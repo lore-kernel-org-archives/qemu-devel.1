@@ -1,25 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59628)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dpAQj-0004qo-SI
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:46:07 -0400
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dpAW4-0000Sd-0Y
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:51:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dpAQe-0003T7-RS
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:46:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36146)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpAQe-0003S2-IU
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:45:56 -0400
-Date: Tue, 5 Sep 2017 10:45:51 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170905094551.GB311@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170905092230.8243-1-berrange@redhat.com>
-	<CAFEAcA92RBgkvKQ-6DGgRFr-bxz_60zbXSuQ1AGtz1eUuX_rYw@mail.gmail.com>
+	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dpAVz-00089b-3f
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:51:32 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:45268
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
+	id 1dpAVy-00089H-Ts
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:51:27 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v859nkHB126743
+	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 05:51:26 -0400
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2csrt0b4d8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 05:51:25 -0400
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
+	Tue, 5 Sep 2017 19:51:22 +1000
+Received: from d23av06.au.ibm.com (d23av06.au.ibm.com [9.190.235.151])
+	by d23relay08.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v859pLZI32374982
+	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 19:51:21 +1000
+Received: from d23av06.au.ibm.com (localhost [127.0.0.1])
+	by d23av06.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v859pKFG003975
+	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 19:51:20 +1000
+References: <1504239778-29893-1-git-send-email-zyimin@linux.vnet.ibm.com>
+	<1504239778-29893-4-git-send-email-zyimin@linux.vnet.ibm.com>
+	<20170905112822.0e9319cd.cohuck@redhat.com>
+From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Date: Tue, 5 Sep 2017 17:51:18 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA92RBgkvKQ-6DGgRFr-bxz_60zbXSuQ1AGtz1eUuX_rYw@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PULL v1 0/9] Merge QEMU I/O 2017/09/05
+In-Reply-To: <20170905112822.0e9319cd.cohuck@redhat.com>
+Content-Type: text/plain; charset=gbk; format=flowed
+Message-Id: <dc1bf02e-aea2-e1ef-904e-dc9949f97651@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] s390x/pci: add iommu replay callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,95 +51,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Knut Omang <knut.omang@oracle.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, richard.henderson@linaro.org
 
-On Tue, Sep 05, 2017 at 10:37:08AM +0100, Peter Maydell wrote:
-> On 5 September 2017 at 10:22, Daniel P. Berrange <berrange@redhat.com> wrote:
-> > The following changes since commit 32f0f68bb77289b75a82925f712bb52e16eac3ba:
-> >
-> >   Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pull-request' into staging (2017-09-01 17:28:54 +0100)
-> >
-> > are available in the git repository at:
-> >
-> >   git://github.com/berrange/qemu tags/pull-qio-20170905-1
-> >
-> > for you to fetch changes up to 33fb97121573985b4a57306b8abdb9dd992061fa:
-> >
-> >   io: fix check for handshake completion in TLS test (2017-09-05 10:20:28 +0100)
-> >
-> > ----------------------------------------------------------------
-> > Merge QEMU I/O 2017/09/05 v1
-> >
-> > ----------------------------------------------------------------
-> 
-> I get a build failure with this I'm afraid:
-> 
-> FreeBSD:
-> /root/qemu/tests/test-listen.c:53:19: error: use of undeclared
-> identifier 'EAI_ADDRFAMILY'
->         if (rc == EAI_ADDRFAMILY ||
->                   ^
 
-Opps, ok, that's an easy fix.
 
-> and test-listen fails on my x86-64 Linux box:
->   GTESTER tests/test-listen
-> ** Failed to assign a port to thread 0 (errno = 98)
-> ** Failed to assign a port to thread 1 (errno = 98)
-> ** Failed to assign a port to thread 2 (errno = 98)
-> ** Failed to assign a port to thread 3 (errno = 98)
-> ** Failed to assign a port to thread 4 (errno = 98)
-> ** Failed to assign a port to thread 5 (errno = 98)
-> ** Failed to assign a port to thread 6 (errno = 98)
-> [snip 7..96 same message]
-> ** Failed to assign a port to thread 97 (errno = 98)
-> ** Failed to assign a port to thread 98 (errno = 98)
-> ** Failed to assign a port to thread 99 (errno = 98)
-> ** Failed to assign a port to thread 100 (errno = 110)
-> ** Failed to assign a port to thread 101 (errno = 110)
-> ** Failed to assign a port to thread 102 (errno = 110)
-> ** Failed to assign a port to thread 103 (errno = 110)
-> [snip more with =110 message]
-> ** Failed to assign a port to thread 198 (errno = 110)
-> ** Failed to assign a port to thread 199 (errno = 110)
-> **
-> ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-listen.c:195:listen_compete_nthr:
-> assertion failed (failed_listens == 0): (200 == 0)
-> GTester: last random seed: R02S501c6ff1c5ff42cf11b1318e0de42bc5
-> 
-> (98 is EADDRINUSE and 110 is ETIMEDOUT I think.)
-> 
-> aarch64 host fails sort of similarly:
-> TEST: tests/test-listen... (pid=12632)
->   /socket/listen-serial/ipv4:                                          OK
->   /socket/listen-serial/ipv6:
-> ** Failed to assign a port to th
-> read 0 (errno = 98)
-> ** Failed to assign a port to thread 1 (errno = 98)
-> ** Failed to assign a port to thread 2 (errno = 98)
-> [snip]
-> ** Failed to assign a port to thread 199 (errno = 98)
-> **
-> ERROR:/home/peter.maydell/qemu/tests/test-listen.c:195:listen_compete_nthr:
-> assertion failed (failed_listens == 0): (200 == 0)
-> FAIL
-> GTester: last random seed: R02Sbd34929fe0b3304c2873c42c94643648
-> (pid=12634)
->   /socket/listen-serial/generic:                                       OK
->   /socket/listen-compete/ipv4:                                         OK
->   /socket/listen-compete/ipv6:                                         OK
->   /socket/listen-compete/generic:                                      OK
-> FAIL: tests/test-listen
-> 
-> except that it's errno 98 all the way through.
-
-Knut,  do you have any thoughts on why Peter would see such failures
-in this test ?
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+=D4=DA 2017/9/5 =CF=C2=CE=E75:28, Cornelia Huck =D0=B4=B5=C0:
+> On Fri,  1 Sep 2017 06:22:58 +0200
+> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+>
+>> Let's introduce iommu replay callback for s390 pci iommu memory region.
+>> Currently we don't need any dma mapping replay. So let it return
+>> directly. This implementation will avoid meaningless loops calling
+>> translation callback.
+>>
+>> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+>> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+>> ---
+>>   hw/s390x/s390-pci-bus.c | 11 +++++++++++
+>>   1 file changed, 11 insertions(+)
+>>
+>> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+>> index bd8a3e1e1c..69f45e3715 100644
+>> --- a/hw/s390x/s390-pci-bus.c
+>> +++ b/hw/s390x/s390-pci-bus.c
+>> @@ -397,6 +397,16 @@ static IOMMUTLBEntry s390_translate_iommu(IOMMUMe=
+moryRegion *mr, hwaddr addr,
+>>       return ret;
+>>   }
+>>  =20
+>> +static void s390_pci_iommu_replay(IOMMUMemoryRegion *iommu,
+>> +                                  IOMMUNotifier *notifier)
+>> +{
+>> +    /* It's impossible to plug a pci device on s390x that already has=
+ iommu
+>> +     * mappings which need to be replayed, that is due to the "one io=
+mmu per
+>> +     * zpci device" construct. So we don't need iommu replay currentl=
+y.
+> I must say that 'currently' still throws me off. Does this refer to
+> vfio? If yes, reword to something like 'Should we support migration of
+> vfio-pci devices in the future, we need to revisit this.'?
+Yeah, it refers to vfio especially. I update this in next version.
+>
+>> +     */
+>> +    return;
+>> +}
+>> +
+>>   static S390PCIIOMMU *s390_pci_get_iommu(S390pciState *s, PCIBus *bus=
+,
+>>                                           int devfn)
+>>   {
+>> @@ -1045,6 +1055,7 @@ static void s390_iommu_memory_region_class_init(=
+ObjectClass *klass, void *data)
+>>       IOMMUMemoryRegionClass *imrc =3D IOMMU_MEMORY_REGION_CLASS(klass=
+);
+>>  =20
+>>       imrc->translate =3D s390_translate_iommu;
+>> +    imrc->replay =3D s390_pci_iommu_replay;
+>>   }
+>>  =20
+>>   static const TypeInfo s390_iommu_memory_region_info =3D {
+>
