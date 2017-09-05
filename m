@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41712)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dp4xz-0001xJ-KV
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 23:56:05 -0400
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dp4y1-0001y4-5V
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 23:56:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dp4xt-0008AG-Qr
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 23:55:59 -0400
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:35381)
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dp4xv-0008C5-ES
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 23:56:01 -0400
+Received: from mail-vk0-x241.google.com ([2607:f8b0:400c:c05::241]:37787)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1dp4xt-00089k-K4
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 23:55:53 -0400
-Received: by mail-vk0-x242.google.com with SMTP id t10so716060vke.2
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 20:55:53 -0700 (PDT)
+	id 1dp4xv-0008Ba-7D
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 23:55:55 -0400
+Received: by mail-vk0-x241.google.com with SMTP id 184so713216vkn.4
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 20:55:55 -0700 (PDT)
 From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Date: Mon,  4 Sep 2017 22:54:55 -0500
-Message-Id: <20170905035457.3753-13-Sergio.G.DelReal@gmail.com>
+Date: Mon,  4 Sep 2017 22:54:56 -0500
+Message-Id: <20170905035457.3753-14-Sergio.G.DelReal@gmail.com>
 In-Reply-To: <20170905035457.3753-1-Sergio.G.DelReal@gmail.com>
 References: <20170905035457.3753-1-Sergio.G.DelReal@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 12/14] hvf: implement vga dirty page tracking
+Subject: [Qemu-devel] [PATCH v3 13/14] hvf: refactor event injection code
+ for hvf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,163 +30,279 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, stefanha@gmail.com, Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 
-This commit implements setting the tracking of dirty pages, using hvf's
-interface to protect guest memory. It uses the MemoryListener callback
-mechanism through .log_start/stop/sync
+This commit refactors the event-injection code for hvf through using the
+appropriate fields already provided by CPUX86State. At vmexit, it fills
+these fields so that hvf_inject_interrupts can just retrieve them without
+calling into hvf.
 
 Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 ---
- include/sysemu/hvf.h  |  5 ++++
- target/i386/hvf-all.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 72 insertions(+), 7 deletions(-)
+ target/i386/cpu.c              |  3 ++
+ target/i386/hvf-all.c          | 57 ++++++++++++++++++++++++++++++++----
+ target/i386/hvf-utils/vmcs.h   |  3 ++
+ target/i386/hvf-utils/vmx.h    |  8 ++++++
+ target/i386/hvf-utils/x86hvf.c | 65 ++++++++++++++++++++----------------------
+ target/i386/kvm.c              |  2 --
+ 6 files changed, 97 insertions(+), 41 deletions(-)
 
-diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
-index 944b014596..43b02be63c 100644
---- a/include/sysemu/hvf.h
-+++ b/include/sysemu/hvf.h
-@@ -34,11 +34,16 @@ uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
- #define hvf_get_supported_cpuid(func, idx, reg) 0
- #endif
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index c6ffd0c928..3b6a42aaa4 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3247,6 +3247,9 @@ static void x86_cpu_reset(CPUState *s)
+     memset(env->mtrr_var, 0, sizeof(env->mtrr_var));
+     memset(env->mtrr_fixed, 0, sizeof(env->mtrr_fixed));
  
-+/* hvf_slot flags */
-+#define HVF_SLOT_LOG (1 << 0)
-+
- typedef struct hvf_slot {
-     uint64_t start;
-     uint64_t size;
-     uint8_t *mem;
-     int slot_id;
-+    uint32_t flags;
-+    MemoryRegion *region;
- } hvf_slot;
- 
- struct hvf_vcpu_caps {
++    env->interrupt_injected = -1;
++    env->exception_injected = -1;
++    env->nmi_injected = false;
+ #if !defined(CONFIG_USER_ONLY)
+     /* We hard-wire the BSP to the first CPU. */
+     apic_designate_bsp(cpu->apic_state, s->cpu_index == 0);
 diff --git a/target/i386/hvf-all.c b/target/i386/hvf-all.c
-index be68c71ea0..5644fa8ae0 100644
+index 5644fa8ae0..8fc6a0b5d1 100644
 --- a/target/i386/hvf-all.c
 +++ b/target/i386/hvf-all.c
-@@ -195,6 +195,7 @@ void hvf_set_phys_mem(MemoryRegionSection *section, bool add)
-     mem->size = int128_get64(section->size);
-     mem->mem = memory_region_get_ram_ptr(area) + section->offset_within_region;
-     mem->start = section->offset_within_address_space;
-+    mem->region = area;
- 
-     if (do_hvf_set_memory(mem)) {
-         error_report("Error registering new memory slot\n");
-@@ -291,8 +292,7 @@ void hvf_cpu_synchronize_post_init(CPUState *cpu_state)
-     run_on_cpu(cpu_state, _hvf_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
+@@ -589,6 +589,55 @@ void hvf_disable(int shouldDisable)
+     hvf_disabled = shouldDisable;
  }
  
--/* TODO: ept fault handlig */
--static bool ept_emulation_fault(uint64_t ept_qual)
-+static bool ept_emulation_fault(hvf_slot *slot, addr_t gpa, uint64_t ept_qual)
- {
-     int read, write;
- 
-@@ -308,6 +308,14 @@ static bool ept_emulation_fault(uint64_t ept_qual)
-         return false;
-     }
- 
-+    if (write && slot) {
-+        if (slot->flags & HVF_SLOT_LOG) {
-+            memory_region_set_dirty(slot->region, gpa - slot->start, 1);
-+            hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
-+                          HV_MEMORY_READ | HV_MEMORY_WRITE);
++static void hvf_store_events(CPUState *cpu, uint32_t ins_len, uint64_t idtvec_info)
++{
++    X86CPU *x86_cpu = X86_CPU(cpu);
++    CPUX86State *env = &x86_cpu->env;
++
++    env->exception_injected = -1;
++    env->interrupt_injected = -1;
++    env->nmi_injected = false;
++    if (idtvec_info & VMCS_IDT_VEC_VALID) {
++        switch (idtvec_info & VMCS_IDT_VEC_TYPE) {
++        case VMCS_IDT_VEC_HWINTR:
++        case VMCS_IDT_VEC_SWINTR:
++            env->interrupt_injected = idtvec_info & VMCS_IDT_VEC_VECNUM;
++            break;
++        case VMCS_IDT_VEC_NMI:
++            env->nmi_injected = true;
++            break;
++        case VMCS_IDT_VEC_HWEXCEPTION:
++        case VMCS_IDT_VEC_SWEXCEPTION:
++            env->exception_injected = idtvec_info & VMCS_IDT_VEC_VECNUM;
++            break;
++        case VMCS_IDT_VEC_PRIV_SWEXCEPTION:
++        default:
++            abort();
++        }
++        if ((idtvec_info & VMCS_IDT_VEC_TYPE) == VMCS_IDT_VEC_SWEXCEPTION ||
++            (idtvec_info & VMCS_IDT_VEC_TYPE) == VMCS_IDT_VEC_SWINTR) {
++            env->ins_len = ins_len;
++        }
++        if (idtvec_info & VMCS_INTR_DEL_ERRCODE) {
++            env->has_error_code = true;
++            env->error_code = rvmcs(cpu->hvf_fd, VMCS_IDT_VECTORING_ERROR);
 +        }
 +    }
++    if ((rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY) &
++        VMCS_INTERRUPTIBILITY_NMI_BLOCKING)) {
++        env->hflags2 |= HF2_NMI_MASK;
++    } else {
++        env->hflags2 &= ~HF2_NMI_MASK;
++    }
++    if (rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY) &
++         (VMCS_INTERRUPTIBILITY_STI_BLOCKING |
++         VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING)) {
++        env->hflags |= HF_INHIBIT_IRQ_MASK;
++    } else {
++        env->hflags &= ~HF_INHIBIT_IRQ_MASK;
++    }
++}
 +
-     /*
-      * The EPT violation must have been caused by accessing a
-      * guest-physical address that is a translation of a guest-linear
-@@ -318,7 +326,59 @@ static bool ept_emulation_fault(uint64_t ept_qual)
-         return false;
+ int hvf_vcpu_exec(CPUState *cpu)
+ {
+     X86CPU *x86_cpu = X86_CPU(cpu);
+@@ -608,11 +657,6 @@ int hvf_vcpu_exec(CPUState *cpu)
+             cpu->vcpu_dirty = false;
+         }
+ 
+-        env->hvf_emul->interruptable =
+-            !(rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY) &
+-             (VMCS_INTERRUPTIBILITY_STI_BLOCKING |
+-             VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING));
+-
+         hvf_inject_interrupts(cpu);
+         vmx_update_tpr(cpu);
+ 
+@@ -631,7 +675,10 @@ int hvf_vcpu_exec(CPUState *cpu)
+         uint64_t exit_qual = rvmcs(cpu->hvf_fd, VMCS_EXIT_QUALIFICATION);
+         uint32_t ins_len = (uint32_t)rvmcs(cpu->hvf_fd,
+                                            VMCS_EXIT_INSTRUCTION_LENGTH);
++
+         uint64_t idtvec_info = rvmcs(cpu->hvf_fd, VMCS_IDT_VECTORING_INFO);
++
++        hvf_store_events(cpu, ins_len, idtvec_info);
+         rip = rreg(cpu->hvf_fd, HV_X86_RIP);
+         RFLAGS(env) = rreg(cpu->hvf_fd, HV_X86_RFLAGS);
+         env->eflags = RFLAGS(env);
+diff --git a/target/i386/hvf-utils/vmcs.h b/target/i386/hvf-utils/vmcs.h
+index c410dcfaaa..0fae73dce5 100644
+--- a/target/i386/hvf-utils/vmcs.h
++++ b/target/i386/hvf-utils/vmcs.h
+@@ -299,6 +299,7 @@
+ /*
+  * VMCS IDT-Vectoring information fields
+  */
++#define VMCS_IDT_VEC_VECNUM 0xFF
+ #define VMCS_IDT_VEC_VALID (1U << 31)
+ #define VMCS_IDT_VEC_TYPE 0x700
+ #define VMCS_IDT_VEC_ERRCODE_VALID (1U << 11)
+@@ -306,6 +307,8 @@
+ #define VMCS_IDT_VEC_NMI (2 << 8)
+ #define VMCS_IDT_VEC_HWEXCEPTION (3 << 8)
+ #define VMCS_IDT_VEC_SWINTR (4 << 8)
++#define VMCS_IDT_VEC_PRIV_SWEXCEPTION (5 << 8)
++#define VMCS_IDT_VEC_SWEXCEPTION (6 << 8)
+ 
+ /*
+  * VMCS Guest interruptibility field
+diff --git a/target/i386/hvf-utils/vmx.h b/target/i386/hvf-utils/vmx.h
+index 44a5c6d554..102075d0d4 100644
+--- a/target/i386/hvf-utils/vmx.h
++++ b/target/i386/hvf-utils/vmx.h
+@@ -181,6 +181,10 @@ static inline void macvm_set_rip(CPUState *cpu, uint64_t rip)
+ 
+ static inline void vmx_clear_nmi_blocking(CPUState *cpu)
+ {
++    X86CPU *x86_cpu = X86_CPU(cpu);
++    CPUX86State *env = &x86_cpu->env;
++
++    env->hflags2 &= ~HF2_NMI_MASK;
+     uint32_t gi = (uint32_t) rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY);
+     gi &= ~VMCS_INTERRUPTIBILITY_NMI_BLOCKING;
+     wvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY, gi);
+@@ -188,6 +192,10 @@ static inline void vmx_clear_nmi_blocking(CPUState *cpu)
+ 
+ static inline void vmx_set_nmi_blocking(CPUState *cpu)
+ {
++    X86CPU *x86_cpu = X86_CPU(cpu);
++    CPUX86State *env = &x86_cpu->env;
++
++    env->hflags2 |= HF2_NMI_MASK;
+     uint32_t gi = (uint32_t)rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY);
+     gi |= VMCS_INTERRUPTIBILITY_NMI_BLOCKING;
+     wvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY, gi);
+diff --git a/target/i386/hvf-utils/x86hvf.c b/target/i386/hvf-utils/x86hvf.c
+index dd0710d056..83eb3be065 100644
+--- a/target/i386/hvf-utils/x86hvf.c
++++ b/target/i386/hvf-utils/x86hvf.c
+@@ -356,50 +356,47 @@ void vmx_clear_int_window_exiting(CPUState *cpu)
+ 
+ void hvf_inject_interrupts(CPUState *cpu_state)
+ {
+-    int allow_nmi = !(rvmcs(cpu_state->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY) &
+-                VMCS_INTERRUPTIBILITY_NMI_BLOCKING);
+     X86CPU *x86cpu = X86_CPU(cpu_state);
+     CPUX86State *env = &x86cpu->env;
+ 
+-    uint64_t idt_info = rvmcs(cpu_state->hvf_fd, VMCS_IDT_VECTORING_INFO);
++    uint8_t vector;
++    uint64_t intr_type;
++    bool have_event = true;
++    if (env->interrupt_injected != -1) {
++        vector = env->interrupt_injected;
++        intr_type = VMCS_INTR_T_SWINTR;
++    } else if (env->exception_injected != -1) {
++        vector = env->exception_injected;
++        if (vector == EXCP03_INT3 || vector == EXCP04_INTO) {
++            intr_type = VMCS_INTR_T_SWEXCEPTION;
++        } else {
++            intr_type = VMCS_INTR_T_HWEXCEPTION;
++        }
++    } else if (env->nmi_injected) {
++        vector = NMI_VEC;
++        intr_type = VMCS_INTR_T_NMI;
++    } else {
++        have_event = false;
++    }
++
+     uint64_t info = 0;
+-    
+-    if (idt_info & VMCS_IDT_VEC_VALID) {
+-        uint8_t vector = idt_info & 0xff;
+-        uint64_t intr_type = idt_info & VMCS_INTR_T_MASK;
+-        info = idt_info;
+-        
++    if (have_event) {
++        info = vector | intr_type | VMCS_INTR_VALID;
+         uint64_t reason = rvmcs(cpu_state->hvf_fd, VMCS_EXIT_REASON);
+-        if (intr_type == VMCS_INTR_T_NMI && reason != EXIT_REASON_TASK_SWITCH) {
+-            allow_nmi = 1;
++        if (env->nmi_injected && reason != EXIT_REASON_TASK_SWITCH) {
+             vmx_clear_nmi_blocking(cpu_state);
+         }
+-        
+-        if ((allow_nmi || intr_type != VMCS_INTR_T_NMI)) {
++
++        if (!(env->hflags2 & HF2_NMI_MASK) || intr_type != VMCS_INTR_T_NMI) {
+             info &= ~(1 << 12); /* clear undefined bit */
+             if (intr_type == VMCS_INTR_T_SWINTR ||
+-                intr_type == VMCS_INTR_T_PRIV_SWEXCEPTION ||
+                 intr_type == VMCS_INTR_T_SWEXCEPTION) {
+-                uint64_t ins_len = rvmcs(cpu_state->hvf_fd,
+-                                         VMCS_EXIT_INSTRUCTION_LENGTH);
+-                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INST_LENGTH, ins_len);
+-            }
+-            if (vector == EXCEPTION_BP || vector == EXCEPTION_OF) {
+-                /*
+-                 * VT-x requires #BP and #OF to be injected as software
+-                 * exceptions.
+-                 */
+-                info &= ~VMCS_INTR_T_MASK;
+-                info |= VMCS_INTR_T_SWEXCEPTION;
+-                uint64_t ins_len = rvmcs(cpu_state->hvf_fd,
+-                                         VMCS_EXIT_INSTRUCTION_LENGTH);
+-                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INST_LENGTH, ins_len);
++                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INST_LENGTH, env->ins_len);
+             }
+             
+-            uint64_t err = 0;
+-            if (idt_info & VMCS_INTR_DEL_ERRCODE) {
+-                err = rvmcs(cpu_state->hvf_fd, VMCS_IDT_VECTORING_ERROR);
+-                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_EXCEPTION_ERROR, err);
++            if (env->has_error_code) {
++                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_EXCEPTION_ERROR,
++                      env->error_code);
+             }
+             /*printf("reinject  %lx err %d\n", info, err);*/
+             wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INTR_INFO, info);
+@@ -407,7 +404,7 @@ void hvf_inject_interrupts(CPUState *cpu_state)
      }
  
--    return true;
-+    return !slot;
-+}
-+
-+static void hvf_set_dirty_tracking(MemoryRegionSection *section, bool on)
-+{
-+    struct mac_slot *macslot;
-+    hvf_slot *slot;
-+
-+    slot = hvf_find_overlap_slot(
-+            section->offset_within_address_space,
-+            section->offset_within_address_space + int128_get64(section->size));
-+
-+    /* protect region against writes; begin tracking it */
-+    if (on) {
-+        slot->flags |= HVF_SLOT_LOG;
-+        hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
-+                      HV_MEMORY_READ);
-+    /* stop tracking region*/
-+    } else {
-+        slot->flags &= ~HVF_SLOT_LOG;
-+        hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
-+                      HV_MEMORY_READ | HV_MEMORY_WRITE);
-+    }
-+}
-+
-+static void hvf_log_start(MemoryListener *listener,
-+                          MemoryRegionSection *section, int old, int new)
-+{
-+    if (old != 0) {
-+        return;
-+    }
-+
-+    hvf_set_dirty_tracking(section, 1);
-+}
-+
-+static void hvf_log_stop(MemoryListener *listener,
-+                         MemoryRegionSection *section, int old, int new)
-+{
-+    if (new != 0) {
-+        return;
-+    }
-+
-+    hvf_set_dirty_tracking(section, 0);
-+}
-+
-+static void hvf_log_sync(MemoryListener *listener,
-+                         MemoryRegionSection *section)
-+{
-+    /*
-+     * sync of dirty pages is handled elsewhere; just make sure we keep
-+     * tracking the region.
-+     */
-+    hvf_set_dirty_tracking(section, 1);
- }
- 
- static void hvf_region_add(MemoryListener *listener,
-@@ -337,6 +397,9 @@ static MemoryListener hvf_memory_listener = {
-     .priority = 10,
-     .region_add = hvf_region_add,
-     .region_del = hvf_region_del,
-+    .log_start = hvf_log_start,
-+    .log_stop = hvf_log_stop,
-+    .log_sync = hvf_log_sync,
- };
- 
- void vmx_reset_vcpu(CPUState *cpu) {
-@@ -609,7 +672,7 @@ int hvf_vcpu_exec(CPUState *cpu)
- 
-             slot = hvf_find_overlap_slot(gpa, gpa);
-             /* mmio */
--            if (ept_emulation_fault(exit_qual) && !slot) {
-+            if (ept_emulation_fault(slot, gpa, exit_qual)) {
-                 struct x86_decode decode;
- 
-                 load_regs(cpu);
-@@ -620,9 +683,6 @@ int hvf_vcpu_exec(CPUState *cpu)
-                 store_regs(cpu);
-                 break;
-             }
--#ifdef DIRTY_VGA_TRACKING
--            /* TODO: handle dirty page tracking */
--#endif
-             break;
+     if (cpu_state->interrupt_request & CPU_INTERRUPT_NMI) {
+-        if (allow_nmi && !(info & VMCS_INTR_VALID)) {
++        if (!(env->hflags2 & HF2_NMI_MASK) && !(info & VMCS_INTR_VALID)) {
+             cpu_state->interrupt_request &= ~CPU_INTERRUPT_NMI;
+             info = VMCS_INTR_VALID | VMCS_INTR_T_NMI | NMI_VEC;
+             wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INTR_INFO, info);
+@@ -416,7 +413,7 @@ void hvf_inject_interrupts(CPUState *cpu_state)
          }
-         case EXIT_REASON_INOUT:
+     }
+ 
+-    if (env->hvf_emul->interruptable &&
++    if (!(env->hflags & HF_INHIBIT_IRQ_MASK) &&
+         (cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
+         (EFLAGS(env) & IF_MASK) && !(info & VMCS_INTR_VALID)) {
+         int line = cpu_get_pic_interrupt(&x86cpu->env);
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 6db7783edc..a695b8cd4e 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1030,8 +1030,6 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
+ {
+     CPUX86State *env = &cpu->env;
+ 
+-    env->exception_injected = -1;
+-    env->interrupt_injected = -1;
+     env->xcr0 = 1;
+     if (kvm_irqchip_in_kernel()) {
+         env->mp_state = cpu_is_bsp(cpu) ? KVM_MP_STATE_RUNNABLE :
 -- 
 2.14.1
