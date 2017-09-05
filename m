@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41393)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dp4xS-0001YJ-4N
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dp4xS-0001YI-1m
 	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 23:55:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dp4xN-0007dd-21
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dp4xM-0007dQ-Uy
 	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 23:55:26 -0400
-Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:35027)
+Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:37863)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1dp4xM-0007dF-SA
+	id 1dp4xM-0007cg-P8
 	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 23:55:20 -0400
-Received: by mail-ua0-x243.google.com with SMTP id g47so847543uad.2
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 20:55:20 -0700 (PDT)
+Received: by mail-ua0-x243.google.com with SMTP id q29so835146uaf.4
+	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 20:55:19 -0700 (PDT)
 From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Date: Mon,  4 Sep 2017 22:54:44 -0500
-Message-Id: <20170905035457.3753-2-Sergio.G.DelReal@gmail.com>
-In-Reply-To: <20170905035457.3753-1-Sergio.G.DelReal@gmail.com>
-References: <20170905035457.3753-1-Sergio.G.DelReal@gmail.com>
-Subject: [Qemu-devel] [PATCH v3 01/14] hvf: add support for
- Hypervisor.framework in the configure script
+Date: Mon,  4 Sep 2017 22:54:43 -0500
+Message-Id: <20170905035457.3753-1-Sergio.G.DelReal@gmail.com>
+Subject: [Qemu-devel] [PATCH v3 00/14] add support for Hypervisor.framework
+ in QEMU
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,162 +28,130 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, stefanha@gmail.com, Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 
-This patch adds to the configure script the code to support the
---enable-hvf argument. If the OS is Darwin, it checks for presence of
-HVF in the system. The patch also adds strings related to HVF in the
-file qemu-options.hx.
-QEMU will only support the modern syntax style '-M accel=hvf' no enable
-hvf; the legacy '-enable-hvf' will not be supported.
+================
+Changes in v3:
+ (1) Fixed licensing issues in patch 3.
+ (2) Revert to late adding of compilation rules in Makefile.objs (patch 8/14);
+     files aren't ready to compile earlier.
+ (3) Make a single patch just for fixing style (patch 4/14).
+ (4) Fix data type for hvf_fd field.
+ (5) Add comment that return value of -1 in apic function added in 7/14 means
+     "no interrupt".
+================
 
-Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
----
- configure       | 38 ++++++++++++++++++++++++++++++++++++++
- qemu-options.hx | 10 +++++-----
- 2 files changed, 43 insertions(+), 5 deletions(-)
+================
+Changes in v2:
+ (1) Removed legacy option "-enable-hvf" in favor of "-M accel=hvf"
+ (2) Added missing copyright headers; replace fprintfs for error_report;
+     improved commit description.
+ (3) Moved patch that adds compilation rules in Makefile.objs right after
+     the patch that adds the new files from Google's repo.
+ (4) Removed conditional macros from cpus.c and cpu.c
+ (5) Moved patch that fixes coding style to patch # 3
+ (6) Fix commit message in apic patch
+ (7) Squash some commits to avoid code churn
+================
 
-diff --git a/configure b/configure
-index dd73cce62f..5d9152b80a 100755
---- a/configure
-+++ b/configure
-@@ -211,6 +211,17 @@ supported_xen_target() {
-     return 1
- }
- 
-+supported_hvf_target() {
-+    test "$hvf" = "yes" || return 1
-+    glob "$1" "*-softmmu" || return 1
-+    case "${1%-softmmu}" in
-+        x86_64)
-+            return 0
-+        ;;
-+    esac
-+    return 1
-+}
-+
- supported_target() {
-     case "$1" in
-         *-softmmu)
-@@ -236,6 +247,7 @@ supported_target() {
-     supported_kvm_target "$1" && return 0
-     supported_xen_target "$1" && return 0
-     supported_hax_target "$1" && return 0
-+    supported_hvf_target "$1" && return 0
-     print_error "TCG disabled, but hardware accelerator not available for '$target'"
-     return 1
- }
-@@ -309,6 +321,7 @@ vhost_vsock="no"
- vhost_user=""
- kvm="no"
- hax="no"
-+hvf="no"
- rdma=""
- gprof="no"
- debug_tcg="no"
-@@ -727,6 +740,7 @@ Darwin)
-   bsd="yes"
-   darwin="yes"
-   hax="yes"
-+  hvf="yes"
-   LDFLAGS_SHARED="-bundle -undefined dynamic_lookup"
-   if [ "$cpu" = "x86_64" ] ; then
-     QEMU_CFLAGS="-arch x86_64 $QEMU_CFLAGS"
-@@ -1027,6 +1041,10 @@ for opt do
-   ;;
-   --enable-hax) hax="yes"
-   ;;
-+  --disable-hvf) hvf="no"
-+  ;;
-+  --enable-hvf) hvf="yes"
-+  ;;
-   --disable-tcg-interpreter) tcg_interpreter="no"
-   ;;
-   --enable-tcg-interpreter) tcg_interpreter="yes"
-@@ -1499,6 +1517,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   bluez           bluez stack connectivity
-   kvm             KVM acceleration support
-   hax             HAX acceleration support
-+  hvf             Hypervisor.framework acceleration support
-   rdma            RDMA-based migration support
-   vde             support for vde network
-   netmap          support for netmap network
-@@ -4900,6 +4919,21 @@ then
- fi
- 
- 
-+#################################################
-+# Check to see if we have the Hypervisor framework
-+if [ "$darwin" == "yes" ] ; then
-+  cat > $TMPC << EOF
-+#include <Hypervisor/hv.h>
-+int main() { return 0;}
-+EOF
-+  if ! compile_object ""; then
-+    hvf='no'
-+  else
-+    hvf='yes'
-+    LDFLAGS="-framework Hypervisor $LDFLAGS"
-+  fi
-+fi
-+
- #################################################
- # Sparc implicitly links with --relax, which is
- # incompatible with -r, so --no-relax should be
-@@ -5356,6 +5390,7 @@ if test "$tcg" = "yes" ; then
-     echo "TCG debug enabled $debug_tcg"
-     echo "TCG interpreter   $tcg_interpreter"
- fi
-+echo "HVF support       $hvf"
- echo "RDMA support      $rdma"
- echo "fdt support       $fdt"
- echo "preadv support    $preadv"
-@@ -6388,6 +6423,9 @@ fi
- if supported_hax_target $target; then
-     echo "CONFIG_HAX=y" >> $config_target_mak
- fi
-+if supported_hvf_target $target; then
-+    echo "CONFIG_HVF=y" >> $config_target_mak
-+fi
- if test "$target_bigendian" = "yes" ; then
-   echo "TARGET_WORDS_BIGENDIAN=y" >> $config_target_mak
- fi
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 9f6e2adfff..bcb44420ee 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -31,7 +31,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "-machine [type=]name[,prop[=value][,...]]\n"
-     "                selects emulated machine ('-machine help' for list)\n"
-     "                property accel=accel1[:accel2[:...]] selects accelerator\n"
--    "                supported accelerators are kvm, xen, hax or tcg (default: tcg)\n"
-+    "                supported accelerators are kvm, xen, hax, hvf or tcg (default: tcg)\n"
-     "                kernel_irqchip=on|off|split controls accelerated irqchip support (default=off)\n"
-     "                vmport=on|off|auto controls emulation of vmport (default: auto)\n"
-     "                kvm_shadow_mem=size of KVM shadow MMU in bytes\n"
-@@ -66,7 +66,7 @@ Supported machine properties are:
- @table @option
- @item accel=@var{accels1}[:@var{accels2}[:...]]
- This is used to enable an accelerator. Depending on the target architecture,
--kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
-+kvm, xen, hax, hvf or tcg can be available. By default, tcg is used. If there is
- more than one accelerator specified, the next one is used if the previous one
- fails to initialize.
- @item kernel_irqchip=on|off
-@@ -120,13 +120,13 @@ ETEXI
- 
- DEF("accel", HAS_ARG, QEMU_OPTION_accel,
-     "-accel [accel=]accelerator[,thread=single|multi]\n"
--    "                select accelerator (kvm, xen, hax or tcg; use 'help' for a list)\n"
--    "                thread=single|multi (enable multi-threaded TCG)\n", QEMU_ARCH_ALL)
-+    "                select accelerator (kvm, xen, hax, hvf or tcg; use 'help' for a list)\n"
-+    "                thread=single|multi (enable multi-threaded TCG)", QEMU_ARCH_ALL)
- STEXI
- @item -accel @var{name}[,prop=@var{value}[,...]]
- @findex -accel
- This is used to enable an accelerator. Depending on the target architecture,
--kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
-+kvm, xen, hax, hvf or tcg can be available. By default, tcg is used. If there is
- more than one accelerator specified, the next one is used if the previous one
- fails to initialize.
- @table @option
+The following patchset adds to QEMU the supporting for macOS's native
+hypervisor, Hypervisor.framework (hvf). The code base is taken from
+Google's Android emulator at
+https://android.googlesource.com/platform/external/qemu/+/emu-master-dev.
+
+Apart from general code refactoring, some additional features were implemented:
+retrieve the set of features supported by host cpu and hvf (cpuid);
+dirty page tracking for VGA memory area; reimplementation of the event
+injection mechanism to allow injection of exceptions during vmexits, which is
+exemplified by the injection of a GP fault when the guest vmexits due to
+execution of the vmcall instruction; changing the emulator's use of CPUState
+structure in favor of CPUX86State, so as to in the future remove data structures
+that are uselessly specific to hvf and unified some of the state between kvm/tcg
+and hvf.
+Some features initially planned to implement that didn't make it include:
+page fault handling in the emulator and implementing the dummy_signal to handle
+the SIG_IPI signal without race conditions. Hopefully these can be implemented
+in the near future.
+
+Sergio Andres Gomez Del Real (14):
+  hvf: add support for Hypervisor.framework in the configure script
+  hvf: add code base from Google's QEMU repository
+  hvf: fix licensing issues; isolate task handling code (GPL v2-only)
+  hvf: run hvf code through checkpatch.pl and fix style issues
+  hvf: add code to cpus.c and do refactoring in preparation for
+    compiling
+  hvf: handle fields from CPUState and CPUX86State
+  apic: add function to apic that will be used by hvf
+  hvf: add compilation rules to Makefile.objs
+  hvf: use new helper functions for put/get xsave
+  hvf: implement hvf_get_supported_cpuid
+  hvf: refactor cpuid code
+  hvf: implement vga dirty page tracking
+  hvf: refactor event injection code for hvf
+  hvf: inject General Protection Fault when vmexit through vmcall
+
+ configure                           |   38 +
+ cpus.c                              |   86 ++
+ hw/intc/apic.c                      |   12 +
+ include/hw/i386/apic.h              |    1 +
+ include/qom/cpu.h                   |    2 +
+ include/sysemu/hvf.h                |  107 ++
+ qemu-options.hx                     |   10 +-
+ target/i386/Makefile.objs           |    1 +
+ target/i386/cpu-qom.h               |    4 +-
+ target/i386/cpu.c                   |   79 +-
+ target/i386/cpu.h                   |   38 +-
+ target/i386/hvf-all.c               |  963 +++++++++++++++
+ target/i386/hvf-i386.h              |   48 +
+ target/i386/hvf-utils/Makefile.objs |    1 +
+ target/i386/hvf-utils/README.md     |    7 +
+ target/i386/hvf-utils/vmcs.h        |  371 ++++++
+ target/i386/hvf-utils/vmx.h         |  222 ++++
+ target/i386/hvf-utils/x86.c         |  184 +++
+ target/i386/hvf-utils/x86.h         |  476 ++++++++
+ target/i386/hvf-utils/x86_cpuid.c   |  417 +++++++
+ target/i386/hvf-utils/x86_cpuid.h   |   52 +
+ target/i386/hvf-utils/x86_decode.c  | 2186 +++++++++++++++++++++++++++++++++++
+ target/i386/hvf-utils/x86_decode.h  |  325 ++++++
+ target/i386/hvf-utils/x86_descr.c   |  124 ++
+ target/i386/hvf-utils/x86_descr.h   |   55 +
+ target/i386/hvf-utils/x86_emu.c     | 1536 ++++++++++++++++++++++++
+ target/i386/hvf-utils/x86_emu.h     |   49 +
+ target/i386/hvf-utils/x86_flags.c   |  333 ++++++
+ target/i386/hvf-utils/x86_flags.h   |  243 ++++
+ target/i386/hvf-utils/x86_gen.h     |   53 +
+ target/i386/hvf-utils/x86_mmu.c     |  273 +++++
+ target/i386/hvf-utils/x86_mmu.h     |   45 +
+ target/i386/hvf-utils/x86_task.c    |  201 ++++
+ target/i386/hvf-utils/x86_task.h    |   18 +
+ target/i386/hvf-utils/x86hvf.c      |  463 ++++++++
+ target/i386/hvf-utils/x86hvf.h      |   39 +
+ target/i386/kvm.c                   |    2 -
+ 37 files changed, 9031 insertions(+), 33 deletions(-)
+ create mode 100644 include/sysemu/hvf.h
+ create mode 100644 target/i386/hvf-all.c
+ create mode 100644 target/i386/hvf-i386.h
+ create mode 100644 target/i386/hvf-utils/Makefile.objs
+ create mode 100644 target/i386/hvf-utils/README.md
+ create mode 100644 target/i386/hvf-utils/vmcs.h
+ create mode 100644 target/i386/hvf-utils/vmx.h
+ create mode 100644 target/i386/hvf-utils/x86.c
+ create mode 100644 target/i386/hvf-utils/x86.h
+ create mode 100644 target/i386/hvf-utils/x86_cpuid.c
+ create mode 100644 target/i386/hvf-utils/x86_cpuid.h
+ create mode 100644 target/i386/hvf-utils/x86_decode.c
+ create mode 100644 target/i386/hvf-utils/x86_decode.h
+ create mode 100644 target/i386/hvf-utils/x86_descr.c
+ create mode 100644 target/i386/hvf-utils/x86_descr.h
+ create mode 100644 target/i386/hvf-utils/x86_emu.c
+ create mode 100644 target/i386/hvf-utils/x86_emu.h
+ create mode 100644 target/i386/hvf-utils/x86_flags.c
+ create mode 100644 target/i386/hvf-utils/x86_flags.h
+ create mode 100644 target/i386/hvf-utils/x86_gen.h
+ create mode 100644 target/i386/hvf-utils/x86_mmu.c
+ create mode 100644 target/i386/hvf-utils/x86_mmu.h
+ create mode 100644 target/i386/hvf-utils/x86_task.c
+ create mode 100644 target/i386/hvf-utils/x86_task.h
+ create mode 100644 target/i386/hvf-utils/x86hvf.c
+ create mode 100644 target/i386/hvf-utils/x86hvf.h
+
 -- 
 2.14.1
