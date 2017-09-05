@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50144)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dp42Y-0004vZ-3O
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:56:42 -0400
+	(envelope-from <famz@redhat.com>) id 1dp42e-0004zn-O7
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:56:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dp42T-0003P4-Lb
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:56:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52576)
+	(envelope-from <famz@redhat.com>) id 1dp42a-0003QU-BA
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:56:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52688)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dp42T-0003Of-Fg
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:56:33 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dp42a-0003QN-4x
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:56:40 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue,  5 Sep 2017 10:56:11 +0800
-Message-Id: <20170905025614.579-4-famz@redhat.com>
+Date: Tue,  5 Sep 2017 10:56:12 +0800
+Message-Id: <20170905025614.579-5-famz@redhat.com>
 In-Reply-To: <20170905025614.579-1-famz@redhat.com>
 References: <20170905025614.579-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 3/6] docker: Use unconfined security profile
+Subject: [Qemu-devel] [PATCH v4 4/6] docker: Add nettle-devel to fedora image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +26,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, kchamart@redhat.com, eblake@redhat.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-Some by default blocked syscalls are required to run tests for example
-userfaultfd.
+The LUKS cases in qemu-iotests requires this.
 
 Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/docker/Makefile.include | 1 +
+ tests/docker/dockerfiles/fedora.docker | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index 7a027d5bd6..168198e026 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -134,6 +134,7 @@ docker-run: docker-qemu-src
- 	$(call quiet-command,						\
- 		$(SRC_PATH)/tests/docker/docker.py run 			\
- 			$(if $(NOUSER),,-u $(shell id -u)) -t 		\
-+			--security-opt seccomp=unconfined		\
- 			$(if $V,,--rm) 					\
- 			$(if $(DEBUG),-i,)				\
- 			$(if $(NETWORK),$(if $(subst $(NETWORK),,1),--net=$(NETWORK)),--net=none) \
+diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
+index 4eaa8ed2a5..27e8201c54 100644
+--- a/tests/docker/dockerfiles/fedora.docker
++++ b/tests/docker/dockerfiles/fedora.docker
+@@ -3,6 +3,7 @@ ENV PACKAGES \
+     ccache git tar PyYAML sparse flex bison python2 bzip2 hostname \
+     glib2-devel pixman-devel zlib-devel SDL-devel libfdt-devel \
+     gcc gcc-c++ clang make perl which bc findutils libaio-devel \
++    nettle-devel \
+     mingw32-pixman mingw32-glib2 mingw32-gmp mingw32-SDL mingw32-pkg-config \
+     mingw32-gtk2 mingw32-gtk3 mingw32-gnutls mingw32-nettle mingw32-libtasn1 \
+     mingw32-libjpeg-turbo mingw32-libpng mingw32-curl mingw32-libssh2 \
 -- 
 2.13.5
