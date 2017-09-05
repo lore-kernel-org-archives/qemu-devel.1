@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44976)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47780)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dp3j2-0008DR-3G
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:36:32 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dp3sQ-00025n-5D
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:46:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dp3ix-0007tu-D7
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:36:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39804)
+	(envelope-from <jasowang@redhat.com>) id 1dp3sL-0005sj-KV
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:46:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42050)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dp3ix-0007sv-3f
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:36:23 -0400
-References: <cover.1504533674.git.maozy.fnst@cn.fujitsu.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dp3sL-0005sE-Dw
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:46:05 -0400
+References: <20170903163726.16541-1-n54@gmx.com>
+	<20170904072353.GA19748@lemon.lan>
+	<17D7366F-5413-4A0B-B984-33ED480A9A3C@daynix.com>
+	<8c58f1f4-28e2-59e8-e8e6-fa09d546dbca@gmx.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <0dbfac40-b8e4-9e13-78ee-6be038db8c4e@redhat.com>
-Date: Tue, 5 Sep 2017 10:36:01 +0800
+Message-ID: <1b66ecda-fbe2-91de-6b7e-a6c2d407a421@redhat.com>
+Date: Tue, 5 Sep 2017 10:45:56 +0800
 MIME-Version: 1.0
-In-Reply-To: <cover.1504533674.git.maozy.fnst@cn.fujitsu.com>
+In-Reply-To: <8c58f1f4-28e2-59e8-e8e6-fa09d546dbca@gmx.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v9 0/4] Improve error reporting
+Subject: Re: [Qemu-devel] [PATCH] e1000: Rename the SEC symbol to SEQEC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,98 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, eblake@redhat.com
+To: Kamil Rytarowski <n54@gmx.com>, Dmitry Fleytman <dmitry@daynix.com>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Jonathan Perkin <jperkin@joyent.com>
 
 
 
-On 2017=E5=B9=B409=E6=9C=8804=E6=97=A5 22:35, Mao Zhongyi wrote:
-> v9:
-> * -rebase on upstream
->    -fix the commit message of patch04
+On 2017=E5=B9=B409=E6=9C=8805=E6=97=A5 07:51, Kamil Rytarowski wrote:
+> Please put it on a pull-request queue. I don't maintain one myself.
 >
-> v8:
-> * PATCH 02 & 04
->    -resetting the error message for the user to read.   [Markus Armbrus=
-ter]
->    -fix the indentation and commit message.  [Markus Armbruster]
->   =20
-> v7:
-> * PATCH 01
->    -fix the error message.    [Daniel P. Berrange]
->    -adjust the indentation problem.    [Eric Blake]
-> * PATCH 03
->    -print a generic message when gethostbyname() failed in parse_host_p=
-ort(),
->     drop the misleading ": unkonwn host" part.    [Markus Armbruster]
->
-> v6:
-> * PATCH 02
->    -rename the subject
->    -drop the "qemu: error: " prefix.
->    -correct inappropriate error information settings.
-> * PATCH 03,04
->    -correct inappropriate error information settings.    [Markus Armbru=
-ster]
->
-> v5:
-> * PATCH 01 make the commit message more exact about the actual function=
-.    [Markus Armbruster]
-> * PATCH 02, 03, 04 still retains the original function, but specific
->             content and order of each patch has been adjusted substanti=
-ally,
->             so that ensure each patch is a completed fix.    [Markus Ar=
-mbruster]
->
-> v4:
-> * PATCH 01 is redoing previous patch 1, replace the fprintf() with erro=
-r_report()
-> 		     in the 'default' case of net_socket_fd_init() [Markus Armbruster=
-]
->
-> v3:
-> * PATCH 01 is suggested by Markus and Daniel that removes the dubious '=
-default' case
->             in the net_socket_fd_init(). Jason agreed.
-> * PATCH 02 is redoing previous patch 4.
-> * PATCH 04 is redoing previous patch 2, improves sort of error messages=
-.
->
-> v2:
-> * PATCH 02 reworking of patch 2 following Markus's suggestion that conv=
-ert error_report()
->             in the function called by net_socket_*_init() to Error. Als=
-o add many error
->             handling information.
-> * PATCH 03 net_socket_mcast_create(), net_socket_fd_init_dgram() and ne=
-t_socket_fd_init()
->             use the function such as fprintf, perror to report an error=
- message. Convert it
->             to Error.
-> * PATCH 04 parse_host_port() may fail without reporting an error. Now, =
-fix it to set an
->             error when it fails.
->
-> Cc: jasowang@redhat.com
-> Cc: armbru@redhat.com
-> Cc: berrange@redhat.com
-> Cc: kraxel@redhat.com
-> Cc: pbonzini@redhat.com
-> Cc: eblake@redhat.com
->
-> Mao Zhongyi (4):
->    net/socket: Don't treat odd socket type as SOCK_STREAM
->    net/socket: Convert several helper functions to Error
->    net/net: Convert parse_host_port() to Error
->    net/socket: Improve -net socket error reporting
->
->   include/qemu/sockets.h |   3 +-
->   net/net.c              |  22 +++++--
->   net/socket.c           | 156 ++++++++++++++++++++++++++++------------=
----------
->   3 files changed, 108 insertions(+), 73 deletions(-)
->
+> On 04.09.2017 09:29, Dmitry Fleytman wrote:
+>> Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
+>>
+>>> On 4 Sep 2017, at 10:23 AM, Fam Zheng <famz@redhat.com> wrote:
+>>>
+>>> On Sun, 09/03 18:37, Kamil Rytarowski wrote:
+>>>> SunOS defines SEC in <sys/time.h> as 1 (commonly used time symbols).
+>>>>
+>>>> This fixes build on SmartOS (Joyent).
+>>>>
+>>>> Patch cherry-picked from pkgsrc by jperkin (Joyent).
+>>>>
+>>>> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+>>> Cc Jason Wang (net maintainer).
+>>>
+>>> Fam
 
-Applied.
+Applied, will be in next pull request.
 
 Thanks
