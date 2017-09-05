@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60383)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dpDBU-0006sK-O8
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:42:33 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dpDCn-0007u0-3Q
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:43:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dpDBQ-0002AM-70
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:42:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59294)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dpDBQ-00029r-0y
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:42:24 -0400
-References: <20170904154316.4148-1-david@redhat.com>
-	<20170904154316.4148-9-david@redhat.com>
-	<20170905143801.1dc39cb1.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <e4ed534e-6eef-30ea-6359-0b535f483cc3@redhat.com>
-Date: Tue, 5 Sep 2017 14:42:19 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1dpDCi-00035G-90
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:43:49 -0400
+Received: from mail-oi0-f41.google.com ([209.85.218.41]:36654)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dpDCi-00034T-3D
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:43:44 -0400
+Received: by mail-oi0-f41.google.com with SMTP id x190so8032784oix.3
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 05:43:43 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170905143801.1dc39cb1.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 08/19] s390x: move sclp_service_call()
- to interrupt.c
+In-Reply-To: <2ad3ad60-1f03-4585-45e1-d12ab593008f@redhat.com>
+References: <20170901180340.30009-1-eblake@redhat.com>
+	<20170901180340.30009-17-eblake@redhat.com>
+	<2ad3ad60-1f03-4585-45e1-d12ab593008f@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 5 Sep 2017 14:43:41 +0200
+Message-ID: <CABgObfYCUmUO8oTp3oM56t1d9cX-t7FdRTE4e5SaDVqp4UAS0g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v6 16/29] libqos: Use explicit
+ QTestState for virtio operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,25 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: "open list:Block layer core" <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, armbru@redhat.com, Eric Blake <eblake@redhat.com>
 
-On 05.09.2017 14:38, Cornelia Huck wrote:
-> On Mon,  4 Sep 2017 17:43:05 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> Fix up includes and rename it to s390x_*.
-> 
-> I'm not quite sure whether that is the right direction: servc is just an
-> instruction that does something and then happens to also generate an
-> interrupt on conclusion. I'll think a bit more about it.
-> 
+>  typedef struct QVirtioDevice {
+>      const QVirtioBus *bus;
+> +    QTestState *qts;
+>      /* Device type */
+>      uint16_t device_type;
+>  } QVirtioDevice;
+> @@ -35,12 +36,14 @@ typedef struct QVirtQueue {
+>      uint16_t last_used_idx;
+>      bool indirect;
+>      bool event;
+> +    QTestState *qts;
+>  } QVirtQueue;
+>
+>  typedef struct QVRingIndirectDesc {
+>      uint64_t desc; /* This points to an array fo struct vring_desc */
+>      uint16_t index;
+>      uint16_t elem;
+> +    QTestState *qts;
+>  } QVRingIndirectDesc;
 
-Having CPU related stuff in sclp looks also wrong. Feel free to skip
-this patch, should be unrelated to the following patches.
+Adding QTestState to QVRingIndirectDesc and QVirtQueue sounds somewhat
+ugly to me. I think they should either rather have a pointer to the
+associated QVirtioDevice, or the functions where this is needed
+(qvring_init() for example) should get a "QTestState *" parameter instead.
 
--- 
 
-Thanks,
+I agree with Thomas and even extend it to QVirtioDevice. If there is a
+has-a hierarchy between libqos objects, only the topmost one (such as the
+virtio mmio bus device, and the PCI host bridge---or possibly even the
+machine object exclusively) should have a QTestState. Everyone else can
+access it implicitly through operations on its bus.
 
-David
+Test code on the other hand can use global_qtest implicitly when they
+prepare/read buffers that the devices do DMA from/to.
+
+Paolo
+
+
+
+Just my 0.02 =E2=82=AC.
+
+ Thomas
