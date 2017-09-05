@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35901)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dpEPy-0008Of-HS
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:01:38 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dpEQC-0000DY-Go
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:01:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dpEPp-000313-BV
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:01:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40092)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dpEPp-0002zt-6a
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:01:21 -0400
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Tue,  5 Sep 2017 16:01:14 +0200
-Message-Id: <20170905140116.28181-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 0/2] drop pixman submodule
+	(envelope-from <stefanha@redhat.com>) id 1dpEQ3-0003Bk-0d
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:01:44 -0400
+Date: Tue, 5 Sep 2017 15:01:17 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170905140117.GQ17449@stefanha-x1.localdomain>
+References: <20170825132028.6184-1-el13635@mail.ntua.gr>
+	<20170825132028.6184-7-el13635@mail.ntua.gr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170825132028.6184-7-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [PATCH v9 6/6] qemu-iotests: add 184 for throttle
+ filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,22 +24,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-v2: also drop the pixman configure switches.
+On Fri, Aug 25, 2017 at 04:20:28PM +0300, Manos Pitsidianakis wrote:
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+> ---
+>  tests/qemu-iotests/184     | 205 +++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/184.out | 300 +++++++++++++++++++++++++++++++++++++++++++++
+>  tests/qemu-iotests/group   |   1 +
+>  3 files changed, 506 insertions(+)
+>  create mode 100755 tests/qemu-iotests/184
+>  create mode 100644 tests/qemu-iotests/184.out
 
-Gerd Hoffmann (2):
-  pixman: drop submodule
-  pixman: drop configure switches
-
- configure        | 44 ++++----------------------------------------
- Makefile         | 10 ----------
- ui/qemu-pixman.c |  4 ----
- .gitmodules      |  3 ---
- pixman           |  1 -
- 5 files changed, 4 insertions(+), 58 deletions(-)
- delete mode 160000 pixman
-
--- 
-2.9.3
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
