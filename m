@@ -1,22 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52250)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <niuguoxiang@huawei.com>) id 1dpD29-0000Rm-QH
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:33:01 -0400
+	(envelope-from <groug@kaod.org>) id 1dpEyV-0006KN-VG
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:37:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <niuguoxiang@huawei.com>) id 1dpD1p-0000Ov-MR
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:32:49 -0400
-From: niuguoxiang <niuguoxiang@huawei.com>
-Date: Tue, 5 Sep 2017 12:30:53 +0000
-Message-ID: <7FD21DDFE9A3784693E393AF276FE7D21F17E49E@DGGEMA501-MBX.china.huawei.com>
-References: <20170905112152.8851-1-ppandit@redhat.com>
-	<CAFEAcA8B4EwXCPSBsftt=QkAuH8jCBbK23-uU7NA7G3k6ADHLw@mail.gmail.com>
-In-Reply-To: <CAFEAcA8B4EwXCPSBsftt=QkAuH8jCBbK23-uU7NA7G3k6ADHLw@mail.gmail.com>
-Content-Language: zh-CN
+	(envelope-from <groug@kaod.org>) id 1dpEyR-00036P-Ba
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:37:11 -0400
+Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:47086)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dpEyR-00034e-4U
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:37:07 -0400
+Received: from player157.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id CFCBBA96CE
+	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 16:37:04 +0200 (CEST)
+Date: Tue, 5 Sep 2017 16:36:56 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170905163656.73d98e23@bahia>
+In-Reply-To: <150456160452.17000.3290192176290246589.stgit@bahia.lan>
+References: <150456160452.17000.3290192176290246589.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBbUEFUQ0hdIGludGM6IGFybV9naWN2?=
- =?utf-8?q?3=3A_limit_GICR_ipriority_index?=
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/NUr1VY6uRxecSU3O5pE22QN";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/4] ppc: fix migration with KVM
+ PR (nested)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,84 +31,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, P J P <ppandit@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
+To: qemu-devel@nongnu.org
+Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Sam Bobroff <sam.bobroff@au1.ibm.com>
 
-SSB0aGluayBvbmx5IGFzc2VydCBpcyBub3QgZW5vdWdoLCBiZWNhdXNlIGFzc2VydCgpIGRlcGVu
-ZHMgb24gTkRFQlVHIHByZXByb2Nlc3NpbmcsIHBsZWFzZSBjaGVjayA6DQoNCg0KDQovdXNyL2lu
-Y2x1ZGUvYXNzZXJ0LmgNCg0KDQoNCjM3I2lmIGRlZmluZWQgX19jcGx1c3BsdXMgJiYgX19HTlVD
-X1BSRVJFUSAoMiw5NSkNCg0KMzgjIGRlZmluZSBfX0FTU0VSVF9WT0lEX0NBU1Qgc3RhdGljX2Nh
-c3Q8dm9pZD4NCg0KMzkjZWxzZQ0KDQo0MCMgZGVmaW5lIF9fQVNTRVJUX1ZPSURfQ0FTVCAodm9p
-ZCkNCg0KNDEjZW5kaWYNCg0KDQoNCjQ4I2lmZGVmICBOREVCVUcNCg0KNDkNCg0KNTAjIGRlZmlu
-ZSBhc3NlcnQoZXhwcikgICAgICAgICAgIChfX0FTU0VSVF9WT0lEX0NBU1QgKDApKQ0KDQoNCg0K
-NjIjZWxzZSAvKiBOb3QgTkRFQlVHLiAgKi8NCg0KNjgvKiBUaGlzIHByaW50cyBhbiAiQXNzZXJ0
-aW9uIGZhaWxlZCIgbWVzc2FnZSBhbmQgYWJvcnRzLiAgKi8NCg0KNjlleHRlcm4gdm9pZCBfX2Fz
-c2VydF9mYWlsIChjb25zdCBjaGFyICpfX2Fzc2VydGlvbiwgY29uc3QgY2hhciAqX19maWxlLA0K
-DQo3MCAgICAgICAgICAgICAgICAgICAgICAgICAgIHVuc2lnbmVkIGludCBfX2xpbmUsIGNvbnN0
-IGNoYXIgKl9fZnVuY3Rpb24pDQoNCjcxICAgICBfX1RIUk9XIF9fYXR0cmlidXRlX18gKChfX25v
-cmV0dXJuX18pKTsNCg0KIDg2I2VuZGlmIC8qIE5vdCBfQVNTRVJUX0hfREVDTFMgKi8NCg0KDQoN
-Cjg4IyBkZWZpbmUgYXNzZXJ0KGV4cHIpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgXA0KDQo4OSAgKChleHByKSAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCg0KOTAgICA/IF9fQVNT
-RVJUX1ZPSURfQ0FTVCAoMCkgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBcDQoNCjkxICAgOiBfX2Fzc2VydF9mYWlsIChfX1NUUklORyhleHByKSwgX19GSUxFX18s
-IF9fTElORV9fLCBfX0FTU0VSVF9GVU5DVElPTikpDQoNCjkyDQoNCg0KDQpGcm9tIGFib3ZlLCBm
-b3IgTkRFQlVHLCBpdCBtYXkgZG8gbm90aGluZyB3aGVuIGFzc2VydCBmYWlsLA0KDQpmb3IgTm90
-IE5ERUJVRywgaXQgd2lsbCBwcmludCBhbmQgYWJvcnQgd2hlbiBhc3NlcnQgZmFpbC4NCg0KDQoN
-ClNvLCBmb3IgTkRFQlVHLCBhc3NlcnQgd2lsbCBub3Qgd29yayB3aGVuIG9mZnNldCBpcyAweDEw
-MDAwZC4NCg0KDQoNCkhvdyBkbyB5b3UgdGhpbms/DQoNCg0KDQpCcu+8jA0KDQpHdW94aWFuZyBO
-aXUNCg0KDQoNCuWNjuS4uuaKgOacr+aciemZkOWFrOWPuCBIdWF3ZWkgVGVjaG5vbG9naWVzIENv
-LiwgTHRkLg0KDQoNCg0KDQoNCg0KDQrmnKzpgq7ku7blj4rlhbbpmYTku7blkKvmnInljY7kuLrl
-hazlj7jnmoTkv53lr4bkv6Hmga/vvIzku4XpmZDkuo7lj5HpgIHnu5nkuIrpnaLlnLDlnYDkuK3l
-iJflh7rnmoTkuKrkurrmiJbnvqTnu4TjgILnpoENCg0K5q2i5Lu75L2V5YW25LuW5Lq65Lul5Lu7
-5L2V5b2i5byP5L2/55So77yI5YyF5ous5L2G5LiN6ZmQ5LqO5YWo6YOo5oiW6YOo5YiG5Zyw5rOE
-6Zyy44CB5aSN5Yi244CB5oiW5pWj5Y+R77yJ5pys6YKu5Lu25LitDQoNCueahOS/oeaBr+OAguWm
-guaenOaCqOmUmeaUtuS6huacrOmCruS7tu+8jOivt+aCqOeri+WNs+eUteivneaIlumCruS7tumA
-muefpeWPkeS7tuS6uuW5tuWIoOmZpOacrOmCruS7tu+8gQ0KDQpUaGlzIGUtbWFpbCBhbmQgaXRz
-IGF0dGFjaG1lbnRzIGNvbnRhaW4gY29uZmlkZW50aWFsIGluZm9ybWF0aW9uIGZyb20gSFVBV0VJ
-LCB3aGljaA0KDQppcyBpbnRlbmRlZCBvbmx5IGZvciB0aGUgcGVyc29uIG9yIGVudGl0eSB3aG9z
-ZSBhZGRyZXNzIGlzIGxpc3RlZCBhYm92ZS4gQW55IHVzZSBvZiB0aGUNCg0KaW5mb3JtYXRpb24g
-Y29udGFpbmVkIGhlcmVpbiBpbiBhbnkgd2F5IChpbmNsdWRpbmcsIGJ1dCBub3QgbGltaXRlZCB0
-bywgdG90YWwgb3IgcGFydGlhbA0KDQpkaXNjbG9zdXJlLCByZXByb2R1Y3Rpb24sIG9yIGRpc3Nl
-bWluYXRpb24pIGJ5IHBlcnNvbnMgb3RoZXIgdGhhbiB0aGUgaW50ZW5kZWQNCg0KcmVjaXBpZW50
-KHMpIGlzIHByb2hpYml0ZWQuIElmIHlvdSByZWNlaXZlIHRoaXMgZS1tYWlsIGluIGVycm9yLCBw
-bGVhc2Ugbm90aWZ5IHRoZSBzZW5kZXIgYnkNCg0KcGhvbmUgb3IgZW1haWwgaW1tZWRpYXRlbHkg
-YW5kIGRlbGV0ZSBpdCENCg0KDQoNCi0tLS0t6YKu5Lu25Y6f5Lu2LS0tLS0NCuWPkeS7tuS6ujog
-UGV0ZXIgTWF5ZGVsbCBbbWFpbHRvOnBldGVyLm1heWRlbGxAbGluYXJvLm9yZ10NCuWPkemAgeaX
-tumXtDogMjAxN+W5tDnmnIg15pelIDE5OjU5DQrmlLbku7bkuro6IFAgSiBQDQrmioTpgIE6IFFF
-TVUgRGV2ZWxvcGVyczsgcWVtdS1hcm07IG5pdWd1b3hpYW5nOyBQcmFzYWQgSiBQYW5kaXQNCuS4
-u+mimDogUmU6IFtQQVRDSF0gaW50YzogYXJtX2dpY3YzOiBsaW1pdCBHSUNSIGlwcmlvcml0eSBp
-bmRleA0KDQoNCg0KT24gNSBTZXB0ZW1iZXIgMjAxNyBhdCAxMjoyMSwgUCBKIFAgPHBwYW5kaXRA
-cmVkaGF0LmNvbTxtYWlsdG86cHBhbmRpdEByZWRoYXQuY29tPj4gd3JvdGU6DQoNCj4gRnJvbTog
-UHJhc2FkIEogUGFuZGl0IDxwanBAZmVkb3JhcHJvamVjdC5vcmc8bWFpbHRvOnBqcEBmZWRvcmFw
-cm9qZWN0Lm9yZz4+DQoNCj4NCg0KPiBXaGVuIHJlYWRpbmcgb3Igd3JpdGluZyB0byBHSUNSIGlw
-cmlvcml0eSBhcnJheSwgaW5kZXggJ2lycScNCg0KPiBjb3VsZCBnbyBiZXlvbmQgaXRzIGJvdW5k
-czsgUmVzdHJpY3QgaXQgd2l0aGluIGFycmF5IGxpbWl0cy4NCg0KPg0KDQo+IFJlcG9ydGVkLWJ5
-OiBHdW94aWFuZyBOaXUgPG5pdWd1b3hpYW5nQGh1YXdlaS5jb208bWFpbHRvOm5pdWd1b3hpYW5n
-QGh1YXdlaS5jb20+Pg0KDQo+IFNpZ25lZC1vZmYtYnk6IFByYXNhZCBKIFBhbmRpdCA8cGpwQGZl
-ZG9yYXByb2plY3Qub3JnPG1haWx0bzpwanBAZmVkb3JhcHJvamVjdC5vcmc+Pg0KDQo+IC0tLQ0K
-DQo+ICBody9pbnRjL2FybV9naWN2M19yZWRpc3QuYyB8IDQgKystLQ0KDQo+ICAxIGZpbGUgY2hh
-bmdlZCwgMiBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KDQo+DQoNCj4gZGlmZiAtLWdp
-dCBhL2h3L2ludGMvYXJtX2dpY3YzX3JlZGlzdC5jIGIvaHcvaW50Yy9hcm1fZ2ljdjNfcmVkaXN0
-LmMNCg0KPiBpbmRleCA3N2U1Y2ZhMzI3Li43NjgzYzRjYzdmIDEwMDY0NA0KDQo+IC0tLSBhL2h3
-L2ludGMvYXJtX2dpY3YzX3JlZGlzdC5jDQoNCj4gKysrIGIvaHcvaW50Yy9hcm1fZ2ljdjNfcmVk
-aXN0LmMNCg0KPiBAQCAtMTg3LDcgKzE4Nyw3IEBAIHN0YXRpYyBNZW1UeFJlc3VsdCBnaWNyX3Jl
-YWRsKEdJQ3YzQ1BVU3RhdGUgKmNzLCBod2FkZHIgb2Zmc2V0LA0KDQo+ICAgICAgY2FzZSBHSUNS
-X0lDQUNUSVZFUjA6DQoNCj4gICAgICAgICAgKmRhdGEgPSBnaWNyX3JlYWRfYml0bWFwX3JlZyhj
-cywgYXR0cnMsIGNzLT5naWNyX2lhY3RpdmVyMCk7DQoNCj4gICAgICAgICAgcmV0dXJuIE1FTVRY
-X09LOw0KDQo+IC0gICAgY2FzZSBHSUNSX0lQUklPUklUWVIgLi4uIEdJQ1JfSVBSSU9SSVRZUiAr
-IDB4MWY6DQoNCj4gKyAgICBjYXNlIEdJQ1JfSVBSSU9SSVRZUiAuLi4gR0lDUl9JUFJJT1JJVFlS
-ICsgMHgxYzoNCg0KPiAgICAgIHsNCg0KPiAgICAgICAgICBpbnQgaSwgaXJxID0gb2Zmc2V0IC0g
-R0lDUl9JUFJJT1JJVFlSOw0KDQo+ICAgICAgICAgIHVpbnQzMl90IHZhbHVlID0gMDsNCg0KPiBA
-QCAtMzEwLDcgKzMxMCw3IEBAIHN0YXRpYyBNZW1UeFJlc3VsdCBnaWNyX3dyaXRlbChHSUN2M0NQ
-VVN0YXRlICpjcywgaHdhZGRyIG9mZnNldCwNCg0KPiAgICAgIGNhc2UgR0lDUl9JQ0FDVElWRVIw
-Og0KDQo+ICAgICAgICAgIGdpY3Jfd3JpdGVfY2xlYXJfYml0bWFwX3JlZyhjcywgYXR0cnMsICZj
-cy0+Z2ljcl9pYWN0aXZlcjAsIHZhbHVlKTsNCg0KPiAgICAgICAgICByZXR1cm4gTUVNVFhfT0s7
-DQoNCj4gLSAgICBjYXNlIEdJQ1JfSVBSSU9SSVRZUiAuLi4gR0lDUl9JUFJJT1JJVFlSICsgMHgx
-ZjoNCg0KPiArICAgIGNhc2UgR0lDUl9JUFJJT1JJVFlSIC4uLiBHSUNSX0lQUklPUklUWVIgKyAw
-eDFjOg0KDQo+ICAgICAgew0KDQo+ICAgICAgICAgIGludCBpLCBpcnEgPSBvZmZzZXQgLSBHSUNS
-X0lQUklPUklUWVI7DQoNCg0KDQpXaHkgZG8geW91IHRoaW5rIHRoZSBidWZmZXIgY2FuIGJlIG92
-ZXJydW4/IFRoZXNlIGZ1bmN0aW9ucyBhcmUgdGhlIHdvcmQgKDQgYnl0ZSkgYWNjZXNzIGZ1bmN0
-aW9ucywgYW5kIHRoZXkgY2Fubm90IGJlIGNhbGxlZCB3aXRoIGEgbm9uLTQtYWxpZ25lZCBvZmZz
-ZXQgKHNlZSB0aGUgYXNzZXJ0cyBpbg0KDQpnaWN2M19yZWRpc3RfcmVhZCgpIGFuZCBnaWN2M19y
-ZWRpc3Rfd3JpdGUoKSkuDQoNCg0KDQp0aGFua3MNCg0KLS0gUE1NDQo=
+--Sig_/NUr1VY6uRxecSU3O5pE22QN
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+I wanted to Cc Sam also but it was late and I forgot :)
+
+On Mon, 04 Sep 2017 23:46:44 +0200
+Greg Kurz <groug@kaod.org> wrote:
+
+> A guest running with KVM PR ends up irresponsive after migration most of =
+the
+> time. This happens because the HPT allocated by QEMU is likely to have a
+> different address on the destination than it had on the source, but we pu=
+sh
+> the source address to KVM.
+>=20
+> This series does a little cleanup and fixes the issue. I could successful=
+ly
+> test it with a nested setup (KVM PR running in KVM HV).
+>=20
+> However, this isn't enough to fix migration when using KVM PR on baremeta=
+l...
+> CPUs seem to end up looping on H_CEDE in the guest. I can't figure out wh=
+at's
+> happening... Any suggestion would be appreciated.
+>=20
+> Cheers,
+>=20
+> --
+> Greg
+>=20
+> ---
+>=20
+> Greg Kurz (4):
+>       spapr: only update SDR1 once per-cpu during CAS
+>       spapr: introduce a helper to compute the address of the HPT
+>       ppc: kvm: introduce a helper to update SDR1 for a single CPU
+>       ppc: kvm: update HPT pointer in KVM PR after migration
+>=20
+>=20
+>  hw/ppc/spapr.c          |   15 +++++++++++++++
+>  hw/ppc/spapr_cpu_core.c |    8 +++-----
+>  hw/ppc/spapr_hcall.c    |   20 +++++++++-----------
+>  include/hw/ppc/spapr.h  |    1 +
+>  target/ppc/cpu.h        |    1 +
+>  target/ppc/kvm.c        |   12 ++++++++----
+>  target/ppc/kvm_ppc.h    |    3 ++-
+>  target/ppc/machine.c    |    7 +++++++
+>  8 files changed, 46 insertions(+), 21 deletions(-)
+>=20
+>=20
+
+
+--Sig_/NUr1VY6uRxecSU3O5pE22QN
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWa62iAAKCRAC/DrrAQHb
+whjLAJ4ocKsyqa/bWfd46woH2Y+EImQTOACgnzdUlVlE3Za8sB2dVEtuN1Wf8Mk=
+=BeAZ
+-----END PGP SIGNATURE-----
+
+--Sig_/NUr1VY6uRxecSU3O5pE22QN--
