@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dpEyV-0006KN-VG
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:37:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dpF1a-0007lI-SX
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:40:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dpEyR-00036P-Ba
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:37:11 -0400
-Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:47086)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dpEyR-00034e-4U
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:37:07 -0400
-Received: from player157.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id CFCBBA96CE
-	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 16:37:04 +0200 (CEST)
-Date: Tue, 5 Sep 2017 16:36:56 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170905163656.73d98e23@bahia>
-In-Reply-To: <150456160452.17000.3290192176290246589.stgit@bahia.lan>
-References: <150456160452.17000.3290192176290246589.stgit@bahia.lan>
+	(envelope-from <kwolf@redhat.com>) id 1dpF1R-0005Uw-9p
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:40:22 -0400
+Date: Tue, 5 Sep 2017 16:39:49 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170905143949.GM4633@localhost.localdomain>
+References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
+	<a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
+	<cb783ebb-198e-1814-2f9c-aec93c83b17a@virtuozzo.com>
+	<0988b4ef-56e2-5ce9-ed25-40a742eadbd4@redhat.com>
+	<b0d72a26-2052-ecc6-67f5-d32572804ebf@redhat.com>
+	<20170828025706.GA18194@lemon.lan>
+	<20170905130107.GJ4633@localhost.localdomain>
+	<20170905131858.GW22515@lemon.lan>
+	<20170905132756.GL4633@localhost.localdomain>
+	<20170905133957.GX22515@lemon.lan>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/NUr1VY6uRxecSU3O5pE22QN";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 0/4] ppc: fix migration with KVM
- PR (nested)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170905133957.GX22515@lemon.lan>
+Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +31,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, Sam Bobroff <sam.bobroff@au1.ibm.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Qemu-block <qemu-block@nongnu.org>, Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
---Sig_/NUr1VY6uRxecSU3O5pE22QN
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Am 05.09.2017 um 15:39 hat Fam Zheng geschrieben:
+> On Tue, 09/05 15:27, Kevin Wolf wrote:
+> > Am 05.09.2017 um 15:18 hat Fam Zheng geschrieben:
+> > > On Tue, 09/05 15:01, Kevin Wolf wrote:
+> > > > Am 28.08.2017 um 04:57 hat Fam Zheng geschrieben:
+> > > > > On Fri, 08/25 15:44, Max Reitz wrote:
+> > > > > > Well, OK.  The main argument against supporting anything but qcow2 is
+> > > > > > "if you want features, use qcow2; and we are working on making qcow2 as
+> > > > > > fast as possible."  I think that's a very good argument still.  At some
+> > > > > > point I (and probably others, too) had the idea of making qcow2 files in
+> > > > > > raw layout: 
+> > > > > 
+> > > > > Yes! I think this idea makes a whole lot of sense, too. Metadata tables can be
+> > > > > generated so old implementation can still use it.
+> > > > 
+> > > > Maybe a nice way to attack this would be "huge pages", i.e. have a L1
+> > > > entry flag that tells "this points directly to a huge cluster instead of
+> > > > an L2 table". Gives us 512 MB clusters with a 64k cluster size, or a
+> > > > maximum of 512 GB clusters with a 2 MB cluster size.
+> > > > 
+> > > > Huge clusters would only be used by qemu-img create if the respective
+> > > > option is given, and only with preallocation.
+> > > 
+> > > Then this image is not usable on old QEMUs, right? So this is going to be an
+> > > incompatible_feature, whereas with the linear mapping L1/L2 tables approach, it
+> > > can be an autoclear_feature.
+> > 
+> > Ah yes, that's true. Maybe that's important enough that just a single
+> > global flag is better, even if it's less flexible.
+> > 
+> > Of course, this approach also means that we still need to write all of
+> > the L2 tables and use disk space for them, even though newer versions
+> > will never look at them.
+> 
+> To speculate^Wmitigate, "qemu-img create" is free to pick a larger cluster size
+> when this feature is used?
 
-I wanted to Cc Sam also but it was late and I forgot :)
+Seems reasonable, though the 2 MB limit for the cluster size still
+applies.
 
-On Mon, 04 Sep 2017 23:46:44 +0200
-Greg Kurz <groug@kaod.org> wrote:
-
-> A guest running with KVM PR ends up irresponsive after migration most of =
-the
-> time. This happens because the HPT allocated by QEMU is likely to have a
-> different address on the destination than it had on the source, but we pu=
-sh
-> the source address to KVM.
->=20
-> This series does a little cleanup and fixes the issue. I could successful=
-ly
-> test it with a nested setup (KVM PR running in KVM HV).
->=20
-> However, this isn't enough to fix migration when using KVM PR on baremeta=
-l...
-> CPUs seem to end up looping on H_CEDE in the guest. I can't figure out wh=
-at's
-> happening... Any suggestion would be appreciated.
->=20
-> Cheers,
->=20
-> --
-> Greg
->=20
-> ---
->=20
-> Greg Kurz (4):
->       spapr: only update SDR1 once per-cpu during CAS
->       spapr: introduce a helper to compute the address of the HPT
->       ppc: kvm: introduce a helper to update SDR1 for a single CPU
->       ppc: kvm: update HPT pointer in KVM PR after migration
->=20
->=20
->  hw/ppc/spapr.c          |   15 +++++++++++++++
->  hw/ppc/spapr_cpu_core.c |    8 +++-----
->  hw/ppc/spapr_hcall.c    |   20 +++++++++-----------
->  include/hw/ppc/spapr.h  |    1 +
->  target/ppc/cpu.h        |    1 +
->  target/ppc/kvm.c        |   12 ++++++++----
->  target/ppc/kvm_ppc.h    |    3 ++-
->  target/ppc/machine.c    |    7 +++++++
->  8 files changed, 46 insertions(+), 21 deletions(-)
->=20
->=20
-
-
---Sig_/NUr1VY6uRxecSU3O5pE22QN
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWa62iAAKCRAC/DrrAQHb
-whjLAJ4ocKsyqa/bWfd46woH2Y+EImQTOACgnzdUlVlE3Za8sB2dVEtuN1Wf8Mk=
-=BeAZ
------END PGP SIGNATURE-----
-
---Sig_/NUr1VY6uRxecSU3O5pE22QN--
+Kevin
