@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52563)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dpAKh-0007gl-Av
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:39:51 -0400
+	(envelope-from <bounces@canonical.com>) id 1dpALs-0000Hk-ME
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:41:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dpAKc-0007Nq-Qu
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:39:47 -0400
-Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:38170)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dpAKc-0007NN-K5
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:39:42 -0400
-Received: by mail-wr0-x236.google.com with SMTP id 108so7312032wra.5
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 02:39:42 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1dpALn-0008CV-VZ
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:41:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43345)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dpALn-0008BJ-Q5
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:40:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dpALm-0005rt-Fh
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 09:40:54 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 48FD02E80C9
+	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 09:40:54 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <4aa4042a-1fa5-958e-6bc9-5666c5e56d3a@amsat.org>
-References: <20170508233918.9043-1-f4bug@amsat.org>
-	<20170508233918.9043-4-f4bug@amsat.org>
-	<2ad7eaf6-3691-f9f1-4d09-204444adbd19@redhat.com>
-	<4aa4042a-1fa5-958e-6bc9-5666c5e56d3a@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Sep 2017 10:39:20 +0100
-Message-ID: <CAFEAcA_SEHpVBMrU02R4FwsV8vVZO8TEp+gUD=xo1a59CKb_jQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 03/11] hw/misc: add missing includes
+Date: Tue, 05 Sep 2017 09:31:33 -0000
+From: ilovezfs <1714750@bugs.launchpad.net>
+Reply-To: Bug 1714750 <1714750@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150442540217.17409.6458222878014636993.malonedeb@gac.canonical.com>
+Message-Id: <150460389357.11273.11364035470209259748.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1714750] Re: 2.10.0 cannot be installed on
+ case-insensitive file system
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,18 +37,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Fam Zheng <famz@redhat.com>
+To: qemu-devel@nongnu.org
 
-On 5 September 2017 at 10:35, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
-> I'm not sure this kind of mistake happens often enough, but it might wort=
-h
-> add a such test in checkpatch.pl (easier to say than to implement :p)
+Thanks for taking care of that @ubuntu-weilnetz
 
-It doesn't run automatically, but you can run scripts/clean-includes
-on your new files to remove unneeded includes and add osdep.h if it's
-missing.
+-- =
 
-thanks
--- PMM
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1714750
+
+Title:
+  2.10.0 cannot be installed on case-insensitive file system
+
+Status in QEMU:
+  New
+
+Bug description:
+  The https://download.qemu.org/qemu-2.10.0.tar.bz2 tarball cannot be
+  unpacked on a case-insensitive file system because it has a file
+  qemu-2.10.0/roms/u-boot/scripts/Kconfig and a directory
+  qemu-2.10.0/roms/u-boot/scripts/kconfig. This prevents installation on
+  most macOS systems since by default the file system is case
+  insensitive. The 2.10.0 upgrade is blocked in Homebrew due to this
+  issue. See https://github.com/Homebrew/homebrew-core/pull/17467. This
+  is a regression from 2.9.0, which didn't have this problem.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1714750/+subscriptions
