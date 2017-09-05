@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38845)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpAhy-0000yL-TE
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:04:02 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dpAiN-0001Ev-MT
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:04:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpAhp-0001fA-3q
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:03:50 -0400
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-14-eblake@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d00055a9-5c4a-f639-6197-bd754416458b@redhat.com>
-Date: Tue, 5 Sep 2017 12:03:36 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dpAiG-00028b-4A
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:04:15 -0400
+Date: Tue, 5 Sep 2017 11:04:04 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170905100404.GH17449@stefanha-x1.localdomain>
+References: <20170901105434.3288-1-berrange@redhat.com>
+	<20170901105434.3288-3-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170901180340.30009-14-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 13/29] libqos: Use explicit QTestState
- for pci operations
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170901105434.3288-3-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] iotests: blacklist 194
+ with the luks driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,17 +24,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Alexander Graf <agraf@suse.de>, "open list:sPAPR" <qemu-ppc@nongnu.org>, armbru@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On 01.09.2017 20:03, Eric Blake wrote:
-> Now that the QPCIBus tracks QTestState, use that state instead
-> of an implicit reliance on global_qtest.
+On Fri, Sep 01, 2017 at 11:54:34AM +0100, Daniel P. Berrange wrote:
+> The 194 test has alot of code that assumes a simple image file. Rewriting
+> this to work with luks is possible, but non-trivial, so blacklist the
+> luks format for now.
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  tests/libqos/pci-pc.c    | 47 ++++++++++++++++++++++++-----------------------
->  tests/libqos/pci-spapr.c | 20 ++++++++++----------
->  2 files changed, 34 insertions(+), 33 deletions(-)
+>  tests/qemu-iotests/194        | 1 +
+>  tests/qemu-iotests/iotests.py | 4 +++-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
