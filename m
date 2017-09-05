@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59235)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ramysameh26@gmail.com>) id 1dpI5X-0001iD-Ki
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:56:44 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dpI6b-0002KZ-Lp
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:57:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ramysameh26@gmail.com>) id 1dpI5S-0001vu-A1
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:56:39 -0400
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:34302)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ramysameh26@gmail.com>)
-	id 1dpI5S-0001uz-3n
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:56:34 -0400
-Received: by mail-oi0-x233.google.com with SMTP id h70so29228359oic.1
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 10:56:32 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dpI6W-0002Xx-Me
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:57:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dpI6W-0002WN-Ec
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:57:40 -0400
+Date: Tue, 5 Sep 2017 18:57:35 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170905175734.GG2112@work-vm>
+References: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1504541267-36954-7-git-send-email-pradeep.jagadeesh@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9YNO7kgC8yzZ_RUKck=+98pUET0ogVZ7TvC1kxV+_fFA@mail.gmail.com>
-References: <CAF6HrYxj5BoTQpQjz95Z1_N_p615jpEE12xh_afuuqE4fcTyLg@mail.gmail.com>
-	<CAFEAcA9YNO7kgC8yzZ_RUKck=+98pUET0ogVZ7TvC1kxV+_fFA@mail.gmail.com>
-From: Ramy Sameh <ramysameh26@gmail.com>
-Date: Tue, 5 Sep 2017 19:56:31 +0200
-Message-ID: <CAF6HrYwT7WP_i7cVhvEyRvqSK7J+bLnKU4b+WrMQfVkLaNDrvQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Questions regarding emulated UART in VersatilePB
- board
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1504541267-36954-7-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v10 6/6] fsdev: hmp interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,98 +27,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Ahmed Aly <ahmedaly50@gmail.com>
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-Thanks Peter for your help.
+* Pradeep Jagadeesh (pradeepkiruvale@gmail.com) wrote:
+> This patch introduces hmp interfaces for the fsdev
+> devices.
+> 
+> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+> ---
+>  hmp-commands-info.hx | 18 ++++++++++++++++
+>  hmp-commands.hx      | 19 +++++++++++++++++
+>  hmp.c                | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  hmp.h                |  4 ++++
+>  4 files changed, 101 insertions(+)
+> 
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index d9df238..07ed338 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -84,6 +84,24 @@ STEXI
+>  Show block device statistics.
+>  ETEXI
+>  
+> +#if defined(CONFIG_VIRTFS)
+> +
+> +    {
+> +        .name       = "fsdev_iothrottle",
+> +        .args_type  = "",
+> +        .params     = "",
+> +        .help       = "show fsdev iothrottle information",
+> +        .cmd        = hmp_info_fsdev_iothrottle,
+> +    },
+> +
+> +#endif
+> +
+> +STEXI
+> +@item info fsdev_iothrottle
+> +@findex fsdev_iothrottle
+> +Show fsdev device throttle info.
+> +ETEXI
+> +
+>      {
+>          .name       = "block-jobs",
+>          .args_type  = "",
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 1941e19..aef9f79 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1680,6 +1680,25 @@ STEXI
+>  Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
+>  ETEXI
+>  
+> +#if defined(CONFIG_VIRTFS)
+> +
+> +    {
+> +        .name       = "fsdev_set_io_throttle",
+> +        .args_type  = "device:B,bps:l,bps_rd:l,bps_wr:l,iops:l,iops_rd:l,iops_wr:l",
+> +        .params     = "device bps bps_rd bps_wr iops iops_rd iops_wr",
+> +        .help       = "change I/O throttle limits for a fs devices",
+> +        .cmd        = hmp_fsdev_set_io_throttle,
+> +    },
+> +
+> +#endif
+> +
+> +STEXI
+> +@item fsdev_set_io_throttle @var{device} @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
+> +@findex fsdev_set_io_throttle
+> +Change I/O throttle limits for a fs devices to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
+> +ETEXI
 
-Are there any documentation or source of information, that can describe how
-interrupts are implemented, and how to use them (where is the vector table
-to put the ISR ... etc) ?
-In addition, any source of info that describes the code workflow when
-reading or writing to the uart would be very helpful.
-(because I put printfs in the functions to understand the workflow, but the
-order of these printfs made me very confused).
+I'm OK with this, and I see it's a copy of the equivalent
+block_set_io_throttle, but can you clarify the meaning - for
+example if a value is 0 what does it mean? Does it mean
+there's no throttle set for that variable?
+Also is the 'bps' bytes/second (as opposed to bits or blocks).
+Clarifying both of these in the text would be good.
 
-Regarding the registers, I have checked pl011_read and pl011_write, and
-found them, thanks for that.
-But I couldn't find the register "UARTICR" (*Interrupt clear register*)
-I think this might be related to my lack of understanding of how interrupts
-are implemented in emulated pl011.
+Dave
 
-Regarding the ID registers, whose values are hard-wired in the board, and
-there was no need to implement modifiable states for them.
-Do you mean *Peripheral identification registers, UARTPeriphID0-3* and
-*PrimeCell
-identification registers, UARTPCellID0-3* ?
-
-Thanks in advance for your help.
-
-
-On Mon, Sep 4, 2017 at 10:50 AM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> On 4 September 2017 at 01:27, Ramy Sameh <ramysameh26@gmail.com> wrote:
-> > *My 2 questions are:*
-> >
-> > *First:*
-> > Are interrupts activated in the emulated pl011 ?
-> > I mean, if I enabled the interrupt bits for UARTTXINTR, will this trigger
-> > an interrupt when the FIFO reaches a certain level?
->
-> Yes, we implement interrupts.
->
-> > *Second:*
-> > Another problem is that I can't find some of the UART registers (which
-> are
-> > in the data sheet PrimeCell UART (PL011)), in QEMU's emulated UART pl011.
-> >
-> > *These are the registers which I can't find their matches in the
-> structure
-> > PL011State:*
-> >
-> > 1.) Interrupt FIFO level select register, UARTIFLS
-> > 2.) Raw interrupt status register, UARTRIS
-> > 3.) Masked interrupt status register, UARTMIS
-> > 4.) Interrupt clear register, UARTICR
-> > 5.) Peripheral identification registers, UARTPeriphID0-3
-> > 6.) PrimeCell identification registers, UARTPCellID0-3
->
-> All these registers are implemented. You can find the code that
-> implements them in the pl011_read() and pl011_write() functions.
->
-> > *This is the structure where I get pl011 emulated registers:*
-> > typedef struct PL011State
->
-> This structure defines (among other things) fields which
-> hold the underlying state of the device (in hardware terms,
-> usually information which is in a flipflop or otherwise
-> stored). This is not the same as a guest-visible register,
-> although there is very often overlap. For instance, the
-> ID registers are constant and read-only, so they do not
-> have any modifiable state that we need to put in the struct
-> (in hardware, they'll be implemented by just tying off
-> lines to 0 or 1, not with flops). Sometimes a register
-> value as seen by the guest is just a logical combination
-> of state used by other registers, eg UARTMIS is just the
-> logical OR of UARTRIS and UARTIMSC, so it doesn't need
-> any extra state in the struct.
->
-> Some of the state fields have names that don't correspond
-> to the register names for historical reasons (eg UARTIFLS
-> is in s->ifl); you should always start with the read and
-> write functions to look at how the register behaviour
-> is implemented, which will show you which state fields
-> if any are involved.
->
-> thanks
-> -- PMM
->
-
-
-
--- 
-Best Regards,
-Ramy Sameh
-Embedded Software Engineer
-+2-010-172-777-14
+> +
+> +
+>      {
+>          .name       = "set_password",
+>          .args_type  = "protocol:s,password:s,connected:s?",
+> diff --git a/hmp.c b/hmp.c
+> index 2dbfb80..6e63cf1 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -1783,6 +1783,66 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
+>      hmp_handle_error(mon, &err);
+>  }
+>  
+> +#ifdef CONFIG_VIRTFS
+> +
+> +void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict)
+> +{
+> +    Error *err = NULL;
+> +    IOThrottle throttle = {
+> +        .has_id = true,
+> +        .id = (char *) qdict_get_str(qdict, "device"),
+> +    };
+> +
+> +    hmp_initialize_io_throttle(&throttle, qdict);
+> +    qmp_fsdev_set_io_throttle(&throttle, &err);
+> +    hmp_handle_error(mon, &err);
+> +}
+> +
+> +static void print_fsdev_throttle_config(Monitor *mon, IOThrottle *fscfg)
+> +{
+> +    monitor_printf(mon, "%s", fscfg->id);
+> +    monitor_printf(mon, "    I/O throttling:"
+> +                   " bps=%" PRId64
+> +                   " bps_rd=%" PRId64  " bps_wr=%" PRId64
+> +                   " bps_max=%" PRId64
+> +                   " bps_rd_max=%" PRId64
+> +                   " bps_wr_max=%" PRId64
+> +                   " iops=%" PRId64 " iops_rd=%" PRId64
+> +                   " iops_wr=%" PRId64
+> +                   " iops_max=%" PRId64
+> +                   " iops_rd_max=%" PRId64
+> +                   " iops_wr_max=%" PRId64
+> +                   " iops_size=%" PRId64
+> +                   "\n",
+> +                   fscfg->bps,
+> +                   fscfg->bps_rd,
+> +                   fscfg->bps_wr,
+> +                   fscfg->bps_max,
+> +                   fscfg->bps_rd_max,
+> +                   fscfg->bps_wr_max,
+> +                   fscfg->iops,
+> +                   fscfg->iops_rd,
+> +                   fscfg->iops_wr,
+> +                   fscfg->iops_max,
+> +                   fscfg->iops_rd_max,
+> +                   fscfg->iops_wr_max,
+> +                   fscfg->iops_size);
+> +}
+> +
+> +void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict)
+> +{
+> +    Error *err = NULL;
+> +    IOThrottleList *fsdev_list, *info;
+> +    fsdev_list = qmp_query_fsdev_io_throttle(&err);
+> +
+> +    for (info = fsdev_list; info; info = info->next) {
+> +        print_fsdev_throttle_config(mon, info->value);
+> +    }
+> +    qapi_free_IOThrottleList(fsdev_list);
+> +}
+> +
+> +#endif
+> +
+>  void hmp_block_stream(Monitor *mon, const QDict *qdict)
+>  {
+>      Error *error = NULL;
+> diff --git a/hmp.h b/hmp.h
+> index 1ff4552..d700d7d 100644
+> --- a/hmp.h
+> +++ b/hmp.h
+> @@ -81,6 +81,10 @@ void hmp_set_password(Monitor *mon, const QDict *qdict);
+>  void hmp_expire_password(Monitor *mon, const QDict *qdict);
+>  void hmp_eject(Monitor *mon, const QDict *qdict);
+>  void hmp_change(Monitor *mon, const QDict *qdict);
+> +#ifdef CONFIG_VIRTFS
+> +void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict);
+> +void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict);
+> +#endif
+>  void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict);
+>  void hmp_block_stream(Monitor *mon, const QDict *qdict);
+>  void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict);
+> -- 
+> 1.8.3.1
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
