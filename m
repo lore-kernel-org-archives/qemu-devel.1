@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40822)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpDZJ-0003Ck-Qq
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:07:16 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40999)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1dpDZv-0003Qk-NO
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:07:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpDZE-0003T6-Du
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:07:05 -0400
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-29-eblake@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c04242da-f026-3cc1-7359-a78065a63946@redhat.com>
-Date: Tue, 5 Sep 2017 15:06:16 +0200
+	(envelope-from <n54@gmx.com>) id 1dpDZq-00040x-PU
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:07:43 -0400
+References: <1504613972-15847-1-git-send-email-peter.maydell@linaro.org>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <9daeb0c9-b1b3-66d4-2b0c-77affb449efd@gmx.com>
+Date: Tue, 5 Sep 2017 14:57:18 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170901180340.30009-29-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 28/29] libqtest: Remove qtest_start()
- and qtest_end() shortcuts
+In-Reply-To: <1504613972-15847-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iTaeI2rF1bX5llqKJ40IrkEEUW83P4TL0"
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] util/qemu-thread-posix.c:
+ Replace OS ifdefs with CONFIG_HAVE_SEM_TIMEDWAIT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,145 +24,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: "open list:Floppy" <qemu-block@nongnu.org>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Amit Shah <amit@kernel.org>, armbru@redhat.com, Alexander Graf <agraf@suse.de>, Keith Busch <keith.busch@intel.com>, "open list:sPAPR" <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com, John Snow <jsnow@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: patches@linaro.org
 
-On 01.09.2017 20:03, Eric Blake wrote:
-> Remove the trivial wrappers qtest_start() and qtest_end(), to make
-> it obvious in the rest of the testsuite where we are still relying on
-> global_qtest.  Doing this makes it easier to see what remaining
-> cleanups will be needed if we don't want an implicit dependency
-> on global state.  Many tests can also take advantage of qtest_init()
-> doing formatting of args, avoiding a temporary local variable.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iTaeI2rF1bX5llqKJ40IrkEEUW83P4TL0
+From: Kamil Rytarowski <n54@gmx.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+Cc: patches@linaro.org
+Message-ID: <9daeb0c9-b1b3-66d4-2b0c-77affb449efd@gmx.com>
+Subject: Re: [Qemu-trivial] [PATCH] util/qemu-thread-posix.c: Replace OS
+ ifdefs with CONFIG_HAVE_SEM_TIMEDWAIT
+References: <1504613972-15847-1-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1504613972-15847-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 05.09.2017 14:19, Peter Maydell wrote:
+> In qemu-thread-posix.c we have two implementations of the
+> various qemu_sem_* functions, one of which uses native POSIX
+> sem_* and the other of which emulates them with pthread conditions.
+> This is necessary because not all our host OSes support
+> sem_timedwait().
+>=20
+> Instead of a hard-coded list of OSes which don't implement
+> sem_timedwait(), which gets out of date, make configure
+> test for the presence of the function and set a new
+> CONFIG_HAVE_SEM_TIMEDWAIT appropriately.
+>=20
+> In particular, newer NetBSDs have sem_timedwait(), so this
+> commit will switch them over to using it. OSX still does
+> not have an implementation.
+>=20
+
+The NetBSD part looks fine. It builds fine on NetBSD/amd64 8.99.2. All
+tests pass (with disabled PaX MPROTECT).
+
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Kamil Rytarowski <n54@gmx.com>
+
 > ---
->  tests/libqtest.h               | 26 ------------------
->  tests/libqtest.c               |  4 +--
->  tests/ac97-test.c              |  4 +--
->  tests/boot-order-test.c        | 11 +++-----
->  tests/boot-serial-test.c       | 12 +++------
->  tests/device-introspect-test.c | 24 ++++++++---------
->  tests/display-vga-test.c       | 18 +++++--------
->  tests/drive_del-test.c         | 17 ++++++------
->  tests/ds1338-test.c            |  2 +-
->  tests/e1000-test.c             | 10 ++-----
->  tests/e1000e-test.c            | 14 +++-------
->  tests/eepro100-test.c          | 11 ++------
->  tests/endianness-test.c        | 33 +++++++++--------------
->  tests/es1370-test.c            |  4 +--
->  tests/fdc-test.c               |  4 +--
->  tests/hd-geo-test.c            | 16 +++++------
->  tests/i440fx-test.c            | 16 +++++------
->  tests/i82801b11-test.c         |  5 ++--
->  tests/ide-test.c               |  4 +--
->  tests/intel-hda-test.c         | 11 ++++----
->  tests/ioh3420-test.c           |  7 ++---
->  tests/ipmi-bt-test.c           | 11 +++-----
->  tests/ipmi-kcs-test.c          |  5 +---
->  tests/ipoctal232-test.c        |  5 ++--
->  tests/ivshmem-test.c           |  4 +--
->  tests/libqos/libqos.c          |  2 +-
->  tests/m25p80-test.c            |  9 +++----
->  tests/m48t59-test.c            |  2 +-
->  tests/ne2000-test.c            |  4 +--
->  tests/numa-test.c              | 28 ++++++++++----------
->  tests/nvme-test.c              |  7 ++---
->  tests/pc-cpu-test.c            | 26 +++++++-----------
->  tests/pcnet-test.c             |  4 +--
->  tests/pnv-xscom-test.c         | 14 ++--------
->  tests/prom-env-test.c          | 13 ++++-----
->  tests/pvpanic-test.c           |  4 +--
->  tests/pxe-test.c               | 14 ++++------
->  tests/q35-test.c               |  8 +++---
->  tests/qom-test.c               |  7 ++---
->  tests/rtc-test.c               |  2 +-
->  tests/rtl8139-test.c           |  4 +--
->  tests/spapr-phb-test.c         |  5 ++--
->  tests/tco-test.c               | 12 ++++-----
->  tests/test-arm-mptimer.c       |  4 +--
->  tests/test-filter-mirror.c     | 16 +++++------
->  tests/test-filter-redirector.c | 60 ++++++++++++++++++++----------------------
->  tests/test-hmp.c               |  7 ++---
->  tests/test-netfilter.c         |  9 +++----
->  tests/test-x86-cpuid-compat.c  | 13 ++++-----
->  tests/tmp105-test.c            |  2 +-
->  tests/tpci200-test.c           |  4 +--
->  tests/usb-hcd-ehci-test.c      | 25 +++++++++---------
->  tests/usb-hcd-ohci-test.c      |  4 +--
->  tests/usb-hcd-xhci-test.c      |  4 +--
->  tests/virtio-balloon-test.c    |  4 +--
->  tests/virtio-blk-test.c        | 13 ++++-----
->  tests/virtio-console-test.c    |  8 +++---
->  tests/virtio-net-test.c        |  4 +--
->  tests/virtio-rng-test.c        |  4 +--
->  tests/virtio-serial-test.c     |  4 +--
->  tests/vmgenid-test.c           | 29 ++++++--------------
->  tests/vmxnet3-test.c           |  4 +--
->  62 files changed, 267 insertions(+), 394 deletions(-)
-> 
-> diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index d338de3e22..0459526187 100644
-> --- a/tests/libqtest.h
-> +++ b/tests/libqtest.h
-> @@ -509,32 +509,6 @@ void qtest_add_data_func_full(const char *str, void *data,
->  void qtest_add_abrt_handler(GHookFunc fn, const void *data);
-> 
->  /**
-> - * qtest_start:
-> - * @args: other arguments to pass to QEMU
-> - *
-> - * Start QEMU and assign the resulting #QTestState to a global variable.
-> - * The global variable is used by "shortcut" functions documented below.
-> - *
-> - * Returns: #QTestState instance.
-> - */
-> -static inline QTestState *qtest_start(const char *args)
-> -{
-> -    global_qtest = qtest_init("%s", args);
-> -    return global_qtest;
-> -}
-> -
-> -/**
-> - * qtest_end:
-> - *
-> - * Shut down the QEMU process started by qtest_start().
-> - */
-> -static inline void qtest_end(void)
-> -{
-> -    qtest_quit(global_qtest);
-> -    global_qtest = NULL;
-> -}
-> -
-> -/**
->   * qmp:
->   * @fmt...: QMP message to send to qemu
->   *
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index 18facbf130..fa4e47c137 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -970,7 +970,7 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine))
->      QString *qstr;
->      const char *mname;
-> 
-> -    qtest_start("-machine none");
-> +    global_qtest = qtest_init("-machine none");
->      response = qmp("{ 'execute': 'query-machines' }");
->      g_assert(response);
->      list = qdict_get_qlist(response, "return");
-> @@ -987,6 +987,6 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine))
->          cb(mname);
->      }
-> 
-> -    qtest_end();
-> +    qtest_quit(global_qtest);
->      QDECREF(response);
->  }
-[...]
+> It would be nice to gradually reduce the number of places
+> we do per-OS ifdeffery in favour of checking for the specific
+> feature we care about in each case...
+> Tested on Linux, NetBSD, OSX.
+>=20
+>  configure                   | 15 +++++++++++++++
+>  include/qemu/thread-posix.h |  2 +-
+>  util/qemu-thread-posix.c    | 10 +++++-----
+>  3 files changed, 21 insertions(+), 6 deletions(-)
+>=20
+> diff --git a/configure b/configure
+> index fb7e34a..aa8d4d9 100755
+> --- a/configure
+> +++ b/configure
+> @@ -4448,6 +4448,18 @@ if compile_prog "" "" ; then
+>  fi
+> =20
+>  ##########################################
+> +# check if we have sem_timedwait
+> +
+> +sem_timedwait=3Dno
+> +cat > $TMPC << EOF
+> +#include <semaphore.h>
+> +int main(void) { return sem_timedwait(0, 0); }
+> +EOF
+> +if compile_prog "" "" ; then
+> +    sem_timedwait=3Dyes
+> +fi
+> +
+> +##########################################
+>  # check if trace backend exists
+> =20
+>  $python "$source_path/scripts/tracetool.py" "--backends=3D$trace_backe=
+nds" --check-backends  > /dev/null 2> /dev/null
+> @@ -5680,6 +5692,9 @@ fi
+>  if test "$inotify1" =3D "yes" ; then
+>    echo "CONFIG_INOTIFY1=3Dy" >> $config_host_mak
+>  fi
+> +if test "$sem_timedwait" =3D "yes" ; then
+> +  echo "CONFIG_SEM_TIMEDWAIT=3Dy" >> $config_host_mak
+> +fi
+>  if test "$byteswap_h" =3D "yes" ; then
+>    echo "CONFIG_BYTESWAP_H=3Dy" >> $config_host_mak
+>  fi
+> diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
+> index e5e3a0f..f4296d3 100644
+> --- a/include/qemu/thread-posix.h
+> +++ b/include/qemu/thread-posix.h
+> @@ -21,7 +21,7 @@ struct QemuCond {
+>  };
+> =20
+>  struct QemuSemaphore {
+> -#if defined(__APPLE__) || defined(__NetBSD__)
+> +#ifndef CONFIG_SEM_TIMEDWAIT
+>      pthread_mutex_t lock;
+>      pthread_cond_t cond;
+>      unsigned int count;
+> diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+> index 4e95d27..7306475 100644
+> --- a/util/qemu-thread-posix.c
+> +++ b/util/qemu-thread-posix.c
+> @@ -168,7 +168,7 @@ void qemu_sem_init(QemuSemaphore *sem, int init)
+>  {
+>      int rc;
+> =20
+> -#if defined(__APPLE__) || defined(__NetBSD__)
+> +#ifndef CONFIG_SEM_TIMEDWAIT
+>      rc =3D pthread_mutex_init(&sem->lock, NULL);
+>      if (rc !=3D 0) {
+>          error_exit(rc, __func__);
+> @@ -196,7 +196,7 @@ void qemu_sem_destroy(QemuSemaphore *sem)
+> =20
+>      assert(sem->initialized);
+>      sem->initialized =3D false;
+> -#if defined(__APPLE__) || defined(__NetBSD__)
+> +#ifndef CONFIG_SEM_TIMEDWAIT
+>      rc =3D pthread_cond_destroy(&sem->cond);
+>      if (rc < 0) {
+>          error_exit(rc, __func__);
+> @@ -218,7 +218,7 @@ void qemu_sem_post(QemuSemaphore *sem)
+>      int rc;
+> =20
+>      assert(sem->initialized);
+> -#if defined(__APPLE__) || defined(__NetBSD__)
+> +#ifndef CONFIG_SEM_TIMEDWAIT
+>      pthread_mutex_lock(&sem->lock);
+>      if (sem->count =3D=3D UINT_MAX) {
+>          rc =3D EINVAL;
+> @@ -256,7 +256,7 @@ int qemu_sem_timedwait(QemuSemaphore *sem, int ms)
+>      struct timespec ts;
+> =20
+>      assert(sem->initialized);
+> -#if defined(__APPLE__) || defined(__NetBSD__)
+> +#ifndef CONFIG_SEM_TIMEDWAIT
+>      rc =3D 0;
+>      compute_abs_deadline(&ts, ms);
+>      pthread_mutex_lock(&sem->lock);
+> @@ -304,7 +304,7 @@ void qemu_sem_wait(QemuSemaphore *sem)
+>      int rc;
+> =20
+>      assert(sem->initialized);
+> -#if defined(__APPLE__) || defined(__NetBSD__)
+> +#ifndef CONFIG_SEM_TIMEDWAIT
+>      pthread_mutex_lock(&sem->lock);
+>      while (sem->count =3D=3D 0) {
+>          rc =3D pthread_cond_wait(&sem->cond, &sem->lock);
+>=20
 
-Maybe this patch could be postponed 'till we can completely remove
-global_qtest? Otherwise you've got to change these lines over and over
-again...
 
- Thomas
+
+--iTaeI2rF1bX5llqKJ40IrkEEUW83P4TL0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZrp81AAoJEEuzCOmwLnZs6q0QAI573EKu8J7jXS1CqfBK/gFv
+y2AdD4lX13hS6z5gGjSewKq7QaSwUl9w04KPZyhpeUV8Dj2FkPQgXlQp+bS5E7eL
+20j59Ripug1xsH0TxW6HQ9jxELhjz982JtgYP6M9vKE0AxPN35l4Nm4S6wQ0UDE/
+r+RrHOI31lkRXcFfqYrCh8uZwTA/mJYjcXfETOykF+/hDOnHfMbbcUqFFS7rI1Wv
+dRQX+2/60SXoxlQoAKkwl5qoPWXEIE1I9W3tjQc6pGA5kgKU7uHow9GqffoPpxrw
+blIsJIjigD1C6Ft8FlA9FZYqK+cLHDBxusdB0PBb8TezbDzzKXWhPUDexMV+neKg
+7KN53il5/1lYhiSfU9hnm+QPPzWZla2ZVqJVndvaro8F45pxmDN78v3Xhti+56OV
+nJdlQvihOs0sI6AC+ukYdnSux3AEDJt9S+fGbOdS8CYevrHCMExB/mlscmwYihZV
+bt/y/Je5wP1y032X0fPMJLjU/nRoUcex4R4YpTF68hq9hpVsB99opkkyFyqku8ew
+mfPeGnBEtMz1b1aSGwfHAxpcwkEdhE9cRxRSPGpcM5uevUu7Kaf1REVGI4w9T3Ra
+kc6ViMJuHQzG3l1j47IheimH1ccuCpD5jrFuuxiCweSEtgBZUssLX5sTvuejM9+9
+cwxD61az1nz4qsezIfVW
+=4oPD
+-----END PGP SIGNATURE-----
+
+--iTaeI2rF1bX5llqKJ40IrkEEUW83P4TL0--
