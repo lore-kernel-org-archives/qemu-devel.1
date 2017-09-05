@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59694)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpDB1-0006Ps-03
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:42:03 -0400
+	(envelope-from <david@redhat.com>) id 1dpDBU-0006sK-O8
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:42:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpDAw-0001ki-4J
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:41:59 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <CAJ+F1C+mPu9ftXwgs4UrGTQp4f65-thhvmWoB-kuRmu0=vnFFw@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <54c80221-aaf8-48c3-d58d-485003f77988@amsat.org>
-Date: Tue, 5 Sep 2017 09:41:40 -0300
+	(envelope-from <david@redhat.com>) id 1dpDBQ-0002AM-70
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:42:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59294)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dpDBQ-00029r-0y
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:42:24 -0400
+References: <20170904154316.4148-1-david@redhat.com>
+	<20170904154316.4148-9-david@redhat.com>
+	<20170905143801.1dc39cb1.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <e4ed534e-6eef-30ea-6359-0b535f483cc3@redhat.com>
+Date: Tue, 5 Sep 2017 14:42:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1C+mPu9ftXwgs4UrGTQp4f65-thhvmWoB-kuRmu0=vnFFw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170905143801.1dc39cb1.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] clang-tidy: use g_new() family of functions
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 08/19] s390x: move sclp_service_call()
+ to interrupt.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +30,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, qemu trival <qemu-trivial@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi Marc-André,
+On 05.09.2017 14:38, Cornelia Huck wrote:
+> On Mon,  4 Sep 2017 17:43:05 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> Fix up includes and rename it to s390x_*.
+> 
+> I'm not quite sure whether that is the right direction: servc is just an
+> instruction that does something and then happens to also generate an
+> interrupt on conclusion. I'll think a bit more about it.
+> 
 
-On 09/05/2017 09:14 AM, Marc-André Lureau wrote:
-> Hi,
-> 
-> I have a series of changes generated with clang-tidy qemu [1] pending
-> for review [2].
-> 
-> It translates calloc/*malloc*/*realloc() calls to
-> g_new/g_newa/g_new0/g_renew() where the argument is a sizeof(T) [* N].
-> 
-> This is the first commit to give you an idea:
-> 
-> diff --git a/hw/timer/arm_timer.c b/hw/timer/arm_timer.c
-> index 98fddd7ac1..75affcb8a6 100644
-> --- a/hw/timer/arm_timer.c
-> +++ b/hw/timer/arm_timer.c
-> @@ -166,7 +166,7 @@ static arm_timer_state *arm_timer_init(uint32_t freq)
->       arm_timer_state *s;
->       QEMUBH *bh;
-> 
-> -    s = (arm_timer_state *)g_malloc0(sizeof(arm_timer_state));
-> +    s = g_new0(arm_timer_state, 1);
->       s->freq = freq;
->       s->control = TIMER_CTRL_IE;
-> 
-> g_new() advantages (from glib doc):
-> - the returned pointer is cast to a pointer to the given type.
-> - care is taken to avoid overflow when calculating the size of the
-> allocated block.
-> 
-> But it is also shorter&nicer :)
-> 
-> I have not included in the first batch the opportunity to also
-> translate: alloc(sizeof(*p) * x) to g_new(typeof(*p), x), since it is
-> arguably not much nicer. But for consistency, I think it would be good
+Having CPU related stuff in sclp looks also wrong. Feel free to skip
+this patch, should be unrelated to the following patches.
 
-"avoid overflow when calculating the size" sounds nicer.
+-- 
 
-> to use g_new(). What do you think?
+Thanks,
 
-Dunno if useful, but Juan Quintela had some issue:
-
-http://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg00085.html
-
-> 
-> I splitted the changes amont the various MAINTAINERS entries, but it
-> is still about 70 patches (without the typeof() changes).
-> 
-> 
-> [1] https://github.com/elmarco/clang-tools-extra/
-> [2] https://github.com/elmarco/qemu/commits/gnew
-> 
-> 
+David
