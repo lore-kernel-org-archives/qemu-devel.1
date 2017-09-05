@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34829)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37583)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dpGHk-0006gP-Dm
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 12:01:14 -0400
+	(envelope-from <groug@kaod.org>) id 1dpHD4-0008TE-9K
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:00:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dpGHb-0000g1-0F
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 12:01:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45308)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dpGHa-0000fT-QL
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 12:00:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dpGHZ-0000Cj-EK
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 16:00:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5C5E12E80C7
-	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 16:00:57 +0000 (UTC)
+	(envelope-from <groug@kaod.org>) id 1dpHCz-0002Jv-KW
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:00:22 -0400
+Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:42320)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dpHCz-0002J5-DU
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:00:17 -0400
+Received: from player157.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 90616AACE4
+	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 19:00:15 +0200 (CEST)
+Date: Tue, 5 Sep 2017 19:00:10 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170905190010.0c84335f@bahia>
+In-Reply-To: <150462482278.16876.9815938798442180307@loki>
+References: <150451194093.7046.18254446012958612468.stgit@bahia>
+	<1d5efdef-21b8-9b7b-6939-339b97fd9bce@redhat.com>
+	<20170905162425.3a202a87@bahia>
+	<150462482278.16876.9815938798442180307@loki>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 05 Sep 2017 15:50:17 -0000
-From: Brian Rak <brak@vultr.com>
-Reply-To: Bug 1715186 <1715186@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150462661769.17099.11925025088141121020.malonedeb@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715186] [NEW] websockets: Improve error messages
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/.nQxN3ZK3C7V0nWgTK58+FS";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] virtfs: error out gracefully when
+ mandatory suboptions are missing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,55 +34,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-Public bug reported:
+--Sig_/.nQxN3ZK3C7V0nWgTK58+FS
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Since 2.9 / 07e95cd529af345fdeea230913f68eff5b925bb6 , whenever the VNC
-websocket server finds an error with the incoming connection request, it
-just closes the socket with no further information.
+On Tue, 05 Sep 2017 10:20:22 -0500
+Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
+[...]
+> >=20
+> > Well, it's been there forever and it isn't a critical fix... but the
+> > thread on qemu-discuss the other day showed that it was confusing
+> > people, and the fix is trivial. So I guess it doesn't hurt to have
+> > this in stable. :)
+> >=20
+> > Michael,
+> >=20
+> > I'll send a pull req later today. If it's not too late, maybe you can a=
+dd
+> > this patch to 2.9.1 when it's merged in master? =20
+>=20
+> We're in freeze as of yesterday with release set for Thursday, so it's a
+> bit late. OTOH I don't have test coverage for virtfs and the patch seems
+> isolated enough that I don't see any harm in slipping it in if it
+> lands in master by tomorrow. Otherwise it'll have to wait for 2.10.1,
+> which I'm hoping to get out this month.
+>=20
 
-This makes figuring out what's wrong with the request nearly impossible.
+The fix just got merged.
 
-I would be nice if:
+commit 32b6943699948f7adc35ada233fbd25daffad5e9
+Author: Greg Kurz <groug@kaod.org>
+Date:   Mon Sep 4 09:59:01 2017 +0200
 
-* HTTP 400 were returned to the client, with an appropriate error message
-* Maybe something written to the log as well?
+    virtfs: error out gracefully when mandatory suboptions are missing
 
-Currently, I'm resorting to looking at my request and the websocket
-source and hoping I can figure out what's wrong.
+Cheers,
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+--
+Greg
 
--- =
+--Sig_/.nQxN3ZK3C7V0nWgTK58+FS
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715186
+-----BEGIN PGP SIGNATURE-----
 
-Title:
-  websockets: Improve error messages
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWa7YGgAKCRAC/DrrAQHb
+wlG6AJ9o7+EGTKLK1GX4nXPXvWicFU78RACffs/3c1YgnWIaPI6sDA1KapA5uzU=
+=shm+
+-----END PGP SIGNATURE-----
 
-Status in QEMU:
-  New
-
-Bug description:
-  Since 2.9 / 07e95cd529af345fdeea230913f68eff5b925bb6 , whenever the
-  VNC websocket server finds an error with the incoming connection
-  request, it just closes the socket with no further information.
-
-  This makes figuring out what's wrong with the request nearly
-  impossible.
-
-  I would be nice if:
-
-  * HTTP 400 were returned to the client, with an appropriate error message
-  * Maybe something written to the log as well?
-
-  Currently, I'm resorting to looking at my request and the websocket
-  source and hoping I can figure out what's wrong.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715186/+subscriptions
+--Sig_/.nQxN3ZK3C7V0nWgTK58+FS--
