@@ -1,35 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46439)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpBr6-0005Cy-7f
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpBr5-0005Cx-RA
 	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 07:17:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpBqw-0007zM-DY
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 07:17:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37808
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpBr0-00083s-LO
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 07:17:19 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57860
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dpBqw-0007yS-7r
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 07:17:10 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	id 1dpBr0-00083H-Fb
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 07:17:14 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v85BEdcs059403
-	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 07:17:09 -0400
+	v85BEffv173054
+	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 07:17:14 -0400
 Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2csrt0f17y-1
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cstttrc36-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 07:17:09 -0400
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 07:17:13 -0400
 Received: from localhost
 	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 5 Sep 2017 12:17:07 +0100
+	Tue, 5 Sep 2017 12:17:12 +0100
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue,  5 Sep 2017 13:16:41 +0200
+Date: Tue,  5 Sep 2017 13:16:45 +0200
 In-Reply-To: <20170905111645.18068-1-pasic@linux.vnet.ibm.com>
 References: <20170905111645.18068-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20170905111645.18068-2-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/5] s390x/css: introduce css data stream
+Message-Id: <20170905111645.18068-6-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 5/5] s390x/ccs: add ccw-tester emulated device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,172 +41,225 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Cornelia Huck <cohuck@redhat.com>
 Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-This is a preparation for introducing handling for indirect data
-addressing and modified indirect data addressing (CCW). Here we introduce
-an interface which should make the addressing scheme transparent for the
-client code. Here we implement only basic scheme (no IDA or MIDA).
+Add a fake device meant for testing the correctness of our css emulation.
+
+What we currently have is writing a Fibonacci sequence of uint32_t to the
+device via ccw write. The write is going to fail if it ain't a Fibonacci
+and indicate a device exception in scsw together with the proper residual
+count.
+
+Of course lot's of invalid inputs (besides basic data processing) can be
+tested with that as well.
+
+Usage:
+1) fire up a qemu with something like -device ccw-tester,devno=fe.0.0001
+   on the command line
+2) exercise the device from the guest
 
 Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 ---
- hw/s390x/css.c         | 55 +++++++++++++++++++++++++++++++++++++++++
- include/hw/s390x/css.h | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 122 insertions(+)
 
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 1880b1a0ff..87d913f81c 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -783,6 +783,61 @@ static CCW1 copy_ccw_from_guest(hwaddr addr, bool fmt1)
-     }
-     return ret;
- }
-+/**
-+ * If out of bounds marks the stream broken. If broken returns -EINVAL,
-+ * otherwise the requested  length (may be zero)
-+ */
-+static inline int cds_check_len(CcwDataStream *cds, int len)
+It may not make sense to merge this work in the current form, as it is
+solely for test purposes.
+---
+ hw/s390x/Makefile.objs |   1 +
+ hw/s390x/ccw-tester.c  | 179 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 180 insertions(+)
+ create mode 100644 hw/s390x/ccw-tester.c
+
+diff --git a/hw/s390x/Makefile.objs b/hw/s390x/Makefile.objs
+index b2aade2466..44a07431da 100644
+--- a/hw/s390x/Makefile.objs
++++ b/hw/s390x/Makefile.objs
+@@ -17,3 +17,4 @@ obj-y += s390-stattrib.o
+ obj-$(CONFIG_KVM) += s390-skeys-kvm.o
+ obj-$(CONFIG_KVM) += s390-stattrib-kvm.o
+ obj-y += s390-ccw.o
++obj-y += ccw-tester.o
+diff --git a/hw/s390x/ccw-tester.c b/hw/s390x/ccw-tester.c
+new file mode 100644
+index 0000000000..c8017818c4
+--- /dev/null
++++ b/hw/s390x/ccw-tester.c
+@@ -0,0 +1,179 @@
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu/module.h"
++#include "cpu.h"
++#include "hw/s390x/css.h"
++#include "hw/s390x/css-bridge.h"
++#include "hw/s390x/3270-ccw.h"
++#include "exec/address-spaces.h"
++#include <error.h>
++
++typedef struct CcwTesterDevice {
++    CcwDevice parent_obj;
++    uint16_t cu_type;
++    uint8_t chpid_type;
++    struct {
++        uint32_t ring[4];
++        unsigned int next;
++    } fib;
++} CcwTesterDevice;
++
++
++typedef struct CcwTesterClass {
++    CCWDeviceClass parent_class;
++    DeviceRealize parent_realize;
++} CcwTesterClass;
++
++#define TYPE_CCW_TESTER "ccw-tester"
++
++#define CCW_TESTER(obj) \
++     OBJECT_CHECK(CcwTesterDevice, (obj), TYPE_CCW_TESTER)
++#define CCW_TESTER_CLASS(klass) \
++     OBJECT_CLASS_CHECK(CcwTesterClass, (klass), TYPE_CCW_TESTER)
++#define CCW_TESTER_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(CcwTesterClass, (obj), TYPE_CCW_TESTER)
++
++#define CCW_CMD_READ 0x01U
++#define CCW_CMD_WRITE 0x02U
++
++static unsigned int abs_to_ring(unsigned int i)
 +{
-+    if (cds->at_byte + len > cds->count) {
-+        cds->flags |= CDS_F_STREAM_BROKEN;
-+    }
-+    return cds->flags & CDS_F_STREAM_BROKEN ? -EINVAL : len;
++    return i & 0x3;
 +}
 +
-+static int ccw_dstream_rw_noflags(CcwDataStream *cds, void *buff, int len,
-+                                  CcwDataStreamOp op)
++static int  ccw_tester_write_fib(SubchDev *sch, CCW1 ccw)
 +{
-+    int ret;
++    CcwTesterDevice *d = sch->driver_data;
++    bool is_fib = true;
++    uint32_t sum;
++    int ret = 0;
 +
-+    ret = cds_check_len(cds, len);
-+    if (ret <= 0) {
-+        return ret;
++    ccw_dstream_init(&sch->cds, &ccw, &sch->orb);
++    d->fib.next = 0;
++    while (ccw_dstream_avail(&sch->cds) > 0) {
++        ret = ccw_dstream_read(&sch->cds,
++                               d->fib.ring[abs_to_ring(d->fib.next)]);
++        if (ret) {
++            error(0, -ret, "fib");
++            break;
++        }
++        if (d->fib.next > 2) {
++            sum = (d->fib.ring[abs_to_ring(d->fib.next - 1)]
++                  + d->fib.ring[abs_to_ring(d->fib.next - 2)]);
++            is_fib = sum ==  d->fib.ring[abs_to_ring(d->fib.next)];
++            if (!is_fib) {
++                break;
++            }
++        }
++        ++(d->fib.next);
 +    }
-+    if (op == CDS_OP_A) {
-+        goto incr;
++    if (!is_fib) {
++        sch->curr_status.scsw.ctrl &= ~SCSW_ACTL_START_PEND;
++        sch->curr_status.scsw.ctrl |= SCSW_STCTL_PRIMARY |
++                                      SCSW_STCTL_SECONDARY |
++                                      SCSW_STCTL_ALERT |
++                                      SCSW_STCTL_STATUS_PEND;
++        sch->curr_status.scsw.count = ccw_dstream_residual_count(&sch->cds);
++        sch->curr_status.scsw.cpa = sch->channel_prog + 8;
++        sch->curr_status.scsw.dstat =  SCSW_DSTAT_UNIT_EXCEP;
++        return -EIO;
 +    }
-+    ret = address_space_rw(&address_space_memory, cds->cda,
-+                           MEMTXATTRS_UNSPECIFIED, buff, len, op);
-+    if (ret != MEMTX_OK) {
-+        cds->flags |= CDS_F_STREAM_BROKEN;
++    return ret;
++}
++
++static int ccw_tester_ccw_cb_impl(SubchDev *sch, CCW1 ccw)
++{
++    switch (ccw.cmd_code) {
++    case CCW_CMD_READ:
++        break;
++    case CCW_CMD_WRITE:
++        return ccw_tester_write_fib(sch, ccw);
++    default:
 +        return -EINVAL;
 +    }
-+incr:
-+    cds->at_byte += len;
-+    cds->cda += len;
 +    return 0;
 +}
 +
-+void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
++static void ccw_tester_realize(DeviceState *ds, Error **errp)
 +{
-+    /*
-+     * We don't support MIDA (an optional facility) yet and we
-+     * catch this earlier. Just for expressing the precondition.
-+     */
-+    assert(!(orb->ctrl1 & ORB_CTRL1_MASK_MIDAW));
-+    cds->flags = (orb->ctrl0 & ORB_CTRL0_MASK_I2K ? CDS_F_I2K : 0) |
-+                 (orb->ctrl0 & ORB_CTRL0_MASK_C64 ? CDS_F_C64 : 0) |
-+                 (ccw->flags & CCW_FLAG_IDA ? CDS_F_IDA : 0);
-+    cds->count = ccw->count;
-+    cds->cda_orig = ccw->cda;
-+    ccw_dstream_rewind(cds);
-+    if (!(cds->flags & CDS_F_IDA)) {
-+        cds->op_handler = ccw_dstream_rw_noflags;
-+    } else {
-+        assert(false);
++    uint16_t chpid;
++    CcwTesterDevice *dev = CCW_TESTER(ds);
++    CcwTesterClass *ctc = CCW_TESTER_GET_CLASS(dev);
++    CcwDevice *cdev = CCW_DEVICE(ds);
++    BusState *qbus = qdev_get_parent_bus(ds);
++    VirtualCssBus *cbus = VIRTUAL_CSS_BUS(qbus);
++    SubchDev *sch;
++    Error *err = NULL;
++
++    sch = css_create_sch(cdev->devno, true, cbus->squash_mcss, errp);
++    if (!sch) {
++        return;
 +    }
++
++    sch->driver_data = dev;
++    cdev->sch = sch;
++    chpid = css_find_free_chpid(sch->cssid);
++
++    if (chpid > MAX_CHPID) {
++        error_setg(&err, "No available chpid to use.");
++        goto out_err;
++    }
++
++    sch->id.reserved = 0xff;
++    sch->id.cu_type = dev->cu_type;
++    css_sch_build_virtual_schib(sch, (uint8_t)chpid,
++                                dev->chpid_type);
++    sch->ccw_cb = ccw_tester_ccw_cb_impl;
++    sch->do_subchannel_work = do_subchannel_work_virtual;
++
++
++    ctc->parent_realize(ds, &err);
++    if (err) {
++        goto out_err;
++    }
++
++    css_generate_sch_crws(sch->cssid, sch->ssid, sch->schid,
++                          ds->hotplugged, 1);
++    return;
++
++out_err:
++    error_propagate(errp, err);
++    css_subch_assign(sch->cssid, sch->ssid, sch->schid, sch->devno, NULL);
++    cdev->sch = NULL;
++    g_free(sch);
 +}
- 
- static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
-                              bool suspend_allowed)
-diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-index 5c5fe6b202..7b7207f9a2 100644
---- a/include/hw/s390x/css.h
-+++ b/include/hw/s390x/css.h
-@@ -74,6 +74,29 @@ typedef struct CMBE {
-     uint32_t reserved[7];
- } QEMU_PACKED CMBE;
- 
-+typedef enum CcwDataStreamOp {
-+    CDS_OP_R = 0,
-+    CDS_OP_W = 1,
-+    CDS_OP_A = 2
-+} CcwDataStreamOp;
 +
-+/** normal usage is via SuchchDev.cds instead of instantiating */
-+typedef struct CcwDataStream {
-+#define CDS_F_IDA   0x01
-+#define CDS_F_MIDA  0x02
-+#define CDS_F_I2K   0x04
-+#define CDS_F_C64   0x08
-+#define CDS_F_STREAM_BROKEN  0x80
-+    uint8_t flags;
-+    uint8_t at_idaw;
-+    uint16_t at_byte;
-+    uint16_t count;
-+    uint32_t cda_orig;
-+    int (*op_handler)(struct CcwDataStream *cds, void *buff, int len,
-+                      CcwDataStreamOp op);
-+    hwaddr cda;
-+} CcwDataStream;
++static Property ccw_tester_properties[] = {
++    DEFINE_PROP_UINT16("cu_type", CcwTesterDevice, cu_type,
++                        0x3831),
++    DEFINE_PROP_UINT8("chpid_type", CcwTesterDevice, chpid_type,
++                       0x98),
++    DEFINE_PROP_END_OF_LIST(),
++};
 +
- typedef struct SubchDev SubchDev;
- struct SubchDev {
-     /* channel-subsystem related things: */
-@@ -91,6 +114,7 @@ struct SubchDev {
-     uint8_t ccw_no_data_cnt;
-     uint16_t migrated_schid; /* used for missmatch detection */
-     ORB orb;
-+    CcwDataStream cds;
-     /* transport-provided data: */
-     int (*ccw_cb) (SubchDev *, CCW1);
-     void (*disable_cb)(SubchDev *);
-@@ -238,4 +262,47 @@ SubchDev *css_create_sch(CssDevId bus_id, bool is_virtual, bool squash_mcss,
- /** Turn on css migration */
- void css_register_vmstate(void);
- 
-+
-+void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb);
-+
-+static inline void ccw_dstream_rewind(CcwDataStream *cds)
++static void ccw_tester_class_init(ObjectClass *klass, void *data)
 +{
-+    cds->at_byte = 0;
-+    cds->at_idaw = 0;
-+    cds->cda = cds->cda_orig;
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    CcwTesterClass *ctc = CCW_TESTER_CLASS(klass);
++
++    dc->props = ccw_tester_properties;
++    dc->bus_type = TYPE_VIRTUAL_CSS_BUS;
++    ctc->parent_realize = dc->realize;
++    dc->realize = ccw_tester_realize;
++    dc->hotpluggable = false;
 +}
 +
-+static inline bool ccw_dstream_good(CcwDataStream *cds)
++static const TypeInfo ccw_tester_info = {
++    .name = TYPE_CCW_TESTER,
++    .parent = TYPE_CCW_DEVICE,
++    .instance_size = sizeof(CcwTesterDevice),
++    .class_init = ccw_tester_class_init,
++    .class_size = sizeof(CcwTesterClass),
++};
++
++static void ccw_tester_register(void)
 +{
-+    return !(cds->flags & CDS_F_STREAM_BROKEN);
++    type_register_static(&ccw_tester_info);
 +}
 +
-+static inline uint16_t ccw_dstream_residual_count(CcwDataStream *cds)
-+{
-+    return cds->count - cds->at_byte;
-+}
-+
-+static inline uint16_t ccw_dstream_avail(CcwDataStream *cds)
-+{
-+    return ccw_dstream_good(cds) ?  ccw_dstream_residual_count(cds) : 0;
-+}
-+
-+static inline int ccw_dstream_advance(CcwDataStream *cds, int len)
-+{
-+    return cds->op_handler(cds, NULL, len, CDS_OP_A);
-+}
-+
-+static inline int ccw_dstream_write_buf(CcwDataStream *cds, void *buff, int len)
-+{
-+    return cds->op_handler(cds, buff, len, CDS_OP_W);
-+}
-+
-+static inline int ccw_dstream_read_buf(CcwDataStream *cds, void *buff, int len)
-+{
-+    return cds->op_handler(cds, buff, len, CDS_OP_R);
-+}
-+
-+#define ccw_dstream_read(cds, v) ccw_dstream_read_buf((cds), &(v), sizeof(v))
-+#define ccw_dstream_write(cds, v) ccw_dstream_write_buf((cds), &(v), sizeof(v))
-+
- #endif
++type_init(ccw_tester_register)
 -- 
 2.13.5
