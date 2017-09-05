@@ -1,20 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42886)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpDeJ-0006cV-D2
+	(envelope-from <famz@redhat.com>) id 1dpDeJ-0006cc-HC
 	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:12:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpDe9-0007t5-NV
+	(envelope-from <famz@redhat.com>) id 1dpDeE-0007zL-MS
 	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:12:15 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue,  5 Sep 2017 21:11:44 +0800
-Message-Id: <20170905131149.10669-2-famz@redhat.com>
+Date: Tue,  5 Sep 2017 21:11:46 +0800
+Message-Id: <20170905131149.10669-4-famz@redhat.com>
 In-Reply-To: <20170905131149.10669-1-famz@redhat.com>
 References: <20170905131149.10669-1-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 1/6] armv7m: Convert bitband.source-memory
- to DEFINE_PROP_LINK
+Subject: [Qemu-devel] [PATCH v6 3/6] gicv3: Convert to DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +23,59 @@ To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- hw/arm/armv7m.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ hw/intc/arm_gicv3_its_kvm.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
 
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index d2477e84e4..4c560dde56 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -97,12 +97,6 @@ static void bitband_init(Object *obj)
-     BitBandState *s =3D BITBAND(obj);
-     SysBusDevice *dev =3D SYS_BUS_DEVICE(obj);
-=20
--    object_property_add_link(obj, "source-memory",
--                             TYPE_MEMORY_REGION,
--                             (Object **)&s->source_memory,
--                             qdev_prop_allow_set_link_before_realize,
+diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
+index 1f8991b8a6..39903d5eab 100644
+--- a/hw/intc/arm_gicv3_its_kvm.c
++++ b/hw/intc/arm_gicv3_its_kvm.c
+@@ -120,17 +120,6 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
+     qemu_add_vm_change_state_handler(vm_change_state_handler, s);
+ }
+ 
+-static void kvm_arm_its_init(Object *obj)
+-{
+-    GICv3ITSState *s = KVM_ARM_ITS(obj);
+-
+-    object_property_add_link(obj, "parent-gicv3",
+-                             "kvm-arm-gicv3", (Object **)&s->gicv3,
+-                             object_property_allow_set_link,
 -                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
 -                             &error_abort);
-     memory_region_init_io(&s->iomem, obj, &bitband_ops, s,
-                           "bitband", 0x02000000);
-     sysbus_init_mmio(dev, &s->iomem);
-@@ -349,6 +343,8 @@ void armv7m_load_kernel(ARMCPU *cpu, const char *kern=
-el_filename, int mem_size)
-=20
- static Property bitband_properties[] =3D {
-     DEFINE_PROP_UINT32("base", BitBandState, base, 0),
-+    DEFINE_PROP_LINK("source-memory", BitBandState, source_memory,
-+                     TYPE_MEMORY_REGION, MemoryRegion *),
-     DEFINE_PROP_END_OF_LIST(),
+-}
+-
+ /**
+  * kvm_arm_its_pre_save - handles the saving of ITS registers.
+  * ITS tables are flushed into guest RAM separately and earlier,
+@@ -205,12 +194,19 @@ static void kvm_arm_its_post_load(GICv3ITSState *s)
+                       GITS_CTLR, &s->ctlr, true, &error_abort);
+ }
+ 
++static Property kvm_arm_its_props[] = {
++    DEFINE_PROP_LINK("parent-gicv3", GICv3ITSState, gicv3, "kvm-arm-gicv3",
++                     GICv3State *),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
+ static void kvm_arm_its_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     GICv3ITSCommonClass *icc = ARM_GICV3_ITS_COMMON_CLASS(klass);
+ 
+     dc->realize = kvm_arm_its_realize;
++    dc->props   = kvm_arm_its_props;
+     icc->send_msi = kvm_its_send_msi;
+     icc->pre_save = kvm_arm_its_pre_save;
+     icc->post_load = kvm_arm_its_post_load;
+@@ -220,7 +216,6 @@ static const TypeInfo kvm_arm_its_info = {
+     .name = TYPE_KVM_ARM_ITS,
+     .parent = TYPE_ARM_GICV3_ITS_COMMON,
+     .instance_size = sizeof(GICv3ITSState),
+-    .instance_init = kvm_arm_its_init,
+     .class_init = kvm_arm_its_class_init,
  };
-=20
---=20
+ 
+-- 
 2.13.5
