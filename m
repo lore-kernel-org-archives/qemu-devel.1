@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50872)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1dpDo9-0006Jj-Do
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:22:30 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dpDu3-0000Hi-Gh
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:28:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1dpDnz-0007WA-J7
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:22:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34782)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1dpDnz-0007VK-AT
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:22:15 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 53A993F74C
-	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 13:22:14 +0000 (UTC)
-From: Michal Privoznik <mprivozn@redhat.com>
-Date: Tue,  5 Sep 2017 15:22:04 +0200
-Message-Id: <f9d56290959d378dfa65b3906bf0d822ab938ac9.1504617551.git.mprivozn@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] watchdog: Allow setting action on the fly
+	(envelope-from <kwolf@redhat.com>) id 1dpDty-0003Mr-Ru
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:28:31 -0400
+Date: Tue, 5 Sep 2017 15:27:56 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170905132756.GL4633@localhost.localdomain>
+References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
+	<a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
+	<cb783ebb-198e-1814-2f9c-aec93c83b17a@virtuozzo.com>
+	<0988b4ef-56e2-5ce9-ed25-40a742eadbd4@redhat.com>
+	<b0d72a26-2052-ecc6-67f5-d32572804ebf@redhat.com>
+	<20170828025706.GA18194@lemon.lan>
+	<20170905130107.GJ4633@localhost.localdomain>
+	<20170905131858.GW22515@lemon.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170905131858.GW22515@lemon.lan>
+Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,206 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, eblake@redhat.com
+To: Fam Zheng <famz@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Qemu-block <qemu-block@nongnu.org>, Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-Currently, the only time that users can set watchdog action is at
-the start as all we expose is this -watchdog-action command line
-argument. This is suboptimal when users want to plug the device
-later via monitor. Alternatively, they might want to change the
-action for already existing device on the fly.
+Am 05.09.2017 um 15:18 hat Fam Zheng geschrieben:
+> On Tue, 09/05 15:01, Kevin Wolf wrote:
+> > Am 28.08.2017 um 04:57 hat Fam Zheng geschrieben:
+> > > On Fri, 08/25 15:44, Max Reitz wrote:
+> > > > Well, OK.  The main argument against supporting anything but qcow2 is
+> > > > "if you want features, use qcow2; and we are working on making qcow2 as
+> > > > fast as possible."  I think that's a very good argument still.  At some
+> > > > point I (and probably others, too) had the idea of making qcow2 files in
+> > > > raw layout: 
+> > > 
+> > > Yes! I think this idea makes a whole lot of sense, too. Metadata tables can be
+> > > generated so old implementation can still use it.
+> > 
+> > Maybe a nice way to attack this would be "huge pages", i.e. have a L1
+> > entry flag that tells "this points directly to a huge cluster instead of
+> > an L2 table". Gives us 512 MB clusters with a 64k cluster size, or a
+> > maximum of 512 GB clusters with a 2 MB cluster size.
+> > 
+> > Huge clusters would only be used by qemu-img create if the respective
+> > option is given, and only with preallocation.
+> 
+> Then this image is not usable on old QEMUs, right? So this is going to be an
+> incompatible_feature, whereas with the linear mapping L1/L2 tables approach, it
+> can be an autoclear_feature.
 
-At the same time, drop local redefinition of the actions eum in
-watchdog.h in favour of the ones defined in schema.
+Ah yes, that's true. Maybe that's important enough that just a single
+global flag is better, even if it's less flexible.
 
-Inspired by: https://bugzilla.redhat.com/show_bug.cgi?id=1447169
+Of course, this approach also means that we still need to write all of
+the L2 tables and use disk space for them, even though newer versions
+will never look at them.
 
-Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
----
-
-diff to v1:
-- instead of allowing 'action' to be arbitrary string, use enum for it and thus
-  drop local redefinition of the enum.
-
- hw/watchdog/watchdog.c    | 52 ++++++++++++++++++++++++-----------------------
- hw/watchdog/wdt_diag288.c |  6 +++---
- include/sysemu/watchdog.h | 12 ++---------
- qapi-schema.json          |  9 ++++++++
- 4 files changed, 41 insertions(+), 38 deletions(-)
-
-diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
-index 0c5c9cde1c..a3e9d7b59b 100644
---- a/hw/watchdog/watchdog.c
-+++ b/hw/watchdog/watchdog.c
-@@ -29,8 +29,11 @@
- #include "qapi-event.h"
- #include "hw/nmi.h"
- #include "qemu/help_option.h"
-+#include "qmp-commands.h"
-+#include "qapi/qmp/qerror.h"
-+#include "qapi/util.h"
- 
--static int watchdog_action = WDT_RESET;
-+static WatchdogExpirationAction watchdog_action = WATCHDOG_EXPIRATION_ACTION_RESET;
- static QLIST_HEAD(watchdog_list, WatchdogTimerModel) watchdog_list;
- 
- void watchdog_add_model(WatchdogTimerModel *model)
-@@ -77,27 +80,17 @@ int select_watchdog(const char *p)
- 
- int select_watchdog_action(const char *p)
- {
--    if (strcasecmp(p, "reset") == 0)
--        watchdog_action = WDT_RESET;
--    else if (strcasecmp(p, "shutdown") == 0)
--        watchdog_action = WDT_SHUTDOWN;
--    else if (strcasecmp(p, "poweroff") == 0)
--        watchdog_action = WDT_POWEROFF;
--    else if (strcasecmp(p, "pause") == 0)
--        watchdog_action = WDT_PAUSE;
--    else if (strcasecmp(p, "debug") == 0)
--        watchdog_action = WDT_DEBUG;
--    else if (strcasecmp(p, "none") == 0)
--        watchdog_action = WDT_NONE;
--    else if (strcasecmp(p, "inject-nmi") == 0)
--        watchdog_action = WDT_NMI;
--    else
--        return -1;
-+    int action;
- 
-+    action = qapi_enum_parse(WatchdogExpirationAction_lookup, p,
-+                             WATCHDOG_EXPIRATION_ACTION__MAX, -1, NULL);
-+    if (action < 0)
-+        return -1;
-+    qmp_watchdog_set_action(action, NULL);
-     return 0;
- }
- 
--int get_watchdog_action(void)
-+WatchdogExpirationAction get_watchdog_action(void)
- {
-     return watchdog_action;
- }
-@@ -108,21 +101,21 @@ int get_watchdog_action(void)
- void watchdog_perform_action(void)
- {
-     switch (watchdog_action) {
--    case WDT_RESET:             /* same as 'system_reset' in monitor */
-+    case WATCHDOG_EXPIRATION_ACTION_RESET:      /* same as 'system_reset' in monitor */
-         qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_RESET, &error_abort);
-         qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-         break;
- 
--    case WDT_SHUTDOWN:          /* same as 'system_powerdown' in monitor */
-+    case WATCHDOG_EXPIRATION_ACTION_SHUTDOWN:   /* same as 'system_powerdown' in monitor */
-         qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_SHUTDOWN, &error_abort);
-         qemu_system_powerdown_request();
-         break;
- 
--    case WDT_POWEROFF:          /* same as 'quit' command in monitor */
-+    case WATCHDOG_EXPIRATION_ACTION_POWEROFF:   /* same as 'quit' command in monitor */
-         qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_POWEROFF, &error_abort);
-         exit(0);
- 
--    case WDT_PAUSE:             /* same as 'stop' command in monitor */
-+    case WATCHDOG_EXPIRATION_ACTION_PAUSE:      /* same as 'stop' command in monitor */
-         /* In a timer callback, when vm_stop calls qemu_clock_enable
-          * you would get a deadlock.  Bypass the problem.
-          */
-@@ -131,19 +124,28 @@ void watchdog_perform_action(void)
-         qemu_system_vmstop_request(RUN_STATE_WATCHDOG);
-         break;
- 
--    case WDT_DEBUG:
-+    case WATCHDOG_EXPIRATION_ACTION_DEBUG:
-         qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_DEBUG, &error_abort);
-         fprintf(stderr, "watchdog: timer fired\n");
-         break;
- 
--    case WDT_NONE:
-+    case WATCHDOG_EXPIRATION_ACTION_NONE:
-         qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_NONE, &error_abort);
-         break;
- 
--    case WDT_NMI:
-+    case WATCHDOG_EXPIRATION_ACTION_INJECT_NMI:
-         qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_INJECT_NMI,
-                                  &error_abort);
-         nmi_monitor_handle(0, NULL);
-         break;
-+
-+    case WATCHDOG_EXPIRATION_ACTION__MAX:
-+        /* keep gcc happy */
-+        break;
-     }
- }
-+
-+void qmp_watchdog_set_action(WatchdogExpirationAction action, Error **errp)
-+{
-+    watchdog_action = action;
-+}
-diff --git a/hw/watchdog/wdt_diag288.c b/hw/watchdog/wdt_diag288.c
-index 47f289216a..451644eb89 100644
---- a/hw/watchdog/wdt_diag288.c
-+++ b/hw/watchdog/wdt_diag288.c
-@@ -57,9 +57,9 @@ static void diag288_timer_expired(void *dev)
-      * the BQL; reset before triggering the action to avoid races with
-      * diag288 instructions. */
-     switch (get_watchdog_action()) {
--    case WDT_DEBUG:
--    case WDT_NONE:
--    case WDT_PAUSE:
-+    case WATCHDOG_EXPIRATION_ACTION_DEBUG:
-+    case WATCHDOG_EXPIRATION_ACTION_NONE:
-+    case WATCHDOG_EXPIRATION_ACTION_PAUSE:
-         break;
-     default:
-         wdt_diag288_reset(dev);
-diff --git a/include/sysemu/watchdog.h b/include/sysemu/watchdog.h
-index 72a4da07a6..1b830df152 100644
---- a/include/sysemu/watchdog.h
-+++ b/include/sysemu/watchdog.h
-@@ -23,15 +23,7 @@
- #define QEMU_WATCHDOG_H
- 
- #include "qemu/queue.h"
--
--/* Possible values for action parameter. */
--#define WDT_RESET        1      /* Hard reset. */
--#define WDT_SHUTDOWN     2      /* Shutdown. */
--#define WDT_POWEROFF     3      /* Quit. */
--#define WDT_PAUSE        4      /* Pause. */
--#define WDT_DEBUG        5      /* Prints a message and continues running. */
--#define WDT_NONE         6      /* Do nothing. */
--#define WDT_NMI          7      /* Inject nmi into the guest. */
-+#include "qapi-types.h"
- 
- struct WatchdogTimerModel {
-     QLIST_ENTRY(WatchdogTimerModel) entry;
-@@ -46,7 +38,7 @@ typedef struct WatchdogTimerModel WatchdogTimerModel;
- /* in hw/watchdog.c */
- int select_watchdog(const char *p);
- int select_watchdog_action(const char *action);
--int get_watchdog_action(void);
-+WatchdogExpirationAction get_watchdog_action(void);
- void watchdog_add_model(WatchdogTimerModel *model);
- void watchdog_perform_action(void);
- 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 802ea53d00..40605be36f 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -6539,3 +6539,12 @@
- # Since 2.9
- ##
- { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
-+
-+##
-+# @watchdog-set-action:
-+#
-+# Set watchdog action
-+#
-+# Since 2.11
-+##
-+{ 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogExpirationAction'} }
--- 
-2.13.5
+Kevin
