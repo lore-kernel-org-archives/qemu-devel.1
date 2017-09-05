@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpMbS-0007YJ-QE
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 18:45:59 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dpMcG-000888-RE
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 18:46:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpMbN-0008Ln-PY
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 18:45:54 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
-	<1503414539-28762-7-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a6b2c6cf-4cd0-cc99-daef-ab85f6a4b1a7@amsat.org>
-Date: Tue, 5 Sep 2017 19:45:46 -0300
+	(envelope-from <alistair23@gmail.com>) id 1dpMcC-0000St-2M
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 18:46:44 -0400
 MIME-Version: 1.0
-In-Reply-To: <1503414539-28762-7-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 06/20] target/arm: Make BASEPRI
- register banked for v8M
+In-Reply-To: <20170905221226.GZ7570@localhost.localdomain>
+References: <1504533662-198084-1-git-send-email-imammedo@redhat.com>
+	<1504533662-198084-7-git-send-email-imammedo@redhat.com>
+	<20170905213152.GG17184@localhost.localdomain>
+	<CAKmqyKPWDmVYJceYao7NkD5svWqN_fYbDoUJ4uLNFdAhv+kFwg@mail.gmail.com>
+	<20170905221226.GZ7570@localhost.localdomain>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 5 Sep 2017 15:46:07 -0700
+Message-ID: <CAKmqyKO4yRz3R0BJ+gz=UfLc0d_AoNtEAHn-SNFMzg3xo12D=Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 6/6] arm: drop intermadiate cpu_model ->
+ cpu type parsing and use cpu type directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,143 +26,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Rob Herring <robh@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-Hi Peter,
+On Tue, Sep 5, 2017 at 3:12 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Tue, Sep 05, 2017 at 02:47:52PM -0700, Alistair Francis wrote:
+>> On Tue, Sep 5, 2017 at 2:31 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> [...]
+>> >> diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+>> >> index f61e735..1cd6374 100644
+>> >> --- a/hw/arm/stm32f205_soc.c
+>> >> +++ b/hw/arm/stm32f205_soc.c
+>> >> @@ -112,7 +112,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+>> >>
+>> >>      armv7m = DEVICE(&s->armv7m);
+>> >>      qdev_prop_set_uint32(armv7m, "num-irq", 96);
+>> >> -    qdev_prop_set_string(armv7m, "cpu-model", s->cpu_model);
+>> >> +    qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
+>> >>      object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+>> >>                                       "memory", &error_abort);
+>> >>      object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+>> >> @@ -200,7 +200,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+>> >>  }
+>> >>
+>> >>  static Property stm32f205_soc_properties[] = {
+>> >> -    DEFINE_PROP_STRING("cpu-model", STM32F205State, cpu_model),
+>> >> +    DEFINE_PROP_STRING("cpu-type", STM32F205State, cpu_type),
+>> >
+>> > Same as armv7m: are we 100% sure users are not setting this
+>> > manually?
+>>
+>> In an embedded board like this it really doesn't make sense to let the
+>> user overwrite the CPU. The SoC will take it as an option, but the
+>> board (which creates the SoC) just blindly always uses the same CPU.
+>> That feature is more for QOMificatoion then any real reason though.
+>>
+>
+> I'm not talking about -cpu (no user-visible change in the
+> handling of -cpu should result from this patch), but about
+> possible cases where the user set the "cpu-model" property using
+> another mechanism, like -global.  Probably it's impossible for an
+> user to override the property successfully, but I would like to
+> be sure.
 
-On 08/22/2017 12:08 PM, Peter Maydell wrote:
-> Make the BASEPRI register banked if v8M security extensions are enabled.
-> 
-> Note that we do not yet implement the functionality of the new
-> AIRCR.PRIS bit (which allows the effect of the NS copy of BASEPRI to
-> be restricted).
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->   target/arm/cpu.h      | 14 +++++++++++++-
->   hw/intc/armv7m_nvic.c |  4 ++--
->   target/arm/helper.c   | 10 ++++++----
->   target/arm/machine.c  |  3 ++-
->   4 files changed, 23 insertions(+), 8 deletions(-)
-> 
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index 436ca0d..0c28dfd 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -72,6 +72,18 @@
->   #define ARMV7M_EXCP_PENDSV  14
->   #define ARMV7M_EXCP_SYSTICK 15
->   
-> +/* For M profile, some registers are banked secure vs non-secure;
-> + * these are represented as a 2-element array where the first element
-> + * is the non-secure copy and the second is the secure copy.
-> + * When the CPU does not have implement the security extension then
-> + * only the first element is used.
-> + * This means that the copy for the current security state can be
-> + * accessed via env->registerfield[env->v7m.secure] (whether the security
-> + * extension is implemented or not).
-> + */
-> +#define M_REG_NS 0
-> +#define M_REG_S 1
+Ah, that is trickier.
 
-enum {
-     M_REG_NS = 0,
-     M_REG_S = 1,
-     M_BANKED_SECURE_REG_COUNT = 2;
-};
+I guess that is possible to do, but the object setting logic should
+handle the error gracefully and inform the user of the error.
 
-or directly this?
+>
+>
+>> In saying that I think a warning if the user tries to set the CPU
+>> would make sense. I know that this issues comes up in other ARM boards
+>> (Zynq-7000 has the same issue as well) so maybe a machine property
+>> saying that the board doesn't accept custom CPUs would be a good idea.
+>
+> Yeah, there are multiple cases in this patch where boards are
+> validating the CPU model, but not all boards do that.  A generic
+> MachineClass::valid_cpu_types[] field would be useful.
+>
+>>
+>> Overall I think this patch is moving in the right direction though and
+>> this CPU option being ignored existed before this series.
+>
+> I agree this is going on the right direction.  However, I don't
+> see any board that ignore the CPU option: all of them seem to use
+> cpu_model when creating the CPUs, already.
 
-#define M_BANKED_SECURE_REG_COUNT 2
+The Netduino2 will ignore any CPU options and always use a Cortex-m3.
+I was wrong about Zynq-7000 though, it does respect the -cpu option.
 
-shorter nicer...
+Thanks,
+Alistair
 
-#define M_BANKED_SECURE_REGS 2
-
-> +
->   /* ARM-specific interrupt pending bits.  */
->   #define CPU_INTERRUPT_FIQ   CPU_INTERRUPT_TGT_EXT_1
->   #define CPU_INTERRUPT_VIRQ  CPU_INTERRUPT_TGT_EXT_2
-> @@ -409,7 +421,7 @@ typedef struct CPUARMState {
->       struct {
->           uint32_t other_sp;
->           uint32_t vecbase;
-> -        uint32_t basepri;
-> +        uint32_t basepri[2];
-
-             uint32_t basepri[M_BANKED_SECURE_REGS];
-
-(and following patches of this series...)
-
->           uint32_t control;
->           uint32_t ccr; /* Configuration and Control */
->           uint32_t cfsr; /* Configurable Fault Status */
-> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-> index c0dbbad..2a41e5d 100644
-> --- a/hw/intc/armv7m_nvic.c
-> +++ b/hw/intc/armv7m_nvic.c
-> @@ -171,8 +171,8 @@ static inline int nvic_exec_prio(NVICState *s)
->           running = -1;
->       } else if (env->v7m.primask) {
->           running = 0;
-> -    } else if (env->v7m.basepri > 0) {
-> -        running = env->v7m.basepri & nvic_gprio_mask(s);
-> +    } else if (env->v7m.basepri[env->v7m.secure] > 0) {
-> +        running = env->v7m.basepri[env->v7m.secure] & nvic_gprio_mask(s);
->       } else {
->           running = NVIC_NOEXC_PRIO; /* lower than any possible priority */
->       }
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 1debebc..1087f19 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -8838,7 +8838,7 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
->           return env->v7m.primask;
->       case 17: /* BASEPRI */
->       case 18: /* BASEPRI_MAX */
-> -        return env->v7m.basepri;
-> +        return env->v7m.basepri[env->v7m.secure];
->       case 19: /* FAULTMASK */
->           return env->v7m.faultmask;
->       default:
-> @@ -8898,12 +8898,14 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
->           env->v7m.primask = val & 1;
->           break;
->       case 17: /* BASEPRI */
-> -        env->v7m.basepri = val & 0xff;
-> +        env->v7m.basepri[env->v7m.secure] = val & 0xff;
->           break;
->       case 18: /* BASEPRI_MAX */
->           val &= 0xff;
-> -        if (val != 0 && (val < env->v7m.basepri || env->v7m.basepri == 0))
-> -            env->v7m.basepri = val;
-> +        if (val != 0 && (val < env->v7m.basepri[env->v7m.secure]
-> +                         || env->v7m.basepri[env->v7m.secure] == 0)) {
-> +            env->v7m.basepri[env->v7m.secure] = val;
-> +        }
->           break;
->       case 19: /* FAULTMASK */
->           env->v7m.faultmask = val & 1;
-> diff --git a/target/arm/machine.c b/target/arm/machine.c
-> index 745adae..8476efd 100644
-> --- a/target/arm/machine.c
-> +++ b/target/arm/machine.c
-> @@ -115,7 +115,7 @@ static const VMStateDescription vmstate_m = {
->       .needed = m_needed,
->       .fields = (VMStateField[]) {
->           VMSTATE_UINT32(env.v7m.vecbase, ARMCPU),
-> -        VMSTATE_UINT32(env.v7m.basepri, ARMCPU),
-> +        VMSTATE_UINT32(env.v7m.basepri[M_REG_NS], ARMCPU),
->           VMSTATE_UINT32(env.v7m.control, ARMCPU),
->           VMSTATE_UINT32(env.v7m.ccr, ARMCPU),
->           VMSTATE_UINT32(env.v7m.cfsr, ARMCPU),
-> @@ -250,6 +250,7 @@ static const VMStateDescription vmstate_m_security = {
->       .needed = m_security_needed,
->       .fields = (VMStateField[]) {
->           VMSTATE_UINT32(env.v7m.secure, ARMCPU),
-> +        VMSTATE_UINT32(env.v7m.basepri[M_REG_S], ARMCPU),
->           VMSTATE_END_OF_LIST()
->       }
->   };
-> 
+>
+> --
+> Eduardo
