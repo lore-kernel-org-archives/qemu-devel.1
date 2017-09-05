@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dpANM-0001cu-0M
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:42:41 -0400
+	(envelope-from <armbru@redhat.com>) id 1dpANd-0001rC-5z
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:42:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dpANH-00013C-69
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:42:32 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:37853)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dpANG-00012x-Vc
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:42:27 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id u26so16375766wma.0
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 02:42:26 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1dpANY-0001Jg-DH
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:42:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54150)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpANY-0001Ia-4m
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:42:44 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-21-marcandre.lureau@redhat.com>
+Date: Tue, 05 Sep 2017 11:42:39 +0200
+In-Reply-To: <20170822132255.23945-21-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
+	15:22:21 +0200")
+Message-ID: <87fuc11nxs.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA92RBgkvKQ-6DGgRFr-bxz_60zbXSuQ1AGtz1eUuX_rYw@mail.gmail.com>
-References: <20170905092230.8243-1-berrange@redhat.com>
-	<CAFEAcA92RBgkvKQ-6DGgRFr-bxz_60zbXSuQ1AGtz1eUuX_rYw@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Sep 2017 10:42:04 +0100
-Message-ID: <CAFEAcA-PERUcwZw7_is27nHGQ2WSNmyBUsSP-nygF7RLwCQVcw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v1 0/9] Merge QEMU I/O 2017/09/05
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 20/54] qapi-introspect: modify to_qlit()
+ to take an optional suffix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,72 +30,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 5 September 2017 at 10:37, Peter Maydell <peter.maydell@linaro.org> wrote:
-> and test-listen fails on my x86-64 Linux box:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-OpenBSD fails too, but only starting at thread 124, and
-it fails like this for all the tests whereas Linux
-only failed on the ipv6 test:
+> The following patch is going to break list entries with #if/#endif, so
+> they should have the trailing ',' as suffix.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi-introspect.py | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+> index 4c437d60ec..dfb6d2ded4 100644
+> --- a/scripts/qapi-introspect.py
+> +++ b/scripts/qapi-introspect.py
+> @@ -16,7 +16,7 @@ def to_c_string(s):
+>      return '"' + s.replace('\\', r'\\').replace('"', r'\"') + '"'
+>=20=20
+>=20=20
+> -def to_qlit(obj, level=3D0, first_indent=3DTrue):
+> +def to_qlit(obj, level=3D0, first_indent=3DTrue, suffix=3D''):
+>=20=20
+>      def indent(level):
+>          return level * 4 * ' '
+> @@ -29,11 +29,11 @@ def to_qlit(obj, level=3D0, first_indent=3DTrue):
+>      elif isinstance(obj, str):
+>          ret +=3D 'QLIT_QSTR(' + to_c_string(obj) + ')'
+>      elif isinstance(obj, list):
+> -        elts =3D [to_qlit(elt, level + 1)
+> +        elts =3D [to_qlit(elt, level + 1, suffix=3D',')
+>                  for elt in obj]
+>          elts.append(indent(level + 1) + "{}")
+>          ret +=3D 'QLIT_QLIST(((QLitObject[]) {\n'
+> -        ret +=3D ',\n'.join(elts) + '\n'
+> +        ret +=3D '\n'.join(elts) + '\n'
+>          ret +=3D indent(level) + '}))'
+>      elif isinstance(obj, dict):
+>          elts =3D []
+> @@ -46,7 +46,7 @@ def to_qlit(obj, level=3D0, first_indent=3DTrue):
+>          ret +=3D indent(level) + '}))'
+>      else:
+>          assert False                # not implemented
+> -    return ret
+> +    return ret + suffix
+>=20=20
+>=20=20
+>  class QAPISchemaGenIntrospectVisitor(QAPISchemaVisitor):
 
-TEST: tests/test-listen... (pid=12010)
-  /socket/listen-serial/ipv4:
-** Failed to assign a port to thread 124 (errno = 48)
-** Failed to assign a port to thread 125 (errno = 48)
-** Failed to assign a port to thread 126 (errno = 48)
-** Failed to assign a port to thread 127 (errno = 48)
-** Failed to assign a port to thread 128 (errno = 48)
-** Failed to assign a port to thread 129 (errno = 48)
-** Failed to assign a port to thread 130 (errno = 48)
-** Failed to assign a port to thread 131 (errno = 48)
-** Failed to assign a port to thread 132 (errno = 48)
-[snip]
-** Failed to assign a port to thread 197 (errno = 48)
-** Failed to assign a port to thread 198 (errno = 48)
-** Failed to assign a port to thread 199 (errno = 48)
-**
-ERROR:/home/qemu/tests/test-listen.c:195:listen_compete_nthr:
-assertion failed (failed_listens == 0): (76 == 0)
-FAIL
-GTester: last random seed: R02S5df2be6aaaf10151ac566254ab2f7e88
-(pid=37081)
-  /socket/listen-serial/ipv6:
-** Failed to assign a port to thread 124 (errno = 48)
-** Failed to assign a port to thread 125 (errno = 48)
-** Failed to assign a port to thread 126 (errno = 48)
-** Failed to assign a port to thread 127 (errno = 48)
-[snip]
-** Failed to assign a port to thread 198 (errno = 48)
-** Failed to assign a port to thread 199 (errno = 48)
-**
-ERROR:/home/qemu/tests/test-listen.c:195:listen_compete_nthr:
-assertion failed (failed_listens == 0): (76 == 0)
-FAIL
-GTester: last random seed: R02Sa41cf200664d43a074a38d7fff7b5393
-(pid=93074)
-  /socket/listen-serial/generic:
-** Failed to assign a port to thread 124 (errno = 48)
-** Failed to assign a port to thread 125 (errno = 48)
-** Failed to assign a port to thread 126 (errno = 48)
-** Failed to assign a port to thread 127 (errno = 48)
-[snip]
-** Failed to assign a port to thread 198 (errno = 48)
-** Failed to assign a port to thread 199 (errno = 48)
-**
-ERROR:/home/qemu/tests/test-listen.c:195:listen_compete_nthr:
-assertion failed (failed_listens == 0): (76 == 0)
-FAIL
-GTester: last random seed: R02S072bffdb79ddc59e35f0b9c1f8b8f69f
-(pid=56289)
-  /socket/listen-compete/ipv4:
-** Failed to assign a port to thread 124 (errno = 24)
-** Failed to assign a port to thread 127 (errno = 24)
-** Failed to assign a port to thread 128 (errno = 24)
-** Failed to assign a port to thread 129 (errno = 24)
-** Failed to assign a port to thread 130 (errno = 24)
-[etc etc]
+Hmm.  I wonder the appended simpler patch would do.
 
-thanks
--- PMM
+diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+index 4c437d60ec..73edb55cd5 100644
+--- a/scripts/qapi-introspect.py
++++ b/scripts/qapi-introspect.py
+@@ -33,7 +33,7 @@ def to_qlit(obj, level=3D0, first_indent=3DTrue):
+                 for elt in obj]
+         elts.append(indent(level + 1) + "{}")
+         ret +=3D 'QLIT_QLIST(((QLitObject[]) {\n'
+-        ret +=3D ',\n'.join(elts) + '\n'
++        ret +=3D '\n'.join(elts) + '\n'
+         ret +=3D indent(level) + '}))'
+     elif isinstance(obj, dict):
+         elts =3D []
+@@ -46,6 +46,8 @@ def to_qlit(obj, level=3D0, first_indent=3DTrue):
+         ret +=3D indent(level) + '}))'
+     else:
+         assert False                # not implemented
++    if level > 0:
++        ret +=3D ','
+     return ret
+=20
+=20
