@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55938)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1dpF6G-0001pT-2s
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:45:16 -0400
+	(envelope-from <armbru@redhat.com>) id 1dpFEI-0003yz-Ow
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:53:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <drjones@redhat.com>) id 1dpF68-0002iO-CR
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:45:12 -0400
-Date: Tue, 5 Sep 2017 16:44:49 +0200
-From: Andrew Jones <drjones@redhat.com>
-Message-ID: <20170905144449.yiupcvhbnfc3sakn@kamzik.brq.redhat.com>
-References: <1500471597-2517-1-git-send-email-drjones@redhat.com>
-	<1500471597-2517-5-git-send-email-drjones@redhat.com>
-	<CAFEAcA_xDei18gfdLuo5=aPM=9D9Ou6LBLfT+gtGUKgcpDC88A@mail.gmail.com>
+	(envelope-from <armbru@redhat.com>) id 1dpFEE-0003BP-0D
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:53:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36304)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpFED-0003Au-Nl
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:53:25 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-24-marcandre.lureau@redhat.com>
+Date: Tue, 05 Sep 2017 16:53:17 +0200
+In-Reply-To: <20170822132255.23945-24-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
+	15:22:24 +0200")
+Message-ID: <874lshp57m.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_xDei18gfdLuo5=aPM=9D9Ou6LBLfT+gtGUKgcpDC88A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] target/arm/kvm: pmu: improve error
- handling
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 23/54] qapi-commands: add #if conditions
+ to commands
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +30,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Christoffer Dall <cdall@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Mon, Sep 04, 2017 at 03:17:21PM +0100, Peter Maydell wrote:
-> On 19 July 2017 at 14:39, Andrew Jones <drjones@redhat.com> wrote:
-> > If a KVM PMU init or set-irq attr call fails we just silently stop
-> > the PMU DT node generation. The only way they could fail, though,
-> > is if the attr's respective KVM has-attr call fails. But that should
-> > never happen if KVM advertises the PMU capability, because both
-> > attrs have been available since the capability was introduced. Let's
-> > just abort if this should-never-happen stuff does happen, because,
-> > if it does, then something is obviously horribly wrong.
-> >
-> > Signed-off-by: Andrew Jones <drjones@redhat.com>
-> > ---
-> >  hw/arm/virt.c        |  9 +++------
-> >  target/arm/kvm32.c   |  3 +--
-> >  target/arm/kvm64.c   | 28 ++++++++++++++++++++--------
-> >  target/arm/kvm_arm.h | 15 ++++-----------
-> >  4 files changed, 28 insertions(+), 27 deletions(-)
-> 
-> This breaks compile on 32-bit ARM:
-> 
-> /home/peter.maydell/qemu/target/arm/kvm32.c:530:5: error: conflicting
-> types for 'kvm_arm_pmu_init'
->  int kvm_arm_pmu_init(CPUState *cs)
->      ^
-> In file included from /home/peter.maydell/qemu/target/arm/kvm32.c:21:0:
-> /home/peter.maydell/qemu/target/arm/kvm_arm.h:199:6: note: previous
-> declaration of 'kvm_arm_pmu_init' w
-> as here
->  void kvm_arm_pmu_init(CPUState *cs);
->       ^
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-Argh. Sorry about that. I could have sworn I compile-tested for 32-bit
-ARM. Maybe I changed the series afterwards and forgot to compile-test
-again...
+> Wrap generated code with #if/#endif using the ifcond_decorator.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi-commands.py  | 2 ++
+>  tests/test-qmp-commands.c | 4 ++--
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+> index 5eb96b2d95..db45415c41 100644
+> --- a/scripts/qapi-commands.py
+> +++ b/scripts/qapi-commands.py
+> @@ -228,6 +228,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+>          self.defn =3D None
+>          self._regy =3D None
+>          self._visited_ret_types =3D None
+> +        self.if_members =3D ['decl', 'defn', '_regy']
+>=20=20
+>      def visit_begin(self, schema):
+>          self.decl =3D ''
+> @@ -240,6 +241,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+>          self._regy =3D None
+>          self._visited_ret_types =3D None
+>=20=20
+> +    @ifcond_decorator
+>      def visit_command(self, name, info, arg_type, ret_type,
+>                        gen, success_response, boxed, ifcond):
+>          if not gen:
+> diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
+> index 9b9a7ffee7..ad7b6e4e1d 100644
+> --- a/tests/test-qmp-commands.c
+> +++ b/tests/test-qmp-commands.c
+> @@ -10,11 +10,11 @@
+>=20=20
+>  static QmpCommandList qmp_commands;
+>=20=20
+> -/* #if defined(TEST_IF_CMD) */
+> +#if defined(TEST_IF_CMD)
+>  void qmp_TestIfCmd(TestIfStruct *foo, Error **errp)
+>  {
+>  }
+> -/* #endif */
+> +#endif
+>=20=20
+>  void qmp_user_def_cmd(Error **errp)
+>  {
 
-> 
-> Looks like you forgot to update the 32-bit version of the function
-> to the new API; I'll just fix up the patch in my queue.
+To find out whether the clever decorator is worth its keep, I replaced
+it with the dumbest, most obvious code I could think of (appended).
+Does this make visit_command() easier or harder to understand?
 
-Thanks!
 
-drew
+
+diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+index db45415c41..13d37d2ac2 100644
+--- a/scripts/qapi-commands.py
++++ b/scripts/qapi-commands.py
+@@ -228,7 +228,6 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+         self.defn =3D None
+         self._regy =3D None
+         self._visited_ret_types =3D None
+-        self.if_members =3D ['decl', 'defn', '_regy']
+=20
+     def visit_begin(self, schema):
+         self.decl =3D ''
+@@ -241,18 +240,21 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+         self._regy =3D None
+         self._visited_ret_types =3D None
+=20
+-    @ifcond_decorator
+     def visit_command(self, name, info, arg_type, ret_type,
+                       gen, success_response, boxed, ifcond):
+         if not gen:
+             return
+-        self.decl +=3D gen_command_decl(name, arg_type, boxed, ret_type)
++        decl =3D gen_command_decl(name, arg_type, boxed, ret_type)
++        defn =3D ''
+         if ret_type and ret_type not in self._visited_ret_types:
+             self._visited_ret_types.add(ret_type)
+-            self.defn +=3D gen_marshal_output(ret_type)
+-        self.decl +=3D gen_marshal_decl(name)
+-        self.defn +=3D gen_marshal(name, arg_type, boxed, ret_type)
+-        self._regy +=3D gen_register_command(name, success_response)
++            defn +=3D gen_marshal_output(ret_type)
++        decl +=3D gen_marshal_decl(name)
++        defn +=3D gen_marshal(name, arg_type, boxed, ret_type)
++        self.decl +=3D gen_ifcond(ifcond, decl)
++        self.defn +=3D gen_ifcond(ifcond, defn)
++        self._regy +=3D gen_ifcond(ifcond,
++                                 gen_register_command(name, success_respon=
+se))
+=20
+=20
+ (input_file, output_dir, do_c, do_h, prefix, opts) =3D parse_command_line()
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 52099332f1..3de5b8b8f0 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -1918,29 +1918,10 @@ def gen_endif(ifcond):
+     return ret
+=20
+=20
+-# Wrap a method to add #if / #endif to generated code, only if some
+-# code was generated.
+-# self must have 'if_members' listing the attributes to wrap.
+-# The last argument of the wrapped function must be the 'ifcond'.
+-def ifcond_decorator(func):
+-
+-    def func_wrapper(self, *args, **kwargs):
+-        ifcond =3D args[-1]
+-        save =3D {}
+-        for mem in self.if_members:
+-            save[mem] =3D getattr(self, mem)
+-        func(self, *args, **kwargs)
+-        for mem, val in save.items():
+-            newval =3D getattr(self, mem)
+-            if newval !=3D val:
+-                assert newval.startswith(val)
+-                newval =3D newval[len(val):]
+-                val +=3D gen_if(ifcond)
+-                val +=3D newval
+-                val +=3D gen_endif(ifcond)
+-            setattr(self, mem, val)
+-
+-    return func_wrapper
++def gen_ifcond(ifcond, ctext):
++    if ifcond:
++        return gen_if(ifcond) + ctext + gen_endif(ifcond)
++    return ctext
+=20
+=20
+ def gen_enum_lookup(name, values, prefix=3DNone):
