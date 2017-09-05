@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37171)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dp9vw-00050y-IM
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:14:17 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dp9we-0005lE-7W
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:15:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dp9vr-0003tR-OI
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:14:12 -0400
-Received: from lhrrgout.huawei.com ([194.213.3.17]:22977)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dp9vr-0003rl-FE
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:14:07 -0400
-References: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1504541267-36954-7-git-send-email-pradeep.jagadeesh@huawei.com>
-	<w51tw0h7f9t.fsf@maestria.local.igalia.com>
-	<75f2f6f9-7d23-dced-6920-4b0be04876b9@huawei.com>
-	<w51r2vl7btq.fsf@maestria.local.igalia.com>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <0d3ed742-e6f8-8124-29c6-f123b68e8b08@huawei.com>
-Date: Tue, 5 Sep 2017 11:13:09 +0200
+	(envelope-from <borntraeger@de.ibm.com>) id 1dp9wZ-0004Qu-IX
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:14:56 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40259)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dp9wZ-0004PP-9d
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:14:51 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v859E2tE025500
+	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 05:14:50 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2csqt5mx8c-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 05:14:49 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Tue, 5 Sep 2017 10:14:47 +0100
+References: <20170904154316.4148-1-david@redhat.com>
+	<20170904154316.4148-18-david@redhat.com>
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+Date: Tue, 5 Sep 2017 11:14:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <w51r2vl7btq.fsf@maestria.local.igalia.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
+In-Reply-To: <20170904154316.4148-18-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 6/6] fsdev: hmp interface for throttling
+Message-Id: <f162eece-8dd0-a8e9-f339-356465ab6587@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 17/19] s390x: CPU hot unplug via
+ device_del cannot work
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,66 +43,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 9/5/2017 11:07 AM, Alberto Garcia wrote:
-> On Tue 05 Sep 2017 10:28:02 AM CEST, Pradeep Jagadeesh wrote:
->>>> +void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict)
->>>> +{
->>>> +    Error *err = NULL;
->>>> +    IOThrottleList *fsdev_list, *info;
->>>> +    fsdev_list = qmp_query_fsdev_io_throttle(&err);
->>>> +
->>>> +    for (info = fsdev_list; info; info = info->next) {
->>>> +        print_fsdev_throttle_config(mon, info->value);
->>>> +    }
->>>> +    qapi_free_IOThrottleList(fsdev_list);
->>>> +}
->>>
->>> You're passing an Error to qmp_query_fsdev_io_throttle() but then you
->>> don't handle it. Use hmp_handle_error() as I said in my previous e-mail.
->> OK I will handle it.
->>>
->>> I know that with the current code qmp_query_fsdev_io_throttle() is never
->>> going to fail, but that's no reason to declare an Error and then ignore
->>> it.
->
->> I need to pass err because the function
->> qmp_query_fsdev_io_throttle(Error *) is created by the scripts. So, I
->> have to declare and pass it. I do not is there any way to avoid this.
->
-> When a function takes an Error ** like qmp_query_fsdev_io_throttle() and
-> many others do, there are two alternatives:
->
-> a) Declare an Error, pass it _and then handle it_ (if you don't handle
->    it, you're leaking it):
->
->    Error *err = NULL;
->    some_function(&err);
->    if (err) {
->       /* handle err */
->    }
->
-> b) Don't declare the Error and pass NULL instead:
->
->    some_function(NULL);
->
-> Note that (b) is perfectly valid, but if the function you're calling
-> tries to set an Error then you won't get it. It's ok if you know what
-> you're doing (which usually means: you have other way to determine if
-> the function failed, _or_ you don't care if the function failed).
->
-> Here you have no other way to know if qmp_query_fsdev_io_throttle()
-> fails, so you should choose (a).
->
-> I know that at the moment qmp_query_fsdev_io_throttle() can never fail
-> so in practice this doesn't matter much _now_, but if in the future that
-> function can fail then your code should be ready to handle it.
-OK, I will pass NULL.
+On 09/04/2017 05:43 PM, David Hildenbrand wrote:
+> device_del on a CPU will currently do nothing. Let's emmit an error
+> telling that this is will never work (there is no architecture support
+> on s390x). Error message copied from ppc.
+> 
+> (qemu) device_del cpu1
+> device_del cpu1
+> CPU hot unplug not supported on this machine
 
--Pradeep
+Given the fact that I get the question about unplug _every_ time when I give a presentation
+about KVM on z, I will try to get some architecture folks look at this. Maybe we can define
+something very simple like "if the CPU is in the stopped state we can remove this and just
+piggy back on the existing sclp EVENT_QUAL_CPU_CHANGE notification".
 
->
-> Berto
->
+So maybe add  "currently"
+
+
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 22a8a1b45d..dd149567bb 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -338,6 +338,15 @@ static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
+>      }
+>  }
+> 
+> +static void s390_machine_device_unplug_request(HotplugHandler *hotplug_dev,
+> +                                               DeviceState *dev, Error **errp)
+> +{
+> +    if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> +        error_setg(errp, "CPU hot unplug not supported on this machine");
+> +        return;
+> +    }
+> +}
+> +
+>  static HotplugHandler *s390_get_hotplug_handler(MachineState *machine,
+>                                                  DeviceState *dev)
+>  {
+> @@ -387,6 +396,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+>      mc->max_cpus = 248;
+>      mc->get_hotplug_handler = s390_get_hotplug_handler;
+>      hc->plug = s390_machine_device_plug;
+> +    hc->unplug_request = s390_machine_device_unplug_request;
+>      nc->nmi_monitor_handler = s390_nmi;
+>  }
+> 
