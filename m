@@ -1,14 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpAYT-0002Gf-4G
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:54:06 -0400
+	(envelope-from <armbru@redhat.com>) id 1dpAZO-00034C-GK
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:55:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpAYO-0001DV-F1
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:54:01 -0400
-From: Thomas Huth <thuth@redhat.com>
-Date: Tue,  5 Sep 2017 11:53:47 +0200
-Message-Id: <1504605227-5124-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [RFC PATCH] tests: Add a device_add/del HMP test
+	(envelope-from <armbru@redhat.com>) id 1dpAZJ-0001mo-Up
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:54:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60120)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpAZJ-0001lv-P3
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:54:53 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ADB17356C7
+	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 09:54:52 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170901180340.30009-1-eblake@redhat.com>
+	<20170901180340.30009-9-eblake@redhat.com>
+	<0a344384-f482-5602-490a-928db53c46b5@redhat.com>
+Date: Tue, 05 Sep 2017 11:54:51 +0200
+In-Reply-To: <0a344384-f482-5602-490a-928db53c46b5@redhat.com> (Thomas Huth's
+	message of "Tue, 5 Sep 2017 10:12:30 +0200")
+Message-ID: <87zia9xyfo.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 08/29] libqtest: Let socket_send()
+ compute length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,120 +35,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, John Snow <jsnow@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, armbru@redhat.com, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-People tend to forget to mark internal devices with "user_creatable = false
-or hotpluggable = false, and these devices can crash QEMU if added via the
-HMP monitor. So let's add a test to run through all devices and that tries
-to add them blindly (without arguments) to see whether this could crash the
-QEMU instance.
+Thomas Huth <thuth@redhat.com> writes:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- I've marked the patch as RFC since not all of the required device bug
- fixes have been merged yet (so this patch can not be included yet without
- breaking "make check"). It's also sad that "macio-oldworld" currently
- has to be blacklisted - I tried to find a fix for that device,  but I was
- not able to spot the exact problem so far. So help for fixing that device
- is very very welcome! The crash can be reproduced like this:
+> On 01.09.2017 20:03, Eric Blake wrote:
+>> Rather than make multiple callers call strlen(), it's easier if
+>> socket_send() itself can compute a length via strlen() if none
+>> was provided (caller passes -1).  Callers that can get at the
+>> length more efficiently are left that way.
+>> 
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> ---
+>>  tests/libqtest.c | 10 ++++++----
+>>  1 file changed, 6 insertions(+), 4 deletions(-)
+>
+> I have to say that I don't like this idea very much. socket_send()
+> should IMHO not know about the type of the data that should be sent,
+> i.e. it should not assume that the content is a zero-terminated string.
 
- $ qemu-system-ppc64 -nographic -S -monitor stdio -serial none
- QEMU 2.10.50 monitor - type 'help' for more information
- (qemu) device_add macio-oldworld,id=x
- (qemu) device_del x
- (qemu) **
- ERROR:qom/object.c:1611:object_get_canonical_path_component:
-  assertion failed: (obj->parent != NULL)
- Aborted (core dumped)
+I agree.
 
- tests/test-hmp.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 59 insertions(+), 1 deletion(-)
+> This also could lead to some hard to detect bugs later in case somebody
+> is calling the function like this:
+>
+>   size = someotherfunction();
+>   socket_send(fd, buf, size);
+>
+> ... and the someotherfunction() returned a negative error code instead
+> of a correct size.
+>
+> So I'd like to suggest to simply drop this patch.
 
-diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-index 7a38cdc..e8a25c4 100644
---- a/tests/test-hmp.c
-+++ b/tests/test-hmp.c
-@@ -28,7 +28,6 @@ static const char *hmp_cmds[] = {
-     "commit all",
-     "cpu-add 1",
-     "cpu 0",
--    "device_add ?",
-     "device_add usb-mouse,id=mouse1",
-     "mouse_button 7",
-     "mouse_move 10 10",
-@@ -116,6 +115,64 @@ static void test_info_commands(void)
-     g_free(info_buf);
- }
- 
-+/*
-+ * People tend to forget to mark internal devices with "user_creatable = false
-+ * and these devices can crash QEMU if added via the HMP monitor. So let's run
-+ * through all devices and try to add them blindly (without arguments) to see
-+ * whether this could crash the QEMU instance.
-+ */
-+static void test_device_add_commands(void)
-+{
-+    char *resp, *devices, *devices_buf, *endp;
-+
-+    devices = devices_buf = hmp("device_add help");
-+
-+    while (*devices) {
-+        /* Ignore header lines etc. */
-+        if (strncmp(devices, "name \"", 6)) {
-+            devices = strchr(devices, '\n');
-+            if (!devices) {
-+                break;
-+            }
-+            devices += 1;
-+            continue;
-+        }
-+        /* Extract the device name, ignore parameters and description */
-+        devices += 6;
-+        endp = strchr(devices, '"');
-+        g_assert(endp != NULL);
-+        *endp = '\0';
-+        /* Check whether it is blacklisted... */
-+        if (g_str_equal("macio-oldworld", devices)) {
-+            devices = strchr(endp + 1, '\n');
-+            if (!devices) {
-+                break;
-+            }
-+            devices += 1;
-+            continue;
-+        }
-+        /* Now run the device_add + device_del commands */
-+        if (verbose) {
-+            fprintf(stderr, "\tdevice_add %s,id=%s\n", devices, devices);
-+        }
-+        resp = hmp("device_add %s,id=%s", devices, devices);
-+        g_free(resp);
-+        if (verbose) {
-+            fprintf(stderr, "\tdevice_del %s\n", devices);
-+        }
-+        resp = hmp("device_del %s", devices);
-+        g_free(resp);
-+        /* And move forward to the next line */
-+        devices = strchr(endp + 1, '\n');
-+        if (!devices) {
-+            break;
-+        }
-+        devices += 1;
-+    }
-+
-+    g_free(devices_buf);
-+}
-+
- static void test_machine(gconstpointer data)
- {
-     const char *machine = data;
-@@ -125,6 +182,7 @@ static void test_machine(gconstpointer data)
-     qtest_start(args);
- 
-     test_info_commands();
-+    test_device_add_commands();
-     test_commands();
- 
-     qtest_end();
--- 
-1.8.3.1
+A separate wrapper function for sending zero-terminated strings would be
+fine with me.
