@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55657)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpE14-0005kW-LU
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:35:51 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dpE5J-00086Y-Cn
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:40:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpE0w-000050-NV
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:35:46 -0400
-References: <150451194093.7046.18254446012958612468.stgit@bahia>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <1d5efdef-21b8-9b7b-6939-339b97fd9bce@redhat.com>
-Date: Tue, 5 Sep 2017 15:35:34 +0200
+	(envelope-from <ehabkost@redhat.com>) id 1dpE59-0004u2-Hk
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:40:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42728)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dpE59-0004tJ-8i
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:39:59 -0400
+Date: Tue, 5 Sep 2017 10:20:34 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170905132034.GX7570@localhost.localdomain>
+References: <1504603805-180240-1-git-send-email-arei.gonglei@huawei.com>
+	<1504603805-180240-2-git-send-email-arei.gonglei@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <150451194093.7046.18254446012958612468.stgit@bahia>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtfs: error out gracefully when
- mandatory suboptions are missing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1504603805-180240-2-git-send-email-arei.gonglei@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] pc: add 2.11 machine type
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +27,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org
+To: Gonglei <arei.gonglei@huawei.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, vrozenfe@redhat.com, weidong.huang@huawei.com
 
-On 04.09.2017 09:59, Greg Kurz wrote:
-> We internally convert -virtfs to -fsdev/-device. If the user doesn't
-> provide the path or security_model suboptions, and the fsdev backend
-> requires them, we hit an assertion when populating the internal -fsdev
-> option:
-> 
-> util/qemu-option.c:547: opt_set: Assertion `opt->str' failed.
-> Aborted (core dumped)
-> 
-> Let's test the suboption presence on the command line before trying
-> to set it in the internal -fsdev option, and let the backend code
-> error out gracefully (ie, like it already does when the user passes
-> -fsdev on the command line).
-> 
-> Reported-by: Thomas Huth <thuth@redhat.com>
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+On Tue, Sep 05, 2017 at 05:30:04PM +0800, Gonglei wrote:
+> CC: "Michael S. Tsirkin" <mst@redhat.com>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: Richard Henderson <rth@twiddle.net>
+> CC: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
 > ---
->  vl.c |   16 ++++++++++------
->  1 file changed, 10 insertions(+), 6 deletions(-)
+>  hw/i386/pc_piix.c    | 15 ++++++++++++---
+>  hw/i386/pc_q35.c     | 13 +++++++++++--
+>  include/hw/i386/pc.h |  3 +++
+>  3 files changed, 26 insertions(+), 5 deletions(-)
 > 
-> diff --git a/vl.c b/vl.c
-> index 8e247cc2a239..d63269332fed 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -3557,7 +3557,7 @@ int main(int argc, char **argv, char **envp)
->              case QEMU_OPTION_virtfs: {
->                  QemuOpts *fsdev;
->                  QemuOpts *device;
-> -                const char *writeout, *sock_fd, *socket;
-> +                const char *writeout, *sock_fd, *socket, *path, *security_model;
+> diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+> index 46dfd2c..b03cc04 100644
+> --- a/hw/i386/pc_piix.c
+> +++ b/hw/i386/pc_piix.c
+> @@ -436,21 +436,30 @@ static void pc_i440fx_machine_options(MachineClass *m)
+>      m->default_display = "std";
+>  }
 >  
->                  olist = qemu_find_opts("virtfs");
->                  if (!olist) {
-> @@ -3596,11 +3596,15 @@ int main(int argc, char **argv, char **envp)
->                  }
->                  qemu_opt_set(fsdev, "fsdriver",
->                               qemu_opt_get(opts, "fsdriver"), &error_abort);
-> -                qemu_opt_set(fsdev, "path", qemu_opt_get(opts, "path"),
-> -                             &error_abort);
-> -                qemu_opt_set(fsdev, "security_model",
-> -                             qemu_opt_get(opts, "security_model"),
-> -                             &error_abort);
-> +                path = qemu_opt_get(opts, "path");
-> +                if (path) {
-> +                    qemu_opt_set(fsdev, "path", path, &error_abort);
-> +                }
-> +                security_model = qemu_opt_get(opts, "security_model");
-> +                if (security_model) {
-> +                    qemu_opt_set(fsdev, "security_model", security_model,
-> +                                 &error_abort);
-> +                }
->                  socket = qemu_opt_get(opts, "socket");
->                  if (socket) {
->                      qemu_opt_set(fsdev, "socket", socket, &error_abort);
+> -static void pc_i440fx_2_10_machine_options(MachineClass *m)
+> +static void pc_i440fx_2_11_machine_options(MachineClass *m)
+>  {
+>      pc_i440fx_machine_options(m);
+>      m->alias = "pc";
+>      m->is_default = 1;
+>  }
+>  
+> +DEFINE_I440FX_MACHINE(v2_11, "pc-i440fx-2.11", NULL,
+> +                      pc_i440fx_2_11_machine_options);
+> +
+> +static void pc_i440fx_2_10_machine_options(MachineClass *m)
+> +{
+> +    pc_i440fx_2_11_machine_options(m);
+> +    m->is_default = 0;
+> +    m->alias = NULL;
+> +    SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
+> +}
+> +
+>  DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
+>                        pc_i440fx_2_10_machine_options);
+>  
+>  static void pc_i440fx_2_9_machine_options(MachineClass *m)
+>  {
+>      pc_i440fx_2_10_machine_options(m);
+> -    m->is_default = 0;
+> -    m->alias = NULL;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
+>      m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
+>  }
+> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+> index 169a214..d6fef8d 100644
+> --- a/hw/i386/pc_q35.c
+> +++ b/hw/i386/pc_q35.c
+> @@ -302,20 +302,29 @@ static void pc_q35_machine_options(MachineClass *m)
+>      m->max_cpus = 288;
+>  }
+>  
+> -static void pc_q35_2_10_machine_options(MachineClass *m)
+> +static void pc_q35_2_11_machine_options(MachineClass *m)
+>  {
+>      pc_q35_machine_options(m);
+>      m->alias = "q35";
+>      m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
+>  }
+>  
+> +DEFINE_Q35_MACHINE(v2_11, "pc-q35-2.11", NULL,
+> +                   pc_q35_2_11_machine_options);
+> +
+> +static void pc_q35_2_10_machine_options(MachineClass *m)
+> +{
+> +    pc_q35_2_11_machine_options(m);
+> +    m->alias = NULL;
+> +    SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
+> +}
+> +
+>  DEFINE_Q35_MACHINE(v2_10, "pc-q35-2.10", NULL,
+>                     pc_q35_2_10_machine_options);
+>  
+>  static void pc_q35_2_9_machine_options(MachineClass *m)
+>  {
+>      pc_q35_2_10_machine_options(m);
+> -    m->alias = NULL;
+>      SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
+>  }
+>  
+> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+> index d80859b..8226904 100644
+> --- a/include/hw/i386/pc.h
+> +++ b/include/hw/i386/pc.h
+> @@ -369,6 +369,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
+>  int e820_get_num_entries(void);
+>  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+>  
+> +#define PC_COMPAT_2_10 \
+> +    HW_COMPAT_2_10 \
+> +
 
-By the way, I think this should be CC:-ed to stable, too.
+Patch looks good, but I would remove the trailing backslash here.
 
- Thomas
+With that changed:
+
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+
+
+>  #define PC_COMPAT_2_9 \
+>      HW_COMPAT_2_9 \
+>      {\
+> -- 
+> 1.8.3.1
+> 
+> 
+
+-- 
+Eduardo
