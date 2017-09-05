@@ -1,20 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44859)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46779)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dpDi1-0001eB-7l
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:16:10 -0400
+	(envelope-from <famz@redhat.com>) id 1dpDlS-0004F9-U5
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:19:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dpDht-0002Qb-Ev
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:16:05 -0400
-Date: Tue, 5 Sep 2017 15:15:19 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170905131519.GK4633@localhost.localdomain>
+	(envelope-from <famz@redhat.com>) id 1dpDlJ-0005Gn-IC
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:19:38 -0400
+Date: Tue, 5 Sep 2017 21:18:58 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170905131858.GW22515@lemon.lan>
 References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
-	<39bf15aa-70e0-45ad-e368-fb489ee30a7c@redhat.com>
-	<6fd08a23-a4f1-527f-6665-d1dbeb51a64a@redhat.com>
+	<a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
+	<cb783ebb-198e-1814-2f9c-aec93c83b17a@virtuozzo.com>
+	<0988b4ef-56e2-5ce9-ed25-40a742eadbd4@redhat.com>
+	<b0d72a26-2052-ecc6-67f5-d32572804ebf@redhat.com>
+	<20170828025706.GA18194@lemon.lan>
+	<20170905130107.GJ4633@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6fd08a23-a4f1-527f-6665-d1dbeb51a64a@redhat.com>
+In-Reply-To: <20170905130107.GJ4633@localhost.localdomain>
 Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,69 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Qemu-block <qemu-block@nongnu.org>, Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-Am 23.08.2017 um 19:44 hat John Snow geschrieben:
-> On 08/23/2017 01:31 PM, Max Reitz wrote:
-> > On 2017-08-22 21:07, John Snow wrote:
+On Tue, 09/05 15:01, Kevin Wolf wrote:
+> Am 28.08.2017 um 04:57 hat Fam Zheng geschrieben:
+> > On Fri, 08/25 15:44, Max Reitz wrote:
+> > > Well, OK.  The main argument against supporting anything but qcow2 is
+> > > "if you want features, use qcow2; and we are working on making qcow2 as
+> > > fast as possible."  I think that's a very good argument still.  At some
+> > > point I (and probably others, too) had the idea of making qcow2 files in
+> > > raw layout: 
 > > 
-> > [...]
-> > 
-> >> (3) Add either a new flag that turns qcow2's backing file into a full
-> >> R/W backing file, or add a new extension to qcow2 entirely (bypassing
-> >> the traditional backing file mechanism to avoid confusion for older
-> >> tooling) that adds a new read-write backing file field.
-> >>
-> >> This RW backing file field will be used for all reads AND writes; the
-> >> qcow2 in question becomes a metadata container on top of the BDS chain.
-> >> We can re-use Vladimir's bitmap persistence extension to save bitmaps in
-> >> a qcow2 shell.
-> >>
-> >> The qcow2 becomes effectively a metadata cache for a new (essentially)
-> >> filter node that handles features such as bitmaps. This could also be
-> >> used to provide allocation map data for RAW files and other goodies down
-> >> the road.
-> >>
-> >> Hopefully this achieves our desire to not create new formats AND our
-> >> desire to concentrate features (and debugging, testing, etc) into qcow2,
-> >> while allowing users to "have bitmaps with raw files."
-> >>
-> >> Of course, in this scenario, users now have two files: a qcow2 wrapper
-> >> and the actual raw file in question; but regardless of how we were going
-> >> to solve this, a raw file necessitates an external file of some sort,
-> >> else we give up the idea that it was a raw file.
-> >>
-> >>
-> >> Sound good?
-> > 
-> > While I don't quite like the idea of R/W backing files, I guess "don't
-> > quite like" is still rather good.
+> > Yes! I think this idea makes a whole lot of sense, too. Metadata tables can be
+> > generated so old implementation can still use it.
 > 
-> Yeah, it's not necessarily my first pick, but it might be the least bad.
+> Maybe a nice way to attack this would be "huge pages", i.e. have a L1
+> entry flag that tells "this points directly to a huge cluster instead of
+> an L2 table". Gives us 512 MB clusters with a 64k cluster size, or a
+> maximum of 512 GB clusters with a 2 MB cluster size.
+> 
+> Huge clusters would only be used by qemu-img create if the respective
+> option is given, and only with preallocation.
 
-As for backing files always being read-only, that ship has sailed long
-ago. We really never had it because I think HMP 'commit' was introduced
-at the same time as backing files, but at least it was still contained
-in synchronous function protected by the BQL. But at latest since we
-introduced live block jobs, it's not a reasonable assumption to make any
-more.
+Then this image is not usable on old QEMUs, right? So this is going to be an
+incompatible_feature, whereas with the linear mapping L1/L2 tables approach, it
+can be an autoclear_feature.
 
-At this point, I have no problems with adding more users of writable
-backing files any more. We'll have to use op blockers to make it safe.
-
-> If you have any suggestions or alternatives for a way to accomplish the
-> same in a way that does not leave any, even faint, bad taste in your
-> mouth you are more than welcome to suggest it.
-
-Maybe one thing that I don't want to dismiss right away would be a
-separate BlockDriver for passthrough qcow2 images so that we don't
-clutter all functions with special cases. But I'm not compeltely
-convinced of it either.
-
-I think I once had a use case for clusters that are marked as
-"read/write to backing file", but I can't seem to remember it now. If we
-had such a per-cluster setting, then a separate BlockDriver wouldn't be
-an option, obviously.
-
-Kevin
+Fam
