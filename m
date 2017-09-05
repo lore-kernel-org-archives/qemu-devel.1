@@ -1,32 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60869)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpAY0-0001uQ-K2
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:53:37 -0400
+	(envelope-from <thuth@redhat.com>) id 1dpAYT-0002Gf-4G
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:54:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpAXv-0000xI-Uq
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:53:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41286)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpAXv-0000wp-PA
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:53:27 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B867F130C
-	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 09:53:26 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-3-eblake@redhat.com>
-	<09983e6e-9506-ca02-a8ce-b1a1773d793c@redhat.com>
-Date: Tue, 05 Sep 2017 11:53:22 +0200
-In-Reply-To: <09983e6e-9506-ca02-a8ce-b1a1773d793c@redhat.com> (Thomas Huth's
-	message of "Tue, 5 Sep 2017 09:20:50 +0200")
-Message-ID: <874lshzd2l.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 02/29] tests: Sort .gitignore
+	(envelope-from <thuth@redhat.com>) id 1dpAYO-0001DV-F1
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:54:01 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Tue,  5 Sep 2017 11:53:47 +0200
+Message-Id: <1504605227-5124-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [RFC PATCH] tests: Add a device_add/del HMP test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,43 +17,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, John Snow <jsnow@redhat.com>, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, armbru@redhat.com, =?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>
 
-Thomas Huth <thuth@redhat.com> writes:
+People tend to forget to mark internal devices with "user_creatable = false
+or hotpluggable = false, and these devices can crash QEMU if added via the
+HMP monitor. So let's add a test to run through all devices and that tries
+to add them blindly (without arguments) to see whether this could crash the
+QEMU instance.
 
-> On 01.09.2017 20:03, Eric Blake wrote:
->> It doesn't matter if things are unsorted, but finding stuff in a list
->> is easier when it is sorted.  (Sorted under LC_ALL=3DC rules, rather than
->> en_US.UTF-8).
->>=20
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->>  tests/.gitignore | 30 +++++++++++++++---------------
->>  1 file changed, 15 insertions(+), 15 deletions(-)
->
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
->
-> BTW, did you note the patch "build-sys: generate tests/.gitignore" from
-> Marc-Andr=C3=A9 ? Maybe the list can be generated automatically, too...
->
->> diff --git a/tests/.gitignore b/tests/.gitignore
->> index 64ecd6683b..8d35a58751 100644
->> --- a/tests/.gitignore
->> +++ b/tests/.gitignore
->> @@ -1,25 +1,27 @@
->> +*-test
->
-> ... but looking at this wildcard, I wonder if we just named most of our
-> tests in a bad way. If we name the files something-test instead of
-> test-something, we maybe do not need the automatic generation from
-> Marc-Andr=C3=A9 (which is kind of ugly because it writes to the source
-> directory - and this should not happen when doing out of tree builds).
->
-> So what do you think about renaming our tests, so that the above
-> wildcard applies instead?
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ I've marked the patch as RFC since not all of the required device bug
+ fixes have been merged yet (so this patch can not be included yet without
+ breaking "make check"). It's also sad that "macio-oldworld" currently
+ has to be blacklisted - I tried to find a fix for that device,  but I was
+ not able to spot the exact problem so far. So help for fixing that device
+ is very very welcome! The crash can be reproduced like this:
 
-Apropos naming tests: there's an (unspoken) convention to name unit
-tests check-FOO or test-FOO and tests using libqtest FOO-test, but it's
-not really honored anymore, probably because people creating tests
-didn't know about it.
+ $ qemu-system-ppc64 -nographic -S -monitor stdio -serial none
+ QEMU 2.10.50 monitor - type 'help' for more information
+ (qemu) device_add macio-oldworld,id=x
+ (qemu) device_del x
+ (qemu) **
+ ERROR:qom/object.c:1611:object_get_canonical_path_component:
+  assertion failed: (obj->parent != NULL)
+ Aborted (core dumped)
+
+ tests/test-hmp.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 59 insertions(+), 1 deletion(-)
+
+diff --git a/tests/test-hmp.c b/tests/test-hmp.c
+index 7a38cdc..e8a25c4 100644
+--- a/tests/test-hmp.c
++++ b/tests/test-hmp.c
+@@ -28,7 +28,6 @@ static const char *hmp_cmds[] = {
+     "commit all",
+     "cpu-add 1",
+     "cpu 0",
+-    "device_add ?",
+     "device_add usb-mouse,id=mouse1",
+     "mouse_button 7",
+     "mouse_move 10 10",
+@@ -116,6 +115,64 @@ static void test_info_commands(void)
+     g_free(info_buf);
+ }
+ 
++/*
++ * People tend to forget to mark internal devices with "user_creatable = false
++ * and these devices can crash QEMU if added via the HMP monitor. So let's run
++ * through all devices and try to add them blindly (without arguments) to see
++ * whether this could crash the QEMU instance.
++ */
++static void test_device_add_commands(void)
++{
++    char *resp, *devices, *devices_buf, *endp;
++
++    devices = devices_buf = hmp("device_add help");
++
++    while (*devices) {
++        /* Ignore header lines etc. */
++        if (strncmp(devices, "name \"", 6)) {
++            devices = strchr(devices, '\n');
++            if (!devices) {
++                break;
++            }
++            devices += 1;
++            continue;
++        }
++        /* Extract the device name, ignore parameters and description */
++        devices += 6;
++        endp = strchr(devices, '"');
++        g_assert(endp != NULL);
++        *endp = '\0';
++        /* Check whether it is blacklisted... */
++        if (g_str_equal("macio-oldworld", devices)) {
++            devices = strchr(endp + 1, '\n');
++            if (!devices) {
++                break;
++            }
++            devices += 1;
++            continue;
++        }
++        /* Now run the device_add + device_del commands */
++        if (verbose) {
++            fprintf(stderr, "\tdevice_add %s,id=%s\n", devices, devices);
++        }
++        resp = hmp("device_add %s,id=%s", devices, devices);
++        g_free(resp);
++        if (verbose) {
++            fprintf(stderr, "\tdevice_del %s\n", devices);
++        }
++        resp = hmp("device_del %s", devices);
++        g_free(resp);
++        /* And move forward to the next line */
++        devices = strchr(endp + 1, '\n');
++        if (!devices) {
++            break;
++        }
++        devices += 1;
++    }
++
++    g_free(devices_buf);
++}
++
+ static void test_machine(gconstpointer data)
+ {
+     const char *machine = data;
+@@ -125,6 +182,7 @@ static void test_machine(gconstpointer data)
+     qtest_start(args);
+ 
+     test_info_commands();
++    test_device_add_commands();
+     test_commands();
+ 
+     qtest_end();
+-- 
+1.8.3.1
