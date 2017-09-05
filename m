@@ -1,17 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dpCkm-00014A-91
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:15:01 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dpCp8-0002ts-BR
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:19:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dpCke-0006ph-GW
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:14:52 -0400
-MIME-Version: 1.0
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 5 Sep 2017 14:14:42 +0200
-Message-ID: <CAJ+F1C+mPu9ftXwgs4UrGTQp4f65-thhvmWoB-kuRmu0=vnFFw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] clang-tidy: use g_new() family of functions
+	(envelope-from <pm215@archaic.org.uk>) id 1dpCp3-0001Sx-HV
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:19:22 -0400
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue,  5 Sep 2017 13:19:32 +0100
+Message-Id: <1504613972-15847-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH] util/qemu-thread-posix.c: Replace OS ifdefs
+ with CONFIG_HAVE_SEM_TIMEDWAIT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,50 +18,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU <qemu-devel@nongnu.org>, qemu trival <qemu-trivial@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: patches@linaro.org
 
-Hi,
+In qemu-thread-posix.c we have two implementations of the
+various qemu_sem_* functions, one of which uses native POSIX
+sem_* and the other of which emulates them with pthread conditions.
+This is necessary because not all our host OSes support
+sem_timedwait().
 
-I have a series of changes generated with clang-tidy qemu [1] pending
-for review [2].
+Instead of a hard-coded list of OSes which don't implement
+sem_timedwait(), which gets out of date, make configure
+test for the presence of the function and set a new
+CONFIG_HAVE_SEM_TIMEDWAIT appropriately.
 
-It translates calloc/*malloc*/*realloc() calls to
-g_new/g_newa/g_new0/g_renew() where the argument is a sizeof(T) [* N].
+In particular, newer NetBSDs have sem_timedwait(), so this
+commit will switch them over to using it. OSX still does
+not have an implementation.
 
-This is the first commit to give you an idea:
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+It would be nice to gradually reduce the number of places
+we do per-OS ifdeffery in favour of checking for the specific
+feature we care about in each case...
+Tested on Linux, NetBSD, OSX.
 
-diff --git a/hw/timer/arm_timer.c b/hw/timer/arm_timer.c
-index 98fddd7ac1..75affcb8a6 100644
---- a/hw/timer/arm_timer.c
-+++ b/hw/timer/arm_timer.c
-@@ -166,7 +166,7 @@ static arm_timer_state *arm_timer_init(uint32_t freq)
-     arm_timer_state *s;
-     QEMUBH *bh;
+ configure                   | 15 +++++++++++++++
+ include/qemu/thread-posix.h |  2 +-
+ util/qemu-thread-posix.c    | 10 +++++-----
+ 3 files changed, 21 insertions(+), 6 deletions(-)
 
--    s =3D (arm_timer_state *)g_malloc0(sizeof(arm_timer_state));
-+    s =3D g_new0(arm_timer_state, 1);
-     s->freq =3D freq;
-     s->control =3D TIMER_CTRL_IE;
-
-g_new() advantages (from glib doc):
-- the returned pointer is cast to a pointer to the given type.
-- care is taken to avoid overflow when calculating the size of the
-allocated block.
-
-But it is also shorter&nicer :)
-
-I have not included in the first batch the opportunity to also
-translate: alloc(sizeof(*p) * x) to g_new(typeof(*p), x), since it is
-arguably not much nicer. But for consistency, I think it would be good
-to use g_new(). What do you think?
-
-I splitted the changes amont the various MAINTAINERS entries, but it
-is still about 70 patches (without the typeof() changes).
-
-
-[1] https://github.com/elmarco/clang-tools-extra/
-[2] https://github.com/elmarco/qemu/commits/gnew
-
-
---=20
-Marc-Andr=C3=A9 Lureau
+diff --git a/configure b/configure
+index fb7e34a..aa8d4d9 100755
+--- a/configure
++++ b/configure
+@@ -4448,6 +4448,18 @@ if compile_prog "" "" ; then
+ fi
+ 
+ ##########################################
++# check if we have sem_timedwait
++
++sem_timedwait=no
++cat > $TMPC << EOF
++#include <semaphore.h>
++int main(void) { return sem_timedwait(0, 0); }
++EOF
++if compile_prog "" "" ; then
++    sem_timedwait=yes
++fi
++
++##########################################
+ # check if trace backend exists
+ 
+ $python "$source_path/scripts/tracetool.py" "--backends=$trace_backends" --check-backends  > /dev/null 2> /dev/null
+@@ -5680,6 +5692,9 @@ fi
+ if test "$inotify1" = "yes" ; then
+   echo "CONFIG_INOTIFY1=y" >> $config_host_mak
+ fi
++if test "$sem_timedwait" = "yes" ; then
++  echo "CONFIG_SEM_TIMEDWAIT=y" >> $config_host_mak
++fi
+ if test "$byteswap_h" = "yes" ; then
+   echo "CONFIG_BYTESWAP_H=y" >> $config_host_mak
+ fi
+diff --git a/include/qemu/thread-posix.h b/include/qemu/thread-posix.h
+index e5e3a0f..f4296d3 100644
+--- a/include/qemu/thread-posix.h
++++ b/include/qemu/thread-posix.h
+@@ -21,7 +21,7 @@ struct QemuCond {
+ };
+ 
+ struct QemuSemaphore {
+-#if defined(__APPLE__) || defined(__NetBSD__)
++#ifndef CONFIG_SEM_TIMEDWAIT
+     pthread_mutex_t lock;
+     pthread_cond_t cond;
+     unsigned int count;
+diff --git a/util/qemu-thread-posix.c b/util/qemu-thread-posix.c
+index 4e95d27..7306475 100644
+--- a/util/qemu-thread-posix.c
++++ b/util/qemu-thread-posix.c
+@@ -168,7 +168,7 @@ void qemu_sem_init(QemuSemaphore *sem, int init)
+ {
+     int rc;
+ 
+-#if defined(__APPLE__) || defined(__NetBSD__)
++#ifndef CONFIG_SEM_TIMEDWAIT
+     rc = pthread_mutex_init(&sem->lock, NULL);
+     if (rc != 0) {
+         error_exit(rc, __func__);
+@@ -196,7 +196,7 @@ void qemu_sem_destroy(QemuSemaphore *sem)
+ 
+     assert(sem->initialized);
+     sem->initialized = false;
+-#if defined(__APPLE__) || defined(__NetBSD__)
++#ifndef CONFIG_SEM_TIMEDWAIT
+     rc = pthread_cond_destroy(&sem->cond);
+     if (rc < 0) {
+         error_exit(rc, __func__);
+@@ -218,7 +218,7 @@ void qemu_sem_post(QemuSemaphore *sem)
+     int rc;
+ 
+     assert(sem->initialized);
+-#if defined(__APPLE__) || defined(__NetBSD__)
++#ifndef CONFIG_SEM_TIMEDWAIT
+     pthread_mutex_lock(&sem->lock);
+     if (sem->count == UINT_MAX) {
+         rc = EINVAL;
+@@ -256,7 +256,7 @@ int qemu_sem_timedwait(QemuSemaphore *sem, int ms)
+     struct timespec ts;
+ 
+     assert(sem->initialized);
+-#if defined(__APPLE__) || defined(__NetBSD__)
++#ifndef CONFIG_SEM_TIMEDWAIT
+     rc = 0;
+     compute_abs_deadline(&ts, ms);
+     pthread_mutex_lock(&sem->lock);
+@@ -304,7 +304,7 @@ void qemu_sem_wait(QemuSemaphore *sem)
+     int rc;
+ 
+     assert(sem->initialized);
+-#if defined(__APPLE__) || defined(__NetBSD__)
++#ifndef CONFIG_SEM_TIMEDWAIT
+     pthread_mutex_lock(&sem->lock);
+     while (sem->count == 0) {
+         rc = pthread_cond_wait(&sem->cond, &sem->lock);
+-- 
+2.7.4
