@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42617)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43197)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dpHOD-0003xW-VA
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:11:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpHPC-0004gN-GY
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:12:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dpHO9-0002Mg-7k
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:11:53 -0400
-Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33115)
+	(envelope-from <peter.maydell@linaro.org>) id 1dpHP7-0002zG-OI
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:12:54 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:36954)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dpHO9-0002Lk-27
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:11:49 -0400
-Received: by mail-wr0-x232.google.com with SMTP id a43so10067283wrc.0
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 10:11:49 -0700 (PDT)
+	id 1dpHP7-0002yQ-Hy
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:12:49 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id k20so1177556wre.4
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 10:12:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170905170822.9109-1-f4bug@amsat.org>
-References: <20170905170822.9109-1-f4bug@amsat.org>
+In-Reply-To: <20170905160027.15081-1-groug@kaod.org>
+References: <20170905160027.15081-1-groug@kaod.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Sep 2017 18:11:27 +0100
-Message-ID: <CAFEAcA_dejMPN9MSU0dObB103xOtzcu9H19PkZ5OoN=jaW1EZQ@mail.gmail.com>
+Date: Tue, 5 Sep 2017 18:12:28 +0100
+Message-ID: <CAFEAcA9mynRtf6emrHy9=K12nfTxv51HDo+03K-5E9faQMbirA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] vhost-user: disable broken test
+Subject: Re: [Qemu-devel] [PULL v2 0/4] 9pfs/virtfs patches for 2.11 20170905
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,49 +29,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Greg Kurz <groug@kaod.org>
 Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 5 September 2017 at 18:08, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
-> tests/vhost-user-test keeps failing on build-system since Aug 15:
+On 5 September 2017 at 17:00, Greg Kurz <groug@kaod.org> wrote:
+> The following changes since commit 53e2c48d3f0db6a1598f49baf0b56dd4975e53=
+a7:
 >
->   ERROR:tests/vhost-user-test.c:835:test_flags_mismatch: child process (/=
-i386/vhost-user/flags-mismatch/subprocess [4836]) failed unexpectedly
-> ...
->   ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process (/x8=
-6_64/vhost-user/connect-fail/subprocess [58910]) failed unexpectedly
+>   Merge remote-tracking branch 'remotes/mcayland/tags/qemu-sparc-signed' =
+into staging (2017-09-04 18:53:46 +0100)
 >
-> The test can still be build for debug session using:
+> are available in the git repository at:
 >
->   $ FORCE_VHOST_USER_NET_TEST=3D1 ./configure ...
+>   https://github.com/gkurz/qemu.git tags/for-upstream
 >
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
->  configure | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+> for you to fetch changes up to 32b6943699948f7adc35ada233fbd25daffad5e9:
 >
-> diff --git a/configure b/configure
-> index fb7e34a901..d3b895b167 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6386,7 +6386,12 @@ if supported_kvm_target $target; then
->      if test "$vhost_net" =3D "yes" ; then
->          echo "CONFIG_VHOST_NET=3Dy" >> $config_target_mak
->          if test "$vhost_user" =3D "yes" ; then
-> -            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=3Dy" >> $confi=
-g_host_mak
-> +            if test -n "${FORCE_VHOST_USER_NET_TEST}"; then
-> +                echo "CONFIG_VHOST_USER_NET_TEST_$target_name=3Dy" >> $c=
-onfig_host_mak
-> +            elif test -z "${VHOST_USER_NET_TEST_WARNED}"; then
-> +                echo "warning: vhost-user tests disabled" >&2
-> +                VHOST_USER_NET_TEST_WARNED=3D"warned"
-> +            fi
+>   virtfs: error out gracefully when mandatory suboptions are missing (201=
+7-09-05 17:56:58 +0200)
+>
+> ----------------------------------------------------------------
+> Some trivial fixes/cleanup and a fix to cause QEMU to error out gracefull=
+y
+> instead of aborting.
+>
+> ----------------------------------------------------------------
+> Greg Kurz (2):
+>       9pfs: local: clarify fchmodat_nofollow() implementation
+>       virtfs: error out gracefully when mandatory suboptions are missing
+>
+> Philippe Mathieu-Daud=C3=A9 (1):
+>       9pfs: avoid sign conversion error simplifying the code
+>
+> ZhiPeng Lu (1):
+>       fsdev: fix memory leak in main()
 
-Please don't make this print a warning -- that will just create
-noise in my test logs to no useful effect.
+Applied, thanks.
 
-thanks
 -- PMM
