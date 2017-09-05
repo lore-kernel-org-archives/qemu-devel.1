@@ -1,36 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vrozenfe@redhat.com>) id 1dp7QZ-0005JY-Fk
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 02:33:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1dp7uD-0003Kk-Sj
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 03:04:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vrozenfe@redhat.com>) id 1dp7QU-0000Y8-JY
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 02:33:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58032)
+	(envelope-from <thuth@redhat.com>) id 1dp7u9-0001lg-BI
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 03:04:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46096)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vrozenfe@redhat.com>) id 1dp7QU-0000WO-Ai
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 02:33:34 -0400
-References: <589C099A.9090605@huawei.com>
-	<AF60004D-7133-44D1-8A9F-7DB9822D84AF@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1B4379@DGGEMA505-MBX.china.huawei.com>
-	<105e5774-38c3-0683-ca08-64f6ed53c643@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1B6988@DGGEMA505-MBX.china.huawei.com>
-	<2127602137.20489688.1486827559449.JavaMail.zimbra@redhat.com>
-	<1486980300.17184.28.camel@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1BD1CA@DGGEMA505-MBX.china.huawei.com>
-	<ea1dbe94-7343-ef9e-56e1-9c6d8bcd78d6@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1C13C3@DGGEMA505-MBX.china.huawei.com>
-	<43632326-97a1-1f60-39f4-1044cd596b66@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1C1608@DGGEMA505-MBX.china.huawei.com>
-	<ec45f714-66f7-ba93-70c2-e2a033ad4ccd@redhat.com>
-	<33183CC9F5247A488A2544077AF19020DA1C16C5@DGGEMA505-MBX.china.huawei.com>
-From: Vadim Rozenfeld <vrozenfe@redhat.com>
-Message-ID: <b6daba68-f3e2-74ff-6fa8-fab6a04d9813@redhat.com>
-Date: Tue, 5 Sep 2017 16:33:23 +1000
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dp7u9-0001lN-5V
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 03:04:13 -0400
+References: <20170901180340.30009-1-eblake@redhat.com>
+	<20170901180340.30009-23-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <a1f65bd1-6307-63bd-6404-7f3fbb49c81d@redhat.com>
+Date: Tue, 5 Sep 2017 09:04:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <33183CC9F5247A488A2544077AF19020DA1C16C5@DGGEMA505-MBX.china.huawei.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20170901180340.30009-23-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Help] Windows2012 as Guest 64+cores on KVM Halts
+Subject: Re: [Qemu-devel] [PATCH v6 22/29] tests/boot-sector: Drop
+ dependence on global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,57 +29,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Hangaohuai <hangaohuai@huawei.com>, Yan Vugenfirer <yvugenfi@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Igor Mammedov <imammedo@redhat.com>, armbru@redhat.com, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
+On 01.09.2017 20:03, Eric Blake wrote:
+> As a general rule, we prefer avoiding implicit global state
+> because it makes code harder to safely copy and paste without
+> thinking about the global state.  Adjust the helper code to
+> use explicit state instead, and update all callers.
+> 
+> Fix some trailing whitespace while touching the file.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/boot-sector.h      | 6 ++++--
+>  tests/bios-tables-test.c | 2 +-
+>  tests/boot-sector.c      | 8 ++++----
+>  tests/pxe-test.c         | 2 +-
+>  tests/vmgenid-test.c     | 2 +-
+>  5 files changed, 11 insertions(+), 9 deletions(-)
 
-
-On 21/02/17 00:18, Gonglei (Arei) wrote:
->>
->> On 20/02/2017 12:54, Gonglei (Arei) wrote:
->>>> On 20/02/2017 10:19, Gonglei (Arei) wrote:
->>>>> Hi Paolo,
->>>>>
->>>>>>
->>>>>> On 16/02/2017 02:31, Gonglei (Arei) wrote:
->>>>>>> And the below patch works for me, I can support max 255 vcpus for
->>>> WS2012
->>>>>>> with hyper-v enlightenments.
->>>>>>>
->>>>>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
->>>>>>> index 27fd050..efe3cbc 100644
->>>>>>> --- a/target/i386/kvm.c
->>>>>>> +++ b/target/i386/kvm.c
->>>>>>> @@ -772,7 +772,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>>>>>>
->>>>>>>           c = &cpuid_data.entries[cpuid_i++];
->>>>>>>           c->function = HYPERV_CPUID_IMPLEMENT_LIMITS;
->>>>>>> -        c->eax = 0x40;
->>>>>>> +        c->eax = -1;
->>>>>>>           c->ebx = 0x40;
->>>>>>>
->>>>>>>           kvm_base = KVM_CPUID_SIGNATURE_NEXT;
->>>>>> This needs to depend on the machine type, but apart from that I think
->>>>> I don't know why. Because the negative effects for this change don't exist
->>>>> on current QEMU IIUC, and we don't have compatible problems for live
->>>> migration.
->>>>
->>>> CPUID should never change with the same machine type and command line.
->>>>
->>> OK, then how do we add compat code for the CPUID change? It's not a visible
->> property.
->>
->> You can add a new property, something like hv-cpuid-limits-eax.
->>
-> Sounds good. Let me try.  :)
->
-> Thanks,
-> -Gonglei
-Hi Gonglei,
-Any update on this issue?
-
-We've found that SVVP on WS2016  is passing successfully with the above 
-change
-and more than 64 vCPUs defined.
-
-Vadim.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
