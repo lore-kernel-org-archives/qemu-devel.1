@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59235)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dpI6b-0002KZ-Lp
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:57:50 -0400
+	(envelope-from <bounces@canonical.com>) id 1dpI9y-0003v4-9H
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 14:01:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dpI6W-0002Xx-Me
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:57:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54264)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dpI6W-0002WN-Ec
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:57:40 -0400
-Date: Tue, 5 Sep 2017 18:57:35 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170905175734.GG2112@work-vm>
-References: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1504541267-36954-7-git-send-email-pradeep.jagadeesh@huawei.com>
+	(envelope-from <bounces@canonical.com>) id 1dpI9t-0004Vi-EP
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 14:01:14 -0400
+Received: from indium.canonical.com ([91.189.90.7]:42046)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dpI9t-0004V8-8h
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 14:01:09 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dpI9s-0002D3-1Q
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 18:01:08 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D0FB02E80D3
+	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 18:01:07 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1504541267-36954-7-git-send-email-pradeep.jagadeesh@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH v10 6/6] fsdev: hmp interface for throttling
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 05 Sep 2017 17:55:46 -0000
+From: kallisti5 <1715203@bugs.launchpad.net>
+Reply-To: Bug 1715203 <1715203@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150463414707.19543.9931062189110648888.malonedeb@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1715203] [NEW] Maintain Haiku support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,178 +35,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Cc: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-* Pradeep Jagadeesh (pradeepkiruvale@gmail.com) wrote:
-> This patch introduces hmp interfaces for the fsdev
-> devices.
-> 
-> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-> ---
->  hmp-commands-info.hx | 18 ++++++++++++++++
->  hmp-commands.hx      | 19 +++++++++++++++++
->  hmp.c                | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  hmp.h                |  4 ++++
->  4 files changed, 101 insertions(+)
-> 
-> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-> index d9df238..07ed338 100644
-> --- a/hmp-commands-info.hx
-> +++ b/hmp-commands-info.hx
-> @@ -84,6 +84,24 @@ STEXI
->  Show block device statistics.
->  ETEXI
->  
-> +#if defined(CONFIG_VIRTFS)
-> +
-> +    {
-> +        .name       = "fsdev_iothrottle",
-> +        .args_type  = "",
-> +        .params     = "",
-> +        .help       = "show fsdev iothrottle information",
-> +        .cmd        = hmp_info_fsdev_iothrottle,
-> +    },
-> +
-> +#endif
-> +
-> +STEXI
-> +@item info fsdev_iothrottle
-> +@findex fsdev_iothrottle
-> +Show fsdev device throttle info.
-> +ETEXI
-> +
->      {
->          .name       = "block-jobs",
->          .args_type  = "",
-> diff --git a/hmp-commands.hx b/hmp-commands.hx
-> index 1941e19..aef9f79 100644
-> --- a/hmp-commands.hx
-> +++ b/hmp-commands.hx
-> @@ -1680,6 +1680,25 @@ STEXI
->  Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
->  ETEXI
->  
-> +#if defined(CONFIG_VIRTFS)
-> +
-> +    {
-> +        .name       = "fsdev_set_io_throttle",
-> +        .args_type  = "device:B,bps:l,bps_rd:l,bps_wr:l,iops:l,iops_rd:l,iops_wr:l",
-> +        .params     = "device bps bps_rd bps_wr iops iops_rd iops_wr",
-> +        .help       = "change I/O throttle limits for a fs devices",
-> +        .cmd        = hmp_fsdev_set_io_throttle,
-> +    },
-> +
-> +#endif
-> +
-> +STEXI
-> +@item fsdev_set_io_throttle @var{device} @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
-> +@findex fsdev_set_io_throttle
-> +Change I/O throttle limits for a fs devices to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
-> +ETEXI
+Public bug reported:
 
-I'm OK with this, and I see it's a copy of the equivalent
-block_set_io_throttle, but can you clarify the meaning - for
-example if a value is 0 what does it mean? Does it mean
-there's no throttle set for that variable?
-Also is the 'bps' bytes/second (as opposed to bits or blocks).
-Clarifying both of these in the text would be good.
+It was pointed out that the 2.10 release notes are pushing to drop Haiku
+support.  The qemu port is currently working as-is under Haiku.
 
-Dave
+Was there a reason this was recommended? Is there anything Haiku can do
+to keep it from being dropped?
 
-> +
-> +
->      {
->          .name       = "set_password",
->          .args_type  = "protocol:s,password:s,connected:s?",
-> diff --git a/hmp.c b/hmp.c
-> index 2dbfb80..6e63cf1 100644
-> --- a/hmp.c
-> +++ b/hmp.c
-> @@ -1783,6 +1783,66 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
->      hmp_handle_error(mon, &err);
->  }
->  
-> +#ifdef CONFIG_VIRTFS
-> +
-> +void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *err = NULL;
-> +    IOThrottle throttle = {
-> +        .has_id = true,
-> +        .id = (char *) qdict_get_str(qdict, "device"),
-> +    };
-> +
-> +    hmp_initialize_io_throttle(&throttle, qdict);
-> +    qmp_fsdev_set_io_throttle(&throttle, &err);
-> +    hmp_handle_error(mon, &err);
-> +}
-> +
-> +static void print_fsdev_throttle_config(Monitor *mon, IOThrottle *fscfg)
-> +{
-> +    monitor_printf(mon, "%s", fscfg->id);
-> +    monitor_printf(mon, "    I/O throttling:"
-> +                   " bps=%" PRId64
-> +                   " bps_rd=%" PRId64  " bps_wr=%" PRId64
-> +                   " bps_max=%" PRId64
-> +                   " bps_rd_max=%" PRId64
-> +                   " bps_wr_max=%" PRId64
-> +                   " iops=%" PRId64 " iops_rd=%" PRId64
-> +                   " iops_wr=%" PRId64
-> +                   " iops_max=%" PRId64
-> +                   " iops_rd_max=%" PRId64
-> +                   " iops_wr_max=%" PRId64
-> +                   " iops_size=%" PRId64
-> +                   "\n",
-> +                   fscfg->bps,
-> +                   fscfg->bps_rd,
-> +                   fscfg->bps_wr,
-> +                   fscfg->bps_max,
-> +                   fscfg->bps_rd_max,
-> +                   fscfg->bps_wr_max,
-> +                   fscfg->iops,
-> +                   fscfg->iops_rd,
-> +                   fscfg->iops_wr,
-> +                   fscfg->iops_max,
-> +                   fscfg->iops_rd_max,
-> +                   fscfg->iops_wr_max,
-> +                   fscfg->iops_size);
-> +}
-> +
-> +void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict)
-> +{
-> +    Error *err = NULL;
-> +    IOThrottleList *fsdev_list, *info;
-> +    fsdev_list = qmp_query_fsdev_io_throttle(&err);
-> +
-> +    for (info = fsdev_list; info; info = info->next) {
-> +        print_fsdev_throttle_config(mon, info->value);
-> +    }
-> +    qapi_free_IOThrottleList(fsdev_list);
-> +}
-> +
-> +#endif
-> +
->  void hmp_block_stream(Monitor *mon, const QDict *qdict)
->  {
->      Error *error = NULL;
-> diff --git a/hmp.h b/hmp.h
-> index 1ff4552..d700d7d 100644
-> --- a/hmp.h
-> +++ b/hmp.h
-> @@ -81,6 +81,10 @@ void hmp_set_password(Monitor *mon, const QDict *qdict);
->  void hmp_expire_password(Monitor *mon, const QDict *qdict);
->  void hmp_eject(Monitor *mon, const QDict *qdict);
->  void hmp_change(Monitor *mon, const QDict *qdict);
-> +#ifdef CONFIG_VIRTFS
-> +void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict);
-> +void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict);
-> +#endif
->  void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict);
->  void hmp_block_stream(Monitor *mon, const QDict *qdict);
->  void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict);
-> -- 
-> 1.8.3.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+We're working on a docker container to cross-compile rust-lang for
+Haiku, could this be of some use to qemu when complete?
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1715203
+
+Title:
+  Maintain Haiku support
+
+Status in QEMU:
+  New
+
+Bug description:
+  It was pointed out that the 2.10 release notes are pushing to drop
+  Haiku support.  The qemu port is currently working as-is under Haiku.
+
+  Was there a reason this was recommended? Is there anything Haiku can
+  do to keep it from being dropped?
+
+  We're working on a docker container to cross-compile rust-lang for
+  Haiku, could this be of some use to qemu when complete?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1715203/+subscriptions
