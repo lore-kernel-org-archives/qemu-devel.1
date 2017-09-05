@@ -1,23 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57515)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59311)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dp7N7-00039L-Hd
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 02:30:10 -0400
+	(envelope-from <vrozenfe@redhat.com>) id 1dp7QZ-0005JY-Fk
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 02:33:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dp7N2-0006Ao-Oc
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 02:30:05 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:33561
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhangchen.fnst@cn.fujitsu.com>) id 1dp7N1-00069o-UV
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 02:30:00 -0400
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-Date: Tue, 5 Sep 2017 14:31:06 +0800
-Message-ID: <1504593066-14023-4-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-In-Reply-To: <1504593066-14023-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-References: <1504593066-14023-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	(envelope-from <vrozenfe@redhat.com>) id 1dp7QU-0000Y8-JY
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 02:33:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58032)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vrozenfe@redhat.com>) id 1dp7QU-0000WO-Ai
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 02:33:34 -0400
+References: <589C099A.9090605@huawei.com>
+	<AF60004D-7133-44D1-8A9F-7DB9822D84AF@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1B4379@DGGEMA505-MBX.china.huawei.com>
+	<105e5774-38c3-0683-ca08-64f6ed53c643@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1B6988@DGGEMA505-MBX.china.huawei.com>
+	<2127602137.20489688.1486827559449.JavaMail.zimbra@redhat.com>
+	<1486980300.17184.28.camel@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1BD1CA@DGGEMA505-MBX.china.huawei.com>
+	<ea1dbe94-7343-ef9e-56e1-9c6d8bcd78d6@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1C13C3@DGGEMA505-MBX.china.huawei.com>
+	<43632326-97a1-1f60-39f4-1044cd596b66@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1C1608@DGGEMA505-MBX.china.huawei.com>
+	<ec45f714-66f7-ba93-70c2-e2a033ad4ccd@redhat.com>
+	<33183CC9F5247A488A2544077AF19020DA1C16C5@DGGEMA505-MBX.china.huawei.com>
+From: Vadim Rozenfeld <vrozenfe@redhat.com>
+Message-ID: <b6daba68-f3e2-74ff-6fa8-fab6a04d9813@redhat.com>
+Date: Tue, 5 Sep 2017 16:33:23 +1000
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH V6 3/3] net/colo-compare.c: Fix comments and
- scheme
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA1C16C5@DGGEMA505-MBX.china.huawei.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Help] Windows2012 as Guest 64+cores on KVM Halts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,100 +39,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>, Li Zhijian <lizhijian@cn.fujitsu.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Hangaohuai <hangaohuai@huawei.com>, Yan Vugenfirer <yvugenfi@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Radim Krcmar <rkrcmar@redhat.com>
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
----
- net/colo-compare.c | 59 ++++++++++++++++++++++++++++--------------------------
- 1 file changed, 31 insertions(+), 28 deletions(-)
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index c31adc6..d5fcfea 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -41,27 +41,27 @@
- #define REGULAR_PACKET_CHECK_MS 3000
- 
- /*
--  + CompareState ++
--  |               |
--  +---------------+   +---------------+         +---------------+
--  |conn list      +--->conn           +--------->conn           |
--  +---------------+   +---------------+         +---------------+
--  |               |     |           |             |          |
--  +---------------+ +---v----+  +---v----+    +---v----+ +---v----+
--                    |primary |  |secondary    |primary | |secondary
--                    |packet  |  |packet  +    |packet  | |packet  +
--                    +--------+  +--------+    +--------+ +--------+
--                        |           |             |          |
--                    +---v----+  +---v----+    +---v----+ +---v----+
--                    |primary |  |secondary    |primary | |secondary
--                    |packet  |  |packet  +    |packet  | |packet  +
--                    +--------+  +--------+    +--------+ +--------+
--                        |           |             |          |
--                    +---v----+  +---v----+    +---v----+ +---v----+
--                    |primary |  |secondary    |primary | |secondary
--                    |packet  |  |packet  +    |packet  | |packet  +
--                    +--------+  +--------+    +--------+ +--------+
--*/
-+ *  + CompareState ++
-+ *  |               |
-+ *  +---------------+   +---------------+         +---------------+
-+ *  |   conn list   + - >      conn     + ------- >      conn     + -- > ......
-+ *  +---------------+   +---------------+         +---------------+
-+ *  |               |     |           |             |          |
-+ *  +---------------+ +---v----+  +---v----+    +---v----+ +---v----+
-+ *                    |primary |  |secondary    |primary | |secondary
-+ *                    |packet  |  |packet  +    |packet  | |packet  +
-+ *                    +--------+  +--------+    +--------+ +--------+
-+ *                        |           |             |          |
-+ *                    +---v----+  +---v----+    +---v----+ +---v----+
-+ *                    |primary |  |secondary    |primary | |secondary
-+ *                    |packet  |  |packet  +    |packet  | |packet  +
-+ *                    +--------+  +--------+    +--------+ +--------+
-+ *                        |           |             |          |
-+ *                    +---v----+  +---v----+    +---v----+ +---v----+
-+ *                    |primary |  |secondary    |primary | |secondary
-+ *                    |packet  |  |packet  +    |packet  | |packet  +
-+ *                    +--------+  +--------+    +--------+ +--------+
-+ */
- typedef struct CompareState {
-     Object parent;
- 
-@@ -75,14 +75,14 @@ typedef struct CompareState {
-     SocketReadState sec_rs;
-     bool vnet_hdr;
- 
--    /* connection list: the connections belonged to this NIC could be found
--     * in this list.
--     * element type: Connection
-+    /*
-+     * Record the connection that through the NIC
-+     * Element type: Connection
-      */
-     GQueue conn_list;
--    /* hashtable to save connection */
-+    /* Record the connection without repetition */
-     GHashTable *connection_track_table;
--    /* compare thread, a thread for each NIC */
-+    /* This thread just do packet compare job */
-     QemuThread thread;
- 
-     GMainContext *worker_context;
-@@ -444,8 +444,11 @@ static int colo_old_packet_check_one_conn(Connection *conn,
-                                  (GCompareFunc)colo_old_packet_check_one);
- 
-     if (result) {
--        /* do checkpoint will flush old packet */
--        /* TODO: colo_notify_checkpoint();*/
-+        /* Do checkpoint will flush old packet */
-+        /*
-+         * TODO: Notify colo frame to do checkpoint.
-+         * colo_compare_inconsistent_notify();
-+         */
-         return 0;
-     }
- 
--- 
-2.7.4
+
+On 21/02/17 00:18, Gonglei (Arei) wrote:
+>>
+>> On 20/02/2017 12:54, Gonglei (Arei) wrote:
+>>>> On 20/02/2017 10:19, Gonglei (Arei) wrote:
+>>>>> Hi Paolo,
+>>>>>
+>>>>>>
+>>>>>> On 16/02/2017 02:31, Gonglei (Arei) wrote:
+>>>>>>> And the below patch works for me, I can support max 255 vcpus for
+>>>> WS2012
+>>>>>>> with hyper-v enlightenments.
+>>>>>>>
+>>>>>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>>>>>>> index 27fd050..efe3cbc 100644
+>>>>>>> --- a/target/i386/kvm.c
+>>>>>>> +++ b/target/i386/kvm.c
+>>>>>>> @@ -772,7 +772,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>>>>>>
+>>>>>>>           c = &cpuid_data.entries[cpuid_i++];
+>>>>>>>           c->function = HYPERV_CPUID_IMPLEMENT_LIMITS;
+>>>>>>> -        c->eax = 0x40;
+>>>>>>> +        c->eax = -1;
+>>>>>>>           c->ebx = 0x40;
+>>>>>>>
+>>>>>>>           kvm_base = KVM_CPUID_SIGNATURE_NEXT;
+>>>>>> This needs to depend on the machine type, but apart from that I think
+>>>>> I don't know why. Because the negative effects for this change don't exist
+>>>>> on current QEMU IIUC, and we don't have compatible problems for live
+>>>> migration.
+>>>>
+>>>> CPUID should never change with the same machine type and command line.
+>>>>
+>>> OK, then how do we add compat code for the CPUID change? It's not a visible
+>> property.
+>>
+>> You can add a new property, something like hv-cpuid-limits-eax.
+>>
+> Sounds good. Let me try.  :)
+>
+> Thanks,
+> -Gonglei
+Hi Gonglei,
+Any update on this issue?
+
+We've found that SVVP on WS2016  is passing successfully with the above 
+change
+and more than 64 vCPUs defined.
+
+Vadim.
