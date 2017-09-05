@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37583)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dpHD4-0008TE-9K
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:00:26 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dpHL0-00021q-Ju
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:08:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dpHCz-0002Jv-KW
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:00:22 -0400
-Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:42320)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dpHCz-0002J5-DU
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:00:17 -0400
-Received: from player157.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 90616AACE4
-	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 19:00:15 +0200 (CEST)
-Date: Tue, 5 Sep 2017 19:00:10 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170905190010.0c84335f@bahia>
-In-Reply-To: <150462482278.16876.9815938798442180307@loki>
-References: <150451194093.7046.18254446012958612468.stgit@bahia>
-	<1d5efdef-21b8-9b7b-6939-339b97fd9bce@redhat.com>
-	<20170905162425.3a202a87@bahia>
-	<150462482278.16876.9815938798442180307@loki>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dpHKw-0000UZ-0L
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:08:34 -0400
+Received: from mail-qt0-x231.google.com ([2607:f8b0:400d:c0d::231]:35255)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dpHKv-0000UM-Rf
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:08:29 -0400
+Received: by mail-qt0-x231.google.com with SMTP id k2so13646303qte.2
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 10:08:29 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Tue,  5 Sep 2017 14:08:22 -0300
+Message-Id: <20170905170822.9109-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/.nQxN3ZK3C7V0nWgTK58+FS";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] virtfs: error out gracefully when
- mandatory suboptions are missing
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] vhost-user: disable broken test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,57 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
---Sig_/.nQxN3ZK3C7V0nWgTK58+FS
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+tests/vhost-user-test keeps failing on build-system since Aug 15:
 
-On Tue, 05 Sep 2017 10:20:22 -0500
-Michael Roth <mdroth@linux.vnet.ibm.com> wrote:
-[...]
-> >=20
-> > Well, it's been there forever and it isn't a critical fix... but the
-> > thread on qemu-discuss the other day showed that it was confusing
-> > people, and the fix is trivial. So I guess it doesn't hurt to have
-> > this in stable. :)
-> >=20
-> > Michael,
-> >=20
-> > I'll send a pull req later today. If it's not too late, maybe you can a=
-dd
-> > this patch to 2.9.1 when it's merged in master? =20
->=20
-> We're in freeze as of yesterday with release set for Thursday, so it's a
-> bit late. OTOH I don't have test coverage for virtfs and the patch seems
-> isolated enough that I don't see any harm in slipping it in if it
-> lands in master by tomorrow. Otherwise it'll have to wait for 2.10.1,
-> which I'm hoping to get out this month.
->=20
+  ERROR:tests/vhost-user-test.c:835:test_flags_mismatch: child process (/i386/vhost-user/flags-mismatch/subprocess [4836]) failed unexpectedly
+...
+  ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process (/x86_64/vhost-user/connect-fail/subprocess [58910]) failed unexpectedly
 
-The fix just got merged.
+The test can still be build for debug session using:
 
-commit 32b6943699948f7adc35ada233fbd25daffad5e9
-Author: Greg Kurz <groug@kaod.org>
-Date:   Mon Sep 4 09:59:01 2017 +0200
+  $ FORCE_VHOST_USER_NET_TEST=1 ./configure ...
 
-    virtfs: error out gracefully when mandatory suboptions are missing
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ configure | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Cheers,
-
---
-Greg
-
---Sig_/.nQxN3ZK3C7V0nWgTK58+FS
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWa7YGgAKCRAC/DrrAQHb
-wlG6AJ9o7+EGTKLK1GX4nXPXvWicFU78RACffs/3c1YgnWIaPI6sDA1KapA5uzU=
-=shm+
------END PGP SIGNATURE-----
-
---Sig_/.nQxN3ZK3C7V0nWgTK58+FS--
+diff --git a/configure b/configure
+index fb7e34a901..d3b895b167 100755
+--- a/configure
++++ b/configure
+@@ -6386,7 +6386,12 @@ if supported_kvm_target $target; then
+     if test "$vhost_net" = "yes" ; then
+         echo "CONFIG_VHOST_NET=y" >> $config_target_mak
+         if test "$vhost_user" = "yes" ; then
+-            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
++            if test -n "${FORCE_VHOST_USER_NET_TEST}"; then
++                echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
++            elif test -z "${VHOST_USER_NET_TEST_WARNED}"; then
++                echo "warning: vhost-user tests disabled" >&2
++                VHOST_USER_NET_TEST_WARNED="warned"
++            fi
+         fi
+     fi
+ fi
+-- 
+2.14.1
