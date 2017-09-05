@@ -1,19 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42919)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42943)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpDeL-0006eh-OG
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:12:22 -0400
+	(envelope-from <famz@redhat.com>) id 1dpDeQ-0006jD-AI
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:12:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpDeH-00081f-5R
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:12:17 -0400
+	(envelope-from <famz@redhat.com>) id 1dpDeL-000862-MV
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:12:22 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Tue,  5 Sep 2017 21:11:47 +0800
-Message-Id: <20170905131149.10669-5-famz@redhat.com>
+Date: Tue,  5 Sep 2017 21:11:45 +0800
+Message-Id: <20170905131149.10669-3-famz@redhat.com>
 In-Reply-To: <20170905131149.10669-1-famz@redhat.com>
 References: <20170905131149.10669-1-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 4/6] xlnx_zynqmp: Convert to DEFINE_PROP_LINK
+Subject: [Qemu-devel] [PATCH v6 2/6] armv7m: Convert armv7m.memory to
+ DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +29,36 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, =?UTF-8?q?Phi
 Signed-off-by: Fam Zheng <famz@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- hw/arm/xlnx-zynqmp.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ hw/arm/armv7m.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
-index 9eceadbdc8..22c2a33719 100644
---- a/hw/arm/xlnx-zynqmp.c
-+++ b/hw/arm/xlnx-zynqmp.c
-@@ -140,11 +140,6 @@ static void xlnx_zynqmp_init(Object *obj)
-                                   &error_abort);
-     }
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index 4c560dde56..b64a409b40 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -132,12 +132,6 @@ static void armv7m_instance_init(Object *obj)
 =20
--    object_property_add_link(obj, "ddr-ram", TYPE_MEMORY_REGION,
--                             (Object **)&s->ddr_ram,
+     /* Can't init the cpu here, we don't yet know which model to use */
+=20
+-    object_property_add_link(obj, "memory",
+-                             TYPE_MEMORY_REGION,
+-                             (Object **)&s->board_memory,
 -                             qdev_prop_allow_set_link_before_realize,
--                             OBJ_PROP_LINK_UNREF_ON_RELEASE, &error_abor=
-t);
--
-     object_initialize(&s->gic, sizeof(s->gic), gic_class_name());
-     qdev_set_parent_bus(DEVICE(&s->gic), sysbus_get_default());
+-                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
+-                             &error_abort);
+     memory_region_init(&s->container, obj, "armv7m-container", UINT64_MA=
+X);
 =20
-@@ -433,6 +428,8 @@ static Property xlnx_zynqmp_props[] =3D {
-     DEFINE_PROP_STRING("boot-cpu", XlnxZynqMPState, boot_cpu),
-     DEFINE_PROP_BOOL("secure", XlnxZynqMPState, secure, false),
-     DEFINE_PROP_BOOL("has_rpu", XlnxZynqMPState, has_rpu, false),
-+    DEFINE_PROP_LINK("ddr-ram", XlnxZynqMPState, ddr_ram, TYPE_MEMORY_RE=
+     object_initialize(&s->nvic, sizeof(s->nvic), TYPE_NVIC);
+@@ -248,6 +242,8 @@ static void armv7m_realize(DeviceState *dev, Error **=
+errp)
+=20
+ static Property armv7m_properties[] =3D {
+     DEFINE_PROP_STRING("cpu-model", ARMv7MState, cpu_model),
++    DEFINE_PROP_LINK("memory", ARMv7MState, board_memory, TYPE_MEMORY_RE=
 GION,
 +                     MemoryRegion *),
-     DEFINE_PROP_END_OF_LIST()
+     DEFINE_PROP_END_OF_LIST(),
  };
 =20
 --=20
