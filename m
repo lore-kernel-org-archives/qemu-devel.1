@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42174)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dpHNY-0003cZ-HJ
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:11:17 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpHOD-0003xW-VA
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:11:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dpHNT-0001ne-O4
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:11:12 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35251)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dpHNT-0001nM-Hw
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:11:07 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dpHNS-0006bM-5b
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 17:11:06 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 1111F2E80D0
-	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 17:11:06 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1dpHO9-0002Mg-7k
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:11:53 -0400
+Received: from mail-wr0-x232.google.com ([2a00:1450:400c:c0c::232]:33115)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dpHO9-0002Lk-27
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:11:49 -0400
+Received: by mail-wr0-x232.google.com with SMTP id a43so10067283wrc.0
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 10:11:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20170905170822.9109-1-f4bug@amsat.org>
+References: <20170905170822.9109-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Sep 2017 18:11:27 +0100
+Message-ID: <CAFEAcA_dejMPN9MSU0dObB103xOtzcu9H19PkZ5OoN=jaW1EZQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 05 Sep 2017 16:57:41 -0000
-From: Daniel Berrange <1715186@bugs.launchpad.net>
-Reply-To: Bug 1715186 <1715186@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150462661769.17099.11925025088141121020.malonedeb@gac.canonical.com>
-Message-Id: <150463066181.16996.4572164984216544456.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715186] Re: websockets: Improve error messages
+Subject: Re: [Qemu-devel] [PATCH] vhost-user: disable broken test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,37 +29,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-At very least we should also use 404 if given a invalid path
+On 5 September 2017 at 18:08, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+> tests/vhost-user-test keeps failing on build-system since Aug 15:
+>
+>   ERROR:tests/vhost-user-test.c:835:test_flags_mismatch: child process (/=
+i386/vhost-user/flags-mismatch/subprocess [4836]) failed unexpectedly
+> ...
+>   ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process (/x8=
+6_64/vhost-user/connect-fail/subprocess [58910]) failed unexpectedly
+>
+> The test can still be build for debug session using:
+>
+>   $ FORCE_VHOST_USER_NET_TEST=3D1 ./configure ...
+>
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+>  configure | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/configure b/configure
+> index fb7e34a901..d3b895b167 100755
+> --- a/configure
+> +++ b/configure
+> @@ -6386,7 +6386,12 @@ if supported_kvm_target $target; then
+>      if test "$vhost_net" =3D "yes" ; then
+>          echo "CONFIG_VHOST_NET=3Dy" >> $config_target_mak
+>          if test "$vhost_user" =3D "yes" ; then
+> -            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=3Dy" >> $confi=
+g_host_mak
+> +            if test -n "${FORCE_VHOST_USER_NET_TEST}"; then
+> +                echo "CONFIG_VHOST_USER_NET_TEST_$target_name=3Dy" >> $c=
+onfig_host_mak
+> +            elif test -z "${VHOST_USER_NET_TEST_WARNED}"; then
+> +                echo "warning: vhost-user tests disabled" >&2
+> +                VHOST_USER_NET_TEST_WARNED=3D"warned"
+> +            fi
 
--- =
+Please don't make this print a warning -- that will just create
+noise in my test logs to no useful effect.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715186
-
-Title:
-  websockets: Improve error messages
-
-Status in QEMU:
-  New
-
-Bug description:
-  Since 2.9 / 07e95cd529af345fdeea230913f68eff5b925bb6 , whenever the
-  VNC websocket server finds an error with the incoming connection
-  request, it just closes the socket with no further information.
-
-  This makes figuring out what's wrong with the request nearly
-  impossible.
-
-  I would be nice if:
-
-  * HTTP 400 were returned to the client, with an appropriate error message
-  * Maybe something written to the log as well?
-
-  Currently, I'm resorting to looking at my request and the websocket
-  source and hoping I can figure out what's wrong.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715186/+subscriptions
+thanks
+-- PMM
