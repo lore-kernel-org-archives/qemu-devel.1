@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dpHij-00022u-5K
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:33:09 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dpHmj-0003I1-SM
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:37:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dpHie-0005od-Ia
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:33:05 -0400
-Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:36440)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dpHie-0005nY-BN
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:33:00 -0400
-Received: by mail-wr0-x241.google.com with SMTP id 40so2030196wrv.3
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 10:32:58 -0700 (PDT)
+	(envelope-from <alistair23@gmail.com>) id 1dpHme-0008MZ-Py
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:37:13 -0400
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20170904141748.GU7570@localhost.localdomain>
-References: <cover.1504228916.git.alistair.francis@xilinx.com>
-	<5bf40ca8376c537ac05dd848a84e072a88a1d939.1504228916.git.alistair.francis@xilinx.com>
-	<20170904141748.GU7570@localhost.localdomain>
+In-Reply-To: <20170904093224.62b43efb@nial.brq.redhat.com>
+References: <cover.1504293917.git.alistair.francis@xilinx.com>
+	<241130c59df31aebaf4f23b5f151b6b5c91f36fa.1504293917.git.alistair.francis@xilinx.com>
+	<20170904093224.62b43efb@nial.brq.redhat.com>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 5 Sep 2017 10:32:25 -0700
-Message-ID: <CAKmqyKMjQvWFQhnt_or9OhGDND=41p+iEFnQ7TCiMwEdm=W6Sw@mail.gmail.com>
+Date: Tue, 5 Sep 2017 10:36:36 -0700
+Message-ID: <CAKmqyKOyxQX__uV8Sh3bmyq9NACwsekPz2EaGVBZP9i3dFKSPg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 1/7] hw/i386: Improve some of the
- warning messages
+Subject: Re: [Qemu-devel] [PATCH v2 2/6] xlnx-zynqmp-pmu: Add the CPU and
+ memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,44 +25,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Don Slutz <dslutz@verizon.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, Edgar Iglesias <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>
 
-On Mon, Sep 4, 2017 at 7:17 AM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> On Fri, Sep 01, 2017 at 09:51:05AM -0700, Alistair Francis wrote:
-> [...]
->> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
->> index 169a214d50..435eb2c458 100644
->> --- a/hw/i386/pc_q35.c
->> +++ b/hw/i386/pc_q35.c
->> @@ -101,9 +101,11 @@ static void pc_q35_init(MachineState *machine)
->>          lowmem = pcms->max_ram_below_4g;
->>          if (machine->ram_size - lowmem > lowmem &&
->>              lowmem & ((1ULL << 30) - 1)) {
->> -            warn_report("Large machine and max_ram_below_4g(%"PRIu64
->> -                        ") not a multiple of 1G; possible bad performance.",
->> -                        pcms->max_ram_below_4g);
->> +            warn_report("Large machine as the ram size (0x%" PRIx64 ") is more"
->> +                        " then twice the size of the internal limit"
->> +                        " (0x%" PRIx64 ") and max-ram-below-4g (%"PRIu64")"
->> +                        " note a multiple of 1G; possible bad performance.",
->> +                        machine->ram_size, lowmem, pcms->max_ram_below_4g);
+On Mon, Sep 4, 2017 at 12:32 AM, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Fri, 1 Sep 2017 14:00:37 -0700
+> Alistair Francis <alistair.francis@xilinx.com> wrote:
 >
-> Here lowmem and max_ram_below_4g have exactly the same value,
-> don't they?  There's no internal limit involved in this logic,
-> only max_ram_below_4g and ram_size.
+>> Connect the MicroBlaze CPU and the ROM and RAM memory regions.
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> ---
+>>
+>>  hw/microblaze/xlnx-zynqmp-pmu.c | 65 +++++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 63 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
+>> index fc3c8b236f..33584cfa4d 100644
+>> --- a/hw/microblaze/xlnx-zynqmp-pmu.c
+>> +++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+>> @@ -18,8 +18,11 @@
+>>  #include "qemu/osdep.h"
+>>  #include "qapi/error.h"
+>>  #include "qemu-common.h"
+>> +#include "exec/address-spaces.h"
+>>  #include "hw/boards.h"
+>> +#include "hw/qdev-properties.h"
+>>  #include "cpu.h"
+>> +#include "boot.h"
+>>
+>>  /* Define the PMU device */
+>>
+>> @@ -27,21 +30,51 @@
+>>  #define XLNX_ZYNQMP_PMU(obj) OBJECT_CHECK(XlnxZynqMPPMUState, (obj), \
+>>                                            TYPE_XLNX_ZYNQMP_PMU)
+>>
+>> +#define XLNX_ZYNQMP_PMU_ROM_SIZE    0x8000
+>> +#define XLNX_ZYNQMP_PMU_ROM_ADDR    0xFFD00000
+>> +#define XLNX_ZYNQMP_PMU_RAM_ADDR    0xFFDC0000
+>> +
+>>  typedef struct XlnxZynqMPPMUState {
+>>      /*< private >*/
+>>      DeviceState parent_obj;
+>>
+>>      /*< public >*/
+>> +    MicroBlazeCPU cpu;
+>>  }  XlnxZynqMPPMUState;
+>>
+>>  static void xlnx_zynqmp_pmu_init(Object *obj)
+>>  {
+>> +    XlnxZynqMPPMUState *s = XLNX_ZYNQMP_PMU(obj);
+>>
+>> +    object_initialize(&s->cpu, sizeof(s->cpu),
+>> +                      TYPE_MICROBLAZE_CPU);
+>> +    object_property_add_child(obj, "pmu-cpu[*]", OBJECT(&s->cpu),
+>                                               ^^^ why do you use this syntax here?
+>
 
-Good point, I'll change it to this:
+Woops, that was a left over from the ARM ZynqMP. I'll remove the '[*]'
 
-warn_report("There is possibly poor performance as the ram size "
-            " (0x%" PRIx64 ") is more then twice the size of"
-            " max-ram-below-4g (%"PRIu64") and"
-            " max-ram-below-4g is not a multiple of 1G.",
-            machine->ram_size, pcms->max_ram_below_4g);
+>> +                              &error_abort);
+>>  }
+>>
+>>  static void xlnx_zynqmp_pmu_realize(DeviceState *dev, Error **errp)
+>>  {
+>> -
+>> +    XlnxZynqMPPMUState *s = XLNX_ZYNQMP_PMU(dev);
+>> +
+>> +    object_property_set_uint(OBJECT(&s->cpu), XLNX_ZYNQMP_PMU_ROM_ADDR,
+>> +                             "base-vectors", &error_abort);
+>> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-stack-protection",
+>> +                             &error_abort);
+>> +    object_property_set_uint(OBJECT(&s->cpu), 0, "use-fpu", &error_abort);
+>> +    object_property_set_uint(OBJECT(&s->cpu), 0, "use-hw-mul", &error_abort);
+>> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-barrel",
+>> +                             &error_abort);
+>> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-msr-instr",
+>> +                             &error_abort);
+>> +    object_property_set_bool(OBJECT(&s->cpu), true, "use-pcmp-instr",
+>> +                             &error_abort);
+>> +    object_property_set_bool(OBJECT(&s->cpu), false, "use-mmu", &error_abort);
+>> +    object_property_set_bool(OBJECT(&s->cpu), true, "endianness",
+>> +                             &error_abort);
+>> +    object_property_set_str(OBJECT(&s->cpu), "8.40.b", "version",
+>> +                            &error_abort);
+>> +    object_property_set_uint(OBJECT(&s->cpu), 0, "pvr", &error_abort);
+>> +    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &error_fatal);
+> I'd replace error_fatal here with errp
+
+Will do.
 
 Thanks,
 Alistair
 
 >
-> --
-> Eduardo
+>>  }
+>>
+>>  static void xlnx_zynqmp_pmu_class_init(ObjectClass *oc, void *data)
+>> @@ -70,7 +103,35 @@ type_init(xlnx_zynqmp_pmu_register_types)
+>>
+>>  static void xlnx_zcu102_pmu_init(MachineState *machine)
+>>  {
+>> -
+>> +    XlnxZynqMPPMUState *pmu = g_new0(XlnxZynqMPPMUState, 1);
+>> +    MemoryRegion *address_space_mem = get_system_memory();
+>> +    MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
+>> +    MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
+>> +
+>> +    /* Create the ROM */
+>> +    memory_region_init_rom(pmu_rom, NULL, "xlnx-zcu102-pmu.rom",
+>> +                           XLNX_ZYNQMP_PMU_ROM_SIZE, &error_fatal);
+>> +    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_ROM_ADDR,
+>> +                                pmu_rom);
+>> +
+>> +    /* Create the RAM */
+>> +    memory_region_init_ram(pmu_ram, NULL, "xlnx-zcu102-pmu.ram",
+>> +                           machine->ram_size, &error_fatal);
+>> +    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_RAM_ADDR,
+>> +                                pmu_ram);
+>> +
+>> +    /* Create the PMU device */
+>> +    object_initialize(pmu, sizeof(XlnxZynqMPPMUState), TYPE_XLNX_ZYNQMP_PMU);
+>> +    object_property_add_child(OBJECT(machine), "pmu", OBJECT(pmu),
+>> +                              &error_abort);
+>> +    object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
+>> +
+>> +    /* Load the kernel */
+>> +    microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
+>> +                           machine->ram_size,
+>> +                           machine->kernel_filename,
+>> +                           machine->dtb,
+>> +                           NULL);
+>>  }
+>>
+>>  static void xlnx_zcu102_pmu_machine_init(MachineClass *mc)
+>
