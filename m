@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46412)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dpABs-0008W3-VS
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:30:50 -0400
+	(envelope-from <armbru@redhat.com>) id 1dpADe-0001cP-A3
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:32:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dpABk-0007vD-Vm
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:30:40 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2252)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dpABk-0007t2-95
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:30:32 -0400
-From: Gonglei <arei.gonglei@huawei.com>
-Date: Tue, 5 Sep 2017 17:30:05 +0800
-Message-ID: <1504603805-180240-3-git-send-email-arei.gonglei@huawei.com>
-In-Reply-To: <1504603805-180240-1-git-send-email-arei.gonglei@huawei.com>
-References: <1504603805-180240-1-git-send-email-arei.gonglei@huawei.com>
+	(envelope-from <armbru@redhat.com>) id 1dpADZ-0000qu-KU
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:32:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46622)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpADZ-0000qL-CS
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:32:25 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-20-marcandre.lureau@redhat.com>
+Date: Tue, 05 Sep 2017 11:32:20 +0200
+In-Reply-To: <20170822132255.23945-20-marcandre.lureau@redhat.com>
+	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
+	15:22:20 +0200")
+Message-ID: <87o9qp1oez.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH 2/2] i386/cpu/hyperv: support over 64 vcpus for
- windows guests
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 19/54] qapi: add #if/#endif helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,99 +29,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, vrozenfe@redhat.com, weidong.huang@huawei.com, Gonglei <arei.gonglei@huawei.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Starting with Windows Server 2012 and Windows 8, if
-CPUID.40000005.EAX contains a value of -1, Windows assumes specific
-limit to the number of VPs. In this case, Windows Server 2012
-guest VMs may use more than 64 VPs, up to the maximum supported
-number of processors applicable to the specific Windows
-version being used.
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
+> Add helpers to generate #if/#endif and wrap visitor methods generating
+> code. Used in the following patches.
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  scripts/qapi.py | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 51 insertions(+)
+>
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index 86845a28f9..52099332f1 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -1892,6 +1892,57 @@ def guardend(name):
+>                   name=3Dguardname(name))
+>=20=20
+>=20=20
+> +def gen_if(ifcond):
+> +    if not ifcond:
+> +        return ''
+> +    if isinstance(ifcond, str):
+> +        ifcond =3D [ifcond]
+> +    # Not using mcgen() because we don't want indent or \n stipped
 
-For compatibility, Let's introduce a new property for X86CPU,
-named "hv-cpuid-limits-eax" as Paolo's suggestion, and set it
-to "on" before machine 2.10.
+s/stipped/stripped/ I guess.
 
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
----
- include/hw/i386/pc.h |  5 +++++
- target/i386/cpu.c    |  1 +
- target/i386/cpu.h    |  2 ++
- target/i386/kvm.c    | 18 +++++++++++++++++-
- 4 files changed, 25 insertions(+), 1 deletion(-)
+Which newline exactly don't you want to strip?
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 8226904..db32e58 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -371,6 +371,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- 
- #define PC_COMPAT_2_10 \
-     HW_COMPAT_2_10 \
-+    {\
-+        .driver   = TYPE_X86_CPU,\
-+        .property = "hv_cpuid_limits_eax",\
-+        .value    = "on",\
-+    },\
- 
- #define PC_COMPAT_2_9 \
-     HW_COMPAT_2_9 \
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 69676e1..0d47bdd 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4145,6 +4145,7 @@ static Property x86_cpu_properties[] = {
-                      false),
-     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
-     DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
-+    DEFINE_PROP_BOOL("hv-cpuid-limits-eax", X86CPU, hv_cpuid_limits_eax, false),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 525d35d..f8b455a 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1282,6 +1282,8 @@ struct X86CPU {
-     int32_t socket_id;
-     int32_t core_id;
-     int32_t thread_id;
-+
-+    bool hv_cpuid_limits_eax;
- };
- 
- static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 6db7783..cf6ef96 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -751,7 +751,23 @@ int kvm_arch_init_vcpu(CPUState *cs)
- 
-         c = &cpuid_data.entries[cpuid_i++];
-         c->function = HYPERV_CPUID_IMPLEMENT_LIMITS;
--        c->eax = 0x40;
-+
-+        if (!cpu->hv_cpuid_limits_eax) {
-+            /*
-+             * Starting with Windows Server 2012 and Windows 8, if
-+             * CPUID.40000005.EAX contains a value of -1, Windows
-+             * assumes specific limit to the number of VPs. In this case,
-+             * Windows Server 2012 guest VMs may use more than 64 VPs,
-+             * up to the maximum supported number of processors
-+             * applicable to the specific Windows version being used.
-+             *
-+             * https://docs.microsoft.com/en-us/virtualization/
-+             *    hyper-v-on-windows/reference/tlfs
-+             */
-+            c->eax = -1;
-+        } else {
-+            c->eax = 0x40;
-+        }
-         c->ebx = 0x40;
- 
-         kvm_base = KVM_CPUID_SIGNATURE_NEXT;
--- 
-1.8.3.1
+Here's what mcgen() currently does:
+
+* Strip one leading newline, so that this works:
+
+      mcgen('''
+  line 1
+  line 2
+  ''')
+
+* Interpolate keywords
+
+* Indent by @indent_level spaces
+
+* Strip @eatspace.
+
+> +    ret =3D '\n'
+> +    for ifc in ifcond:
+> +        ret +=3D '#if %s\n' % ifc
+> +    ret +=3D '\n'
+> +    return ret
+> +
+> +
+> +def gen_endif(ifcond):
+> +    if not ifcond:
+> +        return ''
+> +    if isinstance(ifcond, str):
+> +        ifcond =3D [ifcond]
+> +    # Not using mcgen() because we don't want indent or \n stipped
+
+Likewise.
+
+> +    ret =3D '\n'
+> +    for ifc in reversed(ifcond):
+> +        ret +=3D '#endif /* %s */\n' % ifc
+> +    ret +=3D '\n'
+> +    return ret
+
+I guess factoring out the common parts of gen_if() and gen_endif() would
+make the code longer and more complex.
+
+> +
+> +
+> +# Wrap a method to add #if / #endif to generated code, only if some
+> +# code was generated.
+> +# self must have 'if_members' listing the attributes to wrap.
+> +# The last argument of the wrapped function must be the 'ifcond'.
+> +def ifcond_decorator(func):
+> +
+> +    def func_wrapper(self, *args, **kwargs):
+> +        ifcond =3D args[-1]
+> +        save =3D {}
+> +        for mem in self.if_members:
+> +            save[mem] =3D getattr(self, mem)
+> +        func(self, *args, **kwargs)
+> +        for mem, val in save.items():
+> +            newval =3D getattr(self, mem)
+> +            if newval !=3D val:
+> +                assert newval.startswith(val)
+> +                newval =3D newval[len(val):]
+> +                val +=3D gen_if(ifcond)
+> +                val +=3D newval
+> +                val +=3D gen_endif(ifcond)
+> +            setattr(self, mem, val)
+> +
+> +    return func_wrapper
+> +
+> +
+>  def gen_enum_lookup(name, values, prefix=3DNone):
+>      ret =3D mcgen('''
+
+My gut feeling is "too clever by half", but i'm reserving judgement
+until after review of its use.
