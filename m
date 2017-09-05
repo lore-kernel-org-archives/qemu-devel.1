@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59477)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59744)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpCMz-0007I1-Ez
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 07:50:22 -0400
+	(envelope-from <thuth@redhat.com>) id 1dpCNl-0007sG-S7
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 07:51:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpCMu-0004Jw-MJ
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 07:50:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60406)
+	(envelope-from <thuth@redhat.com>) id 1dpCNh-0004yc-6s
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 07:51:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59636)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpCMu-0004J3-Fs
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 07:50:12 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A3F7888E60
-	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 11:50:10 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <b604df0885958328765a9d481186a5d60a9ab4b1.1504609507.git.mprivozn@redhat.com>
-Date: Tue, 05 Sep 2017 13:50:08 +0200
-In-Reply-To: <b604df0885958328765a9d481186a5d60a9ab4b1.1504609507.git.mprivozn@redhat.com>
-	(Michal Privoznik's message of "Tue, 5 Sep 2017 13:10:31 +0200")
-Message-ID: <87shg1tle7.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dpCNg-0004y0-Tw
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 07:51:01 -0400
+References: <150451194093.7046.18254446012958612468.stgit@bahia>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2799e274-32ff-4251-3d92-6e3026cdac24@redhat.com>
+Date: Tue, 5 Sep 2017 13:50:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] watchdog: Allow setting action on the fly
+In-Reply-To: <150451194093.7046.18254446012958612468.stgit@bahia>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] virtfs: error out gracefully when
+ mandatory suboptions are missing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,69 +28,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Privoznik <mprivozn@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-Michal Privoznik <mprivozn@redhat.com> writes:
-
-> Currently, the only time that users can set watchdog action is at
-> the start as all we expose is this -watchdog-action command line
-> argument. This is suboptimal when users want to plug the device
-> later via monitor. Alternatively, they might want to change the
-> action for already existing device on the fly.
->
-> Inspired by: https://bugzilla.redhat.com/show_bug.cgi?id=1447169
->
-> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+On 04.09.2017 09:59, Greg Kurz wrote:
+> We internally convert -virtfs to -fsdev/-device. If the user doesn't
+> provide the path or security_model suboptions, and the fsdev backend
+> requires them, we hit an assertion when populating the internal -fsdev
+> option:
+> 
+> util/qemu-option.c:547: opt_set: Assertion `opt->str' failed.
+> Aborted (core dumped)
+> 
+> Let's test the suboption presence on the command line before trying
+> to set it in the internal -fsdev option, and let the backend code
+> error out gracefully (ie, like it already does when the user passes
+> -fsdev on the command line).
+> 
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  hw/watchdog/watchdog.c | 9 +++++++++
->  qapi-schema.json       | 9 +++++++++
->  2 files changed, 18 insertions(+)
->
-> diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
-> index 0c5c9cde1c..971f05c61a 100644
-> --- a/hw/watchdog/watchdog.c
-> +++ b/hw/watchdog/watchdog.c
-> @@ -29,6 +29,8 @@
->  #include "qapi-event.h"
->  #include "hw/nmi.h"
->  #include "qemu/help_option.h"
-> +#include "qmp-commands.h"
-> +#include "qapi/qmp/qerror.h"
+>  vl.c |   16 ++++++++++------
+>  1 file changed, 10 insertions(+), 6 deletions(-)
+> 
+> diff --git a/vl.c b/vl.c
+> index 8e247cc2a239..d63269332fed 100644
+> --- a/vl.c
+> +++ b/vl.c
+> @@ -3557,7 +3557,7 @@ int main(int argc, char **argv, char **envp)
+>              case QEMU_OPTION_virtfs: {
+>                  QemuOpts *fsdev;
+>                  QemuOpts *device;
+> -                const char *writeout, *sock_fd, *socket;
+> +                const char *writeout, *sock_fd, *socket, *path, *security_model;
 >  
->  static int watchdog_action = WDT_RESET;
->  static QLIST_HEAD(watchdog_list, WatchdogTimerModel) watchdog_list;
-> @@ -147,3 +149,10 @@ void watchdog_perform_action(void)
->          break;
->      }
->  }
-> +
-> +void qmp_watchdog_set_action(const char *action, Error **errp)
-> +{
-> +    if (select_watchdog_action(action) == -1) {
-> +        error_setg(errp, QERR_INVALID_PARAMETER, action);
-> +    }
-> +}
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 802ea53d00..be81ffc0bb 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -6539,3 +6539,12 @@
->  # Since 2.9
->  ##
->  { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
-> +
-> +##
-> +# @watchdog-set-action:
-> +#
-> +# Set watchdog action
-> +#
-> +# Since 2.11
-> +##
-> +{ 'command': 'watchdog-set-action', 'data' : {'action': 'str'} }
+>                  olist = qemu_find_opts("virtfs");
+>                  if (!olist) {
+> @@ -3596,11 +3596,15 @@ int main(int argc, char **argv, char **envp)
+>                  }
+>                  qemu_opt_set(fsdev, "fsdriver",
+>                               qemu_opt_get(opts, "fsdriver"), &error_abort);
+> -                qemu_opt_set(fsdev, "path", qemu_opt_get(opts, "path"),
+> -                             &error_abort);
+> -                qemu_opt_set(fsdev, "security_model",
+> -                             qemu_opt_get(opts, "security_model"),
+> -                             &error_abort);
+> +                path = qemu_opt_get(opts, "path");
+> +                if (path) {
+> +                    qemu_opt_set(fsdev, "path", path, &error_abort);
+> +                }
+> +                security_model = qemu_opt_get(opts, "security_model");
+> +                if (security_model) {
+> +                    qemu_opt_set(fsdev, "security_model", security_model,
+> +                                 &error_abort);
+> +                }
+>                  socket = qemu_opt_get(opts, "socket");
+>                  if (socket) {
+>                      qemu_opt_set(fsdev, "socket", socket, &error_abort);
+> 
 
-@action needs to be a QAPI enum.  It'll replace the #defines in
-watchdog.  select_watchdog_action() then calls qapi_enum_parse() to map
-string to enum, and qmp_watchdog_set_action() to make the actual change.
+Looks good to me.
 
-Questions?
+Reviewed-by: Thomas Huth <thuth@redhat.com>
