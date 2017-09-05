@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpAZO-00034C-GK
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:55:03 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dpAak-0004PF-0C
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:56:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpAZJ-0001mo-Up
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:54:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpAZJ-0001lv-P3
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:54:53 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ADB17356C7
-	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 09:54:52 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-9-eblake@redhat.com>
-	<0a344384-f482-5602-490a-928db53c46b5@redhat.com>
-Date: Tue, 05 Sep 2017 11:54:51 +0200
-In-Reply-To: <0a344384-f482-5602-490a-928db53c46b5@redhat.com> (Thomas Huth's
-	message of "Tue, 5 Sep 2017 10:12:30 +0200")
-Message-ID: <87zia9xyfo.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanha@gmail.com>) id 1dpAaf-0003LQ-A9
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:56:22 -0400
+Date: Tue, 5 Sep 2017 10:56:10 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170905095610.GF17449@stefanha-x1.localdomain>
+References: <20170901201054.11738-1-briansteffens@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 08/29] libqtest: Let socket_send()
- compute length
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170901201054.11738-1-briansteffens@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH 1/1] block: add block device shared field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +22,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: Brian Steffens <briansteffens@gmail.com>
+Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-Thomas Huth <thuth@redhat.com> writes:
+On Fri, Sep 01, 2017 at 08:10:54PM +0000, Brian Steffens wrote:
+> This adds a boolean option called 'shared' to block devices. It defaults
+> to off/false. When enabled for a particular block device, the 'shared' option
+> causes the block migration code to skip over syncing of that device. This
+> allows controlling exactly which block devices get synced during a migration.
+> 
+> Signed-off-by: Brian Steffens <briansteffens@gmail.com>
+> ---
+>  block.c                   | 7 +++++++
+>  block/qapi.c              | 2 ++
+>  include/block/block.h     | 1 +
+>  include/block/block_int.h | 3 +++
+>  migration/block.c         | 4 ++++
+>  qapi/block-core.json      | 2 +-
+>  6 files changed, 18 insertions(+), 1 deletion(-)
 
-> On 01.09.2017 20:03, Eric Blake wrote:
->> Rather than make multiple callers call strlen(), it's easier if
->> socket_send() itself can compute a length via strlen() if none
->> was provided (caller passes -1).  Callers that can get at the
->> length more efficiently are left that way.
->> 
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
->>  tests/libqtest.c | 10 ++++++----
->>  1 file changed, 6 insertions(+), 4 deletions(-)
->
-> I have to say that I don't like this idea very much. socket_send()
-> should IMHO not know about the type of the data that should be sent,
-> i.e. it should not assume that the content is a zero-terminated string.
+Thanks for the patch!  Please email the relevant maintainers:
 
-I agree.
+  $ scripts/get_maintainer.pl -f block.c
+  Kevin Wolf <kwolf@redhat.com> (supporter:Block layer core)
+  Max Reitz <mreitz@redhat.com> (supporter:Block layer core)
+  qemu-block@nongnu.org (open list:Block layer core)
+  qemu-devel@nongnu.org (open list:All patches CC here)
 
-> This also could lead to some hard to detect bugs later in case somebody
-> is calling the function like this:
->
->   size = someotherfunction();
->   socket_send(fd, buf, size);
->
-> ... and the someotherfunction() returned a negative error code instead
-> of a correct size.
->
-> So I'd like to suggest to simply drop this patch.
+I have CCed them so they see this email.
 
-A separate wrapper function for sending zero-terminated strings would be
-fine with me.
+> diff --git a/migration/block.c b/migration/block.c
+> index 9171f60028..b347c3dc61 100644
+> --- a/migration/block.c
+> +++ b/migration/block.c
+> @@ -402,6 +402,10 @@ static int init_blk_migration(QEMUFile *f)
+>      bmds_bs = g_malloc0(num_bs * sizeof(*bmds_bs));
+>  
+>      for (i = 0, bs = bdrv_first(&it); bs; bs = bdrv_next(&it), i++) {
+> +        if (bs->shared) {
+> +            continue;
+> +        }
+> +
+
+Have you considered extending the 'migrate' command with a list of
+drives instead?
+
+  { 'command': 'migrate',
+    'data': {'*blk': 'bool',
+	     '*drives': ['str'], <--- new!
+	     ...}}
+
+That way the set of drives doesn't need to be decided until migration
+time.  It avoids adding new state to BlockDriverState that is used only
+by the legacy block/migration.c code.
+
+In case you haven't seen it, the preferred approach for non-shared
+storage migration is drive-mirror + NBD.  The block/migration.c code is
+an older feature that is less flexible.  More info on drive-mirror +
+NBD:
+http://wiki.libvirt.org/page/NBD_storage_migration
+Slide 29 in http://events.linuxfoundation.org/sites/events/files/slides/A-Practical-Look-at-QEMU-Block-Layer-Primitives.pdf
+
+Stefan
