@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44859)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpDeb-0006ta-GW
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:12:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dpDi1-0001eB-7l
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:16:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpDeR-0008BN-Mc
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:12:33 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue,  5 Sep 2017 21:11:49 +0800
-Message-Id: <20170905131149.10669-7-famz@redhat.com>
-In-Reply-To: <20170905131149.10669-1-famz@redhat.com>
-References: <20170905131149.10669-1-famz@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1dpDht-0002Qb-Ev
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:16:05 -0400
+Date: Tue, 5 Sep 2017 15:15:19 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170905131519.GK4633@localhost.localdomain>
+References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
+	<39bf15aa-70e0-45ad-e368-fb489ee30a7c@redhat.com>
+	<6fd08a23-a4f1-527f-6665-d1dbeb51a64a@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 6/6] xilinx_axidma: Convert to
- DEFINE_PROP_LINK
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6fd08a23-a4f1-527f-6665-d1dbeb51a64a@redhat.com>
+Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,49 +24,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: John Snow <jsnow@redhat.com>
+Cc: Max Reitz <mreitz@redhat.com>, Qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
- hw/dma/xilinx_axidma.c | 16 ++++------------
- 1 file changed, 4 insertions(+), 12 deletions(-)
+Am 23.08.2017 um 19:44 hat John Snow geschrieben:
+> On 08/23/2017 01:31 PM, Max Reitz wrote:
+> > On 2017-08-22 21:07, John Snow wrote:
+> > 
+> > [...]
+> > 
+> >> (3) Add either a new flag that turns qcow2's backing file into a full
+> >> R/W backing file, or add a new extension to qcow2 entirely (bypassing
+> >> the traditional backing file mechanism to avoid confusion for older
+> >> tooling) that adds a new read-write backing file field.
+> >>
+> >> This RW backing file field will be used for all reads AND writes; the
+> >> qcow2 in question becomes a metadata container on top of the BDS chain.
+> >> We can re-use Vladimir's bitmap persistence extension to save bitmaps in
+> >> a qcow2 shell.
+> >>
+> >> The qcow2 becomes effectively a metadata cache for a new (essentially)
+> >> filter node that handles features such as bitmaps. This could also be
+> >> used to provide allocation map data for RAW files and other goodies down
+> >> the road.
+> >>
+> >> Hopefully this achieves our desire to not create new formats AND our
+> >> desire to concentrate features (and debugging, testing, etc) into qcow2,
+> >> while allowing users to "have bitmaps with raw files."
+> >>
+> >> Of course, in this scenario, users now have two files: a qcow2 wrapper
+> >> and the actual raw file in question; but regardless of how we were going
+> >> to solve this, a raw file necessitates an external file of some sort,
+> >> else we give up the idea that it was a raw file.
+> >>
+> >>
+> >> Sound good?
+> > 
+> > While I don't quite like the idea of R/W backing files, I guess "don't
+> > quite like" is still rather good.
+> 
+> Yeah, it's not necessarily my first pick, but it might be the least bad.
 
-diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
-index 3987b5ff96..9b48103574 100644
---- a/hw/dma/xilinx_axidma.c
-+++ b/hw/dma/xilinx_axidma.c
-@@ -562,18 +562,6 @@ static void xilinx_axidma_init(Object *obj)
-     XilinxAXIDMA *s =3D XILINX_AXI_DMA(obj);
-     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
-=20
--    object_property_add_link(obj, "axistream-connected", TYPE_STREAM_SLA=
-VE,
--                             (Object **)&s->tx_data_dev,
--                             qdev_prop_allow_set_link_before_realize,
--                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
--                             &error_abort);
--    object_property_add_link(obj, "axistream-control-connected",
--                             TYPE_STREAM_SLAVE,
--                             (Object **)&s->tx_control_dev,
--                             qdev_prop_allow_set_link_before_realize,
--                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
--                             &error_abort);
--
-     object_initialize(&s->rx_data_dev, sizeof(s->rx_data_dev),
-                       TYPE_XILINX_AXI_DMA_DATA_STREAM);
-     object_initialize(&s->rx_control_dev, sizeof(s->rx_control_dev),
-@@ -593,6 +581,10 @@ static void xilinx_axidma_init(Object *obj)
-=20
- static Property axidma_properties[] =3D {
-     DEFINE_PROP_UINT32("freqhz", XilinxAXIDMA, freqhz, 50000000),
-+    DEFINE_PROP_LINK("axistream-connected", XilinxAXIDMA,
-+                     tx_data_dev, TYPE_STREAM_SLAVE, StreamSlave *),
-+    DEFINE_PROP_LINK("axistream-control-connected", XilinxAXIDMA,
-+                     tx_control_dev, TYPE_STREAM_SLAVE, StreamSlave *),
-     DEFINE_PROP_END_OF_LIST(),
- };
-=20
---=20
-2.13.5
+As for backing files always being read-only, that ship has sailed long
+ago. We really never had it because I think HMP 'commit' was introduced
+at the same time as backing files, but at least it was still contained
+in synchronous function protected by the BQL. But at latest since we
+introduced live block jobs, it's not a reasonable assumption to make any
+more.
+
+At this point, I have no problems with adding more users of writable
+backing files any more. We'll have to use op blockers to make it safe.
+
+> If you have any suggestions or alternatives for a way to accomplish the
+> same in a way that does not leave any, even faint, bad taste in your
+> mouth you are more than welcome to suggest it.
+
+Maybe one thing that I don't want to dismiss right away would be a
+separate BlockDriver for passthrough qcow2 images so that we don't
+clutter all functions with special cases. But I'm not compeltely
+convinced of it either.
+
+I think I once had a use case for clusters that are marked as
+"read/write to backing file", but I can't seem to remember it now. If we
+had such a per-cluster setting, then a separate BlockDriver wouldn't be
+an option, obviously.
+
+Kevin
