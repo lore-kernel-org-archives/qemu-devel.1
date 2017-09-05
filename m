@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51454)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpB6C-0004aK-5z
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:28:56 -0400
+	(envelope-from <thuth@redhat.com>) id 1dpBAW-0005p5-9v
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:33:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpB67-0007gL-I7
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:28:52 -0400
-Date: Tue, 5 Sep 2017 11:28:44 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170905102844.GJ17449@stefanha-x1.localdomain>
-References: <20170830100605.22694-1-famz@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1dpBAR-0001Pi-MM
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:33:20 -0400
+References: <20170901180340.30009-1-eblake@redhat.com>
+	<20170901180340.30009-18-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <96c07533-e245-ccee-9632-b80821fad9be@redhat.com>
+Date: Tue, 5 Sep 2017 12:32:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170830100605.22694-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Cleanup BMDS in
- bdrv_close_all
+In-Reply-To: <20170901180340.30009-18-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 17/29] ahci-test: Drop dependence on
+ global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,28 +25,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org, peterx@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, John Snow <jsnow@redhat.com>, armbru@redhat.com, "open list:IDE" <qemu-block@nongnu.org>
 
-On Wed, Aug 30, 2017 at 06:06:05PM +0800, Fam Zheng wrote:
-> This fixes the assertion due to op blockers added by BMDS:
+On 01.09.2017 20:03, Eric Blake wrote:
+> Managing parallel connections to two different monitors via
+> the implicit global_qtest makes it hard to copy-and-paste code
+> to tests that are not aware of the implicit state; the
+> management of global_qtest is even harder to follow because
+> it was masked behind set_context().
 > 
-> block.c:3248: bdrv_delete: Assertion `bdrv_op_blocker_is_empty(bs)' failed.
+> Instead, explicitly pass QTestState* around (generally, by
+> reusing the member already present in ahci->parent QOSState),
+> and call explicit qtest_* functions on all places that
+> interact with a monitor.
 > 
-> Reproducer: simply start block migration and quit QEMU before it ends.
+> We can assert that the conversion is correct by checking that
+> global_qtest remains NULL throughout the test (a later patch
+> that changes global_qtest to not be a public global variable
+> will drop the assertions).
 > 
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Bonus: there were several spots that were constructing a JSON
+> string, then passing that through qmp() as the format, rather
+> than directly using qmp() to construct the JSON.  Fixing that
+> gets us one step closer to enabling -Wformat checking on
+> constructed JSON.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
->  block.c                 | 2 ++
->  migration/block.c       | 2 +-
->  migration/block.h       | 1 +
->  stubs/Makefile.objs     | 1 +
->  stubs/block-migration.c | 6 ++++++
->  5 files changed, 11 insertions(+), 1 deletion(-)
->  create mode 100644 stubs/block-migration.c
+>  tests/libqos/libqos.h    |  1 -
+>  tests/ahci-test.c        | 83 +++++++++++++++++++++++-------------------------
+>  tests/libqos/ahci.c      | 45 +++++++++++++-------------
+>  tests/libqos/libqos-pc.c |  2 +-
+>  tests/libqos/libqos.c    | 37 ++++++---------------
+>  5 files changed, 73 insertions(+), 95 deletions(-)
 
-Thanks, applied to my block tree:
-https://github.com/stefanha/qemu/commits/block
+Might be easier to review if you'd split the changes to libqos.c into a
+separate patch. But anyway:
 
-Stefan
+Reviewed-by: Thomas Huth <thuth@redhat.com>
