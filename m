@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dpE5G-00084i-BD
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:40:15 -0400
+	(envelope-from <famz@redhat.com>) id 1dpE5d-0008Ky-Ls
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:40:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dpE56-0004q1-QI
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:40:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51406)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dpE56-0004oV-EI
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:39:56 -0400
-Date: Tue, 5 Sep 2017 10:16:48 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170905131648.GW7570@localhost.localdomain>
-References: <1504603805-180240-1-git-send-email-arei.gonglei@huawei.com>
-	<1504603805-180240-3-git-send-email-arei.gonglei@huawei.com>
+	(envelope-from <famz@redhat.com>) id 1dpE5Y-0005NG-RQ
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:40:29 -0400
+Date: Tue, 5 Sep 2017 21:39:57 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170905133957.GX22515@lemon.lan>
+References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
+	<a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
+	<cb783ebb-198e-1814-2f9c-aec93c83b17a@virtuozzo.com>
+	<0988b4ef-56e2-5ce9-ed25-40a742eadbd4@redhat.com>
+	<b0d72a26-2052-ecc6-67f5-d32572804ebf@redhat.com>
+	<20170828025706.GA18194@lemon.lan>
+	<20170905130107.GJ4633@localhost.localdomain>
+	<20170905131858.GW22515@lemon.lan>
+	<20170905132756.GL4633@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1504603805-180240-3-git-send-email-arei.gonglei@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH 2/2] i386/cpu/hyperv: support over 64 vcpus
- for windows guests
+In-Reply-To: <20170905132756.GL4633@localhost.localdomain>
+Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,151 +30,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gonglei <arei.gonglei@huawei.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, vrozenfe@redhat.com, weidong.huang@huawei.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Qemu-block <qemu-block@nongnu.org>, Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-On Tue, Sep 05, 2017 at 05:30:05PM +0800, Gonglei wrote:
-> Starting with Windows Server 2012 and Windows 8, if
-> CPUID.40000005.EAX contains a value of -1, Windows assumes specific
-> limit to the number of VPs. In this case, Windows Server 2012
-> guest VMs may use more than 64 VPs, up to the maximum supported
-> number of processors applicable to the specific Windows
-> version being used.
+On Tue, 09/05 15:27, Kevin Wolf wrote:
+> Am 05.09.2017 um 15:18 hat Fam Zheng geschrieben:
+> > On Tue, 09/05 15:01, Kevin Wolf wrote:
+> > > Am 28.08.2017 um 04:57 hat Fam Zheng geschrieben:
+> > > > On Fri, 08/25 15:44, Max Reitz wrote:
+> > > > > Well, OK.  The main argument against supporting anything but qcow2 is
+> > > > > "if you want features, use qcow2; and we are working on making qcow2 as
+> > > > > fast as possible."  I think that's a very good argument still.  At some
+> > > > > point I (and probably others, too) had the idea of making qcow2 files in
+> > > > > raw layout: 
+> > > > 
+> > > > Yes! I think this idea makes a whole lot of sense, too. Metadata tables can be
+> > > > generated so old implementation can still use it.
+> > > 
+> > > Maybe a nice way to attack this would be "huge pages", i.e. have a L1
+> > > entry flag that tells "this points directly to a huge cluster instead of
+> > > an L2 table". Gives us 512 MB clusters with a 64k cluster size, or a
+> > > maximum of 512 GB clusters with a 2 MB cluster size.
+> > > 
+> > > Huge clusters would only be used by qemu-img create if the respective
+> > > option is given, and only with preallocation.
+> > 
+> > Then this image is not usable on old QEMUs, right? So this is going to be an
+> > incompatible_feature, whereas with the linear mapping L1/L2 tables approach, it
+> > can be an autoclear_feature.
 > 
-> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
+> Ah yes, that's true. Maybe that's important enough that just a single
+> global flag is better, even if it's less flexible.
 > 
-> For compatibility, Let's introduce a new property for X86CPU,
-> named "hv-cpuid-limits-eax" as Paolo's suggestion, and set it
-> to "on" before machine 2.10.
-> 
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> ---
->  include/hw/i386/pc.h |  5 +++++
->  target/i386/cpu.c    |  1 +
->  target/i386/cpu.h    |  2 ++
->  target/i386/kvm.c    | 18 +++++++++++++++++-
->  4 files changed, 25 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 8226904..db32e58 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -371,6 +371,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->  
->  #define PC_COMPAT_2_10 \
->      HW_COMPAT_2_10 \
-> +    {\
-> +        .driver   = TYPE_X86_CPU,\
-> +        .property = "hv_cpuid_limits_eax",\
+> Of course, this approach also means that we still need to write all of
+> the L2 tables and use disk space for them, even though newer versions
+> will never look at them.
 
-The property name is hv-cpuid-limits-eax.
+To speculate^Wmitigate, "qemu-img create" is free to pick a larger cluster size
+when this feature is used?
 
-> +        .value    = "on",\
-> +    },\
->  
->  #define PC_COMPAT_2_9 \
->      HW_COMPAT_2_9 \
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 69676e1..0d47bdd 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -4145,6 +4145,7 @@ static Property x86_cpu_properties[] = {
->                       false),
->      DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
->      DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
-> +    DEFINE_PROP_BOOL("hv-cpuid-limits-eax", X86CPU, hv_cpuid_limits_eax, false),
-
-The property name "hv-cpuid-limits-eax" doesn't say anything
-about what it does exactly when set to true.
-
-What about just making it int32?  e.g.:
-
-    DEFINE_PROP_INT32("x-hv-max-vps", X86CPU, hv_max_vps, -1)
-[...]
-    {\
-        .driver   = TYPE_X86_CPU,\
-        .property = "x-hv-max-vps",\
-        .value    = "0x40",\
-    },\
-[...]
-    c->function = HYPERV_CPUID_IMPLEMENT_LIMITS;
-    c->eax = cpu->hv_max_vps;
-
-
-(The "x-" prefix indicates that the property is not supposed to
-be a stable user interface.)
-
-
->      DEFINE_PROP_END_OF_LIST()
->  };
->  
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 525d35d..f8b455a 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1282,6 +1282,8 @@ struct X86CPU {
->      int32_t socket_id;
->      int32_t core_id;
->      int32_t thread_id;
-> +
-> +    bool hv_cpuid_limits_eax;
->  };
->  
->  static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 6db7783..cf6ef96 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -751,7 +751,23 @@ int kvm_arch_init_vcpu(CPUState *cs)
->  
->          c = &cpuid_data.entries[cpuid_i++];
->          c->function = HYPERV_CPUID_IMPLEMENT_LIMITS;
-> -        c->eax = 0x40;
-> +
-> +        if (!cpu->hv_cpuid_limits_eax) {
-> +            /*
-> +             * Starting with Windows Server 2012 and Windows 8, if
-> +             * CPUID.40000005.EAX contains a value of -1, Windows
-> +             * assumes specific limit to the number of VPs. In this case,
-> +             * Windows Server 2012 guest VMs may use more than 64 VPs,
-> +             * up to the maximum supported number of processors
-> +             * applicable to the specific Windows version being used.
-
-That was a direct quote from a document, so I recommend citing
-the specific document you quoted.  e.g.:
-
-    /*
-     * From "Requirements for Implementing the Microsoft
-     * Hypervisor Interface":
-     * https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
-     *
-     * "Starting with Windows Server 2012 and Windows 8, if
-     * CPUID.40000005.EAX contains a value of -1, Windows assumes
-     * specific limit to the number of VPs. In this case, Windows
-     * Server 2012 guest VMs may use more than 64 VPs, up to the
-     * maximum supported number of processors applicable to the
-     * specific Windows version being used."
-     */
-
-
-> +             *
-> +             * https://docs.microsoft.com/en-us/virtualization/
-> +             *    hyper-v-on-windows/reference/tlfs
-
-IMO a long line is preferable to a broken URL.
-
-> +             */
-> +            c->eax = -1;
-> +        } else {
-> +            c->eax = 0x40;
-> +        }
->          c->ebx = 0x40;
->  
->          kvm_base = KVM_CPUID_SIGNATURE_NEXT;
-> -- 
-> 1.8.3.1
-> 
-> 
-
--- 
-Eduardo
+Fam
