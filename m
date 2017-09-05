@@ -1,25 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dp3L1-0002iY-Tg
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:11:44 -0400
+	(envelope-from <famz@redhat.com>) id 1dp3Ld-0002yr-M9
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:12:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dp3Kx-0007aT-0y
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:11:39 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:60105
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dp3Kw-0007VH-Dj
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:11:34 -0400
-References: <1504505688-32455-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-	<1504505688-32455-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <6e950754-7be8-1e9e-1fb8-3fffbdff44e2@cn.fujitsu.com>
-Date: Tue, 5 Sep 2017 10:11:07 +0800
-MIME-Version: 1.0
-In-Reply-To: <1504505688-32455-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH V5 1/3] net/colo-compare.c: Optimize
- unpredictable tcp options comparison
+	(envelope-from <famz@redhat.com>) id 1dp3LY-0007qs-Do
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:12:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55100)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dp3LY-0007qU-5L
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:12:12 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Tue,  5 Sep 2017 10:11:49 +0800
+Message-Id: <20170905021201.25684-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v6 00/12] tests: Add VM based build tests (for
+ non-x86_64 and/or non-Linux)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +22,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-Hi Chen,
+v6: Add license to new file. [Philippe]
+    Change tests/.gitignore. [Philippe]
 
-At 09/04/2017 02:14 PM, Zhang Chen wrote:
-> When network is busy, some tcp options(like sack) will unpredictable
-> occur in primary side or secondary side. it will make packet size
-> not same, but the two packet's payload is identical. colo just
-> care about packet payload, so we skip the option field.
->
-> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
-> ---
->  net/colo-compare.c | 40 ++++++++++++++++++++++++++++------------
->  1 file changed, 28 insertions(+), 12 deletions(-)
->
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index ca67c68..18a9ebf 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -186,7 +186,10 @@ static int packet_enqueue(CompareState *s, int mode)
->   * return:    0  means packet same
->   *            > 0 || < 0 means packet different
->   */
-> -static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
-> +static int colo_packet_compare_common(Packet *ppkt,
-> +                                      Packet *spkt,
-> +                                      int poffset,
-> +                                      int soffset)
->  {
->      if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
->          char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
-> @@ -201,12 +204,14 @@ static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
->                                     sec_ip_src, sec_ip_dst);
->      }
->
-> -    offset = ppkt->vnet_hdr_len + offset;
-> +    poffset = ppkt->vnet_hdr_len + poffset;
-> +    soffset = ppkt->vnet_hdr_len + soffset;
->
-> -    if (ppkt->size == spkt->size) {
-> -        return memcmp(ppkt->data + offset,
-> -                      spkt->data + offset,
-> -                      spkt->size - offset);
-> +    if (ppkt->size == spkt->size ||
-> +        ppkt->size - poffset == spkt->size - soffset) {
+v5: Generate source tar file with a script.
+    Fix tmpdir, use pwd.
+    Reduce default -j to half cores.
 
-This logic has a problem:
+v4: Drop unused imports and parameters. [Cleber]
+    Use --exclude-vcs (still no --exclude-vcs-ignores because it's too new). [Philippe]
+    Use gtar if available. [Philippe, Kamil]
+    /dev/ld1a -> /dev/rld1a for netbsd. [Kamil]
+    Only use '-enable-kvm' if /dev/kvm is there. [Kamil]
+    Grammar fixes of README. [Stefan]
+    Rename image on the server to include version and arch. [Kamil]
+    Just ignore *.tmp. [Philippe]
 
-ppkt->data
-    |-----------|---------rangeP---------|
-                |                    \   |
-            poffset                 ppkt->size
-                  \    equal range     \
-spkt->data        \                    \
-    |---------------|------rangeS--------|
-                    |                    |
-                 soffset            spkt->size
+v3: Drop RFC.
+    Add Stefan's and Kamil's reviewed-bys.
+    Use optparse. [Stefan]
+    Drop the VGA patch. [Paolo, Stefan]
+    Improve exit/exit code/doc. [Stefan]
+    Drop unused line from basevm.py. [Stefan]
+    Drop "--target-list" form Makefile.
+    More intelligent '-j'.
+    Add README. [Stefan]
 
-See the above picture, (ppkt->size == spkt->size) is true,
-if  [soffset, spkt->size] == [poffset, poffset+(spkt->size- soffset) is
-also ture, the code will return 0, but actually, they are not equal.
+v2: - Add docstring. [Stefan]
+    - Call self._load_io_lod. [Stefan]
+    - Use "info usernet" and dynamic ssh_port forwarding. [Stefan]
+    - Add image checksum.
+    - Use os.rename() and os.makedirs(). [Stefan]
+    - Fix NetBSD URL. [Kamil]
 
-Please use following code instead,
+Build tests in one 32 bit Linux guest and three BSD images are defined in this
+series. This is a more managable way than the manually maintained virtual
+machines in patchew. Also, one big advantage of ephemeral VMs over long running
+guests is the reduced RAM usage of host, which makes it possible to have one
+host test all these BSD variants and probably more.
 
-if (ppkt->size - poffset == spkt->size - soffset)
+The BSD guest templates are manually prepared following
 
-I am a new boy in COLO, let's see what we actually want to compare,
-If I am wrong, please correct me. :-)
+https://wiki.qemu.org/Hosts/BSD
 
-ppkt->data
-    |-----------|---------rangeP---------|
-                |                        |
-            poffset                 ppkt->size
+as it is not easy to automate. (The ideal approach is like the ubuntu.i386
+script, which configures the guest on top of an official released image, fully
+automatically.)
 
-spkt->data
-    |----|----------rangeS---------|
-         |                         |
-      soffset                 spkt->size
+Need for help: "gmake check" in the added OpenBSD image fails with -ENOMEM
+errors, even if I change "-m 2G" to "-m 8G" when starting VM. Ideas? And there
+is a warning from ./configure about OpenBSD going to be unsupported in coming
+releases, is it still the case?
 
-The data in rangeP and rangeS is what we want to compare.
-So, we just need care about the rangeX's size and head pointer,
-not the whole size.
+Fam
 
+Fam Zheng (12):
+  gitignore: Ignore vm test images
+  qemu.py: Add "wait()" method
+  scripts: Add archive-source.sh
+  tests: Add vm test lib
+  tests: Add ubuntu.i386 image
+  tests: Add FreeBSD image
+  tests: Add NetBSD image
+  tests: Add OpenBSD image
+  Makefile: Add rules to run vm tests
+  MAINTAINERS: Add tests/vm entry
+  tests: Add README for vm tests
+  docker: Use archive-source.py
 
-Thanks,
-	dou.
+ .gitignore                    |   1 +
+ MAINTAINERS                   |   1 +
+ Makefile                      |   2 +
+ configure                     |   2 +-
+ scripts/archive-source.sh     |  31 +++++
+ scripts/qemu.py               |   7 ++
+ tests/.gitignore              |   1 +
+ tests/docker/Makefile.include |  15 +--
+ tests/docker/run              |   8 +-
+ tests/vm/Makefile.include     |  42 +++++++
+ tests/vm/README               |  63 ++++++++++
+ tests/vm/basevm.py            | 276 ++++++++++++++++++++++++++++++++++++++++++
+ tests/vm/freebsd              |  42 +++++++
+ tests/vm/netbsd               |  42 +++++++
+ tests/vm/openbsd              |  43 +++++++
+ tests/vm/ubuntu.i386          |  88 ++++++++++++++
+ 16 files changed, 643 insertions(+), 21 deletions(-)
+ create mode 100755 scripts/archive-source.sh
+ create mode 100644 tests/vm/Makefile.include
+ create mode 100644 tests/vm/README
+ create mode 100755 tests/vm/basevm.py
+ create mode 100755 tests/vm/freebsd
+ create mode 100755 tests/vm/netbsd
+ create mode 100755 tests/vm/openbsd
+ create mode 100755 tests/vm/ubuntu.i386
+
+-- 
+2.13.5
