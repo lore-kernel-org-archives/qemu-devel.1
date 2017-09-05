@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46397)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpAuE-0000mB-E9
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:16:35 -0400
+	(envelope-from <bounces@canonical.com>) id 1dpAys-00021o-RI
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:21:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpAu9-0005wH-92
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:16:30 -0400
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-16-eblake@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7ba1c642-f17d-8f55-ae14-18b8bd55fa9d@redhat.com>
-Date: Tue, 5 Sep 2017 12:16:20 +0200
+	(envelope-from <bounces@canonical.com>) id 1dpAyn-0000tE-QF
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:21:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54828)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dpAyn-0000sk-KM
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:21:13 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dpAyk-0000I8-SI
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 10:21:11 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D8E012E81AC
+	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 10:21:03 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170901180340.30009-16-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v6 15/29] libqos: Use explicit QTestState
- for rtas operations
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 05 Sep 2017 10:14:16 -0000
+From: Stefan Hajnoczi <1714331@bugs.launchpad.net>
+Reply-To: Bug 1714331 <1714331@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150420685550.8035.5310753798215250364.malonedeb@soybean.canonical.com>
+Message-Id: <150460645678.19543.15448355970175816239.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1714331] Re: Virtual machines not working anymore
+ on 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,195 +37,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Laurent Vivier <lvivier@redhat.com>, qemu-ppc@nongnu.org, armbru@redhat.com, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
 
-On 01.09.2017 20:03, Eric Blake wrote:
-> Drop one more client of global_qtest by teaching all rtas test
-> functionality to pass in an explicit QTestState, adjusting all
-> callers.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/libqos/rtas.h      |  9 ++++++---
->  tests/libqos/pci-spapr.c | 18 ++++++++++++------
->  tests/libqos/rtas.c      | 21 ++++++++++++---------
->  tests/rtas-test.c        |  2 +-
->  4 files changed, 31 insertions(+), 19 deletions(-)
-> 
-> diff --git a/tests/libqos/rtas.h b/tests/libqos/rtas.h
-> index 498eb19230..e3d0f850a7 100644
-> --- a/tests/libqos/rtas.h
-> +++ b/tests/libqos/rtas.h
-> @@ -7,9 +7,12 @@
->  #define LIBQOS_RTAS_H
->  #include "libqos/malloc.h"
-> 
-> -int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns);
-> -uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
-> +int qrtas_get_time_of_day(QTestState *qts, QGuestAllocator *alloc,
-> +                          struct tm *tm, uint32_t *ns);
-> +uint32_t qrtas_ibm_read_pci_config(QTestState *qts, QGuestAllocator *alloc,
-> +                                   uint64_t buid,
->                                     uint32_t addr, uint32_t size);
-> -int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
-> +int qrtas_ibm_write_pci_config(QTestState *qts, QGuestAllocator *alloc,
-> +                               uint64_t buid,
->                                 uint32_t addr, uint32_t size, uint32_t val);
->  #endif /* LIBQOS_RTAS_H */
-> diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
-> index d7b2aa75e6..b7199501b4 100644
-> --- a/tests/libqos/pci-spapr.c
-> +++ b/tests/libqos/pci-spapr.c
-> @@ -108,21 +108,24 @@ static uint8_t qpci_spapr_config_readb(QPCIBus *bus, int devfn, uint8_t offset)
->  {
->      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
->      uint32_t config_addr = (devfn << 8) | offset;
-> -    return qrtas_ibm_read_pci_config(s->alloc, s->buid, config_addr, 1);
-> +    return qrtas_ibm_read_pci_config(bus->qts, s->alloc, s->buid,
-> +                                     config_addr, 1);
->  }
-> 
->  static uint16_t qpci_spapr_config_readw(QPCIBus *bus, int devfn, uint8_t offset)
->  {
->      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
->      uint32_t config_addr = (devfn << 8) | offset;
-> -    return qrtas_ibm_read_pci_config(s->alloc, s->buid, config_addr, 2);
-> +    return qrtas_ibm_read_pci_config(bus->qts, s->alloc, s->buid,
-> +                                     config_addr, 2);
->  }
-> 
->  static uint32_t qpci_spapr_config_readl(QPCIBus *bus, int devfn, uint8_t offset)
->  {
->      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
->      uint32_t config_addr = (devfn << 8) | offset;
-> -    return qrtas_ibm_read_pci_config(s->alloc, s->buid, config_addr, 4);
-> +    return qrtas_ibm_read_pci_config(bus->qts, s->alloc, s->buid,
-> +                                     config_addr, 4);
->  }
-> 
->  static void qpci_spapr_config_writeb(QPCIBus *bus, int devfn, uint8_t offset,
-> @@ -130,7 +133,8 @@ static void qpci_spapr_config_writeb(QPCIBus *bus, int devfn, uint8_t offset,
->  {
->      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
->      uint32_t config_addr = (devfn << 8) | offset;
-> -    qrtas_ibm_write_pci_config(s->alloc, s->buid, config_addr, 1, value);
-> +    qrtas_ibm_write_pci_config(bus->qts, s->alloc, s->buid,
-> +                               config_addr, 1, value);
->  }
-> 
->  static void qpci_spapr_config_writew(QPCIBus *bus, int devfn, uint8_t offset,
-> @@ -138,7 +142,8 @@ static void qpci_spapr_config_writew(QPCIBus *bus, int devfn, uint8_t offset,
->  {
->      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
->      uint32_t config_addr = (devfn << 8) | offset;
-> -    qrtas_ibm_write_pci_config(s->alloc, s->buid, config_addr, 2, value);
-> +    qrtas_ibm_write_pci_config(bus->qts, s->alloc, s->buid,
-> +                               config_addr, 2, value);
->  }
-> 
->  static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
-> @@ -146,7 +151,8 @@ static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
->  {
->      QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
->      uint32_t config_addr = (devfn << 8) | offset;
-> -    qrtas_ibm_write_pci_config(s->alloc, s->buid, config_addr, 4, value);
-> +    qrtas_ibm_write_pci_config(bus->qts, s->alloc, s->buid,
-> +                               config_addr, 4, value);
->  }
-> 
->  #define SPAPR_PCI_BASE               (1ULL << 45)
-> diff --git a/tests/libqos/rtas.c b/tests/libqos/rtas.c
-> index 0269803ce0..fb25f91723 100644
-> --- a/tests/libqos/rtas.c
-> +++ b/tests/libqos/rtas.c
-> @@ -26,7 +26,8 @@ static void qrtas_copy_ret(uint64_t target_ret, uint32_t nret, uint32_t *ret)
->      }
->  }
-> 
-> -static uint64_t qrtas_call(QGuestAllocator *alloc, const char *name,
-> +static uint64_t qrtas_call(QTestState *qts, QGuestAllocator *alloc,
-> +                           const char *name,
->                             uint32_t nargs, uint32_t *args,
->                             uint32_t nret, uint32_t *ret)
->  {
-> @@ -37,8 +38,7 @@ static uint64_t qrtas_call(QGuestAllocator *alloc, const char *name,
->      target_ret = guest_alloc(alloc, nret * sizeof(uint32_t));
-> 
->      qrtas_copy_args(target_args, nargs, args);
-> -    res = qtest_rtas_call(global_qtest, name,
-> -                          nargs, target_args, nret, target_ret);
-> +    res = qtest_rtas_call(qts, name, nargs, target_args, nret, target_ret);
->      qrtas_copy_ret(target_ret, nret, ret);
-> 
->      guest_free(alloc, target_ret);
-> @@ -47,12 +47,13 @@ static uint64_t qrtas_call(QGuestAllocator *alloc, const char *name,
->      return res;
->  }
-> 
-> -int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns)
-> +int qrtas_get_time_of_day(QTestState *qts, QGuestAllocator *alloc,
-> +                          struct tm *tm, uint32_t *ns)
->  {
->      int res;
->      uint32_t ret[8];
-> 
-> -    res = qrtas_call(alloc, "get-time-of-day", 0, NULL, 8, ret);
-> +    res = qrtas_call(qts, alloc, "get-time-of-day", 0, NULL, 8, ret);
->      if (res != 0) {
->          return res;
->      }
-> @@ -70,7 +71,8 @@ int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns)
->      return res;
->  }
-> 
-> -uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
-> +uint32_t qrtas_ibm_read_pci_config(QTestState *qts, QGuestAllocator *alloc,
-> +                                   uint64_t buid,
->                                     uint32_t addr, uint32_t size)
->  {
->      int res;
-> @@ -80,7 +82,7 @@ uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
->      args[1] = buid >> 32;
->      args[2] = buid & 0xffffffff;
->      args[3] = size;
-> -    res = qrtas_call(alloc, "ibm,read-pci-config", 4, args, 2, ret);
-> +    res = qrtas_call(qts, alloc, "ibm,read-pci-config", 4, args, 2, ret);
->      if (res != 0) {
->          return -1;
->      }
-> @@ -92,7 +94,8 @@ uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
->      return ret[1];
->  }
-> 
-> -int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
-> +int qrtas_ibm_write_pci_config(QTestState *qts, QGuestAllocator *alloc,
-> +                               uint64_t buid,
->                                 uint32_t addr, uint32_t size, uint32_t val)
->  {
->      int res;
-> @@ -103,7 +106,7 @@ int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
->      args[2] = buid & 0xffffffff;
->      args[3] = size;
->      args[4] = val;
-> -    res = qrtas_call(alloc, "ibm,write-pci-config", 5, args, 1, ret);
-> +    res = qrtas_call(qts, alloc, "ibm,write-pci-config", 5, args, 1, ret);
->      if (res != 0) {
->          return -1;
->      }
-> diff --git a/tests/rtas-test.c b/tests/rtas-test.c
-> index 276c87ef84..34a692163f 100644
-> --- a/tests/rtas-test.c
-> +++ b/tests/rtas-test.c
-> @@ -16,7 +16,7 @@ static void test_rtas_get_time_of_day(void)
->      qs = qtest_spapr_boot("-machine pseries");
-> 
->      t1 = time(NULL);
-> -    ret = qrtas_get_time_of_day(qs->alloc, &tm, &ns);
-> +    ret = qrtas_get_time_of_day(qs->qts, qs->alloc, &tm, &ns);
->      g_assert_cmpint(ret, ==, 0);
->      t2 = mktimegm(&tm);
->      g_assert(t2 - t1 < 5); /* 5 sec max to run the test */
-> 
+Mary: If you have time to run a git bisect that would be very helpful,
+thanks!
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+  $ git bisect v2.10.0 v2.9.0
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1714331
+
+Title:
+  Virtual machines not working anymore on 2.10
+
+Status in QEMU:
+  New
+
+Bug description:
+  Using 2.10, my virtual machine(s) don't work anymore. This happens
+  100% of the times.
+
+  -----
+
+  I use QEMU compiling it from source, on Ubuntu 16.04 amd64. This is
+  the configure command:
+
+      configure --target-list=3Dx86_64-softmmu --enable-debug --enable-gtk
+  --enable-spice --audio-drv-list=3Dpa
+
+  I have one virtual disk, with a Windows 10 64-bit, which I launch in
+  two different ways; both work perfectly on 2.9 (and used to do on 2.8,
+  but I haven't used it for a long time).
+
+  This is the first way:
+
+      qemu-system-x86_64
+        -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.=
+fd
+        -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
+        -enable-kvm
+        -machine q35,accel=3Dkvm,mem-merge=3Doff
+        -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinloc=
+ks=3D0x1fff,hv_vapic,hv_time
+        -smp 4,cores=3D4,sockets=3D1,threads=3D1
+        -m 4096
+        -display gtk
+        -vga qxl
+        -rtc base=3Dlocaltime
+        -serial none
+        -parallel none
+        -usb
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device virtio-scsi-pci,id=3Dscsi
+        -drive file=3D/path/to/image-diff.img,id=3Dhdd1,format=3Dqcow2,if=
+=3Dnone,cache=3Dwriteback
+        -device scsi-hd,drive=3Dhdd1
+        -net nic,model=3Dvirtio
+        -net user
+
+  On QEMU 2.10, I get the `Recovery - Your PC/Device needs to be
+  repaired` windows screen; on 2.9, it boots regularly.
+
+  This is the second way:
+
+      qemu-system-x86_64
+        -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.=
+fd
+        -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
+        -enable-kvm
+        -machine q35,accel=3Dkvm,mem-merge=3Doff
+        -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinloc=
+ks=3D0x1fff,hv_vapic,hv_time
+        -smp 4,cores=3D4,sockets=3D1,threads=3D1
+        -m 10240
+        -vga none
+        -rtc base=3Dlocaltime
+        -serial none
+        -parallel none
+        -usb
+        -device vfio-pci,host=3D01:00.0,multifunction=3Don
+        -device vfio-pci,host=3D01:00.1
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
+        -device virtio-scsi-pci,id=3Dscsi
+        -drive file=3D/path/to/image-diff.img,id=3Dhdd1,format=3Dqcow2,if=
+=3Dnone,cache=3Dwriteback
+        -device scsi-hd,drive=3Dhdd1
+        -net nic,model=3Dvirtio
+        -net user
+
+  On QEMU 2.10, I get the debug window on the linux monitor, and blank scre=
+en on VFIO one (no BIOS screen at all); after 10/20 seconds, QEMU crashes w=
+ithout any message.
+  On 2.9, this works perfectly.
+
+  -----
+
+  I am able to perform a git bisect, if that helps, but if this is the
+  case, I'd need this issue to be reviewed, since bisecting is going to
+  take me a lot of time.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1714331/+subscriptions
