@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpA9n-0006N1-UI
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:28:39 -0400
+	(envelope-from <berrange@redhat.com>) id 1dpAAY-00073d-MN
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:29:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpA9j-0006g3-6b
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:28:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47746)
+	(envelope-from <berrange@redhat.com>) id 1dpAAU-00079e-0x
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:29:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40964)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpA9i-0006fd-VU
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:28:27 -0400
-Date: Tue, 5 Sep 2017 11:28:22 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170905112822.0e9319cd.cohuck@redhat.com>
-In-Reply-To: <1504239778-29893-4-git-send-email-zyimin@linux.vnet.ibm.com>
-References: <1504239778-29893-1-git-send-email-zyimin@linux.vnet.ibm.com>
-	<1504239778-29893-4-git-send-email-zyimin@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpAAT-00079F-Rd
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:29:13 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Tue,  5 Sep 2017 10:29:08 +0100
+Message-Id: <20170905092910.8946-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] s390x/pci: add iommu replay callback
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v1 0/2] Merge QEMU crypto 2017/09/05
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,55 +24,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, richard.henderson@linaro.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Fri,  1 Sep 2017 06:22:58 +0200
-Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+The following changes since commit 32f0f68bb77289b75a82925f712bb52e16eac3=
+ba:
 
-> Let's introduce iommu replay callback for s390 pci iommu memory region.
-> Currently we don't need any dma mapping replay. So let it return
-> directly. This implementation will avoid meaningless loops calling
-> translation callback.
-> 
-> Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-> ---
->  hw/s390x/s390-pci-bus.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-> index bd8a3e1e1c..69f45e3715 100644
-> --- a/hw/s390x/s390-pci-bus.c
-> +++ b/hw/s390x/s390-pci-bus.c
-> @@ -397,6 +397,16 @@ static IOMMUTLBEntry s390_translate_iommu(IOMMUMemoryRegion *mr, hwaddr addr,
->      return ret;
->  }
->  
-> +static void s390_pci_iommu_replay(IOMMUMemoryRegion *iommu,
-> +                                  IOMMUNotifier *notifier)
-> +{
-> +    /* It's impossible to plug a pci device on s390x that already has iommu
-> +     * mappings which need to be replayed, that is due to the "one iommu per
-> +     * zpci device" construct. So we don't need iommu replay currently.
+  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pul=
+l-request' into staging (2017-09-01 17:28:54 +0100)
 
-I must say that 'currently' still throws me off. Does this refer to
-vfio? If yes, reword to something like 'Should we support migration of
-vfio-pci devices in the future, we need to revisit this.'?
+are available in the git repository at:
 
-> +     */
-> +    return;
-> +}
-> +
->  static S390PCIIOMMU *s390_pci_get_iommu(S390pciState *s, PCIBus *bus,
->                                          int devfn)
->  {
-> @@ -1045,6 +1055,7 @@ static void s390_iommu_memory_region_class_init(ObjectClass *klass, void *data)
->      IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
->  
->      imrc->translate = s390_translate_iommu;
-> +    imrc->replay = s390_pci_iommu_replay;
->  }
->  
->  static const TypeInfo s390_iommu_memory_region_info = {
+  git://github.com/berrange/qemu tags/pull-qcrypto-20170905-1
+
+for you to fetch changes up to 23c1595b0297e6ca8f37559af6f0b8533aa1fd99:
+
+  crypto: fix test cert generation to not use SHA1 algorithm (2017-09-04 =
+10:45:19 +0100)
+
+----------------------------------------------------------------
+Merge QEMU crypto 2017/09/05 v1
+
+----------------------------------------------------------------
+
+Daniel P. Berrange (1):
+  crypto: fix test cert generation to not use SHA1 algorithm
+
+Philippe Mathieu-Daud=C3=A9 (1):
+  tests: fix incorrect size_t format in benchmark-crypto
+
+ tests/benchmark-crypto-cipher.c | 4 ++--
+ tests/benchmark-crypto-hash.c   | 4 ++--
+ tests/benchmark-crypto-hmac.c   | 4 ++--
+ tests/crypto-tls-x509-helpers.c | 3 ++-
+ 4 files changed, 8 insertions(+), 7 deletions(-)
+
+--=20
+2.13.5
