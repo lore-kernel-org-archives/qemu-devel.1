@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46689)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpEko-0008C3-8N
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:23:10 -0400
+	(envelope-from <groug@kaod.org>) id 1dpEmO-0000eE-9x
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:24:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpEke-0001WX-Jl
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:23:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:13375)
+	(envelope-from <groug@kaod.org>) id 1dpEmJ-0002Nv-8I
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:24:40 -0400
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:52913)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dpEke-0001Ve-C8
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:22:52 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4B469C014182
-	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 14:22:51 +0000 (UTC)
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-3-eblake@redhat.com>
-	<09983e6e-9506-ca02-a8ce-b1a1773d793c@redhat.com>
-	<874lshzd2l.fsf@dusky.pond.sub.org> <20170905101003.GD311@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <658b73e4-86fd-e272-4032-b999c5f2a859@redhat.com>
-Date: Tue, 5 Sep 2017 09:22:41 -0500
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dpEmJ-0002Lj-1o
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:24:35 -0400
+Received: from player157.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 0A282AAEB2
+	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 16:24:32 +0200 (CEST)
+Date: Tue, 5 Sep 2017 16:24:25 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170905162425.3a202a87@bahia>
+In-Reply-To: <1d5efdef-21b8-9b7b-6939-339b97fd9bce@redhat.com>
+References: <150451194093.7046.18254446012958612468.stgit@bahia>
+	<1d5efdef-21b8-9b7b-6939-339b97fd9bce@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170905101003.GD311@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="ANlpHG4AGr4lOq7MN27JaUSv0HraXwllM"
-Subject: Re: [Qemu-devel] [PATCH v6 02/29] tests: Sort .gitignore
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/9glOxOmFT1hlWQgHCaHOX1G";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] virtfs: error out gracefully when
+ mandatory suboptions are missing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,66 +32,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Cc: pbonzini@redhat.com, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org, mdroth@linux.vnet.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ANlpHG4AGr4lOq7MN27JaUSv0HraXwllM
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
-Cc: pbonzini@redhat.com, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?=
- <marcandre.lureau@redhat.com>
-Message-ID: <658b73e4-86fd-e272-4032-b999c5f2a859@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 02/29] tests: Sort .gitignore
-References: <20170901180340.30009-1-eblake@redhat.com>
- <20170901180340.30009-3-eblake@redhat.com>
- <09983e6e-9506-ca02-a8ce-b1a1773d793c@redhat.com>
- <874lshzd2l.fsf@dusky.pond.sub.org> <20170905101003.GD311@redhat.com>
-In-Reply-To: <20170905101003.GD311@redhat.com>
-Content-Type: text/plain; charset=utf-8
+--Sig_/9glOxOmFT1hlWQgHCaHOX1G
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On 09/05/2017 05:10 AM, Daniel P. Berrange wrote:
+On Tue, 5 Sep 2017 15:35:34 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-> Fairly even split between 'test' as a prefix vs suffix. 'check' as a
-> prefix should clearly be killed as a minority pattern. Any appetite
-> for standardizing naming of everything else ?
+> On 04.09.2017 09:59, Greg Kurz wrote:
+> > We internally convert -virtfs to -fsdev/-device. If the user doesn't
+> > provide the path or security_model suboptions, and the fsdev backend
+> > requires them, we hit an assertion when populating the internal -fsdev
+> > option:
+> >=20
+> > util/qemu-option.c:547: opt_set: Assertion `opt->str' failed.
+> > Aborted (core dumped)
+> >=20
+> > Let's test the suboption presence on the command line before trying
+> > to set it in the internal -fsdev option, and let the backend code
+> > error out gracefully (ie, like it already does when the user passes
+> > -fsdev on the command line).
+> >=20
+> > Reported-by: Thomas Huth <thuth@redhat.com>
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  vl.c |   16 ++++++++++------
+> >  1 file changed, 10 insertions(+), 6 deletions(-)
+> >=20
+> > diff --git a/vl.c b/vl.c
+> > index 8e247cc2a239..d63269332fed 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -3557,7 +3557,7 @@ int main(int argc, char **argv, char **envp)
+> >              case QEMU_OPTION_virtfs: {
+> >                  QemuOpts *fsdev;
+> >                  QemuOpts *device;
+> > -                const char *writeout, *sock_fd, *socket;
+> > +                const char *writeout, *sock_fd, *socket, *path, *secur=
+ity_model;
+> > =20
+> >                  olist =3D qemu_find_opts("virtfs");
+> >                  if (!olist) {
+> > @@ -3596,11 +3596,15 @@ int main(int argc, char **argv, char **envp)
+> >                  }
+> >                  qemu_opt_set(fsdev, "fsdriver",
+> >                               qemu_opt_get(opts, "fsdriver"), &error_ab=
+ort);
+> > -                qemu_opt_set(fsdev, "path", qemu_opt_get(opts, "path"),
+> > -                             &error_abort);
+> > -                qemu_opt_set(fsdev, "security_model",
+> > -                             qemu_opt_get(opts, "security_model"),
+> > -                             &error_abort);
+> > +                path =3D qemu_opt_get(opts, "path");
+> > +                if (path) {
+> > +                    qemu_opt_set(fsdev, "path", path, &error_abort);
+> > +                }
+> > +                security_model =3D qemu_opt_get(opts, "security_model"=
+);
+> > +                if (security_model) {
+> > +                    qemu_opt_set(fsdev, "security_model", security_mod=
+el,
+> > +                                 &error_abort);
+> > +                }
+> >                  socket =3D qemu_opt_get(opts, "socket");
+> >                  if (socket) {
+> >                      qemu_opt_set(fsdev, "socket", socket, &error_abort=
+); =20
 >=20
-> A further idea might be to actually have separate sub-directories for
-> unit tests vs qtests. eg go for
+> By the way, I think this should be CC:-ed to stable, too.
 >=20
->   tests
->     +- unit
->     +- qtest
->     +- iotests
 
-I like the idea, but don't know if I want to be the one tackling it...
+Well, it's been there forever and it isn't a critical fix... but the
+thread on qemu-discuss the other day showed that it was confusing
+people, and the fix is trivial. So I guess it doesn't hurt to have
+this in stable. :)
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Michael,
 
+I'll send a pull req later today. If it's not too late, maybe you can add
+this patch to 2.9.1 when it's merged in master?
 
---ANlpHG4AGr4lOq7MN27JaUSv0HraXwllM
-Content-Type: application/pgp-signature; name="signature.asc"
+Cheers,
+
+--
+Greg
+
+>  Thomas
+
+--Sig_/9glOxOmFT1hlWQgHCaHOX1G
+Content-Type: application/pgp-signature
 Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmuszEACgkQp6FrSiUn
-Q2pvxwgAifOSukUoaKvqC+Fp4ErIaEBD3BZSLiN9+iq51BP3/VqLfBQpfDGIMloW
-E3jJ1erNsTM2u77bKYkIHRcbLSEkfh5Qxos3arsrXOKaJ3j3SdPoejO6BN9lWREq
-6jvkzQ/ppDrNR3VJHrsA8p0WMPqHMGBDAeQhkFXhXe5f3ZJZDRdMHS4ZhOlCp1Ba
-AMMKB8YxyWjsLoZrKQwuC4BIQj+7RZgEH/5jrLPbKbWtrioUsvdFMQrR8WdftQ8p
-WoXxylockk2I5DzsqzDZmg3Jj+BxWtnWWtrxu70oZBh+En1Q+L8EmLi2VZrUL75s
-GCJd6ap6IdRWCpo4O/6PlEykqX31/Q==
-=hsRy
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWa6zmQAKCRAC/DrrAQHb
+wj6IAJ0dn+60IMF0sJixH+rJ1JBJOvef7wCeOSNV7wj9EzEygJ10yQct9gJ/qsA=
+=TnFN
 -----END PGP SIGNATURE-----
 
---ANlpHG4AGr4lOq7MN27JaUSv0HraXwllM--
+--Sig_/9glOxOmFT1hlWQgHCaHOX1G--
