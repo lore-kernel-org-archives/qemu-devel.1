@@ -1,40 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dp9we-0005lE-7W
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:15:00 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dp9xa-0006ej-7J
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:15:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dp9wZ-0004Qu-IX
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:14:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40259)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dp9wZ-0004PP-9d
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:14:51 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v859E2tE025500
-	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 05:14:50 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2csqt5mx8c-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 05:14:49 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 5 Sep 2017 10:14:47 +0100
-References: <20170904154316.4148-1-david@redhat.com>
-	<20170904154316.4148-18-david@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 5 Sep 2017 11:14:43 +0200
+	(envelope-from <cohuck@redhat.com>) id 1dp9xU-0005KE-DI
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:15:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51242)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dp9xT-0005GC-MG
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:15:48 -0400
+Date: Tue, 5 Sep 2017 11:15:40 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170905111540.027058d1.cohuck@redhat.com>
+In-Reply-To: <07ef5826-6b09-5ac8-7d51-d00db7170437@linux.vnet.ibm.com>
+References: <1504239778-29893-1-git-send-email-zyimin@linux.vnet.ibm.com>
+	<1504239778-29893-2-git-send-email-zyimin@linux.vnet.ibm.com>
+	<20170905102928.6b23a28a.cohuck@redhat.com>
+	<0923f97e-4f69-0bf3-b9ab-8e5f69a56bbb@linux.vnet.ibm.com>
+	<20170905105041.3409c8cd.cohuck@redhat.com>
+	<07ef5826-6b09-5ac8-7d51-d00db7170437@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170904154316.4148-18-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <f162eece-8dd0-a8e9-f339-356465ab6587@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 17/19] s390x: CPU hot unplug via
- device_del cannot work
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] s390x/pci: remove idx from msix msg
+ data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,57 +32,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
+To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, richard.henderson@linaro.org
 
-On 09/04/2017 05:43 PM, David Hildenbrand wrote:
-> device_del on a CPU will currently do nothing. Let's emmit an error
-> telling that this is will never work (there is no architecture support
-> on s390x). Error message copied from ppc.
-> 
-> (qemu) device_del cpu1
-> device_del cpu1
-> CPU hot unplug not supported on this machine
+On Tue, 5 Sep 2017 17:08:14 +0800
+Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
 
-Given the fact that I get the question about unplug _every_ time when I give a presentation
-about KVM on z, I will try to get some architecture folks look at this. Maybe we can define
-something very simple like "if the CPU is in the stopped state we can remove this and just
-piggy back on the existing sclp EVENT_QUAL_CPU_CHANGE notification".
+> =E5=9C=A8 2017/9/5 =E4=B8=8B=E5=8D=884:50, Cornelia Huck =E5=86=99=E9=81=
+=93:
+> > On Tue, 5 Sep 2017 16:44:37 +0800
+> > Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+> > =20
+> >> =E5=9C=A8 2017/9/5 =E4=B8=8B=E5=8D=884:29, Cornelia Huck =E5=86=99=E9=
+=81=93: =20
+> >>> On Fri,  1 Sep 2017 06:22:56 +0200
+> >>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+> >>>    =20
+> >>>> PCIDevice pointer has been a parameter of kvm_arch_fixup_msi_route().
+> >>>> So we don't need to store zpci idx in msix message data to find out =
+the
+> >>>> specific zpci device. Instead, we could use pci device id to find its
+> >>>> corresponding zpci device.
+> >>>>
+> >>>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> >>>> ---
+> >>>>    hw/s390x/s390-pci-bus.c  | 16 +++++-----------
+> >>>>    hw/s390x/s390-pci-bus.h  |  2 ++
+> >>>>    hw/s390x/s390-pci-inst.c | 24 ------------------------
+> >>>>    hw/s390x/s390-pci-stub.c |  6 ++++++
+> >>>>    target/s390x/kvm.c       |  7 +++++--
+> >>>>    5 files changed, 18 insertions(+), 37 deletions(-)
+> >>>>
 
-So maybe add  "currently"
+> >>>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> >>>> index 1338c29528..3d490c5e4b 100644
+> >>>> --- a/target/s390x/kvm.c
+> >>>> +++ b/target/s390x/kvm.c
+> >>>> @@ -2533,10 +2533,13 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_=
+routing_entry *route,
+> >>>>                                 uint64_t address, uint32_t data, PCI=
+Device *dev)
+> >>>>    {
+> >>>>        S390PCIBusDevice *pbdev;
+> >>>> -    uint32_t idx =3D data >> ZPCI_MSI_VEC_BITS;
+> >>>>        uint32_t vec =3D data & ZPCI_MSI_VEC_MASK;
+> >>>>   =20
+> >>>> -    pbdev =3D s390_pci_find_dev_by_idx(s390_get_phb(), idx);
+> >>>> +    if (!dev) {
+> >>>> +        return -ENODEV; =20
+> >>> Can this actually happen? =20
+> >> I think this cannot happen. But I'm afraid that I miss something.
+> >> So I added this to avoid NULL pointer. But from the code and
+> >> my test, there has not been NULL pointer happened. =20
+> > I'm wondering if that is in the same category as the instance I
+> > commented on above. Do you want to log something?
+> > =20
+> For the case above, I ensure that zpci device must exist. But here, I'm=20
+> not sure.
+> Because it's called from outside. I'm not sure if the caller might call
+> kvm_irqchip_add_msi_route() with NULL as pci device argument.
+>=20
+> Although msix ctrl mr is accessed from outside. But its initialization
+> is controled by our code and the pointer to zpci device is saved as
+> mr's opaque.
 
+OK. Maybe add a DPRINTF as for the condition below?
 
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/s390x/s390-virtio-ccw.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 22a8a1b45d..dd149567bb 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -338,6 +338,15 @@ static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
->      }
->  }
-> 
-> +static void s390_machine_device_unplug_request(HotplugHandler *hotplug_dev,
-> +                                               DeviceState *dev, Error **errp)
-> +{
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-> +        error_setg(errp, "CPU hot unplug not supported on this machine");
-> +        return;
-> +    }
-> +}
-> +
->  static HotplugHandler *s390_get_hotplug_handler(MachineState *machine,
->                                                  DeviceState *dev)
->  {
-> @@ -387,6 +396,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->      mc->max_cpus = 248;
->      mc->get_hotplug_handler = s390_get_hotplug_handler;
->      hc->plug = s390_machine_device_plug;
-> +    hc->unplug_request = s390_machine_device_unplug_request;
->      nc->nmi_monitor_handler = s390_nmi;
->  }
-> 
+> >>>    =20
+> >>>> +    }
+> >>>> +
+> >>>> +    pbdev =3D s390_pci_find_dev_by_target(s390_get_phb(), DEVICE(de=
+v)->id);
+> >>>>        if (!pbdev) {
+> >>>>            DPRINTF("add_msi_route no dev\n");
+> >>>>            return -ENODEV; =20
+> >>>    =20
+> > =20
+>=20
