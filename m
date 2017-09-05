@@ -1,14 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpGAa-0000O6-NJ
+	(envelope-from <pm215@archaic.org.uk>) id 1dpGAa-0000Nm-A0
 	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 11:53:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpGAW-0004Im-9f
+	(envelope-from <pm215@archaic.org.uk>) id 1dpGAV-0004IW-JZ
 	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 11:53:44 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue,  5 Sep 2017 16:53:31 +0100
-Message-Id: <1504626814-23124-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 0/3] Add do_transaction_failed hook for ARM
+Date: Tue,  5 Sep 2017 16:53:34 +0100
+Message-Id: <1504626814-23124-4-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1504626814-23124-1-git-send-email-peter.maydell@linaro.org>
+References: <1504626814-23124-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH v2 3/3] target/arm: Implement new
+ do_transaction_failed hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,58 +23,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org, Richard Henderson <rth@twiddle.net>
 
-I sent these patches earlier, but only realized when I
-put them in the target-arm pull request that they broke
-the user-mode emulators.
+Implement the new do_transaction_failed hook for ARM, which should
+cause the CPU to take a prefetch abort or data abort.
 
-Only change in these 3 patches from v1 is that patch 1
-now checks that what it gets from qdev_get_machine()
-is really an instance of TYPE_MACHINE before using it
-(which only happens for the user-mode emulators, where
-we don't need to set ignore_memory_transaction_failures).
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ target/arm/internals.h | 10 ++++++++++
+ target/arm/cpu.c       |  1 +
+ target/arm/op_helper.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 54 insertions(+)
 
-thanks
--- PMM
-
-Peter Maydell (3):
-  boards.h: Define new flag ignore_memory_transaction_failures
-  hw/arm: Set ignore_memory_transaction_failures for most ARM boards
-  target/arm: Implement new do_transaction_failed hook
-
- include/hw/boards.h     | 11 +++++++++++
- include/qom/cpu.h       |  7 ++++++-
- target/arm/internals.h  | 10 ++++++++++
- hw/arm/aspeed.c         |  3 +++
- hw/arm/collie.c         |  1 +
- hw/arm/cubieboard.c     |  1 +
- hw/arm/digic_boards.c   |  1 +
- hw/arm/exynos4_boards.c |  2 ++
- hw/arm/gumstix.c        |  2 ++
- hw/arm/highbank.c       |  2 ++
- hw/arm/imx25_pdk.c      |  1 +
- hw/arm/integratorcp.c   |  1 +
- hw/arm/kzm.c            |  1 +
- hw/arm/mainstone.c      |  1 +
- hw/arm/musicpal.c       |  1 +
- hw/arm/netduino2.c      |  1 +
- hw/arm/nseries.c        |  2 ++
- hw/arm/omap_sx1.c       |  2 ++
- hw/arm/palm.c           |  1 +
- hw/arm/raspi.c          |  1 +
- hw/arm/realview.c       |  4 ++++
- hw/arm/sabrelite.c      |  1 +
- hw/arm/spitz.c          |  4 ++++
- hw/arm/stellaris.c      |  2 ++
- hw/arm/tosa.c           |  1 +
- hw/arm/versatilepb.c    |  2 ++
- hw/arm/vexpress.c       |  1 +
- hw/arm/xilinx_zynq.c    |  1 +
- hw/arm/xlnx-ep108.c     |  2 ++
- hw/arm/z2.c             |  1 +
- qom/cpu.c               | 16 ++++++++++++++++
- target/arm/cpu.c        |  1 +
- target/arm/op_helper.c  | 43 +++++++++++++++++++++++++++++++++++++++++++
- 33 files changed, 130 insertions(+), 1 deletion(-)
-
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index 461f558..b100da9 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -472,6 +472,16 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
+                                  MMUAccessType access_type,
+                                  int mmu_idx, uintptr_t retaddr);
+ 
++/* arm_cpu_do_transaction_failed: handle a memory system error response
++ * (eg "no device/memory present at address") by raising an external abort
++ * exception
++ */
++void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
++                                   vaddr addr, unsigned size,
++                                   MMUAccessType access_type,
++                                   int mmu_idx, MemTxAttrs attrs,
++                                   MemTxResult response, uintptr_t retaddr);
++
+ /* Call the EL change hook if one has been registered */
+ static inline void arm_call_el_change_hook(ARMCPU *cpu)
+ {
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 41ae6ba..a323e6b 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1667,6 +1667,7 @@ static void arm_cpu_class_init(ObjectClass *oc, void *data)
+ #else
+     cc->do_interrupt = arm_cpu_do_interrupt;
+     cc->do_unaligned_access = arm_cpu_do_unaligned_access;
++    cc->do_transaction_failed = arm_cpu_do_transaction_failed;
+     cc->get_phys_page_attrs_debug = arm_cpu_get_phys_page_attrs_debug;
+     cc->asidx_from_attrs = arm_asidx_from_attrs;
+     cc->vmsd = &vmstate_arm_cpu;
+diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+index 8f6db80..d1bca46 100644
+--- a/target/arm/op_helper.c
++++ b/target/arm/op_helper.c
+@@ -229,6 +229,49 @@ void arm_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
+     deliver_fault(cpu, vaddr, access_type, fsr, fsc, &fi);
+ }
+ 
++/* arm_cpu_do_transaction_failed: handle a memory system error response
++ * (eg "no device/memory present at address") by raising an external abort
++ * exception
++ */
++void arm_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr,
++                                   vaddr addr, unsigned size,
++                                   MMUAccessType access_type,
++                                   int mmu_idx, MemTxAttrs attrs,
++                                   MemTxResult response, uintptr_t retaddr)
++{
++    ARMCPU *cpu = ARM_CPU(cs);
++    CPUARMState *env = &cpu->env;
++    uint32_t fsr, fsc;
++    ARMMMUFaultInfo fi = {};
++    ARMMMUIdx arm_mmu_idx = core_to_arm_mmu_idx(env, mmu_idx);
++
++    if (retaddr) {
++        /* now we have a real cpu fault */
++        cpu_restore_state(cs, retaddr);
++    }
++
++    /* The EA bit in syndromes and fault status registers is an
++     * IMPDEF classification of external aborts. ARM implementations
++     * usually use this to indicate AXI bus Decode error (0) or
++     * Slave error (1); in QEMU we follow that.
++     */
++    fi.ea = (response != MEMTX_DECODE_ERROR);
++
++    /* The fault status register format depends on whether we're using
++     * the LPAE long descriptor format, or the short descriptor format.
++     */
++    if (arm_s1_regime_using_lpae_format(env, arm_mmu_idx)) {
++        /* long descriptor form, STATUS 0b010000: synchronous ext abort */
++        fsr = (fi.ea << 12) | (1 << 9) | 0x10;
++    } else {
++        /* short descriptor form, FSR 0b01000 : synchronous ext abort */
++        fsr = (fi.ea << 12) | 0x8;
++    }
++    fsc = 0x10;
++
++    deliver_fault(cpu, addr, access_type, fsr, fsc, &fi);
++}
++
+ #endif /* !defined(CONFIG_USER_ONLY) */
+ 
+ uint32_t HELPER(add_setq)(CPUARMState *env, uint32_t a, uint32_t b)
 -- 
 2.7.4
