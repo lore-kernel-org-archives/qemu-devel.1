@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58170)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59907)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dp3DE-00016E-UB
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:03:41 -0400
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dp3L1-0002iY-Tg
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:11:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dp3DA-0003hs-1m
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:03:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42236)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dp3D9-0003hM-Ra
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:03:31 -0400
-Date: Tue, 5 Sep 2017 10:03:25 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170905020325.GC22515@lemon.lan>
-References: <20170831064302.14427-1-famz@redhat.com>
-	<20170831064302.14427-4-famz@redhat.com>
-	<3e83fff4-2a8d-f16b-51cd-9d99441f443d@amsat.org>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dp3Kx-0007aT-0y
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:11:39 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:60105
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dp3Kw-0007VH-Dj
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:11:34 -0400
+References: <1504505688-32455-1-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+	<1504505688-32455-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <6e950754-7be8-1e9e-1fb8-3fffbdff44e2@cn.fujitsu.com>
+Date: Tue, 5 Sep 2017 10:11:07 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <3e83fff4-2a8d-f16b-51cd-9d99441f443d@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 03/12] scripts: Add archive-source.sh
+In-Reply-To: <1504505688-32455-2-git-send-email-zhangchen.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH V5 1/3] net/colo-compare.c: Optimize
+ unpredictable tcp options comparison
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +28,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, qemu devel <qemu-devel@nongnu.org>, Jason Wang <jasowang@redhat.com>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>
 
-On Fri, 09/01 17:31, Philippe Mathieu-Daud=E9 wrote:
-> On 08/31/2017 03:42 AM, Fam Zheng wrote:
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >   scripts/archive-source.sh | 29 +++++++++++++++++++++++++++++
-> >   1 file changed, 29 insertions(+)
-> >   create mode 100755 scripts/archive-source.sh
-> >=20
-> > diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-> > new file mode 100755
-> > index 0000000000..84e84961d4
-> > --- /dev/null
-> > +++ b/scripts/archive-source.sh
-> > @@ -0,0 +1,29 @@
-> > +#!/bin/sh
-> > +#
-> > +# Author: Fam Zheng <famz@redhat.com>
-> > +#
-> > +# Create archive of source tree, including submodules
-> > +#
->=20
-> It seems you missed the license here.
+Hi Chen,
 
-I can add one.
+At 09/04/2017 02:14 PM, Zhang Chen wrote:
+> When network is busy, some tcp options(like sack) will unpredictable
+> occur in primary side or secondary side. it will make packet size
+> not same, but the two packet's payload is identical. colo just
+> care about packet payload, so we skip the option field.
+>
+> Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+> ---
+>  net/colo-compare.c | 40 ++++++++++++++++++++++++++++------------
+>  1 file changed, 28 insertions(+), 12 deletions(-)
+>
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index ca67c68..18a9ebf 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -186,7 +186,10 @@ static int packet_enqueue(CompareState *s, int mode)
+>   * return:    0  means packet same
+>   *            > 0 || < 0 means packet different
+>   */
+> -static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
+> +static int colo_packet_compare_common(Packet *ppkt,
+> +                                      Packet *spkt,
+> +                                      int poffset,
+> +                                      int soffset)
+>  {
+>      if (trace_event_get_state(TRACE_COLO_COMPARE_MISCOMPARE)) {
+>          char pri_ip_src[20], pri_ip_dst[20], sec_ip_src[20], sec_ip_dst[20];
+> @@ -201,12 +204,14 @@ static int colo_packet_compare_common(Packet *ppkt, Packet *spkt, int offset)
+>                                     sec_ip_src, sec_ip_dst);
+>      }
+>
+> -    offset = ppkt->vnet_hdr_len + offset;
+> +    poffset = ppkt->vnet_hdr_len + poffset;
+> +    soffset = ppkt->vnet_hdr_len + soffset;
+>
+> -    if (ppkt->size == spkt->size) {
+> -        return memcmp(ppkt->data + offset,
+> -                      spkt->data + offset,
+> -                      spkt->size - offset);
+> +    if (ppkt->size == spkt->size ||
+> +        ppkt->size - poffset == spkt->size - soffset) {
 
-Fam
+This logic has a problem:
 
->=20
-> > +
-> > +set -e
-> > +
-> > +if test $# -lt 1; then
-> > +    echo "Usage: $0 <output>"
-> > +    exit 1
-> > +fi
-> > +
-> > +submodules=3D$(git submodule foreach --recursive --quiet 'echo $name=
-')
-> > +
-> > +if test -n "$submodules"; then
-> > +    {
-> > +        git ls-files
-> > +        for sm in $submodules; do
-> > +            (cd $sm; git ls-files) | sed "s:^:$sm/:"
-> > +        done
-> > +    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) =
-> $1.list
-> > +else
-> > +    git ls-files > $1.list
-> > +fi
-> > +
-> > +tar -cf $1 -T $1.list
-> > +rm $1.list
-> >=20
+ppkt->data
+    |-----------|---------rangeP---------|
+                |                    \   |
+            poffset                 ppkt->size
+                  \    equal range     \
+spkt->data        \                    \
+    |---------------|------rangeS--------|
+                    |                    |
+                 soffset            spkt->size
+
+See the above picture, (ppkt->size == spkt->size) is true,
+if  [soffset, spkt->size] == [poffset, poffset+(spkt->size- soffset) is
+also ture, the code will return 0, but actually, they are not equal.
+
+Please use following code instead,
+
+if (ppkt->size - poffset == spkt->size - soffset)
+
+I am a new boy in COLO, let's see what we actually want to compare,
+If I am wrong, please correct me. :-)
+
+ppkt->data
+    |-----------|---------rangeP---------|
+                |                        |
+            poffset                 ppkt->size
+
+spkt->data
+    |----|----------rangeS---------|
+         |                         |
+      soffset                 spkt->size
+
+The data in rangeP and rangeS is what we want to compare.
+So, we just need care about the rangeX's size and head pointer,
+not the whole size.
+
+
+Thanks,
+	dou.
