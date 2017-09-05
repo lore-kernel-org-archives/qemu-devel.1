@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dpB1h-0002v4-Ji
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:24:23 -0400
+	(envelope-from <thuth@redhat.com>) id 1dpB3q-0003sx-G2
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:26:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dpB1c-0003LP-Q6
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:24:13 -0400
-Date: Tue, 5 Sep 2017 12:23:48 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170905102348.GG4633@localhost.localdomain>
-References: <20170831110518.10741-1-berrange@redhat.com>
-	<20170831110518.10741-3-berrange@redhat.com>
-	<20170905095215.GF4633@localhost.localdomain>
-	<20170905100538.GC311@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1dpB3l-0005K6-N0
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:26:26 -0400
+References: <20170901180340.30009-1-eblake@redhat.com>
+	<20170901180340.30009-17-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <2ad3ad60-1f03-4585-45e1-d12ab593008f@redhat.com>
+Date: Tue, 5 Sep 2017 12:26:05 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170905100538.GC311@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 2/4] block: use BDRV_SECTOR_SIZE in
- crypto driver
+In-Reply-To: <20170901180340.30009-17-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 16/29] libqos: Use explicit QTestState
+ for virtio operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, "open list:virtio-blk" <qemu-block@nongnu.org>, armbru@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
 
-Am 05.09.2017 um 12:05 hat Daniel P. Berrange geschrieben:
-> On Tue, Sep 05, 2017 at 11:52:15AM +0200, Kevin Wolf wrote:
-> > Am 31.08.2017 um 13:05 hat Daniel P. Berrange geschrieben:
-> > > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> > > ---
-> > >  block/crypto.c | 32 ++++++++++++++++----------------
-> > >  1 file changed, 16 insertions(+), 16 deletions(-)
-> > 
-> > I'm actually not sure about this one. Anything that is left after
-> > patch 3 is probably not the arbitrary unit that qemu uses internally
-> > for some interfaces, but the unit in which data is encrypted.
-> > 
-> > Basically, if just for fun we ever changed the unit of things like
-> > bdrv_write() from 512 to 4096, then everything that needs to or at least
-> > can be changed to use 4096 is BDRV_SECTOR_SIZE. But everything that
-> > needs to stay on 512 (like I suspect most of the occurrences in the
-> > crypto driver) is a different constant really (QCRYPTO_SECTOR_SIZE?).
-> 
-> Yeah for sure LUKSv1 & legacy qcow2 encryption need to stay 512
-> forever, so if BDRV_SECTOR_SIZE were to change that would be a
-> problem.
-> 
-> I wrote this on the assumption that we would never change BDRV_SECTOR_SIZE
-> though. If we did need different sector sizes in the block layer I figured
-> it would surely end up being a dynamic property per disk, rather than just
-> changing the compile time constant. So from that POV I thought it ok to
-> use BDRV_SECTOR_SIZE.
+On 01.09.2017 20:03, Eric Blake wrote:
+> Drop one more client of global_qtest by teaching all virtio test
+> functionality to pass in an explicit QTestState in constructors,
+> where it is then reused for later access.  Adjust all callers.
+> This gets us one step closer to eliminating implicit use of
+> global_qtest.
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/libqos/virtio-mmio.h |  3 +-
+>  tests/libqos/virtio.h      |  5 ++-
+>  tests/libqos/virtio-mmio.c | 54 +++++++++++++++++---------------
+>  tests/libqos/virtio-pci.c  |  3 ++
+>  tests/libqos/virtio.c      | 77 ++++++++++++++++++++++++++------------=
+--------
+>  tests/virtio-blk-test.c    |  3 +-
+>  6 files changed, 84 insertions(+), 61 deletions(-)
+>=20
+> diff --git a/tests/libqos/virtio-mmio.h b/tests/libqos/virtio-mmio.h
+> index e3e52b9ce1..bd01386054 100644
+> --- a/tests/libqos/virtio-mmio.h
+> +++ b/tests/libqos/virtio-mmio.h
+> @@ -41,6 +41,7 @@ typedef struct QVirtioMMIODevice {
+>=20
+>  extern const QVirtioBus qvirtio_mmio;
+>=20
+> -QVirtioMMIODevice *qvirtio_mmio_init_device(uint64_t addr, uint32_t pa=
+ge_size);
+> +QVirtioMMIODevice *qvirtio_mmio_init_device(QTestState *qts, uint64_t =
+addr,
+> +                                            uint32_t page_size);
+>=20
+>  #endif
+> diff --git a/tests/libqos/virtio.h b/tests/libqos/virtio.h
+> index 8fbcd1869c..d180d54fc4 100644
+> --- a/tests/libqos/virtio.h
+> +++ b/tests/libqos/virtio.h
+> @@ -19,6 +19,7 @@ typedef struct QVirtioBus QVirtioBus;
+>=20
+>  typedef struct QVirtioDevice {
+>      const QVirtioBus *bus;
+> +    QTestState *qts;
+>      /* Device type */
+>      uint16_t device_type;
+>  } QVirtioDevice;
+> @@ -35,12 +36,14 @@ typedef struct QVirtQueue {
+>      uint16_t last_used_idx;
+>      bool indirect;
+>      bool event;
+> +    QTestState *qts;
+>  } QVirtQueue;
+>=20
+>  typedef struct QVRingIndirectDesc {
+>      uint64_t desc; /* This points to an array fo struct vring_desc */
+>      uint16_t index;
+>      uint16_t elem;
+> +    QTestState *qts;
+>  } QVRingIndirectDesc;
 
-Yes, I agree that we'll never BDRV_SECTOR_SIZE in practice. I just use
-this as a way to check whether this is really BDRV_SECTOR_SIZE, or
-whether we have two different quantities that just happen to be both
-512.
+Adding QTestState to QVRingIndirectDesc and QVirtQueue sounds somewhat
+ugly to me. I think they should either rather have a pointer to the
+associated QVirtioDevice, or the functions where this is needed
+(qvring_init() for example) should get a "QTestState *" parameter instead=
+.
 
-For example, QDICT_BUCKET_MAX is also 512, but that doesn't make it
-right to use here, even though it works and is unlikely to change.
+Just my 0.02 =E2=82=AC.
 
-What we may actually want to do at some point (won't be in the near
-future, though) is removing BDRV_SECTOR_SIZE because it refers to an
-arbitrary unit in APIs and we're in the process of making everything
-byte-based instead. This is another way to check whether some value is
-BDRV_SECTOR_SIZE: If it will remain even after removing APIs with
-sector-based parameters, it's probably something different.
-
-> Perhaps I should instead add a qcrypto_block_get_sector_size() API though
-> and use that, so we can fetch the sector size per encryption scheme in
-> case we ever get a scheme using a non-512 sector size for encryption.
-
-If you have a use for it, sure. Otherwise, I'd just suggest introducing
-another constant for now.
-
-Kevin
+ Thomas
