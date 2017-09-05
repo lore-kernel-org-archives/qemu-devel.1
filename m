@@ -1,33 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49660)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50459)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpAGI-0003tY-0S
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:35:18 -0400
+	(envelope-from <thuth@redhat.com>) id 1dpAHX-00050Q-OQ
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:36:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpAGD-00034k-9b
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:35:14 -0400
-Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:32779)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpAGD-00031o-4w
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:35:09 -0400
-Received: by mail-qk0-x243.google.com with SMTP id p12so1773256qkl.0
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 02:35:07 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170508233918.9043-1-f4bug@amsat.org>
-	<20170508233918.9043-4-f4bug@amsat.org>
-	<2ad7eaf6-3691-f9f1-4d09-204444adbd19@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4aa4042a-1fa5-958e-6bc9-5666c5e56d3a@amsat.org>
-Date: Tue, 5 Sep 2017 06:35:04 -0300
+	(envelope-from <thuth@redhat.com>) id 1dpAHT-0004Qu-17
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:36:31 -0400
+References: <20170901180340.30009-1-eblake@redhat.com>
+	<20170901180340.30009-13-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <28a1f49b-ed07-8c46-eb0c-be9b92d106fe@redhat.com>
+Date: Tue, 5 Sep 2017 11:36:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <2ad7eaf6-3691-f9f1-4d09-204444adbd19@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170901180340.30009-13-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 03/11] hw/misc: add missing includes
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 12/29] libqos: Track QTestState with
+ QPCIBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,27 +26,96 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>
+Cc: "open list:IDE" <qemu-block@nongnu.org>, Alexander Graf <agraf@suse.de>, armbru@redhat.com, "open list:sPAPR" <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On 05/08/2017 08:56 PM, Eric Blake wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   include/hw/misc/unimp.h | 3 +++
->>   1 file changed, 3 insertions(+)
->>
->> diff --git a/include/hw/misc/unimp.h b/include/hw/misc/unimp.h
->> index 3462d85836..353ee19abf 100644
->> --- a/include/hw/misc/unimp.h
->> +++ b/include/hw/misc/unimp.h
->> @@ -8,6 +8,9 @@
->>   #ifndef HW_MISC_UNIMP_H
->>   #define HW_MISC_UNIMP_H
->>   
->> +#include "qemu/osdep.h"
-> 
-> NACK. .h files should not include osdep.h, because the .c file that is
-> using the .h file should have already done so.  This is mentioned in
-> HACKING.
+On 01.09.2017 20:03, Eric Blake wrote:
+> When initializing a QPCIBus, track which QTestState the bus is
+> associated with (so that a later patch can then explicitly use
+> that test state for all communication on the bus, rather than
+> blindly relying on global_qtest).  Update the initialization
+> functions to take another parameter, and update all callers to
+> pass in state (for now, most callers get away with passing the
+> current global_qtest as the current state, although this required
+> fixing the order of initialization to ensure qtest_start() is
+> called before qpci_init*() in rtl8139-test, and provided an
+> opportunity to pass in the allocator in e1000e-test).
+>=20
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+[...]
+> diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
+> index 6226546c28..c95428e1cb 100644
+> --- a/tests/libqos/libqos.c
+> +++ b/tests/libqos/libqos.c
+> @@ -26,8 +26,8 @@ QOSState *qtest_vboot(QOSOps *ops, const char *cmdlin=
+e_fmt, va_list ap)
+>          if (ops->init_allocator) {
+>              qs->alloc =3D ops->init_allocator(ALLOC_NO_FLAGS);
+>          }
+> -        if (ops->qpci_init && qs->alloc) {
+> -            qs->pcibus =3D ops->qpci_init(qs->alloc);
+> +        if (ops->qpci_init) {
 
-I'm not sure this kind of mistake happens often enough, but it might 
-worth add a such test in checkpatch.pl (easier to say than to implement :p)
+Why did you remove the check for qs->alloc?
+
+> +            qs->pcibus =3D ops->qpci_init(qs->qts, qs->alloc);
+>          }
+>      }
+>=20
+> diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+> index 02ce49927a..85b34c6d13 100644
+> --- a/tests/libqos/pci-pc.c
+> +++ b/tests/libqos/pci-pc.c
+> @@ -115,11 +115,14 @@ static void qpci_pc_config_writel(QPCIBus *bus, i=
+nt devfn, uint8_t offset, uint3
+>      outl(0xcfc, value);
+>  }
+>=20
+> -QPCIBus *qpci_init_pc(QGuestAllocator *alloc)
+> +QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
+>  {
+>      QPCIBusPC *ret;
+>=20
+> +    assert(qts);
+> +
+>      ret =3D g_malloc(sizeof(*ret));
+> +    ret->bus.qts =3D qts;
+>=20
+>      ret->bus.pio_readb =3D qpci_pc_pio_readb;
+>      ret->bus.pio_readw =3D qpci_pc_pio_readw;
+> diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
+> index 2043f1e123..cd9b8f52d2 100644
+> --- a/tests/libqos/pci-spapr.c
+> +++ b/tests/libqos/pci-spapr.c
+> @@ -154,11 +154,14 @@ static void qpci_spapr_config_writel(QPCIBus *bus=
+, int devfn, uint8_t offset,
+>  #define SPAPR_PCI_MMIO32_WIN_SIZE    0x80000000 /* 2 GiB */
+>  #define SPAPR_PCI_IO_WIN_SIZE        0x10000
+>=20
+> -QPCIBus *qpci_init_spapr(QGuestAllocator *alloc)
+> +QPCIBus *qpci_init_spapr(QTestState *qts, QGuestAllocator *alloc)
+>  {
+>      QPCIBusSPAPR *ret;
+>=20
+> +    assert(qts);
+> +
+>      ret =3D g_malloc(sizeof(*ret));
+
++1 for using g_malloc0 here instead.
+
+> +    ret->bus.qts =3D qts;
+>=20
+>      ret->alloc =3D alloc;
+>=20
+> @@ -201,6 +204,7 @@ QPCIBus *qpci_init_spapr(QGuestAllocator *alloc)
+>      ret->bus.mmio_alloc_ptr =3D ret->mmio32.pci_base;
+>      ret->bus.mmio_limit =3D ret->mmio32.pci_base + ret->mmio32.size;
+>=20
+> +
+
+Superfluous white space change.
+
+>      return &ret->bus;
+>  }
+
+ Thomas
