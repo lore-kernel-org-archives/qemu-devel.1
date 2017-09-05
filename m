@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dpEQG-0000Gj-Nb
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:01:58 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dpEQP-0000N0-5e
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:02:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dpEQ7-0003G9-BY
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:01:48 -0400
-Date: Tue, 5 Sep 2017 15:01:21 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170905140121.GR17449@stefanha-x1.localdomain>
-References: <20170825132028.6184-1-el13635@mail.ntua.gr>
+	(envelope-from <dgilbert@redhat.com>) id 1dpEQF-0003No-9X
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:01:57 -0400
+Date: Tue, 5 Sep 2017 15:01:24 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170905140124.GE2112@work-vm>
+References: <cover.1504112256.git.jcody@redhat.com>
+	<8a9d17a953caedcb66655d945181457eccde9acd.1504112256.git.jcody@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170825132028.6184-1-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [PATCH v9 0/6] add throttle block driver filter
+In-Reply-To: <8a9d17a953caedcb66655d945181457eccde9acd.1504112256.git.jcody@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] hmp: Optionally disable live block
+ operations in HMP monitor
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,87 +24,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
+To: Jeff Cody <jcody@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mrezanin@redhat.com, ehabkost@redhat.com, peterx@redhat.com, jsnow@redhat.com
 
-On Fri, Aug 25, 2017 at 04:20:22PM +0300, Manos Pitsidianakis wrote:
-> This series adds a throttle block driver filter. Currently throttling is done
-> at the BlockBackend level. Using block driver interfaces we can move the
-> throttling to any point in the BDS graph using a throttle node which uses the
-> existing throttling code. This allows for potentially more complex
-> configurations (throttling at any point in the graph, chained filters)
+* Jeff Cody (jcody@redhat.com) wrote:
+> From: Jeffrey Cody <jcody@redhat.com>
 > 
-> v9:
->   fix suggestions by stefanha in patch 4
->   add 'throttle_group_can_be_deleted' function in patch 4
+> If live block operations are disabled, disable the corresponding
+> HMP commands.
 > 
-> v8:
->   fix suggestions by berto
+> Signed-off-by: Jeff Cody <jcody@redhat.com>
+
+OK from HMP side, although perhaps it's worth squashing
+some of the commands so they're adjacent in the files.
+
+Dave
+
+> ---
+>  hmp-commands-info.hx |  4 ++++
+>  hmp-commands.hx      | 12 ++++++++++++
+>  hmp.c                | 12 ++++++++++++
+>  3 files changed, 28 insertions(+)
 > 
-> v7:
->   remove anonymous groups
->   error on missing throttle-group option on block/throttle.c
->   change switch case format in block/throttle-groups.c (berto)
-> 
-> v6:
->   don't allow named group limit configuration in block/throttle.c; allow either
->         -drive driver=throttle,file.filename=foo.qcow2, \
->             limits.iops-total=...
->       or
->         -drive driver=throttle,file.filename=foo.qcow2,throttle-group=bar
->   fixes suggested by berto
-> 
-> v5:
->   fix crash in 'add aio_context field in ThrottleGroupMember'
->   fix suggestions in block/throttle.c
-> 
-> v4:
->   fix suggestions in block/throttle.c
->   fix suggestions in block/throttle_groups.c
->   add doc note in BlockDevOptionsThrottle
-> 
-> v3:
->   fix style error in 'add aio_context field in ThrottleGroupMember'
-> 
-> v2:
->   change QOM throttle group object name
->   print valid ranges for uint on error
->   move frees in throttle_group_obj_finalize()
->   split throttle_group_{set,get}()
->   add throttle_recurse_is_first_non_filter()
-> 
-> 
-> Manos Pitsidianakis (6):
->   block: move ThrottleGroup membership to ThrottleGroupMember
->   block: add aio_context field in ThrottleGroupMember
->   block: tidy ThrottleGroupMember initializations
->   block: convert ThrottleGroup to object with QOM
->   block: add throttle block filter driver
->   qemu-iotests: add 184 for throttle filter driver
-> 
->  qapi/block-core.json            |  66 +++-
->  include/block/throttle-groups.h |  52 ++-
->  include/qemu/throttle-options.h |  60 +++-
->  include/qemu/throttle.h         |   3 +
->  include/sysemu/block-backend.h  |  20 +-
->  block/block-backend.c           |  62 ++--
->  block/qapi.c                    |   8 +-
->  block/throttle-groups.c         | 748 ++++++++++++++++++++++++++++++----------
->  block/throttle.c                | 250 ++++++++++++++
->  blockdev.c                      |   4 +-
->  tests/test-throttle.c           | 111 +++---
->  util/throttle.c                 | 151 ++++++++
->  block/Makefile.objs             |   1 +
->  tests/qemu-iotests/184          | 205 +++++++++++
->  tests/qemu-iotests/184.out      | 300 ++++++++++++++++
->  tests/qemu-iotests/group        |   1 +
->  16 files changed, 1721 insertions(+), 321 deletions(-)
->  create mode 100644 block/throttle.c
->  create mode 100755 tests/qemu-iotests/184
->  create mode 100644 tests/qemu-iotests/184.out
-> 
+> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+> index d9df238..0967e41 100644
+> --- a/hmp-commands-info.hx
+> +++ b/hmp-commands-info.hx
+> @@ -84,6 +84,8 @@ STEXI
+>  Show block device statistics.
+>  ETEXI
+>  
+> +#ifdef CONFIG_LIVE_BLOCK_OPS
+> +
+>      {
+>          .name       = "block-jobs",
+>          .args_type  = "",
+> @@ -98,6 +100,8 @@ STEXI
+>  Show progress of ongoing block device operations.
+>  ETEXI
+>  
+> +#endif /* CONFIG_LIVE_BLOCK_OPS */
+> +
+>      {
+>          .name       = "registers",
+>          .args_type  = "cpustate_all:-a",
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 1941e19..2d137a1 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -73,6 +73,8 @@ but should be used with extreme caution.  Note that this command only
+>  resizes image files, it can not resize block devices like LVM volumes.
+>  ETEXI
+>  
+> +#ifdef CONFIG_LIVE_BLOCK_OPS
+> +
+>      {
+>          .name       = "block_stream",
+>          .args_type  = "device:B,speed:o?,base:s?",
+> @@ -159,6 +161,8 @@ STEXI
+>  Resume a paused block streaming operation.
+>  ETEXI
+>  
+> +#endif /* CONFIG_LIVE_BLOCK_OPS */
+> +
+>      {
+>          .name       = "eject",
+>          .args_type  = "force:-f,device:B",
+> @@ -1169,6 +1173,8 @@ STEXI
+>  Enables or disables migration mode.
+>  ETEXI
+>  
+> +#ifdef CONFIG_LIVE_BLOCK_OPS
+> +
+>      {
+>          .name       = "snapshot_blkdev",
+>          .args_type  = "reuse:-n,device:B,snapshot-file:s?,format:s?",
+> @@ -1190,6 +1196,8 @@ STEXI
+>  Snapshot device, using snapshot file as target if provided
+>  ETEXI
+>  
+> +#endif /* CONFIG_LIVE_BLOCK_OPS */
+> +
+>      {
+>          .name       = "snapshot_blkdev_internal",
+>          .args_type  = "device:B,name:s",
+> @@ -1224,6 +1232,8 @@ STEXI
+>  Delete an internal snapshot on device if it support
+>  ETEXI
+>  
+> +#ifdef CONFIG_LIVE_BLOCK_OPS
+> +
+>      {
+>          .name       = "drive_mirror",
+>          .args_type  = "reuse:-n,full:-f,device:B,target:s,format:s?",
+> @@ -1267,6 +1277,8 @@ STEXI
+>  Start a point-in-time copy of a block device to a specificed target.
+>  ETEXI
+>  
+> +#endif /* CONFIG_LIVE_BLOCK_OPS */
+> +
+>      {
+>          .name       = "drive_add",
+>          .args_type  = "node:-n,pci_addr:s,opts:s",
+> diff --git a/hmp.c b/hmp.c
+> index fd80dce..ab985c6 100644
+> --- a/hmp.c
+> +++ b/hmp.c
+> @@ -951,6 +951,8 @@ void hmp_info_pci(Monitor *mon, const QDict *qdict)
+>      qapi_free_PciInfoList(info_list);
+>  }
+>  
+> +#ifdef CONFIG_LIVE_BLOCK_OPS
+> +
+>  void hmp_info_block_jobs(Monitor *mon, const QDict *qdict)
+>  {
+>      BlockJobInfoList *list;
+> @@ -989,6 +991,8 @@ void hmp_info_block_jobs(Monitor *mon, const QDict *qdict)
+>      qapi_free_BlockJobInfoList(list);
+>  }
+>  
+> +#endif /* CONFIG_LIVE_BLOCK_OPS */
+> +
+>  void hmp_info_tpm(Monitor *mon, const QDict *qdict)
+>  {
+>      TPMInfoList *info_list, *info;
+> @@ -1197,6 +1201,8 @@ void hmp_block_resize(Monitor *mon, const QDict *qdict)
+>      hmp_handle_error(mon, &err);
+>  }
+>  
+> +#ifdef CONFIG_LIVE_BLOCK_OPS
+> +
+>  void hmp_drive_mirror(Monitor *mon, const QDict *qdict)
+>  {
+>      const char *filename = qdict_get_str(qdict, "target");
+> @@ -1280,6 +1286,8 @@ void hmp_snapshot_blkdev(Monitor *mon, const QDict *qdict)
+>      hmp_handle_error(mon, &err);
+>  }
+>  
+> +#endif /* CONFIG_LIVE_BLOCK_OPS */
+> +
+>  void hmp_snapshot_blkdev_internal(Monitor *mon, const QDict *qdict)
+>  {
+>      const char *device = qdict_get_str(qdict, "device");
+> @@ -1776,6 +1784,8 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
+>      hmp_handle_error(mon, &err);
+>  }
+>  
+> +#ifdef CONFIG_LIVE_BLOCK_OPS
+> +
+>  void hmp_block_stream(Monitor *mon, const QDict *qdict)
+>  {
+>      Error *error = NULL;
+> @@ -1842,6 +1852,8 @@ void hmp_block_job_complete(Monitor *mon, const QDict *qdict)
+>      hmp_handle_error(mon, &error);
+>  }
+>  
+> +#endif /* CONFIG_LIVE_BLOCK_OPS */
+> +
+>  typedef struct HMPMigrationStatus
+>  {
+>      QEMUTimer *timer;
 > -- 
-> 2.11.0
+> 2.9.5
 > 
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
