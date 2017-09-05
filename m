@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45855)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpKmc-0000xx-Sz
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 16:49:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1dpLAW-0006cQ-Nq
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:14:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpKmX-0006oh-Tu
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 16:49:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53404)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dpKmX-0006oH-K1
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 16:49:13 -0400
-References: <20170904090310.22530-1-marcandre.lureau@redhat.com>
-	<1931f0be-40ce-49b8-02e4-0d98801091ae@redhat.com>
-	<CAJ+F1CLaz9KsPWG+_h1H=dwmY0EgAfcq6r2dAJvfvJz8JB5cBA@mail.gmail.com>
+	(envelope-from <eblake@redhat.com>) id 1dpLAR-0002u0-Me
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:14:00 -0400
+References: <20170825132028.6184-1-el13635@mail.ntua.gr>
+	<20170825132028.6184-7-el13635@mail.ntua.gr>
+	<20170905161643.GO4633@localhost.localdomain>
+	<20170905190621.GQ4633@localhost.localdomain>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <49cae611-f2fc-e6ef-d122-b498f20c05d8@redhat.com>
-Date: Tue, 5 Sep 2017 15:49:08 -0500
+Message-ID: <a861d95e-553c-4797-486c-2601c2b6e17b@redhat.com>
+Date: Tue, 5 Sep 2017 16:13:39 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CLaz9KsPWG+_h1H=dwmY0EgAfcq6r2dAJvfvJz8JB5cBA@mail.gmail.com>
+In-Reply-To: <20170905190621.GQ4633@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="AlujHFJkDGRgXud5HuA831vu5QghP8ib1"
-Subject: Re: [Qemu-devel] [PATCH] build-sys: generate tests/.gitignore
+	boundary="bpmcpxdlAb3ScTIeXchpPDPKcDEO8MoCb"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v9 6/6] qemu-iotests: add 184
+ for throttle filter driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,81 +27,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com
+To: Kevin Wolf <kwolf@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AlujHFJkDGRgXud5HuA831vu5QghP8ib1
+--bpmcpxdlAb3ScTIeXchpPDPKcDEO8MoCb
 From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com
-Message-ID: <49cae611-f2fc-e6ef-d122-b498f20c05d8@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] build-sys: generate tests/.gitignore
-References: <20170904090310.22530-1-marcandre.lureau@redhat.com>
- <1931f0be-40ce-49b8-02e4-0d98801091ae@redhat.com>
- <CAJ+F1CLaz9KsPWG+_h1H=dwmY0EgAfcq6r2dAJvfvJz8JB5cBA@mail.gmail.com>
-In-Reply-To: <CAJ+F1CLaz9KsPWG+_h1H=dwmY0EgAfcq6r2dAJvfvJz8JB5cBA@mail.gmail.com>
+To: Kevin Wolf <kwolf@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <a861d95e-553c-4797-486c-2601c2b6e17b@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v9 6/6] qemu-iotests: add 184
+ for throttle filter driver
+References: <20170825132028.6184-1-el13635@mail.ntua.gr>
+ <20170825132028.6184-7-el13635@mail.ntua.gr>
+ <20170905161643.GO4633@localhost.localdomain>
+ <20170905190621.GQ4633@localhost.localdomain>
+In-Reply-To: <20170905190621.GQ4633@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 09/05/2017 05:42 AM, Marc-Andr=C3=A9 Lureau wrote:
->=20
-> I understand the feeling, I do also mostly out of tree build. However, =
-I
-> don't think it makes much sense to generate .gitignore in the build dir=
-=2E
-> It's git related, and in the git source dir, you have .git that is writ=
-able
-> already: it'd be odd that the git wortree/srcdir is read-only, and the
-> point is to generate .gitignore. Not so true with tarballs though.
->=20
-> I wrote this patch inspired by how the
-> https://github.com/behdad/git.mk/blob/master/git.mk rules does it (it i=
+On 09/05/2017 02:06 PM, Kevin Wolf wrote:
+> Am 05.09.2017 um 18:16 hat Kevin Wolf geschrieben:
+>> Am 25.08.2017 um 15:20 hat Manos Pitsidianakis geschrieben:
+>>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>>> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+>>
+>> Does this test actually (still) pass for you? I can't see that it's
+>> related to any recent change in master, but this is the diff that I ge=
+t.
+>>
+>> I can update the reference output while applying, but obviously if it'=
 s
-> uses by many GNOME projects and others with autoconf). The way it gets =
-away
-> with not touching the srcdir in non-git tree, is that the git.mk file i=
-s
-> not shipped in distributed tarball. We could have a similar approach if=
-
-> necessary.
-
-Shipping .gitignore in the tarball is not necessary; it's main benefit
-is for in-tree development.
-
+>> currently passing for you, it will fail after I "fix" it.
 >=20
-> Another alternative, which I find much less appealing, is that qemu tre=
-e
-> keeps shipping .gitignore, and we just add a manual rule to maintain it=
-=2E
-
-Keeping .gitignore in git, if it is generated, is a pain, because then
-we have to manually resync it every time it gets out of date (and we're
-already demonstrating that we forget to update .gitignore with new
-tests).  This patch is only worthwhile if it reduces maintainer
-overhead, but not if it trades one task for another.
-
+> For the record, we discussed this on IRC. The test works correctly on
+> master, but on my block branch there is a conflict with "block: pass
+> bdrv_* methods to bs->file by default in block filters".
 >=20
-> You suggested using more test* *test etc wildcards. I think this is bad=
-, I
-> would rather have a precise .gitignore, and not ignore extra files that=
- are
-> not part of the build-system. I couldn't find a simple way to generate
-> precise rules for intermediary files (like .o etc), but for end targets=
-,
-> this patch demonstrates it can be done quite easily.
->=20
-> Finally, there is this trend these days with meson to not even allow
-> in-tree build, and thus no need for .gitignore..
+> The correct action is to merge this throttle driver series after the
+> conflicting patch because throttle doesn't implement .bdrv_get_info and=
 
-Please don't go the direction of forbidding in-tree builds.  While I am
-a BIG fan of VPATH builds, I'm also a big fan of in-tree builds (it's
-slightly faster to do a one-off in-tree build of a fresh git checkout
-than it is to set up yet another VPATH build directory).  Projects that
-force one way or the other are annoying.  I see no reason why we should
-not keep both approaches working, particularly if we have patchew or
-other automation that covers both styles.
+> needs the forwarding that the other patch implements.
+>=20
+> I updated the test output accordingly and applied the series to my bloc=
+k
+> branch.
+
+Could you also squash this in to 5/6? (as long as we're intentionally
+basing throttle on top of defaults, then we should use the right default
+instead of duplicating things)
+
+diff --git i/block/throttle.c w/block/throttle.c
+index 7b33613372..5bca76300f 100644
+--- i/block/throttle.c
++++ w/block/throttle.c
+@@ -197,19 +197,6 @@ static bool
+throttle_recurse_is_first_non_filter(BlockDriverState *bs,
+     return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
+ }
+
+-static int64_t coroutine_fn
+throttle_co_get_block_status(BlockDriverState *bs,
+-                                                         int64_t
+sector_num,
+-                                                         int nb_sectors,=
+
+-                                                         int *pnum,
+-
+BlockDriverState **file)
+-{
+-    assert(bs->file && bs->file->bs);
+-    *pnum =3D nb_sectors;
+-    *file =3D bs->file->bs;
+-    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
+-           (sector_num << BDRV_SECTOR_BITS);
+-}
+-
+ static BlockDriver bdrv_throttle =3D {
+     .format_name                        =3D   "throttle",
+     .protocol_name                      =3D   "throttle",
+@@ -237,7 +224,7 @@ static BlockDriver bdrv_throttle =3D {
+     .bdrv_reopen_prepare                =3D   throttle_reopen_prepare,
+     .bdrv_reopen_commit                 =3D   throttle_reopen_commit,
+     .bdrv_reopen_abort                  =3D   throttle_reopen_abort,
+-    .bdrv_co_get_block_status           =3D   throttle_co_get_block_stat=
+us,
++    .bdrv_co_get_block_status           =3D
+bdrv_co_get_block_status_from_file,
+
+     .is_filter                          =3D   true,
+ };
+
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -111,7 +126,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---AlujHFJkDGRgXud5HuA831vu5QghP8ib1
+--bpmcpxdlAb3ScTIeXchpPDPKcDEO8MoCb
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -120,14 +135,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmvDcQACgkQp6FrSiUn
-Q2qOJQf/dWADwJIpD6kzZc7Bt1dkfFn6yKyTLwIzA9o5oAGJUTL+3Hug/kV7qIR5
-AKT9bMCajU1rfetDO4a6SbMux/2Jpq9pLK8sKjUJR6oWzZLDov9JBc3jYhLNK5o8
-t9RryaKsUIcpUWovvKmG2doKVD55rz3+Xj5CJ3KkPtfPgP+0F7Pmb6864P8E+UqU
-OsDHn2gE09oBUn37nw3ec1aVn3CpVLAk9abn6A8zgW8BEdJOq4wlE9WQ9Xm2dBCf
-CmCJ73HSMvUNOMoYoj8m87pA2NfFa1f4UPguE8mBHbiO1xyn7fb5Uka2wCxilHGr
-jtEUUqNTJVStjmNJQqZernl9P2A7Lg==
-=5Ndl
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmvE4MACgkQp6FrSiUn
+Q2qtiwgAk7BFR599pketfeEqD41JwP0LOqz5jsGw5POJcz9rQtBz3ZnmzrKAzHk8
+Y6bEoQgzFwTm9xNOuiZkCbpWj5Ei3F/0nNjjLGe7qMOZyJDVKRn9kP8BnBhS19cv
+U19X3Sgc+QAu70l0+6pXSJ3uZWclvQVy0JXAmA9+o/L/pRBv0xqZ5xmFbqRDtV+6
+lm9ho0CLlMrkgUbZzVP55uXFX1KcGo3VjCZlQ8g4Lro7tGb1PZ9mnk1JBvNrn3ys
+5+HTZEeF3zQN464iNdCdZYhMCqJKGGJ3TqoiUf+g2xkZhBwpVfk65BBEbbF7W1uJ
+16OgDYSb1+UAFCeYO1eIcVz3jSXvFA==
+=hwGo
 -----END PGP SIGNATURE-----
 
---AlujHFJkDGRgXud5HuA831vu5QghP8ib1--
+--bpmcpxdlAb3ScTIeXchpPDPKcDEO8MoCb--
