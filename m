@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41219)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41236)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dpA4H-0001De-5Z
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:22:54 -0400
+	(envelope-from <berrange@redhat.com>) id 1dpA4H-0001EE-NN
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:22:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dpA46-0002gv-AS
+	(envelope-from <berrange@redhat.com>) id 1dpA4B-0002lO-Kj
 	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:22:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45188)
+Received: from mx1.redhat.com ([209.132.183.28]:2282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpA46-0002gQ-1M
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:22:38 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpA4B-0002kR-Bi
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:22:43 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue,  5 Sep 2017 10:22:23 +0100
-Message-Id: <20170905092230.8243-3-berrange@redhat.com>
+Date: Tue,  5 Sep 2017 10:22:27 +0100
+Message-Id: <20170905092230.8243-7-berrange@redhat.com>
 In-Reply-To: <20170905092230.8243-1-berrange@redhat.com>
 References: <20170905092230.8243-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v1 2/9] tests: Add test-listen - a stress test
- for QEMU socket listen
+Subject: [Qemu-devel] [PULL v1 6/9] util: remove the obsolete non-blocking
+ connect
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,336 +25,495 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Knut Omang <knut.omang@oracle.com>, "Daniel P . Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cao jin <caoj.fnst@cn.fujitsu.com>, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-From: Knut Omang <knut.omang@oracle.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
 
-There's a potential race condition between multiple bind()'s
-attempting to bind to the same port, which occasionally
-allows more than one bind to succeed against the same port.
+The non-blocking connect mechanism is obsolete, and it doesn't
+work well in inet connection, because it will call getaddrinfo
+first and getaddrinfo will blocks on DNS lookups. Since commit
+e65c67e4 & d984464e, the non-blocking connect of migration goes
+through QIOChannel in a different manner(using a thread), and
+nobody use this old non-blocking connect anymore.
 
-When a subsequent listen() call is made with the same socket
-only one will succeed.
+Any newly written code which needs a non-blocking connect should
+use the QIOChannel code, so we can drop NonBlockingConnectHandler
+as a concept entirely.
 
-The current QEMU code does however not take this situation into account
-and the listen will cause the code to break out and fail even
-when there are actually available ports to use.
-
-This test exposes two subtests:
-
-/socket/listen-serial
-/socket/listen-compete
-
-The "compete" subtest creates a number of threads and have them all trying to bind
-to the same port with a large enough offset input to
-allow all threads to get it's own port.
-The "serial" subtest just does the same, except in series in a
-single thread.
-
-The serial version passes, probably in most versions of QEMU.
-
-The parallel version exposes the problem in a relatively reliable way,
-eg. it fails a majority of times, but not with a 100% rate, occasional
-passes can be seen. Nevertheless this is quite good given that
-the bug was tricky to reproduce and has been left undetected for
-a while.
-
-The problem seems to be present in all versions of QEMU.
-
-The original failure scenario occurred with VNC port allocation
-in a traditional Xen based build, in different code
-but with similar functionality.
-
-Reported-by: Bhavesh Davda <bhavesh.davda@oracle.com>
-Signed-off-by: Knut Omang <knut.omang@oracle.com>
-Reviewed-by: Yuval Shaia <yuval.shaia@oracle.com>
-Reviewed-by: Bhavesh Davda <bhavesh.davda@oracle.com>
-Reviewed-by: Girish Moodalbail <girish.moodalbail@oracle.com>
+Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- tests/Makefile.include |   2 +
- tests/test-listen.c    | 253 +++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 255 insertions(+)
- create mode 100644 tests/test-listen.c
+ block/sheepdog.c       |   2 +-
+ block/ssh.c            |   2 +-
+ include/qemu/sockets.h |  12 +--
+ io/channel-socket.c    |   2 +-
+ util/qemu-sockets.c    | 205 ++++++-------------------------------------------
+ 5 files changed, 28 insertions(+), 195 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f08b7418f0..a231754517 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -151,6 +151,7 @@ check-unit-y += tests/test-bufferiszero$(EXESUF)
- gcov-files-check-bufferiszero-y = util/bufferiszero.c
- check-unit-y += tests/test-uuid$(EXESUF)
- check-unit-y += tests/ptimer-test$(EXESUF)
-+#check-unit-y += tests/test-listen$(EXESUF)
- gcov-files-ptimer-test-y = hw/core/ptimer.c
- check-unit-y += tests/test-qapi-util$(EXESUF)
- gcov-files-test-qapi-util-y = qapi/qapi-util.c
-@@ -796,6 +797,7 @@ tests/test-arm-mptimer$(EXESUF): tests/test-arm-mptimer.o
- tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
- tests/numa-test$(EXESUF): tests/numa-test.o
- tests/vmgenid-test$(EXESUF): tests/vmgenid-test.o tests/boot-sector.o tests/acpi-utils.o
-+tests/test-listen$(EXESUF): tests/test-listen.o $(test-util-obj-y)
+diff --git a/block/sheepdog.c b/block/sheepdog.c
+index abb2e79065..64ab07f3b7 100644
+--- a/block/sheepdog.c
++++ b/block/sheepdog.c
+@@ -591,7 +591,7 @@ static int connect_to_sdog(BDRVSheepdogState *s, Error **errp)
+ {
+     int fd;
  
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
-diff --git a/tests/test-listen.c b/tests/test-listen.c
-new file mode 100644
-index 0000000000..03c4c8f03b
---- /dev/null
-+++ b/tests/test-listen.c
-@@ -0,0 +1,253 @@
-+/*
-+ * Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
-+ *    Author: Knut Omang <knut.omang@oracle.com>
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 or later
-+ * as published by the Free Software Foundation.
-+ *
-+ * Test parallel port listen configuration with
-+ * dynamic port allocation
-+ */
+-    fd = socket_connect(s->addr, NULL, NULL, errp);
++    fd = socket_connect(s->addr, errp);
+ 
+     if (s->addr->type == SOCKET_ADDRESS_TYPE_INET && fd >= 0) {
+         int ret = socket_set_nodelay(fd);
+diff --git a/block/ssh.c b/block/ssh.c
+index e8f0404c03..b049a16eb9 100644
+--- a/block/ssh.c
++++ b/block/ssh.c
+@@ -678,7 +678,7 @@ static int connect_to_ssh(BDRVSSHState *s, QDict *options,
+     }
+ 
+     /* Open the socket and connect. */
+-    s->sock = inet_connect_saddr(s->inet, NULL, NULL, errp);
++    s->sock = inet_connect_saddr(s->inet, errp);
+     if (s->sock < 0) {
+         ret = -EIO;
+         goto err;
+diff --git a/include/qemu/sockets.h b/include/qemu/sockets.h
+index ef6b5591f7..639cc079d9 100644
+--- a/include/qemu/sockets.h
++++ b/include/qemu/sockets.h
+@@ -27,18 +27,11 @@ int socket_set_fast_reuse(int fd);
+ #define SHUT_RDWR 2
+ #endif
+ 
+-/* callback function for nonblocking connect
+- * valid fd on success, negative error code on failure
+- */
+-typedef void NonBlockingConnectHandler(int fd, Error *err, void *opaque);
+-
+ int inet_ai_family_from_address(InetSocketAddress *addr,
+                                 Error **errp);
+ int inet_parse(InetSocketAddress *addr, const char *str, Error **errp);
+ int inet_connect(const char *str, Error **errp);
+-int inet_connect_saddr(InetSocketAddress *saddr,
+-                       NonBlockingConnectHandler *callback, void *opaque,
+-                       Error **errp);
++int inet_connect_saddr(InetSocketAddress *saddr, Error **errp);
+ 
+ NetworkAddressFamily inet_netfamily(int family);
+ 
+@@ -46,8 +39,7 @@ int unix_listen(const char *path, char *ostr, int olen, Error **errp);
+ int unix_connect(const char *path, Error **errp);
+ 
+ SocketAddress *socket_parse(const char *str, Error **errp);
+-int socket_connect(SocketAddress *addr, NonBlockingConnectHandler *callback,
+-                   void *opaque, Error **errp);
++int socket_connect(SocketAddress *addr, Error **errp);
+ int socket_listen(SocketAddress *addr, Error **errp);
+ void socket_listen_cleanup(int fd, Error **errp);
+ int socket_dgram(SocketAddress *remote, SocketAddress *local, Error **errp);
+diff --git a/io/channel-socket.c b/io/channel-socket.c
+index 591d27e8c3..563e297357 100644
+--- a/io/channel-socket.c
++++ b/io/channel-socket.c
+@@ -140,7 +140,7 @@ int qio_channel_socket_connect_sync(QIOChannelSocket *ioc,
+     int fd;
+ 
+     trace_qio_channel_socket_connect_sync(ioc, addr);
+-    fd = socket_connect(addr, NULL, NULL, errp);
++    fd = socket_connect(addr, errp);
+     if (fd < 0) {
+         trace_qio_channel_socket_connect_fail(ioc);
+         return -1;
+diff --git a/util/qemu-sockets.c b/util/qemu-sockets.c
+index 6a511fbf76..b47fb45885 100644
+--- a/util/qemu-sockets.c
++++ b/util/qemu-sockets.c
+@@ -342,88 +342,19 @@ listen_ok:
+     ((rc) == -EINPROGRESS)
+ #endif
+ 
+-/* Struct to store connect state for non blocking connect */
+-typedef struct ConnectState {
+-    int fd;
+-    struct addrinfo *addr_list;
+-    struct addrinfo *current_addr;
+-    NonBlockingConnectHandler *callback;
+-    void *opaque;
+-} ConnectState;
+-
+-static int inet_connect_addr(struct addrinfo *addr, bool *in_progress,
+-                             ConnectState *connect_state, Error **errp);
++static int inet_connect_addr(struct addrinfo *addr, Error **errp);
+ 
+-static void wait_for_connect(void *opaque)
+-{
+-    ConnectState *s = opaque;
+-    int val = 0, rc = 0;
+-    socklen_t valsize = sizeof(val);
+-    bool in_progress;
+-    Error *err = NULL;
+-
+-    qemu_set_fd_handler(s->fd, NULL, NULL, NULL);
+-
+-    do {
+-        rc = qemu_getsockopt(s->fd, SOL_SOCKET, SO_ERROR, &val, &valsize);
+-    } while (rc == -1 && errno == EINTR);
+-
+-    /* update rc to contain error */
+-    if (!rc && val) {
+-        rc = -1;
+-        errno = val;
+-    }
+-
+-    /* connect error */
+-    if (rc < 0) {
+-        error_setg_errno(&err, errno, "Error connecting to socket");
+-        closesocket(s->fd);
+-        s->fd = rc;
+-    }
+-
+-    /* try to connect to the next address on the list */
+-    if (s->current_addr) {
+-        while (s->current_addr->ai_next != NULL && s->fd < 0) {
+-            s->current_addr = s->current_addr->ai_next;
+-            s->fd = inet_connect_addr(s->current_addr, &in_progress, s, NULL);
+-            if (s->fd < 0) {
+-                error_free(err);
+-                err = NULL;
+-                error_setg_errno(&err, errno, "Unable to start socket connect");
+-            }
+-            /* connect in progress */
+-            if (in_progress) {
+-                goto out;
+-            }
+-        }
+-
+-        freeaddrinfo(s->addr_list);
+-    }
+-
+-    if (s->callback) {
+-        s->callback(s->fd, err, s->opaque);
+-    }
+-    g_free(s);
+-out:
+-    error_free(err);
+-}
+-
+-static int inet_connect_addr(struct addrinfo *addr, bool *in_progress,
+-                             ConnectState *connect_state, Error **errp)
++static int inet_connect_addr(struct addrinfo *addr, Error **errp)
+ {
+     int sock, rc;
+ 
+-    *in_progress = false;
+-
+     sock = qemu_socket(addr->ai_family, addr->ai_socktype, addr->ai_protocol);
+     if (sock < 0) {
+         error_setg_errno(errp, errno, "Failed to create socket");
+         return -1;
+     }
+     socket_set_fast_reuse(sock);
+-    if (connect_state != NULL) {
+-        qemu_set_nonblock(sock);
+-    }
 +
-+#include "qemu/osdep.h"
-+#include "libqtest.h"
-+#include "qemu-common.h"
-+#include "qemu/thread.h"
-+#include "qemu/sockets.h"
-+#include "qapi/error.h"
+     /* connect to peer */
+     do {
+         rc = 0;
+@@ -432,15 +363,12 @@ static int inet_connect_addr(struct addrinfo *addr, bool *in_progress,
+         }
+     } while (rc == -EINTR);
+ 
+-    if (connect_state != NULL && QEMU_SOCKET_RC_INPROGRESS(rc)) {
+-        connect_state->fd = sock;
+-        qemu_set_fd_handler(sock, NULL, wait_for_connect, connect_state);
+-        *in_progress = true;
+-    } else if (rc < 0) {
++    if (rc < 0) {
+         error_setg_errno(errp, errno, "Failed to connect socket");
+         closesocket(sock);
+         return -1;
+     }
 +
-+#define NAME_LEN 1024
-+#define PORT_LEN 16
+     return sock;
+ }
+ 
+@@ -498,44 +426,24 @@ static struct addrinfo *inet_parse_connect_saddr(InetSocketAddress *saddr,
+  *
+  * @saddr: Inet socket address specification
+  * @errp: set on error
+- * @callback: callback function for non-blocking connect
+- * @opaque: opaque for callback function
+  *
+  * Returns: -1 on error, file descriptor on success.
+- *
+- * If @callback is non-null, the connect is non-blocking.  If this
+- * function succeeds, callback will be called when the connection
+- * completes, with the file descriptor on success, or -1 on error.
+  */
+-int inet_connect_saddr(InetSocketAddress *saddr,
+-                       NonBlockingConnectHandler *callback, void *opaque,
+-                       Error **errp)
++int inet_connect_saddr(InetSocketAddress *saddr, Error **errp)
+ {
+     Error *local_err = NULL;
+     struct addrinfo *res, *e;
+     int sock = -1;
+-    bool in_progress;
+-    ConnectState *connect_state = NULL;
+ 
+     res = inet_parse_connect_saddr(saddr, errp);
+     if (!res) {
+         return -1;
+     }
+ 
+-    if (callback != NULL) {
+-        connect_state = g_malloc0(sizeof(*connect_state));
+-        connect_state->addr_list = res;
+-        connect_state->callback = callback;
+-        connect_state->opaque = opaque;
+-    }
+-
+     for (e = res; e != NULL; e = e->ai_next) {
+         error_free(local_err);
+         local_err = NULL;
+-        if (connect_state != NULL) {
+-            connect_state->current_addr = e;
+-        }
+-        sock = inet_connect_addr(e, &in_progress, connect_state, &local_err);
++        sock = inet_connect_addr(e, &local_err);
+         if (sock >= 0) {
+             break;
+         }
+@@ -543,15 +451,8 @@ int inet_connect_saddr(InetSocketAddress *saddr,
+ 
+     if (sock < 0) {
+         error_propagate(errp, local_err);
+-    } else if (in_progress) {
+-        /* wait_for_connect() will do the rest */
+-        return sock;
+-    } else {
+-        if (callback) {
+-            callback(sock, NULL, opaque);
+-        }
+     }
+-    g_free(connect_state);
 +
-+struct thr_info {
-+    QemuThread thread;
-+    int to_port;
-+    bool ipv4;
-+    bool ipv6;
-+    int got_port;
-+    int eno;
-+    int fd;
-+    const char *errstr;
-+    char hostname[NAME_LEN + 1];
-+    char port[PORT_LEN + 1];
-+};
+     freeaddrinfo(res);
+     return sock;
+ }
+@@ -730,7 +631,7 @@ int inet_connect(const char *str, Error **errp)
+     InetSocketAddress *addr = g_new(InetSocketAddress, 1);
+ 
+     if (!inet_parse(addr, str, errp)) {
+-        sock = inet_connect_saddr(addr, NULL, NULL, errp);
++        sock = inet_connect_saddr(addr, errp);
+     }
+     qapi_free_InetSocketAddress(addr);
+     return sock;
+@@ -763,21 +664,16 @@ static bool vsock_parse_vaddr_to_sockaddr(const VsockSocketAddress *vaddr,
+     return true;
+ }
+ 
+-static int vsock_connect_addr(const struct sockaddr_vm *svm, bool *in_progress,
+-                              ConnectState *connect_state, Error **errp)
++static int vsock_connect_addr(const struct sockaddr_vm *svm, Error **errp)
+ {
+     int sock, rc;
+ 
+-    *in_progress = false;
+-
+     sock = qemu_socket(AF_VSOCK, SOCK_STREAM, 0);
+     if (sock < 0) {
+         error_setg_errno(errp, errno, "Failed to create socket");
+         return -1;
+     }
+-    if (connect_state != NULL) {
+-        qemu_set_nonblock(sock);
+-    }
 +
+     /* connect to peer */
+     do {
+         rc = 0;
+@@ -786,50 +682,26 @@ static int vsock_connect_addr(const struct sockaddr_vm *svm, bool *in_progress,
+         }
+     } while (rc == -EINTR);
+ 
+-    if (connect_state != NULL && QEMU_SOCKET_RC_INPROGRESS(rc)) {
+-        connect_state->fd = sock;
+-        qemu_set_fd_handler(sock, NULL, wait_for_connect, connect_state);
+-        *in_progress = true;
+-    } else if (rc < 0) {
++    if (rc < 0) {
+         error_setg_errno(errp, errno, "Failed to connect socket");
+         closesocket(sock);
+         return -1;
+     }
 +
-+/* These two functions taken from test-io-channel-socket.c */
-+static int check_bind(const char *hostname, bool *has_proto)
-+{
-+    int fd = -1;
-+    struct addrinfo ai, *res = NULL;
-+    int rc;
-+    int ret = -1;
-+
-+    memset(&ai, 0, sizeof(ai));
-+    ai.ai_flags = AI_CANONNAME | AI_ADDRCONFIG;
-+    ai.ai_family = AF_UNSPEC;
-+    ai.ai_socktype = SOCK_STREAM;
-+
-+    /* lookup */
-+    rc = getaddrinfo(hostname, NULL, &ai, &res);
-+    if (rc != 0) {
-+        if (rc == EAI_ADDRFAMILY ||
-+            rc == EAI_FAMILY) {
-+            *has_proto = false;
-+            goto done;
-+        }
-+        goto cleanup;
-+    }
-+
-+    fd = qemu_socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-+    if (fd < 0) {
-+        goto cleanup;
-+    }
-+
-+    if (bind(fd, res->ai_addr, res->ai_addrlen) < 0) {
-+        if (errno == EADDRNOTAVAIL) {
-+            *has_proto = false;
-+            goto done;
-+        }
-+        goto cleanup;
-+    }
-+
-+    *has_proto = true;
-+ done:
-+    ret = 0;
-+
-+ cleanup:
-+    if (fd != -1) {
-+        close(fd);
-+    }
-+    if (res) {
-+        freeaddrinfo(res);
-+    }
-+    return ret;
-+}
-+
-+static int check_protocol_support(bool *has_ipv4, bool *has_ipv6)
-+{
-+    if (check_bind("127.0.0.1", has_ipv4) < 0) {
-+        return -1;
-+    }
-+    if (check_bind("::1", has_ipv6) < 0) {
-+        return -1;
-+    }
-+
-+    return 0;
-+}
-+
-+static void *listener_thread(void *arg)
-+{
-+    struct thr_info *thr = (struct thr_info *)arg;
-+    SocketAddress addr = {
-+        .type = SOCKET_ADDRESS_TYPE_INET,
-+        .u = {
-+            .inet = {
-+                .host = thr->hostname,
-+                .port = thr->port,
-+                .has_ipv4 = thr->ipv4,
-+                .ipv4 = thr->ipv4,
-+                .has_ipv6 = thr->ipv6,
-+                .ipv6 = thr->ipv6,
-+                .has_to = true,
-+                .to = thr->to_port,
-+            },
-+        },
-+    };
-+    Error *err = NULL;
-+    int fd;
-+
-+    fd = socket_listen(&addr, &err);
-+    if (fd < 0) {
-+        thr->eno = errno;
-+        thr->errstr = error_get_pretty(err);
-+    } else {
-+        struct sockaddr_in a;
-+        socklen_t a_len = sizeof(a);
-+        g_assert_cmpint(getsockname(fd, (struct sockaddr *)&a, &a_len), ==, 0);
-+        thr->got_port = ntohs(a.sin_port);
-+        thr->fd = fd;
-+    }
-+    return arg;
-+}
-+
-+
-+static void listen_compete_nthr(bool threaded, int nthreads,
-+                                int start_port, int max_offset,
-+                                bool ipv4, bool ipv6)
-+{
-+    int i;
-+    int failed_listens = 0;
-+    struct thr_info *thr = g_new0(struct thr_info, nthreads);
-+    int used[max_offset + 1];
-+
-+    memset(used, 0, sizeof(used));
-+    for (i = 0; i < nthreads; i++) {
-+        snprintf(thr[i].port, PORT_LEN, "%d", start_port);
-+        strcpy(thr[i].hostname, "localhost");
-+        thr[i].to_port = start_port + max_offset;
-+        thr[i].ipv4 = ipv4;
-+        thr[i].ipv6 = ipv6;
-+    }
-+
-+    for (i = 0; i < nthreads; i++) {
-+        if (threaded) {
-+            qemu_thread_create(&thr[i].thread, "listener",
-+                               listener_thread, &thr[i],
-+                               QEMU_THREAD_JOINABLE);
-+        } else {
-+            listener_thread(&thr[i]);
-+        }
-+    }
-+
-+    if (threaded) {
-+        for (i = 0; i < nthreads; i++) {
-+            qemu_thread_join(&thr[i].thread);
-+        }
-+    }
-+    for (i = 0; i < nthreads; i++) {
-+        if (thr[i].got_port) {
-+            closesocket(thr[i].fd);
-+        }
-+    }
-+
-+    for (i = 0; i < nthreads; i++) {
-+        if (thr[i].eno != 0) {
-+            const char *m;
-+            g_printerr("** Failed to assign a port to thread %d (errno = %d)\n",
-+                   i, thr[i].eno);
-+            /* This is what we are interested in capturing -
-+             * catch and report details if something unexpected happens:
-+             */
-+            m = strstr(thr[i].errstr, "Failed to listen on socket");
-+            if (m != NULL) {
-+                g_assert_cmpstr(thr[i].errstr, ==,
-+                    "Failed to listen on socket: Address already in use");
-+            }
-+            failed_listens++;
-+        } else {
-+            int assigned_port = thr[i].got_port;
-+            g_assert_cmpint(assigned_port, <= , thr[i].to_port);
-+            g_assert_cmpint(used[assigned_port - start_port], == , 0);
-+        }
-+    }
-+    g_assert_cmpint(failed_listens, ==, 0);
-+    g_free(thr);
-+}
-+
-+
-+static void listen_compete_ipv4(void)
-+{
-+    listen_compete_nthr(true, 200, 5920, 300, true, false);
-+}
-+
-+static void listen_serial_ipv4(void)
-+{
-+    listen_compete_nthr(false, 200, 6300, 300, true, false);
-+}
-+
-+static void listen_compete_ipv6(void)
-+{
-+    listen_compete_nthr(true, 200, 5920, 300, true, false);
-+}
-+
-+static void listen_serial_ipv6(void)
-+{
-+    listen_compete_nthr(false, 200, 6300, 300, false, true);
-+}
-+
-+static void listen_compete_gen(void)
-+{
-+    listen_compete_nthr(true, 200, 5920, 300, true, true);
-+}
-+
-+static void listen_serial_gen(void)
-+{
-+    listen_compete_nthr(false, 200, 6300, 300, true, true);
-+}
-+
-+
-+int main(int argc, char **argv)
-+{
-+    bool has_ipv4, has_ipv6;
-+    g_test_init(&argc, &argv, NULL);
-+
-+    if (check_protocol_support(&has_ipv4, &has_ipv6) < 0) {
-+        return 1;
-+    }
-+
-+    if (has_ipv4) {
-+        g_test_add_func("/socket/listen-serial/ipv4", listen_serial_ipv4);
-+        g_test_add_func("/socket/listen-compete/ipv4", listen_compete_ipv4);
-+    }
-+    if (has_ipv6) {
-+        g_test_add_func("/socket/listen-serial/ipv6", listen_serial_ipv6);
-+        g_test_add_func("/socket/listen-compete/ipv6", listen_compete_ipv6);
-+    }
-+    if (has_ipv4 && has_ipv6) {
-+        g_test_add_func("/socket/listen-serial/generic", listen_serial_gen);
-+        g_test_add_func("/socket/listen-compete/generic", listen_compete_gen);
-+    }
-+    return g_test_run();
-+}
+     return sock;
+ }
+ 
+-static int vsock_connect_saddr(VsockSocketAddress *vaddr,
+-                               NonBlockingConnectHandler *callback,
+-                               void *opaque,
+-                               Error **errp)
++static int vsock_connect_saddr(VsockSocketAddress *vaddr, Error **errp)
+ {
+     struct sockaddr_vm svm;
+     int sock = -1;
+-    bool in_progress;
+-    ConnectState *connect_state = NULL;
+ 
+     if (!vsock_parse_vaddr_to_sockaddr(vaddr, &svm, errp)) {
+         return -1;
+     }
+ 
+-    if (callback != NULL) {
+-        connect_state = g_malloc0(sizeof(*connect_state));
+-        connect_state->callback = callback;
+-        connect_state->opaque = opaque;
+-    }
++    sock = vsock_connect_addr(&svm, errp);
+ 
+-    sock = vsock_connect_addr(&svm, &in_progress, connect_state, errp);
+-    if (sock < 0) {
+-        /* do nothing */
+-    } else if (in_progress) {
+-        /* wait_for_connect() will do the rest */
+-        return sock;
+-    } else {
+-        if (callback) {
+-            callback(sock, NULL, opaque);
+-        }
+-    }
+-    g_free(connect_state);
+     return sock;
+ }
+ 
+@@ -889,9 +761,7 @@ static void vsock_unsupported(Error **errp)
+     error_setg(errp, "socket family AF_VSOCK unsupported");
+ }
+ 
+-static int vsock_connect_saddr(VsockSocketAddress *vaddr,
+-                               NonBlockingConnectHandler *callback,
+-                               void *opaque, Error **errp)
++static int vsock_connect_saddr(VsockSocketAddress *vaddr, Error **errp)
+ {
+     vsock_unsupported(errp);
+     return -1;
+@@ -994,12 +864,9 @@ err:
+     return -1;
+ }
+ 
+-static int unix_connect_saddr(UnixSocketAddress *saddr,
+-                              NonBlockingConnectHandler *callback, void *opaque,
+-                              Error **errp)
++static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
+ {
+     struct sockaddr_un un;
+-    ConnectState *connect_state = NULL;
+     int sock, rc;
+ 
+     if (saddr->path == NULL) {
+@@ -1012,12 +879,6 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
+         error_setg_errno(errp, errno, "Failed to create socket");
+         return -1;
+     }
+-    if (callback != NULL) {
+-        connect_state = g_malloc0(sizeof(*connect_state));
+-        connect_state->callback = callback;
+-        connect_state->opaque = opaque;
+-        qemu_set_nonblock(sock);
+-    }
+ 
+     if (strlen(saddr->path) > sizeof(un.sun_path)) {
+         error_setg(errp, "UNIX socket path '%s' is too long", saddr->path);
+@@ -1038,29 +899,16 @@ static int unix_connect_saddr(UnixSocketAddress *saddr,
+         }
+     } while (rc == -EINTR);
+ 
+-    if (connect_state != NULL && QEMU_SOCKET_RC_INPROGRESS(rc)) {
+-        connect_state->fd = sock;
+-        qemu_set_fd_handler(sock, NULL, wait_for_connect, connect_state);
+-        return sock;
+-    } else if (rc >= 0) {
+-        /* non blocking socket immediate success, call callback */
+-        if (callback != NULL) {
+-            callback(sock, NULL, opaque);
+-        }
+-    }
+-
+     if (rc < 0) {
+         error_setg_errno(errp, -rc, "Failed to connect socket %s",
+                          saddr->path);
+         goto err;
+     }
+ 
+-    g_free(connect_state);
+     return sock;
+ 
+  err:
+     close(sock);
+-    g_free(connect_state);
+     return -1;
+ }
+ 
+@@ -1075,9 +923,7 @@ static int unix_listen_saddr(UnixSocketAddress *saddr,
+     return -1;
+ }
+ 
+-static int unix_connect_saddr(UnixSocketAddress *saddr,
+-                              NonBlockingConnectHandler *callback, void *opaque,
+-                              Error **errp)
++static int unix_connect_saddr(UnixSocketAddress *saddr, Error **errp)
+ {
+     error_setg(errp, "unix sockets are not available on windows");
+     errno = ENOTSUP;
+@@ -1123,7 +969,7 @@ int unix_connect(const char *path, Error **errp)
+ 
+     saddr = g_new0(UnixSocketAddress, 1);
+     saddr->path = g_strdup(path);
+-    sock = unix_connect_saddr(saddr, NULL, NULL, errp);
++    sock = unix_connect_saddr(saddr, errp);
+     qapi_free_UnixSocketAddress(saddr);
+     return sock;
+ }
+@@ -1168,30 +1014,25 @@ fail:
+     return NULL;
+ }
+ 
+-int socket_connect(SocketAddress *addr, NonBlockingConnectHandler *callback,
+-                   void *opaque, Error **errp)
++int socket_connect(SocketAddress *addr, Error **errp)
+ {
+     int fd;
+ 
+     switch (addr->type) {
+     case SOCKET_ADDRESS_TYPE_INET:
+-        fd = inet_connect_saddr(&addr->u.inet, callback, opaque, errp);
++        fd = inet_connect_saddr(&addr->u.inet, errp);
+         break;
+ 
+     case SOCKET_ADDRESS_TYPE_UNIX:
+-        fd = unix_connect_saddr(&addr->u.q_unix, callback, opaque, errp);
++        fd = unix_connect_saddr(&addr->u.q_unix, errp);
+         break;
+ 
+     case SOCKET_ADDRESS_TYPE_FD:
+         fd = monitor_get_fd(cur_mon, addr->u.fd.str, errp);
+-        if (fd >= 0 && callback) {
+-            qemu_set_nonblock(fd);
+-            callback(fd, NULL, opaque);
+-        }
+         break;
+ 
+     case SOCKET_ADDRESS_TYPE_VSOCK:
+-        fd = vsock_connect_saddr(&addr->u.vsock, callback, opaque, errp);
++        fd = vsock_connect_saddr(&addr->u.vsock, errp);
+         break;
+ 
+     default:
 -- 
 2.13.5
