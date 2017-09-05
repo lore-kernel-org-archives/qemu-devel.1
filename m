@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42991)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpDeY-0006rA-Vm
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:12:35 -0400
+	(envelope-from <famz@redhat.com>) id 1dpDeb-0006ta-GW
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:12:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpDeU-0008DX-47
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:12:30 -0400
-Date: Tue, 5 Sep 2017 21:12:08 +0800
+	(envelope-from <famz@redhat.com>) id 1dpDeR-0008BN-Mc
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:12:33 -0400
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170905131208.GV22515@lemon.lan>
-References: <20170717023824.18796-1-famz@redhat.com>
-	<20170905033501.GS22515@lemon.lan>
-	<CAFEAcA9bDh7c5WtUb+2qCFk0baj+=M2VvkYr1HW+1w=jqFRN=A@mail.gmail.com>
+Date: Tue,  5 Sep 2017 21:11:49 +0800
+Message-Id: <20170905131149.10669-7-famz@redhat.com>
+In-Reply-To: <20170905131149.10669-1-famz@redhat.com>
+References: <20170905131149.10669-1-famz@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9bDh7c5WtUb+2qCFk0baj+=M2VvkYr1HW+1w=jqFRN=A@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v5 0/6] arm: Make use of DEFINE_PROP_LINK
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 6/6] xilinx_axidma: Convert to
+ DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,39 +23,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
-On Tue, 09/05 11:43, Peter Maydell wrote:
-> On 5 September 2017 at 04:35, Fam Zheng <famz@redhat.com> wrote:
-> > Hi,
-> >
-> > Ping for 2.11.
-> >
-> > Peter, what do you think?
-> >
-> > On Mon, 07/17 10:38, Fam Zheng wrote:
-> >> This is the arm part that was left out from:
-> >>
-> >> https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg04006.html
-> >>
-> >> Make use of the new DEFINE_PROP_LINK, in favor of open coded the
-> >> object_property_add_link. The advantage of it is the property now get reflected
-> >> in the info qtree output, for a bit more introspectability.
-> >>
-> >> Fam Zheng (6):
-> >>   armv7m: Convert bitband.source-mamory to DEFINE_PROP_LINK
-> >>   armv7m: Convert armv7m.memory to DEFINE_PROP_LINK
-> >>   gicv3: Convert to DEFINE_PROP_LINK
-> >>   xlnx_zynqmp: Convert to DEFINE_PROP_LINK
-> >>   xilinx_axienet: Convert to DEFINE_PROP_LINK
-> >>   xilinx_axidma: Convert to DEFINE_PROP_LINK
-> 
-> These look OK, but they've fallen out of the 'patches' cache.
-> There's a typo in the subject of the bitband one: should
-> be "memory", not "mamory". Can you fix that, add the reviewed-bys
-> and resend the series, please, and I'll put it in my queue?
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+ hw/dma/xilinx_axidma.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
-Sure, sent v6.
-
-Fam
+diff --git a/hw/dma/xilinx_axidma.c b/hw/dma/xilinx_axidma.c
+index 3987b5ff96..9b48103574 100644
+--- a/hw/dma/xilinx_axidma.c
++++ b/hw/dma/xilinx_axidma.c
+@@ -562,18 +562,6 @@ static void xilinx_axidma_init(Object *obj)
+     XilinxAXIDMA *s =3D XILINX_AXI_DMA(obj);
+     SysBusDevice *sbd =3D SYS_BUS_DEVICE(obj);
+=20
+-    object_property_add_link(obj, "axistream-connected", TYPE_STREAM_SLA=
+VE,
+-                             (Object **)&s->tx_data_dev,
+-                             qdev_prop_allow_set_link_before_realize,
+-                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
+-                             &error_abort);
+-    object_property_add_link(obj, "axistream-control-connected",
+-                             TYPE_STREAM_SLAVE,
+-                             (Object **)&s->tx_control_dev,
+-                             qdev_prop_allow_set_link_before_realize,
+-                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
+-                             &error_abort);
+-
+     object_initialize(&s->rx_data_dev, sizeof(s->rx_data_dev),
+                       TYPE_XILINX_AXI_DMA_DATA_STREAM);
+     object_initialize(&s->rx_control_dev, sizeof(s->rx_control_dev),
+@@ -593,6 +581,10 @@ static void xilinx_axidma_init(Object *obj)
+=20
+ static Property axidma_properties[] =3D {
+     DEFINE_PROP_UINT32("freqhz", XilinxAXIDMA, freqhz, 50000000),
++    DEFINE_PROP_LINK("axistream-connected", XilinxAXIDMA,
++                     tx_data_dev, TYPE_STREAM_SLAVE, StreamSlave *),
++    DEFINE_PROP_LINK("axistream-control-connected", XilinxAXIDMA,
++                     tx_control_dev, TYPE_STREAM_SLAVE, StreamSlave *),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+=20
+--=20
+2.13.5
