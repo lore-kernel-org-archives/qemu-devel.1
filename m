@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpHdH-0000Fq-P0
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:27:32 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dpHij-00022u-5K
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:33:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpHdD-0002rh-6Y
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:27:27 -0400
-Received: from mail-qt0-x22a.google.com ([2607:f8b0:400d:c0d::22a]:35514)
+	(envelope-from <alistair23@gmail.com>) id 1dpHie-0005od-Ia
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:33:05 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:36440)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpHdD-0002rR-2L
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:27:23 -0400
-Received: by mail-qt0-x22a.google.com with SMTP id k2so13783731qte.2
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 10:27:23 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue,  5 Sep 2017 14:27:14 -0300
-Message-Id: <20170905172714.15554-1-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1dpHie-0005nY-BN
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:33:00 -0400
+Received: by mail-wr0-x241.google.com with SMTP id 40so2030196wrv.3
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 10:32:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2] vhost-user: disable broken test
+Sender: alistair23@gmail.com
+In-Reply-To: <20170904141748.GU7570@localhost.localdomain>
+References: <cover.1504228916.git.alistair.francis@xilinx.com>
+	<5bf40ca8376c537ac05dd848a84e072a88a1d939.1504228916.git.alistair.francis@xilinx.com>
+	<20170904141748.GU7570@localhost.localdomain>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 5 Sep 2017 10:32:25 -0700
+Message-ID: <CAKmqyKMjQvWFQhnt_or9OhGDND=41p+iEFnQ7TCiMwEdm=W6Sw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v3 1/7] hw/i386: Improve some of the
+ warning messages
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,43 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Don Slutz <dslutz@verizon.com>
 
-tests/vhost-user-test keeps failing on build-system since Aug 15:
+On Mon, Sep 4, 2017 at 7:17 AM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> On Fri, Sep 01, 2017 at 09:51:05AM -0700, Alistair Francis wrote:
+> [...]
+>> diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
+>> index 169a214d50..435eb2c458 100644
+>> --- a/hw/i386/pc_q35.c
+>> +++ b/hw/i386/pc_q35.c
+>> @@ -101,9 +101,11 @@ static void pc_q35_init(MachineState *machine)
+>>          lowmem = pcms->max_ram_below_4g;
+>>          if (machine->ram_size - lowmem > lowmem &&
+>>              lowmem & ((1ULL << 30) - 1)) {
+>> -            warn_report("Large machine and max_ram_below_4g(%"PRIu64
+>> -                        ") not a multiple of 1G; possible bad performance.",
+>> -                        pcms->max_ram_below_4g);
+>> +            warn_report("Large machine as the ram size (0x%" PRIx64 ") is more"
+>> +                        " then twice the size of the internal limit"
+>> +                        " (0x%" PRIx64 ") and max-ram-below-4g (%"PRIu64")"
+>> +                        " note a multiple of 1G; possible bad performance.",
+>> +                        machine->ram_size, lowmem, pcms->max_ram_below_4g);
+>
+> Here lowmem and max_ram_below_4g have exactly the same value,
+> don't they?  There's no internal limit involved in this logic,
+> only max_ram_below_4g and ram_size.
 
-  ERROR:tests/vhost-user-test.c:835:test_flags_mismatch: child process (/i386/vhost-user/flags-mismatch/subprocess [4836]) failed unexpectedly
-...
-  ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process (/x86_64/vhost-user/connect-fail/subprocess [58910]) failed unexpectedly
+Good point, I'll change it to this:
 
-The test can still be build for debug session using:
+warn_report("There is possibly poor performance as the ram size "
+            " (0x%" PRIx64 ") is more then twice the size of"
+            " max-ram-below-4g (%"PRIu64") and"
+            " max-ram-below-4g is not a multiple of 1G.",
+            machine->ram_size, pcms->max_ram_below_4g);
 
-  $ FORCE_VHOST_USER_NET_TEST=1 ./configure ...
+Thanks,
+Alistair
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-v2: remove unuseful warning
-
- configure | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/configure b/configure
-index fb7e34a901..921b3e1cff 100755
---- a/configure
-+++ b/configure
-@@ -6386,7 +6386,11 @@ if supported_kvm_target $target; then
-     if test "$vhost_net" = "yes" ; then
-         echo "CONFIG_VHOST_NET=y" >> $config_target_mak
-         if test "$vhost_user" = "yes" ; then
--            echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
-+            # test currently broken (v2.10.0) but can still be forced using:
-+            #   FORCE_VHOST_USER_NET_TEST=1 ./configure [...]
-+            if test -n "${FORCE_VHOST_USER_NET_TEST}"; then
-+                echo "CONFIG_VHOST_USER_NET_TEST_$target_name=y" >> $config_host_mak
-+            fi
-         fi
-     fi
- fi
--- 
-2.14.1
+>
+> --
+> Eduardo
