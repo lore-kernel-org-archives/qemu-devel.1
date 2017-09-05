@@ -1,19 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpAak-0004PF-0C
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:56:26 -0400
+	(envelope-from <thuth@redhat.com>) id 1dpAdU-0006Zt-02
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:59:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpAaf-0003LQ-A9
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:56:22 -0400
-Date: Tue, 5 Sep 2017 10:56:10 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170905095610.GF17449@stefanha-x1.localdomain>
-References: <20170901201054.11738-1-briansteffens@gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1dpAdK-0005TD-Cx
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:59:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57130)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dpAdK-0005SM-6r
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:59:02 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 066B38765D
+	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 09:59:01 +0000 (UTC)
+References: <20170901180340.30009-1-eblake@redhat.com>
+	<20170901180340.30009-3-eblake@redhat.com>
+	<09983e6e-9506-ca02-a8ce-b1a1773d793c@redhat.com>
+	<874lshzd2l.fsf@dusky.pond.sub.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1e7502ef-2798-54b1-b3dc-dec9d6fee6c0@redhat.com>
+Date: Tue, 5 Sep 2017 11:58:56 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170901201054.11738-1-briansteffens@gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] block: add block device shared field
+In-Reply-To: <874lshzd2l.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 02/29] tests: Sort .gitignore
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,65 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brian Steffens <briansteffens@gmail.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 
-On Fri, Sep 01, 2017 at 08:10:54PM +0000, Brian Steffens wrote:
-> This adds a boolean option called 'shared' to block devices. It defaults
-> to off/false. When enabled for a particular block device, the 'shared' option
-> causes the block migration code to skip over syncing of that device. This
-> allows controlling exactly which block devices get synced during a migration.
-> 
-> Signed-off-by: Brian Steffens <briansteffens@gmail.com>
-> ---
->  block.c                   | 7 +++++++
->  block/qapi.c              | 2 ++
->  include/block/block.h     | 1 +
->  include/block/block_int.h | 3 +++
->  migration/block.c         | 4 ++++
->  qapi/block-core.json      | 2 +-
->  6 files changed, 18 insertions(+), 1 deletion(-)
+On 05.09.2017 11:53, Markus Armbruster wrote:
+> Thomas Huth <thuth@redhat.com> writes:
+>=20
+>> On 01.09.2017 20:03, Eric Blake wrote:
+>>> It doesn't matter if things are unsorted, but finding stuff in a list
+>>> is easier when it is sorted.  (Sorted under LC_ALL=3DC rules, rather =
+than
+>>> en_US.UTF-8).
+>>>
+>>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>> ---
+>>>  tests/.gitignore | 30 +++++++++++++++---------------
+>>>  1 file changed, 15 insertions(+), 15 deletions(-)
+>>
+>> Reviewed-by: Thomas Huth <thuth@redhat.com>
+>>
+>> BTW, did you note the patch "build-sys: generate tests/.gitignore" fro=
+m
+>> Marc-Andr=C3=A9 ? Maybe the list can be generated automatically, too..=
+.
+>>
+>>> diff --git a/tests/.gitignore b/tests/.gitignore
+>>> index 64ecd6683b..8d35a58751 100644
+>>> --- a/tests/.gitignore
+>>> +++ b/tests/.gitignore
+>>> @@ -1,25 +1,27 @@
+>>> +*-test
+>>
+>> ... but looking at this wildcard, I wonder if we just named most of ou=
+r
+>> tests in a bad way. If we name the files something-test instead of
+>> test-something, we maybe do not need the automatic generation from
+>> Marc-Andr=C3=A9 (which is kind of ugly because it writes to the source
+>> directory - and this should not happen when doing out of tree builds).
+>>
+>> So what do you think about renaming our tests, so that the above
+>> wildcard applies instead?
+>=20
+> Apropos naming tests: there's an (unspoken) convention to name unit
+> tests check-FOO or test-FOO and tests using libqtest FOO-test, but it's
+> not really honored anymore, probably because people creating tests
+> didn't know about it.
 
-Thanks for the patch!  Please email the relevant maintainers:
+Maybe it would help to have an entry for libqtest in MAINTAINERS with a
+wildcard for tests/*-test.c ? Then we would have at least some kind of
+documentation for this... (BTW: Any volunteers here for such a
+maintainer job? ;-))
 
-  $ scripts/get_maintainer.pl -f block.c
-  Kevin Wolf <kwolf@redhat.com> (supporter:Block layer core)
-  Max Reitz <mreitz@redhat.com> (supporter:Block layer core)
-  qemu-block@nongnu.org (open list:Block layer core)
-  qemu-devel@nongnu.org (open list:All patches CC here)
-
-I have CCed them so they see this email.
-
-> diff --git a/migration/block.c b/migration/block.c
-> index 9171f60028..b347c3dc61 100644
-> --- a/migration/block.c
-> +++ b/migration/block.c
-> @@ -402,6 +402,10 @@ static int init_blk_migration(QEMUFile *f)
->      bmds_bs = g_malloc0(num_bs * sizeof(*bmds_bs));
->  
->      for (i = 0, bs = bdrv_first(&it); bs; bs = bdrv_next(&it), i++) {
-> +        if (bs->shared) {
-> +            continue;
-> +        }
-> +
-
-Have you considered extending the 'migrate' command with a list of
-drives instead?
-
-  { 'command': 'migrate',
-    'data': {'*blk': 'bool',
-	     '*drives': ['str'], <--- new!
-	     ...}}
-
-That way the set of drives doesn't need to be decided until migration
-time.  It avoids adding new state to BlockDriverState that is used only
-by the legacy block/migration.c code.
-
-In case you haven't seen it, the preferred approach for non-shared
-storage migration is drive-mirror + NBD.  The block/migration.c code is
-an older feature that is less flexible.  More info on drive-mirror +
-NBD:
-http://wiki.libvirt.org/page/NBD_storage_migration
-Slide 29 in http://events.linuxfoundation.org/sites/events/files/slides/A-Practical-Look-at-QEMU-Block-Layer-Primitives.pdf
-
-Stefan
+ Thomas
