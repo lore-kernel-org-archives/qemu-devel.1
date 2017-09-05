@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpJGA-0000Yd-Gk
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 15:11:47 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dpJLA-0004Rl-5A
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 15:16:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpJG4-0005cF-Qd
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 15:11:42 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Tue,  5 Sep 2017 14:11:14 -0500
-Message-Id: <20170905191114.5959-4-eblake@redhat.com>
-In-Reply-To: <20170905191114.5959-1-eblake@redhat.com>
-References: <20170905191114.5959-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] nbd: Use new qio_channel_*_all() functions
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dpJL4-0000ZH-Gu
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 15:16:52 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
+	<1503414539-28762-2-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <cfc75c71-1558-3405-8e5c-188cdb329bfe@amsat.org>
+Date: Tue, 5 Sep 2017 16:16:41 -0300
+MIME-Version: 1.0
+In-Reply-To: <1503414539-28762-2-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 01/20] target/arm: Implement
+ ARMv8M's PMSAv8 registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,240 +29,353 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, pbonzini@redhat.com, qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-Rather than open-coding our own read/write-all functions, we
-can make use of the recently-added qio code.  It slightly
-changes the error message in one of the iotests.
+Hi Peter,
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- include/block/nbd.h        |  2 --
- nbd/nbd-internal.h         | 41 +++++++----------------------------------
- block/nbd-client.c         | 15 +++++++--------
- nbd/common.c               | 45 ---------------------------------------------
- tests/qemu-iotests/083.out |  8 ++++----
- 5 files changed, 18 insertions(+), 93 deletions(-)
+On 08/22/2017 12:08 PM, Peter Maydell wrote:
+> As part of ARMv8M, we need to add support for the PMSAv8 MPU
+> architecture.
+> 
+> PMSAv8 differs from PMSAv7 both in register/data layout (for instance
+> using base and limit registers rather than base and size) and also in
+> behaviour (for example it does not have subregions); rather than
+> trying to wedge it into the existing PMSAv7 code and data structures,
+> we define separate ones.
+> 
+> This commit adds the data structures which hold the state for a
+> PMSAv8 MPU and the register interface to it.  The implementation of
+> the MPU behaviour will be added in a subsequent commit.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>   target/arm/cpu.h      |  13 ++++++
+>   hw/intc/armv7m_nvic.c | 122 ++++++++++++++++++++++++++++++++++++++++++++++----
+>   target/arm/cpu.c      |  36 ++++++++++-----
+>   target/arm/machine.c  |  28 +++++++++++-
+>   4 files changed, 179 insertions(+), 20 deletions(-)
+> 
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index fe6edb7..b6bb78a 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -522,6 +522,19 @@ typedef struct CPUARMState {
+>           uint32_t rnr;
+>       } pmsav7;
+>   
+> +    /* PMSAv8 MPU */
+> +    struct {
+> +        /* The PMSAv8 implementation also shares some PMSAv7 config
+> +         * and state:
+> +         *  pmsav7.rnr (region number register)
+> +         *  pmsav7_dregion (number of configured regions)
+> +         */
+> +        uint32_t *rbar;
+> +        uint32_t *rlar;
+> +        uint32_t mair0;
+> +        uint32_t mair1;
+> +    } pmsav8;
+> +
+>       void *nvic;
+>       const struct arm_boot_info *boot_info;
+>       /* Store GICv3CPUState to access from this struct */
+> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+> index bbfe2d5..c0dbbad 100644
+> --- a/hw/intc/armv7m_nvic.c
+> +++ b/hw/intc/armv7m_nvic.c
+> @@ -544,25 +544,67 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset)
+>       {
+>           int region = cpu->env.pmsav7.rnr;
+>   
+> +        if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
+> +            /* PMSAv8M handling of the aliases is different from v7M:
+> +             * aliases A1, A2, A3 override the low two bits of the region
+> +             * number in MPU_RNR, and there is no 'region' field in the
+> +             * RBAR register.
+> +             */
+> +            int aliasno = (offset - 0xd9c) / 8; /* 0..3 */
+> +            if (aliasno) {
+> +                region = deposit32(region, 0, 2, aliasno);
+> +            }
+> +            if (region >= cpu->pmsav7_dregion) {
+> +                return 0;
+> +            }
+> +            return cpu->env.pmsav8.rbar[region];
+> +        }
+> +
+>           if (region >= cpu->pmsav7_dregion) {
+>               return 0;
+>           }
+>           return (cpu->env.pmsav7.drbar[region] & 0x1f) | (region & 0xf);
+>       }
+> -    case 0xda0: /* MPU_RASR */
+> -    case 0xda8: /* MPU_RASR_A1 */
+> -    case 0xdb0: /* MPU_RASR_A2 */
+> -    case 0xdb8: /* MPU_RASR_A3 */
+> +    case 0xda0: /* MPU_RASR (v7M), MPU_RLAR (v8M) */
+> +    case 0xda8: /* MPU_RASR_A1 (v7M), MPU_RLAR_A1 (v8M) */
+> +    case 0xdb0: /* MPU_RASR_A2 (v7M), MPU_RLAR_A2 (v8M) */
+> +    case 0xdb8: /* MPU_RASR_A3 (v7M), MPU_RLAR_A3 (v8M) */
+>       {
+>           int region = cpu->env.pmsav7.rnr;
+>   
+> +        if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
+> +            /* PMSAv8M handling of the aliases is different from v7M:
+> +             * aliases A1, A2, A3 override the low two bits of the region
+> +             * number in MPU_RNR.
+> +             */
+> +            int aliasno = (offset - 0xda0) / 8; /* 0..3 */
+> +            if (aliasno) {
+> +                region = deposit32(region, 0, 2, aliasno);
+> +            }
+> +            if (region >= cpu->pmsav7_dregion) {
+> +                return 0;
+> +            }
+> +            return cpu->env.pmsav8.rlar[region];
+> +        }
+> +
+>           if (region >= cpu->pmsav7_dregion) {
+>               return 0;
+>           }
+>           return ((cpu->env.pmsav7.dracr[region] & 0xffff) << 16) |
+>               (cpu->env.pmsav7.drsr[region] & 0xffff);
+>       }
+> +    case 0xdc0: /* MPU_MAIR0 */
+> +        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
+> +            goto bad_offset;
+> +        }
+> +        return cpu->env.pmsav8.mair0;
+> +    case 0xdc4: /* MPU_MAIR1 */
+> +        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
+> +            goto bad_offset;
+> +        }
+> +        return cpu->env.pmsav8.mair1;
+>       default:
+> +    bad_offset:
+>           qemu_log_mask(LOG_GUEST_ERROR, "NVIC: Bad read offset 0x%x\n", offset);
+>           return 0;
+>       }
+> @@ -691,6 +733,26 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+>       {
+>           int region;
+>   
+> +        if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
+> +            /* PMSAv8M handling of the aliases is different from v7M:
+> +             * aliases A1, A2, A3 override the low two bits of the region
+> +             * number in MPU_RNR, and there is no 'region' field in the
+> +             * RBAR register.
+> +             */
+> +            int aliasno = (offset - 0xd9c) / 8; /* 0..3 */
+> +
+> +            region = cpu->env.pmsav7.rnr;
+> +            if (aliasno) {
+> +                region = deposit32(region, 0, 2, aliasno);
+> +            }
+> +            if (region >= cpu->pmsav7_dregion) {
+> +                return;
+> +            }
+> +            cpu->env.pmsav8.rbar[region] = value;
+> +            tlb_flush(CPU(cpu));
+> +            return;
+> +        }
+> +
+>           if (value & (1 << 4)) {
+>               /* VALID bit means use the region number specified in this
+>                * value and also update MPU_RNR.REGION with that value.
+> @@ -715,13 +777,32 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+>           tlb_flush(CPU(cpu));
+>           break;
+>       }
+> -    case 0xda0: /* MPU_RASR */
+> -    case 0xda8: /* MPU_RASR_A1 */
+> -    case 0xdb0: /* MPU_RASR_A2 */
+> -    case 0xdb8: /* MPU_RASR_A3 */
+> +    case 0xda0: /* MPU_RASR (v7M), MPU_RLAR (v8M) */
+> +    case 0xda8: /* MPU_RASR_A1 (v7M), MPU_RLAR_A1 (v8M) */
+> +    case 0xdb0: /* MPU_RASR_A2 (v7M), MPU_RLAR_A2 (v8M) */
+> +    case 0xdb8: /* MPU_RASR_A3 (v7M), MPU_RLAR_A3 (v8M) */
+>       {
+>           int region = cpu->env.pmsav7.rnr;
+>   
+> +        if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
+> +            /* PMSAv8M handling of the aliases is different from v7M:
+> +             * aliases A1, A2, A3 override the low two bits of the region
+> +             * number in MPU_RNR.
+> +             */
+> +            int aliasno = (offset - 0xd9c) / 8; /* 0..3 */
+> +
+> +            region = cpu->env.pmsav7.rnr;
+> +            if (aliasno) {
+> +                region = deposit32(region, 0, 2, aliasno);
+> +            }
+> +            if (region >= cpu->pmsav7_dregion) {
+> +                return;
+> +            }
+> +            cpu->env.pmsav8.rlar[region] = value;
+> +            tlb_flush(CPU(cpu));
+> +            return;
+> +        }
+> +
+>           if (region >= cpu->pmsav7_dregion) {
+>               return;
+>           }
+> @@ -731,6 +812,30 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+>           tlb_flush(CPU(cpu));
+>           break;
+>       }
+> +    case 0xdc0: /* MPU_MAIR0 */
+> +        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
+> +            goto bad_offset;
+> +        }
+> +        if (cpu->pmsav7_dregion) {
+> +            /* Register is RES0 if no MPU regions are implemented */
+> +            cpu->env.pmsav8.mair0 = value;
+> +        }
+> +        /* We don't need to do anything else because memory attributes
+> +         * only affect cacheability, and we don't implement caching.
+> +         */
+> +        break;
+> +    case 0xdc4: /* MPU_MAIR1 */
+> +        if (!arm_feature(&cpu->env, ARM_FEATURE_V8)) {
+> +            goto bad_offset;
+> +        }
+> +        if (cpu->pmsav7_dregion) {
+> +            /* Register is RES0 if no MPU regions are implemented */
+> +            cpu->env.pmsav8.mair1 = value;
+> +        }
+> +        /* We don't need to do anything else because memory attributes
+> +         * only affect cacheability, and we don't implement caching.
+> +         */
+> +        break;
+>       case 0xf00: /* Software Triggered Interrupt Register */
+>       {
+>           int excnum = (value & 0x1ff) + NVIC_FIRST_IRQ;
+> @@ -740,6 +845,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value)
+>           break;
+>       }
+>       default:
+> +    bad_offset:
+>           qemu_log_mask(LOG_GUEST_ERROR,
+>                         "NVIC: Bad write offset 0x%x\n", offset);
+>       }
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 41ae6ba..8b610de 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -228,17 +228,25 @@ static void arm_cpu_reset(CPUState *s)
+>       env->vfp.xregs[ARM_VFP_FPEXC] = 0;
+>   #endif
+>   
+> -    if (arm_feature(env, ARM_FEATURE_PMSA) &&
+> -        arm_feature(env, ARM_FEATURE_V7)) {
+> +    if (arm_feature(env, ARM_FEATURE_PMSA)) {
+>           if (cpu->pmsav7_dregion > 0) {
+> -            memset(env->pmsav7.drbar, 0,
+> -                   sizeof(*env->pmsav7.drbar) * cpu->pmsav7_dregion);
+> -            memset(env->pmsav7.drsr, 0,
+> -                   sizeof(*env->pmsav7.drsr) * cpu->pmsav7_dregion);
+> -            memset(env->pmsav7.dracr, 0,
+> -                   sizeof(*env->pmsav7.dracr) * cpu->pmsav7_dregion);
+> +            if (arm_feature(env, ARM_FEATURE_V8)) {
+> +                memset(env->pmsav8.rbar, 0,
+> +                       sizeof(*env->pmsav8.rbar) * cpu->pmsav7_dregion);
+> +                memset(env->pmsav8.rlar, 0,
+> +                       sizeof(*env->pmsav8.rlar) * cpu->pmsav7_dregion);
+> +            } else if (arm_feature(env, ARM_FEATURE_V7)) {
+> +                memset(env->pmsav7.drbar, 0,
+> +                       sizeof(*env->pmsav7.drbar) * cpu->pmsav7_dregion);
+> +                memset(env->pmsav7.drsr, 0,
+> +                       sizeof(*env->pmsav7.drsr) * cpu->pmsav7_dregion);
+> +                memset(env->pmsav7.dracr, 0,
+> +                       sizeof(*env->pmsav7.dracr) * cpu->pmsav7_dregion);
+> +            }
+>           }
+>           env->pmsav7.rnr = 0;
+> +        env->pmsav8.mair0 = 0;
+> +        env->pmsav8.mair1 = 0;
+>       }
+>   
+>       set_flush_to_zero(1, &env->vfp.standard_fp_status);
+> @@ -809,9 +817,15 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+>           }
+>   
+>           if (nr) {
+> -            env->pmsav7.drbar = g_new0(uint32_t, nr);
+> -            env->pmsav7.drsr = g_new0(uint32_t, nr);
+> -            env->pmsav7.dracr = g_new0(uint32_t, nr);
+> +            if (arm_feature(env, ARM_FEATURE_V8)) {
+> +                /* PMSAv8 */
+> +                env->pmsav8.rbar = g_new0(uint32_t, nr);
+> +                env->pmsav8.rlar = g_new0(uint32_t, nr);
+> +            } else {
+> +                env->pmsav7.drbar = g_new0(uint32_t, nr);
+> +                env->pmsav7.drsr = g_new0(uint32_t, nr);
+> +                env->pmsav7.dracr = g_new0(uint32_t, nr);
+> +            }
+>           }
+>       }
+>   
+> diff --git a/target/arm/machine.c b/target/arm/machine.c
+> index 3193b00..05e2909 100644
+> --- a/target/arm/machine.c
+> +++ b/target/arm/machine.c
+> @@ -159,7 +159,8 @@ static bool pmsav7_needed(void *opaque)
+>       CPUARMState *env = &cpu->env;
+>   
+>       return arm_feature(env, ARM_FEATURE_PMSA) &&
+> -           arm_feature(env, ARM_FEATURE_V7);
+> +           arm_feature(env, ARM_FEATURE_V7) &&
+> +           !arm_feature(env, ARM_FEATURE_V8);
+>   }
+>   
+>   static bool pmsav7_rgnr_vmstate_validate(void *opaque, int version_id)
+> @@ -209,6 +210,31 @@ static const VMStateDescription vmstate_pmsav7_rnr = {
+>       }
+>   };
+>   
+> +static bool pmsav8_needed(void *opaque)
+> +{
+> +    ARMCPU *cpu = opaque;
+> +    CPUARMState *env = &cpu->env;
+> +
+> +    return arm_feature(env, ARM_FEATURE_PMSA) &&
+> +        arm_feature(env, ARM_FEATURE_V8);
+> +}
+> +
+> +static const VMStateDescription vmstate_pmsav8 = {
+> +    .name = "cpu/pmsav8",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = pmsav8_needed,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_VARRAY_UINT32(env.pmsav8.rbar, ARMCPU, pmsav7_dregion, 0,
+> +                              vmstate_info_uint32, uint32_t),
+> +        VMSTATE_VARRAY_UINT32(env.pmsav8.rlar, ARMCPU, pmsav7_dregion, 0,
+> +                              vmstate_info_uint32, uint32_t),
+> +        VMSTATE_UINT32(env.pmsav8.mair0, ARMCPU),
+> +        VMSTATE_UINT32(env.pmsav8.mair1, ARMCPU),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>   static int get_cpsr(QEMUFile *f, void *opaque, size_t size,
+>                       VMStateField *field)
+>   {
+> 
 
-diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 040cdd2e60..707fd37575 100644
---- a/include/block/nbd.h
-+++ b/include/block/nbd.h
-@@ -155,8 +155,6 @@ struct NBDExportInfo {
- };
- typedef struct NBDExportInfo NBDExportInfo;
+maybe you plan to add migration between version 22 and 23 in a later 
+patch, else
 
--ssize_t nbd_rwv(QIOChannel *ioc, struct iovec *iov, size_t niov, size_t length,
--                bool do_read, Error **errp);
- int nbd_receive_negotiate(QIOChannel *ioc, const char *name,
-                           QCryptoTLSCreds *tlscreds, const char *hostname,
-                           QIOChannel **outioc, NBDExportInfo *info,
-diff --git a/nbd/nbd-internal.h b/nbd/nbd-internal.h
-index 03549e3f39..8a609a227f 100644
---- a/nbd/nbd-internal.h
-+++ b/nbd/nbd-internal.h
-@@ -85,28 +85,14 @@
- static inline int nbd_read_eof(QIOChannel *ioc, void *buffer, size_t size,
-                                Error **errp)
- {
--    struct iovec iov = { .iov_base = buffer, .iov_len = size };
--    ssize_t ret;
--
--    /* Sockets are kept in blocking mode in the negotiation phase.  After
--     * that, a non-readable socket simply means that another thread stole
--     * our request/reply.  Synchronization is done with recv_coroutine, so
--     * that this is coroutine-safe.
--     */
-+    int ret;
+...
+const VMStateDescription vmstate_arm_cpu = {
+     ...
+     .subsections = (const VMStateDescription*[]) {
+         ...
+         &vmstate_pmsav8,
 
-     assert(size);
--
--    ret = nbd_rwv(ioc, &iov, 1, size, true, errp);
--    if (ret <= 0) {
--        return ret;
-+    ret = qio_channel_read_all_eof(ioc, buffer, size, errp);
-+    if (ret < 0) {
-+        ret = -EIO;
-     }
--
--    if (ret != size) {
--        error_setg(errp, "End of file");
--        return -EINVAL;
--    }
--
--    return 1;
-+    return ret;
- }
+do not forget this ^
 
- /* nbd_read
-@@ -115,14 +101,7 @@ static inline int nbd_read_eof(QIOChannel *ioc, void *buffer, size_t size,
- static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,
-                            Error **errp)
- {
--    int ret = nbd_read_eof(ioc, buffer, size, errp);
--
--    if (ret == 0) {
--        ret = -EINVAL;
--        error_setg(errp, "End of file");
--    }
--
--    return ret < 0 ? ret : 0;
-+    return qio_channel_read_all(ioc, buffer, size, errp) < 0 ? -EIO : 0;
- }
+Regards,
 
- /* nbd_write
-@@ -131,13 +110,7 @@ static inline int nbd_read(QIOChannel *ioc, void *buffer, size_t size,
- static inline int nbd_write(QIOChannel *ioc, const void *buffer, size_t size,
-                             Error **errp)
- {
--    struct iovec iov = { .iov_base = (void *) buffer, .iov_len = size };
--
--    ssize_t ret = nbd_rwv(ioc, &iov, 1, size, false, errp);
--
--    assert(ret < 0 || ret == size);
--
--    return ret < 0 ? ret : 0;
-+    return qio_channel_write_all(ioc, buffer, size, errp) < 0 ? -EIO : 0;
- }
-
- struct NBDTLSHandshakeData {
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index f0dbea24d3..ee7f758e68 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -121,7 +121,7 @@ static int nbd_co_send_request(BlockDriverState *bs,
-                                QEMUIOVector *qiov)
- {
-     NBDClientSession *s = nbd_get_client_session(bs);
--    int rc, ret, i;
-+    int rc, i;
-
-     qemu_co_mutex_lock(&s->send_mutex);
-     while (s->in_flight == MAX_NBD_REQUESTS) {
-@@ -156,9 +156,9 @@ static int nbd_co_send_request(BlockDriverState *bs,
-         qio_channel_set_cork(s->ioc, true);
-         rc = nbd_send_request(s->ioc, request);
-         if (rc >= 0 && !s->quit) {
--            ret = nbd_rwv(s->ioc, qiov->iov, qiov->niov, request->len, false,
--                          NULL);
--            if (ret != request->len) {
-+            assert(request->len == iov_size(qiov->iov, qiov->niov));
-+            if (qio_channel_writev_all(s->ioc, qiov->iov, qiov->niov,
-+                                       NULL) < 0) {
-                 rc = -EIO;
-             }
-         }
-@@ -184,7 +184,6 @@ static void nbd_co_receive_reply(NBDClientSession *s,
-                                  QEMUIOVector *qiov)
- {
-     int i = HANDLE_TO_INDEX(s, request->handle);
--    int ret;
-
-     /* Wait until we're woken up by nbd_read_reply_entry.  */
-     s->requests[i].receiving = true;
-@@ -195,9 +194,9 @@ static void nbd_co_receive_reply(NBDClientSession *s,
-         reply->error = EIO;
-     } else {
-         if (qiov && reply->error == 0) {
--            ret = nbd_rwv(s->ioc, qiov->iov, qiov->niov, request->len, true,
--                          NULL);
--            if (ret != request->len) {
-+            assert(request->len == iov_size(qiov->iov, qiov->niov));
-+            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
-+                                      NULL) < 0) {
-                 reply->error = EIO;
-                 s->quit = true;
-             }
-diff --git a/nbd/common.c b/nbd/common.c
-index e288d1b972..59a5316be9 100644
---- a/nbd/common.c
-+++ b/nbd/common.c
-@@ -20,51 +20,6 @@
- #include "qapi/error.h"
- #include "nbd-internal.h"
-
--/* nbd_wr_syncv
-- * The function may be called from coroutine or from non-coroutine context.
-- * When called from non-coroutine context @ioc must be in blocking mode.
-- */
--ssize_t nbd_rwv(QIOChannel *ioc, struct iovec *iov, size_t niov, size_t length,
--                bool do_read, Error **errp)
--{
--    ssize_t done = 0;
--    struct iovec *local_iov = g_new(struct iovec, niov);
--    struct iovec *local_iov_head = local_iov;
--    unsigned int nlocal_iov = niov;
--
--    nlocal_iov = iov_copy(local_iov, nlocal_iov, iov, niov, 0, length);
--
--    while (nlocal_iov > 0) {
--        ssize_t len;
--        if (do_read) {
--            len = qio_channel_readv(ioc, local_iov, nlocal_iov, errp);
--        } else {
--            len = qio_channel_writev(ioc, local_iov, nlocal_iov, errp);
--        }
--        if (len == QIO_CHANNEL_ERR_BLOCK) {
--            /* errp should not be set */
--            assert(qemu_in_coroutine());
--            qio_channel_yield(ioc, do_read ? G_IO_IN : G_IO_OUT);
--            continue;
--        }
--        if (len < 0) {
--            done = -EIO;
--            goto cleanup;
--        }
--
--        if (do_read && len == 0) {
--            break;
--        }
--
--        iov_discard_front(&local_iov, &nlocal_iov, len);
--        done += len;
--    }
--
-- cleanup:
--    g_free(local_iov_head);
--    return done;
--}
--
- /* Discard length bytes from channel.  Return -errno on failure and 0 on
-  * success */
- int nbd_drop(QIOChannel *ioc, size_t size, Error **errp)
-diff --git a/tests/qemu-iotests/083.out b/tests/qemu-iotests/083.out
-index fb71b6f8ad..25dde519e3 100644
---- a/tests/qemu-iotests/083.out
-+++ b/tests/qemu-iotests/083.out
-@@ -69,12 +69,12 @@ read failed: Input/output error
-
- === Check disconnect 4 reply ===
-
--End of file
-+Unexpected end-of-file before all bytes were read
- read failed: Input/output error
-
- === Check disconnect 8 reply ===
-
--End of file
-+Unexpected end-of-file before all bytes were read
- read failed: Input/output error
-
- === Check disconnect before data ===
-@@ -180,12 +180,12 @@ read failed: Input/output error
-
- === Check disconnect 4 reply ===
-
--End of file
-+Unexpected end-of-file before all bytes were read
- read failed: Input/output error
-
- === Check disconnect 8 reply ===
-
--End of file
-+Unexpected end-of-file before all bytes were read
- read failed: Input/output error
-
- === Check disconnect before data ===
--- 
-2.13.5
+Phil.
