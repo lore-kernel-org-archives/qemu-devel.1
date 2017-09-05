@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33746)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpIEq-0005vV-Un
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 14:06:21 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpIFM-0006AC-Mj
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 14:06:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpIEm-0007Pz-5H
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 14:06:16 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:33577)
+	(envelope-from <peter.maydell@linaro.org>) id 1dpIFH-0007gg-UC
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 14:06:48 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:38306)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpIEm-0007Pj-0C
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 14:06:12 -0400
-Received: by mail-qt0-x241.google.com with SMTP id h15so2639841qta.0
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 11:06:11 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue,  5 Sep 2017 15:06:02 -0300
-Message-Id: <20170905180602.28698-1-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dpIFH-0007g5-N6
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 14:06:43 -0400
+Received: by mail-wr0-x235.google.com with SMTP id 108so10156232wra.5
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 11:06:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3] vhost-user: disable the *broken* subprocess
- tests
+In-Reply-To: <CAF6HrYwT7WP_i7cVhvEyRvqSK7J+bLnKU4b+WrMQfVkLaNDrvQ@mail.gmail.com>
+References: <CAF6HrYxj5BoTQpQjz95Z1_N_p615jpEE12xh_afuuqE4fcTyLg@mail.gmail.com>
+	<CAFEAcA9YNO7kgC8yzZ_RUKck=+98pUET0ogVZ7TvC1kxV+_fFA@mail.gmail.com>
+	<CAF6HrYwT7WP_i7cVhvEyRvqSK7J+bLnKU4b+WrMQfVkLaNDrvQ@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Sep 2017 19:06:22 +0100
+Message-ID: <CAFEAcA9kEEyUj7=7Wd-jNbVOWwfgkj0a201q+L4e5CDR22JUgw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Questions regarding emulated UART in VersatilePB
+ board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +31,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Daniel P . Berrange" <berrange@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Ramy Sameh <ramysameh26@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ahmed Aly <ahmedaly50@gmail.com>
 
-tests/vhost-user-test keeps failing on build-system since Aug 15:
+On 5 September 2017 at 18:56, Ramy Sameh <ramysameh26@gmail.com> wrote:
+> Are there any documentation or source of information, that can describe how
+> interrupts are implemented, and how to use them (where is the vector table
+> to put the ISR ... etc) ?
 
-  ERROR:tests/vhost-user-test.c:835:test_flags_mismatch: child process (/i386/vhost-user/flags-mismatch/subprocess [4836]) failed unexpectedly
-...
-  ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process (/x86_64/vhost-user/connect-fail/subprocess [58910]) failed unexpectedly
+The source code is it.
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Suggested-by: Daniel P. Berrange <berrange@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-v3: only disable tests using glib subprocess,
-    migrate/multiqueue/guest-mem are still tested.
+Note that the pl011 is only a UART. It is used in a variety
+of different boards, which have different interrupt controllers,
+and with different CPUs. Things like ISR vector tables are
+generally part of the CPU or interrupt controller emulation.
 
-v2: remove unuseful warning
+The pl011's part of this is simply to raise and lower its outbound IRQ line
+when the conditions are right -- this happens by calling qemu_set_irq()
+in pl011_update(). This corresponds to the hardware's UARTINTR line.
+In QEMU that IRQ line is connected up to an emulated interrupt controller
+which in turn is connected to an emulated CPU, just as in hardware
+the pl011 UARTINTR line is connected to a hardware interrupt controller
+and thus to a CPU.
 
- tests/vhost-user-test.c | 17 ++++++++++-------
- 1 file changed, 10 insertions(+), 7 deletions(-)
+For information on how guest code should use a UART, how it should
+set up interrupts and so on, you should consult the documentation
+on how the hardware behaves.
 
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index d4da09f147..4b98018478 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -31,6 +31,8 @@
- #include <linux/virtio_net.h>
- #include <sys/vfs.h>
- 
-+#define VHOST_USER_NET_TESTS_WORKING 0 /* broken as of 2.10.0 */
-+
- /* GLIB version compatibility flags */
- #if !GLIB_CHECK_VERSION(2, 26, 0)
- #define G_TIME_SPAN_SECOND              (G_GINT64_CONSTANT(1000000))
-@@ -472,11 +474,6 @@ static void test_server_listen(TestServer *server)
-     test_server_create_chr(server, ",server,nowait");
- }
- 
--static inline void test_server_connect(TestServer *server)
--{
--    test_server_create_chr(server, ",reconnect=1");
--}
--
- #define GET_QEMU_CMD(s)                                         \
-     g_strdup_printf(QEMU_CMD, 512, 512, (root), (s)->chr_name,  \
-                     (s)->socket_path, "", (s)->chr_name)
-@@ -722,7 +719,12 @@ static void wait_for_rings_started(TestServer *s, size_t count)
-     g_mutex_unlock(&s->data_mutex);
- }
- 
--#ifdef CONFIG_HAS_GLIB_SUBPROCESS_TESTS
-+#if VHOST_USER_NET_TESTS_WORKING && defined(CONFIG_HAS_GLIB_SUBPROCESS_TESTS)
-+static inline void test_server_connect(TestServer *server)
-+{
-+    test_server_create_chr(server, ",reconnect=1");
-+}
-+
- static gboolean
- reconnect_cb(gpointer user_data)
- {
-@@ -962,7 +964,8 @@ int main(int argc, char **argv)
-     qtest_add_data_func("/vhost-user/read-guest-mem", server, read_guest_mem);
-     qtest_add_func("/vhost-user/migrate", test_migrate);
-     qtest_add_func("/vhost-user/multiqueue", test_multiqueue);
--#ifdef CONFIG_HAS_GLIB_SUBPROCESS_TESTS
-+
-+#if VHOST_USER_NET_TESTS_WORKING && defined(CONFIG_HAS_GLIB_SUBPROCESS_TESTS)
-     qtest_add_func("/vhost-user/reconnect/subprocess",
-                    test_reconnect_subprocess);
-     qtest_add_func("/vhost-user/reconnect", test_reconnect);
--- 
-2.14.1
+> In addition, any source of info that describes the code workflow when
+> reading or writing to the uart would be very helpful.
+> (because I put printfs in the functions to understand the workflow, but the
+> order of these printfs made me very confused).
+>
+> Regarding the registers, I have checked pl011_read and pl011_write, and
+> found them, thanks for that.
+> But I couldn't find the register "UARTICR" (Interrupt clear register)
+> I think this might be related to my lack of understanding of how interrupts
+> are implemented in emulated pl011.
+
+UARTICR is a write-only register, so it is handled only in
+pl011_write():
+
+    case 17: /* UARTICR */
+        s->int_level &= ~value;
+        pl011_update(s);
+        break;
+
+(It's write-1-to-clear, hence the &= ~.)
+
+> Regarding the ID registers, whose values are hard-wired in the board, and
+> there was no need to implement modifiable states for them.
+> Do you mean Peripheral identification registers, UARTPeriphID0-3 and
+> PrimeCell identification registers, UARTPCellID0-3 ?
+
+Yes. (See the pl011_id_arm[] array which has the values.)
+
+thanks
+-- PMM
