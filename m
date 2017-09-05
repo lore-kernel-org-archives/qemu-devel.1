@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dp559-00085Z-FQ
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 00:03:28 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dp59C-0002pp-R9
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 00:07:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1dp554-0005Sm-N8
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 00:03:23 -0400
-Received: from mail-ua0-x243.google.com ([2607:f8b0:400c:c08::243]:33736)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1dp554-0005SR-Ib
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 00:03:18 -0400
-Received: by mail-ua0-x243.google.com with SMTP id s15so849554uag.0
-	for <qemu-devel@nongnu.org>; Mon, 04 Sep 2017 21:03:18 -0700 (PDT)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dp597-0008C6-44
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 00:07:34 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:4856
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dp596-00083q-9V
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 00:07:29 -0400
+References: <1502241852-6302-1-git-send-email-mst@redhat.com>
+	<1502241852-6302-4-git-send-email-mst@redhat.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <7927e87a-3546-fd32-2423-6a493299bff1@cn.fujitsu.com>
+Date: Tue, 5 Sep 2017 12:05:11 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170905035457.3753-9-Sergio.G.DelReal@gmail.com>
-References: <20170905035457.3753-1-Sergio.G.DelReal@gmail.com>
-	<20170905035457.3753-9-Sergio.G.DelReal@gmail.com>
-From: =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?=
-	<sergio.g.delreal@gmail.com>
-Date: Mon, 4 Sep 2017 23:03:17 -0500
-Message-ID: <CAMzKsXu29K+b=fGuPLti5if6zj5=pQhpmQz1iei6-hgjbq_41Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v3 08/14] hvf: add compilation rules to
- Makefile.objs
+In-Reply-To: <1502241852-6302-4-git-send-email-mst@redhat.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL 3/5] net: fix -netdev socket,
+ fd= for UDP sockets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,38 +28,167 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, Jens Freimann <jfreimann@redhat.com>
 
-Note that until this patch (8/14) there is no compiling. I tried to put
-this patch earlier in the patchset but found difficulties because some
-things need to be done before the hvf code compiles well.
-Also, the commit message needs to be updated (remove the -enable-hvf part).
 
-On Mon, Sep 4, 2017 at 10:54 PM, Sergio Andres Gomez Del Real <
-sergio.g.delreal@gmail.com> wrote:
 
-> This commit adds to target/i386/Makefile.objs the necessary rules so
-> that the new files for hvf are compiled by the build system.
-> It also adds handling of the -enable-hvf argument in the main function
-> in vl.c.
+On 08/09/2017 09:50 AM, Michael S. Tsirkin wrote:
+> From: Jens Freimann <jfreimann@redhat.com>
 >
-> Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
+> This patch fixes -netdev socket,fd= for UDP sockets
+> Currently -netdev socket,fd=<...> results in
+>
+>   qemu: error: specified mcastaddr "127.0.0.1" (0x7f000001) does not
+>     contain a multicast address
+>   qemu-system-x86_64: -netdev
+>     socket,id=n1,fd=3: Device 'socket' could not be initialized
+>
+> To fix these we need to allow specifying multicast and fd arguments
+> for the same netdev. With this the user can specify "-netdev
+> fd=3,mcast=<IP:port>"
+>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Fixes: 3d830459b1eccdb61b75e2712fd364012ce5a115
+> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 > ---
->  target/i386/Makefile.objs | 1 +
->  1 file changed, 1 insertion(+)
+>  net/socket.c | 37 ++++++++++++++++++-------------------
+>  1 file changed, 18 insertions(+), 19 deletions(-)
 >
-> diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
-> index 6a26e9d9f0..0bef89c099 100644
-> --- a/target/i386/Makefile.objs
-> +++ b/target/i386/Makefile.objs
-> @@ -12,4 +12,5 @@ obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-windows.o
->  endif
->  ifdef CONFIG_DARWIN
->  obj-$(CONFIG_HAX) += hax-all.o hax-mem.o hax-darwin.o
-> +obj-$(CONFIG_HVF) += hvf-utils/ hvf-all.o
->  endif
-> --
-> 2.14.1
+> diff --git a/net/socket.c b/net/socket.c
+> index f85ef7d..18af2ab 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -320,11 +320,11 @@ static NetClientInfo net_dgram_socket_info = {
+>  static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
+>                                                  const char *model,
+>                                                  const char *name,
+> -                                                int fd, int is_connected)
+> +                                                int fd, int is_connected,
+> +                                                const char *mcast)
+>  {
+>      struct sockaddr_in saddr;
+>      int newfd;
+> -    socklen_t saddr_len = sizeof(saddr);
+>      NetClientState *nc;
+>      NetSocketState *s;
 >
+> @@ -333,8 +333,13 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
+>       * by ONLY ONE process: we must "clone" this dgram socket --jjo
+>       */
+>
+> -    if (is_connected) {
+> -        if (getsockname(fd, (struct sockaddr *) &saddr, &saddr_len) == 0) {
+> +    if (is_connected && mcast != NULL) {
+> +            if (parse_host_port(&saddr, mcast) < 0) {
+> +                fprintf(stderr,
+> +                        "qemu: error: init_dgram: fd=%d failed parse_host_port()\n",
+> +                        fd);
+> +                goto err;
+> +            }
+>              /* must be bound */
+>              if (saddr.sin_addr.s_addr == 0) {
+>                  fprintf(stderr, "qemu: error: init_dgram: fd=%d unbound, "
+> @@ -351,12 +356,6 @@ static NetSocketState *net_socket_fd_init_dgram(NetClientState *peer,
+>              dup2(newfd, fd);
+>              close(newfd);
+>
+> -        } else {
+> -            fprintf(stderr,
+> -                    "qemu: error: init_dgram: fd=%d failed getsockname(): %s\n",
+> -                    fd, strerror(errno));
+> -            goto err;
+> -        }
+>      }
+>
+>      nc = qemu_new_net_client(&net_dgram_socket_info, peer, model, name);
+> @@ -432,7 +431,7 @@ static NetSocketState *net_socket_fd_init_stream(NetClientState *peer,
+>
+>  static NetSocketState *net_socket_fd_init(NetClientState *peer,
+>                                            const char *model, const char *name,
+> -                                          int fd, int is_connected)
+> +                                          int fd, int is_connected, const char *mc)
+>  {
+>      int so_type = -1, optlen=sizeof(so_type);
+>
+> @@ -445,7 +444,7 @@ static NetSocketState *net_socket_fd_init(NetClientState *peer,
+>      }
+>      switch(so_type) {
+>      case SOCK_DGRAM:
+> -        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected);
+> +        return net_socket_fd_init_dgram(peer, model, name, fd, is_connected, mc);
+>      case SOCK_STREAM:
+>          return net_socket_fd_init_stream(peer, model, name, fd, is_connected);
+>      default:
+> @@ -567,7 +566,7 @@ static int net_socket_connect_init(NetClientState *peer,
+>              break;
+>          }
+>      }
+> -    s = net_socket_fd_init(peer, model, name, fd, connected);
+> +    s = net_socket_fd_init(peer, model, name, fd, connected, NULL);
+>      if (!s)
+>          return -1;
+>      snprintf(s->nc.info_str, sizeof(s->nc.info_str),
+> @@ -602,7 +601,7 @@ static int net_socket_mcast_init(NetClientState *peer,
+>      if (fd < 0)
+>          return -1;
+>
+> -    s = net_socket_fd_init(peer, model, name, fd, 0);
+> +    s = net_socket_fd_init(peer, model, name, fd, 0, NULL);
+>      if (!s)
+>          return -1;
+>
+> @@ -652,7 +651,7 @@ static int net_socket_udp_init(NetClientState *peer,
+>      }
+>      qemu_set_nonblock(fd);
+>
+> -    s = net_socket_fd_init(peer, model, name, fd, 0);
+> +    s = net_socket_fd_init(peer, model, name, fd, 0, NULL);
+>      if (!s) {
+>          return -1;
+>      }
+> @@ -675,9 +674,9 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>      assert(netdev->type == NET_CLIENT_DRIVER_SOCKET);
+>      sock = &netdev->u.socket;
+>
+> -    if (sock->has_fd + sock->has_listen + sock->has_connect + sock->has_mcast +
+> -        sock->has_udp != 1) {
+> -        error_report("exactly one of fd=, listen=, connect=, mcast= or udp="
+> +    if (sock->has_listen + sock->has_connect + sock->has_mcast +
+> +        sock->has_udp > 1) {
+> +        error_report("exactly one of listen=, connect=, mcast= or udp="
+>                       " is required");
+>          return -1;
+>      }
+
+Hi, all
+
+I think there is a bug in here:
+
+$ ./x86_64-softmmu/qemu-system-x86_64 -net socket
+qemu-system-x86_64: net/socket.c:729: net_init_socket: Assertion `sock->has_udp' failed.
+Aborted (core dumped)
+
+Exactly one of listen=, connect=, mcast= or udp= is required. It
+means less or more than one is wrong. But here ignores the situation
+that one has not been specified to occur the above error.
+
+If I am wrong, please correct me, else I will send a patch to fix it. :)
+
+Thanks,
+Mao
+
+
+> @@ -696,7 +695,7 @@ int net_init_socket(const Netdev *netdev, const char *name,
+>              return -1;
+>          }
+>          qemu_set_nonblock(fd);
+> -        if (!net_socket_fd_init(peer, "socket", name, fd, 1)) {
+> +        if (!net_socket_fd_init(peer, "socket", name, fd, 1, sock->mcast)) {
+>              return -1;
+>          }
+>          return 0;
 >
