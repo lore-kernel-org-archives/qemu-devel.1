@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50459)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpAHX-00050Q-OQ
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:36:37 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dpAIN-0005j1-3Y
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:37:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpAHT-0004Qu-17
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:36:31 -0400
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-13-eblake@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <28a1f49b-ed07-8c46-eb0c-be9b92d106fe@redhat.com>
-Date: Tue, 5 Sep 2017 11:36:00 +0200
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dpAII-0005Ud-JD
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:37:23 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:22981)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dpAII-0005Tj-8h
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:37:18 -0400
+References: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1504541267-36954-7-git-send-email-pradeep.jagadeesh@huawei.com>
+	<w51tw0h7f9t.fsf@maestria.local.igalia.com>
+	<75f2f6f9-7d23-dced-6920-4b0be04876b9@huawei.com>
+	<w51r2vl7btq.fsf@maestria.local.igalia.com>
+	<0d3ed742-e6f8-8124-29c6-f123b68e8b08@huawei.com>
+	<w51o9qp7al2.fsf@maestria.local.igalia.com>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <a89406c9-2725-7016-fa3d-7c5008d19b5e@huawei.com>
+Date: Tue, 5 Sep 2017 11:36:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170901180340.30009-13-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 12/29] libqos: Track QTestState with
- QPCIBus
+In-Reply-To: <w51o9qp7al2.fsf@maestria.local.igalia.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v10 6/6] fsdev: hmp interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,97 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: "open list:IDE" <qemu-block@nongnu.org>, Alexander Graf <agraf@suse.de>, armbru@redhat.com, "open list:sPAPR" <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Alberto Garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On 01.09.2017 20:03, Eric Blake wrote:
-> When initializing a QPCIBus, track which QTestState the bus is
-> associated with (so that a later patch can then explicitly use
-> that test state for all communication on the bus, rather than
-> blindly relying on global_qtest).  Update the initialization
-> functions to take another parameter, and update all callers to
-> pass in state (for now, most callers get away with passing the
-> current global_qtest as the current state, although this required
-> fixing the order of initialization to ensure qtest_start() is
-> called before qpci_init*() in rtl8139-test, and provided an
-> opportunity to pass in the allocator in e1000e-test).
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
-[...]
-> diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
-> index 6226546c28..c95428e1cb 100644
-> --- a/tests/libqos/libqos.c
-> +++ b/tests/libqos/libqos.c
-> @@ -26,8 +26,8 @@ QOSState *qtest_vboot(QOSOps *ops, const char *cmdlin=
-e_fmt, va_list ap)
->          if (ops->init_allocator) {
->              qs->alloc =3D ops->init_allocator(ALLOC_NO_FLAGS);
->          }
-> -        if (ops->qpci_init && qs->alloc) {
-> -            qs->pcibus =3D ops->qpci_init(qs->alloc);
-> +        if (ops->qpci_init) {
+On 9/5/2017 11:34 AM, Alberto Garcia wrote:
+> On Tue 05 Sep 2017 11:13:09 AM CEST, Pradeep Jagadeesh wrote:
+>>> a) Declare an Error, pass it _and then handle it_ (if you don't
+>>>    handle it, you're leaking it):
+>>>
+>>> Here you have no other way to know if qmp_query_fsdev_io_throttle()
+>>> fails, so you should choose (a).
+>>>
+>> OK, I will pass NULL.
+>
+> :-)
+>
+> (it's ok I guess, I don't see how that function can ever be made to fail
+> in the future)
+:) Agreed.
 
-Why did you remove the check for qs->alloc?
+-Pradeep
 
-> +            qs->pcibus =3D ops->qpci_init(qs->qts, qs->alloc);
->          }
->      }
->=20
-> diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
-> index 02ce49927a..85b34c6d13 100644
-> --- a/tests/libqos/pci-pc.c
-> +++ b/tests/libqos/pci-pc.c
-> @@ -115,11 +115,14 @@ static void qpci_pc_config_writel(QPCIBus *bus, i=
-nt devfn, uint8_t offset, uint3
->      outl(0xcfc, value);
->  }
->=20
-> -QPCIBus *qpci_init_pc(QGuestAllocator *alloc)
-> +QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
->  {
->      QPCIBusPC *ret;
->=20
-> +    assert(qts);
-> +
->      ret =3D g_malloc(sizeof(*ret));
-> +    ret->bus.qts =3D qts;
->=20
->      ret->bus.pio_readb =3D qpci_pc_pio_readb;
->      ret->bus.pio_readw =3D qpci_pc_pio_readw;
-> diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
-> index 2043f1e123..cd9b8f52d2 100644
-> --- a/tests/libqos/pci-spapr.c
-> +++ b/tests/libqos/pci-spapr.c
-> @@ -154,11 +154,14 @@ static void qpci_spapr_config_writel(QPCIBus *bus=
-, int devfn, uint8_t offset,
->  #define SPAPR_PCI_MMIO32_WIN_SIZE    0x80000000 /* 2 GiB */
->  #define SPAPR_PCI_IO_WIN_SIZE        0x10000
->=20
-> -QPCIBus *qpci_init_spapr(QGuestAllocator *alloc)
-> +QPCIBus *qpci_init_spapr(QTestState *qts, QGuestAllocator *alloc)
->  {
->      QPCIBusSPAPR *ret;
->=20
-> +    assert(qts);
-> +
->      ret =3D g_malloc(sizeof(*ret));
-
-+1 for using g_malloc0 here instead.
-
-> +    ret->bus.qts =3D qts;
->=20
->      ret->alloc =3D alloc;
->=20
-> @@ -201,6 +204,7 @@ QPCIBus *qpci_init_spapr(QGuestAllocator *alloc)
->      ret->bus.mmio_alloc_ptr =3D ret->mmio32.pci_base;
->      ret->bus.mmio_limit =3D ret->mmio32.pci_base + ret->mmio32.size;
->=20
-> +
-
-Superfluous white space change.
-
->      return &ret->bus;
->  }
-
- Thomas
+>
+> Berto
+>
