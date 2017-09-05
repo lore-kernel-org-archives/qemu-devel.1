@@ -1,26 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50872)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51226)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dpDu3-0000Hi-Gh
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:28:36 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dpDuo-0000gt-0r
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:29:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dpDty-0003Mr-Ru
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:28:31 -0400
-Date: Tue, 5 Sep 2017 15:27:56 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170905132756.GL4633@localhost.localdomain>
-References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
-	<a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
-	<cb783ebb-198e-1814-2f9c-aec93c83b17a@virtuozzo.com>
-	<0988b4ef-56e2-5ce9-ed25-40a742eadbd4@redhat.com>
-	<b0d72a26-2052-ecc6-67f5-d32572804ebf@redhat.com>
-	<20170828025706.GA18194@lemon.lan>
-	<20170905130107.GJ4633@localhost.localdomain>
-	<20170905131858.GW22515@lemon.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170905131858.GW22515@lemon.lan>
-Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
+	(envelope-from <stefanha@redhat.com>) id 1dpDuj-0003ns-7H
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:29:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50954)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dpDuj-0003mw-1E
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:29:13 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue,  5 Sep 2017 14:29:04 +0100
+Message-Id: <20170905132908.30931-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PULL 0/4] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +21,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Qemu-block <qemu-block@nongnu.org>, Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Am 05.09.2017 um 15:18 hat Fam Zheng geschrieben:
-> On Tue, 09/05 15:01, Kevin Wolf wrote:
-> > Am 28.08.2017 um 04:57 hat Fam Zheng geschrieben:
-> > > On Fri, 08/25 15:44, Max Reitz wrote:
-> > > > Well, OK.  The main argument against supporting anything but qcow2 is
-> > > > "if you want features, use qcow2; and we are working on making qcow2 as
-> > > > fast as possible."  I think that's a very good argument still.  At some
-> > > > point I (and probably others, too) had the idea of making qcow2 files in
-> > > > raw layout: 
-> > > 
-> > > Yes! I think this idea makes a whole lot of sense, too. Metadata tables can be
-> > > generated so old implementation can still use it.
-> > 
-> > Maybe a nice way to attack this would be "huge pages", i.e. have a L1
-> > entry flag that tells "this points directly to a huge cluster instead of
-> > an L2 table". Gives us 512 MB clusters with a 64k cluster size, or a
-> > maximum of 512 GB clusters with a 2 MB cluster size.
-> > 
-> > Huge clusters would only be used by qemu-img create if the respective
-> > option is given, and only with preallocation.
-> 
-> Then this image is not usable on old QEMUs, right? So this is going to be an
-> incompatible_feature, whereas with the linear mapping L1/L2 tables approach, it
-> can be an autoclear_feature.
+The following changes since commit 2b483739791b33c46e6084b51edcf62107058ae1:
 
-Ah yes, that's true. Maybe that's important enough that just a single
-global flag is better, even if it's less flexible.
+  Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170904-2' into staging (2017-09-04 17:21:24 +0100)
 
-Of course, this approach also means that we still need to write all of
-the L2 tables and use disk space for them, even though newer versions
-will never look at them.
+are available in the git repository at:
 
-Kevin
+  git://github.com/stefanha/qemu.git tags/block-pull-request
+
+for you to fetch changes up to b461151ff31c7925f271c297e8abed20231ac7d3:
+
+  block: document semantics of bdrv_co_preadv|pwritev (2017-09-05 11:07:02 +0100)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Daniel P. Berrange (1):
+  block: document semantics of bdrv_co_preadv|pwritev
+
+Stefan Hajnoczi (3):
+  qemu.py: make VM() a context manager
+  iotests.py: add FilePath context manager
+  qemu-iotests: use context managers for resource cleanup in 194
+
+ include/block/block_int.h     |  31 +++++++++++
+ scripts/qemu.py               |  16 +++++-
+ tests/qemu-iotests/194        | 117 +++++++++++++++++++++---------------------
+ tests/qemu-iotests/iotests.py |  26 ++++++++++
+ 4 files changed, 130 insertions(+), 60 deletions(-)
+
+-- 
+2.13.5
