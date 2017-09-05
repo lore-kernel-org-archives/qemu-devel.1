@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dpA6u-0003kH-KV
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:25:37 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dpA74-0003uh-Ku
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dpA6m-0004dY-RV
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:25:32 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:35380)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dpA6m-0004d7-Ie
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:25:24 -0400
-Received: by mail-wm0-x230.google.com with SMTP id h144so2392515wme.0
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 02:25:24 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1dpA6z-0004nK-Fu
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:25:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56024)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpA6z-0004mT-77
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:25:37 -0400
+Date: Tue, 5 Sep 2017 11:25:33 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170905112533.31e576b5.cohuck@redhat.com>
+In-Reply-To: <65b4c93c-fc2e-7ba3-b6e2-aa6c2312df3b@linux.vnet.ibm.com>
+References: <1504239778-29893-1-git-send-email-zyimin@linux.vnet.ibm.com>
+	<1504239778-29893-2-git-send-email-zyimin@linux.vnet.ibm.com>
+	<20170905102928.6b23a28a.cohuck@redhat.com>
+	<0923f97e-4f69-0bf3-b9ab-8e5f69a56bbb@linux.vnet.ibm.com>
+	<20170905105041.3409c8cd.cohuck@redhat.com>
+	<07ef5826-6b09-5ac8-7d51-d00db7170437@linux.vnet.ibm.com>
+	<20170905111540.027058d1.cohuck@redhat.com>
+	<65b4c93c-fc2e-7ba3-b6e2-aa6c2312df3b@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170904175101.GA27187@kentang.lan>
-References: <20170904175101.GA27187@kentang.lan>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 5 Sep 2017 10:25:02 +0100
-Message-ID: <CAFEAcA-9Cd1pHrTGTssF5wsspoQ0NOtr7-qRoUX6iCMgAmS2Fw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL] qemu-sparc updates
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] s390x/pci: remove idx from msix msg
+ data
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +34,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, richard.henderson@linaro.org
 
-On 4 September 2017 at 18:51, Mark Cave-Ayland
-<mark.cave-ayland@ilande.co.uk> wrote:
-> Hi Peter,
->
-> Here is the first patchset in preparation for updating the sun4u machine PCI topology. Please pull.
->
->
-> ATB,
->
-> Mark.
->
->
-> The following changes since commit 2b483739791b33c46e6084b51edcf62107058ae1:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170904-2' into staging (2017-09-04 17:21:24 +0100)
->
-> are available in the git repository at:
->
->
->   https://github.com/mcayland/qemu.git tags/qemu-sparc-signed
->
-> for you to fetch changes up to e5fd1eb05ec918e9877640d85ec45680cf106632:
->
->   apb: add busA qdev property to PBM PCI bridge (2017-09-04 18:41:01 +0100)
->
-> ----------------------------------------------------------------
-> qemu-sparc update
->
-> ----------------------------------------------------------------
-> Mark Cave-Ayland (6):
->       sun4u: pass PCIDevice into pci_ebus_init() instead of PCIBus
->       sun4u: switch to using qdev to instantiate fw_cfg interface
->       sun4u: expose fw_cfg and NVRAM on ebus PCI IO address space
->       apb: fix up PCI bus nomenclature
->       apb: fix endianness for APB and PCI config accesses
->       apb: add busA qdev property to PBM PCI bridge
->
->  hw/pci-host/apb.c  |   62 +++++++++++++++++++++++++++++++++++++---------------
->  hw/sparc64/sun4u.c |   27 ++++++++++++++---------
->  2 files changed, 61 insertions(+), 28 deletions(-)
+On Tue, 5 Sep 2017 17:21:52 +0800
+Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
 
+> =E5=9C=A8 2017/9/5 =E4=B8=8B=E5=8D=885:15, Cornelia Huck =E5=86=99=E9=81=
+=93:
+> > On Tue, 5 Sep 2017 17:08:14 +0800
+> > Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+> > =20
+> >> =E5=9C=A8 2017/9/5 =E4=B8=8B=E5=8D=884:50, Cornelia Huck =E5=86=99=E9=
+=81=93: =20
+> >>> On Tue, 5 Sep 2017 16:44:37 +0800
+> >>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+> >>>    =20
+> >>>> =E5=9C=A8 2017/9/5 =E4=B8=8B=E5=8D=884:29, Cornelia Huck =E5=86=99=
+=E9=81=93: =20
+> >>>>> On Fri,  1 Sep 2017 06:22:56 +0200
+> >>>>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+> >>>>>       =20
+> >>>>>> PCIDevice pointer has been a parameter of kvm_arch_fixup_msi_route=
+().
+> >>>>>> So we don't need to store zpci idx in msix message data to find ou=
+t the
+> >>>>>> specific zpci device. Instead, we could use pci device id to find =
+its
+> >>>>>> corresponding zpci device.
+> >>>>>>
+> >>>>>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
+> >>>>>> ---
+> >>>>>>     hw/s390x/s390-pci-bus.c  | 16 +++++-----------
+> >>>>>>     hw/s390x/s390-pci-bus.h  |  2 ++
+> >>>>>>     hw/s390x/s390-pci-inst.c | 24 ------------------------
+> >>>>>>     hw/s390x/s390-pci-stub.c |  6 ++++++
+> >>>>>>     target/s390x/kvm.c       |  7 +++++--
+> >>>>>>     5 files changed, 18 insertions(+), 37 deletions(-)
+> >>>>>>
+> >>>>>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> >>>>>> index 1338c29528..3d490c5e4b 100644
+> >>>>>> --- a/target/s390x/kvm.c
+> >>>>>> +++ b/target/s390x/kvm.c
+> >>>>>> @@ -2533,10 +2533,13 @@ int kvm_arch_fixup_msi_route(struct kvm_ir=
+q_routing_entry *route,
+> >>>>>>                                  uint64_t address, uint32_t data, =
+PCIDevice *dev)
+> >>>>>>     {
+> >>>>>>         S390PCIBusDevice *pbdev;
+> >>>>>> -    uint32_t idx =3D data >> ZPCI_MSI_VEC_BITS;
+> >>>>>>         uint32_t vec =3D data & ZPCI_MSI_VEC_MASK;
+> >>>>>>    =20
+> >>>>>> -    pbdev =3D s390_pci_find_dev_by_idx(s390_get_phb(), idx);
+> >>>>>> +    if (!dev) {
+> >>>>>> +        return -ENODEV; =20
+> >>>>> Can this actually happen? =20
+> >>>> I think this cannot happen. But I'm afraid that I miss something.
+> >>>> So I added this to avoid NULL pointer. But from the code and
+> >>>> my test, there has not been NULL pointer happened. =20
+> >>> I'm wondering if that is in the same category as the instance I
+> >>> commented on above. Do you want to log something?
+> >>>    =20
+> >> For the case above, I ensure that zpci device must exist. But here, I'm
+> >> not sure.
+> >> Because it's called from outside. I'm not sure if the caller might call
+> >> kvm_irqchip_add_msi_route() with NULL as pci device argument.
+> >>
+> >> Although msix ctrl mr is accessed from outside. But its initialization
+> >> is controled by our code and the pointer to zpci device is saved as
+> >> mr's opaque. =20
+> > OK. Maybe add a DPRINTF as for the condition below? =20
+> OK. How about DPRINTF("add_msi_route no pci device\n")?
+> And change the DPRINTF for the below condition to
+> DPRINTF("add_msi_route no zpci device\n").
 
-Applied, thanks.
+works for me
 
--- PMM
+> > =20
+> >>>>>       =20
+> >>>>>> +    }
+> >>>>>> +
+> >>>>>> +    pbdev =3D s390_pci_find_dev_by_target(s390_get_phb(), DEVICE(=
+dev)->id);
+> >>>>>>         if (!pbdev) {
+> >>>>>>             DPRINTF("add_msi_route no dev\n");
+> >>>>>>             return -ENODEV; =20
+> >>>>>       =20
+> >>>    =20
+> > =20
+>=20
