@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpJmj-00066t-5d
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 15:45:25 -0400
+	(envelope-from <eblake@redhat.com>) id 1dpJrV-0007IY-IU
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 15:50:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpJme-0000Du-Gg
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 15:45:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53090)
+	(envelope-from <eblake@redhat.com>) id 1dpJrQ-0007yU-RO
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 15:50:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35282)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dpJme-0000Db-7e
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 15:45:16 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dpJrQ-0007y4-I9
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 15:50:12 -0400
 References: <20170818222313.13391-1-eblake@redhat.com>
-	<874lt16zdl.fsf@dusky.pond.sub.org>
-	<CAFEAcA-8XL_YA7rDpyW6ZU5_R7jv2ZAnF92EoeRL-Y7C1z3EpQ@mail.gmail.com>
+	<1c41ef09-3e34-63ba-fc85-5aac46a5c355@linux.vnet.ibm.com>
+	<ebea7edf-6f5b-9096-552c-079bfcad71a4@redhat.com>
+	<87d17lqu85.fsf@dusky.pond.sub.org>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <92a63172-28c3-1d27-5123-104be54cb07d@redhat.com>
-Date: Tue, 5 Sep 2017 14:45:09 -0500
+Message-ID: <f40a5fc9-a140-041f-1c3c-d97036dab898@redhat.com>
+Date: Tue, 5 Sep 2017 14:50:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-8XL_YA7rDpyW6ZU5_R7jv2ZAnF92EoeRL-Y7C1z3EpQ@mail.gmail.com>
+In-Reply-To: <87d17lqu85.fsf@dusky.pond.sub.org>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="XfoDiGFJ5jX8OXNRHrQLMhhcFUEFBrenl"
+	boundary="8dbrHvNhWIKSB8qDpn1sMb6F3QAbu4EgJ"
 Subject: Re: [Qemu-devel] [RFC PATCH] osdep.h: Prohibit disabling assert()
  in supported builds
 List-Id: <qemu-devel.nongnu.org>
@@ -30,47 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, f4bug@amsat.org, "Michael S. Tsirkin" <mst@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XfoDiGFJ5jX8OXNRHrQLMhhcFUEFBrenl
+--8dbrHvNhWIKSB8qDpn1sMb6F3QAbu4EgJ
 From: Eric Blake <eblake@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Markus Armbruster <armbru@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin"
- <mst@redhat.com>
-Message-ID: <92a63172-28c3-1d27-5123-104be54cb07d@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, f4bug@amsat.org,
+ "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <f40a5fc9-a140-041f-1c3c-d97036dab898@redhat.com>
 Subject: Re: [Qemu-devel] [RFC PATCH] osdep.h: Prohibit disabling assert() in
  supported builds
 References: <20170818222313.13391-1-eblake@redhat.com>
- <874lt16zdl.fsf@dusky.pond.sub.org>
- <CAFEAcA-8XL_YA7rDpyW6ZU5_R7jv2ZAnF92EoeRL-Y7C1z3EpQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA-8XL_YA7rDpyW6ZU5_R7jv2ZAnF92EoeRL-Y7C1z3EpQ@mail.gmail.com>
+ <1c41ef09-3e34-63ba-fc85-5aac46a5c355@linux.vnet.ibm.com>
+ <ebea7edf-6f5b-9096-552c-079bfcad71a4@redhat.com>
+ <87d17lqu85.fsf@dusky.pond.sub.org>
+In-Reply-To: <87d17lqu85.fsf@dusky.pond.sub.org>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 08/21/2017 05:08 AM, Peter Maydell wrote:
-> On 21 August 2017 at 10:31, Markus Armbruster <armbru@redhat.com> wrote=
-:
->> I'm fine with project-wide, but does it have to be a hard error?  Can =
-we
->> make it a warning?  Same effect by default, but it lets people
->> experiment more easily with --disable-werror.
+On 08/24/2017 02:51 AM, Markus Armbruster wrote:
+> Eric Blake <eblake@redhat.com> writes:
 >=20
-> It won't be the same effect by default for our releases, which
-> don't use -Werror.
+>> On 08/22/2017 06:19 AM, Halil Pasic wrote:
+>>
+>>> OTOH I do think this is to some degree institutionalizing a bad pract=
+ice
+>>> (you say we do not want to do that, but IMHO refusing to build with
+>>> NDEBUG makes only sense if we want to alter the semantic of assert so=
+
+>>> that once bad becomes acceptable). I can live with that, but I'm not
+>>> happy about it. Have we considered rolling our own construct which is=
+
+>>> designed to exhibit the properties we desire?
+>>
+
+>>
+>> I'd prefer that if we are going to introduce our own construct that
+>> always evaluates side effects, and only has a compile-time switch on
+>> whether to abort() or (foolishly) plow on, that we name it something
+>> without 'assert' in the name, so that reviewers don't have to be
+>> confused about remembering which variant evaluates side effects.  Mayb=
+e:
+>>
+>> q_verify(cond)
+>>
+
 >=20
-> I don't think we want to make it easy for people to turn this
-> off -- and it's only commenting out a single #error line if
-> anybody really does want to mess about with it.
+> I vote for frying bigger fish.
+>=20
+> I also vote for using standard C when standard C is servicable.
 
-Two lines, actually, since we are also prohibiting disabling g_assert().
+So if it were up to me alone, the answer is:
 
-Anyways, as the topic came up again on the list, should I promote this
-patch from RFC to actual patch? Whose tree would it go in through?
+I'm NOT going to add any new construct (whether spelled q_verify() or
+otherwise), and will merely document in the commit message that we
+discussed this as an alternative (so someone who wants to disable #error
+can get a git history of what went into the decision).
+
+Also, it sounds like we want to keep it #error, not #warn.
+
+But if anyone else has strong opinions before we promote this from RFC
+to actual patch, I'm still interested in your arguments.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -78,7 +102,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---XfoDiGFJ5jX8OXNRHrQLMhhcFUEFBrenl
+--8dbrHvNhWIKSB8qDpn1sMb6F3QAbu4EgJ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -87,14 +111,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmu/sUACgkQp6FrSiUn
-Q2pTLQf+LnZFjgAqp5EwQppZRNaSwOWIoprP054+bYnNM5GnrwqpRynmc5mp4J3z
-zdxb4ehcdy7HfI9SBbJNv5LBlsqJWXYdaZYLBoIIbb/7GaJ7xJ/isrA7erxn9i7y
-FiiUUf/F2vsXnb0f2wQjfO+nmrt3AJlIvHpdy98j69wswB5fxUIE/vuJ9dg451cw
-5yr+ktWf9LzA6KdSaBRJYvLOgMwerjz+vFWwBCXwLLq6htvKOk49ioY5MgYFoBxG
-KPAFGg30nbGnGXg86bTEaDRjW+TquTbRJAv0NQpRlLnRYluiiN0z/hChQOeRGB3m
-z3C3A47qCn4vAdiOJyzktgO7AF//LQ==
-=tUDi
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmu/+0ACgkQp6FrSiUn
+Q2r6KQf8D2acxGujelbaS/K7E/IL3CYsacN5AkSeDDDEnb3nlQO49IIVTCQpbBLz
+EjGrcOhqrlUAbbHgaNcjjdWsc9VvP0B9FWbEccLDZIjgTScVDUgLF9Spzk5HsyNi
+ZqpLGwzVuGYZfuZnW6QtZq6zuWxHbmfO4I9FSIBudM+LoOXw7Qzq2tOfH8zyoYM4
+u2S32w9do4ZjXjkwBReQSG6CdfyyYK3oE7LuUp8alYRd5cvy5gKlcBDURTk8Ur1l
+EpPw9x9/n74euDsoJ9qhGPvBBBWTqCUszCUDqAmLYS8MKJiQt1UfxndraWxeIoXQ
+gbZsDWhfY8Jgp2MCExDIiS0AlkoRNw==
+=02wz
 -----END PGP SIGNATURE-----
 
---XfoDiGFJ5jX8OXNRHrQLMhhcFUEFBrenl--
+--8dbrHvNhWIKSB8qDpn1sMb6F3QAbu4EgJ--
