@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpA74-0003uh-Ku
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:25:48 -0400
+	(envelope-from <thuth@redhat.com>) id 1dpA7T-0004GP-DE
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:26:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpA6z-0004nK-Fu
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:25:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56024)
+	(envelope-from <thuth@redhat.com>) id 1dpA7K-00054k-E7
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:26:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45112)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpA6z-0004mT-77
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:25:37 -0400
-Date: Tue, 5 Sep 2017 11:25:33 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170905112533.31e576b5.cohuck@redhat.com>
-In-Reply-To: <65b4c93c-fc2e-7ba3-b6e2-aa6c2312df3b@linux.vnet.ibm.com>
-References: <1504239778-29893-1-git-send-email-zyimin@linux.vnet.ibm.com>
-	<1504239778-29893-2-git-send-email-zyimin@linux.vnet.ibm.com>
-	<20170905102928.6b23a28a.cohuck@redhat.com>
-	<0923f97e-4f69-0bf3-b9ab-8e5f69a56bbb@linux.vnet.ibm.com>
-	<20170905105041.3409c8cd.cohuck@redhat.com>
-	<07ef5826-6b09-5ac8-7d51-d00db7170437@linux.vnet.ibm.com>
-	<20170905111540.027058d1.cohuck@redhat.com>
-	<65b4c93c-fc2e-7ba3-b6e2-aa6c2312df3b@linux.vnet.ibm.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dpA7K-00054F-8d
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:25:58 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5A96BC04B31B
+	for <qemu-devel@nongnu.org>; Tue,  5 Sep 2017 09:25:57 +0000 (UTC)
+References: <20170901180340.30009-1-eblake@redhat.com>
+	<20170901180340.30009-12-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f065d46f-e295-b4dd-ed9b-a2708b89b5a2@redhat.com>
+Date: Tue, 5 Sep 2017 11:25:54 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] s390x/pci: remove idx from msix msg
- data
+In-Reply-To: <20170901180340.30009-12-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 11/29] libqtest: Inline
+ qtest_query_target_endianness()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,92 +35,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, agraf@suse.de, richard.henderson@linaro.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, armbru@redhat.com
 
-On Tue, 5 Sep 2017 17:21:52 +0800
-Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
+On 01.09.2017 20:03, Eric Blake wrote:
+> There was only one caller; it's easier to inline things.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/libqtest.c | 22 ++++++----------------
+>  1 file changed, 6 insertions(+), 16 deletions(-)
+> 
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index 5d16351e24..b6dd26e54a 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -244,20 +244,6 @@ redo:
+>      return words;
+>  }
+> 
+> -static int qtest_query_target_endianness(QTestState *s)
+> -{
+> -    gchar **args;
+> -    int big_endian;
+> -
+> -    qtest_sendf(s, "endianness\n");
+> -    args = qtest_rsp(s, 1);
+> -    g_assert(strcmp(args[1], "big") == 0 || strcmp(args[1], "little") == 0);
+> -    big_endian = strcmp(args[1], "big") == 0;
+> -    g_strfreev(args);
+> -
+> -    return big_endian;
+> -}
+> -
+>  static void cleanup_sigabrt_handler(void)
+>  {
+>      sigaction(SIGABRT, &sigact_old, NULL);
+> @@ -288,6 +274,7 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+>      gchar *qmp_socket_path;
+>      gchar *command;
+>      const char *qemu_binary;
+> +    gchar **args;
+> 
+>      qemu_binary = getenv("QTEST_QEMU_BINARY");
+>      if (!qemu_binary) {
+> @@ -351,8 +338,11 @@ QTestState *qtest_init_without_qmp_handshake(const char *extra_args)
+>      }
+> 
+>      /* ask endianness of the target */
+> -
+> -    s->big_endian = qtest_query_target_endianness(s);
+> +    qtest_sendf(s, "endianness\n");
+> +    args = qtest_rsp(s, 1);
+> +    g_assert(strcmp(args[1], "big") == 0 || strcmp(args[1], "little") == 0);
+> +    s->big_endian = strcmp(args[1], "big") == 0;
+> +    g_strfreev(args);
+> 
+>      return s;
+>  }
 
-> =E5=9C=A8 2017/9/5 =E4=B8=8B=E5=8D=885:15, Cornelia Huck =E5=86=99=E9=81=
-=93:
-> > On Tue, 5 Sep 2017 17:08:14 +0800
-> > Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
-> > =20
-> >> =E5=9C=A8 2017/9/5 =E4=B8=8B=E5=8D=884:50, Cornelia Huck =E5=86=99=E9=
-=81=93: =20
-> >>> On Tue, 5 Sep 2017 16:44:37 +0800
-> >>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
-> >>>    =20
-> >>>> =E5=9C=A8 2017/9/5 =E4=B8=8B=E5=8D=884:29, Cornelia Huck =E5=86=99=
-=E9=81=93: =20
-> >>>>> On Fri,  1 Sep 2017 06:22:56 +0200
-> >>>>> Yi Min Zhao <zyimin@linux.vnet.ibm.com> wrote:
-> >>>>>       =20
-> >>>>>> PCIDevice pointer has been a parameter of kvm_arch_fixup_msi_route=
-().
-> >>>>>> So we don't need to store zpci idx in msix message data to find ou=
-t the
-> >>>>>> specific zpci device. Instead, we could use pci device id to find =
-its
-> >>>>>> corresponding zpci device.
-> >>>>>>
-> >>>>>> Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-> >>>>>> ---
-> >>>>>>     hw/s390x/s390-pci-bus.c  | 16 +++++-----------
-> >>>>>>     hw/s390x/s390-pci-bus.h  |  2 ++
-> >>>>>>     hw/s390x/s390-pci-inst.c | 24 ------------------------
-> >>>>>>     hw/s390x/s390-pci-stub.c |  6 ++++++
-> >>>>>>     target/s390x/kvm.c       |  7 +++++--
-> >>>>>>     5 files changed, 18 insertions(+), 37 deletions(-)
-> >>>>>>
-> >>>>>> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> >>>>>> index 1338c29528..3d490c5e4b 100644
-> >>>>>> --- a/target/s390x/kvm.c
-> >>>>>> +++ b/target/s390x/kvm.c
-> >>>>>> @@ -2533,10 +2533,13 @@ int kvm_arch_fixup_msi_route(struct kvm_ir=
-q_routing_entry *route,
-> >>>>>>                                  uint64_t address, uint32_t data, =
-PCIDevice *dev)
-> >>>>>>     {
-> >>>>>>         S390PCIBusDevice *pbdev;
-> >>>>>> -    uint32_t idx =3D data >> ZPCI_MSI_VEC_BITS;
-> >>>>>>         uint32_t vec =3D data & ZPCI_MSI_VEC_MASK;
-> >>>>>>    =20
-> >>>>>> -    pbdev =3D s390_pci_find_dev_by_idx(s390_get_phb(), idx);
-> >>>>>> +    if (!dev) {
-> >>>>>> +        return -ENODEV; =20
-> >>>>> Can this actually happen? =20
-> >>>> I think this cannot happen. But I'm afraid that I miss something.
-> >>>> So I added this to avoid NULL pointer. But from the code and
-> >>>> my test, there has not been NULL pointer happened. =20
-> >>> I'm wondering if that is in the same category as the instance I
-> >>> commented on above. Do you want to log something?
-> >>>    =20
-> >> For the case above, I ensure that zpci device must exist. But here, I'm
-> >> not sure.
-> >> Because it's called from outside. I'm not sure if the caller might call
-> >> kvm_irqchip_add_msi_route() with NULL as pci device argument.
-> >>
-> >> Although msix ctrl mr is accessed from outside. But its initialization
-> >> is controled by our code and the pointer to zpci device is saved as
-> >> mr's opaque. =20
-> > OK. Maybe add a DPRINTF as for the condition below? =20
-> OK. How about DPRINTF("add_msi_route no pci device\n")?
-> And change the DPRINTF for the below condition to
-> DPRINTF("add_msi_route no zpci device\n").
+Ah, well, now that's another way of getting rid of the forward
+declaration in the previous patch - so may I suggest to drop the
+previous patch, and simply do the code inlining here instead?
 
-works for me
-
-> > =20
-> >>>>>       =20
-> >>>>>> +    }
-> >>>>>> +
-> >>>>>> +    pbdev =3D s390_pci_find_dev_by_target(s390_get_phb(), DEVICE(=
-dev)->id);
-> >>>>>>         if (!pbdev) {
-> >>>>>>             DPRINTF("add_msi_route no dev\n");
-> >>>>>>             return -ENODEV; =20
-> >>>>>       =20
-> >>>    =20
-> > =20
->=20
+ Thomas
