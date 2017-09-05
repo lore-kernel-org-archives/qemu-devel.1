@@ -1,24 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55922)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpLAW-0006cQ-Nq
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:14:05 -0400
+	(envelope-from <portias@xilinx.com>) id 1dpLBI-0006yv-GY
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:14:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpLAR-0002u0-Me
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:14:00 -0400
-References: <20170825132028.6184-1-el13635@mail.ntua.gr>
-	<20170825132028.6184-7-el13635@mail.ntua.gr>
-	<20170905161643.GO4633@localhost.localdomain>
-	<20170905190621.GQ4633@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a861d95e-553c-4797-486c-2601c2b6e17b@redhat.com>
-Date: Tue, 5 Sep 2017 16:13:39 -0500
+	(envelope-from <portias@xilinx.com>) id 1dpLBD-0003XM-JX
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:14:48 -0400
+From: Portia Stephens <portia.stephens@xilinx.com>
+Date: Tue, 5 Sep 2017 14:12:32 -0700
+Message-ID: <20170905211232.11092-1-portia.stephens@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <20170905190621.GQ4633@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="bpmcpxdlAb3ScTIeXchpPDPKcDEO8MoCb"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v9 6/6] qemu-iotests: add 184
- for throttle filter driver
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] target/arm: Add Jazelle feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,122 +19,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org, portia.stephens@xilinx.com, stephensportia@gmail.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bpmcpxdlAb3ScTIeXchpPDPKcDEO8MoCb
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>,
- Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <a861d95e-553c-4797-486c-2601c2b6e17b@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v9 6/6] qemu-iotests: add 184
- for throttle filter driver
-References: <20170825132028.6184-1-el13635@mail.ntua.gr>
- <20170825132028.6184-7-el13635@mail.ntua.gr>
- <20170905161643.GO4633@localhost.localdomain>
- <20170905190621.GQ4633@localhost.localdomain>
-In-Reply-To: <20170905190621.GQ4633@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This adds the Jazelle execution state as a feature if ARM_FEATURE_V6 is
+set or if the processor is arm926 or arm1026. This fixes the issue that any
+BXJ instruction will result in an illegal_op. BXJ instructions will now
+check if the architecture supports ARM_FEATURE_JAZELLE.
 
-On 09/05/2017 02:06 PM, Kevin Wolf wrote:
-> Am 05.09.2017 um 18:16 hat Kevin Wolf geschrieben:
->> Am 25.08.2017 um 15:20 hat Manos Pitsidianakis geschrieben:
->>> Reviewed-by: Alberto Garcia <berto@igalia.com>
->>> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
->>
->> Does this test actually (still) pass for you? I can't see that it's
->> related to any recent change in master, but this is the diff that I ge=
-t.
->>
->> I can update the reference output while applying, but obviously if it'=
-s
->> currently passing for you, it will fail after I "fix" it.
->=20
-> For the record, we discussed this on IRC. The test works correctly on
-> master, but on my block branch there is a conflict with "block: pass
-> bdrv_* methods to bs->file by default in block filters".
->=20
-> The correct action is to merge this throttle driver series after the
-> conflicting patch because throttle doesn't implement .bdrv_get_info and=
+Signed-off-by: Portia Stephens <portia.stephens@xilinx.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+---
 
-> needs the forwarding that the other patch implements.
->=20
-> I updated the test output accordingly and applied the series to my bloc=
-k
-> branch.
+This is a rewrite from my previous patch, "target/arm: Remove 5J
+architecture"
+-Instead of removing 5J architecture, added a Jazelle feature.
 
-Could you also squash this in to 5/6? (as long as we're intentionally
-basing throttle on top of defaults, then we should use the right default
-instead of duplicating things)
+ target/arm/cpu.c       | 3 +++
+ target/arm/cpu.h       | 1 +
+ target/arm/translate.c | 2 +-
+ 3 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git i/block/throttle.c w/block/throttle.c
-index 7b33613372..5bca76300f 100644
---- i/block/throttle.c
-+++ w/block/throttle.c
-@@ -197,19 +197,6 @@ static bool
-throttle_recurse_is_first_non_filter(BlockDriverState *bs,
-     return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
- }
-
--static int64_t coroutine_fn
-throttle_co_get_block_status(BlockDriverState *bs,
--                                                         int64_t
-sector_num,
--                                                         int nb_sectors,=
-
--                                                         int *pnum,
--
-BlockDriverState **file)
--{
--    assert(bs->file && bs->file->bs);
--    *pnum =3D nb_sectors;
--    *file =3D bs->file->bs;
--    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID |
--           (sector_num << BDRV_SECTOR_BITS);
--}
--
- static BlockDriver bdrv_throttle =3D {
-     .format_name                        =3D   "throttle",
-     .protocol_name                      =3D   "throttle",
-@@ -237,7 +224,7 @@ static BlockDriver bdrv_throttle =3D {
-     .bdrv_reopen_prepare                =3D   throttle_reopen_prepare,
-     .bdrv_reopen_commit                 =3D   throttle_reopen_commit,
-     .bdrv_reopen_abort                  =3D   throttle_reopen_abort,
--    .bdrv_co_get_block_status           =3D   throttle_co_get_block_stat=
-us,
-+    .bdrv_co_get_block_status           =3D
-bdrv_co_get_block_status_from_file,
-
-     .is_filter                          =3D   true,
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 41ae6ba3c2..0fb2fddae3 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -681,6 +681,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     }
+     if (arm_feature(env, ARM_FEATURE_V6)) {
+         set_feature(env, ARM_FEATURE_V5);
++        set_feature(env, ARM_FEATURE_JAZELLE);
+         if (!arm_feature(env, ARM_FEATURE_M)) {
+             set_feature(env, ARM_FEATURE_AUXCR);
+         }
+@@ -887,6 +888,7 @@ static void arm926_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_VFP);
+     set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
+     set_feature(&cpu->env, ARM_FEATURE_CACHE_TEST_CLEAN);
++    set_feature(&cpu->env, ARM_FEATURE_JAZELLE);
+     cpu->midr = 0x41069265;
+     cpu->reset_fpsid = 0x41011090;
+     cpu->ctr = 0x1dd20d2;
+@@ -916,6 +918,7 @@ static void arm1026_initfn(Object *obj)
+     set_feature(&cpu->env, ARM_FEATURE_AUXCR);
+     set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
+     set_feature(&cpu->env, ARM_FEATURE_CACHE_TEST_CLEAN);
++    set_feature(&cpu->env, ARM_FEATURE_JAZELLE);
+     cpu->midr = 0x4106a262;
+     cpu->reset_fpsid = 0x410110a0;
+     cpu->ctr = 0x1dd20d2;
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 92771d3790..daa99169fd 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -1250,6 +1250,7 @@ enum arm_features {
+     ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings */
+     ARM_FEATURE_PMU, /* has PMU support */
+     ARM_FEATURE_VBAR, /* has cp15 VBAR */
++    ARM_FEATURE_JAZELLE, /* has Jazelle execution state */
  };
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---bpmcpxdlAb3ScTIeXchpPDPKcDEO8MoCb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmvE4MACgkQp6FrSiUn
-Q2qtiwgAk7BFR599pketfeEqD41JwP0LOqz5jsGw5POJcz9rQtBz3ZnmzrKAzHk8
-Y6bEoQgzFwTm9xNOuiZkCbpWj5Ei3F/0nNjjLGe7qMOZyJDVKRn9kP8BnBhS19cv
-U19X3Sgc+QAu70l0+6pXSJ3uZWclvQVy0JXAmA9+o/L/pRBv0xqZ5xmFbqRDtV+6
-lm9ho0CLlMrkgUbZzVP55uXFX1KcGo3VjCZlQ8g4Lro7tGb1PZ9mnk1JBvNrn3ys
-5+HTZEeF3zQN464iNdCdZYhMCqJKGGJ3TqoiUf+g2xkZhBwpVfk65BBEbbF7W1uJ
-16OgDYSb1+UAFCeYO1eIcVz3jSXvFA==
-=hwGo
------END PGP SIGNATURE-----
-
---bpmcpxdlAb3ScTIeXchpPDPKcDEO8MoCb--
+ 
+ static inline int arm_feature(CPUARMState *env, int feature)
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index e52a6d7622..3a9142cd7d 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -41,7 +41,7 @@
+ #define ENABLE_ARCH_5     arm_dc_feature(s, ARM_FEATURE_V5)
+ /* currently all emulated v5 cores are also v5TE, so don't bother */
+ #define ENABLE_ARCH_5TE   arm_dc_feature(s, ARM_FEATURE_V5)
+-#define ENABLE_ARCH_5J    0
++#define ENABLE_ARCH_5J    arm_dc_feature(s, ARM_FEATURE_JAZELLE)
+ #define ENABLE_ARCH_6     arm_dc_feature(s, ARM_FEATURE_V6)
+ #define ENABLE_ARCH_6K    arm_dc_feature(s, ARM_FEATURE_V6K)
+ #define ENABLE_ARCH_6T2   arm_dc_feature(s, ARM_FEATURE_THUMB2)
+-- 
+2.14.1
