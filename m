@@ -1,44 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpHWx-0007Fn-PX
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:21:00 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpHcy-000085-JG
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:27:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpHWs-00075z-L6
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:20:55 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41468)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dpHWs-000759-Bd
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:20:50 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v85HJpix040429
-	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 13:20:49 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2csyqvsfs3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 13:20:48 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 5 Sep 2017 18:20:46 +0100
-References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
-	<20170830163609.50260-3-pasic@linux.vnet.ibm.com>
-	<20170831111953.242ddc28.cohuck@redhat.com>
-	<e805e756-495d-3125-eaf0-262635b9c545@linux.vnet.ibm.com>
-	<20170905100234.7a92128e.cohuck@redhat.com>
-	<bff0fcd2-4c1d-b5da-2d11-dc479d9d7275@linux.vnet.ibm.com>
-	<20170905174606.1e0c6404.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 5 Sep 2017 19:20:43 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dpHct-0002ht-OU
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:27:08 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:35277)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dpHct-0002ha-Gm
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 13:27:03 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id f199so1899277wme.0
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 10:27:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170905174606.1e0c6404.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <24e87c3e-2674-8fc1-cd0a-94f4907ddc7d@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 2/9] s390x: fix invalid use of cc 1 for SSCH
+In-Reply-To: <1503066227-18251-5-git-send-email-gengdongjiu@huawei.com>
+References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com>
+	<1503066227-18251-5-git-send-email-gengdongjiu@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Sep 2017 18:26:41 +0100
+Message-ID: <CAFEAcA9oecuzXXrdo3zZHxF3AgrDUh_NHxz-znto4GU+OoxVFw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v11 4/6] target-arm: kvm64: detect guest
+ RAS EXTENSION feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,94 +30,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Dongjiu Geng <gengdongjiu@huawei.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-acpi@vger.kernel.org, devel@acpica.org, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, huangdaode@hisilicon.com, wangzhou1@hisilicon.com, Huangshaoyu <huangshaoyu@huawei.com>, wuquanming <wuquanming@huawei.com>, Linuxarm <linuxarm@huawei.com>, zhengqiang10@huawei.com
 
+On 18 August 2017 at 15:23, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+> check if kvm supports guest RAS EXTENSION. if so, set
+> corresponding feature bit for vcpu.
+>
+> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+> ---
+>  linux-headers/linux/kvm.h | 1 +
+>  target/arm/cpu.h          | 3 +++
+>  target/arm/kvm64.c        | 8 ++++++++
+>  3 files changed, 12 insertions(+)
+>
+> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+> index 7971a4f..2aa176e 100644
+> --- a/linux-headers/linux/kvm.h
+> +++ b/linux-headers/linux/kvm.h
+> @@ -929,6 +929,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_PPC_SMT_POSSIBLE 147
+>  #define KVM_CAP_HYPERV_SYNIC2 148
+>  #define KVM_CAP_HYPERV_VP_INDEX 149
+> +#define KVM_CAP_ARM_RAS_EXTENSION 150
+>
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>
 
+Hi. Changes to linux-headers need to be done as a patch of their
+own created using scripts/update-linux-headers.sh run against a
+mainline kernel tree (and with a commit message that quotes the
+kernel commit hash used). This ensures that we have a consistent
+set of headers that don't diverge from the kernel copy.
 
-On 09/05/2017 05:46 PM, Cornelia Huck wrote:
-> On Tue, 5 Sep 2017 17:24:19 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> 
->> My problem with a program check (indicated by SCSW word 2 bit 10) is
->> that, in my reading of the architecture, the semantic behind it is: The
->> channel subsystem (not the cu or device) has detected, that the 
->> the channel program (previously submitted as an ORB) is erroneous. Which
->> programs are erroneous is specified by the architecture. What we have
->> here does not qualify.
->>
->> My idea was to rather blame the virtual hardware (device) and put no blame
->> on the program nor he channel subsystem. This could be done using device
->> status (unit check with command reject, maybe unit exception) or interface
->> check. My train of thought was, the problem is not consistent across a
->> device type, so it has to be device specific.
-> 
-> Unit exception might be a better way to express what is happening here.
-> At least, it moves us away from cc 1 and not towards cc 3 :)
-> 
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index b39d64a..6b0961b 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -611,6 +611,8 @@ struct ARMCPU {
+>
+>      /* CPU has memory protection unit */
+>      bool has_mpu;
+> +    /* CPU has ras extension unit */
+> +    bool has_ras_extension;
+>      /* PMSAv7 MPU number of supported regions */
+>      uint32_t pmsav7_dregion;
+>
+> @@ -1229,6 +1231,7 @@ enum arm_features {
+>      ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings */
+>      ARM_FEATURE_PMU, /* has PMU support */
+>      ARM_FEATURE_VBAR, /* has cp15 VBAR */
+> +    ARM_FEATURE_RAS_EXTENSION, /*has RAS extension support */
 
-I will do a follow up patch pursuing device exception.
+Missing space after '/*' ?
 
->>
->> Of course blaming the device could mislead the person encountering the
->> problem, and make him believe it's an non-virtual hardware problem.
->>
->> About the misleading, I think the best we can do is log out a message
->> indicating what really happened.
-> 
-> Just document it in the code? If it doesn't happen with Linux as a
-> guest, it is highly unlikely to be seen in the wild.
-> 
+>  };
+>
+>  static inline int arm_feature(CPUARMState *env, int feature)
+> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+> index a16abc8..0781367 100644
+> --- a/target/arm/kvm64.c
+> +++ b/target/arm/kvm64.c
+> @@ -518,6 +518,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>          unset_feature(&env->features, ARM_FEATURE_PMU);
+>      }
+>
+> +    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_RAS_EXTENSION)) {
+> +        cpu->has_ras_extension = true;
+> +        set_feature(&env->features, ARM_FEATURE_RAS_EXTENSION);
+> +    } else {
+> +        cpu->has_ras_extension = false;
+> +        unset_feature(&env->features, ARM_FEATURE_RAS_EXTENSION);
+> +    }
+> +
 
+Shouldn't we need to also tell the kernel that we actually want
+it to expose RAS to the guest? Compare the PMU code in this
+function, where we set a kvm_init_features bit to do this.
+(This suggests that your ABI for the kernel part of this feature
+may not be correct?)
 
-Well we have two problems here:
-1) Unit exception can be already defined by the device type for the
-command (reference: http://publibfp.dhe.ibm.com/cgi-bin/bookmgr/BOOKS/dz9ar110/2.6.10?DT=19920904110920).
-I think this one is what you mean. And I agree that's best handled
-with comment in code.
-2) The poor user/programmer is trying to figure out why things
-don't work (why are we getting the unit exception)? I think that's
-best remedied with producing something for the log (maybe a warning
-with warn_report which states that the implementation vfio-ccw requires
-the given flags).
+You should also not be calling set_feature() here -- if the
+CPU features bit doesn't say "this CPU should have the RAS
+extensions" we shouldn't create a CPU with them. Instead
+you should set it in kvm_arm_get_host_cpu_features() (again,
+compare the PMU code).
 
-[..] 
->>>>>> @@ -1115,7 +1112,7 @@ static int do_subchannel_work(SubchDev *sch)
->>>>>>      if (sch->do_subchannel_work) {
->>>>>>          return sch->do_subchannel_work(sch);
->>>>>>      } else {
->>>>>> -        return -EINVAL;
->>>>>> +        return -ENODEV;    
->>>>>
->>>>> This rather seems like a job for an assert? If we don't have a function
->>>>> for the 'asynchronous' handling of the various functions assigned for a
->>>>> subchannel, that looks like an internal error.
->>>>>     
->>>>
->>>> IMHO it depends. Aborting qemu is heavy handed, and as an user I would not
->>>> be happy about it. But certainly it is an assert situation.  We can look for
->>>> an even better solution, but I think this is an improvement. The logic behind
->>>> is that the device is broken and can't be talked to properly.  
->>>
->>> We currently don't have a vast array of subchannel types (and are
->>> unlikely to get more types that need a different handler function). We
->>> know the current ones are fine, and an assert would catch programming
->>> errors early.
->>>   
->>
->> Despite of that we already had a problem of this type: see 1728cff2ab
->> ("s390x/3270: fix instruction interception handler", 2017-06-09) by 
->> Dong Jia. If we had some automated testing covering all the asserts
->> I would not think twice about using an assert here. But I don't think
->> we do and I'm reluctant (not positive that assert is superior to what
->> we have now). Maybe we could agree on reported by again.
-> 
-> Yes, we (as in generally 'we') are really lacking automated testing...
-> (it is somewhere on my todo list).
-> 
-> Either leave it as-is, or do an assert. -ENODEV just feels wrong.
-> 
-
-I think I will leave this one as is and maybe try to discuss with
-the folks here about reliable test coverage. Just spoke with Marc H.,
-and according to that we have a long way to go.
+thanks
+-- PMM
