@@ -1,27 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47780)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dp3sQ-00025n-5D
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:46:14 -0400
+	(envelope-from <famz@redhat.com>) id 1dp42O-0004sK-2G
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:56:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dp3sL-0005sj-KV
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:46:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42050)
+	(envelope-from <famz@redhat.com>) id 1dp42J-0003HP-4L
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:56:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41312)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dp3sL-0005sE-Dw
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:46:05 -0400
-References: <20170903163726.16541-1-n54@gmx.com>
-	<20170904072353.GA19748@lemon.lan>
-	<17D7366F-5413-4A0B-B984-33ED480A9A3C@daynix.com>
-	<8c58f1f4-28e2-59e8-e8e6-fa09d546dbca@gmx.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <1b66ecda-fbe2-91de-6b7e-a6c2d407a421@redhat.com>
-Date: Tue, 5 Sep 2017 10:45:56 +0800
-MIME-Version: 1.0
-In-Reply-To: <8c58f1f4-28e2-59e8-e8e6-fa09d546dbca@gmx.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] e1000: Rename the SEC symbol to SEQEC
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dp42I-0003GQ-Ue
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:56:23 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Tue,  5 Sep 2017 10:56:08 +0800
+Message-Id: <20170905025614.579-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/6] docker: Add test-block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,31 +21,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>, Dmitry Fleytman <dmitry@daynix.com>, Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, Jonathan Perkin <jperkin@joyent.com>
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, kchamart@redhat.com, eblake@redhat.com, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 
+Based-on: 20170905021201.25684-1-famz@redhat.com
+([PATCH v6 00/12] tests: Add VM based build tests (for non-x86_64 and/or
+non-Linux))
 
+A few tweaks to the docker images and running commands allow us to run
+qemu-iotests in the fedora container. This will be added to the patchew test
+cases later.
 
-On 2017=E5=B9=B409=E6=9C=8805=E6=97=A5 07:51, Kamil Rytarowski wrote:
-> Please put it on a pull-request queue. I don't maintain one myself.
->
-> On 04.09.2017 09:29, Dmitry Fleytman wrote:
->> Reviewed-by: Dmitry Fleytman <dmitry@daynix.com>
->>
->>> On 4 Sep 2017, at 10:23 AM, Fam Zheng <famz@redhat.com> wrote:
->>>
->>> On Sun, 09/03 18:37, Kamil Rytarowski wrote:
->>>> SunOS defines SEC in <sys/time.h> as 1 (commonly used time symbols).
->>>>
->>>> This fixes build on SmartOS (Joyent).
->>>>
->>>> Patch cherry-picked from pkgsrc by jperkin (Joyent).
->>>>
->>>> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
->>> Cc Jason Wang (net maintainer).
->>>
->>> Fam
+v4: Don't use 'set -e'. [Eric]
+    Add Kashyap's rev-by to unchanged patches.
 
-Applied, will be in next pull request.
+v3: Add nbd, luks and limit to quick group.
 
-Thanks
+v2: Add nettle-devel because a few iotest cases blindly assumes the support is
+there.
+
+Fam Zheng (6):
+  docker: Fix return code of build_qemu()
+  docker: Add test_fail and prep_fail
+  docker: Use unconfined security profile
+  docker: Add nettle-devel to fedora image
+  docker: Add test-block
+  docker: Drop 'set -e' from run script
+
+ tests/docker/Makefile.include          |  1 +
+ tests/docker/common.rc                 | 15 +++++++++++++--
+ tests/docker/dockerfiles/fedora.docker |  1 +
+ tests/docker/run                       |  8 +++-----
+ tests/docker/test-block                | 22 ++++++++++++++++++++++
+ 5 files changed, 40 insertions(+), 7 deletions(-)
+ create mode 100755 tests/docker/test-block
+
+-- 
+2.13.5
