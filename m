@@ -1,21 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36057)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36096)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dpEQC-0000DY-Go
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:01:52 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dpEQG-0000Gj-Nb
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:01:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dpEQ3-0003Bk-0d
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:01:44 -0400
-Date: Tue, 5 Sep 2017 15:01:17 +0100
+	(envelope-from <stefanha@redhat.com>) id 1dpEQ7-0003G9-BY
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:01:48 -0400
+Date: Tue, 5 Sep 2017 15:01:21 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170905140117.GQ17449@stefanha-x1.localdomain>
+Message-ID: <20170905140121.GR17449@stefanha-x1.localdomain>
 References: <20170825132028.6184-1-el13635@mail.ntua.gr>
-	<20170825132028.6184-7-el13635@mail.ntua.gr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170825132028.6184-7-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [PATCH v9 6/6] qemu-iotests: add 184 for throttle
- filter driver
+In-Reply-To: <20170825132028.6184-1-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [PATCH v9 0/6] add throttle block driver filter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,15 +25,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Manos Pitsidianakis <el13635@mail.ntua.gr>
 Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>
 
-On Fri, Aug 25, 2017 at 04:20:28PM +0300, Manos Pitsidianakis wrote:
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
-> ---
->  tests/qemu-iotests/184     | 205 +++++++++++++++++++++++++++++++
->  tests/qemu-iotests/184.out | 300 +++++++++++++++++++++++++++++++++++++++++++++
->  tests/qemu-iotests/group   |   1 +
->  3 files changed, 506 insertions(+)
+On Fri, Aug 25, 2017 at 04:20:22PM +0300, Manos Pitsidianakis wrote:
+> This series adds a throttle block driver filter. Currently throttling is done
+> at the BlockBackend level. Using block driver interfaces we can move the
+> throttling to any point in the BDS graph using a throttle node which uses the
+> existing throttling code. This allows for potentially more complex
+> configurations (throttling at any point in the graph, chained filters)
+> 
+> v9:
+>   fix suggestions by stefanha in patch 4
+>   add 'throttle_group_can_be_deleted' function in patch 4
+> 
+> v8:
+>   fix suggestions by berto
+> 
+> v7:
+>   remove anonymous groups
+>   error on missing throttle-group option on block/throttle.c
+>   change switch case format in block/throttle-groups.c (berto)
+> 
+> v6:
+>   don't allow named group limit configuration in block/throttle.c; allow either
+>         -drive driver=throttle,file.filename=foo.qcow2, \
+>             limits.iops-total=...
+>       or
+>         -drive driver=throttle,file.filename=foo.qcow2,throttle-group=bar
+>   fixes suggested by berto
+> 
+> v5:
+>   fix crash in 'add aio_context field in ThrottleGroupMember'
+>   fix suggestions in block/throttle.c
+> 
+> v4:
+>   fix suggestions in block/throttle.c
+>   fix suggestions in block/throttle_groups.c
+>   add doc note in BlockDevOptionsThrottle
+> 
+> v3:
+>   fix style error in 'add aio_context field in ThrottleGroupMember'
+> 
+> v2:
+>   change QOM throttle group object name
+>   print valid ranges for uint on error
+>   move frees in throttle_group_obj_finalize()
+>   split throttle_group_{set,get}()
+>   add throttle_recurse_is_first_non_filter()
+> 
+> 
+> Manos Pitsidianakis (6):
+>   block: move ThrottleGroup membership to ThrottleGroupMember
+>   block: add aio_context field in ThrottleGroupMember
+>   block: tidy ThrottleGroupMember initializations
+>   block: convert ThrottleGroup to object with QOM
+>   block: add throttle block filter driver
+>   qemu-iotests: add 184 for throttle filter driver
+> 
+>  qapi/block-core.json            |  66 +++-
+>  include/block/throttle-groups.h |  52 ++-
+>  include/qemu/throttle-options.h |  60 +++-
+>  include/qemu/throttle.h         |   3 +
+>  include/sysemu/block-backend.h  |  20 +-
+>  block/block-backend.c           |  62 ++--
+>  block/qapi.c                    |   8 +-
+>  block/throttle-groups.c         | 748 ++++++++++++++++++++++++++++++----------
+>  block/throttle.c                | 250 ++++++++++++++
+>  blockdev.c                      |   4 +-
+>  tests/test-throttle.c           | 111 +++---
+>  util/throttle.c                 | 151 ++++++++
+>  block/Makefile.objs             |   1 +
+>  tests/qemu-iotests/184          | 205 +++++++++++
+>  tests/qemu-iotests/184.out      | 300 ++++++++++++++++
+>  tests/qemu-iotests/group        |   1 +
+>  16 files changed, 1721 insertions(+), 321 deletions(-)
+>  create mode 100644 block/throttle.c
 >  create mode 100755 tests/qemu-iotests/184
 >  create mode 100644 tests/qemu-iotests/184.out
+> 
+> -- 
+> 2.11.0
+> 
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
