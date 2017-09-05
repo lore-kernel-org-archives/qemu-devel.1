@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50803)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dp9Tl-0003MQ-0g
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:45:14 -0400
+	(envelope-from <ybettan@redhat.com>) id 1dp9Vg-0004jP-9K
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:47:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dp9Tg-0000lX-ER
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:45:05 -0400
-Date: Tue, 5 Sep 2017 10:44:31 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170905084431.GA4633@localhost.localdomain>
-References: <20170830100605.22694-1-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170830100605.22694-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] block: Cleanup BMDS in bdrv_close_all
+	(envelope-from <ybettan@redhat.com>) id 1dp9VY-0002BI-RE
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:47:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37250)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ybettan@redhat.com>) id 1dp9VY-0002AH-LW
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 04:46:56 -0400
+From: Yoni Bettan <ybettan@redhat.com>
+Date: Tue,  5 Sep 2017 11:46:34 +0300
+Message-Id: <20170905084634.13182-1-ybettan@redhat.com>
+Subject: [Qemu-devel] [PATCH] acpi/vmgenid: change device category to misc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,48 +21,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org, peterx@redhat.com, Max Reitz <mreitz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: marcel@redhat.com, Yoni Bettan <ybettan@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>
 
-Am 30.08.2017 um 12:06 hat Fam Zheng geschrieben:
-> This fixes the assertion due to op blockers added by BMDS:
-> 
-> block.c:3248: bdrv_delete: Assertion `bdrv_op_blocker_is_empty(bs)' failed.
-> 
-> Reproducer: simply start block migration and quit QEMU before it ends.
-> 
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  block.c                 | 2 ++
->  migration/block.c       | 2 +-
->  migration/block.h       | 1 +
->  stubs/Makefile.objs     | 1 +
->  stubs/block-migration.c | 6 ++++++
->  5 files changed, 11 insertions(+), 1 deletion(-)
->  create mode 100644 stubs/block-migration.c
-> 
-> diff --git a/block.c b/block.c
-> index 3308814bba..508a57274d 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -43,6 +43,7 @@
->  #include "qemu/cutils.h"
->  #include "qemu/id.h"
->  #include "qapi/util.h"
-> +#include "migration/block.h"
->  
->  #ifdef CONFIG_BSD
->  #include <sys/ioctl.h>
-> @@ -3111,6 +3112,7 @@ static void bdrv_close(BlockDriverState *bs)
->  
->  void bdrv_close_all(void)
->  {
-> +    block_migration_cleanup_bmds();
->      block_job_cancel_sync_all();
->      nbd_export_close_all();
+Moved vmgenid from uncategorized to misc category in QEMU help menu
 
-This is before bdrv_drain_all(). Can't we still have a block migration
-request in flight, whose callback will then dereference a stale pointer?
+Signed-off-by: Yoni Bettan <ybettan@redhat.com>
+---
+ hw/acpi/vmgenid.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Kevin
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+index a32b847fe0..876723a4ce 100644
+--- a/hw/acpi/vmgenid.c
++++ b/hw/acpi/vmgenid.c
+@@ -240,6 +240,7 @@ static void vmgenid_device_class_init(ObjectClass *klass, void *data)
+     dc->realize = vmgenid_realize;
+     dc->hotpluggable = false;
+     dc->props = vmgenid_properties;
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+ 
+     object_class_property_add_str(klass, VMGENID_GUID, NULL,
+                                   vmgenid_set_guid, NULL);
+-- 
+2.13.5
