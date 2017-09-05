@@ -1,17 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpFat-0008If-Fv
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 11:16:56 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dpFex-0002e8-MH
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 11:21:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpFaj-0002ti-OR
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 11:16:51 -0400
-From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue,  5 Sep 2017 17:16:12 +0200
-Message-Id: <20170905151614.31303-2-cohuck@redhat.com>
-In-Reply-To: <20170905151614.31303-1-cohuck@redhat.com>
-References: <20170905151614.31303-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/3] iotests: use -ccw on s390x for 040, 139,
- and 182
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dpFep-0005p7-VA
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 11:21:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38939)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1dpFep-0005n5-MQ
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 11:20:55 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v85FJHUV086924
+	for <qemu-devel@nongnu.org>; Tue, 5 Sep 2017 11:20:52 -0400
+Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2csx6d0y1g-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 11:20:48 -0400
+Received: from localhost
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Tue, 5 Sep 2017 09:20:31 -0600
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170905162425.3a202a87@bahia>
+References: <150451194093.7046.18254446012958612468.stgit@bahia>
+	<1d5efdef-21b8-9b7b-6939-339b97fd9bce@redhat.com>
+	<20170905162425.3a202a87@bahia>
+Date: Tue, 05 Sep 2017 10:20:22 -0500
+Message-Id: <150462482278.16876.9815938798442180307@loki>
+Subject: Re: [Qemu-devel] [PATCH] virtfs: error out gracefully when
+ mandatory suboptions are missing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,106 +43,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kwolf@redhat.com, mreitz@redhat.com
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, haoqf@linux.vnet.ibm.com, Cornelia Huck <cohuck@redhat.com>
+To: Greg Kurz <groug@kaod.org>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-The default cpu model on s390x does not provide zPCI, which is
-not yet wired up on tcg. Moreover, virtio-ccw is the standard
-on s390x, so use the -ccw instead of the -pci versions of virtio
-devices on s390x.
+Quoting Greg Kurz (2017-09-05 09:24:25)
+> On Tue, 5 Sep 2017 15:35:34 +0200
+> Thomas Huth <thuth@redhat.com> wrote:
+> =
 
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
----
- tests/qemu-iotests/040 |  6 +++++-
- tests/qemu-iotests/139 | 12 ++++++++++--
- tests/qemu-iotests/182 | 13 +++++++++++--
- 3 files changed, 26 insertions(+), 5 deletions(-)
+> > On 04.09.2017 09:59, Greg Kurz wrote:
+> > > We internally convert -virtfs to -fsdev/-device. If the user doesn't
+> > > provide the path or security_model suboptions, and the fsdev backend
+> > > requires them, we hit an assertion when populating the internal -fsdev
+> > > option:
+> > > =
 
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index 95b7510571..c284d08796 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -82,7 +82,11 @@ class TestSingleDrive(ImageCommitTestCase):
-         qemu_io('-f', 'raw', '-c', 'write -P 0xab 0 524288', backing_img)
-         qemu_io('-f', iotests.imgfmt, '-c', 'write -P 0xef 524288 524288', mid_img)
-         self.vm = iotests.VM().add_drive(test_img, "node-name=top,backing.node-name=mid,backing.backing.node-name=base", interface="none")
--        self.vm.add_device("virtio-scsi-pci")
-+        if iotests.qemu_default_machine == 's390-ccw-virtio':
-+            self.vm.add_device("virtio-scsi-ccw")
-+        else:
-+            self.vm.add_device("virtio-scsi-pci")
-+
-         self.vm.add_device("scsi-hd,id=scsi0,drive=drive0")
-         self.vm.launch()
- 
-diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
-index 50cf40fbd5..f8f02808a9 100644
---- a/tests/qemu-iotests/139
-+++ b/tests/qemu-iotests/139
-@@ -25,13 +25,21 @@ import time
- 
- base_img = os.path.join(iotests.test_dir, 'base.img')
- new_img = os.path.join(iotests.test_dir, 'new.img')
-+if iotests.qemu_default_machine == 's390-ccw-virtio':
-+    default_virtio_blk = 'virtio-blk-ccw'
-+else:
-+    default_virtio_blk = 'virtio-blk-pci'
- 
- class TestBlockdevDel(iotests.QMPTestCase):
- 
-     def setUp(self):
-         iotests.qemu_img('create', '-f', iotests.imgfmt, base_img, '1M')
-         self.vm = iotests.VM()
--        self.vm.add_device("virtio-scsi-pci,id=virtio-scsi")
-+        if iotests.qemu_default_machine == 's390-ccw-virtio':
-+            self.vm.add_device("virtio-scsi-ccw,id=virtio-scsi")
-+        else:
-+            self.vm.add_device("virtio-scsi-pci,id=virtio-scsi")
-+
-         self.vm.launch()
- 
-     def tearDown(self):
-@@ -87,7 +95,7 @@ class TestBlockdevDel(iotests.QMPTestCase):
-         self.checkBlockDriverState(node, expect_error)
- 
-     # Add a device model
--    def addDeviceModel(self, device, backend, driver = 'virtio-blk-pci'):
-+    def addDeviceModel(self, device, backend, driver = default_virtio_blk):
-         result = self.vm.qmp('device_add', id = device,
-                              driver = driver, drive = backend)
-         self.assert_qmp(result, 'return', {})
-diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
-index 7ecbb22604..2e078ceed8 100755
---- a/tests/qemu-iotests/182
-+++ b/tests/qemu-iotests/182
-@@ -45,17 +45,26 @@ _supported_os Linux
- 
- size=32M
- 
-+case "$QEMU_DEFAULT_MACHINE" in
-+  s390-ccw-virtio)
-+      virtioblk=virtio-blk-ccw
-+      ;;
-+  *)
-+      virtioblk=virtio-blk-pci
-+      ;;
-+esac
-+
- _make_test_img $size
- 
- echo "Starting QEMU"
- _launch_qemu -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
--    -device virtio-blk-pci,drive=drive0
-+    -device $virtioblk,drive=drive0
- 
- echo
- echo "Starting a second QEMU using the same image should fail"
- echo 'quit' | $QEMU -monitor stdio \
-     -drive file=$TEST_IMG,if=none,id=drive0,file.locking=on \
--    -device virtio-blk-pci,drive=drive0 2>&1 | _filter_testdir 2>&1 |
-+    -device $virtioblk,drive=drive0 2>&1 | _filter_testdir 2>&1 |
-     _filter_qemu |
-     sed -e '/falling back to POSIX file/d' \
-         -e '/locks can be lost unexpectedly/d'
--- 
-2.13.5
+> > > util/qemu-option.c:547: opt_set: Assertion `opt->str' failed.
+> > > Aborted (core dumped)
+> > > =
+
+> > > Let's test the suboption presence on the command line before trying
+> > > to set it in the internal -fsdev option, and let the backend code
+> > > error out gracefully (ie, like it already does when the user passes
+> > > -fsdev on the command line).
+> > > =
+
+> > > Reported-by: Thomas Huth <thuth@redhat.com>
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > > ---
+> > >  vl.c |   16 ++++++++++------
+> > >  1 file changed, 10 insertions(+), 6 deletions(-)
+> > > =
+
+> > > diff --git a/vl.c b/vl.c
+> > > index 8e247cc2a239..d63269332fed 100644
+> > > --- a/vl.c
+> > > +++ b/vl.c
+> > > @@ -3557,7 +3557,7 @@ int main(int argc, char **argv, char **envp)
+> > >              case QEMU_OPTION_virtfs: {
+> > >                  QemuOpts *fsdev;
+> > >                  QemuOpts *device;
+> > > -                const char *writeout, *sock_fd, *socket;
+> > > +                const char *writeout, *sock_fd, *socket, *path, *sec=
+urity_model;
+> > >  =
+
+> > >                  olist =3D qemu_find_opts("virtfs");
+> > >                  if (!olist) {
+> > > @@ -3596,11 +3596,15 @@ int main(int argc, char **argv, char **envp)
+> > >                  }
+> > >                  qemu_opt_set(fsdev, "fsdriver",
+> > >                               qemu_opt_get(opts, "fsdriver"), &error_=
+abort);
+> > > -                qemu_opt_set(fsdev, "path", qemu_opt_get(opts, "path=
+"),
+> > > -                             &error_abort);
+> > > -                qemu_opt_set(fsdev, "security_model",
+> > > -                             qemu_opt_get(opts, "security_model"),
+> > > -                             &error_abort);
+> > > +                path =3D qemu_opt_get(opts, "path");
+> > > +                if (path) {
+> > > +                    qemu_opt_set(fsdev, "path", path, &error_abort);
+> > > +                }
+> > > +                security_model =3D qemu_opt_get(opts, "security_mode=
+l");
+> > > +                if (security_model) {
+> > > +                    qemu_opt_set(fsdev, "security_model", security_m=
+odel,
+> > > +                                 &error_abort);
+> > > +                }
+> > >                  socket =3D qemu_opt_get(opts, "socket");
+> > >                  if (socket) {
+> > >                      qemu_opt_set(fsdev, "socket", socket, &error_abo=
+rt);  =
+
+> > =
+
+> > By the way, I think this should be CC:-ed to stable, too.
+> > =
+
+> =
+
+> Well, it's been there forever and it isn't a critical fix... but the
+> thread on qemu-discuss the other day showed that it was confusing
+> people, and the fix is trivial. So I guess it doesn't hurt to have
+> this in stable. :)
+> =
+
+> Michael,
+> =
+
+> I'll send a pull req later today. If it's not too late, maybe you can add
+> this patch to 2.9.1 when it's merged in master?
+
+We're in freeze as of yesterday with release set for Thursday, so it's a
+bit late. OTOH I don't have test coverage for virtfs and the patch seems
+isolated enough that I don't see any harm in slipping it in if it
+lands in master by tomorrow. Otherwise it'll have to wait for 2.10.1,
+which I'm hoping to get out this month.
+
+> =
+
+> Cheers,
+> =
+
+> --
+> Greg
+> =
+
+> >  Thomas
