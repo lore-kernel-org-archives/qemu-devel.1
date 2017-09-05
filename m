@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50565)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpFss-0008Tw-1v
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 11:35:30 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpFuo-0000yt-30
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 11:37:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpFsn-00076u-H5
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 11:35:26 -0400
-Date: Tue, 5 Sep 2017 23:35:07 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170905153507.GA31389@lemon.lan>
-References: <20170905131149.10669-1-famz@redhat.com>
-	<20170905131149.10669-4-famz@redhat.com>
-	<a628d888-f1e8-2d7f-034c-095c29818ae4@amsat.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1dpFue-0008GM-DD
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 11:37:26 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:35669)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dpFue-0008Eo-4I
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 11:37:16 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id y15so9578906wrc.2
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 08:37:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <a628d888-f1e8-2d7f-034c-095c29818ae4@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 3/6] gicv3: Convert to DEFINE_PROP_LINK
+In-Reply-To: <20170905132908.30931-1-stefanha@redhat.com>
+References: <20170905132908.30931-1-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Sep 2017 16:36:54 +0100
+Message-ID: <CAFEAcA8iis1JEgUzF=eS2HTc1t29F+CNDaw=zg5bQy9mdhhy9g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/4] Block patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +28,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 09/05 10:44, Philippe Mathieu-Daud=E9 wrote:
-> Hi Fam,
->=20
-> On 09/05/2017 10:11 AM, Fam Zheng wrote:
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >   hw/intc/arm_gicv3_its_kvm.c | 19 +++++++------------
-> >   1 file changed, 7 insertions(+), 12 deletions(-)
-> >=20
-> > diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.=
-c
-> > index 1f8991b8a6..39903d5eab 100644
-> > --- a/hw/intc/arm_gicv3_its_kvm.c
-> > +++ b/hw/intc/arm_gicv3_its_kvm.c
-> > @@ -120,17 +120,6 @@ static void kvm_arm_its_realize(DeviceState *dev=
-, Error **errp)
-> >       qemu_add_vm_change_state_handler(vm_change_state_handler, s);
-> >   }
-> > -static void kvm_arm_its_init(Object *obj)
-> > -{
-> > -    GICv3ITSState *s =3D KVM_ARM_ITS(obj);
-> > -
-> > -    object_property_add_link(obj, "parent-gicv3",
-> > -                             "kvm-arm-gicv3", (Object **)&s->gicv3,
-> > -                             object_property_allow_set_link,
-> > -                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
-> > -                             &error_abort);
-> > -}
-> > -
-> >   /**
-> >    * kvm_arm_its_pre_save - handles the saving of ITS registers.
-> >    * ITS tables are flushed into guest RAM separately and earlier,
-> > @@ -205,12 +194,19 @@ static void kvm_arm_its_post_load(GICv3ITSState=
- *s)
-> >                         GITS_CTLR, &s->ctlr, true, &error_abort);
-> >   }
-> > +static Property kvm_arm_its_props[] =3D {
-> > +    DEFINE_PROP_LINK("parent-gicv3", GICv3ITSState, gicv3, "kvm-arm-=
-gicv3",
->=20
-> moving TYPE_KVM_ARM_GICV3 to kvm_arm.h and using it here:
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+On 5 September 2017 at 14:29, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> The following changes since commit 2b483739791b33c46e6084b51edcf62107058ae1:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170904-2' into staging (2017-09-04 17:21:24 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/stefanha/qemu.git tags/block-pull-request
+>
+> for you to fetch changes up to b461151ff31c7925f271c297e8abed20231ac7d3:
+>
+>   block: document semantics of bdrv_co_preadv|pwritev (2017-09-05 11:07:02 +0100)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
+> Daniel P. Berrange (1):
+>   block: document semantics of bdrv_co_preadv|pwritev
+>
+> Stefan Hajnoczi (3):
+>   qemu.py: make VM() a context manager
+>   iotests.py: add FilePath context manager
+>   qemu-iotests: use context managers for resource cleanup in 194
+>
+>  include/block/block_int.h     |  31 +++++++++++
+>  scripts/qemu.py               |  16 +++++-
+>  tests/qemu-iotests/194        | 117 +++++++++++++++++++++---------------------
+>  tests/qemu-iotests/iotests.py |  26 ++++++++++
+>  4 files changed, 130 insertions(+), 60 deletions(-)
 
-This file is only compiled natively on arm, so I'm not comfortable to mak=
-e a
-more complex change than this patch which may break build due to the #ifd=
-ef's in
-the headers, or add your rev-by without a compile test.  :(
+Applied, thanks.
 
-The open coded type name has already been used here so the change you req=
-uested
-can be done separately, I think.
-
-Fam
+-- PMM
