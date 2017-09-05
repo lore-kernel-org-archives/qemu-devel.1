@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dpD91-0004Wt-Gu
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:40:00 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dpDB1-0006Ps-03
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:42:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dpD8s-0000AQ-0C
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:39:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59492)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpD8r-00009E-R5
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:39:45 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue,  5 Sep 2017 13:39:35 +0100
-Message-Id: <20170905123935.26645-6-berrange@redhat.com>
-In-Reply-To: <20170905123935.26645-1-berrange@redhat.com>
-References: <20170905123935.26645-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PULL v2 5/5] io: fix check for handshake completion
- in TLS test
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dpDAw-0001ki-4J
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:41:59 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <CAJ+F1C+mPu9ftXwgs4UrGTQp4f65-thhvmWoB-kuRmu0=vnFFw@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <54c80221-aaf8-48c3-d58d-485003f77988@amsat.org>
+Date: Tue, 5 Sep 2017 09:41:40 -0300
+MIME-Version: 1.0
+In-Reply-To: <CAJ+F1C+mPu9ftXwgs4UrGTQp4f65-thhvmWoB-kuRmu0=vnFFw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] clang-tidy: use g_new() family of functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +27,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, qemu trival <qemu-trivial@nongnu.org>
 
-The TLS I/O channel test had mistakenly used && instead
-of || when checking for handshake completion. As a
-result it could terminate the handshake process before
-it had actually completed. This was harmless before but
-changes in GNUTLS 3.6.0 exposed this bug and caused the
-test suite to fail.
+Hi Marc-André,
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- tests/test-io-channel-tls.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 09/05/2017 09:14 AM, Marc-André Lureau wrote:
+> Hi,
+> 
+> I have a series of changes generated with clang-tidy qemu [1] pending
+> for review [2].
+> 
+> It translates calloc/*malloc*/*realloc() calls to
+> g_new/g_newa/g_new0/g_renew() where the argument is a sizeof(T) [* N].
+> 
+> This is the first commit to give you an idea:
+> 
+> diff --git a/hw/timer/arm_timer.c b/hw/timer/arm_timer.c
+> index 98fddd7ac1..75affcb8a6 100644
+> --- a/hw/timer/arm_timer.c
+> +++ b/hw/timer/arm_timer.c
+> @@ -166,7 +166,7 @@ static arm_timer_state *arm_timer_init(uint32_t freq)
+>       arm_timer_state *s;
+>       QEMUBH *bh;
+> 
+> -    s = (arm_timer_state *)g_malloc0(sizeof(arm_timer_state));
+> +    s = g_new0(arm_timer_state, 1);
+>       s->freq = freq;
+>       s->control = TIMER_CTRL_IE;
+> 
+> g_new() advantages (from glib doc):
+> - the returned pointer is cast to a pointer to the given type.
+> - care is taken to avoid overflow when calculating the size of the
+> allocated block.
+> 
+> But it is also shorter&nicer :)
+> 
+> I have not included in the first batch the opportunity to also
+> translate: alloc(sizeof(*p) * x) to g_new(typeof(*p), x), since it is
+> arguably not much nicer. But for consistency, I think it would be good
 
-diff --git a/tests/test-io-channel-tls.c b/tests/test-io-channel-tls.c
-index ff96877323..a210d01ba5 100644
---- a/tests/test-io-channel-tls.c
-+++ b/tests/test-io-channel-tls.c
-@@ -218,7 +218,7 @@ static void test_io_channel_tls(const void *opaque)
-     mainloop = g_main_context_default();
-     do {
-         g_main_context_iteration(mainloop, TRUE);
--    } while (!clientHandshake.finished &&
-+    } while (!clientHandshake.finished ||
-              !serverHandshake.finished);
- 
-     g_assert(clientHandshake.failed == data->expectClientFail);
--- 
-2.13.5
+"avoid overflow when calculating the size" sounds nicer.
+
+> to use g_new(). What do you think?
+
+Dunno if useful, but Juan Quintela had some issue:
+
+http://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg00085.html
+
+> 
+> I splitted the changes amont the various MAINTAINERS entries, but it
+> is still about 70 patches (without the typeof() changes).
+> 
+> 
+> [1] https://github.com/elmarco/clang-tools-extra/
+> [2] https://github.com/elmarco/qemu/commits/gnew
+> 
+> 
