@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38845)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpAhE-0000XR-MK
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:03:09 -0400
+	(envelope-from <thuth@redhat.com>) id 1dpAhy-0000yL-TE
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:04:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpAh7-0000vO-76
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:03:04 -0400
-Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:36369)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dpAh6-0000tp-WC
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:02:57 -0400
-Received: by mail-wm0-x234.google.com with SMTP id i145so16822904wmf.1
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 03:02:56 -0700 (PDT)
-Date: Tue, 5 Sep 2017 11:02:50 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170905100250.GG17449@stefanha-x1.localdomain>
-References: <20170901112829.2571-1-apahim@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1dpAhp-0001fA-3q
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 06:03:50 -0400
+References: <20170901180340.30009-1-eblake@redhat.com>
+	<20170901180340.30009-14-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d00055a9-5c4a-f639-6197-bd754416458b@redhat.com>
+Date: Tue, 5 Sep 2017 12:03:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170901112829.2571-1-apahim@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 00/13] scripts/qemu.py fixes and cleanups
+In-Reply-To: <20170901180340.30009-14-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 13/29] libqos: Use explicit QTestState
+ for pci operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,16 +25,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Amador Pahim <apahim@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, kwolf@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, Alexander Graf <agraf@suse.de>, "open list:sPAPR" <qemu-ppc@nongnu.org>, armbru@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, Sep 01, 2017 at 01:28:16PM +0200, Amador Pahim wrote:
+On 01.09.2017 20:03, Eric Blake wrote:
+> Now that the QPCIBus tracks QTestState, use that state instead
+> of an implicit reliance on global_qtest.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/libqos/pci-pc.c    | 47 ++++++++++++++++++++++++-----------------------
+>  tests/libqos/pci-spapr.c | 20 ++++++++++----------
+>  2 files changed, 34 insertions(+), 33 deletions(-)
 
-Please update the patches with Reviewed-bys from past revisions so I
-know which patches I've already reviewed.
-
-If someone has posted a R-b then it should be included in the next
-revision unless you substantially modify that patch.
-
-Thanks,
-Stefan
+Reviewed-by: Thomas Huth <thuth@redhat.com>
