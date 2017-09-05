@@ -1,16 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55922)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57855)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <portias@xilinx.com>) id 1dpLBI-0006yv-GY
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:14:53 -0400
+	(envelope-from <eblake@redhat.com>) id 1dpLFs-00011m-Uu
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:19:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <portias@xilinx.com>) id 1dpLBD-0003XM-JX
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:14:48 -0400
-From: Portia Stephens <portia.stephens@xilinx.com>
-Date: Tue, 5 Sep 2017 14:12:32 -0700
-Message-ID: <20170905211232.11092-1-portia.stephens@xilinx.com>
+	(envelope-from <eblake@redhat.com>) id 1dpLFo-0006MH-5G
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 17:19:32 -0400
+References: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <809da3cc-4051-cb39-7f6a-2355013d3f9a@redhat.com>
+Date: Tue, 5 Sep 2017 16:19:11 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH] target/arm: Add Jazelle feature
+In-Reply-To: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6ijkiRs6wOgkSLPOdM9ervufAr2qio2dp"
+Subject: Re: [Qemu-devel] [PATCH v10 0/6] fsdev: qmp interface for io
+ throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,79 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org, qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org, portia.stephens@xilinx.com, stephensportia@gmail.com
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org, "kwolf@redhat.com" <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>
 
-This adds the Jazelle execution state as a feature if ARM_FEATURE_V6 is
-set or if the processor is arm926 or arm1026. This fixes the issue that any
-BXJ instruction will result in an illegal_op. BXJ instructions will now
-check if the architecture supports ARM_FEATURE_JAZELLE.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6ijkiRs6wOgkSLPOdM9ervufAr2qio2dp
+From: Eric Blake <eblake@redhat.com>
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>,
+ alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org,
+ "kwolf@redhat.com" <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>
+Message-ID: <809da3cc-4051-cb39-7f6a-2355013d3f9a@redhat.com>
+Subject: Re: [PATCH v10 0/6] fsdev: qmp interface for io throttling
+References: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
+In-Reply-To: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Portia Stephens <portia.stephens@xilinx.com>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
----
+On 09/04/2017 11:07 AM, Pradeep Jagadeesh wrote:
+> These patches provide the qmp interface, to query the io throttle=20
+> status of the all fsdev devices that are present in a vm.
+> also, it provides an interface to set the io throttle parameters of a
+> fsdev to a required value. some of the patches also remove the duplicat=
+e
+> code that was present in block and fsdev files.=20
+>=20
+> Pradeep Jagadeesh (6):
+>   throttle: factor out duplicate code
+>   qmp: Create IOThrottle structure
+>   throttle: move out function to reuse the code
+>   hmp: create a throttle initialization function for code reusability
+>   fsdev: QMP interface for throttling
+>   fsdev: hmp interface for throttling
 
-This is a rewrite from my previous patch, "target/arm: Remove 5J
-architecture"
--Instead of removing 5J architecture, added a Jazelle feature.
+I know you're already up to v10, but your code changes conflict with
+Manos throttling work, which has now landed on Kevin's branch:
 
- target/arm/cpu.c       | 3 +++
- target/arm/cpu.h       | 1 +
- target/arm/translate.c | 2 +-
- 3 files changed, 5 insertions(+), 1 deletion(-)
+https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01051.html
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 41ae6ba3c2..0fb2fddae3 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -681,6 +681,7 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-     }
-     if (arm_feature(env, ARM_FEATURE_V6)) {
-         set_feature(env, ARM_FEATURE_V5);
-+        set_feature(env, ARM_FEATURE_JAZELLE);
-         if (!arm_feature(env, ARM_FEATURE_M)) {
-             set_feature(env, ARM_FEATURE_AUXCR);
-         }
-@@ -887,6 +888,7 @@ static void arm926_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_VFP);
-     set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
-     set_feature(&cpu->env, ARM_FEATURE_CACHE_TEST_CLEAN);
-+    set_feature(&cpu->env, ARM_FEATURE_JAZELLE);
-     cpu->midr = 0x41069265;
-     cpu->reset_fpsid = 0x41011090;
-     cpu->ctr = 0x1dd20d2;
-@@ -916,6 +918,7 @@ static void arm1026_initfn(Object *obj)
-     set_feature(&cpu->env, ARM_FEATURE_AUXCR);
-     set_feature(&cpu->env, ARM_FEATURE_DUMMY_C15_REGS);
-     set_feature(&cpu->env, ARM_FEATURE_CACHE_TEST_CLEAN);
-+    set_feature(&cpu->env, ARM_FEATURE_JAZELLE);
-     cpu->midr = 0x4106a262;
-     cpu->reset_fpsid = 0x410110a0;
-     cpu->ctr = 0x1dd20d2;
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 92771d3790..daa99169fd 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1250,6 +1250,7 @@ enum arm_features {
-     ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings */
-     ARM_FEATURE_PMU, /* has PMU support */
-     ARM_FEATURE_VBAR, /* has cp15 VBAR */
-+    ARM_FEATURE_JAZELLE, /* has Jazelle execution state */
- };
- 
- static inline int arm_feature(CPUARMState *env, int feature)
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index e52a6d7622..3a9142cd7d 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -41,7 +41,7 @@
- #define ENABLE_ARCH_5     arm_dc_feature(s, ARM_FEATURE_V5)
- /* currently all emulated v5 cores are also v5TE, so don't bother */
- #define ENABLE_ARCH_5TE   arm_dc_feature(s, ARM_FEATURE_V5)
--#define ENABLE_ARCH_5J    0
-+#define ENABLE_ARCH_5J    arm_dc_feature(s, ARM_FEATURE_JAZELLE)
- #define ENABLE_ARCH_6     arm_dc_feature(s, ARM_FEATURE_V6)
- #define ENABLE_ARCH_6K    arm_dc_feature(s, ARM_FEATURE_V6K)
- #define ENABLE_ARCH_6T2   arm_dc_feature(s, ARM_FEATURE_THUMB2)
--- 
-2.14.1
+T: git git://repo.or.cz/qemu/kevin.git block
+
+How hard is it for you to post a rebased v11 on top of Manos' work?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--6ijkiRs6wOgkSLPOdM9ervufAr2qio2dp
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmvFM8ACgkQp6FrSiUn
+Q2qIWQf8CA8dQkGAA1SLnHSaLg6WZUWtESNPKKxASKAT/eT9+WIhfA19AiDoUH/J
+JOhlrpkAplCzm7NEESm4g7xN/dtL0ffJqCrDrc9RKiUf4SUfqKRig2Hkb3VznJu2
+iUM+lcNlZPj3LDaW9ipYGohIEc4qbnOohHCir3NthIrwt+57XMgQqfzUMbEdnpDr
+nGPMKvJ77NHcK4bcDylsKtYjtrONvlh8lPPrr4DnEzCFIUmLpOljZV4K1+YI/QzG
+e4bOEkKIvKbmkrt9WaGgg+vLVoarDs7kr+1WkCHktDM2Ovcuz7VDoXGnGfrqu0NQ
+cZghyHvB7xb/+kJCJFw5KjL/vpsoUQ==
+=uhd7
+-----END PGP SIGNATURE-----
+
+--6ijkiRs6wOgkSLPOdM9ervufAr2qio2dp--
