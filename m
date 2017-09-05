@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44976)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dp3dQ-0006ER-M6
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:30:45 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dp3j2-0008DR-3G
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:36:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dp3dL-00042V-H8
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:30:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42634)
+	(envelope-from <jasowang@redhat.com>) id 1dp3ix-0007tu-D7
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:36:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39804)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dp3dL-00041w-4l
-	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:30:35 -0400
-Date: Tue, 5 Sep 2017 10:30:31 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170905023031.GD22515@lemon.lan>
-References: <20170901152200.5953-1-famz@redhat.com>
-	<20170901152200.5953-4-famz@redhat.com>
-	<dc1cf740-09d8-edfd-c953-e559395363cd@redhat.com>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dp3ix-0007sv-3f
+	for qemu-devel@nongnu.org; Mon, 04 Sep 2017 22:36:23 -0400
+References: <cover.1504533674.git.maozy.fnst@cn.fujitsu.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <0dbfac40-b8e4-9e13-78ee-6be038db8c4e@redhat.com>
+Date: Tue, 5 Sep 2017 10:36:01 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dc1cf740-09d8-edfd-c953-e559395363cd@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] docker: Add test-block
+In-Reply-To: <cover.1504533674.git.maozy.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v9 0/4] Improve error reporting
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,64 +27,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, kchamart@redhat.com
+To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, berrange@redhat.com, kraxel@redhat.com, pbonzini@redhat.com, eblake@redhat.com
 
-On Fri, 09/01 13:35, Eric Blake wrote:
-> On 09/01/2017 10:22 AM, Fam Zheng wrote:
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >  tests/docker/test-block | 22 ++++++++++++++++++++++
-> >  1 file changed, 22 insertions(+)
-> >  create mode 100755 tests/docker/test-block
-> > 
-> > diff --git a/tests/docker/test-block b/tests/docker/test-block
-> > new file mode 100755
-> > index 0000000000..efc77b4b91
-> > --- /dev/null
-> > +++ b/tests/docker/test-block
-> > @@ -0,0 +1,22 @@
-> > +#!/bin/bash -e
-> 
-> 'set -e' is awful; it exists for backwards-compatibility with shell
-> scripts that pre-date functions, but is NOT intuitive and generally does
-> NOT do what you want when shell functions are added to the mix.  You're
-> better off doing manual error checking than relying on 'set -e' to check
-> for errors on your behalf.
-> 
-> > +#
-> > +# Run block test cases
-> > +#
-> > +# Copyright (c) 2017 Red Hat Inc.
-> > +#
-> > +# Authors:
-> > +#  Fam Zheng <famz@redhat.com>
-> > +#
-> > +# This work is licensed under the terms of the GNU GPL, version 2
-> > +# or (at your option) any later version. See the COPYING file in
-> > +# the top-level directory.
-> > +
-> > +. common.rc
-> 
-> Are we sure that '.' is early enough on $PATH that this will pick up the
-> right common.rc? Safer is '. ./common.rc'.
-> 
-> > +
-> > +cd "$BUILD_DIR"
-> > +
-> > +build_qemu --target-list=x86_64-softmmu
-> > +cd tests/qemu-iotests
-> > +for t in raw qcow2 nbd luks; do
-> > +    ./check -g quick -$t
-> > +done
-> 
-> That said, this script (and common.rc) is small enough to verify that
-> you probably aren't going to trip over those non-intuitive 'set -e'
-> behaviors, so the real reason to avoid it is if we want to be able to
-> copy-and-paste into other scripts that aren't using 'set -e' (on the
-> premise that avoiding implicit global state, like 'set -e', and being
-> explicit instead, is a good thing).
 
-OK, I will revise this patch and drop set -e.
 
-Fam
+On 2017=E5=B9=B409=E6=9C=8804=E6=97=A5 22:35, Mao Zhongyi wrote:
+> v9:
+> * -rebase on upstream
+>    -fix the commit message of patch04
+>
+> v8:
+> * PATCH 02 & 04
+>    -resetting the error message for the user to read.   [Markus Armbrus=
+ter]
+>    -fix the indentation and commit message.  [Markus Armbruster]
+>   =20
+> v7:
+> * PATCH 01
+>    -fix the error message.    [Daniel P. Berrange]
+>    -adjust the indentation problem.    [Eric Blake]
+> * PATCH 03
+>    -print a generic message when gethostbyname() failed in parse_host_p=
+ort(),
+>     drop the misleading ": unkonwn host" part.    [Markus Armbruster]
+>
+> v6:
+> * PATCH 02
+>    -rename the subject
+>    -drop the "qemu: error: " prefix.
+>    -correct inappropriate error information settings.
+> * PATCH 03,04
+>    -correct inappropriate error information settings.    [Markus Armbru=
+ster]
+>
+> v5:
+> * PATCH 01 make the commit message more exact about the actual function=
+.    [Markus Armbruster]
+> * PATCH 02, 03, 04 still retains the original function, but specific
+>             content and order of each patch has been adjusted substanti=
+ally,
+>             so that ensure each patch is a completed fix.    [Markus Ar=
+mbruster]
+>
+> v4:
+> * PATCH 01 is redoing previous patch 1, replace the fprintf() with erro=
+r_report()
+> 		     in the 'default' case of net_socket_fd_init() [Markus Armbruster=
+]
+>
+> v3:
+> * PATCH 01 is suggested by Markus and Daniel that removes the dubious '=
+default' case
+>             in the net_socket_fd_init(). Jason agreed.
+> * PATCH 02 is redoing previous patch 4.
+> * PATCH 04 is redoing previous patch 2, improves sort of error messages=
+.
+>
+> v2:
+> * PATCH 02 reworking of patch 2 following Markus's suggestion that conv=
+ert error_report()
+>             in the function called by net_socket_*_init() to Error. Als=
+o add many error
+>             handling information.
+> * PATCH 03 net_socket_mcast_create(), net_socket_fd_init_dgram() and ne=
+t_socket_fd_init()
+>             use the function such as fprintf, perror to report an error=
+ message. Convert it
+>             to Error.
+> * PATCH 04 parse_host_port() may fail without reporting an error. Now, =
+fix it to set an
+>             error when it fails.
+>
+> Cc: jasowang@redhat.com
+> Cc: armbru@redhat.com
+> Cc: berrange@redhat.com
+> Cc: kraxel@redhat.com
+> Cc: pbonzini@redhat.com
+> Cc: eblake@redhat.com
+>
+> Mao Zhongyi (4):
+>    net/socket: Don't treat odd socket type as SOCK_STREAM
+>    net/socket: Convert several helper functions to Error
+>    net/net: Convert parse_host_port() to Error
+>    net/socket: Improve -net socket error reporting
+>
+>   include/qemu/sockets.h |   3 +-
+>   net/net.c              |  22 +++++--
+>   net/socket.c           | 156 ++++++++++++++++++++++++++++------------=
+---------
+>   3 files changed, 108 insertions(+), 73 deletions(-)
+>
+
+Applied.
+
+Thanks
