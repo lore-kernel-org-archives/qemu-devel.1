@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55759)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57460)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpE5d-0008Ky-Ls
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:40:37 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dpEA5-0002sA-CY
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:45:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpE5Y-0005NG-RQ
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:40:29 -0400
-Date: Tue, 5 Sep 2017 21:39:57 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170905133957.GX22515@lemon.lan>
-References: <f5ef1341-cfe2-6e20-3f98-b08ef2f7d373@redhat.com>
-	<a81c8dfb-3d98-57ad-8159-5147283433fa@virtuozzo.com>
-	<cb783ebb-198e-1814-2f9c-aec93c83b17a@virtuozzo.com>
-	<0988b4ef-56e2-5ce9-ed25-40a742eadbd4@redhat.com>
-	<b0d72a26-2052-ecc6-67f5-d32572804ebf@redhat.com>
-	<20170828025706.GA18194@lemon.lan>
-	<20170905130107.GJ4633@localhost.localdomain>
-	<20170905131858.GW22515@lemon.lan>
-	<20170905132756.GL4633@localhost.localdomain>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dpEA0-0000VD-Pz
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 09:45:05 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170905131149.10669-1-famz@redhat.com>
+	<20170905131149.10669-4-famz@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a628d888-f1e8-2d7f-034c-095c29818ae4@amsat.org>
+Date: Tue, 5 Sep 2017 10:44:46 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170905132756.GL4633@localhost.localdomain>
-Subject: Re: [Qemu-devel] Persistent bitmaps for non-qcow2 formats
+In-Reply-To: <20170905131149.10669-4-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 3/6] gicv3: Convert to DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,43 +28,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Qemu-block <qemu-block@nongnu.org>, Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org
 
-On Tue, 09/05 15:27, Kevin Wolf wrote:
-> Am 05.09.2017 um 15:18 hat Fam Zheng geschrieben:
-> > On Tue, 09/05 15:01, Kevin Wolf wrote:
-> > > Am 28.08.2017 um 04:57 hat Fam Zheng geschrieben:
-> > > > On Fri, 08/25 15:44, Max Reitz wrote:
-> > > > > Well, OK.  The main argument against supporting anything but qcow2 is
-> > > > > "if you want features, use qcow2; and we are working on making qcow2 as
-> > > > > fast as possible."  I think that's a very good argument still.  At some
-> > > > > point I (and probably others, too) had the idea of making qcow2 files in
-> > > > > raw layout: 
-> > > > 
-> > > > Yes! I think this idea makes a whole lot of sense, too. Metadata tables can be
-> > > > generated so old implementation can still use it.
-> > > 
-> > > Maybe a nice way to attack this would be "huge pages", i.e. have a L1
-> > > entry flag that tells "this points directly to a huge cluster instead of
-> > > an L2 table". Gives us 512 MB clusters with a 64k cluster size, or a
-> > > maximum of 512 GB clusters with a 2 MB cluster size.
-> > > 
-> > > Huge clusters would only be used by qemu-img create if the respective
-> > > option is given, and only with preallocation.
-> > 
-> > Then this image is not usable on old QEMUs, right? So this is going to be an
-> > incompatible_feature, whereas with the linear mapping L1/L2 tables approach, it
-> > can be an autoclear_feature.
+Hi Fam,
+
+On 09/05/2017 10:11 AM, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>   hw/intc/arm_gicv3_its_kvm.c | 19 +++++++------------
+>   1 file changed, 7 insertions(+), 12 deletions(-)
 > 
-> Ah yes, that's true. Maybe that's important enough that just a single
-> global flag is better, even if it's less flexible.
+> diff --git a/hw/intc/arm_gicv3_its_kvm.c b/hw/intc/arm_gicv3_its_kvm.c
+> index 1f8991b8a6..39903d5eab 100644
+> --- a/hw/intc/arm_gicv3_its_kvm.c
+> +++ b/hw/intc/arm_gicv3_its_kvm.c
+> @@ -120,17 +120,6 @@ static void kvm_arm_its_realize(DeviceState *dev, Error **errp)
+>       qemu_add_vm_change_state_handler(vm_change_state_handler, s);
+>   }
+>   
+> -static void kvm_arm_its_init(Object *obj)
+> -{
+> -    GICv3ITSState *s = KVM_ARM_ITS(obj);
+> -
+> -    object_property_add_link(obj, "parent-gicv3",
+> -                             "kvm-arm-gicv3", (Object **)&s->gicv3,
+> -                             object_property_allow_set_link,
+> -                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
+> -                             &error_abort);
+> -}
+> -
+>   /**
+>    * kvm_arm_its_pre_save - handles the saving of ITS registers.
+>    * ITS tables are flushed into guest RAM separately and earlier,
+> @@ -205,12 +194,19 @@ static void kvm_arm_its_post_load(GICv3ITSState *s)
+>                         GITS_CTLR, &s->ctlr, true, &error_abort);
+>   }
+>   
+> +static Property kvm_arm_its_props[] = {
+> +    DEFINE_PROP_LINK("parent-gicv3", GICv3ITSState, gicv3, "kvm-arm-gicv3",
+
+moving TYPE_KVM_ARM_GICV3 to kvm_arm.h and using it here:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> +                     GICv3State *),
+> +    DEFINE_PROP_END_OF_LIST(),
+> +};
+> +
+>   static void kvm_arm_its_class_init(ObjectClass *klass, void *data)
+>   {
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>       GICv3ITSCommonClass *icc = ARM_GICV3_ITS_COMMON_CLASS(klass);
+>   
+>       dc->realize = kvm_arm_its_realize;
+> +    dc->props   = kvm_arm_its_props;
+>       icc->send_msi = kvm_its_send_msi;
+>       icc->pre_save = kvm_arm_its_pre_save;
+>       icc->post_load = kvm_arm_its_post_load;
+> @@ -220,7 +216,6 @@ static const TypeInfo kvm_arm_its_info = {
+>       .name = TYPE_KVM_ARM_ITS,
+>       .parent = TYPE_ARM_GICV3_ITS_COMMON,
+>       .instance_size = sizeof(GICv3ITSState),
+> -    .instance_init = kvm_arm_its_init,
+>       .class_init = kvm_arm_its_class_init,
+>   };
+>   
 > 
-> Of course, this approach also means that we still need to write all of
-> the L2 tables and use disk space for them, even though newer versions
-> will never look at them.
-
-To speculate^Wmitigate, "qemu-img create" is free to pick a larger cluster size
-when this feature is used?
-
-Fam
