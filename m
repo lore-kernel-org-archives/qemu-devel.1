@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dpAAY-00073d-MN
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:29:23 -0400
+	(envelope-from <berrange@redhat.com>) id 1dpAAc-00076t-K8
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:29:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dpAAU-00079e-0x
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:29:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40964)
+	(envelope-from <berrange@redhat.com>) id 1dpAAY-0007CM-0h
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:29:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38296)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpAAT-00079F-Rd
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:29:13 -0400
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpAAX-0007Bw-RM
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 05:29:17 -0400
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue,  5 Sep 2017 10:29:08 +0100
-Message-Id: <20170905092910.8946-1-berrange@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v1 0/2] Merge QEMU crypto 2017/09/05
+Date: Tue,  5 Sep 2017 10:29:10 +0100
+Message-Id: <20170905092910.8946-3-berrange@redhat.com>
+In-Reply-To: <20170905092910.8946-1-berrange@redhat.com>
+References: <20170905092910.8946-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PULL v1 2/2] crypto: fix test cert generation to not
+ use SHA1 algorithm
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,37 +27,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, "Daniel P. Berrange" <berrange@redhat.com>
 
-The following changes since commit 32f0f68bb77289b75a82925f712bb52e16eac3=
-ba:
+GNUTLS 3.6.0 marked SHA1 as untrusted for certificates.
+Unfortunately the gnutls_x509_crt_sign() method we are
+using to create certificates in the test suite is fixed
+to always use SHA1. We must switch to a different method
+and explicitly ask for SHA256.
 
-  Merge remote-tracking branch 'remotes/ehabkost/tags/x86-and-machine-pul=
-l-request' into staging (2017-09-01 17:28:54 +0100)
-
-are available in the git repository at:
-
-  git://github.com/berrange/qemu tags/pull-qcrypto-20170905-1
-
-for you to fetch changes up to 23c1595b0297e6ca8f37559af6f0b8533aa1fd99:
-
-  crypto: fix test cert generation to not use SHA1 algorithm (2017-09-04 =
-10:45:19 +0100)
-
-----------------------------------------------------------------
-Merge QEMU crypto 2017/09/05 v1
-
-----------------------------------------------------------------
-
-Daniel P. Berrange (1):
-  crypto: fix test cert generation to not use SHA1 algorithm
-
-Philippe Mathieu-Daud=C3=A9 (1):
-  tests: fix incorrect size_t format in benchmark-crypto
-
- tests/benchmark-crypto-cipher.c | 4 ++--
- tests/benchmark-crypto-hash.c   | 4 ++--
- tests/benchmark-crypto-hmac.c   | 4 ++--
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
  tests/crypto-tls-x509-helpers.c | 3 ++-
- 4 files changed, 8 insertions(+), 7 deletions(-)
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
---=20
+diff --git a/tests/crypto-tls-x509-helpers.c b/tests/crypto-tls-x509-helpers.c
+index 64073d3bd3..173d4e28fb 100644
+--- a/tests/crypto-tls-x509-helpers.c
++++ b/tests/crypto-tls-x509-helpers.c
+@@ -406,7 +406,8 @@ test_tls_generate_cert(QCryptoTLSTestCertReq *req,
+      * If no 'ca' is set then we are self signing
+      * the cert. This is done for the root CA certs
+      */
+-    err = gnutls_x509_crt_sign(crt, ca ? ca : crt, privkey);
++    err = gnutls_x509_crt_sign2(crt, ca ? ca : crt, privkey,
++                                GNUTLS_DIG_SHA256, 0);
+     if (err < 0) {
+         g_critical("Failed to sign certificate %s",
+                    gnutls_strerror(err));
+-- 
 2.13.5
