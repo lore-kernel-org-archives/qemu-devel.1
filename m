@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46921)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpEmj-0000vl-PU
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:25:11 -0400
+	(envelope-from <niuguoxiang@huawei.com>) id 1dpD29-0000Rm-QH
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:33:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpEmb-0002Yh-Sm
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:25:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49172)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpEmb-0002Xp-KO
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:24:53 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-23-marcandre.lureau@redhat.com>
-Date: Tue, 05 Sep 2017 16:24:48 +0200
-In-Reply-To: <20170822132255.23945-23-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
-	15:22:23 +0200")
-Message-ID: <87lgltp6j3.fsf@dusky.pond.sub.org>
+	(envelope-from <niuguoxiang@huawei.com>) id 1dpD1p-0000Ov-MR
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 08:32:49 -0400
+From: niuguoxiang <niuguoxiang@huawei.com>
+Date: Tue, 5 Sep 2017 12:30:53 +0000
+Message-ID: <7FD21DDFE9A3784693E393AF276FE7D21F17E49E@DGGEMA501-MBX.china.huawei.com>
+References: <20170905112152.8851-1-ppandit@redhat.com>
+	<CAFEAcA8B4EwXCPSBsftt=QkAuH8jCBbK23-uU7NA7G3k6ADHLw@mail.gmail.com>
+In-Reply-To: <CAFEAcA8B4EwXCPSBsftt=QkAuH8jCBbK23-uU7NA7G3k6ADHLw@mail.gmail.com>
+Content-Language: zh-CN
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 22/54] qapi-introspect: add preprocessor
- conditions to generated QLit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBbUEFUQ0hdIGludGM6IGFybV9naWN2?=
+ =?utf-8?q?3=3A_limit_GICR_ipriority_index?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,104 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>, P J P <ppandit@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Prasad J Pandit <pjp@fedoraproject.org>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Add 'ifcond' condition to QLit objects.
->
-> to_qlit() handles the (obj, ifcond) tuples.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi-introspect.py | 20 +++++++++++---------
->  1 file changed, 11 insertions(+), 9 deletions(-)
->
-> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-> index 9ef6f271d4..5e736a06df 100644
-> --- a/scripts/qapi-introspect.py
-> +++ b/scripts/qapi-introspect.py
-> @@ -125,12 +125,12 @@ const QLitObject %(c_name)s =3D %(c_string)s;
->              return '[' + self._use_type(typ.element_type) + ']'
->          return self._name(typ.name)
->=20=20
-> -    def _gen_qlit(self, name, mtype, obj):
-> +    def _gen_qlit(self, name, mtype, obj, ifcond):
->          if mtype not in ('command', 'event', 'builtin', 'array'):
->              name =3D self._name(name)
->          obj['name'] =3D name
->          obj['meta-type'] =3D mtype
-> -        self._qlits.append(obj)
-> +        self._qlits.append((obj, ifcond))
-
-If I read this correctly, all elements of self._qlits become pairs, even
-the unconditional ones.  They all go through to_qlit()'s tuple case.
-Works, because gen_if(None) and gen_endif(None) do nothing.
-
-Would
-
-           if ifcond:
-               obj =3D (obj, ifcond)
-           self.qlits.append(obj)
-
-be clearer?  It could be a bit more efficient, but I doubt that matters.
-
->=20=20
->      def _gen_member(self, member):
->          ret =3D {'name': member.name, 'type': self._use_type(member.type=
-)}
-> @@ -146,26 +146,27 @@ const QLitObject %(c_name)s =3D %(c_string)s;
->          return {'case': variant.name, 'type': self._use_type(variant.typ=
-e)}
->=20=20
->      def visit_builtin_type(self, name, info, json_type):
-> -        self._gen_qlit(name, 'builtin', {'json-type': json_type})
-> +        self._gen_qlit(name, 'builtin', {'json-type': json_type}, None)
->=20=20
->      def visit_enum_type(self, name, info, values, prefix, ifcond):
-> -        self._gen_qlit(name, 'enum', {'values': values})
-> +        self._gen_qlit(name, 'enum', {'values': values}, ifcond)
->=20=20
->      def visit_array_type(self, name, info, element_type, ifcond):
->          element =3D self._use_type(element_type)
-> -        self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
-ement})
-> +        self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
-ement},
-> +                       ifcond)
->=20=20
->      def visit_object_type_flat(self, name, info, members, variants, ifco=
-nd):
->          obj =3D {'members': [self._gen_member(m) for m in members]}
->          if variants:
->              obj.update(self._gen_variants(variants.tag_member.name,
->                                            variants.variants))
-> -        self._gen_qlit(name, 'object', obj)
-> +        self._gen_qlit(name, 'object', obj, ifcond)
->=20=20
->      def visit_alternate_type(self, name, info, variants, ifcond):
->          self._gen_qlit(name, 'alternate',
->                         {'members': [{'type': self._use_type(m.type)}
-> -                                    for m in variants.variants]})
-> +                                    for m in variants.variants]}, ifcond)
->=20=20
->      def visit_command(self, name, info, arg_type, ret_type,
->                        gen, success_response, boxed, ifcond):
-> @@ -173,11 +174,12 @@ const QLitObject %(c_name)s =3D %(c_string)s;
->          ret_type =3D ret_type or self._schema.the_empty_object_type
->          self._gen_qlit(name, 'command',
->                         {'arg-type': self._use_type(arg_type),
-> -                        'ret-type': self._use_type(ret_type)})
-> +                        'ret-type': self._use_type(ret_type)}, ifcond)
->=20=20
->      def visit_event(self, name, info, arg_type, boxed, ifcond):
->          arg_type =3D arg_type or self._schema.the_empty_object_type
-> -        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
-pe)})
-> +        self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
-pe)},
-> +                       ifcond)
->=20=20
->  # Debugging aid: unmask QAPI schema's type names
->  # We normally mask them, because they're not QMP wire ABI
+SSB0aGluayBvbmx5IGFzc2VydCBpcyBub3QgZW5vdWdoLCBiZWNhdXNlIGFzc2VydCgpIGRlcGVu
+ZHMgb24gTkRFQlVHIHByZXByb2Nlc3NpbmcsIHBsZWFzZSBjaGVjayA6DQoNCg0KDQovdXNyL2lu
+Y2x1ZGUvYXNzZXJ0LmgNCg0KDQoNCjM3I2lmIGRlZmluZWQgX19jcGx1c3BsdXMgJiYgX19HTlVD
+X1BSRVJFUSAoMiw5NSkNCg0KMzgjIGRlZmluZSBfX0FTU0VSVF9WT0lEX0NBU1Qgc3RhdGljX2Nh
+c3Q8dm9pZD4NCg0KMzkjZWxzZQ0KDQo0MCMgZGVmaW5lIF9fQVNTRVJUX1ZPSURfQ0FTVCAodm9p
+ZCkNCg0KNDEjZW5kaWYNCg0KDQoNCjQ4I2lmZGVmICBOREVCVUcNCg0KNDkNCg0KNTAjIGRlZmlu
+ZSBhc3NlcnQoZXhwcikgICAgICAgICAgIChfX0FTU0VSVF9WT0lEX0NBU1QgKDApKQ0KDQoNCg0K
+NjIjZWxzZSAvKiBOb3QgTkRFQlVHLiAgKi8NCg0KNjgvKiBUaGlzIHByaW50cyBhbiAiQXNzZXJ0
+aW9uIGZhaWxlZCIgbWVzc2FnZSBhbmQgYWJvcnRzLiAgKi8NCg0KNjlleHRlcm4gdm9pZCBfX2Fz
+c2VydF9mYWlsIChjb25zdCBjaGFyICpfX2Fzc2VydGlvbiwgY29uc3QgY2hhciAqX19maWxlLA0K
+DQo3MCAgICAgICAgICAgICAgICAgICAgICAgICAgIHVuc2lnbmVkIGludCBfX2xpbmUsIGNvbnN0
+IGNoYXIgKl9fZnVuY3Rpb24pDQoNCjcxICAgICBfX1RIUk9XIF9fYXR0cmlidXRlX18gKChfX25v
+cmV0dXJuX18pKTsNCg0KIDg2I2VuZGlmIC8qIE5vdCBfQVNTRVJUX0hfREVDTFMgKi8NCg0KDQoN
+Cjg4IyBkZWZpbmUgYXNzZXJ0KGV4cHIpICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgXA0KDQo4OSAgKChleHByKSAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFwNCg0KOTAgICA/IF9fQVNT
+RVJUX1ZPSURfQ0FTVCAoMCkgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBcDQoNCjkxICAgOiBfX2Fzc2VydF9mYWlsIChfX1NUUklORyhleHByKSwgX19GSUxFX18s
+IF9fTElORV9fLCBfX0FTU0VSVF9GVU5DVElPTikpDQoNCjkyDQoNCg0KDQpGcm9tIGFib3ZlLCBm
+b3IgTkRFQlVHLCBpdCBtYXkgZG8gbm90aGluZyB3aGVuIGFzc2VydCBmYWlsLA0KDQpmb3IgTm90
+IE5ERUJVRywgaXQgd2lsbCBwcmludCBhbmQgYWJvcnQgd2hlbiBhc3NlcnQgZmFpbC4NCg0KDQoN
+ClNvLCBmb3IgTkRFQlVHLCBhc3NlcnQgd2lsbCBub3Qgd29yayB3aGVuIG9mZnNldCBpcyAweDEw
+MDAwZC4NCg0KDQoNCkhvdyBkbyB5b3UgdGhpbms/DQoNCg0KDQpCcu+8jA0KDQpHdW94aWFuZyBO
+aXUNCg0KDQoNCuWNjuS4uuaKgOacr+aciemZkOWFrOWPuCBIdWF3ZWkgVGVjaG5vbG9naWVzIENv
+LiwgTHRkLg0KDQoNCg0KDQoNCg0KDQrmnKzpgq7ku7blj4rlhbbpmYTku7blkKvmnInljY7kuLrl
+hazlj7jnmoTkv53lr4bkv6Hmga/vvIzku4XpmZDkuo7lj5HpgIHnu5nkuIrpnaLlnLDlnYDkuK3l
+iJflh7rnmoTkuKrkurrmiJbnvqTnu4TjgILnpoENCg0K5q2i5Lu75L2V5YW25LuW5Lq65Lul5Lu7
+5L2V5b2i5byP5L2/55So77yI5YyF5ous5L2G5LiN6ZmQ5LqO5YWo6YOo5oiW6YOo5YiG5Zyw5rOE
+6Zyy44CB5aSN5Yi244CB5oiW5pWj5Y+R77yJ5pys6YKu5Lu25LitDQoNCueahOS/oeaBr+OAguWm
+guaenOaCqOmUmeaUtuS6huacrOmCruS7tu+8jOivt+aCqOeri+WNs+eUteivneaIlumCruS7tumA
+muefpeWPkeS7tuS6uuW5tuWIoOmZpOacrOmCruS7tu+8gQ0KDQpUaGlzIGUtbWFpbCBhbmQgaXRz
+IGF0dGFjaG1lbnRzIGNvbnRhaW4gY29uZmlkZW50aWFsIGluZm9ybWF0aW9uIGZyb20gSFVBV0VJ
+LCB3aGljaA0KDQppcyBpbnRlbmRlZCBvbmx5IGZvciB0aGUgcGVyc29uIG9yIGVudGl0eSB3aG9z
+ZSBhZGRyZXNzIGlzIGxpc3RlZCBhYm92ZS4gQW55IHVzZSBvZiB0aGUNCg0KaW5mb3JtYXRpb24g
+Y29udGFpbmVkIGhlcmVpbiBpbiBhbnkgd2F5IChpbmNsdWRpbmcsIGJ1dCBub3QgbGltaXRlZCB0
+bywgdG90YWwgb3IgcGFydGlhbA0KDQpkaXNjbG9zdXJlLCByZXByb2R1Y3Rpb24sIG9yIGRpc3Nl
+bWluYXRpb24pIGJ5IHBlcnNvbnMgb3RoZXIgdGhhbiB0aGUgaW50ZW5kZWQNCg0KcmVjaXBpZW50
+KHMpIGlzIHByb2hpYml0ZWQuIElmIHlvdSByZWNlaXZlIHRoaXMgZS1tYWlsIGluIGVycm9yLCBw
+bGVhc2Ugbm90aWZ5IHRoZSBzZW5kZXIgYnkNCg0KcGhvbmUgb3IgZW1haWwgaW1tZWRpYXRlbHkg
+YW5kIGRlbGV0ZSBpdCENCg0KDQoNCi0tLS0t6YKu5Lu25Y6f5Lu2LS0tLS0NCuWPkeS7tuS6ujog
+UGV0ZXIgTWF5ZGVsbCBbbWFpbHRvOnBldGVyLm1heWRlbGxAbGluYXJvLm9yZ10NCuWPkemAgeaX
+tumXtDogMjAxN+W5tDnmnIg15pelIDE5OjU5DQrmlLbku7bkuro6IFAgSiBQDQrmioTpgIE6IFFF
+TVUgRGV2ZWxvcGVyczsgcWVtdS1hcm07IG5pdWd1b3hpYW5nOyBQcmFzYWQgSiBQYW5kaXQNCuS4
+u+mimDogUmU6IFtQQVRDSF0gaW50YzogYXJtX2dpY3YzOiBsaW1pdCBHSUNSIGlwcmlvcml0eSBp
+bmRleA0KDQoNCg0KT24gNSBTZXB0ZW1iZXIgMjAxNyBhdCAxMjoyMSwgUCBKIFAgPHBwYW5kaXRA
+cmVkaGF0LmNvbTxtYWlsdG86cHBhbmRpdEByZWRoYXQuY29tPj4gd3JvdGU6DQoNCj4gRnJvbTog
+UHJhc2FkIEogUGFuZGl0IDxwanBAZmVkb3JhcHJvamVjdC5vcmc8bWFpbHRvOnBqcEBmZWRvcmFw
+cm9qZWN0Lm9yZz4+DQoNCj4NCg0KPiBXaGVuIHJlYWRpbmcgb3Igd3JpdGluZyB0byBHSUNSIGlw
+cmlvcml0eSBhcnJheSwgaW5kZXggJ2lycScNCg0KPiBjb3VsZCBnbyBiZXlvbmQgaXRzIGJvdW5k
+czsgUmVzdHJpY3QgaXQgd2l0aGluIGFycmF5IGxpbWl0cy4NCg0KPg0KDQo+IFJlcG9ydGVkLWJ5
+OiBHdW94aWFuZyBOaXUgPG5pdWd1b3hpYW5nQGh1YXdlaS5jb208bWFpbHRvOm5pdWd1b3hpYW5n
+QGh1YXdlaS5jb20+Pg0KDQo+IFNpZ25lZC1vZmYtYnk6IFByYXNhZCBKIFBhbmRpdCA8cGpwQGZl
+ZG9yYXByb2plY3Qub3JnPG1haWx0bzpwanBAZmVkb3JhcHJvamVjdC5vcmc+Pg0KDQo+IC0tLQ0K
+DQo+ICBody9pbnRjL2FybV9naWN2M19yZWRpc3QuYyB8IDQgKystLQ0KDQo+ICAxIGZpbGUgY2hh
+bmdlZCwgMiBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygtKQ0KDQo+DQoNCj4gZGlmZiAtLWdp
+dCBhL2h3L2ludGMvYXJtX2dpY3YzX3JlZGlzdC5jIGIvaHcvaW50Yy9hcm1fZ2ljdjNfcmVkaXN0
+LmMNCg0KPiBpbmRleCA3N2U1Y2ZhMzI3Li43NjgzYzRjYzdmIDEwMDY0NA0KDQo+IC0tLSBhL2h3
+L2ludGMvYXJtX2dpY3YzX3JlZGlzdC5jDQoNCj4gKysrIGIvaHcvaW50Yy9hcm1fZ2ljdjNfcmVk
+aXN0LmMNCg0KPiBAQCAtMTg3LDcgKzE4Nyw3IEBAIHN0YXRpYyBNZW1UeFJlc3VsdCBnaWNyX3Jl
+YWRsKEdJQ3YzQ1BVU3RhdGUgKmNzLCBod2FkZHIgb2Zmc2V0LA0KDQo+ICAgICAgY2FzZSBHSUNS
+X0lDQUNUSVZFUjA6DQoNCj4gICAgICAgICAgKmRhdGEgPSBnaWNyX3JlYWRfYml0bWFwX3JlZyhj
+cywgYXR0cnMsIGNzLT5naWNyX2lhY3RpdmVyMCk7DQoNCj4gICAgICAgICAgcmV0dXJuIE1FTVRY
+X09LOw0KDQo+IC0gICAgY2FzZSBHSUNSX0lQUklPUklUWVIgLi4uIEdJQ1JfSVBSSU9SSVRZUiAr
+IDB4MWY6DQoNCj4gKyAgICBjYXNlIEdJQ1JfSVBSSU9SSVRZUiAuLi4gR0lDUl9JUFJJT1JJVFlS
+ICsgMHgxYzoNCg0KPiAgICAgIHsNCg0KPiAgICAgICAgICBpbnQgaSwgaXJxID0gb2Zmc2V0IC0g
+R0lDUl9JUFJJT1JJVFlSOw0KDQo+ICAgICAgICAgIHVpbnQzMl90IHZhbHVlID0gMDsNCg0KPiBA
+QCAtMzEwLDcgKzMxMCw3IEBAIHN0YXRpYyBNZW1UeFJlc3VsdCBnaWNyX3dyaXRlbChHSUN2M0NQ
+VVN0YXRlICpjcywgaHdhZGRyIG9mZnNldCwNCg0KPiAgICAgIGNhc2UgR0lDUl9JQ0FDVElWRVIw
+Og0KDQo+ICAgICAgICAgIGdpY3Jfd3JpdGVfY2xlYXJfYml0bWFwX3JlZyhjcywgYXR0cnMsICZj
+cy0+Z2ljcl9pYWN0aXZlcjAsIHZhbHVlKTsNCg0KPiAgICAgICAgICByZXR1cm4gTUVNVFhfT0s7
+DQoNCj4gLSAgICBjYXNlIEdJQ1JfSVBSSU9SSVRZUiAuLi4gR0lDUl9JUFJJT1JJVFlSICsgMHgx
+ZjoNCg0KPiArICAgIGNhc2UgR0lDUl9JUFJJT1JJVFlSIC4uLiBHSUNSX0lQUklPUklUWVIgKyAw
+eDFjOg0KDQo+ICAgICAgew0KDQo+ICAgICAgICAgIGludCBpLCBpcnEgPSBvZmZzZXQgLSBHSUNS
+X0lQUklPUklUWVI7DQoNCg0KDQpXaHkgZG8geW91IHRoaW5rIHRoZSBidWZmZXIgY2FuIGJlIG92
+ZXJydW4/IFRoZXNlIGZ1bmN0aW9ucyBhcmUgdGhlIHdvcmQgKDQgYnl0ZSkgYWNjZXNzIGZ1bmN0
+aW9ucywgYW5kIHRoZXkgY2Fubm90IGJlIGNhbGxlZCB3aXRoIGEgbm9uLTQtYWxpZ25lZCBvZmZz
+ZXQgKHNlZSB0aGUgYXNzZXJ0cyBpbg0KDQpnaWN2M19yZWRpc3RfcmVhZCgpIGFuZCBnaWN2M19y
+ZWRpc3Rfd3JpdGUoKSkuDQoNCg0KDQp0aGFua3MNCg0KLS0gUE1NDQo=
