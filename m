@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpFEI-0003yz-Ow
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:53:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpFHU-00069H-4z
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:56:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpFEE-0003BP-0D
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:53:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36304)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpFED-0003Au-Nl
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:53:25 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-24-marcandre.lureau@redhat.com>
-Date: Tue, 05 Sep 2017 16:53:17 +0200
-In-Reply-To: <20170822132255.23945-24-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
-	15:22:24 +0200")
-Message-ID: <874lshp57m.fsf@dusky.pond.sub.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1dpFHK-0005Pm-LM
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:56:48 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:38252)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dpFHK-0005PS-Df
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 10:56:38 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id 108so9287381wra.5
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 07:56:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170831035306.29170-1-f4bug@amsat.org>
+References: <20170831035306.29170-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 5 Sep 2017 15:56:16 +0100
+Message-ID: <CAFEAcA9cK2UEJGY9=Y5z8+d14MTF7n84rVgwjTDu_1f6BD0hzA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 23/54] qapi-commands: add #if conditions
- to commands
+Subject: Re: [Qemu-devel] [PATCH 0/7] serial: add serial_chr_nonnull()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,140 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>, Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Eric Blake <eblake@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-
-> Wrap generated code with #if/#endif using the ifcond_decorator.
+On 31 August 2017 at 04:52, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> w=
+rote:
+> Hi,
 >
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi-commands.py  | 2 ++
->  tests/test-qmp-commands.c | 4 ++--
->  2 files changed, 4 insertions(+), 2 deletions(-)
+> This series add the serial_chr_nonnull() which connect to the "null" char=
+dev
+> backend if none is provided.
 >
-> diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-> index 5eb96b2d95..db45415c41 100644
-> --- a/scripts/qapi-commands.py
-> +++ b/scripts/qapi-commands.py
-> @@ -228,6 +228,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
->          self.defn =3D None
->          self._regy =3D None
->          self._visited_ret_types =3D None
-> +        self.if_members =3D ['decl', 'defn', '_regy']
->=20=20
->      def visit_begin(self, schema):
->          self.decl =3D ''
-> @@ -240,6 +241,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
->          self._regy =3D None
->          self._visited_ret_types =3D None
->=20=20
-> +    @ifcond_decorator
->      def visit_command(self, name, info, arg_type, ret_type,
->                        gen, success_response, boxed, ifcond):
->          if not gen:
-> diff --git a/tests/test-qmp-commands.c b/tests/test-qmp-commands.c
-> index 9b9a7ffee7..ad7b6e4e1d 100644
-> --- a/tests/test-qmp-commands.c
-> +++ b/tests/test-qmp-commands.c
-> @@ -10,11 +10,11 @@
->=20=20
->  static QmpCommandList qmp_commands;
->=20=20
-> -/* #if defined(TEST_IF_CMD) */
-> +#if defined(TEST_IF_CMD)
->  void qmp_TestIfCmd(TestIfStruct *foo, Error **errp)
->  {
->  }
-> -/* #endif */
-> +#endif
->=20=20
->  void qmp_user_def_cmd(Error **errp)
->  {
+> Inspired by Peter's suggestion:
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg05987.html
+> which also refers to this issue:
+> http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg03546.html
+>
+> Some boards still check serial_hds[x] non null before calling serial_mm_i=
+nit(),
+> this check could now be removed on the SoC which always have an UART mapp=
+ed.
 
-To find out whether the clever decorator is worth its keep, I replaced
-it with the dumbest, most obvious code I could think of (appended).
-Does this make visit_command() easier or harder to understand?
+I think this is definitely an area we need to sort out,
+so thanks for sending this patchset. I have two major comments
+on it:
+
+(1) I don't think we should be using serial_chr_nonnull() in the
+board and SoC code (your patches 3 and 4 here). I think the design
+principle we should be aiming for is:
+ * devices which accept a Chardev should cope with being passed
+   a NULL pointer, and so their users never need to care
+
+serial_mm_init() is basically a device (though it has never been
+QOMified), so it is correct that it should change to handle NULL.
+
+Patch 4 (malta) : we should just delete the entire for() loop,
+ideally, but this runs into awkwardness because serial_hds_isa_init()
+then won't create uart 0 and 1. Maybe leave it alone for the moment.
+
+In patch 5, exynos4210_uart_create() is code that uses a device,
+not code that implements it, so it should be able to simplify to
+just doing chr =3D serial_hds[channel]; .
+(there is scope for further cleanup here because there are only
+4 callsites for this utility function, which really ought to
+just always take a Chardev* and not support the 'or pass an
+integer channel number' stuff. I'd leave that for a different
+patchset though.)
+
+Patches 6 and 7 look OK.
 
 
+On to point (2): is creating a dummy null chardev the right
+way to arrange for devices to handle a NULL chardev pointer?
+Most of the qemu_chr_fe_*() functions have checks for
+"if we are passed a CharBackend with a NULL Chardev pointer
+do nothing", which suggests that the design intent here is
+that char devices should be able to just work without having
+to special case NULL. If that can generally be done without
+char device authors having to think too hard then I feel
+like we should continue with that approach. It's only
+if it looks like that's too error-prone that the "create
+a dummy null chardev" approach makes sense, I think (and in
+that case maybe we can drop all those NULL pointer checks
+in the fe functions?)
 
-diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-index db45415c41..13d37d2ac2 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi-commands.py
-@@ -228,7 +228,6 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
-         self.defn =3D None
-         self._regy =3D None
-         self._visited_ret_types =3D None
--        self.if_members =3D ['decl', 'defn', '_regy']
-=20
-     def visit_begin(self, schema):
-         self.decl =3D ''
-@@ -241,18 +240,21 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
-         self._regy =3D None
-         self._visited_ret_types =3D None
-=20
--    @ifcond_decorator
-     def visit_command(self, name, info, arg_type, ret_type,
-                       gen, success_response, boxed, ifcond):
-         if not gen:
-             return
--        self.decl +=3D gen_command_decl(name, arg_type, boxed, ret_type)
-+        decl =3D gen_command_decl(name, arg_type, boxed, ret_type)
-+        defn =3D ''
-         if ret_type and ret_type not in self._visited_ret_types:
-             self._visited_ret_types.add(ret_type)
--            self.defn +=3D gen_marshal_output(ret_type)
--        self.decl +=3D gen_marshal_decl(name)
--        self.defn +=3D gen_marshal(name, arg_type, boxed, ret_type)
--        self._regy +=3D gen_register_command(name, success_response)
-+            defn +=3D gen_marshal_output(ret_type)
-+        decl +=3D gen_marshal_decl(name)
-+        defn +=3D gen_marshal(name, arg_type, boxed, ret_type)
-+        self.decl +=3D gen_ifcond(ifcond, decl)
-+        self.defn +=3D gen_ifcond(ifcond, defn)
-+        self._regy +=3D gen_ifcond(ifcond,
-+                                 gen_register_command(name, success_respon=
-se))
-=20
-=20
- (input_file, output_dir, do_c, do_h, prefix, opts) =3D parse_command_line()
-diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 52099332f1..3de5b8b8f0 100644
---- a/scripts/qapi.py
-+++ b/scripts/qapi.py
-@@ -1918,29 +1918,10 @@ def gen_endif(ifcond):
-     return ret
-=20
-=20
--# Wrap a method to add #if / #endif to generated code, only if some
--# code was generated.
--# self must have 'if_members' listing the attributes to wrap.
--# The last argument of the wrapped function must be the 'ifcond'.
--def ifcond_decorator(func):
--
--    def func_wrapper(self, *args, **kwargs):
--        ifcond =3D args[-1]
--        save =3D {}
--        for mem in self.if_members:
--            save[mem] =3D getattr(self, mem)
--        func(self, *args, **kwargs)
--        for mem, val in save.items():
--            newval =3D getattr(self, mem)
--            if newval !=3D val:
--                assert newval.startswith(val)
--                newval =3D newval[len(val):]
--                val +=3D gen_if(ifcond)
--                val +=3D newval
--                val +=3D gen_endif(ifcond)
--            setattr(self, mem, val)
--
--    return func_wrapper
-+def gen_ifcond(ifcond, ctext):
-+    if ifcond:
-+        return gen_if(ifcond) + ctext + gen_endif(ifcond)
-+    return ctext
-=20
-=20
- def gen_enum_lookup(name, values, prefix=3DNone):
+What is going wrong in the serial_mm_init() case that's
+causing it to fail when the chardev pointer is NULL ?
+
+thanks
+-- PMM
