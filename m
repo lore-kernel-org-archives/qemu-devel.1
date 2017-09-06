@@ -1,41 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48849)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjrosato@linux.vnet.ibm.com>) id 1dpepb-0001Tw-UU
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:13:44 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dperG-000295-WC
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:15:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjrosato@linux.vnet.ibm.com>) id 1dpepX-0003er-UE
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:13:43 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54225
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mjrosato@linux.vnet.ibm.com>)
-	id 1dpepX-0003ed-O8
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:13:39 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v86I8m2U062807
-	for <qemu-devel@nongnu.org>; Wed, 6 Sep 2017 14:13:39 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cth6xpbw3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 14:13:38 -0400
-Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mjrosato@linux.vnet.ibm.com>;
-	Wed, 6 Sep 2017 14:13:38 -0400
-References: <20170904154316.4148-1-david@redhat.com>
-	<20170904154316.4148-18-david@redhat.com>
-From: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
-Date: Wed, 6 Sep 2017 14:13:34 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dperC-0004Jk-T2
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:15:26 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:47387)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dperC-0004JX-Hc
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:15:22 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed,  6 Sep 2017 21:15:11 +0300
+Message-Id: <150472171121.24907.12569584037182483614.stgit@frigg.lan>
+In-Reply-To: <150471856141.24907.274176769201097378.stgit@frigg.lan>
+References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170904154316.4148-18-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <40d23c4e-2761-24ae-5f5a-3db9b478ffd2@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 17/19] s390x: CPU hot unplug via
- device_del cannot work
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 13/20] instrument: Add event 'guest_cpu_exit'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,54 +26,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 09/04/2017 11:43 AM, David Hildenbrand wrote:
-> device_del on a CPU will currently do nothing. Let's emmit an error
-> telling that this is will never work (there is no architecture support
-> on s390x). Error message copied from ppc.
-> 
-> (qemu) device_del cpu1
-> device_del cpu1
-> CPU hot unplug not supported on this machine
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ instrument/control.c            |    9 +++++++++
+ instrument/events.h             |    3 +++
+ instrument/events.inc.h         |   11 +++++++++++
+ instrument/load.c               |    1 +
+ instrument/qemu-instr/control.h |    9 +++++++++
+ stubs/instrument.c              |    1 +
+ trace/control.c                 |    4 +++-
+ 7 files changed, 37 insertions(+), 1 deletion(-)
 
-Architecture discussions aside, this code will work as-is to prevent CPU
-unplug.  Add "currently" as Christian suggests and:
-
-Reviewed-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
-
-> ---
->  hw/s390x/s390-virtio-ccw.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 22a8a1b45d..dd149567bb 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -338,6 +338,15 @@ static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
->      }
->  }
-> 
-> +static void s390_machine_device_unplug_request(HotplugHandler *hotplug_dev,
-> +                                               DeviceState *dev, Error **errp)
-> +{
-> +    if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-> +        error_setg(errp, "CPU hot unplug not supported on this machine");
-> +        return;
-> +    }
-> +}
-> +
->  static HotplugHandler *s390_get_hotplug_handler(MachineState *machine,
->                                                  DeviceState *dev)
->  {
-> @@ -387,6 +396,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->      mc->max_cpus = 248;
->      mc->get_hotplug_handler = s390_get_hotplug_handler;
->      hc->plug = s390_machine_device_plug;
-> +    hc->unplug_request = s390_machine_device_unplug_request;
->      nc->nmi_monitor_handler = s390_nmi;
->  }
-> 
+diff --git a/instrument/control.c b/instrument/control.c
+index ed0d537b88..09ba682483 100644
+--- a/instrument/control.c
++++ b/instrument/control.c
+@@ -57,3 +57,12 @@ QI_VPUBLIC void qi_event_set_guest_cpu_enter(void (*fn=
+)(QICPU vcpu))
+     ERROR_IF(!instr_get_state(), "called outside instrumentation");
+     instr_set_event(guest_cpu_enter, fn);
+ }
++
++
++void (*instr_event__guest_cpu_exit)(QICPU vcpu);
++
++QI_VPUBLIC void qi_event_set_guest_cpu_exit(void (*fn)(QICPU vcpu))
++{
++    ERROR_IF(!instr_get_state(), "called outside instrumentation");
++    instr_set_event(guest_cpu_exit, fn);
++}
+diff --git a/instrument/events.h b/instrument/events.h
+index 947f120aa9..c743cb8180 100644
+--- a/instrument/events.h
++++ b/instrument/events.h
+@@ -36,6 +36,9 @@ extern void *instr_event__fini_data;
+ extern void (*instr_event__guest_cpu_enter)(QICPU vcpu);
+ static inline void instr_guest_cpu_enter(CPUState *vcpu);
+=20
++extern void (*instr_event__guest_cpu_exit)(QICPU vcpu);
++static inline void instr_guest_cpu_exit(CPUState *vcpu);
++
+=20
+ #include "instrument/events.inc.h"
+=20
+diff --git a/instrument/events.inc.h b/instrument/events.inc.h
+index 238cce9855..bcbf0cb32a 100644
+--- a/instrument/events.inc.h
++++ b/instrument/events.inc.h
+@@ -20,3 +20,14 @@ static inline void instr_guest_cpu_enter(CPUState *vcp=
+u)
+         instr_set_state(INSTR_STATE_DISABLE);
+     }
+ }
++
++static inline void instr_guest_cpu_exit(CPUState *vcpu)
++{
++    void (*cb)(QICPU vcpu) =3D instr_get_event(guest_cpu_exit);
++    if (cb) {
++        QICPU vcpu_ =3D instr_cpu_set(vcpu);
++        instr_set_state(INSTR_STATE_ENABLE);
++        (*cb)(vcpu_);
++        instr_set_state(INSTR_STATE_DISABLE);
++    }
++}
+diff --git a/instrument/load.c b/instrument/load.c
+index 0fe878afa8..63b7d564ec 100644
+--- a/instrument/load.c
++++ b/instrument/load.c
+@@ -149,6 +149,7 @@ InstrUnloadError instr_unload(int64_t handle_id)
+=20
+     instr_set_event(fini_fn, NULL);
+     instr_set_event(guest_cpu_enter, NULL);
++    instr_set_event(guest_cpu_exit, NULL);
+=20
+     /* this should never fail */
+     if (dlclose(handle->dlhandle) < 0) {
+diff --git a/instrument/qemu-instr/control.h b/instrument/qemu-instr/cont=
+rol.h
+index 26d8aa976d..c37a380ab0 100644
+--- a/instrument/qemu-instr/control.h
++++ b/instrument/qemu-instr/control.h
+@@ -80,6 +80,15 @@ void qi_set_fini(qi_fini_fn fn, void *data);
+  */
+ void qi_event_set_guest_cpu_enter(void (*fn)(QICPU vcpu));
+=20
++/*
++ * Hot-unplug a virtual (guest) CPU.
++ *
++ * Mode: user, softmmu
++ * Targets: all
++ * Time: exec
++ */
++void qi_event_set_guest_cpu_exit(void (*fn)(QICPU vcpu));
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/stubs/instrument.c b/stubs/instrument.c
+index 658a872e1c..ea8df6d467 100644
+--- a/stubs/instrument.c
++++ b/stubs/instrument.c
+@@ -12,3 +12,4 @@
+=20
+ __thread InstrState instr_cur_state;
+ void (*instr_event__guest_cpu_enter)(QICPU *vcpu);
++void (*instr_event__guest_cpu_exit)(QICPU *vcpu);
+diff --git a/trace/control.c b/trace/control.c
+index 82d8989c4d..946a0af818 100644
+--- a/trace/control.c
++++ b/trace/control.c
+@@ -1,13 +1,14 @@
+ /*
+  * Interface for configuring and controlling the state of tracing events.
+  *
+- * Copyright (C) 2011-2016 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ * Copyright (C) 2011-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
+  */
+=20
+ #include "qemu/osdep.h"
++#include "instrument/events.h"
+ #include "trace/control.h"
+ #include "qemu/help_option.h"
+ #ifdef CONFIG_TRACE_SIMPLE
+@@ -272,6 +273,7 @@ void trace_fini_vcpu(CPUState *vcpu)
+     TraceEventIter iter;
+     TraceEvent *ev;
+=20
++    instr_guest_cpu_exit(vcpu);
+     trace_guest_cpu_exit(vcpu);
+=20
+     trace_event_iter_init(&iter, NULL);
