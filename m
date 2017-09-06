@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dpbRP-0006zI-JH
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:36:32 -0400
+	(envelope-from <quintela@redhat.com>) id 1dpbX7-0001wW-6P
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:42:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dpbRK-0000sV-Pw
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:36:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41504)
+	(envelope-from <quintela@redhat.com>) id 1dpbX3-00047S-Vz
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:42:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56730)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dpbRK-0000rU-K2
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:36:26 -0400
-Date: Wed, 6 Sep 2017 15:36:19 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170906143618.GE2215@work-vm>
-References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-	<1504081950-2528-5-git-send-email-peterx@redhat.com>
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dpbX3-00045u-QI
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:42:21 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id ADA41C047B67
+	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 14:42:20 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <7e71d190-8e49-ca6b-ef44-522100b27b8c@redhat.com> (Eric Blake's
+	message of "Wed, 6 Sep 2017 09:00:51 -0500")
+References: <20170906115143.27451-1-quintela@redhat.com>
+	<20170906115143.27451-2-quintela@redhat.com>
+	<7e71d190-8e49-ca6b-ef44-522100b27b8c@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 06 Sep 2017 16:42:18 +0200
+Message-ID: <87pob351o5.fsf@secure.mitica>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1504081950-2528-5-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 04/33] migration: dump str in
- migrate_set_state trace
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v7 01/22] Revert "io: add new
+ qio_channel_{readv, writev, read, write}_all functions"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +36,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Strings are more readable for debugging.
-> 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+Eric Blake <eblake@redhat.com> wrote:
+> On 09/06/2017 06:51 AM, Juan Quintela wrote:
+>> This reverts commit d4622e55883211072621958d39ddaa73483d201e.
+>
+> But with no reason why?  What bugs are you fixing by reverting this?
 
-I've queued this individual patch; it's standalone and useful as is.
+I put it on the cover letter.  I am investigating *why* it fails on me.
+It got the thread handed.
 
-Dave
+>
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  include/io/channel.h       |  90 ---------------------------------------
+>>  io/channel.c               |  94 -----------------------------------------
+>>  tests/io-channel-helpers.c | 102 +++++++++++++++++++++++++++++++++++++++++----
+>>  3 files changed, 93 insertions(+), 193 deletions(-)
+>>
+>
+> Looking ahead, I see 8/22 recreates qio_channel_readv_all (but not
+> qio_channel_read_all); how does that differ from this one?
+>
+> Should you be squashing 1/22 and 8/22 into a single non-revert patch
+> that just fixes bugs on top of what is already in the tree?
 
-> ---
->  migration/migration.c  | 3 ++-
->  migration/trace-events | 2 +-
->  2 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index eb7d767..c818412 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -914,8 +914,9 @@ void qmp_migrate_start_postcopy(Error **errp)
->  
->  void migrate_set_state(int *state, int old_state, int new_state)
->  {
-> +    assert(new_state < MIGRATION_STATUS__MAX);
->      if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
-> -        trace_migrate_set_state(new_state);
-> +        trace_migrate_set_state(MigrationStatus_lookup[new_state]);
->          migrate_generate_event(new_state);
->      }
->  }
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 7a3b514..d2910a6 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -80,7 +80,7 @@ ram_save_queue_pages(const char *rbname, size_t start, size_t len) "%s: start: 0
->  # migration/migration.c
->  await_return_path_close_on_source_close(void) ""
->  await_return_path_close_on_source_joining(void) ""
-> -migrate_set_state(int new_state) "new state %d"
-> +migrate_set_state(const char *new_state) "new state %s"
->  migrate_fd_cleanup(void) ""
->  migrate_fd_error(const char *error_desc) "error=%s"
->  migrate_fd_cancel(void) ""
-> -- 
-> 2.7.4
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+My plan is to fix whatever is there and see why it is failing.
+
+> Also, have you seen my patches, that also fix bugs in the _all functions?
+> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01053.html
+
+No, I have to take a look, thanks.
+
+Thanks, Juan.
