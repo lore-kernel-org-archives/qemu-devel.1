@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40121)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40142)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpbea-0005en-Ko
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:50:11 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dpbec-0005gd-5v
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:50:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpbeU-0000SR-FX
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:50:08 -0400
-Received: from mail-pf0-x22d.google.com ([2607:f8b0:400e:c00::22d]:36792)
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dpbeX-0000YW-KV
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:50:10 -0400
+Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:34180)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dpbeU-0000S4-7s
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:50:02 -0400
-Received: by mail-pf0-x22d.google.com with SMTP id e199so13133570pfh.3
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 07:50:02 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  6 Sep 2017 07:49:40 -0700
-Message-Id: <20170906144940.30880-15-richard.henderson@linaro.org>
-In-Reply-To: <20170906144940.30880-1-richard.henderson@linaro.org>
-References: <20170906144940.30880-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 14/14] tcg/s390: Use slbgr for setcond le and leu
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dpbeX-0000Wa-Fz
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:50:05 -0400
+Received: by mail-oi0-x243.google.com with SMTP id l185so4847866oib.1
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 07:50:05 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170906142109.2685-1-kraxel@redhat.com>
+References: <20170906142109.2685-1-kraxel@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 6 Sep 2017 16:50:04 +0200
+Message-ID: <CAJ+F1C+ejn8=LBMd1Oa9C6NbDZmTzhmTZbriwafiO1zKZ2Cfjw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] console: fix dpy_gfx_replace_surface assert
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,177 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>
 
-From: Richard Henderson <rth@twiddle.net>
+On Wed, Sep 6, 2017 at 4:21 PM, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> virtio-gpu can trigger the assert added by commit "6905b93447 console:
+> add same surface replace pre-condition" in multihead setups (where
+> surface can be NULL for secondary displays).  Allow surface being NULL.
+>
+> Fixes: 6905b93447a42e606dfd126b90f75f4cd3c6fe94
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Richard Henderson <rth@twiddle.net>
----
- tcg/s390/tcg-target.inc.c | 119 +++++++++++++++++-----------------------------
- 1 file changed, 43 insertions(+), 76 deletions(-)
+oops
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-index 0de968fde2..38b9e791ee 100644
---- a/tcg/s390/tcg-target.inc.c
-+++ b/tcg/s390/tcg-target.inc.c
-@@ -1084,11 +1084,20 @@ static void tgen_setcond(TCGContext *s, TCGType type, TCGCond cond,
- 
-     have_loc = (s390_facilities & FACILITY_LOAD_ON_COND) != 0;
- 
--    /* For HAVE_LOC, only the path through do_greater is smaller.  */
-+    /* For HAVE_LOC, only the paths through GTU/GT/LEU/LE are smaller.  */
-+ restart:
-     switch (cond) {
-+    case TCG_COND_NE:
-+        /* X != 0 is X > 0.  */
-+        if (c2const && c2 == 0) {
-+            cond = TCG_COND_GTU;
-+        } else {
-+            break;
-+        }
-+        /* fallthru */
-+
-     case TCG_COND_GTU:
-     case TCG_COND_GT:
--    do_greater:
-         /* The result of a compare has CC=2 for GT and CC=3 unused.
-            ADD LOGICAL WITH CARRY considers (CC & 2) the carry bit.  */
-         tgen_cmp(s, type, cond, c1, c2, c2const, true);
-@@ -1096,49 +1105,33 @@ static void tgen_setcond(TCGContext *s, TCGType type, TCGCond cond,
-         tcg_out_insn(s, RRE, ALCGR, dest, dest);
-         return;
- 
--    case TCG_COND_GEU:
--        if (have_loc) {
--            goto do_loc;
--        }
--    do_geu:
--        /* We need "real" carry semantics, so use SUBTRACT LOGICAL
--           instead of COMPARE LOGICAL.  This may need an extra move.  */
--        if (c2const) {
--            tcg_out_mov(s, type, TCG_TMP0, c1);
--            if (type == TCG_TYPE_I32) {
--                tcg_out_insn(s, RIL, SLFI, TCG_TMP0, c2);
--            } else {
--                tcg_out_insn(s, RIL, SLGFI, TCG_TMP0, c2);
--            }
--        } else if (s390_facilities & FACILITY_DISTINCT_OPS) {
--            if (type == TCG_TYPE_I32) {
--                tcg_out_insn(s, RRF, SLRK, TCG_TMP0, c1, c2);
--            } else {
--                tcg_out_insn(s, RRF, SLGRK, TCG_TMP0, c1, c2);
--            }
-+    case TCG_COND_EQ:
-+        /* X == 0 is X <= 0.  */
-+        if (c2const && c2 == 0) {
-+            cond = TCG_COND_LEU;
-         } else {
--            tcg_out_mov(s, type, TCG_TMP0, c1);
--            if (type == TCG_TYPE_I32) {
--                tcg_out_insn(s, RR, SLR, TCG_TMP0, c2);
--            } else {
--                tcg_out_insn(s, RRE, SLGR, TCG_TMP0, c2);
--            }
-+            break;
-         }
--        tcg_out_movi(s, TCG_TYPE_I64, dest, 0);
--        tcg_out_insn(s, RRE, ALCGR, dest, dest);
--        return;
-+        /* fallthru */
- 
-     case TCG_COND_LEU:
--        if (have_loc) {
--            goto do_loc;
--        }
--        /* fallthru */
-+    case TCG_COND_LE:
-+        /* As above, but we're looking for borrow, or !carry.
-+           The second insn computes d - d - borrow, or -1 for true
-+           and 0 for false.  So we must mask to 1 bit afterward.  */
-+        tgen_cmp(s, type, cond, c1, c2, c2const, true);
-+        tcg_out_insn(s, RRE, SLBGR, dest, dest);
-+        tgen_andi(s, type, dest, 1);
-+        return;
-+
-+    case TCG_COND_GEU:
-     case TCG_COND_LTU:
-     case TCG_COND_LT:
--        /* Swap operands so that we can use GEU/GTU/GT.  */
-+    case TCG_COND_GE:
-+        /* Swap operands so that we can use LEU/GTU/GT/LE.  */
-         if (c2const) {
-             if (have_loc) {
--                goto do_loc;
-+                break;
-             }
-             tcg_out_movi(s, type, TCG_TMP0, c2);
-             c2 = c1;
-@@ -1149,51 +1142,25 @@ static void tgen_setcond(TCGContext *s, TCGType type, TCGCond cond,
-             c1 = c2;
-             c2 = t;
-         }
--        if (cond == TCG_COND_LEU) {
--            goto do_geu;
--        }
-         cond = tcg_swap_cond(cond);
--        goto do_greater;
--
--    case TCG_COND_NE:
--        /* X != 0 is X > 0.  */
--        if (c2const && c2 == 0) {
--            cond = TCG_COND_GTU;
--            goto do_greater;
--        }
--        break;
--
--    case TCG_COND_EQ:
--        if (have_loc) {
--            goto do_loc;
--        }
--        /* X == 0 is X <= 0 is 0 >= X.  */
--        if (c2const && c2 == 0) {
--            tcg_out_movi(s, TCG_TYPE_I64, TCG_TMP0, 0);
--            c2 = c1;
--            c2const = 0;
--            c1 = TCG_TMP0;
--            goto do_geu;
--        }
--        break;
-+        goto restart;
- 
-     default:
--        break;
-+        g_assert_not_reached();
-     }
- 
-     cc = tgen_cmp(s, type, cond, c1, c2, c2const, false);
--    /* Emit: d = 1; if (cc) goto over; d = 0; over:  */
--    tcg_out_movi(s, type, dest, 1);
--    tcg_out_insn(s, RI, BRC, cc, (4 + 4) >> 1);
--    tcg_out_movi(s, type, dest, 0);
--    return;
--
-- do_loc:
--    cc = tgen_cmp(s, type, cond, c1, c2, c2const, false);
--    /* Emit: d = 0, t = 1, d = (cc ? t : d).  */
--    tcg_out_movi(s, TCG_TYPE_I64, dest, 0);
--    tcg_out_movi(s, TCG_TYPE_I64, TCG_TMP0, 1);
--    tcg_out_insn(s, RRF, LOCGR, dest, TCG_TMP0, cc);
-+    if (have_loc) {
-+        /* Emit: d = 0, t = 1, d = (cc ? t : d).  */
-+        tcg_out_movi(s, TCG_TYPE_I64, dest, 0);
-+        tcg_out_movi(s, TCG_TYPE_I64, TCG_TMP0, 1);
-+        tcg_out_insn(s, RRF, LOCGR, dest, TCG_TMP0, cc);
-+    } else {
-+        /* Emit: d = 1; if (cc) goto over; d = 0; over:  */
-+        tcg_out_movi(s, type, dest, 1);
-+        tcg_out_insn(s, RI, BRC, cc, (4 + 4) >> 1);
-+        tcg_out_movi(s, type, dest, 0);
-+    }
- }
- 
- static void tgen_movcond(TCGContext *s, TCGType type, TCGCond c, TCGReg dest,
--- 
-2.13.5
+
+
+> ---
+>  ui/console.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/ui/console.c b/ui/console.c
+> index d2d3534c49..f0292d7820 100644
+> --- a/ui/console.c
+> +++ b/ui/console.c
+> @@ -1540,7 +1540,7 @@ void dpy_gfx_replace_surface(QemuConsole *con,
+>      DisplaySurface *old_surface =3D con->surface;
+>      DisplayChangeListener *dcl;
+>
+> -    assert(old_surface !=3D surface);
+> +    assert(old_surface !=3D surface || surface =3D=3D NULL);
+>
+>      con->surface =3D surface;
+>      QLIST_FOREACH(dcl, &s->listeners, next) {
+> --
+> 2.9.3
+>
+>
+
+
+
+--=20
+Marc-Andr=C3=A9 Lureau
