@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59785)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dpOio-0007nk-2r
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:01:39 -0400
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dpOnj-0000Mb-Fz
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:06:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dpOim-0000bH-Af
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:01:38 -0400
-Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:38213)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dpOil-0000ZB-Vy
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:01:36 -0400
-Received: by mail-pg0-x243.google.com with SMTP id t3so2740999pgt.5
-	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 18:01:34 -0700 (PDT)
-MIME-Version: 1.0
-References: <1503013010-11500-1-git-send-email-zuban32s@gmail.com>
-	<fafa3ece-f7f7-99d5-adfb-b56e890cf03b@redhat.com>
-	<20170823053949-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170823053949-mutt-send-email-mst@kernel.org>
-From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Wed, 06 Sep 2017 01:01:23 +0000
-Message-ID: <CAKSfGUAEjTGf0k77Pg_8eZkLagMCCb823-N1W4L3VknEJKHHfA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v7 0/4] Generic PCIE-PCI Bridge
+	(envelope-from <wang.yong155@zte.com.cn>) id 1dpOnf-0003DF-Hw
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:06:43 -0400
+Received: from out1.zte.com.cn ([202.103.147.172]:48086 helo=mxct.zte.com.cn)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <wang.yong155@zte.com.cn>)
+	id 1dpOne-0003B6-N8
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:06:39 -0400
+Date: Wed, 6 Sep 2017 09:06:10 +0800 (CST)
+Message-ID: <201709060906108605957@zte.com.cn>
+References: 1503991359-3353-1-git-send-email-wang.yong155@zte.com.cn,
+	1503991359-3353-3-git-send-email-wang.yong155@zte.com.cn
+Mime-Version: 1.0
+From: <wang.yong155@zte.com.cn>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64 
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?=5BPATCHv5_02/03=5D_colo-compare=3A_Use_I?=
+ =?utf-8?q?OThread_to_Check_old_packet_regularly_and_Process_pactkets_of_t?=
+ =?utf-8?q?he_primary?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,156 +31,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: lersek@redhat.com, qemu-devel@nongnu.org, seabios@seabios.org
+To: jasowang@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, famz@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhang.zhanghailiang@huawei.com
+Cc: lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org, wang.yong155@zte.com.cn, wang.guang55@zte.com.cn
 
-=D1=81=D1=80, 23 =D0=B0=D0=B2=D0=B3. 2017 =D0=B3. =D0=B2 5:46, Michael S. T=
-sirkin <mst@redhat.com>:
-
-> On Tue, Aug 22, 2017 at 02:43:39PM +0300, Marcel Apfelbaum wrote:
-> > On 18/08/2017 2:36, Aleksandr Bezzubikov wrote:
-> > > This series introduces a new device - Generic PCI Express to PCI
-> bridge,
-> > > and also makes all necessary changes to enable hotplug of the bridge
-> itself
-> > > and any device into the bridge.
-> > >
-> >
-> > Hi,
-> >
-> > Series
-> >    Tested-by: Marcel Apfelbaum <marcel@redhat.com>
-> > (focused on changes from v6)
-> >
-> >
-> > Michael, will Alecsandr need to re-send it after freeze?
->
-> re-send or ping pls.
-
-
-Michael, it seems that freeze is over, so you can pick this patches.
-
-
->
-> > I am asking because the GSOC project is ending in a week or so.
-> >
-> >
-> > Thanks,
-> > Marcel
-> >
-> > > Changes v6->v7:
-> > > Change IO/MEM/PREF reservation properties type to SIZE.
-> > >
-> > > Changes v5->v6:
-> > > 1. Fix indentation in the cap creation function (addresses Marcel's
-> comment)
-> > > 2. Simplify capability pref_mem_* fields assignment (addresses
-> Marcel's comment)
-> > > 3. Documentation fixes:
-> > >     - fix mutually exclusive fields definition (addresses Laszlo's
-> comment)
-> > >     - fix pcie-pci-bridge usage example (addresses Marcel's comment)
-> > >
-> > > Changes v4->v5:
-> > > 1. Change PCIE-PCI Bridge license (addresses Marcel's comment)
-> > > 2. The capability layout changes (adress Laszlo' comments):
-> > >      - separate pref_mem into pref_mem_32 and pref_mem_64 fields
-> (SeaBIOS side has the same changes)
-> > >      - accordingly change the Generic Root Port's properties
-> > > 3. Do not add the capability to the root port if no valid values are
-> provided (adresses Michael's comment)
-> > > 4. Rename the capability type to 'RESOURCE_RESERVE' (addresses
-> Marcel's comment)
-> > > 5. Remove shpc_present check function (addresses Marcel's comment)
-> > > 6. Fix the 4th patch message (adresses Michael's comment)
-> > > 7. Patch for SHPC enabling in _OSC method has been already merged
-> > >
-> > > Changes v3->v4:
-> > > 1. PCIE-PCI Bridge device: "msi_enable"->"msi", "shpc"->"shpc_bar",
-> remove local_err,
-> > >     make "msi" property OnOffAuto, shpc_present() is still here
-> > >     to avoid SHPC_VMSTATE refactoring (address Marcel's comments).
-> > > 2. Change QEMU PCI capability layout (SeaBIOS side has the same
-> changes):
-> > >    - change reservation fields types: bus_res - uint32_t, others -
-> uint64_t
-> > >    - rename 'non_pref' and 'pref' fields
-> > >    - interpret -1 value as 'ignore'
-> > > 3. Use parent_realize in Generic PCI Express Root Port properly.
-> > > 4. Fix documentation: fully replace the DMI-PCI bridge references wit=
-h
-> the new PCIE-PCI bridge,
-> > > "PCIE"->"PCI Express", small mistakes and typos - address Laszlo's an=
-d
-> Marcel's comments.
-> > > 5. Rename QEMU PCI cap creation fucntion - addresses Marcel's comment=
-.
-> > >
-> > > Changes v2->v3:
-> > > (0). 'do_not_use' capability field flag is still _not_ in here since
-> we haven't come to consesus on it yet.
-> > > 1. Merge commits 5 (bus_reserve property creation) and 6 (property
-> usage) together - addresses Michael's comment.
-> > > 2. Add 'bus_reserve' property and QEMU PCI capability only to Generic
-> PCIE Root Port - addresses Michael's and Marcel's comments.
-> > > 3. Change 'bus_reserve' property's default value to 0 - addresses
-> Michael's comment.
-> > > 4. Rename QEMU bridge-specific PCI capability creation function -
-> addresses Michael's comment.
-> > > 5. Init the whole QEMU PCI capability with zeroes - addresses
-> Michael's and Laszlo's comments.
-> > > 6. Change QEMU PCI capability layout (SeaBIOS side has the same
-> changes)
-> > >    - add 'type' field to distinguish multiple
-> > >      RedHat-specific capabilities - addresses Michael's comment
-> > >    - do not mimi=D1=81 PCI Config space register layout, but use mutu=
-ally
-> exclusive differently
-> > >      sized fields for IO and prefetchable memory limits - addresses
-> Laszlo's comment
-> > > 7. Correct error handling in PCIE-PCI bridge realize function.
-> > > 8. Replace a '2' constant with PCI_CAP_FLAGS in the capability
-> creation function - addresses Michael's comment.
-> > > 9. Remove a comment on _OSC which isn't correct anymore - address
-> Marcel's comment.
-> > > 10. Add documentation for the Generic PCIE-PCI Bridge and QEMU PCI
-> capability - addresses Michael's comment.
-> > >
-> > > Changes v1->v2:
-> > > 1. Enable SHPC for the bridge.
-> > > 2. Enable SHPC support for the Q35 machine (ACPI stuff).
-> > > 3. Introduce PCI capability to help firmware on the system init.
-> > >     This allows the bridge to be hotpluggable. Now it's supported
-> > >     only for pcie-root-port. Now it's supposed to used with
-> > >     SeaBIOS only, look at the SeaBIOS corresponding series
-> > >     "Allow RedHat PCI bridges reserve more buses than necessary durin=
-g
-> init".
-> > >
-> > > Aleksandr Bezzubikov (4):
-> > >    hw/pci: introduce pcie-pci-bridge device
-> > >    hw/pci: introduce bridge-only vendor-specific capability to provid=
-e
-> > >      some hints to firmware
-> > >    hw/pci: add QEMU-specific PCI capability to the Generic PCI Expres=
-s
-> > >      Root Port
-> > >    docs: update documentation considering PCIE-PCI bridge
-> > >
-> > >   docs/pcie.txt                      |  49 +++++-----
-> > >   docs/pcie_pci_bridge.txt           | 114 ++++++++++++++++++++++
-> > >   hw/pci-bridge/Makefile.objs        |   2 +-
-> > >   hw/pci-bridge/gen_pcie_root_port.c |  36 +++++++
-> > >   hw/pci-bridge/pcie_pci_bridge.c    | 192
-> +++++++++++++++++++++++++++++++++++++
-> > >   hw/pci/pci_bridge.c                |  46 +++++++++
-> > >   include/hw/pci/pci.h               |   1 +
-> > >   include/hw/pci/pci_bridge.h        |  25 +++++
-> > >   include/hw/pci/pcie_port.h         |   1 +
-> > >   9 files changed, 442 insertions(+), 24 deletions(-)
-> > >   create mode 100644 docs/pcie_pci_bridge.txt
-> > >   create mode 100644 hw/pci-bridge/pcie_pci_bridge.c
-> > >
->
---=20
-Aleksandr Bezzubikov
+PlJlbW92ZSB0aGUgdGFzayB3aGljaCBjaGVjayBvbGQgcGFja2V0IGluIHRoZSBjb21wYXJpbmcg
+dGhyZWFkLA0KDQo+dGhlbiB1c2UgSU90aHJlYWQgY29udGV4dCB0aW1lciB0byBoYW5kbGUgaXQu
+DQoNCj4NCg0KPlByb2Nlc3MgcGFjdGtldHMgaW4gdGhlIElPVGhyZWFkIHdoaWNoIGFycml2ZWQg
+b3ZlciB0aGUgc29ja2V0Lg0KDQo+d2UgdXNlIGlvdGhyZWFkX2dldF9nX21haW5fY29udGV4dCB0
+byBjcmVhdGUgYSBuZXcgZ19tYWluX2xvb3AgaW4NCg0KPnRoZSBJT1RocmVhZC50aGVuIHRoZSBw
+YWNrZXRzIGZyb20gdGhlIHByaW1hcnkgYW5kIHRoZSBzZWNvbmRhcnkNCg0KPmFyZSBwcm9jZXNz
+ZWQgaW4gdGhlIElPVGhyZWFkLg0KDQo+DQoNCj5GaW5hbGx5IHJlbW92ZSB0aGUgY29sby1jb21w
+YXJlIHRocmVhZCB1c2luZyB0aGUgSU9UaHJlYWQgaW5zdGVhZC4NCg0KPg0KDQo+U2lnbmVkLW9m
+Zi1ieTogV2FuZyBZb25nIDx3YW5nLnlvbmcxNTVAenRlLmNvbS5jbj4NCg0KPlNpZ25lZC1vZmYt
+Ynk6IFdhbmcgR3VhbmcgPHdhbmcuZ3Vhbmc1NUB6dGUuY29tLmNuPg0KDQo+LS0tDQoNCj4gbmV0
+L2NvbG8tY29tcGFyZS5jIHwgODMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tDQoNCj4gMSBmaWxlIGNoYW5nZWQsIDQ1IGluc2VydGlvbnMoKyks
+IDM4IGRlbGV0aW9ucygtKQ0KDQoNCg0KDQpIaSBKYXNvbiwNCg0KSG93IGFib3V0IHRoaXMgc2Vy
+aWVzPw0KDQoNCg0KDQpUaGFua3MNCg0KDQoNCg0KDQoNCuWOn+Wni+mCruS7tg0KDQoNCg0K5Y+R
+5Lu25Lq677ya546L5YuHMTAxNzA1MzANCuaUtuS7tuS6uu+8miA8cGJvbnppbmlAcmVkaGF0LmNv
+bT4gPHN0ZWZhbmhhQHJlZGhhdC5jb20+IDxmYW16QHJlZGhhdC5jb20+IDxqYXNvd2FuZ0ByZWRo
+YXQuY29tPiA8emhhbmdjaGVuLmZuc3RAY24uZnVqaXRzdS5jb20+IDx6aGFuZy56aGFuZ2hhaWxp
+YW5nQGh1YXdlaS5jb20+DQrmioTpgIHkurrvvJrnjovli4cxMDE3MDUzMOeOi+W5vzEwMTY1OTky
+IDxsaXpoaWppYW5AY24uZnVqaXRzdS5jb20+IDxxZW11LWRldmVsQG5vbmdudS5vcmc+DQrml6Ug
+5pyfIO+8mjIwMTflubQwOOaciDI55pelIDE1OjIyDQrkuLsg6aKYIO+8mltQQVRDSHY1IDAyLzAz
+XSBjb2xvLWNvbXBhcmU6IFVzZSBJT1RocmVhZCB0byBDaGVjayBvbGQgcGFja2V0IHJlZ3VsYXJs
+eSBhbmQgUHJvY2VzcyBwYWN0a2V0cyBvZiB0aGUgcHJpbWFyeQ0KDQoNCg0KDQoNCkZyb206IFdh
+bmcgWW9uZyA8d2FuZy55b25nMTU1QHp0ZS5jb20uY24+DQoNClJlbW92ZSB0aGUgdGFzayB3aGlj
+aCBjaGVjayBvbGQgcGFja2V0IGluIHRoZSBjb21wYXJpbmcgdGhyZWFkLA0KdGhlbiB1c2UgSU90
+aHJlYWQgY29udGV4dCB0aW1lciB0byBoYW5kbGUgaXQuDQoNClByb2Nlc3MgcGFjdGtldHMgaW4g
+dGhlIElPVGhyZWFkIHdoaWNoIGFycml2ZWQgb3ZlciB0aGUgc29ja2V0Lg0Kd2UgdXNlIGlvdGhy
+ZWFkX2dldF9nX21haW5fY29udGV4dCB0byBjcmVhdGUgYSBuZXcgZ19tYWluX2xvb3AgaW4NCnRo
+ZSBJT1RocmVhZC50aGVuIHRoZSBwYWNrZXRzIGZyb20gdGhlIHByaW1hcnkgYW5kIHRoZSBzZWNv
+bmRhcnkNCmFyZSBwcm9jZXNzZWQgaW4gdGhlIElPVGhyZWFkLg0KDQpGaW5hbGx5IHJlbW92ZSB0
+aGUgY29sby1jb21wYXJlIHRocmVhZCB1c2luZyB0aGUgSU9UaHJlYWQgaW5zdGVhZC4NCg0KU2ln
+bmVkLW9mZi1ieTogV2FuZyBZb25nIDx3YW5nLnlvbmcxNTVAenRlLmNvbS5jbj4NClNpZ25lZC1v
+ZmYtYnk6IFdhbmcgR3VhbmcgPHdhbmcuZ3Vhbmc1NUB6dGUuY29tLmNuPg0KLS0tDQogbmV0L2Nv
+bG8tY29tcGFyZS5jIHwgODMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tDQogMSBmaWxlIGNoYW5nZWQsIDQ1IGluc2VydGlvbnMoKyksIDM4IGRl
+bGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvbmV0L2NvbG8tY29tcGFyZS5jIGIvbmV0L2NvbG8t
+Y29tcGFyZS5jDQppbmRleCA1ZmU4ZTNmLi5iMmEyYTEzIDEwMDY0NA0KLS0tIGEvbmV0L2NvbG8t
+Y29tcGFyZS5jDQorKysgYi9uZXQvY29sby1jb21wYXJlLmMNCkBAIC0yOSw2ICsyOSw3IEBADQog
+I2luY2x1ZGUgInFlbXUvc29ja2V0cy5oIg0KICNpbmNsdWRlICJxYXBpLXZpc2l0LmgiDQogI2lu
+Y2x1ZGUgIm5ldC9jb2xvLmgiDQorI2luY2x1ZGUgInN5c2VtdS9pb3RocmVhZC5oIg0KIA0KICNk
+ZWZpbmUgVFlQRV9DT0xPX0NPTVBBUkUgImNvbG8tY29tcGFyZSINCiAjZGVmaW5lIENPTE9fQ09N
+UEFSRShvYmopIFwNCkBAIC04MiwxMSArODMsMTAgQEAgdHlwZWRlZiBzdHJ1Y3QgQ29tcGFyZVN0
+YXRlIHsNCiAgICAgR1F1ZXVlIGNvbm5fbGlzdA0KICAgICAvKiBoYXNodGFibGUgdG8gc2F2ZSBj
+b25uZWN0aW9uICovDQogICAgIEdIYXNoVGFibGUgKmNvbm5lY3Rpb25fdHJhY2tfdGFibGUNCi0g
+ICAgLyogY29tcGFyZSB0aHJlYWQsIGEgdGhyZWFkIGZvciBlYWNoIE5JQyAqLw0KLSAgICBRZW11
+VGhyZWFkIHRocmVhZA0KIA0KKyAgICBJT1RocmVhZCAqaW90aHJlYWQNCiAgICAgR01haW5Db250
+ZXh0ICp3b3JrZXJfY29udGV4dA0KLSAgICBHTWFpbkxvb3AgKmNvbXBhcmVfbG9vcA0KKyAgICBR
+RU1VVGltZXIgKnBhY2tldF9jaGVja190aW1lcg0KIH0gQ29tcGFyZVN0YXRlDQogDQogdHlwZWRl
+ZiBzdHJ1Y3QgQ29tcGFyZUNsYXNzIHsNCkBAIC01OTcsMjIgKzU5Nyw0MCBAQCBzdGF0aWMgdm9p
+ZCBjb21wYXJlX3NlY19jaHJfaW4odm9pZCAqb3BhcXVlLCBjb25zdCB1aW50OF90ICpidWYsIGlu
+dCBzaXplKQ0KICAqIENoZWNrIG9sZCBwYWNrZXQgcmVndWxhcmx5IHNvIGl0IGNhbiB3YXRjaCBm
+b3IgYW55IHBhY2tldHMNCiAgKiB0aGF0IHRoZSBzZWNvbmRhcnkgaGFzbid0IHByb2R1Y2VkIGVx
+dWl2YWxlbnRzIG9mLg0KICAqLw0KLXN0YXRpYyBnYm9vbGVhbiBjaGVja19vbGRfcGFja2V0X3Jl
+Z3VsYXIodm9pZCAqb3BhcXVlKQ0KK3N0YXRpYyB2b2lkIGNoZWNrX29sZF9wYWNrZXRfcmVndWxh
+cih2b2lkICpvcGFxdWUpDQogew0KICAgICBDb21wYXJlU3RhdGUgKnMgPSBvcGFxdWUNCiANCiAg
+ICAgLyogaWYgaGF2ZSBvbGQgcGFja2V0IHdlIHdpbGwgbm90aWZ5IGNoZWNrcG9pbnQgKi8NCiAg
+ICAgY29sb19vbGRfcGFja2V0X2NoZWNrKHMpDQorICAgIHRpbWVyX21vZChzLT5wYWNrZXRfY2hl
+Y2tfdGltZXIsIHFlbXVfY2xvY2tfZ2V0X21zKFFFTVVfQ0xPQ0tfVklSVFVBTCkgKw0KKyAgICAg
+ICAgICAgICAgICBSRUdVTEFSX1BBQ0tFVF9DSEVDS19NUykNCit9DQorDQorc3RhdGljIHZvaWQg
+Y29sb19jb21wYXJlX3RpbWVyX2luaXQoQ29tcGFyZVN0YXRlICpzKQ0KK3sNCisgICAgQWlvQ29u
+dGV4dCAqY3R4ID0gaW90aHJlYWRfZ2V0X2Fpb19jb250ZXh0KHMtPmlvdGhyZWFkKQ0KIA0KLSAg
+ICByZXR1cm4gVFJVRQ0KKyAgICBzLT5wYWNrZXRfY2hlY2tfdGltZXIgPSBhaW9fdGltZXJfbmV3
+KGN0eCwgUUVNVV9DTE9DS19WSVJUVUFMLA0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgU0NBTEVfTVMsIGNoZWNrX29sZF9wYWNrZXRfcmVndWxhciwNCisgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIHMpDQorICAgIHRpbWVyX21vZChzLT5wYWNrZXRfY2hlY2tfdGltZXIs
+IHFlbXVfY2xvY2tfZ2V0X21zKFFFTVVfQ0xPQ0tfVklSVFVBTCkgKw0KKyAgICAgICAgICAgICAg
+ICAgICAgUkVHVUxBUl9QQUNLRVRfQ0hFQ0tfTVMpDQogfQ0KIA0KLXN0YXRpYyB2b2lkICpjb2xv
+X2NvbXBhcmVfdGhyZWFkKHZvaWQgKm9wYXF1ZSkNCitzdGF0aWMgdm9pZCBjb2xvX2NvbXBhcmVf
+dGltZXJfZGVsKENvbXBhcmVTdGF0ZSAqcykNCiB7DQotICAgIENvbXBhcmVTdGF0ZSAqcyA9IG9w
+YXF1ZQ0KLSAgICBHU291cmNlICp0aW1lb3V0X3NvdXJjZQ0KKyAgICBpZiAocy0+cGFja2V0X2No
+ZWNrX3RpbWVyKSB7DQorICAgICAgICB0aW1lcl9kZWwocy0+cGFja2V0X2NoZWNrX3RpbWVyKQ0K
+KyAgICAgICAgdGltZXJfZnJlZShzLT5wYWNrZXRfY2hlY2tfdGltZXIpDQorICAgICAgICBzLT5w
+YWNrZXRfY2hlY2tfdGltZXIgPSBOVUxMDQorICAgIH0NCisgfQ0KIA0KLSAgICBzLT53b3JrZXJf
+Y29udGV4dCA9IGdfbWFpbl9jb250ZXh0X25ldygpDQorc3RhdGljIHZvaWQgY29sb19jb21wYXJl
+X2lvdGhyZWFkKENvbXBhcmVTdGF0ZSAqcykNCit7DQorICAgIG9iamVjdF9yZWYoT0JKRUNUKHMt
+PmlvdGhyZWFkKSkNCisgICAgcy0+d29ya2VyX2NvbnRleHQgPSBpb3RocmVhZF9nZXRfZ19tYWlu
+X2NvbnRleHQocy0+aW90aHJlYWQpDQogDQogICAgIHFlbXVfY2hyX2ZlX3NldF9oYW5kbGVycygm
+cy0+Y2hyX3ByaV9pbiwgY29tcGFyZV9jaHJfY2FuX3JlYWQsDQogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBjb21wYXJlX3ByaV9jaHJfaW4sIE5VTEwsIE5VTEwsDQpAQCAtNjIxLDIwICs2
+MzksNyBAQCBzdGF0aWMgdm9pZCAqY29sb19jb21wYXJlX3RocmVhZCh2b2lkICpvcGFxdWUpDQog
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb21wYXJlX3NlY19jaHJfaW4sIE5VTEwsIE5V
+TEwsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLCBzLT53b3JrZXJfY29udGV4dCwg
+dHJ1ZSkNCiANCi0gICAgcy0+Y29tcGFyZV9sb29wID0gZ19tYWluX2xvb3BfbmV3KHMtPndvcmtl
+cl9jb250ZXh0LCBGQUxTRSkNCi0NCi0gICAgLyogVG8ga2ljayBhbnkgcGFja2V0cyB0aGF0IHRo
+ZSBzZWNvbmRhcnkgZG9lc24ndCBtYXRjaCAqLw0KLSAgICB0aW1lb3V0X3NvdXJjZSA9IGdfdGlt
+ZW91dF9zb3VyY2VfbmV3KFJFR1VMQVJfUEFDS0VUX0NIRUNLX01TKQ0KLSAgICBnX3NvdXJjZV9z
+ZXRfY2FsbGJhY2sodGltZW91dF9zb3VyY2UsDQotICAgICAgICAgICAgICAgICAgICAgICAgICAo
+R1NvdXJjZUZ1bmMpY2hlY2tfb2xkX3BhY2tldF9yZWd1bGFyLCBzLCBOVUxMKQ0KLSAgICBnX3Nv
+dXJjZV9hdHRhY2godGltZW91dF9zb3VyY2UsIHMtPndvcmtlcl9jb250ZXh0KQ0KLQ0KLSAgICBn
+X21haW5fbG9vcF9ydW4ocy0+Y29tcGFyZV9sb29wKQ0KLQ0KLSAgICBnX3NvdXJjZV91bnJlZih0
+aW1lb3V0X3NvdXJjZSkNCi0gICAgZ19tYWluX2xvb3BfdW5yZWYocy0+Y29tcGFyZV9sb29wKQ0K
+LSAgICBnX21haW5fY29udGV4dF91bnJlZihzLT53b3JrZXJfY29udGV4dCkNCi0gICAgcmV0dXJu
+IE5VTEwNCisgICAgY29sb19jb21wYXJlX3RpbWVyX2luaXQocykNCiB9DQogDQogc3RhdGljIGNo
+YXIgKmNvbXBhcmVfZ2V0X3ByaV9pbmRldihPYmplY3QgKm9iaiwgRXJyb3IgKiplcnJwKQ0KQEAg
+LTc1OSwxMiArNzY0LDEwIEBAIHN0YXRpYyB2b2lkIGNvbG9fY29tcGFyZV9jb21wbGV0ZShVc2Vy
+Q3JlYXRhYmxlICp1YywgRXJyb3IgKiplcnJwKQ0KIHsNCiAgICAgQ29tcGFyZVN0YXRlICpzID0g
+Q09MT19DT01QQVJFKHVjKQ0KICAgICBDaGFyZGV2ICpjaHINCi0gICAgY2hhciB0aHJlYWRfbmFt
+ZVs2NF0NCi0gICAgc3RhdGljIGludCBjb21wYXJlX2lkDQogDQotICAgIGlmICghcy0+cHJpX2lu
+ZGV2IHx8ICFzLT5zZWNfaW5kZXYgfHwgIXMtPm91dGRldikgew0KKyAgICBpZiAoIXMtPnByaV9p
+bmRldiB8fCAhcy0+c2VjX2luZGV2IHx8ICFzLT5vdXRkZXYgfHwgIXMtPmlvdGhyZWFkKSB7DQog
+ICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJjb2xvIGNvbXBhcmUgbmVlZHMgJ3ByaW1hcnlfaW4n
+ICwiDQotICAgICAgICAgICAgICAgICAgICInc2Vjb25kYXJ5X2luJywnb3V0ZGV2JyBwcm9wZXJ0
+eSBzZXQiKQ0KKyAgICAgICAgICAgICAgICAgICAiJ3NlY29uZGFyeV9pbicsJ291dGRldicsJ2lv
+dGhyZWFkJyBwcm9wZXJ0eSBzZXQiKQ0KICAgICAgICAgcmV0dXJuDQogICAgIH0gZWxzZSBpZiAo
+IXN0cmNtcChzLT5wcmlfaW5kZXYsIHMtPm91dGRldikgfHwNCiAgICAgICAgICAgICAgICAhc3Ry
+Y21wKHMtPnNlY19pbmRldiwgcy0+b3V0ZGV2KSB8fA0KQEAgLTc5OSwxMiArODAyLDcgQEAgc3Rh
+dGljIHZvaWQgY29sb19jb21wYXJlX2NvbXBsZXRlKFVzZXJDcmVhdGFibGUgKnVjLCBFcnJvciAq
+KmVycnApDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgZ19mcmVlLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIGNvbm5lY3Rpb25fZGVzdHJveSkNCiANCi0gICAgc3ByaW50Zih0aHJlYWRf
+bmFtZSwgImNvbG8tY29tcGFyZSAlZCIsIGNvbXBhcmVfaWQpDQotICAgIHFlbXVfdGhyZWFkX2Ny
+ZWF0ZSgmcy0+dGhyZWFkLCB0aHJlYWRfbmFtZSwNCi0gICAgICAgICAgICAgICAgICAgICAgIGNv
+bG9fY29tcGFyZV90aHJlYWQsIHMsDQotICAgICAgICAgICAgICAgICAgICAgICBRRU1VX1RIUkVB
+RF9KT0lOQUJMRSkNCi0gICAgY29tcGFyZV9pZCsrDQotDQorICAgIGNvbG9fY29tcGFyZV9pb3Ro
+cmVhZChzKQ0KICAgICByZXR1cm4NCiB9DQogDQpAQCAtODQ4LDYgKzg0NiwxMCBAQCBzdGF0aWMg
+dm9pZCBjb2xvX2NvbXBhcmVfaW5pdChPYmplY3QgKm9iaikNCiAgICAgb2JqZWN0X3Byb3BlcnR5
+X2FkZF9zdHIob2JqLCAib3V0ZGV2IiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29t
+cGFyZV9nZXRfb3V0ZGV2LCBjb21wYXJlX3NldF9vdXRkZXYsDQogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIE5VTEwpDQorICAgIG9iamVjdF9wcm9wZXJ0eV9hZGRfbGluayhvYmosICJpb3Ro
+cmVhZCIsIFRZUEVfSU9USFJFQUQsDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgIChPYmpl
+Y3QgKiopJnMtPmlvdGhyZWFkLA0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICBvYmplY3Rf
+cHJvcGVydHlfYWxsb3dfc2V0X2xpbmssDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgIE9C
+Sl9QUk9QX0xJTktfVU5SRUZfT05fUkVMRUFTRSwgTlVMTCkNCiANCiAgICAgcy0+dm5ldF9oZHIg
+PSBmYWxzZQ0KICAgICBvYmplY3RfcHJvcGVydHlfYWRkX2Jvb2wob2JqLCAidm5ldF9oZHJfc3Vw
+cG9ydCIsIGNvbXBhcmVfZ2V0X3ZuZXRfaGRyLA0KQEAgLTg2MSwxNiArODYzLDIxIEBAIHN0YXRp
+YyB2b2lkIGNvbG9fY29tcGFyZV9maW5hbGl6ZShPYmplY3QgKm9iaikNCiAgICAgcWVtdV9jaHJf
+ZmVfZGVpbml0KCZzLT5jaHJfcHJpX2luLCBmYWxzZSkNCiAgICAgcWVtdV9jaHJfZmVfZGVpbml0
+KCZzLT5jaHJfc2VjX2luLCBmYWxzZSkNCiAgICAgcWVtdV9jaHJfZmVfZGVpbml0KCZzLT5jaHJf
+b3V0LCBmYWxzZSkNCi0NCi0gICAgZ19tYWluX2xvb3BfcXVpdChzLT5jb21wYXJlX2xvb3ApDQot
+ICAgIHFlbXVfdGhyZWFkX2pvaW4oJnMtPnRocmVhZCkNCi0NCisgICAgaWYgKHMtPmlvdGhyZWFk
+KSB7DQorICAgICAgICBjb2xvX2NvbXBhcmVfdGltZXJfZGVsKHMpDQorICAgIH0NCiAgICAgLyog
+UmVsZWFzZSBhbGwgdW5oYW5kbGVkIHBhY2tldHMgYWZ0ZXIgY29tcGFyZSB0aGVhZCBleGl0ZWQg
+Ki8NCiAgICAgZ19xdWV1ZV9mb3JlYWNoKCZzLT5jb25uX2xpc3QsIGNvbG9fZmx1c2hfcGFja2V0
+cywgcykNCiANCiAgICAgZ19xdWV1ZV9jbGVhcigmcy0+Y29ubl9saXN0KQ0KIA0KLSAgICBnX2hh
+c2hfdGFibGVfZGVzdHJveShzLT5jb25uZWN0aW9uX3RyYWNrX3RhYmxlKQ0KKyAgICBpZiAocy0+
+Y29ubmVjdGlvbl90cmFja190YWJsZSkgew0KKyAgICAgICAgZ19oYXNoX3RhYmxlX2Rlc3Ryb3ko
+cy0+Y29ubmVjdGlvbl90cmFja190YWJsZSkNCisgICAgfQ0KKw0KKyAgICBpZiAocy0+aW90aHJl
+YWQpIHsNCisgICAgICAgIG9iamVjdF91bnJlZihPQkpFQ1Qocy0+aW90aHJlYWQpKQ0KKyAgICB9
+DQogICAgIGdfZnJlZShzLT5wcmlfaW5kZXYpDQogICAgIGdfZnJlZShzLT5zZWNfaW5kZXYpDQog
+ICAgIGdfZnJlZShzLT5vdXRkZXYpDQotLSANCjEuOC4zLjE=
