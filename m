@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dpO0q-0007TC-HO
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 20:16:17 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dpO1O-0007sg-4U
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 20:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dpO0l-0000OG-Ha
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 20:16:12 -0400
-Received: from mail-by2nam01on0071.outbound.protection.outlook.com
-	([104.47.34.71]:28224
-	helo=NAM01-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dpO0l-0000Nf-6i
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 20:16:07 -0400
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Tue, 5 Sep 2017 17:12:01 -0700
-Message-ID: <b2bfe1ee20bd9764572015df0d167d3015036ef0.1504656490.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1504656490.git.alistair.francis@xilinx.com>
-References: <cover.1504656490.git.alistair.francis@xilinx.com>
+	(envelope-from <alistair23@gmail.com>) id 1dpO1J-0000ik-Bt
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 20:16:46 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [RFC v1 1/2] machine: Add a valid_cpu_types property
+In-Reply-To: <CAKmqyKO4yRz3R0BJ+gz=UfLc0d_AoNtEAHn-SNFMzg3xo12D=Q@mail.gmail.com>
+References: <1504533662-198084-1-git-send-email-imammedo@redhat.com>
+	<1504533662-198084-7-git-send-email-imammedo@redhat.com>
+	<20170905213152.GG17184@localhost.localdomain>
+	<CAKmqyKPWDmVYJceYao7NkD5svWqN_fYbDoUJ4uLNFdAhv+kFwg@mail.gmail.com>
+	<20170905221226.GZ7570@localhost.localdomain>
+	<CAKmqyKO4yRz3R0BJ+gz=UfLc0d_AoNtEAHn-SNFMzg3xo12D=Q@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Tue, 5 Sep 2017 17:16:09 -0700
+Message-ID: <CAKmqyKM+2W158tCWdQ_0EqEGnoBSrEca-6Pi+uha1Hg=SrxWDA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 6/6] arm: drop intermadiate cpu_model ->
+ cpu type parsing and use cpu type directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +27,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, ehabkost@redhat.com, marcel@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Rob Herring <robh@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
----
+On Tue, Sep 5, 2017 at 3:46 PM, Alistair Francis <alistair23@gmail.com> wrote:
+> On Tue, Sep 5, 2017 at 3:12 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> On Tue, Sep 05, 2017 at 02:47:52PM -0700, Alistair Francis wrote:
+>>> On Tue, Sep 5, 2017 at 2:31 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> [...]
+>>> >> diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+>>> >> index f61e735..1cd6374 100644
+>>> >> --- a/hw/arm/stm32f205_soc.c
+>>> >> +++ b/hw/arm/stm32f205_soc.c
+>>> >> @@ -112,7 +112,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+>>> >>
+>>> >>      armv7m = DEVICE(&s->armv7m);
+>>> >>      qdev_prop_set_uint32(armv7m, "num-irq", 96);
+>>> >> -    qdev_prop_set_string(armv7m, "cpu-model", s->cpu_model);
+>>> >> +    qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
+>>> >>      object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+>>> >>                                       "memory", &error_abort);
+>>> >>      object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+>>> >> @@ -200,7 +200,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+>>> >>  }
+>>> >>
+>>> >>  static Property stm32f205_soc_properties[] = {
+>>> >> -    DEFINE_PROP_STRING("cpu-model", STM32F205State, cpu_model),
+>>> >> +    DEFINE_PROP_STRING("cpu-type", STM32F205State, cpu_type),
+>>> >
+>>> > Same as armv7m: are we 100% sure users are not setting this
+>>> > manually?
+>>>
+>>> In an embedded board like this it really doesn't make sense to let the
+>>> user overwrite the CPU. The SoC will take it as an option, but the
+>>> board (which creates the SoC) just blindly always uses the same CPU.
+>>> That feature is more for QOMificatoion then any real reason though.
+>>>
+>>
+>> I'm not talking about -cpu (no user-visible change in the
+>> handling of -cpu should result from this patch), but about
+>> possible cases where the user set the "cpu-model" property using
+>> another mechanism, like -global.  Probably it's impossible for an
+>> user to override the property successfully, but I would like to
+>> be sure.
+>
+> Ah, that is trickier.
+>
+> I guess that is possible to do, but the object setting logic should
+> handle the error gracefully and inform the user of the error.
+>
+>>
+>>
+>>> In saying that I think a warning if the user tries to set the CPU
+>>> would make sense. I know that this issues comes up in other ARM boards
+>>> (Zynq-7000 has the same issue as well) so maybe a machine property
+>>> saying that the board doesn't accept custom CPUs would be a good idea.
+>>
+>> Yeah, there are multiple cases in this patch where boards are
+>> validating the CPU model, but not all boards do that.  A generic
+>> MachineClass::valid_cpu_types[] field would be useful.
 
- hw/core/machine.c   | 27 +++++++++++++++++++++++++++
- include/hw/boards.h |  1 +
- 2 files changed, 28 insertions(+)
+I just sent a RFC out that does this, let me know what you think.
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 41b53a17ad..de0f127d27 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -758,6 +758,33 @@ void machine_run_board_init(MachineState *machine)
-         machine_numa_finish_init(machine);
-     }
-     machine_class->init(machine);
-+
-+    if (machine_class->valid_cpu_types && machine->cpu_model) {
-+        const char *temp;
-+        int i, len = machine_class->valid_cpu_types->len;
-+
-+        for (i = 0; i < len; i++) {
-+            temp = g_array_index(machine_class->valid_cpu_types, char *, i);
-+            if (!strcmp(machine->cpu_model, temp)) {
-+                /* The user specificed CPU is in the valid field, we are
-+                 * good to go.
-+                 */
-+                g_array_free(machine_class->valid_cpu_types, true);
-+                return;
-+            }
-+        }
-+        /* The user specified CPU must not be a valid CPU, print a sane error */
-+        temp = g_array_index(machine_class->valid_cpu_types, char *, 0);
-+        error_report("Invalid CPU: %s", machine->cpu_model);
-+        error_printf("The valid options are: %s", temp);
-+        for (i = 1; i < len; i++) {
-+            temp = g_array_index(machine_class->valid_cpu_types, char *, i);
-+            error_printf(", %s", temp);
-+        }
-+        error_printf("\n");
-+        g_array_free(machine_class->valid_cpu_types, true);
-+        exit(1);
-+    }
- }
- 
- static void machine_class_finalize(ObjectClass *klass, void *data)
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 3363dd19fd..78678f84a9 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -172,6 +172,7 @@ struct MachineClass {
-     int minimum_page_bits;
-     bool has_hotpluggable_cpus;
-     int numa_mem_align_shift;
-+    GArray *valid_cpu_types;
-     void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
-                                  int nb_nodes, ram_addr_t size);
- 
--- 
-2.11.0
+The cover letter is called: "Add a valid_cpu_types property"
+
+Thanks,
+Alistair
+
+>>
+>>>
+>>> Overall I think this patch is moving in the right direction though and
+>>> this CPU option being ignored existed before this series.
+>>
+>> I agree this is going on the right direction.  However, I don't
+>> see any board that ignore the CPU option: all of them seem to use
+>> cpu_model when creating the CPUs, already.
+>
+> The Netduino2 will ignore any CPU options and always use a Cortex-m3.
+> I was wrong about Zynq-7000 though, it does respect the -cpu option.
+>
+> Thanks,
+> Alistair
+>
+>>
+>> --
+>> Eduardo
