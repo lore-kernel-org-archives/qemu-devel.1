@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59868)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1dpTQ7-0001ZA-Bd
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:02:40 -0400
+	(envelope-from <armbru@redhat.com>) id 1dpTXg-0002vH-LU
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:10:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1dpTQ2-00067Z-CJ
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:02:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58726)
+	(envelope-from <armbru@redhat.com>) id 1dpTXc-0001TT-IC
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:10:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42842)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1dpTQ2-00066a-6E
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:02:34 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpTXc-0001Sx-9S
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:10:24 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 307227E426
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 06:02:33 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 277957E428
+	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 06:10:23 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
 References: <f9d56290959d378dfa65b3906bf0d822ab938ac9.1504617551.git.mprivozn@redhat.com>
-	<a0659c96-31c6-d193-19bb-438fe6aa2601@redhat.com>
-From: Michal Privoznik <mprivozn@redhat.com>
-Message-ID: <8173dc23-3027-9ca2-9567-c70534728d75@redhat.com>
-Date: Wed, 6 Sep 2017 08:02:31 +0200
+Date: Wed, 06 Sep 2017 08:10:21 +0200
+In-Reply-To: <f9d56290959d378dfa65b3906bf0d822ab938ac9.1504617551.git.mprivozn@redhat.com>
+	(Michal Privoznik's message of "Tue, 5 Sep 2017 15:22:04 +0200")
+Message-ID: <87bmmofjci.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <a0659c96-31c6-d193-19bb-438fe6aa2601@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Subject: Re: [Qemu-devel] [PATCH v2] watchdog: Allow setting action on the
  fly
 List-Id: <qemu-devel.nongnu.org>
@@ -35,81 +33,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com
+To: Michal Privoznik <mprivozn@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 09/05/2017 10:36 PM, Eric Blake wrote:
-> On 09/05/2017 08:22 AM, Michal Privoznik wrote:
->> Currently, the only time that users can set watchdog action is at
->> the start as all we expose is this -watchdog-action command line
->> argument. This is suboptimal when users want to plug the device
->> later via monitor. Alternatively, they might want to change the
->> action for already existing device on the fly.
->>
->> At the same time, drop local redefinition of the actions eum in
-> 
-> s/eum/enum/
-> 
->> watchdog.h in favour of the ones defined in schema.
->>
->> Inspired by: https://bugzilla.redhat.com/show_bug.cgi?id=1447169
->>
->> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
->> ---
-> 
->> @@ -77,27 +80,17 @@ int select_watchdog(const char *p)
->>  
->>  int select_watchdog_action(const char *p)
->>  {
-> 
->> +    int action;
->>  
->> +    action = qapi_enum_parse(WatchdogExpirationAction_lookup, p,
->> +                             WATCHDOG_EXPIRATION_ACTION__MAX, -1, NULL);
-> 
-> Semantic conflict; you need to rebase now that the qapi enum lookup code
-> has landed (see commit ebf677c8 and parents)
+Michal Privoznik <mprivozn@redhat.com> writes:
 
+> Currently, the only time that users can set watchdog action is at
+> the start as all we expose is this -watchdog-action command line
+> argument. This is suboptimal when users want to plug the device
+> later via monitor. Alternatively, they might want to change the
+> action for already existing device on the fly.
+>
+> At the same time, drop local redefinition of the actions eum in
+> watchdog.h in favour of the ones defined in schema.
+>
+> Inspired by: https://bugzilla.redhat.com/show_bug.cgi?id=1447169
+>
+> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+> ---
+>
+> diff to v1:
+> - instead of allowing 'action' to be arbitrary string, use enum for it and thus
+>   drop local redefinition of the enum.
+>
+>  hw/watchdog/watchdog.c    | 52 ++++++++++++++++++++++++-----------------------
+>  hw/watchdog/wdt_diag288.c |  6 +++---
+>  include/sysemu/watchdog.h | 12 ++---------
+>  qapi-schema.json          |  9 ++++++++
+>  4 files changed, 41 insertions(+), 38 deletions(-)
+>
+> diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
+> index 0c5c9cde1c..a3e9d7b59b 100644
+> --- a/hw/watchdog/watchdog.c
+> +++ b/hw/watchdog/watchdog.c
+> @@ -29,8 +29,11 @@
+>  #include "qapi-event.h"
+>  #include "hw/nmi.h"
+>  #include "qemu/help_option.h"
+> +#include "qmp-commands.h"
+> +#include "qapi/qmp/qerror.h"
+> +#include "qapi/util.h"
+>  
+> -static int watchdog_action = WDT_RESET;
+> +static WatchdogExpirationAction watchdog_action = WATCHDOG_EXPIRATION_ACTION_RESET;
+>  static QLIST_HEAD(watchdog_list, WatchdogTimerModel) watchdog_list;
+>  
+>  void watchdog_add_model(WatchdogTimerModel *model)
+> @@ -77,27 +80,17 @@ int select_watchdog(const char *p)
+>  
+>  int select_watchdog_action(const char *p)
+>  {
+> -    if (strcasecmp(p, "reset") == 0)
+> -        watchdog_action = WDT_RESET;
+> -    else if (strcasecmp(p, "shutdown") == 0)
+> -        watchdog_action = WDT_SHUTDOWN;
+> -    else if (strcasecmp(p, "poweroff") == 0)
+> -        watchdog_action = WDT_POWEROFF;
+> -    else if (strcasecmp(p, "pause") == 0)
+> -        watchdog_action = WDT_PAUSE;
+> -    else if (strcasecmp(p, "debug") == 0)
+> -        watchdog_action = WDT_DEBUG;
+> -    else if (strcasecmp(p, "none") == 0)
+> -        watchdog_action = WDT_NONE;
+> -    else if (strcasecmp(p, "inject-nmi") == 0)
+> -        watchdog_action = WDT_NMI;
+> -    else
+> -        return -1;
+> +    int action;
+>  
+> +    action = qapi_enum_parse(WatchdogExpirationAction_lookup, p,
+> +                             WATCHDOG_EXPIRATION_ACTION__MAX, -1, NULL);
+> +    if (action < 0)
+> +        return -1;
+> +    qmp_watchdog_set_action(action, NULL);
 
-D'oh. Okay.
+&error_abort
 
-> 
->> +
->> +    case WATCHDOG_EXPIRATION_ACTION__MAX:
->> +        /* keep gcc happy */
->> +        break;
-> 
-> Could use g_assert_not_reached() here instead.
-> 
->> +++ b/qapi-schema.json
->> @@ -6539,3 +6539,12 @@
->>  # Since 2.9
->>  ##
->>  { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
->> +
->> +##
->> +# @watchdog-set-action:
->> +#
->> +# Set watchdog action
->> +#
->> +# Since 2.11
->> +##
->> +{ 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogExpirationAction'} }
-> 
-> Can a machine have more than one watchdog device, in which case you'd
-> want a device name to select which watchdog gets which action?  But the
-> command-line version that you are replacing seems to be global, so I
-> guess you're okay with this interface.
-> 
+>      return 0;
+>  }
+>  
+> -int get_watchdog_action(void)
+> +WatchdogExpirationAction get_watchdog_action(void)
+>  {
+>      return watchdog_action;
+>  }
+> @@ -108,21 +101,21 @@ int get_watchdog_action(void)
+>  void watchdog_perform_action(void)
+>  {
+>      switch (watchdog_action) {
+> -    case WDT_RESET:             /* same as 'system_reset' in monitor */
+> +    case WATCHDOG_EXPIRATION_ACTION_RESET:      /* same as 'system_reset' in monitor */
+>          qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_RESET, &error_abort);
+>          qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+>          break;
+>  
+> -    case WDT_SHUTDOWN:          /* same as 'system_powerdown' in monitor */
+> +    case WATCHDOG_EXPIRATION_ACTION_SHUTDOWN:   /* same as 'system_powerdown' in monitor */
+>          qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_SHUTDOWN, &error_abort);
+>          qemu_system_powerdown_request();
+>          break;
+>  
+> -    case WDT_POWEROFF:          /* same as 'quit' command in monitor */
+> +    case WATCHDOG_EXPIRATION_ACTION_POWEROFF:   /* same as 'quit' command in monitor */
+>          qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_POWEROFF, &error_abort);
+>          exit(0);
+>  
+> -    case WDT_PAUSE:             /* same as 'stop' command in monitor */
+> +    case WATCHDOG_EXPIRATION_ACTION_PAUSE:      /* same as 'stop' command in monitor */
+>          /* In a timer callback, when vm_stop calls qemu_clock_enable
+>           * you would get a deadlock.  Bypass the problem.
+>           */
+> @@ -131,19 +124,28 @@ void watchdog_perform_action(void)
+>          qemu_system_vmstop_request(RUN_STATE_WATCHDOG);
+>          break;
+>  
+> -    case WDT_DEBUG:
+> +    case WATCHDOG_EXPIRATION_ACTION_DEBUG:
+>          qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_DEBUG, &error_abort);
+>          fprintf(stderr, "watchdog: timer fired\n");
+>          break;
+>  
+> -    case WDT_NONE:
+> +    case WATCHDOG_EXPIRATION_ACTION_NONE:
+>          qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_NONE, &error_abort);
+>          break;
+>  
+> -    case WDT_NMI:
+> +    case WATCHDOG_EXPIRATION_ACTION_INJECT_NMI:
+>          qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_INJECT_NMI,
+>                                   &error_abort);
+>          nmi_monitor_handle(0, NULL);
+>          break;
+> +
+> +    case WATCHDOG_EXPIRATION_ACTION__MAX:
+> +        /* keep gcc happy */
+> +        break;
 
-Yeah, I don't think that a guest can have more than one watchdog:
+       default:
+           assert(0);
 
-/qemu.git $ ./x86_64-softmmu/qemu-system-x86_64 \
--watchdog ib700 -watchdog i6300esb
-qemu-system-x86_64: -watchdog i6300esb: only one watchdog option may be
-given
+>      }
+>  }
+> +
+> +void qmp_watchdog_set_action(WatchdogExpirationAction action, Error **errp)
+> +{
+> +    watchdog_action = action;
+> +}
+> diff --git a/hw/watchdog/wdt_diag288.c b/hw/watchdog/wdt_diag288.c
+> index 47f289216a..451644eb89 100644
+> --- a/hw/watchdog/wdt_diag288.c
+> +++ b/hw/watchdog/wdt_diag288.c
+> @@ -57,9 +57,9 @@ static void diag288_timer_expired(void *dev)
+>       * the BQL; reset before triggering the action to avoid races with
+>       * diag288 instructions. */
+>      switch (get_watchdog_action()) {
+> -    case WDT_DEBUG:
+> -    case WDT_NONE:
+> -    case WDT_PAUSE:
+> +    case WATCHDOG_EXPIRATION_ACTION_DEBUG:
+> +    case WATCHDOG_EXPIRATION_ACTION_NONE:
+> +    case WATCHDOG_EXPIRATION_ACTION_PAUSE:
+>          break;
+>      default:
+>          wdt_diag288_reset(dev);
+> diff --git a/include/sysemu/watchdog.h b/include/sysemu/watchdog.h
+> index 72a4da07a6..1b830df152 100644
+> --- a/include/sysemu/watchdog.h
+> +++ b/include/sysemu/watchdog.h
+> @@ -23,15 +23,7 @@
+>  #define QEMU_WATCHDOG_H
+>  
+>  #include "qemu/queue.h"
+> -
+> -/* Possible values for action parameter. */
+> -#define WDT_RESET        1      /* Hard reset. */
+> -#define WDT_SHUTDOWN     2      /* Shutdown. */
+> -#define WDT_POWEROFF     3      /* Quit. */
+> -#define WDT_PAUSE        4      /* Pause. */
+> -#define WDT_DEBUG        5      /* Prints a message and continues running. */
+> -#define WDT_NONE         6      /* Do nothing. */
+> -#define WDT_NMI          7      /* Inject nmi into the guest. */
+> +#include "qapi-types.h"
+>  
+>  struct WatchdogTimerModel {
+>      QLIST_ENTRY(WatchdogTimerModel) entry;
+> @@ -46,7 +38,7 @@ typedef struct WatchdogTimerModel WatchdogTimerModel;
+>  /* in hw/watchdog.c */
+>  int select_watchdog(const char *p);
+>  int select_watchdog_action(const char *action);
+> -int get_watchdog_action(void);
+> +WatchdogExpirationAction get_watchdog_action(void);
+>  void watchdog_add_model(WatchdogTimerModel *model);
+>  void watchdog_perform_action(void);
+>  
+> diff --git a/qapi-schema.json b/qapi-schema.json
+> index 802ea53d00..40605be36f 100644
+> --- a/qapi-schema.json
+> +++ b/qapi-schema.json
+> @@ -6539,3 +6539,12 @@
+>  # Since 2.9
+>  ##
+>  { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+> +
+> +##
+> +# @watchdog-set-action:
+> +#
+> +# Set watchdog action
+> +#
+> +# Since 2.11
+> +##
+> +{ 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogExpirationAction'} }
 
-Also, would it make sense? I mean, what would be the benefit of having
-two or more watchdogs?
+I was wondering whether you forgot to include the enum definition, until
+I discovered you smartly reused the existing one.
 
-Michal
+If it was a new one instead, I would suggest naming it WatchdogAction,
+because a watchdog's one and only action is the expiration action, and
+therefore the shorter name serves just fine.  Hmm, it's used in just two
+places...  okay, I'm suggesting you rename it, in a separate preparatory
+patch.
+
+This cleans up code duplication.  Worth mentioning in the commit
+message.
+
+Looks pretty good overall; a quick respin should get us there.
