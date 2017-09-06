@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39557)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ramysameh26@gmail.com>) id 1dpZCM-00066R-EJ
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:12:54 -0400
+	(envelope-from <wlfightup@gmail.com>) id 1dpZDG-0006i3-2H
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:13:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ramysameh26@gmail.com>) id 1dpZCL-0001Kd-2l
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:12:50 -0400
-Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:35064)
+	(envelope-from <wlfightup@gmail.com>) id 1dpZDB-0001iq-28
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:13:46 -0400
+Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:34888)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ramysameh26@gmail.com>)
-	id 1dpZCK-0001KS-Rp
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:12:48 -0400
-Received: by mail-oi0-x22c.google.com with SMTP id n18so40351757oig.2
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 05:12:48 -0700 (PDT)
+	(Exim 4.71) (envelope-from <wlfightup@gmail.com>) id 1dpZDA-0001iF-SB
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:13:40 -0400
+Received: by mail-yw0-x242.google.com with SMTP id s128so3214265yws.2
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 05:13:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAF6HrYw9B1ns0ZVtU_gxqJZxOe0dG03UQiAV7FHxBB-wQh6kNQ@mail.gmail.com>
-References: <CAF6HrYxj5BoTQpQjz95Z1_N_p615jpEE12xh_afuuqE4fcTyLg@mail.gmail.com>
-	<CAFEAcA9YNO7kgC8yzZ_RUKck=+98pUET0ogVZ7TvC1kxV+_fFA@mail.gmail.com>
-	<CAF6HrYwT7WP_i7cVhvEyRvqSK7J+bLnKU4b+WrMQfVkLaNDrvQ@mail.gmail.com>
-	<CAFEAcA9kEEyUj7=7Wd-jNbVOWwfgkj0a201q+L4e5CDR22JUgw@mail.gmail.com>
-	<CAF6HrYw9B1ns0ZVtU_gxqJZxOe0dG03UQiAV7FHxBB-wQh6kNQ@mail.gmail.com>
-From: Ramy Sameh <ramysameh26@gmail.com>
-Date: Wed, 6 Sep 2017 14:12:47 +0200
-Message-ID: <CAF6HrYym57hZjSFE=iExPkp8vBX82zqXvTxh8GJDYNPL1FTSqA@mail.gmail.com>
+From: Paul Schlacter <wlfightup@gmail.com>
+Date: Wed, 6 Sep 2017 20:13:38 +0800
+Message-ID: <CADak6y7DSednJgLkivprv0fAkLvE2=Dge0LzNJ0MnigvBEz+_A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Questions regarding emulated UART in VersatilePB
- board
+Subject: [Qemu-devel] how to modify or add machines type ?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +25,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Ahmed Aly <ahmedaly50@gmail.com>
+To: qemu-devel@nongnu.org
 
-Hello Peter,
+I made the default config build the qemu-kvm , But I used virsh xml
+corresponding machine-type inconsistent, resulting in an error.
 
-I have one more simple question please.
-
-Do the emulated baud rate registers have any effect? (I think they would
-have no effect, because there is no real clock that can be used to produce
-the baud rate).
-
-
-On Tue, Sep 5, 2017 at 8:50 PM, Ramy Sameh <ramysameh26@gmail.com> wrote:
-
-> Thank you very much Peter.
->
-> I will check the documentation for VersatilePB and ARM926EJ-S for more
-> understanding of interrupts handling.
->
->
->
-> On Tue, Sep 5, 2017 at 8:06 PM, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
->
->> On 5 September 2017 at 18:56, Ramy Sameh <ramysameh26@gmail.com> wrote:
->> > Are there any documentation or source of information, that can describe
->> how
->> > interrupts are implemented, and how to use them (where is the vector
->> table
->> > to put the ISR ... etc) ?
->>
->> The source code is it.
->>
->> Note that the pl011 is only a UART. It is used in a variety
->> of different boards, which have different interrupt controllers,
->> and with different CPUs. Things like ISR vector tables are
->> generally part of the CPU or interrupt controller emulation.
->>
->> The pl011's part of this is simply to raise and lower its outbound IRQ
->> line
->> when the conditions are right -- this happens by calling qemu_set_irq()
->> in pl011_update(). This corresponds to the hardware's UARTINTR line.
->> In QEMU that IRQ line is connected up to an emulated interrupt controller
->> which in turn is connected to an emulated CPU, just as in hardware
->> the pl011 UARTINTR line is connected to a hardware interrupt controller
->> and thus to a CPU.
->>
->> For information on how guest code should use a UART, how it should
->> set up interrupts and so on, you should consult the documentation
->> on how the hardware behaves.
->>
->> > In addition, any source of info that describes the code workflow when
->> > reading or writing to the uart would be very helpful.
->> > (because I put printfs in the functions to understand the workflow, but
->> the
->> > order of these printfs made me very confused).
->> >
->> > Regarding the registers, I have checked pl011_read and pl011_write, and
->> > found them, thanks for that.
->> > But I couldn't find the register "UARTICR" (Interrupt clear register)
->> > I think this might be related to my lack of understanding of how
->> interrupts
->> > are implemented in emulated pl011.
->>
->> UARTICR is a write-only register, so it is handled only in
->> pl011_write():
->>
->>     case 17: /* UARTICR */
->>         s->int_level &= ~value;
->>         pl011_update(s);
->>         break;
->>
->> (It's write-1-to-clear, hence the &= ~.)
->>
->> > Regarding the ID registers, whose values are hard-wired in the board,
->> and
->> > there was no need to implement modifiable states for them.
->> > Do you mean Peripheral identification registers, UARTPeriphID0-3 and
->> > PrimeCell identification registers, UARTPCellID0-3 ?
->>
->> Yes. (See the pl011_id_arm[] array which has the values.)
->>
->> thanks
->> -- PMM
->>
->
->
->
-> --
-> Best Regards,
-> Ramy Sameh
-> Embedded Software Engineer
-> +2-010-172-777-14
->
+error:
+2017-09-06T12:16:36.036200Z qemu-kvm: -machine
+pc-i440fx-rhel7.0.0,accel=kvm,usb=off: unsupported machine type
+Use -machine help to list supported machines
 
 
+Is there any way to modify the machines in qemu-kvm?
 
--- 
-Best Regards,
-Ramy Sameh
-Embedded Software Engineer
-+2-010-172-777-14
+
+[root@nova02 qemu-2.6.0]# /usr/libexec/qemu-kvm -M ?
+Supported machines are:
+pc                   Standard PC (i440FX + PIIX, 1996) (alias of
+pc-i440fx-2.6)
+pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996) (default)
+pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
+pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
+pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
+pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
+pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
+pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
+pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
+pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
+pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
+pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
+pc-1.3               Standard PC (i440FX + PIIX, 1996)
+pc-1.2               Standard PC (i440FX + PIIX, 1996)
+pc-1.1               Standard PC (i440FX + PIIX, 1996)
+pc-1.0               Standard PC (i440FX + PIIX, 1996)
+pc-0.15              Standard PC (i440FX + PIIX, 1996)
+pc-0.14              Standard PC (i440FX + PIIX, 1996)
+pc-0.13              Standard PC (i440FX + PIIX, 1996)
+pc-0.12              Standard PC (i440FX + PIIX, 1996)
+pc-0.11              Standard PC (i440FX + PIIX, 1996)
+pc-0.10              Standard PC (i440FX + PIIX, 1996)
+q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.6)
+pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
+pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
+pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
+isapc                ISA-only PC
+none                 empty machine
