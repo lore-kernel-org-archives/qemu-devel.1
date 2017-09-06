@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpe2X-0007MS-1A
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 13:23:02 -0400
+	(envelope-from <armbru@redhat.com>) id 1dpe5U-0008Nh-V4
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 13:26:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpe2Q-0000cx-VS
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 13:23:01 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:55258)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpe2Q-0000bS-Ex
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 13:22:54 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed,  6 Sep 2017 20:22:41 +0300
-Message-Id: <150471856141.24907.274176769201097378.stgit@frigg.lan>
+	(envelope-from <armbru@redhat.com>) id 1dpe5R-00025w-0s
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 13:26:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51248)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpe5Q-00025F-Qt
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 13:26:00 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C85107F414
+	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 17:25:59 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1504696921.git.mprivozn@redhat.com>
+	<9fe40ce91ada6dfdade83f32940f420e8b373db2.1504696921.git.mprivozn@redhat.com>
+	<6ac4f80c-3e80-297b-a4d6-2f4ae0b70d66@redhat.com>
+Date: Wed, 06 Sep 2017 19:25:58 +0200
+In-Reply-To: <6ac4f80c-3e80-297b-a4d6-2f4ae0b70d66@redhat.com> (Eric Blake's
+	message of "Wed, 6 Sep 2017 10:37:48 -0500")
+Message-ID: <87zia7rb6h.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 00/20] instrument: Add basic event
- instrumentation
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] watchdog.h: Drop local redefinition
+ of actions enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,164 +35,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org
 
-This series adds an API to add instrumentation events.
+Eric Blake <eblake@redhat.com> writes:
 
-It also provides additional APIs for:
-* Controlling tracing events
-* Peek/poke guest memory
+> On 09/06/2017 06:24 AM, Michal Privoznik wrote:
+>> We already have enum that enumerates all the action that a
+>
+> s/action/actions/
+>
+>> watchdog can take when hitting its timeout: WatchdogAction.
+>> Use that instead of inventing our own.
+>> 
+>> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+>> ---
+>
+>> @@ -77,27 +77,16 @@ int select_watchdog(const char *p)
+>>  
+>>  int select_watchdog_action(const char *p)
+>>  {
+>> -    if (strcasecmp(p, "reset") == 0)
+>> -        watchdog_action = WDT_RESET;
+>
+> The old code was case-insensitive,
+>
+>> +    action = qapi_enum_parse(&WatchdogAction_lookup, p, -1, NULL);
+>
+> the new code is not.  Do we care?  (I don't, but we could be breaking
+> someone's control flow).  Should qapi_enum_parse be taught to be
+> case-insensitive?  Or perhaps we answer related questions first: Do we
+> have any QAPI enums that have values differing only in case? Do we
+> prevent such QAPI definitions, to give us the potential of making the
+> parsing insensitive?
 
-There's still missing APIs for (can be added in later series?):
-* Provide something like tracing's per-vCPU trace states (i.e., so that e=
-ach
-  vCPU can have different instrumentation code). It's still not clear to =
-me if
-  we should extend the per-vCPU bitmap with instrumentation events, or ot=
-herwise
-  somehow reuse the bits in tracing events (since they're currently limit=
-ed).
-* Peek/poke guest registers
+Case-sensitive everywhere is fine.  Case-insensitive everywhere also
+fine, just not my personal preference.  What's not fine is "guess
+whether this part of the interface is case-sensitive or not".
 
-The instrumentation code is dynamically loaded as a library into QEMU eit=
-her
-when it starts or later using its remote control interfaces.
+QMP is case-sensitive.  Let's keep it that way.
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
+The -watchdog-action option has a case-insensitive argument.  The
+obvious way to remain misfeature-^Wbackwards compatible is converting
+the argument to lower case before handing it off to qapi_enum_parse.  I
+doubt it matters, but just doing it is less work than debating how far
+exactly we want to bend over backwards.
 
-Changes in v4
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Add missing stub function.
-
-
-Changes in v3
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Use a separate event set for instrumentation (i.e., do not instrument t=
-racing
-  events) [Stefan Hajnoczi].
-* Add API for peek/poke guest memory.
-
-
-Changes in v2
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-* Update QEMU version in QAPI [Eric Blake].
-* Clarify 'msg' result in QAPI is for humans only.
-* Make 'msg' and 'handle' results optional in QAPI.
-* Use a list of 'str' in 'instr-load' QAPI command.
-* Update MAINTAINERS.
-* Add macros for error-reporting in API.
-
-
-Llu=C3=ADs Vilanova (20):
-      instrument: Add documentation
-      instrument: Add configure-time flag
-      instrument: Add generic library loader
-      instrument: [linux-user] Add command line library loader
-      instrument: [bsd-user] Add command line library loader
-      instrument: [softmmu] Add command line library loader
-      instrument: [qapi] Add library loader
-      instrument: [hmp] Add library loader
-      instrument: Add basic control interface
-      instrument: Add support for tracing events
-      instrument: Track vCPUs
-      instrument: Add event 'guest_cpu_enter'
-      instrument: Add event 'guest_cpu_exit'
-      instrument: Add event 'guest_cpu_reset'
-      trace: Introduce a proper structure to describe memory accesses
-      instrument: Add event 'guest_mem_before_trans'
-      instrument: Add event 'guest_mem_before_exec'
-      instrument: Add event 'guest_user_syscall'
-      instrument: Add event 'guest_user_syscall_ret'
-      instrument: Add API to manipulate guest memory
-
-
- .gitignore                                |    1=20
- MAINTAINERS                               |    7 +
- Makefile                                  |    8 +
- Makefile.objs                             |    4 +
- Makefile.target                           |    1=20
- bsd-user/main.c                           |   15 ++
- bsd-user/syscall.c                        |   11 ++
- configure                                 |   12 ++
- cpus-common.c                             |    9 +
- docs/instrument.txt                       |  174 +++++++++++++++++++++++=
-+++
- hmp-commands.hx                           |   28 ++++
- include/exec/cpu_ldst_template.h          |   19 +--
- include/exec/cpu_ldst_useronly_template.h |   19 +--
- include/exec/helper-gen.h                 |    1=20
- include/exec/helper-proto.h               |    1=20
- include/exec/helper-tcg.h                 |    1=20
- instrument/Makefile.objs                  |    9 +
- instrument/cmdline.c                      |  124 ++++++++++++++++++
- instrument/cmdline.h                      |   49 +++++++
- instrument/control.c                      |  148 ++++++++++++++++++++++
- instrument/control.h                      |  123 ++++++++++++++++++
- instrument/control.inc.h                  |   56 ++++++++
- instrument/error.h                        |   34 +++++
- instrument/events.h                       |   86 +++++++++++++
- instrument/events.inc.h                   |  108 ++++++++++++++++
- instrument/helpers.h                      |    1=20
- instrument/load.c                         |  196 +++++++++++++++++++++++=
-++++++
- instrument/load.h                         |   87 +++++++++++++
- instrument/qemu-instr/control.h           |  169 +++++++++++++++++++++++=
-++
- instrument/qemu-instr/state.h             |  104 +++++++++++++++
- instrument/qemu-instr/types.h             |  115 +++++++++++++++++
- instrument/qemu-instr/types.inc.h         |   15 ++
- instrument/qemu-instr/visibility.h        |   58 +++++++++
- instrument/qmp.c                          |   88 +++++++++++++
- instrument/state.c                        |   72 +++++++++++
- instrument/trace.c                        |  125 ++++++++++++++++++
- linux-user/main.c                         |   19 +++
- linux-user/syscall.c                      |    6 +
- monitor.c                                 |   60 +++++++++
- qapi-schema.json                          |    3=20
- qapi/instrument.json                      |   96 ++++++++++++++
- qemu-options.hx                           |   19 +++
- qom/cpu.c                                 |    2=20
- stubs/Makefile.objs                       |    1=20
- stubs/instrument.c                        |   25 ++++
- tcg/tcg-op.c                              |   27 +++-
- trace/control-target.c                    |    2=20
- trace/control.c                           |    4 -
- trace/control.h                           |   24 ++++
- trace/mem-internal.h                      |   22 ++-
- trace/mem.h                               |    8 +
- vl.c                                      |   15 ++
- 52 files changed, 2371 insertions(+), 40 deletions(-)
- create mode 100644 docs/instrument.txt
- create mode 100644 instrument/Makefile.objs
- create mode 100644 instrument/cmdline.c
- create mode 100644 instrument/cmdline.h
- create mode 100644 instrument/control.c
- create mode 100644 instrument/control.h
- create mode 100644 instrument/control.inc.h
- create mode 100644 instrument/error.h
- create mode 100644 instrument/events.h
- create mode 100644 instrument/events.inc.h
- create mode 100644 instrument/helpers.h
- create mode 100644 instrument/load.c
- create mode 100644 instrument/load.h
- create mode 100644 instrument/qemu-instr/control.h
- create mode 100644 instrument/qemu-instr/state.h
- create mode 100644 instrument/qemu-instr/types.h
- create mode 100644 instrument/qemu-instr/types.inc.h
- create mode 100644 instrument/qemu-instr/visibility.h
- create mode 100644 instrument/qmp.c
- create mode 100644 instrument/state.c
- create mode 100644 instrument/trace.c
- create mode 100644 qapi/instrument.json
- create mode 100644 stubs/instrument.c
-
-
-To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Emilio G. Cota <cota@braap.org>
-Cc: Eric Blake <eblake@redhat.com>
+g_ascii_strdown() should do.  It only converts ASCII characters, but
+anything else is going to fail in qapi_enum_parse() anyway.
