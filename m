@@ -1,24 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41564)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpZIE-00081p-0u
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:18:58 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpZOV-000245-S6
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:25:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpZIA-00058V-LB
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:18:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36508)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpZIA-00057u-Cv
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:18:50 -0400
-Date: Wed, 6 Sep 2017 14:18:46 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170906141846.0be413fb.cohuck@redhat.com>
-In-Reply-To: <20170905111645.18068-2-pasic@linux.vnet.ibm.com>
-References: <20170905111645.18068-1-pasic@linux.vnet.ibm.com>
-	<20170905111645.18068-2-pasic@linux.vnet.ibm.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpZOS-0000l3-Np
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:25:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36664)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dpZOS-0000kQ-Eq
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:25:20 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v86COATT127379
+	for <qemu-devel@nongnu.org>; Wed, 6 Sep 2017 08:25:18 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ctcd5dt6v-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 08:25:18 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 6 Sep 2017 13:25:16 +0100
+References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
+	<20170830163609.50260-5-pasic@linux.vnet.ibm.com>
+	<20170831115535.1e4201d3.cohuck@redhat.com>
+	<7540741b-d230-e7c4-50d3-036f31997c8b@linux.vnet.ibm.com>
+	<20170905182546.00457332.cohuck@redhat.com>
+	<fe102a7a-e998-8ebe-b94d-e653c4f66c39@linux.vnet.ibm.com>
+	<20170906043108.GY31680@bjsdjshi@linux.vnet.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 6 Sep 2017 14:25:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/5] s390x/css: introduce css data stream
+In-Reply-To: <20170906043108.GY31680@bjsdjshi@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <8946b1ec-4d14-c953-deab-aaded7cd2c9d@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 4/9] s390x: refactor error handling for
+ SSCH and RSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,107 +48,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Tue,  5 Sep 2017 13:16:41 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-> This is a preparation for introducing handling for indirect data
-> addressing and modified indirect data addressing (CCW). Here we introduce
-> an interface which should make the addressing scheme transparent for the
-> client code. Here we implement only basic scheme (no IDA or MIDA).
 
-s/basic scheme/the basic scheme/
-
+On 09/06/2017 06:31 AM, Dong Jia Shi wrote:
+> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-06 00:30:58 +0200]:
 > 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> ---
->  hw/s390x/css.c         | 55 +++++++++++++++++++++++++++++++++++++++++
->  include/hw/s390x/css.h | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 122 insertions(+)
+> [...]
 > 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 1880b1a0ff..87d913f81c 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -783,6 +783,61 @@ static CCW1 copy_ccw_from_guest(hwaddr addr, bool fmt1)
->      }
->      return ret;
->  }
-> +/**
-> + * If out of bounds marks the stream broken. If broken returns -EINVAL,
-> + * otherwise the requested  length (may be zero)
+>>>
+>>>> But I guess, I was afraid of somebody blaming me for this
+>>>> comment (such TODOs in production code are a bit strange -- what
+>>>> does it mean: we did not bother to figure it out?).
+>>>
+>>> For one, the TODO is preexisting... and we really should remember to
+>>> figure out if there's something better rather than just drop the
+>>> comment.
+>>>
+>>> (And I sure hope nobody is using vfio-ccw in production yet...)
+>>>
+>> Since blame says the TODO has been around since 2017-05-17
+>> let me have a critical look at it.
+>>
+>> At a first glance I would say addressing exception for SSCH
+>> is not what we want: the only possibility I see for address
+>> exception for SSCH is due to the ORB address. But if that's
+>> the case we will never reach the code in question.
+> Agree.
+> 
+>> So I suppose we can do better.
+> As the comment said, I'm (still) in the state of 'wondering'.
+> 
+>>
+>> Adding Ren. @Ren: Do you agree with my analysis. If you do,
+>> I could come up with a proposal what to do -- after some reading.
+> If you have a better idea, and time, why not? ;)
+> 
 
-s/requested  length/requested length/
+We have basically two possibilities/options which ask for different
+handling:
+1) EFAULT is due to a bug in the vfio-ccw implementation
+(can be QEMU or kernel).
+2) EFAULT is due to buggy channel program.
 
-> + */
-> +static inline int cds_check_len(CcwDataStream *cds, int len)
-> +{
-> +    if (cds->at_byte + len > cds->count) {
-> +        cds->flags |= CDS_F_STREAM_BROKEN;
-> +    }
-> +    return cds->flags & CDS_F_STREAM_BROKEN ? -EINVAL : len;
-> +}
-> +
-> +static int ccw_dstream_rw_noflags(CcwDataStream *cds, void *buff, int len,
-> +                                  CcwDataStreamOp op)
-> +{
-> +    int ret;
-> +
-> +    ret = cds_check_len(cds, len);
-> +    if (ret <= 0) {
-> +        return ret;
-> +    }
-> +    if (op == CDS_OP_A) {
-> +        goto incr;
-> +    }
-> +    ret = address_space_rw(&address_space_memory, cds->cda,
-> +                           MEMTXATTRS_UNSPECIFIED, buff, len, op);
-> +    if (ret != MEMTX_OK) {
-> +        cds->flags |= CDS_F_STREAM_BROKEN;
+Option 2) is basically to be handled with a channel-program check and
+setting primary secondary and alert status. For reference see PoP page
+15-59 ("Designation of Storage Area").  An exception may be an invalid
+channel program address in the ORB. There the channel-program check ain't
+explicitly stated (although) I would expect one. It may be implied by the
+things on page 15-59 though.
 
-Do we want to distinguish between different reasons for the stream
-being broken? I.e, is there a case where we want to signal different
-errors back to the caller?
+Option 1) is however very similar to other we have figured out that the
+implementation is broken situations and should be handled consequently.
+The current state of the discussion is with a unit exception.
 
-> +        return -EINVAL;
-> +    }
-> +incr:
-> +    cds->at_byte += len;
-> +    cds->cda += len;
-> +    return 0;
-> +}
-> +
-> +void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
-> +{
-> +    /*
-> +     * We don't support MIDA (an optional facility) yet and we
-> +     * catch this earlier. Just for expressing the precondition.
-> +     */
-> +    assert(!(orb->ctrl1 & ORB_CTRL1_MASK_MIDAW));
+Does that make sense?
 
-I don't know, this is infrastructure, should it trust its callers? If
-you keep the assert, please make it g_assert().
+Now, Dong Jia, I need your help to figure out do we have option 1 or
+option 2 here? After quick look at the kernel code, it appears to me that
+I've seen both option 1 and option 2 (I'm afraid) -- but my assessment
+was really very superficial.
 
-> +    cds->flags = (orb->ctrl0 & ORB_CTRL0_MASK_I2K ? CDS_F_I2K : 0) |
-> +                 (orb->ctrl0 & ORB_CTRL0_MASK_C64 ? CDS_F_C64 : 0) |
-> +                 (ccw->flags & CCW_FLAG_IDA ? CDS_F_IDA : 0);
-> +    cds->count = ccw->count;
-> +    cds->cda_orig = ccw->cda;
-> +    ccw_dstream_rewind(cds);
-> +    if (!(cds->flags & CDS_F_IDA)) {
-> +        cds->op_handler = ccw_dstream_rw_noflags;
-> +    } else {
-> +        assert(false);
+I would expect option 2 to be handled differently (kernel provides the
+SCSW) though.
 
-Same here.
-
-Or should we make this return an error and have the callers deal with
-that? (I still need to look at the users.)
-
-> +    }
-> +}
->  
->  static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
->                               bool suspend_allowed)
+Regards,
+Halil
