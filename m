@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54123)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54202)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dpYZ2-00060n-9R
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:32:14 -0400
+	(envelope-from <groug@kaod.org>) id 1dpYZJ-00068C-0W
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:32:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dpYYy-0008EZ-DR
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:32:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38502)
+	(envelope-from <groug@kaod.org>) id 1dpYZE-0008KN-1J
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:32:29 -0400
+Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:50773)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dpYYy-0008Dy-4V
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:32:08 -0400
-Date: Wed, 6 Sep 2017 12:31:58 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170906113157.GD2215@work-vm>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<20170829110357.GG3783@redhat.com> <20170906094846.GA2215@work-vm>
-	<20170906104603.GK15510@redhat.com> <20170906104850.GB2215@work-vm>
-	<20170906105414.GL15510@redhat.com> <20170906105704.GC2215@work-vm>
-	<20170906110629.GM15510@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dpYZD-0008Jh-O8
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:32:23 -0400
+Received: from player714.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 467D27AF2F
+	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 13:32:22 +0200 (CEST)
+Date: Wed, 6 Sep 2017 13:32:09 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170906133209.0a497a2c@bahia>
+In-Reply-To: <20170731025825.GC2652@umbus.fritz.box>
+References: <150100547373.27487.3154210751350595400.stgit@bahia>
+	<150100571083.27487.4628655387393519076.stgit@bahia>
+	<20170728034925.GF3098@umbus.fritz.box>
+	<20170728123035.70cdd434@bahia.lan>
+	<20170731025825.GC2652@umbus.fritz.box>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170906110629.GM15510@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/P0GEhRyoDmZPY.w2PExY8Nr";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [for-2.11 PATCH 18/26] spapr: create DR
+ connectors for PHBs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,284 +35,227 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Bharata B Rao <bharata@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> On Wed, Sep 06, 2017 at 11:57:05AM +0100, Dr. David Alan Gilbert wrote:
-> > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > > On Wed, Sep 06, 2017 at 11:48:51AM +0100, Dr. David Alan Gilbert wr=
-ote:
-> > > > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > > > > On Wed, Sep 06, 2017 at 10:48:46AM +0100, Dr. David Alan Gilber=
-t wrote:
-> > > > > > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > > > > > > On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
-> > > > > > > > v2:
-> > > > > > > > - fixed "make check" error that patchew reported
-> > > > > > > > - moved the thread_join upper in monitor_data_destroy(), =
-before
-> > > > > > > >   resources are released
-> > > > > > > > - added one new patch (current patch 3) that fixes a nast=
-y risk
-> > > > > > > >   condition with IOWatchPoll.  Please see commit message =
-for more
-> > > > > > > >   information.
-> > > > > > > > - added a g_main_context_wakeup() to make sure the separa=
-te loop
-> > > > > > > >   thread can be kicked always when we want to destroy the=
- per-monitor
-> > > > > > > >   threads.
-> > > > > > > > - added one new patch (current patch 8) to introduce migr=
-ation mgmt
-> > > > > > > >   lock for migrate_incoming.
-> > > > > > > >=20
-> > > > > > > > This is an extended work for migration postcopy recovery.=
- This series
-> > > > > > > > is tested with the following series to make sure it solve=
-s the monitor
-> > > > > > > > hang problem that we have encountered for postcopy recove=
-ry:
-> > > > > > > >=20
-> > > > > > > >   [RFC 00/29] Migration: postcopy failure recovery
-> > > > > > > >   [RFC 0/6] migration: re-use migrate_incoming for postco=
-py recovery
-> > > > > > > >=20
-> > > > > > > > The root problem is that, monitor commands are all handle=
-d in main
-> > > > > > > > loop thread now, no matter how many monitors we specify. =
-And, if main
-> > > > > > > > loop thread hangs due to some reason, all monitors will b=
-e stuck.
-> > > > > > > > This can be done in reversed order as well: if any of the=
- monitor
-> > > > > > > > hangs, it will hang the main loop, and the rest of the mo=
-nitors (if
-> > > > > > > > there is any).
-> > > > > > > >=20
-> > > > > > > > That affects postcopy recovery, since the recovery requir=
-es user input
-> > > > > > > > on destination side.  If monitors hang, the destination V=
-M dies and
-> > > > > > > > lose hope for even a final recovery.
-> > > > > > > >=20
-> > > > > > > > So, sometimes we need to make sure the monitor be alive, =
-at least one
-> > > > > > > > of them.
-> > > > > > > >=20
-> > > > > > > > The whole idea of this series is that instead if handling=
- monitor
-> > > > > > > > commands all in main loop thread, we do it separately in =
-per-monitor
-> > > > > > > > threads.  Then, even if main loop thread hangs at any poi=
-nt by any
-> > > > > > > > reason, per-monitor thread can still survive.  Further, w=
-e add hint in
-> > > > > > > > QMP/HMP to show whether a command can be executed without=
- QMP, if so,
-> > > > > > > > we avoid taking BQL when running that command.  It greatl=
-y reduced
-> > > > > > > > contention of BQL.  Now the only user of that new paramet=
-er (currently
-> > > > > > > > I call it "without-bql") is "migrate-incoming" command, w=
-hich is the
-> > > > > > > > only command to rescue a paused postcopy migration.
-> > > > > > > >=20
-> > > > > > > > However, even with the series, it does not mean that per-=
-monitor
-> > > > > > > > threads will never hang.  One example is that we can stil=
-l run "info
-> > > > > > > > vcpus" in per-monitor threads during a paused postcopy (i=
-n that state,
-> > > > > > > > page faults are never handled, and "info cpus" will never=
- return since
-> > > > > > > > it tries to sync every vcpus).  So to make sure it does n=
-ot hang, we
-> > > > > > > > not only need the per-monitor thread, the user should be =
-careful as
-> > > > > > > > well on how to use it.
-> > > > > > > >=20
-> > > > > > > > For postcopy recovery, we may need dedicated monitor chan=
-nel for
-> > > > > > > > recovery.  In other words, a destination VM that supports=
- postcopy
-> > > > > > > > recovery would possibly need:
-> > > > > > > >=20
-> > > > > > > >   -qmp MAIN_CHANNEL -qmp RECOVERY_CHANNEL
-> > > > > > >=20
-> > > > > > > I think this is a really horrible thing to expose to manage=
-ment applications.
-> > > > > > > They should not need to be aware of fact that QEMU is buggy=
- and thus requires
-> > > > > > > that certain commands be run on different monitors to work =
-around the bug.
-> > > > > >=20
-> > > > > > It's unfortunately baked in way too deep to fix in the near t=
-erm; the
-> > > > > > BQL is just too cantagious and we have a fundamental design o=
-f running
-> > > > > > all the main IO emulation in one thread.
-> > > > > >=20
-> > > > > > > I'd much prefer to see the problem described handled transp=
-arently inside
-> > > > > > > QEMU. One approach is have a dedicated thread in QEMU respo=
-nsible for all
-> > > > > > > monitor I/O. This thread should never actually execute moni=
-tor commands
-> > > > > > > though, it would simply parse the command request and put d=
-ata onto a queue
-> > > > > > > of pending commands, thus it could never hang. The command =
-queue could be
-> > > > > > > processed by the main thread, or by another thread that is =
-interested.
-> > > > > > > eg the migration thread could process any queued commands r=
-elated to
-> > > > > > > migration directly.
-> > > > > >=20
-> > > > > > That requires a change in the current API to allow async comm=
-and
-> > > > > > completion (OK that is something Marc-Andre's world has) so t=
-hat
-> > > > > > from the one connection you can have multiple outstanding com=
-mands.
-> > > > > > Hmm unless....
-> > > > > >=20
-> > > > > > We've also got problems that some commands don't like being r=
-un outside
-> > > > > > of the main thread (see Fam's reply on the 21st pointing out =
-that a lot
-> > > > > > of block commands would assert).
-> > > > > >=20
-> > > > > > I think the way to move to what you describe would be:
-> > > > > >   a) A separate thread for monitor IO
-> > > > > >       This seems a separate problem
-> > > > > >       How hard is that?  Will all the current IO mechanisms u=
-sed
-> > > > > >       for monitors just work if we run them in a separate thr=
-ead?
-> > > > > >       What about mux?
-> > > > > >=20
-> > > > > >   b) Initially all commands get dispatched to the main thread
-> > > > > >      so nothing changes about the API.
-> > > > > >=20
-> > > > > >   c) We create a new thread for the lock-free commands, and r=
-oute
-> > > > > >       lock-free commands down it.
-> > > > > >=20
-> > > > > >   d) We start with a rule that on any one monitor connection =
-we
-> > > > > >   don't allow you to start a command until the previous one h=
-as
-> > > > > >   finished
-> > > > > >=20
-> > > > > > (d) allows us to avoid any API changes, but allows us to do l=
-ock-free
-> > > > > > stuff on a separate connection like Peter's world.
-> > > > > > We can drop (d) once we have a way of doing async commands.
-> > > > > > We can add dispatching to more threads once someone describes
-> > > > > > what they want from those threads.
-> > > > > >=20
-> > > > > > Does that work for you Dan?
-> > > > >=20
-> > > > > It would *provided* that we do (c) for the commands Peter wants=
- for
-> > > > > this migration series.  IOW, I don't want to have to have logic=
- in
-> > > > > libvirt that either needs to add a 2nd monitor server, or open =
-a 2nd
-> > > > > monitor connection, to deal with migration post-copy recovery i=
-n some
-> > > > > versions of QEMU.  So whatever is needed to make post-copy reco=
-very
-> > > > > work has to be done for (c).
+--Sig_/P0GEhRyoDmZPY.w2PExY8Nr
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, 31 Jul 2017 12:58:25 +1000
+David Gibson <david@gibson.dropbear.id.au> wrote:
+
+> On Fri, Jul 28, 2017 at 12:30:35PM +0200, Greg Kurz wrote:
+> > On Fri, 28 Jul 2017 13:49:25 +1000
+> > David Gibson <david@gibson.dropbear.id.au> wrote:
+> >  =20
+> > > On Tue, Jul 25, 2017 at 08:01:50PM +0200, Greg Kurz wrote: =20
+> > > > From: Michael Roth <mdroth@linux.vnet.ibm.com>
 > > > >=20
-> > > > But then doesn't that mean you're requiring us to break (d) and c=
-hange
-> > > > the QMP interface to libvirt so it can do async stuff?
+> > > > Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> > > > Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> > > > Signed-off-by: Greg Kurz <groug@kaod.org>   =20
 > > >=20
-> > > Depends on your definition of break - I'm assuming there's either a=
- way
-> > > to opt-in to use of a async mode for existing commands in (c), or t=
-hat
-> > > async commands would be added in parallel with existing sync comman=
-ds.
-> > > IOW, its not a API breakage - its an opt-in extension of existing
-> > > functionality.
+> > >=20
+> > >  =20
+> > > > ---
+> > > > Changes since RFC:
+> > > > - rebased against ppc-for-2.10 (reset hooks registering already mer=
+ged)
+> > > > - added new DRC type for PHB
+> > > > ---
+> > > >  hw/ppc/spapr.c             |   15 +++++++++++++++
+> > > >  hw/ppc/spapr_drc.c         |   17 +++++++++++++++++
+> > > >  include/hw/ppc/spapr_drc.h |    8 ++++++++
+> > > >  3 files changed, 40 insertions(+)
+> > > >=20
+> > > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > > index 8dc505343c0f..5950c009ab7e 100644
+> > > > --- a/hw/ppc/spapr.c
+> > > > +++ b/hw/ppc/spapr.c
+> > > > @@ -98,6 +98,9 @@
+> > > > =20
+> > > >  #define PHANDLE_XICP            0x00001111
+> > > > =20
+> > > > +/* maximum number of hotpluggable PHBs */
+> > > > +#define SPAPR_DRC_MAX_PHB       256   =20
+> > >=20
+> > > I wonder if we should actually make this a machine property.
+> > >  =20
 > >=20
-> > But you'd need to do async commands for all commands you issued to av=
-oid
-> > blocking the io thread so that you could then issue the recovery
-> > commands.
+> > It makes sense.
+> >=20
+> > Also, if all PHBs are instanciated with index !=3D -1, we're limited to=
+ 31.
+> > Maybe this could be the default value for the machine property instead =
+of
+> > 256 then ? =20
 >=20
-> I don't see why that has to be the case. In order to issue an async com=
-mand
-> all that needs to be the case is that command replies should be allowed=
- to
-> be sent out of order.
+> Actually, if we're binding it back to index, which has a hard limit,
+> then it no longer makes sense to have it as a property and we should
+> go back to a constant (well, it could vary by machine type version).
 >=20
-> IOW if command A is blocking and command B is async, then we shoudl be
-> allowed to have the following
->=20
->    req A
->    req B
->    res A
->    res B
->=20
-> Or
->=20
->    req A
->    req B
->    res B
->    res A
->=20
-> Or
->=20
->    req B
->    req A
->    res B
->    res A
->=20
-> etc.
->=20
-> This does imply that you need a separate monitor I/O processing, from t=
-he
-> command execution thread, but I see no need for all commands to suddenl=
-y
-> become async. Just allowing interleaved replies is sufficient from the
-> POV of the protocol definition. This interleaving is easy to handle fro=
-m
-> the client POV - just requires a unique 'serial' in the request by the
-> client, that is copied into the reply by QEMU.
 
-OK, so for that we can just take Marc-Andr=E9's syntax and call it 'id':
-  https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03634.html
+But I guess that the hard limit of 31 as described in the changelog of
+commit 357d1e3bc7d2d80e5271bc4f3ac8537e30dc8046 still holds, doesn't it ?
 
-then it's upto the caller to ensure those id's are unique.
+    Because some guest versions (including most current distro kernels) can=
+'t
+    access PCI MMIO above 64 TiB, we put all the PCI windows between 32 TiB=
+ and
+    64 TiB.  This is broken into 1 TiB chunks.  The first 1 TiB contains the
+    PIO (64 kiB) and 32-bit MMIO (2 GiB) windows for all of the PHBs.  Each
+    subsequent TiB chunk contains a naturally aligned 64-bit MMIO window for
+    one PHB each.
+   =20
+    This reduces the number of allowed PHBs (without full manual configurat=
+ion
+    of all the windows) from 256 to 31, but this should still be plenty in
+    practice.
 
-I do worry about two things:
-  a) With this the caller doesn't really know which commands could be
-  in parallel - for example if we've got a recovery command that's
-  executed by this non-locking thread that's OK, we expect that
-  to be doable in parallel.  If in the future though we do
-  what you initially suggested and have a bunch of commands get
-  routed to the migration thread (say) then those would suddenly
-  operate in parallel with other commands that we're previously
-  synchronous.
+Not sure why a machine type version would have a different limit. Can
+you think of a use case ?
 
-  b) I still worry how the various IO channels will behave on another
-  thread.  But that's more a general feeling rather than anything
-  specific.
+> > > >  static ICSState *spapr_ics_create(sPAPRMachineState *spapr,
+> > > >                                    const char *type_ics,
+> > > >                                    int nr_irqs, Error **errp)
+> > > > @@ -2384,6 +2387,18 @@ static void ppc_spapr_init(MachineState *mac=
+hine)
+> > > > =20
+> > > >      spapr->dr_phb_enabled =3D smc->dr_phb_enabled;
+> > > > =20
+> > > > +    /* Setup hotplug / dynamic-reconfiguration connectors. top-lev=
+el
+> > > > +     * connectors (described in root DT node's "ibm,drc-types" pro=
+perty)
+> > > > +     * are pre-initialized here. additional child connectors (such=
+ as
+> > > > +     * connectors for a PHBs PCI slots) are added as needed during=
+ their
+> > > > +     * parent's realization.
+> > > > +     */
+> > > > +    if (spapr->dr_phb_enabled) {
+> > > > +        for (i =3D 0; i < SPAPR_DRC_MAX_PHB; i++) {
+> > > > +            spapr_dr_connector_new(OBJECT(machine), TYPE_SPAPR_DRC=
+_PHB, i);
+> > > > +        }
+> > > > +    }
+> > > > +
+> > > >      /* Set up PCI */
+> > > >      spapr_pci_rtas_init();
+> > > > =20
+> > > > diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+> > > > index eb8024d37c54..2e1049ce61c7 100644
+> > > > --- a/hw/ppc/spapr_drc.c
+> > > > +++ b/hw/ppc/spapr_drc.c
+> > > > @@ -697,6 +697,15 @@ static void spapr_drc_lmb_class_init(ObjectCla=
+ss *k, void *data)
+> > > >      drck->release =3D spapr_lmb_release;
+> > > >  }
+> > > > =20
+> > > > +static void spapr_drc_phb_class_init(ObjectClass *k, void *data)
+> > > > +{
+> > > > +    sPAPRDRConnectorClass *drck =3D SPAPR_DR_CONNECTOR_CLASS(k);
+> > > > +
+> > > > +    drck->typeshift =3D SPAPR_DR_CONNECTOR_TYPE_SHIFT_PHB;
+> > > > +    drck->typename =3D "PHB";
+> > > > +    drck->drc_name_prefix =3D "PHB ";
+> > > > +}
+> > > > +
+> > > >  static const TypeInfo spapr_dr_connector_info =3D {
+> > > >      .name          =3D TYPE_SPAPR_DR_CONNECTOR,
+> > > >      .parent        =3D TYPE_DEVICE,
+> > > > @@ -740,6 +749,13 @@ static const TypeInfo spapr_drc_lmb_info =3D {
+> > > >      .class_init    =3D spapr_drc_lmb_class_init,
+> > > >  };
+> > > > =20
+> > > > +static const TypeInfo spapr_drc_phb_info =3D {
+> > > > +    .name          =3D TYPE_SPAPR_DRC_PHB,
+> > > > +    .parent        =3D TYPE_SPAPR_DRC_LOGICAL,   =20
+> > >=20
+> > > I thought PHB DRCs were physical..
+> > >  =20
+> >=20
+> > My understanding is that only PCI IOAs need a physical DRC.
+> >=20
+> > From LoPAPR v1.1 (March 24, 2016):
+> >=20
+> > 13.7 Logical Resource Dynamic Reconfiguration (LRDR)
+> >=20
+> > The Logical Resource Dynamic Reconfiguration option allows a platform t=
+o make available and recover platform re-
+> > sources such as CPUs, Memory Regions, Processor Host Bridges, and I/O s=
+lots to/from its operating OS image(s).
+> >=20
+> > ...
+> >=20
+> > The device tree contains logical resource DR connectors for the maximum=
+ number of resources that the platform can
+> > allocate to the specific OS. In some cases such as for processors and P=
+HBs...
+> >=20
+> > and
+> >=20
+> > Table 240. Currently Defined DR Connector Types
+> >=20
+> > | PHB | Logical PCI Host Bridge | =20
+>=20
+> Ah, my mistake.
+>=20
+> >  =20
+> > > > +    .instance_size =3D sizeof(sPAPRDRConnector),
+> > > > +    .class_init    =3D spapr_drc_phb_class_init,
+> > > > +};
+> > > > +
+> > > >  /* helper functions for external users */
+> > > > =20
+> > > >  sPAPRDRConnector *spapr_drc_by_index(uint32_t index)
+> > > > @@ -1179,6 +1195,7 @@ static void spapr_drc_register_types(void)
+> > > >      type_register_static(&spapr_drc_cpu_info);
+> > > >      type_register_static(&spapr_drc_pci_info);
+> > > >      type_register_static(&spapr_drc_lmb_info);
+> > > > +    type_register_static(&spapr_drc_phb_info);
+> > > > =20
+> > > >      spapr_rtas_register(RTAS_SET_INDICATOR, "set-indicator",
+> > > >                          rtas_set_indicator);
+> > > > diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+> > > > index a7958d0a8d14..535fc61b98a8 100644
+> > > > --- a/include/hw/ppc/spapr_drc.h
+> > > > +++ b/include/hw/ppc/spapr_drc.h
+> > > > @@ -69,6 +69,14 @@
+> > > >  #define SPAPR_DRC_LMB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
+> > > >                                          TYPE_SPAPR_DRC_LMB)
+> > > > =20
+> > > > +#define TYPE_SPAPR_DRC_PHB "spapr-drc-phb"
+> > > > +#define SPAPR_DRC_PHB_GET_CLASS(obj) \
+> > > > +        OBJECT_GET_CLASS(sPAPRDRConnectorClass, obj, TYPE_SPAPR_DR=
+C_PHB)
+> > > > +#define SPAPR_DRC_PHB_CLASS(klass) \
+> > > > +        OBJECT_CLASS_CHECK(sPAPRDRConnectorClass, klass, TYPE_SPAP=
+R_DRC_PHB)
+> > > > +#define SPAPR_DRC_PHB(obj) OBJECT_CHECK(sPAPRDRConnector, (obj), \
+> > > > +                                        TYPE_SPAPR_DRC_PHB)
+> > > > +
+> > > >  /*
+> > > >   * Various hotplug types managed by sPAPRDRConnector
+> > > >   *
+> > > >    =20
+> > >  =20
+> >  =20
+>=20
+>=20
+>=20
 
-Dave
 
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
-ange :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange=
-.com :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
-ange :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--Sig_/P0GEhRyoDmZPY.w2PExY8Nr
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWa/cuQAKCRAC/DrrAQHb
+wq/9AJ9kOi1OtABg2QveW406RUM5FY/SyQCgo40g15aa4wvywFxNXSmG4frjtlQ=
+=LH8I
+-----END PGP SIGNATURE-----
+
+--Sig_/P0GEhRyoDmZPY.w2PExY8Nr--
