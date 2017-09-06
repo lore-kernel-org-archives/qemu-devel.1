@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dpWgF-0004yw-Ve
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:31:36 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1dpWl2-0006oy-Fw
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dpWgB-00060y-3K
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:31:31 -0400
-Date: Wed, 6 Sep 2017 10:31:22 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170906093122.GB18719@redhat.com>
-References: <20170906085006.26983-1-rjones@redhat.com>
+	(envelope-from <gengdongjiu@huawei.com>) id 1dpWky-0000Sb-Ha
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:36:28 -0400
+References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com>
+	<1503066227-18251-5-git-send-email-gengdongjiu@huawei.com>
+	<CAFEAcA9oecuzXXrdo3zZHxF3AgrDUh_NHxz-znto4GU+OoxVFw@mail.gmail.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <5e3c8d25-6260-d00e-dda3-d160a9973701@huawei.com>
+Date: Wed, 6 Sep 2017 17:35:33 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170906085006.26983-1-rjones@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] qemu-options: Document the -drive
- locking parameter.
+In-Reply-To: <CAFEAcA9oecuzXXrdo3zZHxF3AgrDUh_NHxz-znto4GU+OoxVFw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 4/6] target-arm: kvm64: detect guest
+ RAS EXTENSION feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,21 +25,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-trivial@nongnu.org, mjt@tls.msk.ru, famz@redhat.com, armbru@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will
+	Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-acpi@vger.kernel.org, devel@acpica.org, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, huangdaode@hisilicon.com, wangzhou1@hisilicon.com, Huangshaoyu <huangshaoyu@huawei.com>, wuquanming <wuquanming@huawei.com>, Linuxarm <linuxarm@huawei.com>, zhengqiang10@huawei.com
 
-On Wed, Sep 06, 2017 at 09:50:06AM +0100, Richard W.M. Jones wrote:
-> Commit 16b48d5d66d2 ("file-posix: Add 'locking' option") added this
-> option, but as it was not documented in the -help output it was not
-> easily possible to tell if a particular qemu binary supports it.
+Hi Peter,
+  Thanks very much for your review, I will check your comments in detail and reply.
 
-My apologies, I think this patch is wrong.  I'm going to rethink it.
 
-Rich.
-
--- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-df lists disk usage of guests without needing to install any
-software inside the virtual machine.  Supports Linux and Windows.
-http://people.redhat.com/~rjones/virt-df/
+On 2017/9/6 1:26, Peter Maydell wrote:
+> On 18 August 2017 at 15:23, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
+>> check if kvm supports guest RAS EXTENSION. if so, set
+>> corresponding feature bit for vcpu.
+>>
+>> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
+>> ---
+>>  linux-headers/linux/kvm.h | 1 +
+>>  target/arm/cpu.h          | 3 +++
+>>  target/arm/kvm64.c        | 8 ++++++++
+>>  3 files changed, 12 insertions(+)
+>>
+>> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+>> index 7971a4f..2aa176e 100644
+>> --- a/linux-headers/linux/kvm.h
+>> +++ b/linux-headers/linux/kvm.h
+>> @@ -929,6 +929,7 @@ struct kvm_ppc_resize_hpt {
+>>  #define KVM_CAP_PPC_SMT_POSSIBLE 147
+>>  #define KVM_CAP_HYPERV_SYNIC2 148
+>>  #define KVM_CAP_HYPERV_VP_INDEX 149
+>> +#define KVM_CAP_ARM_RAS_EXTENSION 150
+>>
+>>  #ifdef KVM_CAP_IRQ_ROUTING
+>>
+> 
+> Hi. Changes to linux-headers need to be done as a patch of their
+> own created using scripts/update-linux-headers.sh run against a
+> mainline kernel tree (and with a commit message that quotes the
+> kernel commit hash used). This ensures that we have a consistent
+> set of headers that don't diverge from the kernel copy.
+> 
+>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>> index b39d64a..6b0961b 100644
+>> --- a/target/arm/cpu.h
+>> +++ b/target/arm/cpu.h
+>> @@ -611,6 +611,8 @@ struct ARMCPU {
+>>
+>>      /* CPU has memory protection unit */
+>>      bool has_mpu;
+>> +    /* CPU has ras extension unit */
+>> +    bool has_ras_extension;
+>>      /* PMSAv7 MPU number of supported regions */
+>>      uint32_t pmsav7_dregion;
+>>
+>> @@ -1229,6 +1231,7 @@ enum arm_features {
+>>      ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings */
+>>      ARM_FEATURE_PMU, /* has PMU support */
+>>      ARM_FEATURE_VBAR, /* has cp15 VBAR */
+>> +    ARM_FEATURE_RAS_EXTENSION, /*has RAS extension support */
+> 
+> Missing space after '/*' ?
+> 
+>>  };
+>>
+>>  static inline int arm_feature(CPUARMState *env, int feature)
+>> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
+>> index a16abc8..0781367 100644
+>> --- a/target/arm/kvm64.c
+>> +++ b/target/arm/kvm64.c
+>> @@ -518,6 +518,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>          unset_feature(&env->features, ARM_FEATURE_PMU);
+>>      }
+>>
+>> +    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_RAS_EXTENSION)) {
+>> +        cpu->has_ras_extension = true;
+>> +        set_feature(&env->features, ARM_FEATURE_RAS_EXTENSION);
+>> +    } else {
+>> +        cpu->has_ras_extension = false;
+>> +        unset_feature(&env->features, ARM_FEATURE_RAS_EXTENSION);
+>> +    }
+>> +
+> 
+> Shouldn't we need to also tell the kernel that we actually want
+> it to expose RAS to the guest? Compare the PMU code in this
+> function, where we set a kvm_init_features bit to do this.
+> (This suggests that your ABI for the kernel part of this feature
+> may not be correct?)
+> 
+> You should also not be calling set_feature() here -- if the
+> CPU features bit doesn't say "this CPU should have the RAS
+> extensions" we shouldn't create a CPU with them. Instead
+> you should set it in kvm_arm_get_host_cpu_features() (again,
+> compare the PMU code).
+> 
+> thanks
+> -- PMM
+> 
+> .
+> 
