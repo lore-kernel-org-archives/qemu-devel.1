@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpefZ-0004mF-4P
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:03:31 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dpeiM-0005lX-Rp
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:06:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpefT-0003yd-Ur
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:03:21 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:56110)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpefT-0003xz-E4
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:03:15 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed,  6 Sep 2017 21:03:04 +0300
-Message-Id: <150472098452.24907.17299050957814650497.stgit@frigg.lan>
-In-Reply-To: <150471856141.24907.274176769201097378.stgit@frigg.lan>
-References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dpeiI-0006QL-Gi
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:06:14 -0400
+Received: from mail-qk0-x243.google.com ([2607:f8b0:400d:c09::243]:38631)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dpeiI-0006Ok-Ao
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:06:10 -0400
+Received: by mail-qk0-x243.google.com with SMTP id c69so4244661qke.5
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 11:06:08 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170906104043.30745-1-berrange@redhat.com>
+	<20170906104043.30745-2-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <dac64b67-0fcf-73c2-2371-377f0a3fbb48@amsat.org>
+Date: Wed, 6 Sep 2017 15:06:03 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 10/20] instrument: Add support for tracing
- events
+In-Reply-To: <20170906104043.30745-2-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1 1/2] io: send proper HTTP response for
+ websocket errors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,302 +36,449 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Brian Rak <brak@vultr.com>
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- .gitignore                        |    1=20
- Makefile                          |    3 +
- instrument/Makefile.objs          |    1=20
- instrument/error.h                |    6 ++
- instrument/qemu-instr/types.h     |   51 +++++++++++++++
- instrument/qemu-instr/types.inc.h |   15 ++++
- instrument/trace.c                |  125 +++++++++++++++++++++++++++++++=
-++++++
- trace/control.h                   |    1=20
- 8 files changed, 203 insertions(+)
- create mode 100644 instrument/qemu-instr/types.h
- create mode 100644 instrument/qemu-instr/types.inc.h
- create mode 100644 instrument/trace.c
+Hi Daniel,
 
-diff --git a/.gitignore b/.gitignore
-index cf65316863..5ffcb9a091 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -134,3 +134,4 @@ trace-dtrace-root.h
- trace-dtrace-root.dtrace
- trace-ust-all.h
- trace-ust-all.c
-+!/instrument/*
-diff --git a/Makefile b/Makefile
-index 6171661458..6f4de75f79 100644
---- a/Makefile
-+++ b/Makefile
-@@ -592,6 +592,9 @@ endif
- ifdef CONFIG_INSTRUMENT
- 	$(INSTALL_DIR) "$(DESTDIR)$(includedir)/qemu-instr/"
- 	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/control.h "$(DESTDIR)=
-$(includedir)/qemu-instr/"
-+	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/trace.h "$(DESTDIR)$(=
-includedir)/qemu-instr/"
-+	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/types.h "$(DESTDIR)$(=
-includedir)/qemu-instr/"
-+	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/types.inc.h "$(DESTDI=
-R)$(includedir)/qemu-instr/"
- 	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/visibility.h "$(DESTD=
-IR)$(includedir)/qemu-instr/"
- endif
-=20
-diff --git a/instrument/Makefile.objs b/instrument/Makefile.objs
-index 9b7e1c03aa..8258dbfa79 100644
---- a/instrument/Makefile.objs
-+++ b/instrument/Makefile.objs
-@@ -5,3 +5,4 @@ target-obj-$(CONFIG_INSTRUMENT) +=3D load.o
- target-obj-y +=3D qmp.o
-=20
- target-obj-$(CONFIG_INSTRUMENT) +=3D control.o
-+target-obj-$(CONFIG_INSTRUMENT) +=3D trace.o
-diff --git a/instrument/error.h b/instrument/error.h
-index f8d1dd4b16..7a51d62fdb 100644
---- a/instrument/error.h
-+++ b/instrument/error.h
-@@ -25,4 +25,10 @@
-         return;                      \
-     }
-=20
-+#define ERROR_IF_RET(cond, ret, msg, args...)   \
-+    if (unlikely(cond)) {                       \
-+        _ERROR(msg, ##args);                    \
-+        return ret;                             \
-+    }                                           \
-+
- #endif  /* INSTRUMENT_ERROR_H */
-diff --git a/instrument/qemu-instr/types.h b/instrument/qemu-instr/types.=
-h
-new file mode 100644
-index 0000000000..ea3a032b4f
---- /dev/null
-+++ b/instrument/qemu-instr/types.h
-@@ -0,0 +1,51 @@
-+/*
-+ * QEMU-specific types for instrumentation clients.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef QI__TYPES_H
-+#define QI__TYPES_H
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+/**
-+ * SECTION: types
-+ * @section_id: qi-types
-+ * @title: Common types
-+ */
-+
-+/**
-+ * QITraceEvent:
-+ *
-+ * Opaque structure defining a tracing event.
-+ */
-+typedef struct QITraceEvent QITraceEvent;
-+
-+/**
-+ * QITraceEventIter:
-+ *
-+ * Opaque structure defining a tracing event iterator.
-+ */
-+typedef struct QITraceEventIter QITraceEventIter;
-+
-+/**
-+ * QICPU:
-+ *
-+ * Opaque guest CPU pointer.
-+ */
-+typedef struct QICPU_d *QICPU;
-+
-+
-+#include <qemu-instr/types.inc.h>
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+
-+#endif  /* QI__TYPES_H */
-diff --git a/instrument/qemu-instr/types.inc.h b/instrument/qemu-instr/ty=
-pes.inc.h
-new file mode 100644
-index 0000000000..0d99ea59a2
---- /dev/null
-+++ b/instrument/qemu-instr/types.inc.h
-@@ -0,0 +1,15 @@
-+/*
-+ * QEMU-specific types for instrumentation clients.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include <stdlib.h>
-+
-+
-+struct QITraceEventIter {
-+    char buffer[(sizeof(size_t) * 2) + sizeof(char *)];
-+};
-diff --git a/instrument/trace.c b/instrument/trace.c
-new file mode 100644
-index 0000000000..a73fcdf50a
---- /dev/null
-+++ b/instrument/trace.c
-@@ -0,0 +1,125 @@
-+/*
-+ * API for QEMU's tracing events.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "instrument/error.h"
-+#include "qemu-instr/trace.h"
-+#include "qemu-instr/visibility.h"
-+#include "trace/control.h"
-+
-+
-+QI_VPUBLIC
-+QITraceEvent *qi_trace_event_name(const char *name)
-+{
-+    ERROR_IF_RET(!name, NULL, "must provide a name");
-+    return (QITraceEvent *)trace_event_name(name);
-+}
-+
-+QI_VPUBLIC
-+void qi_trace_event_iter_init(QITraceEventIter *iter, const char *patter=
-n)
-+{
-+    TraceEventIter *iter_ =3D (TraceEventIter *)iter;
-+    ERROR_IF(!iter_, "must provide an iterator");
-+    trace_event_iter_init(iter_, pattern);
-+}
-+
-+QI_VPUBLIC
-+QITraceEvent *qi_trace_event_iter_next(QITraceEventIter *iter)
-+{
-+    TraceEventIter *iter_ =3D (TraceEventIter *)iter;
-+    ERROR_IF_RET(!iter_, NULL, "must provide an iterator");
-+    return (QITraceEvent *)trace_event_iter_next(iter_);
-+}
-+
-+
-+QI_VPUBLIC
-+bool qi_trace_event_is_vcpu(QITraceEvent *ev)
-+{
-+    TraceEvent *ev_ =3D (TraceEvent *)ev;
-+    ERROR_IF_RET(!ev_, false, "must provide an event");
-+    return trace_event_is_vcpu(ev_);
-+}
-+
-+QI_VPUBLIC
-+const char * qi_trace_event_get_name(QITraceEvent *ev)
-+{
-+    TraceEvent *ev_ =3D (TraceEvent *)ev;
-+    ERROR_IF_RET(!ev_, false, "must provide an event");
-+    return trace_event_get_name(ev_);
-+}
-+
-+
-+QI_VPUBLIC
-+bool qi_trace_event_get_state(QITraceEvent *ev)
-+{
-+    TraceEvent *ev_ =3D (TraceEvent *)ev;
-+    ERROR_IF_RET(!ev_, false, "must provide an event");
-+    return trace_event_get_state_static(ev_) &&
-+        trace_event_get_state_dynamic(ev_);
-+}
-+
-+QI_VPUBLIC
-+bool qi_trace_event_get_vcpu_state(QICPU *vcpu, QITraceEvent *ev)
-+{
-+    CPUState *vcpu_ =3D (CPUState *)vcpu;
-+    TraceEvent *ev_ =3D (TraceEvent *)ev;
-+    ERROR_IF_RET(!vcpu_, false, "must provide a vCPU");
-+    ERROR_IF_RET(!ev_, false, "must provide an event");
-+    return trace_event_get_state_static(ev_) &&
-+        trace_event_get_vcpu_state_dynamic(vcpu_, ev_);
-+}
-+
-+QI_VPUBLIC
-+bool qi_trace_event_get_state_static(QITraceEvent *ev)
-+{
-+    TraceEvent *ev_ =3D (TraceEvent *)ev;
-+    ERROR_IF_RET(!ev_, false, "must provide an event");
-+    return trace_event_get_state_static(ev_);
-+}
-+
-+QI_VPUBLIC
-+bool qi_trace_event_get_state_dynamic(QITraceEvent *ev)
-+{
-+    TraceEvent *ev_ =3D (TraceEvent *)ev;
-+    ERROR_IF_RET(!ev_, false, "must provide an event");
-+    return trace_event_get_state_dynamic(ev_);
-+}
-+
-+QI_VPUBLIC
-+bool qi_trace_event_get_vcpu_state_dynamic(QICPU *vcpu, QITraceEvent *ev=
-)
-+{
-+    CPUState *vcpu_ =3D (CPUState *)vcpu;
-+    TraceEvent *ev_ =3D (TraceEvent *)ev;
-+    ERROR_IF_RET(!vcpu_, false, "must provide a vCPU");
-+    ERROR_IF_RET(!ev_, false, "must provide an event");
-+    return trace_event_get_vcpu_state_dynamic(vcpu_, ev_);
-+}
-+
-+QI_VPUBLIC
-+void qi_trace_event_set_state_dynamic(QITraceEvent *ev, bool state)
-+{
-+    TraceEvent *ev_ =3D (TraceEvent *)ev;
-+    ERROR_IF(!ev_, "must provide an event");
-+    ERROR_IF(!trace_event_get_state_static(ev_),
-+             "event must be statically enabled");
-+    trace_event_set_state_dynamic(ev_, state);
-+}
-+
-+QI_VPUBLIC
-+void qi_trace_event_set_vcpu_state_dynamic(QICPU *vcpu,
-+                                           QITraceEvent *ev, bool state)
-+{
-+    CPUState *vcpu_ =3D (CPUState *)vcpu;
-+    TraceEvent *ev_ =3D (TraceEvent *)ev;
-+    ERROR_IF(!vcpu_, "must provide a vCPU");
-+    ERROR_IF(!ev_, "must provide an event");
-+    ERROR_IF(!trace_event_get_state_static(ev_),
-+             "event must be statically enabled");
-+    trace_event_set_vcpu_state_dynamic(vcpu_, ev_, state);
-+}
-diff --git a/trace/control.h b/trace/control.h
-index 1903e22975..3e6da24c98 100644
---- a/trace/control.h
-+++ b/trace/control.h
-@@ -13,6 +13,7 @@
- #include "qemu-common.h"
- #include "event-internal.h"
-=20
-+/* NOTE: Keep in sync with size of QITraceEventIter */
- typedef struct TraceEventIter {
-     size_t event;
-     size_t group;
+On 09/06/2017 07:40 AM, Daniel P. Berrange wrote:
+> When any error occurs while processing the websockets handshake,
+> QEMU just terminates the connection abruptly. This is in violation
+> of the HTTP specs and does not help the client understand what they
+> did wrong. This is particularly bad when the client gives the wrong
+> path, as a "404 Not Found" would be very helpful.
+> 
+> Refactor the handshake code so that it always sends a response to
+> the client unless there was an I/O error.
+> 
+> Fixes bug: #1715186
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>   io/channel-websock.c | 179 ++++++++++++++++++++++++++++++++++++++-------------
+>   1 file changed, 134 insertions(+), 45 deletions(-)
+> 
+> diff --git a/io/channel-websock.c b/io/channel-websock.c
+> index 5a3badbec2..b9cc5a1371 100644
+> --- a/io/channel-websock.c
+> +++ b/io/channel-websock.c
+> @@ -44,13 +44,39 @@
+>   #define QIO_CHANNEL_WEBSOCK_CONNECTION_UPGRADE "Upgrade"
+>   #define QIO_CHANNEL_WEBSOCK_UPGRADE_WEBSOCKET "websocket"
+>   
+> -#define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RESPONSE  \
+> +#define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_COMMON \
+> +    "Server: QEMU VNC\r\n"                       \
+> +    "Date: %s\r\n"
+
+and
+         "Sec-WebSocket-Version: " \
+           QIO_CHANNEL_WEBSOCK_SUPPORTED_VERSION "\r\n" \
+
+or what about:
+
+#define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_COMMON(conn)   \
+           "Server: QEMU VNC\r\n"                         \
+           "Date: %s\r\n"                                 \
+           "Connection: " conn "\r\n"                     \
+           "Sec-WebSocket-Version: "                      \
+             QIO_CHANNEL_WEBSOCK_SUPPORTED_VERSION "\r\n"
+> +
+> +#define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_OK    \
+>       "HTTP/1.1 101 Switching Protocols\r\n"      \
+> +    QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_COMMON    \
+>       "Upgrade: websocket\r\n"                    \
+>       "Connection: Upgrade\r\n"                   \
+>       "Sec-WebSocket-Accept: %s\r\n"              \
+>       "Sec-WebSocket-Protocol: binary\r\n"        \
+>       "\r\n"
+> +#define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_NOT_FOUND \
+> +    "HTTP/1.1 404 Not Found\r\n"                    \
+> +    QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_COMMON        \
+> +    "Connection: close\r\n"                         \
+> +    "\r\n"
+> +#define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_BAD_REQUEST \
+> +    "HTTP/1.1 400 Bad Request\r\n"                    \
+> +    QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_COMMON          \
+> +    "Connection: close\r\n"                           \
+> +    "Sec-WebSocket-Version: 13\r\n"                   \
+
+drop
+
+> +    "\r\n"
+
+or with previous macro:
+
+#define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_BAD_REQUEST \
+     "HTTP/1.1 400 Bad Request\r\n"                    \
+     QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_COMMON("close") \
+     "\r\n"
+
+> +#define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_SERVER_ERR \
+> +    "HTTP/1.1 500 Internal Server Error\r\n"         \
+> +    QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_COMMON         \
+> +    "Connection: close\r\n"                          \
+> +    "\r\n"
+> +#define QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_TOO_LARGE  \
+> +    "HTTP/1.1 403 Request Entity Too Large\r\n"      \
+> +    QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_COMMON         \
+> +    "Connection: close\r\n"                          \
+> +    "\r\n"
+>   #define QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM "\r\n"
+>   #define QIO_CHANNEL_WEBSOCK_HANDSHAKE_END "\r\n\r\n"
+>   #define QIO_CHANNEL_WEBSOCK_SUPPORTED_VERSION "13"
+> @@ -123,8 +149,43 @@ enum {
+>       QIO_CHANNEL_WEBSOCK_OPCODE_PONG = 0xA
+>   };
+>   
+> +static void qio_channel_websock_handshake_send_res(QIOChannelWebsock *ioc,
+> +                                                   const char *resmsg,
+> +                                                   ...)
+> +{
+> +    va_list vargs;
+> +    char *response = NULL;
+
+NULL not needed
+
+> +    size_t responselen;
+> +
+> +    va_start(vargs, resmsg);
+> +    response = g_strdup_vprintf(resmsg, vargs);
+> +    responselen = strlen(response);
+> +    buffer_reserve(&ioc->encoutput, responselen);
+> +    buffer_append(&ioc->encoutput, response, responselen);
+> +    va_end(vargs);
+> +}
+> +
+> +static gchar *qio_channel_websock_date_str(void)
+> +{
+> +    GTimeZone *utc = g_time_zone_new_utc();
+> +    GDateTime *now = g_date_time_new_now(utc);
+> +    gchar *ret = g_date_time_format(now, "%a, %d %b %Y %H:%M:%S GMT");
+
+assert(ret);
+
+> +    g_date_time_unref(now);
+> +    g_time_zone_unref(utc);
+> +    return ret;
+> +}
+> +
+> +static void qio_channel_websock_handshake_send_res_err(QIOChannelWebsock *ioc,
+> +                                                       const char *resdata)
+> +{
+> +    char *date = qio_channel_websock_date_str();
+> +    qio_channel_websock_handshake_send_res(ioc, resdata, date);
+> +    g_free(date);
+> +}
+> +
+>   static size_t
+> -qio_channel_websock_extract_headers(char *buffer,
+> +qio_channel_websock_extract_headers(QIOChannelWebsock *ioc,
+> +                                    char *buffer,
+>                                       QIOChannelWebsockHTTPHeader *hdrs,
+>                                       size_t nhdrsalloc,
+>                                       Error **errp)
+> @@ -145,7 +206,7 @@ qio_channel_websock_extract_headers(char *buffer,
+>       nl = strstr(buffer, QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM);
+>       if (!nl) {
+>           error_setg(errp, "Missing HTTP header delimiter");
+> -        return 0;
+> +        goto bad_request;
+>       }
+>       *nl = '\0';
+>   
+> @@ -158,18 +219,20 @@ qio_channel_websock_extract_headers(char *buffer,
+>   
+>       if (!g_str_equal(buffer, QIO_CHANNEL_WEBSOCK_HTTP_METHOD)) {
+>           error_setg(errp, "Unsupported HTTP method %s", buffer);
+> -        return 0;
+> +        goto bad_request;
+>       }
+>   
+>       buffer = tmp + 1;
+>       tmp = strchr(buffer, ' ');
+>       if (!tmp) {
+>           error_setg(errp, "Missing HTTP version delimiter");
+> -        return 0;
+> +        goto bad_request;
+>       }
+>       *tmp = '\0';
+>   
+>       if (!g_str_equal(buffer, QIO_CHANNEL_WEBSOCK_HTTP_PATH)) {
+> +        qio_channel_websock_handshake_send_res_err(
+> +            ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_NOT_FOUND);
+>           error_setg(errp, "Unexpected HTTP path %s", buffer);
+>           return 0;
+>       }
+> @@ -178,7 +241,7 @@ qio_channel_websock_extract_headers(char *buffer,
+>   
+>       if (!g_str_equal(buffer, QIO_CHANNEL_WEBSOCK_HTTP_VERSION)) {
+>           error_setg(errp, "Unsupported HTTP version %s", buffer);
+> -        return 0;
+> +        goto bad_request;
+>       }
+>   
+>       buffer = nl + strlen(QIO_CHANNEL_WEBSOCK_HANDSHAKE_DELIM);
+> @@ -203,7 +266,7 @@ qio_channel_websock_extract_headers(char *buffer,
+>           sep = strchr(buffer, ':');
+>           if (!sep) {
+>               error_setg(errp, "Malformed HTTP header");
+> -            return 0;
+> +            goto bad_request;
+>           }
+>           *sep = '\0';
+>           sep++;
+> @@ -213,7 +276,7 @@ qio_channel_websock_extract_headers(char *buffer,
+>   
+>           if (nhdrs >= nhdrsalloc) {
+>               error_setg(errp, "Too many HTTP headers");
+> -            return 0;
+> +            goto bad_request;
+>           }
+>   
+>           hdr = &hdrs[nhdrs++];
+> @@ -231,6 +294,11 @@ qio_channel_websock_extract_headers(char *buffer,
+>       } while (nl != NULL);
+>   
+>       return nhdrs;
+> +
+> + bad_request:
+> +    qio_channel_websock_handshake_send_res_err(
+> +        ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_BAD_REQUEST);
+> +    return 0;
+>   }
+>   
+>   static const char *
+> @@ -250,14 +318,14 @@ qio_channel_websock_find_header(QIOChannelWebsockHTTPHeader *hdrs,
+>   }
+>   
+>   
+> -static int qio_channel_websock_handshake_send_response(QIOChannelWebsock *ioc,
+> -                                                       const char *key,
+> -                                                       Error **errp)
+> +static void qio_channel_websock_handshake_send_res_ok(QIOChannelWebsock *ioc,
+> +                                                      const char *key,
+> +                                                      Error **errp)
+>   {
+>       char combined_key[QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN +
+>                         QIO_CHANNEL_WEBSOCK_GUID_LEN + 1];
+> -    char *accept = NULL, *response = NULL;
+> -    size_t responselen;
+> +    char *accept = NULL;
+> +    char *date = qio_channel_websock_date_str();
+>   
+>       g_strlcpy(combined_key, key, QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN + 1);
+>       g_strlcat(combined_key, QIO_CHANNEL_WEBSOCK_GUID,
+> @@ -271,105 +339,110 @@ static int qio_channel_websock_handshake_send_response(QIOChannelWebsock *ioc,
+>                               QIO_CHANNEL_WEBSOCK_GUID_LEN,
+>                               &accept,
+>                               errp) < 0) {
+> -        return -1;
+> +        qio_channel_websock_handshake_send_res_err(
+> +            ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_SERVER_ERR);
+> +        return;
+>       }
+>   
+> -    response = g_strdup_printf(QIO_CHANNEL_WEBSOCK_HANDSHAKE_RESPONSE, accept);
+> -    responselen = strlen(response);
+> -    buffer_reserve(&ioc->encoutput, responselen);
+> -    buffer_append(&ioc->encoutput, response, responselen);
+> +    qio_channel_websock_handshake_send_res(
+> +        ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_OK, date, accept);
+>   
+> +    g_free(date);
+>       g_free(accept);
+> -    g_free(response);
+>   
+> -    return 0;
+> +    return;
+
+drop
+
+>   }
+>   
+> -static int qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
+> -                                                 char *buffer,
+> -                                                 Error **errp)
+> +static void qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
+> +                                                  char *buffer,
+> +                                                  Error **errp)
+>   {
+>       QIOChannelWebsockHTTPHeader hdrs[32];
+>       size_t nhdrs = G_N_ELEMENTS(hdrs);
+>       const char *protocols = NULL, *version = NULL, *key = NULL,
+>           *host = NULL, *connection = NULL, *upgrade = NULL;
+>   
+> -    nhdrs = qio_channel_websock_extract_headers(buffer, hdrs, nhdrs, errp);
+> +    nhdrs = qio_channel_websock_extract_headers(ioc, buffer, hdrs, nhdrs, errp);
+>       if (!nhdrs) {
+> -        return -1;
+> +        return;
+>       }
+>   
+>       protocols = qio_channel_websock_find_header(
+>           hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_PROTOCOL);
+>       if (!protocols) {
+>           error_setg(errp, "Missing websocket protocol header data");
+> -        return -1;
+> +        goto bad_request;
+>       }
+>   
+>       version = qio_channel_websock_find_header(
+>           hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_VERSION);
+>       if (!version) {
+>           error_setg(errp, "Missing websocket version header data");
+> -        return -1;
+> +        goto bad_request;
+>       }
+>   
+>       key = qio_channel_websock_find_header(
+>           hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_KEY);
+>       if (!key) {
+>           error_setg(errp, "Missing websocket key header data");
+> -        return -1;
+> +        goto bad_request;
+>       }
+>   
+>       host = qio_channel_websock_find_header(
+>           hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_HOST);
+>       if (!host) {
+>           error_setg(errp, "Missing websocket host header data");
+> -        return -1;
+> +        goto bad_request;
+>       }
+>   
+>       connection = qio_channel_websock_find_header(
+>           hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_CONNECTION);
+>       if (!connection) {
+>           error_setg(errp, "Missing websocket connection header data");
+> -        return -1;
+> +        goto bad_request;
+>       }
+>   
+>       upgrade = qio_channel_websock_find_header(
+>           hdrs, nhdrs, QIO_CHANNEL_WEBSOCK_HEADER_UPGRADE);
+>       if (!upgrade) {
+>           error_setg(errp, "Missing websocket upgrade header data");
+> -        return -1;
+> +        goto bad_request;
+>       }
+>   
+>       if (!g_strrstr(protocols, QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY)) {
+>           error_setg(errp, "No '%s' protocol is supported by client '%s'",
+>                      QIO_CHANNEL_WEBSOCK_PROTOCOL_BINARY, protocols);
+> -        return -1;
+> +        goto bad_request;
+>       }
+>   
+>       if (!g_str_equal(version, QIO_CHANNEL_WEBSOCK_SUPPORTED_VERSION)) {
+>           error_setg(errp, "Version '%s' is not supported by client '%s'",
+>                      QIO_CHANNEL_WEBSOCK_SUPPORTED_VERSION, version);
+> -        return -1;
+> +        goto bad_request;
+>       }
+>   
+>       if (strlen(key) != QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN) {
+>           error_setg(errp, "Key length '%zu' was not as expected '%d'",
+>                      strlen(key), QIO_CHANNEL_WEBSOCK_CLIENT_KEY_LEN);
+> -        return -1;
+> +        goto bad_request;
+>       }
+>   
+>       if (!g_strrstr(connection, QIO_CHANNEL_WEBSOCK_CONNECTION_UPGRADE)) {
+>           error_setg(errp, "No connection upgrade requested '%s'", connection);
+> -        return -1;
+> +        goto bad_request;
+>       }
+>   
+>       if (!g_str_equal(upgrade, QIO_CHANNEL_WEBSOCK_UPGRADE_WEBSOCKET)) {
+>           error_setg(errp, "Incorrect upgrade method '%s'", upgrade);
+> -        return -1;
+> +        goto bad_request;
+>       }
+>   
+> -    return qio_channel_websock_handshake_send_response(ioc, key, errp);
+> +    qio_channel_websock_handshake_send_res_ok(ioc, key, errp);
+> +    return;
+> +
+> + bad_request:
+> +    qio_channel_websock_handshake_send_res_err(
+> +        ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_BAD_REQUEST);
+>   }
+>   
+>   static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+> @@ -393,20 +466,20 @@ static int qio_channel_websock_handshake_read(QIOChannelWebsock *ioc,
+>                                    QIO_CHANNEL_WEBSOCK_HANDSHAKE_END);
+>       if (!handshake_end) {
+>           if (ioc->encinput.offset >= 4096) {
+> +            qio_channel_websock_handshake_send_res_err(
+> +                ioc, QIO_CHANNEL_WEBSOCK_HANDSHAKE_RES_TOO_LARGE);
+>               error_setg(errp,
+>                          "End of headers not found in first 4096 bytes");
+> -            return -1;
+> +            return 1;
+>           } else {
+>               return 0;
+>           }
+>       }
+>       *handshake_end = '\0';
+>   
+> -    if (qio_channel_websock_handshake_process(ioc,
+> -                                              (char *)ioc->encinput.buffer,
+> -                                              errp) < 0) {
+> -        return -1;
+> -    }
+> +    qio_channel_websock_handshake_process(ioc,
+> +                                          (char *)ioc->encinput.buffer,
+> +                                          errp);
+>   
+>       buffer_advance(&ioc->encinput,
+>                      handshake_end - (char *)ioc->encinput.buffer +
+> @@ -438,8 +511,15 @@ static gboolean qio_channel_websock_handshake_send(QIOChannel *ioc,
+>   
+>       buffer_advance(&wioc->encoutput, ret);
+>       if (wioc->encoutput.offset == 0) {
+> -        trace_qio_channel_websock_handshake_complete(ioc);
+> -        qio_task_complete(task);
+> +        if (wioc->io_err) {
+> +            trace_qio_channel_websock_handshake_fail(ioc);
+> +            qio_task_set_error(task, wioc->io_err);
+> +            wioc->io_err = NULL;
+> +            qio_task_complete(task);
+> +        } else {
+> +            trace_qio_channel_websock_handshake_complete(ioc);
+> +            qio_task_complete(task);
+> +        }
+>           return FALSE;
+>       }
+>       trace_qio_channel_websock_handshake_pending(ioc, G_IO_OUT);
+> @@ -458,6 +538,11 @@ static gboolean qio_channel_websock_handshake_io(QIOChannel *ioc,
+>   
+>       ret = qio_channel_websock_handshake_read(wioc, &err);
+>       if (ret < 0) {
+> +        /*
+> +         * We only take this path on a fatal I/O error reading from
+> +         * client connection, as most of the time we have an
+> +         * HTTP 4xx err response to send instead
+> +         */
+>           trace_qio_channel_websock_handshake_fail(ioc);
+>           qio_task_set_error(task, err);
+>           qio_task_complete(task);
+> @@ -469,6 +554,10 @@ static gboolean qio_channel_websock_handshake_io(QIOChannel *ioc,
+>           return TRUE;
+>       }
+>   
+> +    if (err) {
+> +        error_propagate(&wioc->io_err, err);
+> +    }
+> +
+>       trace_qio_channel_websock_handshake_reply(ioc);
+>       qio_channel_add_watch(
+>           wioc->master,
+> 
+
+looks good :)
+
+Regards,
+
+Phil.
