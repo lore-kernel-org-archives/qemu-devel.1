@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpebf-0003RH-96
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 13:59:21 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dpefZ-0004mF-4P
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:03:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpebZ-0007p4-KB
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 13:59:19 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:38567)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dpefT-0003yd-Ur
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:03:21 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:56110)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpebZ-0007no-0L
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 13:59:13 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dpefT-0003xz-E4
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:03:15 -0400
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed,  6 Sep 2017 20:59:02 +0300
-Message-Id: <150472074219.24907.5510718414753398145.stgit@frigg.lan>
+Date: Wed,  6 Sep 2017 21:03:04 +0300
+Message-Id: <150472098452.24907.17299050957814650497.stgit@frigg.lan>
 In-Reply-To: <150471856141.24907.274176769201097378.stgit@frigg.lan>
 References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 09/20] instrument: Add basic control
- interface
+Subject: [Qemu-devel] [PATCH v4 10/20] instrument: Add support for tracing
+ events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,203 +28,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- Makefile                           |    5 +++
- configure                          |    1 +
- instrument/Makefile.objs           |    2 +
- instrument/control.c               |   28 +++++++++++++++++
- instrument/control.h               |   44 +++++++++++++++++++++++++++
- instrument/control.inc.h           |   25 ++++++++++++++++
- instrument/error.h                 |   28 +++++++++++++++++
- instrument/events.h                |   37 +++++++++++++++++++++++
- instrument/events.inc.h            |   11 +++++++
- instrument/load.c                  |   13 ++++++++
- instrument/qemu-instr/control.h    |   43 +++++++++++++++++++++++++++
- instrument/qemu-instr/visibility.h |   58 ++++++++++++++++++++++++++++++=
+ .gitignore                        |    1=20
+ Makefile                          |    3 +
+ instrument/Makefile.objs          |    1=20
+ instrument/error.h                |    6 ++
+ instrument/qemu-instr/types.h     |   51 +++++++++++++++
+ instrument/qemu-instr/types.inc.h |   15 ++++
+ instrument/trace.c                |  125 +++++++++++++++++++++++++++++++=
 ++++++
- stubs/Makefile.objs                |    1 +
- stubs/instrument.c                 |   13 ++++++++
- 14 files changed, 309 insertions(+)
- create mode 100644 instrument/control.c
- create mode 100644 instrument/control.h
- create mode 100644 instrument/control.inc.h
- create mode 100644 instrument/error.h
- create mode 100644 instrument/events.h
- create mode 100644 instrument/events.inc.h
- create mode 100644 instrument/qemu-instr/control.h
- create mode 100644 instrument/qemu-instr/visibility.h
- create mode 100644 stubs/instrument.c
+ trace/control.h                   |    1=20
+ 8 files changed, 203 insertions(+)
+ create mode 100644 instrument/qemu-instr/types.h
+ create mode 100644 instrument/qemu-instr/types.inc.h
+ create mode 100644 instrument/trace.c
 
+diff --git a/.gitignore b/.gitignore
+index cf65316863..5ffcb9a091 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -134,3 +134,4 @@ trace-dtrace-root.h
+ trace-dtrace-root.dtrace
+ trace-ust-all.h
+ trace-ust-all.c
++!/instrument/*
 diff --git a/Makefile b/Makefile
-index 81447b1f08..6171661458 100644
+index 6171661458..6f4de75f79 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -589,6 +589,11 @@ ifdef CONFIG_VIRTFS
- 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man1"
- 	$(INSTALL_DATA) fsdev/virtfs-proxy-helper.1 "$(DESTDIR)$(mandir)/man1"
- endif
-+ifdef CONFIG_INSTRUMENT
-+	$(INSTALL_DIR) "$(DESTDIR)$(includedir)/qemu-instr/"
-+	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/control.h "$(DESTDIR)=
+@@ -592,6 +592,9 @@ endif
+ ifdef CONFIG_INSTRUMENT
+ 	$(INSTALL_DIR) "$(DESTDIR)$(includedir)/qemu-instr/"
+ 	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/control.h "$(DESTDIR)=
 $(includedir)/qemu-instr/"
-+	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/visibility.h "$(DESTD=
++	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/trace.h "$(DESTDIR)$(=
+includedir)/qemu-instr/"
++	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/types.h "$(DESTDIR)$(=
+includedir)/qemu-instr/"
++	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/types.inc.h "$(DESTDI=
+R)$(includedir)/qemu-instr/"
+ 	$(INSTALL_DATA) $(SRC_PATH)/instrument/qemu-instr/visibility.h "$(DESTD=
 IR)$(includedir)/qemu-instr/"
-+endif
+ endif
 =20
- install-datadir:
- 	$(INSTALL_DIR) "$(DESTDIR)$(qemu_datadir)"
-diff --git a/configure b/configure
-index 05bd7b1950..3673fc9058 100755
---- a/configure
-+++ b/configure
-@@ -6038,6 +6038,7 @@ if test "$instrument" =3D "yes"; then
-   LIBS=3D"-ldl $LIBS"
-   echo "CONFIG_INSTRUMENT=3Dy" >> $config_host_mak
- fi
-+QEMU_INCLUDES=3D"-I\$(SRC_PATH)/instrument $QEMU_INCLUDES"
-=20
- if test "$rdma" =3D "yes" ; then
-   echo "CONFIG_RDMA=3Dy" >> $config_host_mak
 diff --git a/instrument/Makefile.objs b/instrument/Makefile.objs
-index 13a8f60431..9b7e1c03aa 100644
+index 9b7e1c03aa..8258dbfa79 100644
 --- a/instrument/Makefile.objs
 +++ b/instrument/Makefile.objs
-@@ -3,3 +3,5 @@
- target-obj-y +=3D cmdline.o
- target-obj-$(CONFIG_INSTRUMENT) +=3D load.o
+@@ -5,3 +5,4 @@ target-obj-$(CONFIG_INSTRUMENT) +=3D load.o
  target-obj-y +=3D qmp.o
-+
-+target-obj-$(CONFIG_INSTRUMENT) +=3D control.o
-diff --git a/instrument/control.c b/instrument/control.c
-new file mode 100644
-index 0000000000..2c2781beeb
---- /dev/null
-+++ b/instrument/control.c
-@@ -0,0 +1,28 @@
-+/*
-+ * Control instrumentation during program (de)initialization.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "instrument/control.h"
-+#include "instrument/error.h"
-+#include "instrument/events.h"
-+#include "instrument/load.h"
-+#include "instrument/qemu-instr/control.h"
-+#include "instrument/qemu-instr/visibility.h"
-+
-+__thread InstrState instr_cur_state;
-+
-+
-+qi_fini_fn instr_event__fini_fn;
-+void *instr_event__fini_data;
-+
-+QI_VPUBLIC void qi_set_fini(qi_fini_fn fn, void *data)
-+{
-+    ERROR_IF(!instr_get_state(), "called outside instrumentation");
-+    instr_set_event(fini_fn, fn);
-+    instr_set_event(fini_data, data);
-+}
-diff --git a/instrument/control.h b/instrument/control.h
-new file mode 100644
-index 0000000000..f2b085f69b
---- /dev/null
-+++ b/instrument/control.h
-@@ -0,0 +1,44 @@
-+/*
-+ * Control instrumentation during program (de)initialization.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef INSTRUMENT__CONTROL_H
-+#define INSTRUMENT__CONTROL_H
-+
-+
-+/**
-+ * InstrState:
-+ * @INSTR_STATE_DISABLE: Intrumentation API not available.
-+ * @INSTR_STATE_ENABLE: Intrumentation API available.
-+ *
-+ * Instrumentation state of current host thread. Used to ensure instrume=
-ntation
-+ * clients use QEMU's API only in expected points.
-+ */
-+typedef enum {
-+    INSTR_STATE_DISABLE,
-+    INSTR_STATE_ENABLE,
-+} InstrState;
-+
-+/**
-+ * instr_set_state:
-+ *
-+ * Set the instrumentation state of the current host thread.
-+ */
-+static inline void instr_set_state(InstrState state);
-+
-+/**
-+ * instr_get_state:
-+ *
-+ * Get the instrumentation state of the current host thread.
-+ */
-+static inline InstrState instr_get_state(void);
-+
-+
-+#include "instrument/control.inc.h"
-+
-+#endif  /* INSTRUMENT__CONTROL_H */
-diff --git a/instrument/control.inc.h b/instrument/control.inc.h
-new file mode 100644
-index 0000000000..0f649f4caa
---- /dev/null
-+++ b/instrument/control.inc.h
-@@ -0,0 +1,25 @@
-+/*
-+ * Control instrumentation during program (de)initialization.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/atomic.h"
-+#include "qemu/compiler.h"
-+#include <stdbool.h>
-+
-+
-+extern __thread InstrState instr_cur_state;
-+
-+static inline void instr_set_state(InstrState state)
-+{
-+    atomic_store_release(&instr_cur_state, state);
-+}
-+
-+static inline InstrState instr_get_state(void)
-+{
-+    return atomic_load_acquire(&instr_cur_state);
-+}
+=20
+ target-obj-$(CONFIG_INSTRUMENT) +=3D control.o
++target-obj-$(CONFIG_INSTRUMENT) +=3D trace.o
 diff --git a/instrument/error.h b/instrument/error.h
-new file mode 100644
-index 0000000000..f8d1dd4b16
---- /dev/null
+index f8d1dd4b16..7a51d62fdb 100644
+--- a/instrument/error.h
 +++ b/instrument/error.h
-@@ -0,0 +1,28 @@
+@@ -25,4 +25,10 @@
+         return;                      \
+     }
+=20
++#define ERROR_IF_RET(cond, ret, msg, args...)   \
++    if (unlikely(cond)) {                       \
++        _ERROR(msg, ##args);                    \
++        return ret;                             \
++    }                                           \
++
+ #endif  /* INSTRUMENT_ERROR_H */
+diff --git a/instrument/qemu-instr/types.h b/instrument/qemu-instr/types.=
+h
+new file mode 100644
+index 0000000000..ea3a032b4f
+--- /dev/null
++++ b/instrument/qemu-instr/types.h
+@@ -0,0 +1,51 @@
 +/*
-+ * Helpers for controlling errors in instrumentation libraries.
++ * QEMU-specific types for instrumentation clients.
 + *
 + * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 + *
@@ -233,275 +115,214 @@ ter.
 + * See the COPYING file in the top-level directory.
 + */
 +
-+#ifndef INSTRUMENT_ERROR_H
-+#define INSTRUMENT_ERROR_H
++#ifndef QI__TYPES_H
++#define QI__TYPES_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++/**
++ * SECTION: types
++ * @section_id: qi-types
++ * @title: Common types
++ */
++
++/**
++ * QITraceEvent:
++ *
++ * Opaque structure defining a tracing event.
++ */
++typedef struct QITraceEvent QITraceEvent;
++
++/**
++ * QITraceEventIter:
++ *
++ * Opaque structure defining a tracing event iterator.
++ */
++typedef struct QITraceEventIter QITraceEventIter;
++
++/**
++ * QICPU:
++ *
++ * Opaque guest CPU pointer.
++ */
++typedef struct QICPU_d *QICPU;
++
++
++#include <qemu-instr/types.inc.h>
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif  /* QI__TYPES_H */
+diff --git a/instrument/qemu-instr/types.inc.h b/instrument/qemu-instr/ty=
+pes.inc.h
+new file mode 100644
+index 0000000000..0d99ea59a2
+--- /dev/null
++++ b/instrument/qemu-instr/types.inc.h
+@@ -0,0 +1,15 @@
++/*
++ * QEMU-specific types for instrumentation clients.
++ *
++ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include <stdlib.h>
++
++
++struct QITraceEventIter {
++    char buffer[(sizeof(size_t) * 2) + sizeof(char *)];
++};
+diff --git a/instrument/trace.c b/instrument/trace.c
+new file mode 100644
+index 0000000000..a73fcdf50a
+--- /dev/null
++++ b/instrument/trace.c
+@@ -0,0 +1,125 @@
++/*
++ * API for QEMU's tracing events.
++ *
++ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
++#include "instrument/error.h"
++#include "qemu-instr/trace.h"
++#include "qemu-instr/visibility.h"
++#include "trace/control.h"
 +
 +
-+#define _ERROR(msg, args...)                            \
-+    do {                                                \
-+        error_report("%s:" msg, __func__, ##args);      \
-+    } while (0)
++QI_VPUBLIC
++QITraceEvent *qi_trace_event_name(const char *name)
++{
++    ERROR_IF_RET(!name, NULL, "must provide a name");
++    return (QITraceEvent *)trace_event_name(name);
++}
 +
-+#define ERROR_IF(cond, msg, args...) \
-+    if (unlikely(cond)) {            \
-+        _ERROR(msg, ##args);         \
-+        return;                      \
-+    }
++QI_VPUBLIC
++void qi_trace_event_iter_init(QITraceEventIter *iter, const char *patter=
+n)
++{
++    TraceEventIter *iter_ =3D (TraceEventIter *)iter;
++    ERROR_IF(!iter_, "must provide an iterator");
++    trace_event_iter_init(iter_, pattern);
++}
 +
-+#endif  /* INSTRUMENT_ERROR_H */
-diff --git a/instrument/events.h b/instrument/events.h
-new file mode 100644
-index 0000000000..82ad0bd827
---- /dev/null
-+++ b/instrument/events.h
-@@ -0,0 +1,37 @@
-+/*
-+ * Internal API for triggering instrumentation events.
-+ *
-+ * Copyright (C) 2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef INSTRUMENT__EVENTS_H
-+#define INSTRUMENT__EVENTS_H
-+
-+#include "instrument/qemu-instr/control.h"
-+
-+/**
-+ * instr_get_event:
-+ *
-+ * Get value set by instrumentation library.
-+ */
-+#define instr_get_event(name)                   \
-+    atomic_load_acquire(&instr_event__ ## name)
-+
-+/**
-+ * instr_get_event:
-+ *
-+ * Set value from instrumentation library.
-+ */
-+#define instr_set_event(name, fn)               \
-+    atomic_store_release(&instr_event__ ## name, fn)
++QI_VPUBLIC
++QITraceEvent *qi_trace_event_iter_next(QITraceEventIter *iter)
++{
++    TraceEventIter *iter_ =3D (TraceEventIter *)iter;
++    ERROR_IF_RET(!iter_, NULL, "must provide an iterator");
++    return (QITraceEvent *)trace_event_iter_next(iter_);
++}
 +
 +
-+extern qi_fini_fn instr_event__fini_fn;
-+extern void *instr_event__fini_data;
++QI_VPUBLIC
++bool qi_trace_event_is_vcpu(QITraceEvent *ev)
++{
++    TraceEvent *ev_ =3D (TraceEvent *)ev;
++    ERROR_IF_RET(!ev_, false, "must provide an event");
++    return trace_event_is_vcpu(ev_);
++}
 +
-+#include "instrument/events.inc.h"
-+
-+#endif  /* INSTRUMENT__EVENTS_H */
-diff --git a/instrument/events.inc.h b/instrument/events.inc.h
-new file mode 100644
-index 0000000000..8b1ce7fcb2
---- /dev/null
-+++ b/instrument/events.inc.h
-@@ -0,0 +1,11 @@
-+/*
-+ * Internal API for triggering instrumentation events.
-+ *
-+ * Copyright (C) 2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
++QI_VPUBLIC
++const char * qi_trace_event_get_name(QITraceEvent *ev)
++{
++    TraceEvent *ev_ =3D (TraceEvent *)ev;
++    ERROR_IF_RET(!ev_, false, "must provide an event");
++    return trace_event_get_name(ev_);
++}
 +
 +
++QI_VPUBLIC
++bool qi_trace_event_get_state(QITraceEvent *ev)
++{
++    TraceEvent *ev_ =3D (TraceEvent *)ev;
++    ERROR_IF_RET(!ev_, false, "must provide an event");
++    return trace_event_get_state_static(ev_) &&
++        trace_event_get_state_dynamic(ev_);
++}
 +
-diff --git a/instrument/load.c b/instrument/load.c
-index a57401102a..e180f03429 100644
---- a/instrument/load.c
-+++ b/instrument/load.c
-@@ -11,6 +11,8 @@
++QI_VPUBLIC
++bool qi_trace_event_get_vcpu_state(QICPU *vcpu, QITraceEvent *ev)
++{
++    CPUState *vcpu_ =3D (CPUState *)vcpu;
++    TraceEvent *ev_ =3D (TraceEvent *)ev;
++    ERROR_IF_RET(!vcpu_, false, "must provide a vCPU");
++    ERROR_IF_RET(!ev_, false, "must provide an event");
++    return trace_event_get_state_static(ev_) &&
++        trace_event_get_vcpu_state_dynamic(vcpu_, ev_);
++}
++
++QI_VPUBLIC
++bool qi_trace_event_get_state_static(QITraceEvent *ev)
++{
++    TraceEvent *ev_ =3D (TraceEvent *)ev;
++    ERROR_IF_RET(!ev_, false, "must provide an event");
++    return trace_event_get_state_static(ev_);
++}
++
++QI_VPUBLIC
++bool qi_trace_event_get_state_dynamic(QITraceEvent *ev)
++{
++    TraceEvent *ev_ =3D (TraceEvent *)ev;
++    ERROR_IF_RET(!ev_, false, "must provide an event");
++    return trace_event_get_state_dynamic(ev_);
++}
++
++QI_VPUBLIC
++bool qi_trace_event_get_vcpu_state_dynamic(QICPU *vcpu, QITraceEvent *ev=
+)
++{
++    CPUState *vcpu_ =3D (CPUState *)vcpu;
++    TraceEvent *ev_ =3D (TraceEvent *)ev;
++    ERROR_IF_RET(!vcpu_, false, "must provide a vCPU");
++    ERROR_IF_RET(!ev_, false, "must provide an event");
++    return trace_event_get_vcpu_state_dynamic(vcpu_, ev_);
++}
++
++QI_VPUBLIC
++void qi_trace_event_set_state_dynamic(QITraceEvent *ev, bool state)
++{
++    TraceEvent *ev_ =3D (TraceEvent *)ev;
++    ERROR_IF(!ev_, "must provide an event");
++    ERROR_IF(!trace_event_get_state_static(ev_),
++             "event must be statically enabled");
++    trace_event_set_state_dynamic(ev_, state);
++}
++
++QI_VPUBLIC
++void qi_trace_event_set_vcpu_state_dynamic(QICPU *vcpu,
++                                           QITraceEvent *ev, bool state)
++{
++    CPUState *vcpu_ =3D (CPUState *)vcpu;
++    TraceEvent *ev_ =3D (TraceEvent *)ev;
++    ERROR_IF(!vcpu_, "must provide a vCPU");
++    ERROR_IF(!ev_, "must provide an event");
++    ERROR_IF(!trace_event_get_state_static(ev_),
++             "event must be statically enabled");
++    trace_event_set_vcpu_state_dynamic(vcpu_, ev_, state);
++}
+diff --git a/trace/control.h b/trace/control.h
+index 1903e22975..3e6da24c98 100644
+--- a/trace/control.h
++++ b/trace/control.h
+@@ -13,6 +13,7 @@
  #include "qemu-common.h"
+ #include "event-internal.h"
 =20
- #include <dlfcn.h>
-+#include "instrument/control.h"
-+#include "instrument/events.h"
- #include "instrument/load.h"
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
-@@ -105,8 +107,11 @@ InstrLoadError instr_load(const char * path, int arg=
-c, const char ** argv,
-         res =3D INSTR_LOAD_DLERROR;
-         goto err;
-     }
-+    instr_set_event(fini_fn, NULL);
-=20
-+    instr_set_state(INSTR_STATE_ENABLE);
-     main_res =3D main_cb(argc, argv);
-+    instr_set_state(INSTR_STATE_DISABLE);
-=20
-     if (main_res !=3D 0) {
-         res =3D INSTR_LOAD_ERROR;
-@@ -136,6 +141,14 @@ InstrUnloadError instr_unload(int64_t handle_id)
-         goto out;
-     }
-=20
-+    qi_fini_fn fini_fn =3D instr_get_event(fini_fn);
-+    if (fini_fn) {
-+        void *fini_data =3D instr_get_event(fini_data);
-+        fini_fn(fini_data);
-+    }
-+
-+    instr_set_event(fini_fn, NULL);
-+
-     /* this should never fail */
-     if (dlclose(handle->dlhandle) < 0) {
-         res =3D INSTR_UNLOAD_DLERROR;
-diff --git a/instrument/qemu-instr/control.h b/instrument/qemu-instr/cont=
-rol.h
-new file mode 100644
-index 0000000000..f6e289daa0
---- /dev/null
-+++ b/instrument/qemu-instr/control.h
-@@ -0,0 +1,43 @@
-+/*
-+ * Main instrumentation interface for QEMU.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef QI__CONTROL_H
-+#define QI__CONTROL_H
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+#include <stdbool.h>
-+#include <stddef.h>
-+
-+
-+/**
-+ * SECTION:control
-+ * @section_id: qi-control
-+ * @title: Event control API for QEMU event instrumentation
-+ */
-+
-+typedef void (*qi_fini_fn)(void *arg);
-+
-+/**
-+ * qi_set_fini:
-+ * @fn: Finalization function.
-+ * @data: Argument to pass to the finalization function.
-+ *
-+ * Set the function to call when finalizing (unloading) the instrumentat=
-ion
-+ * library.
-+ */
-+void qi_set_fini(qi_fini_fn fn, void *data);
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+
-+#endif  /* QI__CONTROL_H */
-diff --git a/instrument/qemu-instr/visibility.h b/instrument/qemu-instr/v=
-isibility.h
-new file mode 100644
-index 0000000000..305dddf7d8
---- /dev/null
-+++ b/instrument/qemu-instr/visibility.h
-@@ -0,0 +1,58 @@
-+/*
-+ * Macros for symbol visibility.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory of QEMU.
-+ */
-+
-+#ifndef QI__VISIBILITY_H
-+#define QI__VISIBILITY_H
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+/**
-+ * SECTION:visibility
-+ * @section_id: qi-visibility
-+ * @title: Symbol visibility
-+ *
-+ * This code is taken from http://gcc.gnu.org/wiki/Visibility.
-+ */
-+
-+/**
-+ * QI_VPUBLIC:
-+ *
-+ * Make an element public to user's instrumentation code.
-+ */
-+
-+/**
-+ * QI_VLOCAL:
-+ *
-+ * Make an element not visible to user's instrumentation code.
-+ */
-+
-+#if defined _WIN32 || defined __CYGWIN__
-+  #ifdef __GNUC__
-+    #define QI_VPUBLIC __attribute__ ((dllimport))
-+  #else
-+    #define QI_VPUBLIC __declspec(dllimport)
-+  #endif
-+  #define QI_VLOCAL
-+#else
-+  #if __GNUC__ >=3D 4
-+    #define QI_VPUBLIC __attribute__ ((visibility ("default")))
-+    #define QI_VLOCAL  __attribute__ ((visibility ("hidden")))
-+  #else
-+    #define QI_VPUBLIC
-+    #define QI_VLOCAL
-+  #endif
-+#endif
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+
-+#endif  /* QI__VISIBILITY_H */
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index e69c217aff..3aaec2d9dd 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -13,6 +13,7 @@ stub-obj-y +=3D error-printf.o
- stub-obj-y +=3D fdset.o
- stub-obj-y +=3D gdbstub.o
- stub-obj-y +=3D get-vm-name.o
-+stub-obj-y +=3D instrument.o
- stub-obj-y +=3D iothread.o
- stub-obj-y +=3D iothread-lock.o
- stub-obj-y +=3D is-daemonized.o
-diff --git a/stubs/instrument.c b/stubs/instrument.c
-new file mode 100644
-index 0000000000..6731710fd5
---- /dev/null
-+++ b/stubs/instrument.c
-@@ -0,0 +1,13 @@
-+/*
-+ * Instrumentation placeholders.
-+ *
-+ * Copyright (C) 2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "instrument/control.h"
-+
-+
-+__thread InstrState instr_cur_state;
++/* NOTE: Keep in sync with size of QITraceEventIter */
+ typedef struct TraceEventIter {
+     size_t event;
+     size_t group;
