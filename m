@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40154)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpXys-0000Bm-PU
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:54:51 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dpY1G-0001Zn-02
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:57:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpXyp-0007Y9-L0
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:54:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38460)
+	(envelope-from <dgilbert@redhat.com>) id 1dpY1C-0000ii-Ry
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:57:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44890)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpXyp-0007Xh-Cw
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:54:47 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-26-marcandre.lureau@redhat.com>
-Date: Wed, 06 Sep 2017 12:54:41 +0200
-In-Reply-To: <20170822132255.23945-26-marcandre.lureau@redhat.com>
-	(=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 22 Aug 2017
-	15:22:26 +0200")
-Message-ID: <87efrk85ce.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dpY1C-0000i9-Jv
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:57:14 -0400
+Date: Wed, 6 Sep 2017 11:57:05 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170906105704.GC2215@work-vm>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<20170829110357.GG3783@redhat.com> <20170906094846.GA2215@work-vm>
+	<20170906104603.GK15510@redhat.com> <20170906104850.GB2215@work-vm>
+	<20170906105414.GL15510@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 25/54] qapi-visit: add #if conditions to
- visitors
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170906105414.GL15510@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,117 +29,151 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> On Wed, Sep 06, 2017 at 11:48:51AM +0100, Dr. David Alan Gilbert wrote:
+> > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > On Wed, Sep 06, 2017 at 10:48:46AM +0100, Dr. David Alan Gilbert wrote:
+> > > > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > > > On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
+> > > > > > v2:
+> > > > > > - fixed "make check" error that patchew reported
+> > > > > > - moved the thread_join upper in monitor_data_destroy(), before
+> > > > > >   resources are released
+> > > > > > - added one new patch (current patch 3) that fixes a nasty risk
+> > > > > >   condition with IOWatchPoll.  Please see commit message for more
+> > > > > >   information.
+> > > > > > - added a g_main_context_wakeup() to make sure the separate loop
+> > > > > >   thread can be kicked always when we want to destroy the per-monitor
+> > > > > >   threads.
+> > > > > > - added one new patch (current patch 8) to introduce migration mgmt
+> > > > > >   lock for migrate_incoming.
+> > > > > > 
+> > > > > > This is an extended work for migration postcopy recovery. This series
+> > > > > > is tested with the following series to make sure it solves the monitor
+> > > > > > hang problem that we have encountered for postcopy recovery:
+> > > > > > 
+> > > > > >   [RFC 00/29] Migration: postcopy failure recovery
+> > > > > >   [RFC 0/6] migration: re-use migrate_incoming for postcopy recovery
+> > > > > > 
+> > > > > > The root problem is that, monitor commands are all handled in main
+> > > > > > loop thread now, no matter how many monitors we specify. And, if main
+> > > > > > loop thread hangs due to some reason, all monitors will be stuck.
+> > > > > > This can be done in reversed order as well: if any of the monitor
+> > > > > > hangs, it will hang the main loop, and the rest of the monitors (if
+> > > > > > there is any).
+> > > > > > 
+> > > > > > That affects postcopy recovery, since the recovery requires user input
+> > > > > > on destination side.  If monitors hang, the destination VM dies and
+> > > > > > lose hope for even a final recovery.
+> > > > > > 
+> > > > > > So, sometimes we need to make sure the monitor be alive, at least one
+> > > > > > of them.
+> > > > > > 
+> > > > > > The whole idea of this series is that instead if handling monitor
+> > > > > > commands all in main loop thread, we do it separately in per-monitor
+> > > > > > threads.  Then, even if main loop thread hangs at any point by any
+> > > > > > reason, per-monitor thread can still survive.  Further, we add hint in
+> > > > > > QMP/HMP to show whether a command can be executed without QMP, if so,
+> > > > > > we avoid taking BQL when running that command.  It greatly reduced
+> > > > > > contention of BQL.  Now the only user of that new parameter (currently
+> > > > > > I call it "without-bql") is "migrate-incoming" command, which is the
+> > > > > > only command to rescue a paused postcopy migration.
+> > > > > > 
+> > > > > > However, even with the series, it does not mean that per-monitor
+> > > > > > threads will never hang.  One example is that we can still run "info
+> > > > > > vcpus" in per-monitor threads during a paused postcopy (in that state,
+> > > > > > page faults are never handled, and "info cpus" will never return since
+> > > > > > it tries to sync every vcpus).  So to make sure it does not hang, we
+> > > > > > not only need the per-monitor thread, the user should be careful as
+> > > > > > well on how to use it.
+> > > > > > 
+> > > > > > For postcopy recovery, we may need dedicated monitor channel for
+> > > > > > recovery.  In other words, a destination VM that supports postcopy
+> > > > > > recovery would possibly need:
+> > > > > > 
+> > > > > >   -qmp MAIN_CHANNEL -qmp RECOVERY_CHANNEL
+> > > > > 
+> > > > > I think this is a really horrible thing to expose to management applications.
+> > > > > They should not need to be aware of fact that QEMU is buggy and thus requires
+> > > > > that certain commands be run on different monitors to work around the bug.
+> > > > 
+> > > > It's unfortunately baked in way too deep to fix in the near term; the
+> > > > BQL is just too cantagious and we have a fundamental design of running
+> > > > all the main IO emulation in one thread.
+> > > > 
+> > > > > I'd much prefer to see the problem described handled transparently inside
+> > > > > QEMU. One approach is have a dedicated thread in QEMU responsible for all
+> > > > > monitor I/O. This thread should never actually execute monitor commands
+> > > > > though, it would simply parse the command request and put data onto a queue
+> > > > > of pending commands, thus it could never hang. The command queue could be
+> > > > > processed by the main thread, or by another thread that is interested.
+> > > > > eg the migration thread could process any queued commands related to
+> > > > > migration directly.
+> > > > 
+> > > > That requires a change in the current API to allow async command
+> > > > completion (OK that is something Marc-Andre's world has) so that
+> > > > from the one connection you can have multiple outstanding commands.
+> > > > Hmm unless....
+> > > > 
+> > > > We've also got problems that some commands don't like being run outside
+> > > > of the main thread (see Fam's reply on the 21st pointing out that a lot
+> > > > of block commands would assert).
+> > > > 
+> > > > I think the way to move to what you describe would be:
+> > > >   a) A separate thread for monitor IO
+> > > >       This seems a separate problem
+> > > >       How hard is that?  Will all the current IO mechanisms used
+> > > >       for monitors just work if we run them in a separate thread?
+> > > >       What about mux?
+> > > > 
+> > > >   b) Initially all commands get dispatched to the main thread
+> > > >      so nothing changes about the API.
+> > > > 
+> > > >   c) We create a new thread for the lock-free commands, and route
+> > > >       lock-free commands down it.
+> > > > 
+> > > >   d) We start with a rule that on any one monitor connection we
+> > > >   don't allow you to start a command until the previous one has
+> > > >   finished
+> > > > 
+> > > > (d) allows us to avoid any API changes, but allows us to do lock-free
+> > > > stuff on a separate connection like Peter's world.
+> > > > We can drop (d) once we have a way of doing async commands.
+> > > > We can add dispatching to more threads once someone describes
+> > > > what they want from those threads.
+> > > > 
+> > > > Does that work for you Dan?
+> > > 
+> > > It would *provided* that we do (c) for the commands Peter wants for
+> > > this migration series.  IOW, I don't want to have to have logic in
+> > > libvirt that either needs to add a 2nd monitor server, or open a 2nd
+> > > monitor connection, to deal with migration post-copy recovery in some
+> > > versions of QEMU.  So whatever is needed to make post-copy recovery
+> > > work has to be done for (c).
+> > 
+> > But then doesn't that mean you're requiring us to break (d) and change
+> > the QMP interface to libvirt so it can do async stuff?
+> 
+> Depends on your definition of break - I'm assuming there's either a way
+> to opt-in to use of a async mode for existing commands in (c), or that
+> async commands would be added in parallel with existing sync commands.
+> IOW, its not a API breakage - its an opt-in extension of existing
+> functionality.
 
-> Wrap generated code with #if/#endif using the ifcond_decorator.
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  scripts/qapi-visit.py | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-> index c29c2d869e..bb18c9edee 100644
-> --- a/scripts/qapi-visit.py
-> +++ b/scripts/qapi-visit.py
-> @@ -267,6 +267,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
->          self.decl =3D None
->          self.defn =3D None
->          self._btin =3D None
-> +        self.if_members =3D ['decl', 'defn', '_btin']
->=20=20
->      def visit_begin(self, schema):
->          self.decl =3D ''
-> @@ -282,6 +283,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
->          self.decl =3D self._btin + self.decl
->          self._btin =3D None
->=20=20
-> +    @ifcond_decorator
->      def visit_enum_type(self, name, info, values, prefix, ifcond):
->          # Special case for our lone builtin enum type
->          # TODO use something cleaner than existence of info
-> @@ -293,6 +295,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
->              self.decl +=3D gen_visit_decl(name, scalar=3DTrue)
->              self.defn +=3D gen_visit_enum(name)
->=20=20
-> +    @ifcond_decorator
->      def visit_array_type(self, name, info, element_type, ifcond):
->          decl =3D gen_visit_decl(name)
->          defn =3D gen_visit_list(name, element_type)
-> @@ -304,6 +307,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
->              self.decl +=3D decl
->              self.defn +=3D defn
->=20=20
-> +    @ifcond_decorator
->      def visit_object_type(self, name, info, base, members, variants, ifc=
-ond):
->          # Nothing to do for the special empty builtin
->          if name =3D=3D 'q_empty':
-> @@ -317,6 +321,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
->              self.decl +=3D gen_visit_decl(name)
->              self.defn +=3D gen_visit_object(name, base, members, variant=
-s)
->=20=20
-> +    @ifcond_decorator
->      def visit_alternate_type(self, name, info, variants, ifcond):
->          self.decl +=3D gen_visit_decl(name)
->          self.defn +=3D gen_visit_alternate(name, variants)
+But you'd need to do async commands for all commands you issued to avoid
+blocking the io thread so that you could then issue the recovery
+commands.
 
-make check fails to compile, first error:
+Dave
 
-make -C ~/work/qemu/bld-x86/ check
-make: Entering directory '/work/armbru/qemu/bld-x86'
-[...]
-  GEN     tests/test-qapi-types.c
-  CC      tests/test-qapi-types.o
-tests/test-qapi-types.c: In function =E2=80=98qapi_free_TestIfAlternate=E2=
-=80=99:
-tests/test-qapi-types.c:190:5: warning: implicit declaration of function =
-=E2=80=98visit_type_TestIfAlternate=E2=80=99; did you mean =E2=80=98visit_t=
-ype_UserDefAlternate=E2=80=99? [-Wimplicit-function-declaration]
-     visit_type_TestIfAlternate(v, NULL, &obj, NULL);
-     ^~~~~~~~~~~~~~~~~~~~~~~~~~
-     visit_type_UserDefAlternate
-tests/test-qapi-types.c:190:5: warning: nested extern declaration of =E2=80=
-=98visit_type_TestIfAlternate=E2=80=99 [-Wnested-externs]
-tests/test-qapi-types.c: In function =E2=80=98qapi_free_TestIfStruct=E2=80=
-=99:
-tests/test-qapi-types.c:213:5: warning: implicit declaration of function =
-=E2=80=98visit_type_TestIfStruct=E2=80=99; did you mean =E2=80=98visit_type=
-_TestStruct=E2=80=99? [-Wimplicit-function-declaration]
-     visit_type_TestIfStruct(v, NULL, &obj, NULL);
-     ^~~~~~~~~~~~~~~~~~~~~~~
-     visit_type_TestStruct
-tests/test-qapi-types.c:213:5: warning: nested extern declaration of =E2=80=
-=98visit_type_TestIfStruct=E2=80=99 [-Wnested-externs]
-tests/test-qapi-types.c: In function =E2=80=98qapi_free_TestIfUnion=E2=80=
-=99:
-tests/test-qapi-types.c:226:5: warning: implicit declaration of function =
-=E2=80=98visit_type_TestIfUnion=E2=80=99; did you mean =E2=80=98visit_type_=
-TestStruct=E2=80=99? [-Wimplicit-function-declaration]
-     visit_type_TestIfUnion(v, NULL, &obj, NULL);
-     ^~~~~~~~~~~~~~~~~~~~~~
-     visit_type_TestStruct
-tests/test-qapi-types.c:226:5: warning: nested extern declaration of =E2=80=
-=98visit_type_TestIfUnion=E2=80=99 [-Wnested-externs]
-  GEN     tests/test-qapi-event.c
-  CC      tests/test-qapi-event.o
-  GEN     tests/test-qmp-introspect.c
-  CC      tests/test-qmp-introspect.o
-  LINK    tests/test-qobject-output-visitor
-tests/test-qapi-types.o: In function `qapi_free_TestIfAlternate':
-/work/armbru/qemu/bld-x86/tests/test-qapi-types.c:190: undefined reference =
-to `visit_type_TestIfAlternate'
-tests/test-qapi-types.o: In function `qapi_free_TestIfStruct':
-test-qapi-types.c:(.text+0x361): undefined reference to `visit_type_TestIfS=
-truct'
-tests/test-qapi-types.o: In function `qapi_free_TestIfUnion':
-test-qapi-types.c:(.text+0x3af): undefined reference to `visit_type_TestIfU=
-nion'
-collect2: error: ld returned 1 exit status
-make: *** [/work/armbru/qemu/rules.mak:121: tests/test-qobject-output-visit=
-or] Error 1
-make: Leaving directory '/work/armbru/qemu/bld-x86'
+> Regards,
+> Daniel
+> -- 
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
