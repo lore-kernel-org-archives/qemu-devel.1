@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47598)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dpWl2-0006oy-Fw
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:36:29 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dpWxA-0001Dc-NN
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:49:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dpWky-0000Sb-Ha
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:36:28 -0400
-References: <1503066227-18251-1-git-send-email-gengdongjiu@huawei.com>
-	<1503066227-18251-5-git-send-email-gengdongjiu@huawei.com>
-	<CAFEAcA9oecuzXXrdo3zZHxF3AgrDUh_NHxz-znto4GU+OoxVFw@mail.gmail.com>
-From: gengdongjiu <gengdongjiu@huawei.com>
-Message-ID: <5e3c8d25-6260-d00e-dda3-d160a9973701@huawei.com>
-Date: Wed, 6 Sep 2017 17:35:33 +0800
+	(envelope-from <dgilbert@redhat.com>) id 1dpWx7-00084w-IB
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:49:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52228)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dpWx7-00084a-8U
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:48:57 -0400
+Date: Wed, 6 Sep 2017 10:48:46 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170906094846.GA2215@work-vm>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<20170829110357.GG3783@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9oecuzXXrdo3zZHxF3AgrDUh_NHxz-znto4GU+OoxVFw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 4/6] target-arm: kvm64: detect guest
- RAS EXTENSION feature
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20170829110357.GG3783@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,100 +28,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Shannon Zhao <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will
-	Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, bp@suse.de, shiju.jose@huawei.com, zjzhang@codeaurora.org, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-acpi@vger.kernel.org, devel@acpica.org, john.garry@huawei.com, jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, huangdaode@hisilicon.com, wangzhou1@hisilicon.com, Huangshaoyu <huangshaoyu@huawei.com>, wuquanming <wuquanming@huawei.com>, Linuxarm <linuxarm@huawei.com>, zhengqiang10@huawei.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Hi Peter,
-  Thanks very much for your review, I will check your comments in detail and reply.
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
+> > v2:
+> > - fixed "make check" error that patchew reported
+> > - moved the thread_join upper in monitor_data_destroy(), before
+> >   resources are released
+> > - added one new patch (current patch 3) that fixes a nasty risk
+> >   condition with IOWatchPoll.  Please see commit message for more
+> >   information.
+> > - added a g_main_context_wakeup() to make sure the separate loop
+> >   thread can be kicked always when we want to destroy the per-monitor
+> >   threads.
+> > - added one new patch (current patch 8) to introduce migration mgmt
+> >   lock for migrate_incoming.
+> >=20
+> > This is an extended work for migration postcopy recovery. This series
+> > is tested with the following series to make sure it solves the monitor
+> > hang problem that we have encountered for postcopy recovery:
+> >=20
+> >   [RFC 00/29] Migration: postcopy failure recovery
+> >   [RFC 0/6] migration: re-use migrate_incoming for postcopy recovery
+> >=20
+> > The root problem is that, monitor commands are all handled in main
+> > loop thread now, no matter how many monitors we specify. And, if main
+> > loop thread hangs due to some reason, all monitors will be stuck.
+> > This can be done in reversed order as well: if any of the monitor
+> > hangs, it will hang the main loop, and the rest of the monitors (if
+> > there is any).
+> >=20
+> > That affects postcopy recovery, since the recovery requires user input
+> > on destination side.  If monitors hang, the destination VM dies and
+> > lose hope for even a final recovery.
+> >=20
+> > So, sometimes we need to make sure the monitor be alive, at least one
+> > of them.
+> >=20
+> > The whole idea of this series is that instead if handling monitor
+> > commands all in main loop thread, we do it separately in per-monitor
+> > threads.  Then, even if main loop thread hangs at any point by any
+> > reason, per-monitor thread can still survive.  Further, we add hint in
+> > QMP/HMP to show whether a command can be executed without QMP, if so,
+> > we avoid taking BQL when running that command.  It greatly reduced
+> > contention of BQL.  Now the only user of that new parameter (currently
+> > I call it "without-bql") is "migrate-incoming" command, which is the
+> > only command to rescue a paused postcopy migration.
+> >=20
+> > However, even with the series, it does not mean that per-monitor
+> > threads will never hang.  One example is that we can still run "info
+> > vcpus" in per-monitor threads during a paused postcopy (in that state,
+> > page faults are never handled, and "info cpus" will never return since
+> > it tries to sync every vcpus).  So to make sure it does not hang, we
+> > not only need the per-monitor thread, the user should be careful as
+> > well on how to use it.
+> >=20
+> > For postcopy recovery, we may need dedicated monitor channel for
+> > recovery.  In other words, a destination VM that supports postcopy
+> > recovery would possibly need:
+> >=20
+> >   -qmp MAIN_CHANNEL -qmp RECOVERY_CHANNEL
+>=20
+> I think this is a really horrible thing to expose to management applicati=
+ons.
+> They should not need to be aware of fact that QEMU is buggy and thus requ=
+ires
+> that certain commands be run on different monitors to work around the bug.
+
+It's unfortunately baked in way too deep to fix in the near term; the
+BQL is just too cantagious and we have a fundamental design of running
+all the main IO emulation in one thread.
+
+> I'd much prefer to see the problem described handled transparently inside
+> QEMU. One approach is have a dedicated thread in QEMU responsible for all
+> monitor I/O. This thread should never actually execute monitor commands
+> though, it would simply parse the command request and put data onto a que=
+ue
+> of pending commands, thus it could never hang. The command queue could be
+> processed by the main thread, or by another thread that is interested.
+> eg the migration thread could process any queued commands related to
+> migration directly.
+
+That requires a change in the current API to allow async command
+completion (OK that is something Marc-Andre's world has) so that
+=66rom the one connection you can have multiple outstanding commands.
+Hmm unless....
+
+We've also got problems that some commands don't like being run outside
+of the main thread (see Fam's reply on the 21st pointing out that a lot
+of block commands would assert).
+
+I think the way to move to what you describe would be:
+  a) A separate thread for monitor IO
+      This seems a separate problem
+      How hard is that?  Will all the current IO mechanisms used
+      for monitors just work if we run them in a separate thread?
+      What about mux?
+
+  b) Initially all commands get dispatched to the main thread
+     so nothing changes about the API.
+
+  c) We create a new thread for the lock-free commands, and route
+      lock-free commands down it.
+
+  d) We start with a rule that on any one monitor connection we
+  don't allow you to start a command until the previous one has
+  finished
+
+(d) allows us to avoid any API changes, but allows us to do lock-free
+stuff on a separate connection like Peter's world.
+We can drop (d) once we have a way of doing async commands.
+We can add dispatching to more threads once someone describes
+what they want from those threads.
+
+Does that work for you Dan?
+
+(IMHO this is still more complex than Peter's world and I don't
+really see the advantage).
+
+Dave
 
 
-On 2017/9/6 1:26, Peter Maydell wrote:
-> On 18 August 2017 at 15:23, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->> check if kvm supports guest RAS EXTENSION. if so, set
->> corresponding feature bit for vcpu.
->>
->> Signed-off-by: Dongjiu Geng <gengdongjiu@huawei.com>
->> ---
->>  linux-headers/linux/kvm.h | 1 +
->>  target/arm/cpu.h          | 3 +++
->>  target/arm/kvm64.c        | 8 ++++++++
->>  3 files changed, 12 insertions(+)
->>
->> diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
->> index 7971a4f..2aa176e 100644
->> --- a/linux-headers/linux/kvm.h
->> +++ b/linux-headers/linux/kvm.h
->> @@ -929,6 +929,7 @@ struct kvm_ppc_resize_hpt {
->>  #define KVM_CAP_PPC_SMT_POSSIBLE 147
->>  #define KVM_CAP_HYPERV_SYNIC2 148
->>  #define KVM_CAP_HYPERV_VP_INDEX 149
->> +#define KVM_CAP_ARM_RAS_EXTENSION 150
->>
->>  #ifdef KVM_CAP_IRQ_ROUTING
->>
-> 
-> Hi. Changes to linux-headers need to be done as a patch of their
-> own created using scripts/update-linux-headers.sh run against a
-> mainline kernel tree (and with a commit message that quotes the
-> kernel commit hash used). This ensures that we have a consistent
-> set of headers that don't diverge from the kernel copy.
-> 
->> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> index b39d64a..6b0961b 100644
->> --- a/target/arm/cpu.h
->> +++ b/target/arm/cpu.h
->> @@ -611,6 +611,8 @@ struct ARMCPU {
->>
->>      /* CPU has memory protection unit */
->>      bool has_mpu;
->> +    /* CPU has ras extension unit */
->> +    bool has_ras_extension;
->>      /* PMSAv7 MPU number of supported regions */
->>      uint32_t pmsav7_dregion;
->>
->> @@ -1229,6 +1231,7 @@ enum arm_features {
->>      ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings */
->>      ARM_FEATURE_PMU, /* has PMU support */
->>      ARM_FEATURE_VBAR, /* has cp15 VBAR */
->> +    ARM_FEATURE_RAS_EXTENSION, /*has RAS extension support */
-> 
-> Missing space after '/*' ?
-> 
->>  };
->>
->>  static inline int arm_feature(CPUARMState *env, int feature)
->> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
->> index a16abc8..0781367 100644
->> --- a/target/arm/kvm64.c
->> +++ b/target/arm/kvm64.c
->> @@ -518,6 +518,14 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>          unset_feature(&env->features, ARM_FEATURE_PMU);
->>      }
->>
->> +    if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_RAS_EXTENSION)) {
->> +        cpu->has_ras_extension = true;
->> +        set_feature(&env->features, ARM_FEATURE_RAS_EXTENSION);
->> +    } else {
->> +        cpu->has_ras_extension = false;
->> +        unset_feature(&env->features, ARM_FEATURE_RAS_EXTENSION);
->> +    }
->> +
-> 
-> Shouldn't we need to also tell the kernel that we actually want
-> it to expose RAS to the guest? Compare the PMU code in this
-> function, where we set a kvm_init_features bit to do this.
-> (This suggests that your ABI for the kernel part of this feature
-> may not be correct?)
-> 
-> You should also not be calling set_feature() here -- if the
-> CPU features bit doesn't say "this CPU should have the RAS
-> extensions" we shouldn't create a CPU with them. Instead
-> you should set it in kvm_arm_get_host_cpu_features() (again,
-> compare the PMU code).
-> 
-> thanks
-> -- PMM
-> 
-> .
-> 
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
