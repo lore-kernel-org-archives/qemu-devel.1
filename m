@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47598)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47841)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dpWxA-0001Dc-NN
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:49:02 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dpWxl-0001a3-Te
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:49:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dpWx7-00084w-IB
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:49:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52228)
+	(envelope-from <cohuck@redhat.com>) id 1dpWxi-0008Gt-R1
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:49:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36248)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dpWx7-00084a-8U
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:48:57 -0400
-Date: Wed, 6 Sep 2017 10:48:46 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170906094846.GA2215@work-vm>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<20170829110357.GG3783@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20170829110357.GG3783@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpWxi-0008Gm-IB
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 05:49:34 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9055DC049D7F
+	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 09:49:33 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Wed,  6 Sep 2017 11:49:27 +0200
+Message-Id: <20170906094927.22376-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC] accel: default to an actually available
+ accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,137 +28,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, pbonzini@redhat.com, thuth@redhat.com, mreitz@redhat.com, kwolf@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-* Daniel P. Berrange (berrange@redhat.com) wrote:
-> On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
-> > v2:
-> > - fixed "make check" error that patchew reported
-> > - moved the thread_join upper in monitor_data_destroy(), before
-> >   resources are released
-> > - added one new patch (current patch 3) that fixes a nasty risk
-> >   condition with IOWatchPoll.  Please see commit message for more
-> >   information.
-> > - added a g_main_context_wakeup() to make sure the separate loop
-> >   thread can be kicked always when we want to destroy the per-monitor
-> >   threads.
-> > - added one new patch (current patch 8) to introduce migration mgmt
-> >   lock for migrate_incoming.
-> >=20
-> > This is an extended work for migration postcopy recovery. This series
-> > is tested with the following series to make sure it solves the monitor
-> > hang problem that we have encountered for postcopy recovery:
-> >=20
-> >   [RFC 00/29] Migration: postcopy failure recovery
-> >   [RFC 0/6] migration: re-use migrate_incoming for postcopy recovery
-> >=20
-> > The root problem is that, monitor commands are all handled in main
-> > loop thread now, no matter how many monitors we specify. And, if main
-> > loop thread hangs due to some reason, all monitors will be stuck.
-> > This can be done in reversed order as well: if any of the monitor
-> > hangs, it will hang the main loop, and the rest of the monitors (if
-> > there is any).
-> >=20
-> > That affects postcopy recovery, since the recovery requires user input
-> > on destination side.  If monitors hang, the destination VM dies and
-> > lose hope for even a final recovery.
-> >=20
-> > So, sometimes we need to make sure the monitor be alive, at least one
-> > of them.
-> >=20
-> > The whole idea of this series is that instead if handling monitor
-> > commands all in main loop thread, we do it separately in per-monitor
-> > threads.  Then, even if main loop thread hangs at any point by any
-> > reason, per-monitor thread can still survive.  Further, we add hint in
-> > QMP/HMP to show whether a command can be executed without QMP, if so,
-> > we avoid taking BQL when running that command.  It greatly reduced
-> > contention of BQL.  Now the only user of that new parameter (currently
-> > I call it "without-bql") is "migrate-incoming" command, which is the
-> > only command to rescue a paused postcopy migration.
-> >=20
-> > However, even with the series, it does not mean that per-monitor
-> > threads will never hang.  One example is that we can still run "info
-> > vcpus" in per-monitor threads during a paused postcopy (in that state,
-> > page faults are never handled, and "info cpus" will never return since
-> > it tries to sync every vcpus).  So to make sure it does not hang, we
-> > not only need the per-monitor thread, the user should be careful as
-> > well on how to use it.
-> >=20
-> > For postcopy recovery, we may need dedicated monitor channel for
-> > recovery.  In other words, a destination VM that supports postcopy
-> > recovery would possibly need:
-> >=20
-> >   -qmp MAIN_CHANNEL -qmp RECOVERY_CHANNEL
->=20
-> I think this is a really horrible thing to expose to management applicati=
-ons.
-> They should not need to be aware of fact that QEMU is buggy and thus requ=
-ires
-> that certain commands be run on different monitors to work around the bug.
+configure_accelerator() falls back to tcg if no accelerator has
+been specified. Formerly, we could be sure that tcg is always
+available; however, with --disable-tcg, this is not longer true,
+and you are not able to start qemu without explicitly specifying
+another accelerator on those builds.
 
-It's unfortunately baked in way too deep to fix in the near term; the
-BQL is just too cantagious and we have a fundamental design of running
-all the main IO emulation in one thread.
+Instead, choose an accelerator in the order tcg->kvm->xen->hax.
 
-> I'd much prefer to see the problem described handled transparently inside
-> QEMU. One approach is have a dedicated thread in QEMU responsible for all
-> monitor I/O. This thread should never actually execute monitor commands
-> though, it would simply parse the command request and put data onto a que=
-ue
-> of pending commands, thus it could never hang. The command queue could be
-> processed by the main thread, or by another thread that is interested.
-> eg the migration thread could process any queued commands related to
-> migration directly.
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
 
-That requires a change in the current API to allow async command
-completion (OK that is something Marc-Andre's world has) so that
-=66rom the one connection you can have multiple outstanding commands.
-Hmm unless....
+RFC mainly because this breaks iotest 186 in a different way on a
+tcg-less x86_64 build: Before, it fails with "-machine accel=tcg: No
+accelerator found"; afterwards, there seems to be a difference in
+output due to different autogenerated devices. Not sure how to handle
+that.
 
-We've also got problems that some commands don't like being run outside
-of the main thread (see Fam's reply on the 21st pointing out that a lot
-of block commands would assert).
+cc:ing some hopefully interested folks (-ENOMAINTAINER again).
 
-I think the way to move to what you describe would be:
-  a) A separate thread for monitor IO
-      This seems a separate problem
-      How hard is that?  Will all the current IO mechanisms used
-      for monitors just work if we run them in a separate thread?
-      What about mux?
+---
+ accel/accel.c              | 22 ++++++++++++++++++++--
+ arch_init.c                | 17 +++++++++++++++++
+ include/sysemu/arch_init.h |  2 ++
+ qemu-options.hx            |  6 ++++--
+ 4 files changed, 43 insertions(+), 4 deletions(-)
 
-  b) Initially all commands get dispatched to the main thread
-     so nothing changes about the API.
-
-  c) We create a new thread for the lock-free commands, and route
-      lock-free commands down it.
-
-  d) We start with a rule that on any one monitor connection we
-  don't allow you to start a command until the previous one has
-  finished
-
-(d) allows us to avoid any API changes, but allows us to do lock-free
-stuff on a separate connection like Peter's world.
-We can drop (d) once we have a way of doing async commands.
-We can add dispatching to more threads once someone describes
-what they want from those threads.
-
-Does that work for you Dan?
-
-(IMHO this is still more complex than Peter's world and I don't
-really see the advantage).
-
-Dave
-
-
-> Regards,
-> Daniel
-> --=20
-> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/accel/accel.c b/accel/accel.c
+index 8ae40e1e13..26a3f32627 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -68,6 +68,25 @@ static int accel_init_machine(AccelClass *acc, MachineState *ms)
+     return ret;
+ }
+ 
++static const char *default_accelerator(void)
++{
++    if (tcg_available()) {
++        return "tcg";
++    }
++    if (kvm_available()) {
++        return "kvm";
++    }
++    if (xen_available()) {
++        return "xen";
++    }
++    if (hax_available()) {
++        return "hax";
++    }
++    /* configure makes sure we have at least one accelerator */
++    g_assert(false);
++    return "";
++}
++
+ void configure_accelerator(MachineState *ms)
+ {
+     const char *accel, *p;
+@@ -79,8 +98,7 @@ void configure_accelerator(MachineState *ms)
+ 
+     accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
+     if (accel == NULL) {
+-        /* Use the default "accelerator", tcg */
+-        accel = "tcg";
++        accel = default_accelerator();
+     }
+ 
+     p = accel;
+diff --git a/arch_init.c b/arch_init.c
+index a0b8ed6167..1d84eca14d 100644
+--- a/arch_init.c
++++ b/arch_init.c
+@@ -103,6 +103,23 @@ int xen_available(void)
+ #endif
+ }
+ 
++int tcg_available(void)
++{
++#ifdef CONFIG_TCG
++    return 1;
++#else
++    return 0;
++#endif
++}
++
++int hax_available(void)
++{
++#ifdef CONFIG_HAX
++    return 1;
++#else
++    return 0;
++#endif
++}
+ 
+ TargetInfo *qmp_query_target(Error **errp)
+ {
+diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
+index 8751c468ed..43e515c233 100644
+--- a/include/sysemu/arch_init.h
++++ b/include/sysemu/arch_init.h
+@@ -30,6 +30,8 @@ extern const uint32_t arch_type;
+ 
+ int kvm_available(void);
+ int xen_available(void);
++int tcg_available(void);
++int hax_available(void);
+ 
+ CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp);
+ CpuModelExpansionInfo *arch_query_cpu_model_expansion(CpuModelExpansionType type,
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 9f6e2adfff..386e6e945d 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -66,7 +66,8 @@ Supported machine properties are:
+ @table @option
+ @item accel=@var{accels1}[:@var{accels2}[:...]]
+ This is used to enable an accelerator. Depending on the target architecture,
+-kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
++kvm, xen, hax or tcg can be available. By default, the first one available
++out of tcg, kvm, xen, hax (in that order) is used. If there is
+ more than one accelerator specified, the next one is used if the previous one
+ fails to initialize.
+ @item kernel_irqchip=on|off
+@@ -126,7 +127,8 @@ STEXI
+ @item -accel @var{name}[,prop=@var{value}[,...]]
+ @findex -accel
+ This is used to enable an accelerator. Depending on the target architecture,
+-kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
++kvm, xen, hax or tcg can be available. By default, the first one available
++out of tcg, kvm, xen, hax (in that order) is used. If there is
+ more than one accelerator specified, the next one is used if the previous one
+ fails to initialize.
+ @table @option
+-- 
+2.13.5
