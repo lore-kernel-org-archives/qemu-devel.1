@@ -1,26 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dpVlt-0001kC-Oh
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 04:33:21 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dpVpm-0002fB-BW
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 04:37:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dpVlk-0005Ar-7D
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 04:33:17 -0400
-Date: Wed, 6 Sep 2017 10:32:56 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170906083256.GA3753@dhcp-200-186.str.redhat.com>
-References: <20170825132028.6184-1-el13635@mail.ntua.gr>
-	<20170825132028.6184-7-el13635@mail.ntua.gr>
-	<20170905161643.GO4633@localhost.localdomain>
-	<20170905190621.GQ4633@localhost.localdomain>
-	<a861d95e-553c-4797-486c-2601c2b6e17b@redhat.com>
-	<20170906082622.7idtvai3xpclicrg@postretch>
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dpVpj-0007M7-3g
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 04:37:18 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53166
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1dpVpi-0007Ly-UC
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 04:37:15 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v868Tl38119836
+	for <qemu-devel@nongnu.org>; Wed, 6 Sep 2017 04:37:14 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ctd7ch95k-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 04:37:14 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Wed, 6 Sep 2017 04:37:13 -0400
+Date: Wed, 6 Sep 2017 16:37:08 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
+	<20170830163609.50260-3-pasic@linux.vnet.ibm.com>
+	<20170831111953.242ddc28.cohuck@redhat.com>
+	<e805e756-495d-3125-eaf0-262635b9c545@linux.vnet.ibm.com>
+	<20170905100234.7a92128e.cohuck@redhat.com>
+	<bff0fcd2-4c1d-b5da-2d11-dc479d9d7275@linux.vnet.ibm.com>
+	<20170905174606.1e0c6404.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="r5Pyd7+fXNt84Ff3"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170906082622.7idtvai3xpclicrg@postretch>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v9 6/6] qemu-iotests: add 184
- for throttle filter driver
+In-Reply-To: <20170905174606.1e0c6404.cohuck@redhat.com>
+Message-Id: <20170906083708.GA31680@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/9] s390x: fix invalid use of cc 1 for SSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,71 +47,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Eric Blake <eblake@redhat.com>, qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
+* Cornelia Huck <cohuck@redhat.com> [2017-09-05 17:46:06 +0200]:
 
---r5Pyd7+fXNt84Ff3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Tue, 5 Sep 2017 17:24:19 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+> > My problem with a program check (indicated by SCSW word 2 bit 10) is
+> > that, in my reading of the architecture, the semantic behind it is: The
+> > channel subsystem (not the cu or device) has detected, that the 
+> > the channel program (previously submitted as an ORB) is erroneous. Which
+> > programs are erroneous is specified by the architecture. What we have
+> > here does not qualify.
+> > 
+> > My idea was to rather blame the virtual hardware (device) and put no blame
+> > on the program nor he channel subsystem. This could be done using device
+> > status (unit check with command reject, maybe unit exception) or interface
+> > check. My train of thought was, the problem is not consistent across a
+> > device type, so it has to be device specific.
+> 
+> Unit exception might be a better way to express what is happening here.
+> At least, it moves us away from cc 1 and not towards cc 3 :)
+> 
+> > 
+> > Of course blaming the device could mislead the person encountering the
+> > problem, and make him believe it's an non-virtual hardware problem.
+> > 
+> > About the misleading, I think the best we can do is log out a message
+> > indicating what really happened.
+> 
+> Just document it in the code? If it doesn't happen with Linux as a
+> guest, it is highly unlikely to be seen in the wild.
+> 
+> > 
+> > In the end I don't care that deeply about vfio-ccw, and this problem
+> > already took me more time than I intended to spend on this. We have
+> > people driving this whole vfio-ccw stuff and I'm not one of them (I'm
+> > rather in the supporting role).
+> > 
+> > I'm also fine with me being credited with a reported-by once the
+> > more involved people figure out what to do, and keeping the vfio-ccw
+> > stuff as is. Should we go with that option? 
+> 
+> If converting the reporting to a device status is straightforward
+> enough, let's do that. I'm fine with postponing this and waiting for a
+> real fix as well (I don't really have spare cycles to actually write
+> vfio-ccw code currently...)
+> 
 
-Am 06.09.2017 um 10:26 hat Manos Pitsidianakis geschrieben:
-> On Tue, Sep 05, 2017 at 04:13:39PM -0500, Eric Blake wrote:
-> > On 09/05/2017 02:06 PM, Kevin Wolf wrote:
-> > > Am 05.09.2017 um 18:16 hat Kevin Wolf geschrieben:
-> > > > Am 25.08.2017 um 15:20 hat Manos Pitsidianakis geschrieben:
-> > > > > Reviewed-by: Alberto Garcia <berto@igalia.com>
-> > > > > Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
-> > > >=20
-> > > > Does this test actually (still) pass for you? I can't see that it's
-> > > > related to any recent change in master, but this is the diff that I=
- get.
-> > > >=20
-> > > > I can update the reference output while applying, but obviously if =
-it's
-> > > > currently passing for you, it will fail after I "fix" it.
-> > >=20
-> > > For the record, we discussed this on IRC. The test works correctly on
-> > > master, but on my block branch there is a conflict with "block: pass
-> > > bdrv_* methods to bs->file by default in block filters".
-> > >=20
-> > > The correct action is to merge this throttle driver series after the
-> > > conflicting patch because throttle doesn't implement .bdrv_get_info a=
-nd
-> > > needs the forwarding that the other patch implements.
-> > >=20
-> > > I updated the test output accordingly and applied the series to my bl=
-ock
-> > > branch.
-> >=20
-> > Could you also squash this in to 5/6? (as long as we're intentionally
-> > basing throttle on top of defaults, then we should use the right default
-> > instead of duplicating things)
->=20
-> Yes, this change makes sense, if it's no trouble with Kevin.
+I can do this after this series.
 
-Already done, I was just waiting for your opinion. :-)
+[...]
 
-Kevin
-
---r5Pyd7+fXNt84Ff3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIcBAEBAgAGBQJZr7K4AAoJEH8JsnLIjy/WKyIP/ijB0DeEx7w/dSR5ifH642xV
-iJQkZ7W7BKHn/ZM5RkmBt3HW2qAQaKwJN2dkcfGzLQOgQwfi7zsCBYDwTDhEVSLI
-QRgpeXUq0jUc32rxEQk91OmeImpnEHFucUAnUkx65/7729mhl9OIUNXtluSJuHKY
-SyiRs32hwdn11UdQ2UtnQazuUcmg0GMMDWXIeOH7VAdsSMai3Zbnvhra82gIh+ls
-S4Fn3F3gs/XlH97vsqRSblEY1qq5Pu7E2vvXRQyJ4ryiM8q8vmlt7EnNuTGaqO1J
-1f2a6TEZT6MnChFwrW8QiYzLSrTmbcsM2ybDvsms+GzEdTthMajys6V5qbNzya3K
-VLnqpx8RHt3HVUSMMJwrvausPSncHREcv16zzyqsTsDddC57sURvwHM5qzjwC0ff
-VAHIx/45Gf49bbRuZNT64UGSqQ3HIYxDAbPn4mw8rNPX9x59viPS+NlTtp6H1Zo+
-oWl/EiTWukrLLhBT1sk6XahfLikAWddUlYNfViFwOJu4CrtXUfnKKsSgbxO1qimU
-8jA23QkX0Ku33s9wEANPRMz5zrIoyPoTxJp+AgwslyXU3rR+hsZPehbfPQsIhtOS
-9IVjPiVIAI2hSpDKTJLWgvbV/Qa84QIGmZZ8oYpwMQxmCvCrik7yfndr+Eui84kj
-obvq7NfPzQlh+oJN6tIM
-=9+6z
------END PGP SIGNATURE-----
-
---r5Pyd7+fXNt84Ff3--
+-- 
+Dong Jia Shi
