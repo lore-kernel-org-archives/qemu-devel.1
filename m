@@ -1,32 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpat7-0004F4-1r
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:01:14 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dpauJ-00050G-LH
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:02:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpat2-0007hD-7U
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:01:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36898)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dpat1-0007gg-V2
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:01:00 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E1F8EC0587F8
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 14:00:58 +0000 (UTC)
-References: <20170906115143.27451-1-quintela@redhat.com>
-	<20170906115143.27451-2-quintela@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7e71d190-8e49-ca6b-ef44-522100b27b8c@redhat.com>
-Date: Wed, 6 Sep 2017 09:00:51 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dpauA-0000LK-93
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:02:19 -0400
+Received: from mail-oi0-x244.google.com ([2607:f8b0:4003:c06::244]:37261)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dpauA-0000KC-3Y
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:02:10 -0400
+Received: by mail-oi0-x244.google.com with SMTP id h70so4482926oic.4
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 07:02:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170906115143.27451-2-quintela@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="cBfd0pQsELox7cDNIqu3KOtklMJjJwXQd"
-Subject: Re: [Qemu-devel] [PATCH v7 01/22] Revert "io: add new
- qio_channel_{readv, writev, read, write}_all functions"
+In-Reply-To: <87fuc11nxs.fsf@dusky.pond.sub.org>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-21-marcandre.lureau@redhat.com>
+	<87fuc11nxs.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 6 Sep 2017 16:02:07 +0200
+Message-ID: <CAJ+F1CLNcMYkYvA0ZO+oN7z=nmYEMmLajCnU1uuG1+DocFQzvw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 20/54] qapi-introspect: modify to_qlit()
+ to take an optional suffix
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,73 +32,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---cBfd0pQsELox7cDNIqu3KOtklMJjJwXQd
-From: Eric Blake <eblake@redhat.com>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
-Message-ID: <7e71d190-8e49-ca6b-ef44-522100b27b8c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 01/22] Revert "io: add new
- qio_channel_{readv, writev, read, write}_all functions"
-References: <20170906115143.27451-1-quintela@redhat.com>
- <20170906115143.27451-2-quintela@redhat.com>
-In-Reply-To: <20170906115143.27451-2-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Sep 5, 2017 at 11:42 AM, Markus Armbruster <armbru@redhat.com> wrot=
+e:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> The following patch is going to break list entries with #if/#endif, so
+>> they should have the trailing ',' as suffix.
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  scripts/qapi-introspect.py | 8 ++++----
+>>  1 file changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+>> index 4c437d60ec..dfb6d2ded4 100644
+>> --- a/scripts/qapi-introspect.py
+>> +++ b/scripts/qapi-introspect.py
+>> @@ -16,7 +16,7 @@ def to_c_string(s):
+>>      return '"' + s.replace('\\', r'\\').replace('"', r'\"') + '"'
+>>
+>>
+>> -def to_qlit(obj, level=3D0, first_indent=3DTrue):
+>> +def to_qlit(obj, level=3D0, first_indent=3DTrue, suffix=3D''):
+>>
+>>      def indent(level):
+>>          return level * 4 * ' '
+>> @@ -29,11 +29,11 @@ def to_qlit(obj, level=3D0, first_indent=3DTrue):
+>>      elif isinstance(obj, str):
+>>          ret +=3D 'QLIT_QSTR(' + to_c_string(obj) + ')'
+>>      elif isinstance(obj, list):
+>> -        elts =3D [to_qlit(elt, level + 1)
+>> +        elts =3D [to_qlit(elt, level + 1, suffix=3D',')
+>>                  for elt in obj]
+>>          elts.append(indent(level + 1) + "{}")
+>>          ret +=3D 'QLIT_QLIST(((QLitObject[]) {\n'
+>> -        ret +=3D ',\n'.join(elts) + '\n'
+>> +        ret +=3D '\n'.join(elts) + '\n'
+>>          ret +=3D indent(level) + '}))'
+>>      elif isinstance(obj, dict):
+>>          elts =3D []
+>> @@ -46,7 +46,7 @@ def to_qlit(obj, level=3D0, first_indent=3DTrue):
+>>          ret +=3D indent(level) + '}))'
+>>      else:
+>>          assert False                # not implemented
+>> -    return ret
+>> +    return ret + suffix
+>>
+>>
+>>  class QAPISchemaGenIntrospectVisitor(QAPISchemaVisitor):
+>
+> Hmm.  I wonder the appended simpler patch would do.
 
-On 09/06/2017 06:51 AM, Juan Quintela wrote:
-> This reverts commit d4622e55883211072621958d39ddaa73483d201e.
+It works, thanks for the suggestion
 
-But with no reason why?  What bugs are you fixing by reverting this?
-
->=20
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> ---
->  include/io/channel.h       |  90 -------------------------------------=
---
->  io/channel.c               |  94 -------------------------------------=
-----
->  tests/io-channel-helpers.c | 102 +++++++++++++++++++++++++++++++++++++=
-++++----
->  3 files changed, 93 insertions(+), 193 deletions(-)
+>
+> diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+> index 4c437d60ec..73edb55cd5 100644
+> --- a/scripts/qapi-introspect.py
+> +++ b/scripts/qapi-introspect.py
+> @@ -33,7 +33,7 @@ def to_qlit(obj, level=3D0, first_indent=3DTrue):
+>                  for elt in obj]
+>          elts.append(indent(level + 1) + "{}")
+>          ret +=3D 'QLIT_QLIST(((QLitObject[]) {\n'
+> -        ret +=3D ',\n'.join(elts) + '\n'
+> +        ret +=3D '\n'.join(elts) + '\n'
+>          ret +=3D indent(level) + '}))'
+>      elif isinstance(obj, dict):
+>          elts =3D []
+> @@ -46,6 +46,8 @@ def to_qlit(obj, level=3D0, first_indent=3DTrue):
+>          ret +=3D indent(level) + '}))'
+>      else:
+>          assert False                # not implemented
+> +    if level > 0:
+> +        ret +=3D ','
+>      return ret
+>
+>
 >
 
-Looking ahead, I see 8/22 recreates qio_channel_readv_all (but not
-qio_channel_read_all); how does that differ from this one?
 
-Should you be squashing 1/22 and 8/22 into a single non-revert patch
-that just fixes bugs on top of what is already in the tree?
-
-Also, have you seen my patches, that also fix bugs in the _all functions?=
-
-https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01053.html
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---cBfd0pQsELox7cDNIqu3KOtklMJjJwXQd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmv/5QACgkQp6FrSiUn
-Q2oIXAf/WlbcUz36JWRMjFaVQi4+oCfZKyi4Eko+bMeote3BAP1OS/0v03AAPGe1
-nJXwxifwe81QCD9YAC8RRE3goueCJ+vXBNb4JmpH6qcLOiBx4wARkS0D3vCqdYON
-WDD8fAkDsWsXni3MS1gpiC7GZg2uBHq1ENQDyeftJb3IigbzkRC0YJOm4KTTTJKC
-yJCgX4XYm89ulcvZyvt5DyU+F32fDFdVDXGBlTnBWO9WvBfgNyf2BIV37/NLk/zh
-S/36lZWLXDOfsWxAzLLV5SjFUNjcJBWJJ34PUFtzZmTNVu1msgVnrm4y17s/3iYP
-CGnBuFfMJY3b64RmhlUnuBM0Yd1Iww==
-=ngMp
------END PGP SIGNATURE-----
-
---cBfd0pQsELox7cDNIqu3KOtklMJjJwXQd--
+Marc-Andr=C3=A9 Lureau
