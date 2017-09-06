@@ -1,34 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dpTKa-0007ot-Sn
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:56:58 -0400
+	(envelope-from <famz@redhat.com>) id 1dpTLr-0008TQ-Ey
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:58:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dpTKV-0003Kw-U0
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:56:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36400)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dpTKV-0003Ke-O4
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:56:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dpTKU-0000Ua-MO
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 05:56:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7CABF2E80CC
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 05:56:50 +0000 (UTC)
+	(envelope-from <famz@redhat.com>) id 1dpTLq-00049E-J6
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:58:15 -0400
+Date: Wed, 6 Sep 2017 13:58:05 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170906055804.GA26413@lemon.lan>
+References: <20170901201054.11738-1-briansteffens@gmail.com>
+	<20170905095610.GF17449@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 06 Sep 2017 05:40:27 -0000
-From: Tomasz Rostanski <1407813@bugs.launchpad.net>
-Reply-To: Bug 1407813 <1407813@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20150105223623.22315.6307.malonedeb@gac.canonical.com>
-Message-Id: <150467642805.8725.4586843870482676186.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1407813] Re: QEMU wrongly translates newlines on
- serial output
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170905095610.GF17449@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 1/1] block: add block device shared field
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Brian Steffens <briansteffens@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-I think this bug relates to:
-https://bugs.launchpad.net/qemu/+bug/1715296
+On Tue, 09/05 10:56, Stefan Hajnoczi wrote:
+> On Fri, Sep 01, 2017 at 08:10:54PM +0000, Brian Steffens wrote:
+> > This adds a boolean option called 'shared' to block devices. It defaults
+> > to off/false. When enabled for a particular block device, the 'shared' option
+> > causes the block migration code to skip over syncing of that device. This
+> > allows controlling exactly which block devices get synced during a migration.
+> > 
+> > Signed-off-by: Brian Steffens <briansteffens@gmail.com>
+> > ---
+> >  block.c                   | 7 +++++++
+> >  block/qapi.c              | 2 ++
+> >  include/block/block.h     | 1 +
+> >  include/block/block_int.h | 3 +++
+> >  migration/block.c         | 4 ++++
+> >  qapi/block-core.json      | 2 +-
+> >  6 files changed, 18 insertions(+), 1 deletion(-)
+> 
+> Thanks for the patch!  Please email the relevant maintainers:
+> 
+>   $ scripts/get_maintainer.pl -f block.c
+>   Kevin Wolf <kwolf@redhat.com> (supporter:Block layer core)
+>   Max Reitz <mreitz@redhat.com> (supporter:Block layer core)
+>   qemu-block@nongnu.org (open list:Block layer core)
+>   qemu-devel@nongnu.org (open list:All patches CC here)
+> 
+> I have CCed them so they see this email.
+> 
+> > diff --git a/migration/block.c b/migration/block.c
+> > index 9171f60028..b347c3dc61 100644
+> > --- a/migration/block.c
+> > +++ b/migration/block.c
+> > @@ -402,6 +402,10 @@ static int init_blk_migration(QEMUFile *f)
+> >      bmds_bs = g_malloc0(num_bs * sizeof(*bmds_bs));
+> >  
+> >      for (i = 0, bs = bdrv_first(&it); bs; bs = bdrv_next(&it), i++) {
+> > +        if (bs->shared) {
 
--- =
+If we go with this approach, I'd prefer a more specific name like
+bs->skip_block_migration; "shared" has a lot meanings so is less readable.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1407813
+Fam
 
-Title:
-  QEMU wrongly translates newlines on serial output
-
-Status in QEMU:
-  New
-
-Bug description:
-  When using "-serial stdio", QEMU shows the guest serial port's output
-  on the tty running qemu. As it should, QEMU sets the tty to raw mode.
-  Or almost... Strangely, it neglects to remove one output-translation
-  bit, ONLCR (see termios(3)) enabled on the tty. And it should have
-  removed this output translation!
-
-  The problem is that with this ONLCR, the guest has no way of
-  outputting a bare linefeed ('\n') - every time the guest tries to
-  output a bare linefeed to the serial port, the host tty will translate
-  it to \r\n which will be sent to the underlying terminal (e.g.,
-  xterm).
-
-  In most cases, this issue doesn't cause a problem: When the guest is
-  running a Unix-like operating system which is itself in cooked mode,
-  the guest itself will always output \r\n, and the hosts second
-  translation (to \r\r\n) does no harm. But in certain cases, the guest
-  can *really* want to output just \n, and have this \n reach the
-  terminal emulator and do what a linefeed is supposed to do without a
-  carriage-return - namely - just go one line down in the same column.
-
-  As an illustration of this bug, consider a guest running a Unix-like
-  operating system running a curses-based application (e.g., "vi"). If
-  you look at the output of "infocmp xterm", you'll notice that cud1=3D^J.
-  This means that if the curses library decides to move one line down
-  (it can happen in some cursor movement situations) it might decide to
-  print a linefeed (\n) to move one line down. The guest's operating
-  system will not mess with this linefeed (because the guest is in raw
-  mode), but then qemu's tty, because it was wrongly left in ONLCR mode,
-  will change this \n to \r\n before it reaches the terminal - causing
-  wrong cursor movement (instead the cursor going straight down, it
-  moves to the first column of the next line).
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1407813/+subscriptions
+> > +            continue;
+> > +        }
+> > +
