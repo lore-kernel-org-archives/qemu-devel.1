@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41604)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <patrick@advancedtelematic.com>) id 1dpb31-0003UP-Cl
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:11:24 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dpbi8-0000K4-Ig
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:53:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <patrick@advancedtelematic.com>) id 1dpb2w-0005Lp-AU
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:11:19 -0400
-Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:35036)
+	(envelope-from <pbonzini@redhat.com>) id 1dpbi5-0005xH-U4
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:53:48 -0400
+Received: from mail-oi0-f52.google.com ([209.85.218.52]:36394)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <patrick@advancedtelematic.com>)
-	id 1dpb2w-0005KW-39
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:11:14 -0400
-Received: by mail-wm0-x22b.google.com with SMTP id f199so9932109wme.0
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 07:11:12 -0700 (PDT)
-Received: from [192.168.1.62] (p57bf9f95.dip0.t-ipconnect.de. [87.191.159.149])
-	by smtp.gmail.com with ESMTPSA id 61sm3652824wre.44.2017.09.06.07.11.10
-	for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Wed, 06 Sep 2017 07:11:10 -0700 (PDT)
-From: Patrick Vacek <patrick@advancedtelematic.com>
-Message-ID: <2385fc24-dbc3-ba7c-948f-b986edb27c7a@advancedtelematic.com>
-Date: Wed, 6 Sep 2017 16:11:09 +0200
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dpbi5-0005uw-Mt
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:53:45 -0400
+Received: by mail-oi0-f52.google.com with SMTP id x190so27293616oix.3
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 07:53:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-Subject: [Qemu-devel] Trying to use ccid-card-emulated
+In-Reply-To: <20170906085024.GB15510@redhat.com>
+References: <20170905191114.5959-1-eblake@redhat.com>
+	<20170905191114.5959-2-eblake@redhat.com>
+	<20170906085024.GB15510@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Wed, 6 Sep 2017 16:53:43 +0200
+Message-ID: <CABgObfb7yOAAKX9YeNVYrnXdhhNP94O1Wsfo9qGGHDaofMXOEg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 1/3] io: Yield rather than wait when
+ already in coroutine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,38 +30,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "P. Berrange, Daniel" <berrange@redhat.com>
+Cc: "Blake, Eric" <eblake@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu-block@nongnu.org
 
-Hello,
+Il 06 set 2017 10:51 AM, "Daniel P. Berrange" <berrange@redhat.com> ha
+scritto:
 
-I'm trying to emulate a smartcard. I found section 4 of docs/ccid.txt,
-which appears to do exactly what I'm interested in. However, that
-document is a few years old and references CoolKey, which at this point
-seems obsolete, with OpenSC being the preferred succcessor. I've
-followed the rest of steps with success, and tried registering OpenSC
-with NSS (i.e. modutil -dbdir /etc/pki/nssdb -add "CAC Module" -libfile
-/usr/lib/opensc-pkcs11.so), but I'm still not seeing my three
-certificates listed on the device as I'd expect.
+On Tue, Sep 05, 2017 at 02:11:12PM -0500, Eric Blake wrote:
+> The new qio_channel_{read,write}{,v}_all functions are documented
+> as yielding until data is available.  When used on a blocking
+> channel, this yield is done via qio_channel_wait() which spawns
+> a new coroutine under the hood (so it is the new entry point that
+> yields as needed); but if we are already in a coroutine (at which
 
-I'm using QEMU emulator version 2.8.0(Debian 1:2.8+dfsg-3ubuntu2.3).
-I've also tried using QEMU emulator version 2.10.0 (built from source),
-but the interface has changed and the commands from the documentation
-don't work anymore.
+qio_channel_wait doesn't spawn any coroutine - it simply rnus a
+nested event loop to wait for the channel...
 
-1. Am I correct to assume that OpenSC is the logical successor to
-CoolKey, and should I expect a simple substitution such as that to work?
-2. Are there other steps I might be overlooking with OpenSC or with
-getting the certificates recognized on the device?
-3. If, as I suspect, that document is no longer up to date, what do the
-steps currently look like to get smartcard emulation working?
+> point QIO_CHANNEL_ERR_BLOCK is only possible if we are a
+> non-blocking channel), we want to yield the current coroutine
+> instead of spawning a new one.
 
-Thanks,
-Patrick
+...none the less, I think this is ok.
 
---=20
-Patrick Vacek
-ATS Advanced Telematic Systems GmbH
-Kantstra=C3=9Fe 162, 10623 Berlin
-HRB 151501 B, Amtsgericht Charlottenburg
-Vertreten durch die Gesch=C3=A4ftsf=C3=BChrer
-Dirk P=C3=B6schl, Armin G. Schmidt
+
+Great, this works for me on the pr-helper too.
+
+Paolo
+
+
+>
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  io/channel.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+>
+> diff --git a/io/channel.c b/io/channel.c
+> index 5e8c2f0a91..9e62794cab 100644
+> --- a/io/channel.c
+> +++ b/io/channel.c
+> @@ -105,7 +105,11 @@ int qio_channel_readv_all(QIOChannel *ioc,
+>          ssize_t len;
+>          len = qio_channel_readv(ioc, local_iov, nlocal_iov, errp);
+>          if (len == QIO_CHANNEL_ERR_BLOCK) {
+> -            qio_channel_wait(ioc, G_IO_IN);
+> +            if (qemu_in_coroutine()) {
+> +                qio_channel_yield(ioc, G_IO_IN);
+> +            } else {
+> +                qio_channel_wait(ioc, G_IO_IN);
+> +            }
+>              continue;
+>          } else if (len < 0) {
+>              goto cleanup;
+> @@ -143,7 +147,11 @@ int qio_channel_writev_all(QIOChannel *ioc,
+>          ssize_t len;
+>          len = qio_channel_writev(ioc, local_iov, nlocal_iov, errp);
+>          if (len == QIO_CHANNEL_ERR_BLOCK) {
+> -            qio_channel_wait(ioc, G_IO_OUT);
+> +            if (qemu_in_coroutine()) {
+> +                qio_channel_yield(ioc, G_IO_OUT);
+> +            } else {
+> +                qio_channel_wait(ioc, G_IO_OUT);
+> +            }
+>              continue;
+>          }
+>          if (len < 0) {
+
+Acked-by: Daniel P. Berrange <berrange@redhat.com>
+
+Regards,
+Daniel
+--
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange
+:|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com
+:|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange
+:|
