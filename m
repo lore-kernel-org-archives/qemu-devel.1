@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41665)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41696)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpcqX-0008Sd-KS
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:38 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dpcqa-0008VA-1D
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpcqT-0001xj-Lv
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:33 -0400
-Received: from mail-pf0-x233.google.com ([2607:f8b0:400e:c00::233]:36480)
+	(envelope-from <richard.henderson@linaro.org>) id 1dpcqU-0001zM-Vv
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:36 -0400
+Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:37871)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dpcqT-0001tQ-GT
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:29 -0400
-Received: by mail-pf0-x233.google.com with SMTP id e199so13452448pfh.3
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 09:06:29 -0700 (PDT)
+	id 1dpcqU-0001z0-Nv
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:30 -0400
+Received: by mail-pg0-x22b.google.com with SMTP id d8so15974594pgt.4
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 09:06:30 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  6 Sep 2017 09:05:50 -0700
-Message-Id: <20170906160612.22769-11-richard.henderson@linaro.org>
+Date: Wed,  6 Sep 2017 09:05:51 -0700
+Message-Id: <20170906160612.22769-12-richard.henderson@linaro.org>
 In-Reply-To: <20170906160612.22769-1-richard.henderson@linaro.org>
 References: <20170906160612.22769-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 10/32] target/i386: [tcg] Port to
- breakpoint_check
+Subject: [Qemu-devel] [PULL 11/32] target/i386: [tcg] Port to translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,83 +40,124 @@ loop.
 Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
 Reviewed-by: Emilio G. Cota <cota@braap.org>
-Message-Id: <150002170871.22386.2172835658104140576.stgit@frigg.lan>
+Message-Id: <150002195074.22386.16195894320027075398.stgit@frigg.lan>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/i386/translate.c | 46 ++++++++++++++++++++++++++++++++++------------
- 1 file changed, 34 insertions(+), 12 deletions(-)
+ target/i386/translate.c | 66 +++++++++++++++++++++++++++++++------------------
+ 1 file changed, 42 insertions(+), 24 deletions(-)
 
 diff --git a/target/i386/translate.c b/target/i386/translate.c
-index b7e5854513..4d4083fe30 100644
+index 4d4083fe30..0f38896f17 100644
 --- a/target/i386/translate.c
 +++ b/target/i386/translate.c
-@@ -8456,6 +8456,26 @@ static void i386_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
-     tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
+@@ -4417,15 +4417,16 @@ static void gen_sse(CPUX86State *env, DisasContext *s, int b,
+ 
+ /* convert one instruction. s->base.is_jmp is set if the translation must
+    be stopped. Return the next pc value */
+-static target_ulong disas_insn(CPUX86State *env, DisasContext *s,
+-                               target_ulong pc_start)
++static target_ulong disas_insn(DisasContext *s, CPUState *cpu)
+ {
++    CPUX86State *env = cpu->env_ptr;
+     int b, prefixes;
+     int shift;
+     TCGMemOp ot, aflag, dflag;
+     int modrm, reg, rm, mod, op, opreg, val;
+     target_ulong next_eip, tval;
+     int rex_w, rex_r;
++    target_ulong pc_start = s->base.pc_next;
+ 
+     s->pc_start = s->pc = pc_start;
+     prefixes = 0;
+@@ -8476,10 +8477,46 @@ static bool i386_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
+     }
  }
  
-+static bool i386_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
-+                                     const CPUBreakpoint *bp)
++static void i386_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
 +{
 +    DisasContext *dc = container_of(dcbase, DisasContext, base);
-+    /* If RF is set, suppress an internally generated breakpoint.  */
-+    int flags = dc->base.tb->flags & HF_RF_MASK ? BP_GDB : BP_ANY;
-+    if (bp->flags & flags) {
-+        gen_debug(dc, dc->base.pc_next - dc->cs_base);
-+        dc->base.is_jmp = DISAS_NORETURN;
-+        /* The address covered by the breakpoint must be included in
-+           [tb->pc, tb->pc + tb->size) in order to for it to be
-+           properly cleared -- thus we increment the PC here so that
-+           the logic setting tb->size below does the right thing.  */
-+        dc->base.pc_next += 1;
-+        return true;
-+    } else {
-+        return false;
++    target_ulong pc_next = disas_insn(dc, cpu);
++
++    if (dc->tf || (dc->base.tb->flags & HF_INHIBIT_IRQ_MASK)) {
++        /* if single step mode, we generate only one instruction and
++           generate an exception */
++        /* if irq were inhibited with HF_INHIBIT_IRQ_MASK, we clear
++           the flag and abort the translation to give the irqs a
++           chance to happen */
++        gen_jmp_im(pc_next - dc->cs_base);
++        gen_eob(dc);
++        dc->base.is_jmp = DISAS_TOO_MANY;
++    } else if ((dc->base.tb->cflags & CF_USE_ICOUNT)
++               && ((dc->base.pc_next & TARGET_PAGE_MASK)
++                   != ((dc->base.pc_next + TARGET_MAX_INSN_SIZE - 1)
++                       & TARGET_PAGE_MASK)
++                   || (dc->base.pc_next & ~TARGET_PAGE_MASK) == 0)) {
++        /* Do not cross the boundary of the pages in icount mode,
++           it can cause an exception. Do it only when boundary is
++           crossed by the first instruction in the block.
++           If current instruction already crossed the bound - it's ok,
++           because an exception hasn't stopped this code.
++         */
++        gen_jmp_im(pc_next - dc->cs_base);
++        gen_eob(dc);
++        dc->base.is_jmp = DISAS_TOO_MANY;
++    } else if ((pc_next - dc->base.pc_first) >= (TARGET_PAGE_SIZE - 32)) {
++        gen_jmp_im(pc_next - dc->cs_base);
++        gen_eob(dc);
++        dc->base.is_jmp = DISAS_TOO_MANY;
 +    }
++
++    dc->base.pc_next = pc_next;
 +}
 +
  /* generate intermediate code for basic block 'tb'.  */
  void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
  {
-@@ -8486,18 +8506,21 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-         i386_tr_insn_start(&dc->base, cs);
-         num_insns++;
- 
--        /* If RF is set, suppress an internally generated breakpoint.  */
--        if (unlikely(cpu_breakpoint_test(cs, dc->base.pc_next,
--                                         tb->flags & HF_RF_MASK
--                                         ? BP_GDB : BP_ANY))) {
--            gen_debug(dc, dc->base.pc_next - dc->cs_base);
--            /* The address covered by the breakpoint must be included in
--               [tb->pc, tb->pc + tb->size) in order to for it to be
--               properly cleared -- thus we increment the PC here so that
--               the logic setting tb->size below does the right thing.  */
--            dc->base.pc_next += 1;
--            goto done_generating;
-+        if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
-+            CPUBreakpoint *bp;
-+            QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
-+                if (bp->pc == dc->base.pc_next) {
-+                    if (i386_tr_breakpoint_check(&dc->base, cs, bp)) {
-+                        break;
-+                    }
-+                }
-+            }
-+
-+            if (dc->base.is_jmp == DISAS_NORETURN) {
-+                break;
-+            }
-         }
-+
-         if (num_insns == max_insns && (tb->cflags & CF_LAST_IO)) {
+-    CPUX86State *env = cs->env_ptr;
+     DisasContext dc1, *dc = &dc1;
+     int num_insns;
+     int max_insns;
+@@ -8525,39 +8562,20 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
              gen_io_start();
          }
-@@ -8548,7 +8571,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-     }
-     if (tb->cflags & CF_LAST_IO)
-         gen_io_end();
--done_generating:
-     gen_tb_end(tb, num_insns);
  
- #ifdef DEBUG_DISAS
+-        dc->base.pc_next = disas_insn(env, dc, dc->base.pc_next);
++        i386_tr_translate_insn(&dc->base, cs);
+         /* stop translation if indicated */
+         if (dc->base.is_jmp) {
+             break;
+         }
+         /* if single step mode, we generate only one instruction and
+            generate an exception */
+-        /* if irq were inhibited with HF_INHIBIT_IRQ_MASK, we clear
+-           the flag and abort the translation to give the irqs a
+-           change to be happen */
+-        if (dc->tf || dc->base.singlestep_enabled ||
+-            (dc->base.tb->flags & HF_INHIBIT_IRQ_MASK)) {
+-            gen_jmp_im(dc->base.pc_next - dc->cs_base);
+-            gen_eob(dc);
+-            break;
+-        }
+-        /* Do not cross the boundary of the pages in icount mode,
+-           it can cause an exception. Do it only when boundary is
+-           crossed by the first instruction in the block.
+-           If current instruction already crossed the bound - it's ok,
+-           because an exception hasn't stopped this code.
+-         */
+-        if ((tb->cflags & CF_USE_ICOUNT)
+-            && ((dc->base.pc_next & TARGET_PAGE_MASK)
+-                != ((dc->base.pc_next + TARGET_MAX_INSN_SIZE - 1) & TARGET_PAGE_MASK)
+-                || (dc->base.pc_next & ~TARGET_PAGE_MASK) == 0)) {
++        if (dc->base.singlestep_enabled) {
+             gen_jmp_im(dc->base.pc_next - dc->cs_base);
+             gen_eob(dc);
+             break;
+         }
+         /* if too long translation, stop generation too */
+         if (tcg_op_buf_full() ||
+-            (dc->base.pc_next - dc->base.pc_first) >= (TARGET_PAGE_SIZE - 32) ||
+             num_insns >= max_insns) {
+             gen_jmp_im(dc->base.pc_next - dc->cs_base);
+             gen_eob(dc);
 -- 
 2.13.5
