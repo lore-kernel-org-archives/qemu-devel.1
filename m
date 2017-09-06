@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpdQ4-0004WH-Rf
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:43:20 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dpdsx-0003mW-FC
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 13:13:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpdPv-0001KQ-Gg
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:43:16 -0400
-References: <cover.1504112256.git.jcody@redhat.com>
-	<fc2539281a00353777c10f37dea6ccdb6aae4285.1504112256.git.jcody@redhat.com>
-	<20170906130041.GI3753@dhcp-200-186.str.redhat.com>
-	<20170906150221.GB7570@localhost.localdomain>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f28c0ee8-68e5-34f6-3f92-2bdcce159bc8@redhat.com>
-Date: Wed, 6 Sep 2017 11:42:50 -0500
+	(envelope-from <vilanova@ac.upc.edu>) id 1dpdss-0005Dq-G2
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 13:13:07 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:57444)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dpdss-0005DY-0q
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 13:13:02 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed,  6 Sep 2017 20:12:47 +0300
+Message-Id: <150471796678.22700.13195884741555855506.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170906150221.GB7570@localhost.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="7anVeBFRGcUSvcc35oTmLuCgAlMUa75gx"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/3] block-jobs: Optionally
- unregister live block operations
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 00/21] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +25,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, mrezanin@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---7anVeBFRGcUSvcc35oTmLuCgAlMUa75gx
-From: Eric Blake <eblake@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>,
- qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com,
- mrezanin@redhat.com
-Message-ID: <f28c0ee8-68e5-34f6-3f92-2bdcce159bc8@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/3] block-jobs: Optionally
- unregister live block operations
-References: <cover.1504112256.git.jcody@redhat.com>
- <fc2539281a00353777c10f37dea6ccdb6aae4285.1504112256.git.jcody@redhat.com>
- <20170906130041.GI3753@dhcp-200-186.str.redhat.com>
- <20170906150221.GB7570@localhost.localdomain>
-In-Reply-To: <20170906150221.GB7570@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This series adds an API to add instrumentation events.
 
-On 09/06/2017 10:02 AM, Eduardo Habkost wrote:
-> On Wed, Sep 06, 2017 at 03:00:41PM +0200, Kevin Wolf wrote:
->> Am 30.08.2017 um 19:01 hat Jeff Cody geschrieben:
->>> From: Jeffrey Cody <jcody@redhat.com>
->>>
->>> If configured without live block operations enabled, unregister the
->>> live block operation commands.
->>>
->>> Signed-off-by: Jeff Cody <jcody@redhat.com>
->>
->> How sure are we that libvirt will like a qemu that advertises these
->> commands in the schema, but doesn't actually provide them?
->=20
-> If libvirt wants to know if a command is available, it uses
-> 'query-commands', not 'query-qmp-schema'.
->=20
-> The only query-qmp-schema elements used by latest libvirt are
-> gluster-related blockdev-add options (see
-> libvirt/src/qemu/qemu_capabilities.c:virQEMUCapsQMPSchemaQueries]]).
+It also provides additional APIs for:
+* Controlling tracing events
+* Peek/poke guest memory
 
-Indeed, libvirt is currently just fine with the fact that query-commands
-introspection hides disabled commands, even if they are still leaked in
-query-qmp-schema.  Besides, Marc-Andre's work on adding #if support to
-QAPI should probably also land in 2.11, at which point the hack goes
-away (because then we ARE properly hiding things from the schema
-introspection).
+There's still missing APIs for (can be added in later series?):
+* Provide something like tracing's per-vCPU trace states (i.e., so that e=
+ach
+  vCPU can have different instrumentation code). It's still not clear to =
+me if
+  we should extend the per-vCPU bitmap with instrumentation events, or ot=
+herwise
+  somehow reuse the bits in tracing events (since they're currently limit=
+ed).
+* Peek/poke guest registers
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+The instrumentation code is dynamically loaded as a library into QEMU eit=
+her
+when it starts or later using its remote control interfaces.
+
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+
+Changes in v3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Use a separate event set for instrumentation (i.e., do not instrument t=
+racing
+  events) [Stefan Hajnoczi].
+* Add API for peek/poke guest memory.
 
 
---7anVeBFRGcUSvcc35oTmLuCgAlMUa75gx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Changes in v2
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+* Update QEMU version in QAPI [Eric Blake].
+* Clarify 'msg' result in QAPI is for humans only.
+* Make 'msg' and 'handle' results optional in QAPI.
+* Use a list of 'str' in 'instr-load' QAPI command.
+* Update MAINTAINERS.
+* Add macros for error-reporting in API.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmwJYoACgkQp6FrSiUn
-Q2rqsgf/VTihbAou+M4jneRQtRhbSVOwjQiRahKQot0TFp6Qw3Wug4qTTeOc9D6O
-S97m/Z1rNKZveyghSjHsxJ1fiYd9Jqc6b65cTucUt43vHSkbC7Lpxz2F42BUCYEE
-TTi9fTlji4uMoHx3MC7o7x+DV46LTydudG0ax3OaqSGRETz5exPuXw9wIZniMC+p
-Ams4wonTh/SMIf7VXoQCHZxxm6PhLNjc6O7PIFtrmKMjIljFjxBtbqkX47eJMxLX
-7Gv1Vm0g5M2WEmSwuHW3zPSC9maGSFvdazp5W3D5MMIIWFjN8ZhFshq96zUriagL
-QyNwM5QcJsFcS96DaCUk5CSeSwkDnQ==
-=Ajsh
------END PGP SIGNATURE-----
 
---7anVeBFRGcUSvcc35oTmLuCgAlMUa75gx--
+Llu=C3=ADs Vilanova (21):
+      instrument: Add documentation
+      instrument: Add configure-time flag
+      instrument: Add generic library loader
+      instrument: [linux-user] Add command line library loader
+      instrument: [bsd-user] Add command line library loader
+      instrument: [softmmu] Add command line library loader
+      instrument: [qapi] Add library loader
+      instrument: [hmp] Add library loader
+      instrument: Add basic control interface
+      instrument: Add support for tracing events
+      instrument: Track vCPUs
+      instrument: Add event 'guest_cpu_enter'
+      instrument: Add event 'guest_cpu_exit'
+      instrument: Add event 'guest_cpu_reset'
+      trace: Introduce a proper structure to describe memory accesses
+      instrument: Add event 'guest_mem_before_trans'
+      instrument: Add event 'guest_mem_before_exec'
+      instrument: Add event 'guest_user_syscall'
+      instrument: Add event 'guest_user_syscall_ret'
+      instrument: Add API to manipulate guest memory
+      instrument: Add API to manipulate guest CPU registers
+
+
+ .gitignore                                |    1=20
+ MAINTAINERS                               |    7 +
+ Makefile                                  |    8 +
+ Makefile.objs                             |    4 +
+ Makefile.target                           |    1=20
+ bsd-user/main.c                           |   15 ++
+ bsd-user/syscall.c                        |   11 ++
+ configure                                 |   12 ++
+ cpus-common.c                             |    9 +
+ docs/instrument.txt                       |  174 +++++++++++++++++++++++=
++++
+ hmp-commands.hx                           |   28 ++++
+ include/exec/cpu_ldst_template.h          |   19 +--
+ include/exec/cpu_ldst_useronly_template.h |   19 +--
+ include/exec/helper-gen.h                 |    1=20
+ include/exec/helper-proto.h               |    1=20
+ include/exec/helper-tcg.h                 |    1=20
+ instrument/Makefile.objs                  |    9 +
+ instrument/cmdline.c                      |  124 ++++++++++++++++++
+ instrument/cmdline.h                      |   49 +++++++
+ instrument/control.c                      |  148 ++++++++++++++++++++++
+ instrument/control.h                      |  123 ++++++++++++++++++
+ instrument/control.inc.h                  |   56 ++++++++
+ instrument/error.h                        |   34 +++++
+ instrument/events.h                       |   86 +++++++++++++
+ instrument/events.inc.h                   |  108 ++++++++++++++++
+ instrument/helpers.h                      |    1=20
+ instrument/load.c                         |  196 +++++++++++++++++++++++=
+++++++
+ instrument/load.h                         |   87 +++++++++++++
+ instrument/qemu-instr/control.h           |  169 +++++++++++++++++++++++=
+++
+ instrument/qemu-instr/state.h             |  190 +++++++++++++++++++++++=
++++++
+ instrument/qemu-instr/types.h             |  122 ++++++++++++++++++
+ instrument/qemu-instr/types.inc.h         |   15 ++
+ instrument/qemu-instr/visibility.h        |   58 +++++++++
+ instrument/qmp.c                          |   88 +++++++++++++
+ instrument/state.c                        |  178 +++++++++++++++++++++++=
++++
+ instrument/trace.c                        |  125 ++++++++++++++++++
+ linux-user/main.c                         |   19 +++
+ linux-user/syscall.c                      |    6 +
+ monitor.c                                 |   60 +++++++++
+ qapi-schema.json                          |    3=20
+ qapi/instrument.json                      |   96 ++++++++++++++
+ qemu-options.hx                           |   19 +++
+ qom/cpu.c                                 |    2=20
+ stubs/Makefile.objs                       |    1=20
+ stubs/instrument.c                        |   25 ++++
+ tcg/tcg-op.c                              |   27 +++-
+ trace/control-target.c                    |    2=20
+ trace/control.c                           |    4 -
+ trace/control.h                           |   24 ++++
+ trace/mem-internal.h                      |   22 ++-
+ trace/mem.h                               |    8 +
+ vl.c                                      |   15 ++
+ 52 files changed, 2570 insertions(+), 40 deletions(-)
+ create mode 100644 docs/instrument.txt
+ create mode 100644 instrument/Makefile.objs
+ create mode 100644 instrument/cmdline.c
+ create mode 100644 instrument/cmdline.h
+ create mode 100644 instrument/control.c
+ create mode 100644 instrument/control.h
+ create mode 100644 instrument/control.inc.h
+ create mode 100644 instrument/error.h
+ create mode 100644 instrument/events.h
+ create mode 100644 instrument/events.inc.h
+ create mode 100644 instrument/helpers.h
+ create mode 100644 instrument/load.c
+ create mode 100644 instrument/load.h
+ create mode 100644 instrument/qemu-instr/control.h
+ create mode 100644 instrument/qemu-instr/state.h
+ create mode 100644 instrument/qemu-instr/types.h
+ create mode 100644 instrument/qemu-instr/types.inc.h
+ create mode 100644 instrument/qemu-instr/visibility.h
+ create mode 100644 instrument/qmp.c
+ create mode 100644 instrument/state.c
+ create mode 100644 instrument/trace.c
+ create mode 100644 qapi/instrument.json
+ create mode 100644 stubs/instrument.c
+
+
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Emilio G. Cota <cota@braap.org>
+Cc: Eric Blake <eblake@redhat.com>
