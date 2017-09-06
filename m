@@ -1,26 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dpbDw-0004U6-HD
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:22:47 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpbGD-0006H6-Ay
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:24:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dpbDs-0002bc-V9
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:22:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39896)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dpbDs-0002ab-N9
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:22:32 -0400
-Date: Wed, 6 Sep 2017 10:22:31 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <548852672.9319673.1504707751479.JavaMail.zimbra@redhat.com>
-In-Reply-To: <87efrk85ce.fsf@dusky.pond.sub.org>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-26-marcandre.lureau@redhat.com>
-	<87efrk85ce.fsf@dusky.pond.sub.org>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpbG6-0003nx-5t
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:24:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60004
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dpbG5-0003nn-W7
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:24:50 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v86EOPc5067079
+	for <qemu-devel@nongnu.org>; Wed, 6 Sep 2017 10:24:49 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cth6x6y9v-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 10:24:47 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 6 Sep 2017 15:24:17 +0100
+References: <20170905111645.18068-1-pasic@linux.vnet.ibm.com>
+	<20170905111645.18068-6-pasic@linux.vnet.ibm.com>
+	<20170906151821.1a77afe5.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 6 Sep 2017 16:24:13 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170906151821.1a77afe5.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 25/54] qapi-visit: add #if conditions to
- visitors
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <abc65014-f9fa-4cea-7f49-3e97e3845a3c@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 5/5] s390x/ccs: add ccw-tester emulated
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,129 +45,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Janosch Frank <frankja@linux.vnet.ibm.com>
 
 
 
------ Original Message -----
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->=20
-> > Wrap generated code with #if/#endif using the ifcond_decorator.
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  scripts/qapi-visit.py | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> > diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-> > index c29c2d869e..bb18c9edee 100644
-> > --- a/scripts/qapi-visit.py
-> > +++ b/scripts/qapi-visit.py
-> > @@ -267,6 +267,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
-> >          self.decl =3D None
-> >          self.defn =3D None
-> >          self._btin =3D None
-> > +        self.if_members =3D ['decl', 'defn', '_btin']
-> > =20
-> >      def visit_begin(self, schema):
-> >          self.decl =3D ''
-> > @@ -282,6 +283,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
-> >          self.decl =3D self._btin + self.decl
-> >          self._btin =3D None
-> > =20
-> > +    @ifcond_decorator
-> >      def visit_enum_type(self, name, info, values, prefix, ifcond):
-> >          # Special case for our lone builtin enum type
-> >          # TODO use something cleaner than existence of info
-> > @@ -293,6 +295,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
-> >              self.decl +=3D gen_visit_decl(name, scalar=3DTrue)
-> >              self.defn +=3D gen_visit_enum(name)
-> > =20
-> > +    @ifcond_decorator
-> >      def visit_array_type(self, name, info, element_type, ifcond):
-> >          decl =3D gen_visit_decl(name)
-> >          defn =3D gen_visit_list(name, element_type)
-> > @@ -304,6 +307,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
-> >              self.decl +=3D decl
-> >              self.defn +=3D defn
-> > =20
-> > +    @ifcond_decorator
-> >      def visit_object_type(self, name, info, base, members, variants,
-> >      ifcond):
-> >          # Nothing to do for the special empty builtin
-> >          if name =3D=3D 'q_empty':
-> > @@ -317,6 +321,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
-> >              self.decl +=3D gen_visit_decl(name)
-> >              self.defn +=3D gen_visit_object(name, base, members, varia=
-nts)
-> > =20
-> > +    @ifcond_decorator
-> >      def visit_alternate_type(self, name, info, variants, ifcond):
-> >          self.decl +=3D gen_visit_decl(name)
-> >          self.defn +=3D gen_visit_alternate(name, variants)
->=20
-> make check fails to compile, first error:
->=20
+On 09/06/2017 03:18 PM, Cornelia Huck wrote:
+> On Tue,  5 Sep 2017 13:16:45 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> Add a fake device meant for testing the correctness of our css emulation.
+>>
+>> What we currently have is writing a Fibonacci sequence of uint32_t to the
+>> device via ccw write. The write is going to fail if it ain't a Fibonacci
+>> and indicate a device exception in scsw together with the proper residual
+>> count.
+>>
+>> Of course lot's of invalid inputs (besides basic data processing) can be
+>> tested with that as well.
+>>
+>> Usage:
+>> 1) fire up a qemu with something like -device ccw-tester,devno=fe.0.0001
+>>    on the command line
+>> 2) exercise the device from the guest
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> ---
+>>
+>> It may not make sense to merge this work in the current form, as it is
+>> solely for test purposes.
+>> ---
+>>  hw/s390x/Makefile.objs |   1 +
+>>  hw/s390x/ccw-tester.c  | 179 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 180 insertions(+)
+>>  create mode 100644 hw/s390x/ccw-tester.c
+> 
+> The main problem here is that you want to exercise a middle layer (the
+> css code) and need to write boilerplate code on both host and guest
+> side in order to be able to do so.
+> 
 
-I'll merge back qapi-types & qapi-visited #if addition (regression from the=
- split).=20
+Nod.
 
-> make -C ~/work/qemu/bld-x86/ check
-> make: Entering directory '/work/armbru/qemu/bld-x86'
-> [...]
->   GEN     tests/test-qapi-types.c
->   CC      tests/test-qapi-types.o
-> tests/test-qapi-types.c: In function =E2=80=98qapi_free_TestIfAlternate=
-=E2=80=99:
-> tests/test-qapi-types.c:190:5: warning: implicit declaration of function
-> =E2=80=98visit_type_TestIfAlternate=E2=80=99; did you mean =E2=80=98visit=
-_type_UserDefAlternate=E2=80=99?
-> [-Wimplicit-function-declaration]
->      visit_type_TestIfAlternate(v, NULL, &obj, NULL);
->      ^~~~~~~~~~~~~~~~~~~~~~~~~~
->      visit_type_UserDefAlternate
-> tests/test-qapi-types.c:190:5: warning: nested extern declaration of
-> =E2=80=98visit_type_TestIfAlternate=E2=80=99 [-Wnested-externs]
-> tests/test-qapi-types.c: In function =E2=80=98qapi_free_TestIfStruct=E2=
-=80=99:
-> tests/test-qapi-types.c:213:5: warning: implicit declaration of function
-> =E2=80=98visit_type_TestIfStruct=E2=80=99; did you mean =E2=80=98visit_ty=
-pe_TestStruct=E2=80=99?
-> [-Wimplicit-function-declaration]
->      visit_type_TestIfStruct(v, NULL, &obj, NULL);
->      ^~~~~~~~~~~~~~~~~~~~~~~
->      visit_type_TestStruct
-> tests/test-qapi-types.c:213:5: warning: nested extern declaration of
-> =E2=80=98visit_type_TestIfStruct=E2=80=99 [-Wnested-externs]
-> tests/test-qapi-types.c: In function =E2=80=98qapi_free_TestIfUnion=E2=80=
-=99:
-> tests/test-qapi-types.c:226:5: warning: implicit declaration of function
-> =E2=80=98visit_type_TestIfUnion=E2=80=99; did you mean =E2=80=98visit_typ=
-e_TestStruct=E2=80=99?
-> [-Wimplicit-function-declaration]
->      visit_type_TestIfUnion(v, NULL, &obj, NULL);
->      ^~~~~~~~~~~~~~~~~~~~~~
->      visit_type_TestStruct
-> tests/test-qapi-types.c:226:5: warning: nested extern declaration of
-> =E2=80=98visit_type_TestIfUnion=E2=80=99 [-Wnested-externs]
->   GEN     tests/test-qapi-event.c
->   CC      tests/test-qapi-event.o
->   GEN     tests/test-qmp-introspect.c
->   CC      tests/test-qmp-introspect.o
->   LINK    tests/test-qobject-output-visitor
-> tests/test-qapi-types.o: In function `qapi_free_TestIfAlternate':
-> /work/armbru/qemu/bld-x86/tests/test-qapi-types.c:190: undefined referenc=
-e to
-> `visit_type_TestIfAlternate'
-> tests/test-qapi-types.o: In function `qapi_free_TestIfStruct':
-> test-qapi-types.c:(.text+0x361): undefined reference to
-> `visit_type_TestIfStruct'
-> tests/test-qapi-types.o: In function `qapi_free_TestIfUnion':
-> test-qapi-types.c:(.text+0x3af): undefined reference to
-> `visit_type_TestIfUnion'
-> collect2: error: ld returned 1 exit status
-> make: *** [/work/armbru/qemu/rules.mak:121:
-> tests/test-qobject-output-visitor] Error 1
-> make: Leaving directory '/work/armbru/qemu/bld-x86'
->=20
+> In general, a device that accepts arbitrary channel programs looks
+> useful for testing purposes. I would split out processing of expected
+> responses out, though, so that it can be more easily reused for
+> different use cases.
+> 
+
+I'm not sure what do you mean here. Could you clarify please?
+
+> (I dimly recall other test devices...)
+> 
+
+What's on your mind? How do these relate to our problem? Can you
+give me some pointers?
+
+> For the guest tester: Can that be done via the qtest infrastructure
+> somehow?
+> 
+
+Well, for now I have the out-of-tree Linux kernel module provided in the
+cover letter of the series (you did not comment on that one yet).
+
+I think for building trust regarding my IDA implementation it should be
+able to do the job. Don't you agree?
+
+Just a couple of hours ago Janosch (cc-ing Janosch) came to my office,
+and told be that he is working on CCW-tests for zonk (a minimal kernel
+for testing -- internal tool AFAIR).
+
+By qtest you mean libqtest/libqos? I'm not familiar with that and have no
+idea what do we have for s390x. I see on libqos-s390x file in test/libqos
+for starters.
+
+Regards,
+Halil
