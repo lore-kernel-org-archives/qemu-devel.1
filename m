@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56520)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpb8B-0007cJ-PQ
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:16:40 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dpbB9-0002Mx-9O
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:19:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpb86-00084V-NK
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:16:39 -0400
-Date: Wed, 6 Sep 2017 15:16:31 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170906141631.GE15535@stefanha-x1.localdomain>
-References: <20170901201054.11738-1-briansteffens@gmail.com>
-	<20170905095610.GF17449@stefanha-x1.localdomain>
-	<CALGxsMdOM_pv-uqMoC0MSVo0ai1vm_nHdZ5U8BNt+YNMXQEpkA@mail.gmail.com>
+	(envelope-from <dgilbert@redhat.com>) id 1dpbB5-0001Md-6T
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:19:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58402)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dpbB5-0001MG-09
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:19:39 -0400
+Date: Wed, 6 Sep 2017 15:19:32 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170906141931.GC8457@work-vm>
+References: <20170825141940.20740-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALGxsMdOM_pv-uqMoC0MSVo0ai1vm_nHdZ5U8BNt+YNMXQEpkA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH 1/1] block: add block device shared field
+In-Reply-To: <20170825141940.20740-1-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] Fix double loadvm failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,33 +26,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brian Steffens <briansteffens@gmail.com>
-Cc: qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org, shorne@gmail.com, quintela@redhat.com, mreitz@redhat.com
+Cc: peterx@redhat.com, lvivier@redhat.com
 
-On Tue, Sep 05, 2017 at 11:10:55AM -0400, Brian Steffens wrote:
-> > Have you considered extending the 'migrate' command with a list of
-> > drives instead?
+* Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > 
-> That was my original plan but I thought having information on whether a
-> device is shared or not could potentially be useful to other systems. If
-> not then you're right, it would be a lighter touch to add it only to the
-> 'migrate' command.
-
-I agree with Fam that bs->shared doesn't necessarily have the same
-meaning to everyone.  Therefore I suggest extending the 'migrate'
-command instead.
-
-> > In case you haven't seen it, the preferred approach for non-shared
-> > storage migration is drive-mirror + NBD.  The block/migration.c code is
-> > an older feature that is less flexible.  More info on drive-mirror +
-> > NBD:
+> lp: https://bugs.launchpad.net/qemu/+bug/1712564
 > 
-> I didn't realize drive-mirror + NBD was the preferred approach. Are
-> there any plans to drop support for the block/migration.c style?
+> Reported-by: Stafford Horne <shorne@gmail.com>
+> 
+> Dr. David Alan Gilbert (2):
+>   migration: Reset rather than destroy main_thread_load_event
+>   snapshot/tests: Try loadvm twice
+> 
+>  migration/migration.c      | 2 +-
+>  tests/qemu-iotests/068     | 2 +-
+>  tests/qemu-iotests/068.out | 4 ++++
+>  3 files changed, 6 insertions(+), 2 deletions(-)
 
-migration/block.c is not formally deprecated yet.  It's still used by
-libvirt in situations where NBD connections are not desirable.
-Eventually it will probably be deprecated and then removed after 2 more
-QEMU releases according to the deprecation policy (see qemu-doc.texi).
+Queued
 
-Stefan
+> -- 
+> 2.13.5
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
