@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41649)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpcqV-0008Qv-Sa
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:41 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dpcqa-0008W7-J3
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpcqM-0001eo-GW
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:31 -0400
-Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:33604)
+	(envelope-from <richard.henderson@linaro.org>) id 1dpcqZ-0002BM-7u
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:36 -0400
+Received: from mail-pf0-x22c.google.com ([2607:f8b0:400e:c00::22c]:33132)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dpcqM-0001cE-B5
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:22 -0400
-Received: by mail-pg0-x22a.google.com with SMTP id t3so16077697pgt.0
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 09:06:22 -0700 (PDT)
+	id 1dpcqY-0002A9-Vs
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:35 -0400
+Received: by mail-pf0-x22c.google.com with SMTP id y68so13495970pfd.0
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 09:06:34 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  6 Sep 2017 09:05:45 -0700
-Message-Id: <20170906160612.22769-6-richard.henderson@linaro.org>
+Date: Wed,  6 Sep 2017 09:05:54 -0700
+Message-Id: <20170906160612.22769-15-richard.henderson@linaro.org>
 In-Reply-To: <20170906160612.22769-1-richard.henderson@linaro.org>
 References: <20170906160612.22769-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 05/32] target/arm: Delay check for magic kernel
- page
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 14/32] target/i386: [tcg] Port to generic
+ translation framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,59 +31,152 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Richard Henderson <rth@twiddle.net>
 
-From: Richard Henderson <rth@twiddle.net>
+From: Lluís Vilanova <vilanova@ac.upc.edu>
 
-There's nothing magic about the exception that we generate in order
-to execute the magic kernel page.  We can and should allow gdb to
-set a breakpoint at this location.
-
+Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 Reviewed-by: Emilio G. Cota <cota@braap.org>
+Tested-by: Emilio G. Cota <cota@braap.org>
+Message-Id: <150002267714.22386.5095442346868988808.stgit@frigg.lan>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/arm/translate.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ target/i386/translate.c | 106 +++++++++---------------------------------------
+ 1 file changed, 19 insertions(+), 87 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 0c39c2b996..746193eebc 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -11968,17 +11968,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-                            0);
-         num_insns++;
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index ad4b2735f4..de0c989763 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -8450,6 +8450,10 @@ static int i386_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu,
+     return max_insns;
+ }
  
--#ifdef CONFIG_USER_ONLY
--        /* Intercept jump to the magic kernel page.  */
--        if (dc->pc >= 0xffff0000) {
--            /* We always get here via a jump, so know we are not in a
--               conditional execution block.  */
--            gen_exception_internal(EXCP_KERNEL_TRAP);
--            dc->is_jmp = DISAS_NORETURN;
++static void i386_tr_tb_start(DisasContextBase *db, CPUState *cpu)
++{
++}
++
+ static void i386_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+@@ -8469,7 +8473,7 @@ static bool i386_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
+         /* The address covered by the breakpoint must be included in
+            [tb->pc, tb->pc + tb->size) in order to for it to be
+            properly cleared -- thus we increment the PC here so that
+-           the logic setting tb->size below does the right thing.  */
++           the generic logic setting tb->size later does the right thing.  */
+         dc->base.pc_next += 1;
+         return true;
+     } else {
+@@ -8533,94 +8537,22 @@ static void i386_tr_disas_log(const DisasContextBase *dcbase,
+     log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size, disas_flags);
+ }
+ 
+-/* generate intermediate code for basic block 'tb'.  */
+-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+-{
+-    DisasContext dc1, *dc = &dc1;
+-    int num_insns;
+-    int max_insns;
+-
+-    /* generate intermediate code */
+-    dc->base.singlestep_enabled = cs->singlestep_enabled;
+-    dc->base.tb = tb;
+-    dc->base.is_jmp = DISAS_NEXT;
+-    dc->base.pc_first = tb->pc;
+-    dc->base.pc_next = dc->base.pc_first;
+-
+-    max_insns = tb->cflags & CF_COUNT_MASK;
+-    if (max_insns == 0) {
+-        max_insns = CF_COUNT_MASK;
+-    }
+-    if (max_insns > TCG_MAX_INSNS) {
+-        max_insns = TCG_MAX_INSNS;
+-    }
+-    max_insns = i386_tr_init_disas_context(&dc->base, cs, max_insns);
+-
+-    num_insns = 0;
+-    gen_tb_start(tb);
+-    for(;;) {
+-        i386_tr_insn_start(&dc->base, cs);
+-        num_insns++;
+-
+-        if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
+-            CPUBreakpoint *bp;
+-            QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
+-                if (bp->pc == dc->base.pc_next) {
+-                    if (i386_tr_breakpoint_check(&dc->base, cs, bp)) {
+-                        break;
+-                    }
+-                }
+-            }
+-
+-            if (dc->base.is_jmp == DISAS_NORETURN) {
+-                break;
+-            }
+-        }
+-
+-        if (num_insns == max_insns && (tb->cflags & CF_LAST_IO)) {
+-            gen_io_start();
+-        }
+-
+-        i386_tr_translate_insn(&dc->base, cs);
+-        /* stop translation if indicated */
+-        if (dc->base.is_jmp) {
 -            break;
 -        }
--#endif
--
-         if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
-             CPUBreakpoint *bp;
-             QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
-@@ -12010,6 +11999,17 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-             gen_io_start();
-         }
+-        /* if single step mode, we generate only one instruction and
+-           generate an exception */
+-        if (dc->base.singlestep_enabled) {
+-            dc->base.is_jmp = DISAS_TOO_MANY;
+-            break;
+-        }
+-        /* if too long translation, stop generation too */
+-        if (tcg_op_buf_full() ||
+-            num_insns >= max_insns) {
+-            dc->base.is_jmp = DISAS_TOO_MANY;
+-            break;
+-        }
+-        if (singlestep) {
+-            dc->base.is_jmp = DISAS_TOO_MANY;
+-            break;
+-        }
+-    }
+-    i386_tr_tb_stop(&dc->base, cs);
+-    if (tb->cflags & CF_LAST_IO)
+-        gen_io_end();
+-    gen_tb_end(tb, num_insns);
++static const TranslatorOps i386_tr_ops = {
++    .init_disas_context = i386_tr_init_disas_context,
++    .tb_start           = i386_tr_tb_start,
++    .insn_start         = i386_tr_insn_start,
++    .breakpoint_check   = i386_tr_breakpoint_check,
++    .translate_insn     = i386_tr_translate_insn,
++    .tb_stop            = i386_tr_tb_stop,
++    .disas_log          = i386_tr_disas_log,
++};
  
-+#ifdef CONFIG_USER_ONLY
-+        /* Intercept jump to the magic kernel page.  */
-+        if (dc->pc >= 0xffff0000) {
-+            /* We always get here via a jump, so know we are not in a
-+               conditional execution block.  */
-+            gen_exception_internal(EXCP_KERNEL_TRAP);
-+            dc->is_jmp = DISAS_NORETURN;
-+            break;
-+        }
-+#endif
-+
-         if (dc->ss_active && !dc->pstate_ss) {
-             /* Singlestep state is Active-pending.
-              * If we're in this state at the start of a TB then either
+-    tb->size = dc->base.pc_next - dc->base.pc_first;
+-    tb->icount = num_insns;
++/* generate intermediate code for basic block 'tb'.  */
++void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
++{
++    DisasContext dc;
+ 
+-#ifdef DEBUG_DISAS
+-    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+-        && qemu_log_in_addr_range(dc->base.pc_first)) {
+-        qemu_log_lock();
+-        qemu_log("----------------\n");
+-        i386_tr_disas_log(&dc->base, cs);
+-        qemu_log("\n");
+-        qemu_log_unlock();
+-    }
+-#endif
++    translator_loop(&i386_tr_ops, &dc.base, cpu, tb);
+ }
+ 
+ void restore_state_to_opc(CPUX86State *env, TranslationBlock *tb,
 -- 
 2.13.5
