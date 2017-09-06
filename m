@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58367)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dpfIU-0004oO-3u
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:43:39 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dpfIc-0004wP-93
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:43:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <danielhb@linux.vnet.ibm.com>) id 1dpfIP-0002gw-9g
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:43:34 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54724)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <danielhb@linux.vnet.ibm.com>)
-	id 1dpfIP-0002gK-1B
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:43:29 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v86Ied8J050673
-	for <qemu-devel@nongnu.org>; Wed, 6 Sep 2017 14:43:27 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2ctpfjgbqk-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 14:43:27 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <danielhb@linux.vnet.ibm.com>;
-	Wed, 6 Sep 2017 14:43:21 -0400
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Date: Wed,  6 Sep 2017 15:43:05 -0300
-Message-Id: <20170906184305.2612-1-danielhb@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH] hw/ppc/spapr.c: cleaning up qdev_get_machine()
- calls
+	(envelope-from <vilanova@ac.upc.edu>) id 1dpfIZ-0002lS-4K
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:43:42 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:53873)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dpfIY-0002l8-LU
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:43:39 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed,  6 Sep 2017 21:43:28 +0300
+Message-Id: <150472340780.24907.7057286910324120181.stgit@frigg.lan>
+In-Reply-To: <150471856141.24907.274176769201097378.stgit@frigg.lan>
+References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v4 20/20] instrument: Add API to manipulate
+ guest memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,110 +28,232 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, mdroth@linux.vnet.ibm.com
+Cc: Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
 
-This patch removes the qdev_get_machine() calls that are made in
-spapr.c in situations where we can get an existing pointer for
-the MachineState by either passing it as an argument to the function
-or by using other already available pointers.
+It includes access to the guest's memory and vCPU registers.
 
-The following changes were made:
-
-- spapr_node0_size: static function that is called two times:
-at spapr_setup_hpt_and_vrma and ppc_spapr_init. In both cases we can
-pass an existing MachineState pointer to it.
-
-- spapr_build_fdt: MachineState pointer can be retrieved from
-the existing sPAPRMachineState pointer.
-
-- spapr_boot_set: the opaque in the first arg is a sPAPRMachineState
-pointer as we can see inside ppc_spapr_init:
-
-    qemu_register_boot_set(spapr_boot_set, spapr);
-
-We can get a MachineState pointer from it.
-
-- spapr_machine_device_plug and spapr_machine_device_unplug_request: the
-MachineState, sPAPRMachineState, MachineClass and sPAPRMachineClass pointers
-can all be retrieved from the HotplugHandler pointer.
-
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- hw/ppc/spapr.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ instrument/Makefile.objs      |    1=20
+ instrument/qemu-instr/state.h |  104 +++++++++++++++++++++++++++++++++++=
+++++++
+ instrument/state.c            |   72 ++++++++++++++++++++++++++++
+ 3 files changed, 177 insertions(+)
+ create mode 100644 instrument/qemu-instr/state.h
+ create mode 100644 instrument/state.c
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index cec441c..6ac3390 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -390,10 +390,8 @@ static int spapr_fixup_cpu_dt(void *fdt, sPAPRMachineState *spapr)
-     return ret;
- }
- 
--static hwaddr spapr_node0_size(void)
-+static hwaddr spapr_node0_size(MachineState *machine)
- {
--    MachineState *machine = MACHINE(qdev_get_machine());
--
-     if (nb_numa_nodes) {
-         int i;
-         for (i = 0; i < nb_numa_nodes; ++i) {
-@@ -1027,7 +1025,7 @@ static void *spapr_build_fdt(sPAPRMachineState *spapr,
-                              hwaddr rtas_addr,
-                              hwaddr rtas_size)
- {
--    MachineState *machine = MACHINE(qdev_get_machine());
-+    MachineState *machine = MACHINE(spapr);
-     MachineClass *mc = MACHINE_GET_CLASS(machine);
-     sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
-     int ret;
-@@ -1347,7 +1345,7 @@ void spapr_setup_hpt_and_vrma(sPAPRMachineState *spapr)
-     spapr_reallocate_hpt(spapr, hpt_shift, &error_fatal);
- 
-     if (spapr->vrma_adjust) {
--        spapr->rma_size = kvmppc_rma_size(spapr_node0_size(),
-+        spapr->rma_size = kvmppc_rma_size(spapr_node0_size(MACHINE(spapr)),
-                                           spapr->htab_shift);
-     }
-     /* We're setting up a hash table, so that means we're not radix */
-@@ -2007,7 +2005,7 @@ static SaveVMHandlers savevm_htab_handlers = {
- static void spapr_boot_set(void *opaque, const char *boot_device,
-                            Error **errp)
- {
--    MachineState *machine = MACHINE(qdev_get_machine());
-+    MachineState *machine = MACHINE(opaque);
-     machine->boot_order = g_strdup(boot_device);
- }
- 
-@@ -2154,7 +2152,7 @@ static void ppc_spapr_init(MachineState *machine)
-     MemoryRegion *rma_region;
-     void *rma = NULL;
-     hwaddr rma_alloc_size;
--    hwaddr node0_size = spapr_node0_size();
-+    hwaddr node0_size = spapr_node0_size(machine);
-     long load_limit, fw_size;
-     char *filename;
-     Error *resize_hpt_err = NULL;
-@@ -3198,7 +3196,8 @@ out:
- static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
-                                       DeviceState *dev, Error **errp)
- {
--    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(qdev_get_machine());
-+    MachineState *ms = MACHINE(hotplug_dev);
-+    sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-         int node;
-@@ -3247,8 +3246,8 @@ static void spapr_machine_device_plug(HotplugHandler *hotplug_dev,
- static void spapr_machine_device_unplug_request(HotplugHandler *hotplug_dev,
-                                                 DeviceState *dev, Error **errp)
- {
--    sPAPRMachineState *sms = SPAPR_MACHINE(qdev_get_machine());
--    MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
-+    sPAPRMachineState *sms = SPAPR_MACHINE(OBJECT(hotplug_dev));
-+    MachineClass *mc = MACHINE_GET_CLASS(sms);
- 
-     if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
-         if (spapr_ovec_test(sms->ov5_cas, OV5_HP_EVT)) {
--- 
-2.9.4
+diff --git a/instrument/Makefile.objs b/instrument/Makefile.objs
+index 8258dbfa79..c9bc4e75f4 100644
+--- a/instrument/Makefile.objs
++++ b/instrument/Makefile.objs
+@@ -6,3 +6,4 @@ target-obj-y +=3D qmp.o
+=20
+ target-obj-$(CONFIG_INSTRUMENT) +=3D control.o
+ target-obj-$(CONFIG_INSTRUMENT) +=3D trace.o
++target-obj-$(CONFIG_INSTRUMENT) +=3D state.o
+diff --git a/instrument/qemu-instr/state.h b/instrument/qemu-instr/state.=
+h
+new file mode 100644
+index 0000000000..0ae6255fe5
+--- /dev/null
++++ b/instrument/qemu-instr/state.h
+@@ -0,0 +1,104 @@
++/*
++ * Interface for accessing guest state.
++ *
++ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef QI__STATE_H
++#define QI__STATE_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#include <qemu-instr/types.h>
++
++
++/**
++ * qi_mem_read_virt:
++ * @vcpu: CPU to use for address translation.
++ * @vaddr: Starting virtual address to read from.
++ * @size: Number of bytes to read.
++ * @buf: Buffer to write into.
++ *
++ * Read contents from virtual memory.
++ *
++ * Returns: Whether the range of virtual addresses to read could be tran=
+slated.
++ *
++ * Warning: Even on error, some of the destination buffer might have bee=
+n
++ *          modified.
++ *
++ * Precondition: The output buffer has at least "size" bytes.
++ */
++bool qi_mem_read_virt(QICPU vcpu, uint64_t vaddr, size_t size, void *buf=
+);
++
++/**
++ * qi_mem_write_virt:
++ * @vcpu: CPU to use for address translation.
++ * @vaddr: Starting virtual address to write into.
++ * @size: Number of bytes to write.
++ * @buf: Buffer with the contents to write from.
++ *
++ * Write contents into virtual memory.
++ *
++ * Returns: Whether the range of virtual addresses to write could be tra=
+nslated.
++ *
++ * Warning: Even on error, some of the destination memory might have bee=
+n
++ *          modified.
++ * Precondition: The input buffer has at least "size" bytes.
++ */
++bool qi_mem_write_virt(QICPU vcpu, uint64_t vaddr, size_t size, void *bu=
+f);
++
++/**
++ * qi_mem_virt_to_phys:
++ * @vcpu: CPU to use for address translation.
++ * @vaddr: Virtual address to translate.
++ * @paddr: Pointer to output physical address.
++ *
++ * Translate a virtual address into a physical address.
++ *
++ * Returns: Whether the address could be translated.
++ */
++bool qi_mem_virt_to_phys(QICPU vcpu, uint64_t vaddr, uint64_t *paddr);
++
++/**
++ * qi_mem_read_phys:
++ * @paddr: Starting physical address to read from.
++ * @size: Number of bytes to read.
++ * @buf: Buffer to write into.
++ *
++ * Read contents from physical memory.
++ *
++ * Returns: Whether the range of physical addresses is valid.
++ *
++ * Warning: Even on error, some of the destination buffer might have bee=
+n
++ *          modified.
++ * Precondition: The output buffer has at least "size" bytes.
++ */
++bool qi_mem_read_phys(uint64_t paddr, size_t size, void *buf);
++
++/**
++ * qi_mem_write_phys:
++ * @paddr: Starting physical address to write into.
++ * @size: Number of bytes to write.
++ * @buf: Buffer with the contents to write from.
++ *
++ * Write contents into virtual memory.
++ *
++ * Returns: Whether the range of physical addresses is valid.
++ *
++ * Warning: Even on error, some of the destination memory might have bee=
+n
++ *          modified.
++ *
++ * Precondition: The input buffer has at least "size" bytes.
++ */
++bool qi_mem_write_phys(uint64_t paddr, size_t size, void *buf);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif  /* QI__STATE_H */
+diff --git a/instrument/state.c b/instrument/state.c
+new file mode 100644
+index 0000000000..4bf99b4882
+--- /dev/null
++++ b/instrument/state.c
+@@ -0,0 +1,72 @@
++/*
++ * Interface for accessing guest state.
++ *
++ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "exec/cpu-all.h"
++#include "instrument/control.h"
++#include "instrument/error.h"
++#include "instrument/qemu-instr/state.h"
++#include "instrument/qemu-instr/visibility.h"
++
++
++QI_VPUBLIC bool qi_mem_read_virt(QICPU vcpu, uint64_t vaddr,
++                                 size_t size, void *buf)
++{
++    CPUState *vcpu_ =3D instr_cpu_get(vcpu);
++    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
+ion");
++    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
++    return cpu_memory_rw_debug(vcpu_, vaddr, buf, size, 0) =3D=3D 0;
++}
++
++QI_VPUBLIC bool qi_mem_write_virt(QICPU vcpu, uint64_t vaddr,
++                                  size_t size, void *buf)
++{
++    CPUState *vcpu_ =3D instr_cpu_get(vcpu);
++    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
+ion");
++    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
++    return cpu_memory_rw_debug(vcpu_, vaddr, buf, size, 1) =3D=3D 0;
++}
++
++QI_VPUBLIC bool qi_mem_virt_to_phys(QICPU vcpu, uint64_t vaddr, uint64_t=
+ *paddr)
++{
++    CPUState *vcpu_ =3D instr_cpu_get(vcpu);
++    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
+ion");
++    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
++
++#if defined(CONFIG_USER_ONLY)
++    *paddr =3D vaddr;
++    return true;
++#else
++    *paddr =3D cpu_get_phys_page_debug(vcpu_, vaddr);
++    return *paddr !=3D -1;
++#endif
++}
++
++QI_VPUBLIC bool qi_mem_read_phys(uint64_t paddr, size_t size, void *buf)
++{
++    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
+ion");
++#if defined(CONFIG_USER_ONLY)
++    return cpu_memory_rw_debug(NULL, paddr, buf, size, 0) =3D=3D 0;
++#else
++    cpu_physical_memory_read(paddr, buf, size);
++    return true;
++#endif
++}
++
++QI_VPUBLIC bool qi_mem_write_phys(uint64_t paddr, size_t size, void *buf=
+)
++{
++    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
+ion");
++#if defined(CONFIG_USER_ONLY)
++    return cpu_memory_rw_debug(NULL, paddr, buf, size, 1) =3D=3D 0;
++#else
++    cpu_physical_memory_write(paddr, buf, size);
++    return true;
++#endif
++}
