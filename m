@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49261)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35822)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dpikh-00032i-5b
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 18:24:56 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dpjZT-00062U-Ms
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 19:17:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dpikc-0002fb-Ds
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 18:24:55 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:41671)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dpikc-0002fI-7B
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 18:24:50 -0400
-Date: Wed, 6 Sep 2017 18:24:48 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170906222448.GA21183@flamenco>
-References: <150471163020.18882.9386672218918089445.stgit@frigg.lan>
+	(envelope-from <alistair23@gmail.com>) id 1dpjZS-0002RV-Rg
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 19:17:23 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <150471163020.18882.9386672218918089445.stgit@frigg.lan>
-Subject: Re: [Qemu-devel] [PATCH] trace: Immediately apply per-vCPU state
- changes if a vCPU is being created
+In-Reply-To: <a0cce589-b6e1-d17e-34df-f8232c64e5fa@linaro.org>
+References: <1504626814-23124-1-git-send-email-peter.maydell@linaro.org>
+	<1504626814-23124-2-git-send-email-peter.maydell@linaro.org>
+	<a0cce589-b6e1-d17e-34df-f8232c64e5fa@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 6 Sep 2017 16:16:44 -0700
+Message-ID: <CAKmqyKPy=Vja7Bq6KTWKh8mrHyJht8rHxcRzC+vHY5DknXjC=g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 1/3] boards.h: Define new flag
+ ignore_memory_transaction_failures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +24,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
-Cc: qemu-devel@nongnu.org, stefanha@gmail.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-On Wed, Sep 06, 2017 at 18:27:10 +0300, Lluís Vilanova wrote:
-> Right now, function trace_event_set_vcpu_state_dynamic() asynchronously enables
-> events in the case a vCPU is executing TCG code. If the vCPU is being created
-> this makes some events like "guest_cpu_enter" to not be traced.
-> 
-> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-> ---
->  trace/control-target.c |   19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
-> 
-> diff --git a/trace/control-target.c b/trace/control-target.c
-> index 4e36101997..0056da6a46 100644
-> --- a/trace/control-target.c
-> +++ b/trace/control-target.c
-> @@ -88,13 +88,18 @@ void trace_event_set_vcpu_state_dynamic(CPUState *vcpu,
->              clear_bit(vcpu_id, vcpu->trace_dstate_delayed);
->              (*ev->dstate)--;
->          }
-> -        /*
-> -         * Delay changes until next TB; we want all TBs to be built from a
-> -         * single set of dstate values to ensure consistency of generated
-> -         * tracing code.
-> -         */
-> -        async_run_on_cpu(vcpu, trace_event_synchronize_vcpu_state_dynamic,
-> -                         RUN_ON_CPU_NULL);
-> +        if (vcpu->created) {
-> +            /*
-> +             * Delay changes until next TB; we want all TBs to be built from a
-> +             * single set of dstate values to ensure consistency of generated
-> +             * tracing code.
-> +             */
-> +            async_run_on_cpu(vcpu, trace_event_synchronize_vcpu_state_dynamic,
-> +                             RUN_ON_CPU_NULL);
-> +        } else {
-> +            run_on_cpu_data ignored;
-> +            trace_event_synchronize_vcpu_state_dynamic(vcpu, ignored);
+On Tue, Sep 5, 2017 at 9:03 AM, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 09/05/2017 08:53 AM, Peter Maydell wrote:
+>> Define a new MachineClass field ignore_memory_transaction_failures.
+>> If this is flag is true then the CPU will ignore memory transaction
+>> failures which should cause the CPU to take an exception due to an
+>> access to an unassigned physical address; the transaction will
+>> instead return zero (for a read) or be ignored (for a write).  This
+>> should be set only by legacy board models which rely on the old
+>> RAZ/WI behaviour for handling devices that QEMU does not yet model.
+>> New board models should instead use "unimplemented-device" for all
+>> memory ranges where the guest will attempt to probe for a device that
+>> QEMU doesn't implement and a stub device is required.
+>>
+>> We need this for ARM boards, where we're about to implement support for
+>> generating external aborts on memory transaction failures. Too many
+>> of our legacy board models rely on the RAZ/WI behaviour and we
+>> would break currently working guests when their "probe for device"
+>> code provoked an external abort rather than a RAZ.
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>>  include/hw/boards.h | 11 +++++++++++
+>>  include/qom/cpu.h   |  7 ++++++-
+>>  qom/cpu.c           | 16 ++++++++++++++++
+>>  3 files changed, 33 insertions(+), 1 deletion(-)
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-I'd prefer RUN_ON_CPU_NULL here instead of the ignored param.
-Other than that,
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-Reviewed-by: Emilio G. Cota <cota@braap.org>
+Thanks,
+Alistair
 
-		E.
+>
+>
+> r~
+>
