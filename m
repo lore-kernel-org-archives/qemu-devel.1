@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36880)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dphpF-0005b7-9m
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:25:34 -0400
+	(envelope-from <cota@braap.org>) id 1dpi0A-0001BT-IX
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:36:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dphpE-00078t-EF
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:25:33 -0400
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-15-eblake@redhat.com>
-	<8064a471-f2ff-63e4-c90d-ebf3ca4e33cd@redhat.com>
-	<a91fb46c-0044-3fcc-70a7-60f186a37c9f@redhat.com>
-	<5b39beb0-530e-cc63-2917-cd121d515ee3@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ce91b2df-8bde-e785-8f2d-1f9862bd9501@redhat.com>
-Date: Wed, 6 Sep 2017 16:25:20 -0500
+	(envelope-from <cota@braap.org>) id 1dpi05-0007MH-RF
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:36:50 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:36701)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dpi05-0007Jm-IU
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:36:45 -0400
+Date: Wed, 6 Sep 2017 17:36:41 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170906213641.GE25558@flamenco>
+References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
+	<150472122675.24907.11597641982841030964.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <5b39beb0-530e-cc63-2917-cd121d515ee3@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PlrwnWGCTkpMbWE9IuBitJlwUEg542AtD"
-Subject: Re: [Qemu-devel] [PATCH v6 14/29] libqos: Use explicit QTestState
- for fw_cfg operations
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <150472122675.24907.11597641982841030964.stgit@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v4 11/20] instrument: Track vCPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,77 +28,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: "open list:IDE" <qemu-block@nongnu.org>, Alexander Graf <agraf@suse.de>, armbru@redhat.com, "open list:sPAPR" <qemu-ppc@nongnu.org>, pbonzini@redhat.com, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PlrwnWGCTkpMbWE9IuBitJlwUEg542AtD
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: "open list:IDE" <qemu-block@nongnu.org>, Alexander Graf <agraf@suse.de>,
- armbru@redhat.com, "open list:sPAPR" <qemu-ppc@nongnu.org>,
- pbonzini@redhat.com, John Snow <jsnow@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <ce91b2df-8bde-e785-8f2d-1f9862bd9501@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 14/29] libqos: Use explicit QTestState for
- fw_cfg operations
-References: <20170901180340.30009-1-eblake@redhat.com>
- <20170901180340.30009-15-eblake@redhat.com>
- <8064a471-f2ff-63e4-c90d-ebf3ca4e33cd@redhat.com>
- <a91fb46c-0044-3fcc-70a7-60f186a37c9f@redhat.com>
- <5b39beb0-530e-cc63-2917-cd121d515ee3@redhat.com>
-In-Reply-To: <5b39beb0-530e-cc63-2917-cd121d515ee3@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Sep 06, 2017 at 21:07:06 +0300, Lluís Vilanova wrote:
+> Keep a translation between instrumentation's QICPU and CPUState objects to avoid
+> exposing QEMU's internals to instrumentation clients.
+> 
+> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+(snip)
+> diff --git a/instrument/control.c b/instrument/control.c
+> index 2c2781beeb..83453ea561 100644
+> --- a/instrument/control.c
+> +++ b/instrument/control.c
+> @@ -13,10 +13,32 @@
+>  #include "instrument/load.h"
+>  #include "instrument/qemu-instr/control.h"
+>  #include "instrument/qemu-instr/visibility.h"
+> +#include "qom/cpu.h"
+> +
+>  
+>  __thread InstrState instr_cur_state;
+>  
+>  
+> +unsigned int instr_cpus_count;
+> +CPUState **instr_cpus;
+> +
+> +void instr_cpu_add(CPUState *vcpu)
+> +{
+> +    unsigned int idx = vcpu->cpu_index;
+> +    if (idx >= instr_cpus_count) {
+> +        instr_cpus_count = idx + 1;
+> +        instr_cpus = realloc(instr_cpus, sizeof(*instr_cpus) * instr_cpus_count);
+> +    }
+> +    instr_cpus[idx] = vcpu;
+> +}
+> +
+> +void instr_cpu_remove(CPUState *vcpu)
+> +{
+> +    unsigned int idx = vcpu->cpu_index;
+> +    instr_cpus[idx] = NULL;
+> +}
 
-On 09/06/2017 04:10 PM, Eric Blake wrote:
->> I'm not a fan of including header files from other header files, so
->> changing the include order in the .c files sounds like the better
->> solution to me.
->=20
-> Eww. I like headers to be self-contained.  Other than stuff we get from=
+instr_cpus_count and instr_cpus are both modified with cpu_list_lock.
+However, other readers do not acquire this same lock. This gets messy
+when you try to implement something like "vcpu_for_each", which is
+very useful when you load an instrumentation tool once the program
+is running (otherwise the tool cannot know for sure what the vCPUs
+are). This vcpu_for_each would also have to take cpu_list_lock, for
+otherwise it'd miss new threads being added. As you can imagine this
+gets messy pretty quickly, given that you have your own lock here.
+I went with having my own hash table (a list would be fine too),
+protected with the same "instr_lock" you have (i.e. the recursive mutex).
 
-> osdep.h (which we know is included by EVERY .c file), I prefer that if =
-a
-> header uses another type, then it guarantees that an idempotent
-> inclusion of a header that declares that type is also present in the
-> header file, rather than forcing .c files to know which order to includ=
-e
-> things in.
+An unrelated comment: your usage of get/set/put confuses me. I'd expect those
+to work on refcounted items; instead you use them for instance to hide a cast
+(cpu_set) or to create/destroy (e.g. handle_get/put).
 
-The qemu tree-wide policy appears to be that a header should be
-self-contained (order of inclusion in .c files shouldn't matter).  Also,
-if header A only uses 'SomeType *', it can either get the definition of
-SomeType from header B, or we can add the typedef to typedef.h at which
-point both header A and B get the typedef from there (that is, typedef.h
-is great for breaking what would otherwise be cyclic inclusion of
-mutually-recursive types across different headers, as well as a way to
-speed up compilation when a typedef is sufficient rather than a full
-definition).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---PlrwnWGCTkpMbWE9IuBitJlwUEg542AtD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmwZ8AACgkQp6FrSiUn
-Q2r3Hgf+Nl41pepCki7NpI/QbVq0bssV7vJz38Ab4bp8d1io21mkg87Y3VL6ajKa
-RVn4C5lT6Wx+iUe3v0JLHOE1ALg21HqY3DVVg4tUfOckpqLjCA/yuguZ8zn9nZgn
-+JMx9NBXh666+mjTgsW3gz+K2JGCMvMkHcw8VW0T4eW2A5ykJK5Lc2J2qkWNbNg8
-NRqKrXmc4CoJJUj4CyhlfWXN+Sh0iHBwCL1eHmIZqwu38LPD6T3mP4HYhIatjDgM
-mAEjhP/42Mmhc6VwxpYaIVVRu7aQ0u/XqMwi2rz6ed3tsD/tvhj4ONALq21wlJBZ
-KnBDODLovs1bM6ObDcT6n0YN89aGYA==
-=rxd+
------END PGP SIGNATURE-----
-
---PlrwnWGCTkpMbWE9IuBitJlwUEg542AtD--
+		E.
