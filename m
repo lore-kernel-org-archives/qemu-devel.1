@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33823)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35546)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dphb7-0007rV-Lo
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:10:58 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dphk9-0002tg-Dn
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:20:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dphb6-0007SA-HP
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:10:57 -0400
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-15-eblake@redhat.com>
-	<8064a471-f2ff-63e4-c90d-ebf3ca4e33cd@redhat.com>
-	<a91fb46c-0044-3fcc-70a7-60f186a37c9f@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5b39beb0-530e-cc63-2917-cd121d515ee3@redhat.com>
-Date: Wed, 6 Sep 2017 16:10:39 -0500
+	(envelope-from <richard.henderson@linaro.org>) id 1dphk6-0003rz-9z
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:20:17 -0400
+Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:37525)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dphk6-0003rO-2V
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:20:14 -0400
+Received: by mail-pg0-x231.google.com with SMTP id d8so17314902pgt.4
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 14:20:13 -0700 (PDT)
+References: <20170904154316.4148-1-david@redhat.com>
+	<20170904154316.4148-12-david@redhat.com>
+	<2c620927-0406-2fc1-895c-09ffc2e44a4e@linux.vnet.ibm.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6b3e9c2b-4cb7-fdf8-5f9b-ff7ebbf52d1e@linaro.org>
+Date: Wed, 6 Sep 2017 14:20:09 -0700
 MIME-Version: 1.0
-In-Reply-To: <a91fb46c-0044-3fcc-70a7-60f186a37c9f@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lpkwGJEpmmEuJUCV76QGWV9N2oE0lq7sC"
-Subject: Re: [Qemu-devel] [PATCH v6 14/29] libqos: Use explicit QTestState
- for fw_cfg operations
+In-Reply-To: <2c620927-0406-2fc1-895c-09ffc2e44a4e@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 11/19] s390x: allow only 1 CPU with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,97 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: "open list:IDE" <qemu-block@nongnu.org>, Alexander Graf <agraf@suse.de>, armbru@redhat.com, "open list:sPAPR" <qemu-ppc@nongnu.org>, pbonzini@redhat.com, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Matthew Rosato <mjrosato@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lpkwGJEpmmEuJUCV76QGWV9N2oE0lq7sC
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: "open list:IDE" <qemu-block@nongnu.org>, Alexander Graf <agraf@suse.de>,
- armbru@redhat.com, "open list:sPAPR" <qemu-ppc@nongnu.org>,
- pbonzini@redhat.com, John Snow <jsnow@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <5b39beb0-530e-cc63-2917-cd121d515ee3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 14/29] libqos: Use explicit QTestState for
- fw_cfg operations
-References: <20170901180340.30009-1-eblake@redhat.com>
- <20170901180340.30009-15-eblake@redhat.com>
- <8064a471-f2ff-63e4-c90d-ebf3ca4e33cd@redhat.com>
- <a91fb46c-0044-3fcc-70a7-60f186a37c9f@redhat.com>
-In-Reply-To: <a91fb46c-0044-3fcc-70a7-60f186a37c9f@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/05/2017 06:03 AM, Thomas Huth wrote:
-> On 05.09.2017 12:12, Thomas Huth wrote:
->> On 01.09.2017 20:03, Eric Blake wrote:
->>> Drop one more client of global_qtest by teaching all fw_cfg test
->>> functionality (invoked through alloc-pc) to pass in an explicit
->>> QTestState, adjusting all callers.  In particular, fw_cfg-test
->>> had to reorder things to create the test state prior to creating
->>> the fw_cfg.
->>>
-
->>> +++ b/tests/libqos/fw_cfg.h
->>> @@ -15,10 +15,12 @@
->>>
->>>
->>>  typedef struct QFWCFG QFWCFG;
->>> +typedef struct QTestState QTestState;
+On 09/06/2017 11:16 AM, Matthew Rosato wrote:
+> On 09/04/2017 11:43 AM, David Hildenbrand wrote:
+>> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
+>> guest tries to bring these CPUs up but fails), because we don't support
+>> multiple CPUs on s390x under TCG.
 >>
->> Not sure, but I slightly remember that typedeffing a struct like this =
-in
->> multiple places can cause compiler warnings or errors with certain
->> versions of GCC or clang? So a file that includes both, fw_cfg.h and
->> libqtest.h will then fail to compile?
-
-Yes, older gcc fails to compile (my off-hand recollection is that it was
-a bug in the older gcc, and not a standards-compliance issue to
-encounter the same typedef twice, but I could be wrong), ergo the fixup
-that you later noticed.
-
+>> Let's bail out if more than 1 is specified, so we don't raise people's
+>> hope. Make it a define, so we can easily bump it up later.
 >>
->> I think it would be better to change the include order in the .c files=
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+> 
+> Makes sense.  Ran the described environment without this patch (errors)
+> and again with this patch (graceful exit w/ message).
+> 
+> Tested-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
 
->> instead, so that libqtest.h is always included before fw_cfg.h.
->=20
-> Ah, well, I just saw that you also sent a fixup patch for this. Anyway,=
+Can someone review
 
-> I'm not a fan of including header files from other header files, so
-> changing the include order in the .c files sounds like the better
-> solution to me.
+  http://patchwork.ozlabs.org/patch/760010/
 
-Eww. I like headers to be self-contained.  Other than stuff we get from
-osdep.h (which we know is included by EVERY .c file), I prefer that if a
-header uses another type, then it guarantees that an idempotent
-inclusion of a header that declares that type is also present in the
-header file, rather than forcing .c files to know which order to include
-things in.
+which does at least start to add the SIGP support.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Once tcg can bring up 2 cpus, I see no reason it couldn't bring up N.  I don't
+see the point of the define.
 
 
---lpkwGJEpmmEuJUCV76QGWV9N2oE0lq7sC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmwZE8ACgkQp6FrSiUn
-Q2rJvAgApaK3Jpqd7OOolxEHqTKLNjMtw7e7xbp9Hzui8U0C7aF+UnDm5UNvGy+B
-X4UXcujPr+B1YIihuS9bCgfS6QMVkW5/xcnD+O6w1Byf87pckxnXOtkGZR7WVOs2
-Rl8Vc6UB+JgBSJv/ZB0IF46Ysd2QJpH5e9fGIvHd0Pn6PPLyR0XKSCJAXEclXYgT
-gwPVxC7JSQCd+5Ferwjt864xBROYqbp/Xn5TGFzHjhdZXGJwT0H8b1hYr6KYt8NK
-b+/y6i+FgJ/1IpLdxA93SX6zJcbq9Rad/uyPQ+Z66Jf3gakFjAE68YocRVH8MTFN
-dJnrxHbku/3sMROoTBU1/YNuqEuqQQ==
-=7zE2
------END PGP SIGNATURE-----
-
---lpkwGJEpmmEuJUCV76QGWV9N2oE0lq7sC--
+r~
