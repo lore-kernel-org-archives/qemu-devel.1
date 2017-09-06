@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37317)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dpXpN-0005BQ-1D
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:45:02 -0400
+	(envelope-from <berrange@redhat.com>) id 1dpXqb-00066t-Dn
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:46:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rjones@redhat.com>) id 1dpXpJ-0002U6-3c
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:45:01 -0400
-Date: Wed, 6 Sep 2017 11:44:51 +0100
-From: "Richard W.M. Jones" <rjones@redhat.com>
-Message-ID: <20170906104451.GM20914@redhat.com>
-References: <20170906085006.26983-1-rjones@redhat.com>
-	<20170906101905.GD3753@dhcp-200-186.str.redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1dpXqX-0003BI-GV
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:46:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53006)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpXqX-0003Al-81
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:46:13 -0400
+Date: Wed, 6 Sep 2017 11:46:03 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170906104603.GK15510@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<20170829110357.GG3783@redhat.com> <20170906094846.GA2215@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170906101905.GD3753@dhcp-200-186.str.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] qemu-options: Document the -drive
- locking parameter.
+In-Reply-To: <20170906094846.GA2215@work-vm>
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,63 +28,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, famz@redhat.com, qemu-trivial@nongnu.org, mjt@tls.msk.ru
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Wed, Sep 06, 2017 at 12:19:05PM +0200, Kevin Wolf wrote:
-> Am 06.09.2017 um 10:50 hat Richard W.M. Jones geschrieben:
-> > Commit 16b48d5d66d2 ("file-posix: Add 'locking' option") added this
-> > option, but as it was not documented in the -help output it was not
-> > easily possible to tell if a particular qemu binary supports it.
+On Wed, Sep 06, 2017 at 10:48:46AM +0100, Dr. David Alan Gilbert wrote:
+> * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
+> > > v2:
+> > > - fixed "make check" error that patchew reported
+> > > - moved the thread_join upper in monitor_data_destroy(), before
+> > >   resources are released
+> > > - added one new patch (current patch 3) that fixes a nasty risk
+> > >   condition with IOWatchPoll.  Please see commit message for more
+> > >   information.
+> > > - added a g_main_context_wakeup() to make sure the separate loop
+> > >   thread can be kicked always when we want to destroy the per-monitor
+> > >   threads.
+> > > - added one new patch (current patch 8) to introduce migration mgmt
+> > >   lock for migrate_incoming.
+> > > 
+> > > This is an extended work for migration postcopy recovery. This series
+> > > is tested with the following series to make sure it solves the monitor
+> > > hang problem that we have encountered for postcopy recovery:
+> > > 
+> > >   [RFC 00/29] Migration: postcopy failure recovery
+> > >   [RFC 0/6] migration: re-use migrate_incoming for postcopy recovery
+> > > 
+> > > The root problem is that, monitor commands are all handled in main
+> > > loop thread now, no matter how many monitors we specify. And, if main
+> > > loop thread hangs due to some reason, all monitors will be stuck.
+> > > This can be done in reversed order as well: if any of the monitor
+> > > hangs, it will hang the main loop, and the rest of the monitors (if
+> > > there is any).
+> > > 
+> > > That affects postcopy recovery, since the recovery requires user input
+> > > on destination side.  If monitors hang, the destination VM dies and
+> > > lose hope for even a final recovery.
+> > > 
+> > > So, sometimes we need to make sure the monitor be alive, at least one
+> > > of them.
+> > > 
+> > > The whole idea of this series is that instead if handling monitor
+> > > commands all in main loop thread, we do it separately in per-monitor
+> > > threads.  Then, even if main loop thread hangs at any point by any
+> > > reason, per-monitor thread can still survive.  Further, we add hint in
+> > > QMP/HMP to show whether a command can be executed without QMP, if so,
+> > > we avoid taking BQL when running that command.  It greatly reduced
+> > > contention of BQL.  Now the only user of that new parameter (currently
+> > > I call it "without-bql") is "migrate-incoming" command, which is the
+> > > only command to rescue a paused postcopy migration.
+> > > 
+> > > However, even with the series, it does not mean that per-monitor
+> > > threads will never hang.  One example is that we can still run "info
+> > > vcpus" in per-monitor threads during a paused postcopy (in that state,
+> > > page faults are never handled, and "info cpus" will never return since
+> > > it tries to sync every vcpus).  So to make sure it does not hang, we
+> > > not only need the per-monitor thread, the user should be careful as
+> > > well on how to use it.
+> > > 
+> > > For postcopy recovery, we may need dedicated monitor channel for
+> > > recovery.  In other words, a destination VM that supports postcopy
+> > > recovery would possibly need:
+> > > 
+> > >   -qmp MAIN_CHANNEL -qmp RECOVERY_CHANNEL
 > > 
-> > Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
-> > ---
-> >  qemu-options.hx | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/qemu-options.hx b/qemu-options.hx
-> > index 9f6e2adfff..f8f95eb498 100644
-> > --- a/qemu-options.hx
-> > +++ b/qemu-options.hx
-> > @@ -796,7 +796,7 @@ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
-> >      "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
-> >      "       [,serial=s][,addr=A][,rerror=ignore|stop|report]\n"
-> >      "       [,werror=ignore|stop|report|enospc][,id=name][,aio=threads|native]\n"
-> > -    "       [,readonly=on|off][,copy-on-read=on|off]\n"
-> > +    "       [,readonly=on|off][,copy-on-read=on|off][,locking=off|auto|on]\n"
-> >      "       [,discard=ignore|unmap][,detect-zeroes=on|off|unmap]\n"
-> >      "       [[,bps=b]|[[,bps_rd=r][,bps_wr=w]]]\n"
-> >      "       [[,iops=i]|[[,iops_rd=r][,iops_wr=w]]]\n"
+> > I think this is a really horrible thing to expose to management applications.
+> > They should not need to be aware of fact that QEMU is buggy and thus requires
+> > that certain commands be run on different monitors to work around the bug.
 > 
-> 'locking' is a driver-specific option and not universally available for
-> all images, so it shouldn't be included here.
+> It's unfortunately baked in way too deep to fix in the near term; the
+> BQL is just too cantagious and we have a fundamental design of running
+> all the main IO emulation in one thread.
+> 
+> > I'd much prefer to see the problem described handled transparently inside
+> > QEMU. One approach is have a dedicated thread in QEMU responsible for all
+> > monitor I/O. This thread should never actually execute monitor commands
+> > though, it would simply parse the command request and put data onto a queue
+> > of pending commands, thus it could never hang. The command queue could be
+> > processed by the main thread, or by another thread that is interested.
+> > eg the migration thread could process any queued commands related to
+> > migration directly.
+> 
+> That requires a change in the current API to allow async command
+> completion (OK that is something Marc-Andre's world has) so that
+> from the one connection you can have multiple outstanding commands.
+> Hmm unless....
+> 
+> We've also got problems that some commands don't like being run outside
+> of the main thread (see Fam's reply on the 21st pointing out that a lot
+> of block commands would assert).
+> 
+> I think the way to move to what you describe would be:
+>   a) A separate thread for monitor IO
+>       This seems a separate problem
+>       How hard is that?  Will all the current IO mechanisms used
+>       for monitors just work if we run them in a separate thread?
+>       What about mux?
+> 
+>   b) Initially all commands get dispatched to the main thread
+>      so nothing changes about the API.
+> 
+>   c) We create a new thread for the lock-free commands, and route
+>       lock-free commands down it.
+> 
+>   d) We start with a rule that on any one monitor connection we
+>   don't allow you to start a command until the previous one has
+>   finished
+> 
+> (d) allows us to avoid any API changes, but allows us to do lock-free
+> stuff on a separate connection like Peter's world.
+> We can drop (d) once we have a way of doing async commands.
+> We can add dispatching to more threads once someone describes
+> what they want from those threads.
+> 
+> Does that work for you Dan?
 
-Indeed this patch is wrong, please ignore it.
+It would *provided* that we do (c) for the commands Peter wants for
+this migration series.  IOW, I don't want to have to have logic in
+libvirt that either needs to add a 2nd monitor server, or open a 2nd
+monitor connection, to deal with migration post-copy recovery in some
+versions of QEMU.  So whatever is needed to make post-copy recovery
+work has to be done for (c).
 
-However I couldn't work out the incantation to disable locking for a
-qcow2 overlay backed by a file which is locked by another qemu
-process:
-
-  ...
-      -drive file=/home/rjones/d/libguestfs/tmp/libguestfsSOXEiU/overlay1,cache=unsafe,format=qcow2,file.locking=off,id=hd0,if=none \
-      -device scsi-hd,drive=hd0 \
-  ...
-  qemu-system-x86_64: -device scsi-hd,drive=hd0: Failed to get shared "write" lock
-  Is another process using the image?
-  ...
-
-I'm guessing I need another level of indirection to get to the backing
-file, but file.file.locking=off did not work either.
-
-I think the error message there is wrong as well since it doesn't
-refer to the right command line option nor tell you which file is
-locked.
-
-Rich.
-
+Regards,
+Daniel
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-virt-p2v converts physical machines to virtual machines.  Boot with a
-live CD or over the network (PXE) and turn machines into KVM guests.
-http://libguestfs.org/virt-v2v
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
