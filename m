@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59868)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60012)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpTXg-0002vH-LU
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:10:30 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dpTYI-0003CL-KJ
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpTXc-0001TT-IC
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:10:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42842)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpTXc-0001Sx-9S
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:10:24 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 277957E428
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 06:10:23 +0000 (UTC)
-From: Markus Armbruster <armbru@redhat.com>
-References: <f9d56290959d378dfa65b3906bf0d822ab938ac9.1504617551.git.mprivozn@redhat.com>
-Date: Wed, 06 Sep 2017 08:10:21 +0200
-In-Reply-To: <f9d56290959d378dfa65b3906bf0d822ab938ac9.1504617551.git.mprivozn@redhat.com>
-	(Michal Privoznik's message of "Tue, 5 Sep 2017 15:22:04 +0200")
-Message-ID: <87bmmofjci.fsf@dusky.pond.sub.org>
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dpTYF-0001gW-7Q
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:11:06 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v2] watchdog: Allow setting action on the
- fly
+In-Reply-To: <1503938283-12404-4-git-send-email-sundeep.lkml@gmail.com>
+References: <1503938283-12404-1-git-send-email-sundeep.lkml@gmail.com>
+	<1503938283-12404-4-git-send-email-sundeep.lkml@gmail.com>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Wed, 6 Sep 2017 11:41:00 +0530
+Message-ID: <CALHRZurCYW+B2e+Ru62VH2VJJQfL1gNkz+OF=G9YD+VptDXhtw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu devel v7 PATCH 3/5] msf2: Add Smartfusion2
+ SPI controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,227 +23,544 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Privoznik <mprivozn@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-Michal Privoznik <mprivozn@redhat.com> writes:
+Ping.
 
-> Currently, the only time that users can set watchdog action is at
-> the start as all we expose is this -watchdog-action command line
-> argument. This is suboptimal when users want to plug the device
-> later via monitor. Alternatively, they might want to change the
-> action for already existing device on the fly.
+Thanks,
+Sundeep
+
+On Mon, Aug 28, 2017 at 10:08 PM, Subbaraya Sundeep <sundeep.lkml@gmail.com>
+wrote:
+
+> Modelled Microsemi's Smartfusion2 SPI controller.
 >
-> At the same time, drop local redefinition of the actions eum in
-> watchdog.h in favour of the ones defined in schema.
->
-> Inspired by: https://bugzilla.redhat.com/show_bug.cgi?id=1447169
->
-> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 > ---
+>  hw/ssi/Makefile.objs     |   1 +
+>  hw/ssi/mss-spi.c         | 409 ++++++++++++++++++++++++++++++
+> +++++++++++++++++
+>  include/hw/ssi/mss-spi.h |  58 +++++++
+>  3 files changed, 468 insertions(+)
+>  create mode 100644 hw/ssi/mss-spi.c
+>  create mode 100644 include/hw/ssi/mss-spi.h
 >
-> diff to v1:
-> - instead of allowing 'action' to be arbitrary string, use enum for it and thus
->   drop local redefinition of the enum.
+> diff --git a/hw/ssi/Makefile.objs b/hw/ssi/Makefile.objs
+> index 487add2..f5bcc65 100644
+> --- a/hw/ssi/Makefile.objs
+> +++ b/hw/ssi/Makefile.objs
+> @@ -4,6 +4,7 @@ common-obj-$(CONFIG_XILINX_SPI) += xilinx_spi.o
+>  common-obj-$(CONFIG_XILINX_SPIPS) += xilinx_spips.o
+>  common-obj-$(CONFIG_ASPEED_SOC) += aspeed_smc.o
+>  common-obj-$(CONFIG_STM32F2XX_SPI) += stm32f2xx_spi.o
+> +common-obj-$(CONFIG_MSF2) += mss-spi.o
 >
->  hw/watchdog/watchdog.c    | 52 ++++++++++++++++++++++++-----------------------
->  hw/watchdog/wdt_diag288.c |  6 +++---
->  include/sysemu/watchdog.h | 12 ++---------
->  qapi-schema.json          |  9 ++++++++
->  4 files changed, 41 insertions(+), 38 deletions(-)
->
-> diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
-> index 0c5c9cde1c..a3e9d7b59b 100644
-> --- a/hw/watchdog/watchdog.c
-> +++ b/hw/watchdog/watchdog.c
-> @@ -29,8 +29,11 @@
->  #include "qapi-event.h"
->  #include "hw/nmi.h"
->  #include "qemu/help_option.h"
-> +#include "qmp-commands.h"
-> +#include "qapi/qmp/qerror.h"
-> +#include "qapi/util.h"
->  
-> -static int watchdog_action = WDT_RESET;
-> +static WatchdogExpirationAction watchdog_action = WATCHDOG_EXPIRATION_ACTION_RESET;
->  static QLIST_HEAD(watchdog_list, WatchdogTimerModel) watchdog_list;
->  
->  void watchdog_add_model(WatchdogTimerModel *model)
-> @@ -77,27 +80,17 @@ int select_watchdog(const char *p)
->  
->  int select_watchdog_action(const char *p)
->  {
-> -    if (strcasecmp(p, "reset") == 0)
-> -        watchdog_action = WDT_RESET;
-> -    else if (strcasecmp(p, "shutdown") == 0)
-> -        watchdog_action = WDT_SHUTDOWN;
-> -    else if (strcasecmp(p, "poweroff") == 0)
-> -        watchdog_action = WDT_POWEROFF;
-> -    else if (strcasecmp(p, "pause") == 0)
-> -        watchdog_action = WDT_PAUSE;
-> -    else if (strcasecmp(p, "debug") == 0)
-> -        watchdog_action = WDT_DEBUG;
-> -    else if (strcasecmp(p, "none") == 0)
-> -        watchdog_action = WDT_NONE;
-> -    else if (strcasecmp(p, "inject-nmi") == 0)
-> -        watchdog_action = WDT_NMI;
-> -    else
-> -        return -1;
-> +    int action;
->  
-> +    action = qapi_enum_parse(WatchdogExpirationAction_lookup, p,
-> +                             WATCHDOG_EXPIRATION_ACTION__MAX, -1, NULL);
-> +    if (action < 0)
-> +        return -1;
-> +    qmp_watchdog_set_action(action, NULL);
-
-&error_abort
-
->      return 0;
->  }
->  
-> -int get_watchdog_action(void)
-> +WatchdogExpirationAction get_watchdog_action(void)
->  {
->      return watchdog_action;
->  }
-> @@ -108,21 +101,21 @@ int get_watchdog_action(void)
->  void watchdog_perform_action(void)
->  {
->      switch (watchdog_action) {
-> -    case WDT_RESET:             /* same as 'system_reset' in monitor */
-> +    case WATCHDOG_EXPIRATION_ACTION_RESET:      /* same as 'system_reset' in monitor */
->          qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_RESET, &error_abort);
->          qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->          break;
->  
-> -    case WDT_SHUTDOWN:          /* same as 'system_powerdown' in monitor */
-> +    case WATCHDOG_EXPIRATION_ACTION_SHUTDOWN:   /* same as 'system_powerdown' in monitor */
->          qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_SHUTDOWN, &error_abort);
->          qemu_system_powerdown_request();
->          break;
->  
-> -    case WDT_POWEROFF:          /* same as 'quit' command in monitor */
-> +    case WATCHDOG_EXPIRATION_ACTION_POWEROFF:   /* same as 'quit' command in monitor */
->          qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_POWEROFF, &error_abort);
->          exit(0);
->  
-> -    case WDT_PAUSE:             /* same as 'stop' command in monitor */
-> +    case WATCHDOG_EXPIRATION_ACTION_PAUSE:      /* same as 'stop' command in monitor */
->          /* In a timer callback, when vm_stop calls qemu_clock_enable
->           * you would get a deadlock.  Bypass the problem.
->           */
-> @@ -131,19 +124,28 @@ void watchdog_perform_action(void)
->          qemu_system_vmstop_request(RUN_STATE_WATCHDOG);
->          break;
->  
-> -    case WDT_DEBUG:
-> +    case WATCHDOG_EXPIRATION_ACTION_DEBUG:
->          qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_DEBUG, &error_abort);
->          fprintf(stderr, "watchdog: timer fired\n");
->          break;
->  
-> -    case WDT_NONE:
-> +    case WATCHDOG_EXPIRATION_ACTION_NONE:
->          qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_NONE, &error_abort);
->          break;
->  
-> -    case WDT_NMI:
-> +    case WATCHDOG_EXPIRATION_ACTION_INJECT_NMI:
->          qapi_event_send_watchdog(WATCHDOG_EXPIRATION_ACTION_INJECT_NMI,
->                                   &error_abort);
->          nmi_monitor_handle(0, NULL);
->          break;
+>  obj-$(CONFIG_OMAP) += omap_spi.o
+>  obj-$(CONFIG_IMX) += imx_spi.o
+> diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
+> new file mode 100644
+> index 0000000..7209363
+> --- /dev/null
+> +++ b/hw/ssi/mss-spi.c
+> @@ -0,0 +1,409 @@
+> +/*
+> + * Block model of SPI controller present in
+> + * Microsemi's SmartFusion2 and SmartFusion SoCs.
+> + *
+> + * Copyright (C) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining
+> a copy
+> + * of this software and associated documentation files (the "Software"),
+> to deal
+> + * in the Software without restriction, including without limitation the
+> rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
+> sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be
+> included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+> EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+> MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+> OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+> ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+> IN
+> + * THE SOFTWARE.
+> + */
 > +
-> +    case WATCHDOG_EXPIRATION_ACTION__MAX:
-> +        /* keep gcc happy */
-> +        break;
-
-       default:
-           assert(0);
-
->      }
->  }
+> +#include "qemu/osdep.h"
+> +#include "hw/ssi/mss-spi.h"
+> +#include "qemu/log.h"
 > +
-> +void qmp_watchdog_set_action(WatchdogExpirationAction action, Error **errp)
+> +#ifndef MSS_SPI_ERR_DEBUG
+> +#define MSS_SPI_ERR_DEBUG   0
+> +#endif
+> +
+> +#define DB_PRINT_L(lvl, fmt, args...) do { \
+> +    if (MSS_SPI_ERR_DEBUG >= lvl) { \
+> +        qemu_log("%s: " fmt "\n", __func__, ## args); \
+> +    } \
+> +} while (0);
+> +
+> +#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
+> +
+> +#define FIFO_CAPACITY         32
+> +#define FIFO_CAPACITY         32
+> +
+> +#define R_SPI_CONTROL         0
+> +#define R_SPI_DFSIZE          1
+> +#define R_SPI_STATUS          2
+> +#define R_SPI_INTCLR          3
+> +#define R_SPI_RX              4
+> +#define R_SPI_TX              5
+> +#define R_SPI_CLKGEN          6
+> +#define R_SPI_SS              7
+> +#define R_SPI_MIS             8
+> +#define R_SPI_RIS             9
+> +
+> +#define S_TXDONE             (1 << 0)
+> +#define S_RXRDY              (1 << 1)
+> +#define S_RXCHOVRF           (1 << 2)
+> +#define S_RXFIFOFUL          (1 << 4)
+> +#define S_RXFIFOFULNXT       (1 << 5)
+> +#define S_RXFIFOEMP          (1 << 6)
+> +#define S_RXFIFOEMPNXT       (1 << 7)
+> +#define S_TXFIFOFUL          (1 << 8)
+> +#define S_TXFIFOFULNXT       (1 << 9)
+> +#define S_TXFIFOEMP          (1 << 10)
+> +#define S_TXFIFOEMPNXT       (1 << 11)
+> +#define S_FRAMESTART         (1 << 12)
+> +#define S_SSEL               (1 << 13)
+> +#define S_ACTIVE             (1 << 14)
+> +
+> +#define C_ENABLE             (1 << 0)
+> +#define C_MODE               (1 << 1)
+> +#define C_INTRXDATA          (1 << 4)
+> +#define C_INTTXDATA          (1 << 5)
+> +#define C_INTRXOVRFLO        (1 << 6)
+> +#define C_SPS                (1 << 26)
+> +#define C_BIGFIFO            (1 << 29)
+> +#define C_RESET              (1 << 31)
+> +
+> +#define FRAMESZ_MASK         0x1F
+> +#define FMCOUNT_MASK         0x00FFFF00
+> +#define FMCOUNT_SHIFT        8
+> +
+> +static void txfifo_reset(MSSSpiState *s)
 > +{
-> +    watchdog_action = action;
-> +}
-> diff --git a/hw/watchdog/wdt_diag288.c b/hw/watchdog/wdt_diag288.c
-> index 47f289216a..451644eb89 100644
-> --- a/hw/watchdog/wdt_diag288.c
-> +++ b/hw/watchdog/wdt_diag288.c
-> @@ -57,9 +57,9 @@ static void diag288_timer_expired(void *dev)
->       * the BQL; reset before triggering the action to avoid races with
->       * diag288 instructions. */
->      switch (get_watchdog_action()) {
-> -    case WDT_DEBUG:
-> -    case WDT_NONE:
-> -    case WDT_PAUSE:
-> +    case WATCHDOG_EXPIRATION_ACTION_DEBUG:
-> +    case WATCHDOG_EXPIRATION_ACTION_NONE:
-> +    case WATCHDOG_EXPIRATION_ACTION_PAUSE:
->          break;
->      default:
->          wdt_diag288_reset(dev);
-> diff --git a/include/sysemu/watchdog.h b/include/sysemu/watchdog.h
-> index 72a4da07a6..1b830df152 100644
-> --- a/include/sysemu/watchdog.h
-> +++ b/include/sysemu/watchdog.h
-> @@ -23,15 +23,7 @@
->  #define QEMU_WATCHDOG_H
->  
->  #include "qemu/queue.h"
-> -
-> -/* Possible values for action parameter. */
-> -#define WDT_RESET        1      /* Hard reset. */
-> -#define WDT_SHUTDOWN     2      /* Shutdown. */
-> -#define WDT_POWEROFF     3      /* Quit. */
-> -#define WDT_PAUSE        4      /* Pause. */
-> -#define WDT_DEBUG        5      /* Prints a message and continues running. */
-> -#define WDT_NONE         6      /* Do nothing. */
-> -#define WDT_NMI          7      /* Inject nmi into the guest. */
-> +#include "qapi-types.h"
->  
->  struct WatchdogTimerModel {
->      QLIST_ENTRY(WatchdogTimerModel) entry;
-> @@ -46,7 +38,7 @@ typedef struct WatchdogTimerModel WatchdogTimerModel;
->  /* in hw/watchdog.c */
->  int select_watchdog(const char *p);
->  int select_watchdog_action(const char *action);
-> -int get_watchdog_action(void);
-> +WatchdogExpirationAction get_watchdog_action(void);
->  void watchdog_add_model(WatchdogTimerModel *model);
->  void watchdog_perform_action(void);
->  
-> diff --git a/qapi-schema.json b/qapi-schema.json
-> index 802ea53d00..40605be36f 100644
-> --- a/qapi-schema.json
-> +++ b/qapi-schema.json
-> @@ -6539,3 +6539,12 @@
->  # Since 2.9
->  ##
->  { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+> +    fifo32_reset(&s->tx_fifo);
 > +
-> +##
-> +# @watchdog-set-action:
-> +#
-> +# Set watchdog action
-> +#
-> +# Since 2.11
-> +##
-> +{ 'command': 'watchdog-set-action', 'data' : {'action': 'WatchdogExpirationAction'} }
-
-I was wondering whether you forgot to include the enum definition, until
-I discovered you smartly reused the existing one.
-
-If it was a new one instead, I would suggest naming it WatchdogAction,
-because a watchdog's one and only action is the expiration action, and
-therefore the shorter name serves just fine.  Hmm, it's used in just two
-places...  okay, I'm suggesting you rename it, in a separate preparatory
-patch.
-
-This cleans up code duplication.  Worth mentioning in the commit
-message.
-
-Looks pretty good overall; a quick respin should get us there.
+> +    s->regs[R_SPI_STATUS] &= ~S_TXFIFOFUL;
+> +    s->regs[R_SPI_STATUS] |= S_TXFIFOEMP;
+> +}
+> +
+> +static void rxfifo_reset(MSSSpiState *s)
+> +{
+> +    fifo32_reset(&s->rx_fifo);
+> +
+> +    s->regs[R_SPI_STATUS] &= ~S_RXFIFOFUL;
+> +    s->regs[R_SPI_STATUS] |= S_RXFIFOEMP;
+> +}
+> +
+> +static void set_fifodepth(MSSSpiState *s)
+> +{
+> +    unsigned int size = s->regs[R_SPI_DFSIZE] & FRAMESZ_MASK;
+> +
+> +    if (size <= 8) {
+> +        s->fifo_depth = 32;
+> +    } else if (size <= 16) {
+> +        s->fifo_depth = 16;
+> +    } else if (size <= 32) {
+> +        s->fifo_depth = 8;
+> +    } else {
+> +        s->fifo_depth = 4;
+> +    }
+> +}
+> +
+> +static void mss_spi_do_reset(MSSSpiState *s)
+> +{
+> +    memset(s->regs, 0, sizeof s->regs);
+> +    s->regs[R_SPI_CONTROL] = 0x80000102;
+> +    s->regs[R_SPI_DFSIZE] = 0x4;
+> +    s->regs[R_SPI_STATUS] = S_SSEL | S_TXFIFOEMP | S_RXFIFOEMP;
+> +    s->regs[R_SPI_CLKGEN] = 0x7;
+> +    s->regs[R_SPI_RIS] = 0x0;
+> +
+> +    s->fifo_depth = 4;
+> +    s->frame_count = 1;
+> +    s->enabled = false;
+> +
+> +    rxfifo_reset(s);
+> +    txfifo_reset(s);
+> +}
+> +
+> +static void update_mis(MSSSpiState *s)
+> +{
+> +    uint32_t reg = s->regs[R_SPI_CONTROL];
+> +    uint32_t tmp;
+> +
+> +    /*
+> +     * form the Control register interrupt enable bits
+> +     * same as RIS, MIS and Interrupt clear registers for simplicity
+> +     */
+> +    tmp = ((reg & C_INTRXOVRFLO) >> 4) | ((reg & C_INTRXDATA) >> 3) |
+> +           ((reg & C_INTTXDATA) >> 5);
+> +    s->regs[R_SPI_MIS] |= tmp & s->regs[R_SPI_RIS];
+> +}
+> +
+> +static void spi_update_irq(MSSSpiState *s)
+> +{
+> +    int irq;
+> +
+> +    update_mis(s);
+> +    irq = !!(s->regs[R_SPI_MIS]);
+> +
+> +    qemu_set_irq(s->irq, irq);
+> +}
+> +
+> +static void mss_spi_reset(DeviceState *d)
+> +{
+> +    mss_spi_do_reset(MSS_SPI(d));
+> +}
+> +
+> +static uint64_t
+> +spi_read(void *opaque, hwaddr addr, unsigned int size)
+> +{
+> +    MSSSpiState *s = opaque;
+> +    uint32_t ret = 0;
+> +
+> +    addr >>= 2;
+> +    switch (addr) {
+> +    case R_SPI_RX:
+> +        s->regs[R_SPI_STATUS] &= ~S_RXFIFOFUL;
+> +        s->regs[R_SPI_STATUS] &= ~S_RXCHOVRF;
+> +        ret = fifo32_pop(&s->rx_fifo);
+> +        if (fifo32_is_empty(&s->rx_fifo)) {
+> +            s->regs[R_SPI_STATUS] |= S_RXFIFOEMP;
+> +        }
+> +        break;
+> +
+> +    case R_SPI_MIS:
+> +        update_mis(s);
+> +        ret = s->regs[R_SPI_MIS];
+> +        break;
+> +
+> +    default:
+> +        if (addr < ARRAY_SIZE(s->regs)) {
+> +            ret = s->regs[addr];
+> +        } else {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func__,
+> +                         addr * 4);
+> +        }
+> +        break;
+> +    }
+> +
+> +    DB_PRINT("addr=0x%" HWADDR_PRIx " = 0x%" PRIx32, addr * 4, ret);
+> +    spi_update_irq(s);
+> +    return ret;
+> +}
+> +
+> +static void assert_cs(MSSSpiState *s)
+> +{
+> +    qemu_set_irq(s->cs_line, 0);
+> +}
+> +
+> +static void deassert_cs(MSSSpiState *s)
+> +{
+> +    qemu_set_irq(s->cs_line, 1);
+> +}
+> +
+> +static void spi_flush_txfifo(MSSSpiState *s)
+> +{
+> +    uint32_t tx;
+> +    uint32_t rx;
+> +    bool sps = !!(s->regs[R_SPI_CONTROL] & C_SPS);
+> +
+> +    /*
+> +     * Chip Select(CS) is automatically controlled by this controller.
+> +     * If SPS bit is set in Control register then CS is asserted
+> +     * until all the frames set in frame count of Control register are
+> +     * transferred. If SPS is not set then CS pulses between frames.
+> +     * Note that Slave Select register specifies which of the CS line
+> +     * has to be controlled automatically by controller. Bits SS[7:1] are
+> for
+> +     * masters in FPGA fabric since we model only Microcontroller
+> subsystem
+> +     * of Smartfusion2 we control only one CS(SS[0]) line.
+> +     */
+> +    while (!fifo32_is_empty(&s->tx_fifo) && s->frame_count) {
+> +        assert_cs(s);
+> +
+> +        s->regs[R_SPI_STATUS] &= ~(S_TXDONE | S_RXRDY);
+> +
+> +        tx = fifo32_pop(&s->tx_fifo);
+> +        DB_PRINT("data tx:0x%" PRIx32, tx);
+> +        rx = ssi_transfer(s->spi, tx);
+> +        DB_PRINT("data rx:0x%" PRIx32, rx);
+> +
+> +        if (fifo32_num_used(&s->rx_fifo) == s->fifo_depth) {
+> +            s->regs[R_SPI_STATUS] |= S_RXCHOVRF;
+> +            s->regs[R_SPI_RIS] |= S_RXCHOVRF;
+> +        } else {
+> +            fifo32_push(&s->rx_fifo, rx);
+> +            s->regs[R_SPI_STATUS] &= ~S_RXFIFOEMP;
+> +            if (fifo32_num_used(&s->rx_fifo) == (s->fifo_depth - 1)) {
+> +                s->regs[R_SPI_STATUS] |= S_RXFIFOFULNXT;
+> +            } else if (fifo32_num_used(&s->rx_fifo) == s->fifo_depth) {
+> +                s->regs[R_SPI_STATUS] |= S_RXFIFOFUL;
+> +            }
+> +        }
+> +        s->frame_count--;
+> +        if (!sps) {
+> +            deassert_cs(s);
+> +        }
+> +    }
+> +
+> +    if (!s->frame_count) {
+> +        s->frame_count = (s->regs[R_SPI_CONTROL] & FMCOUNT_MASK) >>
+> +                            FMCOUNT_SHIFT;
+> +        if (sps) {
+> +            deassert_cs(s);
+> +        }
+> +        s->regs[R_SPI_RIS] |= S_TXDONE | S_RXRDY;
+> +        s->regs[R_SPI_STATUS] |= S_TXDONE | S_RXRDY;
+> +   }
+> +}
+> +
+> +static void spi_write(void *opaque, hwaddr addr,
+> +            uint64_t val64, unsigned int size)
+> +{
+> +    MSSSpiState *s = opaque;
+> +    uint32_t value = val64;
+> +
+> +    DB_PRINT("addr=0x%" HWADDR_PRIx " =0x%" PRIx32, addr, value);
+> +    addr >>= 2;
+> +
+> +    switch (addr) {
+> +    case R_SPI_TX:
+> +        /* adding to already full FIFO */
+> +        if (fifo32_num_used(&s->tx_fifo) == s->fifo_depth) {
+> +            break;
+> +        }
+> +        s->regs[R_SPI_STATUS] &= ~S_TXFIFOEMP;
+> +        fifo32_push(&s->tx_fifo, value);
+> +        if (fifo32_num_used(&s->tx_fifo) == (s->fifo_depth - 1)) {
+> +            s->regs[R_SPI_STATUS] |= S_TXFIFOFULNXT;
+> +        } else if (fifo32_num_used(&s->tx_fifo) == s->fifo_depth) {
+> +            s->regs[R_SPI_STATUS] |= S_TXFIFOFUL;
+> +        }
+> +        if (s->enabled) {
+> +            spi_flush_txfifo(s);
+> +        }
+> +        break;
+> +
+> +    case R_SPI_CONTROL:
+> +        s->regs[R_SPI_CONTROL] = value;
+> +        if (value & C_BIGFIFO) {
+> +            set_fifodepth(s);
+> +        } else {
+> +            s->fifo_depth = 4;
+> +        }
+> +        s->enabled = value & C_ENABLE;
+> +        s->frame_count = (value & FMCOUNT_MASK) >> FMCOUNT_SHIFT;
+> +        if (value & C_RESET) {
+> +            mss_spi_do_reset(s);
+> +        }
+> +        break;
+> +
+> +    case R_SPI_DFSIZE:
+> +        if (s->enabled) {
+> +            break;
+> +        }
+> +        s->regs[R_SPI_DFSIZE] = value;
+> +        break;
+> +
+> +    case R_SPI_INTCLR:
+> +        s->regs[R_SPI_INTCLR] = value;
+> +        if (value & S_TXDONE) {
+> +            s->regs[R_SPI_RIS] &= ~S_TXDONE;
+> +        }
+> +        if (value & S_RXRDY) {
+> +            s->regs[R_SPI_RIS] &= ~S_RXRDY;
+> +        }
+> +        if (value & S_RXCHOVRF) {
+> +            s->regs[R_SPI_RIS] &= ~S_RXCHOVRF;
+> +        }
+> +        break;
+> +
+> +    case R_SPI_MIS:
+> +    case R_SPI_STATUS:
+> +    case R_SPI_RIS:
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                         "%s: Write to read only register 0x%"
+> HWADDR_PRIx "\n",
+> +                         __func__, addr * 4);
+> +        break;
+> +
+> +    default:
+> +        if (addr < ARRAY_SIZE(s->regs)) {
+> +            s->regs[addr] = value;
+> +        } else {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                         "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func__,
+> +                         addr * 4);
+> +        }
+> +        break;
+> +    }
+> +
+> +    spi_update_irq(s);
+> +}
+> +
+> +static const MemoryRegionOps spi_ops = {
+> +    .read = spi_read,
+> +    .write = spi_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .valid = {
+> +        .min_access_size = 1,
+> +        .max_access_size = 4
+> +    }
+> +};
+> +
+> +static void mss_spi_realize(DeviceState *dev, Error **errp)
+> +{
+> +    MSSSpiState *s = MSS_SPI(dev);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> +
+> +    s->spi = ssi_create_bus(dev, "spi");
+> +
+> +    sysbus_init_irq(sbd, &s->irq);
+> +    ssi_auto_connect_slaves(dev, &s->cs_line, s->spi);
+> +    sysbus_init_irq(sbd, &s->cs_line);
+> +
+> +    memory_region_init_io(&s->mmio, OBJECT(s), &spi_ops, s,
+> +                          TYPE_MSS_SPI, R_SPI_MAX * 4);
+> +    sysbus_init_mmio(sbd, &s->mmio);
+> +
+> +    fifo32_create(&s->tx_fifo, FIFO_CAPACITY);
+> +    fifo32_create(&s->rx_fifo, FIFO_CAPACITY);
+> +}
+> +
+> +static const VMStateDescription vmstate_mss_spi = {
+> +    .name = TYPE_MSS_SPI,
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_FIFO32(tx_fifo, MSSSpiState),
+> +        VMSTATE_FIFO32(rx_fifo, MSSSpiState),
+> +        VMSTATE_UINT32_ARRAY(regs, MSSSpiState, R_SPI_MAX),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+> +static void mss_spi_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->realize = mss_spi_realize;
+> +    dc->reset = mss_spi_reset;
+> +    dc->vmsd = &vmstate_mss_spi;
+> +}
+> +
+> +static const TypeInfo mss_spi_info = {
+> +    .name           = TYPE_MSS_SPI,
+> +    .parent         = TYPE_SYS_BUS_DEVICE,
+> +    .instance_size  = sizeof(MSSSpiState),
+> +    .class_init     = mss_spi_class_init,
+> +};
+> +
+> +static void mss_spi_register_types(void)
+> +{
+> +    type_register_static(&mss_spi_info);
+> +}
+> +
+> +type_init(mss_spi_register_types)
+> diff --git a/include/hw/ssi/mss-spi.h b/include/hw/ssi/mss-spi.h
+> new file mode 100644
+> index 0000000..f0cf324
+> --- /dev/null
+> +++ b/include/hw/ssi/mss-spi.h
+> @@ -0,0 +1,58 @@
+> +/*
+> + * Microsemi SmartFusion2 SPI
+> + *
+> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining
+> a copy
+> + * of this software and associated documentation files (the "Software"),
+> to deal
+> + * in the Software without restriction, including without limitation the
+> rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or
+> sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be
+> included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+> EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+> MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+> OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+> ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+> IN
+> + * THE SOFTWARE.
+> + */
+> +
+> +#ifndef HW_MSS_SPI_H
+> +#define HW_MSS_SPI_H
+> +
+> +#include "hw/sysbus.h"
+> +#include "hw/ssi/ssi.h"
+> +#include "qemu/fifo32.h"
+> +
+> +#define TYPE_MSS_SPI   "mss-spi"
+> +#define MSS_SPI(obj)   OBJECT_CHECK(MSSSpiState, (obj), TYPE_MSS_SPI)
+> +
+> +#define R_SPI_MAX             16
+> +
+> +typedef struct MSSSpiState {
+> +    SysBusDevice parent_obj;
+> +
+> +    MemoryRegion mmio;
+> +
+> +    qemu_irq irq;
+> +
+> +    qemu_irq cs_line;
+> +
+> +    SSIBus *spi;
+> +
+> +    Fifo32 rx_fifo;
+> +    Fifo32 tx_fifo;
+> +
+> +    int fifo_depth;
+> +    uint32_t frame_count;
+> +    bool enabled;
+> +
+> +    uint32_t regs[R_SPI_MAX];
+> +} MSSSpiState;
+> +
+> +#endif /* HW_MSS_SPI_H */
+> --
+> 2.5.0
+>
+>
