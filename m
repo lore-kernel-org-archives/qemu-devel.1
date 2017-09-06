@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36246)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36214)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpP7m-0003li-Ck
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:27:27 -0400
+	(envelope-from <famz@redhat.com>) id 1dpP7j-0003lB-PA
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:27:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpP7l-00088c-Gp
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:27:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42120)
+	(envelope-from <famz@redhat.com>) id 1dpP7h-00084J-PW
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:27:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56948)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dpP7l-00087E-Ai
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:27:25 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dpP7h-000840-J6
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:27:21 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 57A81859F7
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 01:27:24 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id A52CA751
+	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 01:27:20 +0000 (UTC)
 From: Fam Zheng <famz@redhat.com>
-Date: Wed,  6 Sep 2017 09:27:15 +0800
-Message-Id: <20170906012715.31761-4-famz@redhat.com>
+Date: Wed,  6 Sep 2017 09:27:13 +0800
+Message-Id: <20170906012715.31761-2-famz@redhat.com>
 In-Reply-To: <20170906012715.31761-1-famz@redhat.com>
 References: <20170906012715.31761-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 3/3] buildsys: Move gcrypt cflags/libs to
+Subject: [Qemu-devel] [PATCH v2 1/3] buildsys: Move nettle cflags/libs to
  per object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,49 +35,48 @@ To: qemu-devel@nongnu.org
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
  configure            | 5 ++---
- crypto/Makefile.objs | 7 +++++++
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ crypto/Makefile.objs | 6 ++++++
+ 2 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/configure b/configure
-index d24a7eab37..42622b98be 100755
+index fb7e34a901..6a4cb3832b 100755
 --- a/configure
 +++ b/configure
-@@ -2566,9 +2566,6 @@ if test "$gcrypt" != "no"; then
-         then
-             gcrypt_libs="$gcrypt_libs -lgpg-error"
-         fi
--        libs_softmmu="$gcrypt_libs $libs_softmmu"
--        libs_tools="$gcrypt_libs $libs_tools"
--        QEMU_CFLAGS="$QEMU_CFLAGS $gcrypt_cflags"
-         gcrypt="yes"
-         if test -z "$nettle"; then
-            nettle="no"
-@@ -5716,6 +5713,8 @@ if test "$gnutls_rnd" = "yes" ; then
- fi
- if test "$gcrypt" = "yes" ; then
-   echo "CONFIG_GCRYPT=y" >> $config_host_mak
-+  echo "GCRYPT_CFLAGS=$gcrypt_cflags" >> $config_host_mak
-+  echo "GCRYPT_LIBS=$gcrypt_libs" >> $config_host_mak
-   if test "$gcrypt_hmac" = "yes" ; then
-     echo "CONFIG_GCRYPT_HMAC=y" >> $config_host_mak
+@@ -2616,9 +2616,6 @@ if test "$nettle" != "no"; then
+         nettle_cflags=$($pkg_config --cflags nettle)
+         nettle_libs=$($pkg_config --libs nettle)
+         nettle_version=$($pkg_config --modversion nettle)
+-        libs_softmmu="$nettle_libs $libs_softmmu"
+-        libs_tools="$nettle_libs $libs_tools"
+-        QEMU_CFLAGS="$QEMU_CFLAGS $nettle_cflags"
+         nettle="yes"
+ 
+         cat > $TMPC << EOF
+@@ -5732,6 +5729,8 @@ if test "$nettle" = "yes" ; then
+   if test "$nettle_kdf" = "yes" ; then
+     echo "CONFIG_NETTLE_KDF=y" >> $config_host_mak
    fi
++  echo "NETTLE_CFLAGS=$nettle_cflags" >> $config_host_mak
++  echo "NETTLE_LIBS=$nettle_libs" >> $config_host_mak
+ fi
+ if test "$tasn1" = "yes" ; then
+   echo "CONFIG_TASN1=y" >> $config_host_mak
 diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-index 0cb5fa24b6..45f7c0c80d 100644
+index 2b99e08062..a936957d03 100644
 --- a/crypto/Makefile.objs
 +++ b/crypto/Makefile.objs
-@@ -34,6 +34,13 @@ crypto-obj-y += block.o
+@@ -34,6 +34,12 @@ crypto-obj-y += block.o
  crypto-obj-y += block-qcow.o
  crypto-obj-y += block-luks.o
  
-+$(if $(CONFIG_GCRYPT), \
-+	$(foreach x, init cipher hash-gcrypt hmac-gcrypt random-gcrypt \
-+			pbkdf-gcrypt, \
++$(if $(CONFIG_NETTLE), \
++	$(foreach x, cipher hash-nettle hmac-nettle pbkdf-nettle, \
 +		$(eval $x.o-cflags := $(NETTLE_CFLAGS)) \
 +		$(eval $x.o-libs := $(NETTLE_LIBS))) \
 +)
 +
- $(if $(CONFIG_NETTLE), \
- 	$(foreach x, cipher hash-nettle hmac-nettle pbkdf-nettle, \
- 		$(eval $x.o-cflags := $(NETTLE_CFLAGS)) \
+ # Let the userspace emulators avoid linking gnutls/etc
+ crypto-aes-obj-y = aes.o
+ 
 -- 
 2.13.5
