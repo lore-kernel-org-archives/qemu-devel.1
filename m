@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57898)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dpYlk-0004FO-JA
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:45:21 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dpYqS-0006Tc-D7
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:50:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dpYlf-00052H-Qy
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:45:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58572)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dpYlf-00051t-IM
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:45:15 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6EC3D85376
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 11:45:14 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  6 Sep 2017 13:44:55 +0200
-Message-Id: <20170906114456.27339-2-quintela@redhat.com>
-In-Reply-To: <20170906114456.27339-1-quintela@redhat.com>
-References: <20170906114456.27339-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 1/2] tests: Use real size for iov tests
+	(envelope-from <kwolf@redhat.com>) id 1dpYqN-0006zN-Uv
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:50:12 -0400
+Date: Wed, 6 Sep 2017 13:49:53 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170906114953.GF3753@dhcp-200-186.str.redhat.com>
+References: <20170906110359.13854-1-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170906110359.13854-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v5] docs: add qemu-block-drivers(7) man page
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,91 +22,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Eric Blake <eblake@redhat.com>, el13635@mail.ntua.gr
 
-We were using -1 instead of the real size because the functions check
-what is bigger, size in bytes or the size of the iov.  Recent gcc's
-barf at this.
+Am 06.09.2017 um 13:03 hat Stefan Hajnoczi geschrieben:
+> Block driver documentation is available in qemu-doc.html.  It would be
+> convenient to have documentation for formats, protocols, and filter
+> drivers in a man page.
+> 
+> Extract the relevant part of qemu-doc.html into a new file called
+> docs/qemu-block-drivers.texi.  This file can also be built as a
+> stand-alone document (man, html, etc).
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+> v5:
+>  * Dropped .html, .info, and .txt due to cross-platform texi toolchain
+>    issues (qemu-img.texi also supports man output only) after Kevin
+>    reported warnings
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Tested-by: Cleber Rosa <crosa@redhat.com>
---
+Now it doesn't build at all any more. :-(
 
-Remove comments about this feature.
-Fix missing -1.
----
- include/qemu/iov.h |  6 ------
- tests/test-iov.c   | 10 +++++-----
- 2 files changed, 5 insertions(+), 11 deletions(-)
+  GEN     docs/qemu-block-drivers.7
+No filename or title
+make: *** [rules.mak:387: docs/qemu-block-drivers.7] Fehler 21
 
-diff --git a/include/qemu/iov.h b/include/qemu/iov.h
-index bd9fd55b0a..72d4c559b4 100644
---- a/include/qemu/iov.h
-+++ b/include/qemu/iov.h
-@@ -31,11 +31,6 @@ size_t iov_size(const struct iovec *iov, const unsigned int iov_cnt);
-  * Number of bytes actually copied will be returned, which is
-  *  min(bytes, iov_size(iov)-offset)
-  * `Offset' must point to the inside of iovec.
-- * It is okay to use very large value for `bytes' since we're
-- * limited by the size of the iovec anyway, provided that the
-- * buffer pointed to by buf has enough space.  One possible
-- * such "large" value is -1 (sinice size_t is unsigned),
-- * so specifying `-1' as `bytes' means 'up to the end of iovec'.
-  */
- size_t iov_from_buf_full(const struct iovec *iov, unsigned int iov_cnt,
-                          size_t offset, const void *buf, size_t bytes);
-@@ -76,7 +71,6 @@ iov_to_buf(const struct iovec *iov, const unsigned int iov_cnt,
-  * up to the end of it, will be filled with the specified value.
-  * Function return actual number of bytes processed, which is
-  * min(size, iov_size(iov) - offset).
-- * Again, it is okay to use large value for `bytes' to mean "up to the end".
-  */
- size_t iov_memset(const struct iovec *iov, const unsigned int iov_cnt,
-                   size_t offset, int fillc, size_t bytes);
-diff --git a/tests/test-iov.c b/tests/test-iov.c
-index fa3d75aee1..458ca25099 100644
---- a/tests/test-iov.c
-+++ b/tests/test-iov.c
-@@ -81,17 +81,17 @@ static void test_to_from_buf_1(void)
-           * skip whole vector and process exactly 0 bytes */
- 
-          /* first set bytes [i..sz) to some "random" value */
--         n = iov_memset(iov, niov, 0, 0xff, -1);
-+         n = iov_memset(iov, niov, 0, 0xff, sz);
-          g_assert(n == sz);
- 
-          /* next copy bytes [i..sz) from ibuf to iovec */
--         n = iov_from_buf(iov, niov, i, ibuf + i, -1);
-+         n = iov_from_buf(iov, niov, i, ibuf + i, sz - i);
-          g_assert(n == sz - i);
- 
-          /* clear part of obuf */
-          memset(obuf + i, 0, sz - i);
-          /* and set this part of obuf to values from iovec */
--         n = iov_to_buf(iov, niov, i, obuf + i, -1);
-+         n = iov_to_buf(iov, niov, i, obuf + i, sz - i);
-          g_assert(n == sz - i);
- 
-          /* now compare resulting buffers */
-@@ -109,7 +109,7 @@ static void test_to_from_buf_1(void)
-               * with j in [i..sz]. */
- 
-              /* clear iovec */
--             n = iov_memset(iov, niov, 0, 0xff, -1);
-+             n = iov_memset(iov, niov, 0, 0xff, sz);
-              g_assert(n == sz);
- 
-              /* copy bytes [i..j) from ibuf to iovec */
-@@ -225,7 +225,7 @@ static void test_io(void)
-        for (i = 0; i <= sz; ++i) {
-            for (j = i; j <= sz; ++j) {
-                k = i;
--               iov_memset(iov, niov, 0, 0xff, -1);
-+               iov_memset(iov, niov, 0, 0xff, sz);
-                do {
-                    s = g_test_rand_int_range(0, j - k + 1);
-                    r = iov_recv(sv[0], iov, niov, k, s);
--- 
-2.13.5
+Kevin
