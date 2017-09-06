@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dpZ9B-0004KW-M4
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:09:34 -0400
+	(envelope-from <ramysameh26@gmail.com>) id 1dpZCM-00066R-EJ
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:12:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dpZ96-0007Qz-Vi
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:09:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59622)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dpZ96-0007Qg-P9
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:09:28 -0400
-Date: Wed, 6 Sep 2017 08:09:26 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <622608851.9114372.1504699766400.JavaMail.zimbra@redhat.com>
-In-Reply-To: <87bmmphwdz.fsf@dusky.pond.sub.org>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-29-marcandre.lureau@redhat.com>
-	<87bmmphwdz.fsf@dusky.pond.sub.org>
+	(envelope-from <ramysameh26@gmail.com>) id 1dpZCL-0001Kd-2l
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:12:50 -0400
+Received: from mail-oi0-x22c.google.com ([2607:f8b0:4003:c06::22c]:35064)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ramysameh26@gmail.com>)
+	id 1dpZCK-0001KS-Rp
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:12:48 -0400
+Received: by mail-oi0-x22c.google.com with SMTP id n18so40351757oig.2
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 05:12:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 28/54] qapi: do not define enumeration
- value explicitely
+In-Reply-To: <CAF6HrYw9B1ns0ZVtU_gxqJZxOe0dG03UQiAV7FHxBB-wQh6kNQ@mail.gmail.com>
+References: <CAF6HrYxj5BoTQpQjz95Z1_N_p615jpEE12xh_afuuqE4fcTyLg@mail.gmail.com>
+	<CAFEAcA9YNO7kgC8yzZ_RUKck=+98pUET0ogVZ7TvC1kxV+_fFA@mail.gmail.com>
+	<CAF6HrYwT7WP_i7cVhvEyRvqSK7J+bLnKU4b+WrMQfVkLaNDrvQ@mail.gmail.com>
+	<CAFEAcA9kEEyUj7=7Wd-jNbVOWwfgkj0a201q+L4e5CDR22JUgw@mail.gmail.com>
+	<CAF6HrYw9B1ns0ZVtU_gxqJZxOe0dG03UQiAV7FHxBB-wQh6kNQ@mail.gmail.com>
+From: Ramy Sameh <ramysameh26@gmail.com>
+Date: Wed, 6 Sep 2017 14:12:47 +0200
+Message-ID: <CAF6HrYym57hZjSFE=iExPkp8vBX82zqXvTxh8GJDYNPL1FTSqA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Questions regarding emulated UART in VersatilePB
+ board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,65 +33,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ahmed Aly <ahmedaly50@gmail.com>
+
+Hello Peter,
+
+I have one more simple question please.
+
+Do the emulated baud rate registers have any effect? (I think they would
+have no effect, because there is no real clock that can be used to produce
+the baud rate).
+
+
+On Tue, Sep 5, 2017 at 8:50 PM, Ramy Sameh <ramysameh26@gmail.com> wrote:
+
+> Thank you very much Peter.
+>
+> I will check the documentation for VersatilePB and ARM926EJ-S for more
+> understanding of interrupts handling.
+>
+>
+>
+> On Tue, Sep 5, 2017 at 8:06 PM, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+>
+>> On 5 September 2017 at 18:56, Ramy Sameh <ramysameh26@gmail.com> wrote:
+>> > Are there any documentation or source of information, that can describe
+>> how
+>> > interrupts are implemented, and how to use them (where is the vector
+>> table
+>> > to put the ISR ... etc) ?
+>>
+>> The source code is it.
+>>
+>> Note that the pl011 is only a UART. It is used in a variety
+>> of different boards, which have different interrupt controllers,
+>> and with different CPUs. Things like ISR vector tables are
+>> generally part of the CPU or interrupt controller emulation.
+>>
+>> The pl011's part of this is simply to raise and lower its outbound IRQ
+>> line
+>> when the conditions are right -- this happens by calling qemu_set_irq()
+>> in pl011_update(). This corresponds to the hardware's UARTINTR line.
+>> In QEMU that IRQ line is connected up to an emulated interrupt controller
+>> which in turn is connected to an emulated CPU, just as in hardware
+>> the pl011 UARTINTR line is connected to a hardware interrupt controller
+>> and thus to a CPU.
+>>
+>> For information on how guest code should use a UART, how it should
+>> set up interrupts and so on, you should consult the documentation
+>> on how the hardware behaves.
+>>
+>> > In addition, any source of info that describes the code workflow when
+>> > reading or writing to the uart would be very helpful.
+>> > (because I put printfs in the functions to understand the workflow, but
+>> the
+>> > order of these printfs made me very confused).
+>> >
+>> > Regarding the registers, I have checked pl011_read and pl011_write, and
+>> > found them, thanks for that.
+>> > But I couldn't find the register "UARTICR" (Interrupt clear register)
+>> > I think this might be related to my lack of understanding of how
+>> interrupts
+>> > are implemented in emulated pl011.
+>>
+>> UARTICR is a write-only register, so it is handled only in
+>> pl011_write():
+>>
+>>     case 17: /* UARTICR */
+>>         s->int_level &= ~value;
+>>         pl011_update(s);
+>>         break;
+>>
+>> (It's write-1-to-clear, hence the &= ~.)
+>>
+>> > Regarding the ID registers, whose values are hard-wired in the board,
+>> and
+>> > there was no need to implement modifiable states for them.
+>> > Do you mean Peripheral identification registers, UARTPeriphID0-3 and
+>> > PrimeCell identification registers, UARTPCellID0-3 ?
+>>
+>> Yes. (See the pl011_id_arm[] array which has the values.)
+>>
+>> thanks
+>> -- PMM
+>>
+>
+>
+>
+> --
+> Best Regards,
+> Ramy Sameh
+> Embedded Software Engineer
+> +2-010-172-777-14
+>
 
 
 
------ Original Message -----
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->=20
-> > The C standard has the initial value at 0 and the subsequent values
-> > incremented by 1. No need to set this explicitely.
-> >
-> > This will prevent from artificial "gaps" when compiling out some enum
-> > values and having unnecessarily large MAX values & enums arrays.
->=20
-> Yes, but it also risks entertaining mishaps like compiling this one
->=20
->     typedef enum Color {
->         COLOR_WHITE,
-> #if defined(NEED_CPU_H)
-> #if defined(TARGET_S390X)
->         COLOR_BLUE,
-> #endif /* defined(TARGET_S390X) */
-> #endif /* defined(NEED_CPU_H) */
->         COLOR_BLACK,
->     } Color;
->=20
-> in s390x-code (COLOR_BLACK =3D 2) and in target-independent code
-> (COLOR_BLACK =3D 1), then linking the two together.
-
-This is also true with other kind of types, like struct.
-
-One of the main reason why we should have schemas for target-only and the N=
-EED_CPU_H is a temporary working hack.
-
->=20
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  scripts/qapi.py | 7 ++-----
-> >  1 file changed, 2 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/scripts/qapi.py b/scripts/qapi.py
-> > index 52099332f1..9d075440d3 100644
-> > --- a/scripts/qapi.py
-> > +++ b/scripts/qapi.py
-> > @@ -1979,14 +1979,11 @@ typedef enum %(c_name)s {
-> >  ''',
-> >                  c_name=3Dc_name(name))
-> > =20
-> > -    i =3D 0
-> >      for value in enum_values:
-> >          ret +=3D mcgen('''
-> > -    %(c_enum)s =3D %(i)d,
-> > +    %(c_enum)s,
-> >  ''',
-> > -                     c_enum=3Dc_enum_const(name, value, prefix),
-> > -                     i=3Di)
-> > -        i +=3D 1
-> > +                     c_enum=3Dc_enum_const(name, value, prefix))
-> > =20
-> >      ret +=3D mcgen('''
-> >  } %(c_name)s;
->=20
+-- 
+Best Regards,
+Ramy Sameh
+Embedded Software Engineer
++2-010-172-777-14
