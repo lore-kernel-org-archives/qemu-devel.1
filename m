@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36708)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49006)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpMyc-00084r-D2
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 19:09:55 -0400
+	(envelope-from <alistai@xilinx.com>) id 1dpO0U-0007Fn-N8
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 20:15:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dpMyX-0000Hb-Ga
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 19:09:50 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1503414539-28762-1-git-send-email-peter.maydell@linaro.org>
-	<1503414539-28762-4-git-send-email-peter.maydell@linaro.org>
-	<9af3401e-031a-3ae3-d2fc-315dab3ef9e1@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3495db71-0325-29be-1943-b8344a023984@amsat.org>
-Date: Tue, 5 Sep 2017 20:09:41 -0300
+	(envelope-from <alistai@xilinx.com>) id 1dpO0P-00006v-Ts
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 20:15:50 -0400
+Received: from mail-co1nam03on0046.outbound.protection.outlook.com
+	([104.47.40.46]:30160
+	helo=NAM03-CO1-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1dpO0P-00005z-Gr
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 20:15:45 -0400
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Tue, 5 Sep 2017 17:12:03 -0700
+Message-ID: <16cf589bc0c0431fbba6bbed8d1a50b49d24e867.1504656490.git.alistair.francis@xilinx.com>
+In-Reply-To: <cover.1504656490.git.alistair.francis@xilinx.com>
+References: <cover.1504656490.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <9af3401e-031a-3ae3-d2fc-315dab3ef9e1@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 03/20] target/arm: Add state field,
- feature bit and migration for v8M secure state
+Content-Type: text/plain
+Subject: [Qemu-devel] [RFC v1 2/2] netduino2: Specify the valid CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +27,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, patches@linaro.org
+To: qemu-devel@nongnu.org
+Cc: alistair.francis@xilinx.com, alistair23@gmail.com, ehabkost@redhat.com, marcel@redhat.com
 
-On 08/29/2017 12:28 PM, Richard Henderson wrote:
-> On 08/22/2017 08:08 AM, Peter Maydell wrote:
->> As the first step in implementing ARM v8M's security extension:
->>   * add a new feature bit ARM_FEATURE_M_SECURITY
->>   * add the CPU state field that indicates whether the CPU is
->>     currently in the secure state
->>   * add a migration subsection for this new state
->>     (we will add the Secure copies of banked register state
->>     to this subsection in later patches)
->>   * add a #define for the one new-in-v8M exception type
->>   * make the CPU debug log print S/NS status
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->>   target/arm/cpu.h       |  3 +++
->>   target/arm/cpu.c       |  4 ++++
->>   target/arm/machine.c   | 20 ++++++++++++++++++++
->>   target/arm/translate.c |  8 +++++++-
->>   4 files changed, 34 insertions(+), 1 deletion(-)
-> 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+---
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+ hw/arm/netduino2.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
+index 3cfe332dd1..accca344fd 100644
+--- a/hw/arm/netduino2.c
++++ b/hw/arm/netduino2.c
+@@ -43,8 +43,13 @@ static void netduino2_init(MachineState *machine)
+ 
+ static void netduino2_machine_init(MachineClass *mc)
+ {
++    const char *val = "cortex-m3";
++
+     mc->desc = "Netduino 2 Machine";
+     mc->init = netduino2_init;
++
++    mc->valid_cpu_types = g_array_new(false, false, sizeof(char *));
++    g_array_append_val(mc->valid_cpu_types, val);
+ }
+ 
+ DEFINE_MACHINE("netduino2", netduino2_machine_init)
+-- 
+2.11.0
