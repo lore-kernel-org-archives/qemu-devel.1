@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpTpV-0006Fq-Q3
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:28:54 -0400
+	(envelope-from <ppandit@redhat.com>) id 1dpU5r-0000Hf-My
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:45:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <armbru@redhat.com>) id 1dpTpS-00006U-Mp
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:28:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33614)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpTpS-00006D-Gt
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:28:50 -0400
-From: Markus Armbruster <armbru@redhat.com>
-References: <CAO6-N=a7WwhsDqZsm=wppXWMunGub=RH17FBk5w_tK0vu-8=cQ@mail.gmail.com>
-Date: Wed, 06 Sep 2017 08:28:44 +0200
-In-Reply-To: <CAO6-N=a7WwhsDqZsm=wppXWMunGub=RH17FBk5w_tK0vu-8=cQ@mail.gmail.com>
-	(Taimoor Mirza's message of "Mon, 21 Aug 2017 18:02:07 +0500")
-Message-ID: <87tw0ge3xf.fsf@dusky.pond.sub.org>
+	(envelope-from <ppandit@redhat.com>) id 1dpU5r-0007Ga-18
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 02:45:47 -0400
+Date: Wed, 6 Sep 2017 12:15:32 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+In-Reply-To: <CAFEAcA8JxuM-ddQVTBfgnSDD2fD+kz_RNShdNDqMqVH=zOKBfw@mail.gmail.com>
+Message-ID: <nycvar.YSQ.7.76.1709061202500.13418@wniryva>
+References: <20170905112152.8851-1-ppandit@redhat.com>
+	<CAFEAcA8B4EwXCPSBsftt=QkAuH8jCBbK23-uU7NA7G3k6ADHLw@mail.gmail.com>
+	<7FD21DDFE9A3784693E393AF276FE7D21F17E49E@DGGEMA501-MBX.china.huawei.com>
+	<CAFEAcA8JxuM-ddQVTBfgnSDD2fD+kz_RNShdNDqMqVH=zOKBfw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] stack smash while using SDL 1.2.5 with QEMU 2.9
+Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [Qemu-devel]
+ =?gb2312?b?tPC4tDogW1BBVENIXSBpbnRjOiBhcm1fZ2ljdjM6?=
+ =?gb2312?b?IGxpbWl0IEdJQ1IgaXByaW9yaXR5IGluZGV4?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,46 +26,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Taimoor Mirza <taimoor.mrza@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: niuguoxiang <niuguoxiang@huawei.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-Gerd, any ideas?
++-- On Tue, 5 Sep 2017, Peter Maydell wrote --+
+| The code cannot be reached with a non-aligned value,
+| because we register these functions via the gic_ops[]
+| MemoryRegionops in hw/intc/arm_gicv3.c, and since we
+| do not specify .valid.unaligned=true there, the memory.c
+| code will throw out attempts at unaligned accesses.
 
-Taimoor Mirza <taimoor.mrza@gmail.com> writes:
+  I see, thank you for the clarification; ie. within the range
 
-> Hi Guys,
->
-> I have been using QEMU 1.5 earlier with SDL version 1.2.5. Now we have
-> decided to move to new version of QEMU. I have built QEMU binaries with SDL
-> support using SDL 1.2.5 that we were using earlier. Windows binaries work
-> fine but I get stack smash in sdl.c on Linux. Below are stack traces that I
-> have got from GDB:
->
-> Program received signal SIGABRT, Aborted.
-> 0x00007ffff6e74c37 in __GI_raise (sig=sig@entry=6) at
-> ../nptl/sysdeps/unix/sysv/linux/raise.c:56
-> 56    ../nptl/sysdeps/unix/sysv/linux/raise.c: No such file or directory.
-> (gdb) bt
-> #0  0x00007ffff6e74c37 in __GI_raise (sig=sig@entry=6) at
-> ../nptl/sysdeps/unix/sysv/linux/raise.c:56
-> #1  0x00007ffff6e78028 in __GI_abort () at abort.c:89
-> #2  0x00007ffff6eb12a4 in __libc_message (do_abort=do_abort@entry=1,
-> fmt=fmt@entry=0x7ffff6fc0d70 "*** %s ***: %s terminated\n") at
-> ../sysdeps/posix/libc_fatal.c:175
-> #3  0x00007ffff6f4c83c in __GI___fortify_fail (msg=<optimized out>,
-> msg@entry=0x7ffff6fc0d58 "stack smashing detected") at fortify_fail.c:38
-> #4  0x00007ffff6f4c7e0 in __stack_chk_fail () at stack_chk_fail.c:28
-> #5  0x0000555555a66909 in sdl_display_init (ds=<optimized out>,
-> full_screen=0, no_frame=<optimized out>) at
-> /scratch/tmirza/builds/qemu_build/obj/qemu-src-master-999999-arm-linux-gnueabi-x86_64-linux-gnu/ui/sdl.c:1054
-> #6  0x0000000006e00002 in ?? ()
-> #7  0x0000000006e00003 in ?? ()
-> #8  0x0000555556feca30 in ?? ()
-> #9  0x0000555555c784e1 in ?? ()
-> #10 0x0000000000000000 in ?? ()
->
-> I want to know whether it is a known issue and Is QEMU 2.9 compatible with
-> SDL 1.2.5?
->
-> Thanks,
-> Taimoor Mirza
+   GICR_IPRIORITYR ... GICR_IPRIORITYR + 0x1f:
+
+'offset' would be GICR_IPRIORITYR +0, +4, +8 ... 0x1c?
+
+Maybe the patch could still be considered, not as bug fix though.
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+47AF CE69 3A90 54AA 9045 1053 DD13 3D32 FE5B 041F
