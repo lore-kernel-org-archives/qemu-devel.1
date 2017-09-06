@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53926)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53914)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpc92-0004GF-UE
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 11:21:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dpc91-0004FJ-NN
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 11:21:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpc8y-0007D1-TW
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 11:21:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1dpc8w-0007Bw-2y
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 11:21:35 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed,  6 Sep 2017 10:21:07 -0500
-Message-Id: <20170906152111.16958-2-eblake@redhat.com>
+Date: Wed,  6 Sep 2017 10:21:08 -0500
+Message-Id: <20170906152111.16958-3-eblake@redhat.com>
 In-Reply-To: <20170906152111.16958-1-eblake@redhat.com>
 References: <20170906152111.16958-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PULL 1/5] iotests: rewrite 192 to use _launch_qemu to
- fix LUKS support
+Subject: [Qemu-devel] [PULL 2/5] iotests: blacklist 194 with the luks driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,59 +24,51 @@ Cc: "Daniel P. Berrange" <berrange@redhat.com>, Kevin Wolf <kwolf@redhat.com>, M
 
 From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The LUKS driver requires extra args to QEMU to setup passwords.
-The _launch_qemu function takes care of this, so convert the
-test to use this function and use correct -drive syntax
+The 194 test has a lot of code that assumes a simple image file. Rewriting
+this to work with luks is possible, but non-trivial, so blacklist the
+luks format for now.
 
 Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-Message-Id: <20170901105434.3288-2-berrange@redhat.com>
+Message-Id: <20170901105434.3288-3-berrange@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 Tested-by: Fam Zheng <famz@redhat.com>
+[eblake: commit message typo fixed]
+Reviewed-by: Kashyap Chamarthy <kchamart@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qemu-iotests/192 | 23 ++++++++++++++++-------
- 1 file changed, 16 insertions(+), 7 deletions(-)
+ tests/qemu-iotests/194        | 1 +
+ tests/qemu-iotests/iotests.py | 4 +++-
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
-index b50a2c0c8e..595f0d786a 100755
---- a/tests/qemu-iotests/192
-+++ b/tests/qemu-iotests/192
-@@ -37,6 +37,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- # get standard environment, filters and checks
- . ./common.rc
- . ./common.filter
-+. ./common.qemu
+diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
+index 6449b9b64a..8d973b440f 100755
+--- a/tests/qemu-iotests/194
++++ b/tests/qemu-iotests/194
+@@ -21,6 +21,7 @@
 
- _supported_fmt generic
- _supported_proto file
-@@ -49,13 +50,21 @@ fi
- size=64M
- _make_test_img $size
+ import iotests
 
--{
--echo "nbd_server_start unix:$TEST_DIR/nbd"
--echo "nbd_server_add -w drive0"
--echo "q"
--} | $QEMU -nodefaults -display none -monitor stdio \
--    -drive format=$IMGFMT,file=$TEST_IMG,if=ide,id=drive0 \
--    -incoming defer 2>&1 | _filter_testdir | _filter_qemu | _filter_hmp
-+if test "$IMGOPTSSYNTAX" = "true"
-+then
-+    DRIVE_ARG=if=ide,id=drive0,$TEST_IMG
-+else
-+    DRIVE_ARG=if=ide,id=drive0,format=$IMGFMT,file=$TEST_IMG
-+fi
-+
-+qemu_comm_method="monitor"
-+_launch_qemu -drive $DRIVE_ARG -incoming defer
-+h=$QEMU_HANDLE
-+QEMU_COMM_TIMEOUT=1
-+
-+_send_qemu_cmd $h "nbd_server_start unix:$TEST_DIR/nbd" "(qemu)"
-+_send_qemu_cmd $h "nbd_server_add -w drive0" "(qemu)"
-+_send_qemu_cmd $h "q" "(qemu)"
++iotests.verify_image_format(unsupported_fmts=['luks'])
+ iotests.verify_platform(['linux'])
 
- # success, all done
- echo "*** done"
+ with iotests.FilePath('source.img') as source_img_path, \
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index 07fa1626a0..1af117e37d 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -421,9 +421,11 @@ def notrun(reason):
+     print '%s not run: %s' % (seq, reason)
+     sys.exit(0)
+
+-def verify_image_format(supported_fmts=[]):
++def verify_image_format(supported_fmts=[], unsupported_fmts=[]):
+     if supported_fmts and (imgfmt not in supported_fmts):
+         notrun('not suitable for this image format: %s' % imgfmt)
++    if unsupported_fmts and (imgfmt in unsupported_fmts):
++        notrun('not suitable for this image format: %s' % imgfmt)
+
+ def verify_platform(supported_oses=['linux']):
+     if True not in [sys.platform.startswith(x) for x in supported_oses]:
 -- 
 2.13.5
