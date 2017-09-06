@@ -1,30 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpapU-0002cn-7w
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:57:21 -0400
+	(envelope-from <berrange@redhat.com>) id 1dparE-0003RI-Gg
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:59:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpapO-0005Ov-53
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:57:20 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35055)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dpapN-0005Nm-Ul
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:57:14 -0400
-Received: by mail-wm0-x242.google.com with SMTP id e64so5400052wmi.2
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 06:57:12 -0700 (PDT)
-Date: Wed, 6 Sep 2017 14:57:08 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170906135708.GD15535@stefanha-x1.localdomain>
-References: <20170905035457.3753-1-Sergio.G.DelReal@gmail.com>
-	<20170905035457.3753-9-Sergio.G.DelReal@gmail.com>
-	<CAMzKsXu29K+b=fGuPLti5if6zj5=pQhpmQz1iei6-hgjbq_41Q@mail.gmail.com>
-	<CAMzKsXu0LOR=mzBNq-=sbv3YRBCjKXxx2NjeJya-TPkK6mYT2Q@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMzKsXu0LOR=mzBNq-=sbv3YRBCjKXxx2NjeJya-TPkK6mYT2Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v3 08/14] hvf: add compilation rules to
- Makefile.objs
+	(envelope-from <berrange@redhat.com>) id 1dparB-0006IY-FM
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:59:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50728)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dparB-0006Hy-A3
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:59:05 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Wed,  6 Sep 2017 14:58:59 +0100
+Message-Id: <20170906135859.15831-1-berrange@redhat.com>
+Subject: [Qemu-devel] [PATCH] io: use case insensitive check for Connection
+ & Upgrade websock headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,18 +22,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Sergio =?iso-8859-1?Q?Andr=E9s_G=F3mez?= del Real <sergio.g.delreal@gmail.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Brian Rak <brak@vultr.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-On Tue, Sep 05, 2017 at 08:12:31PM -0500, Sergio Andrés Gómez del Real wrote:
-> Stefan, is this acceptable? I mean delaying the compiling; up until patch 7
-> no hvf code is compiled. Or should I just squash everything from patch 2 to
-> 7?
+When checking the value of the Connection and Upgrade HTTP headers
+the websock RFC (6455) requires the comparison to be case insensitive.
+The Connection value should be an exact match not a substring.
 
-It's okay.  Feel free to delay until patch 7 for now.
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+---
+ io/channel-websock.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-There is value in importing code verbatim and making changes in separate
-patches.  That way it's easy to diff the code against the upstream
-source to verify that it was imported correctly.
-
-Stefan
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index 463c04b0aa..abb2470146 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -427,12 +427,12 @@ static void qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
+         goto bad_request;
+     }
+ 
+-    if (!g_strrstr(connection, QIO_CHANNEL_WEBSOCK_CONNECTION_UPGRADE)) {
++    if (strcasecmp(connection, QIO_CHANNEL_WEBSOCK_CONNECTION_UPGRADE) != 0) {
+         error_setg(errp, "No connection upgrade requested '%s'", connection);
+         goto bad_request;
+     }
+ 
+-    if (!g_str_equal(upgrade, QIO_CHANNEL_WEBSOCK_UPGRADE_WEBSOCKET)) {
++    if (strcasecmp(upgrade, QIO_CHANNEL_WEBSOCK_UPGRADE_WEBSOCKET) != 0) {
+         error_setg(errp, "Incorrect upgrade method '%s'", upgrade);
+         goto bad_request;
+     }
+-- 
+2.13.5
