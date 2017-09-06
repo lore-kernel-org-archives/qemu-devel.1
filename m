@@ -1,33 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37525)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38257)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dpbX7-0001wW-6P
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:42:30 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpbYY-0002r6-RY
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:43:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dpbX3-00047S-Vz
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:42:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56730)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dpbX3-00045u-QI
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:42:21 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id ADA41C047B67
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 14:42:20 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <7e71d190-8e49-ca6b-ef44-522100b27b8c@redhat.com> (Eric Blake's
-	message of "Wed, 6 Sep 2017 09:00:51 -0500")
-References: <20170906115143.27451-1-quintela@redhat.com>
-	<20170906115143.27451-2-quintela@redhat.com>
-	<7e71d190-8e49-ca6b-ef44-522100b27b8c@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 06 Sep 2017 16:42:18 +0200
-Message-ID: <87pob351o5.fsf@secure.mitica>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpbYV-00058I-Ii
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:43:54 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47329
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dpbYV-00057m-CN
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:43:51 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v86EgMVM031802
+	for <qemu-devel@nongnu.org>; Wed, 6 Sep 2017 10:43:50 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cthjqeaqv-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 10:43:50 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 6 Sep 2017 15:43:46 +0100
+References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
+	<20170830163609.50260-5-pasic@linux.vnet.ibm.com>
+	<20170831115535.1e4201d3.cohuck@redhat.com>
+	<7540741b-d230-e7c4-50d3-036f31997c8b@linux.vnet.ibm.com>
+	<20170905182546.00457332.cohuck@redhat.com>
+	<fe102a7a-e998-8ebe-b94d-e653c4f66c39@linux.vnet.ibm.com>
+	<20170906043108.GY31680@bjsdjshi@linux.vnet.ibm.com>
+	<8946b1ec-4d14-c953-deab-aaded7cd2c9d@linux.vnet.ibm.com>
+	<20170906162019.45eeec4a.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 6 Sep 2017 16:43:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v7 01/22] Revert "io: add new
- qio_channel_{readv, writev, read, write}_all functions"
+In-Reply-To: <20170906162019.45eeec4a.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <cc6eab96-969d-eb66-91b5-cdb965c1bcbb@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 4/9] s390x: refactor error handling for
+ SSCH and RSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,39 +51,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Eric Blake <eblake@redhat.com> wrote:
-> On 09/06/2017 06:51 AM, Juan Quintela wrote:
->> This reverts commit d4622e55883211072621958d39ddaa73483d201e.
->
-> But with no reason why?  What bugs are you fixing by reverting this?
 
-I put it on the cover letter.  I am investigating *why* it fails on me.
-It got the thread handed.
 
->
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> ---
->>  include/io/channel.h       |  90 ---------------------------------------
->>  io/channel.c               |  94 -----------------------------------------
->>  tests/io-channel-helpers.c | 102 +++++++++++++++++++++++++++++++++++++++++----
->>  3 files changed, 93 insertions(+), 193 deletions(-)
+On 09/06/2017 04:20 PM, Cornelia Huck wrote:
+> On Wed, 6 Sep 2017 14:25:13 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> We have basically two possibilities/options which ask for different
+>> handling:
+>> 1) EFAULT is due to a bug in the vfio-ccw implementation
+>> (can be QEMU or kernel).
+>> 2) EFAULT is due to buggy channel program.
 >>
->
-> Looking ahead, I see 8/22 recreates qio_channel_readv_all (but not
-> qio_channel_read_all); how does that differ from this one?
->
-> Should you be squashing 1/22 and 8/22 into a single non-revert patch
-> that just fixes bugs on top of what is already in the tree?
+>> Option 2) is basically to be handled with a channel-program check and
+>> setting primary secondary and alert status. For reference see PoP page
+>> 15-59 ("Designation of Storage Area").  An exception may be an invalid
+>> channel program address in the ORB. There the channel-program check ain't
+>> explicitly stated (although) I would expect one. It may be implied by the
+>> things on page 15-59 though.
+>>
+>> Option 1) is however very similar to other we have figured out that the
+>> implementation is broken situations and should be handled consequently.
+>> The current state of the discussion is with a unit exception.
+>>
+>> Does that make sense?
+> 
+> I think the situation is slightly different here, though. For the orb
+> flags, we reject something out of hand because we have not implemented
+> it, and for that, unit exception sounds like a good fit. Processing
+> errors, however, are more similar to errors in the hardware, and as
+> such can probably be reported via something like equipment check.
+> 
 
-My plan is to fix whatever is there and see why it is failing.
+Noted. Let's see what Dong Jia has to say, before we continuing a
+discussion on something (option 1) what may be irrelevant anyway.
 
-> Also, have you seen my patches, that also fix bugs in the _all functions?
-> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01053.html
-
-No, I have to take a look, thanks.
-
-Thanks, Juan.
+>>
+>> Now, Dong Jia, I need your help to figure out do we have option 1 or
+>> option 2 here? After quick look at the kernel code, it appears to me that
+>> I've seen both option 1 and option 2 (I'm afraid) -- but my assessment
+>> was really very superficial.
+>>
+>> I would expect option 2 to be handled differently (kernel provides the
+>> SCSW) though.
+>>
+>> Regards,
+>> Halil
+>>
+> 
+> 
