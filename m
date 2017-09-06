@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35732)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dphk9-0002tg-Dn
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:20:18 -0400
+	(envelope-from <cota@braap.org>) id 1dphkr-0003In-O1
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:21:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dphk6-0003rz-9z
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:20:17 -0400
-Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:37525)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dphk6-0003rO-2V
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:20:14 -0400
-Received: by mail-pg0-x231.google.com with SMTP id d8so17314902pgt.4
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 14:20:13 -0700 (PDT)
-References: <20170904154316.4148-1-david@redhat.com>
-	<20170904154316.4148-12-david@redhat.com>
-	<2c620927-0406-2fc1-895c-09ffc2e44a4e@linux.vnet.ibm.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6b3e9c2b-4cb7-fdf8-5f9b-ff7ebbf52d1e@linaro.org>
-Date: Wed, 6 Sep 2017 14:20:09 -0700
+	(envelope-from <cota@braap.org>) id 1dphko-0004HY-JH
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:21:01 -0400
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:50295)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dphko-0004GC-D2
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 17:20:58 -0400
+Date: Wed, 6 Sep 2017 17:20:56 -0400
+From: "Emilio G. Cota" <cota@braap.org>
+Message-ID: <20170906212056.GC25558@flamenco>
+References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
+	<150471928780.24907.14047559834166839201.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <2c620927-0406-2fc1-895c-09ffc2e44a4e@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/19] s390x: allow only 1 CPU with TCG
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <150471928780.24907.14047559834166839201.stgit@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v4 03/20] instrument: Add generic library
+ loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,34 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Matthew Rosato <mjrosato@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com
+To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 09/06/2017 11:16 AM, Matthew Rosato wrote:
-> On 09/04/2017 11:43 AM, David Hildenbrand wrote:
->> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
->> guest tries to bring these CPUs up but fails), because we don't support
->> multiple CPUs on s390x under TCG.
->>
->> Let's bail out if more than 1 is specified, so we don't raise people's
->> hope. Make it a define, so we can easily bump it up later.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
-> 
-> Makes sense.  Ran the described environment without this patch (errors)
-> and again with this patch (graceful exit w/ message).
-> 
-> Tested-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
+On Wed, Sep 06, 2017 at 20:34:48 +0300, Lluís Vilanova wrote:
+> Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+> ---
+(snip)
+> diff --git a/configure b/configure
+> index 80dcc91c98..05bd7b1950 100755
+> --- a/configure
+> +++ b/configure
+> @@ -6034,6 +6034,8 @@ fi
+>  echo "CONFIG_TRACE_FILE=$trace_file" >> $config_host_mak
+>  
+>  if test "$instrument" = "yes"; then
+> +  LDFLAGS="-rdynamic $LDFLAGS"          # limit symbols available to clients
 
-Can someone review
+-rdynamic exports all objects to the instrumenters, not the other way around.
+You can see it with nm(1).
 
-  http://patchwork.ozlabs.org/patch/760010/
+BTW I'm using ebf447b5b from your qemu-dbi repo. Is that the same as this
+patchset? It doesn't compile with --enable-instrument:
+$ make
+  CC      x86_64-linux-user/instrument/trace.o
+/data/src/qemu2/instrument/trace.c:12:30: fatal error: qemu-instr/trace.h: No such file or directory
+compilation terminated.
+/data/src/qemu2/rules.mak:66: recipe for target 'instrument/trace.o' failed
+make[1]: *** [instrument/trace.o] Error 1
+Makefile:326: recipe for target 'subdir-x86_64-linux-user' failed
+make: *** [subdir-x86_64-linux-user] Error 2
 
-which does at least start to add the SIGP support.
-
-Once tcg can bring up 2 cpus, I see no reason it couldn't bring up N.  I don't
-see the point of the define.
-
-
-r~
+		Emilio
