@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40006)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpbeP-0005Ui-IS
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:49:58 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dpbeN-0005Rz-2B
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:49:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpbeO-0000K9-37
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:49:57 -0400
-Received: from mail-pf0-x22b.google.com ([2607:f8b0:400e:c00::22b]:35656)
+	(envelope-from <richard.henderson@linaro.org>) id 1dpbeK-0000FP-Ft
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:49:55 -0400
+Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:35783)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dpbeN-0000It-TV
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:49:56 -0400
-Received: by mail-pf0-x22b.google.com with SMTP id g13so13161392pfm.2
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 07:49:55 -0700 (PDT)
+	id 1dpbeK-0000EN-9n
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:49:52 -0400
+Received: by mail-pg0-x22b.google.com with SMTP id 188so12369382pgb.2
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 07:49:52 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  6 Sep 2017 07:49:35 -0700
-Message-Id: <20170906144940.30880-10-richard.henderson@linaro.org>
+Date: Wed,  6 Sep 2017 07:49:32 -0700
+Message-Id: <20170906144940.30880-7-richard.henderson@linaro.org>
 In-Reply-To: <20170906144940.30880-1-richard.henderson@linaro.org>
 References: <20170906144940.30880-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 09/14] tcg/s390: Merge muli facilities check to
- tcg_target_op_def
+Subject: [Qemu-devel] [PULL 06/14] disas/i386: Add disassembly of rorx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,97 +31,55 @@ Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>
 
 From: Richard Henderson <rth@twiddle.net>
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/s390/tcg-target.inc.c | 45 +++++++++++++++++++++++++--------------------
- 1 file changed, 25 insertions(+), 20 deletions(-)
+ disas/i386.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-index e075b4844a..ff3f644f8e 100644
---- a/tcg/s390/tcg-target.inc.c
-+++ b/tcg/s390/tcg-target.inc.c
-@@ -38,12 +38,13 @@
-    a 32-bit displacement here Just In Case.  */
- #define USE_LONG_BRANCHES 0
+diff --git a/disas/i386.c b/disas/i386.c
+index 7eaa378a10..a557e678ec 100644
+--- a/disas/i386.c
++++ b/disas/i386.c
+@@ -684,6 +684,7 @@ fetch_data(struct disassemble_info *info, bfd_byte *addr)
+ #define PREGRP106 NULL, { { NULL, USE_PREFIX_USER_TABLE }, { NULL, 106 } }
+ #define PREGRP107 NULL, { { NULL, USE_PREFIX_USER_TABLE }, { NULL, 107 } }
+ #define PREGRP108 NULL, { { NULL, USE_PREFIX_USER_TABLE }, { NULL, 108 } }
++#define PREGRP109 NULL, { { NULL, USE_PREFIX_USER_TABLE }, { NULL, 109 } }
  
--#define TCG_CT_CONST_MULI  0x100
--#define TCG_CT_CONST_ORI   0x200
--#define TCG_CT_CONST_XORI  0x400
--#define TCG_CT_CONST_U31   0x800
--#define TCG_CT_CONST_ADLI  0x1000
--#define TCG_CT_CONST_ZERO  0x2000
-+#define TCG_CT_CONST_S16   0x100
-+#define TCG_CT_CONST_S32   0x200
-+#define TCG_CT_CONST_ORI   0x400
-+#define TCG_CT_CONST_XORI  0x800
-+#define TCG_CT_CONST_U31   0x1000
-+#define TCG_CT_CONST_ADLI  0x2000
-+#define TCG_CT_CONST_ZERO  0x4000
- 
- /* Several places within the instruction set 0 means "no register"
-    rather than TCG_REG_R0.  */
-@@ -388,8 +389,11 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
-     case 'A':
-         ct->ct |= TCG_CT_CONST_ADLI;
-         break;
--    case 'K':
--        ct->ct |= TCG_CT_CONST_MULI;
-+    case 'I':
-+        ct->ct |= TCG_CT_CONST_S16;
-+        break;
-+    case 'J':
-+        ct->ct |= TCG_CT_CONST_S32;
-         break;
-     case 'O':
-         ct->ct |= TCG_CT_CONST_ORI;
-@@ -503,16 +507,10 @@ static int tcg_target_const_match(tcg_target_long val, TCGType type,
-     }
- 
-     /* The following are mutually exclusive.  */
--    if (ct & TCG_CT_CONST_MULI) {
--        /* Immediates that may be used with multiply.  If we have the
--           general-instruction-extensions, then we have MULTIPLY SINGLE
--           IMMEDIATE with a signed 32-bit, otherwise we have only
--           MULTIPLY HALFWORD IMMEDIATE, with a signed 16-bit.  */
--        if (s390_facilities & FACILITY_GEN_INST_EXT) {
--            return val == (int32_t)val;
--        } else {
--            return val == (int16_t)val;
--        }
-+    if (ct & TCG_CT_CONST_S16) {
-+        return val == (int16_t)val;
-+    } else if (ct & TCG_CT_CONST_S32) {
-+        return val == (int32_t)val;
-     } else if (ct & TCG_CT_CONST_ADLI) {
-         return tcg_match_add2i(type, val);
-     } else if (ct & TCG_CT_CONST_ORI) {
-@@ -2239,7 +2237,8 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     static const TCGTargetOpDef r_rZ = { .args_ct_str = { "r", "rZ" } };
-     static const TCGTargetOpDef r_r_ri = { .args_ct_str = { "r", "r", "ri" } };
-     static const TCGTargetOpDef r_0_ri = { .args_ct_str = { "r", "0", "ri" } };
--    static const TCGTargetOpDef r_0_rK = { .args_ct_str = { "r", "0", "rK" } };
-+    static const TCGTargetOpDef r_0_rI = { .args_ct_str = { "r", "0", "rI" } };
-+    static const TCGTargetOpDef r_0_rJ = { .args_ct_str = { "r", "0", "rJ" } };
-     static const TCGTargetOpDef r_0_rO = { .args_ct_str = { "r", "0", "rO" } };
-     static const TCGTargetOpDef r_0_rX = { .args_ct_str = { "r", "0", "rX" } };
- 
-@@ -2274,9 +2273,15 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-     case INDEX_op_sub_i32:
-     case INDEX_op_sub_i64:
-         return &r_0_ri;
+ #define X86_64_0  NULL, { { NULL, X86_64_SPECIAL }, { NULL, 0 } }
+ #define X86_64_1  NULL, { { NULL, X86_64_SPECIAL }, { NULL, 1 } }
+@@ -1557,7 +1558,7 @@ static const unsigned char threebyte_0x3a_uses_REPNZ_prefix[256] = {
+   /* c0 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* cf */
+   /* d0 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* df */
+   /* e0 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* ef */
+-  /* f0 */ 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* ff */
++  /* f0 */ 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, /* ff */
+   /*       -------------------------------        */
+   /*       0 1 2 3 4 5 6 7 8 9 a b c d e f        */
+ };
+@@ -2817,6 +2818,14 @@ static const struct dis386 prefix_user_table[][4] = {
+     { "(bad)",  { XX } },
+     { "pdep",   { Gv, Bv, Ev } },
+   },
 +
-     case INDEX_op_mul_i32:
-+        /* If we have the general-instruction-extensions, then we have
-+           MULTIPLY SINGLE IMMEDIATE with a signed 32-bit, otherwise we
-+           have only MULTIPLY HALFWORD IMMEDIATE, with a signed 16-bit.  */
-+        return (s390_facilities & FACILITY_GEN_INST_EXT ? &r_0_ri : &r_0_rI);
-     case INDEX_op_mul_i64:
--        return &r_0_rK;
-+        return (s390_facilities & FACILITY_GEN_INST_EXT ? &r_0_rJ : &r_0_rI);
-+
-     case INDEX_op_or_i32:
-     case INDEX_op_or_i64:
-         return &r_0_rO;
++  /* PREGRP109 */
++  {
++    { "(bad)",  { XX } },
++    { "(bad)",  { XX } },
++    { "(bad)",  { XX } },
++    { "rorx",   { Gv, Ev, Ib } },
++  },
+ };
+ 
+ static const struct dis386 x86_64_table[][2] = {
+@@ -3403,7 +3412,7 @@ static const struct dis386 three_byte_table[][256] = {
+     { "(bad)", { XX } },
+     { "(bad)", { XX } },
+     /* f0 */
+-    { "(bad)", { XX } },
++    { PREGRP109 },
+     { "(bad)", { XX } },
+     { "(bad)", { XX } },
+     { "(bad)", { XX } },
 -- 
 2.13.5
