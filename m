@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41658)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpcqX-0008SC-7u
+	(envelope-from <richard.henderson@linaro.org>) id 1dpcqX-0008SX-Ie
 	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpcqQ-0001p8-WD
+	(envelope-from <richard.henderson@linaro.org>) id 1dpcqW-00021w-Ar
 	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:33 -0400
-Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:33605)
+Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:34479)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dpcqQ-0001oG-NQ
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:26 -0400
-Received: by mail-pg0-x231.google.com with SMTP id t3so16078080pgt.0
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 09:06:26 -0700 (PDT)
+	id 1dpcqW-00020a-3s
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:32 -0400
+Received: by mail-pg0-x22d.google.com with SMTP id q68so157402pgq.1
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 09:06:32 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  6 Sep 2017 09:05:48 -0700
-Message-Id: <20170906160612.22769-9-richard.henderson@linaro.org>
+Date: Wed,  6 Sep 2017 09:05:52 -0700
+Message-Id: <20170906160612.22769-13-richard.henderson@linaro.org>
 In-Reply-To: <20170906160612.22769-1-richard.henderson@linaro.org>
 References: <20170906160612.22769-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 08/32] target/i386: [tcg] Port to
- init_disas_context
+Subject: [Qemu-devel] [PULL 12/32] target/i386: [tcg] Port to tb_stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,122 +37,84 @@ From: Lluís Vilanova <vilanova@ac.upc.edu>
 Incrementally paves the way towards using the generic instruction translation
 loop.
 
+Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
 Reviewed-by: Emilio G. Cota <cota@braap.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Alex Benneé <alex.benee@linaro.org>
-Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-Message-Id: <150002122448.22386.16854673576827449259.stgit@frigg.lan>
-[rth: Adjust for max_insns interface change.]
+Message-Id: <150002219289.22386.17959138704858928730.stgit@frigg.lan>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/i386/translate.c | 46 +++++++++++++++++++++++++++-------------------
- 1 file changed, 27 insertions(+), 19 deletions(-)
+ target/i386/translate.c | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
 diff --git a/target/i386/translate.c b/target/i386/translate.c
-index 3a3d91c4d7..4281e9bc56 100644
+index 0f38896f17..9872f84a03 100644
 --- a/target/i386/translate.c
 +++ b/target/i386/translate.c
-@@ -8377,20 +8377,13 @@ void tcg_x86_init(void)
+@@ -8488,8 +8488,6 @@ static void i386_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+         /* if irq were inhibited with HF_INHIBIT_IRQ_MASK, we clear
+            the flag and abort the translation to give the irqs a
+            chance to happen */
+-        gen_jmp_im(pc_next - dc->cs_base);
+-        gen_eob(dc);
+         dc->base.is_jmp = DISAS_TOO_MANY;
+     } else if ((dc->base.tb->cflags & CF_USE_ICOUNT)
+                && ((dc->base.pc_next & TARGET_PAGE_MASK)
+@@ -8502,18 +8500,24 @@ static void i386_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+            If current instruction already crossed the bound - it's ok,
+            because an exception hasn't stopped this code.
+          */
+-        gen_jmp_im(pc_next - dc->cs_base);
+-        gen_eob(dc);
+         dc->base.is_jmp = DISAS_TOO_MANY;
+     } else if ((pc_next - dc->base.pc_first) >= (TARGET_PAGE_SIZE - 32)) {
+-        gen_jmp_im(pc_next - dc->cs_base);
+-        gen_eob(dc);
+         dc->base.is_jmp = DISAS_TOO_MANY;
      }
+ 
+     dc->base.pc_next = pc_next;
  }
  
--/* generate intermediate code for basic block 'tb'.  */
--void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+static int i386_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cpu,
-+                                      int max_insns)
- {
--    CPUX86State *env = cs->env_ptr;
--    DisasContext dc1, *dc = &dc1;
--    uint32_t flags;
--    target_ulong cs_base;
--    int num_insns;
--    int max_insns;
--
--    /* generate intermediate code */
--    dc->base.pc_first = tb->pc;
--    cs_base = tb->cs_base;
--    flags = tb->flags;
++static void i386_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
++{
 +    DisasContext *dc = container_of(dcbase, DisasContext, base);
-+    CPUX86State *env = cpu->env_ptr;
-+    uint32_t flags = dc->base.tb->flags;
-+    target_ulong cs_base = dc->base.tb->cs_base;
- 
-     dc->pe = (flags >> HF_PE_SHIFT) & 1;
-     dc->code32 = (flags >> HF_CS32_SHIFT) & 1;
-@@ -8401,11 +8394,9 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-     dc->cpl = (flags >> HF_CPL_SHIFT) & 3;
-     dc->iopl = (flags >> IOPL_SHIFT) & 3;
-     dc->tf = (flags >> TF_SHIFT) & 1;
--    dc->base.singlestep_enabled = cs->singlestep_enabled;
-     dc->cc_op = CC_OP_DYNAMIC;
-     dc->cc_op_dirty = false;
-     dc->cs_base = cs_base;
--    dc->base.tb = tb;
-     dc->popl_esp_hack = 0;
-     /* select memory access functions */
-     dc->mem_index = 0;
-@@ -8423,7 +8414,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-     dc->code64 = (flags >> HF_CS64_SHIFT) & 1;
- #endif
-     dc->flags = flags;
--    dc->jmp_opt = !(dc->tf || cs->singlestep_enabled ||
-+    dc->jmp_opt = !(dc->tf || dc->base.singlestep_enabled ||
-                     (flags & HF_INHIBIT_IRQ_MASK));
-     /* Do not optimize repz jumps at all in icount mode, because
-        rep movsS instructions are execured with different paths
-@@ -8435,7 +8426,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-        record/replay modes and there will always be an
-        additional step for ecx=0 when icount is enabled.
-      */
--    dc->repz_opt = !dc->jmp_opt && !(tb->cflags & CF_USE_ICOUNT);
-+    dc->repz_opt = !dc->jmp_opt && !(dc->base.tb->cflags & CF_USE_ICOUNT);
- #if 0
-     /* check addseg logic */
-     if (!dc->addseg && (dc->vm86 || !dc->pe || !dc->code32))
-@@ -8455,9 +8446,24 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-     cpu_ptr1 = tcg_temp_new_ptr();
-     cpu_cc_srcT = tcg_temp_local_new();
- 
-+    return max_insns;
++
++    if (dc->base.is_jmp == DISAS_TOO_MANY) {
++        gen_jmp_im(dc->base.pc_next - dc->cs_base);
++        gen_eob(dc);
++    }
 +}
 +
-+/* generate intermediate code for basic block 'tb'.  */
-+void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-+{
-+    CPUX86State *env = cs->env_ptr;
-+    DisasContext dc1, *dc = &dc1;
-+    int num_insns;
-+    int max_insns;
-+
-+    /* generate intermediate code */
-+    dc->base.singlestep_enabled = cs->singlestep_enabled;
-+    dc->base.tb = tb;
-     dc->base.is_jmp = DISAS_NEXT;
-+    dc->base.pc_first = tb->pc;
-     dc->base.pc_next = dc->base.pc_first;
--    num_insns = 0;
-+
-     max_insns = tb->cflags & CF_COUNT_MASK;
-     if (max_insns == 0) {
-         max_insns = CF_COUNT_MASK;
-@@ -8465,7 +8471,9 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-     if (max_insns > TCG_MAX_INSNS) {
-         max_insns = TCG_MAX_INSNS;
-     }
-+    max_insns = i386_tr_init_disas_context(&dc->base, cs, max_insns);
- 
-+    num_insns = 0;
-     gen_tb_start(tb);
-     for(;;) {
-         tcg_gen_insn_start(dc->base.pc_next, dc->cc_op);
-@@ -8498,7 +8506,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-            the flag and abort the translation to give the irqs a
-            change to be happen */
-         if (dc->tf || dc->base.singlestep_enabled ||
--            (flags & HF_INHIBIT_IRQ_MASK)) {
-+            (dc->base.tb->flags & HF_INHIBIT_IRQ_MASK)) {
-             gen_jmp_im(dc->base.pc_next - dc->cs_base);
-             gen_eob(dc);
+ /* generate intermediate code for basic block 'tb'.  */
+ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ {
+@@ -8570,23 +8574,21 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+         /* if single step mode, we generate only one instruction and
+            generate an exception */
+         if (dc->base.singlestep_enabled) {
+-            gen_jmp_im(dc->base.pc_next - dc->cs_base);
+-            gen_eob(dc);
++            dc->base.is_jmp = DISAS_TOO_MANY;
              break;
+         }
+         /* if too long translation, stop generation too */
+         if (tcg_op_buf_full() ||
+             num_insns >= max_insns) {
+-            gen_jmp_im(dc->base.pc_next - dc->cs_base);
+-            gen_eob(dc);
++            dc->base.is_jmp = DISAS_TOO_MANY;
+             break;
+         }
+         if (singlestep) {
+-            gen_jmp_im(dc->base.pc_next - dc->cs_base);
+-            gen_eob(dc);
++            dc->base.is_jmp = DISAS_TOO_MANY;
+             break;
+         }
+     }
++    i386_tr_tb_stop(&dc->base, cs);
+     if (tb->cflags & CF_LAST_IO)
+         gen_io_end();
+     gen_tb_end(tb, num_insns);
 -- 
 2.13.5
