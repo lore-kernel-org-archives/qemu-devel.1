@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36441)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpV0h-0004q7-SB
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 03:44:32 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dpVFu-00016A-7I
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 04:00:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpV0h-0004QY-1P
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 03:44:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49178)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dpV0g-0004QF-Ru
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 03:44:30 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B6D3785543
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 07:44:29 +0000 (UTC)
-From: Fam Zheng <famz@redhat.com>
-Date: Wed,  6 Sep 2017 15:44:18 +0800
-Message-Id: <20170906074418.10903-4-famz@redhat.com>
-In-Reply-To: <20170906074418.10903-1-famz@redhat.com>
-References: <20170906074418.10903-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 3/3] buildsys: Move gcrypt cflags/libs to
- per object
+	(envelope-from <cohuck@redhat.com>) id 1dpVFo-0004n8-Jm
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 04:00:14 -0400
+Date: Wed, 6 Sep 2017 09:59:53 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170906095953.13d5fb01.cohuck@redhat.com>
+In-Reply-To: <4af30c89-15a8-c3e6-3563-aa4c8e76c577@linux.vnet.ibm.com>
+References: <20170905151614.31303-1-cohuck@redhat.com>
+	<4af30c89-15a8-c3e6-3563-aa4c8e76c577@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 0/3] iotests: cure s390x failures by
+ switching to ccw
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,54 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: QingFeng Hao <haoqf@linux.vnet.ibm.com>
+Cc: kwolf@redhat.com, mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, Yi Min Zhao <zyimin@linux.vnet.ibm.com>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- configure            | 5 ++---
- crypto/Makefile.objs | 7 +++++++
- 2 files changed, 9 insertions(+), 3 deletions(-)
+On Wed, 6 Sep 2017 14:57:48 +0800
+QingFeng Hao <haoqf@linux.vnet.ibm.com> wrote:
 
-diff --git a/configure b/configure
-index 6d90e73a8b..b37cd54bda 100755
---- a/configure
-+++ b/configure
-@@ -2565,9 +2565,6 @@ if test "$gcrypt" != "no"; then
-         then
-             gcrypt_libs="$gcrypt_libs -lgpg-error"
-         fi
--        libs_softmmu="$gcrypt_libs $libs_softmmu"
--        libs_tools="$gcrypt_libs $libs_tools"
--        QEMU_CFLAGS="$QEMU_CFLAGS $gcrypt_cflags"
-         gcrypt="yes"
-         if test -z "$nettle"; then
-            nettle="no"
-@@ -5715,6 +5712,8 @@ if test "$gnutls_rnd" = "yes" ; then
- fi
- if test "$gcrypt" = "yes" ; then
-   echo "CONFIG_GCRYPT=y" >> $config_host_mak
-+  echo "GCRYPT_CFLAGS=$gcrypt_cflags" >> $config_host_mak
-+  echo "GCRYPT_LIBS=$gcrypt_libs" >> $config_host_mak
-   if test "$gcrypt_hmac" = "yes" ; then
-     echo "CONFIG_GCRYPT_HMAC=y" >> $config_host_mak
-   fi
-diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-index 0cb5fa24b6..45f7c0c80d 100644
---- a/crypto/Makefile.objs
-+++ b/crypto/Makefile.objs
-@@ -34,6 +34,13 @@ crypto-obj-y += block.o
- crypto-obj-y += block-qcow.o
- crypto-obj-y += block-luks.o
- 
-+$(if $(CONFIG_GCRYPT), \
-+	$(foreach x, init cipher hash-gcrypt hmac-gcrypt random-gcrypt \
-+			pbkdf-gcrypt, \
-+		$(eval $x.o-cflags := $(NETTLE_CFLAGS)) \
-+		$(eval $x.o-libs := $(NETTLE_LIBS))) \
-+)
-+
- $(if $(CONFIG_NETTLE), \
- 	$(foreach x, cipher hash-nettle hmac-nettle pbkdf-nettle, \
- 		$(eval $x.o-cflags := $(NETTLE_CFLAGS)) \
--- 
-2.13.5
+> =E5=9C=A8 2017/9/5 23:16, Cornelia Huck =E5=86=99=E9=81=93:
+> > Recent changes in s390x made pci support dependant on the zpci cpu
+> > feature, which is not provided on all models (and not on by default).
+> > This means we cannot instatiate pci devices on a standard qemu
+> > invocation for s390x. Moreover, the zpci instructions are not even
+> > wired up for tcg yet, so actually doing anything with those pci devices
+> > is bound to fail on tcg.
+> >
+> > Let's follow the existing example in 068 and switch to the (default)
+> > virtio-ccw transport on s390x. The changes for 051 and 067 are split
+> > out as they require adding an output file for s390x (the actual command
+> > lines are part of the output). =20
+> We also found this error and YiMin suggested to change the code in ccw_in=
+it
+> as below:
+>=20
+> if (pci_available) {
+>  =C2=A0=C2=A0=C2=A0 DeviceState *dev =3D qdev_create(NULL, TYPE_S390_PCI_=
+HOST_BRIDGE);
+>  =C2=A0=C2=A0=C2=A0 ...
+> }
+> We tested it and it can make the 5 cases passed.
+
+OK, looked at this. This won't work: pci_available means "this qemu has
+pci support built in". _Working_ zpci, however, depends on the presence
+of the zpci feature bit: You'll have a host bridge and can define
+devices that have absolutely no chance of working, since all pci
+instruction will return errors. You will be in a similar situation
+under kvm as under tcg: you can specify virtio-pci devices on the
+command line, but they can't work.
+
+This probably makes the 5 cases pass as they only rely on the ability
+to create the device, not to do anything with them.
+
+So, I still think the right thing to do is to switch to ccw in the
+tests (and to wire up pci in tcg, but that's an orthogonal issue).
