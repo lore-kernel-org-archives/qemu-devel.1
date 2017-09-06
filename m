@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dpYs8-0007Du-D3
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:51:57 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dpYs7-0007uR-CX
+	(envelope-from <quintela@redhat.com>) id 1dpYs7-0007Ds-GK
 	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:51:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47510)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dpYs7-0007uC-4K
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <quintela@redhat.com>) id 1dpYs4-0007qN-5j
 	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:51:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60370)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dpYs3-0007pF-SH
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:51:52 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
 	[10.5.11.11])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1ECD35D5EB
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 11:51:54 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B632E85376
+	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 11:51:50 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed,  6 Sep 2017 13:51:23 +0200
-Message-Id: <20170906115143.27451-3-quintela@redhat.com>
-In-Reply-To: <20170906115143.27451-1-quintela@redhat.com>
-References: <20170906115143.27451-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 02/22] migration: Create
- migration_ioc_process_incoming()
+Date: Wed,  6 Sep 2017 13:51:21 +0200
+Message-Id: <20170906115143.27451-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH v7 00/22] Multifd
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,105 +30,170 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We pass the ioc instead of the fd.  This will allow us to have more
-than one channel open.  We also make sure that we set the
-from_src_file sooner, so we don't need to pass it as a parameter.
+Hi
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
----
- migration/channel.c   |  3 +--
- migration/migration.c | 23 +++++++++++++++++++----
- migration/migration.h |  2 ++
- 3 files changed, 22 insertions(+), 6 deletions(-)
+Things NOT done yet:
 
-diff --git a/migration/channel.c b/migration/channel.c
-index 3b7252f5a2..edceebdb7b 100644
---- a/migration/channel.c
-+++ b/migration/channel.c
-@@ -36,8 +36,7 @@ void migration_channel_process_incoming(QIOChannel *ioc)
-             error_report_err(local_err);
-         }
-     } else {
--        QEMUFile *f = qemu_fopen_channel_input(ioc);
--        migration_fd_process_incoming(f);
-+        migration_ioc_process_incoming(ioc);
-     }
- }
- 
-diff --git a/migration/migration.c b/migration/migration.c
-index 1a2b3ebd1a..d16d8a63ec 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -306,17 +306,16 @@ static void process_incoming_migration_bh(void *opaque)
- 
- static void process_incoming_migration_co(void *opaque)
- {
--    QEMUFile *f = opaque;
-     MigrationIncomingState *mis = migration_incoming_get_current();
-     PostcopyState ps;
-     int ret;
- 
--    mis->from_src_file = f;
-+    assert(mis->from_src_file);
-     mis->largest_page_size = qemu_ram_pagesize_largest();
-     postcopy_state_set(POSTCOPY_INCOMING_NONE);
-     migrate_set_state(&mis->state, MIGRATION_STATUS_NONE,
-                       MIGRATION_STATUS_ACTIVE);
--    ret = qemu_loadvm_state(f);
-+    ret = qemu_loadvm_state(mis->from_src_file);
- 
-     ps = postcopy_state_get();
-     trace_process_incoming_migration_co_end(ret, ps);
-@@ -364,12 +363,28 @@ static void process_incoming_migration_co(void *opaque)
- 
- void migration_fd_process_incoming(QEMUFile *f)
- {
--    Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, f);
-+    Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, NULL);
-+    MigrationIncomingState *mis = migration_incoming_get_current();
- 
-+    if (!mis->from_src_file) {
-+        mis->from_src_file = f;
-+    }
-     qemu_file_set_blocking(f, false);
-     qemu_coroutine_enter(co);
- }
- 
-+void migration_ioc_process_incoming(QIOChannel *ioc)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+
-+    if (!mis->from_src_file) {
-+        QEMUFile *f = qemu_fopen_channel_input(ioc);
-+        mis->from_src_file = f;
-+        migration_fd_process_incoming(f);
-+    }
-+    /* We still only have a single channel.  Nothing to do here yet */
-+}
-+
- /*
-  * Send a 'SHUT' message on the return channel with the given value
-  * to indicate that we've finished with the RP.  Non-0 value indicates
-diff --git a/migration/migration.h b/migration/migration.h
-index 148c9facbc..99c398d484 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -20,6 +20,7 @@
- #include "exec/cpu-common.h"
- #include "qemu/coroutine_int.h"
- #include "hw/qdev.h"
-+#include "io/channel.h"
- 
- /* State for the incoming migration */
- struct MigrationIncomingState {
-@@ -152,6 +153,7 @@ struct MigrationState
- void migrate_set_state(int *state, int old_state, int new_state);
- 
- void migration_fd_process_incoming(QEMUFile *f);
-+void migration_ioc_process_incoming(QIOChannel *ioc);
- 
- uint64_t migrate_max_downtime(void);
- 
+  be able to return with errors from other threads.
+- still connects synchronusly.  I need to redo the other changes to fix this.
+  doing it asynchronously is easy.  Making sure that everything finishes is not.
+  testing this.
+- renaming outgoing variables, thingking about it some more
+- paolo suggestion of not having a control channel
+  needs iyet more cleanups to be able to have more than one ramstate, trying it.
+- still not performance done, but it has been very stable
+
+Please, comment.
+
+On v7:
+- tests fixed as danp wanted
+- have to revert danp qio_*_all patches, as they break multifd, I have to investigate why.
+- error_abort is gone.  After several tries about getting errors, I ended having a single error
+  proceted by a lock and first error wins.
+- Addressed basically all reviews (see on ToDo)
+- Pointers to struct are done now
+- fix lots of leaks
+- lots of small fixes
+
+
+[v6]
+- Improve migration_ioc_porcess_incoming
+- teach about G_SOURCE_REMOVE/CONTINUE
+- Add test for migration_has_all_channels
+- use DEFIN_PROP*
+- change recv_state to use pointers to parameters
+  make easier to receive channels out of order
+- use g_strdup_printf()
+- improve count of threads to know when we have to finish
+- report channel id's on errors
+- Use last_page parameter for multifd_send_page() sooner
+- Improve commets for address
+- use g_new0() instead of g_malloc()
+- create MULTIFD_CONTINUE instead of using UINT16_MAX
+- clear memory used by group of pages
+  once there, pass everything to the global state variables instead of being
+  local to the function.  This way it works if we cancel migration and start
+  a new one
+- Really wait to create the migration_thread until all channels are created
+- split initial_bytes setup to make clearer following patches.
+- createRAM_SAVE_FLAG_MULTIFD_SYNC macro, to make clear what we are doing
+- move setting of need_flush to inside bitmap_sync
+- Lots of other small changes & reorderings
+
+Please, comment.
+
+
+[v5]
+
+- tests from qio functions (a.k.a. make danp happy)
+- 1st message from one channel to the other contains:
+   <uuid> multifd <channel number>
+   This would allow us to create more channels as we want them.
+   a.k.a. Making dave happy
+- Waiting in reception for new channels using qio listeners
+  Getting threads, qio and reference counters working at the same time
+  was interesing.
+  Another make danp happy.
+
+- Lots and lots of small changes and fixes.  Notice that the last 70 patches
+  that I merged or so what to make this series easier/smaller.
+
+- NOT DONE: I haven't been woring on measuring performance
+  differences, this was about getting the creation of the
+  threads/channels right.
+
+So, what I want:
+
+- Are people happy with how I have (ab)used qio channels? (yes danp,
+  that is you).
+- My understanding is th
+
+ToDo:
+
+- Make paolo happy: He wanted to test using control information
+  through each channel, not only pages.  This requires yet more
+  cleanups to be able to have more than one QEMUFile/RAMState open at
+  the same time.
+
+- How I create multiple channels.  Things I know:
+  * with current changes, it should work with fd/channels (the multifd bits),
+    but we don;t have a way to pass multiple fd;s or exec files.
+    Danp, any idea about how to create an UI for it?
+  * My idea is that we would split current code to be:
+    + channel creation at migration.c
+    + rest of bits at ram.c
+    + change format to:
+      <uuid> main <rest of migration capabilities/paramentes> so we can check
+      <uuid> postcopy <no clue what parameters are needed>
+          Dave wanted a way to create a new fd for postcopy for some time
+    + Adding new channels is easy
+
+- Performance data/numbers: Yes, I wanted to get this out at once, I
+  would continue with this.
+
+
+Please, review.
+
+
+[v4]
+This is the 4th version of multifd. Changes:
+- XBZRLE don't need to be checked for
+- Documentation and defaults are consistent
+- split socketArgs
+- use iovec instead of creating something similar.
+- We use now the exported size of target page (another HACK removal)
+- created qio_chanel_{wirtev,readv}_all functions.  the _full() name
+  was already taken.
+  What they do is the same that the without _all() function, but if it
+  returns due to blocking it redo the call.
+- it is checkpatch.pl clean now.
+
+Please comment, Juan.
+
+
+Juan Quintela (22):
+  Revert "io: add new qio_channel_{readv, writev, read, write}_all
+    functions"
+  migration: Create migration_ioc_process_incoming()
+  migration: Teach it about G_SOURCE_REMOVE
+  migration: Add comments to channel functions
+  migration: Create migration_has_all_channels
+  migration: Improve migration thread error handling
+  migration: Make migrate_fd_error() the owner of the Error
+  qio: Create new qio_channel_{readv,writev}_all
+  migration: Add multifd capability
+  migration: Create x-multifd-threads parameter
+  migration: Create x-multifd-group parameter
+  migration: Create multifd migration threads
+  migration: Split migration_fd_process_incoming
+  migration: Start of multiple fd work
+  migration: Create ram_multifd_page
+  migration: Really use multiple pages at a time
+  migration: Send the fd number which we are going to use for this page
+  migration: Create thread infrastructure for multifd recv side
+  migration: Test new fd infrastructure
+  migration: Rename initial_bytes
+  migration: Transfer pages over new channels
+  migration: Flush receive queue
+
+ hmp.c                         |  16 ++
+ include/glib-compat.h         |   2 +
+ include/io/channel.h          |  70 +-----
+ io/channel.c                  |  57 ++---
+ migration/channel.c           |  19 +-
+ migration/exec.c              |   2 +-
+ migration/fd.c                |   2 +-
+ migration/migration.c         | 176 +++++++++++--
+ migration/migration.h         |  17 +-
+ migration/qemu-file-channel.c |  29 +--
+ migration/ram.c               | 564 +++++++++++++++++++++++++++++++++++++++++-
+ migration/ram.h               |   8 +
+ migration/socket.c            |  46 +++-
+ migration/socket.h            |  10 +
+ migration/tls.c               |   1 -
+ qapi/migration.json           |  44 +++-
+ tests/io-channel-helpers.c    | 120 ++++++++-
+ 17 files changed, 1016 insertions(+), 167 deletions(-)
+
 -- 
 2.13.5
