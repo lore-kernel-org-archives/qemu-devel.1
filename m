@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46952)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dpanL-0001mn-52
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:55:11 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dpapU-0002cn-7w
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:57:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1dpanF-0003qr-LB
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:55:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35028)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1dpanF-0003qR-Fi
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:55:01 -0400
-Date: Wed, 6 Sep 2017 09:55:00 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <219850500.9239913.1504706100152.JavaMail.zimbra@redhat.com>
-In-Reply-To: <87efrk54kf.fsf@dusky.pond.sub.org>
-References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
-	<20170822132255.23945-29-marcandre.lureau@redhat.com>
-	<87bmmphwdz.fsf@dusky.pond.sub.org>
-	<622608851.9114372.1504699766400.JavaMail.zimbra@redhat.com>
-	<87efrk54kf.fsf@dusky.pond.sub.org>
+	(envelope-from <stefanha@gmail.com>) id 1dpapO-0005Ov-53
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:57:20 -0400
+Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:35055)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dpapN-0005Nm-Ul
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:57:14 -0400
+Received: by mail-wm0-x242.google.com with SMTP id e64so5400052wmi.2
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 06:57:12 -0700 (PDT)
+Date: Wed, 6 Sep 2017 14:57:08 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170906135708.GD15535@stefanha-x1.localdomain>
+References: <20170905035457.3753-1-Sergio.G.DelReal@gmail.com>
+	<20170905035457.3753-9-Sergio.G.DelReal@gmail.com>
+	<CAMzKsXu29K+b=fGuPLti5if6zj5=pQhpmQz1iei6-hgjbq_41Q@mail.gmail.com>
+	<CAMzKsXu0LOR=mzBNq-=sbv3YRBCjKXxx2NjeJya-TPkK6mYT2Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 28/54] qapi: do not define enumeration
- value explicitely
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMzKsXu0LOR=mzBNq-=sbv3YRBCjKXxx2NjeJya-TPkK6mYT2Q@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v3 08/14] hvf: add compilation rules to
+ Makefile.objs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +33,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Sergio =?iso-8859-1?Q?Andr=E9s_G=F3mez?= del Real <sergio.g.delreal@gmail.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Hi
+On Tue, Sep 05, 2017 at 08:12:31PM -0500, Sergio Andrés Gómez del Real wrote:
+> Stefan, is this acceptable? I mean delaying the compiling; up until patch 7
+> no hvf code is compiled. Or should I just squash everything from patch 2 to
+> 7?
 
------ Original Message -----
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
->=20
-> > ----- Original Message -----
-> >> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
-> >>=20
-> >> > The C standard has the initial value at 0 and the subsequent values
-> >> > incremented by 1. No need to set this explicitely.
-> >> >
-> >> > This will prevent from artificial "gaps" when compiling out some enu=
-m
-> >> > values and having unnecessarily large MAX values & enums arrays.
-> >>=20
-> >> Yes, but it also risks entertaining mishaps like compiling this one
-> >>=20
-> >>     typedef enum Color {
-> >>         COLOR_WHITE,
-> >> #if defined(NEED_CPU_H)
-> >> #if defined(TARGET_S390X)
-> >>         COLOR_BLUE,
-> >> #endif /* defined(TARGET_S390X) */
-> >> #endif /* defined(NEED_CPU_H) */
-> >>         COLOR_BLACK,
-> >>     } Color;
-> >>=20
-> >> in s390x-code (COLOR_BLACK =3D 2) and in target-independent code
-> >> (COLOR_BLACK =3D 1), then linking the two together.
-> >
-> > This is also true with other kind of types, like struct.
-> >
-> > One of the main reason why we should have schemas for target-only and t=
-he
-> > NEED_CPU_H is a temporary working hack.
->=20
-> A temporary hack that's ugly or occasionally breaks in an obvious way is
-> okay, but this is an open deathtrap.  I'm afraid we need to rethink our
-> short term conditional code generation strategy.
->=20
-> Stupidest solution that could possibly work: apply conditionals *only*
-> to qmp-introspect.c, leave everything unconditional elsewhere.  What do
-> you think?
+It's okay.  Feel free to delay until patch 7 for now.
 
-That's not what I had in mind when I started. My first 45 loc approach woul=
-d have saved us a lot of troubles :)
+There is value in importing code verbatim and making changes in separate
+patches.  That way it's easy to diff the code against the upstream
+source to verify that it was imported correctly.
 
-I would rather fix this, and split the schema. I'll investigate.
+Stefan
