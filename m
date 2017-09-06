@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50373)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dpavl-00062Y-2K
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:03:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1dpavp-00066J-3J
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:04:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dpave-0001GG-N5
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:03:49 -0400
-From: Kevin Wolf <kwolf@redhat.com>
-Date: Wed,  6 Sep 2017 16:02:45 +0200
-Message-Id: <20170906140246.7326-14-kwolf@redhat.com>
-In-Reply-To: <20170906140246.7326-1-kwolf@redhat.com>
-References: <20170906140246.7326-1-kwolf@redhat.com>
-Subject: [Qemu-devel] [PULL 13/14] qemu-iotests: add 184 for throttle filter
- driver
+	(envelope-from <eblake@redhat.com>) id 1dpavo-0001Lx-8l
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:03:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36630)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dpavo-0001LP-0K
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:03:52 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 069FD7E428
+	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 14:03:51 +0000 (UTC)
+References: <20170906115143.27451-1-quintela@redhat.com>
+	<20170906115143.27451-9-quintela@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f46e8437-a739-08cf-75c4-cbb5309b5c23@redhat.com>
+Date: Wed, 6 Sep 2017 09:03:40 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170906115143.27451-9-quintela@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="tTJtjQPB0ljHd9CsgsMSVfW5cN24uhO9s"
+Subject: Re: [Qemu-devel] [PATCH v7 08/22] qio: Create new
+ qio_channel_{readv, writev}_all
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,553 +35,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com, "Daniel P. Berrange" <berrange@redhat.com>
 
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--tTJtjQPB0ljHd9CsgsMSVfW5cN24uhO9s
+From: Eric Blake <eblake@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com,
+ "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <f46e8437-a739-08cf-75c4-cbb5309b5c23@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 08/22] qio: Create new qio_channel_{readv,
+ writev}_all
+References: <20170906115143.27451-1-quintela@redhat.com>
+ <20170906115143.27451-9-quintela@redhat.com>
+In-Reply-To: <20170906115143.27451-9-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qemu-iotests/184     | 205 ++++++++++++++++++++++++++++++
- tests/qemu-iotests/184.out | 302 +++++++++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/group   |   1 +
- 3 files changed, 508 insertions(+)
- create mode 100755 tests/qemu-iotests/184
- create mode 100644 tests/qemu-iotests/184.out
+On 09/06/2017 06:51 AM, Juan Quintela wrote:
+> The functions waits until it is able to write the full iov.
+>=20
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>=20
+> --
+>=20
+> Add tests.
+>=20
+> fix reader to check for len =3D=3D 0.
+>=20
+> make reader wait on G_IO_IN (dave)
+> change tests to make sure that all combinations of call work with all b=
+ackends
 
-diff --git a/tests/qemu-iotests/184 b/tests/qemu-iotests/184
-new file mode 100755
-index 0000000000..704f38f936
---- /dev/null
-+++ b/tests/qemu-iotests/184
-@@ -0,0 +1,205 @@
-+#!/bin/bash
-+#
-+# Test I/O throttle block filter driver interface
-+#
-+# Copyright (C) 2017 Manos Pitsidianakis
-+#
-+# This program is free software; you can redistribute it and/or modify
-+# it under the terms of the GNU General Public License as published by
-+# the Free Software Foundation; either version 2 of the License, or
-+# (at your option) any later version.
-+#
-+# This program is distributed in the hope that it will be useful,
-+# but WITHOUT ANY WARRANTY; without even the implied warranty of
-+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+# GNU General Public License for more details.
-+#
-+# You should have received a copy of the GNU General Public License
-+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-+#
-+
-+# creator
-+owner="Manos Pitsidianakis"
-+
-+seq=`basename $0`
-+echo "QA output created by $seq"
-+
-+here=`pwd`
-+status=1	# failure is the default!
-+
-+_cleanup()
-+{
-+    _cleanup_test_img
-+}
-+trap "_cleanup; exit \$status" 0 1 2 3 15
-+
-+# get standard environment, filters and checks
-+. ./common.rc
-+. ./common.filter
-+
-+_supported_fmt qcow2
-+_supported_proto file
-+_supported_os Linux
-+
-+function do_run_qemu()
-+{
-+    echo Testing: "$@" | _filter_imgfmt
-+    $QEMU -nographic -qmp-pretty stdio -serial none "$@"
-+    echo
-+}
-+
-+function run_qemu()
-+{
-+    do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qemu | _filter_qmp\
-+                          | _filter_qemu_io | _filter_generated_node_ids
-+}
-+
-+_make_test_img 64M
-+test_throttle=$($QEMU_IMG --help|grep throttle)
-+[ "$test_throttle" = "" ] && _supported_fmt throttle
-+
-+echo
-+echo "== checking interface =="
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "blockdev-add",
-+  "arguments": {
-+    "driver": "$IMGFMT",
-+    "node-name": "disk0",
-+    "file": {
-+      "driver": "file",
-+      "filename": "$TEST_IMG"
-+    }
-+  }
-+}
-+{ "execute": "object-add",
-+  "arguments": {
-+    "qom-type": "throttle-group",
-+    "id": "group0",
-+    "props": {
-+      "limits" : {
-+        "iops-total": 1000
-+      }
-+    }
-+  }
-+}
-+{ "execute": "blockdev-add",
-+  "arguments": {
-+    "driver": "throttle",
-+    "node-name": "throttle0",
-+    "throttle-group": "group0",
-+    "file": "disk0"
-+  }
-+}
-+{ "execute": "query-named-block-nodes" }
-+{ "execute": "query-block" }
-+{ "execute": "quit" }
-+EOF
-+
-+echo
-+echo "== property changes in ThrottleGroup =="
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "object-add",
-+  "arguments": {
-+    "qom-type": "throttle-group",
-+    "id": "group0",
-+    "props" : {
-+      "limits": {
-+          "iops-total": 1000
-+      }
-+    }
-+  }
-+}
-+{ "execute" : "qom-get",
-+  "arguments" : {
-+    "path" : "group0",
-+    "property" : "limits"
-+  }
-+}
-+{ "execute" : "qom-set",
-+    "arguments" : {
-+        "path" : "group0",
-+        "property" : "limits",
-+        "value" : {
-+            "iops-total" : 0
-+        }
-+    }
-+}
-+{ "execute" : "qom-get",
-+  "arguments" : {
-+    "path" : "group0",
-+    "property" : "limits"
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+echo
-+echo "== object creation/set errors  =="
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "object-add",
-+  "arguments": {
-+    "qom-type": "throttle-group",
-+    "id": "group0",
-+    "props" : {
-+      "limits": {
-+          "iops-total": 1000
-+      }
-+    }
-+  }
-+}
-+{ "execute" : "qom-set",
-+  "arguments" : {
-+    "path" : "group0",
-+    "property" : "x-iops-total",
-+    "value" : 0
-+  }
-+}
-+{ "execute" : "qom-set",
-+    "arguments" : {
-+        "path" : "group0",
-+        "property" : "limits",
-+        "value" : {
-+            "iops-total" : 10,
-+            "iops-read" : 10
-+        }
-+    }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+echo
-+echo "== don't specify group =="
-+
-+run_qemu <<EOF
-+{ "execute": "qmp_capabilities" }
-+{ "execute": "blockdev-add",
-+  "arguments": {
-+    "driver": "$IMGFMT",
-+    "node-name": "disk0",
-+    "file": {
-+      "driver": "file",
-+      "filename": "$TEST_IMG"
-+    }
-+  }
-+}
-+{ "execute": "blockdev-add",
-+  "arguments": {
-+    "driver": "throttle",
-+    "node-name": "throttle0",
-+    "file": "disk0"
-+  }
-+}
-+{ "execute": "quit" }
-+EOF
-+
-+echo
-+# success, all done
-+echo "*** done"
-+rm -f $seq.full
-+status=0
-diff --git a/tests/qemu-iotests/184.out b/tests/qemu-iotests/184.out
-new file mode 100644
-index 0000000000..0aed1a2220
---- /dev/null
-+++ b/tests/qemu-iotests/184.out
-@@ -0,0 +1,302 @@
-+QA output created by 184
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
-+
-+== checking interface ==
-+Testing:
-+{
-+    QMP_VERSION
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": [
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 67108864,
-+                "filename": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"qcow2\", \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/t.qcow2\"}}}",
-+                "cluster-size": 65536,
-+                "format": "throttle",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "throttle0",
-+            "backing_file_depth": 0,
-+            "drv": "throttle",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"qcow2\", \"file\": {\"driver\": \"file\", \"filename\": \"TEST_DIR/t.qcow2\"}}}",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 67108864,
-+                "filename": "TEST_DIR/t.qcow2",
-+                "cluster-size": 65536,
-+                "format": "qcow2",
-+                "actual-size": 200704,
-+                "format-specific": {
-+                    "type": "qcow2",
-+                    "data": {
-+                        "compat": "1.1",
-+                        "lazy-refcounts": false,
-+                        "refcount-bits": 16,
-+                        "corrupt": false
-+                    }
-+                },
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "disk0",
-+            "backing_file_depth": 0,
-+            "drv": "qcow2",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2",
-+            "encryption_key_missing": false
-+        },
-+        {
-+            "iops_rd": 0,
-+            "detect_zeroes": "off",
-+            "image": {
-+                "virtual-size": 197120,
-+                "filename": "TEST_DIR/t.qcow2",
-+                "format": "file",
-+                "actual-size": 200704,
-+                "dirty-flag": false
-+            },
-+            "iops_wr": 0,
-+            "ro": false,
-+            "node-name": "NODE_NAME",
-+            "backing_file_depth": 0,
-+            "drv": "file",
-+            "iops": 0,
-+            "bps_wr": 0,
-+            "write_threshold": 0,
-+            "encrypted": false,
-+            "bps": 0,
-+            "bps_rd": 0,
-+            "cache": {
-+                "no-flush": false,
-+                "direct": false,
-+                "writeback": true
-+            },
-+            "file": "TEST_DIR/t.qcow2",
-+            "encryption_key_missing": false
-+        }
-+    ]
-+}
-+{
-+    "return": [
-+    ]
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "SHUTDOWN",
-+    "data": {
-+        "guest": false
-+    }
-+}
-+
-+
-+== property changes in ThrottleGroup ==
-+Testing:
-+{
-+    QMP_VERSION
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+        "bps-read-max-length": 1,
-+        "iops-read-max-length": 1,
-+        "bps-read-max": 0,
-+        "bps-total": 0,
-+        "iops-total-max-length": 1,
-+        "iops-total": 1000,
-+        "iops-write-max": 0,
-+        "bps-write": 0,
-+        "bps-total-max": 0,
-+        "bps-write-max": 0,
-+        "iops-size": 0,
-+        "iops-read": 0,
-+        "iops-write-max-length": 1,
-+        "iops-write": 0,
-+        "bps-total-max-length": 1,
-+        "iops-read-max": 0,
-+        "bps-read": 0,
-+        "bps-write-max-length": 1,
-+        "iops-total-max": 0
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+        "bps-read-max-length": 1,
-+        "iops-read-max-length": 1,
-+        "bps-read-max": 0,
-+        "bps-total": 0,
-+        "iops-total-max-length": 1,
-+        "iops-total": 0,
-+        "iops-write-max": 0,
-+        "bps-write": 0,
-+        "bps-total-max": 0,
-+        "bps-write-max": 0,
-+        "iops-size": 0,
-+        "iops-read": 0,
-+        "iops-write-max-length": 1,
-+        "iops-write": 0,
-+        "bps-total-max-length": 1,
-+        "iops-read-max": 0,
-+        "bps-read": 0,
-+        "bps-write-max-length": 1,
-+        "iops-total-max": 0
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "SHUTDOWN",
-+    "data": {
-+        "guest": false
-+    }
-+}
-+
-+
-+== object creation/set errors  ==
-+Testing:
-+{
-+    QMP_VERSION
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "error": {
-+        "class": "GenericError",
-+        "desc": "Property cannot be set after initialization"
-+    }
-+}
-+{
-+    "error": {
-+        "class": "GenericError",
-+        "desc": "bps/iops/max total values and read/write values cannot be used at the same time"
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "SHUTDOWN",
-+    "data": {
-+        "guest": false
-+    }
-+}
-+
-+
-+== don't specify group ==
-+Testing:
-+{
-+    QMP_VERSION
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "error": {
-+        "class": "GenericError",
-+        "desc": "Parameter 'throttle-group' is missing"
-+    }
-+}
-+{
-+    "return": {
-+    }
-+}
-+{
-+    "timestamp": {
-+        "seconds":  TIMESTAMP,
-+        "microseconds":  TIMESTAMP
-+    },
-+    "event": "SHUTDOWN",
-+    "data": {
-+        "guest": false
-+    }
-+}
-+
-+
-+*** done
-diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 4bd5017008..94e764865a 100644
---- a/tests/qemu-iotests/group
-+++ b/tests/qemu-iotests/group
-@@ -180,6 +180,7 @@
- 181 rw auto migration
- 182 rw auto quick
- 183 rw auto migration
-+184 rw auto quick
- 185 rw auto
- 186 rw auto
- 187 rw auto
--- 
-2.13.5
+Since Dan's patch to add qio_channel_readv_all has already landed,
+shouldn't this patch just be rebased to add the tests? Or is it also
+fixing some bugs?
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--tTJtjQPB0ljHd9CsgsMSVfW5cN24uhO9s
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmwADwACgkQp6FrSiUn
+Q2ozHggAsBC0Z6RoZ/TsjHn08FTb0xIylXw3RPyFFENNBfHGcMImRBYGMRBJnF2T
+dTVMOoAhMxjHHVoeu45ueRgXi04BWAc+iVTygr3diNkA72mk71Q5NYDLsGzxPL64
+jWpH0dHtkoE2Sfk7ROBZK+n7ASjQqwpA5NdVsCWnPsVkTC7luzQsuooRMNOxcg3j
+gBSsxaynSQqCBsJRXFCLI8XwLCzm6WneHt+ukrK69cW9xEUBLxsl2p8z1GncgxYD
+o1GXWd1yjd5j1tTTxko2xwn9n2dKjALoF4ORFZypogmNDNcg1guv2fnNSP4t6vrY
+PhSgDclNtS8y5GAft4MLmby7Z5Wqlg==
+=ma8q
+-----END PGP SIGNATURE-----
+
+--tTJtjQPB0ljHd9CsgsMSVfW5cN24uhO9s--
