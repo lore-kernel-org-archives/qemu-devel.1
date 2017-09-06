@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54649)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dpdFP-0005JR-J7
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:32:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1dpdQ4-0004WH-Rf
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:43:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dpdFL-00037K-Ec
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:32:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50634)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpdFL-00036Z-8z
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:32:11 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1EC18C049E31
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 16:32:10 +0000 (UTC)
-Date: Wed, 6 Sep 2017 17:32:05 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170906163205.GX15510@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170906115143.27451-1-quintela@redhat.com>
-	<20170906115143.27451-2-quintela@redhat.com>
-	<7e71d190-8e49-ca6b-ef44-522100b27b8c@redhat.com>
-	<87pob351o5.fsf@secure.mitica>
+	(envelope-from <eblake@redhat.com>) id 1dpdPv-0001KQ-Gg
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:43:16 -0400
+References: <cover.1504112256.git.jcody@redhat.com>
+	<fc2539281a00353777c10f37dea6ccdb6aae4285.1504112256.git.jcody@redhat.com>
+	<20170906130041.GI3753@dhcp-200-186.str.redhat.com>
+	<20170906150221.GB7570@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f28c0ee8-68e5-34f6-3f92-2bdcce159bc8@redhat.com>
+Date: Wed, 6 Sep 2017 11:42:50 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87pob351o5.fsf@secure.mitica>
-Subject: Re: [Qemu-devel] [PATCH v7 01/22] Revert "io: add new
- qio_channel_{readv, writev, read, write}_all functions"
+In-Reply-To: <20170906150221.GB7570@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7anVeBFRGcUSvcc35oTmLuCgAlMUa75gx"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/3] block-jobs: Optionally
+ unregister live block operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,28 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com, mrezanin@redhat.com
 
-On Wed, Sep 06, 2017 at 04:42:18PM +0200, Juan Quintela wrote:
-> Eric Blake <eblake@redhat.com> wrote:
-> > On 09/06/2017 06:51 AM, Juan Quintela wrote:
-> >> This reverts commit d4622e55883211072621958d39ddaa73483d201e.
-> >
-> > But with no reason why?  What bugs are you fixing by reverting this?
-> 
-> I put it on the cover letter.  I am investigating *why* it fails on me.
-> It got the thread handed.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7anVeBFRGcUSvcc35oTmLuCgAlMUa75gx
+From: Eric Blake <eblake@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>,
+ qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com,
+ mrezanin@redhat.com
+Message-ID: <f28c0ee8-68e5-34f6-3f92-2bdcce159bc8@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 2/3] block-jobs: Optionally
+ unregister live block operations
+References: <cover.1504112256.git.jcody@redhat.com>
+ <fc2539281a00353777c10f37dea6ccdb6aae4285.1504112256.git.jcody@redhat.com>
+ <20170906130041.GI3753@dhcp-200-186.str.redhat.com>
+ <20170906150221.GB7570@localhost.localdomain>
+In-Reply-To: <20170906150221.GB7570@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Your functions return the number of bytes written. My impl only
-returns the 0 or -1 on the basis that the caller does not need
-to know how many bytes were written - its always exactly the
-amount asked for. You probably need to adjust your code to take
-that into account.
+On 09/06/2017 10:02 AM, Eduardo Habkost wrote:
+> On Wed, Sep 06, 2017 at 03:00:41PM +0200, Kevin Wolf wrote:
+>> Am 30.08.2017 um 19:01 hat Jeff Cody geschrieben:
+>>> From: Jeffrey Cody <jcody@redhat.com>
+>>>
+>>> If configured without live block operations enabled, unregister the
+>>> live block operation commands.
+>>>
+>>> Signed-off-by: Jeff Cody <jcody@redhat.com>
+>>
+>> How sure are we that libvirt will like a qemu that advertises these
+>> commands in the schema, but doesn't actually provide them?
+>=20
+> If libvirt wants to know if a command is available, it uses
+> 'query-commands', not 'query-qmp-schema'.
+>=20
+> The only query-qmp-schema elements used by latest libvirt are
+> gluster-related blockdev-add options (see
+> libvirt/src/qemu/qemu_capabilities.c:virQEMUCapsQMPSchemaQueries]]).
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Indeed, libvirt is currently just fine with the fact that query-commands
+introspection hides disabled commands, even if they are still leaked in
+query-qmp-schema.  Besides, Marc-Andre's work on adding #if support to
+QAPI should probably also land in 2.11, at which point the hack goes
+away (because then we ARE properly hiding things from the schema
+introspection).
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--7anVeBFRGcUSvcc35oTmLuCgAlMUa75gx
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmwJYoACgkQp6FrSiUn
+Q2rqsgf/VTihbAou+M4jneRQtRhbSVOwjQiRahKQot0TFp6Qw3Wug4qTTeOc9D6O
+S97m/Z1rNKZveyghSjHsxJ1fiYd9Jqc6b65cTucUt43vHSkbC7Lpxz2F42BUCYEE
+TTi9fTlji4uMoHx3MC7o7x+DV46LTydudG0ax3OaqSGRETz5exPuXw9wIZniMC+p
+Ams4wonTh/SMIf7VXoQCHZxxm6PhLNjc6O7PIFtrmKMjIljFjxBtbqkX47eJMxLX
+7Gv1Vm0g5M2WEmSwuHW3zPSC9maGSFvdazp5W3D5MMIIWFjN8ZhFshq96zUriagL
+QyNwM5QcJsFcS96DaCUk5CSeSwkDnQ==
+=Ajsh
+-----END PGP SIGNATURE-----
+
+--7anVeBFRGcUSvcc35oTmLuCgAlMUa75gx--
