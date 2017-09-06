@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpfIc-0004wP-93
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:43:47 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dpfb9-0004wm-C6
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 15:02:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpfIZ-0002lS-4K
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:43:42 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:53873)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpfIY-0002l8-LU
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:43:39 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed,  6 Sep 2017 21:43:28 +0300
-Message-Id: <150472340780.24907.7057286910324120181.stgit@frigg.lan>
-In-Reply-To: <150471856141.24907.274176769201097378.stgit@frigg.lan>
-References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dpfb0-0003vP-0v
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 15:02:51 -0400
+Received: from chuckie.co.uk ([82.165.15.123]:47421
+	helo=s16892447.onlinehome-server.info)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+	id 1dpfaz-0003tm-Qw
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 15:02:41 -0400
+References: <1500236854-28271-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1500236854-28271-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<66bd157d-02d4-5d87-5774-71fd995652f6@linux.vnet.ibm.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <d58de819-f5aa-9fb5-6f09-ada3ec14fd0c@ilande.co.uk>
+Date: Wed, 6 Sep 2017 20:02:30 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 20/20] instrument: Add API to manipulate
- guest memory
+In-Reply-To: <66bd157d-02d4-5d87-5774-71fd995652f6@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=gbk
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCHv3 1/2] pci: move check for existing devfn
+ into new pci_bus_devfn_available() helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,233 +32,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
+To: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-It includes access to the guest's memory and vCPU registers.
+On 04/09/17 11:01, Yi Min Zhao wrote:
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- instrument/Makefile.objs      |    1=20
- instrument/qemu-instr/state.h |  104 +++++++++++++++++++++++++++++++++++=
-++++++
- instrument/state.c            |   72 ++++++++++++++++++++++++++++
- 3 files changed, 177 insertions(+)
- create mode 100644 instrument/qemu-instr/state.h
- create mode 100644 instrument/state.c
+> I want to ask a question. According to the next patch, you check
+> bus->devices[devfn]
+> and reserved bit separately. Why not move the reserved bit check here?
+> I think bus->devices[devfn] != NULL or revsered bit set means slot is
+> unavailable.
 
-diff --git a/instrument/Makefile.objs b/instrument/Makefile.objs
-index 8258dbfa79..c9bc4e75f4 100644
---- a/instrument/Makefile.objs
-+++ b/instrument/Makefile.objs
-@@ -6,3 +6,4 @@ target-obj-y +=3D qmp.o
-=20
- target-obj-$(CONFIG_INSTRUMENT) +=3D control.o
- target-obj-$(CONFIG_INSTRUMENT) +=3D trace.o
-+target-obj-$(CONFIG_INSTRUMENT) +=3D state.o
-diff --git a/instrument/qemu-instr/state.h b/instrument/qemu-instr/state.=
-h
-new file mode 100644
-index 0000000000..0ae6255fe5
---- /dev/null
-+++ b/instrument/qemu-instr/state.h
-@@ -0,0 +1,104 @@
-+/*
-+ * Interface for accessing guest state.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef QI__STATE_H
-+#define QI__STATE_H
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+#include <qemu-instr/types.h>
-+
-+
-+/**
-+ * qi_mem_read_virt:
-+ * @vcpu: CPU to use for address translation.
-+ * @vaddr: Starting virtual address to read from.
-+ * @size: Number of bytes to read.
-+ * @buf: Buffer to write into.
-+ *
-+ * Read contents from virtual memory.
-+ *
-+ * Returns: Whether the range of virtual addresses to read could be tran=
-slated.
-+ *
-+ * Warning: Even on error, some of the destination buffer might have bee=
-n
-+ *          modified.
-+ *
-+ * Precondition: The output buffer has at least "size" bytes.
-+ */
-+bool qi_mem_read_virt(QICPU vcpu, uint64_t vaddr, size_t size, void *buf=
-);
-+
-+/**
-+ * qi_mem_write_virt:
-+ * @vcpu: CPU to use for address translation.
-+ * @vaddr: Starting virtual address to write into.
-+ * @size: Number of bytes to write.
-+ * @buf: Buffer with the contents to write from.
-+ *
-+ * Write contents into virtual memory.
-+ *
-+ * Returns: Whether the range of virtual addresses to write could be tra=
-nslated.
-+ *
-+ * Warning: Even on error, some of the destination memory might have bee=
-n
-+ *          modified.
-+ * Precondition: The input buffer has at least "size" bytes.
-+ */
-+bool qi_mem_write_virt(QICPU vcpu, uint64_t vaddr, size_t size, void *bu=
-f);
-+
-+/**
-+ * qi_mem_virt_to_phys:
-+ * @vcpu: CPU to use for address translation.
-+ * @vaddr: Virtual address to translate.
-+ * @paddr: Pointer to output physical address.
-+ *
-+ * Translate a virtual address into a physical address.
-+ *
-+ * Returns: Whether the address could be translated.
-+ */
-+bool qi_mem_virt_to_phys(QICPU vcpu, uint64_t vaddr, uint64_t *paddr);
-+
-+/**
-+ * qi_mem_read_phys:
-+ * @paddr: Starting physical address to read from.
-+ * @size: Number of bytes to read.
-+ * @buf: Buffer to write into.
-+ *
-+ * Read contents from physical memory.
-+ *
-+ * Returns: Whether the range of physical addresses is valid.
-+ *
-+ * Warning: Even on error, some of the destination buffer might have bee=
-n
-+ *          modified.
-+ * Precondition: The output buffer has at least "size" bytes.
-+ */
-+bool qi_mem_read_phys(uint64_t paddr, size_t size, void *buf);
-+
-+/**
-+ * qi_mem_write_phys:
-+ * @paddr: Starting physical address to write into.
-+ * @size: Number of bytes to write.
-+ * @buf: Buffer with the contents to write from.
-+ *
-+ * Write contents into virtual memory.
-+ *
-+ * Returns: Whether the range of physical addresses is valid.
-+ *
-+ * Warning: Even on error, some of the destination memory might have bee=
-n
-+ *          modified.
-+ *
-+ * Precondition: The input buffer has at least "size" bytes.
-+ */
-+bool qi_mem_write_phys(uint64_t paddr, size_t size, void *buf);
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+
-+#endif  /* QI__STATE_H */
-diff --git a/instrument/state.c b/instrument/state.c
-new file mode 100644
-index 0000000000..4bf99b4882
---- /dev/null
-+++ b/instrument/state.c
-@@ -0,0 +1,72 @@
-+/*
-+ * Interface for accessing guest state.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "exec/cpu-all.h"
-+#include "instrument/control.h"
-+#include "instrument/error.h"
-+#include "instrument/qemu-instr/state.h"
-+#include "instrument/qemu-instr/visibility.h"
-+
-+
-+QI_VPUBLIC bool qi_mem_read_virt(QICPU vcpu, uint64_t vaddr,
-+                                 size_t size, void *buf)
-+{
-+    CPUState *vcpu_ =3D instr_cpu_get(vcpu);
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
-+    return cpu_memory_rw_debug(vcpu_, vaddr, buf, size, 0) =3D=3D 0;
-+}
-+
-+QI_VPUBLIC bool qi_mem_write_virt(QICPU vcpu, uint64_t vaddr,
-+                                  size_t size, void *buf)
-+{
-+    CPUState *vcpu_ =3D instr_cpu_get(vcpu);
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
-+    return cpu_memory_rw_debug(vcpu_, vaddr, buf, size, 1) =3D=3D 0;
-+}
-+
-+QI_VPUBLIC bool qi_mem_virt_to_phys(QICPU vcpu, uint64_t vaddr, uint64_t=
- *paddr)
-+{
-+    CPUState *vcpu_ =3D instr_cpu_get(vcpu);
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
-+
-+#if defined(CONFIG_USER_ONLY)
-+    *paddr =3D vaddr;
-+    return true;
-+#else
-+    *paddr =3D cpu_get_phys_page_debug(vcpu_, vaddr);
-+    return *paddr !=3D -1;
-+#endif
-+}
-+
-+QI_VPUBLIC bool qi_mem_read_phys(uint64_t paddr, size_t size, void *buf)
-+{
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+#if defined(CONFIG_USER_ONLY)
-+    return cpu_memory_rw_debug(NULL, paddr, buf, size, 0) =3D=3D 0;
-+#else
-+    cpu_physical_memory_read(paddr, buf, size);
-+    return true;
-+#endif
-+}
-+
-+QI_VPUBLIC bool qi_mem_write_phys(uint64_t paddr, size_t size, void *buf=
-)
-+{
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+#if defined(CONFIG_USER_ONLY)
-+    return cpu_memory_rw_debug(NULL, paddr, buf, size, 1) =3D=3D 0;
-+#else
-+    cpu_physical_memory_write(paddr, buf, size);
-+    return true;
-+#endif
-+}
+Primarily it was to allow callers to distinguish between the two
+different cases i.e. the error message can tell you that the reason the
+slot was unavailable was because it was reserved, i.e. you can *never*
+plug anything into it compared with unavailable where someone has
+plugged something into the slot with -device but it could be later
+removed, for example with hotplug.
+
+
+ATB,
+
+Mark.
