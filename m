@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42545)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <prvs=415137b24=anthony.perard@citrix.com>)
-	id 1dpaZh-0004Z5-H3
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:41:02 -0400
+	id 1dpaZj-0004aM-8h
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <prvs=415137b24=anthony.perard@citrix.com>)
-	id 1dpaZd-0004mj-WF
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:41:01 -0400
+	id 1dpaZd-0004mR-LB
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:41:03 -0400
 Received: from smtp.citrix.com ([66.165.176.89]:63080)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
 	(envelope-from <prvs=415137b24=anthony.perard@citrix.com>)
-	id 1dpaZd-0004m8-Os
+	id 1dpaZd-0004m8-Ez
 	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 09:40:57 -0400
 From: Anthony PERARD <anthony.perard@citrix.com>
-Date: Wed, 6 Sep 2017 14:40:33 +0100
-Message-ID: <20170906134033.13348-4-anthony.perard@citrix.com>
-In-Reply-To: <20170906134033.13348-1-anthony.perard@citrix.com>
-References: <20170906134033.13348-1-anthony.perard@citrix.com>
+Date: Wed, 6 Sep 2017 14:40:30 +0100
+Message-ID: <20170906134033.13348-1-anthony.perard@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v4 3/3] Revert "ACPI: don't call
- acpi_pcihp_device_plug_cb on xen"
+Subject: [Qemu-devel] [PATCH v4 0/3] Fix hotplug of PCI passthrought device
+ on Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +28,23 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, Stefano Stabellini <sstabellini@kernel.org>, Bruce Rogers <brogers@suse.com>, "Michael S.
-	Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+Cc: Anthony PERARD <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org
 
-This reverts commit 153eba4726dfa1bdfc31d1fe973b2a61b9035492.
+Adding PCI passthrough before the guest start works fine (broken in 2.9 but now
+fixed), but hotplug does not work anymore.
 
-This patch prevents PCI passthrough hotplug on Xen. Even if the Xen tool
-stack prepares its own ACPI tables, we still rely on QEMU for hotplug
-ACPI notifications.
-
-The original issue is fixed by the two previous patch:
+Anthony PERARD (3):
   hw/acpi: Limit hotplug to root bus on legacy mode
   hw/acpi: Move acpi_set_pci_info to pcihp
+  Revert "ACPI: don't call acpi_pcihp_device_plug_cb on xen"
 
-Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
----
-CC: Stefano Stabellini <sstabellini@kernel.org>
-CC: Bruce Rogers <brogers@suse.com>
----
- hw/acpi/piix4.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+ hw/acpi/pcihp.c       | 40 +++++++++++++++++++++++++++++++++++++++-
+ hw/acpi/piix4.c       | 11 +++--------
+ hw/i386/acpi-build.c  | 32 --------------------------------
+ stubs/Makefile.objs   |  1 +
+ stubs/pci-host-piix.c |  6 ++++++
+ 5 files changed, 49 insertions(+), 41 deletions(-)
+ create mode 100644 stubs/pci-host-piix.c
 
-diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-index f276967365..f4fd5907b8 100644
---- a/hw/acpi/piix4.c
-+++ b/hw/acpi/piix4.c
-@@ -385,10 +385,7 @@ static void piix4_device_plug_cb(HotplugHandler *hotplug_dev,
-                                 dev, errp);
-         }
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
--        if (!xen_enabled()) {
--            acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
--                                      errp);
--        }
-+        acpi_pcihp_device_plug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
-         if (s->cpu_hotplug_legacy) {
-             legacy_acpi_cpu_plug_cb(hotplug_dev, &s->gpe_cpu, dev, errp);
-@@ -411,10 +408,8 @@ static void piix4_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-         acpi_memory_unplug_request_cb(hotplug_dev, &s->acpi_memory_hotplug,
-                                       dev, errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_PCI_DEVICE)) {
--        if (!xen_enabled()) {
--            acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
--                                        errp);
--        }
-+        acpi_pcihp_device_unplug_cb(hotplug_dev, &s->acpi_pci_hotplug, dev,
-+                                    errp);
-     } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU) &&
-                !s->cpu_hotplug_legacy) {
-         acpi_cpu_unplug_request_cb(hotplug_dev, &s->cpuhp_state, dev, errp);
 -- 
 Anthony PERARD
