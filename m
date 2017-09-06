@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpSWn-0007Tg-2N
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:05:29 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dpSmK-0001F4-5X
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:21:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dpSWi-0007IU-4l
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:05:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42904)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dpSWh-0007IE-Uu
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:05:24 -0400
-References: <20170904090310.22530-1-marcandre.lureau@redhat.com>
-	<1931f0be-40ce-49b8-02e4-0d98801091ae@redhat.com>
-	<CAJ+F1CLaz9KsPWG+_h1H=dwmY0EgAfcq6r2dAJvfvJz8JB5cBA@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <aa1b0e7c-1968-fbee-6219-a26a08313d4f@redhat.com>
-Date: Wed, 6 Sep 2017 07:05:17 +0200
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dpSmG-0004Xa-0q
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:21:32 -0400
+References: <1504550378-2291-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1504550378-2291-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170905011343.GD2735@umbus.fritz.box>
+	<20170906031619.GE2735@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <f6d2df4e-a67d-a601-40a1-0c9d0d610eec@ilande.co.uk>
+Date: Wed, 6 Sep 2017 06:21:08 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAJ+F1CLaz9KsPWG+_h1H=dwmY0EgAfcq6r2dAJvfvJz8JB5cBA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170906031619.GE2735@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] build-sys: generate tests/.gitignore
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] net: Add SunGEM device emulation as
+ found on Apple UniNorth
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
-Cc: famz@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 05.09.2017 12:42, Marc-Andr=C3=A9 Lureau wrote:
-> Hi
->=20
-> On Mon, Sep 4, 2017 at 12:21 PM Thomas Huth <thuth@redhat.com
-> <mailto:thuth@redhat.com>> wrote:
->=20
->     On 04.09.2017 11 <tel:04%2009%2020%2017%2011>:03, Marc-Andr=C3=A9 L=
-ureau
->     wrote:
-[...]
->     >=C2=A0 # Build the help program automatically
->     >
->     >=C2=A0 all: $(QEMU_IOTESTS_HELPERS-y)
->     >
->     > +$(SRC_PATH)/tests/.gitignore: $(MAKEFILE_LIST)
->     > +=C2=A0 =C2=A0 =C2=A0$(call quiet-command, echo "$(tests-cleanfil=
-es)"
->     "$(tests-cleandirs)" | \
->     > +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0xargs -n1 | sort=
- | uniq | sed -e s:^:/: >
->     $@,"GEN","$(@F)")
->=20
->     Please do not use SRC_PATH here. I'm doing out of tree builds, and =
-I
->     don't want that these are touching my source folder!
->=20
-> I understand the feeling, I do also mostly out of tree build. However, =
-I
-> don't think it makes much sense to generate .gitignore in the build dir=
-.
+On 06/09/17 04:16, David Gibson wrote:
+> On Tue, Sep 05, 2017 at 11:13:43AM +1000, David Gibson wrote:
+>> On Mon, Sep 04, 2017 at 07:39:38PM +0100, Mark Cave-Ayland wrote:
+>>> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>>>
+>>> This adds a simplistic emulation of the Sun GEM ethernet controller
+>>> found in Apple ASICs.
+>>>
+>>> Currently we only support the Apple UniNorth 1.x variant, but the
+>>> other Apple or Sun variants should mostly be a matter of adding
+>>> PCI IDs options.
+>>>
+>>> We have a very primitive emulation of a single Broadcom 5201 PHY
+>>> which is supported by the MacOS driver.
+>>>
+>>> This model brings out-of-the-box networking to MacOS 9, and all
+>>> versions of OS X I tried with the mac99 platform.
+>>>
+>>> Further improvements from Mark:
+>>> - Remove sungem.h file, moving constants into sungem.c as required
+>>> - Switch to using tracepoints for debugging
+>>> - Split register blocks into separate memory regions
+>>> - Use arrays in SunGEMState to hold register values
+>>> - Add state-saving support
+>>>
+>>> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>
+>> Applied to ppc-for-2.11.
+> 
+> Until I discovered that it breaks compile with
+> --enable-trace-backend=ust.   So I've removed it again.
 
-Why not? If you're doing out-of-tree builds, you don't need the
-.gitignore in the source directory anyway, so it certainly does not make
-sense to generate there such a file in the source directory.
+Oh that's interesting. I've had --enable-trace-backend=simple as part of
+my default build for a long while now, so I'm quite surprised that the
+trace-events are backend sensitive.
 
-> It's git related, and in the git source dir, you have .git that is
-> writable already
-
-It's unlikely, but I think it is perfectly legal to have your git source
-directory e.g. mounted temporarily as a read-only file system. I'd then
-still expect to be able to use my read-only sources to build QEMU out of
-tree.
-
- Thomas
+Any clue as to what the error might be before I go and start installing
+the relevant libraries?
 
 
-PS: Looks like you're sending HTML mails ... please check the setup of
-your mail program.
+ATB,
+
+Mark.
