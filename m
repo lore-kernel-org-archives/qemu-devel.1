@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dpSmK-0001F4-5X
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:21:33 -0400
+	(envelope-from <thuth@redhat.com>) id 1dpSrb-0002Rm-ED
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:27:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dpSmG-0004Xa-0q
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:21:32 -0400
-References: <1504550378-2291-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1504550378-2291-2-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170905011343.GD2735@umbus.fritz.box>
-	<20170906031619.GE2735@umbus.fritz.box>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <f6d2df4e-a67d-a601-40a1-0c9d0d610eec@ilande.co.uk>
-Date: Wed, 6 Sep 2017 06:21:08 +0100
+	(envelope-from <thuth@redhat.com>) id 1dpSrX-0004cY-G7
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:26:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43818)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dpSrX-0004Zn-7Z
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 01:26:55 -0400
+References: <20170818222313.13391-1-eblake@redhat.com>
+	<1c41ef09-3e34-63ba-fc85-5aac46a5c355@linux.vnet.ibm.com>
+	<ebea7edf-6f5b-9096-552c-079bfcad71a4@redhat.com>
+	<87d17lqu85.fsf@dusky.pond.sub.org>
+	<f40a5fc9-a140-041f-1c3c-d97036dab898@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f14f7069-6557-8633-d7c4-3caee567f905@redhat.com>
+Date: Wed, 6 Sep 2017 07:26:42 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170906031619.GE2735@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] net: Add SunGEM device emulation as
- found on Apple UniNorth
+In-Reply-To: <f40a5fc9-a140-041f-1c3c-d97036dab898@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="9lpbn3O6Uv4xuciCheM5JLlfGRAjSct1p"
+Subject: Re: [Qemu-devel] [RFC PATCH] osdep.h: Prohibit disabling assert()
+ in supported builds
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,50 +32,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org, f4bug@amsat.org
 
-On 06/09/17 04:16, David Gibson wrote:
-> On Tue, Sep 05, 2017 at 11:13:43AM +1000, David Gibson wrote:
->> On Mon, Sep 04, 2017 at 07:39:38PM +0100, Mark Cave-Ayland wrote:
->>> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->>>
->>> This adds a simplistic emulation of the Sun GEM ethernet controller
->>> found in Apple ASICs.
->>>
->>> Currently we only support the Apple UniNorth 1.x variant, but the
->>> other Apple or Sun variants should mostly be a matter of adding
->>> PCI IDs options.
->>>
->>> We have a very primitive emulation of a single Broadcom 5201 PHY
->>> which is supported by the MacOS driver.
->>>
->>> This model brings out-of-the-box networking to MacOS 9, and all
->>> versions of OS X I tried with the mac99 platform.
->>>
->>> Further improvements from Mark:
->>> - Remove sungem.h file, moving constants into sungem.c as required
->>> - Switch to using tracepoints for debugging
->>> - Split register blocks into separate memory regions
->>> - Use arrays in SunGEMState to hold register values
->>> - Add state-saving support
->>>
->>> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--9lpbn3O6Uv4xuciCheM5JLlfGRAjSct1p
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 05.09.2017 21:50, Eric Blake wrote:
+> On 08/24/2017 02:51 AM, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
 >>
->> Applied to ppc-for-2.11.
-> 
-> Until I discovered that it breaks compile with
-> --enable-trace-backend=ust.   So I've removed it again.
+>>> On 08/22/2017 06:19 AM, Halil Pasic wrote:
+[...]
+>>> I'd prefer that if we are going to introduce our own construct that
+>>> always evaluates side effects, and only has a compile-time switch on
+>>> whether to abort() or (foolishly) plow on, that we name it something
+>>> without 'assert' in the name, so that reviewers don't have to be
+>>> confused about remembering which variant evaluates side effects.  May=
+be:
+>>>
+>>> q_verify(cond)
+>>
+>> I vote for frying bigger fish.
+>>
+>> I also vote for using standard C when standard C is servicable.
+>=20
+> So if it were up to me alone, the answer is:
+>=20
+> I'm NOT going to add any new construct (whether spelled q_verify() or
+> otherwise), and will merely document in the commit message that we
+> discussed this as an alternative (so someone who wants to disable #erro=
+r
+> can get a git history of what went into the decision).
+>=20
+> Also, it sounds like we want to keep it #error, not #warn.
+>=20
+> But if anyone else has strong opinions before we promote this from RFC
+> to actual patch, I'm still interested in your arguments.
 
-Oh that's interesting. I've had --enable-trace-backend=simple as part of
-my default build for a long while now, so I'm quite surprised that the
-trace-events are backend sensitive.
+You asked for opinions, so here's mine: I agree with you, please do
+*not* add a new QEMU-specific construct here. assert() should be a
+well-known C construct that every programmer should have understood. You
+also need it for other projects. If you haven't understood that it's a
+macro and has side-effects, you should learn it (e.g. during patch
+review), not avoid it, otherwise you'll run into problems in another
+project that is using it again.
 
-Any clue as to what the error might be before I go and start installing
-the relevant libraries?
+But IMHO we should still try to get rid of wrong usage of assert() in
+the QEMU sources. So maybe we could allow building with NDEBUG one day
+for the brave people who need the extra percent of additional speed. But
+as long as we're not there, I think this patch is a good thing to avoid
+wrong expectations.
+
+ Thomas
 
 
-ATB,
+--9lpbn3O6Uv4xuciCheM5JLlfGRAjSct1p
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Mark.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBAgAGBQJZr4cXAAoJEC7Z13T+cC21ycAP/272nzKz7rwObfKQA38sKe1z
+p6jPjKum6zT50ULIdxhlXY4qQUVnFc+WVRRc/3VE3M0TgE0mEaCUXBrD8NdBtQaG
+oLNP4eoUM9RRRxuamsLo8yMMb/gBiKH8JenCJvUPfOyNC2W6Jzj3um5o0arOt+u2
+6x5Wa8o6AN3WrSGWN/Nv/Hhf5TbHA5wPw2wS7EwVFligdgG8cnurQy1aM48vqurL
+w16ji5pqEwZkDLdZl8UpaSi4K5yf8AD9e/6tv04EdLo4ikNAtQPpchNzxzLDoBus
+AYvrXrLVQTrfM+GNmT/YIW7hkZJA1l+WBt4LB7H0g8ex5OFKTG8JeLhnGF46n2us
+vnBJJzsKOaL0wAuBe2UfihmrJkFKS8gn9ULBNwmwDe1Rgm3f+HAKdGXU+/PTawWd
+LeeeZ3jsnwmP8HSlE2gJxf+xhqUDNKyco8NzXz/SN/NbW3rJWIuF/AaRNtFYxkuP
+2qgmgMEHwexQm1RN1fyVRnxrjv6HGLB7YNd812BneJ3P3Rjxg6ik1xGupRDQ/lCG
+fekL0gfcFP3jeel6Kr2E5TSfQTXPfr89/T73tUnh0kLRDtPQcc2XIsQSCZa82clF
+zohxjyoGwdKVGtuIbFvxrSjinF9YfInIoEqDxynxQUMFUQf+gD+Tz7n32J2NnIgd
+OOVopFDvRNqrtpl0Vg8H
+=M1wN
+-----END PGP SIGNATURE-----
+
+--9lpbn3O6Uv4xuciCheM5JLlfGRAjSct1p--
