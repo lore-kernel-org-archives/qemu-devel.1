@@ -1,29 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51423)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51772)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1dpYRx-0001aJ-CA
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:24:58 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dpYSp-0002JO-Fy
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mprivozn@redhat.com>) id 1dpYRu-0005DV-EF
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:24:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57406)
+	(envelope-from <cohuck@redhat.com>) id 1dpYSk-0005T4-HE
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:25:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52666)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1dpYRu-0005DM-5j
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:24:50 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 351984E4CA
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 11:24:49 +0000 (UTC)
-From: Michal Privoznik <mprivozn@redhat.com>
-Date: Wed,  6 Sep 2017 13:24:39 +0200
-Message-Id: <9fe40ce91ada6dfdade83f32940f420e8b373db2.1504696921.git.mprivozn@redhat.com>
-In-Reply-To: <cover.1504696921.git.mprivozn@redhat.com>
-References: <cover.1504696921.git.mprivozn@redhat.com>
-In-Reply-To: <cover.1504696921.git.mprivozn@redhat.com>
-References: <cover.1504696921.git.mprivozn@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 2/3] watchdog.h: Drop local redefinition of
- actions enum
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpYSk-0005SM-7y
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:25:42 -0400
+Date: Wed, 6 Sep 2017 13:25:38 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170906132538.73b31142.cohuck@redhat.com>
+In-Reply-To: <20170906082720.GZ31680@bjsdjshi@linux.vnet.ibm.com>
+References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
+	<20170830163609.50260-3-pasic@linux.vnet.ibm.com>
+	<20170831111953.242ddc28.cohuck@redhat.com>
+	<e805e756-495d-3125-eaf0-262635b9c545@linux.vnet.ibm.com>
+	<20170905100234.7a92128e.cohuck@redhat.com>
+	<bff0fcd2-4c1d-b5da-2d11-dc479d9d7275@linux.vnet.ibm.com>
+	<20170905174606.1e0c6404.cohuck@redhat.com>
+	<24e87c3e-2674-8fc1-cd0a-94f4907ddc7d@linux.vnet.ibm.com>
+	<20170906082720.GZ31680@bjsdjshi@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/9] s390x: fix invalid use of cc 1 for SSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,165 +34,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, berrange@redhat.com, eblake@redhat.com
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-We already have enum that enumerates all the action that a
-watchdog can take when hitting its timeout: WatchdogAction.
-Use that instead of inventing our own.
+On Wed, 6 Sep 2017 16:27:20 +0800
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
 
-Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
----
- hw/watchdog/watchdog.c    | 42 +++++++++++++++++-------------------------
- hw/watchdog/wdt_diag288.c |  6 +++---
- include/sysemu/watchdog.h | 12 ++----------
- 3 files changed, 22 insertions(+), 38 deletions(-)
+> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-05 19:20:43 +0200]:
+> 
+> > 
+> > 
+> > On 09/05/2017 05:46 PM, Cornelia Huck wrote:  
+> > > On Tue, 5 Sep 2017 17:24:19 +0200
+> > > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> > >   
+> > >> My problem with a program check (indicated by SCSW word 2 bit 10) is
+> > >> that, in my reading of the architecture, the semantic behind it is: The
+> > >> channel subsystem (not the cu or device) has detected, that the 
+> > >> the channel program (previously submitted as an ORB) is erroneous. Which
+> > >> programs are erroneous is specified by the architecture. What we have
+> > >> here does not qualify.
+> > >>
+> > >> My idea was to rather blame the virtual hardware (device) and put no blame
+> > >> on the program nor he channel subsystem. This could be done using device
+> > >> status (unit check with command reject, maybe unit exception) or interface
+> > >> check. My train of thought was, the problem is not consistent across a
+> > >> device type, so it has to be device specific.  
+> > > 
+> > > Unit exception might be a better way to express what is happening here.
+> > > At least, it moves us away from cc 1 and not towards cc 3 :)
+> > >   
+> > 
+> > I will do a follow up patch pursuing device exception.
+> >   
+> > >>
+> > >> Of course blaming the device could mislead the person encountering the
+> > >> problem, and make him believe it's an non-virtual hardware problem.
+> > >>
+> > >> About the misleading, I think the best we can do is log out a message
+> > >> indicating what really happened.  
+> > > 
+> > > Just document it in the code? If it doesn't happen with Linux as a
+> > > guest, it is highly unlikely to be seen in the wild.
+> > >   
+> > 
+> > 
+> > Well we have two problems here:
+> > 1) Unit exception can be already defined by the device type for the
+> > command (reference: http://publibfp.dhe.ibm.com/cgi-bin/bookmgr/BOOKS/dz9ar110/2.6.10?DT=19920904110920).
+> > I think this one is what you mean. And I agree that's best handled
+> > with comment in code.  
+> Using unit check, with bit 3 byte 0 of the sense data set to 1, to
+> indicate an 'Equipment check', sounds a bit more proper than unit
+> exception.
 
-diff --git a/hw/watchdog/watchdog.c b/hw/watchdog/watchdog.c
-index 358d79804d..547a49a1e4 100644
---- a/hw/watchdog/watchdog.c
-+++ b/hw/watchdog/watchdog.c
-@@ -30,7 +30,7 @@
- #include "hw/nmi.h"
- #include "qemu/help_option.h"
- 
--static int watchdog_action = WDT_RESET;
-+static WatchdogAction watchdog_action = WATCHDOG_ACTION_RESET;
- static QLIST_HEAD(watchdog_list, WatchdogTimerModel) watchdog_list;
- 
- void watchdog_add_model(WatchdogTimerModel *model)
-@@ -77,27 +77,16 @@ int select_watchdog(const char *p)
- 
- int select_watchdog_action(const char *p)
- {
--    if (strcasecmp(p, "reset") == 0)
--        watchdog_action = WDT_RESET;
--    else if (strcasecmp(p, "shutdown") == 0)
--        watchdog_action = WDT_SHUTDOWN;
--    else if (strcasecmp(p, "poweroff") == 0)
--        watchdog_action = WDT_POWEROFF;
--    else if (strcasecmp(p, "pause") == 0)
--        watchdog_action = WDT_PAUSE;
--    else if (strcasecmp(p, "debug") == 0)
--        watchdog_action = WDT_DEBUG;
--    else if (strcasecmp(p, "none") == 0)
--        watchdog_action = WDT_NONE;
--    else if (strcasecmp(p, "inject-nmi") == 0)
--        watchdog_action = WDT_NMI;
--    else
--        return -1;
-+    int action;
- 
-+    action = qapi_enum_parse(&WatchdogAction_lookup, p, -1, NULL);
-+    if (action < 0)
-+        return -1;
-+    watchdog_action = action;
-     return 0;
- }
- 
--int get_watchdog_action(void)
-+WatchdogAction get_watchdog_action(void)
- {
-     return watchdog_action;
- }
-@@ -108,21 +97,21 @@ int get_watchdog_action(void)
- void watchdog_perform_action(void)
- {
-     switch (watchdog_action) {
--    case WDT_RESET:             /* same as 'system_reset' in monitor */
-+    case WATCHDOG_ACTION_RESET:     /* same as 'system_reset' in monitor */
-         qapi_event_send_watchdog(WATCHDOG_ACTION_RESET, &error_abort);
-         qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-         break;
- 
--    case WDT_SHUTDOWN:          /* same as 'system_powerdown' in monitor */
-+    case WATCHDOG_ACTION_SHUTDOWN:  /* same as 'system_powerdown' in monitor */
-         qapi_event_send_watchdog(WATCHDOG_ACTION_SHUTDOWN, &error_abort);
-         qemu_system_powerdown_request();
-         break;
- 
--    case WDT_POWEROFF:          /* same as 'quit' command in monitor */
-+    case WATCHDOG_ACTION_POWEROFF:  /* same as 'quit' command in monitor */
-         qapi_event_send_watchdog(WATCHDOG_ACTION_POWEROFF, &error_abort);
-         exit(0);
- 
--    case WDT_PAUSE:             /* same as 'stop' command in monitor */
-+    case WATCHDOG_ACTION_PAUSE:     /* same as 'stop' command in monitor */
-         /* In a timer callback, when vm_stop calls qemu_clock_enable
-          * you would get a deadlock.  Bypass the problem.
-          */
-@@ -131,19 +120,22 @@ void watchdog_perform_action(void)
-         qemu_system_vmstop_request(RUN_STATE_WATCHDOG);
-         break;
- 
--    case WDT_DEBUG:
-+    case WATCHDOG_ACTION_DEBUG:
-         qapi_event_send_watchdog(WATCHDOG_ACTION_DEBUG, &error_abort);
-         fprintf(stderr, "watchdog: timer fired\n");
-         break;
- 
--    case WDT_NONE:
-+    case WATCHDOG_ACTION_NONE:
-         qapi_event_send_watchdog(WATCHDOG_ACTION_NONE, &error_abort);
-         break;
- 
--    case WDT_NMI:
-+    case WATCHDOG_ACTION_INJECT_NMI:
-         qapi_event_send_watchdog(WATCHDOG_ACTION_INJECT_NMI,
-                                  &error_abort);
-         nmi_monitor_handle(0, NULL);
-         break;
-+
-+    default:
-+        assert(0);
-     }
- }
-diff --git a/hw/watchdog/wdt_diag288.c b/hw/watchdog/wdt_diag288.c
-index 47f289216a..1475743527 100644
---- a/hw/watchdog/wdt_diag288.c
-+++ b/hw/watchdog/wdt_diag288.c
-@@ -57,9 +57,9 @@ static void diag288_timer_expired(void *dev)
-      * the BQL; reset before triggering the action to avoid races with
-      * diag288 instructions. */
-     switch (get_watchdog_action()) {
--    case WDT_DEBUG:
--    case WDT_NONE:
--    case WDT_PAUSE:
-+    case WATCHDOG_ACTION_DEBUG:
-+    case WATCHDOG_ACTION_NONE:
-+    case WATCHDOG_ACTION_PAUSE:
-         break;
-     default:
-         wdt_diag288_reset(dev);
-diff --git a/include/sysemu/watchdog.h b/include/sysemu/watchdog.h
-index 72a4da07a6..677ace3945 100644
---- a/include/sysemu/watchdog.h
-+++ b/include/sysemu/watchdog.h
-@@ -23,15 +23,7 @@
- #define QEMU_WATCHDOG_H
- 
- #include "qemu/queue.h"
--
--/* Possible values for action parameter. */
--#define WDT_RESET        1      /* Hard reset. */
--#define WDT_SHUTDOWN     2      /* Shutdown. */
--#define WDT_POWEROFF     3      /* Quit. */
--#define WDT_PAUSE        4      /* Pause. */
--#define WDT_DEBUG        5      /* Prints a message and continues running. */
--#define WDT_NONE         6      /* Do nothing. */
--#define WDT_NMI          7      /* Inject nmi into the guest. */
-+#include "qapi-types.h"
- 
- struct WatchdogTimerModel {
-     QLIST_ENTRY(WatchdogTimerModel) entry;
-@@ -46,7 +38,7 @@ typedef struct WatchdogTimerModel WatchdogTimerModel;
- /* in hw/watchdog.c */
- int select_watchdog(const char *p);
- int select_watchdog_action(const char *action);
--int get_watchdog_action(void);
-+WatchdogAction get_watchdog_action(void);
- void watchdog_add_model(WatchdogTimerModel *model);
- void watchdog_perform_action(void);
- 
--- 
-2.13.5
+I don't agree: Equipment check sounds a lot more dire (and seems to
+imply a malfunction). I like unit exception better.
+
+> 
+> > 2) The poor user/programmer is trying to figure out why things
+> > don't work (why are we getting the unit exception)? I think that's
+> > best remedied with producing something for the log (maybe a warning
+> > with warn_report which states that the implementation vfio-ccw requires
+> > the given flags).  
+> Fine with me.
+
+With me as well.
