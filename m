@@ -1,44 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dpRzx-0002SG-NO
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 00:31:34 -0400
+	(envelope-from <thuth@redhat.com>) id 1dpSLY-0005Kp-9o
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 00:53:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dpRzt-0000q0-MQ
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 00:31:33 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46775
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1dpRzt-0000nH-GA
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 00:31:29 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v864SgWD091303
-	for <qemu-devel@nongnu.org>; Wed, 6 Sep 2017 00:31:27 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2ct3hgvj2f-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 00:31:27 -0400
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Wed, 6 Sep 2017 00:31:27 -0400
-Date: Wed, 6 Sep 2017 12:31:08 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
-	<20170830163609.50260-5-pasic@linux.vnet.ibm.com>
-	<20170831115535.1e4201d3.cohuck@redhat.com>
-	<7540741b-d230-e7c4-50d3-036f31997c8b@linux.vnet.ibm.com>
-	<20170905182546.00457332.cohuck@redhat.com>
-	<fe102a7a-e998-8ebe-b94d-e653c4f66c39@linux.vnet.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1dpSLV-0003CW-7R
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 00:53:52 -0400
+References: <1504605227-5124-1-git-send-email-thuth@redhat.com>
+	<871snlwev0.fsf@dusky.pond.sub.org> <20170905164835.GF2112@work-vm>
+	<6e03aa82-3663-c251-c8e1-ac2e7eb0e7e7@redhat.com>
+	<20170905183716.GH2112@work-vm>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7fd704ae-81c5-dc9b-33f0-fc640399dbf8@redhat.com>
+Date: Wed, 6 Sep 2017 06:53:41 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fe102a7a-e998-8ebe-b94d-e653c4f66c39@linux.vnet.ibm.com>
-Message-Id: <20170906043108.GY31680@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 4/9] s390x: refactor error handling for
- SSCH and RSCH
+In-Reply-To: <20170905183716.GH2112@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH] tests: Add a device_add/del
+ HMP test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,44 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Eduardo Habkost <ehabkost@redhat.com>
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-06 00:30:58 +0200]:
-
+On 05.09.2017 20:37, Dr. David Alan Gilbert wrote:
+> * Thomas Huth (thuth@redhat.com) wrote:
+>> On 05.09.2017 18:48, Dr. David Alan Gilbert wrote:
+>>> * Markus Armbruster (armbru@redhat.com) wrote:
+>>>> Thomas Huth <thuth@redhat.com> writes:
+>>>>
+>>>>> People tend to forget to mark internal devices with "user_creatable = false
+>>>>> or hotpluggable = false, and these devices can crash QEMU if added via the
+>>>>> HMP monitor. So let's add a test to run through all devices and that tries
+>>>>> to add them blindly (without arguments) to see whether this could crash the
+>>>>> QEMU instance.
+>>>>>
+>>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>>> ---
 [...]
-
-> > 
-> >> But I guess, I was afraid of somebody blaming me for this
-> >> comment (such TODOs in production code are a bit strange -- what
-> >> does it mean: we did not bother to figure it out?).
-> > 
-> > For one, the TODO is preexisting... and we really should remember to
-> > figure out if there's something better rather than just drop the
-> > comment.
-> > 
-> > (And I sure hope nobody is using vfio-ccw in production yet...)
-> >
-> Since blame says the TODO has been around since 2017-05-17
-> let me have a critical look at it.
+>>> If I'm reading the code right it's creating the device with the same
+>>> name as the device;  I wonder if that always works?
+>>
+>> Why not? The id is just an arbitrary string, isn't it?
 > 
-> At a first glance I would say addressing exception for SSCH
-> is not what we want: the only possibility I see for address
-> exception for SSCH is due to the ORB address. But if that's
-> the case we will never reach the code in question.
-Agree.
+> I didn't know how arbitrary they were allowed to be and I was
+> also worried they might clash with some existing id.
+> As an example, I see there's at least one device (SUNW,fdtwo) with
+> a , in it's name - is that legal for an id ?
 
-> So I suppose we can do better.
-As the comment said, I'm (still) in the state of 'wondering'.
+Oh, right, I didn't think of comma :-/ ... I'll try to come up with a
+better solution in the next version of the patch...
 
-> 
-> Adding Ren. @Ren: Do you agree with my analysis. If you do,
-> I could come up with a proposal what to do -- after some reading.
-If you have a better idea, and time, why not? ;)
-
-> 
-> Regards,
-> Halil
-
--- 
-Dong Jia Shi
+ Thomas
