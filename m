@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52214)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpc45-0001Yf-CZ
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 11:16:35 -0400
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dpc7K-00037r-Gg
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 11:19:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpc41-0000Pq-80
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 11:16:29 -0400
-References: <20170905191114.5959-1-eblake@redhat.com>
-	<20170905191114.5959-2-eblake@redhat.com>
-	<20170906085024.GB15510@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <586f8b2f-366f-bbf7-c209-12def49d58cc@redhat.com>
-Date: Wed, 6 Sep 2017 10:16:12 -0500
+	(envelope-from <marcandre.lureau@gmail.com>) id 1dpc7G-00055C-BP
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 11:19:50 -0400
+Received: from mail-oi0-x242.google.com ([2607:f8b0:4003:c06::242]:34758)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
+	id 1dpc7G-00054W-6F
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 11:19:46 -0400
+Received: by mail-oi0-x242.google.com with SMTP id l185so4906899oib.1
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 08:19:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170906085024.GB15510@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="fiW6rqqBaEVmE7sLCBgLSoLKSdBeXmw09"
-Subject: Re: [Qemu-devel] [PATCH 1/3] io: Yield rather than wait when
- already in coroutine
+In-Reply-To: <87o9qp1oez.fsf@dusky.pond.sub.org>
+References: <20170822132255.23945-1-marcandre.lureau@redhat.com>
+	<20170822132255.23945-20-marcandre.lureau@redhat.com>
+	<87o9qp1oez.fsf@dusky.pond.sub.org>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Wed, 6 Sep 2017 17:19:44 +0200
+Message-ID: <CAJ+F1CKVejC6k+qESjYMtjMLbxyP=4wF=YNsA0j7RanhmGsK2w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 19/54] qapi: add #if/#endif helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,80 +31,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fiW6rqqBaEVmE7sLCBgLSoLKSdBeXmw09
-From: Eric Blake <eblake@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, pbonzini@redhat.com, qemu-block@nongnu.org
-Message-ID: <586f8b2f-366f-bbf7-c209-12def49d58cc@redhat.com>
-Subject: Re: [PATCH 1/3] io: Yield rather than wait when already in coroutine
-References: <20170905191114.5959-1-eblake@redhat.com>
- <20170905191114.5959-2-eblake@redhat.com> <20170906085024.GB15510@redhat.com>
-In-Reply-To: <20170906085024.GB15510@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Tue, Sep 5, 2017 at 11:32 AM, Markus Armbruster <armbru@redhat.com> wrot=
+e:
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
+>
+>> Add helpers to generate #if/#endif and wrap visitor methods generating
+>> code. Used in the following patches.
+>>
+>> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> ---
+>>  scripts/qapi.py | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++=
++
+>>  1 file changed, 51 insertions(+)
+>>
+>> diff --git a/scripts/qapi.py b/scripts/qapi.py
+>> index 86845a28f9..52099332f1 100644
+>> --- a/scripts/qapi.py
+>> +++ b/scripts/qapi.py
+>> @@ -1892,6 +1892,57 @@ def guardend(name):
+>>                   name=3Dguardname(name))
+>>
+>>
+>> +def gen_if(ifcond):
+>> +    if not ifcond:
+>> +        return ''
+>> +    if isinstance(ifcond, str):
+>> +        ifcond =3D [ifcond]
+>> +    # Not using mcgen() because we don't want indent or \n stipped
+>
+> s/stipped/stripped/ I guess.
+>
+> Which newline exactly don't you want to strip?
 
-On 09/06/2017 03:50 AM, Daniel P. Berrange wrote:
-> On Tue, Sep 05, 2017 at 02:11:12PM -0500, Eric Blake wrote:
->> The new qio_channel_{read,write}{,v}_all functions are documented
->> as yielding until data is available.  When used on a blocking
->> channel, this yield is done via qio_channel_wait() which spawns
->> a new coroutine under the hood (so it is the new entry point that
->> yields as needed); but if we are already in a coroutine (at which
->=20
-> qio_channel_wait doesn't spawn any coroutine - it simply rnus a
-> nested event loop to wait for the channel...
->=20
->> point QIO_CHANNEL_ERR_BLOCK is only possible if we are a
->> non-blocking channel), we want to yield the current coroutine
->> instead of spawning a new one.
->=20
-> ...none the less, I think this is ok.
+My first attempt at using mcgen() was a fail.
 
-Okay, tweaking the commit message:
+>
+> Here's what mcgen() currently does:
+>
+> * Strip one leading newline, so that this works:
+>
+>       mcgen('''
+>   line 1
+>   line 2
+>   ''')
+>
+> * Interpolate keywords
+>
+> * Indent by @indent_level spaces
+>
+> * Strip @eatspace.
+>
 
-    The new qio_channel_{read,write}{,v}_all functions are documented
-    as yielding until data is available.  When used on a blocking
-    channel, this yield is done via qio_channel_wait() which spawns
-    a nested event loop under the hood (so it is that secondary loop
-    which yields as needed); but if we are already in a coroutine (at
-    which point QIO_CHANNEL_ERR_BLOCK is only possible if we are a
-    non-blocking channel), we want to yield the current coroutine
-    instead of spawning a nested event loop.
+So we don't need much from mcgen(), especailly, we don't want indent
+on preprocessor lines. I have added a patch to fix that. And now, I
+switch to mcgen() for more consistency.
 
->=20
-> Acked-by: Daniel P. Berrange <berrange@redhat.com>
->=20
-> Regards,
-> Daniel
->=20
+>> +    ret =3D '\n'
+>> +    for ifc in ifcond:
+>> +        ret +=3D '#if %s\n' % ifc
+>> +    ret +=3D '\n'
+>> +    return ret
+>> +
+>> +
+>> +def gen_endif(ifcond):
+>> +    if not ifcond:
+>> +        return ''
+>> +    if isinstance(ifcond, str):
+>> +        ifcond =3D [ifcond]
+>> +    # Not using mcgen() because we don't want indent or \n stipped
+>
+> Likewise.
+>
+>> +    ret =3D '\n'
+>> +    for ifc in reversed(ifcond):
+>> +        ret +=3D '#endif /* %s */\n' % ifc
+>> +    ret +=3D '\n'
+>> +    return ret
+>
+> I guess factoring out the common parts of gen_if() and gen_endif() would
+> make the code longer and more complex.
+>
+>> +
+>> +
+>> +# Wrap a method to add #if / #endif to generated code, only if some
+>> +# code was generated.
+>> +# self must have 'if_members' listing the attributes to wrap.
+>> +# The last argument of the wrapped function must be the 'ifcond'.
+>> +def ifcond_decorator(func):
+>> +
+>> +    def func_wrapper(self, *args, **kwargs):
+>> +        ifcond =3D args[-1]
+>> +        save =3D {}
+>> +        for mem in self.if_members:
+>> +            save[mem] =3D getattr(self, mem)
+>> +        func(self, *args, **kwargs)
+>> +        for mem, val in save.items():
+>> +            newval =3D getattr(self, mem)
+>> +            if newval !=3D val:
+>> +                assert newval.startswith(val)
+>> +                newval =3D newval[len(val):]
+>> +                val +=3D gen_if(ifcond)
+>> +                val +=3D newval
+>> +                val +=3D gen_endif(ifcond)
+>> +            setattr(self, mem, val)
+>> +
+>> +    return func_wrapper
+>> +
+>> +
+>>  def gen_enum_lookup(name, values, prefix=3DNone):
+>>      ret =3D mcgen('''
+>
+> My gut feeling is "too clever by half", but i'm reserving judgement
+> until after review of its use.
+>
+
+Well easy to change later on too, I'd not focus on this for now.
 
 --=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---fiW6rqqBaEVmE7sLCBgLSoLKSdBeXmw09
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmwETwACgkQp6FrSiUn
-Q2pAsgf/YpidaOzfmZZX29K9mrpV5B0sM9bqQmcxoT/WDy69stkQ6VcLF4oC2apD
-fv1YXtg0kDO5PY7WrvfJ18beIZDcNMz7Uy1wPDYM5XwTUpCca1w5floQkJHSxbT5
-y8/KS1o/mWbdlWs4Yq7Pe+QKECSrYi1z0HQ7e4YWg3E88zlm0ChhzGH+EBQsyXCj
-+RL2FmN3EJEzIHD/Zl+OI2nTGMX0J4Ej+WZ/NVPwg0se75dMe3STj0AuiWqOj6Ci
-HgYkleOZtj2D0NueNdjYcNwpO84lpTCafT2z7vmODvRcoL83lX+hi+4Rf1plHCNT
-a2ZZvwuizEhR9nD9IA/og5SCS4aArA==
-=/993
------END PGP SIGNATURE-----
-
---fiW6rqqBaEVmE7sLCBgLSoLKSdBeXmw09--
+Marc-Andr=C3=A9 Lureau
