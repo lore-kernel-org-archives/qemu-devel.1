@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dpOnj-0000Mb-Fz
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:06:45 -0400
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dpOtO-0001dM-0g
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:12:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wang.yong155@zte.com.cn>) id 1dpOnf-0003DF-Hw
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:06:43 -0400
-Received: from out1.zte.com.cn ([202.103.147.172]:48086 helo=mxct.zte.com.cn)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wang.yong155@zte.com.cn>)
-	id 1dpOne-0003B6-N8
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:06:39 -0400
-Date: Wed, 6 Sep 2017 09:06:10 +0800 (CST)
-Message-ID: <201709060906108605957@zte.com.cn>
-References: 1503991359-3353-1-git-send-email-wang.yong155@zte.com.cn,
-	1503991359-3353-3-git-send-email-wang.yong155@zte.com.cn
-Mime-Version: 1.0
-From: <wang.yong155@zte.com.cn>
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64 
-Subject: Re: [Qemu-devel]
- =?utf-8?q?=5BPATCHv5_02/03=5D_colo-compare=3A_Use_I?=
- =?utf-8?q?OThread_to_Check_old_packet_regularly_and_Process_pactkets_of_t?=
- =?utf-8?q?he_primary?=
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1dpOtM-0006vA-Tq
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:12:33 -0400
+Received: from mail-vk0-x234.google.com ([2607:f8b0:400c:c05::234]:32941)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
+	id 1dpOtM-0006ud-Oq
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:12:32 -0400
+Received: by mail-vk0-x234.google.com with SMTP id t10so9775406vke.0
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 18:12:32 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAMzKsXu29K+b=fGuPLti5if6zj5=pQhpmQz1iei6-hgjbq_41Q@mail.gmail.com>
+References: <20170905035457.3753-1-Sergio.G.DelReal@gmail.com>
+	<20170905035457.3753-9-Sergio.G.DelReal@gmail.com>
+	<CAMzKsXu29K+b=fGuPLti5if6zj5=pQhpmQz1iei6-hgjbq_41Q@mail.gmail.com>
+From: =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?=
+	<sergio.g.delreal@gmail.com>
+Date: Tue, 5 Sep 2017 20:12:31 -0500
+Message-ID: <CAMzKsXu0LOR=mzBNq-=sbv3YRBCjKXxx2NjeJya-TPkK6mYT2Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 08/14] hvf: add compilation rules to
+ Makefile.objs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,145 +33,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jasowang@redhat.com, stefanha@redhat.com, pbonzini@redhat.com, famz@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhang.zhanghailiang@huawei.com
-Cc: lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org, wang.yong155@zte.com.cn, wang.guang55@zte.com.cn
+To: qemu-devel <qemu-devel@nongnu.org>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-PlJlbW92ZSB0aGUgdGFzayB3aGljaCBjaGVjayBvbGQgcGFja2V0IGluIHRoZSBjb21wYXJpbmcg
-dGhyZWFkLA0KDQo+dGhlbiB1c2UgSU90aHJlYWQgY29udGV4dCB0aW1lciB0byBoYW5kbGUgaXQu
-DQoNCj4NCg0KPlByb2Nlc3MgcGFjdGtldHMgaW4gdGhlIElPVGhyZWFkIHdoaWNoIGFycml2ZWQg
-b3ZlciB0aGUgc29ja2V0Lg0KDQo+d2UgdXNlIGlvdGhyZWFkX2dldF9nX21haW5fY29udGV4dCB0
-byBjcmVhdGUgYSBuZXcgZ19tYWluX2xvb3AgaW4NCg0KPnRoZSBJT1RocmVhZC50aGVuIHRoZSBw
-YWNrZXRzIGZyb20gdGhlIHByaW1hcnkgYW5kIHRoZSBzZWNvbmRhcnkNCg0KPmFyZSBwcm9jZXNz
-ZWQgaW4gdGhlIElPVGhyZWFkLg0KDQo+DQoNCj5GaW5hbGx5IHJlbW92ZSB0aGUgY29sby1jb21w
-YXJlIHRocmVhZCB1c2luZyB0aGUgSU9UaHJlYWQgaW5zdGVhZC4NCg0KPg0KDQo+U2lnbmVkLW9m
-Zi1ieTogV2FuZyBZb25nIDx3YW5nLnlvbmcxNTVAenRlLmNvbS5jbj4NCg0KPlNpZ25lZC1vZmYt
-Ynk6IFdhbmcgR3VhbmcgPHdhbmcuZ3Vhbmc1NUB6dGUuY29tLmNuPg0KDQo+LS0tDQoNCj4gbmV0
-L2NvbG8tY29tcGFyZS5jIHwgODMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tDQoNCj4gMSBmaWxlIGNoYW5nZWQsIDQ1IGluc2VydGlvbnMoKyks
-IDM4IGRlbGV0aW9ucygtKQ0KDQoNCg0KDQpIaSBKYXNvbiwNCg0KSG93IGFib3V0IHRoaXMgc2Vy
-aWVzPw0KDQoNCg0KDQpUaGFua3MNCg0KDQoNCg0KDQoNCuWOn+Wni+mCruS7tg0KDQoNCg0K5Y+R
-5Lu25Lq677ya546L5YuHMTAxNzA1MzANCuaUtuS7tuS6uu+8miA8cGJvbnppbmlAcmVkaGF0LmNv
-bT4gPHN0ZWZhbmhhQHJlZGhhdC5jb20+IDxmYW16QHJlZGhhdC5jb20+IDxqYXNvd2FuZ0ByZWRo
-YXQuY29tPiA8emhhbmdjaGVuLmZuc3RAY24uZnVqaXRzdS5jb20+IDx6aGFuZy56aGFuZ2hhaWxp
-YW5nQGh1YXdlaS5jb20+DQrmioTpgIHkurrvvJrnjovli4cxMDE3MDUzMOeOi+W5vzEwMTY1OTky
-IDxsaXpoaWppYW5AY24uZnVqaXRzdS5jb20+IDxxZW11LWRldmVsQG5vbmdudS5vcmc+DQrml6Ug
-5pyfIO+8mjIwMTflubQwOOaciDI55pelIDE1OjIyDQrkuLsg6aKYIO+8mltQQVRDSHY1IDAyLzAz
-XSBjb2xvLWNvbXBhcmU6IFVzZSBJT1RocmVhZCB0byBDaGVjayBvbGQgcGFja2V0IHJlZ3VsYXJs
-eSBhbmQgUHJvY2VzcyBwYWN0a2V0cyBvZiB0aGUgcHJpbWFyeQ0KDQoNCg0KDQoNCkZyb206IFdh
-bmcgWW9uZyA8d2FuZy55b25nMTU1QHp0ZS5jb20uY24+DQoNClJlbW92ZSB0aGUgdGFzayB3aGlj
-aCBjaGVjayBvbGQgcGFja2V0IGluIHRoZSBjb21wYXJpbmcgdGhyZWFkLA0KdGhlbiB1c2UgSU90
-aHJlYWQgY29udGV4dCB0aW1lciB0byBoYW5kbGUgaXQuDQoNClByb2Nlc3MgcGFjdGtldHMgaW4g
-dGhlIElPVGhyZWFkIHdoaWNoIGFycml2ZWQgb3ZlciB0aGUgc29ja2V0Lg0Kd2UgdXNlIGlvdGhy
-ZWFkX2dldF9nX21haW5fY29udGV4dCB0byBjcmVhdGUgYSBuZXcgZ19tYWluX2xvb3AgaW4NCnRo
-ZSBJT1RocmVhZC50aGVuIHRoZSBwYWNrZXRzIGZyb20gdGhlIHByaW1hcnkgYW5kIHRoZSBzZWNv
-bmRhcnkNCmFyZSBwcm9jZXNzZWQgaW4gdGhlIElPVGhyZWFkLg0KDQpGaW5hbGx5IHJlbW92ZSB0
-aGUgY29sby1jb21wYXJlIHRocmVhZCB1c2luZyB0aGUgSU9UaHJlYWQgaW5zdGVhZC4NCg0KU2ln
-bmVkLW9mZi1ieTogV2FuZyBZb25nIDx3YW5nLnlvbmcxNTVAenRlLmNvbS5jbj4NClNpZ25lZC1v
-ZmYtYnk6IFdhbmcgR3VhbmcgPHdhbmcuZ3Vhbmc1NUB6dGUuY29tLmNuPg0KLS0tDQogbmV0L2Nv
-bG8tY29tcGFyZS5jIHwgODMgKysrKysrKysrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tDQogMSBmaWxlIGNoYW5nZWQsIDQ1IGluc2VydGlvbnMoKyksIDM4IGRl
-bGV0aW9ucygtKQ0KDQpkaWZmIC0tZ2l0IGEvbmV0L2NvbG8tY29tcGFyZS5jIGIvbmV0L2NvbG8t
-Y29tcGFyZS5jDQppbmRleCA1ZmU4ZTNmLi5iMmEyYTEzIDEwMDY0NA0KLS0tIGEvbmV0L2NvbG8t
-Y29tcGFyZS5jDQorKysgYi9uZXQvY29sby1jb21wYXJlLmMNCkBAIC0yOSw2ICsyOSw3IEBADQog
-I2luY2x1ZGUgInFlbXUvc29ja2V0cy5oIg0KICNpbmNsdWRlICJxYXBpLXZpc2l0LmgiDQogI2lu
-Y2x1ZGUgIm5ldC9jb2xvLmgiDQorI2luY2x1ZGUgInN5c2VtdS9pb3RocmVhZC5oIg0KIA0KICNk
-ZWZpbmUgVFlQRV9DT0xPX0NPTVBBUkUgImNvbG8tY29tcGFyZSINCiAjZGVmaW5lIENPTE9fQ09N
-UEFSRShvYmopIFwNCkBAIC04MiwxMSArODMsMTAgQEAgdHlwZWRlZiBzdHJ1Y3QgQ29tcGFyZVN0
-YXRlIHsNCiAgICAgR1F1ZXVlIGNvbm5fbGlzdA0KICAgICAvKiBoYXNodGFibGUgdG8gc2F2ZSBj
-b25uZWN0aW9uICovDQogICAgIEdIYXNoVGFibGUgKmNvbm5lY3Rpb25fdHJhY2tfdGFibGUNCi0g
-ICAgLyogY29tcGFyZSB0aHJlYWQsIGEgdGhyZWFkIGZvciBlYWNoIE5JQyAqLw0KLSAgICBRZW11
-VGhyZWFkIHRocmVhZA0KIA0KKyAgICBJT1RocmVhZCAqaW90aHJlYWQNCiAgICAgR01haW5Db250
-ZXh0ICp3b3JrZXJfY29udGV4dA0KLSAgICBHTWFpbkxvb3AgKmNvbXBhcmVfbG9vcA0KKyAgICBR
-RU1VVGltZXIgKnBhY2tldF9jaGVja190aW1lcg0KIH0gQ29tcGFyZVN0YXRlDQogDQogdHlwZWRl
-ZiBzdHJ1Y3QgQ29tcGFyZUNsYXNzIHsNCkBAIC01OTcsMjIgKzU5Nyw0MCBAQCBzdGF0aWMgdm9p
-ZCBjb21wYXJlX3NlY19jaHJfaW4odm9pZCAqb3BhcXVlLCBjb25zdCB1aW50OF90ICpidWYsIGlu
-dCBzaXplKQ0KICAqIENoZWNrIG9sZCBwYWNrZXQgcmVndWxhcmx5IHNvIGl0IGNhbiB3YXRjaCBm
-b3IgYW55IHBhY2tldHMNCiAgKiB0aGF0IHRoZSBzZWNvbmRhcnkgaGFzbid0IHByb2R1Y2VkIGVx
-dWl2YWxlbnRzIG9mLg0KICAqLw0KLXN0YXRpYyBnYm9vbGVhbiBjaGVja19vbGRfcGFja2V0X3Jl
-Z3VsYXIodm9pZCAqb3BhcXVlKQ0KK3N0YXRpYyB2b2lkIGNoZWNrX29sZF9wYWNrZXRfcmVndWxh
-cih2b2lkICpvcGFxdWUpDQogew0KICAgICBDb21wYXJlU3RhdGUgKnMgPSBvcGFxdWUNCiANCiAg
-ICAgLyogaWYgaGF2ZSBvbGQgcGFja2V0IHdlIHdpbGwgbm90aWZ5IGNoZWNrcG9pbnQgKi8NCiAg
-ICAgY29sb19vbGRfcGFja2V0X2NoZWNrKHMpDQorICAgIHRpbWVyX21vZChzLT5wYWNrZXRfY2hl
-Y2tfdGltZXIsIHFlbXVfY2xvY2tfZ2V0X21zKFFFTVVfQ0xPQ0tfVklSVFVBTCkgKw0KKyAgICAg
-ICAgICAgICAgICBSRUdVTEFSX1BBQ0tFVF9DSEVDS19NUykNCit9DQorDQorc3RhdGljIHZvaWQg
-Y29sb19jb21wYXJlX3RpbWVyX2luaXQoQ29tcGFyZVN0YXRlICpzKQ0KK3sNCisgICAgQWlvQ29u
-dGV4dCAqY3R4ID0gaW90aHJlYWRfZ2V0X2Fpb19jb250ZXh0KHMtPmlvdGhyZWFkKQ0KIA0KLSAg
-ICByZXR1cm4gVFJVRQ0KKyAgICBzLT5wYWNrZXRfY2hlY2tfdGltZXIgPSBhaW9fdGltZXJfbmV3
-KGN0eCwgUUVNVV9DTE9DS19WSVJUVUFMLA0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgU0NBTEVfTVMsIGNoZWNrX29sZF9wYWNrZXRfcmVndWxhciwNCisgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgIHMpDQorICAgIHRpbWVyX21vZChzLT5wYWNrZXRfY2hlY2tfdGltZXIs
-IHFlbXVfY2xvY2tfZ2V0X21zKFFFTVVfQ0xPQ0tfVklSVFVBTCkgKw0KKyAgICAgICAgICAgICAg
-ICAgICAgUkVHVUxBUl9QQUNLRVRfQ0hFQ0tfTVMpDQogfQ0KIA0KLXN0YXRpYyB2b2lkICpjb2xv
-X2NvbXBhcmVfdGhyZWFkKHZvaWQgKm9wYXF1ZSkNCitzdGF0aWMgdm9pZCBjb2xvX2NvbXBhcmVf
-dGltZXJfZGVsKENvbXBhcmVTdGF0ZSAqcykNCiB7DQotICAgIENvbXBhcmVTdGF0ZSAqcyA9IG9w
-YXF1ZQ0KLSAgICBHU291cmNlICp0aW1lb3V0X3NvdXJjZQ0KKyAgICBpZiAocy0+cGFja2V0X2No
-ZWNrX3RpbWVyKSB7DQorICAgICAgICB0aW1lcl9kZWwocy0+cGFja2V0X2NoZWNrX3RpbWVyKQ0K
-KyAgICAgICAgdGltZXJfZnJlZShzLT5wYWNrZXRfY2hlY2tfdGltZXIpDQorICAgICAgICBzLT5w
-YWNrZXRfY2hlY2tfdGltZXIgPSBOVUxMDQorICAgIH0NCisgfQ0KIA0KLSAgICBzLT53b3JrZXJf
-Y29udGV4dCA9IGdfbWFpbl9jb250ZXh0X25ldygpDQorc3RhdGljIHZvaWQgY29sb19jb21wYXJl
-X2lvdGhyZWFkKENvbXBhcmVTdGF0ZSAqcykNCit7DQorICAgIG9iamVjdF9yZWYoT0JKRUNUKHMt
-PmlvdGhyZWFkKSkNCisgICAgcy0+d29ya2VyX2NvbnRleHQgPSBpb3RocmVhZF9nZXRfZ19tYWlu
-X2NvbnRleHQocy0+aW90aHJlYWQpDQogDQogICAgIHFlbXVfY2hyX2ZlX3NldF9oYW5kbGVycygm
-cy0+Y2hyX3ByaV9pbiwgY29tcGFyZV9jaHJfY2FuX3JlYWQsDQogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBjb21wYXJlX3ByaV9jaHJfaW4sIE5VTEwsIE5VTEwsDQpAQCAtNjIxLDIwICs2
-MzksNyBAQCBzdGF0aWMgdm9pZCAqY29sb19jb21wYXJlX3RocmVhZCh2b2lkICpvcGFxdWUpDQog
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb21wYXJlX3NlY19jaHJfaW4sIE5VTEwsIE5V
-TEwsDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBzLCBzLT53b3JrZXJfY29udGV4dCwg
-dHJ1ZSkNCiANCi0gICAgcy0+Y29tcGFyZV9sb29wID0gZ19tYWluX2xvb3BfbmV3KHMtPndvcmtl
-cl9jb250ZXh0LCBGQUxTRSkNCi0NCi0gICAgLyogVG8ga2ljayBhbnkgcGFja2V0cyB0aGF0IHRo
-ZSBzZWNvbmRhcnkgZG9lc24ndCBtYXRjaCAqLw0KLSAgICB0aW1lb3V0X3NvdXJjZSA9IGdfdGlt
-ZW91dF9zb3VyY2VfbmV3KFJFR1VMQVJfUEFDS0VUX0NIRUNLX01TKQ0KLSAgICBnX3NvdXJjZV9z
-ZXRfY2FsbGJhY2sodGltZW91dF9zb3VyY2UsDQotICAgICAgICAgICAgICAgICAgICAgICAgICAo
-R1NvdXJjZUZ1bmMpY2hlY2tfb2xkX3BhY2tldF9yZWd1bGFyLCBzLCBOVUxMKQ0KLSAgICBnX3Nv
-dXJjZV9hdHRhY2godGltZW91dF9zb3VyY2UsIHMtPndvcmtlcl9jb250ZXh0KQ0KLQ0KLSAgICBn
-X21haW5fbG9vcF9ydW4ocy0+Y29tcGFyZV9sb29wKQ0KLQ0KLSAgICBnX3NvdXJjZV91bnJlZih0
-aW1lb3V0X3NvdXJjZSkNCi0gICAgZ19tYWluX2xvb3BfdW5yZWYocy0+Y29tcGFyZV9sb29wKQ0K
-LSAgICBnX21haW5fY29udGV4dF91bnJlZihzLT53b3JrZXJfY29udGV4dCkNCi0gICAgcmV0dXJu
-IE5VTEwNCisgICAgY29sb19jb21wYXJlX3RpbWVyX2luaXQocykNCiB9DQogDQogc3RhdGljIGNo
-YXIgKmNvbXBhcmVfZ2V0X3ByaV9pbmRldihPYmplY3QgKm9iaiwgRXJyb3IgKiplcnJwKQ0KQEAg
-LTc1OSwxMiArNzY0LDEwIEBAIHN0YXRpYyB2b2lkIGNvbG9fY29tcGFyZV9jb21wbGV0ZShVc2Vy
-Q3JlYXRhYmxlICp1YywgRXJyb3IgKiplcnJwKQ0KIHsNCiAgICAgQ29tcGFyZVN0YXRlICpzID0g
-Q09MT19DT01QQVJFKHVjKQ0KICAgICBDaGFyZGV2ICpjaHINCi0gICAgY2hhciB0aHJlYWRfbmFt
-ZVs2NF0NCi0gICAgc3RhdGljIGludCBjb21wYXJlX2lkDQogDQotICAgIGlmICghcy0+cHJpX2lu
-ZGV2IHx8ICFzLT5zZWNfaW5kZXYgfHwgIXMtPm91dGRldikgew0KKyAgICBpZiAoIXMtPnByaV9p
-bmRldiB8fCAhcy0+c2VjX2luZGV2IHx8ICFzLT5vdXRkZXYgfHwgIXMtPmlvdGhyZWFkKSB7DQog
-ICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJjb2xvIGNvbXBhcmUgbmVlZHMgJ3ByaW1hcnlfaW4n
-ICwiDQotICAgICAgICAgICAgICAgICAgICInc2Vjb25kYXJ5X2luJywnb3V0ZGV2JyBwcm9wZXJ0
-eSBzZXQiKQ0KKyAgICAgICAgICAgICAgICAgICAiJ3NlY29uZGFyeV9pbicsJ291dGRldicsJ2lv
-dGhyZWFkJyBwcm9wZXJ0eSBzZXQiKQ0KICAgICAgICAgcmV0dXJuDQogICAgIH0gZWxzZSBpZiAo
-IXN0cmNtcChzLT5wcmlfaW5kZXYsIHMtPm91dGRldikgfHwNCiAgICAgICAgICAgICAgICAhc3Ry
-Y21wKHMtPnNlY19pbmRldiwgcy0+b3V0ZGV2KSB8fA0KQEAgLTc5OSwxMiArODAyLDcgQEAgc3Rh
-dGljIHZvaWQgY29sb19jb21wYXJlX2NvbXBsZXRlKFVzZXJDcmVhdGFibGUgKnVjLCBFcnJvciAq
-KmVycnApDQogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgZ19mcmVlLA0KICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIGNvbm5lY3Rpb25fZGVzdHJveSkNCiANCi0gICAgc3ByaW50Zih0aHJlYWRf
-bmFtZSwgImNvbG8tY29tcGFyZSAlZCIsIGNvbXBhcmVfaWQpDQotICAgIHFlbXVfdGhyZWFkX2Ny
-ZWF0ZSgmcy0+dGhyZWFkLCB0aHJlYWRfbmFtZSwNCi0gICAgICAgICAgICAgICAgICAgICAgIGNv
-bG9fY29tcGFyZV90aHJlYWQsIHMsDQotICAgICAgICAgICAgICAgICAgICAgICBRRU1VX1RIUkVB
-RF9KT0lOQUJMRSkNCi0gICAgY29tcGFyZV9pZCsrDQotDQorICAgIGNvbG9fY29tcGFyZV9pb3Ro
-cmVhZChzKQ0KICAgICByZXR1cm4NCiB9DQogDQpAQCAtODQ4LDYgKzg0NiwxMCBAQCBzdGF0aWMg
-dm9pZCBjb2xvX2NvbXBhcmVfaW5pdChPYmplY3QgKm9iaikNCiAgICAgb2JqZWN0X3Byb3BlcnR5
-X2FkZF9zdHIob2JqLCAib3V0ZGV2IiwNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgY29t
-cGFyZV9nZXRfb3V0ZGV2LCBjb21wYXJlX3NldF9vdXRkZXYsDQogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIE5VTEwpDQorICAgIG9iamVjdF9wcm9wZXJ0eV9hZGRfbGluayhvYmosICJpb3Ro
-cmVhZCIsIFRZUEVfSU9USFJFQUQsDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgIChPYmpl
-Y3QgKiopJnMtPmlvdGhyZWFkLA0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICBvYmplY3Rf
-cHJvcGVydHlfYWxsb3dfc2V0X2xpbmssDQorICAgICAgICAgICAgICAgICAgICAgICAgICAgIE9C
-Sl9QUk9QX0xJTktfVU5SRUZfT05fUkVMRUFTRSwgTlVMTCkNCiANCiAgICAgcy0+dm5ldF9oZHIg
-PSBmYWxzZQ0KICAgICBvYmplY3RfcHJvcGVydHlfYWRkX2Jvb2wob2JqLCAidm5ldF9oZHJfc3Vw
-cG9ydCIsIGNvbXBhcmVfZ2V0X3ZuZXRfaGRyLA0KQEAgLTg2MSwxNiArODYzLDIxIEBAIHN0YXRp
-YyB2b2lkIGNvbG9fY29tcGFyZV9maW5hbGl6ZShPYmplY3QgKm9iaikNCiAgICAgcWVtdV9jaHJf
-ZmVfZGVpbml0KCZzLT5jaHJfcHJpX2luLCBmYWxzZSkNCiAgICAgcWVtdV9jaHJfZmVfZGVpbml0
-KCZzLT5jaHJfc2VjX2luLCBmYWxzZSkNCiAgICAgcWVtdV9jaHJfZmVfZGVpbml0KCZzLT5jaHJf
-b3V0LCBmYWxzZSkNCi0NCi0gICAgZ19tYWluX2xvb3BfcXVpdChzLT5jb21wYXJlX2xvb3ApDQot
-ICAgIHFlbXVfdGhyZWFkX2pvaW4oJnMtPnRocmVhZCkNCi0NCisgICAgaWYgKHMtPmlvdGhyZWFk
-KSB7DQorICAgICAgICBjb2xvX2NvbXBhcmVfdGltZXJfZGVsKHMpDQorICAgIH0NCiAgICAgLyog
-UmVsZWFzZSBhbGwgdW5oYW5kbGVkIHBhY2tldHMgYWZ0ZXIgY29tcGFyZSB0aGVhZCBleGl0ZWQg
-Ki8NCiAgICAgZ19xdWV1ZV9mb3JlYWNoKCZzLT5jb25uX2xpc3QsIGNvbG9fZmx1c2hfcGFja2V0
-cywgcykNCiANCiAgICAgZ19xdWV1ZV9jbGVhcigmcy0+Y29ubl9saXN0KQ0KIA0KLSAgICBnX2hh
-c2hfdGFibGVfZGVzdHJveShzLT5jb25uZWN0aW9uX3RyYWNrX3RhYmxlKQ0KKyAgICBpZiAocy0+
-Y29ubmVjdGlvbl90cmFja190YWJsZSkgew0KKyAgICAgICAgZ19oYXNoX3RhYmxlX2Rlc3Ryb3ko
-cy0+Y29ubmVjdGlvbl90cmFja190YWJsZSkNCisgICAgfQ0KKw0KKyAgICBpZiAocy0+aW90aHJl
-YWQpIHsNCisgICAgICAgIG9iamVjdF91bnJlZihPQkpFQ1Qocy0+aW90aHJlYWQpKQ0KKyAgICB9
-DQogICAgIGdfZnJlZShzLT5wcmlfaW5kZXYpDQogICAgIGdfZnJlZShzLT5zZWNfaW5kZXYpDQog
-ICAgIGdfZnJlZShzLT5vdXRkZXYpDQotLSANCjEuOC4zLjE=
+Stefan, is this acceptable? I mean delaying the compiling; up until patch 7
+no hvf code is compiled. Or should I just squash everything from patch 2 to
+7?
+
+El 4/09/2017 23:03, "Sergio Andr=C3=A9s G=C3=B3mez del Real" <
+sergio.g.delreal@gmail.com> escribi=C3=B3:
+
+Note that until this patch (8/14) there is no compiling. I tried to put
+this patch earlier in the patchset but found difficulties because some
+things need to be done before the hvf code compiles well.
+Also, the commit message needs to be updated (remove the -enable-hvf part).
+
+On Mon, Sep 4, 2017 at 10:54 PM, Sergio Andres Gomez Del Real <
+sergio.g.delreal@gmail.com> wrote:
+
+> This commit adds to target/i386/Makefile.objs the necessary rules so
+> that the new files for hvf are compiled by the build system.
+> It also adds handling of the -enable-hvf argument in the main function
+> in vl.c.
+>
+> Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
+> ---
+>  target/i386/Makefile.objs | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/target/i386/Makefile.objs b/target/i386/Makefile.objs
+> index 6a26e9d9f0..0bef89c099 100644
+> --- a/target/i386/Makefile.objs
+> +++ b/target/i386/Makefile.objs
+> @@ -12,4 +12,5 @@ obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o hax-windows.=
+o
+>  endif
+>  ifdef CONFIG_DARWIN
+>  obj-$(CONFIG_HAX) +=3D hax-all.o hax-mem.o hax-darwin.o
+> +obj-$(CONFIG_HVF) +=3D hvf-utils/ hvf-all.o
+>  endif
+> --
+> 2.14.1
+>
+>
