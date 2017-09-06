@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41863)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41936)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpcqk-0000JX-2p
+	(envelope-from <richard.henderson@linaro.org>) id 1dpcqo-0000PB-M3
 	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpcqf-0002Ub-TQ
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:46 -0400
-Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:35366)
+	(envelope-from <richard.henderson@linaro.org>) id 1dpcqn-0002pU-Hn
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:50 -0400
+Received: from mail-pg0-x236.google.com ([2607:f8b0:400e:c05::236]:38907)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dpcqf-0002TM-Nt
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:41 -0400
-Received: by mail-pf0-x229.google.com with SMTP id g13so13483540pfm.2
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 09:06:41 -0700 (PDT)
+	id 1dpcqn-0002kd-9X
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:49 -0400
+Received: by mail-pg0-x236.google.com with SMTP id v66so15892327pgb.5
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 09:06:49 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  6 Sep 2017 09:05:59 -0700
-Message-Id: <20170906160612.22769-20-richard.henderson@linaro.org>
+Date: Wed,  6 Sep 2017 09:06:05 -0700
+Message-Id: <20170906160612.22769-26-richard.henderson@linaro.org>
 In-Reply-To: <20170906160612.22769-1-richard.henderson@linaro.org>
 References: <20170906160612.22769-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 19/32] target/arm: [tcg] Port to insn_start
+Subject: [Qemu-devel] [PULL 25/32] target/arm: [tcg,a64] Port to tb_stop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,47 +37,159 @@ From: Lluís Vilanova <vilanova@ac.upc.edu>
 Incrementally paves the way towards using the generic instruction translation
 loop.
 
-Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+Reviewed-by: Emilio G. Cota <cota@braap.org>
 Reviewed-by: Richard Henderson <rth@twiddle.net>
-Reviewed-by: Alex Benneé <alex.benee@linaro.org>
-Message-Id: <150002388959.22386.12439646324427589940.stgit@frigg.lan>
+Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
+Message-Id: <150002558503.22386.1149037590886263349.stgit@frigg.lan>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/arm/translate.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ target/arm/translate-a64.c | 127 ++++++++++++++++++++++++---------------------
+ 1 file changed, 67 insertions(+), 60 deletions(-)
 
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 3138a23e0c..005157225c 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -11936,6 +11936,16 @@ static void arm_tr_tb_start(DisasContextBase *dcbase, CPUState *cpu)
-     }
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index f959f4469a..723e86c976 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11327,6 +11327,72 @@ static void aarch64_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+     dc->base.pc_next = dc->pc;
  }
  
-+static void arm_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
++static void aarch64_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
 +{
 +    DisasContext *dc = container_of(dcbase, DisasContext, base);
 +
-+    dc->insn_start_idx = tcg_op_buf_count();
-+    tcg_gen_insn_start(dc->pc,
-+                       (dc->condexec_cond << 4) | (dc->condexec_mask >> 1),
-+                       0);
++    if (unlikely(dc->base.singlestep_enabled || dc->ss_active)) {
++        /* Note that this means single stepping WFI doesn't halt the CPU.
++         * For conditional branch insns this is harmless unreachable code as
++         * gen_goto_tb() has already handled emitting the debug exception
++         * (and thus a tb-jump is not possible when singlestepping).
++         */
++        switch (dc->base.is_jmp) {
++        default:
++            gen_a64_set_pc_im(dc->pc);
++            /* fall through */
++        case DISAS_JUMP:
++            if (dc->base.singlestep_enabled) {
++                gen_exception_internal(EXCP_DEBUG);
++            } else {
++                gen_step_complete_exception(dc);
++            }
++            break;
++        case DISAS_NORETURN:
++            break;
++        }
++    } else {
++        switch (dc->base.is_jmp) {
++        case DISAS_NEXT:
++        case DISAS_TOO_MANY:
++            gen_goto_tb(dc, 1, dc->pc);
++            break;
++        default:
++        case DISAS_UPDATE:
++            gen_a64_set_pc_im(dc->pc);
++            /* fall through */
++        case DISAS_JUMP:
++            tcg_gen_lookup_and_goto_ptr(cpu_pc);
++            break;
++        case DISAS_EXIT:
++            tcg_gen_exit_tb(0);
++            break;
++        case DISAS_NORETURN:
++        case DISAS_SWI:
++            break;
++        case DISAS_WFE:
++            gen_a64_set_pc_im(dc->pc);
++            gen_helper_wfe(cpu_env);
++            break;
++        case DISAS_YIELD:
++            gen_a64_set_pc_im(dc->pc);
++            gen_helper_yield(cpu_env);
++            break;
++        case DISAS_WFI:
++            /* This is a special case because we don't want to just halt the CPU
++             * if trying to debug across a WFI.
++             */
++            gen_a64_set_pc_im(dc->pc);
++            gen_helper_wfi(cpu_env);
++            /* The helper doesn't necessarily throw an exception, but we
++             * must go back to the main loop to check for interrupts anyway.
++             */
++            tcg_gen_exit_tb(0);
++            break;
++        }
++    }
 +}
 +
- /* generate intermediate code for basic block 'tb'.  */
- void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+                                TranslationBlock *tb)
  {
-@@ -11979,10 +11989,7 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+@@ -11398,66 +11464,7 @@ void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+         gen_io_end();
+     }
  
-     do {
-         dc->base.num_insns++;
--        dc->insn_start_idx = tcg_op_buf_count();
--        tcg_gen_insn_start(dc->pc,
--                           (dc->condexec_cond << 4) | (dc->condexec_mask >> 1),
--                           0);
-+        arm_tr_insn_start(&dc->base, cs);
+-    if (unlikely(cs->singlestep_enabled || dc->ss_active)) {
+-        /* Note that this means single stepping WFI doesn't halt the CPU.
+-         * For conditional branch insns this is harmless unreachable code as
+-         * gen_goto_tb() has already handled emitting the debug exception
+-         * (and thus a tb-jump is not possible when singlestepping).
+-         */
+-        switch (dc->base.is_jmp) {
+-        default:
+-            gen_a64_set_pc_im(dc->pc);
+-            /* fall through */
+-        case DISAS_JUMP:
+-            if (cs->singlestep_enabled) {
+-                gen_exception_internal(EXCP_DEBUG);
+-            } else {
+-                gen_step_complete_exception(dc);
+-            }
+-            break;
+-        case DISAS_NORETURN:
+-            break;
+-        }
+-    } else {
+-        switch (dc->base.is_jmp) {
+-        case DISAS_NEXT:
+-        case DISAS_TOO_MANY:
+-            gen_goto_tb(dc, 1, dc->pc);
+-            break;
+-        case DISAS_JUMP:
+-            tcg_gen_lookup_and_goto_ptr(cpu_pc);
+-            break;
+-        case DISAS_NORETURN:
+-        case DISAS_SWI:
+-            break;
+-        case DISAS_WFE:
+-            gen_a64_set_pc_im(dc->pc);
+-            gen_helper_wfe(cpu_env);
+-            break;
+-        case DISAS_YIELD:
+-            gen_a64_set_pc_im(dc->pc);
+-            gen_helper_yield(cpu_env);
+-            break;
+-        case DISAS_WFI:
+-            /* This is a special case because we don't want to just halt the CPU
+-             * if trying to debug across a WFI.
+-             */
+-            gen_a64_set_pc_im(dc->pc);
+-            gen_helper_wfi(cpu_env);
+-            /* The helper doesn't necessarily throw an exception, but we
+-             * must go back to the main loop to check for interrupts anyway.
+-             */
+-            tcg_gen_exit_tb(0);
+-            break;
+-        case DISAS_UPDATE:
+-            gen_a64_set_pc_im(dc->pc);
+-            /* fall through */
+-        case DISAS_EXIT:
+-        default:
+-            tcg_gen_exit_tb(0);
+-            break;
+-        }
+-    }
++    aarch64_tr_tb_stop(&dc->base, cs);
  
-         if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
-             CPUBreakpoint *bp;
+     gen_tb_end(tb, dc->base.num_insns);
+ 
 -- 
 2.13.5
