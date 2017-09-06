@@ -1,42 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dpbJg-0000v1-I4
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:28:38 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dpbPZ-0005b1-NF
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:34:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dpbJc-0005Ll-DT
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:28:32 -0400
-Received: from mail-oi0-f54.google.com ([209.85.218.54]:34049)
+	(envelope-from <stefanha@gmail.com>) id 1dpbPW-0008Nt-9m
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:34:37 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:37669)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dpbJc-0005LM-4T
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:28:28 -0400
-Received: by mail-oi0-f54.google.com with SMTP id h70so42627899oic.1
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 07:28:27 -0700 (PDT)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dpbPV-0008NJ-Vl
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:34:34 -0400
+Received: by mail-wm0-x233.google.com with SMTP id u26so31915294wma.0
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 07:34:33 -0700 (PDT)
+Date: Wed, 6 Sep 2017 15:34:30 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170906143430.GF15535@stefanha-x1.localdomain>
+References: <150420685550.8035.5310753798215250364.malonedeb@soybean.canonical.com>
+	<150463692706.10750.12505622774232959951.malone@wampee.canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <CABgObfac1_DfU1JSu6AeocYQWEqQURxdFt2JPDHzEXG15EOPwQ@mail.gmail.com>
-References: <20170830082702.3011-1-Sergio.G.DelReal@gmail.com>
-	<20170830082702.3011-3-Sergio.G.DelReal@gmail.com>
-	<20170830140738.GS18526@redhat.com>
-	<20170831074215.GA13619@stefanha-x1.localdomain>
-	<CABgObfYRUtdH9-7+zWx5Zur=iE_Qr5953+EOgcxRfVGnEonbmg@mail.gmail.com>
-	<CAJTBuyhJgVZ-A+AHatjAwPjsSv2Q-HxuF7nc1NpbWNmGnCOhVQ@mail.gmail.com>
-	<CABgObfaDtgixAEF8OPLuDf=21GiCwY3EUOPHujXPeLqYTup=Yw@mail.gmail.com>
-	<CAJTBuyhKqbXWjphh-t60TVjZfVFEYGyWFgEs4TmR+CE1q04GhQ@mail.gmail.com>
-	<CAJTBuyhvCySRHvrKMOW7fvjuogTUUUXi4QRjiJrrzfu-gbb5jQ@mail.gmail.com>
-	<CABgObfYAH3xtVO0mZCBiVnE5m=p_BqiopGJtovzL1LFBN0366Q@mail.gmail.com>
-	<CAJTBuyg2Q43RhiVo1KuYL6uKZG3ztt5j09oeEoOk5h8r16hjeA@mail.gmail.com>
-	<CABgObfaDuLvaxpb-GmefsNcoUsjJi3y_oAnfYuQU8LQcGtx9zQ@mail.gmail.com>
-	<CABgObfYx+uP2gmsT4SfagM-kZre-8RieyMQ21yOEcLOp38WaNg@mail.gmail.com>
-	<CAJTBuyj7rQgOUBZRb1p4JdSbSFbTLDJM6suArdpD3myug79WEQ@mail.gmail.com>
-	<CABgObfZTRAF7NJea=-SyNy67ZXFZVgoQLRjgswvPSs14euq+zw@mail.gmail.com>
-	<CABgObfYv7GCbjhtCe0e=+MJH0dw_sfqhT6RxaeL9M6vRwKRFwg@mail.gmail.com>
-	<CAJTBuyiG6V+N2WNEqopbRvJHPX4W5pgjU4k1_A8u+u1axy7Vqw@mail.gmail.com>
-	<CABgObfac1_DfU1JSu6AeocYQWEqQURxdFt2JPDHzEXG15EOPwQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 6 Sep 2017 16:28:25 +0200
-Message-ID: <CABgObfZoRozGBAd5UxrT5ckQiUU=Usqe5XuRbri3f2KjuWRHbw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 02/13] hvf: add code base from Google's
- QEMU repository
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <150463692706.10750.12505622774232959951.malone@wampee.canonical.com>
+Subject: Re: [Qemu-devel] [Bug 1714331] Re: Virtual machines not working
+ anymore on 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,239 +30,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Izik Eidus <izik@veertu.com>
-Cc: vpalatin@chromium.org, qemu-devel <qemu-devel@nongnu.org>, "Hajnoczi, Stefan" <stefanha@gmail.com>, =?UTF-8?Q?Sergio_Andr=C3=A9s_G=C3=B3mez_del_Real?= <sergio.g.delreal@gmail.com>
+To: Bug 1714331 <1714331@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, Phil Dennis-Jordan <phil@philjordan.eu>, Paolo Bonzini <pbonzini@redhat.com>
 
-Il 06 set 2017 3:29 PM, "Izik Eidus" <izik@veertu.com> ha scritto:
+On Tue, Sep 05, 2017 at 06:42:06PM -0000, Chris Unsworth wrote:
+> I think my issue looks like the same.  Sometimes I just get spinning
+> dots, and sometimes there is the message about doing an automatic repair
+> below the spinning dots before it stops and uses 100% cpu.  I just did a
+> git bisect:
 
-Paolo, I was reviewing more and more our code and found another issue
-regarding licensing of gpl2v+: the file x86_descr.c include:
-#define VMX_SEGMENT_FIELD(seg) that is coming from KVM that is gpl2 code.
+Perfect, thanks Chris!
 
+I have CCed Phil and Paolo regarding the commit you identified.
 
-I don't think that's copyrightable.
-
-unfortunately we had a developer that introduced both this code and
-the task_switch, I am reviewing more and more this now to find if we
-have any other gpl2v only in our code.
-
-Maybe it does worth to reconsider us donating hypervisor.framework
-implemantion that will be clean from such gpl2v only issue? I know it
-will slow little bit the integration but we are willing to put all the
-effort that is needed, including syncing all Sergio later on patch's
-and whatever is needed more.
-
-
-I think we need to be pragmatic and picking the best of the two
-implementations (plus KVM itself) is the best option. There is considerable
-overlap between QEMU and KVM developers, and anyone could say in bad faith
-that people are reusing their KVM knowledge when touching HVF code in QEMU.
-
-What matters more in my non-lawyerly opinion is that we handle HVF code as
-a part of QEMU rather than something bolted on the side. This alone will
-make a lot of functions that _could_ come from external sources go away, as
-the processor emulation stuff from TCG can easily get reused.
-
-Patio
-
-Paolo
-
-
-Thanks.
-
->
->
-> Then Izik and Frank can reply with their Signed-off-by to that extra
-patch.
->
-> Thanks,
->
-> Paolo
->
->
->
-> >
-> > I think it's safe to use v2+ for this code once Google agrees. The task
-> > switch code, which is going to go away soon anyway and is isolated from
-the
-> > rest, can be moved to a separate file for the time being.
-> >
->
->
-> OK, such case would be simpler to me to go if this what you prefer, in
-such
-> case, i will send the 1|2|3 patches splited from task switch and
-> everything  beside task switch as gpl2v+.
->
-> Whatever you guys decide...
->
-> Thanks.
->
->
-> >
-> > Paolo
-> >
-> >
-> > >
-> > > Paolo
-> > >
-> > > in
-> > > such case all copyright go back to BSD2 and we can license it as
-GPL2v+
-> > or
-> > > whatever work for QEMU.
-> > > If you want to go in such case what we will do would be the following:
-> > > take kvm user space implemantion of qemu that is GPLv2+, integrate to
-it
-> > > the hypervisor framework from Anka (in kvm user space style) - this
-will
-> > > put us in hvf [1|2|3 / 13] in safe GPLv2+ and then we can back port
-the
-> > > rest of Sergio changes to this stuff.
-> > >
-> > > I know this is less than ideal as it requires some changes to the
-current
-> > > patch set, however it will make it 100% safe to be GPL2v+, what you
-guys
-> > > think?, we can get this stuff done before the end of this week...
-> > >
-> > > Thanks.
-> > >
-> > >
-> > > On Fri, Sep 1, 2017 at 12:39 AM, Izik Eidus <izik@veertu.com
-> > <javascript:_e(%7B%7D,'cvml','izik@veertu.com');>> wrote:
-> > >
-> > > >
-> > > >
-> > > > On Fri, Sep 1, 2017 at 12:21 AM, Paolo Bonzini <pbonzini@redhat.com
-> > <javascript:_e(%7B%7D,'cvml','pbonzini@redhat.com');>>
-> > > > wrote:
-> > > >
-> > > >> Il 31 ago 2017 3:54 PM, "Izik Eidus" <izik@veertu.com
-> > <javascript:_e(%7B%7D,'cvml','izik@veertu.com');>> ha scritto:
->
-> > > >>
-> > > >> > Izik, Vincent (assuming you are the right person to contact at
-> > > Google),
-> > > >> > can you reply to Daniel and Stefan?
-> > > >> >
-> > > >>
-> > > >> Hi,
-> > > >>
-> > > >> What I suggest is that we will send our patch' again as gpl2+ and
-> > clean
-> > > >> the
-> > > >> entire stuff to make sure they are falling into the right copyright
-> > > >> category as required by QEMU.
-> > > >>
-> > > >>
-> > > >> That's not necessary. Just you and Vincent replying to this thread
-> > with
-> > > a
-> > > >> "Signed-off-by" line would be enough for Sergio to use the right
-> > > license in
-> > > >> his v3 submission. Sergio already made some non-trivial changes
-that
-> > are
-> > > >> needed for inclusion in QEMU from a supportability (e.g. dirty page
-> > > >> tracking for graphics) or maintainability perspective (e.g. -cpu
-> > > support),
-> > > >> so the simplest thing to do is to retrofit the right license to his
-> > > >> submission. You can do so if you can confirm that the code you used
-> > only
-> > > >> came from QEMU itself, Bochs or other GPLv2+/LGPL software (and the
-> > rest
-> > > >> was written by Veertu).
-> > > >>
-> > > >
-> > > > Hi,
-> > > >
-> > > > Sure fine with us, let me go over all the code and see that all
-> > copyright
-> > > > that are needed are there, and then you can relicense all our code
-to
-> > > > GPLv2+, I think I saw a a file that was missing Bochs copyright in
-it,
-> > > so I
-> > > > want to make sure that I fix this before and that all others are
-fine.
-> > > >
-> > > > Thanks.
-> > > >
-> > > >
-> > > >>
-> > > >> Google has already contributed the HAXN accelerator, so I am
-> > moderately
-> > > >> optimistic that they can help with HVF too.
-> > > >>
-> > > >> BTW, another thing that need to be integrated in order to make this
-> > > stuff
-> > > >> useful is the vmnet patch's, it is apple NAT for vms that allow
-guests
-> > > to
-> > > >> have networking...
-> > > >>
-> > > >>
-> > > >> People can always use slirp (or tap with some more effort), so
-these
-> > > >> patches are already a minimum viable feature and pretty close to
-being
-> > > >> mergeable. But of course any other contribution is welcome!
-> > > >>
-> > > >> Paolo
-> > > >>
-> > > >>
-> > > >> (altho that it come with a trick, without certificate it
-> > > >> will require root permission, while hypverisor framework itself can
-> > run
-> > > >> without root)
-> > > >>
-> > > >> What do you guys think?
-> > > >>
-> > > >>
-> > > >> >
-> > > >> > Sergio worked on completing the QEMU port to
-Hypervisor.framework.
-> > The
-> > > >> > hvf-all.c file that Daniel pointed out as v2-only is derived from
-> > > >> kvm-all.c
-> > > >> > and hax-all.c, and should be under v2-or-later license. The
-others
-> > > seem
-> > > >> to
-> > > >> > be either original or derived from Bochs, which is LGPL, so they
-> > could
-> > > >> be
-> > > >> > LGPL or GPLv2+.
-> > > >> >
-> > > >> > Thanks,
-> > > >> >
-> > > >> > Paolo
-> > > >> >
-> > > >> >
-> > > >> > There are benefits to having this code upstream.  If they ever
-want
-> > to
-> > > >> > rebase on qemu.git there will be less work for them.
-> > > >>
-> > > >>
-> > > OK,
-> > >
-> > >
-> > > > >
-> > > >> > Stefan
-> > > >> >
-> > > >> >
-> > > >> >
-> > > >>
-> > > >>
-> > > >>
-> > > >
-> > >
-> > >
-> > >
-> >
-> >
-> >
->
->
+> 
+> # git bisect log
+> # bad: [1ab5eb4efb91a3d4569b0df6e824cc08ab4bd8ec] Update version for v2.10.0 release
+> # good: [6c02258e143700314ebf268dae47eb23db17d1cf] Update version for v2.9.0 release
+> git bisect start 'v2.10.0' 'v2.9.0'
+> # bad: [269c20b2bbd2aa8531e0cdc741fb166f290d7a2b] tests/qdict: check more get_try_int() cases
+> git bisect bad 269c20b2bbd2aa8531e0cdc741fb166f290d7a2b
+> # bad: [eba0161990af8509608332450ee7e338273cf5df] Merge remote-tracking branch 'rth/tags/pull-s390-20170512' into staging
+> git bisect bad eba0161990af8509608332450ee7e338273cf5df
+> # good: [9ea5ada76f34a0ef048b131c3a166d8564199bdb] audio: Use ARRAY_SIZE from qemu/osdep.h
+> git bisect good 9ea5ada76f34a0ef048b131c3a166d8564199bdb
+> # bad: [1effe6ad5eac1b2e50a077695ac801d172891d6a] Merge remote-tracking branch 'danpb/tags/pull-qcrypto-2017-05-09-1' into staging
+> git bisect bad 1effe6ad5eac1b2e50a077695ac801d172891d6a
+> # good: [f03f9f0c10dcfadee5811d43240f0a6af230f1ce] Merge remote-tracking branch 'cohuck/tags/s390x-3270-20170504' into staging
+> git bisect good f03f9f0c10dcfadee5811d43240f0a6af230f1ce
+> # good: [6c02258e143700314ebf268dae47eb23db17d1cf] qobject-input-visitor: Document full_name_nth()
+> git bisect good 6c02258e143700314ebf268dae47eb23db17d1cf
+> # bad: [95615ce5a1beffff1a5dd3597d8cb6ba83f0010e] vhost-scsi: create a vhost-scsi-common abstraction
+> git bisect bad 95615ce5a1beffff1a5dd3597d8cb6ba83f0010e
+> # bad: [31f5a726b59bda5580e2f9413867893501dd7d93] trace: add qemu mutex lock and unlock trace events
+> git bisect bad 31f5a726b59bda5580e2f9413867893501dd7d93
+> # bad: [49e00a18708e27c815828d9440d5c9300d19547c] use _Static_assert in QEMU_BUILD_BUG_ON
+> git bisect bad 49e00a18708e27c815828d9440d5c9300d19547c
+> # bad: [6103451aeb749e92bf7d730429985189c6921c32] hw/i386: Build-time assertion on pc/q35 reset register being identical.
+> git bisect bad 6103451aeb749e92bf7d730429985189c6921c32
+> # bad: [77af8a2b95b79699de650965d5228772743efe84] hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.
+> git bisect bad 77af8a2b95b79699de650965d5228772743efe84
+> # first bad commit: [77af8a2b95b79699de650965d5228772743efe84] hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.
+> 
+> 
+> 77af8a2b95b79699de650965d5228772743efe84 is the first bad commit
+> commit 77af8a2b95b79699de650965d5228772743efe84
+> Author: Phil Dennis-Jordan <phil@philjordan.eu>
+> Date:   Wed Mar 15 19:20:26 2017 +1300
+> 
+>     hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest
+> OS support.
+> 
+>     This updates the FADT generated for x86/64 machine types from
+> Revision 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) The
+> intention is to expose the reset register information to guest operating
+> systems which require it, specifically OS X/macOS. Revision 1 FADTs do
+> not contain the fields relating to the reset register.
+> 
+>     The new layout and contents remains backwards-compatible with
+> operating systems which only support ACPI 1.0, as the existing fields
+> are not modified by this change, as the 64-bit and 32-bit variants are
+> allowed to co-exist according to the ACPI 2.0 standard. No regressions
+> became apparent in tests with a range of Windows (XP-10) and Linux
+> versions.
+> 
+>     The BIOS tables test suite's FADT checksum test has also been
+> updated to reflect the new FADT layout and content.
+> 
+>     Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
+>     Message-Id: <1489558827-28971-2-git-send-email-phil@philjordan.eu>
+>     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> :040000 040000 40063761c0b86f87e798e03ea48eff9ea0753425 6d2a94150cf1eafb16f0ccf6325281415fef64a6 M      hw
+> :040000 040000 fe3f1480a91b76fea238c765f0725e715932d96d 68f9368d8d78fd3267f609b603f97e8a74bdf528 M      include
+> :040000 040000 895e961b0a160100aa95b2f557cfe6b87a7d9bff 8ed08cef10fddee7814e38ad62be11371592a75a M      tests
+> 
+> -- 
+> You received this bug notification because you are a member of qemu-
+> devel-ml, which is subscribed to QEMU.
+> https://bugs.launchpad.net/bugs/1714331
+> 
+> Title:
+>   Virtual machines not working anymore on 2.10
+> 
+> Status in QEMU:
+>   New
+> 
+> Bug description:
+>   Using 2.10, my virtual machine(s) don't work anymore. This happens
+>   100% of the times.
+> 
+>   -----
+> 
+>   I use QEMU compiling it from source, on Ubuntu 16.04 amd64. This is
+>   the configure command:
+> 
+>       configure --target-list=x86_64-softmmu --enable-debug --enable-gtk
+>   --enable-spice --audio-drv-list=pa
+> 
+>   I have one virtual disk, with a Windows 10 64-bit, which I launch in
+>   two different ways; both work perfectly on 2.9 (and used to do on 2.8,
+>   but I haven't used it for a long time).
+> 
+>   This is the first way:
+> 
+>       qemu-system-x86_64
+>         -drive if=pflash,format=raw,readonly,file=/path/to/OVMF_CODE.fd
+>         -drive if=pflash,format=raw,file=/tmp/OVMF_VARS.fd.tmp
+>         -enable-kvm
+>         -machine q35,accel=kvm,mem-merge=off
+>         -cpu host,kvm=off,hv_vendor_id=vgaptrocks,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time
+>         -smp 4,cores=4,sockets=1,threads=1
+>         -m 4096
+>         -display gtk
+>         -vga qxl
+>         -rtc base=localtime
+>         -serial none
+>         -parallel none
+>         -usb
+>         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
+>         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
+>         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
+>         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
+>         -device virtio-scsi-pci,id=scsi
+>         -drive file=/path/to/image-diff.img,id=hdd1,format=qcow2,if=none,cache=writeback
+>         -device scsi-hd,drive=hdd1
+>         -net nic,model=virtio
+>         -net user
+> 
+>   On QEMU 2.10, I get the `Recovery - Your PC/Device needs to be
+>   repaired` windows screen; on 2.9, it boots regularly.
+> 
+>   This is the second way:
+> 
+>       qemu-system-x86_64
+>         -drive if=pflash,format=raw,readonly,file=/path/to/OVMF_CODE.fd
+>         -drive if=pflash,format=raw,file=/tmp/OVMF_VARS.fd.tmp
+>         -enable-kvm
+>         -machine q35,accel=kvm,mem-merge=off
+>         -cpu host,kvm=off,hv_vendor_id=vgaptrocks,hv_relaxed,hv_spinlocks=0x1fff,hv_vapic,hv_time
+>         -smp 4,cores=4,sockets=1,threads=1
+>         -m 10240
+>         -vga none
+>         -rtc base=localtime
+>         -serial none
+>         -parallel none
+>         -usb
+>         -device vfio-pci,host=01:00.0,multifunction=on
+>         -device vfio-pci,host=01:00.1
+>         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
+>         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
+>         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
+>         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
+>         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
+>         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
+>         -device virtio-scsi-pci,id=scsi
+>         -drive file=/path/to/image-diff.img,id=hdd1,format=qcow2,if=none,cache=writeback
+>         -device scsi-hd,drive=hdd1
+>         -net nic,model=virtio
+>         -net user
+> 
+>   On QEMU 2.10, I get the debug window on the linux monitor, and blank screen on VFIO one (no BIOS screen at all); after 10/20 seconds, QEMU crashes without any message.
+>   On 2.9, this works perfectly.
+> 
+>   -----
+> 
+>   I am able to perform a git bisect, if that helps, but if this is the
+>   case, I'd need this issue to be reviewed, since bisecting is going to
+>   take me a lot of time.
+> 
+> To manage notifications about this bug go to:
+> https://bugs.launchpad.net/qemu/+bug/1714331/+subscriptions
+> 
