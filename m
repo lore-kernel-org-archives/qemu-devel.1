@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53404)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54123)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpYWg-0005A6-0a
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:29:47 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dpYZ2-00060n-9R
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:32:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpYWb-00074b-2Q
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:29:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60842)
+	(envelope-from <dgilbert@redhat.com>) id 1dpYYy-0008EZ-DR
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:32:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38502)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpYWa-00074H-Pz
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:29:41 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DF1D9C057F93
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 11:29:39 +0000 (UTC)
-Date: Wed, 6 Sep 2017 13:29:36 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170906132936.7cf49b24.cohuck@redhat.com>
-In-Reply-To: <20170906094927.22376-1-cohuck@redhat.com>
-References: <20170906094927.22376-1-cohuck@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dpYYy-0008Dy-4V
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 07:32:08 -0400
+Date: Wed, 6 Sep 2017 12:31:58 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170906113157.GD2215@work-vm>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<20170829110357.GG3783@redhat.com> <20170906094846.GA2215@work-vm>
+	<20170906104603.GK15510@redhat.com> <20170906104850.GB2215@work-vm>
+	<20170906105414.GL15510@redhat.com> <20170906105704.GC2215@work-vm>
+	<20170906110629.GM15510@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] accel: default to an actually
- available accelerator
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170906110629.GM15510@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,107 +31,284 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, pbonzini@redhat.com, thuth@redhat.com, mreitz@redhat.com, kwolf@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Wed,  6 Sep 2017 11:49:27 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
+* Daniel P. Berrange (berrange@redhat.com) wrote:
+> On Wed, Sep 06, 2017 at 11:57:05AM +0100, Dr. David Alan Gilbert wrote:
+> > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > On Wed, Sep 06, 2017 at 11:48:51AM +0100, Dr. David Alan Gilbert wr=
+ote:
+> > > > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > > > On Wed, Sep 06, 2017 at 10:48:46AM +0100, Dr. David Alan Gilber=
+t wrote:
+> > > > > > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > > > > > On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
+> > > > > > > > v2:
+> > > > > > > > - fixed "make check" error that patchew reported
+> > > > > > > > - moved the thread_join upper in monitor_data_destroy(), =
+before
+> > > > > > > >   resources are released
+> > > > > > > > - added one new patch (current patch 3) that fixes a nast=
+y risk
+> > > > > > > >   condition with IOWatchPoll.  Please see commit message =
+for more
+> > > > > > > >   information.
+> > > > > > > > - added a g_main_context_wakeup() to make sure the separa=
+te loop
+> > > > > > > >   thread can be kicked always when we want to destroy the=
+ per-monitor
+> > > > > > > >   threads.
+> > > > > > > > - added one new patch (current patch 8) to introduce migr=
+ation mgmt
+> > > > > > > >   lock for migrate_incoming.
+> > > > > > > >=20
+> > > > > > > > This is an extended work for migration postcopy recovery.=
+ This series
+> > > > > > > > is tested with the following series to make sure it solve=
+s the monitor
+> > > > > > > > hang problem that we have encountered for postcopy recove=
+ry:
+> > > > > > > >=20
+> > > > > > > >   [RFC 00/29] Migration: postcopy failure recovery
+> > > > > > > >   [RFC 0/6] migration: re-use migrate_incoming for postco=
+py recovery
+> > > > > > > >=20
+> > > > > > > > The root problem is that, monitor commands are all handle=
+d in main
+> > > > > > > > loop thread now, no matter how many monitors we specify. =
+And, if main
+> > > > > > > > loop thread hangs due to some reason, all monitors will b=
+e stuck.
+> > > > > > > > This can be done in reversed order as well: if any of the=
+ monitor
+> > > > > > > > hangs, it will hang the main loop, and the rest of the mo=
+nitors (if
+> > > > > > > > there is any).
+> > > > > > > >=20
+> > > > > > > > That affects postcopy recovery, since the recovery requir=
+es user input
+> > > > > > > > on destination side.  If monitors hang, the destination V=
+M dies and
+> > > > > > > > lose hope for even a final recovery.
+> > > > > > > >=20
+> > > > > > > > So, sometimes we need to make sure the monitor be alive, =
+at least one
+> > > > > > > > of them.
+> > > > > > > >=20
+> > > > > > > > The whole idea of this series is that instead if handling=
+ monitor
+> > > > > > > > commands all in main loop thread, we do it separately in =
+per-monitor
+> > > > > > > > threads.  Then, even if main loop thread hangs at any poi=
+nt by any
+> > > > > > > > reason, per-monitor thread can still survive.  Further, w=
+e add hint in
+> > > > > > > > QMP/HMP to show whether a command can be executed without=
+ QMP, if so,
+> > > > > > > > we avoid taking BQL when running that command.  It greatl=
+y reduced
+> > > > > > > > contention of BQL.  Now the only user of that new paramet=
+er (currently
+> > > > > > > > I call it "without-bql") is "migrate-incoming" command, w=
+hich is the
+> > > > > > > > only command to rescue a paused postcopy migration.
+> > > > > > > >=20
+> > > > > > > > However, even with the series, it does not mean that per-=
+monitor
+> > > > > > > > threads will never hang.  One example is that we can stil=
+l run "info
+> > > > > > > > vcpus" in per-monitor threads during a paused postcopy (i=
+n that state,
+> > > > > > > > page faults are never handled, and "info cpus" will never=
+ return since
+> > > > > > > > it tries to sync every vcpus).  So to make sure it does n=
+ot hang, we
+> > > > > > > > not only need the per-monitor thread, the user should be =
+careful as
+> > > > > > > > well on how to use it.
+> > > > > > > >=20
+> > > > > > > > For postcopy recovery, we may need dedicated monitor chan=
+nel for
+> > > > > > > > recovery.  In other words, a destination VM that supports=
+ postcopy
+> > > > > > > > recovery would possibly need:
+> > > > > > > >=20
+> > > > > > > >   -qmp MAIN_CHANNEL -qmp RECOVERY_CHANNEL
+> > > > > > >=20
+> > > > > > > I think this is a really horrible thing to expose to manage=
+ment applications.
+> > > > > > > They should not need to be aware of fact that QEMU is buggy=
+ and thus requires
+> > > > > > > that certain commands be run on different monitors to work =
+around the bug.
+> > > > > >=20
+> > > > > > It's unfortunately baked in way too deep to fix in the near t=
+erm; the
+> > > > > > BQL is just too cantagious and we have a fundamental design o=
+f running
+> > > > > > all the main IO emulation in one thread.
+> > > > > >=20
+> > > > > > > I'd much prefer to see the problem described handled transp=
+arently inside
+> > > > > > > QEMU. One approach is have a dedicated thread in QEMU respo=
+nsible for all
+> > > > > > > monitor I/O. This thread should never actually execute moni=
+tor commands
+> > > > > > > though, it would simply parse the command request and put d=
+ata onto a queue
+> > > > > > > of pending commands, thus it could never hang. The command =
+queue could be
+> > > > > > > processed by the main thread, or by another thread that is =
+interested.
+> > > > > > > eg the migration thread could process any queued commands r=
+elated to
+> > > > > > > migration directly.
+> > > > > >=20
+> > > > > > That requires a change in the current API to allow async comm=
+and
+> > > > > > completion (OK that is something Marc-Andre's world has) so t=
+hat
+> > > > > > from the one connection you can have multiple outstanding com=
+mands.
+> > > > > > Hmm unless....
+> > > > > >=20
+> > > > > > We've also got problems that some commands don't like being r=
+un outside
+> > > > > > of the main thread (see Fam's reply on the 21st pointing out =
+that a lot
+> > > > > > of block commands would assert).
+> > > > > >=20
+> > > > > > I think the way to move to what you describe would be:
+> > > > > >   a) A separate thread for monitor IO
+> > > > > >       This seems a separate problem
+> > > > > >       How hard is that?  Will all the current IO mechanisms u=
+sed
+> > > > > >       for monitors just work if we run them in a separate thr=
+ead?
+> > > > > >       What about mux?
+> > > > > >=20
+> > > > > >   b) Initially all commands get dispatched to the main thread
+> > > > > >      so nothing changes about the API.
+> > > > > >=20
+> > > > > >   c) We create a new thread for the lock-free commands, and r=
+oute
+> > > > > >       lock-free commands down it.
+> > > > > >=20
+> > > > > >   d) We start with a rule that on any one monitor connection =
+we
+> > > > > >   don't allow you to start a command until the previous one h=
+as
+> > > > > >   finished
+> > > > > >=20
+> > > > > > (d) allows us to avoid any API changes, but allows us to do l=
+ock-free
+> > > > > > stuff on a separate connection like Peter's world.
+> > > > > > We can drop (d) once we have a way of doing async commands.
+> > > > > > We can add dispatching to more threads once someone describes
+> > > > > > what they want from those threads.
+> > > > > >=20
+> > > > > > Does that work for you Dan?
+> > > > >=20
+> > > > > It would *provided* that we do (c) for the commands Peter wants=
+ for
+> > > > > this migration series.  IOW, I don't want to have to have logic=
+ in
+> > > > > libvirt that either needs to add a 2nd monitor server, or open =
+a 2nd
+> > > > > monitor connection, to deal with migration post-copy recovery i=
+n some
+> > > > > versions of QEMU.  So whatever is needed to make post-copy reco=
+very
+> > > > > work has to be done for (c).
+> > > >=20
+> > > > But then doesn't that mean you're requiring us to break (d) and c=
+hange
+> > > > the QMP interface to libvirt so it can do async stuff?
+> > >=20
+> > > Depends on your definition of break - I'm assuming there's either a=
+ way
+> > > to opt-in to use of a async mode for existing commands in (c), or t=
+hat
+> > > async commands would be added in parallel with existing sync comman=
+ds.
+> > > IOW, its not a API breakage - its an opt-in extension of existing
+> > > functionality.
+> >=20
+> > But you'd need to do async commands for all commands you issued to av=
+oid
+> > blocking the io thread so that you could then issue the recovery
+> > commands.
+>=20
+> I don't see why that has to be the case. In order to issue an async com=
+mand
+> all that needs to be the case is that command replies should be allowed=
+ to
+> be sent out of order.
+>=20
+> IOW if command A is blocking and command B is async, then we shoudl be
+> allowed to have the following
+>=20
+>    req A
+>    req B
+>    res A
+>    res B
+>=20
+> Or
+>=20
+>    req A
+>    req B
+>    res B
+>    res A
+>=20
+> Or
+>=20
+>    req B
+>    req A
+>    res B
+>    res A
+>=20
+> etc.
+>=20
+> This does imply that you need a separate monitor I/O processing, from t=
+he
+> command execution thread, but I see no need for all commands to suddenl=
+y
+> become async. Just allowing interleaved replies is sufficient from the
+> POV of the protocol definition. This interleaving is easy to handle fro=
+m
+> the client POV - just requires a unique 'serial' in the request by the
+> client, that is copied into the reply by QEMU.
 
-> configure_accelerator() falls back to tcg if no accelerator has
-> been specified. Formerly, we could be sure that tcg is always
-> available; however, with --disable-tcg, this is not longer true,
-> and you are not able to start qemu without explicitly specifying
-> another accelerator on those builds.
-> 
-> Instead, choose an accelerator in the order tcg->kvm->xen->hax.
-> 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
-> 
-> RFC mainly because this breaks iotest 186 in a different way on a
-> tcg-less x86_64 build: Before, it fails with "-machine accel=tcg: No
-> accelerator found"; afterwards, there seems to be a difference in
-> output due to different autogenerated devices. Not sure how to handle
-> that.
-> 
-> cc:ing some hopefully interested folks (-ENOMAINTAINER again).
-> 
-> ---
->  accel/accel.c              | 22 ++++++++++++++++++++--
->  arch_init.c                | 17 +++++++++++++++++
->  include/sysemu/arch_init.h |  2 ++
->  qemu-options.hx            |  6 ++++--
->  4 files changed, 43 insertions(+), 4 deletions(-)
-> 
-> diff --git a/accel/accel.c b/accel/accel.c
-> index 8ae40e1e13..26a3f32627 100644
-> --- a/accel/accel.c
-> +++ b/accel/accel.c
-> @@ -68,6 +68,25 @@ static int accel_init_machine(AccelClass *acc, MachineState *ms)
->      return ret;
->  }
->  
-> +static const char *default_accelerator(void)
-> +{
-> +    if (tcg_available()) {
-> +        return "tcg";
-> +    }
-> +    if (kvm_available()) {
-> +        return "kvm";
-> +    }
-> +    if (xen_available()) {
-> +        return "xen";
-> +    }
-> +    if (hax_available()) {
-> +        return "hax";
-> +    }
-> +    /* configure makes sure we have at least one accelerator */
-> +    g_assert(false);
-> +    return "";
-> +}
-> +
->  void configure_accelerator(MachineState *ms)
->  {
->      const char *accel, *p;
-> @@ -79,8 +98,7 @@ void configure_accelerator(MachineState *ms)
->  
->      accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
->      if (accel == NULL) {
-> -        /* Use the default "accelerator", tcg */
-> -        accel = "tcg";
-> +        accel = default_accelerator();
+OK, so for that we can just take Marc-Andr=E9's syntax and call it 'id':
+  https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03634.html
 
-It actually may be easier to just switch the default to
-"tcg:kvm:xen:hax". Haven't tested that, though.
+then it's upto the caller to ensure those id's are unique.
 
->      }
->  
->      p = accel;
+I do worry about two things:
+  a) With this the caller doesn't really know which commands could be
+  in parallel - for example if we've got a recovery command that's
+  executed by this non-locking thread that's OK, we expect that
+  to be doable in parallel.  If in the future though we do
+  what you initially suggested and have a bunch of commands get
+  routed to the migration thread (say) then those would suddenly
+  operate in parallel with other commands that we're previously
+  synchronous.
 
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 9f6e2adfff..386e6e945d 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -66,7 +66,8 @@ Supported machine properties are:
->  @table @option
->  @item accel=@var{accels1}[:@var{accels2}[:...]]
->  This is used to enable an accelerator. Depending on the target architecture,
-> -kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
-> +kvm, xen, hax or tcg can be available. By default, the first one available
-> +out of tcg, kvm, xen, hax (in that order) is used. If there is
->  more than one accelerator specified, the next one is used if the previous one
->  fails to initialize.
->  @item kernel_irqchip=on|off
-> @@ -126,7 +127,8 @@ STEXI
->  @item -accel @var{name}[,prop=@var{value}[,...]]
->  @findex -accel
->  This is used to enable an accelerator. Depending on the target architecture,
-> -kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
-> +kvm, xen, hax or tcg can be available. By default, the first one available
-> +out of tcg, kvm, xen, hax (in that order) is used. If there is
->  more than one accelerator specified, the next one is used if the previous one
->  fails to initialize.
->  @table @option
+  b) I still worry how the various IO channels will behave on another
+  thread.  But that's more a general feeling rather than anything
+  specific.
 
-These changes would still apply, as would the question about what to do
-with the iotest.
+Dave
+
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberr=
+ange :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange=
+.com :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberr=
+ange :|
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
