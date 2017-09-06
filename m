@@ -1,42 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47530)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjrosato@linux.vnet.ibm.com>) id 1dpd4l-0004Ho-PI
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:21:17 -0400
+	(envelope-from <berrange@redhat.com>) id 1dpdFP-0005JR-J7
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:32:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjrosato@linux.vnet.ibm.com>) id 1dpd4g-0005Xr-QI
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:21:15 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60191
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mjrosato@linux.vnet.ibm.com>)
-	id 1dpd4g-0005Wo-Jy
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:21:10 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v86GJvVj037903
-	for <qemu-devel@nongnu.org>; Wed, 6 Sep 2017 12:21:08 -0400
-Received: from e15.ny.us.ibm.com (e15.ny.us.ibm.com [129.33.205.205])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cth6xe473-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 12:21:08 -0400
-Received: from localhost
-	by e15.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mjrosato@linux.vnet.ibm.com>;
-	Wed, 6 Sep 2017 12:21:08 -0400
-References: <20170904154316.4148-1-david@redhat.com>
-	<67bc4b1b-d934-dff6-9ce6-f5f34c11c9ca@de.ibm.com>
-	<58b1ddef-e588-b976-824e-ed537740ad3a@redhat.com>
-From: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
-Date: Wed, 6 Sep 2017 12:21:04 -0400
+	(envelope-from <berrange@redhat.com>) id 1dpdFL-00037K-Ec
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:32:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50634)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpdFL-00036Z-8z
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:32:11 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1EC18C049E31
+	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 16:32:10 +0000 (UTC)
+Date: Wed, 6 Sep 2017 17:32:05 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170906163205.GX15510@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170906115143.27451-1-quintela@redhat.com>
+	<20170906115143.27451-2-quintela@redhat.com>
+	<7e71d190-8e49-ca6b-ef44-522100b27b8c@redhat.com>
+	<87pob351o5.fsf@secure.mitica>
 MIME-Version: 1.0
-In-Reply-To: <58b1ddef-e588-b976-824e-ed537740ad3a@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <aa512cc9-ff96-36a4-63e6-5351d8c7f08d@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 00/19] s390x cleanups and CPU hotplug
- via device_add
+Content-Disposition: inline
+In-Reply-To: <87pob351o5.fsf@secure.mitica>
+Subject: Re: [Qemu-devel] [PATCH v7 01/22] Revert "io: add new
+ qio_channel_{readv, writev, read, write}_all functions"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,21 +37,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>
+To: Juan Quintela <quintela@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, lvivier@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, dgilbert@redhat.com
 
-On 09/06/2017 12:03 PM, David Hildenbrand wrote:
-> On 05.09.2017 09:51, Christian Borntraeger wrote:
->> I think we certainly want to have device_add as well (as long as the old
->> interface stays for a while).
->>
->> Adding Matt. Can you have a look at the cpu hotplug bits?
+On Wed, Sep 06, 2017 at 04:42:18PM +0200, Juan Quintela wrote:
+> Eric Blake <eblake@redhat.com> wrote:
+> > On 09/06/2017 06:51 AM, Juan Quintela wrote:
+> >> This reverts commit d4622e55883211072621958d39ddaa73483d201e.
+> >
+> > But with no reason why?  What bugs are you fixing by reverting this?
 > 
-> If there is no further feedback, I'll be sending a new version out
-> tomorrow, including the suggested changes. In addition, I'll be
-> including support to hotplug VCPUs in random order (2 additional patches).
-> 
+> I put it on the cover letter.  I am investigating *why* it fails on me.
+> It got the thread handed.
 
-Hi David, just returning from vacation -- Will look at this set today.
+Your functions return the number of bytes written. My impl only
+returns the 0 or -1 on the basis that the caller does not need
+to know how many bytes were written - its always exactly the
+amount asked for. You probably need to adjust your code to take
+that into account.
 
-Matt
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
