@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42059)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpcqx-0000aP-Q8
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:07:09 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dpcr5-0000mL-KJ
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:07:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpcqw-0003A3-JE
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:59 -0400
-Received: from mail-pg0-x22c.google.com ([2607:f8b0:400e:c05::22c]:37876)
+	(envelope-from <richard.henderson@linaro.org>) id 1dpcqv-00038L-HJ
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:07:07 -0400
+Received: from mail-pf0-x22d.google.com ([2607:f8b0:400e:c00::22d]:34785)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dpcqw-00038p-Dg
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:58 -0400
-Received: by mail-pg0-x22c.google.com with SMTP id d8so15976971pgt.4
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 09:06:58 -0700 (PDT)
+	id 1dpcqv-00037z-8x
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:57 -0400
+Received: by mail-pf0-x22d.google.com with SMTP id m1so13486557pfk.1
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 09:06:57 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  6 Sep 2017 09:06:12 -0700
-Message-Id: <20170906160612.22769-33-richard.henderson@linaro.org>
+Date: Wed,  6 Sep 2017 09:06:11 -0700
+Message-Id: <20170906160612.22769-32-richard.henderson@linaro.org>
 In-Reply-To: <20170906160612.22769-1-richard.henderson@linaro.org>
 References: <20170906160612.22769-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 32/32] target/arm: Perform per-insn cross-page
- check only for Thumb
+Subject: [Qemu-devel] [PULL 31/32] target/arm: Split out
+ thumb_tr_translate_insn
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,91 +32,99 @@ Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>
 
 From: Richard Henderson <rth@twiddle.net>
 
-ARM is a fixed-length ISA and we can compute the page crossing
-condition exactly once during init_disas_context.
+We need not check for ARM vs Thumb state in order to dispatch
+disassembly of every instruction.
 
+Tested-by: Emilio G. Cota <cota@braap.org>
 Reviewed-by: Emilio G. Cota <cota@braap.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/arm/translate.c | 58 ++++++++++++++++++++++++++++----------------------
- 1 file changed, 33 insertions(+), 25 deletions(-)
+ target/arm/translate.c | 121 ++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 80 insertions(+), 41 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 9e7bfbcf0c..6946e56a3a 100644
+index 0dd24aad90..9e7bfbcf0c 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -11888,6 +11888,13 @@ static int arm_tr_init_disas_context(DisasContextBase *dcbase,
-         max_insns = 1;
-     }
- 
-+    /* ARM is a fixed-length ISA.  Bound the number of insns to execute
-+       to those left on the page.  */
-+    if (!dc->thumb) {
-+        int bound = (dc->next_page_start - dc->base.pc_first) / 4;
-+        max_insns = MIN(max_insns, bound);
-+    }
-+
-     cpu_F0s = tcg_temp_new_i32();
-     cpu_F1s = tcg_temp_new_i32();
-     cpu_F0d = tcg_temp_new_i64();
-@@ -12015,34 +12022,12 @@ static bool arm_pre_translate_insn(DisasContext *dc)
-     return false;
+@@ -11981,11 +11981,8 @@ static bool arm_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
+     return true;
  }
  
--static void arm_post_translate_insn(CPUARMState *env, DisasContext *dc)
-+static void arm_post_translate_insn(DisasContext *dc)
+-static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
++static bool arm_pre_translate_insn(DisasContext *dc)
  {
+-    DisasContext *dc = container_of(dcbase, DisasContext, base);
+-    CPUARMState *env = cpu->env_ptr;
+-
+ #ifdef CONFIG_USER_ONLY
+     /* Intercept jump to the magic kernel page.  */
+     if (dc->pc >= 0xffff0000) {
+@@ -11993,7 +11990,7 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+            conditional execution block.  */
+         gen_exception_internal(EXCP_KERNEL_TRAP);
+         dc->base.is_jmp = DISAS_NORETURN;
+-        return;
++        return true;
+     }
+ #endif
+ 
+@@ -12012,56 +12009,85 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
+         gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
+                       default_exception_el(dc));
+         dc->base.is_jmp = DISAS_NORETURN;
+-        return;
++        return true;
+     }
+ 
+-    if (dc->thumb) {
+-        disas_thumb_insn(env, dc);
+-        if (dc->condexec_mask) {
+-            dc->condexec_cond = (dc->condexec_cond & 0xe)
+-                | ((dc->condexec_mask >> 4) & 1);
+-            dc->condexec_mask = (dc->condexec_mask << 1) & 0x1f;
+-            if (dc->condexec_mask == 0) {
+-                dc->condexec_cond = 0;
+-            }
+-        }
+-    } else {
+-        unsigned int insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
+-        dc->pc += 4;
+-        disas_arm_insn(dc, insn);
+-    }
++    return false;
++}
+ 
++static void arm_post_translate_insn(CPUARMState *env, DisasContext *dc)
++{
      if (dc->condjmp && !dc->base.is_jmp) {
          gen_set_label(dc->condlabel);
          dc->condjmp = 0;
      }
+ 
+-    if (dc->base.is_jmp == DISAS_NEXT) {
+-        /* Translation stops when a conditional branch is encountered.
+-         * Otherwise the subsequent code could get translated several times.
+-         * Also stop translation when a page boundary is reached.  This
+-         * ensures prefetch aborts occur at the right place.  */
 -
--    /* Translation stops when a conditional branch is encountered.
--     * Otherwise the subsequent code could get translated several times.
--     * Also stop translation when a page boundary is reached.  This
--     * ensures prefetch aborts occur at the right place.
--     *
--     * We want to stop the TB if the next insn starts in a new page,
--     * or if it spans between this page and the next. This means that
--     * if we're looking at the last halfword in the page we need to
--     * see if it's a 16-bit Thumb insn (which will fit in this TB)
--     * or a 32-bit Thumb insn (which won't).
--     * This is to avoid generating a silly TB with a single 16-bit insn
--     * in it at the end of this page (which would execute correctly
--     * but isn't very efficient).
--     */
--    if (dc->base.is_jmp == DISAS_NEXT
--        && (dc->pc >= dc->next_page_start
--            || (dc->pc >= dc->next_page_start - 3
--                && insn_crosses_page(env, dc)))) {
--        dc->base.is_jmp = DISAS_TOO_MANY;
--    }
--
-     dc->base.pc_next = dc->pc;
-     translator_loop_temp_check(&dc->base);
- }
-@@ -12061,7 +12046,10 @@ static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-     dc->pc += 4;
-     disas_arm_insn(dc, insn);
- 
--    arm_post_translate_insn(env, dc);
-+    arm_post_translate_insn(dc);
-+
-+    /* ARM is a fixed-length ISA.  We performed the cross-page check
-+       in init_disas_context by adjusting max_insns.  */
- }
- 
- static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-@@ -12085,7 +12073,27 @@ static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
-         }
-     }
- 
--    arm_post_translate_insn(env, dc);
-+    arm_post_translate_insn(dc);
-+
-+    /* Thumb is a variable-length ISA.  Stop translation when the next insn
-+     * will touch a new page.  This ensures that prefetch aborts occur at
-+     * the right place.
+-        if (dc->pc >= dc->next_page_start ||
+-            (dc->pc >= dc->next_page_start - 3 &&
+-             insn_crosses_page(env, dc))) {
+-            /* We want to stop the TB if the next insn starts in a new page,
+-             * or if it spans between this page and the next. This means that
+-             * if we're looking at the last halfword in the page we need to
+-             * see if it's a 16-bit Thumb insn (which will fit in this TB)
+-             * or a 32-bit Thumb insn (which won't).
+-             * This is to avoid generating a silly TB with a single 16-bit insn
+-             * in it at the end of this page (which would execute correctly
+-             * but isn't very efficient).
+-             */
+-            dc->base.is_jmp = DISAS_TOO_MANY;
+-        }
++    /* Translation stops when a conditional branch is encountered.
++     * Otherwise the subsequent code could get translated several times.
++     * Also stop translation when a page boundary is reached.  This
++     * ensures prefetch aborts occur at the right place.
 +     *
 +     * We want to stop the TB if the next insn starts in a new page,
 +     * or if it spans between this page and the next. This means that
@@ -132,9 +140,81 @@ index 9e7bfbcf0c..6946e56a3a 100644
 +            || (dc->pc >= dc->next_page_start - 3
 +                && insn_crosses_page(env, dc)))) {
 +        dc->base.is_jmp = DISAS_TOO_MANY;
-+    }
+     }
+ 
+     dc->base.pc_next = dc->pc;
+     translator_loop_temp_check(&dc->base);
  }
  
++static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
++{
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++    CPUARMState *env = cpu->env_ptr;
++    unsigned int insn;
++
++    if (arm_pre_translate_insn(dc)) {
++        return;
++    }
++
++    insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
++    dc->pc += 4;
++    disas_arm_insn(dc, insn);
++
++    arm_post_translate_insn(env, dc);
++}
++
++static void thumb_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
++{
++    DisasContext *dc = container_of(dcbase, DisasContext, base);
++    CPUARMState *env = cpu->env_ptr;
++
++    if (arm_pre_translate_insn(dc)) {
++        return;
++    }
++
++    disas_thumb_insn(env, dc);
++
++    /* Advance the Thumb condexec condition.  */
++    if (dc->condexec_mask) {
++        dc->condexec_cond = ((dc->condexec_cond & 0xe) |
++                             ((dc->condexec_mask >> 4) & 1));
++        dc->condexec_mask = (dc->condexec_mask << 1) & 0x1f;
++        if (dc->condexec_mask == 0) {
++            dc->condexec_cond = 0;
++        }
++    }
++
++    arm_post_translate_insn(env, dc);
++}
++
  static void arm_tr_tb_stop(DisasContextBase *dcbase, CPUState *cpu)
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+@@ -12198,12 +12224,25 @@ static const TranslatorOps arm_translator_ops = {
+     .disas_log          = arm_tr_disas_log,
+ };
+ 
++static const TranslatorOps thumb_translator_ops = {
++    .init_disas_context = arm_tr_init_disas_context,
++    .tb_start           = arm_tr_tb_start,
++    .insn_start         = arm_tr_insn_start,
++    .breakpoint_check   = arm_tr_breakpoint_check,
++    .translate_insn     = thumb_tr_translate_insn,
++    .tb_stop            = arm_tr_tb_stop,
++    .disas_log          = arm_tr_disas_log,
++};
++
+ /* generate intermediate code for basic block 'tb'.  */
+ void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb)
+ {
+     DisasContext dc;
+     const TranslatorOps *ops = &arm_translator_ops;
+ 
++    if (ARM_TBFLAG_THUMB(tb->flags)) {
++        ops = &thumb_translator_ops;
++    }
+ #ifdef TARGET_AARCH64
+     if (ARM_TBFLAG_AARCH64_STATE(tb->flags)) {
+         ops = &aarch64_translator_ops;
 -- 
 2.13.5
