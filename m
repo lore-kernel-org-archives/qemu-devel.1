@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39946)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41492)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wlfightup@gmail.com>) id 1dpZDG-0006i3-2H
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:13:47 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpZHs-0007rt-Rr
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:18:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wlfightup@gmail.com>) id 1dpZDB-0001iq-28
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:13:46 -0400
-Received: from mail-yw0-x242.google.com ([2607:f8b0:4002:c05::242]:34888)
+	(envelope-from <peter.maydell@linaro.org>) id 1dpZHr-0004zG-UM
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:18:32 -0400
+Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:33810)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wlfightup@gmail.com>) id 1dpZDA-0001iF-SB
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:13:40 -0400
-Received: by mail-yw0-x242.google.com with SMTP id s128so3214265yws.2
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 05:13:39 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dpZHr-0004y5-N7
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 08:18:31 -0400
+Received: by mail-wr0-x235.google.com with SMTP id a47so11760793wra.1
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 05:18:30 -0700 (PDT)
 MIME-Version: 1.0
-From: Paul Schlacter <wlfightup@gmail.com>
-Date: Wed, 6 Sep 2017 20:13:38 +0800
-Message-ID: <CADak6y7DSednJgLkivprv0fAkLvE2=Dge0LzNJ0MnigvBEz+_A@mail.gmail.com>
+In-Reply-To: <CAF6HrYym57hZjSFE=iExPkp8vBX82zqXvTxh8GJDYNPL1FTSqA@mail.gmail.com>
+References: <CAF6HrYxj5BoTQpQjz95Z1_N_p615jpEE12xh_afuuqE4fcTyLg@mail.gmail.com>
+	<CAFEAcA9YNO7kgC8yzZ_RUKck=+98pUET0ogVZ7TvC1kxV+_fFA@mail.gmail.com>
+	<CAF6HrYwT7WP_i7cVhvEyRvqSK7J+bLnKU4b+WrMQfVkLaNDrvQ@mail.gmail.com>
+	<CAFEAcA9kEEyUj7=7Wd-jNbVOWwfgkj0a201q+L4e5CDR22JUgw@mail.gmail.com>
+	<CAF6HrYw9B1ns0ZVtU_gxqJZxOe0dG03UQiAV7FHxBB-wQh6kNQ@mail.gmail.com>
+	<CAF6HrYym57hZjSFE=iExPkp8vBX82zqXvTxh8GJDYNPL1FTSqA@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 6 Sep 2017 13:18:08 +0100
+Message-ID: <CAFEAcA_iKqs_QXz_qSwsOw6A-Z1BJjVN3WPAgaERejWQXrQhNw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: [Qemu-devel] how to modify or add machines type ?
+Subject: Re: [Qemu-devel] Questions regarding emulated UART in VersatilePB
+ board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,48 +34,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Ramy Sameh <ramysameh26@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ahmed Aly <ahmedaly50@gmail.com>
 
-I made the default config build the qemu-kvm , But I used virsh xml
-corresponding machine-type inconsistent, resulting in an error.
+On 6 September 2017 at 13:12, Ramy Sameh <ramysameh26@gmail.com> wrote:
+> Do the emulated baud rate registers have any effect? (I think they would
+> have no effect, because there is no real clock that can be used to produce
+> the baud rate).
 
-error:
-2017-09-06T12:16:36.036200Z qemu-kvm: -machine
-pc-i440fx-rhel7.0.0,accel=kvm,usb=off: unsupported machine type
-Use -machine help to list supported machines
+No, they don't have any effect. (In this UART model we don't implement
+the feature that you can connect a guest serial port to a host serial
+port and have the guest baud rate etc settings propagate through.
+We do that in other UART models and maybe one day we'll add it here,
+but for now, baud rate settings are ignored.)
 
-
-Is there any way to modify the machines in qemu-kvm?
-
-
-[root@nova02 qemu-2.6.0]# /usr/libexec/qemu-kvm -M ?
-Supported machines are:
-pc                   Standard PC (i440FX + PIIX, 1996) (alias of
-pc-i440fx-2.6)
-pc-i440fx-2.6        Standard PC (i440FX + PIIX, 1996) (default)
-pc-i440fx-2.5        Standard PC (i440FX + PIIX, 1996)
-pc-i440fx-2.4        Standard PC (i440FX + PIIX, 1996)
-pc-i440fx-2.3        Standard PC (i440FX + PIIX, 1996)
-pc-i440fx-2.2        Standard PC (i440FX + PIIX, 1996)
-pc-i440fx-2.1        Standard PC (i440FX + PIIX, 1996)
-pc-i440fx-2.0        Standard PC (i440FX + PIIX, 1996)
-pc-i440fx-1.7        Standard PC (i440FX + PIIX, 1996)
-pc-i440fx-1.6        Standard PC (i440FX + PIIX, 1996)
-pc-i440fx-1.5        Standard PC (i440FX + PIIX, 1996)
-pc-i440fx-1.4        Standard PC (i440FX + PIIX, 1996)
-pc-1.3               Standard PC (i440FX + PIIX, 1996)
-pc-1.2               Standard PC (i440FX + PIIX, 1996)
-pc-1.1               Standard PC (i440FX + PIIX, 1996)
-pc-1.0               Standard PC (i440FX + PIIX, 1996)
-pc-0.15              Standard PC (i440FX + PIIX, 1996)
-pc-0.14              Standard PC (i440FX + PIIX, 1996)
-pc-0.13              Standard PC (i440FX + PIIX, 1996)
-pc-0.12              Standard PC (i440FX + PIIX, 1996)
-pc-0.11              Standard PC (i440FX + PIIX, 1996)
-pc-0.10              Standard PC (i440FX + PIIX, 1996)
-q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.6)
-pc-q35-2.6           Standard PC (Q35 + ICH9, 2009)
-pc-q35-2.5           Standard PC (Q35 + ICH9, 2009)
-pc-q35-2.4           Standard PC (Q35 + ICH9, 2009)
-isapc                ISA-only PC
-none                 empty machine
+thanks
+-- PMM
