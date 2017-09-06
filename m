@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dpbId-0008O9-7y
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:27:31 -0400
+	(envelope-from <marcel@redhat.com>) id 1dpbIi-0008T3-3C
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dpbIV-0004k7-IB
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:27:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60368)
+	(envelope-from <marcel@redhat.com>) id 1dpbIg-0004oc-SB
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:27:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51092)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dpbIV-0004js-A3
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:27:19 -0400
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dpbIg-0004ng-JJ
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:27:30 -0400
 From: Marcel Apfelbaum <marcel@redhat.com>
-Date: Wed,  6 Sep 2017 17:26:57 +0300
-Message-Id: <20170906142658.58298-2-marcel@redhat.com>
+Date: Wed,  6 Sep 2017 17:26:58 +0300
+Message-Id: <20170906142658.58298-3-marcel@redhat.com>
 In-Reply-To: <20170906142658.58298-1-marcel@redhat.com>
 References: <20170906142658.58298-1-marcel@redhat.com>
-Subject: [Qemu-devel]  [PATCH 1/2] pc: add 2.11 machine types
+Subject: [Qemu-devel] [PATCH 2/2] hw/pcie: disable IO port fwd by default
+ for pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,98 +27,122 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: marcel@redhat.com, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com
 
+For most cases the devices attached to PCIe Root Ports
+do not need IO ports range, add an 'enable-io-fwd' property
+making it false by default, but keeping it true for older machines.
+
 Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
 ---
- hw/i386/pc_piix.c    | 15 ++++++++++++---
- hw/i386/pc_q35.c     | 13 +++++++++++--
- include/hw/i386/pc.h |  3 +++
- 3 files changed, 26 insertions(+), 5 deletions(-)
+ hw/pci-bridge/gen_pcie_root_port.c | 38 ++++++++++++++++++++++++++++++++++++++
+ include/hw/compat.h                |  6 +++++-
+ 2 files changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 46dfd2c954..b03cc047c3 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -436,21 +436,30 @@ static void pc_i440fx_machine_options(MachineClass *m)
-     m->default_display = "std";
- }
+diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+index cb694d6da5..cbdeb73e2c 100644
+--- a/hw/pci-bridge/gen_pcie_root_port.c
++++ b/hw/pci-bridge/gen_pcie_root_port.c
+@@ -20,12 +20,26 @@
+ #define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
+ #define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
  
--static void pc_i440fx_2_10_machine_options(MachineClass *m)
-+static void pc_i440fx_2_11_machine_options(MachineClass *m)
- {
-     pc_i440fx_machine_options(m);
-     m->alias = "pc";
-     m->is_default = 1;
- }
- 
-+DEFINE_I440FX_MACHINE(v2_11, "pc-i440fx-2.11", NULL,
-+                      pc_i440fx_2_11_machine_options);
++#define GEN_PCIE_ROOT_PORT(obj) \
++     OBJECT_CHECK(GenPCIERootPort, (obj), TYPE_GEN_PCIE_ROOT_PORT)
++#define GEN_PCIE_ROOT_PORT_CLASS(klass) \
++     OBJECT_CLASS_CHECK(GenPCIERootPortClass, (klass), TYPE_GEN_PCIE_ROOT_PORT)
++#define GEN_PCIE_ROOT_PORT_GET_CLASS(obj) \
++     OBJECT_GET_CLASS(GenPCIERootPortClass, (obj), TYPE_GEN_PCIE_ROOT_PORT)
 +
-+static void pc_i440fx_2_10_machine_options(MachineClass *m)
++typedef struct GenPCIERootPortClass {
++    PCIERootPortClass parent_class;
++
++    DeviceRealize parent_realize;
++} GenPCIERootPortClass;
++
+ typedef struct GenPCIERootPort {
+     /*< private >*/
+     PCIESlot parent_obj;
+     /*< public >*/
+ 
+     bool migrate_msix;
++    bool enable_io_fwd;
+ } GenPCIERootPort;
+ 
+ static uint8_t gen_rp_aer_vector(const PCIDevice *d)
+@@ -60,6 +74,25 @@ static bool gen_rp_test_migrate_msix(void *opaque, int version_id)
+     return rp->migrate_msix;
+ }
+ 
++static void gen_rp_realize(DeviceState *d, Error **errp)
 +{
-+    pc_i440fx_2_11_machine_options(m);
-+    m->is_default = 0;
-+    m->alias = NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
++    GenPCIERootPortClass *grpc = GEN_PCIE_ROOT_PORT_GET_CLASS(d);
++    GenPCIERootPort *grp = GEN_PCIE_ROOT_PORT(d);
++    PCIDevice *pci_dev = PCI_DEVICE(d);
++
++    grpc->parent_realize(DEVICE(d), errp);
++    if (*errp) {
++        return;
++    }
++
++    if (!grp->enable_io_fwd) {
++        pci_word_test_and_clear_mask(pci_dev->wmask + PCI_COMMAND,
++                                     PCI_COMMAND_IO);
++        pci_dev->wmask[PCI_IO_BASE] = 0;
++        pci_dev->wmask[PCI_IO_LIMIT] = 0;
++    }
 +}
 +
- DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
-                       pc_i440fx_2_10_machine_options);
+ static const VMStateDescription vmstate_rp_dev = {
+     .name = "pcie-root-port",
+     .version_id = 1,
+@@ -78,6 +111,7 @@ static const VMStateDescription vmstate_rp_dev = {
  
- static void pc_i440fx_2_9_machine_options(MachineClass *m)
- {
-     pc_i440fx_2_10_machine_options(m);
--    m->is_default = 0;
--    m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
-     m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
- }
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index 169a214d50..c1cba584d1 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -302,10 +302,20 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->max_cpus = 288;
- }
+ static Property gen_rp_props[] = {
+     DEFINE_PROP_BOOL("x-migrate-msix", GenPCIERootPort, migrate_msix, true),
++    DEFINE_PROP_BOOL("enable-io-fwd", GenPCIERootPort, enable_io_fwd, false),
+     DEFINE_PROP_END_OF_LIST()
+ };
  
--static void pc_q35_2_10_machine_options(MachineClass *m)
-+static void pc_q35_2_11_machine_options(MachineClass *m)
- {
-     pc_q35_machine_options(m);
-     m->alias = "q35";
-+}
-+
-+DEFINE_Q35_MACHINE(v2_11, "pc-q35-2.11", NULL,
-+                   pc_q35_2_11_machine_options);
-+
-+static void pc_q35_2_10_machine_options(MachineClass *m)
-+{
-+    pc_q35_2_11_machine_options(m);
-+    m->alias = NULL;
-+    SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
-     m->numa_auto_assign_ram = numa_legacy_auto_assign_ram;
+@@ -86,6 +120,7 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
+     DeviceClass *dc = DEVICE_CLASS(klass);
+     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+     PCIERootPortClass *rpc = PCIE_ROOT_PORT_CLASS(klass);
++    GenPCIERootPortClass *grpc = GEN_PCIE_ROOT_PORT_CLASS(klass);
+ 
+     k->vendor_id = PCI_VENDOR_ID_REDHAT;
+     k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_RP;
+@@ -96,6 +131,8 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
+     rpc->interrupts_init = gen_rp_interrupts_init;
+     rpc->interrupts_uninit = gen_rp_interrupts_uninit;
+     rpc->aer_offset = GEN_PCIE_ROOT_PORT_AER_OFFSET;
++    grpc->parent_realize = dc->realize;
++    dc->realize = gen_rp_realize;
  }
  
-@@ -315,7 +325,6 @@ DEFINE_Q35_MACHINE(v2_10, "pc-q35-2.10", NULL,
- static void pc_q35_2_9_machine_options(MachineClass *m)
- {
-     pc_q35_2_10_machine_options(m);
--    m->alias = NULL;
-     SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
- }
+ static const TypeInfo gen_rp_dev_info = {
+@@ -103,6 +140,7 @@ static const TypeInfo gen_rp_dev_info = {
+     .parent        = TYPE_PCIE_ROOT_PORT,
+     .instance_size = sizeof(GenPCIERootPort),
+     .class_init    = gen_rp_dev_class_init,
++    .class_size    = sizeof(GenPCIERootPortClass),
+ };
  
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index d80859bfad..8226904524 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -369,6 +369,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
- int e820_get_num_entries(void);
- bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+  static void gen_rp_register_types(void)
+diff --git a/include/hw/compat.h b/include/hw/compat.h
+index 3e101f8f67..843bf4a3a5 100644
+--- a/include/hw/compat.h
++++ b/include/hw/compat.h
+@@ -2,7 +2,11 @@
+ #define HW_COMPAT_H
  
-+#define PC_COMPAT_2_10 \
-+    HW_COMPAT_2_10 \
-+
- #define PC_COMPAT_2_9 \
-     HW_COMPAT_2_9 \
+ #define HW_COMPAT_2_10 \
+-    /* empty */
++    {\
++        .driver   = "pcie-root-port",\
++        .property = "enable-io-fwd",\
++        .value    = "true",\
++    },
+ 
+ #define HW_COMPAT_2_9 \
      {\
 -- 
 2.13.5
