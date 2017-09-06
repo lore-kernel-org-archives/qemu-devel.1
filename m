@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56767)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpbBs-0002um-MS
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:20:32 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dpbCX-0003Pz-9Q
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:21:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpbBn-0001cQ-Ub
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:20:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60182)
+	(envelope-from <kraxel@redhat.com>) id 1dpbCW-0001op-Bh
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:21:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37398)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpbBn-0001cI-OG
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:20:23 -0400
-Date: Wed, 6 Sep 2017 16:20:19 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170906162019.45eeec4a.cohuck@redhat.com>
-In-Reply-To: <8946b1ec-4d14-c953-deab-aaded7cd2c9d@linux.vnet.ibm.com>
-References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
-	<20170830163609.50260-5-pasic@linux.vnet.ibm.com>
-	<20170831115535.1e4201d3.cohuck@redhat.com>
-	<7540741b-d230-e7c4-50d3-036f31997c8b@linux.vnet.ibm.com>
-	<20170905182546.00457332.cohuck@redhat.com>
-	<fe102a7a-e998-8ebe-b94d-e653c4f66c39@linux.vnet.ibm.com>
-	<20170906043108.GY31680@bjsdjshi@linux.vnet.ibm.com>
-	<8946b1ec-4d14-c953-deab-aaded7cd2c9d@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/9] s390x: refactor error handling for
- SSCH and RSCH
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dpbCW-0001np-3G
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:21:08 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 864D1883BB
+	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 14:21:05 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed,  6 Sep 2017 16:20:58 +0200
+Message-Id: <20170906142058.2460-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PATCH] virtio-gpu: don't clear QemuUIInfo information
+ on reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,46 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-On Wed, 6 Sep 2017 14:25:13 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+Don't reset window layout information (passed via virtio_gpu_ui_info) on
+device reset, so the user interface window layout will be kept intact
+over reboots.  The head size and position was commented out already, so
+this patch just drops the dead code.  Additionally the enabled head mask
+must be kept so multihead setups work properly too.
 
-> We have basically two possibilities/options which ask for different
-> handling:
-> 1) EFAULT is due to a bug in the vfio-ccw implementation
-> (can be QEMU or kernel).
-> 2) EFAULT is due to buggy channel program.
-> 
-> Option 2) is basically to be handled with a channel-program check and
-> setting primary secondary and alert status. For reference see PoP page
-> 15-59 ("Designation of Storage Area").  An exception may be an invalid
-> channel program address in the ORB. There the channel-program check ain't
-> explicitly stated (although) I would expect one. It may be implied by the
-> things on page 15-59 though.
-> 
-> Option 1) is however very similar to other we have figured out that the
-> implementation is broken situations and should be handled consequently.
-> The current state of the discussion is with a unit exception.
-> 
-> Does that make sense?
+Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1460595
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/virtio-gpu.c | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-I think the situation is slightly different here, though. For the orb
-flags, we reject something out of hand because we have not implemented
-it, and for that, unit exception sounds like a good fit. Processing
-errors, however, are more similar to errors in the hardware, and as
-such can probably be reported via something like equipment check.
-
-> 
-> Now, Dong Jia, I need your help to figure out do we have option 1 or
-> option 2 here? After quick look at the kernel code, it appears to me that
-> I've seen both option 1 and option 2 (I'm afraid) -- but my assessment
-> was really very superficial.
-> 
-> I would expect option 2 to be handled differently (kernel provides the
-> SCSW) though.
-> 
-> Regards,
-> Halil
-> 
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index f0761cf18b..622ee300f9 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -1195,17 +1195,6 @@ static void virtio_gpu_reset(VirtIODevice *vdev)
+         virtio_gpu_resource_destroy(g, res);
+     }
+     for (i = 0; i < g->conf.max_outputs; i++) {
+-#if 0
+-        g->req_state[i].x = 0;
+-        g->req_state[i].y = 0;
+-        if (i == 0) {
+-            g->req_state[0].width = 1024;
+-            g->req_state[0].height = 768;
+-        } else {
+-            g->req_state[i].width = 0;
+-            g->req_state[i].height = 0;
+-        }
+-#endif
+         g->scanout[i].resource_id = 0;
+         g->scanout[i].width = 0;
+         g->scanout[i].height = 0;
+@@ -1213,7 +1202,6 @@ static void virtio_gpu_reset(VirtIODevice *vdev)
+         g->scanout[i].y = 0;
+         g->scanout[i].ds = NULL;
+     }
+-    g->enabled_output_bitmask = 1;
+ 
+ #ifdef CONFIG_VIRGL
+     if (g->use_virgl_renderer) {
+-- 
+2.9.3
