@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56520)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56767)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dpbB9-0002Mx-9O
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:19:47 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dpbBs-0002um-MS
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:20:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dpbB5-0001Md-6T
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:19:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58402)
+	(envelope-from <cohuck@redhat.com>) id 1dpbBn-0001cQ-Ub
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:20:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60182)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dpbB5-0001MG-09
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:19:39 -0400
-Date: Wed, 6 Sep 2017 15:19:32 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170906141931.GC8457@work-vm>
-References: <20170825141940.20740-1-dgilbert@redhat.com>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpbBn-0001cI-OG
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 10:20:23 -0400
+Date: Wed, 6 Sep 2017 16:20:19 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170906162019.45eeec4a.cohuck@redhat.com>
+In-Reply-To: <8946b1ec-4d14-c953-deab-aaded7cd2c9d@linux.vnet.ibm.com>
+References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
+	<20170830163609.50260-5-pasic@linux.vnet.ibm.com>
+	<20170831115535.1e4201d3.cohuck@redhat.com>
+	<7540741b-d230-e7c4-50d3-036f31997c8b@linux.vnet.ibm.com>
+	<20170905182546.00457332.cohuck@redhat.com>
+	<fe102a7a-e998-8ebe-b94d-e653c4f66c39@linux.vnet.ibm.com>
+	<20170906043108.GY31680@bjsdjshi@linux.vnet.ibm.com>
+	<8946b1ec-4d14-c953-deab-aaded7cd2c9d@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170825141940.20740-1-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] Fix double loadvm failure
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/9] s390x: refactor error handling for
+ SSCH and RSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,30 +34,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, shorne@gmail.com, quintela@redhat.com, mreitz@redhat.com
-Cc: peterx@redhat.com, lvivier@redhat.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-* Dr. David Alan Gilbert (git) (dgilbert@redhat.com) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> lp: https://bugs.launchpad.net/qemu/+bug/1712564
-> 
-> Reported-by: Stafford Horne <shorne@gmail.com>
-> 
-> Dr. David Alan Gilbert (2):
->   migration: Reset rather than destroy main_thread_load_event
->   snapshot/tests: Try loadvm twice
-> 
->  migration/migration.c      | 2 +-
->  tests/qemu-iotests/068     | 2 +-
->  tests/qemu-iotests/068.out | 4 ++++
->  3 files changed, 6 insertions(+), 2 deletions(-)
+On Wed, 6 Sep 2017 14:25:13 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-Queued
+> We have basically two possibilities/options which ask for different
+> handling:
+> 1) EFAULT is due to a bug in the vfio-ccw implementation
+> (can be QEMU or kernel).
+> 2) EFAULT is due to buggy channel program.
+> 
+> Option 2) is basically to be handled with a channel-program check and
+> setting primary secondary and alert status. For reference see PoP page
+> 15-59 ("Designation of Storage Area").  An exception may be an invalid
+> channel program address in the ORB. There the channel-program check ain't
+> explicitly stated (although) I would expect one. It may be implied by the
+> things on page 15-59 though.
+> 
+> Option 1) is however very similar to other we have figured out that the
+> implementation is broken situations and should be handled consequently.
+> The current state of the discussion is with a unit exception.
+> 
+> Does that make sense?
 
-> -- 
-> 2.13.5
+I think the situation is slightly different here, though. For the orb
+flags, we reject something out of hand because we have not implemented
+it, and for that, unit exception sounds like a good fit. Processing
+errors, however, are more similar to errors in the hardware, and as
+such can probably be reported via something like equipment check.
+
 > 
+> Now, Dong Jia, I need your help to figure out do we have option 1 or
+> option 2 here? After quick look at the kernel code, it appears to me that
+> I've seen both option 1 and option 2 (I'm afraid) -- but my assessment
+> was really very superficial.
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> I would expect option 2 to be handled differently (kernel provides the
+> SCSW) though.
+> 
+> Regards,
+> Halil
+> 
