@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58324)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpV0d-0004nF-1h
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 03:44:27 -0400
+	(envelope-from <famz@redhat.com>) id 1dpV0f-0004oN-Uj
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 03:44:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpV0a-0004NO-Os
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 03:44:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46786)
+	(envelope-from <famz@redhat.com>) id 1dpV0e-0004Pg-UY
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 03:44:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57976)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dpV0a-0004NG-IB
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 03:44:24 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dpV0e-0004PC-Lu
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 03:44:28 -0400
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
 	[10.5.11.12])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 922365AFC7
-	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 07:44:23 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id AA144C04B92C
+	for <qemu-devel@nongnu.org>; Wed,  6 Sep 2017 07:44:27 +0000 (UTC)
 From: Fam Zheng <famz@redhat.com>
-Date: Wed,  6 Sep 2017 15:44:16 +0800
-Message-Id: <20170906074418.10903-2-famz@redhat.com>
+Date: Wed,  6 Sep 2017 15:44:17 +0800
+Message-Id: <20170906074418.10903-3-famz@redhat.com>
 In-Reply-To: <20170906074418.10903-1-famz@redhat.com>
 References: <20170906074418.10903-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/3] buildsys: Move nettle cflags/libs to
+Subject: [Qemu-devel] [PATCH v3 2/3] buildsys: Move gnutls cflags/libs to
  per object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -34,49 +34,76 @@ To: qemu-devel@nongnu.org
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- configure            | 5 ++---
- crypto/Makefile.objs | 6 ++++++
- 2 files changed, 8 insertions(+), 3 deletions(-)
+ configure              |  5 ++---
+ crypto/Makefile.objs   |  7 +++++++
+ tests/Makefile.include | 10 +++++-----
+ 3 files changed, 14 insertions(+), 8 deletions(-)
 
 diff --git a/configure b/configure
-index fb7e34a901..6a4cb3832b 100755
+index 6a4cb3832b..6d90e73a8b 100755
 --- a/configure
 +++ b/configure
-@@ -2616,9 +2616,6 @@ if test "$nettle" != "no"; then
-         nettle_cflags=$($pkg_config --cflags nettle)
-         nettle_libs=$($pkg_config --libs nettle)
-         nettle_version=$($pkg_config --modversion nettle)
--        libs_softmmu="$nettle_libs $libs_softmmu"
--        libs_tools="$nettle_libs $libs_tools"
--        QEMU_CFLAGS="$QEMU_CFLAGS $nettle_cflags"
-         nettle="yes"
+@@ -2472,9 +2472,6 @@ if test "$gnutls" != "no"; then
+     if gnutls_works; then
+         gnutls_cflags=$($pkg_config --cflags gnutls)
+         gnutls_libs=$($pkg_config --libs gnutls)
+-        libs_softmmu="$gnutls_libs $libs_softmmu"
+-        libs_tools="$gnutls_libs $libs_tools"
+-	QEMU_CFLAGS="$QEMU_CFLAGS $gnutls_cflags"
+         gnutls="yes"
  
-         cat > $TMPC << EOF
-@@ -5732,6 +5729,8 @@ if test "$nettle" = "yes" ; then
-   if test "$nettle_kdf" = "yes" ; then
-     echo "CONFIG_NETTLE_KDF=y" >> $config_host_mak
-   fi
-+  echo "NETTLE_CFLAGS=$nettle_cflags" >> $config_host_mak
-+  echo "NETTLE_LIBS=$nettle_libs" >> $config_host_mak
+ 	# gnutls_rnd requires >= 2.11.0
+@@ -5710,6 +5707,8 @@ fi
+ echo "CONFIG_TLS_PRIORITY=\"$tls_priority\"" >> $config_host_mak
+ if test "$gnutls" = "yes" ; then
+   echo "CONFIG_GNUTLS=y" >> $config_host_mak
++  echo "GNUTLS_CFLAGS=$gnutls_cflags" >> $config_host_mak
++  echo "GNUTLS_LIBS=$gnutls_libs" >> $config_host_mak
  fi
- if test "$tasn1" = "yes" ; then
-   echo "CONFIG_TASN1=y" >> $config_host_mak
+ if test "$gnutls_rnd" = "yes" ; then
+   echo "CONFIG_GNUTLS_RND=y" >> $config_host_mak
 diff --git a/crypto/Makefile.objs b/crypto/Makefile.objs
-index 2b99e08062..a936957d03 100644
+index a936957d03..0cb5fa24b6 100644
 --- a/crypto/Makefile.objs
 +++ b/crypto/Makefile.objs
-@@ -34,6 +34,12 @@ crypto-obj-y += block.o
- crypto-obj-y += block-qcow.o
- crypto-obj-y += block-luks.o
+@@ -40,6 +40,13 @@ $(if $(CONFIG_NETTLE), \
+ 		$(eval $x.o-libs := $(NETTLE_LIBS))) \
+ )
  
-+$(if $(CONFIG_NETTLE), \
-+	$(foreach x, cipher hash-nettle hmac-nettle pbkdf-nettle, \
-+		$(eval $x.o-cflags := $(NETTLE_CFLAGS)) \
-+		$(eval $x.o-libs := $(NETTLE_LIBS))) \
++$(if $(CONFIG_GNUTLS), \
++	$(foreach x, init random-gnutls tlscreds tlscredsanon \
++			tlscredsx509 tlssession, \
++		$(eval $x.o-cflags := $(GNUTLS_CFLAGS)) \
++		$(eval $x.o-libs := $(GNUTLS_LIBS))) \
 +)
 +
  # Let the userspace emulators avoid linking gnutls/etc
  crypto-aes-obj-y = aes.o
  
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index fae5715e9c..d46c22d1ec 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -677,15 +677,15 @@ tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-c
+ tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
+ tests/test-crypto-xts$(EXESUF): tests/test-crypto-xts.o $(test-crypto-obj-y)
+ 
+-tests/crypto-tls-x509-helpers.o-cflags := $(TASN1_CFLAGS)
+-tests/crypto-tls-x509-helpers.o-libs := $(TASN1_LIBS)
+-tests/pkix_asn1_tab.o-cflags := $(TASN1_CFLAGS)
++tests/crypto-tls-x509-helpers.o-cflags := $(TASN1_CFLAGS) $(GNUTLS_CFLAGS)
++tests/crypto-tls-x509-helpers.o-libs := $(TASN1_LIBS) $(GNUTLS_LIBS)
++tests/pkix_asn1_tab.o-cflags := $(TASN1_CFLAGS) $(GNUTLS_LIBS)
+ 
+-tests/test-crypto-tlscredsx509.o-cflags := $(TASN1_CFLAGS)
++tests/test-crypto-tlscredsx509.o-cflags := $(TASN1_CFLAGS) $(GNUTLS_CFLAGS)
+ tests/test-crypto-tlscredsx509$(EXESUF): tests/test-crypto-tlscredsx509.o \
+ 	tests/crypto-tls-x509-helpers.o tests/pkix_asn1_tab.o $(test-crypto-obj-y)
+ 
+-tests/test-crypto-tlssession.o-cflags := $(TASN1_CFLAGS)
++tests/test-crypto-tlssession.o-cflags := $(TASN1_CFLAGS) $(GNUTLS_CFLAGS)
+ tests/test-crypto-tlssession$(EXESUF): tests/test-crypto-tlssession.o \
+ 	tests/crypto-tls-x509-helpers.o tests/pkix_asn1_tab.o $(test-crypto-obj-y)
+ tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
 -- 
 2.13.5
