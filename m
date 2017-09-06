@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dpOJw-00045T-Bt
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 20:35:57 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dpOio-0007nk-2r
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:01:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bobby.prani@gmail.com>) id 1dpOJr-0001a7-Qe
-	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 20:35:56 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dpOim-0000bH-Af
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:01:38 -0400
+Received: from mail-pg0-x243.google.com ([2607:f8b0:400e:c05::243]:38213)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dpOil-0000ZB-Vy
+	for qemu-devel@nongnu.org; Tue, 05 Sep 2017 21:01:36 -0400
+Received: by mail-pg0-x243.google.com with SMTP id t3so2740999pgt.5
+	for <qemu-devel@nongnu.org>; Tue, 05 Sep 2017 18:01:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87lgltmjzl.fsf@linaro.org>
-References: <20170829063313.10237-1-bobby.prani@gmail.com>
-	<87lgltmjzl.fsf@linaro.org>
-From: Pranith Kumar <bobby.prani@gmail.com>
-Date: Tue, 5 Sep 2017 20:35:14 -0400
-Message-ID: <CAJhHMCBy-rh9o+HymcVVHh4RGcHbrVzQXK7rtvRf2aJ-afSSiw@mail.gmail.com>
+References: <1503013010-11500-1-git-send-email-zuban32s@gmail.com>
+	<fafa3ece-f7f7-99d5-adfb-b56e890cf03b@redhat.com>
+	<20170823053949-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20170823053949-mutt-send-email-mst@kernel.org>
+From: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Date: Wed, 06 Sep 2017 01:01:23 +0000
+Message-ID: <CAKSfGUAEjTGf0k77Pg_8eZkLagMCCb823-N1W4L3VknEJKHHfA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/5] target/arm: Remove stale comment
+Subject: Re: [Qemu-devel] [PATCH v7 0/4] Generic PCIE-PCI Bridge
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,25 +30,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, "open list:ARM" <qemu-arm@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: lersek@redhat.com, qemu-devel@nongnu.org, seabios@seabios.org
 
-Hi Alex,
+=D1=81=D1=80, 23 =D0=B0=D0=B2=D0=B3. 2017 =D0=B3. =D0=B2 5:46, Michael S. T=
+sirkin <mst@redhat.com>:
 
-On Tue, Sep 5, 2017 at 8:02 AM, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
-rote:
+> On Tue, Aug 22, 2017 at 02:43:39PM +0300, Marcel Apfelbaum wrote:
+> > On 18/08/2017 2:36, Aleksandr Bezzubikov wrote:
+> > > This series introduces a new device - Generic PCI Express to PCI
+> bridge,
+> > > and also makes all necessary changes to enable hotplug of the bridge
+> itself
+> > > and any device into the bridge.
+> > >
+> >
+> > Hi,
+> >
+> > Series
+> >    Tested-by: Marcel Apfelbaum <marcel@redhat.com>
+> > (focused on changes from v6)
+> >
+> >
+> > Michael, will Alecsandr need to re-send it after freeze?
 >
-> Pranith Kumar <bobby.prani@gmail.com> writes:
->
->> Update the comment which is not true since MTTCG.
->
-> What happened to the cover letter? We seem to have a mix of patches but
-> no summary of the overall outcome.
->
+> re-send or ping pls.
 
-These are a bunch of unrelated patches, so there is no theme. I will
-include a cover letter saying so from now on.
 
-Thanks,
+Michael, it seems that freeze is over, so you can pick this patches.
+
+
+>
+> > I am asking because the GSOC project is ending in a week or so.
+> >
+> >
+> > Thanks,
+> > Marcel
+> >
+> > > Changes v6->v7:
+> > > Change IO/MEM/PREF reservation properties type to SIZE.
+> > >
+> > > Changes v5->v6:
+> > > 1. Fix indentation in the cap creation function (addresses Marcel's
+> comment)
+> > > 2. Simplify capability pref_mem_* fields assignment (addresses
+> Marcel's comment)
+> > > 3. Documentation fixes:
+> > >     - fix mutually exclusive fields definition (addresses Laszlo's
+> comment)
+> > >     - fix pcie-pci-bridge usage example (addresses Marcel's comment)
+> > >
+> > > Changes v4->v5:
+> > > 1. Change PCIE-PCI Bridge license (addresses Marcel's comment)
+> > > 2. The capability layout changes (adress Laszlo' comments):
+> > >      - separate pref_mem into pref_mem_32 and pref_mem_64 fields
+> (SeaBIOS side has the same changes)
+> > >      - accordingly change the Generic Root Port's properties
+> > > 3. Do not add the capability to the root port if no valid values are
+> provided (adresses Michael's comment)
+> > > 4. Rename the capability type to 'RESOURCE_RESERVE' (addresses
+> Marcel's comment)
+> > > 5. Remove shpc_present check function (addresses Marcel's comment)
+> > > 6. Fix the 4th patch message (adresses Michael's comment)
+> > > 7. Patch for SHPC enabling in _OSC method has been already merged
+> > >
+> > > Changes v3->v4:
+> > > 1. PCIE-PCI Bridge device: "msi_enable"->"msi", "shpc"->"shpc_bar",
+> remove local_err,
+> > >     make "msi" property OnOffAuto, shpc_present() is still here
+> > >     to avoid SHPC_VMSTATE refactoring (address Marcel's comments).
+> > > 2. Change QEMU PCI capability layout (SeaBIOS side has the same
+> changes):
+> > >    - change reservation fields types: bus_res - uint32_t, others -
+> uint64_t
+> > >    - rename 'non_pref' and 'pref' fields
+> > >    - interpret -1 value as 'ignore'
+> > > 3. Use parent_realize in Generic PCI Express Root Port properly.
+> > > 4. Fix documentation: fully replace the DMI-PCI bridge references wit=
+h
+> the new PCIE-PCI bridge,
+> > > "PCIE"->"PCI Express", small mistakes and typos - address Laszlo's an=
+d
+> Marcel's comments.
+> > > 5. Rename QEMU PCI cap creation fucntion - addresses Marcel's comment=
+.
+> > >
+> > > Changes v2->v3:
+> > > (0). 'do_not_use' capability field flag is still _not_ in here since
+> we haven't come to consesus on it yet.
+> > > 1. Merge commits 5 (bus_reserve property creation) and 6 (property
+> usage) together - addresses Michael's comment.
+> > > 2. Add 'bus_reserve' property and QEMU PCI capability only to Generic
+> PCIE Root Port - addresses Michael's and Marcel's comments.
+> > > 3. Change 'bus_reserve' property's default value to 0 - addresses
+> Michael's comment.
+> > > 4. Rename QEMU bridge-specific PCI capability creation function -
+> addresses Michael's comment.
+> > > 5. Init the whole QEMU PCI capability with zeroes - addresses
+> Michael's and Laszlo's comments.
+> > > 6. Change QEMU PCI capability layout (SeaBIOS side has the same
+> changes)
+> > >    - add 'type' field to distinguish multiple
+> > >      RedHat-specific capabilities - addresses Michael's comment
+> > >    - do not mimi=D1=81 PCI Config space register layout, but use mutu=
+ally
+> exclusive differently
+> > >      sized fields for IO and prefetchable memory limits - addresses
+> Laszlo's comment
+> > > 7. Correct error handling in PCIE-PCI bridge realize function.
+> > > 8. Replace a '2' constant with PCI_CAP_FLAGS in the capability
+> creation function - addresses Michael's comment.
+> > > 9. Remove a comment on _OSC which isn't correct anymore - address
+> Marcel's comment.
+> > > 10. Add documentation for the Generic PCIE-PCI Bridge and QEMU PCI
+> capability - addresses Michael's comment.
+> > >
+> > > Changes v1->v2:
+> > > 1. Enable SHPC for the bridge.
+> > > 2. Enable SHPC support for the Q35 machine (ACPI stuff).
+> > > 3. Introduce PCI capability to help firmware on the system init.
+> > >     This allows the bridge to be hotpluggable. Now it's supported
+> > >     only for pcie-root-port. Now it's supposed to used with
+> > >     SeaBIOS only, look at the SeaBIOS corresponding series
+> > >     "Allow RedHat PCI bridges reserve more buses than necessary durin=
+g
+> init".
+> > >
+> > > Aleksandr Bezzubikov (4):
+> > >    hw/pci: introduce pcie-pci-bridge device
+> > >    hw/pci: introduce bridge-only vendor-specific capability to provid=
+e
+> > >      some hints to firmware
+> > >    hw/pci: add QEMU-specific PCI capability to the Generic PCI Expres=
+s
+> > >      Root Port
+> > >    docs: update documentation considering PCIE-PCI bridge
+> > >
+> > >   docs/pcie.txt                      |  49 +++++-----
+> > >   docs/pcie_pci_bridge.txt           | 114 ++++++++++++++++++++++
+> > >   hw/pci-bridge/Makefile.objs        |   2 +-
+> > >   hw/pci-bridge/gen_pcie_root_port.c |  36 +++++++
+> > >   hw/pci-bridge/pcie_pci_bridge.c    | 192
+> +++++++++++++++++++++++++++++++++++++
+> > >   hw/pci/pci_bridge.c                |  46 +++++++++
+> > >   include/hw/pci/pci.h               |   1 +
+> > >   include/hw/pci/pci_bridge.h        |  25 +++++
+> > >   include/hw/pci/pcie_port.h         |   1 +
+> > >   9 files changed, 442 insertions(+), 24 deletions(-)
+> > >   create mode 100644 docs/pcie_pci_bridge.txt
+> > >   create mode 100644 hw/pci-bridge/pcie_pci_bridge.c
+> > >
+>
 --=20
-Pranith
+Aleksandr Bezzubikov
