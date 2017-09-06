@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dpXLU-0006Fx-GB
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:14:14 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dpXQS-0007eL-As
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:19:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dpXLO-0000ty-J5
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:14:08 -0400
-References: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<809da3cc-4051-cb39-7f6a-2355013d3f9a@redhat.com>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <4cbf1e77-a32e-ec81-2eeb-31f3a596ae83@huawei.com>
-Date: Wed, 6 Sep 2017 12:12:41 +0200
+	(envelope-from <kwolf@redhat.com>) id 1dpXQN-0004Bp-Dl
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 06:19:16 -0400
+Date: Wed, 6 Sep 2017 12:19:05 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170906101905.GD3753@dhcp-200-186.str.redhat.com>
+References: <20170906085006.26983-1-rjones@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <809da3cc-4051-cb39-7f6a-2355013d3f9a@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v10 0/6] fsdev: qmp interface for io
- throttling
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170906085006.26983-1-rjones@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10] qemu-options: Document the -drive
+ locking parameter.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,34 +23,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
-Cc: alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org, "kwolf@redhat.com" <kwolf@redhat.com>, qemu block <qemu-block@nongnu.org>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, famz@redhat.com, qemu-trivial@nongnu.org, mjt@tls.msk.ru
 
-On 9/5/2017 11:19 PM, Eric Blake wrote:
-> On 09/04/2017 11:07 AM, Pradeep Jagadeesh wrote:
->> These patches provide the qmp interface, to query the io throttle
->> status of the all fsdev devices that are present in a vm.
->> also, it provides an interface to set the io throttle parameters of a
->> fsdev to a required value. some of the patches also remove the duplicate
->> code that was present in block and fsdev files.
->>
->> Pradeep Jagadeesh (6):
->>   throttle: factor out duplicate code
->>   qmp: Create IOThrottle structure
->>   throttle: move out function to reuse the code
->>   hmp: create a throttle initialization function for code reusability
->>   fsdev: QMP interface for throttling
->>   fsdev: hmp interface for throttling
->
-> I know you're already up to v10, but your code changes conflict with
-> Manos throttling work, which has now landed on Kevin's branch:
->
-> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01051.html
->
-> T: git git://repo.or.cz/qemu/kevin.git block
->
-> How hard is it for you to post a rebased v11 on top of Manos' work?
->
-Hmm, I will try. No idea, how long its gonna take.
+Am 06.09.2017 um 10:50 hat Richard W.M. Jones geschrieben:
+> Commit 16b48d5d66d2 ("file-posix: Add 'locking' option") added this
+> option, but as it was not documented in the -help output it was not
+> easily possible to tell if a particular qemu binary supports it.
+> 
+> Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+> ---
+>  qemu-options.hx | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/qemu-options.hx b/qemu-options.hx
+> index 9f6e2adfff..f8f95eb498 100644
+> --- a/qemu-options.hx
+> +++ b/qemu-options.hx
+> @@ -796,7 +796,7 @@ DEF("drive", HAS_ARG, QEMU_OPTION_drive,
+>      "       [,cache=writethrough|writeback|none|directsync|unsafe][,format=f]\n"
+>      "       [,serial=s][,addr=A][,rerror=ignore|stop|report]\n"
+>      "       [,werror=ignore|stop|report|enospc][,id=name][,aio=threads|native]\n"
+> -    "       [,readonly=on|off][,copy-on-read=on|off]\n"
+> +    "       [,readonly=on|off][,copy-on-read=on|off][,locking=off|auto|on]\n"
+>      "       [,discard=ignore|unmap][,detect-zeroes=on|off|unmap]\n"
+>      "       [[,bps=b]|[[,bps_rd=r][,bps_wr=w]]]\n"
+>      "       [[,iops=i]|[[,iops_rd=r][,iops_wr=w]]]\n"
 
--Pradeep
+'locking' is a driver-specific option and not universally available for
+all images, so it shouldn't be included here.
+
+Of course, you're right that driver-specific options should be
+documented somewhere, and currently that's only in the QAPI schema for
+blockdev-add, which isn't quite satisfying. Maybe adding them to the
+'qemu-block-drivers' man page could work (which currently only contains
+'qemu-img create' options).
+
+Kevin
