@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41906)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpcqn-0000MH-BZ
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:55 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dpcqm-0000LW-Qf
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dpcqk-0002fj-0s
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:49 -0400
-Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:35580)
+	(envelope-from <richard.henderson@linaro.org>) id 1dpcqi-0002cX-CW
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:48 -0400
+Received: from mail-pf0-x234.google.com ([2607:f8b0:400e:c00::234]:34783)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dpcqj-0002dc-Ml
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:45 -0400
-Received: by mail-pg0-x22d.google.com with SMTP id 188so12738604pgb.2
-	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 09:06:45 -0700 (PDT)
+	id 1dpcqi-0002bQ-6n
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 12:06:44 -0400
+Received: by mail-pf0-x234.google.com with SMTP id m1so13485760pfk.1
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 09:06:44 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Wed,  6 Sep 2017 09:06:02 -0700
-Message-Id: <20170906160612.22769-23-richard.henderson@linaro.org>
+Date: Wed,  6 Sep 2017 09:06:01 -0700
+Message-Id: <20170906160612.22769-22-richard.henderson@linaro.org>
 In-Reply-To: <20170906160612.22769-1-richard.henderson@linaro.org>
 References: <20170906160612.22769-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 22/32] target/arm: [tcg] Port to translate_insn
+Subject: [Qemu-devel] [PULL 21/32] target/arm: [tcg,
+ a64] Port to breakpoint_check
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,234 +39,97 @@ Incrementally paves the way towards using the generic instruction translation
 loop.
 
 Reviewed-by: Emilio G. Cota <cota@braap.org>
+Reviewed-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-Message-Id: <150002485863.22386.13949856269576226529.stgit@frigg.lan>
-[rth: Adjust for translate_insn interface change.]
+Message-Id: <150002461630.22386.14827196109258040543.stgit@frigg.lan>
+[rth: Use DISAS_TOO_MANY for "execute only one more" after bp.]
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/arm/translate.h |   1 +
- target/arm/translate.c | 165 +++++++++++++++++++++++++++----------------------
- 2 files changed, 91 insertions(+), 75 deletions(-)
+ target/arm/translate-a64.c | 48 ++++++++++++++++++++++++++++++----------------
+ 1 file changed, 31 insertions(+), 17 deletions(-)
 
-diff --git a/target/arm/translate.h b/target/arm/translate.h
-index a804ff65ac..e8dcec51ac 100644
---- a/target/arm/translate.h
-+++ b/target/arm/translate.h
-@@ -9,6 +9,7 @@ typedef struct DisasContext {
-     DisasContextBase base;
- 
-     target_ulong pc;
-+    target_ulong next_page_start;
-     uint32_t insn;
-     /* Nonzero if this instruction has been conditionally skipped.  */
-     int condjmp;
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 2f5f65310d..5737299943 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -11880,6 +11880,8 @@ static int arm_tr_init_disas_context(DisasContextBase *dcbase,
-     dc->is_ldex = false;
-     dc->ss_same_el = false; /* Can't be true since EL_d must be AArch64 */
- 
-+    dc->next_page_start =
-+        (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
- 
-     cpu_F0s = tcg_temp_new_i32();
-     cpu_F1s = tcg_temp_new_i32();
-@@ -11973,14 +11975,93 @@ static bool arm_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
-     return true;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 1eab10696c..e94198280d 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -11267,6 +11267,30 @@ static void aarch64_tr_insn_start(DisasContextBase *dcbase, CPUState *cpu)
+     tcg_gen_insn_start(dc->pc, 0, 0);
  }
  
-+static void arm_tr_translate_insn(DisasContextBase *dcbase, CPUState *cpu)
++static bool aarch64_tr_breakpoint_check(DisasContextBase *dcbase, CPUState *cpu,
++                                        const CPUBreakpoint *bp)
 +{
 +    DisasContext *dc = container_of(dcbase, DisasContext, base);
-+    CPUARMState *env = cpu->env_ptr;
 +
-+#ifdef CONFIG_USER_ONLY
-+    /* Intercept jump to the magic kernel page.  */
-+    if (dc->pc >= 0xffff0000) {
-+        /* We always get here via a jump, so know we are not in a
-+           conditional execution block.  */
-+        gen_exception_internal(EXCP_KERNEL_TRAP);
-+        dc->base.is_jmp = DISAS_NORETURN;
-+        return;
-+    }
-+#endif
-+
-+    if (dc->ss_active && !dc->pstate_ss) {
-+        /* Singlestep state is Active-pending.
-+         * If we're in this state at the start of a TB then either
-+         *  a) we just took an exception to an EL which is being debugged
-+         *     and this is the first insn in the exception handler
-+         *  b) debug exceptions were masked and we just unmasked them
-+         *     without changing EL (eg by clearing PSTATE.D)
-+         * In either case we're going to take a swstep exception in the
-+         * "did not step an insn" case, and so the syndrome ISV and EX
-+         * bits should be zero.
-+         */
-+        assert(dc->base.num_insns == 1);
-+        gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
-+                      default_exception_el(dc));
-+        dc->base.is_jmp = DISAS_NORETURN;
-+        return;
-+    }
-+
-+    if (dc->thumb) {
-+        disas_thumb_insn(env, dc);
-+        if (dc->condexec_mask) {
-+            dc->condexec_cond = (dc->condexec_cond & 0xe)
-+                | ((dc->condexec_mask >> 4) & 1);
-+            dc->condexec_mask = (dc->condexec_mask << 1) & 0x1f;
-+            if (dc->condexec_mask == 0) {
-+                dc->condexec_cond = 0;
-+            }
-+        }
++    if (bp->flags & BP_CPU) {
++        gen_a64_set_pc_im(dc->pc);
++        gen_helper_check_breakpoints(cpu_env);
++        /* End the TB early; it likely won't be executed */
++        dc->base.is_jmp = DISAS_TOO_MANY;
 +    } else {
-+        unsigned int insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
++        gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
++        /* The address covered by the breakpoint must be
++           included in [tb->pc, tb->pc + tb->size) in order
++           to for it to be properly cleared -- thus we
++           increment the PC here so that the logic setting
++           tb->size below does the right thing.  */
 +        dc->pc += 4;
-+        disas_arm_insn(dc, insn);
++        dc->base.is_jmp = DISAS_NORETURN;
 +    }
 +
-+    if (dc->condjmp && !dc->base.is_jmp) {
-+        gen_set_label(dc->condlabel);
-+        dc->condjmp = 0;
-+    }
-+
-+    if (dc->base.is_jmp == DISAS_NEXT) {
-+        /* Translation stops when a conditional branch is encountered.
-+         * Otherwise the subsequent code could get translated several times.
-+         * Also stop translation when a page boundary is reached.  This
-+         * ensures prefetch aborts occur at the right place.  */
-+
-+        if (is_singlestepping(dc)) {
-+            dc->base.is_jmp = DISAS_TOO_MANY;
-+        } else if ((dc->pc >= dc->next_page_start) ||
-+                   ((dc->pc >= dc->next_page_start - 3) &&
-+                    insn_crosses_page(env, dc))) {
-+            /* We want to stop the TB if the next insn starts in a new page,
-+             * or if it spans between this page and the next. This means that
-+             * if we're looking at the last halfword in the page we need to
-+             * see if it's a 16-bit Thumb insn (which will fit in this TB)
-+             * or a 32-bit Thumb insn (which won't).
-+             * This is to avoid generating a silly TB with a single 16-bit insn
-+             * in it at the end of this page (which would execute correctly
-+             * but isn't very efficient).
-+             */
-+            dc->base.is_jmp = DISAS_TOO_MANY;
-+        }
-+    }
-+
-+    dc->base.pc_next = dc->pc;
++    return true;
 +}
 +
- /* generate intermediate code for basic block 'tb'.  */
- void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
+ void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+                                TranslationBlock *tb)
  {
--    CPUARMState *env = cs->env_ptr;
-     DisasContext dc1, *dc = &dc1;
--    target_ulong next_page_start;
-     int max_insns;
--    bool end_of_page;
- 
-     /* generate intermediate code */
- 
-@@ -11999,7 +12080,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-     dc->base.num_insns = 0;
-     dc->base.singlestep_enabled = cs->singlestep_enabled;
- 
--    next_page_start = (dc->base.pc_first & TARGET_PAGE_MASK) + TARGET_PAGE_SIZE;
-     max_insns = tb->cflags & CF_COUNT_MASK;
-     if (max_insns == 0) {
-         max_insns = CF_COUNT_MASK;
-@@ -12036,83 +12116,18 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb)
-             gen_io_start();
+@@ -11303,25 +11327,15 @@ void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+         if (unlikely(!QTAILQ_EMPTY(&cs->breakpoints))) {
+             CPUBreakpoint *bp;
+             QTAILQ_FOREACH(bp, &cs->breakpoints, entry) {
+-                if (bp->pc == dc->pc) {
+-                    if (bp->flags & BP_CPU) {
+-                        gen_a64_set_pc_im(dc->pc);
+-                        gen_helper_check_breakpoints(cpu_env);
+-                        /* End the TB early; it likely won't be executed */
+-                        dc->base.is_jmp = DISAS_UPDATE;
+-                    } else {
+-                        gen_exception_internal_insn(dc, 0, EXCP_DEBUG);
+-                        /* The address covered by the breakpoint must be
+-                           included in [dc->base.tb->pc, dc->base.tb->pc + dc->base.tb->size) in order
+-                           to for it to be properly cleared -- thus we
+-                           increment the PC here so that the logic setting
+-                           dc->base.tb->size below does the right thing.  */
+-                        dc->pc += 4;
+-                        goto done_generating;
++                if (bp->pc == dc->base.pc_next) {
++                    if (aarch64_tr_breakpoint_check(&dc->base, cs, bp)) {
++                        break;
+                     }
+-                    break;
+                 }
+             }
++            if (dc->base.is_jmp > DISAS_TOO_MANY) {
++                break;
++            }
          }
  
--#ifdef CONFIG_USER_ONLY
--        /* Intercept jump to the magic kernel page.  */
--        if (dc->pc >= 0xffff0000) {
--            /* We always get here via a jump, so know we are not in a
--               conditional execution block.  */
--            gen_exception_internal(EXCP_KERNEL_TRAP);
--            dc->base.is_jmp = DISAS_NORETURN;
--            break;
--        }
--#endif
--
--        if (dc->ss_active && !dc->pstate_ss) {
--            /* Singlestep state is Active-pending.
--             * If we're in this state at the start of a TB then either
--             *  a) we just took an exception to an EL which is being debugged
--             *     and this is the first insn in the exception handler
--             *  b) debug exceptions were masked and we just unmasked them
--             *     without changing EL (eg by clearing PSTATE.D)
--             * In either case we're going to take a swstep exception in the
--             * "did not step an insn" case, and so the syndrome ISV and EX
--             * bits should be zero.
--             */
--            assert(dc->base.num_insns == 1);
--            gen_exception(EXCP_UDEF, syn_swstep(dc->ss_same_el, 0, 0),
--                          default_exception_el(dc));
--            dc->base.is_jmp = DISAS_NORETURN;
--            break;
--        }
--
--        if (dc->thumb) {
--            disas_thumb_insn(env, dc);
--            if (dc->condexec_mask) {
--                dc->condexec_cond = (dc->condexec_cond & 0xe)
--                                   | ((dc->condexec_mask >> 4) & 1);
--                dc->condexec_mask = (dc->condexec_mask << 1) & 0x1f;
--                if (dc->condexec_mask == 0) {
--                    dc->condexec_cond = 0;
--                }
--            }
--        } else {
--            unsigned int insn = arm_ldl_code(env, dc->pc, dc->sctlr_b);
--            dc->pc += 4;
--            disas_arm_insn(dc, insn);
--        }
--
--        if (dc->condjmp && !dc->base.is_jmp) {
--            gen_set_label(dc->condlabel);
--            dc->condjmp = 0;
--        }
-+        arm_tr_translate_insn(&dc->base, cs);
- 
-         if (tcg_check_temp_count()) {
-             fprintf(stderr, "TCG temporary leak before "TARGET_FMT_lx"\n",
-                     dc->pc);
+         if (dc->base.num_insns == max_insns && (dc->base.tb->cflags & CF_LAST_IO)) {
+@@ -11392,6 +11406,7 @@ void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
+     } else {
+         switch (dc->base.is_jmp) {
+         case DISAS_NEXT:
++        case DISAS_TOO_MANY:
+             gen_goto_tb(dc, 1, dc->pc);
+             break;
+         case DISAS_JUMP:
+@@ -11429,7 +11444,6 @@ void gen_intermediate_code_a64(DisasContextBase *dcbase, CPUState *cs,
          }
+     }
  
--        /* Translation stops when a conditional branch is encountered.
--         * Otherwise the subsequent code could get translated several times.
--         * Also stop translation when a page boundary is reached.  This
--         * ensures prefetch aborts occur at the right place.  */
--
--        /* We want to stop the TB if the next insn starts in a new page,
--         * or if it spans between this page and the next. This means that
--         * if we're looking at the last halfword in the page we need to
--         * see if it's a 16-bit Thumb insn (which will fit in this TB)
--         * or a 32-bit Thumb insn (which won't).
--         * This is to avoid generating a silly TB with a single 16-bit insn
--         * in it at the end of this page (which would execute correctly
--         * but isn't very efficient).
--         */
--        end_of_page = (dc->pc >= next_page_start) ||
--            ((dc->pc >= next_page_start - 3) && insn_crosses_page(env, dc));
--
--    } while (!dc->base.is_jmp && !tcg_op_buf_full() &&
--             !is_singlestepping(dc) &&
--             !singlestep &&
--             !end_of_page &&
--             dc->base.num_insns < max_insns);
-+        if (!dc->base.is_jmp && (tcg_op_buf_full() || singlestep ||
-+                            dc->base.num_insns >= max_insns)) {
-+            dc->base.is_jmp = DISAS_TOO_MANY;
-+        }
-+    } while (!dc->base.is_jmp);
+-done_generating:
+     gen_tb_end(tb, dc->base.num_insns);
  
-     if (tb->cflags & CF_LAST_IO) {
-         if (dc->condjmp) {
+ #ifdef DEBUG_DISAS
 -- 
 2.13.5
