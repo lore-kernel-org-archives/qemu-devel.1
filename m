@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpejT-0006gd-OV
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:07:28 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dpemq-0008KQ-SN
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:10:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpejP-0008Sg-Fb
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:07:23 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:56132)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dpejP-0008PE-4n
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:07:19 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed,  6 Sep 2017 21:07:06 +0300
-Message-Id: <150472122675.24907.11597641982841030964.stgit@frigg.lan>
-In-Reply-To: <150471856141.24907.274176769201097378.stgit@frigg.lan>
-References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
+	(envelope-from <richard.henderson@linaro.org>) id 1dpemm-0002Zs-8q
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:10:52 -0400
+Received: from mail-pg0-x234.google.com ([2607:f8b0:400e:c05::234]:34616)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dpemm-0002Zd-0z
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:10:48 -0400
+Received: by mail-pg0-x234.google.com with SMTP id q68so713089pgq.1
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 11:10:47 -0700 (PDT)
+References: <1502196172-13818-1-git-send-email-peter.maydell@linaro.org>
+	<CAFEAcA9MLp8kUihyujJKBLUr=HNtHhy+d2VCE_6NdyxVe6RXwA@mail.gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <6f781530-bddd-e78d-e66b-c5110892c1cc@linaro.org>
+Date: Wed, 6 Sep 2017 11:10:44 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 11/20] instrument: Track vCPUs
+In-Reply-To: <CAFEAcA9MLp8kUihyujJKBLUr=HNtHhy+d2VCE_6NdyxVe6RXwA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/alpha: Switch to
+ do_transaction_failed() hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,175 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
+To: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: "patches@linaro.org" <patches@linaro.org>, Richard Henderson <rth@twiddle.net>
 
-Keep a translation between instrumentation's QICPU and CPUState objects t=
-o avoid
-exposing QEMU's internals to instrumentation clients.
+On 09/05/2017 08:54 AM, Peter Maydell wrote:
+> On 8 August 2017 at 13:42, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> Switch the alpha target from the old unassigned_access hook
+>> to the new do_transaction_failed hook. This allows us to
+>> resolve a ??? in the old hook implementation.
+>>
+>> The only part of the alpha target that does physical
+>> memory accesses is reading the page table -- add a
+>> TODO comment there to the effect that we should handle
+>> bus faults on page table walks. (Since the palcode
+>> doesn't actually do anything useful on a bus fault anyway
+>> it's a bit moot for now.)
+>>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+>> ---
+>> Based-on: 1501867249-1924-1-git-send-email-peter.maydell@linaro.org
+>> This patch sits on top of the series adding the new hook.
+> 
+> The prerequisites for this patch are now all in git master.
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- cpus-common.c            |    9 +++++++++
- instrument/control.c     |   22 ++++++++++++++++++++++
- instrument/control.h     |   32 ++++++++++++++++++++++++++++++++
- instrument/control.inc.h |   23 +++++++++++++++++++++++
- 4 files changed, 86 insertions(+)
+Thanks.  Queued to tgt-axp.
 
-diff --git a/cpus-common.c b/cpus-common.c
-index 59f751ecf9..ec5f46cc3d 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -22,6 +22,9 @@
- #include "exec/cpu-common.h"
- #include "qom/cpu.h"
- #include "sysemu/cpus.h"
-+#if defined(CONFIG_INSTRUMENT)
-+#include "instrument/control.h"
-+#endif
-=20
- static QemuMutex qemu_cpu_list_lock;
- static QemuCond exclusive_cond;
-@@ -84,6 +87,9 @@ void cpu_list_add(CPUState *cpu)
-     } else {
-         assert(!cpu_index_auto_assigned);
-     }
-+#if defined(CONFIG_INSTRUMENT)
-+    instr_cpu_add(cpu);
-+#endif
-     QTAILQ_INSERT_TAIL(&cpus, cpu, node);
-     qemu_mutex_unlock(&qemu_cpu_list_lock);
-=20
-@@ -102,6 +108,9 @@ void cpu_list_remove(CPUState *cpu)
-     assert(!(cpu_index_auto_assigned && cpu !=3D QTAILQ_LAST(&cpus, CPUT=
-ailQ)));
-=20
-     QTAILQ_REMOVE(&cpus, cpu, node);
-+#if defined(CONFIG_INSTRUMENT)
-+    instr_cpu_remove(cpu);
-+#endif
-     cpu->cpu_index =3D UNASSIGNED_CPU_INDEX;
-     qemu_mutex_unlock(&qemu_cpu_list_lock);
- }
-diff --git a/instrument/control.c b/instrument/control.c
-index 2c2781beeb..83453ea561 100644
---- a/instrument/control.c
-+++ b/instrument/control.c
-@@ -13,10 +13,32 @@
- #include "instrument/load.h"
- #include "instrument/qemu-instr/control.h"
- #include "instrument/qemu-instr/visibility.h"
-+#include "qom/cpu.h"
-+
-=20
- __thread InstrState instr_cur_state;
-=20
-=20
-+unsigned int instr_cpus_count;
-+CPUState **instr_cpus;
-+
-+void instr_cpu_add(CPUState *vcpu)
-+{
-+    unsigned int idx =3D vcpu->cpu_index;
-+    if (idx >=3D instr_cpus_count) {
-+        instr_cpus_count =3D idx + 1;
-+        instr_cpus =3D realloc(instr_cpus, sizeof(*instr_cpus) * instr_c=
-pus_count);
-+    }
-+    instr_cpus[idx] =3D vcpu;
-+}
-+
-+void instr_cpu_remove(CPUState *vcpu)
-+{
-+    unsigned int idx =3D vcpu->cpu_index;
-+    instr_cpus[idx] =3D NULL;
-+}
-+
-+
- qi_fini_fn instr_event__fini_fn;
- void *instr_event__fini_data;
-=20
-diff --git a/instrument/control.h b/instrument/control.h
-index f2b085f69b..0c37692465 100644
---- a/instrument/control.h
-+++ b/instrument/control.h
-@@ -10,6 +10,38 @@
- #ifndef INSTRUMENT__CONTROL_H
- #define INSTRUMENT__CONTROL_H
-=20
-+#include "qemu/typedefs.h"
-+#include "instrument/qemu-instr/types.h"
-+
-+
-+/**
-+ * instr_cpu_add:
-+ *
-+ * Make @vcpu available to instrumentation clients.
-+ */
-+void instr_cpu_add(CPUState *vcpu);
-+
-+/**
-+ * instr_cpu_remove:
-+ *
-+ * Make @vcpu unavailable to instrumentation clients.
-+ */
-+void instr_cpu_remove(CPUState *vcpu);
-+
-+/**
-+ * instr_cpu_get:
-+ *
-+ * Get the #CPUState corresponding to the given #QICPU.
-+ */
-+static inline CPUState *instr_cpu_get(QICPU vcpu);
-+
-+/**
-+ * instr_cpu_set:
-+ *
-+ * Get the #QICPU corresponding to the given #CPUState.
-+ */
-+static inline QICPU instr_cpu_set(CPUState *vcpu);
-+
-=20
- /**
-  * InstrState:
-diff --git a/instrument/control.inc.h b/instrument/control.inc.h
-index 0f649f4caa..18ae6a34cc 100644
---- a/instrument/control.inc.h
-+++ b/instrument/control.inc.h
-@@ -7,9 +7,12 @@
-  * See the COPYING file in the top-level directory.
-  */
-=20
-+#include "qemu/osdep.h"
- #include "qemu/atomic.h"
- #include "qemu/compiler.h"
-+#include "qom/cpu.h"
- #include <stdbool.h>
-+#include <stdint.h>
-=20
-=20
- extern __thread InstrState instr_cur_state;
-@@ -23,3 +26,23 @@ static inline InstrState instr_get_state(void)
- {
-     return atomic_load_acquire(&instr_cur_state);
- }
-+
-+
-+extern unsigned int instr_cpus_count;
-+extern CPUState **instr_cpus;
-+
-+static inline CPUState *instr_cpu_get(QICPU vcpu)
-+{
-+    unsigned int idx =3D (uintptr_t)vcpu;
-+    if (idx >=3D instr_cpus_count) {
-+        return NULL;
-+    } else {
-+        return instr_cpus[idx];
-+    }
-+}
-+
-+static inline QICPU instr_cpu_set(CPUState *vcpu)
-+{
-+    uintptr_t idx =3D vcpu->cpu_index;
-+    return (QICPU )idx;
-+}
+
+r~
