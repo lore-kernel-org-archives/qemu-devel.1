@@ -1,23 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48849)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dperG-000295-WC
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:15:28 -0400
+	(envelope-from <mjrosato@linux.vnet.ibm.com>) id 1dpesX-0002nX-Gl
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:16:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dperC-0004Jk-T2
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:15:26 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:47387)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dperC-0004JX-Hc
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:15:22 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed,  6 Sep 2017 21:15:11 +0300
-Message-Id: <150472171121.24907.12569584037182483614.stgit@frigg.lan>
-In-Reply-To: <150471856141.24907.274176769201097378.stgit@frigg.lan>
-References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
+	(envelope-from <mjrosato@linux.vnet.ibm.com>) id 1dpesT-00051r-G5
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:16:45 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43652
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mjrosato@linux.vnet.ibm.com>)
+	id 1dpesT-000509-A6
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 14:16:41 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v86IEVIl138062
+	for <qemu-devel@nongnu.org>; Wed, 6 Sep 2017 14:16:40 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2ctmrwf77s-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 14:16:40 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mjrosato@linux.vnet.ibm.com>;
+	Wed, 6 Sep 2017 14:16:40 -0400
+References: <20170904154316.4148-1-david@redhat.com>
+	<20170904154316.4148-12-david@redhat.com>
+From: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
+Date: Wed, 6 Sep 2017 14:16:34 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 13/20] instrument: Add event 'guest_cpu_exit'
+In-Reply-To: <20170904154316.4148-12-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <2c620927-0406-2fc1-895c-09ffc2e44a4e@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 11/19] s390x: allow only 1 CPU with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,140 +43,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- instrument/control.c            |    9 +++++++++
- instrument/events.h             |    3 +++
- instrument/events.inc.h         |   11 +++++++++++
- instrument/load.c               |    1 +
- instrument/qemu-instr/control.h |    9 +++++++++
- stubs/instrument.c              |    1 +
- trace/control.c                 |    4 +++-
- 7 files changed, 37 insertions(+), 1 deletion(-)
+On 09/04/2017 11:43 AM, David Hildenbrand wrote:
+> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
+> guest tries to bring these CPUs up but fails), because we don't support
+> multiple CPUs on s390x under TCG.
+> 
+> Let's bail out if more than 1 is specified, so we don't raise people's
+> hope. Make it a define, so we can easily bump it up later.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
 
-diff --git a/instrument/control.c b/instrument/control.c
-index ed0d537b88..09ba682483 100644
---- a/instrument/control.c
-+++ b/instrument/control.c
-@@ -57,3 +57,12 @@ QI_VPUBLIC void qi_event_set_guest_cpu_enter(void (*fn=
-)(QICPU vcpu))
-     ERROR_IF(!instr_get_state(), "called outside instrumentation");
-     instr_set_event(guest_cpu_enter, fn);
- }
-+
-+
-+void (*instr_event__guest_cpu_exit)(QICPU vcpu);
-+
-+QI_VPUBLIC void qi_event_set_guest_cpu_exit(void (*fn)(QICPU vcpu))
-+{
-+    ERROR_IF(!instr_get_state(), "called outside instrumentation");
-+    instr_set_event(guest_cpu_exit, fn);
-+}
-diff --git a/instrument/events.h b/instrument/events.h
-index 947f120aa9..c743cb8180 100644
---- a/instrument/events.h
-+++ b/instrument/events.h
-@@ -36,6 +36,9 @@ extern void *instr_event__fini_data;
- extern void (*instr_event__guest_cpu_enter)(QICPU vcpu);
- static inline void instr_guest_cpu_enter(CPUState *vcpu);
-=20
-+extern void (*instr_event__guest_cpu_exit)(QICPU vcpu);
-+static inline void instr_guest_cpu_exit(CPUState *vcpu);
-+
-=20
- #include "instrument/events.inc.h"
-=20
-diff --git a/instrument/events.inc.h b/instrument/events.inc.h
-index 238cce9855..bcbf0cb32a 100644
---- a/instrument/events.inc.h
-+++ b/instrument/events.inc.h
-@@ -20,3 +20,14 @@ static inline void instr_guest_cpu_enter(CPUState *vcp=
-u)
-         instr_set_state(INSTR_STATE_DISABLE);
-     }
- }
-+
-+static inline void instr_guest_cpu_exit(CPUState *vcpu)
-+{
-+    void (*cb)(QICPU vcpu) =3D instr_get_event(guest_cpu_exit);
-+    if (cb) {
-+        QICPU vcpu_ =3D instr_cpu_set(vcpu);
-+        instr_set_state(INSTR_STATE_ENABLE);
-+        (*cb)(vcpu_);
-+        instr_set_state(INSTR_STATE_DISABLE);
-+    }
-+}
-diff --git a/instrument/load.c b/instrument/load.c
-index 0fe878afa8..63b7d564ec 100644
---- a/instrument/load.c
-+++ b/instrument/load.c
-@@ -149,6 +149,7 @@ InstrUnloadError instr_unload(int64_t handle_id)
-=20
-     instr_set_event(fini_fn, NULL);
-     instr_set_event(guest_cpu_enter, NULL);
-+    instr_set_event(guest_cpu_exit, NULL);
-=20
-     /* this should never fail */
-     if (dlclose(handle->dlhandle) < 0) {
-diff --git a/instrument/qemu-instr/control.h b/instrument/qemu-instr/cont=
-rol.h
-index 26d8aa976d..c37a380ab0 100644
---- a/instrument/qemu-instr/control.h
-+++ b/instrument/qemu-instr/control.h
-@@ -80,6 +80,15 @@ void qi_set_fini(qi_fini_fn fn, void *data);
-  */
- void qi_event_set_guest_cpu_enter(void (*fn)(QICPU vcpu));
-=20
-+/*
-+ * Hot-unplug a virtual (guest) CPU.
-+ *
-+ * Mode: user, softmmu
-+ * Targets: all
-+ * Time: exec
-+ */
-+void qi_event_set_guest_cpu_exit(void (*fn)(QICPU vcpu));
-+
- #ifdef __cplusplus
- }
- #endif
-diff --git a/stubs/instrument.c b/stubs/instrument.c
-index 658a872e1c..ea8df6d467 100644
---- a/stubs/instrument.c
-+++ b/stubs/instrument.c
-@@ -12,3 +12,4 @@
-=20
- __thread InstrState instr_cur_state;
- void (*instr_event__guest_cpu_enter)(QICPU *vcpu);
-+void (*instr_event__guest_cpu_exit)(QICPU *vcpu);
-diff --git a/trace/control.c b/trace/control.c
-index 82d8989c4d..946a0af818 100644
---- a/trace/control.c
-+++ b/trace/control.c
-@@ -1,13 +1,14 @@
- /*
-  * Interface for configuring and controlling the state of tracing events.
-  *
-- * Copyright (C) 2011-2016 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ * Copyright (C) 2011-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-  *
-  * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-  * See the COPYING file in the top-level directory.
-  */
-=20
- #include "qemu/osdep.h"
-+#include "instrument/events.h"
- #include "trace/control.h"
- #include "qemu/help_option.h"
- #ifdef CONFIG_TRACE_SIMPLE
-@@ -272,6 +273,7 @@ void trace_fini_vcpu(CPUState *vcpu)
-     TraceEventIter iter;
-     TraceEvent *ev;
-=20
-+    instr_guest_cpu_exit(vcpu);
-     trace_guest_cpu_exit(vcpu);
-=20
-     trace_event_iter_init(&iter, NULL);
+Makes sense.  Ran the described environment without this patch (errors)
+and again with this patch (graceful exit w/ message).
+
+Tested-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
+
+>  hw/s390x/s390-virtio-ccw.c | 7 +++++++
+>  target/s390x/cpu.h         | 2 ++
+>  2 files changed, 9 insertions(+)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index f67b4b5d58..f7ca20d77a 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -23,6 +23,7 @@
+>  #include "hw/s390x/css.h"
+>  #include "virtio-ccw.h"
+>  #include "qemu/config-file.h"
+> +#include "qemu/error-report.h"
+>  #include "s390-pci-bus.h"
+>  #include "hw/s390x/storage-keys.h"
+>  #include "hw/s390x/storage-attributes.h"
+> @@ -55,6 +56,12 @@ static void s390_init_cpus(MachineState *machine)
+>      if (machine->cpu_model == NULL) {
+>          machine->cpu_model = s390_default_cpu_model_name();
+>      }
+> +    if (tcg_enabled() && max_cpus > S390_TCG_MAX_CPUS) {
+> +        error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
+> +                     "supported by TCG (%d) on s390x", max_cpus,
+> +                     S390_TCG_MAX_CPUS);
+> +        exit(1);
+> +    }
+> 
+>      cpu_states = g_new0(S390CPU *, max_cpus);
+> 
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 147aceba28..dca6aa9aae 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -209,6 +209,8 @@ static inline S390CPU *s390_env_get_cpu(CPUS390XState *env)
+> 
+>  #define ENV_OFFSET offsetof(S390CPU, env)
+> 
+> +#define S390_TCG_MAX_CPUS 1
+> +
+>  #ifndef CONFIG_USER_ONLY
+>  extern const struct VMStateDescription vmstate_s390_cpu;
+>  #endif
+> 
