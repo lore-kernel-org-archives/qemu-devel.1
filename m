@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34989)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35566)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dptCq-0002j7-Iz
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:34:45 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dptEA-0003PS-3D
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:36:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dptCm-00064Z-1P
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:34:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42300)
+	(envelope-from <dgilbert@redhat.com>) id 1dptE5-0006XP-GW
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:36:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56600)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dptCl-00064O-Sz
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:34:35 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 05B5D81DEF
-	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 09:34:35 +0000 (UTC)
-Message-ID: <1504776868.15653.6.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Thu, 07 Sep 2017 11:34:28 +0200
-In-Reply-To: <20170907082918.7299-1-famz@redhat.com>
-References: <20170907082918.7299-1-famz@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/9] buildsys: Move ui/usb library
- cflags/libs to per object
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dptE5-0006XG-AA
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:35:57 -0400
+Date: Thu, 7 Sep 2017 10:35:47 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170907093546.GE2098@work-vm>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<20170906145043.GG15535@stefanha-x1.localdomain>
+	<20170906151436.GF2215@work-vm>
+	<CAJSP0QUu45oPTL2JErTWAt7OFrHpcB-88EvGBwVAKxn0CE=ebg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QUu45oPTL2JErTWAt7OFrHpcB-88EvGBwVAKxn0CE=ebg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,18 +29,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, 2017-09-07 at 16:29 +0800, Fam Zheng wrote:
-> Hi Gerd,
+* Stefan Hajnoczi (stefanha@gmail.com) wrote:
+> On Wed, Sep 6, 2017 at 4:14 PM, Dr. David Alan Gilbert
+> <dgilbert@redhat.com> wrote:
+> > * Stefan Hajnoczi (stefanha@gmail.com) wrote:
+> >> On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
+> >> > The root problem is that, monitor commands are all handled in main
+> >> > loop thread now, no matter how many monitors we specify. And, if main
+> >> > loop thread hangs due to some reason, all monitors will be stuck.
+> >>
+> >> I see a larger issue with postcopy: existing QEMU code assumes that
+> >> guest memory access is instantaneous.
+> >>
+> >> Postcopy breaks this assumption and introduces blocking points that can
+> >> now take unbounded time.
+> >>
+> >> This problem isn't specific to the monitor.  It can also happen to other
+> >> components in QEMU like the gdbstub.
+> >>
+> >> Do we need an asynchronous memory API?  Synchronous memory access should
+> >> only be allowed in vcpu threads.
+> >
+> > It would probably be useful for gdbstub where the overhead of async
+> > doesn't matter;  but doing that for all IO emulation is hard.
 > 
-> This is part two of the QEMU_CFLAGS and libs_softmmu cleanup series,
-> including
-> ui/, audio/ and hw/usb/. Please review.
+> Why is it hard?
+> 
+> Memory access can be synchronous in the vcpu thread.  That eliminates
+> a lot of code straight away.
+> 
+> Anything using dma-helpers.c is already async.  They just don't know
+> that the memory access part is being made async too :).
 
-Looks good, survived a test build.
+Can you point me to some info on that ?
 
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+> The remaining cases are virtio and some other devices.
+> 
+> If you are worried about performance, the first rule is that async
+> memory access is only needed on the destination side when post-copy is
+> active.  Maybe use setjmp to return from the signal handler and queue
+> a callback for when the page has been loaded.
 
-cheers,
-  Gerd
+I'm not sure it's worth trying to be too clever at avoiding this;
+I see the fact that we're doing IO with the bql held as a more
+fundamental problem.
+
+Dave
+
+> Stefan
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
