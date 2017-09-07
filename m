@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50033)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dq1Q9-0004IG-7j
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:21:03 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dq1kP-0003bl-Ro
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:41:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dq1Q2-0008IZ-PF
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:20:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51603)
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dq1kL-0004CA-C5
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:41:53 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34825
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dq1Q2-0008I2-DV
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:20:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dq1Q0-0003SL-W0
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 18:20:48 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F0EB62E8470
-	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 18:20:48 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Sep 2017 18:07:55 -0000
-From: Brad Parker <1715715@bugs.launchpad.net>
-Reply-To: Bug 1715715 <1715715@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150480734842.32058.3488330551186130563.malonedeb@soybean.canonical.com>
-Message-Id: <150480767633.22608.12159537801154580657.launchpad@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715715] Re: [qemu-ppc] Segfault when booting
- from HD after OS install
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1dq1kL-00049k-61
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:41:49 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v87IeNfa056764
+	for <qemu-devel@nongnu.org>; Thu, 7 Sep 2017 14:41:45 -0400
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cub7t98pu-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 14:41:45 -0400
+Received: from localhost
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 7 Sep 2017 14:41:44 -0400
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Thu,  7 Sep 2017 14:41:38 -0400
+Message-Id: <1504809698-30479-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH] Add myself as maintainer for TPM code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,316 +37,26 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-** Description changed:
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
+---
+ MAINTAINERS | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-  I created an empty 128G qcow2 image and booted from a Mac OS 9.2.1
-  Install CD, in which I was able to install the OS successfully to the
-  hard drive. Upon reboot, this time from the hard drive directly, qemu-
-- system-ppc segfaults.
-+ system-ppc segfaults. Host system is Ubuntu 16.04.2 with latest qemu
-+ commit.
-  =
-
-  qemu --version reports "v2.10.0-244-gb07d1c2-dirty", but I used git
-  commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e and built with
-  "./configure --target-list=3Dppc-softmmu --enable-debug --disable-strip".
-  =
-
-  Here is the command-line arguments:
-  =
-
-  qemu-system-ppc -boot c -g 1024x768x32 -M mac99 -m 256 -prom-env 'auto-
-  boot?=3Dtrue' -prom-env 'boot-args=3D-v' -prom-env 'vga-ndrv?=3Dtrue' -dr=
-ive
-  file=3D../os9.img,format=3Draw,media=3Dcdrom -drive
-  file=3DMacOS9.qcow2,format=3Dqcow2,media=3Ddisk -spice port=3D5901,passwo=
-rd=3DXXX
-  -net nic,model=3Drtl8139 -net user -monitor stdio
-  =
-
-  And the GDB backtrace:
-  =
-
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
-) at util/qemu-timer.c:462
-  462         timer_mod_ns(ts, expire_time * ts->scale);
-  [Current thread is 1 (Thread 0x7f60e43cb700 (LWP 9853))]
-  (gdb) bt
-  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
-) at util/qemu-timer.c:462
-  #1  0x0000559065d63769 in openpic_tmr_set_tmr (tmr=3D0x5590676fa7e0, val=
-=3D96, enabled=3Dtrue) at hw/intc/openpic.c:861
-  #2  0x0000559065d63995 in openpic_tmr_write (opaque=3D0x5590676f71f0, add=
-r=3D16, val=3D96, len=3D4) at hw/intc/openpic.c:912
-  #3  0x0000559065b02811 in memory_region_write_accessor (mr=3D0x5590676f77=
-10, addr=3D32, value=3D0x7f60e43c7da8, size=3D4, shift=3D0, mask=3D42949672=
-95, attrs=3D...) at /home/bp/qemu/memory.c:529
-  #4  0x0000559065b02a29 in access_with_adjusted_size (addr=3D32, value=3D0=
-x7f60e43c7da8, size=3D1, access_size_min=3D4, access_size_max=3D4, access=
-=3D0x559065b02727 <memory_region_write_accessor>, mr=3D0x5590676f7710, attr=
-s=3D...) at /home/bp/qemu/memory.c:595
-  #5  0x0000559065b051eb in memory_region_dispatch_write (mr=3D0x5590676f77=
-10, addr=3D32, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c:=
-1337
-  #6  0x0000559065aa3a36 in address_space_write_continue (as=3D0x559067614d=
-90, addr=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", le=
-n=3D1, addr1=3D32, l=3D1, mr=3D0x5590676f7710) at /home/bp/qemu/exec.c:2942
-  #7  0x0000559065aa3b84 in address_space_write (as=3D0x559067614d90, addr=
-=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", len=3D1) a=
-t /home/bp/qemu/exec.c:2987
-  #8  0x0000559065aa2ec0 in subpage_write (opaque=3D0x7f60c8275fc0, addr=3D=
-272, value=3D96, len=3D1, attrs=3D...) at /home/bp/qemu/exec.c:2565
-  #9  0x0000559065b02906 in memory_region_write_with_attrs_accessor (mr=3D0=
-x7f60c8275fc0, addr=3D272, value=3D0x7f60e43c7fc8, size=3D1, shift=3D0, mas=
-k=3D255, attrs=3D...) at /home/bp/qemu/memory.c:555
-  #10 0x0000559065b029d3 in access_with_adjusted_size (addr=3D272, value=3D=
-0x7f60e43c7fc8, size=3D1, access_size_min=3D1, access_size_max=3D8, access=
-=3D0x559065b02818 <memory_region_write_with_attrs_accessor>, mr=3D0x7f60c82=
-75fc0, attrs=3D...) at /home/bp/qemu/memory.c:590
-  #11 0x0000559065b0523a in memory_region_dispatch_write (mr=3D0x7f60c8275f=
-c0, addr=3D272, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c=
-:1344
-  #12 0x0000559065b175db in io_writex (env=3D0x7f60e43d42a0, iotlbentry=3D0=
-x7f60e43e8130, mmu_idx=3D3, val=3D96, addr=3D2147750160, retaddr=3D14005415=
-8295744, size=3D1) at /home/bp/qemu/accel/tcg/cputlb.c:807
-  #13 0x0000559065b18055 in io_writeb (env=3D0x7f60e43d42a0, mmu_idx=3D3, i=
-ndex=3D65, val=3D96 '`', addr=3D2147750160, retaddr=3D140054158295744) at /=
-home/bp/qemu/softmmu_template.h:265
-  #14 0x0000559065b181ea in helper_ret_stb_mmu (env=3D0x7f60e43d42a0, addr=
-=3D2147750160, val=3D96 '`', oi=3D3, retaddr=3D140054158295744) at /home/bp=
-/qemu/softmmu_template.h:300
-  #15 0x00007f60e65ac2c0 in code_gen_buffer ()
-  #16 0x0000559065b1ff26 in cpu_tb_exec (cpu=3D0x7f60e43cc010, itb=3D0x7f60=
-e65ac5c0 <code_gen_buffer+935318>) at /home/bp/qemu/accel/tcg/cpu-exec.c:166
-  #17 0x0000559065b20bfd in cpu_loop_exec_tb (cpu=3D0x7f60e43cc010, tb=3D0x=
-7f60e65ac5c0 <code_gen_buffer+935318>, last_tb=3D0x7f60e43c8678, tb_exit=3D=
-0x7f60e43c8674) at /home/bp/qemu/accel/tcg/cpu-exec.c:578
-  #18 0x0000559065b20eed in cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp/qem=
-u/accel/tcg/cpu-exec.c:676
-  #19 0x0000559065aebc3d in tcg_cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp=
-/qemu/cpus.c:1270
-  #20 0x0000559065aebe64 in qemu_tcg_rr_cpu_thread_fn (arg=3D0x7f60e43cc010=
-) at /home/bp/qemu/cpus.c:1365
-  #21 0x00007f60f56f06ba in start_thread (arg=3D0x7f60e43cb700) at pthread_=
-create.c:333
-  #22 0x00007f60f542682d in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:109
-  =
-
-- =
-
-  Any idea what is going on?
-
-** Description changed:
-
-  I created an empty 128G qcow2 image and booted from a Mac OS 9.2.1
-  Install CD, in which I was able to install the OS successfully to the
-  hard drive. Upon reboot, this time from the hard drive directly, qemu-
-  system-ppc segfaults. Host system is Ubuntu 16.04.2 with latest qemu
-  commit.
-  =
-
-- qemu --version reports "v2.10.0-244-gb07d1c2-dirty", but I used git
-- commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e and built with
-+ qemu --version reports "2.10.50 (v2.10.0-244-gb07d1c2-dirty)", but I
-+ used git commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e and built with
-  "./configure --target-list=3Dppc-softmmu --enable-debug --disable-strip".
-  =
-
-  Here is the command-line arguments:
-  =
-
-  qemu-system-ppc -boot c -g 1024x768x32 -M mac99 -m 256 -prom-env 'auto-
-  boot?=3Dtrue' -prom-env 'boot-args=3D-v' -prom-env 'vga-ndrv?=3Dtrue' -dr=
-ive
-  file=3D../os9.img,format=3Draw,media=3Dcdrom -drive
-  file=3DMacOS9.qcow2,format=3Dqcow2,media=3Ddisk -spice port=3D5901,passwo=
-rd=3DXXX
-  -net nic,model=3Drtl8139 -net user -monitor stdio
-  =
-
-  And the GDB backtrace:
-  =
-
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
-) at util/qemu-timer.c:462
-  462         timer_mod_ns(ts, expire_time * ts->scale);
-  [Current thread is 1 (Thread 0x7f60e43cb700 (LWP 9853))]
-  (gdb) bt
-  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
-) at util/qemu-timer.c:462
-  #1  0x0000559065d63769 in openpic_tmr_set_tmr (tmr=3D0x5590676fa7e0, val=
-=3D96, enabled=3Dtrue) at hw/intc/openpic.c:861
-  #2  0x0000559065d63995 in openpic_tmr_write (opaque=3D0x5590676f71f0, add=
-r=3D16, val=3D96, len=3D4) at hw/intc/openpic.c:912
-  #3  0x0000559065b02811 in memory_region_write_accessor (mr=3D0x5590676f77=
-10, addr=3D32, value=3D0x7f60e43c7da8, size=3D4, shift=3D0, mask=3D42949672=
-95, attrs=3D...) at /home/bp/qemu/memory.c:529
-  #4  0x0000559065b02a29 in access_with_adjusted_size (addr=3D32, value=3D0=
-x7f60e43c7da8, size=3D1, access_size_min=3D4, access_size_max=3D4, access=
-=3D0x559065b02727 <memory_region_write_accessor>, mr=3D0x5590676f7710, attr=
-s=3D...) at /home/bp/qemu/memory.c:595
-  #5  0x0000559065b051eb in memory_region_dispatch_write (mr=3D0x5590676f77=
-10, addr=3D32, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c:=
-1337
-  #6  0x0000559065aa3a36 in address_space_write_continue (as=3D0x559067614d=
-90, addr=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", le=
-n=3D1, addr1=3D32, l=3D1, mr=3D0x5590676f7710) at /home/bp/qemu/exec.c:2942
-  #7  0x0000559065aa3b84 in address_space_write (as=3D0x559067614d90, addr=
-=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", len=3D1) a=
-t /home/bp/qemu/exec.c:2987
-  #8  0x0000559065aa2ec0 in subpage_write (opaque=3D0x7f60c8275fc0, addr=3D=
-272, value=3D96, len=3D1, attrs=3D...) at /home/bp/qemu/exec.c:2565
-  #9  0x0000559065b02906 in memory_region_write_with_attrs_accessor (mr=3D0=
-x7f60c8275fc0, addr=3D272, value=3D0x7f60e43c7fc8, size=3D1, shift=3D0, mas=
-k=3D255, attrs=3D...) at /home/bp/qemu/memory.c:555
-  #10 0x0000559065b029d3 in access_with_adjusted_size (addr=3D272, value=3D=
-0x7f60e43c7fc8, size=3D1, access_size_min=3D1, access_size_max=3D8, access=
-=3D0x559065b02818 <memory_region_write_with_attrs_accessor>, mr=3D0x7f60c82=
-75fc0, attrs=3D...) at /home/bp/qemu/memory.c:590
-  #11 0x0000559065b0523a in memory_region_dispatch_write (mr=3D0x7f60c8275f=
-c0, addr=3D272, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c=
-:1344
-  #12 0x0000559065b175db in io_writex (env=3D0x7f60e43d42a0, iotlbentry=3D0=
-x7f60e43e8130, mmu_idx=3D3, val=3D96, addr=3D2147750160, retaddr=3D14005415=
-8295744, size=3D1) at /home/bp/qemu/accel/tcg/cputlb.c:807
-  #13 0x0000559065b18055 in io_writeb (env=3D0x7f60e43d42a0, mmu_idx=3D3, i=
-ndex=3D65, val=3D96 '`', addr=3D2147750160, retaddr=3D140054158295744) at /=
-home/bp/qemu/softmmu_template.h:265
-  #14 0x0000559065b181ea in helper_ret_stb_mmu (env=3D0x7f60e43d42a0, addr=
-=3D2147750160, val=3D96 '`', oi=3D3, retaddr=3D140054158295744) at /home/bp=
-/qemu/softmmu_template.h:300
-  #15 0x00007f60e65ac2c0 in code_gen_buffer ()
-  #16 0x0000559065b1ff26 in cpu_tb_exec (cpu=3D0x7f60e43cc010, itb=3D0x7f60=
-e65ac5c0 <code_gen_buffer+935318>) at /home/bp/qemu/accel/tcg/cpu-exec.c:166
-  #17 0x0000559065b20bfd in cpu_loop_exec_tb (cpu=3D0x7f60e43cc010, tb=3D0x=
-7f60e65ac5c0 <code_gen_buffer+935318>, last_tb=3D0x7f60e43c8678, tb_exit=3D=
-0x7f60e43c8674) at /home/bp/qemu/accel/tcg/cpu-exec.c:578
-  #18 0x0000559065b20eed in cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp/qem=
-u/accel/tcg/cpu-exec.c:676
-  #19 0x0000559065aebc3d in tcg_cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp=
-/qemu/cpus.c:1270
-  #20 0x0000559065aebe64 in qemu_tcg_rr_cpu_thread_fn (arg=3D0x7f60e43cc010=
-) at /home/bp/qemu/cpus.c:1365
-  #21 0x00007f60f56f06ba in start_thread (arg=3D0x7f60e43cb700) at pthread_=
-create.c:333
-  #22 0x00007f60f542682d in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:109
-  =
-
-  Any idea what is going on?
-
-** Summary changed:
-
-- [qemu-ppc] Segfault when booting from HD after OS install
-+ [qemu-ppc] Segfault when booting from HD after MacOS9 install
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715715
-
-Title:
-  [qemu-ppc] Segfault when booting from HD after MacOS9 install
-
-Status in QEMU:
-  New
-
-Bug description:
-  I created an empty 128G qcow2 image and booted from a Mac OS 9.2.1
-  Install CD, in which I was able to install the OS successfully to the
-  hard drive. Upon reboot, this time from the hard drive directly, qemu-
-  system-ppc segfaults. Host system is Ubuntu 16.04.2 with latest qemu
-  commit.
-
-  qemu --version reports "2.10.50 (v2.10.0-244-gb07d1c2-dirty)", but I
-  used git commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e and built
-  with "./configure --target-list=3Dppc-softmmu --enable-debug --disable-
-  strip".
-
-  Here is the command-line arguments:
-
-  qemu-system-ppc -boot c -g 1024x768x32 -M mac99 -m 256 -prom-env
-  'auto-boot?=3Dtrue' -prom-env 'boot-args=3D-v' -prom-env 'vga-ndrv?=3Dtru=
-e'
-  -drive file=3D../os9.img,format=3Draw,media=3Dcdrom -drive
-  file=3DMacOS9.qcow2,format=3Dqcow2,media=3Ddisk -spice
-  port=3D5901,password=3DXXX -net nic,model=3Drtl8139 -net user -monitor st=
-dio
-
-  And the GDB backtrace:
-
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
-) at util/qemu-timer.c:462
-  462         timer_mod_ns(ts, expire_time * ts->scale);
-  [Current thread is 1 (Thread 0x7f60e43cb700 (LWP 9853))]
-  (gdb) bt
-  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
-) at util/qemu-timer.c:462
-  #1  0x0000559065d63769 in openpic_tmr_set_tmr (tmr=3D0x5590676fa7e0, val=
-=3D96, enabled=3Dtrue) at hw/intc/openpic.c:861
-  #2  0x0000559065d63995 in openpic_tmr_write (opaque=3D0x5590676f71f0, add=
-r=3D16, val=3D96, len=3D4) at hw/intc/openpic.c:912
-  #3  0x0000559065b02811 in memory_region_write_accessor (mr=3D0x5590676f77=
-10, addr=3D32, value=3D0x7f60e43c7da8, size=3D4, shift=3D0, mask=3D42949672=
-95, attrs=3D...) at /home/bp/qemu/memory.c:529
-  #4  0x0000559065b02a29 in access_with_adjusted_size (addr=3D32, value=3D0=
-x7f60e43c7da8, size=3D1, access_size_min=3D4, access_size_max=3D4, access=
-=3D0x559065b02727 <memory_region_write_accessor>, mr=3D0x5590676f7710, attr=
-s=3D...) at /home/bp/qemu/memory.c:595
-  #5  0x0000559065b051eb in memory_region_dispatch_write (mr=3D0x5590676f77=
-10, addr=3D32, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c:=
-1337
-  #6  0x0000559065aa3a36 in address_space_write_continue (as=3D0x559067614d=
-90, addr=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", le=
-n=3D1, addr1=3D32, l=3D1, mr=3D0x5590676f7710) at /home/bp/qemu/exec.c:2942
-  #7  0x0000559065aa3b84 in address_space_write (as=3D0x559067614d90, addr=
-=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", len=3D1) a=
-t /home/bp/qemu/exec.c:2987
-  #8  0x0000559065aa2ec0 in subpage_write (opaque=3D0x7f60c8275fc0, addr=3D=
-272, value=3D96, len=3D1, attrs=3D...) at /home/bp/qemu/exec.c:2565
-  #9  0x0000559065b02906 in memory_region_write_with_attrs_accessor (mr=3D0=
-x7f60c8275fc0, addr=3D272, value=3D0x7f60e43c7fc8, size=3D1, shift=3D0, mas=
-k=3D255, attrs=3D...) at /home/bp/qemu/memory.c:555
-  #10 0x0000559065b029d3 in access_with_adjusted_size (addr=3D272, value=3D=
-0x7f60e43c7fc8, size=3D1, access_size_min=3D1, access_size_max=3D8, access=
-=3D0x559065b02818 <memory_region_write_with_attrs_accessor>, mr=3D0x7f60c82=
-75fc0, attrs=3D...) at /home/bp/qemu/memory.c:590
-  #11 0x0000559065b0523a in memory_region_dispatch_write (mr=3D0x7f60c8275f=
-c0, addr=3D272, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c=
-:1344
-  #12 0x0000559065b175db in io_writex (env=3D0x7f60e43d42a0, iotlbentry=3D0=
-x7f60e43e8130, mmu_idx=3D3, val=3D96, addr=3D2147750160, retaddr=3D14005415=
-8295744, size=3D1) at /home/bp/qemu/accel/tcg/cputlb.c:807
-  #13 0x0000559065b18055 in io_writeb (env=3D0x7f60e43d42a0, mmu_idx=3D3, i=
-ndex=3D65, val=3D96 '`', addr=3D2147750160, retaddr=3D140054158295744) at /=
-home/bp/qemu/softmmu_template.h:265
-  #14 0x0000559065b181ea in helper_ret_stb_mmu (env=3D0x7f60e43d42a0, addr=
-=3D2147750160, val=3D96 '`', oi=3D3, retaddr=3D140054158295744) at /home/bp=
-/qemu/softmmu_template.h:300
-  #15 0x00007f60e65ac2c0 in code_gen_buffer ()
-  #16 0x0000559065b1ff26 in cpu_tb_exec (cpu=3D0x7f60e43cc010, itb=3D0x7f60=
-e65ac5c0 <code_gen_buffer+935318>) at /home/bp/qemu/accel/tcg/cpu-exec.c:166
-  #17 0x0000559065b20bfd in cpu_loop_exec_tb (cpu=3D0x7f60e43cc010, tb=3D0x=
-7f60e65ac5c0 <code_gen_buffer+935318>, last_tb=3D0x7f60e43c8678, tb_exit=3D=
-0x7f60e43c8674) at /home/bp/qemu/accel/tcg/cpu-exec.c:578
-  #18 0x0000559065b20eed in cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp/qem=
-u/accel/tcg/cpu-exec.c:676
-  #19 0x0000559065aebc3d in tcg_cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp=
-/qemu/cpus.c:1270
-  #20 0x0000559065aebe64 in qemu_tcg_rr_cpu_thread_fn (arg=3D0x7f60e43cc010=
-) at /home/bp/qemu/cpus.c:1365
-  #21 0x00007f60f56f06ba in start_thread (arg=3D0x7f60e43cb700) at pthread_=
-create.c:333
-  #22 0x00007f60f542682d in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:109
-
-  Any idea what is going on?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715715/+subscriptions
+diff --git a/MAINTAINERS b/MAINTAINERS
+index caf7e8a..1d5ea97 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1487,7 +1487,8 @@ F: docs/tracing.txt
+ T: git git://github.com/stefanha/qemu.git tracing
+ 
+ TPM
+-S: Orphan
++M: Stefan Berger <stefanb@linux.vnet.ibm.com>
++S: Maintained
+ F: tpm.c
+ F: hw/tpm/*
+ F: include/hw/acpi/tpm.h
+-- 
+2.5.5
