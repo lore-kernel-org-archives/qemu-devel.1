@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50951)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpwaZ-0002Ry-Ig
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:11:28 -0400
+	(envelope-from <paddusn@yahoo.com>) id 1dpwWT-0001zs-5E
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:07:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpwaU-0004kr-Hu
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:11:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56347)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpwaU-0004jt-BG
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:11:18 -0400
-Date: Thu, 7 Sep 2017 15:11:07 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170907151107.6959cd86.cohuck@redhat.com>
-In-Reply-To: <4cb9db9c-7294-abde-92eb-8247ae354d86@redhat.com>
-References: <20170904154316.4148-1-david@redhat.com>
-	<20170904154316.4148-2-david@redhat.com>
-	<934be1e8-469e-6d54-bcc1-21e12da2e408@redhat.com>
-	<4cb9db9c-7294-abde-92eb-8247ae354d86@redhat.com>
+	(envelope-from <paddusn@yahoo.com>) id 1dpwWO-0001v1-1h
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:07:09 -0400
+Received: from sonic315-35.consmr.mail.gq1.yahoo.com ([98.137.65.59]:36924)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <paddusn@yahoo.com>) id 1dpwWN-0001tA-Pb
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:07:03 -0400
+Date: Thu, 7 Sep 2017 13:02:59 +0000 (UTC)
+From: Padmanabhan S N <paddusn@yahoo.com>
+Message-ID: <129545317.4985876.1504789379418@mail.yahoo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/19] exec, dump, i386, ppc,
- s390x: don't include exec/cpu-all.h explicitly
+References: <129545317.4985876.1504789379418.ref@mail.yahoo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] Converting host virtual addresses to guest physical
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +25,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On Thu, 7 Sep 2017 14:41:21 +0200
-David Hildenbrand <david@redhat.com> wrote:
+I'm developing a new block backend driver. Since my Guest RAM is coming out=
+ of shared memory (memory-backend-file,mem-path=3D/dev/shmem/foo), while pe=
+rforming the IO I would like to pass QEMUIOVector buffers directly to anoth=
+er user-space process running on the same host to enable zerocopy. Can some=
+one help me understand the different memory regions that are mapped in the =
+qemu process address space and how they map to each other ?
+1. My guest is configured with 1G RAM. /proc/<pid>/maps on the qemu process=
+ shows two 1G regions that are mapped. One of them is /dev/shmem/foo, which=
+ I believe corresponds to the guest physical memory. What is the other 1G r=
+egion ?=C2=A0
+2. The QEMUIOVector buffers point to this 'other' 1G region that I referred=
+ above. How do I convert these pointers to locations in the /dev/shmem/foo =
+region ? My plan is to convert the QEMUIOVector buffer pointer to a region =
+in /dev/shmem/foo and pass that pointer to another userspace process that a=
+lso has the /dev/shmem/foo region mapped.
+I understand vhost-user might be the right way to approach this problem. Ho=
+wever I'm currently working with qemu-2.8 and it looks neither vhost-user-s=
+csi nor vhost-user-blk are available in that version. If you believe there =
+is a better approach to solve this problem, let me know.
 
-> On 07.09.2017 07:46, Thomas Huth wrote:
-> >>  #include "qemu/cutils.h"
-> >>  #include "cpu.h"
-> >> -#include "exec/exec-all.h"  
-> > You should maybe mention exec-all.h in the patch description, too.
-> > (I think it can be dropped here because it is included by
-> > translate-all.h already).
-> > 
-> > If you tweak the patch description:
-> > Reviewed-by: Thomas Huth <thuth@redhat.com>  
-> 
-> I'll just drop that hunk although it can also be removed.
-> 
-> Yes, this was not included on purpose - these similar names still
-> confuse me :)
-> 
-
-Not only you :)
-
-If we can do a sweep of exec-all.h as well, it should be a separate
-patch.
+Thanks,Paddy.
