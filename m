@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41670)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dpw7d-00085V-IE
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:41:34 -0400
+	(envelope-from <david@redhat.com>) id 1dpwCs-0001oq-4a
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:46:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dpw7Z-0007da-1c
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:41:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52170)
+	(envelope-from <david@redhat.com>) id 1dpwCn-0003Yn-LZ
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:46:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59470)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dpw7Y-0007cp-Rc
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:41:24 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dpwCn-0003Y4-FQ
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:46:49 -0400
 References: <20170904154316.4148-1-david@redhat.com>
-	<20170904154316.4148-2-david@redhat.com>
-	<934be1e8-469e-6d54-bcc1-21e12da2e408@redhat.com>
+	<20170904154316.4148-8-david@redhat.com>
+	<3f858041-2cc1-7beb-78bc-d43c3b42b6ab@redhat.com>
 From: David Hildenbrand <david@redhat.com>
-Message-ID: <4cb9db9c-7294-abde-92eb-8247ae354d86@redhat.com>
-Date: Thu, 7 Sep 2017 14:41:21 +0200
+Message-ID: <09ff8ae8-3ad2-7dd3-16d9-0528c1ee665a@redhat.com>
+Date: Thu, 7 Sep 2017 14:46:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <934be1e8-469e-6d54-bcc1-21e12da2e408@redhat.com>
+In-Reply-To: <3f858041-2cc1-7beb-78bc-d43c3b42b6ab@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 01/19] exec, dump, i386, ppc,
- s390x: don't include exec/cpu-all.h explicitly
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 07/19] s390x: move two function
+ declarations to s390-virtio-ccw.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,23 +33,34 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 07.09.2017 07:46, Thomas Huth wrote:
->>  #include "qemu/cutils.h"
->>  #include "cpu.h"
->> -#include "exec/exec-all.h"
-> You should maybe mention exec-all.h in the patch description, too.
-> (I think it can be dropped here because it is included by
-> translate-all.h already).
-> 
-> If you tweak the patch description:
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-I'll just drop that hunk although it can also be removed.
+>> +++ b/target/s390x/interrupt.c
+>> @@ -15,6 +15,9 @@
+>>  #include "exec/exec-all.h"
+>>  #include "sysemu/kvm.h"
+>>  #include "hw/s390x/ioinst.h"
+>> +#if !defined(CONFIG_USER_ONLY)
+>> +#include "hw/s390x/s390-virtio-ccw.h"
+>> +#endif
+>> =20
+>>  /* Ensure to exit the TB after this call! */
+>>  void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_=
+t ilen)
+>>
+>=20
+> If I listen to my gut feeling, I still think we should rather move
+> s390_cpu_addr2state() to cpu.c instead. It does not sound as it's reall=
+y
+> specific to the virtio-ccw machine... Just my 0.02 =E2=82=AC
+>=20
 
-Yes, this was not included on purpose - these similar names still
-confuse me :)
+I prefer to leave it as is for now, so just a header cleanup. E.g. with
+patch 18 we could implement it directly using ms->possible_cpus.
 
--- 
+>  Thomas
+
+
+--=20
 
 Thanks,
 
