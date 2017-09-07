@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41556)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dpzJJ-00081l-MH
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:05:50 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dpzgj-0008I3-Qg
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:30:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dpzJE-00070s-OH
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:05:45 -0400
-Received: from mail-oi0-f41.google.com ([209.85.218.41]:33339)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dpzJE-000709-HS
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:05:40 -0400
-Received: by mail-oi0-f41.google.com with SMTP id r20so883138oie.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 09:05:39 -0700 (PDT)
+	(envelope-from <alistair23@gmail.com>) id 1dpzgf-0003Ge-3W
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:29:57 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170902091520.bxecfhisvy46o4cb@aurel32.net>
-References: <20170901110332.32650-1-otubo@redhat.com>
-	<20170901143016.GK7570@localhost.localdomain>
-	<20170902091520.bxecfhisvy46o4cb@aurel32.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 7 Sep 2017 18:05:37 +0200
-Message-ID: <CABgObfZ-CthwUFC-E2QTxnpqYZ-Sr_f_M3-FdmH6tQPdjG3OAg@mail.gmail.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <CAKmqyKMd0JcEtkqiajLd5sbWP9WpjS8XqwfGGWPuANchE5Ej3A@mail.gmail.com>
+References: <cover.1504222314.git.alistair.francis@xilinx.com>
+	<CAFEAcA8TSpNkz3ew+wk6K0vu18B5RCr=0vbkihcaDz8v2zUN8g@mail.gmail.com>
+	<CAKmqyKMd0JcEtkqiajLd5sbWP9WpjS8XqwfGGWPuANchE5Ej3A@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 7 Sep 2017 09:29:20 -0700
+Message-ID: <CAKmqyKPSm4UHL7K0ZBGF28Z+wZ0qtMLd7CSvF9W94LwsXfN9zQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] dma/i82374: avoid double creation of
- i82374 device
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] Expose the secure and virt
+ properties to the
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +25,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Jarno, Aurelien" <aurelien@aurel32.net>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Gibson,
-	David" <david@gibson.dropbear.id.au>, Eduardo Otubo <otubo@redhat.com>, qemu-trivial@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, mst@redhat.com, Eduardo Habkost <ehabkost@redhat.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-Il 02 set 2017 11:17 AM, "Aurelien Jarno" <aurelien@aurel32.net> ha scritto:
+On Thu, Sep 7, 2017 at 9:01 AM, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> On Thu, Sep 7, 2017 at 5:51 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+>> On 1 September 2017 at 00:34, Alistair Francis
+>> <alistair.francis@xilinx.com> wrote:
+>>>
+>>> The EL2 and EL3 work is working well now and interanlly we now have
+>>> tests that expect to start in EL3 and transition through EL2 to EL1. To
+>>> make this easy to run let's expose the secure property to the machine
+>>> and also add a virt property that can enable EL2.
+>>>
+>>> This series also does some machine/name tidying up and makes the first
+>>> move to deprecating the EP108 machine, which was just an early access
+>>> development board.
+>>>
+>>> V2:
+>>>  - Add a virt option for setting EL2
+>>
+>> It looks like only patches 4 5 and the cover letter got through the
+>> mailing list server, so patches and patchwork don't have the whole
+>> thing. Could I ask you to try a resend?
+>
+> Just re-sent now. Hopefully it works this time.
 
-On 2017-09-01 11:30, Eduardo Habkost wrote:
-> i82374 is compiled in only on ppc and sh4, so I'm CCing the
-> maintainers for those architectures.
+It looks like patch 1 and 3 still didn't make it through. I see them
+leaving the corporate network and going through to my personal email.
 
-The i82374 device is not useful nor usable on SH4. It has just been
-added in commit 85d3846a39 to be able to run the tests.
+Can anyone see anything on the QEMU mail server side? Any logs might
+help me push IT to investigate.
 
+Thanks,
+Alistair
 
-But that means that the patch is wrong and probably was not tested with
-"make check".
-
-Eduardo's proposal is the right one.
-
-Paolo
-
-
-Aurelien
-
---
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                 http://www.aurel32.net
+>
+> Thanks,
+> Alistair
+>
+>>
+>> thanks
+>> -- PMM
