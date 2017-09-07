@@ -1,23 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dq3Hm-0001Ng-Fv
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 16:20:31 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1dq3OX-0007r5-G5
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 16:27:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dq3Hh-0006N2-JJ
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 16:20:26 -0400
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-18-eblake@redhat.com>
-	<96c07533-e245-ccee-9632-b80821fad9be@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <86b3bc7b-03bf-cbf6-e52e-df43e04a9c28@redhat.com>
-Date: Thu, 7 Sep 2017 15:19:54 -0500
+	(envelope-from <alex.williamson@redhat.com>) id 1dq3OS-0002y5-Rh
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 16:27:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54286)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1dq3OS-0002wU-Kz
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 16:27:20 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id F26FF6148C
+	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 20:27:18 +0000 (UTC)
+From: Alex Williamson <alex.williamson@redhat.com>
+Date: Thu, 07 Sep 2017 14:27:09 -0600
+Message-ID: <20170907202637.23121.65136.stgit@gimli.home>
 MIME-Version: 1.0
-In-Reply-To: <96c07533-e245-ccee-9632-b80821fad9be@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="EcStPP2evuWMxeghALqXPVwXFxMPks7Ks"
-Subject: Re: [Qemu-devel] [PATCH v6 17/29] ahci-test: Drop dependence on
- global_qtest
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] vhost: Release memory references on cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,75 +31,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, John Snow <jsnow@redhat.com>, armbru@redhat.com, "open list:IDE" <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, mst@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---EcStPP2evuWMxeghALqXPVwXFxMPks7Ks
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, John Snow <jsnow@redhat.com>, armbru@redhat.com,
- "open list:IDE" <qemu-block@nongnu.org>
-Message-ID: <86b3bc7b-03bf-cbf6-e52e-df43e04a9c28@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 17/29] ahci-test: Drop dependence on
- global_qtest
-References: <20170901180340.30009-1-eblake@redhat.com>
- <20170901180340.30009-18-eblake@redhat.com>
- <96c07533-e245-ccee-9632-b80821fad9be@redhat.com>
-In-Reply-To: <96c07533-e245-ccee-9632-b80821fad9be@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+vhost registers a MemoryListener where it adds and removes references
+to MemoryRegions as the MemoryRegionSections pass through.  The
+region_add callback is invoked for each existing section when the
+MemoryListener is registered, but unregistering the MemoryListener
+performs no reciprocal region_del callback.  It's therefore the
+owner of the MemoryListener's responsibility to cleanup any persistent
+changes, such as these memory references, after unregistering.
 
-On 09/05/2017 05:32 AM, Thomas Huth wrote:
-> On 01.09.2017 20:03, Eric Blake wrote:
->> Managing parallel connections to two different monitors via
->> the implicit global_qtest makes it hard to copy-and-paste code
->> to tests that are not aware of the implicit state; the
->> management of global_qtest is even harder to follow because
->> it was masked behind set_context().
->>
+The consequence of this bug is that if we have both a vhost device
+and a vfio device, the vhost device will reference any mmap'd MMIO of
+the vfio device via this MemoryListener.  If the vhost device is then
+removed, those references remain outstanding.  If we then attempt to
+remove the vfio device, it never gets finalized and the only way to
+release the kernel file descriptors is to terminate the QEMU process.
 
->> ---
->>  tests/libqos/libqos.h    |  1 -
->>  tests/ahci-test.c        | 83 +++++++++++++++++++++++----------------=
----------
->>  tests/libqos/ahci.c      | 45 +++++++++++++-------------
->>  tests/libqos/libqos-pc.c |  2 +-
->>  tests/libqos/libqos.c    | 37 ++++++---------------
->>  5 files changed, 73 insertions(+), 95 deletions(-)
->=20
-> Might be easier to review if you'd split the changes to libqos.c into a=
+Fixes: dfde4e6e1a86 ("memory: add ref/unref calls")
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-stable@nongnu.org # v1.6.0+
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ hw/virtio/vhost.c |    4 ++++
+ 1 file changed, 4 insertions(+)
 
-> separate patch. But anyway:
->=20
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-
-I'll split it, even though it means dropping R-b on both halves of the
-split (so you can make sure the pieces still look sane).
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---EcStPP2evuWMxeghALqXPVwXFxMPks7Ks
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmxqesACgkQp6FrSiUn
-Q2r8Pgf+Ie6865uQVDNaB+RxjKhQcXO+e9wYEOEdZeI+8uahbyS3FPyN89oMnTPQ
-UmAh2myGA2MO8e6cRotNHarRHBwlyge3tVDdnW1XpYant9MLvi+5TTbRURnIF+Cq
-TCUxOqBrSV7hXifP7wzKtp1es+cgSDI75MdVfxUH6CAYXjXUOQoGqLXDKgDp+OM/
-ZCjm8fCmloclSc0rGuRSxz48zZvU4Kv6wp6wmejkTLaMCQiPnqU7OvEP98i851/3
-BFlDFom8HrQ5tqdlhIo+9EG8jij4sLdXdf90EnyfWI5BJu/GtEuW8QMqD4qSUMdi
-T/B7b0HAQ+SMQ3IjkulgzH0u836GPg==
-=CdMp
------END PGP SIGNATURE-----
-
---EcStPP2evuWMxeghALqXPVwXFxMPks7Ks--
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 6eddb099b02f..b737ca915b06 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -1356,6 +1356,10 @@ void vhost_dev_cleanup(struct vhost_dev *hdev)
+     if (hdev->mem) {
+         /* those are only safe after successful init */
+         memory_listener_unregister(&hdev->memory_listener);
++        for (i = 0; i < hdev->n_mem_sections; ++i) {
++            MemoryRegionSection *section = &hdev->mem_sections[i];
++            memory_region_unref(section->mr);
++        }
+         QLIST_REMOVE(hdev, entry);
+     }
+     if (hdev->migration_blocker) {
