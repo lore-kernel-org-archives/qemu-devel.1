@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35469)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35482)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpsBp-0006u7-2C
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:29:36 -0400
+	(envelope-from <famz@redhat.com>) id 1dpsBs-0006wh-D9
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:29:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpsBk-0001kc-E4
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:29:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56204)
+	(envelope-from <famz@redhat.com>) id 1dpsBn-0001lt-LA
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:29:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:5414)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dpsBk-0001kH-8A
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:29:28 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dpsBn-0001lk-Cr
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:29:31 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 49F8E7E426
-	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 08:29:27 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 74D4080461
+	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 08:29:30 +0000 (UTC)
 From: Fam Zheng <famz@redhat.com>
-Date: Thu,  7 Sep 2017 16:29:11 +0800
-Message-Id: <20170907082918.7299-3-famz@redhat.com>
+Date: Thu,  7 Sep 2017 16:29:12 +0800
+Message-Id: <20170907082918.7299-4-famz@redhat.com>
 In-Reply-To: <20170907082918.7299-1-famz@redhat.com>
 References: <20170907082918.7299-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/9] buildsys: Move sdl cflags/libs to per
+Subject: [Qemu-devel] [PATCH 3/9] buildsys: Move vnc cflags/libs to per
  object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -35,51 +35,91 @@ Cc: Gerd Hoffmann <kraxel@redhat.com>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- audio/Makefile.objs | 1 +
- configure           | 2 +-
- ui/Makefile.objs    | 1 +
- 3 files changed, 3 insertions(+), 1 deletion(-)
+ configure        | 14 ++++++++------
+ ui/Makefile.objs | 21 ++++++++++++---------
+ 2 files changed, 20 insertions(+), 15 deletions(-)
 
-diff --git a/audio/Makefile.objs b/audio/Makefile.objs
-index 481d1aa30e..c20695668f 100644
---- a/audio/Makefile.objs
-+++ b/audio/Makefile.objs
-@@ -11,3 +11,4 @@ common-obj-$(CONFIG_AUDIO_WIN_INT) += audio_win_int.o
- common-obj-y += wavcapture.o
- 
- sdlaudio.o-cflags := $(SDL_CFLAGS)
-+sdlaudio.o-libs := $(SDL_LIBS)
 diff --git a/configure b/configure
-index e27a4bd683..812a1ce615 100755
+index 812a1ce615..9b0eb91a9b 100755
 --- a/configure
 +++ b/configure
-@@ -2794,7 +2794,6 @@ EOF
-     sdl_cflags="$sdl_cflags $x11_cflags"
-     sdl_libs="$sdl_libs $x11_libs"
+@@ -2834,8 +2834,8 @@ EOF
+   vnc_sasl_libs="-lsasl2"
+   if compile_prog "$vnc_sasl_cflags" "$vnc_sasl_libs" ; then
+     vnc_sasl=yes
+-    libs_softmmu="$vnc_sasl_libs $libs_softmmu"
+-    QEMU_CFLAGS="$QEMU_CFLAGS $vnc_sasl_cflags"
++    vnc_libs="$vnc_libs $vnc_sasl_libs"
++    vnc_cflags="$vnc_cflags $vnc_sasl_cflags"
+   else
+     if test "$vnc_sasl" = "yes" ; then
+       feature_not_found "vnc-sasl" "Install Cyrus SASL devel"
+@@ -2856,8 +2856,8 @@ EOF
+     vnc_jpeg_libs="-ljpeg"
+   if compile_prog "$vnc_jpeg_cflags" "$vnc_jpeg_libs" ; then
+     vnc_jpeg=yes
+-    libs_softmmu="$vnc_jpeg_libs $libs_softmmu"
+-    QEMU_CFLAGS="$QEMU_CFLAGS $vnc_jpeg_cflags"
++    vnc_libs="$vnc_libs $vnc_jpeg_libs"
++    vnc_cflags="$vnc_cflags $vnc_jpeg_cflags"
+   else
+     if test "$vnc_jpeg" = "yes" ; then
+       feature_not_found "vnc-jpeg" "Install libjpeg-turbo devel"
+@@ -2888,8 +2888,8 @@ EOF
    fi
--  libs_softmmu="$sdl_libs $libs_softmmu"
+   if compile_prog "$vnc_png_cflags" "$vnc_png_libs" ; then
+     vnc_png=yes
+-    libs_softmmu="$vnc_png_libs $libs_softmmu"
+-    QEMU_CFLAGS="$QEMU_CFLAGS $vnc_png_cflags"
++    vnc_libs="$vnc_libs $vnc_png_libs"
++    vnc_cflags="$vnc_cflags $vnc_png_cflags"
+   else
+     if test "$vnc_png" = "yes" ; then
+       feature_not_found "vnc-png" "Install libpng devel"
+@@ -5558,6 +5558,8 @@ echo "CONFIG_BDRV_RW_WHITELIST=$block_drv_rw_whitelist" >> $config_host_mak
+ echo "CONFIG_BDRV_RO_WHITELIST=$block_drv_ro_whitelist" >> $config_host_mak
+ if test "$vnc" = "yes" ; then
+   echo "CONFIG_VNC=y" >> $config_host_mak
++  echo "VNC_CFLAGS=$vnc_cflags" >> $config_host_mak
++  echo "VNC_LIBS=$vnc_libs" >> $config_host_mak
  fi
- 
- ##########################################
-@@ -5593,6 +5592,7 @@ if test "$sdl" = "yes" ; then
-   echo "CONFIG_SDL=y" >> $config_host_mak
-   echo "CONFIG_SDLABI=$sdlabi" >> $config_host_mak
-   echo "SDL_CFLAGS=$sdl_cflags" >> $config_host_mak
-+  echo "SDL_LIBS=$sdl_libs" >> $config_host_mak
- fi
- if test "$cocoa" = "yes" ; then
-   echo "CONFIG_COCOA=y" >> $config_host_mak
+ if test "$vnc_sasl" = "yes" ; then
+   echo "CONFIG_VNC_SASL=y" >> $config_host_mak
 diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index 146a8ce062..b3e29e21f0 100644
+index b3e29e21f0..a0b3c15a28 100644
 --- a/ui/Makefile.objs
 +++ b/ui/Makefile.objs
-@@ -27,6 +27,7 @@ sdl.mo-objs += sdl2-gl.o
- endif
- endif
- sdl.mo-cflags := $(SDL_CFLAGS)
-+sdl.mo-libs := $(SDL_LIBS)
+@@ -1,11 +1,14 @@
+-vnc-obj-y += vnc.o
+-vnc-obj-y += vnc-enc-zlib.o vnc-enc-hextile.o
+-vnc-obj-y += vnc-enc-tight.o vnc-palette.o
+-vnc-obj-y += vnc-enc-zrle.o
+-vnc-obj-y += vnc-auth-vencrypt.o
+-vnc-obj-$(CONFIG_VNC_SASL) += vnc-auth-sasl.o
+-vnc-obj-y += vnc-ws.o
+-vnc-obj-y += vnc-jobs.o
++vnc.mo-objs += vnc.o
++vnc.mo-objs += vnc-enc-zlib.o vnc-enc-hextile.o
++vnc.mo-objs += vnc-enc-tight.o vnc-palette.o
++vnc.mo-objs += vnc-enc-zrle.o
++vnc.mo-objs += vnc-auth-vencrypt.o
++vnc.mo-objs += $(if $(CONFIG_VNC_SASL), vnc-auth-sasl.o)
++vnc.mo-objs += vnc-ws.o
++vnc.mo-objs += vnc-jobs.o
++
++vnc.mo-cflags := $(VNC_CFLAGS)
++vnc.mo-libs := $(VNC_LIBS)
  
- ifeq ($(CONFIG_OPENGL),y)
- common-obj-y += shader.o
+ common-obj-y += keymaps.o console.o cursor.o qemu-pixman.o
+ common-obj-y += input.o input-keymap.o input-legacy.o
+@@ -14,7 +17,7 @@ common-obj-$(CONFIG_SPICE) += spice-core.o spice-input.o spice-display.o
+ common-obj-$(CONFIG_SDL) += sdl.mo x_keymap.o
+ common-obj-$(CONFIG_COCOA) += cocoa.o
+ common-obj-$(CONFIG_CURSES) += curses.o
+-common-obj-$(CONFIG_VNC) += $(vnc-obj-y)
++common-obj-$(CONFIG_VNC) += vnc.mo
+ common-obj-$(CONFIG_GTK) += gtk.o x_keymap.o
+ 
+ ifeq ($(CONFIG_SDLABI),1.2)
 -- 
 2.13.5
