@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59402)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dq10i-0007Ln-DT
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:54:45 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dq12b-0000R3-Ed
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:56:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dq10d-0000Ev-S4
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:54:40 -0400
-Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:33192)
+	(envelope-from <peter.maydell@linaro.org>) id 1dq12W-0001If-Ma
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:56:37 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:36137)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dq10d-0000Df-L2
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:54:35 -0400
-Received: by mail-pf0-x22e.google.com with SMTP id y68so641526pfd.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 10:54:34 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Sep 2017 10:54:30 -0700
-Message-Id: <20170907175430.2720-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH] tcg/tci: Add TCG_TARGET_DEFAULT_MO
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dq12W-0001IG-Fi
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:56:32 -0400
+Received: by mail-wr0-x236.google.com with SMTP id o42so791982wrb.3
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 10:56:32 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170907135332.GO30609@redhat.com>
+References: <20170906152111.16958-1-eblake@redhat.com>
+	<CAFEAcA-1QOkSF+sG+0ymTv-Cx0WDEG4Ns4NydW-vz-box2Pi3Q@mail.gmail.com>
+	<5ba61e49-3b84-46a4-2978-d42d3457f21b@redhat.com>
+	<20170907135332.GO30609@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Sep 2017 18:56:10 +0100
+Message-ID: <CAFEAcA-MtUaXasWkiXq=7wTrmwk4m2Hq=Du9T9UP5wQB9Nkmsw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] NBD patches for 2017-09-06
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +31,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-Missed being added as part of 71650df7b0ee.
+On 7 September 2017 at 14:53, Daniel P. Berrange <berrange@redhat.com> wrote:
+> On Thu, Sep 07, 2017 at 08:48:15AM -0500, Eric Blake wrote:
+>> On 09/07/2017 07:26 AM, Peter Maydell wrote:
+>> > On 6 September 2017 at 16:21, Eric Blake <eblake@redhat.com> wrote:
+>> >> The following changes since commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e:
+>> >>
+>> >>   Revert "kvm: use DIV_ROUND_UP" (2017-09-05 18:55:40 +0100)
+>> >>
+>> >> are available in the git repository at:
+>> >>
+>> >>   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-09-06
+>> >>
+>> >> for you to fetch changes up to 030fa7f6f950f5c8963f1dee8e6bb7387ed86a99:
+>> >>
+>> >>   nbd: Use new qio_channel_*_all() functions (2017-09-06 10:11:54 -0500)
+>> >>
+>>
+>> > I get an error in test-aio-multithread (clang, linux, x86-64):
+>> >   GTESTER tests/test-aio-multithread
+>> > **
+>> > ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-aio-multithread.c:368:test_multi_fair_mutex:
+>> > assertion failed (counter == atomic_counter): (532693 == 532694)
+>> > GTester: last random seed: R02Sa68ef1eb4822359eb869642ff26180df
+>>
+>> I wonder if that is a rare but pre-existing bug, as I don't see any use
+>> of qio_channel in test-aio-multithread, and therefore no obvious way
+>> that this series would be the cause of the intermittent failure.
+>
+> Agreed. Even if there was use of QIOChannel, there is certainly no use
+> of the qio_channel_read|write_all functions that are being changed
+> in this series, since they've only just been added to QEMU and are only
+> used in the test suite and your final NBD patch here. So I think this
+> must be a pre-existing race condition.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tci/tcg-target.h | 5 +++++
- 1 file changed, 5 insertions(+)
+OK. I've applied the pullreq.
 
-diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
-index 06963288dc..8df628a319 100644
---- a/tcg/tci/tcg-target.h
-+++ b/tcg/tci/tcg-target.h
-@@ -192,4 +192,9 @@ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
- {
- }
- 
-+/* We could notice __i386__ or __s390x__ and reduce the barriers depending
-+   on the host.  But if you want performance, you use the normal backend.
-+   We prefer consistency across hosts on this.  */
-+#define TCG_TARGET_DEFAULT_MO  (0)
-+
- #endif /* TCG_TARGET_H */
--- 
-2.13.5
+thanks
+-- PMM
