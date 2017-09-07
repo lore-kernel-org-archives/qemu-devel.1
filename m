@@ -1,21 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40216)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dq3CP-0004mQ-5j
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 16:14:57 -0400
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dq3E6-0006KO-PN
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 16:16:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dq3CK-0002Ze-F3
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 16:14:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59984)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dq3CK-0002ZK-9U
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 16:14:48 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Thu,  7 Sep 2017 22:13:35 +0200
-Message-Id: <20170907201335.13956-22-david@redhat.com>
-In-Reply-To: <20170907201335.13956-1-david@redhat.com>
-References: <20170907201335.13956-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 21/21] s390x: allow CPU hotplug in random
- core-id order
+	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dq3E2-0003hL-5C
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 16:16:38 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41679)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
+	id 1dq3E1-0003eg-RX
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 16:16:34 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v87KErkt067192
+	for <qemu-devel@nongnu.org>; Thu, 7 Sep 2017 16:16:31 -0400
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cucr80nde-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 16:16:31 -0400
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
+	Thu, 7 Sep 2017 14:16:30 -0600
+From: Stefan Berger <stefanb@linux.vnet.ibm.com>
+Date: Thu,  7 Sep 2017 16:16:24 -0400
+Message-Id: <1504815384-8490-1-git-send-email-stefanb@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2] Add myself as maintainer for TPM code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +36,34 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>
+Cc: armbru@redhat.com, f4bug@amsat.org, Stefan Berger <stefanb@linux.vnet.ibm.com>
 
-SCLP correctly indicates the core-id aka. CPU address for each available
-CPU.
+Also add backends/tpm.c to the list of files.
 
-As the core-id corresponds to cpu_index, also a newly created kvm vcpu
-gets assigned this core-id as vcpu id. So SIGP in the kernel works
-correctly (it uses the vcpu id to lookup the correct CPU).
-
-So there should be nothing hindering us from hotplugging CPUs in random
-core-id order.
-
-This now makes sure that the output from "query-hotpluggable-cpus"
-is completely true. Until now, a specific order is implicit. Performance
-vice, hotplugging CPUs in non-sequential order might not be the best thing
-to do, as VCPU lookup inside KVM might be a little slower. But that
-doesn't hinder us from supporting it.
-
-next_core_id is now used by linux user only.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Stefan Berger <stefanb@linux.vnet.ibm.com>
 ---
- target/s390x/cpu.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
+ MAINTAINERS | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index ad9dcdaaf1..5701a41112 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -199,6 +199,7 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
- #else
-     /* implicitly set for linux-user only */
-     cpu->env.core_id = scc->next_core_id;
-+    scc->next_core_id++;
- #endif
+diff --git a/MAINTAINERS b/MAINTAINERS
+index caf7e8a..c434a09 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1487,12 +1487,14 @@ F: docs/tracing.txt
+ T: git git://github.com/stefanha/qemu.git tracing
  
-     if (cpu_exists(cpu->env.core_id)) {
-@@ -206,12 +207,6 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-                    cpu->env.core_id);
-         goto out;
-     }
--    if (cpu->env.core_id != scc->next_core_id) {
--        error_setg(&err, "Unable to add CPU: %" PRIu32
--                   ", the next available id is %" PRIu32, cpu->env.core_id,
--                   scc->next_core_id);
--        goto out;
--    }
+ TPM
+-S: Orphan
++M: Stefan Berger <stefanb@linux.vnet.ibm.com>
++S: Maintained
+ F: tpm.c
+ F: hw/tpm/*
+ F: include/hw/acpi/tpm.h
+ F: include/sysemu/tpm*
+ F: qapi/tpm.json
++F: backends/tpm.c
  
-     /* sync cs->cpu_index and env->core_id. The latter is needed for TCG. */
-     cs->cpu_index = env->core_id;
-@@ -219,7 +214,6 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-     if (err != NULL) {
-         goto out;
-     }
--    scc->next_core_id++;
- 
- #if !defined(CONFIG_USER_ONLY)
-     qemu_register_reset(s390_cpu_machine_reset_cb, cpu);
+ Checkpatch
+ S: Odd Fixes
 -- 
-2.13.5
+2.5.5
