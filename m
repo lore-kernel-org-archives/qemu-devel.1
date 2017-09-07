@@ -1,23 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48348)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51633)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpn0f-0003kh-Ok
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 22:57:42 -0400
+	(envelope-from <mjrosato@linux.vnet.ibm.com>) id 1dpnIC-00062r-VU
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 23:15:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpn0e-0003ER-TF
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 22:57:41 -0400
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-30-eblake@redhat.com>
-	<3e70c2c4-3266-6cc7-3682-2cf3c2c61d42@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c2d81388-50e2-c38c-3e90-609a392bdb06@redhat.com>
-Date: Wed, 6 Sep 2017 21:57:20 -0500
+	(envelope-from <mjrosato@linux.vnet.ibm.com>) id 1dpnI8-0004Zu-Ti
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 23:15:48 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55495
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mjrosato@linux.vnet.ibm.com>)
+	id 1dpnI8-0004Zg-Nq
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 23:15:44 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v873DfX3095086
+	for <qemu-devel@nongnu.org>; Wed, 6 Sep 2017 23:15:44 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2ctq57tncj-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 06 Sep 2017 23:15:43 -0400
+Received: from localhost
+	by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mjrosato@linux.vnet.ibm.com>;
+	Wed, 6 Sep 2017 23:15:43 -0400
+References: <20170904154316.4148-1-david@redhat.com>
+	<20170904154316.4148-14-david@redhat.com>
+From: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
+Date: Wed, 6 Sep 2017 23:15:39 -0400
 MIME-Version: 1.0
-In-Reply-To: <3e70c2c4-3266-6cc7-3682-2cf3c2c61d42@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="V0GHL4LVMSHcA3iPH0tuQ04sFMF0Bh9PP"
-Subject: Re: [Qemu-devel] [PATCH v6 29/29] libqtest: Rename qtest_init() to
- qtest_start()
+In-Reply-To: <20170904154316.4148-14-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <f59a2e64-d1fb-2db7-0241-4fe76dbe9d95@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 13/19] target/s390x: use "core-id" for
+ cpu number/address/id handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,78 +44,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: "open list:Floppy" <qemu-block@nongnu.org>, Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Amit Shah <amit@kernel.org>, armbru@redhat.com, Alexander Graf <agraf@suse.de>, Keith Busch <keith.busch@intel.com>, "open list:sPAPR" <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>, pbonzini@redhat.com, John Snow <jsnow@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---V0GHL4LVMSHcA3iPH0tuQ04sFMF0Bh9PP
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: "open list:Floppy" <qemu-block@nongnu.org>,
- Ben Warren <ben@skyportsystems.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Amit Shah <amit@kernel.org>,
- armbru@redhat.com, Alexander Graf <agraf@suse.de>,
- Keith Busch <keith.busch@intel.com>, "open list:sPAPR"
- <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- pbonzini@redhat.com, John Snow <jsnow@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <c2d81388-50e2-c38c-3e90-609a392bdb06@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 29/29] libqtest: Rename qtest_init() to
- qtest_start()
-References: <20170901180340.30009-1-eblake@redhat.com>
- <20170901180340.30009-30-eblake@redhat.com>
- <3e70c2c4-3266-6cc7-3682-2cf3c2c61d42@redhat.com>
-In-Reply-To: <3e70c2c4-3266-6cc7-3682-2cf3c2c61d42@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 09/04/2017 11:43 AM, David Hildenbrand wrote:
+> Some time ago we discussed that using "id" as property name is not the
+> right thing to do, as it is a reserved property for other devices and
+> will not work with device_add.
+> 
+> Switch to the term "core-id" instead, and use it as an equivalent to
+> "CPU address" mentioned in the PoP. There is no such thing as cpu number,
+> so rename env.cpu_num to env.core_id. We use "core-id" as this is the
+> common term to use for device_add later on (x86 and ppc).
+> 
+> We can get rid of cpu->id now. Keep cpu_index and env->core_id in sync.
+> cpu_index was already implicitly used by e.g. cpu_exists(), so keeping
+> both in sync seems to be the right thing to do.
+> 
 
-On 09/05/2017 08:10 AM, Thomas Huth wrote:
-> On 01.09.2017 20:03, Eric Blake wrote:
->> We already have another qtest_init() in the tree, for the
->> top-level qtest.c device; having two functions with different
->> signatures is confusing.  Rename the libqtest version to
->> qtest_start() to eliminate the duplication.
->=20
-> This is too much code churn for my taste, and I also do not like the
-> idea of naming the function qtest_start() - since this was a function
-> with different semantics before your patch 28/29, so this will cause
-> confusion for all the people who are used to the old qtest_start()
-> function or who want to backport patches that have done after this
-> change to a code level before this change.
->=20
-> If you are really bugged by the qtest_init() name clash, I think it's
-> way easier if you rename the qtest_init() in the qtest.c file instead.
+Rename & removal of 'id' is fine w/ me - in retrospect, it's a shame we
+used 'id' in the first place.
 
-Except the qtest_init() in qtest.c really is our normal pattern of
-*_init for devices, so that one's named correctly.  Our testsuite is the
-one that is using a name different from its normal usage in the rest of
-the tree.
+> cpu_index will now no longer automatically get set via
+> cpu_exec_realizefn(). For now, we were lucky that both implicitly stayed
+> in sync.>
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Good catch.
 
+> Our new cpu property "core-id" can be a static property. Range checks can
+> be avoided by using the correct type and the "setting after realized"
+> check is done implicitly.
+> 
+> device_add will later need the reserved "id" property. Hotplugging a CPU
+> on s390x will then be: "device_add host-s390-cpu,id=cpu2,core-id=2".
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
 
---V0GHL4LVMSHcA3iPH0tuQ04sFMF0Bh9PP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+[...]
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+> diff --git a/target/s390x/translate.c b/target/s390x/translate.c
+> index 4b0db7b7bd..b8963f2fe2 100644
+> --- a/target/s390x/translate.c
+> +++ b/target/s390x/translate.c
+> @@ -3822,10 +3822,7 @@ static ExitStatus op_ssm(DisasContext *s, DisasOps *o)
+>  static ExitStatus op_stap(DisasContext *s, DisasOps *o)
+>  {
+>      check_privileged(s);
+> -    /* ??? Surely cpu address != cpu number.  In any case the previous
+> -       version of this stored more than the required half-word, so it
+> -       is unlikely this has ever been tested.  */
+> -    tcg_gen_ld32u_i64(o->out, cpu_env, offsetof(CPUS390XState, cpu_num));
+> +    tcg_gen_ld32u_i64(o->out, cpu_env, offsetof(CPUS390XState, core_id));
+>      return NO_EXIT;
+>  }
+> 
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmwtZAACgkQp6FrSiUn
-Q2p3tAgAmh2k8LnIPHitLYtblJRtu4AV5ZIVYTsBmOUem7ad5C2biLS428y1+jqJ
-N7v+TIeSvBYoWPhS/2poyO3y3PDSyJdAxQ1oM1bodV+tZTSy9o5tec/U7kohQCOq
-z8bEuN07pV46UC+DDikt3Bkw+hXjCh+mo1MOQIE3ZXD2GhnyCFhij1d4WQR3fq3r
-3AWIzbJ2MXa66Fgn1/uQz1AcCCJBSByS08gSdDklPaZmoME4mZU6RMVyww9IQFpK
-DZPXt3bi5MuBqBoDNUEq9aXkNAyy2QcDACKgAYFt4do64Sty/2+9sE6d/EMpHMDb
-l9jPikYLzJ/gjYwJiFKPIHxFiAVMSw==
-=0HAI
------END PGP SIGNATURE-----
+Are you sure it's OK to remove this blurb in its entirety?  You are
+certainly collapsing the various CPU identifiers, but you aren't
+changing the size of the store from when this blurb was put in
+(411fea3d) So, "the previous version of this stored more than the
+required half-word" seems to be still relevant -- Unless you've gone
+ahead and tested it out?
 
---V0GHL4LVMSHcA3iPH0tuQ04sFMF0Bh9PP--
+Outside of that nit, I like the changes.
+
+Reviewed-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
