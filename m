@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40318)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45972)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dq0OA-0001cS-UV
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:14:55 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dq0cs-0005IG-5q
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:30:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dq0O5-0001tR-RV
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:14:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60178)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dq0O5-0001se-J4
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:14:45 -0400
-Date: Thu, 7 Sep 2017 18:14:36 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170907171435.GE2194@work-vm>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<20170906145043.GG15535@stefanha-x1.localdomain>
-	<20170906151436.GF2215@work-vm>
-	<CAJSP0QUu45oPTL2JErTWAt7OFrHpcB-88EvGBwVAKxn0CE=ebg@mail.gmail.com>
-	<20170907093546.GE2098@work-vm>
-	<CAJSP0QWA2gci=PxKDVEWQNhxDv-9pDdJzyWdQut=Zkr+rCb+3A@mail.gmail.com>
-	<20170907120227.GE23040@pxdev.xzpeter.org>
-	<CAJSP0QWT2fNs16_mAy-iO_zc=ocYegCVwgV6UAXAL8S_GFjGXg@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dq0cn-0002y9-LZ
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:30:02 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:37264)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dq0cn-0002xn-E6
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:29:57 -0400
+Received: by mail-wr0-x233.google.com with SMTP id k20so676006wre.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 10:29:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJSP0QWT2fNs16_mAy-iO_zc=ocYegCVwgV6UAXAL8S_GFjGXg@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
+In-Reply-To: <CAFEAcA_0tC5cqxVKi+pyPEUuumvNAQ6peMFPq0abqOBz4jfq5w@mail.gmail.com>
+References: <20170222183919.11928-1-ehabkost@redhat.com>
+	<CAFEAcA8_SsbdXWFbAt+qKXF-XGBjAt=ZbDgzSaeXYFzYPL1KTQ@mail.gmail.com>
+	<20170224171152.GU2778@thinpad.lan.raisama.net>
+	<CAFEAcA_0tC5cqxVKi+pyPEUuumvNAQ6peMFPq0abqOBz4jfq5w@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Sep 2017 18:29:35 +0100
+Message-ID: <CAFEAcA-B+NL=139kr98m2btvFFAm8HMQ93up4pXhG3cEpBZtVw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] i386: Add "max" CPU model to TCG
+ and KVM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,109 +32,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Peter Xu <peterx@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Richard W.M. Jones" <rjones@redhat.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "Daniel P. Berrange" <berrange@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Jiri Denemark <jdenemar@redhat.com>, Richard Henderson <rth@twiddle.net>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J. Herne" <jjherne@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-* Stefan Hajnoczi (stefanha@gmail.com) wrote:
-> On Thu, Sep 7, 2017 at 1:02 PM, Peter Xu <peterx@redhat.com> wrote:
-> > On Thu, Sep 07, 2017 at 11:09:29AM +0100, Stefan Hajnoczi wrote:
-> >> On Thu, Sep 7, 2017 at 10:35 AM, Dr. David Alan Gilbert
-> >> <dgilbert@redhat.com> wrote:
-> >> > * Stefan Hajnoczi (stefanha@gmail.com) wrote:
-> >> >> On Wed, Sep 6, 2017 at 4:14 PM, Dr. David Alan Gilbert
-> >> >> <dgilbert@redhat.com> wrote:
-> >> >> > * Stefan Hajnoczi (stefanha@gmail.com) wrote:
-> >> >> >> On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
-> >> >> >> > The root problem is that, monitor commands are all handled in main
-> >> >> >> > loop thread now, no matter how many monitors we specify. And, if main
-> >> >> >> > loop thread hangs due to some reason, all monitors will be stuck.
-> >> >> >>
-> >> >> >> I see a larger issue with postcopy: existing QEMU code assumes that
-> >> >> >> guest memory access is instantaneous.
-> >> >> >>
-> >> >> >> Postcopy breaks this assumption and introduces blocking points that can
-> >> >> >> now take unbounded time.
-> >> >> >>
-> >> >> >> This problem isn't specific to the monitor.  It can also happen to other
-> >> >> >> components in QEMU like the gdbstub.
-> >> >> >>
-> >> >> >> Do we need an asynchronous memory API?  Synchronous memory access should
-> >> >> >> only be allowed in vcpu threads.
-> >> >> >
-> >> >> > It would probably be useful for gdbstub where the overhead of async
-> >> >> > doesn't matter;  but doing that for all IO emulation is hard.
-> >> >>
-> >> >> Why is it hard?
-> >> >>
-> >> >> Memory access can be synchronous in the vcpu thread.  That eliminates
-> >> >> a lot of code straight away.
-> >> >>
-> >> >> Anything using dma-helpers.c is already async.  They just don't know
-> >> >> that the memory access part is being made async too :).
-> >> >
-> >> > Can you point me to some info on that ?
-> >>
-> >> IDE and SCSI use dma-helpers.c to perform I/O:
-> >> hw/ide/core.c:892:        s->bus->dma->aiocb =
-> >> dma_blk_io(blk_get_aio_context(s->blk),
-> >> hw/ide/macio.c:189:        s->bus->dma->aiocb =
-> >> dma_blk_io(blk_get_aio_context(s->blk), &s->sg,
-> >> hw/scsi/scsi-disk.c:348:        r->req.aiocb =
-> >> dma_blk_io(blk_get_aio_context(s->qdev.conf.blk),
-> >> hw/scsi/scsi-disk.c:551:        r->req.aiocb =
-> >> dma_blk_io(blk_get_aio_context(s->qdev.conf.blk),
-> >>
-> >> They pass a scatter-gather list of guest RAM addresses to
-> >> dma-helpers.c.  They receive a callback when I/O has finished.
-> >>
-> >> Try following the code path.  Request submission may be from a vcpu
-> >> thread or IOThread.  Completion occurs in the main loop or an
-> >> IOThread.
-> >>
-> >> The main point is that this API is already asynchronous.  If any
-> >> changes are needed for async guest memory access (not sure, I haven't
-> >> checked), then at least the dma-helpers.c users do not need to be
-> >> modified.
-> >>
-> >> >> The remaining cases are virtio and some other devices.
-> >> >>
-> >> >> If you are worried about performance, the first rule is that async
-> >> >> memory access is only needed on the destination side when post-copy is
-> >> >> active.  Maybe use setjmp to return from the signal handler and queue
-> >> >> a callback for when the page has been loaded.
-> >> >
-> >> > I'm not sure it's worth trying to be too clever at avoiding this;
-> >> > I see the fact that we're doing IO with the bql held as a more
-> >> > fundamental problem.
-> >>
-> >> QEMU should be doing I/O syscalls in async fashion or threadpool
-> >> workers (no BQL) so the BQL is not an issue.  Anything else could
-> >> cause unbounded waits even without postcopy.
-> >
-> > E.g. when vcpu got page faulted with BQL taken, while the main thread
-> > needs the BQL to dispatch anything, including monitor commands.
-> >
-> > So I think it's a multiplex problem - we need to solve both (1) main
-> > thread accessing guest memories which is still missing, and (2) BQL
-> > deadlocks between vcpu threads and main thread.
-> 
-> I think we need a single solution and cannot treat these as separate.
-> This is because the same virtio device emulation code may run in 3
-> contexts:
-> 1. vcpu thread (ioeventfd=off)
-> 2. main loop thread (ioeventfd=on)
-> 3. IOThread (ioeventfd=on, iothread=<id>)
-> 
-> If you try to solve them separately then the code won't work in all 3
-> contexts anymore.
+On 24 February 2017 at 18:04, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 24 February 2017 at 17:11, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>> On Fri, Feb 24, 2017 at 01:48:46PM +0000, Peter Maydell wrote:
+>>> I had a look at implementing this for ARM, and ran into problems
+>>> because of how we've done '-cpu host'. For us the "host" CPU
+>>> type is registered dynamically when kvm_init() is called,
+>>> because (a) it only exists if -enable-kvm and (b) it probes
+>>> the kernel to find out what's available. So I could easily
+>>> add 'max' in the same place; but then where should I add the
+>>> type definition of 'max' for the non-KVM case?
+>>
+>> I recommend registering the type unconditionally, moving
+>> KVM-specific initialization to ->instance_init() and/or
+>> ->realize() (being careful to make instance_init() not crash if
+>> KVM is disabled), and make ->realize() fail if KVM is disabled.
+>> IIRC, we did exactly that on x86 a while ago.
+>
+> Thanks, sounds reasonable. Also sounds like more rework than
+> I want to try to write, test and cram into QEMU before freeze
+> deadline on Tuesday, so I guess we'll have to wait til after
+> 2.9; a pity, but can't be helped.
 
-I think you can also get main loop thread hangs on things like
-network packet reception.
+I remembered this week that I'd completely forgotten that
+we should have a go at "cpu max" for ARM in the 2.10 cycle.
+Maybe for 2.11 :-)
 
-Dave
-
-> 
-> Stefan
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
