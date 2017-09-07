@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34878)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dps8C-00054F-63
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:25:49 -0400
+	(envelope-from <otubo@redhat.com>) id 1dpsAL-00062Y-G2
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:28:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dps87-00082f-Fm
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:25:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55965)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dps87-00081w-8W
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:25:43 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 277766146E
-	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 08:25:42 +0000 (UTC)
-Date: Thu, 7 Sep 2017 10:25:38 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170907102538.15ed780d.cohuck@redhat.com>
-In-Reply-To: <7eb83905-41cd-fa32-226c-0849d42bed04@redhat.com>
-References: <20170906094927.22376-1-cohuck@redhat.com>
-	<20170906132936.7cf49b24.cohuck@redhat.com>
-	<20170907081131.GB4461@dhcp-200-186.str.redhat.com>
-	<7eb83905-41cd-fa32-226c-0849d42bed04@redhat.com>
+	(envelope-from <otubo@redhat.com>) id 1dpsAG-0000v9-Tx
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:28:01 -0400
+Date: Thu, 7 Sep 2017 10:27:49 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20170907082749.GA2441@vader>
+References: <20170821155005.16885-1-otubo@redhat.com>
+	<45e8e004-5a55-07a3-190b-c01106af5de4@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC] accel: default to an actually
- available accelerator
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <45e8e004-5a55-07a3-190b-c01106af5de4@cn.fujitsu.com>
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] filter-mirror: segfault
+ when specifying non existent device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, pbonzini@redhat.com, mreitz@redhat.com
+To: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+Cc: qemu-trivial@nongnu.org, lizhijian@cn.fujitsu.com, mjt@tls.msk.ru, qemu-devel@nongnu.org
 
-On Thu, 7 Sep 2017 10:14:27 +0200
-Thomas Huth <thuth@redhat.com> wrote:
-
-> On 07.09.2017 10:11, Kevin Wolf wrote:
-> [...]
-> > But the real reason why I'm replying: Should we add changing the default
-> > to "kvm:tcg" to the list of planned 3.0 changes? I am part of the group
-> > that intentionally uses TCG occasionally, but I think the majority of
-> > users wants to use KVM (or whatever the fastest option is on their
-> > system) whenever it is available.  
+On Tue, Aug 22, 2017 at 09:19:20AM +0800, Zhang Chen wrote:
 > 
-> If you consider how often people are getting this wrong (they want to
-> use KVM but end up with TCG in the first try), I think that's a good idea.
+> 
+> On 08/21/2017 11:50 PM, Eduardo Otubo wrote:
+> > When using filter-mirror like the example below where the interface
+> > 'ndev0' does not exist on the host, QEMU crashes into segmentation
+> > fault.
+> > 
+> >   $ qemu-system-x86_64 -S -machine pc -netdev user,id=ndev0 -object filter-mirror,id=test-object,netdev=ndev0
+> > 
+> > This happens because the function filter_mirror_setup() does not checks
+> > if the device actually exists and still keep on processing calling
+> > qemu_chr_find(). This patch fixes this issue.
+> > 
+> > Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> 
+> Looks good for me.
+> 
+> Reviewed-by: Zhang Chen<zhangchen.fnst@cn.fujitsu.com>
 
-Agreed.
+Ping.
 
-I'm wondering what that means for our tests, though. Some of them work
-slightly different under tcg or kvm (cf. iotest 186, as referenced in
-the original mail), and sometimes you'll probably explicitly want to
-exercise tcg. That does not speak against the change, but we probably
-need to look at what we want in more detail.
+> 
+> Thanks
+> Zhang Chen
+> 
+> > ---
+> >   net/filter-mirror.c | 14 +++++++++++---
+> >   1 file changed, 11 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/net/filter-mirror.c b/net/filter-mirror.c
+> > index 90e2c92337..e18a4b16a0 100644
+> > --- a/net/filter-mirror.c
+> > +++ b/net/filter-mirror.c
+> > @@ -213,14 +213,22 @@ static void filter_mirror_setup(NetFilterState *nf, Error **errp)
+> >       MirrorState *s = FILTER_MIRROR(nf);
+> >       Chardev *chr;
+> > +    if (s->outdev == NULL) {
+> > +        goto err;
+> > +    }
+> > +
+> >       chr = qemu_chr_find(s->outdev);
+> > +
+> >       if (chr == NULL) {
+> > -        error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+> > -                  "Device '%s' not found", s->outdev);
+> > -        return;
+> > +        goto err;
+> >       }
+> >       qemu_chr_fe_init(&s->chr_out, chr, errp);
+> > +
+> > +err:
+> > +    error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND, "Device '%s' not found",
+> > +              nf->netdev_id);
+> > +    return;
+> >   }
+> >   static void redirector_rs_finalize(SocketReadState *rs)
+> 
+> -- 
+> Thanks
+> Zhang Chen
+> 
+> 
+> 
+> 
 
-> Maybe we should start a Wiki page where we collect ideas for QEMU 3.0?
-
-Also a good idea.
-
-[Do we already have any idea about the timeframe for 3.0?]
+-- 
+Eduardo Otubo
+Senior Software Engineer @ RedHat
