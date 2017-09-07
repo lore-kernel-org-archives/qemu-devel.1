@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56463)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwr6-00011k-Rf
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:39 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwr3-00010B-KL
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwqy-0007ej-NZ
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:28 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37196)
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwqt-0007as-Qr
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:25 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37186)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dpwqy-0007dn-DX
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:20 -0400
+	id 1dpwqt-0007Xf-Iq
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:15 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwqx-0001ek-E9
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:28:19 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwqs-0001bg-GR
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:28:14 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  7 Sep 2017 14:28:16 +0100
-Message-Id: <1504790904-17018-24-git-send-email-peter.maydell@linaro.org>
+Date: Thu,  7 Sep 2017 14:28:09 +0100
+Message-Id: <1504790904-17018-17-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1504790904-17018-1-git-send-email-peter.maydell@linaro.org>
 References: <1504790904-17018-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 23/31] target/arm: Make CCR register banked for
- v8M
+Subject: [Qemu-devel] [PULL 16/31] target/arm: Make CONTROL register banked
+ for v8M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,185 +30,155 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Make the CCR register banked if v8M security extensions are enabled.
-
-This is slightly more complicated than the other "add banking"
-patches because there is one bit in the register which is not
-banked. We keep the live data in the NS copy of the register,
-and adjust it on register reads and writes. (Since we don't
-currently implement the behaviour that the bit controls, there
-is nowhere else that needs to care.)
-
-This patch includes the enforcement of the bits which are newly
-RES1 in ARMv8M.
+Make the CONTROL register banked if v8M security extensions are enabled.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 1503414539-28762-17-git-send-email-peter.maydell@linaro.org
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 1503414539-28762-10-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/cpu.h      |  2 +-
- hw/intc/armv7m_nvic.c | 33 +++++++++++++++++++++++++++------
- target/arm/cpu.c      | 12 +++++++++---
- target/arm/helper.c   |  5 +++--
- target/arm/machine.c  |  3 ++-
- 5 files changed, 42 insertions(+), 13 deletions(-)
+ target/arm/cpu.h       |  5 +++--
+ target/arm/helper.c    | 21 +++++++++++----------
+ target/arm/machine.c   |  3 ++-
+ target/arm/translate.c |  2 +-
+ 4 files changed, 17 insertions(+), 14 deletions(-)
 
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 29ffb26..d223446 100644
+index 5cf2e76..1d9eb36 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -423,7 +423,7 @@ typedef struct CPUARMState {
-         uint32_t vecbase[2];
+@@ -422,7 +422,7 @@ typedef struct CPUARMState {
+         uint32_t other_sp;
+         uint32_t vecbase;
          uint32_t basepri[2];
-         uint32_t control[2];
--        uint32_t ccr; /* Configuration and Control */
-+        uint32_t ccr[2]; /* Configuration and Control */
+-        uint32_t control;
++        uint32_t control[2];
+         uint32_t ccr; /* Configuration and Control */
          uint32_t cfsr; /* Configurable Fault Status */
          uint32_t hfsr; /* HardFault Status */
-         uint32_t dfsr; /* Debug Fault Status Register */
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index a4c298f..a889397 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -448,7 +448,12 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-         /* TODO: Implement SLEEPONEXIT.  */
-         return 0;
-     case 0xd14: /* Configuration Control.  */
--        return cpu->env.v7m.ccr;
-+        /* The BFHFNMIGN bit is the only non-banked bit; we
-+         * keep it in the non-secure copy of the register.
-+         */
-+        val = cpu->env.v7m.ccr[attrs.secure];
-+        val |= cpu->env.v7m.ccr[M_REG_NS] & R_V7M_CCR_BFHFNMIGN_MASK;
-+        return val;
-     case 0xd24: /* System Handler Status.  */
-         val = 0;
-         if (s->vectors[ARMV7M_EXCP_MEM].active) {
-@@ -673,7 +678,20 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-                   R_V7M_CCR_USERSETMPEND_MASK |
-                   R_V7M_CCR_NONBASETHRDENA_MASK);
- 
--        cpu->env.v7m.ccr = value;
-+        if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-+            /* v8M makes NONBASETHRDENA and STKALIGN be RES1 */
-+            value |= R_V7M_CCR_NONBASETHRDENA_MASK
-+                | R_V7M_CCR_STKALIGN_MASK;
-+        }
-+        if (attrs.secure) {
-+            /* the BFHFNMIGN bit is not banked; keep that in the NS copy */
-+            cpu->env.v7m.ccr[M_REG_NS] =
-+                (cpu->env.v7m.ccr[M_REG_NS] & ~R_V7M_CCR_BFHFNMIGN_MASK)
-+                | (value & R_V7M_CCR_BFHFNMIGN_MASK);
-+            value &= ~R_V7M_CCR_BFHFNMIGN_MASK;
-+        }
-+
-+        cpu->env.v7m.ccr[attrs.secure] = value;
-         break;
-     case 0xd24: /* System Handler Control.  */
-         s->vectors[ARMV7M_EXCP_MEM].active = (value & (1 << 0)) != 0;
-@@ -860,12 +878,15 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-     }
- }
- 
--static bool nvic_user_access_ok(NVICState *s, hwaddr offset)
-+static bool nvic_user_access_ok(NVICState *s, hwaddr offset, MemTxAttrs attrs)
+@@ -1681,7 +1681,8 @@ static inline bool arm_v7m_is_handler_mode(CPUARMState *env)
+ static inline int arm_current_el(CPUARMState *env)
  {
-     /* Return true if unprivileged access to this register is permitted. */
-     switch (offset) {
-     case 0xf00: /* STIR: accessible only if CCR.USERSETMPEND permits */
--        return s->cpu->env.v7m.ccr & R_V7M_CCR_USERSETMPEND_MASK;
-+        /* For access via STIR_NS it is the NS CCR.USERSETMPEND that
-+         * controls access even though the CPU is in Secure state (I_QDKX).
-+         */
-+        return s->cpu->env.v7m.ccr[attrs.secure] & R_V7M_CCR_USERSETMPEND_MASK;
-     default:
-         /* All other user accesses cause a BusFault unconditionally */
-         return false;
-@@ -881,7 +902,7 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-     unsigned i, startvec, end;
-     uint32_t val;
- 
--    if (attrs.user && !nvic_user_access_ok(s, addr)) {
-+    if (attrs.user && !nvic_user_access_ok(s, addr, attrs)) {
-         /* Generate BusFault for unprivileged accesses */
-         return MEMTX_ERROR;
+     if (arm_feature(env, ARM_FEATURE_M)) {
+-        return arm_v7m_is_handler_mode(env) || !(env->v7m.control & 1);
++        return arm_v7m_is_handler_mode(env) ||
++            !(env->v7m.control[env->v7m.secure] & 1);
      }
-@@ -971,7 +992,7 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
  
-     trace_nvic_sysreg_write(addr, value, size);
- 
--    if (attrs.user && !nvic_user_access_ok(s, addr)) {
-+    if (attrs.user && !nvic_user_access_ok(s, addr, attrs)) {
-         /* Generate BusFault for unprivileged accesses */
-         return MEMTX_ERROR;
-     }
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index b7f5ec2..116b567 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -189,11 +189,17 @@ static void arm_cpu_reset(CPUState *s)
-             env->v7m.secure = true;
-         }
- 
--        /* The reset value of this bit is IMPDEF, but ARM recommends
-+        /* In v7M the reset value of this bit is IMPDEF, but ARM recommends
-          * that it resets to 1, so QEMU always does that rather than making
--         * it dependent on CPU model.
-+         * it dependent on CPU model. In v8M it is RES1.
-          */
--        env->v7m.ccr = R_V7M_CCR_STKALIGN_MASK;
-+        env->v7m.ccr[M_REG_NS] = R_V7M_CCR_STKALIGN_MASK;
-+        env->v7m.ccr[M_REG_S] = R_V7M_CCR_STKALIGN_MASK;
-+        if (arm_feature(env, ARM_FEATURE_V8)) {
-+            /* in v8M the NONBASETHRDENA bit [0] is RES1 */
-+            env->v7m.ccr[M_REG_NS] |= R_V7M_CCR_NONBASETHRDENA_MASK;
-+            env->v7m.ccr[M_REG_S] |= R_V7M_CCR_NONBASETHRDENA_MASK;
-+        }
- 
-         /* Unlike A/R profile, M profile defines the reset LR value */
-         env->regs[14] = 0xffffffff;
+     if (is_a64(env)) {
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index cc68688..2fe1662 100644
+index 4f53ea1..aa64596 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -6113,7 +6113,8 @@ static void v7m_push_stack(ARMCPU *cpu)
-     uint32_t xpsr = xpsr_read(env);
+@@ -6048,14 +6048,15 @@ static uint32_t v7m_pop(CPUARMState *env)
+ static void switch_v7m_sp(CPUARMState *env, bool new_spsel)
+ {
+     uint32_t tmp;
+-    bool old_spsel = env->v7m.control & R_V7M_CONTROL_SPSEL_MASK;
++    uint32_t old_control = env->v7m.control[env->v7m.secure];
++    bool old_spsel = old_control & R_V7M_CONTROL_SPSEL_MASK;
  
-     /* Align stack pointer if the guest wants that */
--    if ((env->regs[13] & 4) && (env->v7m.ccr & R_V7M_CCR_STKALIGN_MASK)) {
-+    if ((env->regs[13] & 4) &&
-+        (env->v7m.ccr[env->v7m.secure] & R_V7M_CCR_STKALIGN_MASK)) {
-         env->regs[13] -= 4;
-         xpsr |= XPSR_SPREALIGN;
+     if (old_spsel != new_spsel) {
+         tmp = env->v7m.other_sp;
+         env->v7m.other_sp = env->regs[13];
+         env->regs[13] = tmp;
+ 
+-        env->v7m.control = deposit32(env->v7m.control,
++        env->v7m.control[env->v7m.secure] = deposit32(old_control,
+                                      R_V7M_CONTROL_SPSEL_SHIFT,
+                                      R_V7M_CONTROL_SPSEL_LENGTH, new_spsel);
      }
-@@ -6211,7 +6212,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-         /* fall through */
-     case 9: /* Return to Thread using Main stack */
-         if (!rettobase &&
--            !(env->v7m.ccr & R_V7M_CCR_NONBASETHRDENA_MASK)) {
-+            !(env->v7m.ccr[env->v7m.secure] & R_V7M_CCR_NONBASETHRDENA_MASK)) {
-             ufault = true;
+@@ -6409,7 +6410,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+     }
+ 
+     lr = 0xfffffff1;
+-    if (env->v7m.control & R_V7M_CONTROL_SPSEL_MASK) {
++    if (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK) {
+         lr |= 4;
+     }
+     if (!arm_v7m_is_handler_mode(env)) {
+@@ -8827,7 +8828,7 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+         return xpsr_read(env) & mask;
+         break;
+     case 20: /* CONTROL */
+-        return env->v7m.control;
++        return env->v7m.control[env->v7m.secure];
+     }
+ 
+     if (el == 0) {
+@@ -8836,10 +8837,10 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+ 
+     switch (reg) {
+     case 8: /* MSP */
+-        return (env->v7m.control & R_V7M_CONTROL_SPSEL_MASK) ?
++        return (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK) ?
+             env->v7m.other_sp : env->regs[13];
+     case 9: /* PSP */
+-        return (env->v7m.control & R_V7M_CONTROL_SPSEL_MASK) ?
++        return (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK) ?
+             env->regs[13] : env->v7m.other_sp;
+     case 16: /* PRIMASK */
+         return env->v7m.primask[env->v7m.secure];
+@@ -8888,14 +8889,14 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
          }
          break;
+     case 8: /* MSP */
+-        if (env->v7m.control & R_V7M_CONTROL_SPSEL_MASK) {
++        if (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK) {
+             env->v7m.other_sp = val;
+         } else {
+             env->regs[13] = val;
+         }
+         break;
+     case 9: /* PSP */
+-        if (env->v7m.control & R_V7M_CONTROL_SPSEL_MASK) {
++        if (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK) {
+             env->regs[13] = val;
+         } else {
+             env->v7m.other_sp = val;
+@@ -8926,8 +8927,8 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+         if (!arm_v7m_is_handler_mode(env)) {
+             switch_v7m_sp(env, (val & R_V7M_CONTROL_SPSEL_MASK) != 0);
+         }
+-        env->v7m.control &= ~R_V7M_CONTROL_NPRIV_MASK;
+-        env->v7m.control |= val & R_V7M_CONTROL_NPRIV_MASK;
++        env->v7m.control[env->v7m.secure] &= ~R_V7M_CONTROL_NPRIV_MASK;
++        env->v7m.control[env->v7m.secure] |= val & R_V7M_CONTROL_NPRIV_MASK;
+         break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR, "Attempt to write unknown special"
 diff --git a/target/arm/machine.c b/target/arm/machine.c
-index 666655d..d740e83 100644
+index 94f7279..5e379ed 100644
 --- a/target/arm/machine.c
 +++ b/target/arm/machine.c
-@@ -117,7 +117,7 @@ static const VMStateDescription vmstate_m = {
-         VMSTATE_UINT32(env.v7m.vecbase[M_REG_NS], ARMCPU),
+@@ -116,7 +116,7 @@ static const VMStateDescription vmstate_m = {
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(env.v7m.vecbase, ARMCPU),
          VMSTATE_UINT32(env.v7m.basepri[M_REG_NS], ARMCPU),
-         VMSTATE_UINT32(env.v7m.control[M_REG_NS], ARMCPU),
--        VMSTATE_UINT32(env.v7m.ccr, ARMCPU),
-+        VMSTATE_UINT32(env.v7m.ccr[M_REG_NS], ARMCPU),
+-        VMSTATE_UINT32(env.v7m.control, ARMCPU),
++        VMSTATE_UINT32(env.v7m.control[M_REG_NS], ARMCPU),
+         VMSTATE_UINT32(env.v7m.ccr, ARMCPU),
          VMSTATE_UINT32(env.v7m.cfsr, ARMCPU),
          VMSTATE_UINT32(env.v7m.hfsr, ARMCPU),
-         VMSTATE_UINT32(env.v7m.dfsr, ARMCPU),
-@@ -271,6 +271,7 @@ static const VMStateDescription vmstate_m_security = {
-         VMSTATE_UINT32(env.pmsav7.rnr[M_REG_S], ARMCPU),
-         VMSTATE_VALIDATE("secure MPU_RNR is valid", s_rnr_vmstate_validate),
-         VMSTATE_UINT32(env.v7m.mpu_ctrl[M_REG_S], ARMCPU),
-+        VMSTATE_UINT32(env.v7m.ccr[M_REG_S], ARMCPU),
+@@ -253,6 +253,7 @@ static const VMStateDescription vmstate_m_security = {
+         VMSTATE_UINT32(env.v7m.basepri[M_REG_S], ARMCPU),
+         VMSTATE_UINT32(env.v7m.primask[M_REG_S], ARMCPU),
+         VMSTATE_UINT32(env.v7m.faultmask[M_REG_S], ARMCPU),
++        VMSTATE_UINT32(env.v7m.control[M_REG_S], ARMCPU),
          VMSTATE_END_OF_LIST()
      }
  };
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index dea0a6f..6aa2d7c 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -12241,7 +12241,7 @@ void arm_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+         if (xpsr & XPSR_EXCP) {
+             mode = "handler";
+         } else {
+-            if (env->v7m.control & R_V7M_CONTROL_NPRIV_MASK) {
++            if (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_NPRIV_MASK) {
+                 mode = "unpriv-thread";
+             } else {
+                 mode = "priv-thread";
 -- 
 2.7.4
