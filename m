@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dptyw-0003Hc-JD
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:24:23 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dpu6F-0004qi-DV
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:31:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dptyt-0004AF-E0
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:24:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51310)
+	(envelope-from <cohuck@redhat.com>) id 1dpu6C-0007xC-9u
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:31:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57980)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dptyt-00049P-4y
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:24:19 -0400
-Date: Thu, 7 Sep 2017 18:24:10 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170907102410.GD23040@pxdev.xzpeter.org>
-References: <20170906104603.GK15510@redhat.com> <20170906104850.GB2215@work-vm>
-	<20170906105414.GL15510@redhat.com> <20170906105704.GC2215@work-vm>
-	<20170906110629.GM15510@redhat.com> <20170906113157.GD2215@work-vm>
-	<20170906115428.GP15510@redhat.com>
-	<20170907081341.GA23040@pxdev.xzpeter.org>
-	<CAJSP0QUcfEtb2PWJH-zH8qBCUGk6i_8bBQwbZcF+G3QwjmZMbg@mail.gmail.com>
-	<20170907091815.GB2098@work-vm>
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpu6C-0007u8-12
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:31:52 -0400
+Date: Thu, 7 Sep 2017 12:24:00 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170907122400.5b2e3faa.cohuck@redhat.com>
+In-Reply-To: <20170907085831.GF31680@bjsdjshi@linux.vnet.ibm.com>
+References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
+	<20170830163609.50260-5-pasic@linux.vnet.ibm.com>
+	<20170831115535.1e4201d3.cohuck@redhat.com>
+	<7540741b-d230-e7c4-50d3-036f31997c8b@linux.vnet.ibm.com>
+	<20170905182546.00457332.cohuck@redhat.com>
+	<fe102a7a-e998-8ebe-b94d-e653c4f66c39@linux.vnet.ibm.com>
+	<20170906043108.GY31680@bjsdjshi@linux.vnet.ibm.com>
+	<8946b1ec-4d14-c953-deab-aaded7cd2c9d@linux.vnet.ibm.com>
+	<20170906162019.45eeec4a.cohuck@redhat.com>
+	<cc6eab96-969d-eb66-91b5-cdb965c1bcbb@linux.vnet.ibm.com>
+	<20170907085831.GF31680@bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170907091815.GB2098@work-vm>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/9] s390x: refactor error handling for
+ SSCH and RSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,124 +37,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, "Daniel P. Berrange" <berrange@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Thu, Sep 07, 2017 at 10:18:16AM +0100, Dr. David Alan Gilbert wrote:
-> * Stefan Hajnoczi (stefanha@gmail.com) wrote:
-> > On Thu, Sep 7, 2017 at 9:13 AM, Peter Xu <peterx@redhat.com> wrote:
-> > > On Wed, Sep 06, 2017 at 12:54:28PM +0100, Daniel P. Berrange wrote:
-> > >> On Wed, Sep 06, 2017 at 12:31:58PM +0100, Dr. David Alan Gilbert w=
-rote:
-> > >> > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > >> > > This does imply that you need a separate monitor I/O processin=
-g, from the
-> > >> > > command execution thread, but I see no need for all commands t=
-o suddenly
-> > >> > > become async. Just allowing interleaved replies is sufficient =
-from the
-> > >> > > POV of the protocol definition. This interleaving is easy to h=
-andle from
-> > >> > > the client POV - just requires a unique 'serial' in the reques=
-t by the
-> > >> > > client, that is copied into the reply by QEMU.
-> > >> >
-> > >> > OK, so for that we can just take Marc-Andr=C3=A9's syntax and ca=
-ll it 'id':
-> > >> >   https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03634=
-.html
-> > >> >
-> > >> > then it's upto the caller to ensure those id's are unique.
+On Thu, 7 Sep 2017 16:58:31 +0800
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+
+> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-06 16:43:42 +0200]:
+> 
+> > 
+> > 
+> > On 09/06/2017 04:20 PM, Cornelia Huck wrote:  
+> > > On Wed, 6 Sep 2017 14:25:13 +0200
+> > > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> > >   
+> > >> We have basically two possibilities/options which ask for different
+> > >> handling:
+> > >> 1) EFAULT is due to a bug in the vfio-ccw implementation
+> > >> (can be QEMU or kernel).
+> > >> 2) EFAULT is due to buggy channel program.
 > > >>
-> > >> Libvirt has in fact generated a unique 'id' for every monitor comm=
-and
-> > >> since day 1 of supporting QMP.
+> > >> Option 2) is basically to be handled with a channel-program check and
+> > >> setting primary secondary and alert status. For reference see PoP page
+> > >> 15-59 ("Designation of Storage Area").  An exception may be an invalid
+> > >> channel program address in the ORB. There the channel-program check ain't
+> > >> explicitly stated (although) I would expect one. It may be implied by the
+> > >> things on page 15-59 though.
 > > >>
-> > >> > I do worry about two things:
-> > >> >   a) With this the caller doesn't really know which commands cou=
-ld be
-> > >> >   in parallel - for example if we've got a recovery command that=
-'s
-> > >> >   executed by this non-locking thread that's OK, we expect that
-> > >> >   to be doable in parallel.  If in the future though we do
-> > >> >   what you initially suggested and have a bunch of commands get
-> > >> >   routed to the migration thread (say) then those would suddenly
-> > >> >   operate in parallel with other commands that we're previously
-> > >> >   synchronous.
+> > >> Option 1) is however very similar to other we have figured out that the
+> > >> implementation is broken situations and should be handled consequently.
+> > >> The current state of the discussion is with a unit exception.
 > > >>
-> > >> We could still have an opt-in for async commands. eg default to ex=
-ecuting
-> > >> all commands in the main thread, unless the client issues an expli=
-cit
-> > >> "make it async" command, to switch to allowing the migration threa=
-d to
-> > >> process it async.
+> > >> Does that make sense?  
+> > > 
+> > > I think the situation is slightly different here, though. For the orb
+> > > flags, we reject something out of hand because we have not implemented
+> > > it, and for that, unit exception sounds like a good fit. Processing
+> > > errors, however, are more similar to errors in the hardware, and as
+> > > such can probably be reported via something like equipment check.
+> > >   
+> > 
+> > Noted. Let's see what Dong Jia has to say, before we continuing a
+> > discussion on something (option 1) what may be irrelevant anyway.
+> >   
 > > >>
-> > >>  { "execute": "qmp_allow_async",
-> > >>    "data": { "commands": [
-> > >>        "migrate_cancel",
-> > >>    ] } }
+> > >> Now, Dong Jia, I need your help to figure out do we have option 1 or
+> > >> option 2 here? After quick look at the kernel code, it appears to me that
+> > >> I've seen both option 1 and option 2 (I'm afraid) -- but my assessment
+> > >> was really very superficial.  
+> There are three cases (all in the kernel) that generate a -EFAULT ret
+> code:
+> a. vfio_ccw_mdev_write: copy_from_user() fails.
+>   This is option 1.
+> 
+> b. ccwchain_fetch_tic
+>   It's mostly likely that the vfio-ccw driver processed the ccw chains
+>   wrongly. (Actually I can not think of any other reason.)
+
+Me neither, I'd consider hitting this a bug in the implementation.
+
+>   This is option 1.
+> 
+> c. ccwchain_fetch_idal
+>   When we find that an IDAW contents an invalid address
+>   This is option 2.
+> 
 > > >>
-> > >>
-> > >>  { "return": { "commands": [
-> > >>        "migrate_cancel",
-> > >>    ] } }
-> > >>
-> > >> The server response contains the subset of commands from the reque=
-st
-> > >> for which async is supported.
-> > >>
-> > >> That gives good negotiation ability going forward as we incrementa=
-lly
-> > >> support async on more commands.
-> > >
-> > > I think this goes back to the discussion on which design we'd like =
-to
-> > > choose.  IMHO the whole async idea plus the per-command-id is indee=
-d
-> > > cleaner and nicer, and I believe that can benefit not only libvirt,
-> > > but also other QMP users.  The problem is, I have no idea how long
-> > > it'll take to let us have such a feature - I believe that will incl=
-ude
-> > > QEMU and Libvirt to both support that.  And it'll be a pity if the
-> > > postcopy recovery cannot work only because we cannot guarantee a
-> > > stable monitor.
-> >=20
-> > Please don't rush in a hack, they often introduce new bugs that we
-> > have to support long-term when they are part of the QMP API.
+> > >> I would expect option 2 to be handled differently (kernel provides the
+> > >> SCSW) though.
 
-Sorry, I wasn't meant to push anything.  I was trying to see what
-would be the best way to go.
-
-> >=20
-> > In your original email you mentioned "info cpus".  Have you considere=
-d
-> > modifying this command so it does not sync the CPU?  I'm not sure
-> > callers really need to sync the CPU, typically they just want to know
-> > the vcpu numbers, thread IDs, and current state (halted, running,
-> > etc).
->=20
-> But it has the pc as well, so that's actual state.
-
-Yes.  Even if we don't need to sync pc regs for this single "info
-cpus" command, I do feel slightly awkward if we don't allow things
-like syncing CPU to happen in any command.  IMHO we just need to make
-sure these commands may block.
-
->=20
-> Dave
->=20
-> > The next step after that would be to audit other monitor commands for
-> > unnecessary vcpu synchronization.
-
-It's really hard to do this for every single command, at least to me.
-
-Comparing to this, I think now I more prefer what Dan has suggested in
-the other reply to have an extra way to request async commands while
-keep the rest of commands compatible (though obviously I misunderstood
-the email when I was writting up previous reply...).
-
-Thanks,
-
---=20
-Peter Xu
+So we would do an equipment check for the first two ("equipment", i.e.
+the software, is malfunctioning) and use a more appropriate way for the
+malformed idaw?
