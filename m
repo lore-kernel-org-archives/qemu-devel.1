@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwr2-0000zu-CH
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwqz-0000zg-Gv
 	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwqw-0007dC-VP
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:24 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37192)
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwqu-0007bK-EA
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:21 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37190)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dpwqw-0007bf-ML
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:18 -0400
+	id 1dpwqu-0007ak-63
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:16 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwqv-0001dG-9E
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:28:17 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwqt-0001c8-5B
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:28:15 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  7 Sep 2017 14:28:13 +0100
-Message-Id: <1504790904-17018-21-git-send-email-peter.maydell@linaro.org>
+Date: Thu,  7 Sep 2017 14:28:10 +0100
+Message-Id: <1504790904-17018-18-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1504790904-17018-1-git-send-email-peter.maydell@linaro.org>
 References: <1504790904-17018-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 20/31] target/arm: Make MPU_RBAR,
- MPU_RLAR banked for v8M
+Subject: [Qemu-devel] [PULL 17/31] nvic: Add NS alias SCS region
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,190 +29,128 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Make the MPU registers MPU_MAIR0 and MPU_MAIR1 banked if v8M security
-extensions are enabled.
-
-We can freely add more items to vmstate_m_security without
-breaking migration compatibility, because no CPU currently
-has the ARM_FEATURE_M_SECURITY bit enabled and so this
-subsection is not yet used by anything.
+For v8M the range 0xe002e000..0xe002efff is an alias region which
+for secure accesses behaves like a NonSecure access to the main
+SCS region. (For nonsecure accesses including when the security
+extension is not implemented, it is RAZ/WI.)
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1503414539-28762-14-git-send-email-peter.maydell@linaro.org
+Message-id: 1503414539-28762-11-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/cpu.h      |  4 ++--
- hw/intc/armv7m_nvic.c |  8 ++++----
- target/arm/cpu.c      | 26 ++++++++++++++++++++------
- target/arm/helper.c   | 11 ++++++-----
- target/arm/machine.c  | 12 ++++++++----
- 5 files changed, 40 insertions(+), 21 deletions(-)
+ include/hw/intc/armv7m_nvic.h |  1 +
+ hw/intc/armv7m_nvic.c         | 66 ++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 66 insertions(+), 1 deletion(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 42a6cb2..d385ef2 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -543,8 +543,8 @@ typedef struct CPUARMState {
-          *  pmsav7.rnr (region number register)
-          *  pmsav7_dregion (number of configured regions)
-          */
--        uint32_t *rbar;
--        uint32_t *rlar;
-+        uint32_t *rbar[2];
-+        uint32_t *rlar[2];
-         uint32_t mair0[2];
-         uint32_t mair1[2];
-     } pmsav8;
+diff --git a/include/hw/intc/armv7m_nvic.h b/include/hw/intc/armv7m_nvic.h
+index 1d145fb..1a4cce7 100644
+--- a/include/hw/intc/armv7m_nvic.h
++++ b/include/hw/intc/armv7m_nvic.h
+@@ -50,6 +50,7 @@ typedef struct NVICState {
+     int exception_prio; /* group prio of the highest prio active exception */
+ 
+     MemoryRegion sysregmem;
++    MemoryRegion sysreg_ns_mem;
+     MemoryRegion container;
+ 
+     uint32_t num_irq;
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index e98eb95..9ced7af 100644
+index babdc3b..2b0b328 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -564,7 +564,7 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-             if (region >= cpu->pmsav7_dregion) {
-                 return 0;
-             }
--            return cpu->env.pmsav8.rbar[region];
-+            return cpu->env.pmsav8.rbar[attrs.secure][region];
-         }
- 
-         if (region >= cpu->pmsav7_dregion) {
-@@ -591,7 +591,7 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-             if (region >= cpu->pmsav7_dregion) {
-                 return 0;
-             }
--            return cpu->env.pmsav8.rlar[region];
-+            return cpu->env.pmsav8.rlar[attrs.secure][region];
-         }
- 
-         if (region >= cpu->pmsav7_dregion) {
-@@ -756,7 +756,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-             if (region >= cpu->pmsav7_dregion) {
-                 return;
-             }
--            cpu->env.pmsav8.rbar[region] = value;
-+            cpu->env.pmsav8.rbar[attrs.secure][region] = value;
-             tlb_flush(CPU(cpu));
-             return;
-         }
-@@ -806,7 +806,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-             if (region >= cpu->pmsav7_dregion) {
-                 return;
-             }
--            cpu->env.pmsav8.rlar[region] = value;
-+            cpu->env.pmsav8.rlar[attrs.secure][region] = value;
-             tlb_flush(CPU(cpu));
-             return;
-         }
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 7b4acc0..40ec445 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -235,10 +235,20 @@ static void arm_cpu_reset(CPUState *s)
-     if (arm_feature(env, ARM_FEATURE_PMSA)) {
-         if (cpu->pmsav7_dregion > 0) {
-             if (arm_feature(env, ARM_FEATURE_V8)) {
--                memset(env->pmsav8.rbar, 0,
--                       sizeof(*env->pmsav8.rbar) * cpu->pmsav7_dregion);
--                memset(env->pmsav8.rlar, 0,
--                       sizeof(*env->pmsav8.rlar) * cpu->pmsav7_dregion);
-+                memset(env->pmsav8.rbar[M_REG_NS], 0,
-+                       sizeof(*env->pmsav8.rbar[M_REG_NS])
-+                       * cpu->pmsav7_dregion);
-+                memset(env->pmsav8.rlar[M_REG_NS], 0,
-+                       sizeof(*env->pmsav8.rlar[M_REG_NS])
-+                       * cpu->pmsav7_dregion);
-+                if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+                    memset(env->pmsav8.rbar[M_REG_S], 0,
-+                           sizeof(*env->pmsav8.rbar[M_REG_S])
-+                           * cpu->pmsav7_dregion);
-+                    memset(env->pmsav8.rlar[M_REG_S], 0,
-+                           sizeof(*env->pmsav8.rlar[M_REG_S])
-+                           * cpu->pmsav7_dregion);
-+                }
-             } else if (arm_feature(env, ARM_FEATURE_V7)) {
-                 memset(env->pmsav7.drbar, 0,
-                        sizeof(*env->pmsav7.drbar) * cpu->pmsav7_dregion);
-@@ -825,8 +835,12 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
-         if (nr) {
-             if (arm_feature(env, ARM_FEATURE_V8)) {
-                 /* PMSAv8 */
--                env->pmsav8.rbar = g_new0(uint32_t, nr);
--                env->pmsav8.rlar = g_new0(uint32_t, nr);
-+                env->pmsav8.rbar[M_REG_NS] = g_new0(uint32_t, nr);
-+                env->pmsav8.rlar[M_REG_NS] = g_new0(uint32_t, nr);
-+                if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+                    env->pmsav8.rbar[M_REG_S] = g_new0(uint32_t, nr);
-+                    env->pmsav8.rlar[M_REG_S] = g_new0(uint32_t, nr);
-+                }
-             } else {
-                 env->pmsav7.drbar = g_new0(uint32_t, nr);
-                 env->pmsav7.drsr = g_new0(uint32_t, nr);
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 4685d50..bcbd087 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -8437,6 +8437,7 @@ static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
- {
-     ARMCPU *cpu = arm_env_get_cpu(env);
-     bool is_user = regime_is_user(env, mmu_idx);
-+    uint32_t secure = regime_is_secure(env, mmu_idx);
-     int n;
-     int matchregion = -1;
-     bool hit = false;
-@@ -8463,10 +8464,10 @@ static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
-              * with bits [4:0] all zeroes, but the limit address is bits
-              * [31:5] from the register with bits [4:0] all ones.
-              */
--            uint32_t base = env->pmsav8.rbar[n] & ~0x1f;
--            uint32_t limit = env->pmsav8.rlar[n] | 0x1f;
-+            uint32_t base = env->pmsav8.rbar[secure][n] & ~0x1f;
-+            uint32_t limit = env->pmsav8.rlar[secure][n] | 0x1f;
- 
--            if (!(env->pmsav8.rlar[n] & 0x1)) {
-+            if (!(env->pmsav8.rlar[secure][n] & 0x1)) {
-                 /* Region disabled */
-                 continue;
-             }
-@@ -8515,8 +8516,8 @@ static bool get_phys_addr_pmsav8(CPUARMState *env, uint32_t address,
-         /* hit using the background region */
-         get_phys_addr_pmsav7_default(env, mmu_idx, address, prot);
-     } else {
--        uint32_t ap = extract32(env->pmsav8.rbar[matchregion], 1, 2);
--        uint32_t xn = extract32(env->pmsav8.rbar[matchregion], 0, 1);
-+        uint32_t ap = extract32(env->pmsav8.rbar[secure][matchregion], 1, 2);
-+        uint32_t xn = extract32(env->pmsav8.rbar[secure][matchregion], 0, 1);
- 
-         if (m_is_system_region(env, address)) {
-             /* System space is always execute never */
-diff --git a/target/arm/machine.c b/target/arm/machine.c
-index 80942d6..0017ea0 100644
---- a/target/arm/machine.c
-+++ b/target/arm/machine.c
-@@ -225,10 +225,10 @@ static const VMStateDescription vmstate_pmsav8 = {
-     .minimum_version_id = 1,
-     .needed = pmsav8_needed,
-     .fields = (VMStateField[]) {
--        VMSTATE_VARRAY_UINT32(env.pmsav8.rbar, ARMCPU, pmsav7_dregion, 0,
--                              vmstate_info_uint32, uint32_t),
--        VMSTATE_VARRAY_UINT32(env.pmsav8.rlar, ARMCPU, pmsav7_dregion, 0,
--                              vmstate_info_uint32, uint32_t),
-+        VMSTATE_VARRAY_UINT32(env.pmsav8.rbar[M_REG_NS], ARMCPU, pmsav7_dregion,
-+                              0, vmstate_info_uint32, uint32_t),
-+        VMSTATE_VARRAY_UINT32(env.pmsav8.rlar[M_REG_NS], ARMCPU, pmsav7_dregion,
-+                              0, vmstate_info_uint32, uint32_t),
-         VMSTATE_UINT32(env.pmsav8.mair0[M_REG_NS], ARMCPU),
-         VMSTATE_UINT32(env.pmsav8.mair1[M_REG_NS], ARMCPU),
-         VMSTATE_END_OF_LIST()
-@@ -257,6 +257,10 @@ static const VMStateDescription vmstate_m_security = {
-         VMSTATE_UINT32(env.v7m.vecbase[M_REG_S], ARMCPU),
-         VMSTATE_UINT32(env.pmsav8.mair0[M_REG_S], ARMCPU),
-         VMSTATE_UINT32(env.pmsav8.mair1[M_REG_S], ARMCPU),
-+        VMSTATE_VARRAY_UINT32(env.pmsav8.rbar[M_REG_S], ARMCPU, pmsav7_dregion,
-+                              0, vmstate_info_uint32, uint32_t),
-+        VMSTATE_VARRAY_UINT32(env.pmsav8.rlar[M_REG_S], ARMCPU, pmsav7_dregion,
-+                              0, vmstate_info_uint32, uint32_t),
-         VMSTATE_END_OF_LIST()
-     }
+@@ -1040,6 +1040,47 @@ static const MemoryRegionOps nvic_sysreg_ops = {
+     .endianness = DEVICE_NATIVE_ENDIAN,
  };
+ 
++static MemTxResult nvic_sysreg_ns_write(void *opaque, hwaddr addr,
++                                        uint64_t value, unsigned size,
++                                        MemTxAttrs attrs)
++{
++    if (attrs.secure) {
++        /* S accesses to the alias act like NS accesses to the real region */
++        attrs.secure = 0;
++        return nvic_sysreg_write(opaque, addr, value, size, attrs);
++    } else {
++        /* NS attrs are RAZ/WI for privileged, and BusFault for user */
++        if (attrs.user) {
++            return MEMTX_ERROR;
++        }
++        return MEMTX_OK;
++    }
++}
++
++static MemTxResult nvic_sysreg_ns_read(void *opaque, hwaddr addr,
++                                       uint64_t *data, unsigned size,
++                                       MemTxAttrs attrs)
++{
++    if (attrs.secure) {
++        /* S accesses to the alias act like NS accesses to the real region */
++        attrs.secure = 0;
++        return nvic_sysreg_read(opaque, addr, data, size, attrs);
++    } else {
++        /* NS attrs are RAZ/WI for privileged, and BusFault for user */
++        if (attrs.user) {
++            return MEMTX_ERROR;
++        }
++        *data = 0;
++        return MEMTX_OK;
++    }
++}
++
++static const MemoryRegionOps nvic_sysreg_ns_ops = {
++    .read_with_attrs = nvic_sysreg_ns_read,
++    .write_with_attrs = nvic_sysreg_ns_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++};
++
+ static int nvic_post_load(void *opaque, int version_id)
+ {
+     NVICState *s = opaque;
+@@ -1141,6 +1182,7 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+     NVICState *s = NVIC(dev);
+     SysBusDevice *systick_sbd;
+     Error *err = NULL;
++    int regionlen;
+ 
+     s->cpu = ARM_CPU(qemu_get_cpu(0));
+     assert(s->cpu);
+@@ -1173,8 +1215,23 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+      *  0xd00..0xd3c - SCS registers
+      *  0xd40..0xeff - Reserved or Not implemented
+      *  0xf00 - STIR
++     *
++     * Some registers within this space are banked between security states.
++     * In v8M there is a second range 0xe002e000..0xe002efff which is the
++     * NonSecure alias SCS; secure accesses to this behave like NS accesses
++     * to the main SCS range, and non-secure accesses (including when
++     * the security extension is not implemented) are RAZ/WI.
++     * Note that both the main SCS range and the alias range are defined
++     * to be exempt from memory attribution (R_BLJT) and so the memory
++     * transaction attribute always matches the current CPU security
++     * state (attrs.secure == env->v7m.secure). In the nvic_sysreg_ns_ops
++     * wrappers we change attrs.secure to indicate the NS access; so
++     * generally code determining which banked register to use should
++     * use attrs.secure; code determining actual behaviour of the system
++     * should use env->v7m.secure.
+      */
+-    memory_region_init(&s->container, OBJECT(s), "nvic", 0x1000);
++    regionlen = arm_feature(&s->cpu->env, ARM_FEATURE_V8) ? 0x21000 : 0x1000;
++    memory_region_init(&s->container, OBJECT(s), "nvic", regionlen);
+     /* The system register region goes at the bottom of the priority
+      * stack as it covers the whole page.
+      */
+@@ -1185,6 +1242,13 @@ static void armv7m_nvic_realize(DeviceState *dev, Error **errp)
+                                         sysbus_mmio_get_region(systick_sbd, 0),
+                                         1);
+ 
++    if (arm_feature(&s->cpu->env, ARM_FEATURE_V8)) {
++        memory_region_init_io(&s->sysreg_ns_mem, OBJECT(s),
++                              &nvic_sysreg_ns_ops, s,
++                              "nvic_sysregs_ns", 0x1000);
++        memory_region_add_subregion(&s->container, 0x20000, &s->sysreg_ns_mem);
++    }
++
+     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->container);
+ }
+ 
 -- 
 2.7.4
