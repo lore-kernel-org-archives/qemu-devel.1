@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38629)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dq1Et-00076x-Tv
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:09:25 -0400
+	(envelope-from <bounces@canonical.com>) id 1dq1GV-0008Bm-5k
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:11:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dq1Eo-0001Aw-4h
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:09:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53568)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dq1En-0001AS-R2
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:09:14 -0400
-Date: Thu, 7 Sep 2017 19:09:00 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170907180900.GV2098@work-vm>
-References: <20170906104850.GB2215@work-vm> <20170906105414.GL15510@redhat.com>
-	<20170906105704.GC2215@work-vm> <20170906110629.GM15510@redhat.com>
-	<20170906113157.GD2215@work-vm> <20170906115428.GP15510@redhat.com>
-	<20170907081341.GA23040@pxdev.xzpeter.org>
-	<87inguaclr.fsf@dusky.pond.sub.org>
-	<20170907132259.GM30609@redhat.com>
-	<87h8weo186.fsf@dusky.pond.sub.org>
+	(envelope-from <bounces@canonical.com>) id 1dq1GP-0002Va-E5
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:10:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49444)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dq1GP-0002V4-4O
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:10:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dq1GO-0001as-7x
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 18:10:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 30F892E846D
+	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 18:10:52 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87h8weo186.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 07 Sep 2017 18:02:28 -0000
+From: Brad Parker <1715715@bugs.launchpad.net>
+Reply-To: Bug 1715715 <1715715@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150480734842.32058.3488330551186130563.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1715715] [NEW] [qemu-ppc] Segfault when booting
+ from HD after OS install
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,231 +36,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
 
-* Markus Armbruster (armbru@redhat.com) wrote:
-> "Daniel P. Berrange" <berrange@redhat.com> writes:
-> 
-> > On Thu, Sep 07, 2017 at 02:59:28PM +0200, Markus Armbruster wrote:
-> >> So, what exactly is going to drain the command queue?  If there's more
-> >> than one consumer, how exactly are commands from the queue dispatched to
-> >> the consumers?
-> >
-> > In terms of my proposal, for any single command there should only ever
-> > be a single consumer. The default consumer would be the main event loop
-> > thread, such that we have no semantic change to QMP operation from today.
-> >
-> > Some commands that are capable of being made "async", would have a
-> > different consumer. For example, if the client requested the 'migrate-cancel'
-> > be made async, this would change things such that the migration thread is
-> > now responsible for consuming the "migrate-cancel" command, instead of the
-> > default main loop.
-> >
-> >> What are the "no hang" guarantees (if any) and conditions for each of
-> >> these consumers?
-> >
-> > The non-main thread consumers would have to have some reasonable
-> > guarantee that they won't block on a lock held by the main loop,
-> > otherwise the whole feature is largely useless.
-> 
-> Same if they block indefinitely on anything else, actually.  In other
-> words, we need to talk about liveness.
-> 
-> Threads by themselves don't buy us liveness.  Being careful with
-> operations that may block does.  That care may lead to farming out
-> certain operations to other threads, where they may block without harm.
-> 
-> You only talk about "the non-main thread consumers".  What about the
-> main thread?  Is it okay for the main thread to block?  If yes, why?
+Public bug reported:
 
-It would be great if the main thread never blocked; but IMHO that's
-a huge task that we'll never get done [challenge].
+I created an empty 128G qcow2 image and booted from a Mac OS 9.2.1
+Install CD, in which I was able to install the OS successfully to the
+hard drive. Upon reboot, this time from the hard drive directly, qemu-
+system-ppc segfaults. Host system is Ubuntu 16.04.2 with latest qemu
+commit.
 
-> >> We can have any number of QMP monitors today.  Would each of them feed
-> >> its own queue?  Would they all feed a shared queue?
-> >
-> > Currently with multiple QMP monitors, everything runs in the main
-> > loop, so commands arriving across  multiple monitors are 100%
-> > serialized and processed strictly in the order in which QEMU reads
-> > them off the wire.  To maintain these semantics, we would need to
-> > have a single shared queue for the default main loop consumer, so
-> > that ordering does not change.
-> >
-> >> How exactly is opt-in asynchronous to work?  Per QMP monitor?  Per
-> >> command?
-> >
-> > Per monitor+command. ie just because libvirt knows how to cope with
-> > async execution on the monitor it has open, does not mean that a
-> > different app on the 2nd monitor command can cope. So in my proposal
-> > the switch to async must be scoped to the particular command only
-> > for the monitor connection that requesteed it.
-> >
-> >> What does it mean when an asynchronous command follows a synchronous
-> >> command in the same QMP monitor?  I would expect the synchronous command
-> >> to complete before the asynchronous command, because that's what
-> >> synchronous means, isn't it?  To keep your QMP monitor available, you
-> >> then must not send synchronous commands that can hang.
-> >
-> > No, that is not what I described. All synchronous commands are
-> > serialized wrt each other, just as today. An asychronous command
-> > can run as soon as it is received, regardless of whether any
-> > earlier sent sync commands are still executing or pending. This
-> > is trivial to achieve when you separate monitor I/O from command
-> > execution in separate threads, provided of course the async
-> > command consumers are not in the main loop.
-> 
-> So, a synchronous command is synchronous with respect to other commands,
-> except for certain non-blocking commands.  The distinctive feature of
-> the latter isn't so much an asynchronous reply, but out-of-band
-> dispatch.
-> 
-> Out-of-band dispatch of commands that cannot block in fact orthogonal to
-> asynchronous replies.  I can't see why out-of-band dispatch of
-> synchronous non-blocking commands wouldn't work, too.
-> 
-> >> How can we determine whether a certain synchronous command can hang?
-> >> Note that with opt-in async, *all* commands are also synchronous
-> >> commands.
-> >> 
-> >> In short, explain to me how exactly you plan to ensure that certain QMP
-> >> commands (such as post-copy recovery) can always "get through", in the
-> >> presence of multiple monitors, hanging main loop, hanging synchronous
-> >> commands, hanging whatever-else-can-now-hang-in-this-post-copy-world.
-> >
-> > Taking migrate-cancel as the example. The migration code already has
-> > a background thread doing work independantly onthe main loop. Upon
-> > marking the migrate-cancel command as async, the migration control
-> > thread would become the consumer of migrate-cancel.
-> 
-> From 30,000 feet, the QMP monitor sends a "cancel" message to the
-> migration thread, and later receives a "canceled" message from the
-> migration thread.
-> 
-> From 300 feet, we use the migrate-cancel QMP command as the cancel
-> message, and its success response as the "canceled" message.
-> 
-> In other words, we're pressing the external QM-Protocol into service as
-> internal message passing protocol.
+qemu --version reports "2.10.50 (v2.10.0-244-gb07d1c2-dirty)", but I
+used git commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e and built with
+"./configure --target-list=3Dppc-softmmu --enable-debug --disable-strip".
 
-Be careful; it's not a cancel in the postcopy recovery case, it's a
-restart.  The command is very much like the migration-incoming command.
-The management layer has to provide data with the request, so it's not
-an internal command.
+Here is the command-line arguments:
 
-> >                                                     This allows the
-> > migration operation to be cancelled immediately, regardless of whether
-> > there are earlier monitor commands blocked in the main loop.
-> 
-> The necessary part is moving all operations that can block out of
-> whatever loop runs the monitor, be it the main loop, some other event
-> loop, or a dedicated monitor thread's monitor loop.
-> 
-> Moving out non-blocking operations isn't necessary.  migrate-cancel
-> could communicate with the migration thread by any suitable mechanism or
-> protocol.  It doesn't have to be QMP.  Why would we want it to be QMP?
+qemu-system-ppc -boot c -g 1024x768x32 -M mac99 -m 256 -prom-env 'auto-
+boot?=3Dtrue' -prom-env 'boot-args=3D-v' -prom-env 'vga-ndrv?=3Dtrue' -drive
+file=3D../os9.img,format=3Draw,media=3Dcdrom -drive
+file=3DMacOS9.qcow2,format=3Dqcow2,media=3Ddisk -spice port=3D5901,password=
+=3DXXX
+-net nic,model=3Drtl8139 -net user -monitor stdio
 
-Because why invent another wheel?
-This is a command that the management layer has to issue to qemu for
-it to recover, including passing data, in a way similar to other
-commands - so it looks like a QMP command, so why not use QMP.
+And the GDB backtrace:
 
-Also, I think making other commands lock-free is advantageous - 
-some of the 'info' commands just dont really need locks, making them
-not use locks removes latency effects caused by the management layer
-prodding qemu.
+Program terminated with signal SIGSEGV, Segmentation fault.
+#0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010) =
+at util/qemu-timer.c:462
+462         timer_mod_ns(ts, expire_time * ts->scale);
+[Current thread is 1 (Thread 0x7f60e43cb700 (LWP 9853))]
+(gdb) bt
+#0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010) =
+at util/qemu-timer.c:462
+#1  0x0000559065d63769 in openpic_tmr_set_tmr (tmr=3D0x5590676fa7e0, val=3D=
+96, enabled=3Dtrue) at hw/intc/openpic.c:861
+#2  0x0000559065d63995 in openpic_tmr_write (opaque=3D0x5590676f71f0, addr=
+=3D16, val=3D96, len=3D4) at hw/intc/openpic.c:912
+#3  0x0000559065b02811 in memory_region_write_accessor (mr=3D0x5590676f7710=
+, addr=3D32, value=3D0x7f60e43c7da8, size=3D4, shift=3D0, mask=3D4294967295=
+, attrs=3D...) at /home/bp/qemu/memory.c:529
+#4  0x0000559065b02a29 in access_with_adjusted_size (addr=3D32, value=3D0x7=
+f60e43c7da8, size=3D1, access_size_min=3D4, access_size_max=3D4, access=3D0=
+x559065b02727 <memory_region_write_accessor>, mr=3D0x5590676f7710, attrs=3D=
+...) at /home/bp/qemu/memory.c:595
+#5  0x0000559065b051eb in memory_region_dispatch_write (mr=3D0x5590676f7710=
+, addr=3D32, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c:13=
+37
+#6  0x0000559065aa3a36 in address_space_write_continue (as=3D0x559067614d90=
+, addr=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", len=
+=3D1, addr1=3D32, l=3D1, mr=3D0x5590676f7710) at /home/bp/qemu/exec.c:2942
+#7  0x0000559065aa3b84 in address_space_write (as=3D0x559067614d90, addr=3D=
+2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", len=3D1) at /=
+home/bp/qemu/exec.c:2987
+#8  0x0000559065aa2ec0 in subpage_write (opaque=3D0x7f60c8275fc0, addr=3D27=
+2, value=3D96, len=3D1, attrs=3D...) at /home/bp/qemu/exec.c:2565
+#9  0x0000559065b02906 in memory_region_write_with_attrs_accessor (mr=3D0x7=
+f60c8275fc0, addr=3D272, value=3D0x7f60e43c7fc8, size=3D1, shift=3D0, mask=
+=3D255, attrs=3D...) at /home/bp/qemu/memory.c:555
+#10 0x0000559065b029d3 in access_with_adjusted_size (addr=3D272, value=3D0x=
+7f60e43c7fc8, size=3D1, access_size_min=3D1, access_size_max=3D8, access=3D=
+0x559065b02818 <memory_region_write_with_attrs_accessor>, mr=3D0x7f60c8275f=
+c0, attrs=3D...) at /home/bp/qemu/memory.c:590
+#11 0x0000559065b0523a in memory_region_dispatch_write (mr=3D0x7f60c8275fc0=
+, addr=3D272, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c:1=
+344
+#12 0x0000559065b175db in io_writex (env=3D0x7f60e43d42a0, iotlbentry=3D0x7=
+f60e43e8130, mmu_idx=3D3, val=3D96, addr=3D2147750160, retaddr=3D1400541582=
+95744, size=3D1) at /home/bp/qemu/accel/tcg/cputlb.c:807
+#13 0x0000559065b18055 in io_writeb (env=3D0x7f60e43d42a0, mmu_idx=3D3, ind=
+ex=3D65, val=3D96 '`', addr=3D2147750160, retaddr=3D140054158295744) at /ho=
+me/bp/qemu/softmmu_template.h:265
+#14 0x0000559065b181ea in helper_ret_stb_mmu (env=3D0x7f60e43d42a0, addr=3D=
+2147750160, val=3D96 '`', oi=3D3, retaddr=3D140054158295744) at /home/bp/qe=
+mu/softmmu_template.h:300
+#15 0x00007f60e65ac2c0 in code_gen_buffer ()
+#16 0x0000559065b1ff26 in cpu_tb_exec (cpu=3D0x7f60e43cc010, itb=3D0x7f60e6=
+5ac5c0 <code_gen_buffer+935318>) at /home/bp/qemu/accel/tcg/cpu-exec.c:166
+#17 0x0000559065b20bfd in cpu_loop_exec_tb (cpu=3D0x7f60e43cc010, tb=3D0x7f=
+60e65ac5c0 <code_gen_buffer+935318>, last_tb=3D0x7f60e43c8678, tb_exit=3D0x=
+7f60e43c8674) at /home/bp/qemu/accel/tcg/cpu-exec.c:578
+#18 0x0000559065b20eed in cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp/qemu/=
+accel/tcg/cpu-exec.c:676
+#19 0x0000559065aebc3d in tcg_cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp/q=
+emu/cpus.c:1270
+#20 0x0000559065aebe64 in qemu_tcg_rr_cpu_thread_fn (arg=3D0x7f60e43cc010) =
+at /home/bp/qemu/cpus.c:1365
+#21 0x00007f60f56f06ba in start_thread (arg=3D0x7f60e43cb700) at pthread_cr=
+eate.c:333
+#22 0x00007f60f542682d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clo=
+ne.S:109
 
-> > Of course this assumes the migration control thread can't block
-> > for locks held by the main thread.
-> 
-> Thanks for your answers, they help.
-> 
-> >> Now let's talk about QMP requirements.
-> >> 
-> >> Any addition to QMP must consider what exists already.
-> >> 
-> >> You may add more of the same.
-> >> 
-> >> You may generalize existing stuff.
-> >> 
-> >> You may change existing stuff if you have sufficient reason, subject to
-> >> backward compatibility constraints.
-> >> 
-> >> But attempts to add new ways to do the same old stuff without properly
-> >> integrating the existing ways are not going to fly.
-> >> 
-> >> In particular, any new way to start some job, monitor and control it
-> >> while it lives, get notified about its state changes and so forth must
-> >> integrate the existing ways.  These include block jobs (probably the
-> >> most sophisticated of the lot), migration, dump-guest-memory, and
-> >> possibly more.  They all work the same way: synchronous command to kick
-> >> off the job, more synchronous commands to monitor and control, events to
-> >> notify.  They do differ in detail.
-> >> 
-> >> Asynchronous commands are a new way to do this.  When you only need to
-> >> be notified on "done", and don't need to monitor / control, they fit the
-> >> bill quite neatly.
-> >> 
-> >> However, we can't just ignore the cases where we need more than that!
-> >> For those, we want a single generic solution instead of the several ad
-> >> hoc solutions we have now.
-> >> 
-> >> If we add asynchronous commands *now*, and for simple cases only, we add
-> >> yet another special case for a future generic solution to integrate.
-> >> I'm not going to let that happen.
-> >
-> > With the async commands suggestion, while it would initially not
-> > provide a way to query incremental status, that could easily be
-> > fitted in.
-> 
-> This is [*] below.
-> 
-> >             Because command replies from async commands may be
-> > out-of-order wrt the original requests, clients would need to
-> > provide a unique ID for each command run. This originally was
-> > part of QMP spec but then dropped, but libvirt still actually
-> > generates a uniqe ID for every QMP command.
-> >
-> > Given this, one option is to actually use the QMP command ID as
-> > a job ID, and let you query ongoing status via some new QMP
-> > command that accepts the ID of the job to be queried. A complexity
-> > with this is how to make the jobs visible across multiple QMP
-> > monitors. The job ID might actually have to be a combination of
-> > the serial ID from the QMP command, and the ID of the monitor
-> > chardev combined.
-> 
-> Yes.  The job ID must be unique across all QMP monitors to make
-> broadcast notifications work.
-> 
-> >> I figure the closest to a generic solution we have is block jobs.
-> >> Perhaps a generic solution could be had by abstracting away the "block"
-> >> from "block jobs", leaving just "jobs".
-> 
-> [*] starts here:
-> 
-> >> Another approach is generalizing the asynchronous command proposal to
-> >> fully cover the not-so-simple cases.
-> 
-> We know asynchronous commands "fully cover" when we can use them to
-> replace all the existing job-like commands.
-> 
-> Until then, they enlarge rather than solve our jobs problem.
-> 
-> I get the need for an available monitor.  But I need to balance it with
-> other needs.  Can we find a solution for our monitor availability
-> problem that doesn't enlarge our jobs problem?
+Any idea what is going on?
 
-Hopefully!
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-Dave
+-- =
 
-> >> If you'd rather want to make progress on monitor availability without
-> >> cracking the "jobs" problem, you're in luck!  Use your license to "add
-> >> more of the same": synchronous command to start a job, query to monitor,
-> >> event to notify.  
-> >> 
-> >> If you insist on tying your monitor availability solution to
-> >> asynchronous commands, then I'm in luck!  I just found volunteers to
-> >> solve the "jobs" problem for me.
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1715715
+
+Title:
+  [qemu-ppc] Segfault when booting from HD after OS install
+
+Status in QEMU:
+  New
+
+Bug description:
+  I created an empty 128G qcow2 image and booted from a Mac OS 9.2.1
+  Install CD, in which I was able to install the OS successfully to the
+  hard drive. Upon reboot, this time from the hard drive directly, qemu-
+  system-ppc segfaults. Host system is Ubuntu 16.04.2 with latest qemu
+  commit.
+
+  qemu --version reports "2.10.50 (v2.10.0-244-gb07d1c2-dirty)", but I
+  used git commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e and built
+  with "./configure --target-list=3Dppc-softmmu --enable-debug --disable-
+  strip".
+
+  Here is the command-line arguments:
+
+  qemu-system-ppc -boot c -g 1024x768x32 -M mac99 -m 256 -prom-env
+  'auto-boot?=3Dtrue' -prom-env 'boot-args=3D-v' -prom-env 'vga-ndrv?=3Dtru=
+e'
+  -drive file=3D../os9.img,format=3Draw,media=3Dcdrom -drive
+  file=3DMacOS9.qcow2,format=3Dqcow2,media=3Ddisk -spice
+  port=3D5901,password=3DXXX -net nic,model=3Drtl8139 -net user -monitor st=
+dio
+
+  And the GDB backtrace:
+
+  Program terminated with signal SIGSEGV, Segmentation fault.
+  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
+) at util/qemu-timer.c:462
+  462         timer_mod_ns(ts, expire_time * ts->scale);
+  [Current thread is 1 (Thread 0x7f60e43cb700 (LWP 9853))]
+  (gdb) bt
+  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
+) at util/qemu-timer.c:462
+  #1  0x0000559065d63769 in openpic_tmr_set_tmr (tmr=3D0x5590676fa7e0, val=
+=3D96, enabled=3Dtrue) at hw/intc/openpic.c:861
+  #2  0x0000559065d63995 in openpic_tmr_write (opaque=3D0x5590676f71f0, add=
+r=3D16, val=3D96, len=3D4) at hw/intc/openpic.c:912
+  #3  0x0000559065b02811 in memory_region_write_accessor (mr=3D0x5590676f77=
+10, addr=3D32, value=3D0x7f60e43c7da8, size=3D4, shift=3D0, mask=3D42949672=
+95, attrs=3D...) at /home/bp/qemu/memory.c:529
+  #4  0x0000559065b02a29 in access_with_adjusted_size (addr=3D32, value=3D0=
+x7f60e43c7da8, size=3D1, access_size_min=3D4, access_size_max=3D4, access=
+=3D0x559065b02727 <memory_region_write_accessor>, mr=3D0x5590676f7710, attr=
+s=3D...) at /home/bp/qemu/memory.c:595
+  #5  0x0000559065b051eb in memory_region_dispatch_write (mr=3D0x5590676f77=
+10, addr=3D32, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c:=
+1337
+  #6  0x0000559065aa3a36 in address_space_write_continue (as=3D0x559067614d=
+90, addr=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", le=
+n=3D1, addr1=3D32, l=3D1, mr=3D0x5590676f7710) at /home/bp/qemu/exec.c:2942
+  #7  0x0000559065aa3b84 in address_space_write (as=3D0x559067614d90, addr=
+=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", len=3D1) a=
+t /home/bp/qemu/exec.c:2987
+  #8  0x0000559065aa2ec0 in subpage_write (opaque=3D0x7f60c8275fc0, addr=3D=
+272, value=3D96, len=3D1, attrs=3D...) at /home/bp/qemu/exec.c:2565
+  #9  0x0000559065b02906 in memory_region_write_with_attrs_accessor (mr=3D0=
+x7f60c8275fc0, addr=3D272, value=3D0x7f60e43c7fc8, size=3D1, shift=3D0, mas=
+k=3D255, attrs=3D...) at /home/bp/qemu/memory.c:555
+  #10 0x0000559065b029d3 in access_with_adjusted_size (addr=3D272, value=3D=
+0x7f60e43c7fc8, size=3D1, access_size_min=3D1, access_size_max=3D8, access=
+=3D0x559065b02818 <memory_region_write_with_attrs_accessor>, mr=3D0x7f60c82=
+75fc0, attrs=3D...) at /home/bp/qemu/memory.c:590
+  #11 0x0000559065b0523a in memory_region_dispatch_write (mr=3D0x7f60c8275f=
+c0, addr=3D272, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c=
+:1344
+  #12 0x0000559065b175db in io_writex (env=3D0x7f60e43d42a0, iotlbentry=3D0=
+x7f60e43e8130, mmu_idx=3D3, val=3D96, addr=3D2147750160, retaddr=3D14005415=
+8295744, size=3D1) at /home/bp/qemu/accel/tcg/cputlb.c:807
+  #13 0x0000559065b18055 in io_writeb (env=3D0x7f60e43d42a0, mmu_idx=3D3, i=
+ndex=3D65, val=3D96 '`', addr=3D2147750160, retaddr=3D140054158295744) at /=
+home/bp/qemu/softmmu_template.h:265
+  #14 0x0000559065b181ea in helper_ret_stb_mmu (env=3D0x7f60e43d42a0, addr=
+=3D2147750160, val=3D96 '`', oi=3D3, retaddr=3D140054158295744) at /home/bp=
+/qemu/softmmu_template.h:300
+  #15 0x00007f60e65ac2c0 in code_gen_buffer ()
+  #16 0x0000559065b1ff26 in cpu_tb_exec (cpu=3D0x7f60e43cc010, itb=3D0x7f60=
+e65ac5c0 <code_gen_buffer+935318>) at /home/bp/qemu/accel/tcg/cpu-exec.c:166
+  #17 0x0000559065b20bfd in cpu_loop_exec_tb (cpu=3D0x7f60e43cc010, tb=3D0x=
+7f60e65ac5c0 <code_gen_buffer+935318>, last_tb=3D0x7f60e43c8678, tb_exit=3D=
+0x7f60e43c8674) at /home/bp/qemu/accel/tcg/cpu-exec.c:578
+  #18 0x0000559065b20eed in cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp/qem=
+u/accel/tcg/cpu-exec.c:676
+  #19 0x0000559065aebc3d in tcg_cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp=
+/qemu/cpus.c:1270
+  #20 0x0000559065aebe64 in qemu_tcg_rr_cpu_thread_fn (arg=3D0x7f60e43cc010=
+) at /home/bp/qemu/cpus.c:1365
+  #21 0x00007f60f56f06ba in start_thread (arg=3D0x7f60e43cb700) at pthread_=
+create.c:333
+  #22 0x00007f60f542682d in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:109
+
+  Any idea what is going on?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1715715/+subscriptions
