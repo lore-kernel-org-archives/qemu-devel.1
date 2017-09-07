@@ -1,34 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dpvL3-0007iC-Kg
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 07:51:22 -0400
+	(envelope-from <quintela@redhat.com>) id 1dpvNl-0000HI-GY
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 07:54:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dpvKy-00083t-LK
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 07:51:17 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51402)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dpvKy-00083V-Es
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 07:51:12 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dpvKv-000169-Kj
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 11:51:10 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4BE122E81F1
-	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 11:50:59 +0000 (UTC)
+	(envelope-from <quintela@redhat.com>) id 1dpvNg-00018Y-Q7
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 07:54:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42582)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dpvNg-000188-Jy
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 07:54:00 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C8A037E42C
+	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 11:53:58 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <265f10bb-5718-aaac-d0fe-595a78acdf46@redhat.com> (Eric Blake's
+	message of "Wed, 6 Sep 2017 11:15:23 -0500")
+References: <20170906115143.27451-1-quintela@redhat.com>
+	<20170906115143.27451-8-quintela@redhat.com>
+	<265f10bb-5718-aaac-d0fe-595a78acdf46@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Thu, 07 Sep 2017 13:53:55 +0200
+Message-ID: <87tw0ebu7g.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Sep 2017 11:42:55 -0000
-From: Chris Unsworth <1714331@bugs.launchpad.net>
-Reply-To: Bug 1714331 <1714331@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150420685550.8035.5310753798215250364.malonedeb@soybean.canonical.com>
-Message-Id: <150478457561.19046.12771740833214811772.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1714331] Re: Virtual machines not working anymore
- on 2.10
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v7 07/22] migration: Make
+ migrate_fd_error() the owner of the Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,118 +36,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-I was using a version of OVMF from about a year ago which works fine
-with QEMU 2.8 and 2.9 but doesn't work with 2.10.  I just updated to the
-latest OVMF from master and everything's working now with QEMU 2.10 and
-WIndows 10 64 bit, so the old OVMF was the issue.
+Eric Blake <eblake@redhat.com> wrote:
+D> On 09/06/2017 06:51 AM, Juan Quintela wrote:
+>> So far, we had to free the error after each caller, so just do it
+>> here.  Once there, tls.c was leaking the error.
+>
+> You mention tls.c,
+>
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> ---
+>>  migration/channel.c   |  1 -
+>>  migration/migration.c | 10 ++++------
+>>  migration/migration.h |  4 ++--
+>>  migration/socket.c    |  1 -
+>>  4 files changed, 6 insertions(+), 10 deletions(-)
+>
+> but don't touch it.  Am I missing something?
+>
 
-Thanks for your help,
-Chris
+It was missing error_free();  So it leaked the Error * variable.
+I will improve the message for next version.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1714331
 
-Title:
-  Virtual machines not working anymore on 2.10
+>>  
+>> -void migrate_fd_error(MigrationState *s, const Error *error)
+>> +void migrate_fd_error(MigrationState *s, Error *error)
+>>  {
+>
+> No comments at definition,
 
-Status in QEMU:
-  New
+We free it inside now, so it can't be const.
 
-Bug description:
-  Using 2.10, my virtual machine(s) don't work anymore. This happens
-  100% of the times.
+>> +++ b/migration/migration.h
+>> @@ -163,8 +163,8 @@ bool  migration_has_all_channels(void);
+>>  
+>>  uint64_t migrate_max_downtime(void);
+>>  
+>> -void migrate_set_error(MigrationState *s, const Error *error);
+>> -void migrate_fd_error(MigrationState *s, const Error *error);
+>> +void migrate_set_error(MigrationState *s, Error *error);
+>> +void migrate_fd_error(MigrationState *s, Error *error);
+>
+> or at declaration. That would be worth adding at some point, but this
+> patch isn't making it worse.
 
-  -----
+will add them, thanks.
 
-  I use QEMU compiling it from source, on Ubuntu 16.04 amd64. This is
-  the configure command:
+> The code looks okay in isolation, so if it is only the commit message
+> that needs fixing,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-      configure --target-list=3Dx86_64-softmmu --enable-debug --enable-gtk
-  --enable-spice --audio-drv-list=3Dpa
-
-  I have one virtual disk, with a Windows 10 64-bit, which I launch in
-  two different ways; both work perfectly on 2.9 (and used to do on 2.8,
-  but I haven't used it for a long time).
-
-  This is the first way:
-
-      qemu-system-x86_64
-        -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.=
-fd
-        -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
-        -enable-kvm
-        -machine q35,accel=3Dkvm,mem-merge=3Doff
-        -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinloc=
-ks=3D0x1fff,hv_vapic,hv_time
-        -smp 4,cores=3D4,sockets=3D1,threads=3D1
-        -m 4096
-        -display gtk
-        -vga qxl
-        -rtc base=3Dlocaltime
-        -serial none
-        -parallel none
-        -usb
-        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
-        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
-        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
-        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
-        -device virtio-scsi-pci,id=3Dscsi
-        -drive file=3D/path/to/image-diff.img,id=3Dhdd1,format=3Dqcow2,if=
-=3Dnone,cache=3Dwriteback
-        -device scsi-hd,drive=3Dhdd1
-        -net nic,model=3Dvirtio
-        -net user
-
-  On QEMU 2.10, I get the `Recovery - Your PC/Device needs to be
-  repaired` windows screen; on 2.9, it boots regularly.
-
-  This is the second way:
-
-      qemu-system-x86_64
-        -drive if=3Dpflash,format=3Draw,readonly,file=3D/path/to/OVMF_CODE.=
-fd
-        -drive if=3Dpflash,format=3Draw,file=3D/tmp/OVMF_VARS.fd.tmp
-        -enable-kvm
-        -machine q35,accel=3Dkvm,mem-merge=3Doff
-        -cpu host,kvm=3Doff,hv_vendor_id=3Dvgaptrocks,hv_relaxed,hv_spinloc=
-ks=3D0x1fff,hv_vapic,hv_time
-        -smp 4,cores=3D4,sockets=3D1,threads=3D1
-        -m 10240
-        -vga none
-        -rtc base=3Dlocaltime
-        -serial none
-        -parallel none
-        -usb
-        -device vfio-pci,host=3D01:00.0,multifunction=3Don
-        -device vfio-pci,host=3D01:00.1
-        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
-        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
-        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
-        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
-        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
-        -device usb-host,vendorid=3D0xNNNN,productid=3D0xNNNN
-        -device virtio-scsi-pci,id=3Dscsi
-        -drive file=3D/path/to/image-diff.img,id=3Dhdd1,format=3Dqcow2,if=
-=3Dnone,cache=3Dwriteback
-        -device scsi-hd,drive=3Dhdd1
-        -net nic,model=3Dvirtio
-        -net user
-
-  On QEMU 2.10, I get the debug window on the linux monitor, and blank scre=
-en on VFIO one (no BIOS screen at all); after 10/20 seconds, QEMU crashes w=
-ithout any message.
-  On 2.9, this works perfectly.
-
-  -----
-
-  I am able to perform a git bisect, if that helps, but if this is the
-  case, I'd need this issue to be reviewed, since bisecting is going to
-  take me a lot of time.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1714331/+subscriptions
+Thanks.
