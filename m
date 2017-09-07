@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpxAP-0002G3-On
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:48:30 -0400
+	(envelope-from <david@redhat.com>) id 1dpxEO-0005ru-Ca
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:52:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpxAL-0004hN-0X
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:48:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59036)
+	(envelope-from <david@redhat.com>) id 1dpxEG-00009A-HH
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:52:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39150)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dpxAK-0004gX-OH
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:48:20 -0400
-References: <20170906152111.16958-1-eblake@redhat.com>
-	<CAFEAcA-1QOkSF+sG+0ymTv-Cx0WDEG4Ns4NydW-vz-box2Pi3Q@mail.gmail.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <5ba61e49-3b84-46a4-2978-d42d3457f21b@redhat.com>
-Date: Thu, 7 Sep 2017 08:48:15 -0500
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dpxEG-00006c-7X
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:52:24 -0400
+References: <20170904154316.4148-1-david@redhat.com>
+	<20170904154316.4148-11-david@redhat.com>
+	<20170907153259.744c2c79.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <59bfd678-dd2b-818d-4b64-b522cfda5ea2@redhat.com>
+Date: Thu, 7 Sep 2017 15:52:19 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-1QOkSF+sG+0ymTv-Cx0WDEG4Ns4NydW-vz-box2Pi3Q@mail.gmail.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="aBKHrlulvwoUrTFnShvHTCKIo7p4QL8mo"
-Subject: Re: [Qemu-devel] [PULL 0/5] NBD patches for 2017-09-06
+In-Reply-To: <20170907153259.744c2c79.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 10/19] target/s390x: use
+ program_interrupt() in per_check_exception()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,85 +30,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---aBKHrlulvwoUrTFnShvHTCKIo7p4QL8mo
-From: Eric Blake <eblake@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <5ba61e49-3b84-46a4-2978-d42d3457f21b@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/5] NBD patches for 2017-09-06
-References: <20170906152111.16958-1-eblake@redhat.com>
- <CAFEAcA-1QOkSF+sG+0ymTv-Cx0WDEG4Ns4NydW-vz-box2Pi3Q@mail.gmail.com>
-In-Reply-To: <CAFEAcA-1QOkSF+sG+0ymTv-Cx0WDEG4Ns4NydW-vz-box2Pi3Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/07/2017 07:26 AM, Peter Maydell wrote:
-> On 6 September 2017 at 16:21, Eric Blake <eblake@redhat.com> wrote:
->> The following changes since commit b07d1c2f5607489d4d4a6a65ce36a3e896a=
-c065e:
+On 07.09.2017 15:32, Cornelia Huck wrote:
+> On Mon,  4 Sep 2017 17:43:07 +0200
+> David Hildenbrand <david@redhat.com> wrote:
+> 
+>> Clean it up by reusing program_interrupt(). Add a concern regarding
+>> ilen.
 >>
->>   Revert "kvm: use DIV_ROUND_UP" (2017-09-05 18:55:40 +0100)
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  target/s390x/misc_helper.c | 15 +++++++++------
+>>  1 file changed, 9 insertions(+), 6 deletions(-)
 >>
->> are available in the git repository at:
->>
->>   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-09-06
->>
->> for you to fetch changes up to 030fa7f6f950f5c8963f1dee8e6bb7387ed86a9=
-9:
->>
->>   nbd: Use new qio_channel_*_all() functions (2017-09-06 10:11:54 -050=
-0)
->>
+>> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+>> index 57c02ddf1b..5096286157 100644
+>> --- a/target/s390x/misc_helper.c
+>> +++ b/target/s390x/misc_helper.c
+>> @@ -446,14 +446,17 @@ void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
+>>  #ifndef CONFIG_USER_ONLY
+>>  void HELPER(per_check_exception)(CPUS390XState *env)
+>>  {
+>> -    CPUState *cs = CPU(s390_env_get_cpu(env));
+>> +    uint32_t ilen;
+>>  
+>>      if (env->per_perc_atmid) {
+>> -        env->int_pgm_code = PGM_PER;
+>> -        env->int_pgm_ilen = get_ilen(cpu_ldub_code(env, env->per_address));
+>> -
+>> -        cs->exception_index = EXCP_PGM;
+>> -        cpu_loop_exit(cs);
+>> +        /*
+>> +         * FIXME: ILEN_AUTO is most probably the right thing to use. ilen
+>> +         * always has to match the instruction referenced in the PSW. E.g.
+>> +         * if a PER interrupt is triggered via EXECUTE, we have to use ilen
+>> +         * of EXECUTE, while per_address contains the target of EXECUTE.
+>> +         */
+>> +        ilen = get_ilen(cpu_ldub_code(env, env->per_address));
+>> +        program_interrupt(env, PGM_PER, ilen);
+>>      }
+>>  }
+>>  
+> 
+> Wrapping my head around it: You preserve the current behavior, which
+> should probably be changed to use ILEN_AUTO to handle cases like
+> EXECUTE correctly?
 
-> I get an error in test-aio-multithread (clang, linux, x86-64):
->   GTESTER tests/test-aio-multithread
-> **
-> ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-aio-multithread.=
-c:368:test_multi_fair_mutex:
-> assertion failed (counter =3D=3D atomic_counter): (532693 =3D=3D 532694=
-)
-> GTester: last random seed: R02Sa68ef1eb4822359eb869642ff26180df
+Exactly, e.g. if EXECUTE executes instruction Y, and Y is to generate an
+IFETCH event, AFAIK
 
-I wonder if that is a rare but pre-existing bug, as I don't see any use
-of qio_channel in test-aio-multithread, and therefore no obvious way
-that this series would be the cause of the intermittent failure.
+a) per_address points at Y
+b) old PGM PSW points at instruction after EXECUTE (ignoring nullifying
+for now)
+c) PGM ilen has to match EXECUTE (so the PSW can properly be rewound)
 
->=20
-> Seems to be very intermittent, though -- I haven't been able
-> to reproduce it, even with loading the box up with a
-> compile job at the same time.
+The case where per_address == (PGM PSW - ilen) (ignoring nullification)
+should happen without EXECUTE being involved. That's why PER currently
+works just fine with Linux (e.g. uprobe smoke tests when kernel boots up).
 
-Paolo, this appears to be your area of expertise.
+Execute handling with PER is just nasty. And one first has to find out
+how that plays together with EXECUTE handling in TCG. Therefore, no easy
+fix (although ILEN_AUTO might most probably really be the right thing to
+do).
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> 
+> Do you plan to do a follow up? (Should I spend some cycles on it?)
+> 
 
+Somewhere on my list. The next thing (in this area) I want do is write
+kvm-unit-tests for PER, because also KVM could benefit from that
+(EXECUTE handling is just nasty).
 
---aBKHrlulvwoUrTFnShvHTCKIo7p4QL8mo
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+So sure, go ahead and have a look at it if you have some spare cycles :)
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+-- 
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmxTh8ACgkQp6FrSiUn
-Q2rXbQf6A+ANplA2Wm8KB1KGeIg72AwmDegLZAX2qeDWQkJmtuJE+0zdT+BepyGZ
-D+BpcyfgXqWrx7U+kkNqURIGI3gfaMcUN+NiEm7aHXYRq96+5kTTDgnoGu0UJioo
-4G2EqnU1L9PHPr6+De0WYIASpyhb9LO9qqdY+tXIovh+BEiLdMqgT0Yixp86E/IH
-IFyrWR1g23qVLr1SCavShDiyLC1cDsb9kcFZeHa49rSCoDRXnP2733uxPtOnSKNi
-dsdBllYJ5/ybyDFpt3PKooqwD82byOu9oq4Xq87S5dU9QuST84WYZtGL3nQ3DBf0
-XMqdGufaju0FEyCITlkPzVXJu3uF5A==
-=kjO3
------END PGP SIGNATURE-----
+Thanks,
 
---aBKHrlulvwoUrTFnShvHTCKIo7p4QL8mo--
+David
