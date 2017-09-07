@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dpxgt-0004Nz-1Z
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 10:22:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1dpxk0-0005V6-KQ
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 10:25:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cota@braap.org>) id 1dpxgn-0007zQ-Pa
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 10:21:59 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:55963)
+	(envelope-from <eblake@redhat.com>) id 1dpxjq-000107-NZ
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 10:25:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39736)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cota@braap.org>) id 1dpxgn-0007y9-IG
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 10:21:53 -0400
-Date: Thu, 7 Sep 2017 10:21:52 -0400
-From: "Emilio G. Cota" <cota@braap.org>
-Message-ID: <20170907142152.GA19705@flamenco>
-References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
-	<87a826epxe.fsf@dusky.pond.sub.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dpxjq-0000zf-H7
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 10:25:02 -0400
+References: <20170907141245.31946-1-famz@redhat.com>
+	<20170907141245.31946-3-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c2d4ea72-f64c-517d-046b-b5dbd0705b22@redhat.com>
+Date: Thu, 7 Sep 2017 09:24:56 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87a826epxe.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [PATCH v4 00/20] instrument: Add basic event
- instrumentation
+In-Reply-To: <20170907141245.31946-3-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4x2GJmfk7qpDe62evGFBHDql9GaggjXV0"
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] docker: Enable features explicitly
+ in test-full
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +29,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-On Thu, Sep 07, 2017 at 12:58:05 +0200, Markus Armbruster wrote:
-> Lluís Vilanova <vilanova@ac.upc.edu> writes:
-> 
-> > This series adds an API to add instrumentation events.
-> >
-> > It also provides additional APIs for:
-> > * Controlling tracing events
-> > * Peek/poke guest memory
-> >
-> > There's still missing APIs for (can be added in later series?):
-> > * Provide something like tracing's per-vCPU trace states (i.e., so that each
-> >   vCPU can have different instrumentation code). It's still not clear to me if
-> >   we should extend the per-vCPU bitmap with instrumentation events, or otherwise
-> >   somehow reuse the bits in tracing events (since they're currently limited).
-> > * Peek/poke guest registers
-> >
-> > The instrumentation code is dynamically loaded as a library into QEMU either
-> > when it starts or later using its remote control interfaces.
-> >
-> > Signed-off-by: Lluís Vilanova <vilanova@ac.upc.edu>
-> 
-> Taking a step back.
-> 
-> This looks like a way to dynamically load arbitrary code.  What
-> interfaces can this code use?  Your cover letter should answer this.
-> 
-> As long as the answer is "everything the dynamic linker is willing to
-> resolve", this series heading nowhere.  We can talk about an interface
-> for plugins, but "anything goes" is not on the menu.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4x2GJmfk7qpDe62evGFBHDql9GaggjXV0
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c2d4ea72-f64c-517d-046b-b5dbd0705b22@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] docker: Enable features explicitly in
+ test-full
+References: <20170907141245.31946-1-famz@redhat.com>
+ <20170907141245.31946-3-famz@redhat.com>
+In-Reply-To: <20170907141245.31946-3-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-A simple solution to this is to only export the API symbols by passing
---dynamic-file to the linker -- see patch 2 of the following series for an
-example (ELF-only, although I'm pretty sure this can be achieved on Windows
-as well):
-  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01446.html
+On 09/07/2017 09:12 AM, Fam Zheng wrote:
+> Also avoid "set -e".
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  tests/docker/test-full | 82 ++++++++++++++++++++++++++++++++++++++++++=
+++++----
+>  1 file changed, 76 insertions(+), 6 deletions(-)
 
-Thanks,
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-		Emilio
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--4x2GJmfk7qpDe62evGFBHDql9GaggjXV0
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmxVrgACgkQp6FrSiUn
+Q2qkCQf/ZLnNb4ODRmz8mP/USS6Lu2W8kjY8qmwdZHVaNqYrcKgKp8WqXxmZm0TB
+aBGLUxlluLPUqnmrYxTrBWg9ajaNTKKwG+GbQFPqmkHp5euoQV9AdIBi74CIfHU8
+Inx7iVwB0lXjcelcVnDGPn3WTZrI5Ve1iQRXFdDt9EKpL4FdymWrceA8n8EZTNKK
+Z9072zIdh2g6+F9U6RFvQynCk06FVfxu6so80gYUrWwTfVjZoVB6D1q1yzyosl/I
+NidaqRGILBJ3d3YqXH9YNSujPSx9heo0pEkgxsjenjrfHQHyhpQJDaxBiZXwnzyk
+sgNqA6iXybp5RY4Yfp8ImOx/82v0AA==
+=CYLx
+-----END PGP SIGNATURE-----
+
+--4x2GJmfk7qpDe62evGFBHDql9GaggjXV0--
