@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59181)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1dpt2e-00044Z-TI
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:24:14 -0400
+	(envelope-from <berrange@redhat.com>) id 1dpt43-0005E5-NM
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:25:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <phil@philjordan.eu>) id 1dpt2Y-0001Xr-GE
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:24:08 -0400
-Received: from mail-oi0-x232.google.com ([2607:f8b0:4003:c06::232]:35241)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <phil@philjordan.eu>) id 1dpt2Y-0001X4-6f
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:24:02 -0400
-Received: by mail-oi0-x232.google.com with SMTP id n18so55356665oig.2
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 02:24:00 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1dpt3y-0001yT-HU
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:25:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57578)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpt3y-0001yI-95
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:25:30 -0400
+Date: Thu, 7 Sep 2017 10:25:07 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170907092507.GD30609@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170906094846.GA2215@work-vm> <20170906104603.GK15510@redhat.com>
+	<20170906104850.GB2215@work-vm> <20170906105414.GL15510@redhat.com>
+	<20170906105704.GC2215@work-vm> <20170906110629.GM15510@redhat.com>
+	<20170906113157.GD2215@work-vm> <20170906115428.GP15510@redhat.com>
+	<20170907081341.GA23040@pxdev.xzpeter.org>
+	<20170907091508.GA2098@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20170906143430.GF15535@stefanha-x1.localdomain>
-References: <150420685550.8035.5310753798215250364.malonedeb@soybean.canonical.com>
-	<150463692706.10750.12505622774232959951.malone@wampee.canonical.com>
-	<20170906143430.GF15535@stefanha-x1.localdomain>
-From: Phil Dennis-Jordan <phil@philjordan.eu>
-Date: Thu, 7 Sep 2017 11:23:39 +0200
-Message-ID: <CAAibmn1DVqyE_XrAnMBounx_noWuH1bQ9VgDgkzNMR1SXWadow@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Bug 1714331] Re: Virtual machines not working
- anymore on 2.10
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170907091508.GA2098@work-vm>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,213 +33,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Bug 1714331 <1714331@bugs.launchpad.net>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Hi Stefan,
+On Thu, Sep 07, 2017 at 10:15:09AM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > On Wed, Sep 06, 2017 at 12:54:28PM +0100, Daniel P. Berrange wrote:
+> > > On Wed, Sep 06, 2017 at 12:31:58PM +0100, Dr. David Alan Gilbert wr=
+ote:
+> > > > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > > > This does imply that you need a separate monitor I/O processing=
+, from the
+> > > > > command execution thread, but I see no need for all commands to=
+ suddenly
+> > > > > become async. Just allowing interleaved replies is sufficient f=
+rom the
+> > > > > POV of the protocol definition. This interleaving is easy to ha=
+ndle from
+> > > > > the client POV - just requires a unique 'serial' in the request=
+ by the
+> > > > > client, that is copied into the reply by QEMU.
+> > > >=20
+> > > > OK, so for that we can just take Marc-Andr=C3=A9's syntax and cal=
+l it 'id':
+> > > >   https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03634.=
+html
+> > > >=20
+> > > > then it's upto the caller to ensure those id's are unique.
+> > >=20
+> > > Libvirt has in fact generated a unique 'id' for every monitor comma=
+nd
+> > > since day 1 of supporting QMP.
+> > >=20
+> > > > I do worry about two things:
+> > > >   a) With this the caller doesn't really know which commands coul=
+d be
+> > > >   in parallel - for example if we've got a recovery command that'=
+s
+> > > >   executed by this non-locking thread that's OK, we expect that
+> > > >   to be doable in parallel.  If in the future though we do
+> > > >   what you initially suggested and have a bunch of commands get
+> > > >   routed to the migration thread (say) then those would suddenly
+> > > >   operate in parallel with other commands that we're previously
+> > > >   synchronous.
+> > >=20
+> > > We could still have an opt-in for async commands. eg default to exe=
+cuting
+> > > all commands in the main thread, unless the client issues an explic=
+it
+> > > "make it async" command, to switch to allowing the migration thread=
+ to
+> > > process it async.
+> > >=20
+> > >  { "execute": "qmp_allow_async",
+> > >    "data": { "commands": [
+> > >        "migrate_cancel",
+> > >    ] } }
+> > >=20
+> > >=20
+> > >  { "return": { "commands": [
+> > >        "migrate_cancel",
+> > >    ] } }
+> > >=20
+> > > The server response contains the subset of commands from the reques=
+t
+> > > for which async is supported.
+> > >=20
+> > > That gives good negotiation ability going forward as we incremental=
+ly
+> > > support async on more commands.
+> >=20
+> > I think this goes back to the discussion on which design we'd like to
+> > choose.  IMHO the whole async idea plus the per-command-id is indeed
+> > cleaner and nicer, and I believe that can benefit not only libvirt,
+> > but also other QMP users.  The problem is, I have no idea how long
+> > it'll take to let us have such a feature - I believe that will includ=
+e
+> > QEMU and Libvirt to both support that.  And it'll be a pity if the
+> > postcopy recovery cannot work only because we cannot guarantee a
+> > stable monitor.
+>=20
+> libvirt will need changes for postcopy recovery however we do it;
+> so we need to do it the way they want.
+>=20
+> I think Dan's suggestion isn't as hard as it initially sounded;  a firs=
+t
+> thing to try would be taking all the monitor IO into another thread
+> and feeding all commands to the main thread for execution - that sounds
+> like the hard part.
+> (I'm not sure how multiple monitors interact for this).
 
-What version of OVMF are you using? There were a bunch of bugs related to
-FADT in OVMF which were fixed back in March. Specifically, commits
-072060a, 78807f6, and 198a46d. If your version of OVMF doesn't include
-these fixes, that's a likely source for your problems.
+Multiple monitors is probably not as hard as it sounds. No matter how
+many monitors you have configured today, they'll all serviced by the
+main loop so commands from each monitor are strictly serialized.
 
-Hope that helps.
+So if you moved I/O processing to a separate thread, and had a single
+queue of commands to be executed by the main thread, you would still
+have the exact same serialized processing across multiple monitors.
 
-Phil
-
-
-On 6 September 2017 at 16:34, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-
-> On Tue, Sep 05, 2017 at 06:42:06PM -0000, Chris Unsworth wrote:
-> > I think my issue looks like the same.  Sometimes I just get spinning
-> > dots, and sometimes there is the message about doing an automatic repair
-> > below the spinning dots before it stops and uses 100% cpu.  I just did a
-> > git bisect:
->
-> Perfect, thanks Chris!
->
-> I have CCed Phil and Paolo regarding the commit you identified.
->
-> >
-> > # git bisect log
-> > # bad: [1ab5eb4efb91a3d4569b0df6e824cc08ab4bd8ec] Update version for
-> v2.10.0 release
-> > # good: [6c02258e143700314ebf268dae47eb23db17d1cf] Update version for
-> v2.9.0 release
-> > git bisect start 'v2.10.0' 'v2.9.0'
-> > # bad: [269c20b2bbd2aa8531e0cdc741fb166f290d7a2b] tests/qdict: check
-> more get_try_int() cases
-> > git bisect bad 269c20b2bbd2aa8531e0cdc741fb166f290d7a2b
-> > # bad: [eba0161990af8509608332450ee7e338273cf5df] Merge remote-tracking
-> branch 'rth/tags/pull-s390-20170512' into staging
-> > git bisect bad eba0161990af8509608332450ee7e338273cf5df
-> > # good: [9ea5ada76f34a0ef048b131c3a166d8564199bdb] audio: Use
-> ARRAY_SIZE from qemu/osdep.h
-> > git bisect good 9ea5ada76f34a0ef048b131c3a166d8564199bdb
-> > # bad: [1effe6ad5eac1b2e50a077695ac801d172891d6a] Merge remote-tracking
-> branch 'danpb/tags/pull-qcrypto-2017-05-09-1' into staging
-> > git bisect bad 1effe6ad5eac1b2e50a077695ac801d172891d6a
-> > # good: [f03f9f0c10dcfadee5811d43240f0a6af230f1ce] Merge
-> remote-tracking branch 'cohuck/tags/s390x-3270-20170504' into staging
-> > git bisect good f03f9f0c10dcfadee5811d43240f0a6af230f1ce
-> > # good: [6c02258e143700314ebf268dae47eb23db17d1cf]
-> qobject-input-visitor: Document full_name_nth()
-> > git bisect good 6c02258e143700314ebf268dae47eb23db17d1cf
-> > # bad: [95615ce5a1beffff1a5dd3597d8cb6ba83f0010e] vhost-scsi: create a
-> vhost-scsi-common abstraction
-> > git bisect bad 95615ce5a1beffff1a5dd3597d8cb6ba83f0010e
-> > # bad: [31f5a726b59bda5580e2f9413867893501dd7d93] trace: add qemu mutex
-> lock and unlock trace events
-> > git bisect bad 31f5a726b59bda5580e2f9413867893501dd7d93
-> > # bad: [49e00a18708e27c815828d9440d5c9300d19547c] use _Static_assert in
-> QEMU_BUILD_BUG_ON
-> > git bisect bad 49e00a18708e27c815828d9440d5c9300d19547c
-> > # bad: [6103451aeb749e92bf7d730429985189c6921c32] hw/i386: Build-time
-> assertion on pc/q35 reset register being identical.
-> > git bisect bad 6103451aeb749e92bf7d730429985189c6921c32
-> > # bad: [77af8a2b95b79699de650965d5228772743efe84] hw/i386: Use Rev3
-> FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.
-> > git bisect bad 77af8a2b95b79699de650965d5228772743efe84
-> > # first bad commit: [77af8a2b95b79699de650965d5228772743efe84] hw/i386:
-> Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest OS support.
-> >
-> >
-> > 77af8a2b95b79699de650965d5228772743efe84 is the first bad commit
-> > commit 77af8a2b95b79699de650965d5228772743efe84
-> > Author: Phil Dennis-Jordan <phil@philjordan.eu>
-> > Date:   Wed Mar 15 19:20:26 2017 +1300
-> >
-> >     hw/i386: Use Rev3 FADT (ACPI 2.0) instead of Rev1 to improve guest
-> > OS support.
-> >
-> >     This updates the FADT generated for x86/64 machine types from
-> > Revision 1 to 3. (Based on ACPI standard 2.0 instead of 1.0) The
-> > intention is to expose the reset register information to guest operating
-> > systems which require it, specifically OS X/macOS. Revision 1 FADTs do
-> > not contain the fields relating to the reset register.
-> >
-> >     The new layout and contents remains backwards-compatible with
-> > operating systems which only support ACPI 1.0, as the existing fields
-> > are not modified by this change, as the 64-bit and 32-bit variants are
-> > allowed to co-exist according to the ACPI 2.0 standard. No regressions
-> > became apparent in tests with a range of Windows (XP-10) and Linux
-> > versions.
-> >
-> >     The BIOS tables test suite's FADT checksum test has also been
-> > updated to reflect the new FADT layout and content.
-> >
-> >     Signed-off-by: Phil Dennis-Jordan <phil@philjordan.eu>
-> >     Message-Id: <1489558827-28971-2-git-send-email-phil@philjordan.eu>
-> >     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> >
-> > :040000 040000 40063761c0b86f87e798e03ea48eff9ea0753425
-> 6d2a94150cf1eafb16f0ccf6325281415fef64a6 M      hw
-> > :040000 040000 fe3f1480a91b76fea238c765f0725e715932d96d
-> 68f9368d8d78fd3267f609b603f97e8a74bdf528 M      include
-> > :040000 040000 895e961b0a160100aa95b2f557cfe6b87a7d9bff
-> 8ed08cef10fddee7814e38ad62be11371592a75a M      tests
-> >
-> > --
-> > You received this bug notification because you are a member of qemu-
-> > devel-ml, which is subscribed to QEMU.
-> > https://bugs.launchpad.net/bugs/1714331
-> >
-> > Title:
-> >   Virtual machines not working anymore on 2.10
-> >
-> > Status in QEMU:
-> >   New
-> >
-> > Bug description:
-> >   Using 2.10, my virtual machine(s) don't work anymore. This happens
-> >   100% of the times.
-> >
-> >   -----
-> >
-> >   I use QEMU compiling it from source, on Ubuntu 16.04 amd64. This is
-> >   the configure command:
-> >
-> >       configure --target-list=x86_64-softmmu --enable-debug --enable-gtk
-> >   --enable-spice --audio-drv-list=pa
-> >
-> >   I have one virtual disk, with a Windows 10 64-bit, which I launch in
-> >   two different ways; both work perfectly on 2.9 (and used to do on 2.8,
-> >   but I haven't used it for a long time).
-> >
-> >   This is the first way:
-> >
-> >       qemu-system-x86_64
-> >         -drive if=pflash,format=raw,readonly,file=/path/to/OVMF_CODE.fd
-> >         -drive if=pflash,format=raw,file=/tmp/OVMF_VARS.fd.tmp
-> >         -enable-kvm
-> >         -machine q35,accel=kvm,mem-merge=off
-> >         -cpu host,kvm=off,hv_vendor_id=vgaptrocks,hv_relaxed,hv_
-> spinlocks=0x1fff,hv_vapic,hv_time
-> >         -smp 4,cores=4,sockets=1,threads=1
-> >         -m 4096
-> >         -display gtk
-> >         -vga qxl
-> >         -rtc base=localtime
-> >         -serial none
-> >         -parallel none
-> >         -usb
-> >         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
-> >         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
-> >         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
-> >         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
-> >         -device virtio-scsi-pci,id=scsi
-> >         -drive file=/path/to/image-diff.img,
-> id=hdd1,format=qcow2,if=none,cache=writeback
-> >         -device scsi-hd,drive=hdd1
-> >         -net nic,model=virtio
-> >         -net user
-> >
-> >   On QEMU 2.10, I get the `Recovery - Your PC/Device needs to be
-> >   repaired` windows screen; on 2.9, it boots regularly.
-> >
-> >   This is the second way:
-> >
-> >       qemu-system-x86_64
-> >         -drive if=pflash,format=raw,readonly,file=/path/to/OVMF_CODE.fd
-> >         -drive if=pflash,format=raw,file=/tmp/OVMF_VARS.fd.tmp
-> >         -enable-kvm
-> >         -machine q35,accel=kvm,mem-merge=off
-> >         -cpu host,kvm=off,hv_vendor_id=vgaptrocks,hv_relaxed,hv_
-> spinlocks=0x1fff,hv_vapic,hv_time
-> >         -smp 4,cores=4,sockets=1,threads=1
-> >         -m 10240
-> >         -vga none
-> >         -rtc base=localtime
-> >         -serial none
-> >         -parallel none
-> >         -usb
-> >         -device vfio-pci,host=01:00.0,multifunction=on
-> >         -device vfio-pci,host=01:00.1
-> >         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
-> >         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
-> >         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
-> >         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
-> >         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
-> >         -device usb-host,vendorid=0xNNNN,productid=0xNNNN
-> >         -device virtio-scsi-pci,id=scsi
-> >         -drive file=/path/to/image-diff.img,
-> id=hdd1,format=qcow2,if=none,cache=writeback
-> >         -device scsi-hd,drive=hdd1
-> >         -net nic,model=virtio
-> >         -net user
-> >
-> >   On QEMU 2.10, I get the debug window on the linux monitor, and blank
-> screen on VFIO one (no BIOS screen at all); after 10/20 seconds, QEMU
-> crashes without any message.
-> >   On 2.9, this works perfectly.
-> >
-> >   -----
-> >
-> >   I am able to perform a git bisect, if that helps, but if this is the
-> >   case, I'd need this issue to be reviewed, since bisecting is going to
-> >   take me a lot of time.
-> >
-> > To manage notifications about this bug go to:
-> > https://bugs.launchpad.net/qemu/+bug/1714331/+subscriptions
-> >
->
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
