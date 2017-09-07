@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58638)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60591)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpwvh-00056z-Vz
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:33:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1dpwxr-000743-FB
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:35:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpwvZ-0001eL-DT
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:33:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49264)
+	(envelope-from <eblake@redhat.com>) id 1dpwxh-0002op-Uv
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:35:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29864)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpwvZ-0001e4-73
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:33:05 -0400
-Date: Thu, 7 Sep 2017 15:32:59 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170907153259.744c2c79.cohuck@redhat.com>
-In-Reply-To: <20170904154316.4148-11-david@redhat.com>
-References: <20170904154316.4148-1-david@redhat.com>
-	<20170904154316.4148-11-david@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dpwxh-0002o2-Lz
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:35:17 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A817561476
+	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 13:35:16 +0000 (UTC)
+References: <cover.1504771369.git.mprivozn@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <dd548267-cae0-7087-caf8-fac63bf5c01b@redhat.com>
+Date: Thu, 7 Sep 2017 08:35:13 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/19] target/s390x: use
- program_interrupt() in per_check_exception()
+In-Reply-To: <cover.1504771369.git.mprivozn@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="q9EahWrMljjgQXC4XhCWbKMTC5U9WNhu8"
+Subject: Re: [Qemu-devel] [PATCH v5 0/3] watchdog.h: Drop local redefinition
+ of actions enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,51 +34,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
+To: Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com
 
-On Mon,  4 Sep 2017 17:43:07 +0200
-David Hildenbrand <david@redhat.com> wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--q9EahWrMljjgQXC4XhCWbKMTC5U9WNhu8
+From: Eric Blake <eblake@redhat.com>
+To: Michal Privoznik <mprivozn@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com
+Message-ID: <dd548267-cae0-7087-caf8-fac63bf5c01b@redhat.com>
+Subject: Re: [PATCH v5 0/3] watchdog.h: Drop local redefinition of actions
+ enum
+References: <cover.1504771369.git.mprivozn@redhat.com>
+In-Reply-To: <cover.1504771369.git.mprivozn@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> Clean it up by reusing program_interrupt(). Add a concern regarding
-> ilen.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  target/s390x/misc_helper.c | 15 +++++++++------
->  1 file changed, 9 insertions(+), 6 deletions(-)
-> 
-> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-> index 57c02ddf1b..5096286157 100644
-> --- a/target/s390x/misc_helper.c
-> +++ b/target/s390x/misc_helper.c
-> @@ -446,14 +446,17 @@ void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
->  #ifndef CONFIG_USER_ONLY
->  void HELPER(per_check_exception)(CPUS390XState *env)
->  {
-> -    CPUState *cs = CPU(s390_env_get_cpu(env));
-> +    uint32_t ilen;
->  
->      if (env->per_perc_atmid) {
-> -        env->int_pgm_code = PGM_PER;
-> -        env->int_pgm_ilen = get_ilen(cpu_ldub_code(env, env->per_address));
-> -
-> -        cs->exception_index = EXCP_PGM;
-> -        cpu_loop_exit(cs);
-> +        /*
-> +         * FIXME: ILEN_AUTO is most probably the right thing to use. ilen
-> +         * always has to match the instruction referenced in the PSW. E.g.
-> +         * if a PER interrupt is triggered via EXECUTE, we have to use ilen
-> +         * of EXECUTE, while per_address contains the target of EXECUTE.
-> +         */
-> +        ilen = get_ilen(cpu_ldub_code(env, env->per_address));
-> +        program_interrupt(env, PGM_PER, ilen);
->      }
->  }
->  
+On 09/07/2017 03:05 AM, Michal Privoznik wrote:
+> diff to v4:
+> - in 3/3 compare passed action string case insensitively to the qapi en=
+um
+>=20
+> Michal Privoznik (3):
+>   qapi: Rename WatchdogExpirationAction enum
+>   watchdog.h: Drop local redefinition of actions enum
+>   watchdog: Allow setting action on the fly
 
-Wrapping my head around it: You preserve the current behavior, which
-should probably be changed to use ILEN_AUTO to handle cases like
-EXECUTE correctly?
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
-Do you plan to do a follow up? (Should I spend some cycles on it?)
+>=20
+>  hw/watchdog/watchdog.c    | 65 ++++++++++++++++++++++++---------------=
+--------
+>  hw/watchdog/wdt_diag288.c |  6 ++---
+>  include/sysemu/watchdog.h | 12 ++-------
+>  monitor.c                 |  4 +--
+>  qapi-schema.json          |  9 +++++++
+>  qapi/run-state.json       |  6 ++---
+>  6 files changed, 52 insertions(+), 50 deletions(-)
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--q9EahWrMljjgQXC4XhCWbKMTC5U9WNhu8
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmxSxEACgkQp6FrSiUn
+Q2oSAQf/fMgeJH/dlEeetZl+tHNHEB++deXu1Mxi8b6jieszgz29jveO8nuIKY8P
+c+AXE6n7LdzmDM8r16b6NrLOOGPJ42/phk03Z1629YYhPF9imSEd/qNo/gnvY8jg
+2JGQ5XHpVdtS6ZbEycEl3Fa0aj0KPSA+su8yiG5CImIO+cI18tpvNsQMSrNtSyYZ
+DwO4xosGuaj9MBHYEN3xRiXe5A3Cf0lqficgfoYh/WX63fdVp3oPZ52uEmalhLes
+CFuCwN65knxFIB7Y90PxWMGEgaOzQcQiUX5dglJtfxYzILf/lNiZvJMjDZxBJ3Af
+hEyBx2Ljz2DLF3v11x8yowl6b7Lwpw==
+=8OSA
+-----END PGP SIGNATURE-----
+
+--q9EahWrMljjgQXC4XhCWbKMTC5U9WNhu8--
