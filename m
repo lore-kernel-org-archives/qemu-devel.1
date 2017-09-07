@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44806)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44836)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpwHh-0004Hi-Uq
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:51:58 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpwHm-0004Hw-MP
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:52:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpwHd-00077u-5h
+	(envelope-from <peter.maydell@linaro.org>) id 1dpwHi-0007FZ-4G
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:51:58 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:33507)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dpwHh-0007DP-TZ
 	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:51:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60204)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpwHc-00076O-WD
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:51:49 -0400
-Date: Thu, 7 Sep 2017 14:51:40 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170907145140.5e7e0b19.cohuck@redhat.com>
-In-Reply-To: <f5f34674-74d4-48b3-bde1-13605c746ad1@redhat.com>
-References: <20170904154316.4148-1-david@redhat.com>
-	<20170904154316.4148-12-david@redhat.com>
-	<2c620927-0406-2fc1-895c-09ffc2e44a4e@linux.vnet.ibm.com>
-	<6b3e9c2b-4cb7-fdf8-5f9b-ff7ebbf52d1e@linaro.org>
-	<f5f34674-74d4-48b3-bde1-13605c746ad1@redhat.com>
+Received: by mail-wr0-x22d.google.com with SMTP id a43so19267236wrc.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 05:51:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/19] s390x: allow only 1 CPU with TCG
+In-Reply-To: <cover.1504222314.git.alistair.francis@xilinx.com>
+References: <cover.1504222314.git.alistair.francis@xilinx.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Sep 2017 13:51:32 +0100
+Message-ID: <CAFEAcA8TSpNkz3ew+wk6K0vu18B5RCr=0vbkihcaDz8v2zUN8g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 0/5] Expose the secure and virt
+ properties to the
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, qemu-devel@nongnu.org, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
 
-On Thu, 7 Sep 2017 14:49:49 +0200
-David Hildenbrand <david@redhat.com> wrote:
+On 1 September 2017 at 00:34, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+>
+> The EL2 and EL3 work is working well now and interanlly we now have
+> tests that expect to start in EL3 and transition through EL2 to EL1. To
+> make this easy to run let's expose the secure property to the machine
+> and also add a virt property that can enable EL2.
+>
+> This series also does some machine/name tidying up and makes the first
+> move to deprecating the EP108 machine, which was just an early access
+> development board.
+>
+> V2:
+>  - Add a virt option for setting EL2
 
-> On 06.09.2017 23:20, Richard Henderson wrote:
-> > On 09/06/2017 11:16 AM, Matthew Rosato wrote:  
-> >> On 09/04/2017 11:43 AM, David Hildenbrand wrote:  
-> >>> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
-> >>> guest tries to bring these CPUs up but fails), because we don't support
-> >>> multiple CPUs on s390x under TCG.
-> >>>
-> >>> Let's bail out if more than 1 is specified, so we don't raise people's
-> >>> hope. Make it a define, so we can easily bump it up later.
-> >>>
-> >>> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >>> ---  
-> >>
-> >> Makes sense.  Ran the described environment without this patch (errors)
-> >> and again with this patch (graceful exit w/ message).
-> >>
-> >> Tested-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>  
-> > 
-> > Can someone review
-> > 
-> >   http://patchwork.ozlabs.org/patch/760010/
-> >   
-> 
-> Yes, we also discovered that patch during review of v1.
-> 
-> > which does at least start to add the SIGP support.
-> > 
-> > Once tcg can bring up 2 cpus, I see no reason it couldn't bring up N.  I don't
-> > see the point of the define.
-> >   
-> 
-> Conny requested a define. So it boils down to
-> 
-> a) no define just as in v1
-> b) a define like S390_TCG_SMP_SUPPORTED
-> 
-> What do you suggest?
+It looks like only patches 4 5 and the cover letter got through the
+mailing list server, so patches and patchwork don't have the whole
+thing. Could I ask you to try a resend?
 
-FWIW, I'd prefer b).
-
-> 
-> > 
-> > r~
-> >   
-> 
-> 
+thanks
+-- PMM
