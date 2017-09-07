@@ -1,47 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52994)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dprlV-0002Ld-FX
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:02:27 -0400
+	(envelope-from <mprivozn@redhat.com>) id 1dpron-0003CR-Ak
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:05:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dprlQ-00075X-Fn
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:02:21 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52109
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1dprlQ-000752-9g
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:02:16 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v877xSxp036836
-	for <qemu-devel@nongnu.org>; Thu, 7 Sep 2017 04:02:15 -0400
-Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cu10wbaph-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 04:02:14 -0400
-Received: from localhost
-	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Thu, 7 Sep 2017 04:02:13 -0400
-Date: Thu, 7 Sep 2017 16:02:08 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170830163609.50260-1-pasic@linux.vnet.ibm.com>
-	<20170830163609.50260-3-pasic@linux.vnet.ibm.com>
-	<20170831111953.242ddc28.cohuck@redhat.com>
-	<e805e756-495d-3125-eaf0-262635b9c545@linux.vnet.ibm.com>
-	<20170905100234.7a92128e.cohuck@redhat.com>
-	<bff0fcd2-4c1d-b5da-2d11-dc479d9d7275@linux.vnet.ibm.com>
-	<20170905174606.1e0c6404.cohuck@redhat.com>
-	<24e87c3e-2674-8fc1-cd0a-94f4907ddc7d@linux.vnet.ibm.com>
-	<20170906082720.GZ31680@bjsdjshi@linux.vnet.ibm.com>
-	<20170906132538.73b31142.cohuck@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170906132538.73b31142.cohuck@redhat.com>
-Message-Id: <20170907080208.GE31680@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 2/9] s390x: fix invalid use of cc 1 for SSCH
+	(envelope-from <mprivozn@redhat.com>) id 1dproi-0000QP-A5
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:05:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mprivozn@redhat.com>) id 1dproi-0000Pf-3o
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:05:40 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 1C6E5C057FAF
+	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 08:05:39 +0000 (UTC)
+From: Michal Privoznik <mprivozn@redhat.com>
+Date: Thu,  7 Sep 2017 10:05:23 +0200
+Message-Id: <cover.1504771369.git.mprivozn@redhat.com>
+Subject: [Qemu-devel] [PATCH v5 0/3] watchdog.h: Drop local redefinition of
+ actions enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -50,65 +28,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, eblake@redhat.com
 
-* Cornelia Huck <cohuck@redhat.com> [2017-09-06 13:25:38 +0200]:
+diff to v4:
+- in 3/3 compare passed action string case insensitively to the qapi enum
 
-> On Wed, 6 Sep 2017 16:27:20 +0800
-> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> 
-> > * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-05 19:20:43 +0200]:
-> > 
-> > > 
-> > > 
-> > > On 09/05/2017 05:46 PM, Cornelia Huck wrote:  
-> > > > On Tue, 5 Sep 2017 17:24:19 +0200
-> > > > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> > > >   
-> > > >> My problem with a program check (indicated by SCSW word 2 bit 10) is
-> > > >> that, in my reading of the architecture, the semantic behind it is: The
-> > > >> channel subsystem (not the cu or device) has detected, that the 
-> > > >> the channel program (previously submitted as an ORB) is erroneous. Which
-> > > >> programs are erroneous is specified by the architecture. What we have
-> > > >> here does not qualify.
-> > > >>
-> > > >> My idea was to rather blame the virtual hardware (device) and put no blame
-> > > >> on the program nor he channel subsystem. This could be done using device
-> > > >> status (unit check with command reject, maybe unit exception) or interface
-> > > >> check. My train of thought was, the problem is not consistent across a
-> > > >> device type, so it has to be device specific.  
-> > > > 
-> > > > Unit exception might be a better way to express what is happening here.
-> > > > At least, it moves us away from cc 1 and not towards cc 3 :)
-> > > >   
-> > > 
-> > > I will do a follow up patch pursuing device exception.
-> > >   
-> > > >>
-> > > >> Of course blaming the device could mislead the person encountering the
-> > > >> problem, and make him believe it's an non-virtual hardware problem.
-> > > >>
-> > > >> About the misleading, I think the best we can do is log out a message
-> > > >> indicating what really happened.  
-> > > > 
-> > > > Just document it in the code? If it doesn't happen with Linux as a
-> > > > guest, it is highly unlikely to be seen in the wild.
-> > > >   
-> > > 
-> > > 
-> > > Well we have two problems here:
-> > > 1) Unit exception can be already defined by the device type for the
-> > > command (reference: http://publibfp.dhe.ibm.com/cgi-bin/bookmgr/BOOKS/dz9ar110/2.6.10?DT=19920904110920).
-> > > I think this one is what you mean. And I agree that's best handled
-> > > with comment in code.  
-> > Using unit check, with bit 3 byte 0 of the sense data set to 1, to
-> > indicate an 'Equipment check', sounds a bit more proper than unit
-> > exception.
-> 
-> I don't agree: Equipment check sounds a lot more dire (and seems to
-> imply a malfunction). I like unit exception better.
-Got the point. Fair enough!
+Michal Privoznik (3):
+  qapi: Rename WatchdogExpirationAction enum
+  watchdog.h: Drop local redefinition of actions enum
+  watchdog: Allow setting action on the fly
+
+ hw/watchdog/watchdog.c    | 65 ++++++++++++++++++++++++-----------------------
+ hw/watchdog/wdt_diag288.c |  6 ++---
+ include/sysemu/watchdog.h | 12 ++-------
+ monitor.c                 |  4 +--
+ qapi-schema.json          |  9 +++++++
+ qapi/run-state.json       |  6 ++---
+ 6 files changed, 52 insertions(+), 50 deletions(-)
 
 -- 
-Dong Jia Shi
+2.13.5
