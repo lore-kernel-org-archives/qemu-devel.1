@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dq0H9-00088p-0U
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:07:39 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dq0Ld-0000mr-DM
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:12:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dq0H4-0005bt-DR
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:07:34 -0400
-Received: from mail-qt0-x22c.google.com ([2607:f8b0:400d:c0d::22c]:36599)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dq0H4-0005bd-8z
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:07:30 -0400
-Received: by mail-qt0-x22c.google.com with SMTP id b52so821871qtb.3
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 10:07:30 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170901125742.4249-1-kraxel@redhat.com>
-	<ff830cfa-a8fa-0852-596f-4fc535512b1c@amsat.org>
-	<1504772696.15653.5.camel@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <b2d705c1-d86c-ba64-3af2-56aabe08c32b@amsat.org>
-Date: Thu, 7 Sep 2017 14:07:26 -0300
+	(envelope-from <cohuck@redhat.com>) id 1dq0LY-0008TB-Le
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:12:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:6168)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dq0LY-0008Sf-FR
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:12:08 -0400
+Date: Thu, 7 Sep 2017 19:11:59 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170907191159.767509da.cohuck@redhat.com>
+In-Reply-To: <20170904154316.4148-20-david@redhat.com>
+References: <20170904154316.4148-1-david@redhat.com>
+	<20170904154316.4148-20-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1504772696.15653.5.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 0/5] Vga 20170901 patches
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 19/19] s390x: get rid of
+ cpu_s390x_create()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,31 +28,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
 
-Hi Gerd,
+On Mon,  4 Sep 2017 17:43:16 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-On 09/07/2017 05:24 AM, Gerd Hoffmann wrote:
->    Hi,
+> Now that there is only one user of cpu_s390x_create() left, make cpu
+> creation looks like on x86.
+> - Perform the model/properties split and checks in s390_init_cpus()
+> - Parse features only once without having to remember if already parsed
+> - Pass only the typename to s390x_new_cpu()
+> - Use the typename of an existing CPU for hotplug via cpu-add
 > 
-> I'v been reviewing your patches and took some notes but didn't
-> finished,
->> since there is something bothering me.
->> I see they haven't been reviewed yet, can you hold this PR and wait
->> the
->> weekend?
-> 
-> Ping.  Care to share your concerns?  Weekend is long over ...
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 29 +++++++++++++++++++++++++++--
+>  target/s390x/cpu.h         |  2 +-
+>  target/s390x/helper.c      | 45 ++-------------------------------------------
+>  target/s390x/internal.h    |  1 -
+>  4 files changed, 30 insertions(+), 47 deletions(-)
 
-I apologize it took me so long :/ I had doubts about patches 1 & 2 but 
-it could clarify them.
-
-Do you notice performance degradations since patch 2?
-
-Your series is OK, if you ever resend rebased you can add:
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Regards,
-
-Phil.
+LGTM
