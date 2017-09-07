@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51593)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dpseK-0000OG-05
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:59:04 -0400
+	(envelope-from <armbru@redhat.com>) id 1dpsiA-0003Ba-Dm
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:03:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dpseJ-0003P9-Bg
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:59:00 -0400
-Received: from mail-lf0-x22a.google.com ([2a00:1450:4010:c07::22a]:38786)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dpseJ-0003JK-3c
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:58:59 -0400
-Received: by mail-lf0-x22a.google.com with SMTP id q132so22975868lfe.5
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 01:58:58 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1dpsi6-0007xO-GU
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:02:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46066)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpsi6-0007wn-8f
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:02:54 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 23C4280099
+	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 09:02:49 +0000 (UTC)
+From: Markus Armbruster <armbru@redhat.com>
+References: <cover.1504696921.git.mprivozn@redhat.com>
+	<9fe40ce91ada6dfdade83f32940f420e8b373db2.1504696921.git.mprivozn@redhat.com>
+	<6ac4f80c-3e80-297b-a4d6-2f4ae0b70d66@redhat.com>
+	<87zia7rb6h.fsf@dusky.pond.sub.org>
+	<cd13f335-e1ae-b340-61e5-06a7bc78881f@redhat.com>
+Date: Thu, 07 Sep 2017 11:02:47 +0200
+In-Reply-To: <cd13f335-e1ae-b340-61e5-06a7bc78881f@redhat.com> (Michal
+	Privoznik's message of "Thu, 7 Sep 2017 09:56:24 +0200")
+Message-ID: <87k21aj2yw.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170905180602.28698-1-f4bug@amsat.org>
-References: <20170905180602.28698-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Sep 2017 09:58:37 +0100
-Message-ID: <CAFEAcA_iaNVc_L+HDwQONuj44f+mOQA_KEO7t9S2Th=URBP=6w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3] vhost-user: disable the *broken*
- subprocess tests
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v4 2/3] watchdog.h: Drop local redefinition
+ of actions enum
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,28 +37,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: "Daniel P . Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Michal Privoznik <mprivozn@redhat.com>
+Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
 
-On 5 September 2017 at 19:06, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
-> tests/vhost-user-test keeps failing on build-system since Aug 15:
->
->   ERROR:tests/vhost-user-test.c:835:test_flags_mismatch: child process (/=
-i386/vhost-user/flags-mismatch/subprocess [4836]) failed unexpectedly
-> ...
->   ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process (/x8=
-6_64/vhost-user/connect-fail/subprocess [58910]) failed unexpectedly
->
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> v3: only disable tests using glib subprocess,
->     migrate/multiqueue/guest-mem are still tested.
->
-> v2: remove unuseful warning
+Michal Privoznik <mprivozn@redhat.com> writes:
 
-Applied, thanks.
+> On 09/06/2017 07:25 PM, Markus Armbruster wrote:
+>> Eric Blake <eblake@redhat.com> writes:
+>> 
+>>> On 09/06/2017 06:24 AM, Michal Privoznik wrote:
+>>>> We already have enum that enumerates all the action that a
+>>>
+>>> s/action/actions/
+>>>
+>>>> watchdog can take when hitting its timeout: WatchdogAction.
+>>>> Use that instead of inventing our own.
+>>>>
+>>>> Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
+>>>> ---
+>>>
+>>>> @@ -77,27 +77,16 @@ int select_watchdog(const char *p)
+>>>>  
+>>>>  int select_watchdog_action(const char *p)
+>>>>  {
+>>>> -    if (strcasecmp(p, "reset") == 0)
+>>>> -        watchdog_action = WDT_RESET;
+>>>
+>>> The old code was case-insensitive,
+>>>
+>>>> +    action = qapi_enum_parse(&WatchdogAction_lookup, p, -1, NULL);
+>>>
+>>> the new code is not.  Do we care?  (I don't, but we could be breaking
+>>> someone's control flow).  Should qapi_enum_parse be taught to be
+>>> case-insensitive?  Or perhaps we answer related questions first: Do we
+>>> have any QAPI enums that have values differing only in case? Do we
+>>> prevent such QAPI definitions, to give us the potential of making the
+>>> parsing insensitive?
+>> 
+>> Case-sensitive everywhere is fine.  Case-insensitive everywhere also
+>> fine, just not my personal preference.  What's not fine is "guess
+>> whether this part of the interface is case-sensitive or not".
+>> 
+>> QMP is case-sensitive.  Let's keep it that way.
+>> 
+>> The -watchdog-action option has a case-insensitive argument.  The
+>> obvious way to remain misfeature-^Wbackwards compatible is converting
+>> the argument to lower case before handing it off to qapi_enum_parse.  I
+>> doubt it matters, but just doing it is less work than debating how far
+>> exactly we want to bend over backwards.
+>> 
+>> g_ascii_strdown() should do.  It only converts ASCII characters, but
+>> anything else is going to fail in qapi_enum_parse() anyway.
+>> 
+>
+> On the other hand, the documentation enumerates the accepted values in
+> lowercase. So one can argue that upper- or mixed-case is just a misuse
+> of a bug in the code.
 
--- PMM
+I quite agree, but...
+
+>                       But getting the code in is more important to me so
+> I'll do the strdown() conversion and sent yet another version.
+
+... like you, I have to pick my battles.  A respin adding the stupid
+case conversion seems safer for both of us than risking a debate on how
+far we need to go for backward compatibility.
