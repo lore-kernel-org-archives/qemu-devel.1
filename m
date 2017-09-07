@@ -1,42 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dpyMm-0002ji-Cx
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 11:05:25 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dpyPZ-0004LW-MK
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 11:08:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1dpyMh-00070d-N4
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 11:05:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53656
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1dpyMh-0006ys-Hy
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 11:05:11 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v87F4EZl018557
-	for <qemu-devel@nongnu.org>; Thu, 7 Sep 2017 11:05:09 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cu38bg4e1-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 11:05:09 -0400
-Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Thu, 7 Sep 2017 11:05:09 -0400
-References: <1503602048-12268-1-git-send-email-armbru@redhat.com>
-	<1503602048-12268-12-git-send-email-armbru@redhat.com>
-	<CAJ+F1C+JyRBxc-cv0ko1zqNnNt6N0h5OhrLM2GdVT3yLocgNKw@mail.gmail.com>
-	<87inh82anm.fsf@dusky.pond.sub.org>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Thu, 7 Sep 2017 11:05:05 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dpyPQ-0001jf-8K
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 11:08:09 -0400
+Date: Thu, 7 Sep 2017 17:07:39 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170907150739.GH4461@dhcp-200-186.str.redhat.com>
+References: <20170811080939.22304-1-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87inh82anm.fsf@dusky.pond.sub.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Message-Id: <898fa7aa-6923-04ab-637e-4232a6f4c9f4@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 11/16] qapi-schema: Collect TPM stuff in
- qapi/tpm.json
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170811080939.22304-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.11 v2] file-posix: Clear out first
+ sector in hdev_create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,36 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 
-On 08/28/2017 07:29 AM, Markus Armbruster wrote:
-> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> writes:
->
->> On Thu, Aug 24, 2017 at 9:23 PM Markus Armbruster <armbru@redhat.com> =
-wrote:
->>
->>> Sadly, we don't have a TPM maintainer, not even a MAINTAINERS entry.
->>> Create one, and mark it orphaned.
->>>
->>>
->> This is also proposed in:
->> http://patchew.org/QEMU/20170728053610.15770-1-f4bug@amsat.org/
-> Forgot about that one.
->
-> My patch additionally has "F: include/hw/acpi/tpm.h", and of course the
-> new "qapi/tpm.json", and it's not marked "RFC".
->
->> Stefan Berger, any chance you declare yourself a TPM maintainer?
-> Please?
+Am 11.08.2017 um 10:09 hat Fam Zheng geschrieben:
+> People get surprised when, after "qemu-img create -f raw /dev/sdX", they
+> still see qcow2 with "qemu-img info", if previously the bdev had a qcow2
+> header. While this is natural because raw doesn't need to write any
+> magic bytes during creation, hdev_create is free to clear out the first
+> sector to make sure the stale qcow2 header doesn't cause such confusion.
+> 
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> 
+> ---
+> 
+> v2: Use stack allocated buffer. [Eric]
+>     Fix return value.
+>     (Keep qemu_write_full instead of switching to qemu_pwritev because
+>     the former handles short writes.)
+>     Fix typo "qemu-img". [Changlong]
+> ---
+>  block/file-posix.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index f4de022ae0..a63bbf2b90 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -2703,6 +2703,16 @@ static int hdev_create(const char *filename, QemuOpts *opts,
+>          ret = -ENOSPC;
+>      }
 
-Ok, I'll do it.
+So the error paths above only set ret, but don't actually return or jump
+to the end of the function.
 
-   Stefan
+> +    if (total_size) {
+> +        uint8_t buf[BDRV_SECTOR_SIZE] = { 0 };
+> +        int64_t zero_size = MIN(BDRV_SECTOR_SIZE, total_size);
+> +        if (lseek(fd, 0, SEEK_SET) == -1) {
+> +            ret = -errno;
+> +        } else {
+> +            ret = qemu_write_full(fd, buf, zero_size);
+> +            ret = ret == zero_size ? 0 : -errno;
 
->
->> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->>
->> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> Thanks!
->
+Which means that an error above (like a too small block device or using
+a regular file) can be overwritten with a success value if clearing the
+first sector works. That's probably not quite right.
+
+> +        }
+> +    }
+>      qemu_close(fd);
+>      return ret;
+>  }
+
+Kevin
