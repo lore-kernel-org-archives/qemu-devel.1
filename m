@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53490)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dpzni-0003fQ-LI
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:37:15 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpzom-0004NB-IE
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:38:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dpznd-0007B9-QK
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:37:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55928)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dpznd-0007AX-HN
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:37:05 -0400
-Date: Thu, 7 Sep 2017 17:36:52 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170907163651.GT2098@work-vm>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-12-dgilbert@redhat.com>
-	<CAJ+F1CLxV2JxRMUStYr7hrTjy7iKauHonPJrhDZf5_T4abjTnQ@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dpzoh-0007Z0-Pa
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:38:16 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:37754)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dpzoh-0007Yk-J1
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:38:11 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id k20so459123wre.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 09:38:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CLxV2JxRMUStYr7hrTjy7iKauHonPJrhDZf5_T4abjTnQ@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 11/32] vhub: Open userfaultfd
+In-Reply-To: <59B17425.1050701@ispras.ru>
+References: <59B17425.1050701@ispras.ru>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Sep 2017 17:37:49 +0100
+Message-ID: <CAFEAcA-QP7J_Rjre_RmwuYFnBU84gPFXuH4efeSddwgXhgq5Vg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] emulation cycle number implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,113 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Maxime Coquelin <maxime.coquelin@redhat.com>, a.perevalov@samsung.com, "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>, aarcange@redhat.com, Felipe Franciosi <felipe@nutanix.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: Sergey Smolov <smolov@ispras.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-* Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
-> I would rather use libvhost-user: message prefix (same for similar
-> libvhost-user patches)
+On 7 September 2017 at 17:30, Sergey Smolov <smolov@ispras.ru> wrote:
+> I'm running MIPS assembler programs on QEMU. I need to log some events that
+> happen through emulation (writes to some registers, for example). When an
+> event happens, I need to print not only the event-related information, but
+> an "emulation cycle number" also. This number should be an integer
+> increasing value that is similar to real hardware clock.
+>
+> How to implement this in QEMU? May QEMU timers be helpful in solving such a
+> problem?
 
-Done.
+You can use cpu_get_ticks(), though if we're not in icount mode
+you may find it doesn't behave quite as helpfully as you might like
+(in that case it roughly tracks host hardware cycles.)
 
-> On Thu, Aug 24, 2017 at 12:27 PM, Dr. David Alan Gilbert (git)
-> <dgilbert@redhat.com> wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >
-> > Open a userfaultfd (on a postcopy_advise) and send it back in
-> > the reply to the qemu for it to monitor.
-> >
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  contrib/libvhost-user/libvhost-user.c | 26 +++++++++++++++++++++++--=
--
-> >  contrib/libvhost-user/libvhost-user.h |  3 +++
-> >  2 files changed, 26 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost=
--user/libvhost-user.c
-> > index 47884c0a15..f9b5b12b28 100644
-> > --- a/contrib/libvhost-user/libvhost-user.c
-> > +++ b/contrib/libvhost-user/libvhost-user.c
-> > @@ -15,6 +15,7 @@
-> >
-> >  #include <qemu/osdep.h>
-> >  #include <sys/eventfd.h>
-> > +#include <sys/syscall.h>
-> >  #include <linux/vhost.h>
-> >
-> >  #include "qemu/atomic.h"
-> > @@ -773,11 +774,30 @@ vu_set_vring_enable_exec(VuDev *dev, VhostUserM=
-sg *vmsg)
-> >  static bool
-> >  vu_set_postcopy_advise(VuDev *dev, VhostUserMsg *vmsg)
-> >  {
-> > -    /* TODO: Open ufd, pass it back in the request
-> > -     * TODO: Add addresses
-> > -     */
-> > +    struct uffdio_api api_struct;
-> > +
-> > +    dev->postcopy_ufd =3D syscall(__NR_userfaultfd, O_CLOEXEC | O_NO=
-NBLOCK);
->=20
-> This will likely fail to compile on !Linux, could you add some
-> appropriate #ifdef?
-
-Note that we already #include <linux/vhost.h> so this file only builds
-on Linux anyway before I came along, however I'll add some ifdef's for
-my new code.
-
-Dave
-
-
-> > +    /* TODO: Add addresses */
-> >      vmsg->payload.u64 =3D 0xcafe;
-> >      vmsg->size =3D sizeof(vmsg->payload.u64);
-> > +
-> > +    if (dev->postcopy_ufd =3D=3D -1) {
-> > +        vu_panic(dev, "Userfaultfd not available: %s", strerror(errn=
-o));
-> > +        goto out;
-> > +    }
-> > +    api_struct.api =3D UFFD_API;
-> > +    api_struct.features =3D 0;
-> > +    if (ioctl(dev->postcopy_ufd, UFFDIO_API, &api_struct)) {
-> > +        vu_panic(dev, "Failed UFFDIO_API: %s", strerror(errno));
-> > +        close(dev->postcopy_ufd);
-> > +        dev->postcopy_ufd =3D -1;
-> > +        goto out;
-> > +    }
-> > +    /* TODO: Stash feature flags somewhere */
-> > +out:
-> > +    /* Return a ufd to the QEMU */
-> > +    vmsg->fd_num =3D 1;
-> > +    vmsg->fds[0] =3D dev->postcopy_ufd;
-> >      return true; /* =3D send a reply */
-> >  }
-> >
-> > diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost=
--user/libvhost-user.h
-> > index 3987ce643d..3e8efdd919 100644
-> > --- a/contrib/libvhost-user/libvhost-user.h
-> > +++ b/contrib/libvhost-user/libvhost-user.h
-> > @@ -234,6 +234,9 @@ struct VuDev {
-> >       * re-initialize */
-> >      vu_panic_cb panic;
-> >      const VuDevIface *iface;
-> > +
-> > +    /* Postcopy data */
-> > +    int postcopy_ufd;
-> >  };
-> >
-> >  typedef struct VuVirtqElement {
-> > --
-> > 2.13.5
-> >
-> >
->=20
->=20
->=20
-> --=20
-> Marc-Andr=E9 Lureau
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+thanks
+-- PMM
