@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34030)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34918)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dq08g-0003sh-Bq
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:58:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1dq0Av-0004k6-IX
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:01:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dq08b-0001YC-64
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:58:50 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:43050)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dq08a-0001Xw-ON
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:58:45 -0400
-Received: by mail-wm0-x231.google.com with SMTP id f145so388145wme.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 09:58:44 -0700 (PDT)
-References: <20170817230114.3655-1-richard.henderson@linaro.org>
-	<20170817230114.3655-3-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170817230114.3655-3-richard.henderson@linaro.org>
-Date: Thu, 07 Sep 2017 17:58:41 +0100
-Message-ID: <877examon2.fsf@linaro.org>
+	(envelope-from <bounces@canonical.com>) id 1dq0Am-0002im-Aw
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:01:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59114)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dq0Am-0002i3-51
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 13:01:00 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dq0Al-00021o-0F
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 17:00:59 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id F18002E805B
+	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 17:00:58 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/8] target/arm: Use generic vector
- infrastructure for aa64 add/sub/logic
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 07 Sep 2017 16:48:30 -0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150480291073.23034.17016784083746166885.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
+ 2.10 (works on 2.9)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,232 +37,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
 
+Hi,
+  There's a good chance this is the same as lp 1714331 - fixed by a newer O=
+VMF.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+-- =
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  target/arm/translate-a64.c | 137 ++++++++++++++++++++++++++++-----------------
->  1 file changed, 87 insertions(+), 50 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 2200e25be0..025354f983 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -21,6 +21,7 @@
->  #include "cpu.h"
->  #include "exec/exec-all.h"
->  #include "tcg-op.h"
-> +#include "tcg-op-gvec.h"
->  #include "qemu/log.h"
->  #include "arm_ldst.h"
->  #include "translate.h"
-> @@ -82,6 +83,7 @@ typedef void NeonGenTwoDoubleOPFn(TCGv_i64, TCGv_i64, TCGv_i64, TCGv_ptr);
->  typedef void NeonGenOneOpFn(TCGv_i64, TCGv_i64);
->  typedef void CryptoTwoOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32);
->  typedef void CryptoThreeOpEnvFn(TCGv_ptr, TCGv_i32, TCGv_i32, TCGv_i32);
-> +typedef void GVecGenTwoFn(uint32_t, uint32_t, uint32_t, uint32_t, uint32_t);
->
->  /* initialize TCG globals.  */
->  void a64_translate_init(void)
-> @@ -537,6 +539,21 @@ static inline int vec_reg_offset(DisasContext *s, int regno,
->      return offs;
->  }
->
-> +/* Return the offset info CPUARMState of the "whole" vector register Qn.  */
-> +static inline int vec_full_reg_offset(DisasContext *s, int regno)
-> +{
-> +    assert_fp_access_checked(s);
-> +    return offsetof(CPUARMState, vfp.regs[regno * 2]);
-> +}
-> +
-> +/* Return the byte size of the "whole" vector register, VL / 8.  */
-> +static inline int vec_full_reg_size(DisasContext *s)
-> +{
-> +    /* FIXME SVE: We should put the composite ZCR_EL* value into tb->flags.
-> +       In the meantime this is just the AdvSIMD length of 128.  */
-> +    return 128 / 8;
-> +}
-> +
->  /* Return the offset into CPUARMState of a slice (from
->   * the least significant end) of FP register Qn (ie
->   * Dn, Sn, Hn or Bn).
-> @@ -9042,11 +9059,38 @@ static void disas_simd_3same_logic(DisasContext *s, uint32_t insn)
->      bool is_q = extract32(insn, 30, 1);
->      TCGv_i64 tcg_op1, tcg_op2, tcg_res[2];
->      int pass;
-> +    GVecGenTwoFn *gvec_op;
->
->      if (!fp_access_check(s)) {
->          return;
->      }
->
-> +    switch (size + 4 * is_u) {
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1715700
 
-Hmm I find this switch a little too magical. I mean I can see that the
-encoding abuses size for the final opcode when I look at the manual but
-it reads badly.
+Title:
+  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
 
-> +    case 0: /* AND */
-> +        gvec_op = tcg_gen_gvec_and8;
-> +        goto do_gvec;
-> +    case 1: /* BIC */
-> +        gvec_op = tcg_gen_gvec_andc8;
-> +        goto do_gvec;
-> +    case 2: /* ORR */
-> +        gvec_op = tcg_gen_gvec_or8;
-> +        goto do_gvec;
-> +    case 3: /* ORN */
-> +        gvec_op = tcg_gen_gvec_orc8;
-> +        goto do_gvec;
-> +    case 4: /* EOR */
-> +        gvec_op = tcg_gen_gvec_xor8;
-> +        goto do_gvec;
-> +    do_gvec:
-> +        gvec_op(vec_full_reg_offset(s, rd),
-> +                vec_full_reg_offset(s, rn),
-> +                vec_full_reg_offset(s, rm),
-> +                is_q ? 16 : 8, vec_full_reg_size(s));
-> +        return;
+Status in QEMU:
+  New
 
-No default case (although I guess we just fall through). What's wrong
-with just having a !is_u test with gvec_op = tbl[size] and skipping all
-the goto stuff?
+Bug description:
+  Qemu version: 2.10 stable.
+  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
+st.
+  Command line:
+  qemu-system-x86_64 \
+      -nodefaults \
+      -nodefconfig \
+      -machine type=3Dq35,accel=3Dkvm \
+      -enable-kvm \
+      -cpu host \
+      -m 2048 \
+      -vga virtio \
+      -boot menu=3Don \
+      -smbios file=3D/path/dmidecode_BIOS.bin \
+      -acpitable file=3D/path/acpi_slic.bin \
+      -bios /path/OVMF_CODE.fd \
+      -net none \
+      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
+      -device pcie-root-port \
+      -device ich9-usb-ehci1 \
+      -device ich9-usb-uhci1 \
+      -device ich9-usb-uhci2 \
+      -device ich9-usb-uhci3
 
-> +    }
-> +
-> +    /* Note that we've now eliminated all !is_u.  */
-> +
->      tcg_op1 = tcg_temp_new_i64();
->      tcg_op2 = tcg_temp_new_i64();
->      tcg_res[0] = tcg_temp_new_i64();
-> @@ -9056,47 +9100,27 @@ static void disas_simd_3same_logic(DisasContext *s, uint32_t insn)
->          read_vec_element(s, tcg_op1, rn, pass, MO_64);
->          read_vec_element(s, tcg_op2, rm, pass, MO_64);
->
-> -        if (!is_u) {
-> -            switch (size) {
-> -            case 0: /* AND */
-> -                tcg_gen_and_i64(tcg_res[pass], tcg_op1, tcg_op2);
-> -                break;
-> -            case 1: /* BIC */
-> -                tcg_gen_andc_i64(tcg_res[pass], tcg_op1, tcg_op2);
-> -                break;
-> -            case 2: /* ORR */
-> -                tcg_gen_or_i64(tcg_res[pass], tcg_op1, tcg_op2);
-> -                break;
-> -            case 3: /* ORN */
-> -                tcg_gen_orc_i64(tcg_res[pass], tcg_op1, tcg_op2);
-> -                break;
-> -            }
-> -        } else {
-> -            if (size != 0) {
-> -                /* B* ops need res loaded to operate on */
-> -                read_vec_element(s, tcg_res[pass], rd, pass, MO_64);
-> -            }
-> +        /* B* ops need res loaded to operate on */
-> +        read_vec_element(s, tcg_res[pass], rd, pass, MO_64);
->
-> -            switch (size) {
-> -            case 0: /* EOR */
-> -                tcg_gen_xor_i64(tcg_res[pass], tcg_op1, tcg_op2);
-> -                break;
-> -            case 1: /* BSL bitwise select */
-> -                tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_op2);
-> -                tcg_gen_and_i64(tcg_op1, tcg_op1, tcg_res[pass]);
-> -                tcg_gen_xor_i64(tcg_res[pass], tcg_op2, tcg_op1);
-> -                break;
-> -            case 2: /* BIT, bitwise insert if true */
-> -                tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_res[pass]);
-> -                tcg_gen_and_i64(tcg_op1, tcg_op1, tcg_op2);
-> -                tcg_gen_xor_i64(tcg_res[pass], tcg_res[pass], tcg_op1);
-> -                break;
-> -            case 3: /* BIF, bitwise insert if false */
-> -                tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_res[pass]);
-> -                tcg_gen_andc_i64(tcg_op1, tcg_op1, tcg_op2);
-> -                tcg_gen_xor_i64(tcg_res[pass], tcg_res[pass], tcg_op1);
-> -                break;
-> -            }
-> +        switch (size) {
-> +        case 1: /* BSL bitwise select */
-> +            tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_op2);
-> +            tcg_gen_and_i64(tcg_op1, tcg_op1, tcg_res[pass]);
-> +            tcg_gen_xor_i64(tcg_res[pass], tcg_op2, tcg_op1);
-> +            break;
-> +        case 2: /* BIT, bitwise insert if true */
-> +            tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_res[pass]);
-> +            tcg_gen_and_i64(tcg_op1, tcg_op1, tcg_op2);
-> +            tcg_gen_xor_i64(tcg_res[pass], tcg_res[pass], tcg_op1);
-> +            break;
-> +        case 3: /* BIF, bitwise insert if false */
-> +            tcg_gen_xor_i64(tcg_op1, tcg_op1, tcg_res[pass]);
-> +            tcg_gen_andc_i64(tcg_op1, tcg_op1, tcg_op2);
-> +            tcg_gen_xor_i64(tcg_res[pass], tcg_res[pass], tcg_op1);
-> +            break;
-> +        default:
-> +            g_assert_not_reached();
->          }
->      }
->
-> @@ -9370,6 +9394,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
->      int rn = extract32(insn, 5, 5);
->      int rd = extract32(insn, 0, 5);
->      int pass;
-> +    GVecGenTwoFn *gvec_op;
->
->      switch (opcode) {
->      case 0x13: /* MUL, PMUL */
-> @@ -9409,6 +9434,28 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
->          return;
->      }
->
-> +    switch (opcode) {
-> +    case 0x10: /* ADD, SUB */
-> +        {
-> +            static GVecGenTwoFn * const fns[4][2] = {
-> +                { tcg_gen_gvec_add8, tcg_gen_gvec_sub8 },
-> +                { tcg_gen_gvec_add16, tcg_gen_gvec_sub16 },
-> +                { tcg_gen_gvec_add32, tcg_gen_gvec_sub32 },
-> +                { tcg_gen_gvec_add64, tcg_gen_gvec_sub64 },
-> +            };
-> +            gvec_op = fns[size][u];
-> +            goto do_gvec;
-> +        }
-> +        break;
-> +
-> +    do_gvec:
-> +        gvec_op(vec_full_reg_offset(s, rd),
-> +                vec_full_reg_offset(s, rn),
-> +                vec_full_reg_offset(s, rm),
-> +                is_q ? 16 : 8, vec_full_reg_size(s));
-> +        return;
-> +    }
-> +
->      if (size == 3) {
->          assert(is_q);
->          for (pass = 0; pass < 2; pass++) {
-> @@ -9581,16 +9628,6 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
->                  genfn = fns[size][u];
->                  break;
->              }
-> -            case 0x10: /* ADD, SUB */
-> -            {
-> -                static NeonGenTwoOpFn * const fns[3][2] = {
-> -                    { gen_helper_neon_add_u8, gen_helper_neon_sub_u8 },
-> -                    { gen_helper_neon_add_u16, gen_helper_neon_sub_u16 },
-> -                    { tcg_gen_add_i32, tcg_gen_sub_i32 },
-> -                };
-> -                genfn = fns[size][u];
-> -                break;
-> -            }
->              case 0x11: /* CMTST, CMEQ */
->              {
->                  static NeonGenTwoOpFn * const fns[3][2] = {
+  Windows hangs at boot with waving flag screen (flag doesn't freeze,
+  keeps waving indefinitely). Same command line boots fine with Qemu
+  2.9. I tried changing machine type to pc-q35-2.9 - same result.
 
-Other than the comments on the switch the rest looks good to me.
-
---
-Alex Bennée
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
