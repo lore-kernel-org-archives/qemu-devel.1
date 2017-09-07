@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42299)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dq2Pv-0006fw-RV
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:24:54 -0400
+	(envelope-from <bounces@canonical.com>) id 1dq2Qp-0007Wv-6o
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:25:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dq2Pq-0004J5-Kw
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:24:47 -0400
-From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Date: Fri,  8 Sep 2017 00:54:11 +0530
-Message-Id: <1504812251-23438-6-git-send-email-sundeep.lkml@gmail.com>
-In-Reply-To: <1504812251-23438-1-git-send-email-sundeep.lkml@gmail.com>
-References: <1504812251-23438-1-git-send-email-sundeep.lkml@gmail.com>
+	(envelope-from <bounces@canonical.com>) id 1dq2Qk-0004zG-0d
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:25:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33187)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dq2Qj-0004yG-MX
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:25:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dq2Qh-0000fl-T3
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 19:25:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id AC5AF2E846C
+	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 19:25:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [Qemu devel v8 PATCH 5/5] msf2: Add Emcraft's
- Smartfusion2 SOM kit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 07 Sep 2017 19:15:39 -0000
+From: Thomas Huth <1358619@bugs.launchpad.net>
+Reply-To: Bug 1358619 <1358619@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20140819063553.17571.47743.malonedeb@soybean.canonical.com>
+Message-Id: <150481173947.23563.11720248704613618838.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1358619] Re: keep savevm/loadvm and migration
+ cause snapshot crash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,130 +37,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com, f4bug@amsat.org, Subbaraya Sundeep <sundeep.lkml@gmail.com>
+To: qemu-devel@nongnu.org
 
-Emulated Emcraft's Smartfusion2 System On Module starter
-kit.
+Triaging old bug tickets... can you still reproduce this issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
-Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/Makefile.objs |  2 +-
- hw/arm/msf2-som.c    | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 96 insertions(+), 1 deletion(-)
- create mode 100644 hw/arm/msf2-som.c
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index df36a03..e81a7dc 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -19,4 +19,4 @@ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
- obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
- obj-$(CONFIG_MPS2) += mps2.o
--obj-$(CONFIG_MSF2) += msf2-soc.o
-+obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
-diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
-new file mode 100644
-index 0000000..bc917db
---- /dev/null
-+++ b/hw/arm/msf2-som.c
-@@ -0,0 +1,95 @@
-+/*
-+ * SmartFusion2 SOM starter kit(from Emcraft) emulation.
-+ *
-+ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/boards.h"
-+#include "hw/arm/arm.h"
-+#include "exec/address-spaces.h"
-+#include "qemu/cutils.h"
-+#include "hw/arm/msf2-soc.h"
-+
-+#define DDR_BASE_ADDRESS      0xA0000000
-+#define DDR_SIZE              (64 * M_BYTE)
-+
-+#define M2S010_ENVM_SIZE      (256 * K_BYTE)
-+#define M2S010_ESRAM_SIZE     (64 * K_BYTE)
-+
-+static void emcraft_sf2_s2s010_init(MachineState *machine)
-+{
-+    DeviceState *dev;
-+    DeviceState *spi_flash;
-+    MSF2State *soc;
-+    DriveInfo *dinfo = drive_get_next(IF_MTD);
-+    qemu_irq cs_line;
-+    SSIBus *spi_bus;
-+    MemoryRegion *sysmem = get_system_memory();
-+    MemoryRegion *ddr = g_new(MemoryRegion, 1);
-+
-+    memory_region_init_ram(ddr, NULL, "ddr-ram", DDR_SIZE,
-+                           &error_fatal);
-+    memory_region_add_subregion(sysmem, DDR_BASE_ADDRESS, ddr);
-+
-+    dev = qdev_create(NULL, TYPE_MSF2_SOC);
-+    qdev_prop_set_string(dev, "part-name", "M2S010");
-+    qdev_prop_set_uint64(dev, "eNVM-size", M2S010_ENVM_SIZE);
-+    qdev_prop_set_uint64(dev, "eSRAM-size", M2S010_ESRAM_SIZE);
-+
-+    /*
-+     * CPU clock and peripheral clocks(APB0, APB1)are configurable
-+     * in Libero. CPU clock is divided by APB0 and APB1 divisors for
-+     * peripherals. Emcraft's SoM kit comes with these settings by default.
-+     */
-+    qdev_prop_set_uint32(dev, "m3clk", 142 * 1000000);
-+    qdev_prop_set_uint32(dev, "apb0div", 2);
-+    qdev_prop_set_uint32(dev, "apb1div", 2);
-+
-+    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-+
-+    soc = MSF2_SOC(dev);
-+
-+    /* Attach SPI flash to SPI0 controller */
-+    spi_bus = (SSIBus *)qdev_get_child_bus(dev, "spi0");
-+    spi_flash = ssi_create_slave_no_init(spi_bus, "s25sl12801");
-+    qdev_prop_set_uint8(spi_flash, "spansion-cr2nv", 1);
-+    if (dinfo) {
-+        qdev_prop_set_drive(spi_flash, "drive", blk_by_legacy_dinfo(dinfo),
-+                                    &error_fatal);
-+    }
-+    qdev_init_nofail(spi_flash);
-+    cs_line = qdev_get_gpio_in_named(spi_flash, SSI_GPIO_CS, 0);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
-+
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-+                       soc->envm_size);
-+}
-+
-+static void emcraft_sf2_machine_init(MachineClass *mc)
-+{
-+    mc->desc = "SmartFusion2 SOM kit from Emcraft (M2S010)";
-+    mc->init = emcraft_sf2_s2s010_init;
-+    mc->ignore_memory_transaction_failures = true;
-+}
-+
-+DEFINE_MACHINE("emcraft-sf2", emcraft_sf2_machine_init)
--- 
-2.5.0
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1358619
+
+Title:
+  keep savevm/loadvm and migration cause snapshot crash
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  --Version:  qemu 2.1.0  public release
+  --OS:          CentOS release 6.4
+  --gcc:         4.4.7
+
+  Hi:
+       I found problems when doing some tests on qemu migration and savevm/=
+loadvm.
+  On my experiment, a quest is migrated between two same host back and fort=
+h. =
+
+  Source host would savevm after migration completed and incoming host load=
+vm before migration coming.
+
+  image=3D./image/centos-1.qcow2
+
+  =3D=3D=3D=3DMigration Part=3D=3D=3D=3D
+  qemu-system-x86_64 \
+          -qmp tcp:$host_ip:4451,server,nowait \
+          -drive file=3D$image \
+          --enable-kvm \
+          -monitor stdio \
+          -m 8192 \
+          -device virtio-net-pci,netdev=3Dnet0,mac=3D$mac \
+          -netdev tap,id=3Dnet0,script=3D./qemu-ifup
+
+  =3D=3D=3D=3DIncoming Part=3D=3D=3D=3D
+  qemu-system-x86_64 \
+          -qmp tcp:$host_ip:4451,server,nowait \
+          -incoming tcp:0:4449 \
+          --enable-kvm \
+          -monitor stdio \
+          -drive file=3D$image \
+          -m 8192 \
+          -device virtio-net-pci,netdev=3Dnet0,mac=3D$mac \
+          -netdev tap,id=3Dnet0,script=3D./qemu-ifup
+
+  =
+
+  Command lines:
+
+  host1 $:  qemu-system-x86_64 ........  //migration part
+  host2 $:  qemu-system-x86_64 ...incoming... //incoming part
+
+  After finishing boot
+
+  host1 (qemu) : migrate tcp:host2:4449
+  host1 (qemu) : savevm s1
+  host1 (qemu) : quit
+  host1 $: qemu-system-x86_64 ...incoming... //incoming part
+  host1 (qemu) : loadvm s1
+
+  host2 (qemu) : migrate tcp:host1:4449
+  host2 (qemu) : savevm s2
+  host2 (qemu) : quit
+  host2 $:  qemu-system-x86_64 ...incoming... //incoming part
+  host2 (qemu) : loadvm s2
+
+  host1 (qemu) : migrate tcp:host2:4449
+  host1 (qemu) : savevm s3
+  host1 (qemu) : quit
+  host1 $: qemu-system-x86_64 ...incoming... //incoming part
+  host1 (qemu) : loadvm s3
+
+  I wish those operation can be success every time. =
+
+  However problem happened irregularly when loadvm and error messages are n=
+ot the same.
+
+  host1 (qemu) :  loadvm s3
+  qcow2: Preventing invalid write on metadata (overlaps with active L1 tabl=
+e); image marked as corrupt.
+  Error -5 while activating snapshot 's3' on 'ide0-hd0'
+
+  or
+
+  host2 (qemu) : loadvm s2
+  Error -22 while loading VM state
+
+  =
+
+  I have done some sample test on savevm/loadvm
+  On same host
+  (qemu) savevm test1
+  (qemu) loadvm test1
+  (qemu) savevm test2
+  (qemu) loadvm test2
+  (qemu) savevm test3
+  (qemu) loadvm test3
+  (qemu) savevm test4
+  (qemu) loadvm test4
+  (qemu) savevm test5
+  (qemu) loadvm test5
+  (qemu) savevm test6
+  (qemu) loadvm test6
+
+  This is OK. No any problem.
+
+  =
+
+  Any idea? =
+
+  I think it is related to migration.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1358619/+subscriptions
