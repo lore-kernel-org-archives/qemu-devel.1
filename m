@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41762)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dpxEO-0005ru-Ca
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:52:37 -0400
+	(envelope-from <berrange@redhat.com>) id 1dpxFb-0007gJ-Pi
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:53:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dpxEG-00009A-HH
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:52:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39150)
+	(envelope-from <berrange@redhat.com>) id 1dpxFS-0001KT-Az
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:53:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44624)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dpxEG-00006c-7X
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:52:24 -0400
-References: <20170904154316.4148-1-david@redhat.com>
-	<20170904154316.4148-11-david@redhat.com>
-	<20170907153259.744c2c79.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <59bfd678-dd2b-818d-4b64-b522cfda5ea2@redhat.com>
-Date: Thu, 7 Sep 2017 15:52:19 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpxFS-0001Ji-4U
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:53:38 -0400
+Date: Thu, 7 Sep 2017 14:53:32 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170907135332.GO30609@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170906152111.16958-1-eblake@redhat.com>
+	<CAFEAcA-1QOkSF+sG+0ymTv-Cx0WDEG4Ns4NydW-vz-box2Pi3Q@mail.gmail.com>
+	<5ba61e49-3b84-46a4-2978-d42d3457f21b@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170907153259.744c2c79.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 10/19] target/s390x: use
- program_interrupt() in per_check_exception()
+Content-Disposition: inline
+In-Reply-To: <5ba61e49-3b84-46a4-2978-d42d3457f21b@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 0/5] NBD patches for 2017-09-06
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,83 +29,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 07.09.2017 15:32, Cornelia Huck wrote:
-> On Mon,  4 Sep 2017 17:43:07 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+On Thu, Sep 07, 2017 at 08:48:15AM -0500, Eric Blake wrote:
+> On 09/07/2017 07:26 AM, Peter Maydell wrote:
+> > On 6 September 2017 at 16:21, Eric Blake <eblake@redhat.com> wrote:
+> >> The following changes since commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e:
+> >>
+> >>   Revert "kvm: use DIV_ROUND_UP" (2017-09-05 18:55:40 +0100)
+> >>
+> >> are available in the git repository at:
+> >>
+> >>   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-09-06
+> >>
+> >> for you to fetch changes up to 030fa7f6f950f5c8963f1dee8e6bb7387ed86a99:
+> >>
+> >>   nbd: Use new qio_channel_*_all() functions (2017-09-06 10:11:54 -0500)
+> >>
 > 
->> Clean it up by reusing program_interrupt(). Add a concern regarding
->> ilen.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  target/s390x/misc_helper.c | 15 +++++++++------
->>  1 file changed, 9 insertions(+), 6 deletions(-)
->>
->> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
->> index 57c02ddf1b..5096286157 100644
->> --- a/target/s390x/misc_helper.c
->> +++ b/target/s390x/misc_helper.c
->> @@ -446,14 +446,17 @@ void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
->>  #ifndef CONFIG_USER_ONLY
->>  void HELPER(per_check_exception)(CPUS390XState *env)
->>  {
->> -    CPUState *cs = CPU(s390_env_get_cpu(env));
->> +    uint32_t ilen;
->>  
->>      if (env->per_perc_atmid) {
->> -        env->int_pgm_code = PGM_PER;
->> -        env->int_pgm_ilen = get_ilen(cpu_ldub_code(env, env->per_address));
->> -
->> -        cs->exception_index = EXCP_PGM;
->> -        cpu_loop_exit(cs);
->> +        /*
->> +         * FIXME: ILEN_AUTO is most probably the right thing to use. ilen
->> +         * always has to match the instruction referenced in the PSW. E.g.
->> +         * if a PER interrupt is triggered via EXECUTE, we have to use ilen
->> +         * of EXECUTE, while per_address contains the target of EXECUTE.
->> +         */
->> +        ilen = get_ilen(cpu_ldub_code(env, env->per_address));
->> +        program_interrupt(env, PGM_PER, ilen);
->>      }
->>  }
->>  
+> > I get an error in test-aio-multithread (clang, linux, x86-64):
+> >   GTESTER tests/test-aio-multithread
+> > **
+> > ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-aio-multithread.c:368:test_multi_fair_mutex:
+> > assertion failed (counter == atomic_counter): (532693 == 532694)
+> > GTester: last random seed: R02Sa68ef1eb4822359eb869642ff26180df
 > 
-> Wrapping my head around it: You preserve the current behavior, which
-> should probably be changed to use ILEN_AUTO to handle cases like
-> EXECUTE correctly?
+> I wonder if that is a rare but pre-existing bug, as I don't see any use
+> of qio_channel in test-aio-multithread, and therefore no obvious way
+> that this series would be the cause of the intermittent failure.
 
-Exactly, e.g. if EXECUTE executes instruction Y, and Y is to generate an
-IFETCH event, AFAIK
+Agreed. Even if there was use of QIOChannel, there is certainly no use
+of the qio_channel_read|write_all functions that are being changed
+in this series, since they've only just been added to QEMU and are only
+used in the test suite and your final NBD patch here. So I think this
+must be a pre-existing race condition.
 
-a) per_address points at Y
-b) old PGM PSW points at instruction after EXECUTE (ignoring nullifying
-for now)
-c) PGM ilen has to match EXECUTE (so the PSW can properly be rewound)
-
-The case where per_address == (PGM PSW - ilen) (ignoring nullification)
-should happen without EXECUTE being involved. That's why PER currently
-works just fine with Linux (e.g. uprobe smoke tests when kernel boots up).
-
-Execute handling with PER is just nasty. And one first has to find out
-how that plays together with EXECUTE handling in TCG. Therefore, no easy
-fix (although ILEN_AUTO might most probably really be the right thing to
-do).
-
-> 
-> Do you plan to do a follow up? (Should I spend some cycles on it?)
-> 
-
-Somewhere on my list. The next thing (in this area) I want do is write
-kvm-unit-tests for PER, because also KVM could benefit from that
-(EXECUTE handling is just nasty).
-
-So sure, go ahead and have a look at it if you have some spare cycles :)
-
+Regards,
+Daniel
 -- 
-
-Thanks,
-
-David
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
