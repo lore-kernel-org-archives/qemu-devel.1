@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45678)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpsVY-00044Y-VT
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:49:58 -0400
+	(envelope-from <armbru@redhat.com>) id 1dpsXc-0004vq-Mc
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:52:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpsVX-00041m-Pl
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:49:57 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:36461)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dpsVX-00041L-I5
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:49:55 -0400
-Received: by mail-wr0-x231.google.com with SMTP id o42so7419638wrb.3
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 01:49:55 -0700 (PDT)
+	(envelope-from <armbru@redhat.com>) id 1dpsXX-0005Kf-P4
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:52:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46206)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dpsXX-0005KF-Fj
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:51:59 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
+	<150472050004.24907.4613952373869620144.stgit@frigg.lan>
+Date: Thu, 07 Sep 2017 10:51:54 +0200
+In-Reply-To: <150472050004.24907.4613952373869620144.stgit@frigg.lan>
+	(=?utf-8?Q?=22Llu=C3=ADs?=
+	Vilanova"'s message of "Wed, 6 Sep 2017 20:55:00 +0300")
+Message-ID: <87vakuki1h.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170907081341.GA23040@pxdev.xzpeter.org>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<20170829110357.GG3783@redhat.com> <20170906094846.GA2215@work-vm>
-	<20170906104603.GK15510@redhat.com> <20170906104850.GB2215@work-vm>
-	<20170906105414.GL15510@redhat.com> <20170906105704.GC2215@work-vm>
-	<20170906110629.GM15510@redhat.com> <20170906113157.GD2215@work-vm>
-	<20170906115428.GP15510@redhat.com>
-	<20170907081341.GA23040@pxdev.xzpeter.org>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 7 Sep 2017 09:49:53 +0100
-Message-ID: <CAJSP0QUcfEtb2PWJH-zH8qBCUGk6i_8bBQwbZcF+G3QwjmZMbg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
+Subject: Re: [Qemu-devel] [PATCH v4 08/20] instrument: [hmp] Add library
+ loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,85 +30,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?utf-8?Q?Llu=C3=ADs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>
 
-On Thu, Sep 7, 2017 at 9:13 AM, Peter Xu <peterx@redhat.com> wrote:
-> On Wed, Sep 06, 2017 at 12:54:28PM +0100, Daniel P. Berrange wrote:
->> On Wed, Sep 06, 2017 at 12:31:58PM +0100, Dr. David Alan Gilbert wrote:
->> > * Daniel P. Berrange (berrange@redhat.com) wrote:
->> > > This does imply that you need a separate monitor I/O processing, fro=
-m the
->> > > command execution thread, but I see no need for all commands to sudd=
-enly
->> > > become async. Just allowing interleaved replies is sufficient from t=
-he
->> > > POV of the protocol definition. This interleaving is easy to handle =
-from
->> > > the client POV - just requires a unique 'serial' in the request by t=
-he
->> > > client, that is copied into the reply by QEMU.
->> >
->> > OK, so for that we can just take Marc-Andr=C3=A9's syntax and call it =
-'id':
->> >   https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03634.html
->> >
->> > then it's upto the caller to ensure those id's are unique.
->>
->> Libvirt has in fact generated a unique 'id' for every monitor command
->> since day 1 of supporting QMP.
->>
->> > I do worry about two things:
->> >   a) With this the caller doesn't really know which commands could be
->> >   in parallel - for example if we've got a recovery command that's
->> >   executed by this non-locking thread that's OK, we expect that
->> >   to be doable in parallel.  If in the future though we do
->> >   what you initially suggested and have a bunch of commands get
->> >   routed to the migration thread (say) then those would suddenly
->> >   operate in parallel with other commands that we're previously
->> >   synchronous.
->>
->> We could still have an opt-in for async commands. eg default to executin=
-g
->> all commands in the main thread, unless the client issues an explicit
->> "make it async" command, to switch to allowing the migration thread to
->> process it async.
->>
->>  { "execute": "qmp_allow_async",
->>    "data": { "commands": [
->>        "migrate_cancel",
->>    ] } }
->>
->>
->>  { "return": { "commands": [
->>        "migrate_cancel",
->>    ] } }
->>
->> The server response contains the subset of commands from the request
->> for which async is supported.
->>
->> That gives good negotiation ability going forward as we incrementally
->> support async on more commands.
+Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> writes:
+
+> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+> ---
+>  hmp-commands.hx |   28 ++++++++++++++++++++++++++
+>  monitor.c       |   60 +++++++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  2 files changed, 88 insertions(+)
 >
-> I think this goes back to the discussion on which design we'd like to
-> choose.  IMHO the whole async idea plus the per-command-id is indeed
-> cleaner and nicer, and I believe that can benefit not only libvirt,
-> but also other QMP users.  The problem is, I have no idea how long
-> it'll take to let us have such a feature - I believe that will include
-> QEMU and Libvirt to both support that.  And it'll be a pity if the
-> postcopy recovery cannot work only because we cannot guarantee a
-> stable monitor.
+> diff --git a/hmp-commands.hx b/hmp-commands.hx
+> index 1941e19932..703d7262f5 100644
+> --- a/hmp-commands.hx
+> +++ b/hmp-commands.hx
+> @@ -1858,6 +1858,34 @@ ETEXI
+>          .sub_table  =3D info_cmds,
+>      },
+>=20=20
+> +    {
+> +        .name       =3D "instr-load",
+> +        .args_type  =3D "path:F,args:s?",
+> +        .params     =3D "path [arg]",
+> +        .help       =3D "load an instrumentation library",
+> +        .cmd        =3D hmp_instr_load,
+> +    },
+> +
+> +STEXI
+> +@item instr-load @var{path} [args=3Dvalue[,...]]
+> +@findex instr-load
+> +Load an instrumentation library.
+> +ETEXI
+> +
+> +    {
+> +        .name       =3D "instr-unload",
+> +        .args_type  =3D "handle:i",
+> +        .params     =3D "handle",
+> +        .help       =3D "unload an instrumentation library",
+> +        .cmd        =3D hmp_instr_unload,
+> +    },
+> +
+> +STEXI
+> +@item instr-unload
+> +@findex instr-unload
+> +Unload an instrumentation library.
+> +ETEXI
+> +
+>  STEXI
+>  @end table
+>  ETEXI
 
-Please don't rush in a hack, they often introduce new bugs that we
-have to support long-term when they are part of the QMP API.
+Want #ifdef CONFIG_INSTRUMENT, see my review of the previous patch.
 
-In your original email you mentioned "info cpus".  Have you considered
-modifying this command so it does not sync the CPU?  I'm not sure
-callers really need to sync the CPU, typically they just want to know
-the vcpu numbers, thread IDs, and current state (halted, running,
-etc).
+See also my remark there on returning handles vs. passing in IDs.
 
-The next step after that would be to audit other monitor commands for
-unnecessary vcpu synchronization.
+> diff --git a/monitor.c b/monitor.c
+> index e0f880107f..8a7684f860 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -2319,6 +2319,66 @@ int monitor_fd_param(Monitor *mon, const char *fdn=
+ame, Error **errp)
+>      return fd;
+>  }
+>=20=20
+> +static void hmp_instr_load(Monitor *mon, const QDict *qdict)
+> +{
+> +    const char *path =3D qdict_get_str(qdict, "path");
+> +    const char *str =3D qdict_get_try_str(qdict, "args");
+> +    strList args;
 
-Stefan
+Blank line between last declaration and first statement, please.
+
+> +    args.value =3D (str =3D=3D NULL) ? NULL : (char *)str;
+
+What's wrong with
+
+       args.value =3D (char *)str;
+
+?
+
+> +    args.next =3D NULL;
+> +    InstrLoadResult *res =3D qmp_instr_load(path, args.value !=3D NULL,
+> +                                          args.value !=3D NULL ? &args :=
+ NULL,
+> +                                          NULL);
+> +    switch (res->code) {
+> +    case INSTR_LOAD_CODE_OK:
+> +        monitor_printf(mon, "Handle: %"PRId64"\n", res->handle);
+> +        monitor_printf(mon, "OK\n");
+> +        break;
+> +    case INSTR_LOAD_CODE_TOO_MANY:
+> +        monitor_printf(mon, "Too many instrumentation libraries already =
+loaded\n");
+> +        break;
+> +    case INSTR_LOAD_CODE_ERROR:
+> +        monitor_printf(mon, "Instrumentation library returned a non-zero=
+ value during initialization");
+> +        break;
+> +    case INSTR_LOAD_CODE_DLERROR:
+> +        monitor_printf(mon, "Error loading library: %s\n", res->msg);
+> +        break;
+> +    case INSTR_LOAD_CODE_UNAVAILABLE:
+> +        monitor_printf(mon, "Service not available\n");
+> +        break;
+> +    default:
+> +        fprintf(stderr, "Unknown instrumentation load code: %d", res->co=
+de);
+> +        exit(1);
+
+Impossible conditions should be assertion failures, but it's a moot point
+because...
+
+> +        break;
+> +    }
+> +    qapi_free_InstrLoadResult(res);
+> +}
+
+With qmp_instr_load() fixed to set an error on failure, this becomes
+something like
+
+       InstrLoadResult *res =3D qmp_instr_load(path, args.value !=3D NULL,
+                                             args.value !=3D NULL ? &args :=
+ NULL,
+                                             &err);
+       if (err) {
+           error_report_err(err);
+       } else {
+           monitor_printf(mon, "Handle: %"PRId64"\n", res->handle);
+           monitor_printf(mon, "OK\n");
+       }
+       qapi_free_InstrLoadResult(res);
+
+> +
+> +static void hmp_instr_unload(Monitor *mon, const QDict *qdict)
+> +{
+> +    int64_t handle =3D qdict_get_int(qdict, "handle");
+> +    InstrUnloadResult *res =3D qmp_instr_unload(handle, NULL);
+> +    switch (res->code) {
+> +    case INSTR_UNLOAD_CODE_OK:
+> +        monitor_printf(mon, "OK\n");
+> +        break;
+> +    case INSTR_UNLOAD_CODE_INVALID:
+> +        monitor_printf(mon, "Invalid handle\n");
+> +        break;
+> +    case INSTR_UNLOAD_CODE_DLERROR:
+> +        monitor_printf(mon, "Error unloading library: %s\n", res->msg);
+> +        break;
+> +    case INSTR_UNLOAD_CODE_UNAVAILABLE:
+> +        monitor_printf(mon, "Service not available\n");
+> +        break;
+> +    default:
+> +        fprintf(stderr, "Unknown instrumentation unload code: %d", res->=
+code);
+> +        exit(1);
+> +        break;
+> +    }
+> +    qapi_free_InstrUnloadResult(res);
+> +}
+> +
+>  /* Please update hmp-commands.hx when adding or changing commands */
+>  static mon_cmd_t info_cmds[] =3D {
+>  #include "hmp-commands-info.h"
+
+Likewise.
