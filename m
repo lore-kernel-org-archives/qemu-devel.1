@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58337)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dpzzn-0000iH-PZ
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:49:45 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dq03m-00028w-0I
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:53:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dpzzj-0005vO-6Y
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:49:39 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dq03h-0007zD-36
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:53:46 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:37663)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dq03g-0007ym-Oq
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:53:41 -0400
+Received: by mail-wr0-x243.google.com with SMTP id u48so122714wrf.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 09:53:39 -0700 (PDT)
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAFEAcA_0FyFFqJ2GOtUw5CPBKTj1YR9ykroyL-7WCYfbgR0hAg@mail.gmail.com>
-References: <cover.1504222314.git.alistair.francis@xilinx.com>
-	<CAFEAcA8TSpNkz3ew+wk6K0vu18B5RCr=0vbkihcaDz8v2zUN8g@mail.gmail.com>
-	<CAKmqyKMd0JcEtkqiajLd5sbWP9WpjS8XqwfGGWPuANchE5Ej3A@mail.gmail.com>
-	<CAKmqyKPSm4UHL7K0ZBGF28Z+wZ0qtMLd7CSvF9W94LwsXfN9zQ@mail.gmail.com>
-	<CAFEAcA_0FyFFqJ2GOtUw5CPBKTj1YR9ykroyL-7WCYfbgR0hAg@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 7 Sep 2017 09:48:51 -0700
-Message-ID: <CAKmqyKOqOJJceCf-wMjZTMQCHDjHWGWT4JAdsqERVXeNtTP6dw@mail.gmail.com>
+In-Reply-To: <20170907120227.GE23040@pxdev.xzpeter.org>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<20170906145043.GG15535@stefanha-x1.localdomain>
+	<20170906151436.GF2215@work-vm>
+	<CAJSP0QUu45oPTL2JErTWAt7OFrHpcB-88EvGBwVAKxn0CE=ebg@mail.gmail.com>
+	<20170907093546.GE2098@work-vm>
+	<CAJSP0QWA2gci=PxKDVEWQNhxDv-9pDdJzyWdQut=Zkr+rCb+3A@mail.gmail.com>
+	<20170907120227.GE23040@pxdev.xzpeter.org>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 7 Sep 2017 17:53:37 +0100
+Message-ID: <CAJSP0QWT2fNs16_mAy-iO_zc=ocYegCVwgV6UAXAL8S_GFjGXg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] Expose the secure and virt
- properties to the
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,33 +33,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Thu, Sep 7, 2017 at 9:33 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> On 7 September 2017 at 17:29, Alistair Francis
-> <alistair.francis@xilinx.com> wrote:
->> It looks like patch 1 and 3 still didn't make it through. I see them
->> leaving the corporate network and going through to my personal email.
+On Thu, Sep 7, 2017 at 1:02 PM, Peter Xu <peterx@redhat.com> wrote:
+> On Thu, Sep 07, 2017 at 11:09:29AM +0100, Stefan Hajnoczi wrote:
+>> On Thu, Sep 7, 2017 at 10:35 AM, Dr. David Alan Gilbert
+>> <dgilbert@redhat.com> wrote:
+>> > * Stefan Hajnoczi (stefanha@gmail.com) wrote:
+>> >> On Wed, Sep 6, 2017 at 4:14 PM, Dr. David Alan Gilbert
+>> >> <dgilbert@redhat.com> wrote:
+>> >> > * Stefan Hajnoczi (stefanha@gmail.com) wrote:
+>> >> >> On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
+>> >> >> > The root problem is that, monitor commands are all handled in main
+>> >> >> > loop thread now, no matter how many monitors we specify. And, if main
+>> >> >> > loop thread hangs due to some reason, all monitors will be stuck.
+>> >> >>
+>> >> >> I see a larger issue with postcopy: existing QEMU code assumes that
+>> >> >> guest memory access is instantaneous.
+>> >> >>
+>> >> >> Postcopy breaks this assumption and introduces blocking points that can
+>> >> >> now take unbounded time.
+>> >> >>
+>> >> >> This problem isn't specific to the monitor.  It can also happen to other
+>> >> >> components in QEMU like the gdbstub.
+>> >> >>
+>> >> >> Do we need an asynchronous memory API?  Synchronous memory access should
+>> >> >> only be allowed in vcpu threads.
+>> >> >
+>> >> > It would probably be useful for gdbstub where the overhead of async
+>> >> > doesn't matter;  but doing that for all IO emulation is hard.
+>> >>
+>> >> Why is it hard?
+>> >>
+>> >> Memory access can be synchronous in the vcpu thread.  That eliminates
+>> >> a lot of code straight away.
+>> >>
+>> >> Anything using dma-helpers.c is already async.  They just don't know
+>> >> that the memory access part is being made async too :).
+>> >
+>> > Can you point me to some info on that ?
 >>
->> Can anyone see anything on the QEMU mail server side? Any logs might
->> help me push IT to investigate.
+>> IDE and SCSI use dma-helpers.c to perform I/O:
+>> hw/ide/core.c:892:        s->bus->dma->aiocb =
+>> dma_blk_io(blk_get_aio_context(s->blk),
+>> hw/ide/macio.c:189:        s->bus->dma->aiocb =
+>> dma_blk_io(blk_get_aio_context(s->blk), &s->sg,
+>> hw/scsi/scsi-disk.c:348:        r->req.aiocb =
+>> dma_blk_io(blk_get_aio_context(s->qdev.conf.blk),
+>> hw/scsi/scsi-disk.c:551:        r->req.aiocb =
+>> dma_blk_io(blk_get_aio_context(s->qdev.conf.blk),
+>>
+>> They pass a scatter-gather list of guest RAM addresses to
+>> dma-helpers.c.  They receive a callback when I/O has finished.
+>>
+>> Try following the code path.  Request submission may be from a vcpu
+>> thread or IOThread.  Completion occurs in the main loop or an
+>> IOThread.
+>>
+>> The main point is that this API is already asynchronous.  If any
+>> changes are needed for async guest memory access (not sure, I haven't
+>> checked), then at least the dma-helpers.c users do not need to be
+>> modified.
+>>
+>> >> The remaining cases are virtio and some other devices.
+>> >>
+>> >> If you are worried about performance, the first rule is that async
+>> >> memory access is only needed on the destination side when post-copy is
+>> >> active.  Maybe use setjmp to return from the signal handler and queue
+>> >> a callback for when the page has been loaded.
+>> >
+>> > I'm not sure it's worth trying to be too clever at avoiding this;
+>> > I see the fact that we're doing IO with the bql held as a more
+>> > fundamental problem.
+>>
+>> QEMU should be doing I/O syscalls in async fashion or threadpool
+>> workers (no BQL) so the BQL is not an issue.  Anything else could
+>> cause unbounded waits even without postcopy.
 >
-> Unfortunately we don't really have much visibility into what
-> the mail server is doing, because it's run by nongnu.org.
-> It does seem to have a habit of occasionally eating patches
-> (maybe it thinks they're spam or something).
-
-Hmmm... I'm not sure how to look into this then, as I can see the
-patches going through to my personal email address, so it's hard to
-place the blame on the Xilinx mail server.
-
-Do you want me to try sending out patches 1 and 3 again?
-
-Thanks,
-Alistair
-
+> E.g. when vcpu got page faulted with BQL taken, while the main thread
+> needs the BQL to dispatch anything, including monitor commands.
 >
-> thanks
-> -- PMM
->
+> So I think it's a multiplex problem - we need to solve both (1) main
+> thread accessing guest memories which is still missing, and (2) BQL
+> deadlocks between vcpu threads and main thread.
+
+I think we need a single solution and cannot treat these as separate.
+This is because the same virtio device emulation code may run in 3
+contexts:
+1. vcpu thread (ioeventfd=off)
+2. main loop thread (ioeventfd=on)
+3. IOThread (ioeventfd=on, iothread=<id>)
+
+If you try to solve them separately then the code won't work in all 3
+contexts anymore.
+
+Stefan
