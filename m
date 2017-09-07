@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dq29e-0001Kj-Dy
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:08:03 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dq2Pk-0006b2-32
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:24:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dq29Z-0002Yx-Km
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:07:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42676)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dq29Z-0002YS-Bs
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:07:53 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 625AD81DFD
-	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 19:07:52 +0000 (UTC)
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-28-eblake@redhat.com>
-	<ef46a4d8-27f8-296a-1336-2678beb1a332@redhat.com>
-	<ea485554-e4fd-44e1-f0ab-579ca0ead575@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <718433c5-59b8-f949-12a1-6f2cd3242d3c@redhat.com>
-Date: Thu, 7 Sep 2017 21:07:42 +0200
-MIME-Version: 1.0
-In-Reply-To: <ea485554-e4fd-44e1-f0ab-579ca0ead575@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="udjwfcU8urBjkNHb3q0DAc2VpDmKFhg1U"
-Subject: Re: [Qemu-devel] [PATCH v6 27/29] libqtest: Make qtest_init()
- accept format string
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dq2Pe-0004Ap-Vu
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:24:36 -0400
+From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Date: Fri,  8 Sep 2017 00:54:06 +0530
+Message-Id: <1504812251-23438-1-git-send-email-sundeep.lkml@gmail.com>
+Subject: [Qemu-devel] [Qemu devel v8 PATCH 0/5] Add support for Smartfusion2
+ SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,91 +18,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Igor Mammedov <imammedo@redhat.com>, armbru@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com, f4bug@amsat.org, Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---udjwfcU8urBjkNHb3q0DAc2VpDmKFhg1U
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Hi Qemu-devel,
 
-On 07.09.2017 20:00, Eric Blake wrote:
-> On 09/05/2017 07:46 AM, Thomas Huth wrote:
->> On 01.09.2017 20:03, Eric Blake wrote:
->>> Several callers were formatting a string into a temporary
->>> variable before calling qtest_init(); factor that into the
->>> common code.
->>>
->>> Signed-off-by: Eric Blake <eblake@redhat.com>
->>> ---
->=20
->>> -QTestState *qtest_init(const char *extra_args);
->>> +QTestState *qtest_init(const char *extra_args, ...) GCC_FMT_ATTR(1, =
-2);
->>
->> Maybe the parameter should be called "fmt" or "format" now instead?
->> (similar to printf() and friends)
->=20
-> Sure.
->=20
->>
->>>  /**
->>>   * qtest_init_without_qmp_handshake:
->>> @@ -518,7 +519,7 @@ void qtest_add_abrt_handler(GHookFunc fn, const v=
-oid *data);
->>>   */
->>>  static inline QTestState *qtest_start(const char *args)
->>>  {
->>> -    global_qtest =3D qtest_init(args);
->>> +    global_qtest =3D qtest_init("%s", args);
->>
->> That's a little bit sad that there are some spots which need an explic=
-it
->> "%s" now ... maybe it would be nicer to add a new function called
->> qtest_initf() instead and keep the old one (without the "f") as it is?=
+I am trying to add Smartfusion2 SoC.
+SoC is from Microsemi and System on Module(SOM)
+board is from Emcraft systems. Smartfusion2 has hardened
+Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
+At the moment only system timer, sysreg and SPI
+controller are modelled.
 
->=20
-> Indeed, and looking back over my series, I see we could also benefit
-> from a va_list form.
->=20
-> Also, since you already questioned me on the churn from qtest_start() =3D=
->
-> qtest_init() =3D> qtest_start(), I can make less churn in the next spin=
- by
-> converging on qtest_start() from the get-go.
->=20
-> So I will go with qtest_start() (plain string), qtest_startf()
-> (formatted like sprintf), and qtest_vstartf() (formatted like vsprintf)=
-=2E
+Testing:
+./arm-softmmu/qemu-system-arm -M smartfusion2-som -serial mon:stdio \
+-kernel u-boot.bin -display none -drive file=spi.bin,if=mtd,format=raw
 
-Thanks, that sounds like a better way to me, too!
+Binaries u-boot.bin and spi.bin are at:
+https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git
 
- Thomas
+U-boot is from Emcraft with modified
+    - SPI driver not to use PDMA.
+    - ugly hack to pass dtb to kernel in r1.
+@
+https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git
+
+Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource
+driver added by myself @
+https://github.com/Subbaraya-Sundeep/linux.git
+
+v8:
+	memory_region_init_ram to memory_region_init_rom in soc
+	%s/emcraft_sf2_init/emcraft_sf2_s2s010_init/g in som
+	Added mc->ignore_memory_transaction_failures = true in som
+		as per latest commit.
+	Code simplifications as suggested by Alistair in sysreg and ssi.
+
+v7:
+	Removed vmstate_register_ram_global as per latest commit
+	Moved header files to C which are local to C source files
+	Removed abort() from msf2-sysreg.c
+	Added VMStateDescription in mss-timer.c
+
+v6:
+    Moved some defines from header files to source files
+    Added properties m3clk, apb0div, apb0div1 properties
+    to soc.
+    Added properties apb0divisor, apb1divisor to sysreg
+    Update system_clock_source in msf2-soc.c
+    Changed machine name smartfusion2-som->emcraft-sf2
+
+v5
+    As per Philippe comments:
+        Added abort in Sysreg if guest tries to remap memory
+        other than default mapping.
+        Use of CONFIG_MSF2 in Makefile for soc.c
+        Fixed incorrect logic in timer model.
+        Renamed msf2-timer.c -> mss-timer.c
+                msf2-spi.c -> mss-spi.c also type names
+        Renamed function msf2_init->emcraft_sf2_init in msf2-som.c
+        Added part-name,eNVM-size,eSRAM-size,pclk0 and pclk1
+            properties to soc.
+        Pass soc part-name,memory size and clock rate properties from som.
+v4:
+    Fixed build failure by using PRIx macros.
+v3:
+    Added SoC file and board file as per Alistair comments.
+v2:
+    Added SPI controller so that u-boot loads kernel from spi flash.
+v1:
+    Initial patch set with timer and sysreg
+
+Thanks,
+Sundeep
 
 
+Subbaraya Sundeep (5):
+  msf2: Add Smartfusion2 System timer
+  msf2: Microsemi Smartfusion2 System Register block
+  msf2: Add Smartfusion2 SPI controller
+  msf2: Add Smartfusion2 SoC
+  msf2: Add Emcraft's Smartfusion2 SOM kit
 
---udjwfcU8urBjkNHb3q0DAc2VpDmKFhg1U
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/Makefile.objs            |   1 +
+ hw/arm/msf2-soc.c               | 218 ++++++++++++++++++++++
+ hw/arm/msf2-som.c               |  95 ++++++++++
+ hw/misc/Makefile.objs           |   1 +
+ hw/misc/msf2-sysreg.c           | 195 +++++++++++++++++++
+ hw/ssi/Makefile.objs            |   1 +
+ hw/ssi/mss-spi.c                | 404 ++++++++++++++++++++++++++++++++++++++++
+ hw/timer/Makefile.objs          |   1 +
+ hw/timer/mss-timer.c            | 289 ++++++++++++++++++++++++++++
+ include/hw/arm/msf2-soc.h       |  66 +++++++
+ include/hw/misc/msf2-sysreg.h   |  78 ++++++++
+ include/hw/ssi/mss-spi.h        |  58 ++++++
+ include/hw/timer/mss-timer.h    |  64 +++++++
+ 14 files changed, 1472 insertions(+)
+ create mode 100644 hw/arm/msf2-soc.c
+ create mode 100644 hw/arm/msf2-som.c
+ create mode 100644 hw/misc/msf2-sysreg.c
+ create mode 100644 hw/ssi/mss-spi.c
+ create mode 100644 hw/timer/mss-timer.c
+ create mode 100644 include/hw/arm/msf2-soc.h
+ create mode 100644 include/hw/misc/msf2-sysreg.h
+ create mode 100644 include/hw/ssi/mss-spi.h
+ create mode 100644 include/hw/timer/mss-timer.h
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJZsZkCAAoJEC7Z13T+cC21TDMQAIAfIuE59Gerdk2ow9qoOqZ5
-5xKO1be06BRyuTF/spXKfSSHfSoaWViWvcMzsGFJkplHdGk/d6F9c+v6Yqags5JZ
-dfwWARQpwGxR2yQWl6I768mI+F4oNlbZ4rovGv/JVunzBIXquthZFbkw35ItRA9i
-lawjP0BENXa+mMGVBTuIcUKk3NbePe+jP1m2w89EhpMcKIETrH9qe32OpdrIvUlB
-ZmEu2AopJc7/+dBgDqjdFSxHL+tVI6C5vEjaty4Kg9QdPL8hwscFlJufkAz/64aG
-pKchd4qxZx6sgKqPq1KV52hutnNOhRaNo+FgzFiDsSd99DsM+okYjWXKwIe2Mghm
-XEYy8ndtZP/UOZfe+h6tB0xB7Pk5b3gDpaZ4m5VISaetJHfM10DwEoUFgSGUbHB3
-pJ4Qyr4MMRngGleo69UaJ7O9QCnKUi0c31M1w3Lsi35ne6yW1QUednLFyRkWbvMb
-0p+WFHpJKmKlyXc3dZqdDK1Z6oiQCc/lMslT1jaA0odjwQlxAAFTYXBEIc1oFqZL
-3qWBI0o38wNY9hxOTldd4Rq/BsnER1VXUYVi6hxyCB7yShviVOFTkIP92F/J+7mZ
-cnWEIx+HpQxxRH82Elo7c965qOCDgOYJlMTTLJH+c5kR8No7+FglJER/Sz2OKcYE
-+0Zs+v3QGltsQmVXUx2P
-=vRXN
------END PGP SIGNATURE-----
-
---udjwfcU8urBjkNHb3q0DAc2VpDmKFhg1U--
+-- 
+2.5.0
