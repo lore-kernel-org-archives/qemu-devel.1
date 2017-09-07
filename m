@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dptjg-0006Q7-0v
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:08:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dptkH-0006hS-Bq
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:09:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dptja-0004l6-LN
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:08:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50074)
+	(envelope-from <dgibson@ozlabs.org>) id 1dptkG-00050C-A0
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:09:13 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:51971)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dptja-0004kX-Db
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:08:30 -0400
-Date: Thu, 7 Sep 2017 11:08:17 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170907100817.GI30609@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170829110357.GG3783@redhat.com> <20170906094846.GA2215@work-vm>
-	<20170906104603.GK15510@redhat.com> <20170906104850.GB2215@work-vm>
-	<20170906105414.GL15510@redhat.com> <20170906105704.GC2215@work-vm>
-	<20170906110629.GM15510@redhat.com> <20170906113157.GD2215@work-vm>
-	<20170906115428.GP15510@redhat.com> <20170907100402.GG2098@work-vm>
+	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dptkF-0004z2-Ty
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:09:12 -0400
+Date: Thu, 7 Sep 2017 20:08:48 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170907100848.GL2735@umbus.fritz.box>
+References: <20170907092010.3605-1-aik@ozlabs.ru>
+	<20170907095142.GA2194@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="qo7zVO9a9OQ5oQtr"
 Content-Disposition: inline
-In-Reply-To: <20170907100402.GG2098@work-vm>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
+In-Reply-To: <20170907095142.GA2194@work-vm>
+Subject: Re: [Qemu-devel] [RFC PATCH qemu 0/4] memory: Reduce memory use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,90 +29,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On Thu, Sep 07, 2017 at 11:04:02AM +0100, Dr. David Alan Gilbert wrote:
-> * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > On Wed, Sep 06, 2017 at 12:31:58PM +0100, Dr. David Alan Gilbert wrot=
-e:
-> > > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > > > This does imply that you need a separate monitor I/O processing, =
-from the
-> > > > command execution thread, but I see no need for all commands to s=
-uddenly
-> > > > become async. Just allowing interleaved replies is sufficient fro=
-m the
-> > > > POV of the protocol definition. This interleaving is easy to hand=
-le from
-> > > > the client POV - just requires a unique 'serial' in the request b=
-y the
-> > > > client, that is copied into the reply by QEMU.
-> > >=20
-> > > OK, so for that we can just take Marc-Andr=C3=A9's syntax and call =
-it 'id':
-> > >   https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03634.ht=
-ml
-> > >=20
-> > > then it's upto the caller to ensure those id's are unique.
+
+--qo7zVO9a9OQ5oQtr
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Sep 07, 2017 at 10:51:42AM +0100, Dr. David Alan Gilbert wrote:
+> * Alexey Kardashevskiy (aik@ozlabs.ru) wrote:
+> > This was inspired by https://bugzilla.redhat.com/show_bug.cgi?id=3D1481=
+593
 > >=20
-> > Libvirt has in fact generated a unique 'id' for every monitor command
-> > since day 1 of supporting QMP.
+> > What happens ithere is that every virtio block device creates 2 address
+> > spaces - for modern config space (called "virtio-pci-cfg-as") and
+> > for busmaster (common pci thing, called after the device name,
+> > in my case "virtio-blk-pci").
 > >=20
-> > > I do worry about two things:
-> > >   a) With this the caller doesn't really know which commands could =
-be
-> > >   in parallel - for example if we've got a recovery command that's
-> > >   executed by this non-locking thread that's OK, we expect that
-> > >   to be doable in parallel.  If in the future though we do
-> > >   what you initially suggested and have a bunch of commands get
-> > >   routed to the migration thread (say) then those would suddenly
-> > >   operate in parallel with other commands that we're previously
-> > >   synchronous.
+> > Each address_space_init() updates topology for every address space.
+> > Every topology update (address_space_update_topology()) creates a new
+> > dispatch tree - AddressSpaceDispatch with nodes (1KB) and
+> > sections (48KB) and destroys the old one.
 > >=20
-> > We could still have an opt-in for async commands. eg default to execu=
-ting
-> > all commands in the main thread, unless the client issues an explicit
-> > "make it async" command, to switch to allowing the migration thread t=
-o
-> > process it async.
+> > However the dispatch destructor is postponed via RCU which does not
+> > get a chance to execute until the machine is initialized but before
+> > we get there, memory is not returned to the pool, and this is a lot
+> > of memory which grows n^2.
 > >=20
-> >  { "execute": "qmp_allow_async",
-> >    "data": { "commands": [
-> >        "migrate_cancel",
-> >    ] } }
-> >=20
-> >=20
-> >  { "return": { "commands": [
-> >        "migrate_cancel",
-> >    ] } }
-> >=20
-> > The server response contains the subset of commands from the request
-> > for which async is supported.
-> >=20
-> > That gives good negotiation ability going forward as we incrementally
-> > support async on more commands.
+> > These patches are trying to address the memory use and boot time
+> > issues but tbh only the first one provides visible outcome.
 >=20
-> Is that 'qmp_allow_async' a command purely to query whether a command
-> is async or is it a wrapper to cause that command to be executed async?
+> Do you have a feel for how much memory is saved?
 
-The former.
+I think that's a bit hard to answer.
 
-It merely used by the client to tell QEMU that it wants the command(s)
-listed to have async processing enabled. QEMU reports back which commands
-it has actually enabled async for.
+As noted above there's O(n^2) (or more) space complexity here - one
+which shouldn't be required by the data we actually have to track.
+That means the amount of "excess" memory depends on how many devices
+there are.
 
-IOW, before executing this, everything is still processed synchronously,
-even if QEMU has support for async. This ensures back compat as we enable
-support for async per command. After executing this command, then future
-usage of 'migrate_cancel' would be run async.
+I haven't yet looked at these patches in detail, to know if it truly
+fixes that O(n^2) or just pares the constant.  If it does fix the
+O(n^2) then the amount is going to vary from "probably not enough to
+worry about" in normal use cases to hundreds of gigabytes in cases
+with many devices.
 
-
-Regards,
-Daniel
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--qo7zVO9a9OQ5oQtr
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmxGrAACgkQbDjKyiDZ
+s5LOJRAAsLuVP7iGPDcX4ixYKtwrrnt5oECgO+SY4IbcomaQ969PtgG8lTtO6x81
+Hy7gMBjoAZSj0ZIBj8GhXYOmlEdOhVc7Z7kuo7EsnWN6wP8ixZi1nXlh6tvWzpW1
+B3ItNZbQtmzH7fgYkY7TniQ5sq2knS72FtG3kdVw/1BrPWDtwbbQ3M+yFx+qGA0Y
+/ry4sbjBDwcED7MXC8Uip+yPjphW4Uc/DjzXoEOEhmtiQqLXWMY/CW8sLdrAE8BR
+INDKsjq4c9CSii4USNXz85a13jxV1d1gck0B1I6D+Tr/TUGS4pDrXDyOryDF+nnE
+GCFNLtoWOKA6aaxDOfiqVLt0mjOJVzOhuNOaddgllj2kl1fx6Vv2vSsY1JqV0Ozi
+odBw9P43fx4INPZDJUM6aihPLJVF9lpux1QG+NYZ6OUx5WlCBooBWZcs4ymxwJtB
+/l/dmgpwmFh/SU+Xe/qk8Sd2IfISdW4T7TgAOZMYybyaQaCDRe3zi5b8T2ZlBNFX
+PCaJZPD4gGHC+N9zB/7nuSa0UwXa08Ub8JuD2Q4OVVgZn2/EFaH5GLGy6TWj4h5M
+tD9lAJP45iRykgRyDlot7/g1hS4Jm4DszHg9BTsq0waUZmFmU4Tg3kFC8Wfsvl0a
+h5pu3bq1cEWd9VBkxD2OMEc2xilQTYCDYdX6rf4sfJqJhluonD0=
+=/os0
+-----END PGP SIGNATURE-----
+
+--qo7zVO9a9OQ5oQtr--
