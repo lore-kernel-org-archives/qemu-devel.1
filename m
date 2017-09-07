@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57069)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dpl9K-0002Vc-Q9
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 20:58:32 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1dplGV-0003kL-SN
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 21:05:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dpl9H-00030a-O4
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 20:58:30 -0400
-Received: from szxga02-in.huawei.com ([45.249.212.188]:4419)
+	(envelope-from <arei.gonglei@huawei.com>) id 1dplGS-0006Yy-LG
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 21:05:55 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:4354)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1dpl9G-0002y0-R3
-	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 20:58:27 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1dplGR-0006Xc-LH
+	for qemu-devel@nongnu.org; Wed, 06 Sep 2017 21:05:52 -0400
 From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Thu, 7 Sep 2017 00:58:02 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA3A2524@DGGEMA505-MBX.china.huawei.com>
+Date: Thu, 7 Sep 2017 01:05:33 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA3A2534@DGGEMA505-MBX.china.huawei.com>
 References: <1504603805-180240-1-git-send-email-arei.gonglei@huawei.com>
-	<1504603805-180240-2-git-send-email-arei.gonglei@huawei.com>
-	<20170905132034.GX7570@localhost.localdomain>
-In-Reply-To: <20170905132034.GX7570@localhost.localdomain>
+	<1504603805-180240-3-git-send-email-arei.gonglei@huawei.com>
+	<20170905131648.GW7570@localhost.localdomain>
+In-Reply-To: <20170905131648.GW7570@localhost.localdomain>
 Content-Language: zh-CN
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH 1/2] pc: add 2.11 machine type
+Subject: Re: [Qemu-devel] [PATCH 2/2] i386/cpu/hyperv: support over 64 vcpus
+ for windows guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,119 +37,164 @@ Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redha
 
 > -----Original Message-----
 > From: Eduardo Habkost [mailto:ehabkost@redhat.com]
-> Sent: Tuesday, September 05, 2017 9:21 PM
+> Sent: Tuesday, September 05, 2017 9:17 PM
 > To: Gonglei (Arei)
 > Cc: qemu-devel@nongnu.org; mst@redhat.com; pbonzini@redhat.com;
 > rth@twiddle.net; mtosatti@redhat.com; vrozenfe@redhat.com;
 > Huangweidong (C)
-> Subject: Re: [PATCH 1/2] pc: add 2.11 machine type
+> Subject: Re: [PATCH 2/2] i386/cpu/hyperv: support over 64 vcpus for windo=
+ws
+> guests
 >=20
-> On Tue, Sep 05, 2017 at 05:30:04PM +0800, Gonglei wrote:
-> > CC: "Michael S. Tsirkin" <mst@redhat.com>
-> > CC: Paolo Bonzini <pbonzini@redhat.com>
-> > CC: Richard Henderson <rth@twiddle.net>
-> > CC: Eduardo Habkost <ehabkost@redhat.com>
+> On Tue, Sep 05, 2017 at 05:30:05PM +0800, Gonglei wrote:
+> > Starting with Windows Server 2012 and Windows 8, if
+> > CPUID.40000005.EAX contains a value of -1, Windows assumes specific
+> > limit to the number of VPs. In this case, Windows Server 2012
+> > guest VMs may use more than 64 VPs, up to the maximum supported
+> > number of processors applicable to the specific Windows
+> > version being used.
+> >
+> >
+> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/refere=
+nc
+> e/tlfs
+> >
+> > For compatibility, Let's introduce a new property for X86CPU,
+> > named "hv-cpuid-limits-eax" as Paolo's suggestion, and set it
+> > to "on" before machine 2.10.
+> >
 > > Signed-off-by: Gonglei <arei.gonglei@huawei.com>
 > > ---
-> >  hw/i386/pc_piix.c    | 15 ++++++++++++---
-> >  hw/i386/pc_q35.c     | 13 +++++++++++--
-> >  include/hw/i386/pc.h |  3 +++
-> >  3 files changed, 26 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> > index 46dfd2c..b03cc04 100644
-> > --- a/hw/i386/pc_piix.c
-> > +++ b/hw/i386/pc_piix.c
-> > @@ -436,21 +436,30 @@ static void
-> pc_i440fx_machine_options(MachineClass *m)
-> >      m->default_display =3D "std";
-> >  }
-> >
-> > -static void pc_i440fx_2_10_machine_options(MachineClass *m)
-> > +static void pc_i440fx_2_11_machine_options(MachineClass *m)
-> >  {
-> >      pc_i440fx_machine_options(m);
-> >      m->alias =3D "pc";
-> >      m->is_default =3D 1;
-> >  }
-> >
-> > +DEFINE_I440FX_MACHINE(v2_11, "pc-i440fx-2.11", NULL,
-> > +                      pc_i440fx_2_11_machine_options);
-> > +
-> > +static void pc_i440fx_2_10_machine_options(MachineClass *m)
-> > +{
-> > +    pc_i440fx_2_11_machine_options(m);
-> > +    m->is_default =3D 0;
-> > +    m->alias =3D NULL;
-> > +    SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
-> > +}
-> > +
-> >  DEFINE_I440FX_MACHINE(v2_10, "pc-i440fx-2.10", NULL,
-> >                        pc_i440fx_2_10_machine_options);
-> >
-> >  static void pc_i440fx_2_9_machine_options(MachineClass *m)
-> >  {
-> >      pc_i440fx_2_10_machine_options(m);
-> > -    m->is_default =3D 0;
-> > -    m->alias =3D NULL;
-> >      SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
-> >      m->numa_auto_assign_ram =3D numa_legacy_auto_assign_ram;
-> >  }
-> > diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-> > index 169a214..d6fef8d 100644
-> > --- a/hw/i386/pc_q35.c
-> > +++ b/hw/i386/pc_q35.c
-> > @@ -302,20 +302,29 @@ static void
-> pc_q35_machine_options(MachineClass *m)
-> >      m->max_cpus =3D 288;
-> >  }
-> >
-> > -static void pc_q35_2_10_machine_options(MachineClass *m)
-> > +static void pc_q35_2_11_machine_options(MachineClass *m)
-> >  {
-> >      pc_q35_machine_options(m);
-> >      m->alias =3D "q35";
-> >      m->numa_auto_assign_ram =3D numa_legacy_auto_assign_ram;
-> >  }
-> >
-> > +DEFINE_Q35_MACHINE(v2_11, "pc-q35-2.11", NULL,
-> > +                   pc_q35_2_11_machine_options);
-> > +
-> > +static void pc_q35_2_10_machine_options(MachineClass *m)
-> > +{
-> > +    pc_q35_2_11_machine_options(m);
-> > +    m->alias =3D NULL;
-> > +    SET_MACHINE_COMPAT(m, PC_COMPAT_2_10);
-> > +}
-> > +
-> >  DEFINE_Q35_MACHINE(v2_10, "pc-q35-2.10", NULL,
-> >                     pc_q35_2_10_machine_options);
-> >
-> >  static void pc_q35_2_9_machine_options(MachineClass *m)
-> >  {
-> >      pc_q35_2_10_machine_options(m);
-> > -    m->alias =3D NULL;
-> >      SET_MACHINE_COMPAT(m, PC_COMPAT_2_9);
-> >  }
+> >  include/hw/i386/pc.h |  5 +++++
+> >  target/i386/cpu.c    |  1 +
+> >  target/i386/cpu.h    |  2 ++
+> >  target/i386/kvm.c    | 18 +++++++++++++++++-
+> >  4 files changed, 25 insertions(+), 1 deletion(-)
 > >
 > > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > index d80859b..8226904 100644
+> > index 8226904..db32e58 100644
 > > --- a/include/hw/i386/pc.h
 > > +++ b/include/hw/i386/pc.h
-> > @@ -369,6 +369,9 @@ int e820_add_entry(uint64_t, uint64_t, uint32_t);
-> >  int e820_get_num_entries(void);
-> >  bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+> > @@ -371,6 +371,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *,
+> uint64_t *);
 > >
-> > +#define PC_COMPAT_2_10 \
-> > +    HW_COMPAT_2_10 \
-> > +
+> >  #define PC_COMPAT_2_10 \
+> >      HW_COMPAT_2_10 \
+> > +    {\
+> > +        .driver   =3D TYPE_X86_CPU,\
+> > +        .property =3D "hv_cpuid_limits_eax",\
 >=20
-> Patch looks good, but I would remove the trailing backslash here.
+> The property name is hv-cpuid-limits-eax.
 >=20
-OK.
+Make sense to me.
 
-> With that changed:
+> > +        .value    =3D "on",\
+> > +    },\
+> >
+> >  #define PC_COMPAT_2_9 \
+> >      HW_COMPAT_2_9 \
+> > diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> > index 69676e1..0d47bdd 100644
+> > --- a/target/i386/cpu.c
+> > +++ b/target/i386/cpu.c
+> > @@ -4145,6 +4145,7 @@ static Property x86_cpu_properties[] =3D {
+> >                       false),
+> >      DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU,
+> vmware_cpuid_freq, true),
+> >      DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
+> > +    DEFINE_PROP_BOOL("hv-cpuid-limits-eax", X86CPU,
+> hv_cpuid_limits_eax, false),
 >=20
-> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+> The property name "hv-cpuid-limits-eax" doesn't say anything
+> about what it does exactly when set to true.
 >=20
-Thanks.
+> What about just making it int32?  e.g.:
+>=20
+>     DEFINE_PROP_INT32("x-hv-max-vps", X86CPU, hv_max_vps, -1)
+> [...]
+>     {\
+>         .driver   =3D TYPE_X86_CPU,\
+>         .property =3D "x-hv-max-vps",\
+>         .value    =3D "0x40",\
+>     },\
+> [...]
+>     c->function =3D HYPERV_CPUID_IMPLEMENT_LIMITS;
+>     c->eax =3D cpu->hv_max_vps;
+>=20
+>=20
+> (The "x-" prefix indicates that the property is not supposed to
+> be a stable user interface.)
+>=20
+I thought about this as well.
+but actually we can't assure that users set the x-hv-max-vps an invalid val=
+ue if
+we use this method. Do we really need to expose eax directly?
+
+>=20
+> >      DEFINE_PROP_END_OF_LIST()
+> >  };
+> >
+> > diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+> > index 525d35d..f8b455a 100644
+> > --- a/target/i386/cpu.h
+> > +++ b/target/i386/cpu.h
+> > @@ -1282,6 +1282,8 @@ struct X86CPU {
+> >      int32_t socket_id;
+> >      int32_t core_id;
+> >      int32_t thread_id;
+> > +
+> > +    bool hv_cpuid_limits_eax;
+> >  };
+> >
+> >  static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
+> > diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+> > index 6db7783..cf6ef96 100644
+> > --- a/target/i386/kvm.c
+> > +++ b/target/i386/kvm.c
+> > @@ -751,7 +751,23 @@ int kvm_arch_init_vcpu(CPUState *cs)
+> >
+> >          c =3D &cpuid_data.entries[cpuid_i++];
+> >          c->function =3D HYPERV_CPUID_IMPLEMENT_LIMITS;
+> > -        c->eax =3D 0x40;
+> > +
+> > +        if (!cpu->hv_cpuid_limits_eax) {
+> > +            /*
+> > +             * Starting with Windows Server 2012 and Windows 8, if
+> > +             * CPUID.40000005.EAX contains a value of -1, Windows
+> > +             * assumes specific limit to the number of VPs. In this ca=
+se,
+> > +             * Windows Server 2012 guest VMs may use more than 64
+> VPs,
+> > +             * up to the maximum supported number of processors
+> > +             * applicable to the specific Windows version being used.
+>=20
+> That was a direct quote from a document, so I recommend citing
+> the specific document you quoted.  e.g.:
+>=20
+>     /*
+>      * From "Requirements for Implementing the Microsoft
+>      * Hypervisor Interface":
+>      *
+> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/refere=
+nc
+> e/tlfs
+>      *
+>      * "Starting with Windows Server 2012 and Windows 8, if
+>      * CPUID.40000005.EAX contains a value of -1, Windows assumes
+>      * specific limit to the number of VPs. In this case, Windows
+>      * Server 2012 guest VMs may use more than 64 VPs, up to the
+>      * maximum supported number of processors applicable to the
+>      * specific Windows version being used."
+>      */
+>=20
+>=20
+> > +             *
+> > +             * https://docs.microsoft.com/en-us/virtualization/
+> > +             *    hyper-v-on-windows/reference/tlfs
+>=20
+> IMO a long line is preferable to a broken URL.
+>=20
+Make sense to me.
+
+Thanks,
+-Gonglei
