@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52400)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dq5UJ-0003IV-N4
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 18:41:36 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dq5UK-0003JO-NQ
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 18:41:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dq5UE-0008Qr-Rp
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 18:41:31 -0400
-Received: from mail-pf0-x22b.google.com ([2607:f8b0:400e:c00::22b]:35371)
+	(envelope-from <richard.henderson@linaro.org>) id 1dq5UG-0008TD-3w
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 18:41:32 -0400
+Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:35371)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dq5UE-0008Q0-LJ
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 18:41:26 -0400
-Received: by mail-pf0-x22b.google.com with SMTP id g13so1630258pfm.2
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 15:41:26 -0700 (PDT)
+	id 1dq5UF-0008RY-Ug
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 18:41:28 -0400
+Received: by mail-pf0-x22e.google.com with SMTP id g13so1630320pfm.2
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 15:41:27 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Sep 2017 15:40:50 -0700
-Message-Id: <20170907224051.21518-23-richard.henderson@linaro.org>
+Date: Thu,  7 Sep 2017 15:40:51 -0700
+Message-Id: <20170907224051.21518-24-richard.henderson@linaro.org>
 In-Reply-To: <20170907224051.21518-1-richard.henderson@linaro.org>
 References: <20170907224051.21518-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 22/23] tcg/ppc: Look for shifted constants
+Subject: [Qemu-devel] [PULL 23/23] tcg/ppc: Use constant pool for movi
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,110 +33,101 @@ From: Richard Henderson <rth@twiddle.net>
 
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/ppc/tcg-target.inc.c | 58 +++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 48 insertions(+), 10 deletions(-)
+ tcg/ppc/tcg-target.h     |  1 +
+ tcg/ppc/tcg-target.inc.c | 34 ++++++++++++++++++++++++++++++----
+ 2 files changed, 31 insertions(+), 4 deletions(-)
 
+diff --git a/tcg/ppc/tcg-target.h b/tcg/ppc/tcg-target.h
+index 3772cc6648..be52ad1d2e 100644
+--- a/tcg/ppc/tcg-target.h
++++ b/tcg/ppc/tcg-target.h
+@@ -132,5 +132,6 @@ void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
+ #ifdef CONFIG_SOFTMMU
+ #define TCG_TARGET_NEED_LDST_LABELS
+ #endif
++#define TCG_TARGET_NEED_POOL_LABELS
+ 
+ #endif
 diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index bc14d2c9c6..df709c4a96 100644
+index df709c4a96..21d764c102 100644
 --- a/tcg/ppc/tcg-target.inc.c
 +++ b/tcg/ppc/tcg-target.inc.c
-@@ -593,11 +593,26 @@ static inline void tcg_out_shri64(TCGContext *s, TCGReg dst, TCGReg src, int c)
-     tcg_out_rld(s, RLDICL, dst, src, 64 - c, c);
+@@ -22,6 +22,9 @@
+  * THE SOFTWARE.
+  */
+ 
++#include "elf.h"
++#include "tcg-pool.inc.c"
++
+ #if defined _CALL_DARWIN || defined __APPLE__
+ #define TCG_TARGET_CALL_DARWIN
+ #endif
+@@ -58,8 +61,6 @@
+ 
+ static tcg_insn_unit *tb_ret_addr;
+ 
+-#include "elf.h"
+-
+ bool have_isa_2_06;
+ bool have_isa_3_00;
+ 
+@@ -224,9 +225,12 @@ static inline void tcg_out_bc_noaddr(TCGContext *s, int insn)
+ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
+                         intptr_t value, intptr_t addend)
+ {
+-    tcg_insn_unit *target = (tcg_insn_unit *)value;
++    tcg_insn_unit *target;
++    tcg_insn_unit old;
++
++    value += addend;
++    target = (tcg_insn_unit *)value;
+ 
+-    tcg_debug_assert(addend == 0);
+     switch (type) {
+     case R_PPC_REL14:
+         reloc_pc14(code_ptr, target);
+@@ -234,6 +238,12 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
+     case R_PPC_REL24:
+         reloc_pc24(code_ptr, target);
+         break;
++    case R_PPC_ADDR16:
++        assert(value == (int16_t)value);
++        old = *code_ptr;
++        old = deposit32(old, 0, 16, value);
++        *code_ptr = old;
++        break;
+     default:
+         tcg_abort();
+     }
+@@ -676,6 +686,14 @@ static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
+         return;
+     }
+ 
++    /* Use the constant pool, if possible.  */
++    if (!in_prologue && USE_REG_TB) {
++        new_pool_label(s, arg, R_PPC_ADDR16, s->code_ptr,
++                       -(intptr_t)s->code_gen_ptr);
++        tcg_out32(s, LD | TAI(ret, TCG_REG_TB, 0));
++        return;
++    }
++
+     tmp = arg >> 31 >> 1;
+     tcg_out_movi(s, TCG_TYPE_I32, ret, tmp);
+     if (tmp) {
+@@ -1858,6 +1876,14 @@ static void tcg_out_qemu_st(TCGContext *s, const TCGArg *args, bool is_64)
+ #endif
  }
  
-+/* Emit a move into ret of arg, if it can be done in one insn.  */
-+static bool tcg_out_movi_one(TCGContext *s, TCGReg ret, tcg_target_long arg)
++static void tcg_out_nop_fill(tcg_insn_unit *p, int count)
 +{
-+    if (arg == (int16_t)arg) {
-+        tcg_out32(s, ADDI | TAI(ret, 0, arg));
-+        return true;
++    int i;
++    for (i = 0; i < count; ++i) {
++        p[i] = NOP;
 +    }
-+    if (arg == (int32_t)arg && (arg & 0xffff) == 0) {
-+        tcg_out32(s, ADDIS | TAI(ret, 0, arg >> 16));
-+        return true;
-+    }
-+    return false;
 +}
 +
- static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
-                              tcg_target_long arg, bool in_prologue)
- {
-     intptr_t tb_diff;
--    int32_t high;
-+    tcg_target_long tmp;
-+    int shift;
- 
-     tcg_debug_assert(TCG_TARGET_REG_BITS == 64 || type == TCG_TYPE_I32);
- 
-@@ -606,8 +621,7 @@ static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
-     }
- 
-     /* Load 16-bit immediates with one insn.  */
--    if (arg == (int16_t)arg) {
--        tcg_out32(s, ADDI | TAI(ret, 0, arg));
-+    if (tcg_out_movi_one(s, ret, arg)) {
-         return;
-     }
- 
-@@ -618,12 +632,11 @@ static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
-         return;
-     }
- 
--    /* Load 32-bit immediates with two insns.  */
-+    /* Load 32-bit immediates with two insns.  Note that we've already
-+       eliminated bare ADDIS, so we know both insns are required.  */
-     if (TCG_TARGET_REG_BITS == 32 || arg == (int32_t)arg) {
-         tcg_out32(s, ADDIS | TAI(ret, 0, arg >> 16));
--        if (arg & 0xffff) {
--            tcg_out32(s, ORI | SAI(ret, ret, arg));
--        }
-+        tcg_out32(s, ORI | SAI(ret, ret, arg));
-         return;
-     }
-     if (arg == (uint32_t)arg && !(arg & 0x8000)) {
-@@ -632,15 +645,40 @@ static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
-         return;
-     }
- 
-+    /* Load masked 16-bit value.  */
-+    if (arg > 0 && (arg & 0x8000)) {
-+        tmp = arg | 0x7fff;
-+        if ((tmp & (tmp + 1)) == 0) {
-+            int mb = clz64(tmp + 1) + 1;
-+            tcg_out32(s, ADDI | TAI(ret, 0, arg));
-+            tcg_out_rld(s, RLDICL, ret, ret, 0, mb);
-+            return;
-+        }
-+    }
-+
-+    /* Load common masks with 2 insns.  */
-+    shift = ctz64(arg);
-+    tmp = arg >> shift;
-+    if (tmp == (int16_t)tmp) {
-+        tcg_out32(s, ADDI | TAI(ret, 0, tmp));
-+        tcg_out_shli64(s, ret, ret, shift);
-+        return;
-+    }
-+    shift = clz64(arg);
-+    if (tcg_out_movi_one(s, ret, arg << shift)) {
-+        tcg_out_shri64(s, ret, ret, shift);
-+        return;
-+    }
-+
-     /* Load addresses within 2GB of TB with 2 (or rarely 3) insns.  */
-     if (!in_prologue && USE_REG_TB && tb_diff == (int32_t)tb_diff) {
-         tcg_out_mem_long(s, ADDI, ADD, ret, TCG_REG_TB, tb_diff);
-         return;
-     }
- 
--    high = arg >> 31 >> 1;
--    tcg_out_movi(s, TCG_TYPE_I32, ret, high);
--    if (high) {
-+    tmp = arg >> 31 >> 1;
-+    tcg_out_movi(s, TCG_TYPE_I32, ret, tmp);
-+    if (tmp) {
-         tcg_out_shli64(s, ret, ret, 32);
-     }
-     if (arg & 0xffff0000) {
+ /* Parameters for function call generation, used in tcg.c.  */
+ #define TCG_TARGET_STACK_ALIGN       16
+ #define TCG_TARGET_EXTEND_ARGS       1
 -- 
 2.13.5
