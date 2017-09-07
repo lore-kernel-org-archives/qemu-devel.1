@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56411)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwr2-0000zn-4N
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:33 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwr2-0000zp-6N
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwqw-0007d8-VM
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwqv-0007cJ-QF
 	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:24 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37186)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dpwqw-0007Xf-MX
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:18 -0400
+	id 1dpwqv-0007Xf-H6
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:17 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwqm-0001Xz-Jf
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:28:08 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwqo-0001ZH-Hv
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:28:10 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  7 Sep 2017 14:28:00 +0100
-Message-Id: <1504790904-17018-8-git-send-email-peter.maydell@linaro.org>
+Date: Thu,  7 Sep 2017 14:28:03 +0100
+Message-Id: <1504790904-17018-11-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1504790904-17018-1-git-send-email-peter.maydell@linaro.org>
 References: <1504790904-17018-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 07/31] hw/arm/allwinner-a10: Mark the
- allwinner-a10 device with user_creatable = false
+Subject: [Qemu-devel] [PULL 10/31] target/arm: Add state field,
+ feature bit and migration for v8M secure state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +30,138 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Thomas Huth <thuth@redhat.com>
+As the first step in implementing ARM v8M's security extension:
+ * add a new feature bit ARM_FEATURE_M_SECURITY
+ * add the CPU state field that indicates whether the CPU is
+   currently in the secure state
+ * add a migration subsection for this new state
+   (we will add the Secure copies of banked register state
+   to this subsection in later patches)
+ * add a #define for the one new-in-v8M exception type
+ * make the CPU debug log print S/NS status
 
-QEMU currently exits unexpectedly when the user accidentially
-tries to do something like this:
-
-$ aarch64-softmmu/qemu-system-aarch64 -S -M integratorcp -nographic
-QEMU 2.9.93 monitor - type 'help' for more information
-(qemu) device_add allwinner-a10
-Unsupported NIC model: smc91c111
-
-Exiting just due to a "device_add" should not happen. Looking closer
-at the the realize and instance_init function of this device also
-reveals that it is using serial_hds and nd_table directly there, so
-this device is clearly not creatable by the user and should be marked
-accordingly.
-
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-id: 1503416789-32080-1-git-send-email-thuth@redhat.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 1503414539-28762-4-git-send-email-peter.maydell@linaro.org
 ---
- hw/arm/allwinner-a10.c    | 2 ++
- scripts/device-crash-test | 1 -
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ target/arm/cpu.h       |  3 +++
+ target/arm/cpu.c       |  4 ++++
+ target/arm/machine.c   | 20 ++++++++++++++++++++
+ target/arm/translate.c |  8 +++++++-
+ 4 files changed, 34 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index f62a9a3..43a3f01 100644
---- a/hw/arm/allwinner-a10.c
-+++ b/hw/arm/allwinner-a10.c
-@@ -118,6 +118,8 @@ static void aw_a10_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 9fd5de7..02919a3 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -66,6 +66,7 @@
+ #define ARMV7M_EXCP_MEM     4
+ #define ARMV7M_EXCP_BUS     5
+ #define ARMV7M_EXCP_USAGE   6
++#define ARMV7M_EXCP_SECURE  7
+ #define ARMV7M_EXCP_SVC     11
+ #define ARMV7M_EXCP_DEBUG   12
+ #define ARMV7M_EXCP_PENDSV  14
+@@ -420,6 +421,7 @@ typedef struct CPUARMState {
+         int exception;
+         uint32_t primask;
+         uint32_t faultmask;
++        uint32_t secure; /* Is CPU in Secure state? (not guest visible) */
+     } v7m;
  
-     dc->realize = aw_a10_realize;
-+    /* Reason: Uses serial_hds in realize and nd_table in instance_init */
-+    dc->user_creatable = false;
- }
+     /* Information associated with an exception about to be taken:
+@@ -1263,6 +1265,7 @@ enum arm_features {
+     ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings */
+     ARM_FEATURE_PMU, /* has PMU support */
+     ARM_FEATURE_VBAR, /* has cp15 VBAR */
++    ARM_FEATURE_M_SECURITY, /* M profile Security Extension */
+ };
  
- static const TypeInfo aw_a10_type_info = {
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index e77b693..81d65b9 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -187,7 +187,6 @@ ERROR_WHITELIST = [
-     {'log':r"Device [\w.,-]+ can not be dynamically instantiated"},
-     {'log':r"Platform Bus: Can not fit MMIO region of size "},
-     # other more specific errors we will ignore:
--    {'device':'allwinner-a10', 'log':"Unsupported NIC model:"},
-     {'device':'.*-spapr-cpu-core', 'log':r"CPU core type should be"},
-     {'log':r"MSI(-X)? is not supported by interrupt controller"},
-     {'log':r"pxb-pcie? devices cannot reside on a PCIe? bus"},
+ static inline int arm_feature(CPUARMState *env, int feature)
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 8b610de..f32317e 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -185,6 +185,10 @@ static void arm_cpu_reset(CPUState *s)
+         uint32_t initial_pc; /* Loaded from 0x4 */
+         uint8_t *rom;
+ 
++        if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
++            env->v7m.secure = true;
++        }
++
+         /* The reset value of this bit is IMPDEF, but ARM recommends
+          * that it resets to 1, so QEMU always does that rather than making
+          * it dependent on CPU model.
+diff --git a/target/arm/machine.c b/target/arm/machine.c
+index 7b6f9de..f70fcf3 100644
+--- a/target/arm/machine.c
++++ b/target/arm/machine.c
+@@ -235,6 +235,25 @@ static const VMStateDescription vmstate_pmsav8 = {
+     }
+ };
+ 
++static bool m_security_needed(void *opaque)
++{
++    ARMCPU *cpu = opaque;
++    CPUARMState *env = &cpu->env;
++
++    return arm_feature(env, ARM_FEATURE_M_SECURITY);
++}
++
++static const VMStateDescription vmstate_m_security = {
++    .name = "cpu/m-security",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = m_security_needed,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(env.v7m.secure, ARMCPU),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ static int get_cpsr(QEMUFile *f, void *opaque, size_t size,
+                     VMStateField *field)
+ {
+@@ -485,6 +504,7 @@ const VMStateDescription vmstate_arm_cpu = {
+         &vmstate_pmsav7_rnr,
+         &vmstate_pmsav7,
+         &vmstate_pmsav8,
++        &vmstate_m_security,
+         NULL
+     }
+ };
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index e52a6d7..dea0a6f 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -12232,6 +12232,11 @@ void arm_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+     if (arm_feature(env, ARM_FEATURE_M)) {
+         uint32_t xpsr = xpsr_read(env);
+         const char *mode;
++        const char *ns_status = "";
++
++        if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
++            ns_status = env->v7m.secure ? "S " : "NS ";
++        }
+ 
+         if (xpsr & XPSR_EXCP) {
+             mode = "handler";
+@@ -12243,13 +12248,14 @@ void arm_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
+             }
+         }
+ 
+-        cpu_fprintf(f, "XPSR=%08x %c%c%c%c %c %s\n",
++        cpu_fprintf(f, "XPSR=%08x %c%c%c%c %c %s%s\n",
+                     xpsr,
+                     xpsr & XPSR_N ? 'N' : '-',
+                     xpsr & XPSR_Z ? 'Z' : '-',
+                     xpsr & XPSR_C ? 'C' : '-',
+                     xpsr & XPSR_V ? 'V' : '-',
+                     xpsr & XPSR_T ? 'T' : 'A',
++                    ns_status,
+                     mode);
+     } else {
+         uint32_t psr = cpsr_read(env);
 -- 
 2.7.4
