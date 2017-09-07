@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58034)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dpzrW-0005XO-8F
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:41:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpzz3-0000Hn-P1
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:48:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dpzrR-0000PJ-D6
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:41:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52640)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dpzrR-0000P0-6g
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:41:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dpzrO-0001vz-8z
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 16:40:58 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F14F32E846C
-	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 16:40:57 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1dpzyz-0005go-5s
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:48:53 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:33572)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dpzyy-0005gO-UM
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:48:49 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id a43so544394wrc.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 09:48:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 07 Sep 2017 16:31:14 -0000
-From: Aleksei Kovura <alex3kov@zoho.com>
-Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715700] [NEW] Windows 7 guest won't boot on qemu
- 2.10 (works on 2.9)
+In-Reply-To: <1504790904-17018-1-git-send-email-peter.maydell@linaro.org>
+References: <1504790904-17018-1-git-send-email-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Sep 2017 17:48:26 +0100
+Message-ID: <CAFEAcA8QdJVVmeXVfg8=8Fr3CwwbCwCnA0FQn=L1u5rFYeDm0A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/31] target-arm queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,84 +28,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-Public bug reported:
+On 7 September 2017 at 14:27, Peter Maydell <peter.maydell@linaro.org> wrote:
+> Second ARM pull request of this week; this one has my next
+> set of v8M patches and a handful of more minor stuff from
+> other people.
+>
+> thanks
+> -- PMM
+>
+> The following changes since commit 8ee5f9b3ecc94e3eb7a8235f4b2c3ec9024807f6:
+>
+>   Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into staging (2017-09-07 10:45:18 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20170907
+>
+> for you to fetch changes up to c99a55d38dd5b5131f3fcbbaf41828a09ee62544:
+>
+>   target/arm: Add Jazelle feature (2017-09-07 13:54:55 +0100)
+>
+> ----------------------------------------------------------------
+> target-arm:
+>  * cleanups converting to DEFINE_PROP_LINK
+>  * allwinner-a10: mark as not user-creatable
+>  * initial patches working towards ARMv8M support
+>  * implement generating aborts on memory transaction failures
+>  * make BXJ behave correctly (ie not UNDEF) on ARMv6-and-later
 
-Qemu version: 2.10 stable.
-Guest: Windows 7 SP1 x64, virtio drivers are already installed in the guest.
-Command line:
-qemu-system-x86_64 \
-    -nodefaults \
-    -nodefconfig \
-    -machine type=3Dq35,accel=3Dkvm \
-    -enable-kvm \
-    -cpu host \
-    -m 2048 \
-    -vga virtio \
-    -boot menu=3Don \
-    -smbios file=3D/path/dmidecode_BIOS.bin \
-    -acpitable file=3D/path/acpi_slic.bin \
-    -bios /path/OVMF_CODE.fd \
-    -net none \
-    -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
-    -device pcie-root-port \
-    -device ich9-usb-ehci1 \
-    -device ich9-usb-uhci1 \
-    -device ich9-usb-uhci2 \
-    -device ich9-usb-uhci3
+Applied, thanks.
 
-Windows hangs at boot with waving flag screen (flag doesn't freeze,
-keeps waving indefinitely). Same command line boots fine with Qemu 2.9.
-I tried changing machine type to pc-q35-2.9 - same result.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: windows
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715700
-
-Title:
-  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu version: 2.10 stable.
-  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
-st.
-  Command line:
-  qemu-system-x86_64 \
-      -nodefaults \
-      -nodefconfig \
-      -machine type=3Dq35,accel=3Dkvm \
-      -enable-kvm \
-      -cpu host \
-      -m 2048 \
-      -vga virtio \
-      -boot menu=3Don \
-      -smbios file=3D/path/dmidecode_BIOS.bin \
-      -acpitable file=3D/path/acpi_slic.bin \
-      -bios /path/OVMF_CODE.fd \
-      -net none \
-      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
-      -device pcie-root-port \
-      -device ich9-usb-ehci1 \
-      -device ich9-usb-uhci1 \
-      -device ich9-usb-uhci2 \
-      -device ich9-usb-uhci3
-
-  Windows hangs at boot with waving flag screen (flag doesn't freeze,
-  keeps waving indefinitely). Same command line boots fine with Qemu
-  2.9. I tried changing machine type to pc-q35-2.9 - same result.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
+-- PMM
