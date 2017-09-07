@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38615)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39634)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpsIF-0003E9-QX
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:36:17 -0400
+	(envelope-from <otubo@redhat.com>) id 1dpsKi-0005HQ-KW
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:38:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpsI6-0004HI-4E
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:36:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52780)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dpsI5-0004Gg-VK
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:36:02 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0A931356D0
-	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 08:36:01 +0000 (UTC)
-From: Fam Zheng <famz@redhat.com>
-Date: Thu,  7 Sep 2017 16:35:52 +0800
-Message-Id: <20170907083552.17725-3-famz@redhat.com>
-In-Reply-To: <20170907083552.17725-1-famz@redhat.com>
-References: <20170907083552.17725-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH 2/2] buildsys: Move vde libs to per object
+	(envelope-from <otubo@redhat.com>) id 1dpsKd-0006Cu-LN
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:38:44 -0400
+Date: Thu, 7 Sep 2017 10:38:29 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20170907083829.GB2441@vader>
+References: <20170901110332.32650-1-otubo@redhat.com>
+	<20170901143016.GK7570@localhost.localdomain>
+	<87lglyzb3p.fsf@dusky.pond.sub.org>
+	<20170901154430.GN7570@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170901154430.GN7570@localhost.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] dma/i82374: avoid double
+ creation of i82374 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +26,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Jason Wang <jasowang@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, mst@redhat.com, qemu-trivial@nongnu.org, qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, qemu-ppc@nongnu.org, pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- configure         | 3 +--
- net/Makefile.objs | 2 ++
- 2 files changed, 3 insertions(+), 2 deletions(-)
+On Fri, Sep 01, 2017 at 12:44:30PM -0300, Eduardo Habkost wrote:
+> On Fri, Sep 01, 2017 at 05:34:34PM +0200, Markus Armbruster wrote:
+> > Eduardo Habkost <ehabkost@redhat.com> writes:
+> > 
+> > > i82374 is compiled in only on ppc and sh4, so I'm CCing the
+> > > maintainers for those architectures.
+> > >
+> > > On Fri, Sep 01, 2017 at 01:03:32PM +0200, Eduardo Otubo wrote:
+> > >> When used with the following command line:
+> > >> 
+> > >>  ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
+> > >> 
+> > >> QEMU with machine type 40p already creates the device i82374. If
+> > >> specified in the command line, it will try to create it again, hence
+> > >> generating the error.
 
-diff --git a/configure b/configure
-index fb7e34a901..bc09487668 100755
---- a/configure
-+++ b/configure
-@@ -2963,8 +2963,6 @@ int main(void)
- EOF
-   if compile_prog "" "$vde_libs" ; then
-     vde=yes
--    libs_softmmu="$vde_libs $libs_softmmu"
--    libs_tools="$vde_libs $libs_tools"
-   else
-     if test "$vde" = "yes" ; then
-       feature_not_found "vde" "Install vde (Virtual Distributed Ethernet) devel"
-@@ -5545,6 +5543,7 @@ if test "$slirp" = "yes" ; then
- fi
- if test "$vde" = "yes" ; then
-   echo "CONFIG_VDE=y" >> $config_host_mak
-+  echo "VDE_LIBS=$vde_libs" >> $config_host_mak
- fi
- if test "$netmap" = "yes" ; then
-   echo "CONFIG_NETMAP=y" >> $config_host_mak
-diff --git a/net/Makefile.objs b/net/Makefile.objs
-index 67ba5e26fb..64adf32f40 100644
---- a/net/Makefile.objs
-+++ b/net/Makefile.objs
-@@ -21,3 +21,5 @@ tap-obj-$(CONFIG_SOLARIS) = tap-solaris.o
- tap-obj-y ?= tap-stub.o
- common-obj-$(CONFIG_POSIX) += tap.o $(tap-obj-y)
- common-obj-$(CONFIG_WIN32) += tap-win32.o
-+
-+vde.o-libs = $(VDE_LIBS)
+Well pointed, forgot to describe the actual error. I may inlcude for
+the next version of the patch. For for correctness sake, here it is:
+
+ ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
+ qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
+ Aborted (core dumped)
+
+> > >
+> > > Which error?
+> > >
+> > >
+> > >>                       One way to avoid this problem is to set
+> > >> user_creatable=false.
+> > >> 
+> > >> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> > >
+> > > The patch does more than just avoiding double creation: it
+> > > prevents usage of "-device i82374" completely.
+> > >
+> > > Maybe nobody needs it to work with -device today (would the
+> > > device even work?) and it is OK to set user_creatable=false until
+> > > we fix the crash.  But we need to be sure of that.
+> > >
+> > >> ---
+> > >>  hw/dma/i82374.c | 1 +
+> > >>  1 file changed, 1 insertion(+)
+> > >> 
+> > >> diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
+> > >> index 6c0f975df0..5275d822e0 100644
+> > >> --- a/hw/dma/i82374.c
+> > >> +++ b/hw/dma/i82374.c
+> > >> @@ -139,6 +139,7 @@ static void i82374_class_init(ObjectClass *klass, void *data)
+> > >>      dc->realize = i82374_realize;
+> > >>      dc->vmsd = &vmstate_i82374;
+> > >>      dc->props = i82374_properties;
+> > >> +    dc->user_creatable = false;
+> > >
+> > > A "Reason:" comment explaining why user_creatable=false is
+> > > mandatory.  See the comment above user_creatable declaration in
+> > > qdev-core.h for reference.
+> > >
+> > > I suggest the following:
+> > >
+> > >     /*
+> > >      * Reason: i82374_realize() crashes (assertion failure inside isa_bus_dma()
+> > >      *         if the device is instantiated twice.
+> > >      */
+
+I agree with the comment above. If there's nothing left to fix/add
+I'll just send a v2 for this shortly.
+
+> > 
+> > We need to find out *why* it crashes.  Once we know, we can likely write
+> > a better comment.
+> 
+> It crashes because isa_bus_dma() isn't supposed to be called
+> twice for the same bus.
+> 
+> Making isa_bus_dma()/DMA_init()/i82374_realize() return an error
+> instead of asserting would be even better than setting
+> user_creatable=false.
+> 
+> -- 
+> Eduardo
+> 
+
 -- 
-2.13.5
+Eduardo Otubo
+Senior Software Engineer @ RedHat
