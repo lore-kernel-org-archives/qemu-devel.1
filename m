@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54260)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56937)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpvR3-0002OW-5f
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 07:57:34 -0400
+	(envelope-from <peterx@redhat.com>) id 1dpvWS-00042I-Sz
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:03:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dpvQy-0002p9-Gz
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 07:57:29 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47182
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dpvQy-0002nu-CY
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 07:57:24 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v87BsEJe195801
-	for <qemu-devel@nongnu.org>; Thu, 7 Sep 2017 07:57:22 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cu32y08ge-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 07:57:22 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 7 Sep 2017 12:57:21 +0100
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu,  7 Sep 2017 13:57:00 +0200
-Message-Id: <20170907115700.69911-1-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 1/1] s390x/css: drop data-check in
- interpretation
+	(envelope-from <peterx@redhat.com>) id 1dpvWN-0005P4-Kn
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:03:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49760)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dpvWN-0005OQ-C7
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:02:59 -0400
+Date: Thu, 7 Sep 2017 20:02:27 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170907120227.GE23040@pxdev.xzpeter.org>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<20170906145043.GG15535@stefanha-x1.localdomain>
+	<20170906151436.GF2215@work-vm>
+	<CAJSP0QUu45oPTL2JErTWAt7OFrHpcB-88EvGBwVAKxn0CE=ebg@mail.gmail.com>
+	<20170907093546.GE2098@work-vm>
+	<CAJSP0QWA2gci=PxKDVEWQNhxDv-9pDdJzyWdQut=Zkr+rCb+3A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAJSP0QWA2gci=PxKDVEWQNhxDv-9pDdJzyWdQut=Zkr+rCb+3A@mail.gmail.com>
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,75 +31,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-The architecture says that channel-data check is indicating that
-an uncorrected storage (memory) error has been detected in regard
-to the data residing in main storage (memory) that is currently
-used for an I/O operation. The described detection is done using
-the CBC technology.
+On Thu, Sep 07, 2017 at 11:09:29AM +0100, Stefan Hajnoczi wrote:
+> On Thu, Sep 7, 2017 at 10:35 AM, Dr. David Alan Gilbert
+> <dgilbert@redhat.com> wrote:
+> > * Stefan Hajnoczi (stefanha@gmail.com) wrote:
+> >> On Wed, Sep 6, 2017 at 4:14 PM, Dr. David Alan Gilbert
+> >> <dgilbert@redhat.com> wrote:
+> >> > * Stefan Hajnoczi (stefanha@gmail.com) wrote:
+> >> >> On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
+> >> >> > The root problem is that, monitor commands are all handled in main
+> >> >> > loop thread now, no matter how many monitors we specify. And, if main
+> >> >> > loop thread hangs due to some reason, all monitors will be stuck.
+> >> >>
+> >> >> I see a larger issue with postcopy: existing QEMU code assumes that
+> >> >> guest memory access is instantaneous.
+> >> >>
+> >> >> Postcopy breaks this assumption and introduces blocking points that can
+> >> >> now take unbounded time.
+> >> >>
+> >> >> This problem isn't specific to the monitor.  It can also happen to other
+> >> >> components in QEMU like the gdbstub.
+> >> >>
+> >> >> Do we need an asynchronous memory API?  Synchronous memory access should
+> >> >> only be allowed in vcpu threads.
+> >> >
+> >> > It would probably be useful for gdbstub where the overhead of async
+> >> > doesn't matter;  but doing that for all IO emulation is hard.
+> >>
+> >> Why is it hard?
+> >>
+> >> Memory access can be synchronous in the vcpu thread.  That eliminates
+> >> a lot of code straight away.
+> >>
+> >> Anything using dma-helpers.c is already async.  They just don't know
+> >> that the memory access part is being made async too :).
+> >
+> > Can you point me to some info on that ?
+> 
+> IDE and SCSI use dma-helpers.c to perform I/O:
+> hw/ide/core.c:892:        s->bus->dma->aiocb =
+> dma_blk_io(blk_get_aio_context(s->blk),
+> hw/ide/macio.c:189:        s->bus->dma->aiocb =
+> dma_blk_io(blk_get_aio_context(s->blk), &s->sg,
+> hw/scsi/scsi-disk.c:348:        r->req.aiocb =
+> dma_blk_io(blk_get_aio_context(s->qdev.conf.blk),
+> hw/scsi/scsi-disk.c:551:        r->req.aiocb =
+> dma_blk_io(blk_get_aio_context(s->qdev.conf.blk),
+> 
+> They pass a scatter-gather list of guest RAM addresses to
+> dma-helpers.c.  They receive a callback when I/O has finished.
+> 
+> Try following the code path.  Request submission may be from a vcpu
+> thread or IOThread.  Completion occurs in the main loop or an
+> IOThread.
+> 
+> The main point is that this API is already asynchronous.  If any
+> changes are needed for async guest memory access (not sure, I haven't
+> checked), then at least the dma-helpers.c users do not need to be
+> modified.
+> 
+> >> The remaining cases are virtio and some other devices.
+> >>
+> >> If you are worried about performance, the first rule is that async
+> >> memory access is only needed on the destination side when post-copy is
+> >> active.  Maybe use setjmp to return from the signal handler and queue
+> >> a callback for when the page has been loaded.
+> >
+> > I'm not sure it's worth trying to be too clever at avoiding this;
+> > I see the fact that we're doing IO with the bql held as a more
+> > fundamental problem.
+> 
+> QEMU should be doing I/O syscalls in async fashion or threadpool
+> workers (no BQL) so the BQL is not an issue.  Anything else could
+> cause unbounded waits even without postcopy.
 
-The ccw interpretation code is however generating a channel-data check
-effectively when the (device specific) ccw_cb returns -EFAULT.  In case
-of virtio-ccw devices this happens when mapping memory fails, or when a
-NULL pointer is encountered. So this behavior is not architecture
-conform.
+E.g. when vcpu got page faulted with BQL taken, while the main thread
+needs the BQL to dispatch anything, including monitor commands.
 
-Furthermore the best fit for these situations (null pointer, mapping a
-piece of guest memory fails) from architectural perspective the condition
-described as the channel subsystem refers to a location that is not
-available, which when encountered shall result in a channel-program
-check.
+So I think it's a multiplex problem - we need to solve both (1) main
+thread accessing guest memories which is still missing, and (2) BQL
+deadlocks between vcpu threads and main thread.
 
-To fix this, all we have to do is to get rid of the switch case matching
--EFAULT: the default is generating a channel-program check.
+Thanks,
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
----
-
-References
------------
-
-1. paragraph: PoP page 16-42 "Channel-Data Check".
-3. paragraph: PoP page 15-59 "Designation of Storage Area"
-
-Side note on usage of error codes
-----------------------------------
-
-I'm currently having a patch set under discussion which aims to move away
-from mapping CSS conditions to error codes and back for the IO
-instruction handlers. IMHO as of today the given usage of the error codes
-is rather obfuscating the source code than contributing to clarity. I've
-experimented with a bunch of changes to improve on the readability of the
-code, but did not settle about if and what to do yet (the main problem is
-the gains not solid and quite limited -- it's hard to justify churn).
-
-If there is interest I would be happy to write up an RFC and start a
-discussion on what makes sense and what does not.
----
- hw/s390x/css.c | 9 ---------
- 1 file changed, 9 deletions(-)
-
-diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 1880b1a0ff..72fb193676 100644
---- a/hw/s390x/css.c
-+++ b/hw/s390x/css.c
-@@ -980,15 +980,6 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
-                     SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
-             s->cpa = sch->channel_prog + 8;
-             break;
--        case -EFAULT:
--            /* memory problem, generate channel data check */
--            s->ctrl &= ~SCSW_ACTL_START_PEND;
--            s->cstat = SCSW_CSTAT_DATA_CHECK;
--            s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
--            s->ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
--                    SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
--            s->cpa = sch->channel_prog + 8;
--            break;
-         case -EBUSY:
-             /* subchannel busy, generate deferred cc 1 */
-             s->flags &= ~SCSW_FLAGS_MASK_CC;
 -- 
-2.13.5
+Peter Xu
