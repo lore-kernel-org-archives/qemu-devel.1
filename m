@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwr9-000141-Ck
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:39 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwrC-00017d-JS
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwqy-0007eZ-Kc
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:31 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37190)
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwr2-0007hU-Hi
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:34 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37200)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dpwqy-0007ak-DM
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:20 -0400
+	id 1dpwr2-0007gC-AD
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:24 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwqj-0001VJ-5u
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:28:05 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwr0-0001hd-V6
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:28:22 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  7 Sep 2017 14:27:55 +0100
-Message-Id: <1504790904-17018-3-git-send-email-peter.maydell@linaro.org>
+Date: Thu,  7 Sep 2017 14:28:21 +0100
+Message-Id: <1504790904-17018-29-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1504790904-17018-1-git-send-email-peter.maydell@linaro.org>
 References: <1504790904-17018-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 02/31] armv7m: Convert armv7m.memory to
- DEFINE_PROP_LINK
+Subject: [Qemu-devel] [PULL 28/31] boards.h: Define new flag
+ ignore_memory_transaction_failures
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,42 +30,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Fam Zheng <famz@redhat.com>
+Define a new MachineClass field ignore_memory_transaction_failures.
+If this is flag is true then the CPU will ignore memory transaction
+failures which should cause the CPU to take an exception due to an
+access to an unassigned physical address; the transaction will
+instead return zero (for a read) or be ignored (for a write).  This
+should be set only by legacy board models which rely on the old
+RAZ/WI behaviour for handling devices that QEMU does not yet model.
+New board models should instead use "unimplemented-device" for all
+memory ranges where the guest will attempt to probe for a device that
+QEMU doesn't implement and a stub device is required.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20170905131149.10669-3-famz@redhat.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+We need this for ARM boards, where we're about to implement support for
+generating external aborts on memory transaction failures. Too many
+of our legacy board models rely on the RAZ/WI behaviour and we
+would break currently working guests when their "probe for device"
+code provoked an external abort rather than a RAZ.
+
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Message-id: 1504626814-23124-2-git-send-email-peter.maydell@linaro.org
 ---
- hw/arm/armv7m.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ include/hw/boards.h | 11 +++++++++++
+ include/qom/cpu.h   |  7 ++++++-
+ qom/cpu.c           | 16 ++++++++++++++++
+ 3 files changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
-index 4c560dd..b64a409 100644
---- a/hw/arm/armv7m.c
-+++ b/hw/arm/armv7m.c
-@@ -132,12 +132,6 @@ static void armv7m_instance_init(Object *obj)
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 3363dd1..7f044d1 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -131,6 +131,16 @@ typedef struct {
+  *    size than the target architecture's minimum. (Attempting to create
+  *    such a CPU will fail.) Note that changing this is a migration
+  *    compatibility break for the machine.
++ * @ignore_memory_transaction_failures:
++ *    If this is flag is true then the CPU will ignore memory transaction
++ *    failures which should cause the CPU to take an exception due to an
++ *    access to an unassigned physical address; the transaction will instead
++ *    return zero (for a read) or be ignored (for a write). This should be
++ *    set only by legacy board models which rely on the old RAZ/WI behaviour
++ *    for handling devices that QEMU does not yet model. New board models
++ *    should instead use "unimplemented-device" for all memory ranges where
++ *    the guest will attempt to probe for a device that QEMU doesn't
++ *    implement and a stub device is required.
+  */
+ struct MachineClass {
+     /*< private >*/
+@@ -171,6 +181,7 @@ struct MachineClass {
+     bool rom_file_has_mr;
+     int minimum_page_bits;
+     bool has_hotpluggable_cpus;
++    bool ignore_memory_transaction_failures;
+     int numa_mem_align_shift;
+     void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
+                                  int nb_nodes, ram_addr_t size);
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 08bd868..995a7be 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -312,6 +312,9 @@ struct qemu_work_item;
+  * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
+  *                        to @trace_dstate).
+  * @trace_dstate: Dynamic tracing state of events for this vCPU (bitmask).
++ * @ignore_memory_transaction_failures: Cached copy of the MachineState
++ *    flag of the same name: allows the board to suppress calling of the
++ *    CPU do_transaction_failed hook function.
+  *
+  * State of one CPU core or thread.
+  */
+@@ -398,6 +401,8 @@ struct CPUState {
+      */
+     bool throttle_thread_scheduled;
  
-     /* Can't init the cpu here, we don't yet know which model to use */
++    bool ignore_memory_transaction_failures;
++
+     /* Note that this is accessed at the start of every TB via a negative
+        offset from AREG0.  Leave this field at the end so as to make the
+        (absolute value) offset as small as possible.  This reduces code
+@@ -864,7 +869,7 @@ static inline void cpu_transaction_failed(CPUState *cpu, hwaddr physaddr,
+ {
+     CPUClass *cc = CPU_GET_CLASS(cpu);
  
--    object_property_add_link(obj, "memory",
--                             TYPE_MEMORY_REGION,
--                             (Object **)&s->board_memory,
--                             qdev_prop_allow_set_link_before_realize,
--                             OBJ_PROP_LINK_UNREF_ON_RELEASE,
--                             &error_abort);
-     memory_region_init(&s->container, obj, "armv7m-container", UINT64_MAX);
+-    if (cc->do_transaction_failed) {
++    if (!cpu->ignore_memory_transaction_failures && cc->do_transaction_failed) {
+         cc->do_transaction_failed(cpu, physaddr, addr, size, access_type,
+                                   mmu_idx, attrs, response, retaddr);
+     }
+diff --git a/qom/cpu.c b/qom/cpu.c
+index deb8880..dc5392d 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -29,6 +29,7 @@
+ #include "exec/cpu-common.h"
+ #include "qemu/error-report.h"
+ #include "sysemu/sysemu.h"
++#include "hw/boards.h"
+ #include "hw/qdev-properties.h"
+ #include "trace-root.h"
  
-     object_initialize(&s->nvic, sizeof(s->nvic), TYPE_NVIC);
-@@ -248,6 +242,8 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+@@ -363,6 +364,21 @@ static void cpu_common_parse_features(const char *typename, char *features,
+ static void cpu_common_realizefn(DeviceState *dev, Error **errp)
+ {
+     CPUState *cpu = CPU(dev);
++    Object *machine = qdev_get_machine();
++
++    /* qdev_get_machine() can return something that's not TYPE_MACHINE
++     * if this is one of the user-only emulators; in that case there's
++     * no need to check the ignore_memory_transaction_failures board flag.
++     */
++    if (object_dynamic_cast(machine, TYPE_MACHINE)) {
++        ObjectClass *oc = object_get_class(machine);
++        MachineClass *mc = MACHINE_CLASS(oc);
++
++        if (mc) {
++            cpu->ignore_memory_transaction_failures =
++                mc->ignore_memory_transaction_failures;
++        }
++    }
  
- static Property armv7m_properties[] = {
-     DEFINE_PROP_STRING("cpu-model", ARMv7MState, cpu_model),
-+    DEFINE_PROP_LINK("memory", ARMv7MState, board_memory, TYPE_MEMORY_REGION,
-+                     MemoryRegion *),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
+     if (dev->hotplugged) {
+         cpu_synchronize_post_init(cpu);
 -- 
 2.7.4
