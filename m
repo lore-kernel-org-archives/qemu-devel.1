@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpwvd-00051Z-2t
+	(envelope-from <cohuck@redhat.com>) id 1dpwvh-00056z-Vz
 	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:33:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dpwvY-0001dw-5o
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:33:09 -0400
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-13-eblake@redhat.com>
-	<28a1f49b-ed07-8c46-eb0c-be9b92d106fe@redhat.com>
-	<1a55f8d5-b4d3-85c7-dab4-472ccc4dca52@redhat.com>
-	<a0e0335b-2d2f-6220-e2f7-24ef01bc2bad@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <b601702b-1a77-27cb-64f3-ffd6f441d0b3@redhat.com>
-Date: Thu, 7 Sep 2017 08:32:41 -0500
+	(envelope-from <cohuck@redhat.com>) id 1dpwvZ-0001eL-DT
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:33:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49264)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpwvZ-0001e4-73
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:33:05 -0400
+Date: Thu, 7 Sep 2017 15:32:59 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170907153259.744c2c79.cohuck@redhat.com>
+In-Reply-To: <20170904154316.4148-11-david@redhat.com>
+References: <20170904154316.4148-1-david@redhat.com>
+	<20170904154316.4148-11-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a0e0335b-2d2f-6220-e2f7-24ef01bc2bad@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="rc06sNRGVPXfGJe2kkIva9n7LTJC6mvd5"
-Subject: Re: [Qemu-devel] [PATCH v6 12/29] libqos: Track QTestState with
- QPCIBus
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 10/19] target/s390x: use
+ program_interrupt() in per_check_exception()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +28,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: "open list:IDE" <qemu-block@nongnu.org>, Alexander Graf <agraf@suse.de>, armbru@redhat.com, "open list:sPAPR" <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rc06sNRGVPXfGJe2kkIva9n7LTJC6mvd5
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: "open list:IDE" <qemu-block@nongnu.org>, Alexander Graf <agraf@suse.de>,
- armbru@redhat.com, "open list:sPAPR" <qemu-ppc@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>, pbonzini@redhat.com,
- John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <b601702b-1a77-27cb-64f3-ffd6f441d0b3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 12/29] libqos: Track QTestState with
- QPCIBus
-References: <20170901180340.30009-1-eblake@redhat.com>
- <20170901180340.30009-13-eblake@redhat.com>
- <28a1f49b-ed07-8c46-eb0c-be9b92d106fe@redhat.com>
- <1a55f8d5-b4d3-85c7-dab4-472ccc4dca52@redhat.com>
- <a0e0335b-2d2f-6220-e2f7-24ef01bc2bad@redhat.com>
-In-Reply-To: <a0e0335b-2d2f-6220-e2f7-24ef01bc2bad@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Mon,  4 Sep 2017 17:43:07 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-On 09/07/2017 12:35 AM, Thomas Huth wrote:
-> On 06.09.2017 23:00, Eric Blake wrote:
->> On 09/05/2017 04:36 AM, Thomas Huth wrote:
->>> On 01.09.2017 20:03, Eric Blake wrote:
->>>> When initializing a QPCIBus, track which QTestState the bus is
->>>> associated with (so that a later patch can then explicitly use
->>>> that test state for all communication on the bus, rather than
->>>> blindly relying on global_qtest).  Update the initialization
->>>> functions to take another parameter, and update all callers to
->>>> pass in state (for now, most callers get away with passing the
->>>> current global_qtest as the current state, although this required
->>>> fixing the order of initialization to ensure qtest_start() is
->>>> called before qpci_init*() in rtl8139-test, and provided an
->>>> opportunity to pass in the allocator in e1000e-test).
->>>>
+> Clean it up by reusing program_interrupt(). Add a concern regarding
+> ilen.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/misc_helper.c | 15 +++++++++------
+>  1 file changed, 9 insertions(+), 6 deletions(-)
+> 
+> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+> index 57c02ddf1b..5096286157 100644
+> --- a/target/s390x/misc_helper.c
+> +++ b/target/s390x/misc_helper.c
+> @@ -446,14 +446,17 @@ void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
+>  #ifndef CONFIG_USER_ONLY
+>  void HELPER(per_check_exception)(CPUS390XState *env)
+>  {
+> -    CPUState *cs = CPU(s390_env_get_cpu(env));
+> +    uint32_t ilen;
+>  
+>      if (env->per_perc_atmid) {
+> -        env->int_pgm_code = PGM_PER;
+> -        env->int_pgm_ilen = get_ilen(cpu_ldub_code(env, env->per_address));
+> -
+> -        cs->exception_index = EXCP_PGM;
+> -        cpu_loop_exit(cs);
+> +        /*
+> +         * FIXME: ILEN_AUTO is most probably the right thing to use. ilen
+> +         * always has to match the instruction referenced in the PSW. E.g.
+> +         * if a PER interrupt is triggered via EXECUTE, we have to use ilen
+> +         * of EXECUTE, while per_address contains the target of EXECUTE.
+> +         */
+> +        ilen = get_ilen(cpu_ldub_code(env, env->per_address));
+> +        program_interrupt(env, PGM_PER, ilen);
+>      }
+>  }
+>  
 
->>>
->>> Why did you remove the check for qs->alloc?
->>>
->>>> +            qs->pcibus =3D ops->qpci_init(qs->qts, qs->alloc);
->>
->> Because we want to ensure qpci_init() is called to set qs->qts
->> (presumably, whether or not qs->alloc is set).  Furthermore, only two
->> files declare a 'static QOSOps' structure in the first place
->> (libqos-pc.c and libqos-spapr.c); where both files set both the
->> .init_allocator and .qpci_init callbacks; a little bit of auditing sho=
-ws
->> that the .init_allocator() never returns NULL (although that requires
->> browsing yet more files for malloc-{pc,spapr}.c).
->=20
-> OK, thanks for the explanation! ... but maybe we should
-> g_assert(gs->alloc) somewhere instead? ... just an idea, I'm also fine
-> if you leave it away.
+Wrapping my head around it: You preserve the current behavior, which
+should probably be changed to use ILEN_AUTO to handle cases like
+EXECUTE correctly?
 
-Users of QOSOps always supply qs->alloc, but there are tests that
-successfully use NULL for qs->alloc (because they did not go through
-QOSOps).  At any rate, I can certainly update the commit message.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---rc06sNRGVPXfGJe2kkIva9n7LTJC6mvd5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmxSnkACgkQp6FrSiUn
-Q2r1sQf/QrtinnFcggT9xAf/6+fUdtySdAtHqdrOObfmLleRM/YmlQAMVtraW+JD
-KkcMIKwAyeRVR0v6KhTxFcXtF91LMySLw7cWuKHKvKwV3oW1vzJVtdM5ByHdYICc
-YKdLUTwtdYjczMKPu/84wKtILDCClANgOvYgudo3abc1cobTnBOAGIXQgy4a7Iku
-HaOXEI4Xiuk50dAK2xSrttfQ7dYOhqTEPSjoZK0Pd8Qg9FERovGh7TJhdtD8NHQW
-CGcWh9tn7iVMnh4gc/aKLMSErYF1O0V4NYmoywis+MfSQzZSt7Z7Db5Pp+BQe7RV
-sLrmEInaiyklMeLX6V5DNBz4m6efdg==
-=PgTy
------END PGP SIGNATURE-----
-
---rc06sNRGVPXfGJe2kkIva9n7LTJC6mvd5--
+Do you plan to do a follow up? (Should I spend some cycles on it?)
