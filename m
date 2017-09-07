@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48905)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpse5-0000BV-E8
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:58:50 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpseK-0000OG-05
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:59:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dpse0-0001Tb-PS
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:58:45 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33515)
+	(envelope-from <peter.maydell@linaro.org>) id 1dpseJ-0003P9-Bg
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:59:00 -0400
+Received: from mail-lf0-x22a.google.com ([2a00:1450:4010:c07::22a]:38786)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dpse0-0001Pc-JR
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:58:40 -0400
-Received: by mail-wm0-x242.google.com with SMTP id 187so923301wmn.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 01:58:40 -0700 (PDT)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dpseJ-0003JK-3c
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:58:59 -0400
+Received: by mail-lf0-x22a.google.com with SMTP id q132so22975868lfe.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 01:58:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170906151436.GF2215@work-vm>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<20170906145043.GG15535@stefanha-x1.localdomain>
-	<20170906151436.GF2215@work-vm>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 7 Sep 2017 09:58:38 +0100
-Message-ID: <CAJSP0QUu45oPTL2JErTWAt7OFrHpcB-88EvGBwVAKxn0CE=ebg@mail.gmail.com>
+In-Reply-To: <20170905180602.28698-1-f4bug@amsat.org>
+References: <20170905180602.28698-1-f4bug@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Sep 2017 09:58:37 +0100
+Message-ID: <CAFEAcA_iaNVc_L+HDwQONuj44f+mOQA_KEO7t9S2Th=URBP=6w@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3] vhost-user: disable the *broken*
+ subprocess tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +30,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Peter Xu <peterx@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Wed, Sep 6, 2017 at 4:14 PM, Dr. David Alan Gilbert
-<dgilbert@redhat.com> wrote:
-> * Stefan Hajnoczi (stefanha@gmail.com) wrote:
->> On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
->> > The root problem is that, monitor commands are all handled in main
->> > loop thread now, no matter how many monitors we specify. And, if main
->> > loop thread hangs due to some reason, all monitors will be stuck.
->>
->> I see a larger issue with postcopy: existing QEMU code assumes that
->> guest memory access is instantaneous.
->>
->> Postcopy breaks this assumption and introduces blocking points that can
->> now take unbounded time.
->>
->> This problem isn't specific to the monitor.  It can also happen to other
->> components in QEMU like the gdbstub.
->>
->> Do we need an asynchronous memory API?  Synchronous memory access should
->> only be allowed in vcpu threads.
+On 5 September 2017 at 19:06, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
+> tests/vhost-user-test keeps failing on build-system since Aug 15:
 >
-> It would probably be useful for gdbstub where the overhead of async
-> doesn't matter;  but doing that for all IO emulation is hard.
+>   ERROR:tests/vhost-user-test.c:835:test_flags_mismatch: child process (/=
+i386/vhost-user/flags-mismatch/subprocess [4836]) failed unexpectedly
+> ...
+>   ERROR:tests/vhost-user-test.c:807:test_connect_fail: child process (/x8=
+6_64/vhost-user/connect-fail/subprocess [58910]) failed unexpectedly
+>
+> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> ---
+> v3: only disable tests using glib subprocess,
+>     migrate/multiqueue/guest-mem are still tested.
+>
+> v2: remove unuseful warning
 
-Why is it hard?
+Applied, thanks.
 
-Memory access can be synchronous in the vcpu thread.  That eliminates
-a lot of code straight away.
-
-Anything using dma-helpers.c is already async.  They just don't know
-that the memory access part is being made async too :).
-
-The remaining cases are virtio and some other devices.
-
-If you are worried about performance, the first rule is that async
-memory access is only needed on the destination side when post-copy is
-active.  Maybe use setjmp to return from the signal handler and queue
-a callback for when the page has been loaded.
-
-Stefan
+-- PMM
