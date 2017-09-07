@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwr2-0000zp-6N
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwr2-0000zy-My
 	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwqv-0007cJ-QF
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwqx-0007ds-Te
 	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:24 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37186)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37192)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dpwqv-0007Xf-H6
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:17 -0400
+	id 1dpwqx-0007bf-NK
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:28:19 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dpwqo-0001ZH-Hv
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:28:10 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dpwqk-0001Vn-K6
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:28:06 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu,  7 Sep 2017 14:28:03 +0100
-Message-Id: <1504790904-17018-11-git-send-email-peter.maydell@linaro.org>
+Date: Thu,  7 Sep 2017 14:27:57 +0100
+Message-Id: <1504790904-17018-5-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1504790904-17018-1-git-send-email-peter.maydell@linaro.org>
 References: <1504790904-17018-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 10/31] target/arm: Add state field,
- feature bit and migration for v8M secure state
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 04/31] xlnx_zynqmp: Convert to DEFINE_PROP_LINK
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,138 +32,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-As the first step in implementing ARM v8M's security extension:
- * add a new feature bit ARM_FEATURE_M_SECURITY
- * add the CPU state field that indicates whether the CPU is
-   currently in the secure state
- * add a migration subsection for this new state
-   (we will add the Secure copies of banked register state
-   to this subsection in later patches)
- * add a #define for the one new-in-v8M exception type
- * make the CPU debug log print S/NS status
+From: Fam Zheng <famz@redhat.com>
 
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20170905131149.10669-5-famz@redhat.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1503414539-28762-4-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/cpu.h       |  3 +++
- target/arm/cpu.c       |  4 ++++
- target/arm/machine.c   | 20 ++++++++++++++++++++
- target/arm/translate.c |  8 +++++++-
- 4 files changed, 34 insertions(+), 1 deletion(-)
+ hw/arm/xlnx-zynqmp.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 9fd5de7..02919a3 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -66,6 +66,7 @@
- #define ARMV7M_EXCP_MEM     4
- #define ARMV7M_EXCP_BUS     5
- #define ARMV7M_EXCP_USAGE   6
-+#define ARMV7M_EXCP_SECURE  7
- #define ARMV7M_EXCP_SVC     11
- #define ARMV7M_EXCP_DEBUG   12
- #define ARMV7M_EXCP_PENDSV  14
-@@ -420,6 +421,7 @@ typedef struct CPUARMState {
-         int exception;
-         uint32_t primask;
-         uint32_t faultmask;
-+        uint32_t secure; /* Is CPU in Secure state? (not guest visible) */
-     } v7m;
- 
-     /* Information associated with an exception about to be taken:
-@@ -1263,6 +1265,7 @@ enum arm_features {
-     ARM_FEATURE_THUMB_DSP, /* DSP insns supported in the Thumb encodings */
-     ARM_FEATURE_PMU, /* has PMU support */
-     ARM_FEATURE_VBAR, /* has cp15 VBAR */
-+    ARM_FEATURE_M_SECURITY, /* M profile Security Extension */
- };
- 
- static inline int arm_feature(CPUARMState *env, int feature)
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 8b610de..f32317e 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -185,6 +185,10 @@ static void arm_cpu_reset(CPUState *s)
-         uint32_t initial_pc; /* Loaded from 0x4 */
-         uint8_t *rom;
- 
-+        if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+            env->v7m.secure = true;
-+        }
-+
-         /* The reset value of this bit is IMPDEF, but ARM recommends
-          * that it resets to 1, so QEMU always does that rather than making
-          * it dependent on CPU model.
-diff --git a/target/arm/machine.c b/target/arm/machine.c
-index 7b6f9de..f70fcf3 100644
---- a/target/arm/machine.c
-+++ b/target/arm/machine.c
-@@ -235,6 +235,25 @@ static const VMStateDescription vmstate_pmsav8 = {
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 9eceadb..22c2a33 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -140,11 +140,6 @@ static void xlnx_zynqmp_init(Object *obj)
+                                   &error_abort);
      }
+ 
+-    object_property_add_link(obj, "ddr-ram", TYPE_MEMORY_REGION,
+-                             (Object **)&s->ddr_ram,
+-                             qdev_prop_allow_set_link_before_realize,
+-                             OBJ_PROP_LINK_UNREF_ON_RELEASE, &error_abort);
+-
+     object_initialize(&s->gic, sizeof(s->gic), gic_class_name());
+     qdev_set_parent_bus(DEVICE(&s->gic), sysbus_get_default());
+ 
+@@ -433,6 +428,8 @@ static Property xlnx_zynqmp_props[] = {
+     DEFINE_PROP_STRING("boot-cpu", XlnxZynqMPState, boot_cpu),
+     DEFINE_PROP_BOOL("secure", XlnxZynqMPState, secure, false),
+     DEFINE_PROP_BOOL("has_rpu", XlnxZynqMPState, has_rpu, false),
++    DEFINE_PROP_LINK("ddr-ram", XlnxZynqMPState, ddr_ram, TYPE_MEMORY_REGION,
++                     MemoryRegion *),
+     DEFINE_PROP_END_OF_LIST()
  };
  
-+static bool m_security_needed(void *opaque)
-+{
-+    ARMCPU *cpu = opaque;
-+    CPUARMState *env = &cpu->env;
-+
-+    return arm_feature(env, ARM_FEATURE_M_SECURITY);
-+}
-+
-+static const VMStateDescription vmstate_m_security = {
-+    .name = "cpu/m-security",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = m_security_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(env.v7m.secure, ARMCPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static int get_cpsr(QEMUFile *f, void *opaque, size_t size,
-                     VMStateField *field)
- {
-@@ -485,6 +504,7 @@ const VMStateDescription vmstate_arm_cpu = {
-         &vmstate_pmsav7_rnr,
-         &vmstate_pmsav7,
-         &vmstate_pmsav8,
-+        &vmstate_m_security,
-         NULL
-     }
- };
-diff --git a/target/arm/translate.c b/target/arm/translate.c
-index e52a6d7..dea0a6f 100644
---- a/target/arm/translate.c
-+++ b/target/arm/translate.c
-@@ -12232,6 +12232,11 @@ void arm_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-     if (arm_feature(env, ARM_FEATURE_M)) {
-         uint32_t xpsr = xpsr_read(env);
-         const char *mode;
-+        const char *ns_status = "";
-+
-+        if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-+            ns_status = env->v7m.secure ? "S " : "NS ";
-+        }
- 
-         if (xpsr & XPSR_EXCP) {
-             mode = "handler";
-@@ -12243,13 +12248,14 @@ void arm_cpu_dump_state(CPUState *cs, FILE *f, fprintf_function cpu_fprintf,
-             }
-         }
- 
--        cpu_fprintf(f, "XPSR=%08x %c%c%c%c %c %s\n",
-+        cpu_fprintf(f, "XPSR=%08x %c%c%c%c %c %s%s\n",
-                     xpsr,
-                     xpsr & XPSR_N ? 'N' : '-',
-                     xpsr & XPSR_Z ? 'Z' : '-',
-                     xpsr & XPSR_C ? 'C' : '-',
-                     xpsr & XPSR_V ? 'V' : '-',
-                     xpsr & XPSR_T ? 'T' : 'A',
-+                    ns_status,
-                     mode);
-     } else {
-         uint32_t psr = cpsr_read(env);
 -- 
 2.7.4
