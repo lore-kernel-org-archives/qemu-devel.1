@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52010)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dq5Tv-0002yJ-PS
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 18:41:13 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dq5Tw-0002yt-PB
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 18:41:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dq5Tq-000859-RW
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 18:41:07 -0400
-Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:33213)
+	(envelope-from <richard.henderson@linaro.org>) id 1dq5Tr-00086H-VS
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 18:41:08 -0400
+Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:37894)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dq5Tq-00084W-J7
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 18:41:02 -0400
-Received: by mail-pg0-x22a.google.com with SMTP id t3so1832996pgt.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 15:41:02 -0700 (PDT)
+	id 1dq5Tr-00085b-PI
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 18:41:03 -0400
+Received: by mail-pg0-x232.google.com with SMTP id v66so1788082pgb.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 15:41:03 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Sep 2017 15:40:33 -0700
-Message-Id: <20170907224051.21518-6-richard.henderson@linaro.org>
+Date: Thu,  7 Sep 2017 15:40:34 -0700
+Message-Id: <20170907224051.21518-7-richard.henderson@linaro.org>
 In-Reply-To: <20170907224051.21518-1-richard.henderson@linaro.org>
 References: <20170907224051.21518-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PULL 05/23] tcg/s390: Introduce TCG_REG_TB
+Subject: [Qemu-devel] [PULL 06/23] tcg/s390: Fix sign of patch_reloc addend
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,181 +31,96 @@ Cc: peter.maydell@linaro.org, Richard Henderson <rth@twiddle.net>
 
 From: Richard Henderson <rth@twiddle.net>
 
+We were passing in -2 instead of +2, but then ignoring
+the actual contents of addend in the calculation.
+
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- tcg/s390/tcg-target.h     |  2 +-
- tcg/s390/tcg-target.inc.c | 71 +++++++++++++++++++++++++++++++++++++++--------
- 2 files changed, 61 insertions(+), 12 deletions(-)
+ tcg/s390/tcg-target.inc.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/tcg/s390/tcg-target.h b/tcg/s390/tcg-target.h
-index 52010c30cb..9c9c8cd464 100644
---- a/tcg/s390/tcg-target.h
-+++ b/tcg/s390/tcg-target.h
-@@ -95,7 +95,7 @@ extern uint64_t s390_facilities;
- #define TCG_TARGET_HAS_extrl_i64_i32  0
- #define TCG_TARGET_HAS_extrh_i64_i32  0
- #define TCG_TARGET_HAS_goto_ptr       1
--#define TCG_TARGET_HAS_direct_jump    1
-+#define TCG_TARGET_HAS_direct_jump    (s390_facilities & FACILITY_GEN_INST_EXT)
- 
- #define TCG_TARGET_HAS_div2_i64       1
- #define TCG_TARGET_HAS_rot_i64        1
 diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
-index ee0dff995a..e007586315 100644
+index e007586315..59c0da0922 100644
 --- a/tcg/s390/tcg-target.inc.c
 +++ b/tcg/s390/tcg-target.inc.c
-@@ -51,6 +51,12 @@
- /* A scratch register that may be be used throughout the backend.  */
- #define TCG_TMP0        TCG_REG_R1
- 
-+/* A scratch register that holds a pointer to the beginning of the TB.
-+   We don't need this when we have pc-relative loads with the general
-+   instructions extension facility.  */
-+#define TCG_REG_TB      TCG_REG_R12
-+#define USE_REG_TB      (!(s390_facilities & FACILITY_GEN_INST_EXT))
-+
- #ifndef CONFIG_SOFTMMU
- #define TCG_GUEST_BASE_REG TCG_REG_R13
- #endif
-@@ -556,8 +562,8 @@ static void tcg_out_mov(TCGContext *s, TCGType type, TCGReg dst, TCGReg src)
- }
- 
- /* load a register with an immediate value */
--static void tcg_out_movi(TCGContext *s, TCGType type,
--                         TCGReg ret, tcg_target_long sval)
-+static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
-+                             tcg_target_long sval, bool in_prologue)
+@@ -360,21 +360,22 @@ uint64_t s390_facilities;
+ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
+                         intptr_t value, intptr_t addend)
  {
-     static const S390Opcode lli_insns[4] = {
-         RI_LLILL, RI_LLILH, RI_LLIHL, RI_LLIHH
-@@ -601,13 +607,22 @@ static void tcg_out_movi(TCGContext *s, TCGType type,
-         }
-     }
+-    intptr_t pcrel2 = (tcg_insn_unit *)value - (code_ptr - 1);
+-    tcg_debug_assert(addend == -2);
++    intptr_t pcrel2;
++
++    value += addend;
++    pcrel2 = (tcg_insn_unit *)value - code_ptr;
  
--    /* Try for PC-relative address load.  */
-+    /* Try for PC-relative address load.  For odd addresses,
-+       attempt to use an offset from the start of the TB.  */
-     if ((sval & 1) == 0) {
-         ptrdiff_t off = tcg_pcrel_diff(s, (void *)sval) >> 1;
-         if (off == (int32_t)off) {
-             tcg_out_insn(s, RIL, LARL, ret, off);
-             return;
-         }
-+    } else if (USE_REG_TB && !in_prologue) {
-+        ptrdiff_t off = sval - (uintptr_t)s->code_gen_ptr;
-+        if (off == sextract64(off, 0, 20)) {
-+            /* This is certain to be an address within TB, and therefore
-+               OFF will be negative; don't try RX_LA.  */
-+            tcg_out_insn(s, RXY, LAY, ret, TCG_REG_TB, TCG_REG_NONE, off);
-+            return;
-+        }
-     }
- 
-     /* If extended immediates are not present, then we may have to issue
-@@ -663,6 +678,11 @@ static void tcg_out_movi(TCGContext *s, TCGType type,
+     switch (type) {
+     case R_390_PC16DBL:
+-        tcg_debug_assert(pcrel2 == (int16_t)pcrel2);
++        assert(pcrel2 == (int16_t)pcrel2);
+         tcg_patch16(code_ptr, pcrel2);
+         break;
+     case R_390_PC32DBL:
+-        tcg_debug_assert(pcrel2 == (int32_t)pcrel2);
++        assert(pcrel2 == (int32_t)pcrel2);
+         tcg_patch32(code_ptr, pcrel2);
+         break;
+     default:
+-        tcg_abort();
+-        break;
++        g_assert_not_reached();
      }
  }
  
-+static void tcg_out_movi(TCGContext *s, TCGType type,
-+                         TCGReg ret, tcg_target_long sval)
-+{
-+    tcg_out_movi_int(s, type, ret, sval, false);
-+}
- 
- /* Emit a load/store type instruction.  Inputs are:
-    DATA:     The register to be loaded or stored.
-@@ -739,6 +759,13 @@ static void tcg_out_ld_abs(TCGContext *s, TCGType type, TCGReg dest, void *abs)
-             return;
-         }
+@@ -1270,11 +1271,11 @@ static void tgen_branch(TCGContext *s, int cc, TCGLabel *l)
+         tgen_gotoi(s, cc, l->u.value_ptr);
+     } else if (USE_LONG_BRANCHES) {
+         tcg_out16(s, RIL_BRCL | (cc << 4));
+-        tcg_out_reloc(s, s->code_ptr, R_390_PC32DBL, l, -2);
++        tcg_out_reloc(s, s->code_ptr, R_390_PC32DBL, l, 2);
+         s->code_ptr += 2;
+     } else {
+         tcg_out16(s, RI_BRC | (cc << 4));
+-        tcg_out_reloc(s, s->code_ptr, R_390_PC16DBL, l, -2);
++        tcg_out_reloc(s, s->code_ptr, R_390_PC16DBL, l, 2);
+         s->code_ptr += 1;
      }
-+    if (USE_REG_TB) {
-+        ptrdiff_t disp = abs - (void *)s->code_gen_ptr;
-+        if (disp == sextract64(disp, 0, 20)) {
-+            tcg_out_ld(s, type, dest, TCG_REG_TB, disp);
-+            return;
-+        }
-+    }
- 
-     tcg_out_movi(s, TCG_TYPE_PTR, dest, addr & ~0xffff);
-     tcg_out_ld(s, type, dest, dest, addr & 0xffff);
-@@ -1690,6 +1717,7 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-         break;
- 
-     case INDEX_op_goto_tb:
-+        a0 = args[0];
-         if (s->tb_jmp_insn_offset) {
-             /* branch displacement must be aligned for atomic patching;
-              * see if we need to add extra nop before branch
-@@ -1697,21 +1725,34 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-             if (!QEMU_PTR_IS_ALIGNED(s->code_ptr + 1, 4)) {
-                 tcg_out16(s, NOP);
-             }
-+            tcg_debug_assert(!USE_REG_TB);
-             tcg_out16(s, RIL_BRCL | (S390_CC_ALWAYS << 4));
--            s->tb_jmp_insn_offset[args[0]] = tcg_current_code_size(s);
-+            s->tb_jmp_insn_offset[a0] = tcg_current_code_size(s);
-             s->code_ptr += 2;
-         } else {
--            /* load address stored at s->tb_jmp_target_addr + args[0] */
--            tcg_out_ld_abs(s, TCG_TYPE_PTR, TCG_TMP0,
--                           s->tb_jmp_target_addr + args[0]);
-+            /* load address stored at s->tb_jmp_target_addr + a0 */
-+            tcg_out_ld_abs(s, TCG_TYPE_PTR, TCG_REG_TB,
-+                           s->tb_jmp_target_addr + a0);
-             /* and go there */
--            tcg_out_insn(s, RR, BCR, S390_CC_ALWAYS, TCG_TMP0);
-+            tcg_out_insn(s, RR, BCR, S390_CC_ALWAYS, TCG_REG_TB);
-+        }
-+        s->tb_jmp_reset_offset[a0] = tcg_current_code_size(s);
-+
-+        /* For the unlinked path of goto_tb, we need to reset
-+           TCG_REG_TB to the beginning of this TB.  */
-+        if (USE_REG_TB) {
-+            int ofs = -tcg_current_code_size(s);
-+            assert(ofs == (int16_t)ofs);
-+            tcg_out_insn(s, RI, AGHI, TCG_REG_TB, ofs);
-         }
--        s->tb_jmp_reset_offset[args[0]] = tcg_current_code_size(s);
-         break;
- 
-     case INDEX_op_goto_ptr:
--        tcg_out_insn(s, RR, BCR, S390_CC_ALWAYS, args[0]);
-+        a0 = args[0];
-+        if (USE_REG_TB) {
-+            tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_TB, a0);
-+        }
-+        tcg_out_insn(s, RR, BCR, S390_CC_ALWAYS, a0);
-         break;
- 
-     OP_32_64(ld8u):
-@@ -2476,6 +2517,9 @@ static void tcg_target_init(TCGContext *s)
-     /* XXX many insns can't be used with R0, so we better avoid it for now */
-     tcg_regset_set_reg(s->reserved_regs, TCG_REG_R0);
-     tcg_regset_set_reg(s->reserved_regs, TCG_REG_CALL_STACK);
-+    if (USE_REG_TB) {
-+        tcg_regset_set_reg(s->reserved_regs, TCG_REG_TB);
-+    }
  }
- 
- #define FRAME_SIZE  ((int)(TCG_TARGET_CALL_STACK_OFFSET          \
-@@ -2496,12 +2540,17 @@ static void tcg_target_qemu_prologue(TCGContext *s)
- 
- #ifndef CONFIG_SOFTMMU
-     if (guest_base >= 0x80000) {
--        tcg_out_movi(s, TCG_TYPE_PTR, TCG_GUEST_BASE_REG, guest_base);
-+        tcg_out_movi_int(s, TCG_TYPE_PTR, TCG_GUEST_BASE_REG, guest_base, true);
-         tcg_regset_set_reg(s->reserved_regs, TCG_GUEST_BASE_REG);
+@@ -1289,7 +1290,7 @@ static void tgen_compare_branch(TCGContext *s, S390Opcode opc, int cc,
+     } else {
+         /* We need to keep the offset unchanged for retranslation.  */
+         off = s->code_ptr[1];
+-        tcg_out_reloc(s, s->code_ptr + 1, R_390_PC16DBL, l, -2);
++        tcg_out_reloc(s, s->code_ptr + 1, R_390_PC16DBL, l, 2);
      }
- #endif
  
-     tcg_out_mov(s, TCG_TYPE_PTR, TCG_AREG0, tcg_target_call_iarg_regs[0]);
-+    if (USE_REG_TB) {
-+        tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_TB,
-+                    tcg_target_call_iarg_regs[1]);
-+    }
-+
-     /* br %r3 (go to TB) */
-     tcg_out_insn(s, RR, BCR, S390_CC_ALWAYS, tcg_target_call_iarg_regs[1]);
+     tcg_out16(s, (opc & 0xff00) | (r1 << 4) | r2);
+@@ -1307,7 +1308,7 @@ static void tgen_compare_imm_branch(TCGContext *s, S390Opcode opc, int cc,
+     } else {
+         /* We need to keep the offset unchanged for retranslation.  */
+         off = s->code_ptr[1];
+-        tcg_out_reloc(s, s->code_ptr + 1, R_390_PC16DBL, l, -2);
++        tcg_out_reloc(s, s->code_ptr + 1, R_390_PC16DBL, l, 2);
+     }
  
+     tcg_out16(s, (opc & 0xff00) | (r1 << 4) | cc);
+@@ -1571,7 +1572,7 @@ static void tcg_out_qemu_ld_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     TCGMemOpIdx oi = lb->oi;
+     TCGMemOp opc = get_memop(oi);
+ 
+-    patch_reloc(lb->label_ptr[0], R_390_PC16DBL, (intptr_t)s->code_ptr, -2);
++    patch_reloc(lb->label_ptr[0], R_390_PC16DBL, (intptr_t)s->code_ptr, 2);
+ 
+     tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_R2, TCG_AREG0);
+     if (TARGET_LONG_BITS == 64) {
+@@ -1592,7 +1593,7 @@ static void tcg_out_qemu_st_slow_path(TCGContext *s, TCGLabelQemuLdst *lb)
+     TCGMemOpIdx oi = lb->oi;
+     TCGMemOp opc = get_memop(oi);
+ 
+-    patch_reloc(lb->label_ptr[0], R_390_PC16DBL, (intptr_t)s->code_ptr, -2);
++    patch_reloc(lb->label_ptr[0], R_390_PC16DBL, (intptr_t)s->code_ptr, 2);
+ 
+     tcg_out_mov(s, TCG_TYPE_PTR, TCG_REG_R2, TCG_AREG0);
+     if (TARGET_LONG_BITS == 64) {
 -- 
 2.13.5
