@@ -1,24 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpsSv-00033P-Oj
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:47:14 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dpsVY-00044Y-VT
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:49:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dpsSr-0002sv-76
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:47:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50516)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dpsSo-0002rw-Li
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:47:09 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7D815883C5
-	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 08:47:05 +0000 (UTC)
-From: Fam Zheng <famz@redhat.com>
-Date: Thu,  7 Sep 2017 16:47:00 +0800
-Message-Id: <20170907084700.952-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH] buildsys: Move brlapi libs to per object
+	(envelope-from <stefanha@gmail.com>) id 1dpsVX-00041m-Pl
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:49:57 -0400
+Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:36461)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dpsVX-00041L-I5
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 04:49:55 -0400
+Received: by mail-wr0-x231.google.com with SMTP id o42so7419638wrb.3
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 01:49:55 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170907081341.GA23040@pxdev.xzpeter.org>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<20170829110357.GG3783@redhat.com> <20170906094846.GA2215@work-vm>
+	<20170906104603.GK15510@redhat.com> <20170906104850.GB2215@work-vm>
+	<20170906105414.GL15510@redhat.com> <20170906105704.GC2215@work-vm>
+	<20170906110629.GM15510@redhat.com> <20170906113157.GD2215@work-vm>
+	<20170906115428.GP15510@redhat.com>
+	<20170907081341.GA23040@pxdev.xzpeter.org>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 7 Sep 2017 09:49:53 +0100
+Message-ID: <CAJSP0QUcfEtb2PWJH-zH8qBCUGk6i_8bBQwbZcF+G3QwjmZMbg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +34,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-baum.o already receives the sdl cflags in its per object variable, do
-the same for brlapi libs to avoid cluttering libs_softmmu.
+On Thu, Sep 7, 2017 at 9:13 AM, Peter Xu <peterx@redhat.com> wrote:
+> On Wed, Sep 06, 2017 at 12:54:28PM +0100, Daniel P. Berrange wrote:
+>> On Wed, Sep 06, 2017 at 12:31:58PM +0100, Dr. David Alan Gilbert wrote:
+>> > * Daniel P. Berrange (berrange@redhat.com) wrote:
+>> > > This does imply that you need a separate monitor I/O processing, fro=
+m the
+>> > > command execution thread, but I see no need for all commands to sudd=
+enly
+>> > > become async. Just allowing interleaved replies is sufficient from t=
+he
+>> > > POV of the protocol definition. This interleaving is easy to handle =
+from
+>> > > the client POV - just requires a unique 'serial' in the request by t=
+he
+>> > > client, that is copied into the reply by QEMU.
+>> >
+>> > OK, so for that we can just take Marc-Andr=C3=A9's syntax and call it =
+'id':
+>> >   https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03634.html
+>> >
+>> > then it's upto the caller to ensure those id's are unique.
+>>
+>> Libvirt has in fact generated a unique 'id' for every monitor command
+>> since day 1 of supporting QMP.
+>>
+>> > I do worry about two things:
+>> >   a) With this the caller doesn't really know which commands could be
+>> >   in parallel - for example if we've got a recovery command that's
+>> >   executed by this non-locking thread that's OK, we expect that
+>> >   to be doable in parallel.  If in the future though we do
+>> >   what you initially suggested and have a bunch of commands get
+>> >   routed to the migration thread (say) then those would suddenly
+>> >   operate in parallel with other commands that we're previously
+>> >   synchronous.
+>>
+>> We could still have an opt-in for async commands. eg default to executin=
+g
+>> all commands in the main thread, unless the client issues an explicit
+>> "make it async" command, to switch to allowing the migration thread to
+>> process it async.
+>>
+>>  { "execute": "qmp_allow_async",
+>>    "data": { "commands": [
+>>        "migrate_cancel",
+>>    ] } }
+>>
+>>
+>>  { "return": { "commands": [
+>>        "migrate_cancel",
+>>    ] } }
+>>
+>> The server response contains the subset of commands from the request
+>> for which async is supported.
+>>
+>> That gives good negotiation ability going forward as we incrementally
+>> support async on more commands.
+>
+> I think this goes back to the discussion on which design we'd like to
+> choose.  IMHO the whole async idea plus the per-command-id is indeed
+> cleaner and nicer, and I believe that can benefit not only libvirt,
+> but also other QMP users.  The problem is, I have no idea how long
+> it'll take to let us have such a feature - I believe that will include
+> QEMU and Libvirt to both support that.  And it'll be a pity if the
+> postcopy recovery cannot work only because we cannot guarantee a
+> stable monitor.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- chardev/Makefile.objs | 1 +
- configure             | 2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
+Please don't rush in a hack, they often introduce new bugs that we
+have to support long-term when they are part of the QMP API.
 
-diff --git a/chardev/Makefile.objs b/chardev/Makefile.objs
-index 52a8127606..d68e1347f9 100644
---- a/chardev/Makefile.objs
-+++ b/chardev/Makefile.objs
-@@ -20,5 +20,6 @@ chardev-obj-$(CONFIG_WIN32) += char-win-stdio.o
- common-obj-y += msmouse.o wctablet.o testdev.o
- common-obj-$(CONFIG_BRLAPI) += baum.o
- baum.o-cflags := $(SDL_CFLAGS)
-+baum.o-libs := $(BRLAPI_LIBS)
- 
- common-obj-$(CONFIG_SPICE) += spice.o
-diff --git a/configure b/configure
-index fb7e34a901..d718718cfa 100755
---- a/configure
-+++ b/configure
-@@ -3106,7 +3106,6 @@ int main( void ) { return brlapi__openConnection (NULL, NULL, NULL); }
- EOF
-   if compile_prog "" "$brlapi_libs" ; then
-     brlapi=yes
--    libs_softmmu="$brlapi_libs $libs_softmmu"
-   else
-     if test "$brlapi" = "yes" ; then
-       feature_not_found "brlapi" "Install brlapi devel"
-@@ -5693,6 +5692,7 @@ if test "$curl" = "yes" ; then
- fi
- if test "$brlapi" = "yes" ; then
-   echo "CONFIG_BRLAPI=y" >> $config_host_mak
-+  echo "BRLAPI_LIBS=$brlapi_libs" >> $config_host_mak
- fi
- if test "$bluez" = "yes" ; then
-   echo "CONFIG_BLUEZ=y" >> $config_host_mak
--- 
-2.13.5
+In your original email you mentioned "info cpus".  Have you considered
+modifying this command so it does not sync the CPU?  I'm not sure
+callers really need to sync the CPU, typically they just want to know
+the vcpu numbers, thread IDs, and current state (halted, running,
+etc).
+
+The next step after that would be to audit other monitor commands for
+unnecessary vcpu synchronization.
+
+Stefan
