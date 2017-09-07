@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59191)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dq24I-0006zG-Fz
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:02:31 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dq24U-00079B-HT
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:02:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dq24D-0007AF-3s
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:02:26 -0400
-Received: from mail-wm0-x232.google.com ([2a00:1450:400c:c09::232]:36413)
+	(envelope-from <richard.henderson@linaro.org>) id 1dq24P-0007WQ-Gp
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:02:38 -0400
+Received: from mail-pf0-x22e.google.com ([2607:f8b0:400e:c00::22e]:34563)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dq24C-00077F-RM
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:02:21 -0400
-Received: by mail-wm0-x232.google.com with SMTP id i189so2115278wmf.1
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 12:02:20 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dq24P-0007U1-94
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 15:02:33 -0400
+Received: by mail-pf0-x22e.google.com with SMTP id e1so888091pfk.1
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 12:02:33 -0700 (PDT)
 References: <20170817230114.3655-1-richard.henderson@linaro.org>
-	<20170817230114.3655-6-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170817230114.3655-6-richard.henderson@linaro.org>
-Date: Thu, 07 Sep 2017 20:02:18 +0100
-Message-ID: <87377ymix1.fsf@linaro.org>
+	<20170817230114.3655-5-richard.henderson@linaro.org>
+	<874lsemj0d.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <f18d9635-1ae5-08f0-3856-c2d445e62b99@linaro.org>
+Date: Thu, 7 Sep 2017 12:02:29 -0700
 MIME-Version: 1.0
+In-Reply-To: <874lsemj0d.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 5/8] tcg: Add tcg_op_supported
+Subject: Re: [Qemu-devel] [PATCH 4/8] tcg: Add operations for host vectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,356 +32,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
+On 09/07/2017 12:00 PM, Alex Bennée wrote:
+> 
+> Richard Henderson <richard.henderson@linaro.org> writes:
+> 
+>> Nothing uses or implements them yet.
+>>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  tcg/tcg-opc.h | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  tcg/tcg.h     | 24 ++++++++++++++++
+>>  2 files changed, 113 insertions(+)
+>>
+>> diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
+>> index 956fb1e9f3..9162125fac 100644
+>> --- a/tcg/tcg-opc.h
+>> +++ b/tcg/tcg-opc.h
+>> @@ -206,6 +206,95 @@ DEF(qemu_st_i64, 0, TLADDR_ARGS + DATA64_ARGS, 1,
+>>
+>>  #undef TLADDR_ARGS
+>>  #undef DATA64_ARGS
+>> +
+>> +/* Host integer vector operations.  */
+>> +/* These opcodes are required whenever the base vector size is enabled.  */
+>> +
+>> +DEF(mov_v64, 1, 1, 0, IMPL(TCG_TARGET_HAS_v64))
+>> +DEF(mov_v128, 1, 1, 0, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(mov_v256, 1, 1, 0, IMPL(TCG_TARGET_HAS_v256))
+>> +
+>> +DEF(movi_v64, 1, 0, 1, IMPL(TCG_TARGET_HAS_v64))
+>> +DEF(movi_v128, 1, 0, 1, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(movi_v256, 1, 0, 1, IMPL(TCG_TARGET_HAS_v256))
+>> +
+>> +DEF(ld_v64, 1, 1, 1, IMPL(TCG_TARGET_HAS_v64))
+>> +DEF(ld_v128, 1, 1, 1, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(ld_v256, 1, 1, 1, IMPL(TCG_TARGET_HAS_v256))
+>> +
+>> +DEF(st_v64, 0, 2, 1, IMPL(TCG_TARGET_HAS_v64))
+>> +DEF(st_v128, 0, 2, 1, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(st_v256, 0, 2, 1, IMPL(TCG_TARGET_HAS_v256))
+>> +
+>> +DEF(and_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>> +DEF(and_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(and_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>> +
+>> +DEF(or_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>> +DEF(or_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(or_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>> +
+>> +DEF(xor_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>> +DEF(xor_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(xor_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>> +
+>> +DEF(add8_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>> +DEF(add16_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>> +DEF(add32_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>> +
+>> +DEF(add8_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(add16_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(add32_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(add64_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>> +
+>> +DEF(add8_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>> +DEF(add16_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>> +DEF(add32_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>> +DEF(add64_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>> +
+>> +DEF(sub8_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>> +DEF(sub16_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>> +DEF(sub32_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>> +
+>> +DEF(sub8_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(sub16_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(sub32_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>> +DEF(sub64_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>> +
+>> +DEF(sub8_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>> +DEF(sub16_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>> +DEF(sub32_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>> +DEF(sub64_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>> +
+>> +/* These opcodes are optional.
+>> +   All element counts must be supported if any are.  */
+>> +
+>> +DEF(not_v64, 1, 1, 0, IMPL(TCG_TARGET_HAS_not_v64))
+>> +DEF(not_v128, 1, 1, 0, IMPL(TCG_TARGET_HAS_not_v128))
+>> +DEF(not_v256, 1, 1, 0, IMPL(TCG_TARGET_HAS_not_v256))
+>> +
+>> +DEF(andc_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_andc_v64))
+>> +DEF(andc_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_andc_v128))
+>> +DEF(andc_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_andc_v256))
+>> +
+>> +DEF(orc_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_orc_v64))
+>> +DEF(orc_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_orc_v128))
+>> +DEF(orc_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_orc_v256))
+>> +
+>> +DEF(neg8_v64, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v64))
+>> +DEF(neg16_v64, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v64))
+>> +DEF(neg32_v64, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v64))
+>> +
+>> +DEF(neg8_v128, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v128))
+>> +DEF(neg16_v128, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v128))
+>> +DEF(neg32_v128, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v128))
+>> +DEF(neg64_v128, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v128))
+>> +
+>> +DEF(neg8_v256, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v256))
+>> +DEF(neg16_v256, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v256))
+>> +DEF(neg32_v256, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v256))
+>> +DEF(neg64_v256, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v256))
+>> +
+>>  #undef IMPL
+>>  #undef IMPL64
+>>  #undef DEF
+>> diff --git a/tcg/tcg.h b/tcg/tcg.h
+>> index 1277caed3d..b9e15da13b 100644
+>> --- a/tcg/tcg.h
+>> +++ b/tcg/tcg.h
+>> @@ -166,6 +166,30 @@ typedef uint64_t TCGRegSet;
+>>  #define TCG_TARGET_HAS_rem_i64          0
+>>  #endif
+>>
+>> +#ifndef TCG_TARGET_HAS_v64
+>> +#define TCG_TARGET_HAS_v64              0
+>> +#define TCG_TARGET_HAS_andc_v64         0
+>> +#define TCG_TARGET_HAS_orc_v64          0
+>> +#define TCG_TARGET_HAS_not_v64          0
+>> +#define TCG_TARGET_HAS_neg_v64          0
+>> +#endif
+>> +
+>> +#ifndef TCG_TARGET_HAS_v128
+>> +#define TCG_TARGET_HAS_v128             0
+>> +#define TCG_TARGET_HAS_andc_v128        0
+>> +#define TCG_TARGET_HAS_orc_v128         0
+>> +#define TCG_TARGET_HAS_not_v128         0
+>> +#define TCG_TARGET_HAS_neg_v128         0
+>> +#endif
+>> +
+>> +#ifndef TCG_TARGET_HAS_v256
+>> +#define TCG_TARGET_HAS_v256             0
+>> +#define TCG_TARGET_HAS_andc_v256        0
+>> +#define TCG_TARGET_HAS_orc_v256         0
+>> +#define TCG_TARGET_HAS_not_v256         0
+>> +#define TCG_TARGET_HAS_neg_v256         0
+>> +#endif
+> 
+> Is it possible to use the DEF expanders to avoid manually defining all
+> the TCG_TARGET_HAS_op for each vector size?
 
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-> ---
->  tcg/tcg.h |   2 +
->  tcg/tcg.c | 310 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 312 insertions(+)
->
-> diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index b9e15da13b..b443143b21 100644
-> --- a/tcg/tcg.h
-> +++ b/tcg/tcg.h
-> @@ -962,6 +962,8 @@ do {\
->  #define tcg_temp_free_ptr(T) tcg_temp_free_i64(TCGV_PTR_TO_NAT(T))
->  #endif
->
-> +bool tcg_op_supported(TCGOpcode op);
-> +
->  void tcg_gen_callN(TCGContext *s, void *func,
->                     TCGArg ret, int nargs, TCGArg *args);
->
-> diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index ea78d47fad..3c3cdda938 100644
-> --- a/tcg/tcg.c
-> +++ b/tcg/tcg.c
-> @@ -751,6 +751,316 @@ int tcg_check_temp_count(void)
->  }
->  #endif
->
-> +/* Return true if OP may appear in the opcode stream.
-> +   Test the runtime variable that controls each opcode.  */
-> +bool tcg_op_supported(TCGOpcode op)
-> +{
-> +    switch (op) {
-> +    case INDEX_op_discard:
-> +    case INDEX_op_set_label:
-> +    case INDEX_op_call:
-> +    case INDEX_op_br:
-> +    case INDEX_op_mb:
-> +    case INDEX_op_insn_start:
-> +    case INDEX_op_exit_tb:
-> +    case INDEX_op_goto_tb:
-> +    case INDEX_op_qemu_ld_i32:
-> +    case INDEX_op_qemu_st_i32:
-> +    case INDEX_op_qemu_ld_i64:
-> +    case INDEX_op_qemu_st_i64:
-> +        return true;
-> +
-> +    case INDEX_op_goto_ptr:
-> +        return TCG_TARGET_HAS_goto_ptr;
-> +
-> +    case INDEX_op_mov_i32:
-> +    case INDEX_op_movi_i32:
-> +    case INDEX_op_setcond_i32:
-> +    case INDEX_op_brcond_i32:
-> +    case INDEX_op_ld8u_i32:
-> +    case INDEX_op_ld8s_i32:
-> +    case INDEX_op_ld16u_i32:
-> +    case INDEX_op_ld16s_i32:
-> +    case INDEX_op_ld_i32:
-> +    case INDEX_op_st8_i32:
-> +    case INDEX_op_st16_i32:
-> +    case INDEX_op_st_i32:
-> +    case INDEX_op_add_i32:
-> +    case INDEX_op_sub_i32:
-> +    case INDEX_op_mul_i32:
-> +    case INDEX_op_and_i32:
-> +    case INDEX_op_or_i32:
-> +    case INDEX_op_xor_i32:
-> +    case INDEX_op_shl_i32:
-> +    case INDEX_op_shr_i32:
-> +    case INDEX_op_sar_i32:
-> +        return true;
-> +
-> +    case INDEX_op_movcond_i32:
-> +        return TCG_TARGET_HAS_movcond_i32;
-> +    case INDEX_op_div_i32:
-> +    case INDEX_op_divu_i32:
-> +        return TCG_TARGET_HAS_div_i32;
-> +    case INDEX_op_rem_i32:
-> +    case INDEX_op_remu_i32:
-> +        return TCG_TARGET_HAS_rem_i32;
-> +    case INDEX_op_div2_i32:
-> +    case INDEX_op_divu2_i32:
-> +        return TCG_TARGET_HAS_div2_i32;
-> +    case INDEX_op_rotl_i32:
-> +    case INDEX_op_rotr_i32:
-> +        return TCG_TARGET_HAS_rot_i32;
-> +    case INDEX_op_deposit_i32:
-> +        return TCG_TARGET_HAS_deposit_i32;
-> +    case INDEX_op_extract_i32:
-> +        return TCG_TARGET_HAS_extract_i32;
-> +    case INDEX_op_sextract_i32:
-> +        return TCG_TARGET_HAS_sextract_i32;
-> +    case INDEX_op_add2_i32:
-> +        return TCG_TARGET_HAS_add2_i32;
-> +    case INDEX_op_sub2_i32:
-> +        return TCG_TARGET_HAS_sub2_i32;
-> +    case INDEX_op_mulu2_i32:
-> +        return TCG_TARGET_HAS_mulu2_i32;
-> +    case INDEX_op_muls2_i32:
-> +        return TCG_TARGET_HAS_muls2_i32;
-> +    case INDEX_op_muluh_i32:
-> +        return TCG_TARGET_HAS_muluh_i32;
-> +    case INDEX_op_mulsh_i32:
-> +        return TCG_TARGET_HAS_mulsh_i32;
-> +    case INDEX_op_ext8s_i32:
-> +        return TCG_TARGET_HAS_ext8s_i32;
-> +    case INDEX_op_ext16s_i32:
-> +        return TCG_TARGET_HAS_ext16s_i32;
-> +    case INDEX_op_ext8u_i32:
-> +        return TCG_TARGET_HAS_ext8u_i32;
-> +    case INDEX_op_ext16u_i32:
-> +        return TCG_TARGET_HAS_ext16u_i32;
-> +    case INDEX_op_bswap16_i32:
-> +        return TCG_TARGET_HAS_bswap16_i32;
-> +    case INDEX_op_bswap32_i32:
-> +        return TCG_TARGET_HAS_bswap32_i32;
-> +    case INDEX_op_not_i32:
-> +        return TCG_TARGET_HAS_not_i32;
-> +    case INDEX_op_neg_i32:
-> +        return TCG_TARGET_HAS_neg_i32;
-> +    case INDEX_op_andc_i32:
-> +        return TCG_TARGET_HAS_andc_i32;
-> +    case INDEX_op_orc_i32:
-> +        return TCG_TARGET_HAS_orc_i32;
-> +    case INDEX_op_eqv_i32:
-> +        return TCG_TARGET_HAS_eqv_i32;
-> +    case INDEX_op_nand_i32:
-> +        return TCG_TARGET_HAS_nand_i32;
-> +    case INDEX_op_nor_i32:
-> +        return TCG_TARGET_HAS_nor_i32;
-> +    case INDEX_op_clz_i32:
-> +        return TCG_TARGET_HAS_clz_i32;
-> +    case INDEX_op_ctz_i32:
-> +        return TCG_TARGET_HAS_ctz_i32;
-> +    case INDEX_op_ctpop_i32:
-> +        return TCG_TARGET_HAS_ctpop_i32;
-> +
-> +    case INDEX_op_brcond2_i32:
-> +    case INDEX_op_setcond2_i32:
-> +        return TCG_TARGET_REG_BITS == 32;
-> +
-> +    case INDEX_op_mov_i64:
-> +    case INDEX_op_movi_i64:
-> +    case INDEX_op_setcond_i64:
-> +    case INDEX_op_brcond_i64:
-> +    case INDEX_op_ld8u_i64:
-> +    case INDEX_op_ld8s_i64:
-> +    case INDEX_op_ld16u_i64:
-> +    case INDEX_op_ld16s_i64:
-> +    case INDEX_op_ld32u_i64:
-> +    case INDEX_op_ld32s_i64:
-> +    case INDEX_op_ld_i64:
-> +    case INDEX_op_st8_i64:
-> +    case INDEX_op_st16_i64:
-> +    case INDEX_op_st32_i64:
-> +    case INDEX_op_st_i64:
-> +    case INDEX_op_add_i64:
-> +    case INDEX_op_sub_i64:
-> +    case INDEX_op_mul_i64:
-> +    case INDEX_op_and_i64:
-> +    case INDEX_op_or_i64:
-> +    case INDEX_op_xor_i64:
-> +    case INDEX_op_shl_i64:
-> +    case INDEX_op_shr_i64:
-> +    case INDEX_op_sar_i64:
-> +    case INDEX_op_ext_i32_i64:
-> +    case INDEX_op_extu_i32_i64:
-> +        return TCG_TARGET_REG_BITS == 64;
-> +
-> +    case INDEX_op_movcond_i64:
-> +        return TCG_TARGET_HAS_movcond_i64;
-> +    case INDEX_op_div_i64:
-> +    case INDEX_op_divu_i64:
-> +        return TCG_TARGET_HAS_div_i64;
-> +    case INDEX_op_rem_i64:
-> +    case INDEX_op_remu_i64:
-> +        return TCG_TARGET_HAS_rem_i64;
-> +    case INDEX_op_div2_i64:
-> +    case INDEX_op_divu2_i64:
-> +        return TCG_TARGET_HAS_div2_i64;
-> +    case INDEX_op_rotl_i64:
-> +    case INDEX_op_rotr_i64:
-> +        return TCG_TARGET_HAS_rot_i64;
-> +    case INDEX_op_deposit_i64:
-> +        return TCG_TARGET_HAS_deposit_i64;
-> +    case INDEX_op_extract_i64:
-> +        return TCG_TARGET_HAS_extract_i64;
-> +    case INDEX_op_sextract_i64:
-> +        return TCG_TARGET_HAS_sextract_i64;
-> +    case INDEX_op_extrl_i64_i32:
-> +        return TCG_TARGET_HAS_extrl_i64_i32;
-> +    case INDEX_op_extrh_i64_i32:
-> +        return TCG_TARGET_HAS_extrh_i64_i32;
-> +    case INDEX_op_ext8s_i64:
-> +        return TCG_TARGET_HAS_ext8s_i64;
-> +    case INDEX_op_ext16s_i64:
-> +        return TCG_TARGET_HAS_ext16s_i64;
-> +    case INDEX_op_ext32s_i64:
-> +        return TCG_TARGET_HAS_ext32s_i64;
-> +    case INDEX_op_ext8u_i64:
-> +        return TCG_TARGET_HAS_ext8u_i64;
-> +    case INDEX_op_ext16u_i64:
-> +        return TCG_TARGET_HAS_ext16u_i64;
-> +    case INDEX_op_ext32u_i64:
-> +        return TCG_TARGET_HAS_ext32u_i64;
-> +    case INDEX_op_bswap16_i64:
-> +        return TCG_TARGET_HAS_bswap16_i64;
-> +    case INDEX_op_bswap32_i64:
-> +        return TCG_TARGET_HAS_bswap32_i64;
-> +    case INDEX_op_bswap64_i64:
-> +        return TCG_TARGET_HAS_bswap64_i64;
-> +    case INDEX_op_not_i64:
-> +        return TCG_TARGET_HAS_not_i64;
-> +    case INDEX_op_neg_i64:
-> +        return TCG_TARGET_HAS_neg_i64;
-> +    case INDEX_op_andc_i64:
-> +        return TCG_TARGET_HAS_andc_i64;
-> +    case INDEX_op_orc_i64:
-> +        return TCG_TARGET_HAS_orc_i64;
-> +    case INDEX_op_eqv_i64:
-> +        return TCG_TARGET_HAS_eqv_i64;
-> +    case INDEX_op_nand_i64:
-> +        return TCG_TARGET_HAS_nand_i64;
-> +    case INDEX_op_nor_i64:
-> +        return TCG_TARGET_HAS_nor_i64;
-> +    case INDEX_op_clz_i64:
-> +        return TCG_TARGET_HAS_clz_i64;
-> +    case INDEX_op_ctz_i64:
-> +        return TCG_TARGET_HAS_ctz_i64;
-> +    case INDEX_op_ctpop_i64:
-> +        return TCG_TARGET_HAS_ctpop_i64;
-> +    case INDEX_op_add2_i64:
-> +        return TCG_TARGET_HAS_add2_i64;
-> +    case INDEX_op_sub2_i64:
-> +        return TCG_TARGET_HAS_sub2_i64;
-> +    case INDEX_op_mulu2_i64:
-> +        return TCG_TARGET_HAS_mulu2_i64;
-> +    case INDEX_op_muls2_i64:
-> +        return TCG_TARGET_HAS_muls2_i64;
-> +    case INDEX_op_muluh_i64:
-> +        return TCG_TARGET_HAS_muluh_i64;
-> +    case INDEX_op_mulsh_i64:
-> +        return TCG_TARGET_HAS_mulsh_i64;
-> +
-> +    case INDEX_op_mov_v64:
-> +    case INDEX_op_movi_v64:
-> +    case INDEX_op_ld_v64:
-> +    case INDEX_op_st_v64:
-> +    case INDEX_op_and_v64:
-> +    case INDEX_op_or_v64:
-> +    case INDEX_op_xor_v64:
-> +    case INDEX_op_add8_v64:
-> +    case INDEX_op_add16_v64:
-> +    case INDEX_op_add32_v64:
-> +    case INDEX_op_sub8_v64:
-> +    case INDEX_op_sub16_v64:
-> +    case INDEX_op_sub32_v64:
-> +        return TCG_TARGET_HAS_v64;
-> +
-> +    case INDEX_op_mov_v128:
-> +    case INDEX_op_movi_v128:
-> +    case INDEX_op_ld_v128:
-> +    case INDEX_op_st_v128:
-> +    case INDEX_op_and_v128:
-> +    case INDEX_op_or_v128:
-> +    case INDEX_op_xor_v128:
-> +    case INDEX_op_add8_v128:
-> +    case INDEX_op_add16_v128:
-> +    case INDEX_op_add32_v128:
-> +    case INDEX_op_add64_v128:
-> +    case INDEX_op_sub8_v128:
-> +    case INDEX_op_sub16_v128:
-> +    case INDEX_op_sub32_v128:
-> +    case INDEX_op_sub64_v128:
-> +        return TCG_TARGET_HAS_v128;
-> +
-> +    case INDEX_op_mov_v256:
-> +    case INDEX_op_movi_v256:
-> +    case INDEX_op_ld_v256:
-> +    case INDEX_op_st_v256:
-> +    case INDEX_op_and_v256:
-> +    case INDEX_op_or_v256:
-> +    case INDEX_op_xor_v256:
-> +    case INDEX_op_add8_v256:
-> +    case INDEX_op_add16_v256:
-> +    case INDEX_op_add32_v256:
-> +    case INDEX_op_add64_v256:
-> +    case INDEX_op_sub8_v256:
-> +    case INDEX_op_sub16_v256:
-> +    case INDEX_op_sub32_v256:
-> +    case INDEX_op_sub64_v256:
-> +        return TCG_TARGET_HAS_v256;
-> +
-> +    case INDEX_op_not_v64:
-> +        return TCG_TARGET_HAS_not_v64;
-> +    case INDEX_op_not_v128:
-> +        return TCG_TARGET_HAS_not_v128;
-> +    case INDEX_op_not_v256:
-> +        return TCG_TARGET_HAS_not_v256;
-> +
-> +    case INDEX_op_andc_v64:
-> +        return TCG_TARGET_HAS_andc_v64;
-> +    case INDEX_op_andc_v128:
-> +        return TCG_TARGET_HAS_andc_v128;
-> +    case INDEX_op_andc_v256:
-> +        return TCG_TARGET_HAS_andc_v256;
-> +
-> +    case INDEX_op_orc_v64:
-> +        return TCG_TARGET_HAS_orc_v64;
-> +    case INDEX_op_orc_v128:
-> +        return TCG_TARGET_HAS_orc_v128;
-> +    case INDEX_op_orc_v256:
-> +        return TCG_TARGET_HAS_orc_v256;
-> +
-> +    case INDEX_op_neg8_v64:
-> +    case INDEX_op_neg16_v64:
-> +    case INDEX_op_neg32_v64:
-> +        return TCG_TARGET_HAS_neg_v64;
-> +
-> +    case INDEX_op_neg8_v128:
-> +    case INDEX_op_neg16_v128:
-> +    case INDEX_op_neg32_v128:
-> +    case INDEX_op_neg64_v128:
-> +        return TCG_TARGET_HAS_neg_v128;
-> +
-> +    case INDEX_op_neg8_v256:
-> +    case INDEX_op_neg16_v256:
-> +    case INDEX_op_neg32_v256:
-> +    case INDEX_op_neg64_v256:
-> +        return TCG_TARGET_HAS_neg_v256;
-> +
-> +    case NB_OPS:
-> +        break;
-> +    }
-> +    g_assert_not_reached();
-> +}
-> +
->  /* Note: we convert the 64 bit args to 32 bit and do some alignment
->     and endian swap. Maybe it would be better to do the alignment
->     and endian swap in tcg_reg_alloc_call(). */
+No.  The preprocessor doesn't work that way.
 
 
---
-Alex Bennée
+r~
