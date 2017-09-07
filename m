@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dpvrw-0001s5-NH
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:25:26 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dpvtR-0002dh-Ql
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:26:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dpvrs-0006wv-1n
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:25:16 -0400
-Date: Thu, 7 Sep 2017 14:24:53 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170907122453.GF4461@dhcp-200-186.str.redhat.com>
-References: <20170825132332.6734-1-el13635@mail.ntua.gr>
-	<20170825132332.6734-4-el13635@mail.ntua.gr>
+	(envelope-from <peter.maydell@linaro.org>) id 1dpvtM-0007Ka-TV
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:26:49 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:34281)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dpvtM-0007Jw-Mw
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 08:26:44 -0400
+Received: by mail-wm0-x229.google.com with SMTP id 137so33565006wmj.1
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 05:26:43 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170825132332.6734-4-el13635@mail.ntua.gr>
-Subject: Re: [Qemu-devel] [PATCH v3 3/7] block: require job-id when device
- is a node name
+In-Reply-To: <20170906152111.16958-1-eblake@redhat.com>
+References: <20170906152111.16958-1-eblake@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Sep 2017 13:26:21 +0100
+Message-ID: <CAFEAcA-1QOkSF+sG+0ymTv-Cx0WDEG4Ns4NydW-vz-box2Pi3Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/5] NBD patches for 2017-09-06
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,29 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Am 25.08.2017 um 15:23 hat Manos Pitsidianakis geschrieben:
-> With implicit filter nodes on the top of the graph it is not possible to
-> generate job-ids with the name of the device in block_job_create()
-> anymore, since the job's bs will not be a child_root.
-> 
-> Instead we can require that job-id is not NULL in block_job_create(),
-> and check that a job-id has been set in the callers of
-> block_job_create() in blockdev.c. It is more consistent to require an
-> explicit job-id when the device parameter in the job creation command,
-> eg
-> 
->  { "execute": "drive-backup",
->    "arguments": { "device": "drive0",
->                   "sync": "full",
->                   "target": "backup.img" } }
-> 
-> is not a BlockBackend name, instead of automatically getting it from the
-> root BS if device is a node name. That information is lost after calling
-> block_job_create(), so we can do it in its caller instead.
-> 
-> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+On 6 September 2017 at 16:21, Eric Blake <eblake@redhat.com> wrote:
+> The following changes since commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e:
+>
+>   Revert "kvm: use DIV_ROUND_UP" (2017-09-05 18:55:40 +0100)
+>
+> are available in the git repository at:
+>
+>   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-09-06
+>
+> for you to fetch changes up to 030fa7f6f950f5c8963f1dee8e6bb7387ed86a99:
+>
+>   nbd: Use new qio_channel_*_all() functions (2017-09-06 10:11:54 -0500)
+>
+> ----------------------------------------------------------------
+> nbd patches for 2017-09-06
+>
+> - Daniel P. Berrange: [0/2] Fix / skip recent iotests with LUKS driver
+> - Eric Blake: [0/3] nbd: Use common read/write-all qio functions
+>
+> ----------------------------------------------------------------
+> Daniel P. Berrange (2):
+>       iotests: rewrite 192 to use _launch_qemu to fix LUKS support
+>       iotests: blacklist 194 with the luks driver
+>
+> Eric Blake (3):
+>       io: Yield rather than wait when already in coroutine
+>       io: Add new qio_channel_read{, v}_all_eof functions
+>       nbd: Use new qio_channel_*_all() functions
 
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+I get an error in test-aio-multithread (clang, linux, x86-64):
+  GTESTER tests/test-aio-multithread
+**
+ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-aio-multithread.c:368:test_multi_fair_mutex:
+assertion failed (counter == atomic_counter): (532693 == 532694)
+GTester: last random seed: R02Sa68ef1eb4822359eb869642ff26180df
+
+Seems to be very intermittent, though -- I haven't been able
+to reproduce it, even with loading the box up with a
+compile job at the same time.
+
+thanks
+-- PMM
