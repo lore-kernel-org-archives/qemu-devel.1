@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dpxFb-0007gJ-Pi
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:53:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1dpxLM-0003V4-SP
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:59:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dpxFS-0001KT-Az
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:53:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44624)
+	(envelope-from <eblake@redhat.com>) id 1dpxLF-0007WB-3h
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:59:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37404)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dpxFS-0001Ji-4U
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:53:38 -0400
-Date: Thu, 7 Sep 2017 14:53:32 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170907135332.GO30609@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170906152111.16958-1-eblake@redhat.com>
-	<CAFEAcA-1QOkSF+sG+0ymTv-Cx0WDEG4Ns4NydW-vz-box2Pi3Q@mail.gmail.com>
-	<5ba61e49-3b84-46a4-2978-d42d3457f21b@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dpxLE-0007VM-QL
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:59:37 -0400
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<20170829110357.GG3783@redhat.com> <20170906094846.GA2215@work-vm>
+	<20170906104603.GK15510@redhat.com> <20170906104850.GB2215@work-vm>
+	<20170906105414.GL15510@redhat.com> <20170906105704.GC2215@work-vm>
+	<20170906110629.GM15510@redhat.com> <20170906113157.GD2215@work-vm>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <1788c2ff-78a0-fcb6-b6aa-6238af7af740@redhat.com>
+Date: Thu, 7 Sep 2017 08:59:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5ba61e49-3b84-46a4-2978-d42d3457f21b@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 0/5] NBD patches for 2017-09-06
+In-Reply-To: <20170906113157.GD2215@work-vm>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="UTFeF2N8e2lcfb1qBa4d8rhvsiKc9ViHj"
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +31,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On Thu, Sep 07, 2017 at 08:48:15AM -0500, Eric Blake wrote:
-> On 09/07/2017 07:26 AM, Peter Maydell wrote:
-> > On 6 September 2017 at 16:21, Eric Blake <eblake@redhat.com> wrote:
-> >> The following changes since commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e:
-> >>
-> >>   Revert "kvm: use DIV_ROUND_UP" (2017-09-05 18:55:40 +0100)
-> >>
-> >> are available in the git repository at:
-> >>
-> >>   git://repo.or.cz/qemu/ericb.git tags/pull-nbd-2017-09-06
-> >>
-> >> for you to fetch changes up to 030fa7f6f950f5c8963f1dee8e6bb7387ed86a99:
-> >>
-> >>   nbd: Use new qio_channel_*_all() functions (2017-09-06 10:11:54 -0500)
-> >>
-> 
-> > I get an error in test-aio-multithread (clang, linux, x86-64):
-> >   GTESTER tests/test-aio-multithread
-> > **
-> > ERROR:/home/petmay01/linaro/qemu-for-merges/tests/test-aio-multithread.c:368:test_multi_fair_mutex:
-> > assertion failed (counter == atomic_counter): (532693 == 532694)
-> > GTester: last random seed: R02Sa68ef1eb4822359eb869642ff26180df
-> 
-> I wonder if that is a rare but pre-existing bug, as I don't see any use
-> of qio_channel in test-aio-multithread, and therefore no obvious way
-> that this series would be the cause of the intermittent failure.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UTFeF2N8e2lcfb1qBa4d8rhvsiKc9ViHj
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Fam Zheng <famz@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com,
+ Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <1788c2ff-78a0-fcb6-b6aa-6238af7af740@redhat.com>
+Subject: Re: [RFC v2 0/8] monitor: allow per-monitor thread
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+ <20170829110357.GG3783@redhat.com> <20170906094846.GA2215@work-vm>
+ <20170906104603.GK15510@redhat.com> <20170906104850.GB2215@work-vm>
+ <20170906105414.GL15510@redhat.com> <20170906105704.GC2215@work-vm>
+ <20170906110629.GM15510@redhat.com> <20170906113157.GD2215@work-vm>
+In-Reply-To: <20170906113157.GD2215@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Agreed. Even if there was use of QIOChannel, there is certainly no use
-of the qio_channel_read|write_all functions that are being changed
-in this series, since they've only just been added to QEMU and are only
-used in the test suite and your final NBD patch here. So I think this
-must be a pre-existing race condition.
+On 09/06/2017 06:31 AM, Dr. David Alan Gilbert wrote:
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>> This does imply that you need a separate monitor I/O processing, from =
+the
+>> command execution thread, but I see no need for all commands to sudden=
+ly
+>> become async. Just allowing interleaved replies is sufficient from the=
+
+>> POV of the protocol definition. This interleaving is easy to handle fr=
+om
+>> the client POV - just requires a unique 'serial' in the request by the=
+
+>> client, that is copied into the reply by QEMU.
+>=20
+> OK, so for that we can just take Marc-Andr=C3=A9's syntax and call it '=
+id':
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03634.html
+>=20
+> then it's upto the caller to ensure those id's are unique.
+
+We ALREADY support 'id', and it is already up to the caller to ensure
+those id's are unique, even without Marc-Andr=C3=A9's additions.
+
+>=20
+> I do worry about two things:
+>   a) With this the caller doesn't really know which commands could be
+>   in parallel - for example if we've got a recovery command that's
+>   executed by this non-locking thread that's OK, we expect that
+>   to be doable in parallel.  If in the future though we do
+>   what you initially suggested and have a bunch of commands get
+>   routed to the migration thread (say) then those would suddenly
+>   operate in parallel with other commands that we're previously
+>   synchronous.
+
+Presumably, all existing commands are NOT async, and introspection via
+query-qmp-schema will let you query which new commands ARE async.  Or
+existing commands will gain an optional parameter to opt-in to async
+behavior for that command, defaulting to sync by default.  Thus, an old
+libvirt will never call an async command, and never notice the
+difference, but a new libvirt that is aware of async commands will opt
+in to the commands that it wants to use in an async manner.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--UTFeF2N8e2lcfb1qBa4d8rhvsiKc9ViHj
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmxUL0ACgkQp6FrSiUn
+Q2pU3ggAong6cdwyO0j340Hdpb5ZStyOTQCIz5ahZ9phdWsl11ALdDNDWcNTQiu8
+0kjdVZCPQHOT1yZZnmvzZV8BPghMUM3XkGTIkPmxO1CR8t4csOvdQVvESxZuqjXy
+l8LVwO+9+oNkW3sCuLqvhZEBievvrbvk7+fH1bE/mgKXcbzjgRBUcnAIPp7FAgB1
+Ue8uclgKQSez5hSqy70SRdJy+M4zIVAPAEf/2GQzy+gkDQU5pUxle9GnXEVCBbH8
+x9O3L7wqq9hZk4sEM7kOPGCYg2wpxyBwBDO2/TnNYlTQ7Uravq+asw+BnRH3ISRF
+VVoAz8dlMrfGOknMbpQ19b9Ujfa7Vg==
+=3SYa
+-----END PGP SIGNATURE-----
+
+--UTFeF2N8e2lcfb1qBa4d8rhvsiKc9ViHj--
