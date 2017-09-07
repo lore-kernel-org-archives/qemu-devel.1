@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34438)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35036)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dq16r-0002kK-At
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:01:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dq17z-0003U0-40
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:02:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dq16m-0003y3-BM
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:01:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56340)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dq16m-0003xm-13
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:00:56 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 05A5D80F79
-	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 18:00:55 +0000 (UTC)
-References: <20170901180340.30009-1-eblake@redhat.com>
-	<20170901180340.30009-28-eblake@redhat.com>
-	<ef46a4d8-27f8-296a-1336-2678beb1a332@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ea485554-e4fd-44e1-f0ab-579ca0ead575@redhat.com>
-Date: Thu, 7 Sep 2017 13:00:48 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1dq17r-0004ia-Nw
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:02:11 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:35511)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dq17r-0004hw-Ft
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:02:03 -0400
+Received: by mail-wm0-x231.google.com with SMTP id f199so3467274wme.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 11:02:03 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <ef46a4d8-27f8-296a-1336-2678beb1a332@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="AMJko6aG5E1oK9sjmvthTUQA25FT4wuiw"
-Subject: Re: [Qemu-devel] [PATCH v6 27/29] libqtest: Make qtest_init()
- accept format string
+In-Reply-To: <20170907175430.2720-1-richard.henderson@linaro.org>
+References: <20170907175430.2720-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 7 Sep 2017 19:01:41 +0100
+Message-ID: <CAFEAcA_moESxhiTQrV_YS7h7pRB0cGMJ7GGW1xJjBinkQ5SdAg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] tcg/tci: Add TCG_TARGET_DEFAULT_MO
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,94 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Igor Mammedov <imammedo@redhat.com>, armbru@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---AMJko6aG5E1oK9sjmvthTUQA25FT4wuiw
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, Igor Mammedov <imammedo@redhat.com>,
- armbru@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <ea485554-e4fd-44e1-f0ab-579ca0ead575@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 27/29] libqtest: Make qtest_init() accept
- format string
-References: <20170901180340.30009-1-eblake@redhat.com>
- <20170901180340.30009-28-eblake@redhat.com>
- <ef46a4d8-27f8-296a-1336-2678beb1a332@redhat.com>
-In-Reply-To: <ef46a4d8-27f8-296a-1336-2678beb1a332@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/05/2017 07:46 AM, Thomas Huth wrote:
-> On 01.09.2017 20:03, Eric Blake wrote:
->> Several callers were formatting a string into a temporary
->> variable before calling qtest_init(); factor that into the
->> common code.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
->> ---
-
->> -QTestState *qtest_init(const char *extra_args);
->> +QTestState *qtest_init(const char *extra_args, ...) GCC_FMT_ATTR(1, 2=
-);
->=20
-> Maybe the parameter should be called "fmt" or "format" now instead?
-> (similar to printf() and friends)
-
-Sure.
-
->=20
->>  /**
->>   * qtest_init_without_qmp_handshake:
->> @@ -518,7 +519,7 @@ void qtest_add_abrt_handler(GHookFunc fn, const vo=
-id *data);
->>   */
->>  static inline QTestState *qtest_start(const char *args)
->>  {
->> -    global_qtest =3D qtest_init(args);
->> +    global_qtest =3D qtest_init("%s", args);
->=20
-> That's a little bit sad that there are some spots which need an explici=
-t
-> "%s" now ... maybe it would be nicer to add a new function called
-> qtest_initf() instead and keep the old one (without the "f") as it is?
-
-Indeed, and looking back over my series, I see we could also benefit
-from a va_list form.
-
-Also, since you already questioned me on the churn from qtest_start() =3D=
+On 7 September 2017 at 18:54, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Missed being added as part of 71650df7b0ee.
 >
-qtest_init() =3D> qtest_start(), I can make less churn in the next spin b=
-y
-converging on qtest_start() from the get-go.
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tcg/tci/tcg-target.h | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
+> index 06963288dc..8df628a319 100644
+> --- a/tcg/tci/tcg-target.h
+> +++ b/tcg/tci/tcg-target.h
+> @@ -192,4 +192,9 @@ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
+>  {
+>  }
+>
+> +/* We could notice __i386__ or __s390x__ and reduce the barriers depending
+> +   on the host.  But if you want performance, you use the normal backend.
+> +   We prefer consistency across hosts on this.  */
+> +#define TCG_TARGET_DEFAULT_MO  (0)
+> +
+>  #endif /* TCG_TARGET_H */
 
-So I will go with qtest_start() (plain string), qtest_startf()
-(formatted like sprintf), and qtest_vstartf() (formatted like vsprintf).
+Applied to master as a travis build fix, thanks.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---AMJko6aG5E1oK9sjmvthTUQA25FT4wuiw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmxiVAACgkQp6FrSiUn
-Q2oj4wf+LK4/x4wZ3fIJEOPkMH1fUT8R9fmfXSNJedjQhORNd+IeGRlItQ1ws8ud
-ZLPA39shrwMEZnRewjk3Ou7ZJi84qvFJRJ3BAXs1SMXtVwDXldSUNFl7xB9qVpok
-mQgwxDSAeDdRWEETB8kQf0BOM14XginvrM8uGEVULWATdAoiNwLdexcJvGkkJsOz
-5RSxQUGOZrtA1YTkrGNmtHB1h1TRclBhPMGUf+31gio9qn7GnBKHkzRxfr36gEO+
-8kzXEFPJQW+7neQ4/zL3O668iSOkjhhys9EdTGHC4PpQ1hXOkXb2s0tTdUZuDlTL
-mncSJGkS3Fcj7jPb6AeZEPwhMoLfIw==
-=5yvl
------END PGP SIGNATURE-----
-
---AMJko6aG5E1oK9sjmvthTUQA25FT4wuiw--
+-- PMM
