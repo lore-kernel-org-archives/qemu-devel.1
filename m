@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dptkH-0006hS-Bq
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:09:14 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dptka-0006tP-BN
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:09:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dptkG-00050C-A0
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:09:13 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:51971)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dptkF-0004z2-Ty
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:09:12 -0400
-Date: Thu, 7 Sep 2017 20:08:48 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170907100848.GL2735@umbus.fritz.box>
-References: <20170907092010.3605-1-aik@ozlabs.ru>
-	<20170907095142.GA2194@work-vm>
+	(envelope-from <stefanha@gmail.com>) id 1dptkZ-00055r-C7
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:09:32 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:35416)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dptkZ-00055e-4t
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 06:09:31 -0400
+Received: by mail-wm0-x233.google.com with SMTP id f199so685536wme.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 03:09:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qo7zVO9a9OQ5oQtr"
-Content-Disposition: inline
-In-Reply-To: <20170907095142.GA2194@work-vm>
-Subject: Re: [Qemu-devel] [RFC PATCH qemu 0/4] memory: Reduce memory use
+In-Reply-To: <20170907093546.GE2098@work-vm>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<20170906145043.GG15535@stefanha-x1.localdomain>
+	<20170906151436.GF2215@work-vm>
+	<CAJSP0QUu45oPTL2JErTWAt7OFrHpcB-88EvGBwVAKxn0CE=ebg@mail.gmail.com>
+	<20170907093546.GE2098@work-vm>
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Date: Thu, 7 Sep 2017 11:09:29 +0100
+Message-ID: <CAJSP0QWA2gci=PxKDVEWQNhxDv-9pDdJzyWdQut=Zkr+rCb+3A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +32,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Xu <peterx@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
+On Thu, Sep 7, 2017 at 10:35 AM, Dr. David Alan Gilbert
+<dgilbert@redhat.com> wrote:
+> * Stefan Hajnoczi (stefanha@gmail.com) wrote:
+>> On Wed, Sep 6, 2017 at 4:14 PM, Dr. David Alan Gilbert
+>> <dgilbert@redhat.com> wrote:
+>> > * Stefan Hajnoczi (stefanha@gmail.com) wrote:
+>> >> On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
+>> >> > The root problem is that, monitor commands are all handled in main
+>> >> > loop thread now, no matter how many monitors we specify. And, if main
+>> >> > loop thread hangs due to some reason, all monitors will be stuck.
+>> >>
+>> >> I see a larger issue with postcopy: existing QEMU code assumes that
+>> >> guest memory access is instantaneous.
+>> >>
+>> >> Postcopy breaks this assumption and introduces blocking points that can
+>> >> now take unbounded time.
+>> >>
+>> >> This problem isn't specific to the monitor.  It can also happen to other
+>> >> components in QEMU like the gdbstub.
+>> >>
+>> >> Do we need an asynchronous memory API?  Synchronous memory access should
+>> >> only be allowed in vcpu threads.
+>> >
+>> > It would probably be useful for gdbstub where the overhead of async
+>> > doesn't matter;  but doing that for all IO emulation is hard.
+>>
+>> Why is it hard?
+>>
+>> Memory access can be synchronous in the vcpu thread.  That eliminates
+>> a lot of code straight away.
+>>
+>> Anything using dma-helpers.c is already async.  They just don't know
+>> that the memory access part is being made async too :).
+>
+> Can you point me to some info on that ?
 
---qo7zVO9a9OQ5oQtr
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+IDE and SCSI use dma-helpers.c to perform I/O:
+hw/ide/core.c:892:        s->bus->dma->aiocb =
+dma_blk_io(blk_get_aio_context(s->blk),
+hw/ide/macio.c:189:        s->bus->dma->aiocb =
+dma_blk_io(blk_get_aio_context(s->blk), &s->sg,
+hw/scsi/scsi-disk.c:348:        r->req.aiocb =
+dma_blk_io(blk_get_aio_context(s->qdev.conf.blk),
+hw/scsi/scsi-disk.c:551:        r->req.aiocb =
+dma_blk_io(blk_get_aio_context(s->qdev.conf.blk),
 
-On Thu, Sep 07, 2017 at 10:51:42AM +0100, Dr. David Alan Gilbert wrote:
-> * Alexey Kardashevskiy (aik@ozlabs.ru) wrote:
-> > This was inspired by https://bugzilla.redhat.com/show_bug.cgi?id=3D1481=
-593
-> >=20
-> > What happens ithere is that every virtio block device creates 2 address
-> > spaces - for modern config space (called "virtio-pci-cfg-as") and
-> > for busmaster (common pci thing, called after the device name,
-> > in my case "virtio-blk-pci").
-> >=20
-> > Each address_space_init() updates topology for every address space.
-> > Every topology update (address_space_update_topology()) creates a new
-> > dispatch tree - AddressSpaceDispatch with nodes (1KB) and
-> > sections (48KB) and destroys the old one.
-> >=20
-> > However the dispatch destructor is postponed via RCU which does not
-> > get a chance to execute until the machine is initialized but before
-> > we get there, memory is not returned to the pool, and this is a lot
-> > of memory which grows n^2.
-> >=20
-> > These patches are trying to address the memory use and boot time
-> > issues but tbh only the first one provides visible outcome.
->=20
-> Do you have a feel for how much memory is saved?
+They pass a scatter-gather list of guest RAM addresses to
+dma-helpers.c.  They receive a callback when I/O has finished.
 
-I think that's a bit hard to answer.
+Try following the code path.  Request submission may be from a vcpu
+thread or IOThread.  Completion occurs in the main loop or an
+IOThread.
 
-As noted above there's O(n^2) (or more) space complexity here - one
-which shouldn't be required by the data we actually have to track.
-That means the amount of "excess" memory depends on how many devices
-there are.
+The main point is that this API is already asynchronous.  If any
+changes are needed for async guest memory access (not sure, I haven't
+checked), then at least the dma-helpers.c users do not need to be
+modified.
 
-I haven't yet looked at these patches in detail, to know if it truly
-fixes that O(n^2) or just pares the constant.  If it does fix the
-O(n^2) then the amount is going to vary from "probably not enough to
-worry about" in normal use cases to hundreds of gigabytes in cases
-with many devices.
+>> The remaining cases are virtio and some other devices.
+>>
+>> If you are worried about performance, the first rule is that async
+>> memory access is only needed on the destination side when post-copy is
+>> active.  Maybe use setjmp to return from the signal handler and queue
+>> a callback for when the page has been loaded.
+>
+> I'm not sure it's worth trying to be too clever at avoiding this;
+> I see the fact that we're doing IO with the bql held as a more
+> fundamental problem.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+QEMU should be doing I/O syscalls in async fashion or threadpool
+workers (no BQL) so the BQL is not an issue.  Anything else could
+cause unbounded waits even without postcopy.
 
---qo7zVO9a9OQ5oQtr
-Content-Type: application/pgp-signature; name="signature.asc"
+Can you explain what you are worried about?
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmxGrAACgkQbDjKyiDZ
-s5LOJRAAsLuVP7iGPDcX4ixYKtwrrnt5oECgO+SY4IbcomaQ969PtgG8lTtO6x81
-Hy7gMBjoAZSj0ZIBj8GhXYOmlEdOhVc7Z7kuo7EsnWN6wP8ixZi1nXlh6tvWzpW1
-B3ItNZbQtmzH7fgYkY7TniQ5sq2knS72FtG3kdVw/1BrPWDtwbbQ3M+yFx+qGA0Y
-/ry4sbjBDwcED7MXC8Uip+yPjphW4Uc/DjzXoEOEhmtiQqLXWMY/CW8sLdrAE8BR
-INDKsjq4c9CSii4USNXz85a13jxV1d1gck0B1I6D+Tr/TUGS4pDrXDyOryDF+nnE
-GCFNLtoWOKA6aaxDOfiqVLt0mjOJVzOhuNOaddgllj2kl1fx6Vv2vSsY1JqV0Ozi
-odBw9P43fx4INPZDJUM6aihPLJVF9lpux1QG+NYZ6OUx5WlCBooBWZcs4ymxwJtB
-/l/dmgpwmFh/SU+Xe/qk8Sd2IfISdW4T7TgAOZMYybyaQaCDRe3zi5b8T2ZlBNFX
-PCaJZPD4gGHC+N9zB/7nuSa0UwXa08Ub8JuD2Q4OVVgZn2/EFaH5GLGy6TWj4h5M
-tD9lAJP45iRykgRyDlot7/g1hS4Jm4DszHg9BTsq0waUZmFmU4Tg3kFC8Wfsvl0a
-h5pu3bq1cEWd9VBkxD2OMEc2xilQTYCDYdX6rf4sfJqJhluonD0=
-=/os0
------END PGP SIGNATURE-----
-
---qo7zVO9a9OQ5oQtr--
+Stefan
