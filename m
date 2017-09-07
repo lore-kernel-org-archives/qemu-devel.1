@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50263)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dpzgj-0008I3-Qg
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:30:02 -0400
+	(envelope-from <smolov@ispras.ru>) id 1dpzhO-0000Mo-9p
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dpzgf-0003Ge-3W
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:29:57 -0400
+	(envelope-from <smolov@ispras.ru>) id 1dpzhJ-0003vK-Qt
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:30:38 -0400
+Received: from bran.ispras.ru ([83.149.199.196]:41613 helo=smtp.ispras.ru)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <smolov@ispras.ru>) id 1dpzhJ-0003s5-IU
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:30:33 -0400
+Received: from [10.10.2.131] (castle.intra.ispras.ru [10.10.2.131])
+	by smtp.ispras.ru (Postfix) with ESMTP id 78306203D0
+	for <qemu-devel@nongnu.org>; Thu,  7 Sep 2017 19:30:29 +0300 (MSK)
+Message-ID: <59B17425.1050701@ispras.ru>
+Date: Thu, 07 Sep 2017 19:30:29 +0300
+From: Sergey Smolov <smolov@ispras.ru>
 MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAKmqyKMd0JcEtkqiajLd5sbWP9WpjS8XqwfGGWPuANchE5Ej3A@mail.gmail.com>
-References: <cover.1504222314.git.alistair.francis@xilinx.com>
-	<CAFEAcA8TSpNkz3ew+wk6K0vu18B5RCr=0vbkihcaDz8v2zUN8g@mail.gmail.com>
-	<CAKmqyKMd0JcEtkqiajLd5sbWP9WpjS8XqwfGGWPuANchE5Ej3A@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 7 Sep 2017 09:29:20 -0700
-Message-ID: <CAKmqyKPSm4UHL7K0ZBGF28Z+wZ0qtMLd7CSvF9W94LwsXfN9zQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] Expose the secure and virt
- properties to the
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] emulation cycle number implementation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,46 +27,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Sep 7, 2017 at 9:01 AM, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> On Thu, Sep 7, 2017 at 5:51 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
->> On 1 September 2017 at 00:34, Alistair Francis
->> <alistair.francis@xilinx.com> wrote:
->>>
->>> The EL2 and EL3 work is working well now and interanlly we now have
->>> tests that expect to start in EL3 and transition through EL2 to EL1. To
->>> make this easy to run let's expose the secure property to the machine
->>> and also add a virt property that can enable EL2.
->>>
->>> This series also does some machine/name tidying up and makes the first
->>> move to deprecating the EP108 machine, which was just an early access
->>> development board.
->>>
->>> V2:
->>>  - Add a virt option for setting EL2
->>
->> It looks like only patches 4 5 and the cover letter got through the
->> mailing list server, so patches and patchwork don't have the whole
->> thing. Could I ask you to try a resend?
->
-> Just re-sent now. Hopefully it works this time.
+Hello, List!
 
-It looks like patch 1 and 3 still didn't make it through. I see them
-leaving the corporate network and going through to my personal email.
 
-Can anyone see anything on the QEMU mail server side? Any logs might
-help me push IT to investigate.
+I'm running MIPS assembler programs on QEMU. I need to log some events 
+that happen through emulation (writes to some registers, for example). 
+When an event happens, I need to print not only the event-related 
+information, but an "emulation cycle number" also. This number should be 
+an integer increasing value that is similar to real hardware clock.
 
-Thanks,
-Alistair
+How to implement this in QEMU? May QEMU timers be helpful in solving 
+such a problem?
 
->
-> Thanks,
-> Alistair
->
->>
->> thanks
->> -- PMM
+Thanks in advance.
+
+-- 
+Sincerely yours,
+Sergey Smolov
