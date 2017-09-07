@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60431)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dq03m-00028w-0I
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:53:50 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dq067-0002w7-E5
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:56:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dq03h-0007zD-36
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:53:46 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:37663)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dq03g-0007ym-Oq
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:53:41 -0400
-Received: by mail-wr0-x243.google.com with SMTP id u48so122714wrf.4
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 09:53:39 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1dq062-0000Gm-Ec
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:56:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39652)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dq062-0000GQ-5k
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 12:56:06 -0400
+Date: Thu, 7 Sep 2017 18:55:56 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170907185556.323c604c.cohuck@redhat.com>
+In-Reply-To: <59bfd678-dd2b-818d-4b64-b522cfda5ea2@redhat.com>
+References: <20170904154316.4148-1-david@redhat.com>
+	<20170904154316.4148-11-david@redhat.com>
+	<20170907153259.744c2c79.cohuck@redhat.com>
+	<59bfd678-dd2b-818d-4b64-b522cfda5ea2@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170907120227.GE23040@pxdev.xzpeter.org>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<20170906145043.GG15535@stefanha-x1.localdomain>
-	<20170906151436.GF2215@work-vm>
-	<CAJSP0QUu45oPTL2JErTWAt7OFrHpcB-88EvGBwVAKxn0CE=ebg@mail.gmail.com>
-	<20170907093546.GE2098@work-vm>
-	<CAJSP0QWA2gci=PxKDVEWQNhxDv-9pDdJzyWdQut=Zkr+rCb+3A@mail.gmail.com>
-	<20170907120227.GE23040@pxdev.xzpeter.org>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Thu, 7 Sep 2017 17:53:37 +0100
-Message-ID: <CAJSP0QWT2fNs16_mAy-iO_zc=ocYegCVwgV6UAXAL8S_GFjGXg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 10/19] target/s390x: use
+ program_interrupt() in per_check_exception()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,99 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Thu, Sep 7, 2017 at 1:02 PM, Peter Xu <peterx@redhat.com> wrote:
-> On Thu, Sep 07, 2017 at 11:09:29AM +0100, Stefan Hajnoczi wrote:
->> On Thu, Sep 7, 2017 at 10:35 AM, Dr. David Alan Gilbert
->> <dgilbert@redhat.com> wrote:
->> > * Stefan Hajnoczi (stefanha@gmail.com) wrote:
->> >> On Wed, Sep 6, 2017 at 4:14 PM, Dr. David Alan Gilbert
->> >> <dgilbert@redhat.com> wrote:
->> >> > * Stefan Hajnoczi (stefanha@gmail.com) wrote:
->> >> >> On Wed, Aug 23, 2017 at 02:51:03PM +0800, Peter Xu wrote:
->> >> >> > The root problem is that, monitor commands are all handled in main
->> >> >> > loop thread now, no matter how many monitors we specify. And, if main
->> >> >> > loop thread hangs due to some reason, all monitors will be stuck.
->> >> >>
->> >> >> I see a larger issue with postcopy: existing QEMU code assumes that
->> >> >> guest memory access is instantaneous.
->> >> >>
->> >> >> Postcopy breaks this assumption and introduces blocking points that can
->> >> >> now take unbounded time.
->> >> >>
->> >> >> This problem isn't specific to the monitor.  It can also happen to other
->> >> >> components in QEMU like the gdbstub.
->> >> >>
->> >> >> Do we need an asynchronous memory API?  Synchronous memory access should
->> >> >> only be allowed in vcpu threads.
->> >> >
->> >> > It would probably be useful for gdbstub where the overhead of async
->> >> > doesn't matter;  but doing that for all IO emulation is hard.
->> >>
->> >> Why is it hard?
->> >>
->> >> Memory access can be synchronous in the vcpu thread.  That eliminates
->> >> a lot of code straight away.
->> >>
->> >> Anything using dma-helpers.c is already async.  They just don't know
->> >> that the memory access part is being made async too :).
->> >
->> > Can you point me to some info on that ?
->>
->> IDE and SCSI use dma-helpers.c to perform I/O:
->> hw/ide/core.c:892:        s->bus->dma->aiocb =
->> dma_blk_io(blk_get_aio_context(s->blk),
->> hw/ide/macio.c:189:        s->bus->dma->aiocb =
->> dma_blk_io(blk_get_aio_context(s->blk), &s->sg,
->> hw/scsi/scsi-disk.c:348:        r->req.aiocb =
->> dma_blk_io(blk_get_aio_context(s->qdev.conf.blk),
->> hw/scsi/scsi-disk.c:551:        r->req.aiocb =
->> dma_blk_io(blk_get_aio_context(s->qdev.conf.blk),
->>
->> They pass a scatter-gather list of guest RAM addresses to
->> dma-helpers.c.  They receive a callback when I/O has finished.
->>
->> Try following the code path.  Request submission may be from a vcpu
->> thread or IOThread.  Completion occurs in the main loop or an
->> IOThread.
->>
->> The main point is that this API is already asynchronous.  If any
->> changes are needed for async guest memory access (not sure, I haven't
->> checked), then at least the dma-helpers.c users do not need to be
->> modified.
->>
->> >> The remaining cases are virtio and some other devices.
->> >>
->> >> If you are worried about performance, the first rule is that async
->> >> memory access is only needed on the destination side when post-copy is
->> >> active.  Maybe use setjmp to return from the signal handler and queue
->> >> a callback for when the page has been loaded.
->> >
->> > I'm not sure it's worth trying to be too clever at avoiding this;
->> > I see the fact that we're doing IO with the bql held as a more
->> > fundamental problem.
->>
->> QEMU should be doing I/O syscalls in async fashion or threadpool
->> workers (no BQL) so the BQL is not an issue.  Anything else could
->> cause unbounded waits even without postcopy.
->
-> E.g. when vcpu got page faulted with BQL taken, while the main thread
-> needs the BQL to dispatch anything, including monitor commands.
->
-> So I think it's a multiplex problem - we need to solve both (1) main
-> thread accessing guest memories which is still missing, and (2) BQL
-> deadlocks between vcpu threads and main thread.
+On Thu, 7 Sep 2017 15:52:19 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-I think we need a single solution and cannot treat these as separate.
-This is because the same virtio device emulation code may run in 3
-contexts:
-1. vcpu thread (ioeventfd=off)
-2. main loop thread (ioeventfd=on)
-3. IOThread (ioeventfd=on, iothread=<id>)
+> On 07.09.2017 15:32, Cornelia Huck wrote:
+> > On Mon,  4 Sep 2017 17:43:07 +0200
+> > David Hildenbrand <david@redhat.com> wrote:
+> >   
+> >> Clean it up by reusing program_interrupt(). Add a concern regarding
+> >> ilen.
+> >>
+> >> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >> ---
+> >>  target/s390x/misc_helper.c | 15 +++++++++------
+> >>  1 file changed, 9 insertions(+), 6 deletions(-)
+> >>
+> >> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+> >> index 57c02ddf1b..5096286157 100644
+> >> --- a/target/s390x/misc_helper.c
+> >> +++ b/target/s390x/misc_helper.c
+> >> @@ -446,14 +446,17 @@ void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
+> >>  #ifndef CONFIG_USER_ONLY
+> >>  void HELPER(per_check_exception)(CPUS390XState *env)
+> >>  {
+> >> -    CPUState *cs = CPU(s390_env_get_cpu(env));
+> >> +    uint32_t ilen;
+> >>  
+> >>      if (env->per_perc_atmid) {
+> >> -        env->int_pgm_code = PGM_PER;
+> >> -        env->int_pgm_ilen = get_ilen(cpu_ldub_code(env, env->per_address));
+> >> -
+> >> -        cs->exception_index = EXCP_PGM;
+> >> -        cpu_loop_exit(cs);
+> >> +        /*
+> >> +         * FIXME: ILEN_AUTO is most probably the right thing to use. ilen
+> >> +         * always has to match the instruction referenced in the PSW. E.g.
+> >> +         * if a PER interrupt is triggered via EXECUTE, we have to use ilen
+> >> +         * of EXECUTE, while per_address contains the target of EXECUTE.
+> >> +         */
+> >> +        ilen = get_ilen(cpu_ldub_code(env, env->per_address));
+> >> +        program_interrupt(env, PGM_PER, ilen);
+> >>      }
+> >>  }
+> >>    
+> > 
+> > Wrapping my head around it: You preserve the current behavior, which
+> > should probably be changed to use ILEN_AUTO to handle cases like
+> > EXECUTE correctly?  
+> 
+> Exactly, e.g. if EXECUTE executes instruction Y, and Y is to generate an
+> IFETCH event, AFAIK
+> 
+> a) per_address points at Y
+> b) old PGM PSW points at instruction after EXECUTE (ignoring nullifying
+> for now)
+> c) PGM ilen has to match EXECUTE (so the PSW can properly be rewound)
+> 
+> The case where per_address == (PGM PSW - ilen) (ignoring nullification)
+> should happen without EXECUTE being involved. That's why PER currently
+> works just fine with Linux (e.g. uprobe smoke tests when kernel boots up).
+> 
+> Execute handling with PER is just nasty. And one first has to find out
+> how that plays together with EXECUTE handling in TCG. Therefore, no easy
+> fix (although ILEN_AUTO might most probably really be the right thing to
+> do).
 
-If you try to solve them separately then the code won't work in all 3
-contexts anymore.
+That really sounds like a lot of fun...
 
-Stefan
+> 
+> > 
+> > Do you plan to do a follow up? (Should I spend some cycles on it?)
+> >   
+> 
+> Somewhere on my list. The next thing (in this area) I want do is write
+> kvm-unit-tests for PER, because also KVM could benefit from that
+> (EXECUTE handling is just nasty).
+> 
+> So sure, go ahead and have a look at it if you have some spare cycles :)
+
+Spare cycles? Me? :)
+
+I think we can live with the current state a bit longer. Adding the
+FIXME is actually an improvement...
