@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54700)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpwmf-0007Es-Vf
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:23:58 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dpwpE-00009c-4O
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:26:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dpwmW-00054w-Km
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:23:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55546)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dpwmW-00054N-F5
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:23:44 -0400
-Date: Thu, 7 Sep 2017 15:23:37 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170907152337.02f7aec8.cohuck@redhat.com>
-In-Reply-To: <09ff8ae8-3ad2-7dd3-16d9-0528c1ee665a@redhat.com>
-References: <20170904154316.4148-1-david@redhat.com>
-	<20170904154316.4148-8-david@redhat.com>
-	<3f858041-2cc1-7beb-78bc-d43c3b42b6ab@redhat.com>
-	<09ff8ae8-3ad2-7dd3-16d9-0528c1ee665a@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1dpwp9-0006IF-9m
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 09:26:32 -0400
+Date: Thu, 7 Sep 2017 15:26:11 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170907132611.GG4461@dhcp-200-186.str.redhat.com>
+References: <20170825132332.6734-1-el13635@mail.ntua.gr>
+	<20170825132332.6734-5-el13635@mail.ntua.gr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 07/19] s390x: move two function
- declarations to s390-virtio-ccw.h
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170825132332.6734-5-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [PATCH v3 4/7] block: remove legacy I/O throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,32 +23,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Thu, 7 Sep 2017 14:46:44 +0200
-David Hildenbrand <david@redhat.com> wrote:
+Am 25.08.2017 um 15:23 hat Manos Pitsidianakis geschrieben:
+> This commit removes all I/O throttling from block/block-backend.c. In
+> order to support the existing interface, it is changed to use the
+> block/throttle.c filter driver.
+> 
+> The throttle filter node that is created by the legacy interface is
+> stored in a 'throttle_node' field in the BlockBackendPublic of the
+> device. The legacy throttle node is managed by the legacy interface
+> completely. More advanced configurations with the filter drive are
+> possible using the QMP API, but these will be ignored by the legacy
+> interface.
+> 
+> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 
-> >> +++ b/target/s390x/interrupt.c
-> >> @@ -15,6 +15,9 @@
-> >>  #include "exec/exec-all.h"
-> >>  #include "sysemu/kvm.h"
-> >>  #include "hw/s390x/ioinst.h"
-> >> +#if !defined(CONFIG_USER_ONLY)
-> >> +#include "hw/s390x/s390-virtio-ccw.h"
-> >> +#endif
-> >> =20
-> >>  /* Ensure to exit the TB after this call! */
-> >>  void trigger_pgm_exception(CPUS390XState *env, uint32_t code, uint32_=
-t ilen)
-> >> =20
-> >=20
-> > If I listen to my gut feeling, I still think we should rather move
-> > s390_cpu_addr2state() to cpu.c instead. It does not sound as it's really
-> > specific to the virtio-ccw machine... Just my 0.02 =E2=82=AC
-> >  =20
->=20
-> I prefer to leave it as is for now, so just a header cleanup. E.g. with
-> patch 18 we could implement it directly using ms->possible_cpus.
+This patch doesn't apply cleanly any more and needs a rebase.
 
-If you do that, would you also get rid of the conditional include above?
+>  /* should be called before blk_set_io_limits if a limit is set */
+> -void blk_io_limits_enable(BlockBackend *blk, const char *group)
+> +void blk_io_limits_enable(BlockBackend *blk, const char *group,  Error **errp)
+>  {
+> -    assert(!blk->public.throttle_group_member.throttle_state);
+> -    throttle_group_register_tgm(&blk->public.throttle_group_member,
+> -                                group, blk_get_aio_context(blk));
+> +    BlockDriverState *bs = blk_bs(blk), *throttle_node;
+> +    QDict *options = qdict_new();
+> +    Error *local_err = NULL;
+> +    ThrottleState *ts;
+> +
+> +    bdrv_drained_begin(bs);
+
+bs can be NULL:
+
+$ x86_64-softmmu/qemu-system-x86_64 -drive media=cdrom,bps=1024
+Segmentation fault (core dumped)
+
+>  static void blk_root_drained_begin(BdrvChild *child)
+>  {
+> +    ThrottleGroupMember *tgm;
+>      BlockBackend *blk = child->opaque;
+>  
+>      if (++blk->quiesce_counter == 1) {
+> @@ -1997,19 +2025,25 @@ static void blk_root_drained_begin(BdrvChild *child)
+>  
+>      /* Note that blk->root may not be accessible here yet if we are just
+>       * attaching to a BlockDriverState that is drained. Use child instead. */
+> -
+> -    if (atomic_fetch_inc(&blk->public.throttle_group_member.io_limits_disabled) == 0) {
+> -        throttle_group_restart_tgm(&blk->public.throttle_group_member);
+> +    if (blk->public.throttle_node) {
+> +        tgm = throttle_get_tgm(blk->public.throttle_node);
+> +        if (atomic_fetch_inc(&tgm->io_limits_disabled) == 0) {
+> +            throttle_group_restart_tgm(tgm);
+> +        }
+>      }
+>  }
+>  
+>  static void blk_root_drained_end(BdrvChild *child)
+>  {
+> +    ThrottleGroupMember *tgm;
+>      BlockBackend *blk = child->opaque;
+>      assert(blk->quiesce_counter);
+>  
+> -    assert(blk->public.throttle_group_member.io_limits_disabled);
+> -    atomic_dec(&blk->public.throttle_group_member.io_limits_disabled);
+> +    if (blk->public.throttle_node) {
+> +        tgm = throttle_get_tgm(blk->public.throttle_node);
+> +        assert(tgm->io_limits_disabled);
+> +        atomic_dec(&tgm->io_limits_disabled);
+> +    }
+
+We shouldn't really need any throttling code in
+blk_root_drained_begin/end any more now because the throttle node will
+be drained. If this code is necessary, a bdrv_drain() on an explicit
+throttle node will work differently from one on an implicit one.
+
+Unfortunately, this seems to be true about the throttle node. Implicit
+throttle nodes will keep ignoring the throttle limit in order to
+complete the drain request quickly, where as explicit throttle nodes
+will process their requests at the configured speed before the drain
+request can be completed.
+
+This doesn't feel right to me, both should behave the same.
+
+Kevin
