@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dq1tL-00009b-WA
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:51:13 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dq1tK-00008v-Pw
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:51:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dq1tG-0000UY-Sv
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:51:08 -0400
-Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:34895)
+	(envelope-from <richard.henderson@linaro.org>) id 1dq1tF-0000TY-LZ
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:51:06 -0400
+Received: from mail-pg0-x230.google.com ([2607:f8b0:400e:c05::230]:33554)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dq1tG-0000Tw-KU
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:51:02 -0400
-Received: by mail-pg0-x22d.google.com with SMTP id 188so996415pgb.2
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 11:51:02 -0700 (PDT)
+	id 1dq1tF-0000T1-D7
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:51:01 -0400
+Received: by mail-pg0-x230.google.com with SMTP id t3so1010855pgt.0
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 11:51:01 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu,  7 Sep 2017 11:50:54 -0700
-Message-Id: <20170907185057.23421-3-richard.henderson@linaro.org>
+Date: Thu,  7 Sep 2017 11:50:53 -0700
+Message-Id: <20170907185057.23421-2-richard.henderson@linaro.org>
 In-Reply-To: <20170907185057.23421-1-richard.henderson@linaro.org>
 References: <20170907185057.23421-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 2/5] target/sh4: Convert to DisasJumpType
+Subject: [Qemu-devel] [PATCH v2 1/5] target/sh4: Use cmpxchg for movco when
+ parallel_cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,250 +32,213 @@ Cc: aurelien@aurel32.net, Richard Henderson <rth@twiddle.net>
 
 From: Richard Henderson <rth@twiddle.net>
 
+As for other targets, cmpxchg isn't quite right for ll/sc,
+suffering from an ABA race, but is sufficient to implement
+portable atomic operations.
+
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- target/sh4/translate.c | 65 +++++++++++++++++++++++---------------------------
- 1 file changed, 30 insertions(+), 35 deletions(-)
+ linux-user/main.c      | 19 +++++++++---
+ target/sh4/cpu.h       |  4 ++-
+ target/sh4/helper.c    |  1 +
+ target/sh4/translate.c | 81 ++++++++++++++++++++++++++++++++++++--------------
+ 4 files changed, 78 insertions(+), 27 deletions(-)
 
+diff --git a/linux-user/main.c b/linux-user/main.c
+index 03666ef657..22b3bdafc5 100644
+--- a/linux-user/main.c
++++ b/linux-user/main.c
+@@ -2665,6 +2665,8 @@ void cpu_loop(CPUSH4State *env)
+     target_siginfo_t info;
+ 
+     while (1) {
++        bool arch_interrupt = true;
++
+         cpu_exec_start(cs);
+         trapnr = cpu_exec(cs);
+         cpu_exec_end(cs);
+@@ -2696,13 +2698,14 @@ void cpu_loop(CPUSH4State *env)
+                 int sig;
+ 
+                 sig = gdb_handlesig(cs, TARGET_SIGTRAP);
+-                if (sig)
+-                  {
++                if (sig) {
+                     info.si_signo = sig;
+                     info.si_errno = 0;
+                     info.si_code = TARGET_TRAP_BRKPT;
+                     queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+-                  }
++                } else {
++                    arch_interrupt = false;
++                }
+             }
+             break;
+ 	case 0xa0:
+@@ -2713,9 +2716,9 @@ void cpu_loop(CPUSH4State *env)
+             info._sifields._sigfault._addr = env->tea;
+             queue_signal(env, info.si_signo, QEMU_SI_FAULT, &info);
+ 	    break;
+-
+         case EXCP_ATOMIC:
+             cpu_exec_step_atomic(cs);
++            arch_interrupt = false;
+             break;
+         default:
+             printf ("Unhandled trap: 0x%x\n", trapnr);
+@@ -2723,6 +2726,14 @@ void cpu_loop(CPUSH4State *env)
+             exit(EXIT_FAILURE);
+         }
+         process_pending_signals (env);
++
++        /* Most of the traps imply an exception or interrupt, which
++           implies an REI instruction has been executed.  Which means
++           that LDST (aka LOK_ADDR) should be cleared.  But there are
++           a few exceptions for traps internal to QEMU.  */
++        if (arch_interrupt) {
++            env->lock_addr = -1;
++        }
+     }
+ }
+ #endif
+diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+index 79f85d3365..603614a2d8 100644
+--- a/target/sh4/cpu.h
++++ b/target/sh4/cpu.h
+@@ -184,7 +184,9 @@ typedef struct CPUSH4State {
+     tlb_t itlb[ITLB_SIZE];	/* instruction translation table */
+     tlb_t utlb[UTLB_SIZE];	/* unified translation table */
+ 
+-    uint32_t ldst;
++    /* LDST = LOCK_ADDR != -1.  */
++    uint32_t lock_addr;
++    uint32_t lock_value;
+ 
+     /* Fields up to this point are cleared by a CPU reset */
+     struct {} end_reset_fields;
+diff --git a/target/sh4/helper.c b/target/sh4/helper.c
+index 28d93c2543..680b583e53 100644
+--- a/target/sh4/helper.c
++++ b/target/sh4/helper.c
+@@ -171,6 +171,7 @@ void superh_cpu_do_interrupt(CPUState *cs)
+     env->spc = env->pc;
+     env->sgr = env->gregs[15];
+     env->sr |= (1u << SR_BL) | (1u << SR_MD) | (1u << SR_RB);
++    env->lock_addr = -1;
+ 
+     if (env->flags & DELAY_SLOT_MASK) {
+         /* Branch instruction should be executed again before delay slot. */
 diff --git a/target/sh4/translate.c b/target/sh4/translate.c
-index 4365b21624..6e03370871 100644
+index 10191073b2..4365b21624 100644
 --- a/target/sh4/translate.c
 +++ b/target/sh4/translate.c
-@@ -25,10 +25,9 @@
- #include "exec/exec-all.h"
- #include "tcg-op.h"
- #include "exec/cpu_ldst.h"
--
- #include "exec/helper-proto.h"
- #include "exec/helper-gen.h"
--
-+#include "exec/translator.h"
- #include "trace-tcg.h"
- #include "exec/log.h"
+@@ -70,7 +70,8 @@ static TCGv cpu_gregs[32];
+ static TCGv cpu_sr, cpu_sr_m, cpu_sr_q, cpu_sr_t;
+ static TCGv cpu_pc, cpu_ssr, cpu_spc, cpu_gbr;
+ static TCGv cpu_vbr, cpu_sgr, cpu_dbr, cpu_mach, cpu_macl;
+-static TCGv cpu_pr, cpu_fpscr, cpu_fpul, cpu_ldst;
++static TCGv cpu_pr, cpu_fpscr, cpu_fpul;
++static TCGv cpu_lock_addr, cpu_lock_value;
+ static TCGv cpu_fregs[32];
  
-@@ -39,7 +38,7 @@ typedef struct DisasContext {
-     uint16_t opcode;
-     uint32_t tbflags;    /* should stay unmodified during the TB translation */
-     uint32_t envflags;   /* should stay in sync with env->flags using TCG ops */
--    int bstate;
-+    DisasJumpType bstate;
-     int memidx;
-     int gbank;
-     int fbank;
-@@ -55,14 +54,10 @@ typedef struct DisasContext {
- #define IS_USER(ctx) (!(ctx->tbflags & (1u << SR_MD)))
- #endif
+ /* internal register indexes */
+@@ -156,8 +157,12 @@ void sh4_translate_init(void)
+                                               offsetof(CPUSH4State,
+                                                        delayed_cond),
+                                               "_delayed_cond_");
+-    cpu_ldst = tcg_global_mem_new_i32(cpu_env,
+-				      offsetof(CPUSH4State, ldst), "_ldst_");
++    cpu_lock_addr = tcg_global_mem_new_i32(cpu_env,
++				           offsetof(CPUSH4State, lock_addr),
++                                           "_lock_addr_");
++    cpu_lock_value = tcg_global_mem_new_i32(cpu_env,
++				            offsetof(CPUSH4State, lock_value),
++                                            "_lock_value_");
  
--enum {
--    BS_NONE     = 0, /* We go out of the TB without reaching a branch or an
--                      * exception condition
--                      */
--    BS_STOP     = 1, /* We want to stop translation for any reason */
--    BS_BRANCH   = 2, /* We reached a branch condition     */
--    BS_EXCP     = 3, /* We reached an exception condition */
--};
-+/* Target-specific values for ctx->bstate.  */
-+/* We want to exit back to the cpu loop for some reason.
-+   Usually this is to recognize interrupts immediately.  */
-+#define DISAS_STOP    DISAS_TARGET_0
- 
- /* global register indexes */
- static TCGv_env cpu_env;
-@@ -269,6 +264,7 @@ static void gen_goto_tb(DisasContext *ctx, int n, target_ulong dest)
-             tcg_gen_lookup_and_goto_ptr(cpu_pc);
-         }
-     }
-+    ctx->bstate = DISAS_NORETURN;
- }
- 
- static void gen_jump(DisasContext * ctx)
-@@ -315,7 +311,7 @@ static void gen_conditional_jump(DisasContext *ctx, target_ulong dest,
-     gen_goto_tb(ctx, 0, dest);
-     gen_set_label(l1);
-     gen_goto_tb(ctx, 1, ctx->pc + 2);
--    ctx->bstate = BS_BRANCH;
-+    ctx->bstate = DISAS_NORETURN;
- }
- 
- /* Delayed conditional jump (bt or bf) */
-@@ -338,6 +334,7 @@ static void gen_delayed_conditional_jump(DisasContext * ctx)
-         gen_jump(ctx);
- 
-         gen_set_label(l1);
-+        ctx->bstate = DISAS_NEXT;
-         return;
-     }
- 
-@@ -479,7 +476,7 @@ static void _decode_opc(DisasContext * ctx)
- 	tcg_gen_mov_i32(cpu_delayed_pc, cpu_spc);
-         ctx->envflags |= DELAY_SLOT_RTE;
- 	ctx->delayed_pc = (uint32_t) - 1;
--        ctx->bstate = BS_STOP;
-+        ctx->bstate = DISAS_STOP;
+     for (i = 0; i < 32; i++)
+         cpu_fregs[i] = tcg_global_mem_new_i32(cpu_env,
+@@ -1558,31 +1563,63 @@ static void _decode_opc(DisasContext * ctx)
  	return;
-     case 0x0058:		/* sets */
-         tcg_gen_ori_i32(cpu_sr, cpu_sr, (1u << SR_S));
-@@ -490,17 +487,17 @@ static void _decode_opc(DisasContext * ctx)
-     case 0xfbfd:		/* frchg */
-         CHECK_FPSCR_PR_0
- 	tcg_gen_xori_i32(cpu_fpscr, cpu_fpscr, FPSCR_FR);
--	ctx->bstate = BS_STOP;
-+	ctx->bstate = DISAS_STOP;
- 	return;
-     case 0xf3fd:		/* fschg */
-         CHECK_FPSCR_PR_0
-         tcg_gen_xori_i32(cpu_fpscr, cpu_fpscr, FPSCR_SZ);
--	ctx->bstate = BS_STOP;
-+	ctx->bstate = DISAS_STOP;
- 	return;
-     case 0xf7fd:                /* fpchg */
+     case 0x0073:
+         /* MOVCO.L
+-	       LDST -> T
+-               If (T == 1) R0 -> (Rn)
+-               0 -> LDST
+-        */
++         *     LDST -> T
++         *     If (T == 1) R0 -> (Rn)
++         *     0 -> LDST
++         *
++         * The above description doesn't work in a parallel context.
++         * Since we currently support no smp boards, this implies user-mode.
++         * But we can still support the official mechanism while user-mode
++         * is single-threaded.  */
          CHECK_SH4A
-         tcg_gen_xori_i32(cpu_fpscr, cpu_fpscr, FPSCR_PR);
--        ctx->bstate = BS_STOP;
-+        ctx->bstate = DISAS_STOP;
+         {
+-            TCGLabel *label = gen_new_label();
+-            tcg_gen_mov_i32(cpu_sr_t, cpu_ldst);
+-	    tcg_gen_brcondi_i32(TCG_COND_EQ, cpu_ldst, 0, label);
+-            tcg_gen_qemu_st_i32(REG(0), REG(B11_8), ctx->memidx, MO_TEUL);
+-	    gen_set_label(label);
+-	    tcg_gen_movi_i32(cpu_ldst, 0);
+-	    return;
++            TCGLabel *fail = gen_new_label();
++            TCGLabel *done = gen_new_label();
++
++            if (parallel_cpus) {
++                TCGv tmp;
++
++                tcg_gen_brcond_i32(TCG_COND_NE, REG(B11_8), cpu_lock_addr, fail);
++                tmp = tcg_temp_new();
++                tcg_gen_atomic_cmpxchg_i32(tmp, REG(B11_8), cpu_lock_value,
++                                           REG(0), ctx->memidx, MO_TEUL);
++                tcg_gen_setcond_i32(TCG_COND_EQ, cpu_sr_t, tmp, cpu_lock_value);
++                tcg_temp_free(tmp);
++            } else {
++                tcg_gen_brcondi_i32(TCG_COND_EQ, cpu_lock_addr, -1, fail);
++                tcg_gen_qemu_st_i32(REG(0), REG(B11_8), ctx->memidx, MO_TEUL);
++                tcg_gen_movi_i32(cpu_sr_t, 1);
++            }
++            tcg_gen_br(done);
++
++            gen_set_label(fail);
++            tcg_gen_movi_i32(cpu_sr_t, 0);
++
++            gen_set_label(done);
++            tcg_gen_movi_i32(cpu_lock_addr, -1);
+         }
++        return;
+     case 0x0063:
+         /* MOVLI.L @Rm,R0
+-               1 -> LDST
+-               (Rm) -> R0
+-               When interrupt/exception
+-               occurred 0 -> LDST
+-        */
++         *     1 -> LDST
++         *     (Rm) -> R0
++         *     When interrupt/exception
++         *     occurred 0 -> LDST
++         *
++         * In a parallel context, we must also save the loaded value
++         * for use with the cmpxchg that we'll use with movco.l.  */
+         CHECK_SH4A
+-        tcg_gen_movi_i32(cpu_ldst, 0);
+-        tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx, MO_TESL);
+-        tcg_gen_movi_i32(cpu_ldst, 1);
++        if (parallel_cpus) {
++            TCGv tmp = tcg_temp_new();
++            tcg_gen_mov_i32(tmp, REG(B11_8));
++            tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx, MO_TESL);
++            tcg_gen_mov_i32(cpu_lock_value, REG(0));
++            tcg_gen_mov_i32(cpu_lock_addr, tmp);
++            tcg_temp_free(tmp);
++        } else {
++            tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx, MO_TESL);
++            tcg_gen_movi_i32(cpu_lock_addr, 0);
++        }
          return;
-     case 0x0009:		/* nop */
- 	return;
-@@ -535,7 +532,7 @@ static void _decode_opc(DisasContext * ctx)
-            region (stored in R0) in the next TB.  */
-         if (B11_8 == 15 && B7_0s < 0 && parallel_cpus) {
-             ctx->envflags = deposit32(ctx->envflags, GUSA_SHIFT, 8, B7_0s);
--            ctx->bstate = BS_STOP;
-+            ctx->bstate = DISAS_STOP;
-         }
- #endif
- 	tcg_gen_movi_i32(REG(B11_8), B7_0s);
-@@ -1320,7 +1317,7 @@ static void _decode_opc(DisasContext * ctx)
- 	    imm = tcg_const_i32(B7_0);
-             gen_helper_trapa(cpu_env, imm);
- 	    tcg_temp_free(imm);
--            ctx->bstate = BS_EXCP;
-+            ctx->bstate = DISAS_NORETURN;
- 	}
- 	return;
-     case 0xc800:		/* tst #imm,R0 */
-@@ -1429,7 +1426,7 @@ static void _decode_opc(DisasContext * ctx)
-             tcg_gen_andi_i32(val, REG(B11_8), 0x700083f3);
-             gen_write_sr(val);
-             tcg_temp_free(val);
--            ctx->bstate = BS_STOP;
-+            ctx->bstate = DISAS_STOP;
-         }
- 	return;
-     case 0x4007:		/* ldc.l @Rm+,SR */
-@@ -1441,7 +1438,7 @@ static void _decode_opc(DisasContext * ctx)
-             gen_write_sr(val);
- 	    tcg_temp_free(val);
- 	    tcg_gen_addi_i32(REG(B11_8), REG(B11_8), 4);
--	    ctx->bstate = BS_STOP;
-+	    ctx->bstate = DISAS_STOP;
- 	}
- 	return;
-     case 0x0002:		/* stc SR,Rn */
-@@ -1503,7 +1500,7 @@ static void _decode_opc(DisasContext * ctx)
-     case 0x406a:		/* lds Rm,FPSCR */
- 	CHECK_FPU_ENABLED
-         gen_helper_ld_fpscr(cpu_env, REG(B11_8));
--	ctx->bstate = BS_STOP;
-+	ctx->bstate = DISAS_STOP;
- 	return;
-     case 0x4066:		/* lds.l @Rm+,FPSCR */
- 	CHECK_FPU_ENABLED
-@@ -1513,7 +1510,7 @@ static void _decode_opc(DisasContext * ctx)
- 	    tcg_gen_addi_i32(REG(B11_8), REG(B11_8), 4);
-             gen_helper_ld_fpscr(cpu_env, addr);
- 	    tcg_temp_free(addr);
--	    ctx->bstate = BS_STOP;
-+	    ctx->bstate = DISAS_STOP;
- 	}
- 	return;
-     case 0x006a:		/* sts FPSCR,Rn */
-@@ -1849,7 +1846,7 @@ static void _decode_opc(DisasContext * ctx)
-         gen_save_cpu_state(ctx, true);
-         gen_helper_raise_illegal_instruction(cpu_env);
-     }
--    ctx->bstate = BS_EXCP;
-+    ctx->bstate = DISAS_NORETURN;
-     return;
- 
-  do_fpu_disabled:
-@@ -1859,7 +1856,7 @@ static void _decode_opc(DisasContext * ctx)
-     } else {
-         gen_helper_raise_fpu_disable(cpu_env);
-     }
--    ctx->bstate = BS_EXCP;
-+    ctx->bstate = DISAS_NORETURN;
-     return;
- }
- 
-@@ -1885,7 +1882,6 @@ static void decode_opc(DisasContext * ctx)
-         ctx->envflags &= ~GUSA_MASK;
- 
-         tcg_gen_movi_i32(cpu_flags, ctx->envflags);
--        ctx->bstate = BS_BRANCH;
-         if (old_flags & DELAY_SLOT_CONDITIONAL) {
- 	    gen_delayed_conditional_jump(ctx);
-         } else {
-@@ -2256,7 +2252,7 @@ static int decode_gusa(DisasContext *ctx, CPUSH4State *env, int *pmax_insns)
-     ctx->envflags |= GUSA_EXCLUSIVE;
-     gen_save_cpu_state(ctx, false);
-     gen_helper_exclusive(cpu_env);
--    ctx->bstate = BS_EXCP;
-+    ctx->bstate = DISAS_NORETURN;
- 
-     /* We're not executing an instruction, but we must report one for the
-        purposes of accounting within the TB.  We might as well report the
-@@ -2279,7 +2275,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     ctx.pc = pc_start;
-     ctx.tbflags = (uint32_t)tb->flags;
-     ctx.envflags = tb->flags & TB_FLAG_ENVFLAGS_MASK;
--    ctx.bstate = BS_NONE;
-+    ctx.bstate = DISAS_NEXT;
-     ctx.memidx = (ctx.tbflags & (1u << SR_MD)) == 0 ? 1 : 0;
-     /* We don't know if the delayed pc came from a dynamic or static branch,
-        so assume it is a dynamic branch.  */
-@@ -2317,7 +2313,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-     }
- #endif
- 
--    while (ctx.bstate == BS_NONE
-+    while (ctx.bstate == DISAS_NEXT
-            && num_insns < max_insns
-            && !tcg_op_buf_full()) {
-         tcg_gen_insn_start(ctx.pc, ctx.envflags);
-@@ -2327,7 +2323,7 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-             /* We have hit a breakpoint - make sure PC is up-to-date */
-             gen_save_cpu_state(&ctx, true);
-             gen_helper_debug(cpu_env);
--            ctx.bstate = BS_EXCP;
-+            ctx.bstate = DISAS_NORETURN;
-             /* The address covered by the breakpoint must be included in
-                [tb->pc, tb->pc + tb->size) in order to for it to be
-                properly cleared -- thus we increment the PC here so that
-@@ -2358,19 +2354,18 @@ void gen_intermediate_code(CPUState *cs, struct TranslationBlock *tb)
-         gen_helper_debug(cpu_env);
-     } else {
- 	switch (ctx.bstate) {
--        case BS_STOP:
-+        case DISAS_STOP:
-             gen_save_cpu_state(&ctx, true);
-             tcg_gen_exit_tb(0);
-             break;
--        case BS_NONE:
-+        case DISAS_NEXT:
-             gen_save_cpu_state(&ctx, false);
-             gen_goto_tb(&ctx, 0, ctx.pc);
-             break;
--        case BS_EXCP:
--            /* fall through */
--        case BS_BRANCH:
--        default:
-+        case DISAS_NORETURN:
-             break;
-+        default:
-+            g_assert_not_reached();
- 	}
-     }
- 
+     case 0x0093:		/* ocbi @Rn */
+ 	{
 -- 
 2.13.5
