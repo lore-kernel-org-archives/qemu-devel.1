@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57239)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dpszX-0001EW-Sw
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:21:00 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dpszZ-0001Fa-Ci
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:21:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dpszS-0007cR-Uz
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:20:55 -0400
-Received: from ozlabs.ru ([107.173.13.209]:51528)
+	(envelope-from <aik@ozlabs.ru>) id 1dpszU-0007ev-QZ
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:20:57 -0400
+Received: from ozlabs.ru ([107.173.13.209]:51572)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dpszS-0007cA-Oj
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:20:50 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dpszU-0007e8-Kl
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 05:20:52 -0400
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Thu,  7 Sep 2017 19:20:06 +1000
-Message-Id: <20170907092010.3605-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [RFC PATCH qemu 0/4] memory: Reduce memory use
+Date: Thu,  7 Sep 2017 19:20:07 +1000
+Message-Id: <20170907092010.3605-2-aik@ozlabs.ru>
+In-Reply-To: <20170907092010.3605-1-aik@ozlabs.ru>
+References: <20170907092010.3605-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [RFC PATCH qemu 1/4] memory: Postpone flatview and
+ dispatch tree building till all devices are added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +27,43 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
 
-This was inspired by https://bugzilla.redhat.com/show_bug.cgi?id=1481593
+Most devices use at least one address space and every time a new address
+space is added, flat views and dispatch trees are rebuild for all address
+spaces. This is not a problem for a relatively small amount of devices but
+even 50 virtio-pci devices use more than 8GB of RAM.
 
-What happens ithere is that every virtio block device creates 2 address
-spaces - for modern config space (called "virtio-pci-cfg-as") and
-for busmaster (common pci thing, called after the device name,
-in my case "virtio-blk-pci").
+What happens that on every flatview/dispatch rebuild, new arrays are
+allocated and old ones release but the release is done via RCU so until
+an entire machine is build, they are not released.
 
-Each address_space_init() updates topology for every address space.
-Every topology update (address_space_update_topology()) creates a new
-dispatch tree - AddressSpaceDispatch with nodes (1KB) and
-sections (48KB) and destroys the old one.
+This wraps devices creation into memory_region_transaction_begin/commit
+to massively reduce amount of flat view/dispatch tree (re)allocations.
 
-However the dispatch destructor is postponed via RCU which does not
-get a chance to execute until the machine is initialized but before
-we get there, memory is not returned to the pool, and this is a lot
-of memory which grows n^2.
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+ vl.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-These patches are trying to address the memory use and boot time
-issues but tbh only the first one provides visible outcome.
-
-There are still things to polish and double check the use of RCU,
-I'd like to get any feedback before proceeding - is this going
-the right way or way too ugly?
-
-
-This is based on sha1
-1ab5eb4efb Peter Maydell "Update version for v2.10.0 release".
-
-Please comment. Thanks.
-
-
-
-Alexey Kardashevskiy (4):
-  memory: Postpone flatview and dispatch tree building till all devices
-    are added
-  memory: Prepare for shared flat views
-  memory: Share flat views and dispatch trees between address spaces
-  memory: Add flat views to HMP "info mtree"
-
- include/exec/memory-internal.h |   6 +-
- include/exec/memory.h          |  93 +++++++++----
- exec.c                         | 242 +++++++++++++++++++--------------
- hw/alpha/typhoon.c             |   2 +-
- hw/dma/rc4030.c                |   4 +-
- hw/i386/amd_iommu.c            |   2 +-
- hw/i386/intel_iommu.c          |   9 +-
- hw/intc/openpic_kvm.c          |   2 +-
- hw/pci-host/apb.c              |   2 +-
- hw/pci/pci.c                   |   3 +-
- hw/ppc/spapr_iommu.c           |   4 +-
- hw/s390x/s390-pci-bus.c        |   2 +-
- hw/vfio/common.c               |   6 +-
- hw/virtio/vhost.c              |   6 +-
- memory.c                       | 299 +++++++++++++++++++++++++++--------------
- monitor.c                      |   3 +-
- vl.c                           |   4 +
- hmp-commands-info.hx           |   7 +-
- 18 files changed, 448 insertions(+), 248 deletions(-)
-
+diff --git a/vl.c b/vl.c
+index 8e247cc2a2..3c39cc8b3a 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4655,12 +4655,16 @@ int main(int argc, char **argv, char **envp)
+     igd_gfx_passthru();
+ 
+     /* init generic devices */
++    memory_region_transaction_begin();
++
+     rom_set_order_override(FW_CFG_ORDER_OVERRIDE_DEVICE);
+     if (qemu_opts_foreach(qemu_find_opts("device"),
+                           device_init_func, NULL, NULL)) {
+         exit(1);
+     }
+ 
++    memory_region_transaction_commit();
++
+     cpu_synchronize_all_post_init();
+ 
+     rom_reset_order_override();
 -- 
 2.11.0
