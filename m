@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35036)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36063)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dq17z-0003U0-40
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:02:15 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dq1Af-0004YF-P9
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:05:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dq17r-0004ia-Nw
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:02:11 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:35511)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dq17r-0004hw-Ft
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:02:03 -0400
-Received: by mail-wm0-x231.google.com with SMTP id f199so3467274wme.0
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 11:02:03 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dq1AZ-0005vQ-M5
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:04:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56426)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dq1AZ-0005up-C8
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 14:04:51 -0400
+Date: Thu, 7 Sep 2017 19:04:39 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170907180438.GU2098@work-vm>
+References: <20170906104850.GB2215@work-vm> <20170906105414.GL15510@redhat.com>
+	<20170906105704.GC2215@work-vm> <20170906110629.GM15510@redhat.com>
+	<20170906113157.GD2215@work-vm> <20170906115428.GP15510@redhat.com>
+	<20170907081341.GA23040@pxdev.xzpeter.org>
+	<87inguaclr.fsf@dusky.pond.sub.org> <20170907142046.GQ2098@work-vm>
+	<87fubyo17d.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-In-Reply-To: <20170907175430.2720-1-richard.henderson@linaro.org>
-References: <20170907175430.2720-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 7 Sep 2017 19:01:41 +0100
-Message-ID: <CAFEAcA_moESxhiTQrV_YS7h7pRB0cGMJ7GGW1xJjBinkQ5SdAg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] tcg/tci: Add TCG_TARGET_DEFAULT_MO
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <87fubyo17d.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +32,339 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>, mdroth@linux.vnet.ibm.com, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
-On 7 September 2017 at 18:54, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Missed being added as part of 71650df7b0ee.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  tcg/tci/tcg-target.h | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
-> index 06963288dc..8df628a319 100644
-> --- a/tcg/tci/tcg-target.h
-> +++ b/tcg/tci/tcg-target.h
-> @@ -192,4 +192,9 @@ static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
->  {
->  }
->
-> +/* We could notice __i386__ or __s390x__ and reduce the barriers depending
-> +   on the host.  But if you want performance, you use the normal backend.
-> +   We prefer consistency across hosts on this.  */
-> +#define TCG_TARGET_DEFAULT_MO  (0)
-> +
->  #endif /* TCG_TARGET_H */
+* Markus Armbruster (armbru@redhat.com) wrote:
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
+>=20
+> > * Markus Armbruster (armbru@redhat.com) wrote:
+> >> Peter Xu <peterx@redhat.com> writes:
+> >>=20
+> >> > On Wed, Sep 06, 2017 at 12:54:28PM +0100, Daniel P. Berrange wrote:
+> >> >> On Wed, Sep 06, 2017 at 12:31:58PM +0100, Dr. David Alan Gilbert wr=
+ote:
+> >> >> > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> >> >> > > This does imply that you need a separate monitor I/O processing=
+, from the
+> >> >> > > command execution thread, but I see no need for all commands to=
+ suddenly
+> >> >> > > become async. Just allowing interleaved replies is sufficient f=
+rom the
+> >> >> > > POV of the protocol definition. This interleaving is easy to ha=
+ndle from
+> >> >> > > the client POV - just requires a unique 'serial' in the request=
+ by the
+> >> >> > > client, that is copied into the reply by QEMU.
+> >> >> >=20
+> >> >> > OK, so for that we can just take Marc-Andr=E9's syntax and call i=
+t 'id':
+> >> >> >   https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03634.=
+html
+> >> >> >=20
+> >> >> > then it's upto the caller to ensure those id's are unique.
+> >> >>=20
+> >> >> Libvirt has in fact generated a unique 'id' for every monitor comma=
+nd
+> >> >> since day 1 of supporting QMP.
+> >> >>=20
+> >> >> > I do worry about two things:
+> >> >> >   a) With this the caller doesn't really know which commands coul=
+d be
+> >> >> >   in parallel - for example if we've got a recovery command that's
+> >> >> >   executed by this non-locking thread that's OK, we expect that
+> >> >> >   to be doable in parallel.  If in the future though we do
+> >> >> >   what you initially suggested and have a bunch of commands get
+> >> >> >   routed to the migration thread (say) then those would suddenly
+> >> >> >   operate in parallel with other commands that we're previously
+> >> >> >   synchronous.
+> >> >>=20
+> >> >> We could still have an opt-in for async commands. eg default to exe=
+cuting
+> >> >> all commands in the main thread, unless the client issues an explic=
+it
+> >> >> "make it async" command, to switch to allowing the migration thread=
+ to
+> >> >> process it async.
+> >> >>=20
+> >> >>  { "execute": "qmp_allow_async",
+> >> >>    "data": { "commands": [
+> >> >>        "migrate_cancel",
+> >> >>    ] } }
+> >> >>=20
+> >> >>=20
+> >> >>  { "return": { "commands": [
+> >> >>        "migrate_cancel",
+> >> >>    ] } }
+> >> >>=20
+> >> >> The server response contains the subset of commands from the request
+> >> >> for which async is supported.
+> >> >>=20
+> >> >> That gives good negotiation ability going forward as we incremental=
+ly
+> >> >> support async on more commands.
+> >> >
+> >> > I think this goes back to the discussion on which design we'd like to
+> >> > choose.  IMHO the whole async idea plus the per-command-id is indeed
+> >> > cleaner and nicer, and I believe that can benefit not only libvirt,
+> >>=20
+> >> The following may be a bit harsh in places.  I apologize in advance.  A
+> >> better writer than me wouldn't have to resort to that.  I've tried a f=
+ew
+> >> times to make my point that "async QMP" is neither necessary nor
+> >> sufficient for monitor availability, but apparently without luck, since
+> >> there's still talk like it was.  I hope this attempt will work.
+> >>=20
+> >> > but also other QMP users.  The problem is, I have no idea how long
+> >> > it'll take to let us have such a feature - I believe that will inclu=
+de
+> >> > QEMU and Libvirt to both support that.  And it'll be a pity if the
+> >> > postcopy recovery cannot work only because we cannot guarantee a
+> >> > stable monitor.
+> >> >
+> >> > I'm curious whether there are other requirements (besides postcopy
+> >> > recovery) that would want an always-alive monitor to run some
+> >> > lock-free commands?  If there is, I'd be more inclined to first
+> >> > provide a work-around solution like "-qmp-lockfree", and we can
+> >> > provide a better solution afterwards until when the whole async QMP
+> >> > work ready.
+> >>=20
+> >> Yes, there are other requirements for "async QMP", and no, "async QMP"
+> >> isn't a solution, but at best a part of a solution.
+> >>=20
+> >> Before I talk about QMP requirements, I need to ask a whole raft of
+> >> questions, because so far this thread feels like dreaming up grand
+> >> designs with only superficial understanding of the subject matter.
+> >
+> > I think Dan's suggestions are pretty good; while I prefered Peter's
+> > implementation, I think Dan's will work fine and if that's good for
+> > libvirt I'm OK with that.  I think we have a reasonable understanding
+> > of the problem.
+> >
+> >> Quite possibly because *my* understanding is superficial.  If yours
+> >> isn't, great!  Go answer my questions :)
+> >>=20
+> >> The root problem are main loop hangs.  QMP monitor hangs are merely a
+> >> special case.
+> >>=20
+> >> The main loop should not hang.  We've always violated that design
+> >> assumption in places, e.g. in monitor commands that write to disk, and
+> >> thus can hang indefinitely with NFS.  Post-copy adds more violations, =
+as
+> >> Stefan pointed out.
+> >>=20
+> >> I can't say whether solving the special case "QMP monitor hangs" witho=
+ut
+> >> also solving "main loop hangs" is useful.  A perfectly available QMP
+> >> monitor buys you nothing if it feeds a command queue that isn't being
+> >> emptied because its consumers all hang.
+> >
+> > Correct.
+> >
+> >> So, what exactly is going to drain the command queue?  If there's more
+> >> than one consumer, how exactly are commands from the queue dispatched =
+to
+> >> the consumers?
+> >
+> > The idea is to have 2 extra threads:
+> >    a) An IO thread
+> >    b) A thread that deals with non-blocking commands
+>=20
+> These are the two extra threads, and ...
+>=20
+> >    the existing main thread.
+>=20
+> ... they are "extras" to the existing main thread, right?
 
-Applied to master as a travis build fix, thanks.
+Yes; three threads total.
 
--- PMM
+> >    The IO thread dispatches most commands to the main thread
+> > but doesn't wait for the response.  When responses arrive it forwards
+> > the response back.
+>=20
+> The QMP monitor runs in this I/O thread?
+
+Yes; all the output formatting, basic checking of the input stream
+(assuming that is that's all lock free)
+
+> >    A class of commands is forwarded to the non-blocking command thread.
+>=20
+> Since the non-blocking commands by definition don't block, why can't we
+> simply execute them in the I/O thread?
+
+Yes, I think that's possible.
+I think it came from Dan's shape of suggestion so that in future
+maybe we would add more threads for other types of things (e.g.
+a thread that handled block commands)
+(I don't think that ends up looking too different from Peter's world -
+it's got one thread per monitor connection which is the other way up
+=66rom this but I think the behaviour is very similar).
+
+> >    More threads may be added in the future with some set of the commands
+> > being moved off the main thread to these other threads.  Eventually
+> > maybe no commands would be handled on the main thread.
+> >
+> >> What are the "no hang" guarantees (if any) and conditions for each of
+> >> these consumers?
+> >
+> > Commands sent to the main thread are as they are now.
+> > The non-blocking-command thread *shall not block*, it will not access
+> > guest memory, it wont take any lock that is taken by any other thread
+> > that can block on the main thread or main memory.  Commands that run
+> > on it can:
+> >    a) Access state that can be read atomically - e.g.=20
+> >       'info status'
+> >    b) Store parameters and then wake another thread
+> >    c) Issue a non-blocking system call.
+> >
+> >
+> >   In the case of postcopy recovery I see a command issued which starts
+> > the new migration stream;  the command parses the path and makes sure
+> > it's valid, and then stores it and kicks a recovery thread.
+> >   In the case of a COLO failover I'd see something that does a
+> > shutdown(2) on the migration stream.
+> >
+> >> We can have any number of QMP monitors today.  Would each of them feed
+> >> its own queue?  Would they all feed a shared queue?
+> >
+> > I see two queues; one which is the set of commands being forwarded
+> > to the main thread, the other is the set of commands being forwarded
+> > to the non-blocking thread.
+> >
+> >> How exactly is opt-in asynchronous to work?  Per QMP monitor?  Per
+> >> command?
+> >
+> > The command that Dan suggested is the opt-in; I think it's per monitor;
+> > now we're starting to get a bit more fuzzy.
+> >
+> >> What does it mean when an asynchronous command follows a synchronous
+> >> command in the same QMP monitor?  I would expect the synchronous comma=
+nd
+> >> to complete before the asynchronous command, because that's what
+> >> synchronous means, isn't it?  To keep your QMP monitor available, you
+> >> then must not send synchronous commands that can hang.
+> >
+> > Once you opt-in, all commands operate in a semi-asynchronous fashion;
+> > that is they don't block the IO thread, but at the same time there's
+> > never any more than one command outstanding on any one thread.
+> > You can issue any command you like; one command at a time waiting
+> > for the response with the knowledge that you can then always
+> > issue one of the non-blocking-commands after it.
+> >
+> >> How can we determine whether a certain synchronous command can hang?
+> >> Note that with opt-in async, *all* commands are also synchronous
+> >> commands.
+> >
+> > You regard all commands as blockable unless told otherwise.  The result
+> > from Dan's command is a list of truly async commands.
+> >
+> >> In short, explain to me how exactly you plan to ensure that certain QMP
+> >> commands (such as post-copy recovery) can always "get through", in the
+> >> presence of multiple monitors, hanging main loop, hanging synchronous
+> >> commands, hanging whatever-else-can-now-hang-in-this-post-copy-world.
+> >
+> > Have I missed anything?
+>=20
+> I'm trying to square this with Dan's reply, but it's probably too late
+> in my day for me to succeed.
+
+Nod.
+
+> >> Now let's talk about QMP requirements.
+> >>=20
+> >> Any addition to QMP must consider what exists already.
+> >
+> > Yes.
+> >
+> >> You may add more of the same.
+> >
+> > Yes
+> >
+> >> You may generalize existing stuff.
+> >
+> > Yes
+> >
+> >> You may change existing stuff if you have sufficient reason, subject to
+> >> backward compatibility constraints.
+> >
+> > Yes
+> >
+> >> But attempts to add new ways to do the same old stuff without properly
+> >> integrating the existing ways are not going to fly.
+> >
+> > Agreed; that's why I'm following Dan's recommendations.
+> >
+> >> In particular, any new way to start some job, monitor and control it
+> >> while it lives, get notified about its state changes and so forth must
+> >> integrate the existing ways.  These include block jobs (probably the
+> >> most sophisticated of the lot), migration, dump-guest-memory, and
+> >> possibly more.  They all work the same way: synchronous command to kick
+> >> off the job, more synchronous commands to monitor and control, events =
+to
+> >> notify.  They do differ in detail.
+> >
+> > And that's why we have the rule that all existing commands go onto the
+> > main thread and only one of those is outstanding at a time.  That way
+> > the actual behaviour of the existing commands doesn't change at all -
+> > however you do require the 'id' field in the command to put into the
+> > response so that you can distinguish the response of a command from each
+> > thread.  Even if you enable async, if you don't use any of the
+> > non-blocking commands the stream is just the same - send a command, get
+> > a response, send a command, get a response....
+> >
+> >> Asynchronous commands are a new way to do this.  When you only need to
+> >> be notified on "done", and don't need to monitor / control, they fit t=
+he
+> >> bill quite neatly.
+> >>=20
+> >> However, we can't just ignore the cases where we need more than that!
+> >> For those, we want a single generic solution instead of the several ad
+> >> hoc solutions we have now.
+> >>=20
+> >> If we add asynchronous commands *now*, and for simple cases only, we a=
+dd
+> >> yet another special case for a future generic solution to integrate.
+> >> I'm not going to let that happen.
+> >>=20
+> >> I figure the closest to a generic solution we have is block jobs.
+> >> Perhaps a generic solution could be had by abstracting away the "block"
+> >> from "block jobs", leaving just "jobs".
+> >
+> > I don't know block jobs well enough to answer that.
+> > I would suggest you could add a thread for asynchronous commands
+> > and you could shuffle commands onto that thread as and when you feel
+> > like it.
+> >
+> >> Another approach is generalizing the asynchronous command proposal to
+> >> fully cover the not-so-simple cases.
+> >>=20
+> >> If you'd rather want to make progress on monitor availability without
+> >> cracking the "jobs" problem, you're in luck!  Use your license to "add
+> >> more of the same": synchronous command to start a job, query to monito=
+r,
+> >> event to notify. =20
+> >>=20
+> >> If you insist on tying your monitor availability solution to
+> >> asynchronous commands, then I'm in luck!  I just found volunteers to
+> >> solve the "jobs" problem for me.
+> >
+> > I'm looking for minimal change here while keeping the door open for
+> > the future, if there's anything you think we should do to make that
+> > easy then tell us - but I'd rather this didn't turn into a 'fix all
+> > known monitor problems' because frankly we may as well give up now.
+> > So i don't see this as solving the 'jobs' problem, but if we can
+> > do something to make it easier to solve in the future then lets do it.
+>=20
+> Forget about asynchronous commands, jobs and the whole shebang of
+> distractions, and consider what you really need: I suspect it could be
+> out-of-band dispatch of non-blocking commands.  More on that in my reply
+> to Daniel.
+
+Right, and then the only thing we need to do is make sure the caller
+doesn't get the replies to those commands mixed up with the replies
+to the blocking commands.
+
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
