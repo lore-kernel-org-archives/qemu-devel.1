@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42320)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG1R-00009D-IY
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:33 -0400
+	(envelope-from <famz@redhat.com>) id 1dqG1W-0000El-Ft
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG1M-0005EL-VV
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53302)
+	(envelope-from <famz@redhat.com>) id 1dqG1R-0005IW-VX
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44662)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG1M-0005Dm-Pw
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:20 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG1R-0005Hu-Pr
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:25 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  8 Sep 2017 17:55:04 +0800
-Message-Id: <20170908095506.13594-37-famz@redhat.com>
+Date: Fri,  8 Sep 2017 17:55:06 +0800
+Message-Id: <20170908095506.13594-39-famz@redhat.com>
 In-Reply-To: <20170908095506.13594-1-famz@redhat.com>
 References: <20170908095506.13594-1-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 36/38] buildsys: Move usb redir cflags/libs to
- per object
+Subject: [Qemu-devel] [PULL 38/38] buildsys: Move rdma libs to per object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,49 +27,44 @@ To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170907082918.7299-10-famz@redhat.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Message-Id: <20170907084230.26493-1-famz@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- configure            | 4 ++--
- hw/usb/Makefile.objs | 2 ++
- 2 files changed, 4 insertions(+), 2 deletions(-)
+ configure               | 2 +-
+ migration/Makefile.objs | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/configure b/configure
-index 18368670b1..64a931d1e2 100755
+index e354497eaa..5b86653bcd 100755
 --- a/configure
 +++ b/configure
-@@ -4270,8 +4270,6 @@ if test "$usb_redir" !=3D "no" ; then
-         usb_redir=3D"yes"
-         usb_redir_cflags=3D$($pkg_config --cflags libusbredirparser-0.5)
-         usb_redir_libs=3D$($pkg_config --libs libusbredirparser-0.5)
--        QEMU_CFLAGS=3D"$QEMU_CFLAGS $usb_redir_cflags"
--        libs_softmmu=3D"$libs_softmmu $usb_redir_libs"
-     else
-         if test "$usb_redir" =3D "yes"; then
-             feature_not_found "usb-redir" "Install usbredir devel"
-@@ -5838,6 +5836,8 @@ fi
-=20
- if test "$usb_redir" =3D "yes" ; then
-   echo "CONFIG_USB_REDIR=3Dy" >> $config_host_mak
-+  echo "USB_REDIR_CFLAGS=3D$usb_redir_cflags" >> $config_host_mak
-+  echo "USB_REDIR_LIBS=3D$usb_redir_libs" >> $config_host_mak
+@@ -2812,7 +2812,6 @@ EOF
+   rdma_libs="-lrdmacm -libverbs"
+   if compile_prog "" "$rdma_libs" ; then
+     rdma="yes"
+-    libs_softmmu="$libs_softmmu $rdma_libs"
+   else
+     if test "$rdma" = "yes" ; then
+         error_exit \
+@@ -6039,6 +6038,7 @@ echo "CONFIG_TRACE_FILE=$trace_file" >> $config_host_mak
+ 
+ if test "$rdma" = "yes" ; then
+   echo "CONFIG_RDMA=y" >> $config_host_mak
++  echo "RDMA_LIBS=$rdma_libs" >> $config_host_mak
  fi
-=20
- if test "$opengl" =3D "yes" ; then
-diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-index 9ce9eadb47..92eb199697 100644
---- a/hw/usb/Makefile.objs
-+++ b/hw/usb/Makefile.objs
-@@ -38,6 +38,8 @@ endif
-=20
- # usb redirection
- common-obj-$(CONFIG_USB_REDIR) +=3D redirect.o quirks.o
-+redirect.o-cflags =3D $(USB_REDIR_CFLAGS)
-+redirect.o-libs =3D $(USB_REDIR_LIBS)
-=20
- # usb pass-through
- common-obj-y +=3D $(patsubst %,host-%.o,$(HOST_USB))
---=20
+ 
+ if test "$have_rtnetlink" = "yes" ; then
+diff --git a/migration/Makefile.objs b/migration/Makefile.objs
+index 1c7770da46..99e038024d 100644
+--- a/migration/Makefile.objs
++++ b/migration/Makefile.objs
+@@ -11,3 +11,4 @@ common-obj-$(CONFIG_RDMA) += rdma.o
+ 
+ common-obj-$(CONFIG_LIVE_BLOCK_MIGRATION) += block.o
+ 
++rdma.o-libs := $(RDMA_LIBS)
+-- 
 2.13.5
