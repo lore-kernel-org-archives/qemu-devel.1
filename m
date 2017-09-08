@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42022)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG1B-0008LM-Dh
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:14 -0400
+	(envelope-from <famz@redhat.com>) id 1dqG1D-0008NC-A1
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG16-000516-NB
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36642)
+	(envelope-from <famz@redhat.com>) id 1dqG18-00052a-Mr
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57516)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG16-00050R-HV
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:04 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG18-00051v-Gm
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:06 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  8 Sep 2017 17:54:56 +0800
-Message-Id: <20170908095506.13594-29-famz@redhat.com>
+Date: Fri,  8 Sep 2017 17:54:57 +0800
+Message-Id: <20170908095506.13594-30-famz@redhat.com>
 In-Reply-To: <20170908095506.13594-1-famz@redhat.com>
 References: <20170908095506.13594-1-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 28/38] buildsys: Move gtk/vte cflags/libs to per
+Subject: [Qemu-devel] [PULL 29/38] buildsys: Move sdl cflags/libs to per
  object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,57 +31,56 @@ To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170907082918.7299-2-famz@redhat.com>
+Message-Id: <20170907082918.7299-3-famz@redhat.com>
 Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- configure        | 3 +--
- ui/Makefile.objs | 4 ++++
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ audio/Makefile.objs | 1 +
+ configure           | 2 +-
+ ui/Makefile.objs    | 1 +
+ 3 files changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/audio/Makefile.objs b/audio/Makefile.objs
+index 481d1aa30e..c20695668f 100644
+--- a/audio/Makefile.objs
++++ b/audio/Makefile.objs
+@@ -11,3 +11,4 @@ common-obj-$(CONFIG_AUDIO_WIN_INT) +=3D audio_win_int.o
+ common-obj-y +=3D wavcapture.o
+=20
+ sdlaudio.o-cflags :=3D $(SDL_CFLAGS)
++sdlaudio.o-libs :=3D $(SDL_LIBS)
 diff --git a/configure b/configure
-index 821922fffc..a007a4d430 100755
+index a007a4d430..90a8851342 100755
 --- a/configure
 +++ b/configure
-@@ -2434,7 +2434,6 @@ if test "$gtk" !=3D "no"; then
-             gtk_cflags=3D"$gtk_cflags $x11_cflags"
-             gtk_libs=3D"$gtk_libs $x11_libs"
-         fi
--        libs_softmmu=3D"$gtk_libs $libs_softmmu"
-         gtk=3D"yes"
-     elif test "$gtk" =3D "yes"; then
-         feature_not_found "gtk" "Install gtk3-devel"
-@@ -2684,7 +2683,6 @@ if test "$vte" !=3D "no"; then
-         vte_cflags=3D$($pkg_config --cflags $vtepackage)
-         vte_libs=3D$($pkg_config --libs $vtepackage)
-         vteversion=3D$($pkg_config --modversion $vtepackage)
--        libs_softmmu=3D"$vte_libs $libs_softmmu"
-         vte=3D"yes"
-     elif test "$vte" =3D "yes"; then
-         if test "$gtkabi" =3D "3.0"; then
-@@ -5749,6 +5747,7 @@ fi
- if test "$vte" =3D "yes" ; then
-   echo "CONFIG_VTE=3Dy" >> $config_host_mak
-   echo "VTE_CFLAGS=3D$vte_cflags" >> $config_host_mak
-+  echo "VTE_LIBS=3D$vte_libs" >> $config_host_mak
+@@ -2800,7 +2800,6 @@ EOF
+     sdl_cflags=3D"$sdl_cflags $x11_cflags"
+     sdl_libs=3D"$sdl_libs $x11_libs"
+   fi
+-  libs_softmmu=3D"$sdl_libs $libs_softmmu"
  fi
- if test "$virglrenderer" =3D "yes" ; then
-   echo "CONFIG_VIRGL=3Dy" >> $config_host_mak
+=20
+ ##########################################
+@@ -5598,6 +5597,7 @@ if test "$sdl" =3D "yes" ; then
+   echo "CONFIG_SDL=3Dy" >> $config_host_mak
+   echo "CONFIG_SDLABI=3D$sdlabi" >> $config_host_mak
+   echo "SDL_CFLAGS=3D$sdl_cflags" >> $config_host_mak
++  echo "SDL_LIBS=3D$sdl_libs" >> $config_host_mak
+ fi
+ if test "$cocoa" =3D "yes" ; then
+   echo "CONFIG_COCOA=3Dy" >> $config_host_mak
 diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index 3369451285..146a8ce062 100644
+index 146a8ce062..b3e29e21f0 100644
 --- a/ui/Makefile.objs
 +++ b/ui/Makefile.objs
-@@ -45,6 +45,10 @@ gtk.o-cflags :=3D $(GTK_CFLAGS) $(VTE_CFLAGS)
- gtk-egl.o-cflags :=3D $(GTK_CFLAGS) $(VTE_CFLAGS)
- gtk-gl-area.o-cflags :=3D $(GTK_CFLAGS) $(VTE_CFLAGS)
+@@ -27,6 +27,7 @@ sdl.mo-objs +=3D sdl2-gl.o
+ endif
+ endif
+ sdl.mo-cflags :=3D $(SDL_CFLAGS)
++sdl.mo-libs :=3D $(SDL_LIBS)
 =20
-+gtk.o-libs :=3D $(GTK_LIBS) $(VTE_LIBS)
-+gtk-egl.o-libs :=3D $(GTK_LIBS) $(VTE_LIBS)
-+gtk-gl-area.o-libs :=3D $(GTK_LIBS) $(VTE_LIBS)
-+
- gtk-egl.o-libs +=3D $(OPENGL_LIBS)
- shader.o-libs +=3D $(OPENGL_LIBS)
- console-gl.o-libs +=3D $(OPENGL_LIBS)
+ ifeq ($(CONFIG_OPENGL),y)
+ common-obj-y +=3D shader.o
 --=20
 2.13.5
