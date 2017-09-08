@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55240)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56687)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dqIy5-0002fu-Mv
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:05:15 -0400
+	(envelope-from <thuth@redhat.com>) id 1dqJ0u-0004of-S6
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:08:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dqIy0-0006DC-5L
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:05:09 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170830215523.25278-1-f4bug@amsat.org>
-	<20170830215523.25278-13-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9244c59c-569c-60b0-24e3-42a06f28d707@amsat.org>
-Date: Fri, 8 Sep 2017 10:04:50 -0300
+	(envelope-from <thuth@redhat.com>) id 1dqJ0u-0000WG-24
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:08:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40640)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dqJ0t-0000VG-SM
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:08:03 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D67E381DEF
+	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 13:08:02 +0000 (UTC)
+References: <20170908114407.25906-1-otubo@redhat.com>
+	<20170908114407.25906-2-otubo@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5b6920cb-89c9-89b7-dc71-9f973709f339@redhat.com>
+Date: Fri, 8 Sep 2017 15:07:58 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170830215523.25278-13-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170908114407.25906-2-otubo@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 12/17] MAINTAINERS: add missing megasas
- test entry
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCHv6 1/5] seccomp: changing from whitelist to
+ blacklist
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +35,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Hannes Reinecke <hare@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
 
-ping?
-
-On 08/30/2017 06:55 PM, Philippe Mathieu-Daudé wrote:
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On 08.09.2017 13:44, Eduardo Otubo wrote:
+> This patch changes the default behavior of the seccomp filter from
+> whitelist to blacklist. By default now all system calls are allowed and
+> a small black list of definitely forbidden ones was created.
+> 
+> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
 > ---
->   MAINTAINERS | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index fa74b7254b..20d65dca73 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1118,6 +1118,7 @@ L: qemu-block@nongnu.org
->   S: Supported
->   F: hw/scsi/megasas.c
->   F: hw/scsi/mfi.h
-> +F: tests/megasas-test.c
->   
->   Network packet abstractions
->   M: Dmitry Fleytman <dmitry@daynix.com>
-> 
+>  include/sysemu/seccomp.h |   2 +
+>  qemu-seccomp.c           | 260 +++++------------------------------------------
+>  vl.c                     |   1 -
+>  3 files changed, 30 insertions(+), 233 deletions(-)
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
