@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqFZv-0006xj-W2
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:28:05 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dqFab-0007YD-JU
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:28:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqFZm-0001pg-C5
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:27:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57092)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqFZm-0001ox-3W
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:27:50 -0400
-Date: Fri, 8 Sep 2017 10:27:38 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170908092738.GB3609@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170906104850.GB2215@work-vm> <20170906105414.GL15510@redhat.com>
-	<20170906105704.GC2215@work-vm> <20170906110629.GM15510@redhat.com>
-	<20170906113157.GD2215@work-vm> <20170906115428.GP15510@redhat.com>
-	<20170907081341.GA23040@pxdev.xzpeter.org>
-	<87inguaclr.fsf@dusky.pond.sub.org>
-	<20170907132259.GM30609@redhat.com>
-	<87h8weo186.fsf@dusky.pond.sub.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1dqFaW-0002Ow-DK
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:28:41 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:36699)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dqFaW-0002Nw-33
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:28:36 -0400
+Received: by mail-wr0-x230.google.com with SMTP id o42so3555510wrb.3
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 02:28:35 -0700 (PDT)
+References: <20170817230114.3655-1-richard.henderson@linaro.org>
+	<20170817230114.3655-5-richard.henderson@linaro.org>
+	<874lsemj0d.fsf@linaro.org>
+	<f18d9635-1ae5-08f0-3856-c2d445e62b99@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <f18d9635-1ae5-08f0-3856-c2d445e62b99@linaro.org>
+Date: Fri, 08 Sep 2017 10:28:33 +0100
+Message-ID: <877ex9iloe.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87h8weo186.fsf@dusky.pond.sub.org>
-Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 4/8] tcg: Add operations for host vectors
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,85 +32,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-On Thu, Sep 07, 2017 at 07:41:29PM +0200, Markus Armbruster wrote:
-> "Daniel P. Berrange" <berrange@redhat.com> writes:
-> 
-> > On Thu, Sep 07, 2017 at 02:59:28PM +0200, Markus Armbruster wrote:
-> >> So, what exactly is going to drain the command queue?  If there's more
-> >> than one consumer, how exactly are commands from the queue dispatched to
-> >> the consumers?
-> >
-> > In terms of my proposal, for any single command there should only ever
-> > be a single consumer. The default consumer would be the main event loop
-> > thread, such that we have no semantic change to QMP operation from today.
-> >
-> > Some commands that are capable of being made "async", would have a
-> > different consumer. For example, if the client requested the 'migrate-cancel'
-> > be made async, this would change things such that the migration thread is
-> > now responsible for consuming the "migrate-cancel" command, instead of the
-> > default main loop.
-> >
-> >> What are the "no hang" guarantees (if any) and conditions for each of
-> >> these consumers?
-> >
-> > The non-main thread consumers would have to have some reasonable
-> > guarantee that they won't block on a lock held by the main loop,
-> > otherwise the whole feature is largely useless.
-> 
-> Same if they block indefinitely on anything else, actually.  In other
-> words, we need to talk about liveness.
-> 
-> Threads by themselves don't buy us liveness.  Being careful with
-> operations that may block does.  That care may lead to farming out
-> certain operations to other threads, where they may block without harm.
-> 
-> You only talk about "the non-main thread consumers".  What about the
-> main thread?  Is it okay for the main thread to block?  If yes, why?
 
-It isn't ok, but I feel that challenge is intractable in the short to
-medium term. Agree that having separate threads doesn't automatically
-give liveness, but I think it makes the problem tractble to solve for
-at least a subset of scenarios.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
-> > No, that is not what I described. All synchronous commands are
-> > serialized wrt each other, just as today. An asychronous command
-> > can run as soon as it is received, regardless of whether any
-> > earlier sent sync commands are still executing or pending. This
-> > is trivial to achieve when you separate monitor I/O from command
-> > execution in separate threads, provided of course the async
-> > command consumers are not in the main loop.
-> 
-> So, a synchronous command is synchronous with respect to other commands,
-> except for certain non-blocking commands.  The distinctive feature of
-> the latter isn't so much an asynchronous reply, but out-of-band
-> dispatch.
+> On 09/07/2017 12:00 PM, Alex Bennée wrote:
+>>
+>> Richard Henderson <richard.henderson@linaro.org> writes:
+>>
+>>> Nothing uses or implements them yet.
+>>>
+>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>> ---
+>>>  tcg/tcg-opc.h | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>  tcg/tcg.h     | 24 ++++++++++++++++
+>>>  2 files changed, 113 insertions(+)
+>>>
+>>> diff --git a/tcg/tcg-opc.h b/tcg/tcg-opc.h
+>>> index 956fb1e9f3..9162125fac 100644
+>>> --- a/tcg/tcg-opc.h
+>>> +++ b/tcg/tcg-opc.h
+>>> @@ -206,6 +206,95 @@ DEF(qemu_st_i64, 0, TLADDR_ARGS + DATA64_ARGS, 1,
+>>>
+>>>  #undef TLADDR_ARGS
+>>>  #undef DATA64_ARGS
+>>> +
+>>> +/* Host integer vector operations.  */
+>>> +/* These opcodes are required whenever the base vector size is enabled.  */
+>>> +
+>>> +DEF(mov_v64, 1, 1, 0, IMPL(TCG_TARGET_HAS_v64))
+>>> +DEF(mov_v128, 1, 1, 0, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(mov_v256, 1, 1, 0, IMPL(TCG_TARGET_HAS_v256))
+>>> +
+>>> +DEF(movi_v64, 1, 0, 1, IMPL(TCG_TARGET_HAS_v64))
+>>> +DEF(movi_v128, 1, 0, 1, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(movi_v256, 1, 0, 1, IMPL(TCG_TARGET_HAS_v256))
+>>> +
+>>> +DEF(ld_v64, 1, 1, 1, IMPL(TCG_TARGET_HAS_v64))
+>>> +DEF(ld_v128, 1, 1, 1, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(ld_v256, 1, 1, 1, IMPL(TCG_TARGET_HAS_v256))
+>>> +
+>>> +DEF(st_v64, 0, 2, 1, IMPL(TCG_TARGET_HAS_v64))
+>>> +DEF(st_v128, 0, 2, 1, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(st_v256, 0, 2, 1, IMPL(TCG_TARGET_HAS_v256))
+>>> +
+>>> +DEF(and_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>>> +DEF(and_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(and_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>>> +
+>>> +DEF(or_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>>> +DEF(or_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(or_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>>> +
+>>> +DEF(xor_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>>> +DEF(xor_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(xor_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>>> +
+>>> +DEF(add8_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>>> +DEF(add16_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>>> +DEF(add32_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>>> +
+>>> +DEF(add8_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(add16_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(add32_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(add64_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>>> +
+>>> +DEF(add8_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>>> +DEF(add16_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>>> +DEF(add32_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>>> +DEF(add64_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>>> +
+>>> +DEF(sub8_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>>> +DEF(sub16_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>>> +DEF(sub32_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_v64))
+>>> +
+>>> +DEF(sub8_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(sub16_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(sub32_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>>> +DEF(sub64_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_v128))
+>>> +
+>>> +DEF(sub8_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>>> +DEF(sub16_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>>> +DEF(sub32_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>>> +DEF(sub64_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_v256))
+>>> +
+>>> +/* These opcodes are optional.
+>>> +   All element counts must be supported if any are.  */
+>>> +
+>>> +DEF(not_v64, 1, 1, 0, IMPL(TCG_TARGET_HAS_not_v64))
+>>> +DEF(not_v128, 1, 1, 0, IMPL(TCG_TARGET_HAS_not_v128))
+>>> +DEF(not_v256, 1, 1, 0, IMPL(TCG_TARGET_HAS_not_v256))
+>>> +
+>>> +DEF(andc_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_andc_v64))
+>>> +DEF(andc_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_andc_v128))
+>>> +DEF(andc_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_andc_v256))
+>>> +
+>>> +DEF(orc_v64, 1, 2, 0, IMPL(TCG_TARGET_HAS_orc_v64))
+>>> +DEF(orc_v128, 1, 2, 0, IMPL(TCG_TARGET_HAS_orc_v128))
+>>> +DEF(orc_v256, 1, 2, 0, IMPL(TCG_TARGET_HAS_orc_v256))
+>>> +
+>>> +DEF(neg8_v64, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v64))
+>>> +DEF(neg16_v64, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v64))
+>>> +DEF(neg32_v64, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v64))
+>>> +
+>>> +DEF(neg8_v128, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v128))
+>>> +DEF(neg16_v128, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v128))
+>>> +DEF(neg32_v128, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v128))
+>>> +DEF(neg64_v128, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v128))
+>>> +
+>>> +DEF(neg8_v256, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v256))
+>>> +DEF(neg16_v256, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v256))
+>>> +DEF(neg32_v256, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v256))
+>>> +DEF(neg64_v256, 1, 1, 0, IMPL(TCG_TARGET_HAS_neg_v256))
+>>> +
+>>>  #undef IMPL
+>>>  #undef IMPL64
+>>>  #undef DEF
+>>> diff --git a/tcg/tcg.h b/tcg/tcg.h
+>>> index 1277caed3d..b9e15da13b 100644
+>>> --- a/tcg/tcg.h
+>>> +++ b/tcg/tcg.h
+>>> @@ -166,6 +166,30 @@ typedef uint64_t TCGRegSet;
+>>>  #define TCG_TARGET_HAS_rem_i64          0
+>>>  #endif
+>>>
+>>> +#ifndef TCG_TARGET_HAS_v64
+>>> +#define TCG_TARGET_HAS_v64              0
+>>> +#define TCG_TARGET_HAS_andc_v64         0
+>>> +#define TCG_TARGET_HAS_orc_v64          0
+>>> +#define TCG_TARGET_HAS_not_v64          0
+>>> +#define TCG_TARGET_HAS_neg_v64          0
+>>> +#endif
+>>> +
+>>> +#ifndef TCG_TARGET_HAS_v128
+>>> +#define TCG_TARGET_HAS_v128             0
+>>> +#define TCG_TARGET_HAS_andc_v128        0
+>>> +#define TCG_TARGET_HAS_orc_v128         0
+>>> +#define TCG_TARGET_HAS_not_v128         0
+>>> +#define TCG_TARGET_HAS_neg_v128         0
+>>> +#endif
+>>> +
+>>> +#ifndef TCG_TARGET_HAS_v256
+>>> +#define TCG_TARGET_HAS_v256             0
+>>> +#define TCG_TARGET_HAS_andc_v256        0
+>>> +#define TCG_TARGET_HAS_orc_v256         0
+>>> +#define TCG_TARGET_HAS_not_v256         0
+>>> +#define TCG_TARGET_HAS_neg_v256         0
+>>> +#endif
+>>
+>> Is it possible to use the DEF expanders to avoid manually defining all
+>> the TCG_TARGET_HAS_op for each vector size?
+>
+> No.  The preprocessor doesn't work that way.
 
-The terminology synchronous vs asynchronous is not a great fit for
-what I was describing. The distinction is really closer to being
-serialized vs parallelizable commands.
+Ahh I follow now. tcg-target.h defines the TCG_TARGET_HAS_foo for all
+ops it supports and this boilerplate ensures there is a concrete define
+for the targets that don't support it (yet).
 
-> >                                                     This allows the
-> > migration operation to be cancelled immediately, regardless of whether
-> > there are earlier monitor commands blocked in the main loop.
-> 
-> The necessary part is moving all operations that can block out of
-> whatever loop runs the monitor, be it the main loop, some other event
-> loop, or a dedicated monitor thread's monitor loop.
-> 
-> Moving out non-blocking operations isn't necessary.  migrate-cancel
-> could communicate with the migration thread by any suitable mechanism or
-> protocol.  It doesn't have to be QMP.  Why would we want it to be QMP?
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-I don't think we really want to invent yet another way of controlling
-QEMU, that isn't QMP do we, particularly not if it is special cased
-to just one operationg ?
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+--
+Alex Bennée
