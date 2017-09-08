@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39294)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39385)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dqNEQ-0007a5-3X
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:38:18 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dqNEW-0007iT-BG
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:38:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dqNEP-0007eZ-Cx
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:38:18 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri,  8 Sep 2017 14:36:32 -0300
-Message-Id: <20170908173632.6711-14-f4bug@amsat.org>
-In-Reply-To: <20170908173632.6711-1-f4bug@amsat.org>
-References: <20170908173632.6711-1-f4bug@amsat.org>
-In-Reply-To: <20170908173146.6446-1-f4bug@amsat.org>
+	(envelope-from <dgilbert@redhat.com>) id 1dqNES-0007gJ-Ed
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:38:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58596)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dqNES-0007fr-5d
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:38:20 -0400
+Date: Fri, 8 Sep 2017 18:38:10 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170908173809.GG2836@work-vm>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<1503471071-2233-5-git-send-email-peterx@redhat.com>
+	<20170823174411.GG2648@work-vm> <20170823233732.GA16947@lemon>
+	<20170825053718.GF14174@pxdev.xzpeter.org>
+	<20170825091412.GB2090@work-vm>
+	<20170828080827.GL14174@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 15/15] MAINTAINERS: update docs/interop/
- entries
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170828080827.GL14174@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC v2 4/8] QAPI: new QMP command option
+ "without-bql"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +32,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-trivial@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Fam Zheng <famz@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+To: Peter Xu <peterx@redhat.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-moved in commit 7746cf8aab68
+* Peter Xu (peterx@redhat.com) wrote:
+> On Fri, Aug 25, 2017 at 10:14:12AM +0100, Dr. David Alan Gilbert wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> > > On Thu, Aug 24, 2017 at 07:37:32AM +0800, Fam Zheng wrote:
+> > > > On Wed, 08/23 18:44, Dr. David Alan Gilbert wrote:
+> > > > > * Peter Xu (peterx@redhat.com) wrote:
+> > > > > > Introducing this new parameter for QMP commands in general to mark out
+> > > > > > when the command does not need BQL.  Normally QMP command executions are
+> > > > > > done with the protection of BQL in QEMU.  However the truth is that not
+> > > > > > all the QMP commands require the BQL.
+> > > > > > 
+> > > > > > This new parameter provides a way to allow QMP commands to run in
+> > > > > > parallel when possible, without the contention on the BQL.
+> > > > > > 
+> > > > > > Since the default value of "without-bql" is still false, so now all QMP
+> > > > > > commands are still protected by BQL still.
+> > > > > > 
+> > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > > 
+> > > > > We should define what a 'without-bql' command is allowed to do:
+> > > > >    'Commands that have without-bql set _may_ be called without the bql
+> > > > >    being taken.  They must not take the bql or any other lock that may
+> > > > >    become dependent on the bql.'
+> > > 
+> > > Sure.
+> > > 
+> > > > >    (Do we need to say anything about RCU?)
+> > > 
+> > > Could I ask how is RCU related?
+> > 
+> > My definition above said that anything declared without bql couldn't
+> > take the bql, so couldn't block on any other thread holding the bql.
+> > But is our command allowed to use synchronize_rcu or rcu_read_lock
+> > that could wait for or block other threads doing rcu stuff?
+> > Because if it did is there any guarantee that it wouldn't block?
+> 
+> I see.  Shall we just ignore RCU for now?  Since currently I don't see
+> a real synchronize_rcu() user yet in QEMU, except the RCU thread.  And
+> rcu_read_lock() should not block itself, so IMHO calling it only in
+> monitor command handlers should always be fine?
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Acked-by: Fam Zheng <famz@redhat.com>
-Acked-by: John Snow <jsnow@redhat.com>
----
- MAINTAINERS | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Yes, I think you're right that the rcu_read_lock is OK; just something
+to keep in mind.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f8630561de..99f3681842 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1259,7 +1259,7 @@ F: block/dirty-bitmap.c
- F: include/qemu/hbitmap.h
- F: include/block/dirty-bitmap.h
- F: tests/test-hbitmap.c
--F: docs/bitmaps.md
-+F: docs/interop/bitmaps.rst
- T: git git://github.com/famz/qemu.git bitmaps
- T: git git://github.com/jnsnow/qemu.git bitmaps
- 
-@@ -1837,7 +1837,7 @@ M: Denis V. Lunev <den@openvz.org>
- L: qemu-block@nongnu.org
- S: Supported
- F: block/parallels.c
--F: docs/specs/parallels.txt
-+F: docs/interop/parallels.txt
- 
- qed
- M: Stefan Hajnoczi <stefanha@redhat.com>
--- 
-2.14.1
+Dave
+
+> > 
+> > 
+> > > 
+> > > > > 
+> > > > > Also, 'no-bql' is shorter :-)
+> > > > 
+> > > > Or rather "need-bql" that defaults to true to avoid double negative (TM) with
+> > > > "no-bql = false"?
+> > > 
+> > > Ok let me use "need-bql". :)
+> > 
+> > Fine by me.
+> 
+> I'm switching to "need-bql" for QMP only, and used "no-bql" in HMP,
+> since I failed to find a good way to init mon_cmd_t field to true by
+> default.
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
