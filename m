@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqKdi-00051B-T7
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:52:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dqKhc-0007dC-Dg
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:56:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqKdc-0000bK-9i
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:52:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52552)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqKdb-0000Zn-Vg
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:52:08 -0400
-Date: Fri, 8 Sep 2017 15:52:01 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170908145201.GJ32645@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
-	<20170908131555.GD32645@redhat.com>
-	<9BF693FD-B1CD-4813-86B4-4A909D8847A1@amd.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dqKhb-0007oO-Al
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:56:16 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:36005)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dqKhb-0007mQ-2W
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:56:15 -0400
+Received: by mail-wr0-x229.google.com with SMTP id o42so5145172wrb.3
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 07:56:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9BF693FD-B1CD-4813-86B4-4A909D8847A1@amd.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] libvirt/QEMU/SEV interaction
+In-Reply-To: <0184EA26B2509940AA629AE1405DD7F2015F5973@DGGEMA503-MBX.china.huawei.com>
+References: <0184EA26B2509940AA629AE1405DD7F2015F5973@DGGEMA503-MBX.china.huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 Sep 2017 15:55:53 +0100
+Message-ID: <CAFEAcA-tCv9HAG4JzgHbW9VC77tYYFD=rp=b1BoKN7UayWc0yA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v11 4/6] target-arm: kvm64: detect guest
+ RAS EXTENSION feature
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,304 +29,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Relph, Richard" <Richard.Relph@amd.com>
-Cc: "Singh, Brijesh" <brijesh.singh@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, "devel@acpica.org" <devel@acpica.org>, John Garry <john.garry@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, huangdaode <huangdaode@hisilicon.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>
 
-On Fri, Sep 08, 2017 at 01:45:06PM +0000, Relph, Richard wrote:
-> A few answers in line=E2=80=A6
->=20
-> On 9/8/17, 8:16 AM, "Daniel P. Berrange" <berrange@redhat.com> wrote:
->=20
->     On Fri, Sep 08, 2017 at 06:57:30AM -0500, Brijesh Singh wrote:
->     > Hi All,
->     >=20
->     > (sorry for the long message)
->     >=20
->     > CPUs from AMD EPYC family supports Secure Encrypted Virtualizatio=
-n (SEV)
->     > feature - the feature allows running encrypted VMs. To enable the=
- feature,
->     > I have been submitting patches to Linux kernel [1], Qemu [2] and =
-OVMF [3].
->     > We have been making some good progress in getting patches accepte=
-d upstream
->     > in Linux and OVMF trees. SEV builds upon SME (Secure Memory Encry=
-ption)
->     > feature -- SME support just got pulled into 4.14 merge window. Th=
-e base
->     > SEV patches are accepted in OVMF tree -- now we have SEV aware gu=
-est BIOS.
->     > I am getting ready to take off "RFC" tag from remaining patches t=
-o get them
->     > reviewed and accepted.
->     >=20
->     > The boot flow for launching an SEV guest is a bit different from =
-a typical
->     > guest launch. In order to launch SEV guest from virt-manager or o=
-ther
->     > high-level VM management tools, we need to design and implement n=
-ew
->     > interface between libvirt and qemu, and probably add new APIs in =
-libvirt
->     > to be used by VM management tools. I am new to the libvirt and ne=
-ed some
->     > expert advice while designing this interface. A pictorial represe=
-ntation
->     > for a SEV guest launch flow is available in SEV Spec Appendix A [=
-4].
->     >=20
->     > A typical flow looks like this:
->     >=20
->     > 1. Guest owner (GO) asks the cloud provider to launch SEV guest.
->     > 2. VM tool asks libvirt to provide its Platform Diffie-Hellman (P=
-DH) key.
->     > 3. libvirt opens /dev/sev device to get its PDH and return the bl=
-ob to the
->     >    caller.
->    =20
->     What sort of size are we talking about for the PDH ?
->=20
-> The PDH blob is described in reference 4. It=E2=80=99s 0x824 bytes long=
-=E2=80=A6 a bit over 2K bytes.
-> PDH is =E2=80=9CPlatform Diffie-Hellman=E2=80=9D key, public portion.
->    =20
->     There's a few ways libvirt could report it
->    =20
->      1. As an XML element in the host capabilities XML
->      2. As an XML element in the emulator capabilities XML
->      3. Via a newly added host API
->    =20
->     > 4. VM tool gives its PDH to GO.
->     > 5. GO provides its DH key, session-info and guest policy.
->    =20
->     Are steps 4 & 5 strictly required to be in this order, or is it
->     possible
->=20
-> Steps 4 and 5 must occur in that order. The data sent by the GO in the
-> =E2=80=9Csession info=E2=80=9D is encrypted and integrity protected wit=
-h keys that the
-> GO derives from the GO private Diffie-Hellman key and the PDH public
-> Diffie-Hellman key.
->    =20
->     What are the security requirements around the DH key, session info
->     and guest policy ? Are any of them sensitive data which needs to be
->     kept private from untrustworthy users. Also are all three of these
->     items different for every guest launched, or are some of them
->     likely to be the same for every guest ?
->=20
-> The PDH is not sensitive. It is relatively static for the platform.
-> (It only changes when the platform owner chooses to change the apparent
-> identity of the platform that will actually run the virtual machine.)
-> The 128-byte session info data is encrypted and integrity protected by
-> the GO. It need not be additionally encrypted or integrity protected.
-> It should vary for EVERY guest launch.
-> The 4-byte guest policy must be sent in the clear as some components
-> may want to observe the policy bits. It may change from guest to guest,
-> but there will likely only be a few common values.
-
-Given this, and the pretty small data sizes, I think this info could
-in fact all be provided inline in the XML config - either hex or base64
-encoded for the binary blobs.
+On 8 September 2017 at 15:26, gengdongjiu <gengdongjiu@huawei.com> wrote:
 
 
+>> Shouldn't we need to also tell the kernel that we actually want
+>> it to expose RAS to the guest? Compare the PMU code in this function,
+>> where we set a kvm_init_features bit to do this.
 
->     > 8. libvirt launches the guest with "-S"
->    =20
->     All libvirt guests get launched with -S, to give libvirt chance to =
-do some
->     setup before starting vCPUs. Normally vCPUs are started by default,=
- but
->     the VIR_DOMAIN_START_PAUSED flag allows the mgmt app to tell libvir=
-t to
->     leave vCPUS paused.
->    =20
->     Alternatively, if libvirt sees presencese of 'sev' config for the g=
-uest,
->     it could automatically leave it in PAUSED state regardless of the
->     VIR_DOMAIN_START_PAUSED flag.
->=20
-> While using the LAUNCH_MEASURE and LAUNCH_SECRET operations is expected
-> to be the common case, they are optional. I would recommend requiring
-> the upstream software to explicitly set the VIR_DOMAIN_START_PAUSED fla=
-g,
-> if only to minimize the dependencies=E2=80=A6
+> In the PMU code, it indeed sets a kvm_init_features bit. Here ARM
+> James has a concern that we are depend on the host CPU RAS extension,
+> He means that if userspace receives the SIGBUS delivered by host
+> memory_failure(), user space should record the CPER for guest
+> and handling the error regardless whether host CPU supports RAS
+> extension. But I think if user space receives the SIGBUS signal,
+> that means
+> host CPU RAS module detects the error or CPU consumes the poison
+> data, thus we should check whether physical CPU support RAS extension.
 
-Ok.
+I don't understand what you have in mind here. If the host does
+not support the CPU RAS extension then we should never get a
+SIGBUS in the first place.
 
->     > 9. While creating the SEV guest qemu does the following
->     >  i) create encryption context using GO's DH, session-info and gue=
-st policy
->     >     (LAUNCH_START)
->     >  ii) encrypts the guest bios (LAUNCH_UPDATE_DATA)
->     >  iii) calls LAUNCH_MEASUREMENT to get the encrypted bios measurem=
-ent
->     > 10. By some interface we must propagate the measurement all the w=
-ay to GO
->     >   before libvirt starts the guest.
->    =20
->     Again, what kind of size data are we talking about for athe "measur=
-ement"
->     blob ? a KB, 10's of KB, or more ?
->=20
-> The measurement is 48 bytes=E2=80=A6
+In any case this doesn't seem relevant to the question of whether it
+should be optional to expose the RAS extension to the *guest*.
+Even if the host does support RAS, you should be able to run a
+VM that knows nothing about RAS.
 
-For that small size we can definitely provide is inline in the event
-payload then.
-
->     My first gut instinct would be for QEMU to emit a QMP event when it=
- has
->     the measurement available. The event could include the actual data =
-blob,
->     or we can could add an explicit QMP command to fetch the data blob.
->    =20
->     Libvirt could listen for this QEMU event, and in turn emit an event=
- from
->     libvirt with the same data, which the mgmt tool can finally give to=
- the
->     GO.
->    =20
->     > 11. GO verifies the measurement and if measurement matches then i=
-t may
->     >  give a secret blob -- which must be injected into the guest befo=
-re
->     >  libvirt starts the VM. If verification failed, GO will request c=
-loud
->     >  provider to destroy the VM.
->    =20
->     So we need some mechanism to provide the secret blob.  This could b=
-e
->     done via a new libvirt API.  Alternatively, if we're using virSecre=
-t
->     for the other stuff, the guest config XML could include the UUID of
->     a 4th  secret. Libvirt would then watch to see when that secret has
->     a value set, and pass that onto QEMU.
->=20
-> The secret is optional=E2=80=A6 it is up to 16KB, already encrypted, an=
-d integrity
-> protected with an IV and MAC value passed with the secret. The guest
-> address the secret should be deposited at is=20
-> Technically, the SEV FW API allows there to be more than one secret=E2=80=
-=A6
-> I don=E2=80=99t see a strong reason to require libvirt to support more =
-than one,
-> though.
-
-So I think we could simply add a new API to libvirt to provide this
-data item.
-
->     > 12. After secret blob is injected into guest, we call LAUNCH_FINI=
-SH
->     >   to destory the encryption context.
->     > 13. libvirt issues "continue" command to resume the guest boot.
->    =20
->     This is as simple as the mgmt tool calling virDomainResume to unpau=
-se
->     CPUs. We could have it such that virDomainResume checks whether the
->     virSecret has been populated secret blob by GO, and pass it onto
->     QEMU at this time.
->    =20
->     > Please note that the measurement value is protected with transpor=
-t
->     > encryption key (TIK) and it changes on each run. Similarly the se=
-cret blob
->     > provided by GO does not need to be protected using libvirt/qemu A=
-PIs. The
->     > secret is protected by TIK. From qemu and libvirt point of view t=
-hese are
->     > blobs and must be passed as-is to the SEV FW.
->     >=20
->     > Questions:
->     > a) Do we need to add a new set of APIs in libvirt to return the P=
-DH from
->     > libvirt and VM tool ? Or can we use some pre-existing APIs to pas=
-s the
->     > opaque blobs ? (this is mainly for step 3 and 6)
->     > b) do we need to define a new xml tag to for memory-encryption ? =
-or just
->     > use the qemu:args tag ? (step 6)
->    =20
->     <qemu:args> is explicitly only ever for ad-hoc testing.
->    =20
->     For anything that is to be used in production deployment we must
->     explicitly model it in the XML. So we definitely need new XML
->     defined.
->    =20
->     > c) what existing communicate interface can be used between libvir=
-t and qemu
->     > to get the measurement ? can we add a new qemu monitor command
->     > 'get_sev_measurement' to get the measurement ? (step 10)
->    =20
->     Yes, QMP commands seeem most likely.
->    =20
->     > d) how to pass the secret blob from libvirt to qemu ? should we c=
-onsider
->     > adding a new object (sev-guest-secret) -- libvirt can add the obj=
-ect through
->     > qemu monitor.
->    =20
->     Yeah, that looks like a viable option too.
-
-So I could see a flow like the following:
-
-
-  1. mgmt tool calls  virConnectGetCapabilities. This returns an XML
-     document that includes the following
-
-      <host>
-         ...other bits...
-        <sev>
-	  <platform-key>...hex encoded PDH key...</platform-key>
-	</sev>
-      </host>
-
-  2. mgmt tool requests to start a guest calling virCreateXML(),
-     passing VIR_DOMAIN_START_PAUSED. The XML would include
-
-      <sev>
-        <owner-key>...hex encode DH key...</owner-key>
-	<session-info>..hex encode info...</session-info>
-	<policy>...int32 value..</policy>
-      </sev>
-
-
-     if <sev> is provided and VIR_DOMAIN_START_PAUSED is missing,
-     libvirt would report an error and refuse to start the guest
-
-  3. Libvirt generates the QEMU cli arg to enable SEV using
-     the XML data and starts QEMU, leaving CPUs paused
-
-  4. QEMU emits a SEV_MEASURE event containing the measurement
-     blob
-
-  5. Libvirt catches the QEMU event and emits its own
-     VIR_CONNECT_DOMAIN_EVENT_SEV_MEASURE event containing
-     the measurement blob
-
-  6. GO does its validation of the measurement
-
-  7a  If validation failed, then virDomainDestroy() to stop QEMU
-
-  7b  If validation succeeed
-
-     Optionally call
-
-         virDomainSetSEVSecret()
-
-     providing the optional secret, then
-
-         virDomainResume()
-
-     to let QEMU continue
-
-
-
-
-Regards,
-Daniel
---=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+thanks
+-- PMM
