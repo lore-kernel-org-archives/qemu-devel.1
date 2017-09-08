@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39028)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dqM2p-0006dB-0g
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:16 -0400
+	(envelope-from <berrange@redhat.com>) id 1dqM3I-0006wb-P9
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dqM2o-0004QL-3h
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:15 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:38791)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dqM2n-0004Q2-TB
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:14 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id 108so5542503wra.5
-	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 09:22:13 -0700 (PDT)
+	(envelope-from <berrange@redhat.com>) id 1dqM3F-0004Yq-LW
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53928)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqM3F-0004Xi-Fm
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:41 -0400
+Date: Fri, 8 Sep 2017 17:22:35 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170908162235.GL32645@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170724181544.20292-1-brandon.carpenter@cypherpath.com>
+	<20170725083603.GC26394@redhat.com>
+	<1504887484.8245.0@smtp.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <0184EA26B2509940AA629AE1405DD7F2015F5F11@DGGEMA503-MBX.china.huawei.com>
-References: <0184EA26B2509940AA629AE1405DD7F2015F5F11@DGGEMA503-MBX.china.huawei.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Sep 2017 17:21:52 +0100
-Message-ID: <CAFEAcA8HPhHeeXEDtxnewJ7mAJ-gYzR96pC06qA+Xx95LHu2DA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v11 5/6] target-arm: kvm64: handle SIGBUS
- signal for synchronous External Abort
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1504887484.8245.0@smtp.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] io: Always remove an old channel watch
+ before adding a new one.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,60 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, "devel@acpica.org" <devel@acpica.org>, John Garry <john.garry@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, huangdaode <huangdaode@hisilicon.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>
+To: Brandon Carpenter <brandon.carpenter@cypherpath.com>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 
-On 8 September 2017 at 17:17, gengdongjiu <gengdongjiu@huawei.com> wrote:
->>
->> This code has all just been copied-and-pasted from target/i386/kvm.c.
->> Please instead abstract it out properly into a cpu-independent source file.
->
->
-> Yes, it copied from x86.
-> Do you mean abstracting this code to a common folder so that i386 and arm platform share it?
+On Fri, Sep 08, 2017 at 09:18:04AM -0700, Brandon Carpenter wrote:
+> I haven't seen this patch hit master yet and am about to submit a patch set
+> that is dependent on this one because it triggers the bug fixed by this
+> patch, causing a segmentation fault. Is it preferred that I include this
+> patch in that series with the Reviewed-by: tags or to just reference this
+> patch in the cover letter?
 
-I mean it should go into a common source file (perhaps
-accel/kvm/kvm-all.c).
+Yes, if you re-post the patch as part of a larger just, add any
+Reviewed-by tags to the commit message when you re-post.
 
+> On Tue, Jul 25, 2017 at 1:36 AM, Daniel P. Berrange <berrange@redhat.com>
+> wrote:
+> > On Mon, Jul 24, 2017 at 11:15:44AM -0700, Brandon Carpenter wrote:
+> > >  Also set saved handle to zero when removing without adding a new
+> > > watch.
+> > > 
+> > >  Signed-off-by: Brandon Carpenter <brandon.carpenter@cypherpath.com>
+> > >  ---
+> > >   ui/vnc-auth-vencrypt.c | 3 +++
+> > >   ui/vnc-ws.c            | 6 ++++++
+> > >   ui/vnc.c               | 4 ++++
+> > >   3 files changed, 13 insertions(+)
+> > 
+> > Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+> > 
+> > 
 
->> What is this ??? You should never need to look up things in the cpreg arrays by fieldoffset.
->
->
-> I used it to set the esr_el1's and far_el1's value, for example:
->
->   /* set ESR_EL1 */
->   ret = kvm_arm_cpreg_value(cpu, offsetof(CPUARMState, cp15.esr_el[1]));
->
->   /* set FAR_EL1 */
->   ret = kvm_arm_cpreg_value(cpu, offsetof(CPUARMState, cp15.far_el[1]));
-
-Yes, I saw that, but I have no idea why you think that's
-the right way to set register values. No other code in
-QEMU does this.
-
-> So use the added API kvm_arm_cpreg_value() to set their value.
-> If not used it, do you better method to set their value?
-
-I suggest:
-
->> The code for handling debug exits (software step, watchpoint,
->> etc) is probably a good place to look for how to deal with register state.
-
->> Any new globally-visible function prototype in a header should
->> have a doc-comment formatted documentation comment, please.
->
->
-> Ok, thanks for this reminder. Do you mean I need to add comments
-> for this globally-visible function, such as below:
->
-> /*
->  * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
->  */
-> void kvm_hwpoison_page_add(ram_addr_t ram_addr);
-
-It should be in the doc-comment format, which begins
-"/**" and has some stylization of how you list parameters
-and so on. Lots of examples in the existing headers.
-
-thanks
--- PMM
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
