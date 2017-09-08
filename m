@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49069)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dqFJO-0001CC-U3
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:11:01 -0400
+	(envelope-from <otubo@redhat.com>) id 1dqFJS-0001CM-2J
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:11:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dqFJK-0002uD-10
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:10:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38874)
+	(envelope-from <otubo@redhat.com>) id 1dqFJN-0002xc-6u
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:10:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53138)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dqFJJ-0002tC-K2
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:10:49 -0400
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dqFJM-0002wb-V8
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:10:53 -0400
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
 	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BC5FCC047B62
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 09:10:48 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 235B77E421
+	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 09:10:52 +0000 (UTC)
 From: Eduardo Otubo <otubo@redhat.com>
-Date: Fri,  8 Sep 2017 11:10:24 +0200
-Message-Id: <20170908091027.9104-3-otubo@redhat.com>
+Date: Fri,  8 Sep 2017 11:10:26 +0200
+Message-Id: <20170908091027.9104-5-otubo@redhat.com>
 In-Reply-To: <20170908091027.9104-1-otubo@redhat.com>
 References: <20170908091027.9104-1-otubo@redhat.com>
-Subject: [Qemu-devel] [PATCHv5 2/5] seccomp: add obsolete argument to
- command line
+Subject: [Qemu-devel] [PATCHv5 4/5] seccomp: add spawn argument to command
+ line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,140 +33,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: thuth@redhat.com, "Daniel P . Berrange" <berrange@redhat.com>
 
-This patch introduces the argument [,obsolete=allow] to the `-sandbox on'
-option. It allows Qemu to run safely on old system that still relies on
-old system calls.
+This patch adds [,spawn=deny] argument to `-sandbox on' option. It
+blacklists fork and execve system calls, avoiding Qemu to spawn new
+threads or processes.
 
 Signed-off-by: Eduardo Otubo <otubo@redhat.com>
 ---
- include/sysemu/seccomp.h |  3 ++-
- qemu-options.hx          | 12 ++++++++++--
- qemu-seccomp.c           | 20 +++++++++++++++++++-
- vl.c                     | 22 +++++++++++++++++++++-
- 4 files changed, 52 insertions(+), 5 deletions(-)
+ include/sysemu/seccomp.h |  1 +
+ qemu-options.hx          |  9 +++++++--
+ qemu-seccomp.c           | 12 ++++++++++++
+ vl.c                     | 16 ++++++++++++++++
+ 4 files changed, 36 insertions(+), 2 deletions(-)
 
 diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
-index 23b9c3c789..215138a372 100644
+index 4a9e63c7cd..3ab5fc4f61 100644
 --- a/include/sysemu/seccomp.h
 +++ b/include/sysemu/seccomp.h
-@@ -16,8 +16,9 @@
- #define QEMU_SECCOMP_H
- 
+@@ -18,6 +18,7 @@
  #define QEMU_SECCOMP_SET_DEFAULT     (1 << 0)
-+#define QEMU_SECCOMP_SET_OBSOLETE    (1 << 1)
+ #define QEMU_SECCOMP_SET_OBSOLETE    (1 << 1)
+ #define QEMU_SECCOMP_SET_PRIVILEGED  (1 << 2)
++#define QEMU_SECCOMP_SET_SPAWN       (1 << 3)
  
  #include <seccomp.h>
  
--int seccomp_start(void);
-+int seccomp_start(uint32_t seccomp_opts);
- #endif
 diff --git a/qemu-options.hx b/qemu-options.hx
-index 9f6e2adfff..72150c6b84 100644
+index 5c1b163fb5..2b04b9f170 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -4017,13 +4017,21 @@ Old param mode (ARM only).
- ETEXI
+@@ -4018,6 +4018,7 @@ ETEXI
  
  DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
--    "-sandbox <arg>  Enable seccomp mode 2 system call filter (default 'off').\n",
-+    "-sandbox on[,obsolete=allow|deny]\n" \
-+    "                Enable seccomp mode 2 system call filter (default 'off').\n" \
-+    "                use 'obsolete' to allow obsolete system calls that are provided\n" \
-+    "                    by the kernel, but typically no longer used by modern\n" \
-+    "                    C library implementations.\n",
+     "-sandbox on[,obsolete=allow|deny][,elevateprivileges=allow|deny|children]\n" \
++    "          [,spawn=allow|deny]\n" \
+     "                Enable seccomp mode 2 system call filter (default 'off').\n" \
+     "                use 'obsolete' to allow obsolete system calls that are provided\n" \
+     "                    by the kernel, but typically no longer used by modern\n" \
+@@ -4025,10 +4026,12 @@ DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
+     "                use 'elevateprivileges' to allow or deny QEMU process to elevate\n" \
+     "                    its privileges by blacklisting all set*uid|gid system calls.\n" \
+     "                    The value 'children' will deny set*uid|gid system calls for\n" \
+-    "                    main QEMU process but will allow forks and execves to run unprivileged\n",
++    "                    main QEMU process but will allow forks and execves to run unprivileged\n" \
++    "                use 'spawn' to avoid QEMU to spawn new threads or processes by\n" \
++    "                     blacklisting *fork and execve\n",
      QEMU_ARCH_ALL)
  STEXI
--@item -sandbox @var{arg}
-+@item -sandbox @var{arg}[,obsolete=@var{string}]
+-@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}]
++@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}][,spawn=@var{string}]
  @findex -sandbox
  Enable Seccomp mode 2 system call filter. 'on' will enable syscall filtering and 'off' will
  disable it.  The default is 'off'.
-+@table @option
-+@item obsolete=@var{string}
-+Enable Obsolete system calls
-+@end table
+@@ -4037,6 +4040,8 @@ disable it.  The default is 'off'.
+ Enable Obsolete system calls
+ @item elevateprivileges=@var{string}
+ Disable set*uid|gid system calls
++@item spawn=@var{string}
++Disable *fork and execve
+ @end table
  ETEXI
  
- DEF("readconfig", HAS_ARG, QEMU_OPTION_readconfig,
 diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-index bc9a1f77ff..126e5ee2d5 100644
+index 2bad16cafb..4c169febf8 100644
 --- a/qemu-seccomp.c
 +++ b/qemu-seccomp.c
-@@ -56,9 +56,22 @@ static const struct QemuSeccompSyscall blacklist[] = {
-     { SCMP_SYS(tuxcall),                1, QEMU_SECCOMP_SET_DEFAULT },
-     { SCMP_SYS(ulimit),                 1, QEMU_SECCOMP_SET_DEFAULT },
-     { SCMP_SYS(vserver),                1, QEMU_SECCOMP_SET_DEFAULT },
-+    /* obsolete */
-+    { SCMP_SYS(readdir),                2, QEMU_SECCOMP_SET_OBSOLETE },
-+    { SCMP_SYS(_sysctl),                2, QEMU_SECCOMP_SET_OBSOLETE },
-+    { SCMP_SYS(bdflush),                2, QEMU_SECCOMP_SET_OBSOLETE },
-+    { SCMP_SYS(create_module),          2, QEMU_SECCOMP_SET_OBSOLETE },
-+    { SCMP_SYS(get_kernel_syms),        2, QEMU_SECCOMP_SET_OBSOLETE },
-+    { SCMP_SYS(query_module),           2, QEMU_SECCOMP_SET_OBSOLETE },
-+    { SCMP_SYS(sgetmask),               2, QEMU_SECCOMP_SET_OBSOLETE },
-+    { SCMP_SYS(ssetmask),               2, QEMU_SECCOMP_SET_OBSOLETE },
-+    { SCMP_SYS(sysfs),                  2, QEMU_SECCOMP_SET_OBSOLETE },
-+    { SCMP_SYS(uselib),                 2, QEMU_SECCOMP_SET_OBSOLETE },
-+    { SCMP_SYS(ustat),                  2, QEMU_SECCOMP_SET_OBSOLETE },
+@@ -79,6 +79,10 @@ static const struct QemuSeccompSyscall blacklist[] = {
+     { SCMP_SYS(setresgid),              4, QEMU_SECCOMP_SET_PRIVILEGED },
+     { SCMP_SYS(setfsuid),               4, QEMU_SECCOMP_SET_PRIVILEGED },
+     { SCMP_SYS(setfsgid),               4, QEMU_SECCOMP_SET_PRIVILEGED },
++    /* spawn */
++    { SCMP_SYS(fork),                   8, QEMU_SECCOMP_SET_SPAWN },
++    { SCMP_SYS(vfork),                  8, QEMU_SECCOMP_SET_SPAWN },
++    { SCMP_SYS(execve),                 8, QEMU_SECCOMP_SET_SPAWN },
  };
  
--int seccomp_start(void)
-+
-+int seccomp_start(uint32_t seccomp_opts)
- {
-     int rc = 0;
-     unsigned int i = 0;
-@@ -72,6 +85,11 @@ int seccomp_start(void)
  
-     for (i = 0; i < ARRAY_SIZE(blacklist); i++) {
-         switch (blacklist[i].set) {
-+        case QEMU_SECCOMP_SET_OBSOLETE:
-+            if ((seccomp_opts & QEMU_SECCOMP_SET_OBSOLETE)) {
+@@ -109,6 +113,14 @@ int seccomp_start(uint32_t seccomp_opts)
+             }
+ 
+             break;
++        case QEMU_SECCOMP_SET_SPAWN:
++            if (seccomp_opts & QEMU_SECCOMP_SET_SPAWN) {
++                break;
++            } else {
 +                continue;
 +            }
++
 +            break;
          default:
              break;
          }
 diff --git a/vl.c b/vl.c
-index 76e0b3a946..dafbe30e2b 100644
+index 413cfe8504..0af137da17 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -271,6 +271,10 @@ static QemuOptsList qemu_sandbox_opts = {
-             .name = "enable",
-             .type = QEMU_OPT_BOOL,
+@@ -280,6 +280,10 @@ static QemuOptsList qemu_sandbox_opts = {
+             .name = "elevateprivileges",
+             .type = QEMU_OPT_STRING,
          },
 +        {
-+            .name = "obsolete",
++            .name = "spawn",
 +            .type = QEMU_OPT_STRING,
 +        },
          { /* end of list */ }
      },
  };
-@@ -1034,7 +1038,23 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
- {
-     if (qemu_opt_get_bool(opts, "enable", false)) {
- #ifdef CONFIG_SECCOMP
--        if (seccomp_start() < 0) {
-+        uint32_t seccomp_opts = 0x00000;
-+        const char *value = NULL;
-+
-+        value = qemu_opt_get(opts, "obsolete");
+@@ -1081,6 +1085,18 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
+             }
+         }
+ 
++        value = qemu_opt_get(opts, "spawn");
 +        if (value) {
-+            if (g_str_equal(value, "allow")) {
-+                seccomp_opts |= QEMU_SECCOMP_SET_OBSOLETE;
-+            } else if (g_str_equal(value, "deny")) {
-+                /* this is the default option, this if is here
-+                 * to provide a little bit of consistency for
-+                 * the command line */
++            if (g_str_equal(value, "deny")) {
++                seccomp_opts |= QEMU_SECCOMP_SET_SPAWN;
++            } else if (g_str_equal(value, "allow")) {
++                /* default value */
 +            } else {
-+                error_report("invalid argument for obsolete");
++                error_report("invalid argument for spawn");
++                return -1;
 +            }
 +        }
 +
-+        if (seccomp_start(seccomp_opts) < 0) {
+         if (seccomp_start(seccomp_opts) < 0) {
              error_report("failed to install seccomp syscall filter "
                           "in the kernel");
-             return -1;
 -- 
 2.13.5
