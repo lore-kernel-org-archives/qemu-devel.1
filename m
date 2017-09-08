@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39001)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39028)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dqM2k-0006Zc-1S
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:11 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dqM2p-0006dB-0g
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dqM2g-0004O3-UM
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48548)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dqM2g-0004NZ-L3
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:06 -0400
-Date: Fri, 8 Sep 2017 17:22:02 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170908162201.GC2836@work-vm>
-References: <20170908155359.27952-1-dgilbert@redhat.com>
-	<26a00723-027c-4445-0590-d50739dec557@amsat.org>
+	(envelope-from <peter.maydell@linaro.org>) id 1dqM2o-0004QL-3h
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:15 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:38791)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dqM2n-0004Q2-TB
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:14 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id 108so5542503wra.5
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 09:22:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <26a00723-027c-4445-0590-d50739dec557@amsat.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] slirp: Add explanation for hostfwd parsing
- failure
+In-Reply-To: <0184EA26B2509940AA629AE1405DD7F2015F5F11@DGGEMA503-MBX.china.huawei.com>
+References: <0184EA26B2509940AA629AE1405DD7F2015F5F11@DGGEMA503-MBX.china.huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 Sep 2017 17:21:52 +0100
+Message-ID: <CAFEAcA8HPhHeeXEDtxnewJ7mAJ-gYzR96pC06qA+Xx95LHu2DA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v11 5/6] target-arm: kvm64: handle SIGBUS
+ signal for synchronous External Abort
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,110 +29,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
+To: gengdongjiu <gengdongjiu@huawei.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, "devel@acpica.org" <devel@acpica.org>, John Garry <john.garry@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, huangdaode <huangdaode@hisilicon.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>
 
-* Philippe Mathieu-Daud=E9 (f4bug@amsat.org) wrote:
-> Hi David,
->=20
-> On 09/08/2017 12:53 PM, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> >=20
-> > e.g.
-> > ./x86_64-softmmu/qemu-system-x86_64 -nographic -netdev 'user,id=3Dvne=
-t,hostfwd=3D:555.0.0.0:0-:22'
-> > qemu-system-x86_64: -netdev user,id=3Dvnet,hostfwd=3D:555.0.0.0:0-:22=
-: Invalid host forwarding rule ':555.0.0.0:0-:22' (Bad host address)
-> >=20
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >   net/slirp.c | 13 ++++++++++++-
-> >   1 file changed, 12 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/net/slirp.c b/net/slirp.c
-> > index 01ed21c006..d87664d42e 100644
-> > --- a/net/slirp.c
-> > +++ b/net/slirp.c
-> > @@ -496,9 +496,11 @@ static int slirp_hostfwd(SlirpState *s, const ch=
-ar *redir_str,
-> >       char buf[256];
-> >       int is_udp;
-> >       char *end;
-> > +    const char *fail_reason =3D "";
->=20
-> Isn't it better not initialize this? So if one add a new failed syntax =
-case
-> the build with abort with -Werror=3Duninitialized
+On 8 September 2017 at 17:17, gengdongjiu <gengdongjiu@huawei.com> wrote:
+>>
+>> This code has all just been copied-and-pasted from target/i386/kvm.c.
+>> Please instead abstract it out properly into a cpu-independent source file.
+>
+>
+> Yes, it copied from x86.
+> Do you mean abstracting this code to a common folder so that i386 and arm platform share it?
 
-I never quite trust compilers to spot it or not-moan even though
-every route to failure will have set it.
+I mean it should go into a common source file (perhaps
+accel/kvm/kvm-all.c).
 
-> Anyway:
-> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
-Thanks.
+>> What is this ??? You should never need to look up things in the cpreg arrays by fieldoffset.
+>
+>
+> I used it to set the esr_el1's and far_el1's value, for example:
+>
+>   /* set ESR_EL1 */
+>   ret = kvm_arm_cpreg_value(cpu, offsetof(CPUARMState, cp15.esr_el[1]));
+>
+>   /* set FAR_EL1 */
+>   ret = kvm_arm_cpreg_value(cpu, offsetof(CPUARMState, cp15.far_el[1]));
 
-Dave
+Yes, I saw that, but I have no idea why you think that's
+the right way to set register values. No other code in
+QEMU does this.
 
->=20
-> >       p =3D redir_str;
-> >       if (!p || get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
-> > +        fail_reason =3D "No : separators";
-> >           goto fail_syntax;
-> >       }
-> >       if (!strcmp(buf, "tcp") || buf[0] =3D=3D '\0') {
-> > @@ -506,35 +508,43 @@ static int slirp_hostfwd(SlirpState *s, const c=
-har *redir_str,
-> >       } else if (!strcmp(buf, "udp")) {
-> >           is_udp =3D 1;
-> >       } else {
-> > +        fail_reason =3D "Bad protocol name";
-> >           goto fail_syntax;
-> >       }
-> >       if (!legacy_format) {
-> >           if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
-> > +            fail_reason =3D "Missing : separator";
-> >               goto fail_syntax;
-> >           }
-> >           if (buf[0] !=3D '\0' && !inet_aton(buf, &host_addr)) {
-> > +            fail_reason =3D "Bad host address";
-> >               goto fail_syntax;
-> >           }
-> >       }
-> >       if (get_str_sep(buf, sizeof(buf), &p, legacy_format ? ':' : '-'=
-) < 0) {
-> > +        fail_reason =3D "Bad host port separator";
-> >           goto fail_syntax;
-> >       }
-> >       host_port =3D strtol(buf, &end, 0);
-> >       if (*end !=3D '\0' || host_port < 0 || host_port > 65535) {
-> > +        fail_reason =3D "Bad host port";
-> >           goto fail_syntax;
-> >       }
-> >       if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
-> > +        fail_reason =3D "Missing guest address";
-> >           goto fail_syntax;
-> >       }
-> >       if (buf[0] !=3D '\0' && !inet_aton(buf, &guest_addr)) {
-> > +        fail_reason =3D "Bad guest address";
-> >           goto fail_syntax;
-> >       }
-> >       guest_port =3D strtol(p, &end, 0);
-> >       if (*end !=3D '\0' || guest_port < 1 || guest_port > 65535) {
-> > +        fail_reason =3D "Bad guest port";
-> >           goto fail_syntax;
-> >       }
-> > @@ -547,7 +557,8 @@ static int slirp_hostfwd(SlirpState *s, const cha=
-r *redir_str,
-> >       return 0;
-> >    fail_syntax:
-> > -    error_setg(errp, "Invalid host forwarding rule '%s'", redir_str)=
-;
-> > +    error_setg(errp, "Invalid host forwarding rule '%s' (%s)", redir=
-_str,
-> > +               fail_reason);
-> >       return -1;
-> >   }
-> >=20
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> So use the added API kvm_arm_cpreg_value() to set their value.
+> If not used it, do you better method to set their value?
+
+I suggest:
+
+>> The code for handling debug exits (software step, watchpoint,
+>> etc) is probably a good place to look for how to deal with register state.
+
+>> Any new globally-visible function prototype in a header should
+>> have a doc-comment formatted documentation comment, please.
+>
+>
+> Ok, thanks for this reminder. Do you mean I need to add comments
+> for this globally-visible function, such as below:
+>
+> /*
+>  * xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+>  */
+> void kvm_hwpoison_page_add(ram_addr_t ram_addr);
+
+It should be in the doc-comment format, which begins
+"/**" and has some stylization of how you list parameters
+and so on. Lots of examples in the existing headers.
+
+thanks
+-- PMM
