@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqIWl-0006H3-0S
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:36:56 -0400
+	(envelope-from <mst@redhat.com>) id 1dqIap-0007s1-N2
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqIWh-0007jz-Tz
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:36:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45906)
+	(envelope-from <mst@redhat.com>) id 1dqIak-0002Wp-Oz
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:41:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqIWh-0007j4-Ne
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:36:51 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 1BB9F128E
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 12:36:50 +0000 (UTC)
-Date: Fri, 8 Sep 2017 13:36:41 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170908123641.GA32645@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170906124900.17354-1-famz@redhat.com>
-	<20170908100537.GI3609@redhat.com> <20170908102701.GL4511@lemon>
-	<20170908103602.GJ3609@redhat.com> <20170908105853.GM4511@lemon>
-	<20170908110033.GK3609@redhat.com> <20170908112352.GN4511@lemon>
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dqIak-0002WD-FJ
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:41:02 -0400
+Date: Fri, 8 Sep 2017 15:40:56 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170908153726-mutt-send-email-mst@kernel.org>
+References: <20170807181618.22562-1-marcandre.lureau@redhat.com>
+	<20170807181618.22562-3-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20170908112352.GN4511@lemon>
-Subject: Re: [Qemu-devel] [PATCH v4] buildsys: Move crypto cflags/libs to
- per object variables
+In-Reply-To: <20170807181618.22562-3-marcandre.lureau@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 2/8] fw_cfg: add write callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +28,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, Ben Warren <ben@skyportsystems.com>, Paolo Bonzini <pbonzini@redhat.com>, anderson@redhat.com, imammedo@redhat.com, lersek@redhat.com, Richard Henderson <rth@twiddle.net>
 
-On Fri, Sep 08, 2017 at 07:23:52PM +0800, Fam Zheng wrote:
-> On Fri, 09/08 12:00, Daniel P. Berrange wrote:
-> > On Fri, Sep 08, 2017 at 06:58:53PM +0800, Fam Zheng wrote:
-> > > If you don't like introducing {nettle,gcrypt,gnutls}.mo for now, we can probably
-> > > defer it to the time when crypto subsystem is modularized.
-> > 
-> > I don't anticipate the crypot subsystem ever being modularized - it is
-> > really core functionality used across all other subsystems (block layer,
-> > chardev, ui, migration, and more)
-> 
-> I get your point that crypto is a fundamental thing, "optionally secure" is not
-> what I meant.  But moduarization still has the advantage of offering more
-> flexibility to end users, potentially. Crypto backends could be shipped as
-> qemu-crypto-{nettle,gcrypt,gnutls} packages, and depending on which are
-> installed and which are not, the core crypto code in QEMU can pick the suitable
-> implementation at runtime, based on a hardcoded priority or even an option.
+On Mon, Aug 07, 2017 at 08:16:12PM +0200, Marc-Andr=E9 Lureau wrote:
+> Reintroduce the write callback that was removed when write support was
+> removed in commit 023e3148567ac898c7258138f8e86c3c2bb40d07.
+>=20
+> The write_cb callback is called when a write reaches the end of file,
+> that is when the write pointer/offset reaches the size of the file.
+>=20
+> Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  include/hw/nvram/fw_cfg.h |  2 ++
+>  hw/acpi/vmgenid.c         |  2 +-
+>  hw/core/loader.c          |  2 +-
+>  hw/i386/acpi-build.c      |  2 +-
+>  hw/isa/lpc_ich9.c         |  4 ++--
+>  hw/nvram/fw_cfg.c         | 18 ++++++++++++++----
+>  6 files changed, 21 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
+> index f50d068563..3527cd51d8 100644
+> --- a/include/hw/nvram/fw_cfg.h
+> +++ b/include/hw/nvram/fw_cfg.h
+> @@ -183,6 +183,7 @@ void fw_cfg_add_file(FWCfgState *s, const char *fil=
+ename, void *data,
+>   * @s: fw_cfg device being modified
+>   * @filename: name of new fw_cfg file item
+>   * @select_cb: callback function when selecting
+> + * @write_cb: callback function when write reached EOF
+>   * @callback_opaque: argument to be passed into callback function
+>   * @data: pointer to start of item data
+>   * @len: size of item data
+> @@ -202,6 +203,7 @@ void fw_cfg_add_file(FWCfgState *s, const char *fil=
+ename, void *data,
+>   */
+>  void fw_cfg_add_file_callback(FWCfgState *s, const char *filename,
+>                                FWCfgCallback select_cb,
+> +                              FWCfgCallback write_cb,
+>                                void *callback_opaque,
+>                                void *data, size_t len, bool read_only);
+> =20
+> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+> index a32b847fe0..c1e935da9f 100644
+> --- a/hw/acpi/vmgenid.c
+> +++ b/hw/acpi/vmgenid.c
+> @@ -124,7 +124,7 @@ void vmgenid_add_fw_cfg(VmGenIdState *vms, FWCfgSta=
+te *s, GArray *guid)
+>      fw_cfg_add_file(s, VMGENID_GUID_FW_CFG_FILE, guid->data,
+>                      VMGENID_FW_CFG_SIZE);
+>      /* Create a read-write fw_cfg file for Address */
+> -    fw_cfg_add_file_callback(s, VMGENID_ADDR_FW_CFG_FILE, NULL, NULL,
+> +    fw_cfg_add_file_callback(s, VMGENID_ADDR_FW_CFG_FILE, NULL, NULL, =
+NULL,
+>                               vms->vmgenid_addr_le,
+>                               ARRAY_SIZE(vms->vmgenid_addr_le), false);
+>  }
+> diff --git a/hw/core/loader.c b/hw/core/loader.c
+> index 4593061445..91669d65aa 100644
+> --- a/hw/core/loader.c
+> +++ b/hw/core/loader.c
+> @@ -1023,7 +1023,7 @@ MemoryRegion *rom_add_blob(const char *name, cons=
+t void *blob, size_t len,
+>          }
+> =20
+>          fw_cfg_add_file_callback(fw_cfg, fw_file_name,
+> -                                 fw_callback, callback_opaque,
+> +                                 fw_callback, NULL, callback_opaque,
+>                                   data, rom->datasize, read_only);
+>      }
+>      return mr;
+> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+> index b9c245c9bb..be2992b708 100644
+> --- a/hw/i386/acpi-build.c
+> +++ b/hw/i386/acpi-build.c
+> @@ -2922,7 +2922,7 @@ void acpi_setup(void)
+> =20
+>          build_state->rsdp =3D g_memdup(tables.rsdp->data, rsdp_size);
+>          fw_cfg_add_file_callback(pcms->fw_cfg, ACPI_BUILD_RSDP_FILE,
+> -                                 acpi_build_update, build_state,
+> +                                 acpi_build_update, NULL, build_state,
+>                                   build_state->rsdp, rsdp_size, true);
+>          build_state->rsdp_mr =3D NULL;
+>      } else {
+> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+> index ac8416d42b..de8fbb7260 100644
+> --- a/hw/isa/lpc_ich9.c
+> +++ b/hw/isa/lpc_ich9.c
+> @@ -402,12 +402,12 @@ void ich9_lpc_pm_init(PCIDevice *lpc_pci, bool sm=
+m_enabled)
+>           * just link them into fw_cfg here.
+>           */
+>          fw_cfg_add_file_callback(fw_cfg, "etc/smi/requested-features",
+> -                                 NULL, NULL,
+> +                                 NULL, NULL, NULL,
+>                                   lpc->smi_guest_features_le,
+>                                   sizeof lpc->smi_guest_features_le,
+>                                   false);
+>          fw_cfg_add_file_callback(fw_cfg, "etc/smi/features-ok",
+> -                                 smi_features_ok_callback, lpc,
+> +                                 smi_features_ok_callback, NULL, lpc,
+>                                   &lpc->smi_features_ok,
+>                                   sizeof lpc->smi_features_ok,
+>                                   true);
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index e3bd626b8c..28780088b9 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -56,6 +56,7 @@ struct FWCfgEntry {
+>      uint8_t *data;
+>      void *callback_opaque;
+>      FWCfgCallback select_cb;
+> +    FWCfgCallback write_cb;
+>  };
+> =20
+>  #define JPG_FILE 0
+> @@ -384,6 +385,12 @@ static void fw_cfg_dma_transfer(FWCfgState *s)
+>      stl_be_dma(s->dma_as, dma_addr + offsetof(FWCfgDmaAccess, control)=
+,
+>                  dma.control);
+> =20
+> +    if (write &&
+> +        !(dma.control & FW_CFG_DMA_CTL_ERROR) &&
+> +        s->cur_offset =3D=3D e->len) {
+> +        e->write_cb(e->callback_opaque);
+> +    }
+> +
 
-There's no choice between gnutls vs the other two - it is always a case of
-building gnutls *and* either nettle or gcrypt. We pick nettle or gcrypt based
-on which is used by gnutls, to minimise number of different crypto libraries
-we load. So dynamically picking them at runtime makese no sense.
+I think callback should be invoked on every write.
+And your device should verify that all of it is written.
+We are doing DMA so all of it can be written in one go.
 
-> To be "secure by default", qemu-crypto-nettle could be a hard requirement of
-> qemu core package.
-> 
-> Is it worth the effort?
 
-I don't really think that is useful. You should think of the crypto stuff
-as being part of the 'libqemuutil.la' library - the only reason it is not
-linked into that is because we wanted to avoid adds deps on the userspace
-emulators - everything else we build wants it present. 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>      trace_fw_cfg_read(s, 0);
+>  }
+> =20
+> @@ -570,6 +577,7 @@ static const VMStateDescription vmstate_fw_cfg =3D =
+{
+> =20
+>  static void fw_cfg_add_bytes_callback(FWCfgState *s, uint16_t key,
+>                                        FWCfgCallback select_cb,
+> +                                      FWCfgCallback write_cb,
+>                                        void *callback_opaque,
+>                                        void *data, size_t len,
+>                                        bool read_only)
+> @@ -584,6 +592,7 @@ static void fw_cfg_add_bytes_callback(FWCfgState *s=
+, uint16_t key,
+>      s->entries[arch][key].data =3D data;
+>      s->entries[arch][key].len =3D (uint32_t)len;
+>      s->entries[arch][key].select_cb =3D select_cb;
+> +    s->entries[arch][key].write_cb =3D write_cb;
+>      s->entries[arch][key].callback_opaque =3D callback_opaque;
+>      s->entries[arch][key].allow_write =3D !read_only;
+>  }
+> @@ -610,7 +619,7 @@ static void *fw_cfg_modify_bytes_read(FWCfgState *s=
+, uint16_t key,
+> =20
+>  void fw_cfg_add_bytes(FWCfgState *s, uint16_t key, void *data, size_t =
+len)
+>  {
+> -    fw_cfg_add_bytes_callback(s, key, NULL, NULL, data, len, true);
+> +    fw_cfg_add_bytes_callback(s, key, NULL, NULL, NULL, data, len, tru=
+e);
+>  }
+> =20
+>  void fw_cfg_add_string(FWCfgState *s, uint16_t key, const char *value)
+> @@ -737,6 +746,7 @@ static int get_fw_cfg_order(FWCfgState *s, const ch=
+ar *name)
+> =20
+>  void fw_cfg_add_file_callback(FWCfgState *s,  const char *filename,
+>                                FWCfgCallback select_cb,
+> +                              FWCfgCallback write_cb,
+>                                void *callback_opaque,
+>                                void *data, size_t len, bool read_only)
+>  {
+> @@ -800,7 +810,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const=
+ char *filename,
+>      }
+> =20
+>      fw_cfg_add_bytes_callback(s, FW_CFG_FILE_FIRST + index,
+> -                              select_cb,
+> +                              select_cb, write_cb,
+>                                callback_opaque, data, len,
+>                                read_only);
+> =20
+> @@ -815,7 +825,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const=
+ char *filename,
+>  void fw_cfg_add_file(FWCfgState *s,  const char *filename,
+>                       void *data, size_t len)
+>  {
+> -    fw_cfg_add_file_callback(s, filename, NULL, NULL, data, len, true)=
+;
+> +    fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len,=
+ true);
+>  }
+> =20
+>  void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
+> @@ -838,7 +848,7 @@ void *fw_cfg_modify_file(FWCfgState *s, const char =
+*filename,
+>          }
+>      }
+>      /* add new one */
+> -    fw_cfg_add_file_callback(s, filename, NULL, NULL, data, len, true)=
+;
+> +    fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len,=
+ true);
+>      return NULL;
+>  }
+> =20
+> --=20
+> 2.14.0.1.geff633fa0
+>=20
