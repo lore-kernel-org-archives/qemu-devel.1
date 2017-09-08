@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40759)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqM3I-0006wb-P9
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:45 -0400
+	(envelope-from <groug@kaod.org>) id 1dqM5U-00009b-FR
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:25:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqM3F-0004Yq-LW
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53928)
+	(envelope-from <groug@kaod.org>) id 1dqM5T-0006Mw-JL
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:25:00 -0400
+Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:58788)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqM3F-0004Xi-Fm
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:41 -0400
-Date: Fri, 8 Sep 2017 17:22:35 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170908162235.GL32645@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170724181544.20292-1-brandon.carpenter@cypherpath.com>
-	<20170725083603.GC26394@redhat.com>
-	<1504887484.8245.0@smtp.gmail.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dqM5T-0006DD-Dz
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:24:59 -0400
+Received: from player714.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 052147A3DC
+	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 18:24:51 +0200 (CEST)
+Date: Fri, 8 Sep 2017 18:24:42 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170908182442.34054758@bahia>
+In-Reply-To: <20170908143344.12960-2-clg@kaod.org>
+References: <20170908143344.12960-1-clg@kaod.org>
+	<20170908143344.12960-2-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1504887484.8245.0@smtp.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] io: Always remove an old channel watch
- before adding a new one.
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/b=i3mL.1RU8aTkGuI0PwyWH";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 1/3] ppc/xive: fix
+ OV5_XIVE_EXPLOIT bits
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +32,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-Cc: qemu-devel@nongnu.org, kraxel@redhat.com
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, Sep 08, 2017 at 09:18:04AM -0700, Brandon Carpenter wrote:
-> I haven't seen this patch hit master yet and am about to submit a patch set
-> that is dependent on this one because it triggers the bug fixed by this
-> patch, causing a segmentation fault. Is it preferred that I include this
-> patch in that series with the Reviewed-by: tags or to just reference this
-> patch in the cover letter?
+--Sig_/b=i3mL.1RU8aTkGuI0PwyWH
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Yes, if you re-post the patch as part of a larger just, add any
-Reviewed-by tags to the commit message when you re-post.
+Shouldn't the patch title mention spapr instead of ppc/xive ?
 
-> On Tue, Jul 25, 2017 at 1:36 AM, Daniel P. Berrange <berrange@redhat.com>
-> wrote:
-> > On Mon, Jul 24, 2017 at 11:15:44AM -0700, Brandon Carpenter wrote:
-> > >  Also set saved handle to zero when removing without adding a new
-> > > watch.
-> > > 
-> > >  Signed-off-by: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-> > >  ---
-> > >   ui/vnc-auth-vencrypt.c | 3 +++
-> > >   ui/vnc-ws.c            | 6 ++++++
-> > >   ui/vnc.c               | 4 ++++
-> > >   3 files changed, 13 insertions(+)
-> > 
-> > Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-> > 
-> > 
+On Fri,  8 Sep 2017 16:33:42 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> On POWER9, the Client Architecture Support (CAS) negotiation process
+> determines whether the guest operates in XIVE Legacy compatibility or
+> in XIVE exploitation mode. Now that we have initial guest support for
+> the XIVE interrupt controller, let's fix the bits definition which have
+> evolved in the latest specs.
+>=20
+> The platform advertises the XIVE Exploitation Mode support using the
+> property "ibm,arch-vec-5-platform-support-vec-5", byte 23 bits 0-1 :
+>=20
+>  - 0b00 XIVE legacy mode Only
+>  - 0b01 XIVE exploitation mode Only
+>  - 0b10 XIVE legacy or exploitation mode
+>=20
+> The OS asks for XIVE Exploitation Mode support using the property
+> "ibm,architecture-vec-5", byte 23 bits 0-1:
+>=20
+>  - 0b00 XIVE legacy mode Only
+>  - 0b01 XIVE exploitation mode Only
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/ppc/spapr.c              | 2 +-
+>  include/hw/ppc/spapr_ovec.h | 3 ++-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index cec441cbf48d..3e3ff1fbc988 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -914,7 +914,7 @@ static void spapr_dt_ov5_platform_support(void *fdt, =
+int chosen)
+>      PowerPCCPU *first_ppc_cpu =3D POWERPC_CPU(first_cpu);
+> =20
+>      char val[2 * 4] =3D {
+> -        23, 0x00, /* Xive mode: 0 =3D legacy (as in ISA 2.7), 1 =3D Expl=
+oitation */
+> +        23, 0x00, /* Xive mode, filled in below. */
+>          24, 0x00, /* Hash/Radix, filled in below. */
+>          25, 0x00, /* Hash options: Segment Tables =3D=3D no, GTSE =3D=3D=
+ no. */
+>          26, 0x40, /* Radix options: GTSE =3D=3D yes. */
+> diff --git a/include/hw/ppc/spapr_ovec.h b/include/hw/ppc/spapr_ovec.h
+> index 9edfa5ff7530..bf25e5d954a1 100644
+> --- a/include/hw/ppc/spapr_ovec.h
+> +++ b/include/hw/ppc/spapr_ovec.h
+> @@ -51,7 +51,8 @@ typedef struct sPAPROptionVector sPAPROptionVector;
+>  #define OV5_FORM1_AFFINITY      OV_BIT(5, 0)
+>  #define OV5_HP_EVT              OV_BIT(6, 5)
+>  #define OV5_HPT_RESIZE          OV_BIT(6, 7)
+> -#define OV5_XIVE_EXPLOIT        OV_BIT(23, 7)
+> +#define OV5_XIVE_BOTH           OV_BIT(23, 0)
+> +#define OV5_XIVE_EXPLOIT        OV_BIT(23, 1) /* 1=3Dexploitation 0=3Dle=
+gacy */
+> =20
+>  /* ISA 3.00 MMU features: */
+>  #define OV5_MMU_BOTH            OV_BIT(24, 0) /* Radix and hash */
+
+
+--Sig_/b=i3mL.1RU8aTkGuI0PwyWH
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbLESgAKCRAC/DrrAQHb
+wsujAJ4nFFl118IkWQUJvYpSSm8jF83vHQCghN/tSZ3Fa6J5nXKr0q3NyUqZslk=
+=bIQq
+-----END PGP SIGNATURE-----
+
+--Sig_/b=i3mL.1RU8aTkGuI0PwyWH--
