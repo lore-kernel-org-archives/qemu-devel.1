@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqSRo-000097-R3
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 19:12:29 -0400
+	(envelope-from <famz@redhat.com>) id 1dqSSi-0000wq-97
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 19:13:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqSRj-0004rm-QN
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 19:12:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37290)
+	(envelope-from <famz@redhat.com>) id 1dqSSh-0006Dr-CX
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 19:13:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35224)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqSRj-0004ot-K5
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 19:12:23 -0400
-Date: Sat, 9 Sep 2017 07:12:17 +0800
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqSSh-0006D0-6C
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 19:13:23 -0400
+Date: Sat, 9 Sep 2017 07:13:18 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170908231217.GA18677@lemon.lan>
+Message-ID: <20170908231318.GB18677@lemon.lan>
 References: <20170905021201.25684-1-famz@redhat.com>
-	<20170905021201.25684-2-famz@redhat.com>
-	<87y3ppgty2.fsf@linaro.org>
+	<20170905021201.25684-4-famz@redhat.com>
+	<CAFEAcA9mFqWntuM3=vGQKv-rLjRpRnBLhXomJNTHH9U6+zhTLQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87y3ppgty2.fsf@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 01/12] gitignore: Ignore vm test images
+In-Reply-To: <CAFEAcA9mFqWntuM3=vGQKv-rLjRpRnBLhXomJNTHH9U6+zhTLQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v6 03/12] scripts: Add archive-source.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,36 +28,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Eric Blake <eblake@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
 
-On Fri, 09/08 15:12, Alex Benn=E9e wrote:
->=20
-> Fam Zheng <famz@redhat.com> writes:
->=20
+On Fri, 09/08 15:56, Peter Maydell wrote:
+> On 5 September 2017 at 03:11, Fam Zheng <famz@redhat.com> wrote:
 > > Signed-off-by: Fam Zheng <famz@redhat.com>
 > > ---
-> >  .gitignore       | 1 +
-> >  tests/.gitignore | 1 +
-> >  2 files changed, 2 insertions(+)
+> >  scripts/archive-source.sh | 31 +++++++++++++++++++++++++++++++
+> >  1 file changed, 31 insertions(+)
+> >  create mode 100755 scripts/archive-source.sh
 > >
-> > diff --git a/.gitignore b/.gitignore
-> > index cf65316863..40acfcb9e2 100644
-> > --- a/.gitignore
-> > +++ b/.gitignore
-> > @@ -52,6 +52,7 @@
-> >  /vscclient
-> >  /vhost-user-scsi
-> >  /fsdev/virtfs-proxy-helper
-> > +*.tmp
->=20
-> I'm not sure we should be dumping anything in the rootdir, .gitignored
-> or not.
+> > diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+> > new file mode 100755
+> > index 0000000000..3cae7f34d3
+> > --- /dev/null
+> > +++ b/scripts/archive-source.sh
+> > @@ -0,0 +1,31 @@
+> > +#!/bin/sh
+> > +#
+> > +# Author: Fam Zheng <famz@redhat.com>
+> > +#
+> > +# Create archive of source tree, including submodules
+> > +#
+> > +# This work is licensed under the terms of the GNU GPL, version 2.
+> > +# See the COPYING file in the top-level directory.
+> 
+> Why GPL-2-only? We generally prefer GPL-2-or-later for new
+> files, or something more permissive.
 
-It used to be /tests/vm/*.tmp but Philippe asked for a generic rule in pr=
-evious
-reviewing. I think it makes sense, we can also unify the docker-src.* pat=
-tern by
-making the directory names to have a .tmp suffix later.
+Copied from some other script/* files, apparently. :)
+
+Will make it GPL-2-or-later.
 
 Fam
