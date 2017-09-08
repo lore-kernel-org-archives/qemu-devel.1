@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57540)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqHWy-0004Sy-Tx
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:33:09 -0400
+	(envelope-from <marcel@redhat.com>) id 1dqHd3-0006kb-1V
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:39:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqHWu-0006Wp-HZ
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:33:04 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58542)
+	(envelope-from <marcel@redhat.com>) id 1dqHcz-0002mM-Qv
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:39:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41636)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqHWu-0006WQ-Bi
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:33:00 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5E1BD806A2
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 11:32:59 +0000 (UTC)
-Date: Fri, 8 Sep 2017 19:32:55 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170908113255.GO4511@lemon>
-References: <20170908111217.21985-1-kraxel@redhat.com>
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dqHcz-0002l3-L1
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:39:17 -0400
+References: <20170906142658.58298-1-marcel@redhat.com>
+	<20170906142658.58298-3-marcel@redhat.com>
+	<20170906144958.GA7570@localhost.localdomain>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <0c764f20-16ed-5bbc-f792-e410f56f1c93@redhat.com>
+Date: Fri, 8 Sep 2017 14:39:04 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170908111217.21985-1-kraxel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] usb-host: cleanups
+In-Reply-To: <20170906144958.GA7570@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/pcie: disable IO port fwd by
+ default for pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,14 +30,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, Laine Stump <laine@redhat.com>, Alexander Bezzubikov <zuban32s@gmail.com>
 
-On Fri, 09/08 13:12, Gerd Hoffmann wrote:
+On 06/09/2017 17:49, Eduardo Habkost wrote:
+> On Wed, Sep 06, 2017 at 05:26:58PM +0300, Marcel Apfelbaum wrote:
+>> For most cases the devices attached to PCIe Root Ports
+>> do not need IO ports range, add an 'enable-io-fwd' property
+>> making it false by default, but keeping it true for older machines.
+>>
+>> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> [...]
+>> @@ -78,6 +111,7 @@ static const VMStateDescription vmstate_rp_dev = {
+>>   
+>>   static Property gen_rp_props[] = {
+>>       DEFINE_PROP_BOOL("x-migrate-msix", GenPCIERootPort, migrate_msix, true),
+>> +    DEFINE_PROP_BOOL("enable-io-fwd", GenPCIERootPort, enable_io_fwd, false),
 > 
-> 
-> Gerd Hoffmann (2):
->   usb: drop HOST_USB
->   usb: only build usb-host with CONFIG_USB=y
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Hi Eduardo,
+
+> There's no "x-" prefix, so I guess we really need to let the user
+> or management software to set enable-io-fwd=on explicitly on some
+> cases?
+> 
+
+Definitely. Specifically 2 cases:
+  - attach PCIe-PCI bridge to start a legacy PCI hierarchy.
+  - assign a device requiring IO ports range.
+
+Thanks,
+Marcel
