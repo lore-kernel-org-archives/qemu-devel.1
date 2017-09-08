@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58980)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqGeI-0002KM-5R
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGeJ-0002Ly-91
 	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqGe8-0003PU-Et
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:34 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGe8-0003Pq-Mg
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:35 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  8 Sep 2017 20:35:53 +1000
-Message-Id: <20170908103558.31632-36-david@gibson.dropbear.id.au>
+Date: Fri,  8 Sep 2017 20:35:56 +1000
+Message-Id: <20170908103558.31632-39-david@gibson.dropbear.id.au>
 In-Reply-To: <20170908103558.31632-1-david@gibson.dropbear.id.au>
 References: <20170908103558.31632-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 35/40] ppc: make cpu alias point only to real
- cpu models
+Subject: [Qemu-devel] [PULL 38/40] ppc: drop caching ObjectClass from
+ PowerPCCPUAlias
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,180 +25,102 @@ Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sam.bobroff@au1.ibm
 
 From: Igor Mammedov <imammedo@redhat.com>
 
-alias pointing to another alias forces lookup code to
-do recurrsive translation till real cpu model is reached.
+Caching there practically doesn't give any benefits
+and that at slow path druring querying supported CPU list.
+But it introduces non conventional path of where from
+comes used CPU type name (kvm_ppc_register_host_cpu_type).
 
-Drop this nonsence and make each alias point to cpu model
-that has corresponding CPU type. It will allow to drop
-recurrsion in cpu model translation code and actually
-make ppc_cpu_aliases[] content use PowerPCCPUAlias
-fields properly
-(i.e. alias goes into .alias and model goes into .model)
-
-While at it add TODO defines around aliases that point to
-cpu models excluded by the same TODO defines.
+Taking in account that kvm_ppc_register_host_cpu_type()
+fixes up models the aliases point to, it's sufficient to
+make ppc_cpu_class_by_name() translate cpu alias to
+correct cpu type name.
+So drop PowerPCCPUAlias::oc field + ppc_cpu_class_by_alias()
+and let ppc_cpu_class_by_name() do conversion to cpu type name,
+which simplifies code a little bit saving ~20LOC and trouble
+wondering why ppc_cpu_class_by_alias() is necessary.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/cpu-models.c | 56 ++++++++++++++++++++++++++-----------------------
- target/ppc/cpu-models.h |  2 +-
- 2 files changed, 31 insertions(+), 27 deletions(-)
+ target/ppc/cpu-models.h     |  1 -
+ target/ppc/kvm.c            |  1 -
+ target/ppc/translate_init.c | 26 ++------------------------
+ 3 files changed, 2 insertions(+), 26 deletions(-)
 
-diff --git a/target/ppc/cpu-models.c b/target/ppc/cpu-models.c
-index 07a48ca548..64629fc39f 100644
---- a/target/ppc/cpu-models.c
-+++ b/target/ppc/cpu-models.c
-@@ -1237,6 +1237,7 @@ PowerPCCPUAlias ppc_cpu_aliases[] = {
-     { "x2vp50", "x2vp20" },
- 
-     { "440ep", "440epb" },
-+#if defined(TODO_USER_ONLY)
-     { "440gp", "440gpc" },
-     { "440gr", "440gra" },
-     { "440gx", "440gxf" },
-@@ -1274,36 +1275,37 @@ PowerPCCPUAlias ppc_cpu_aliases[] = {
-     { "mpc875", "mpc8xx" },
-     { "mpc880", "mpc8xx" },
-     { "mpc885", "mpc8xx" },
-+#endif
- 
-     /* PowerPC MPC603 microcontrollers */
-     { "mpc8240", "603" },
- 
--    { "mpc52xx", "mpc5200" },
-+    { "mpc52xx", "mpc5200_v12" },
-     { "mpc5200", "mpc5200_v12" },
-     { "mpc5200b", "mpc5200b_v21" },
- 
--    { "mpc82xx", "mpc8280" },
--    { "powerquicc-ii", "mpc82xx" },
-+    { "mpc82xx", "g2legp3" },
-+    { "powerquicc-ii", "g2legp3" },
-     { "mpc8241", "g2hip4" },
-     { "mpc8245", "g2hip4" },
-     { "mpc8247", "g2legp3" },
-     { "mpc8248", "g2legp3" },
--    { "mpc8250", "mpc8250_hip4" },
-+    { "mpc8250", "g2hip4" },
-     { "mpc8250_hip3", "g2hip3" },
-     { "mpc8250_hip4", "g2hip4" },
--    { "mpc8255", "mpc8255_hip4" },
-+    { "mpc8255", "g2hip4" },
-     { "mpc8255_hip3", "g2hip3" },
-     { "mpc8255_hip4", "g2hip4" },
--    { "mpc8260", "mpc8260_hip4" },
-+    { "mpc8260", "g2hip4" },
-     { "mpc8260_hip3", "g2hip3" },
-     { "mpc8260_hip4", "g2hip4" },
--    { "mpc8264", "mpc8264_hip4" },
-+    { "mpc8264", "g2hip4" },
-     { "mpc8264_hip3", "g2hip3" },
-     { "mpc8264_hip4", "g2hip4" },
--    { "mpc8265", "mpc8265_hip4" },
-+    { "mpc8265", "g2hip4" },
-     { "mpc8265_hip3", "g2hip3" },
-     { "mpc8265_hip4", "g2hip4" },
--    { "mpc8266", "mpc8266_hip4" },
-+    { "mpc8266", "g2hip4" },
-     { "mpc8266_hip3", "g2hip3" },
-     { "mpc8266_hip4", "g2hip4" },
-     { "mpc8270", "g2legp3" },
-@@ -1341,18 +1343,18 @@ PowerPCCPUAlias ppc_cpu_aliases[] = {
-     { "601v", "601_v2" },
-     { "vanilla", "603" },
-     { "603e", "603e_v4.1" },
--    { "stretch", "603e" },
-+    { "stretch", "603e_v4.1" },
-     { "vaillant", "603e7v" },
-     { "603r", "603e7t" },
--    { "goldeneye", "603r" },
-+    { "goldeneye", "603e7t" },
-     { "604e", "604e_v2.4" },
--    { "sirocco", "604e" },
-+    { "sirocco", "604e_v2.4" },
-     { "mach5", "604r" },
-     { "740", "740_v3.1" },
--    { "arthur", "740" },
-+    { "arthur", "740_v3.1" },
-     { "750", "750_v3.1" },
--    { "typhoon", "750" },
--    { "g3",      "750" },
-+    { "typhoon", "750_v3.1" },
-+    { "g3",      "750_v3.1" },
-     { "conan/doyle", "750p" },
-     { "750cl", "750cl_v2.0" },
-     { "750cx", "750cx_v2.2" },
-@@ -1360,32 +1362,34 @@ PowerPCCPUAlias ppc_cpu_aliases[] = {
-     { "750fx", "750fx_v2.3" },
-     { "750gx", "750gx_v1.2" },
-     { "750l", "750l_v3.2" },
--    { "lonestar", "750l" },
-+    { "lonestar", "750l_v3.2" },
-     { "745", "745_v2.8" },
-     { "755", "755_v2.8" },
--    { "goldfinger", "755" },
-+    { "goldfinger", "755_v2.8" },
-     { "7400", "7400_v2.9" },
--    { "max", "7400" },
--    { "g4",  "7400" },
-+    { "max", "7400_v2.9" },
-+    { "g4",  "7400_v2.9" },
-     { "7410", "7410_v1.4" },
--    { "nitro", "7410" },
-+    { "nitro", "7410_v1.4" },
-     { "7448", "7448_v2.1" },
-     { "7450", "7450_v2.1" },
--    { "vger", "7450" },
-+    { "vger", "7450_v2.1" },
-     { "7441", "7441_v2.3" },
-     { "7451", "7451_v2.3" },
-     { "7445", "7445_v3.2" },
-     { "7455", "7455_v3.2" },
--    { "apollo6", "7455" },
-+    { "apollo6", "7455_v3.2" },
-     { "7447", "7447_v1.1" },
-     { "7457", "7457_v1.2" },
--    { "apollo7", "7457" },
-+    { "apollo7", "7457_v1.2" },
-     { "7447a", "7447a_v1.2" },
-     { "7457a", "7457a_v1.2" },
-     { "apollo7pm", "7457a_v1.0" },
- #if defined(TARGET_PPC64)
-+#if defined(TODO)
-     { "power3", "630" },
-     { "power3+", "631" },
-+#endif
-     { "power5+", "power5+_v2.1" },
-     { "power5gs", "power5+_v2.1" },
-     { "power7", "power7_v2.3" },
-@@ -1401,10 +1405,10 @@ PowerPCCPUAlias ppc_cpu_aliases[] = {
- 
-     /* Generic PowerPCs */
- #if defined(TARGET_PPC64)
--    { "ppc64", "970fx" },
-+    { "ppc64", "970fx_v3.1" },
- #endif
-     { "ppc32", "604" },
--    { "ppc", "ppc32" },
--    { "default", "ppc" },
-+    { "ppc", "604" },
-+    { "default", "604" },
-     { NULL, NULL }
- };
 diff --git a/target/ppc/cpu-models.h b/target/ppc/cpu-models.h
-index eaa6849a42..629f112337 100644
+index 629f112337..df31d7f492 100644
 --- a/target/ppc/cpu-models.h
 +++ b/target/ppc/cpu-models.h
-@@ -24,7 +24,7 @@
- /**
-  * PowerPCCPUAlias:
-  * @alias: The alias name.
-- * @model: The CPU model @alias refers to.
-+ * @model: The CPU model @alias refers to, that directly resolves into CPU type
-  *
-  * A mapping entry from CPU @alias to CPU @model.
-  */
+@@ -31,7 +31,6 @@
+ typedef struct PowerPCCPUAlias {
+     const char *alias;
+     const char *model;
+-    ObjectClass *oc;
+ } PowerPCCPUAlias;
+ 
+ extern PowerPCCPUAlias ppc_cpu_aliases[];
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 6861f2f585..6442dfcb95 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2533,7 +2533,6 @@ static int kvm_ppc_register_host_cpu_type(void)
+             if (suffix) {
+                 *suffix = 0;
+             }
+-            ppc_cpu_aliases[i].oc = oc;
+             break;
+         }
+     }
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 7c1d83b489..3e24cddb86 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -10253,28 +10253,6 @@ PowerPCCPUClass *ppc_cpu_class_by_pvr_mask(uint32_t pvr)
+     return pcc;
+ }
+ 
+-static ObjectClass *ppc_cpu_class_by_name(const char *name);
+-
+-static ObjectClass *ppc_cpu_class_by_alias(PowerPCCPUAlias *alias)
+-{
+-    ObjectClass *invalid_class = (void*)ppc_cpu_class_by_alias;
+-
+-    /* Cache target class lookups in the alias table */
+-    if (!alias->oc) {
+-        alias->oc = ppc_cpu_class_by_name(alias->model);
+-        if (!alias->oc) {
+-            /* Fast check for non-existing aliases */
+-            alias->oc = invalid_class;
+-        }
+-    }
+-
+-    if (alias->oc == invalid_class) {
+-        return NULL;
+-    } else {
+-        return alias->oc;
+-    }
+-}
+-
+ static ObjectClass *ppc_cpu_class_by_name(const char *name)
+ {
+     char *cpu_model, *typename;
+@@ -10386,7 +10364,7 @@ static void ppc_cpu_list_entry(gpointer data, gpointer user_data)
+                       name, pcc->pvr);
+     for (i = 0; ppc_cpu_aliases[i].alias != NULL; i++) {
+         PowerPCCPUAlias *alias = &ppc_cpu_aliases[i];
+-        ObjectClass *alias_oc = ppc_cpu_class_by_alias(alias);
++        ObjectClass *alias_oc = ppc_cpu_class_by_name(alias->model);
+ 
+         if (alias_oc != oc) {
+             continue;
+@@ -10466,7 +10444,7 @@ CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
+         CpuDefinitionInfoList *entry;
+         CpuDefinitionInfo *info;
+ 
+-        oc = ppc_cpu_class_by_alias(alias);
++        oc = ppc_cpu_class_by_name(alias->model);
+         if (oc == NULL) {
+             continue;
+         }
 -- 
 2.13.5
