@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1dqNFR-0000Mc-VS
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:39:23 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dqNNL-0008G7-1G
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:47:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1dqNFQ-0008MB-NC
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:39:22 -0400
-Received: from mail-pg0-x22e.google.com ([2607:f8b0:400e:c05::22e]:37686)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1dqNFQ-0008LM-F2
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:39:20 -0400
-Received: by mail-pg0-x22e.google.com with SMTP id d8so5918000pgt.4
-	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 10:39:20 -0700 (PDT)
+	(envelope-from <alistair23@gmail.com>) id 1dqNNK-0007H3-2P
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:47:31 -0400
 MIME-Version: 1.0
-From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-Date: Fri,  8 Sep 2017 10:38:01 -0700
-Message-Id: <20170908173801.15205-7-brandon.carpenter@cypherpath.com>
-In-Reply-To: <20170908173801.15205-1-brandon.carpenter@cypherpath.com>
-References: <20170908173801.15205-1-brandon.carpenter@cypherpath.com>
-In-Reply-To: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
-References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
-Content-Type: text/plain; charset="US-ASCII"
-Subject: [Qemu-devel] [PATCH v2 6/6] io: Reply to ping frames
+In-Reply-To: <20170908163859.29820-1-richard.henderson@linaro.org>
+References: <20170908163859.29820-1-richard.henderson@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 8 Sep 2017 10:46:57 -0700
+Message-ID: <CAKmqyKMdfNLtVTnDGVytJKaaoWMkxt+G3+U6Ph5Vm8U2ZGzRaA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Avoid an extra temporary for
+ store_exclusive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,134 +22,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, brandon.carpenter@cypherpath.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-Add an immediate ping reply (pong) to the outgoing stream when a ping
-is received. Unsolicited pongs are ignored.
+On Fri, Sep 8, 2017 at 9:38 AM, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Instead of copying addr to a local temp, reuse the value (which we
+> have just compared as equal) already saved in cpu_exclusive_addr.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Brandon Carpenter <brandon.carpenter@cypherpath.com>
----
- io/channel-websock.c | 50 ++++++++++++++++++++++++++++++++------------------
- 1 file changed, 32 insertions(+), 18 deletions(-)
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
-diff --git a/io/channel-websock.c b/io/channel-websock.c
-index 50387050d5..175f17ce6b 100644
---- a/io/channel-websock.c
-+++ b/io/channel-websock.c
-@@ -479,7 +479,8 @@ static gboolean qio_channel_websock_handshake_io(QIOChannel *ioc,
- }
- 
- 
--static void qio_channel_websock_encode(QIOChannelWebsock *ioc)
-+static void qio_channel_websock_encode_buffer(QIOChannelWebsock *ioc,
-+                                              uint8_t opcode, Buffer *buffer)
- {
-     size_t header_size;
-     union {
-@@ -487,33 +488,37 @@ static void qio_channel_websock_encode(QIOChannelWebsock *ioc)
-         QIOChannelWebsockHeader ws;
-     } header;
- 
--    if (!ioc->rawoutput.offset) {
--        return;
--    }
--
-     header.ws.b0 = QIO_CHANNEL_WEBSOCK_HEADER_FIELD_FIN |
--        (QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME &
--         QIO_CHANNEL_WEBSOCK_HEADER_FIELD_OPCODE);
--    if (ioc->rawoutput.offset <
-+        (opcode & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_OPCODE);
-+    if (buffer->offset <
-         QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_THRESHOLD_7_BIT) {
--        header.ws.b1 = (uint8_t)ioc->rawoutput.offset;
-+        header.ws.b1 = (uint8_t)buffer->offset;
-         header_size = QIO_CHANNEL_WEBSOCK_HEADER_LEN_7_BIT;
--    } else if (ioc->rawoutput.offset <
-+    } else if (buffer->offset <
-                QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_THRESHOLD_16_BIT) {
-         header.ws.b1 = QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_MAGIC_16_BIT;
--        header.ws.u.s16.l16 = cpu_to_be16((uint16_t)ioc->rawoutput.offset);
-+        header.ws.u.s16.l16 = cpu_to_be16((uint16_t)buffer->offset);
-         header_size = QIO_CHANNEL_WEBSOCK_HEADER_LEN_16_BIT;
-     } else {
-         header.ws.b1 = QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_MAGIC_64_BIT;
--        header.ws.u.s64.l64 = cpu_to_be64(ioc->rawoutput.offset);
-+        header.ws.u.s64.l64 = cpu_to_be64(buffer->offset);
-         header_size = QIO_CHANNEL_WEBSOCK_HEADER_LEN_64_BIT;
-     }
-     header_size -= QIO_CHANNEL_WEBSOCK_HEADER_LEN_MASK;
- 
--    buffer_reserve(&ioc->encoutput, header_size + ioc->rawoutput.offset);
-+    buffer_reserve(&ioc->encoutput, header_size + buffer->offset);
-     buffer_append(&ioc->encoutput, header.buf, header_size);
--    buffer_append(&ioc->encoutput, ioc->rawoutput.buffer,
--                  ioc->rawoutput.offset);
-+    buffer_append(&ioc->encoutput, buffer->buffer, buffer->offset);
-+}
-+
-+
-+static void qio_channel_websock_encode(QIOChannelWebsock *ioc)
-+{
-+    if (!ioc->rawoutput.offset) {
-+        return;
-+    }
-+    qio_channel_websock_encode_buffer(ioc,
-+            QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME, &ioc->rawoutput);
-     buffer_reset(&ioc->rawoutput);
- }
- 
-@@ -558,7 +563,7 @@ static int qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
-     /* Websocket frame sanity check:
-      * * Fragmentation is only supported for binary frames.
-      * * All frames sent by a client MUST be masked.
--     * * Only binary encoding is supported.
-+     * * Only binary and ping/pong encoding is supported.
-      */
-     if (!fin) {
-         if (opcode != QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
-@@ -619,6 +624,11 @@ static int qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
-          * for purpose of unmasking, except at end of payload
-          */
-         if (ioc->encinput.offset < ioc->payload_remain) {
-+            /* Wait for the entire payload before processing control frames
-+             * because the payload will most likely be echoed back. */
-+            if (ioc->opcode & QIO_CHANNEL_WEBSOCK_CONTROL_OPCODE_MASK) {
-+                return QIO_CHANNEL_ERR_BLOCK;
-+            }
-             payload_len = ioc->encinput.offset - (ioc->encinput.offset % 4);
-         } else {
-             payload_len = ioc->payload_remain;
-@@ -641,13 +651,17 @@ static int qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
-         }
-     }
- 
--    /* Drop the payload of ping/pong packets */
-     if (ioc->opcode == QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
-         if (payload_len) {
-+            /* binary frames are passed on */
-             buffer_reserve(&ioc->rawinput, payload_len);
-             buffer_append(&ioc->rawinput, ioc->encinput.buffer, payload_len);
-         }
--    }
-+    } else if (ioc->opcode == QIO_CHANNEL_WEBSOCK_OPCODE_PING) {
-+        /* ping frames produce an immediate pong reply */
-+        qio_channel_websock_encode_buffer(ioc,
-+                QIO_CHANNEL_WEBSOCK_OPCODE_PONG, &ioc->encinput);
-+    }   /* pong frames are ignored */
- 
-     if (payload_len) {
-         buffer_advance(&ioc->encinput, payload_len);
--- 
-2.14.1
+Thanks,
+Alistair
 
-
--- 
-
-
-CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is 
-for the sole use of the intended recipient(s) and may contain proprietary, 
-confidential or privileged information or otherwise be protected by law. 
-Any unauthorized review, use, disclosure or distribution is prohibited. If 
-you are not the intended recipient, please notify the sender and destroy 
-all copies and the original message.
+> ---
+>  target/arm/translate-a64.c | 26 +++++++++-----------------
+>  1 file changed, 9 insertions(+), 17 deletions(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 9017e30510..114e21cc58 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -1894,7 +1894,7 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
+>  }
+>
+>  static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+> -                                TCGv_i64 inaddr, int size, int is_pair)
+> +                                TCGv_i64 addr, int size, int is_pair)
+>  {
+>      /* if (env->exclusive_addr == addr && env->exclusive_val == [addr]
+>       *     && (!is_pair || env->exclusive_high == [addr + datasize])) {
+> @@ -1910,13 +1910,8 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+>       */
+>      TCGLabel *fail_label = gen_new_label();
+>      TCGLabel *done_label = gen_new_label();
+> -    TCGv_i64 addr = tcg_temp_local_new_i64();
+>      TCGv_i64 tmp;
+>
+> -    /* Copy input into a local temp so it is not trashed when the
+> -     * basic block ends at the branch insn.
+> -     */
+> -    tcg_gen_mov_i64(addr, inaddr);
+>      tcg_gen_brcond_i64(TCG_COND_NE, addr, cpu_exclusive_addr, fail_label);
+>
+>      tmp = tcg_temp_new_i64();
+> @@ -1927,27 +1922,24 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+>              } else {
+>                  tcg_gen_concat32_i64(tmp, cpu_reg(s, rt2), cpu_reg(s, rt));
+>              }
+> -            tcg_gen_atomic_cmpxchg_i64(tmp, addr, cpu_exclusive_val, tmp,
+> +            tcg_gen_atomic_cmpxchg_i64(tmp, cpu_exclusive_addr,
+> +                                       cpu_exclusive_val, tmp,
+>                                         get_mem_index(s),
+>                                         MO_64 | MO_ALIGN | s->be_data);
+>              tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
+>          } else if (s->be_data == MO_LE) {
+> -            gen_helper_paired_cmpxchg64_le(tmp, cpu_env, addr, cpu_reg(s, rt),
+> -                                           cpu_reg(s, rt2));
+> +            gen_helper_paired_cmpxchg64_le(tmp, cpu_env, cpu_exclusive_addr,
+> +                                           cpu_reg(s, rt), cpu_reg(s, rt2));
+>          } else {
+> -            gen_helper_paired_cmpxchg64_be(tmp, cpu_env, addr, cpu_reg(s, rt),
+> -                                           cpu_reg(s, rt2));
+> +            gen_helper_paired_cmpxchg64_be(tmp, cpu_env, cpu_exclusive_addr,
+> +                                           cpu_reg(s, rt), cpu_reg(s, rt2));
+>          }
+>      } else {
+> -        TCGv_i64 val = cpu_reg(s, rt);
+> -        tcg_gen_atomic_cmpxchg_i64(tmp, addr, cpu_exclusive_val, val,
+> -                                   get_mem_index(s),
+> +        tcg_gen_atomic_cmpxchg_i64(tmp, cpu_exclusive_addr, cpu_exclusive_val,
+> +                                   cpu_reg(s, rt), get_mem_index(s),
+>                                     size | MO_ALIGN | s->be_data);
+>          tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
+>      }
+> -
+> -    tcg_temp_free_i64(addr);
+> -
+>      tcg_gen_mov_i64(cpu_reg(s, rd), tmp);
+>      tcg_temp_free_i64(tmp);
+>      tcg_gen_br(done_label);
+> --
+> 2.13.5
+>
+>
