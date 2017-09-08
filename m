@@ -1,26 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57531)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dqFYl-0005ph-P1
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:26:52 -0400
+	(envelope-from <berrange@redhat.com>) id 1dqFZv-0006xj-W2
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:28:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dqFYg-0000uf-EJ
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:26:47 -0400
-Resent-Message-Id: <E1dqFYg-0000uf-EJ@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21360)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dqFYg-0000sc-6j
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:26:42 -0400
-In-Reply-To: <20170908091700.14867-1-famz@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150486278080.210.2380735069955690933@6d89bd104fc3>
+	(envelope-from <berrange@redhat.com>) id 1dqFZm-0001pg-C5
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:27:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqFZm-0001ox-3W
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:27:50 -0400
+Date: Fri, 8 Sep 2017 10:27:38 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170908092738.GB3609@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170906104850.GB2215@work-vm> <20170906105414.GL15510@redhat.com>
+	<20170906105704.GC2215@work-vm> <20170906110629.GM15510@redhat.com>
+	<20170906113157.GD2215@work-vm> <20170906115428.GP15510@redhat.com>
+	<20170907081341.GA23040@pxdev.xzpeter.org>
+	<87inguaclr.fsf@dusky.pond.sub.org>
+	<20170907132259.GM30609@redhat.com>
+	<87h8weo186.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 8 Sep 2017 02:26:21 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH RFC 0/7] Proof of concept to power up "make
- test" with docker
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <87h8weo186.fsf@dusky.pond.sub.org>
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +33,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, thuth@redhat.com, f4bug@amsat.org, programmingkidx@gmail.com, crosa@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org, rth@twiddle.net
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCBSRkMgMC83XSBQcm9vZiBvZiBjb25jZXB0IHRvIHBvd2VyIHVwICJtYWtl
-IHRlc3QiIHdpdGggZG9ja2VyCk1lc3NhZ2UtaWQ6IDIwMTcwOTA4MDkxNzAwLjE0ODY3LTEtZmFt
-ekByZWRoYXQuY29tClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9i
-aW4vYmFzaAoKQkFTRT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4g
-fCB3YyAtbCkKZmFpbGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cg
-LS1mb3JtYXQ9JUggLS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAg
-IGVjaG8gIkNoZWNraW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9
-JXMgJGMpLi4uIgogICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0
-cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAg
-ICAgZWNobwogICAgZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNU
-IFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJk
-ODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAq
-IFtuZXcgdGFnXSAgICAgICAgICAgICAgIHBhdGNoZXcvMjAxNzA5MDgwOTE3MDAuMTQ4NjctMS1m
-YW16QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDkwODA5MTcwMC4xNDg2Ny0xLWZhbXpAcmVk
-aGF0LmNvbQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3L2NvdmVyLjE1MDQyMjg5
-MTYuZ2l0LmFsaXN0YWlyLmZyYW5jaXNAeGlsaW54LmNvbSAtPiBwYXRjaGV3L2NvdmVyLjE1MDQy
-Mjg5MTYuZ2l0LmFsaXN0YWlyLmZyYW5jaXNAeGlsaW54LmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBi
-cmFuY2ggJ3Rlc3QnCjBjN2E2NDJhODYgdGVzdHM6IE1vdmUgaTM4NiB0Y2cgdGVzdHMgdG8gY2hl
-Y2stdGNnCjQ0MjI2Y2E0ZmQgYnVpbGRzeXM6IEFkZCAiY2hlY2stdGNnIiB0YXJnZXQKZTY3MGM0
-ZTExNCB0ZXN0czogQnVpbGQgZml4IGZvciBsaW51eC10ZXN0CjA5ZmJiZDc4NDIgdGVzdHM6IEJ1
-aWxkIGZpeCBmb3IgaGVsbG8taTM4NgowNTQ2Mzk5YThhIGRvY2tlcjogQWRkIGZlZG9yYS1pMzg2
-LWNyb3NzIGltYWdlCjVhOGNkMjFhMDIgZG9ja2VyOiBBZGQgImNjIiBzdWJjb21tYW5kCjg5ZDQz
-NDZmNmUgTWFrZWZpbGU6IFJlbmFtZSBUQVJHRVRfRElSUyB0byBUQVJHRVRfTElTVAoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS83OiBNYWtlZmlsZTogUmVuYW1lIFRBUkdF
-VF9ESVJTIHRvIFRBUkdFVF9MSVNULi4uCkNoZWNraW5nIFBBVENIIDIvNzogZG9ja2VyOiBBZGQg
-ImNjIiBzdWJjb21tYW5kLi4uCkNoZWNraW5nIFBBVENIIDMvNzogZG9ja2VyOiBBZGQgZmVkb3Jh
-LWkzODYtY3Jvc3MgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNC83OiB0ZXN0czogQnVpbGQgZml4
-IGZvciBoZWxsby1pMzg2Li4uCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5j
-IGZpbGVzCiMyMDogRklMRTogdGVzdHMvdGNnL2hlbGxvLWkzODYuYzoyMzoKK3ZvaWQgX3N0YXJ0
-KHZvaWQpOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCA3IGxpbmVzIGNoZWNrZWQKCllv
-dXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDUvNzog
-dGVzdHM6IEJ1aWxkIGZpeCBmb3IgbGludXgtdGVzdC4uLgpFUlJPUjogaWYgdGhpcyBjb2RlIGlz
-IHJlZHVuZGFudCBjb25zaWRlciByZW1vdmluZyBpdAojMTQxOiBGSUxFOiB0ZXN0cy90Y2cvbGlu
-dXgtdGVzdC5jOjMyNjoKKyNpZiAwCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE3OSBs
-aW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVj
-a2luZyBQQVRDSCA2Lzc6IGJ1aWxkc3lzOiBBZGQgImNoZWNrLXRjZyIgdGFyZ2V0Li4uCkNoZWNr
-aW5nIFBBVENIIDcvNzogdGVzdHM6IE1vdmUgaTM4NiB0Y2cgdGVzdHMgdG8gY2hlY2stdGNnLi4u
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVl
-bGlzdHMub3Jn
+On Thu, Sep 07, 2017 at 07:41:29PM +0200, Markus Armbruster wrote:
+> "Daniel P. Berrange" <berrange@redhat.com> writes:
+> 
+> > On Thu, Sep 07, 2017 at 02:59:28PM +0200, Markus Armbruster wrote:
+> >> So, what exactly is going to drain the command queue?  If there's more
+> >> than one consumer, how exactly are commands from the queue dispatched to
+> >> the consumers?
+> >
+> > In terms of my proposal, for any single command there should only ever
+> > be a single consumer. The default consumer would be the main event loop
+> > thread, such that we have no semantic change to QMP operation from today.
+> >
+> > Some commands that are capable of being made "async", would have a
+> > different consumer. For example, if the client requested the 'migrate-cancel'
+> > be made async, this would change things such that the migration thread is
+> > now responsible for consuming the "migrate-cancel" command, instead of the
+> > default main loop.
+> >
+> >> What are the "no hang" guarantees (if any) and conditions for each of
+> >> these consumers?
+> >
+> > The non-main thread consumers would have to have some reasonable
+> > guarantee that they won't block on a lock held by the main loop,
+> > otherwise the whole feature is largely useless.
+> 
+> Same if they block indefinitely on anything else, actually.  In other
+> words, we need to talk about liveness.
+> 
+> Threads by themselves don't buy us liveness.  Being careful with
+> operations that may block does.  That care may lead to farming out
+> certain operations to other threads, where they may block without harm.
+> 
+> You only talk about "the non-main thread consumers".  What about the
+> main thread?  Is it okay for the main thread to block?  If yes, why?
+
+It isn't ok, but I feel that challenge is intractable in the short to
+medium term. Agree that having separate threads doesn't automatically
+give liveness, but I think it makes the problem tractble to solve for
+at least a subset of scenarios.
+
+> > No, that is not what I described. All synchronous commands are
+> > serialized wrt each other, just as today. An asychronous command
+> > can run as soon as it is received, regardless of whether any
+> > earlier sent sync commands are still executing or pending. This
+> > is trivial to achieve when you separate monitor I/O from command
+> > execution in separate threads, provided of course the async
+> > command consumers are not in the main loop.
+> 
+> So, a synchronous command is synchronous with respect to other commands,
+> except for certain non-blocking commands.  The distinctive feature of
+> the latter isn't so much an asynchronous reply, but out-of-band
+> dispatch.
+
+The terminology synchronous vs asynchronous is not a great fit for
+what I was describing. The distinction is really closer to being
+serialized vs parallelizable commands.
+
+> >                                                     This allows the
+> > migration operation to be cancelled immediately, regardless of whether
+> > there are earlier monitor commands blocked in the main loop.
+> 
+> The necessary part is moving all operations that can block out of
+> whatever loop runs the monitor, be it the main loop, some other event
+> loop, or a dedicated monitor thread's monitor loop.
+> 
+> Moving out non-blocking operations isn't necessary.  migrate-cancel
+> could communicate with the migration thread by any suitable mechanism or
+> protocol.  It doesn't have to be QMP.  Why would we want it to be QMP?
+
+I don't think we really want to invent yet another way of controlling
+QEMU, that isn't QMP do we, particularly not if it is special cased
+to just one operationg ?
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
