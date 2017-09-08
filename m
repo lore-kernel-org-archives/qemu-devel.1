@@ -1,14 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36064)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dqEpq-0000yv-De
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 04:40:32 -0400
+	(envelope-from <armbru@redhat.com>) id 1dqEr3-0001cP-RE
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 04:41:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dqEpf-0000Jp-T9
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 04:40:22 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri,  8 Sep 2017 09:39:41 +0100
-Message-Id: <20170908083941.14591-1-stefanha@redhat.com>
-Subject: [Qemu-devel] [PATCH v6] docs: add qemu-block-drivers(7) man page
+	(envelope-from <armbru@redhat.com>) id 1dqEqx-0001l4-JZ
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 04:41:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46064)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <armbru@redhat.com>) id 1dqEqx-0001jl-A9
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 04:41:31 -0400
+From: Markus Armbruster <armbru@redhat.com>
+References: <20170906104850.GB2215@work-vm>
+	<20170906105414.GL15510@redhat.com> <20170906105704.GC2215@work-vm>
+	<20170906110629.GM15510@redhat.com> <20170906113157.GD2215@work-vm>
+	<20170906115428.GP15510@redhat.com>
+	<20170907081341.GA23040@pxdev.xzpeter.org>
+	<87inguaclr.fsf@dusky.pond.sub.org>
+	<20170907132259.GM30609@redhat.com>
+	<87h8weo186.fsf@dusky.pond.sub.org> <20170907180900.GV2098@work-vm>
+Date: Fri, 08 Sep 2017 10:41:22 +0200
+In-Reply-To: <20170907180900.GV2098@work-vm> (David Alan Gilbert's message of
+	"Thu, 7 Sep 2017 19:09:00 +0100")
+Message-ID: <87k219fuq5.fsf@dusky.pond.sub.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,1678 +33,392 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, el13635@mail.ntua.gr, Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 
-Block driver documentation is available in qemu-doc.html.  It would be
-convenient to have documentation for formats, protocols, and filter
-drivers in a man page.
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
 
-Extract the relevant part of qemu-doc.html into a new file called
-docs/qemu-block-drivers.texi.  This file can also be built as a
-stand-alone document (man, html, etc).
+> * Markus Armbruster (armbru@redhat.com) wrote:
+>> "Daniel P. Berrange" <berrange@redhat.com> writes:
+>> 
+>> > On Thu, Sep 07, 2017 at 02:59:28PM +0200, Markus Armbruster wrote:
+>> >> So, what exactly is going to drain the command queue?  If there's more
+>> >> than one consumer, how exactly are commands from the queue dispatched to
+>> >> the consumers?
+>> >
+>> > In terms of my proposal, for any single command there should only ever
+>> > be a single consumer. The default consumer would be the main event loop
+>> > thread, such that we have no semantic change to QMP operation from today.
+>> >
+>> > Some commands that are capable of being made "async", would have a
+>> > different consumer. For example, if the client requested the 'migrate-cancel'
+>> > be made async, this would change things such that the migration thread is
+>> > now responsible for consuming the "migrate-cancel" command, instead of the
+>> > default main loop.
+>> >
+>> >> What are the "no hang" guarantees (if any) and conditions for each of
+>> >> these consumers?
+>> >
+>> > The non-main thread consumers would have to have some reasonable
+>> > guarantee that they won't block on a lock held by the main loop,
+>> > otherwise the whole feature is largely useless.
+>> 
+>> Same if they block indefinitely on anything else, actually.  In other
+>> words, we need to talk about liveness.
+>> 
+>> Threads by themselves don't buy us liveness.  Being careful with
+>> operations that may block does.  That care may lead to farming out
+>> certain operations to other threads, where they may block without harm.
+>> 
+>> You only talk about "the non-main thread consumers".  What about the
+>> main thread?  Is it okay for the main thread to block?  If yes, why?
+>
+> It would be great if the main thread never blocked; but IMHO that's
+> a huge task that we'll never get done [challenge].
 
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
-v6:
- * Added missing qemu-block-driver.7 rule in Makefile
-v5:
- * Dropped .html, .info, and .txt due to cross-platform texi toolchain
-   issues (qemu-img.texi also supports man output only) after Kevin
-   reported warnings
----
- Makefile                     |   6 +-
- docs/qemu-block-drivers.texi | 804 +++++++++++++++++++++++++++++++++++++++++++
- qemu-doc.texi                | 781 +----------------------------------------
- 3 files changed, 810 insertions(+), 781 deletions(-)
- create mode 100644 docs/qemu-block-drivers.texi
+This is perhaps starting to wander off the topic, but here goes anyway.
 
-diff --git a/Makefile b/Makefile
-index 81447b1f08..92bab62d6b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -209,6 +209,7 @@ ifdef BUILD_DOCS
- DOCS=qemu-doc.html qemu-doc.txt qemu.1 qemu-img.1 qemu-nbd.8 qemu-ga.8
- DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
- DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
-+DOCS+=docs/qemu-block-drivers.7
- ifdef CONFIG_VIRTFS
- DOCS+=fsdev/virtfs-proxy-helper.1
- endif
-@@ -528,6 +529,7 @@ distclean: clean
- 	rm -f docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
- 	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
- 	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
-+	rm -f docs/qemu-block-drivers.7
- 	for d in $(TARGET_DIRS); do \
- 	rm -rf $$d || exit 1 ; \
-         done
-@@ -573,6 +575,7 @@ ifdef CONFIG_POSIX
- 	$(INSTALL_DATA) qemu.1 "$(DESTDIR)$(mandir)/man1"
- 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man7"
- 	$(INSTALL_DATA) docs/interop/qemu-qmp-ref.7 "$(DESTDIR)$(mandir)/man7"
-+	$(INSTALL_DATA) docs/qemu-block-drivers.7 "$(DESTDIR)$(mandir)/man7"
- ifneq ($(TOOLS),)
- 	$(INSTALL_DATA) qemu-img.1 "$(DESTDIR)$(mandir)/man1"
- 	$(INSTALL_DIR) "$(DESTDIR)$(mandir)/man8"
-@@ -718,6 +721,7 @@ qemu-img.1: qemu-img.texi qemu-option-trace.texi qemu-img-cmds.texi
- fsdev/virtfs-proxy-helper.1: fsdev/virtfs-proxy-helper.texi
- qemu-nbd.8: qemu-nbd.texi qemu-option-trace.texi
- qemu-ga.8: qemu-ga.texi
-+docs/qemu-block-drivers.7: docs/qemu-block-drivers.texi
- 
- html: qemu-doc.html docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
- info: qemu-doc.info docs/interop/qemu-qmp-ref.info docs/interop/qemu-ga-ref.info
-@@ -727,7 +731,7 @@ txt: qemu-doc.txt docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
- qemu-doc.html qemu-doc.info qemu-doc.pdf qemu-doc.txt: \
- 	qemu-img.texi qemu-nbd.texi qemu-options.texi qemu-option-trace.texi \
- 	qemu-monitor.texi qemu-img-cmds.texi qemu-ga.texi \
--	qemu-monitor-info.texi
-+	qemu-monitor-info.texi docs/qemu-block-drivers.texi
- 
- docs/interop/qemu-ga-ref.dvi docs/interop/qemu-ga-ref.html \
-     docs/interop/qemu-ga-ref.info docs/interop/qemu-ga-ref.pdf \
-diff --git a/docs/qemu-block-drivers.texi b/docs/qemu-block-drivers.texi
-new file mode 100644
-index 0000000000..1cb1e55686
---- /dev/null
-+++ b/docs/qemu-block-drivers.texi
-@@ -0,0 +1,804 @@
-+@c man begin SYNOPSIS
-+QEMU block driver reference manual
-+@c man end
-+
-+@c man begin DESCRIPTION
-+
-+@node disk_images_formats
-+@subsection Disk image file formats
-+
-+QEMU supports many image file formats that can be used with VMs as well as with
-+any of the tools (like @code{qemu-img}). This includes the preferred formats
-+raw and qcow2 as well as formats that are supported for compatibility with
-+older QEMU versions or other hypervisors.
-+
-+Depending on the image format, different options can be passed to
-+@code{qemu-img create} and @code{qemu-img convert} using the @code{-o} option.
-+This section describes each format and the options that are supported for it.
-+
-+@table @option
-+@item raw
-+
-+Raw disk image format. This format has the advantage of
-+being simple and easily exportable to all other emulators. If your
-+file system supports @emph{holes} (for example in ext2 or ext3 on
-+Linux or NTFS on Windows), then only the written sectors will reserve
-+space. Use @code{qemu-img info} to know the real size used by the
-+image or @code{ls -ls} on Unix/Linux.
-+
-+Supported options:
-+@table @code
-+@item preallocation
-+Preallocation mode (allowed values: @code{off}, @code{falloc}, @code{full}).
-+@code{falloc} mode preallocates space for image by calling posix_fallocate().
-+@code{full} mode preallocates space for image by writing zeros to underlying
-+storage.
-+@end table
-+
-+@item qcow2
-+QEMU image format, the most versatile format. Use it to have smaller
-+images (useful if your filesystem does not supports holes, for example
-+on Windows), zlib based compression and support of multiple VM
-+snapshots.
-+
-+Supported options:
-+@table @code
-+@item compat
-+Determines the qcow2 version to use. @code{compat=0.10} uses the
-+traditional image format that can be read by any QEMU since 0.10.
-+@code{compat=1.1} enables image format extensions that only QEMU 1.1 and
-+newer understand (this is the default). Amongst others, this includes
-+zero clusters, which allow efficient copy-on-read for sparse images.
-+
-+@item backing_file
-+File name of a base image (see @option{create} subcommand)
-+@item backing_fmt
-+Image format of the base image
-+@item encryption
-+This option is deprecated and equivalent to @code{encrypt.format=aes}
-+
-+@item encrypt.format
-+
-+If this is set to @code{luks}, it requests that the qcow2 payload (not
-+qcow2 header) be encrypted using the LUKS format. The passphrase to
-+use to unlock the LUKS key slot is given by the @code{encrypt.key-secret}
-+parameter. LUKS encryption parameters can be tuned with the other
-+@code{encrypt.*} parameters.
-+
-+If this is set to @code{aes}, the image is encrypted with 128-bit AES-CBC.
-+The encryption key is given by the @code{encrypt.key-secret} parameter.
-+This encryption format is considered to be flawed by modern cryptography
-+standards, suffering from a number of design problems:
-+
-+@itemize @minus
-+@item The AES-CBC cipher is used with predictable initialization vectors based
-+on the sector number. This makes it vulnerable to chosen plaintext attacks
-+which can reveal the existence of encrypted data.
-+@item The user passphrase is directly used as the encryption key. A poorly
-+chosen or short passphrase will compromise the security of the encryption.
-+@item In the event of the passphrase being compromised there is no way to
-+change the passphrase to protect data in any qcow images. The files must
-+be cloned, using a different encryption passphrase in the new file. The
-+original file must then be securely erased using a program like shred,
-+though even this is ineffective with many modern storage technologies.
-+@end itemize
-+
-+The use of this is no longer supported in system emulators. Support only
-+remains in the command line utilities, for the purposes of data liberation
-+and interoperability with old versions of QEMU. The @code{luks} format
-+should be used instead.
-+
-+@item encrypt.key-secret
-+
-+Provides the ID of a @code{secret} object that contains the passphrase
-+(@code{encrypt.format=luks}) or encryption key (@code{encrypt.format=aes}).
-+
-+@item encrypt.cipher-alg
-+
-+Name of the cipher algorithm and key length. Currently defaults
-+to @code{aes-256}. Only used when @code{encrypt.format=luks}.
-+
-+@item encrypt.cipher-mode
-+
-+Name of the encryption mode to use. Currently defaults to @code{xts}.
-+Only used when @code{encrypt.format=luks}.
-+
-+@item encrypt.ivgen-alg
-+
-+Name of the initialization vector generator algorithm. Currently defaults
-+to @code{plain64}. Only used when @code{encrypt.format=luks}.
-+
-+@item encrypt.ivgen-hash-alg
-+
-+Name of the hash algorithm to use with the initialization vector generator
-+(if required). Defaults to @code{sha256}. Only used when @code{encrypt.format=luks}.
-+
-+@item encrypt.hash-alg
-+
-+Name of the hash algorithm to use for PBKDF algorithm
-+Defaults to @code{sha256}. Only used when @code{encrypt.format=luks}.
-+
-+@item encrypt.iter-time
-+
-+Amount of time, in milliseconds, to use for PBKDF algorithm per key slot.
-+Defaults to @code{2000}. Only used when @code{encrypt.format=luks}.
-+
-+@item cluster_size
-+Changes the qcow2 cluster size (must be between 512 and 2M). Smaller cluster
-+sizes can improve the image file size whereas larger cluster sizes generally
-+provide better performance.
-+
-+@item preallocation
-+Preallocation mode (allowed values: @code{off}, @code{metadata}, @code{falloc},
-+@code{full}). An image with preallocated metadata is initially larger but can
-+improve performance when the image needs to grow. @code{falloc} and @code{full}
-+preallocations are like the same options of @code{raw} format, but sets up
-+metadata also.
-+
-+@item lazy_refcounts
-+If this option is set to @code{on}, reference count updates are postponed with
-+the goal of avoiding metadata I/O and improving performance. This is
-+particularly interesting with @option{cache=writethrough} which doesn't batch
-+metadata updates. The tradeoff is that after a host crash, the reference count
-+tables must be rebuilt, i.e. on the next open an (automatic) @code{qemu-img
-+check -r all} is required, which may take some time.
-+
-+This option can only be enabled if @code{compat=1.1} is specified.
-+
-+@item nocow
-+If this option is set to @code{on}, it will turn off COW of the file. It's only
-+valid on btrfs, no effect on other file systems.
-+
-+Btrfs has low performance when hosting a VM image file, even more when the guest
-+on the VM also using btrfs as file system. Turning off COW is a way to mitigate
-+this bad performance. Generally there are two ways to turn off COW on btrfs:
-+a) Disable it by mounting with nodatacow, then all newly created files will be
-+NOCOW. b) For an empty file, add the NOCOW file attribute. That's what this option
-+does.
-+
-+Note: this option is only valid to new or empty files. If there is an existing
-+file which is COW and has data blocks already, it couldn't be changed to NOCOW
-+by setting @code{nocow=on}. One can issue @code{lsattr filename} to check if
-+the NOCOW flag is set or not (Capital 'C' is NOCOW flag).
-+
-+@end table
-+
-+@item qed
-+Old QEMU image format with support for backing files and compact image files
-+(when your filesystem or transport medium does not support holes).
-+
-+When converting QED images to qcow2, you might want to consider using the
-+@code{lazy_refcounts=on} option to get a more QED-like behaviour.
-+
-+Supported options:
-+@table @code
-+@item backing_file
-+File name of a base image (see @option{create} subcommand).
-+@item backing_fmt
-+Image file format of backing file (optional).  Useful if the format cannot be
-+autodetected because it has no header, like some vhd/vpc files.
-+@item cluster_size
-+Changes the cluster size (must be power-of-2 between 4K and 64K). Smaller
-+cluster sizes can improve the image file size whereas larger cluster sizes
-+generally provide better performance.
-+@item table_size
-+Changes the number of clusters per L1/L2 table (must be power-of-2 between 1
-+and 16).  There is normally no need to change this value but this option can be
-+used for performance benchmarking.
-+@end table
-+
-+@item qcow
-+Old QEMU image format with support for backing files, compact image files,
-+encryption and compression.
-+
-+Supported options:
-+@table @code
-+@item backing_file
-+File name of a base image (see @option{create} subcommand)
-+@item encryption
-+This option is deprecated and equivalent to @code{encrypt.format=aes}
-+
-+@item encrypt.format
-+If this is set to @code{aes}, the image is encrypted with 128-bit AES-CBC.
-+The encryption key is given by the @code{encrypt.key-secret} parameter.
-+This encryption format is considered to be flawed by modern cryptography
-+standards, suffering from a number of design problems enumerated previously
-+against the @code{qcow2} image format.
-+
-+The use of this is no longer supported in system emulators. Support only
-+remains in the command line utilities, for the purposes of data liberation
-+and interoperability with old versions of QEMU.
-+
-+Users requiring native encryption should use the @code{qcow2} format
-+instead with @code{encrypt.format=luks}.
-+
-+@item encrypt.key-secret
-+
-+Provides the ID of a @code{secret} object that contains the encryption
-+key (@code{encrypt.format=aes}).
-+
-+@end table
-+
-+@item luks
-+
-+LUKS v1 encryption format, compatible with Linux dm-crypt/cryptsetup
-+
-+Supported options:
-+@table @code
-+
-+@item key-secret
-+
-+Provides the ID of a @code{secret} object that contains the passphrase.
-+
-+@item cipher-alg
-+
-+Name of the cipher algorithm and key length. Currently defaults
-+to @code{aes-256}.
-+
-+@item cipher-mode
-+
-+Name of the encryption mode to use. Currently defaults to @code{xts}.
-+
-+@item ivgen-alg
-+
-+Name of the initialization vector generator algorithm. Currently defaults
-+to @code{plain64}.
-+
-+@item ivgen-hash-alg
-+
-+Name of the hash algorithm to use with the initialization vector generator
-+(if required). Defaults to @code{sha256}.
-+
-+@item hash-alg
-+
-+Name of the hash algorithm to use for PBKDF algorithm
-+Defaults to @code{sha256}.
-+
-+@item iter-time
-+
-+Amount of time, in milliseconds, to use for PBKDF algorithm per key slot.
-+Defaults to @code{2000}.
-+
-+@end table
-+
-+@item vdi
-+VirtualBox 1.1 compatible image format.
-+Supported options:
-+@table @code
-+@item static
-+If this option is set to @code{on}, the image is created with metadata
-+preallocation.
-+@end table
-+
-+@item vmdk
-+VMware 3 and 4 compatible image format.
-+
-+Supported options:
-+@table @code
-+@item backing_file
-+File name of a base image (see @option{create} subcommand).
-+@item compat6
-+Create a VMDK version 6 image (instead of version 4)
-+@item hwversion
-+Specify vmdk virtual hardware version. Compat6 flag cannot be enabled
-+if hwversion is specified.
-+@item subformat
-+Specifies which VMDK subformat to use. Valid options are
-+@code{monolithicSparse} (default),
-+@code{monolithicFlat},
-+@code{twoGbMaxExtentSparse},
-+@code{twoGbMaxExtentFlat} and
-+@code{streamOptimized}.
-+@end table
-+
-+@item vpc
-+VirtualPC compatible image format (VHD).
-+Supported options:
-+@table @code
-+@item subformat
-+Specifies which VHD subformat to use. Valid options are
-+@code{dynamic} (default) and @code{fixed}.
-+@end table
-+
-+@item VHDX
-+Hyper-V compatible image format (VHDX).
-+Supported options:
-+@table @code
-+@item subformat
-+Specifies which VHDX subformat to use. Valid options are
-+@code{dynamic} (default) and @code{fixed}.
-+@item block_state_zero
-+Force use of payload blocks of type 'ZERO'.  Can be set to @code{on} (default)
-+or @code{off}.  When set to @code{off}, new blocks will be created as
-+@code{PAYLOAD_BLOCK_NOT_PRESENT}, which means parsers are free to return
-+arbitrary data for those blocks.  Do not set to @code{off} when using
-+@code{qemu-img convert} with @code{subformat=dynamic}.
-+@item block_size
-+Block size; min 1 MB, max 256 MB.  0 means auto-calculate based on image size.
-+@item log_size
-+Log size; min 1 MB.
-+@end table
-+@end table
-+
-+@subsubsection Read-only formats
-+More disk image file formats are supported in a read-only mode.
-+@table @option
-+@item bochs
-+Bochs images of @code{growing} type.
-+@item cloop
-+Linux Compressed Loop image, useful only to reuse directly compressed
-+CD-ROM images present for example in the Knoppix CD-ROMs.
-+@item dmg
-+Apple disk image.
-+@item parallels
-+Parallels disk image format.
-+@end table
-+
-+
-+@node host_drives
-+@subsection Using host drives
-+
-+In addition to disk image files, QEMU can directly access host
-+devices. We describe here the usage for QEMU version >= 0.8.3.
-+
-+@subsubsection Linux
-+
-+On Linux, you can directly use the host device filename instead of a
-+disk image filename provided you have enough privileges to access
-+it. For example, use @file{/dev/cdrom} to access to the CDROM.
-+
-+@table @code
-+@item CD
-+You can specify a CDROM device even if no CDROM is loaded. QEMU has
-+specific code to detect CDROM insertion or removal. CDROM ejection by
-+the guest OS is supported. Currently only data CDs are supported.
-+@item Floppy
-+You can specify a floppy device even if no floppy is loaded. Floppy
-+removal is currently not detected accurately (if you change floppy
-+without doing floppy access while the floppy is not loaded, the guest
-+OS will think that the same floppy is loaded).
-+Use of the host's floppy device is deprecated, and support for it will
-+be removed in a future release.
-+@item Hard disks
-+Hard disks can be used. Normally you must specify the whole disk
-+(@file{/dev/hdb} instead of @file{/dev/hdb1}) so that the guest OS can
-+see it as a partitioned disk. WARNING: unless you know what you do, it
-+is better to only make READ-ONLY accesses to the hard disk otherwise
-+you may corrupt your host data (use the @option{-snapshot} command
-+line option or modify the device permissions accordingly).
-+@end table
-+
-+@subsubsection Windows
-+
-+@table @code
-+@item CD
-+The preferred syntax is the drive letter (e.g. @file{d:}). The
-+alternate syntax @file{\\.\d:} is supported. @file{/dev/cdrom} is
-+supported as an alias to the first CDROM drive.
-+
-+Currently there is no specific code to handle removable media, so it
-+is better to use the @code{change} or @code{eject} monitor commands to
-+change or eject media.
-+@item Hard disks
-+Hard disks can be used with the syntax: @file{\\.\PhysicalDrive@var{N}}
-+where @var{N} is the drive number (0 is the first hard disk).
-+
-+WARNING: unless you know what you do, it is better to only make
-+READ-ONLY accesses to the hard disk otherwise you may corrupt your
-+host data (use the @option{-snapshot} command line so that the
-+modifications are written in a temporary file).
-+@end table
-+
-+
-+@subsubsection Mac OS X
-+
-+@file{/dev/cdrom} is an alias to the first CDROM.
-+
-+Currently there is no specific code to handle removable media, so it
-+is better to use the @code{change} or @code{eject} monitor commands to
-+change or eject media.
-+
-+@node disk_images_fat_images
-+@subsection Virtual FAT disk images
-+
-+QEMU can automatically create a virtual FAT disk image from a
-+directory tree. In order to use it, just type:
-+
-+@example
-+qemu-system-i386 linux.img -hdb fat:/my_directory
-+@end example
-+
-+Then you access access to all the files in the @file{/my_directory}
-+directory without having to copy them in a disk image or to export
-+them via SAMBA or NFS. The default access is @emph{read-only}.
-+
-+Floppies can be emulated with the @code{:floppy:} option:
-+
-+@example
-+qemu-system-i386 linux.img -fda fat:floppy:/my_directory
-+@end example
-+
-+A read/write support is available for testing (beta stage) with the
-+@code{:rw:} option:
-+
-+@example
-+qemu-system-i386 linux.img -fda fat:floppy:rw:/my_directory
-+@end example
-+
-+What you should @emph{never} do:
-+@itemize
-+@item use non-ASCII filenames ;
-+@item use "-snapshot" together with ":rw:" ;
-+@item expect it to work when loadvm'ing ;
-+@item write to the FAT directory on the host system while accessing it with the guest system.
-+@end itemize
-+
-+@node disk_images_nbd
-+@subsection NBD access
-+
-+QEMU can access directly to block device exported using the Network Block Device
-+protocol.
-+
-+@example
-+qemu-system-i386 linux.img -hdb nbd://my_nbd_server.mydomain.org:1024/
-+@end example
-+
-+If the NBD server is located on the same host, you can use an unix socket instead
-+of an inet socket:
-+
-+@example
-+qemu-system-i386 linux.img -hdb nbd+unix://?socket=/tmp/my_socket
-+@end example
-+
-+In this case, the block device must be exported using qemu-nbd:
-+
-+@example
-+qemu-nbd --socket=/tmp/my_socket my_disk.qcow2
-+@end example
-+
-+The use of qemu-nbd allows sharing of a disk between several guests:
-+@example
-+qemu-nbd --socket=/tmp/my_socket --share=2 my_disk.qcow2
-+@end example
-+
-+@noindent
-+and then you can use it with two guests:
-+@example
-+qemu-system-i386 linux1.img -hdb nbd+unix://?socket=/tmp/my_socket
-+qemu-system-i386 linux2.img -hdb nbd+unix://?socket=/tmp/my_socket
-+@end example
-+
-+If the nbd-server uses named exports (supported since NBD 2.9.18, or with QEMU's
-+own embedded NBD server), you must specify an export name in the URI:
-+@example
-+qemu-system-i386 -cdrom nbd://localhost/debian-500-ppc-netinst
-+qemu-system-i386 -cdrom nbd://localhost/openSUSE-11.1-ppc-netinst
-+@end example
-+
-+The URI syntax for NBD is supported since QEMU 1.3.  An alternative syntax is
-+also available.  Here are some example of the older syntax:
-+@example
-+qemu-system-i386 linux.img -hdb nbd:my_nbd_server.mydomain.org:1024
-+qemu-system-i386 linux2.img -hdb nbd:unix:/tmp/my_socket
-+qemu-system-i386 -cdrom nbd:localhost:10809:exportname=debian-500-ppc-netinst
-+@end example
-+
-+@node disk_images_sheepdog
-+@subsection Sheepdog disk images
-+
-+Sheepdog is a distributed storage system for QEMU.  It provides highly
-+available block level storage volumes that can be attached to
-+QEMU-based virtual machines.
-+
-+You can create a Sheepdog disk image with the command:
-+@example
-+qemu-img create sheepdog:///@var{image} @var{size}
-+@end example
-+where @var{image} is the Sheepdog image name and @var{size} is its
-+size.
-+
-+To import the existing @var{filename} to Sheepdog, you can use a
-+convert command.
-+@example
-+qemu-img convert @var{filename} sheepdog:///@var{image}
-+@end example
-+
-+You can boot from the Sheepdog disk image with the command:
-+@example
-+qemu-system-i386 sheepdog:///@var{image}
-+@end example
-+
-+You can also create a snapshot of the Sheepdog image like qcow2.
-+@example
-+qemu-img snapshot -c @var{tag} sheepdog:///@var{image}
-+@end example
-+where @var{tag} is a tag name of the newly created snapshot.
-+
-+To boot from the Sheepdog snapshot, specify the tag name of the
-+snapshot.
-+@example
-+qemu-system-i386 sheepdog:///@var{image}#@var{tag}
-+@end example
-+
-+You can create a cloned image from the existing snapshot.
-+@example
-+qemu-img create -b sheepdog:///@var{base}#@var{tag} sheepdog:///@var{image}
-+@end example
-+where @var{base} is a image name of the source snapshot and @var{tag}
-+is its tag name.
-+
-+You can use an unix socket instead of an inet socket:
-+
-+@example
-+qemu-system-i386 sheepdog+unix:///@var{image}?socket=@var{path}
-+@end example
-+
-+If the Sheepdog daemon doesn't run on the local host, you need to
-+specify one of the Sheepdog servers to connect to.
-+@example
-+qemu-img create sheepdog://@var{hostname}:@var{port}/@var{image} @var{size}
-+qemu-system-i386 sheepdog://@var{hostname}:@var{port}/@var{image}
-+@end example
-+
-+@node disk_images_iscsi
-+@subsection iSCSI LUNs
-+
-+iSCSI is a popular protocol used to access SCSI devices across a computer
-+network.
-+
-+There are two different ways iSCSI devices can be used by QEMU.
-+
-+The first method is to mount the iSCSI LUN on the host, and make it appear as
-+any other ordinary SCSI device on the host and then to access this device as a
-+/dev/sd device from QEMU. How to do this differs between host OSes.
-+
-+The second method involves using the iSCSI initiator that is built into
-+QEMU. This provides a mechanism that works the same way regardless of which
-+host OS you are running QEMU on. This section will describe this second method
-+of using iSCSI together with QEMU.
-+
-+In QEMU, iSCSI devices are described using special iSCSI URLs
-+
-+@example
-+URL syntax:
-+iscsi://[<username>[%<password>]@@]<host>[:<port>]/<target-iqn-name>/<lun>
-+@end example
-+
-+Username and password are optional and only used if your target is set up
-+using CHAP authentication for access control.
-+Alternatively the username and password can also be set via environment
-+variables to have these not show up in the process list
-+
-+@example
-+export LIBISCSI_CHAP_USERNAME=<username>
-+export LIBISCSI_CHAP_PASSWORD=<password>
-+iscsi://<host>/<target-iqn-name>/<lun>
-+@end example
-+
-+Various session related parameters can be set via special options, either
-+in a configuration file provided via '-readconfig' or directly on the
-+command line.
-+
-+If the initiator-name is not specified qemu will use a default name
-+of 'iqn.2008-11.org.linux-kvm[:<uuid>'] where <uuid> is the UUID of the
-+virtual machine. If the UUID is not specified qemu will use
-+'iqn.2008-11.org.linux-kvm[:<name>'] where <name> is the name of the
-+virtual machine.
-+
-+@example
-+Setting a specific initiator name to use when logging in to the target
-+-iscsi initiator-name=iqn.qemu.test:my-initiator
-+@end example
-+
-+@example
-+Controlling which type of header digest to negotiate with the target
-+-iscsi header-digest=CRC32C|CRC32C-NONE|NONE-CRC32C|NONE
-+@end example
-+
-+These can also be set via a configuration file
-+@example
-+[iscsi]
-+  user = "CHAP username"
-+  password = "CHAP password"
-+  initiator-name = "iqn.qemu.test:my-initiator"
-+  # header digest is one of CRC32C|CRC32C-NONE|NONE-CRC32C|NONE
-+  header-digest = "CRC32C"
-+@end example
-+
-+
-+Setting the target name allows different options for different targets
-+@example
-+[iscsi "iqn.target.name"]
-+  user = "CHAP username"
-+  password = "CHAP password"
-+  initiator-name = "iqn.qemu.test:my-initiator"
-+  # header digest is one of CRC32C|CRC32C-NONE|NONE-CRC32C|NONE
-+  header-digest = "CRC32C"
-+@end example
-+
-+
-+Howto use a configuration file to set iSCSI configuration options:
-+@example
-+cat >iscsi.conf <<EOF
-+[iscsi]
-+  user = "me"
-+  password = "my password"
-+  initiator-name = "iqn.qemu.test:my-initiator"
-+  header-digest = "CRC32C"
-+EOF
-+
-+qemu-system-i386 -drive file=iscsi://127.0.0.1/iqn.qemu.test/1 \
-+    -readconfig iscsi.conf
-+@end example
-+
-+
-+Howto set up a simple iSCSI target on loopback and accessing it via QEMU:
-+@example
-+This example shows how to set up an iSCSI target with one CDROM and one DISK
-+using the Linux STGT software target. This target is available on Red Hat based
-+systems as the package 'scsi-target-utils'.
-+
-+tgtd --iscsi portal=127.0.0.1:3260
-+tgtadm --lld iscsi --op new --mode target --tid 1 -T iqn.qemu.test
-+tgtadm --lld iscsi --mode logicalunit --op new --tid 1 --lun 1 \
-+    -b /IMAGES/disk.img --device-type=disk
-+tgtadm --lld iscsi --mode logicalunit --op new --tid 1 --lun 2 \
-+    -b /IMAGES/cd.iso --device-type=cd
-+tgtadm --lld iscsi --op bind --mode target --tid 1 -I ALL
-+
-+qemu-system-i386 -iscsi initiator-name=iqn.qemu.test:my-initiator \
-+    -boot d -drive file=iscsi://127.0.0.1/iqn.qemu.test/1 \
-+    -cdrom iscsi://127.0.0.1/iqn.qemu.test/2
-+@end example
-+
-+@node disk_images_gluster
-+@subsection GlusterFS disk images
-+
-+GlusterFS is a user space distributed file system.
-+
-+You can boot from the GlusterFS disk image with the command:
-+@example
-+URI:
-+qemu-system-x86_64 -drive file=gluster[+@var{type}]://[@var{host}[:@var{port}]]/@var{volume}/@var{path}
-+                               [?socket=...][,file.debug=9][,file.logfile=...]
-+
-+JSON:
-+qemu-system-x86_64 'json:@{"driver":"qcow2",
-+                           "file":@{"driver":"gluster",
-+                                    "volume":"testvol","path":"a.img","debug":9,"logfile":"...",
-+                                    "server":[@{"type":"tcp","host":"...","port":"..."@},
-+                                              @{"type":"unix","socket":"..."@}]@}@}'
-+@end example
-+
-+@var{gluster} is the protocol.
-+
-+@var{type} specifies the transport type used to connect to gluster
-+management daemon (glusterd). Valid transport types are
-+tcp and unix. In the URI form, if a transport type isn't specified,
-+then tcp type is assumed.
-+
-+@var{host} specifies the server where the volume file specification for
-+the given volume resides. This can be either a hostname or an ipv4 address.
-+If transport type is unix, then @var{host} field should not be specified.
-+Instead @var{socket} field needs to be populated with the path to unix domain
-+socket.
-+
-+@var{port} is the port number on which glusterd is listening. This is optional
-+and if not specified, it defaults to port 24007. If the transport type is unix,
-+then @var{port} should not be specified.
-+
-+@var{volume} is the name of the gluster volume which contains the disk image.
-+
-+@var{path} is the path to the actual disk image that resides on gluster volume.
-+
-+@var{debug} is the logging level of the gluster protocol driver. Debug levels
-+are 0-9, with 9 being the most verbose, and 0 representing no debugging output.
-+The default level is 4. The current logging levels defined in the gluster source
-+are 0 - None, 1 - Emergency, 2 - Alert, 3 - Critical, 4 - Error, 5 - Warning,
-+6 - Notice, 7 - Info, 8 - Debug, 9 - Trace
-+
-+@var{logfile} is a commandline option to mention log file path which helps in
-+logging to the specified file and also help in persisting the gfapi logs. The
-+default is stderr.
-+
-+
-+
-+
-+You can create a GlusterFS disk image with the command:
-+@example
-+qemu-img create gluster://@var{host}/@var{volume}/@var{path} @var{size}
-+@end example
-+
-+Examples
-+@example
-+qemu-system-x86_64 -drive file=gluster://1.2.3.4/testvol/a.img
-+qemu-system-x86_64 -drive file=gluster+tcp://1.2.3.4/testvol/a.img
-+qemu-system-x86_64 -drive file=gluster+tcp://1.2.3.4:24007/testvol/dir/a.img
-+qemu-system-x86_64 -drive file=gluster+tcp://[1:2:3:4:5:6:7:8]/testvol/dir/a.img
-+qemu-system-x86_64 -drive file=gluster+tcp://[1:2:3:4:5:6:7:8]:24007/testvol/dir/a.img
-+qemu-system-x86_64 -drive file=gluster+tcp://server.domain.com:24007/testvol/dir/a.img
-+qemu-system-x86_64 -drive file=gluster+unix:///testvol/dir/a.img?socket=/tmp/glusterd.socket
-+qemu-system-x86_64 -drive file=gluster+rdma://1.2.3.4:24007/testvol/a.img
-+qemu-system-x86_64 -drive file=gluster://1.2.3.4/testvol/a.img,file.debug=9,file.logfile=/var/log/qemu-gluster.log
-+qemu-system-x86_64 'json:@{"driver":"qcow2",
-+                           "file":@{"driver":"gluster",
-+                                    "volume":"testvol","path":"a.img",
-+                                    "debug":9,"logfile":"/var/log/qemu-gluster.log",
-+                                    "server":[@{"type":"tcp","host":"1.2.3.4","port":24007@},
-+                                              @{"type":"unix","socket":"/var/run/glusterd.socket"@}]@}@}'
-+qemu-system-x86_64 -drive driver=qcow2,file.driver=gluster,file.volume=testvol,file.path=/path/a.img,
-+                                       file.debug=9,file.logfile=/var/log/qemu-gluster.log,
-+                                       file.server.0.type=tcp,file.server.0.host=1.2.3.4,file.server.0.port=24007,
-+                                       file.server.1.type=unix,file.server.1.socket=/var/run/glusterd.socket
-+@end example
-+
-+@node disk_images_ssh
-+@subsection Secure Shell (ssh) disk images
-+
-+You can access disk images located on a remote ssh server
-+by using the ssh protocol:
-+
-+@example
-+qemu-system-x86_64 -drive file=ssh://[@var{user}@@]@var{server}[:@var{port}]/@var{path}[?host_key_check=@var{host_key_check}]
-+@end example
-+
-+Alternative syntax using properties:
-+
-+@example
-+qemu-system-x86_64 -drive file.driver=ssh[,file.user=@var{user}],file.host=@var{server}[,file.port=@var{port}],file.path=@var{path}[,file.host_key_check=@var{host_key_check}]
-+@end example
-+
-+@var{ssh} is the protocol.
-+
-+@var{user} is the remote user.  If not specified, then the local
-+username is tried.
-+
-+@var{server} specifies the remote ssh server.  Any ssh server can be
-+used, but it must implement the sftp-server protocol.  Most Unix/Linux
-+systems should work without requiring any extra configuration.
-+
-+@var{port} is the port number on which sshd is listening.  By default
-+the standard ssh port (22) is used.
-+
-+@var{path} is the path to the disk image.
-+
-+The optional @var{host_key_check} parameter controls how the remote
-+host's key is checked.  The default is @code{yes} which means to use
-+the local @file{.ssh/known_hosts} file.  Setting this to @code{no}
-+turns off known-hosts checking.  Or you can check that the host key
-+matches a specific fingerprint:
-+@code{host_key_check=md5:78:45:8e:14:57:4f:d5:45:83:0a:0e:f3:49:82:c9:c8}
-+(@code{sha1:} can also be used as a prefix, but note that OpenSSH
-+tools only use MD5 to print fingerprints).
-+
-+Currently authentication must be done using ssh-agent.  Other
-+authentication methods may be supported in future.
-+
-+Note: Many ssh servers do not support an @code{fsync}-style operation.
-+The ssh driver cannot guarantee that disk flush requests are
-+obeyed, and this causes a risk of disk corruption if the remote
-+server or network goes down during writes.  The driver will
-+print a warning when @code{fsync} is not supported:
-+
-+warning: ssh server @code{ssh.example.com:22} does not support fsync
-+
-+With sufficiently new versions of libssh2 and OpenSSH, @code{fsync} is
-+supported.
-+
-+@c man end
-+
-+@ignore
-+
-+@setfilename qemu-block-drivers
-+@settitle QEMU block drivers reference
-+
-+@c man begin SEEALSO
-+The HTML documentation of QEMU for more precise information and Linux
-+user mode emulator invocation.
-+@c man end
-+
-+@c man begin AUTHOR
-+Fabrice Bellard and the QEMU Project developers
-+@c man end
-+
-+@end ignore
-diff --git a/qemu-doc.texi b/qemu-doc.texi
-index 4076226f39..ecd186a159 100644
---- a/qemu-doc.texi
-+++ b/qemu-doc.texi
-@@ -490,786 +490,7 @@ state is not saved or restored properly (in particular USB).
- 
- @include qemu-nbd.texi
- 
--@node disk_images_formats
--@subsection Disk image file formats
--
--QEMU supports many image file formats that can be used with VMs as well as with
--any of the tools (like @code{qemu-img}). This includes the preferred formats
--raw and qcow2 as well as formats that are supported for compatibility with
--older QEMU versions or other hypervisors.
--
--Depending on the image format, different options can be passed to
--@code{qemu-img create} and @code{qemu-img convert} using the @code{-o} option.
--This section describes each format and the options that are supported for it.
--
--@table @option
--@item raw
--
--Raw disk image format. This format has the advantage of
--being simple and easily exportable to all other emulators. If your
--file system supports @emph{holes} (for example in ext2 or ext3 on
--Linux or NTFS on Windows), then only the written sectors will reserve
--space. Use @code{qemu-img info} to know the real size used by the
--image or @code{ls -ls} on Unix/Linux.
--
--Supported options:
--@table @code
--@item preallocation
--Preallocation mode (allowed values: @code{off}, @code{falloc}, @code{full}).
--@code{falloc} mode preallocates space for image by calling posix_fallocate().
--@code{full} mode preallocates space for image by writing zeros to underlying
--storage.
--@end table
--
--@item qcow2
--QEMU image format, the most versatile format. Use it to have smaller
--images (useful if your filesystem does not supports holes, for example
--on Windows), zlib based compression and support of multiple VM
--snapshots.
--
--Supported options:
--@table @code
--@item compat
--Determines the qcow2 version to use. @code{compat=0.10} uses the
--traditional image format that can be read by any QEMU since 0.10.
--@code{compat=1.1} enables image format extensions that only QEMU 1.1 and
--newer understand (this is the default). Amongst others, this includes
--zero clusters, which allow efficient copy-on-read for sparse images.
--
--@item backing_file
--File name of a base image (see @option{create} subcommand)
--@item backing_fmt
--Image format of the base image
--@item encryption
--This option is deprecated and equivalent to @code{encrypt.format=aes}
--
--@item encrypt.format
--
--If this is set to @code{luks}, it requests that the qcow2 payload (not
--qcow2 header) be encrypted using the LUKS format. The passphrase to
--use to unlock the LUKS key slot is given by the @code{encrypt.key-secret}
--parameter. LUKS encryption parameters can be tuned with the other
--@code{encrypt.*} parameters.
--
--If this is set to @code{aes}, the image is encrypted with 128-bit AES-CBC.
--The encryption key is given by the @code{encrypt.key-secret} parameter.
--This encryption format is considered to be flawed by modern cryptography
--standards, suffering from a number of design problems:
--
--@itemize @minus
--@item The AES-CBC cipher is used with predictable initialization vectors based
--on the sector number. This makes it vulnerable to chosen plaintext attacks
--which can reveal the existence of encrypted data.
--@item The user passphrase is directly used as the encryption key. A poorly
--chosen or short passphrase will compromise the security of the encryption.
--@item In the event of the passphrase being compromised there is no way to
--change the passphrase to protect data in any qcow images. The files must
--be cloned, using a different encryption passphrase in the new file. The
--original file must then be securely erased using a program like shred,
--though even this is ineffective with many modern storage technologies.
--@end itemize
--
--The use of this is no longer supported in system emulators. Support only
--remains in the command line utilities, for the purposes of data liberation
--and interoperability with old versions of QEMU. The @code{luks} format
--should be used instead.
--
--@item encrypt.key-secret
--
--Provides the ID of a @code{secret} object that contains the passphrase
--(@code{encrypt.format=luks}) or encryption key (@code{encrypt.format=aes}).
--
--@item encrypt.cipher-alg
--
--Name of the cipher algorithm and key length. Currently defaults
--to @code{aes-256}. Only used when @code{encrypt.format=luks}.
--
--@item encrypt.cipher-mode
--
--Name of the encryption mode to use. Currently defaults to @code{xts}.
--Only used when @code{encrypt.format=luks}.
--
--@item encrypt.ivgen-alg
--
--Name of the initialization vector generator algorithm. Currently defaults
--to @code{plain64}. Only used when @code{encrypt.format=luks}.
--
--@item encrypt.ivgen-hash-alg
--
--Name of the hash algorithm to use with the initialization vector generator
--(if required). Defaults to @code{sha256}. Only used when @code{encrypt.format=luks}.
--
--@item encrypt.hash-alg
--
--Name of the hash algorithm to use for PBKDF algorithm
--Defaults to @code{sha256}. Only used when @code{encrypt.format=luks}.
--
--@item encrypt.iter-time
--
--Amount of time, in milliseconds, to use for PBKDF algorithm per key slot.
--Defaults to @code{2000}. Only used when @code{encrypt.format=luks}.
--
--@item cluster_size
--Changes the qcow2 cluster size (must be between 512 and 2M). Smaller cluster
--sizes can improve the image file size whereas larger cluster sizes generally
--provide better performance.
--
--@item preallocation
--Preallocation mode (allowed values: @code{off}, @code{metadata}, @code{falloc},
--@code{full}). An image with preallocated metadata is initially larger but can
--improve performance when the image needs to grow. @code{falloc} and @code{full}
--preallocations are like the same options of @code{raw} format, but sets up
--metadata also.
--
--@item lazy_refcounts
--If this option is set to @code{on}, reference count updates are postponed with
--the goal of avoiding metadata I/O and improving performance. This is
--particularly interesting with @option{cache=writethrough} which doesn't batch
--metadata updates. The tradeoff is that after a host crash, the reference count
--tables must be rebuilt, i.e. on the next open an (automatic) @code{qemu-img
--check -r all} is required, which may take some time.
--
--This option can only be enabled if @code{compat=1.1} is specified.
--
--@item nocow
--If this option is set to @code{on}, it will turn off COW of the file. It's only
--valid on btrfs, no effect on other file systems.
--
--Btrfs has low performance when hosting a VM image file, even more when the guest
--on the VM also using btrfs as file system. Turning off COW is a way to mitigate
--this bad performance. Generally there are two ways to turn off COW on btrfs:
--a) Disable it by mounting with nodatacow, then all newly created files will be
--NOCOW. b) For an empty file, add the NOCOW file attribute. That's what this option
--does.
--
--Note: this option is only valid to new or empty files. If there is an existing
--file which is COW and has data blocks already, it couldn't be changed to NOCOW
--by setting @code{nocow=on}. One can issue @code{lsattr filename} to check if
--the NOCOW flag is set or not (Capital 'C' is NOCOW flag).
--
--@end table
--
--@item qed
--Old QEMU image format with support for backing files and compact image files
--(when your filesystem or transport medium does not support holes).
--
--When converting QED images to qcow2, you might want to consider using the
--@code{lazy_refcounts=on} option to get a more QED-like behaviour.
--
--Supported options:
--@table @code
--@item backing_file
--File name of a base image (see @option{create} subcommand).
--@item backing_fmt
--Image file format of backing file (optional).  Useful if the format cannot be
--autodetected because it has no header, like some vhd/vpc files.
--@item cluster_size
--Changes the cluster size (must be power-of-2 between 4K and 64K). Smaller
--cluster sizes can improve the image file size whereas larger cluster sizes
--generally provide better performance.
--@item table_size
--Changes the number of clusters per L1/L2 table (must be power-of-2 between 1
--and 16).  There is normally no need to change this value but this option can be
--used for performance benchmarking.
--@end table
--
--@item qcow
--Old QEMU image format with support for backing files, compact image files,
--encryption and compression.
--
--Supported options:
--@table @code
--@item backing_file
--File name of a base image (see @option{create} subcommand)
--@item encryption
--This option is deprecated and equivalent to @code{encrypt.format=aes}
--
--@item encrypt.format
--If this is set to @code{aes}, the image is encrypted with 128-bit AES-CBC.
--The encryption key is given by the @code{encrypt.key-secret} parameter.
--This encryption format is considered to be flawed by modern cryptography
--standards, suffering from a number of design problems enumerated previously
--against the @code{qcow2} image format.
--
--The use of this is no longer supported in system emulators. Support only
--remains in the command line utilities, for the purposes of data liberation
--and interoperability with old versions of QEMU.
--
--Users requiring native encryption should use the @code{qcow2} format
--instead with @code{encrypt.format=luks}.
--
--@item encrypt.key-secret
--
--Provides the ID of a @code{secret} object that contains the encryption
--key (@code{encrypt.format=aes}).
--
--@end table
--
--@item luks
--
--LUKS v1 encryption format, compatible with Linux dm-crypt/cryptsetup
--
--Supported options:
--@table @code
--
--@item key-secret
--
--Provides the ID of a @code{secret} object that contains the passphrase.
--
--@item cipher-alg
--
--Name of the cipher algorithm and key length. Currently defaults
--to @code{aes-256}.
--
--@item cipher-mode
--
--Name of the encryption mode to use. Currently defaults to @code{xts}.
--
--@item ivgen-alg
--
--Name of the initialization vector generator algorithm. Currently defaults
--to @code{plain64}.
--
--@item ivgen-hash-alg
--
--Name of the hash algorithm to use with the initialization vector generator
--(if required). Defaults to @code{sha256}.
--
--@item hash-alg
--
--Name of the hash algorithm to use for PBKDF algorithm
--Defaults to @code{sha256}.
--
--@item iter-time
--
--Amount of time, in milliseconds, to use for PBKDF algorithm per key slot.
--Defaults to @code{2000}.
--
--@end table
--
--@item vdi
--VirtualBox 1.1 compatible image format.
--Supported options:
--@table @code
--@item static
--If this option is set to @code{on}, the image is created with metadata
--preallocation.
--@end table
--
--@item vmdk
--VMware 3 and 4 compatible image format.
--
--Supported options:
--@table @code
--@item backing_file
--File name of a base image (see @option{create} subcommand).
--@item compat6
--Create a VMDK version 6 image (instead of version 4)
--@item hwversion
--Specify vmdk virtual hardware version. Compat6 flag cannot be enabled
--if hwversion is specified.
--@item subformat
--Specifies which VMDK subformat to use. Valid options are
--@code{monolithicSparse} (default),
--@code{monolithicFlat},
--@code{twoGbMaxExtentSparse},
--@code{twoGbMaxExtentFlat} and
--@code{streamOptimized}.
--@end table
--
--@item vpc
--VirtualPC compatible image format (VHD).
--Supported options:
--@table @code
--@item subformat
--Specifies which VHD subformat to use. Valid options are
--@code{dynamic} (default) and @code{fixed}.
--@end table
--
--@item VHDX
--Hyper-V compatible image format (VHDX).
--Supported options:
--@table @code
--@item subformat
--Specifies which VHDX subformat to use. Valid options are
--@code{dynamic} (default) and @code{fixed}.
--@item block_state_zero
--Force use of payload blocks of type 'ZERO'.  Can be set to @code{on} (default)
--or @code{off}.  When set to @code{off}, new blocks will be created as
--@code{PAYLOAD_BLOCK_NOT_PRESENT}, which means parsers are free to return
--arbitrary data for those blocks.  Do not set to @code{off} when using
--@code{qemu-img convert} with @code{subformat=dynamic}.
--@item block_size
--Block size; min 1 MB, max 256 MB.  0 means auto-calculate based on image size.
--@item log_size
--Log size; min 1 MB.
--@end table
--@end table
--
--@subsubsection Read-only formats
--More disk image file formats are supported in a read-only mode.
--@table @option
--@item bochs
--Bochs images of @code{growing} type.
--@item cloop
--Linux Compressed Loop image, useful only to reuse directly compressed
--CD-ROM images present for example in the Knoppix CD-ROMs.
--@item dmg
--Apple disk image.
--@item parallels
--Parallels disk image format.
--@end table
--
--
--@node host_drives
--@subsection Using host drives
--
--In addition to disk image files, QEMU can directly access host
--devices. We describe here the usage for QEMU version >= 0.8.3.
--
--@subsubsection Linux
--
--On Linux, you can directly use the host device filename instead of a
--disk image filename provided you have enough privileges to access
--it. For example, use @file{/dev/cdrom} to access to the CDROM.
--
--@table @code
--@item CD
--You can specify a CDROM device even if no CDROM is loaded. QEMU has
--specific code to detect CDROM insertion or removal. CDROM ejection by
--the guest OS is supported. Currently only data CDs are supported.
--@item Floppy
--You can specify a floppy device even if no floppy is loaded. Floppy
--removal is currently not detected accurately (if you change floppy
--without doing floppy access while the floppy is not loaded, the guest
--OS will think that the same floppy is loaded).
--Use of the host's floppy device is deprecated, and support for it will
--be removed in a future release.
--@item Hard disks
--Hard disks can be used. Normally you must specify the whole disk
--(@file{/dev/hdb} instead of @file{/dev/hdb1}) so that the guest OS can
--see it as a partitioned disk. WARNING: unless you know what you do, it
--is better to only make READ-ONLY accesses to the hard disk otherwise
--you may corrupt your host data (use the @option{-snapshot} command
--line option or modify the device permissions accordingly).
--@end table
--
--@subsubsection Windows
--
--@table @code
--@item CD
--The preferred syntax is the drive letter (e.g. @file{d:}). The
--alternate syntax @file{\\.\d:} is supported. @file{/dev/cdrom} is
--supported as an alias to the first CDROM drive.
--
--Currently there is no specific code to handle removable media, so it
--is better to use the @code{change} or @code{eject} monitor commands to
--change or eject media.
--@item Hard disks
--Hard disks can be used with the syntax: @file{\\.\PhysicalDrive@var{N}}
--where @var{N} is the drive number (0 is the first hard disk).
--
--WARNING: unless you know what you do, it is better to only make
--READ-ONLY accesses to the hard disk otherwise you may corrupt your
--host data (use the @option{-snapshot} command line so that the
--modifications are written in a temporary file).
--@end table
--
--
--@subsubsection Mac OS X
--
--@file{/dev/cdrom} is an alias to the first CDROM.
--
--Currently there is no specific code to handle removable media, so it
--is better to use the @code{change} or @code{eject} monitor commands to
--change or eject media.
--
--@node disk_images_fat_images
--@subsection Virtual FAT disk images
--
--QEMU can automatically create a virtual FAT disk image from a
--directory tree. In order to use it, just type:
--
--@example
--qemu-system-i386 linux.img -hdb fat:/my_directory
--@end example
--
--Then you access access to all the files in the @file{/my_directory}
--directory without having to copy them in a disk image or to export
--them via SAMBA or NFS. The default access is @emph{read-only}.
--
--Floppies can be emulated with the @code{:floppy:} option:
--
--@example
--qemu-system-i386 linux.img -fda fat:floppy:/my_directory
--@end example
--
--A read/write support is available for testing (beta stage) with the
--@code{:rw:} option:
--
--@example
--qemu-system-i386 linux.img -fda fat:floppy:rw:/my_directory
--@end example
--
--What you should @emph{never} do:
--@itemize
--@item use non-ASCII filenames ;
--@item use "-snapshot" together with ":rw:" ;
--@item expect it to work when loadvm'ing ;
--@item write to the FAT directory on the host system while accessing it with the guest system.
--@end itemize
--
--@node disk_images_nbd
--@subsection NBD access
--
--QEMU can access directly to block device exported using the Network Block Device
--protocol.
--
--@example
--qemu-system-i386 linux.img -hdb nbd://my_nbd_server.mydomain.org:1024/
--@end example
--
--If the NBD server is located on the same host, you can use an unix socket instead
--of an inet socket:
--
--@example
--qemu-system-i386 linux.img -hdb nbd+unix://?socket=/tmp/my_socket
--@end example
--
--In this case, the block device must be exported using qemu-nbd:
--
--@example
--qemu-nbd --socket=/tmp/my_socket my_disk.qcow2
--@end example
--
--The use of qemu-nbd allows sharing of a disk between several guests:
--@example
--qemu-nbd --socket=/tmp/my_socket --share=2 my_disk.qcow2
--@end example
--
--@noindent
--and then you can use it with two guests:
--@example
--qemu-system-i386 linux1.img -hdb nbd+unix://?socket=/tmp/my_socket
--qemu-system-i386 linux2.img -hdb nbd+unix://?socket=/tmp/my_socket
--@end example
--
--If the nbd-server uses named exports (supported since NBD 2.9.18, or with QEMU's
--own embedded NBD server), you must specify an export name in the URI:
--@example
--qemu-system-i386 -cdrom nbd://localhost/debian-500-ppc-netinst
--qemu-system-i386 -cdrom nbd://localhost/openSUSE-11.1-ppc-netinst
--@end example
--
--The URI syntax for NBD is supported since QEMU 1.3.  An alternative syntax is
--also available.  Here are some example of the older syntax:
--@example
--qemu-system-i386 linux.img -hdb nbd:my_nbd_server.mydomain.org:1024
--qemu-system-i386 linux2.img -hdb nbd:unix:/tmp/my_socket
--qemu-system-i386 -cdrom nbd:localhost:10809:exportname=debian-500-ppc-netinst
--@end example
--
--@node disk_images_sheepdog
--@subsection Sheepdog disk images
--
--Sheepdog is a distributed storage system for QEMU.  It provides highly
--available block level storage volumes that can be attached to
--QEMU-based virtual machines.
--
--You can create a Sheepdog disk image with the command:
--@example
--qemu-img create sheepdog:///@var{image} @var{size}
--@end example
--where @var{image} is the Sheepdog image name and @var{size} is its
--size.
--
--To import the existing @var{filename} to Sheepdog, you can use a
--convert command.
--@example
--qemu-img convert @var{filename} sheepdog:///@var{image}
--@end example
--
--You can boot from the Sheepdog disk image with the command:
--@example
--qemu-system-i386 sheepdog:///@var{image}
--@end example
--
--You can also create a snapshot of the Sheepdog image like qcow2.
--@example
--qemu-img snapshot -c @var{tag} sheepdog:///@var{image}
--@end example
--where @var{tag} is a tag name of the newly created snapshot.
--
--To boot from the Sheepdog snapshot, specify the tag name of the
--snapshot.
--@example
--qemu-system-i386 sheepdog:///@var{image}#@var{tag}
--@end example
--
--You can create a cloned image from the existing snapshot.
--@example
--qemu-img create -b sheepdog:///@var{base}#@var{tag} sheepdog:///@var{image}
--@end example
--where @var{base} is a image name of the source snapshot and @var{tag}
--is its tag name.
--
--You can use an unix socket instead of an inet socket:
--
--@example
--qemu-system-i386 sheepdog+unix:///@var{image}?socket=@var{path}
--@end example
--
--If the Sheepdog daemon doesn't run on the local host, you need to
--specify one of the Sheepdog servers to connect to.
--@example
--qemu-img create sheepdog://@var{hostname}:@var{port}/@var{image} @var{size}
--qemu-system-i386 sheepdog://@var{hostname}:@var{port}/@var{image}
--@end example
--
--@node disk_images_iscsi
--@subsection iSCSI LUNs
--
--iSCSI is a popular protocol used to access SCSI devices across a computer
--network.
--
--There are two different ways iSCSI devices can be used by QEMU.
--
--The first method is to mount the iSCSI LUN on the host, and make it appear as
--any other ordinary SCSI device on the host and then to access this device as a
--/dev/sd device from QEMU. How to do this differs between host OSes.
--
--The second method involves using the iSCSI initiator that is built into
--QEMU. This provides a mechanism that works the same way regardless of which
--host OS you are running QEMU on. This section will describe this second method
--of using iSCSI together with QEMU.
--
--In QEMU, iSCSI devices are described using special iSCSI URLs
--
--@example
--URL syntax:
--iscsi://[<username>[%<password>]@@]<host>[:<port>]/<target-iqn-name>/<lun>
--@end example
--
--Username and password are optional and only used if your target is set up
--using CHAP authentication for access control.
--Alternatively the username and password can also be set via environment
--variables to have these not show up in the process list
--
--@example
--export LIBISCSI_CHAP_USERNAME=<username>
--export LIBISCSI_CHAP_PASSWORD=<password>
--iscsi://<host>/<target-iqn-name>/<lun>
--@end example
--
--Various session related parameters can be set via special options, either
--in a configuration file provided via '-readconfig' or directly on the
--command line.
--
--If the initiator-name is not specified qemu will use a default name
--of 'iqn.2008-11.org.linux-kvm[:<uuid>'] where <uuid> is the UUID of the
--virtual machine. If the UUID is not specified qemu will use
--'iqn.2008-11.org.linux-kvm[:<name>'] where <name> is the name of the
--virtual machine.
--
--@example
--Setting a specific initiator name to use when logging in to the target
---iscsi initiator-name=iqn.qemu.test:my-initiator
--@end example
--
--@example
--Controlling which type of header digest to negotiate with the target
---iscsi header-digest=CRC32C|CRC32C-NONE|NONE-CRC32C|NONE
--@end example
--
--These can also be set via a configuration file
--@example
--[iscsi]
--  user = "CHAP username"
--  password = "CHAP password"
--  initiator-name = "iqn.qemu.test:my-initiator"
--  # header digest is one of CRC32C|CRC32C-NONE|NONE-CRC32C|NONE
--  header-digest = "CRC32C"
--@end example
--
--
--Setting the target name allows different options for different targets
--@example
--[iscsi "iqn.target.name"]
--  user = "CHAP username"
--  password = "CHAP password"
--  initiator-name = "iqn.qemu.test:my-initiator"
--  # header digest is one of CRC32C|CRC32C-NONE|NONE-CRC32C|NONE
--  header-digest = "CRC32C"
--@end example
--
--
--Howto use a configuration file to set iSCSI configuration options:
--@example
--cat >iscsi.conf <<EOF
--[iscsi]
--  user = "me"
--  password = "my password"
--  initiator-name = "iqn.qemu.test:my-initiator"
--  header-digest = "CRC32C"
--EOF
--
--qemu-system-i386 -drive file=iscsi://127.0.0.1/iqn.qemu.test/1 \
--    -readconfig iscsi.conf
--@end example
--
--
--Howto set up a simple iSCSI target on loopback and accessing it via QEMU:
--@example
--This example shows how to set up an iSCSI target with one CDROM and one DISK
--using the Linux STGT software target. This target is available on Red Hat based
--systems as the package 'scsi-target-utils'.
--
--tgtd --iscsi portal=127.0.0.1:3260
--tgtadm --lld iscsi --op new --mode target --tid 1 -T iqn.qemu.test
--tgtadm --lld iscsi --mode logicalunit --op new --tid 1 --lun 1 \
--    -b /IMAGES/disk.img --device-type=disk
--tgtadm --lld iscsi --mode logicalunit --op new --tid 1 --lun 2 \
--    -b /IMAGES/cd.iso --device-type=cd
--tgtadm --lld iscsi --op bind --mode target --tid 1 -I ALL
--
--qemu-system-i386 -iscsi initiator-name=iqn.qemu.test:my-initiator \
--    -boot d -drive file=iscsi://127.0.0.1/iqn.qemu.test/1 \
--    -cdrom iscsi://127.0.0.1/iqn.qemu.test/2
--@end example
--
--@node disk_images_gluster
--@subsection GlusterFS disk images
--
--GlusterFS is a user space distributed file system.
--
--You can boot from the GlusterFS disk image with the command:
--@example
--URI:
--qemu-system-x86_64 -drive file=gluster[+@var{type}]://[@var{host}[:@var{port}]]/@var{volume}/@var{path}
--                               [?socket=...][,file.debug=9][,file.logfile=...]
--
--JSON:
--qemu-system-x86_64 'json:@{"driver":"qcow2",
--                           "file":@{"driver":"gluster",
--                                    "volume":"testvol","path":"a.img","debug":9,"logfile":"...",
--                                    "server":[@{"type":"tcp","host":"...","port":"..."@},
--                                              @{"type":"unix","socket":"..."@}]@}@}'
--@end example
--
--@var{gluster} is the protocol.
--
--@var{type} specifies the transport type used to connect to gluster
--management daemon (glusterd). Valid transport types are
--tcp and unix. In the URI form, if a transport type isn't specified,
--then tcp type is assumed.
--
--@var{host} specifies the server where the volume file specification for
--the given volume resides. This can be either a hostname or an ipv4 address.
--If transport type is unix, then @var{host} field should not be specified.
--Instead @var{socket} field needs to be populated with the path to unix domain
--socket.
--
--@var{port} is the port number on which glusterd is listening. This is optional
--and if not specified, it defaults to port 24007. If the transport type is unix,
--then @var{port} should not be specified.
--
--@var{volume} is the name of the gluster volume which contains the disk image.
--
--@var{path} is the path to the actual disk image that resides on gluster volume.
--
--@var{debug} is the logging level of the gluster protocol driver. Debug levels
--are 0-9, with 9 being the most verbose, and 0 representing no debugging output.
--The default level is 4. The current logging levels defined in the gluster source
--are 0 - None, 1 - Emergency, 2 - Alert, 3 - Critical, 4 - Error, 5 - Warning,
--6 - Notice, 7 - Info, 8 - Debug, 9 - Trace
--
--@var{logfile} is a commandline option to mention log file path which helps in
--logging to the specified file and also help in persisting the gfapi logs. The
--default is stderr.
--
--
--
--
--You can create a GlusterFS disk image with the command:
--@example
--qemu-img create gluster://@var{host}/@var{volume}/@var{path} @var{size}
--@end example
--
--Examples
--@example
--qemu-system-x86_64 -drive file=gluster://1.2.3.4/testvol/a.img
--qemu-system-x86_64 -drive file=gluster+tcp://1.2.3.4/testvol/a.img
--qemu-system-x86_64 -drive file=gluster+tcp://1.2.3.4:24007/testvol/dir/a.img
--qemu-system-x86_64 -drive file=gluster+tcp://[1:2:3:4:5:6:7:8]/testvol/dir/a.img
--qemu-system-x86_64 -drive file=gluster+tcp://[1:2:3:4:5:6:7:8]:24007/testvol/dir/a.img
--qemu-system-x86_64 -drive file=gluster+tcp://server.domain.com:24007/testvol/dir/a.img
--qemu-system-x86_64 -drive file=gluster+unix:///testvol/dir/a.img?socket=/tmp/glusterd.socket
--qemu-system-x86_64 -drive file=gluster+rdma://1.2.3.4:24007/testvol/a.img
--qemu-system-x86_64 -drive file=gluster://1.2.3.4/testvol/a.img,file.debug=9,file.logfile=/var/log/qemu-gluster.log
--qemu-system-x86_64 'json:@{"driver":"qcow2",
--                           "file":@{"driver":"gluster",
--                                    "volume":"testvol","path":"a.img",
--                                    "debug":9,"logfile":"/var/log/qemu-gluster.log",
--                                    "server":[@{"type":"tcp","host":"1.2.3.4","port":24007@},
--                                              @{"type":"unix","socket":"/var/run/glusterd.socket"@}]@}@}'
--qemu-system-x86_64 -drive driver=qcow2,file.driver=gluster,file.volume=testvol,file.path=/path/a.img,
--                                       file.debug=9,file.logfile=/var/log/qemu-gluster.log,
--                                       file.server.0.type=tcp,file.server.0.host=1.2.3.4,file.server.0.port=24007,
--                                       file.server.1.type=unix,file.server.1.socket=/var/run/glusterd.socket
--@end example
--
--@node disk_images_ssh
--@subsection Secure Shell (ssh) disk images
--
--You can access disk images located on a remote ssh server
--by using the ssh protocol:
--
--@example
--qemu-system-x86_64 -drive file=ssh://[@var{user}@@]@var{server}[:@var{port}]/@var{path}[?host_key_check=@var{host_key_check}]
--@end example
--
--Alternative syntax using properties:
--
--@example
--qemu-system-x86_64 -drive file.driver=ssh[,file.user=@var{user}],file.host=@var{server}[,file.port=@var{port}],file.path=@var{path}[,file.host_key_check=@var{host_key_check}]
--@end example
--
--@var{ssh} is the protocol.
--
--@var{user} is the remote user.  If not specified, then the local
--username is tried.
--
--@var{server} specifies the remote ssh server.  Any ssh server can be
--used, but it must implement the sftp-server protocol.  Most Unix/Linux
--systems should work without requiring any extra configuration.
--
--@var{port} is the port number on which sshd is listening.  By default
--the standard ssh port (22) is used.
--
--@var{path} is the path to the disk image.
--
--The optional @var{host_key_check} parameter controls how the remote
--host's key is checked.  The default is @code{yes} which means to use
--the local @file{.ssh/known_hosts} file.  Setting this to @code{no}
--turns off known-hosts checking.  Or you can check that the host key
--matches a specific fingerprint:
--@code{host_key_check=md5:78:45:8e:14:57:4f:d5:45:83:0a:0e:f3:49:82:c9:c8}
--(@code{sha1:} can also be used as a prefix, but note that OpenSSH
--tools only use MD5 to print fingerprints).
--
--Currently authentication must be done using ssh-agent.  Other
--authentication methods may be supported in future.
--
--Note: Many ssh servers do not support an @code{fsync}-style operation.
--The ssh driver cannot guarantee that disk flush requests are
--obeyed, and this causes a risk of disk corruption if the remote
--server or network goes down during writes.  The driver will
--print a warning when @code{fsync} is not supported:
--
--warning: ssh server @code{ssh.example.com:22} does not support fsync
--
--With sufficiently new versions of libssh2 and OpenSSH, @code{fsync} is
--supported.
-+@include docs/qemu-block-drivers.texi
- 
- @node pcsys_network
- @section Network emulation
--- 
-2.13.5
+What unpleasant things can happen when the main loop hangs?
+
+What are the known causes of main loop hangs?  Any ideas on fixing them?
+
+Are the unknown main loop hangs relevant in practice?
+
+If we can't eliminate main loop hangs, any ideas on reducing their
+impact?
+
+>> >> We can have any number of QMP monitors today.  Would each of them feed
+>> >> its own queue?  Would they all feed a shared queue?
+>> >
+>> > Currently with multiple QMP monitors, everything runs in the main
+>> > loop, so commands arriving across  multiple monitors are 100%
+>> > serialized and processed strictly in the order in which QEMU reads
+>> > them off the wire.  To maintain these semantics, we would need to
+>> > have a single shared queue for the default main loop consumer, so
+>> > that ordering does not change.
+>> >
+>> >> How exactly is opt-in asynchronous to work?  Per QMP monitor?  Per
+>> >> command?
+>> >
+>> > Per monitor+command. ie just because libvirt knows how to cope with
+>> > async execution on the monitor it has open, does not mean that a
+>> > different app on the 2nd monitor command can cope. So in my proposal
+>> > the switch to async must be scoped to the particular command only
+>> > for the monitor connection that requesteed it.
+>> >
+>> >> What does it mean when an asynchronous command follows a synchronous
+>> >> command in the same QMP monitor?  I would expect the synchronous command
+>> >> to complete before the asynchronous command, because that's what
+>> >> synchronous means, isn't it?  To keep your QMP monitor available, you
+>> >> then must not send synchronous commands that can hang.
+>> >
+>> > No, that is not what I described. All synchronous commands are
+>> > serialized wrt each other, just as today. An asychronous command
+>> > can run as soon as it is received, regardless of whether any
+>> > earlier sent sync commands are still executing or pending. This
+>> > is trivial to achieve when you separate monitor I/O from command
+>> > execution in separate threads, provided of course the async
+>> > command consumers are not in the main loop.
+>> 
+>> So, a synchronous command is synchronous with respect to other commands,
+>> except for certain non-blocking commands.  The distinctive feature of
+>> the latter isn't so much an asynchronous reply, but out-of-band
+>> dispatch.
+>> 
+>> Out-of-band dispatch of commands that cannot block in fact orthogonal to
+>> asynchronous replies.  I can't see why out-of-band dispatch of
+>> synchronous non-blocking commands wouldn't work, too.
+>> 
+>> >> How can we determine whether a certain synchronous command can hang?
+>> >> Note that with opt-in async, *all* commands are also synchronous
+>> >> commands.
+>> >> 
+>> >> In short, explain to me how exactly you plan to ensure that certain QMP
+>> >> commands (such as post-copy recovery) can always "get through", in the
+>> >> presence of multiple monitors, hanging main loop, hanging synchronous
+>> >> commands, hanging whatever-else-can-now-hang-in-this-post-copy-world.
+>> >
+>> > Taking migrate-cancel as the example. The migration code already has
+>> > a background thread doing work independantly onthe main loop. Upon
+>> > marking the migrate-cancel command as async, the migration control
+>> > thread would become the consumer of migrate-cancel.
+>> 
+>> From 30,000 feet, the QMP monitor sends a "cancel" message to the
+>> migration thread, and later receives a "canceled" message from the
+>> migration thread.
+>> 
+>> From 300 feet, we use the migrate-cancel QMP command as the cancel
+>> message, and its success response as the "canceled" message.
+>> 
+>> In other words, we're pressing the external QM-Protocol into service as
+>> internal message passing protocol.
+>
+> Be careful; it's not a cancel in the postcopy recovery case, it's a
+> restart.  The command is very much like the migration-incoming command.
+> The management layer has to provide data with the request, so it's not
+> an internal command.
+
+It's still a message.
+
+>> >                                                     This allows the
+>> > migration operation to be cancelled immediately, regardless of whether
+>> > there are earlier monitor commands blocked in the main loop.
+>> 
+>> The necessary part is moving all operations that can block out of
+>> whatever loop runs the monitor, be it the main loop, some other event
+>> loop, or a dedicated monitor thread's monitor loop.
+>> 
+>> Moving out non-blocking operations isn't necessary.  migrate-cancel
+>> could communicate with the migration thread by any suitable mechanism or
+>> protocol.  It doesn't have to be QMP.  Why would we want it to be QMP?
+>
+> Because why invent another wheel?
+> This is a command that the management layer has to issue to qemu for
+> it to recover, including passing data, in a way similar to other
+> commands - so it looks like a QMP command, so why not use QMP.
+
+Point taken.
+
+Minor terminology remark: I'd prefer to call this a reuse of QAPI rather
+than QMP, because QMP makes me think of sockets and JSON, while QAPI
+makes me think of generated data types and marshaling code.
+
+> Also, I think making other commands lock-free is advantageous - 
+> some of the 'info' commands just dont really need locks, making them
+> not use locks removes latency effects caused by the management layer
+> prodding qemu.
+
+I get the desire to move commands that can block out of whatever loop
+runs the monitor.  But moving out commands that always complete quickly
+seems pointless: by the time you're done queuing them, you could be done
+*executing* them.  More on that below.
+
+>> > Of course this assumes the migration control thread can't block
+>> > for locks held by the main thread.
+>> 
+>> Thanks for your answers, they help.
+>> 
+>> >> Now let's talk about QMP requirements.
+>> >> 
+>> >> Any addition to QMP must consider what exists already.
+>> >> 
+>> >> You may add more of the same.
+>> >> 
+>> >> You may generalize existing stuff.
+>> >> 
+>> >> You may change existing stuff if you have sufficient reason, subject to
+>> >> backward compatibility constraints.
+>> >> 
+>> >> But attempts to add new ways to do the same old stuff without properly
+>> >> integrating the existing ways are not going to fly.
+>> >> 
+>> >> In particular, any new way to start some job, monitor and control it
+>> >> while it lives, get notified about its state changes and so forth must
+>> >> integrate the existing ways.  These include block jobs (probably the
+>> >> most sophisticated of the lot), migration, dump-guest-memory, and
+>> >> possibly more.  They all work the same way: synchronous command to kick
+>> >> off the job, more synchronous commands to monitor and control, events to
+>> >> notify.  They do differ in detail.
+>> >> 
+>> >> Asynchronous commands are a new way to do this.  When you only need to
+>> >> be notified on "done", and don't need to monitor / control, they fit the
+>> >> bill quite neatly.
+>> >> 
+>> >> However, we can't just ignore the cases where we need more than that!
+>> >> For those, we want a single generic solution instead of the several ad
+>> >> hoc solutions we have now.
+>> >> 
+>> >> If we add asynchronous commands *now*, and for simple cases only, we add
+>> >> yet another special case for a future generic solution to integrate.
+>> >> I'm not going to let that happen.
+>> >
+>> > With the async commands suggestion, while it would initially not
+>> > provide a way to query incremental status, that could easily be
+>> > fitted in.
+>> 
+>> This is [*] below.
+>> 
+>> >             Because command replies from async commands may be
+>> > out-of-order wrt the original requests, clients would need to
+>> > provide a unique ID for each command run. This originally was
+>> > part of QMP spec but then dropped, but libvirt still actually
+>> > generates a uniqe ID for every QMP command.
+>> >
+>> > Given this, one option is to actually use the QMP command ID as
+>> > a job ID, and let you query ongoing status via some new QMP
+>> > command that accepts the ID of the job to be queried. A complexity
+>> > with this is how to make the jobs visible across multiple QMP
+>> > monitors. The job ID might actually have to be a combination of
+>> > the serial ID from the QMP command, and the ID of the monitor
+>> > chardev combined.
+>> 
+>> Yes.  The job ID must be unique across all QMP monitors to make
+>> broadcast notifications work.
+>> 
+>> >> I figure the closest to a generic solution we have is block jobs.
+>> >> Perhaps a generic solution could be had by abstracting away the "block"
+>> >> from "block jobs", leaving just "jobs".
+>> 
+>> [*] starts here:
+>> 
+>> >> Another approach is generalizing the asynchronous command proposal to
+>> >> fully cover the not-so-simple cases.
+>> 
+>> We know asynchronous commands "fully cover" when we can use them to
+>> replace all the existing job-like commands.
+>> 
+>> Until then, they enlarge rather than solve our jobs problem.
+>> 
+>> I get the need for an available monitor.  But I need to balance it with
+>> other needs.  Can we find a solution for our monitor availability
+>> problem that doesn't enlarge our jobs problem?
+>
+> Hopefully!
+>
+> Dave
+>
+>> >> If you'd rather want to make progress on monitor availability without
+>> >> cracking the "jobs" problem, you're in luck!  Use your license to "add
+>> >> more of the same": synchronous command to start a job, query to monitor,
+>> >> event to notify.  
+>> >> 
+>> >> If you insist on tying your monitor availability solution to
+>> >> asynchronous commands, then I'm in luck!  I just found volunteers to
+>> >> solve the "jobs" problem for me.
+
+Let me try to distill the discussion so far into a design sketch.
+
+1. A QMP monitor runs in a loop.  The loop may execute other stuff, but
+   this must not unduly delay the monitor's work.  Thus, everything in
+   this loop must complete "quickly".
+
+   All QMP monitors currently run in the main loop, which really should
+   satisfy "quickly", but doesn't.  Since fixing that to a tolerable
+   degree is beyond our means (is it?), we move them out.
+
+   Design alternative: either one loop and thread per monitor, or one
+   loop and thread for all monitors, or something in between.
+
+   I'm wary of "one thread per software artifact" designs.  "One
+   (preemptable) thread per activity, all sharing state" is a lousy way
+   to structure software.
+
+2. A QMP monitor receives and dispatches commands, and sends command
+   responses and events.
+
+   What if sending a response or event would block?  See 6.
+
+3. Arbitrary code can trigger QMP events.  Events are broadcast to all
+   QMP monitors.  Each QMP monitor provides an event queue.  When an
+   event is triggered, it gets put into all queues, subject to rate
+   limiting.
+
+   Rate limiting and queuing needs some shared data, which is protected
+   by a mutex.  The critical sections guarded by this mutex must be
+   "quick".
+
+   Nothing new here, it's how events work today.
+
+   We could easily add events that go to just one monitor, if there's a
+   need.
+
+4. Commands are normally dispatched to a worker thread, where they can
+   take their own sweet time to complete.
+
+   Currently, the monitor runs in the main loop and executes commands
+   directly.  This is effectively dispatching commands to the main loop.
+   Dispatch to main loop is wrong, because it can make the main loop
+   hang.  If it was the only relevant cause for main loop hangs, we'd
+   move the command work out and be done.  Since it isn't (see 1.) we
+   *also* have to move the monitor out to prevent main loop hangs from
+   hanging the monitor.
+
+   Moving monitor and command work to separate threads changes the
+   dispatch from function call to queuing.  Need a pair of queues, one
+   for commands, one for responses.
+
+   Design alternative: one worker per monitor, or one worker for all
+   monitors, or main loop is the one worker for all monitors.  The
+   latter leaves the main loop hangs unaddressed.  No worse than before,
+   so it could be okay as a first step.
+
+   The worker provides the pair of queues.  It executes commands in
+   order.  If a command blocks, the command queue stalls.
+
+   The command queue can therefore grow without bounds.  See 6.
+
+5. Certain commands that always complete "quickly" can instead be
+   executed directly, at the QMP client's request.  This direct
+   execution is out-of-band; the response can "overtake" prior in-band
+   commands' responses.
+
+   The amount of work these out-of-band commands do themselves is up to
+   them.  A qiuck query command would do all the work.  migrate-cancel
+   could perhaps notify the migration thread and be done.  Postcopy
+   recovery could perhaps send its argument struct to whatever thread
+   handles recovery.
+
+6. Flow control
+
+   We currently leave flow control to the underlying character device.
+   If the client sends more quickly than the monitor can execute, the
+   client's send eventually blocks or fails with EAGAIN.  If the monitor
+   sends more quickly than the client accepts, the monitor buffers
+   without bounds (I think).
+
+   Buffering monitor output without bounds is bad.  We could perhaps
+   kill a monitor when it exceeds its limit.
+
+   Buffering monitor input (in the command queue) without bounds is just
+   as bad.  It also destroys the existing flow control mechanism: the
+   client can no longer detect that it's sending too much.  Not an issue
+   for fully synchronous clients, i.e. clients that wait for the
+   previous command's response before they send the next command.  Such
+   clients cannot use of out-of-band command execution.
+
+   The obvious way to limit the command queue is to fail commands when
+   the queue is "full".
+
+   Note that we can't send an error response right away then, because
+   the command is in-band (if it wasn't, we wouldn't queue it), so its
+   response has to go after all all the respones to the (in-band)
+   commands currently in the queue.
+
+   To tell the client right away, we could send an event.
+
+   Delaying the "queue full" response until the correct time to send it
+   requires state: at least the command ID.  We can just as well enqueue
+   and pray memory will suffice.
+
+   Note that the only reason for the command queue is out-of-band
+   commands.  Without them, reading the next command is pointless.  This
+   leads me to a possible solution: separate out-of-band mode, default
+   off, QMP client can switch it on.  When off, we read monitor input
+   just like we do now (no queue, no problem).  When on, we read and
+   queue.  If the queue is full, we send a "queue full" event with the
+   IDs of the commands we dropped on the floor.  By switching on
+   out-of-band-mode, the QMP client also opts into this event.
+
+   Switching could be done with QMP capabilities negotiation.
+
+7. How all this is related to "jobs"
+
+   Out-of-band execution is a limited special case of asynchronous
+   execution.  With general asynchronous execution, responses can be
+   sent in any order.  With out-of-band execution, only the out-of-band
+   responses can "jump" order, and only over in-band responses.
+
+   "All commands are (to be treated as) asynchronous" is arguably more
+   elegant than this out-of-band thing.  However, it runs into two
+   roadblocks that don't apply to out-of-band.
+
+   One, backward compatibility.  That's a roadblock only as much as we
+   make it one.
+
+   Two, consistency.  "All asynchronous, but we do most job-like things
+   with commands + events anyway" is not acceptable to me.  I'd be
+   willing to accept "all asynchronous" when it solves the jobs problem.
+
+   You asked for a solution to the monitor availability problem that
+   doesn't require you to solve the jobs problem first.  Well, here's my
+   best try.  Go shoot some holes into it :)
