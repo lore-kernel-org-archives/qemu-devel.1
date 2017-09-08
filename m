@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58897)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqGeE-0002H0-SH
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGeF-0002HG-5R
 	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqGe6-0003Mf-Gc
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGe6-0003Mn-K8
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:31 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  8 Sep 2017 20:35:48 +1000
-Message-Id: <20170908103558.31632-31-david@gibson.dropbear.id.au>
+Date: Fri,  8 Sep 2017 20:35:58 +1000
+Message-Id: <20170908103558.31632-41-david@gibson.dropbear.id.au>
 In-Reply-To: <20170908103558.31632-1-david@gibson.dropbear.id.au>
 References: <20170908103558.31632-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 30/40] spapr: fallback to raw mode if best
- compat mode cannot be set during CAS
+Subject: [Qemu-devel] [PULL 40/40] ppc: spapr: Move VCPU ID calculation into
+ sPAPR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,79 +21,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sam.bobroff@au1.ibm.com, imammedo@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sam.bobroff@au1.ibm.com, imammedo@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Greg Kurz <groug@kaod.org>
+From: Sam Bobroff <sam.bobroff@au1.ibm.com>
 
-KVM PR doesn't allow to set a compat mode. This causes ppc_set_compat_all()
-to fail and we return H_HARDWARE to the guest right away.
+Move the calculation of a CPU's VCPU ID out of the generic PPC code
+(ppc_cpu_realizefn()) and into sPAPR specific code
+(spapr_cpu_core_realize()) where it belongs.
 
-This is excessive: even if we favor compat mode since commit 152ef803ceb19,
-we should at least fallback to raw mode if the guest supports it.
+Unfortunately, due to the way things are ordered, we still need to
+default the VCPU ID in ppc_cpu_realizfn() but at least doing that
+doesn't require any interaction with sPAPR.
 
-This patch modifies cas_check_pvr() so that it also reports that the real
-PVR was found in the table supplied by the guest. Note that this is only
-makes sense if raw mode isn't explicitely disabled (ie, the user didn't
-set the machine "max-cpu-compat" property). If this is the case, we can
-simply ignore ppc_set_compat_all() failures, and let the guest run in raw
-mode.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_hcall.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ hw/ppc/spapr_cpu_core.c     | 11 +++++++++++
+ target/ppc/translate_init.c | 18 +++---------------
+ 2 files changed, 14 insertions(+), 15 deletions(-)
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 7cf0993800..8b3c0e17e7 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1441,7 +1441,8 @@ static target_ulong h_signal_sys_reset(PowerPCCPU *cpu,
- }
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 92bec033b3..85037ef71e 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -213,6 +213,7 @@ error:
  
- static uint32_t cas_check_pvr(sPAPRMachineState *spapr, PowerPCCPU *cpu,
--                              target_ulong *addr, Error **errp)
-+                              target_ulong *addr, bool *raw_mode_supported,
-+                              Error **errp)
+ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
  {
-     bool explicit_match = false; /* Matched the CPU's real PVR */
-     uint32_t max_compat = spapr->max_compat_pvr;
-@@ -1481,6 +1482,8 @@ static uint32_t cas_check_pvr(sPAPRMachineState *spapr, PowerPCCPU *cpu,
-         return 0;
-     }
- 
-+    *raw_mode_supported = explicit_match;
++    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+     CPUCore *cc = CPU_CORE(OBJECT(dev));
+@@ -239,6 +240,16 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+         cs = CPU(obj);
+         cpu = POWERPC_CPU(cs);
+         cs->cpu_index = cc->core_id + i;
++        cpu->vcpu_id = (cc->core_id * spapr->vsmt / smp_threads) + i;
++        if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
++            error_setg(&local_err, "Can't create CPU with id %d in KVM",
++                       cpu->vcpu_id);
++            error_append_hint(&local_err, "Adjust the number of cpus to %d "
++                              "or try to raise the number of threads per core\n",
++                              cpu->vcpu_id * smp_threads / spapr->vsmt);
++            goto err;
++        }
 +
-     /* Parsing finished */
-     trace_spapr_cas_pvr(cpu->compat_pvr, explicit_match, best_compat);
  
-@@ -1499,8 +1502,9 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     sPAPROptionVector *ov1_guest, *ov5_guest, *ov5_cas_old, *ov5_updates;
-     bool guest_radix;
+         /* Set NUMA node for the threads belonged to core  */
+         cpu->node_id = sc->node_id;
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 3e24cddb86..c827d1e388 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -9904,28 +9904,15 @@ static void ppc_cpu_realizefn(DeviceState *dev, Error **errp)
+     PowerPCCPU *cpu = POWERPC_CPU(dev);
+     PowerPCCPUClass *pcc = POWERPC_CPU_GET_CLASS(cpu);
      Error *local_err = NULL;
-+    bool raw_mode_supported = false;
+-#if !defined(CONFIG_USER_ONLY)
+-    int max_smt = kvmppc_smt_threads();
+-#endif
  
--    cas_pvr = cas_check_pvr(spapr, cpu, &addr, &local_err);
-+    cas_pvr = cas_check_pvr(spapr, cpu, &addr, &raw_mode_supported, &local_err);
-     if (local_err) {
-         error_report_err(local_err);
-         return H_HARDWARE;
-@@ -1510,8 +1514,14 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     if (cpu->compat_pvr != cas_pvr) {
-         ppc_set_compat_all(cas_pvr, &local_err);
-         if (local_err) {
--            error_report_err(local_err);
--            return H_HARDWARE;
-+            /* We fail to set compat mode (likely because running with KVM PR),
-+             * but maybe we can fallback to raw mode if the guest supports it.
-+             */
-+            if (!raw_mode_supported) {
-+                error_report_err(local_err);
-+                return H_HARDWARE;
-+            }
-+            local_err = NULL;
-         }
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
+         return;
      }
+-
+-#if !defined(CONFIG_USER_ONLY)
+-    cpu->vcpu_id = (cs->cpu_index / smp_threads) * max_smt
+-        + (cs->cpu_index % smp_threads);
+-
+-    if (kvm_enabled() && !kvm_vcpu_id_is_valid(cpu->vcpu_id)) {
+-        error_setg(errp, "Can't create CPU with id %d in KVM", cpu->vcpu_id);
+-        error_append_hint(errp, "Adjust the number of cpus to %d "
+-                          "or try to raise the number of threads per core\n",
+-                          cpu->vcpu_id * smp_threads / max_smt);
+-        goto unrealize;
++    if (cpu->vcpu_id == UNASSIGNED_CPU_INDEX) {
++        cpu->vcpu_id = cs->cpu_index;
+     }
+-#endif
  
+     if (tcg_enabled()) {
+         if (ppc_fixup_cpu(cpu) != 0) {
+@@ -10576,6 +10563,7 @@ static void ppc_cpu_initfn(Object *obj)
+     CPUPPCState *env = &cpu->env;
+ 
+     cs->env_ptr = env;
++    cpu->vcpu_id = UNASSIGNED_CPU_INDEX;
+ 
+     env->msr_mask = pcc->msr_mask;
+     env->mmu_model = pcc->mmu_model;
 -- 
 2.13.5
