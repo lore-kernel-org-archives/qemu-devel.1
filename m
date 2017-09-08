@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58651)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58656)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqGe4-000280-JX
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:27 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGe4-00028F-R0
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqGdz-0003De-SI
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGe0-0003Do-0L
 	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:20 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  8 Sep 2017 20:35:32 +1000
-Message-Id: <20170908103558.31632-15-david@gibson.dropbear.id.au>
+Date: Fri,  8 Sep 2017 20:35:39 +1000
+Message-Id: <20170908103558.31632-22-david@gibson.dropbear.id.au>
 In-Reply-To: <20170908103558.31632-1-david@gibson.dropbear.id.au>
 References: <20170908103558.31632-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 14/40] e500: Use cpu_index instead of vcpu_dt_id
+Subject: [Qemu-devel] [PULL 21/40] spapr_iommu: Realloc guest visible TCE
+ table when hot(un)plugging vfio-pci
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,56 +23,74 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: peter.maydell@linaro.org
 Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sam.bobroff@au1.ibm.com, imammedo@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
 
-The e500 platform code uses the function ppc_get_vcpu_dt_id() to get
-an id to put in its device tree.  Which seems like it makes sense, but
-ppc_get_vcpu_dt_id() is actually badly named - it only differs from
-cpu_index in cases where you're running on KVM HV and the host's
-number of threads differs from the guests.  Since KVM HV only supports
-PAPR, not e500, it doesn't make sense to use it here.
+This replaces g_malloc() with spapr_tce_alloc_table() as this is
+the standard way of allocating tables and this allows moving the table
+back to KVM when unplugging a VFIO PCI device and VFIO TCE acceleration
+support is not present in the KVM.
 
-Simply use the cpu_index instead (which is 'i' in this context
-because qemu_get_cpu(i) returns the cpu with cpu_index == i).
+Although spapr_tce_alloc_table() is expected to fail with EBUSY
+if called when previous fd is not closed yet, in practice we will not
+see it because cap_spapr_vfio is false at the moment.
 
-Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-[dwg: Rewrote commit message]
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/e500.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ hw/ppc/spapr_iommu.c | 35 ++++++++++++++---------------------
+ 1 file changed, 14 insertions(+), 21 deletions(-)
 
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index f0596f34ff..55cad780f4 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -382,7 +382,6 @@ static int ppce500_load_device_tree(MachineState *machine,
-        the first node as boot node and be happy */
-     for (i = smp_cpus - 1; i >= 0; i--) {
-         CPUState *cpu;
--        PowerPCCPU *pcpu;
-         char cpu_name[128];
-         uint64_t cpu_release_addr = params->spin_base + (i * 0x20);
+diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+index a75584c947..fa8b969840 100644
+--- a/hw/ppc/spapr_iommu.c
++++ b/hw/ppc/spapr_iommu.c
+@@ -275,33 +275,26 @@ static void spapr_tce_table_realize(DeviceState *dev, Error **errp)
+ void spapr_tce_set_need_vfio(sPAPRTCETable *tcet, bool need_vfio)
+ {
+     size_t table_size = tcet->nb_table * sizeof(uint64_t);
+-    void *newtable;
++    uint64_t *oldtable;
++    int newfd = -1;
  
-@@ -391,16 +390,13 @@ static int ppce500_load_device_tree(MachineState *machine,
-             continue;
-         }
-         env = cpu->env_ptr;
--        pcpu = POWERPC_CPU(cpu);
+-    if (need_vfio == tcet->need_vfio) {
+-        /* Nothing to do */
+-        return;
+-    }
+-
+-    if (!need_vfio) {
+-        /* FIXME: We don't support transition back to KVM accelerated
+-         * TCEs yet */
+-        return;
+-    }
++    g_assert(need_vfio != tcet->need_vfio);
  
--        snprintf(cpu_name, sizeof(cpu_name), "/cpus/PowerPC,8544@%x",
--                 ppc_get_vcpu_dt_id(pcpu));
-+        snprintf(cpu_name, sizeof(cpu_name), "/cpus/PowerPC,8544@%x", i);
-         qemu_fdt_add_subnode(fdt, cpu_name);
-         qemu_fdt_setprop_cell(fdt, cpu_name, "clock-frequency", clock_freq);
-         qemu_fdt_setprop_cell(fdt, cpu_name, "timebase-frequency", tb_freq);
-         qemu_fdt_setprop_string(fdt, cpu_name, "device_type", "cpu");
--        qemu_fdt_setprop_cell(fdt, cpu_name, "reg",
--                              ppc_get_vcpu_dt_id(pcpu));
-+        qemu_fdt_setprop_cell(fdt, cpu_name, "reg", i);
-         qemu_fdt_setprop_cell(fdt, cpu_name, "d-cache-line-size",
-                               env->dcache_line_size);
-         qemu_fdt_setprop_cell(fdt, cpu_name, "i-cache-line-size",
+-    tcet->need_vfio = true;
++    tcet->need_vfio = need_vfio;
+ 
+-    if (tcet->fd < 0) {
+-        /* Table is already in userspace, nothing to be do */
+-        return;
+-    }
++    oldtable = tcet->table;
+ 
+-    newtable = g_malloc(table_size);
+-    memcpy(newtable, tcet->table, table_size);
++    tcet->table = spapr_tce_alloc_table(tcet->liobn,
++                                        tcet->page_shift,
++                                        tcet->bus_offset,
++                                        tcet->nb_table,
++                                        &newfd,
++                                        need_vfio);
++    memcpy(tcet->table, oldtable, table_size);
+ 
+-    kvmppc_remove_spapr_tce(tcet->table, tcet->fd, tcet->nb_table);
++    spapr_tce_free_table(oldtable, tcet->fd, tcet->nb_table);
+ 
+-    tcet->fd = -1;
+-    tcet->table = newtable;
++    tcet->fd = newfd;
+ }
+ 
+ sPAPRTCETable *spapr_tce_new_table(DeviceState *owner, uint32_t liobn)
 -- 
 2.13.5
