@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53039)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dqLba-0006TH-FY
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 11:54:08 -0400
+	(envelope-from <thuth@redhat.com>) id 1dqLd7-0007k0-Hb
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 11:55:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dqLbW-00047c-Jc
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 11:54:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35476)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dqLbW-00046J-Cf
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 11:54:02 -0400
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Fri,  8 Sep 2017 16:53:59 +0100
-Message-Id: <20170908155359.27952-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH] slirp: Add explanation for hostfwd parsing
- failure
+	(envelope-from <thuth@redhat.com>) id 1dqLd6-00050V-Mq
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 11:55:41 -0400
+References: <20170905151614.31303-1-cohuck@redhat.com>
+	<20170905151614.31303-3-cohuck@redhat.com>
+	<20170908110425.GC3283@localhost.localdomain>
+	<20170908132439.3ab53d7d.cohuck@redhat.com>
+	<20170908115414.GF3283@localhost.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <4374d570-cee8-5f82-7187-dcb7bf57bf55@redhat.com>
+Date: Fri, 8 Sep 2017 17:55:29 +0200
+MIME-Version: 1.0
+In-Reply-To: <20170908115414.GF3283@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 2/3] iotests: use -ccw on s390x for 051
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,88 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
+To: Kevin Wolf <kwolf@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: haoqf@linux.vnet.ibm.com, qemu-block@nongnu.org, david@redhat.com, agraf@suse.de, qemu-devel@nongnu.org, borntraeger@de.ibm.com, mreitz@redhat.com, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 08.09.2017 13:54, Kevin Wolf wrote:
+> Am 08.09.2017 um 13:24 hat Cornelia Huck geschrieben:
+>> On Fri, 8 Sep 2017 13:04:25 +0200
+>> Kevin Wolf <kwolf@redhat.com> wrote:
+>>
+>>> Am 05.09.2017 um 17:16 hat Cornelia Huck geschrieben:
+>>>> The default cpu model on s390x does not provide zPCI, which is
+>>>> not yet wired up on tcg. Moreover, virtio-ccw is the standard
+>>>> on s390x, so use the -ccw instead of the -pci versions of virtio
+>>>> devices on s390x.
+>>>>
+>>>> Provide an output file for s390x.
+>>>>
+>>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>>> ---
+>>>>  tests/qemu-iotests/051                     |   9 +-
+>>>>  tests/qemu-iotests/051.s390-ccw-virtio.out | 434 ++++++++++++++++++=
++++++++++++
+>>>>  2 files changed, 442 insertions(+), 1 deletion(-)
+>>>>  create mode 100644 tests/qemu-iotests/051.s390-ccw-virtio.out =20
+>>>
+>>> It's already a pain to have two separate output files for 051, let's =
+try
+>>> to avoid adding a third one. Even more so since I think that the spli=
+t
+>>> between 051.out and 051.pc.out was already made for s390, so I'm not
+>>> sure if anyone would actually still make use of the plain 051.out
+>>> output if s390 got it's own one.
+>>
+>> Are there no non-pc and non-s390 machines for which this is run?
+>=20
+> Who knows? But I'm not aware of anyone who is interested in something
+> else and has contributed to the test cases until now.
 
-e.g.
-./x86_64-softmmu/qemu-system-x86_64 -nographic -netdev 'user,id=vnet,hostfwd=:555.0.0.0:0-:22'
-qemu-system-x86_64: -netdev user,id=vnet,hostfwd=:555.0.0.0:0-:22: Invalid host forwarding rule ':555.0.0.0:0-:22' (Bad host address)
+FWIW, as far as I know, Luk=C3=A1=C5=A1 is running this test also on ppc6=
+4 in our
+weekly regression run. So it would be good to keep that working, please :=
+-)
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- net/slirp.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+>> Another approach would be to drop the -pci postfix, but I don't want t=
+o
+>> introduce more usage of aliases.
+>=20
+> Maybe that would indeed be the easiest way. As long as we don't intend
+> to remove the alias from qemu, there's no reason not to use it in tests=
+.
 
-diff --git a/net/slirp.c b/net/slirp.c
-index 01ed21c006..d87664d42e 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -496,9 +496,11 @@ static int slirp_hostfwd(SlirpState *s, const char *redir_str,
-     char buf[256];
-     int is_udp;
-     char *end;
-+    const char *fail_reason = "";
- 
-     p = redir_str;
-     if (!p || get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
-+        fail_reason = "No : separators";
-         goto fail_syntax;
-     }
-     if (!strcmp(buf, "tcp") || buf[0] == '\0') {
-@@ -506,35 +508,43 @@ static int slirp_hostfwd(SlirpState *s, const char *redir_str,
-     } else if (!strcmp(buf, "udp")) {
-         is_udp = 1;
-     } else {
-+        fail_reason = "Bad protocol name";
-         goto fail_syntax;
-     }
- 
-     if (!legacy_format) {
-         if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
-+            fail_reason = "Missing : separator";
-             goto fail_syntax;
-         }
-         if (buf[0] != '\0' && !inet_aton(buf, &host_addr)) {
-+            fail_reason = "Bad host address";
-             goto fail_syntax;
-         }
-     }
- 
-     if (get_str_sep(buf, sizeof(buf), &p, legacy_format ? ':' : '-') < 0) {
-+        fail_reason = "Bad host port separator";
-         goto fail_syntax;
-     }
-     host_port = strtol(buf, &end, 0);
-     if (*end != '\0' || host_port < 0 || host_port > 65535) {
-+        fail_reason = "Bad host port";
-         goto fail_syntax;
-     }
- 
-     if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
-+        fail_reason = "Missing guest address";
-         goto fail_syntax;
-     }
-     if (buf[0] != '\0' && !inet_aton(buf, &guest_addr)) {
-+        fail_reason = "Bad guest address";
-         goto fail_syntax;
-     }
- 
-     guest_port = strtol(p, &end, 0);
-     if (*end != '\0' || guest_port < 1 || guest_port > 65535) {
-+        fail_reason = "Bad guest port";
-         goto fail_syntax;
-     }
- 
-@@ -547,7 +557,8 @@ static int slirp_hostfwd(SlirpState *s, const char *redir_str,
-     return 0;
- 
-  fail_syntax:
--    error_setg(errp, "Invalid host forwarding rule '%s'", redir_str);
-+    error_setg(errp, "Invalid host forwarding rule '%s' (%s)", redir_str,
-+               fail_reason);
-     return -1;
- }
- 
--- 
-2.13.5
+Maybe we should even use it in a couple of places on purpose - so we get
+some test coverage for them?
+
+ Thomas
