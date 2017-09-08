@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40807)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqH0A-0005tK-D3
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:59:15 -0400
+	(envelope-from <berrange@redhat.com>) id 1dqH1e-0007LC-T1
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:00:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqH02-0005OM-Gu
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:59:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53986)
+	(envelope-from <berrange@redhat.com>) id 1dqH1Z-0006Dy-Qf
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:00:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53478)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqH02-0005O1-86
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:59:02 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqH1Z-0006DT-Gr
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:00:37 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id F0AA081DF1
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 10:58:55 +0000 (UTC)
-Date: Fri, 8 Sep 2017 18:58:53 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170908105853.GM4511@lemon>
+	by mx1.redhat.com (Postfix) with ESMTPS id 7E1D3356D9
+	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 11:00:36 +0000 (UTC)
+Date: Fri, 8 Sep 2017 12:00:33 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170908110033.GK3609@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20170906124900.17354-1-famz@redhat.com>
 	<20170908100537.GI3609@redhat.com> <20170908102701.GL4511@lemon>
-	<20170908103602.GJ3609@redhat.com>
+	<20170908103602.GJ3609@redhat.com> <20170908105853.GM4511@lemon>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170908103602.GJ3609@redhat.com>
+In-Reply-To: <20170908105853.GM4511@lemon>
 Subject: Re: [Qemu-devel] [PATCH v4] buildsys: Move crypto cflags/libs to
  per object variables
 List-Id: <qemu-devel.nongnu.org>
@@ -35,112 +36,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
+To: Fam Zheng <famz@redhat.com>
 Cc: qemu-devel@nongnu.org
 
-On Fri, 09/08 11:36, Daniel P. Berrange wrote:
-> On Fri, Sep 08, 2017 at 06:27:01PM +0800, Fam Zheng wrote:
-> > On Fri, 09/08 11:05, Daniel P. Berrange wrote:
-> > > On Wed, Sep 06, 2017 at 08:49:00PM +0800, Fam Zheng wrote:
-> > > > This patch groups the crypto objects into a few .mo objects based on
-> > > > functional submodules, and moves inclusion conditions to *-objs
-> > > > variables, then moves the global cflags/libs to the *-cflags and *-libs
-> > > > variables.
+On Fri, Sep 08, 2017 at 06:58:53PM +0800, Fam Zheng wrote:
+> On Fri, 09/08 11:36, Daniel P. Berrange wrote:
+> > On Fri, Sep 08, 2017 at 06:27:01PM +0800, Fam Zheng wrote:
+> > > On Fri, 09/08 11:05, Daniel P. Berrange wrote:
+> > > > On Wed, Sep 06, 2017 at 08:49:00PM +0800, Fam Zheng wrote:
+> > > > > This patch groups the crypto objects into a few .mo objects based on
+> > > > > functional submodules, and moves inclusion conditions to *-objs
+> > > > > variables, then moves the global cflags/libs to the *-cflags and *-libs
+> > > > > variables.
+> > > > > 
+> > > > > For init.o and cipher.o, which may or may not need the library flags
+> > > > > depending on config, adding flags and libs unconditionally doesn't hurt,
+> > > > > because if the library is not available, the variables are empty.  This
+> > > > > makes less code.
+> > > > > 
+> > > > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > > > > 
+> > > > > ---
+> > > > > 
+> > > > > v4: Merge into one patch which is supposedly easier to manage and
+> > > > > review, and use .mo appraoch to avoid $(foreach) and $(eval) magics.
 > > > > 
-> > > > For init.o and cipher.o, which may or may not need the library flags
-> > > > depending on config, adding flags and libs unconditionally doesn't hurt,
-> > > > because if the library is not available, the variables are empty.  This
-> > > > makes less code.
-> > > > 
-> > > > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > > > 
-> > > > ---
-> > > > 
-> > > > v4: Merge into one patch which is supposedly easier to manage and
-> > > > review, and use .mo appraoch to avoid $(foreach) and $(eval) magics.
+> > > > I don't think using  .mo is suitable here. You've used it as a generic
+> > > > mechanism for grouping .o files, but that is not what it does. There
+> > > > are special semantics around .mo rules that affect how the final
+> > > > binaries are linked.
 > > > 
-> > > I don't think using  .mo is suitable here. You've used it as a generic
-> > > mechanism for grouping .o files, but that is not what it does. There
-> > > are special semantics around .mo rules that affect how the final
-> > > binaries are linked.
+> > > Using .mo is okay here, but after a hindsight I think grouping by library
+> > > (nettle.mo, gcrypt.mo, etc.) is better than grouping by functionality, for
+> > > modularization in the future. But that also means assigning the cflags/libs
+> > > variable cannot be simplified like this.
+> > > 
+> > > > 
+> > > > eg looking back at the description of .mo files 
+> > > > 
+> > > > [quote]
+> > > > commit c261d774fb9093d00e0938a19f502fb220f62718
+> > > > Author: Fam Zheng <famz@redhat.com>
+> > > > Date:   Mon Sep 1 18:35:10 2014 +0800
+> > > > 
+> > > > [...snip...]
+> > > > 
+> > > >     3) When linking an executable, those .mo files in its "-y" variables are
+> > > >        filtered out, and replaced by one or more -Wl,-u,$symbol flags. This
+> > > >        is done in the added macro "process-archive-undefs".
+> > > >     
+> > > >        These "-Wl,-u,$symbol" flags will force ld to pull in the function
+> > > >        definition from the archives when linking.
+> > > >     
+> > > >        Note that the .mo objects, that are actually meant to be linked in
+> > > >        the executables, are already expanded in unnest-vars, before the
+> > > >        linking command. So we are safe to simply filter out .mo for the
+> > > >        purpose of pulling undefined symbols.
+> > > >     
+> > > >        process-archive-undefs works as this: For each ".mo", find all the
+> > > >        undefined symbols in it, filter ones that are defined in the
+> > > >        archives. For each of these symbols, generate a "-Wl,-u,$symbol" in
+> > > >        the link command, and put them before archive names in the command
+> > > >        line.
+> > > > [/quote]
+> > > > 
+> > > > Based on this, I don't think I can ack this patch, because it can
+> > > > have unexpected consequences.
+> > > 
+> > > This described the process-archive-undefs semantics of .mo, but not the essence
+> > > of it.  Basically .mo is just partial linking with the additional services of
+> > > -cflags, -libs and the above -Wl,-u thing. I cannot think of any unexpected
+> > > consequences with this change. We've had sdl.mo in ui/Makefile.objs for long,
+> > > just for the same purpose of this patch, with no problem.
 > > 
-> > Using .mo is okay here, but after a hindsight I think grouping by library
-> > (nettle.mo, gcrypt.mo, etc.) is better than grouping by functionality, for
-> > modularization in the future. But that also means assigning the cflags/libs
-> > variable cannot be simplified like this.
+> > While I'm in favour of moving the linker/compiler flags out of the global
+> > vars, I'm not convinced this impl is a step forward.
 > > 
-> > > 
-> > > eg looking back at the description of .mo files 
-> > > 
-> > > [quote]
-> > > commit c261d774fb9093d00e0938a19f502fb220f62718
-> > > Author: Fam Zheng <famz@redhat.com>
-> > > Date:   Mon Sep 1 18:35:10 2014 +0800
-> > > 
-> > > [...snip...]
-> > > 
-> > >     3) When linking an executable, those .mo files in its "-y" variables are
-> > >        filtered out, and replaced by one or more -Wl,-u,$symbol flags. This
-> > >        is done in the added macro "process-archive-undefs".
-> > >     
-> > >        These "-Wl,-u,$symbol" flags will force ld to pull in the function
-> > >        definition from the archives when linking.
-> > >     
-> > >        Note that the .mo objects, that are actually meant to be linked in
-> > >        the executables, are already expanded in unnest-vars, before the
-> > >        linking command. So we are safe to simply filter out .mo for the
-> > >        purpose of pulling undefined symbols.
-> > >     
-> > >        process-archive-undefs works as this: For each ".mo", find all the
-> > >        undefined symbols in it, filter ones that are defined in the
-> > >        archives. For each of these symbols, generate a "-Wl,-u,$symbol" in
-> > >        the link command, and put them before archive names in the command
-> > >        line.
-> > > [/quote]
-> > > 
-> > > Based on this, I don't think I can ack this patch, because it can
-> > > have unexpected consequences.
+> > We already have a mechanism for grouping object files - the 'NNNN-obj-y'
+> > variables we use throughout our Makefiles.
 > > 
-> > This described the process-archive-undefs semantics of .mo, but not the essence
-> > of it.  Basically .mo is just partial linking with the additional services of
-> > -cflags, -libs and the above -Wl,-u thing. I cannot think of any unexpected
-> > consequences with this change. We've had sdl.mo in ui/Makefile.objs for long,
-> > just for the same purpose of this patch, with no problem.
+> > This patch is adding a second level of grouping purely to work around the
+> > fact that we can't set linker/compiler flags on the NNN-obj-y variables
+> > we use. I think this second level of grouping makes the makefiles more
+> > complex than they ought to be.
 > 
-> While I'm in favour of moving the linker/compiler flags out of the global
-> vars, I'm not convinced this impl is a step forward.
+> Not quite, it is actually a required step to modularization, which I'm inclined
+> to get my hands on next. That is also why .mo was introduced.
 > 
-> We already have a mechanism for grouping object files - the 'NNNN-obj-y'
-> variables we use throughout our Makefiles.
+> > 
+> > IOW, I'd rather see the rules fixed so that we can set variables against
+> > the existing grouping we have. eg
+> > 
+> >    crypto-obj-y-cflags := ...
+> >    crypto-obj-y-libs := ...
+> > 
+> > so we avoid having to introduce second level groups every time we want
+> > to set these cflags/libs.
 > 
-> This patch is adding a second level of grouping purely to work around the
-> fact that we can't set linker/compiler flags on the NNN-obj-y variables
-> we use. I think this second level of grouping makes the makefiles more
-> complex than they ought to be.
-
-Not quite, it is actually a required step to modularization, which I'm inclined
-to get my hands on next. That is also why .mo was introduced.
-
+> This is certainly true, but taking the modularization work into account, .mo
+> based -cflags and -libs are more natural and consistent. IMO we already have the
+> latter, so other mechanisms are not really necessary. Remember how complex the
+> general unnest-vars code is?  I believe adding support to crypto-obj-y-cflags is
+> more complex than (ab)using .mo objects, even if just for flags/libs
+> localization.
 > 
-> IOW, I'd rather see the rules fixed so that we can set variables against
-> the existing grouping we have. eg
-> 
->    crypto-obj-y-cflags := ...
->    crypto-obj-y-libs := ...
-> 
-> so we avoid having to introduce second level groups every time we want
-> to set these cflags/libs.
+> If you don't like introducing {nettle,gcrypt,gnutls}.mo for now, we can probably
+> defer it to the time when crypto subsystem is modularized.
 
-This is certainly true, but taking the modularization work into account, .mo
-based -cflags and -libs are more natural and consistent. IMO we already have the
-latter, so other mechanisms are not really necessary. Remember how complex the
-general unnest-vars code is?  I believe adding support to crypto-obj-y-cflags is
-more complex than (ab)using .mo objects, even if just for flags/libs
-localization.
+I don't anticipate the crypot subsystem ever being modularized - it is
+really core functionality used across all other subsystems (block layer,
+chardev, ui, migration, and more)
 
-If you don't like introducing {nettle,gcrypt,gnutls}.mo for now, we can probably
-defer it to the time when crypto subsystem is modularized.
 
-Either way let's drop this patch for now.
-
-Fam
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
