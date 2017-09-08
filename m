@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49023)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dqK7l-0006YZ-V8
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:19:15 -0400
+	(envelope-from <mst@redhat.com>) id 1dqK7o-0006Zr-0F
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:19:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dqK7k-0004sK-Js
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:19:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40068)
+	(envelope-from <mst@redhat.com>) id 1dqK7m-0004un-Mv
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:19:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41478)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dqK7k-0004rT-9T
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:19:12 -0400
-Date: Fri, 8 Sep 2017 17:19:08 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dqK7m-0004td-Dv
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:19:14 -0400
+Date: Fri, 8 Sep 2017 17:19:12 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <1504880304-12069-5-git-send-email-mst@redhat.com>
+Message-ID: <1504880304-12069-7-git-send-email-mst@redhat.com>
 References: <1504880304-12069-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1504880304-12069-1-git-send-email-mst@redhat.com>
-Subject: [Qemu-devel] [PULL 04/17] hw/acpi: Move acpi_set_pci_info to pcihp
+Subject: [Qemu-devel] [PULL 06/17] hw/pci: introduce pcie-pci-bridge device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,162 +27,247 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Anthony PERARD <anthony.perard@citrix.com>, Sander Eikelenboom <linux@eikelenboom.it>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Aleksandr Bezzubikov <zuban32s@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>
 
-From: Anthony PERARD <anthony.perard@citrix.com>
+From: Aleksandr Bezzubikov <zuban32s@gmail.com>
 
-HW part of ACPI PCI hotplug in QEMU depends on ACPI_PCIHP_PROP_BSEL
-being set on a PCI bus that supports ACPI hotplug. It should work
-regardless of the source of ACPI tables (QEMU generator/legacy SeaBIOS/Xen).
-So move ACPI_PCIHP_PROP_BSEL initialization into HW ACPI implementation
-part from QEMU's ACPI table generator.
+Introduce a new PCIExpress-to-PCI Bridge device,
+which is a hot-pluggable PCI Express device and
+supports devices hot-plug with SHPC.
 
-To do PCI passthrough with Xen, the property ACPI_PCIHP_PROP_BSEL needs
-to be set, but this was done only when ACPI tables are built which is
-not needed for a Xen guest. The need for the property starts with commit
-"pc: pcihp: avoid adding ACPI_PCIHP_PROP_BSEL twice"
-(f0c9d64a68b776374ec4732424a3e27753ce37b6).
+This device is intended to replace the DMI-to-PCI Bridge.
 
-Adding find_i440fx into stubs so that mips-softmmu target can be built.
-
-Reported-by: Sander Eikelenboom <linux@eikelenboom.it>
-Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+Tested-by: Marcel Apfelbaum <marcel@redhat.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- hw/acpi/pcihp.c       | 38 ++++++++++++++++++++++++++++++++++++++
- hw/i386/acpi-build.c  | 32 --------------------------------
- stubs/pci-host-piix.c |  6 ++++++
- stubs/Makefile.objs   |  1 +
- 4 files changed, 45 insertions(+), 32 deletions(-)
- create mode 100644 stubs/pci-host-piix.c
+ include/hw/pci/pci.h            |   1 +
+ hw/pci-bridge/pcie_pci_bridge.c | 192 ++++++++++++++++++++++++++++++++++++++++
+ hw/pci-bridge/Makefile.objs     |   2 +-
+ 3 files changed, 194 insertions(+), 1 deletion(-)
+ create mode 100644 hw/pci-bridge/pcie_pci_bridge.c
 
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index 9db3c2e..7da51c0 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -75,6 +75,43 @@ static int acpi_pcihp_get_bsel(PCIBus *bus)
-     }
- }
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 8bb6449..aa7ef9c 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -100,6 +100,7 @@ extern bool pci_available;
+ #define PCI_DEVICE_ID_REDHAT_PXB_PCIE    0x000b
+ #define PCI_DEVICE_ID_REDHAT_PCIE_RP     0x000c
+ #define PCI_DEVICE_ID_REDHAT_XHCI        0x000d
++#define PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE 0x000e
+ #define PCI_DEVICE_ID_REDHAT_QXL         0x0100
  
-+/* Assign BSEL property to all buses.  In the future, this can be changed
-+ * to only assign to buses that support hotplug.
+ #define FMT_PCIBUS                      PRIx64
+diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+new file mode 100644
+index 0000000..9aa5cc3
+--- /dev/null
++++ b/hw/pci-bridge/pcie_pci_bridge.c
+@@ -0,0 +1,192 @@
++/*
++ * QEMU Generic PCIE-PCI Bridge
++ *
++ * Copyright (c) 2017 Aleksandr Bezzubikov
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
 + */
-+static void *acpi_set_bsel(PCIBus *bus, void *opaque)
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/pci/pci.h"
++#include "hw/pci/pci_bus.h"
++#include "hw/pci/pci_bridge.h"
++#include "hw/pci/msi.h"
++#include "hw/pci/shpc.h"
++#include "hw/pci/slotid_cap.h"
++
++typedef struct PCIEPCIBridge {
++    /*< private >*/
++    PCIBridge parent_obj;
++
++    OnOffAuto msi;
++    MemoryRegion shpc_bar;
++    /*< public >*/
++} PCIEPCIBridge;
++
++#define TYPE_PCIE_PCI_BRIDGE_DEV "pcie-pci-bridge"
++#define PCIE_PCI_BRIDGE_DEV(obj) \
++        OBJECT_CHECK(PCIEPCIBridge, (obj), TYPE_PCIE_PCI_BRIDGE_DEV)
++
++static void pcie_pci_bridge_realize(PCIDevice *d, Error **errp)
 +{
-+    unsigned *bsel_alloc = opaque;
-+    unsigned *bus_bsel;
++    PCIBridge *br = PCI_BRIDGE(d);
++    PCIEPCIBridge *pcie_br = PCIE_PCI_BRIDGE_DEV(d);
++    int rc, pos;
 +
-+    if (qbus_is_hotpluggable(BUS(bus))) {
-+        bus_bsel = g_malloc(sizeof *bus_bsel);
++    pci_bridge_initfn(d, TYPE_PCI_BUS);
 +
-+        *bus_bsel = (*bsel_alloc)++;
-+        object_property_add_uint32_ptr(OBJECT(bus), ACPI_PCIHP_PROP_BSEL,
-+                                       bus_bsel, &error_abort);
++    d->config[PCI_INTERRUPT_PIN] = 0x1;
++    memory_region_init(&pcie_br->shpc_bar, OBJECT(d), "shpc-bar",
++                       shpc_bar_size(d));
++    rc = shpc_init(d, &br->sec_bus, &pcie_br->shpc_bar, 0, errp);
++    if (rc) {
++        goto error;
 +    }
 +
-+    return bsel_alloc;
++    rc = pcie_cap_init(d, 0, PCI_EXP_TYPE_PCI_BRIDGE, 0, errp);
++    if (rc < 0) {
++        goto cap_error;
++    }
++
++    pos = pci_add_capability(d, PCI_CAP_ID_PM, 0, PCI_PM_SIZEOF, errp);
++    if (pos < 0) {
++        goto pm_error;
++    }
++    d->exp.pm_cap = pos;
++    pci_set_word(d->config + pos + PCI_PM_PMC, 0x3);
++
++    pcie_cap_arifwd_init(d);
++    pcie_cap_deverr_init(d);
++
++    rc = pcie_aer_init(d, PCI_ERR_VER, 0x100, PCI_ERR_SIZEOF, errp);
++    if (rc < 0) {
++        goto aer_error;
++    }
++
++    if (pcie_br->msi != ON_OFF_AUTO_OFF) {
++        rc = msi_init(d, 0, 1, true, true, errp);
++        if (rc < 0) {
++            goto msi_error;
++        }
++    }
++    pci_register_bar(d, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
++                     PCI_BASE_ADDRESS_MEM_TYPE_64, &pcie_br->shpc_bar);
++    return;
++
++msi_error:
++    pcie_aer_exit(d);
++aer_error:
++pm_error:
++    pcie_cap_exit(d);
++cap_error:
++    shpc_free(d);
++error:
++    pci_bridge_exitfn(d);
 +}
 +
-+static void acpi_set_pci_info(void)
++static void pcie_pci_bridge_exit(PCIDevice *d)
 +{
-+    static bool bsel_is_set;
-+    PCIBus *bus;
-+    unsigned bsel_alloc = ACPI_PCIHP_BSEL_DEFAULT;
++    PCIEPCIBridge *bridge_dev = PCIE_PCI_BRIDGE_DEV(d);
++    pcie_cap_exit(d);
++    shpc_cleanup(d, &bridge_dev->shpc_bar);
++    pci_bridge_exitfn(d);
++}
 +
-+    if (bsel_is_set) {
++static void pcie_pci_bridge_reset(DeviceState *qdev)
++{
++    PCIDevice *d = PCI_DEVICE(qdev);
++    pci_bridge_reset(qdev);
++    msi_reset(d);
++    shpc_reset(d);
++}
++
++static void pcie_pci_bridge_write_config(PCIDevice *d,
++        uint32_t address, uint32_t val, int len)
++{
++    pci_bridge_write_config(d, address, val, len);
++    msi_write_config(d, address, val, len);
++    shpc_cap_write_config(d, address, val, len);
++}
++
++static Property pcie_pci_bridge_dev_properties[] = {
++        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi, ON_OFF_AUTO_ON),
++        DEFINE_PROP_END_OF_LIST(),
++};
++
++static const VMStateDescription pcie_pci_bridge_dev_vmstate = {
++        .name = TYPE_PCIE_PCI_BRIDGE_DEV,
++        .fields = (VMStateField[]) {
++            VMSTATE_PCI_DEVICE(parent_obj, PCIBridge),
++            SHPC_VMSTATE(shpc, PCIDevice, NULL),
++            VMSTATE_END_OF_LIST()
++        }
++};
++
++static void pcie_pci_bridge_hotplug_cb(HotplugHandler *hotplug_dev,
++                                      DeviceState *dev, Error **errp)
++{
++    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
++
++    if (!shpc_present(pci_hotplug_dev)) {
++        error_setg(errp, "standard hotplug controller has been disabled for "
++                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
 +        return;
 +    }
-+    bsel_is_set = true;
-+
-+    bus = find_i440fx(); /* TODO: Q35 support */
-+    if (bus) {
-+        /* Scan all PCI buses. Set property to enable acpi based hotplug. */
-+        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
-+    }
++    shpc_device_hotplug_cb(hotplug_dev, dev, errp);
 +}
 +
- static void acpi_pcihp_test_hotplug_bus(PCIBus *bus, void *opaque)
- {
-     AcpiPciHpFind *find = opaque;
-@@ -177,6 +214,7 @@ static void acpi_pcihp_update(AcpiPciHpState *s)
- 
- void acpi_pcihp_reset(AcpiPciHpState *s)
- {
-+    acpi_set_pci_info();
-     acpi_pcihp_update(s);
- }
- 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 98dd424..4d19d91 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -493,36 +493,6 @@ build_madt(GArray *table_data, BIOSLinker *linker, PCMachineState *pcms)
-                  table_data->len - madt_start, 1, NULL, NULL);
- }
- 
--/* Assign BSEL property to all buses.  In the future, this can be changed
-- * to only assign to buses that support hotplug.
-- */
--static void *acpi_set_bsel(PCIBus *bus, void *opaque)
--{
--    unsigned *bsel_alloc = opaque;
--    unsigned *bus_bsel;
--
--    if (qbus_is_hotpluggable(BUS(bus))) {
--        bus_bsel = g_malloc(sizeof *bus_bsel);
--
--        *bus_bsel = (*bsel_alloc)++;
--        object_property_add_uint32_ptr(OBJECT(bus), ACPI_PCIHP_PROP_BSEL,
--                                       bus_bsel, &error_abort);
--    }
--
--    return bsel_alloc;
--}
--
--static void acpi_set_pci_info(void)
--{
--    PCIBus *bus = find_i440fx(); /* TODO: Q35 support */
--    unsigned bsel_alloc = ACPI_PCIHP_BSEL_DEFAULT;
--
--    if (bus) {
--        /* Scan all PCI buses. Set property to enable acpi based hotplug. */
--        pci_for_each_bus_depth_first(bus, acpi_set_bsel, NULL, &bsel_alloc);
--    }
--}
--
- static void build_append_pcihp_notify_entry(Aml *method, int slot)
- {
-     Aml *if_ctx;
-@@ -2888,8 +2858,6 @@ void acpi_setup(void)
- 
-     build_state = g_malloc0(sizeof *build_state);
- 
--    acpi_set_pci_info();
--
-     acpi_build_tables_init(&tables);
-     acpi_build(&tables, MACHINE(pcms));
- 
-diff --git a/stubs/pci-host-piix.c b/stubs/pci-host-piix.c
-new file mode 100644
-index 0000000..6ed81b1
---- /dev/null
-+++ b/stubs/pci-host-piix.c
-@@ -0,0 +1,6 @@
-+#include "qemu/osdep.h"
-+#include "hw/i386/pc.h"
-+PCIBus *find_i440fx(void)
++static void pcie_pci_bridge_hot_unplug_request_cb(HotplugHandler *hotplug_dev,
++                                                 DeviceState *dev,
++                                                 Error **errp)
 +{
-+    return NULL;
++    PCIDevice *pci_hotplug_dev = PCI_DEVICE(hotplug_dev);
++
++    if (!shpc_present(pci_hotplug_dev)) {
++        error_setg(errp, "standard hotplug controller has been disabled for "
++                   "this %s", TYPE_PCIE_PCI_BRIDGE_DEV);
++        return;
++    }
++    shpc_device_hot_unplug_request_cb(hotplug_dev, dev, errp);
 +}
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index e69c217..4a33495 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -40,3 +40,4 @@ stub-obj-y += pc_madt_cpu_entry.o
- stub-obj-y += vmgenid.o
- stub-obj-y += xen-common.o
- stub-obj-y += xen-hvm.o
-+stub-obj-y += pci-host-piix.o
++
++static void pcie_pci_bridge_class_init(ObjectClass *klass, void *data)
++{
++    PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
++
++    k->is_express = 1;
++    k->is_bridge = 1;
++    k->vendor_id = PCI_VENDOR_ID_REDHAT;
++    k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE;
++    k->realize = pcie_pci_bridge_realize;
++    k->exit = pcie_pci_bridge_exit;
++    k->config_write = pcie_pci_bridge_write_config;
++    dc->vmsd = &pcie_pci_bridge_dev_vmstate;
++    dc->props = pcie_pci_bridge_dev_properties;
++    dc->vmsd = &pcie_pci_bridge_dev_vmstate;
++    dc->reset = &pcie_pci_bridge_reset;
++    set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
++    hc->plug = pcie_pci_bridge_hotplug_cb;
++    hc->unplug_request = pcie_pci_bridge_hot_unplug_request_cb;
++}
++
++static const TypeInfo pcie_pci_bridge_info = {
++        .name = TYPE_PCIE_PCI_BRIDGE_DEV,
++        .parent = TYPE_PCI_BRIDGE,
++        .instance_size = sizeof(PCIEPCIBridge),
++        .class_init = pcie_pci_bridge_class_init,
++        .interfaces = (InterfaceInfo[]) {
++            { TYPE_HOTPLUG_HANDLER },
++            { },
++        }
++};
++
++static void pciepci_register(void)
++{
++    type_register_static(&pcie_pci_bridge_info);
++}
++
++type_init(pciepci_register);
+diff --git a/hw/pci-bridge/Makefile.objs b/hw/pci-bridge/Makefile.objs
+index c4683cf..666db37 100644
+--- a/hw/pci-bridge/Makefile.objs
++++ b/hw/pci-bridge/Makefile.objs
+@@ -1,4 +1,4 @@
+-common-obj-y += pci_bridge_dev.o
++common-obj-y += pci_bridge_dev.o pcie_pci_bridge.o
+ common-obj-$(CONFIG_PCIE_PORT) += pcie_root_port.o gen_pcie_root_port.o
+ common-obj-$(CONFIG_PXB) += pci_expander_bridge.o
+ common-obj-$(CONFIG_XIO3130) += xio3130_upstream.o xio3130_downstream.o
 -- 
 MST
