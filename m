@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49076)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52438)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dqFJT-0001CV-IS
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:11:04 -0400
+	(envelope-from <famz@redhat.com>) id 1dqFPX-0005vY-BV
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:17:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dqFJO-0002yq-M9
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:10:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50680)
+	(envelope-from <famz@redhat.com>) id 1dqFPS-0000Ij-Jw
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:17:15 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dqFJO-0002y3-Cy
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:10:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 81FC180461
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 09:10:53 +0000 (UTC)
-From: Eduardo Otubo <otubo@redhat.com>
-Date: Fri,  8 Sep 2017 11:10:27 +0200
-Message-Id: <20170908091027.9104-6-otubo@redhat.com>
-In-Reply-To: <20170908091027.9104-1-otubo@redhat.com>
-References: <20170908091027.9104-1-otubo@redhat.com>
-Subject: [Qemu-devel] [PATCHv5 5/5] seccomp: add resourcecontrol argument to
- command line
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqFPS-0000Hr-EM
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:17:10 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Fri,  8 Sep 2017 17:16:53 +0800
+Message-Id: <20170908091700.14867-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH RFC 0/7] Proof of concept to power up "make
+ test" with docker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,138 +23,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, "Daniel P . Berrange" <berrange@redhat.com>
+Cc: peter.maydell@linaro.org, thuth@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, programmingkidx@gmail.com, crosa@redhat.com, pbonzini@redhat.com, rth@twiddle.net
 
-This patch adds [,resourcecontrol=deny] to `-sandbox on' option. It
-blacklists all process affinity and scheduler priority system calls to
-avoid any bigger of the process.
+Recently it was brought up that "make test" is in an orphaned state, and making
+it work would be a good thing because it has valuable test coverage for tcg:
 
-Signed-off-by: Eduardo Otubo <otubo@redhat.com>
----
- include/sysemu/seccomp.h |  1 +
- qemu-options.hx          |  9 ++++++---
- qemu-seccomp.c           | 19 +++++++++++++++++++
- vl.c                     | 16 ++++++++++++++++
- 4 files changed, 42 insertions(+), 3 deletions(-)
+https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04978.html
 
-diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
-index 3ab5fc4f61..e67c2dc840 100644
---- a/include/sysemu/seccomp.h
-+++ b/include/sysemu/seccomp.h
-@@ -19,6 +19,7 @@
- #define QEMU_SECCOMP_SET_OBSOLETE    (1 << 1)
- #define QEMU_SECCOMP_SET_PRIVILEGED  (1 << 2)
- #define QEMU_SECCOMP_SET_SPAWN       (1 << 3)
-+#define QEMU_SECCOMP_SET_RESOURCECTL (1 << 4)
- 
- #include <seccomp.h>
- 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 2b04b9f170..600614f6e5 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4018,7 +4018,7 @@ ETEXI
- 
- DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
-     "-sandbox on[,obsolete=allow|deny][,elevateprivileges=allow|deny|children]\n" \
--    "          [,spawn=allow|deny]\n" \
-+    "          [,spawn=allow|deny][,resourcecontrol=allow|deny]\n" \
-     "                Enable seccomp mode 2 system call filter (default 'off').\n" \
-     "                use 'obsolete' to allow obsolete system calls that are provided\n" \
-     "                    by the kernel, but typically no longer used by modern\n" \
-@@ -4028,10 +4028,11 @@ DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
-     "                    The value 'children' will deny set*uid|gid system calls for\n" \
-     "                    main QEMU process but will allow forks and execves to run unprivileged\n" \
-     "                use 'spawn' to avoid QEMU to spawn new threads or processes by\n" \
--    "                     blacklisting *fork and execve\n",
-+    "                     blacklisting *fork and execve\n" \
-+    "                use 'resourcecontrol' to disable process affinity and schedular priority\n",
-     QEMU_ARCH_ALL)
- STEXI
--@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}][,spawn=@var{string}]
-+@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}][,spawn=@var{string}][,resourcecontrol=@var{string}]
- @findex -sandbox
- Enable Seccomp mode 2 system call filter. 'on' will enable syscall filtering and 'off' will
- disable it.  The default is 'off'.
-@@ -4042,6 +4043,8 @@ Enable Obsolete system calls
- Disable set*uid|gid system calls
- @item spawn=@var{string}
- Disable *fork and execve
-+@item resourcecontrol=@var{string}
-+Disable process affinity and schedular priority
- @end table
- ETEXI
- 
-diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-index 4c169febf8..e7c19c8165 100644
---- a/qemu-seccomp.c
-+++ b/qemu-seccomp.c
-@@ -83,6 +83,17 @@ static const struct QemuSeccompSyscall blacklist[] = {
-     { SCMP_SYS(fork),                   8, QEMU_SECCOMP_SET_SPAWN },
-     { SCMP_SYS(vfork),                  8, QEMU_SECCOMP_SET_SPAWN },
-     { SCMP_SYS(execve),                 8, QEMU_SECCOMP_SET_SPAWN },
-+    /* resource control */
-+    { SCMP_SYS(getpriority),            16, QEMU_SECCOMP_SET_RESOURCECTL },
-+    { SCMP_SYS(setpriority),            16, QEMU_SECCOMP_SET_RESOURCECTL },
-+    { SCMP_SYS(sched_setparam),         16, QEMU_SECCOMP_SET_RESOURCECTL },
-+    { SCMP_SYS(sched_getparam),         16, QEMU_SECCOMP_SET_RESOURCECTL },
-+    { SCMP_SYS(sched_setscheduler),     16, QEMU_SECCOMP_SET_RESOURCECTL },
-+    { SCMP_SYS(sched_getscheduler),     16, QEMU_SECCOMP_SET_RESOURCECTL },
-+    { SCMP_SYS(sched_setaffinity),      16, QEMU_SECCOMP_SET_RESOURCECTL },
-+    { SCMP_SYS(sched_getaffinity),      16, QEMU_SECCOMP_SET_RESOURCECTL },
-+    { SCMP_SYS(sched_get_priority_max), 16, QEMU_SECCOMP_SET_RESOURCECTL },
-+    { SCMP_SYS(sched_get_priority_min), 16, QEMU_SECCOMP_SET_RESOURCECTL },
- };
- 
- 
-@@ -121,6 +132,14 @@ int seccomp_start(uint32_t seccomp_opts)
-             }
- 
-             break;
-+        case QEMU_SECCOMP_SET_RESOURCECTL:
-+            if (seccomp_opts & QEMU_SECCOMP_SET_RESOURCECTL) {
-+                break;
-+            } else {
-+                continue;
-+            }
-+
-+            break;
-         default:
-             break;
-         }
-diff --git a/vl.c b/vl.c
-index 0af137da17..ce3883ccb1 100644
---- a/vl.c
-+++ b/vl.c
-@@ -284,6 +284,10 @@ static QemuOptsList qemu_sandbox_opts = {
-             .name = "spawn",
-             .type = QEMU_OPT_STRING,
-         },
-+        {
-+            .name = "resourcecontrol",
-+            .type = QEMU_OPT_STRING,
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -1097,6 +1101,18 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
-             }
-         }
- 
-+        value = qemu_opt_get(opts, "resourcecontrol");
-+        if (value) {
-+            if (g_str_equal(value, "deny")) {
-+                seccomp_opts |= QEMU_SECCOMP_SET_RESOURCECTL;
-+            } else if (g_str_equal(value, "allow")) {
-+                /* default value */
-+            } else {
-+                error_report("invalid argument for resourcecontrol");
-+                return -1;
-+            }
-+        }
-+
-         if (seccomp_start(seccomp_opts) < 0) {
-             error_report("failed to install seccomp syscall filter "
-                          "in the kernel");
+This RFC is an attempt to use docker to cross build the test binaries that will
+be run by qemu-user and meanwhile rename it from "make test" to "make
+check-tcg" to align with the naming convention of other test targets we have.
+
+As the initial version only i386 is converted, not because it's easy, but
+because it is a test set that covers the most types of rules we will need
+(cross-build, run and compare result).
+
+After these patches, "make check-tcg" will do the i386 tests with the new
+rules first (which fails but that's out of the scope of this series), then
+continue to do the old "make -C tests/tcg test" command. Once all tests are
+moved into the new Makefile.include file, the old Makefile can be dropped.
+
+Fam Zheng (7):
+  Makefile: Rename TARGET_DIRS to TARGET_LIST
+  docker: Add "cc" subcommand
+  docker: Add fedora-i386-cross image
+  tests: Build fix for hello-i386
+  tests: Build fix for linux-test
+  buildsys: Add "check-tcg" target
+  tests: Move i386 tcg tests to check-tcg
+
+ Makefile                                          | 21 ++++---
+ configure                                         |  2 +-
+ scripts/create_config                             |  2 +-
+ tests/Makefile.include                            |  3 +-
+ tests/docker/docker.py                            | 23 +++++++
+ tests/docker/dockerfiles/fedora-i386-cross.docker | 13 ++++
+ tests/tcg/Makefile                                | 60 ------------------
+ tests/tcg/Makefile.include                        | 75 +++++++++++++++++++++++
+ tests/tcg/hello-i386.c                            |  1 +
+ tests/tcg/linux-test.c                            | 67 +++++++-------------
+ 10 files changed, 149 insertions(+), 118 deletions(-)
+ create mode 100644 tests/docker/dockerfiles/fedora-i386-cross.docker
+ create mode 100644 tests/tcg/Makefile.include
+
 -- 
 2.13.5
