@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43463)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dq7yx-0002Gz-Oc
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 21:21:24 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dq89e-0004i2-Lj
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 21:32:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dq7yt-0001LM-0X
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 21:21:19 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58923)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dq7ys-0001K2-Qv
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 21:21:14 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dq7yp-0003h7-4x
-	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 01:21:11 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 5D9122E847A
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 01:21:10 +0000 (UTC)
+	(envelope-from <jasowang@redhat.com>) id 1dq89Z-0003xK-Kq
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 21:32:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55366)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dq89Z-0003vP-FY
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 21:32:17 -0400
+References: <1503991359-3353-1-git-send-email-wang.yong155@zte.com.cn>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <99e96941-cd9f-3c6c-e4dc-b64762cd329a@redhat.com>
+Date: Fri, 8 Sep 2017 09:32:01 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1503991359-3353-1-git-send-email-wang.yong155@zte.com.cn>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 08 Sep 2017 01:09:58 -0000
-From: kallisti5 <1715203@bugs.launchpad.net>
-Reply-To: Bug 1715203 <1715203@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150463414707.19543.9931062189110648888.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150483299893.23063.10440710568889161784.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715203] Re: Maintain Haiku support
+Subject: Re: [Qemu-devel] [PATCHv5 00/03] Replace the COLO comparing thread
+ with IOThread
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,32 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Wang yong <wang.yong155@zte.com.cn>, pbonzini@redhat.com, stefanha@redhat.com, famz@redhat.com, zhangchen.fnst@cn.fujitsu.com, zhang.zhanghailiang@huawei.com
+Cc: wang.guang55@zte.com.cn, lizhijian@cn.fujitsu.com, qemu-devel@nongnu.org
 
-We're purchasing some new hardware, once we get it set up we'll setup a
-x86_64 Haiku machine to build qemu.
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715203
+On 2017=E5=B9=B408=E6=9C=8829=E6=97=A5 15:22, Wang yong wrote:
+> From: Wang Yong <wang.yong155@zte.com.cn>
+>
+> It's a good idea to use IOThread instead of COLO comparing thread.
+> comparing thread can be completely replaced by IOThread, so this idea c=
+ame.
+>
+> This series of updates mainly include IOThread supports the GMainContex=
+t
+> event loop, then the old packet regularly check and primary/secondary n=
+etwork
+> packets compare all into the IOThread processing.
+>
+> Please review,thanks.
+>
+> wangyong(3):
+> qemu-iothread: IOThread supports the GMainContext event loop
+> colo-compare: Use IOThread to Check old packet regularly and
+>   Process pactkets of the primary
+> colo-compare: Update the COLO document to add the IOThread
+>   configuration
+>
+>   include/sysemu/iothread.h | 10 +++++++++
+>   iothread.c                | 54 ++++++++++++++++++++++++++++++++++++++=
++++++++++
+>   net/colo-compare.c | 75 ++++++++++++++++++++++++++++-----------------=
+---------
+>   docs/colo-proxy.txt | 3 ++-
+>   4 file changed, 97 insertions(+), 39 deletions(-)
+>
+> --
+> 1.8.3.1
+>
 
-Title:
-  Maintain Haiku support
+Applied.
 
-Status in QEMU:
-  New
-
-Bug description:
-  It was pointed out that the 2.10 release notes are pushing to drop
-  Haiku support.  The qemu port is currently working as-is under Haiku.
-
-  Was there a reason this was recommended? Is there anything Haiku can
-  do to keep it from being dropped?
-
-  We're working on a docker container to cross-compile rust-lang for
-  Haiku, could this be of some use to qemu when complete?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715203/+subscriptions
+Thanks
