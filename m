@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42124)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG1J-0008Sr-4R
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:21 -0400
+	(envelope-from <famz@redhat.com>) id 1dqG1K-0008Tw-4z
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG1E-00057L-F1
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57696)
+	(envelope-from <famz@redhat.com>) id 1dqG1A-00054J-N0
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41468)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG1E-00056t-8b
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:12 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG1A-00053O-EV
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:08 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  8 Sep 2017 17:55:00 +0800
-Message-Id: <20170908095506.13594-33-famz@redhat.com>
+Date: Fri,  8 Sep 2017 17:54:58 +0800
+Message-Id: <20170908095506.13594-31-famz@redhat.com>
 In-Reply-To: <20170908095506.13594-1-famz@redhat.com>
 References: <20170908095506.13594-1-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 32/38] buildsys: Move curese cflags/libs to per
+Subject: [Qemu-devel] [PULL 30/38] buildsys: Move vnc cflags/libs to per
  object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,49 +31,99 @@ To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170907082918.7299-6-famz@redhat.com>
+Message-Id: <20170907082918.7299-4-famz@redhat.com>
 Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- configure        | 6 ++++--
- ui/Makefile.objs | 3 +++
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ configure        | 14 ++++++++------
+ ui/Makefile.objs | 21 ++++++++++++---------
+ 2 files changed, 20 insertions(+), 15 deletions(-)
 
 diff --git a/configure b/configure
-index ddddfde599..df22b14259 100755
+index 90a8851342..2b3db2f5c3 100755
 --- a/configure
 +++ b/configure
-@@ -3141,8 +3141,8 @@ EOF
-       unset IFS
-       if compile_prog "$curses_inc" "$curses_lib" ; then
-         curses_found=3Dyes
--        QEMU_CFLAGS=3D"$curses_inc $QEMU_CFLAGS"
--        libs_softmmu=3D"$curses_lib $libs_softmmu"
-+        curses_cflags=3D"$curses_inc $curses_cflags"
-+        curses_libs=3D"$curses_lib $curses_libs"
-         break
-       fi
-     done
-@@ -5611,6 +5611,8 @@ if test "$cocoa" =3D "yes" ; then
+@@ -2840,8 +2840,8 @@ EOF
+   vnc_sasl_libs=3D"-lsasl2"
+   if compile_prog "$vnc_sasl_cflags" "$vnc_sasl_libs" ; then
+     vnc_sasl=3Dyes
+-    libs_softmmu=3D"$vnc_sasl_libs $libs_softmmu"
+-    QEMU_CFLAGS=3D"$QEMU_CFLAGS $vnc_sasl_cflags"
++    vnc_libs=3D"$vnc_libs $vnc_sasl_libs"
++    vnc_cflags=3D"$vnc_cflags $vnc_sasl_cflags"
+   else
+     if test "$vnc_sasl" =3D "yes" ; then
+       feature_not_found "vnc-sasl" "Install Cyrus SASL devel"
+@@ -2862,8 +2862,8 @@ EOF
+     vnc_jpeg_libs=3D"-ljpeg"
+   if compile_prog "$vnc_jpeg_cflags" "$vnc_jpeg_libs" ; then
+     vnc_jpeg=3Dyes
+-    libs_softmmu=3D"$vnc_jpeg_libs $libs_softmmu"
+-    QEMU_CFLAGS=3D"$QEMU_CFLAGS $vnc_jpeg_cflags"
++    vnc_libs=3D"$vnc_libs $vnc_jpeg_libs"
++    vnc_cflags=3D"$vnc_cflags $vnc_jpeg_cflags"
+   else
+     if test "$vnc_jpeg" =3D "yes" ; then
+       feature_not_found "vnc-jpeg" "Install libjpeg-turbo devel"
+@@ -2894,8 +2894,8 @@ EOF
+   fi
+   if compile_prog "$vnc_png_cflags" "$vnc_png_libs" ; then
+     vnc_png=3Dyes
+-    libs_softmmu=3D"$vnc_png_libs $libs_softmmu"
+-    QEMU_CFLAGS=3D"$QEMU_CFLAGS $vnc_png_cflags"
++    vnc_libs=3D"$vnc_libs $vnc_png_libs"
++    vnc_cflags=3D"$vnc_cflags $vnc_png_cflags"
+   else
+     if test "$vnc_png" =3D "yes" ; then
+       feature_not_found "vnc-png" "Install libpng devel"
+@@ -5563,6 +5563,8 @@ echo "CONFIG_BDRV_RW_WHITELIST=3D$block_drv_rw_whit=
+elist" >> $config_host_mak
+ echo "CONFIG_BDRV_RO_WHITELIST=3D$block_drv_ro_whitelist" >> $config_hos=
+t_mak
+ if test "$vnc" =3D "yes" ; then
+   echo "CONFIG_VNC=3Dy" >> $config_host_mak
++  echo "VNC_CFLAGS=3D$vnc_cflags" >> $config_host_mak
++  echo "VNC_LIBS=3D$vnc_libs" >> $config_host_mak
  fi
- if test "$curses" =3D "yes" ; then
-   echo "CONFIG_CURSES=3Dy" >> $config_host_mak
-+  echo "CURSES_CFLAGS=3D$curses_cflags" >> $config_host_mak
-+  echo "CURSES_LIBS=3D$curses_libs" >> $config_host_mak
- fi
- if test "$pipe2" =3D "yes" ; then
-   echo "CONFIG_PIPE2=3Dy" >> $config_host_mak
+ if test "$vnc_sasl" =3D "yes" ; then
+   echo "CONFIG_VNC_SASL=3Dy" >> $config_host_mak
 diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index a0b3c15a28..e3403b698b 100644
+index b3e29e21f0..a0b3c15a28 100644
 --- a/ui/Makefile.objs
 +++ b/ui/Makefile.objs
-@@ -57,3 +57,6 @@ gtk-egl.o-libs +=3D $(OPENGL_LIBS)
- shader.o-libs +=3D $(OPENGL_LIBS)
- console-gl.o-libs +=3D $(OPENGL_LIBS)
- egl-helpers.o-libs +=3D $(OPENGL_LIBS)
+@@ -1,11 +1,14 @@
+-vnc-obj-y +=3D vnc.o
+-vnc-obj-y +=3D vnc-enc-zlib.o vnc-enc-hextile.o
+-vnc-obj-y +=3D vnc-enc-tight.o vnc-palette.o
+-vnc-obj-y +=3D vnc-enc-zrle.o
+-vnc-obj-y +=3D vnc-auth-vencrypt.o
+-vnc-obj-$(CONFIG_VNC_SASL) +=3D vnc-auth-sasl.o
+-vnc-obj-y +=3D vnc-ws.o
+-vnc-obj-y +=3D vnc-jobs.o
++vnc.mo-objs +=3D vnc.o
++vnc.mo-objs +=3D vnc-enc-zlib.o vnc-enc-hextile.o
++vnc.mo-objs +=3D vnc-enc-tight.o vnc-palette.o
++vnc.mo-objs +=3D vnc-enc-zrle.o
++vnc.mo-objs +=3D vnc-auth-vencrypt.o
++vnc.mo-objs +=3D $(if $(CONFIG_VNC_SASL), vnc-auth-sasl.o)
++vnc.mo-objs +=3D vnc-ws.o
++vnc.mo-objs +=3D vnc-jobs.o
 +
-+curses.o-cflags :=3D $(CURSES_CFLAGS)
-+curses.o-libs :=3D $(CURSES_LIBS)
++vnc.mo-cflags :=3D $(VNC_CFLAGS)
++vnc.mo-libs :=3D $(VNC_LIBS)
+=20
+ common-obj-y +=3D keymaps.o console.o cursor.o qemu-pixman.o
+ common-obj-y +=3D input.o input-keymap.o input-legacy.o
+@@ -14,7 +17,7 @@ common-obj-$(CONFIG_SPICE) +=3D spice-core.o spice-inpu=
+t.o spice-display.o
+ common-obj-$(CONFIG_SDL) +=3D sdl.mo x_keymap.o
+ common-obj-$(CONFIG_COCOA) +=3D cocoa.o
+ common-obj-$(CONFIG_CURSES) +=3D curses.o
+-common-obj-$(CONFIG_VNC) +=3D $(vnc-obj-y)
++common-obj-$(CONFIG_VNC) +=3D vnc.mo
+ common-obj-$(CONFIG_GTK) +=3D gtk.o x_keymap.o
+=20
+ ifeq ($(CONFIG_SDLABI),1.2)
 --=20
 2.13.5
