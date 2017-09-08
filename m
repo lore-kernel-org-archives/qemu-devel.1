@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37627)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqJXi-0001xb-8H
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:41:59 -0400
+	(envelope-from <eblake@redhat.com>) id 1dqJZ5-0002oq-UE
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:43:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqJXf-0004uf-41
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:41:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47238)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqJXe-0004tp-Ro
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:41:55 -0400
-Date: Fri, 8 Sep 2017 14:41:45 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170908134145.GF32645@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170908103011.25821-1-berrange@redhat.com>
-	<150486803677.210.12147319216227977632@6d89bd104fc3>
+	(envelope-from <eblake@redhat.com>) id 1dqJZ2-0006ax-R6
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:43:21 -0400
+References: <20170830210542.2153-1-eblake@redhat.com>
+	<20170830210542.2153-15-eblake@redhat.com>
+	<20170908131518.GI3283@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0afaa754-a5a1-2c0a-af5d-4ba5bd152d17@redhat.com>
+Date: Fri, 8 Sep 2017 08:43:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <150486803677.210.12147319216227977632@6d89bd104fc3>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] Improve websock response / error
- handling
+In-Reply-To: <20170908131518.GI3283@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="RvSmAoT4oU9dFcKPhLOBX7XlFmwjUbB3d"
+Subject: Re: [Qemu-devel] [PATCH v6 14/18] qcow2: Switch qcow2_measure() to
+ byte-based iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +26,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: famz@redhat.com, brak@vultr.com, f4bug@amsat.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Fri, Sep 08, 2017 at 03:53:57AM -0700, no-reply@patchew.org wrote:
-> /tmp/qemu-test/src/io/channel-websock.c: In function =E2=80=98qio_chann=
-el_websock_date_str=E2=80=99:
-> /tmp/qemu-test/src/io/channel-websock.c:171: error: =E2=80=98GTimeZone=E2=
-=80=99 undeclared (first use in this function)
-> /tmp/qemu-test/src/io/channel-websock.c:171: error: (Each undeclared id=
-entifier is reported only once
-> /tmp/qemu-test/src/io/channel-websock.c:171: error: for each function i=
-t appears in.)
-> /tmp/qemu-test/src/io/channel-websock.c:171: error: =E2=80=98utc=E2=80=99=
- undeclared (first use in this function)
-> /tmp/qemu-test/src/io/channel-websock.c:171: warning: implicit declarat=
-ion of function =E2=80=98g_time_zone_new_utc=E2=80=99
-> /tmp/qemu-test/src/io/channel-websock.c:171: warning: nested extern dec=
-laration of =E2=80=98g_time_zone_new_utc=E2=80=99
-> /tmp/qemu-test/src/io/channel-websock.c:172: error: =E2=80=98GDateTime=E2=
-=80=99 undeclared (first use in this function)
-> /tmp/qemu-test/src/io/channel-websock.c:172: error: =E2=80=98now=E2=80=99=
- undeclared (first use in this function)
-> /tmp/qemu-test/src/io/channel-websock.c:172: warning: implicit declarat=
-ion of function =E2=80=98g_date_time_new_now=E2=80=99
-> /tmp/qemu-test/src/io/channel-websock.c:172: warning: nested extern dec=
-laration of =E2=80=98g_date_time_new_now=E2=80=99
-> /tmp/qemu-test/src/io/channel-websock.c:173: warning: implicit declarat=
-ion of function =E2=80=98g_date_time_format=E2=80=99
-> /tmp/qemu-test/src/io/channel-websock.c:173: warning: nested extern dec=
-laration of =E2=80=98g_date_time_format=E2=80=99
-> /tmp/qemu-test/src/io/channel-websock.c:175: warning: implicit declarat=
-ion of function =E2=80=98g_date_time_unref=E2=80=99
-> /tmp/qemu-test/src/io/channel-websock.c:175: warning: nested extern dec=
-laration of =E2=80=98g_date_time_unref=E2=80=99
-> /tmp/qemu-test/src/io/channel-websock.c:176: warning: implicit declarat=
-ion of function =E2=80=98g_time_zone_unref=E2=80=99
-> /tmp/qemu-test/src/io/channel-websock.c:176: warning: nested extern dec=
-laration of =E2=80=98g_time_zone_unref=E2=80=99
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--RvSmAoT4oU9dFcKPhLOBX7XlFmwjUbB3d
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <0afaa754-a5a1-2c0a-af5d-4ba5bd152d17@redhat.com>
+Subject: Re: [PATCH v6 14/18] qcow2: Switch qcow2_measure() to byte-based
+ iteration
+References: <20170830210542.2153-1-eblake@redhat.com>
+ <20170830210542.2153-15-eblake@redhat.com>
+ <20170908131518.GI3283@localhost.localdomain>
+In-Reply-To: <20170908131518.GI3283@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Urgh,  GTimeZone arrived in glib 2.26 and we hav 2.22 as the min :-(
+On 09/08/2017 08:15 AM, Kevin Wolf wrote:
+> Am 30.08.2017 um 23:05 hat Eric Blake geschrieben:
+>> This is new code, but it is easier to read if it makes passes over
+>> the image using bytes rather than sectors (and will get easier in
+>> the future when bdrv_get_block_status is converted to byte-based).
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>
 
-I'll have to switch to strftime....
+>> -                int nb_sectors =3D MIN(ssize / BDRV_SECTOR_SIZE - sec=
+tor_num,
+>> -                                     BDRV_REQUEST_MAX_SECTORS);
+>> +            for (offset =3D 0; offset < ssize;
+>> +                 offset +=3D pnum * BDRV_SECTOR_SIZE) {
+>> +                int nb_sectors =3D MIN(ssize - offset,
+>> +                                     INT_MAX) / BDRV_SECTOR_SIZE;
+>=20
+> Shouldn't this be BDRV_REQUEST_MAX_BYTES? (Which is close to INT_MAX,
+> but rounded down to sector alignment.)
 
-Regards,
-Daniel
+The division rounds down to sector alignment after the MIN(), for the
+same result in nb_sectors either way.  But you are correct that an
+absolutely literal translation of the pre-patch version would feed
+BDRV_REQUEST_MAX_BYTES instead of INT_MAX into the MIN().
+
 --=20
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
-ge :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.c=
-om :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
-ge :|
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--RvSmAoT4oU9dFcKPhLOBX7XlFmwjUbB3d
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmynmoACgkQp6FrSiUn
+Q2qKDAf/XpswYiEiztyvxb9oEjFgEFND+CdxyM6LC0UpPnxhFOoc9PJ/5p8SAWzr
+UgjzOP89Qq/CzdUhf8biqcXTGtS81dsqUYc6ZC5kHjcbEBROJSLXtz2Pesi+J+3D
+e3Y1i5kn3h0fcOrqJIjpTCrAQMqND9QzRLyqdyXnAfyVEJQ+QRYPgx0evEnDLDFp
+3sHXJQrpVTzO0GXigyg5KK71dOLWOSuVngtGlqQmsZnrPkl3UCMBbmmsP8lsrbKH
+ZwAXslmR5KEwuOkFSEEdtHj7yJRQVodNw/tCXpQBrWvF8onYb/jAVmrKTB8zYYbU
+wQ8x8jWHB8rHRrd/cewTQgLtvCobXA==
+=q8/k
+-----END PGP SIGNATURE-----
+
+--RvSmAoT4oU9dFcKPhLOBX7XlFmwjUbB3d--
