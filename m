@@ -1,27 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57025)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dqNan-0004Mq-7M
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 14:01:26 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dqNc3-0005e1-3P
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 14:02:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dqNai-0000qZ-Ni
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 14:01:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45122)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dqNai-0000ps-Ev
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 14:01:20 -0400
-References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
-	<20170724181544.20292-1-brandon.carpenter@cypherpath.com>
-	<20170908173801.15205-1-brandon.carpenter@cypherpath.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <c4d0a4bb-79d4-3a59-ba50-46ba696249cf@redhat.com>
-Date: Fri, 8 Sep 2017 13:01:12 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dqNby-0001wG-7Z
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 14:02:43 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33582)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dqNby-0001vc-2x
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 14:02:38 -0400
+Received: by mail-qt0-x243.google.com with SMTP id h15so1997239qta.0
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 11:02:37 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170908155359.27952-1-dgilbert@redhat.com>
+	<26a00723-027c-4445-0590-d50739dec557@amsat.org>
+	<20170908162201.GC2836@work-vm>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <7c4ca224-2577-0ef6-6e19-9760dd58c723@amsat.org>
+Date: Fri, 8 Sep 2017 15:02:34 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170908173801.15205-1-brandon.carpenter@cypherpath.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="k369ocbiKRFh1loKjOgiQNNdsnNANO2ev"
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] Update websocket code to more fully
- support the RFC
+In-Reply-To: <20170908162201.GC2836@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] slirp: Add explanation for hostfwd parsing
+ failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,60 +37,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brandon Carpenter <brandon.carpenter@cypherpath.com>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---k369ocbiKRFh1loKjOgiQNNdsnNANO2ev
-From: Eric Blake <eblake@redhat.com>
-To: Brandon Carpenter <brandon.carpenter@cypherpath.com>,
- qemu-devel@nongnu.org
-Message-ID: <c4d0a4bb-79d4-3a59-ba50-46ba696249cf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/6] Update websocket code to more fully
- support the RFC
-References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
- <20170724181544.20292-1-brandon.carpenter@cypherpath.com>
- <20170908173801.15205-1-brandon.carpenter@cypherpath.com>
-In-Reply-To: <20170908173801.15205-1-brandon.carpenter@cypherpath.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 09/08/2017 01:22 PM, Dr. David Alan Gilbert wrote:
+> * Philippe Mathieu-Daudé (f4bug@amsat.org) wrote:
+>> Hi David,
+>>
+>> On 09/08/2017 12:53 PM, Dr. David Alan Gilbert (git) wrote:
+>>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>>
+>>> e.g.
+>>> ./x86_64-softmmu/qemu-system-x86_64 -nographic -netdev 'user,id=vnet,hostfwd=:555.0.0.0:0-:22'
+>>> qemu-system-x86_64: -netdev user,id=vnet,hostfwd=:555.0.0.0:0-:22: Invalid host forwarding rule ':555.0.0.0:0-:22' (Bad host address)
+>>>
+>>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>> ---
+>>>    net/slirp.c | 13 ++++++++++++-
+>>>    1 file changed, 12 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/net/slirp.c b/net/slirp.c
+>>> index 01ed21c006..d87664d42e 100644
+>>> --- a/net/slirp.c
+>>> +++ b/net/slirp.c
+>>> @@ -496,9 +496,11 @@ static int slirp_hostfwd(SlirpState *s, const char *redir_str,
+>>>        char buf[256];
+>>>        int is_udp;
+>>>        char *end;
+>>> +    const char *fail_reason = "";
+>>
+>> Isn't it better not initialize this? So if one add a new failed syntax case
+>> the build with abort with -Werror=uninitialized
+> 
+> I never quite trust compilers to spot it or not-moan even though
+> every route to failure will have set it.
 
-On 09/08/2017 12:37 PM, Brandon Carpenter wrote:
-> We've been experiencing issues where the qemu websocket server closes
-> connections from noVNC clients for no apparent reason. Debugging shows
-> that certain web browsers are injecting ping and pong frames when the
-> connection becomes idle. Some browsers send those frames without a
-> payload, which also is causing closure. This patch series addresses
-> these issues by making the websocket server more conformant to RFC
-> 6455 - The WebSocket Protocol.
+I see, what about:
 
-meta-comment: sending v2 in-reply-to v1 makes it harder for automated
-tooling to recognize that you are sending new patches.  We prefer that
-v2 be a top-level thread.  More patch submission hints at:
-https://wiki.qemu.org/index.php/Contribute/SubmitAPatch
+const char *fail_reason = "Unknown reason";
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---k369ocbiKRFh1loKjOgiQNNdsnNANO2ev
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmy2ukACgkQp6FrSiUn
-Q2ov+gf/Qv85jhrj1GZ1f0or5xHaxAxKC5nHSh/wa0fKgYHnFES+5ZeG2YehaEuc
-qj1GLw8lTdCzF2EjnKZoNDNS4ZeVRXNbFOY/49DlHEbccm622+N1aGtGcBra7pXp
-00FGztIripJdlgs+FAEYts2ZxsoiqjxsarrEVkQgNQL9nLcQ1oICeIBeVYCK4/Pv
-iE5M/7RY/08YzY7k9pKulhLMYAQipSt02qRcXr1I/V0OK172hMXK95iGAQyz3IXz
-4DTRjxRfAd+fNxjjACLHtnbDzOUzIOUNtBUn1eicx9uahu5OrIVsKfrm1HkwAxah
-bNv9oWdLzZjWUn8cybpvzCpHtsNPdQ==
-=J/8g
------END PGP SIGNATURE-----
-
---k369ocbiKRFh1loKjOgiQNNdsnNANO2ev--
+> 
+>> Anyway:
+>> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
