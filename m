@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48920)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dqK5X-0004ya-6K
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:16:56 -0400
+	(envelope-from <mst@redhat.com>) id 1dqK7W-0006Hx-TR
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:19:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dqK5T-00026E-5i
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:16:55 -0400
-Date: Fri, 8 Sep 2017 16:16:29 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170908141629.GK3283@localhost.localdomain>
-References: <20170830210542.2153-1-eblake@redhat.com>
-	<20170830210542.2153-17-eblake@redhat.com>
-	<20170908132741.GJ3283@localhost.localdomain>
-	<3e1edd8f-dcfa-561e-a5e1-99ef89b1ec81@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1dqK7S-0004c3-KT
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:18:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33318)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dqK7S-0004bB-C6
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:18:54 -0400
+Date: Fri, 8 Sep 2017 17:18:52 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <1504880304-12069-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="mP3DRpeJDSE+ciuQ"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3e1edd8f-dcfa-561e-a5e1-99ef89b1ec81@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 16/18] qcow2: Switch store_bitmap_data()
- to byte-based iteration
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/17] pc, pci,
+ virtio: patches queued before 2.10
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +26,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>
 
+The following changes since commit 74bbfe024da80a50dbe51fbb17f219d2f3e4d2=
+dd:
 
---mP3DRpeJDSE+ciuQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  Merge remote-tracking branch 'remotes/jasowang/tags/net-pull-request' i=
+nto staging (2017-09-08 12:57:28 +0100)
 
-Am 08.09.2017 um 16:09 hat Eric Blake geschrieben:
-> On 09/08/2017 08:27 AM, Kevin Wolf wrote:
-> > Am 30.08.2017 um 23:05 hat Eric Blake geschrieben:
-> >> Now that we have adjusted the majority of the calls this function
-> >> makes to be byte-based, it is easier to read the code if it makes
-> >> passes over the image using bytes rather than sectors.
-> >>
-> >> Signed-off-by: Eric Blake <eblake@redhat.com>
-> >> Reviewed-by: John Snow <jsnow@redhat.com>
-> >> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> >>
->=20
-> >>
-> >> -    while ((sector =3D bdrv_dirty_iter_next(dbi) >> BDRV_SECTOR_BITS)=
- !=3D -1) {
-> >> -        uint64_t cluster =3D sector / sbc;
-> >> +    while ((offset =3D bdrv_dirty_iter_next(dbi)) !=3D -1) {
-> >=20
-> > Don't you have to multiply both sides of the equation? This would be
-> > offset !=3D -512, which points out that the previous patch to convert
-> > bdrv_dirty_iter_next() to byte-based gave it a really awkward interface.
->=20
-> I think what I really need to do is change '!=3D -1' to '< 0', as that's
-> much easier to reason about when scaling is present.
+are available in the git repository at:
 
-Hm, I think I would prefer a special case for -1 in bdrv_dirty_iter_next()
-so that it returns -1 after the last entry. Even if you check for < 0,
--512 is still an odd return value to signal the end.
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-Though I think after the final patch, we're back to -1 anyway, so it's
-not that important.
+for you to fetch changes up to 6f6f4aec749ba9a4fb58c7c20536a61b0381ff35:
 
-Kevin
+  fw_cfg: rename read callback (2017-09-08 16:15:17 +0300)
 
---mP3DRpeJDSE+ciuQ
-Content-Type: application/pgp-signature; name="signature.asc"
+----------------------------------------------------------------
+pc, pci, virtio: patches queued before 2.10
 
------BEGIN PGP SIGNATURE-----
+A bunch of stuff that was posted before the 2.10 timeframe,
+mostly fixes/cleanups.  New PCI bridges.
 
-iQIcBAEBAgAGBQJZsqY9AAoJEH8JsnLIjy/WbsgQAMmEM/+ATSXQ1P3rtfoLGsLX
-tE8fmh+Jjg73fwLEB4NwQJ9qh/c7NUeS41zIRwOysgBwsrHOPjb7d3o7wAfykr1t
-cLet6tSVZi2qlFsY/pYdltAd/xdIXlHbinLVgcT5oKpix/8kcqCEssJlQAHFxClj
-37m9BVVW7HSJ/YnXe5z9Htla4vazPAttUkA+W23hva36plrASWLT7/J59VQNCL/i
-Q4tbmQfVAKfKt+T3DlihlSdE+/KMivd5jtsJimGyvOqAYrl4+8c83TTkrfliCP02
-v+UOpgegK9SzJ2SWEf5H2HQyEXBJlLtTVcJYuUhtMtSbaw2weotdR4Yc8M4CR0rQ
-tpNe0S2eY0EsUyH34/7KnspFIJpHvwL7hMackvB5Vr4Lip4+pWc05WgcB9A/VuHq
-mh0dPLS7f2iVKoxO1Z+hEYinafQpXo/aivrWMloFAOMF0vCf4yrd97T7kj+kz92+
-gKS6u5x8Em6tPyF1w/KadUrhcxG89knYIN+J936c2+IXABq/naB5hA777xFMhxJG
-fzsMh0nqUPOXrXdQ9m83E5F0w7xyik0PBS8CPsxWZRqCQot1yKmIj9H3id58zYdU
-60w76gVpT/l9gSGoaidfbUTPJRkiI972+iwcuAUOVuexe7kaYXf9PllWuuFYwuVT
-1q3cmoIBk0Y7IPqFSEWp
-=U6r0
------END PGP SIGNATURE-----
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
---mP3DRpeJDSE+ciuQ--
+----------------------------------------------------------------
+Aleksandr Bezzubikov (4):
+      hw/pci: introduce pcie-pci-bridge device
+      hw/pci: introduce bridge-only vendor-specific capability to provide=
+ some hints to firmware
+      hw/pci: add QEMU-specific PCI capability to the Generic PCI Express=
+ Root Port
+      docs: update documentation considering PCIE-PCI bridge
+
+Alex Williamson (1):
+      vhost: Release memory references on cleanup
+
+Anthony PERARD (3):
+      hw/acpi: Limit hotplug to root bus on legacy mode
+      hw/acpi: Move acpi_set_pci_info to pcihp
+      Revert "ACPI: don't call acpi_pcihp_device_plug_cb on xen"
+
+Marc-Andr=C3=A9 Lureau (4):
+      libvhost-user: support resuming vq->last_avail_idx based on used_id=
+x
+      vhost-user-bridge: fix resume regression (since 2.9)
+      vmgenid: replace x-write-pointer-available hack
+      fw_cfg: rename read callback
+
+Marcel Apfelbaum (1):
+      pc: add 2.11 machine types
+
+Mark Cave-Ayland (2):
+      pci: move check for existing devfn into new pci_bus_devfn_available=
+() helper
+      pci: add reserved slot check to do_pci_register_device()
+
+Peter Xu (1):
+      intel_iommu: fix missing BQL in pt fast path
+
+Yoni Bettan (1):
+      acpi/vmgenid: change device category to misc
+
+ docs/pcie.txt                         |  49 +++++----
+ docs/pcie_pci_bridge.txt              | 114 ++++++++++++++++++++
+ contrib/libvhost-user/libvhost-user.h |   7 ++
+ include/hw/acpi/bios-linker-loader.h  |   2 +
+ include/hw/acpi/vmgenid.h             |   1 -
+ include/hw/compat.h                   |   4 -
+ include/hw/i386/pc.h                  |   3 +
+ include/hw/loader.h                   |   2 +-
+ include/hw/nvram/fw_cfg.h             |   7 +-
+ include/hw/pci/pci.h                  |   1 +
+ include/hw/pci/pci_bridge.h           |  25 +++++
+ include/hw/pci/pci_bus.h              |   1 +
+ include/hw/pci/pcie_port.h            |   1 +
+ contrib/libvhost-user/libvhost-user.c |  13 +++
+ hw/acpi/bios-linker-loader.c          |  10 ++
+ hw/acpi/pcihp.c                       |  40 ++++++-
+ hw/acpi/piix4.c                       |  11 +-
+ hw/acpi/vmgenid.c                     |  10 +-
+ hw/core/loader.c                      |   2 +-
+ hw/i386/acpi-build.c                  |  32 ------
+ hw/i386/intel_iommu.c                 |  15 +++
+ hw/i386/pc_piix.c                     |  15 ++-
+ hw/i386/pc_q35.c                      |  13 ++-
+ hw/nvram/fw_cfg.c                     |  30 +++---
+ hw/pci-bridge/gen_pcie_root_port.c    |  36 +++++++
+ hw/pci-bridge/pcie_pci_bridge.c       | 192 ++++++++++++++++++++++++++++=
+++++++
+ hw/pci/pci.c                          |  26 ++++-
+ hw/pci/pci_bridge.c                   |  46 ++++++++
+ hw/virtio/vhost.c                     |   4 +
+ stubs/pci-host-piix.c                 |   6 ++
+ tests/vhost-user-bridge.c             |   7 ++
+ hw/pci-bridge/Makefile.objs           |   2 +-
+ stubs/Makefile.objs                   |   1 +
+ 33 files changed, 622 insertions(+), 106 deletions(-)
+ create mode 100644 docs/pcie_pci_bridge.txt
+ create mode 100644 hw/pci-bridge/pcie_pci_bridge.c
+ create mode 100644 stubs/pci-host-piix.c
