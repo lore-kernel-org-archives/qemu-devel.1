@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dqMLk-00070Q-MJ
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:41:49 -0400
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dqMM0-0007Be-VL
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:42:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1dqMLj-0007WD-Bv
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:41:47 -0400
-From: gengdongjiu <gengdongjiu@huawei.com>
-Date: Fri, 8 Sep 2017 16:40:51 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F2015F5FE7@DGGEMA503-MBX.china.huawei.com>
-References: <0184EA26B2509940AA629AE1405DD7F2015F5F11@DGGEMA503-MBX.china.huawei.com>
-	<CAFEAcA8HPhHeeXEDtxnewJ7mAJ-gYzR96pC06qA+Xx95LHu2DA@mail.gmail.com>
-In-Reply-To: <CAFEAcA8HPhHeeXEDtxnewJ7mAJ-gYzR96pC06qA+Xx95LHu2DA@mail.gmail.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-Subject: [Qemu-devel] =?utf-8?b?562U5aSNOiBbUEFUQ0ggdjExIDUvNl0gdGFyZ2V0?=
- =?utf-8?q?-arm=3A_kvm64=3A_handle_SIGBUS_signal_for_synchronous_External_?=
- =?utf-8?q?Abort?=
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dqMLx-0007hu-35
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:42:05 -0400
+Received: from research.iiit.ac.in ([196.12.53.8]:60954)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dqMLw-0007f9-E2
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:42:01 -0400
+From: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Date: Fri,  8 Sep 2017 22:11:45 +0530
+Message-Id: <1504888905-22396-4-git-send-email-chugh.ishani@research.iiit.ac.in>
+In-Reply-To: <1504888905-22396-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+References: <1504888905-22396-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+Subject: [Qemu-devel] [PATCH v4 3/3] Test for full Backup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,16 +26,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo
-	Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will
-	Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, lkml -
-	Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, "devel@acpica.org" <devel@acpica.org>, John Garry <john.garry@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, huangdaode <huangdaode@hisilicon.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: stefanha@redhat.com, jsnow@redhat.com, famz@redhat.com, Ishani Chugh <chugh.ishani@research.iiit.ac.in>
 
-Wy4uLl0NCj4gPg0KPiA+IC8qDQo+ID4gICogeHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4
-eHh4eA0KPiA+ICAqLw0KPiA+IHZvaWQga3ZtX2h3cG9pc29uX3BhZ2VfYWRkKHJhbV9hZGRyX3Qg
-cmFtX2FkZHIpOw0KPiANCj4gSXQgc2hvdWxkIGJlIGluIHRoZSBkb2MtY29tbWVudCBmb3JtYXQs
-IHdoaWNoIGJlZ2lucyAiLyoqIiBhbmQgaGFzIHNvbWUgc3R5bGl6YXRpb24gb2YgaG93IHlvdSBs
-aXN0IHBhcmFtZXRlcnMgYW5kIHNvIG9uLiBMb3RzIG9mDQo+IGV4YW1wbGVzIGluIHRoZSBleGlz
-dGluZyBoZWFkZXJzLg0KDQp1bmRlcnN0YW5kLCB0aGFua3MgZm9yIHRoZSBleHBsYW5hdGlvbi4N
-Cg0KPiANCj4gdGhhbmtzDQo+IC0tIFBNTQ0K
+This patch is the test for full backup implementation in Backup tool.
+The test employs two basic substests:
+1) Backing up an empty guest and comparing it with base image.
+2) Writing a pattern to the guest, creating backup and comparing
+   with the base image.
+
+Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+---
+ tests/qemu-iotests/191     | 86 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/191.out | 35 +++++++++++++++++++
+ tests/qemu-iotests/group   |  1 +
+ 3 files changed, 122 insertions(+)
+ create mode 100755 tests/qemu-iotests/191
+ create mode 100644 tests/qemu-iotests/191.out
+
+diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
+new file mode 100755
+index 0000000..16988d8
+--- /dev/null
++++ b/tests/qemu-iotests/191
+@@ -0,0 +1,86 @@
++#!/bin/bash
++#
++# Test full backup functionality of qemu-backup tool
++#
++# Copyright (C) 2017 Ishani Chugh <chugh.ishani@research.iiit.ac.in>
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License
++# along with this program.  If not, see <http://www.gnu.org/licenses/>.
++#
++
++# creator
++owner=chugh.ishani@research.iiit.ac.in
++
++seq=`basename $0`
++echo "QA output created by $seq"
++
++here=`pwd`
++status=1	# failure is the default!
++
++
++# get standard environment, filters and checks
++. ./common.rc
++. ./common.filter
++. ./common.qemu
++
++_supported_fmt generic
++_supported_proto generic
++_supported_os Linux
++
++_cleanup()
++{
++        rm -f "$TEST_DIR"/virtio0
++        rm -f "$CONFIG_FILE"
++}
++trap "_cleanup; exit \$status" 0 1 2 3 15
++
++CONFIG_FILE="$TEST_DIR"/backup-config
++SOCKET=unix:"$TEST_DIR"/backup_socket
++size=128M
++
++_make_test_img "$size"
++export QEMU_BACKUP_CONFIG="$CONFIG_FILE"
++qemu_comm_method="monitor"
++echo
++_launch_qemu -drive if=virtio,file="$TEST_IMG" -qmp "$SOCKET",server,nowait
++$PYTHON ../../contrib/backup/qemu-backup.py guest add --guest adad --qmp "$SOCKET"
++$PYTHON ../../contrib/backup/qemu-backup.py drive add --id virtio0 --guest adad --target "$TEST_DIR"/virtio0
++echo
++echo "== Creating backup =="
++$PYTHON ../../contrib/backup/qemu-backup.py backup --guest adad
++_send_qemu_cmd $QEMU_HANDLE 'quit' ''
++wait=1 _cleanup_qemu
++echo
++echo "== Comparing images =="
++$QEMU_IMG compare "$TEST_DIR"/virtio0 "$TEST_IMG"
++_cleanup
++
++_launch_qemu -drive if=virtio,id=virtio0,file="$TEST_IMG" -qmp "$SOCKET",server,nowait
++$PYTHON ../../contrib/backup/qemu-backup.py guest add --guest adad --qmp "$SOCKET"
++$PYTHON ../../contrib/backup/qemu-backup.py drive add --id virtio0 --guest adad --target "$TEST_DIR"/virtio0
++echo
++echo "== Writing Pattern =="
++_send_qemu_cmd $QEMU_HANDLE 'qemu-io virtio0 "write -P 0x22 0 1M"' "(qemu)" | _filter_qemu_io
++echo
++echo "== Creating backup =="
++$PYTHON ../../contrib/backup/qemu-backup.py backup --guest adad
++_send_qemu_cmd $QEMU_HANDLE 'quit' ''
++wait=1 _cleanup_qemu
++echo
++echo "== Comparing images =="
++$QEMU_IMG compare "$TEST_DIR"/virtio0 "$TEST_IMG"
++_cleanup
++_cleanup_test_img
++
++echo "*** done"
++status=0
+\ No newline at end of file
+diff --git a/tests/qemu-iotests/191.out b/tests/qemu-iotests/191.out
+new file mode 100644
+index 0000000..c60d47a
+--- /dev/null
++++ b/tests/qemu-iotests/191.out
+@@ -0,0 +1,35 @@
++QA output created by 191
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
++
++Successfully Added Guest
++Successfully Added Drive
++
++== Creating backup ==
++Backup Started
++*virtio0
++Backup Complete
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) Formatting 'TEST_DIR/virtio0', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++quit
++
++== Comparing images ==
++Images are identical.
++Successfully Added Guest
++Successfully Added Drive
++
++== Writing Pattern ==
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) qemu-io virtio0 "write -P 0x22 0 1M"
++
++== Creating backup ==
++Backup Started
++*virtio0
++Backup Complete
++wrote 1048576/1048576 bytes at offset 0
++1 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++(qemu) Formatting 'TEST_DIR/virtio0', fmt=qcow2 size=134217728 cluster_size=65536 lazy_refcounts=off refcount_bits=16
++quit
++
++== Comparing images ==
++Images are identical.
++*** done
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+index 94e7648..f1f23e1 100644
+--- a/tests/qemu-iotests/group
++++ b/tests/qemu-iotests/group
+@@ -187,5 +187,6 @@
+ 188 rw auto quick
+ 189 rw auto
+ 190 rw auto quick
++191 rw auto
+ 192 rw auto quick
+ 194 rw auto migration quick
+--
+2.7.4
