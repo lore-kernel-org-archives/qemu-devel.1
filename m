@@ -1,32 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqGdx-000221-81
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:22 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGe0-00024u-Mp
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqGds-00035a-90
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50036)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqGds-00034n-07
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:08 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E986B81DFA
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 10:36:06 +0000 (UTC)
-Date: Fri, 8 Sep 2017 11:36:02 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170908103602.GJ3609@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170906124900.17354-1-famz@redhat.com>
-	<20170908100537.GI3609@redhat.com> <20170908102701.GL4511@lemon>
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGdv-00038X-Ea
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:16 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri,  8 Sep 2017 20:35:18 +1000
+Message-Id: <20170908103558.31632-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170908102701.GL4511@lemon>
-Subject: Re: [Qemu-devel] [PATCH v4] buildsys: Move crypto cflags/libs to
- per object variables
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/40] ppc-for-2.11 queue 20170908
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,100 +20,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: peter.maydell@linaro.org
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sam.bobroff@au1.ibm.com, imammedo@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Fri, Sep 08, 2017 at 06:27:01PM +0800, Fam Zheng wrote:
-> On Fri, 09/08 11:05, Daniel P. Berrange wrote:
-> > On Wed, Sep 06, 2017 at 08:49:00PM +0800, Fam Zheng wrote:
-> > > This patch groups the crypto objects into a few .mo objects based on
-> > > functional submodules, and moves inclusion conditions to *-objs
-> > > variables, then moves the global cflags/libs to the *-cflags and *-libs
-> > > variables.
-> > > 
-> > > For init.o and cipher.o, which may or may not need the library flags
-> > > depending on config, adding flags and libs unconditionally doesn't hurt,
-> > > because if the library is not available, the variables are empty.  This
-> > > makes less code.
-> > > 
-> > > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > > 
-> > > ---
-> > > 
-> > > v4: Merge into one patch which is supposedly easier to manage and
-> > > review, and use .mo appraoch to avoid $(foreach) and $(eval) magics.
-> > 
-> > I don't think using  .mo is suitable here. You've used it as a generic
-> > mechanism for grouping .o files, but that is not what it does. There
-> > are special semantics around .mo rules that affect how the final
-> > binaries are linked.
-> 
-> Using .mo is okay here, but after a hindsight I think grouping by library
-> (nettle.mo, gcrypt.mo, etc.) is better than grouping by functionality, for
-> modularization in the future. But that also means assigning the cflags/libs
-> variable cannot be simplified like this.
-> 
-> > 
-> > eg looking back at the description of .mo files 
-> > 
-> > [quote]
-> > commit c261d774fb9093d00e0938a19f502fb220f62718
-> > Author: Fam Zheng <famz@redhat.com>
-> > Date:   Mon Sep 1 18:35:10 2014 +0800
-> > 
-> > [...snip...]
-> > 
-> >     3) When linking an executable, those .mo files in its "-y" variables are
-> >        filtered out, and replaced by one or more -Wl,-u,$symbol flags. This
-> >        is done in the added macro "process-archive-undefs".
-> >     
-> >        These "-Wl,-u,$symbol" flags will force ld to pull in the function
-> >        definition from the archives when linking.
-> >     
-> >        Note that the .mo objects, that are actually meant to be linked in
-> >        the executables, are already expanded in unnest-vars, before the
-> >        linking command. So we are safe to simply filter out .mo for the
-> >        purpose of pulling undefined symbols.
-> >     
-> >        process-archive-undefs works as this: For each ".mo", find all the
-> >        undefined symbols in it, filter ones that are defined in the
-> >        archives. For each of these symbols, generate a "-Wl,-u,$symbol" in
-> >        the link command, and put them before archive names in the command
-> >        line.
-> > [/quote]
-> > 
-> > Based on this, I don't think I can ack this patch, because it can
-> > have unexpected consequences.
-> 
-> This described the process-archive-undefs semantics of .mo, but not the essence
-> of it.  Basically .mo is just partial linking with the additional services of
-> -cflags, -libs and the above -Wl,-u thing. I cannot think of any unexpected
-> consequences with this change. We've had sdl.mo in ui/Makefile.objs for long,
-> just for the same purpose of this patch, with no problem.
+The following changes since commit cda4a338c4243fa3bff4498b935340ac7121cc=
+76:
 
-While I'm in favour of moving the linker/compiler flags out of the global
-vars, I'm not convinced this impl is a step forward.
+  tcg/tci: Add TCG_TARGET_DEFAULT_MO (2017-09-07 18:57:34 +0100)
 
-We already have a mechanism for grouping object files - the 'NNNN-obj-y'
-variables we use throughout our Makefiles.
+are available in the git repository at:
 
-This patch is adding a second level of grouping purely to work around the
-fact that we can't set linker/compiler flags on the NNN-obj-y variables
-we use. I think this second level of grouping makes the makefiles more
-complex than they ought to be.
+  git://github.com/dgibson/qemu.git tags/ppc-for-2.11-20170908
 
-IOW, I'd rather see the rules fixed so that we can set variables against
-the existing grouping we have. eg
+for you to fetch changes up to 7cca3e466eb0baa36d1cc29d5aeb5da74a260711:
 
-   crypto-obj-y-cflags := ...
-   crypto-obj-y-libs := ...
+  ppc: spapr: Move VCPU ID calculation into sPAPR (2017-09-08 09:30:55 +1=
+000)
 
-so we avoid having to introduce second level groups every time we want
-to set these cflags/libs.
+----------------------------------------------------------------
+ppc patch queue 2017-09-08
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+This is the first batch of ppc related patches for qemu-2.11, and it's
+accumulated quite a few things.  Includes:
+
+  * A cleanup to handling of ppc cpu models from Igor
+  * First parts of fixes to handling of guest vs. host SMT modes from
+    Sam Bobroff
+  * Preliminary patches towards supporting the Sam460 board from
+    Balaton Zoltan
+  * Several fixes for hotplug logic
+  * Assorted other fixes and cleanups
+
+----------------------------------------------------------------
+Alexey Kardashevskiy (1):
+      spapr_iommu: Realloc guest visible TCE table when hot(un)plugging v=
+fio-pci
+
+BALATON Zoltan (6):
+      ppc4xx: Move MAL from ppc405_uc to ppc4xx_devs
+      ppc4xx: Make MAL emulation more generic
+      ppc4xx: Split off 4xx I2C emulation from ppc405_uc to its own file
+      ppc4xx_i2c: QOMify
+      ppc4xx_i2c: Move to hw/i2c
+      ppc4xx: Export ECB and PLB emulation
+
+Daniel Henrique Barboza (3):
+      hw/ppc/spapr_drc.c: change spapr_drc_needed to use drc->dev
+      hw/ppc: clear pending_events on machine reset
+      hw/ppc: CAS reset on early device hotplug
+
+Greg Kurz (9):
+      spapr_pci: use memory_region_add_subregion() with DMA windows
+      spapr_iommu: use g_strdup_printf() instead of snprintf()
+      spapr_drc: use g_strdup_printf() instead of snprintf()
+      spapr_iommu: convert TCE table object to realize()
+      spapr_pci: parent the MSI memory region to the PHB
+      spapr_drc: add unrealize method to physical DRC class
+      spapr_iommu: unregister vmstate at unrealize time
+      spapr: add pseries-2.11 machine type
+      spapr: fallback to raw mode if best compat mode cannot be set durin=
+g CAS
+
+Igor Mammedov (7):
+      ppc: use macros to make cpu type name from string literal
+      ppc: make cpu_model translation to type consistent
+      ppc: make cpu alias point only to real cpu models
+      ppc: replace inter-function cyclic dependency/recurssion with 2 sim=
+ple lookups
+      ppc: simplify cpu model lookup by PVR
+      ppc: drop caching ObjectClass from PowerPCCPUAlias
+      ppc: remove non implemented cpu models
+
+KONRAD Frederic (4):
+      booke206: fix booke206_tlbnps for mav 2.0
+      booke206: fix tlbnps for fixed size TLB
+      booke206: allow to specify an mmucfg value at the init
+      ppc64: introduce e6500
+
+Michael Roth (2):
+      spapr_drc: pass object ownership to parent/owner
+      spapr_iommu: pass object ownership to parent/owner
+
+Sam Bobroff (5):
+      e500: Use cpu_index instead of vcpu_dt_id
+      ppc: spapr: Rename cpu_dt_id to vcpu_id
+      ppc: spapr: Make VCPU ID handling private to SPAPR
+      PPC: KVM: Support machine option to set VSMT mode
+      ppc: spapr: Move VCPU ID calculation into sPAPR
+
+Thomas Huth (3):
+      hw/ppc/spapr_cpu_core: Add a proper check for spapr machine
+      hw/nvram/spapr_nvram: Device can not be created by the users
+      target/ppc: Remove old STATUS file
+
+ default-configs/ppc-softmmu.mak    |    1 +
+ default-configs/ppc64-softmmu.mak  |    1 +
+ default-configs/ppcemb-softmmu.mak |    1 +
+ hw/i2c/Makefile.objs               |    1 +
+ hw/i2c/ppc4xx_i2c.c                |  216 ++++++++
+ hw/nvram/spapr_nvram.c             |    2 +
+ hw/ppc/e500.c                      |    8 +-
+ hw/ppc/ppc.c                       |   21 -
+ hw/ppc/ppc405.h                    |    3 +
+ hw/ppc/ppc405_uc.c                 |  515 +-----------------
+ hw/ppc/ppc4xx_devs.c               |  227 ++++++++
+ hw/ppc/spapr.c                     |  166 +++++-
+ hw/ppc/spapr_cpu_core.c            |   40 +-
+ hw/ppc/spapr_drc.c                 |   37 +-
+ hw/ppc/spapr_events.c              |   11 +
+ hw/ppc/spapr_hcall.c               |   22 +-
+ hw/ppc/spapr_iommu.c               |   57 +-
+ hw/ppc/spapr_pci.c                 |    6 +-
+ hw/ppc/spapr_rtas.c                |    4 +-
+ include/hw/i2c/ppc4xx_i2c.h        |   61 +++
+ include/hw/ppc/ppc4xx.h            |    3 +
+ include/hw/ppc/spapr.h             |    5 +
+ include/hw/ppc/spapr_drc.h         |    1 +
+ scripts/device-crash-test          |    3 +
+ target/ppc/STATUS                  |  550 -------------------
+ target/ppc/cpu-models.c            | 1021 ++++++++++--------------------=
+------
+ target/ppc/cpu-models.h            |    4 +-
+ target/ppc/cpu.h                   |   51 +-
+ target/ppc/kvm.c                   |   46 +-
+ target/ppc/kvm_ppc.h               |   14 +-
+ target/ppc/mmu_helper.c            |   16 +-
+ target/ppc/translate_init.c        |  232 ++++----
+ 32 files changed, 1310 insertions(+), 2036 deletions(-)
+ create mode 100644 hw/i2c/ppc4xx_i2c.c
+ create mode 100644 include/hw/i2c/ppc4xx_i2c.h
+ delete mode 100644 target/ppc/STATUS
