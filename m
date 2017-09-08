@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54547)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54790)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dqFTj-00015J-1k
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:21:39 -0400
+	(envelope-from <famz@redhat.com>) id 1dqFUC-0001Xy-9s
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:22:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dqFTe-0004dG-JW
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:21:35 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:46241)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dqFTe-0004bE-BA
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:21:30 -0400
-Received: by mail-wm0-x231.google.com with SMTP id i189so1155125wmf.1
-	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 02:21:30 -0700 (PDT)
+	(envelope-from <famz@redhat.com>) id 1dqFU7-0005HL-RO
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:22:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58768)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqFU7-0005Ge-LC
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:21:59 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B734F4E909
+	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 09:21:58 +0000 (UTC)
+Date: Fri, 8 Sep 2017 17:21:54 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170908092154.GI4511@lemon>
+References: <20170907084230.26493-1-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1504545540-8002-1-git-send-email-peter.maydell@linaro.org>
-References: <1504545540-8002-1-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 8 Sep 2017 10:21:08 +0100
-Message-ID: <CAFEAcA8a+wri1aMeGi88K=wY2dMZFU0sTMoEzakVGq9R5wEgrA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] configure: Drop AIX host support
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170907084230.26493-1-famz@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] buildsys: Move rdma libs to per object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,27 +32,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 4 September 2017 at 18:19, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Nobody has mentioned AIX host support on the mailing list for years,
-> and we have no test systems for it so it is most likely broken.
-> We've advertised in configure for two releases now that we plan
-> to drop support for this host OS, and have had no complaints.
-> Drop the AIX host support code.
->
-> We can also drop the now-unused AIX version of sys_cache_info().
->
-> Note that the _CALL_AIX define used in the PPC tcg backend is
-> also used for Linux PPC64, and so that code should not be removed.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  configure        | 13 +------------
->  util/cacheinfo.c | 11 +----------
->  2 files changed, 2 insertions(+), 22 deletions(-)
+On Thu, 09/07 16:42, Fam Zheng wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-Applied to master, thanks.
+I will include this in a coming pull request. Thanks.
 
--- PMM
+Fam
