@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46997)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dqNNL-0008G7-1G
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:47:32 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dqNNz-0000gP-Ol
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:48:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dqNNK-0007H3-2P
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:47:31 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dqNNy-0007jT-V3
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:48:11 -0400
+Date: Fri, 8 Sep 2017 20:47:16 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170908174716.mxylb5ftm3ygk67m@postretch>
+References: <20170825132332.6734-1-el13635@mail.ntua.gr>
+	<20170825132332.6734-5-el13635@mail.ntua.gr>
+	<20170907132611.GG4461@dhcp-200-186.str.redhat.com>
+	<20170908154459.5xpyczgpvim75o62@postretch>
+	<20170908160011.GA17516@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170908163859.29820-1-richard.henderson@linaro.org>
-References: <20170908163859.29820-1-richard.henderson@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 8 Sep 2017 10:46:57 -0700
-Message-ID: <CAKmqyKMdfNLtVTnDGVytJKaaoWMkxt+G3+U6Ph5Vm8U2ZGzRaA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] target/arm: Avoid an extra temporary for
- store_exclusive
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2k4vhbnw4eccbmrb"
+Content-Disposition: inline
+In-Reply-To: <20170908160011.GA17516@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH v3 4/7] block: remove legacy I/O throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,89 +27,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, Patch Tracking <patches@linaro.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, Sep 8, 2017 at 9:38 AM, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> Instead of copying addr to a local temp, reuse the value (which we
-> have just compared as equal) already saved in cpu_exclusive_addr.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+--2k4vhbnw4eccbmrb
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Alistair
+On Fri, Sep 08, 2017 at 06:00:11PM +0200, Kevin Wolf wrote:
+>Am 08.09.2017 um 17:44 hat Manos Pitsidianakis geschrieben:
+>> On Thu, Sep 07, 2017 at 03:26:11PM +0200, Kevin Wolf wrote:
+>> > We shouldn't really need any throttling code in
+>> > blk_root_drained_begin/end any more now because the throttle node will
+>> > be drained. If this code is necessary, a bdrv_drain() on an explicit
+>> > throttle node will work differently from one on an implicit one.
+>> >
+>> > Unfortunately, this seems to be true about the throttle node. Implicit
+>> > throttle nodes will keep ignoring the throttle limit in order to
+>> > complete the drain request quickly, where as explicit throttle nodes
+>> > will process their requests at the configured speed before the drain
+>> > request can be completed.
+>> >
+>> > This doesn't feel right to me, both should behave the same.
+>> >
+>> > Kevin
+>> >
+>>
+>> I suppose we can implement bdrv_co_drain and increase io_limits_disabled
+>> from inside the driver. And then remove the implicit filter logic from
+>> blk_root_drained_begin. But there's no _end callback equivalent so we ca=
+n't
+>> decrease io_limits_disabled at the end of the drain. So I think there are
+>> two options:
+>>
+>> - make a bdrv_co_drain_end cb and recurse in blk_root_drain_end for all
+>> children to call it. Old behavior of I/O bursts (?) during a drain is  k=
+ept.
+>
+>This is the solution I was thinking of. It was always odd to have a
+>drained_begin/end pair in the external interface and in BdrvChildRole,
+>but not in BlockDriver. So it was to be expected that we'd need this
+>sooner or later.
+>
+>> - remove io_limits_disabled and let throttled requests obey limits  duri=
+ng a
+>> drain
+>
+>This was discussed earlier (at least when the disable code was
+>introduced in BlockBackend, but I think actually more than once), and
+>even though everyone agreed that ignoring the limits is ugly, we
+>seem to have come to the conclusion that it's the least bad option.
+>blk_drain() blocks and makes everything else hang, so we don't want it
+>to wait for several seconds.
+>
+>Kevin
 
-> ---
->  target/arm/translate-a64.c | 26 +++++++++-----------------
->  1 file changed, 9 insertions(+), 17 deletions(-)
->
-> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-> index 9017e30510..114e21cc58 100644
-> --- a/target/arm/translate-a64.c
-> +++ b/target/arm/translate-a64.c
-> @@ -1894,7 +1894,7 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
->  }
->
->  static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
-> -                                TCGv_i64 inaddr, int size, int is_pair)
-> +                                TCGv_i64 addr, int size, int is_pair)
->  {
->      /* if (env->exclusive_addr == addr && env->exclusive_val == [addr]
->       *     && (!is_pair || env->exclusive_high == [addr + datasize])) {
-> @@ -1910,13 +1910,8 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
->       */
->      TCGLabel *fail_label = gen_new_label();
->      TCGLabel *done_label = gen_new_label();
-> -    TCGv_i64 addr = tcg_temp_local_new_i64();
->      TCGv_i64 tmp;
->
-> -    /* Copy input into a local temp so it is not trashed when the
-> -     * basic block ends at the branch insn.
-> -     */
-> -    tcg_gen_mov_i64(addr, inaddr);
->      tcg_gen_brcond_i64(TCG_COND_NE, addr, cpu_exclusive_addr, fail_label);
->
->      tmp = tcg_temp_new_i64();
-> @@ -1927,27 +1922,24 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
->              } else {
->                  tcg_gen_concat32_i64(tmp, cpu_reg(s, rt2), cpu_reg(s, rt));
->              }
-> -            tcg_gen_atomic_cmpxchg_i64(tmp, addr, cpu_exclusive_val, tmp,
-> +            tcg_gen_atomic_cmpxchg_i64(tmp, cpu_exclusive_addr,
-> +                                       cpu_exclusive_val, tmp,
->                                         get_mem_index(s),
->                                         MO_64 | MO_ALIGN | s->be_data);
->              tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
->          } else if (s->be_data == MO_LE) {
-> -            gen_helper_paired_cmpxchg64_le(tmp, cpu_env, addr, cpu_reg(s, rt),
-> -                                           cpu_reg(s, rt2));
-> +            gen_helper_paired_cmpxchg64_le(tmp, cpu_env, cpu_exclusive_addr,
-> +                                           cpu_reg(s, rt), cpu_reg(s, rt2));
->          } else {
-> -            gen_helper_paired_cmpxchg64_be(tmp, cpu_env, addr, cpu_reg(s, rt),
-> -                                           cpu_reg(s, rt2));
-> +            gen_helper_paired_cmpxchg64_be(tmp, cpu_env, cpu_exclusive_addr,
-> +                                           cpu_reg(s, rt), cpu_reg(s, rt2));
->          }
->      } else {
-> -        TCGv_i64 val = cpu_reg(s, rt);
-> -        tcg_gen_atomic_cmpxchg_i64(tmp, addr, cpu_exclusive_val, val,
-> -                                   get_mem_index(s),
-> +        tcg_gen_atomic_cmpxchg_i64(tmp, cpu_exclusive_addr, cpu_exclusive_val,
-> +                                   cpu_reg(s, rt), get_mem_index(s),
->                                     size | MO_ALIGN | s->be_data);
->          tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
->      }
-> -
-> -    tcg_temp_free_i64(addr);
-> -
->      tcg_gen_mov_i64(cpu_reg(s, rd), tmp);
->      tcg_temp_free_i64(tmp);
->      tcg_gen_br(done_label);
-> --
-> 2.13.5
->
->
+That makes sense. I will look into this and resubmit the series with=20
+this additional change.
+
+--2k4vhbnw4eccbmrb
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmy16QACgkQc2J8L2kN
+9xDWmQ/+PWxUu2c+l0BcJ5pOpAVdcRC2JcNK1j68hK3eZhZw8kM1QUSJ2Rcovjhw
+hzw3FT7KFZVdU5zc3SNxWdisYZOBQApen4iPtuw3WN3adm8zPpgh/6/tZ1QByuia
+jeKob9NFyaxJczaxgwIt8YdGvZdUB9kR1LnoAYDCht7bAQNdMJw341XF4jvYkduk
+BhqngkDOmDCIgtaBGoNMkJ6m9a4yDVfvpAvAUbDQHFn0xAwROZk/0uqPL/kzEPdi
+mL3R+D/4sz4BIl1FHLCTSOA0/XQB4D6unwytgevU7E+alt7sbCtYmbAr+PNEBEW+
+ueo492xQI22I0Y0p5TkgJ3M2sOy3FjS8upkNG0tRFsA16TMwei7vu3jZErwAwOUG
+LQ0tcUOtp0NSsx5fL8MksRQZu8dfX+SZUfKYxSsO7sNaN+8b5QN82iDvwJ+r+0G2
+j3n4nPf4A/IobdXAueJQ2ijdEbPmgJyH+dQwSgpPq2bVDONvrNV7P9QslGD3gcXZ
+bu2ACGWIg4iduQnki/TFOrTmFEhovX/Vmo5gCUFZnKGgZfE3UyEpomoFmT6NDQeY
+A87gfrL9LfzAn5UkeL2jSH3Aywkr+j6rgPaoEWROToraU20hD1xVMkXaHQMfxUMv
+mvNIgTvimxHfgNcsCSSfLF0BrG+9y0yg22VjQ6EwPquthH5fJPU=
+=r9t+
+-----END PGP SIGNATURE-----
+
+--2k4vhbnw4eccbmrb--
