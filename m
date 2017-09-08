@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53623)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqESx-00040E-QU
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 04:16:48 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dqElg-0007hp-97
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 04:36:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqESt-0003IE-4V
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 04:16:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34322)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqESs-0003HA-Up
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 04:16:39 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E9728883B4
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 08:16:37 +0000 (UTC)
-Date: Fri, 8 Sep 2017 16:16:33 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170908081633.GH4511@lemon>
-References: <20170907085316.8861-1-famz@redhat.com>
-	<20170908081057.GB16888@vader>
+	(envelope-from <eric.auger@redhat.com>) id 1dqElb-0004Wp-DZ
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 04:36:04 -0400
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<CAFEAcA-79barRXh-H1g16UgiswsQqtHnYKLv4_Vhp89nNxM2NQ@mail.gmail.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <05efe60e-e4d0-24e1-548b-b587bf5153ff@redhat.com>
+Date: Fri, 8 Sep 2017 10:35:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170908081057.GB16888@vader>
-Subject: Re: [Qemu-devel] [PATCH] buildsys: Move seccomp cflags/libs to per
- object
+In-Reply-To: <CAFEAcA-79barRXh-H1g16UgiswsQqtHnYKLv4_Vhp89nNxM2NQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 00/20] ARM SMMUv3 Emulation Support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,19 +23,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Otubo <otubo@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: eric.auger.pro@gmail.com, qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Prem Mallappa <prem.mallappa@gmail.com>, Alex Williamson <alex.williamson@redhat.com>, Andrew Jones <drjones@redhat.com>, Christoffer Dall <christoffer.dall@linaro.org>, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, Radha Mohan <mohun106@gmail.com>, Trey Cain <tcain@qti.qualcomm.com>, Bharat Bhushan <bharat.bhushan@nxp.com>, Tomasz Nowicki <tn@semihalf.com>, "Michael S. Tsirkin" <mst@redhat.com>, Will Deacon <will.deacon@arm.com>, jean-philippe.brucker@arm.com, robin.murphy@arm.com, Peter Xu <peterx@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, wtownsen@redhat.com
 
-On Fri, 09/08 10:10, Eduardo Otubo wrote:
-> On Thu, Sep 07, 2017 at 04:53:16PM +0800, Fam Zheng wrote:
-> > Like many other libraries, libseccomp cflags and libs should only apply
-> > to the building of necessary objects. Do so in the usual way with the
-> > help of per object variables.
-> > 
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
+Hi Peter,
+
+On 07/09/2017 14:39, Peter Maydell wrote:
+> On 1 September 2017 at 18:21, Eric Auger <eric.auger@redhat.com> wrote:
+>> This series implements the emulation code for ARM SMMUv3.
+>>
+>> Changes since v6:
+>> - DPDK testpmd now running on guest with 2 assigned VFs
+>> - Changed the instantiation method: add the following option to
+>>   the QEMU command line
+>>   -device smmuv3 # for virtio/vhost use cases
+>>   -device smmuv3,caching-mode # for vfio use cases (based on [1])
+>> - splitted the series into smaller patches to allow the review
+>> - the VFIO integration based on "tlbi-on-map" smmuv3 driver
+>>   is isolated from the rest: last 2 patches, not for upstream.
+>>   This is shipped for testing/bench until a better solution is found.
+>> - Reworked permission flag checks and event generation
 > 
-> I'll include in the next pull request. Thanks for the patch.
+> Hi Eric -- I see you've upgraded this from an RFC to a PATCH set.
+> Do you want the patches reviewed and (eventually) taken into git
+> now?
 
-Great, thanks!
+Yes I split the series to make it more reviewable and from a functional
+point of view I have run all major use cases. So now I would encourage
+people to start reviewing the series (focusing on patches 1-18).
 
-Fam
+Thanks
+
+Eric
+> 
+> thanks
+> -- PMM
+> 
