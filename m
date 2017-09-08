@@ -1,33 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50394)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50774)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqHOC-0003n0-Fb
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:24:05 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dqHPB-0005CI-O4
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:25:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqHO7-00081D-Hk
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:24:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48900)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqHO7-00080V-8Z
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:23:55 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3157F81DE7
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 11:23:54 +0000 (UTC)
-Date: Fri, 8 Sep 2017 19:23:52 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170908112352.GN4511@lemon>
-References: <20170906124900.17354-1-famz@redhat.com>
-	<20170908100537.GI3609@redhat.com> <20170908102701.GL4511@lemon>
-	<20170908103602.GJ3609@redhat.com> <20170908105853.GM4511@lemon>
-	<20170908110033.GK3609@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1dqHP7-00006c-2r
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:25:01 -0400
+Date: Fri, 8 Sep 2017 13:24:39 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170908132439.3ab53d7d.cohuck@redhat.com>
+In-Reply-To: <20170908110425.GC3283@localhost.localdomain>
+References: <20170905151614.31303-1-cohuck@redhat.com>
+	<20170905151614.31303-3-cohuck@redhat.com>
+	<20170908110425.GC3283@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170908110033.GK3609@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v4] buildsys: Move crypto cflags/libs to
- per object variables
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/3] iotests: use -ccw on s390x for 051
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,128 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, haoqf@linux.vnet.ibm.com
 
-On Fri, 09/08 12:00, Daniel P. Berrange wrote:
-> On Fri, Sep 08, 2017 at 06:58:53PM +0800, Fam Zheng wrote:
-> > On Fri, 09/08 11:36, Daniel P. Berrange wrote:
-> > > On Fri, Sep 08, 2017 at 06:27:01PM +0800, Fam Zheng wrote:
-> > > > On Fri, 09/08 11:05, Daniel P. Berrange wrote:
-> > > > > On Wed, Sep 06, 2017 at 08:49:00PM +0800, Fam Zheng wrote:
-> > > > > > This patch groups the crypto objects into a few .mo objects based on
-> > > > > > functional submodules, and moves inclusion conditions to *-objs
-> > > > > > variables, then moves the global cflags/libs to the *-cflags and *-libs
-> > > > > > variables.
-> > > > > > 
-> > > > > > For init.o and cipher.o, which may or may not need the library flags
-> > > > > > depending on config, adding flags and libs unconditionally doesn't hurt,
-> > > > > > because if the library is not available, the variables are empty.  This
-> > > > > > makes less code.
-> > > > > > 
-> > > > > > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > > > > > 
-> > > > > > ---
-> > > > > > 
-> > > > > > v4: Merge into one patch which is supposedly easier to manage and
-> > > > > > review, and use .mo appraoch to avoid $(foreach) and $(eval) magics.
-> > > > > 
-> > > > > I don't think using  .mo is suitable here. You've used it as a generic
-> > > > > mechanism for grouping .o files, but that is not what it does. There
-> > > > > are special semantics around .mo rules that affect how the final
-> > > > > binaries are linked.
-> > > > 
-> > > > Using .mo is okay here, but after a hindsight I think grouping by library
-> > > > (nettle.mo, gcrypt.mo, etc.) is better than grouping by functionality, for
-> > > > modularization in the future. But that also means assigning the cflags/libs
-> > > > variable cannot be simplified like this.
-> > > > 
-> > > > > 
-> > > > > eg looking back at the description of .mo files 
-> > > > > 
-> > > > > [quote]
-> > > > > commit c261d774fb9093d00e0938a19f502fb220f62718
-> > > > > Author: Fam Zheng <famz@redhat.com>
-> > > > > Date:   Mon Sep 1 18:35:10 2014 +0800
-> > > > > 
-> > > > > [...snip...]
-> > > > > 
-> > > > >     3) When linking an executable, those .mo files in its "-y" variables are
-> > > > >        filtered out, and replaced by one or more -Wl,-u,$symbol flags. This
-> > > > >        is done in the added macro "process-archive-undefs".
-> > > > >     
-> > > > >        These "-Wl,-u,$symbol" flags will force ld to pull in the function
-> > > > >        definition from the archives when linking.
-> > > > >     
-> > > > >        Note that the .mo objects, that are actually meant to be linked in
-> > > > >        the executables, are already expanded in unnest-vars, before the
-> > > > >        linking command. So we are safe to simply filter out .mo for the
-> > > > >        purpose of pulling undefined symbols.
-> > > > >     
-> > > > >        process-archive-undefs works as this: For each ".mo", find all the
-> > > > >        undefined symbols in it, filter ones that are defined in the
-> > > > >        archives. For each of these symbols, generate a "-Wl,-u,$symbol" in
-> > > > >        the link command, and put them before archive names in the command
-> > > > >        line.
-> > > > > [/quote]
-> > > > > 
-> > > > > Based on this, I don't think I can ack this patch, because it can
-> > > > > have unexpected consequences.
-> > > > 
-> > > > This described the process-archive-undefs semantics of .mo, but not the essence
-> > > > of it.  Basically .mo is just partial linking with the additional services of
-> > > > -cflags, -libs and the above -Wl,-u thing. I cannot think of any unexpected
-> > > > consequences with this change. We've had sdl.mo in ui/Makefile.objs for long,
-> > > > just for the same purpose of this patch, with no problem.
-> > > 
-> > > While I'm in favour of moving the linker/compiler flags out of the global
-> > > vars, I'm not convinced this impl is a step forward.
-> > > 
-> > > We already have a mechanism for grouping object files - the 'NNNN-obj-y'
-> > > variables we use throughout our Makefiles.
-> > > 
-> > > This patch is adding a second level of grouping purely to work around the
-> > > fact that we can't set linker/compiler flags on the NNN-obj-y variables
-> > > we use. I think this second level of grouping makes the makefiles more
-> > > complex than they ought to be.
+On Fri, 8 Sep 2017 13:04:25 +0200
+Kevin Wolf <kwolf@redhat.com> wrote:
+
+> Am 05.09.2017 um 17:16 hat Cornelia Huck geschrieben:
+> > The default cpu model on s390x does not provide zPCI, which is
+> > not yet wired up on tcg. Moreover, virtio-ccw is the standard
+> > on s390x, so use the -ccw instead of the -pci versions of virtio
+> > devices on s390x.
 > > 
-> > Not quite, it is actually a required step to modularization, which I'm inclined
-> > to get my hands on next. That is also why .mo was introduced.
+> > Provide an output file for s390x.
 > > 
-> > > 
-> > > IOW, I'd rather see the rules fixed so that we can set variables against
-> > > the existing grouping we have. eg
-> > > 
-> > >    crypto-obj-y-cflags := ...
-> > >    crypto-obj-y-libs := ...
-> > > 
-> > > so we avoid having to introduce second level groups every time we want
-> > > to set these cflags/libs.
-> > 
-> > This is certainly true, but taking the modularization work into account, .mo
-> > based -cflags and -libs are more natural and consistent. IMO we already have the
-> > latter, so other mechanisms are not really necessary. Remember how complex the
-> > general unnest-vars code is?  I believe adding support to crypto-obj-y-cflags is
-> > more complex than (ab)using .mo objects, even if just for flags/libs
-> > localization.
-> > 
-> > If you don't like introducing {nettle,gcrypt,gnutls}.mo for now, we can probably
-> > defer it to the time when crypto subsystem is modularized.
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >  tests/qemu-iotests/051                     |   9 +-
+> >  tests/qemu-iotests/051.s390-ccw-virtio.out | 434 +++++++++++++++++++++++++++++
+> >  2 files changed, 442 insertions(+), 1 deletion(-)
+> >  create mode 100644 tests/qemu-iotests/051.s390-ccw-virtio.out  
 > 
-> I don't anticipate the crypot subsystem ever being modularized - it is
-> really core functionality used across all other subsystems (block layer,
-> chardev, ui, migration, and more)
+> It's already a pain to have two separate output files for 051, let's try
+> to avoid adding a third one. Even more so since I think that the split
+> between 051.out and 051.pc.out was already made for s390, so I'm not
+> sure if anyone would actually still make use of the plain 051.out
+> output if s390 got it's own one.
 
-I get your point that crypto is a fundamental thing, "optionally secure" is not
-what I meant.  But moduarization still has the advantage of offering more
-flexibility to end users, potentially. Crypto backends could be shipped as
-qemu-crypto-{nettle,gcrypt,gnutls} packages, and depending on which are
-installed and which are not, the core crypto code in QEMU can pick the suitable
-implementation at runtime, based on a hardcoded priority or even an option.
+Are there no non-pc and non-s390 machines for which this is run?
 
-To be "secure by default", qemu-crypto-nettle could be a hard requirement of
-qemu core package.
+> 
+> > diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
+> > index c8cfc764bc..f6ad0f4f0b 100755
+> > --- a/tests/qemu-iotests/051
+> > +++ b/tests/qemu-iotests/051
+> > @@ -103,7 +103,14 @@ echo
+> >  echo === Device without drive ===
+> >  echo
+> >  
+> > -run_qemu -device virtio-scsi-pci -device scsi-hd
+> > +case "$QEMU_DEFAULT_MACHINE" in
+> > +  s390-ccw-virtio)
+> > +      run_qemu -device virtio-scsi-ccw -device scsi-hd
+> > +      ;;
+> > +  *)
+> > +      run_qemu -device virtio-scsi-pci -device scsi-hd
+> > +      ;;
+> > +esac  
+> 
+> The only real difference between 051.out and 051.s390-ccw-virtio.out is
+> in this one command line. So if we don't want to just skip this part of
+> the test for non-pc like we already skip ther parts, 
 
-Is it worth the effort?
+I don't think there's a reason to skip this: The only difference is
+that we (currently) don't have a by-default usable virtio-pci
+implementation on s390 - but any virtio transport should do.
 
-Fam
+Another approach would be to drop the -pci postfix, but I don't want to
+introduce more usage of aliases.
+
+> we generally solve
+> this kind of thing by just filtering out strings that differ between
+> setups.
+> 
+> For example:
+> 
+>     case "$QEMU_DEFAULT_MACHINE" in
+>       s390-ccw-virtio)
+>           virtio_scsi=virtio-scsi-ccw
+>           ;;
+>       *)
+>           virtio_scsi=virtio-scsi-pci
+>           ;;
+>     esac
+> 
+>     run_qemu -device $virtio_scsi -device scsi-hd |
+>         sed -e "s/$virtio_scsi/VIRTIO-SCSI/"
+
+Yes, I can try this.
