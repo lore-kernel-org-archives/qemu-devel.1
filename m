@@ -1,41 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42461)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <j.pelczar@samsung.com>) id 1dqH3J-0000L6-0P
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:02:29 -0400
+	(envelope-from <berrange@redhat.com>) id 1dqJnw-00024p-LB
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:58:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <j.pelczar@samsung.com>) id 1dqH3E-0007CO-29
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:02:25 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:48522)
+	(envelope-from <berrange@redhat.com>) id 1dqJnv-0005g9-FF
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:58:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47792)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <j.pelczar@samsung.com>)
-	id 1dqH3D-0007AV-Qz
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:02:19 -0400
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id
-	20170908110213euoutp020e21e67643daf0809622c276e073806a~iXfVaFarQ1379013790euoutp02S
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 11:02:13 +0000 (GMT)
-Received: from eusmges5.samsung.com (unknown [203.254.199.245]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20170908110213eucas1p15f11ee99d4d032b88294fa57198eb348~iXfUwHfTJ3259532595eucas1p1Q
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 11:02:13 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20170908110212eucas1p27c5eecf44c5501d23b322d3679a4f12d~iXfUDRbUM2183721837eucas1p2F
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 11:02:12 +0000 (GMT)
-Received: from AMDN1843 ([106.120.52.68]) by eusync4.samsung.com (Oracle
-	Communications Messaging Server 7.0.5.31.0 64bit (built May 5 2014))
-	with ESMTPA id <0OVY00J6NJZOUG50@eusync4.samsung.com> for
-	qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:02:12 +0100 (BST)
-From: Jaroslaw Pelczar <j.pelczar@samsung.com>
-Date: Fri, 08 Sep 2017 13:02:11 +0200
-Message-id: <001801d32891$ec40b930$c4c22b90$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset="us-ascii"
-Content-transfer-encoding: 7bit
-Content-language: pl
-References: <CGME20170908110212eucas1p27c5eecf44c5501d23b322d3679a4f12d@eucas1p2.samsung.com>
-Subject: [Qemu-devel] [PATCH 1/1] AArch64: Fix single stepping of ERET
- instruction
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqJnv-0005em-6j
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:58:43 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Fri,  8 Sep 2017 14:58:30 +0100
+Message-Id: <20170908135831.10556-3-berrange@redhat.com>
+In-Reply-To: <20170908135831.10556-1-berrange@redhat.com>
+References: <20170908135831.10556-1-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 2/3] io: include full error message in
+ websocket handshake trace
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -45,29 +28,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Brian Rak <brak@vultr.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Previously when single stepping through ERET instruction via GDB
-would result in debugger entering the "next" PC after ERET instruction.
-When debugging in kernel mode, this will also cause unintended behavior,
-because debugger will try to access memory from EL0 point of view.
+When the websocket handshake fails it is useful to log the real
+error message via the trace points for debugging purposes.
 
-Signed-off-by: Jaroslaw Pelczar <j.pelczar@samsung.com>
+Fixes bug: #1715186
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- target/arm/translate-a64.c | 1 +
- 1 file changed, 1 insertion(+)
+ io/channel-websock.c | 7 ++++---
+ io/trace-events      | 2 +-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 9017e30510..1bc12d93ca 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -11348,6 +11348,7 @@ static void aarch64_tr_tb_stop(DisasContextBase
-*dcbase, CPUState *cpu)
-         default:
-             gen_a64_set_pc_im(dc->pc);
-             /* fall through */
-+        case DISAS_EXIT:
-         case DISAS_JUMP:
-             if (dc->base.singlestep_enabled) {
-                 gen_exception_internal(EXCP_DEBUG);
--- 
-2.14.1
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index cc93a23f8b..5d2df95596 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -508,7 +508,7 @@ static gboolean qio_channel_websock_handshake_send(QI=
+OChannel *ioc,
+                             &err);
+=20
+     if (ret < 0) {
+-        trace_qio_channel_websock_handshake_fail(ioc);
++        trace_qio_channel_websock_handshake_fail(ioc, error_get_pretty(e=
+rr));
+         qio_task_set_error(task, err);
+         qio_task_complete(task);
+         return FALSE;
+@@ -517,7 +517,8 @@ static gboolean qio_channel_websock_handshake_send(QI=
+OChannel *ioc,
+     buffer_advance(&wioc->encoutput, ret);
+     if (wioc->encoutput.offset =3D=3D 0) {
+         if (wioc->io_err) {
+-            trace_qio_channel_websock_handshake_fail(ioc);
++            trace_qio_channel_websock_handshake_fail(
++                ioc, error_get_pretty(wioc->io_err));
+             qio_task_set_error(task, wioc->io_err);
+             wioc->io_err =3D NULL;
+             qio_task_complete(task);
+@@ -548,7 +549,7 @@ static gboolean qio_channel_websock_handshake_io(QIOC=
+hannel *ioc,
+          * client connection, as most of the time we have an
+          * HTTP 4xx err response to send instead
+          */
+-        trace_qio_channel_websock_handshake_fail(ioc);
++        trace_qio_channel_websock_handshake_fail(ioc, error_get_pretty(e=
+rr));
+         qio_task_set_error(task, err);
+         qio_task_complete(task);
+         return FALSE;
+diff --git a/io/trace-events b/io/trace-events
+index 3d233698d0..6459f71f5b 100644
+--- a/io/trace-events
++++ b/io/trace-events
+@@ -46,7 +46,7 @@ qio_channel_websock_new_server(void *ioc, void *master)=
+ "Websock new client ioc=3D
+ qio_channel_websock_handshake_start(void *ioc) "Websock handshake start =
+ioc=3D%p"
+ qio_channel_websock_handshake_pending(void *ioc, int status) "Websock ha=
+ndshake pending ioc=3D%p status=3D%d"
+ qio_channel_websock_handshake_reply(void *ioc) "Websock handshake reply =
+ioc=3D%p"
+-qio_channel_websock_handshake_fail(void *ioc) "Websock handshake fail io=
+c=3D%p"
++qio_channel_websock_handshake_fail(void *ioc, const char *msg) "Websock =
+handshake fail ioc=3D%p err=3D%s"
+ qio_channel_websock_handshake_complete(void *ioc) "Websock handshake com=
+plete ioc=3D%p"
+=20
+ # io/channel-command.c
+--=20
+2.13.5
