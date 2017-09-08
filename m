@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32945)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32995)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dq8gq-0003l7-6U
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 22:06:44 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dq8gu-0003nG-As
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 22:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dq8gl-0002dS-DH
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 22:06:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56108)
+	(envelope-from <jasowang@redhat.com>) id 1dq8gp-0002gW-8k
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 22:06:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37230)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dq8gl-0002cs-4x
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 22:06:35 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dq8gp-0002fm-07
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 22:06:39 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri,  8 Sep 2017 10:05:21 +0800
-Message-Id: <1504836324-4871-16-git-send-email-jasowang@redhat.com>
+Date: Fri,  8 Sep 2017 10:05:22 +0800
+Message-Id: <1504836324-4871-17-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1504836324-4871-1-git-send-email-jasowang@redhat.com>
 References: <1504836324-4871-1-git-send-email-jasowang@redhat.com>
-Subject: [Qemu-devel] [PULL 15/18] net/colo-compare.c: Fix comments and
- scheme
+Subject: [Qemu-devel] [PULL 16/18] qemu-iothread: IOThread supports the
+ GMainContext event loop
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,102 +25,120 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>, Jason Wang <jasowang@redhat.com>
+Cc: Wang Yong <wang.yong155@zte.com.cn>, Wang Guang <wang.guang55@zte.com.cn>, Jason Wang <jasowang@redhat.com>
 
-From: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+From: Wang Yong <wang.yong155@zte.com.cn>
 
-Signed-off-by: Zhang Chen <zhangchen.fnst@cn.fujitsu.com>
+IOThread uses AioContext event loop and does not run a GMainContext.
+Therefore,chardev cannot work in IOThread,such as the chardev is
+used for colo-compare packets reception.
+
+This patch makes the IOThread run the GMainContext event loop,
+chardev and IOThread can work together.
+
+Reviewed-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Wang Yong <wang.yong155@zte.com.cn>
+Signed-off-by: Wang Guang <wang.guang55@zte.com.cn>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/colo-compare.c | 59 ++++++++++++++++++++++++++++--------------------------
- 1 file changed, 31 insertions(+), 28 deletions(-)
+ include/sysemu/iothread.h |  4 ++++
+ iothread.c                | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 49 insertions(+)
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index f480315..eee33b8 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -41,27 +41,27 @@
- #define REGULAR_PACKET_CHECK_MS 3000
+diff --git a/include/sysemu/iothread.h b/include/sysemu/iothread.h
+index e6da1a4..d2985b3 100644
+--- a/include/sysemu/iothread.h
++++ b/include/sysemu/iothread.h
+@@ -24,6 +24,9 @@ typedef struct {
  
- /*
--  + CompareState ++
--  |               |
--  +---------------+   +---------------+         +---------------+
--  |conn list      +--->conn           +--------->conn           |
--  +---------------+   +---------------+         +---------------+
--  |               |     |           |             |          |
--  +---------------+ +---v----+  +---v----+    +---v----+ +---v----+
--                    |primary |  |secondary    |primary | |secondary
--                    |packet  |  |packet  +    |packet  | |packet  +
--                    +--------+  +--------+    +--------+ +--------+
--                        |           |             |          |
--                    +---v----+  +---v----+    +---v----+ +---v----+
--                    |primary |  |secondary    |primary | |secondary
--                    |packet  |  |packet  +    |packet  | |packet  +
--                    +--------+  +--------+    +--------+ +--------+
--                        |           |             |          |
--                    +---v----+  +---v----+    +---v----+ +---v----+
--                    |primary |  |secondary    |primary | |secondary
--                    |packet  |  |packet  +    |packet  | |packet  +
--                    +--------+  +--------+    +--------+ +--------+
--*/
-+ *  + CompareState ++
-+ *  |               |
-+ *  +---------------+   +---------------+         +---------------+
-+ *  |   conn list   + - >      conn     + ------- >      conn     + -- > ......
-+ *  +---------------+   +---------------+         +---------------+
-+ *  |               |     |           |             |          |
-+ *  +---------------+ +---v----+  +---v----+    +---v----+ +---v----+
-+ *                    |primary |  |secondary    |primary | |secondary
-+ *                    |packet  |  |packet  +    |packet  | |packet  +
-+ *                    +--------+  +--------+    +--------+ +--------+
-+ *                        |           |             |          |
-+ *                    +---v----+  +---v----+    +---v----+ +---v----+
-+ *                    |primary |  |secondary    |primary | |secondary
-+ *                    |packet  |  |packet  +    |packet  | |packet  +
-+ *                    +--------+  +--------+    +--------+ +--------+
-+ *                        |           |             |          |
-+ *                    +---v----+  +---v----+    +---v----+ +---v----+
-+ *                    |primary |  |secondary    |primary | |secondary
-+ *                    |packet  |  |packet  +    |packet  | |packet  +
-+ *                    +--------+  +--------+    +--------+ +--------+
-+ */
- typedef struct CompareState {
-     Object parent;
- 
-@@ -75,14 +75,14 @@ typedef struct CompareState {
-     SocketReadState sec_rs;
-     bool vnet_hdr;
- 
--    /* connection list: the connections belonged to this NIC could be found
--     * in this list.
--     * element type: Connection
-+    /*
-+     * Record the connection that through the NIC
-+     * Element type: Connection
-      */
-     GQueue conn_list;
--    /* hashtable to save connection */
-+    /* Record the connection without repetition */
-     GHashTable *connection_track_table;
--    /* compare thread, a thread for each NIC */
-+    /* This thread just do packet compare job */
      QemuThread thread;
+     AioContext *ctx;
++    GMainContext *worker_context;
++    GMainLoop *main_loop;
++    GOnce once;
+     QemuMutex init_done_lock;
+     QemuCond init_done_cond;    /* is thread initialization done? */
+     bool stopping;
+@@ -41,5 +44,6 @@ typedef struct {
+ char *iothread_get_id(IOThread *iothread);
+ AioContext *iothread_get_aio_context(IOThread *iothread);
+ void iothread_stop_all(void);
++GMainContext *iothread_get_g_main_context(IOThread *iothread);
  
-     GMainContext *worker_context;
-@@ -445,8 +445,11 @@ static int colo_old_packet_check_one_conn(Connection *conn,
-                                  (GCompareFunc)colo_old_packet_check_one);
+ #endif /* IOTHREAD_H */
+diff --git a/iothread.c b/iothread.c
+index beeb870..44c8944 100644
+--- a/iothread.c
++++ b/iothread.c
+@@ -57,6 +57,23 @@ static void *iothread_run(void *opaque)
  
-     if (result) {
--        /* do checkpoint will flush old packet */
--        /* TODO: colo_notify_checkpoint();*/
-+        /* Do checkpoint will flush old packet */
-+        /*
-+         * TODO: Notify colo frame to do checkpoint.
-+         * colo_compare_inconsistent_notify();
-+         */
-         return 0;
+     while (!atomic_read(&iothread->stopping)) {
+         aio_poll(iothread->ctx, true);
++
++        if (atomic_read(&iothread->worker_context)) {
++            GMainLoop *loop;
++
++            g_main_context_push_thread_default(iothread->worker_context);
++            iothread->main_loop =
++                g_main_loop_new(iothread->worker_context, TRUE);
++            loop = iothread->main_loop;
++
++            g_main_loop_run(iothread->main_loop);
++            iothread->main_loop = NULL;
++            g_main_loop_unref(loop);
++
++            g_main_context_pop_thread_default(iothread->worker_context);
++            g_main_context_unref(iothread->worker_context);
++            iothread->worker_context = NULL;
++        }
      }
  
+     rcu_unregister_thread();
+@@ -73,6 +90,9 @@ static int iothread_stop(Object *object, void *opaque)
+     }
+     iothread->stopping = true;
+     aio_notify(iothread->ctx);
++    if (atomic_read(&iothread->main_loop)) {
++        g_main_loop_quit(iothread->main_loop);
++    }
+     qemu_thread_join(&iothread->thread);
+     return 0;
+ }
+@@ -125,6 +145,7 @@ static void iothread_complete(UserCreatable *obj, Error **errp)
+ 
+     qemu_mutex_init(&iothread->init_done_lock);
+     qemu_cond_init(&iothread->init_done_cond);
++    iothread->once = (GOnce) G_ONCE_INIT;
+ 
+     /* This assumes we are called from a thread with useful CPU affinity for us
+      * to inherit.
+@@ -309,3 +330,27 @@ void iothread_stop_all(void)
+ 
+     object_child_foreach(container, iothread_stop, NULL);
+ }
++
++static gpointer iothread_g_main_context_init(gpointer opaque)
++{
++    AioContext *ctx;
++    IOThread *iothread = opaque;
++    GSource *source;
++
++    iothread->worker_context = g_main_context_new();
++
++    ctx = iothread_get_aio_context(iothread);
++    source = aio_get_g_source(ctx);
++    g_source_attach(source, iothread->worker_context);
++    g_source_unref(source);
++
++    aio_notify(iothread->ctx);
++    return NULL;
++}
++
++GMainContext *iothread_get_g_main_context(IOThread *iothread)
++{
++    g_once(&iothread->once, iothread_g_main_context_init, iothread);
++
++    return iothread->worker_context;
++}
 -- 
 2.7.4
