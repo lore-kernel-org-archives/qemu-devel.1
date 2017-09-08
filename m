@@ -1,31 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58939)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dqHgo-0000GH-ME
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:43:15 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dqHhT-0000qO-ES
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:43:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dqHgl-0005F1-FK
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:43:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58434)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dqHgl-0005E8-8V
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:43:11 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3A91934CD
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 11:43:10 +0000 (UTC)
-References: <20170908111217.21985-1-kraxel@redhat.com>
-	<20170908111217.21985-2-kraxel@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0efdb75d-5f13-8797-a5c4-66c06f244cf8@redhat.com>
-Date: Fri, 8 Sep 2017 13:43:05 +0200
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dqHhQ-0005mr-79
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:43:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40951)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dqHhP-0005mI-UL
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:43:52 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v88Bhlfn008514
+	for <qemu-devel@nongnu.org>; Fri, 8 Sep 2017 07:43:50 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cun6rfyu8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 07:43:50 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 8 Sep 2017 12:43:39 +0100
+References: <20170905111645.18068-1-pasic@linux.vnet.ibm.com>
+	<22830b0b-d05d-22de-271c-f0aa9bca6b64@linux.vnet.ibm.com>
+	<20170908124905.52a8de36.cohuck@redhat.com>
+	<5a8f76e9-dfb9-9b19-26b9-99734d67efd7@linux.vnet.ibm.com>
+	<20170908131917.679e3222.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 8 Sep 2017 13:43:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170908111217.21985-2-kraxel@redhat.com>
+In-Reply-To: <20170908131917.679e3222.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] usb: drop HOST_USB
+Content-Transfer-Encoding: 8bit
+Message-Id: <9840ad7f-5c08-d080-f790-6a11fbf0381a@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/5] add CCW indirect data access support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,54 +45,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 08.09.2017 13:12, Gerd Hoffmann wrote:
-> Nowdays we use libusb for usb-host, so we don't have different code
-> for linux vs. bsd any more.  So there is little reason to have the
-> HOST_USB variable, we can just write things directly into the Makefile
-> and avoid a pointless indirection.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  configure            | 7 -------
->  hw/usb/Makefile.objs | 6 +++++-
->  2 files changed, 5 insertions(+), 8 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index a541aadebc..ec93234f47 100755
-> --- a/configure
-> +++ b/configure
-> @@ -5978,13 +5978,6 @@ if test "$live_block_migration" = "yes" ; then
->    echo "CONFIG_LIVE_BLOCK_MIGRATION=y" >> $config_host_mak
->  fi
->  
-> -# USB host support
-> -if test "$libusb" = "yes"; then
-> -  echo "HOST_USB=libusb legacy" >> $config_host_mak
-> -else
-> -  echo "HOST_USB=stub" >> $config_host_mak
-> -fi
-> -
->  # TPM passthrough support?
->  if test "$tpm" = "yes"; then
->    echo 'CONFIG_TPM=$(CONFIG_SOFTMMU)' >> $config_host_mak
-> diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-> index 97f1c4561a..a43ebbc17f 100644
-> --- a/hw/usb/Makefile.objs
-> +++ b/hw/usb/Makefile.objs
-> @@ -38,7 +38,11 @@ endif
->  common-obj-$(CONFIG_USB_REDIR) += redirect.o quirks.o
->  
->  # usb pass-through
-> -common-obj-y += $(patsubst %,host-%.o,$(HOST_USB))
-> +ifeq ($(CONFIG_LIBUSB),y)
-> +common-obj-y += host-libusb.o host-legacy.o
-> +else
-> +common-obj-y += host-stub.o
-> +endif
->  
->  ifeq ($(CONFIG_USB_LIBUSB),y)
->  common-obj-$(CONFIG_XEN) += xen-usb.o
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+On 09/08/2017 01:19 PM, Cornelia Huck wrote:
+> On Fri, 8 Sep 2017 13:03:00 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> On 09/08/2017 12:49 PM, Cornelia Huck wrote:
+>>> On Fri, 8 Sep 2017 12:45:25 +0200
+>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>>>> What do you think, would it make more sense to omit or to keep the testing
+>>>> stuff for v2 (I mean patch 5 and the kernel module in the cover letter)?  
+>>>
+>>> Can you maybe split this out? It makes it easier if you don't have to
+>>> go hunt in a cover letter.
+>>>   
+>>
+>> I'm not sure, I know what you mean. Adding an out-of-tree linux kernel module to
+>> the qemu tree does not sound right, so I suppose I should not send it as a patch.
+>>
+>> Splitting out the test device patch (#5) does not sound like a good idea either,
+>> because it depends on patches #1 and #4.
+>>
+>> TL;DR Yes, I would be glad to if you tell me how.
+> 
+> I'd do a separate "series" with both the kernel and the qemu part,
+> stating the dependencies in the cover letter. Patchew will be unhappy,
+> but I will be happier :)
+> 
+
+I can do that, for me you are definitely more important than Patchew.
+The kernel module patch won't apply to the qemu tree so I can make
+it a two patch series without being too associal.
+
+>>
+>>>>
+>>>> You probably haven't found the time to look at have a glance at "s390x/css: drop
+>>>> data-check in interpretation" (https://urldefense.proofpoint.com/v2/url?u=http-3A__patchwork.ozlabs.org_patch_810995_&d=DwICAg&c=jf_iaSHvJObTbx-siA1ZOg&r=afpWhmOLStQASenyglRLvnb_ajvdRfgp4RlDrLw42F4&m=hshoLebtV7YUijl44CLPl5gP9F1HrXyCbL85tQhvA1w&s=SjTjqdOybbUj1pGpODNHdUfXBZBZU-iav6j10EEWYfQ&e= ). We
+> 
+> Unlikely to be of your doing, but wtf happened here?
+> 
+
+Exactly that. We are fighting it. Corporate cyber-security policies
+are not exactly easy to fight.
+
+>>>> have said it would make some things more straight forward here, and I could
+>>>> drop that ugly TODO comment. I think it's quite straight-forward, and I would
+>>>> not mind having a decision on it before v2 or putting it as preparation into
+>>>> v2. What do you prefer?  
+>>>
+>>> It is marked for my attention. I don't know whether I find time to look
+>>> at it today, but probably early next week.
+>>>   
+>>
+>> OK. Btw, I have a couple of other bug-fixes in the pipe. I think I will just
+>> send out a v1 series to get the discussion started (and for now ignore possible
+>> merge  conflicts with my patches already on the list).
+> 
+> Don't worry about merge conflicts, I need to figure them out myself
+> anyway :)
+> 
+
+OK. Many thanks!
+
+Halil
