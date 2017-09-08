@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG0l-0007w3-Vd
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:48 -0400
+	(envelope-from <famz@redhat.com>) id 1dqG0n-0007xn-R9
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG0h-0004ey-74
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58324)
+	(envelope-from <famz@redhat.com>) id 1dqG0j-0004gI-1i
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56600)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG0g-0004eA-Sn
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:39 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG0i-0004fc-KO
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:40 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  8 Sep 2017 17:54:42 +0800
-Message-Id: <20170908095506.13594-15-famz@redhat.com>
+Date: Fri,  8 Sep 2017 17:54:43 +0800
+Message-Id: <20170908095506.13594-16-famz@redhat.com>
 In-Reply-To: <20170908095506.13594-1-famz@redhat.com>
 References: <20170908095506.13594-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 14/38] tests: Add NetBSD image
+Subject: [Qemu-devel] [PULL 15/38] tests: Add OpenBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,22 +31,21 @@ The image is prepared following instructions as in:
 https://wiki.qemu.org/Hosts/BSD
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Kamil Rytarowski <n54@gmx.com>
-Message-Id: <20170905021201.25684-8-famz@redhat.com>
+Message-Id: <20170905021201.25684-9-famz@redhat.com>
 ---
- tests/vm/netbsd | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
- create mode 100755 tests/vm/netbsd
+ tests/vm/openbsd | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
+ create mode 100755 tests/vm/openbsd
 
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
+diff --git a/tests/vm/openbsd b/tests/vm/openbsd
 new file mode 100755
-index 0000000000..25803370d5
+index 0000000000..9f713a56a1
 --- /dev/null
-+++ b/tests/vm/netbsd
-@@ -0,0 +1,42 @@
++++ b/tests/vm/openbsd
+@@ -0,0 +1,43 @@
 +#!/usr/bin/env python
 +#
-+# NetBSD VM image
++# OpenBSD VM image
 +#
 +# Copyright 2017 Red Hat Inc.
 +#
@@ -62,20 +61,21 @@ index 0000000000..25803370d5
 +import subprocess
 +import basevm
 +
-+class NetBSDVM(basevm.BaseVM):
-+    name = "netbsd"
++class OpenBSDVM(basevm.BaseVM):
++    name = "openbsd"
 +    BUILD_SCRIPT = """
 +        set -e;
 +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-+        tar -xf /dev/rld1a;
-+        ./configure --python=python2.7 {configure_opts};
++        tar -xf /dev/rsd1c;
++        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
 +        gmake -j{jobs};
-+        gmake check;
++        # XXX: "gmake check" seems to always hang or fail
++        #gmake check;
 +    """
 +
 +    def build_image(self, img):
-+        cimg = self._download_with_cache("http://download.patchew.org/netbsd-7.1-amd64.img.xz",
-+                                         sha256sum='b633d565b0eac3d02015cd0c81440bd8a7a8df8512615ac1ee05d318be015732')
++        cimg = self._download_with_cache("http://download.patchew.org/openbsd-6.1-amd64.img.xz",
++                sha256sum='8c6cedc483e602cfee5e04f0406c64eb99138495e8ca580bc0293bcf0640c1bf')
 +        img_tmp_xz = img + ".tmp.xz"
 +        img_tmp = img + ".tmp"
 +        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
@@ -85,6 +85,6 @@ index 0000000000..25803370d5
 +        os.rename(img_tmp, img)
 +
 +if __name__ == "__main__":
-+    sys.exit(basevm.main(NetBSDVM))
++    sys.exit(basevm.main(OpenBSDVM))
 -- 
 2.13.5
