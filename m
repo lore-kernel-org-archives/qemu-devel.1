@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33378)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35225)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dqMzn-00073o-J5
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:23:12 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dqN5t-00012Z-8u
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:29:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dqMzi-0007i2-Kz
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:23:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44360)
+	(envelope-from <dgilbert@redhat.com>) id 1dqN5p-0002vy-8e
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:29:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60518)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dqMzi-0007h9-EZ
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:23:06 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 31A674A6E7
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 17:23:05 +0000 (UTC)
-Date: Fri, 8 Sep 2017 18:22:58 +0100
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dqN5o-0002vC-Vg
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:29:25 -0400
+Date: Fri, 8 Sep 2017 18:29:13 +0100
 From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170908172258.GE2836@work-vm>
-References: <20170906115143.27451-1-quintela@redhat.com>
-	<20170906115143.27451-14-quintela@redhat.com>
+Message-ID: <20170908172912.GF2836@work-vm>
+References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
+	<1503471071-2233-3-git-send-email-peterx@redhat.com>
+	<20170823173534.GF2648@work-vm>
+	<20170825042502.GD14174@pxdev.xzpeter.org>
+	<20170825093042.GC2090@work-vm>
+	<20170828055325.GJ14174@pxdev.xzpeter.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170906115143.27451-14-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 13/22] migration: Split
- migration_fd_process_incoming
+In-Reply-To: <20170828055325.GJ14174@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC v2 2/8] monitor: allow monitor to create
+ thread to poll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,63 +32,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We need that on later patches.
+* Peter Xu (peterx@redhat.com) wrote:
+> On Fri, Aug 25, 2017 at 10:30:42AM +0100, Dr. David Alan Gilbert wrote:
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+> [...]
+> 
+> > > >   c) As mentioned on irc there's fun to be had with cur_mon and error
+> > > >      handling - in my local world I have cur_mon declared as __thread
+> > > >      but never got around to thinking aobut what should set it up.
+> > > >      There's also 'wavcapture: Convert to error_report' that I posted
+> > > >      in March that got rid of some uses of cur_mon in wavcapture.c
+> > > >      for error_report.
+> > > 
+> > > Yeh.  I at least also see a positive ACK from Markus in the other
+> > > thread for per-thread cur_mon, sounds like this is the right way to
+> > > go.
+> > > 
+> > > To setup cur_mon, what I can think of is create wrapper for
+> > > pthread_create() in qemu_thread_create().  I see that we have done
+> > > similar thing in util/qemu-thread-win32.c for Windows.  With that we
+> > > can setup the cur_mon before going into real thread function but in
+> > > the right context, though we may need one more parameter for current
+> > > qemu_thread_create():
+> > > 
+> > > void qemu_thread_create(QemuThread *thread, const char *name,
+> > >                        void *(*start_routine)(void*),
+> > >                        void *arg, int mode, Monitor *mon);
+> > > 
+> > > Then we can specify monitor for any new thread (default to cur_mon).
+> > > For per-monitor threads, I think we need to pass in that specific mon.
+> > > 
+> > > Is this doable?
+> > 
+> > That would mean changing all the qemu_thread_create calls, but yes
+> > I guess is doable.  I'd thought the other way, perhaps you inherit
+> > Monitor except in the case of when the monitor creates threads.
+> 
+> Do you mean setup cur_mon in monitor threads?
+> 
+> I'm afraid that may not be enough, since after we mark cur_mon as
+> __thread variable, it should be NULL for each newly created threads,
+> then we need to init them for every thread.  Or anything I missed?
 
-I think this could also go into current qemu?
+Right, I thought you'd modify qemu_thread_create to setup cur_mon in
+new threads to the same as the parent.
 
 Dave
 
-> ---
->  migration/migration.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
+> [...]
 > 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index 9fec880a58..18bd24a14c 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -372,9 +372,8 @@ static void process_incoming_migration_co(void *opaque)
->      qemu_bh_schedule(mis->bh);
->  }
->  
-> -void migration_fd_process_incoming(QEMUFile *f)
-> +static void migration_incoming_setup(QEMUFile *f)
->  {
-> -    Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, NULL);
->      MigrationIncomingState *mis = migration_incoming_get_current();
->  
->      if (multifd_load_setup() != 0) {
-> @@ -387,9 +386,20 @@ void migration_fd_process_incoming(QEMUFile *f)
->          mis->from_src_file = f;
->      }
->      qemu_file_set_blocking(f, false);
-> +}
-> +
-> +static void migration_incoming_process(void)
-> +{
-> +    Coroutine *co = qemu_coroutine_create(process_incoming_migration_co, NULL);
->      qemu_coroutine_enter(co);
->  }
->  
-> +void migration_fd_process_incoming(QEMUFile *f)
-> +{
-> +    migration_incoming_setup(f);
-> +    migration_incoming_process();
-> +}
-> +
->  void migration_ioc_process_incoming(QIOChannel *ioc)
->  {
->      MigrationIncomingState *mis = migration_incoming_get_current();
+> > > > 
+> > > >   d) I wonder if it's better to have thread as a flag, so that you have
+> > > >      to explicitly ask for a monitor to have it's own thread.
+> > > 
+> > > This should be doable.  Would a new parameter for "-qmp" and "-hmp"
+> > > suffice?
+> > 
+> > Yes.
+> 
+> (I meant "-monitor" when saying "-hmp")
+> 
+> Hmm, it seems not easy to simply add a new parameter for it, since we
+> used "," already to parse the chardev params in monitor codes, like
+> the usage of:
+> 
+>   -qmp telnet::8888,server,nowait
+> 
+> So I cannot simply do:
+> 
+>   -qmp telnet::8888,server,nowait,threaded=on
+> 
+> Or it will be treated for a parameter for chardev type "telnet".
+> 
+> I can at least add something similar to QEMU_OPTION_qmp_pretty, like:
+> QEMU_OPTION_qmp_threaded, and maybe I also need
+> QEMU_OPTION_monitor_pretty.  But I am thinking whether there can be
+> anything better.  Any suggestion from anyone?
+> 
 > -- 
-> 2.13.5
-> 
+> Peter Xu
 --
 Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
