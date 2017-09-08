@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39385)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dqNEW-0007iT-BG
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:38:25 -0400
+	(envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1dqNEb-0007pn-No
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:38:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dqNES-0007gJ-Ed
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:38:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58596)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dqNES-0007fr-5d
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:38:20 -0400
-Date: Fri, 8 Sep 2017 18:38:10 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170908173809.GG2836@work-vm>
-References: <1503471071-2233-1-git-send-email-peterx@redhat.com>
-	<1503471071-2233-5-git-send-email-peterx@redhat.com>
-	<20170823174411.GG2648@work-vm> <20170823233732.GA16947@lemon>
-	<20170825053718.GF14174@pxdev.xzpeter.org>
-	<20170825091412.GB2090@work-vm>
-	<20170828080827.GL14174@pxdev.xzpeter.org>
+	(envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1dqNEX-0007j4-QN
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:38:29 -0400
+Received: from mail-pf0-x236.google.com ([2607:f8b0:400e:c00::236]:34218)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1dqNEX-0007iZ-L1
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:38:25 -0400
+Received: by mail-pf0-x236.google.com with SMTP id e1so5550444pfk.1
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 10:38:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170828080827.GL14174@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC v2 4/8] QAPI: new QMP command option
- "without-bql"
+From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
+Date: Fri,  8 Sep 2017 10:37:55 -0700
+Message-Id: <20170908173801.15205-1-brandon.carpenter@cypherpath.com>
+In-Reply-To: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
+References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
+	<20170724181544.20292-1-brandon.carpenter@cypherpath.com>
+Content-Type: text/plain; charset="US-ASCII"
+Subject: [Qemu-devel] [PATCH v2 0/6] Update websocket code to more fully
+ support the RFC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,73 +32,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, brandon.carpenter@cypherpath.com
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Fri, Aug 25, 2017 at 10:14:12AM +0100, Dr. David Alan Gilbert wrote:
-> > * Peter Xu (peterx@redhat.com) wrote:
-> > > On Thu, Aug 24, 2017 at 07:37:32AM +0800, Fam Zheng wrote:
-> > > > On Wed, 08/23 18:44, Dr. David Alan Gilbert wrote:
-> > > > > * Peter Xu (peterx@redhat.com) wrote:
-> > > > > > Introducing this new parameter for QMP commands in general to mark out
-> > > > > > when the command does not need BQL.  Normally QMP command executions are
-> > > > > > done with the protection of BQL in QEMU.  However the truth is that not
-> > > > > > all the QMP commands require the BQL.
-> > > > > > 
-> > > > > > This new parameter provides a way to allow QMP commands to run in
-> > > > > > parallel when possible, without the contention on the BQL.
-> > > > > > 
-> > > > > > Since the default value of "without-bql" is still false, so now all QMP
-> > > > > > commands are still protected by BQL still.
-> > > > > > 
-> > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > > 
-> > > > > We should define what a 'without-bql' command is allowed to do:
-> > > > >    'Commands that have without-bql set _may_ be called without the bql
-> > > > >    being taken.  They must not take the bql or any other lock that may
-> > > > >    become dependent on the bql.'
-> > > 
-> > > Sure.
-> > > 
-> > > > >    (Do we need to say anything about RCU?)
-> > > 
-> > > Could I ask how is RCU related?
-> > 
-> > My definition above said that anything declared without bql couldn't
-> > take the bql, so couldn't block on any other thread holding the bql.
-> > But is our command allowed to use synchronize_rcu or rcu_read_lock
-> > that could wait for or block other threads doing rcu stuff?
-> > Because if it did is there any guarantee that it wouldn't block?
-> 
-> I see.  Shall we just ignore RCU for now?  Since currently I don't see
-> a real synchronize_rcu() user yet in QEMU, except the RCU thread.  And
-> rcu_read_lock() should not block itself, so IMHO calling it only in
-> monitor command handlers should always be fine?
+We've been experiencing issues where the qemu websocket server closes
+connections from noVNC clients for no apparent reason. Debugging shows
+that certain web browsers are injecting ping and pong frames when the
+connection becomes idle. Some browsers send those frames without a
+payload, which also is causing closure. This patch series addresses
+these issues by making the websocket server more conformant to RFC
+6455 - The WebSocket Protocol.
 
-Yes, I think you're right that the rcu_read_lock is OK; just something
-to keep in mind.
+Remembering the opcode is sufficient for handling fragmented frames from
+the client, which may be introduced by an intermediary server/proxy.
+Respond to pings and ignore pongs rather than close the connection as
+many browsers use ping/pong to test an idle connection. Close
+connections according to the RFC, including providing a reason code and
+message to aid debugging of unexpected disconnects. Empty payloads
+should not cause a disconnect.
 
-Dave
+While updating the websocket code, several other bugs were discovered
+for which patches are also included early in the set.
 
-> > 
-> > 
-> > > 
-> > > > > 
-> > > > > Also, 'no-bql' is shorter :-)
-> > > > 
-> > > > Or rather "need-bql" that defaults to true to avoid double negative (TM) with
-> > > > "no-bql = false"?
-> > > 
-> > > Ok let me use "need-bql". :)
-> > 
-> > Fine by me.
-> 
-> I'm switching to "need-bql" for QMP only, and used "no-bql" in HMP,
-> since I failed to find a good way to init mon_cmd_t field to true by
-> default.
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Brandon Carpenter (6):
+  io: Always remove an old channel watch before adding a new one
+  io: Small updates in preparation for websocket changes
+  io: Add support for fragmented websocket binary frames
+  io: Allow empty websocket payload
+  io: Ignore websocket PING and PONG frames
+  io: Reply to ping frames
+
+ include/io/channel-websock.h |   1 +
+ io/channel-websock.c         | 207 ++++++++++++++++++++++---------------------
+ ui/vnc-auth-vencrypt.c       |   3 +
+ ui/vnc-ws.c                  |   6 ++
+ ui/vnc.c                     |   4 +
+ 5 files changed, 122 insertions(+), 99 deletions(-)
+
+-- 
+2.14.1
+
+
+-- 
+
+
+CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is 
+for the sole use of the intended recipient(s) and may contain proprietary, 
+confidential or privileged information or otherwise be protected by law. 
+Any unauthorized review, use, disclosure or distribution is prohibited. If 
+you are not the intended recipient, please notify the sender and destroy 
+all copies and the original message.
