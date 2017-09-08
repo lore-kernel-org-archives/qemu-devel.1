@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dqJvU-0008R5-IH
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:06:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dqJyZ-0001AG-Nl
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:09:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dqJvO-0007AF-TY
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:06:32 -0400
+	(envelope-from <eblake@redhat.com>) id 1dqJyV-00027o-8G
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 10:09:43 -0400
 References: <20170830210542.2153-1-eblake@redhat.com>
-	<20170830210542.2153-11-eblake@redhat.com>
-	<20170908125102.GH3283@localhost.localdomain>
+	<20170830210542.2153-17-eblake@redhat.com>
+	<20170908132741.GJ3283@localhost.localdomain>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <e0950cb8-fe6f-1137-edba-28b977fb0731@redhat.com>
-Date: Fri, 8 Sep 2017 09:05:56 -0500
+Message-ID: <3e1edd8f-dcfa-561e-a5e1-99ef89b1ec81@redhat.com>
+Date: Fri, 8 Sep 2017 09:09:24 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170908125102.GH3283@localhost.localdomain>
+In-Reply-To: <20170908132741.GJ3283@localhost.localdomain>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="f5tQ0AS9i0Gj2OJJQxQQO7Q4djjQJLuBG"
-Subject: Re: [Qemu-devel] [PATCH v6 10/18] dirty-bitmap: Change
- bdrv_get_dirty_count() to report bytes
+	boundary="kKmBgP08dlBwqnI2oXeQTNGtfFdameNjB"
+Subject: Re: [Qemu-devel] [PATCH v6 16/18] qcow2: Switch store_bitmap_data()
+ to byte-based iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +27,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---f5tQ0AS9i0Gj2OJJQxQQO7Q4djjQJLuBG
+--kKmBgP08dlBwqnI2oXeQTNGtfFdameNjB
 From: Eric Blake <eblake@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>
 Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <e0950cb8-fe6f-1137-edba-28b977fb0731@redhat.com>
-Subject: Re: [PATCH v6 10/18] dirty-bitmap: Change bdrv_get_dirty_count() to
- report bytes
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <3e1edd8f-dcfa-561e-a5e1-99ef89b1ec81@redhat.com>
+Subject: Re: [PATCH v6 16/18] qcow2: Switch store_bitmap_data() to byte-based
+ iteration
 References: <20170830210542.2153-1-eblake@redhat.com>
- <20170830210542.2153-11-eblake@redhat.com>
- <20170908125102.GH3283@localhost.localdomain>
-In-Reply-To: <20170908125102.GH3283@localhost.localdomain>
+ <20170830210542.2153-17-eblake@redhat.com>
+ <20170908132741.GJ3283@localhost.localdomain>
+In-Reply-To: <20170908132741.GJ3283@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 09/08/2017 07:51 AM, Kevin Wolf wrote:
+On 09/08/2017 08:27 AM, Kevin Wolf wrote:
 > Am 30.08.2017 um 23:05 hat Eric Blake geschrieben:
->> Thanks to recent cleanups, all callers were scaling a return value
->> of sectors into bytes; do the scaling internally instead.
+>> Now that we have adjusted the majority of the calls this function
+>> makes to be byte-based, it is easier to read the code if it makes
+>> passes over the image using bytes rather than sectors.
 >>
 >> Signed-off-by: Eric Blake <eblake@redhat.com>
 >> Reviewed-by: John Snow <jsnow@redhat.com>
->> Reviewed-by: Juan Quintela <quintela@redhat.com>
->=20
->> diff --git a/block/mirror.c b/block/mirror.c
->> index af13f5d658..cc47e21814 100644
->> --- a/block/mirror.c
->> +++ b/block/mirror.c
->> @@ -811,11 +811,10 @@ static void coroutine_fn mirror_run(void *opaque=
-)
->=20
-> There is one more place before this one that needs to be converted,
-> mirror_iteration() at line 343:
->=20
->     trace_mirror_restart_iter(s, bdrv_get_dirty_count(s->dirty_bitmap) =
-*
->                               BDRV_SECTOR_SIZE);
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>
 
-Good catch. (I guess I'm a victim of sitting on a patch for several
-months, across several rebases...)
+>>
+>> -    while ((sector =3D bdrv_dirty_iter_next(dbi) >> BDRV_SECTOR_BITS)=
+ !=3D -1) {
+>> -        uint64_t cluster =3D sector / sbc;
+>> +    while ((offset =3D bdrv_dirty_iter_next(dbi)) !=3D -1) {
+>=20
+> Don't you have to multiply both sides of the equation? This would be
+> offset !=3D -512, which points out that the previous patch to convert
+> bdrv_dirty_iter_next() to byte-based gave it a really awkward interface=
+=2E
+
+I think what I really need to do is change '!=3D -1' to '< 0', as that's
+much easier to reason about when scaling is present.
+
+>=20
+>> +        uint64_t cluster =3D offset / limit;
+>>          uint64_t end, write_size;
+>>          int64_t off;
+>>
+>> -        sector =3D cluster * sbc;
+>> -        end =3D MIN(bm_sectors, sector + sbc);
+>> -        write_size =3D bdrv_dirty_bitmap_serialization_size(bitmap,
+>> -            sector * BDRV_SECTOR_SIZE, (end - sector) * BDRV_SECTOR_S=
+IZE);
+>> +        offset =3D cluster * limit;
+>=20
+> You just had cluster =3D offset / limit, so in other words, align down
+> offset? If so, this is how it should be written.
+
+Thanks for the close reviews; looks like I have enough things to do a
+respin.
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -80,7 +94,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---f5tQ0AS9i0Gj2OJJQxQQO7Q4djjQJLuBG
+--kKmBgP08dlBwqnI2oXeQTNGtfFdameNjB
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -89,14 +103,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmyo8QACgkQp6FrSiUn
-Q2pf7ggAlFfoAY4V6UJLZ1Pme5HpXh37oRl244Cs53ZUjM/WNLNJInumc9Uda1Yv
-tqnioQuSl1VjW7CdpMaQAnvm+lFowZ8Nx0fzXZRUMmBzFzllJtKw6cKEL6MaEoxP
-QRgJ4XtGLXGY0LdE2ys2WOp5UxX8wmDxUS1HbsUqxukmOWnckdtwKJLi2IN4f2dy
-vPeH5HHSR/FTAPlNoGtiMB0OxRS+TW8b+EeL65lKMCG3jhLDc+A3iMUAEw1WJJKb
-7JChumN3TevkeVpH5Jmudsw5LK2sGB7w5ggc9d7ODCY3Nhg2uWjETpqX4Jr2Qvi9
-zbyWw7Yyr/whfjc2Vzoc5BMV9GQCuQ==
-=gvXz
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlmypJQACgkQp6FrSiUn
+Q2oS4ggArTVjAg6QRtgUGxxfhHQWS+luIIKk906MgPcWUYKbWQmp6+3p5IICDL+x
+B6HlSk2LQyaWe8R/FMQW/7uPIkMyPurwc+XyTes0ILwevITQkqmFMypEsCHUn1Jd
+6ilnhcBwmdF4/kbZaNGQH6OHcluNzQ1oajDKaSrH8Dl7RW0Ppn4LiHNJQ6FxKaea
+0K5hfnVlYP1rsRzZoZ0oJl8JqnXBISruOIALYmVhkieRA0+J+qWBDkzFJHnkswN1
+mwf4ffLLKxXAw4tENKq2SIZZYfJJB0jPL6yy3kaxEww+LzeUd8U0DzrEzySdf4+o
+sAziSLbqT+JAW4VpPzR00WRGa5AdjQ==
+=ms8j
 -----END PGP SIGNATURE-----
 
---f5tQ0AS9i0Gj2OJJQxQQO7Q4djjQJLuBG--
+--kKmBgP08dlBwqnI2oXeQTNGtfFdameNjB--
