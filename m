@@ -1,33 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40807)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqH1e-0007LC-T1
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:00:51 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dqH4A-00013Q-HK
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:03:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dqH1Z-0006Dy-Qf
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:00:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53478)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqH1Z-0006DT-Gr
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:00:37 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 7E1D3356D9
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 11:00:36 +0000 (UTC)
-Date: Fri, 8 Sep 2017 12:00:33 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170908110033.GK3609@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170906124900.17354-1-famz@redhat.com>
-	<20170908100537.GI3609@redhat.com> <20170908102701.GL4511@lemon>
-	<20170908103602.GJ3609@redhat.com> <20170908105853.GM4511@lemon>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dqH40-0007kk-VC
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:03:18 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51263)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dqH40-0007kE-Lg
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:03:08 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v88B0e1L076551
+	for <qemu-devel@nongnu.org>; Fri, 8 Sep 2017 07:03:07 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cupvq0u76-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 07:03:06 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 8 Sep 2017 12:03:04 +0100
+References: <20170905111645.18068-1-pasic@linux.vnet.ibm.com>
+	<22830b0b-d05d-22de-271c-f0aa9bca6b64@linux.vnet.ibm.com>
+	<20170908124905.52a8de36.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 8 Sep 2017 13:03:00 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170908124905.52a8de36.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170908105853.GM4511@lemon>
-Subject: Re: [Qemu-devel] [PATCH v4] buildsys: Move crypto cflags/libs to
- per object variables
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <5a8f76e9-dfb9-9b19-26b9-99734d67efd7@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/5] add CCW indirect data access support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,121 +43,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Fri, Sep 08, 2017 at 06:58:53PM +0800, Fam Zheng wrote:
-> On Fri, 09/08 11:36, Daniel P. Berrange wrote:
-> > On Fri, Sep 08, 2017 at 06:27:01PM +0800, Fam Zheng wrote:
-> > > On Fri, 09/08 11:05, Daniel P. Berrange wrote:
-> > > > On Wed, Sep 06, 2017 at 08:49:00PM +0800, Fam Zheng wrote:
-> > > > > This patch groups the crypto objects into a few .mo objects based on
-> > > > > functional submodules, and moves inclusion conditions to *-objs
-> > > > > variables, then moves the global cflags/libs to the *-cflags and *-libs
-> > > > > variables.
-> > > > > 
-> > > > > For init.o and cipher.o, which may or may not need the library flags
-> > > > > depending on config, adding flags and libs unconditionally doesn't hurt,
-> > > > > because if the library is not available, the variables are empty.  This
-> > > > > makes less code.
-> > > > > 
-> > > > > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > > > > 
-> > > > > ---
-> > > > > 
-> > > > > v4: Merge into one patch which is supposedly easier to manage and
-> > > > > review, and use .mo appraoch to avoid $(foreach) and $(eval) magics.
-> > > > 
-> > > > I don't think using  .mo is suitable here. You've used it as a generic
-> > > > mechanism for grouping .o files, but that is not what it does. There
-> > > > are special semantics around .mo rules that affect how the final
-> > > > binaries are linked.
-> > > 
-> > > Using .mo is okay here, but after a hindsight I think grouping by library
-> > > (nettle.mo, gcrypt.mo, etc.) is better than grouping by functionality, for
-> > > modularization in the future. But that also means assigning the cflags/libs
-> > > variable cannot be simplified like this.
-> > > 
-> > > > 
-> > > > eg looking back at the description of .mo files 
-> > > > 
-> > > > [quote]
-> > > > commit c261d774fb9093d00e0938a19f502fb220f62718
-> > > > Author: Fam Zheng <famz@redhat.com>
-> > > > Date:   Mon Sep 1 18:35:10 2014 +0800
-> > > > 
-> > > > [...snip...]
-> > > > 
-> > > >     3) When linking an executable, those .mo files in its "-y" variables are
-> > > >        filtered out, and replaced by one or more -Wl,-u,$symbol flags. This
-> > > >        is done in the added macro "process-archive-undefs".
-> > > >     
-> > > >        These "-Wl,-u,$symbol" flags will force ld to pull in the function
-> > > >        definition from the archives when linking.
-> > > >     
-> > > >        Note that the .mo objects, that are actually meant to be linked in
-> > > >        the executables, are already expanded in unnest-vars, before the
-> > > >        linking command. So we are safe to simply filter out .mo for the
-> > > >        purpose of pulling undefined symbols.
-> > > >     
-> > > >        process-archive-undefs works as this: For each ".mo", find all the
-> > > >        undefined symbols in it, filter ones that are defined in the
-> > > >        archives. For each of these symbols, generate a "-Wl,-u,$symbol" in
-> > > >        the link command, and put them before archive names in the command
-> > > >        line.
-> > > > [/quote]
-> > > > 
-> > > > Based on this, I don't think I can ack this patch, because it can
-> > > > have unexpected consequences.
-> > > 
-> > > This described the process-archive-undefs semantics of .mo, but not the essence
-> > > of it.  Basically .mo is just partial linking with the additional services of
-> > > -cflags, -libs and the above -Wl,-u thing. I cannot think of any unexpected
-> > > consequences with this change. We've had sdl.mo in ui/Makefile.objs for long,
-> > > just for the same purpose of this patch, with no problem.
-> > 
-> > While I'm in favour of moving the linker/compiler flags out of the global
-> > vars, I'm not convinced this impl is a step forward.
-> > 
-> > We already have a mechanism for grouping object files - the 'NNNN-obj-y'
-> > variables we use throughout our Makefiles.
-> > 
-> > This patch is adding a second level of grouping purely to work around the
-> > fact that we can't set linker/compiler flags on the NNN-obj-y variables
-> > we use. I think this second level of grouping makes the makefiles more
-> > complex than they ought to be.
-> 
-> Not quite, it is actually a required step to modularization, which I'm inclined
-> to get my hands on next. That is also why .mo was introduced.
-> 
-> > 
-> > IOW, I'd rather see the rules fixed so that we can set variables against
-> > the existing grouping we have. eg
-> > 
-> >    crypto-obj-y-cflags := ...
-> >    crypto-obj-y-libs := ...
-> > 
-> > so we avoid having to introduce second level groups every time we want
-> > to set these cflags/libs.
-> 
-> This is certainly true, but taking the modularization work into account, .mo
-> based -cflags and -libs are more natural and consistent. IMO we already have the
-> latter, so other mechanisms are not really necessary. Remember how complex the
-> general unnest-vars code is?  I believe adding support to crypto-obj-y-cflags is
-> more complex than (ab)using .mo objects, even if just for flags/libs
-> localization.
-> 
-> If you don't like introducing {nettle,gcrypt,gnutls}.mo for now, we can probably
-> defer it to the time when crypto subsystem is modularized.
 
-I don't anticipate the crypot subsystem ever being modularized - it is
-really core functionality used across all other subsystems (block layer,
-chardev, ui, migration, and more)
 
+On 09/08/2017 12:49 PM, Cornelia Huck wrote:
+> On Fri, 8 Sep 2017 12:45:25 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> The discussion seems to have settled down quite a bit. Since there weren't
+>> many complaints, I would like to opt for a v2 fixing the things pointed out
+>> during the review early next week (I was thinking Tuesday maybe some late birds
+>> are going to join in).
+>>
+>> @Connie 
+>> ========
+>>
+>> Does that sound reasonable or would you like more time for v1?
+> 
+> No, sounds good.
+> 
+
+Nod.
+
+>>
+>> What do you think, would it make more sense to omit or to keep the testing
+>> stuff for v2 (I mean patch 5 and the kernel module in the cover letter)?
+> 
+> Can you maybe split this out? It makes it easier if you don't have to
+> go hunt in a cover letter.
+> 
+
+I'm not sure, I know what you mean. Adding an out-of-tree linux kernel module to
+the qemu tree does not sound right, so I suppose I should not send it as a patch.
+
+Splitting out the test device patch (#5) does not sound like a good idea either,
+because it depends on patches #1 and #4.
+
+TL;DR Yes, I would be glad to if you tell me how.
+
+>>
+>> You probably haven't found the time to look at have a glance at "s390x/css: drop
+>> data-check in interpretation" (https://urldefense.proofpoint.com/v2/url?u=http-3A__patchwork.ozlabs.org_patch_810995_&d=DwICAg&c=jf_iaSHvJObTbx-siA1ZOg&r=afpWhmOLStQASenyglRLvnb_ajvdRfgp4RlDrLw42F4&m=hshoLebtV7YUijl44CLPl5gP9F1HrXyCbL85tQhvA1w&s=SjTjqdOybbUj1pGpODNHdUfXBZBZU-iav6j10EEWYfQ&e= ). We
+>> have said it would make some things more straight forward here, and I could
+>> drop that ugly TODO comment. I think it's quite straight-forward, and I would
+>> not mind having a decision on it before v2 or putting it as preparation into
+>> v2. What do you prefer?
+> 
+> It is marked for my attention. I don't know whether I find time to look
+> at it today, but probably early next week.
+> 
+
+OK. Btw, I have a couple of other bug-fixes in the pipe. I think I will just
+send out a v1 series to get the discussion started (and for now ignore possible
+merge  conflicts with my patches already on the list).
 
 Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Halil
