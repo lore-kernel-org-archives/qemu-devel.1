@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40096)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1dqNFQ-0000KE-4X
+	id 1dqNFQ-0000KJ-6R
 	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:39:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1dqNFN-0008JN-Uw
+	id 1dqNFM-0008Hn-4g
 	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:39:20 -0400
-Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:35052)
+Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:35051)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1dqNFN-0008J1-Ot
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:39:17 -0400
-Received: by mail-pg0-x22b.google.com with SMTP id 188so5918619pgb.2
-	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 10:39:17 -0700 (PDT)
+	id 1dqNFL-0008Gr-UQ
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:39:16 -0400
+Received: by mail-pg0-x235.google.com with SMTP id 188so5918520pgb.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 10:39:15 -0700 (PDT)
 MIME-Version: 1.0
 From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-Date: Fri,  8 Sep 2017 10:37:58 -0700
-Message-Id: <20170908173801.15205-4-brandon.carpenter@cypherpath.com>
+Date: Fri,  8 Sep 2017 10:37:56 -0700
+Message-Id: <20170908173801.15205-2-brandon.carpenter@cypherpath.com>
 In-Reply-To: <20170908173801.15205-1-brandon.carpenter@cypherpath.com>
 References: <20170908173801.15205-1-brandon.carpenter@cypherpath.com>
 In-Reply-To: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
 References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
+	<20170724181544.20292-1-brandon.carpenter@cypherpath.com>
 Content-Type: text/plain; charset="US-ASCII"
-Subject: [Qemu-devel] [PATCH v2 3/6] io: Add support for fragmented
- websocket binary frames
+Subject: [Qemu-devel] [PATCH v2 1/6] io: Always remove an old channel watch
+ before adding a new one
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,79 +37,77 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, brandon.carpenter@cypherpath.com
 
-Allows fragmented binary frames by saving the previous opcode. Handles
-the case where an intermediary (i.e., web proxy) fragments frames
-originally sent unfragmented by the client.
+Also set saved handle to zero when removing without adding a new watch.
 
 Signed-off-by: Brandon Carpenter <brandon.carpenter@cypherpath.com>
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- include/io/channel-websock.h |  1 +
- io/channel-websock.c         | 26 ++++++++++++++++++--------
- 2 files changed, 19 insertions(+), 8 deletions(-)
+ ui/vnc-auth-vencrypt.c | 3 +++
+ ui/vnc-ws.c            | 6 ++++++
+ ui/vnc.c               | 4 ++++
+ 3 files changed, 13 insertions(+)
 
-diff --git a/include/io/channel-websock.h b/include/io/channel-websock.h
-index 3c9ff84727..7c896557c5 100644
---- a/include/io/channel-websock.h
-+++ b/include/io/channel-websock.h
-@@ -65,6 +65,7 @@ struct QIOChannelWebsock {
-     guint io_tag;
-     Error *io_err;
-     gboolean io_eof;
-+    uint8_t opcode;
- };
- 
- /**
-diff --git a/io/channel-websock.c b/io/channel-websock.c
-index 185bd31be5..ced24135ec 100644
---- a/io/channel-websock.c
-+++ b/io/channel-websock.c
-@@ -542,28 +542,38 @@ static int qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
-     has_mask = header->b1 & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_HAS_MASK;
-     payload_len = header->b1 & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_PAYLOAD_LEN;
- 
-+    /* Save or restore opcode. */
-+    if (opcode) {
-+        ioc->opcode = opcode;
-+    } else {
-+        opcode = ioc->opcode;
+diff --git a/ui/vnc-auth-vencrypt.c b/ui/vnc-auth-vencrypt.c
+index ffaab57550..c3eece4fa7 100644
+--- a/ui/vnc-auth-vencrypt.c
++++ b/ui/vnc-auth-vencrypt.c
+@@ -77,6 +77,9 @@ static void vnc_tls_handshake_done(QIOTask *task,
+         vnc_client_error(vs);
+         error_free(err);
+     } else {
++        if (vs->ioc_tag) {
++            g_source_remove(vs->ioc_tag);
++        }
+         vs->ioc_tag = qio_channel_add_watch(
+             vs->ioc, G_IO_IN | G_IO_OUT, vnc_client_io, vs, NULL);
+         start_auth_vencrypt_subauth(vs);
+diff --git a/ui/vnc-ws.c b/ui/vnc-ws.c
+index f530cd5474..eaf309553c 100644
+--- a/ui/vnc-ws.c
++++ b/ui/vnc-ws.c
+@@ -36,6 +36,9 @@ static void vncws_tls_handshake_done(QIOTask *task,
+         error_free(err);
+     } else {
+         VNC_DEBUG("TLS handshake complete, starting websocket handshake\n");
++        if (vs->ioc_tag) {
++            g_source_remove(vs->ioc_tag);
++        }
+         vs->ioc_tag = qio_channel_add_watch(
+             QIO_CHANNEL(vs->ioc), G_IO_IN, vncws_handshake_io, vs, NULL);
+     }
+@@ -97,6 +100,9 @@ static void vncws_handshake_done(QIOTask *task,
+     } else {
+         VNC_DEBUG("Websock handshake complete, starting VNC protocol\n");
+         vnc_start_protocol(vs);
++        if (vs->ioc_tag) {
++            g_source_remove(vs->ioc_tag);
++        }
+         vs->ioc_tag = qio_channel_add_watch(
+             vs->ioc, G_IO_IN, vnc_client_io, vs, NULL);
+     }
+diff --git a/ui/vnc.c b/ui/vnc.c
+index 0b5dbc62e4..62f7a3f30a 100644
+--- a/ui/vnc.c
++++ b/ui/vnc.c
+@@ -1121,6 +1121,7 @@ static void vnc_disconnect_start(VncState *vs)
+     vnc_set_share_mode(vs, VNC_SHARE_MODE_DISCONNECTED);
+     if (vs->ioc_tag) {
+         g_source_remove(vs->ioc_tag);
++        vs->ioc_tag = 0;
+     }
+     qio_channel_close(vs->ioc, NULL);
+     vs->disconnecting = TRUE;
+@@ -2931,6 +2932,9 @@ static void vnc_connect(VncDisplay *vd, QIOChannelSocket *sioc,
+     VNC_DEBUG("New client on socket %p\n", vs->sioc);
+     update_displaychangelistener(&vd->dcl, VNC_REFRESH_INTERVAL_BASE);
+     qio_channel_set_blocking(vs->ioc, false, NULL);
++    if (vs->ioc_tag) {
++        g_source_remove(vs->ioc_tag);
 +    }
-+
-     if (opcode == QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE) {
-         /* disconnect */
-         return 0;
-     }
- 
-     /* Websocket frame sanity check:
--     * * Websocket fragmentation is not supported.
--     * * All  websockets frames sent by a client have to be masked.
-+     * * Fragmentation is only supported for binary frames.
-+     * * All frames sent by a client MUST be masked.
-      * * Only binary encoding is supported.
-      */
-     if (!fin) {
--        error_setg(errp, "websocket fragmentation is not supported");
--        return -1;
-+        if (opcode != QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
-+            error_setg(errp, "only binary websocket frames may be fragmented");
-+            return -1;
-+        }
-+    } else {
-+        if (opcode != QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
-+            error_setg(errp, "only binary websocket frames are supported");
-+            return -1;
-+        }
-     }
-     if (!has_mask) {
-         error_setg(errp, "client websocket frames must be masked");
-         return -1;
-     }
--    if (opcode != QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
--        error_setg(errp, "only binary websocket frames are supported");
--        return -1;
--    }
- 
-     if (payload_len < QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_MAGIC_16_BIT) {
-         ioc->payload_remain = payload_len;
+     if (websocket) {
+         vs->websocket = 1;
+         if (vd->tlscreds) {
 -- 
 2.14.1
 
