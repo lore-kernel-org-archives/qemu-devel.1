@@ -1,27 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35816)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1dqA8A-0004pP-Bx
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:39:04 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dqAAK-0005uA-41
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:41:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <batmanustc@gmail.com>) id 1dqA85-0006CW-38
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:38:58 -0400
-Received: from mail-qk0-x229.google.com ([2607:f8b0:400d:c09::229]:37881)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <batmanustc@gmail.com>)
-	id 1dqA84-0006CI-Tc
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:38:53 -0400
-Received: by mail-qk0-x229.google.com with SMTP id b82so3679420qkc.4
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 20:38:52 -0700 (PDT)
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dqAAF-0007q2-6p
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:41:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44339
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1dqAAE-0007pM-Tb
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:41:07 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v883dZnL126657
+	for <qemu-devel@nongnu.org>; Thu, 7 Sep 2017 23:41:05 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cuc9mukht-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 23:41:05 -0400
+Received: from localhost
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Thu, 7 Sep 2017 21:41:04 -0600
+Date: Fri, 8 Sep 2017 11:41:00 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170905182546.00457332.cohuck@redhat.com>
+	<fe102a7a-e998-8ebe-b94d-e653c4f66c39@linux.vnet.ibm.com>
+	<20170906043108.GY31680@bjsdjshi@linux.vnet.ibm.com>
+	<8946b1ec-4d14-c953-deab-aaded7cd2c9d@linux.vnet.ibm.com>
+	<20170906162019.45eeec4a.cohuck@redhat.com>
+	<cc6eab96-969d-eb66-91b5-cdb965c1bcbb@linux.vnet.ibm.com>
+	<20170907085831.GF31680@bjsdjshi@linux.vnet.ibm.com>
+	<20170907122400.5b2e3faa.cohuck@redhat.com>
+	<27b2addf-0d1c-81d7-1e82-1a8cdac70231@linux.vnet.ibm.com>
+	<20170907134134.00f387e8.cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOE=1Z2=dQ_HNjokhXb_Kvf=63YTjoNeX=-aUvDA_VfmSW0i8Q@mail.gmail.com>
-References: <CAOE=1Z0PxGGAkpO50rk1UtUDdLYX7kZZCLpb9rf87gZNVmGmLA@mail.gmail.com>
-	<CAOE=1Z2=dQ_HNjokhXb_Kvf=63YTjoNeX=-aUvDA_VfmSW0i8Q@mail.gmail.com>
-From: Sam <batmanustc@gmail.com>
-Date: Fri, 8 Sep 2017 11:38:51 +0800
-Message-ID: <CAOE=1Z0O9fWKYVaHtb5aws4DrvqKYc2cSZDTU_7Qrz5ZzfT6ew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Monitor socket will close after parse command
- error. Qemu-2.6.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170907134134.00f387e8.cohuck@redhat.com>
+Message-Id: <20170908034100.GH31680@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 4/9] s390x: refactor error handling for
+ SSCH and RSCH
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,145 +51,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: QEMU Developers <qemu-devel@nongnu.org>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-[gangyewei-3@yf-mos-test-net07 tests]$ telnet 127.0.0.1 55919
-Trying 127.0.0.1...
-Connected to 127.0.0.1.
-Escape character is '^]'.
-QEMU 2.6.2 monitor - type 'help' for more information
-(qemu) chardev-add
-socket,id=char-test_intf1,path=/usr/local/var/run/openvswitch/test_intf1,server=on
-chardev-add
-socket,id=char-test_intf1,path=/usr/local/var/run/openvswitch/test_intf1,server=on
-(qemu)
-(qemu) netdev_add
-vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=on
-netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=on
-(qemu)
-(qemu) device_add
-virtio-net-pci,netdev=test_intf1,mac=00:22:79:29:d2:6c,id=netdev-test_intf1
-device_add
-virtio-net-pci,netdev=test_intf1,mac=00:22:79:29:d2:6c,id=netdev-test_intf1
-(qemu)
-(qemu) device_del netdev-test_intf1
-device_del netdev-test_intf1
-(qemu)
-(qemu) netdev_del test_intf1
-netdev_del test_intf1
-(qemu)
-(qemu) chardev-remove char-test_intf1
-chardev-remove char-test_intf1
-Chardev 'char-test_intf1' is busy
-(qemu)
-(qemu) chardev-remove char-test_intf1
-chardev-remove char-test_intf1
-Chardev 'char-test_intf1' is busy
-(qemu)
-(qemu) chardev-remove char-test_intf1
-chardev-remove char-test_intf1
-Chardev 'char-test_intf1' is busy
-(qemu)
-(qemu) chardev-add
-socket,id=char-test_intf1,path=/usr/local/var/run/openvswitch/test_intf1,server=on
-chardev-add
-socket,id=char-test_intf1,path=/usr/local/var/run/openvswitch/test_intf1,server=on
-Duplicate ID 'char-test_intf1' for chardev
-Parsing chardev args failed
-(qemu)
-(qemu) ^[[A^[[A
-chardev-remove char-test_intf1
-Chardev 'char-test_intf1' is busy
-(qemu)
-(qemu)
+* Cornelia Huck <cohuck@redhat.com> [2017-09-07 13:41:34 +0200]:
 
-(qemu)
-(qemu)
+> On Thu, 7 Sep 2017 13:32:41 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+> > On 09/07/2017 12:24 PM, Cornelia Huck wrote:
+> 
+> > > So we would do an equipment check for the first two ("equipment", i.e.
+> > > the software, is malfunctioning) and use a more appropriate way for the
+> > > malformed idaw?
+> > >   
+> > 
+> > You have probably missed my previous email where I state something very
+> > similar (MID  <2aa8cf98-c331-fe5a-0a7e-1a553c6c5054@linux.vnet.ibm.com>).
+> > There I say: if we change the kernel code, yes, if we don't I prefer a
+> > program check.
+> 
+> Not missed, they crossed in mid-air.
+> 
+> But I agree, the decision is Dong Jia's.
+> 
+Let' me summarize here, in case I misunderstand things. Now we have
+two ways to choose:
 
-(qemu)
-(qemu) netdev_add
-vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=on
-netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=on
-Connection closed by foreign host.
+A. Kernel: no change.
+   Qemu  : handle -EFAULT as option 2 by generating a program check.
 
-2017-09-08 11:32 GMT+08:00 Sam <batmanustc@gmail.com>:
+B. Kernel: return -EFAULT
+           +
+           update the IRB area in the I/O region for option 1 to present
+           a unit check SCSW (with proper sense byte ECW), and for option
+           2 to present a program check.
+   Qemu  : handle -EFAULT according to the information that the IRB area
+           provided.
 
-> BTW, same result while using `telnet 127.0.0.1 55919`, which means also
-> have the two problem in the email before.
->
-> 2017-09-08 11:23 GMT+08:00 Sam <batmanustc@gmail.com>:
->
->> Hi all,
->>
->> I'm using HMP socket to send command to add netdev, my command like this:
->>
->> [gangyewei-3@yf-mos-test-net07 tests]$ sudo  python monitor.py 55919
->>> (qemu):
->>>  Connected to qemu monitor ...
->>> on_monitor_open
->>> ds
->>> (qemu):
->>> {'return': ["unknown command: 'ds'"]}
->>> chardev-add socket,id=char-test_intf1,path=/usr/local/var/run/openvswitc
->>> h/test_intf1,server=on
->>> (qemu):
->>> \{'return': []}
->>> netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=
->>> on
->>> (qemu):
->>> {'return': ["unknown command: '\\netdev_add'"]}
->>> netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=
->>> on
->>> (qemu):
->>> {'return': []}
->>> device_add virtio-net-pci,netdev=test_intf1,mac=00:22:79:29:d2:6c,id=
->>> netdev-test_intf1
->>> (qemu):
->>> {'return': []}
->>> device_del netdev-test_intf1
->>> (qemu):
->>> {'return': []}
->>> netdev_del test_intf1
->>> (qemu):
->>> {'return': []}
->>> chardev-remove char-test_intf1
->>> (qemu):
->>> {'return': ["Chardev 'char-test_intf1' is busy"]}
->>> chardev-remove char-test_intf1
->>> (qemu):
->>> {'return': ["Chardev 'char-test_intf1' is busy"]}
->>> ds
->>> (qemu):
->>> {'return': ["unknown command: 'ds'"]}
->>> chardev-add socket,id=char-test_intf1,path=/usr/local/var/run/openvswitc
->>> h/test_intf1,server=on
->>> (qemu):
->>> {'return': ["Duplicate ID 'char-test_intf1' for chardev", 'Parsing
->>> chardev args failed']}
->>> netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=
->>> on
->>> (qemu):
->>> on_monitor_close
->>> Disconnect ...
->>> Bye...
->>> [gangyewei-3@yf-mos-test-net07 tests]$ telnet 127.0.0.1 55919
->>> Trying 127.0.0.1...
->>> telnet: connect to address 127.0.0.1: Connection refused
->>
->>
->> the monitor.py is same like telnet, which send command to 127.0.0.1:55919
->> socket.
->> At the last 5th line, you could see "on_monitor_close", this is because
->> server side of 127.0.0.1:55919 socket is down.
->>
->> I have few questions:
->> 1. Why I got "{'return': ["Chardev 'char-test_intf1' is busy"]}" while
->> using "chardev-remove char-test_intf1"?
->> 2. Why the server side will close while get "{'return': ["Duplicate ID
->> 'char-test_intf1' for chardev", 'Parsing chardev args failed']}" and then
->> send same command?
->>
->> Thank you~
->>
->
->
+I think the difficult part is in the Qemu side. For either A or B, in
+Qemu, we'd need to return a cc0 to indicate the channel program is
+accepted successfully by the device, and then update the virtual IRB and
+inject an I/O interrupt to notify the guest.
+
+The question is, now we need to map -EFAULT to cc0? This is too odd...
+And we need to find a proper place to do the interrupt injection. I
+guess it could be in the sch_handle_start_func_passthrough().
+
+If we do not like such modification in the Qemu side, then A is not the
+way to go.
+
+And for B, we need to update the IRB area of the I/O region in the three
+cases listed in the former mail, and:
+1. We need to set the ret_code as 0 for them, so that Qemu could map it
+   to cc0.
+2. We need to signal Qemu to fetch the IRB we generated with the checks.
+All of these are doable I think.
+
+Any comment for the above thoughts?
+
+-- 
+Dong Jia Shi
