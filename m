@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dqIap-0007s1-N2
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:41:09 -0400
+	(envelope-from <mst@redhat.com>) id 1dqIcM-000082-0j
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:42:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dqIak-0002Wp-Oz
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:41:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37392)
+	(envelope-from <mst@redhat.com>) id 1dqIcH-0003yb-3Y
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:42:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39128)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dqIak-0002WD-FJ
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:41:02 -0400
-Date: Fri, 8 Sep 2017 15:40:56 +0300
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dqIcG-0003y3-QI
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:42:37 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D020046270
+	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 12:42:35 +0000 (UTC)
+Date: Fri, 8 Sep 2017 15:42:33 +0300
 From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170908153726-mutt-send-email-mst@kernel.org>
+Message-ID: <20170908154109-mutt-send-email-mst@kernel.org>
 References: <20170807181618.22562-1-marcandre.lureau@redhat.com>
-	<20170807181618.22562-3-marcandre.lureau@redhat.com>
+	<20170807181618.22562-4-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20170807181618.22562-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20170807181618.22562-4-marcandre.lureau@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 2/8] fw_cfg: add write callback
+Subject: Re: [Qemu-devel] [PATCH v5 3/8] fw_cfg: add vmcoreinfo file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,215 +35,179 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, Ben Warren <ben@skyportsystems.com>, Paolo Bonzini <pbonzini@redhat.com>, anderson@redhat.com, imammedo@redhat.com, lersek@redhat.com, Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, anderson@redhat.com, imammedo@redhat.com, lersek@redhat.com
 
-On Mon, Aug 07, 2017 at 08:16:12PM +0200, Marc-Andr=E9 Lureau wrote:
-> Reintroduce the write callback that was removed when write support was
-> removed in commit 023e3148567ac898c7258138f8e86c3c2bb40d07.
+On Mon, Aug 07, 2017 at 08:16:13PM +0200, Marc-Andr=E9 Lureau wrote:
+> See docs/specs/fw_cfg.txt for details.
 >=20
-> The write_cb callback is called when a write reaches the end of file,
-> that is when the write pointer/offset reaches the size of the file.
+> The "etc/vmcoreinfo" is added when using "-global
+> fw_cfg.vmcoreinfo=3Don" qemu option.
+>=20
+> Disabled by default for machine types v2.9 and older.
 >=20
 > Signed-off-by: Marc-Andr=E9 Lureau <marcandre.lureau@redhat.com>
 > ---
->  include/hw/nvram/fw_cfg.h |  2 ++
->  hw/acpi/vmgenid.c         |  2 +-
->  hw/core/loader.c          |  2 +-
->  hw/i386/acpi-build.c      |  2 +-
->  hw/isa/lpc_ich9.c         |  4 ++--
->  hw/nvram/fw_cfg.c         | 18 ++++++++++++++----
->  6 files changed, 21 insertions(+), 9 deletions(-)
+>  include/hw/compat.h       |  8 ++++++++
+>  include/hw/nvram/fw_cfg.h |  9 +++++++++
+>  hw/nvram/fw_cfg.c         | 20 ++++++++++++++++++++
+>  docs/specs/fw_cfg.txt     | 16 ++++++++++++++++
+>  4 files changed, 53 insertions(+)
 >=20
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 08f36004da..317fd2e2e3 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -18,6 +18,14 @@
+>          .driver   =3D "pcie-root-port",\
+>          .property =3D "x-migrate-msix",\
+>          .value    =3D "false",\
+> +    },{\
+> +        .driver   =3D "fw_cfg_mem",\
+> +        .property =3D "vmcoreinfo",\
+> +        .value    =3D "off",\
+> +    },{\
+> +        .driver   =3D "fw_cfg_io",\
+> +        .property =3D "vmcoreinfo",\
+> +        .value    =3D "off",\
+>      },
+> =20
+>  #define HW_COMPAT_2_8 \
 > diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-> index f50d068563..3527cd51d8 100644
+> index 3527cd51d8..a35f47405d 100644
 > --- a/include/hw/nvram/fw_cfg.h
 > +++ b/include/hw/nvram/fw_cfg.h
-> @@ -183,6 +183,7 @@ void fw_cfg_add_file(FWCfgState *s, const char *fil=
-ename, void *data,
->   * @s: fw_cfg device being modified
->   * @filename: name of new fw_cfg file item
->   * @select_cb: callback function when selecting
-> + * @write_cb: callback function when write reached EOF
->   * @callback_opaque: argument to be passed into callback function
->   * @data: pointer to start of item data
->   * @len: size of item data
-> @@ -202,6 +203,7 @@ void fw_cfg_add_file(FWCfgState *s, const char *fil=
-ename, void *data,
->   */
->  void fw_cfg_add_file_callback(FWCfgState *s, const char *filename,
->                                FWCfgCallback select_cb,
-> +                              FWCfgCallback write_cb,
->                                void *callback_opaque,
->                                void *data, size_t len, bool read_only);
+> @@ -30,6 +30,11 @@ typedef struct FWCfgFile {
+>  void fw_cfg_set_order_override(FWCfgState *fw_cfg, int order);
+>  void fw_cfg_reset_order_override(FWCfgState *fw_cfg);
 > =20
-> diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-> index a32b847fe0..c1e935da9f 100644
-> --- a/hw/acpi/vmgenid.c
-> +++ b/hw/acpi/vmgenid.c
-> @@ -124,7 +124,7 @@ void vmgenid_add_fw_cfg(VmGenIdState *vms, FWCfgSta=
-te *s, GArray *guid)
->      fw_cfg_add_file(s, VMGENID_GUID_FW_CFG_FILE, guid->data,
->                      VMGENID_FW_CFG_SIZE);
->      /* Create a read-write fw_cfg file for Address */
-> -    fw_cfg_add_file_callback(s, VMGENID_ADDR_FW_CFG_FILE, NULL, NULL,
-> +    fw_cfg_add_file_callback(s, VMGENID_ADDR_FW_CFG_FILE, NULL, NULL, =
-NULL,
->                               vms->vmgenid_addr_le,
->                               ARRAY_SIZE(vms->vmgenid_addr_le), false);
->  }
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index 4593061445..91669d65aa 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -1023,7 +1023,7 @@ MemoryRegion *rom_add_blob(const char *name, cons=
-t void *blob, size_t len,
->          }
-> =20
->          fw_cfg_add_file_callback(fw_cfg, fw_file_name,
-> -                                 fw_callback, callback_opaque,
-> +                                 fw_callback, NULL, callback_opaque,
->                                   data, rom->datasize, read_only);
->      }
->      return mr;
-> diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> index b9c245c9bb..be2992b708 100644
-> --- a/hw/i386/acpi-build.c
-> +++ b/hw/i386/acpi-build.c
-> @@ -2922,7 +2922,7 @@ void acpi_setup(void)
-> =20
->          build_state->rsdp =3D g_memdup(tables.rsdp->data, rsdp_size);
->          fw_cfg_add_file_callback(pcms->fw_cfg, ACPI_BUILD_RSDP_FILE,
-> -                                 acpi_build_update, build_state,
-> +                                 acpi_build_update, NULL, build_state,
->                                   build_state->rsdp, rsdp_size, true);
->          build_state->rsdp_mr =3D NULL;
->      } else {
-> diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-> index ac8416d42b..de8fbb7260 100644
-> --- a/hw/isa/lpc_ich9.c
-> +++ b/hw/isa/lpc_ich9.c
-> @@ -402,12 +402,12 @@ void ich9_lpc_pm_init(PCIDevice *lpc_pci, bool sm=
-m_enabled)
->           * just link them into fw_cfg here.
->           */
->          fw_cfg_add_file_callback(fw_cfg, "etc/smi/requested-features",
-> -                                 NULL, NULL,
-> +                                 NULL, NULL, NULL,
->                                   lpc->smi_guest_features_le,
->                                   sizeof lpc->smi_guest_features_le,
->                                   false);
->          fw_cfg_add_file_callback(fw_cfg, "etc/smi/features-ok",
-> -                                 smi_features_ok_callback, lpc,
-> +                                 smi_features_ok_callback, NULL, lpc,
->                                   &lpc->smi_features_ok,
->                                   sizeof lpc->smi_features_ok,
->                                   true);
-> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-> index e3bd626b8c..28780088b9 100644
-> --- a/hw/nvram/fw_cfg.c
-> +++ b/hw/nvram/fw_cfg.c
-> @@ -56,6 +56,7 @@ struct FWCfgEntry {
->      uint8_t *data;
->      void *callback_opaque;
->      FWCfgCallback select_cb;
-> +    FWCfgCallback write_cb;
+> +typedef struct FWCfgVMCoreInfo {
+> +    uint64_t paddr;
+> +    uint32_t size;
+
+Pls add padding to align structure size to multiple of 8 bytes.
+
+> +} QEMU_PACKED FWCfgVMCoreInfo;
+> +
+>  typedef struct FWCfgFiles {
+>      uint32_t  count;
+>      FWCfgFile f[];
+> @@ -65,6 +70,10 @@ struct FWCfgState {
+>      dma_addr_t dma_addr;
+>      AddressSpace *dma_as;
+>      MemoryRegion dma_iomem;
+> +
+> +    bool vmcoreinfo_enabled;
+> +    bool has_vmcoreinfo;
+> +    FWCfgVMCoreInfo vmcoreinfo;
 >  };
 > =20
->  #define JPG_FILE 0
-> @@ -384,6 +385,12 @@ static void fw_cfg_dma_transfer(FWCfgState *s)
->      stl_be_dma(s->dma_as, dma_addr + offsetof(FWCfgDmaAccess, control)=
-,
->                  dma.control);
+>  struct FWCfgIoState {
+> diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
+> index 28780088b9..342afc4ed2 100644
+> --- a/hw/nvram/fw_cfg.c
+> +++ b/hw/nvram/fw_cfg.c
+> @@ -504,6 +504,7 @@ static void fw_cfg_reset(DeviceState *d)
 > =20
-> +    if (write &&
-> +        !(dma.control & FW_CFG_DMA_CTL_ERROR) &&
-> +        s->cur_offset =3D=3D e->len) {
-> +        e->write_cb(e->callback_opaque);
+>      /* we never register a read callback for FW_CFG_SIGNATURE */
+>      fw_cfg_select(s, FW_CFG_SIGNATURE);
+> +    s->has_vmcoreinfo =3D false;
+
+I do not think this is enough.  If guest only writes the last couple of
+bytes you leak some info from before to after reset.
+You want to zero the whole structure.
+
+
+
+>  }
+> =20
+>  /* Save restore 32 bit int as uint16_t
+> @@ -869,7 +870,12 @@ static void fw_cfg_machine_ready(struct Notifier *=
+n, void *data)
+>      qemu_register_reset(fw_cfg_machine_reset, s);
+>  }
+> =20
+> +static void fw_cfg_vmci_written(void *dev)
+> +{
+> +    FWCfgState *s =3D FW_CFG(dev);
+> =20
+> +    s->has_vmcoreinfo =3D true;
+> +}
+> =20
+>  static void fw_cfg_common_realize(DeviceState *dev, Error **errp)
+>  {
+> @@ -895,6 +901,16 @@ static void fw_cfg_common_realize(DeviceState *dev=
+, Error **errp)
+> =20
+>      fw_cfg_add_i32(s, FW_CFG_ID, version);
+> =20
+> +    if (s->vmcoreinfo_enabled) {
+> +        if (!s->dma_enabled) {
+> +            error_setg(errp, "vmcoreinfo requires dma_enabled");
+> +            return;
+> +        }
+> +        fw_cfg_add_file_callback(s, "etc/vmcoreinfo",
+> +                                 NULL, fw_cfg_vmci_written, s,
+> +                                 &s->vmcoreinfo, sizeof(s->vmcoreinfo)=
+, false);
 > +    }
 > +
-
-I think callback should be invoked on every write.
-And your device should verify that all of it is written.
-We are doing DMA so all of it can be written in one go.
-
-
-
->      trace_fw_cfg_read(s, 0);
+>      s->machine_ready.notify =3D fw_cfg_machine_ready;
+>      qemu_add_machine_init_done_notifier(&s->machine_ready);
 >  }
+> @@ -1031,6 +1047,8 @@ static void fw_cfg_file_slots_allocate(FWCfgState=
+ *s, Error **errp)
+>  static Property fw_cfg_io_properties[] =3D {
+>      DEFINE_PROP_BOOL("dma_enabled", FWCfgIoState, parent_obj.dma_enabl=
+ed,
+>                       true),
+> +    DEFINE_PROP_BOOL("vmcoreinfo", FWCfgIoState, parent_obj.vmcoreinfo=
+_enabled,
+> +                     true),
+>      DEFINE_PROP_UINT16("x-file-slots", FWCfgIoState, parent_obj.file_s=
+lots,
+>                         FW_CFG_FILE_SLOTS_DFLT),
+>      DEFINE_PROP_END_OF_LIST(),
+> @@ -1082,6 +1100,8 @@ static Property fw_cfg_mem_properties[] =3D {
+>      DEFINE_PROP_UINT32("data_width", FWCfgMemState, data_width, -1),
+>      DEFINE_PROP_BOOL("dma_enabled", FWCfgMemState, parent_obj.dma_enab=
+led,
+>                       true),
+> +    DEFINE_PROP_BOOL("vmcoreinfo", FWCfgMemState, parent_obj.vmcoreinf=
+o_enabled,
+> +                     true),
+>      DEFINE_PROP_UINT16("x-file-slots", FWCfgMemState, parent_obj.file_=
+slots,
+>                         FW_CFG_FILE_SLOTS_DFLT),
+>      DEFINE_PROP_END_OF_LIST(),
+> diff --git a/docs/specs/fw_cfg.txt b/docs/specs/fw_cfg.txt
+> index 08c00bdf44..37d0f9f40a 100644
+> --- a/docs/specs/fw_cfg.txt
+> +++ b/docs/specs/fw_cfg.txt
+> @@ -136,6 +136,22 @@ struct FWCfgFile {		/* an individual file entry, 6=
+4 bytes total */
+>      char name[56];		/* fw_cfg item name, NUL-terminated ascii */
+>  };
 > =20
-> @@ -570,6 +577,7 @@ static const VMStateDescription vmstate_fw_cfg =3D =
-{
+> +=3D=3D=3D etc/vmcoreinfo =3D=3D=3D
+> +
+> +A guest may use this entry to add information details to qemu
+> +dumps. The entry gives location and size of an ELF note that is
+> +appended in qemu dumps.
+> +
+> +The entry is of 12 bytes with this format:
+> +
+> +struct FWCfgVMCoreInfo {
+> +    uint64_t paddr;             /* physical address of ELF note, LE */
+> +    uint32_t size;              /* size of ELF note region, LE */
+> +};
+> +
+> +The note format/class must be of the target bitness and the size must
+> +be less than 1Mb.
+> +
+>  =3D=3D=3D All Other Data Items =3D=3D=3D
 > =20
->  static void fw_cfg_add_bytes_callback(FWCfgState *s, uint16_t key,
->                                        FWCfgCallback select_cb,
-> +                                      FWCfgCallback write_cb,
->                                        void *callback_opaque,
->                                        void *data, size_t len,
->                                        bool read_only)
-> @@ -584,6 +592,7 @@ static void fw_cfg_add_bytes_callback(FWCfgState *s=
-, uint16_t key,
->      s->entries[arch][key].data =3D data;
->      s->entries[arch][key].len =3D (uint32_t)len;
->      s->entries[arch][key].select_cb =3D select_cb;
-> +    s->entries[arch][key].write_cb =3D write_cb;
->      s->entries[arch][key].callback_opaque =3D callback_opaque;
->      s->entries[arch][key].allow_write =3D !read_only;
->  }
-> @@ -610,7 +619,7 @@ static void *fw_cfg_modify_bytes_read(FWCfgState *s=
-, uint16_t key,
-> =20
->  void fw_cfg_add_bytes(FWCfgState *s, uint16_t key, void *data, size_t =
-len)
->  {
-> -    fw_cfg_add_bytes_callback(s, key, NULL, NULL, data, len, true);
-> +    fw_cfg_add_bytes_callback(s, key, NULL, NULL, NULL, data, len, tru=
-e);
->  }
-> =20
->  void fw_cfg_add_string(FWCfgState *s, uint16_t key, const char *value)
-> @@ -737,6 +746,7 @@ static int get_fw_cfg_order(FWCfgState *s, const ch=
-ar *name)
-> =20
->  void fw_cfg_add_file_callback(FWCfgState *s,  const char *filename,
->                                FWCfgCallback select_cb,
-> +                              FWCfgCallback write_cb,
->                                void *callback_opaque,
->                                void *data, size_t len, bool read_only)
->  {
-> @@ -800,7 +810,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const=
- char *filename,
->      }
-> =20
->      fw_cfg_add_bytes_callback(s, FW_CFG_FILE_FIRST + index,
-> -                              select_cb,
-> +                              select_cb, write_cb,
->                                callback_opaque, data, len,
->                                read_only);
-> =20
-> @@ -815,7 +825,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const=
- char *filename,
->  void fw_cfg_add_file(FWCfgState *s,  const char *filename,
->                       void *data, size_t len)
->  {
-> -    fw_cfg_add_file_callback(s, filename, NULL, NULL, data, len, true)=
-;
-> +    fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len,=
- true);
->  }
-> =20
->  void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
-> @@ -838,7 +848,7 @@ void *fw_cfg_modify_file(FWCfgState *s, const char =
-*filename,
->          }
->      }
->      /* add new one */
-> -    fw_cfg_add_file_callback(s, filename, NULL, NULL, data, len, true)=
-;
-> +    fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len,=
- true);
->      return NULL;
->  }
-> =20
+>  Please consult the QEMU source for the most up-to-date and authoritati=
+ve list
 > --=20
 > 2.14.0.1.geff633fa0
 >=20
