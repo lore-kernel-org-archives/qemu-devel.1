@@ -1,48 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36812)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43863)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dqAAK-0005uA-41
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:41:16 -0400
+	(envelope-from <mst@redhat.com>) id 1dqAJC-0008Jz-NM
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:50:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1dqAAF-0007q2-6p
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:41:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44339
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1dqAAE-0007pM-Tb
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:41:07 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v883dZnL126657
-	for <qemu-devel@nongnu.org>; Thu, 7 Sep 2017 23:41:05 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cuc9mukht-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 23:41:05 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Thu, 7 Sep 2017 21:41:04 -0600
-Date: Fri, 8 Sep 2017 11:41:00 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170905182546.00457332.cohuck@redhat.com>
-	<fe102a7a-e998-8ebe-b94d-e653c4f66c39@linux.vnet.ibm.com>
-	<20170906043108.GY31680@bjsdjshi@linux.vnet.ibm.com>
-	<8946b1ec-4d14-c953-deab-aaded7cd2c9d@linux.vnet.ibm.com>
-	<20170906162019.45eeec4a.cohuck@redhat.com>
-	<cc6eab96-969d-eb66-91b5-cdb965c1bcbb@linux.vnet.ibm.com>
-	<20170907085831.GF31680@bjsdjshi@linux.vnet.ibm.com>
-	<20170907122400.5b2e3faa.cohuck@redhat.com>
-	<27b2addf-0d1c-81d7-1e82-1a8cdac70231@linux.vnet.ibm.com>
-	<20170907134134.00f387e8.cohuck@redhat.com>
+	(envelope-from <mst@redhat.com>) id 1dqAJ7-0000Rn-Fz
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:50:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40378)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dqAJ7-0000Qw-7h
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:50:17 -0400
+Date: Fri, 8 Sep 2017 06:49:52 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170908064744-mutt-send-email-mst@kernel.org>
+References: <1503734014-239116-1-git-send-email-longpeng2@huawei.com>
+	<59A8AE20.1080409@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170907134134.00f387e8.cohuck@redhat.com>
-Message-Id: <20170908034100.GH31680@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 4/9] s390x: refactor error handling for
- SSCH and RSCH
+In-Reply-To: <59A8AE20.1080409@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v19 0/2] virtio-crypto: virtio crypto
+ device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -51,64 +28,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Xiao Feng Ren <renxiaof@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: "Longpeng (Mike)" <longpeng2@huawei.com>
+Cc: stefanha@redhat.com, pasic@linux.vnet.ibm.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, luonengjun@huawei.com, cohuck@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, mike.caraman@nxp.com, agraf@suse.de, jasowang@redhat.com, nmorey@kalray.eu, vincent.jardin@6wind.com, arei.gonglei@hotmail.com, wangxinxin.wang@huawei.com
 
-* Cornelia Huck <cohuck@redhat.com> [2017-09-07 13:41:34 +0200]:
+On Fri, Sep 01, 2017 at 08:47:28AM +0800, Longpeng (Mike) wrote:
+> Ping...
+> 
+> Stefan, Halil, do you have any suggestion ?
 
-> On Thu, 7 Sep 2017 13:32:41 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+I do not see this patchset in the virtio list archives.
+It could be that youa re posting from an email that is
+not a subscriber.
+
+Please subscribe and repost.
+
+We'll then have to allow up to 2 weeks for comments.
+
+Halil, I hope this timing works for you.
+
+> -- 
+> Regards,
+> Longpeng(Mike)
 > 
-> > On 09/07/2017 12:24 PM, Cornelia Huck wrote:
+> On 2017/8/26 15:53, Longpeng(Mike) wrote:
 > 
-> > > So we would do an equipment check for the first two ("equipment", i.e.
-> > > the software, is malfunctioning) and use a more appropriate way for the
-> > > malformed idaw?
-> > >   
+> > Hi guys,
 > > 
-> > You have probably missed my previous email where I state something very
-> > similar (MID  <2aa8cf98-c331-fe5a-0a7e-1a553c6c5054@linux.vnet.ibm.com>).
-> > There I say: if we change the kernel code, yes, if we don't I prefer a
-> > program check.
+> > I'll work on the virtio-crypto spec with Gonglei together, Because He is
+> > so busy on the inner production project.
+> > 
+> > ---
+> > v19 -> v18:
+> >  - fix some typos and grammar fixes [Stefan, Halil]
+> >  - rename VIRTIO_CRYPTO_F_STATELESS_MODE to VIRTIO_CRYPTO_F_MUX_MODE
+> >  - describe the VIRTIO_CRYPTO_STATUS in detial. [Halil]
+> >  - refactor and redescribe the controlq/dataq request's format
+> >    of mux mode. [Halil]
+> >  - other small fixes. [Halil]
+> > 
+> > v18 -> v17:
+> >  - fix many English grammar problems suggested by Stefan, Thanks a lot!
+> > 
+> > v17 -> v16:
+> >  - Some grammar fixes [Stefan, Halil, Michael]
+> >  - add a section named "Supported crypto services" in order to explain bit
+> >    numbers and valuse clearly. [Halil, Cornelia]
+> >  - avoid word reptition [Halil]
+> >  - rename non-session mode to stateless mode [Halil]
+> >  - change descriptions for all elements in struct virtio_crypto_config [Halil]
+> >  - add Halil as a reviewer in the ackonwledgement part, thanks for his work.
+> >  - other fixes here and there.
+> > 
+> > Changes since v15:
+> >  - use feature bits for non-session mode in order to keep compatibility with
+> >    pre-existing code. [Halil & Michael]
+> >  - introduce VIRTIO_CRYPTO_F_ NON_SESSION_MODE feature bit to control all other
+> >    non-session mode feature bits.
+> >  - fix some typos. [Stefan]
+> >  - introduce struct virtio_crypto_op_data_req_mux to support both session
+> >    and non-session based crypto operations and keep compatibility with
+> >    pre-existing code.
+> > 
+> > Changes since v14:
+> >  - drop VIRTIO_CRYPTO_S_STARTED status [Halil & Cornelia]
+> >  - correct a sentence about dataqueue and controlq in the first paragraph. 
+> > [Halil]
+> >  - change a MAY to MUST about max_dataqueues. [Halil]
+> >  - add non-session mode support
+> >    a) add four features for different crypto services to identify wheather 
+> > support session mode.
+> >    b) rewrite some
+> > 
+> > For pervious versions of virtio crypto spec, Pls see:
+> > 
+> > [v18]:
+> > https://www.mail-archive.com/qemu-devel@nongnu.org/msg444897.html
+> > 
+> > [v14]:
+> > https://lists.gnu.org/archive/html/qemu-devel/2016-11/msg02212.html
+> > 
+> > [v13]:
+> > https://lists.gnu.org/archive/html/qemu-devel/2016-10/msg07348.html
+> > 
+> > For more information, please see:
+> >  http://qemu-project.org/Features/VirtioCrypto
+> > 
+> > ---
+> > Gonglei (2):
+> >   virtio-crypto: Add virtio crypto device specification
+> >   virtio-crypto: Add conformance clauses
+> > 
+> >  acknowledgements.tex |    3 +
+> >  conformance.tex      |   29 +
+> >  content.tex          |    2 +
+> >  virtio-crypto.tex    | 1470 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  4 files changed, 1504 insertions(+)
+> >  create mode 100644 virtio-crypto.tex
+> > 
 > 
-> Not missed, they crossed in mid-air.
 > 
-> But I agree, the decision is Dong Jia's.
-> 
-Let' me summarize here, in case I misunderstand things. Now we have
-two ways to choose:
-
-A. Kernel: no change.
-   Qemu  : handle -EFAULT as option 2 by generating a program check.
-
-B. Kernel: return -EFAULT
-           +
-           update the IRB area in the I/O region for option 1 to present
-           a unit check SCSW (with proper sense byte ECW), and for option
-           2 to present a program check.
-   Qemu  : handle -EFAULT according to the information that the IRB area
-           provided.
-
-I think the difficult part is in the Qemu side. For either A or B, in
-Qemu, we'd need to return a cc0 to indicate the channel program is
-accepted successfully by the device, and then update the virtual IRB and
-inject an I/O interrupt to notify the guest.
-
-The question is, now we need to map -EFAULT to cc0? This is too odd...
-And we need to find a proper place to do the interrupt injection. I
-guess it could be in the sch_handle_start_func_passthrough().
-
-If we do not like such modification in the Qemu side, then A is not the
-way to go.
-
-And for B, we need to update the IRB area of the I/O region in the three
-cases listed in the former mail, and:
-1. We need to set the ret_code as 0 for them, so that Qemu could map it
-   to cc0.
-2. We need to signal Qemu to fetch the IRB we generated with the checks.
-All of these are doable I think.
-
-Any comment for the above thoughts?
-
--- 
-Dong Jia Shi
+> -- 
+> Regards,
+> Longpeng(Mike)
