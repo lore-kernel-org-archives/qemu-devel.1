@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43782)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dqIJT-0000TN-74
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:23:12 -0400
+	(envelope-from <groug@kaod.org>) id 1dqINs-0001pb-5b
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:27:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dqIJS-0004A6-0K
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:23:11 -0400
-Date: Fri, 8 Sep 2017 14:22:54 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170908122254.GG3283@localhost.localdomain>
-References: <20170830210542.2153-1-eblake@redhat.com>
-	<20170830210542.2153-6-eblake@redhat.com>
+	(envelope-from <groug@kaod.org>) id 1dqINo-0008AQ-U9
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:27:44 -0400
+Received: from 10.mo177.mail-out.ovh.net ([46.105.73.133]:53291)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dqINo-000891-Ki
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:27:40 -0400
+Received: from player714.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 1E00E79BB2
+	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 14:27:37 +0200 (CEST)
+Date: Fri, 8 Sep 2017 14:27:29 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170908142729.1008e033@bahia>
+In-Reply-To: <1504541267-36954-4-git-send-email-pradeep.jagadeesh@huawei.com>
+References: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1504541267-36954-4-git-send-email-pradeep.jagadeesh@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170830210542.2153-6-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 05/18] dirty-bitmap: Change
- bdrv_dirty_bitmap_size() to report bytes
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/lSso=A9Q6HUOtxSHaVAlbXh";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v10 3/6] throttle: move out function to
+ reuse the code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,112 +32,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: eric blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-Am 30.08.2017 um 23:05 hat Eric Blake geschrieben:
-> We are still using an internal hbitmap that tracks a size in sectors,
-> with the granularity scaled down accordingly, because it lets us
-> use a shortcut for our iterators which are currently sector-based.
-> But there's no reason we can't track the dirty bitmap size in bytes,
-> since it is (mostly) an internal-only variable (remember, the size
-> is how many bytes are covered by the bitmap, not how many bytes the
-> bitmap occupies).  Furthermore, we're already reporting bytes for
-> bdrv_dirty_bitmap_granularity(); mixing bytes and sectors in our
-> return values is a recipe for confusion.  A later cleanup will
-> convert dirty bitmap internals to be entirely byte-based,
-> eliminating the intermediate sector rounding added here; and
-> technically, since bdrv_getlength() already rounds up to sectors,
-> our use of DIV_ROUND_UP is more for theoretical completeness than
-> for any actual rounding.
-> 
-> The only external caller in qcow2-bitmap.c is temporarily more verbose
-> (because it is still using sector-based math), but will later be
-> switched to track progress by bytes instead of sectors.
-> 
-> Use is_power_of_2() while at it, instead of open-coding that, and
-> add an assertion where bdrv_getlength() should not fail.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
+--Sig_/lSso=A9Q6HUOtxSHaVAlbXh
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I think I would have preferred to change the unit of
-BdrvDirtyBitmap.size in one patch and the unit of the return value of
-bdrv_dirty_bitmap_size() in another one to keep review a bit easier.
+On Mon,  4 Sep 2017 12:07:44 -0400
+Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
 
->  block/dirty-bitmap.c | 26 +++++++++++++++-----------
->  block/qcow2-bitmap.c | 14 ++++++++------
->  2 files changed, 23 insertions(+), 17 deletions(-)
-> 
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 42a55e4a4b..e65ec4f7ec 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -1,7 +1,7 @@
->  /*
->   * Block Dirty Bitmap
->   *
-> - * Copyright (c) 2016 Red Hat. Inc
-> + * Copyright (c) 2016-2017 Red Hat. Inc
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining a copy
->   * of this software and associated documentation files (the "Software"), to deal
-> @@ -42,7 +42,7 @@ struct BdrvDirtyBitmap {
->      HBitmap *meta;              /* Meta dirty bitmap */
->      BdrvDirtyBitmap *successor; /* Anonymous child; implies frozen status */
->      char *name;                 /* Optional non-empty unique ID */
-> -    int64_t size;               /* Size of the bitmap (Number of sectors) */
-> +    int64_t size;               /* Size of the bitmap, in bytes */
->      bool disabled;              /* Bitmap is disabled. It ignores all writes to
->                                     the device */
->      int active_iterators;       /* How many iterators are active */
-> @@ -115,17 +115,14 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
->  {
->      int64_t bitmap_size;
->      BdrvDirtyBitmap *bitmap;
-> -    uint32_t sector_granularity;
-> 
-> -    assert((granularity & (granularity - 1)) == 0);
-> +    assert(is_power_of_2(granularity) && granularity >= BDRV_SECTOR_SIZE);
-> 
->      if (name && bdrv_find_dirty_bitmap(bs, name)) {
->          error_setg(errp, "Bitmap already exists: %s", name);
->          return NULL;
+> This patch move out the throttle code to util/throttle.c to maximize
+> the reusability of the code.The same code is also used by fsdev.
+
+s/.The same code is also used by fsdev/. The same code will also be used by=
+ fsdev/
+
+> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
+> ---
+>  blockdev.c                      | 53 +++---------------------------------
+>  include/qemu/throttle-options.h |  2 ++
+>  util/throttle.c                 | 59 +++++++++++++++++++++++++++++++++++=
+++++++
+>  3 files changed, 64 insertions(+), 50 deletions(-)
+>=20
+> diff --git a/blockdev.c b/blockdev.c
+> index 780ae58..1caf2e0 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -2571,6 +2571,7 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg=
+, Error **errp)
+>      BlockDriverState *bs;
+>      BlockBackend *blk;
+>      AioContext *aio_context;
+> +    IOThrottle *iothrottle;
+> =20
+>      blk =3D qmp_get_blk(arg->has_device ? arg->device : NULL,
+>                        arg->has_id ? arg->id : NULL,
+> @@ -2588,56 +2589,8 @@ void qmp_block_set_io_throttle(BlockIOThrottle *ar=
+g, Error **errp)
+>          goto out;
 >      }
-> -    sector_granularity = granularity >> BDRV_SECTOR_BITS;
-> -    assert(sector_granularity);
-> -    bitmap_size = bdrv_nb_sectors(bs);
-> +    bitmap_size = bdrv_getlength(bs);
->      if (bitmap_size < 0) {
->          error_setg_errno(errp, -bitmap_size, "could not get length of device");
->          errno = -bitmap_size;
-> @@ -133,7 +130,12 @@ BdrvDirtyBitmap *bdrv_create_dirty_bitmap(BlockDriverState *bs,
->      }
->      bitmap = g_new0(BdrvDirtyBitmap, 1);
->      bitmap->mutex = &bs->dirty_bitmap_mutex;
-> -    bitmap->bitmap = hbitmap_alloc(bitmap_size, ctz32(sector_granularity));
-> +    /*
-> +     * TODO - let hbitmap track full granularity. For now, it is tracking
-> +     * only sector granularity, as a shortcut for our iterators.
-> +     */
-> +    bitmap->bitmap = hbitmap_alloc(DIV_ROUND_UP(bitmap_size, BDRV_SECTOR_SIZE),
-> +                                   ctz32(granularity) - BDRV_SECTOR_BITS);
->      bitmap->size = bitmap_size;
->      bitmap->name = g_strdup(name);
->      bitmap->disabled = false;
-> @@ -305,13 +307,14 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
->  void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
->  {
->      BdrvDirtyBitmap *bitmap;
-> -    uint64_t size = bdrv_nb_sectors(bs);
-> +    int64_t size = bdrv_getlength(bs);
-> 
-> +    assert(size >= 0);
+> =20
+> -    throttle_config_init(&cfg);
+> -    cfg.buckets[THROTTLE_BPS_TOTAL].avg =3D arg->bps;
+> -    cfg.buckets[THROTTLE_BPS_READ].avg  =3D arg->bps_rd;
+> -    cfg.buckets[THROTTLE_BPS_WRITE].avg =3D arg->bps_wr;
+> -
+> -    cfg.buckets[THROTTLE_OPS_TOTAL].avg =3D arg->iops;
+> -    cfg.buckets[THROTTLE_OPS_READ].avg  =3D arg->iops_rd;
+> -    cfg.buckets[THROTTLE_OPS_WRITE].avg =3D arg->iops_wr;
+> -
+> -    if (arg->has_bps_max) {
+> -        cfg.buckets[THROTTLE_BPS_TOTAL].max =3D arg->bps_max;
+> -    }
+> -    if (arg->has_bps_rd_max) {
+> -        cfg.buckets[THROTTLE_BPS_READ].max =3D arg->bps_rd_max;
+> -    }
+> -    if (arg->has_bps_wr_max) {
+> -        cfg.buckets[THROTTLE_BPS_WRITE].max =3D arg->bps_wr_max;
+> -    }
+> -    if (arg->has_iops_max) {
+> -        cfg.buckets[THROTTLE_OPS_TOTAL].max =3D arg->iops_max;
+> -    }
+> -    if (arg->has_iops_rd_max) {
+> -        cfg.buckets[THROTTLE_OPS_READ].max =3D arg->iops_rd_max;
+> -    }
+> -    if (arg->has_iops_wr_max) {
+> -        cfg.buckets[THROTTLE_OPS_WRITE].max =3D arg->iops_wr_max;
+> -    }
+> -
+> -    if (arg->has_bps_max_length) {
+> -        cfg.buckets[THROTTLE_BPS_TOTAL].burst_length =3D arg->bps_max_le=
+ngth;
+> -    }
+> -    if (arg->has_bps_rd_max_length) {
+> -        cfg.buckets[THROTTLE_BPS_READ].burst_length =3D arg->bps_rd_max_=
+length;
+> -    }
+> -    if (arg->has_bps_wr_max_length) {
+> -        cfg.buckets[THROTTLE_BPS_WRITE].burst_length =3D arg->bps_wr_max=
+_length;
+> -    }
+> -    if (arg->has_iops_max_length) {
+> -        cfg.buckets[THROTTLE_OPS_TOTAL].burst_length =3D arg->iops_max_l=
+ength;
+> -    }
+> -    if (arg->has_iops_rd_max_length) {
+> -        cfg.buckets[THROTTLE_OPS_READ].burst_length =3D arg->iops_rd_max=
+_length;
+> -    }
+> -    if (arg->has_iops_wr_max_length) {
+> -        cfg.buckets[THROTTLE_OPS_WRITE].burst_length =3D arg->iops_wr_ma=
+x_length;
+> -    }
+> -
+> -    if (arg->has_iops_size) {
+> -        cfg.op_size =3D arg->iops_size;
+> -    }
+> +    iothrottle =3D qapi_BlockIOThrottle_base(arg);
+> +    throttle_set_io_limits(&cfg, iothrottle);
+> =20
+>      if (!throttle_is_valid(&cfg, errp)) {
+>          goto out;
+> diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-opti=
+ons.h
+> index f63d38c..b736185 100644
+> --- a/include/qemu/throttle-options.h
+> +++ b/include/qemu/throttle-options.h
+> @@ -11,6 +11,7 @@
+>  #define THROTTLE_OPTIONS_H
+> =20
+>  #include "typedefs.h"
+> +#include "qapi-types.h"
+> =20
+>  #define THROTTLE_OPTS \
+>            { \
+> @@ -92,5 +93,6 @@
+>          }
+> =20
+>  void throttle_parse_options(ThrottleConfig *, QemuOpts *);
+> +void throttle_set_io_limits(ThrottleConfig *, IOThrottle *);
+> =20
+>  #endif
+> diff --git a/util/throttle.c b/util/throttle.c
+> index 95c2ecf..dcc9d5a 100644
+> --- a/util/throttle.c
+> +++ b/util/throttle.c
+> @@ -553,3 +553,62 @@ void throttle_parse_options(ThrottleConfig *throttle=
+_cfg, QemuOpts *opts)
+>      throttle_cfg->op_size =3D
+>          qemu_opt_get_number(opts, "throttling.iops-size", 0);
+>  }
+> +
+> +/* Initialize a throttle config from an IOThrottle structure
+> + *
+> + * @arg: iothrottle limits
+> + * @cfg: throttle configuration
+> + */
+> +void throttle_set_io_limits(ThrottleConfig *cfg, IOThrottle *arg)
+> +{
+> +    throttle_config_init(cfg);
+> +    cfg->buckets[THROTTLE_BPS_TOTAL].avg =3D arg->bps;
+> +    cfg->buckets[THROTTLE_BPS_READ].avg  =3D arg->bps_rd;
+> +    cfg->buckets[THROTTLE_BPS_WRITE].avg =3D arg->bps_wr;
+> +
+> +    cfg->buckets[THROTTLE_OPS_TOTAL].avg =3D arg->iops;
+> +    cfg->buckets[THROTTLE_OPS_READ].avg  =3D arg->iops_rd;
+> +    cfg->buckets[THROTTLE_OPS_WRITE].avg =3D arg->iops_wr;
+> +
+> +    if (arg->has_bps_max) {
+> +        cfg->buckets[THROTTLE_BPS_TOTAL].max =3D arg->bps_max;
+> +    }
+> +    if (arg->has_bps_rd_max) {
+> +        cfg->buckets[THROTTLE_BPS_READ].max =3D arg->bps_rd_max;
+> +    }
+> +    if (arg->has_bps_wr_max) {
+> +        cfg->buckets[THROTTLE_BPS_WRITE].max =3D arg->bps_wr_max;
+> +    }
+> +    if (arg->has_iops_max) {
+> +        cfg->buckets[THROTTLE_OPS_TOTAL].max =3D arg->iops_max;
+> +    }
+> +    if (arg->has_iops_rd_max) {
+> +        cfg->buckets[THROTTLE_OPS_READ].max =3D arg->iops_rd_max;
+> +    }
+> +    if (arg->has_iops_wr_max) {
+> +        cfg->buckets[THROTTLE_OPS_WRITE].max =3D arg->iops_wr_max;
+> +    }
+> +
+> +    if (arg->has_bps_max_length) {
+> +        cfg->buckets[THROTTLE_BPS_TOTAL].burst_length =3D arg->bps_max_l=
+ength;
+> +    }
+> +    if (arg->has_bps_rd_max_length) {
+> +        cfg->buckets[THROTTLE_BPS_READ].burst_length =3D arg->bps_rd_max=
+_length;
+> +    }
+> +    if (arg->has_bps_wr_max_length) {
+> +        cfg->buckets[THROTTLE_BPS_WRITE].burst_length =3D arg->bps_wr_ma=
+x_length;
+> +    }
+> +    if (arg->has_iops_max_length) {
+> +        cfg->buckets[THROTTLE_OPS_TOTAL].burst_length =3D arg->iops_max_=
+length;
+> +    }
+> +    if (arg->has_iops_rd_max_length) {
+> +        cfg->buckets[THROTTLE_OPS_READ].burst_length =3D arg->iops_rd_ma=
+x_length;
+> +    }
+> +    if (arg->has_iops_wr_max_length) {
+> +        cfg->buckets[THROTTLE_OPS_WRITE].burst_length =3D arg->iops_wr_m=
+ax_length;
+> +    }
+> +
+> +    if (arg->has_iops_size) {
+> +        cfg->op_size =3D arg->iops_size;
+> +    }
+> +}
 
-How can you assert that there will never be an error? Even if it's
-correct (I don't know whether you can have dirty bitmaps on devices that
-don't use the cached value), this needs at least a comment.
 
-The rest looks okay.
+--Sig_/lSso=A9Q6HUOtxSHaVAlbXh
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Kevin
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbKMsQAKCRAC/DrrAQHb
+wjvUAJ4sFyjyRgdms106AwjBgiVfwrgJ5wCeIO/mn3VD0PK8UdmrtGIqmMHowEw=
+=rcyR
+-----END PGP SIGNATURE-----
+
+--Sig_/lSso=A9Q6HUOtxSHaVAlbXh--
