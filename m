@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60179)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33292)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dqMvc-0004tt-Pr
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:18:53 -0400
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dqMzS-0006qn-G8
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:22:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dqMvW-0004vS-Tc
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:18:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35102)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dqMvW-0004uQ-Ld
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:18:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A0F354E909
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 17:18:45 +0000 (UTC)
-Date: Fri, 8 Sep 2017 18:18:40 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170908171839.GD2836@work-vm>
-References: <20170906115143.27451-1-quintela@redhat.com>
-	<20170906115143.27451-4-quintela@redhat.com>
+	(envelope-from <anton.ivanov@cambridgegreys.com>) id 1dqMzN-0007Xv-Hu
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:22:50 -0400
+Received: from ivanoab5.miniserver.com ([78.31.111.25]:39707
+	helo=www.kot-begemot.co.uk)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anton.ivanov@cambridgegreys.com>)
+	id 1dqMzN-0007UO-BI
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:22:45 -0400
+References: <20170718170819.28494-1-anton.ivanov@cambridgegreys.com>
+	<20170718170819.28494-4-anton.ivanov@cambridgegreys.com>
+	<e31eb033-a770-e5fd-97b0-0b50f268c22c@redhat.com>
+	<b1194532-a97a-33d3-92d4-8531674d358d@cambridgegreys.com>
+	<2c69da12-2b18-2272-6eff-c6223667aad0@redhat.com>
+From: Anton Ivanov <anton.ivanov@cambridgegreys.com>
+Message-ID: <d1ccdbc2-9126-fcb1-e646-88cc90f7706e@cambridgegreys.com>
+Date: Fri, 8 Sep 2017 18:22:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170906115143.27451-4-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 03/22] migration: Teach it about
- G_SOURCE_REMOVE
+In-Reply-To: <2c69da12-2b18-2272-6eff-c6223667aad0@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/3] Unified Datagram Socket Transport -
+ raw support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,84 +33,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> As this is defined on glib 2.32, add compatibility macros for older glibs.
-> 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
+On 24/07/17 05:03, Jason Wang wrote:
+>
+>
+> On 2017年07月22日 02:50, Anton Ivanov wrote:
+>>
+>> [snip]
+>>
+>>>> +    "-netdev raw,id=str,ifname=ifname\n"
+>>>> +    "                configure a network backend with ID 'str'
+>>>> connected to\n"
+>>>> +    "                an Ethernet interface named ifname via raw
+>>>> socket.\n"
+>>>> +    "                This backend does not change the interface
+>>>> settings.\n"
+>>>> +    "                Most interfaces will require being set into
+>>>> promisc mode,\n"
+>>>> +    "                as well having most offloads (TSO, etc)
+>>>> turned off.\n"
+>>>> +    "                Some virtual interfaces like tap support only
+>>>> RX.\n"
+>>>
+>>> Pay attention that qemu supports vnet header. So any reason to turn
+>>> off e.g TSO here?
+>>
+>> I am not aware of any means to get extra info like checksums, etc
+>> show up on raw socket read.
+>>
+>> If you know a way to make them show up, this is worth investigating.
+>
+> See packet_rcv_vnet(). But a known 'issue' for raw socket is that it
+> forbids change vnet header length after creation, we may need some
+> workaround in qemu.
 
-I think 03 and 04 could both be merged to current qemu?
+There are a couple of other issues - if I understand the situation
+correctly, probing the vnet header size relies on tap ioctls.
 
-I think you could remove the G_SOURCE_CONTINUE/REMOVE defines in
-contrib/vhost-user-scsi/vhost-user-scsi.c as well.
+I have some support for this working now. I will try to get around to
+redo the patches as per your last comments + initial vnet header support
+and re-submit.
 
-Dave
+One definitive advantage of having it is that it allows to detect if
+GSO/TSO is enabled on the interface as this is not something that gets
+along very well with fixed buffer size vector IO.
 
-> ---
->  include/glib-compat.h | 2 ++
->  migration/exec.c      | 2 +-
->  migration/fd.c        | 2 +-
->  migration/socket.c    | 2 +-
->  4 files changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/glib-compat.h b/include/glib-compat.h
-> index fcffcd3f07..e15aca2d40 100644
-> --- a/include/glib-compat.h
-> +++ b/include/glib-compat.h
-> @@ -223,6 +223,8 @@ static inline gboolean g_hash_table_contains(GHashTable *hash_table,
->  {
->      return g_hash_table_lookup_extended(hash_table, key, NULL, NULL);
->  }
-> +#define G_SOURCE_CONTINUE TRUE
-> +#define G_SOURCE_REMOVE FALSE
->  #endif
->  
->  #ifndef g_assert_true
-> diff --git a/migration/exec.c b/migration/exec.c
-> index 08b599e0e2..f3be1baf2e 100644
-> --- a/migration/exec.c
-> +++ b/migration/exec.c
-> @@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
->  {
->      migration_channel_process_incoming(ioc);
->      object_unref(OBJECT(ioc));
-> -    return FALSE; /* unregister */
-> +    return G_SOURCE_REMOVE;
->  }
->  
->  void exec_start_incoming_migration(const char *command, Error **errp)
-> diff --git a/migration/fd.c b/migration/fd.c
-> index 30f5258a6a..30de4b9847 100644
-> --- a/migration/fd.c
-> +++ b/migration/fd.c
-> @@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
->  {
->      migration_channel_process_incoming(ioc);
->      object_unref(OBJECT(ioc));
-> -    return FALSE; /* unregister */
-> +    return G_SOURCE_REMOVE;
->  }
->  
->  void fd_start_incoming_migration(const char *infd, Error **errp)
-> diff --git a/migration/socket.c b/migration/socket.c
-> index 757d3821a1..b02d37d7a3 100644
-> --- a/migration/socket.c
-> +++ b/migration/socket.c
-> @@ -154,7 +154,7 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
->  out:
->      /* Close listening socket as its no longer needed */
->      qio_channel_close(ioc, NULL);
-> -    return FALSE; /* unregister */
-> +    return G_SOURCE_REMOVE;
->  }
->  
->  
-> -- 
-> 2.13.5
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+A.
+
+[snip]
+>>>
+>
+>
+
+
+-- 
+Anton R. Ivanov
+Cambridgegreys Limited. Registered in England. Company Number 10273661
