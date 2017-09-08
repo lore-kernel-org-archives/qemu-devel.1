@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48995)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52340)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dqMQf-00029x-7i
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:46:54 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dqMcE-0007i4-NL
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:58:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dqMQZ-00017n-6B
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:46:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35896)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dqMQY-00017R-Vj
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:46:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dqMQX-0005cd-Um
-	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 16:46:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id E79202E848B
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 16:46:45 +0000 (UTC)
+	(envelope-from <richard.henderson@linaro.org>) id 1dqMcB-0006ps-Oh
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:58:50 -0400
+Received: from mail-pg0-x22a.google.com ([2607:f8b0:400e:c05::22a]:33459)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dqMcB-0006pZ-IA
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:58:47 -0400
+Received: by mail-pg0-x22a.google.com with SMTP id t3so5797581pgt.0
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 09:58:47 -0700 (PDT)
+References: <CGME20170908110212eucas1p27c5eecf44c5501d23b322d3679a4f12d@eucas1p2.samsung.com>
+	<001801d32891$ec40b930$c4c22b90$@samsung.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <633f5a2d-a333-5c78-1e0c-3af2a4c896f9@linaro.org>
+Date: Fri, 8 Sep 2017 09:58:43 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 08 Sep 2017 16:33:18 -0000
-From: Thomas Huth <1135567@bugs.launchpad.net>
-Reply-To: Bug 1135567 <1135567@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130228104653.3556.64942.malonedeb@soybean.canonical.com>
-Message-Id: <150488839897.29505.6281656403036024606.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1135567] Re: QXL crashes a Windows 7 guest if
- host goes into screensaver
+In-Reply-To: <001801d32891$ec40b930$c4c22b90$@samsung.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/1] AArch64: Fix single stepping of ERET
+ instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,50 +32,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Jaroslaw Pelczar <j.pelczar@samsung.com>, qemu-devel@nongnu.org, "open list:ARM" <qemu-arm@nongnu.org>
 
-Triaging old bug tickets... can you still reproduce this issue with the
-latest version of QEMU? Or could we close this ticket nowadays?
+On 09/08/2017 04:02 AM, Jaroslaw Pelczar wrote:
+> Previously when single stepping through ERET instruction via GDB
+> would result in debugger entering the "next" PC after ERET instruction.
+> When debugging in kernel mode, this will also cause unintended behavior,
+> because debugger will try to access memory from EL0 point of view.
+> 
+> Signed-off-by: Jaroslaw Pelczar <j.pelczar@samsung.com>
+> ---
+>  target/arm/translate-a64.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1135567
-
-Title:
-  QXL crashes a Windows 7 guest if host goes into screensaver
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  Note: if further information is required, I'll be glad to supply it.
-
-  I am using on the host
-  - HP z800 with 72GB RAM and 2x x5680
-  - Gentoo 64-bit host (3.7.9 kernel, FGLRX RADEON driver 13.1)
-  - LIBVIRT 1.0.2 with QEMU(-KVM) 1.4.0
-
-  The guest:
-  - Windows 7 32-bit
-  - 2GB allocated
-  - 2 CPU
-  - using virtio for everything (disk,net,memballoon)
-  - Display =3D SPICE with spice channel
-  - Video driver is qxl (ram says 64MB)
-  - Spice-guest-tools 0.52 installed
-
-  When I use QXL and  have the guest open in Virt-Manager/Virt-Viewer
-  and let the host go into screensaver mode, the Win7 crashes hard.
-
-  When I change video to VGA, it survives the screen saver,  no problem
-  at all ,smooth sailing.
-
-  regards
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1135567/+subscriptions
+r~
