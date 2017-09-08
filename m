@@ -1,24 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41521)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41539)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG0S-0007fA-Gu
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:29 -0400
+	(envelope-from <famz@redhat.com>) id 1dqG0T-0007g1-Sb
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG0N-0004Ir-ET
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51652)
+	(envelope-from <famz@redhat.com>) id 1dqG0P-0004KX-9F
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33966)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG0N-0004HZ-8b
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:19 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG0P-0004Ju-31
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:21 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  8 Sep 2017 17:54:32 +0800
-Message-Id: <20170908095506.13594-5-famz@redhat.com>
+Date: Fri,  8 Sep 2017 17:54:33 +0800
+Message-Id: <20170908095506.13594-6-famz@redhat.com>
 In-Reply-To: <20170908095506.13594-1-famz@redhat.com>
 References: <20170908095506.13594-1-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 04/38] docker: reduce noise when building
- travis.docker
+Subject: [Qemu-devel] [PULL 05/38] docker: Update ubuntu image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,34 +26,40 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-From: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Base on the newer ubuntu-lts (16.06) and include more packages for
+better build coverage.
 
-Set the DEBIAN_FRONTEND and locale env vars to stop apt complaining so
-much as we build the image.
-
-Suggested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Message-Id: <20170725133425.436-7-alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Message-Id: <20170907141245.31946-2-famz@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/docker/dockerfiles/travis.docker | 3 +++
- 1 file changed, 3 insertions(+)
+ tests/docker/dockerfiles/ubuntu.docker | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/docker=
-files/travis.docker
-index 57ac8e1419..605b6e429b 100644
---- a/tests/docker/dockerfiles/travis.docker
-+++ b/tests/docker/dockerfiles/travis.docker
-@@ -1,4 +1,7 @@
- FROM quay.io/travisci/travis-ruby
-+ENV DEBIAN_FRONTEND noninteractive
-+ENV LANG en_US.UTF-8
-+ENV LC_ALL en_US.UTF-8
+diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
+index a360a050a2..d73ce02246 100644
+--- a/tests/docker/dockerfiles/ubuntu.docker
++++ b/tests/docker/dockerfiles/ubuntu.docker
+@@ -1,12 +1,17 @@
+-FROM ubuntu:14.04
++FROM ubuntu:16.04
+ RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty universe multiverse" >> \
+     /etc/apt/sources.list
  RUN apt-get update
- RUN apt-get -y build-dep qemu
- RUN apt-get -y install device-tree-compiler python2.7 python-yaml dh-aut=
-oreconf gdb strace lsof net-tools
---=20
+ ENV PACKAGES flex bison \
+-    libusb-1.0-0-dev libiscsi-dev librados-dev libncurses5-dev \
++    libusb-1.0-0-dev libiscsi-dev librados-dev libncurses5-dev libncursesw5-dev \
+     libseccomp-dev libgnutls-dev libssh2-1-dev  libspice-server-dev \
+     libspice-protocol-dev libnss3-dev libfdt-dev \
+-    libgtk-3-dev libvte-2.90-dev libsdl1.2-dev libpng12-dev libpixman-1-dev \
++    libgtk-3-dev libvte-2.91-dev libsdl1.2-dev libpng12-dev libpixman-1-dev \
++    libvdeplug-dev liblzo2-dev libsnappy-dev libbz2-dev libxen-dev librdmacm-dev libibverbs-dev \
++    libsasl2-dev libjpeg-turbo8-dev xfslibs-dev libcap-ng-dev libbrlapi-dev libcurl4-gnutls-dev \
++    libbluetooth-dev librbd-dev libaio-dev glusterfs-common libnuma-dev libepoxy-dev libdrm-dev libgbm-dev \
++    libjemalloc-dev libcacard-dev libusbredirhost-dev libnfs-dev libcap-dev libattr1-dev \
++    texinfo \
+     git make ccache python-yaml gcc clang sparse
+ RUN apt-get -y install $PACKAGES
+ RUN dpkg -l $PACKAGES | sort > /packages.txt
+-- 
 2.13.5
