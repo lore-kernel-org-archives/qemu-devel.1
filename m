@@ -1,32 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53613)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54037)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dqIt4-0000N3-QW
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:59:59 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dqIts-0000tg-6W
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:00:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dqIt0-0001JG-VI
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:59:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38710)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dqIt0-0001Ic-P1
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 08:59:54 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 57D05356D4
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 12:59:53 +0000 (UTC)
-References: <20170908111217.21985-1-kraxel@redhat.com>
-	<20170908111217.21985-3-kraxel@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <707d49a9-51cf-abe4-78bc-07343181ecce@redhat.com>
-Date: Fri, 8 Sep 2017 14:59:48 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dqItm-0002EB-Hh
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:00:48 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:33994)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dqItm-0002AQ-BO
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:00:42 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id v109so4590322wrc.1
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 06:00:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170908111217.21985-3-kraxel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] usb: only build usb-host with
- CONFIG_USB=y
+In-Reply-To: <1504836324-4871-1-git-send-email-jasowang@redhat.com>
+References: <1504836324-4871-1-git-send-email-jasowang@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 Sep 2017 14:00:19 +0100
+Message-ID: <CAFEAcA96m0Z7ns7OobH3c4i-1qjBV141suvNeckTcCsj7maaaA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/18] Net patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,30 +28,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Jason Wang <jasowang@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 08.09.2017 13:12, Gerd Hoffmann wrote:
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/usb/Makefile.objs | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-> index a43ebbc17f..757e365562 100644
-> --- a/hw/usb/Makefile.objs
-> +++ b/hw/usb/Makefile.objs
-> @@ -38,7 +38,7 @@ endif
->  common-obj-$(CONFIG_USB_REDIR) += redirect.o quirks.o
->  
->  # usb pass-through
-> -ifeq ($(CONFIG_LIBUSB),y)
-> +ifeq ($(CONFIG_LIBUSB)$(CONFIG_USB),yy)
->  common-obj-y += host-libusb.o host-legacy.o
->  else
->  common-obj-y += host-stub.o
+On 8 September 2017 at 03:05, Jason Wang <jasowang@redhat.com> wrote:
+> The following changes since commit cda4a338c4243fa3bff4498b935340ac7121cc76:
+>
+>   tcg/tci: Add TCG_TARGET_DEFAULT_MO (2017-09-07 18:57:34 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/jasowang/qemu.git tags/net-pull-request
+>
+> for you to fetch changes up to 861d51e62bb197b43606f888dbefbabebaf0d854:
+>
+>   colo-compare: Update the COLO document to add the IOThread configuration (2017-09-08 09:34:40 +0800)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
 
-Strange that you did not need the hack with "common-obj-$(CONFIG_ALL)"
-in this patch like I had to do in the patch that I sent today... but
-I've just checked it, and it seems to work this way. So:
+Applied, thanks.
 
-Tested-by: Thomas Huth <thuth@redhat.com>
+-- PMM
