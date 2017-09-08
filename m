@@ -1,31 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40089)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1dqNFQ-0000KJ-6R
+	id 1dqNFQ-0000KB-4I
 	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:39:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1dqNFM-0008Hn-4g
+	id 1dqNFN-0008Ik-2B
 	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:39:20 -0400
-Received: from mail-pg0-x235.google.com ([2607:f8b0:400e:c05::235]:35051)
+Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:34225)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1dqNFL-0008Gr-UQ
+	id 1dqNFM-0008Hw-QE
 	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:39:16 -0400
-Received: by mail-pg0-x235.google.com with SMTP id 188so5918520pgb.2
-	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 10:39:15 -0700 (PDT)
+Received: by mail-pf0-x231.google.com with SMTP id e1so5553582pfk.1
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 10:39:16 -0700 (PDT)
 MIME-Version: 1.0
 From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-Date: Fri,  8 Sep 2017 10:37:56 -0700
-Message-Id: <20170908173801.15205-2-brandon.carpenter@cypherpath.com>
+Date: Fri,  8 Sep 2017 10:37:57 -0700
+Message-Id: <20170908173801.15205-3-brandon.carpenter@cypherpath.com>
 In-Reply-To: <20170908173801.15205-1-brandon.carpenter@cypherpath.com>
 References: <20170908173801.15205-1-brandon.carpenter@cypherpath.com>
 In-Reply-To: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
 References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
-	<20170724181544.20292-1-brandon.carpenter@cypherpath.com>
 Content-Type: text/plain; charset="US-ASCII"
-Subject: [Qemu-devel] [PATCH v2 1/6] io: Always remove an old channel watch
- before adding a new one
+Subject: [Qemu-devel] [PATCH v2 2/6] io: Small updates in preparation for
+ websocket changes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,77 +36,173 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, brandon.carpenter@cypherpath.com
 
-Also set saved handle to zero when removing without adding a new watch.
+Gets rid of unnecessary bit shifting and performs proper EOF checking to
+avoid a large number of repeated calls to recvmsg() when a client
+abruptly terminates a connection (bug fix).
 
 Signed-off-by: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- ui/vnc-auth-vencrypt.c | 3 +++
- ui/vnc-ws.c            | 6 ++++++
- ui/vnc.c               | 4 ++++
- 3 files changed, 13 insertions(+)
+ io/channel-websock.c | 62 +++++++++++++++-------------------------------------
+ 1 file changed, 18 insertions(+), 44 deletions(-)
 
-diff --git a/ui/vnc-auth-vencrypt.c b/ui/vnc-auth-vencrypt.c
-index ffaab57550..c3eece4fa7 100644
---- a/ui/vnc-auth-vencrypt.c
-+++ b/ui/vnc-auth-vencrypt.c
-@@ -77,6 +77,9 @@ static void vnc_tls_handshake_done(QIOTask *task,
-         vnc_client_error(vs);
-         error_free(err);
-     } else {
-+        if (vs->ioc_tag) {
-+            g_source_remove(vs->ioc_tag);
-+        }
-         vs->ioc_tag = qio_channel_add_watch(
-             vs->ioc, G_IO_IN | G_IO_OUT, vnc_client_io, vs, NULL);
-         start_auth_vencrypt_subauth(vs);
-diff --git a/ui/vnc-ws.c b/ui/vnc-ws.c
-index f530cd5474..eaf309553c 100644
---- a/ui/vnc-ws.c
-+++ b/ui/vnc-ws.c
-@@ -36,6 +36,9 @@ static void vncws_tls_handshake_done(QIOTask *task,
-         error_free(err);
-     } else {
-         VNC_DEBUG("TLS handshake complete, starting websocket handshake\n");
-+        if (vs->ioc_tag) {
-+            g_source_remove(vs->ioc_tag);
-+        }
-         vs->ioc_tag = qio_channel_add_watch(
-             QIO_CHANNEL(vs->ioc), G_IO_IN, vncws_handshake_io, vs, NULL);
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index 5a3badbec2..185bd31be5 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -86,8 +86,6 @@
+ #define QIO_CHANNEL_WEBSOCK_HEADER_FIELD_OPCODE 0x0f
+ #define QIO_CHANNEL_WEBSOCK_HEADER_FIELD_HAS_MASK 0x80
+ #define QIO_CHANNEL_WEBSOCK_HEADER_FIELD_PAYLOAD_LEN 0x7f
+-#define QIO_CHANNEL_WEBSOCK_HEADER_SHIFT_FIN 7
+-#define QIO_CHANNEL_WEBSOCK_HEADER_SHIFT_HAS_MASK 7
+ 
+ typedef struct QIOChannelWebsockHeader QIOChannelWebsockHeader;
+ 
+@@ -492,7 +490,7 @@ static void qio_channel_websock_encode(QIOChannelWebsock *ioc)
+         return;
      }
-@@ -97,6 +100,9 @@ static void vncws_handshake_done(QIOTask *task,
-     } else {
-         VNC_DEBUG("Websock handshake complete, starting VNC protocol\n");
-         vnc_start_protocol(vs);
-+        if (vs->ioc_tag) {
-+            g_source_remove(vs->ioc_tag);
-+        }
-         vs->ioc_tag = qio_channel_add_watch(
-             vs->ioc, G_IO_IN, vnc_client_io, vs, NULL);
+ 
+-    header.ws.b0 = (1 << QIO_CHANNEL_WEBSOCK_HEADER_SHIFT_FIN) |
++    header.ws.b0 = QIO_CHANNEL_WEBSOCK_HEADER_FIELD_FIN |
+         (QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME &
+          QIO_CHANNEL_WEBSOCK_HEADER_FIELD_OPCODE);
+     if (ioc->rawoutput.offset <
+@@ -519,8 +517,8 @@ static void qio_channel_websock_encode(QIOChannelWebsock *ioc)
+ }
+ 
+ 
+-static ssize_t qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
+-                                                 Error **errp)
++static int qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
++                                             Error **errp)
+ {
+     unsigned char opcode, fin, has_mask;
+     size_t header_size;
+@@ -539,11 +537,9 @@ static ssize_t qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
+         return QIO_CHANNEL_ERR_BLOCK;
      }
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 0b5dbc62e4..62f7a3f30a 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -1121,6 +1121,7 @@ static void vnc_disconnect_start(VncState *vs)
-     vnc_set_share_mode(vs, VNC_SHARE_MODE_DISCONNECTED);
-     if (vs->ioc_tag) {
-         g_source_remove(vs->ioc_tag);
-+        vs->ioc_tag = 0;
+ 
+-    fin = (header->b0 & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_FIN) >>
+-        QIO_CHANNEL_WEBSOCK_HEADER_SHIFT_FIN;
++    fin = header->b0 & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_FIN;
+     opcode = header->b0 & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_OPCODE;
+-    has_mask = (header->b1 & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_HAS_MASK) >>
+-        QIO_CHANNEL_WEBSOCK_HEADER_SHIFT_HAS_MASK;
++    has_mask = header->b1 & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_HAS_MASK;
+     payload_len = header->b1 & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_PAYLOAD_LEN;
+ 
+     if (opcode == QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE) {
+@@ -561,7 +557,7 @@ static ssize_t qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
+         return -1;
      }
-     qio_channel_close(vs->ioc, NULL);
-     vs->disconnecting = TRUE;
-@@ -2931,6 +2932,9 @@ static void vnc_connect(VncDisplay *vd, QIOChannelSocket *sioc,
-     VNC_DEBUG("New client on socket %p\n", vs->sioc);
-     update_displaychangelistener(&vd->dcl, VNC_REFRESH_INTERVAL_BASE);
-     qio_channel_set_blocking(vs->ioc, false, NULL);
-+    if (vs->ioc_tag) {
-+        g_source_remove(vs->ioc_tag);
-+    }
-     if (websocket) {
-         vs->websocket = 1;
-         if (vd->tlscreds) {
+     if (!has_mask) {
+-        error_setg(errp, "websocket frames must be masked");
++        error_setg(errp, "client websocket frames must be masked");
+         return -1;
+     }
+     if (opcode != QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
+@@ -593,8 +589,8 @@ static ssize_t qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
+ }
+ 
+ 
+-static ssize_t qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
+-                                                  Error **errp)
++static int qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
++                                              Error **errp)
+ {
+     size_t i;
+     size_t payload_len;
+@@ -635,7 +631,7 @@ static ssize_t qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
+     buffer_reserve(&ioc->rawinput, payload_len);
+     buffer_append(&ioc->rawinput, ioc->encinput.buffer, payload_len);
+     buffer_advance(&ioc->encinput, payload_len);
+-    return payload_len;
++    return 0;
+ }
+ 
+ 
+@@ -715,8 +711,8 @@ static ssize_t qio_channel_websock_read_wire(QIOChannelWebsock *ioc,
+         if (ret < 0) {
+             return ret;
+         }
+-        if (ret == 0 &&
+-            ioc->encinput.offset == 0) {
++        if (ret == 0 && ioc->encinput.offset == 0) {
++            ioc->io_eof = TRUE;
+             return 0;
+         }
+         ioc->encinput.offset += ret;
+@@ -728,10 +724,6 @@ static ssize_t qio_channel_websock_read_wire(QIOChannelWebsock *ioc,
+             if (ret < 0) {
+                 return ret;
+             }
+-            if (ret == 0) {
+-                ioc->io_eof = TRUE;
+-                break;
+-            }
+         }
+ 
+         ret = qio_channel_websock_decode_payload(ioc, errp);
+@@ -996,14 +988,12 @@ struct QIOChannelWebsockSource {
+ };
+ 
+ static gboolean
+-qio_channel_websock_source_prepare(GSource *source,
+-                                   gint *timeout)
++qio_channel_websock_source_check(GSource *source)
+ {
+     QIOChannelWebsockSource *wsource = (QIOChannelWebsockSource *)source;
+     GIOCondition cond = 0;
+-    *timeout = -1;
+ 
+-    if (wsource->wioc->rawinput.offset) {
++    if (wsource->wioc->rawinput.offset || wsource->wioc->io_eof) {
+         cond |= G_IO_IN;
+     }
+     if (wsource->wioc->rawoutput.offset < QIO_CHANNEL_WEBSOCK_MAX_BUFFER) {
+@@ -1014,19 +1004,11 @@ qio_channel_websock_source_prepare(GSource *source,
+ }
+ 
+ static gboolean
+-qio_channel_websock_source_check(GSource *source)
++qio_channel_websock_source_prepare(GSource *source,
++                                   gint *timeout)
+ {
+-    QIOChannelWebsockSource *wsource = (QIOChannelWebsockSource *)source;
+-    GIOCondition cond = 0;
+-
+-    if (wsource->wioc->rawinput.offset) {
+-        cond |= G_IO_IN;
+-    }
+-    if (wsource->wioc->rawoutput.offset < QIO_CHANNEL_WEBSOCK_MAX_BUFFER) {
+-        cond |= G_IO_OUT;
+-    }
+-
+-    return cond & wsource->condition;
++    *timeout = -1;
++    return qio_channel_websock_source_check(source);
+ }
+ 
+ static gboolean
+@@ -1036,17 +1018,9 @@ qio_channel_websock_source_dispatch(GSource *source,
+ {
+     QIOChannelFunc func = (QIOChannelFunc)callback;
+     QIOChannelWebsockSource *wsource = (QIOChannelWebsockSource *)source;
+-    GIOCondition cond = 0;
+-
+-    if (wsource->wioc->rawinput.offset) {
+-        cond |= G_IO_IN;
+-    }
+-    if (wsource->wioc->rawoutput.offset < QIO_CHANNEL_WEBSOCK_MAX_BUFFER) {
+-        cond |= G_IO_OUT;
+-    }
+ 
+     return (*func)(QIO_CHANNEL(wsource->wioc),
+-                   (cond & wsource->condition),
++                   qio_channel_websock_source_check(source),
+                    user_data);
+ }
+ 
 -- 
 2.14.1
 
