@@ -1,40 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dqMH4-0003SY-6G
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:36:59 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dqMJA-00058Q-7F
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:39:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dqMGz-0005D6-8t
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:36:58 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34468)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1dqMGz-0005CO-0U
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:36:53 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v88GXe5L117012
-	for <qemu-devel@nongnu.org>; Fri, 8 Sep 2017 12:36:51 -0400
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cuvpdr1m5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 12:36:50 -0400
-Received: from localhost
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Fri, 8 Sep 2017 10:36:50 -0600
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-In-Reply-To: <3cd1d667-e29a-d182-54ef-f8676ca3d81c@amsat.org>
-References: <20170830215523.25278-1-f4bug@amsat.org>
-	<20170830215523.25278-7-f4bug@amsat.org>
-	<3cd1d667-e29a-d182-54ef-f8676ca3d81c@amsat.org>
-Date: Fri, 08 Sep 2017 11:36:39 -0500
-Message-Id: <150488859944.2366.9236675440483069288@loki>
-Subject: Re: [Qemu-devel] [PATCH v2 06/17] MAINTAINERS: add missing Guest
- Agent entries
+	(envelope-from <richard.henderson@linaro.org>) id 1dqMJ5-00060a-GV
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:39:08 -0400
+Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:37156)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dqMJ5-00060K-B2
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:39:03 -0400
+Received: by mail-pg0-x22f.google.com with SMTP id d8so5682378pgt.4
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 09:39:03 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri,  8 Sep 2017 09:38:59 -0700
+Message-Id: <20170908163859.29820-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH] target/arm: Avoid an extra temporary for
+ store_exclusive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,53 +25,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?b?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>, =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Tomoki Sekiyama <tomoki.sekiyama.qu@hitachi.com>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-arm@nongnu.org, peter.maydell@linaro.org, patches@linaro.org
 
-Quoting Philippe Mathieu-Daud=C3=A9 (2017-09-08 08:04:45)
-> ping?
-> =
+Instead of copying addr to a local temp, reuse the value (which we
+have just compared as equal) already saved in cpu_exclusive_addr.
 
-> Michael, you told me this looks OK on IRC, can I respin with your Acked-b=
-y?
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/translate-a64.c | 26 +++++++++-----------------
+ 1 file changed, 9 insertions(+), 17 deletions(-)
 
-Sure:
-
-Acked-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-
-> =
-
-> On 08/30/2017 06:55 PM, Philippe Mathieu-Daud=C3=A9 wrote:
-> > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > ---
-> >   MAINTAINERS | 4 ++++
-> >   1 file changed, 4 insertions(+)
-> > =
-
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index aa185c1edd..f4e07173c8 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -1434,6 +1434,10 @@ QEMU Guest Agent
-> >   M: Michael Roth <mdroth@linux.vnet.ibm.com>
-> >   S: Maintained
-> >   F: qga/
-> > +F: qemu-ga.texi
-> > +F: scripts/qemu-guest-agent/
-> =
-
-> I'm not sure you want to maintain this one...
-
-That's fine for now. Thanks!
-
-> =
-
-> > +F: tests/test-qga.c
-> > +F: docs/interop/qemu-ga-ref.texi
-> >   T: git git://github.com/mdroth/qemu.git qga
-> >   =
-
-> >   QOM
-> > =
-
->=20
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 9017e30510..114e21cc58 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1894,7 +1894,7 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
+ }
+ 
+ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+-                                TCGv_i64 inaddr, int size, int is_pair)
++                                TCGv_i64 addr, int size, int is_pair)
+ {
+     /* if (env->exclusive_addr == addr && env->exclusive_val == [addr]
+      *     && (!is_pair || env->exclusive_high == [addr + datasize])) {
+@@ -1910,13 +1910,8 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+      */
+     TCGLabel *fail_label = gen_new_label();
+     TCGLabel *done_label = gen_new_label();
+-    TCGv_i64 addr = tcg_temp_local_new_i64();
+     TCGv_i64 tmp;
+ 
+-    /* Copy input into a local temp so it is not trashed when the
+-     * basic block ends at the branch insn.
+-     */
+-    tcg_gen_mov_i64(addr, inaddr);
+     tcg_gen_brcond_i64(TCG_COND_NE, addr, cpu_exclusive_addr, fail_label);
+ 
+     tmp = tcg_temp_new_i64();
+@@ -1927,27 +1922,24 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+             } else {
+                 tcg_gen_concat32_i64(tmp, cpu_reg(s, rt2), cpu_reg(s, rt));
+             }
+-            tcg_gen_atomic_cmpxchg_i64(tmp, addr, cpu_exclusive_val, tmp,
++            tcg_gen_atomic_cmpxchg_i64(tmp, cpu_exclusive_addr,
++                                       cpu_exclusive_val, tmp,
+                                        get_mem_index(s),
+                                        MO_64 | MO_ALIGN | s->be_data);
+             tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
+         } else if (s->be_data == MO_LE) {
+-            gen_helper_paired_cmpxchg64_le(tmp, cpu_env, addr, cpu_reg(s, rt),
+-                                           cpu_reg(s, rt2));
++            gen_helper_paired_cmpxchg64_le(tmp, cpu_env, cpu_exclusive_addr,
++                                           cpu_reg(s, rt), cpu_reg(s, rt2));
+         } else {
+-            gen_helper_paired_cmpxchg64_be(tmp, cpu_env, addr, cpu_reg(s, rt),
+-                                           cpu_reg(s, rt2));
++            gen_helper_paired_cmpxchg64_be(tmp, cpu_env, cpu_exclusive_addr,
++                                           cpu_reg(s, rt), cpu_reg(s, rt2));
+         }
+     } else {
+-        TCGv_i64 val = cpu_reg(s, rt);
+-        tcg_gen_atomic_cmpxchg_i64(tmp, addr, cpu_exclusive_val, val,
+-                                   get_mem_index(s),
++        tcg_gen_atomic_cmpxchg_i64(tmp, cpu_exclusive_addr, cpu_exclusive_val,
++                                   cpu_reg(s, rt), get_mem_index(s),
+                                    size | MO_ALIGN | s->be_data);
+         tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
+     }
+-
+-    tcg_temp_free_i64(addr);
+-
+     tcg_gen_mov_i64(cpu_reg(s, rd), tmp);
+     tcg_temp_free_i64(tmp);
+     tcg_gen_br(done_label);
+-- 
+2.13.5
