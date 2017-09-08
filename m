@@ -1,24 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42833)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <smolov@ispras.ru>) id 1dqDvS-0001Na-Dk
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 03:42:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1dqE0x-0003Du-5v
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 03:47:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <smolov@ispras.ru>) id 1dqDvN-0004MI-MO
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 03:42:06 -0400
-Received: from bran.ispras.ru ([83.149.199.196]:46969 helo=smtp.ispras.ru)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <smolov@ispras.ru>) id 1dqDvN-0004Kz-Fg
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 03:42:01 -0400
-Message-ID: <59B249C7.2000400@ispras.ru>
-Date: Fri, 08 Sep 2017 10:41:59 +0300
-From: Sergey Smolov <smolov@ispras.ru>
-MIME-Version: 1.0
-References: <59B17425.1050701@ispras.ru>
-	<CAFEAcA-QP7J_Rjre_RmwuYFnBU84gPFXuH4efeSddwgXhgq5Vg@mail.gmail.com>
-In-Reply-To: <CAFEAcA-QP7J_Rjre_RmwuYFnBU84gPFXuH4efeSddwgXhgq5Vg@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] emulation cycle number implementation
+	(envelope-from <thuth@redhat.com>) id 1dqE0s-000121-OA
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 03:47:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50284)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dqE0s-0000zP-Iu
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 03:47:42 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri,  8 Sep 2017 09:47:32 +0200
+Message-Id: <1504856852-12425-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/usb: Disable 'usb-host' device when no USB
+ is available in the target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,34 +22,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Cornelia Huck <cohuck@redhat.com>, David Hildenbrand <david@redhat.com>
 
+The 'usb-host' device currently also shows up in the "-device help"
+list of all targets that do not support USB. That's ugly and kind of
+confusing for the users. We should only provide this device if both,
+the host and the target support USB.
 
-On 07.09.2017 19:37, Peter Maydell wrote:
-> On 7 September 2017 at 17:30, Sergey Smolov <smolov@ispras.ru> wrote:
->> I'm running MIPS assembler programs on QEMU. I need to log some events that
->> happen through emulation (writes to some registers, for example). When an
->> event happens, I need to print not only the event-related information, but
->> an "emulation cycle number" also. This number should be an integer
->> increasing value that is similar to real hardware clock.
->>
->> How to implement this in QEMU? May QEMU timers be helpful in solving such a
->> problem?
-> You can use cpu_get_ticks(), though if we're not in icount mode
-> you may find it doesn't behave quite as helpfully as you might like
-> (in that case it roughly tracks host hardware cycles.)
->
-> thanks
-> -- PMM
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ hw/usb/Makefile.objs | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Thank you, Peter!
-
-But what if I like to track guest hardware cycles? I run the same 
-program on QEMU and RTL model of MIPS microprocessor, and I want to 
-compare simulation traces. I expect, that emulation will start from 0 
-tick in both cases, at least.
-
+diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
+index 97f1c456..323d448 100644
+--- a/hw/usb/Makefile.objs
++++ b/hw/usb/Makefile.objs
+@@ -38,7 +38,9 @@ endif
+ common-obj-$(CONFIG_USB_REDIR) += redirect.o quirks.o
+ 
+ # usb pass-through
+-common-obj-y += $(patsubst %,host-%.o,$(HOST_USB))
++common-obj-$(CONFIG_USB) += $(patsubst %,host-%.o,$(HOST_USB))
++common-obj-$(call lnot,$(CONFIG_USB)) += host-stub.o
++common-obj-$(CONFIG_ALL) += host-stub.o
+ 
+ ifeq ($(CONFIG_USB_LIBUSB),y)
+ common-obj-$(CONFIG_XEN) += xen-usb.o
 -- 
-Sincerely yours,
-Sergey Smolov
+1.8.3.1
