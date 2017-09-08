@@ -1,17 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqGe3-00027P-UL
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:26 -0400
+	(envelope-from <berrange@redhat.com>) id 1dqGdx-000221-81
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqGdu-00037Z-Jo
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:19 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  8 Sep 2017 20:35:19 +1000
-Message-Id: <20170908103558.31632-2-david@gibson.dropbear.id.au>
-In-Reply-To: <20170908103558.31632-1-david@gibson.dropbear.id.au>
-References: <20170908103558.31632-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 01/40] hw/ppc/spapr_drc.c: change
- spapr_drc_needed to use drc->dev
+	(envelope-from <berrange@redhat.com>) id 1dqGds-00035a-90
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50036)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqGds-00034n-07
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:08 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E986B81DFA
+	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 10:36:06 +0000 (UTC)
+Date: Fri, 8 Sep 2017 11:36:02 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170908103602.GJ3609@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170906124900.17354-1-famz@redhat.com>
+	<20170908100537.GI3609@redhat.com> <20170908102701.GL4511@lemon>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170908102701.GL4511@lemon>
+Subject: Re: [Qemu-devel] [PATCH v4] buildsys: Move crypto cflags/libs to
+ per object variables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,44 +35,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sam.bobroff@au1.ibm.com, imammedo@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+On Fri, Sep 08, 2017 at 06:27:01PM +0800, Fam Zheng wrote:
+> On Fri, 09/08 11:05, Daniel P. Berrange wrote:
+> > On Wed, Sep 06, 2017 at 08:49:00PM +0800, Fam Zheng wrote:
+> > > This patch groups the crypto objects into a few .mo objects based on
+> > > functional submodules, and moves inclusion conditions to *-objs
+> > > variables, then moves the global cflags/libs to the *-cflags and *-libs
+> > > variables.
+> > > 
+> > > For init.o and cipher.o, which may or may not need the library flags
+> > > depending on config, adding flags and libs unconditionally doesn't hurt,
+> > > because if the library is not available, the variables are empty.  This
+> > > makes less code.
+> > > 
+> > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > > 
+> > > ---
+> > > 
+> > > v4: Merge into one patch which is supposedly easier to manage and
+> > > review, and use .mo appraoch to avoid $(foreach) and $(eval) magics.
+> > 
+> > I don't think using  .mo is suitable here. You've used it as a generic
+> > mechanism for grouping .o files, but that is not what it does. There
+> > are special semantics around .mo rules that affect how the final
+> > binaries are linked.
+> 
+> Using .mo is okay here, but after a hindsight I think grouping by library
+> (nettle.mo, gcrypt.mo, etc.) is better than grouping by functionality, for
+> modularization in the future. But that also means assigning the cflags/libs
+> variable cannot be simplified like this.
+> 
+> > 
+> > eg looking back at the description of .mo files 
+> > 
+> > [quote]
+> > commit c261d774fb9093d00e0938a19f502fb220f62718
+> > Author: Fam Zheng <famz@redhat.com>
+> > Date:   Mon Sep 1 18:35:10 2014 +0800
+> > 
+> > [...snip...]
+> > 
+> >     3) When linking an executable, those .mo files in its "-y" variables are
+> >        filtered out, and replaced by one or more -Wl,-u,$symbol flags. This
+> >        is done in the added macro "process-archive-undefs".
+> >     
+> >        These "-Wl,-u,$symbol" flags will force ld to pull in the function
+> >        definition from the archives when linking.
+> >     
+> >        Note that the .mo objects, that are actually meant to be linked in
+> >        the executables, are already expanded in unnest-vars, before the
+> >        linking command. So we are safe to simply filter out .mo for the
+> >        purpose of pulling undefined symbols.
+> >     
+> >        process-archive-undefs works as this: For each ".mo", find all the
+> >        undefined symbols in it, filter ones that are defined in the
+> >        archives. For each of these symbols, generate a "-Wl,-u,$symbol" in
+> >        the link command, and put them before archive names in the command
+> >        line.
+> > [/quote]
+> > 
+> > Based on this, I don't think I can ack this patch, because it can
+> > have unexpected consequences.
+> 
+> This described the process-archive-undefs semantics of .mo, but not the essence
+> of it.  Basically .mo is just partial linking with the additional services of
+> -cflags, -libs and the above -Wl,-u thing. I cannot think of any unexpected
+> consequences with this change. We've had sdl.mo in ui/Makefile.objs for long,
+> just for the same purpose of this patch, with no problem.
 
-This patch makes a small fix in 'spapr_drc_needed' to change how we detect
-if a DRC has a device attached. Previously it used dr_entity_sense for this,
-which  works for physical DRCs.
+While I'm in favour of moving the linker/compiler flags out of the global
+vars, I'm not convinced this impl is a step forward.
 
-However, for logical DRCs, it didn't cover the case where a logical DRC has
-a drc->dev but the state is LOGICAL_UNUSABLE (e.g. a hotplugged CPU before
-CAS). In this case, the dr_entity_sense of this DRC returns UNUSABLE and the
-code was considering that there were no dev attached, making spapr_drc_needed
-return 'false' when in fact we would like to migrate the DRC.
+We already have a mechanism for grouping object files - the 'NNNN-obj-y'
+variables we use throughout our Makefiles.
 
-Changing it to check for drc->dev instead works for all DRC types.
+This patch is adding a second level of grouping purely to work around the
+fact that we can't set linker/compiler flags on the NNN-obj-y variables
+we use. I think this second level of grouping makes the makefiles more
+complex than they ought to be.
 
-Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr_drc.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+IOW, I'd rather see the rules fixed so that we can set variables against
+the existing grouping we have. eg
 
-diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
-index 605697d8bd..031ba7c387 100644
---- a/hw/ppc/spapr_drc.c
-+++ b/hw/ppc/spapr_drc.c
-@@ -464,10 +464,9 @@ static bool spapr_drc_needed(void *opaque)
- {
-     sPAPRDRConnector *drc = (sPAPRDRConnector *)opaque;
-     sPAPRDRConnectorClass *drck = SPAPR_DR_CONNECTOR_GET_CLASS(drc);
--    sPAPRDREntitySense value = drck->dr_entity_sense(drc);
- 
-     /* If no dev is plugged in there is no need to migrate the DRC state */
--    if (value != SPAPR_DR_ENTITY_SENSE_PRESENT) {
-+    if (!drc->dev) {
-         return false;
-     }
- 
+   crypto-obj-y-cflags := ...
+   crypto-obj-y-libs := ...
+
+so we avoid having to introduce second level groups every time we want
+to set these cflags/libs.
+
+Regards,
+Daniel
 -- 
-2.13.5
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
