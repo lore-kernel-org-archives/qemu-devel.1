@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58775)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58801)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqGe9-0002Cj-Eo
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:35 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGeA-0002Du-IW
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqGe2-0003Hh-W2
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:25 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGe3-0003IK-Ef
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:26 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  8 Sep 2017 20:35:46 +1000
-Message-Id: <20170908103558.31632-29-david@gibson.dropbear.id.au>
+Date: Fri,  8 Sep 2017 20:35:41 +1000
+Message-Id: <20170908103558.31632-24-david@gibson.dropbear.id.au>
 In-Reply-To: <20170908103558.31632-1-david@gibson.dropbear.id.au>
 References: <20170908103558.31632-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 28/40] hw/ppc/spapr_cpu_core: Add a proper check
- for spapr machine
+Subject: [Qemu-devel] [PULL 23/40] ppc4xx: Make MAL emulation more generic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,59 +20,296 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sam.bobroff@au1.ibm.com, imammedo@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sam.bobroff@au1.ibm.com, imammedo@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
 
-From: Thomas Huth <thuth@redhat.com>
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-QEMU currently crashes when the user tries to add a spapr-cpu-core
-on a non-pseries machine:
+Allow MAL with more RX and TX channels as found in newer versions.
 
-$ qemu-system-ppc64 -S -machine ppce500,accel=tcg \
-                    -device POWER5+_v2.1-spapr-cpu-core
-hw/ppc/spapr_cpu_core.c:178:spapr_cpu_core_realize_child:
-Object 0x55cee1f55160 is not an instance of type spapr-machine
-Aborted (core dumped)
-
-So let's add a proper check for the correct machine time with
-a more friendly error message here.
-
-Reported-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_cpu_core.c   | 5 +++++
- scripts/device-crash-test | 3 +++
- 2 files changed, 8 insertions(+)
+ hw/ppc/ppc405_uc.c      |   2 +-
+ hw/ppc/ppc4xx_devs.c    | 171 +++++++++++++++++++-----------------------------
+ include/hw/ppc/ppc4xx.h |   3 +-
+ 3 files changed, 70 insertions(+), 106 deletions(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index ea278ce2a7..dd9232620d 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -220,6 +220,11 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-     void *obj;
-     int i, j;
+diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+index 3c744021d6..03856d573f 100644
+--- a/hw/ppc/ppc405_uc.c
++++ b/hw/ppc/ppc405_uc.c
+@@ -2281,7 +2281,7 @@ CPUPPCState *ppc405ep_init(MemoryRegion *address_space_mem,
+     mal_irqs[1] = pic[12];
+     mal_irqs[2] = pic[13];
+     mal_irqs[3] = pic[14];
+-    ppc405_mal_init(env, mal_irqs);
++    ppc4xx_mal_init(env, 4, 2, mal_irqs);
+     /* Ethernet */
+     /* Uses pic[9], pic[15], pic[17] */
+     /* CPU control */
+diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
+index b296ea66c2..ec90f13295 100644
+--- a/hw/ppc/ppc4xx_devs.c
++++ b/hw/ppc/ppc4xx_devs.c
+@@ -737,6 +737,7 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
  
-+    if (!object_dynamic_cast(qdev_get_machine(), TYPE_SPAPR_MACHINE)) {
-+        error_setg(errp, "spapr-cpu-core needs a pseries machine");
-+        return;
+ /*****************************************************************************/
+ /* MAL */
++
+ enum {
+     MAL0_CFG      = 0x180,
+     MAL0_ESR      = 0x181,
+@@ -750,17 +751,13 @@ enum {
+     MAL0_RXEOBISR = 0x192,
+     MAL0_RXDEIR   = 0x193,
+     MAL0_TXCTP0R  = 0x1A0,
+-    MAL0_TXCTP1R  = 0x1A1,
+-    MAL0_TXCTP2R  = 0x1A2,
+-    MAL0_TXCTP3R  = 0x1A3,
+     MAL0_RXCTP0R  = 0x1C0,
+-    MAL0_RXCTP1R  = 0x1C1,
+     MAL0_RCBS0    = 0x1E0,
+     MAL0_RCBS1    = 0x1E1,
+ };
+ 
+-typedef struct ppc40x_mal_t ppc40x_mal_t;
+-struct ppc40x_mal_t {
++typedef struct ppc4xx_mal_t ppc4xx_mal_t;
++struct ppc4xx_mal_t {
+     qemu_irq irqs[4];
+     uint32_t cfg;
+     uint32_t esr;
+@@ -773,16 +770,32 @@ struct ppc40x_mal_t {
+     uint32_t rxcarr;
+     uint32_t rxeobisr;
+     uint32_t rxdeir;
+-    uint32_t txctpr[4];
+-    uint32_t rxctpr[2];
+-    uint32_t rcbs[2];
++    uint32_t *txctpr;
++    uint32_t *rxctpr;
++    uint32_t *rcbs;
++    uint8_t  txcnum;
++    uint8_t  rxcnum;
+ };
+ 
+-static void ppc40x_mal_reset(void *opaque);
++static void ppc4xx_mal_reset(void *opaque)
++{
++    ppc4xx_mal_t *mal;
++
++    mal = opaque;
++    mal->cfg = 0x0007C000;
++    mal->esr = 0x00000000;
++    mal->ier = 0x00000000;
++    mal->rxcasr = 0x00000000;
++    mal->rxdeir = 0x00000000;
++    mal->rxeobisr = 0x00000000;
++    mal->txcasr = 0x00000000;
++    mal->txdeir = 0x00000000;
++    mal->txeobisr = 0x00000000;
++}
+ 
+ static uint32_t dcr_read_mal(void *opaque, int dcrn)
+ {
+-    ppc40x_mal_t *mal;
++    ppc4xx_mal_t *mal;
+     uint32_t ret;
+ 
+     mal = opaque;
+@@ -820,48 +833,32 @@ static uint32_t dcr_read_mal(void *opaque, int dcrn)
+     case MAL0_RXDEIR:
+         ret = mal->rxdeir;
+         break;
+-    case MAL0_TXCTP0R:
+-        ret = mal->txctpr[0];
+-        break;
+-    case MAL0_TXCTP1R:
+-        ret = mal->txctpr[1];
+-        break;
+-    case MAL0_TXCTP2R:
+-        ret = mal->txctpr[2];
+-        break;
+-    case MAL0_TXCTP3R:
+-        ret = mal->txctpr[3];
+-        break;
+-    case MAL0_RXCTP0R:
+-        ret = mal->rxctpr[0];
+-        break;
+-    case MAL0_RXCTP1R:
+-        ret = mal->rxctpr[1];
+-        break;
+-    case MAL0_RCBS0:
+-        ret = mal->rcbs[0];
+-        break;
+-    case MAL0_RCBS1:
+-        ret = mal->rcbs[1];
+-        break;
+     default:
+         ret = 0;
+         break;
+     }
++    if (dcrn >= MAL0_TXCTP0R && dcrn < MAL0_TXCTP0R + mal->txcnum) {
++        ret = mal->txctpr[dcrn - MAL0_TXCTP0R];
 +    }
-+
-     sc->threads = g_malloc0(size * cc->nr_threads);
-     for (i = 0; i < cc->nr_threads; i++) {
-         char id[32];
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index 81d65b9617..043b24a4aa 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -160,6 +160,9 @@ ERROR_WHITELIST = [
-     {'machine':'q35|pc.*', 'device':'kvm-ioapic', 'expected':True}, # Only 1 ioapics allowed
-     {'machine':'q35|pc.*', 'device':'ioapic', 'expected':True},     # Only 1 ioapics allowed
++    if (dcrn >= MAL0_RXCTP0R && dcrn < MAL0_RXCTP0R + mal->rxcnum) {
++        ret = mal->rxctpr[dcrn - MAL0_RXCTP0R];
++    }
++    if (dcrn >= MAL0_RCBS0 && dcrn < MAL0_RCBS0 + mal->rxcnum) {
++        ret = mal->rcbs[dcrn - MAL0_RCBS0];
++    }
  
-+    # "spapr-cpu-core needs a pseries machine"
-+    {'machine':'(?!pseries).*', 'device':'.*-spapr-cpu-core', 'expected':True},
-+
-     # KVM-specific devices shouldn't be tried without accel=kvm:
-     {'accel':'(?!kvm).*', 'device':'kvmclock', 'expected':True},
-     {'accel':'(?!kvm).*', 'device':'kvm-pci-assign', 'expected':True},
+     return ret;
+ }
+ 
+ static void dcr_write_mal(void *opaque, int dcrn, uint32_t val)
+ {
+-    ppc40x_mal_t *mal;
+-    int idx;
++    ppc4xx_mal_t *mal;
+ 
+     mal = opaque;
+     switch (dcrn) {
+     case MAL0_CFG:
+         if (val & 0x80000000) {
+-            ppc40x_mal_reset(mal);
++            ppc4xx_mal_reset(mal);
+         }
+         mal->cfg = val & 0x00FFC087;
+         break;
+@@ -900,65 +897,35 @@ static void dcr_write_mal(void *opaque, int dcrn, uint32_t val)
+         /* Read/clear */
+         mal->rxdeir &= ~val;
+         break;
+-    case MAL0_TXCTP0R:
+-        idx = 0;
+-        goto update_tx_ptr;
+-    case MAL0_TXCTP1R:
+-        idx = 1;
+-        goto update_tx_ptr;
+-    case MAL0_TXCTP2R:
+-        idx = 2;
+-        goto update_tx_ptr;
+-    case MAL0_TXCTP3R:
+-        idx = 3;
+-    update_tx_ptr:
+-        mal->txctpr[idx] = val;
+-        break;
+-    case MAL0_RXCTP0R:
+-        idx = 0;
+-        goto update_rx_ptr;
+-    case MAL0_RXCTP1R:
+-        idx = 1;
+-    update_rx_ptr:
+-        mal->rxctpr[idx] = val;
+-        break;
+-    case MAL0_RCBS0:
+-        idx = 0;
+-        goto update_rx_size;
+-    case MAL0_RCBS1:
+-        idx = 1;
+-    update_rx_size:
+-        mal->rcbs[idx] = val & 0x000000FF;
+-        break;
++    }
++    if (dcrn >= MAL0_TXCTP0R && dcrn < MAL0_TXCTP0R + mal->txcnum) {
++        mal->txctpr[dcrn - MAL0_TXCTP0R] = val;
++    }
++    if (dcrn >= MAL0_RXCTP0R && dcrn < MAL0_RXCTP0R + mal->rxcnum) {
++        mal->rxctpr[dcrn - MAL0_RXCTP0R] = val;
++    }
++    if (dcrn >= MAL0_RCBS0 && dcrn < MAL0_RCBS0 + mal->rxcnum) {
++        mal->rcbs[dcrn - MAL0_RCBS0] = val & 0x000000FF;
+     }
+ }
+ 
+-static void ppc40x_mal_reset(void *opaque)
+-{
+-    ppc40x_mal_t *mal;
+-
+-    mal = opaque;
+-    mal->cfg = 0x0007C000;
+-    mal->esr = 0x00000000;
+-    mal->ier = 0x00000000;
+-    mal->rxcasr = 0x00000000;
+-    mal->rxdeir = 0x00000000;
+-    mal->rxeobisr = 0x00000000;
+-    mal->txcasr = 0x00000000;
+-    mal->txdeir = 0x00000000;
+-    mal->txeobisr = 0x00000000;
+-}
+-
+-void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4])
++void ppc4xx_mal_init(CPUPPCState *env, uint8_t txcnum, uint8_t rxcnum,
++                     qemu_irq irqs[4])
+ {
+-    ppc40x_mal_t *mal;
++    ppc4xx_mal_t *mal;
+     int i;
+ 
+-    mal = g_malloc0(sizeof(ppc40x_mal_t));
++    assert(txcnum <= 32 && rxcnum <= 32);
++    mal = g_malloc0(sizeof(*mal));
++    mal->txcnum = txcnum;
++    mal->rxcnum = rxcnum;
++    mal->txctpr = g_new0(uint32_t, txcnum);
++    mal->rxctpr = g_new0(uint32_t, rxcnum);
++    mal->rcbs = g_new0(uint32_t, rxcnum);
+     for (i = 0; i < 4; i++) {
+         mal->irqs[i] = irqs[i];
+     }
+-    qemu_register_reset(&ppc40x_mal_reset, mal);
++    qemu_register_reset(&ppc4xx_mal_reset, mal);
+     ppc_dcr_register(env, MAL0_CFG,
+                      mal, &dcr_read_mal, &dcr_write_mal);
+     ppc_dcr_register(env, MAL0_ESR,
+@@ -981,20 +948,16 @@ void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4])
+                      mal, &dcr_read_mal, &dcr_write_mal);
+     ppc_dcr_register(env, MAL0_RXDEIR,
+                      mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_TXCTP0R,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_TXCTP1R,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_TXCTP2R,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_TXCTP3R,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_RXCTP0R,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_RXCTP1R,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_RCBS0,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
+-    ppc_dcr_register(env, MAL0_RCBS1,
+-                     mal, &dcr_read_mal, &dcr_write_mal);
++    for (i = 0; i < txcnum; i++) {
++        ppc_dcr_register(env, MAL0_TXCTP0R + i,
++                         mal, &dcr_read_mal, &dcr_write_mal);
++    }
++    for (i = 0; i < rxcnum; i++) {
++        ppc_dcr_register(env, MAL0_RXCTP0R + i,
++                         mal, &dcr_read_mal, &dcr_write_mal);
++    }
++    for (i = 0; i < rxcnum; i++) {
++        ppc_dcr_register(env, MAL0_RCBS0 + i,
++                         mal, &dcr_read_mal, &dcr_write_mal);
++    }
+ }
+diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
+index db50cfac02..cb0bb55cec 100644
+--- a/include/hw/ppc/ppc4xx.h
++++ b/include/hw/ppc/ppc4xx.h
+@@ -53,7 +53,8 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
+                         hwaddr *ram_sizes,
+                         int do_init);
+ 
+-void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4]);
++void ppc4xx_mal_init(CPUPPCState *env, uint8_t txcnum, uint8_t rxcnum,
++                     qemu_irq irqs[4]);
+ 
+ #define TYPE_PPC4xx_PCI_HOST_BRIDGE "ppc4xx-pcihost"
+ 
 -- 
 2.13.5
