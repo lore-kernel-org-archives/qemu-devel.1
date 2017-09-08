@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38614)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dqM1C-0005Bx-5G
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:20:35 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dqM2k-0006Zc-1S
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dqM19-0003X5-0D
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:20:34 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:35981)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dqM18-0003Wt-Oz
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:20:30 -0400
-Received: by mail-wr0-x234.google.com with SMTP id o42so5545190wrb.3
-	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 09:20:30 -0700 (PDT)
-References: <20170905021201.25684-1-famz@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170905021201.25684-1-famz@redhat.com>
-Date: Fri, 08 Sep 2017 17:20:27 +0100
-Message-ID: <87shfxgo1g.fsf@linaro.org>
+	(envelope-from <dgilbert@redhat.com>) id 1dqM2g-0004O3-UM
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48548)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dqM2g-0004NZ-L3
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 12:22:06 -0400
+Date: Fri, 8 Sep 2017 17:22:02 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170908162201.GC2836@work-vm>
+References: <20170908155359.27952-1-dgilbert@redhat.com>
+	<26a00723-027c-4445-0590-d50739dec557@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v6 00/12] tests: Add VM based build tests
- (for non-x86_64 and/or non-Linux)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <26a00723-027c-4445-0590-d50739dec557@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] slirp: Add explanation for hostfwd parsing
+ failure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,110 +29,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, Philippe =?utf-8?Q?Mathieu?= =?utf-8?Q?-Daud=C3=A9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, samuel.thibault@ens-lyon.org, jan.kiszka@siemens.com
 
+* Philippe Mathieu-Daud=E9 (f4bug@amsat.org) wrote:
+> Hi David,
+>=20
+> On 09/08/2017 12:53 PM, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> >=20
+> > e.g.
+> > ./x86_64-softmmu/qemu-system-x86_64 -nographic -netdev 'user,id=3Dvne=
+t,hostfwd=3D:555.0.0.0:0-:22'
+> > qemu-system-x86_64: -netdev user,id=3Dvnet,hostfwd=3D:555.0.0.0:0-:22=
+: Invalid host forwarding rule ':555.0.0.0:0-:22' (Bad host address)
+> >=20
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >   net/slirp.c | 13 ++++++++++++-
+> >   1 file changed, 12 insertions(+), 1 deletion(-)
+> >=20
+> > diff --git a/net/slirp.c b/net/slirp.c
+> > index 01ed21c006..d87664d42e 100644
+> > --- a/net/slirp.c
+> > +++ b/net/slirp.c
+> > @@ -496,9 +496,11 @@ static int slirp_hostfwd(SlirpState *s, const ch=
+ar *redir_str,
+> >       char buf[256];
+> >       int is_udp;
+> >       char *end;
+> > +    const char *fail_reason =3D "";
+>=20
+> Isn't it better not initialize this? So if one add a new failed syntax =
+case
+> the build with abort with -Werror=3Duninitialized
 
-Fam Zheng <famz@redhat.com> writes:
+I never quite trust compilers to spot it or not-moan even though
+every route to failure will have set it.
 
-> v6: Add license to new file. [Philippe]
->     Change tests/.gitignore. [Philippe]
->
-> v5: Generate source tar file with a script.
->     Fix tmpdir, use pwd.
->     Reduce default -j to half cores.
->
-> v4: Drop unused imports and parameters. [Cleber]
->     Use --exclude-vcs (still no --exclude-vcs-ignores because it's too new). [Philippe]
->     Use gtar if available. [Philippe, Kamil]
->     /dev/ld1a -> /dev/rld1a for netbsd. [Kamil]
->     Only use '-enable-kvm' if /dev/kvm is there. [Kamil]
->     Grammar fixes of README. [Stefan]
->     Rename image on the server to include version and arch. [Kamil]
->     Just ignore *.tmp. [Philippe]
->
-> v3: Drop RFC.
->     Add Stefan's and Kamil's reviewed-bys.
->     Use optparse. [Stefan]
->     Drop the VGA patch. [Paolo, Stefan]
->     Improve exit/exit code/doc. [Stefan]
->     Drop unused line from basevm.py. [Stefan]
->     Drop "--target-list" form Makefile.
->     More intelligent '-j'.
->     Add README. [Stefan]
->
-> v2: - Add docstring. [Stefan]
->     - Call self._load_io_lod. [Stefan]
->     - Use "info usernet" and dynamic ssh_port forwarding. [Stefan]
->     - Add image checksum.
->     - Use os.rename() and os.makedirs(). [Stefan]
->     - Fix NetBSD URL. [Kamil]
->
-> Build tests in one 32 bit Linux guest and three BSD images are defined in this
-> series. This is a more managable way than the manually maintained virtual
-> machines in patchew. Also, one big advantage of ephemeral VMs over long running
-> guests is the reduced RAM usage of host, which makes it possible to have one
-> host test all these BSD variants and probably more.
->
-> The BSD guest templates are manually prepared following
->
-> https://wiki.qemu.org/Hosts/BSD
->
-> as it is not easy to automate. (The ideal approach is like the ubuntu.i386
-> script, which configures the guest on top of an official released image, fully
-> automatically.)
->
-> Need for help: "gmake check" in the added OpenBSD image fails with -ENOMEM
-> errors, even if I change "-m 2G" to "-m 8G" when starting VM. Ideas? And there
-> is a warning from ./configure about OpenBSD going to be unsupported in coming
-> releases, is it still the case?
+> Anyway:
+> Reviewed-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
-OK I can't boot any of the VMs so I need some more feedback from the
-script when things run.
+Thanks.
 
->
-> Fam
->
-> Fam Zheng (12):
->   gitignore: Ignore vm test images
->   qemu.py: Add "wait()" method
->   scripts: Add archive-source.sh
->   tests: Add vm test lib
->   tests: Add ubuntu.i386 image
->   tests: Add FreeBSD image
->   tests: Add NetBSD image
->   tests: Add OpenBSD image
->   Makefile: Add rules to run vm tests
->   MAINTAINERS: Add tests/vm entry
->   tests: Add README for vm tests
->   docker: Use archive-source.py
->
->  .gitignore                    |   1 +
->  MAINTAINERS                   |   1 +
->  Makefile                      |   2 +
->  configure                     |   2 +-
->  scripts/archive-source.sh     |  31 +++++
->  scripts/qemu.py               |   7 ++
->  tests/.gitignore              |   1 +
->  tests/docker/Makefile.include |  15 +--
->  tests/docker/run              |   8 +-
->  tests/vm/Makefile.include     |  42 +++++++
->  tests/vm/README               |  63 ++++++++++
->  tests/vm/basevm.py            | 276 ++++++++++++++++++++++++++++++++++++++++++
->  tests/vm/freebsd              |  42 +++++++
->  tests/vm/netbsd               |  42 +++++++
->  tests/vm/openbsd              |  43 +++++++
->  tests/vm/ubuntu.i386          |  88 ++++++++++++++
->  16 files changed, 643 insertions(+), 21 deletions(-)
->  create mode 100755 scripts/archive-source.sh
->  create mode 100644 tests/vm/Makefile.include
->  create mode 100644 tests/vm/README
->  create mode 100755 tests/vm/basevm.py
->  create mode 100755 tests/vm/freebsd
->  create mode 100755 tests/vm/netbsd
->  create mode 100755 tests/vm/openbsd
->  create mode 100755 tests/vm/ubuntu.i386
+Dave
 
-
+>=20
+> >       p =3D redir_str;
+> >       if (!p || get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
+> > +        fail_reason =3D "No : separators";
+> >           goto fail_syntax;
+> >       }
+> >       if (!strcmp(buf, "tcp") || buf[0] =3D=3D '\0') {
+> > @@ -506,35 +508,43 @@ static int slirp_hostfwd(SlirpState *s, const c=
+har *redir_str,
+> >       } else if (!strcmp(buf, "udp")) {
+> >           is_udp =3D 1;
+> >       } else {
+> > +        fail_reason =3D "Bad protocol name";
+> >           goto fail_syntax;
+> >       }
+> >       if (!legacy_format) {
+> >           if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
+> > +            fail_reason =3D "Missing : separator";
+> >               goto fail_syntax;
+> >           }
+> >           if (buf[0] !=3D '\0' && !inet_aton(buf, &host_addr)) {
+> > +            fail_reason =3D "Bad host address";
+> >               goto fail_syntax;
+> >           }
+> >       }
+> >       if (get_str_sep(buf, sizeof(buf), &p, legacy_format ? ':' : '-'=
+) < 0) {
+> > +        fail_reason =3D "Bad host port separator";
+> >           goto fail_syntax;
+> >       }
+> >       host_port =3D strtol(buf, &end, 0);
+> >       if (*end !=3D '\0' || host_port < 0 || host_port > 65535) {
+> > +        fail_reason =3D "Bad host port";
+> >           goto fail_syntax;
+> >       }
+> >       if (get_str_sep(buf, sizeof(buf), &p, ':') < 0) {
+> > +        fail_reason =3D "Missing guest address";
+> >           goto fail_syntax;
+> >       }
+> >       if (buf[0] !=3D '\0' && !inet_aton(buf, &guest_addr)) {
+> > +        fail_reason =3D "Bad guest address";
+> >           goto fail_syntax;
+> >       }
+> >       guest_port =3D strtol(p, &end, 0);
+> >       if (*end !=3D '\0' || guest_port < 1 || guest_port > 65535) {
+> > +        fail_reason =3D "Bad guest port";
+> >           goto fail_syntax;
+> >       }
+> > @@ -547,7 +557,8 @@ static int slirp_hostfwd(SlirpState *s, const cha=
+r *redir_str,
+> >       return 0;
+> >    fail_syntax:
+> > -    error_setg(errp, "Invalid host forwarding rule '%s'", redir_str)=
+;
+> > +    error_setg(errp, "Invalid host forwarding rule '%s' (%s)", redir=
+_str,
+> > +               fail_reason);
+> >       return -1;
+> >   }
+> >=20
 --
-Alex Bennée
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
