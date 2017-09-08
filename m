@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53595)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dqAnI-0006ki-6q
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 00:21:33 -0400
+	(envelope-from <thuth@redhat.com>) id 1dqAnX-0006rH-Ha
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 00:21:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dqAnD-0005LT-9I
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 00:21:28 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2254)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1dqAnC-0005FO-Jd
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 00:21:23 -0400
-Message-ID: <59B219BF.9020400@huawei.com>
-Date: Fri, 8 Sep 2017 12:17:03 +0800
-From: "Longpeng (Mike)" <longpeng2@huawei.com>
+	(envelope-from <thuth@redhat.com>) id 1dqAnS-0005cy-LM
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 00:21:43 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56358)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dqAnS-0005cQ-Et
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 00:21:38 -0400
+References: <20170907201335.13956-1-david@redhat.com>
+	<20170907201335.13956-9-david@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1603f6bf-f481-13c2-c7eb-ac155c5a14cc@redhat.com>
+Date: Fri, 8 Sep 2017 06:21:31 +0200
 MIME-Version: 1.0
-References: <1503734014-239116-1-git-send-email-longpeng2@huawei.com>
-	<59A8AE20.1080409@huawei.com>
-	<7f0b8eb2-9e5c-7507-191d-1aab17c6ff0f@linux.vnet.ibm.com>
-	<20170906164839-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170906164839-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v19 0/2] virtio-crypto:
- virtio crypto device specification
+In-Reply-To: <20170907201335.13956-9-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 08/21] s390x: move sclp_service_call()
+ to sclp.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,108 +29,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: stefanha@redhat.com, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, luonengjun@huawei.com, cohuck@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, mike.caraman@nxp.com, agraf@suse.de, jasowang@redhat.com, nmorey@kalray.eu, vincent.jardin@6wind.com, arei.gonglei@hotmail.com, wangxinxin.wang@huawei.com, Gonglei <arei.gonglei@huawei.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-
-
-On 2017/9/6 21:52, Michael S. Tsirkin wrote:
-
-> On Fri, Sep 01, 2017 at 01:45:45PM +0200, Halil Pasic wrote:
->>
->>
->> On 09/01/2017 02:47 AM, Longpeng (Mike) wrote:
->>> Ping...
->>>
->>> Stefan, Halil, do you have any suggestion ?
->>>
->>
->> Hi Longpeng,
->>
->> I've ran trough your patch, and it reads much better that
->> what I recall v18 used to read like. Because it's been a while
->> since v18 doing a conscious review on this will take a considerable
->> amount of time (my memories of the issues identified back then
->> are very sketchy/vague now). It's on my todo list, but it ain't the
->> only item there.
-
-> 
-> I don't think it's a fair reason to delay the merging though.
-> No comments in a while says time to merge to me.
-> There's always a public review period during which more comments
-> can be addressed.
-> 
-> So I think we should start a ballot on this one.
-> Mike - if you agree please open an issue in TC issue
-> tracker.  As a reminder here are the guidelines:
-> 
-
-
-Hi Michael,
-
-I've promised Halil to send an implementation based on the v19 this week and I
-can complete it in this two days, OTOH, Halil had give some very useful
-suggestions on the v18 and we also hope him could closely review the v19 spec.
-
-So I suggest to give Halil enough time(one more week?) to review the v19 if he will.
-
-If everything is ok, we could start a ballot on this one(if no other
-suggestions) or the v20(update according with the new suggestions).
-
--- 
-Regards,
-Longpeng(Mike)
-
-> 
-> --
-> 
-> When you open an issue (can be fixed afterwards as well):
-> 
-> 1. Fill in the reporter in the Environment: field.
-> 2. Shortly describe the issue in the description field
->    Preferably add a URL to discussion here or
->    in the comments.
->    If the mail was copied to virtio-comment or virtio-dev, you can use
->         mid.gmane.org/<message-id>
->    to quickly locate a mail in the archives.
-> 2. Preferably, fill in all affected versions: in
->    "Affects Version/s:".
->    This might not apply to e.g. improvement requests.
-> 
+On 07.09.2017 22:13, David Hildenbrand wrote:
+> Implemented in sclp.c, so let's move it to the right include file.
+> Fix up one include. Do a forward declaration of CPUS390XState to fix th=
+e
+> two sclp consoles complaining.
+>=20
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
-> 
-> When you propose the issue before the TC meeting:
-> 
-> 1. Mark issue as Open
-> 2. Fill in a summary of the final proposed change and
->    link to full proposal in "Proposal"
->    field.
->    [any historical abandoned proposals and extra info can go
->     into comments field]
-> ---
-> 
-> Then mail me and the TC and I will start a ballot.
-> 
-> Thanks!
-> 
->> Btw. I like to have a reference implementation at hand when reviewing
->> a spec. What is the status of the (reference) implementation (I mean
->> the new stuff like stateless/mux)? I think it would be nice to provide
->> this info in the cover letter (e.g. next time, should we need another
->> iteration).
->>
->> Regards,
->> Halil
->>
->>
->> ---------------------------------------------------------------------
->> To unsubscribe, e-mail: virtio-dev-unsubscribe@lists.oasis-open.org
->> For additional commands, e-mail: virtio-dev-help@lists.oasis-open.org
-> 
-> .
-> 
+>  include/hw/s390x/sclp.h    | 2 ++
+>  target/s390x/cpu.h         | 1 -
+>  target/s390x/misc_helper.c | 1 +
+>  3 files changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+> index a72d096081..4b86a8a293 100644
+> --- a/include/hw/s390x/sclp.h
+> +++ b/include/hw/s390x/sclp.h
+> @@ -242,5 +242,7 @@ sclpMemoryHotplugDev *init_sclp_memory_hotplug_dev(=
+void);
+>  sclpMemoryHotplugDev *get_sclp_memory_hotplug_dev(void);
+>  void sclp_service_interrupt(uint32_t sccb);
+>  void raise_irq_cpu_hotplug(void);
+> +typedef struct CPUS390XState CPUS390XState;
+> +int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code=
+);
 
+That's dangerous and likely does not work with certain versions of GCC.
+You can't do a "forward declaration" with typedef in C, I'm afraid. See
+for example:
 
--- 
-Regards,
-Longpeng(Mike)
+ https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01454.html
+ https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg03337.html
+ https://stackoverflow.com/questions/8367646/redefinition-of-typedef
+
+All this typedef'ing in QEMU is pretty bad ... we run into this problem
+again and again. include/qemu/typedefs.h is just a work-around for this.
+I know people like typedefs for some reasons (I used to do that, too,
+before I realized the trouble with them), but IMHO we should rather
+adopt the typedef-related rules from the kernel coding conventions instea=
+d:
+
+ https://www.kernel.org/doc/html/v4.13/process/coding-style.html#typedefs
+
+  Thomas
