@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dqNNz-0000gP-Ol
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:48:12 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dqNST-0004ju-1j
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:52:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dqNNy-0007jT-V3
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:48:11 -0400
-Date: Fri, 8 Sep 2017 20:47:16 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170908174716.mxylb5ftm3ygk67m@postretch>
-References: <20170825132332.6734-1-el13635@mail.ntua.gr>
-	<20170825132332.6734-5-el13635@mail.ntua.gr>
-	<20170907132611.GG4461@dhcp-200-186.str.redhat.com>
-	<20170908154459.5xpyczgpvim75o62@postretch>
-	<20170908160011.GA17516@localhost.localdomain>
+	(envelope-from <dgilbert@redhat.com>) id 1dqNSP-0002Ss-Us
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:52:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:29396)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dqNSP-0002Sa-OX
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 13:52:45 -0400
+Date: Fri, 8 Sep 2017 18:52:35 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170908175234.GH2836@work-vm>
+References: <20170828082608.GM14174@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2k4vhbnw4eccbmrb"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170908160011.GA17516@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v3 4/7] block: remove legacy I/O throttling
+In-Reply-To: <20170828082608.GM14174@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC v2 4/8] QAPI: new QMP command option
+ "without-bql"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,84 +27,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
+* Peter Xu (peterx@redhat.com) wrote:
+> On Fri, Aug 25, 2017 at 10:06:27AM +0100, Dr. David Alan Gilbert wrote:
+> > * Peter Xu (peterx@redhat.com) wrote:
+> > > On Wed, Aug 23, 2017 at 06:44:12PM +0100, Dr. David Alan Gilbert wrote:
+> > > 
+> > > [...]
+> > > 
+> > > > > +Most of the commands require the Big QEMU Lock (BQL) be held during
+> > > > > +execution.  However, there is a small subset of the commands that may
+> > > > > +not really need BQL at all.  To mark out this kind of commands, we can
+> > > > > +specify "without-bql" to "true".  This parameter is only a hint for
+> > > > > +internal QMP implementation to provide possiblility to allow commands
+> > > > > +be run in parallel, or reduce the contention of the lock.  Users of QMP
+> > > > > +should not really be aware of such information.
+> > > > 
+> > > > Well, I think users of these commands might select them specifically
+> > > > because they know that they won't block.  Those who care about latency might
+> > > > look to use commands that don't take the lock because of a reduced
+> > > > effect on the performance as well.
+> > > 
+> > > What would be the best way to tell user?  I think again this should
+> > > mostly for HMP only, right?
+> > 
+> > It needs to be docuemnted for QMP users as well so that those developing
+> > management code know what's safe.
+> 
+> I see.  What's the corresponding QMP documentation I should touch up?
 
---2k4vhbnw4eccbmrb
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I'm not sure, but based on the long thread; I think the idea is to add
+something to the schema so the flag appears in the introspection.  I'll
+leave the details of how to Markus.
 
-On Fri, Sep 08, 2017 at 06:00:11PM +0200, Kevin Wolf wrote:
->Am 08.09.2017 um 17:44 hat Manos Pitsidianakis geschrieben:
->> On Thu, Sep 07, 2017 at 03:26:11PM +0200, Kevin Wolf wrote:
->> > We shouldn't really need any throttling code in
->> > blk_root_drained_begin/end any more now because the throttle node will
->> > be drained. If this code is necessary, a bdrv_drain() on an explicit
->> > throttle node will work differently from one on an implicit one.
->> >
->> > Unfortunately, this seems to be true about the throttle node. Implicit
->> > throttle nodes will keep ignoring the throttle limit in order to
->> > complete the drain request quickly, where as explicit throttle nodes
->> > will process their requests at the configured speed before the drain
->> > request can be completed.
->> >
->> > This doesn't feel right to me, both should behave the same.
->> >
->> > Kevin
->> >
->>
->> I suppose we can implement bdrv_co_drain and increase io_limits_disabled
->> from inside the driver. And then remove the implicit filter logic from
->> blk_root_drained_begin. But there's no _end callback equivalent so we ca=
-n't
->> decrease io_limits_disabled at the end of the drain. So I think there are
->> two options:
->>
->> - make a bdrv_co_drain_end cb and recurse in blk_root_drain_end for all
->> children to call it. Old behavior of I/O bursts (?) during a drain is  k=
-ept.
->
->This is the solution I was thinking of. It was always odd to have a
->drained_begin/end pair in the external interface and in BdrvChildRole,
->but not in BlockDriver. So it was to be expected that we'd need this
->sooner or later.
->
->> - remove io_limits_disabled and let throttled requests obey limits  duri=
-ng a
->> drain
->
->This was discussed earlier (at least when the disable code was
->introduced in BlockBackend, but I think actually more than once), and
->even though everyone agreed that ignoring the limits is ugly, we
->seem to have come to the conclusion that it's the least bad option.
->blk_drain() blocks and makes everything else hang, so we don't want it
->to wait for several seconds.
->
->Kevin
+> > 
+> > > Maybe we can add a new command to list these lock-free commands.  Or,
+> > > I can dump something in "help" and "help info" like:
+> > > 
+> > > (qemu) help migrate_incoming
+> > > migrate_incoming uri -- Continue an incoming migration from an -incoming defer (BQL-less)
+> > 
+> > 'lock free' might be better?
+> 
+> I'm ok with it.  But would the word "lock" too general?
 
-That makes sense. I will look into this and resubmit the series with=20
-this additional change.
+Maybe, but it's probably not just BQL.
 
---2k4vhbnw4eccbmrb
-Content-Type: application/pgp-signature; name="signature.asc"
+Dave
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlmy16QACgkQc2J8L2kN
-9xDWmQ/+PWxUu2c+l0BcJ5pOpAVdcRC2JcNK1j68hK3eZhZw8kM1QUSJ2Rcovjhw
-hzw3FT7KFZVdU5zc3SNxWdisYZOBQApen4iPtuw3WN3adm8zPpgh/6/tZ1QByuia
-jeKob9NFyaxJczaxgwIt8YdGvZdUB9kR1LnoAYDCht7bAQNdMJw341XF4jvYkduk
-BhqngkDOmDCIgtaBGoNMkJ6m9a4yDVfvpAvAUbDQHFn0xAwROZk/0uqPL/kzEPdi
-mL3R+D/4sz4BIl1FHLCTSOA0/XQB4D6unwytgevU7E+alt7sbCtYmbAr+PNEBEW+
-ueo492xQI22I0Y0p5TkgJ3M2sOy3FjS8upkNG0tRFsA16TMwei7vu3jZErwAwOUG
-LQ0tcUOtp0NSsx5fL8MksRQZu8dfX+SZUfKYxSsO7sNaN+8b5QN82iDvwJ+r+0G2
-j3n4nPf4A/IobdXAueJQ2ijdEbPmgJyH+dQwSgpPq2bVDONvrNV7P9QslGD3gcXZ
-bu2ACGWIg4iduQnki/TFOrTmFEhovX/Vmo5gCUFZnKGgZfE3UyEpomoFmT6NDQeY
-A87gfrL9LfzAn5UkeL2jSH3Aywkr+j6rgPaoEWROToraU20hD1xVMkXaHQMfxUMv
-mvNIgTvimxHfgNcsCSSfLF0BrG+9y0yg22VjQ6EwPquthH5fJPU=
-=r9t+
------END PGP SIGNATURE-----
-
---2k4vhbnw4eccbmrb--
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
