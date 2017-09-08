@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG0T-0007g1-Sb
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:30 -0400
+	(envelope-from <famz@redhat.com>) id 1dqG0V-0007hM-Nj
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG0P-0004KX-9F
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33966)
+	(envelope-from <famz@redhat.com>) id 1dqG0R-0004MB-65
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40190)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG0P-0004Ju-31
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:21 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG0R-0004LL-0J
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:23 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  8 Sep 2017 17:54:33 +0800
-Message-Id: <20170908095506.13594-6-famz@redhat.com>
+Date: Fri,  8 Sep 2017 17:54:34 +0800
+Message-Id: <20170908095506.13594-7-famz@redhat.com>
 In-Reply-To: <20170908095506.13594-1-famz@redhat.com>
 References: <20170908095506.13594-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 05/38] docker: Update ubuntu image
+Subject: [Qemu-devel] [PULL 06/38] docker: Enable features explicitly in
+ test-full
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +27,112 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-Base on the newer ubuntu-lts (16.06) and include more packages for
-better build coverage.
+Also avoid "set -e".
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170907141245.31946-2-famz@redhat.com>
+Message-Id: <20170907141245.31946-3-famz@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/docker/dockerfiles/ubuntu.docker | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ tests/docker/test-full | 82 ++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 76 insertions(+), 6 deletions(-)
 
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-index a360a050a2..d73ce02246 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -1,12 +1,17 @@
--FROM ubuntu:14.04
-+FROM ubuntu:16.04
- RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty universe multiverse" >> \
-     /etc/apt/sources.list
- RUN apt-get update
- ENV PACKAGES flex bison \
--    libusb-1.0-0-dev libiscsi-dev librados-dev libncurses5-dev \
-+    libusb-1.0-0-dev libiscsi-dev librados-dev libncurses5-dev libncursesw5-dev \
-     libseccomp-dev libgnutls-dev libssh2-1-dev  libspice-server-dev \
-     libspice-protocol-dev libnss3-dev libfdt-dev \
--    libgtk-3-dev libvte-2.90-dev libsdl1.2-dev libpng12-dev libpixman-1-dev \
-+    libgtk-3-dev libvte-2.91-dev libsdl1.2-dev libpng12-dev libpixman-1-dev \
-+    libvdeplug-dev liblzo2-dev libsnappy-dev libbz2-dev libxen-dev librdmacm-dev libibverbs-dev \
-+    libsasl2-dev libjpeg-turbo8-dev xfslibs-dev libcap-ng-dev libbrlapi-dev libcurl4-gnutls-dev \
-+    libbluetooth-dev librbd-dev libaio-dev glusterfs-common libnuma-dev libepoxy-dev libdrm-dev libgbm-dev \
-+    libjemalloc-dev libcacard-dev libusbredirhost-dev libnfs-dev libcap-dev libattr1-dev \
-+    texinfo \
-     git make ccache python-yaml gcc clang sparse
- RUN apt-get -y install $PACKAGES
- RUN dpkg -l $PACKAGES | sort > /packages.txt
+diff --git a/tests/docker/test-full b/tests/docker/test-full
+index 05f0d491d1..d71bf9d275 100755
+--- a/tests/docker/test-full
++++ b/tests/docker/test-full
+@@ -1,8 +1,8 @@
+-#!/bin/bash -e
++#!/bin/bash
+ #
+-# Compile all the targets.
++# Compile all the targets with as many features enabled as possible
+ #
+-# Copyright (c) 2016 Red Hat Inc.
++# Copyright 2016, 2017 Red Hat Inc.
+ #
+ # Authors:
+ #  Fam Zheng <famz@redhat.com>
+@@ -13,7 +13,77 @@
+ 
+ . common.rc
+ 
+-cd "$BUILD_DIR"
++cd "$BUILD_DIR" || exit 1
+ 
+-build_qemu
+-make check $MAKEFLAGS
++build_qemu \
++    --enable-attr \
++    --enable-bluez \
++    --enable-brlapi \
++    --enable-bsd-user \
++    --enable-bzip2 \
++    --enable-cap-ng \
++    --enable-coroutine-pool \
++    --enable-crypto-afalg \
++    --enable-curl \
++    --enable-curses \
++    --enable-debug \
++    --enable-debug-info \
++    --enable-debug-tcg \
++    --enable-docs \
++    --enable-fdt \
++    --enable-gcrypt \
++    --enable-glusterfs \
++    --enable-gnutls \
++    --enable-gprof \
++    --enable-gtk \
++    --enable-guest-agent \
++    --enable-jemalloc \
++    --enable-kvm \
++    --enable-libiscsi \
++    --enable-libnfs \
++    --enable-libssh2 \
++    --enable-libusb \
++    --enable-linux-aio \
++    --enable-linux-user \
++    --enable-live-block-migration \
++    --enable-lzo \
++    --enable-modules \
++    --enable-numa \
++    --enable-opengl \
++    --enable-pie \
++    --enable-profiler \
++    --enable-qom-cast-debug \
++    --enable-rbd \
++    --enable-rdma \
++    --enable-replication \
++    --enable-sdl \
++    --enable-seccomp \
++    --enable-smartcard \
++    --enable-snappy \
++    --enable-spice \
++    --enable-stack-protector \
++    --enable-system \
++    --enable-tcg \
++    --enable-tcg-interpreter \
++    --enable-tools \
++    --enable-tpm \
++    --enable-trace-backend=ftrace \
++    --enable-usb-redir \
++    --enable-user \
++    --enable-vde \
++    --enable-vhost-net \
++    --enable-vhost-scsi \
++    --enable-vhost-user \
++    --enable-vhost-vsock \
++    --enable-virtfs \
++    --enable-vnc \
++    --enable-vnc-jpeg \
++    --enable-vnc-png \
++    --enable-vnc-sasl \
++    --enable-vte \
++    --enable-werror \
++    --enable-xen \
++    --enable-xen-pci-passthrough \
++    --enable-xen-pv-domain-build \
++    --enable-xfsctl \
++&& make check $MAKEFLAGS
 -- 
 2.13.5
