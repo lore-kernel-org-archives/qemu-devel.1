@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dqJnz-00026g-Dh
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:58:48 -0400
+	(envelope-from <berrange@redhat.com>) id 1dqJnx-00025B-7f
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:58:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dqJnu-0005ei-J8
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:58:47 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:53045
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1dqJnu-0005bC-CL
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:58:42 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Fri,  8 Sep 2017 14:58:24 +0100
-Message-Id: <1504879106-2225-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 0/2] sun4u: add Sun HME (Happy Meal Ethernet)
- on-board NIC
+	(envelope-from <berrange@redhat.com>) id 1dqJnr-0005Z5-MJ
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:58:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37260)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqJnr-0005Uc-Gc
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:58:39 -0400
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Date: Fri,  8 Sep 2017 14:58:28 +0100
+Message-Id: <20170908135831.10556-1-berrange@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 0/3] Improve websock response / error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +25,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, atar4qemu@gmail.com
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Brian Rak <brak@vultr.com>, "Daniel P. Berrange" <berrange@redhat.com>
 
-Only a few OSs contain support for QEMU's in-built PCI NICs as they were
-very rarely used with sun4u hardware and so either aren't compiled in by
-default or fail because of endian issues.
+A followup of:
 
-This patchset implements the Sun HME (Happy Meal Ethernet) NIC for sun4u, a
-common in-built NIC to provide out-of-the-box networking for nearly all
-OSs and then makes it the default for sun4u machines.
+ v1: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01176.html
+ v2: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01974.html
 
-The remaining hold-outs in my tests are OpenBSD and OpenSolaris, however
-this is because they map PCI space differently using a feature which isn't
-yet implemented in QEMU's sun4u MMU code.
+Changed in v3:
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+  - Use strftime instead of g_date_time_format
 
+Changed in v2:
 
-Mark Cave-Ayland (2):
-  net: add Sun HME (Happy Meal Ethernet) on-board NIC
-  sun4u: use sunhme as default on-board NIC
+  - Drop redundant return statement
+  - Drop redundant variable initialization
+  - Assert that g_date_time_format is non-NULL
 
- default-configs/sparc64-softmmu.mak |    1 +
- hw/net/Makefile.objs                |    1 +
- hw/net/sunhme.c                     |  978 +++++++++++++++++++++++++++++++++++
- hw/net/trace-events                 |   29 ++
- hw/sparc64/sun4u.c                  |   25 +-
- include/hw/net/mii.h                |    4 +
- include/hw/pci/pci_ids.h            |    1 +
- 7 files changed, 1035 insertions(+), 4 deletions(-)
- create mode 100644 hw/net/sunhme.c
+Daniel P. Berrange (3):
+  io: send proper HTTP response for websocket errors
+  io: include full error message in websocket handshake trace
+  io: use case insensitive check for Connection & Upgrade websock
+    headers
 
--- 
-1.7.10.4
+ io/channel-websock.c | 195 ++++++++++++++++++++++++++++++++++++++-------=
+------
+ io/trace-events      |   2 +-
+ 2 files changed, 146 insertions(+), 51 deletions(-)
+
+--=20
+2.13.5
