@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42093)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42975)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dqL3L-0006ot-Qe
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 11:18:47 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dqL7E-0008Fz-PZ
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 11:22:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dqL3I-0000xX-Sx
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 11:18:43 -0400
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<1504286483-23327-6-git-send-email-eric.auger@redhat.com>
-	<20170908105214.GA16412@virtx40>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <f569ace6-d8e8-b1db-6acc-0309c5b21960@redhat.com>
-Date: Fri, 8 Sep 2017 17:18:19 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dqL7B-0003Af-G8
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 11:22:44 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:33462)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dqL7B-000398-4n
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 11:22:41 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id a43so5314642wrc.0
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 08:22:39 -0700 (PDT)
+References: <20170905021201.25684-1-famz@redhat.com>
+	<20170905021201.25684-5-famz@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170905021201.25684-5-famz@redhat.com>
+Date: Fri, 08 Sep 2017 16:22:36 +0100
+Message-ID: <87tw0dgqpv.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170908105214.GA16412@virtx40>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 05/20] hw/arm/smmuv3: Skeleton
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v6 04/12] tests: Add vm test lib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,666 +30,369 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Linu Cherian <linuc.decode@gmail.com>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mohun106@gmail.com, jean-philippe.brucker@arm.com, tn@semihalf.com, bharat.bhushan@nxp.com, mst@redhat.com, will.deacon@arm.com, qemu-devel@nongnu.org, peterx@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org, christoffer.dall@linaro.org, linu.cherian@cavium.com, wtownsen@redhat.com, robin.murphy@arm.com, prem.mallappa@gmail.com, eric.auger.pro@gmail.com
-
-Hi Linu,
-
-On 08/09/2017 12:52, Linu Cherian wrote:
-> Hi Eric,
-> 
-> On Fri Sep 01, 2017 at 07:21:08PM +0200, Eric Auger wrote:
->> From: Prem Mallappa <prem.mallappa@broadcom.com>
->>
->> This patch implements a skeleton for the smmuv3 device.
->> Datatypes and register definitions are introduced. The MMIO
->> region, the interrupts and the queue are initialized (PRI is
->> not supported).
->>
->> Only the MMIO read operation is implemented here.
->>
->> Signed-off-by: Prem Mallappa <prem.mallappa@broadcom.com>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>
->> ---
->> v6 -> v7:
->> - split into several patches
->>
->> v5 -> v6:
->> - Use IOMMUMemoryregion
->> - regs become uint32_t and fix 64b MMIO access (.impl)
->> - trace_smmuv3_write/read_mmio take the size param
->>
->> v4 -> v5:
->> - change smmuv3_translate proto (IOMMUAccessFlags flag)
->> - has_stagex replaced by is_ste_stagex
->> - smmu_cfg_populate removed
->> - added smmuv3_decode_config and reworked error management
->> - remwork the naming of IOMMU mrs
->> - fix SMMU_CMDQ_CONS offset
->>
->> v3 -> v4
->> - smmu_irq_update
->> - fix hash key allocation
->> - set smmu_iommu_ops
->> - set SMMU_REG_CR0,
->> - smmuv3_translate: ret.perm not set in bypass mode
->> - use trace events
->> - renamed STM2U64 into L1STD_L2PTR and STMSPAN into L1STD_SPAN
->> - rework smmu_find_ste
->> - fix tg2granule in TT0/0b10 corresponds to 16kB
->>
->> v2 -> v3:
->> - move creation of include/hw/arm/smmuv3.h to this patch to fix compil issue
->> - compilation allowed
->> - fix sbus allocation in smmu_init_pci_iommu
->> - restructure code into headers
->> - misc cleanups
->> ---
->>  hw/arm/Makefile.objs     |   2 +-
->>  hw/arm/smmuv3-internal.h | 201 +++++++++++++++++++++++++++++++++++++++
->>  hw/arm/smmuv3.c          | 239 +++++++++++++++++++++++++++++++++++++++++++++++
->>  hw/arm/trace-events      |   3 +
->>  include/hw/arm/smmuv3.h  |  79 ++++++++++++++++
->>  5 files changed, 523 insertions(+), 1 deletion(-)
->>  create mode 100644 hw/arm/smmuv3-internal.h
->>  create mode 100644 hw/arm/smmuv3.c
->>  create mode 100644 include/hw/arm/smmuv3.h
->>
->> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
->> index 5b2d38d..a7c808b 100644
->> --- a/hw/arm/Makefile.objs
->> +++ b/hw/arm/Makefile.objs
->> @@ -19,4 +19,4 @@ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
->>  obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
->>  obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
->>  obj-$(CONFIG_MPS2) += mps2.o
->> -obj-$(CONFIG_ARM_SMMUV3) += smmu-common.o
->> +obj-$(CONFIG_ARM_SMMUV3) += smmu-common.o smmuv3.o
->> diff --git a/hw/arm/smmuv3-internal.h b/hw/arm/smmuv3-internal.h
->> new file mode 100644
->> index 0000000..488acc8
->> --- /dev/null
->> +++ b/hw/arm/smmuv3-internal.h
->> @@ -0,0 +1,201 @@
->> +/*
->> + * ARM SMMUv3 support - Internal API
->> + *
->> + * Copyright (C) 2014-2016 Broadcom Corporation
->> + * Copyright (c) 2017 Red Hat, Inc.
->> + * Written by Prem Mallappa, Eric Auger
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License as published by
->> + * the Free Software Foundation, either version 2 of the License, or
->> + * (at your option) any later version.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + * You should have received a copy of the GNU General Public License along
->> + * with this program; if not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#ifndef HW_ARM_SMMU_V3_INTERNAL_H
->> +#define HW_ARM_SMMU_V3_INTERNAL_H
->> +
->> +#include "trace.h"
->> +#include "qemu/error-report.h"
->> +#include "hw/arm/smmu-common.h"
->> +
->> +/*****************************
->> + * MMIO Register
->> + *****************************/
->> +enum {
->> +    SMMU_REG_IDR0            = 0x0,
->> +
->> +/* IDR0 Field Values and supported features */
->> +
->> +#define SMMU_IDR0_S2P      1  /* stage 2 */
->> +#define SMMU_IDR0_S1P      1  /* stage 1 */
->> +#define SMMU_IDR0_TTF      2  /* Aarch64 only - not Aarch32 (LPAE) */
->> +#define SMMU_IDR0_COHACC   1  /* IO coherent access */
->> +#define SMMU_IDR0_HTTU     2  /* Access and Dirty flag update */
->> +#define SMMU_IDR0_HYP      0  /* Hypervisor Stage 1 contexts */
->> +#define SMMU_IDR0_ATS      0  /* PCIe RC ATS */
->> +#define SMMU_IDR0_ASID16   1  /* 16-bit ASID */
->> +#define SMMU_IDR0_PRI      0  /* Page Request Interface */
->> +#define SMMU_IDR0_VMID16   0  /* 16-bit VMID */
->> +#define SMMU_IDR0_CD2L     0  /* 2-level Context Descriptor table */
->> +#define SMMU_IDR0_STALL    1  /* Stalling fault model */
->> +#define SMMU_IDR0_TERM     1  /* Termination model behaviour */
->> +#define SMMU_IDR0_STLEVEL  1  /* Multi-level Stream Table */
->> +
->> +#define SMMU_IDR0_S2P_SHIFT      0
->> +#define SMMU_IDR0_S1P_SHIFT      1
->> +#define SMMU_IDR0_TTF_SHIFT      2
->> +#define SMMU_IDR0_COHACC_SHIFT   4
->> +#define SMMU_IDR0_HTTU_SHIFT     6
->> +#define SMMU_IDR0_HYP_SHIFT      9
->> +#define SMMU_IDR0_ATS_SHIFT      10
->> +#define SMMU_IDR0_ASID16_SHIFT   12
->> +#define SMMU_IDR0_PRI_SHIFT      16
->> +#define SMMU_IDR0_VMID16_SHIFT   18
->> +#define SMMU_IDR0_CD2L_SHIFT     19
->> +#define SMMU_IDR0_STALL_SHIFT    24
->> +#define SMMU_IDR0_TERM_SHIFT     26
->> +#define SMMU_IDR0_STLEVEL_SHIFT  27
->> +
->> +    SMMU_REG_IDR1            = 0x4,
->> +#define SMMU_IDR1_SIDSIZE 16
->> +    SMMU_REG_IDR2            = 0x8,
->> +    SMMU_REG_IDR3            = 0xc,
->> +    SMMU_REG_IDR4            = 0x10,
->> +    SMMU_REG_IDR5            = 0x14,
->> +#define SMMU_IDR5_GRAN_SHIFT 4
->> +#define SMMU_IDR5_GRAN       0b101 /* GRAN4K, GRAN64K */
->> +#define SMMU_IDR5_OAS        4     /* 44 bits */
->> +    SMMU_REG_IIDR            = 0x1c,
->> +    SMMU_REG_CR0             = 0x20,
->> +
->> +#define SMMU_CR0_SMMU_ENABLE (1 << 0)
->> +#define SMMU_CR0_PRIQ_ENABLE (1 << 1)
->> +#define SMMU_CR0_EVTQ_ENABLE (1 << 2)
->> +#define SMMU_CR0_CMDQ_ENABLE (1 << 3)
->> +#define SMMU_CR0_ATS_CHECK   (1 << 4)
->> +
->> +    SMMU_REG_CR0_ACK         = 0x24,
->> +    SMMU_REG_CR1             = 0x28,
->> +    SMMU_REG_CR2             = 0x2c,
->> +
->> +    SMMU_REG_STATUSR         = 0x40,
->> +
->> +    SMMU_REG_IRQ_CTRL        = 0x50,
->> +    SMMU_REG_IRQ_CTRL_ACK    = 0x54,
->> +
->> +#define SMMU_IRQ_CTRL_GERROR_EN (1 << 0)
->> +#define SMMU_IRQ_CTRL_EVENT_EN  (1 << 1)
->> +#define SMMU_IRQ_CTRL_PRI_EN    (1 << 2)
->> +
->> +    SMMU_REG_GERROR          = 0x60,
->> +
->> +#define SMMU_GERROR_CMDQ           (1 << 0)
->> +#define SMMU_GERROR_EVENTQ_ABT     (1 << 2)
->> +#define SMMU_GERROR_PRIQ_ABT       (1 << 3)
->> +#define SMMU_GERROR_MSI_CMDQ_ABT   (1 << 4)
->> +#define SMMU_GERROR_MSI_EVENTQ_ABT (1 << 5)
->> +#define SMMU_GERROR_MSI_PRIQ_ABT   (1 << 6)
->> +#define SMMU_GERROR_MSI_GERROR_ABT (1 << 7)
->> +#define SMMU_GERROR_SFM_ERR        (1 << 8)
->> +
->> +    SMMU_REG_GERRORN         = 0x64,
->> +    SMMU_REG_GERROR_IRQ_CFG0 = 0x68,
->> +    SMMU_REG_GERROR_IRQ_CFG1 = 0x70,
->> +    SMMU_REG_GERROR_IRQ_CFG2 = 0x74,
->> +
->> +    /* SMMU_BASE_RA Applies to STRTAB_BASE, CMDQ_BASE and EVTQ_BASE */
->> +#define SMMU_BASE_RA        (1ULL << 62)
->> +    SMMU_REG_STRTAB_BASE     = 0x80,
->> +    SMMU_REG_STRTAB_BASE_CFG = 0x88,
->> +
->> +    SMMU_REG_CMDQ_BASE       = 0x90,
->> +    SMMU_REG_CMDQ_PROD       = 0x98,
->> +    SMMU_REG_CMDQ_CONS       = 0x9c,
->> +    /* CMD Consumer (CONS) */
->> +#define SMMU_CMD_CONS_ERR_SHIFT        24
->> +#define SMMU_CMD_CONS_ERR_BITS         7
->> +
->> +    SMMU_REG_EVTQ_BASE       = 0xa0,
->> +    SMMU_REG_EVTQ_PROD       = 0xa8,
->> +    SMMU_REG_EVTQ_CONS       = 0xac,
->> +    SMMU_REG_EVTQ_IRQ_CFG0   = 0xb0,
->> +    SMMU_REG_EVTQ_IRQ_CFG1   = 0xb8,
->> +    SMMU_REG_EVTQ_IRQ_CFG2   = 0xbc,
->> +
->> +    SMMU_REG_PRIQ_BASE       = 0xc0,
->> +    SMMU_REG_PRIQ_PROD       = 0xc8,
->> +    SMMU_REG_PRIQ_CONS       = 0xcc,
->> +    SMMU_REG_PRIQ_IRQ_CFG0   = 0xd0,
->> +    SMMU_REG_PRIQ_IRQ_CFG1   = 0xd8,
->> +    SMMU_REG_PRIQ_IRQ_CFG2   = 0xdc,
->> +
->> +    SMMU_ID_REGS_OFFSET      = 0xfd0,
->> +
->> +    /* Secure registers are not used for now */
->> +    SMMU_SECURE_OFFSET       = 0x8000,
->> +};
->> +
->> +/**********************
->> + * Data Structures
->> + **********************/
->> +
->> +struct __smmu_data2 {
->> +    uint32_t word[2];
->> +};
->> +
->> +struct __smmu_data8 {
->> +    uint32_t word[8];
->> +};
->> +
->> +struct __smmu_data16 {
->> +    uint32_t word[16];
->> +};
->> +
->> +struct __smmu_data4 {
->> +    uint32_t word[4];
->> +};
->> +
->> +typedef struct __smmu_data4  Cmd; /* Command Entry */
->> +typedef struct __smmu_data8  Evt; /* Event Entry */
->> +
->> +/*****************************
->> + *  Register Access Primitives
->> + *****************************/
->> +
->> +static inline void smmu_write32_reg(SMMUV3State *s, uint32_t addr, uint32_t val)
->> +{
->> +    s->regs[addr >> 2] = val;
->> +}
->> +
->> +static inline void smmu_write64_reg(SMMUV3State *s, uint32_t addr, uint64_t val)
->> +{
->> +    addr >>= 2;
->> +    s->regs[addr] = extract64(val, 0, 32);
->> +    s->regs[addr + 1] = extract64(val, 32, 32);
->> +}
->> +
->> +static inline uint32_t smmu_read32_reg(SMMUV3State *s, uint32_t addr)
->> +{
->> +    return s->regs[addr >> 2];
->> +}
->> +
->> +static inline uint64_t smmu_read64_reg(SMMUV3State *s, uint32_t addr)
->> +{
->> +    addr >>= 2;
->> +    return s->regs[addr] | ((uint64_t)(s->regs[addr + 1]) << 32);
->> +}
->> +
->> +static inline int smmu_enabled(SMMUV3State *s)
->> +{
->> +    return smmu_read32_reg(s, SMMU_REG_CR0) & SMMU_CR0_SMMU_ENABLE;
->> +}
->> +
->> +#endif
->> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
->> new file mode 100644
->> index 0000000..0a7cd1c
->> --- /dev/null
->> +++ b/hw/arm/smmuv3.c
->> @@ -0,0 +1,239 @@
->> +/*
->> + * Copyright (C) 2014-2016 Broadcom Corporation
->> + * Copyright (c) 2017 Red Hat, Inc.
->> + * Written by Prem Mallappa, Eric Auger
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License as published by
->> + * the Free Software Foundation, either version 2 of the License, or
->> + * (at your option) any later version.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + * You should have received a copy of the GNU General Public License along
->> + * with this program; if not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "hw/boards.h"
->> +#include "sysemu/sysemu.h"
->> +#include "hw/sysbus.h"
->> +#include "hw/pci/pci.h"
->> +#include "exec/address-spaces.h"
->> +#include "trace.h"
->> +#include "qemu/error-report.h"
->> +
->> +#include "hw/arm/smmuv3.h"
->> +#include "smmuv3-internal.h"
->> +
->> +static void smmuv3_init_regs(SMMUV3State *s)
->> +{
->> +    uint32_t data =
->> +        SMMU_IDR0_STLEVEL << SMMU_IDR0_STLEVEL_SHIFT |
->> +        SMMU_IDR0_TERM    << SMMU_IDR0_TERM_SHIFT    |
->> +        SMMU_IDR0_STALL   << SMMU_IDR0_STALL_SHIFT   |
->> +        SMMU_IDR0_VMID16  << SMMU_IDR0_VMID16_SHIFT  |
->> +        SMMU_IDR0_PRI     << SMMU_IDR0_PRI_SHIFT     |
->> +        SMMU_IDR0_ASID16  << SMMU_IDR0_ASID16_SHIFT  |
->> +        SMMU_IDR0_ATS     << SMMU_IDR0_ATS_SHIFT     |
->> +        SMMU_IDR0_HYP     << SMMU_IDR0_HYP_SHIFT     |
->> +        SMMU_IDR0_HTTU    << SMMU_IDR0_HTTU_SHIFT    |
->> +        SMMU_IDR0_COHACC  << SMMU_IDR0_COHACC_SHIFT  |
->> +        SMMU_IDR0_TTF     << SMMU_IDR0_TTF_SHIFT     |
->> +        SMMU_IDR0_S1P     << SMMU_IDR0_S1P_SHIFT     |
->> +        SMMU_IDR0_S2P     << SMMU_IDR0_S2P_SHIFT;
->> +
->> +    smmu_write32_reg(s, SMMU_REG_IDR0, data);
->> +
->> +#define SMMU_QUEUE_SIZE_LOG2  19
->> +    data =
->> +        1 << 27 |                    /* Attr Types override */
->> +        SMMU_QUEUE_SIZE_LOG2 << 21 | /* Cmd Q size */
->> +        SMMU_QUEUE_SIZE_LOG2 << 16 | /* Event Q size */
->> +        SMMU_QUEUE_SIZE_LOG2 << 11 | /* PRI Q size */
->> +        0  << 6 |                    /* SSID not supported */
->> +        SMMU_IDR1_SIDSIZE;
->> +
->> +    smmu_write32_reg(s, SMMU_REG_IDR1, data);
->> +
->> +    s->sid_size = SMMU_IDR1_SIDSIZE;
->> +
->> +    data = SMMU_IDR5_GRAN << SMMU_IDR5_GRAN_SHIFT | SMMU_IDR5_OAS;
-> 
-> For VFIO case, should we not set the granule size based on underlying 
-> pagesize bitmap derived from VFIO_IOMMU_GET_INFO. Else if guest kernel
-> is build with 4k page size and the host kernel is 64k we would start
-> getting map errors. 
-
-yes at the moment this is not implemented (1st target of the series is
-virtio/vhost).
-
-On Intel if I understand correctly the minimum requested is 4K, 2MB.
-1GB is optional. I understand the emulated model does not expose 1GB
-(FL1GP = 0).
-
-On ARM nothing is mandatory although 4K and 64K minimal granules are
-"strongly recommended", leading to the following additional sizes.
-
-        if (reg & IDR5_GRAN64K)
-                smmu->pgsize_bitmap |= SZ_64K | SZ_512M;
-        if (reg & IDR5_GRAN16K)
-                smmu->pgsize_bitmap |= SZ_16K | SZ_32M;
-        if (reg & IDR5_GRAN4K)
-                smmu->pgsize_bitmap |= SZ_4K | SZ_2M | SZ_1G;
-
-Maybe we can override the ID5 values using the vfio_memory_listener. I
-will try to prototype this idea.
-
-Thanks
-
-Eric
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, Philippe =?utf-8?Q?Mathieu?= =?utf-8?Q?-Daud=C3=A9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
 
-> 
-> 
-> 
->> +
->> +    smmu_write32_reg(s, SMMU_REG_IDR5, data);
->> +}
->> +
->> +static void smmuv3_init_queues(SMMUV3State *s)
->> +{
->> +    s->cmdq.prod = 0;
->> +    s->cmdq.cons = 0;
->> +    s->cmdq.wrap.prod = 0;
->> +    s->cmdq.wrap.cons = 0;
->> +
->> +    s->evtq.prod = 0;
->> +    s->evtq.cons = 0;
->> +    s->evtq.wrap.prod = 0;
->> +    s->evtq.wrap.cons = 0;
->> +
->> +    s->cmdq.entries = SMMU_QUEUE_SIZE_LOG2;
->> +    s->cmdq.ent_size = sizeof(Cmd);
->> +    s->evtq.entries = SMMU_QUEUE_SIZE_LOG2;
->> +    s->evtq.ent_size = sizeof(Evt);
->> +}
->> +
->> +static void smmuv3_init(SMMUV3State *s)
->> +{
->> +    smmuv3_init_regs(s);
->> +    smmuv3_init_queues(s);
->> +}
->> +
->> +static inline void smmu_update_base_reg(SMMUV3State *s, uint64_t *base,
->> +                                        uint64_t val)
->> +{
->> +    *base = val & ~(SMMU_BASE_RA | 0x3fULL);
->> +}
->> +
->> +static void smmu_write_mmio_fixup(SMMUV3State *s, hwaddr *addr)
->> +{
->> +    switch (*addr) {
->> +    case 0x100a8: case 0x100ac:         /* Aliasing => page0 registers */
->> +    case 0x100c8: case 0x100cc:
->> +        *addr ^= (hwaddr)0x10000;
->> +    }
->> +}
->> +
->> +static void smmu_write_mmio(void *opaque, hwaddr addr,
->> +                            uint64_t val, unsigned size)
->> +{
->> +}
->> +
->> +static uint64_t smmu_read_mmio(void *opaque, hwaddr addr, unsigned size)
->> +{
->> +    SMMUState *sys = opaque;
->> +    SMMUV3State *s = SMMU_V3_DEV(sys);
->> +    uint64_t val;
->> +
->> +    smmu_write_mmio_fixup(s, &addr);
->> +
->> +    /* Primecell/Corelink ID registers */
->> +    switch (addr) {
->> +    case 0xFF0 ... 0xFFC:
->> +    case 0xFDC ... 0xFE4:
->> +        val = 0;
->> +        error_report("addr:0x%"PRIx64" val:0x%"PRIx64, addr, val);
->> +        break;
->> +    case SMMU_REG_STRTAB_BASE ... SMMU_REG_CMDQ_BASE:
->> +    case SMMU_REG_EVTQ_BASE:
->> +    case SMMU_REG_PRIQ_BASE ... SMMU_REG_PRIQ_IRQ_CFG1:
->> +        val = smmu_read64_reg(s, addr);
->> +        break;
->> +    default:
->> +        val = (uint64_t)smmu_read32_reg(s, addr);
->> +        break;
->> +    }
->> +
->> +    trace_smmuv3_read_mmio(addr, val, size);
->> +    return val;
->> +}
->> +
->> +static const MemoryRegionOps smmu_mem_ops = {
->> +    .read = smmu_read_mmio,
->> +    .write = smmu_write_mmio,
->> +    .endianness = DEVICE_LITTLE_ENDIAN,
->> +    .valid = {
->> +        .min_access_size = 4,
->> +        .max_access_size = 8,
->> +    },
->> +    .impl = {
->> +        .min_access_size = 4,
->> +        .max_access_size = 8,
->> +    },
->> +};
->> +
->> +static void smmu_init_irq(SMMUV3State *s, SysBusDevice *dev)
->> +{
->> +    int i;
->> +
->> +    for (i = 0; i < ARRAY_SIZE(s->irq); i++) {
->> +        sysbus_init_irq(dev, &s->irq[i]);
->> +    }
->> +}
->> +
->> +static void smmu_reset(DeviceState *dev)
->> +{
->> +    SMMUV3State *s = SMMU_V3_DEV(dev);
->> +    smmuv3_init(s);
->> +}
->> +
->> +static void smmu_realize(DeviceState *d, Error **errp)
->> +{
->> +    SMMUState *sys = SMMU_SYS_DEV(d);
->> +    SMMUV3State *s = SMMU_V3_DEV(sys);
->> +    SysBusDevice *dev = SYS_BUS_DEVICE(d);
->> +
->> +    memory_region_init_io(&sys->iomem, OBJECT(s),
->> +                          &smmu_mem_ops, sys, TYPE_SMMU_V3_DEV, 0x20000);
->> +
->> +    sys->mrtypename = g_strdup(TYPE_SMMUV3_IOMMU_MEMORY_REGION);
->> +
->> +    sysbus_init_mmio(dev, &sys->iomem);
->> +
->> +    smmu_init_irq(s, dev);
->> +}
->> +
->> +static const VMStateDescription vmstate_smmuv3 = {
->> +    .name = "smmuv3",
->> +    .version_id = 1,
->> +    .minimum_version_id = 1,
->> +    .fields = (VMStateField[]) {
->> +        VMSTATE_UINT32_ARRAY(regs, SMMUV3State, SMMU_NREGS),
->> +        VMSTATE_END_OF_LIST(),
->> +    },
->> +};
->> +
->> +static void smmuv3_instance_init(Object *obj)
->> +{
->> +    /* Nothing much to do here as of now */
->> +}
->> +
->> +static void smmuv3_class_init(ObjectClass *klass, void *data)
->> +{
->> +    DeviceClass *dc = DEVICE_CLASS(klass);
->> +
->> +    dc->reset   = smmu_reset;
->> +    dc->vmsd    = &vmstate_smmuv3;
->> +    dc->realize = smmu_realize;
->> +}
->> +
->> +static void smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
->> +                                                  void *data)
->> +{
->> +}
->> +
->> +static const TypeInfo smmuv3_type_info = {
->> +    .name          = TYPE_SMMU_V3_DEV,
->> +    .parent        = TYPE_SMMU_DEV_BASE,
->> +    .instance_size = sizeof(SMMUV3State),
->> +    .instance_init = smmuv3_instance_init,
->> +    .class_data    = NULL,
->> +    .class_size    = sizeof(SMMUV3Class),
->> +    .class_init    = smmuv3_class_init,
->> +};
->> +
->> +static const TypeInfo smmuv3_iommu_memory_region_info = {
->> +    .parent = TYPE_IOMMU_MEMORY_REGION,
->> +    .name = TYPE_SMMUV3_IOMMU_MEMORY_REGION,
->> +    .class_init = smmuv3_iommu_memory_region_class_init,
->> +};
->> +
->> +static void smmuv3_register_types(void)
->> +{
->> +    type_register(&smmuv3_type_info);
->> +    type_register(&smmuv3_iommu_memory_region_info);
->> +}
->> +
->> +type_init(smmuv3_register_types)
->> +
->> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
->> index c67cd39..8affbf7 100644
->> --- a/hw/arm/trace-events
->> +++ b/hw/arm/trace-events
->> @@ -14,3 +14,6 @@ smmu_page_walk_level_block_pte(int stage, int level, uint64_t baseaddr, uint64_t
->>  smmu_page_walk_level_table_pte(int stage, int level, uint64_t baseaddr, uint64_t pteaddr, uint64_t pte, uint64_t address) "stage=%d, level=%d base@=0x%"PRIx64" pte@=0x%"PRIx64" pte=0x%"PRIx64" next table address = 0x%"PRIx64
->>  smmu_get_pte(uint64_t baseaddr, int index, uint64_t pteaddr, uint64_t pte) "baseaddr=0x%"PRIx64" index=0x%x, pteaddr=0x%"PRIx64", pte=0x%"PRIx64
->>  smmu_set_translated_address(hwaddr iova, hwaddr pa) "iova = 0x%"PRIx64" -> pa = 0x%"PRIx64
->> +
->> +#hw/arm/smmuv3.c
->> +smmuv3_read_mmio(hwaddr addr, uint64_t val, unsigned size) "addr: 0x%"PRIx64" val:0x%"PRIx64" size: 0x%x"
->> diff --git a/include/hw/arm/smmuv3.h b/include/hw/arm/smmuv3.h
->> new file mode 100644
->> index 0000000..0c8973d
->> --- /dev/null
->> +++ b/include/hw/arm/smmuv3.h
->> @@ -0,0 +1,79 @@
->> +/*
->> + * Copyright (C) 2014-2016 Broadcom Corporation
->> + * Copyright (c) 2017 Red Hat, Inc.
->> + * Written by Prem Mallappa, Eric Auger
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License as published by
->> + * the Free Software Foundation, either version 2 of the License, or
->> + * (at your option) any later version.
->> + *
->> + * This program is distributed in the hope that it will be useful,
->> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
->> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
->> + * GNU General Public License for more details.
->> + *
->> + * You should have received a copy of the GNU General Public License along
->> + * with this program; if not, see <http://www.gnu.org/licenses/>.
->> + */
->> +
->> +#ifndef HW_ARM_SMMUV3_H
->> +#define HW_ARM_SMMUV3_H
->> +
->> +#include "hw/arm/smmu-common.h"
->> +
->> +#define TYPE_SMMUV3_IOMMU_MEMORY_REGION "smmuv3-iommu-memory-region"
->> +
->> +#define SMMU_NREGS            0x200
->> +
->> +typedef struct SMMUQueue {
->> +     hwaddr base;
->> +     uint32_t prod;
->> +     uint32_t cons;
->> +     union {
->> +          struct {
->> +               uint8_t prod:1;
->> +               uint8_t cons:1;
->> +          };
->> +          uint8_t unused;
->> +     } wrap;
->> +
->> +     uint16_t entries;           /* Number of entries */
->> +     uint8_t  ent_size;          /* Size of entry in bytes */
->> +     uint8_t  shift;             /* Size in log2 */
->> +} SMMUQueue;
->> +
->> +typedef struct SMMUV3State {
->> +    SMMUState     smmu_state;
->> +
->> +    /* Local cache of most-frequently used registers */
->> +#define SMMU_FEATURE_2LVL_STE (1 << 0)
->> +    uint32_t     features;
->> +    uint16_t     sid_size;
->> +    uint16_t     sid_split;
->> +    uint64_t     strtab_base;
->> +
->> +    uint32_t    regs[SMMU_NREGS];
->> +
->> +    qemu_irq     irq[4];
->> +    SMMUQueue    cmdq, evtq;
->> +
->> +} SMMUV3State;
->> +
->> +typedef enum {
->> +    SMMU_IRQ_EVTQ,
->> +    SMMU_IRQ_PRIQ,
->> +    SMMU_IRQ_CMD_SYNC,
->> +    SMMU_IRQ_GERROR,
->> +} SMMUIrq;
->> +
->> +typedef struct {
->> +    SMMUBaseClass smmu_base_class;
->> +} SMMUV3Class;
->> +
->> +#define TYPE_SMMU_V3_DEV   "smmuv3"
->> +#define SMMU_V3_DEV(obj) OBJECT_CHECK(SMMUV3State, (obj), TYPE_SMMU_V3_DEV)
->> +#define SMMU_V3_DEVICE_GET_CLASS(obj)                              \
->> +    OBJECT_GET_CLASS(SMMUBaseClass, (obj), TYPE_SMMU_V3_DEV)
->> +
->> +#endif
->> -- 
->> 2.5.5
->>
->>
-> 
+Fam Zheng <famz@redhat.com> writes:
+
+> This is the common code to implement a "VM test" to
+>
+>   1) Download and initialize a pre-defined VM that has necessary
+>   dependencies to build QEMU and SSH access.
+>
+>   2) Archive $SRC_PATH to a .tar file.
+>
+>   3) Boot the VM, and pass the source tar file to the guest.
+>
+>   4) SSH into the VM, untar the source tarball, build from the source.
+>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  tests/vm/basevm.py | 276 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 276 insertions(+)
+>  create mode 100755 tests/vm/basevm.py
+>
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> new file mode 100755
+> index 0000000000..9db91d61fa
+> --- /dev/null
+> +++ b/tests/vm/basevm.py
+> @@ -0,0 +1,276 @@
+> +#!/usr/bin/env python
+> +#
+> +# VM testing base class
+> +#
+> +# Copyright (C) 2017 Red Hat Inc.
+> +#
+> +# Authors:
+> +#  Fam Zheng <famz@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2.  See
+> +# the COPYING file in the top-level directory.
+> +#
+> +
+> +import os
+> +import sys
+> +import logging
+> +import time
+> +import datetime
+> +sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
+> +from qemu import QEMUMachine
+> +import subprocess
+> +import hashlib
+> +import optparse
+> +import atexit
+> +import tempfile
+> +import shutil
+> +import multiprocessing
+> +import traceback
+> +
+> +SSH_KEY = """\
+> +-----BEGIN RSA PRIVATE KEY-----
+> +MIIEowIBAAKCAQEAopAuOlmLV6LVHdFBj8/eeOwI9CqguIJPp7eAQSZvOiB4Ag/R
+> +coEhl/RBbrV5Yc/SmSD4PTpJO/iM10RwliNjDb4a3I8q3sykRJu9c9PI/YsH8WN9
+> ++NH2NjKPtJIcKTu287IM5JYxyB6nDoOzILbTyJ1TDR/xH6qYEfBAyiblggdjcvhA
+> +RTf93QIn39F/xLypXvT1K2O9BJEsnJ8lEUvB2UXhKo/JTfSeZF8wPBeowaP9EONk
+> +7b+nuJOWHGg68Ji6wVi62tjwl2Szch6lxIhZBpnV7QNRKMfYHP6eIyF4pusazzZq
+> +Telsq6xI2ghecWLzb/MF5A+rklsGx2FNuJSAJwIDAQABAoIBAHHi4o/8VZNivz0x
+> +cWXn8erzKV6tUoWQvW85Lj/2RiwJvSlsnYZDkx5af1CpEE2HA/pFT8PNRqsd+MWC
+> +7AEy710cVsM4BYerBFYQaYxwzblaoojo88LSjVPw3h5Z0iLM8+IMVd36nwuc9dpE
+> +R8TecMZ1+U4Tl6BgqkK+9xToZRdPKdjS8L5MoFhGN+xY0vRbbJbGaV9Q0IHxLBkB
+> +rEBV7T1mUynneCHRUQlJQEwJmKpT8MH3IjsUXlG5YvnuuvcQJSNTaW2iDLxuOKp8
+> +cxW8+qL88zpb1D5dppoIu6rlrugN0azSq70ruFJQPc/A8GQrDKoGgRQiagxNY3u+
+> +vHZzXlECgYEA0dKO3gfkSxsDBb94sQwskMScqLhcKhztEa8kPxTx6Yqh+x8/scx3
+> +XhJyOt669P8U1v8a/2Al+s81oZzzfQSzO1Q7gEwSrgBcRMSIoRBUw9uYcy02ngb/
+> +j/ng3DGivfJztjjiSJwb46FHkJ2JR8mF2UisC6UMXk3NgFY/3vWQx78CgYEAxlcG
+> +T3hfSWSmTgKRczMJuHQOX9ULfTBIqwP5VqkkkiavzigGRirzb5lgnmuTSPTpF0LB
+> +XVPjR2M4q+7gzP0Dca3pocrvLEoxjwIKnCbYKnyyvnUoE9qHv4Kr+vDbgWpa2LXG
+> +JbLmE7tgTCIp20jOPPT4xuDvlbzQZBJ5qCQSoZkCgYEAgrotSSihlCnAOFSTXbu4
+> +CHp3IKe8xIBBNENq0eK61kcJpOxTQvOha3sSsJsU4JAM6+cFaxb8kseHIqonCj1j
+> +bhOM/uJmwQJ4el/4wGDsbxriYOBKpyq1D38gGhDS1IW6kk3erl6VAb36WJ/OaGum
+> +eTpN9vNeQWM4Jj2WjdNx4QECgYAwTdd6mU1TmZCrJRL5ZG+0nYc2rbMrnQvFoqUi
+> +BvWiJovggHzur90zy73tNzPaq9Ls2FQxf5G1vCN8NCRJqEEjeYCR59OSDMu/EXc2
+> +CnvQ9SevHOdS1oEDEjcCWZCMFzPi3XpRih1gptzQDe31uuiHjf3cqcGPzTlPdfRt
+> +D8P92QKBgC4UaBvIRwREVJsdZzpIzm224Bpe8LOmA7DeTnjlT0b3lkGiBJ36/Q0p
+> +VhYh/6cjX4/iuIs7gJbGon7B+YPB8scmOi3fj0+nkJAONue1mMfBNkba6qQTc6Y2
+> +5mEKw2/O7/JpND7ucU3OK9plcw/qnrWDgHxl0Iz95+OzUIIagxne
+> +-----END RSA PRIVATE KEY-----
+> +"""
+> +SSH_PUB_KEY = """\
+> +ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCikC46WYtXotUd0UGPz9547Aj0KqC4gk+nt4BBJm86IHgCD9FygSGX9EFutXlhz9KZIPg9Okk7+IzXRHCWI2MNvhrcjyrezKREm71z08j9iwfxY3340fY2Mo+0khwpO7bzsgzkljHIHqcOg7MgttPInVMNH/EfqpgR8EDKJuWCB2Ny+EBFN/3dAiff0X/EvKle9PUrY70EkSycnyURS8HZReEqj8lN9J5kXzA8F6jBo/0Q42Ttv6e4k5YcaDrwmLrBWLra2PCXZLNyHqXEiFkGmdXtA1Eox9gc/p4jIXim6xrPNmpN6WyrrEjaCF5xYvNv8wXkD6uSWwbHYU24lIAn qemu-vm-key
+> +"""
+
+I'm not sure we should be embedding the keys in the script. I understand
+we need a common key for downloaded images (although it would be better
+to post-customise the image after download with the local developer
+keys). Perhaps ./tests/testing-keys/id_rsa[.pub]?
+
+> +
+> +class BaseVM(object):
+> +    GUEST_USER = "qemu"
+> +    GUEST_PASS = "qemupass"
+> +    ROOT_PASS = "qemupass"
+> +
+> +    # The script to run in the guest that builds QEMU
+> +    BUILD_SCRIPT = ""
+> +    # The guest name, to be overridden by subclasses
+> +    name = "#base"
+> +    def __init__(self, debug=False, vcpus=None):
+> +        self._guest = None
+> +        self._tmpdir = tempfile.mkdtemp(prefix="vm-test-", suffix=".tmp", dir=".")
+> +        atexit.register(shutil.rmtree, self._tmpdir)
+> +
+> +        self._ssh_key_file = os.path.join(self._tmpdir, "id_rsa")
+> +        open(self._ssh_key_file, "w").write(SSH_KEY)
+> +        subprocess.check_call(["chmod", "600", self._ssh_key_file])
+> +
+> +        self._ssh_pub_key_file = os.path.join(self._tmpdir, "id_rsa.pub")
+> +        open(self._ssh_pub_key_file, "w").write(SSH_PUB_KEY)
+
+As above, I think it would be better just to keep copies of the keys in
+the tests directory rather than in the python source.
+
+> +
+> +        self.debug = debug
+> +        self._stderr = sys.stderr
+> +        self._devnull = open("/dev/null", "w")
+
+You can use os.devnull as a portable reference.
+
+> +        if self.debug:
+> +            self._stdout = sys.stdout
+> +        else:
+> +            self._stdout = self._devnull
+> +        self._args = [ \
+> +            "-nodefaults", "-m", "2G",
+> +            "-cpu", "host",
+> +            "-netdev", "user,id=vnet,hostfwd=:0.0.0.0:0-:22",
+
+It doesn't help that howstfwd is poorly documented. Are we trying to map
+an ephemeral port to the guests 22?
+
+> +            "-device", "virtio-net-pci,netdev=vnet",
+> +            "-vnc", ":0,to=20",
+
+Do we need a GUI?
+
+> +            "-serial", "file:%s" % os.path.join(self._tmpdir,
+> "serial.out")]
+> +        if vcpus:
+> +            self._args += ["-smp", str(vcpus)]
+> +        if os.access("/dev/kvm", os.R_OK | os.W_OK):
+> +            self._args += ["-enable-kvm"]
+> +        else:
+> +            logging.info("KVM not available, not using -enable-kvm")
+> +        self._data_args = []
+> +
+> +    def _download_with_cache(self, url, sha256sum=None):
+> +        def check_sha256sum(fname):
+> +            if not sha256sum:
+> +                return True
+> +            checksum = subprocess.check_output(["sha256sum", fname]).split()[0]
+> +            return sha256sum == checksum
+> +
+> +        cache_dir = os.path.expanduser("~/.cache/qemu-vm/download")
+> +        if not os.path.exists(cache_dir):
+> +            os.makedirs(cache_dir)
+> +        fname = os.path.join(cache_dir, hashlib.sha1(url).hexdigest())
+> +        if os.path.exists(fname) and check_sha256sum(fname):
+> +            return fname
+> +        logging.debug("Downloading %s to %s...", url, fname)
+> +        subprocess.check_call(["wget", "-c", url, "-O", fname + ".download"],
+> +                              stdout=self._stdout,
+> stderr=self._stderr)
+
+Using wget rather than doing it internally adds a utility requirement.
+Is doing a pure python urllib2 fetch too slow for this?
+
+> +        os.rename(fname + ".download", fname)
+> +        return fname
+> +
+> +    def _ssh_do(self, user, cmd, check, interactive=False):
+> +        ssh_cmd = ["ssh", "-q",
+> +                   "-o", "StrictHostKeyChecking=no",
+> +                   "-o", "UserKnownHostsFile=/dev/null",
+> +                   "-o", "ConnectTimeout=1",
+> +                   "-p", self.ssh_port, "-i", self._ssh_key_file]
+> +        if interactive:
+> +            ssh_cmd += ['-t']
+> +        assert not isinstance(cmd, str)
+> +        ssh_cmd += ["%s@127.0.0.1" % user] + list(cmd)
+> +        logging.debug("ssh_cmd: %s", " ".join(ssh_cmd))
+> +        r = subprocess.call(ssh_cmd,
+> +                            stdin=sys.stdin if interactive else self._devnull,
+> +                            stdout=sys.stdout if interactive else self._stdout,
+> +                            stderr=sys.stderr if interactive else self._stderr)
+> +        if check and r != 0:
+> +            raise Exception("SSH command failed: %s" % cmd)
+> +        return r
+> +
+> +    def ssh(self, *cmd):
+> +        return self._ssh_do(self.GUEST_USER, cmd, False)
+> +
+> +    def ssh_interactive(self, *cmd):
+> +        return self._ssh_do(self.GUEST_USER, cmd, False, True)
+> +
+> +    def ssh_root(self, *cmd):
+> +        return self._ssh_do("root", cmd, False)
+> +
+> +    def ssh_check(self, *cmd):
+> +        self._ssh_do(self.GUEST_USER, cmd, True)
+> +
+> +    def ssh_root_check(self, *cmd):
+> +        self._ssh_do("root", cmd, True)
+> +
+> +    def build_image(self, img):
+> +        raise NotImplementedError
+> +
+> +    def add_source_dir(self, src_dir):
+> +        name = "data-" + hashlib.sha1(src_dir).hexdigest()[:5]
+> +        tarfile = os.path.join(self._tmpdir, name + ".tar")
+> +        logging.debug("Creating archive %s for src_dir dir: %s", tarfile, src_dir)
+> +        subprocess.check_call(["./scripts/archive-source.sh", tarfile],
+> +                              cwd=src_dir, stdin=self._devnull,
+> +                              stdout=self._stdout, stderr=self._stderr)
+> +        self._data_args += ["-drive",
+> +                            "file=%s,if=none,id=%s,cache=writeback,format=raw" % \
+> +                                    (tarfile, name),
+> +                            "-device",
+> +                            "virtio-blk,drive=%s,serial=%s,bootindex=1" % (name, name)]
+> +
+> +    def boot(self, img, extra_args=[]):
+> +        args = self._args + [
+> +            "-device", "VGA",
+
+Is specifying a display device at boot time really needed (say rather
+than further up with the rest of the machine description). Do we even
+want a display given use ssh/serial for everything?
+
+> +            "-drive", "file=%s,if=none,id=drive0,cache=writeback" % img,
+> +            "-device", "virtio-blk,drive=drive0,bootindex=0"]
+> +        args += self._data_args + extra_args
+> +        logging.debug("QEMU args: %s", " ".join(args))
+> +        guest = QEMUMachine(binary=os.environ.get("QEMU", "qemu-system-x86_64"),
+> +                            args=args)
+> +        guest.launch()
+> +        atexit.register(self.shutdown)
+> +        self._guest = guest
+> +        usernet_info = guest.qmp("human-monitor-command",
+> +                                 command_line="info usernet")
+> +        self.ssh_port = None
+> +        for l in usernet_info["return"].splitlines():
+> +            fields = l.split()
+> +            if "TCP[HOST_FORWARD]" in fields and "22" in fields:
+> +                self.ssh_port = l.split()[3]
+> +        if not self.ssh_port:
+> +            raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
+> +                            usernet_info)
+> +
+> +    def wait_ssh(self, seconds=120):
+> +        starttime = datetime.datetime.now()
+> +        guest_up = False
+> +        while (datetime.datetime.now() - starttime).total_seconds() < seconds:
+> +            if self.ssh("exit 0") == 0:
+> +                guest_up = True
+> +                break
+> +            time.sleep(1)
+> +        if not guest_up:
+> +            raise Exception("Timeout while waiting for guest ssh")
+> +
+> +    def shutdown(self):
+> +        self._guest.shutdown()
+> +
+> +    def wait(self):
+> +        self._guest.wait()
+> +
+> +    def qmp(self, *args, **kwargs):
+> +        return self._guest.qmp(*args, **kwargs)
+> +
+> +def parse_args(vm_name):
+> +    parser = optparse.OptionParser(description="""
+> +    VM test utility.  Exit codes: 0 = success, 1 = command line error, 2 = environment initialization failed, 3 = test command failed""")
+> +    parser.add_option("--debug", "-D", action="store_true",
+> +                      help="enable debug output")
+> +    parser.add_option("--image", "-i", default="%s.img" % vm_name,
+> +                      help="image file name")
+> +    parser.add_option("--force", "-f", action="store_true",
+> +                      help="force build image even if image exists")
+> +    parser.add_option("--jobs", type=int, default=multiprocessing.cpu_count() / 2,
+> +                      help="number of virtual CPUs")
+> +    parser.add_option("--build-image", "-b", action="store_true",
+> +                      help="build image")
+> +    parser.add_option("--build-qemu",
+> +                      help="build QEMU from source in guest")
+> +    parser.add_option("--interactive", "-I", action="store_true",
+> +                      help="Interactively run command")
+> +    parser.disable_interspersed_args()
+> +    return parser.parse_args()
+> +
+> +def main(vmcls):
+> +    try:
+> +        args, argv = parse_args(vmcls.name)
+> +        if not argv and not args.build_qemu and not args.build_image:
+> +            print "Nothing to do?"
+> +            return 1
+> +        if args.debug:
+> +            logging.getLogger().setLevel(logging.DEBUG)
+> +        vm = vmcls(debug=args.debug, vcpus=args.jobs)
+> +        if args.build_image:
+> +            if os.path.exists(args.image) and not args.force:
+> +                sys.stderr.writelines(["Image file exists: %s\n" % args.image,
+> +                                      "Use --force option to overwrite\n"])
+> +                return 1
+> +            return vm.build_image(args.image)
+> +        if args.build_qemu:
+> +            vm.add_source_dir(args.build_qemu)
+> +            cmd = [vm.BUILD_SCRIPT.format(
+> +                   configure_opts = " ".join(argv),
+> +                   jobs=args.jobs)]
+> +        else:
+> +            cmd = argv
+> +        vm.boot(args.image + ",snapshot=on")
+
+If this fails it's fairly cryptic:
+
+/home/alex/lsrc/qemu/qemu.git/tests/vm/openbsd  --debug   --image "tests/vm/openbsd.img" --build-qemu /home/alex/lsrc/qemu/qemu.git
+DEBUG:root:Creating archive ./vm-test-fxejnB.tmp/data-2de24.tar for src_dir dir: /home/alex/lsrc/qemu/qemu.git
+DEBUG:root:QEMU args: -nodefaults -m 2G -cpu host -netdev user,id=vnet,hostfwd=:0.0.0.0:0-:22 -device virtio-net-pci,netdev=vnet -vnc :0,to=20 -serial file:./vm-test-fxejnB.tmp/serial.out -smp 4 -enable-kvm -device VGA -drive file=tests/vm/openbsd.img,snapshot=on,if=none,id=drive0,cache=writeback -device virtio-blk,drive=drive0,bootindex=0 -drive file=./vm-test-fxejnB.tmp/data-2de24.tar,if=none,id=data-2de24,cache=writeback,format=raw -device virtio-blk,drive=data-2de24,serial=data-2de24,bootindex=1
+Failed to prepare guest environment
+Traceback (most recent call last):
+  File "/home/alex/lsrc/qemu/qemu.git/tests/vm/basevm.py", line 260, in main
+    vm.boot(args.image + ",snapshot=on")
+  File "/home/alex/lsrc/qemu/qemu.git/tests/vm/basevm.py", line 184, in boot
+    guest.launch()
+  File "/home/alex/lsrc/qemu/qemu.git/tests/vm/../../scripts/qemu.py", line 151, in launch
+    self._post_launch()
+  File "/home/alex/lsrc/qemu/qemu.git/tests/vm/../../scripts/qemu.py", line 135, in _post_launch
+    self._qmp.accept()
+  File "/home/alex/lsrc/qemu/qemu.git/tests/vm/../../scripts/qmp/qmp.py", line 147, in accept
+    return self.__negotiate_capabilities()
+  File "/home/alex/lsrc/qemu/qemu.git/tests/vm/../../scripts/qmp/qmp.py", line 60, in __negotiate_capabilities
+    raise QMPConnectError
+QMPConnectError
+
+I assume QEMU failed to boot and might have given us a message that
+would be useful.
+
+
+> +        vm.wait_ssh()
+> +    except Exception as e:
+> +        if isinstance(e, SystemExit) and e.code == 0:
+> +            return 0
+> +        sys.stderr.write("Failed to prepare guest environment\n")
+> +        traceback.print_exc()
+> +        return 2
+> +
+> +    if args.interactive:
+> +        if vm.ssh_interactive(*cmd) == 0:
+> +            return 0
+> +        vm.ssh_interactive()
+> +        return 3
+> +    else:
+> +        if vm.ssh(*cmd) != 0:
+> +            return 3
+
+
+--
+Alex Bennée
