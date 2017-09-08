@@ -1,25 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56723)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58538)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dqGZJ-0006bH-SN
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:31:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGdz-00023n-DV
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dqGZE-0007O2-Cq
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:31:25 -0400
-Resent-Message-Id: <E1dqGZE-0007O2-Cq@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21339)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dqGZE-0007N7-4p
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:31:20 -0400
-In-Reply-To: <20170908095506.13594-1-famz@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150486666428.210.8324654459586571302@6d89bd104fc3>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 8 Sep 2017 03:31:04 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/38] Test and build system patches
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGdu-00037r-PS
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:15 -0400
+From: David Gibson <david@gibson.dropbear.id.au>
+Date: Fri,  8 Sep 2017 20:35:20 +1000
+Message-Id: <20170908103558.31632-3-david@gibson.dropbear.id.au>
+In-Reply-To: <20170908103558.31632-1-david@gibson.dropbear.id.au>
+References: <20170908103558.31632-1-david@gibson.dropbear.id.au>
+Subject: [Qemu-devel] [PULL 02/40] hw/ppc: clear pending_events on machine
+ reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,131 +20,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: peter.maydell@linaro.org
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sam.bobroff@au1.ibm.com, imammedo@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIDAwLzM4XSBUZXN0IGFuZCBidWlsZCBzeXN0ZW0gcGF0Y2hlcwpNZXNzYWdl
-LWlkOiAyMDE3MDkwODA5NTUwNi4xMzU5NC0xLWZhbXpAcmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMK
-Cj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90
-YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFT
-RS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8k
-dG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNo
-b3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4r
-MSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcg
-M2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0
-aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAgICBw
-YXRjaGV3LzIwMTcwOTA4MDk1NTA2LjEzNTk0LTEtZmFtekByZWRoYXQuY29tIC0+IHBhdGNoZXcv
-MjAxNzA5MDgwOTU1MDYuMTM1OTQtMS1mYW16QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcg
-YnJhbmNoICd0ZXN0Jwo2YmM0YjlhZThiIGJ1aWxkc3lzOiBNb3ZlIHJkbWEgbGlicyB0byBwZXIg
-b2JqZWN0Cjk4MjYwNmUyOTggYnVpbGRzeXM6IE1vdmUgYnJsYXBpIGxpYnMgdG8gcGVyIG9iamVj
-dAo3NzQyYjE4MThjIGJ1aWxkc3lzOiBNb3ZlIHVzYiByZWRpciBjZmxhZ3MvbGlicyB0byBwZXIg
-b2JqZWN0CjcwM2MyNDg4MzggYnVpbGRzeXM6IE1vdmUgbGlidXNiIGNmbGFncy9saWJzIHRvIHBl
-ciBvYmplY3QKZWZmYzczNzJjMSBidWlsZHN5czogTW92ZSBsaWJjYWNhcmQgY2ZsYWdzL2xpYnMg
-dG8gcGVyIG9iamVjdAo3NWJmYzE4YThlIGJ1aWxkc3lzOiBNb3ZlIG9wZW5nbCBjZmxhZ3MgdG8g
-cGVyIG9iamVjdApmMGQ5YjE3ZDBiIGJ1aWxkc3lzOiBNb3ZlIGN1cmVzZSBjZmxhZ3MvbGlicyB0
-byBwZXIgb2JqZWN0CjMyOGVhNWRhYWQgYnVpbGRzeXM6IE1vdmUgYXVkaW8gbGlicyB0byBwZXIg
-b2JqZWN0CjUxZmJmZGFmMDkgYnVpbGRzeXM6IE1vdmUgdm5jIGNmbGFncy9saWJzIHRvIHBlciBv
-YmplY3QKZDZmZTBhYjA0MyBidWlsZHN5czogTW92ZSBzZGwgY2ZsYWdzL2xpYnMgdG8gcGVyIG9i
-amVjdAo3Zjc4ZDgxNWE5IGJ1aWxkc3lzOiBNb3ZlIGd0ay92dGUgY2ZsYWdzL2xpYnMgdG8gcGVy
-IG9iamVjdAozODY0NWRlNzk0IGJ1aWxkc3lzOiBNb3ZlIHZkZSBsaWJzIHRvIHBlciBvYmplY3QK
-Y2ZjMTcwYmM2YSB2bDogRG9uJ3QgaW5jbHVkZSB2ZGUgaGVhZGVyCjY1MjBjNDlhNGQgZG9ja2Vy
-OiBEcm9wICdzZXQgLWUnIGZyb20gcnVuIHNjcmlwdAo3YWQ2MjA1NmM5IGRvY2tlcjogQWRkIHRl
-c3QtYmxvY2sKNThiZDU2ZmZkNCBkb2NrZXI6IEFkZCBuZXR0bGUtZGV2ZWwgdG8gZmVkb3JhIGlt
-YWdlCjk4NTM5YTg3ZGUgZG9ja2VyOiBVc2UgdW5jb25maW5lZCBzZWN1cml0eSBwcm9maWxlCjZj
-OTg0NjllMTYgZG9ja2VyOiBBZGQgdGVzdF9mYWlsIGFuZCBwcmVwX2ZhaWwKZDgzZjMxNzMzYyBk
-b2NrZXI6IEZpeCByZXR1cm4gY29kZSBvZiBidWlsZF9xZW11KCkKNTNhNTdlMWEyMiBkb2NrZXI6
-IFVzZSBhcmNoaXZlLXNvdXJjZS5weQo4YmM3MjI1YzBiIHRlc3RzOiBBZGQgUkVBRE1FIGZvciB2
-bSB0ZXN0cwpkYjg1NTZiMjE2IE1BSU5UQUlORVJTOiBBZGQgdGVzdHMvdm0gZW50cnkKMWQxMGU3
-YmFjMCBNYWtlZmlsZTogQWRkIHJ1bGVzIHRvIHJ1biB2bSB0ZXN0cwplMGYyYmE1YzJmIHRlc3Rz
-OiBBZGQgT3BlbkJTRCBpbWFnZQo3MjNkNzgzZGY0IHRlc3RzOiBBZGQgTmV0QlNEIGltYWdlCjZj
-ZmZmZjZmNTUgdGVzdHM6IEFkZCBGcmVlQlNEIGltYWdlCmY0Yzk1N2NjZjggdGVzdHM6IEFkZCB1
-YnVudHUuaTM4NiBpbWFnZQpkZDEwZTUyN2IxIHRlc3RzOiBBZGQgdm0gdGVzdCBsaWIKNTBmMjdm
-YmRmZSBzY3JpcHRzOiBBZGQgYXJjaGl2ZS1zb3VyY2Uuc2gKM2JiZmQwMGU2MiBxZW11LnB5OiBB
-ZGQgIndhaXQoKSIgbWV0aG9kCmQ3OWY4YTRkN2UgZ2l0aWdub3JlOiBJZ25vcmUgdm0gdGVzdCBp
-bWFnZXMKOTE1MDgyOTVlMyB0ZXN0cy9kb2NrZXI6IENsZWFuIHVwIHBhdGhzCjhkZGRmMzE3NTMg
-ZG9ja2VyOiBFbmFibGUgZmVhdHVyZXMgZXhwbGljaXRseSBpbiB0ZXN0LWZ1bGwKNTMxZDAxZDc5
-YiBkb2NrZXI6IFVwZGF0ZSB1YnVudHUgaW1hZ2UKZTkxMmNkOTAwOCBkb2NrZXI6IHJlZHVjZSBu
-b2lzZSB3aGVuIGJ1aWxkaW5nIHRyYXZpcy5kb2NrZXIKMGE3MzJiY2IzZSBkb2NrZXI6IGRvbid0
-IGluc3RhbGwgZGV2aWNlLXRyZWUtY29tcGlsZXIgYnVpbGQtZGVwcyBpbiB0cmF2aXMuZG9ja2Vy
-CmNjZjNiYTc0ZDkgZG9ja2VyOiBkb2NrZXIucHkgbWFrZSAtLW5vLWNhY2hlIHNraXAgY2hlY2tz
-dW0gdGVzdAoxOWQyZmIwYTliIGRvY2tlcjogZW5zdXJlIE5PVVNFUiBmb3IgdHJhdmlzIGltYWdl
-cwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8zODogZG9ja2VyOiBlbnN1
-cmUgTk9VU0VSIGZvciB0cmF2aXMgaW1hZ2VzLi4uCkNoZWNraW5nIFBBVENIIDIvMzg6IGRvY2tl
-cjogZG9ja2VyLnB5IG1ha2UgLS1uby1jYWNoZSBza2lwIGNoZWNrc3VtIHRlc3QuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMy8zODogZG9ja2VyOiBkb24ndCBpbnN0YWxsIGRldmljZS10cmVlLWNvbXBpbGVy
-IGJ1aWxkLWRlcHMgaW4gdHJhdmlzLmRvY2tlci4uLgpDaGVja2luZyBQQVRDSCA0LzM4OiBkb2Nr
-ZXI6IHJlZHVjZSBub2lzZSB3aGVuIGJ1aWxkaW5nIHRyYXZpcy5kb2NrZXIuLi4KQ2hlY2tpbmcg
-UEFUQ0ggNS8zODogZG9ja2VyOiBVcGRhdGUgdWJ1bnR1IGltYWdlLi4uCkNoZWNraW5nIFBBVENI
-IDYvMzg6IGRvY2tlcjogRW5hYmxlIGZlYXR1cmVzIGV4cGxpY2l0bHkgaW4gdGVzdC1mdWxsLi4u
-CkNoZWNraW5nIFBBVENIIDcvMzg6IHRlc3RzL2RvY2tlcjogQ2xlYW4gdXAgcGF0aHMuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggOC8zODogZ2l0aWdub3JlOiBJZ25vcmUgdm0gdGVzdCBpbWFnZXMuLi4KQ2hl
-Y2tpbmcgUEFUQ0ggOS8zODogcWVtdS5weTogQWRkICJ3YWl0KCkiIG1ldGhvZC4uLgpDaGVja2lu
-ZyBQQVRDSCAxMC8zODogc2NyaXB0czogQWRkIGFyY2hpdmUtc291cmNlLnNoLi4uCkNoZWNraW5n
-IFBBVENIIDExLzM4OiB0ZXN0czogQWRkIHZtIHRlc3QgbGliLi4uCkVSUk9SOiBsaW5lIG92ZXIg
-OTAgY2hhcmFjdGVycwojODY6IEZJTEU6IHRlc3RzL3ZtL2Jhc2V2bS5weTo2MDoKK3NzaC1yc2Eg
-QUFBQUIzTnphQzF5YzJFQUFBQURBUUFCQUFBQkFRQ2lrQzQ2V1l0WG90VWQwVUdQejk1NDdBajBL
-cUM0Z2srbnQ0QkJKbTg2SUhnQ0Q5RnlnU0dYOUVGdXRYbGh6OUtaSVBnOU9razcrSXpYUkhDV0ky
-TU52aHJjanlyZXpLUkVtNzF6MDhqOWl3ZnhZMzM0MGZZMk1vKzBraHdwTzdienNnemtsakhJSHFj
-T2c3TWd0dFBJblZNTkgvRWZxcGdSOEVES0p1V0NCMk55K0VCRk4vM2RBaWZmMFgvRXZLbGU5UFVy
-WTcwRWtTeWNueVVSUzhIWlJlRXFqOGxOOUo1a1h6QThGNmpCby8wUTQyVHR2NmU0azVZY2FEcndt
-THJCV0xyYTJQQ1haTE55SHFYRWlGa0dtZFh0QTFFb3g5Z2MvcDRqSVhpbTZ4clBObXBONld5cnJF
-amFDRjV4WXZOdjh3WGtENnVTV3diSFlVMjRsSUFuIHFlbXUtdm0ta2V5CgpXQVJOSU5HOiBsaW5l
-IG92ZXIgODAgY2hhcmFjdGVycwojMTAwOiBGSUxFOiB0ZXN0cy92bS9iYXNldm0ucHk6NzQ6Cisg
-ICAgICAgIHNlbGYuX3RtcGRpciA9IHRlbXBmaWxlLm1rZHRlbXAocHJlZml4PSJ2bS10ZXN0LSIs
-IHN1ZmZpeD0iLnRtcCIsIGRpcj0iLiIpCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
-cwojMTkxOiBGSUxFOiB0ZXN0cy92bS9iYXNldm0ucHk6MTY1OgorICAgICAgICBsb2dnaW5nLmRl
-YnVnKCJDcmVhdGluZyBhcmNoaXZlICVzIGZvciBzcmNfZGlyIGRpcjogJXMiLCB0YXJmaWxlLCBz
-cmNfZGlyKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE5NjogRklMRTogdGVz
-dHMvdm0vYmFzZXZtLnB5OjE3MDoKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAiZmlsZT0l
-cyxpZj1ub25lLGlkPSVzLGNhY2hlPXdyaXRlYmFjayxmb3JtYXQ9cmF3IiAlIFwKCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxOTk6IEZJTEU6IHRlc3RzL3ZtL2Jhc2V2bS5weTox
-NzM6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgInZpcnRpby1ibGssZHJpdmU9JXMsc2Vy
-aWFsPSVzLGJvb3RpbmRleD0xIiAlIChuYW1lLCBuYW1lKV0KCkVSUk9SOiBsaW5lIG92ZXIgOTAg
-Y2hhcmFjdGVycwojMjQ2OiBGSUxFOiB0ZXN0cy92bS9iYXNldm0ucHk6MjIwOgorICAgIFZNIHRl
-c3QgdXRpbGl0eS4gIEV4aXQgY29kZXM6IDAgPSBzdWNjZXNzLCAxID0gY29tbWFuZCBsaW5lIGVy
-cm9yLCAyID0gZW52aXJvbm1lbnQgaW5pdGlhbGl6YXRpb24gZmFpbGVkLCAzID0gdGVzdCBjb21t
-YW5kIGZhaWxlZCIiIikKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNTM6IEZJ
-TEU6IHRlc3RzL3ZtL2Jhc2V2bS5weToyMjc6CisgICAgcGFyc2VyLmFkZF9vcHRpb24oIi0tam9i
-cyIsIHR5cGU9aW50LCBkZWZhdWx0PW11bHRpcHJvY2Vzc2luZy5jcHVfY291bnQoKSAvIDIsCgp0
-b3RhbDogMiBlcnJvcnMsIDUgd2FybmluZ3MsIDI3NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCAxMi8zODogdGVzdHM6
-IEFkZCB1YnVudHUuaTM4NiBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCAxMy8zODogdGVzdHM6IEFk
-ZCBGcmVlQlNEIGltYWdlLi4uCkNoZWNraW5nIFBBVENIIDE0LzM4OiB0ZXN0czogQWRkIE5ldEJT
-RCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCAxNS8zODogdGVzdHM6IEFkZCBPcGVuQlNEIGltYWdl
-Li4uCkNoZWNraW5nIFBBVENIIDE2LzM4OiBNYWtlZmlsZTogQWRkIHJ1bGVzIHRvIHJ1biB2bSB0
-ZXN0cy4uLgpDaGVja2luZyBQQVRDSCAxNy8zODogTUFJTlRBSU5FUlM6IEFkZCB0ZXN0cy92bSBl
-bnRyeS4uLgpDaGVja2luZyBQQVRDSCAxOC8zODogdGVzdHM6IEFkZCBSRUFETUUgZm9yIHZtIHRl
-c3RzLi4uCkNoZWNraW5nIFBBVENIIDE5LzM4OiBkb2NrZXI6IFVzZSBhcmNoaXZlLXNvdXJjZS5w
-eS4uLgpDaGVja2luZyBQQVRDSCAyMC8zODogZG9ja2VyOiBGaXggcmV0dXJuIGNvZGUgb2YgYnVp
-bGRfcWVtdSgpLi4uCkNoZWNraW5nIFBBVENIIDIxLzM4OiBkb2NrZXI6IEFkZCB0ZXN0X2ZhaWwg
-YW5kIHByZXBfZmFpbC4uLgpDaGVja2luZyBQQVRDSCAyMi8zODogZG9ja2VyOiBVc2UgdW5jb25m
-aW5lZCBzZWN1cml0eSBwcm9maWxlLi4uCkNoZWNraW5nIFBBVENIIDIzLzM4OiBkb2NrZXI6IEFk
-ZCBuZXR0bGUtZGV2ZWwgdG8gZmVkb3JhIGltYWdlLi4uCkNoZWNraW5nIFBBVENIIDI0LzM4OiBk
-b2NrZXI6IEFkZCB0ZXN0LWJsb2NrLi4uCkNoZWNraW5nIFBBVENIIDI1LzM4OiBkb2NrZXI6IERy
-b3AgJ3NldCAtZScgZnJvbSBydW4gc2NyaXB0Li4uCkNoZWNraW5nIFBBVENIIDI2LzM4OiB2bDog
-RG9uJ3QgaW5jbHVkZSB2ZGUgaGVhZGVyLi4uCkNoZWNraW5nIFBBVENIIDI3LzM4OiBidWlsZHN5
-czogTW92ZSB2ZGUgbGlicyB0byBwZXIgb2JqZWN0Li4uCkNoZWNraW5nIFBBVENIIDI4LzM4OiBi
-dWlsZHN5czogTW92ZSBndGsvdnRlIGNmbGFncy9saWJzIHRvIHBlciBvYmplY3QuLi4KQ2hlY2tp
-bmcgUEFUQ0ggMjkvMzg6IGJ1aWxkc3lzOiBNb3ZlIHNkbCBjZmxhZ3MvbGlicyB0byBwZXIgb2Jq
-ZWN0Li4uCkNoZWNraW5nIFBBVENIIDMwLzM4OiBidWlsZHN5czogTW92ZSB2bmMgY2ZsYWdzL2xp
-YnMgdG8gcGVyIG9iamVjdC4uLgpDaGVja2luZyBQQVRDSCAzMS8zODogYnVpbGRzeXM6IE1vdmUg
-YXVkaW8gbGlicyB0byBwZXIgb2JqZWN0Li4uCkNoZWNraW5nIFBBVENIIDMyLzM4OiBidWlsZHN5
-czogTW92ZSBjdXJlc2UgY2ZsYWdzL2xpYnMgdG8gcGVyIG9iamVjdC4uLgpDaGVja2luZyBQQVRD
-SCAzMy8zODogYnVpbGRzeXM6IE1vdmUgb3BlbmdsIGNmbGFncyB0byBwZXIgb2JqZWN0Li4uCkNo
-ZWNraW5nIFBBVENIIDM0LzM4OiBidWlsZHN5czogTW92ZSBsaWJjYWNhcmQgY2ZsYWdzL2xpYnMg
-dG8gcGVyIG9iamVjdC4uLgpDaGVja2luZyBQQVRDSCAzNS8zODogYnVpbGRzeXM6IE1vdmUgbGli
-dXNiIGNmbGFncy9saWJzIHRvIHBlciBvYmplY3QuLi4KQ2hlY2tpbmcgUEFUQ0ggMzYvMzg6IGJ1
-aWxkc3lzOiBNb3ZlIHVzYiByZWRpciBjZmxhZ3MvbGlicyB0byBwZXIgb2JqZWN0Li4uCkNoZWNr
-aW5nIFBBVENIIDM3LzM4OiBidWlsZHN5czogTW92ZSBicmxhcGkgbGlicyB0byBwZXIgb2JqZWN0
-Li4uCkNoZWNraW5nIFBBVENIIDM4LzM4OiBidWlsZHN5czogTW92ZSByZG1hIGxpYnMgdG8gcGVy
-IG9iamVjdC4uLgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBj
-b2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0
-dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
-ZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+
+The sPAPR machine isn't clearing up the pending events QTAILQ on
+machine reboot. This allows for unprocessed hotplug/epow events
+to persist in the queue after reset and, when reasserting the IRQs in
+check_exception later on, these will be being processed by the OS.
+
+This patch implements a new function called 'spapr_clear_pending_events'
+that clears up the pending_events QTAILQ. This helper is then called
+inside ppc_spapr_reset to clear up the events queue, preventing
+old/deprecated events from persisting after a reset.
+
+Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/spapr.c         |  1 +
+ hw/ppc/spapr_events.c  | 11 +++++++++++
+ include/hw/ppc/spapr.h |  1 +
+ 3 files changed, 13 insertions(+)
+
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index cec441cbf4..0e5f29d348 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1392,6 +1392,7 @@ static void ppc_spapr_reset(void)
+     }
+ 
+     qemu_devices_reset();
++    spapr_clear_pending_events(spapr);
+ 
+     /*
+      * We place the device tree and RTAS just below either the top of the RMA,
+diff --git a/hw/ppc/spapr_events.c b/hw/ppc/spapr_events.c
+index f952b78237..66b8164f30 100644
+--- a/hw/ppc/spapr_events.c
++++ b/hw/ppc/spapr_events.c
+@@ -700,6 +700,17 @@ static void event_scan(PowerPCCPU *cpu, sPAPRMachineState *spapr,
+     rtas_st(rets, 0, RTAS_OUT_NO_ERRORS_FOUND);
+ }
+ 
++void spapr_clear_pending_events(sPAPRMachineState *spapr)
++{
++    sPAPREventLogEntry *entry = NULL;
++
++    QTAILQ_FOREACH(entry, &spapr->pending_events, next) {
++        QTAILQ_REMOVE(&spapr->pending_events, entry, next);
++        g_free(entry->extended_log);
++        g_free(entry);
++    }
++}
++
+ void spapr_events_init(sPAPRMachineState *spapr)
+ {
+     QTAILQ_INIT(&spapr->pending_events);
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 2a303a705c..5d161ec580 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -662,6 +662,7 @@ void spapr_cpu_parse_features(sPAPRMachineState *spapr);
+ int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
+ void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
+                           Error **errp);
++void spapr_clear_pending_events(sPAPRMachineState *spapr);
+ 
+ /* CPU and LMB DRC release callbacks. */
+ void spapr_core_release(DeviceState *dev);
+-- 
+2.13.5
