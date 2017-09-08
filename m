@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60511)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dqJBw-0002P2-CE
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:19:29 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dqJEV-0003ky-PI
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:22:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dqJBv-0001JI-4M
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:19:28 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:43394)
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dqJES-00051h-K2
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:22:07 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35731)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dqJBu-0001Ho-TQ
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:19:27 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id f145so6033315wme.0
-	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 06:19:26 -0700 (PDT)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dqJES-000515-FT
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:22:04 -0400
+Received: by mail-qt0-x241.google.com with SMTP id p55so1539512qtc.2
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 06:22:04 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170908103011.25821-1-berrange@redhat.com>
+	<20170908103011.25821-4-berrange@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <70a0110b-8295-f0d1-a69c-29d83178d6e9@amsat.org>
+Date: Fri, 8 Sep 2017 10:22:00 -0300
 MIME-Version: 1.0
-In-Reply-To: <87efrhcsve.fsf@dusky.pond.sub.org>
-References: <20170906105704.GC2215@work-vm> <20170906110629.GM15510@redhat.com>
-	<20170906113157.GD2215@work-vm> <20170906115428.GP15510@redhat.com>
-	<20170907081341.GA23040@pxdev.xzpeter.org>
-	<87inguaclr.fsf@dusky.pond.sub.org>
-	<20170907132259.GM30609@redhat.com> <87h8weo186.fsf@dusky.pond.sub.org>
-	<20170907180900.GV2098@work-vm> <87k219fuq5.fsf@dusky.pond.sub.org>
-	<20170908093212.GA2095@work-vm> <87efrhcsve.fsf@dusky.pond.sub.org>
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Date: Fri, 8 Sep 2017 14:19:24 +0100
-Message-ID: <CAJSP0QWJPxns9N+Yi_Of39u=CJ4HyVCw2ZD=gfmB0JgfjjzewQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v2 0/8] monitor: allow per-monitor thread
+In-Reply-To: <20170908103011.25821-4-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] io: use case insensitive check for
+ Connection & Upgrade websock headers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,46 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Xu <peterx@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Brian Rak <brak@vultr.com>
 
-On Fri, Sep 8, 2017 at 12:49 PM, Markus Armbruster <armbru@redhat.com> wrote:
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
->
->> * Markus Armbruster (armbru@redhat.com) wrote:
->>> "Dr. David Alan Gilbert" <dgilbert@redhat.com> writes:
->>>
->>> > * Markus Armbruster (armbru@redhat.com) wrote:
->>> >> "Daniel P. Berrange" <berrange@redhat.com> writes:
->>> >>
->>> >> > On Thu, Sep 07, 2017 at 02:59:28PM +0200, Markus Armbruster wrote:
->>> If we can't eliminate main loop hangs, any ideas on reducing their
->>> impact?
->>
->> Note there's two related things; main loop hangs and bql hangs; I'm not
->> sure that the two are always the same.
->>
->> Stefan mentioned some ways of doing asynchronous memory lookups/accesses
->> though I'm not sure they'd work in the postcopy case; but they'd need
->> work in lots of devices.
->> Some of the IO under the BQL might be fixable; IMHO in a lot of places
->> we don't really need the full BQL, we just need a 'you aren't going to
->> change the config' lock.
->
-> This is all about reducing main loop hangs.  Another one is moving
-> "slow" code out of the main loop, e.g. monitor commands.
->
-> My question was aiming in a slightly different direction, however: given
-> that the main loop can hang, is there anything we can do to mitigate
-> known bad consequences of such hangs?
+Hi Daniel,
 
-I don't think we can mitigate it completely but we can make it visible
-and easier to study.
+On 09/08/2017 07:30 AM, Daniel P. Berrange wrote:
+> When checking the value of the Connection and Upgrade HTTP headers
+> the websock RFC (6455) requires the comparison to be case insensitive.
+> The Connection value should be an exact match not a substring.
+> 
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>   io/channel-websock.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/io/channel-websock.c b/io/channel-websock.c
+> index aed7a6c9b3..ab332ec907 100644
+> --- a/io/channel-websock.c
+> +++ b/io/channel-websock.c
+> @@ -427,12 +427,12 @@ static void qio_channel_websock_handshake_process(QIOChannelWebsock *ioc,
+>           goto bad_request;
+>       }
+>   
+> -    if (!g_strrstr(connection, QIO_CHANNEL_WEBSOCK_CONNECTION_UPGRADE)) {
+> +    if (strcasecmp(connection, QIO_CHANNEL_WEBSOCK_CONNECTION_UPGRADE) != 0) {
 
-There were discussions about making the event loop observable in the
-past.  In other words, logging which handler functions are firing.
-That way you can debug scenarios where the loop is spinning
-("main-loop: WARNING: I/O thread spun for 1000 iterations\n") and also
-latency.  Collecting event handler latencies and looking at the
-histogram would be interesting.  The outliers (e.g. 250+ microseconds)
-are things that we should know about and consider refactoring.
+Why not use g_ascii_strcasecmp() ?
+
+>           error_setg(errp, "No connection upgrade requested '%s'", connection);
+>           goto bad_request;
+>       }
+>   
+> -    if (!g_str_equal(upgrade, QIO_CHANNEL_WEBSOCK_UPGRADE_WEBSOCKET)) {
+> +    if (strcasecmp(upgrade, QIO_CHANNEL_WEBSOCK_UPGRADE_WEBSOCKET) != 0) {
+>           error_setg(errp, "Incorrect upgrade method '%s'", upgrade);
+>           goto bad_request;
+>       }
+> 
