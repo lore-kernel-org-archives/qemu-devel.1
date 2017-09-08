@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34162)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34904)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dqHre-0007DD-0f
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:54:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dqHuP-00084N-7h
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:57:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dqHrc-0005hW-Vp
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:54:26 -0400
-Date: Fri, 8 Sep 2017 13:54:14 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170908115414.GF3283@localhost.localdomain>
-References: <20170905151614.31303-1-cohuck@redhat.com>
-	<20170905151614.31303-3-cohuck@redhat.com>
-	<20170908110425.GC3283@localhost.localdomain>
-	<20170908132439.3ab53d7d.cohuck@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dqHuO-0007f5-Fd
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:57:17 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:32793)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dqHuO-0007eR-82
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:57:16 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id a43so4301496wrc.0
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 04:57:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170908132439.3ab53d7d.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 2/3] iotests: use -ccw on s390x for 051
+In-Reply-To: <20170907224051.21518-1-richard.henderson@linaro.org>
+References: <20170907224051.21518-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 8 Sep 2017 12:56:54 +0100
+Message-ID: <CAFEAcA9fOn95b1GKt9r0nAMVa-pUJN8U3mD40_73yp3T4EM0JQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/23] tcg constant pools and
+ USE_DIRECT_JUMP cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,98 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: mreitz@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, david@redhat.com, haoqf@linux.vnet.ibm.com
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Am 08.09.2017 um 13:24 hat Cornelia Huck geschrieben:
-> On Fri, 8 Sep 2017 13:04:25 +0200
-> Kevin Wolf <kwolf@redhat.com> wrote:
-> 
-> > Am 05.09.2017 um 17:16 hat Cornelia Huck geschrieben:
-> > > The default cpu model on s390x does not provide zPCI, which is
-> > > not yet wired up on tcg. Moreover, virtio-ccw is the standard
-> > > on s390x, so use the -ccw instead of the -pci versions of virtio
-> > > devices on s390x.
-> > > 
-> > > Provide an output file for s390x.
-> > > 
-> > > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > > ---
-> > >  tests/qemu-iotests/051                     |   9 +-
-> > >  tests/qemu-iotests/051.s390-ccw-virtio.out | 434 +++++++++++++++++++++++++++++
-> > >  2 files changed, 442 insertions(+), 1 deletion(-)
-> > >  create mode 100644 tests/qemu-iotests/051.s390-ccw-virtio.out  
-> > 
-> > It's already a pain to have two separate output files for 051, let's try
-> > to avoid adding a third one. Even more so since I think that the split
-> > between 051.out and 051.pc.out was already made for s390, so I'm not
-> > sure if anyone would actually still make use of the plain 051.out
-> > output if s390 got it's own one.
-> 
-> Are there no non-pc and non-s390 machines for which this is run?
+On 7 September 2017 at 23:40, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> Lots of cleanup for aarch32 and s390x.  Minor improvements for
+> aarch64, ppc, sparc, x86_64.  But we'll need this more when we
+> start generating host vector insns.
+>
+>
+> r~
+>
+>
+> The following changes since commit cda4a338c4243fa3bff4498b935340ac7121cc76:
+>
+>   tcg/tci: Add TCG_TARGET_DEFAULT_MO (2017-09-07 18:57:34 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/rth7680/qemu.git tags/pull-tcg-20170907
+>
+> for you to fetch changes up to 53c89efd02cef626040165cc8f06b5cf2c15355d:
+>
+>   tcg/ppc: Use constant pool for movi (2017-09-07 11:57:35 -0700)
+>
+> ----------------------------------------------------------------
+> TCG constant pools
+>
 
-Who knows? But I'm not aware of anyone who is interested in something
-else and has contributed to the test cases until now.
+Applied, thanks.
 
-> > > diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-> > > index c8cfc764bc..f6ad0f4f0b 100755
-> > > --- a/tests/qemu-iotests/051
-> > > +++ b/tests/qemu-iotests/051
-> > > @@ -103,7 +103,14 @@ echo
-> > >  echo === Device without drive ===
-> > >  echo
-> > >  
-> > > -run_qemu -device virtio-scsi-pci -device scsi-hd
-> > > +case "$QEMU_DEFAULT_MACHINE" in
-> > > +  s390-ccw-virtio)
-> > > +      run_qemu -device virtio-scsi-ccw -device scsi-hd
-> > > +      ;;
-> > > +  *)
-> > > +      run_qemu -device virtio-scsi-pci -device scsi-hd
-> > > +      ;;
-> > > +esac  
-> > 
-> > The only real difference between 051.out and 051.s390-ccw-virtio.out is
-> > in this one command line. So if we don't want to just skip this part of
-> > the test for non-pc like we already skip ther parts, 
-> 
-> I don't think there's a reason to skip this: The only difference is
-> that we (currently) don't have a by-default usable virtio-pci
-> implementation on s390 - but any virtio transport should do.
-
-Well, any SCSI controller should do, really. Or in fact, any block
-device that doesn't have removable media.
-
-I agree that there's no real reason to skip the test for s390. On the
-other hand, testing it on s390 doesn't really contribute anything to the
-test coverage as long as the suite is run for PC, too (because there is
-nothing machine dependent in the tested code path), so not running it
-would be tolerable.
-
-> Another approach would be to drop the -pci postfix, but I don't want to
-> introduce more usage of aliases.
-
-Maybe that would indeed be the easiest way. As long as we don't intend
-to remove the alias from qemu, there's no reason not to use it in tests.
-
-> > we generally solve
-> > this kind of thing by just filtering out strings that differ between
-> > setups.
-> > 
-> > For example:
-> > 
-> >     case "$QEMU_DEFAULT_MACHINE" in
-> >       s390-ccw-virtio)
-> >           virtio_scsi=virtio-scsi-ccw
-> >           ;;
-> >       *)
-> >           virtio_scsi=virtio-scsi-pci
-> >           ;;
-> >     esac
-> > 
-> >     run_qemu -device $virtio_scsi -device scsi-hd |
-> >         sed -e "s/$virtio_scsi/VIRTIO-SCSI/"
-> 
-> Yes, I can try this.
-
-Kevin
+-- PMM
