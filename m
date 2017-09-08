@@ -1,32 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dqCeR-0006CM-6x
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 02:20:31 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dqCfw-0006rv-Gy
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 02:22:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dqCeM-0003vJ-KI
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 02:20:27 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51746)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dqCeM-0003uU-DY
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 02:20:22 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 6DF434E4D4
-	for <qemu-devel@nongnu.org>; Fri,  8 Sep 2017 06:20:20 +0000 (UTC)
-Message-ID: <1504851615.13941.0.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Fri, 08 Sep 2017 08:20:15 +0200
-In-Reply-To: <20170907114329.GD25123@lemon.lan>
-References: <20170907082918.7299-1-famz@redhat.com>
-	<1504776868.15653.6.camel@redhat.com>
-	<20170907114329.GD25123@lemon.lan>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(envelope-from <aik@ozlabs.ru>) id 1dqCfr-00057p-Of
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 02:22:00 -0400
+Received: from mail-io0-x22c.google.com ([2607:f8b0:4001:c06::22c]:38900)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dqCfr-00057P-IL
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 02:21:55 -0400
+Received: by mail-io0-x22c.google.com with SMTP id n69so2512562ioi.5
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 23:21:55 -0700 (PDT)
+References: <20170907092010.3605-1-aik@ozlabs.ru>
+	<20170907092010.3605-2-aik@ozlabs.ru>
+	<CAFEAcA-s026tJqgfa+kNsLtY2fEKpFs7ZT6zOk8CMg7ZX84CQA@mail.gmail.com>
+	<2e429b41-8ffd-8bf7-56c7-32461033776e@ozlabs.ru>
+	<CAFEAcA-Px28x1KcyRgQ6P68RUstWuOhHO17Z3wdG_6QL76+9xQ@mail.gmail.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <f445168a-10fc-2139-4bed-ceec1f1039a8@ozlabs.ru>
+Date: Fri, 8 Sep 2017 16:21:48 +1000
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA-Px28x1KcyRgQ6P68RUstWuOhHO17Z3wdG_6QL76+9xQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 0/9] buildsys: Move ui/usb library
- cflags/libs to per object
+Subject: Re: [Qemu-devel] [RFC PATCH qemu 1/4] memory: Postpone flatview and
+ dispatch tree building till all devices are added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,30 +34,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, David Gibson <david@gibson.dropbear.id.au>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-On Thu, 2017-09-07 at 19:43 +0800, Fam Zheng wrote:
-> On Thu, 09/07 11:34, Gerd Hoffmann wrote:
-> > On Thu, 2017-09-07 at 16:29 +0800, Fam Zheng wrote:
-> > > Hi Gerd,
-> > > 
-> > > This is part two of the QEMU_CFLAGS and libs_softmmu cleanup
-> > > series,
-> > > including
-> > > ui/, audio/ and hw/usb/. Please review.
-> > 
-> > Looks good, survived a test build.
-> > 
-> > Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+On 08/09/17 00:30, Peter Maydell wrote:
+> On 7 September 2017 at 15:27, Alexey Kardashevskiy <aik@ozlabs.ru> wrote:
+>> On 07/09/17 19:30, Peter Maydell wrote:
+>>> What happens if something in a device realize function tries
+>>> to do a read from an AddressSpace?
+>>
+>>
+>> address_space_memory is created before that loop but yes, address spaces
+>> for devices are not rendered and QEMU crashes, needs fixing.
 > 
-> Thanks for the quick review! Do you want to queue this in your tree?
-> If not I
-> can include it in my next pull request for "build and test
-> automation" patches.
+> I'd be OK if we defined this to be not permitted, as long as
+> we're reasonably happy that we don't currently do it anywhere
+> and the error if it does happen is fairly clear about what's
+> gone wrong.
 
-Feel free do include it in your pull.  I assumed that is your intention
-anyway as you've asked for review not merge ;)
 
-cheers,
-  Gerd
+QEMU actually only crashes with 2/4 + 3/4, with just 1/4 QEMU gets to
+unassigned_mem_accepts() silently. Not sure how to convert this to a clear
+error message.
+
+
+
+-- 
+Alexey
