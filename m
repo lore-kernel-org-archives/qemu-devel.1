@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG1K-0008Tw-4z
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:23 -0400
+	(envelope-from <famz@redhat.com>) id 1dqG1L-0008VC-RZ
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG1A-00054J-N0
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41468)
+	(envelope-from <famz@redhat.com>) id 1dqG1C-00055m-FI
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44166)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG1A-00053O-EV
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:08 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG1C-000558-9Y
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:10 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  8 Sep 2017 17:54:58 +0800
-Message-Id: <20170908095506.13594-31-famz@redhat.com>
+Date: Fri,  8 Sep 2017 17:54:59 +0800
+Message-Id: <20170908095506.13594-32-famz@redhat.com>
 In-Reply-To: <20170908095506.13594-1-famz@redhat.com>
 References: <20170908095506.13594-1-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 30/38] buildsys: Move vnc cflags/libs to per
- object
+Subject: [Qemu-devel] [PULL 31/38] buildsys: Move audio libs to per object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,99 +30,80 @@ To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170907082918.7299-4-famz@redhat.com>
+Message-Id: <20170907082918.7299-5-famz@redhat.com>
 Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- configure        | 14 ++++++++------
- ui/Makefile.objs | 21 ++++++++++++---------
- 2 files changed, 20 insertions(+), 15 deletions(-)
+ audio/Makefile.objs |  5 +++++
+ configure           | 15 ++++++++++-----
+ 2 files changed, 15 insertions(+), 5 deletions(-)
 
+diff --git a/audio/Makefile.objs b/audio/Makefile.objs
+index c20695668f..8a5ede6e2b 100644
+--- a/audio/Makefile.objs
++++ b/audio/Makefile.objs
+@@ -12,3 +12,8 @@ common-obj-y +=3D wavcapture.o
+=20
+ sdlaudio.o-cflags :=3D $(SDL_CFLAGS)
+ sdlaudio.o-libs :=3D $(SDL_LIBS)
++alsaaudio.o-libs :=3D $(ALSA_LIBS)
++paaudio.o-libs :=3D $(PULSE_LIBS)
++coreaudio.o-libs :=3D $(COREAUDIO_LIBS)
++dsoundaudio.o-libs :=3D $(DSOUND_LIBS)
++ossaudio.o-libs :=3D $(OSS_LIBS)
 diff --git a/configure b/configure
-index 90a8851342..2b3db2f5c3 100755
+index 2b3db2f5c3..ddddfde599 100755
 --- a/configure
 +++ b/configure
-@@ -2840,8 +2840,8 @@ EOF
-   vnc_sasl_libs=3D"-lsasl2"
-   if compile_prog "$vnc_sasl_cflags" "$vnc_sasl_libs" ; then
-     vnc_sasl=3Dyes
--    libs_softmmu=3D"$vnc_sasl_libs $libs_softmmu"
--    QEMU_CFLAGS=3D"$QEMU_CFLAGS $vnc_sasl_cflags"
-+    vnc_libs=3D"$vnc_libs $vnc_sasl_libs"
-+    vnc_cflags=3D"$vnc_cflags $vnc_sasl_cflags"
-   else
-     if test "$vnc_sasl" =3D "yes" ; then
-       feature_not_found "vnc-sasl" "Install Cyrus SASL devel"
-@@ -2862,8 +2862,8 @@ EOF
-     vnc_jpeg_libs=3D"-ljpeg"
-   if compile_prog "$vnc_jpeg_cflags" "$vnc_jpeg_libs" ; then
-     vnc_jpeg=3Dyes
--    libs_softmmu=3D"$vnc_jpeg_libs $libs_softmmu"
--    QEMU_CFLAGS=3D"$QEMU_CFLAGS $vnc_jpeg_cflags"
-+    vnc_libs=3D"$vnc_libs $vnc_jpeg_libs"
-+    vnc_cflags=3D"$vnc_cflags $vnc_jpeg_cflags"
-   else
-     if test "$vnc_jpeg" =3D "yes" ; then
-       feature_not_found "vnc-jpeg" "Install libjpeg-turbo devel"
-@@ -2894,8 +2894,8 @@ EOF
-   fi
-   if compile_prog "$vnc_png_cflags" "$vnc_png_libs" ; then
-     vnc_png=3Dyes
--    libs_softmmu=3D"$vnc_png_libs $libs_softmmu"
--    QEMU_CFLAGS=3D"$QEMU_CFLAGS $vnc_png_cflags"
-+    vnc_libs=3D"$vnc_libs $vnc_png_libs"
-+    vnc_cflags=3D"$vnc_cflags $vnc_png_cflags"
-   else
-     if test "$vnc_png" =3D "yes" ; then
-       feature_not_found "vnc-png" "Install libpng devel"
-@@ -5563,6 +5563,8 @@ echo "CONFIG_BDRV_RW_WHITELIST=3D$block_drv_rw_whit=
-elist" >> $config_host_mak
- echo "CONFIG_BDRV_RO_WHITELIST=3D$block_drv_ro_whitelist" >> $config_hos=
-t_mak
- if test "$vnc" =3D "yes" ; then
-   echo "CONFIG_VNC=3Dy" >> $config_host_mak
-+  echo "VNC_CFLAGS=3D$vnc_cflags" >> $config_host_mak
-+  echo "VNC_LIBS=3D$vnc_libs" >> $config_host_mak
+@@ -3044,13 +3044,13 @@ for drv in $audio_drv_list; do
+     alsa)
+     audio_drv_probe $drv alsa/asoundlib.h -lasound \
+         "return snd_pcm_close((snd_pcm_t *)0);"
+-    libs_softmmu=3D"-lasound $libs_softmmu"
++    alsa_libs=3D"-lasound"
+     ;;
+=20
+     pa)
+     audio_drv_probe $drv pulse/pulseaudio.h "-lpulse" \
+         "pa_context_set_source_output_volume(NULL, 0, NULL, NULL, NULL);=
+ return 0;"
+-    libs_softmmu=3D"-lpulse $libs_softmmu"
++    pulse_libs=3D"-lpulse"
+     audio_pt_int=3D"yes"
+     ;;
+=20
+@@ -3061,16 +3061,16 @@ for drv in $audio_drv_list; do
+     ;;
+=20
+     coreaudio)
+-      libs_softmmu=3D"-framework CoreAudio $libs_softmmu"
++      coreaudio_libs=3D"-framework CoreAudio"
+     ;;
+=20
+     dsound)
+-      libs_softmmu=3D"-lole32 -ldxguid $libs_softmmu"
++      dsound_libs=3D"-lole32 -ldxguid"
+       audio_win_int=3D"yes"
+     ;;
+=20
+     oss)
+-      libs_softmmu=3D"$oss_lib $libs_softmmu"
++      oss_libs=3D"$oss_lib"
+     ;;
+=20
+     wav)
+@@ -5553,6 +5553,11 @@ for drv in $audio_drv_list; do
+     def=3DCONFIG_$(echo $drv | LC_ALL=3DC tr '[a-z]' '[A-Z]')
+     echo "$def=3Dy" >> $config_host_mak
+ done
++echo "ALSA_LIBS=3D$alsa_libs" >> $config_host_mak
++echo "PULSE_LIBS=3D$pulse_libs" >> $config_host_mak
++echo "COREAUDIO_LIBS=3D$coreaudio_libs" >> $config_host_mak
++echo "DSOUND_LIBS=3D$dsound_libs" >> $config_host_mak
++echo "OSS_LIBS=3D$oss_libs" >> $config_host_mak
+ if test "$audio_pt_int" =3D "yes" ; then
+   echo "CONFIG_AUDIO_PT_INT=3Dy" >> $config_host_mak
  fi
- if test "$vnc_sasl" =3D "yes" ; then
-   echo "CONFIG_VNC_SASL=3Dy" >> $config_host_mak
-diff --git a/ui/Makefile.objs b/ui/Makefile.objs
-index b3e29e21f0..a0b3c15a28 100644
---- a/ui/Makefile.objs
-+++ b/ui/Makefile.objs
-@@ -1,11 +1,14 @@
--vnc-obj-y +=3D vnc.o
--vnc-obj-y +=3D vnc-enc-zlib.o vnc-enc-hextile.o
--vnc-obj-y +=3D vnc-enc-tight.o vnc-palette.o
--vnc-obj-y +=3D vnc-enc-zrle.o
--vnc-obj-y +=3D vnc-auth-vencrypt.o
--vnc-obj-$(CONFIG_VNC_SASL) +=3D vnc-auth-sasl.o
--vnc-obj-y +=3D vnc-ws.o
--vnc-obj-y +=3D vnc-jobs.o
-+vnc.mo-objs +=3D vnc.o
-+vnc.mo-objs +=3D vnc-enc-zlib.o vnc-enc-hextile.o
-+vnc.mo-objs +=3D vnc-enc-tight.o vnc-palette.o
-+vnc.mo-objs +=3D vnc-enc-zrle.o
-+vnc.mo-objs +=3D vnc-auth-vencrypt.o
-+vnc.mo-objs +=3D $(if $(CONFIG_VNC_SASL), vnc-auth-sasl.o)
-+vnc.mo-objs +=3D vnc-ws.o
-+vnc.mo-objs +=3D vnc-jobs.o
-+
-+vnc.mo-cflags :=3D $(VNC_CFLAGS)
-+vnc.mo-libs :=3D $(VNC_LIBS)
-=20
- common-obj-y +=3D keymaps.o console.o cursor.o qemu-pixman.o
- common-obj-y +=3D input.o input-keymap.o input-legacy.o
-@@ -14,7 +17,7 @@ common-obj-$(CONFIG_SPICE) +=3D spice-core.o spice-inpu=
-t.o spice-display.o
- common-obj-$(CONFIG_SDL) +=3D sdl.mo x_keymap.o
- common-obj-$(CONFIG_COCOA) +=3D cocoa.o
- common-obj-$(CONFIG_CURSES) +=3D curses.o
--common-obj-$(CONFIG_VNC) +=3D $(vnc-obj-y)
-+common-obj-$(CONFIG_VNC) +=3D vnc.mo
- common-obj-$(CONFIG_GTK) +=3D gtk.o x_keymap.o
-=20
- ifeq ($(CONFIG_SDLABI),1.2)
 --=20
 2.13.5
