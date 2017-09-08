@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dqJK7-0006uI-6X
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:27:56 -0400
+	(envelope-from <berrange@redhat.com>) id 1dqJXi-0001xb-8H
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:41:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dqJK6-0001kM-8w
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:27:55 -0400
-Date: Fri, 8 Sep 2017 15:27:41 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170908132741.GJ3283@localhost.localdomain>
-References: <20170830210542.2153-1-eblake@redhat.com>
-	<20170830210542.2153-17-eblake@redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1dqJXf-0004uf-41
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:41:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47238)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dqJXe-0004tp-Ro
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 09:41:55 -0400
+Date: Fri, 8 Sep 2017 14:41:45 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170908134145.GF32645@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170908103011.25821-1-berrange@redhat.com>
+	<150486803677.210.12147319216227977632@6d89bd104fc3>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170830210542.2153-17-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v6 16/18] qcow2: Switch store_bitmap_data()
- to byte-based iteration
+In-Reply-To: <150486803677.210.12147319216227977632@6d89bd104fc3>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 0/3] Improve websock response / error
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,68 +30,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, brak@vultr.com, f4bug@amsat.org
 
-Am 30.08.2017 um 23:05 hat Eric Blake geschrieben:
-> Now that we have adjusted the majority of the calls this function
-> makes to be byte-based, it is easier to read the code if it makes
-> passes over the image using bytes rather than sectors.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: John Snow <jsnow@redhat.com>
-> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> 
-> ---
-> v5: no change
-> v4: new patch
-> ---
->  block/qcow2-bitmap.c | 26 +++++++++++---------------
->  1 file changed, 11 insertions(+), 15 deletions(-)
-> 
-> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-> index b807298484..63d845e35f 100644
-> --- a/block/qcow2-bitmap.c
-> +++ b/block/qcow2-bitmap.c
-> @@ -1072,10 +1072,9 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
->  {
->      int ret;
->      BDRVQcow2State *s = bs->opaque;
-> -    int64_t sector;
-> -    uint64_t limit, sbc;
-> +    int64_t offset;
-> +    uint64_t limit;
->      uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
-> -    uint64_t bm_sectors = DIV_ROUND_UP(bm_size, BDRV_SECTOR_SIZE);
->      const char *bm_name = bdrv_dirty_bitmap_name(bitmap);
->      uint8_t *buf = NULL;
->      BdrvDirtyBitmapIter *dbi;
-> @@ -1100,18 +1099,17 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
->      dbi = bdrv_dirty_iter_new(bitmap);
->      buf = g_malloc(s->cluster_size);
->      limit = bytes_covered_by_bitmap_cluster(s, bitmap);
-> -    sbc = limit >> BDRV_SECTOR_BITS;
->      assert(DIV_ROUND_UP(bm_size, limit) == tb_size);
-> 
-> -    while ((sector = bdrv_dirty_iter_next(dbi) >> BDRV_SECTOR_BITS) != -1) {
-> -        uint64_t cluster = sector / sbc;
-> +    while ((offset = bdrv_dirty_iter_next(dbi)) != -1) {
+On Fri, Sep 08, 2017 at 03:53:57AM -0700, no-reply@patchew.org wrote:
+> /tmp/qemu-test/src/io/channel-websock.c: In function =E2=80=98qio_chann=
+el_websock_date_str=E2=80=99:
+> /tmp/qemu-test/src/io/channel-websock.c:171: error: =E2=80=98GTimeZone=E2=
+=80=99 undeclared (first use in this function)
+> /tmp/qemu-test/src/io/channel-websock.c:171: error: (Each undeclared id=
+entifier is reported only once
+> /tmp/qemu-test/src/io/channel-websock.c:171: error: for each function i=
+t appears in.)
+> /tmp/qemu-test/src/io/channel-websock.c:171: error: =E2=80=98utc=E2=80=99=
+ undeclared (first use in this function)
+> /tmp/qemu-test/src/io/channel-websock.c:171: warning: implicit declarat=
+ion of function =E2=80=98g_time_zone_new_utc=E2=80=99
+> /tmp/qemu-test/src/io/channel-websock.c:171: warning: nested extern dec=
+laration of =E2=80=98g_time_zone_new_utc=E2=80=99
+> /tmp/qemu-test/src/io/channel-websock.c:172: error: =E2=80=98GDateTime=E2=
+=80=99 undeclared (first use in this function)
+> /tmp/qemu-test/src/io/channel-websock.c:172: error: =E2=80=98now=E2=80=99=
+ undeclared (first use in this function)
+> /tmp/qemu-test/src/io/channel-websock.c:172: warning: implicit declarat=
+ion of function =E2=80=98g_date_time_new_now=E2=80=99
+> /tmp/qemu-test/src/io/channel-websock.c:172: warning: nested extern dec=
+laration of =E2=80=98g_date_time_new_now=E2=80=99
+> /tmp/qemu-test/src/io/channel-websock.c:173: warning: implicit declarat=
+ion of function =E2=80=98g_date_time_format=E2=80=99
+> /tmp/qemu-test/src/io/channel-websock.c:173: warning: nested extern dec=
+laration of =E2=80=98g_date_time_format=E2=80=99
+> /tmp/qemu-test/src/io/channel-websock.c:175: warning: implicit declarat=
+ion of function =E2=80=98g_date_time_unref=E2=80=99
+> /tmp/qemu-test/src/io/channel-websock.c:175: warning: nested extern dec=
+laration of =E2=80=98g_date_time_unref=E2=80=99
+> /tmp/qemu-test/src/io/channel-websock.c:176: warning: implicit declarat=
+ion of function =E2=80=98g_time_zone_unref=E2=80=99
+> /tmp/qemu-test/src/io/channel-websock.c:176: warning: nested extern dec=
+laration of =E2=80=98g_time_zone_unref=E2=80=99
 
-Don't you have to multiply both sides of the equation? This would be
-offset != -512, which points out that the previous patch to convert
-bdrv_dirty_iter_next() to byte-based gave it a really awkward interface.
+Urgh,  GTimeZone arrived in glib 2.26 and we hav 2.22 as the min :-(
 
-> +        uint64_t cluster = offset / limit;
->          uint64_t end, write_size;
->          int64_t off;
-> 
-> -        sector = cluster * sbc;
-> -        end = MIN(bm_sectors, sector + sbc);
-> -        write_size = bdrv_dirty_bitmap_serialization_size(bitmap,
-> -            sector * BDRV_SECTOR_SIZE, (end - sector) * BDRV_SECTOR_SIZE);
-> +        offset = cluster * limit;
+I'll have to switch to strftime....
 
-You just had cluster = offset / limit, so in other words, align down
-offset? If so, this is how it should be written.
-
-Kevin
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
