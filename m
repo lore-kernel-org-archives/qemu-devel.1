@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60812)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dq8g9-00039R-Ut
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 22:06:05 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dq8gD-0003Ci-GK
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 22:06:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jasowang@redhat.com>) id 1dq8g5-00026X-3h
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 22:05:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50354)
+	(envelope-from <jasowang@redhat.com>) id 1dq8g8-00029m-L4
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 22:06:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dq8g4-00026A-RP
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 22:05:53 -0400
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dq8g8-00027l-Cj
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 22:05:56 -0400
 From: Jason Wang <jasowang@redhat.com>
-Date: Fri,  8 Sep 2017 10:05:11 +0800
-Message-Id: <1504836324-4871-6-git-send-email-jasowang@redhat.com>
+Date: Fri,  8 Sep 2017 10:05:12 +0800
+Message-Id: <1504836324-4871-7-git-send-email-jasowang@redhat.com>
 In-Reply-To: <1504836324-4871-1-git-send-email-jasowang@redhat.com>
 References: <1504836324-4871-1-git-send-email-jasowang@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/18] net/rocker: Fix the unusual macro name
+Subject: [Qemu-devel] [PULL 06/18] net: rtl8139: do not use old_mmio accesses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,98 +24,97 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org
-Cc: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, jasowang@redhat.com, jiri@resnulli.us, armbru@redhat.com, f4bug@amsat.org
+Cc: Matt Parker <mtparkr@gmail.com>, Jason Wang <jasowang@redhat.com>
 
-From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+From: Matt Parker <mtparkr@gmail.com>
 
-Cc: jasowang@redhat.com
-Cc: jiri@resnulli.us
-Cc: armbru@redhat.com
-Cc: f4bug@amsat.org
-Suggested-by: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Both io and memory use the same mmio functions in the rtl8139 device.
+This patch removes the separate MemoryRegionOps and old_mmio accessors
+for memory, and replaces it with an alias to the io memory region.
+
+Signed-off-by: Matt Parker <mtparkr@gmail.com>
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/net/rocker/rocker.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ hw/net/rtl8139.c | 53 +++--------------------------------------------------
+ 1 file changed, 3 insertions(+), 50 deletions(-)
 
-diff --git a/hw/net/rocker/rocker.c b/hw/net/rocker/rocker.c
-index bb38cba..9273473 100644
---- a/hw/net/rocker/rocker.c
-+++ b/hw/net/rocker/rocker.c
-@@ -69,10 +69,10 @@ struct rocker {
-     QLIST_ENTRY(rocker) next;
- };
-=20
--#define ROCKER "rocker"
-+#define TYPE_ROCKER "rocker"
-=20
--#define to_rocker(obj) \
--    OBJECT_CHECK(Rocker, (obj), ROCKER)
-+#define ROCKER(obj) \
-+    OBJECT_CHECK(Rocker, (obj), TYPE_ROCKER)
-=20
- static QLIST_HEAD(, rocker) rockers;
-=20
-@@ -1285,7 +1285,7 @@ static World *rocker_world_type_by_name(Rocker *r, =
-const char *name)
-=20
- static void pci_rocker_realize(PCIDevice *dev, Error **errp)
+diff --git a/hw/net/rtl8139.c b/hw/net/rtl8139.c
+index 671c7e4..3be24bb 100644
+--- a/hw/net/rtl8139.c
++++ b/hw/net/rtl8139.c
+@@ -3132,38 +3132,6 @@ static uint32_t rtl8139_io_readl(void *opaque, uint8_t addr)
+ 
+ /* */
+ 
+-static void rtl8139_mmio_writeb(void *opaque, hwaddr addr, uint32_t val)
+-{
+-    rtl8139_io_writeb(opaque, addr & 0xFF, val);
+-}
+-
+-static void rtl8139_mmio_writew(void *opaque, hwaddr addr, uint32_t val)
+-{
+-    rtl8139_io_writew(opaque, addr & 0xFF, val);
+-}
+-
+-static void rtl8139_mmio_writel(void *opaque, hwaddr addr, uint32_t val)
+-{
+-    rtl8139_io_writel(opaque, addr & 0xFF, val);
+-}
+-
+-static uint32_t rtl8139_mmio_readb(void *opaque, hwaddr addr)
+-{
+-    return rtl8139_io_readb(opaque, addr & 0xFF);
+-}
+-
+-static uint32_t rtl8139_mmio_readw(void *opaque, hwaddr addr)
+-{
+-    uint32_t val = rtl8139_io_readw(opaque, addr & 0xFF);
+-    return val;
+-}
+-
+-static uint32_t rtl8139_mmio_readl(void *opaque, hwaddr addr)
+-{
+-    uint32_t val = rtl8139_io_readl(opaque, addr & 0xFF);
+-    return val;
+-}
+-
+ static int rtl8139_post_load(void *opaque, int version_id)
  {
--    Rocker *r =3D to_rocker(dev);
-+    Rocker *r =3D ROCKER(dev);
-     const MACAddr zero =3D { .a =3D { 0, 0, 0, 0, 0, 0 } };
-     const MACAddr dflt =3D { .a =3D { 0x52, 0x54, 0x00, 0x12, 0x35, 0x01=
- } };
-     static int sw_index;
-@@ -1331,7 +1331,7 @@ static void pci_rocker_realize(PCIDevice *dev, Erro=
-r **errp)
-     /* validate switch properties */
-=20
-     if (!r->name) {
--        r->name =3D g_strdup(ROCKER);
-+        r->name =3D g_strdup(TYPE_ROCKER);
-     }
-=20
-     if (rocker_find(r->name)) {
-@@ -1427,7 +1427,7 @@ err_world_type_by_name:
-=20
- static void pci_rocker_uninit(PCIDevice *dev)
- {
--    Rocker *r =3D to_rocker(dev);
-+    Rocker *r =3D ROCKER(dev);
-     int i;
-=20
-     QLIST_REMOVE(r, next);
-@@ -1460,7 +1460,7 @@ static void pci_rocker_uninit(PCIDevice *dev)
-=20
- static void rocker_reset(DeviceState *dev)
- {
--    Rocker *r =3D to_rocker(dev);
-+    Rocker *r =3D ROCKER(dev);
-     int i;
-=20
-     for (i =3D 0; i < ROCKER_WORLD_TYPE_MAX; i++) {
-@@ -1498,7 +1498,7 @@ static Property rocker_properties[] =3D {
+     RTL8139State* s = opaque;
+@@ -3344,22 +3312,6 @@ static const MemoryRegionOps rtl8139_io_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
  };
-=20
- static const VMStateDescription rocker_vmsd =3D {
--    .name =3D ROCKER,
-+    .name =3D TYPE_ROCKER,
-     .unmigratable =3D 1,
- };
-=20
-@@ -1521,7 +1521,7 @@ static void rocker_class_init(ObjectClass *klass, v=
-oid *data)
- }
-=20
- static const TypeInfo rocker_info =3D {
--    .name          =3D ROCKER,
-+    .name          =3D TYPE_ROCKER,
-     .parent        =3D TYPE_PCI_DEVICE,
-     .instance_size =3D sizeof(Rocker),
-     .class_init    =3D rocker_class_init,
---=20
+ 
+-static const MemoryRegionOps rtl8139_mmio_ops = {
+-    .old_mmio = {
+-        .read = {
+-            rtl8139_mmio_readb,
+-            rtl8139_mmio_readw,
+-            rtl8139_mmio_readl,
+-        },
+-        .write = {
+-            rtl8139_mmio_writeb,
+-            rtl8139_mmio_writew,
+-            rtl8139_mmio_writel,
+-        },
+-    },
+-    .endianness = DEVICE_LITTLE_ENDIAN,
+-};
+-
+ static void rtl8139_timer(void *opaque)
+ {
+     RTL8139State *s = opaque;
+@@ -3422,8 +3374,9 @@ static void pci_rtl8139_realize(PCIDevice *dev, Error **errp)
+ 
+     memory_region_init_io(&s->bar_io, OBJECT(s), &rtl8139_io_ops, s,
+                           "rtl8139", 0x100);
+-    memory_region_init_io(&s->bar_mem, OBJECT(s), &rtl8139_mmio_ops, s,
+-                          "rtl8139", 0x100);
++    memory_region_init_alias(&s->bar_mem, OBJECT(s), "rtl8139-mem", &s->bar_io,
++                             0, 0x100);
++
+     pci_register_bar(dev, 0, PCI_BASE_ADDRESS_SPACE_IO, &s->bar_io);
+     pci_register_bar(dev, 1, PCI_BASE_ADDRESS_SPACE_MEMORY, &s->bar_mem);
+ 
+-- 
 2.7.4
