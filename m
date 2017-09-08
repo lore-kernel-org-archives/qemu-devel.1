@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58892)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58960)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqGeE-0002GX-L9
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:42 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGeH-0002JU-Bb
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqGe5-0003LW-WD
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dqGe7-0003OI-Mp
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 06:36:33 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri,  8 Sep 2017 20:35:40 +1000
-Message-Id: <20170908103558.31632-23-david@gibson.dropbear.id.au>
+Date: Fri,  8 Sep 2017 20:35:49 +1000
+Message-Id: <20170908103558.31632-32-david@gibson.dropbear.id.au>
 In-Reply-To: <20170908103558.31632-1-david@gibson.dropbear.id.au>
 References: <20170908103558.31632-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 22/40] ppc4xx: Move MAL from ppc405_uc to
- ppc4xx_devs
+Subject: [Qemu-devel] [PULL 31/40] PPC: KVM: Support machine option to set
+ VSMT mode
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,586 +21,287 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sam.bobroff@au1.ibm.com, imammedo@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, BALATON Zoltan <balaton@eik.bme.hu>, David Gibson <david@gibson.dropbear.id.au>
+Cc: agraf@suse.de, mdroth@linux.vnet.ibm.com, aik@ozlabs.ru, sam.bobroff@au1.ibm.com, imammedo@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
+From: Sam Bobroff <sam.bobroff@au1.ibm.com>
 
-This device appears in other SoCs as well not just in 405 ones
+KVM now allows writing to KVM_CAP_PPC_SMT which has previously been
+read only. Doing so causes KVM to act, for that VM, as if the host's
+SMT mode was the given value. This is particularly important on Power
+9 systems because their default value is 1, but they are able to
+support values up to 8.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+This patch introduces a way to control this capability via a new
+machine property called VSMT ("Virtual SMT"). If the value is not set
+on the command line a default is chosen that is, when possible,
+compatible with legacy systems.
+
+Note that the intialization of KVM_CAP_PPC_SMT has changed slightly
+because it has changed (in KVM) from a global capability to a
+VM-specific one. This won't cause a problem on older KVMs because VM
+capabilities fall back to global ones.
+
+Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/ppc405_uc.c      | 263 -----------------------------------------------
- hw/ppc/ppc4xx_devs.c    | 264 ++++++++++++++++++++++++++++++++++++++++++++++++
- include/hw/ppc/ppc4xx.h |   2 +
- 3 files changed, 266 insertions(+), 263 deletions(-)
+ hw/ppc/spapr.c              | 75 +++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr.h      |  1 +
+ target/ppc/kvm.c            | 39 ++++++++++++++++++++++-
+ target/ppc/kvm_ppc.h        | 12 ++++++++
+ target/ppc/translate_init.c | 14 ---------
+ 5 files changed, 126 insertions(+), 15 deletions(-)
 
-diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
-index f6fe3e6f5e..3c744021d6 100644
---- a/hw/ppc/ppc405_uc.c
-+++ b/hw/ppc/ppc405_uc.c
-@@ -42,7 +42,6 @@
- //#define DEBUG_OCM
- //#define DEBUG_I2C
- //#define DEBUG_GPT
--//#define DEBUG_MAL
- //#define DEBUG_CLOCKS
- //#define DEBUG_CLOCKS_LL
- 
-@@ -1513,268 +1512,6 @@ static void ppc4xx_gpt_init(hwaddr base, qemu_irq irqs[5])
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 067f571416..caffa12763 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -26,6 +26,7 @@
+  */
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
++#include "qapi/visitor.h"
+ #include "sysemu/sysemu.h"
+ #include "sysemu/numa.h"
+ #include "hw/hw.h"
+@@ -2165,6 +2166,61 @@ static void spapr_init_cpus(sPAPRMachineState *spapr)
+     g_free(type);
  }
  
- /*****************************************************************************/
--/* MAL */
--enum {
--    MAL0_CFG      = 0x180,
--    MAL0_ESR      = 0x181,
--    MAL0_IER      = 0x182,
--    MAL0_TXCASR   = 0x184,
--    MAL0_TXCARR   = 0x185,
--    MAL0_TXEOBISR = 0x186,
--    MAL0_TXDEIR   = 0x187,
--    MAL0_RXCASR   = 0x190,
--    MAL0_RXCARR   = 0x191,
--    MAL0_RXEOBISR = 0x192,
--    MAL0_RXDEIR   = 0x193,
--    MAL0_TXCTP0R  = 0x1A0,
--    MAL0_TXCTP1R  = 0x1A1,
--    MAL0_TXCTP2R  = 0x1A2,
--    MAL0_TXCTP3R  = 0x1A3,
--    MAL0_RXCTP0R  = 0x1C0,
--    MAL0_RXCTP1R  = 0x1C1,
--    MAL0_RCBS0    = 0x1E0,
--    MAL0_RCBS1    = 0x1E1,
--};
--
--typedef struct ppc40x_mal_t ppc40x_mal_t;
--struct ppc40x_mal_t {
--    qemu_irq irqs[4];
--    uint32_t cfg;
--    uint32_t esr;
--    uint32_t ier;
--    uint32_t txcasr;
--    uint32_t txcarr;
--    uint32_t txeobisr;
--    uint32_t txdeir;
--    uint32_t rxcasr;
--    uint32_t rxcarr;
--    uint32_t rxeobisr;
--    uint32_t rxdeir;
--    uint32_t txctpr[4];
--    uint32_t rxctpr[2];
--    uint32_t rcbs[2];
--};
--
--static void ppc40x_mal_reset (void *opaque);
--
--static uint32_t dcr_read_mal (void *opaque, int dcrn)
--{
--    ppc40x_mal_t *mal;
--    uint32_t ret;
--
--    mal = opaque;
--    switch (dcrn) {
--    case MAL0_CFG:
--        ret = mal->cfg;
--        break;
--    case MAL0_ESR:
--        ret = mal->esr;
--        break;
--    case MAL0_IER:
--        ret = mal->ier;
--        break;
--    case MAL0_TXCASR:
--        ret = mal->txcasr;
--        break;
--    case MAL0_TXCARR:
--        ret = mal->txcarr;
--        break;
--    case MAL0_TXEOBISR:
--        ret = mal->txeobisr;
--        break;
--    case MAL0_TXDEIR:
--        ret = mal->txdeir;
--        break;
--    case MAL0_RXCASR:
--        ret = mal->rxcasr;
--        break;
--    case MAL0_RXCARR:
--        ret = mal->rxcarr;
--        break;
--    case MAL0_RXEOBISR:
--        ret = mal->rxeobisr;
--        break;
--    case MAL0_RXDEIR:
--        ret = mal->rxdeir;
--        break;
--    case MAL0_TXCTP0R:
--        ret = mal->txctpr[0];
--        break;
--    case MAL0_TXCTP1R:
--        ret = mal->txctpr[1];
--        break;
--    case MAL0_TXCTP2R:
--        ret = mal->txctpr[2];
--        break;
--    case MAL0_TXCTP3R:
--        ret = mal->txctpr[3];
--        break;
--    case MAL0_RXCTP0R:
--        ret = mal->rxctpr[0];
--        break;
--    case MAL0_RXCTP1R:
--        ret = mal->rxctpr[1];
--        break;
--    case MAL0_RCBS0:
--        ret = mal->rcbs[0];
--        break;
--    case MAL0_RCBS1:
--        ret = mal->rcbs[1];
--        break;
--    default:
--        ret = 0;
--        break;
--    }
--
--    return ret;
--}
--
--static void dcr_write_mal (void *opaque, int dcrn, uint32_t val)
--{
--    ppc40x_mal_t *mal;
--    int idx;
--
--    mal = opaque;
--    switch (dcrn) {
--    case MAL0_CFG:
--        if (val & 0x80000000)
--            ppc40x_mal_reset(mal);
--        mal->cfg = val & 0x00FFC087;
--        break;
--    case MAL0_ESR:
--        /* Read/clear */
--        mal->esr &= ~val;
--        break;
--    case MAL0_IER:
--        mal->ier = val & 0x0000001F;
--        break;
--    case MAL0_TXCASR:
--        mal->txcasr = val & 0xF0000000;
--        break;
--    case MAL0_TXCARR:
--        mal->txcarr = val & 0xF0000000;
--        break;
--    case MAL0_TXEOBISR:
--        /* Read/clear */
--        mal->txeobisr &= ~val;
--        break;
--    case MAL0_TXDEIR:
--        /* Read/clear */
--        mal->txdeir &= ~val;
--        break;
--    case MAL0_RXCASR:
--        mal->rxcasr = val & 0xC0000000;
--        break;
--    case MAL0_RXCARR:
--        mal->rxcarr = val & 0xC0000000;
--        break;
--    case MAL0_RXEOBISR:
--        /* Read/clear */
--        mal->rxeobisr &= ~val;
--        break;
--    case MAL0_RXDEIR:
--        /* Read/clear */
--        mal->rxdeir &= ~val;
--        break;
--    case MAL0_TXCTP0R:
--        idx = 0;
--        goto update_tx_ptr;
--    case MAL0_TXCTP1R:
--        idx = 1;
--        goto update_tx_ptr;
--    case MAL0_TXCTP2R:
--        idx = 2;
--        goto update_tx_ptr;
--    case MAL0_TXCTP3R:
--        idx = 3;
--    update_tx_ptr:
--        mal->txctpr[idx] = val;
--        break;
--    case MAL0_RXCTP0R:
--        idx = 0;
--        goto update_rx_ptr;
--    case MAL0_RXCTP1R:
--        idx = 1;
--    update_rx_ptr:
--        mal->rxctpr[idx] = val;
--        break;
--    case MAL0_RCBS0:
--        idx = 0;
--        goto update_rx_size;
--    case MAL0_RCBS1:
--        idx = 1;
--    update_rx_size:
--        mal->rcbs[idx] = val & 0x000000FF;
--        break;
--    }
--}
--
--static void ppc40x_mal_reset (void *opaque)
--{
--    ppc40x_mal_t *mal;
--
--    mal = opaque;
--    mal->cfg = 0x0007C000;
--    mal->esr = 0x00000000;
--    mal->ier = 0x00000000;
--    mal->rxcasr = 0x00000000;
--    mal->rxdeir = 0x00000000;
--    mal->rxeobisr = 0x00000000;
--    mal->txcasr = 0x00000000;
--    mal->txdeir = 0x00000000;
--    mal->txeobisr = 0x00000000;
--}
--
--static void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4])
--{
--    ppc40x_mal_t *mal;
--    int i;
--
--    mal = g_malloc0(sizeof(ppc40x_mal_t));
--    for (i = 0; i < 4; i++)
--        mal->irqs[i] = irqs[i];
--    qemu_register_reset(&ppc40x_mal_reset, mal);
--    ppc_dcr_register(env, MAL0_CFG,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_ESR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_IER,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXCASR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXCARR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXEOBISR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXDEIR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RXCASR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RXCARR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RXEOBISR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RXDEIR,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXCTP0R,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXCTP1R,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXCTP2R,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_TXCTP3R,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RXCTP0R,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RXCTP1R,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RCBS0,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--    ppc_dcr_register(env, MAL0_RCBS1,
--                     mal, &dcr_read_mal, &dcr_write_mal);
--}
--
--/*****************************************************************************/
- /* SPR */
- void ppc40x_core_reset(PowerPCCPU *cpu)
- {
-diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
-index 6b38ed7bc7..b296ea66c2 100644
---- a/hw/ppc/ppc4xx_devs.c
-+++ b/hw/ppc/ppc4xx_devs.c
-@@ -734,3 +734,267 @@ ram_addr_t ppc4xx_sdram_adjust(ram_addr_t ram_size, int nr_banks,
- 
-     return ram_size;
- }
-+
-+/*****************************************************************************/
-+/* MAL */
-+enum {
-+    MAL0_CFG      = 0x180,
-+    MAL0_ESR      = 0x181,
-+    MAL0_IER      = 0x182,
-+    MAL0_TXCASR   = 0x184,
-+    MAL0_TXCARR   = 0x185,
-+    MAL0_TXEOBISR = 0x186,
-+    MAL0_TXDEIR   = 0x187,
-+    MAL0_RXCASR   = 0x190,
-+    MAL0_RXCARR   = 0x191,
-+    MAL0_RXEOBISR = 0x192,
-+    MAL0_RXDEIR   = 0x193,
-+    MAL0_TXCTP0R  = 0x1A0,
-+    MAL0_TXCTP1R  = 0x1A1,
-+    MAL0_TXCTP2R  = 0x1A2,
-+    MAL0_TXCTP3R  = 0x1A3,
-+    MAL0_RXCTP0R  = 0x1C0,
-+    MAL0_RXCTP1R  = 0x1C1,
-+    MAL0_RCBS0    = 0x1E0,
-+    MAL0_RCBS1    = 0x1E1,
-+};
-+
-+typedef struct ppc40x_mal_t ppc40x_mal_t;
-+struct ppc40x_mal_t {
-+    qemu_irq irqs[4];
-+    uint32_t cfg;
-+    uint32_t esr;
-+    uint32_t ier;
-+    uint32_t txcasr;
-+    uint32_t txcarr;
-+    uint32_t txeobisr;
-+    uint32_t txdeir;
-+    uint32_t rxcasr;
-+    uint32_t rxcarr;
-+    uint32_t rxeobisr;
-+    uint32_t rxdeir;
-+    uint32_t txctpr[4];
-+    uint32_t rxctpr[2];
-+    uint32_t rcbs[2];
-+};
-+
-+static void ppc40x_mal_reset(void *opaque);
-+
-+static uint32_t dcr_read_mal(void *opaque, int dcrn)
++static void spapr_set_vsmt_mode(sPAPRMachineState *spapr, Error **errp)
 +{
-+    ppc40x_mal_t *mal;
-+    uint32_t ret;
++    Error *local_err = NULL;
++    bool vsmt_user = !!spapr->vsmt;
++    int kvm_smt = kvmppc_smt_threads();
++    int ret;
 +
-+    mal = opaque;
-+    switch (dcrn) {
-+    case MAL0_CFG:
-+        ret = mal->cfg;
-+        break;
-+    case MAL0_ESR:
-+        ret = mal->esr;
-+        break;
-+    case MAL0_IER:
-+        ret = mal->ier;
-+        break;
-+    case MAL0_TXCASR:
-+        ret = mal->txcasr;
-+        break;
-+    case MAL0_TXCARR:
-+        ret = mal->txcarr;
-+        break;
-+    case MAL0_TXEOBISR:
-+        ret = mal->txeobisr;
-+        break;
-+    case MAL0_TXDEIR:
-+        ret = mal->txdeir;
-+        break;
-+    case MAL0_RXCASR:
-+        ret = mal->rxcasr;
-+        break;
-+    case MAL0_RXCARR:
-+        ret = mal->rxcarr;
-+        break;
-+    case MAL0_RXEOBISR:
-+        ret = mal->rxeobisr;
-+        break;
-+    case MAL0_RXDEIR:
-+        ret = mal->rxdeir;
-+        break;
-+    case MAL0_TXCTP0R:
-+        ret = mal->txctpr[0];
-+        break;
-+    case MAL0_TXCTP1R:
-+        ret = mal->txctpr[1];
-+        break;
-+    case MAL0_TXCTP2R:
-+        ret = mal->txctpr[2];
-+        break;
-+    case MAL0_TXCTP3R:
-+        ret = mal->txctpr[3];
-+        break;
-+    case MAL0_RXCTP0R:
-+        ret = mal->rxctpr[0];
-+        break;
-+    case MAL0_RXCTP1R:
-+        ret = mal->rxctpr[1];
-+        break;
-+    case MAL0_RCBS0:
-+        ret = mal->rcbs[0];
-+        break;
-+    case MAL0_RCBS1:
-+        ret = mal->rcbs[1];
-+        break;
-+    default:
-+        ret = 0;
-+        break;
++    if (!kvm_enabled() && (smp_threads > 1)) {
++        error_setg(&local_err, "TCG cannot support more than 1 thread/core "
++                     "on a pseries machine");
++        goto out;
++    }
++    if (!is_power_of_2(smp_threads)) {
++        error_setg(&local_err, "Cannot support %d threads/core on a pseries "
++                     "machine because it must be a power of 2", smp_threads);
++        goto out;
 +    }
 +
++    /* Detemine the VSMT mode to use: */
++    if (vsmt_user) {
++        if (spapr->vsmt < smp_threads) {
++            error_setg(&local_err, "Cannot support VSMT mode %d"
++                         " because it must be >= threads/core (%d)",
++                         spapr->vsmt, smp_threads);
++            goto out;
++        }
++        /* In this case, spapr->vsmt has been set by the command line */
++    } else {
++        /* Choose a VSMT mode that may be higher than necessary but is
++         * likely to be compatible with hosts that don't have VSMT. */
++        spapr->vsmt = MAX(kvm_smt, smp_threads);
++    }
++
++    /* KVM: If necessary, set the SMT mode: */
++    if (kvm_enabled() && (spapr->vsmt != kvm_smt)) {
++        ret = kvmppc_set_smt_threads(spapr->vsmt);
++        if (ret) {
++            error_setg(&local_err,
++                       "Failed to set KVM's VSMT mode to %d (errno %d)",
++                       spapr->vsmt, ret);
++            if (!vsmt_user) {
++                error_append_hint(&local_err, "On PPC, a VM with %d threads/"
++                             "core on a host with %d threads/core requires "
++                             " the use of VSMT mode %d.\n",
++                             smp_threads, kvm_smt, spapr->vsmt);
++            }
++            kvmppc_hint_smt_possible(&local_err);
++            goto out;
++        }
++    }
++    /* else TCG: nothing to do currently */
++out:
++    error_propagate(errp, local_err);
++}
++
+ /* pSeries LPAR / sPAPR hardware init */
+ static void ppc_spapr_init(MachineState *machine)
+ {
+@@ -2297,6 +2353,8 @@ static void ppc_spapr_init(MachineState *machine)
+ 
+     spapr_cpu_parse_features(spapr);
+ 
++    spapr_set_vsmt_mode(spapr, &error_fatal);
++
+     spapr_init_cpus(spapr);
+ 
+     if (kvm_enabled()) {
+@@ -2681,6 +2739,18 @@ static void spapr_set_resize_hpt(Object *obj, const char *value, Error **errp)
+     }
+ }
+ 
++static void spapr_get_vsmt(Object *obj, Visitor *v, const char *name,
++                                   void *opaque, Error **errp)
++{
++    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
++}
++
++static void spapr_set_vsmt(Object *obj, Visitor *v, const char *name,
++                                   void *opaque, Error **errp)
++{
++    visit_type_uint32(v, name, (uint32_t *)opaque, errp);
++}
++
+ static void spapr_machine_initfn(Object *obj)
+ {
+     sPAPRMachineState *spapr = SPAPR_MACHINE(obj);
+@@ -2711,6 +2781,11 @@ static void spapr_machine_initfn(Object *obj)
+     object_property_set_description(obj, "resize-hpt",
+                                     "Resizing of the Hash Page Table (enabled, disabled, required)",
+                                     NULL);
++    object_property_add(obj, "vsmt", "uint32", spapr_get_vsmt,
++                        spapr_set_vsmt, NULL, &spapr->vsmt, &error_abort);
++    object_property_set_description(obj, "vsmt",
++                                    "Virtual SMT: KVM behaves as if this were"
++                                    " the host's SMT mode", &error_abort);
+ }
+ 
+ static void spapr_machine_finalizefn(Object *obj)
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 91617e3277..c1b365f564 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -99,6 +99,7 @@ struct sPAPRMachineState {
+     uint64_t rtc_offset; /* Now used only during incoming migration */
+     struct PPCTimebase tb;
+     bool has_graphics;
++    uint32_t vsmt;       /* Virtual SMT mode (KVM's "core stride") */
+ 
+     Notifier epow_notifier;
+     QTAILQ_HEAD(, sPAPREventLogEntry) pending_events;
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index f1d54106ac..b6bd0fa7a6 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -74,6 +74,7 @@ static int cap_interrupt_level = false;
+ static int cap_segstate;
+ static int cap_booke_sregs;
+ static int cap_ppc_smt;
++static int cap_ppc_smt_possible;
+ static int cap_ppc_rma;
+ static int cap_spapr_tce;
+ static int cap_spapr_tce_64;
+@@ -130,7 +131,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     cap_interrupt_level = kvm_check_extension(s, KVM_CAP_PPC_IRQ_LEVEL);
+     cap_segstate = kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
+     cap_booke_sregs = kvm_check_extension(s, KVM_CAP_PPC_BOOKE_SREGS);
+-    cap_ppc_smt = kvm_check_extension(s, KVM_CAP_PPC_SMT);
++    cap_ppc_smt_possible = kvm_check_extension(s, KVM_CAP_PPC_SMT_POSSIBLE);
+     cap_ppc_rma = kvm_check_extension(s, KVM_CAP_PPC_RMA);
+     cap_spapr_tce = kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
+     cap_spapr_tce_64 = kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
+@@ -144,6 +145,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+      * only activated after this by kvmppc_set_papr() */
+     cap_htab_fd = kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
+     cap_fixup_hcalls = kvm_check_extension(s, KVM_CAP_PPC_FIXUP_HCALL);
++    cap_ppc_smt = kvm_vm_check_extension(s, KVM_CAP_PPC_SMT);
+     cap_htm = kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
+     cap_mmu_radix = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_RADIX);
+     cap_mmu_hash_v3 = kvm_vm_check_extension(s, KVM_CAP_PPC_MMU_HASH_V3);
+@@ -2134,6 +2136,41 @@ int kvmppc_smt_threads(void)
+     return cap_ppc_smt ? cap_ppc_smt : 1;
+ }
+ 
++int kvmppc_set_smt_threads(int smt)
++{
++    int ret;
++
++    ret = kvm_vm_enable_cap(kvm_state, KVM_CAP_PPC_SMT, 0, smt, 0);
++    if (!ret) {
++        cap_ppc_smt = smt;
++    }
 +    return ret;
 +}
 +
-+static void dcr_write_mal(void *opaque, int dcrn, uint32_t val)
++void kvmppc_hint_smt_possible(Error **errp)
 +{
-+    ppc40x_mal_t *mal;
-+    int idx;
-+
-+    mal = opaque;
-+    switch (dcrn) {
-+    case MAL0_CFG:
-+        if (val & 0x80000000) {
-+            ppc40x_mal_reset(mal);
-+        }
-+        mal->cfg = val & 0x00FFC087;
-+        break;
-+    case MAL0_ESR:
-+        /* Read/clear */
-+        mal->esr &= ~val;
-+        break;
-+    case MAL0_IER:
-+        mal->ier = val & 0x0000001F;
-+        break;
-+    case MAL0_TXCASR:
-+        mal->txcasr = val & 0xF0000000;
-+        break;
-+    case MAL0_TXCARR:
-+        mal->txcarr = val & 0xF0000000;
-+        break;
-+    case MAL0_TXEOBISR:
-+        /* Read/clear */
-+        mal->txeobisr &= ~val;
-+        break;
-+    case MAL0_TXDEIR:
-+        /* Read/clear */
-+        mal->txdeir &= ~val;
-+        break;
-+    case MAL0_RXCASR:
-+        mal->rxcasr = val & 0xC0000000;
-+        break;
-+    case MAL0_RXCARR:
-+        mal->rxcarr = val & 0xC0000000;
-+        break;
-+    case MAL0_RXEOBISR:
-+        /* Read/clear */
-+        mal->rxeobisr &= ~val;
-+        break;
-+    case MAL0_RXDEIR:
-+        /* Read/clear */
-+        mal->rxdeir &= ~val;
-+        break;
-+    case MAL0_TXCTP0R:
-+        idx = 0;
-+        goto update_tx_ptr;
-+    case MAL0_TXCTP1R:
-+        idx = 1;
-+        goto update_tx_ptr;
-+    case MAL0_TXCTP2R:
-+        idx = 2;
-+        goto update_tx_ptr;
-+    case MAL0_TXCTP3R:
-+        idx = 3;
-+    update_tx_ptr:
-+        mal->txctpr[idx] = val;
-+        break;
-+    case MAL0_RXCTP0R:
-+        idx = 0;
-+        goto update_rx_ptr;
-+    case MAL0_RXCTP1R:
-+        idx = 1;
-+    update_rx_ptr:
-+        mal->rxctpr[idx] = val;
-+        break;
-+    case MAL0_RCBS0:
-+        idx = 0;
-+        goto update_rx_size;
-+    case MAL0_RCBS1:
-+        idx = 1;
-+    update_rx_size:
-+        mal->rcbs[idx] = val & 0x000000FF;
-+        break;
-+    }
-+}
-+
-+static void ppc40x_mal_reset(void *opaque)
-+{
-+    ppc40x_mal_t *mal;
-+
-+    mal = opaque;
-+    mal->cfg = 0x0007C000;
-+    mal->esr = 0x00000000;
-+    mal->ier = 0x00000000;
-+    mal->rxcasr = 0x00000000;
-+    mal->rxdeir = 0x00000000;
-+    mal->rxeobisr = 0x00000000;
-+    mal->txcasr = 0x00000000;
-+    mal->txdeir = 0x00000000;
-+    mal->txeobisr = 0x00000000;
-+}
-+
-+void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4])
-+{
-+    ppc40x_mal_t *mal;
 +    int i;
++    GString *g;
++    char *s;
 +
-+    mal = g_malloc0(sizeof(ppc40x_mal_t));
-+    for (i = 0; i < 4; i++) {
-+        mal->irqs[i] = irqs[i];
++    assert(kvm_enabled());
++    if (cap_ppc_smt_possible) {
++        g = g_string_new("Available VSMT modes:");
++        for (i = 63; i >= 0; i--) {
++            if ((1UL << i) & cap_ppc_smt_possible) {
++                g_string_append_printf(g, " %lu", (1UL << i));
++            }
++        }
++        s = g_string_free(g, false);
++        error_append_hint(errp, "%s.\n", s);
++        g_free(s);
++    } else {
++        error_append_hint(errp,
++                          "This KVM seems to be too old to support VSMT.\n");
 +    }
-+    qemu_register_reset(&ppc40x_mal_reset, mal);
-+    ppc_dcr_register(env, MAL0_CFG,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_ESR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_IER,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXCASR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXCARR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXEOBISR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXDEIR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RXCASR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RXCARR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RXEOBISR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RXDEIR,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXCTP0R,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXCTP1R,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXCTP2R,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_TXCTP3R,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RXCTP0R,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RXCTP1R,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RCBS0,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
-+    ppc_dcr_register(env, MAL0_RCBS1,
-+                     mal, &dcr_read_mal, &dcr_write_mal);
 +}
-diff --git a/include/hw/ppc/ppc4xx.h b/include/hw/ppc/ppc4xx.h
-index 66e57a5194..db50cfac02 100644
---- a/include/hw/ppc/ppc4xx.h
-+++ b/include/hw/ppc/ppc4xx.h
-@@ -53,6 +53,8 @@ void ppc4xx_sdram_init (CPUPPCState *env, qemu_irq irq, int nbanks,
-                         hwaddr *ram_sizes,
-                         int do_init);
- 
-+void ppc405_mal_init(CPUPPCState *env, qemu_irq irqs[4]);
 +
- #define TYPE_PPC4xx_PCI_HOST_BRIDGE "ppc4xx-pcihost"
++
+ #ifdef TARGET_PPC64
+ off_t kvmppc_alloc_rma(void **rma)
+ {
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 381afe6240..e6711fc2b7 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -29,6 +29,8 @@ void kvmppc_set_papr(PowerPCCPU *cpu);
+ int kvmppc_set_compat(PowerPCCPU *cpu, uint32_t compat_pvr);
+ void kvmppc_set_mpic_proxy(PowerPCCPU *cpu, int mpic_proxy);
+ int kvmppc_smt_threads(void);
++void kvmppc_hint_smt_possible(Error **errp);
++int kvmppc_set_smt_threads(int smt);
+ int kvmppc_clear_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+ int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits);
+ int kvmppc_set_tcr(PowerPCCPU *cpu);
+@@ -148,6 +150,16 @@ static inline int kvmppc_smt_threads(void)
+     return 1;
+ }
  
- #endif /* PPC4XX_H */
++static inline void kvmppc_hint_smt_possible(Error **errp)
++{
++    return;
++}
++
++static inline int kvmppc_set_smt_threads(int smt)
++{
++    return 0;
++}
++
+ static inline int kvmppc_or_tsr_bits(PowerPCCPU *cpu, uint32_t tsr_bits)
+ {
+     return 0;
+diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
+index 08ef74f064..703ea12f2a 100644
+--- a/target/ppc/translate_init.c
++++ b/target/ppc/translate_init.c
+@@ -9907,20 +9907,6 @@ static void ppc_cpu_realizefn(DeviceState *dev, Error **errp)
+     int max_smt = kvmppc_smt_threads();
+ #endif
+ 
+-#if !defined(CONFIG_USER_ONLY)
+-    if (smp_threads > max_smt) {
+-        error_setg(errp, "Cannot support more than %d threads on PPC with %s",
+-                   max_smt, kvm_enabled() ? "KVM" : "TCG");
+-        return;
+-    }
+-    if (!is_power_of_2(smp_threads)) {
+-        error_setg(errp, "Cannot support %d threads on PPC with %s, "
+-                   "threads count must be a power of 2.",
+-                   smp_threads, kvm_enabled() ? "KVM" : "TCG");
+-        return;
+-    }
+-#endif
+-
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err != NULL) {
+         error_propagate(errp, local_err);
 -- 
 2.13.5
