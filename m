@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG15-0008FH-Rb
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:08 -0400
+	(envelope-from <famz@redhat.com>) id 1dqG17-0008Gv-II
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqG11-0004wB-89
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43716)
+	(envelope-from <famz@redhat.com>) id 1dqG13-0004xe-46
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52494)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG11-0004vd-1w
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:55:59 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqG12-0004x2-UJ
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 05:56:01 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri,  8 Sep 2017 17:54:53 +0800
-Message-Id: <20170908095506.13594-26-famz@redhat.com>
+Date: Fri,  8 Sep 2017 17:54:54 +0800
+Message-Id: <20170908095506.13594-27-famz@redhat.com>
 In-Reply-To: <20170908095506.13594-1-famz@redhat.com>
 References: <20170908095506.13594-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 25/38] docker: Drop 'set -e' from run script
+Subject: [Qemu-devel] [PULL 26/38] vl: Don't include vde header
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,50 +26,31 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170905025614.579-7-famz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Based-on: 20170905021201.25684-1-famz@redhat.com
----
- tests/docker/run | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+Nothing in vl.c uses anything from the vde package, do remove the
+unnecessary include.
 
-diff --git a/tests/docker/run b/tests/docker/run
-index 52b76e443d..c8f940de15 100755
---- a/tests/docker/run
-+++ b/tests/docker/run
-@@ -1,4 +1,4 @@
--#!/bin/bash -e
-+#!/bin/bash
- #
- # Docker test runner
- #
-@@ -11,8 +11,6 @@
- # or (at your option) any later version. See the COPYING file in
- # the top-level directory.
+Signed-off-by: Fam Zheng <famz@redhat.com>
+Message-Id: <20170907083552.17725-2-famz@redhat.com>
+Reviewed-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ vl.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/vl.c b/vl.c
+index fb1f05b937..7187e6c350 100644
+--- a/vl.c
++++ b/vl.c
+@@ -31,10 +31,6 @@
+ #include "sysemu/seccomp.h"
+ #endif
  
--set -e
+-#if defined(CONFIG_VDE)
+-#include <libvdeplug.h>
+-#endif
 -
- if test -n "$V"; then
-     set -x
- fi
-@@ -20,7 +18,7 @@ fi
- BASE="$(dirname $(readlink -e $0))"
- 
- # Prepare the environment
--. /etc/profile || true
-+. /etc/profile
- export PATH=/usr/lib/ccache:$PATH
- 
- if test -n "$J"; then
-@@ -32,7 +30,7 @@ export TEST_DIR=/tmp/qemu-test
- mkdir -p $TEST_DIR/{src,build,install}
- 
- # Extract the source tarballs
--tar -C $TEST_DIR/src -xf $BASE/qemu.tar
-+tar -C $TEST_DIR/src -xf $BASE/qemu.tar || prep_fail "Failed to untar source"
- 
- if test -n "$SHOW_ENV"; then
-     if test -f /packages.txt; then
+ #ifdef CONFIG_SDL
+ #if defined(__APPLE__) || defined(main)
+ #include <SDL.h>
 -- 
 2.13.5
