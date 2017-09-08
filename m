@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43128)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dqH7H-0003rc-Oo
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:06:37 -0400
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dqH7n-0004Kh-Fn
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:07:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1dqH7C-0002B8-En
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:06:31 -0400
-Received: from mga03.intel.com ([134.134.136.65]:27065)
+	(envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dqH7h-0002x2-1W
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:07:03 -0400
+Received: from research.iiit.ac.in ([196.12.53.8]:38190)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1dqH7C-00028B-2j
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:06:26 -0400
-Message-ID: <59B27A64.4040604@intel.com>
-Date: Fri, 08 Sep 2017 19:09:24 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(Exim 4.71) (envelope-from <chugh.ishani@research.iiit.ac.in>)
+	id 1dqH7g-0002kr-1o
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 07:06:56 -0400
+Date: Fri, 8 Sep 2017 16:36:39 +0530 (IST)
+From: Ishani <chugh.ishani@research.iiit.ac.in>
+Message-ID: <434582562.2130747.1504868799443.JavaMail.zimbra@research.iiit.ac.in>
+In-Reply-To: <db264166-9b9f-31ac-321e-8436d7ae0354@redhat.com>
+References: <1504113297-22052-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+	<1504113297-22052-2-git-send-email-chugh.ishani@research.iiit.ac.in>
+	<db264166-9b9f-31ac-321e-8436d7ae0354@redhat.com>
 MIME-Version: 1.0
-References: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
-	<1503914913-28893-4-git-send-email-wei.w.wang@intel.com>
-	<20170828204659-mutt-send-email-mst@kernel.org>
-	<59A4DADE.5050303@intel.com>
-	<20170908062748-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20170908062748-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [virtio-dev] Re: [PATCH v15 3/5] virtio-balloon:
- VIRTIO_BALLOON_F_SG
+Subject: Re: [Qemu-devel] [PATCH v3 1/3] backup: QEMU Backup Tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,202 +31,568 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: jsnow <jsnow@redhat.com>
+Cc: qemu-devel@nongnu.org, famz@redhat.com, stefanha <stefanha@redhat.com>
 
-On 09/08/2017 11:36 AM, Michael S. Tsirkin wrote:
-> On Tue, Aug 29, 2017 at 11:09:18AM +0800, Wei Wang wrote:
->> On 08/29/2017 02:03 AM, Michael S. Tsirkin wrote:
->>> On Mon, Aug 28, 2017 at 06:08:31PM +0800, Wei Wang wrote:
->>>> Add a new feature, VIRTIO_BALLOON_F_SG, which enables the transfer
->>>> of balloon (i.e. inflated/deflated) pages using scatter-gather lists
->>>> to the host.
->>>>
->>>> The implementation of the previous virtio-balloon is not very
->>>> efficient, because the balloon pages are transferred to the
->>>> host one by one. Here is the breakdown of the time in percentage
->>>> spent on each step of the balloon inflating process (inflating
->>>> 7GB of an 8GB idle guest).
->>>>
->>>> 1) allocating pages (6.5%)
->>>> 2) sending PFNs to host (68.3%)
->>>> 3) address translation (6.1%)
->>>> 4) madvise (19%)
->>>>
->>>> It takes about 4126ms for the inflating process to complete.
->>>> The above profiling shows that the bottlenecks are stage 2)
->>>> and stage 4).
->>>>
->>>> This patch optimizes step 2) by transferring pages to the host in
->>>> sgs. An sg describes a chunk of guest physically continuous pages.
->>>> With this mechanism, step 4) can also be optimized by doing address
->>>> translation and madvise() in chunks rather than page by page.
->>>>
->>>> With this new feature, the above ballooning process takes ~597ms
->>>> resulting in an improvement of ~86%.
->>>>
->>>> TODO: optimize stage 1) by allocating/freeing a chunk of pages
->>>> instead of a single page each time.
->>>>
->>>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->>>> Signed-off-by: Liang Li <liang.z.li@intel.com>
->>>> Suggested-by: Michael S. Tsirkin <mst@redhat.com>
->>>> ---
->>>>    drivers/virtio/virtio_balloon.c     | 171 ++++++++++++++++++++++++++++++++----
->>>>    include/uapi/linux/virtio_balloon.h |   1 +
->>>>    2 files changed, 155 insertions(+), 17 deletions(-)
->>>>
->>>> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
->>>> index f0b3a0b..8ecc1d4 100644
->>>> --- a/drivers/virtio/virtio_balloon.c
->>>> +++ b/drivers/virtio/virtio_balloon.c
->>>> @@ -32,6 +32,8 @@
->>>>    #include <linux/mm.h>
->>>>    #include <linux/mount.h>
->>>>    #include <linux/magic.h>
->>>> +#include <linux/xbitmap.h>
->>>> +#include <asm/page.h>
->>>>    /*
->>>>     * Balloon device works in 4K page units.  So each page is pointed to by
->>>> @@ -79,6 +81,9 @@ struct virtio_balloon {
->>>>    	/* Synchronize access/update to this struct virtio_balloon elements */
->>>>    	struct mutex balloon_lock;
->>>> +	/* The xbitmap used to record balloon pages */
->>>> +	struct xb page_xb;
->>>> +
->>>>    	/* The array of pfns we tell the Host about. */
->>>>    	unsigned int num_pfns;
->>>>    	__virtio32 pfns[VIRTIO_BALLOON_ARRAY_PFNS_MAX];
->>>> @@ -141,13 +146,111 @@ static void set_page_pfns(struct virtio_balloon *vb,
->>>>    					  page_to_balloon_pfn(page) + i);
->>>>    }
->>>> +static int add_one_sg(struct virtqueue *vq, void *addr, uint32_t size)
->>>> +{
->>>> +	struct scatterlist sg;
->>>> +
->>>> +	sg_init_one(&sg, addr, size);
->>>> +	return virtqueue_add_inbuf(vq, &sg, 1, vq, GFP_KERNEL);
->>>> +}
->>>> +
->>>> +static void send_balloon_page_sg(struct virtio_balloon *vb,
->>>> +				 struct virtqueue *vq,
->>>> +				 void *addr,
->>>> +				 uint32_t size,
->>>> +				 bool batch)
->>>> +{
->>>> +	unsigned int len;
->>>> +	int err;
->>>> +
->>>> +	err = add_one_sg(vq, addr, size);
->>>> +	/* Sanity check: this can't really happen */
->>>> +	WARN_ON(err);
->>> It might be cleaner to detect that add failed due to
->>> ring full and kick then. Just an idea, up to you
->>> whether to do it.
->>>
->>>> +
->>>> +	/* If batching is in use, we batch the sgs till the vq is full. */
->>>> +	if (!batch || !vq->num_free) {
->>>> +		virtqueue_kick(vq);
->>>> +		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
->>>> +		/* Release all the entries if there are */
->>> Meaning
->>> 	Account for all used entries if any
->>> ?
->>>
->>>> +		while (virtqueue_get_buf(vq, &len))
->>>> +			;
->>> Above code is reused below. Add a function?
->>>
->>>> +	}
->>>> +}
->>>> +
->>>> +/*
->>>> + * Send balloon pages in sgs to host. The balloon pages are recorded in the
->>>> + * page xbitmap. Each bit in the bitmap corresponds to a page of PAGE_SIZE.
->>>> + * The page xbitmap is searched for continuous "1" bits, which correspond
->>>> + * to continuous pages, to chunk into sgs.
->>>> + *
->>>> + * @page_xb_start and @page_xb_end form the range of bits in the xbitmap that
->>>> + * need to be searched.
->>>> + */
->>>> +static void tell_host_sgs(struct virtio_balloon *vb,
->>>> +			  struct virtqueue *vq,
->>>> +			  unsigned long page_xb_start,
->>>> +			  unsigned long page_xb_end)
->>>> +{
->>>> +	unsigned long sg_pfn_start, sg_pfn_end;
->>>> +	void *sg_addr;
->>>> +	uint32_t sg_len, sg_max_len = round_down(UINT_MAX, PAGE_SIZE);
->>>> +
->>>> +	sg_pfn_start = page_xb_start;
->>>> +	while (sg_pfn_start < page_xb_end) {
->>>> +		sg_pfn_start = xb_find_next_bit(&vb->page_xb, sg_pfn_start,
->>>> +						page_xb_end, 1);
->>>> +		if (sg_pfn_start == page_xb_end + 1)
->>>> +			break;
->>>> +		sg_pfn_end = xb_find_next_bit(&vb->page_xb, sg_pfn_start + 1,
->>>> +					      page_xb_end, 0);
->>>> +		sg_addr = (void *)pfn_to_kaddr(sg_pfn_start);
->>>> +		sg_len = (sg_pfn_end - sg_pfn_start) << PAGE_SHIFT;
->>>> +		while (sg_len > sg_max_len) {
->>>> +			send_balloon_page_sg(vb, vq, sg_addr, sg_max_len, 1);
->>> Last argument should be true, not 1.
->>>
->>>> +			sg_addr += sg_max_len;
->>>> +			sg_len -= sg_max_len;
->>>> +		}
->>>> +		send_balloon_page_sg(vb, vq, sg_addr, sg_len, 1);
->>>> +		xb_zero(&vb->page_xb, sg_pfn_start, sg_pfn_end);
->>>> +		sg_pfn_start = sg_pfn_end + 1;
->>>> +	}
->>>> +
->>>> +	/*
->>>> +	 * The last few sgs may not reach the batch size, but need a kick to
->>>> +	 * notify the device to handle them.
->>>> +	 */
->>>> +	if (vq->num_free != virtqueue_get_vring_size(vq)) {
->>>> +		virtqueue_kick(vq);
->>>> +		wait_event(vb->acked, virtqueue_get_buf(vq, &sg_len));
->>>> +		while (virtqueue_get_buf(vq, &sg_len))
->>>> +			;
->>> Some entries can get used after a pause. Looks like they will leak then?
->>> One fix would be to convert above if to a while loop.
->>> I don't know whether to do it like this in send_balloon_page_sg too.
->>>
->> Thanks for the above comments. I've re-written this part of code.
->> Please have a check below if there is anything more we could improve:
->>
->> static void kick_and_wait(struct virtqueue *vq, wait_queue_head_t wq_head)
->> {
->>          unsigned int len;
->>
->>          virtqueue_kick(vq);
->>          wait_event(wq_head, virtqueue_get_buf(vq, &len));
->>          /* Detach all the used buffers from the vq */
->>          while (virtqueue_get_buf(vq, &len))
->>                  ;
-> I would move this last part to before add_buf. Increases chances
-> it succeeds even in case of a bug.
 
->
->> }
->>
->> static int add_one_sg(struct virtqueue *vq, void *addr, uint32_t size)
->> {
->>          struct scatterlist sg;
->>          int ret;
->>
->>          sg_init_one(&sg, addr, size);
->>          ret = virtqueue_add_inbuf(vq, &sg, 1, vq, GFP_KERNEL);
->>          if (unlikely(ret == -ENOSPC))
->>                  dev_warn(&vq->vdev->dev, "%s: failed due to ring full\n",
->>                                   __func__);
-> So if this ever triggers then kick and wait might fail, right?
-> I think you should not special-case this one then.
 
-OK, I will remove the check above, and take other suggestions as well. 
-Thanks.
+----- On Sep 2, 2017, at 4:17 AM, jsnow jsnow@redhat.com wrote:
 
-Best,
-Wei
+> I suggest as your commit message here, something like:
+> 
+> "backup: Add QEMU backup tool"
+> 
+> A good commit message should say what applying the patch will do:
+> 
+> "What will happen if I apply this patch?"
+> "It will 'Add QEMU backup tool'"
+> 
+> On 08/30/2017 01:14 PM, Ishani Chugh wrote:
+>> qemu-backup will be a command-line tool for performing full and
+>> incremental disk backups on running VMs. It is intended as a
+>> reference implementation for management stack and backup developers
+>> to see QEMU's backup features in action. The tool writes details of
+>> guest in a configuration file and the data is retrieved from the file
+>> while creating a backup. The location of config file can be set as an
+>> environment variable QEMU_BACKUP_CONFIG. The usage is as follows:
+>> 
+>> Add a guest
+>> python qemu-backup.py guest add --guest <guest_name> --qmp <socket_path>
+>> 
+> 
+> This should probably be organized by subcommand, so:
+> 
+> guest add
+> guest remove
+> guest list
+> 
+> drive add
+> 
+> backup
+> 
+> restore
+> 
+Will fix in next revision.
+
+>> Add a drive for backup in a specified guest
+>> python qemu-backup.py drive add --guest <guest_name> --id <drive_id> [--target
+>> <target_file_path>]
+>> 
+>> Create backup of the added drives:
+>> python qemu-backup.py backup --guest <guest_name>
+>> 
+>> List all guest configs in configuration file:
+>> python qemu-backup.py guest list
+>> 
+>> Restore operation
+>> python qemu-backup.py restore --guest <guest-name>
+>> 
+>> Remove a guest
+>> python qemu-backup.py guest remove --guest <guest_name>
+>> 
+> 
+> Looks good, but the man page should perhaps be patch 01 instead of 03 so
+> that the usage can be reviewed outside of the commit message.
+
+I will reorder the patches in version 4 with:
+1) Manpage
+2) Full Backup
+3) Test for full backup
+
+>> Signed-off-by: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+>> ---
+>>  contrib/backup/qemu-backup.py | 343 ++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 343 insertions(+)
+>>  create mode 100644 contrib/backup/qemu-backup.py
+>> 
+>> diff --git a/contrib/backup/qemu-backup.py b/contrib/backup/qemu-backup.py
+>> new file mode 100644
+>> index 0000000..248ca9f
+>> --- /dev/null
+>> +++ b/contrib/backup/qemu-backup.py
+>> @@ -0,0 +1,343 @@
+>> +#!/usr/bin/python
+>> +# -*- coding: utf-8 -*-
+>> +#
+>> +# Copyright (C) 2017 Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+>> +#
+>> +# This program is free software; you can redistribute it and/or modify
+>> +# it under the terms of the GNU General Public License as published by
+>> +# the Free Software Foundation; either version 2 of the License, or
+>> +# (at your option) any later version.
+>> +#
+>> +# This program is distributed in the hope that it will be useful,
+>> +# but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> +# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> +# GNU General Public License for more details.
+>> +#
+>> +# You should have received a copy of the GNU General Public License
+>> +# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+>> +#
+>> +
+>> +"""
+>> +This file is an implementation of backup tool
+>> +"""
+>> +from __future__ import print_function
+>> +from argparse import ArgumentParser
+>> +import os
+>> +import errno
+>> +from socket import error as socket_error
+>> +try:
+>> +    import configparser
+>> +except ImportError:
+>> +    import ConfigParser as configparser
+>> +import sys
+>> +sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..',
+>> +                             'scripts', 'qmp'))
+>> +from qmp import QEMUMonitorProtocol
+>> +
+>> +
+>> +class BackupTool(object):
+>> +    """BackupTool Class"""
+>> +    def __init__(self, config_file=os.path.expanduser('~') +
+>> +                 '/.config/qemu/qemu-backup-config'):
+>> +        if "QEMU_BACKUP_CONFIG" in os.environ:
+>> +            self.config_file = os.environ["QEMU_BACKUP_CONFIG"]
+>> +
+>> +        else:
+>> +            self.config_file = config_file
+>> +            try:
+>> +                if not os.path.isdir(os.path.dirname(self.config_file)):
+>> +                    os.makedirs(os.path.dirname(self.config_file))
+>> +            except:
+>> +                print("Cannot create config directory", file=sys.stderr)
+>> +                sys.exit(1)
+>> +        self.config = configparser.ConfigParser()
+>> +        self.config.read(self.config_file)
+>> +        try:
+>> +            if self.config.get('general', 'version') != '1.0':
+>> +                    print("Version Conflict in config file", file=sys.stderr)
+>> +                    sys.exit(1)
+>> +        except:
+>> +            self.config['general'] = {'version': '1.0'}
+>> +            self.write_config()
+>> +
+>> +    def write_config(self):
+>> +        """
+>> +        Writes configuration to ini file.
+>> +        """
+>> +        config_file = open(self.config_file + ".tmp", 'w')
+>> +        self.config.write(config_file)
+>> +        config_file.flush()
+>> +        os.fsync(config_file.fileno())
+>> +        config_file.close()
+>> +        os.rename(self.config_file + ".tmp", self.config_file)
+>> +
+>> +    def get_socket_address(self, socket_address):
+>> +        """
+>> +        Return Socket address in form of string or tuple
+>> +        """
+>> +        if socket_address.startswith('tcp'):
+>> +            return (socket_address.split(':')[1],
+>> +                    int(socket_address.split(':')[2]))
+>> +        return socket_address.split(':', 2)[1]
+>> +
+>> +    def _full_backup(self, guest_name):
+>> +        """
+>> +        Performs full backup of guest
+>> +        """
+>> +        if guest_name not in self.config.sections():
+>> +            print("Cannot find specified guest", file=sys.stderr)
+>> +            sys.exit(1)
+>> +
+>> +        self.verify_guest_running(guest_name)
+>> +        connection = QEMUMonitorProtocol(
+>> +                                         self.get_socket_address(
+>> +                                             self.config[guest_name]['qmp']))
+>> +        connection.connect()
+>> +        cmd = {"execute": "transaction", "arguments": {"actions": []}}
+>> +        drive_list = []
+>> +        for key in self.config[guest_name]:
+>> +            if key.startswith("drive_"):
+>> +                drive = key[len('drive_'):]
+>> +                drive_list.append(drive)
+>> +                target = self.config[guest_name][key]
+>> +                sub_cmd = {"type": "drive-backup", "data": {"device": drive,
+>> +                                                            "target": target,
+>> +                                                            "sync": "full"}}
+>> +                cmd['arguments']['actions'].append(sub_cmd)
+>> +        qmp_return = connection.cmd_obj(cmd)
+>> +        if 'error' in qmp_return:
+>> +            print(qmp_return['error']['desc'], file=sys.stderr)
+>> +            sys.exit(1)
+>> +        print("Backup Started")
+>> +        while drive_list:
+>> +            event = connection.pull_event(wait=True)
+>> +            if event['event'] == 'SHUTDOWN':
+>> +                print("The guest was SHUT DOWN", file=sys.stderr)
+>> +                sys.exit(1)
+>> +
+>> +            if event['event'] == 'BLOCK_JOB_COMPLETED':
+>> +                if event['data']['device'] in drive_list and \
+>> +                        event['data']['type'] == 'backup':
+>> +                        print("*" + event['data']['device'])
+>> +                        drive_list.remove(event['data']['device'])
+>> +
+>> +            if event['event'] == 'BLOCK_JOB_ERROR':
+>> +                if event['data']['device'] in drive_list and \
+>> +                        event['data']['type'] == 'backup':
+>> +                        print(event['data']['device'] + " Backup Failed",
+>> +                              file=sys.stderr)
+>> +                        drive_list.remove(event['data']['device'])
+>> +        print("Backup Complete")
+>> +
+>> +    def _drive_add(self, drive_id, guest_name, target=None):
+>> +        """
+>> +        Adds drive for backup
+>> +        """
+>> +        if target is None:
+>> +            target = os.path.abspath(drive_id)
+> 
+> Similar problem as with other commands:
+> 
+> jhuston@probe (review) ~/s/q/c/backup> ./qemu-backup.py drive add
+> Traceback (most recent call last):
+>  File "./qemu-backup.py", line 343, in <module>
+>    main()
+>  File "./qemu-backup.py", line 340, in main
+>    args.func(args)
+>  File "./qemu-backup.py", line 272, in drive_add_wrapper
+>    self._drive_add(args.id, args.guest, args.target)
+>  File "./qemu-backup.py", line 137, in _drive_add
+>    target = os.path.abspath(drive_id)
+>  File "/usr/lib64/python2.7/posixpath.py", line 360, in abspath
+>    if not isabs(path):
+>  File "/usr/lib64/python2.7/posixpath.py", line 54, in isabs
+>    return s.startswith('/')
+> AttributeError: 'NoneType' object has no attribute 'startswith'
+> 
+> This errors out if you don't tell it what drive you want to add.
+> 
+> 
+> Meanwhile,
+> 
+> jhuston@probe (review) ~/s/q/c/backup> ./qemu-backup.py drive add --id
+> foobar
+> Cannot find specified guest
+> 
+> Should probably error out because you didn't set the guest name at all.
+> 
+>> +
+>> +        if os.path.isdir(os.path.dirname(target)) is False:
+>> +            print("Cannot find target directory", file=sys.stderr)
+>> +            sys.exit(1)
+>> +
+>> +        if guest_name not in self.config.sections():
+>> +            print("Cannot find specified guest", file=sys.stderr)
+>> +            sys.exit(1)
+>> +
+>> +        if "drive_" + drive_id in self.config[guest_name]:
+>> +            print("Drive already marked for backup", file=sys.stderr)
+>> +            sys.exit(1)
+>> +
+>> +        self.verify_guest_running(guest_name)
+>> +
+>> +        connection = QEMUMonitorProtocol(
+>> +                                         self.get_socket_address(
+>> +                                             self.config[guest_name]['qmp']))
+>> +        connection.connect()
+>> +        cmd = {'execute': 'query-block'}
+>> +        returned_json = connection.cmd_obj(cmd)
+>> +        device_present = False
+>> +        for device in returned_json['return']:
+>> +            if device['device'] == drive_id:
+>> +                device_present = True
+>> +                break
+>> +
+>> +        if not device_present:
+>> +            print("No such drive in guest", file=sys.stderr)
+>> +            sys.exit(1)
+> 
+> cool!
+> 
+>> +
+>> +        drive_id = "drive_" + drive_id
+>> +        for d_id in self.config[guest_name]:
+>> +            if self.config[guest_name][d_id] == target:
+>> +                print("Please choose different target", file=sys.stderr)
+>> +                sys.exit(1)
+>> +        self.config.set(guest_name, drive_id, target)
+>> +        self.write_config()
+>> +        print("Successfully Added Drive")
+>> +
+>> +    def verify_guest_running(self, guest_name):
+>> +        """
+>> +        Checks whether specified guest is running or not
+>> +        """
+>> +        socket_address = self.config.get(guest_name, 'qmp')> +        try:
+>> +            connection = QEMUMonitorProtocol(self.get_socket_address(
+>> +                                             socket_address))
+>> +            connection.connect()
+>> +        except socket_error:
+>> +            if socket_error.errno != errno.ECONNREFUSED:
+> 
+> what happens if errno *IS* ECONNREFUSED?
+> 
+>> +                print("Connection to guest refused", file=sys.stderr)
+>> +                sys.exit(1)
+>> +
+>> +    def _guest_add(self, guest_name, socket_address):
+>> +        """
+>> +        Adds a guest to the config file
+>> +        """
+>> +        if guest_name in self.config.sections():
+>> +            print("ID already exists. Please choose a different guest name",
+>> +                  file=sys.stderr)
+>> +            sys.exit(1)
+>> +        self.config[guest_name] = {'qmp': socket_address}
+>> +        self.verify_guest_running(guest_name)
+>> +        self.write_config()
+>> +        print("Successfully Added Guest")
+> 
+> this function crashes if you do not provide a guest_name, it should
+> report an error instead.
+> 
+> ./qemu-backup.py guest add
+> ./qemu-backup.py guest add --guest foobar
+> 
+> both crash, please correct.
+> 
+> ./qemu-backup.py guest add --guest foobar --qmp foobar
+> 
+> also crashes, please error gracefully if you cannot parse the QMP
+> argument as a valid socket.
+
+I will set the required options to True for mandatory arguments.
+
+>> +
+>> +    def _guest_remove(self, guest_name):
+>> +        """
+>> +        Removes a guest from config file
+>> +        """
+>> +        if guest_name not in self.config.sections():
+>> +            print("Guest Not present", file=sys.stderr)
+>> +            sys.exit(1)
+>> +        self.config.remove_section(guest_name)
+>> +        print("Guest successfully deleted")
+>> +
+> 
+> If you don't supply a guest name, you get the "Guest Not present" error
+> message, but really we should error out as if it was a parsing error.
+> 
+> jhuston@probe (review) ~/s/q/c/backup> ./qemu-backup.py guest remove
+> --guest general
+> Guest successfully deleted
+> 
+> Whoops!
+> 
+>> +    def _restore(self, guest_name):
+>> +        """
+>> +        Prints Steps to perform restore operation
+>> +        """
+>> +        if guest_name not in self.config.sections():
+>> +            print("Cannot find specified guest", file=sys.stderr)
+>> +            sys.exit(1)
+>> +
+>> +        self.verify_guest_running(guest_name)
+>> +        connection = QEMUMonitorProtocol(
+>> +                                         self.get_socket_address(
+>> +                                             self.config[guest_name]['qmp']))
+>> +        connection.connect()
+>> +        print("To perform restore:")
+>> +        print("Shut down guest")
+>> +        for key in self.config[guest_name]:
+>> +            if key.startswith("drive_"):
+>> +                drive = key[len('drive_'):]
+>> +                target = self.config[guest_name][key]
+>> +                cmd = {'execute': 'query-block'}
+>> +                returned_json = connection.cmd_obj(cmd)
+>> +                device_present = False
+>> +                for device in returned_json['return']:
+>> +                    if device['device'] == drive:
+>> +                        device_present = True
+>> +                        location = device['inserted']['image']['filename']
+>> +                        print("qemu-img convert " + target + " " + location)
+>> +
+>> +                if not device_present:
+>> +                    print("No such drive in guest", file=sys.stderr)
+>> +                    sys.exit(1)
+>> +
+>> +    def guest_remove_wrapper(self, args):
+>> +        """
+>> +        Wrapper for _guest_remove method.
+>> +        """
+>> +        guest_name = args.guest
+>> +        self._guest_remove(guest_name)
+>> +        self.write_config()
+>> +
+>> +    def list(self, args):
+>> +        """
+>> +        Prints guests present in Config file
+>> +        """
+>> +        for guest_name in self.config.sections():
+>> +            print(guest_name)
+> 
+> This will print out "general" too, which I think should be exempted from
+> this list, as it is not actually a guest!
+> 
+> I propose something like this:
+> 
+> [general]
+> guests=ishanivm1 ishanivm2 ishanivm3
+> 
+> [guest:ishanivm]
+> foo=bar
+> 
+> [guest:ishanivm2]
+> foo=bar2
+> 
+> and so on.
+> 
+> ("What happens if someone tries to name a guest 'guest:foobar'? Well,
+> then the section just gets named 'guest:guest:foobar' and we go about
+> our happy way.")
+> 
+> Whenever a guest is added or removed, you update the list and delete or
+> add the corresponding section appropriately.
+
+The section general will contain the version number. Will it not be better
+to add an additional condition to skip 'general' rather than modifying the
+design of config file?
+
+>> +
+>> +    def guest_add_wrapper(self, args):
+>> +        """
+>> +        Wrapper for _quest_add method
+> 
+> s/quest/guest/
+
+Will fix in next revision.
+ 
+>> +        """
+>> +        self._guest_add(args.guest, args.qmp)
+>> +> +    def drive_add_wrapper(self, args):
+>> +        """
+>> +        Wrapper for _drive_add method
+>> +        """
+>> +        self._drive_add(args.id, args.guest, args.target)
+>> +
+>> +    def fullbackup_wrapper(self, args):
+>> +        """
+>> +        Wrapper for _full_backup method
+>> +        """
+>> +        self._full_backup(args.guest)
+>> +
+>> +    def restore_wrapper(self, args):
+>> +        """
+>> +        Wrapper for restore
+>> +        """
+>> +        self._restore(args.guest)
+>> +
+>> +
+>> +def main():
+>> +    backup_tool = BackupTool()
+>> +    parser = ArgumentParser()
+> 
+> The following is a pretty big block without much visual structure to
+> guide the eye. I'd recommend:
+> 
+> (1) Splitting this out into a helper function so the overall flow of
+> main() is easier to spot at a glance, and
+> (2) Adding a few comments to just visually break up the monotony.
+> 
+>> +    subparsers = parser.add_subparsers(title='Subcommands',
+>> +                                       description='Valid Subcommands',
+>> +                                       help='Subcommand help')       # guest
+>> +    guest_parser = subparsers.add_parser('guest', help='Adds or \
+>> +                                                   removes and lists guest(s)')
+> 
+> Try "Manage guest(s)" as a shorthand, or just write "add, remove, or
+> list guests."
+> 
+> "Adds (or) removes (and) lists" is an awkward construct.
+> 
+>> +    guest_subparsers = guest_parser.add_subparsers(title='Guest Subparser')
+>       # guest list
+>> +    guest_list_parser = guest_subparsers.add_parser('list',
+>> +                                                    help='Lists all guests')
+>> +    guest_list_parser.set_defaults(func=backup_tool.list)
+>> +
+>       # guest add
+>> +    guest_add_parser = guest_subparsers.add_parser('add', help='Adds a guest')
+>> +    guest_add_parser.add_argument('--guest', action='store', type=str,
+>> +                                  help='Name of the guest')
+>> +    guest_add_parser.add_argument('--qmp', action='store', type=str,
+>> +                                  help='Path of socket')
+>> +    guest_add_parser.set_defaults(func=backup_tool.guest_add_wrapper)
+>> +
+>       # guest remove
+>> +    guest_remove_parser = guest_subparsers.add_parser('remove',
+>> +                                                      help='removes a guest')
+>> +    guest_remove_parser.add_argument('--guest', action='store', type=str,
+>> +                                     help='Name of the guest')
+>> +    guest_remove_parser.set_defaults(func=backup_tool.guest_remove_wrapper)
+>> +
+>       # drive
+>> +    drive_parser = subparsers.add_parser('drive',
+>> +                                         help='Adds drive(s) for backup')
+>> +    drive_subparsers = drive_parser.add_subparsers(title='Add subparser',
+>> +                                                   description='Drive \
+>> +                                                                subparser')
+>       # drive add
+>> +    drive_add_parser = drive_subparsers.add_parser('add',
+>> +                                                   help='Adds new \
+>> +                                                         drive for backup')
+>> +    drive_add_parser.add_argument('--guest', action='store',
+>> +                                  type=str, help='Name of the guest')
+>> +    drive_add_parser.add_argument('--id', action='store',
+>> +                                  type=str, help='Drive ID')
+>> +    drive_add_parser.add_argument('--target', nargs='?',
+>> +                                  default=None, help='Destination path')
+>> +    drive_add_parser.set_defaults(func=backup_tool.drive_add_wrapper)
+>> +
+>       # backup
+>> +    backup_parser = subparsers.add_parser('backup', help='Creates backup')
+>> +    backup_parser.add_argument('--guest', action='store',
+>> +                               type=str, help='Name of the guest')
+>> +    backup_parser.set_defaults(func=backup_tool.fullbackup_wrapper)
+>> +
+>       # restore
+>> +    backup_parser = subparsers.add_parser('restore', help='Restores drives')
+>> +    backup_parser.add_argument('--guest', action='store',
+>> +                               type=str, help='Name of the guest')
+>> +    backup_parser.set_defaults(func=backup_tool.restore_wrapper)
+>> +
+> 
+> maybe something like:
+>       parser = buildMyParser()
+> 
+> ?
+
+Will fix in next revision. I have also identified that 
+./qemu-backup.py guest add -h 
+shows every argument as optional argument(even when they are set to required).
+I will also fix it in v4.
+
+>> +    args = parser.parse_args()
+>> +    args.func(args)
+>> +
+>> +if __name__ == '__main__':
+>> +    main()
+>> 
+> 
+> Looking good overall; my advice is to try testing your tool by
+> intentionally omitting items and giving it bad information. Make sure
+> that any arguments marked as mandatory in the manpage/parser are
+> actually mandatory and try to eliminate stack trace dumps from your
+> python tool.
+> 
+> I stopped a little short of reviewing the entire tool this time, so
+> there may be more cases that are similar to the other issues I've
+> already pointed out.
+> 
+> Thanks!
+Thanks for review.
+
+Regards,
+Ishani
