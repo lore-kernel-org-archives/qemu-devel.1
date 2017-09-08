@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35250)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35816)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dqA6T-00040F-Qx
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:37:19 -0400
+	(envelope-from <batmanustc@gmail.com>) id 1dqA8A-0004pP-Bx
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:39:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dqA6O-0005EP-Fw
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:37:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33576)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dqA6O-0005Bc-6B
-	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:37:08 -0400
-Date: Fri, 8 Sep 2017 06:36:46 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170908062748-mutt-send-email-mst@kernel.org>
-References: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
-	<1503914913-28893-4-git-send-email-wei.w.wang@intel.com>
-	<20170828204659-mutt-send-email-mst@kernel.org>
-	<59A4DADE.5050303@intel.com>
+	(envelope-from <batmanustc@gmail.com>) id 1dqA85-0006CW-38
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:38:58 -0400
+Received: from mail-qk0-x229.google.com ([2607:f8b0:400d:c09::229]:37881)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <batmanustc@gmail.com>)
+	id 1dqA84-0006CI-Tc
+	for qemu-devel@nongnu.org; Thu, 07 Sep 2017 23:38:53 -0400
+Received: by mail-qk0-x229.google.com with SMTP id b82so3679420qkc.4
+	for <qemu-devel@nongnu.org>; Thu, 07 Sep 2017 20:38:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <59A4DADE.5050303@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v15 3/5] virtio-balloon: VIRTIO_BALLOON_F_SG
+In-Reply-To: <CAOE=1Z2=dQ_HNjokhXb_Kvf=63YTjoNeX=-aUvDA_VfmSW0i8Q@mail.gmail.com>
+References: <CAOE=1Z0PxGGAkpO50rk1UtUDdLYX7kZZCLpb9rf87gZNVmGmLA@mail.gmail.com>
+	<CAOE=1Z2=dQ_HNjokhXb_Kvf=63YTjoNeX=-aUvDA_VfmSW0i8Q@mail.gmail.com>
+From: Sam <batmanustc@gmail.com>
+Date: Fri, 8 Sep 2017 11:38:51 +0800
+Message-ID: <CAOE=1Z0O9fWKYVaHtb5aws4DrvqKYc2cSZDTU_7Qrz5ZzfT6ew@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Monitor socket will close after parse command
+ error. Qemu-2.6.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,227 +30,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, willy@infradead.org, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, Aug 29, 2017 at 11:09:18AM +0800, Wei Wang wrote:
-> On 08/29/2017 02:03 AM, Michael S. Tsirkin wrote:
-> > On Mon, Aug 28, 2017 at 06:08:31PM +0800, Wei Wang wrote:
-> > > Add a new feature, VIRTIO_BALLOON_F_SG, which enables the transfer
-> > > of balloon (i.e. inflated/deflated) pages using scatter-gather lists
-> > > to the host.
-> > > 
-> > > The implementation of the previous virtio-balloon is not very
-> > > efficient, because the balloon pages are transferred to the
-> > > host one by one. Here is the breakdown of the time in percentage
-> > > spent on each step of the balloon inflating process (inflating
-> > > 7GB of an 8GB idle guest).
-> > > 
-> > > 1) allocating pages (6.5%)
-> > > 2) sending PFNs to host (68.3%)
-> > > 3) address translation (6.1%)
-> > > 4) madvise (19%)
-> > > 
-> > > It takes about 4126ms for the inflating process to complete.
-> > > The above profiling shows that the bottlenecks are stage 2)
-> > > and stage 4).
-> > > 
-> > > This patch optimizes step 2) by transferring pages to the host in
-> > > sgs. An sg describes a chunk of guest physically continuous pages.
-> > > With this mechanism, step 4) can also be optimized by doing address
-> > > translation and madvise() in chunks rather than page by page.
-> > > 
-> > > With this new feature, the above ballooning process takes ~597ms
-> > > resulting in an improvement of ~86%.
-> > > 
-> > > TODO: optimize stage 1) by allocating/freeing a chunk of pages
-> > > instead of a single page each time.
-> > > 
-> > > Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > > Signed-off-by: Liang Li <liang.z.li@intel.com>
-> > > Suggested-by: Michael S. Tsirkin <mst@redhat.com>
-> > > ---
-> > >   drivers/virtio/virtio_balloon.c     | 171 ++++++++++++++++++++++++++++++++----
-> > >   include/uapi/linux/virtio_balloon.h |   1 +
-> > >   2 files changed, 155 insertions(+), 17 deletions(-)
-> > > 
-> > > diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_balloon.c
-> > > index f0b3a0b..8ecc1d4 100644
-> > > --- a/drivers/virtio/virtio_balloon.c
-> > > +++ b/drivers/virtio/virtio_balloon.c
-> > > @@ -32,6 +32,8 @@
-> > >   #include <linux/mm.h>
-> > >   #include <linux/mount.h>
-> > >   #include <linux/magic.h>
-> > > +#include <linux/xbitmap.h>
-> > > +#include <asm/page.h>
-> > >   /*
-> > >    * Balloon device works in 4K page units.  So each page is pointed to by
-> > > @@ -79,6 +81,9 @@ struct virtio_balloon {
-> > >   	/* Synchronize access/update to this struct virtio_balloon elements */
-> > >   	struct mutex balloon_lock;
-> > > +	/* The xbitmap used to record balloon pages */
-> > > +	struct xb page_xb;
-> > > +
-> > >   	/* The array of pfns we tell the Host about. */
-> > >   	unsigned int num_pfns;
-> > >   	__virtio32 pfns[VIRTIO_BALLOON_ARRAY_PFNS_MAX];
-> > > @@ -141,13 +146,111 @@ static void set_page_pfns(struct virtio_balloon *vb,
-> > >   					  page_to_balloon_pfn(page) + i);
-> > >   }
-> > > +static int add_one_sg(struct virtqueue *vq, void *addr, uint32_t size)
-> > > +{
-> > > +	struct scatterlist sg;
-> > > +
-> > > +	sg_init_one(&sg, addr, size);
-> > > +	return virtqueue_add_inbuf(vq, &sg, 1, vq, GFP_KERNEL);
-> > > +}
-> > > +
-> > > +static void send_balloon_page_sg(struct virtio_balloon *vb,
-> > > +				 struct virtqueue *vq,
-> > > +				 void *addr,
-> > > +				 uint32_t size,
-> > > +				 bool batch)
-> > > +{
-> > > +	unsigned int len;
-> > > +	int err;
-> > > +
-> > > +	err = add_one_sg(vq, addr, size);
-> > > +	/* Sanity check: this can't really happen */
-> > > +	WARN_ON(err);
-> > It might be cleaner to detect that add failed due to
-> > ring full and kick then. Just an idea, up to you
-> > whether to do it.
-> > 
-> > > +
-> > > +	/* If batching is in use, we batch the sgs till the vq is full. */
-> > > +	if (!batch || !vq->num_free) {
-> > > +		virtqueue_kick(vq);
-> > > +		wait_event(vb->acked, virtqueue_get_buf(vq, &len));
-> > > +		/* Release all the entries if there are */
-> > Meaning
-> > 	Account for all used entries if any
-> > ?
-> > 
-> > > +		while (virtqueue_get_buf(vq, &len))
-> > > +			;
-> > 
-> > Above code is reused below. Add a function?
-> > 
-> > > +	}
-> > > +}
-> > > +
-> > > +/*
-> > > + * Send balloon pages in sgs to host. The balloon pages are recorded in the
-> > > + * page xbitmap. Each bit in the bitmap corresponds to a page of PAGE_SIZE.
-> > > + * The page xbitmap is searched for continuous "1" bits, which correspond
-> > > + * to continuous pages, to chunk into sgs.
-> > > + *
-> > > + * @page_xb_start and @page_xb_end form the range of bits in the xbitmap that
-> > > + * need to be searched.
-> > > + */
-> > > +static void tell_host_sgs(struct virtio_balloon *vb,
-> > > +			  struct virtqueue *vq,
-> > > +			  unsigned long page_xb_start,
-> > > +			  unsigned long page_xb_end)
-> > > +{
-> > > +	unsigned long sg_pfn_start, sg_pfn_end;
-> > > +	void *sg_addr;
-> > > +	uint32_t sg_len, sg_max_len = round_down(UINT_MAX, PAGE_SIZE);
-> > > +
-> > > +	sg_pfn_start = page_xb_start;
-> > > +	while (sg_pfn_start < page_xb_end) {
-> > > +		sg_pfn_start = xb_find_next_bit(&vb->page_xb, sg_pfn_start,
-> > > +						page_xb_end, 1);
-> > > +		if (sg_pfn_start == page_xb_end + 1)
-> > > +			break;
-> > > +		sg_pfn_end = xb_find_next_bit(&vb->page_xb, sg_pfn_start + 1,
-> > > +					      page_xb_end, 0);
-> > > +		sg_addr = (void *)pfn_to_kaddr(sg_pfn_start);
-> > > +		sg_len = (sg_pfn_end - sg_pfn_start) << PAGE_SHIFT;
-> > > +		while (sg_len > sg_max_len) {
-> > > +			send_balloon_page_sg(vb, vq, sg_addr, sg_max_len, 1);
-> > Last argument should be true, not 1.
-> > 
-> > > +			sg_addr += sg_max_len;
-> > > +			sg_len -= sg_max_len;
-> > > +		}
-> > > +		send_balloon_page_sg(vb, vq, sg_addr, sg_len, 1);
-> > > +		xb_zero(&vb->page_xb, sg_pfn_start, sg_pfn_end);
-> > > +		sg_pfn_start = sg_pfn_end + 1;
-> > > +	}
-> > > +
-> > > +	/*
-> > > +	 * The last few sgs may not reach the batch size, but need a kick to
-> > > +	 * notify the device to handle them.
-> > > +	 */
-> > > +	if (vq->num_free != virtqueue_get_vring_size(vq)) {
-> > > +		virtqueue_kick(vq);
-> > > +		wait_event(vb->acked, virtqueue_get_buf(vq, &sg_len));
-> > > +		while (virtqueue_get_buf(vq, &sg_len))
-> > > +			;
-> > Some entries can get used after a pause. Looks like they will leak then?
-> > One fix would be to convert above if to a while loop.
-> > I don't know whether to do it like this in send_balloon_page_sg too.
-> > 
-> 
-> Thanks for the above comments. I've re-written this part of code.
-> Please have a check below if there is anything more we could improve:
-> 
-> static void kick_and_wait(struct virtqueue *vq, wait_queue_head_t wq_head)
-> {
->         unsigned int len;
-> 
->         virtqueue_kick(vq);
->         wait_event(wq_head, virtqueue_get_buf(vq, &len));
->         /* Detach all the used buffers from the vq */
->         while (virtqueue_get_buf(vq, &len))
->                 ;
+[gangyewei-3@yf-mos-test-net07 tests]$ telnet 127.0.0.1 55919
+Trying 127.0.0.1...
+Connected to 127.0.0.1.
+Escape character is '^]'.
+QEMU 2.6.2 monitor - type 'help' for more information
+(qemu) chardev-add
+socket,id=char-test_intf1,path=/usr/local/var/run/openvswitch/test_intf1,server=on
+chardev-add
+socket,id=char-test_intf1,path=/usr/local/var/run/openvswitch/test_intf1,server=on
+(qemu)
+(qemu) netdev_add
+vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=on
+netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=on
+(qemu)
+(qemu) device_add
+virtio-net-pci,netdev=test_intf1,mac=00:22:79:29:d2:6c,id=netdev-test_intf1
+device_add
+virtio-net-pci,netdev=test_intf1,mac=00:22:79:29:d2:6c,id=netdev-test_intf1
+(qemu)
+(qemu) device_del netdev-test_intf1
+device_del netdev-test_intf1
+(qemu)
+(qemu) netdev_del test_intf1
+netdev_del test_intf1
+(qemu)
+(qemu) chardev-remove char-test_intf1
+chardev-remove char-test_intf1
+Chardev 'char-test_intf1' is busy
+(qemu)
+(qemu) chardev-remove char-test_intf1
+chardev-remove char-test_intf1
+Chardev 'char-test_intf1' is busy
+(qemu)
+(qemu) chardev-remove char-test_intf1
+chardev-remove char-test_intf1
+Chardev 'char-test_intf1' is busy
+(qemu)
+(qemu) chardev-add
+socket,id=char-test_intf1,path=/usr/local/var/run/openvswitch/test_intf1,server=on
+chardev-add
+socket,id=char-test_intf1,path=/usr/local/var/run/openvswitch/test_intf1,server=on
+Duplicate ID 'char-test_intf1' for chardev
+Parsing chardev args failed
+(qemu)
+(qemu) ^[[A^[[A
+chardev-remove char-test_intf1
+Chardev 'char-test_intf1' is busy
+(qemu)
+(qemu)
 
-I would move this last part to before add_buf. Increases chances
-it succeeds even in case of a bug.
+(qemu)
+(qemu)
 
-> }
-> 
-> static int add_one_sg(struct virtqueue *vq, void *addr, uint32_t size)
-> {
->         struct scatterlist sg;
->         int ret;
-> 
->         sg_init_one(&sg, addr, size);
->         ret = virtqueue_add_inbuf(vq, &sg, 1, vq, GFP_KERNEL);
->         if (unlikely(ret == -ENOSPC))
->                 dev_warn(&vq->vdev->dev, "%s: failed due to ring full\n",
->                                  __func__);
+(qemu)
+(qemu) netdev_add
+vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=on
+netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=on
+Connection closed by foreign host.
 
-So if this ever triggers then kick and wait might fail, right?
-I think you should not special-case this one then.
+2017-09-08 11:32 GMT+08:00 Sam <batmanustc@gmail.com>:
 
-> 
->         return ret;
-> }
-> 
-> static void send_balloon_page_sg(struct virtio_balloon *vb,
->                                                       struct virtqueue *vq,
->                                                       void *addr,
->                                                       uint32_t size,
->                                                       bool batch)
-> {
->         int err;
-> 
->         do {
->                 err = add_one_sg(vq, addr, size);
->                 if (err == -ENOSPC || !batch || !vq->num_free)
->                         kick_and_wait(vq, vb->acked);
->         } while (err == -ENOSPC);
-> }
-> 
-> 
-> Best,
-> Wei
-
-I think this fixes the bug, yes. I would skip trying to handle ENOSPC,
-it's more a less a bug if it triggers. Just bail out on any error.
-
--- 
-MST
+> BTW, same result while using `telnet 127.0.0.1 55919`, which means also
+> have the two problem in the email before.
+>
+> 2017-09-08 11:23 GMT+08:00 Sam <batmanustc@gmail.com>:
+>
+>> Hi all,
+>>
+>> I'm using HMP socket to send command to add netdev, my command like this:
+>>
+>> [gangyewei-3@yf-mos-test-net07 tests]$ sudo  python monitor.py 55919
+>>> (qemu):
+>>>  Connected to qemu monitor ...
+>>> on_monitor_open
+>>> ds
+>>> (qemu):
+>>> {'return': ["unknown command: 'ds'"]}
+>>> chardev-add socket,id=char-test_intf1,path=/usr/local/var/run/openvswitc
+>>> h/test_intf1,server=on
+>>> (qemu):
+>>> \{'return': []}
+>>> netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=
+>>> on
+>>> (qemu):
+>>> {'return': ["unknown command: '\\netdev_add'"]}
+>>> netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=
+>>> on
+>>> (qemu):
+>>> {'return': []}
+>>> device_add virtio-net-pci,netdev=test_intf1,mac=00:22:79:29:d2:6c,id=
+>>> netdev-test_intf1
+>>> (qemu):
+>>> {'return': []}
+>>> device_del netdev-test_intf1
+>>> (qemu):
+>>> {'return': []}
+>>> netdev_del test_intf1
+>>> (qemu):
+>>> {'return': []}
+>>> chardev-remove char-test_intf1
+>>> (qemu):
+>>> {'return': ["Chardev 'char-test_intf1' is busy"]}
+>>> chardev-remove char-test_intf1
+>>> (qemu):
+>>> {'return': ["Chardev 'char-test_intf1' is busy"]}
+>>> ds
+>>> (qemu):
+>>> {'return': ["unknown command: 'ds'"]}
+>>> chardev-add socket,id=char-test_intf1,path=/usr/local/var/run/openvswitc
+>>> h/test_intf1,server=on
+>>> (qemu):
+>>> {'return': ["Duplicate ID 'char-test_intf1' for chardev", 'Parsing
+>>> chardev args failed']}
+>>> netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=
+>>> on
+>>> (qemu):
+>>> on_monitor_close
+>>> Disconnect ...
+>>> Bye...
+>>> [gangyewei-3@yf-mos-test-net07 tests]$ telnet 127.0.0.1 55919
+>>> Trying 127.0.0.1...
+>>> telnet: connect to address 127.0.0.1: Connection refused
+>>
+>>
+>> the monitor.py is same like telnet, which send command to 127.0.0.1:55919
+>> socket.
+>> At the last 5th line, you could see "on_monitor_close", this is because
+>> server side of 127.0.0.1:55919 socket is down.
+>>
+>> I have few questions:
+>> 1. Why I got "{'return': ["Chardev 'char-test_intf1' is busy"]}" while
+>> using "chardev-remove char-test_intf1"?
+>> 2. Why the server side will close while get "{'return': ["Duplicate ID
+>> 'char-test_intf1' for chardev", 'Parsing chardev args failed']}" and then
+>> send same command?
+>>
+>> Thank you~
+>>
+>
+>
