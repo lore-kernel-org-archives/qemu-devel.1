@@ -1,27 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36205)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dqbwi-0001x1-Ul
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 05:21:02 -0400
+	(envelope-from <bounces@canonical.com>) id 1dqcdH-0002oU-1z
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 06:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1dqbwh-0001UD-KO
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 05:21:00 -0400
-Received: from mail-oi0-x243.google.com ([2607:f8b0:4003:c06::243]:38628)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1dqbwh-0001To-Du
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 05:20:59 -0400
-Received: by mail-oi0-x243.google.com with SMTP id i6so2128575oih.5
-	for <qemu-devel@nongnu.org>; Sat, 09 Sep 2017 02:20:57 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1dqcdC-0005wb-3h
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 06:04:59 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44216)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dqcdB-0005wC-UJ
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 06:04:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dqcd9-0002Vx-5L
+	for <qemu-devel@nongnu.org>; Sat, 09 Sep 2017 10:04:51 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 12ED22E848B
+	for <qemu-devel@nongnu.org>; Sat,  9 Sep 2017 10:04:51 +0000 (UTC)
 MIME-Version: 1.0
-References: <20170909083001.17451-1-maozy.fnst@cn.fujitsu.com>
-In-Reply-To: <20170909083001.17451-1-maozy.fnst@cn.fujitsu.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Sat, 09 Sep 2017 09:20:46 +0000
-Message-ID: <CAJ+F1CJPnc0OwhzP6_XYzW3L83_UAC_EAVR6A89wtzASTGOUcg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] usb/dev-smartcard-reader: convert to
- realize
+Date: Sat, 09 Sep 2017 09:52:10 -0000
+From: Francois Gouget <1119861@bugs.launchpad.net>
+Reply-To: Bug 1119861 <1119861@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130208231600.11384.57636.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150495073013.22407.10022914235312786994.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1119861] Re: Poor console performance in Windows 7
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, qemu-devel@nongnu.org
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi
+It does seem to be ok now. The test did get simplified to remove parts
+that were mostly redundant so it runs faster now. But still it now takes
+the same time, 7 seconds, on the VMware and QEMU Windows 7 VMs. So as
+far as I'm concerned this can be closed.
 
-On Sat, Sep 9, 2017 at 10:33 AM Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-wrote:
+-- =
 
-> Convert CCID Device to realize and rename the ccid_card_init()
-> to ccid_card_realize().
->
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
-> ---
->  hw/usb/dev-smartcard-reader.c | 18 ++++++++----------
->  1 file changed, 8 insertions(+), 10 deletions(-)
->
-> diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.=
-c
-> index bef1f03..27cd48d 100644
-> --- a/hw/usb/dev-smartcard-reader.c
-> +++ b/hw/usb/dev-smartcard-reader.c
-> @@ -1306,27 +1306,25 @@ static int ccid_card_exit(DeviceState *qdev)
->      return 0;
->  }
->
-> -static int ccid_card_init(DeviceState *qdev)
-> +static void ccid_card_realize(DeviceState *qdev, Error **errp)
->  {
->      CCIDCardState *card =3D CCID_CARD(qdev);
->      USBDevice *dev =3D USB_DEVICE(qdev->parent_bus->parent);
->      USBCCIDState *s =3D USB_CCID_DEV(dev);
-> -    int ret =3D 0;
->
->      if (card->slot !=3D 0) {
-> -        warn_report("usb-ccid supports one slot, can't add %d",
-> +        error_setg(errp, "usb-ccid supports one slot, can't add %d",
->                      card->slot);
-> -        return -1;
-> +        return;
->      }
->      if (s->card !=3D NULL) {
-> -        warn_report("usb-ccid card already full, not adding");
-> -        return -1;
-> +        error_setg(errp, "usb-ccid card already full, not adding");
-> +        return;
->      }
-> -    ret =3D ccid_card_initfn(card);
-> -    if (ret =3D=3D 0) {
-> +
-> +    if (!ccid_card_initfn(card)) {
->          s->card =3D card;
->      }
->
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1119861
 
-You should set an error here, or the caller won't be aware of card init
-error anymore. Best would be to convert ccid_card_initfn() and callbacks to
-take an Error **.
+Title:
+  Poor console performance in Windows 7
 
--    return ret;
->  }
->
->  static void ccid_realize(USBDevice *dev, Error **errp)
-> @@ -1496,7 +1494,7 @@ static void ccid_card_class_init(ObjectClass *klass=
-,
-> void *data)
->  {
->      DeviceClass *k =3D DEVICE_CLASS(klass);
->      k->bus_type =3D TYPE_CCID_BUS;
-> -    k->init =3D ccid_card_init;
-> +    k->realize =3D ccid_card_realize;
->      k->exit =3D ccid_card_exit;
->      k->props =3D ccid_props;
->  }
-> --
-> 2.9.4
->
->
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  As part of its conformance test suite, Wine tests the behavior of the
+  Windows console API. Part of this test involves opening a test console
+  and scrolling things around. The test probably does not need to
+  perform that many scroll operations to achieve its goal. However as is
+  it illustrates a significant performance issue in QEmu. Unfortunately
+  it does so by timing out (the tests must run in less than 2 minutes).
+  Here are the run times on a few configurations:
+
+   10s - QEmu 1.4 + Q9450@2.6GHz + Windows XP + QXL + QXL driver
+    8s - QEmu 1.12 + Opteron 6128 + Windows XP + QXL + QXL driver
+  127s - QEmu 1.12 + Opteron 6128 + Windows 7 + cirrus + vga driver
+  127s - QEmu 1.12 + Opteron 6128 + Windows 7 + QXL + QXL driver
+  147s - QEmu 1.12 + Opteron 6128 + Windows 7 + vmvga + vga driver
+  145s - QEmu 1.12 + Opteron 6128 + Windows 7 + vmvga + vmware driver (xpdm=
+, no better with all graphics effects disabled)
+
+   10s - Metal + Atom N270 + Windows XP + GMA 950 + Intel driver
+    6s - Metal + i5-3317U + Windows 8 + HD4000 + Intel driver
+    3s - VMware + Q9450@2.6GHz + Windows XP + vmvga + vmware driver
+   65s - VMware + Q9450@2.6GHz + Windows 7 + vmvga + vmware driver
+
+  So when running on the bare metal all versions of Windows are about as
+  fast. However in QEmu Windows 7 is almost 16 times slower than Windows
+  XP! VMware is impacted too but it's still maintains a good lead in
+  performance.
+
+  Disabling all graphics effects did not help so it's not clear that the
+  fault lies with Windows 7's compositing desktop window manager. Maybe
+  it has to do with the lack of a proper wddm driver?
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1119861/+subscriptions
