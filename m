@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37178)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1dqgpU-0000Ww-Jy
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 10:33:53 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50488)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <groug@kaod.org>) id 1dqhKf-0007ch-J2
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:06:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1dqgpR-0000MI-HC
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 10:33:52 -0400
-Received: from mout.gmx.net ([212.227.17.20]:58658)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1dqgpR-0000Li-8Q
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 10:33:49 -0400
-From: Kamil Rytarowski <n54@gmx.com>
-Date: Sat,  9 Sep 2017 16:21:16 +0200
-Message-Id: <20170909142116.26816-1-n54@gmx.com>
-In-Reply-To: <20170903163615.15562-1-n54@gmx.com>
-References: <20170903163615.15562-1-n54@gmx.com>
-Subject: [Qemu-devel] [PATCH v2] scsi/esp: Rename the ESP macro to ESP_STATE
+	(envelope-from <groug@kaod.org>) id 1dqhKa-0005oy-L1
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:06:05 -0400
+Received: from 6.mo177.mail-out.ovh.net ([46.105.51.249]:40014)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dqhKa-0005nc-EF
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:06:00 -0400
+Received: from player714.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 752FB6FC63
+	for <qemu-devel@nongnu.org>; Sat,  9 Sep 2017 17:05:58 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Sat, 09 Sep 2017 17:05:46 +0200
+Message-ID: <150496954641.9654.1998704077006846521.stgit@bahia>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH 0/5] spapr_pci: various cleanups and
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,66 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: pbonzini@redhat.com
-Cc: qemu-devel@nongnu.org, Kamil Rytarowski <n54@gmx.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-SunOS defines ESP (x86 register) in <sys/regset.h> as 7.
+Before resuming the huge work on PHB hotplug, here are some patches
+that maybe worth to apply.
 
-This fixes build on SmartOS (Joyent).
+Patches 1 to 3 are basic improvements.
 
-Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+Patch 4 and 5 may be a bit controversial. Everywhere in the spapr
+code where we build an FDT portion, libfdt failures cause QEMU to
+exit, even on hotplug paths. Only spapr_pci doesn't do that and
+propagates the error instead. My understanding is that a failure
+when building the FDT is likely to happen because of a bug in QEMU.
+
+Hence the choice to convert spapr_pci to do like the others. We may
+even consider changing _FDT() to abort() instead of exit().
+
+Alternatively, if libfdt failures shouldn't be necessarily fatal,
+especially on post-realize paths, then we should probably introduce
+an _FDT_ERR() helper to propagate errors. And use it in may places
+where we currently terminate QEMU: memory hotplug, CPU hotplug, CAS,
+machine reset...
+
+--
+Greg
+
 ---
- hw/scsi/esp.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-index eee831efeb..22c2d91e39 100644
---- a/hw/scsi/esp.c
-+++ b/hw/scsi/esp.c
-@@ -593,7 +593,7 @@ const VMStateDescription vmstate_esp = {
- };
- 
- #define TYPE_ESP "esp"
--#define ESP(obj) OBJECT_CHECK(SysBusESPState, (obj), TYPE_ESP)
-+#define ESP_STATE(obj) OBJECT_CHECK(SysBusESPState, (obj), TYPE_ESP)
- 
- typedef struct {
-     /*< private >*/
-@@ -644,7 +644,7 @@ void esp_init(hwaddr espaddr, int it_shift,
-     ESPState *esp;
- 
-     dev = qdev_create(NULL, TYPE_ESP);
--    sysbus = ESP(dev);
-+    sysbus = ESP_STATE(dev);
-     esp = &sysbus->esp;
-     esp->dma_memory_read = dma_memory_read;
-     esp->dma_memory_write = dma_memory_write;
-@@ -672,7 +672,7 @@ static const struct SCSIBusInfo esp_scsi_info = {
- 
- static void sysbus_esp_gpio_demux(void *opaque, int irq, int level)
- {
--    SysBusESPState *sysbus = ESP(opaque);
-+    SysBusESPState *sysbus = ESP_STATE(opaque);
-     ESPState *s = &sysbus->esp;
- 
-     switch (irq) {
-@@ -688,7 +688,7 @@ static void sysbus_esp_gpio_demux(void *opaque, int irq, int level)
- static void sysbus_esp_realize(DeviceState *dev, Error **errp)
- {
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
--    SysBusESPState *sysbus = ESP(dev);
-+    SysBusESPState *sysbus = ESP_STATE(dev);
-     ESPState *s = &sysbus->esp;
- 
-     sysbus_init_irq(sbd, &s->irq);
-@@ -706,7 +706,7 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
- 
- static void sysbus_esp_hard_reset(DeviceState *dev)
- {
--    SysBusESPState *sysbus = ESP(dev);
-+    SysBusESPState *sysbus = ESP_STATE(dev);
-     esp_hard_reset(&sysbus->esp);
- }
- 
--- 
-2.14.1
+Greg Kurz (5):
+      spapr_pci: drop useless check in spapr_phb_vfio_get_loc_code()
+      spapr_pci: drop useless check in spapr_populate_pci_child_dt()
+      spapr_pci: use g_strdup_printf()
+      spapr_pci: use the common _FDT() helper
+      spapr_pci: handle FDT creation errors with _FDT()
+
+
+ hw/ppc/spapr_pci.c |   69 ++++++++++++++++------------------------------------
+ 1 file changed, 21 insertions(+), 48 deletions(-)
