@@ -1,40 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55171)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bauerman@linux.vnet.ibm.com>) id 1dqUWD-0002cU-Tk
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 21:25:11 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dqUWk-0002sp-N9
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 21:25:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bauerman@linux.vnet.ibm.com>) id 1dqUWA-000607-L8
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 21:25:09 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60606
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bauerman@linux.vnet.ibm.com>)
-	id 1dqUWA-0005xv-Fr
-	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 21:25:06 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v891NlZW117605
-	for <qemu-devel@nongnu.org>; Fri, 8 Sep 2017 21:25:05 -0400
-Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cv16wjuha-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 21:25:04 -0400
-Received: from localhost
-	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bauerman@linux.vnet.ibm.com>;
-	Fri, 8 Sep 2017 21:25:04 -0400
-References: <20170818174614.10930-1-bauerman@linux.vnet.ibm.com>
-	<87r2vl37kb.fsf@dusky.pond.sub.org>
-From: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
-In-reply-to: <87r2vl37kb.fsf@dusky.pond.sub.org>
-Date: Fri, 08 Sep 2017 22:24:58 -0300
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dqUWh-0006e8-QR
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 21:25:42 -0400
+Received: from mail-qt0-x234.google.com ([2607:f8b0:400d:c0d::234]:38877)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dqUWh-0006dp-L5
+	for qemu-devel@nongnu.org; Fri, 08 Sep 2017 21:25:39 -0400
+Received: by mail-qt0-x234.google.com with SMTP id q8so10157241qtb.5
+	for <qemu-devel@nongnu.org>; Fri, 08 Sep 2017 18:25:39 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170905021201.25684-1-famz@redhat.com>
+	<20170905021201.25684-5-famz@redhat.com> <87tw0dgqpv.fsf@linaro.org>
+	<20170908232950.GD18677@lemon.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <6e624d60-c8ed-54f5-a2ca-9caf9d9c489f@amsat.org>
+Date: Fri, 8 Sep 2017 22:25:34 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Message-Id: <877ex8ack5.fsf@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] .dir-locals.el: Explicitly set indentation
- level
+In-Reply-To: <20170908232950.GD18677@lemon.lan>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v6 04/12] tests: Add vm test lib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,67 +36,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Kamil Rytarowski <kamil@netbsd.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com
 
+Hi Fam, Alex,
 
-Markus Armbruster <armbru@redhat.com> writes:
-
-> Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com> writes:
->
->> At least in some configurations, setting c-file-style is not enough to
->> conform to the QEMU coding style, so explicitly set c-basic-offset as =
-well.
 >>
->> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.vnet.ibm.com>
->> ---
+>> If this fails it's fairly cryptic:
 >>
->> My emacs was using indentation level of 8 spaces and this patch convin=
-ced
->> it to use the correct value.
+>> /home/alex/lsrc/qemu/qemu.git/tests/vm/openbsd  --debug   --image "tests/vm/openbsd.img" --build-qemu /home/alex/lsrc/qemu/qemu.git
+>> DEBUG:root:Creating archive ./vm-test-fxejnB.tmp/data-2de24.tar for src_dir dir: /home/alex/lsrc/qemu/qemu.git
+>> DEBUG:root:QEMU args: -nodefaults -m 2G -cpu host -netdev user,id=vnet,hostfwd=:0.0.0.0:0-:22 -device virtio-net-pci,netdev=vnet -vnc :0,to=20 -serial file:./vm-test-fxejnB.tmp/serial.out -smp 4 -enable-kvm -device VGA -drive file=tests/vm/openbsd.img,snapshot=on,if=none,id=drive0,cache=writeback -device virtio-blk,drive=drive0,bootindex=0 -drive file=./vm-test-fxejnB.tmp/data-2de24.tar,if=none,id=data-2de24,cache=writeback,format=raw -device virtio-blk,drive=data-2de24,serial=data-2de24,bootindex=1
+>> Failed to prepare guest environment
+>> Traceback (most recent call last):
+>>    File "/home/alex/lsrc/qemu/qemu.git/tests/vm/basevm.py", line 260, in main
+>>      vm.boot(args.image + ",snapshot=on")
+>>    File "/home/alex/lsrc/qemu/qemu.git/tests/vm/basevm.py", line 184, in boot
+>>      guest.launch()
+>>    File "/home/alex/lsrc/qemu/qemu.git/tests/vm/../../scripts/qemu.py", line 151, in launch
+>>      self._post_launch()
+>>    File "/home/alex/lsrc/qemu/qemu.git/tests/vm/../../scripts/qemu.py", line 135, in _post_launch
+>>      self._qmp.accept()
+>>    File "/home/alex/lsrc/qemu/qemu.git/tests/vm/../../scripts/qmp/qmp.py", line 147, in accept
+>>      return self.__negotiate_capabilities()
+>>    File "/home/alex/lsrc/qemu/qemu.git/tests/vm/../../scripts/qmp/qmp.py", line 60, in __negotiate_capabilities
+>>      raise QMPConnectError
+>> QMPConnectError
 >>
->> I set c-basic-offset set to tab-width in my ~/.spacemacs which perhaps
->> isn't the wisest thing to do, but since there's a .dir-locals.el we ca=
-n
->> make the editor always do the right thing.
->
-> I think some of this rationale should be worked into the commit message
-> if we decide the patch makes sense.
+>> I assume QEMU failed to boot and might have given us a message that
+>> would be useful.
+> 
+> It's a separate issue of qemu.py, I didn't try to fix it here because currently
+> there are many patches touching that file on the list, there is a high chance of
+> conflict.
+> 
+> In your case which qemu version are you using? If not master it probably is
+> failing because of the hostfwd syntax.
 
-Ok, I will send a v2 with the rationale in the commit message if it's
-determined that the patch itself is ok.
+very likely.
 
->>  .dir-locals.el | 3 ++-
->>  1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/.dir-locals.el b/.dir-locals.el
->> index 3ac0cfc6f0d6..8e47418c5996 100644
->> --- a/.dir-locals.el
->> +++ b/.dir-locals.el
->> @@ -1,2 +1,3 @@
->>  ((c-mode . ((c-file-style . "stroustrup")
->> -	    (indent-tabs-mode . nil))))
->> +	    (indent-tabs-mode . nil)
->> +	    (c-basic-offset . 4))))
->
-> Style "stroustrup" already specified c-basic-offset 4.  If we need to
-> specify this setting a second time, why don't we need to specify the
-> style's other settings a second time, too?
+one simple way to handle this could be having this script catching 
+QMPConnectError and restart with older command line format,
 
-I added (defvaralias 'c-basic-offset 'tab-width) to my configuration
-file following a suggestion from the "Indentation Basics" page of
-EmacsWiki=C2=B9, which is the first hit if you search for "emacs indentat=
-ion
-width".
+but I prefer starting QEMU binding a QMP socket, then initialize the 
+options via QMP packets, this should be more portable, this is cleaner.
 
-Because of that, I assume a lot of people will have that option in their
-configuration file. If there are other settings that are common and also
-interfere with the stroustrup style I think it makes sense to include
-them in .dir-locals.el as well.
+also I think we don't want to run those images with bleeding edge 
+qemu-system, we want a stable QEMU to be able to compile the bleeding 
+edge codebase inside a working VM.
 
---=20
-Thiago Jung Bauermann
-IBM Linux Technology Center
+another note: currently when a VM fails, it closes and what I've left is 
+only the last stderr.
+I'd rather see 2 modes:
+- run from some CI when only the final return value is useful, the 
+stderr being extra value.
+- in user-dev mode if the build fails I'd like to have access to the 
+terminal, eventually some msg like "this build failed, you can connect 
+to this VM copy/pasting the following ssh command: ... or hit ^C to 
+gracefully shutdown the VM"
+But in this mode I'd rather mount my current workdir via a read-writable 
+netshare rather than a one-time temporary read-only tarball, so I could 
+modify my repo and just run 'make' inside the VM.
 
+Regards,
 
-=C2=B9 https://www.emacswiki.org/emacs/IndentationBasics
+Phil.
