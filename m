@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36205)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dqcdH-0002oU-1z
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 06:05:00 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dqeXv-0002Yo-N0
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 08:07:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dqcdC-0005wb-3h
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 06:04:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44216)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dqcdB-0005wC-UJ
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 06:04:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dqcd9-0002Vx-5L
-	for <qemu-devel@nongnu.org>; Sat, 09 Sep 2017 10:04:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 12ED22E848B
-	for <qemu-devel@nongnu.org>; Sat,  9 Sep 2017 10:04:51 +0000 (UTC)
+	(envelope-from <peter.maydell@linaro.org>) id 1dqeXu-0002ri-MP
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 08:07:35 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:38698)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dqeXu-0002rR-FV
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 08:07:34 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id 108so7972271wra.5
+	for <qemu-devel@nongnu.org>; Sat, 09 Sep 2017 05:07:34 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 09 Sep 2017 09:52:10 -0000
-From: Francois Gouget <1119861@bugs.launchpad.net>
-Reply-To: Bug 1119861 <1119861@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130208231600.11384.57636.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150495073013.22407.10022914235312786994.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1119861] Re: Poor console performance in Windows 7
+In-Reply-To: <20170909054613.19148-11-famz@redhat.com>
+References: <20170909054613.19148-1-famz@redhat.com>
+	<20170909054613.19148-11-famz@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 9 Sep 2017 13:07:12 +0100
+Message-ID: <CAFEAcA83JDUMAsCAY=YBL+qS8A1n6VMfH1p_DAmouF0W8m-j9g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v2 10/37] scripts: Add archive-source.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,55 +29,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-It does seem to be ok now. The test did get simplified to remove parts
-that were mostly redundant so it runs faster now. But still it now takes
-the same time, 7 seconds, on the VMware and QEMU Windows 7 VMs. So as
-far as I'm concerned this can be closed.
+On 9 September 2017 at 06:45, Fam Zheng <famz@redhat.com> wrote:
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> Message-Id: <20170905021201.25684-4-famz@redhat.com>
+> ---
+>  scripts/archive-source.sh | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+>  create mode 100755 scripts/archive-source.sh
+>
+> diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+> new file mode 100755
+> index 0000000000..1de369532e
+> --- /dev/null
+> +++ b/scripts/archive-source.sh
+> @@ -0,0 +1,31 @@
+> +#!/bin/sh
+> +#
+> +# Author: Fam Zheng <famz@redhat.com>
+> +#
+> +# Create archive of source tree, including submodules
+> +#
+> +# This code is licensed under the GPL version 2 or later.  See
+> +# the COPYING file in the top-level directory.
 
--- =
+So is this the script that for instance Mike Roth would use
+to create the release tarballs? If it isn't, should it be?
+Is it intended for end users to create tarballs with, or
+is it really just a helper script for the docker stuff?
+If the latter, it would be helpful to say so. If the former,
+it could really use more usage information/documentation...
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1119861
+> +
+> +set -e
+> +
+> +if test $# -lt 1; then
+> +    echo "Usage: $0 <output>"
+> +    exit 1
+> +fi
+> +
+> +submodules=$(git submodule foreach --recursive --quiet 'echo $name')
+> +
+> +if test -n "$submodules"; then
+> +    {
+> +        git ls-files
+> +        for sm in $submodules; do
+> +            (cd $sm; git ls-files) | sed "s:^:$sm/:"
+> +        done
+> +    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > $1.list
 
-Title:
-  Poor console performance in Windows 7
+Supporting '-e something' in a tar -T listfile seems to
+be GNU tar specific. Do we care?
 
-Status in QEMU:
-  Incomplete
+> +else
+> +    git ls-files > $1.list
+> +fi
 
-Bug description:
-  As part of its conformance test suite, Wine tests the behavior of the
-  Windows console API. Part of this test involves opening a test console
-  and scrolling things around. The test probably does not need to
-  perform that many scroll operations to achieve its goal. However as is
-  it illustrates a significant performance issue in QEmu. Unfortunately
-  it does so by timing out (the tests must run in less than 2 minutes).
-  Here are the run times on a few configurations:
+This will blow up if we ever have a file in the repo
+that starts with a '-'. Do we care?
 
-   10s - QEmu 1.4 + Q9450@2.6GHz + Windows XP + QXL + QXL driver
-    8s - QEmu 1.12 + Opteron 6128 + Windows XP + QXL + QXL driver
-  127s - QEmu 1.12 + Opteron 6128 + Windows 7 + cirrus + vga driver
-  127s - QEmu 1.12 + Opteron 6128 + Windows 7 + QXL + QXL driver
-  147s - QEmu 1.12 + Opteron 6128 + Windows 7 + vmvga + vga driver
-  145s - QEmu 1.12 + Opteron 6128 + Windows 7 + vmvga + vmware driver (xpdm=
-, no better with all graphics effects disabled)
+> +
+> +tar -cf $1 -T $1.list
+> +rm $1.list
 
-   10s - Metal + Atom N270 + Windows XP + GMA 950 + Intel driver
-    6s - Metal + i5-3317U + Windows 8 + HD4000 + Intel driver
-    3s - VMware + Q9450@2.6GHz + Windows XP + vmvga + vmware driver
-   65s - VMware + Q9450@2.6GHz + Windows 7 + vmvga + vmware driver
+This is missing a lot of quoting for $1, so it will go wrong
+if there's a space in that filename argument.
 
-  So when running on the bare metal all versions of Windows are about as
-  fast. However in QEmu Windows 7 is almost 16 times slower than Windows
-  XP! VMware is impacted too but it's still maintains a good lead in
-  performance.
-
-  Disabling all graphics effects did not help so it's not clear that the
-  fault lies with Windows 7's compositing desktop window manager. Maybe
-  it has to do with the lack of a proper wddm driver?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1119861/+subscriptions
+thanks
+-- PMM
