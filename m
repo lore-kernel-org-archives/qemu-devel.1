@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33568)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqYb8-0005pk-7l
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 01:46:31 -0400
+	(envelope-from <famz@redhat.com>) id 1dqYb9-0005re-If
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 01:46:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqYb7-0006Ff-2G
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 01:46:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33216)
+	(envelope-from <famz@redhat.com>) id 1dqYb8-0006GO-Sl
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 01:46:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36702)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqYb6-0006F8-Rn
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 01:46:28 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqYb8-0006G3-MR
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 01:46:30 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Sat,  9 Sep 2017 13:45:42 +0800
-Message-Id: <20170909054613.19148-7-famz@redhat.com>
+Date: Sat,  9 Sep 2017 13:45:43 +0800
+Message-Id: <20170909054613.19148-8-famz@redhat.com>
 In-Reply-To: <20170909054613.19148-1-famz@redhat.com>
 References: <20170909054613.19148-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL v2 06/37] docker: Enable features explicitly in
- test-full
+Subject: [Qemu-devel] [PULL v2 07/37] tests/docker: Clean up paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,112 +26,59 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-Also avoid "set -e".
+The 'run' script already creats src, build and install directories under
+$TEST_DIR, use it in common.rc.
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170907141245.31946-3-famz@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Also the tests always run from $QEMU_SRC/tests/docker, so use a relative
+$CMD string.
+
+Message-Id: <20170817035721.11064-1-famz@redhat.com>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
- tests/docker/test-full | 82 ++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 76 insertions(+), 6 deletions(-)
+ tests/docker/common.rc | 5 +----
+ tests/docker/run       | 4 +++-
+ 2 files changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/tests/docker/test-full b/tests/docker/test-full
-index 05f0d491d1..d71bf9d275 100755
---- a/tests/docker/test-full
-+++ b/tests/docker/test-full
-@@ -1,8 +1,8 @@
--#!/bin/bash -e
-+#!/bin/bash
- #
--# Compile all the targets.
-+# Compile all the targets with as many features enabled as possible
- #
--# Copyright (c) 2016 Red Hat Inc.
-+# Copyright 2016, 2017 Red Hat Inc.
- #
- # Authors:
- #  Fam Zheng <famz@redhat.com>
-@@ -13,7 +13,77 @@
+diff --git a/tests/docker/common.rc b/tests/docker/common.rc
+index 6865689bb5..64b36ba2d0 100755
+--- a/tests/docker/common.rc
++++ b/tests/docker/common.rc
+@@ -11,9 +11,6 @@
+ # or (at your option) any later version. See the COPYING file in
+ # the top-level directory.
  
- . common.rc
+-BUILD_DIR=/var/tmp/qemu-build
+-mkdir $BUILD_DIR
+-
+ requires()
+ {
+     for c in $@; do
+@@ -28,7 +25,7 @@ build_qemu()
+ {
+     config_opts="--enable-werror \
+                  ${TARGET_LIST:+--target-list=${TARGET_LIST}} \
+-                 --prefix=$PWD/install \
++                 --prefix=$INSTALL_DIR \
+                  $QEMU_CONFIGURE_OPTS $EXTRA_CONFIGURE_OPTS \
+                  $@"
+     echo "Configure options:"
+diff --git a/tests/docker/run b/tests/docker/run
+index c1e4513bce..ec2541cbd9 100755
+--- a/tests/docker/run
++++ b/tests/docker/run
+@@ -52,10 +52,12 @@ if test -n "$SHOW_ENV"; then
+ fi
  
--cd "$BUILD_DIR"
-+cd "$BUILD_DIR" || exit 1
+ export QEMU_SRC="$TEST_DIR/src"
++export BUILD_DIR="$TEST_DIR/build"
++export INSTALL_DIR="$TEST_DIR/install"
  
--build_qemu
--make check $MAKEFLAGS
-+build_qemu \
-+    --enable-attr \
-+    --enable-bluez \
-+    --enable-brlapi \
-+    --enable-bsd-user \
-+    --enable-bzip2 \
-+    --enable-cap-ng \
-+    --enable-coroutine-pool \
-+    --enable-crypto-afalg \
-+    --enable-curl \
-+    --enable-curses \
-+    --enable-debug \
-+    --enable-debug-info \
-+    --enable-debug-tcg \
-+    --enable-docs \
-+    --enable-fdt \
-+    --enable-gcrypt \
-+    --enable-glusterfs \
-+    --enable-gnutls \
-+    --enable-gprof \
-+    --enable-gtk \
-+    --enable-guest-agent \
-+    --enable-jemalloc \
-+    --enable-kvm \
-+    --enable-libiscsi \
-+    --enable-libnfs \
-+    --enable-libssh2 \
-+    --enable-libusb \
-+    --enable-linux-aio \
-+    --enable-linux-user \
-+    --enable-live-block-migration \
-+    --enable-lzo \
-+    --enable-modules \
-+    --enable-numa \
-+    --enable-opengl \
-+    --enable-pie \
-+    --enable-profiler \
-+    --enable-qom-cast-debug \
-+    --enable-rbd \
-+    --enable-rdma \
-+    --enable-replication \
-+    --enable-sdl \
-+    --enable-seccomp \
-+    --enable-smartcard \
-+    --enable-snappy \
-+    --enable-spice \
-+    --enable-stack-protector \
-+    --enable-system \
-+    --enable-tcg \
-+    --enable-tcg-interpreter \
-+    --enable-tools \
-+    --enable-tpm \
-+    --enable-trace-backend=ftrace \
-+    --enable-usb-redir \
-+    --enable-user \
-+    --enable-vde \
-+    --enable-vhost-net \
-+    --enable-vhost-scsi \
-+    --enable-vhost-user \
-+    --enable-vhost-vsock \
-+    --enable-virtfs \
-+    --enable-vnc \
-+    --enable-vnc-jpeg \
-+    --enable-vnc-png \
-+    --enable-vnc-sasl \
-+    --enable-vte \
-+    --enable-werror \
-+    --enable-xen \
-+    --enable-xen-pci-passthrough \
-+    --enable-xen-pv-domain-build \
-+    --enable-xfsctl \
-+&& make check $MAKEFLAGS
+ cd "$QEMU_SRC/tests/docker"
+ 
+-CMD="$QEMU_SRC/tests/docker/$@"
++CMD="./$@"
+ 
+ if test -z "$DEBUG"; then
+     exec $CMD
 -- 
 2.13.5
