@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51176)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51638)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dqhLG-00082t-Ou
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:06:44 -0400
+	(envelope-from <famz@redhat.com>) id 1dqhLr-0008VV-S6
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:07:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dqhLC-0006OS-6q
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:06:42 -0400
-Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:35964)
+	(envelope-from <famz@redhat.com>) id 1dqhLm-0007HQ-U6
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:07:19 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36988)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dqhLC-0006MW-0m
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:06:38 -0400
-Received: from player714.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 677EB76A4D
-	for <qemu-devel@nongnu.org>; Sat,  9 Sep 2017 17:06:36 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Sat, 09 Sep 2017 17:06:33 +0200
-Message-ID: <150496959359.9654.1986960584525021648.stgit@bahia>
-In-Reply-To: <150496954641.9654.1998704077006846521.stgit@bahia>
-References: <150496954641.9654.1998704077006846521.stgit@bahia>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqhLm-0007GW-KW
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:07:14 -0400
+Date: Sat, 9 Sep 2017 23:07:10 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170909150710.GA29670@lemon.lan>
+References: <20170909054613.19148-1-famz@redhat.com>
+	<20170909054613.19148-11-famz@redhat.com>
+	<CAFEAcA83JDUMAsCAY=YBL+qS8A1n6VMfH1p_DAmouF0W8m-j9g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 5/5] spapr_pci: handle FDT creation errors with
- _FDT()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA83JDUMAsCAY=YBL+qS8A1n6VMfH1p_DAmouF0W8m-j9g@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PULL v2 10/37] scripts: Add archive-source.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,109 +28,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-libfdt failures when creating the FDT should cause QEMU to terminate.
+On Sat, 09/09 13:07, Peter Maydell wrote:
+> On 9 September 2017 at 06:45, Fam Zheng <famz@redhat.com> wrote:
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > Message-Id: <20170905021201.25684-4-famz@redhat.com>
+> > ---
+> >  scripts/archive-source.sh | 31 +++++++++++++++++++++++++++++++
+> >  1 file changed, 31 insertions(+)
+> >  create mode 100755 scripts/archive-source.sh
+> >
+> > diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+> > new file mode 100755
+> > index 0000000000..1de369532e
+> > --- /dev/null
+> > +++ b/scripts/archive-source.sh
+> > @@ -0,0 +1,31 @@
+> > +#!/bin/sh
+> > +#
+> > +# Author: Fam Zheng <famz@redhat.com>
+> > +#
+> > +# Create archive of source tree, including submodules
+> > +#
+> > +# This code is licensed under the GPL version 2 or later.  See
+> > +# the COPYING file in the top-level directory.
+> 
+> So is this the script that for instance Mike Roth would use
+> to create the release tarballs? If it isn't, should it be?
 
-Let's use the _FDT() macro which does just that instead of propagating
-the error to the caller. spapr_populate_pci_child_dt() no longer needs
-to return a value in this case.
+I don't know the workflow of release tarballs, there is ./scripts/make-release
+for that. So this one is not.
 
-Note that, on the way, this get rids of the following nonsensical lines:
+> Is it intended for end users to create tarballs with, or
+> is it really just a helper script for the docker stuff?
+> If the latter, it would be helpful to say so. If the former,
+> it could really use more usage information/documentation...
 
-    g_assert(!ret);
-    if (ret) {
+I'm not sure what end users would use this for, but it should do its work just
+the same.. What kind of usage information do you suggest? More explaination in
+the header, or in the "usage" output when no target is specified, or a "-h"
+option for help?
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr_pci.c |   30 +++++++-----------------------
- 1 file changed, 7 insertions(+), 23 deletions(-)
+> 
+> > +
+> > +set -e
+> > +
+> > +if test $# -lt 1; then
+> > +    echo "Usage: $0 <output>"
+> > +    exit 1
+> > +fi
+> > +
+> > +submodules=$(git submodule foreach --recursive --quiet 'echo $name')
+> > +
+> > +if test -n "$submodules"; then
+> > +    {
+> > +        git ls-files
+> > +        for sm in $submodules; do
+> > +            (cd $sm; git ls-files) | sed "s:^:$sm/:"
+> > +        done
+> > +    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > $1.list
+> 
+> Supporting '-e something' in a tar -T listfile seems to
+> be GNU tar specific. Do we care?
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index abb9f05e7b75..75cd9392233e 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1204,12 +1204,12 @@ static gchar *pci_get_node_name(PCIDevice *dev)
- static uint32_t spapr_phb_get_pci_drc_index(sPAPRPHBState *phb,
-                                             PCIDevice *pdev);
- 
--static int spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
-+static void spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
-                                        sPAPRPHBState *sphb)
- {
-     ResourceProps rp;
-     bool is_bridge = false;
--    int pci_status, err;
-+    int pci_status;
-     char *buf = NULL;
-     uint32_t drc_index = spapr_phb_get_pci_drc_index(sphb, dev);
-     uint32_t ccode = pci_default_read_config(dev, PCI_CLASS_PROG, 3);
-@@ -1274,11 +1274,8 @@ static int spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
-                                                  ccode & 0xff)));
- 
-     buf = spapr_phb_get_loc_code(sphb, dev);
--    err = fdt_setprop_string(fdt, offset, "ibm,loc-code", buf);
-+    _FDT(fdt_setprop_string(fdt, offset, "ibm,loc-code", buf));
-     g_free(buf);
--    if (err < 0) {
--        return err;
--    }
- 
-     if (drc_index) {
-         _FDT(fdt_setprop_cell(fdt, offset, "ibm,my-drc-index", drc_index));
-@@ -1306,27 +1303,21 @@ static int spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
-     if (sphb->pcie_ecs && pci_is_express(dev)) {
-         _FDT(fdt_setprop_cell(fdt, offset, "ibm,pci-config-space-type", 0x1));
-     }
--
--    return 0;
- }
- 
- /* create OF node for pci device and required OF DT properties */
- static int spapr_create_pci_child_dt(sPAPRPHBState *phb, PCIDevice *dev,
-                                      void *fdt, int node_offset)
- {
--    int offset, ret;
-+    int offset;
-     gchar *nodename;
- 
-     nodename = pci_get_node_name(dev);
--    offset = fdt_add_subnode(fdt, node_offset, nodename);
-+    _FDT(offset = fdt_add_subnode(fdt, node_offset, nodename));
-     g_free(nodename);
- 
--    ret = spapr_populate_pci_child_dt(dev, fdt, offset, phb);
-+    spapr_populate_pci_child_dt(dev, fdt, offset, phb);
- 
--    g_assert(!ret);
--    if (ret) {
--        return 0;
--    }
-     return offset;
- }
- 
-@@ -1416,10 +1407,6 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
- 
-     fdt = create_device_tree(&fdt_size);
-     fdt_start_offset = spapr_create_pci_child_dt(phb, pdev, fdt, 0);
--    if (!fdt_start_offset) {
--        error_setg(&local_err, "Failed to create pci child device tree node");
--        goto out;
--    }
- 
-     spapr_drc_attach(drc, DEVICE(pdev), fdt, fdt_start_offset, &local_err);
-     if (local_err) {
-@@ -2114,11 +2101,8 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
- 
-     /* Start populating the FDT */
-     nodename = g_strdup_printf("pci@%" PRIx64, phb->buid);
--    bus_off = fdt_add_subnode(fdt, 0, nodename);
-+    _FDT(bus_off = fdt_add_subnode(fdt, 0, nodename));
-     g_free(nodename);
--    if (bus_off < 0) {
--        return bus_off;
--    }
- 
-     /* Write PHB properties */
-     _FDT(fdt_setprop_string(fdt, bus_off, "device_type", "pci"));
+The "-e $sm" will go to the grep command line, so it isn't GNU specific, is it?
+
+> 
+> > +else
+> > +    git ls-files > $1.list
+> > +fi
+> 
+> This will blow up if we ever have a file in the repo
+> that starts with a '-'. Do we care?
+
+I'm sure such a file will be a trouble, but I'd rather we deal with it when
+there is one: I don't think anyone will think about adding, or welcome such a
+file.
+
+> 
+> > +
+> > +tar -cf $1 -T $1.list
+> > +rm $1.list
+> 
+> This is missing a lot of quoting for $1, so it will go wrong
+> if there's a space in that filename argument.
+
+Yes, good point. I will fix it before sending another pull request along with
+other comments that are just raised.
+
+Fam
