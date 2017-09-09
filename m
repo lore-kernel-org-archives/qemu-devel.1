@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58749)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqa7K-0000Vp-U3
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 03:23:51 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dqa7K-0000Vo-Tc
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 03:23:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqa7J-0005gB-St
+	(envelope-from <dgibson@ozlabs.org>) id 1dqa7J-0005gD-T6
 	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 03:23:50 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:44011)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgibson@ozlabs.org>) id 1dqa7J-0005f4-4O
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 03:23:49 -0400
-Date: Sat, 9 Sep 2017 17:18:46 +1000
+Date: Sat, 9 Sep 2017 17:02:12 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170909071846.GU2735@umbus.fritz.box>
-References: <20170907092010.3605-1-aik@ozlabs.ru>
-	<20170907092010.3605-3-aik@ozlabs.ru>
+Message-ID: <20170909070212.GT2735@umbus.fritz.box>
+References: <20170906082748.28520-1-nikunj@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hLTC+yGFJlatjToQ"
+	protocol="application/pgp-signature"; boundary="ScUgq5oMe+fJq4F1"
 Content-Disposition: inline
-In-Reply-To: <20170907092010.3605-3-aik@ozlabs.ru>
-Subject: Re: [Qemu-devel] [RFC PATCH qemu 2/4] memory: Prepare for shared
- flat views
+In-Reply-To: <20170906082748.28520-1-nikunj@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +24,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
 
---hLTC+yGFJlatjToQ
+--ScUgq5oMe+fJq4F1
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 07, 2017 at 07:20:08PM +1000, Alexey Kardashevskiy wrote:
-> We are going to share flat views and dispatch trees between address
-> spaces. This moves bits around but no change in behaviour is expected
-> here. The following patch will implement sharing.
+On Wed, Sep 06, 2017 at 01:57:48PM +0530, Nikunj A Dadhania wrote:
+> When the user does not provide the cpu topology, e.g. "-smp 4", machine f=
+ails to
+> initialize 4 cpus. Compute the chip per cores depending on the number of =
+chips
+> and smt threads.
 >=20
-> This switches from AddressSpace to AddressSpaceDispatch as in many
-> places this is what is used actually. Also, since multiple address
-> spaces will be sharing a flat view, MemoryRegionSection cannot store
-> the address space pointer, this changes it to AddressSpaceDispatch
-> as well. As a not very obvious result, IOMMUTLBEntry also switched
-> from AddressSpace to AddressSpaceDispatch to make
-> address_space_get_iotlb_entry() work.
+> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
 
-So, mostly this seems to be exposing AddressSpaceDispatch in more
-places.  It's not obvious to me why that's useful.
+I don't understand why simply treating smp_cores as cores per chip is wrong.
+
+> ---
+>  hw/ppc/pnv.c | 20 ++++++++++++++++++--
+>  1 file changed, 18 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index 9724719..3fbaafb 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -642,7 +642,7 @@ static void ppc_powernv_init(MachineState *machine)
+>      MemoryRegion *ram;
+>      char *fw_filename;
+>      long fw_size;
+> -    int i;
+> +    int i, cores_per_chip;
+>      char *chip_typename;
+>      PCIBus *pbus;
+>      bool has_gfx =3D false;
+> @@ -710,6 +710,22 @@ static void ppc_powernv_init(MachineState *machine)
+>      }
+> =20
+>      pnv->chips =3D g_new0(PnvChip *, pnv->num_chips);
+> +
+> +    /* If user has specified number of cores, use it. Otherwise, compute=
+ it. */
+> +    if (smp_cores !=3D 1) {
+> +        cores_per_chip =3D smp_cores;
+> +    } else {
+> +        cores_per_chip =3D smp_cpus / (smp_threads * pnv->num_chips);
+> +    }
+> +
+> +    if (smp_cpus !=3D (smp_threads * pnv->num_chips * cores_per_chip)) {
+> +        error_report("cpu topology not balanced: "
+> +                     "chips (%u) * cores (%u) * threads (%u) !=3D "
+> +                     "number of cpus (%u)",
+> +                     pnv->num_chips, cores_per_chip, smp_threads, smp_cp=
+us);
+> +        exit(1);
+> +    }
+> +
+>      for (i =3D 0; i < pnv->num_chips; i++) {
+>          char chip_name[32];
+>          Object *chip =3D object_new(chip_typename);
+> @@ -728,7 +744,7 @@ static void ppc_powernv_init(MachineState *machine)
+>          object_property_add_child(OBJECT(pnv), chip_name, chip, &error_f=
+atal);
+>          object_property_set_int(chip, PNV_CHIP_HWID(i), "chip-id",
+>                                  &error_fatal);
+> -        object_property_set_int(chip, smp_cores, "nr-cores", &error_fata=
+l);
+> +        object_property_set_int(chip, cores_per_chip, "nr-cores", &error=
+_fatal);
+>          object_property_set_int(chip, 1, "num-phbs", &error_fatal);
+>          object_property_set_bool(chip, true, "realized", &error_fatal);
+>      }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -60,24 +105,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hLTC+yGFJlatjToQ
+--ScUgq5oMe+fJq4F1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmzldMACgkQbDjKyiDZ
-s5KEkw/7B8JgZwmk1+kJRE8GTeRv304pjWj/x4eOG+ZHAd/fW6PlSsnYke/EmChp
-tVy8QZnmxxYD+H7HbfcNxjzH7y2w5Fg6Nh9JfE9HShzofeVAdH3zQDykQck9mvAP
-/hOECurudw7+5UGJKPd3HyTEfZ6bYmIevOBvE5t9r6tbm8tRlin0PiAM3+5oFkHU
-c3uy+Y/JoGWyaS36x04pZKgx3NuBEbx3RftAXMJgpz0JjT1UOJUmkfzdEpkQ09Bd
-lsykWcN0Oq2EbqbQA0RdJ8TQGP6hIzbI3UE/vKhXYuwmtXyFHq35zhEroRivResX
-f6MhPeR7jQYJYOxeo+/3cvecEqT9650p66XddP3dCTNZqNF3lPQO1svocDqhKdHN
-dKxxKO9Bnd+mNyodBvLKyLzO4rJ4ZDLMuanwj27xxBilGI+a/oxDeh6kC4nIiRG7
-UW87hzZnD/kU9yiE96z4HKjO+9nuoIHiD0N+4oRLy/qapIq2NGBhv1wQ571R2l5i
-NBV02XCREeCeOKmDm8fT2qARFWDOZbT4NOnGNSpKphJyJ2+ecEmFWLckKL05jRii
-PxOayHPuknHpR3ERLlVQJwa1RhQnrFBSAFohlzE8tz/LZqVqBzbpCcnaHd+7uaKc
-Wee5N83wUbsm5fNQYDIaNTaRzZ3pXj06gFpWDeqZalfSwA+aNBU=
-=ntR0
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlmzkfEACgkQbDjKyiDZ
+s5IxqhAAvzYKXeYK/UAybUFtwWC/31y4wT9emXZ0jJjqY8bQM4O2X/y6jMcD2JZG
+kRu3iEFepKuen6J8gDSuABvsMzgmrEBmwLl8u8QjZ5+mfIQLUJKci7pkcntJyIuj
+IEEjvXlnzWKriZFgOSjHzvs5MartOoTP6b2kqgOH8owYj+JJvPZ1hxbzlVgwjy9C
+PGaL1nCVvfl9ZPg1qC9xGS/dPslwIh2aFyhcVpfQeuJxGAd7hYrx0HwBmjWAFvzR
+lBnn6G/s6dllAvVNcbUVwSJo+Wfx9c8mcv8BmMwfu4F+qb7y5z6zZBTX0PcMIV9h
+UfEKr6ChvNRRwuzA4S3xi4dGDUrE8sb03d5ctKmhMQ+9PvuIg95i5f+vh9lUvKhh
+Ooj2ZrdH3gu799Em4LjcVyiY7Xy0c2iv3e06PpTZUjuvQBa4UfBGf7djmUWk11qz
+eUzd5GURNOBZtGXIgSL67xGqGfaOCW37jeYmQrpFS3dYLyucHTQOfKxR5uqimarX
+M8u6n1km8RXMo8Deg1hffqfNVszDAPfB6HTGFI4KtGPJBrDFK5sXD5+uJXC2YPzF
+AW0LkFQjgEZ/8TDI+biKIBZmqX1YV1KmUOfJyfjUuK/kKLDP6YD2mkukkFlPWHFk
+YHkXtcpWf1S++IcJ9qZ1lHkbYRuaP89Zw2tPb4Zt6MWQjrMgTUI=
+=Uuhv
 -----END PGP SIGNATURE-----
 
---hLTC+yGFJlatjToQ--
+--ScUgq5oMe+fJq4F1--
