@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51077)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51176)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dqhL8-0007v5-LK
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:06:39 -0400
+	(envelope-from <groug@kaod.org>) id 1dqhLG-00082t-Ou
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:06:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dqhL4-0006Hd-5u
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:06:34 -0400
-Received: from 10.mo177.mail-out.ovh.net ([46.105.73.133]:41248)
+	(envelope-from <groug@kaod.org>) id 1dqhLC-0006OS-6q
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:06:42 -0400
+Received: from 9.mo177.mail-out.ovh.net ([46.105.72.238]:35964)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dqhL3-0006FX-VJ
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:06:30 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dqhLC-0006MW-0m
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 11:06:38 -0400
 Received: from player714.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 8F0BC751FF
-	for <qemu-devel@nongnu.org>; Sat,  9 Sep 2017 17:06:28 +0200 (CEST)
+	by mo177.mail-out.ovh.net (Postfix) with ESMTP id 677EB76A4D
+	for <qemu-devel@nongnu.org>; Sat,  9 Sep 2017 17:06:36 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Sat, 09 Sep 2017 17:06:25 +0200
-Message-ID: <150496958584.9654.9736122740323515191.stgit@bahia>
+Date: Sat, 09 Sep 2017 17:06:33 +0200
+Message-ID: <150496959359.9654.1986960584525021648.stgit@bahia>
 In-Reply-To: <150496954641.9654.1998704077006846521.stgit@bahia>
 References: <150496954641.9654.1998704077006846521.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 4/5] spapr_pci: use the common _FDT() helper
+Subject: [Qemu-devel] [PATCH 5/5] spapr_pci: handle FDT creation errors with
+ _FDT()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +33,106 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-All other users in hw/ppc already consider an error when building
-the FDT to be fatal, even on hotplug paths. There's no valid reason
-for spapr_pci to behave differently. So let's used the common _FDT()
-helper which terminates QEMU when libfdt fails.
+libfdt failures when creating the FDT should cause QEMU to terminate.
+
+Let's use the _FDT() macro which does just that instead of propagating
+the error to the caller. spapr_populate_pci_child_dt() no longer needs
+to return a value in this case.
+
+Note that, on the way, this get rids of the following nonsensical lines:
+
+    g_assert(!ret);
+    if (ret) {
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr_pci.c |   10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
+ hw/ppc/spapr_pci.c |   30 +++++++-----------------------
+ 1 file changed, 7 insertions(+), 23 deletions(-)
 
 diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 6da73fe6bc29..abb9f05e7b75 100644
+index abb9f05e7b75..75cd9392233e 100644
 --- a/hw/ppc/spapr_pci.c
 +++ b/hw/ppc/spapr_pci.c
-@@ -40,7 +40,7 @@
- #include "trace.h"
- #include "qemu/error-report.h"
- #include "qapi/qmp/qerror.h"
--
-+#include "hw/ppc/fdt.h"
- #include "hw/pci/pci_bridge.h"
- #include "hw/pci/pci_bus.h"
- #include "hw/pci/pci_ids.h"
-@@ -61,14 +61,6 @@
- #define RTAS_TYPE_MSI           1
- #define RTAS_TYPE_MSIX          2
+@@ -1204,12 +1204,12 @@ static gchar *pci_get_node_name(PCIDevice *dev)
+ static uint32_t spapr_phb_get_pci_drc_index(sPAPRPHBState *phb,
+                                             PCIDevice *pdev);
  
--#define _FDT(exp) \
--    do { \
--        int ret = (exp);                                           \
--        if (ret < 0) {                                             \
--            return ret;                                            \
--        }                                                          \
--    } while (0)
--
- sPAPRPHBState *spapr_pci_find_phb(sPAPRMachineState *spapr, uint64_t buid)
+-static int spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
++static void spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
+                                        sPAPRPHBState *sphb)
  {
-     sPAPRPHBState *sphb;
+     ResourceProps rp;
+     bool is_bridge = false;
+-    int pci_status, err;
++    int pci_status;
+     char *buf = NULL;
+     uint32_t drc_index = spapr_phb_get_pci_drc_index(sphb, dev);
+     uint32_t ccode = pci_default_read_config(dev, PCI_CLASS_PROG, 3);
+@@ -1274,11 +1274,8 @@ static int spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
+                                                  ccode & 0xff)));
+ 
+     buf = spapr_phb_get_loc_code(sphb, dev);
+-    err = fdt_setprop_string(fdt, offset, "ibm,loc-code", buf);
++    _FDT(fdt_setprop_string(fdt, offset, "ibm,loc-code", buf));
+     g_free(buf);
+-    if (err < 0) {
+-        return err;
+-    }
+ 
+     if (drc_index) {
+         _FDT(fdt_setprop_cell(fdt, offset, "ibm,my-drc-index", drc_index));
+@@ -1306,27 +1303,21 @@ static int spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
+     if (sphb->pcie_ecs && pci_is_express(dev)) {
+         _FDT(fdt_setprop_cell(fdt, offset, "ibm,pci-config-space-type", 0x1));
+     }
+-
+-    return 0;
+ }
+ 
+ /* create OF node for pci device and required OF DT properties */
+ static int spapr_create_pci_child_dt(sPAPRPHBState *phb, PCIDevice *dev,
+                                      void *fdt, int node_offset)
+ {
+-    int offset, ret;
++    int offset;
+     gchar *nodename;
+ 
+     nodename = pci_get_node_name(dev);
+-    offset = fdt_add_subnode(fdt, node_offset, nodename);
++    _FDT(offset = fdt_add_subnode(fdt, node_offset, nodename));
+     g_free(nodename);
+ 
+-    ret = spapr_populate_pci_child_dt(dev, fdt, offset, phb);
++    spapr_populate_pci_child_dt(dev, fdt, offset, phb);
+ 
+-    g_assert(!ret);
+-    if (ret) {
+-        return 0;
+-    }
+     return offset;
+ }
+ 
+@@ -1416,10 +1407,6 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
+ 
+     fdt = create_device_tree(&fdt_size);
+     fdt_start_offset = spapr_create_pci_child_dt(phb, pdev, fdt, 0);
+-    if (!fdt_start_offset) {
+-        error_setg(&local_err, "Failed to create pci child device tree node");
+-        goto out;
+-    }
+ 
+     spapr_drc_attach(drc, DEVICE(pdev), fdt, fdt_start_offset, &local_err);
+     if (local_err) {
+@@ -2114,11 +2101,8 @@ int spapr_populate_pci_dt(sPAPRPHBState *phb,
+ 
+     /* Start populating the FDT */
+     nodename = g_strdup_printf("pci@%" PRIx64, phb->buid);
+-    bus_off = fdt_add_subnode(fdt, 0, nodename);
++    _FDT(bus_off = fdt_add_subnode(fdt, 0, nodename));
+     g_free(nodename);
+-    if (bus_off < 0) {
+-        return bus_off;
+-    }
+ 
+     /* Write PHB properties */
+     _FDT(fdt_setprop_string(fdt, bus_off, "device_type", "pci"));
