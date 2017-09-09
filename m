@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34228)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqYbw-0006hy-BZ
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 01:47:21 -0400
+	(envelope-from <famz@redhat.com>) id 1dqYc1-0006mF-3v
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 01:47:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dqYbv-0006nx-JF
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 01:47:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33562)
+	(envelope-from <famz@redhat.com>) id 1dqYbz-0006rZ-Sy
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 01:47:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57386)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqYbv-0006mx-D6
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 01:47:19 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqYbz-0006rA-N8
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 01:47:23 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Sat,  9 Sep 2017 13:46:09 +0800
-Message-Id: <20170909054613.19148-34-famz@redhat.com>
+Date: Sat,  9 Sep 2017 13:46:11 +0800
+Message-Id: <20170909054613.19148-36-famz@redhat.com>
 In-Reply-To: <20170909054613.19148-1-famz@redhat.com>
 References: <20170909054613.19148-1-famz@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v2 33/37] buildsys: Move libcacard cflags/libs
+Subject: [Qemu-devel] [PULL v2 35/37] buildsys: Move usb redir cflags/libs
  to per object
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -31,54 +31,49 @@ To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170907082918.7299-8-famz@redhat.com>
+Message-Id: <20170907082918.7299-10-famz@redhat.com>
 Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: Fam Zheng <famz@redhat.com>
 ---
  configure            | 4 ++--
- hw/usb/Makefile.objs | 6 ++++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ hw/usb/Makefile.objs | 2 ++
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/configure b/configure
-index 88eafe8a10..be50159161 100755
+index b50d662cde..85ea2c25bb 100755
 --- a/configure
 +++ b/configure
-@@ -4235,8 +4235,6 @@ if test "$smartcard" !=3D "no"; then
-     if $pkg_config libcacard; then
-         libcacard_cflags=3D$($pkg_config --cflags libcacard)
-         libcacard_libs=3D$($pkg_config --libs libcacard)
--        QEMU_CFLAGS=3D"$QEMU_CFLAGS $libcacard_cflags"
--        libs_softmmu=3D"$libs_softmmu $libcacard_libs"
-         smartcard=3D"yes"
+@@ -4264,8 +4264,6 @@ if test "$usb_redir" !=3D "no" ; then
+         usb_redir=3D"yes"
+         usb_redir_cflags=3D$($pkg_config --cflags libusbredirparser-0.5)
+         usb_redir_libs=3D$($pkg_config --libs libusbredirparser-0.5)
+-        QEMU_CFLAGS=3D"$QEMU_CFLAGS $usb_redir_cflags"
+-        libs_softmmu=3D"$libs_softmmu $usb_redir_libs"
      else
-         if test "$smartcard" =3D "yes"; then
-@@ -5820,6 +5818,8 @@ fi
+         if test "$usb_redir" =3D "yes"; then
+             feature_not_found "usb-redir" "Install usbredir devel"
+@@ -5828,6 +5826,8 @@ fi
 =20
- if test "$smartcard" =3D "yes" ; then
-   echo "CONFIG_SMARTCARD=3Dy" >> $config_host_mak
-+  echo "SMARTCARD_CFLAGS=3D$libcacard_cflags" >> $config_host_mak
-+  echo "SMARTCARD_LIBS=3D$libcacard_libs" >> $config_host_mak
+ if test "$usb_redir" =3D "yes" ; then
+   echo "CONFIG_USB_REDIR=3Dy" >> $config_host_mak
++  echo "USB_REDIR_CFLAGS=3D$usb_redir_cflags" >> $config_host_mak
++  echo "USB_REDIR_LIBS=3D$usb_redir_libs" >> $config_host_mak
  fi
 =20
- if test "$libusb" =3D "yes" ; then
+ if test "$opengl" =3D "yes" ; then
 diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
-index 97f1c4561a..795ff25a5e 100644
+index 9ce9eadb47..92eb199697 100644
 --- a/hw/usb/Makefile.objs
 +++ b/hw/usb/Makefile.objs
-@@ -26,8 +26,10 @@ common-obj-$(CONFIG_USB_BLUETOOTH)    +=3D dev-bluetoo=
-th.o
+@@ -38,6 +38,8 @@ endif
 =20
- ifeq ($(CONFIG_USB_SMARTCARD),y)
- common-obj-y                          +=3D dev-smartcard-reader.o
--common-obj-$(CONFIG_SMARTCARD)        +=3D ccid-card-passthru.o
--common-obj-$(CONFIG_SMARTCARD)        +=3D ccid-card-emulated.o
-+common-obj-$(CONFIG_SMARTCARD)        +=3D smartcard.mo
-+smartcard.mo-objs :=3D ccid-card-passthru.o ccid-card-emulated.o
-+smartcard.mo-cflags :=3D $(SMARTCARD_CFLAGS)
-+smartcard.mo-libs :=3D $(SMARTCARD_LIBS)
- endif
+ # usb redirection
+ common-obj-$(CONFIG_USB_REDIR) +=3D redirect.o quirks.o
++redirect.o-cflags =3D $(USB_REDIR_CFLAGS)
++redirect.o-libs =3D $(USB_REDIR_LIBS)
 =20
- ifeq ($(CONFIG_POSIX),y)
+ # usb pass-through
+ common-obj-y +=3D $(patsubst %,host-%.o,$(HOST_USB))
 --=20
 2.13.5
