@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45004)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dr3N2-0007dU-PX
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dr3N2-0007dR-PE
 	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 10:38:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dr3N1-0000W4-Fq
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dr3N0-0000Ur-4q
 	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 10:38:00 -0400
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 10 Sep 2017 15:37:33 +0100
-Message-Id: <1505054255-2990-3-git-send-email-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <1505054255-2990-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1505054255-2990-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 2/4] ppc: add CPU IRQ state to PPC
- VMStateDescription
+Date: Sun, 10 Sep 2017 15:37:31 +0100
+Message-Id: <1505054255-2990-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 0/4] ppc: migration fixes for TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,47 +19,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, aik@ozlabs.ru, lvivier@redhat.com
 
-Commit a90db15 "target-ppc: Convert ppc cpu savevm to VMStateDescription"
-appears to drop the internal CPU IRQ state from the migration stream. Whilst
-testing migration on g3beige/mac99 machines, test images would randomly fail to
-resume unless a key was pressed on the VGA console.
+This is a rebase of my outstanding patches to fix migration for the Mac
+g3beige and mac99 machines when using TCG. Some discussion on previous
+versions of these patches can be found at:
 
-Further investigation suggests that internal CPU IRQ state isn't being
-preserved and so interrupts asserted at the time of migration are lost. Adding
-the pending_interrupts and irq_input_state fields back into the migration
-stream appears to fix the problem here during local tests.
+https://lists.gnu.org/archive/html/qemu-devel/2016-01/msg00544.html
+https://lists.gnu.org/archive/html/qemu-devel/2016-01/msg01114.html
+https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg01489.html
 
-As part of this commit we bump the vmstate_ppc version from 5 to 6 to handle
-the additional fields.
+With this patchset applied, I've been able to repeatedly execute
+savevm/loadvm commands from the console when installing Darwin on g3beige
+and whilst using MacOS 9.2 on mac99 with no apparent ill effects.
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- target/ppc/machine.c |    6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index e59049f..8fec1a4 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -647,7 +647,7 @@ static const VMStateDescription vmstate_compat = {
- 
- const VMStateDescription vmstate_ppc_cpu = {
-     .name = "cpu",
--    .version_id = 5,
-+    .version_id = 6,
-     .minimum_version_id = 5,
-     .minimum_version_id_old = 4,
-     .load_state_old = cpu_load_old,
-@@ -678,6 +678,10 @@ const VMStateDescription vmstate_ppc_cpu = {
-         VMSTATE_UINTTL(env.hflags_nmsr, PowerPCCPU),
-         /* FIXME: access_type? */
- 
-+        /* Interrupt state */
-+        VMSTATE_UINT32_V(env.pending_interrupts, PowerPCCPU, 6),
-+        VMSTATE_UINT32_V(env.irq_input_state, PowerPCCPU, 6),
-+
-         /* Sanity checking */
-         VMSTATE_UINTTL_TEST(mig_msr_mask, PowerPCCPU, cpu_pre_2_8_migration),
-         VMSTATE_UINT64_TEST(mig_insns_flags, PowerPCCPU, cpu_pre_2_8_migration),
+
+Mark Cave-Ayland (4):
+  ppc: change CPUPPCState access_type from int to uint8_t
+  ppc: add CPU IRQ state to PPC VMStateDescription
+  ppc: add CPU access_type into the migration stream
+  ppc: ensure we update the decrementer value during migration
+
+ target/ppc/cpu.h     |    4 ++--
+ target/ppc/machine.c |   14 +++++++++++---
+ 2 files changed, 13 insertions(+), 5 deletions(-)
+
 -- 
 1.7.10.4
