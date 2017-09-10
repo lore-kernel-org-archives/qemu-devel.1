@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36408)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqrWR-0000Iu-1i
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:58:55 -0400
+	(envelope-from <famz@redhat.com>) id 1dqrdE-0002NY-RB
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 22:05:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqrWQ-0002O7-0o
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:58:55 -0400
-Date: Sun, 10 Sep 2017 11:40:15 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170910014015.GV2735@umbus.fritz.box>
-References: <150496954641.9654.1998704077006846521.stgit@bahia>
+	(envelope-from <famz@redhat.com>) id 1dqrd9-0004UB-Tv
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 22:05:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50728)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dqrd9-0004Tv-Ng
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 22:05:51 -0400
+Date: Sun, 10 Sep 2017 10:05:47 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170910020547.GA32341@lemon.lan>
+References: <20170909054613.19148-1-famz@redhat.com>
+	<20170909054613.19148-11-famz@redhat.com>
+	<CAFEAcA83JDUMAsCAY=YBL+qS8A1n6VMfH1p_DAmouF0W8m-j9g@mail.gmail.com>
+	<20170909150710.GA29670@lemon.lan>
+	<4377bd37-3309-fe80-666f-f05626efe930@gmx.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="uOZhbHG+Ruum37TI"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <150496954641.9654.1998704077006846521.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH 0/5] spapr_pci: various cleanups and
- improvements
+In-Reply-To: <4377bd37-3309-fe80-666f-f05626efe930@gmx.com>
+Subject: Re: [Qemu-devel] [PULL v2 10/37] scripts: Add archive-source.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,66 +30,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Kamil Rytarowski <n54@gmx.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
+On Sat, 09/09 17:08, Kamil Rytarowski wrote:
+> >>> +submodules=$(git submodule foreach --recursive --quiet 'echo $name')
+> >>> +
+> >>> +if test -n "$submodules"; then
+> >>> +    {
+> >>> +        git ls-files
+> >>> +        for sm in $submodules; do
+> >>> +            (cd $sm; git ls-files) | sed "s:^:$sm/:"
+> >>> +        done
+> >>> +    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > $1.list
+> >>
+> >> Supporting '-e something' in a tar -T listfile seems to
+> >> be GNU tar specific. Do we care?
+> > 
+> > The "-e $sm" will go to the grep command line, so it isn't GNU specific, is it?
+> > 
+> 
+> BSD OSes use GNU grep(1) the latest version GPLv2. There is a work in
+> progress BSD grep(1), but not turned on by default as it's slower.
+> 
+> The -e option is supported by SmartOS grep(1).
 
---uOZhbHG+Ruum37TI
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Is there a more portable way to filter out multiple patterns?
 
-On Sat, Sep 09, 2017 at 05:05:46PM +0200, Greg Kurz wrote:
-> Before resuming the huge work on PHB hotplug, here are some patches
-> that maybe worth to apply.
->=20
-> Patches 1 to 3 are basic improvements.
-
-I've applied these to ppc-for-2.11.
-
-> Patch 4 and 5 may be a bit controversial. Everywhere in the spapr
-> code where we build an FDT portion, libfdt failures cause QEMU to
-> exit, even on hotplug paths. Only spapr_pci doesn't do that and
-> propagates the error instead. My understanding is that a failure
-> when building the FDT is likely to happen because of a bug in QEMU.
-
-Still looking at these.
-
->=20
-> Hence the choice to convert spapr_pci to do like the others. We may
-> even consider changing _FDT() to abort() instead of exit().
->=20
-> Alternatively, if libfdt failures shouldn't be necessarily fatal,
-> especially on post-realize paths, then we should probably introduce
-> an _FDT_ERR() helper to propagate errors. And use it in may places
-> where we currently terminate QEMU: memory hotplug, CPU hotplug, CAS,
-> machine reset...
->=20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---uOZhbHG+Ruum37TI
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIyBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm0l/sACgkQbDjKyiDZ
-s5Ki/Q/4kR9XyLcaiN5/0H6QHlk2QEBvpUSPpMiT79h5hqQFVm/PXfB4xLUYxz8e
-MLAdFwxoJ4gK8W3/hFHmpHuHBBCLqj/iKsbGkJo3sLIRgwIzbGmpMXT3ITTVWqCF
-hSneZ/DRUETot1DtXSalIlkJZHcJw5/ZxOBfJI+p+teoUcvUPdpJltyM6KkQaTN2
-f4FpfHl2Vqnv6uVz07eEYXVx1QQuxEGCJN9rhSz+lPOt0XmadafGdL0NreOWFUjf
-mzzqUWYbxGXA+qmd8D0bMqrRN0mqG/B0Rn9zOEGrA/PglE41sLl+6zVOP8a/TCPz
-rVoNpXTRRoEHgkKr6wA/Mu1yj7NCDADDyT0lyWpYNu8sXclnPf+856wf/asjF7yy
-XSailkY90l/12bDH0cR1lXhF6ckhIqdrSe29Tlq+5ChtJLZf/T4kbm3/VKAYIh6p
-kC/s6GoQdbp4gSxCcLzufpQZBj1rfMI7joQWZEBY5RYgzNAhnLvlb8Yy4gDP9hgu
-TumUjCcKI7eAYizMpZ/kg967egyQMxR6Tpwwt9D4j/rXDfCFsC+ptiHBO43+7djg
-bFUOaoKbaQjZgGjmwROyLt7ieKeZYqIXrq3lApk6c3p2Zk5A2s0JiFOfCboE10kg
-1ZVjnwyScmwQ/AwkSxRE0dv57WKoL2Wc4Itmwfw2KUOw8afeaw==
-=UZzK
------END PGP SIGNATURE-----
-
---uOZhbHG+Ruum37TI--
+Fam
