@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58967)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dqttZ-0003i3-DZ
+	(envelope-from <bounces@canonical.com>) id 1dqttZ-0003hy-Cn
 	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 00:30:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dqttV-0003NM-5w
+	(envelope-from <bounces@canonical.com>) id 1dqttT-0003MX-RS
 	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 00:30:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42787)
+Received: from indium.canonical.com ([91.189.90.7]:42741)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dqttU-0003Mv-VC
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 00:30:53 -0400
+	id 1dqttT-0003MH-Kf
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 00:30:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dqttT-0000sg-RC
-	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 04:30:51 +0000
+	id 1dqttS-0000sw-2h
+	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 04:30:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B2E982E8492
-	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 04:30:51 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 121EF2E8490
+	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 04:30:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 10 Sep 2017 04:17:50 -0000
-From: Launchpad Bug Tracker <1094950@bugs.launchpad.net>
-Reply-To: Bug 1094950 <1094950@bugs.launchpad.net>
+Date: Sun, 10 Sep 2017 04:17:51 -0000
+From: Launchpad Bug Tracker <1095857@bugs.launchpad.net>
+Reply-To: Bug 1095857 <1095857@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20121231204645.26308.5533.malonedeb@soybean.canonical.com>
-Message-Id: <150501707104.27827.5882218966394044598.malone@loganberry.canonical.com>
+References: <20130103232452.20840.26594.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150501707180.27827.9818551623176123034.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1094950] Re: crash at qemu_iohandler_poll
- (iohandler.c:124) on macos 10.8.2
+Subject: [Qemu-devel] [Bug 1095857] Re: incorrect handling of [r32] address
+ (long mode)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,80 +48,30 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1094950
+https://bugs.launchpad.net/bugs/1095857
 
 Title:
-  crash at  qemu_iohandler_poll (iohandler.c:124) on macos 10.8.2
+  incorrect handling of [r32] address (long mode)
 
 Status in QEMU:
   Expired
 
 Bug description:
-  I'm seeing consistent hangs / crashes on MacOS 10.8.2 with 1.3.0.
-  I've tried both gcc-4.2 and clang.  I've tried a half a dozen
-  different images/kernels.
+  while executing in Long Mode (x86-64) instructions such as
 
-  I configured qemu like this:
+  mov eax,[r15d]
 
-  ./configure --disable-sdl --disable-kvm --enable-cocoa --cc=3Dgcc-4.2
-  --host-cc=3Dgcc-4.2 --enable-debug   --extra-cflags=3D-g   --extra-
-  ldflags=3D-g
+  end up executing as
 
-  And ran it like this:
+  mov eax,[r15]
 
-  qemu-system-arm -nographic -M versatilepb -kernel
-  vmlinuz-2.6.32-5-versatile -initrd initrd.img-2.6.32-5-versatile -hda
-  debian_squeeze_armel_standard.qcow2 -append "root=3D/dev/sda1
-  console=3DttyAMA0"
-
-  With images, kernel, and initrd described here:
-
-  http://psellos.com/2012/08/2012.08.qemu-arm-osx.html
-
-  And I get:
-
-  Program received signal EXC_BAD_ACCESS, Could not access memory.
-  Reason: KERN_PROTECTION_FAILURE at address: 0x000000010142f2d0
-  0x000000010142f2d0 in ?? ()
-
-  (gdb) bt
-  #0  0x000000010142f2d0 in ?? ()
-  #1  0x000000010016e209 in qemu_iohandler_poll (readfds=3D0x10097ca00, wri=
-tefds=3D0x10097ca80, xfds=3D0x10097cb00, ret=3D4) at iohandler.c:124
-  #2  0x0000000100172acf in main_loop_wait (nonblocking=3D0) at main-loop.c=
-:418
-  #3  0x0000000100207bbf in main_loop () at vl.c:1765
-  #4  0x000000010020e7b0 in qemu_main (argc=3D12, argv=3D0x7fff5fbff360, en=
-vp=3D0x7fff5fbff3c8) at vl.c:3992
-  #5  0x00000001001d6013 in main (argc=3D12, argv=3D0x7fff5fbff360) at ui/c=
-ocoa.m:884
-  (gdb) frame 1
-  #1  0x000000010016e209 in qemu_iohandler_poll (readfds=3D0x10097ca00, wri=
-tefds=3D0x10097ca80, xfds=3D0x10097cb00, ret=3D4) at iohandler.c:124
-  124	                ioh->fd_read(ioh->opaque);
-  Current language:  auto; currently c
-  (gdb) p ioh
-  $1 =3D (IOHandlerRecord *) 0x10142f110
-  (gdb) p *ioh
-  $2 =3D {
-    fd_read_poll =3D 0, =
-
-    fd_read =3D 0x10017212b <sigfd_handler>, =
-
-    fd_write =3D 0, =
-
-    opaque =3D 0x3, =
-
-    next =3D {
-      le_next =3D 0x0, =
-
-      le_prev =3D 0x105d00bc0
-    }, =
-
-    fd =3D 3, =
-
-    deleted =3D false
-  }
+  according to x86 programmer manuals the behavior of using the Address-
+  Size override (in long mode) is supposed to ignore the high 32bits of
+  the register. I use this fact in my operating system to reduce
+  register usage (the high 32 bits of r15 holds other data).
+  consequently a general protection exception occurs since the memory
+  address isn't "canonical". this error doesn't always appear since the
+  high 32 bits might not be zero in those conditions.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1094950/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1095857/+subscriptions
