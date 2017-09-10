@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dr3N2-0007dV-PU
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 10:38:01 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dr4pQ-0002S1-8W
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:11:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dr3Mz-0000UN-N8
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 10:38:00 -0400
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Date: Sun, 10 Sep 2017 15:37:34 +0100
-Message-Id: <1505054255-2990-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-In-Reply-To: <1505054255-2990-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-References: <1505054255-2990-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: [Qemu-devel] [PATCH 3/4] ppc: add CPU access_type into the
- migration stream
+	(envelope-from <vilanova@ac.upc.edu>) id 1dr4pL-0008Ix-Ag
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:11:24 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:54972)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dr4pK-0008IZ-Vn
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:11:19 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Sun, 10 Sep 2017 19:11:07 +0300
+Message-Id: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/7] trace: Add guest code events
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,31 +24,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, aik@ozlabs.ru, lvivier@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
 
-This is referenced in cpu_ppc_handle_mmu_fault() and so should be included
-in the migration stream.
+Adds events to trace guest code execution.
 
-Note: the vmstate_ppc version number has already been bumped by the previous
-patch in this series.
+Events with additional info are disabled by default to minimize overheads=
+, since
+that additional information might not be necessarily needed.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- target/ppc/machine.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index 8fec1a4..10b3c41 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -676,7 +676,7 @@ const VMStateDescription vmstate_ppc_cpu = {
- 
-         /* Internal state */
-         VMSTATE_UINTTL(env.hflags_nmsr, PowerPCCPU),
--        /* FIXME: access_type? */
-+        VMSTATE_UINT8_V(env.access_type, PowerPCCPU, 6),
- 
-         /* Interrupt state */
-         VMSTATE_UINT32_V(env.pending_interrupts, PowerPCCPU, 6),
--- 
-1.7.10.4
+Llu=C3=ADs Vilanova (7):
+      trace: Add event "guest_bbl_before"
+      trace: Add event "guest_inst_before"
+      trace: Add event "guest_inst_info_before"
+      tcg: Add support for "inlining" regions of code
+      trace: Add event "guest_bbl_after"
+      trace: Add event "guest_inst_after"
+      trace: Add event "guest_inst_info_after"
+
+
+ accel/tcg/translator.c    |  104 ++++++++++++++++++++++++++++
+ include/exec/translator.h |   22 ++++++
+ include/qemu/log.h        |    1=20
+ include/qemu/typedefs.h   |    1=20
+ tcg/tcg-op.c              |    2 +
+ tcg/tcg-op.h              |   40 +++++++++++
+ tcg/tcg-opc.h             |    3 +
+ tcg/tcg.c                 |  166 +++++++++++++++++++++++++++++++++++++++=
+++++++
+ tcg/tcg.h                 |   23 ++++++
+ trace-events              |   55 +++++++++++++++
+ util/log.c                |    2 +
+ 11 files changed, 418 insertions(+), 1 deletion(-)
+
+
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
