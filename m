@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dqttZ-0003hz-Cn
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 00:30:58 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dqwQM-0000km-5X
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 03:12:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dqttW-0003Of-9z
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 00:30:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42830)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dqttW-0003Nq-3P
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 00:30:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dqttV-0000t3-1A
-	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 04:30:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id F29492E8488
-	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 04:30:52 +0000 (UTC)
+	(envelope-from <dgibson@ozlabs.org>) id 1dqwQK-0000RE-Ve
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 03:12:58 -0400
+Date: Sun, 10 Sep 2017 17:12:45 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170910071245.GB17405@umbus.fritz.box>
+References: <150496954641.9654.1998704077006846521.stgit@bahia>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 10 Sep 2017 04:17:48 -0000
-From: Launchpad Bug Tracker <1089006@bugs.launchpad.net>
-Reply-To: Bug 1089006 <1089006@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20121211164913.12221.91398.malonedeb@soybean.canonical.com>
-Message-Id: <150501706896.27827.5660993393314358059.malone@loganberry.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1089006] Re: Qemu scrambles order of eth devices
- in vm
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="EuxKj2iCbKjpUGkD"
+Content-Disposition: inline
+In-Reply-To: <150496954641.9654.1998704077006846521.stgit@bahia>
+Subject: Re: [Qemu-devel] [PATCH 0/5] spapr_pci: various cleanups and
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,44 +24,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-[Expired for QEMU because there has been no activity for 60 days.]
 
-** Changed in: qemu
-       Status: Incomplete =3D> Expired
+--EuxKj2iCbKjpUGkD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- =
+On Sat, Sep 09, 2017 at 05:05:46PM +0200, Greg Kurz wrote:
+> Before resuming the huge work on PHB hotplug, here are some patches
+> that maybe worth to apply.
+>=20
+> Patches 1 to 3 are basic improvements.
+>=20
+> Patch 4 and 5 may be a bit controversial. Everywhere in the spapr
+> code where we build an FDT portion, libfdt failures cause QEMU to
+> exit, even on hotplug paths. Only spapr_pci doesn't do that and
+> propagates the error instead. My understanding is that a failure
+> when building the FDT is likely to happen because of a bug in QEMU.
+>=20
+> Hence the choice to convert spapr_pci to do like the others. We may
+> even consider changing _FDT() to abort() instead of exit().
+>=20
+> Alternatively, if libfdt failures shouldn't be necessarily fatal,
+> especially on post-realize paths, then we should probably introduce
+> an _FDT_ERR() helper to propagate errors. And use it in may places
+> where we currently terminate QEMU: memory hotplug, CPU hotplug, CAS,
+> machine reset...
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1089006
+I've applied 4 & 5 as well now.  If I get to it, I hope to make them
+obsolete by replacing most of the fdt wrangling with a qemu internal
+live tree representation, but in the meantime it's still a reasonable
+cleanup.
 
-Title:
-  Qemu scrambles order of eth devices in vm
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Status in QEMU:
-  Expired
+--EuxKj2iCbKjpUGkD
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Bug description:
-  HV =3D 12.04 LTS plus libvirt 1.0x
-  VM =3D 12.04 LTS
+-----BEGIN PGP SIGNATURE-----
 
-  On the HV there are 12 eth interfaces which we make available to the
-  VM. We have 4 10G virtual function interfaces, and 8 1G conventionally
-  bridged interfaces. No matter what order we present the interfaces in
-  the xml file, they come up in eth0-eth11 order on the VM as follows:
-  ( the interfcaes do work, once you figure out which is which)
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm05eoACgkQbDjKyiDZ
+s5I6GQ/8D9VIVwGt19HTdQoQoWOFk3VDvQxsveyAl9+zicsu8XPzF1OInuw8XUiE
+9tmFc5bXnEzKCotEPaGDmUGvBa/EfxxZPLRPPJxktG5qLFp6wbOgGCWTztSETsXD
+DDbgoEBS1nWQ3Pt3dmTuYXI6eWFB5osDCtf1A6G2C1e7YCtEztuDaCWACfPG35Xk
+4Fp/nqvtC/lvwSd/r2sSUpDr/Ig/hoio5Aj6CJ92/PblqcFyiqAsJ09ThlhPilwX
+q4uHcDfNmlnumoy3gcn8u4cJPTurRYFEqOnyxRWxbDkD9ZsBEJ0MwZ7ipSVtSFTI
+XmKlcRu1mipGVBJn7hKt6iw4OB4lxZv4VT2SCVr1iHUYkvxlofv5sgh1jxYRW4nS
+EqzSb1lQwm3Cr6yc8TZAsYhZddE42318DmbtG9YXzx9L85paUObpOS/007jpAUzn
+GeneNjWp5tRuF30AIuxS97uU6GVY6ZuKKMm4Se6SIUDc4+QAIZ4fsdxTAPHLndE4
+zRIROukJE63aSJSNIcTF6vuvg04l+Yun7eloEExYxYrFDYwJEGvUYfFtnQFX3N2N
+lFyFFzvmxIkOeZAKrtXN8Q4le6oJzbIDoc0olo4p1kybdG2oG48fR58UwGeI6cS8
+zTKS+Fk2FhDIWjanQVe9dBzI47BUMSB6mhhfClBxMPyKosntqVA=
+=DLxA
+-----END PGP SIGNATURE-----
 
-  eth0-eth7 not in order as compoared to the bridges on the HV (interfaces =
-file) or compared to the xml file for the VM, or compared to the bus number=
-s. MAC addresses are random.
-  eth8-eth11 show up in the VM  in order of PCU bus numbers just as you'd e=
-xpect, always after the bridged interfaces.
-
-  Consulting the libvirt mailing list, the developer says they present
-  the list in bus order to qemu, but qemu scrambles that order. That
-  appears to me too, to be the case.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1089006/+subscriptions
+--EuxKj2iCbKjpUGkD--
