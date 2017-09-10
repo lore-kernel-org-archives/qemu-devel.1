@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dr85o-0007Hv-Sx
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 15:40:34 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dr9wp-0005u7-P4
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 17:39:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dr85k-0006bk-0I
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 15:40:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51112)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dr85j-0006ao-Nh
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 15:40:27 -0400
-References: <1503012801-10855-1-git-send-email-zuban32s@gmail.com>
-	<CAKSfGUCz8oa2gLE7C1xvWP7PB8jjA+0recj1=MeJwD7NONdc2Q@mail.gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <f95c0dd1-45f2-d5bf-c7c5-0afbaf8e8950@redhat.com>
-Date: Sun, 10 Sep 2017 22:40:27 +0300
+	(envelope-from <vilanova@ac.upc.edu>) id 1dr9wm-0007T1-Hf
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 17:39:23 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:42354 helo=roura.ac.upc.es)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dr9wm-0007SB-2e
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 17:39:20 -0400
+From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
+	<150472025751.24907.6133235993130047929.stgit@frigg.lan>
+	<877exalwzf.fsf@dusky.pond.sub.org>
+Date: Mon, 11 Sep 2017 00:39:05 +0300
+In-Reply-To: <877exalwzf.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+	of "Thu, 07 Sep 2017 10:43:48 +0200")
+Message-ID: <87tw0axmh2.fsf@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAKSfGUCz8oa2gLE7C1xvWP7PB8jjA+0recj1=MeJwD7NONdc2Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RESEND v7 0/3] Red Hat PCI bridge resource
- reserve capability
+Subject: Re: [Qemu-devel] [PATCH v4 07/20] instrument: [qapi] Add library
+ loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,157 +30,374 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>, seabios@seabios.org
-Cc: kevin@koconnor.net, kraxel@redhat.com, lersek@redhat.com, mst@redhat.com, qemu-devel@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, Eric Blake <eblake@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
 
-On 10/09/2017 21:34, Aleksandr Bezzubikov wrote:
->=20
-> =D0=BF=D1=82, 18 =D0=B0=D0=B2=D0=B3. 2017 =D0=B3. =D0=B2 2:33, Aleksand=
-r Bezzubikov <zuban32s@gmail.com=20
-> <mailto:zuban32s@gmail.com>>:
->=20
->     Now PCI bridges get a bus range number on a system init,
->     basing on currently plugged devices. That's why when one wants to
->     hotplug another bridge,
->     it needs his child bus, which the parent is unable to provide
->     (speaking about virtual device).
->     The suggested workaround is to have vendor-specific capability in
->     Red Hat PCI bridges
->     that contains number of additional bus to reserve (as well as
->     IO/MEM/PREF space limit hints)
->     on BIOS PCI init.
->     So this capability is intended only for pure QEMU->SeaBIOS usage.
->=20
->     Considering all aforesaid, this series is directly connected with
->     QEMU series "Generic PCIE-PCI Bridge".
->=20
->     Although the new PCI capability is supposed to contain various
->     limits along with
->     bus number to reserve, now only its full layout is proposed. And
->     only bus_reserve field is used in QEMU and BIOS. Limits usage
->     is still a subject for implementation as now
->     the main goal of this series to provide necessary support from the
->     firmware side to PCIE-PCI bridge hotplug.
->=20
->     Changes v6->v7:
->     0. Resend - fix a bug with incorrect subordinate bus default value.
->     1. Do not use alignment in case of IO reservation cap usage.
->     2. Log additional buses reservation events.
->=20
->     Changes v5->v6:
->     1. Remove unnecessary indents and line breaks (addresses Marcel's
->     comments)
->     2. Count IO/MEM/PREF region size as a maximum of necessary size and
->     one provide in
->              RESOURCE_RESERVE capability (addresses Marcel's comment).
->     3. Make the cap debug message more detailed (addresses Marcel's
->     comment).
->     4. Change pref_32 and pref_64 cap fields comment.
->=20
->     Changes v4->v5:
->     1. Rename capability-related #defines
->     2. Move capability IO/MEM/PREF fields values usage to the regions
->     creation stage (addresses Marcel's comment)
->     3. The capability layout change: separate pref_mem into pref_mem_32
->     and pref_mem_64 fields (QEMU side has the same changes) (addresses
->     Laszlo's comment)
->     4. Extract the capability lookup and check to the separate function
->     (addresses Marcel's comment)
->              - despite of Marcel's comment do not extract field check
->     for -1 since it increases code length
->                and doesn't look nice because of different field types
->     5. Fix the capability's comment (addresses Marcel's comment)
->     6. Fix the 3rd patch message
->=20
->     Changes v3->v4:
->     1. Use all QEMU PCI capability fields - addresses Michael's comment
->     2. Changes of the capability layout (QEMU side has the same changes=
-):
->              - change reservation fields types: bus_res - uint32_t,
->     others - uint64_t
->              - interpret -1 value as 'ignore'
->=20
->     Changes v2->v3:
->     1. Merge commit 2 (Red Hat vendor ID) into commit 4 - addresses
->     Marcel's comment,
->              and add Generic PCIE Root Port device ID - addresses
->     Michael's comment.
->     2. Changes of the capability layout  (QEMU side has the same change=
-s):
->              - add 'type' field to distinguish multiple
->                      RedHat-specific capabilities - addresses Michael's
->     comment
->              - do not mimi=D1=81 PCI Config space register layout, but =
-use
->     mutually exclusive differently
->                      sized fields for IO and prefetchable memory limits
->     - addresses Laszlo's comment
->              - use defines instead of structure and offsetof - addresse=
-s
->     Michael's comment
->     3. Interpret 'bus_reserve' field as a minimum necessary
->               range to reserve - addresses Gerd's comment
->     4. pci_find_capability moved to pci.c - addresses Kevin's comment
->     5. Move capability layout header to src/fw/dev-pci.h - addresses
->     Kevin's comment
->     6. Add the capability documentation - addresses Michael's comment
->     7. Add capability length and bus_reserve field sanity checks -
->     addresses Michael's comment
->=20
->     Changes v1->v2:
->     1. New #define for Red Hat vendor added (addresses Konrad's comment=
-).
->     2. Refactored pci_find_capability function (addresses Marcel's comm=
-ent).
->     3. Capability reworked:
->              - data type added;
->              - reserve space in a structure for IO, memory and
->                prefetchable memory limits.
->=20
->=20
->     Aleksandr Bezzubikov (3):
->        pci: refactor pci_find_capapibilty to get bdf as the first argum=
-ent
->          instead of the whole pci_device
->        pci: add QEMU-specific PCI capability structure
->        pci: enable RedHat PCI bridges to reserve additional resources o=
-n PCI
->          init
->=20
->       src/fw/dev-pci.h    |  53 ++++++++++++++++++++++++++
->       src/fw/pciinit.c    | 108
->     +++++++++++++++++++++++++++++++++++++++++++++++++---
->       src/hw/pci.c        |  25 ++++++++++++
->       src/hw/pci.h        |   1 +
->       src/hw/pci_ids.h    |   3 ++
->       src/hw/pcidevice.c  |  24 ------------
->       src/hw/pcidevice.h  |   1 -
->       src/hw/virtio-pci.c |   6 +--
->       8 files changed, 188 insertions(+), 33 deletions(-)
->       create mode 100644 src/fw/dev-pci.h
->=20
->     --
->     2.7.4
->=20
->=20
-> And what about this series? The matching QEMU series has been applied,=20
-> that's why there should be no problems with picking this series up for=20
-> SeaBIOS
->=20
+Markus Armbruster writes:
 
-Hi Aleksandr,
+> I missed prior versions of this series.  Please cc: qapi-schema
+> maintainers on all non-trivial schema patches.
+> scripts/get_maintainer.pl points to them for this patch.
 
-Since SeaBIOS is a different project, we need to monitor the QEMU
-patches by ourselves and only then ask the maintainer to merge the
-patches if he has no objections, of course. (no automated process)
+> Marc-Andr=C3=A9, semantic conflict with your QAPI conditionals series.  J=
+ust
+> a heads-up, there's nothing for you to do about it right now.
 
-Can you please verify the series still applies to SeaBIOS AS IS
-and run a quick test against today's QEMU master branch?
-Can you please give Kevin your OK before he proceeds with the merge?
+> Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> writes:
 
-Thanks,
-Marcel
+[...]
+>> diff --git a/instrument/load.h b/instrument/load.h
+>> index 2ddb2c6c19..f8a02e6849 100644
+>> --- a/instrument/load.h
+>> +++ b/instrument/load.h
+>> @@ -25,6 +25,8 @@
+>> * @INSTR_LOAD_DLERROR: Error with libdl (see dlerror).
+>> *
+>> * Error codes for instr_load().
+>> + *
+>> + * NOTE: Keep in sync with QAPI's #InstrLoadCode.
+>> */
+>> typedef enum {
+>> INSTR_LOAD_OK,
+>> @@ -40,6 +42,8 @@ typedef enum {
+>> * @INSTR_UNLOAD_DLERROR: Error with libdl (see dlerror).
+>> *
+>> * Error codes for instr_unload().
+>> + *
+>> + * NOTE: Keep in sync with QAPI's #InstrUnloadCode.
+>> */
+>> typedef enum {
+>> INSTR_UNLOAD_OK,
 
->=20
-> --=20
-> Aleksandr Bezzubikov
+> Any particular reason why you can't simply use the QAPI-generated enum
+> types?
+
+Silly me, just missed that "optimization" :) But after reading your later
+comments, I'll keep these and remove the QAPI-generated enums.
+
+
+[...]
+>> diff --git a/instrument/qmp.c b/instrument/qmp.c
+>> new file mode 100644
+>> index 0000000000..c36960c12f
+>> --- /dev/null
+>> +++ b/instrument/qmp.c
+>> @@ -0,0 +1,88 @@
+>> +/*
+>> + * QMP interface for instrumentation control commands.
+>> + *
+>> + * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+>> + *
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or l=
+ater.
+>> + * See the COPYING file in the top-level directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qemu-common.h"
+>> +#include "qapi/qmp/qerror.h"
+>> +#include "qmp-commands.h"
+>> +
+>> +#include <dlfcn.h>
+
+> System headers go right after "qemu/osdep.h".
+
+>> +
+>> +#include "instrument/load.h"
+>> +
+>> +
+>> +
+
+> Fewer blank lines would do.
+
+>> +InstrLoadResult *qmp_instr_load(const char * path,
+>> +                                bool have_args, strList * args,
+
+> checkpatch ERROR: "foo * bar" should be "foo *bar"
+
+> Please feed it all your patches, and carefully consider which of its
+> complaints you should address.
+
+>> +                                Error **errp)
+>> +{
+>> +    InstrLoadResult *res =3D g_malloc0(sizeof(*res));
+>> +
+>> +#if defined(CONFIG_INSTRUMENT)
+>> +    int argc =3D 0;
+>> +    const char **argv =3D NULL;
+>> +
+>> +    strList *entry =3D have_args ? args : NULL;
+>> +    while (entry !=3D NULL) {
+>> +        argv =3D realloc(argv, sizeof(*argv) * (argc + 1));
+>> +        argv[argc] =3D entry->value;
+>> +        argc++;
+>> +        entry =3D entry->next;
+>> +    }
+>> +
+>> +    InstrLoadError code =3D instr_load(path, argc, argv, &res->handle);
+>> +    switch (code) {
+>> +    case INSTR_LOAD_OK:
+>> +        res->code =3D INSTR_LOAD_CODE_OK;
+>> +        res->has_handle =3D true;
+>> +        break;
+>> +    case INSTR_LOAD_TOO_MANY:
+>> +        res->code =3D INSTR_LOAD_CODE_TOO_MANY;
+>> +        break;
+>> +    case INSTR_LOAD_ERROR:
+>> +        res->code =3D INSTR_LOAD_CODE_ERROR;
+>> +        break;
+>> +    case INSTR_LOAD_DLERROR:
+>> +        res->has_msg =3D true;
+>> +        res->msg =3D dlerror();
+>> +        res->code =3D INSTR_LOAD_CODE_DLERROR;
+>> +        break;
+>> +    }
+>> +#else
+>> +    res->code =3D INSTR_LOAD_CODE_UNAVAILABLE;
+>> +#endif
+>> +
+>> +    return res;
+>> +}
+>> +
+>> +InstrUnloadResult *qmp_instr_unload(int64_t handle, Error **errp)
+>> +{
+>> +    InstrUnloadResult *res =3D g_malloc0(sizeof(*res));
+>> +
+>> +#if defined(CONFIG_INSTRUMENT)
+>> +    InstrUnloadError code =3D instr_unload(handle);
+>> +    switch (code) {
+>> +    case INSTR_UNLOAD_OK:
+>> +        res->code =3D INSTR_UNLOAD_CODE_OK;
+>> +        break;
+>> +    case INSTR_UNLOAD_INVALID:
+>> +        res->code =3D INSTR_UNLOAD_CODE_INVALID;
+>> +        break;
+>> +    case INSTR_UNLOAD_DLERROR:
+>> +        res->has_msg =3D true;
+>> +        res->msg =3D dlerror();
+>> +        break;
+>> +        res->code =3D INSTR_UNLOAD_CODE_DLERROR;
+>> +    }
+>> +#else
+>> +    res->code =3D INSTR_UNLOAD_CODE_UNAVAILABLE;
+>> +#endif
+>> +
+>> +    return res;
+>> +}
+
+> You're inventing your own "this feature isn't compiled in" protocol.  We
+> already got too many of them.  Let's stick to one of the existing ones,
+> namely the one that's got some visibility in introspection.  Bonus:
+> turns the semantic conflict with Marc-Andr=C3=A9's work into a textual
+> conflict.  Here's how:
+
+> * Add your commands to qmp_unregister_commands_hack() in monitor.c,
+>   roughly like this:
+
+>     #ifndef CONFIG_INSTRUMENT
+>         qmp_unregister_command(&qmp_commands, "instr-load");
+>         qmp_unregister_command(&qmp_commands, "instr-unload");
+>     #endif
+
+> * Compile qmp.c only when CONFIG_INSTRUMENT, just like the other .c
+>   files there, except for cmdline.c.  Drop the ifdeffery there.
+
+> * Add stubbed out command handlers to stubs/instrument.c, roughly like
+>   this:
+
+>     InstrLoadResult *qmp_instr_load(const char *path,
+>                                     bool have_args, strList *args,
+>                                     Error **errp)
+>     {
+>         error_setg(errp, QERR_UNSUPPORTED);
+>         return NULL;
+>     }
+
+>   Same for qmp_instr_unload().
+
+>   These stubs must exist for the link to succeed, but they won't be
+>   called.  They'll go away when Marc-Andr=C3=A9's work lands.
+
+> * In the next patch, make the HMP command conditional on
+>   CONFIG_INSTRUMENT, just like trace-file is conditional on
+>   CONFIG_TRACE_SIMPLE.
+
+> Questions?
+
+Crystal clear, applied.
+
+
+> You're also inventing your own "command failed" protocol.  I'll explain
+> in my review of instrument.json.
+
+>> diff --git a/qapi-schema.json b/qapi-schema.json
+>> index 802ea53d00..5e343be9ff 100644
+>> --- a/qapi-schema.json
+>> +++ b/qapi-schema.json
+>> @@ -90,6 +90,9 @@
+>> # QAPI introspection
+>> { 'include': 'qapi/introspect.json' }
+>>=20
+>> +# Instrumentation commands
+>> +{ 'include': 'qapi/instrument.json' }
+>> +
+>> ##
+>> # =3D QMP commands
+>> ##
+>> diff --git a/qapi/instrument.json b/qapi/instrument.json
+>> new file mode 100644
+>> index 0000000000..ea63fae309
+>> --- /dev/null
+>> +++ b/qapi/instrument.json
+>> @@ -0,0 +1,96 @@
+>> +# *-*- Mode: Python -*-*
+>> +#
+>> +# QAPI instrumentation control commands.
+>> +#
+>> +# Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+>> +#
+>> +# This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+>> +# See the COPYING file in the top-level directory.
+
+> Make the title a doc comment, like this:
+
+>    # *-*- Mode: Python -*-*
+>    #
+>    # Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+>    #
+>    # This work is licensed under the terms of the GNU GPL, version 2 or l=
+ater.
+>    # See the COPYING file in the top-level directory.
+
+>    ##
+>    # QAPI instrumentation control commands.
+>    ##
+
+> The ## around the title make it go into generated
+> docs/interop/qemu-qmp-ref.* documentation.
+
+>> +
+>> +##
+>> +# @InstrLoadCode:
+>> +#
+>> +# Result code of an 'instr-load' command.
+>> +#
+>> +# @ok: Correctly loaded.
+>> +# @too-many: Tried to load too many instrumentation libraries.
+>> +# @error: The library's main() function returned a non-zero value.
+>> +# @dlerror: Error with libdl (see 'msg').
+>> +# @unavailable: Service not available.
+>> +#
+>> +# Since: 2.11
+>> +##
+>> +{ 'enum': 'InstrLoadCode',
+>> +  'data': [ 'ok', 'too-many', 'error', 'dlerror', 'unavailable' ] }
+>> +
+>> +##
+>> +# @InstrLoadResult:
+>> +#
+>> +# Result of an 'instr-load' command.
+>> +#
+>> +# @code: Result code.
+>> +# @msg: Additional error message (for human consumption only; present o=
+nly in
+>> +#       case of error).
+>> +# @handle: Instrumentation library identifier (present only if successf=
+ul).
+>> +#
+>> +# Since: 2.11
+>> +##
+>> +{ 'struct': 'InstrLoadResult',
+>> +  'data': { 'code': 'InstrLoadCode', '*msg': 'str', '*handle': 'int' } }
+>> +
+>> +##
+>> +# @instr-load:
+>> +#
+>> +# Load an instrumentation library.
+>> +#
+>> +# @path: path to the dynamic instrumentation library
+>> +# @args: arguments to the dynamic instrumentation library
+>> +#
+>> +# Since: 2.11
+>> +##
+>> +{ 'command': 'instr-load',
+>> +  'data':    { 'path': 'str', '*args': ['str'] },
+>> +  'returns': 'InstrLoadResult' }
+
+> No :)
+
+> If the command fails, it must send an error response instead success
+> response.  Yours always sends a success response.
+
+> As far as I can tell, instr-load returns a handle on success, always,
+> and nothing else.  Therefore:
+
+>    { 'struct': 'InstrLoadResult',
+>      'data': { 'handle': 'int' } }
+
+> On error, qmp_instr_load() should set a suitable error with error_setg()
+> and return NULL.
+
+> QAPI enum type InstrLoadCode goes away.
+
+> On returning a handle: we commonly let the user specify an ID string
+> instead.  For instance, device_add doesn't return a handle you can pass
+> to device_del.  Instead, it takes a string-valued 'id' parameter.  Other
+> commands, such as device_del, can refer to the device by that ID.  Is
+> there any particular reason why you can't stick to this convention for
+> instrumentation?
+
+Done too :)
+
+>> +
+>> +
+>> +##
+>> +# @InstrUnloadCode:
+>> +#
+>> +# Result code of an 'instr-unload' command.
+>> +#
+>> +# @ok: Correctly unloaded.
+>> +# @invalid: Invalid handle.
+>> +# @dlerror: Error with libdl (see 'msg').
+>> +# @unavailable: Service not available.
+>> +#
+>> +# Since: 2.11
+>> +##
+>> +{ 'enum': 'InstrUnloadCode',
+>> +  'data': [ 'ok', 'invalid', 'dlerror', 'unavailable' ] }
+>> +
+>> +##
+>> +# @InstrUnloadResult:
+>> +#
+>> +# Result of an 'instr-unload' command.
+>> +#
+>> +# @code: Result code.
+>> +# @msg: Additional error message (for human consumption only; present o=
+nly in
+>> +#       case of error).
+>> +#
+>> +# Since: 2.11
+>> +##
+>> +{ 'struct': 'InstrUnloadResult',
+>> +  'data': { 'code': 'InstrUnloadCode', '*msg': 'str' } }
+>> +
+>> +##
+>> +# @instr-unload:
+>> +#
+>> +# Unload an instrumentation library.
+>> +#
+>> +# @handle: Instrumentation library identifier (see #InstrLoadResult).
+>> +#
+>> +# Since: 2.11
+>> +##
+>> +{ 'command': 'instr-unload',
+>> +  'data': { 'handle': 'int' },
+>> +  'returns': 'InstrUnloadResult' }
+
+> Likewise.  instr-unload returns nothing on success.  Both QAPI types go
+> away.
+
+
+Thanks a lot!
+Lluis
