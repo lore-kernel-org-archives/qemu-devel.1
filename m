@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42084)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42232)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ramysameh26@gmail.com>) id 1dr73L-0006lf-DO
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 14:33:56 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dr73m-00072H-6m
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 14:34:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ramysameh26@gmail.com>) id 1dr73K-000678-ET
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 14:33:55 -0400
-Received: from mail-io0-x22a.google.com ([2607:f8b0:4001:c06::22a]:36267)
+	(envelope-from <zuban32s@gmail.com>) id 1dr73k-0006G2-G5
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 14:34:22 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33901)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ramysameh26@gmail.com>)
-	id 1dr73K-00066f-8X
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 14:33:54 -0400
-Received: by mail-io0-x22a.google.com with SMTP id d16so14641752ioj.3
-	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 11:33:52 -0700 (PDT)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dr73k-0006FJ-7Q
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 14:34:20 -0400
+Received: by mail-pg0-x244.google.com with SMTP id v82so3682996pgb.1
+	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 11:34:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_iKqs_QXz_qSwsOw6A-Z1BJjVN3WPAgaERejWQXrQhNw@mail.gmail.com>
-References: <CAF6HrYxj5BoTQpQjz95Z1_N_p615jpEE12xh_afuuqE4fcTyLg@mail.gmail.com>
-	<CAFEAcA9YNO7kgC8yzZ_RUKck=+98pUET0ogVZ7TvC1kxV+_fFA@mail.gmail.com>
-	<CAF6HrYwT7WP_i7cVhvEyRvqSK7J+bLnKU4b+WrMQfVkLaNDrvQ@mail.gmail.com>
-	<CAFEAcA9kEEyUj7=7Wd-jNbVOWwfgkj0a201q+L4e5CDR22JUgw@mail.gmail.com>
-	<CAF6HrYw9B1ns0ZVtU_gxqJZxOe0dG03UQiAV7FHxBB-wQh6kNQ@mail.gmail.com>
-	<CAF6HrYym57hZjSFE=iExPkp8vBX82zqXvTxh8GJDYNPL1FTSqA@mail.gmail.com>
-	<CAFEAcA_iKqs_QXz_qSwsOw6A-Z1BJjVN3WPAgaERejWQXrQhNw@mail.gmail.com>
-From: Ramy Sameh <ramysameh26@gmail.com>
-Date: Sun, 10 Sep 2017 20:33:51 +0200
-Message-ID: <CAF6HrYx6_uv-K3JouTb4WTrEEkX25VrhkjAVg8mWG3iarvA=AA@mail.gmail.com>
+References: <1503012801-10855-1-git-send-email-zuban32s@gmail.com>
+In-Reply-To: <1503012801-10855-1-git-send-email-zuban32s@gmail.com>
+From: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Date: Sun, 10 Sep 2017 18:34:07 +0000
+Message-ID: <CAKSfGUCz8oa2gLE7C1xvWP7PB8jjA+0recj1=MeJwD7NONdc2Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Questions regarding emulated UART in VersatilePB
- board
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RESEND v7 0/3] Red Hat PCI bridge resource
+ reserve capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,57 +29,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Ahmed Aly <ahmedaly50@gmail.com>
+To: seabios@seabios.org
+Cc: kevin@koconnor.net, kraxel@redhat.com, lersek@redhat.com, marcel@redhat.com, mst@redhat.com, qemu-devel@nongnu.org
 
-Thanks Peter.
+=D0=BF=D1=82, 18 =D0=B0=D0=B2=D0=B3. 2017 =D0=B3. =D0=B2 2:33, Aleksandr Be=
+zzubikov <zuban32s@gmail.com>:
 
-I have made a program to read a string from the UART, then write it again
-to the UART.
-I made a function to manipulate values in the pl011 registers (bit flipping
-the flags inside the registers).
-The target is to simulate hardware fault injection.
-
-For each run of the program, I made a bit-flip in *only one flag* in *one
-register*, and I observed the output of the program.
-
-*My question is*: where to invoke the call of this fault injection function
-to cause *the maximum effect* on the program's output?
-
-*p.s.* I invoked it once inside pl011_read function, and the program gave a
-certain output, and I invoked it again in pl011_update, and it gave another
-output.
-When I invoked the function in pl011_write, the faults injected had no
-effect on the output of the program!
-
-Do you have an explanation for this behaviour?
-
-Thanks in advance.
-
-
-On Wed, Sep 6, 2017 at 2:18 PM, Peter Maydell <peter.maydell@linaro.org>
-wrote:
-
-> On 6 September 2017 at 13:12, Ramy Sameh <ramysameh26@gmail.com> wrote:
-> > Do the emulated baud rate registers have any effect? (I think they would
-> > have no effect, because there is no real clock that can be used to
-> produce
-> > the baud rate).
+> Now PCI bridges get a bus range number on a system init,
+> basing on currently plugged devices. That's why when one wants to hotplug
+> another bridge,
+> it needs his child bus, which the parent is unable to provide (speaking
+> about virtual device).
+> The suggested workaround is to have vendor-specific capability in Red Hat
+> PCI bridges
+> that contains number of additional bus to reserve (as well as IO/MEM/PREF
+> space limit hints)
+> on BIOS PCI init.
+> So this capability is intended only for pure QEMU->SeaBIOS usage.
 >
-> No, they don't have any effect. (In this UART model we don't implement
-> the feature that you can connect a guest serial port to a host serial
-> port and have the guest baud rate etc settings propagate through.
-> We do that in other UART models and maybe one day we'll add it here,
-> but for now, baud rate settings are ignored.)
+> Considering all aforesaid, this series is directly connected with
+> QEMU series "Generic PCIE-PCI Bridge".
 >
-> thanks
-> -- PMM
+> Although the new PCI capability is supposed to contain various limits
+> along with
+> bus number to reserve, now only its full layout is proposed. And
+> only bus_reserve field is used in QEMU and BIOS. Limits usage
+> is still a subject for implementation as now
+> the main goal of this series to provide necessary support from the
+> firmware side to PCIE-PCI bridge hotplug.
+>
+> Changes v6->v7:
+> 0. Resend - fix a bug with incorrect subordinate bus default value.
+> 1. Do not use alignment in case of IO reservation cap usage.
+> 2. Log additional buses reservation events.
+>
+> Changes v5->v6:
+> 1. Remove unnecessary indents and line breaks (addresses Marcel's comment=
+s)
+> 2. Count IO/MEM/PREF region size as a maximum of necessary size and one
+> provide in
+>         RESOURCE_RESERVE capability (addresses Marcel's comment).
+> 3. Make the cap debug message more detailed (addresses Marcel's comment).
+> 4. Change pref_32 and pref_64 cap fields comment.
+>
+> Changes v4->v5:
+> 1. Rename capability-related #defines
+> 2. Move capability IO/MEM/PREF fields values usage to the regions creatio=
+n
+> stage (addresses Marcel's comment)
+> 3. The capability layout change: separate pref_mem into pref_mem_32 and
+> pref_mem_64 fields (QEMU side has the same changes) (addresses Laszlo's
+> comment)
+> 4. Extract the capability lookup and check to the separate function
+> (addresses Marcel's comment)
+>         - despite of Marcel's comment do not extract field check for -1
+> since it increases code length
+>           and doesn't look nice because of different field types
+> 5. Fix the capability's comment (addresses Marcel's comment)
+> 6. Fix the 3rd patch message
+>
+> Changes v3->v4:
+> 1. Use all QEMU PCI capability fields - addresses Michael's comment
+> 2. Changes of the capability layout (QEMU side has the same changes):
+>         - change reservation fields types: bus_res - uint32_t, others -
+> uint64_t
+>         - interpret -1 value as 'ignore'
+>
+> Changes v2->v3:
+> 1. Merge commit 2 (Red Hat vendor ID) into commit 4 - addresses Marcel's
+> comment,
+>         and add Generic PCIE Root Port device ID - addresses Michael's
+> comment.
+> 2. Changes of the capability layout  (QEMU side has the same changes):
+>         - add 'type' field to distinguish multiple
+>                 RedHat-specific capabilities - addresses Michael's commen=
+t
+>         - do not mimi=D1=81 PCI Config space register layout, but use mut=
+ually
+> exclusive differently
+>                 sized fields for IO and prefetchable memory limits -
+> addresses Laszlo's comment
+>         - use defines instead of structure and offsetof - addresses
+> Michael's comment
+> 3. Interpret 'bus_reserve' field as a minimum necessary
+>          range to reserve - addresses Gerd's comment
+> 4. pci_find_capability moved to pci.c - addresses Kevin's comment
+> 5. Move capability layout header to src/fw/dev-pci.h - addresses Kevin's
+> comment
+> 6. Add the capability documentation - addresses Michael's comment
+> 7. Add capability length and bus_reserve field sanity checks - addresses
+> Michael's comment
+>
+> Changes v1->v2:
+> 1. New #define for Red Hat vendor added (addresses Konrad's comment).
+> 2. Refactored pci_find_capability function (addresses Marcel's comment).
+> 3. Capability reworked:
+>         - data type added;
+>         - reserve space in a structure for IO, memory and
+>           prefetchable memory limits.
+>
+>
+> Aleksandr Bezzubikov (3):
+>   pci: refactor pci_find_capapibilty to get bdf as the first argument
+>     instead of the whole pci_device
+>   pci: add QEMU-specific PCI capability structure
+>   pci: enable RedHat PCI bridges to reserve additional resources on PCI
+>     init
+>
+>  src/fw/dev-pci.h    |  53 ++++++++++++++++++++++++++
+>  src/fw/pciinit.c    | 108
+> +++++++++++++++++++++++++++++++++++++++++++++++++---
+>  src/hw/pci.c        |  25 ++++++++++++
+>  src/hw/pci.h        |   1 +
+>  src/hw/pci_ids.h    |   3 ++
+>  src/hw/pcidevice.c  |  24 ------------
+>  src/hw/pcidevice.h  |   1 -
+>  src/hw/virtio-pci.c |   6 +--
+>  8 files changed, 188 insertions(+), 33 deletions(-)
+>  create mode 100644 src/fw/dev-pci.h
+>
+> --
+> 2.7.4
 >
 
+And what about this series? The matching QEMU series has been applied,
+that's why there should be no problems with picking this series up for
+SeaBIOS
 
 
--- 
-Best Regards,
-Ramy Sameh
-Embedded Software Engineer
-+2-010-172-777-14
+> --
+Aleksandr Bezzubikov
