@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40389)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40565)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dr4w8-0004dz-Fk
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:18:21 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dr4xA-00059P-28
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:19:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dr4w4-0002ZQ-G0
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:18:20 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:61829)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dr4w4-0002Z8-7l
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:18:16 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Sun, 10 Sep 2017 18:18:10 +0200
-Message-Id: <20170910161811.21413-1-laurent@vivier.eu>
+	(envelope-from <vilanova@ac.upc.edu>) id 1dr4x6-0002rs-3b
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:19:24 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:55797)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dr4x5-0002rR-Oq
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:19:20 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Sun, 10 Sep 2017 19:19:11 +0300
+Message-Id: <150506035158.19604.740046564057160055.stgit@frigg.lan>
+In-Reply-To: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
+References: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 0/1] M68k for 2.11 patches
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 2/7] trace: Add event "guest_inst_before"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,30 +27,58 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-The following changes since commit fcea73709b966a7ded9efa7b106ea50c7fe9025c:
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ accel/tcg/translator.c |    3 +++
+ trace-events           |    8 ++++++++
+ 2 files changed, 11 insertions(+)
 
-  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-09-08 16:04:42 +0100)
-
-are available in the git repository at:
-
-  git://github.com/vivier/qemu-m68k.git tags/m68k-for-2.11-pull-request
-
-for you to fetch changes up to 6fa9ba09dbf4eb8b52bcb47d6820957f1b77ee0b:
-
-  target/m68k: Switch fpu_rom from make_floatx80() to make_floatx80_init() (2017-09-10 18:07:40 +0200)
-
-----------------------------------------------------------------
-
-----------------------------------------------------------------
-
-Kamil Rytarowski (1):
-  target/m68k: Switch fpu_rom from make_floatx80() to
-    make_floatx80_init()
-
- target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
-
--- 
-2.13.5
+diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
+index 91b3b0da32..287d27b4f7 100644
+--- a/accel/tcg/translator.c
++++ b/accel/tcg/translator.c
+@@ -69,6 +69,8 @@ void translator_loop(const TranslatorOps *ops, DisasCon=
+textBase *db,
+     tcg_debug_assert(db->is_jmp =3D=3D DISAS_NEXT);  /* no early exit */
+=20
+     while (true) {
++        target_ulong pc_insn =3D db->pc_next;
++
+         db->num_insns++;
+         ops->insn_start(db, cpu);
+         tcg_debug_assert(db->is_jmp =3D=3D DISAS_NEXT);  /* no early exi=
+t */
+@@ -96,6 +98,7 @@ void translator_loop(const TranslatorOps *ops, DisasCon=
+textBase *db,
+         if (db->num_insns =3D=3D 1) {
+             trace_guest_bbl_before_tcg(cpu, tcg_ctx.tcg_env, db->pc_firs=
+t);
+         }
++        trace_guest_inst_before_tcg(cpu, tcg_ctx.tcg_env, pc_insn);
+=20
+         /* Disassemble one instruction.  The translate_insn hook should
+            update db->pc_next and db->is_jmp to indicate what should be
+diff --git a/trace-events b/trace-events
+index d242f54254..46457c6158 100644
+--- a/trace-events
++++ b/trace-events
+@@ -99,6 +99,14 @@ vcpu guest_cpu_reset(void)
+ # Targets: TCG(all)
+ vcpu tcg guest_bbl_before(uint64_t vaddr) "vaddr=3D0x%016"PRIx64, "vaddr=
+=3D0x%016"PRIx64
+=20
++# @vaddr: Instruction's virtual address
++#
++# Mark start of instruction execution (before anything gets really execu=
+ted).
++#
++# Mode: user, softmmu
++# Targets: TCG(all)
++vcpu tcg guest_inst_before(uint64_t vaddr) "vaddr=3D0x%016"PRIx64, "vadd=
+r=3D0x%016"PRIx64
++
+ # @vaddr: Access' virtual address.
+ # @info : Access' information (see below).
+ #
