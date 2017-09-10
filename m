@@ -1,23 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dr6X3-0006S0-Kv
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 14:00:34 -0400
+	(envelope-from <ramysameh26@gmail.com>) id 1dr73L-0006lf-DO
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 14:33:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dr6X2-0007xf-Rn
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 14:00:33 -0400
-References: <1505054255-2990-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1505054255-2990-2-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<333a9b48-d30d-03b9-83e4-52a24b2128f3@redhat.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <ddecc45a-0199-8e83-0575-1227ac1ca02c@ilande.co.uk>
-Date: Sun, 10 Sep 2017 19:00:13 +0100
+	(envelope-from <ramysameh26@gmail.com>) id 1dr73K-000678-ET
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 14:33:55 -0400
+Received: from mail-io0-x22a.google.com ([2607:f8b0:4001:c06::22a]:36267)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ramysameh26@gmail.com>)
+	id 1dr73K-00066f-8X
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 14:33:54 -0400
+Received: by mail-io0-x22a.google.com with SMTP id d16so14641752ioj.3
+	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 11:33:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <333a9b48-d30d-03b9-83e4-52a24b2128f3@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] ppc: change CPUPPCState access_type
- from int to uint8_t
+In-Reply-To: <CAFEAcA_iKqs_QXz_qSwsOw6A-Z1BJjVN3WPAgaERejWQXrQhNw@mail.gmail.com>
+References: <CAF6HrYxj5BoTQpQjz95Z1_N_p615jpEE12xh_afuuqE4fcTyLg@mail.gmail.com>
+	<CAFEAcA9YNO7kgC8yzZ_RUKck=+98pUET0ogVZ7TvC1kxV+_fFA@mail.gmail.com>
+	<CAF6HrYwT7WP_i7cVhvEyRvqSK7J+bLnKU4b+WrMQfVkLaNDrvQ@mail.gmail.com>
+	<CAFEAcA9kEEyUj7=7Wd-jNbVOWwfgkj0a201q+L4e5CDR22JUgw@mail.gmail.com>
+	<CAF6HrYw9B1ns0ZVtU_gxqJZxOe0dG03UQiAV7FHxBB-wQh6kNQ@mail.gmail.com>
+	<CAF6HrYym57hZjSFE=iExPkp8vBX82zqXvTxh8GJDYNPL1FTSqA@mail.gmail.com>
+	<CAFEAcA_iKqs_QXz_qSwsOw6A-Z1BJjVN3WPAgaERejWQXrQhNw@mail.gmail.com>
+From: Ramy Sameh <ramysameh26@gmail.com>
+Date: Sun, 10 Sep 2017 20:33:51 +0200
+Message-ID: <CAF6HrYx6_uv-K3JouTb4WTrEEkX25VrhkjAVg8mWG3iarvA=AA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Questions regarding emulated UART in VersatilePB
+ board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +35,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, aik@ozlabs.ru
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ahmed Aly <ahmedaly50@gmail.com>
 
-On 10/09/17 17:30, Laurent Vivier wrote:
+Thanks Peter.
 
-> On 10/09/2017 16:37, Mark Cave-Ayland wrote:
->> This change was suggested by Alexey in advance of a subsequent commit which
->> adds access_type into vmstate_ppc_cpu.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> ---
->>  target/ppc/cpu.h     |    4 ++--
->>  target/ppc/machine.c |    4 +++-
->>  2 files changed, 5 insertions(+), 3 deletions(-)
->>
->> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
->> index 12f0949..59d1656 100644
->> --- a/target/ppc/cpu.h
->> +++ b/target/ppc/cpu.h
->> @@ -1010,8 +1010,8 @@ struct CPUPPCState {
->>      /* Next instruction pointer */
->>      target_ulong nip;
->>  
->> -    int access_type; /* when a memory exception occurs, the access
->> -                        type is stored here */
->> +    uint8_t access_type; /* when a memory exception occurs, the access
->> +                            type is stored here */
-> 
-> I think this breaks TCG as we have:
-> 
-> target/ppc/translate.c:
-> 
->      82 void ppc_translate_init(void)
-> ...
->     191 
->     192     cpu_access_type = tcg_global_mem_new_i32(cpu_env,
->     193                                              offsetof(CPUPPCState, access_type), "access_type");
->     194 
->     195     done_init = 1;
->     196 }
-> 
-> it expects an int32_t (or int).
+I have made a program to read a string from the UART, then write it again
+to the UART.
+I made a function to manipulate values in the pl011 registers (bit flipping
+the flags inside the registers).
+The target is to simulate hardware fault injection.
 
-Indeed, yes. I'm really surprised this didn't break compilation or
-anything at runtime...
+For each run of the program, I made a bit-flip in *only one flag* in *one
+register*, and I observed the output of the program.
 
-Having a further look I can't see any implementations for
-tcg_global_mem_new_u8() or tcg_gen_movi_u8() so changing this isn't a
-straightforward type swap.
+*My question is*: where to invoke the call of this fault injection function
+to cause *the maximum effect* on the program's output?
 
-Alexey, do you still think this is required?
+*p.s.* I invoked it once inside pl011_read function, and the program gave a
+certain output, and I invoked it again in pl011_update, and it gave another
+output.
+When I invoked the function in pl011_write, the faults injected had no
+effect on the output of the program!
+
+Do you have an explanation for this behaviour?
+
+Thanks in advance.
 
 
-ATB,
+On Wed, Sep 6, 2017 at 2:18 PM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-Mark.
+> On 6 September 2017 at 13:12, Ramy Sameh <ramysameh26@gmail.com> wrote:
+> > Do the emulated baud rate registers have any effect? (I think they would
+> > have no effect, because there is no real clock that can be used to
+> produce
+> > the baud rate).
+>
+> No, they don't have any effect. (In this UART model we don't implement
+> the feature that you can connect a guest serial port to a host serial
+> port and have the guest baud rate etc settings propagate through.
+> We do that in other UART models and maybe one day we'll add it here,
+> but for now, baud rate settings are ignored.)
+>
+> thanks
+> -- PMM
+>
+
+
+
+-- 
+Best Regards,
+Ramy Sameh
+Embedded Software Engineer
++2-010-172-777-14
