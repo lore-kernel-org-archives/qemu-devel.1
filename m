@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqrWR-0000Iv-20
+	(envelope-from <dgibson@ozlabs.org>) id 1dqrWR-0000Iu-1i
 	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:58:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqrWQ-0002O9-0e
+	(envelope-from <dgibson@ozlabs.org>) id 1dqrWQ-0002O7-0o
 	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:58:55 -0400
-Date: Sun, 10 Sep 2017 11:58:14 +1000
+Date: Sun, 10 Sep 2017 11:40:15 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170910015814.GW2735@umbus.fritz.box>
-References: <150456160452.17000.3290192176290246589.stgit@bahia.lan>
-	<150456161545.17000.9223127644314285105.stgit@bahia.lan>
+Message-ID: <20170910014015.GV2735@umbus.fritz.box>
+References: <150496954641.9654.1998704077006846521.stgit@bahia>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="eLx2Oic5rP1+EtIt"
+	protocol="application/pgp-signature"; boundary="uOZhbHG+Ruum37TI"
 Content-Disposition: inline
-In-Reply-To: <150456161545.17000.9223127644314285105.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 1/4] spapr: only update SDR1 once per-cpu
- during CAS
+In-Reply-To: <150496954641.9654.1998704077006846521.stgit@bahia>
+Subject: Re: [Qemu-devel] [PATCH 0/5] spapr_pci: various cleanups and
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +25,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
 
---eLx2Oic5rP1+EtIt
+--uOZhbHG+Ruum37TI
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 04, 2017 at 11:46:55PM +0200, Greg Kurz wrote:
-> Commit b55d295e3ec9 added the possibility to support HPT resizing with KV=
-M.
-> In the case of PR, we need to pass the userspace address of the HPT to KVM
-> using the SDR1 slot.
-> This is handled by kvmppc_update_sdr1() which uses CPU_FOREACH() to update
-> all CPUs. It is hence not needed to call kvmppc_update_sdr1() for each CP=
-U.
+On Sat, Sep 09, 2017 at 05:05:46PM +0200, Greg Kurz wrote:
+> Before resuming the huge work on PHB hotplug, here are some patches
+> that maybe worth to apply.
 >=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Patches 1 to 3 are basic improvements.
 
-Applied to ppc-for-2.11.
+I've applied these to ppc-for-2.11.
 
-> ---
->  hw/ppc/spapr_hcall.c |   14 +++++---------
->  1 file changed, 5 insertions(+), 9 deletions(-)
+> Patch 4 and 5 may be a bit controversial. Everywhere in the spapr
+> code where we build an FDT portion, libfdt failures cause QEMU to
+> exit, even on hotplug paths. Only spapr_pci doesn't do that and
+> propagates the error instead. My understanding is that a failure
+> when building the FDT is likely to happen because of a bug in QEMU.
+
+Still looking at these.
+
 >=20
-> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-> index 8b3c0e17e75c..6ab8c188f381 100644
-> --- a/hw/ppc/spapr_hcall.c
-> +++ b/hw/ppc/spapr_hcall.c
-> @@ -1559,20 +1559,16 @@ static target_ulong h_client_architecture_support=
-(PowerPCCPU *cpu,
->          }
-> =20
->          if (spapr->htab_shift < maxshift) {
-> -            CPUState *cs;
-> -
->              /* Guest doesn't know about HPT resizing, so we
->               * pre-emptively resize for the maximum permitted RAM.  At
->               * the point this is called, nothing should have been
->               * entered into the existing HPT */
->              spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
-> -            CPU_FOREACH(cs) {
-> -                if (kvm_enabled()) {
-> -                    /* For KVM PR, update the HPT pointer */
-> -                    target_ulong sdr1 =3D (target_ulong)(uintptr_t)spapr=
-->htab
-> -                        | (spapr->htab_shift - 18);
-> -                    kvmppc_update_sdr1(sdr1);
-> -                }
-> +            if (kvm_enabled()) {
-> +                /* For KVM PR, update the HPT pointer */
-> +                target_ulong sdr1 =3D (target_ulong)(uintptr_t)spapr->ht=
-ab
-> +                    | (spapr->htab_shift - 18);
-> +                kvmppc_update_sdr1(sdr1);
->              }
->          }
->      }
+> Hence the choice to convert spapr_pci to do like the others. We may
+> even consider changing _FDT() to abort() instead of exit().
+>=20
+> Alternatively, if libfdt failures shouldn't be necessarily fatal,
+> especially on post-realize paths, then we should probably introduce
+> an _FDT_ERR() helper to propagate errors. And use it in may places
+> where we currently terminate QEMU: memory hotplug, CPU hotplug, CAS,
+> machine reset...
 >=20
 
 --=20
@@ -92,24 +66,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---eLx2Oic5rP1+EtIt
+--uOZhbHG+Ruum37TI
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm0nDIACgkQbDjKyiDZ
-s5I1fxAAj/71qyd559Efimik9N/f1NKc1Soi+bBAnHzAthj+6c0CfJ2rt807iJ2/
-XiJfv+b4KSaMAJWKbe19a7jCxAGxmoY8WGm9G7hXoln0X0wDslWKhkzj3SCF9z/V
-0xI2Q+z7vy46Iu1X4G4cPf2GAfipB7NikiSKkGjr6PJQp8CGNq2vsfeX0u62+9SY
-FUInZ0ORihLladDLwEsPlLatY/yM4ehySQKI0sHr22Lw5TuVNKApHYrRRS0NOfJc
-g7El69N8qDdReSdTxE5yYQYN8AxfwL57M03HWUHY9Nz5VZr0TesXEwazDeGGBghl
-ctzDAfrcKm8+6JaVG74FUCDbCIDOmyzrrg3OldJ3N0Nr/WPqKm4EYsCHBfmAUIu9
-sl1jP6YeJE88Gs6fI200dmiXNWy5tepPbHqzyN44f112qBRsFvqm2QHJsHAjHOL0
-YTObIuS2QH/eryaQycv1AmYcmBQXQ8Eaq/+/mbo95cVsW270wBtFxN61gLIzeZwA
-mm1WnP8juT1cksTDUEZ8NTLIHQtD1gQ7shls0d5xO6PYnyXPQWPOHLVZOvDaQClj
-U+7GEl/O3ZnHksKiKQGRR2CsNR1dYJ6eD/z0QJJXUooNilV+gDE3MbLKmOY+CU5c
-e9cn0Fzahk85nfqk3lFfeNZrizncTerM8O5USjFC4B8jCNOttC0=
-=o82K
+iQIyBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm0l/sACgkQbDjKyiDZ
+s5Ki/Q/4kR9XyLcaiN5/0H6QHlk2QEBvpUSPpMiT79h5hqQFVm/PXfB4xLUYxz8e
+MLAdFwxoJ4gK8W3/hFHmpHuHBBCLqj/iKsbGkJo3sLIRgwIzbGmpMXT3ITTVWqCF
+hSneZ/DRUETot1DtXSalIlkJZHcJw5/ZxOBfJI+p+teoUcvUPdpJltyM6KkQaTN2
+f4FpfHl2Vqnv6uVz07eEYXVx1QQuxEGCJN9rhSz+lPOt0XmadafGdL0NreOWFUjf
+mzzqUWYbxGXA+qmd8D0bMqrRN0mqG/B0Rn9zOEGrA/PglE41sLl+6zVOP8a/TCPz
+rVoNpXTRRoEHgkKr6wA/Mu1yj7NCDADDyT0lyWpYNu8sXclnPf+856wf/asjF7yy
+XSailkY90l/12bDH0cR1lXhF6ckhIqdrSe29Tlq+5ChtJLZf/T4kbm3/VKAYIh6p
+kC/s6GoQdbp4gSxCcLzufpQZBj1rfMI7joQWZEBY5RYgzNAhnLvlb8Yy4gDP9hgu
+TumUjCcKI7eAYizMpZ/kg967egyQMxR6Tpwwt9D4j/rXDfCFsC+ptiHBO43+7djg
+bFUOaoKbaQjZgGjmwROyLt7ieKeZYqIXrq3lApk6c3p2Zk5A2s0JiFOfCboE10kg
+1ZVjnwyScmwQ/AwkSxRE0dv57WKoL2Wc4Itmwfw2KUOw8afeaw==
+=UZzK
 -----END PGP SIGNATURE-----
 
---eLx2Oic5rP1+EtIt--
+--uOZhbHG+Ruum37TI--
