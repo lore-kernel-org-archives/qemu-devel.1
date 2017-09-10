@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60915)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dr6FF-00022g-2q
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 13:42:09 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dr6GZ-0002pJ-CP
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 13:43:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dr6FC-0002a2-0g
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 13:42:09 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:55584)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dr6FB-0002Zs-LY
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 13:42:05 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
-	<150471928780.24907.14047559834166839201.stgit@frigg.lan>
-	<20170906212056.GC25558@flamenco>
-Date: Sun, 10 Sep 2017 20:41:56 +0300
-In-Reply-To: <20170906212056.GC25558@flamenco> (Emilio G. Cota's message of
-	"Wed, 6 Sep 2017 17:20:56 -0400")
-Message-ID: <87fubuzc0r.fsf@frigg.lan>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dr6GW-00030q-9i
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 13:43:31 -0400
+Received: from mail-qt0-x229.google.com ([2607:f8b0:400d:c0d::229]:34401)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dr6GW-00030j-52
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 13:43:28 -0400
+Received: by mail-qt0-x229.google.com with SMTP id m35so15360605qte.1
+	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 10:43:28 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170830225225.27925-1-f4bug@amsat.org>
+	<20170901151850.GD17184@localhost.localdomain>
+	<e5407d61-b21c-8ff5-1051-f75a6221e222@amsat.org>
+	<20170901154850.GP7570@localhost.localdomain>
+	<e8c0ae1e-e157-35a9-fe71-8eb5b44f8178@amsat.org>
+	<5d7f7453-1303-7879-5437-73a79f2f0033@imgtec.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e2422a4d-4c00-6498-d1c8-725a6bdf399b@amsat.org>
+Date: Sun, 10 Sep 2017 14:43:22 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 03/20] instrument: Add generic library
- loader
+In-Reply-To: <5d7f7453-1303-7879-5437-73a79f2f0033@imgtec.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 0/7] QOMify MIPS cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,51 +39,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-Emilio G Cota writes:
+Hi Eduardo,
 
-> On Wed, Sep 06, 2017 at 20:34:48 +0300, Llu=C3=ADs Vilanova wrote:
->> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
->> ---
-> (snip)
->> diff --git a/configure b/configure
->> index 80dcc91c98..05bd7b1950 100755
->> --- a/configure
->> +++ b/configure
->> @@ -6034,6 +6034,8 @@ fi
->> echo "CONFIG_TRACE_FILE=3D$trace_file" >> $config_host_mak
->>=20
->> if test "$instrument" =3D "yes"; then
->> +  LDFLAGS=3D"-rdynamic $LDFLAGS"          # limit symbols available to =
-clients
+>>>>> On Wed, Aug 30, 2017 at 07:52:18PM -0300, Philippe Mathieu-Daudé wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> This series is based on Igor's "complete cpu QOMification" [1] but
+>>>>>> only modify
+>>>>>> the MIPS part. Igor posted an updated series [2], both series should
+>>>>>> apply
+>>>>>> separately.
+>>>>>>
+>>>>>> Igor suggested on IRC this series could enter via the Machine core
+>>>>>> tree, so
+>>>>>> I added Eduardo and Marcel.
+>>>>>
+>>>>> I would do that only if the MIPS maintainers (CCed) aren't
+>>>>> willing to merge the series themselves.
+>>>>
+>>>> Aurelien told me he looked at the series but isn't comfortable with
+>>>> reviewing QOM code. Anyway since all patches are reviewed/tested and
+>>>> this is
+>>>> MIPS only series it also makes sens to me this enters via their tree.
+>>>>
+>>>> Eduardo can you Ack this series from the QOM part to help Aurelien?
+>>>
+>>> Absolutely:
+>>>
+>>> Acked-by: Eduardo Habkost <ehabkost@redhat.com>
+>>>
+>>> I will try to review the QOM code more closely and send
+>>> Reviewed-by lines too.
 
-> -rdynamic exports all objects to the instrumenters, not the other way aro=
-und.
-> You can see it with nm(1).
+This series with your Acked-by tag is available for you to review at:
 
-I'll send a minor fix for this in next version.
+   git://github.com/philmd/qemu.git tags/mips-qomify-20170910
 
+Regards,
 
-> BTW I'm using ebf447b5b from your qemu-dbi repo. Is that the same as this
-> patchset? It doesn't compile with --enable-instrument:
-> $ make
->   CC      x86_64-linux-user/instrument/trace.o
-> /data/src/qemu2/instrument/trace.c:12:30: fatal error: qemu-instr/trace.h=
-: No such file or directory
-> compilation terminated.
-> /data/src/qemu2/rules.mak:66: recipe for target 'instrument/trace.o' fail=
-ed
-> make[1]: *** [instrument/trace.o] Error 1
-> Makefile:326: recipe for target 'subdir-x86_64-linux-user' failed
-> make: *** [subdir-x86_64-linux-user] Error 2
+Phil.
 
-No, I started using a separate branch to keep the old patches around in the
-meantime.
-
-
-> 		Emilio
-
-
-Lluis
+>>
+>> Thank you!
+>>
+> 
+> I can take the series too. Please carry on reviewing.
+> 
+> Regards,
+> Yongbok
+> 
