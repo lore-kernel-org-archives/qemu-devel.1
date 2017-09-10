@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58970)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dqttZ-0003i2-DR
+	(envelope-from <bounces@canonical.com>) id 1dqttZ-0003i1-DN
 	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 00:30:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dqttV-0003Nu-Lh
+	(envelope-from <bounces@canonical.com>) id 1dqttU-0003Mk-6Z
 	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 00:30:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42812)
+Received: from indium.canonical.com ([91.189.90.7]:42758)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dqttV-0003N4-Fh
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 00:30:53 -0400
+	id 1dqttU-0003MS-03
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 00:30:52 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dqttU-0000tn-EQ
-	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 04:30:52 +0000
+	id 1dqttT-0000tv-21
+	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 04:30:51 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 61FB92E8491
-	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 04:30:52 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 0D71E2E848E
+	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 04:30:51 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sun, 10 Sep 2017 04:17:49 -0000
-From: Launchpad Bug Tracker <1093360@bugs.launchpad.net>
-Reply-To: Bug 1093360 <1093360@bugs.launchpad.net>
+Date: Sun, 10 Sep 2017 04:17:53 -0000
+From: Launchpad Bug Tracker <1095531@bugs.launchpad.net>
+Reply-To: Bug 1095531 <1095531@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20121223234026.15429.45355.malonedeb@wampee.canonical.com>
-Message-Id: <150501707002.27827.8314561867273466430.malone@loganberry.canonical.com>
+References: <20130103052033.32036.58749.malonedeb@wampee.canonical.com>
+Message-Id: <150501707340.27827.4101535471306235367.malone@loganberry.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1093360] Re: files on microsoft iso images
- mounted to qemu VM get stripped from Version info. E.G. Microsoft UAG
- installation fails
+Subject: [Qemu-devel] [Bug 1095531] Re: sparc32plus (and others?) has x86
+ code generation errors on 64bit hosts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,30 +48,80 @@ To: qemu-devel@nongnu.org
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1093360
+https://bugs.launchpad.net/bugs/1095531
 
 Title:
-  files on microsoft iso images mounted to qemu VM  get stripped  from
-  Version info. E.G. Microsoft UAG installation fails
+  sparc32plus (and others?) has x86 code generation errors on 64bit
+  hosts
 
 Status in QEMU:
   Expired
 
 Bug description:
-  QEMU 0.9.0-0.14.1
-  KVM 60-88-0.14.1
-  there is a reference for a root cause, why installation of Microsoft UAG =
-fails.
-  http://blogs.technet.com/b/isablog/archive/2010/07/13/another-tmg-2010-in=
-stallation-failure-with-error-0x80070643.aspx
+  On 64bit hosts, the load and store functions compile improperly. The
+  issue is the call to gen_address_mask() under the ld and st functions
+  in target-sparc/translate.c. Below are some snips from the log file.
+  Doing a gdb debug, this results in constant access violation errors
+  which I do not see when debugging qemu in powerpc mode.
 
-  when checking available information on the mounted UAG ISO in my qemu mac=
-hine, I realized simliar reduced information.
-  this was found:
-  using AQEMU 0.8.2 of 2011.07.27
+  --------------
+  IN: =
 
-  using QEMU 0.9.0-0.14.1 and KVM 60-88-0.14.1
-  in an KVM managed  machine
+  0x0000000040804aa8:  st  %i0, [ %fp + 0x44 ]
+
+  OP:
+   ---- 0x40804aa8
+   ld_i64 tmp1,regwptr,$0xb0
+   mov_i64 tmp0,tmp1
+   movi_i64 tmp2,$0x44
+   add_i64 tmp0,tmp0,tmp2
+   ld_i64 tmp2,regwptr,$0x80
+   ext32u_i64 tmp0,tmp0
+   qemu_st32 tmp2,tmp0,$0x0
+
+  OUT: [size=3D345]
+  0x6032d7f0:  mov    0x40(%r14),%rbp
+  0x6032d7f4:  mov    0xb0(%rbp),%rbx
+  0x6032d7fb:  add    $0x44,%rbx
+  0x6032d7ff:  mov    0x80(%rbp),%rbp
+  0x6032d806:  mov    %ebx,%ebx                 <- bug
+  0x6032d808:  mov    %ebp,%edi
+  0x6032d80a:  bswap  %edi
+  0x6032d80c:  mov    %edi,(%rbx)
+
+  --------------
+  IN: =
+
+  0x0000000040804aec:  add  %l7, %o7, %l7
+  0x0000000040804af0:  ld  [ %l7 ], %g2
+
+  OP:
+   ---- 0x40804aec
+   ld_i64 tmp1,regwptr,$0x78
+   ld_i64 tmp2,regwptr,$0x38
+   add_i64 tmp0,tmp1,tmp2
+   st_i64 tmp0,regwptr,$0x78
+
+   ---- 0x40804af0
+   ld_i64 tmp1,regwptr,$0x78
+   mov_i64 tmp0,tmp1
+   ext32u_i64 tmp0,tmp0
+   qemu_ld32u g2,tmp0,$0x0
+
+  OUT: [size=3D395]
+  0x6032da80:  mov    0x40(%r14),%rbp
+  0x6032da84:  mov    0x78(%rbp),%rbx
+  0x6032da88:  mov    0x38(%rbp),%r12
+  0x6032da8c:  add    %r12,%rbx
+  0x6032da8f:  mov    %rbx,0x78(%rbp)
+  0x6032da93:  mov    0x78(%rbp),%rbx
+  0x6032da97:  mov    %ebx,%ebx                <- bug
+  0x6032da99:  mov    (%rbx),%ebx
+
+  In 64bit mode, doing a 32bit operation will result in the top 32bit's
+  being zero'd. I attempted to simply disable the call to
+  gen_address_mask() but that did not fix the issue and actually caused
+  the sparc32plus I was testing to become unusable.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1093360/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1095531/+subscriptions
