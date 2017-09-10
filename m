@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46145)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqwQM-0000km-5X
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 03:12:59 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dqyMp-0004El-9i
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 05:17:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dqwQK-0000RE-Ve
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 03:12:58 -0400
-Date: Sun, 10 Sep 2017 17:12:45 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170910071245.GB17405@umbus.fritz.box>
-References: <150496954641.9654.1998704077006846521.stgit@bahia>
+	(envelope-from <aik@ozlabs.ru>) id 1dqyMl-0006qv-Ad
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 05:17:27 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:33500)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dqyMl-0006pL-15
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 05:17:23 -0400
+Received: by mail-pg0-x244.google.com with SMTP id i130so1288703pgc.0
+	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 02:17:21 -0700 (PDT)
+References: <20170907092010.3605-1-aik@ozlabs.ru>
+	<20170907092010.3605-3-aik@ozlabs.ru>
+	<20170909071846.GU2735@umbus.fritz.box>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <fe582ba6-ac4f-e592-651d-e178ee99d508@ozlabs.ru>
+Date: Sun, 10 Sep 2017 19:17:13 +1000
 MIME-Version: 1.0
+In-Reply-To: <20170909071846.GU2735@umbus.fritz.box>
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="EuxKj2iCbKjpUGkD"
-Content-Disposition: inline
-In-Reply-To: <150496954641.9654.1998704077006846521.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH 0/5] spapr_pci: various cleanups and
- improvements
+	protocol="application/pgp-signature";
+	boundary="40Eg9JV9PgJVIMRVBCQrh155abaUlCwBm"
+Subject: Re: [Qemu-devel] [RFC PATCH qemu 2/4] memory: Prepare for shared
+ flat views
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
 
-
---EuxKj2iCbKjpUGkD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--40Eg9JV9PgJVIMRVBCQrh155abaUlCwBm
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+Message-ID: <fe582ba6-ac4f-e592-651d-e178ee99d508@ozlabs.ru>
+Subject: Re: [RFC PATCH qemu 2/4] memory: Prepare for shared flat views
+References: <20170907092010.3605-1-aik@ozlabs.ru>
+ <20170907092010.3605-3-aik@ozlabs.ru> <20170909071846.GU2735@umbus.fritz.box>
+In-Reply-To: <20170909071846.GU2735@umbus.fritz.box>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Sep 09, 2017 at 05:05:46PM +0200, Greg Kurz wrote:
-> Before resuming the huge work on PHB hotplug, here are some patches
-> that maybe worth to apply.
+On 09/09/17 17:18, David Gibson wrote:
+> On Thu, Sep 07, 2017 at 07:20:08PM +1000, Alexey Kardashevskiy wrote:
+>> We are going to share flat views and dispatch trees between address
+>> spaces. This moves bits around but no change in behaviour is expected
+>> here. The following patch will implement sharing.
+>>
+>> This switches from AddressSpace to AddressSpaceDispatch as in many
+>> places this is what is used actually. Also, since multiple address
+>> spaces will be sharing a flat view, MemoryRegionSection cannot store
+>> the address space pointer, this changes it to AddressSpaceDispatch
+>> as well. As a not very obvious result, IOMMUTLBEntry also switched
+>> from AddressSpace to AddressSpaceDispatch to make
+>> address_space_get_iotlb_entry() work.
 >=20
-> Patches 1 to 3 are basic improvements.
->=20
-> Patch 4 and 5 may be a bit controversial. Everywhere in the spapr
-> code where we build an FDT portion, libfdt failures cause QEMU to
-> exit, even on hotplug paths. Only spapr_pci doesn't do that and
-> propagates the error instead. My understanding is that a failure
-> when building the FDT is likely to happen because of a bug in QEMU.
->=20
-> Hence the choice to convert spapr_pci to do like the others. We may
-> even consider changing _FDT() to abort() instead of exit().
->=20
-> Alternatively, if libfdt failures shouldn't be necessarily fatal,
-> especially on post-realize paths, then we should probably introduce
-> an _FDT_ERR() helper to propagate errors. And use it in may places
-> where we currently terminate QEMU: memory hotplug, CPU hotplug, CAS,
-> machine reset...
+> So, mostly this seems to be exposing AddressSpaceDispatch in more
+> places.  It's not obvious to me why that's useful.
 
-I've applied 4 & 5 as well now.  If I get to it, I hope to make them
-obsolete by replacing most of the fdt wrangling with a qemu internal
-live tree representation, but in the meantime it's still a reasonable
-cleanup.
+
+It is mostly for IOMMUs - since dispatch tree and flat view is shared amo=
+ng
+address spaces, I cannot use address spaces in iommu_ops::translate - too=
+
+ambiguous - "use any attached to this flatview/dispatch" is just  confusi=
+ng.
+
 
 --=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Alexey
 
---EuxKj2iCbKjpUGkD
+
+--40Eg9JV9PgJVIMRVBCQrh155abaUlCwBm
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm05eoACgkQbDjKyiDZ
-s5I6GQ/8D9VIVwGt19HTdQoQoWOFk3VDvQxsveyAl9+zicsu8XPzF1OInuw8XUiE
-9tmFc5bXnEzKCotEPaGDmUGvBa/EfxxZPLRPPJxktG5qLFp6wbOgGCWTztSETsXD
-DDbgoEBS1nWQ3Pt3dmTuYXI6eWFB5osDCtf1A6G2C1e7YCtEztuDaCWACfPG35Xk
-4Fp/nqvtC/lvwSd/r2sSUpDr/Ig/hoio5Aj6CJ92/PblqcFyiqAsJ09ThlhPilwX
-q4uHcDfNmlnumoy3gcn8u4cJPTurRYFEqOnyxRWxbDkD9ZsBEJ0MwZ7ipSVtSFTI
-XmKlcRu1mipGVBJn7hKt6iw4OB4lxZv4VT2SCVr1iHUYkvxlofv5sgh1jxYRW4nS
-EqzSb1lQwm3Cr6yc8TZAsYhZddE42318DmbtG9YXzx9L85paUObpOS/007jpAUzn
-GeneNjWp5tRuF30AIuxS97uU6GVY6ZuKKMm4Se6SIUDc4+QAIZ4fsdxTAPHLndE4
-zRIROukJE63aSJSNIcTF6vuvg04l+Yun7eloEExYxYrFDYwJEGvUYfFtnQFX3N2N
-lFyFFzvmxIkOeZAKrtXN8Q4le6oJzbIDoc0olo4p1kybdG2oG48fR58UwGeI6cS8
-zTKS+Fk2FhDIWjanQVe9dBzI47BUMSB6mhhfClBxMPyKosntqVA=
-=DLxA
+iQIrBAEBCAAVBQJZtQMZDhxhaWtAb3psYWJzLnJ1AAoJEIYTPdgrwSC5RIEP/0h/
+HHf4vZ+LJXh39ygxElbrkLczJoREVw8y9BFzwWTajjEk5hRyCZfVa4lXoRhgWuem
+S6ihEUXSYd3m+aLGyzcl5OqwhDAI+ANGSbF7g6Nj36++VXYcsNQOc6izgQAIZXeS
+Sl2cP1hNQbBh+Ib8rVEOv0BsSsIPrkAZQk+nEEIcD5Gmk14v3EV0GEDbPNSC0ZzP
+QsskAbfv5opusV96i8ECvNz6g2yZhhnrkXM8AwfXVNMwELU9T8/lbeyBu4fss0am
+Lqqfwr8+EwVZ7KcKgHxkglSxGeGKaVKQlCPWikdxhej0mkGpFano0BBLwrzUQJZy
+7TMiseYkPMBoyk5JrG+TIUBffLvL6pjsUx5wxJgK39FElN4tw+FYGwqzCYH6jpQ9
+NJrtfsA/Lb0C+nEzZ6W9GB+IT940JKBE7C6uiGJkeNHGh21dzCA0K0O4gJlEhgD7
+MT/0I0vuaZ7h5ESJGwchnAT52SO7o1FK0L0cWo0sQvd7XAzO9Tdy3O9UquQ57B8a
+ej8eKXJN/sRCIRAfIsuvONAZq5xQqhts9Czq66oZzkGX+Ttsw+Rjja9uVhcHtrDs
+2UIkphTQIlh4Zw+xhwiNaW4oI5psMiWuhAKBKn2coxTpt+bjAwLVMdIkIaXprDjv
+xCLfdcnD+fKGHQTraV8MZl6eVIk7K/WaYlKHJntt
+=+WHW
 -----END PGP SIGNATURE-----
 
---EuxKj2iCbKjpUGkD--
+--40Eg9JV9PgJVIMRVBCQrh155abaUlCwBm--
