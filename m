@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33778)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dqrHM-0005lO-5E
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:43:21 -0400
+	(envelope-from <mst@redhat.com>) id 1dqrQT-0007Oq-67
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:52:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dqrHI-0004eq-9G
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:43:20 -0400
-Received: from mail-pf0-x235.google.com ([2607:f8b0:400e:c00::235]:36116)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dqrHI-0004eQ-2I
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:43:16 -0400
-Received: by mail-pf0-x235.google.com with SMTP id e199so9411484pfh.3
-	for <qemu-devel@nongnu.org>; Sat, 09 Sep 2017 18:43:14 -0700 (PDT)
-References: <20170817230114.3655-1-richard.henderson@linaro.org>
-	<20170817230114.3655-3-richard.henderson@linaro.org>
-	<877examon2.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <05363152-8a66-af3f-7c66-9627cbdc290b@linaro.org>
-Date: Sat, 9 Sep 2017 18:43:10 -0700
+	(envelope-from <mst@redhat.com>) id 1dqrQQ-0000RC-42
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:52:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34536)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dqrQP-0000Ny-Rf
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:52:42 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C86185D686
+	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 01:52:39 +0000 (UTC)
+Date: Sun, 10 Sep 2017 04:52:36 +0300
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Message-ID: <20170910044820-mutt-send-email-mst@kernel.org>
+References: <20170807181618.22562-1-marcandre.lureau@redhat.com>
+	<20170807181618.22562-4-marcandre.lureau@redhat.com>
+	<20170908183337-mutt-send-email-mst@kernel.org>
+	<20170908183915-mutt-send-email-mst@kernel.org>
+	<257507131.11042763.1504885786158.JavaMail.zimbra@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <877examon2.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/8] target/arm: Use generic vector
- infrastructure for aa64 add/sub/logic
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <257507131.11042763.1504885786158.JavaMail.zimbra@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 3/8] fw_cfg: add vmcoreinfo file
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +37,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
+Cc: qemu-devel@nongnu.org, imammedo@redhat.com, berrange@redhat.com, ehabkost@redhat.com, anderson@redhat.com, lersek@redhat.com
 
-On 09/07/2017 09:58 AM, Alex Bennée wrote:
->> +    switch (size + 4 * is_u) {
-> 
-> Hmm I find this switch a little too magical. I mean I can see that the
-> encoding abuses size for the final opcode when I look at the manual but
-> it reads badly.
-> 
->> +    case 0: /* AND */
->> +        gvec_op = tcg_gen_gvec_and8;
->> +        goto do_gvec;
->> +    case 1: /* BIC */
->> +        gvec_op = tcg_gen_gvec_andc8;
->> +        goto do_gvec;
->> +    case 2: /* ORR */
->> +        gvec_op = tcg_gen_gvec_or8;
->> +        goto do_gvec;
->> +    case 3: /* ORN */
->> +        gvec_op = tcg_gen_gvec_orc8;
->> +        goto do_gvec;
->> +    case 4: /* EOR */
->> +        gvec_op = tcg_gen_gvec_xor8;
->> +        goto do_gvec;
->> +    do_gvec:
->> +        gvec_op(vec_full_reg_offset(s, rd),
->> +                vec_full_reg_offset(s, rn),
->> +                vec_full_reg_offset(s, rm),
->> +                is_q ? 16 : 8, vec_full_reg_size(s));
->> +        return;
-> 
-> No default case (although I guess we just fall through). What's wrong
-> with just having a !is_u test with gvec_op = tbl[size] and skipping all
-> the goto stuff?
+On Fri, Sep 08, 2017 at 11:49:46AM -0400, Marc-Andr=E9 Lureau wrote:
+> Hi
+>=20
+> ----- Original Message -----
+> > On Fri, Sep 08, 2017 at 06:39:01PM +0300, Michael S. Tsirkin wrote:
+> > > On Mon, Aug 07, 2017 at 08:16:13PM +0200, Marc-Andr=E9 Lureau wrote=
+:
+> > > > diff --git a/docs/specs/fw_cfg.txt b/docs/specs/fw_cfg.txt
+> > > > index 08c00bdf44..37d0f9f40a 100644
+> > > > --- a/docs/specs/fw_cfg.txt
+> > > > +++ b/docs/specs/fw_cfg.txt
+> > > > @@ -136,6 +136,22 @@ struct FWCfgFile {		/* an individual file en=
+try, 64
+> > > > bytes total */
+> > > >      char name[56];		/* fw_cfg item name, NUL-terminated ascii */
+> > > >  };
+> > > > =20
+> > > > +=3D=3D=3D etc/vmcoreinfo =3D=3D=3D
+> > > > +
+> > > > +A guest may use this entry to add information details to qemu
+> > > > +dumps. The entry gives location and size of an ELF note that is
+> > > > +appended in qemu dumps.
+> > > > +
+> > > > +The entry is of 12 bytes with this format:
+> > > > +
+> > > > +struct FWCfgVMCoreInfo {
+> > > > +    uint64_t paddr;             /* physical address of ELF note,=
+ LE */
+> > > > +    uint32_t size;              /* size of ELF note region, LE *=
+/
+> > > > +};
+> > > > +
+> > > > +The note format/class must be of the target bitness and the size=
+ must
+> > > > +be less than 1Mb.
+> > > > +
+> > >=20
+> > > I would say adding a format bitmap would make sense for future
+> > > compatibility.
+> > > How about:
+> > >=20
+> > > struct FWCfgVMCoreInfo {
+> > >     uint16_t host_format;       /* Formats host supports. 0x1 LE - =
+ELF
+> > >     note. Other bits - ignored. */
+>=20
+> Could this be added later?
+>
+> For ex, extend the entry to 16 bytes, with those 2 values appended?
 
-Because that would still leave EOR out in the woods.
-I do think this is the cleanest way to filter out these 5 operations.
+I think aligned size is better overall so you can write
+bindings in any language without issues.
+I'm ok with just keeping 0s there for now if you prefer.
 
 
-r~
+> If the size is 12, assume it is ELF note only, and that the host suppor=
+ts it.
+
+Seems more like a hack that will make code ugly down the road.
+
+> > >     uint16_t guest_format;      /* Formats guest supplies. Must be =
+0x1 LE
+> > >     */
+> >=20
+> > .. to set the ELF note info, or 0x0 to reset the device.
+> >=20
+> > >     uint32_t size;              /* size of ELF note region, LE */
+> > >     uint64_t paddr;             /* physical address of ELF note, LE=
+ */
+> > > };
+> > >=20
+> > >=20
+> > > >  =3D=3D=3D All Other Data Items =3D=3D=3D
+> > > > =20
+> > > >  Please consult the QEMU source for the most up-to-date and autho=
+ritative
+> > > >  list
+> > > > --
+> > > > 2.14.0.1.geff633fa0
+> >=20
