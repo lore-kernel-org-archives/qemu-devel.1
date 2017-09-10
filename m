@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dqrQT-0007Oq-67
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:52:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dqrWR-0000Iv-20
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:58:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mst@redhat.com>) id 1dqrQQ-0000RC-42
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:52:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34536)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mst@redhat.com>) id 1dqrQP-0000Ny-Rf
-	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:52:42 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id C86185D686
-	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 01:52:39 +0000 (UTC)
-Date: Sun, 10 Sep 2017 04:52:36 +0300
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Message-ID: <20170910044820-mutt-send-email-mst@kernel.org>
-References: <20170807181618.22562-1-marcandre.lureau@redhat.com>
-	<20170807181618.22562-4-marcandre.lureau@redhat.com>
-	<20170908183337-mutt-send-email-mst@kernel.org>
-	<20170908183915-mutt-send-email-mst@kernel.org>
-	<257507131.11042763.1504885786158.JavaMail.zimbra@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dqrWQ-0002O9-0e
+	for qemu-devel@nongnu.org; Sat, 09 Sep 2017 21:58:55 -0400
+Date: Sun, 10 Sep 2017 11:58:14 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170910015814.GW2735@umbus.fritz.box>
+References: <150456160452.17000.3290192176290246589.stgit@bahia.lan>
+	<150456161545.17000.9223127644314285105.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="eLx2Oic5rP1+EtIt"
 Content-Disposition: inline
-In-Reply-To: <257507131.11042763.1504885786158.JavaMail.zimbra@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 3/8] fw_cfg: add vmcoreinfo file
+In-Reply-To: <150456161545.17000.9223127644314285105.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH 1/4] spapr: only update SDR1 once per-cpu
+ during CAS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,86 +25,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, imammedo@redhat.com, berrange@redhat.com, ehabkost@redhat.com, anderson@redhat.com, lersek@redhat.com
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Suraj Jitindar Singh <sjitindarsingh@gmail.com>, Thomas Huth <thuth@redhat.com>
 
-On Fri, Sep 08, 2017 at 11:49:46AM -0400, Marc-Andr=E9 Lureau wrote:
-> Hi
+
+--eLx2Oic5rP1+EtIt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Sep 04, 2017 at 11:46:55PM +0200, Greg Kurz wrote:
+> Commit b55d295e3ec9 added the possibility to support HPT resizing with KV=
+M.
+> In the case of PR, we need to pass the userspace address of the HPT to KVM
+> using the SDR1 slot.
+> This is handled by kvmppc_update_sdr1() which uses CPU_FOREACH() to update
+> all CPUs. It is hence not needed to call kvmppc_update_sdr1() for each CP=
+U.
 >=20
-> ----- Original Message -----
-> > On Fri, Sep 08, 2017 at 06:39:01PM +0300, Michael S. Tsirkin wrote:
-> > > On Mon, Aug 07, 2017 at 08:16:13PM +0200, Marc-Andr=E9 Lureau wrote=
-:
-> > > > diff --git a/docs/specs/fw_cfg.txt b/docs/specs/fw_cfg.txt
-> > > > index 08c00bdf44..37d0f9f40a 100644
-> > > > --- a/docs/specs/fw_cfg.txt
-> > > > +++ b/docs/specs/fw_cfg.txt
-> > > > @@ -136,6 +136,22 @@ struct FWCfgFile {		/* an individual file en=
-try, 64
-> > > > bytes total */
-> > > >      char name[56];		/* fw_cfg item name, NUL-terminated ascii */
-> > > >  };
-> > > > =20
-> > > > +=3D=3D=3D etc/vmcoreinfo =3D=3D=3D
-> > > > +
-> > > > +A guest may use this entry to add information details to qemu
-> > > > +dumps. The entry gives location and size of an ELF note that is
-> > > > +appended in qemu dumps.
-> > > > +
-> > > > +The entry is of 12 bytes with this format:
-> > > > +
-> > > > +struct FWCfgVMCoreInfo {
-> > > > +    uint64_t paddr;             /* physical address of ELF note,=
- LE */
-> > > > +    uint32_t size;              /* size of ELF note region, LE *=
-/
-> > > > +};
-> > > > +
-> > > > +The note format/class must be of the target bitness and the size=
- must
-> > > > +be less than 1Mb.
-> > > > +
-> > >=20
-> > > I would say adding a format bitmap would make sense for future
-> > > compatibility.
-> > > How about:
-> > >=20
-> > > struct FWCfgVMCoreInfo {
-> > >     uint16_t host_format;       /* Formats host supports. 0x1 LE - =
-ELF
-> > >     note. Other bits - ignored. */
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Applied to ppc-for-2.11.
+
+> ---
+>  hw/ppc/spapr_hcall.c |   14 +++++---------
+>  1 file changed, 5 insertions(+), 9 deletions(-)
 >=20
-> Could this be added later?
->
-> For ex, extend the entry to 16 bytes, with those 2 values appended?
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 8b3c0e17e75c..6ab8c188f381 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1559,20 +1559,16 @@ static target_ulong h_client_architecture_support=
+(PowerPCCPU *cpu,
+>          }
+> =20
+>          if (spapr->htab_shift < maxshift) {
+> -            CPUState *cs;
+> -
+>              /* Guest doesn't know about HPT resizing, so we
+>               * pre-emptively resize for the maximum permitted RAM.  At
+>               * the point this is called, nothing should have been
+>               * entered into the existing HPT */
+>              spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
+> -            CPU_FOREACH(cs) {
+> -                if (kvm_enabled()) {
+> -                    /* For KVM PR, update the HPT pointer */
+> -                    target_ulong sdr1 =3D (target_ulong)(uintptr_t)spapr=
+->htab
+> -                        | (spapr->htab_shift - 18);
+> -                    kvmppc_update_sdr1(sdr1);
+> -                }
+> +            if (kvm_enabled()) {
+> +                /* For KVM PR, update the HPT pointer */
+> +                target_ulong sdr1 =3D (target_ulong)(uintptr_t)spapr->ht=
+ab
+> +                    | (spapr->htab_shift - 18);
+> +                kvmppc_update_sdr1(sdr1);
+>              }
+>          }
+>      }
+>=20
 
-I think aligned size is better overall so you can write
-bindings in any language without issues.
-I'm ok with just keeping 0s there for now if you prefer.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
+--eLx2Oic5rP1+EtIt
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> If the size is 12, assume it is ELF note only, and that the host suppor=
-ts it.
+-----BEGIN PGP SIGNATURE-----
 
-Seems more like a hack that will make code ugly down the road.
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm0nDIACgkQbDjKyiDZ
+s5I1fxAAj/71qyd559Efimik9N/f1NKc1Soi+bBAnHzAthj+6c0CfJ2rt807iJ2/
+XiJfv+b4KSaMAJWKbe19a7jCxAGxmoY8WGm9G7hXoln0X0wDslWKhkzj3SCF9z/V
+0xI2Q+z7vy46Iu1X4G4cPf2GAfipB7NikiSKkGjr6PJQp8CGNq2vsfeX0u62+9SY
+FUInZ0ORihLladDLwEsPlLatY/yM4ehySQKI0sHr22Lw5TuVNKApHYrRRS0NOfJc
+g7El69N8qDdReSdTxE5yYQYN8AxfwL57M03HWUHY9Nz5VZr0TesXEwazDeGGBghl
+ctzDAfrcKm8+6JaVG74FUCDbCIDOmyzrrg3OldJ3N0Nr/WPqKm4EYsCHBfmAUIu9
+sl1jP6YeJE88Gs6fI200dmiXNWy5tepPbHqzyN44f112qBRsFvqm2QHJsHAjHOL0
+YTObIuS2QH/eryaQycv1AmYcmBQXQ8Eaq/+/mbo95cVsW270wBtFxN61gLIzeZwA
+mm1WnP8juT1cksTDUEZ8NTLIHQtD1gQ7shls0d5xO6PYnyXPQWPOHLVZOvDaQClj
+U+7GEl/O3ZnHksKiKQGRR2CsNR1dYJ6eD/z0QJJXUooNilV+gDE3MbLKmOY+CU5c
+e9cn0Fzahk85nfqk3lFfeNZrizncTerM8O5USjFC4B8jCNOttC0=
+=o82K
+-----END PGP SIGNATURE-----
 
-> > >     uint16_t guest_format;      /* Formats guest supplies. Must be =
-0x1 LE
-> > >     */
-> >=20
-> > .. to set the ELF note info, or 0x0 to reset the device.
-> >=20
-> > >     uint32_t size;              /* size of ELF note region, LE */
-> > >     uint64_t paddr;             /* physical address of ELF note, LE=
- */
-> > > };
-> > >=20
-> > >=20
-> > > >  =3D=3D=3D All Other Data Items =3D=3D=3D
-> > > > =20
-> > > >  Please consult the QEMU source for the most up-to-date and autho=
-ritative
-> > > >  list
-> > > > --
-> > > > 2.14.0.1.geff633fa0
-> >=20
+--eLx2Oic5rP1+EtIt--
