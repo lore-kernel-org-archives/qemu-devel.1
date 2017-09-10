@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49737)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drBh7-0002n5-I1
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 19:31:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1drBlF-00041m-LU
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 19:35:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drBh4-0007Ub-E3
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 19:31:17 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:49655)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drBh4-0007UB-45
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 19:31:14 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150471856141.24907.274176769201097378.stgit@frigg.lan>
-	<20170906205947.GB25558@flamenco>
-Date: Mon, 11 Sep 2017 02:31:04 +0300
-In-Reply-To: <20170906205947.GB25558@flamenco> (Emilio G. Cota's message of
-	"Wed, 6 Sep 2017 16:59:47 -0400")
-Message-ID: <87poayuo5j.fsf@frigg.lan>
+	(envelope-from <bounces@canonical.com>) id 1drBlC-0000fU-Hz
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 19:35:33 -0400
+Received: from indium.canonical.com ([91.189.90.7]:52658)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1drBlC-0000f6-Bi
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 19:35:30 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1drBlB-0001Cx-95
+	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 23:35:29 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 3D6EC2E8489
+	for <qemu-devel@nongnu.org>; Sun, 10 Sep 2017 23:35:29 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v4 00/20] instrument: Add basic event
- instrumentation
+Date: Sun, 10 Sep 2017 23:29:24 -0000
+From: Zhuowei Zhang <1716292@bugs.launchpad.net>
+Reply-To: Bug 1716292 <1716292@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150508616435.31900.3449336177179115668.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716292] [NEW] User mode emulation returns wrong
+ value for write(fd, NULL, 0)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,52 +36,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org
 
-Emilio G Cota writes:
+Public bug reported:
 
-> On Wed, Sep 06, 2017 at 20:22:41 +0300, Llu=C3=ADs Vilanova wrote:
->> This series adds an API to add instrumentation events.
->>=20
->> It also provides additional APIs for:
->> * Controlling tracing events
+QEMU version: latest master (fcea73709b966a7ded9efa7b106ea50c7fe9025c)
+OS version: Ubuntu 14.04.5
+Configured with: ../configure --target-list=3Dx86_64-linux-user
 
-> hmm didn't Stefan say that tracing should be decoupled from this?
+QEMU Linux usermode emulation does not handle write() syscalls with zero
+length and a null pointer correctly: on Linux this returns 0, but in
+emulation this returns -1.
 
-I understood decoupling instr from the tracing infrastructure (since tracing
-events are defined as not stable, and instr must be stable by definition).
+I ran into this while using an aarch64 abuild-tar from Alpine Linux in
+user-mode emulation; here's the minimized reproduction test case:
 
+zhuowei@zhuowei-tablet:/tmp$ cat writezerobytes.c
+#include <stdio.h>
+#include <unistd.h>
+#include <fcntl.h>
 
->> * Peek/poke guest memory
->>=20
->> There's still missing APIs for (can be added in later series?):
->> * Provide something like tracing's per-vCPU trace states (i.e., so that =
-each
->> vCPU can have different instrumentation code). It's still not clear to m=
-e if
->> we should extend the per-vCPU bitmap with instrumentation events, or oth=
-erwise
->> somehow reuse the bits in tracing events (since they're currently limite=
-d).
+int main() {
+=C2=A0ssize_t ret =3D write(STDOUT_FILENO, NULL, 0);
+=C2=A0fprintf(stderr, "write returned %ld\n", ret);
+=C2=A0return 0;
+}
+zhuowei@zhuowei-tablet:/tmp$ gcc -o writezerobytes writezerobytes.c
+zhuowei@zhuowei-tablet:/tmp$ uname -a
+Linux zhuowei-tablet 3.13.0-129-generic #178-Ubuntu SMP Fri Aug 11 12:48:20=
+ UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+zhuowei@zhuowei-tablet:/tmp$ ./writezerobytes
+write returned 0
+zhuowei@zhuowei-tablet:/tmp$ /media/zhuowei/redhd/docs/repos/qemu/build4/x8=
+6_64-linux-user/qemu-x86_64 ./writezerobytes
+write returned -1
+zhuowei@zhuowei-tablet:/tmp$ /media/zhuowei/redhd/docs/repos/qemu/build4/x8=
+6_64-linux-user/qemu-x86_64 --version
+qemu-x86_64 version 2.10.50 (v2.10.0-471-gfcea737-dirty)
+Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
 
-> As I said in the description of my alternative implementation [*], I don'=
-t see
-> much value in having per-vCPU events, as most instrumenters just care abo=
-ut
-> the guest application/system. I can only think of cases where the instrum=
-enter
-> is only interested in a guest process (in system-mode), but that'd be ugly
-> anyway (would need to change both QEMU and the guest kernel to track the =
-pid).
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-> If the need ever arises, we could add __vcpu(cpu_index) registration func=
-tions.
+** Description changed:
 
-> [*] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01446.html
+  QEMU version: latest master (fcea73709b966a7ded9efa7b106ea50c7fe9025c)
+- OS version: Ubuntu 14.04.3
++ OS version: Ubuntu 14.04.5
+  Configured with: ../configure --target-list=3Dx86_64-linux-user
+  =
 
-Sorry, your series slipped my radar. I'll take a look at it.
+  QEMU Linux usermode emulation does not handle write() syscalls with zero
+  length and a null pointer correctly: on Linux this returns 0, but in
+  emulation this returns -1.
+  =
 
+  I ran into this while using an aarch64 abuild-tar from Alpine Linux in
+  user-mode emulation; here's the minimized reproduction test case:
+  =
 
-Thanks,
-  Lluis
+  zhuowei@zhuowei-tablet:/tmp$ cat writezerobytes.c
+  #include <stdio.h>
+  #include <unistd.h>
+  #include <fcntl.h>
+  =
+
+  int main() {
+- 	ssize_t ret =3D write(STDOUT_FILENO, NULL, 0);
+- 	fprintf(stderr, "write returned %ld\n", ret);
+- 	return 0;
++ =C2=A0ssize_t ret =3D write(STDOUT_FILENO, NULL, 0);
++ =C2=A0fprintf(stderr, "write returned %ld\n", ret);
++ =C2=A0return 0;
+  }
+  zhuowei@zhuowei-tablet:/tmp$ gcc -o writezerobytes writezerobytes.c
+  zhuowei@zhuowei-tablet:/tmp$ uname -a
+  Linux zhuowei-tablet 3.13.0-129-generic #178-Ubuntu SMP Fri Aug 11 12:48:=
+20 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+- zhuowei@zhuowei-tablet:/tmp$ ./writezerobytes =
+
+- write returned 0        =
+
++ zhuowei@zhuowei-tablet:/tmp$ ./writezerobytes
++ write returned 0
+  zhuowei@zhuowei-tablet:/tmp$ /media/zhuowei/redhd/docs/repos/qemu/build4/=
+x86_64-linux-user/qemu-x86_64 ./writezerobytes
+  write returned -1
+  zhuowei@zhuowei-tablet:/tmp$ /media/zhuowei/redhd/docs/repos/qemu/build4/=
+x86_64-linux-user/qemu-x86_64 --version
+  qemu-x86_64 version 2.10.50 (v2.10.0-471-gfcea737-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716292
+
+Title:
+  User mode emulation returns wrong value for write(fd, NULL, 0)
+
+Status in QEMU:
+  New
+
+Bug description:
+  QEMU version: latest master (fcea73709b966a7ded9efa7b106ea50c7fe9025c)
+  OS version: Ubuntu 14.04.5
+  Configured with: ../configure --target-list=3Dx86_64-linux-user
+
+  QEMU Linux usermode emulation does not handle write() syscalls with
+  zero length and a null pointer correctly: on Linux this returns 0, but
+  in emulation this returns -1.
+
+  I ran into this while using an aarch64 abuild-tar from Alpine Linux in
+  user-mode emulation; here's the minimized reproduction test case:
+
+  zhuowei@zhuowei-tablet:/tmp$ cat writezerobytes.c
+  #include <stdio.h>
+  #include <unistd.h>
+  #include <fcntl.h>
+
+  int main() {
+  =C2=A0ssize_t ret =3D write(STDOUT_FILENO, NULL, 0);
+  =C2=A0fprintf(stderr, "write returned %ld\n", ret);
+  =C2=A0return 0;
+  }
+  zhuowei@zhuowei-tablet:/tmp$ gcc -o writezerobytes writezerobytes.c
+  zhuowei@zhuowei-tablet:/tmp$ uname -a
+  Linux zhuowei-tablet 3.13.0-129-generic #178-Ubuntu SMP Fri Aug 11 12:48:=
+20 UTC 2017 x86_64 x86_64 x86_64 GNU/Linux
+  zhuowei@zhuowei-tablet:/tmp$ ./writezerobytes
+  write returned 0
+  zhuowei@zhuowei-tablet:/tmp$ /media/zhuowei/redhd/docs/repos/qemu/build4/=
+x86_64-linux-user/qemu-x86_64 ./writezerobytes
+  write returned -1
+  zhuowei@zhuowei-tablet:/tmp$ /media/zhuowei/redhd/docs/repos/qemu/build4/=
+x86_64-linux-user/qemu-x86_64 --version
+  qemu-x86_64 version 2.10.50 (v2.10.0-471-gfcea737-dirty)
+  Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716292/+subscriptions
