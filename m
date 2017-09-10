@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39907)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40397)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dr4tH-0003oA-Gx
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:15:24 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dr4w9-0004e6-Cc
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:18:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dr4tC-0001Mu-ID
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:15:23 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:58499)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dr4tC-0001MZ-70
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:15:18 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Sun, 10 Sep 2017 19:15:09 +0300
-Message-Id: <150506010962.19604.7773376130922107594.stgit@frigg.lan>
-In-Reply-To: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
-References: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
+	(envelope-from <laurent@vivier.eu>) id 1dr4w5-0002Zd-DJ
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:18:21 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:64337)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dr4w5-0002ZD-3b
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 12:18:17 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Sun, 10 Sep 2017 18:18:11 +0200
+Message-Id: <20170910161811.21413-2-laurent@vivier.eu>
+In-Reply-To: <20170910161811.21413-1-laurent@vivier.eu>
+References: <20170910161811.21413-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/7] trace: Add event "guest_bbl_before"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 1/1] target/m68k: Switch fpu_rom from
+ make_floatx80() to make_floatx80_init()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +28,85 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kamil Rytarowski <n54@gmx.com>, Laurent Vivier <laurent@vivier.eu>
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+From: Kamil Rytarowski <n54@gmx.com>
+
+GCC 4.7.2 on SunOS reports that the values assigned to array members are not
+real constants:
+
+target/m68k/fpu_helper.c:32:5: error: initializer element is not constant
+target/m68k/fpu_helper.c:32:5: error: (near initialization for 'fpu_rom[0]')
+rules.mak:66: recipe for target 'target/m68k/fpu_helper.o' failed
+
+Convert the array to make_floatx80_init() to fix it.
+Replace floatx80_pi-like constants with make_floatx80_init() as they are
+defined as make_floatx80().
+
+This fixes build on SmartOS (Joyent).
+
+Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20170904212306.3020-1-n54@gmx.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- accel/tcg/translator.c |    6 ++++++
- trace-events           |   11 +++++++++++
- 2 files changed, 17 insertions(+)
+ target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
+ 1 file changed, 22 insertions(+), 22 deletions(-)
 
-diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-index afa3af478a..91b3b0da32 100644
---- a/accel/tcg/translator.c
-+++ b/accel/tcg/translator.c
-@@ -13,6 +13,7 @@
- #include "cpu.h"
- #include "tcg/tcg.h"
- #include "tcg/tcg-op.h"
-+#include "trace-tcg.h"
- #include "exec/exec-all.h"
- #include "exec/gen-icount.h"
- #include "exec/log.h"
-@@ -91,6 +92,11 @@ void translator_loop(const TranslatorOps *ops, DisasCo=
-ntextBase *db,
-             }
-         }
-=20
-+        /* Tracing before */
-+        if (db->num_insns =3D=3D 1) {
-+            trace_guest_bbl_before_tcg(cpu, tcg_ctx.tcg_env, db->pc_firs=
-t);
-+        }
-+
-         /* Disassemble one instruction.  The translate_insn hook should
-            update db->pc_next and db->is_jmp to indicate what should be
-            done next -- either exiting this loop or locate the start of
-diff --git a/trace-events b/trace-events
-index 1f50f56d9d..d242f54254 100644
---- a/trace-events
-+++ b/trace-events
-@@ -88,6 +88,17 @@ vcpu guest_cpu_exit(void)
- # Targets: all
- vcpu guest_cpu_reset(void)
-=20
-+
-+## Guest code
-+
-+# @vaddr: BBL's starting virtual address
-+#
-+# Mark start of BBL execution (before anything gets really executed).
-+#
-+# Mode: user, softmmu
-+# Targets: TCG(all)
-+vcpu tcg guest_bbl_before(uint64_t vaddr) "vaddr=3D0x%016"PRIx64, "vaddr=
-=3D0x%016"PRIx64
-+
- # @vaddr: Access' virtual address.
- # @info : Access' information (see below).
- #
+diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+index bdfc537c68..665e7609af 100644
+--- a/target/m68k/fpu_helper.c
++++ b/target/m68k/fpu_helper.c
+@@ -29,28 +29,28 @@
+  */
+ 
+ static const floatx80 fpu_rom[128] = {
+-    [0x00] = floatx80_pi,                                   /* Pi */
+-    [0x0b] = make_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
+-    [0x0c] = make_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
+-    [0x0d] = make_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
+-    [0x0e] = make_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
+-    [0x0f] = floatx80_zero,                                 /* Zero     */
+-    [0x30] = floatx80_ln2,                                  /* ln(2)    */
+-    [0x31] = make_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
+-    [0x32] = floatx80_one,                                  /* 10^0     */
+-    [0x33] = make_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
+-    [0x34] = make_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
+-    [0x35] = make_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
+-    [0x36] = make_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
+-    [0x37] = make_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
+-    [0x38] = make_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
+-    [0x39] = make_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
+-    [0x3a] = make_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
+-    [0x3b] = make_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
+-    [0x3c] = make_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
+-    [0x3d] = make_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
+-    [0x3e] = make_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
+-    [0x3f] = make_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
++    [0x00] = make_floatx80_init(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
++    [0x0b] = make_floatx80_init(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
++    [0x0c] = make_floatx80_init(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
++    [0x0d] = make_floatx80_init(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
++    [0x0e] = make_floatx80_init(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
++    [0x0f] = make_floatx80_init(0x0000, 0x0000000000000000ULL),  /* Zero     */
++    [0x30] = make_floatx80_init(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
++    [0x31] = make_floatx80_init(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
++    [0x32] = make_floatx80_init(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
++    [0x33] = make_floatx80_init(0x4002, 0xa000000000000000ULL),  /* 10^1     */
++    [0x34] = make_floatx80_init(0x4005, 0xc800000000000000ULL),  /* 10^2     */
++    [0x35] = make_floatx80_init(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
++    [0x36] = make_floatx80_init(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
++    [0x37] = make_floatx80_init(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
++    [0x38] = make_floatx80_init(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
++    [0x39] = make_floatx80_init(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
++    [0x3a] = make_floatx80_init(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
++    [0x3b] = make_floatx80_init(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
++    [0x3c] = make_floatx80_init(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
++    [0x3d] = make_floatx80_init(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
++    [0x3e] = make_floatx80_init(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
++    [0x3f] = make_floatx80_init(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
+ };
+ 
+ int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
+-- 
+2.13.5
