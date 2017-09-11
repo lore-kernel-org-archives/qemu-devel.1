@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35663)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drR99-0005PF-Gd
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:01:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1drRSO-0004Hj-Cu
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:21:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drR8z-0002V3-No
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:01:15 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33212)
+	(envelope-from <bounces@canonical.com>) id 1drRSJ-00040i-Ac
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:21:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38830)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1drR8z-0002Uk-HX
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:01:05 -0400
+	id 1drRSJ-00040N-4Q
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:21:03 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1drR8x-0007WC-NG
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:01:03 +0000
+	id 1drRSG-0000l1-HT
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:21:00 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id ADC4D2E8493
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:01:03 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 28C8C2E8524
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:20:54 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Sep 2017 15:51:10 -0000
-From: Scott Moser <smoser@ubuntu.com>
-Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
+Date: Mon, 11 Sep 2017 16:15:26 -0000
+From: Aleksei Kovura <alex3kov@zoho.com>
+Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
-Message-Id: <150514507048.5972.12259638231195958554.malone@wampee.canonical.com>
+References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150514652632.16396.5785164464607646073.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
- feature flag
+Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
+ 2.10 (works on 2.9)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,106 +39,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-** Attachment added: "dump-qmp-schema.py: a hack job to dump and partially =
-"uncompress" qemu schema output"
-   https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1716028/+attachment/=
-4948028/+files/dump-qmp-schema.py
+Ok, so I cloned from github and am bisecting like this (it's been a while, =
+correct me if I'm wrong):
+$ git bisect start
+$ git bisect bad 1ab5eb4efb91a3d4569b0df6e824cc08ab4bd8ec # 2.10.0 stable c=
+ommit
+$ git bisect good 359c41abe32638adad503e386969fa428cecff52 # 2.9.0 stable c=
+ommit
+Bisecting: 1426 revisions left to test after this (roughly 11 steps)
+[269c20b2bbd2aa8531e0cdc741fb166f290d7a2b] tests/qdict: check more get_try_=
+int() cases
+$ mkdir -p bin/269c20b2bbd2aa8531e0cdc741fb166f290d7a2b
+$ cd bin/269c20b2bbd2aa8531e0cdc741fb166f290d7a2b
+$ ../../configure --target-list=3Dx86_64-softmmu --python=3D/usr/bin/python=
+2 --enable-debug
+
+Compilation fails with this (full log here
+https://pastebin.com/aUYyE6Bb):
+
+  CC      block/block-backend.o
+/media/usb465gb_232gb_NTFS/compile/qemu/block/blkdebug.c: In function =E2=
+=80=98blkdebug_refresh_filename=E2=80=99:
+/media/usb465gb_232gb_NTFS/compile/qemu/block/blkdebug.c:843:31: error: =E2=
+=80=98%s=E2=80=99 directive output may be truncated writing up to 4095 byte=
+s into a region of size 4086 [-Werror=3Dformat-truncation=3D]
+                  "blkdebug:%s:%s", s->config_file ?: "",
+                               ^~
+/media/usb465gb_232gb_NTFS/compile/qemu/block/blkdebug.c:842:9: note: =E2=
+=80=98snprintf=E2=80=99 output 11 or more bytes (assuming 4106) into a dest=
+ination of size 4096
+         snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  "blkdebug:%s:%s", s->config_file ?: "",
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  bs->file->bs->exact_filename);
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [/media/usb465gb_232gb_NTFS/compile/qemu/rules.mak:66: block/blkd=
+ebug.o] Error 1
+make: *** Waiting for unfinished jobs....
+/media/usb465gb_232gb_NTFS/compile/qemu/block/blkverify.c: In function =E2=
+=80=98blkverify_refresh_filename=E2=80=99:
+/media/usb465gb_232gb_NTFS/compile/qemu/block/blkverify.c:305:29: error: =
+=E2=80=98%s=E2=80=99 directive output may be truncated writing up to 4095 b=
+ytes into a region of size 4086 [-Werror=3Dformat-truncation=3D]
+                  "blkverify:%s:%s",
+                             ^~
+/media/usb465gb_232gb_NTFS/compile/qemu/block/blkverify.c:304:9: note: =E2=
+=80=98snprintf=E2=80=99 output between 12 and 8202 bytes into a destination=
+ of size 4096
+         snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  "blkverify:%s:%s",
+                  ~~~~~~~~~~~~~~~~~~
+                  bs->file->bs->exact_filename,
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                  s->test_file->bs->exact_filename);
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc1: all warnings being treated as errors
+make: *** [/media/usb465gb_232gb_NTFS/compile/qemu/rules.mak:66: block/blkv=
+erify.o] Error 1
+
+Did I hit a commit with a broken build or something? What to do next?
 
 -- =
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1716028
+https://bugs.launchpad.net/bugs/1715700
 
 Title:
-  qemu 2.10 locks images with no feature flag
+  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
 
 Status in QEMU:
   New
-Status in qemu package in Ubuntu:
-  New
 
 Bug description:
-  1) % lsb_release -rd
-  Description:	Ubuntu Artful Aardvark (development branch)
-  Release:	17.10
+  Qemu version: 2.10 stable.
+  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
+st.
+  Command line:
+  qemu-system-x86_64 \
+      -nodefaults \
+      -nodefconfig \
+      -machine type=3Dq35,accel=3Dkvm \
+      -enable-kvm \
+      -cpu host \
+      -m 2048 \
+      -vga virtio \
+      -boot menu=3Don \
+      -smbios file=3D/path/dmidecode_BIOS.bin \
+      -acpitable file=3D/path/acpi_slic.bin \
+      -bios /path/OVMF_CODE.fd \
+      -net none \
+      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
+      -device pcie-root-port \
+      -device ich9-usb-ehci1 \
+      -device ich9-usb-uhci1 \
+      -device ich9-usb-uhci2 \
+      -device ich9-usb-uhci3
 
-  2) % apt-cache policy qemu-system-x86
-  qemu-system-x86:
-    Installed: 1:2.10~rc3+dfsg-0ubuntu1
-    Candidate: 1:2.10+dfsg-0ubuntu1
-    Version table:
-       1:2.10+dfsg-0ubuntu1 500
-          500 http://archive.ubuntu.com//ubuntu devel/main amd64 Packages
-   *** 1:2.10~rc3+dfsg-0ubuntu1 100
-          100 /var/lib/dpkg/status
-
-  3) qemu locks image files with no way to discover this feature nor how
-  to disable it
-
-  4) qemu provides a way to query if it supports image locking, and what
-  the default value is, and how to disable the locking via cli
-
-  qemu 2.10 now will lock image files and warn if an image is currently
-  locked.  This prevent qemu from running (and possibly corrupting said
-  image).
-
-  However, qemu does not provide any way to determine if a qemu binary
-  actually has this capability.  Normally behavior changing features are
-  exposed via some change to the qemu help menu or QMP/QAPI output of
-  capabilities.
-
-  I believe this slipped through since libvirt already does image
-  locking, but direct cli users will be caught by this change.
-
-  In particular, we have a use-case where we simulate multipath disks by
-  creating to disks which point to the same file which now breaks
-  without adding the 'file.locking=3Doff' to the -drive parameters;  which
-  is also completely undocumented and unexposed.
-
-  Some parts of the cli like -device allow querying of settable options
-  (qemu-system-x86 -device scsi_hd,?)  but nothing equivalent exists for
-  -drive parameters.
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 17.10
-  Package: qemu-system-x86 1:2.10~rc3+dfsg-0ubuntu1
-  ProcVersionSignature: Ubuntu 4.12.0-11.12-generic 4.12.5
-  Uname: Linux 4.12.0-11-generic x86_64
-  NonfreeKernelModules: zfs zunicode zavl zcommon znvpair
-  ApportVersion: 2.20.6-0ubuntu7
-  Architecture: amd64
-  Date: Fri Sep  8 12:56:53 2017
-  JournalErrors:
-   Hint: You are currently not seeing messages from other users and the sys=
-tem.
-         Users in groups 'adm', 'systemd-journal' can see all messages.
-         Pass -q to turn off this notice.
-   -- Logs begin at Mon 2017-01-30 11:56:02 CST, end at Fri 2017-09-08 12:5=
-6:46 CDT. --
-   -- No entries --
-  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
-  MachineType: HP ProLiant DL360 Gen9
-  ProcEnviron:
-   TERM=3Dxterm
-   PATH=3D(custom, no user)
-   XDG_RUNTIME_DIR=3D<set>
-   LANG=3Den_US.UTF-8
-   SHELL=3D/bin/bash
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.12.0-11-generic root=3DUUID=3D=
-45354276-e0c0-4bf6-9083-f130b89411cc ro --- console=3DttyS1,115200
-  SourcePackage: qemu
-  UpgradeStatus: No upgrade log present (probably fresh install)
-  dmi.bios.date: 03/05/2015
-  dmi.bios.vendor: HP
-  dmi.bios.version: P89
-  dmi.chassis.type: 23
-  dmi.chassis.vendor: HP
-  dmi.modalias: dmi:bvnHP:bvrP89:bd03/05/2015:svnHP:pnProLiantDL360Gen9:pvr=
-:cvnHP:ct23:cvr:
-  dmi.product.family: ProLiant
-  dmi.product.name: ProLiant DL360 Gen9
-  dmi.sys.vendor: HP
+  Windows hangs at boot with waving flag screen (flag doesn't freeze,
+  keeps waving indefinitely). Same command line boots fine with Qemu
+  2.9. I tried changing machine type to pc-q35-2.9 - same result.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1716028/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
