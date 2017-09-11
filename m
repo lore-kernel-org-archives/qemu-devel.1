@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59233)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drVgr-0006aU-1N
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:52:22 -0400
+	(envelope-from <groug@kaod.org>) id 1drVhW-000763-2f
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:53:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drVgj-0005qV-Vu
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:52:21 -0400
-Received: from 18.mo1.mail-out.ovh.net ([46.105.35.72]:38040)
+	(envelope-from <groug@kaod.org>) id 1drVhR-0006Is-8x
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:53:02 -0400
+Received: from 2.mo1.mail-out.ovh.net ([178.32.119.250]:38371)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drVgj-0005nh-P8
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:52:13 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drVhR-0006IH-27
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:52:57 -0400
 Received: from player169.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id E9F2292E6F
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 22:52:10 +0200 (CEST)
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 8BB7B93148
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 22:52:55 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 11 Sep 2017 22:52:06 +0200
-Message-ID: <150516312603.27897.5390701685108186266.stgit@bahia.lan>
+Date: Mon, 11 Sep 2017 22:52:52 +0200
+Message-ID: <150516317201.28067.2144053652052053337.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] spapr_cpu_core: fail gracefully with
- non-pseries machine types
+Subject: [Qemu-devel] [PATCH] spapr_cpu_core: cleaning up qdev_get_machine()
+ calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +29,54 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Sam Bobroff <sam.bobroff@au1.ibm.com>
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
 
-Since commit 7cca3e466eb0 ("ppc: spapr: Move VCPU ID calculation into
-sPAPR"), QEMU aborts when started with a *-spapr-cpu-core device and
-a non-pseries machine.
+This patch removes the qdev_get_machine() calls that are made
+in spapr_cpu_core.c in situations where we can get an existing
+pointer for the MachineState by either passing it as an argument
+to the function or by using other already available pointers.
 
-Let's rely on the already existing call to object_dynamic_cast() instead
-of using the SPAPR_MACHINE() macro.
+Credits to Daniel Henrique Barboza for the idea and the changelog
+text.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr_cpu_core.c |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ hw/ppc/spapr_cpu_core.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index d04d1e0d8164..dc9df0d393d1 100644
+index dc9df0d393d1..e26279116736 100644
 --- a/hw/ppc/spapr_cpu_core.c
 +++ b/hw/ppc/spapr_cpu_core.c
-@@ -201,7 +201,7 @@ error:
+@@ -73,8 +73,8 @@ void spapr_cpu_parse_features(sPAPRMachineState *spapr)
  
- static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+ static void spapr_cpu_reset(void *opaque)
  {
 -    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-+    sPAPRMachineState *spapr;
-     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
-     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
-     CPUCore *cc = CPU_CORE(OBJECT(dev));
-@@ -211,7 +211,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
-     void *obj;
-     int i, j;
+     PowerPCCPU *cpu = opaque;
++    sPAPRMachineState *spapr = SPAPR_MACHINE(&cpu->vhyp);
+     CPUState *cs = CPU(cpu);
+     CPUPPCState *env = &cpu->env;
  
--    if (!object_dynamic_cast(qdev_get_machine(), TYPE_SPAPR_MACHINE)) {
-+    spapr = (sPAPRMachineState *) qdev_get_machine();
-+    if (!object_dynamic_cast((Object *) spapr, TYPE_SPAPR_MACHINE)) {
-         error_setg(errp, "spapr-cpu-core needs a pseries machine");
-         return;
-     }
+@@ -162,10 +162,10 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
+     g_free(sc->threads);
+ }
+ 
+-static void spapr_cpu_core_realize_child(Object *child, Error **errp)
++static void spapr_cpu_core_realize_child(Object *child,
++                                         sPAPRMachineState *spapr, Error **errp)
+ {
+     Error *local_err = NULL;
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     CPUState *cs = CPU(child);
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     Object *obj;
+@@ -254,7 +254,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+     for (j = 0; j < cc->nr_threads; j++) {
+         obj = sc->threads + j * size;
+ 
+-        spapr_cpu_core_realize_child(obj, &local_err);
++        spapr_cpu_core_realize_child(obj, spapr, &local_err);
+         if (local_err) {
+             goto err;
+         }
