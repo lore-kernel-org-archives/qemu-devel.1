@@ -1,32 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49180)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1drTuf-0004qz-11
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:58:29 -0400
+	(envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1drU6x-0008Pi-D7
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:11:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1drTub-0006Ye-Qf
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:58:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39354)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1drTub-0006YS-K2
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:58:25 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 803D2347A50
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 18:58:24 +0000 (UTC)
-Date: Mon, 11 Sep 2017 19:58:18 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170911185818.GG2857@work-vm>
-References: <20170906115143.27451-1-quintela@redhat.com>
-	<20170906115143.27451-8-quintela@redhat.com>
-	<265f10bb-5718-aaac-d0fe-595a78acdf46@redhat.com>
+	(envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1drU6u-00053Z-Mo
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:11:11 -0400
+Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:37878)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1drU6u-00052i-GP
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:11:08 -0400
+Received: by mail-io0-x22f.google.com with SMTP id j141so32770938ioj.4
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 12:11:08 -0700 (PDT)
+Date: Mon, 11 Sep 2017 12:04:15 -0700
+From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
+Message-Id: <1505156655.1214.3@smtp.gmail.com>
+In-Reply-To: <20170911171015.GU21444@redhat.com>
+References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
+	<20170908173801.15205-7-brandon.carpenter@cypherpath.com>
+	<20170911085043.GE21444@redhat.com> <1505149415.1214.1@smtp.gmail.com>
+	<20170911171015.GU21444@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <265f10bb-5718-aaac-d0fe-595a78acdf46@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 07/22] migration: Make
- migrate_fd_error() the owner of the Error
+Content-Type: text/plain; charset="US-ASCII"; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] io: Reply to ping frames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,74 +33,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-* Eric Blake (eblake@redhat.com) wrote:
-> On 09/06/2017 06:51 AM, Juan Quintela wrote:
-> > So far, we had to free the error after each caller, so just do it
-> > here.  Once there, tls.c was leaking the error.
-> 
-> You mention tls.c,
-> 
-> > 
-> > Signed-off-by: Juan Quintela <quintela@redhat.com>
-> > ---
-> >  migration/channel.c   |  1 -
-> >  migration/migration.c | 10 ++++------
-> >  migration/migration.h |  4 ++--
-> >  migration/socket.c    |  1 -
-> >  4 files changed, 6 insertions(+), 10 deletions(-)
-> 
-> but don't touch it.  Am I missing something?
+On Mon, Sep 11, 2017 at 10:10 AM, Daniel P. Berrange 
+<berrange@redhat.com> wrote:
+> It feels like this is still dangerous - the client simply has to 
+> interleave each "ping" with a 1 byte binary frame to get around this 
+> limit. We need to make sure we have an absolute cap on the output 
+> buffer size.
 
+Okay. I see that now that I look at it more closely. This breed of 
+asynchronous I/O is tricky because the conditions for reading/writing 
+are all over the place. There's a lot of context to keep in your head.
 
-hmm well I see in migration/tls.c:
+I have a fix. And I realized that I was missing a patch in the series 
+for RFC-compliant closing of websocket connections, which I must have 
+lost during a rebase. Should I submit v3 of the patch series or just 
+add those patches to this thread?
 
-    if (qio_task_propagate_error(task, &err)) {
-        trace_migration_tls_outgoing_handshake_error(error_get_pretty(err));
-        migrate_fd_error(s, err);
-        error_free(err);
-    } else {
-        trace_migration_tls_outgoing_handshake_complete();
-        migration_channel_connect(s, ioc, NULL);
-    }
-
-so I think that error_free has to go?
-
-Dave
-
-> >  
-> > -void migrate_fd_error(MigrationState *s, const Error *error)
-> > +void migrate_fd_error(MigrationState *s, Error *error)
-> >  {
-> 
-> No comments at definition,
-> 
-> > +++ b/migration/migration.h
-> > @@ -163,8 +163,8 @@ bool  migration_has_all_channels(void);
-> >  
-> >  uint64_t migrate_max_downtime(void);
-> >  
-> > -void migrate_set_error(MigrationState *s, const Error *error);
-> > -void migrate_fd_error(MigrationState *s, const Error *error);
-> > +void migrate_set_error(MigrationState *s, Error *error);
-> > +void migrate_fd_error(MigrationState *s, Error *error);
-> 
-> or at declaration. That would be worth adding at some point, but this
-> patch isn't making it worse.
-> 
-> The code looks okay in isolation, so if it is only the commit message
-> that needs fixing,
-> Reviewed-by: Eric Blake <eblake@redhat.com>
-> 
-> -- 
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
-> 
-
-
-
+Thank you,
 --
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Brandon Carpenter | Software Engineer
+Cypherpath, Inc.
+400 Columbia Point Drive Ste 101 | Richland, Washington USA
+Office: (650) 713-3060
+
+
+-- 
+
+
+CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is 
+for the sole use of the intended recipient(s) and may contain proprietary, 
+confidential or privileged information or otherwise be protected by law. 
+Any unauthorized review, use, disclosure or distribution is prohibited. If 
+you are not the intended recipient, please notify the sender and destroy 
+all copies and the original message.
