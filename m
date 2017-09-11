@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57275)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drN9x-0005nn-O2
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:45:50 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1drNCx-0007vl-7F
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:48:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drN9t-0008Cy-0c
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:45:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36584)
+	(envelope-from <pbonzini@redhat.com>) id 1drNCs-0002VS-7P
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:48:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42648)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drN9s-0008CP-Mb
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:45:44 -0400
-References: <20170903163615.15562-1-n54@gmx.com>
-	<20170909142116.26816-1-n54@gmx.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drNCs-0002Tc-1f
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:48:50 -0400
+References: <20170906094927.22376-1-cohuck@redhat.com>
+	<20170906132936.7cf49b24.cohuck@redhat.com>
+	<CAFEAcA9oOmX1u2zYHJ28AYFDUXVUs=8i04fC05TsxopbvxPmBQ@mail.gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <6c7f02bd-40a8-de0b-ba73-31d54d99905a@redhat.com>
-Date: Mon, 11 Sep 2017 13:45:41 +0200
+Message-ID: <afe815b5-d5a6-8b22-b30f-50f52dbe540e@redhat.com>
+Date: Mon, 11 Sep 2017 13:48:46 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170909142116.26816-1-n54@gmx.com>
+In-Reply-To: <CAFEAcA9oOmX1u2zYHJ28AYFDUXVUs=8i04fC05TsxopbvxPmBQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] scsi/esp: Rename the ESP macro to
- ESP_STATE
+Subject: Re: [Qemu-devel] [PATCH RFC] accel: default to an actually
+ available accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,70 +30,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 09/09/2017 16:21, Kamil Rytarowski wrote:
-> SunOS defines ESP (x86 register) in <sys/regset.h> as 7.
-> 
-> This fixes build on SmartOS (Joyent).
-> 
-> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-> ---
->  hw/scsi/esp.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
-> index eee831efeb..22c2d91e39 100644
-> --- a/hw/scsi/esp.c
-> +++ b/hw/scsi/esp.c
-> @@ -593,7 +593,7 @@ const VMStateDescription vmstate_esp = {
->  };
->  
->  #define TYPE_ESP "esp"
-> -#define ESP(obj) OBJECT_CHECK(SysBusESPState, (obj), TYPE_ESP)
-> +#define ESP_STATE(obj) OBJECT_CHECK(SysBusESPState, (obj), TYPE_ESP)
->  
->  typedef struct {
->      /*< private >*/
-> @@ -644,7 +644,7 @@ void esp_init(hwaddr espaddr, int it_shift,
->      ESPState *esp;
->  
->      dev = qdev_create(NULL, TYPE_ESP);
-> -    sysbus = ESP(dev);
-> +    sysbus = ESP_STATE(dev);
->      esp = &sysbus->esp;
->      esp->dma_memory_read = dma_memory_read;
->      esp->dma_memory_write = dma_memory_write;
-> @@ -672,7 +672,7 @@ static const struct SCSIBusInfo esp_scsi_info = {
->  
->  static void sysbus_esp_gpio_demux(void *opaque, int irq, int level)
->  {
-> -    SysBusESPState *sysbus = ESP(opaque);
-> +    SysBusESPState *sysbus = ESP_STATE(opaque);
->      ESPState *s = &sysbus->esp;
->  
->      switch (irq) {
-> @@ -688,7 +688,7 @@ static void sysbus_esp_gpio_demux(void *opaque, int irq, int level)
->  static void sysbus_esp_realize(DeviceState *dev, Error **errp)
->  {
->      SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-> -    SysBusESPState *sysbus = ESP(dev);
-> +    SysBusESPState *sysbus = ESP_STATE(dev);
->      ESPState *s = &sysbus->esp;
->  
->      sysbus_init_irq(sbd, &s->irq);
-> @@ -706,7 +706,7 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
->  
->  static void sysbus_esp_hard_reset(DeviceState *dev)
->  {
-> -    SysBusESPState *sysbus = ESP(dev);
-> +    SysBusESPState *sysbus = ESP_STATE(dev);
->      esp_hard_reset(&sysbus->esp);
->  }
->  
-> 
+On 06/09/2017 16:35, Peter Maydell wrote:
+>>>      accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
+>>>      if (accel == NULL) {
+>>> -        /* Use the default "accelerator", tcg */
+>>> -        accel = "tcg";
+>>> +        accel = default_accelerator();
+>> It actually may be easier to just switch the default to
+>> "tcg:kvm:xen:hax". Haven't tested that, though.
+> Does it make sense to include Xen in the default list?
+> I don't know much about Xen but I was under the impression
+> that it's a special purpose thing that you can only use
+> as part of a Xen setup, whereas tcg, kvm, hax are all
+> more-or-less interchangeable ways to run a VM under a
+> Linux/etc host. Do I have the wrong end of the Xen stick?
 
-Queued, thanks.
+Yes, that is correct (in fact, -xen-domid is required too).
 
 Paolo
