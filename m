@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38647)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSOa-0007YL-BX
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSOa-0007YN-Br
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSOW-0001Hh-Sb
+	(envelope-from <eblake@redhat.com>) id 1drSOZ-0001IT-4Q
 	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39262)
+Received: from mx1.redhat.com ([209.132.183.28]:39440)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1drSOW-0001HD-JN
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:12 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1drSOY-0001I9-Rz
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:15 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AAB452F14B2
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 17:21:11 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id EB39227F343
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 17:21:13 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 11 Sep 2017 12:20:04 -0500
-Message-Id: <20170911172022.4738-21-eblake@redhat.com>
+Date: Mon, 11 Sep 2017 12:20:06 -0500
+Message-Id: <20170911172022.4738-23-eblake@redhat.com>
 In-Reply-To: <20170911172022.4738-1-eblake@redhat.com>
 References: <20170911172022.4738-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 20/38] postcopy-test: Drop dependence on
+Subject: [Qemu-devel] [PATCH v7 22/38] qmp-test: Drop dependence on
  global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,260 +33,134 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com
 
-Managing parallel connections to two different monitors via
-the implicit global_qtest makes it hard to copy-and-paste code
-to tests that are not aware of the implicit state.  We are
-already half-using the explicit APIs, so fix the remaining
-spots to also be explicit about which connection is in use,
-and avoid global_qtest.
-
-We can assert that the conversion is correct by checking that
-global_qtest remains NULL throughout the test (a later patch
-that changes global_qtest to not be a public global variable
-will drop the assertions).
+As a general rule, we prefer avoiding implicit global state
+because it makes code harder to safely copy and paste without
+thinking about the global state.  Although qmp-test does not
+maintain parallel qtest connections, it was the last test
+assigning to global_qtest.  It's just as easy to be explicit
+about the state; once all tests have been cleaned up, a later
+patch can then get rid of global_qtest and a layer of wrappers
+in libqtest.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/postcopy-test.c | 84 ++++++++++++++++++++++++---------------------------
- 1 file changed, 40 insertions(+), 44 deletions(-)
+ tests/qmp-test.c | 35 ++++++++++++++++++-----------------
+ 1 file changed, 18 insertions(+), 17 deletions(-)
 
-diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
-index 8142f2ab90..0e5fe20a83 100644
---- a/tests/postcopy-test.c
-+++ b/tests/postcopy-test.c
-@@ -223,7 +223,7 @@ static void wait_for_serial(const char *side)
- /*
-  * Events can get in the way of responses we are actually waiting for.
-  */
--static QDict *return_or_event(QDict *response)
-+static QDict *return_or_event(QTestState *qts, QDict *response)
- {
-     const char *event_string;
-     if (!qdict_haskey(response, "event")) {
-@@ -236,7 +236,7 @@ static QDict *return_or_event(QDict *response)
-         got_stop = true;
-     }
-     QDECREF(response);
--    return return_or_event(qtest_qmp_receive(global_qtest));
-+    return return_or_event(qts, qtest_qmp_receive(qts));
+diff --git a/tests/qmp-test.c b/tests/qmp-test.c
+index c5a5c10b41..4e6198c9fa 100644
+--- a/tests/qmp-test.c
++++ b/tests/qmp-test.c
+@@ -41,32 +41,32 @@ static void test_version(QObject *version)
+     visit_free(v);
  }
 
-
-@@ -247,12 +247,13 @@ static QDict *return_or_event(QDict *response)
-  * going postcopy.
-  */
-
--static uint64_t get_migration_pass(void)
-+static uint64_t get_migration_pass(QTestState *qts)
+-static void test_malformed(void)
++static void test_malformed(QTestState *qts)
  {
-     QDict *rsp, *rsp_return, *rsp_ram;
-     uint64_t result;
+     QDict *resp;
 
--    rsp = return_or_event(qmp("{ 'execute': 'query-migrate' }"));
-+    rsp = return_or_event(qts,
-+                          qtest_qmp(qts, "{ 'execute': 'query-migrate' }"));
-     rsp_return = qdict_get_qdict(rsp, "return");
-     if (!qdict_haskey(rsp_return, "ram")) {
-         /* Still in setup */
-@@ -265,7 +266,7 @@ static uint64_t get_migration_pass(void)
-     return result;
+     /* Not even a dictionary */
+-    resp = qmp("null");
++    resp = qtest_qmp(qts, "null");
+     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+     QDECREF(resp);
+
+     /* No "execute" key */
+-    resp = qmp("{}");
++    resp = qtest_qmp(qts, "{}");
+     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+     QDECREF(resp);
+
+     /* "execute" isn't a string */
+-    resp = qmp("{ 'execute': true }");
++    resp = qtest_qmp(qts, "{ 'execute': true }");
+     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+     QDECREF(resp);
+
+     /* "arguments" isn't a dictionary */
+-    resp = qmp("{ 'execute': 'no-such-cmd', 'arguments': [] }");
++    resp = qtest_qmp(qts, "{ 'execute': 'no-such-cmd', 'arguments': [] }");
+     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+     QDECREF(resp);
+
+     /* extra key */
+-    resp = qmp("{ 'execute': 'no-such-cmd', 'extra': true }");
++    resp = qtest_qmp(qts, "{ 'execute': 'no-such-cmd', 'extra': true }");
+     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+     QDECREF(resp);
+ }
+@@ -75,11 +75,12 @@ static void test_qmp_protocol(void)
+ {
+     QDict *resp, *q, *ret;
+     QList *capabilities;
++    QTestState *qts;
+
+-    global_qtest = qtest_init_without_qmp_handshake(common_args);
++    qts = qtest_init_without_qmp_handshake(common_args);
+
+     /* Test greeting */
+-    resp = qmp_receive();
++    resp = qtest_qmp_receive(qts);
+     q = qdict_get_qdict(resp, "QMP");
+     g_assert(q);
+     test_version(qdict_get(q, "version"));
+@@ -88,46 +89,46 @@ static void test_qmp_protocol(void)
+     QDECREF(resp);
+
+     /* Test valid command before handshake */
+-    resp = qmp("{ 'execute': 'query-version' }");
++    resp = qtest_qmp(qts, "{ 'execute': 'query-version' }");
+     g_assert_cmpstr(get_error_class(resp), ==, "CommandNotFound");
+     QDECREF(resp);
+
+     /* Test malformed commands before handshake */
+-    test_malformed();
++    test_malformed(qts);
+
+     /* Test handshake */
+-    resp = qmp("{ 'execute': 'qmp_capabilities' }");
++    resp = qtest_qmp(qts, "{ 'execute': 'qmp_capabilities' }");
+     ret = qdict_get_qdict(resp, "return");
+     g_assert(ret && !qdict_size(ret));
+     QDECREF(resp);
+
+     /* Test repeated handshake */
+-    resp = qmp("{ 'execute': 'qmp_capabilities' }");
++    resp = qtest_qmp(qts, "{ 'execute': 'qmp_capabilities' }");
+     g_assert_cmpstr(get_error_class(resp), ==, "CommandNotFound");
+     QDECREF(resp);
+
+     /* Test valid command */
+-    resp = qmp("{ 'execute': 'query-version' }");
++    resp = qtest_qmp(qts, "{ 'execute': 'query-version' }");
+     test_version(qdict_get(resp, "return"));
+     QDECREF(resp);
+
+     /* Test malformed commands */
+-    test_malformed();
++    test_malformed(qts);
+
+     /* Test 'id' */
+-    resp = qmp("{ 'execute': 'query-name', 'id': 'cookie#1' }");
++    resp = qtest_qmp(qts, "{ 'execute': 'query-name', 'id': 'cookie#1' }");
+     ret = qdict_get_qdict(resp, "return");
+     g_assert(ret);
+     g_assert_cmpstr(qdict_get_try_str(resp, "id"), ==, "cookie#1");
+     QDECREF(resp);
+
+     /* Test command failure with 'id' */
+-    resp = qmp("{ 'execute': 'human-monitor-command', 'id': 2 }");
++    resp = qtest_qmp(qts, "{ 'execute': 'human-monitor-command', 'id': 2 }");
+     g_assert_cmpstr(get_error_class(resp), ==, "GenericError");
+     g_assert_cmpint(qdict_get_int(resp, "id"), ==, 2);
+     QDECREF(resp);
+
+-    qtest_end();
++    qtest_quit(qts);
  }
 
--static void wait_for_migration_complete(void)
-+static void wait_for_migration_complete(QTestState *qts)
- {
-     QDict *rsp, *rsp_return;
-     bool completed;
-@@ -273,7 +274,8 @@ static void wait_for_migration_complete(void)
-     do {
-         const char *status;
-
--        rsp = return_or_event(qmp("{ 'execute': 'query-migrate' }"));
-+        rsp = return_or_event(qts,
-+                              qtest_qmp(qts, "{ 'execute': 'query-migrate' }"));
-         rsp_return = qdict_get_qdict(rsp, "return");
-         status = qdict_get_str(rsp_return, "status");
-         completed = strcmp(status, "completed") == 0;
-@@ -283,14 +285,14 @@ static void wait_for_migration_complete(void)
-     } while (!completed);
- }
-
--static void wait_for_migration_pass(void)
-+static void wait_for_migration_pass(QTestState *qts)
- {
--    uint64_t initial_pass = get_migration_pass();
-+    uint64_t initial_pass = get_migration_pass(qts);
-     uint64_t pass;
-
-     /* Wait for the 1st sync */
-     do {
--        initial_pass = get_migration_pass();
-+        initial_pass = get_migration_pass(qts);
-         if (got_stop || initial_pass) {
-             break;
-         }
-@@ -299,11 +301,11 @@ static void wait_for_migration_pass(void)
-
-     do {
-         usleep(1000 * 100);
--        pass = get_migration_pass();
-+        pass = get_migration_pass(qts);
-     } while (pass == initial_pass && !got_stop);
- }
-
--static void check_guests_ram(void)
-+static void check_guests_ram(QTestState *qts)
- {
-     /* Our ASM test will have been incrementing one byte from each page from
-      * 1MB to <100MB in order.
-@@ -318,13 +320,13 @@ static void check_guests_ram(void)
-     bool hit_edge = false;
-     bool bad = false;
-
--    qtest_memread(global_qtest, start_address, &first_byte, 1);
-+    qtest_memread(qts, start_address, &first_byte, 1);
-     last_byte = first_byte;
-
-     for (address = start_address + 4096; address < end_address; address += 4096)
-     {
-         uint8_t b;
--        qtest_memread(global_qtest, address, &b, 1);
-+        qtest_memread(qts, address, &b, 1);
-         if (b != last_byte) {
-             if (((b + 1) % 256) == last_byte && !hit_edge) {
-                 /* This is OK, the guest stopped at the point of
-@@ -356,9 +358,9 @@ static void cleanup(const char *filename)
- static void test_migrate(void)
- {
-     char *uri = g_strdup_printf("unix:%s/migsocket", tmpfs);
--    QTestState *global = global_qtest, *from, *to;
-+    QTestState *from, *to;
-     unsigned char dest_byte_a, dest_byte_b, dest_byte_c, dest_byte_d;
--    gchar *cmd, *cmd_src, *cmd_dst;
-+    gchar *cmd_src, *cmd_dst;
-     QDict *rsp;
-
-     char *bootpath = g_strdup_printf("%s/bootsect", tmpfs);
-@@ -401,24 +403,24 @@ static void test_migrate(void)
-
-     g_free(bootpath);
-
--    from = qtest_start(cmd_src);
-+    from = qtest_init(cmd_src);
-     g_free(cmd_src);
-
-     to = qtest_init(cmd_dst);
-     g_free(cmd_dst);
-
--    global_qtest = from;
--    rsp = qmp("{ 'execute': 'migrate-set-capabilities',"
--                  "'arguments': { "
-+    assert(!global_qtest);
-+
-+    rsp = qtest_qmp(from, "{ 'execute': 'migrate-set-capabilities',"
-+                    "'arguments': { "
-                       "'capabilities': [ {"
-                           "'capability': 'postcopy-ram',"
-                           "'state': true } ] } }");
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
--    global_qtest = to;
--    rsp = qmp("{ 'execute': 'migrate-set-capabilities',"
--                  "'arguments': { "
-+    rsp = qtest_qmp(to, "{ 'execute': 'migrate-set-capabilities',"
-+                    "'arguments': { "
-                       "'capabilities': [ {"
-                           "'capability': 'postcopy-ram',"
-                           "'state': true } ] } }");
-@@ -429,15 +431,14 @@ static void test_migrate(void)
-      * quickly, but that it doesn't complete precopy even on a slow
-      * machine, so also set the downtime.
-      */
--    global_qtest = from;
--    rsp = qmp("{ 'execute': 'migrate_set_speed',"
--              "'arguments': { 'value': 100000000 } }");
-+    rsp = qtest_qmp(from, "{ 'execute': 'migrate_set_speed',"
-+                    "'arguments': { 'value': 100000000 } }");
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
-     /* 1ms downtime - it should never finish precopy */
--    rsp = qmp("{ 'execute': 'migrate_set_downtime',"
--              "'arguments': { 'value': 0.001 } }");
-+    rsp = qtest_qmp(from, "{ 'execute': 'migrate_set_downtime',"
-+                    "'arguments': { 'value': 0.001 } }");
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
-@@ -445,35 +446,30 @@ static void test_migrate(void)
-     /* Wait for the first serial output from the source */
-     wait_for_serial("src_serial");
-
--    cmd = g_strdup_printf("{ 'execute': 'migrate',"
--                          "'arguments': { 'uri': '%s' } }",
--                          uri);
--    rsp = qmp(cmd);
--    g_free(cmd);
-+    rsp = qtest_qmp(from,
-+                    "{'execute': 'migrate', 'arguments': { 'uri': %s}}", uri);
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
--    wait_for_migration_pass();
-+    wait_for_migration_pass(from);
-
--    rsp = return_or_event(qmp("{ 'execute': 'migrate-start-postcopy' }"));
-+    rsp = return_or_event(from,
-+                          qtest_qmp(from,
-+                                    "{ 'execute': 'migrate-start-postcopy' }"));
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
-     if (!got_stop) {
--        qmp_eventwait("STOP");
-+        qtest_qmp_eventwait(from, "STOP");
-     }
-
--    global_qtest = to;
--    qmp_eventwait("RESUME");
-+    qtest_qmp_eventwait(to, "RESUME");
-
-     wait_for_serial("dest_serial");
--    global_qtest = from;
--    wait_for_migration_complete();
-+    wait_for_migration_complete(from);
-
-     qtest_quit(from);
-
--    global_qtest = to;
--
-     qtest_memread(to, start_address, &dest_byte_a, 1);
-
-     /* Destination still running, wait for a byte to change */
-@@ -482,19 +478,19 @@ static void test_migrate(void)
-         usleep(10 * 1000);
-     } while (dest_byte_a == dest_byte_b);
-
--    qmp_discard_response("{ 'execute' : 'stop'}");
-+    qtest_qmp_discard_response(to, "{ 'execute' : 'stop'}");
-     /* With it stopped, check nothing changes */
-     qtest_memread(to, start_address, &dest_byte_c, 1);
-     sleep(1);
-     qtest_memread(to, start_address, &dest_byte_d, 1);
-     g_assert_cmpint(dest_byte_c, ==, dest_byte_d);
-
--    check_guests_ram();
-+    check_guests_ram(to);
-
-     qtest_quit(to);
-     g_free(uri);
-
--    global_qtest = global;
-+    assert(!global_qtest);
-
-     cleanup("bootsect");
-     cleanup("migsocket");
+ static int query_error_class(const char *cmd)
 -- 
 2.13.5
