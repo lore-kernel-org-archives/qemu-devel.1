@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1drPEX-0007lr-5L
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:58:47 -0400
+	(envelope-from <groug@kaod.org>) id 1drPI3-0001ws-H1
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:02:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1drPET-0000yp-6K
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:58:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53662)
+	(envelope-from <groug@kaod.org>) id 1drPHz-0006ec-Fp
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:02:19 -0400
+Received: from 16.mo1.mail-out.ovh.net ([178.33.104.224]:57355)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1drPES-0000xe-Vy
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:58:37 -0400
-References: <1505126027-1704-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <c5ca72c2-4e5c-1a64-ded6-bf2e1cd7cefd@redhat.com>
-Date: Mon, 11 Sep 2017 15:58:33 +0200
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drPHz-0006cZ-9n
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:02:15 -0400
+Received: from player169.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 2B738931B8
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:02:09 +0200 (CEST)
+Date: Mon, 11 Sep 2017 16:02:02 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170911160202.56e47324@bahia.lan>
+In-Reply-To: <20170911132627.9505-1-cohuck@redhat.com>
+References: <20170911132627.9505-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1505126027-1704-1-git-send-email-mihajlov@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390: set DHCP client architecure id for
- netboot
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/_d/o3WA_pvzo6hzKO94Q4eP";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] dump: do not dump non-existent guest memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +30,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On 11.09.2017 12:33, Viktor Mihajlovski wrote:
-> Setting the client architecture DHCP option to 0x001f (s390 Basic) [1]
-> allows the DHCP server to return a s390-specific bootfile if wanted.
-> DHCP servers not configured for the option (or not yet recognizing the
-> option value) will continue to work as they have done before.
-> 
-> [1] https://www.iana.org/assignments/dhcpv6-parameters
+--Sig_/_d/o3WA_pvzo6hzKO94Q4eP
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Ah, nice, you already registered a value for s390x :-)
-May I ask what's the difference between "Basic" and "Extended" there?
+On Mon, 11 Sep 2017 15:26:27 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-> Signed-off-by: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
+> It does not really make sense to dump memory that is not there.
+>=20
+> Moreover, that fixes a segmentation fault when calling dump-guest-memory
+> with no filter for a machine with no memory defined.
+>=20
+> New behaviour is:
+>=20
+> (qemu) dump-guest-memory /dev/null
+> dump: no guest memory to dump
+> (qemu) dump-guest-memory /dev/null 0 4096
+> dump: no guest memory to dump
+>=20
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+
+Reviewed-by: Greg Kurz <groug@kaod.org>
+
 > ---
->  pc-bios/s390-ccw/netboot.mak | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/pc-bios/s390-ccw/netboot.mak b/pc-bios/s390-ccw/netboot.mak
-> index a9e1374..a25d238 100644
-> --- a/pc-bios/s390-ccw/netboot.mak
-> +++ b/pc-bios/s390-ccw/netboot.mak
-> @@ -50,7 +50,7 @@ libc.a: $(LIBCOBJS)
->  
->  LIBNETOBJS := args.o dhcp.o dns.o icmpv6.o ipv6.o tcp.o udp.o bootp.o \
->  	      dhcpv6.o ethernet.o ipv4.o ndp.o tftp.o
-> -LIBNETCFLAGS := $(QEMU_CFLAGS) $(LIBC_INC) $(LIBNET_INC)
-> +LIBNETCFLAGS := $(QEMU_CFLAGS) -DDHCPARCH=0x1F $(LIBC_INC) $(LIBNET_INC)
->  
->  %.o : $(SLOF_DIR)/lib/libnet/%.c
->  	$(call quiet-command,$(CC) $(LIBNETCFLAGS) -c -o $@ $<,"CC","$(TARGET_DIR)$@")
-> 
+>=20
+> Another unmaintained file. Joy. cc:ing some more-or-less random folks.
+>=20
+> ---
+>  dump.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>=20
+> diff --git a/dump.c b/dump.c
+> index a79773d0f7..d2093e141b 100644
+> --- a/dump.c
+> +++ b/dump.c
+> @@ -1536,6 +1536,12 @@ static void dump_init(DumpState *s, int fd, bool h=
+as_format,
+>      fprintf(stderr, "DUMP: total memory to dump: %lu\n", s->total_size);
+>  #endif
+> =20
+> +    /* it does not make sense to dump non-existent memory */
+> +    if (!s->total_size) {
+> +        error_setg(errp, "dump: no guest memory to dump");
+> +        goto cleanup;
+> +    }
+> +
+>      s->start =3D get_start_block(s);
+>      if (s->start =3D=3D -1) {
+>          error_setg(errp, QERR_INVALID_PARAMETER, "begin");
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+--Sig_/_d/o3WA_pvzo6hzKO94Q4eP
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbaXWgAKCRAC/DrrAQHb
+wnuUAJ90pNOHBC/b/tyBw344AtjgGfHKQwCfakuGJierQ1kx8+rys3gai2scT9Y=
+=xYe+
+-----END PGP SIGNATURE-----
+
+--Sig_/_d/o3WA_pvzo6hzKO94Q4eP--
