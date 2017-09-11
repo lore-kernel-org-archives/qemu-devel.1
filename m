@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35631)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35663)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drR93-0005H6-Jm
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:01:15 -0400
+	(envelope-from <bounces@canonical.com>) id 1drR99-0005PF-Gd
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:01:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drR92-0002Vr-Ci
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:01:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33271)
+	(envelope-from <bounces@canonical.com>) id 1drR8z-0002V3-No
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:01:15 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33212)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1drR92-0002VZ-7S
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:01:08 -0400
+	id 1drR8z-0002Uk-HX
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:01:05 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1drR90-0007YZ-Tv
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:01:06 +0000
+	id 1drR8x-0007WC-NG
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:01:03 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id DFF262E848D
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:01:06 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id ADC4D2E8493
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:01:03 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Sep 2017 15:52:04 -0000
+Date: Mon, 11 Sep 2017 15:51:10 -0000
 From: Scott Moser <smoser@ubuntu.com>
 Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
-Message-Id: <150514512419.5431.605506468204269048.malone@wampee.canonical.com>
+Message-Id: <150514507048.5972.12259638231195958554.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
  feature flag
@@ -41,11 +41,6 @@ To: qemu-devel@nongnu.org
 
 ** Attachment added: "dump-qmp-schema.py: a hack job to dump and partially =
 "uncompress" qemu schema output"
-   https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1716028/+attachment/=
-4948029/+files/dump-qmp-schema.py
-
-** Attachment removed: "dump-qmp-schema.py: a hack job to dump and partiall=
-y "uncompress" qemu schema output"
    https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1716028/+attachment/=
 4948028/+files/dump-qmp-schema.py
 
