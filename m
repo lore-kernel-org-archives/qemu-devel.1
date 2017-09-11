@@ -1,38 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34117)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1drQt7-0006vh-HZ
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:44:43 -0400
+	(envelope-from <bounces@canonical.com>) id 1drR46-0002nk-28
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:56:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanb@linux.vnet.ibm.com>) id 1drQt0-00010l-5W
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:44:41 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47961)
+	(envelope-from <bounces@canonical.com>) id 1drR42-0008Po-S4
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:56:02 -0400
+Received: from indium.canonical.com ([91.189.90.7]:60347)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanb@linux.vnet.ibm.com>)
-	id 1drQsz-0000zL-M1
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:44:33 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8BFiURA059296
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 11:44:32 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cwt0u04vs-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 11:44:31 -0400
-Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <stefanb@linux.vnet.ibm.com>;
-	Mon, 11 Sep 2017 09:44:10 -0600
-References: <150496592440.23639.12760780482468469571.malonedeb@wampee.canonical.com>
-From: Stefan Berger <stefanb@linux.vnet.ibm.com>
-Date: Mon, 11 Sep 2017 11:44:06 -0400
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1drR42-0008PF-Io
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:55:58 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1drR3y-0006LQ-TP
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 15:55:55 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 51F632E84A3
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 15:55:54 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <150496592440.23639.12760780482468469571.malonedeb@wampee.canonical.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <f1bfa5ed-7195-966e-4a2b-17fcd7f5373a@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [Bug 1716132] [NEW] Win 10 bitlocker won't
- initialise pass-through TPM
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 Sep 2017 15:48:50 -0000
+From: Ryan Harper <1716028@bugs.launchpad.net>
+Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
+Message-Id: <150514493014.6029.7087439413770080307.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
+ feature flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,71 +37,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Bug 1716132 <1716132@bugs.launchpad.net>, qemu-devel@nongnu.org, kelvin.middleton@gmail.com
+To: qemu-devel@nongnu.org
 
-On 09/09/2017 10:05 AM, Kelvin Middleton wrote:
-> Public bug reported:
->
-> All stock Ubuntu Zesty, Win10Pro KVM guest configured with OVMF and Q35.
-> My host has an ASRock Z97 Extreme 6 board with a TPM header which is
-> populated with v1.2 complaint device.
->
-> Testing in my host the TPM device is function, I can tpm_takeownership
-> and tpm_clear successfully and similar testing by passing the device
-> through to a linux guest also succeeds.
->
-> However using Bitlocker in Windows 10 Pro release 1703 Windows advises
-> it cannot "Prepare" the device which I take to mean it cannot take
-> ownership of it.  I believe this to be related to Windows inability to
-> view the TCG Event Log which is evidenced in the below 2 screencaps,
-> however I'm no expert.
->
-> https://s26.postimg.org/vter35eh5/Screenshot_20170907_114644.png
-> https://s26.postimg.org/klo854qyx/Screenshot_20170909_143841.png
+Kevin,
 
-There's no event log when you were to use it with SeaBIOS. I don't know 
-about OVMF.
+Thanks for the information.  A couple of points for feedback:
 
-SeaBIOS, once it recognizes that the device has already been 
-initialized, presumably by the host, will back off from using the device 
-and extending PCRs 0-7. Extending them would otherwise mess up the state 
-of the PCRs which has to correspond to the host's BIOS log entries. OVMF 
-should probably behave the same way in this case. The problem the is 
-that this can lead to certain software inside of VMs not working. 
-Bitlocker may be one of them.
+1) there doesn't appear to be a way to run qmp query-schema without
+spawning a qemu instance in -qmp mode and having a second client issue
+the query-schema;  certainly a qemu-system-$arch -qmp-schema would be
+quite useful when examining feature availability.   While I know the
+QMP/QAPI introspection is where most of the work has gone to describing
+how to interact with qemu it's quite cumbersome at best:
 
-The solution that would probably get you the farthest is to use a 
-software TPM emulator, possibly with SeaBIOS as the firmware if Windows 
-10 accepts it. The issue here is that the patches implementing the TPM 
-emulator driver are not commonly available upstream.
+searching for blockdev-add, find arg-type: 48, read arg-type-48, find
+list of 'variants', know that locking feature is part of 'file', find
+type: 207, see member 'locking' in list[A], which is of type 296, find
+type: 296, which is an enum of 'on', 'off', 'auto'
 
-    Stefan
+A. Interesting enough, qapi says the default is None, however qemu
+certainly locks files by default which would seem to imply a mismatch
+between qapi defaults and qemu behavior.
 
+That's pretty heavy;  Maybe that warning message qemu prints could
+provide some hints as to what a user could do (or refer to a manpage on
+locking?).
 
->
-> I've also tested the scenario with qemu 2.10 which provided the exact
-> same results.  The only difference in the test setup is that I had to
-> make the guest boot with SeaBios instead of OVMF.  (Windows wouldn't
-> boot with OVMF with the boot manager giving me an error pointing to a
-> BCD issue.  Researching this it seemed related to an old ACPI problem, I
-> believe this unrelated to my TPM issue so will do more research and
-> raise a separate bug for this if needed.)
->
-> Happy to provide further configurations and build logs as necessary so
-> please advise me what is needed.
->
-> Lastly for background reading.  I've been trying to get TPM passthrough
-> working with Windows for a long time now and have hit several different
-> issues which I believe have been addressed by both code maturity in Qemu
-> but also in Windows releases.  An earlier bug report can be found here
-> (https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1615722) which
-> concludes advising me to raise this new/separate issue.
->
-> Thanks in advance,
->
-> Kelvin
->
-> ** Affects: qemu
->       Importance: Undecided
->           Status: New
->
+2) share-rw appears to be a blockdev parameter (I see it available via
+most block devices via qemu-system-$arch -device {scsi-hd,ide-hd,virtio-
+blk}? However there is no equivalent -blockdev for dumping the default
+options that a -blockdev parameter takes.  The qmp-schema also does not
+include any information about 'share-rw' w.r.t what values are available
+that I could find after dumping the schema.
+
+Thanks smoser:
+
+#!/bin/sh
+qemu-system-x86_64 -S -nodefaults -nographic \
+   -serial none -monitor none -qmp stdio <<EOF |
+{ "execute": "qmp_capabilities" }
+{ "execute": "query-qmp-schema" }
+{ "execute": "quit" }
+EOF
+   python3 -c '
+import json, sys
+data =3D json.loads(sys.stdin.read().splitlines()[2])
+print(json.dumps(data, indent=3D1, sort_keys=3DTrue,
+                 separators=3D(",", ": ")))'
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716028
+
+Title:
+  qemu 2.10 locks images with no feature flag
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  1) % lsb_release -rd
+  Description:	Ubuntu Artful Aardvark (development branch)
+  Release:	17.10
+
+  2) % apt-cache policy qemu-system-x86
+  qemu-system-x86:
+    Installed: 1:2.10~rc3+dfsg-0ubuntu1
+    Candidate: 1:2.10+dfsg-0ubuntu1
+    Version table:
+       1:2.10+dfsg-0ubuntu1 500
+          500 http://archive.ubuntu.com//ubuntu devel/main amd64 Packages
+   *** 1:2.10~rc3+dfsg-0ubuntu1 100
+          100 /var/lib/dpkg/status
+
+  3) qemu locks image files with no way to discover this feature nor how
+  to disable it
+
+  4) qemu provides a way to query if it supports image locking, and what
+  the default value is, and how to disable the locking via cli
+
+  qemu 2.10 now will lock image files and warn if an image is currently
+  locked.  This prevent qemu from running (and possibly corrupting said
+  image).
+
+  However, qemu does not provide any way to determine if a qemu binary
+  actually has this capability.  Normally behavior changing features are
+  exposed via some change to the qemu help menu or QMP/QAPI output of
+  capabilities.
+
+  I believe this slipped through since libvirt already does image
+  locking, but direct cli users will be caught by this change.
+
+  In particular, we have a use-case where we simulate multipath disks by
+  creating to disks which point to the same file which now breaks
+  without adding the 'file.locking=3Doff' to the -drive parameters;  which
+  is also completely undocumented and unexposed.
+
+  Some parts of the cli like -device allow querying of settable options
+  (qemu-system-x86 -device scsi_hd,?)  but nothing equivalent exists for
+  -drive parameters.
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 17.10
+  Package: qemu-system-x86 1:2.10~rc3+dfsg-0ubuntu1
+  ProcVersionSignature: Ubuntu 4.12.0-11.12-generic 4.12.5
+  Uname: Linux 4.12.0-11-generic x86_64
+  NonfreeKernelModules: zfs zunicode zavl zcommon znvpair
+  ApportVersion: 2.20.6-0ubuntu7
+  Architecture: amd64
+  Date: Fri Sep  8 12:56:53 2017
+  JournalErrors:
+   Hint: You are currently not seeing messages from other users and the sys=
+tem.
+         Users in groups 'adm', 'systemd-journal' can see all messages.
+         Pass -q to turn off this notice.
+   -- Logs begin at Mon 2017-01-30 11:56:02 CST, end at Fri 2017-09-08 12:5=
+6:46 CDT. --
+   -- No entries --
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: HP ProLiant DL360 Gen9
+  ProcEnviron:
+   TERM=3Dxterm
+   PATH=3D(custom, no user)
+   XDG_RUNTIME_DIR=3D<set>
+   LANG=3Den_US.UTF-8
+   SHELL=3D/bin/bash
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.12.0-11-generic root=3DUUID=3D=
+45354276-e0c0-4bf6-9083-f130b89411cc ro --- console=3DttyS1,115200
+  SourcePackage: qemu
+  UpgradeStatus: No upgrade log present (probably fresh install)
+  dmi.bios.date: 03/05/2015
+  dmi.bios.vendor: HP
+  dmi.bios.version: P89
+  dmi.chassis.type: 23
+  dmi.chassis.vendor: HP
+  dmi.modalias: dmi:bvnHP:bvrP89:bd03/05/2015:svnHP:pnProLiantDL360Gen9:pvr=
+:cvnHP:ct23:cvr:
+  dmi.product.family: ProLiant
+  dmi.product.name: ProLiant DL360 Gen9
+  dmi.sys.vendor: HP
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716028/+subscriptions
