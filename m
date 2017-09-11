@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35546)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1drTLc-0006kE-IA
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:22:18 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1drTOT-00012B-VP
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1drTLY-0002MS-8T
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:22:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38274)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1drTLX-0002L7-VL
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:22:12 -0400
-Date: Mon, 11 Sep 2017 15:22:07 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170911182207.GR7570@localhost.localdomain>
-References: <20170907201335.13956-1-david@redhat.com>
-	<20170907201335.13956-9-david@redhat.com>
-	<1603f6bf-f481-13c2-c7eb-ac155c5a14cc@redhat.com>
-	<b8f78724-b6be-3e95-60fa-8c7dcafe2eec@redhat.com>
-	<20170909220737.GL7570@localhost.localdomain>
-	<5d20eb5c-85cd-e500-0b98-c044c5176726@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1drTOT-00069y-5t
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:25:13 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:45947)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1drTOS-00069L-Vo
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:25:13 -0400
+Received: by mail-wm0-x235.google.com with SMTP id f199so46286349wme.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 11:25:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5d20eb5c-85cd-e500-0b98-c044c5176726@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 08/21] s390x: move sclp_service_call()
- to sclp.h
+In-Reply-To: <1c72c0c6-bd29-5228-d4ad-b26b11afa712@linaro.org>
+References: <20170911022839.23231-1-f4bug@amsat.org>
+	<1c72c0c6-bd29-5228-d4ad-b26b11afa712@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Sep 2017 19:24:51 +0100
+Message-ID: <CAFEAcA9+iDKf7UmQ2tevR9KQb_F2fJoBY03zrMMwM7ypFUdeAw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tcg/tci: do not use ldst label (never
+ implemented)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,121 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Mon, Sep 11, 2017 at 04:23:09AM +0200, Thomas Huth wrote:
-> On 10.09.2017 00:07, Eduardo Habkost wrote:
-> > On Fri, Sep 08, 2017 at 02:46:36PM +0200, David Hildenbrand wrote:
-> >> On 08.09.2017 06:21, Thomas Huth wrote:
-> >>> On 07.09.2017 22:13, David Hildenbrand wrote:
-> >>>> Implemented in sclp.c, so let's move it to the right include file.
-> >>>> Fix up one include. Do a forward declaration of CPUS390XState to fix the
-> >>>> two sclp consoles complaining.
-> >>>>
-> >>>> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >>>> ---
-> >>>>  include/hw/s390x/sclp.h    | 2 ++
-> >>>>  target/s390x/cpu.h         | 1 -
-> >>>>  target/s390x/misc_helper.c | 1 +
-> >>>>  3 files changed, 3 insertions(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-> >>>> index a72d096081..4b86a8a293 100644
-> >>>> --- a/include/hw/s390x/sclp.h
-> >>>> +++ b/include/hw/s390x/sclp.h
-> >>>> @@ -242,5 +242,7 @@ sclpMemoryHotplugDev *init_sclp_memory_hotplug_dev(void);
-> >>>>  sclpMemoryHotplugDev *get_sclp_memory_hotplug_dev(void);
-> >>>>  void sclp_service_interrupt(uint32_t sccb);
-> >>>>  void raise_irq_cpu_hotplug(void);
-> >>>> +typedef struct CPUS390XState CPUS390XState;
-> >>>> +int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
-> >>>
-> >>> That's dangerous and likely does not work with certain versions of GCC.
-> >>> You can't do a "forward declaration" with typedef in C, I'm afraid. See
-> >>> for example:
-> >>>
-> >>>  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01454.html
-> >>>  https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg03337.html
-> >>>  https://stackoverflow.com/questions/8367646/redefinition-of-typedef
-> >>>
-> >>> All this typedef'ing in QEMU is pretty bad ... we run into this problem
-> >>> again and again. include/qemu/typedefs.h is just a work-around for this.
-> >>> I know people like typedefs for some reasons (I used to do that, too,
-> >>> before I realized the trouble with them), but IMHO we should rather
-> >>> adopt the typedef-related rules from the kernel coding conventions instead:
-> >>>
-> >>>  https://www.kernel.org/doc/html/v4.13/process/coding-style.html#typedefs
-> >>>
-> >>>   Thomas
-> >>>
-> >>
-> >> Yes, this is really nasty. And I wasn't aware of the involved issues.
-> >>
-> >> This seems to be the only feasible solution (including cpu.h sounds
-> >> wrong and will require a bunch of other includes):
-> >>
-> >>
-> >> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-> >> index a72d096081..ce80915a02 100644
-> >> --- a/include/hw/s390x/sclp.h
-> >> +++ b/include/hw/s390x/sclp.h
-> >> @@ -242,5 +242,7 @@ sclpMemoryHotplugDev
-> >> *init_sclp_memory_hotplug_dev(void);
-> >>  sclpMemoryHotplugDev *get_sclp_memory_hotplug_dev(void);
-> >>  void sclp_service_interrupt(uint32_t sccb);
-> >>  void raise_irq_cpu_hotplug(void);
-> >> +struct CPUS390XState;
-> >> +int sclp_service_call(struct CPUS390XState *env, uint64_t sccb,
-> >> uint32_t code);
-> >>
-> >>  #endif
-> > 
-> > Why not use typedefs.h?
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> > diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-> > index 4b86a8a293..3512bf8283 100644
-> > --- a/include/hw/s390x/sclp.h
-> > +++ b/include/hw/s390x/sclp.h
-> > @@ -242,7 +242,6 @@ sclpMemoryHotplugDev *init_sclp_memory_hotplug_dev(void);
-> >  sclpMemoryHotplugDev *get_sclp_memory_hotplug_dev(void);
-> >  void sclp_service_interrupt(uint32_t sccb);
-> >  void raise_irq_cpu_hotplug(void);
-> > -typedef struct CPUS390XState CPUS390XState;
-> >  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
-> >  
-> >  #endif
-> > diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
-> > index 39bc8351a3..9c97bffa92 100644
-> > --- a/include/qemu/typedefs.h
-> > +++ b/include/qemu/typedefs.h
-> 
-> Using include/qeemu/typedefs.h here is IMHO really ugly. Do we really
-> want to pollute a common include file with target specific code? My
-> preferences are first to avoid typdefs, but if we really need/want them
-> (do we? There is no comment about this in our coding styles), I think we
-> should rather introduce target-specific typedefs.h headers, too, for
-> everything that is not part of the common code.
+On 11 September 2017 at 19:01, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 09/10/2017 07:28 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>> changed in 659ef5cbb893, this fixes building with --enable-tcg-interpret=
+er:
+>>
+>> /home/travis/build/qemu/qemu/tcg/tcg.c:116:14: error: =E2=80=98tcg_out_l=
+dst_finalize=E2=80=99 used but never defined [-Werror]
+>>  static bool tcg_out_ldst_finalize(TCGContext *s);
+>>               ^
+>>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+> Oops.
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-I don't see any advantage in splitting typedefs.h into
-arch-specific files.  We don't split typedefs.h into
-subsystem-specific or device-specific headers, so I don't see we
-would need a per-architecture split either.  typedefs.h is just a
-global collection of type identifiers that helps us reduce header
-dependency hell.
+Applied to master as a buildfix, thanks.
 
-(Anyway, the current problem is now going solved by using
-S390CPU* instead of CPUS390XState*, so there's no need to touch
-typedefs.h this time.)
+I've also turned on a tci compile check on my pre-merge tests.
+(It doesn't pass "make check" for me, though...)
 
-About keeping using typedefs: I don't have an strong opinion
-for/against them[1], but I would prefer to keep style consistent
-even if it's not explicitly documented.
-
-[1] The fact that it would make typedefs.h completely unnecessary
-    makes me inclined towards the suggestion to stop using them.
-
--- 
-Eduardo
+thanks
+-- PMM
