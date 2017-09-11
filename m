@@ -1,30 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52561)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54573)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1drU6x-0008Pi-D7
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:11:12 -0400
+	(envelope-from <alex.williamson@redhat.com>) id 1drUED-0001gx-HH
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:18:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1drU6u-00053Z-Mo
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:11:11 -0400
-Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:37878)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1drU6u-00052i-GP
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:11:08 -0400
-Received: by mail-io0-x22f.google.com with SMTP id j141so32770938ioj.4
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 12:11:08 -0700 (PDT)
-Date: Mon, 11 Sep 2017 12:04:15 -0700
-From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-Message-Id: <1505156655.1214.3@smtp.gmail.com>
-In-Reply-To: <20170911171015.GU21444@redhat.com>
-References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
-	<20170908173801.15205-7-brandon.carpenter@cypherpath.com>
-	<20170911085043.GE21444@redhat.com> <1505149415.1214.1@smtp.gmail.com>
-	<20170911171015.GU21444@redhat.com>
+	(envelope-from <alex.williamson@redhat.com>) id 1drUEA-0006Wr-TB
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:18:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34530)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
+	id 1drUEA-0006US-NO
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:18:38 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 89738C01C108
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 19:18:36 +0000 (UTC)
+Date: Mon, 11 Sep 2017 13:18:31 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+Message-ID: <20170911131831.11fe32a0@t450s.home>
+In-Reply-To: <1505156192-18994-1-git-send-email-wexu@redhat.com>
+References: <1505156192-18994-1-git-send-email-wexu@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] io: Reply to ping frames
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Patch 0/3] vfio: reusing address space for the
+ same iommu group devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +34,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: wexu@redhat.com
+Cc: qemu-devel@nongnu.org, jasowang@redhat.com, marcel@redhat.com, Peter Xu <peterx@redhat.com>
 
-On Mon, Sep 11, 2017 at 10:10 AM, Daniel P. Berrange 
-<berrange@redhat.com> wrote:
-> It feels like this is still dangerous - the client simply has to 
-> interleave each "ping" with a 1 byte binary frame to get around this 
-> limit. We need to make sure we have an absolute cap on the output 
-> buffer size.
+On Tue, 12 Sep 2017 02:56:29 +0800
+wexu@redhat.com wrote:
 
-Okay. I see that now that I look at it more closely. This breed of 
-asynchronous I/O is tricky because the conditions for reading/writing 
-are all over the place. There's a lot of context to keep in your head.
+> From: Wei Xu <wexu@redhat.com>
+> 
+> Recently I have been testing passing through 2 ixgbe(82599ES) nics which
+> belong to the same iommu group to a guest with virtual iommu(vIOMMU) on
+> my desktop, while vfio failed to realize the second device and prompted
+> error message as 'group xxx used in multiple address spaces'.
+> 
+> It turned out to be that vtd doesn't know any group info while choosing
+> an address space for the two devices, therefore it creates two separate
+> address space for each which breaks granularity isolation.
+> 
+> This patch fixes this by looking up if there is any exist device within
+> the same iommu group and shares the address space before creating a new
+> one.
+> 
+> I am not sure if this fixes the problem in a correct way due to my limited
+> knowledge about vfio, please come back to me for any feedback & comments,
+> Thanks.
 
-I have a fix. And I realized that I was missing a patch in the series 
-for RFC-compliant closing of websocket connections, which I must have 
-lost during a rebase. Should I submit v3 of the patch series or just 
-add those patches to this thread?
+Hi Wei,
 
-Thank you,
---
-Brandon Carpenter | Software Engineer
-Cypherpath, Inc.
-400 Columbia Point Drive Ste 101 | Richland, Washington USA
-Office: (650) 713-3060
+Are the devices in the same IOMMU group on the host or guest or both?
+My impression is that host IOMMU groups with more than a single
+endpoint are fundamentally incompatible with vIOMMU.  Even if we could
+enforce a VM topology which logically should place them into the same
+IOMMU group, IOMMU groups themselves are a Linux concept and another
+guest OS could rightfully attempt to use them in separate VT-d contexts.
+The only way we could ensure a shared context is if they were in a
+conventional PCI hierarchy within the VM.  I'd suggest that vIOMMU
+should be reserved for hosts and devices which have full isolation and
+for which the VM and guest can create separate mappings per device.
 
+I'm not sure if what I describe is the actual problem you're facing as I
+thought we had quirks to expose the per-port isolation on 82599
+devices, but perhaps the lack of isolation is coming from an upstream
+device.  If I'm off, please provide further details of exactly the host
+and guest scenarios.  Thanks,
 
--- 
+Alex
 
-
-CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is 
-for the sole use of the intended recipient(s) and may contain proprietary, 
-confidential or privileged information or otherwise be protected by law. 
-Any unauthorized review, use, disclosure or distribution is prohibited. If 
-you are not the intended recipient, please notify the sender and destroy 
-all copies and the original message.
+> Wei Xu (3):
+>   vfio: reusing address space for the same iommu group devices
+>   vfio: invoke looking up address space.
+>   vfio: remove checking duplicated vfio device
+> 
+>  hw/vfio/common.c              | 28 ++++++++++++++++++++++++++++
+>  hw/vfio/pci.c                 | 15 ++++++---------
+>  include/hw/vfio/vfio-common.h |  1 +
+>  3 files changed, 35 insertions(+), 9 deletions(-)
+> 
