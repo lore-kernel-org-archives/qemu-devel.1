@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33887)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1drOkA-0001KZ-5X
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:27:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1drOq6-0003dZ-8h
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:33:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <willy@infradead.org>) id 1drOk6-0007oU-W5
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:27:18 -0400
-Received: from bombadil.infradead.org ([65.50.211.133]:55446)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <willy@infradead.org>) id 1drOk6-0007nN-O8
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:27:14 -0400
-Date: Mon, 11 Sep 2017 06:27:10 -0700
-From: Matthew Wilcox <willy@infradead.org>
-Message-ID: <20170911132710.GB32538@bombadil.infradead.org>
-References: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
-	<1503914913-28893-3-git-send-email-wei.w.wang@intel.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1drOq5-0004Yb-Bu
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:33:26 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:33997)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1drOq5-0004Xx-3i
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:33:25 -0400
+Received: by mail-wr0-x230.google.com with SMTP id v109so14687046wrc.1
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 06:33:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1503914913-28893-3-git-send-email-wei.w.wang@intel.com>
-Subject: Re: [Qemu-devel] [PATCH v15 2/5] lib/xbitmap: add
- xb_find_next_bit() and xb_zero()
+In-Reply-To: <20170911141016.2352b022@nial.brq.redhat.com>
+References: <CAFEAcA_sk792HSvX7=6hnd2PEZ+FoVz=JEcBKu5CbLW5drzMhQ@mail.gmail.com>
+	<20170904213851.107ed8c8@Igors-MacBook-Pro.local>
+	<CAFEAcA8H==oJGm=rkjHUG-DPTo+PhqLcb=RG-Gb6oG+dUYVi3Q@mail.gmail.com>
+	<20170911141016.2352b022@nial.brq.redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Sep 2017 14:33:03 +0100
+Message-ID: <CAFEAcA_41Dkh4EdvCWWcnFHZaspOBA0FewKKK22kQ0v97pKG0Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] qdev_get_machine() can return something non-NULL
+ but not TYPE_MACHINE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,106 +32,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Aug 28, 2017 at 06:08:30PM +0800, Wei Wang wrote:
-> +/**
-> + *  xb_zero - zero a range of bits in the xbitmap
-> + *  @xb: the xbitmap that the bits reside in
-> + *  @start: the start of the range, inclusive
-> + *  @end: the end of the range, inclusive
-> + */
-> +void xb_zero(struct xb *xb, unsigned long start, unsigned long end)
-> +{
-> +	unsigned long i;
-> +
-> +	for (i = start; i <= end; i++)
-> +		xb_clear_bit(xb, i);
-> +}
-> +EXPORT_SYMBOL(xb_zero);
+On 11 September 2017 at 13:10, Igor Mammedov <imammedo@redhat.com> wrote:
+> On Tue, 5 Sep 2017 10:08:01 +0100
+> Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+>> On 4 September 2017 at 20:38, Igor Mammedov <imammedo@redhat.com> wrote:
+>> > On Mon, 4 Sep 2017 17:36:59 +0100
+>> > Peter Maydell <peter.maydell@linaro.org> wrote:
+>> >
+>> >> I just got bitten by qdev_get_machine()'s behaviour on the user-only
+>> >> emulators, where it can return something that isn't NULL and isn't
+>> >> an instance of TYPE_MACHINE either.
+>> > user-only shouldn't get to qdev_get_machine() at all,
+>> > issue probably in container_get().
+>>
+>> I need it in cpu_common_realizefn(), for
+>> http://patchwork.ozlabs.org/patch/797940/
+> Link might be broken (unable to connect to server)
 
-Um.  This is not exactly going to be quick if you're clearing a range of bits.
-I think it needs to be more along the lines of this:
+Works for me, but it is in master now anyway, commit
+ed860129acd3fcd0b1.
 
-void xb_clear(struct xb *xb, unsigned long start, unsigned long end) 
-{ 
-        struct radix_tree_root *root = &xb->xbrt; 
-        struct radix_tree_node *node; 
-        void **slot; 
-        struct ida_bitmap *bitmap; 
- 
-        for (; end < start; start = (start | (IDA_BITMAP_BITS - 1)) + 1) { 
-                unsigned long index = start / IDA_BITMAP_BITS; 
-                unsigned long bit = start % IDA_BITMAP_BITS; 
+> Anyways I'd avoid using machine from cpu_*_realizefn(),
+> instead of I'd add property to CPU that has needed data
+> and set it from board code. Should work fine for *-user targets
+> and maintain clear separation of device impl. and board details.
 
-                bitmap = __radix_tree_lookup(root, index, &node, &slot);
-                if (radix_tree_exception(bitmap)) {
-                        unsigned long ebit = bit + 2;
-                        unsigned long tmp = (unsigned long)bitmap;
-                        if (ebit >= BITS_PER_LONG)
-                                continue;
-                        tmp &= ... something ...;
-                        if (tmp == RADIX_TREE_EXCEPTIONAL_ENTRY)
-                                __radix_tree_delete(root, node, slot);
-                        else
-                                rcu_assign_pointer(*slot, (void *)tmp);
-                } else if (bitmap) {
-                        unsigned int nbits = end - start + 1;
-                        if (nbits + bit > IDA_BITMAP_BITS)
-                                nbits = IDA_BITMAP_BITS - bit;
-                        bitmap_clear(bitmap->bitmap, bit, nbits);
-                        if (bitmap_empty(bitmap->bitmap, IDA_BITMAP_BITS)) {
-                                kfree(bitmap);
-                                __radix_tree_delete(root, node, slot);
-                        }
-                }
-        }
-}
+It's not possible in all cases to set a CPU property from the
+top level board code. In quite a lot of cases the CPU
+object is created by an SoC object which is in turn
+created by the board code, and there is no plumbing
+there to pass arbitrary properties through to the CPU
+object...
 
-Also note that this should be called xb_clear(), not xb_zero() to fit
-in with bitmap_clear().  And this needs a thorough test suite testing
-all values for 'start' and 'end' between 0 and at least 1024; probably
-much higher.  And a variable number of bits need to be set before calling
-xb_clear() in the test suite.
-
-Also, this implementation above is missing a few tricks.  For example,
-if 'bit' is 0 and 'nbits' == IDA_BITMAP_BITS, we can simply call kfree
-without first zeroing out the bits and then checking if the whole thing
-is zero.
-
-Another missing optimisation above is that we always restart the radix
-tree walk from the top instead of simply moving on to the next bitmap.
-This is still a thousand times faster than the implementation you posted,
-but I'd be keen to add that optimisation too.
-
-> +/**
-> + * xb_find_next_bit - find next 1 or 0 in the give range of bits
-> + * @xb: the xbitmap that the bits reside in
-> + * @start: the start of the range, inclusive
-> + * @end: the end of the range, inclusive
-> + * @set: the polarity (1 or 0) of the next bit to find
-> + *
-> + * Return the index of the found bit in the xbitmap. If the returned index
-> + * exceeds @end, it indicates that no such bit is found in the given range.
-> + */
-> +unsigned long xb_find_next_bit(struct xb *xb, unsigned long start,
-> +			       unsigned long end, bool set)
-> +{
-> +	unsigned long i;
-> +
-> +	for (i = start; i <= end; i++) {
-> +		if (xb_test_bit(xb, i) == set)
-> +			break;
-> +	}
-> +
-> +	return i;
-> +}
-> +EXPORT_SYMBOL(xb_find_next_bit);
-
-Similar comments ... this is going to be very slow.  You can use the
-tags in the tree to help you find set and clear bits so performance
-doesn't fall apart in big trees.
-
-I'd like to see this be two functions, xb_find_next_zero_bit() and
-xb_find_next_set_bit().
+thanks
+-- PMM
