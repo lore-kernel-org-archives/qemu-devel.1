@@ -1,24 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52962)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drMzi-0005GH-GT
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:35:20 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drN19-0006Ti-1K
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:36:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drMzf-0002nw-6b
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:35:14 -0400
-Received: from 18.mo1.mail-out.ovh.net ([46.105.35.72]:33431)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drMze-0002lu-Ti
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:35:11 -0400
-Received: from player169.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 4B4F493475
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 13:35:09 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 11 Sep 2017 13:35:03 +0200
-Message-ID: <150512970330.16081.7553039475680302776.stgit@bahia>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drN13-0003Kv-2Q
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:36:43 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47517)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1drN12-0003K7-Pu
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:36:36 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8BBaCpR006220
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 07:36:35 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cwqmf8k1d-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 07:36:35 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 11 Sep 2017 12:36:32 +0100
+References: <20170908152446.14606-1-pasic@linux.vnet.ibm.com>
+	<20170908152446.14606-5-pasic@linux.vnet.ibm.com>
+	<20170911120722.17236996.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 11 Sep 2017 13:36:29 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [RFC PATCH] spapr_pci: make index property mandatory
+In-Reply-To: <20170911120722.17236996.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <81215214-82a2-801f-3b5b-f649726f00c6@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] s390x/css: fix incorrect length
+ indication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,157 +44,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Creating several PHBs without index property confuses the DRC code
-and causes issues:
-- only the first index-less PHB is functional, the other ones will
-  silently ignore hotplugging of PCI devices
-- QEMU will even terminate if these PHBs have cold-plugged devices
 
-qemu-system-ppc64: -device virtio-net,bus=pci2.0: an attached device
- is still awaiting release
 
-This happens because DR connectors for child PCI devices are created
-with a DRC index that is derived from the PHB's index property. If the
-PHBs are created without index, then the same value of -1 is used to
-compute the DRC indexes for both PHBs, hence causing the collision.
+On 09/11/2017 12:07 PM, Cornelia Huck wrote:
+> On Fri,  8 Sep 2017 17:24:46 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> We report incorrect length via SCSW program check instead of incorrect
+>> length check (SCWS word 2 bit 10 instead of bit 9). Since we have there
+>> is no fitting errno for incorrect length, and since I don't like what we
+>> do with the errno's, as part of the fix, errnos used for control flow in
+>> ccw interpretation are replaced with an enum using more speaking names.
+> 
+> I'm not sure whether this is the way to go. I mainly dislike the size
+> of the patch (and the fact that it mixes a fix and a change of function
+> signature).
 
-Also, the index property is used to compute the placement of the PHB's
-memory regions. It is limited to 31 or 255, depending on the machine
-type version. This fits well with the requirements of DRC indexes, which
-need the PHB index to be a 16-bit value.
+Do you agree that we should move away from POSIX errno codes? I think
+if we do, this cant' get much smaller.
 
-This patch hence makes the index property mandatory. As a consequence,
-the PHB's memory regions and BUID are now always configured according
-to the index, and it is no longer possible to set them from the command
-line. This is a reasonable trade-off, as it is very unlikely that people
-create PHBs without index (at least libvirt doesn't do it FWIW).
+> 
+> Can we instead choose a mapping for incorrect length, and defer a
+> possible rework?
+> 
 
-We have to introduce a PHB instance init function to initialize the
-64-bit window address to -1 because pseries-2.7 and older machines
-don't set it.
+In the commit message, I say that I don't have a fitting errno.
+If you tell me which one to use, I would be glad to split this up.
+I don't like mixing re-factoring and changing behavior myself.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
+Can I have your position on the re-factoring (that is let us
+imagine I did not change handling for incorrect length)?
 
-Hi,
+> (Another idea would be to have the callback prepare the scsw via helper
+> functions. We'd just keep -EAGAIN to keep processing a chain and 0 to
+> stop.)
+> 
 
-This is a proposal to address the issue uncovered during the review of the
-PHB hotplug patches:
+That was my first idea how to improve on this. I should still have the
+code (patches), but I'm not sure whether it's clean or lumped together
+with other experiments.
 
-https://lists.nongnu.org/archive/html/qemu-ppc/2017-07/msg00557.html
+After pushing the handling down the call chain (caller would use
+inline functions to manipulate SCSW), I've realized that it does
+not buy us much/anything expect the better names, while we get
+the machine code manipulating the SCSW generated in multiple
+instead of in one place. I also showed the results to Dong Jia and
+he was ambivalent too: said something like it does look better,
+but it ain't better enough to make it worthwhile.
 
-I'd like to address this properly before resuming work on PHB hotplug
-itself. Please comment.
+This is why I've decided to go with a less intrusive approach:
+just change the names so that it's obvious what's happening.
 
-Cheers,
+If you like, I look for those patches and if it ain't too
+much work post them as an RFC -- so we have both options in
+front of our eyes. 
 
---
-Greg
----
- hw/ppc/spapr_pci.c |   52 ++++++++++------------------------------------------
- 1 file changed, 10 insertions(+), 42 deletions(-)
+>>
+>> For virtio, if incorrect length checking is suppressed we keep the
+>> current behavior (channel-program check).
+> 
+> Confused. If it is suppressed, there should not be an error, no?
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index cf54160526fa..9a338b7f197b 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1523,16 +1523,6 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
-         sPAPRMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-         Error *local_err = NULL;
- 
--        if ((sphb->buid != (uint64_t)-1) || (sphb->dma_liobn[0] != (uint32_t)-1)
--            || (sphb->dma_liobn[1] != (uint32_t)-1 && windows_supported == 2)
--            || (sphb->mem_win_addr != (hwaddr)-1)
--            || (sphb->mem64_win_addr != (hwaddr)-1)
--            || (sphb->io_win_addr != (hwaddr)-1)) {
--            error_setg(errp, "Either \"index\" or other parameters must"
--                       " be specified for PAPR PHB, not both");
--            return;
--        }
--
-         smc->phb_placement(spapr, sphb->index,
-                            &sphb->buid, &sphb->io_win_addr,
-                            &sphb->mem_win_addr, &sphb->mem64_win_addr,
-@@ -1541,36 +1531,12 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
-             error_propagate(errp, local_err);
-             return;
-         }
--    }
--
--    if (sphb->buid == (uint64_t)-1) {
--        error_setg(errp, "BUID not specified for PHB");
--        return;
--    }
--
--    if ((sphb->dma_liobn[0] == (uint32_t)-1) ||
--        ((sphb->dma_liobn[1] == (uint32_t)-1) && (windows_supported > 1))) {
--        error_setg(errp, "LIOBN(s) not specified for PHB");
--        return;
--    }
--
--    if (sphb->mem_win_addr == (hwaddr)-1) {
--        error_setg(errp, "Memory window address not specified for PHB");
--        return;
--    }
--
--    if (sphb->io_win_addr == (hwaddr)-1) {
--        error_setg(errp, "IO window address not specified for PHB");
-+    } else {
-+        error_setg(errp, "\"index\" for PAPR PHB is mandatory");
-         return;
-     }
- 
-     if (sphb->mem64_win_size != 0) {
--        if (sphb->mem64_win_addr == (hwaddr)-1) {
--            error_setg(errp,
--                       "64-bit memory window address not specified for PHB");
--            return;
--        }
--
-         if (sphb->mem_win_size > SPAPR_PCI_MEM32_WIN_SIZE) {
-             error_setg(errp, "32-bit memory window of size 0x%"HWADDR_PRIx
-                        " (max 2 GiB)", sphb->mem_win_size);
-@@ -1789,18 +1755,12 @@ static void spapr_phb_reset(DeviceState *qdev)
- 
- static Property spapr_phb_properties[] = {
-     DEFINE_PROP_UINT32("index", sPAPRPHBState, index, -1),
--    DEFINE_PROP_UINT64("buid", sPAPRPHBState, buid, -1),
--    DEFINE_PROP_UINT32("liobn", sPAPRPHBState, dma_liobn[0], -1),
--    DEFINE_PROP_UINT32("liobn64", sPAPRPHBState, dma_liobn[1], -1),
--    DEFINE_PROP_UINT64("mem_win_addr", sPAPRPHBState, mem_win_addr, -1),
-     DEFINE_PROP_UINT64("mem_win_size", sPAPRPHBState, mem_win_size,
-                        SPAPR_PCI_MEM32_WIN_SIZE),
--    DEFINE_PROP_UINT64("mem64_win_addr", sPAPRPHBState, mem64_win_addr, -1),
-     DEFINE_PROP_UINT64("mem64_win_size", sPAPRPHBState, mem64_win_size,
-                        SPAPR_PCI_MEM64_WIN_SIZE),
-     DEFINE_PROP_UINT64("mem64_win_pciaddr", sPAPRPHBState, mem64_win_pciaddr,
-                        -1),
--    DEFINE_PROP_UINT64("io_win_addr", sPAPRPHBState, io_win_addr, -1),
-     DEFINE_PROP_UINT64("io_win_size", sPAPRPHBState, io_win_size,
-                        SPAPR_PCI_IO_WIN_SIZE),
-     DEFINE_PROP_BOOL("dynamic-reconfiguration", sPAPRPHBState, dr_enabled,
-@@ -1937,6 +1897,13 @@ static const char *spapr_phb_root_bus_path(PCIHostState *host_bridge,
-     return sphb->dtbusname;
- }
- 
-+static void spapr_phb_instance_init(Object *obj)
-+{
-+    sPAPRPHBState *sphb = SPAPR_PCI_HOST_BRIDGE(obj);
-+
-+    sphb->mem64_win_addr = (hwaddr)-1;
-+}
-+
- static void spapr_phb_class_init(ObjectClass *klass, void *data)
- {
-     PCIHostBridgeClass *hc = PCI_HOST_BRIDGE_CLASS(klass);
-@@ -1960,6 +1927,7 @@ static const TypeInfo spapr_phb_info = {
-     .parent        = TYPE_PCI_HOST_BRIDGE,
-     .instance_size = sizeof(sPAPRPHBState),
-     .class_init    = spapr_phb_class_init,
-+    .instance_init = spapr_phb_instance_init,
-     .interfaces    = (InterfaceInfo[]) {
-         { TYPE_HOTPLUG_HANDLER },
-         { }
+No.
+
+>From VIRTIO 1.0 4.3.1.2  Device Requirements: Basic Concepts
+
+"If a driver did suppress length checks for a channel command, the device
+MUST present a check condition if the transmitted data does not contain
+enough data to process the command."
+(http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-1230001)
+
+So for virtio we have to present a check condition. Architecturally it
+might look better if the one refusing is the device and not the CSS, but
+for that we would have to change the VIRTIO spec. With the given
+constraints a program check is IMHO the best fit.
+
+> 
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> ---
+>>  hw/s390x/3270-ccw.c    |  24 +++++-----
+>>  hw/s390x/css.c         |  67 +++++++++++++++-----------
+>>  hw/s390x/virtio-ccw.c  | 128 ++++++++++++++++++++++++-------------------------
+>>  include/hw/s390x/css.h |  13 ++++-
+>>  4 files changed, 127 insertions(+), 105 deletions(-)
+> 
