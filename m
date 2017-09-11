@@ -1,21 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49221)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50084)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1drSqI-0000tr-Dg
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:49:55 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1drSt2-0003Tc-Ee
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:52:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1drSqF-0008KV-5q
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:49:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58108)
+	(envelope-from <ehabkost@redhat.com>) id 1drSsy-0001mp-B6
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:52:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46164)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1drSqE-0008JJ-Si
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:49:51 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Mon, 11 Sep 2017 19:49:33 +0200
-Message-Id: <20170911174933.20789-7-david@redhat.com>
-In-Reply-To: <20170911174933.20789-1-david@redhat.com>
-References: <20170911174933.20789-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 6/6] kvm: kvm_log_sync() is only called with
- known memory sections
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1drSsy-0001jq-2L
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:52:40 -0400
+Date: Mon, 11 Sep 2017 14:52:24 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170911175224.GP7570@localhost.localdomain>
+References: <20170907201335.13956-1-david@redhat.com>
+	<20170907201335.13956-9-david@redhat.com>
+	<1603f6bf-f481-13c2-c7eb-ac155c5a14cc@redhat.com>
+	<b8f78724-b6be-3e95-60fa-8c7dcafe2eec@redhat.com>
+	<20170909220737.GL7570@localhost.localdomain>
+	<c758ae70-a664-d13a-dd24-768f71e3f2e4@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c758ae70-a664-d13a-dd24-768f71e3f2e4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 08/21] s390x: move sclp_service_call()
+ to sclp.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,121 +32,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, kvm@vger.kernel.org, david@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Flatview will make sure that we can only end up in this function with
-memory sections that correspond to exactly one slot. So we don't
-have to iterate multiple times. There won't be overlapping slots but
-only matching slots.
+On Mon, Sep 11, 2017 at 12:23:10PM +0200, Paolo Bonzini wrote:
+> On 10/09/2017 00:07, Eduardo Habkost wrote:
+> > On Fri, Sep 08, 2017 at 02:46:36PM +0200, David Hildenbrand wrote:
+> >> On 08.09.2017 06:21, Thomas Huth wrote:
+> >>> On 07.09.2017 22:13, David Hildenbrand wrote:
+> >>>> Implemented in sclp.c, so let's move it to the right include file.
+> >>>> Fix up one include. Do a forward declaration of CPUS390XState to fix the
+> >>>> two sclp consoles complaining.
+> >>>>
+> >>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+> >>>> ---
+> >>>>  include/hw/s390x/sclp.h    | 2 ++
+> >>>>  target/s390x/cpu.h         | 1 -
+> >>>>  target/s390x/misc_helper.c | 1 +
+> >>>>  3 files changed, 3 insertions(+), 1 deletion(-)
+> >>>>
+> >>>> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+> >>>> index a72d096081..4b86a8a293 100644
+> >>>> --- a/include/hw/s390x/sclp.h
+> >>>> +++ b/include/hw/s390x/sclp.h
+> >>>> @@ -242,5 +242,7 @@ sclpMemoryHotplugDev *init_sclp_memory_hotplug_dev(void);
+> >>>>  sclpMemoryHotplugDev *get_sclp_memory_hotplug_dev(void);
+> >>>>  void sclp_service_interrupt(uint32_t sccb);
+> >>>>  void raise_irq_cpu_hotplug(void);
+> >>>> +typedef struct CPUS390XState CPUS390XState;
+> >>>> +int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
+> >>>
+> >>> That's dangerous and likely does not work with certain versions of GCC.
+> >>> You can't do a "forward declaration" with typedef in C, I'm afraid. See
+> >>> for example:
+> >>>
+> >>>  https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01454.html
+> >>>  https://lists.gnu.org/archive/html/qemu-devel/2017-06/msg03337.html
+> >>>  https://stackoverflow.com/questions/8367646/redefinition-of-typedef
+> >>>
+> >>> All this typedef'ing in QEMU is pretty bad ... we run into this problem
+> >>> again and again. include/qemu/typedefs.h is just a work-around for this.
+> >>> I know people like typedefs for some reasons (I used to do that, too,
+> >>> before I realized the trouble with them), but IMHO we should rather
+> >>> adopt the typedef-related rules from the kernel coding conventions instead:
+> >>>
+> >>>  https://www.kernel.org/doc/html/v4.13/process/coding-style.html#typedefs
+> >>>
+> >>>   Thomas
+> >>>
+> >>
+> >> Yes, this is really nasty. And I wasn't aware of the involved issues.
+> >>
+> >> This seems to be the only feasible solution (including cpu.h sounds
+> >> wrong and will require a bunch of other includes):
+> >>
+> >>
+> >> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+> >> index a72d096081..ce80915a02 100644
+> >> --- a/include/hw/s390x/sclp.h
+> >> +++ b/include/hw/s390x/sclp.h
+> >> @@ -242,5 +242,7 @@ sclpMemoryHotplugDev
+> >> *init_sclp_memory_hotplug_dev(void);
+> >>  sclpMemoryHotplugDev *get_sclp_memory_hotplug_dev(void);
+> >>  void sclp_service_interrupt(uint32_t sccb);
+> >>  void raise_irq_cpu_hotplug(void);
+> >> +struct CPUS390XState;
+> >> +int sclp_service_call(struct CPUS390XState *env, uint64_t sccb,
+> >> uint32_t code);
+> >>
+> >>  #endif
+> > 
+> > Why not use typedefs.h?
+> 
+> See Markus's reply.  But, maybe it's even better to use S390CPU* and
+> include target/s390x/cpu-qom.h, which by design provides as little
+> definitions as needed.
 
-Properly align the section and look up the corresponding slot. This
-heavily simplifies this function.
+I don't see an argument against moving typedef CPUS390XState to
+typedefs.h in Markus' reply.  I see one argument for it (reducing
+the need for non-cyclic includes).
 
-We can now get rid of kvm_lookup_overlapping_slot().
+cpu-qom.h includes cpu.h, so I don't know why using S390CPU*
+would solve any problem.  I don't disagree about changing the
+function to use S390CPU* eventually, but it would still require
+us make a choice between: a) including the header where the
+typedef name is declared (cpu.h or cpu-qom.h); or b) moving the
+typedef name declaration to typedefs.h.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- accel/kvm/kvm-all.c | 61 +++++++++++------------------------------------------
- 1 file changed, 12 insertions(+), 49 deletions(-)
+> 
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> > diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+> > index 4b86a8a293..3512bf8283 100644
+> > --- a/include/hw/s390x/sclp.h
+> > +++ b/include/hw/s390x/sclp.h
+> > @@ -242,7 +242,6 @@ sclpMemoryHotplugDev *init_sclp_memory_hotplug_dev(void);
+> >  sclpMemoryHotplugDev *get_sclp_memory_hotplug_dev(void);
+> >  void sclp_service_interrupt(uint32_t sccb);
+> >  void raise_irq_cpu_hotplug(void);
+> > -typedef struct CPUS390XState CPUS390XState;
+> >  int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
+> >  
+> >  #endif
+> > diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> > index 39bc8351a3..9c97bffa92 100644
+> > --- a/include/qemu/typedefs.h
+> > +++ b/include/qemu/typedefs.h
+> > @@ -21,6 +21,7 @@ typedef struct Chardev Chardev;
+> >  typedef struct CompatProperty CompatProperty;
+> >  typedef struct CPUAddressSpace CPUAddressSpace;
+> >  typedef struct CPUState CPUState;
+> > +typedef struct CPUS390XState CPUS390XState;
+> >  typedef struct DeviceListener DeviceListener;
+> >  typedef struct DeviceState DeviceState;
+> >  typedef struct DirtyBitmapSnapshot DirtyBitmapSnapshot;
+> > diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> > index 032d1de2e8..f99a82cd5e 100644
+> > --- a/target/s390x/cpu.h
+> > +++ b/target/s390x/cpu.h
+> > @@ -80,7 +80,7 @@ typedef struct MchkQueue {
+> >      uint16_t type;
+> >  } MchkQueue;
+> >  
+> > -typedef struct CPUS390XState {
+> > +struct CPUS390XState {
+> >      uint64_t regs[16];     /* GP registers */
+> >      /*
+> >       * The floating point registers are part of the vector registers.
+> > @@ -174,7 +174,7 @@ typedef struct CPUS390XState {
+> >      /* currently processed sigp order */
+> >      uint8_t sigp_order;
+> >  
+> > -} CPUS390XState;
+> > +};
+> >  
+> >  static inline CPU_DoubleU *get_freg(CPUS390XState *cs, int nr)
+> >  {
+> > 
+> > 
+> > 
+> >> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> >> index 3aa2e46aac..032d1de2e8 100644
+> >> --- a/target/s390x/cpu.h
+> >> +++ b/target/s390x/cpu.h
+> >> @@ -721,6 +721,5 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr,
+> >> uint8_t ar, void *hostbuf,
+> >>
+> >>  /* outside of target/s390x/ */
+> >>  S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
+> >> -int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
+> >>
+> >>  #endif
+> >> diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+> >> index b142db71c6..8b07535b02 100644
+> >> --- a/target/s390x/misc_helper.c
+> >> +++ b/target/s390x/misc_helper.c
+> >> @@ -35,6 +35,7 @@
+> >>  #include "sysemu/sysemu.h"
+> >>  #include "hw/s390x/ebcdic.h"
+> >>  #include "hw/s390x/s390-virtio-hcall.h"
+> >> +#include "hw/s390x/sclp.h"
+> >>  #endif
+> >>
+> >>  /* #define DEBUG_HELPER */
+> >>
+> >>
+> >> Opinions?
+> >>
+> >>
+> >>
+> >> -- 
+> >>
+> >> Thanks,
+> >>
+> >> David
+> > 
+> 
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 2ae459453d..a8083e80be 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -218,34 +218,6 @@ static hwaddr kvm_align_section(MemoryRegionSection *section,
-     return size;
- }
- 
--/*
-- * Find overlapping slot with lowest start address
-- */
--static KVMSlot *kvm_lookup_overlapping_slot(KVMMemoryListener *kml,
--                                            hwaddr start_addr,
--                                            hwaddr end_addr)
--{
--    KVMState *s = kvm_state;
--    KVMSlot *found = NULL;
--    int i;
--
--    for (i = 0; i < s->nr_slots; i++) {
--        KVMSlot *mem = &kml->slots[i];
--
--        if (mem->memory_size == 0 ||
--            (found && found->start_addr < mem->start_addr)) {
--            continue;
--        }
--
--        if (end_addr > mem->start_addr &&
--            start_addr < mem->start_addr + mem->memory_size) {
--            found = mem;
--        }
--    }
--
--    return found;
--}
--
- int kvm_physical_memory_addr_from_host(KVMState *s, void *ram,
-                                        hwaddr *phys_addr)
- {
-@@ -489,18 +461,16 @@ static int kvm_physical_sync_dirty_bitmap(KVMMemoryListener *kml,
-                                           MemoryRegionSection *section)
- {
-     KVMState *s = kvm_state;
--    unsigned long size, allocated_size = 0;
-     struct kvm_dirty_log d = {};
-     KVMSlot *mem;
--    int ret = 0;
--    hwaddr start_addr = section->offset_within_address_space;
--    hwaddr end_addr = start_addr + int128_get64(section->size);
-+    hwaddr start_addr, size;
- 
--    d.dirty_bitmap = NULL;
--    while (start_addr < end_addr) {
--        mem = kvm_lookup_overlapping_slot(kml, start_addr, end_addr);
--        if (mem == NULL) {
--            break;
-+    size = kvm_align_section(section, &start_addr);
-+    if (size) {
-+        mem = kvm_lookup_matching_slot(kml, start_addr, size);
-+        if (!mem) {
-+            fprintf(stderr, "%s: error finding slot\n", __func__);
-+            abort();
-         }
- 
-         /* XXX bad kernel interface alert
-@@ -517,27 +487,20 @@ static int kvm_physical_sync_dirty_bitmap(KVMMemoryListener *kml,
-          */
-         size = ALIGN(((mem->memory_size) >> TARGET_PAGE_BITS),
-                      /*HOST_LONG_BITS*/ 64) / 8;
--        if (!d.dirty_bitmap) {
--            d.dirty_bitmap = g_malloc(size);
--        } else if (size > allocated_size) {
--            d.dirty_bitmap = g_realloc(d.dirty_bitmap, size);
--        }
--        allocated_size = size;
--        memset(d.dirty_bitmap, 0, allocated_size);
-+        d.dirty_bitmap = g_malloc0(size);
- 
-         d.slot = mem->slot | (kml->as_id << 16);
-         if (kvm_vm_ioctl(s, KVM_GET_DIRTY_LOG, &d) == -1) {
-             DPRINTF("ioctl failed %d\n", errno);
--            ret = -1;
--            break;
-+            g_free(d.dirty_bitmap);
-+            return -1;
-         }
- 
-         kvm_get_dirty_pages_log_range(section, d.dirty_bitmap);
--        start_addr = mem->start_addr + mem->memory_size;
-+        g_free(d.dirty_bitmap);
-     }
--    g_free(d.dirty_bitmap);
- 
--    return ret;
-+    return 0;
- }
- 
- static void kvm_coalesce_mmio_region(MemoryListener *listener,
 -- 
-2.13.5
+Eduardo
