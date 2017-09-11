@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40024)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1drUpE-0006JV-5W
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:57:00 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45421)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1drUyz-0005zR-LN
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:07:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1drUpA-0002KK-7M
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:56:56 -0400
-Received: from mail-by2nam03on0078.outbound.protection.outlook.com
-	([104.47.42.78]:23232
-	helo=NAM03-BY2-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alistai@xilinx.com>) id 1drUp9-0002Ji-SM
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:56:52 -0400
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 11 Sep 2017 12:53:02 -0700
-Message-ID: <f5441f63f6527c38a198ae566823238bb92bc489.1505158760.git.alistair.francis@xilinx.com>
-In-Reply-To: <cover.1505158760.git.alistair.francis@xilinx.com>
-References: <cover.1505158760.git.alistair.francis@xilinx.com>
+	(envelope-from <n54@gmx.com>) id 1drUyv-00004y-MO
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:07:01 -0400
+References: <20170903164952.26760-1-n54@gmx.com>
+	<20170911171639.22005-1-n54@gmx.com>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <aae5b3ae-f158-a7a6-fb8c-7726c2a18cd0@gmx.com>
+Date: Mon, 11 Sep 2017 22:09:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 7/8] Makefile: Remove libqemustub.a
+In-Reply-To: <20170911171639.22005-1-n54@gmx.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="iVnRK52EjSv8F66TTJwmnqoEGJS6hHnGC"
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2] Discover openpty(3)
+ dynamically in configure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,125 +25,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alistair.francis@xilinx.com, alistair23@gmail.com, armbru@redhat.com, pbonzini@redhat.com
+To: qemu-trivial@nongnu.org
+Cc: peter.maydell@linaro.org, jperkin@joyent.com, qemu-devel@nongnu.org
 
-Using two libraries (libqemuutil.a and libqemustub.a) would sometimes
-result in circular dependencies. To avoid these issues let's just
-combine both into a single library that functions as both.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--iVnRK52EjSv8F66TTJwmnqoEGJS6hHnGC
+From: Kamil Rytarowski <n54@gmx.com>
+To: qemu-trivial@nongnu.org
+Cc: peter.maydell@linaro.org, jperkin@joyent.com, qemu-devel@nongnu.org
+Message-ID: <aae5b3ae-f158-a7a6-fb8c-7726c2a18cd0@gmx.com>
+Subject: Re: [Qemu-trivial] [PATCH v2] Discover openpty(3) dynamically in
+ configure
+References: <20170903164952.26760-1-n54@gmx.com>
+ <20170911171639.22005-1-n54@gmx.com>
+In-Reply-To: <20170911171639.22005-1-n54@gmx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
----
+On 11.09.2017 19:16, Kamil Rytarowski wrote:
+> openpty(3) might:
+>  - exists in libc (OSX)
+>  - exists in libutil (GNU, BSD)
+>  - does not exist (SmartOS)
+>=20
+> Add a function to discover this function in the ./configure script.
+> Add new config types: CONFIG_OPENPTY_LIBC and CONFIG_OPENPTY_LIBUTIL,
+> respectively defined when openpts(3) links with -lc or -lutil.
+>=20
+> Replace the condition adding -lutil in tests (for openpty(3)) from
+> CONFIG_POSIX to CONFIG_OPENPTY_LIBUTIL.
+>=20
+> Replace the fallback openpty(3) impelementation comment from Solaris
+> to SmartOS. Solaris is EOL'ed and it's confirmed that it does not work
+> on Oracle Solaris.
 
-V3:
- - Fix up the docs
- - Rebase into this series
-V2:
- - Skipped
+Signed-off-by: Kamil Rytarowski <n54@gmx.com>
 
- Makefile                    |  7 +++----
- Makefile.target             |  2 +-
- docs/devel/build-system.txt | 16 +++++++---------
- tests/Makefile.include      |  6 +++---
- 4 files changed, 14 insertions(+), 17 deletions(-)
+> ---
+>  configure              | 25 +++++++++++++++++++++++++
+>  tests/Makefile.include |  2 +-
+>  util/qemu-openpty.c    |  4 ++--
+>  3 files changed, 28 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/configure b/configure
+> index fd7e3a5e81..a614adcd29 100755
+> --- a/configure
+> +++ b/configure
+> @@ -3819,6 +3819,25 @@ EOF
+>    fi
+>  fi
+> =20
+> +##########################################
+> +# openpty probe
+> +openpty_libc=3Dno
+> +openpty_libutil=3Dno
+> +cat > $TMPC << EOF
+> +extern int openpty(int *amaster, int *aslave, char *name, void *termp,=
+ void *winp);
+> +
+> +int main(void)
+> +{
+> +    int master_fd, slave_fd;
+> +    return openpty(&master_fd, &slave_fd, 0, 0, 0) =3D=3D 0;
+> +}
+> +EOF
+> +if compile_prog "" "" ; then
+> +  openpty_libc=3Dyes
+> +elif compile_prog "" "-lutil" ; then
+> +  openpty_libutil=3Dyes
+> +fi
+> +
+>  ##########################################
+>  # signalfd probe
+>  signalfd=3D"no"
+> @@ -5788,6 +5807,12 @@ fi
+>  if test "$fdt" =3D "yes" ; then
+>    echo "CONFIG_FDT=3Dy" >> $config_host_mak
+>  fi
+> +if test "$openpty_libc" =3D "yes" ; then
+> +  echo "CONFIG_OPENPTY_LIBC=3Dy" >> $config_host_mak
+> +fi
+> +if test "$openpty_libutil" =3D "yes" ; then
+> +  echo "CONFIG_OPENPTY_LIBUTIL=3Dy" >> $config_host_mak
+> +fi
+>  if test "$signalfd" =3D "yes" ; then
+>    echo "CONFIG_SIGNALFD=3Dy" >> $config_host_mak
+>  fi
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index fae5715e9c..e7e0bc2724 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -814,7 +814,7 @@ tests/migration/initrd-stress.img: tests/migration/=
+stress$(EXESUF)
+>  	rm $(INITRD_WORK_DIR)/init
+>  	rmdir $(INITRD_WORK_DIR)
+> =20
+> -ifeq ($(CONFIG_POSIX),y)
+> +ifeq ($(CONFIG_OPENPTY_LIBUTIL),y)
+>  LIBS +=3D -lutil
+>  endif
+> =20
+> diff --git a/util/qemu-openpty.c b/util/qemu-openpty.c
+> index 2e8b43bdf5..62c87e5563 100644
+> --- a/util/qemu-openpty.c
+> +++ b/util/qemu-openpty.c
+> @@ -51,8 +51,8 @@
+>  # include <termios.h>
+>  #endif
+> =20
+> -#ifdef __sun__
+> -/* Once Solaris has openpty(), this is going to be removed. */
+> +/* The fallback implementation is needed at least on SmartOS. */
+> +#if !defined(CONFIG_OPENPTY_LIBC) && !defined(CONFIG_OPENPTY_LIBUTIL)
+>  static int openpty(int *amaster, int *aslave, char *name,
+>                     struct termios *termp, struct winsize *winp)
+>  {
+>=20
 
-diff --git a/Makefile b/Makefile
-index 337a1f6f9b..8f1273a159 100644
---- a/Makefile
-+++ b/Makefile
-@@ -344,7 +344,7 @@ subdir-dtc:dtc/libfdt dtc/tests
- dtc/%:
- 	mkdir -p $@
-=20
--$(SUBDIR_RULES): libqemuutil.a libqemustub.a $(common-obj-y) $(chardev-obj=
--y) \
-+$(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
- 	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
-=20
- ROMSUBDIR_RULES=3D$(patsubst %,romsubdir-%, $(ROMS))
-@@ -364,12 +364,11 @@ Makefile: $(version-obj-y)
- ######################################################################
- # Build libraries
-=20
--libqemustub.a: $(stub-obj-y)
--libqemuutil.a: $(util-obj-y) $(trace-obj-y)
-+libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y)
-=20
- ######################################################################
-=20
--COMMON_LDADDS =3D libqemuutil.a libqemustub.a
-+COMMON_LDADDS =3D libqemuutil.a
-=20
- qemu-img.o: qemu-img-cmds.h
-=20
-diff --git a/Makefile.target b/Makefile.target
-index 7f42c45db8..0a80caf79c 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -193,7 +193,7 @@ all-obj-$(CONFIG_SOFTMMU) +=3D $(io-obj-y)
-=20
- $(QEMU_PROG_BUILD): config-devices.mak
-=20
--COMMON_LDADDS =3D ../libqemuutil.a ../libqemustub.a
-+COMMON_LDADDS =3D ../libqemuutil.a
-=20
- # build either PROG or PROGW
- $(QEMU_PROG_BUILD): $(all-obj-y) $(COMMON_LDADDS)
-diff --git a/docs/devel/build-system.txt b/docs/devel/build-system.txt
-index 2af1e668c5..0d54294cb1 100644
---- a/docs/devel/build-system.txt
-+++ b/docs/devel/build-system.txt
-@@ -232,15 +232,13 @@ The utility code that is used by all binaries is buil=
-t into a
- static archive called libqemuutil.a, which is then linked to all the
- binaries. In order to provide hooks that are only needed by some of the
- binaries, code in libqemuutil.a may depend on other functions that are
--not fully implemented by all QEMU binaries. To deal with this there is a
--second library called libqemustub.a which provides dummy stubs for all
--these functions. These will get lazy linked into the binary if the real
--implementation is not present. In this way, the libqemustub.a static
--library can be thought of as a portable implementation of the weak
--symbols concept. All binaries should link to both libqemuutil.a and
--libqemustub.a. e.g.
--
-- qemu-img$(EXESUF): qemu-img.o ..snip.. libqemuutil.a libqemustub.a
-+not fully implemented by all QEMU binaries. Dummy stubs for all  these
-+functions are also provided by this library, and will get lazy linked
-+into the binary if the real implementation is not present. In this way,
-+this static library can be thought of as a portable implementation of
-+the weak symbols concept. All binaries should link to libqemuutil.a. e.g.
-+
-+ qemu-img$(EXESUF): qemu-img.o ..snip.. libqemuutil.a
-=20
-=20
- Windows platform portability
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index fae5715e9c..3d6726e95c 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -561,7 +561,7 @@ QEMU_CFLAGS +=3D -I$(SRC_PATH)/tests
-=20
-=20
- # Deps that are common to various different sets of tests below
--test-util-obj-y =3D libqemuutil.a libqemustub.a
-+test-util-obj-y =3D libqemuutil.a
- test-qom-obj-y =3D $(qom-obj-y) $(test-util-obj-y)
- test-qapi-obj-y =3D tests/test-qapi-visit.o tests/test-qapi-types.o \
- 	tests/test-qapi-event.o tests/test-qmp-introspect.o \
-@@ -617,8 +617,8 @@ tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
- 	$(test-io-obj-y)
- tests/test-timed-average$(EXESUF): tests/test-timed-average.o $(test-util-=
-obj-y)
- tests/test-base64$(EXESUF): tests/test-base64.o \
--	libqemuutil.a libqemustub.a
--tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o =
-hw/core/ptimer.o libqemustub.a
-+	libqemuutil.a
-+tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o =
-hw/core/ptimer.o $(test-util-obj-y)
-=20
- tests/test-logging$(EXESUF): tests/test-logging.o $(test-util-obj-y)
-=20
---=20
-2.11.0
+
+
+--iVnRK52EjSv8F66TTJwmnqoEGJS6hHnGC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJZtu1yAAoJEEuzCOmwLnZsEWkP+gNA/9sasN51UEVeVd/KkEYM
+F7eDI4iA/v5i2rLepFCIs02huwE4xxttlZ+bOV1VOgjJT+MA75kDA62qy0nHrtEk
+bUIM1XmODbS65E6Z4HwvYE6OTbiXx9YjUzrygUfG8e71szIRN75i/q3igqmbg9wH
+/Sql+PdPfie4/VTyZAb392bZrWrrMxFjdlfuCmLIQS5TE1W5UmDBsyo1QWrEar4C
+urgMbksWD64rlsOJ6YX1kogA22HuhrC7g6XrwJAOvwac6+p2t91vOVU9n0uj76OK
+P6zUrgU1PeLuazJSckvpxEeqBMxlYtv9HlBrXeqO+UXgijP4BSnU91zT1gFGgWK3
+iel13Vb1/jeMDnCxEOeV0b3RSVz9CghkDUd+35xNMJ5JaRIm4p9QVY3wWJifYezV
+vsAKm40i4jEZe40FLUuPaIzBKORYMImPC7JOE9laN858wO887UMVssbN6AeyX20P
+YVoUlPBJijS4cAWtjQlJJs67g2/FylXisx87KSv6dnamxfb6Nz8xjBMmksdhJ7A1
+hwToem49i3U9V3MqF3XSmKwVcdZxrVC1q5B7CP3t4vof6GritJ4ooflCIKZVijoe
+8yL3jMH5PDEh1X5kItnGsYXnZl9Znp52bG47bFceBgKNsqKxL4Ln3Vz64MrhdHK6
+GbvxtCB3ApRNsL3cZdla
+=I9fU
+-----END PGP SIGNATURE-----
+
+--iVnRK52EjSv8F66TTJwmnqoEGJS6hHnGC--
