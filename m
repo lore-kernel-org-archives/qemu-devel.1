@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drOcX-0005Zs-EX
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:19:29 -0400
+	(envelope-from <cohuck@redhat.com>) id 1drOjV-0000dz-8r
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:26:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drOcW-0001qO-J8
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:19:25 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <150496954641.9654.1998704077006846521.stgit@bahia>
-	<150496957019.9654.12729412560336508445.stgit@bahia>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2482b70c-66a4-59a2-95ae-ea228ce23324@amsat.org>
-Date: Sun, 10 Sep 2017 13:57:10 -0300
-MIME-Version: 1.0
-In-Reply-To: <150496957019.9654.12729412560336508445.stgit@bahia>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/5] spapr_pci: drop useless check in
- spapr_populate_pci_child_dt()
+	(envelope-from <cohuck@redhat.com>) id 1drOjS-0007D5-4T
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:26:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1drOjR-0007C2-U4
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:26:34 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id C7F8DC073D47
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 13:26:32 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Mon, 11 Sep 2017 15:26:27 +0200
+Message-Id: <20170911132627.9505-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH] dump: do not dump non-existent guest memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,38 +27,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, berrange@redhat.com, peterx@redhat.com, dgilbert@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-On 09/09/2017 12:06 PM, Greg Kurz wrote:
-> spapr_phb_get_loc_code() either returns a non-null pointer, either
-> aborts if g_strdup_printf() failed to allocate memory.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+It does not really make sense to dump memory that is not there.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Moreover, that fixes a segmentation fault when calling dump-guest-memory
+with no filter for a machine with no memory defined.
 
-> ---
->   hw/ppc/spapr_pci.c |    6 +-----
->   1 file changed, 1 insertion(+), 5 deletions(-)
-> 
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index ef982f2ef370..cd8efb181223 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1282,12 +1282,8 @@ static int spapr_populate_pci_child_dt(PCIDevice *dev, void *fdt, int offset,
->                               pci_find_device_name((ccode >> 16) & 0xff,
->                                                    (ccode >> 8) & 0xff,
->                                                    ccode & 0xff)));
-> -    buf = spapr_phb_get_loc_code(sphb, dev);
-> -    if (!buf) {
-> -        error_report("Failed setting the ibm,loc-code");
-> -        return -1;
-> -    }
->   
-> +    buf = spapr_phb_get_loc_code(sphb, dev);
->       err = fdt_setprop_string(fdt, offset, "ibm,loc-code", buf);
->       g_free(buf);
->       if (err < 0) {
-> 
-> 
+New behaviour is:
+
+(qemu) dump-guest-memory /dev/null
+dump: no guest memory to dump
+(qemu) dump-guest-memory /dev/null 0 4096
+dump: no guest memory to dump
+
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+
+Another unmaintained file. Joy. cc:ing some more-or-less random folks.
+
+---
+ dump.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/dump.c b/dump.c
+index a79773d0f7..d2093e141b 100644
+--- a/dump.c
++++ b/dump.c
+@@ -1536,6 +1536,12 @@ static void dump_init(DumpState *s, int fd, bool has_format,
+     fprintf(stderr, "DUMP: total memory to dump: %lu\n", s->total_size);
+ #endif
+ 
++    /* it does not make sense to dump non-existent memory */
++    if (!s->total_size) {
++        error_setg(errp, "dump: no guest memory to dump");
++        goto cleanup;
++    }
++
+     s->start = get_start_block(s);
+     if (s->start == -1) {
+         error_setg(errp, QERR_INVALID_PARAMETER, "begin");
+-- 
+2.13.5
