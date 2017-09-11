@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49434)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49481)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1drQYJ-0004wL-Bt
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:23:15 -0400
+	(envelope-from <david@redhat.com>) id 1drQYQ-00055Q-W7
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:23:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1drQYD-0002Be-8G
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:23:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43374)
+	(envelope-from <david@redhat.com>) id 1drQYM-0002YB-G6
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:23:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45410)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1drQYD-00029X-0H
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:23:05 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1drQYM-0002Vj-6n
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:23:14 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 11 Sep 2017 17:21:44 +0200
-Message-Id: <20170911152150.12535-16-david@redhat.com>
+Date: Mon, 11 Sep 2017 17:21:47 +0200
+Message-Id: <20170911152150.12535-19-david@redhat.com>
 In-Reply-To: <20170911152150.12535-1-david@redhat.com>
 References: <20170911152150.12535-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 15/21] s390x: print CPU definitions in
- sorted order
+Subject: [Qemu-devel] [PATCH v4 18/21] s390x: implement
+ query-hotpluggable-cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,99 +27,240 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Other architectures provide nicely sorted lists, let's do it similarly on
-s390x.
+CPU hotplug is only possible on a per core basis on s390x.
 
-While at it, clean up the code we have to touch either way.
+As we now have ms->possible_cpus, we can get rid of the global variable
+cpu_states.
+
+While rewriting s390_cpu_addr2state() completely to be based on
+possible_cpus, move it to cpu.c, as it is independent of the virtio-ccw
+machine.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu_models.c | 56 ++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 41 insertions(+), 15 deletions(-)
+ hw/s390x/s390-virtio-ccw.c | 87 +++++++++++++++++++++++++++++-----------------
+ qapi-schema.json           | 16 +++++++++
+ target/s390x/cpu.c         | 17 +++++++++
+ target/s390x/cpu.h         |  5 +--
+ 4 files changed, 89 insertions(+), 36 deletions(-)
 
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 8e20e7637b..c295e641e6 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -270,16 +270,11 @@ const S390CPUDef *s390_find_cpu_def(uint16_t type, uint8_t gen, uint8_t ec_ga,
-     return last_compatible;
- }
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 120f82e339..0e10a4c73a 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -36,24 +36,12 @@
+ #include "qapi/qmp/qerror.h"
+ #include "hw/nmi.h"
  
--struct S390PrintCpuListInfo {
--    FILE *f;
--    fprintf_function print;
--};
+-static S390CPU **cpu_states;
 -
--static void print_cpu_model_list(ObjectClass *klass, void *opaque)
-+static void s390_print_cpu_model_list_entry(gpointer data, gpointer user_data)
+-S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+-{
+-    if (cpu_addr >= max_cpus) {
+-        return NULL;
+-    }
+-
+-    /* Fast lookup via CPU ID */
+-    return cpu_states[cpu_addr];
+-}
+-
+ /* #define S390_TCG_SMP_SUPPORT */
+ 
+ static void s390_init_cpus(MachineState *machine)
  {
--    struct S390PrintCpuListInfo *info = opaque;
--    S390CPUClass *scc = S390_CPU_CLASS(klass);
--    char *name = g_strdup(object_class_get_name(klass));
-+    CPUListState *s = user_data;
-+    const S390CPUClass *scc = S390_CPU_CLASS((ObjectClass *)data);
-+    char *name = g_strdup(object_class_get_name((ObjectClass *)data));
-     const char *details = "";
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
+     int i;
+-    gchar *name;
  
-     if (scc->is_static) {
-@@ -290,21 +285,52 @@ static void print_cpu_model_list(ObjectClass *klass, void *opaque)
+     if (machine->cpu_model == NULL) {
+         machine->cpu_model = s390_default_cpu_model_name();
+@@ -66,17 +54,8 @@ static void s390_init_cpus(MachineState *machine)
+     }
+ #endif
  
-     /* strip off the -s390-cpu */
-     g_strrstr(name, "-" TYPE_S390_CPU)[0] = 0;
--    (*info->print)(info->f, "s390 %-15s %-35s %s\n", name, scc->desc,
--                   details);
-+    (*s->cpu_fprintf)(s->file, "s390 %-15s %-35s %s\n", name, scc->desc,
-+                      details);
-     g_free(name);
+-    cpu_states = g_new0(S390CPU *, max_cpus);
+-
+-    for (i = 0; i < max_cpus; i++) {
+-        name = g_strdup_printf("cpu[%i]", i);
+-        object_property_add_link(OBJECT(machine), name, TYPE_S390_CPU,
+-                                 (Object **) &cpu_states[i],
+-                                 object_property_allow_set_link,
+-                                 OBJ_PROP_LINK_UNREF_ON_RELEASE,
+-                                 &error_abort);
+-        g_free(name);
+-    }
++    /* initialize possible_cpus */
++    mc->possible_cpu_arch_ids(machine);
+ 
+     for (i = 0; i < smp_cpus; i++) {
+         s390x_new_cpu(machine->cpu_model, i, &error_fatal);
+@@ -307,17 +286,14 @@ static void ccw_init(MachineState *machine)
+     register_savevm_live(NULL, "todclock", 0, 1, &savevm_gtod, NULL);
  }
  
-+static gint s390_cpu_list_compare(gconstpointer a, gconstpointer b)
+-static void s390_cpu_plug(HotplugHandler *hotplug_dev,
+-                        DeviceState *dev, Error **errp)
++static void s390_cpu_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
++                          Error **errp)
+ {
+-    gchar *name;
++    MachineState *ms = MACHINE(hotplug_dev);
+     S390CPU *cpu = S390_CPU(dev);
+-    CPUState *cs = CPU(dev);
+ 
+-    name = g_strdup_printf("cpu[%i]", cpu->env.core_id);
+-    object_property_set_link(OBJECT(hotplug_dev), OBJECT(cs), name,
+-                             errp);
+-    g_free(name);
++    g_assert(!ms->possible_cpus->cpus[cpu->env.core_id].cpu);
++    ms->possible_cpus->cpus[cpu->env.core_id].cpu = OBJECT(dev);
+ }
+ 
+ static void s390_machine_reset(void)
+@@ -350,6 +326,50 @@ static void s390_machine_device_unplug_request(HotplugHandler *hotplug_dev,
+     }
+ }
+ 
++static CPUArchId *s390_find_cpu_slot(MachineState *ms, uint32_t core_id,
++                                     int *idx)
 +{
-+    const S390CPUClass *cc_a = S390_CPU_CLASS((ObjectClass *)a);
-+    const S390CPUClass *cc_b = S390_CPU_CLASS((ObjectClass *)b);
-+    const char *name_a = object_class_get_name((ObjectClass *)a);
-+    const char *name_b = object_class_get_name((ObjectClass *)b);
-+
-+    /* move qemu and host to the top of the list, qemu first, host second */
-+    if (name_a[0] == 'q') {
-+        return -1;
-+    } else if (name_b[0] == 'q') {
-+        return 1;
-+    } else if (name_a[0] == 'h') {
-+        return -1;
-+    } else if (name_b[0] == 'h') {
-+        return 1;
++    if (core_id >= ms->possible_cpus->len) {
++        return NULL;
 +    }
-+
-+    /* keep the same order we have in our table (sorted by release date) */
-+    if (cc_a->cpu_def != cc_b->cpu_def) {
-+        return cc_a->cpu_def - cc_b->cpu_def;
++    /* core_id corresponds to the index */
++    if (idx) {
++        *idx = core_id;
 +    }
-+
-+    /* exact same definition - list base model first */
-+    return cc_a->is_static ? -1 : 1;
++    return &ms->possible_cpus->cpus[core_id];
 +}
 +
- void s390_cpu_list(FILE *f, fprintf_function print)
++static CpuInstanceProperties s390_cpu_index_to_props(MachineState *machine,
++                                                     unsigned cpu_index)
++{
++    CPUArchId *slot = s390_find_cpu_slot(machine, cpu_index, NULL);
++
++    assert(slot);
++    return slot->props;
++}
++
++static const CPUArchIdList *s390_possible_cpu_arch_ids(MachineState *ms)
++{
++    int i;
++
++    if (ms->possible_cpus) {
++        g_assert(ms->possible_cpus && ms->possible_cpus->len == max_cpus);
++        return ms->possible_cpus;
++    }
++
++    ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
++                                  sizeof(CPUArchId) * max_cpus);
++    ms->possible_cpus->len = max_cpus;
++    for (i = 0; i < ms->possible_cpus->len; i++) {
++        ms->possible_cpus->cpus[i].vcpus_count = 1;
++        ms->possible_cpus->cpus[i].arch_id = i;
++        ms->possible_cpus->cpus[i].props.has_core_id = true;
++        ms->possible_cpus->cpus[i].props.core_id = i;
++    }
++
++    return ms->possible_cpus;
++}
++
+ static HotplugHandler *s390_get_hotplug_handler(MachineState *machine,
+                                                 DeviceState *dev)
  {
--    struct S390PrintCpuListInfo info = {
--        .f = f,
--        .print = print,
-+    CPUListState s = {
-+        .file = f,
-+        .cpu_fprintf = print,
-     };
-     S390FeatGroup group;
-     S390Feat feat;
-+    GSList *list;
+@@ -397,7 +417,10 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+     mc->no_sdcard = 1;
+     mc->use_sclp = 1;
+     mc->max_cpus = 248;
++    mc->has_hotpluggable_cpus = true;
+     mc->get_hotplug_handler = s390_get_hotplug_handler;
++    mc->cpu_index_to_instance_props = s390_cpu_index_to_props;
++    mc->possible_cpu_arch_ids = s390_possible_cpu_arch_ids;
+     hc->plug = s390_machine_device_plug;
+     hc->unplug_request = s390_machine_device_unplug_request;
+     nc->nmi_monitor_handler = s390_nmi;
+diff --git a/qapi-schema.json b/qapi-schema.json
+index f3af2cb851..79e9f85404 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -3121,6 +3121,22 @@
+ #      }
+ #    ]}
+ #
++# For s390x-virtio-ccw machine type started with -smp 1,maxcpus=2 -cpu qemu
++# (Since: 2.11):
++#
++# -> { "execute": "query-hotpluggable-cpus" }
++# <- {"return": [
++#      {
++#         "type": "qemu-s390-cpu", "vcpus-count": 1,
++#         "props": { "core-id": 1 }
++#      },
++#      {
++#         "qom-path": "/machine/unattached/device[0]",
++#         "type": "qemu-s390-cpu", "vcpus-count": 1,
++#         "props": { "core-id": 0 }
++#      }
++#    ]}
++#
+ ##
+ { 'command': 'query-hotpluggable-cpus', 'returns': ['HotpluggableCPU'] }
  
--    object_class_foreach(print_cpu_model_list, TYPE_S390_CPU, false, &info);
-+    list = object_class_get_list(TYPE_S390_CPU, false);
-+    list = g_slist_sort(list, s390_cpu_list_compare);
-+    g_slist_foreach(list, s390_print_cpu_model_list_entry, &s);
-+    g_slist_free(list);
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 5724dffb88..7f174f90a4 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -38,6 +38,7 @@
+ #include "exec/exec-all.h"
+ #include "hw/qdev-properties.h"
+ #ifndef CONFIG_USER_ONLY
++#include "hw/boards.h"
+ #include "hw/hw.h"
+ #include "sysemu/arch_init.h"
+ #include "sysemu/sysemu.h"
+@@ -446,6 +447,22 @@ void s390_enable_css_support(S390CPU *cpu)
+         kvm_s390_enable_css_support(cpu);
+     }
+ }
++
++S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
++{
++    static MachineState *ms;
++
++    if (!ms) {
++        ms = MACHINE(qdev_get_machine());
++        g_assert(ms->possible_cpus);
++    }
++
++    /* CPU address corresponds to the core_id and the index */
++    if (cpu_addr >= ms->possible_cpus->len) {
++        return NULL;
++    }
++    return S390_CPU(ms->possible_cpus->cpus[cpu_addr].cpu);
++}
+ #endif
  
-     (*print)(f, "\nRecognized feature flags:\n");
-     for (feat = 0; feat < S390_FEAT_MAX; feat++) {
+ static gchar *s390_gdb_arch_name(CPUState *cs)
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 1c8456fa57..5810079f48 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -671,6 +671,7 @@ int s390_cpu_restart(S390CPU *cpu);
+ void s390_enable_css_support(S390CPU *cpu);
+ int s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch_id,
+                                 int vq, bool assign);
++S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
+ #ifndef CONFIG_USER_ONLY
+ unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu);
+ #else
+@@ -718,8 +719,4 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
+ #define s390_cpu_virt_mem_check_write(cpu, laddr, ar, len)   \
+         s390_cpu_virt_mem_rw(cpu, laddr, ar, NULL, len, true)
+ 
+-
+-/* outside of target/s390x/ */
+-S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
+-
+ #endif
 -- 
 2.13.5
