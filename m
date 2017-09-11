@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35308)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35382)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1drSHl-0001JE-CQ
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:14:18 -0400
+	(envelope-from <clg@kaod.org>) id 1drSHs-0001QQ-Uc
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:14:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1drSHh-0004Qk-8d
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:14:13 -0400
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:43955)
+	(envelope-from <clg@kaod.org>) id 1drSHo-0004U8-Dx
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:14:20 -0400
+Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:59734)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1drSHh-0004QQ-2A
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:14:09 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1drSHo-0004Ti-88
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:14:16 -0400
 Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 1C75BAB215
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 19:14:08 +0200 (CEST)
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 507E3AB262
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 19:14:15 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon, 11 Sep 2017 19:12:25 +0200
-Message-Id: <20170911171235.29331-12-clg@kaod.org>
+Date: Mon, 11 Sep 2017 19:12:26 +0200
+Message-Id: <20170911171235.29331-13-clg@kaod.org>
 In-Reply-To: <20170911171235.29331-1-clg@kaod.org>
 References: <20170911171235.29331-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH v2 11/21] ppc/xive: push the EQ data in OS
- event queue
+Subject: [Qemu-devel] [RFC PATCH v2 12/21] ppc/xive: notify the CPU when
+ interrupt priority is more privileged
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,109 +33,125 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-If a triggered event is let through, the Event Queue data defined in
-the associated IVE is pushed in the in-memory event queue. The latter
-is a circular buffer provided by the OS using the H_INT_SET_QUEUE_CONFIG
-hcall, one per target and priority couple. It is composed of Event
-Queue entries which are 4 bytes long, the first bit being a
-'generation' bit and the 31 following bits the EQ Data field.
+The Pending Interrupt Priority Register (PIPR) contains the priority
+of the most favored pending notification. It is calculated from the
+Interrupt Pending Buffer (IPB) which indicates a pending interrupt at
+the priority corresponding to the bit number.
 
-The EQ Data field provides a way to set an invariant logical event
-source number for an IRQ. It is set with the H_INT_SET_SOURCE_CONFIG
-hcall.
+If the PIPR is more favored (1) than the Current Processor Priority
+Register (CPPR), the CPU interrupt line can be raised and the EO bit
+of the Notification Source Register is updated to notify the presence
+of an exception for the O/S. The check needs to be done whenever the
+PIPR or the CPPR is changed.
 
-Notification of the CPU will be done in the following patch.
+(1) numerically less than
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/intc/spapr_xive.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 1 file changed, 67 insertions(+)
+ hw/intc/spapr_xive.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++=
+++++
+ 1 file changed, 50 insertions(+)
 
 diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-index 557a7e2535b5..4bc61cfda67a 100644
+index 4bc61cfda67a..e5d4b723b7e0 100644
 --- a/hw/intc/spapr_xive.c
 +++ b/hw/intc/spapr_xive.c
-@@ -175,9 +175,76 @@ static const MemoryRegionOps spapr_xive_tm_ops =3D {
-     },
- };
+@@ -28,11 +28,39 @@
+ #include "xive-internal.h"
 =20
-+static void spapr_xive_eq_push(XiveEQ *eq, uint32_t data)
+=20
++/* Convert a priority number to an Interrupt Pending Buffer (IPB)
++ * register, which indicates a pending interrupt at the priority
++ * corresponding to the bit number
++ */
++static uint8_t priority_to_ipb(uint8_t priority)
 +{
-+    uint64_t qaddr_base =3D (((uint64_t)(eq->w2 & 0x0fffffff)) << 32) | =
-eq->w3;
-+    uint32_t qsize =3D GETFIELD(EQ_W0_QSIZE, eq->w0);
-+    uint32_t qindex =3D GETFIELD(EQ_W1_PAGE_OFF, eq->w1);
-+    uint32_t qgen =3D GETFIELD(EQ_W1_GENERATION, eq->w1);
-+
-+    uint64_t qaddr =3D qaddr_base + (qindex << 2);
-+    uint32_t qdata =3D cpu_to_be32((qgen << 31) | (data & 0x7fffffff));
-+    uint32_t qentries =3D 1 << (qsize + 10);
-+
-+    if (dma_memory_write(&address_space_memory, qaddr, &qdata, sizeof(qd=
-ata))) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to write EQ data @0x%=
-"
-+                      HWADDR_PRIx "\n", __func__, qaddr);
-+        return;
-+    }
-+
-+    qindex =3D (qindex + 1) % qentries;
-+    if (qindex =3D=3D 0) {
-+        qgen ^=3D 1;
-+        eq->w1 =3D SETFIELD(EQ_W1_GENERATION, eq->w1, qgen);
-+    }
-+    eq->w1 =3D SETFIELD(EQ_W1_PAGE_OFF, eq->w1, qindex);
++    return priority > XIVE_PRIORITY_MAX ? 0 :  1 << (7 - priority);
 +}
 +
- static void spapr_xive_irq(sPAPRXive *xive, int srcno)
++/* Convert an Interrupt Pending Buffer (IPB) register to a Pending
++ * Interrupt Priority Register (PIPR), which contains the priority of
++ * the most favored pending notification.
++ *
++ * TODO: PIPR can never be OxFF. Needs a fix.
++ */
++static uint8_t ipb_to_pipr(uint8_t ibp)
++{
++    return ibp ? clz32((uint32_t)ibp << 24) : 0xff;
++}
++
+ static uint64_t spapr_xive_icp_accept(ICPState *icp)
  {
-+    XiveIVE *ive;
-+    XiveEQ *eq;
-+    uint32_t eq_idx;
-+    uint32_t priority;
-+
-+    ive =3D spapr_xive_get_ive(xive, srcno);
-+    if (!ive || !(ive->w & IVE_VALID)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %d\n", srcno)=
-;
-+        return;
-+    }
-+
-+    if (ive->w & IVE_MASKED) {
-+        return;
-+    }
-+
-+    /* Find our XiveEQ */
-+    eq_idx =3D GETFIELD(IVE_EQ_INDEX, ive->w);
-+    eq =3D spapr_xive_get_eq(xive, eq_idx);
-+    if (!eq) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No EQ for LISN %d\n", srcn=
-o);
-+        return;
-+    }
-+
-+    if (eq->w0 & EQ_W0_ENQUEUE) {
-+        spapr_xive_eq_push(eq, GETFIELD(IVE_EQ_DATA, ive->w));
-+    } else {
-+        qemu_log_mask(LOG_UNIMP, "XIVE: !ENQUEUE not implemented\n");
-+    }
-+
-+    if (!(eq->w0 & EQ_W0_UCOND_NOTIFY)) {
-+        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n"=
-);
-+    }
-+
-+    if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) =3D=3D 0) {
-+        priority =3D GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
+     return 0;
+ }
 =20
-+        /* The EQ is masked. Can this happen ?  */
-+        if (priority =3D=3D 0xff) {
-+            return;
-+        }
-+    } else {
-+        qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n");
++static void spapr_xive_icp_notify(ICPState *icp)
++{
++    if (icp->tima_os[TM_PIPR] < icp->tima_os[TM_CPPR]) {
++        icp->tima_os[TM_NSR] |=3D TM_QW1_NSR_EO;
++        qemu_irq_raise(ICP(icp)->output);
 +    }
++}
++
+ static void spapr_xive_icp_set_cppr(ICPState *icp, uint8_t cppr)
+ {
+     if (cppr > XIVE_PRIORITY_MAX) {
+@@ -40,6 +68,10 @@ static void spapr_xive_icp_set_cppr(ICPState *icp, uin=
+t8_t cppr)
+     }
+=20
+     icp->tima_os[TM_CPPR] =3D cppr;
++
++    /* CPPR has changed, inform the ICP which might raise an
++     * exception */
++    spapr_xive_icp_notify(icp);
+ }
+=20
+ /*
+@@ -206,6 +238,8 @@ static void spapr_xive_irq(sPAPRXive *xive, int srcno=
+)
+     XiveEQ *eq;
+     uint32_t eq_idx;
+     uint32_t priority;
++    uint32_t target;
++    ICPState *icp;
+=20
+     ive =3D spapr_xive_get_ive(xive, srcno);
+     if (!ive || !(ive->w & IVE_VALID)) {
+@@ -235,6 +269,13 @@ static void spapr_xive_irq(sPAPRXive *xive, int srcn=
+o)
+         qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n"=
+);
+     }
+=20
++    target =3D GETFIELD(EQ_W6_NVT_INDEX, eq->w6);
++    icp =3D xics_icp_get(xive->ics->xics, target);
++    if (!icp) {
++        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No ICP for target %d\n", t=
+arget);
++        return;
++    }
++
+     if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) =3D=3D 0) {
+         priority =3D GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
+=20
+@@ -242,9 +283,18 @@ static void spapr_xive_irq(sPAPRXive *xive, int srcn=
+o)
+         if (priority =3D=3D 0xff) {
+             return;
+         }
++
++        /* Update the IPB (Interrupt Pending Buffer) with the priority
++         * of the new notification and inform the ICP, which will
++         * decide to raise the exception, or not, depending the CPPR.
++         */
++        icp->tima_os[TM_IPB] |=3D priority_to_ipb(priority);
++        icp->tima_os[TM_PIPR] =3D ipb_to_pipr(icp->tima_os[TM_IPB]);
+     } else {
+         qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n");
+     }
++
++    spapr_xive_icp_notify(icp);
  }
 =20
  /*
