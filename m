@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56987)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1drPrw-0001Uy-Ij
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:39:25 -0400
+	(envelope-from <stefanha@redhat.com>) id 1drPwn-0003bB-MY
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:44:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1drPrv-0007Ww-Mb
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:39:24 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:45634)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1drPrv-0007WA-Fm
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:39:23 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id f199so41494434wme.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 07:39:23 -0700 (PDT)
+	(envelope-from <stefanha@redhat.com>) id 1drPwj-0002Qh-P7
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:44:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53704)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1drPwj-0002Pe-J5
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:44:21 -0400
+Date: Mon, 11 Sep 2017 15:44:14 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170911144414.GB26791@stefanha-x1.localdomain>
+References: <CANr0WEe-r-eXMt2sZuVSVGs5Zk1h+_BhmW30sCptzi2oeZUduQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170911142056.15643-3-lvivier@redhat.com>
-References: <20170911142056.15643-1-lvivier@redhat.com>
-	<20170911142056.15643-3-lvivier@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 11 Sep 2017 15:39:01 +0100
-Message-ID: <CAFEAcA_G8mEzB0Mox0TTz578LQKXgvhNHeZ8Bk7OwC4NbqiXPg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 2/3] hmp: fix "dump-quest-memory"
- segfault (arm)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANr0WEe-r-eXMt2sZuVSVGs5Zk1h+_BhmW30sCptzi2oeZUduQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] irqfd for QEMU NVMe
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +26,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P . Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>
+To: Huaicheng Li <lhcwhu@gmail.com>
+Cc: qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 11 September 2017 at 15:20, Laurent Vivier <lvivier@redhat.com> wrote:
-> Commit fd5d23babf (hmp: fix "dump-quest-memory" segfault)
-> fixes the problem for i386, do the same for arm.
->
-> Running QEMU with
->     qemu-system-aarch64 -M none -nographic -m 256
-> and executing
->     dump-guest-memory /dev/null 0 8192
-> results in segfault
->
-> Fix by checking if we have CPU.
->
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+On Fri, Sep 08, 2017 at 04:17:32PM -0500, Huaicheng Li wrote:
+> I'm writing to ask if it's possible to use irqfd mechanism in QEMU's NVMe
+> virtual controller implementation. My search results show that back in
+> 2015, there is a discussion on improving QEMU NVMe performance by utilizing
+> eventfd for guest-to-host notification, thus i guess irqfd should also work
+> ? If so, could you briefly describe how to do that and how much can we save
+> for the host-to-guest notification path by using irqfd?
 
-It seems a little arbitrary to assume that if there's no
-CPU what you wanted was a 32-bit little-endian dump.
+You'd could benchmark it to find out but I have a vague memory that the
+ioctl() is actually faster for injecting interrupts than irqfd.
 
-Why do we have a machine without a CPU anyway ?
-
-thanks
--- PMM
+Stefan
