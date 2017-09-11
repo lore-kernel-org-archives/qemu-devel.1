@@ -1,27 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drPI3-0001ws-H1
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:02:25 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1drPKk-0003EE-Pm
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:05:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drPHz-0006ec-Fp
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:02:19 -0400
-Received: from 16.mo1.mail-out.ovh.net ([178.33.104.224]:57355)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drPHz-0006cZ-9n
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:02:15 -0400
-Received: from player169.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 2B738931B8
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:02:09 +0200 (CEST)
-Date: Mon, 11 Sep 2017 16:02:02 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170911160202.56e47324@bahia.lan>
-In-Reply-To: <20170911132627.9505-1-cohuck@redhat.com>
-References: <20170911132627.9505-1-cohuck@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1drPKf-0001gN-76
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:05:06 -0400
+Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:37812)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1drPKf-0001fd-1t
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:05:01 -0400
+Received: by mail-qk0-x242.google.com with SMTP id r66so5308260qke.4
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 07:05:00 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1499765477-10541-1-git-send-email-thuth@redhat.com>
+	<20170711185511.3033-1-f4bug@amsat.org>
+	<db1350c0-192f-ab32-250a-2fd234ebe68e@redhat.com>
+	<4a1e2715-7811-c4ed-d76b-d49471eabafd@redhat.com>
+	<2d25cf14-be6c-4cdd-b324-4d203858e499@redhat.com>
+	<ee46c331-56ff-0762-d4e5-02bb04eba6b5@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <559262bf-5223-d1e9-6a99-867057b8a2c7@amsat.org>
+Date: Mon, 11 Sep 2017 11:04:55 -0300
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/_d/o3WA_pvzo6hzKO94Q4eP";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] dump: do not dump non-existent guest memory
+In-Reply-To: <ee46c331-56ff-0762-d4e5-02bb04eba6b5@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] tcg: move atomic_template.h to accel/tcg/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +39,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
 
---Sig_/_d/o3WA_pvzo6hzKO94Q4eP
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+>>>> On 11.07.2017 20:55, Philippe Mathieu-Daudé wrote:
+>>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>>> ---
+>>>>> same as Thomas previous patch. this file had no entry in MAINTAINERS.
+>>>>>
+>>>>>   atomic_template.h => accel/tcg/atomic_template.h | 0
+>>>>>   1 file changed, 0 insertions(+), 0 deletions(-)
+>>>>>   rename atomic_template.h => accel/tcg/atomic_template.h (100%)
+>>>>>
+>>>>> diff --git a/atomic_template.h b/accel/tcg/atomic_template.h
+>>>>> similarity index 100%
+>>>>> rename from atomic_template.h
+>>>>> rename to accel/tcg/atomic_template.h
+>>>>
+>>>> It's also used by a file in tcg/, but I've checked, and yes, the code
+>>>> still compiles fine if the header gets moved to accel/tcg/.
+>>>>
+>>>> Tested-by: Thomas Huth <thuth@redhat.com>
+>>>>
+>>>
+>>> That part of tcg/tcg-runtime.c probably should be moved to user-exec.c,
+>>> and user-exec.c should in turn be in accel/tcg.
+>>>
+>>> Since this is just code movement we can do it after soft freeze.
+>>> Philippe, can you send v2?
+>>
+>> Ping?
+>>
+>> Looks like the atomic_template.h is still in the main directory ...
+> 
+> Still waiting for v2...
 
-On Mon, 11 Sep 2017 15:26:27 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> It does not really make sense to dump memory that is not there.
->=20
-> Moreover, that fixes a segmentation fault when calling dump-guest-memory
-> with no filter for a machine with no memory defined.
->=20
-> New behaviour is:
->=20
-> (qemu) dump-guest-memory /dev/null
-> dump: no guest memory to dump
-> (qemu) dump-guest-memory /dev/null 0 4096
-> dump: no guest memory to dump
->=20
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
-> ---
->=20
-> Another unmaintained file. Joy. cc:ing some more-or-less random folks.
->=20
-> ---
->  dump.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->=20
-> diff --git a/dump.c b/dump.c
-> index a79773d0f7..d2093e141b 100644
-> --- a/dump.c
-> +++ b/dump.c
-> @@ -1536,6 +1536,12 @@ static void dump_init(DumpState *s, int fd, bool h=
-as_format,
->      fprintf(stderr, "DUMP: total memory to dump: %lu\n", s->total_size);
->  #endif
-> =20
-> +    /* it does not make sense to dump non-existent memory */
-> +    if (!s->total_size) {
-> +        error_setg(errp, "dump: no guest memory to dump");
-> +        goto cleanup;
-> +    }
-> +
->      s->start =3D get_start_block(s);
->      if (s->start =3D=3D -1) {
->          error_setg(errp, QERR_INVALID_PARAMETER, "begin");
-
-
---Sig_/_d/o3WA_pvzo6hzKO94Q4eP
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbaXWgAKCRAC/DrrAQHb
-wnuUAJ90pNOHBC/b/tyBw344AtjgGfHKQwCfakuGJierQ1kx8+rys3gai2scT9Y=
-=xYe+
------END PGP SIGNATURE-----
-
---Sig_/_d/o3WA_pvzo6hzKO94Q4eP--
+I chat with Thomas last night about it, with 2.10 freeze I totally 
+forgot about this, sorry! I'll respin v2 during the day.
