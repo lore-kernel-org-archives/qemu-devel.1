@@ -1,35 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35433)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drVuc-0005N2-MW
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:06:35 -0400
+	(envelope-from <groug@kaod.org>) id 1drVwM-0006OK-G8
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:08:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drVuX-0006IP-Ng
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:06:34 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34038)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drVuX-0006Hm-Ig
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:06:29 -0400
-Received: by mail-qt0-x241.google.com with SMTP id q8so6302360qtb.1
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 14:06:29 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170911022839.23231-1-f4bug@amsat.org>
-	<1c72c0c6-bd29-5228-d4ad-b26b11afa712@linaro.org>
-	<CAFEAcA9+iDKf7UmQ2tevR9KQb_F2fJoBY03zrMMwM7ypFUdeAw@mail.gmail.com>
-	<dd244160-8b53-22bc-cf97-9948fb34f0f6@weilnetz.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <fe1fc600-ee0c-88a9-b286-2fe957d78079@amsat.org>
-Date: Mon, 11 Sep 2017 18:06:25 -0300
+	(envelope-from <groug@kaod.org>) id 1drVwI-0007n6-GD
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:08:22 -0400
+Received: from 6.mo1.mail-out.ovh.net ([46.105.43.205]:45912)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drVwI-0007mX-9t
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:08:18 -0400
+Received: from player169.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id C7FE0931A5
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 23:08:16 +0200 (CEST)
+Date: Mon, 11 Sep 2017 23:08:11 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170911230811.7215103f@bahia.lan>
+In-Reply-To: <150516317201.28067.2144053652052053337.stgit@bahia.lan>
+References: <150516317201.28067.2144053652052053337.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <dd244160-8b53-22bc-cf97-9948fb34f0f6@weilnetz.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/tci: do not use ldst label (never
- implemented)
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/ZqO7Of9KnZcC9SueTpMUtT+";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH] spapr_cpu_core: cleaning up
+ qdev_get_machine() calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,23 +31,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-Hi Stefan,
+--Sig_/ZqO7Of9KnZcC9SueTpMUtT+
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On 09/11/2017 05:26 PM, Stefan Weil wrote:> I had an assertion because 
-of a missing qemu-ga
-> when I‌ only had run "make check", so there is a
-> dependency (perhaps check: tools) missing.
-> 
-> Now "make check" is running fine with all targets
-> (at least until check-qtest-ppc64). Sorry, I have
-> to finish for today.
+On Mon, 11 Sep 2017 22:52:52 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-I had this patch in my travis-ci queue, here extracted alone:
-https://patchwork.kernel.org/patch/9948117/
+> This patch removes the qdev_get_machine() calls that are made
+> in spapr_cpu_core.c in situations where we can get an existing
+> pointer for the MachineState by either passing it as an argument
+> to the function or by using other already available pointers.
+>=20
+> Credits to Daniel Henrique Barboza for the idea and the changelog
+> text.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>  hw/ppc/spapr_cpu_core.c |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index dc9df0d393d1..e26279116736 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -73,8 +73,8 @@ void spapr_cpu_parse_features(sPAPRMachineState *spapr)
+> =20
+>  static void spapr_cpu_reset(void *opaque)
+>  {
+> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>      PowerPCCPU *cpu =3D opaque;
+> +    sPAPRMachineState *spapr =3D SPAPR_MACHINE(&cpu->vhyp);
+                                                ^
+                                              Ouch! :-\
 
-Regards,
+I'll send a v2.
 
-Phil.
+>      CPUState *cs =3D CPU(cpu);
+>      CPUPPCState *env =3D &cpu->env;
+> =20
+> @@ -162,10 +162,10 @@ static void spapr_cpu_core_unrealizefn(DeviceState =
+*dev, Error **errp)
+>      g_free(sc->threads);
+>  }
+> =20
+> -static void spapr_cpu_core_realize_child(Object *child, Error **errp)
+> +static void spapr_cpu_core_realize_child(Object *child,
+> +                                         sPAPRMachineState *spapr, Error=
+ **errp)
+>  {
+>      Error *local_err =3D NULL;
+> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>      CPUState *cs =3D CPU(child);
+>      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+>      Object *obj;
+> @@ -254,7 +254,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
+Error **errp)
+>      for (j =3D 0; j < cc->nr_threads; j++) {
+>          obj =3D sc->threads + j * size;
+> =20
+> -        spapr_cpu_core_realize_child(obj, &local_err);
+> +        spapr_cpu_core_realize_child(obj, spapr, &local_err);
+>          if (local_err) {
+>              goto err;
+>          }
+>=20
+>=20
+
+
+--Sig_/ZqO7Of9KnZcC9SueTpMUtT+
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbb7OwAKCRAC/DrrAQHb
+wsZbAJ9EFR95IxDLBlvA9/d/Ma//evvSCwCePbMzZALsjV0/vwf199eBsnBQ7Vs=
+=QnlS
+-----END PGP SIGNATURE-----
+
+--Sig_/ZqO7Of9KnZcC9SueTpMUtT+--
