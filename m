@@ -1,41 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58286)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drT8D-000185-T0
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:08:27 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1drT9m-0002fu-2p
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:10:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drT8A-0006dv-Kf
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:08:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51308
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1drT8A-0006dF-FC
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:08:22 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8BHxEWK088783
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 14:08:22 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cwuvsesbm-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 14:08:21 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 11 Sep 2017 19:08:20 +0100
-References: <20170905111645.18068-1-pasic@linux.vnet.ibm.com>
-	<20170905111645.18068-5-pasic@linux.vnet.ibm.com>
-	<20170906151028.545f208e.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 11 Sep 2017 20:08:16 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1drT9i-0007Ur-SH
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:10:02 -0400
+Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:36656)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1drT9i-0007UY-Kt
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:09:58 -0400
+Received: by mail-pg0-x22d.google.com with SMTP id i130so9315720pgc.3
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 11:09:58 -0700 (PDT)
+References: <20170817230114.3655-1-richard.henderson@linaro.org>
+	<20170817230114.3655-3-richard.henderson@linaro.org>
+	<877examon2.fsf@linaro.org>
+	<05363152-8a66-af3f-7c66-9627cbdc290b@linaro.org>
+	<8760cpbnul.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <f7ea7bc2-29f0-e941-838e-b915f1cc1a5a@linaro.org>
+Date: Mon, 11 Sep 2017 11:09:54 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170906151028.545f208e.cohuck@redhat.com>
+In-Reply-To: <8760cpbnul.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Message-Id: <b4351b30-455a-7247-30f2-9a2b2c21ae17@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 4/5] s390x/css: support ccw IDA
+Subject: Re: [Qemu-devel] [PATCH 2/8] target/arm: Use generic vector
+ infrastructure for aa64 add/sub/logic
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,240 +35,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-
-
-On 09/06/2017 03:10 PM, Cornelia Huck wrote:
-> On Tue,  5 Sep 2017 13:16:44 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On 09/11/2017 02:12 AM, Alex Bennée wrote:
 > 
->> Let's add indirect data addressing support for our virtual channel
->> subsystem. This implementation does no prefetching, but steps
->> trough the idal as we go.
+> Richard Henderson <richard.henderson@linaro.org> writes:
+> 
+>> On 09/07/2017 09:58 AM, Alex Bennée wrote:
+>>>> +    switch (size + 4 * is_u) {
+>>>
+>>> Hmm I find this switch a little too magical. I mean I can see that the
+>>> encoding abuses size for the final opcode when I look at the manual but
+>>> it reads badly.
+>>>
+>>>> +    case 0: /* AND */
+>>>> +        gvec_op = tcg_gen_gvec_and8;
+>>>> +        goto do_gvec;
+>>>> +    case 1: /* BIC */
+>>>> +        gvec_op = tcg_gen_gvec_andc8;
+>>>> +        goto do_gvec;
+>>>> +    case 2: /* ORR */
+>>>> +        gvec_op = tcg_gen_gvec_or8;
+>>>> +        goto do_gvec;
+>>>> +    case 3: /* ORN */
+>>>> +        gvec_op = tcg_gen_gvec_orc8;
+>>>> +        goto do_gvec;
+>>>> +    case 4: /* EOR */
+>>>> +        gvec_op = tcg_gen_gvec_xor8;
+>>>> +        goto do_gvec;
+>>>> +    do_gvec:
+>>>> +        gvec_op(vec_full_reg_offset(s, rd),
+>>>> +                vec_full_reg_offset(s, rn),
+>>>> +                vec_full_reg_offset(s, rm),
+>>>> +                is_q ? 16 : 8, vec_full_reg_size(s));
+>>>> +        return;
+>>>
+>>> No default case (although I guess we just fall through). What's wrong
+>>> with just having a !is_u test with gvec_op = tbl[size] and skipping all
+>>> the goto stuff?
 >>
->> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->> ---
->>  hw/s390x/css.c | 110 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->>  1 file changed, 109 insertions(+), 1 deletion(-)
->>
->> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
->> index c1bc9944e6..9d8f9fd7ea 100644
->> --- a/hw/s390x/css.c
->> +++ b/hw/s390x/css.c
->> @@ -819,6 +819,114 @@ incr:
->>      return 0;
->>  }
->>  
->> +/* retuns values between 1 and bs, where bs is a power of 2 */
+>> Because that would still leave EOR out in the woods.
+>> I do think this is the cleanest way to filter out these 5 operations.
 > 
-> 'bs' is 'block size'?
+> Is this going to look better if the other operations in this branch of
+> the decode are converted as well?
 
-Yes.
+It might do.  I'll have to think about those some more.
 
-> 
->> +static inline uint16_t ida_continuous_left(hwaddr cda, uint64_t bs)
->> +{
->> +    return bs - (cda & (bs - 1));
->> +}
->> +
->> +static inline uint64_t ccw_ida_block_size(uint8_t flags)
->> +{
->> +    return 1ULL << (((flags ^ CDS_F_C64) & (CDS_F_C64 | CDS_F_I2K)) ? 11 : 12);
->> +}
->> +
->> +static inline int ida_read_next_idaw(CcwDataStream *cds)
->> +{
->> +    union {uint64_t fmt2; uint32_t fmt1; } idaw;
->> +    bool is_fmt2 = cds->flags & CDS_F_C64;
->> +    int ret;
->> +    hwaddr idaw_addr;
->> +
->> +    if (is_fmt2) {
->> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt2) * cds->at_idaw;
->> +        if (idaw_addr & 0x07) {
->> +            return -EINVAL; /* chanel program check */
-> 
-> How fashionable ;)
-> 
+Indeed, perhaps that's exactly what I ought to do.  Those are complex logical
+operations which certainly will not get their own opcodes, but are "simple" in
+that they can be implemented in terms of vector xor+and, so there's no reason
+we couldn't expand those inline for all vector supporting hosts.
 
-Learned something new.
 
-> [s/chanel/channel/ :D]
-> 
->> +        }
->> +        ret = address_space_rw(&address_space_memory, idaw_addr,
->> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt2,
->> +                               sizeof(idaw.fmt2), false);
->> +        cds->cda = be64_to_cpu(idaw.fmt2);
->> +    } else {
->> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
->> +        if (idaw_addr & 0x03) {
->> +            return -EINVAL; /* chanel program check */
->> +
->> +        }
->> +        ret = address_space_rw(&address_space_memory, idaw_addr,
->> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt1,
->> +                               sizeof(idaw.fmt1), false);
->> +        cds->cda = be64_to_cpu(idaw.fmt1);
->> +    }
->> +    ++(cds->at_idaw);
->> +    if (ret != MEMTX_OK) {
->> +        /* assume inaccessible address */
->> +        return -EINVAL; /* chanel program check */
->> +
->> +    }
->> +    return 0;
->> +}
->> +
->> +static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int len,
->> +                              CcwDataStreamOp op)
->> +{
->> +    uint64_t bs = ccw_ida_block_size(cds->flags);
->> +    int ret = 0;
->> +    uint16_t cont_left, iter_len;
->> +
->> +    ret = cds_check_len(cds, len);
->> +    if (ret <= 0) {
->> +        return ret;
->> +    }
->> +    if (!cds->at_idaw) {
->> +        /* read first idaw */
->> +        ret = ida_read_next_idaw(cds);
->> +        if (ret) {
->> +            goto err;
->> +        }
->> +        cont_left = ida_continuous_left(cds->cda, bs);
->> +    } else {
->> +        cont_left = ida_continuous_left(cds->cda, bs);
->> +        if (cont_left == bs) {
->> +            ret = ida_read_next_idaw(cds);
->> +            if (ret) {
->> +                goto err;
->> +            }
->> +            if (cds->cda & (bs - 1)) {
->> +                ret = -EINVAL; /* chanel program check */
->> +                goto err;
->> +            }
->> +        }
->> +    }
->> +do_iter_len:
->> +    iter_len = MIN(len, cont_left);
->> +    if (op == CDS_OP_A) {
->> +        goto incr;
->> +    }
->> +    ret = address_space_rw(&address_space_memory, cds->cda,
->> +                           MEMTXATTRS_UNSPECIFIED, buff, iter_len, op);
->> +    if (ret != MEMTX_OK) {
->> +        /* assume inaccessible address */
->> +        ret = -EINVAL; /* chanel program check */
->> +        goto err;
->> +    }
->> +incr:
->> +    cds->at_byte += iter_len;
->> +    cds->cda += iter_len;
->> +    len -= iter_len;
->> +    if (len) {
->> +        ret = ida_read_next_idaw(cds);
->> +        if (ret) {
->> +            goto err;
->> +        }
->> +        cont_left = bs;
->> +        goto do_iter_len;
->> +    }
->> +    return ret;
->> +err:
->> +    cds->flags |= CDS_F_STREAM_BROKEN;
->> +    return ret;
->> +}
-> 
-> I'm not so happy about the many gotos (excepting the err ones). Any
-> chance to get around these?
-> 
-Certainly possible:
-
-static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int len,          
-                              CcwDataStreamOp op)                               
-{                                                                               
-    uint64_t bs = ccw_ida_block_size(cds->flags);                               
-    int ret = 0;                                                                
-    uint16_t cont_left, iter_len;                                               
-                                                                                
-    ret = cds_check_len(cds, len);                                              
-    if (ret <= 0) {                                                             
-        return ret;                                                             
-    }                                                                           
-    if (!cds->at_idaw) {                                                        
-        /* read first idaw */                                                   
-        ret = ida_read_next_idaw(cds);                                          
-        if (ret) {                                                              
-            goto err;                                                           
-        }                                                                       
-        cont_left = ida_continuous_left(cds->cda, bs);                          
-    } else {                                                                    
-        cont_left = ida_continuous_left(cds->cda, bs);                          
-        if (cont_left == bs) {                                                  
-            ret = ida_read_next_idaw(cds);                                      
-            if (ret) {                                                          
-                goto err;                                                       
-            }                                                                   
-            if (cds->cda & (bs - 1)) {                                          
-                ret = -EINVAL; /* channel program check */                      
-                goto err;                                                       
-            }                                                                   
-        }                                                                       
-    }                                                                           
-    do {                                                                        
-        iter_len = MIN(len, cont_left);                                         
-        if (op != CDS_OP_A) {                                                   
-            ret = address_space_rw(&address_space_memory, cds->cda,             
-                                   MEMTXATTRS_UNSPECIFIED, buff, iter_len, op); 
-            if (ret != MEMTX_OK) {                                              
-                /* assume inaccessible address */                               
-                ret = -EINVAL; /* channel program check */                      
-                goto err;                                                       
-            }                                                                   
-        }                                                                       
-        cds->at_byte += iter_len;                                               
-        cds->cda += iter_len;                                                   
-        len -= iter_len;                                                        
-        if (!len) {                                                             
-            break;                                                              
-        }                                                                       
-        ret = ida_read_next_idaw(cds);                                          
-        if (ret) {                                                              
-            goto err;                                                           
-        }                                                                       
-        cont_left = bs;                                                         
-    } while (true);                                                             
-    return ret;                                                                 
-err:                                                                            
-    cds->flags |= CDS_F_STREAM_BROKEN;                                          
-    return ret;                                                                 
-}
-
-My idea was decrease indentation level and at the same time make
-labels tell us something about the purpose of code pieces. Which
-one do you prefer?
-
-Sorry I've forgot about this comment. I would not have negotiated
-v2 before clarifying this.
-
-Halil
-
->> +
->>  void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
->>  {
->>      /*
->> @@ -835,7 +943,7 @@ void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
->>      if (!(cds->flags & CDS_F_IDA)) {
->>          cds->op_handler = ccw_dstream_rw_noflags;
->>      } else {
->> -        assert(false);
->> +        cds->op_handler = ccw_dstream_rw_ida;
->>      }
->>  }
->>  
-> 
-> 
+r~
