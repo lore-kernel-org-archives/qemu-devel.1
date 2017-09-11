@@ -1,28 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53882)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1drT1M-0003Iv-8L
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:01:24 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1drT6e-00081T-8T
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:06:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1drT1I-0000Y6-DO
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:01:20 -0400
-Received: from mail-pg0-x232.google.com ([2607:f8b0:400e:c05::232]:33416)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1drT1I-0000WH-7e
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:01:16 -0400
-Received: by mail-pg0-x232.google.com with SMTP id u18so7119pgo.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 11:01:14 -0700 (PDT)
-References: <20170911022839.23231-1-f4bug@amsat.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1c72c0c6-bd29-5228-d4ad-b26b11afa712@linaro.org>
-Date: Mon, 11 Sep 2017 11:01:10 -0700
+	(envelope-from <ehabkost@redhat.com>) id 1drT6Y-0005aR-Bq
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:06:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39814)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1drT6Y-0005Za-6N
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:06:42 -0400
+Date: Mon, 11 Sep 2017 15:06:32 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170911180632.GQ7570@localhost.localdomain>
+References: <20170907201335.13956-1-david@redhat.com>
+	<20170907201335.13956-9-david@redhat.com>
+	<1603f6bf-f481-13c2-c7eb-ac155c5a14cc@redhat.com>
+	<b8f78724-b6be-3e95-60fa-8c7dcafe2eec@redhat.com>
+	<20170909220737.GL7570@localhost.localdomain>
+	<c758ae70-a664-d13a-dd24-768f71e3f2e4@redhat.com>
+	<20170911175224.GP7570@localhost.localdomain>
+	<8cf0bf17-c1cb-ee13-768c-dcf1836687c2@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170911022839.23231-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/tci: do not use ldst label (never
- implemented)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8cf0bf17-c1cb-ee13-768c-dcf1836687c2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 08/21] s390x: move sclp_service_call()
+ to sclp.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,21 +34,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>
-Cc: qemu-devel@nongnu.org
+To: David Hildenbrand <david@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 09/10/2017 07:28 PM, Philippe Mathieu-Daudé wrote:
-> changed in 659ef5cbb893, this fixes building with --enable-tcg-interpreter:
+On Mon, Sep 11, 2017 at 07:56:19PM +0200, David Hildenbrand wrote:
 > 
-> /home/travis/build/qemu/qemu/tcg/tcg.c:116:14: error: ‘tcg_out_ldst_finalize’ used but never defined [-Werror]
->  static bool tcg_out_ldst_finalize(TCGContext *s);
->               ^
+> >>>>
+> >>>>  #endif
+> >>>
+> >>> Why not use typedefs.h?
+> >>
+> >> See Markus's reply.  But, maybe it's even better to use S390CPU* and
+> >> include target/s390x/cpu-qom.h, which by design provides as little
+> >> definitions as needed.
+> > 
+> > I don't see an argument against moving typedef CPUS390XState to
+> > typedefs.h in Markus' reply.  I see one argument for it (reducing
+> > the need for non-cyclic includes).
+> > 
+> > cpu-qom.h includes cpu.h, so I don't know why using S390CPU*
+> > would solve any problem.  I don't disagree about changing the
+> > function to use S390CPU* eventually, but it would still require
+> > us make a choice between: a) including the header where the
+> > typedef name is declared (cpu.h or cpu-qom.h); or b) moving the
+> > typedef name declaration to typedefs.h.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> It includes qom/cpu.h, not cpu.h. That's why using cpu-qom.h for such
+> typedefs works (see v4).
+> 
 
-Oops.
+Oops, I was looking at an older tree (before commit 347b1a5c).
+You're right, sorry for the noise.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-
-r~
+-- 
+Eduardo
