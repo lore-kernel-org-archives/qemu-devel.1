@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1drSq7-0000jc-Ne
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:49:44 -0400
+	(envelope-from <david@redhat.com>) id 1drSq9-0000lv-R8
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:49:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1drSq5-00085s-Ig
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:49:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:19394)
+	(envelope-from <david@redhat.com>) id 1drSq9-0008BZ-0n
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:49:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35894)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1drSq5-000858-9f
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:49:41 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1drSq8-0008Ae-RN
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:49:44 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 11 Sep 2017 19:49:28 +0200
-Message-Id: <20170911174933.20789-2-david@redhat.com>
+Date: Mon, 11 Sep 2017 19:49:30 +0200
+Message-Id: <20170911174933.20789-4-david@redhat.com>
 In-Reply-To: <20170911174933.20789-1-david@redhat.com>
 References: <20170911174933.20789-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 1/6] kvm: require JOIN_MEMORY_REGIONS_WORKS
+Subject: [Qemu-devel] [PATCH v1 3/6] kvm: use start + size for memory ranges
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,107 +26,44 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Radim=20Kr=C4=8Dm=C3=A1=C5=99?= <rkrcmar@redhat.com>, kvm@vger.kernel.org, david@redhat.com
 
-We already require DESTROY_MEMORY_REGION_WORKS, JOIN_MEMORY_REGIONS_WORKS
-was added just half a year later.
-
-In addition, with flatview overlapping memory regions are first
-removed before adding the changed one. So we can't really detect joining
-memory regions this way.
-
-Let's just get rid of this special handling.
+Convert kvm_lookup_matching_slot().
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- accel/kvm/kvm-all.c | 42 +-----------------------------------------
- 1 file changed, 1 insertion(+), 41 deletions(-)
+ accel/kvm/kvm-all.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f85553a851..985b179ab6 100644
+index e0d100bd30..88b0e631bd 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -79,7 +79,6 @@ struct KVMState
-     int coalesced_mmio;
-     struct kvm_coalesced_mmio_ring *coalesced_mmio_ring;
-     bool coalesced_flush_in_progress;
--    int broken_set_mem_region;
-     int vcpu_events;
-     int robust_singlestep;
-     int debugregs;
-@@ -127,6 +126,7 @@ static bool kvm_immediate_exit;
- static const KVMCapabilityInfo kvm_required_capabilites[] = {
-     KVM_CAP_INFO(USER_MEMORY),
-     KVM_CAP_INFO(DESTROY_MEMORY_REGION_WORKS),
-+    KVM_CAP_INFO(JOIN_MEMORY_REGIONS_WORKS),
-     KVM_CAP_LAST_INFO
- };
+@@ -172,7 +172,7 @@ static KVMSlot *kvm_alloc_slot(KVMMemoryListener *kml)
  
-@@ -696,7 +696,6 @@ kvm_check_extension_list(KVMState *s, const KVMCapabilityInfo *list)
- static void kvm_set_phys_mem(KVMMemoryListener *kml,
-                              MemoryRegionSection *section, bool add)
+ static KVMSlot *kvm_lookup_matching_slot(KVMMemoryListener *kml,
+                                          hwaddr start_addr,
+-                                         hwaddr end_addr)
++                                         hwaddr size)
  {
--    KVMState *s = kvm_state;
-     KVMSlot *mem, old;
-     int err;
-     MemoryRegion *mr = section->mr;
-@@ -763,35 +762,6 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
-             abort();
-         }
+     KVMState *s = kvm_state;
+     int i;
+@@ -180,8 +180,7 @@ static KVMSlot *kvm_lookup_matching_slot(KVMMemoryListener *kml,
+     for (i = 0; i < s->nr_slots; i++) {
+         KVMSlot *mem = &kml->slots[i];
  
--        /* Workaround for older KVM versions: we can't join slots, even not by
--         * unregistering the previous ones and then registering the larger
--         * slot. We have to maintain the existing fragmentation. Sigh.
--         *
--         * This workaround assumes that the new slot starts at the same
--         * address as the first existing one. If not or if some overlapping
--         * slot comes around later, we will fail (not seen in practice so far)
--         * - and actually require a recent KVM version. */
--        if (s->broken_set_mem_region &&
--            old.start_addr == start_addr && old.memory_size < size && add) {
--            mem = kvm_alloc_slot(kml);
--            mem->memory_size = old.memory_size;
--            mem->start_addr = old.start_addr;
--            mem->ram = old.ram;
--            mem->flags = kvm_mem_flags(mr);
--
--            err = kvm_set_user_memory_region(kml, mem);
--            if (err) {
--                fprintf(stderr, "%s: error updating slot: %s\n", __func__,
--                        strerror(-err));
--                abort();
--            }
--
--            start_addr += old.memory_size;
--            ram += old.memory_size;
--            size -= old.memory_size;
--            continue;
--        }
--
-         /* register prefix slot */
-         if (old.start_addr < start_addr) {
-             mem = kvm_alloc_slot(kml);
-@@ -833,10 +803,6 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+-        if (start_addr == mem->start_addr &&
+-            end_addr == mem->start_addr + mem->memory_size) {
++        if (start_addr == mem->start_addr && size == mem->memory_size) {
+             return mem;
          }
      }
+@@ -414,7 +413,7 @@ static int kvm_section_update_flags(KVMMemoryListener *kml,
+ {
+     hwaddr phys_addr = section->offset_within_address_space;
+     ram_addr_t size = int128_get64(section->size);
+-    KVMSlot *mem = kvm_lookup_matching_slot(kml, phys_addr, phys_addr + size);
++    KVMSlot *mem = kvm_lookup_matching_slot(kml, phys_addr, size);
  
--    /* in case the KVM bug workaround already "consumed" the new slot */
--    if (!size) {
--        return;
--    }
-     if (!add) {
-         return;
-     }
-@@ -1692,12 +1658,6 @@ static int kvm_init(MachineState *ms)
- 
-     s->coalesced_mmio = kvm_check_extension(s, KVM_CAP_COALESCED_MMIO);
- 
--    s->broken_set_mem_region = 1;
--    ret = kvm_check_extension(s, KVM_CAP_JOIN_MEMORY_REGIONS_WORKS);
--    if (ret > 0) {
--        s->broken_set_mem_region = 0;
--    }
--
- #ifdef KVM_CAP_VCPU_EVENTS
-     s->vcpu_events = kvm_check_extension(s, KVM_CAP_VCPU_EVENTS);
- #endif
+     if (mem == NULL)  {
+         return 0;
 -- 
 2.13.5
