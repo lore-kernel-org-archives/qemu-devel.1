@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSPL-0008E9-Cj
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSPM-0008FD-AK
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSPI-0001dT-RM
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSPH-0001d4-Pm
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:04 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 11 Sep 2017 12:20:16 -0500
-Message-Id: <20170911172022.4738-33-eblake@redhat.com>
+Date: Mon, 11 Sep 2017 12:20:15 -0500
+Message-Id: <20170911172022.4738-32-eblake@redhat.com>
 In-Reply-To: <20170911172022.4738-1-eblake@redhat.com>
 References: <20170911172022.4738-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 32/38] libqtest: Merge qtest_irq*() with
- irq*()
+Subject: [Qemu-devel] [PATCH v7 31/38] libqtest: Merge qtest_clock_*() with
+ clock_*()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,9 +27,9 @@ Maintaining two layers of libqtest APIs, one that takes an explicit
 QTestState object, and the other that uses the implicit global_qtest,
 is annoying.  In the interest of getting rid of global implicit
 state and having less code to maintain, merge:
- qtest_get_irq()
- qtest_irq_intercept_in()
- qtest_irq_intercept_out()
+ qtest_clock_set()
+ qtest_clock_step()
+ qtest_clock_step_next()
 with their short counterparts.  All callers that previously
 used the short form now make it explicit that they are relying on
 global_qtest, and later patches can then clean things up to remove
@@ -37,562 +37,769 @@ the global variable.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.h         | 47 ++++++-----------------------------------------
- tests/libqtest.c         |  6 +++---
- tests/fdc-test.c         | 48 ++++++++++++++++++++++++------------------------
- tests/ide-test.c         | 17 +++++++++--------
- tests/ipmi-bt-test.c     |  6 +++---
- tests/ipmi-kcs-test.c    |  8 ++++----
- tests/libqos/libqos-pc.c |  2 +-
- tests/rtc-test.c         | 10 +++++-----
- tests/tco-test.c         |  2 +-
- tests/wdt_ib700-test.c   |  8 ++++----
- 10 files changed, 60 insertions(+), 94 deletions(-)
+ tests/libqtest.h         | 50 ++++----------------------------
+ tests/libqtest.c         |  6 ++--
+ tests/e1000e-test.c      |  2 +-
+ tests/fdc-test.c         |  4 +--
+ tests/ide-test.c         |  2 +-
+ tests/libqos/virtio.c    |  8 +++---
+ tests/rtc-test.c         | 74 ++++++++++++++++++++++++------------------------
+ tests/rtl8139-test.c     | 10 +++----
+ tests/tco-test.c         | 22 +++++++-------
+ tests/test-arm-mptimer.c | 25 +++++++++-------
+ tests/wdt_ib700-test.c   | 12 ++++----
+ 11 files changed, 90 insertions(+), 125 deletions(-)
 
 diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 26d5f37bc9..8398c0fd07 100644
+index 5651b77d2f..26d5f37bc9 100644
 --- a/tests/libqtest.h
 +++ b/tests/libqtest.h
-@@ -176,33 +176,33 @@ char *qtest_hmp(QTestState *s, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
- char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap);
+@@ -417,17 +417,17 @@ void qtest_bufwrite(QTestState *s, uint64_t addr,
+ void qtest_memset(QTestState *s, uint64_t addr, uint8_t patt, size_t size);
 
  /**
-- * qtest_get_irq:
-+ * get_irq:
+- * qtest_clock_step_next:
++ * clock_step_next:
   * @s: #QTestState instance to operate on.
-  * @num: Interrupt to observe.
   *
-  * Returns: The level of the @num interrupt.
-  */
--bool qtest_get_irq(QTestState *s, int num);
-+bool get_irq(QTestState *s, int num);
-
- /**
-- * qtest_irq_intercept_in:
-+ * irq_intercept_in:
-  * @s: #QTestState instance to operate on.
-  * @string: QOM path of a device.
+  * Advance the QEMU_CLOCK_VIRTUAL to the next deadline.
   *
-  * Associate qtest irqs with the GPIO-in pins of the device
-  * whose path is specified by @string.
+  * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
   */
--void qtest_irq_intercept_in(QTestState *s, const char *string);
-+void irq_intercept_in(QTestState *s, const char *string);
+-int64_t qtest_clock_step_next(QTestState *s);
++int64_t clock_step_next(QTestState *s);
 
  /**
-- * qtest_irq_intercept_out:
-+ * irq_intercept_out:
-  * @s: #QTestState instance to operate on.
-  * @string: QOM path of a device.
+- * qtest_clock_step:
++ * clock_step:
+  * @s: QTestState instance to operate on.
+  * @step: Number of nanoseconds to advance the clock by.
   *
-  * Associate qtest irqs with the GPIO-out pins of the device
-  * whose path is specified by @string.
+@@ -435,10 +435,10 @@ int64_t qtest_clock_step_next(QTestState *s);
+  *
+  * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
   */
--void qtest_irq_intercept_out(QTestState *s, const char *string);
-+void irq_intercept_out(QTestState *s, const char *string);
+-int64_t qtest_clock_step(QTestState *s, int64_t step);
++int64_t clock_step(QTestState *s, int64_t step);
 
  /**
-  * qtest_outb:
-@@ -594,41 +594,6 @@ static inline QDict *qmp_eventwait_ref(const char *event)
- char *hmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+- * qtest_clock_set:
++ * clock_set:
+  * @s: QTestState instance to operate on.
+  * @val: Nanoseconds value to advance the clock to.
+  *
+@@ -446,7 +446,7 @@ int64_t qtest_clock_step(QTestState *s, int64_t step);
+  *
+  * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
+  */
+-int64_t qtest_clock_set(QTestState *s, int64_t val);
++int64_t clock_set(QTestState *s, int64_t val);
 
  /**
-- * get_irq:
-- * @num: Interrupt to observe.
-- *
-- * Returns: The level of the @num interrupt.
-- */
--static inline bool get_irq(int num)
--{
--    return qtest_get_irq(global_qtest, num);
--}
--
--/**
-- * irq_intercept_in:
-- * @string: QOM path of a device.
-- *
-- * Associate qtest irqs with the GPIO-in pins of the device
-- * whose path is specified by @string.
-- */
--static inline void irq_intercept_in(const char *string)
--{
--    qtest_irq_intercept_in(global_qtest, string);
--}
--
--/**
-- * qtest_irq_intercept_out:
-- * @string: QOM path of a device.
-- *
-- * Associate qtest irqs with the GPIO-out pins of the device
-- * whose path is specified by @string.
-- */
--static inline void irq_intercept_out(const char *string)
--{
--    qtest_irq_intercept_out(global_qtest, string);
--}
--
--/**
-  * outb:
-  * @addr: I/O port to write to.
-  * @value: Value being written.
-diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 9f5f2cb933..962432a27a 100644
---- a/tests/libqtest.c
-+++ b/tests/libqtest.c
-@@ -648,7 +648,7 @@ const char *qtest_get_arch(void)
-     return end + strlen("/qemu-system-");
+  * qtest_big_endian:
+@@ -868,44 +868,6 @@ static inline void qmemset(uint64_t addr, uint8_t patt, size_t size)
+     qtest_memset(global_qtest, addr, patt, size);
  }
 
--bool qtest_get_irq(QTestState *s, int num)
-+bool get_irq(QTestState *s, int num)
+-/**
+- * clock_step_next:
+- *
+- * Advance the QEMU_CLOCK_VIRTUAL to the next deadline.
+- *
+- * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
+- */
+-static inline int64_t clock_step_next(void)
+-{
+-    return qtest_clock_step_next(global_qtest);
+-}
+-
+-/**
+- * clock_step:
+- * @step: Number of nanoseconds to advance the clock by.
+- *
+- * Advance the QEMU_CLOCK_VIRTUAL by @step nanoseconds.
+- *
+- * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
+- */
+-static inline int64_t clock_step(int64_t step)
+-{
+-    return qtest_clock_step(global_qtest, step);
+-}
+-
+-/**
+- * clock_set:
+- * @val: Nanoseconds value to advance the clock to.
+- *
+- * Advance the QEMU_CLOCK_VIRTUAL to @val nanoseconds since the VM was launched.
+- *
+- * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
+- */
+-static inline int64_t clock_set(int64_t val)
+-{
+-    return qtest_clock_set(global_qtest, val);
+-}
+-
+ QDict *qmp_fd_receive(int fd);
+ void qmp_fd_sendv(int fd, const char *fmt, va_list ap);
+ void qmp_fd_send(int fd, const char *fmt, ...);
+diff --git a/tests/libqtest.c b/tests/libqtest.c
+index 44c89813ff..9f5f2cb933 100644
+--- a/tests/libqtest.c
++++ b/tests/libqtest.c
+@@ -666,19 +666,19 @@ static int64_t qtest_clock_rsp(QTestState *s)
+     return clock;
+ }
+
+-int64_t qtest_clock_step_next(QTestState *s)
++int64_t clock_step_next(QTestState *s)
  {
-     /* dummy operation in order to make sure irq is up to date */
-     qtest_inb(s, 0);
-@@ -684,13 +684,13 @@ int64_t clock_set(QTestState *s, int64_t val)
+     qtest_sendf(s, "clock_step\n");
      return qtest_clock_rsp(s);
  }
 
--void qtest_irq_intercept_out(QTestState *s, const char *qom_path)
-+void irq_intercept_out(QTestState *s, const char *qom_path)
+-int64_t qtest_clock_step(QTestState *s, int64_t step)
++int64_t clock_step(QTestState *s, int64_t step)
  {
-     qtest_sendf(s, "irq_intercept_out %s\n", qom_path);
-     qtest_rsp(s, 0);
+     qtest_sendf(s, "clock_step %"PRIi64"\n", step);
+     return qtest_clock_rsp(s);
  }
 
--void qtest_irq_intercept_in(QTestState *s, const char *qom_path)
-+void irq_intercept_in(QTestState *s, const char *qom_path)
+-int64_t qtest_clock_set(QTestState *s, int64_t val)
++int64_t clock_set(QTestState *s, int64_t val)
  {
-     qtest_sendf(s, "irq_intercept_in %s\n", qom_path);
-     qtest_rsp(s, 0);
-diff --git a/tests/fdc-test.c b/tests/fdc-test.c
-index e79cd0f3b5..584ad746ed 100644
---- a/tests/fdc-test.c
-+++ b/tests/fdc-test.c
-@@ -99,7 +99,7 @@ static void ack_irq(uint8_t *pcn)
- {
-     uint8_t ret;
-
--    g_assert(get_irq(FLOPPY_IRQ));
-+    g_assert(get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_send(CMD_SENSE_INT);
-     floppy_recv();
-
-@@ -108,7 +108,7 @@ static void ack_irq(uint8_t *pcn)
-         *pcn = ret;
-     }
-
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
- }
-
- static uint8_t send_read_command(uint8_t cmd)
-@@ -129,7 +129,7 @@ static uint8_t send_read_command(uint8_t cmd)
-
-     floppy_send(cmd);
-     floppy_send(head << 2 | drive);
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_send(cyl);
-     floppy_send(head);
-     floppy_send(sect_addr);
-@@ -185,7 +185,7 @@ static uint8_t send_read_no_dma_command(int nb_sect, uint8_t expected_st0)
-
-     floppy_send(CMD_READ);
-     floppy_send(head << 2 | drive);
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_send(cyl);
-     floppy_send(head);
-     floppy_send(sect_addr);
-@@ -217,7 +217,7 @@ static uint8_t send_read_no_dma_command(int nb_sect, uint8_t expected_st0)
-
-     msr = inb(FLOPPY_BASE + reg_msr);
-     assert_bit_set(msr, BUSY | RQM | DIO);
--    g_assert(get_irq(FLOPPY_IRQ));
-+    g_assert(get_irq(global_qtest, FLOPPY_IRQ));
-
-     st0 = floppy_recv();
-     if (st0 != expected_st0) {
-@@ -229,14 +229,14 @@ static uint8_t send_read_no_dma_command(int nb_sect, uint8_t expected_st0)
-     floppy_recv();
-     floppy_recv();
-     floppy_recv();
--    g_assert(get_irq(FLOPPY_IRQ));
-+    g_assert(get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_recv();
-
-     /* Check that we're back in command phase */
-     msr = inb(FLOPPY_BASE + reg_msr);
-     assert_bit_clear(msr, BUSY | DIO);
-     assert_bit_set(msr, RQM);
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
-
-     return ret;
- }
-@@ -248,7 +248,7 @@ static void send_seek(int cyl)
-
-     floppy_send(CMD_SEEK);
-     floppy_send(head << 2 | drive);
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_send(cyl);
-     ack_irq(NULL);
- }
-@@ -363,7 +363,7 @@ static void test_sense_interrupt(void)
-
-     floppy_send(CMD_SEEK);
-     floppy_send(head << 2 | drive);
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_send(cyl);
-
-     floppy_send(CMD_SENSE_INT);
-@@ -385,7 +385,7 @@ static void test_relative_seek(void)
-     /* Send relative seek to increase track by 1 */
-     floppy_send(CMD_RELATIVE_SEEK_IN);
-     floppy_send(head << 2 | drive);
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_send(cyl);
-
-     ack_irq(&pcn);
-@@ -394,7 +394,7 @@ static void test_relative_seek(void)
-     /* Send relative seek to decrease track by 1 */
-     floppy_send(CMD_RELATIVE_SEEK_OUT);
-     floppy_send(head << 2 | drive);
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_send(cyl);
-
-     ack_irq(&pcn);
-@@ -413,16 +413,16 @@ static void test_read_id(void)
-     send_seek(0);
-
-     floppy_send(CMD_READ_ID);
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_send(head << 2 | drive);
-
-     msr = inb(FLOPPY_BASE + reg_msr);
--    if (!get_irq(FLOPPY_IRQ)) {
-+    if (!get_irq(global_qtest, FLOPPY_IRQ)) {
-         assert_bit_set(msr, BUSY);
-         assert_bit_clear(msr, RQM);
-     }
-
--    while (!get_irq(FLOPPY_IRQ)) {
-+    while (!get_irq(global_qtest, FLOPPY_IRQ)) {
-         /* qemu involves a timer with READ ID... */
-         clock_step(global_qtest, 1000000000LL / 50);
-     }
-@@ -436,9 +436,9 @@ static void test_read_id(void)
-     cyl = floppy_recv();
-     head = floppy_recv();
-     floppy_recv();
--    g_assert(get_irq(FLOPPY_IRQ));
-+    g_assert(get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_recv();
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
-
-     g_assert_cmpint(cyl, ==, 0);
-     g_assert_cmpint(head, ==, 0);
-@@ -450,22 +450,22 @@ static void test_read_id(void)
-
-     floppy_send(CMD_SEEK);
-     floppy_send(head << 2 | drive);
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_send(cyl);
--    g_assert(get_irq(FLOPPY_IRQ));
-+    g_assert(get_irq(global_qtest, FLOPPY_IRQ));
-     ack_irq(NULL);
-
-     floppy_send(CMD_READ_ID);
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_send(head << 2 | drive);
-
-     msr = inb(FLOPPY_BASE + reg_msr);
--    if (!get_irq(FLOPPY_IRQ)) {
-+    if (!get_irq(global_qtest, FLOPPY_IRQ)) {
-         assert_bit_set(msr, BUSY);
-         assert_bit_clear(msr, RQM);
-     }
-
--    while (!get_irq(FLOPPY_IRQ)) {
-+    while (!get_irq(global_qtest, FLOPPY_IRQ)) {
-         /* qemu involves a timer with READ ID... */
-         clock_step(global_qtest, 1000000000LL / 50);
-     }
-@@ -479,9 +479,9 @@ static void test_read_id(void)
-     cyl = floppy_recv();
-     head = floppy_recv();
-     floppy_recv();
--    g_assert(get_irq(FLOPPY_IRQ));
-+    g_assert(get_irq(global_qtest, FLOPPY_IRQ));
-     floppy_recv();
--    g_assert(!get_irq(FLOPPY_IRQ));
-+    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
-
-     g_assert_cmpint(cyl, ==, 8);
-     g_assert_cmpint(head, ==, 1);
-@@ -565,7 +565,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-
-     global_qtest = qtest_start("-device floppy,id=floppy0");
--    qtest_irq_intercept_in(global_qtest, "ioapic");
-+    irq_intercept_in(global_qtest, "ioapic");
-     qtest_add_func("/fdc/cmos", test_cmos);
-     qtest_add_func("/fdc/no_media_on_start", test_no_media_on_start);
-     qtest_add_func("/fdc/read_without_media", test_read_without_media);
-diff --git a/tests/ide-test.c b/tests/ide-test.c
-index 32c8c40294..c22dde55c1 100644
---- a/tests/ide-test.c
-+++ b/tests/ide-test.c
-@@ -255,14 +255,15 @@ static int send_dma_request(int cmd, uint64_t sector, int nb_sectors,
-         status = qpci_io_readb(dev, bmdma_bar, bmreg_status);
-     } while ((status & (BM_STS_ACTIVE | BM_STS_INTR)) == BM_STS_ACTIVE);
-
--    g_assert_cmpint(get_irq(IDE_PRIMARY_IRQ), ==, !!(status & BM_STS_INTR));
-+    g_assert_cmpint(get_irq(global_qtest, IDE_PRIMARY_IRQ), ==,
-+                    !!(status & BM_STS_INTR));
-
-     /* Check IDE status code */
-     assert_bit_set(qpci_io_readb(dev, ide_bar, reg_status), DRDY);
-     assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), BSY | DRQ);
-
-     /* Reading the status register clears the IRQ */
--    g_assert(!get_irq(IDE_PRIMARY_IRQ));
-+    g_assert(!get_irq(global_qtest, IDE_PRIMARY_IRQ));
-
-     /* Stop DMA transfer if still active */
-     if (status & BM_STS_ACTIVE) {
-@@ -458,7 +459,7 @@ static void test_bmdma_setup(void)
-         "-drive file=%s,if=ide,serial=%s,cache=writeback,format=raw "
-         "-global ide-hd.ver=%s",
-         tmp_path, "testdisk", "version");
--    qtest_irq_intercept_in(global_qtest, "ioapic");
-+    irq_intercept_in(global_qtest, "ioapic");
- }
-
- static void test_bmdma_teardown(void)
-@@ -580,7 +581,7 @@ static void test_flush(void)
-
-     dev = get_pci_device(&bmdma_bar, &ide_bar);
-
--    qtest_irq_intercept_in(global_qtest, "ioapic");
-+    irq_intercept_in(global_qtest, "ioapic");
-
-     /* Dirty media so that CMD_FLUSH_CACHE will actually go to disk */
-     make_dirty(0);
-@@ -631,7 +632,7 @@ static void test_retry_flush(const char *machine)
-
-     dev = get_pci_device(&bmdma_bar, &ide_bar);
-
--    qtest_irq_intercept_in(global_qtest, "ioapic");
-+    irq_intercept_in(global_qtest, "ioapic");
-
-     /* Dirty media so that CMD_FLUSH_CACHE will actually go to disk */
-     make_dirty(0);
-@@ -784,7 +785,7 @@ static void ide_wait_intr(int irq)
-
-     time(&st);
-     while (true) {
--        intr = get_irq(irq);
-+        intr = get_irq(global_qtest, irq);
-         if (intr) {
+     qtest_sendf(s, "clock_set %"PRIi64"\n", val);
+     return qtest_clock_rsp(s);
+diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
+index 323aabb454..f4ead74f96 100644
+--- a/tests/e1000e-test.c
++++ b/tests/e1000e-test.c
+@@ -229,7 +229,7 @@ static void e1000e_wait_isr(e1000e_device *d, uint16_t msg_id)
+         if (qpci_msix_pending(d->pci_dev, msg_id)) {
              return;
          }
-@@ -822,7 +823,7 @@ static void cdrom_pio_impl(int nblocks)
-     ide_test_start("-drive if=none,file=%s,media=cdrom,format=raw,id=sr0,index=0 "
-                    "-device ide-cd,drive=sr0,bus=ide.0", tmp_path);
-     dev = get_pci_device(&bmdma_bar, &ide_bar);
--    qtest_irq_intercept_in(global_qtest, "ioapic");
-+    irq_intercept_in(global_qtest, "ioapic");
+-        clock_step(10000);
++        clock_step(global_qtest, 10000);
+     } while (g_get_monotonic_time() < end_time);
 
-     /* PACKET command on device 0 */
-     qpci_io_writeb(dev, ide_bar, reg_device, 0);
-@@ -905,7 +906,7 @@ static void test_cdrom_dma(void)
+     g_error("Timeout expired");
+diff --git a/tests/fdc-test.c b/tests/fdc-test.c
+index ec83625db2..e79cd0f3b5 100644
+--- a/tests/fdc-test.c
++++ b/tests/fdc-test.c
+@@ -424,7 +424,7 @@ static void test_read_id(void)
 
-     ide_test_start("-drive if=none,file=%s,media=cdrom,format=raw,id=sr0,index=0 "
-                    "-device ide-cd,drive=sr0,bus=ide.0", tmp_path);
--    qtest_irq_intercept_in(global_qtest, "ioapic");
-+    irq_intercept_in(global_qtest, "ioapic");
-
-     guest_buf = guest_alloc(guest_malloc, len);
-     prdt[0].addr = cpu_to_le32(guest_buf);
-diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
-index 8be18e3f42..f80a9a83c9 100644
---- a/tests/ipmi-bt-test.c
-+++ b/tests/ipmi-bt-test.c
-@@ -276,10 +276,10 @@ static void bt_cmd(uint8_t *cmd, unsigned int cmd_len,
-     bt_wait_b2h_atn();
-     if (bt_ints_enabled) {
-         g_assert((bt_get_irqreg() & 0x02) == 0x02);
--        g_assert(get_irq(IPMI_IRQ));
-+        g_assert(get_irq(global_qtest, IPMI_IRQ));
-         bt_write_irqreg(0x03);
-     } else {
--        g_assert(!get_irq(IPMI_IRQ));
-+        g_assert(!get_irq(global_qtest, IPMI_IRQ));
+     while (!get_irq(FLOPPY_IRQ)) {
+         /* qemu involves a timer with READ ID... */
+-        clock_step(1000000000LL / 50);
++        clock_step(global_qtest, 1000000000LL / 50);
      }
-     IPMI_BT_CTLREG_SET_H_BUSY();
-     IPMI_BT_CTLREG_SET_B2H_ATN();
-@@ -418,7 +418,7 @@ int main(int argc, char **argv)
-         " -chardev socket,id=ipmi0,host=localhost,port=%d,reconnect=10"
-         " -device ipmi-bmc-extern,chardev=ipmi0,id=bmc0"
-         " -device isa-ipmi-bt,bmc=bmc0", emu_port);
--    qtest_irq_intercept_in(global_qtest, "ioapic");
-+    irq_intercept_in(global_qtest, "ioapic");
-     qtest_add_func("/ipmi/extern/connect", test_connect);
-     qtest_add_func("/ipmi/extern/bt_base", test_bt_base);
-     qtest_add_func("/ipmi/extern/bt_enable_irq", test_enable_irq);
-diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
-index 5acc0d9e35..ddad8dd22f 100644
---- a/tests/ipmi-kcs-test.c
-+++ b/tests/ipmi-kcs-test.c
-@@ -89,14 +89,14 @@ static void kcs_wait_obf(void)
- static void kcs_clear_obf(void)
+
+     msr = inb(FLOPPY_BASE + reg_msr);
+@@ -467,7 +467,7 @@ static void test_read_id(void)
+
+     while (!get_irq(FLOPPY_IRQ)) {
+         /* qemu involves a timer with READ ID... */
+-        clock_step(1000000000LL / 50);
++        clock_step(global_qtest, 1000000000LL / 50);
+     }
+
+     msr = inb(FLOPPY_BASE + reg_msr);
+diff --git a/tests/ide-test.c b/tests/ide-test.c
+index e1650c0132..32c8c40294 100644
+--- a/tests/ide-test.c
++++ b/tests/ide-test.c
+@@ -749,7 +749,7 @@ static void nsleep(int64_t nsecs)
  {
-     if (kcs_ints_enabled) {
--        g_assert(get_irq(IPMI_IRQ));
-+        g_assert(get_irq(global_qtest, IPMI_IRQ));
-     } else {
--        g_assert(!get_irq(IPMI_IRQ));
-+        g_assert(!get_irq(global_qtest, IPMI_IRQ));
+     const struct timespec val = { .tv_nsec = nsecs };
+     nanosleep(&val, NULL);
+-    clock_set(nsecs);
++    clock_set(global_qtest, nsecs);
+ }
+
+ static uint8_t ide_wait_clear(uint8_t flag)
+diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
+index 2212830742..92e47e78f2 100644
+--- a/tests/libqos/virtio.c
++++ b/tests/libqos/virtio.c
+@@ -97,7 +97,7 @@ void qvirtio_wait_queue_isr(QVirtioDevice *d,
+     gint64 start_time = g_get_monotonic_time();
+
+     for (;;) {
+-        qtest_clock_step(d->bus->qts, 100);
++        clock_step(d->bus->qts, 100);
+         if (d->bus->get_queue_isr_status(d, vq)) {
+             return;
+         }
+@@ -119,7 +119,7 @@ uint8_t qvirtio_wait_status_byte_no_isr(QVirtioDevice *d,
+     uint8_t val;
+
+     while ((val = qtest_readb(d->bus->qts, addr)) == 0xff) {
+-        qtest_clock_step(d->bus->qts, 100);
++        clock_step(d->bus->qts, 100);
+         g_assert(!d->bus->get_queue_isr_status(d, vq));
+         g_assert(g_get_monotonic_time() - start_time <= timeout_us);
      }
-     g_assert(IPMI_KCS_CMDREG_GET_OBF() == 1);
-     kcs_get_datareg();
-     g_assert(IPMI_KCS_CMDREG_GET_OBF() == 0);
--    g_assert(!get_irq(IPMI_IRQ));
-+    g_assert(!get_irq(global_qtest, IPMI_IRQ));
- }
+@@ -143,7 +143,7 @@ void qvirtio_wait_used_elem(QVirtioDevice *d,
+     for (;;) {
+         uint32_t got_desc_idx;
 
- static void kcs_check_state(uint8_t state)
-@@ -277,7 +277,7 @@ int main(int argc, char **argv)
+-        qtest_clock_step(d->bus->qts, 100);
++        clock_step(d->bus->qts, 100);
 
-     global_qtest = qtest_start("-device ipmi-bmc-sim,id=bmc0"
-                                " -device isa-ipmi-kcs,bmc=bmc0");
--    qtest_irq_intercept_in(global_qtest, "ioapic");
-+    irq_intercept_in(global_qtest, "ioapic");
-     qtest_add_func("/ipmi/local/kcs_base", test_kcs_base);
-     qtest_add_func("/ipmi/local/kcs_abort", test_kcs_abort);
-     qtest_add_func("/ipmi/local/kcs_enable_irq", test_enable_irq);
-diff --git a/tests/libqos/libqos-pc.c b/tests/libqos/libqos-pc.c
-index a9c1aceaa7..df97f0cd03 100644
---- a/tests/libqos/libqos-pc.c
-+++ b/tests/libqos/libqos-pc.c
-@@ -25,7 +25,7 @@ QOSState *qtest_pc_boot(const char *cmdline_fmt, ...)
-     qs = qtest_vboot(&qos_ops, cmdline_fmt, ap);
-     va_end(ap);
+         if (d->bus->get_queue_isr_status(d, vq) &&
+             qvirtqueue_get_buf(vq, &got_desc_idx)) {
+@@ -160,7 +160,7 @@ void qvirtio_wait_config_isr(QVirtioDevice *d, gint64 timeout_us)
+     gint64 start_time = g_get_monotonic_time();
 
--    qtest_irq_intercept_in(qs->qts, "ioapic");
-+    irq_intercept_in(qs->qts, "ioapic");
-
-     return qs;
- }
+     for (;;) {
+-        qtest_clock_step(d->bus->qts, 100);
++        clock_step(d->bus->qts, 100);
+         if (d->bus->get_config_isr_status(d)) {
+             return;
+         }
 diff --git a/tests/rtc-test.c b/tests/rtc-test.c
-index 9b98e2d494..8ff201993e 100644
+index dd5430dd2d..9b98e2d494 100644
 --- a/tests/rtc-test.c
 +++ b/tests/rtc-test.c
-@@ -277,7 +277,7 @@ static void alarm_time(void)
-     /* set DEC mode */
-     cmos_write(RTC_REG_B, REG_B_24H | REG_B_DM);
-
--    g_assert(!get_irq(RTC_ISA_IRQ));
-+    g_assert(!get_irq(global_qtest, RTC_ISA_IRQ));
-     cmos_read(RTC_REG_C);
-
-     now.tm_sec = (now.tm_sec + 2) % 60;
-@@ -287,14 +287,14 @@ static void alarm_time(void)
-     cmos_write(RTC_REG_B, cmos_read(RTC_REG_B) | REG_B_AIE);
-
-     for (i = 0; i < 2 + wiggle; i++) {
--        if (get_irq(RTC_ISA_IRQ)) {
-+        if (get_irq(global_qtest, RTC_ISA_IRQ)) {
+@@ -291,7 +291,7 @@ static void alarm_time(void)
              break;
          }
 
-         clock_step(global_qtest, 1000000000);
+-        clock_step(1000000000);
++        clock_step(global_qtest, 1000000000);
      }
 
--    g_assert(get_irq(RTC_ISA_IRQ));
-+    g_assert(get_irq(global_qtest, RTC_ISA_IRQ));
-     g_assert((cmos_read(RTC_REG_C) & REG_C_AF) != 0);
-     g_assert(cmos_read(RTC_REG_C) == 0);
- }
-@@ -644,7 +644,7 @@ static void uip_stuck(void)
+     g_assert(get_irq(RTC_ISA_IRQ));
+@@ -371,35 +371,35 @@ static void basic_12h_bcd(void)
+ {
+     /* set BCD 12 hour mode */
+     set_time(0, 0x81, 0x59, 0x00);
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_time(0x81, 0x59, 0x01);
+-    clock_step(59000000000LL);
++    clock_step(global_qtest, 59000000000LL);
+     assert_time(0x82, 0x00, 0x00);
 
+     /* test BCD wraparound */
+     set_time(0, 0x09, 0x59, 0x59);
+-    clock_step(60000000000LL);
++    clock_step(global_qtest, 60000000000LL);
+     assert_time(0x10, 0x00, 0x59);
+
+     /* 12 AM -> 1 AM */
+     set_time(0, 0x12, 0x59, 0x59);
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_time(0x01, 0x00, 0x00);
+
+     /* 12 PM -> 1 PM */
+     set_time(0, 0x92, 0x59, 0x59);
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_time(0x81, 0x00, 0x00);
+
+     /* 11 AM -> 12 PM */
+     set_time(0, 0x11, 0x59, 0x59);
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_time(0x92, 0x00, 0x00);
+     /* TODO: test day wraparound */
+
+     /* 11 PM -> 12 AM */
+     set_time(0, 0x91, 0x59, 0x59);
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_time(0x12, 0x00, 0x00);
+     /* TODO: test day wraparound */
+ }
+@@ -408,29 +408,29 @@ static void basic_12h_dec(void)
+ {
+     /* set decimal 12 hour mode */
+     set_time(REG_B_DM, 0x81, 59, 0);
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_time(0x81, 59, 1);
+-    clock_step(59000000000LL);
++    clock_step(global_qtest, 59000000000LL);
+     assert_time(0x82, 0, 0);
+
+     /* 12 PM -> 1 PM */
+     set_time(REG_B_DM, 0x8c, 59, 59);
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_time(0x81, 0, 0);
+
+     /* 12 AM -> 1 AM */
+     set_time(REG_B_DM, 0x0c, 59, 59);
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_time(0x01, 0, 0);
+
+     /* 11 AM -> 12 PM */
+     set_time(REG_B_DM, 0x0b, 59, 59);
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_time(0x8c, 0, 0);
+
+     /* 11 PM -> 12 AM */
+     set_time(REG_B_DM, 0x8b, 59, 59);
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_time(0x0c, 0, 0);
+     /* TODO: test day wraparound */
+ }
+@@ -439,19 +439,19 @@ static void basic_24h_bcd(void)
+ {
+     /* set BCD 24 hour mode */
+     set_time(REG_B_24H, 0x09, 0x59, 0x00);
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_time(0x09, 0x59, 0x01);
+-    clock_step(59000000000LL);
++    clock_step(global_qtest, 59000000000LL);
+     assert_time(0x10, 0x00, 0x00);
+
+     /* test BCD wraparound */
+     set_time(REG_B_24H, 0x09, 0x59, 0x00);
+-    clock_step(60000000000LL);
++    clock_step(global_qtest, 60000000000LL);
+     assert_time(0x10, 0x00, 0x00);
+
+     /* TODO: test day wraparound */
+     set_time(REG_B_24H, 0x23, 0x59, 0x00);
+-    clock_step(60000000000LL);
++    clock_step(global_qtest, 60000000000LL);
+     assert_time(0x00, 0x00, 0x00);
+ }
+
+@@ -459,19 +459,19 @@ static void basic_24h_dec(void)
+ {
+     /* set decimal 24 hour mode */
+     set_time(REG_B_24H | REG_B_DM, 9, 59, 0);
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_time(9, 59, 1);
+-    clock_step(59000000000LL);
++    clock_step(global_qtest, 59000000000LL);
+     assert_time(10, 0, 0);
+
+     /* test BCD wraparound */
+     set_time(REG_B_24H | REG_B_DM, 9, 59, 0);
+-    clock_step(60000000000LL);
++    clock_step(global_qtest, 60000000000LL);
+     assert_time(10, 0, 0);
+
+     /* TODO: test day wraparound */
+     set_time(REG_B_24H | REG_B_DM, 23, 59, 0);
+-    clock_step(60000000000LL);
++    clock_step(global_qtest, 60000000000LL);
+     assert_time(0, 0, 0);
+ }
+
+@@ -493,7 +493,7 @@ static void am_pm_alarm(void)
+     cmos_write(RTC_REG_A, 0x26);
+
+     /* Check that alarm triggers when AM/PM is set.  */
+-    clock_step(60000000000LL);
++    clock_step(global_qtest, 60000000000LL);
+     g_assert(cmos_read(RTC_HOURS) == 0x82);
+     g_assert((cmos_read(RTC_REG_C) & REG_C_AF) != 0);
+
+@@ -520,7 +520,7 @@ static void am_pm_alarm(void)
+     cmos_write(RTC_REG_A, 0x26);
+
+     /* Check that alarm triggers.  */
+-    clock_step(3600 * 11 * 1000000000LL);
++    clock_step(global_qtest, 3600 * 11 * 1000000000LL);
+     g_assert(cmos_read(RTC_HOURS) == 0x82);
+     g_assert((cmos_read(RTC_REG_C) & REG_C_AF) != 0);
+
+@@ -534,7 +534,7 @@ static void am_pm_alarm(void)
+     cmos_write(RTC_REG_A, 0x26);
+
+     /* Check that alarm does not trigger if hours differ only by AM/PM.  */
+-    clock_step(3600 * 11 * 1000000000LL);
++    clock_step(global_qtest, 3600 * 11 * 1000000000LL);
+     g_assert(cmos_read(RTC_HOURS) == 0x82);
+     g_assert((cmos_read(RTC_REG_C) & REG_C_AF) == 0);
+ }
+@@ -558,7 +558,7 @@ static void fuzz_registers(void)
+ static void register_b_set_flag(void)
+ {
+     if (cmos_read(RTC_REG_A) & REG_A_UIP) {
+-        clock_step(UIP_HOLD_LENGTH + NANOSECONDS_PER_SECOND / 5);
++        clock_step(global_qtest, UIP_HOLD_LENGTH + NANOSECONDS_PER_SECOND / 5);
+     }
+     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
+
+@@ -570,7 +570,7 @@ static void register_b_set_flag(void)
+     assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
+
+     /* Since SET flag is still enabled, time does not advance. */
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
+
+     /* Disable SET flag in Register B */
+@@ -579,7 +579,7 @@ static void register_b_set_flag(void)
+     assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
+
+     /* Since SET flag is disabled, the clock now advances.  */
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_datetime_bcd(0x02, 0x04, 0x59, 0x02, 0x02, 0x2011);
+ }
+
+@@ -595,18 +595,18 @@ static void divider_reset(void)
+     assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
+
+     /* Since divider reset flag is still enabled, these are equality checks. */
+-    clock_step(1000000000LL);
++    clock_step(global_qtest, 1000000000LL);
+     assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
+
+     /* The first update ends 500 ms after divider reset */
+     cmos_write(RTC_REG_A, 0x26);
+-    clock_step(500000000LL - UIP_HOLD_LENGTH - 1);
++    clock_step(global_qtest, 500000000LL - UIP_HOLD_LENGTH - 1);
+     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
+     assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
+
+-    clock_step(1);
++    clock_step(global_qtest, 1);
+     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, !=, 0);
+-    clock_step(UIP_HOLD_LENGTH);
++    clock_step(global_qtest, UIP_HOLD_LENGTH);
+     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
+
+     assert_datetime_bcd(0x02, 0x04, 0x59, 0x02, 0x02, 0x2011);
+@@ -618,7 +618,7 @@ static void uip_stuck(void)
+
+     /* The first update ends 500 ms after divider reset */
+     (void)cmos_read(RTC_REG_C);
+-    clock_step(500000000LL);
++    clock_step(global_qtest, 500000000LL);
+     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
+     assert_datetime_bcd(0x02, 0x04, 0x59, 0x02, 0x02, 0x2011);
+
+@@ -628,12 +628,12 @@ static void uip_stuck(void)
+     cmos_write(RTC_SECONDS_ALARM, 0xC0);
+
+     /* Because the alarm will fire soon, reading register A will latch UIP.  */
+-    clock_step(1000000000LL - UIP_HOLD_LENGTH / 2);
++    clock_step(global_qtest, 1000000000LL - UIP_HOLD_LENGTH / 2);
+     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, !=, 0);
+
+     /* Move the alarm far away.  This must not cause UIP to remain stuck!  */
+     cmos_write(RTC_HOURS_ALARM, 0x03);
+-    clock_step(UIP_HOLD_LENGTH);
++    clock_step(global_qtest, UIP_HOLD_LENGTH);
+     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
+ }
+
+@@ -645,7 +645,7 @@ static void uip_stuck(void)
  static uint64_t wait_periodic_interrupt(uint64_t real_time)
  {
--    while (!get_irq(RTC_ISA_IRQ)) {
-+    while (!get_irq(global_qtest, RTC_ISA_IRQ)) {
-         real_time = clock_step_next(global_qtest);
+     while (!get_irq(RTC_ISA_IRQ)) {
+-        real_time = clock_step_next();
++        real_time = clock_step_next(global_qtest);
      }
 
-@@ -691,7 +691,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
+     g_assert((cmos_read(RTC_REG_C) & REG_C_PF) != 0);
+@@ -664,7 +664,7 @@ static void periodic_timer(void)
+     /* enable periodic interrupt after properly configure the period. */
+     cmos_write(RTC_REG_B, cmos_read(RTC_REG_B) | REG_B_PIE);
 
-     s = global_qtest = qtest_start("-rtc clock=vm");
--    qtest_irq_intercept_in(s, "ioapic");
-+    irq_intercept_in(s, "ioapic");
+-    start_time = real_time = clock_step_next();
++    start_time = real_time = clock_step_next(global_qtest);
 
-     qtest_add_func("/rtc/check-time/bcd", bcd_check_time);
-     qtest_add_func("/rtc/check-time/dec", dec_check_time);
+     for (i = 0; i < RTC_PERIOD_TEST_NR; i++) {
+         cmos_write(RTC_REG_A, RTC_PERIOD_CODE1);
+diff --git a/tests/rtl8139-test.c b/tests/rtl8139-test.c
+index 1741f0ec47..d123245108 100644
+--- a/tests/rtl8139-test.c
++++ b/tests/rtl8139-test.c
+@@ -84,7 +84,7 @@ static void test_timer(void)
+         fatal("time too big %u\n", curr);
+     }
+     for (cnt = 0; ; ) {
+-        clock_step(1 * NANOSECONDS_PER_SECOND);
++        clock_step(global_qtest, 1 * NANOSECONDS_PER_SECOND);
+         prev = curr;
+         curr = in_Timer();
+
+@@ -106,7 +106,7 @@ static void test_timer(void)
+     /* Test 3. Setting TimerInt to 1 and Timer to 0 get interrupt */
+     out_TimerInt(1);
+     out_Timer(0);
+-    clock_step(40);
++    clock_step(global_qtest, 40);
+     if ((in_IntrStatus() & 0x4000) == 0) {
+         fatal("we should have an interrupt here!\n");
+     }
+@@ -123,7 +123,7 @@ static void test_timer(void)
+     out_IntrStatus(0x4000);
+     curr = in_Timer();
+     out_TimerInt(curr + 0.5 * CLK);
+-    clock_step(1 * NANOSECONDS_PER_SECOND);
++    clock_step(global_qtest, 1 * NANOSECONDS_PER_SECOND);
+     out_Timer(0);
+     if ((in_IntrStatus() & 0x4000) == 0) {
+         fatal("we should have an interrupt here!\n");
+@@ -135,7 +135,7 @@ static void test_timer(void)
+     out_IntrStatus(0x4000);
+     curr = in_Timer();
+     out_TimerInt(curr + 0.5 * CLK);
+-    clock_step(1 * NANOSECONDS_PER_SECOND);
++    clock_step(global_qtest, 1 * NANOSECONDS_PER_SECOND);
+     out_TimerInt(0);
+     if ((in_IntrStatus() & 0x4000) == 0) {
+         fatal("we should have an interrupt here!\n");
+@@ -146,7 +146,7 @@ static void test_timer(void)
+     next = curr + 5.0 * CLK;
+     out_TimerInt(next);
+     for (cnt = 0; ; ) {
+-        clock_step(1 * NANOSECONDS_PER_SECOND);
++        clock_step(global_qtest, 1 * NANOSECONDS_PER_SECOND);
+         prev = curr;
+         curr = in_Timer();
+         diff = (curr-prev) & 0xffffffffu;
 diff --git a/tests/tco-test.c b/tests/tco-test.c
-index 27e982d8ac..c2abbeeaac 100644
+index b84a50927a..27e982d8ac 100644
 --- a/tests/tco-test.c
 +++ b/tests/tco-test.c
-@@ -60,7 +60,7 @@ static void test_init(TestData *d)
-                       d->noreboot ? "" : "-global ICH9-LPC.noreboot=false",
-                       !d->args ? "" : d->args);
-     global_qtest = qs;
--    qtest_irq_intercept_in(qs, "ioapic");
-+    irq_intercept_in(qs, "ioapic");
+@@ -173,7 +173,7 @@ static void test_tco_timeout(void)
+     set_tco_timeout(&d, ticks);
+     load_tco(&d);
+     start_tco(&d);
+-    clock_step(ticks * TCO_TICK_NSEC);
++    clock_step(global_qtest, ticks * TCO_TICK_NSEC);
 
-     d->bus = qpci_init_pc(qs, NULL);
-     d->dev = qpci_device_find(d->bus, QPCI_DEVFN(0x1f, 0x00));
+     /* test first timeout */
+     val = qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS);
+@@ -188,7 +188,7 @@ static void test_tco_timeout(void)
+     g_assert(ret == 0);
+
+     /* test second timeout */
+-    clock_step(ticks * TCO_TICK_NSEC);
++    clock_step(global_qtest, ticks * TCO_TICK_NSEC);
+     val = qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS);
+     ret = val & TCO_TIMEOUT ? 1 : 0;
+     g_assert(ret == 1);
+@@ -217,14 +217,14 @@ static void test_tco_max_timeout(void)
+     set_tco_timeout(&d, ticks);
+     load_tco(&d);
+     start_tco(&d);
+-    clock_step(((ticks & TCO_TMR_MASK) - 1) * TCO_TICK_NSEC);
++    clock_step(global_qtest, ((ticks & TCO_TMR_MASK) - 1) * TCO_TICK_NSEC);
+
+     val = qpci_io_readw(d.dev, d.tco_io_bar, TCO_RLD);
+     g_assert_cmpint(val & TCO_RLD_MASK, ==, 1);
+     val = qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS);
+     ret = val & TCO_TIMEOUT ? 1 : 0;
+     g_assert(ret == 0);
+-    clock_step(TCO_TICK_NSEC);
++    clock_step(global_qtest, TCO_TICK_NSEC);
+     val = qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS);
+     ret = val & TCO_TIMEOUT ? 1 : 0;
+     g_assert(ret == 1);
+@@ -260,7 +260,7 @@ static void test_tco_second_timeout_pause(void)
+     set_tco_timeout(&td, TCO_SECS_TO_TICKS(16));
+     load_tco(&td);
+     start_tco(&td);
+-    clock_step(ticks * TCO_TICK_NSEC * 2);
++    clock_step(global_qtest, ticks * TCO_TICK_NSEC * 2);
+     ad = get_watchdog_action();
+     g_assert(!strcmp(qdict_get_str(ad, "action"), "pause"));
+     QDECREF(ad);
+@@ -285,7 +285,7 @@ static void test_tco_second_timeout_reset(void)
+     set_tco_timeout(&td, TCO_SECS_TO_TICKS(16));
+     load_tco(&td);
+     start_tco(&td);
+-    clock_step(ticks * TCO_TICK_NSEC * 2);
++    clock_step(global_qtest, ticks * TCO_TICK_NSEC * 2);
+     ad = get_watchdog_action();
+     g_assert(!strcmp(qdict_get_str(ad, "action"), "reset"));
+     QDECREF(ad);
+@@ -310,7 +310,7 @@ static void test_tco_second_timeout_shutdown(void)
+     set_tco_timeout(&td, ticks);
+     load_tco(&td);
+     start_tco(&td);
+-    clock_step(ticks * TCO_TICK_NSEC * 2);
++    clock_step(global_qtest, ticks * TCO_TICK_NSEC * 2);
+     ad = get_watchdog_action();
+     g_assert(!strcmp(qdict_get_str(ad, "action"), "shutdown"));
+     QDECREF(ad);
+@@ -335,7 +335,7 @@ static void test_tco_second_timeout_none(void)
+     set_tco_timeout(&td, ticks);
+     load_tco(&td);
+     start_tco(&td);
+-    clock_step(ticks * TCO_TICK_NSEC * 2);
++    clock_step(global_qtest, ticks * TCO_TICK_NSEC * 2);
+     ad = get_watchdog_action();
+     g_assert(!strcmp(qdict_get_str(ad, "action"), "none"));
+     QDECREF(ad);
+@@ -364,7 +364,7 @@ static void test_tco_ticks_counter(void)
+     do {
+         rld = qpci_io_readw(d.dev, d.tco_io_bar, TCO_RLD) & TCO_RLD_MASK;
+         g_assert_cmpint(rld, ==, ticks);
+-        clock_step(TCO_TICK_NSEC);
++        clock_step(global_qtest, TCO_TICK_NSEC);
+         ticks--;
+     } while (!(qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS) & TCO_TIMEOUT));
+
+@@ -407,7 +407,7 @@ static void test_tco1_status_bits(void)
+     set_tco_timeout(&d, ticks);
+     load_tco(&d);
+     start_tco(&d);
+-    clock_step(ticks * TCO_TICK_NSEC);
++    clock_step(global_qtest, ticks * TCO_TICK_NSEC);
+
+     qpci_io_writeb(d.dev, d.tco_io_bar, TCO_DAT_IN, 0);
+     qpci_io_writeb(d.dev, d.tco_io_bar, TCO_DAT_OUT, 0);
+@@ -436,7 +436,7 @@ static void test_tco2_status_bits(void)
+     set_tco_timeout(&d, ticks);
+     load_tco(&d);
+     start_tco(&d);
+-    clock_step(ticks * TCO_TICK_NSEC * 2);
++    clock_step(global_qtest, ticks * TCO_TICK_NSEC * 2);
+
+     val = qpci_io_readw(d.dev, d.tco_io_bar, TCO2_STS);
+     ret = val & (TCO_SECOND_TO_STS | TCO_BOOT_STS) ? 1 : 0;
+diff --git a/tests/test-arm-mptimer.c b/tests/test-arm-mptimer.c
+index 9631c55fe3..0e6484a4a8 100644
+--- a/tests/test-arm-mptimer.c
++++ b/tests/test-arm-mptimer.c
+@@ -14,7 +14,8 @@
+ #define TIMER_BLOCK_SCALE(s)    ((((s) & 0xff) + 1) * 10)
+
+ #define TIMER_BLOCK_STEP(scaler, steps_nb) \
+-    clock_step(TIMER_BLOCK_SCALE(scaler) * (int64_t)(steps_nb) + 1)
++    clock_step(global_qtest, \
++               TIMER_BLOCK_SCALE(scaler) * (int64_t)(steps_nb) + 1)
+
+ #define TIMER_BASE_PHYS 0x1e000600
+
+@@ -185,12 +186,14 @@ static void test_timer_periodic(gconstpointer arg)
+     timer_start(PERIODIC, scaler);
+
+     while (repeat--) {
+-        clock_step(TIMER_BLOCK_SCALE(scaler) * (101 + repeat) + 1);
++        clock_step(global_qtest,
++                   TIMER_BLOCK_SCALE(scaler) * (101 + repeat) + 1);
+
+         g_assert_cmpuint(timer_counter(), ==, 100 - repeat);
+         g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 1);
+
+-        clock_step(TIMER_BLOCK_SCALE(scaler) * (101 - repeat) - 1);
++        clock_step(global_qtest,
++                   TIMER_BLOCK_SCALE(scaler) * (101 - repeat) - 1);
+     }
+ }
+
+@@ -686,10 +689,10 @@ static void test_periodic_counter(gconstpointer arg)
+     timer_load(test_load);
+     timer_start(PERIODIC, scaler);
+
+-    clock_step(1);
++    clock_step(global_qtest, 1);
+
+     for (test_val = 0; test_val <= test_load; test_val++) {
+-        clock_step(TIMER_BLOCK_SCALE(scaler) * test_load);
++        clock_step(global_qtest, TIMER_BLOCK_SCALE(scaler) * test_load);
+         g_assert_cmpint(timer_counter(), ==, test_val);
+     }
+ }
+@@ -783,7 +786,7 @@ again:
+     timer_reset();
+     timer_start(mode, 255);
+
+-    clock_step(100);
++    clock_step(global_qtest, 100);
+
+     g_assert_cmpuint(timer_counter(), ==, 0);
+
+@@ -795,7 +798,7 @@ again:
+     timer_load(2);
+     timer_start(mode, 255);
+
+-    clock_step(100);
++    clock_step(global_qtest, 100);
+
+     g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 0);
+
+@@ -811,13 +814,13 @@ again:
+     timer_load(UINT32_MAX);
+     timer_start(mode, 255);
+
+-    clock_step(100);
++    clock_step(global_qtest, 100);
+
+     g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 0);
+
+     timer_set_counter(0);
+
+-    clock_step(100);
++    clock_step(global_qtest, 100);
+
+     g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 0);
+
+@@ -829,13 +832,13 @@ again:
+     timer_load(UINT32_MAX);
+     timer_start(mode, 255);
+
+-    clock_step(100);
++    clock_step(global_qtest, 100);
+
+     g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 0);
+
+     timer_load(0);
+
+-    clock_step(100);
++    clock_step(global_qtest, 100);
+
+     g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 0);
+
 diff --git a/tests/wdt_ib700-test.c b/tests/wdt_ib700-test.c
-index 05690e5159..5ce8f4a08a 100644
+index a169265e16..05690e5159 100644
 --- a/tests/wdt_ib700-test.c
 +++ b/tests/wdt_ib700-test.c
-@@ -58,7 +58,7 @@ static void ib700_pause(void)
-     QDict *d;
-     QTestState *s = qtest_start("-watchdog-action pause -device ib700");
+@@ -22,29 +22,29 @@ static QDict *ib700_program_and_wait(QTestState *s)
+ {
+     QDict *event, *data;
 
--    qtest_irq_intercept_in(s, "ioapic");
-+    irq_intercept_in(s, "ioapic");
-     d = ib700_program_and_wait(s);
-     g_assert(!strcmp(qdict_get_str(d, "action"), "pause"));
-     QDECREF(d);
-@@ -71,7 +71,7 @@ static void ib700_reset(void)
-     QDict *d;
-     QTestState *s = qtest_start("-watchdog-action reset -device ib700");
+-    qtest_clock_step(s, NANOSECONDS_PER_SECOND * 40);
++    clock_step(s, NANOSECONDS_PER_SECOND * 40);
+     qmp_check_no_event(s);
 
--    qtest_irq_intercept_in(s, "ioapic");
-+    irq_intercept_in(s, "ioapic");
-     d = ib700_program_and_wait(s);
-     g_assert(!strcmp(qdict_get_str(d, "action"), "reset"));
-     QDECREF(d);
-@@ -85,7 +85,7 @@ static void ib700_shutdown(void)
-     QTestState *s;
+     /* 2 second limit */
+     qtest_outb(s, 0x443, 14);
 
-     s = qtest_start("-watchdog-action reset -no-reboot -device ib700");
--    qtest_irq_intercept_in(s, "ioapic");
-+    irq_intercept_in(s, "ioapic");
-     d = ib700_program_and_wait(s);
-     g_assert(!strcmp(qdict_get_str(d, "action"), "reset"));
-     QDECREF(d);
-@@ -98,7 +98,7 @@ static void ib700_none(void)
-     QDict *d;
-     QTestState *s = qtest_start("-watchdog-action none -device ib700");
+     /* Ping */
+-    qtest_clock_step(s, NANOSECONDS_PER_SECOND);
++    clock_step(s, NANOSECONDS_PER_SECOND);
+     qmp_check_no_event(s);
+     qtest_outb(s, 0x443, 14);
 
--    qtest_irq_intercept_in(s, "ioapic");
-+    irq_intercept_in(s, "ioapic");
-     d = ib700_program_and_wait(s);
-     g_assert(!strcmp(qdict_get_str(d, "action"), "none"));
-     QDECREF(d);
+     /* Disable */
+-    qtest_clock_step(s, NANOSECONDS_PER_SECOND);
++    clock_step(s, NANOSECONDS_PER_SECOND);
+     qmp_check_no_event(s);
+     qtest_outb(s, 0x441, 1);
+-    qtest_clock_step(s, 3 * NANOSECONDS_PER_SECOND);
++    clock_step(s, 3 * NANOSECONDS_PER_SECOND);
+     qmp_check_no_event(s);
+
+     /* Enable and let it fire */
+     qtest_outb(s, 0x443, 13);
+-    qtest_clock_step(s, 3 * NANOSECONDS_PER_SECOND);
++    clock_step(s, 3 * NANOSECONDS_PER_SECOND);
+     qmp_check_no_event(s);
+-    qtest_clock_step(s, 2 * NANOSECONDS_PER_SECOND);
++    clock_step(s, 2 * NANOSECONDS_PER_SECOND);
+     event = qtest_qmp_eventwait_ref(s, "WATCHDOG");
+     data = qdict_get_qdict(event, "data");
+     QINCREF(data);
 -- 
 2.13.5
