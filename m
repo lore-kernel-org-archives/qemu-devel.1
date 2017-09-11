@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57877)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drS4M-0006Ui-Gg
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:00:28 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1drS4P-0006XW-LV
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:00:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drS4I-0007Je-Ka
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:00:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54982)
+	(envelope-from <dgilbert@redhat.com>) id 1drS4O-0007LH-JJ
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:00:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46288)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1drS4I-0007J7-CK
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:00:18 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5E4991B5C53
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 17:00:17 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 11 Sep 2017 18:59:28 +0200
-Message-Id: <20170911165929.2791-7-marcandre.lureau@redhat.com>
-In-Reply-To: <20170911165929.2791-1-marcandre.lureau@redhat.com>
-References: <20170911165929.2791-1-marcandre.lureau@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1drS4O-0007L9-AR
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:00:24 -0400
+Date: Mon, 11 Sep 2017 18:00:03 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170911170002.GD2150@work-vm>
+References: <20170824192730.8440-1-dgilbert@redhat.com>
+	<20170824192730.8440-8-dgilbert@redhat.com>
+	<20170829060206.GU14174@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 6/7] scripts/dump-guest-memory.py: add
- vmcoreinfo
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170829060206.GU14174@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC v2 07/32] postcopy: Add notifier chain
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,124 +28,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com, anderson@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
 
-Add a vmcoreinfo ELF note in the dump if vmcoreinfo device has the
-memory location details.
+* Peter Xu (peterx@redhat.com) wrote:
+> On Thu, Aug 24, 2017 at 08:27:05PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Add a notifier chain for postcopy with a 'reason' flag
+> > and an opportunity for a notifier member to return an error.
+> > 
+> > Call it when enabling postcopy.
+> > 
+> > This will initially used to enable devices to declare they're unable
+> > to postcopy and later to notify of devices of stages within postcopy.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  migration/postcopy-ram.c | 41 +++++++++++++++++++++++++++++++++++++++++
+> >  migration/postcopy-ram.h | 26 ++++++++++++++++++++++++++
+> >  vl.c                     |  2 ++
+> >  3 files changed, 69 insertions(+)
+> > 
+> > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> > index 640b72d86d..95007c00ef 100644
+> > --- a/migration/postcopy-ram.c
+> > +++ b/migration/postcopy-ram.c
+> > @@ -23,6 +23,8 @@
+> >  #include "savevm.h"
+> >  #include "postcopy-ram.h"
+> >  #include "ram.h"
+> > +#include "qapi/error.h"
+> > +#include "qemu/notify.h"
+> >  #include "sysemu/sysemu.h"
+> >  #include "sysemu/balloon.h"
+> >  #include "qemu/error-report.h"
+> > @@ -45,6 +47,38 @@ struct PostcopyDiscardState {
+> >      unsigned int nsentcmds;
+> >  };
+> >  
+> > +/* A notifier chain for postcopy
+> > + * The notifier should return 0 if it's OK, or a
+> > + * -errno on error.
+> > + * The notifier should expect an Error ** as it's data
+> 
+> "PostcopyNotifyData *" but not "Error **"?
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- scripts/dump-guest-memory.py | 61 ++++++++++++++++++++++++++++++++++++++=
-++++++
- 1 file changed, 61 insertions(+)
+Ah well spotted.
 
-diff --git a/scripts/dump-guest-memory.py b/scripts/dump-guest-memory.py
-index f7c6635f15..69dd5efadf 100644
---- a/scripts/dump-guest-memory.py
-+++ b/scripts/dump-guest-memory.py
-@@ -14,6 +14,7 @@ the COPYING file in the top-level directory.
- """
-=20
- import ctypes
-+import struct
-=20
- UINTPTR_T =3D gdb.lookup_type("uintptr_t")
-=20
-@@ -45,6 +46,17 @@ EM_S390 =3D 22
- EM_AARCH =3D 183
- EM_X86_64 =3D 62
-=20
-+VMCOREINFO_FORMAT_ELF =3D 1
-+
-+def le16_to_cpu(val):
-+    return struct.unpack("<H", struct.pack("=3DH", val))[0]
-+
-+def le32_to_cpu(val):
-+    return struct.unpack("<I", struct.pack("=3DI", val))[0]
-+
-+def le64_to_cpu(val):
-+    return struct.unpack("<Q", struct.pack("=3DQ", val))[0]
-+
- class ELF(object):
-     """Representation of a ELF file."""
-=20
-@@ -120,6 +132,25 @@ class ELF(object):
-         self.segments[0].p_filesz +=3D ctypes.sizeof(note)
-         self.segments[0].p_memsz +=3D ctypes.sizeof(note)
-=20
-+
-+    def add_vmcoreinfo_note(self, vmcoreinfo):
-+        """Adds a vmcoreinfo note to the ELF dump."""
-+        # compute the header size, and copy that many bytes from the not=
-e
-+        header =3D get_arch_note(self.endianness, 0, 0)
-+        ctypes.memmove(ctypes.pointer(header),
-+                       vmcoreinfo, ctypes.sizeof(header))
-+        if header.n_descsz > 1 << 20:
-+            print('warning: invalid vmcoreinfo size')
-+            return
-+        # now get the full note
-+        note =3D get_arch_note(self.endianness,
-+                             header.n_namesz - 1, header.n_descsz)
-+        ctypes.memmove(ctypes.pointer(note), vmcoreinfo, ctypes.sizeof(n=
-ote))
-+
-+        self.notes.append(note)
-+        self.segments[0].p_filesz +=3D ctypes.sizeof(note)
-+        self.segments[0].p_memsz +=3D ctypes.sizeof(note)
-+
-     def add_segment(self, p_type, p_paddr, p_size):
-         """Adds a segment to the elf."""
-=20
-@@ -505,6 +536,35 @@ shape and this command should mostly work."""
-                 cur +=3D chunk_size
-                 left -=3D chunk_size
-=20
-+    def phys_memory_read(self, addr, size):
-+        qemu_core =3D gdb.inferiors()[0]
-+        for block in self.guest_phys_blocks:
-+            if block["target_start"] <=3D addr \
-+               and addr + size <=3D block["target_end"]:
-+                haddr =3D block["host_addr"] + (addr - block["target_sta=
-rt"])
-+                return qemu_core.read_memory(haddr, size)
-+        return None
-+
-+    def add_vmcoreinfo(self):
-+        if not gdb.parse_and_eval("vmcoreinfo_find()") \
-+           or not gdb.parse_and_eval("vmcoreinfo_find()->has_vmcoreinfo"=
-):
-+            return
-+
-+        fmt =3D gdb.parse_and_eval("vmcoreinfo_find()->vmcoreinfo.guest_=
-format")
-+        addr =3D gdb.parse_and_eval("vmcoreinfo_find()->vmcoreinfo.paddr=
-")
-+        size =3D gdb.parse_and_eval("vmcoreinfo_find()->vmcoreinfo.size"=
-)
-+
-+        fmt =3D le16_to_cpu(fmt)
-+        addr =3D le64_to_cpu(addr)
-+        size =3D le32_to_cpu(size)
-+
-+        if fmt !=3D VMCOREINFO_FORMAT_ELF:
-+            return
-+
-+        vmcoreinfo =3D self.phys_memory_read(addr, size)
-+        if vmcoreinfo:
-+            self.elf.add_vmcoreinfo_note(vmcoreinfo.tobytes())
-+
-     def invoke(self, args, from_tty):
-         """Handles command invocation from gdb."""
-=20
-@@ -518,6 +578,7 @@ shape and this command should mostly work."""
-=20
-         self.elf =3D ELF(argv[1])
-         self.guest_phys_blocks =3D get_guest_phys_blocks()
-+        self.add_vmcoreinfo()
-=20
-         with open(argv[0], "wb") as vmcore:
-             self.dump_init(vmcore)
---=20
-2.14.1.146.gd35faa819
+> Maybe we can just remove this block of comment since there is a
+> similar one in the header below.
+
+Yes, that's what I've done.
+
+> Besides:
+> 
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+
+Thanks.
+
+Dave
+
+> 
+> > + */
+> > +static NotifierWithReturnList postcopy_notifier_list;
+> > +
+> > +void postcopy_infrastructure_init(void)
+> > +{
+> > +    notifier_with_return_list_init(&postcopy_notifier_list);
+> > +}
+> > +
+> > +void postcopy_add_notifier(NotifierWithReturn *nn)
+> > +{
+> > +    notifier_with_return_list_add(&postcopy_notifier_list, nn);
+> > +}
+> > +
+> > +void postcopy_remove_notifier(NotifierWithReturn *n)
+> > +{
+> > +    notifier_with_return_remove(n);
+> > +}
+> > +
+> > +int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp)
+> > +{
+> > +    struct PostcopyNotifyData pnd;
+> > +    pnd.reason = reason;
+> > +    pnd.errp = errp;
+> > +
+> > +    return notifier_with_return_list_notify(&postcopy_notifier_list,
+> > +                                            &pnd);
+> > +}
+> > +
+> >  /* Postcopy needs to detect accesses to pages that haven't yet been copied
+> >   * across, and efficiently map new pages in, the techniques for doing this
+> >   * are target OS specific.
+> > @@ -133,6 +167,7 @@ bool postcopy_ram_supported_by_host(void)
+> >      struct uffdio_register reg_struct;
+> >      struct uffdio_range range_struct;
+> >      uint64_t feature_mask;
+> > +    Error *local_err = NULL;
+> >  
+> >      if (qemu_target_page_size() > pagesize) {
+> >          error_report("Target page size bigger than host page size");
+> > @@ -146,6 +181,12 @@ bool postcopy_ram_supported_by_host(void)
+> >          goto out;
+> >      }
+> >  
+> > +    /* Give devices a chance to object */
+> > +    if (postcopy_notify(POSTCOPY_NOTIFY_PROBE, &local_err)) {
+> > +        error_report_err(local_err);
+> > +        goto out;
+> > +    }
+> > +
+> >      /* Version and features check */
+> >      if (!ufd_version_check(ufd)) {
+> >          goto out;
+> > diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+> > index 78a3591322..d688411674 100644
+> > --- a/migration/postcopy-ram.h
+> > +++ b/migration/postcopy-ram.h
+> > @@ -114,4 +114,30 @@ PostcopyState postcopy_state_get(void);
+> >  /* Set the state and return the old state */
+> >  PostcopyState postcopy_state_set(PostcopyState new_state);
+> >  
+> > +/*
+> > + * To be called once at the start before any device initialisation
+> > + */
+> > +void postcopy_infrastructure_init(void);
+> > +
+> > +/* Add a notifier to a list to be called when checking whether the devices
+> > + * can support postcopy.
+> > + * It's data is a *PostcopyNotifyData
+> > + * It should return 0 if OK, or a negative value on failure.
+> > + * On failure it must set the data->errp to an error.
+> > + *
+> > + */
+> > +enum PostcopyNotifyReason {
+> > +    POSTCOPY_NOTIFY_PROBE = 0,
+> > +};
+> > +
+> > +struct PostcopyNotifyData {
+> > +    enum PostcopyNotifyReason reason;
+> > +    Error **errp;
+> > +};
+> > +
+> > +void postcopy_add_notifier(NotifierWithReturn *nn);
+> > +void postcopy_remove_notifier(NotifierWithReturn *n);
+> > +/* Call the notifier list set by postcopy_add_start_notifier */
+> > +int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp);
+> > +
+> >  #endif
+> > diff --git a/vl.c b/vl.c
+> > index 8e247cc2a2..65dd9dc324 100644
+> > --- a/vl.c
+> > +++ b/vl.c
+> > @@ -95,6 +95,7 @@ int main(int argc, char **argv)
+> >  #include "audio/audio.h"
+> >  #include "sysemu/cpus.h"
+> >  #include "migration/colo.h"
+> > +#include "migration/postcopy-ram.h"
+> >  #include "sysemu/kvm.h"
+> >  #include "sysemu/hax.h"
+> >  #include "qapi/qobject-input-visitor.h"
+> > @@ -3082,6 +3083,7 @@ int main(int argc, char **argv, char **envp)
+> >      module_call_init(MODULE_INIT_OPTS);
+> >  
+> >      runstate_init();
+> > +    postcopy_infrastructure_init();
+> >  
+> >      if (qcrypto_init(&err) < 0) {
+> >          error_reportf_err(err, "cannot initialize crypto: ");
+> > -- 
+> > 2.13.5
+> > 
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
