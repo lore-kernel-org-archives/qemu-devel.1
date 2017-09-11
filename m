@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48958)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drHgK-0003bl-Hm
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 01:54:53 -0400
+	(envelope-from <thuth@redhat.com>) id 1drHyO-0007ZY-8o
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 02:13:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drHgF-0005Mn-LY
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 01:54:52 -0400
-Received: from indium.canonical.com ([91.189.90.7]:52563)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1drHgF-0005Mb-Ev
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 01:54:47 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1drHgD-0008HA-FZ
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 05:54:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 67DB02E8492
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 05:54:45 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1drHyK-0005gZ-A8
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 02:13:32 -0400
+References: <1504605227-5124-1-git-send-email-thuth@redhat.com>
+	<871snlwev0.fsf@dusky.pond.sub.org> <20170905164835.GF2112@work-vm>
+	<6e03aa82-3663-c251-c8e1-ac2e7eb0e7e7@redhat.com>
+	<87mv68e2i3.fsf@dusky.pond.sub.org>
+	<20170909204133.GH7570@localhost.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <825b29f3-7857-558e-9092-855c9f75463e@redhat.com>
+Date: Mon, 11 Sep 2017 08:13:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20170909204133.GH7570@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Sep 2017 05:40:23 -0000
-From: Thomas Huth <1119861@bugs.launchpad.net>
-Reply-To: Bug 1119861 <1119861@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130208231600.11384.57636.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150510842413.31851.15733631615351376950.launchpad@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1119861] Re: Poor console performance in Windows 7
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH] tests: Add a device_add/del
+ HMP test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,53 +28,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+On 09.09.2017 22:41, Eduardo Habkost wrote:
+> On Wed, Sep 06, 2017 at 08:59:32AM +0200, Markus Armbruster wrote:
+>> Thomas Huth <thuth@redhat.com> writes:
+>>
+>>> On 05.09.2017 18:48, Dr. David Alan Gilbert wrote:
+>>>> * Markus Armbruster (armbru@redhat.com) wrote:
+>>>>> Thomas Huth <thuth@redhat.com> writes:
+>>>>>
+>>>>>> People tend to forget to mark internal devices with "user_creatabl=
+e =3D false
+>>>>>> or hotpluggable =3D false, and these devices can crash QEMU if add=
+ed via the
+>>>>>> HMP monitor. So let's add a test to run through all devices and th=
+at tries
+>>>>>> to add them blindly (without arguments) to see whether this could =
+crash the
+>>>>>> QEMU instance.
+[...]
+>>>>> * The device supports only cold plug with -device, not hot plug wit=
+h
+>>>>>   device_add.
+>>>
+>>> We've got Eduardo's scripts/device-crash-test script for that already=
+,
+>>> so no need to cover that here.
+>>
+>> Point taken.  So this test is really about hot plug / unplug.  Suggest
+>> to clarify the commit message: s/add them blindly/hotplug and unplug
+>> them blindly/.
+>=20
+> We could extend device-crash-test to test device_add too, as it
+> already has extra code to deal with known crashes and testing
+> multiple machine-types.  Also, any additional code we write to
+> ensure we add mandatory arguments or plug only to valid buses
+> would apply to both -device and device_add.  I also think Python
+> test code is easier to maintain and extend, but that's just my
+> personal preference.
 
--- =
+Adding device_add/del support to device-crash-test is certainly an
+option. The problem is that nobody runs it by default, so this won't
+help to avoid that new problems are being committed to the repository.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1119861
+I think we really should have a test for "make check", too. So would my
+test be acceptable if I'd rewrite it to use QMP instead (I don't think I
+could do the full list that Markus mentioned, but at least a basic test
+via QMP as a start)?
 
-Title:
-  Poor console performance in Windows 7
+>>>> If I'm reading the code right it's creating the device with the same
+>>>> name as the device;  I wonder if that always works?
+>>>
+>>> Why not? The id is just an arbitrary string, isn't it?
+>>
+>> Since you're using HMP, you get to quote ',', which occurs in some
+>> device names[*].  Enjoy!  ;-P
+>>
+>> Picking IDs that aren't anti-social may be easier.
 
-Status in QEMU:
-  Fix Released
+I'm considering to fail the test if it detects a device with a ',' in
+its name. Such devices should really not be there in QEMU...
 
-Bug description:
-  As part of its conformance test suite, Wine tests the behavior of the
-  Windows console API. Part of this test involves opening a test console
-  and scrolling things around. The test probably does not need to
-  perform that many scroll operations to achieve its goal. However as is
-  it illustrates a significant performance issue in QEmu. Unfortunately
-  it does so by timing out (the tests must run in less than 2 minutes).
-  Here are the run times on a few configurations:
-
-   10s - QEmu 1.4 + Q9450@2.6GHz + Windows XP + QXL + QXL driver
-    8s - QEmu 1.12 + Opteron 6128 + Windows XP + QXL + QXL driver
-  127s - QEmu 1.12 + Opteron 6128 + Windows 7 + cirrus + vga driver
-  127s - QEmu 1.12 + Opteron 6128 + Windows 7 + QXL + QXL driver
-  147s - QEmu 1.12 + Opteron 6128 + Windows 7 + vmvga + vga driver
-  145s - QEmu 1.12 + Opteron 6128 + Windows 7 + vmvga + vmware driver (xpdm=
-, no better with all graphics effects disabled)
-
-   10s - Metal + Atom N270 + Windows XP + GMA 950 + Intel driver
-    6s - Metal + i5-3317U + Windows 8 + HD4000 + Intel driver
-    3s - VMware + Q9450@2.6GHz + Windows XP + vmvga + vmware driver
-   65s - VMware + Q9450@2.6GHz + Windows 7 + vmvga + vmware driver
-
-  So when running on the bare metal all versions of Windows are about as
-  fast. However in QEmu Windows 7 is almost 16 times slower than Windows
-  XP! VMware is impacted too but it's still maintains a good lead in
-  performance.
-
-  Disabling all graphics effects did not help so it's not clear that the
-  fault lies with Windows 7's compositing desktop window manager. Maybe
-  it has to do with the lack of a proper wddm driver?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1119861/+subscriptions
+ Thomas
