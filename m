@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51508)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53262)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1drWht-00050n-QG
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:57:30 -0400
+	(envelope-from <groug@kaod.org>) id 1drWp1-00080U-12
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:04:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1drWhs-000381-RT
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:57:29 -0400
-Received: from mail-io0-x244.google.com ([2607:f8b0:4001:c06::244]:36102)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1drWhs-00037m-Lg
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:57:28 -0400
-Received: by mail-io0-x244.google.com with SMTP id n69so2882355ioi.3
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 14:57:28 -0700 (PDT)
+	(envelope-from <groug@kaod.org>) id 1drWow-0006JS-VI
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:04:51 -0400
+Received: from 15.mo1.mail-out.ovh.net ([188.165.38.232]:36492)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drWow-0006JI-P5
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:04:46 -0400
+Received: from player169.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id F0521917B0
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 00:04:44 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Tue, 12 Sep 2017 00:04:40 +0200
+Message-ID: <150516748034.6883.2205624415045931101.stgit@bahia.lan>
 MIME-Version: 1.0
-References: <20170911210129.5874-1-f4bug@amsat.org>
-In-Reply-To: <20170911210129.5874-1-f4bug@amsat.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Mon, 11 Sep 2017 21:57:17 +0000
-Message-ID: <CAJ+F1CK_jv6gemRdrhK75ZYa7qT0hoCACtkmcO_-pT0atYs8_w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] test-qga: add missing qemu-ga tool
- dependency
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] xics: fix several error leaks
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Cedric Le Goater <clg@kaod.org>
 
-On Mon, Sep 11, 2017 at 11:02 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg>
-wrote:
+If object_property_get_link() fails then it allocates an error, which
+must be freed before returning. The error_get_pretty() function is
+merely an accessor to the error message and doesn't free anything.
 
-> this fixes running 'make check-unit' without running 'make all' beforehan=
-d:
->
-> $ make check-unit
->   ...
->   GTESTER tests/test-qga
-> **
-> ERROR:tests/test-qga.c:73:fixture_setup: assertion failed (error =3D=3D N=
-ULL):
-> Failed to execute child process "/build/qemu/qemu-ga" (No such file or
-> directory) (g-exec-error-quark, 8)
-> make: *** [check-tests/test-qga] Error 1
->
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
+The error.h header indicates how to do it right:
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+ * Pass an existing error to the caller with the message modified:
+ *     error_propagate(errp, err);
+ *     error_prepend(errp, "Could not frobnicate '%s': ", name);
 
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/intc/xics.c |   12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-
-> ---
-> occured trying to split Travis jobs to run more/faster
->
->  tests/Makefile.include | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index fae5715e9c..59e027f6ea 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -832,7 +832,8 @@ endif
->  qtest-obj-y =3D tests/libqtest.o $(test-util-obj-y)
->  $(check-qtest-y): $(qtest-obj-y)
->
-> -tests/test-qga: tests/test-qga.o $(qtest-obj-y)
-> +tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
-> +tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
->
->  SPEED =3D quick
->  GTESTER_OPTIONS =3D -k $(if $(V),--verbose,-q)
-> --
-> 2.14.1
->
->
-> --
-Marc-Andr=C3=A9 Lureau
+diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+index a84ba51ad8ff..80c33be02e5e 100644
+--- a/hw/intc/xics.c
++++ b/hw/intc/xics.c
+@@ -306,8 +306,8 @@ static void icp_realize(DeviceState *dev, Error **errp)
+ 
+     obj = object_property_get_link(OBJECT(dev), ICP_PROP_XICS, &err);
+     if (!obj) {
+-        error_setg(errp, "%s: required link '" ICP_PROP_XICS "' not found: %s",
+-                   __func__, error_get_pretty(err));
++        error_propagate(errp, err);
++        error_prepend(errp, "required link '" ICP_PROP_XICS "' not found: ");
+         return;
+     }
+ 
+@@ -315,8 +315,8 @@ static void icp_realize(DeviceState *dev, Error **errp)
+ 
+     obj = object_property_get_link(OBJECT(dev), ICP_PROP_CPU, &err);
+     if (!obj) {
+-        error_setg(errp, "%s: required link '" ICP_PROP_CPU "' not found: %s",
+-                   __func__, error_get_pretty(err));
++        error_propagate(errp, err);
++        error_prepend(errp, "required link '" ICP_PROP_CPU "' not found: ");
+         return;
+     }
+ 
+@@ -641,8 +641,8 @@ static void ics_base_realize(DeviceState *dev, Error **errp)
+ 
+     obj = object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &err);
+     if (!obj) {
+-        error_setg(errp, "%s: required link '" ICS_PROP_XICS "' not found: %s",
+-                   __func__, error_get_pretty(err));
++        error_propagate(errp, err);
++        error_prepend(errp, "required link '" ICS_PROP_XICS "' not found: ");
+         return;
+     }
+     ics->xics = XICS_FABRIC(obj);
