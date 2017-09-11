@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38711)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSOa-0007YP-CV
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSOe-0007cn-79
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSOW-0001HV-L8
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSOd-0001KE-77
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:64535)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1drSOc-0001Jo-VY
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:19 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 11 Sep 2017 12:20:01 -0500
-Message-Id: <20170911172022.4738-18-eblake@redhat.com>
+Date: Mon, 11 Sep 2017 12:20:07 -0500
+Message-Id: <20170911172022.4738-24-eblake@redhat.com>
 In-Reply-To: <20170911172022.4738-1-eblake@redhat.com>
 References: <20170911172022.4738-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 17/38] libqos: Use explicit QTestState for
- remaining libqos operations
+Subject: [Qemu-devel] [PATCH v7 23/38] tests/boot-sector: Drop dependence on
+ global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,291 +25,125 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Greg Kurz <groug@kaod.org>, Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, "open list:IDE" <qemu-block@nongnu.org>, "open list:sPAPR" <qemu-ppc@nongnu.org>
+Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Ben Warren <ben@skyportsystems.com>
 
-Drop one more client of global_qtest by teaching all remaining
-libqos stragglers to pass in an explicit QTestState.  Change the
-setting of global_qtest from being implicit in libqos' call to
-qtest_start() to instead be explicit in all clients that are
-still relying on global_qtest.
+As a general rule, we prefer avoiding implicit global state
+because it makes code harder to safely copy and paste without
+thinking about the global state.  Adjust the helper code to
+use explicit state instead, and update all callers.
 
-Note that qmp_execute() can be greatly simplified in the process,
-and that we also get rid of interpolation of a JSON string into a
-temporary variable when qtest_qmp() can do it more reliably.
+Fix some trailing whitespace while touching the file.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 ---
-v7: split libqos changes from test-ahci, catch more spots
----
- tests/ahci-test.c         |  1 +
- tests/ivshmem-test.c      |  1 +
- tests/libqos/libqos-pc.c  |  2 +-
- tests/libqos/libqos.c     | 30 ++++++++++--------------------
- tests/megasas-test.c      |  5 ++++-
- tests/rtas-test.c         |  1 +
- tests/usb-hcd-uhci-test.c |  1 +
- tests/virtio-9p-test.c    |  1 +
- tests/virtio-blk-test.c   |  1 +
- tests/virtio-net-test.c   | 15 +++++++++------
- tests/virtio-scsi-test.c  | 16 +++++++++-------
- 11 files changed, 39 insertions(+), 35 deletions(-)
+ tests/boot-sector.h      | 6 ++++--
+ tests/bios-tables-test.c | 2 +-
+ tests/boot-sector.c      | 8 ++++----
+ tests/pxe-test.c         | 2 +-
+ tests/vmgenid-test.c     | 2 +-
+ 5 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/tests/ahci-test.c b/tests/ahci-test.c
-index c94d1bd712..d6696cc370 100644
---- a/tests/ahci-test.c
-+++ b/tests/ahci-test.c
-@@ -157,6 +157,7 @@ static AHCIQState *ahci_vboot(const char *cli, va_list ap)
+diff --git a/tests/boot-sector.h b/tests/boot-sector.h
+index 35d61c7e2b..6ee6bb4d97 100644
+--- a/tests/boot-sector.h
++++ b/tests/boot-sector.h
+@@ -5,7 +5,7 @@
+  *
+  * Authors:
+  *  Michael S. Tsirkin <mst@redhat.com>
+- *  Victor Kaplansky <victork@redhat.com>    
++ *  Victor Kaplansky <victork@redhat.com>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or later.
+  * See the COPYING file in the top-level directory.
+@@ -14,11 +14,13 @@
+ #ifndef TEST_BOOT_SECTOR_H
+ #define TEST_BOOT_SECTOR_H
 
-     s = g_malloc0(sizeof(AHCIQState));
-     s->parent = qtest_pc_vboot(cli, ap);
-+    global_qtest = s->parent->qts;
-     alloc_set_flags(s->parent->alloc, ALLOC_LEAK_ASSERT);
++#include "libqtest.h"
++
+ /* Create boot disk file. fname must be a suitable string for mkstemp() */
+ int boot_sector_init(char *fname);
 
-     /* Verify that we have an AHCI device present. */
-diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index d35c922254..d8f8530a4d 100644
---- a/tests/ivshmem-test.c
-+++ b/tests/ivshmem-test.c
-@@ -131,6 +131,7 @@ static void setup_vm_cmd(IVState *s, const char *cmd, bool msix)
-         g_printerr("ivshmem-test tests are only available on x86 or ppc64\n");
-         exit(EXIT_FAILURE);
-     }
-+    global_qtest = s->qs->qts;
-     s->dev = get_device(s->qs->pcibus);
+ /* Loop until signature in memory is OK.  */
+-void boot_sector_test(void);
++void boot_sector_test(QTestState *qts);
 
-     s->reg_bar = qpci_iomap(s->dev, 0, &barsize);
-diff --git a/tests/libqos/libqos-pc.c b/tests/libqos/libqos-pc.c
-index b554758802..a9c1aceaa7 100644
---- a/tests/libqos/libqos-pc.c
-+++ b/tests/libqos/libqos-pc.c
-@@ -25,7 +25,7 @@ QOSState *qtest_pc_boot(const char *cmdline_fmt, ...)
-     qs = qtest_vboot(&qos_ops, cmdline_fmt, ap);
-     va_end(ap);
+ /* unlink boot disk file.  */
+ void boot_sector_cleanup(const char *fname);
+diff --git a/tests/bios-tables-test.c b/tests/bios-tables-test.c
+index 564da45f65..bde62bf1cf 100644
+--- a/tests/bios-tables-test.c
++++ b/tests/bios-tables-test.c
+@@ -632,7 +632,7 @@ static void test_acpi_one(const char *params, test_data *data)
 
--    qtest_irq_intercept_in(global_qtest, "ioapic");
-+    qtest_irq_intercept_in(qs->qts, "ioapic");
+     qtest_start(args);
 
-     return qs;
- }
-diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
-index 40018b9c07..9798e1d027 100644
---- a/tests/libqos/libqos.c
-+++ b/tests/libqos/libqos.c
-@@ -20,7 +20,7 @@ QOSState *qtest_vboot(QOSOps *ops, const char *cmdline_fmt, va_list ap)
-     QOSState *qs = g_new0(QOSState, 1);
+-    boot_sector_test();
++    boot_sector_test(global_qtest);
 
-     cmdline = g_strdup_vprintf(cmdline_fmt, ap);
--    qs->qts = qtest_start(cmdline);
-+    qs->qts = qtest_init(cmdline);
-     qs->ops = ops;
-     if (ops) {
-         qs->alloc = ops->init_allocator(qs->qts, ALLOC_NO_FLAGS);
-@@ -80,29 +80,21 @@ void set_context(QOSState *s)
-     global_qtest = s->qts;
+     test_acpi_rsdp_address(data);
+     test_acpi_rsdp_table(data);
+diff --git a/tests/boot-sector.c b/tests/boot-sector.c
+index 9ee85370b0..8c8ac7f124 100644
+--- a/tests/boot-sector.c
++++ b/tests/boot-sector.c
+@@ -5,7 +5,7 @@
+  *
+  * Authors:
+  *  Michael S. Tsirkin <mst@redhat.com>
+- *  Victor Kaplansky <victork@redhat.com>    
++ *  Victor Kaplansky <victork@redhat.com>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or later.
+  * See the COPYING file in the top-level directory.
+@@ -130,7 +130,7 @@ int boot_sector_init(char *fname)
  }
 
--static QDict *qmp_execute(const char *command)
-+static QDict *qmp_execute(QTestState *qts, const char *command)
+ /* Loop until signature in memory is OK.  */
+-void boot_sector_test(void)
++void boot_sector_test(QTestState *qts)
  {
--    char *fmt;
--    QDict *rsp;
--
--    fmt = g_strdup_printf("{ 'execute': '%s' }", command);
--    rsp = qmp(fmt);
--    g_free(fmt);
--
--    return rsp;
-+    return qtest_qmp(qts, "{ 'execute': %s }", command);
+     uint8_t signature_low;
+     uint8_t signature_high;
+@@ -146,8 +146,8 @@ void boot_sector_test(void)
+      * instruction.
+      */
+     for (i = 0; i < TEST_CYCLES; ++i) {
+-        signature_low = readb(SIGNATURE_ADDR);
+-        signature_high = readb(SIGNATURE_ADDR + 1);
++        signature_low = qtest_readb(qts, SIGNATURE_ADDR);
++        signature_high = qtest_readb(qts, SIGNATURE_ADDR + 1);
+         signature = (signature_high << 8) | signature_low;
+         if (signature == SIGNATURE) {
+             break;
+diff --git a/tests/pxe-test.c b/tests/pxe-test.c
+index 0d70afccd6..e2d3853534 100644
+--- a/tests/pxe-test.c
++++ b/tests/pxe-test.c
+@@ -31,7 +31,7 @@ static void test_pxe_one(const char *params, bool ipv6)
+                            ipv6 ? "on" : "off", params);
+
+     qtest_start(args);
+-    boot_sector_test();
++    boot_sector_test(global_qtest);
+     qtest_quit(global_qtest);
+     g_free(args);
  }
+diff --git a/tests/vmgenid-test.c b/tests/vmgenid-test.c
+index 918c82c82a..0ea98b86d7 100644
+--- a/tests/vmgenid-test.c
++++ b/tests/vmgenid-test.c
+@@ -47,7 +47,7 @@ static uint32_t acpi_find_vgia(void)
+     int i;
 
- void migrate(QOSState *from, QOSState *to, const char *uri)
- {
-     const char *st;
--    char *s;
-     QDict *rsp, *sub;
-     bool running;
+     /* Wait for guest firmware to finish and start the payload. */
+-    boot_sector_test();
++    boot_sector_test(global_qtest);
 
-     set_context(from);
-
-     /* Is the machine currently running? */
--    rsp = qmp_execute("query-status");
-+    rsp = qmp_execute(from->qts, "query-status");
-     g_assert(qdict_haskey(rsp, "return"));
-     sub = qdict_get_qdict(rsp, "return");
-     g_assert(qdict_haskey(sub, "running"));
-@@ -110,30 +102,28 @@ void migrate(QOSState *from, QOSState *to, const char *uri)
-     QDECREF(rsp);
-
-     /* Issue the migrate command. */
--    s = g_strdup_printf("{ 'execute': 'migrate',"
--                        "'arguments': { 'uri': '%s' } }",
--                        uri);
--    rsp = qmp(s);
--    g_free(s);
-+    rsp = qtest_qmp(from->qts,
-+                    "{ 'execute': 'migrate', 'arguments': { 'uri': %s }}",
-+                    uri);
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
-
-     /* Wait for STOP event, but only if we were running: */
-     if (running) {
--        qmp_eventwait("STOP");
-+        qtest_qmp_eventwait(from->qts, "STOP");
-     }
-
-     /* If we were running, we can wait for an event. */
-     if (running) {
-         migrate_allocator(from->alloc, to->alloc);
-         set_context(to);
--        qmp_eventwait("RESUME");
-+        qtest_qmp_eventwait(to->qts, "RESUME");
-         return;
-     }
-
-     /* Otherwise, we need to wait: poll until migration is completed. */
-     while (1) {
--        rsp = qmp_execute("query-migrate");
-+        rsp = qmp_execute(from->qts, "query-migrate");
-         g_assert(qdict_haskey(rsp, "return"));
-         sub = qdict_get_qdict(rsp, "return");
-         g_assert(qdict_haskey(sub, "status"));
-diff --git a/tests/megasas-test.c b/tests/megasas-test.c
-index ce960e7f81..81837e14af 100644
---- a/tests/megasas-test.c
-+++ b/tests/megasas-test.c
-@@ -15,13 +15,16 @@
-
- static QOSState *qmegasas_start(const char *extra_opts)
- {
-+    QOSState *qs;
-     const char *arch = qtest_get_arch();
-     const char *cmd = "-drive id=hd0,if=none,file=null-co://,format=raw "
-                       "-device megasas,id=scsi0,addr=04.0 "
-                       "-device scsi-hd,bus=scsi0.0,drive=hd0 %s";
-
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        return qtest_pc_boot(cmd, extra_opts ? : "");
-+        qs = qtest_pc_boot(cmd, extra_opts ? : "");
-+        global_qtest = qs->qts;
-+        return qs;
-     }
-
-     g_printerr("virtio-scsi tests are only available on x86 or ppc64\n");
-diff --git a/tests/rtas-test.c b/tests/rtas-test.c
-index 34a692163f..009bda6d23 100644
---- a/tests/rtas-test.c
-+++ b/tests/rtas-test.c
-@@ -14,6 +14,7 @@ static void test_rtas_get_time_of_day(void)
-     time_t t1, t2;
-
-     qs = qtest_spapr_boot("-machine pseries");
-+    global_qtest = qs->qts;
-
-     t1 = time(NULL);
-     ret = qrtas_get_time_of_day(qs->qts, qs->alloc, &tm, &ns);
-diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
-index 0fb7f8d223..290416d845 100644
---- a/tests/usb-hcd-uhci-test.c
-+++ b/tests/usb-hcd-uhci-test.c
-@@ -95,6 +95,7 @@ int main(int argc, char **argv)
-                    "available on x86 or ppc64\n");
-         exit(EXIT_FAILURE);
-     }
-+    global_qtest = qs->qts;
-     ret = g_test_run();
-     qtest_shutdown(qs);
-
-diff --git a/tests/virtio-9p-test.c b/tests/virtio-9p-test.c
-index ad33d96387..07cbb7f37c 100644
---- a/tests/virtio-9p-test.c
-+++ b/tests/virtio-9p-test.c
-@@ -46,6 +46,7 @@ static QVirtIO9P *qvirtio_9p_start(const char *driver)
-         g_printerr("virtio-9p tests are only available on x86 or ppc64\n");
-         exit(EXIT_FAILURE);
-     }
-+    global_qtest = v9p->qs->qts;
-
-     return v9p;
- }
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index 99bb6f26cd..0cf33b6810 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -77,6 +77,7 @@ static QOSState *pci_test_start(void)
-         g_printerr("virtio-blk tests are only available on x86 or ppc64\n");
-         exit(EXIT_FAILURE);
-     }
-+    global_qtest = qs->qts;
-     unlink(tmp_path);
-     g_free(tmp_path);
-     return qs;
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index 8b43d3dd65..acecef0a3e 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -53,18 +53,21 @@ static QVirtioPCIDevice *virtio_net_pci_init(QPCIBus *bus, int slot)
-
- static QOSState *pci_test_start(int socket)
- {
-+    QOSState *qs;
-     const char *arch = qtest_get_arch();
-     const char *cmd = "-netdev socket,fd=%d,id=hs0 -device "
-                       "virtio-net-pci,netdev=hs0";
-
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        return qtest_pc_boot(cmd, socket);
-+        qs = qtest_pc_boot(cmd, socket);
-+    } else if (strcmp(arch, "ppc64") == 0) {
-+        qs = qtest_spapr_boot(cmd, socket);
-+    } else {
-+        g_printerr("virtio-net tests are only available on x86 or ppc64\n");
-+        exit(EXIT_FAILURE);
-     }
--    if (strcmp(arch, "ppc64") == 0) {
--        return qtest_spapr_boot(cmd, socket);
--    }
--    g_printerr("virtio-net tests are only available on x86 or ppc64\n");
--    exit(EXIT_FAILURE);
-+    global_qtest = qs->qts;
-+    return qs;
- }
-
- static void driver_init(QVirtioDevice *dev)
-diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-index 87a3b6e81a..4d544ddbc3 100644
---- a/tests/virtio-scsi-test.c
-+++ b/tests/virtio-scsi-test.c
-@@ -34,20 +34,22 @@ typedef struct {
-
- static QOSState *qvirtio_scsi_start(const char *extra_opts)
- {
-+    QOSState *qs;
-     const char *arch = qtest_get_arch();
-     const char *cmd = "-drive id=drv0,if=none,file=null-co://,format=raw "
-                       "-device virtio-scsi-pci,id=vs0 "
-                       "-device scsi-hd,bus=vs0.0,drive=drv0 %s";
-
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        return qtest_pc_boot(cmd, extra_opts ? : "");
-+        qs = qtest_pc_boot(cmd, extra_opts ? : "");
-+    } else if (strcmp(arch, "ppc64") == 0) {
-+        qs = qtest_spapr_boot(cmd, extra_opts ? : "");
-+    } else {
-+        g_printerr("virtio-scsi tests are only available on x86 or ppc64\n");
-+        exit(EXIT_FAILURE);
-     }
--    if (strcmp(arch, "ppc64") == 0) {
--        return qtest_spapr_boot(cmd, extra_opts ? : "");
--    }
--
--    g_printerr("virtio-scsi tests are only available on x86 or ppc64\n");
--    exit(EXIT_FAILURE);
-+    global_qtest = qs->qts;
-+    return qs;
- }
-
- static void qvirtio_scsi_stop(QOSState *qs)
+     /* Tables should be initialized now. */
+     rsdp_offset = acpi_find_rsdp_address();
 -- 
 2.13.5
