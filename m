@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43623)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drKng-0000dB-1q
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 05:14:41 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1drKwy-0002XP-F2
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 05:24:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drKnb-0006qV-3A
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 05:14:40 -0400
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:44860)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drKna-0006pm-TB
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 05:14:35 -0400
-Received: by mail-wm0-f52.google.com with SMTP id 189so6615694wmh.1
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 02:14:34 -0700 (PDT)
-References: <20170822131832.20191-1-pbonzini@redhat.com>
-	<20170822131832.20191-10-pbonzini@redhat.com>
-	<20170830163750.GY24565@stefanha-x1.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <49202119-02f9-af09-6a69-5360e747f91f@redhat.com>
-Date: Mon, 11 Sep 2017 11:14:31 +0200
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1drKwu-0007Sn-GB
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 05:24:16 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:23369)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1drKwu-0007QJ-8Z
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 05:24:12 -0400
+References: <1504541267-36954-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1504541267-36954-6-git-send-email-pradeep.jagadeesh@huawei.com>
+	<87d171fqzd.fsf@dusky.pond.sub.org>
+	<426ebb0f-c603-3d1e-2ba0-963875b14394@huawei.com>
+	<87bmml8j2x.fsf@dusky.pond.sub.org>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <51ae9f4f-fa74-9348-c355-ecd0566c0017@huawei.com>
+Date: Mon, 11 Sep 2017 11:23:05 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170830163750.GY24565@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <87bmml8j2x.fsf@dusky.pond.sub.org>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 09/10] scsi: add multipath
- support to qemu-pr-helper
+Subject: Re: [Qemu-devel] [PATCH v10 5/6] fsdev: QMP interface for throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,52 +30,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, alberto garcia <berto@igalia.com>, qemu-devel@nongnu.org, greg kurz <groug@kaod.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>
 
-On 30/08/2017 18:37, Stefan Hajnoczi wrote:
-> 
-> The case statements asssume sz has a certain minimum value.  I didn't
-> see a check anywhere that guarantees this.  It may be easier to hide the
-> client's sz value and instead use sizeof(client->data).  The caller can
-> worry about sz.
+On 9/8/2017 2:34 PM, Markus Armbruster wrote:
+> Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com> writes:
+>
+>> On 9/8/2017 12:02 PM, Markus Armbruster wrote:
+>>> Pradeep Jagadeesh <pradeepkiruvale@gmail.com> writes:
+> [...]
+>>>> diff --git a/qmp.c b/qmp.c
+>>>> index b86201e..eed91e5 100644
+>>>> --- a/qmp.c
+>>>> +++ b/qmp.c
+>>>> @@ -130,6 +130,20 @@ void qmp_cpu_add(int64_t id, Error **errp)
+>>>>      }
+>>>>  }
+>>>>
+>>>> +#if defined(_WIN64) || defined(_WIN32) || defined(__FreeBSD__)
+>>>> +
+>>>> +void qmp_fsdev_set_io_throttle(IOThrottle *arg, Error **errp)
+>>>> +{
+>>>> +    return;
+>>>> +}
+>>>> +
+>>>> +IOThrottleList *qmp_query_fsdev_io_throttle(Error **errp)
+>>>> +{
+>>>> +    return NULL;
+>>>> +}
+>>>> +
+>>>> +#endif
+>>>> +
+>>>>  #ifndef CONFIG_VNC
+>>>>  /* If VNC support is enabled, the "true" query-vnc command is
+>>>>     defined in the VNC subsystem */
+>>>
+>>> Why do we need *two* stubs for these functions, one here and one in
+>>> fsdev/qemu-fsdev-dummy.c?
+>> At two different platforms the build fails. So, there are needed.
+>
+> We don't add stubs to random places until the linker succeeds for all
+> the configurations we happen to test.  We figure out *how* the linker
+> fails to correct our idea of where a certain stub belongs until we find
+> the one appropriate home for it.
+>
+> If you can't figure that out, that's okay, just tell us how exactly the
+> linker fails for you, and we'll be happy to help.
+If I do not have those stubs in qmp.c.The linking fails when I compile 
+like "make docker-test-mingw@fedora"
 
-Makes sense.  OUT needs the client sz, but IN doesn't and it gets in the
-way.  This lets me just assert in multipath_pr_in that sz is large enough.
+The stubs in qemu-fsdev-dummy.c required because when I configure on x86 
+as --disable-virtfs, then the compilation fails.
 
->> +    /* Convert input data, especially transport IDs, to the structs
->> +     * used by libmpathpersist (which, of course, will immediately
->> +     * do the opposite).
->> +     */
->> +    memset(&paramp, 0, sizeof(paramp));
->> +    memcpy(&paramp.key, &param[0], 8);
->> +    memcpy(&paramp.sa_key, &param[8], 8);
->> +    paramp.sa_flags = param[10];
->> +    for (i = PR_OUT_FIXED_PARAM_SIZE, j = 0; i < sz; ) {
->> +        struct transportid *id = (struct transportid *) &transportids[j];
->> +        int len;
->> +
->> +        id->format_code = param[i] & 0xc0;
->> +        id->protocol_id = param[i] & 0x0f;
->> +        switch (param[i] & 0xcf) {
-> At this point we know sz > PR_OUT_FIXED_PARAM_SIZE && i < sz.  I think
-> the following case statements can read beyond the end of client->data[]
-> because nothing checks sz before accessing param[].
-> 
-> Missing sz checks?
+So, I need the stubs at both the places. Please let me know if I can 
+avoid some how.
 
-There is a transport id length field that has to be checked against sz,
-indeed.  After doing that, the for loop is fine (though the initial
-index is wrong, because PR_OUT_FIXED_PARAM_SIZE points to the length
-field and the transport ids are at PR_OUT_FIXED_PARAM_SIZE + 4).
-
->> +            /* iSCSI transport.  */
->> +            len = lduw_be_p(&param[i + 2]);
->> +            if (len > 252 || (len & 3)) {
-> 
-> int len can be negative here .  Please use the size_t type - it's
-> unsigned and used by memchr(3)/memcpy(3).
-
-Can it? lduw_be_p reads 16 bits (and it's unsigned as the name says).
-
-Paolo
+Regards,
+Pradeep
