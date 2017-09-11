@@ -1,28 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58366)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drVeQ-00051L-Vz
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:49:52 -0400
+	(envelope-from <bounces@canonical.com>) id 1drVfi-0005pH-5v
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:51:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drVeN-0004J1-Tw
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:49:51 -0400
-Received: from mail-qk0-x22a.google.com ([2607:f8b0:400d:c09::22a]:38211)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drVeN-0004Is-Pj
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:49:47 -0400
-Received: by mail-qk0-x22a.google.com with SMTP id a128so21261633qkc.5
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 13:49:47 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 11 Sep 2017 17:49:36 -0300
-Message-Id: <20170911204936.5020-1-f4bug@amsat.org>
+	(envelope-from <bounces@canonical.com>) id 1drVff-00051Q-21
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:51:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55603)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1drVfe-000514-Rm
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:51:06 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1drVfc-0001Jv-Hu
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 20:51:04 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B09542E8493
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 20:51:03 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] tcg/ppc: disable atomic write check on ppc32
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 Sep 2017 20:43:24 -0000
+From: Aleksei Kovura <alex3kov@zoho.com>
+Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150516260450.22505.4670509193542051501.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
+ 2.10 (works on 2.9)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,40 +37,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-this fixes building for ppc64 on ppc32 (changed in 5964fca8a12c):
+Bisected. Good thing Igor is already here :)
 
-  qemu/tcg/ppc/tcg-target.inc.c: In function 'tb_target_set_jmp_target':
-  qemu/include/qemu/compiler.h:86:30: error: static assertion failed: "not expecting: sizeof(*(uint64_t *)jmp_addr) > ATOMIC_REG_SIZE"
-       QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
-       ^
-  qemu/tcg/ppc/tcg-target.inc.c:1377:9: note: in expansion of macro 'atomic_set'
-           atomic_set((uint64_t *)jmp_addr, pair);
-           ^
+208fa0e43645edd0b0d8f838857dfc79daff40a8 is the first bad commit
+commit 208fa0e43645edd0b0d8f838857dfc79daff40a8
+Author: Igor Mammedov <imammedo@redhat.com>
+Date:   Fri Jul 28 11:09:05 2017 +0200
 
-Suggested-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-This fixes Shippable builds, see:
-https://app.shippable.com/github/qemu/qemu/runs/434/10/console
+    pc: make 'pc.rom' readonly when machine has PCI enabled
 
- tcg/ppc/tcg-target.inc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+-- =
 
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 21d764c102..0417901289 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -1374,7 +1374,7 @@ void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
-         pair = (uint64_t)i2 << 32 | i1;
- #endif
- 
--        atomic_set((uint64_t *)jmp_addr, pair);
-+        atomic_set__nocheck((uint64_t *)jmp_addr, pair);
-         flush_icache_range(jmp_addr, jmp_addr + 8);
-     } else {
-         intptr_t diff = addr - jmp_addr;
--- 
-2.14.1
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1715700
+
+Title:
+  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
+
+Status in QEMU:
+  New
+
+Bug description:
+  Qemu version: 2.10 stable.
+  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
+st.
+  Command line:
+  qemu-system-x86_64 \
+      -nodefaults \
+      -nodefconfig \
+      -machine type=3Dq35,accel=3Dkvm \
+      -enable-kvm \
+      -cpu host \
+      -m 2048 \
+      -vga virtio \
+      -boot menu=3Don \
+      -smbios file=3D/path/dmidecode_BIOS.bin \
+      -acpitable file=3D/path/acpi_slic.bin \
+      -bios /path/OVMF_CODE.fd \
+      -net none \
+      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
+      -device pcie-root-port \
+      -device ich9-usb-ehci1 \
+      -device ich9-usb-uhci1 \
+      -device ich9-usb-uhci2 \
+      -device ich9-usb-uhci3
+
+  Windows hangs at boot with waving flag screen (flag doesn't freeze,
+  keeps waving indefinitely). Same command line boots fine with Qemu
+  2.9. I tried changing machine type to pc-q35-2.9 - same result.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
