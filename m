@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59233)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drVfi-0005pH-5v
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:51:11 -0400
+	(envelope-from <groug@kaod.org>) id 1drVgr-0006aU-1N
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:52:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drVff-00051Q-21
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:51:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:55603)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1drVfe-000514-Rm
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:51:06 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1drVfc-0001Jv-Hu
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 20:51:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B09542E8493
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 20:51:03 +0000 (UTC)
+	(envelope-from <groug@kaod.org>) id 1drVgj-0005qV-Vu
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:52:21 -0400
+Received: from 18.mo1.mail-out.ovh.net ([46.105.35.72]:38040)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drVgj-0005nh-P8
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:52:13 -0400
+Received: from player169.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id E9F2292E6F
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 22:52:10 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Mon, 11 Sep 2017 22:52:06 +0200
+Message-ID: <150516312603.27897.5390701685108186266.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Sep 2017 20:43:24 -0000
-From: Aleksei Kovura <alex3kov@zoho.com>
-Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150516260450.22505.4670509193542051501.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
- 2.10 (works on 2.9)
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] spapr_cpu_core: fail gracefully with
+ non-pseries machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,56 +29,40 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Sam Bobroff <sam.bobroff@au1.ibm.com>
 
-Bisected. Good thing Igor is already here :)
+Since commit 7cca3e466eb0 ("ppc: spapr: Move VCPU ID calculation into
+sPAPR"), QEMU aborts when started with a *-spapr-cpu-core device and
+a non-pseries machine.
 
-208fa0e43645edd0b0d8f838857dfc79daff40a8 is the first bad commit
-commit 208fa0e43645edd0b0d8f838857dfc79daff40a8
-Author: Igor Mammedov <imammedo@redhat.com>
-Date:   Fri Jul 28 11:09:05 2017 +0200
+Let's rely on the already existing call to object_dynamic_cast() instead
+of using the SPAPR_MACHINE() macro.
 
-    pc: make 'pc.rom' readonly when machine has PCI enabled
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ hw/ppc/spapr_cpu_core.c |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715700
-
-Title:
-  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu version: 2.10 stable.
-  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
-st.
-  Command line:
-  qemu-system-x86_64 \
-      -nodefaults \
-      -nodefconfig \
-      -machine type=3Dq35,accel=3Dkvm \
-      -enable-kvm \
-      -cpu host \
-      -m 2048 \
-      -vga virtio \
-      -boot menu=3Don \
-      -smbios file=3D/path/dmidecode_BIOS.bin \
-      -acpitable file=3D/path/acpi_slic.bin \
-      -bios /path/OVMF_CODE.fd \
-      -net none \
-      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
-      -device pcie-root-port \
-      -device ich9-usb-ehci1 \
-      -device ich9-usb-uhci1 \
-      -device ich9-usb-uhci2 \
-      -device ich9-usb-uhci3
-
-  Windows hangs at boot with waving flag screen (flag doesn't freeze,
-  keeps waving indefinitely). Same command line boots fine with Qemu
-  2.9. I tried changing machine type to pc-q35-2.9 - same result.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index d04d1e0d8164..dc9df0d393d1 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -201,7 +201,7 @@ error:
+ 
+ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+ {
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
++    sPAPRMachineState *spapr;
+     sPAPRCPUCore *sc = SPAPR_CPU_CORE(OBJECT(dev));
+     sPAPRCPUCoreClass *scc = SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+     CPUCore *cc = CPU_CORE(OBJECT(dev));
+@@ -211,7 +211,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+     void *obj;
+     int i, j;
+ 
+-    if (!object_dynamic_cast(qdev_get_machine(), TYPE_SPAPR_MACHINE)) {
++    spapr = (sPAPRMachineState *) qdev_get_machine();
++    if (!object_dynamic_cast((Object *) spapr, TYPE_SPAPR_MACHINE)) {
+         error_setg(errp, "spapr-cpu-core needs a pseries machine");
+         return;
+     }
