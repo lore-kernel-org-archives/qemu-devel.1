@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34117)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35631)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drR46-0002nk-28
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:56:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1drR93-0005H6-Jm
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:01:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drR42-0008Po-S4
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:56:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60347)
+	(envelope-from <bounces@canonical.com>) id 1drR92-0002Vr-Ci
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:01:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33271)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1drR42-0008PF-Io
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:55:58 -0400
+	id 1drR92-0002VZ-7S
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:01:08 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1drR3y-0006LQ-TP
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 15:55:55 +0000
+	id 1drR90-0007YZ-Tv
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:01:06 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 51F632E84A3
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 15:55:54 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id DFF262E848D
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:01:06 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Sep 2017 15:48:50 -0000
-From: Ryan Harper <1716028@bugs.launchpad.net>
+Date: Mon, 11 Sep 2017 15:52:04 -0000
+From: Scott Moser <smoser@ubuntu.com>
 Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
-Message-Id: <150514493014.6029.7087439413770080307.malone@wampee.canonical.com>
+Message-Id: <150514512419.5431.605506468204269048.malone@wampee.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
  feature flag
@@ -39,51 +39,15 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Kevin,
+** Attachment added: "dump-qmp-schema.py: a hack job to dump and partially =
+"uncompress" qemu schema output"
+   https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1716028/+attachment/=
+4948029/+files/dump-qmp-schema.py
 
-Thanks for the information.  A couple of points for feedback:
-
-1) there doesn't appear to be a way to run qmp query-schema without
-spawning a qemu instance in -qmp mode and having a second client issue
-the query-schema;  certainly a qemu-system-$arch -qmp-schema would be
-quite useful when examining feature availability.   While I know the
-QMP/QAPI introspection is where most of the work has gone to describing
-how to interact with qemu it's quite cumbersome at best:
-
-searching for blockdev-add, find arg-type: 48, read arg-type-48, find
-list of 'variants', know that locking feature is part of 'file', find
-type: 207, see member 'locking' in list[A], which is of type 296, find
-type: 296, which is an enum of 'on', 'off', 'auto'
-
-A. Interesting enough, qapi says the default is None, however qemu
-certainly locks files by default which would seem to imply a mismatch
-between qapi defaults and qemu behavior.
-
-That's pretty heavy;  Maybe that warning message qemu prints could
-provide some hints as to what a user could do (or refer to a manpage on
-locking?).
-
-2) share-rw appears to be a blockdev parameter (I see it available via
-most block devices via qemu-system-$arch -device {scsi-hd,ide-hd,virtio-
-blk}? However there is no equivalent -blockdev for dumping the default
-options that a -blockdev parameter takes.  The qmp-schema also does not
-include any information about 'share-rw' w.r.t what values are available
-that I could find after dumping the schema.
-
-Thanks smoser:
-
-#!/bin/sh
-qemu-system-x86_64 -S -nodefaults -nographic \
-   -serial none -monitor none -qmp stdio <<EOF |
-{ "execute": "qmp_capabilities" }
-{ "execute": "query-qmp-schema" }
-{ "execute": "quit" }
-EOF
-   python3 -c '
-import json, sys
-data =3D json.loads(sys.stdin.read().splitlines()[2])
-print(json.dumps(data, indent=3D1, sort_keys=3DTrue,
-                 separators=3D(",", ": ")))'
+** Attachment removed: "dump-qmp-schema.py: a hack job to dump and partiall=
+y "uncompress" qemu schema output"
+   https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1716028/+attachment/=
+4948028/+files/dump-qmp-schema.py
 
 -- =
 
