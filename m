@@ -1,20 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44008)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44771)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drMaP-0007Au-5u
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:09:07 -0400
+	(envelope-from <bounces@canonical.com>) id 1drMcg-0000ji-1S
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:11:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drMaN-0007hB-J6
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:09:05 -0400
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 11 Sep 2017 13:06:23 +0200
-Message-Id: <20170911110623.24981-51-marcandre.lureau@redhat.com>
-In-Reply-To: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1drMcc-0000d2-1A
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:11:26 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37041)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1drMcb-0000cm-RV
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:11:21 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1drMcZ-0007jh-M2
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 11:11:19 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id A3A782E8488
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 11:11:19 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 50/50] qapi: make query-cpu-definitions
- depend on specific targets
+Date: Mon, 11 Sep 2017 11:05:55 -0000
+From: Kevin Wolf <1716028@bugs.launchpad.net>
+Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
+Message-Id: <150512795511.16865.3226093815771086581.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
+ feature flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,237 +38,137 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Eric Blake <eblake@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>
 
-It depends on TARGET_PPC || TARGET_ARM || TARGET_I386 || TARGET_S390X.
+The correct way to query whether file locking is supported is 'query-
+qmp-schema', which will expose the 'locking' option for the 'file'
+branch of the 'blockdev-add' command then.
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- qapi-schema.json            | 11 -----------
- qapi/target.json            | 12 ++++++++++++
- include/sysemu/arch_init.h  |  1 -
- monitor.c                   | 22 ----------------------
- qmp.c                       |  5 -----
- stubs/arch-query-cpu-def.c  | 10 ----------
- target/arm/helper.c         |  3 ++-
- target/i386/cpu.c           |  2 +-
- target/ppc/translate_init.c |  3 ++-
- target/s390x/cpu_models.c   |  2 +-
- stubs/Makefile.objs         |  1 -
- 11 files changed, 18 insertions(+), 54 deletions(-)
- delete mode 100644 stubs/arch-query-cpu-def.c
+As a first comment, in your setup, completely disabling file locking is
+probably a too big hammer. It is preferable to just allow multiple
+writers on the same image by setting share-rw=3Don for the block device
+(e.g. '-device virtio-blk-pci,drive=3Dfoo,share-rw=3Don'). This will allow
+all guest devices to share the same image, but will still protect the
+image against other users like an incorrect qemu-img invocation while
+the VM is running.
 
-diff --git a/qapi-schema.json b/qapi-schema.json
-index 98525c7702..975f2fd30f 100644
---- a/qapi-schema.json
-+++ b/qapi-schema.json
-@@ -1945,17 +1945,6 @@
-   'data': { 'name': 'str', '*migration-safe': 'bool', 'static': 'bool',
-             '*unavailable-features': [ 'str' ], 'typename': 'str' } }
-=20
--##
--# @query-cpu-definitions:
--#
--# Return a list of supported virtual CPU definitions
--#
--# Returns: a list of CpuDefInfo
--#
--# Since: 1.2.0
--##
--{ 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'] }
--
- ##
- # @CpuModelInfo:
- #
-diff --git a/qapi/target.json b/qapi/target.json
-index d9f3bce22f..e06c9e3ed7 100644
---- a/qapi/target.json
-+++ b/qapi/target.json
-@@ -214,3 +214,15 @@
-             'model': 'CpuModelInfo' },
-   'returns': 'CpuModelExpansionInfo',
-   'if': 'defined(TARGET_S390X) || defined(TARGET_I386)' }
-+
-+##
-+# @query-cpu-definitions:
-+#
-+# Return a list of supported virtual CPU definitions
-+#
-+# Returns: a list of CpuDefInfo
-+#
-+# Since: 1.2.0
-+##
-+{ 'command': 'query-cpu-definitions', 'returns': ['CpuDefinitionInfo'],
-+  'if': 'defined(TARGET_PPC) || defined(TARGET_ARM) || defined(TARGET_I3=
-86) || defined(TARGET_S390X)' }
-diff --git a/include/sysemu/arch_init.h b/include/sysemu/arch_init.h
-index 08a607b89b..e9721b9ce8 100644
---- a/include/sysemu/arch_init.h
-+++ b/include/sysemu/arch_init.h
-@@ -31,5 +31,4 @@ extern const uint32_t arch_type;
- int kvm_available(void);
- int xen_available(void);
-=20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp);
- #endif
-diff --git a/monitor.c b/monitor.c
-index 24680f37a6..00fb1bbf4e 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -957,26 +957,6 @@ static void qmp_query_qmp_schema(QDict *qdict, QObje=
-ct **ret_data,
-     *ret_data =3D qobject_from_qlit(&qmp_schema_qlit);
- }
-=20
--/*
-- * We used to define commands in qmp-commands.hx in addition to the
-- * QAPI schema.  This permitted defining some of them only in certain
-- * configurations.  query-commands has always reflected that (good,
-- * because it lets QMP clients figure out what's actually available),
-- * while query-qmp-schema never did (not so good).  This function is a
-- * hack to keep the configuration-specific commands defined exactly as
-- * before, even though qmp-commands.hx is gone.
-- *
-- * FIXME Educate the QAPI schema on configuration-specific commands,
-- * and drop this hack.
-- */
--static void qmp_unregister_commands_hack(void)
--{
--#if !defined(TARGET_PPC) && !defined(TARGET_ARM) && !defined(TARGET_I386=
-) \
--    && !defined(TARGET_S390X)
--    qmp_unregister_command(&qmp_commands, "query-cpu-definitions");
--#endif
--}
--
- void monitor_init_qmp_commands(void)
- {
-     /*
-@@ -998,8 +978,6 @@ void monitor_init_qmp_commands(void)
-     qmp_register_command(&qmp_commands, "netdev_add", qmp_netdev_add,
-                          QCO_NO_OPTIONS);
-=20
--    qmp_unregister_commands_hack();
--
-     QTAILQ_INIT(&qmp_cap_negotiation_commands);
-     qmp_register_command(&qmp_cap_negotiation_commands, "qmp_capabilitie=
-s",
-                          qmp_marshal_qmp_capabilities, QCO_NO_OPTIONS);
-diff --git a/qmp.c b/qmp.c
-index afa266ec1e..d57ccf1251 100644
---- a/qmp.c
-+++ b/qmp.c
-@@ -541,11 +541,6 @@ DevicePropertyInfoList *qmp_device_list_properties(c=
-onst char *typename,
-     return prop_list;
- }
-=20
--CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
--{
--    return arch_query_cpu_definitions(errp);
--}
--
- void qmp_add_client(const char *protocol, const char *fdname,
-                     bool has_skipauth, bool skipauth, bool has_tls, bool=
- tls,
-                     Error **errp)
-diff --git a/stubs/arch-query-cpu-def.c b/stubs/arch-query-cpu-def.c
-deleted file mode 100644
-index cefe4beb82..0000000000
---- a/stubs/arch-query-cpu-def.c
-+++ /dev/null
-@@ -1,10 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu-common.h"
--#include "sysemu/arch_init.h"
--#include "qapi/qmp/qerror.h"
--
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
--{
--    error_setg(errp, QERR_UNSUPPORTED);
--    return NULL;
--}
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 329e5178d8..b3ea771fcd 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -15,6 +15,7 @@
- #include <zlib.h> /* For crc32 */
- #include "exec/semihost.h"
- #include "sysemu/kvm.h"
-+#include "target-qmp-commands.h"
-=20
- #define ARM_CPU_FREQ 1000000000 /* FIXME: 1 GHz, should be configurable =
-*/
-=20
-@@ -5327,7 +5328,7 @@ static void arm_cpu_add_definition(gpointer data, g=
-pointer user_data)
-     *cpu_list =3D entry;
- }
-=20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     CpuDefinitionInfoList *cpu_list =3D NULL;
-     GSList *list;
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index f8719cb2de..9cd1dee1a5 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2363,7 +2363,7 @@ static void x86_cpu_definition_entry(gpointer data,=
- gpointer user_data)
-     *cpu_list =3D entry;
- }
-=20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     CpuDefinitionInfoList *cpu_list =3D NULL;
-     GSList *list =3D get_sorted_cpu_model_list();
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index c827d1e388..680352f953 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -35,6 +35,7 @@
- #include "mmu-book3s-v3.h"
- #include "sysemu/qtest.h"
- #include "qemu/cutils.h"
-+#include "target-qmp-commands.h"
-=20
- //#define PPC_DUMP_CPU
- //#define PPC_DEBUG_SPR
-@@ -10415,7 +10416,7 @@ static void ppc_cpu_defs_entry(gpointer data, gpo=
-inter user_data)
-     *first =3D entry;
- }
-=20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     CpuDefinitionInfoList *cpu_list =3D NULL;
-     GSList *list;
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index 872dc78455..26c9fff79c 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -390,7 +390,7 @@ static void create_cpu_model_list(ObjectClass *klass,=
- void *opaque)
-     *cpu_list =3D entry;
- }
-=20
--CpuDefinitionInfoList *arch_query_cpu_definitions(Error **errp)
-+CpuDefinitionInfoList *qmp_query_cpu_definitions(Error **errp)
- {
-     struct CpuDefinitionInfoListData list_data =3D {
-         .list =3D NULL,
-diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-index 8d024a2b71..22e9197dcd 100644
---- a/stubs/Makefile.objs
-+++ b/stubs/Makefile.objs
-@@ -1,4 +1,3 @@
--stub-obj-y +=3D arch-query-cpu-def.o
- stub-obj-y +=3D bdrv-next-monitor-owned.o
- stub-obj-y +=3D blk-commit-all.o
- stub-obj-y +=3D blockdev-close-all-bdrv-states.o
---=20
-2.14.1.146.gd35faa819
+However, note that opening the same image file twice is not the best
+approach to the problem anyway. This happens to work with raw images
+(except for the locking), but it would cause corruption for any other
+image format.
+
+The better solution (though it may require more changes to your
+management application) is to open the image once and assign a node-name
+to it, and then let two guest devices point to the same node. Like
+above, this requires that share-rw=3Don be set for guest devices, but it
+will also work with non-raw image formats because the image file is now
+opened only once and the sharing is done internally in qemu.
+
+An example command line fragment might look like this:
+
+  -blockdev node-name=3Ddisk,driver=3Dfile,filename=3Dhd.img
+  -device virtio-blk,drive=3Ddisk,share-rw=3Don
+  -device virtio-blk,drive=3Ddisk,share-rw=3Don
+
+Technically, you can also keep using -drive instead of -blockdev, but it
+will result in a mixed state of modern node-name based block device
+management and the traditional drive based configuration, which might be
+confusing at times.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716028
+
+Title:
+  qemu 2.10 locks images with no feature flag
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  1) % lsb_release -rd
+  Description:	Ubuntu Artful Aardvark (development branch)
+  Release:	17.10
+
+  2) % apt-cache policy qemu-system-x86
+  qemu-system-x86:
+    Installed: 1:2.10~rc3+dfsg-0ubuntu1
+    Candidate: 1:2.10+dfsg-0ubuntu1
+    Version table:
+       1:2.10+dfsg-0ubuntu1 500
+          500 http://archive.ubuntu.com//ubuntu devel/main amd64 Packages
+   *** 1:2.10~rc3+dfsg-0ubuntu1 100
+          100 /var/lib/dpkg/status
+
+  3) qemu locks image files with no way to discover this feature nor how
+  to disable it
+
+  4) qemu provides a way to query if it supports image locking, and what
+  the default value is, and how to disable the locking via cli
+
+  qemu 2.10 now will lock image files and warn if an image is currently
+  locked.  This prevent qemu from running (and possibly corrupting said
+  image).
+
+  However, qemu does not provide any way to determine if a qemu binary
+  actually has this capability.  Normally behavior changing features are
+  exposed via some change to the qemu help menu or QMP/QAPI output of
+  capabilities.
+
+  I believe this slipped through since libvirt already does image
+  locking, but direct cli users will be caught by this change.
+
+  In particular, we have a use-case where we simulate multipath disks by
+  creating to disks which point to the same file which now breaks
+  without adding the 'file.locking=3Doff' to the -drive parameters;  which
+  is also completely undocumented and unexposed.
+
+  Some parts of the cli like -device allow querying of settable options
+  (qemu-system-x86 -device scsi_hd,?)  but nothing equivalent exists for
+  -drive parameters.
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 17.10
+  Package: qemu-system-x86 1:2.10~rc3+dfsg-0ubuntu1
+  ProcVersionSignature: Ubuntu 4.12.0-11.12-generic 4.12.5
+  Uname: Linux 4.12.0-11-generic x86_64
+  NonfreeKernelModules: zfs zunicode zavl zcommon znvpair
+  ApportVersion: 2.20.6-0ubuntu7
+  Architecture: amd64
+  Date: Fri Sep  8 12:56:53 2017
+  JournalErrors:
+   Hint: You are currently not seeing messages from other users and the sys=
+tem.
+         Users in groups 'adm', 'systemd-journal' can see all messages.
+         Pass -q to turn off this notice.
+   -- Logs begin at Mon 2017-01-30 11:56:02 CST, end at Fri 2017-09-08 12:5=
+6:46 CDT. --
+   -- No entries --
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: HP ProLiant DL360 Gen9
+  ProcEnviron:
+   TERM=3Dxterm
+   PATH=3D(custom, no user)
+   XDG_RUNTIME_DIR=3D<set>
+   LANG=3Den_US.UTF-8
+   SHELL=3D/bin/bash
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.12.0-11-generic root=3DUUID=3D=
+45354276-e0c0-4bf6-9083-f130b89411cc ro --- console=3DttyS1,115200
+  SourcePackage: qemu
+  UpgradeStatus: No upgrade log present (probably fresh install)
+  dmi.bios.date: 03/05/2015
+  dmi.bios.vendor: HP
+  dmi.bios.version: P89
+  dmi.chassis.type: 23
+  dmi.chassis.vendor: HP
+  dmi.modalias: dmi:bvnHP:bvrP89:bd03/05/2015:svnHP:pnProLiantDL360Gen9:pvr=
+:cvnHP:ct23:cvr:
+  dmi.product.family: ProLiant
+  dmi.product.name: ProLiant DL360 Gen9
+  dmi.sys.vendor: HP
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716028/+subscriptions
