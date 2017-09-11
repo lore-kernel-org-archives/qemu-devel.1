@@ -1,36 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47509)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drPKk-0003EE-Pm
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:05:12 -0400
+	(envelope-from <imammedo@redhat.com>) id 1drPO4-0004WQ-41
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:08:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drPKf-0001gN-76
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:05:06 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:37812)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drPKf-0001fd-1t
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:05:01 -0400
-Received: by mail-qk0-x242.google.com with SMTP id r66so5308260qke.4
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 07:05:00 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1499765477-10541-1-git-send-email-thuth@redhat.com>
-	<20170711185511.3033-1-f4bug@amsat.org>
-	<db1350c0-192f-ab32-250a-2fd234ebe68e@redhat.com>
-	<4a1e2715-7811-c4ed-d76b-d49471eabafd@redhat.com>
-	<2d25cf14-be6c-4cdd-b324-4d203858e499@redhat.com>
-	<ee46c331-56ff-0762-d4e5-02bb04eba6b5@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <559262bf-5223-d1e9-6a99-867057b8a2c7@amsat.org>
-Date: Mon, 11 Sep 2017 11:04:55 -0300
+	(envelope-from <imammedo@redhat.com>) id 1drPO0-0007FZ-Nw
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:08:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:1302)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1drPO0-0007EO-E6
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:08:28 -0400
+Date: Mon, 11 Sep 2017 16:08:18 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170911160818.1bd44a82@nial.brq.redhat.com>
+In-Reply-To: <20170911044157.15403-1-haozhong.zhang@intel.com>
+References: <20170911043820.14617-1-haozhong.zhang@intel.com>
+	<20170911044157.15403-1-haozhong.zhang@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <ee46c331-56ff-0762-d4e5-02bb04eba6b5@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg: move atomic_template.h to accel/tcg/
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
+ Xen HVM guest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,39 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: Haozhong Zhang <haozhong.zhang@intel.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xen.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
->>>> On 11.07.2017 20:55, Philippe Mathieu-Daudé wrote:
->>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>>>> ---
->>>>> same as Thomas previous patch. this file had no entry in MAINTAINERS.
->>>>>
->>>>>   atomic_template.h => accel/tcg/atomic_template.h | 0
->>>>>   1 file changed, 0 insertions(+), 0 deletions(-)
->>>>>   rename atomic_template.h => accel/tcg/atomic_template.h (100%)
->>>>>
->>>>> diff --git a/atomic_template.h b/accel/tcg/atomic_template.h
->>>>> similarity index 100%
->>>>> rename from atomic_template.h
->>>>> rename to accel/tcg/atomic_template.h
->>>>
->>>> It's also used by a file in tcg/, but I've checked, and yes, the code
->>>> still compiles fine if the header gets moved to accel/tcg/.
->>>>
->>>> Tested-by: Thomas Huth <thuth@redhat.com>
->>>>
->>>
->>> That part of tcg/tcg-runtime.c probably should be moved to user-exec.c,
->>> and user-exec.c should in turn be in accel/tcg.
->>>
->>> Since this is just code movement we can do it after soft freeze.
->>> Philippe, can you send v2?
->>
->> Ping?
->>
->> Looks like the atomic_template.h is still in the main directory ...
+On Mon, 11 Sep 2017 12:41:47 +0800
+Haozhong Zhang <haozhong.zhang@intel.com> wrote:
+
+> This is the QEMU part patches that works with the associated Xen
+> patches to enable vNVDIMM support for Xen HVM domains. Xen relies on
+> QEMU to build guest NFIT and NVDIMM namespace devices, and allocate
+> guest address space for vNVDIMM devices.
 > 
-> Still waiting for v2...
+> All patches can be found at
+>   Xen:  https://github.com/hzzhan9/xen.git nvdimm-rfc-v3
+>   QEMU: https://github.com/hzzhan9/qemu.git xen-nvdimm-rfc-v3
+> 
+> Patch 1 is to avoid dereferencing the NULL pointer to non-existing
+> label data, as the Xen side support for labels is not implemented yet.
+> 
+> Patch 2 & 3 add a memory backend dedicated for Xen usage and a hotplug
+> memory region for Xen guest, in order to make the existing nvdimm
+> device plugging path work on Xen.
+> 
+> Patch 4 - 10 build and cooy NFIT from QEMU to Xen guest, when QEMU is
+> used as the Xen device model.
 
-I chat with Thomas last night about it, with 2.10 freeze I totally 
-forgot about this, sorry! I'll respin v2 during the day.
+I've skimmed over patch-set and can't say that I'm happy with
+number of xen_enabled() invariants it introduced as well as
+with partial blobs it creates.
+
+I'd like to reduce above and a way to do this might be making xen 
+ 1. use fw_cfg
+ 2. fetch QEMU build acpi tables from fw_cfg
+ 3. extract nvdim tables (which is trivial) and use them
+
+looking at xen_load_linux(), it seems possible to use fw_cfg.
+
+So what's stopping xen from using it elsewhere?,
+instead of adding more xen specific code to do 'the same'
+job and not reusing/sharing common code with tcg/kvm.
+
+
+> Haozhong Zhang (10):
+>   nvdimm: do not intiailize nvdimm->label_data if label size is zero
+>   hw/xen-hvm: create the hotplug memory region on Xen
+>   hostmem-xen: add a host memory backend for Xen
+>   nvdimm acpi: do not use fw_cfg on Xen
+>   hw/xen-hvm: initialize DM ACPI
+>   hw/xen-hvm: add function to copy ACPI into guest memory
+>   nvdimm acpi: copy NFIT to Xen guest
+>   nvdimm acpi: copy ACPI namespace device of vNVDIMM to Xen guest
+>   nvdimm acpi: do not build _FIT method on Xen
+>   hw/xen-hvm: enable building DM ACPI if vNVDIMM is enabled
+> 
+>  backends/Makefile.objs |   1 +
+>  backends/hostmem-xen.c | 108 ++++++++++++++++++++++++++
+>  backends/hostmem.c     |   9 +++
+>  hw/acpi/aml-build.c    |  10 ++-
+>  hw/acpi/nvdimm.c       |  79 ++++++++++++++-----
+>  hw/i386/pc.c           | 102 ++++++++++++++-----------
+>  hw/i386/xen/xen-hvm.c  | 204 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>  hw/mem/nvdimm.c        |  10 ++-
+>  hw/mem/pc-dimm.c       |   6 +-
+>  include/hw/i386/pc.h   |   1 +
+>  include/hw/xen/xen.h   |  25 ++++++
+>  stubs/xen-hvm.c        |  10 +++
+>  12 files changed, 495 insertions(+), 70 deletions(-)
+>  create mode 100644 backends/hostmem-xen.c
+> 
