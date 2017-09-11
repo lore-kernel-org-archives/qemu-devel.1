@@ -1,43 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47280)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47651)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drRgx-0000Yz-SZ
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:36:12 -0400
+	(envelope-from <alistair23@gmail.com>) id 1drRhy-0001Ab-VK
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:37:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drRgt-00038r-Rc
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:36:11 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41656
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1drRgt-00038f-Me
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:36:07 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8BGZSXA042357
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 12:36:06 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cwsg0vrg8-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 12:36:05 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 11 Sep 2017 17:36:03 +0100
-References: <20170905111645.18068-1-pasic@linux.vnet.ibm.com>
-	<20170905111645.18068-2-pasic@linux.vnet.ibm.com>
-	<20170906141846.0be413fb.cohuck@redhat.com>
-	<bd30a18f-6d22-e5a7-6e8c-08f628466cc4@linux.vnet.ibm.com>
-	<20170906145158.252cf0cd.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 11 Sep 2017 18:36:00 +0200
+	(envelope-from <alistair23@gmail.com>) id 1drRhy-0003bz-22
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:37:14 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:38834)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1drRhx-0003b1-SY
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:37:13 -0400
+Received: by mail-wr0-x241.google.com with SMTP id p37so4663563wrb.5
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 09:37:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170906145158.252cf0cd.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <27c027c4-58b4-9031-648e-9fd2fa1e5fa8@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] s390x/css: introduce css data stream
+Sender: alistair23@gmail.com
+In-Reply-To: <06b2af89-9871-f121-7641-b2b1a0d8a02c@redhat.com>
+References: <cover.1503077821.git.alistair.francis@xilinx.com>
+	<06b2af89-9871-f121-7641-b2b1a0d8a02c@redhat.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 11 Sep 2017 09:36:40 -0700
+Message-ID: <CAKmqyKPk90_SfHv+1X0+gbPaSCG+WNwxzG7OrXgrxAEBbvrSwQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] Remove libqemustub.a in order to
+ improve error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -46,37 +31,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
 
-
-
-On 09/06/2017 02:51 PM, Cornelia Huck wrote:
->>>> +void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
->>>> +{
->>>> +    /*
->>>> +     * We don't support MIDA (an optional facility) yet and we
->>>> +     * catch this earlier. Just for expressing the precondition.
->>>> +     */
->>>> +    assert(!(orb->ctrl1 & ORB_CTRL1_MASK_MIDAW));  
->>> I don't know, this is infrastructure, should it trust its callers? If
->>> you keep the assert, please make it g_assert().  
+On Mon, Sep 11, 2017 at 2:57 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> On 18/08/2017 20:47, Alistair Francis wrote:
+>> As discussed with Paolo and Markus let's combine libqemustub.a into
+>> libqemuutil.a to avoid circular dependencies.
 >>
->> Why g_assert? I think g_assert comes form a test framework, this is not
->> test code.
-> g_assert() is glib, no?
-> 
+>> Alistair Francis (2):
+>>   Makefile: Remove libqemustub.a
+>>   Convert remaining single line fprintf() to warn_report()
+>>
+>>  Makefile                    |  7 +++----
+>>  Makefile.target             |  2 +-
+>>  docs/devel/build-system.txt | 14 +++++---------
+>>  tests/Makefile.include      |  8 ++++----
+>>  util/cutils.c               |  3 ++-
+>>  5 files changed, 15 insertions(+), 19 deletions(-)
+>>
+>
+> Queued, thanks (with Philippe's adjustments to the comments).
 
-It lives in GLib > GLib Utilities > Testing:
-https://developer.gnome.org/glib/stable/glib-Testing.html
+Thanks Paolo.
 
-The description of "Testing" starts like this: "GLib provides a framework
-for writing and maintaining unit tests in parallel to the code they are
-testing. The API is designed according to established concepts found in
-the other test frameworks (JUnit, NUnit, RUnit), which in turn is based
-on smalltalk unit testing concepts."
+I actually sent a new version with Philippe's comments, it's included
+as part of the "More warning reporting fixed" series.
 
-So yes, it's both glib and testing framework. This is why I
-ask why should one use g_assert in not-unit-test code.
+Version 5 of that has been reviewed by Markus, I will send it out
+today. Can you take that instead?
 
-Halil
+Thanks,
+Alistair
+
+>
+> Paolo
