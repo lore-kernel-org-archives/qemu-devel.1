@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36276)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36854)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1drDJE-00072H-IK
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 21:14:46 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1drDKH-0007v1-8V
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 21:15:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1drDJ9-0005d7-Qz
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 21:14:44 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2259)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <longpeng2@huawei.com>) id 1drDJ9-0005b6-5f
-	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 21:14:39 -0400
-From: "Longpeng(Mike)" <longpeng2@huawei.com>
-Date: Mon, 11 Sep 2017 09:10:33 +0800
-Message-ID: <1505092240-10864-2-git-send-email-longpeng2@huawei.com>
-In-Reply-To: <1505092240-10864-1-git-send-email-longpeng2@huawei.com>
-References: <1505092240-10864-1-git-send-email-longpeng2@huawei.com>
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1drDKC-0006Ln-FN
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 21:15:49 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:23639
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1drDKB-0006JT-Ms
+	for qemu-devel@nongnu.org; Sun, 10 Sep 2017 21:15:44 -0400
+References: <20170909083001.17451-1-maozy.fnst@cn.fujitsu.com>
+	<CAJ+F1CJPnc0OwhzP6_XYzW3L83_UAC_EAVR6A89wtzASTGOUcg@mail.gmail.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <1d475fb0-7e29-9857-74e6-6beb477ba802@cn.fujitsu.com>
+Date: Mon, 11 Sep 2017 09:13:24 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [RFC 1/8] virtio-crypto: add new definations for
- multiplexing mode
+In-Reply-To: <CAJ+F1CJPnc0OwhzP6_XYzW3L83_UAC_EAVR6A89wtzASTGOUcg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] usb/dev-smartcard-reader: convert to
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,76 +28,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
-Cc: luonengjun@huawei.com, mst@redhat.com, cohuck@redhat.com, stefanha@redhat.com, denglingli@chinamobile.com, Jani.Kokkonen@huawei.com, Ola.Liljedahl@arm.com, Varun.Sethi@freescale.com, xin.zeng@intel.com, brian.a.keating@intel.com, liang.j.ma@intel.com, john.griffin@intel.com, weidong.huang@huawei.com, mike.caraman@nxp.com, agraf@suse.de, jasowang@redhat.com, vincent.jardin@6wind.com, arei.gonglei@hotmail.com, pasic@linux.vnet.ibm.com, wangxinxin.wang@huawei.com, arei.gonglei@huawei.com, "Longpeng(Mike)" <longpeng2@huawei.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Adds the defination of the control/operation header for
-multiplexing mode.
 
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
----
- include/standard-headers/linux/virtio_crypto.h | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/include/standard-headers/linux/virtio_crypto.h b/include/standard-headers/linux/virtio_crypto.h
-index 5ff0b4e..987fb1e 100755
---- a/include/standard-headers/linux/virtio_crypto.h
-+++ b/include/standard-headers/linux/virtio_crypto.h
-@@ -38,6 +38,13 @@
- #define VIRTIO_CRYPTO_SERVICE_MAC    2
- #define VIRTIO_CRYPTO_SERVICE_AEAD   3
- 
-+/* The features for virtio crypto device */
-+#define VIRTIO_CRYPTO_F_MUX_MODE	0
-+#define VIRTIO_CRYPTO_F_CIPHER_STATELESS_MODE	1
-+#define VIRTIO_CRYPTO_F_HASH_STATELESS_MODE	2
-+#define VIRTIO_CRYPTO_F_MAC_STATELESS_MODE	3
-+#define VIRTIO_CRYPTO_F_AEAD_STATELESS_MODE	4
-+
- #define VIRTIO_CRYPTO_OPCODE(service, op)   (((service) << 8) | (op))
- 
- struct virtio_crypto_ctrl_header {
-@@ -234,7 +241,7 @@ struct virtio_crypto_destroy_session_req {
- 	uint8_t padding[48];
- };
- 
--/* The request of the control virtqueue's packet */
-+/* The request of the control virtqueue's packet for non-MUX mode */
- struct virtio_crypto_op_ctrl_req {
- 	struct virtio_crypto_ctrl_header header;
- 
-@@ -253,6 +260,11 @@ struct virtio_crypto_op_ctrl_req {
- 	} u;
- };
- 
-+/* The request of the control virtqueue's packet for MUX mode */
-+struct virtio_crypto_op_ctrl_req_mux {
-+	struct virtio_crypto_ctrl_header header;
-+};
-+
- struct virtio_crypto_op_header {
- #define VIRTIO_CRYPTO_CIPHER_ENCRYPT \
- 	VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_CIPHER, 0x00)
-@@ -390,7 +402,7 @@ struct virtio_crypto_aead_data_req {
- 	uint8_t padding[32];
- };
- 
--/* The request of the data virtqueue's packet */
-+/* The request of the data virtqueue's packet for non-MUX mode */
- struct virtio_crypto_op_data_req {
- 	struct virtio_crypto_op_header header;
- 
-@@ -403,6 +415,11 @@ struct virtio_crypto_op_data_req {
- 	} u;
- };
- 
-+/* The request of the data virtqueue's packet for MUX mode */
-+struct virtio_crypto_op_data_req_mux {
-+	struct virtio_crypto_op_header header;
-+};
-+
- #define VIRTIO_CRYPTO_OK        0
- #define VIRTIO_CRYPTO_ERR       1
- #define VIRTIO_CRYPTO_BADMSG    2
--- 
-1.8.3.1
+On 09/09/2017 05:20 PM, Marc-André Lureau wrote:
+> Hi
+>
+> On Sat, Sep 9, 2017 at 10:33 AM Mao Zhongyi <maozy.fnst@cn.fujitsu.com <mailto:maozy.fnst@cn.fujitsu.com>> wrote:
+>
+>     Convert CCID Device to realize and rename the ccid_card_init()
+>     to ccid_card_realize().
+>
+>     Cc: Gerd Hoffmann <kraxel@redhat.com <mailto:kraxel@redhat.com>>
+>     Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com <mailto:maozy.fnst@cn.fujitsu.com>>
+>     ---
+>      hw/usb/dev-smartcard-reader.c | 18 ++++++++----------
+>      1 file changed, 8 insertions(+), 10 deletions(-)
+>
+>     diff --git a/hw/usb/dev-smartcard-reader.c b/hw/usb/dev-smartcard-reader.c
+>     index bef1f03..27cd48d 100644
+>     --- a/hw/usb/dev-smartcard-reader.c
+>     +++ b/hw/usb/dev-smartcard-reader.c
+>     @@ -1306,27 +1306,25 @@ static int ccid_card_exit(DeviceState *qdev)
+>          return 0;
+>      }
+>
+>     -static int ccid_card_init(DeviceState *qdev)
+>     +static void ccid_card_realize(DeviceState *qdev, Error **errp)
+>      {
+>          CCIDCardState *card = CCID_CARD(qdev);
+>          USBDevice *dev = USB_DEVICE(qdev->parent_bus->parent);
+>          USBCCIDState *s = USB_CCID_DEV(dev);
+>     -    int ret = 0;
+>
+>          if (card->slot != 0) {
+>     -        warn_report("usb-ccid supports one slot, can't add %d",
+>     +        error_setg(errp, "usb-ccid supports one slot, can't add %d",
+>                          card->slot);
+>     -        return -1;
+>     +        return;
+>          }
+>          if (s->card != NULL) {
+>     -        warn_report("usb-ccid card already full, not adding");
+>     -        return -1;
+>     +        error_setg(errp, "usb-ccid card already full, not adding");
+>     +        return;
+>          }
+>     -    ret = ccid_card_initfn(card);
+>     -    if (ret == 0) {
+>     +
+>     +    if (!ccid_card_initfn(card)) {
+>              s->card = card;
+>          }
+>
+>
+> You should set an error here, or the caller won't be aware of card init error anymore. Best would be to convert ccid_card_initfn() and callbacks to take an Error **.
+
+Thanks for the info, I will.
+
+--
+Mao
+
+>
+>     -    return ret;
+>      }
+>
+>      static void ccid_realize(USBDevice *dev, Error **errp)
+>     @@ -1496,7 +1494,7 @@ static void ccid_card_class_init(ObjectClass *klass, void *data)
+>      {
+>          DeviceClass *k = DEVICE_CLASS(klass);
+>          k->bus_type = TYPE_CCID_BUS;
+>     -    k->init = ccid_card_init;
+>     +    k->realize = ccid_card_realize;
+>          k->exit = ccid_card_exit;
+>          k->props = ccid_props;
+>      }
+>     --
+>     2.9.4
+>
+>
+>
+>
+> --
+> Marc-André Lureau
