@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57010)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drLjI-0008MB-2b
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:14:15 -0400
+	(envelope-from <groug@kaod.org>) id 1drLjP-0008On-99
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:14:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drLjE-0002dC-S7
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:14:11 -0400
-Received: from 15.mo1.mail-out.ovh.net ([188.165.38.232]:33834)
+	(envelope-from <groug@kaod.org>) id 1drLjM-0002h9-4b
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:14:19 -0400
+Received: from 13.mo1.mail-out.ovh.net ([178.33.253.128]:55240)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drLjE-0002cq-Lk
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:14:08 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drLjL-0002gF-V0
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:14:16 -0400
 Received: from player169.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 3361993377
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 12:14:07 +0200 (CEST)
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 818B093404
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 12:14:14 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Mon, 11 Sep 2017 12:13:56 +0200
-Message-ID: <150512483616.8642.15831240906912354238.stgit@bahia.lan>
+Date: Mon, 11 Sep 2017 12:14:12 +0200
+Message-ID: <150512485206.8642.14117914178635650186.stgit@bahia.lan>
+In-Reply-To: <150512483616.8642.15831240906912354238.stgit@bahia.lan>
+References: <150512483616.8642.15831240906912354238.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 0/2] spapr_pci: some more cleanup
+Subject: [Qemu-devel] [PATCH 1/2] spapr_pci: convert sprintf() to
+ g_strdup_printf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,12 +33,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
+In order to follow a QEMU common practice.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
+ hw/ppc/spapr_pci.c |   21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-Greg Kurz (2):
-      spapr_pci: convert sprintf() to g_strdup_printf()
-      spapr_pci: don't create 64-bit MMIO window if we don't need to
-
-
- hw/ppc/spapr_pci.c |   37 +++++++++++++++++++++++--------------
- 1 file changed, 23 insertions(+), 14 deletions(-)
+diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
+index 75cd9392233e..7d84b9766ed2 100644
+--- a/hw/ppc/spapr_pci.c
++++ b/hw/ppc/spapr_pci.c
+@@ -1609,34 +1609,37 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+ 
+     sphb->dtbusname = g_strdup_printf("pci@%" PRIx64, sphb->buid);
+ 
+-    namebuf = alloca(strlen(sphb->dtbusname) + 32);
+-
+     /* Initialize memory regions */
+-    sprintf(namebuf, "%s.mmio", sphb->dtbusname);
++    namebuf = g_strdup_printf("%s.mmio", sphb->dtbusname);
+     memory_region_init(&sphb->memspace, OBJECT(sphb), namebuf, UINT64_MAX);
++    g_free(namebuf);
+ 
+-    sprintf(namebuf, "%s.mmio32-alias", sphb->dtbusname);
++    namebuf = g_strdup_printf("%s.mmio32-alias", sphb->dtbusname);
+     memory_region_init_alias(&sphb->mem32window, OBJECT(sphb),
+                              namebuf, &sphb->memspace,
+                              SPAPR_PCI_MEM_WIN_BUS_OFFSET, sphb->mem_win_size);
++    g_free(namebuf);
+     memory_region_add_subregion(get_system_memory(), sphb->mem_win_addr,
+                                 &sphb->mem32window);
+ 
+-    sprintf(namebuf, "%s.mmio64-alias", sphb->dtbusname);
++    namebuf = g_strdup_printf("%s.mmio64-alias", sphb->dtbusname);
+     memory_region_init_alias(&sphb->mem64window, OBJECT(sphb),
+                              namebuf, &sphb->memspace,
+                              sphb->mem64_win_pciaddr, sphb->mem64_win_size);
++    g_free(namebuf);
+     memory_region_add_subregion(get_system_memory(), sphb->mem64_win_addr,
+                                 &sphb->mem64window);
+ 
+     /* Initialize IO regions */
+-    sprintf(namebuf, "%s.io", sphb->dtbusname);
++    namebuf = g_strdup_printf("%s.io", sphb->dtbusname);
+     memory_region_init(&sphb->iospace, OBJECT(sphb),
+                        namebuf, SPAPR_PCI_IO_WIN_SIZE);
++    g_free(namebuf);
+ 
+-    sprintf(namebuf, "%s.io-alias", sphb->dtbusname);
++    namebuf = g_strdup_printf("%s.io-alias", sphb->dtbusname);
+     memory_region_init_alias(&sphb->iowindow, OBJECT(sphb), namebuf,
+                              &sphb->iospace, 0, SPAPR_PCI_IO_WIN_SIZE);
++    g_free(namebuf);
+     memory_region_add_subregion(get_system_memory(), sphb->io_win_addr,
+                                 &sphb->iowindow);
+ 
+@@ -1654,10 +1657,10 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
+      * Later the guest might want to create another DMA window
+      * which will become another memory subregion.
+      */
+-    sprintf(namebuf, "%s.iommu-root", sphb->dtbusname);
+-
++    namebuf = g_strdup_printf("%s.iommu-root", sphb->dtbusname);
+     memory_region_init(&sphb->iommu_root, OBJECT(sphb),
+                        namebuf, UINT64_MAX);
++    g_free(namebuf);
+     address_space_init(&sphb->iommu_as, &sphb->iommu_root,
+                        sphb->dtbusname);
+ 
