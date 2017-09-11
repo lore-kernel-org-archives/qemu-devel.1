@@ -1,34 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drRSO-0004Hj-Cu
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:21:09 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drRgx-0000Yz-SZ
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:36:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drRSJ-00040i-Ac
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:21:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:38830)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drRgt-00038r-Rc
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:36:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41656
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1drRSJ-00040N-4Q
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:21:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1drRSG-0000l1-HT
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:21:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 28C8C2E8524
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:20:54 +0000 (UTC)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1drRgt-00038f-Me
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:36:07 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8BGZSXA042357
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 12:36:06 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cwsg0vrg8-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 12:36:05 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 11 Sep 2017 17:36:03 +0100
+References: <20170905111645.18068-1-pasic@linux.vnet.ibm.com>
+	<20170905111645.18068-2-pasic@linux.vnet.ibm.com>
+	<20170906141846.0be413fb.cohuck@redhat.com>
+	<bd30a18f-6d22-e5a7-6e8c-08f628466cc4@linux.vnet.ibm.com>
+	<20170906145158.252cf0cd.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 11 Sep 2017 18:36:00 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Sep 2017 16:15:26 -0000
-From: Aleksei Kovura <alex3kov@zoho.com>
-Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150514652632.16396.5785164464607646073.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
- 2.10 (works on 2.9)
+In-Reply-To: <20170906145158.252cf0cd.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <27c027c4-58b4-9031-648e-9fd2fa1e5fa8@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] s390x/css: introduce css data stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,111 +46,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Ok, so I cloned from github and am bisecting like this (it's been a while, =
-correct me if I'm wrong):
-$ git bisect start
-$ git bisect bad 1ab5eb4efb91a3d4569b0df6e824cc08ab4bd8ec # 2.10.0 stable c=
-ommit
-$ git bisect good 359c41abe32638adad503e386969fa428cecff52 # 2.9.0 stable c=
-ommit
-Bisecting: 1426 revisions left to test after this (roughly 11 steps)
-[269c20b2bbd2aa8531e0cdc741fb166f290d7a2b] tests/qdict: check more get_try_=
-int() cases
-$ mkdir -p bin/269c20b2bbd2aa8531e0cdc741fb166f290d7a2b
-$ cd bin/269c20b2bbd2aa8531e0cdc741fb166f290d7a2b
-$ ../../configure --target-list=3Dx86_64-softmmu --python=3D/usr/bin/python=
-2 --enable-debug
 
-Compilation fails with this (full log here
-https://pastebin.com/aUYyE6Bb):
 
-  CC      block/block-backend.o
-/media/usb465gb_232gb_NTFS/compile/qemu/block/blkdebug.c: In function =E2=
-=80=98blkdebug_refresh_filename=E2=80=99:
-/media/usb465gb_232gb_NTFS/compile/qemu/block/blkdebug.c:843:31: error: =E2=
-=80=98%s=E2=80=99 directive output may be truncated writing up to 4095 byte=
-s into a region of size 4086 [-Werror=3Dformat-truncation=3D]
-                  "blkdebug:%s:%s", s->config_file ?: "",
-                               ^~
-/media/usb465gb_232gb_NTFS/compile/qemu/block/blkdebug.c:842:9: note: =E2=
-=80=98snprintf=E2=80=99 output 11 or more bytes (assuming 4106) into a dest=
-ination of size 4096
-         snprintf(bs->exact_filename, sizeof(bs->exact_filename),
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                  "blkdebug:%s:%s", s->config_file ?: "",
-                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                  bs->file->bs->exact_filename);
-                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-make: *** [/media/usb465gb_232gb_NTFS/compile/qemu/rules.mak:66: block/blkd=
-ebug.o] Error 1
-make: *** Waiting for unfinished jobs....
-/media/usb465gb_232gb_NTFS/compile/qemu/block/blkverify.c: In function =E2=
-=80=98blkverify_refresh_filename=E2=80=99:
-/media/usb465gb_232gb_NTFS/compile/qemu/block/blkverify.c:305:29: error: =
-=E2=80=98%s=E2=80=99 directive output may be truncated writing up to 4095 b=
-ytes into a region of size 4086 [-Werror=3Dformat-truncation=3D]
-                  "blkverify:%s:%s",
-                             ^~
-/media/usb465gb_232gb_NTFS/compile/qemu/block/blkverify.c:304:9: note: =E2=
-=80=98snprintf=E2=80=99 output between 12 and 8202 bytes into a destination=
- of size 4096
-         snprintf(bs->exact_filename, sizeof(bs->exact_filename),
-         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                  "blkverify:%s:%s",
-                  ~~~~~~~~~~~~~~~~~~
-                  bs->file->bs->exact_filename,
-                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-                  s->test_file->bs->exact_filename);
-                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
-make: *** [/media/usb465gb_232gb_NTFS/compile/qemu/rules.mak:66: block/blkv=
-erify.o] Error 1
+On 09/06/2017 02:51 PM, Cornelia Huck wrote:
+>>>> +void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
+>>>> +{
+>>>> +    /*
+>>>> +     * We don't support MIDA (an optional facility) yet and we
+>>>> +     * catch this earlier. Just for expressing the precondition.
+>>>> +     */
+>>>> +    assert(!(orb->ctrl1 & ORB_CTRL1_MASK_MIDAW));  
+>>> I don't know, this is infrastructure, should it trust its callers? If
+>>> you keep the assert, please make it g_assert().  
+>>
+>> Why g_assert? I think g_assert comes form a test framework, this is not
+>> test code.
+> g_assert() is glib, no?
+> 
 
-Did I hit a commit with a broken build or something? What to do next?
+It lives in GLib > GLib Utilities > Testing:
+https://developer.gnome.org/glib/stable/glib-Testing.html
 
--- =
+The description of "Testing" starts like this: "GLib provides a framework
+for writing and maintaining unit tests in parallel to the code they are
+testing. The API is designed according to established concepts found in
+the other test frameworks (JUnit, NUnit, RUnit), which in turn is based
+on smalltalk unit testing concepts."
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715700
+So yes, it's both glib and testing framework. This is why I
+ask why should one use g_assert in not-unit-test code.
 
-Title:
-  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu version: 2.10 stable.
-  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
-st.
-  Command line:
-  qemu-system-x86_64 \
-      -nodefaults \
-      -nodefconfig \
-      -machine type=3Dq35,accel=3Dkvm \
-      -enable-kvm \
-      -cpu host \
-      -m 2048 \
-      -vga virtio \
-      -boot menu=3Don \
-      -smbios file=3D/path/dmidecode_BIOS.bin \
-      -acpitable file=3D/path/acpi_slic.bin \
-      -bios /path/OVMF_CODE.fd \
-      -net none \
-      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
-      -device pcie-root-port \
-      -device ich9-usb-ehci1 \
-      -device ich9-usb-uhci1 \
-      -device ich9-usb-uhci2 \
-      -device ich9-usb-uhci3
-
-  Windows hangs at boot with waving flag screen (flag doesn't freeze,
-  keeps waving indefinitely). Same command line boots fine with Qemu
-  2.9. I tried changing machine type to pc-q35-2.9 - same result.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
+Halil
