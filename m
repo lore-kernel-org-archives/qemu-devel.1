@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38322)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSO9-00077j-Sb
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:54 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSOF-0007Av-0a
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSO7-00013u-PZ
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSOB-00015H-Aw
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:54 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 11 Sep 2017 12:19:52 -0500
-Message-Id: <20170911172022.4738-9-eblake@redhat.com>
+Date: Mon, 11 Sep 2017 12:19:53 -0500
+Message-Id: <20170911172022.4738-10-eblake@redhat.com>
 In-Reply-To: <20170911172022.4738-1-eblake@redhat.com>
 References: <20170911172022.4738-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 08/38] libqos: Track QTestState with QPCIBus
+Subject: [Qemu-devel] [PATCH v7 09/38] libqos: Track QTestState with
+ QVirtioBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,367 +21,218 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Gerd Hoffmann <kraxel@redhat.com>, "open list:IDE" <qemu-block@nongnu.org>, "open list:sPAPR" <qemu-ppc@nongnu.org>
+Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, "open list:virtio-blk" <qemu-block@nongnu.org>
 
-When initializing a QPCIBus, track which QTestState the bus is
-associated with (so that a later patch can then explicitly use
-that test state for all communication on the bus, rather than
-blindly relying on global_qtest).  Update the initialization
-functions to take another parameter, and update all callers to
-pass in state (for now, most callers get away with passing the
-current global_qtest as the current state, although this required
-fixing the order of initialization to ensure qtest_start() is
-called before qpci_init*() in rtl8139-test, and provided an
-opportunity to pass in the allocator in e1000e-test).
+When initializing a QVirtioDevice (which always has an associated
+QVirtioBus), we want to track which QTestState to use for all
+I/O processed through that bus and device.  Copy the paradigm
+used for QPCIBus, and track the test state at the bus level; this
+in turn requires a separate bus object per device (and associated
+cleanup) rather than just sharing a const version of the dispatch
+table.  Update all affected callers.
 
-Touch up some allocations to use g_new0() rather than g_malloc()
-while in the area, and simplify some code (all implementations
-of QOSOps provide a .init_allocator() that never fails).
+Likewise, let QVirtQueue trace back to its associated QVirtioDevice.
+
+A later patch can then explicitly use the QTestState associated
+with the bus rather than blindly relying on global_qtest.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-
 ---
-v7: use g_new0() instead of g_malloc(), drop dead conditionals
----
- tests/libqos/ahci.h       |  2 +-
- tests/libqos/libqos.h     |  2 +-
- tests/libqos/pci-pc.h     |  2 +-
- tests/libqos/pci-spapr.h  |  2 +-
- tests/libqos/pci.h        |  1 +
- tests/ahci-test.c         |  2 +-
- tests/e1000e-test.c       |  6 +++---
- tests/i440fx-test.c       |  2 +-
- tests/ide-test.c          |  2 +-
- tests/libqos/ahci.c       |  4 ++--
- tests/libqos/libqos.c     | 10 +++-------
- tests/libqos/pci-pc.c     |  7 ++++---
- tests/libqos/pci-spapr.c  |  7 ++++---
- tests/q35-test.c          |  4 ++--
- tests/rtl8139-test.c      |  5 +++--
- tests/tco-test.c          |  2 +-
- tests/usb-hcd-ehci-test.c |  2 +-
- tests/vhost-user-test.c   |  4 ++--
- 18 files changed, 33 insertions(+), 33 deletions(-)
+ tests/libqos/virtio-mmio.h |  6 +++---
+ tests/libqos/virtio-pci.h  |  2 --
+ tests/libqos/virtio.h      |  7 ++++++-
+ tests/libqos/virtio-mmio.c | 12 ++++++++++--
+ tests/libqos/virtio-pci.c  |  6 ++++--
+ tests/libqos/virtio.c      | 10 ++++++++++
+ tests/virtio-blk-test.c    |  5 +++--
+ 7 files changed, 36 insertions(+), 12 deletions(-)
 
-diff --git a/tests/libqos/ahci.h b/tests/libqos/ahci.h
-index 5f9627bb0f..715ca1e226 100644
---- a/tests/libqos/ahci.h
-+++ b/tests/libqos/ahci.h
-@@ -571,7 +571,7 @@ void ahci_free(AHCIQState *ahci, uint64_t addr);
- void ahci_clean_mem(AHCIQState *ahci);
+diff --git a/tests/libqos/virtio-mmio.h b/tests/libqos/virtio-mmio.h
+index e3e52b9ce1..fe7fa636b8 100644
+--- a/tests/libqos/virtio-mmio.h
++++ b/tests/libqos/virtio-mmio.h
+@@ -39,8 +39,8 @@ typedef struct QVirtioMMIODevice {
+     uint32_t features; /* As it cannot be read later, save it */
+ } QVirtioMMIODevice;
 
- /* Device management */
--QPCIDevice *get_ahci_device(uint32_t *fingerprint);
-+QPCIDevice *get_ahci_device(QTestState *qts, uint32_t *fingerprint);
- void free_ahci_device(QPCIDevice *dev);
- void ahci_pci_enable(AHCIQState *ahci);
- void start_ahci_device(AHCIQState *ahci);
-diff --git a/tests/libqos/libqos.h b/tests/libqos/libqos.h
-index 231969766f..78e5c044a0 100644
---- a/tests/libqos/libqos.h
-+++ b/tests/libqos/libqos.h
-@@ -10,7 +10,7 @@ typedef struct QOSState QOSState;
- typedef struct QOSOps {
-     QGuestAllocator *(*init_allocator)(QAllocOpts);
-     void (*uninit_allocator)(QGuestAllocator *);
--    QPCIBus *(*qpci_init)(QGuestAllocator *alloc);
-+    QPCIBus *(*qpci_init)(QTestState *qts, QGuestAllocator *alloc);
-     void (*qpci_free)(QPCIBus *bus);
-     void (*shutdown)(QOSState *);
- } QOSOps;
-diff --git a/tests/libqos/pci-pc.h b/tests/libqos/pci-pc.h
-index 9479b51642..491eeac756 100644
---- a/tests/libqos/pci-pc.h
-+++ b/tests/libqos/pci-pc.h
-@@ -16,7 +16,7 @@
- #include "libqos/pci.h"
- #include "libqos/malloc.h"
-
--QPCIBus *qpci_init_pc(QGuestAllocator *alloc);
-+QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc);
- void     qpci_free_pc(QPCIBus *bus);
-
- #endif
-diff --git a/tests/libqos/pci-spapr.h b/tests/libqos/pci-spapr.h
-index 4192126d86..387686dfc8 100644
---- a/tests/libqos/pci-spapr.h
-+++ b/tests/libqos/pci-spapr.h
-@@ -11,7 +11,7 @@
- #include "libqos/malloc.h"
- #include "libqos/pci.h"
-
--QPCIBus *qpci_init_spapr(QGuestAllocator *alloc);
-+QPCIBus *qpci_init_spapr(QTestState *qts, QGuestAllocator *alloc);
- void     qpci_free_spapr(QPCIBus *bus);
-
- #endif
-diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
-index ed480614ff..429c382282 100644
---- a/tests/libqos/pci.h
-+++ b/tests/libqos/pci.h
-@@ -48,6 +48,7 @@ struct QPCIBus {
-     void (*config_writel)(QPCIBus *bus, int devfn,
-                           uint8_t offset, uint32_t value);
-
-+    QTestState *qts;
-     uint16_t pio_alloc_ptr;
-     uint64_t mmio_alloc_ptr, mmio_limit;
- };
-diff --git a/tests/ahci-test.c b/tests/ahci-test.c
-index 999121bb7c..c94d1bd712 100644
---- a/tests/ahci-test.c
-+++ b/tests/ahci-test.c
-@@ -160,7 +160,7 @@ static AHCIQState *ahci_vboot(const char *cli, va_list ap)
-     alloc_set_flags(s->parent->alloc, ALLOC_LEAK_ASSERT);
-
-     /* Verify that we have an AHCI device present. */
--    s->dev = get_ahci_device(&s->fingerprint);
-+    s->dev = get_ahci_device(s->parent->qts, &s->fingerprint);
-
-     return s;
- }
-diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
-index c612dc64ec..d8085d944e 100644
---- a/tests/e1000e-test.c
-+++ b/tests/e1000e-test.c
-@@ -392,12 +392,12 @@ static void data_test_init(e1000e_device *d)
-     qtest_start(cmdline);
-     g_free(cmdline);
-
--    test_bus = qpci_init_pc(NULL);
--    g_assert_nonnull(test_bus);
+-extern const QVirtioBus qvirtio_mmio;
 -
-     test_alloc = pc_alloc_init();
-     g_assert_nonnull(test_alloc);
+-QVirtioMMIODevice *qvirtio_mmio_init_device(uint64_t addr, uint32_t page_size);
++QVirtioMMIODevice *qvirtio_mmio_init_device(QTestState *qts, uint64_t addr,
++                                            uint32_t page_size);
++void qvirtio_mmio_device_free(QVirtioMMIODevice *dev);
 
-+    test_bus = qpci_init_pc(global_qtest, test_alloc);
-+    g_assert_nonnull(test_bus);
+ #endif
+diff --git a/tests/libqos/virtio-pci.h b/tests/libqos/virtio-pci.h
+index 6ef19094cb..bcd0594245 100644
+--- a/tests/libqos/virtio-pci.h
++++ b/tests/libqos/virtio-pci.h
+@@ -29,8 +29,6 @@ typedef struct QVirtQueuePCI {
+     uint32_t msix_data;
+ } QVirtQueuePCI;
+
+-extern const QVirtioBus qvirtio_pci;
+-
+ QVirtioPCIDevice *qvirtio_pci_device_find(QPCIBus *bus, uint16_t device_type);
+ QVirtioPCIDevice *qvirtio_pci_device_find_slot(QPCIBus *bus,
+                                                uint16_t device_type, int slot);
+diff --git a/tests/libqos/virtio.h b/tests/libqos/virtio.h
+index 8fbcd1869c..def46ad9bb 100644
+--- a/tests/libqos/virtio.h
++++ b/tests/libqos/virtio.h
+@@ -18,12 +18,13 @@
+ typedef struct QVirtioBus QVirtioBus;
+
+ typedef struct QVirtioDevice {
+-    const QVirtioBus *bus;
++    QVirtioBus *bus;
+     /* Device type */
+     uint16_t device_type;
+ } QVirtioDevice;
+
+ typedef struct QVirtQueue {
++    QVirtioDevice *dev;
+     uint64_t desc; /* This points to an array of struct vring_desc */
+     uint64_t avail; /* This points to a struct vring_avail */
+     uint64_t used; /* This points to a struct vring_used */
+@@ -88,6 +89,8 @@ struct QVirtioBus {
+
+     /* Notify changes in virtqueue */
+     void (*virtqueue_kick)(QVirtioDevice *d, QVirtQueue *vq);
 +
-     e1000e_device_init(test_bus, d);
++    QTestState *qts;
+ };
+
+ static inline bool qvirtio_is_big_endian(QVirtioDevice *d)
+@@ -103,6 +106,8 @@ static inline uint32_t qvring_size(uint32_t num, uint32_t align)
+         + sizeof(uint16_t) * 3 + sizeof(struct vring_used_elem) * num;
  }
 
-diff --git a/tests/i440fx-test.c b/tests/i440fx-test.c
-index e9d05c87d1..4390e5591e 100644
---- a/tests/i440fx-test.c
-+++ b/tests/i440fx-test.c
-@@ -38,7 +38,7 @@ static QPCIBus *test_start_get_bus(const TestData *s)
-     cmdline = g_strdup_printf("-smp %d", s->num_cpus);
-     qtest_start(cmdline);
-     g_free(cmdline);
--    return qpci_init_pc(NULL);
-+    return qpci_init_pc(global_qtest, NULL);
++QVirtioBus *qvirtio_init_bus(QTestState *qts, const QVirtioBus *base);
++
+ uint8_t qvirtio_config_readb(QVirtioDevice *d, uint64_t addr);
+ uint16_t qvirtio_config_readw(QVirtioDevice *d, uint64_t addr);
+ uint32_t qvirtio_config_readl(QVirtioDevice *d, uint64_t addr);
+diff --git a/tests/libqos/virtio-mmio.c b/tests/libqos/virtio-mmio.c
+index 7aa8383338..12770319cd 100644
+--- a/tests/libqos/virtio-mmio.c
++++ b/tests/libqos/virtio-mmio.c
+@@ -131,6 +131,7 @@ static QVirtQueue *qvirtio_mmio_virtqueue_setup(QVirtioDevice *d,
+     qvirtio_mmio_queue_select(d, index);
+     writel(dev->addr + QVIRTIO_MMIO_QUEUE_ALIGN, dev->page_size);
+
++    vq->dev = d;
+     vq->index = index;
+     vq->size = qvirtio_mmio_get_queue_size(d);
+     vq->free_head = 0;
+@@ -187,7 +188,8 @@ const QVirtioBus qvirtio_mmio = {
+     .virtqueue_kick = qvirtio_mmio_virtqueue_kick,
+ };
+
+-QVirtioMMIODevice *qvirtio_mmio_init_device(uint64_t addr, uint32_t page_size)
++QVirtioMMIODevice *qvirtio_mmio_init_device(QTestState *qts, uint64_t addr,
++                                            uint32_t page_size)
+ {
+     QVirtioMMIODevice *dev;
+     uint32_t magic;
+@@ -199,9 +201,15 @@ QVirtioMMIODevice *qvirtio_mmio_init_device(uint64_t addr, uint32_t page_size)
+     dev->addr = addr;
+     dev->page_size = page_size;
+     dev->vdev.device_type = readl(addr + QVIRTIO_MMIO_DEVICE_ID);
+-    dev->vdev.bus = &qvirtio_mmio;
++    dev->vdev.bus = qvirtio_init_bus(qts, &qvirtio_mmio);
+
+     writel(addr + QVIRTIO_MMIO_GUEST_PAGE_SIZE, page_size);
+
+     return dev;
  }
++
++void qvirtio_mmio_device_free(QVirtioMMIODevice *dev)
++{
++    g_free(dev->vdev.bus);
++    g_free(dev);
++}
+diff --git a/tests/libqos/virtio-pci.c b/tests/libqos/virtio-pci.c
+index 7ac15c04e1..6225e6df9b 100644
+--- a/tests/libqos/virtio-pci.c
++++ b/tests/libqos/virtio-pci.c
+@@ -31,6 +31,7 @@ typedef struct QVirtioPCIForeachData {
 
- static void test_i440fx_defaults(gconstpointer opaque)
-diff --git a/tests/ide-test.c b/tests/ide-test.c
-index aa9de065fc..b2237b6158 100644
---- a/tests/ide-test.c
-+++ b/tests/ide-test.c
-@@ -143,7 +143,7 @@ static QPCIDevice *get_pci_device(QPCIBar *bmdma_bar, QPCIBar *ide_bar)
-     uint16_t vendor_id, device_id;
-
-     if (!pcibus) {
--        pcibus = qpci_init_pc(NULL);
-+        pcibus = qpci_init_pc(global_qtest, NULL);
-     }
-
-     /* Find PCI device and verify it's the right one */
-diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
-index 1ca7f456b5..790ef991b3 100644
---- a/tests/libqos/ahci.c
-+++ b/tests/libqos/ahci.c
-@@ -123,13 +123,13 @@ bool is_atapi(AHCIQState *ahci, uint8_t port)
- /**
-  * Locate, verify, and return a handle to the AHCI device.
-  */
--QPCIDevice *get_ahci_device(uint32_t *fingerprint)
-+QPCIDevice *get_ahci_device(QTestState *qts, uint32_t *fingerprint)
+ void qvirtio_pci_device_free(QVirtioPCIDevice *dev)
  {
-     QPCIDevice *ahci;
-     uint32_t ahci_fingerprint;
-     QPCIBus *pcibus;
-
--    pcibus = qpci_init_pc(NULL);
-+    pcibus = qpci_init_pc(qts, NULL);
-
-     /* Find the AHCI PCI device and verify it's the right one. */
-     ahci = qpci_device_find(pcibus, QPCI_DEVFN(0x1F, 0x02));
-diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
-index 6226546c28..7a76c1ef34 100644
---- a/tests/libqos/libqos.c
-+++ b/tests/libqos/libqos.c
-@@ -17,18 +17,14 @@ QOSState *qtest_vboot(QOSOps *ops, const char *cmdline_fmt, va_list ap)
- {
-     char *cmdline;
-
--    struct QOSState *qs = g_malloc(sizeof(QOSState));
-+    QOSState *qs = g_new0(QOSState, 1);
-
-     cmdline = g_strdup_vprintf(cmdline_fmt, ap);
-     qs->qts = qtest_start(cmdline);
-     qs->ops = ops;
-     if (ops) {
--        if (ops->init_allocator) {
--            qs->alloc = ops->init_allocator(ALLOC_NO_FLAGS);
--        }
--        if (ops->qpci_init && qs->alloc) {
--            qs->pcibus = ops->qpci_init(qs->alloc);
--        }
-+        qs->alloc = ops->init_allocator(ALLOC_NO_FLAGS);
-+        qs->pcibus = ops->qpci_init(qs->qts, qs->alloc);
-     }
-
-     g_free(cmdline);
-diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
-index 02ce49927a..e267fd1a44 100644
---- a/tests/libqos/pci-pc.c
-+++ b/tests/libqos/pci-pc.c
-@@ -115,11 +115,11 @@ static void qpci_pc_config_writel(QPCIBus *bus, int devfn, uint8_t offset, uint3
-     outl(0xcfc, value);
++    g_free(dev->vdev.bus);
+     g_free(dev->pdev);
+     g_free(dev);
  }
+@@ -233,6 +234,7 @@ static QVirtQueue *qvirtio_pci_virtqueue_setup(QVirtioDevice *d,
+     feat = qvirtio_pci_get_guest_features(d);
 
--QPCIBus *qpci_init_pc(QGuestAllocator *alloc)
-+QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
- {
--    QPCIBusPC *ret;
-+    QPCIBusPC *ret = g_new0(QPCIBusPC, 1);
+     qvirtio_pci_queue_select(d, index);
++    vqpci->vq.dev = d;
+     vqpci->vq.index = index;
+     vqpci->vq.size = qvirtio_pci_get_queue_size(d);
+     vqpci->vq.free_head = 0;
+@@ -315,7 +317,7 @@ QVirtioPCIDevice *qvirtio_pci_device_find(QPCIBus *bus, uint16_t device_type)
+     qvirtio_pci_foreach(bus, device_type, false, 0,
+                         qvirtio_pci_assign_device, &dev);
 
--    ret = g_malloc(sizeof(*ret));
+-    dev->vdev.bus = &qvirtio_pci;
++    dev->vdev.bus = qvirtio_init_bus(bus->qts, &qvirtio_pci);
+
+     return dev;
+ }
+@@ -328,7 +330,7 @@ QVirtioPCIDevice *qvirtio_pci_device_find_slot(QPCIBus *bus,
+     qvirtio_pci_foreach(bus, device_type, true, slot,
+                         qvirtio_pci_assign_device, &dev);
+
+-    dev->vdev.bus = &qvirtio_pci;
++    dev->vdev.bus = qvirtio_init_bus(bus->qts, &qvirtio_pci);
+
+     return dev;
+ }
+diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
+index 9880a6964e..2b7d9e62c4 100644
+--- a/tests/libqos/virtio.c
++++ b/tests/libqos/virtio.c
+@@ -13,6 +13,16 @@
+ #include "standard-headers/linux/virtio_config.h"
+ #include "standard-headers/linux/virtio_ring.h"
+
++QVirtioBus *qvirtio_init_bus(QTestState *qts, const QVirtioBus *base)
++{
++    QVirtioBus *bus = g_new0(QVirtioBus, 1);
++
 +    assert(qts);
-
-     ret->bus.pio_readb = qpci_pc_pio_readb;
-     ret->bus.pio_readw = qpci_pc_pio_readw;
-@@ -142,6 +142,7 @@ QPCIBus *qpci_init_pc(QGuestAllocator *alloc)
-     ret->bus.config_writew = qpci_pc_config_writew;
-     ret->bus.config_writel = qpci_pc_config_writel;
-
-+    ret->bus.qts = qts;
-     ret->bus.pio_alloc_ptr = 0xc000;
-     ret->bus.mmio_alloc_ptr = 0xE0000000;
-     ret->bus.mmio_limit = 0x100000000ULL;
-diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
-index 2043f1e123..ef52fcbe2b 100644
---- a/tests/libqos/pci-spapr.c
-+++ b/tests/libqos/pci-spapr.c
-@@ -154,11 +154,11 @@ static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
- #define SPAPR_PCI_MMIO32_WIN_SIZE    0x80000000 /* 2 GiB */
- #define SPAPR_PCI_IO_WIN_SIZE        0x10000
-
--QPCIBus *qpci_init_spapr(QGuestAllocator *alloc)
-+QPCIBus *qpci_init_spapr(QTestState *qts, QGuestAllocator *alloc)
++    *bus = *base;
++    bus->qts = qts;
++    return bus;
++}
++
+ uint8_t qvirtio_config_readb(QVirtioDevice *d, uint64_t addr)
  {
--    QPCIBusSPAPR *ret;
-+    QPCIBusSPAPR *ret = g_new0(QPCIBusSPAPR, 1);
+     return d->bus->config_readb(d, addr);
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index 0576cb16ba..ca4ee645b7 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -687,7 +687,8 @@ static void mmio_basic(void)
 
--    ret = g_malloc(sizeof(*ret));
-+    assert(qts);
+     arm_test_start();
 
-     ret->alloc = alloc;
-
-@@ -197,6 +197,7 @@ QPCIBus *qpci_init_spapr(QGuestAllocator *alloc)
-     ret->mmio32.pci_base = SPAPR_PCI_MMIO32_WIN_SIZE;
-     ret->mmio32.size = SPAPR_PCI_MMIO32_WIN_SIZE;
-
-+    ret->bus.qts = qts;
-     ret->bus.pio_alloc_ptr = 0xc000;
-     ret->bus.mmio_alloc_ptr = ret->mmio32.pci_base;
-     ret->bus.mmio_limit = ret->mmio32.pci_base + ret->mmio32.size;
-diff --git a/tests/q35-test.c b/tests/q35-test.c
-index f98bed7a2d..e149c4c51d 100644
---- a/tests/q35-test.c
-+++ b/tests/q35-test.c
-@@ -86,7 +86,7 @@ static void test_smram_lock(void)
-
-     qtest_start("-M q35");
-
--    pcibus = qpci_init_pc(NULL);
-+    pcibus = qpci_init_pc(global_qtest, NULL);
-     g_assert(pcibus != NULL);
-
-     pcidev = qpci_device_find(pcibus, 0);
-@@ -145,7 +145,7 @@ static void test_tseg_size(const void *data)
-     g_free(cmdline);
-
-     /* locate the DRAM controller */
--    pcibus = qpci_init_pc(NULL);
-+    pcibus = qpci_init_pc(global_qtest, NULL);
-     g_assert(pcibus != NULL);
-     pcidev = qpci_device_find(pcibus, 0);
-     g_assert(pcidev != NULL);
-diff --git a/tests/rtl8139-test.c b/tests/rtl8139-test.c
-index 7de7dc45ae..68bfc42178 100644
---- a/tests/rtl8139-test.c
-+++ b/tests/rtl8139-test.c
-@@ -35,7 +35,7 @@ static QPCIDevice *get_device(void)
- {
-     QPCIDevice *dev;
-
--    pcibus = qpci_init_pc(NULL);
-+    pcibus = qpci_init_pc(global_qtest, NULL);
-     qpci_device_foreach(pcibus, 0x10ec, 0x8139, save_fn, &dev);
+-    dev = qvirtio_mmio_init_device(MMIO_DEV_BASE_ADDR, MMIO_PAGE_SIZE);
++    dev = qvirtio_mmio_init_device(global_qtest, MMIO_DEV_BASE_ADDR,
++                                   MMIO_PAGE_SIZE);
      g_assert(dev != NULL);
+     g_assert_cmphex(dev->vdev.device_type, ==, VIRTIO_ID_BLOCK);
 
-@@ -197,11 +197,12 @@ int main(int argc, char **argv)
- {
-     int ret;
+@@ -711,7 +712,7 @@ static void mmio_basic(void)
 
-+    qtest_start("-device rtl8139");
-+
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/rtl8139/nop", nop);
-     qtest_add_func("/rtl8139/timer", test_init);
-
--    qtest_start("-device rtl8139");
-     ret = g_test_run();
-
-     qtest_end();
-diff --git a/tests/tco-test.c b/tests/tco-test.c
-index f2ed6ed91c..0387971953 100644
---- a/tests/tco-test.c
-+++ b/tests/tco-test.c
-@@ -64,7 +64,7 @@ static void test_init(TestData *d)
-     qtest_irq_intercept_in(qs, "ioapic");
-     g_free(s);
-
--    d->bus = qpci_init_pc(NULL);
-+    d->bus = qpci_init_pc(qs, NULL);
-     d->dev = qpci_device_find(d->bus, QPCI_DEVFN(0x1f, 0x00));
-     g_assert(d->dev != NULL);
-
-diff --git a/tests/usb-hcd-ehci-test.c b/tests/usb-hcd-ehci-test.c
-index 944eb1c088..55d4743a2a 100644
---- a/tests/usb-hcd-ehci-test.c
-+++ b/tests/usb-hcd-ehci-test.c
-@@ -52,7 +52,7 @@ static void ehci_port_test(struct qhc *hc, int port, uint32_t expect)
-
- static void test_init(void)
- {
--    pcibus = qpci_init_pc(NULL);
-+    pcibus = qpci_init_pc(global_qtest, NULL);
-     g_assert(pcibus != NULL);
-
-     qusb_pci_init_one(pcibus, &uhci1, QPCI_DEVFN(0x1d, 0), 4);
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index 4b98018478..f762b2ebc1 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -166,7 +166,7 @@ static void init_virtio_dev(TestServer *s)
-     QVirtioPCIDevice *dev;
-     uint32_t features;
-
--    s->bus = qpci_init_pc(NULL);
-+    s->bus = qpci_init_pc(global_qtest, NULL);
-     g_assert_nonnull(s->bus);
-
-     dev = qvirtio_pci_device_find(s->bus, VIRTIO_ID_NET);
-@@ -893,7 +893,7 @@ static void test_multiqueue(void)
-     qtest_start(cmd);
-     g_free(cmd);
-
--    bus = qpci_init_pc(NULL);
-+    bus = qpci_init_pc(global_qtest, NULL);
-     dev = virtio_net_pci_init(bus, PCI_SLOT);
-
-     alloc = pc_alloc_init();
+     /* End test */
+     qvirtqueue_cleanup(dev->vdev.bus, vq, alloc);
+-    g_free(dev);
++    qvirtio_mmio_device_free(dev);
+     generic_alloc_uninit(alloc);
+     test_end();
+ }
 -- 
 2.13.5
