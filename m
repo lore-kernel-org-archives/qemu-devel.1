@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1drSIw-0002Uw-A2
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:15:30 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1drSNR-0006Mz-ML
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1drSIr-00054a-BI
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:15:26 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:34120)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1drSIr-00054K-1Y
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:15:21 -0400
-Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 14321AB263
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 19:15:20 +0200 (CEST)
-From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Mon, 11 Sep 2017 19:12:35 +0200
-Message-Id: <20170911171235.29331-22-clg@kaod.org>
-In-Reply-To: <20170911171235.29331-1-clg@kaod.org>
-References: <20170911171235.29331-1-clg@kaod.org>
+	(envelope-from <dgilbert@redhat.com>) id 1drSNM-0000Zt-Vi
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:05 -0400
+Date: Mon, 11 Sep 2017 18:19:54 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170911171953.GE2150@work-vm>
+References: <1505054255-2990-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1505054255-2990-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170911095059.101e0cfc@bahia.lan> <20170911093032.GA2857@work-vm>
+	<20170911104854.GB2784@umbus.fritz.box>
+	<cc212d72-1eff-86ae-1e34-fdc1636015e5@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [RFC PATCH v2 21/21] spapr: activate XIVE exploitation
- mode
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cc212d72-1eff-86ae-1e34-fdc1636015e5@ilande.co.uk>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/4] ppc: add CPU IRQ state to
+ PPC VMStateDescription
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,151 +27,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
-Cc: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: David Gibson <david@gibson.dropbear.id.au>, lvivier@redhat.com, aik@ozlabs.ru, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-A couple of adjustments need to be done to activate XIVE exploitation
-mode. First, the hypervisor should advertise support for both models
-XIVE legacy and XIVE exploitation in "ibm,arch-vec-5-platform-support".
+* Mark Cave-Ayland (mark.cave-ayland@ilande.co.uk) wrote:
+> On 11/09/17 11:48, David Gibson wrote:
+> 
+> > On Mon, Sep 11, 2017 at 10:30:33AM +0100, Dr. David Alan Gilbert wrote:
+> >> * Greg Kurz (groug@kaod.org) wrote:
+> >>> On Sun, 10 Sep 2017 15:37:33 +0100
+> >>> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> wrote:
+> >>>
+> >>>> Commit a90db15 "target-ppc: Convert ppc cpu savevm to VMStateDescription"
+> >>>> appears to drop the internal CPU IRQ state from the migration stream. Whilst
+> >>>> testing migration on g3beige/mac99 machines, test images would randomly fail to
+> >>>> resume unless a key was pressed on the VGA console.
+> >>>>
+> >>>> Further investigation suggests that internal CPU IRQ state isn't being
+> >>>> preserved and so interrupts asserted at the time of migration are lost. Adding
+> >>>> the pending_interrupts and irq_input_state fields back into the migration
+> >>>> stream appears to fix the problem here during local tests.
+> >>>>
+> >>>> As part of this commit we bump the vmstate_ppc version from 5 to 6 to handle
+> >>>> the additional fields.
+> >>>>
+> >>>
+> >>> And so this unconditionally breaks backward migration... what about adding
+> >>> a subsection for this ?
+> >>
+> >> and wiring it to a flag on the machine type so that older machine types
+> >> don't send it.
+> > 
+> > Right, a subsection is certainly necessary to avoid breaking backwards
+> > migration.
+> 
+> The suggestion of using the VMSTATE_*_V macros with an increased version
+> number came from Alexey's original review of the patch many months ago
+> which is why I did it that way.
+> 
+> Out of curiosity though, what is the criteria for supporting backwards
+> migration? Obviously forward migration is supported as-is in this
+> manner, so what determines if a patch needs to be backwards compatible
+> and how far?
 
-The sPAPR machine starts with the XICS interrupt model (the default
-behavior could be changed later on for POWER9) and, depending on the
-guest capabilities, the XIVE exploitation mode is negotiated during
-CAS. A reset is then performed to rebuild the device tree with new
-XIVE properties under the "interrupt-controller" node.
+It's a bit fuzzy.  Downstream we do backwards migration between various
+versions - and those versions are pretty arbitrarily chosen.
+Generally I prefer if we don't break that upstream either, although
+it isn't tested much.
 
-Finally, the MMIO regions for the ESB and TIMA should be mapped at
-reset time and post_load when XIVE exploitation mode is on.
+If it was in code that was specific to your g3beige I wouldn't mind;
+but for ppc in general then if it breaks the server migration it'll
+be a pain we'd have to then fix.  Best to keep it working upstream.
 
-Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
----
- hw/ppc/spapr.c       | 33 ++++++++++++++++++++++++++++++---
- hw/ppc/spapr_hcall.c |  6 ++++++
- 2 files changed, 36 insertions(+), 3 deletions(-)
+But it's fairly easy to put new fields in a subsection and tie it
+to a property;  that makes it easy to switch it on/off in machine
+types.
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index d8b25be70cd8..aaf1be7a50fe 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -942,7 +942,8 @@ static void spapr_dt_rtas(sPAPRMachineState *spapr, v=
-oid *fdt)
- /* Prepare ibm,arch-vec-5-platform-support, which indicates the MMU feat=
-ures
-  * that the guest may request and thus the valid values for bytes 24..26=
- of
-  * option vector 5: */
--static void spapr_dt_ov5_platform_support(void *fdt, int chosen)
-+static void spapr_dt_ov5_platform_support(sPAPRMachineState *spapr,
-+                                          void *fdt, int chosen)
- {
-     PowerPCCPU *first_ppc_cpu =3D POWERPC_CPU(first_cpu);
-=20
-@@ -961,6 +962,13 @@ static void spapr_dt_ov5_platform_support(void *fdt,=
- int chosen)
-         } else {
-             val[3] =3D 0x00; /* Hash */
-         }
-+
-+        /* TODO: introduce a kvmppc_has_cap_xive() ? Works with
-+         * irqchip=3Doff for now
-+         */
-+        if (spapr->xive) {
-+            val[1] =3D 0x80; /* OV5_XIVE_BOTH */
-+        }
-     } else {
-         if (first_ppc_cpu->env.mmu_model & POWERPC_MMU_V3) {
-             /* V3 MMU supports both hash and radix (with dynamic switchi=
-ng) */
-@@ -969,6 +977,9 @@ static void spapr_dt_ov5_platform_support(void *fdt, =
-int chosen)
-             /* Otherwise we can only do hash */
-             val[3] =3D 0x00;
-         }
-+        if (spapr->xive) {
-+            val[1] =3D 0x80;  /* OV5_XIVE_BOTH */
-+        }
-     }
-     _FDT(fdt_setprop(fdt, chosen, "ibm,arch-vec-5-platform-support",
-                      val, sizeof(val)));
-@@ -1027,7 +1038,7 @@ static void spapr_dt_chosen(sPAPRMachineState *spap=
-r, void *fdt)
-         _FDT(fdt_setprop_string(fdt, chosen, "linux,stdout-path", stdout=
-_path));
-     }
-=20
--    spapr_dt_ov5_platform_support(fdt, chosen);
-+    spapr_dt_ov5_platform_support(spapr, fdt, chosen);
-=20
-     g_free(stdout_path);
-     g_free(bootlist);
-@@ -1106,7 +1117,13 @@ static void *spapr_build_fdt(sPAPRMachineState *sp=
-apr,
-     _FDT(fdt_setprop_cell(fdt, 0, "#size-cells", 2));
-=20
-     /* /interrupt controller */
--    spapr_dt_xics(xics_max_server_number(), fdt, PHANDLE_XICP);
-+    if (!spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-+        spapr_dt_xics(xics_max_server_number(), fdt, PHANDLE_XICP);
-+    } else {
-+        /* populate device tree for XIVE */ ;
-+        spapr_xive_populate(spapr->xive, fdt, PHANDLE_XICP);
-+        spapr_xive_mmio_map(spapr->xive);
-+    }
-=20
-     ret =3D spapr_populate_memory(spapr, fdt);
-     if (ret < 0) {
-@@ -1552,6 +1569,10 @@ static int spapr_post_load(void *opaque, int versi=
-on_id)
-         }
-     }
-=20
-+    if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-+        spapr_xive_mmio_map(spapr->xive);
-+    }
-+
-     return err;
- }
-=20
-@@ -2332,6 +2353,7 @@ static void ppc_spapr_init(MachineState *machine)
-                                XICS_IRQS_SPAPR + xics_max_server_number(=
-),
-                                xics_max_server_number(),
-                                &error_fatal);
-+            spapr_ovec_set(spapr->ov5, OV5_XIVE_EXPLOIT);
-         }
-     }
-=20
-@@ -3463,6 +3485,11 @@ static qemu_irq spapr_qirq_get(XICSFabric *dev, in=
-t irq)
-         return NULL;
-     }
-=20
-+    /* use XIVE qirqs when XIVE exploitation mode is on */
-+    if (spapr_ovec_test(spapr->ov5_cas, OV5_XIVE_EXPLOIT)) {
-+        return spapr->xive->qirqs[irq - spapr->ics->offset];
-+    }
-+
-     return spapr->ics->qirqs[irq - spapr->ics->offset];
- }
-=20
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 92f1e21358b8..ba00b8d3fdd6 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1613,6 +1613,12 @@ static target_ulong h_client_architecture_support(=
-PowerPCCPU *cpu,
-             (spapr_h_cas_compose_response(spapr, args[1], args[2],
-                                           ov5_updates) !=3D 0);
-     }
-+
-+    /* We need to rebuild the device tree for XIVE, generate a reset */
-+    if (!spapr->cas_reboot) {
-+        spapr->cas_reboot =3D spapr_ovec_test(ov5_updates, OV5_XIVE_EXPL=
-OIT);
-+    }
-+
-     spapr_ovec_cleanup(ov5_updates);
-=20
-     if (spapr->cas_reboot) {
---=20
-2.13.5
+> > But apart from that I want to understand better exactly why this is
+> > necessary.  What's the state that's being lost, and is it really not
+> > recoverable from anywhere else.
+> 
+> The test case I have is installing Darwin PPC 6.02 with qemu-system-ppc
+> TCG and repeatedly pausing, executing "savevm foo", then quitting and
+> continuing with "-loadvm foo" during the installation phase. About 1 in
+> 10 times the installer hangs after the loadvm until I press a key, at
+> which point it carries on as normal.
+> 
+> I then proceeded to going backwards through the git history until I
+> found out that it was the removal of the pending_interrupts,
+> irq_input_state and access_type fields during the conversion to
+> VMStateDescription commit a90db15 which seemed to cause the problem.
+> 
+> > The other thing that concerns me is how we're encoding the
+> > information.  These are essentially internal fields, not reflecting
+> > something with an architected encoding - adding those to the migration
+> > stream is often a bad idea - it inhibits our ability to rework
+> > internal encodings.
+> 
+> I'm not sure how this should be managed, however there was a similar
+> issue with excp_prefix (which was also removed in a90db15) that was
+> fixed in 2360b6e by calling a helper in cpu_post_load(). I can't easily
+> see how could work with env.pending_interrupts and env.irq_input_state
+> though.
+
+Without knowing anything about this hardware... generally the migration
+stream should reflect the real state of the system rather than internal
+implementation detail, that way if you change the implementation you
+don't need to fudge the state.  Having said that, there's generally
+some internal state that's perhaps not immediately obvious from specs
+until you try and implement it.
+
+Dave
+
+> ATB,
+> 
+> Mark.
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
