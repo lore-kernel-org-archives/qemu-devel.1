@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34288)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drUfw-0002JW-Qy
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:47:21 -0400
+	(envelope-from <sw@weilnetz.de>) id 1drUn2-0005Bs-34
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:54:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drUfr-0003cd-U0
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:47:20 -0400
-Received: from mail-qk0-x22e.google.com ([2607:f8b0:400d:c09::22e]:33624)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drUfr-0003cW-Py
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:47:15 -0400
-Received: by mail-qk0-x22e.google.com with SMTP id o129so20928042qkd.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 12:47:15 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
+	(envelope-from <sw@weilnetz.de>) id 1drUmy-00010U-7H
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:54:40 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:54092
+	helo=v2201612906741603.powersrv.de)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1drUmy-0000zT-0j
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:54:36 -0400
 References: <20170911022839.23231-1-f4bug@amsat.org>
 	<1c72c0c6-bd29-5228-d4ad-b26b11afa712@linaro.org>
 	<CAFEAcA9+iDKf7UmQ2tevR9KQb_F2fJoBY03zrMMwM7ypFUdeAw@mail.gmail.com>
 	<6a9c81f3-bbe3-e177-1ede-ad0cf40fe553@weilnetz.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <005f4db4-ff06-30ee-f693-f233fd37c247@amsat.org>
-Date: Mon, 11 Sep 2017 16:47:07 -0300
+	<005f4db4-ff06-30ee-f693-f233fd37c247@amsat.org>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <4296c8b2-e3ed-7a73-05bb-985603d08423@weilnetz.de>
+Date: Mon, 11 Sep 2017 21:54:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <6a9c81f3-bbe3-e177-1ede-ad0cf40fe553@weilnetz.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <005f4db4-ff06-30ee-f693-f233fd37c247@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [PATCH] tcg/tci: do not use ldst label (never
  implemented)
 List-Id: <qemu-devel.nongnu.org>
@@ -38,39 +33,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-Hi Peter, Stefan,
+Am 11.09.2017 um 21:47 schrieb Philippe Mathieu-Daud=C3=A9:
+[...]> Stefan are you testing no-X86 targets?
 
-> Am 11.09.2017 um 20:24 schrieb Peter Maydell:
->> I've also turned on a tci compile check on my pre-merge tests.
->> (It doesn't pass "make check" for me, though...)
+I only tested x86_64:
 
-Peter you might want to restrict it to X86...
+./configure --enable-debug --enable-tcg-interpreter \
+  --target-list=3Dx86_64-linux-user,x86_64-softmmu
 
---target-list=subdir-i386-softmmu,x86_64-softmmu,x86_64-linux-user
+If other targets fail, I'll have a look to find the cause.
 
-> 
-> I just tested it myself. "make check" passed, but printed some
-> KVM related messages which could be suppressed by fixing the
-> test code:
-> 
-> [...]
->    GTESTER tests/test-qht-par
-> Could not access KVM kernel module: No such file or directory
-> qemu-system-x86_64: failed to initialize KVM: No such file or directory
-> qemu-system-x86_64: Back to tcg accelerator
-> Could not access KVM kernel module: No such file or directory
-> qemu-system-x86_64: failed to initialize KVM: No such file or directory
-> [...]
-> Could not access KVM kernel module: No such file or directory
-> qemu-system-x86_64: failed to initialize KVM: No such file or directory
-> qemu-system-x86_64: Back to tcg accelerator
-> make: Verzeichnis „/qemu/bin/“ wird verlassen
-
-Stefan are you testing no-X86 targets?
-
-Regards,
-
-Phil.
+Stefan
