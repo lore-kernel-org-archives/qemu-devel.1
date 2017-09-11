@@ -1,20 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43876)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1drSbU-0003c0-Jx
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:34:37 -0400
+	(envelope-from <berrange@redhat.com>) id 1drSeb-0006Fx-5v
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:37:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1drSbT-0001C9-IB
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:34:36 -0400
+	(envelope-from <berrange@redhat.com>) id 1drSeZ-0002QP-H2
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:37:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36186)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1drSeZ-0002QJ-87
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:37:47 -0400
+Date: Mon, 11 Sep 2017 18:37:43 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170911173743.GV21444@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
+	<20170908173801.15205-7-brandon.carpenter@cypherpath.com>
 MIME-Version: 1.0
-In-Reply-To: <1505137930-13255-3-git-send-email-peter.maydell@linaro.org>
-References: <1505137930-13255-1-git-send-email-peter.maydell@linaro.org>
-	<1505137930-13255-3-git-send-email-peter.maydell@linaro.org>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 11 Sep 2017 10:33:56 -0700
-Message-ID: <CAKmqyKNr-tJg4uLny4QAT3oBSC_sC0dZjFBOzsG0HJ=b7cknHA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/7] target/arm: Clear exclusive monitor on
- v7M reset, exception entry/exit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170908173801.15205-7-brandon.carpenter@cypherpath.com>
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] io: Reply to ping frames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,100 +28,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
+To: Brandon Carpenter <brandon.carpenter@cypherpath.com>
+Cc: qemu-devel@nongnu.org
 
-On Mon, Sep 11, 2017 at 6:52 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
-> For M profile we must clear the exclusive monitor on reset, exception
-> entry and exception exit.  We weren't doing any of these things; fix
-> this bug.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-
-Thanks,
-Alistair
-
+On Fri, Sep 08, 2017 at 10:38:01AM -0700, Brandon Carpenter wrote:
+> Add an immediate ping reply (pong) to the outgoing stream when a ping
+> is received. Unsolicited pongs are ignored.
+> 
+> Signed-off-by: Brandon Carpenter <brandon.carpenter@cypherpath.com>
 > ---
->  target/arm/internals.h | 10 ++++++++++
->  target/arm/cpu.c       |  6 ++++++
->  target/arm/helper.c    |  2 ++
->  target/arm/op_helper.c |  2 +-
->  4 files changed, 19 insertions(+), 1 deletion(-)
->
-> diff --git a/target/arm/internals.h b/target/arm/internals.h
-> index 5d7f24c..a315354 100644
-> --- a/target/arm/internals.h
-> +++ b/target/arm/internals.h
-> @@ -444,6 +444,16 @@ void arm_handle_psci_call(ARMCPU *cpu);
->  #endif
->
->  /**
-> + * arm_clear_exclusive: clear the exclusive monitor
-> + * @env: CPU env
-> + * Clear the CPU's exclusive monitor, like the guest CLREX instruction.
-> + */
-> +static inline void arm_clear_exclusive(CPUARMState *env)
-> +{
-> +    env->exclusive_addr = -1;
+>  io/channel-websock.c | 50 ++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 32 insertions(+), 18 deletions(-)
+> 
+> diff --git a/io/channel-websock.c b/io/channel-websock.c
+> index 50387050d5..175f17ce6b 100644
+> --- a/io/channel-websock.c
+> +++ b/io/channel-websock.c
+> @@ -479,7 +479,8 @@ static gboolean qio_channel_websock_handshake_io(QIOChannel *ioc,
+>  }
+>  
+>  
+> -static void qio_channel_websock_encode(QIOChannelWebsock *ioc)
+> +static void qio_channel_websock_encode_buffer(QIOChannelWebsock *ioc,
+> +                                              uint8_t opcode, Buffer *buffer)
+>  {
+>      size_t header_size;
+>      union {
+> @@ -487,33 +488,37 @@ static void qio_channel_websock_encode(QIOChannelWebsock *ioc)
+>          QIOChannelWebsockHeader ws;
+>      } header;
+>  
+> -    if (!ioc->rawoutput.offset) {
+> -        return;
+> -    }
+> -
+>      header.ws.b0 = QIO_CHANNEL_WEBSOCK_HEADER_FIELD_FIN |
+> -        (QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME &
+> -         QIO_CHANNEL_WEBSOCK_HEADER_FIELD_OPCODE);
+> -    if (ioc->rawoutput.offset <
+> +        (opcode & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_OPCODE);
+> +    if (buffer->offset <
+>          QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_THRESHOLD_7_BIT) {
+> -        header.ws.b1 = (uint8_t)ioc->rawoutput.offset;
+> +        header.ws.b1 = (uint8_t)buffer->offset;
+>          header_size = QIO_CHANNEL_WEBSOCK_HEADER_LEN_7_BIT;
+> -    } else if (ioc->rawoutput.offset <
+> +    } else if (buffer->offset <
+>                 QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_THRESHOLD_16_BIT) {
+>          header.ws.b1 = QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_MAGIC_16_BIT;
+> -        header.ws.u.s16.l16 = cpu_to_be16((uint16_t)ioc->rawoutput.offset);
+> +        header.ws.u.s16.l16 = cpu_to_be16((uint16_t)buffer->offset);
+>          header_size = QIO_CHANNEL_WEBSOCK_HEADER_LEN_16_BIT;
+>      } else {
+>          header.ws.b1 = QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_MAGIC_64_BIT;
+> -        header.ws.u.s64.l64 = cpu_to_be64(ioc->rawoutput.offset);
+> +        header.ws.u.s64.l64 = cpu_to_be64(buffer->offset);
+>          header_size = QIO_CHANNEL_WEBSOCK_HEADER_LEN_64_BIT;
+>      }
+>      header_size -= QIO_CHANNEL_WEBSOCK_HEADER_LEN_MASK;
+>  
+> -    buffer_reserve(&ioc->encoutput, header_size + ioc->rawoutput.offset);
+> +    buffer_reserve(&ioc->encoutput, header_size + buffer->offset);
+>      buffer_append(&ioc->encoutput, header.buf, header_size);
+> -    buffer_append(&ioc->encoutput, ioc->rawoutput.buffer,
+> -                  ioc->rawoutput.offset);
+> +    buffer_append(&ioc->encoutput, buffer->buffer, buffer->offset);
 > +}
 > +
-> +/**
->   * ARMMMUFaultInfo: Information describing an ARM MMU Fault
->   * @s2addr: Address that caused a fault at stage 2
->   * @stage2: True if we faulted at stage 2
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index a1acce3..412e94c 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -235,6 +235,12 @@ static void arm_cpu_reset(CPUState *s)
->          env->regs[15] = 0xFFFF0000;
->      }
->
-> +    /* M profile requires that reset clears the exclusive monitor;
-> +     * A profile does not, but clearing it makes more sense than having it
-> +     * set with an exclusive access on address zero.
-> +     */
-> +    arm_clear_exclusive(env);
 > +
->      env->vfp.xregs[ARM_VFP_FPEXC] = 0;
->  #endif
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 329e517..668e367 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -6175,6 +6175,7 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr)
->
->      armv7m_nvic_acknowledge_irq(env->nvic);
->      switch_v7m_sp(env, 0);
-> +    arm_clear_exclusive(env);
->      /* Clear IT bits */
->      env->condexec_bits = 0;
->      env->regs[14] = lr;
-> @@ -6354,6 +6355,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
->      }
->
->      /* Otherwise, we have a successful exception exit. */
-> +    arm_clear_exclusive(env);
->      qemu_log_mask(CPU_LOG_INT, "...successful exception return\n");
+> +static void qio_channel_websock_encode(QIOChannelWebsock *ioc)
+> +{
+> +    if (!ioc->rawoutput.offset) {
+> +        return;
+> +    }
+> +    qio_channel_websock_encode_buffer(ioc,
+> +            QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME, &ioc->rawoutput);
+>      buffer_reset(&ioc->rawoutput);
 >  }
->
-> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index d1bca46..6a60464 100644
-> --- a/target/arm/op_helper.c
-> +++ b/target/arm/op_helper.c
-> @@ -1022,7 +1022,7 @@ void HELPER(exception_return)(CPUARMState *env)
->
->      aarch64_save_sp(env, cur_el);
->
-> -    env->exclusive_addr = -1;
-> +    arm_clear_exclusive(env);
->
->      /* We must squash the PSTATE.SS bit to zero unless both of the
->       * following hold:
-> --
-> 2.7.4
->
->
+>  
+> @@ -558,7 +563,7 @@ static int qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
+>      /* Websocket frame sanity check:
+>       * * Fragmentation is only supported for binary frames.
+>       * * All frames sent by a client MUST be masked.
+> -     * * Only binary encoding is supported.
+> +     * * Only binary and ping/pong encoding is supported.
+>       */
+>      if (!fin) {
+>          if (opcode != QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
+> @@ -619,6 +624,11 @@ static int qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
+>           * for purpose of unmasking, except at end of payload
+>           */
+>          if (ioc->encinput.offset < ioc->payload_remain) {
+> +            /* Wait for the entire payload before processing control frames
+> +             * because the payload will most likely be echoed back. */
+> +            if (ioc->opcode & QIO_CHANNEL_WEBSOCK_CONTROL_OPCODE_MASK) {
+> +                return QIO_CHANNEL_ERR_BLOCK;
+> +            }
+>              payload_len = ioc->encinput.offset - (ioc->encinput.offset % 4);
+>          } else {
+>              payload_len = ioc->payload_remain;
+> @@ -641,13 +651,17 @@ static int qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
+>          }
+>      }
+>  
+> -    /* Drop the payload of ping/pong packets */
+>      if (ioc->opcode == QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
+>          if (payload_len) {
+> +            /* binary frames are passed on */
+>              buffer_reserve(&ioc->rawinput, payload_len);
+>              buffer_append(&ioc->rawinput, ioc->encinput.buffer, payload_len);
+>          }
+> -    }
+> +    } else if (ioc->opcode == QIO_CHANNEL_WEBSOCK_OPCODE_PING) {
+> +        /* ping frames produce an immediate pong reply */
+> +        qio_channel_websock_encode_buffer(ioc,
+> +                QIO_CHANNEL_WEBSOCK_OPCODE_PONG, &ioc->encinput);
+> +    }   /* pong frames are ignored */
+
+BTW, replying to the PING here is going to scramble the protocol if
+the PING contains payload data. At the time qio_channel_websock_decode_header
+is run, 'encinput' is only guaranteed to contain enough data to decode the
+header.  You might be lucky and have some bytes from the payload already
+read off the wire and stored in 'encinput', but equally you might have
+nothing.  So you can not access 'encinput' here for your PONG reply
+payload.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
