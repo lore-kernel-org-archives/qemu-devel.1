@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drS5X-0007Wn-06
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:01:41 -0400
+	(envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1drS7d-000108-KR
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:03:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drS5T-0007jB-UM
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:01:35 -0400
-Received: from indium.canonical.com ([91.189.90.7]:50481)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1drS5T-0007iD-Oe
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:01:31 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1drS5R-0007k6-R3
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 17:01:30 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 8033B2E84A5
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 17:01:29 +0000 (UTC)
+	(envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1drS7a-0000JF-Gh
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:03:45 -0400
+Received: from mail-io0-x22c.google.com ([2607:f8b0:4001:c06::22c]:35419)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1drS7a-0000IU-9g
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:03:42 -0400
+Received: by mail-io0-x22c.google.com with SMTP id g32so12799098ioj.2
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 10:03:40 -0700 (PDT)
+Date: Mon, 11 Sep 2017 10:03:35 -0700
+From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
+Message-Id: <1505149415.1214.1@smtp.gmail.com>
+In-Reply-To: <20170911085043.GE21444@redhat.com>
+References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
+	<20170908173801.15205-7-brandon.carpenter@cypherpath.com>
+	<20170911085043.GE21444@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Sep 2017 16:53:50 -0000
-From: Daniel Berrange <1716028@bugs.launchpad.net>
-Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
-Message-Id: <150514883069.31851.12414351275626495298.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
- feature flag
+Content-Type: text/plain; charset="US-ASCII"; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] io: Reply to ping frames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,110 +32,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Having a single QEMU process open the same qcow2 file twice is just as
-dangerous as having two separate QEMU processes open the same qcow2 file
-concurrently. In both cases you have qcow2 state cached in a
-BlockDriverState and nothing is able to invalidate the cache in the
-other BlockDriverState.  So short-circuiting locking if the current pid
-matches would be wrong.
+On Mon, Sep 11, 2017 at 1:50 AM, Daniel P. Berrange 
+<berrange@redhat.com> wrote:
+> I'm concerned that there is no rate limiting here though, so if a 
+> large number of PINGs are sent, and writing of the reply blocks for 
+> some reason, encoutput will grow without bounds.
 
--- =
+That is a good point. How about something like this to fix it?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1716028
+diff --git a/include/io/channel-websock.h b/include/io/channel-websock.h
+index 7c896557c5..c5a8c3e96c 100644
+--- a/include/io/channel-websock.h
++++ b/include/io/channel-websock.h
+@@ -66,6 +66,7 @@ struct QIOChannelWebsock {
+     Error *io_err;
+     gboolean io_eof;
+     uint8_t opcode;
++ uint8_t prev_opcode;
+ };
 
-Title:
-  qemu 2.10 locks images with no feature flag
+ /**
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index 175f17ce6b..a9315c01fb 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -549,6 +549,7 @@ static int 
+qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
+     payload_len = header->b1 & 
+QIO_CHANNEL_WEBSOCK_HEADER_FIELD_PAYLOAD_LEN;
 
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  New
+     /* Save or restore opcode. */
++ ioc->prev_opcode = ioc->opcode;
+     if (opcode) {
+         ioc->opcode = opcode;
+     } else {
+@@ -658,9 +659,14 @@ static int 
+qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
+             buffer_append(&ioc->rawinput, ioc->encinput.buffer, 
+payload_len);
+         }
+     } else if (ioc->opcode == QIO_CHANNEL_WEBSOCK_OPCODE_PING) {
+- /* ping frames produce an immediate pong reply */
+- qio_channel_websock_encode_buffer(ioc,
+- QIO_CHANNEL_WEBSOCK_OPCODE_PONG, &ioc->encinput);
++ /* Ping frames produce an immediate pong reply, unless one
++ * is already queued, in which case they are coalesced
++ * to avoid unbounded buffer growth.
++ */
++ if (!ioc->encoutput.offset || ioc->prev_opcode != 
+QIO_CHANNEL_WEBSOCK_OPCODE_PING) {
++ qio_channel_websock_encode_buffer(ioc,
++ QIO_CHANNEL_WEBSOCK_OPCODE_PONG, &ioc->encinput);
++ }
+     } /* pong frames are ignored */
 
-Bug description:
-  1) % lsb_release -rd
-  Description:	Ubuntu Artful Aardvark (development branch)
-  Release:	17.10
+     if (payload_len) {
 
-  2) % apt-cache policy qemu-system-x86
-  qemu-system-x86:
-    Installed: 1:2.10~rc3+dfsg-0ubuntu1
-    Candidate: 1:2.10+dfsg-0ubuntu1
-    Version table:
-       1:2.10+dfsg-0ubuntu1 500
-          500 http://archive.ubuntu.com//ubuntu devel/main amd64 Packages
-   *** 1:2.10~rc3+dfsg-0ubuntu1 100
-          100 /var/lib/dpkg/status
+--
+Brandon Carpenter | Software Engineer
+Cypherpath, Inc.
+400 Columbia Point Drive Ste 101 | Richland, Washington USA
+Office: (650) 713-3060
 
-  3) qemu locks image files with no way to discover this feature nor how
-  to disable it
 
-  4) qemu provides a way to query if it supports image locking, and what
-  the default value is, and how to disable the locking via cli
+-- 
 
-  qemu 2.10 now will lock image files and warn if an image is currently
-  locked.  This prevent qemu from running (and possibly corrupting said
-  image).
 
-  However, qemu does not provide any way to determine if a qemu binary
-  actually has this capability.  Normally behavior changing features are
-  exposed via some change to the qemu help menu or QMP/QAPI output of
-  capabilities.
-
-  I believe this slipped through since libvirt already does image
-  locking, but direct cli users will be caught by this change.
-
-  In particular, we have a use-case where we simulate multipath disks by
-  creating to disks which point to the same file which now breaks
-  without adding the 'file.locking=3Doff' to the -drive parameters;  which
-  is also completely undocumented and unexposed.
-
-  Some parts of the cli like -device allow querying of settable options
-  (qemu-system-x86 -device scsi_hd,?)  but nothing equivalent exists for
-  -drive parameters.
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 17.10
-  Package: qemu-system-x86 1:2.10~rc3+dfsg-0ubuntu1
-  ProcVersionSignature: Ubuntu 4.12.0-11.12-generic 4.12.5
-  Uname: Linux 4.12.0-11-generic x86_64
-  NonfreeKernelModules: zfs zunicode zavl zcommon znvpair
-  ApportVersion: 2.20.6-0ubuntu7
-  Architecture: amd64
-  Date: Fri Sep  8 12:56:53 2017
-  JournalErrors:
-   Hint: You are currently not seeing messages from other users and the sys=
-tem.
-         Users in groups 'adm', 'systemd-journal' can see all messages.
-         Pass -q to turn off this notice.
-   -- Logs begin at Mon 2017-01-30 11:56:02 CST, end at Fri 2017-09-08 12:5=
-6:46 CDT. --
-   -- No entries --
-  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
-  MachineType: HP ProLiant DL360 Gen9
-  ProcEnviron:
-   TERM=3Dxterm
-   PATH=3D(custom, no user)
-   XDG_RUNTIME_DIR=3D<set>
-   LANG=3Den_US.UTF-8
-   SHELL=3D/bin/bash
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.12.0-11-generic root=3DUUID=3D=
-45354276-e0c0-4bf6-9083-f130b89411cc ro --- console=3DttyS1,115200
-  SourcePackage: qemu
-  UpgradeStatus: No upgrade log present (probably fresh install)
-  dmi.bios.date: 03/05/2015
-  dmi.bios.vendor: HP
-  dmi.bios.version: P89
-  dmi.chassis.type: 23
-  dmi.chassis.vendor: HP
-  dmi.modalias: dmi:bvnHP:bvrP89:bd03/05/2015:svnHP:pnProLiantDL360Gen9:pvr=
-:cvnHP:ct23:cvr:
-  dmi.product.family: ProLiant
-  dmi.product.name: ProLiant DL360 Gen9
-  dmi.sys.vendor: HP
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1716028/+subscriptions
+CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is 
+for the sole use of the intended recipient(s) and may contain proprietary, 
+confidential or privileged information or otherwise be protected by law. 
+Any unauthorized review, use, disclosure or distribution is prohibited. If 
+you are not the intended recipient, please notify the sender and destroy 
+all copies and the original message.
