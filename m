@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38719)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drQFh-00033b-2I
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:04:03 -0400
+	(envelope-from <imammedo@redhat.com>) id 1drQHy-0004KF-1K
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:06:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drQFb-00074A-7A
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:03:57 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1505137930-13255-1-git-send-email-peter.maydell@linaro.org>
-	<1505137930-13255-8-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <eece5841-17c1-a469-81e5-c65a518eca94@amsat.org>
-Date: Mon, 11 Sep 2017 12:03:46 -0300
+	(envelope-from <imammedo@redhat.com>) id 1drQHu-0000m4-SN
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:06:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38606)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1drQHu-0000lW-Jv
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:06:14 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A253B30619B
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 15:06:13 +0000 (UTC)
+Date: Mon, 11 Sep 2017 17:06:00 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170911170600.145e752d@nial.brq.redhat.com>
+In-Reply-To: <f62b660d-596a-f5ed-b4c7-d5adf58d2913@redhat.com>
+References: <1504776162-31400-1-git-send-email-thuth@redhat.com>
+	<20170911145344.4f2e192c@nial.brq.redhat.com>
+	<f62b660d-596a-f5ed-b4c7-d5adf58d2913@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1505137930-13255-8-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 7/7] target/arm: Rename 'type'
- to 'excret' in do_v7m_exception_exit()
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/core/qdev: Do not allow hot-plugging
+ without hotplug controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,104 +35,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-On 09/11/2017 10:52 AM, Peter Maydell wrote:
-> In the v7M and v8M ARM ARM, the magic exception return values are
-> referred to as EXC_RETURN values, and in QEMU we use V7M_EXCRET_*
-> constants to define bits within them. Rename the 'type' variable
-> which holds the exception return value in do_v7m_exception_exit()
-> to excret, making it clearer that it does hold an EXC_RETURN value.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Mon, 11 Sep 2017 16:31:39 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> On 11.09.2017 14:53, Igor Mammedov wrote:
+> > On Thu,  7 Sep 2017 11:22:42 +0200
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >   
+> >> qdev_unplug() bails out with an assertion if the user tries to device_del
+> >> a hot-plugged device that does not have a hotplug controller. Unfortunately,
+> >> our devices are all marked with hotpluggable = true by default (see the
+> >> device_class_init() function in qdev.c), so it currently can happen that
+> >> the user runs into this situation and QEMU gets terminated unexpectedly:
+> >>
+> >> $ qemu-system-aarch64 -M virt -nographic -nodefaults -monitor stdio -S
+> >> QEMU 2.10.50 monitor - type 'help' for more information
+> >> (qemu) device_add aux-to-i2c-bridge,id=x
+> >> (qemu) device_del x
+> >> **
+> >> ERROR:qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_ctrl)
+> >> Aborted (core dumped)
+> >> Hotplugging devices without a hotplug controller does not make much sense,
+> >> so we should disallow this during the device_add process already!
+> >>
+> >> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> >> ---
+> >>  hw/core/qdev.c | 5 +++++
+> >>  1 file changed, 5 insertions(+)
+> >>
+> >> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> >> index 606ab53..d9ccce6 100644
+> >> --- a/hw/core/qdev.c
+> >> +++ b/hw/core/qdev.c
+> >> @@ -908,6 +908,11 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+> >>              if (local_err != NULL) {
+> >>                  goto fail;
+> >>              }
+> >> +        } else if (dev->hotplugged) {
+> >> +            /* Hot-plugged device without hotplug controller? No way! */
+> >> +            error_setg(&local_err, QERR_DEVICE_NO_HOTPLUG,
+> >> +                       object_get_typename(obj));
+> >> +            goto fail;
+> >>          }
+> >>  
+> >>          if (dc->realize) {  
+> > 
+> > maybe it should be other way around, i.e, fix device so that following would work
+> > 
+> >   device_set_realized()
+> >     if (dev->hotplugged && !dc->hotpluggable) {                                  
+> >         error_setg(errp, QERR_DEVICE_NO_HOTPLUG, object_get_typename(obj));      
+> >         return;                                                                  
+> >     }
+> > 
+> > instead of leaving device broken, like in yours
+> >  84ebd3e watchdog/wdt_diag288: Mark diag288 watchdog as non-hotpluggable  
+> 
+> No, that apparently does not work right for new devices since people
+> keep forgetting to set hotpluggable = false there. Both, Paolo and Peter
+> suggested that we should not allow hot-plugging if there's no hot plug
+> controller - it indeed does not make sense, so we should not allow it.
+historically all devices were hotpluggble and conversion to hotplug
+controller didn't fix it which os fine as far as user did not attempt
+unreasonable things. However it should be fixedfor code to work correctly.
 
-> ---
->   target/arm/helper.c | 23 ++++++++++++-----------
->   1 file changed, 12 insertions(+), 11 deletions(-)
-> 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index a502e4e..4f41841 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -6212,7 +6212,7 @@ static void v7m_push_stack(ARMCPU *cpu)
->   static void do_v7m_exception_exit(ARMCPU *cpu)
->   {
->       CPUARMState *env = &cpu->env;
-> -    uint32_t type;
-> +    uint32_t excret;
->       uint32_t xpsr;
->       bool ufault = false;
->       bool return_to_sp_process = false;
-> @@ -6233,18 +6233,19 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
->        * the target value up between env->regs[15] and env->thumb in
->        * gen_bx(). Reconstitute it.
->        */
-> -    type = env->regs[15];
-> +    excret = env->regs[15];
->       if (env->thumb) {
-> -        type |= 1;
-> +        excret |= 1;
->       }
->   
->       qemu_log_mask(CPU_LOG_INT, "Exception return: magic PC %" PRIx32
->                     " previous exception %d\n",
-> -                  type, env->v7m.exception);
-> +                  excret, env->v7m.exception);
->   
-> -    if ((type & R_V7M_EXCRET_RES1_MASK) != R_V7M_EXCRET_RES1_MASK) {
-> +    if ((excret & R_V7M_EXCRET_RES1_MASK) != R_V7M_EXCRET_RES1_MASK) {
->           qemu_log_mask(LOG_GUEST_ERROR, "M profile: zero high bits in exception "
-> -                      "exit PC value 0x%" PRIx32 " are UNPREDICTABLE\n", type);
-> +                      "exit PC value 0x%" PRIx32 " are UNPREDICTABLE\n",
-> +                      excret);
->       }
->   
->       if (env->v7m.exception != ARMV7M_EXCP_NMI) {
-> @@ -6255,7 +6256,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
->            * which security state's faultmask to clear. (v8M ARM ARM R_KBNF.)
->            */
->           if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
-> -            int es = type & R_V7M_EXCRET_ES_MASK;
-> +            int es = excret & R_V7M_EXCRET_ES_MASK;
->               if (armv7m_nvic_raw_execution_priority(env->nvic) >= 0) {
->                   env->v7m.faultmask[es] = 0;
->               }
-> @@ -6283,7 +6284,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
->           g_assert_not_reached();
->       }
->   
-> -    switch (type & 0xf) {
-> +    switch (excret & 0xf) {
->       case 1: /* Return to Handler */
->           return_to_handler = true;
->           break;
-> @@ -6306,7 +6307,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
->            */
->           env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
->           armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
-> -        v7m_exception_taken(cpu, type);
-> +        v7m_exception_taken(cpu, excret);
->           qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
->                         "stackframe: failed exception return integrity check\n");
->           return;
-> @@ -6341,14 +6342,14 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
->   
->       /* The restored xPSR exception field will be zero if we're
->        * resuming in Thread mode. If that doesn't match what the
-> -     * exception return type specified then this is a UsageFault.
-> +     * exception return excret specified then this is a UsageFault.
->        */
->       if (return_to_handler != arm_v7m_is_handler_mode(env)) {
->           /* Take an INVPC UsageFault by pushing the stack again. */
->           armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
->           env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
->           v7m_push_stack(cpu);
-> -        v7m_exception_taken(cpu, type);
-> +        v7m_exception_taken(cpu, excret);
->           qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on new stackframe: "
->                         "failed exception return integrity check\n");
->           return;
-> 
+I'd suggest to flip default
+ dc->hotpluggable = false;
+and set it to true explicitly for devices that support hotplug,
+it obviously harder to do than this patch as it requires audit
+of all devices, but it looks more correct than fixing symptoms of
+incorrectly set dc->hotpluggable property.
+
+>  Thomas
