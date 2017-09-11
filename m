@@ -1,31 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1drUED-0001gx-HH
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:18:42 -0400
+	(envelope-from <sw@weilnetz.de>) id 1drUY1-0007wh-My
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:39:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.williamson@redhat.com>) id 1drUEA-0006Wr-TB
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:18:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34530)
+	(envelope-from <sw@weilnetz.de>) id 1drUXw-0006nM-Qn
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:39:09 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:53928
+	helo=v2201612906741603.powersrv.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alex.williamson@redhat.com>)
-	id 1drUEA-0006US-NO
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:18:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 89738C01C108
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 19:18:36 +0000 (UTC)
-Date: Mon, 11 Sep 2017 13:18:31 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <20170911131831.11fe32a0@t450s.home>
-In-Reply-To: <1505156192-18994-1-git-send-email-wexu@redhat.com>
-References: <1505156192-18994-1-git-send-email-wexu@redhat.com>
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1drUXw-0006m7-Jz
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 15:39:04 -0400
+References: <20170911022839.23231-1-f4bug@amsat.org>
+	<1c72c0c6-bd29-5228-d4ad-b26b11afa712@linaro.org>
+	<CAFEAcA9+iDKf7UmQ2tevR9KQb_F2fJoBY03zrMMwM7ypFUdeAw@mail.gmail.com>
+From: Stefan Weil <sw@weilnetz.de>
+Message-ID: <6a9c81f3-bbe3-e177-1ede-ad0cf40fe553@weilnetz.de>
+Date: Mon, 11 Sep 2017 21:39:01 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Patch 0/3] vfio: reusing address space for the
- same iommu group devices
+In-Reply-To: <CAFEAcA9+iDKf7UmQ2tevR9KQb_F2fJoBY03zrMMwM7ypFUdeAw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] tcg/tci: do not use ldst label (never
+ implemented)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,59 +31,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: wexu@redhat.com
-Cc: qemu-devel@nongnu.org, jasowang@redhat.com, marcel@redhat.com, Peter Xu <peterx@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 12 Sep 2017 02:56:29 +0800
-wexu@redhat.com wrote:
+Am 11.09.2017 um 20:24 schrieb Peter Maydell:
+> On 11 September 2017 at 19:01, Richard Henderson
+> <richard.henderson@linaro.org> wrote:
+>> On 09/10/2017 07:28 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> changed in 659ef5cbb893, this fixes building with --enable-tcg-interp=
+reter:
+>>>
+>>> /home/travis/build/qemu/qemu/tcg/tcg.c:116:14: error: =E2=80=98tcg_ou=
+t_ldst_finalize=E2=80=99 used but never defined [-Werror]
+>>>  static bool tcg_out_ldst_finalize(TCGContext *s);
+>>>               ^
+>>>
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>
+>> Oops.
+>>
+>> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+>=20
+> Applied to master as a buildfix, thanks.
 
-> From: Wei Xu <wexu@redhat.com>
-> 
-> Recently I have been testing passing through 2 ixgbe(82599ES) nics which
-> belong to the same iommu group to a guest with virtual iommu(vIOMMU) on
-> my desktop, while vfio failed to realize the second device and prompted
-> error message as 'group xxx used in multiple address spaces'.
-> 
-> It turned out to be that vtd doesn't know any group info while choosing
-> an address space for the two devices, therefore it creates two separate
-> address space for each which breaks granularity isolation.
-> 
-> This patch fixes this by looking up if there is any exist device within
-> the same iommu group and shares the address space before creating a new
-> one.
-> 
-> I am not sure if this fixes the problem in a correct way due to my limited
-> knowledge about vfio, please come back to me for any feedback & comments,
-> Thanks.
+Thank you, Peter.
 
-Hi Wei,
+> I've also turned on a tci compile check on my pre-merge tests.
+> (It doesn't pass "make check" for me, though...)
 
-Are the devices in the same IOMMU group on the host or guest or both?
-My impression is that host IOMMU groups with more than a single
-endpoint are fundamentally incompatible with vIOMMU.  Even if we could
-enforce a VM topology which logically should place them into the same
-IOMMU group, IOMMU groups themselves are a Linux concept and another
-guest OS could rightfully attempt to use them in separate VT-d contexts.
-The only way we could ensure a shared context is if they were in a
-conventional PCI hierarchy within the VM.  I'd suggest that vIOMMU
-should be reserved for hosts and devices which have full isolation and
-for which the VM and guest can create separate mappings per device.
+I just tested it myself. "make check" passed, but printed some
+KVM related messages which could be suppressed by fixing the
+test code:
 
-I'm not sure if what I describe is the actual problem you're facing as I
-thought we had quirks to expose the per-port isolation on 82599
-devices, but perhaps the lack of isolation is coming from an upstream
-device.  If I'm off, please provide further details of exactly the host
-and guest scenarios.  Thanks,
+[...]
+  GTESTER tests/test-qht-par
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+[...]
+Could not access KVM kernel module: No such file or directory
+qemu-system-x86_64: failed to initialize KVM: No such file or directory
+qemu-system-x86_64: Back to tcg accelerator
+make: Verzeichnis =E2=80=9E/qemu/bin/=E2=80=9C wird verlassen
 
-Alex
+What failures do you get?
 
-> Wei Xu (3):
->   vfio: reusing address space for the same iommu group devices
->   vfio: invoke looking up address space.
->   vfio: remove checking duplicated vfio device
-> 
->  hw/vfio/common.c              | 28 ++++++++++++++++++++++++++++
->  hw/vfio/pci.c                 | 15 ++++++---------
->  include/hw/vfio/vfio-common.h |  1 +
->  3 files changed, 35 insertions(+), 9 deletions(-)
-> 
+Regards,
+Stefan
