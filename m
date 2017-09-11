@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43446)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43876)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1drSaA-0002VY-8t
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:33:15 -0400
+	(envelope-from <alistair23@gmail.com>) id 1drSbU-0003c0-Jx
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:34:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1drSa9-0000eh-0S
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:33:14 -0400
+	(envelope-from <alistair23@gmail.com>) id 1drSbT-0001C9-IB
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:34:36 -0400
 MIME-Version: 1.0
-In-Reply-To: <2a61ae5a-dd09-d782-8cc1-66afd7a31559@amsat.org>
+In-Reply-To: <1505137930-13255-3-git-send-email-peter.maydell@linaro.org>
 References: <1505137930-13255-1-git-send-email-peter.maydell@linaro.org>
-	<1505137930-13255-2-git-send-email-peter.maydell@linaro.org>
-	<2a61ae5a-dd09-d782-8cc1-66afd7a31559@amsat.org>
+	<1505137930-13255-3-git-send-email-peter.maydell@linaro.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 11 Sep 2017 10:32:38 -0700
-Message-ID: <CAKmqyKNrk_aBGwMs0gL_xf5PiA6BEL0x3xxxsFf+i3NJReEEaA@mail.gmail.com>
+Date: Mon, 11 Sep 2017 10:33:56 -0700
+Message-ID: <CAKmqyKNr-tJg4uLny4QAT3oBSC_sC0dZjFBOzsG0HJ=b7cknHA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/7] target/arm: Use
- M_REG_NUM_BANKS rather than hardcoding 2
+Subject: Re: [Qemu-devel] [PATCH 2/7] target/arm: Clear exclusive monitor on
+ v7M reset, exception entry/exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,110 +23,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-On Mon, Sep 11, 2017 at 7:59 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> On 09/11/2017 10:52 AM, Peter Maydell wrote:
->>
->> Use a symbolic constant M_REG_NUM_BANKS for the array size for
->> registers which are banked by M profile security state, rather
->> than hardcoding lots of 2s.
->>
->> Suggested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Mon, Sep 11, 2017 at 6:52 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> For M profile we must clear the exclusive monitor on reset, exception
+> entry and exception exit.  We weren't doing any of these things; fix
+> this bug.
 >
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
 Thanks,
 Alistair
 
+> ---
+>  target/arm/internals.h | 10 ++++++++++
+>  target/arm/cpu.c       |  6 ++++++
+>  target/arm/helper.c    |  2 ++
+>  target/arm/op_helper.c |  2 +-
+>  4 files changed, 19 insertions(+), 1 deletion(-)
 >
->> ---
->> Philippe suggested this in review on the last round of
->> patches but I forgot about it :-(
+> diff --git a/target/arm/internals.h b/target/arm/internals.h
+> index 5d7f24c..a315354 100644
+> --- a/target/arm/internals.h
+> +++ b/target/arm/internals.h
+> @@ -444,6 +444,16 @@ void arm_handle_psci_call(ARMCPU *cpu);
+>  #endif
 >
+>  /**
+> + * arm_clear_exclusive: clear the exclusive monitor
+> + * @env: CPU env
+> + * Clear the CPU's exclusive monitor, like the guest CLREX instruction.
+> + */
+> +static inline void arm_clear_exclusive(CPUARMState *env)
+> +{
+> +    env->exclusive_addr = -1;
+> +}
+> +
+> +/**
+>   * ARMMMUFaultInfo: Information describing an ARM MMU Fault
+>   * @s2addr: Address that caused a fault at stage 2
+>   * @stage2: True if we faulted at stage 2
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index a1acce3..412e94c 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -235,6 +235,12 @@ static void arm_cpu_reset(CPUState *s)
+>          env->regs[15] = 0xFFFF0000;
+>      }
 >
-> Thank you, it eases review and looks cleaner :)
+> +    /* M profile requires that reset clears the exclusive monitor;
+> +     * A profile does not, but clearing it makes more sense than having it
+> +     * set with an exclusive access on address zero.
+> +     */
+> +    arm_clear_exclusive(env);
+> +
+>      env->vfp.xregs[ARM_VFP_FPEXC] = 0;
+>  #endif
 >
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 329e517..668e367 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -6175,6 +6175,7 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr)
 >
->> ---
->>   target/arm/cpu.h | 35 +++++++++++++++++++----------------
->>   1 file changed, 19 insertions(+), 16 deletions(-)
->>
->> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
->> index 98b9b26..5a1f957 100644
->> --- a/target/arm/cpu.h
->> +++ b/target/arm/cpu.h
->> @@ -81,8 +81,11 @@
->>    * accessed via env->registerfield[env->v7m.secure] (whether the
->> security
->>    * extension is implemented or not).
->>    */
->> -#define M_REG_NS 0
->> -#define M_REG_S 1
->> +enum {
->> +    M_REG_NS =3D 0,
->> +    M_REG_S =3D 1,
->> +    M_REG_NUM_BANKS =3D 2,
->> +};
->>     /* ARM-specific interrupt pending bits.  */
->>   #define CPU_INTERRUPT_FIQ   CPU_INTERRUPT_TGT_EXT_1
->> @@ -433,19 +436,19 @@ typedef struct CPUARMState {
->>           uint32_t other_sp;
->>           uint32_t other_ss_msp;
->>           uint32_t other_ss_psp;
->> -        uint32_t vecbase[2];
->> -        uint32_t basepri[2];
->> -        uint32_t control[2];
->> -        uint32_t ccr[2]; /* Configuration and Control */
->> -        uint32_t cfsr[2]; /* Configurable Fault Status */
->> +        uint32_t vecbase[M_REG_NUM_BANKS];
->> +        uint32_t basepri[M_REG_NUM_BANKS];
->> +        uint32_t control[M_REG_NUM_BANKS];
->> +        uint32_t ccr[M_REG_NUM_BANKS]; /* Configuration and Control */
->> +        uint32_t cfsr[M_REG_NUM_BANKS]; /* Configurable Fault Status */
->>           uint32_t hfsr; /* HardFault Status */
->>           uint32_t dfsr; /* Debug Fault Status Register */
->> -        uint32_t mmfar[2]; /* MemManage Fault Address */
->> +        uint32_t mmfar[M_REG_NUM_BANKS]; /* MemManage Fault Address */
->>           uint32_t bfar; /* BusFault Address */
->> -        unsigned mpu_ctrl[2]; /* MPU_CTRL */
->> +        unsigned mpu_ctrl[M_REG_NUM_BANKS]; /* MPU_CTRL */
->>           int exception;
->> -        uint32_t primask[2];
->> -        uint32_t faultmask[2];
->> +        uint32_t primask[M_REG_NUM_BANKS];
->> +        uint32_t faultmask[M_REG_NUM_BANKS];
->>           uint32_t secure; /* Is CPU in Secure state? (not guest visible=
-)
->> */
->>       } v7m;
->>   @@ -546,7 +549,7 @@ typedef struct CPUARMState {
->>           uint32_t *drbar;
->>           uint32_t *drsr;
->>           uint32_t *dracr;
->> -        uint32_t rnr[2];
->> +        uint32_t rnr[M_REG_NUM_BANKS];
->>       } pmsav7;
->>         /* PMSAv8 MPU */
->> @@ -556,10 +559,10 @@ typedef struct CPUARMState {
->>            *  pmsav7.rnr (region number register)
->>            *  pmsav7_dregion (number of configured regions)
->>            */
->> -        uint32_t *rbar[2];
->> -        uint32_t *rlar[2];
->> -        uint32_t mair0[2];
->> -        uint32_t mair1[2];
->> +        uint32_t *rbar[M_REG_NUM_BANKS];
->> +        uint32_t *rlar[M_REG_NUM_BANKS];
->> +        uint32_t mair0[M_REG_NUM_BANKS];
->> +        uint32_t mair1[M_REG_NUM_BANKS];
->>       } pmsav8;
->>         void *nvic;
->>
+>      armv7m_nvic_acknowledge_irq(env->nvic);
+>      switch_v7m_sp(env, 0);
+> +    arm_clear_exclusive(env);
+>      /* Clear IT bits */
+>      env->condexec_bits = 0;
+>      env->regs[14] = lr;
+> @@ -6354,6 +6355,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+>      }
+>
+>      /* Otherwise, we have a successful exception exit. */
+> +    arm_clear_exclusive(env);
+>      qemu_log_mask(CPU_LOG_INT, "...successful exception return\n");
+>  }
+>
+> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+> index d1bca46..6a60464 100644
+> --- a/target/arm/op_helper.c
+> +++ b/target/arm/op_helper.c
+> @@ -1022,7 +1022,7 @@ void HELPER(exception_return)(CPUARMState *env)
+>
+>      aarch64_save_sp(env, cur_el);
+>
+> -    env->exclusive_addr = -1;
+> +    arm_clear_exclusive(env);
+>
+>      /* We must squash the PSTATE.SS bit to zero unless both of the
+>       * following hold:
+> --
+> 2.7.4
+>
 >
