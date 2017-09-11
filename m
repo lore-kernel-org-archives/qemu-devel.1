@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drWYI-0001f3-JR
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:47:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1drWcn-0003dN-QZ
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:52:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drWYD-0004hY-LR
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:47:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38634)
+	(envelope-from <eblake@redhat.com>) id 1drWcj-0000AU-9h
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:52:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drWYD-0004gS-C5
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:47:29 -0400
-Date: Mon, 11 Sep 2017 17:47:27 -0400 (EDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <1827777248.5103399.1505166447511.JavaMail.zimbra@redhat.com>
-In-Reply-To: <20170911213328.9701-4-f4bug@amsat.org>
-References: <20170911213328.9701-1-f4bug@amsat.org>
-	<20170911213328.9701-4-f4bug@amsat.org>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1drWci-00009u-W7
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:52:09 -0400
+References: <20170804012551.2714-1-eblake@redhat.com>
+	<20170804012551.2714-6-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <6f449d3a-bff7-f3bd-23e2-7b56258ee8c9@redhat.com>
+Date: Mon, 11 Sep 2017 16:52:06 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] tcg: move tcg-runtime to accel/tcg/
+In-Reply-To: <20170804012551.2714-6-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="QWwKd5DHMhNqvEmkXa6oDc6daMGb8GsEM"
+Subject: Re: [Qemu-devel] [PATCH v4 05/22] qobject: Simplify
+ qobject_from_jsonv()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,72 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Cc: Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--QWwKd5DHMhNqvEmkXa6oDc6daMGb8GsEM
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: armbru@redhat.com, Michael Roth <mdroth@linux.vnet.ibm.com>
+Message-ID: <6f449d3a-bff7-f3bd-23e2-7b56258ee8c9@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 05/22] qobject: Simplify
+ qobject_from_jsonv()
+References: <20170804012551.2714-1-eblake@redhat.com>
+ <20170804012551.2714-6-eblake@redhat.com>
+In-Reply-To: <20170804012551.2714-6-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-
------ Original Message -----
-> From: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
-> To: "Paolo Bonzini" <pbonzini@redhat.com>, "Richard Henderson" <rth@twidd=
-le.net>, "Peter Crosthwaite"
-> <crosthwaite.peter@gmail.com>, "Thomas Huth" <thuth@redhat.com>
-> Cc: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>, qemu-devel@nongnu.or=
-g
-> Sent: Monday, September 11, 2017 11:33:26 PM
-> Subject: [PATCH v2 3/5] tcg: move tcg-runtime to accel/tcg/
+On 08/03/2017 08:25 PM, Eric Blake wrote:
+> qobject_from_jsonv() was unusual in that it took a va_list*, instead
+> of the more typical va_list; this was so that callers could pass
+> NULL to avoid % interpolation.  While this works under the hood, it
+> is awkward for callers, so move the magic into qjson.c rather than
+> in the public interface, and finally improve the documentation of
+> qobject_from_jsonf().
 >=20
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-To make this better, the "#ifndef CONFIG_SOFTMMU" part at the
-end of this should be moved to user-exec.c.  Feel free to just
-post a sixth patch for it.
+> +/*
+> + * va_list form of qobject_from_jsonf().
+> + *
+> + * IMPORTANT: This function aborts on error, thus it must not
+> + * be used with untrusted arguments.
+> + */
+> +QObject *qobject_from_jsonv(const char *string, va_list ap)
+> +{
 
-Paolo
+Given your comments on vararg naming elsewhere in the series, I'm also
+thinking this is a good chance to fix this to be named
+qobject_from_vjsonf() (making it obvious it is the va_list form of
+formatted json, and similar to printf/vprintf or my
+qtest_startf/qtest_vstartf in my v7 preliminary cleanup series).
 
-> ---
->  Makefile.target                  | 2 +-
->  {tcg =3D> accel/tcg}/tcg-runtime.h | 0
->  {tcg =3D> accel/tcg}/tcg-runtime.c | 0
->  accel/tcg/Makefile.objs          | 1 +
->  4 files changed, 2 insertions(+), 1 deletion(-)
->  rename {tcg =3D> accel/tcg}/tcg-runtime.h (100%)
->  rename {tcg =3D> accel/tcg}/tcg-runtime.c (100%)
->=20
-> diff --git a/Makefile.target b/Makefile.target
-> index 520305b025..6361f957fb 100644
-> --- a/Makefile.target
-> +++ b/Makefile.target
-> @@ -94,7 +94,7 @@ all: $(PROGS) stap
->  obj-y +=3D exec.o
->  obj-y +=3D accel/
->  obj-$(CONFIG_TCG) +=3D tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
-> -obj-$(CONFIG_TCG) +=3D tcg/tcg-common.o tcg/tcg-runtime.o
-> +obj-$(CONFIG_TCG) +=3D tcg/tcg-common.o
->  obj-$(CONFIG_TCG_INTERPRETER) +=3D tcg/tci.o
->  obj-$(CONFIG_TCG_INTERPRETER) +=3D disas/tci.o
->  obj-y +=3D fpu/softfloat.o
-> diff --git a/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
-> similarity index 100%
-> rename from tcg/tcg-runtime.h
-> rename to accel/tcg/tcg-runtime.h
-> diff --git a/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-> similarity index 100%
-> rename from tcg/tcg-runtime.c
-> rename to accel/tcg/tcg-runtime.c
-> diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
-> index f2422d0fb3..228cd84fa4 100644
-> --- a/accel/tcg/Makefile.objs
-> +++ b/accel/tcg/Makefile.objs
-> @@ -1,5 +1,6 @@
->  obj-$(CONFIG_SOFTMMU) +=3D tcg-all.o
->  obj-$(CONFIG_SOFTMMU) +=3D cputlb.o
-> +obj-y +=3D tcg-runtime.o
->  obj-y +=3D cpu-exec.o cpu-exec-common.o translate-all.o
->  obj-y +=3D translator.o
-> =20
-> --
-> 2.14.1
->=20
->=20
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--QWwKd5DHMhNqvEmkXa6oDc6daMGb8GsEM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm3BYYACgkQp6FrSiUn
+Q2olIgf+JcsaYL8zlf4KovPybidvgf4qQzO9CcudHF4na36QWkKs4y5CCIh4muW6
+xBA7r5hw790Nr2Tvsax4JDzJ+lQ6hJw28Clg05fAhrsEbumuc0LXlGaOUWR9jdYD
+FDVU3tfy67Pvn9umiFRZYTjmDhnhZkth/xjrqweU/lAWzaPyOj8Vj6KcYnYzHBtq
+ICcssYZfirGY1CWLaA2ayRAscnTSPqozwx98AVv7ffPqpbopDOAba3q9z/wOGC6y
+41qvEaNM/VFs1waNvWI2hnAxUIzl09P653/uv0WBlHknNCm5m5iZg5S26ZNEP/eL
+p5dnNlNU1teyLmyaTimsFSlk8GoJ5A==
+=c01Q
+-----END PGP SIGNATURE-----
+
+--QWwKd5DHMhNqvEmkXa6oDc6daMGb8GsEM--
