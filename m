@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43339)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43279)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drMZ8-0005zy-4c
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drMZ4-0005wu-Kh
 	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drMZ2-0006mc-43
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32974)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drMYy-0006kF-DL
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55252)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1drMZ1-0006m5-Sd
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:40 -0400
+	id 1drMYy-0006im-5l
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:36 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 11 Sep 2017 13:06:00 +0200
-Message-Id: <20170911110623.24981-28-marcandre.lureau@redhat.com>
+Date: Mon, 11 Sep 2017 13:05:59 +0200
+Message-Id: <20170911110623.24981-27-marcandre.lureau@redhat.com>
 In-Reply-To: <20170911110623.24981-1-marcandre.lureau@redhat.com>
 References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 27/50] qapi: add #if conditions to generated
- variants
+Subject: [Qemu-devel] [PATCH v3 26/50] qapi: add 'if' on union variants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,86 +32,133 @@ Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@re
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi-introspect.py | 3 ++-
- scripts/qapi-types.py      | 2 ++
- scripts/qapi-visit.py      | 4 ++++
- 3 files changed, 8 insertions(+), 1 deletion(-)
+ scripts/qapi.py                         | 15 ++++++++++-----
+ tests/qapi-schema/qapi-schema-test.json |  7 ++++++-
+ tests/qapi-schema/qapi-schema-test.out  |  8 ++++++++
+ tests/qapi-schema/test-qapi.py          |  5 ++++-
+ 4 files changed, 28 insertions(+), 7 deletions(-)
 
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-index 0e43e470bb..ef2d5577db 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi-introspect.py
-@@ -148,7 +148,8 @@ const QLitObject %(c_name)s =3D %(c_string)s;
-                 'variants': [self._gen_variant(v) for v in variants]}
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 15711f96fa..2f14edfa1f 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -1412,8 +1412,8 @@ class QAPISchemaObjectTypeVariants(object):
+ class QAPISchemaObjectTypeVariant(QAPISchemaObjectTypeMember):
+     role =3D 'branch'
 =20
-     def _gen_variant(self, variant):
--        return {'case': variant.name, 'type': self._use_type(variant.typ=
-e)}
-+        return ({'case': variant.name, 'type': self._use_type(variant.ty=
-pe)},
-+                variant.ifcond)
+-    def __init__(self, name, typ):
+-        QAPISchemaObjectTypeMember.__init__(self, name, typ, False)
++    def __init__(self, name, typ, ifcond=3DNone):
++        QAPISchemaObjectTypeMember.__init__(self, name, typ, False, ifco=
+nd)
 =20
-     def visit_builtin_type(self, name, info, json_type):
-         self._gen_qlit(name, 'builtin', {'json-type': json_type}, None)
-diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
-index 7e6df21f53..312685c295 100644
---- a/scripts/qapi-types.py
-+++ b/scripts/qapi-types.py
-@@ -131,11 +131,13 @@ def gen_variants(variants):
-                 c_name=3Dc_name(variants.tag_member.name))
 =20
-     for var in variants.variants:
-+        ret +=3D gen_if(var.ifcond)
-         ret +=3D mcgen('''
-         %(c_type)s %(c_name)s;
- ''',
-                      c_type=3Dvar.type.c_unboxed_type(),
-                      c_name=3Dc_name(var.name))
-+        ret +=3D gen_endif(var.ifcond)
+ class QAPISchemaAlternateType(QAPISchemaType):
+@@ -1674,13 +1674,18 @@ class QAPISchema(object):
+         return QAPISchemaObjectTypeVariant(case, typ)
 =20
-     ret +=3D mcgen('''
-     } u;
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index 6a3a52e39d..369e1f927d 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -82,6 +82,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
-)s *obj, Error **errp)
-                      c_name=3Dc_name(variants.tag_member.name))
+     def _make_simple_variant(self, case, typ, info):
++        ifcond =3D None
++        if isinstance(typ, dict):
++            check_unknown_keys(info, typ, {'type', 'if'})
++            ifcond =3D typ.get('if')
++            typ =3D typ['type']
+         if isinstance(typ, list):
+             assert len(typ) =3D=3D 1
+             typ =3D self._make_array_type(typ[0], info)
+         typ =3D self._make_implicit_object_type(
+             typ, info, None, self.lookup_type(typ).ifcond,
+             'wrapper', [self._make_member('data', typ, info)])
+-        return QAPISchemaObjectTypeVariant(case, typ)
++        return QAPISchemaObjectTypeVariant(case, typ, ifcond)
 =20
-         for var in variants.variants:
-+            ret +=3D gen_if(var.ifcond)
-             ret +=3D mcgen('''
-     case %(case)s:
-         visit_type_%(c_type)s_members(v, &obj->u.%(c_name)s, &err);
-@@ -92,6 +93,7 @@ void visit_type_%(c_name)s_members(Visitor *v, %(c_name=
-)s *obj, Error **errp)
-                                            variants.tag_member.type.pref=
-ix),
-                          c_type=3Dvar.type.c_name(), c_name=3Dc_name(var=
-.name))
+     def _def_union_type(self, expr, info, doc):
+         name =3D expr['union']
+@@ -1700,8 +1705,8 @@ class QAPISchema(object):
+         else:
+             variants =3D [self._make_simple_variant(key, value, info)
+                         for (key, value) in data.iteritems()]
+-            typ =3D self._make_implicit_enum_type(name, info, ifcond,
+-                                                [v.name for v in variant=
+s])
++            values =3D [{'name': v.name, 'if': v.ifcond} for v in varian=
+ts]
++            typ =3D self._make_implicit_enum_type(name, info, ifcond, va=
+lues)
+             tag_member =3D QAPISchemaObjectTypeMember('type', typ, False=
+)
+             members =3D [tag_member]
+         self._def_entity(
+diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/=
+qapi-schema-test.json
+index 5cfccabb3d..895e80a978 100644
+--- a/tests/qapi-schema/qapi-schema-test.json
++++ b/tests/qapi-schema/qapi-schema-test.json
+@@ -200,9 +200,14 @@
+   [ 'foo', { 'name' : 'bar', 'if': 'defined(TEST_IF_ENUM_BAR)' } ],
+   'if': 'defined(TEST_IF_ENUM)' }
 =20
-+            ret +=3D gen_endif(var.ifcond)
-         ret +=3D mcgen('''
-     default:
-         abort();
-@@ -182,6 +184,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *na=
-me, %(c_name)s **obj, Error
-                  c_name=3Dc_name(name))
+-{ 'union': 'TestIfUnion', 'data': { 'foo': 'TestStruct' },
++{ 'union': 'TestIfUnion', 'data':
++  { 'foo': 'TestStruct',
++    'union_bar': { 'type': 'str', 'if': 'defined(TEST_IF_UNION_BAR)'} },
+   'if': 'defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)' }
 =20
-     for var in variants.variants:
-+        ret +=3D gen_if(var.ifcond)
-         ret +=3D mcgen('''
-     case %(case)s:
- ''',
-@@ -209,6 +212,7 @@ void visit_type_%(c_name)s(Visitor *v, const char *na=
-me, %(c_name)s **obj, Error
-         ret +=3D mcgen('''
-         break;
- ''')
-+        ret +=3D gen_endif(var.ifcond)
++{ 'command': 'TestIfUnionCmd', 'data': { 'union_cmd_arg': 'TestIfUnion' =
+},
++  'if': 'defined(TEST_IF_UNION)' }
++
+ { 'alternate': 'TestIfAlternate', 'data': { 'foo': 'int', 'bar': 'TestSt=
+ruct' },
+   'if': 'defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)' }
 =20
-     ret +=3D mcgen('''
-     case QTYPE_NONE:
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 6df4e49c69..ee009c5626 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -87,9 +87,14 @@ object TestIfUnion
+     member type: TestIfUnionKind optional=3DFalse
+     tag type
+     case foo: q_obj_TestStruct-wrapper
++    case union_bar: q_obj_str-wrapper if=3Ddefined(TEST_IF_UNION_BAR)
+     if defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)
++command TestIfUnionCmd q_obj_TestIfUnionCmd-arg -> None
++   gen=3DTrue success_response=3DTrue boxed=3DFalse
++    if defined(TEST_IF_UNION)
+ enum TestIfUnionKind
+     member foo:
++    member union_bar: if=3Ddefined(TEST_IF_UNION_BAR)
+     if defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)
+ object TestStruct
+     member integer: int optional=3DFalse
+@@ -235,6 +240,9 @@ object q_obj_TestIfEvent-arg
+     member foo: TestIfStruct optional=3DFalse
+     member bar: TestIfEnum optional=3DFalse if=3Ddefined(TEST_IF_EVT_BAR=
+)
+     if defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)
++object q_obj_TestIfUnionCmd-arg
++    member union_cmd_arg: TestIfUnion optional=3DFalse
++    if defined(TEST_IF_UNION)
+ object q_obj_TestStruct-wrapper
+     member data: TestStruct optional=3DFalse
+ object q_obj_UserDefFlatUnion2-base
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
+.py
+index a86c3b5ee1..87a8efff78 100644
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -65,7 +65,10 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+         if variants:
+             print '    tag %s' % variants.tag_member.name
+             for v in variants.variants:
+-                print '    case %s: %s' % (v.name, v.type.name)
++                print '    case %s: %s' % (v.name, v.type.name),
++                if v.ifcond:
++                    print 'if=3D%s' % v.ifcond,
++                print
+=20
+     @staticmethod
+     def _print_if(ifcond):
 --=20
 2.14.1.146.gd35faa819
