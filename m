@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56987)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1drPrn-0001PV-DZ
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:39:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1drPrw-0001Uy-Ij
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:39:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1drPrj-0007QV-A6
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:39:15 -0400
-References: <20170911110037.6567-1-lvivier@redhat.com>
-	<20170911110615.GK21444@redhat.com>
-	<20170911134158.1f046176.cohuck@redhat.com>
-	<20170911114347.GL21444@redhat.com> <20170911120441.GB2857@work-vm>
-	<616d2319-1198-5a20-ebf4-ac2c532352db@redhat.com>
-	<20170911121356.GN21444@redhat.com>
-	<33a05e8f-0c26-b41c-e4ca-e602d67bb638@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7e17b567-49c6-3c03-9a84-8abb8d6f8386@redhat.com>
-Date: Mon, 11 Sep 2017 16:39:05 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1drPrv-0007Ww-Mb
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:39:24 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:45634)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1drPrv-0007WA-Fm
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:39:23 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id f199so41494434wme.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 07:39:23 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <33a05e8f-0c26-b41c-e4ca-e602d67bb638@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hmp: fix "dump-quest-memory" segfault (ppc)
+In-Reply-To: <20170911142056.15643-3-lvivier@redhat.com>
+References: <20170911142056.15643-1-lvivier@redhat.com>
+	<20170911142056.15643-3-lvivier@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 11 Sep 2017 15:39:01 +0100
+Message-ID: <CAFEAcA_G8mEzB0Mox0TTz578LQKXgvhNHeZ8Bk7OwC4NbqiXPg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] hmp: fix "dump-quest-memory"
+ segfault (arm)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,54 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P . Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>
 
-On 11.09.2017 14:15, Laurent Vivier wrote:
-> On 11/09/2017 14:13, Daniel P. Berrange wrote:
->> On Mon, Sep 11, 2017 at 02:10:14PM +0200, Laurent Vivier wrote:
->>> On 11/09/2017 14:04, Dr. David Alan Gilbert wrote:
->>>> * Daniel P. Berrange (berrange@redhat.com) wrote:
->>>>> On Mon, Sep 11, 2017 at 01:41:58PM +0200, Cornelia Huck wrote:
->>>>>> On Mon, 11 Sep 2017 12:06:15 +0100
->>>>>> "Daniel P. Berrange" <berrange@redhat.com> wrote:
->>>>>>
->>>>>>> On Mon, Sep 11, 2017 at 01:00:37PM +0200, Laurent Vivier wrote:
->>>>>>>> Commit fd5d23babf (hmp: fix "dump-quest-memory" segfault)
->>>>>>>> fixes the problem for i386, do the same for ppc.  
->>>>>>>
->>>>>>> What about all the other targets QEMU supports ?  Have you checked if they
->>>>>>> are similarly affected, as we don't want to wait another 6 months to get a
->>>>>>> bug report that s390 or aarch64 crash in exactly the same way too.
->>>>>>
->>>>>> This patch actually prompted me to check s390, and the mentioned
->>>>>> command line works fine.
->>>>>>
->>>>>> However, if we start a qemu with no guest memory defined and then call
->>>>>> dump-guest-memory without filtering, we get a core dump instead of a
->>>>>> guest dump (s390x or x86_64, machine none).
->>>>>>
->>>>>> I can take a stab at fixing that, unless someone beats me to it.
->>>>>
->>>>> I wonder if someone wants to write a qtest job to run dump-guest-memory
->>>>> across all machine types, on all targets. Seems we have enough crashiness
->>>>> in this code to make it worthwhile to test
->>>>
->>>> We do have - that's how we found this case;  it's part of test-hmp.
->>>
->>> The test-hmp runs by default with 0 MB of memory, the problem can only
->>> be found with some memory added to the machine.
->>>
->>> Perhaps we can simply update the test to add memory?
->>
->> Probably best to run it twice, 0MB and with say 2MB, as they're both
->> fairly magic values.
-> 
-> OK, I'm going to update the test.
+On 11 September 2017 at 15:20, Laurent Vivier <lvivier@redhat.com> wrote:
+> Commit fd5d23babf (hmp: fix "dump-quest-memory" segfault)
+> fixes the problem for i386, do the same for arm.
+>
+> Running QEMU with
+>     qemu-system-aarch64 -M none -nographic -m 256
+> and executing
+>     dump-guest-memory /dev/null 0 8192
+> results in segfault
+>
+> Fix by checking if we have CPU.
+>
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-Thanks! But please note that it is only the "none" machine which is
-started without memory and CPU by default - all the other boards should
-have a default set of memory and at least one CPU. So we should only add
-an additional tests for the "none" machine here.
+It seems a little arbitrary to assume that if there's no
+CPU what you wanted was a 32-bit little-endian dump.
 
- Thomas
+Why do we have a machine without a CPU anyway ?
+
+thanks
+-- PMM
