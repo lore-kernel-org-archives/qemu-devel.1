@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41592)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47766)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drQMo-0007TU-W6
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:11:20 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1drQU8-00020m-HF
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:18:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drQMl-00037Q-RI
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:11:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43238)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1drQMl-00036w-IF
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:11:15 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 837E0B5C1B
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 15:11:14 +0000 (UTC)
-From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 11 Sep 2017 17:11:06 +0200
-Message-Id: <20170911151106.20734-1-marcandre.lureau@redhat.com>
+	(envelope-from <gengdongjiu@huawei.com>) id 1drQU7-0002XO-6Y
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:18:52 -0400
+From: gengdongjiu <gengdongjiu@huawei.com>
+Date: Mon, 11 Sep 2017 15:17:56 +0000
+Message-ID: <0184EA26B2509940AA629AE1405DD7F2015FE17F@DGGEMA503-MBX.china.huawei.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2] build-sys: generate tests/.gitignore
+Subject: Re: [Qemu-devel] [PATCH v11 6/6] target-arm: kvm64: Handle SError
+ interrupt for the guest OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,237 +22,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: eblake@redhat.com, thuth@redhat.com, armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo
+	Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will
+	Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, lkml -
+	Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, "devel@acpica.org" <devel@acpica.org>, John Garry <john.garry@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, huangdaode <huangdaode@hisilicon.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>
 
-tests/.gitignore is often out of date. Let's generate it based on the
-files and directories to clean. Generate it by default only when doing
-in-tree build.
-
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
----
- Makefile                   |  9 ++++-
- tests/.gitignore           | 97 ----------------------------------------=
-------
- tests/Makefile.include     | 38 ++++++++++++++++--
- tests/migration/.gitignore |  2 -
- 4 files changed, 42 insertions(+), 104 deletions(-)
- delete mode 100644 tests/.gitignore
- delete mode 100644 tests/migration/.gitignore
-
-
-v2:
- - only generate when doing in-tree builds
- - fix wrong ignore of tests/qemu-iotests-quick.sh
-
-diff --git a/Makefile b/Makefile
-index 81447b1f08..2ccb98cd64 100644
---- a/Makefile
-+++ b/Makefile
-@@ -6,7 +6,7 @@ BUILD_DIR=3D$(CURDIR)
- # Before including a proper config-host.mak, assume we are in the source=
- tree
- SRC_PATH=3D.
-=20
--UNCHECKED_GOALS :=3D %clean TAGS cscope ctags docker docker-%
-+UNCHECKED_GOALS :=3D %clean TAGS cscope ctags docker docker-% gitignore
-=20
- # All following code might depend on configuration variables
- ifneq ($(wildcard config-host.mak),)
-@@ -14,6 +14,13 @@ ifneq ($(wildcard config-host.mak),)
- all:
- include config-host.mak
-=20
-+.PHONY: gitignore
-+ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGO=
-ALS),,fail))
-+ifeq ($(BUILD_DIR),$(SRC_PATH))
-+all $(MAKECMDGOALS): gitignore
-+endif
-+endif
-+
- # Check that we're not trying to do an out-of-tree build from
- # a tree that's been used for an in-tree build.
- ifneq ($(realpath $(SRC_PATH)),$(realpath .))
-diff --git a/tests/.gitignore b/tests/.gitignore
-deleted file mode 100644
-index fed0189a5a..0000000000
---- a/tests/.gitignore
-+++ /dev/null
-@@ -1,97 +0,0 @@
--atomic_add-bench
--benchmark-crypto-cipher
--benchmark-crypto-hash
--benchmark-crypto-hmac
--check-qdict
--check-qnum
--check-qjson
--check-qlist
--check-qnull
--check-qstring
--check-qom-interface
--check-qom-proplist
--qht-bench
--rcutorture
--test-aio
--test-aio-multithread
--test-arm-mptimer
--test-base64
--test-bitops
--test-bitcnt
--test-blockjob
--test-blockjob-txn
--test-bufferiszero
--test-char
--test-clone-visitor
--test-coroutine
--test-crypto-afsplit
--test-crypto-block
--test-crypto-cipher
--test-crypto-hash
--test-crypto-hmac
--test-crypto-ivgen
--test-crypto-pbkdf
--test-crypto-secret
--test-crypto-tlscredsx509
--test-crypto-tlscredsx509-work/
--test-crypto-tlscredsx509-certs/
--test-crypto-tlssession
--test-crypto-tlssession-work/
--test-crypto-tlssession-client/
--test-crypto-tlssession-server/
--test-crypto-xts
--test-cutils
--test-hbitmap
--test-hmp
--test-int128
--test-iov
--test-io-channel-buffer
--test-io-channel-command
--test-io-channel-command.fifo
--test-io-channel-file
--test-io-channel-file.txt
--test-io-channel-socket
--test-io-channel-tls
--test-io-task
--test-keyval
--test-logging
--test-mul64
--test-opts-visitor
--test-qapi-event.[ch]
--test-qapi-types.[ch]
--test-qapi-util
--test-qapi-visit.[ch]
--test-qdev-global-props
--test-qemu-opts
--test-qdist
--test-qga
--test-qht
--test-qht-par
--test-qmp-commands
--test-qmp-commands.h
--test-qmp-event
--test-qobject-input-strict
--test-qobject-input-visitor
--test-qmp-introspect.[ch]
--test-qmp-marshal.c
--test-qobject-output-visitor
--test-rcu-list
--test-replication
--test-shift128
--test-string-input-visitor
--test-string-output-visitor
--test-thread-pool
--test-throttle
--test-timed-average
--test-uuid
--test-visitor-serialization
--test-vmstate
--test-write-threshold
--test-x86-cpuid
--test-x86-cpuid-compat
--test-xbzrle
--test-netfilter
--test-filter-mirror
--test-filter-redirector
--*-test
--qapi-schema/*.test.*
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index f08b7418f0..29d8e4ebf4 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -901,8 +901,33 @@ $(patsubst %, check-%, $(check-qapi-schema-y)): chec=
-k-%.json: $(SRC_PATH)/%.json
- check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.t=
-exi
- 	@diff -q $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
-=20
--# Consolidated targets
-+tests-cleanfiles =3D *.o
-+tests-cleanfiles +=3D .gitignore
-+tests-cleanfiles +=3D qht-bench$(EXESUF)
-+tests-cleanfiles +=3D qapi-schema/*.test.*
-+tests-cleanfiles +=3D test-qapi-event.[ch]
-+tests-cleanfiles +=3D test-qapi-types.[ch]
-+tests-cleanfiles +=3D test-qapi-visit.[ch]
-+tests-cleanfiles +=3D test-qmp-introspect.[ch]
-+tests-cleanfiles +=3D test-qmp-commands.h
-+tests-cleanfiles +=3D test-qmp-marshal.c
-+tests-cleanfiles +=3D $(subst tests/,,$(check-unit-y))
-+tests-cleanfiles +=3D $(subst tests/,,$(check-speed-y))
-+tests-cleanfiles +=3D $(subst tests/,,$(check-qtest-y))
-+tests-cleanfiles +=3D $(subst tests/,,$(QEMU_IOTESTS_HELPERS-y))
-+tests-cleanfiles +=3D migration/initrd-stress.img
-+tests-cleanfiles +=3D migration/stress$(EXESUF)
-+tests-cleanfiles +=3D atomic_add-bench$(EXESUF)
-+tests-cleanfiles +=3D test-io-channel-file.txt
-+tests-cleanfiles +=3D test-io-channel-command.fifo
-+
-+tests-cleandirs +=3D test-crypto-tlscredsx509-certs/
-+tests-cleandirs +=3D test-crypto-tlscredsx509-work/
-+tests-cleandirs +=3D test-crypto-tlssession-client/
-+tests-cleandirs +=3D test-crypto-tlssession-server/
-+tests-cleandirs +=3D test-crypto-tlssession-work/
-=20
-+# Consolidated targets
- .PHONY: check-qapi-schema check-qtest check-unit check check-clean
- check-qapi-schema: $(patsubst %,check-%, $(check-qapi-schema-y)) check-t=
-ests/qapi-schema/doc-good.texi
- check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
-@@ -912,15 +937,20 @@ check-block: $(patsubst %,check-%, $(check-block-y)=
-)
- check: check-qapi-schema check-unit check-qtest
- check-clean:
- 	$(MAKE) -C tests/tcg clean
--	rm -rf $(check-unit-y) tests/*.o $(QEMU_IOTESTS_HELPERS-y)
--	rm -rf $(sort $(foreach target,$(SYSEMU_TARGET_LIST), $(check-qtest-$(t=
-arget)-y)) $(check-qtest-generic-y))
--
-+	rm -f $(addprefix tests/, $(tests-cleanfiles))
-+	rm -rf $(addprefix tests/, $(tests-cleandirs))
- clean: check-clean
-=20
- # Build the help program automatically
-=20
- all: $(QEMU_IOTESTS_HELPERS-y)
-=20
-+$(SRC_PATH)/tests/.gitignore: $(MAKEFILE_LIST)
-+	$(call quiet-command, echo "$(tests-cleanfiles)" "$(tests-cleandirs)" |=
- \
-+		xargs -n1 | sort | uniq | sed -e s:^:/: > $@,"GEN","$(@F)")
-+
-+gitignore: $(SRC_PATH)/tests/.gitignore
-+
- -include $(wildcard tests/*.d)
- -include $(wildcard tests/libqos/*.d)
-=20
-diff --git a/tests/migration/.gitignore b/tests/migration/.gitignore
-deleted file mode 100644
-index 84f37552e4..0000000000
---- a/tests/migration/.gitignore
-+++ /dev/null
-@@ -1,2 +0,0 @@
--initrd-stress.img
--stress
---=20
-2.14.1.146.gd35faa819
+SGkgcGV0ZXIsDQoNCj4gDQo+IE9uIDE4IEF1Z3VzdCAyMDE3IGF0IDE1OjIzLCBEb25naml1IEdl
+bmcgPGdlbmdkb25naml1QGh1YXdlaS5jb20+IHdyb3RlOg0KPiA+IFdoZW4gZ3Vlc3QgT1MgaGFw
+cGVucyBTRXJyb3IgaW50ZXJydXB0KFNFSSksIGl0IHdpbGwgdHJhcCB0byBob3N0Lg0KPiA+IEhv
+c3QgZmlyc3RseSBjYWxscyBtZW1vcnkgZmFpbHVyZSB0byBkZWFsIHdpdGggdGhpcyBlcnJvciBh
+bmQgZGVjaWRlDQo+ID4gd2hldGhlciBpdCBuZWVkcyB0byBkZWxpdmVyIFNJR0JVUyBzaWduYWwg
+dG8gdXNlcnNwYWNlLiBUaGUgYWR2YW50YWdlDQo+ID4gdGhhdCB1c2luZyBzaWduYWwgdG8gbm90
+aWZ5IGlzIHRoYXQgaXQgY2FuIG1ha2UgdGhlIG5vdGlmaWNhdGlvbg0KPiA+IG1ldGhvZCBpcyBn
+ZW5lcmFsLCBub24tS1ZNIHVzZXIgY2FuIGFsc28gdXNlIGl0LiB3aGVuIHVzZXJzcGFjZSBnZXRz
+DQo+ID4gdGhpcyBzaWduYWwgYW5kIGtub3dzIHRoaXMgaXMgU0Vycm9yIGludGVycnVwdCwgaXQg
+d2lsbCB0cmFuc2xhdGUgdGhlDQo+ID4gZGVsaXZlcmVkIGhvc3QgVkEgdG8gUEEgYW5kIHJlY29y
+ZCB0aGlzIFBBIHRvIEdIRVMuDQo+ID4NCj4gPiBCZWNhdXNlIEFSTXY4LjIgYWRkcyBhbiBleHRl
+bnNpb24gdG8gUkFTIHRvIGFsbG93IHN5c3RlbSBzb2Z0d2FyZQ0KPiA+IGluc2VydCBpbXBsaWNp
+dCBFcnJvciBTeW5jaHJvbml6YXRpb24gQmFycmllciBvcGVyYXRpb25zIHRvIGlzb2xhdGUNCj4g
+PiB0aGUgZXJyb3IgYW5kIGFsbG93IHBhc3NlcyBzcGVjaWZpZWQgc3luZHJvbWUgdG8gZ3Vlc3Qg
+T1MsIHNvIGFmdGVyDQo+ID4gcmVjb3JkIHRoZSBDUEVSLCB1c2VyIHNwYWNlIGNhbGxzIElPQ1RM
+IHRvIHBhc3MgYSBzcGVjaWZpZWQgc3luZHJvbWUNCj4gPiB0byBLVk0sIHRoZW4gc3dpdGNoIHRv
+IGd1ZXN0IE9TLCBndWVzdCBPUyBjYW4gdXNlIHRoZSByZWNvcmRlZCBDUEVSDQo+ID4gcmVjb3Jk
+IGFuZCBzeW5kcm9tZSBpbmZvcm1hdGlvbiB0byBkbyB0aGUgcmVjb3ZlcnkuDQo+ID4NCj4gPiBU
+aGUgc3RlcHMgYXJlIHNob3duIGJlbG93Og0KPiA+IDEuIHRyYW5zbGF0ZSB0aGUgaG9zdCBWQSB0
+byBndWVzdCBPUyBQQSBhbmQgcmVjb3JkIHRoaXMgZXJyb3IgUEEgdG8gSEVTVCB0YWJsZS4NCj4g
+PiAyLiBzZXQgc3BlY2lmaWVkIHZpcnR1YWwgU0Vycm9yIHN5bmRyb21lIGFuZCBwYXNzIHRoZSB2
+YWx1ZSB0byBLVk0uDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBEb25naml1IEdlbmcgPGdlbmdk
+b25naml1QGh1YXdlaS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogUXVhbm1pbmcgV3UgPHd1cXVh
+bm1pbmdAaHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4gPiAgbGludXgtaGVhZGVycy9saW51eC9rdm0u
+aCB8ICAxICsNCj4gPiAgdGFyZ2V0L2FybS9pbnRlcm5hbHMuaCAgICB8ICAxICsNCj4gPiAgdGFy
+Z2V0L2FybS9rdm02NC5jICAgICAgICB8IDI4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysN
+Cj4gPiAgMyBmaWxlcyBjaGFuZ2VkLCAzMCBpbnNlcnRpb25zKCspDQo+ID4NCj4gPiBkaWZmIC0t
+Z2l0IGEvbGludXgtaGVhZGVycy9saW51eC9rdm0uaCBiL2xpbnV4LWhlYWRlcnMvbGludXgva3Zt
+LmgNCj4gPiBpbmRleCAyYWExNzZlLi4xMGRmY2FiIDEwMDY0NA0KPiA+IC0tLSBhL2xpbnV4LWhl
+YWRlcnMvbGludXgva3ZtLmgNCj4gPiArKysgYi9saW51eC1oZWFkZXJzL2xpbnV4L2t2bS5oDQo+
+ID4gQEAgLTEzNTYsNiArMTM1Niw3IEBAIHN0cnVjdCBrdm1fczM5MF91Y2FzX21hcHBpbmcgew0K
+PiA+ICAvKiBBdmFpbGFibGUgd2l0aCBLVk1fQ0FQX1MzOTBfQ01NQV9NSUdSQVRJT04gKi8NCj4g
+PiAgI2RlZmluZSBLVk1fUzM5MF9HRVRfQ01NQV9CSVRTICAgICAgX0lPV1IoS1ZNSU8sIDB4Yjgs
+IHN0cnVjdCBrdm1fczM5MF9jbW1hX2xvZykNCj4gPiAgI2RlZmluZSBLVk1fUzM5MF9TRVRfQ01N
+QV9CSVRTICAgICAgX0lPVyhLVk1JTywgMHhiOSwgc3RydWN0IGt2bV9zMzkwX2NtbWFfbG9nKQ0K
+PiA+ICsjZGVmaW5lIEtWTV9BUk1fU0VJICAgICAgICAgICAgICAgICBfSU8oS1ZNSU8sICAgMHhi
+MTApDQo+ID4NCj4gPiAgI2RlZmluZSBLVk1fREVWX0FTU0lHTl9FTkFCTEVfSU9NTVUgICAgKDEg
+PDwgMCkNCj4gPiAgI2RlZmluZSBLVk1fREVWX0FTU0lHTl9QQ0lfMl8zICAgICAgICAgKDEgPDwg
+MSkNCj4gPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2FybS9pbnRlcm5hbHMuaCBiL3RhcmdldC9hcm0v
+aW50ZXJuYWxzLmggaW5kZXgNCj4gPiBmYzBhZDZkLi4xOGIxY2JjIDEwMDY0NA0KPiA+IC0tLSBh
+L3RhcmdldC9hcm0vaW50ZXJuYWxzLmgNCj4gPiArKysgYi90YXJnZXQvYXJtL2ludGVybmFscy5o
+DQo+ID4gQEAgLTIzNyw2ICsyMzcsNyBAQCBlbnVtIGFybV9leGNlcHRpb25fY2xhc3MgeyAgI2Rl
+ZmluZSBBUk1fRUxfSVNWICgxDQo+ID4gPDwgQVJNX0VMX0lTVl9TSElGVCkgICNkZWZpbmUgQVJN
+X0VMX0VDX01BU0sgICgoMHgzRikgPDwNCj4gPiBBUk1fRUxfRUNfU0hJRlQpICAjZGVmaW5lIEFS
+TV9FTF9GU0NfVFlQRSAoMHgzQykNCj4gPiArI2RlZmluZSBBUk1fRUxfSVNTX01BU0sgKCgxIDw8
+IEFSTV9FTF9JTF9TSElGVCkgLSAxKQ0KPiA+DQo+ID4gICNkZWZpbmUgRlNDX1NFQSAgICAgICAg
+ICgweDEwKQ0KPiA+ICAjZGVmaW5lIEZTQ19TRUFfVFRXMCAgICAoMHgxNCkNCj4gPiBkaWZmIC0t
+Z2l0IGEvdGFyZ2V0L2FybS9rdm02NC5jIGIvdGFyZ2V0L2FybS9rdm02NC5jIGluZGV4DQo+ID4g
+ZDNiZGFiMi4uYjg0Y2I0OSAxMDA2NDQNCj4gPiAtLS0gYS90YXJnZXQvYXJtL2t2bTY0LmMNCj4g
+PiArKysgYi90YXJnZXQvYXJtL2t2bTY0LmMNCj4gPiBAQCAtNjE2LDYgKzYxNiwyMiBAQCBzdGF0
+aWMgaW50IGt2bV9hcm1fY3ByZWdfdmFsdWUoQVJNQ1BVICpjcHUsIHB0cmRpZmZfdCBmaWVsZG9m
+ZnNldCkNCj4gPiAgICAgIHJldHVybiAtRUlOVkFMOw0KPiA+ICB9DQo+ID4NCj4gPiArc3RhdGlj
+IGludCBrdm1faW5qZWN0X2FybV9zZWkoQ1BVU3RhdGUgKmNzKSB7DQo+ID4gKyAgICBBUk1DUFUg
+KmNwdSA9IEFSTV9DUFUoY3MpOw0KPiA+ICsgICAgQ1BVQVJNU3RhdGUgKmVudiA9ICZjcHUtPmVu
+djsNCj4gPiArDQo+ID4gKyAgICB1bnNpZ25lZCBsb25nIHN5bmRyb21lID0gZW52LT5leGNlcHRp
+b24udmFkZHJlc3M7DQo+ID4gKyAgICAvKiBzZXQgdmlydHVhbCBTRXJyb3Igc3luZHJvbWUgKi8N
+Cj4gPiArICAgIGlmIChhcm1fZmVhdHVyZShlbnYsIEFSTV9GRUFUVVJFX1JBU19FWFRFTlNJT04p
+KSB7DQo+ID4gKyAgICAgICAgc3luZHJvbWUgPSBzeW5kcm9tZSAmIEFSTV9FTF9JU1NfTUFTSzsN
+Cj4gPiArICAgIH0gZWxzZSB7DQo+ID4gKyAgICAgICAgc3luZHJvbWUgPSAwOw0KPiA+ICsgICAg
+fQ0KPiA+ICsNCj4gPiArICAgIHJldHVybiAga3ZtX3ZjcHVfaW9jdGwoQ1BVKGNwdSksIEtWTV9B
+Uk1fU0VJLCAmc3luZHJvbWUpOw0KPiANCj4gVGhpcyBsb29rcyBvZGQuIElmIHdlIGRvbid0IGhh
+dmUgdGhlIFJBUyBleHRlbnNpb24gd2h5IGRvIHdlIG5lZWQgdG8gZG8gYW55dGhpbmcgYXQgYWxs
+IGhlcmUgPw0KDQpUaGlzIGlzIGJlY2F1c2UgUWVtdSBtYXkgbmVlZCB0byBzdXBwb3J0IG5vbi1S
+QVMgZXh0ZW5zaW9uIGFzIGRpc2N1c3NlZCB3aXRoIEFSTSBKYW1lcyBiZWZvcmUuDQpUaGF0IGlz
+IHRvIHNheSBob3N0IGhhcmR3YXJlIENQVSBkb2VzIG5vdCBzdXBwb3J0IFJBUywgYnV0IGd1ZXN0
+IHN1cHBvcnRzLg0KVGhhdCBpcyB1bmRlciBkaXNjdXNzaW9uLg0KV2hlbiBob3N0IGhhcmR3YXJl
+IHN1cHBvcnRzIFJBUywgc3BlY2lmeSB0aGUgc3luZHJvbWUgdG8gYSB2YWxpZCB2YWx1ZSwgb3Ro
+ZXJ3aXNlLCBzZXQgaXQgdG8gMC4NCg0KPiANCj4gPiArfQ0KPiA+ICsNCj4gPiAgLyogSW5qZWN0
+IHN5bmNocm9ub3VzIGV4dGVybmFsIGFib3J0ICovICBzdGF0aWMgaW50DQo+ID4ga3ZtX2luamVj
+dF9hcm1fc2VhKENQVVN0YXRlICpjKSAgeyBAQCAtMTAwNyw2ICsxMDIzLDE1IEBAIHN0YXRpYyBi
+b29sDQo+ID4gaXNfYWJvcnRfc2VhKHVuc2lnbmVkIGxvbmcgc3luZHJvbWUpDQo+ID4gICAgICB9
+DQo+ID4gIH0NCj4gPg0KPiA+ICtzdGF0aWMgYm9vbCBpc19hYm9ydF9zZWkodW5zaWduZWQgbG9u
+ZyBzeW5kcm9tZSkgew0KPiA+ICsgICAgdWludDhfdCBlYyA9ICgoc3luZHJvbWUgJiBBUk1fRUxf
+RUNfTUFTSykgPj4gQVJNX0VMX0VDX1NISUZUKTsNCj4gDQo+IFlvdSBkb24ndCBuZWVkIHRvIGJv
+dGhlciBtYXNraW5nIGhlcmUgLS0gaW4gb3RoZXIgcGxhY2VzIGluIFFFTVUgd2UgYXNzdW1lIHRo
+YXQgdGhlIEVDIGZpZWxkIGlzIGF0IHRoZSB0b3Agb2YgdGhlIHdvcmQsIHNvIGp1c3QgInN5bmRy
+b21lID4+DQo+IEFSTV9FTF9FQ19TSElGVCIgaXMgc3VmZmljaWVudC4NCg0KT0ssIHRoYW5rcyBm
+b3IgdGhlIHN1Z2dlc3Rpb24uDQoNCj4gDQo+ID4gKyAgICBpZiAoKGVjICE9IEVDX1NFUlJPUikp
+DQo+ID4gKyAgICAgICAgcmV0dXJuIGZhbHNlOw0KPiA+ICsgICAgZWxzZQ0KPiA+ICsgICAgICAg
+IHJldHVybiB0cnVlOw0KPiANCj4gc2NyaXB0cy9jaGVja3BhdGNoLnBsIHNob3VsZCB0ZWxsIHlv
+dSB0aGF0IHRoaXMgaWYgbmVlZHMgYnJhY2VzIChpdCdzIGdvb2QgdG8gZ2V0IGluIHRoZSBoYWJp
+dCBvZiBydW5uaW5nIGl0IG9uIGFsbCBwYXRjaGVzOyBpdCBpcyBub3QgYWx3YXlzDQo+IGNvcnJl
+Y3QsIHNvIGp1ZGdlbWVudCBpcyByZXF1aXJlZCwgYnV0IGl0IHdpbGwgZmxhZyB1cCBzb21lIGNv
+bW1vbiBtaXN0YWtlcykuDQo+IA0KPiBJbiB0aGlzIHBhcnRpY3VsYXIgY2FzZSwgeW91IHNob3Vs
+ZCBqdXN0DQo+ICAgIHJldHVybiBlYyA9PSBFQ19TRVJST1I7DQo+IHRob3VnaC4NCg0KR29vZCBz
+dWdnZXN0aW9uLg0KDQo+IA0KPiA+ICt9DQo+ID4gKw0KPiA+ICB2b2lkIGt2bV9hcmNoX29uX3Np
+Z2J1c192Y3B1KENQVVN0YXRlICpjLCBpbnQgY29kZSwgdm9pZCAqYWRkcikgIHsNCj4gPiAgICAg
+IHJhbV9hZGRyX3QgcmFtX2FkZHI7DQo+ID4gQEAgLTEwMjQsNiArMTA0OSw5IEBAIHZvaWQga3Zt
+X2FyY2hfb25fc2lnYnVzX3ZjcHUoQ1BVU3RhdGUgKmMsIGludCBjb2RlLCB2b2lkICphZGRyKQ0K
+PiA+ICAgICAgICAgICAgICBpZiAoaXNfYWJvcnRfc2VhKGVudi0+ZXhjZXB0aW9uLnN5bmRyb21l
+KSkgew0KPiA+ICAgICAgICAgICAgICAgICAgZ2hlc191cGRhdGVfZ3Vlc3QoQUNQSV9IRVNUX05P
+VElGWV9TRUEsIHBhZGRyKTsNCj4gPiAgICAgICAgICAgICAgICAgIGt2bV9pbmplY3RfYXJtX3Nl
+YShjKTsNCj4gPiArICAgICAgICAgICAgfSBlbHNlIGlmIChpc19hYm9ydF9zZWkoZW52LT5leGNl
+cHRpb24uc3luZHJvbWUpKSB7DQo+ID4gKyAgICAgICAgICAgICAgICBnaGVzX3VwZGF0ZV9ndWVz
+dChBQ1BJX0hFU1RfTk9USUZZX1NFSSwgcGFkZHIpOw0KPiA+ICsgICAgICAgICAgICAgICAga3Zt
+X2luamVjdF9hcm1fc2VpKGMpOw0KPiA+ICAgICAgICAgICAgICB9DQo+ID4gICAgICAgICAgICAg
+IHJldHVybjsNCj4gPiAgICAgICAgICB9DQo+ID4gLS0NCj4gPiAxLjguMy4xDQo+IA0KPiB0aGFu
+a3MNCj4gLS0gUE1NDQo=
