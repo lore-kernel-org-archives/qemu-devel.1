@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43645)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43686)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drMZh-0006XR-Kq
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:08:28 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drMZm-0006bv-Ee
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:08:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drMZg-0007BQ-4R
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:08:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56850)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drMZl-0007HI-Cw
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:08:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41338)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1drMZf-0007AQ-Sc
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:08:20 -0400
+	id 1drMZl-0007Gt-48
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:08:25 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 11 Sep 2017 13:06:13 +0200
-Message-Id: <20170911110623.24981-41-marcandre.lureau@redhat.com>
+Date: Mon, 11 Sep 2017 13:06:15 +0200
+Message-Id: <20170911110623.24981-43-marcandre.lureau@redhat.com>
 In-Reply-To: <20170911110623.24981-1-marcandre.lureau@redhat.com>
 References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 40/50] qapi: add -i/--include filename.h
+Subject: [Qemu-devel] [PATCH v3 42/50] qapi: add a -u/--unit option to
+ specify which unit to visit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,212 +31,87 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Add a new option to add user-specified #include lines in the generated
-headers. This will help to split a schema, where one generated header
-will depend on another.
+Allow to filter expressions based on unit name.
+
+By default, only default units are processed (unspecified pragma).
+
+'all' will include all units. Anything else will filter by unit name.
+
+(add a FIXME to make implicit array types use the element type unit,
+not the unit of the first expression using that array type. This isn't
+necessary for now, and I am not sure how to best do it yet)
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi.py            | 13 +++++++++----
- scripts/qapi-commands.py   |  7 +++++--
- scripts/qapi-event.py      |  6 ++++--
- scripts/qapi-introspect.py |  5 +++--
- scripts/qapi-types.py      |  6 ++++--
- scripts/qapi-visit.py      |  5 +++--
- 6 files changed, 28 insertions(+), 14 deletions(-)
+ scripts/qapi.py      | 14 ++++++++++++--
+ scripts/qapi2texi.py |  1 +
+ 2 files changed, 13 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/qapi.py b/scripts/qapi.py
-index 19e48bd4d2..eb4ffdc06d 100644
+index 1d0defd638..7778585819 100644
 --- a/scripts/qapi.py
 +++ b/scripts/qapi.py
-@@ -2096,9 +2096,9 @@ def parse_command_line(extra_options=3D'', extra_lo=
-ng_options=3D[]):
+@@ -47,6 +47,9 @@ returns_whitelist =3D []
+ # Whitelist of entities allowed to violate case conventions
+ name_case_whitelist =3D []
+=20
++# Unit to consider for the visit, 'all' for all units
++visit_unit =3D None
++
+ enum_types =3D {}
+ struct_types =3D {}
+ union_types =3D {}
+@@ -1796,6 +1799,10 @@ class QAPISchema(object):
+     def visit(self, visitor):
+         visitor.visit_begin(self)
+         for (name, entity) in sorted(self._entity_dict.items()):
++            # FIXME: implicit array types should use element type unit
++            unit =3D entity.info and entity.info.get('unit')
++            if visit_unit !=3D 'all' and visit_unit !=3D unit:
++                continue
+             if visitor.visit_needed(entity):
+                 entity.visit(visitor)
+         visitor.visit_end()
+@@ -2103,13 +2110,14 @@ def parse_command_line(extra_options=3D'', extra_=
+long_options=3D[]):
 =20
      try:
          opts, args =3D getopt.gnu_getopt(sys.argv[1:],
--                                       'chp:o:' + extra_options,
--                                       ['source', 'header', 'prefix=3D',
--                                        'output-dir=3D'] + extra_long_op=
-tions)
-+            'chp:o:i:' + extra_options,
-+            ['source', 'header', 'prefix=3D', 'output-dir=3D',
-+             'include=3D'] + extra_long_options)
+-            'chp:o:i:' + extra_options,
++            'chp:o:u:i:' + extra_options,
+             ['source', 'header', 'prefix=3D', 'output-dir=3D',
+-             'include=3D'] + extra_long_options)
++             'unit=3D', 'include=3D'] + extra_long_options)
      except getopt.GetoptError as err:
          print >>sys.stderr, "%s: %s" % (sys.argv[0], str(err))
          sys.exit(1)
-@@ -2107,6 +2107,7 @@ def parse_command_line(extra_options=3D'', extra_lo=
-ng_options=3D[]):
+=20
++    global visit_unit
+     output_dir =3D ''
      prefix =3D ''
      do_c =3D False
-     do_h =3D False
-+    includes =3D []
-     extra_opts =3D []
-=20
-     for oa in opts:
-@@ -2125,6 +2126,8 @@ def parse_command_line(extra_options=3D'', extra_lo=
+@@ -2129,6 +2137,8 @@ def parse_command_line(extra_options=3D'', extra_lo=
 ng_options=3D[]):
+             prefix =3D a
+         elif o in ('-o', '--output-dir'):
+             output_dir =3D a + '/'
++        elif o in ('-u', '--unit'):
++            visit_unit =3D a
+         elif o in ('-c', '--source'):
              do_c =3D True
          elif o in ('-h', '--header'):
-             do_h =3D True
-+        elif o in ('-i', '--include'):
-+            includes.append(a)
-         else:
-             extra_opts.append(oa)
-=20
-@@ -2137,7 +2140,9 @@ def parse_command_line(extra_options=3D'', extra_lo=
-ng_options=3D[]):
+diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+index 4e7b1cda87..6c856d4cb7 100755
+--- a/scripts/qapi2texi.py
++++ b/scripts/qapi2texi.py
+@@ -293,6 +293,7 @@ def main(argv):
+         print >>sys.stderr, "%s: need exactly 1 argument: SCHEMA" % argv=
+[0]
          sys.exit(1)
-     fname =3D args[0]
 =20
--    return (fname, output_dir, do_c, do_h, prefix, extra_opts)
-+    includes =3D "\n".join(['#include "%s"' % inc for inc in includes])
-+
-+    return (fname, output_dir, do_c, do_h, prefix, includes, extra_opts)
-=20
- #
- # Generate output files with boilerplate
-diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
-index 7455d2b8bb..4841f4d9a1 100644
---- a/scripts/qapi-commands.py
-+++ b/scripts/qapi-commands.py
-@@ -253,7 +253,8 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
-         self._regy +=3D gen_register_command(name, success_response)
-=20
-=20
--(input_file, output_dir, do_c, do_h, prefix, opts) =3D parse_command_lin=
-e()
-+(input_file, output_dir, do_c, do_h, prefix, includes, opts) =3D \
-+        parse_command_line()
-=20
- c_comment =3D '''
- /*
-@@ -305,6 +306,7 @@ fdef.write(mcgen('''
-                  prefix=3Dprefix))
-=20
- fdecl.write(mcgen('''
-+%(includes)s
- #include "%(prefix)sqapi-types.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/dispatch.h"
-@@ -312,7 +314,8 @@ fdecl.write(mcgen('''
-=20
- void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
- ''',
--                  prefix=3Dprefix, c_prefix=3Dc_name(prefix, protect=3DF=
-alse)))
-+                  includes=3Dincludes, prefix=3Dprefix,
-+                  c_prefix=3Dc_name(prefix, protect=3DFalse)))
-=20
- schema =3D QAPISchema(input_file)
- gen =3D QAPISchemaGenCommandVisitor()
-diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
-index 60c6f7030d..0aba866dc8 100644
---- a/scripts/qapi-event.py
-+++ b/scripts/qapi-event.py
-@@ -171,7 +171,8 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
-         self._event_names.append(QAPISchemaMember(name, ifcond))
-=20
-=20
--(input_file, output_dir, do_c, do_h, prefix, dummy) =3D parse_command_li=
-ne()
-+(input_file, output_dir, do_c, do_h, prefix, includes, dummy) =3D \
-+        parse_command_line()
-=20
- c_comment =3D '''
- /*
-@@ -218,13 +219,14 @@ fdef.write(mcgen('''
-                  prefix=3Dprefix))
-=20
- fdecl.write(mcgen('''
-+%(includes)s
- #include "qapi/error.h"
- #include "qapi/util.h"
- #include "qapi/qmp/qdict.h"
- #include "%(prefix)sqapi-types.h"
-=20
- ''',
--                  prefix=3Dprefix))
-+                  includes=3Dincludes, prefix=3Dprefix))
-=20
- event_enum_name =3D c_name(prefix + 'QAPIEvent', protect=3DFalse)
-=20
-diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
-index d6194ff702..f9abd83490 100644
---- a/scripts/qapi-introspect.py
-+++ b/scripts/qapi-introspect.py
-@@ -192,7 +192,7 @@ const QLitObject %(c_name)s =3D %(c_string)s;
- # We normally mask them, because they're not QMP wire ABI
- opt_unmask =3D False
-=20
--(input_file, output_dir, do_c, do_h, prefix, opts) =3D \
-+(input_file, output_dir, do_c, do_h, prefix, includes, opts) =3D \
-     parse_command_line('u', ['unmask-non-abi-names'])
-=20
- for o, a in opts:
-@@ -235,10 +235,11 @@ fdef.write(mcgen('''
-                  prefix=3Dprefix))
-=20
- fdecl.write(mcgen('''
-+%(includes)s
- #include "qemu/osdep.h"
- #include "qapi/qmp/qlit.h"
-=20
--'''))
-+''', includes=3Dincludes))
-=20
- schema =3D QAPISchema(input_file)
- gen =3D QAPISchemaGenIntrospectVisitor(opt_unmask)
-diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
-index 312685c295..2b46a7e17f 100644
---- a/scripts/qapi-types.py
-+++ b/scripts/qapi-types.py
-@@ -266,7 +266,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
- # QAPISchemaGenTypeVisitor.visit_end().
- do_builtins =3D False
-=20
--(input_file, output_dir, do_c, do_h, prefix, opts) =3D \
-+(input_file, output_dir, do_c, do_h, prefix, includes, opts) =3D \
-     parse_command_line('b', ['builtins'])
-=20
- for o, a in opts:
-@@ -317,7 +317,9 @@ fdef.write(mcgen('''
-=20
- fdecl.write(mcgen('''
- #include "qapi/util.h"
--'''))
-+%(includes)s
-+''',
-+                  includes=3Dincludes))
-=20
- schema =3D QAPISchema(input_file)
- gen =3D QAPISchemaGenTypeVisitor()
-diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
-index 369e1f927d..1e173d3cd7 100644
---- a/scripts/qapi-visit.py
-+++ b/scripts/qapi-visit.py
-@@ -338,7 +338,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
- # QAPISchemaGenVisitVisitor.visit_end().
- do_builtins =3D False
-=20
--(input_file, output_dir, do_c, do_h, prefix, opts) =3D \
-+(input_file, output_dir, do_c, do_h, prefix, includes, opts) =3D \
-     parse_command_line('b', ['builtins'])
-=20
- for o, a in opts:
-@@ -387,12 +387,13 @@ fdef.write(mcgen('''
-                  prefix=3Dprefix))
-=20
- fdecl.write(mcgen('''
-+%(includes)s
- #include "qapi/visitor.h"
- #include "qapi/qmp/qerror.h"
- #include "%(prefix)sqapi-types.h"
-=20
- ''',
--                  prefix=3Dprefix))
-+                  includes=3Dincludes, prefix=3Dprefix))
-=20
- schema =3D QAPISchema(input_file)
- gen =3D QAPISchemaGenVisitVisitor()
++    qapi.visit_unit =3D 'all'
+     schema =3D qapi.QAPISchema(argv[1])
+     if not qapi.doc_required:
+         print >>sys.stderr, ("%s: need pragma 'doc-required' "
 --=20
 2.14.1.146.gd35faa819
