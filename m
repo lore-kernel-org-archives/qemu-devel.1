@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42719)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drMY9-0004vh-P4
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:06:51 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drMYD-00050Q-LI
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:06:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drMY5-00062w-QO
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:06:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34726)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drMYB-00067T-Hz
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:06:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38672)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1drMY5-00062j-HX
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:06:41 -0400
+	id 1drMYB-000674-98
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:06:47 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 11 Sep 2017 13:05:38 +0200
-Message-Id: <20170911110623.24981-6-marcandre.lureau@redhat.com>
+Date: Mon, 11 Sep 2017 13:05:40 +0200
+Message-Id: <20170911110623.24981-8-marcandre.lureau@redhat.com>
 In-Reply-To: <20170911110623.24981-1-marcandre.lureau@redhat.com>
 References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 05/50] qapi: add tests for invalid 'if'
+Subject: [Qemu-devel] [PATCH v3 07/50] qapi: add 'ifcond' to visitor methods
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,137 +30,451 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
+Modify the test visitor to check correct passing of values.
+
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/Makefile.include                   | 3 +++
- tests/qapi-schema/bad-if-empty-list.err  | 1 +
- tests/qapi-schema/bad-if-empty-list.exit | 1 +
- tests/qapi-schema/bad-if-empty-list.json | 3 +++
- tests/qapi-schema/bad-if-empty-list.out  | 0
- tests/qapi-schema/bad-if-empty.err       | 1 +
- tests/qapi-schema/bad-if-empty.exit      | 1 +
- tests/qapi-schema/bad-if-empty.json      | 3 +++
- tests/qapi-schema/bad-if-empty.out       | 0
- tests/qapi-schema/bad-if.err             | 1 +
- tests/qapi-schema/bad-if.exit            | 1 +
- tests/qapi-schema/bad-if.json            | 3 +++
- tests/qapi-schema/bad-if.out             | 0
- 13 files changed, 18 insertions(+)
- create mode 100644 tests/qapi-schema/bad-if-empty-list.err
- create mode 100644 tests/qapi-schema/bad-if-empty-list.exit
- create mode 100644 tests/qapi-schema/bad-if-empty-list.json
- create mode 100644 tests/qapi-schema/bad-if-empty-list.out
- create mode 100644 tests/qapi-schema/bad-if-empty.err
- create mode 100644 tests/qapi-schema/bad-if-empty.exit
- create mode 100644 tests/qapi-schema/bad-if-empty.json
- create mode 100644 tests/qapi-schema/bad-if-empty.out
- create mode 100644 tests/qapi-schema/bad-if.err
- create mode 100644 tests/qapi-schema/bad-if.exit
- create mode 100644 tests/qapi-schema/bad-if.json
- create mode 100644 tests/qapi-schema/bad-if.out
+ scripts/qapi.py                        | 31 +++++++++++++++++-----------=
+---
+ scripts/qapi-commands.py               |  2 +-
+ scripts/qapi-event.py                  |  2 +-
+ scripts/qapi-introspect.py             | 12 ++++++------
+ scripts/qapi-types.py                  |  8 ++++----
+ scripts/qapi-visit.py                  |  8 ++++----
+ scripts/qapi2texi.py                   | 10 +++++-----
+ tests/qapi-schema/qapi-schema-test.out |  9 +++++++++
+ tests/qapi-schema/test-qapi.py         | 21 ++++++++++++++++-----
+ 9 files changed, 63 insertions(+), 40 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index fae5715e9c..8dac7c9083 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -402,6 +402,9 @@ qapi-schema +=3D args-unknown.json
- qapi-schema +=3D bad-base.json
- qapi-schema +=3D bad-data.json
- qapi-schema +=3D bad-ident.json
-+qapi-schema +=3D bad-if.json
-+qapi-schema +=3D bad-if-empty.json
-+qapi-schema +=3D bad-if-empty-list.json
- qapi-schema +=3D bad-type-bool.json
- qapi-schema +=3D bad-type-dict.json
- qapi-schema +=3D bad-type-int.json
-diff --git a/tests/qapi-schema/bad-if-empty-list.err b/tests/qapi-schema/=
-bad-if-empty-list.err
-new file mode 100644
-index 0000000000..75fe6497bc
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-empty-list.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/bad-if-empty-list.json:2: 'if' condition [] is useless
-diff --git a/tests/qapi-schema/bad-if-empty-list.exit b/tests/qapi-schema=
-/bad-if-empty-list.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-empty-list.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/bad-if-empty-list.json b/tests/qapi-schema=
-/bad-if-empty-list.json
-new file mode 100644
-index 0000000000..94f2eb8670
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-empty-list.json
-@@ -0,0 +1,3 @@
-+# check empty 'if' list
-+{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-+  'if': [] }
-diff --git a/tests/qapi-schema/bad-if-empty-list.out b/tests/qapi-schema/=
-bad-if-empty-list.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/bad-if-empty.err b/tests/qapi-schema/bad-i=
-f-empty.err
-new file mode 100644
-index 0000000000..358bdc3e51
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-empty.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/bad-if-empty.json:2: 'if' condition '' makes no sense
-diff --git a/tests/qapi-schema/bad-if-empty.exit b/tests/qapi-schema/bad-=
-if-empty.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-empty.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/bad-if-empty.json b/tests/qapi-schema/bad-=
-if-empty.json
-new file mode 100644
-index 0000000000..fe1dd4eca6
---- /dev/null
-+++ b/tests/qapi-schema/bad-if-empty.json
-@@ -0,0 +1,3 @@
-+# check empty 'if'
-+{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-+  'if': '' }
-diff --git a/tests/qapi-schema/bad-if-empty.out b/tests/qapi-schema/bad-i=
-f-empty.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/bad-if.err b/tests/qapi-schema/bad-if.err
-new file mode 100644
-index 0000000000..c2e3f5f44c
---- /dev/null
-+++ b/tests/qapi-schema/bad-if.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/bad-if.json:2: 'if' condition must be a string or a li=
-st of strings
-diff --git a/tests/qapi-schema/bad-if.exit b/tests/qapi-schema/bad-if.exi=
-t
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/bad-if.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/bad-if.json b/tests/qapi-schema/bad-if.jso=
-n
-new file mode 100644
-index 0000000000..3edd1a0bf2
---- /dev/null
-+++ b/tests/qapi-schema/bad-if.json
-@@ -0,0 +1,3 @@
-+# check invalid 'if' type
-+{ 'struct': 'TestIfStruct', 'data': { 'foo': 'int' },
-+  'if': { 'value': 'defined(TEST_IF_STRUCT)' } }
-diff --git a/tests/qapi-schema/bad-if.out b/tests/qapi-schema/bad-if.out
-new file mode 100644
-index 0000000000..e69de29bb2
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 0f55caa18d..f2b5a7e131 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -1039,26 +1039,26 @@ class QAPISchemaVisitor(object):
+     def visit_builtin_type(self, name, info, json_type):
+         pass
+=20
+-    def visit_enum_type(self, name, info, values, prefix):
++    def visit_enum_type(self, name, info, ifcond, values, prefix):
+         pass
+=20
+-    def visit_array_type(self, name, info, element_type):
++    def visit_array_type(self, name, info, ifcond, element_type):
+         pass
+=20
+-    def visit_object_type(self, name, info, base, members, variants):
++    def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+         pass
+=20
+-    def visit_object_type_flat(self, name, info, members, variants):
++    def visit_object_type_flat(self, name, info, ifcond, members, varian=
+ts):
+         pass
+=20
+-    def visit_alternate_type(self, name, info, variants):
++    def visit_alternate_type(self, name, info, ifcond, variants):
+         pass
+=20
+-    def visit_command(self, name, info, arg_type, ret_type,
++    def visit_command(self, name, info, ifcond, arg_type, ret_type,
+                       gen, success_response, boxed):
+         pass
+=20
+-    def visit_event(self, name, info, arg_type, boxed):
++    def visit_event(self, name, info, ifcond, arg_type, boxed):
+         pass
+=20
+=20
+@@ -1157,7 +1157,7 @@ class QAPISchemaEnumType(QAPISchemaType):
+         return 'string'
+=20
+     def visit(self, visitor):
+-        visitor.visit_enum_type(self.name, self.info,
++        visitor.visit_enum_type(self.name, self.info, self.ifcond,
+                                 self.member_names(), self.prefix)
+=20
+=20
+@@ -1189,7 +1189,8 @@ class QAPISchemaArrayType(QAPISchemaType):
+         return 'array of ' + elt_doc_type
+=20
+     def visit(self, visitor):
+-        visitor.visit_array_type(self.name, self.info, self.element_type=
+)
++        visitor.visit_array_type(self.name, self.info, self.ifcond,
++                                 self.element_type)
+=20
+=20
+ class QAPISchemaObjectType(QAPISchemaType):
+@@ -1270,9 +1271,9 @@ class QAPISchemaObjectType(QAPISchemaType):
+         return 'object'
+=20
+     def visit(self, visitor):
+-        visitor.visit_object_type(self.name, self.info,
++        visitor.visit_object_type(self.name, self.info, self.ifcond,
+                                   self.base, self.local_members, self.va=
+riants)
+-        visitor.visit_object_type_flat(self.name, self.info,
++        visitor.visit_object_type_flat(self.name, self.info, self.ifcond=
+,
+                                        self.members, self.variants)
+=20
+=20
+@@ -1416,7 +1417,8 @@ class QAPISchemaAlternateType(QAPISchemaType):
+         return 'value'
+=20
+     def visit(self, visitor):
+-        visitor.visit_alternate_type(self.name, self.info, self.variants=
+)
++        visitor.visit_alternate_type(self.name, self.info, self.ifcond,
++                                     self.variants)
+=20
+     def is_empty(self):
+         return False
+@@ -1456,7 +1458,7 @@ class QAPISchemaCommand(QAPISchemaEntity):
+             assert isinstance(self.ret_type, QAPISchemaType)
+=20
+     def visit(self, visitor):
+-        visitor.visit_command(self.name, self.info,
++        visitor.visit_command(self.name, self.info, self.ifcond,
+                               self.arg_type, self.ret_type,
+                               self.gen, self.success_response, self.boxe=
+d)
+=20
+@@ -1486,7 +1488,8 @@ class QAPISchemaEvent(QAPISchemaEntity):
+             raise QAPISemError(self.info, "Use of 'boxed' requires 'data=
+'")
+=20
+     def visit(self, visitor):
+-        visitor.visit_event(self.name, self.info, self.arg_type, self.bo=
+xed)
++        visitor.visit_event(self.name, self.info, self.ifcond,
++                            self.arg_type, self.boxed)
+=20
+=20
+ class QAPISchema(object):
+diff --git a/scripts/qapi-commands.py b/scripts/qapi-commands.py
+index 974d0a4a80..669aef1eb7 100644
+--- a/scripts/qapi-commands.py
++++ b/scripts/qapi-commands.py
+@@ -240,7 +240,7 @@ class QAPISchemaGenCommandVisitor(QAPISchemaVisitor):
+         self._regy =3D None
+         self._visited_ret_types =3D None
+=20
+-    def visit_command(self, name, info, arg_type, ret_type,
++    def visit_command(self, name, info, ifcond, arg_type, ret_type,
+                       gen, success_response, boxed):
+         if not gen:
+             return
+diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
+index 07b4b70199..dda496e824 100644
+--- a/scripts/qapi-event.py
++++ b/scripts/qapi-event.py
+@@ -163,7 +163,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
+         self.defn +=3D gen_enum_lookup(event_enum_name, self._event_name=
+s)
+         self._event_names =3D None
+=20
+-    def visit_event(self, name, info, arg_type, boxed):
++    def visit_event(self, name, info, ifcond, arg_type, boxed):
+         self.decl +=3D gen_event_send_decl(name, arg_type, boxed)
+         self.defn +=3D gen_event_send(name, arg_type, boxed)
+         self._event_names.append(name)
+diff --git a/scripts/qapi-introspect.py b/scripts/qapi-introspect.py
+index 0002bc1a68..56c1f9d548 100644
+--- a/scripts/qapi-introspect.py
++++ b/scripts/qapi-introspect.py
+@@ -142,26 +142,26 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+     def visit_builtin_type(self, name, info, json_type):
+         self._gen_qlit(name, 'builtin', {'json-type': json_type})
+=20
+-    def visit_enum_type(self, name, info, values, prefix):
++    def visit_enum_type(self, name, info, ifcond, values, prefix):
+         self._gen_qlit(name, 'enum', {'values': values})
+=20
+-    def visit_array_type(self, name, info, element_type):
++    def visit_array_type(self, name, info, ifcond, element_type):
+         element =3D self._use_type(element_type)
+         self._gen_qlit('[' + element + ']', 'array', {'element-type': el=
+ement})
+=20
+-    def visit_object_type_flat(self, name, info, members, variants):
++    def visit_object_type_flat(self, name, info, ifcond, members, varian=
+ts):
+         obj =3D {'members': [self._gen_member(m) for m in members]}
+         if variants:
+             obj.update(self._gen_variants(variants.tag_member.name,
+                                           variants.variants))
+         self._gen_qlit(name, 'object', obj)
+=20
+-    def visit_alternate_type(self, name, info, variants):
++    def visit_alternate_type(self, name, info, ifcond, variants):
+         self._gen_qlit(name, 'alternate',
+                        {'members': [{'type': self._use_type(m.type)}
+                                     for m in variants.variants]})
+=20
+-    def visit_command(self, name, info, arg_type, ret_type,
++    def visit_command(self, name, info, ifcond, arg_type, ret_type,
+                       gen, success_response, boxed):
+         arg_type =3D arg_type or self._schema.the_empty_object_type
+         ret_type =3D ret_type or self._schema.the_empty_object_type
+@@ -169,7 +169,7 @@ const QLitObject %(c_name)s =3D %(c_string)s;
+                        {'arg-type': self._use_type(arg_type),
+                         'ret-type': self._use_type(ret_type)})
+=20
+-    def visit_event(self, name, info, arg_type, boxed):
++    def visit_event(self, name, info, ifcond, arg_type, boxed):
+         arg_type =3D arg_type or self._schema.the_empty_object_type
+         self._gen_qlit(name, 'event', {'arg-type': self._use_type(arg_ty=
+pe)})
+=20
+diff --git a/scripts/qapi-types.py b/scripts/qapi-types.py
+index 7e3051dbb9..915786c463 100644
+--- a/scripts/qapi-types.py
++++ b/scripts/qapi-types.py
+@@ -195,7 +195,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+         self.decl +=3D gen_type_cleanup_decl(name)
+         self.defn +=3D gen_type_cleanup(name)
+=20
+-    def visit_enum_type(self, name, info, values, prefix):
++    def visit_enum_type(self, name, info, ifcond, values, prefix):
+         # Special case for our lone builtin enum type
+         # TODO use something cleaner than existence of info
+         if not info:
+@@ -206,7 +206,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+             self._fwdecl +=3D gen_enum(name, values, prefix)
+             self.defn +=3D gen_enum_lookup(name, values, prefix)
+=20
+-    def visit_array_type(self, name, info, element_type):
++    def visit_array_type(self, name, info, ifcond, element_type):
+         if isinstance(element_type, QAPISchemaBuiltinType):
+             self._btin +=3D gen_fwd_object_or_array(name)
+             self._btin +=3D gen_array(name, element_type)
+@@ -218,7 +218,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+             self.decl +=3D gen_array(name, element_type)
+             self._gen_type_cleanup(name)
+=20
+-    def visit_object_type(self, name, info, base, members, variants):
++    def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+         # Nothing to do for the special empty builtin
+         if name =3D=3D 'q_empty':
+             return
+@@ -232,7 +232,7 @@ class QAPISchemaGenTypeVisitor(QAPISchemaVisitor):
+             # implicit types won't be directly allocated/freed
+             self._gen_type_cleanup(name)
+=20
+-    def visit_alternate_type(self, name, info, variants):
++    def visit_alternate_type(self, name, info, ifcond, variants):
+         self._fwdecl +=3D gen_fwd_object_or_array(name)
+         self.decl +=3D gen_object(name, None, [variants.tag_member], var=
+iants)
+         self._gen_type_cleanup(name)
+diff --git a/scripts/qapi-visit.py b/scripts/qapi-visit.py
+index 7e1cfc13f0..aceea2a9f9 100644
+--- a/scripts/qapi-visit.py
++++ b/scripts/qapi-visit.py
+@@ -282,7 +282,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
+         self.decl =3D self._btin + self.decl
+         self._btin =3D None
+=20
+-    def visit_enum_type(self, name, info, values, prefix):
++    def visit_enum_type(self, name, info, ifcond, values, prefix):
+         # Special case for our lone builtin enum type
+         # TODO use something cleaner than existence of info
+         if not info:
+@@ -293,7 +293,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
+             self.decl +=3D gen_visit_decl(name, scalar=3DTrue)
+             self.defn +=3D gen_visit_enum(name)
+=20
+-    def visit_array_type(self, name, info, element_type):
++    def visit_array_type(self, name, info, ifcond, element_type):
+         decl =3D gen_visit_decl(name)
+         defn =3D gen_visit_list(name, element_type)
+         if isinstance(element_type, QAPISchemaBuiltinType):
+@@ -304,7 +304,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
+             self.decl +=3D decl
+             self.defn +=3D defn
+=20
+-    def visit_object_type(self, name, info, base, members, variants):
++    def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+         # Nothing to do for the special empty builtin
+         if name =3D=3D 'q_empty':
+             return
+@@ -317,7 +317,7 @@ class QAPISchemaGenVisitVisitor(QAPISchemaVisitor):
+             self.decl +=3D gen_visit_decl(name)
+             self.defn +=3D gen_visit_object(name, base, members, variant=
+s)
+=20
+-    def visit_alternate_type(self, name, info, variants):
++    def visit_alternate_type(self, name, info, ifcond, variants):
+         self.decl +=3D gen_visit_decl(name)
+         self.defn +=3D gen_visit_alternate(name, variants)
+=20
+diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+index 73cfb01727..cf63cb0006 100755
+--- a/scripts/qapi2texi.py
++++ b/scripts/qapi2texi.py
+@@ -207,7 +207,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor)=
+:
+     def visit_begin(self, schema):
+         self.out =3D ''
+=20
+-    def visit_enum_type(self, name, info, values, prefix):
++    def visit_enum_type(self, name, info, ifcond, values, prefix):
+         doc =3D self.cur_doc
+         if self.out:
+             self.out +=3D '\n'
+@@ -216,7 +216,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor)=
+:
+                              body=3Dtexi_entity(doc, 'Values',
+                                               member_func=3Dtexi_enum_va=
+lue))
+=20
+-    def visit_object_type(self, name, info, base, members, variants):
++    def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+         doc =3D self.cur_doc
+         if base and base.is_implicit():
+             base =3D None
+@@ -226,7 +226,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor)=
+:
+                              name=3Ddoc.symbol,
+                              body=3Dtexi_entity(doc, 'Members', base, va=
+riants))
+=20
+-    def visit_alternate_type(self, name, info, variants):
++    def visit_alternate_type(self, name, info, ifcond, variants):
+         doc =3D self.cur_doc
+         if self.out:
+             self.out +=3D '\n'
+@@ -234,7 +234,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor)=
+:
+                              name=3Ddoc.symbol,
+                              body=3Dtexi_entity(doc, 'Members'))
+=20
+-    def visit_command(self, name, info, arg_type, ret_type,
++    def visit_command(self, name, info, ifcond, arg_type, ret_type,
+                       gen, success_response, boxed):
+         doc =3D self.cur_doc
+         if self.out:
+@@ -249,7 +249,7 @@ class QAPISchemaGenDocVisitor(qapi.QAPISchemaVisitor)=
+:
+                             name=3Ddoc.symbol,
+                             body=3Dbody)
+=20
+-    def visit_event(self, name, info, arg_type, boxed):
++    def visit_event(self, name, info, ifcond, arg_type, boxed):
+         doc =3D self.cur_doc
+         if self.out:
+             self.out +=3D '\n'
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/q=
+api-schema-test.out
+index 7fbaea19bc..fc5fd25f1b 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -56,18 +56,25 @@ alternate TestIfAlternate
+     tag type
+     case foo: int
+     case bar: TestStruct
++    if defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)
+ command TestIfCmd q_obj_TestIfCmd-arg -> None
+    gen=3DTrue success_response=3DTrue boxed=3DFalse
++    if defined(TEST_IF_CMD) && defined(TEST_IF_STRUCT)
+ enum TestIfEnum ['foo', 'bar']
++    if defined(TEST_IF_ENUM)
+ event TestIfEvent q_obj_TestIfEvent-arg
+    boxed=3DFalse
++    if defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)
+ object TestIfStruct
+     member foo: int optional=3DFalse
++    if defined(TEST_IF_STRUCT)
+ object TestIfUnion
+     member type: TestIfUnionKind optional=3DFalse
+     tag type
+     case foo: q_obj_TestStruct-wrapper
++    if defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)
+ enum TestIfUnionKind ['foo']
++    if defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)
+ object TestStruct
+     member integer: int optional=3DFalse
+     member boolean: bool optional=3DFalse
+@@ -190,8 +197,10 @@ object q_obj_EVENT_D-arg
+     member enum3: EnumOne optional=3DTrue
+ object q_obj_TestIfCmd-arg
+     member foo: TestIfStruct optional=3DFalse
++    if defined(TEST_IF_CMD) && defined(TEST_IF_STRUCT)
+ object q_obj_TestIfEvent-arg
+     member foo: TestIfStruct optional=3DFalse
++    if defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)
+ object q_obj_TestStruct-wrapper
+     member data: TestStruct optional=3DFalse
+ object q_obj_UserDefFlatUnion2-base
+diff --git a/tests/qapi-schema/test-qapi.py b/tests/qapi-schema/test-qapi=
+.py
+index c7724d3437..8627f978af 100644
+--- a/tests/qapi-schema/test-qapi.py
++++ b/tests/qapi-schema/test-qapi.py
+@@ -17,12 +17,13 @@ import sys
+=20
+=20
+ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+-    def visit_enum_type(self, name, info, values, prefix):
++    def visit_enum_type(self, name, info, ifcond, values, prefix):
+         print 'enum %s %s' % (name, values)
+         if prefix:
+             print '    prefix %s' % prefix
++        self._print_if(ifcond)
+=20
+-    def visit_object_type(self, name, info, base, members, variants):
++    def visit_object_type(self, name, info, ifcond, base, members, varia=
+nts):
+         print 'object %s' % name
+         if base:
+             print '    base %s' % base.name
+@@ -30,21 +31,25 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+             print '    member %s: %s optional=3D%s' % \
+                 (m.name, m.type.name, m.optional)
+         self._print_variants(variants)
++        self._print_if(ifcond)
+=20
+-    def visit_alternate_type(self, name, info, variants):
++    def visit_alternate_type(self, name, info, ifcond, variants):
+         print 'alternate %s' % name
+         self._print_variants(variants)
++        self._print_if(ifcond)
+=20
+-    def visit_command(self, name, info, arg_type, ret_type,
++    def visit_command(self, name, info, ifcond, arg_type, ret_type,
+                       gen, success_response, boxed):
+         print 'command %s %s -> %s' % \
+             (name, arg_type and arg_type.name, ret_type and ret_type.nam=
+e)
+         print '   gen=3D%s success_response=3D%s boxed=3D%s' % \
+             (gen, success_response, boxed)
++        self._print_if(ifcond)
+=20
+-    def visit_event(self, name, info, arg_type, boxed):
++    def visit_event(self, name, info, ifcond, arg_type, boxed):
+         print 'event %s %s' % (name, arg_type and arg_type.name)
+         print '   boxed=3D%s' % boxed
++        self._print_if(ifcond)
+=20
+     @staticmethod
+     def _print_variants(variants):
+@@ -53,6 +58,12 @@ class QAPISchemaTestVisitor(QAPISchemaVisitor):
+             for v in variants.variants:
+                 print '    case %s: %s' % (v.name, v.type.name)
+=20
++    @staticmethod
++    def _print_if(ifcond):
++        if ifcond:
++            print '    if %s' % ifcond
++
++
+ schema =3D QAPISchema(sys.argv[1])
+ schema.visit(QAPISchemaTestVisitor())
+=20
 --=20
 2.14.1.146.gd35faa819
