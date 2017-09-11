@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38597)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38644)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSOW-0007Ue-Nr
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:16 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSOa-0007YK-BQ
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSOS-0001Fv-6u
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSOX-0001I1-Tt
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44512)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1drSOX-0001Ho-Ko
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:13 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BFAF536D05D
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 17:21:12 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 11 Sep 2017 12:20:00 -0500
-Message-Id: <20170911172022.4738-17-eblake@redhat.com>
+Date: Mon, 11 Sep 2017 12:20:05 -0500
+Message-Id: <20170911172022.4738-22-eblake@redhat.com>
 In-Reply-To: <20170911172022.4738-1-eblake@redhat.com>
 References: <20170911172022.4738-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 16/38] libqos: Use explicit QTestState for
- ahci operations
+Subject: [Qemu-devel] [PATCH v7 21/38] vhost-user-test: Drop dependence on
+ global_qtest
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,193 +31,253 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, John Snow <jsnow@redhat.com>, "open list:IDE" <qemu-block@nongnu.org>
+Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com
 
-Drop one more client of global_qtest by teaching all ahci test
-functionality to pass in an explicit QTestState.  The state was
-already available, so no callers had to be adjusted.
+Managing parallel connections to two different monitors via
+the implicit global_qtest makes it hard to copy-and-paste code
+to tests that are not aware of the implicit state.  Now that
+libqos is fully-explicit, it is easy to expand the rest of
+vhost-user-test to also use explicit state everywhere.
+
+We can assert that the conversion is correct by checking that
+global_qtest remains NULL throughout the test (a later patch
+that changes global_qtest to not be a public global variable
+will drop the assertions).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 ---
-v7: split libqos changes from test-ahci
----
- tests/libqos/ahci.c | 45 +++++++++++++++++++++++----------------------
- 1 file changed, 23 insertions(+), 22 deletions(-)
+ tests/vhost-user-test.c | 68 ++++++++++++++++++++++---------------------------
+ 1 file changed, 30 insertions(+), 38 deletions(-)
 
-diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
-index 790ef991b3..ba79cd77a0 100644
---- a/tests/libqos/ahci.c
-+++ b/tests/libqos/ahci.c
-@@ -283,7 +283,8 @@ void ahci_hba_enable(AHCIQState *ahci)
-         /* Allocate Memory for the Command List Buffer & FIS Buffer */
-         /* PxCLB space ... 0x20 per command, as in 4.2.2 p 36 */
-         ahci->port[i].clb = ahci_alloc(ahci, num_cmd_slots * 0x20);
--        qmemset(ahci->port[i].clb, 0x00, num_cmd_slots * 0x20);
-+        qtest_memset(ahci->parent->qts, ahci->port[i].clb, 0x00,
-+                     num_cmd_slots * 0x20);
-         g_test_message("CLB: 0x%08" PRIx64, ahci->port[i].clb);
-         ahci_px_wreg(ahci, i, AHCI_PX_CLB, ahci->port[i].clb);
-         g_assert_cmphex(ahci->port[i].clb, ==,
-@@ -291,7 +292,7 @@ void ahci_hba_enable(AHCIQState *ahci)
+diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
+index b041d2c6a2..d5afc5f9f6 100644
+--- a/tests/vhost-user-test.c
++++ b/tests/vhost-user-test.c
+@@ -141,6 +141,7 @@ enum {
+ };
 
-         /* PxFB space ... 0x100, as in 4.2.1 p 35 */
-         ahci->port[i].fb = ahci_alloc(ahci, 0x100);
--        qmemset(ahci->port[i].fb, 0x00, 0x100);
-+        qtest_memset(ahci->parent->qts, ahci->port[i].fb, 0x00, 0x100);
-         g_test_message("FB: 0x%08" PRIx64, ahci->port[i].fb);
-         ahci_px_wreg(ahci, i, AHCI_PX_FB, ahci->port[i].fb);
-         g_assert_cmphex(ahci->port[i].fb, ==,
-@@ -397,7 +398,7 @@ void ahci_port_clear(AHCIQState *ahci, uint8_t port)
-     g_assert_cmphex(ahci_px_rreg(ahci, port, AHCI_PX_IS), ==, 0);
+ typedef struct TestServer {
++    QTestState *qts;
+     QPCIBus *bus;
+     gchar *socket_path;
+     gchar *mig_path;
+@@ -166,7 +167,7 @@ static void init_virtio_dev(TestServer *s)
+     QVirtioPCIDevice *dev;
+     uint32_t features;
 
-     /* Wipe the FIS-Receive Buffer */
--    qmemset(ahci->port[port].fb, 0x00, 0x100);
-+    qtest_memset(ahci->parent->qts, ahci->port[port].fb, 0x00, 0x100);
- }
+-    s->bus = qpci_init_pc(global_qtest, NULL);
++    s->bus = qpci_init_pc(s->qts, NULL);
+     g_assert_nonnull(s->bus);
 
- /**
-@@ -466,7 +467,7 @@ void ahci_port_check_d2h_sanity(AHCIQState *ahci, uint8_t port, uint8_t slot)
-     RegD2HFIS *d2h = g_malloc0(0x20);
-     uint32_t reg;
+     dev = qvirtio_pci_device_find(s->bus, VIRTIO_ID_NET);
+@@ -238,8 +239,11 @@ static void read_guest_mem(const void *data)
+         guest_mem += (s->memory.regions[i].mmap_offset / sizeof(*guest_mem));
 
--    memread(ahci->port[port].fb + 0x40, d2h, 0x20);
-+    qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x40, d2h, 0x20);
-     g_assert_cmphex(d2h->fis_type, ==, 0x34);
+         for (j = 0; j < 256; j++) {
+-            uint32_t a = readl(s->memory.regions[i].guest_phys_addr + j*4);
+-            uint32_t b = guest_mem[j];
++            uint32_t a, b;
++
++            a = qtest_readl(s->qts,
++                            s->memory.regions[i].guest_phys_addr + j * 4);
++            b = guest_mem[j];
 
-     reg = ahci_px_rreg(ahci, port, AHCI_PX_TFD);
-@@ -484,7 +485,7 @@ void ahci_port_check_pio_sanity(AHCIQState *ahci, uint8_t port,
-     /* We cannot check the Status or E_Status registers, because
-      * the status may have again changed between the PIO Setup FIS
-      * and the conclusion of the command with the D2H Register FIS. */
--    memread(ahci->port[port].fb + 0x20, pio, 0x20);
-+    qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x20, pio, 0x20);
-     g_assert_cmphex(pio->fis_type, ==, 0x5f);
+             g_assert_cmpint(a, ==, b);
+         }
+@@ -512,6 +516,12 @@ static gboolean _test_server_free(TestServer *server)
 
-     /* BUG: PIO Setup FIS as utilized by QEMU tries to fit the entire
-@@ -516,7 +517,7 @@ void ahci_get_command_header(AHCIQState *ahci, uint8_t port,
+ static void test_server_free(TestServer *server)
  {
-     uint64_t ba = ahci->port[port].clb;
-     ba += slot * sizeof(AHCICommandHeader);
--    memread(ba, cmd, sizeof(AHCICommandHeader));
-+    qtest_memread(ahci->parent->qts, ba, cmd, sizeof(AHCICommandHeader));
-
-     cmd->flags = le16_to_cpu(cmd->flags);
-     cmd->prdtl = le16_to_cpu(cmd->prdtl);
-@@ -537,7 +538,7 @@ void ahci_set_command_header(AHCIQState *ahci, uint8_t port,
-     tmp.prdbc = cpu_to_le32(cmd->prdbc);
-     tmp.ctba = cpu_to_le64(cmd->ctba);
-
--    memwrite(ba, &tmp, sizeof(AHCICommandHeader));
-+    qtest_memwrite(ahci->parent->qts, ba, &tmp, sizeof(AHCICommandHeader));
++    assert(!global_qtest);
++    if (server->qts) {
++        qtest_quit(server->qts);
++        server->qts = NULL;
++    }
++
+     g_idle_add((GSourceFunc)_test_server_free, server);
  }
 
- void ahci_destroy_command(AHCIQState *ahci, uint8_t port, uint8_t slot)
-@@ -575,7 +576,7 @@ void ahci_write_fis(AHCIQState *ahci, AHCICommand *cmd)
-         tmp.count = cpu_to_le16(tmp.count);
-     }
+@@ -623,7 +633,6 @@ static void test_migrate(void)
+     TestServer *s = test_server_new("src");
+     TestServer *dest = test_server_new("dest");
+     char *uri = g_strdup_printf("%s%s", "unix:", dest->mig_path);
+-    QTestState *global = global_qtest, *from, *to;
+     GSource *source;
+     gchar *cmd;
+     QDict *rsp;
+@@ -634,7 +643,7 @@ static void test_migrate(void)
+     test_server_listen(dest);
 
--    memwrite(addr, &tmp, sizeof(tmp));
-+    qtest_memwrite(ahci->parent->qts, addr, &tmp, sizeof(tmp));
- }
+     cmd = GET_QEMU_CMDE(s, 2, "", "");
+-    from = qtest_start(cmd);
++    s->qts = qtest_init(cmd);
+     g_free(cmd);
 
- unsigned ahci_pick_cmd(AHCIQState *ahci, uint8_t port)
-@@ -636,7 +637,7 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
-     if (opts->size && !opts->buffer) {
-         opts->buffer = ahci_alloc(ahci, opts->size);
-         g_assert(opts->buffer);
--        qmemset(opts->buffer, 0x00, opts->size);
-+        qtest_memset(ahci->parent->qts, opts->buffer, 0x00, opts->size);
-     }
+     init_virtio_dev(s);
+@@ -643,7 +652,7 @@ static void test_migrate(void)
+     g_assert_cmpint(size, ==, (2 * 1024 * 1024) / (VHOST_LOG_PAGE * 8));
 
-     /* Command creation */
-@@ -661,15 +662,15 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
-     ahci_command_commit(ahci, cmd, port);
-     ahci_command_issue_async(ahci, cmd);
-     if (opts->error) {
--        qmp_eventwait("STOP");
-+        qtest_qmp_eventwait(ahci->parent->qts, "STOP");
-     }
-     if (opts->mid_cb) {
-         rc = opts->mid_cb(ahci, cmd, opts);
-         g_assert_cmpint(rc, ==, 0);
-     }
-     if (opts->error) {
--        qmp_async("{'execute':'cont' }");
--        qmp_eventwait("RESUME");
-+        qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
-+        qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
-     }
+     cmd = GET_QEMU_CMDE(dest, 2, "", " -incoming %s", uri);
+-    to = qtest_init(cmd);
++    dest->qts = qtest_init(cmd);
+     g_free(cmd);
 
-     /* Wait for command to complete and verify sanity */
-@@ -697,7 +698,7 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uint8_t port,
-     ahci_command_adjust(cmd, sector, buffer, bufsize, 0);
-     ahci_command_commit(ahci, cmd, port);
-     ahci_command_issue_async(ahci, cmd);
+     source = g_source_new(&test_migrate_source_funcs,
+@@ -654,16 +663,13 @@ static void test_migrate(void)
+
+     /* slow down migration to have time to fiddle with log */
+     /* TODO: qtest could learn to break on some places */
+-    rsp = qmp("{ 'execute': 'migrate_set_speed',"
+-              "'arguments': { 'value': 10 } }");
++    rsp = qtest_qmp(s->qts, "{ 'execute': 'migrate_set_speed',"
++                    "'arguments': { 'value': 10 } }");
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+
+-    cmd = g_strdup_printf("{ 'execute': 'migrate',"
+-                          "'arguments': { 'uri': '%s' } }",
+-                          uri);
+-    rsp = qmp(cmd);
+-    g_free(cmd);
++    rsp = qtest_qmp(s->qts,
++                    "{'execute': 'migrate', 'arguments': { 'uri': %s}}", uri);
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+
+@@ -678,28 +684,23 @@ static void test_migrate(void)
+     munmap(log, size);
+
+     /* speed things up */
+-    rsp = qmp("{ 'execute': 'migrate_set_speed',"
+-              "'arguments': { 'value': 0 } }");
++    rsp = qtest_qmp(s->qts, "{ 'execute': 'migrate_set_speed',"
++                    "'arguments': { 'value': 0 } }");
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+
 -    qmp_eventwait("STOP");
-+    qtest_qmp_eventwait(ahci->parent->qts, "STOP");
++    qtest_qmp_eventwait(s->qts, "STOP");
 
-     return cmd;
- }
-@@ -706,8 +707,8 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uint8_t port,
- void ahci_guest_io_resume(AHCIQState *ahci, AHCICommand *cmd)
- {
-     /* Complete the command */
--    qmp_async("{'execute':'cont' }");
+-    global_qtest = to;
 -    qmp_eventwait("RESUME");
-+    qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
-+    qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
-     ahci_command_wait(ahci, cmd);
-     ahci_command_verify(ahci, cmd);
-     ahci_command_free(cmd);
-@@ -754,16 +755,16 @@ void ahci_io(AHCIQState *ahci, uint8_t port, uint8_t ide_cmd,
-     g_assert(props);
-     ptr = ahci_alloc(ahci, bufsize);
-     g_assert(!bufsize || ptr);
--    qmemset(ptr, 0x00, bufsize);
-+    qtest_memset(ahci->parent->qts, ptr, 0x00, bufsize);
++    qtest_qmp_eventwait(dest->qts, "RESUME");
 
-     if (bufsize && props->write) {
--        bufwrite(ptr, buffer, bufsize);
-+        qtest_bufwrite(ahci->parent->qts, ptr, buffer, bufsize);
-     }
+     read_guest_mem(dest);
 
-     ahci_guest_io(ahci, port, ide_cmd, ptr, bufsize, sector);
+     g_source_destroy(source);
+     g_source_unref(source);
 
-     if (bufsize && props->read) {
--        bufread(ptr, buffer, bufsize);
-+        qtest_bufread(ahci->parent->qts, ptr, buffer, bufsize);
-     }
-
-     ahci_free(ahci, ptr);
-@@ -901,7 +902,7 @@ static int copy_buffer(AHCIQState *ahci, AHCICommand *cmd,
-                         const AHCIOpts *opts)
- {
-     unsigned char *rx = opts->opaque;
--    bufread(opts->buffer, rx, opts->size);
-+    qtest_bufread(ahci->parent->qts, opts->buffer, rx, opts->size);
-     return 0;
+-    qtest_quit(to);
+     test_server_free(dest);
+-    qtest_quit(from);
+     test_server_free(s);
+     g_free(uri);
+-
+-    global_qtest = global;
  }
 
-@@ -1141,7 +1142,7 @@ void ahci_command_commit(AHCIQState *ahci, AHCICommand *cmd, uint8_t port)
-     ahci_write_fis(ahci, cmd);
-     /* Then ATAPI CMD, if needed */
-     if (cmd->props->atapi) {
--        memwrite(table_ptr + 0x40, cmd->atapi_cmd, 16);
-+        qtest_memwrite(ahci->parent->qts, table_ptr + 0x40, cmd->atapi_cmd, 16);
+ static void wait_for_rings_started(TestServer *s, size_t count)
+@@ -754,7 +755,7 @@ static void test_reconnect_subprocess(void)
+
+     g_thread_new("connect", connect_thread, s);
+     cmd = GET_QEMU_CMDE(s, 2, ",server", "");
+-    qtest_start(cmd);
++    s->qts = qtest_init(cmd);
+     g_free(cmd);
+
+     init_virtio_dev(s);
+@@ -768,7 +769,6 @@ static void test_reconnect_subprocess(void)
+     wait_for_fds(s);
+     wait_for_rings_started(s, 2);
+
+-    qtest_end();
+     test_server_free(s);
+     return;
+ }
+@@ -790,14 +790,13 @@ static void test_connect_fail_subprocess(void)
+     s->test_fail = true;
+     g_thread_new("connect", connect_thread, s);
+     cmd = GET_QEMU_CMDE(s, 2, ",server", "");
+-    qtest_start(cmd);
++    s->qts = qtest_init(cmd);
+     g_free(cmd);
+
+     init_virtio_dev(s);
+     wait_for_fds(s);
+     wait_for_rings_started(s, 2);
+
+-    qtest_end();
+     test_server_free(s);
+ }
+
+@@ -818,14 +817,13 @@ static void test_flags_mismatch_subprocess(void)
+     s->test_flags = TEST_FLAGS_DISCONNECT;
+     g_thread_new("connect", connect_thread, s);
+     cmd = GET_QEMU_CMDE(s, 2, ",server", "");
+-    qtest_start(cmd);
++    s->qts = qtest_init(cmd);
+     g_free(cmd);
+
+     init_virtio_dev(s);
+     wait_for_fds(s);
+     wait_for_rings_started(s, 2);
+
+-    qtest_end();
+     test_server_free(s);
+ }
+
+@@ -890,13 +888,13 @@ static void test_multiqueue(void)
+                           512, 512, root, s->chr_name,
+                           s->socket_path, "", s->chr_name,
+                           queues, queues * 2 + 2);
+-    qtest_start(cmd);
++    s->qts = qtest_init(cmd);
+     g_free(cmd);
+
+-    bus = qpci_init_pc(global_qtest, NULL);
++    bus = qpci_init_pc(s->qts, NULL);
+     dev = virtio_net_pci_init(bus, PCI_SLOT);
+
+-    alloc = pc_alloc_init(global_qtest);
++    alloc = pc_alloc_init(s->qts);
+     for (i = 0; i < queues * 2; i++) {
+         vq[i] = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, alloc, i);
      }
+@@ -913,14 +911,12 @@ static void test_multiqueue(void)
+     g_free(dev->pdev);
+     g_free(dev);
+     qpci_free_pc(bus);
+-    qtest_end();
 
-     /* Construct and write the PRDs to the command table */
-@@ -1162,8 +1163,8 @@ void ahci_command_commit(AHCIQState *ahci, AHCICommand *cmd, uint8_t port)
-         prd.dbc |= cpu_to_le32(0x80000000); /* Request DPS Interrupt */
+     test_server_free(s);
+ }
 
-         /* Commit the PRD entry to the Command Table */
--        memwrite(table_ptr + 0x80 + (i * sizeof(PRD)),
--                 &prd, sizeof(PRD));
-+        qtest_memwrite(ahci->parent->qts, table_ptr + 0x80 + (i * sizeof(PRD)),
-+                       &prd, sizeof(PRD));
-     }
+ int main(int argc, char **argv)
+ {
+-    QTestState *s = NULL;
+     TestServer *server = NULL;
+     const char *hugefs;
+     char *qemu_cmd = NULL;
+@@ -957,7 +953,7 @@ int main(int argc, char **argv)
 
-     /* Bookmark the PRDTL and CTBA values */
+     qemu_cmd = GET_QEMU_CMD(server);
+
+-    s = qtest_start(qemu_cmd);
++    server->qts = qtest_init(qemu_cmd);
+     g_free(qemu_cmd);
+     init_virtio_dev(server);
+
+@@ -979,10 +975,6 @@ int main(int argc, char **argv)
+
+     ret = g_test_run();
+
+-    if (s) {
+-        qtest_quit(s);
+-    }
+-
+     /* cleanup */
+     test_server_free(server);
+
 -- 
 2.13.5
