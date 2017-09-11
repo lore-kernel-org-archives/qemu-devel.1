@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56193)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1drGY5-0000rv-1D
+	(envelope-from <haozhong.zhang@intel.com>) id 1drGY5-0000rx-1b
 	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 00:42:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1drGY1-0004VO-82
+	(envelope-from <haozhong.zhang@intel.com>) id 1drGY2-0004W3-FJ
 	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 00:42:17 -0400
 Received: from mga04.intel.com ([192.55.52.120]:23374)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1drGY0-0004UV-Sk
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 00:42:13 -0400
+	id 1drGY2-0004UV-2W
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 00:42:14 -0400
 From: Haozhong Zhang <haozhong.zhang@intel.com>
-Date: Mon, 11 Sep 2017 12:41:49 +0800
-Message-Id: <20170911044157.15403-3-haozhong.zhang@intel.com>
+Date: Mon, 11 Sep 2017 12:41:50 +0800
+Message-Id: <20170911044157.15403-4-haozhong.zhang@intel.com>
 In-Reply-To: <20170911044157.15403-1-haozhong.zhang@intel.com>
 References: <20170911044157.15403-1-haozhong.zhang@intel.com>
-Subject: [Qemu-devel] [RFC QEMU PATCH v3 02/10] hw/xen-hvm: create the
- hotplug memory region on Xen
+Subject: [Qemu-devel] [RFC QEMU PATCH v3 03/10] hostmem-xen: add a host
+ memory backend for Xen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,156 +26,210 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org, xen-devel@lists.xen.org
-Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Haozhong Zhang <haozhong.zhang@intel.com>, Eduardo Habkost <ehabkost@redhat.com>, Igor Mammedov <imammedo@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 
-The guest physical address of vNVDIMM is allocated from the hotplug
-memory region, which is not created when QEMU is used as Xen device
-model. In order to use vNVDIMM for Xen HVM domains, this commit reuses
-the code for pc machine type to create the hotplug memory region for
-Xen HVM domains.
+vNVDIMM requires a host memory backend to allocate its backend
+resources to the guest. When QEMU is used as Xen device model, the
+backend resource allocation of vNVDIMM is managed out of QEMU. A new
+host memory backend 'memory-backend-xen' is introduced to represent
+the backend resource allocated by Xen. It simply creates a memory
+region of the specified size as a placeholder in the guest address
+space, which will be mapped by Xen to the actual backend resource.
+
+Following example QEMU options create a vNVDIMM device backed by a 4GB
+host PMEM region at host physical address 0x100000000:
+   -object memory-backend-xen,id=mem1,host-addr=0x100000000,size=4G
+   -device nvdimm,id=nvdimm1,memdev=mem1
 
 Signed-off-by: Haozhong Zhang <haozhong.zhang@intel.com>
 ---
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-CC: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Anthony Perard <anthony.perard@citrix.com>
 ---
- hw/i386/pc.c          | 86 ++++++++++++++++++++++++++++-----------------------
- hw/i386/xen/xen-hvm.c |  2 ++
- include/hw/i386/pc.h  |  1 +
- 3 files changed, 51 insertions(+), 38 deletions(-)
+ backends/Makefile.objs |   1 +
+ backends/hostmem-xen.c | 108 +++++++++++++++++++++++++++++++++++++++++++++++++
+ backends/hostmem.c     |   9 +++++
+ hw/mem/pc-dimm.c       |   6 ++-
+ 4 files changed, 123 insertions(+), 1 deletion(-)
+ create mode 100644 backends/hostmem-xen.c
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 21081041d5..5cbdce61a7 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1347,6 +1347,53 @@ void xen_load_linux(PCMachineState *pcms)
-     pcms->fw_cfg = fw_cfg;
- }
+diff --git a/backends/Makefile.objs b/backends/Makefile.objs
+index 0400799efd..3096fde21f 100644
+--- a/backends/Makefile.objs
++++ b/backends/Makefile.objs
+@@ -5,6 +5,7 @@ common-obj-$(CONFIG_TPM) += tpm.o
  
-+void pc_memory_hotplug_init(PCMachineState *pcms, MemoryRegion *system_memory)
+ common-obj-y += hostmem.o hostmem-ram.o
+ common-obj-$(CONFIG_LINUX) += hostmem-file.o
++common-obj-${CONFIG_XEN_BACKEND} += hostmem-xen.o
+ 
+ common-obj-y += cryptodev.o
+ common-obj-y += cryptodev-builtin.o
+diff --git a/backends/hostmem-xen.c b/backends/hostmem-xen.c
+new file mode 100644
+index 0000000000..99211efd81
+--- /dev/null
++++ b/backends/hostmem-xen.c
+@@ -0,0 +1,108 @@
++/*
++ * QEMU Host Memory Backend for Xen
++ *
++ * Copyright(C) 2017 Intel Corporation.
++ *
++ * Author:
++ *   Haozhong Zhang <haozhong.zhang@intel.com>
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>
++ */
++
++#include "qemu/osdep.h"
++#include "sysemu/hostmem.h"
++#include "qapi/error.h"
++#include "qom/object_interfaces.h"
++
++#define TYPE_MEMORY_BACKEND_XEN "memory-backend-xen"
++
++#define MEMORY_BACKEND_XEN(obj) \
++    OBJECT_CHECK(HostMemoryBackendXen, (obj), TYPE_MEMORY_BACKEND_XEN)
++
++typedef struct HostMemoryBackendXen HostMemoryBackendXen;
++
++struct HostMemoryBackendXen {
++    HostMemoryBackend parent_obj;
++
++    uint64_t host_addr;
++};
++
++static void xen_backend_get_host_addr(Object *obj, Visitor *v, const char *name,
++                                      void *opaque, Error **errp)
 +{
-+    MachineState *machine = MACHINE(pcms);
-+    PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-+    ram_addr_t hotplug_mem_size = machine->maxram_size - machine->ram_size;
++    HostMemoryBackendXen *backend = MEMORY_BACKEND_XEN(obj);
++    uint64_t value = backend->host_addr;
 +
-+    if (!pcmc->has_reserved_memory || machine->ram_size >= machine->maxram_size)
-+        return;
-+
-+    if (memory_region_size(&pcms->hotplug_memory.mr)) {
-+        error_report("hotplug memory region has been initialized");
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (machine->ram_slots > ACPI_MAX_RAM_SLOTS) {
-+        error_report("unsupported amount of memory slots: %"PRIu64,
-+                     machine->ram_slots);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    if (QEMU_ALIGN_UP(machine->maxram_size,
-+                      TARGET_PAGE_SIZE) != machine->maxram_size) {
-+        error_report("maximum memory size must by aligned to multiple of "
-+                     "%d bytes", TARGET_PAGE_SIZE);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    pcms->hotplug_memory.base =
-+        ROUND_UP(0x100000000ULL + pcms->above_4g_mem_size, 1ULL << 30);
-+
-+    if (pcmc->enforce_aligned_dimm) {
-+        /* size hotplug region assuming 1G page max alignment per slot */
-+        hotplug_mem_size += (1ULL << 30) * machine->ram_slots;
-+    }
-+
-+    if ((pcms->hotplug_memory.base + hotplug_mem_size) < hotplug_mem_size) {
-+        error_report("unsupported amount of maximum memory: " RAM_ADDR_FMT,
-+                     machine->maxram_size);
-+        exit(EXIT_FAILURE);
-+    }
-+
-+    memory_region_init(&pcms->hotplug_memory.mr, OBJECT(pcms),
-+                       "hotplug-memory", hotplug_mem_size);
-+    memory_region_add_subregion(system_memory, pcms->hotplug_memory.base,
-+                                &pcms->hotplug_memory.mr);
++    visit_type_size(v, name, &value, errp);
 +}
 +
- void pc_memory_init(PCMachineState *pcms,
-                     MemoryRegion *system_memory,
-                     MemoryRegion *rom_memory,
-@@ -1398,44 +1445,7 @@ void pc_memory_init(PCMachineState *pcms,
-     }
- 
-     /* initialize hotplug memory address space */
--    if (pcmc->has_reserved_memory &&
--        (machine->ram_size < machine->maxram_size)) {
--        ram_addr_t hotplug_mem_size =
--            machine->maxram_size - machine->ram_size;
--
--        if (machine->ram_slots > ACPI_MAX_RAM_SLOTS) {
--            error_report("unsupported amount of memory slots: %"PRIu64,
--                         machine->ram_slots);
--            exit(EXIT_FAILURE);
--        }
--
--        if (QEMU_ALIGN_UP(machine->maxram_size,
--                          TARGET_PAGE_SIZE) != machine->maxram_size) {
--            error_report("maximum memory size must by aligned to multiple of "
--                         "%d bytes", TARGET_PAGE_SIZE);
--            exit(EXIT_FAILURE);
--        }
--
--        pcms->hotplug_memory.base =
--            ROUND_UP(0x100000000ULL + pcms->above_4g_mem_size, 1ULL << 30);
--
--        if (pcmc->enforce_aligned_dimm) {
--            /* size hotplug region assuming 1G page max alignment per slot */
--            hotplug_mem_size += (1ULL << 30) * machine->ram_slots;
--        }
--
--        if ((pcms->hotplug_memory.base + hotplug_mem_size) <
--            hotplug_mem_size) {
--            error_report("unsupported amount of maximum memory: " RAM_ADDR_FMT,
--                         machine->maxram_size);
--            exit(EXIT_FAILURE);
--        }
--
--        memory_region_init(&pcms->hotplug_memory.mr, OBJECT(pcms),
--                           "hotplug-memory", hotplug_mem_size);
--        memory_region_add_subregion(system_memory, pcms->hotplug_memory.base,
--                                    &pcms->hotplug_memory.mr);
--    }
-+    pc_memory_hotplug_init(pcms, system_memory);
- 
-     /* Initialize PC system firmware */
-     pc_system_firmware_init(rom_memory, !pcmc->pci_enabled);
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index d9ccd5d0d6..90163e1a1b 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -235,6 +235,8 @@ static void xen_ram_init(PCMachineState *pcms,
-                                  pcms->above_4g_mem_size);
-         memory_region_add_subregion(sysmem, 0x100000000ULL, &ram_hi);
-     }
++static void xen_backend_set_host_addr(Object *obj, Visitor *v, const char *name,
++                                      void *opaque, Error **errp)
++{
++    HostMemoryBackend *backend = MEMORY_BACKEND(obj);
++    HostMemoryBackendXen *xb = MEMORY_BACKEND_XEN(obj);
++    Error *local_err = NULL;
++    uint64_t value;
 +
-+    pc_memory_hotplug_init(pcms, sysmem);
- }
++    if (memory_region_size(&backend->mr)) {
++        error_setg(&local_err, "cannot change property value");
++        goto out;
++    }
++
++    visit_type_size(v, name, &value, &local_err);
++    if (local_err) {
++        goto out;
++    }
++    xb->host_addr = value;
++
++ out:
++    error_propagate(errp, local_err);
++}
++
++static void xen_backend_alloc(HostMemoryBackend *backend, Error **errp)
++{
++    if (!backend->size) {
++        error_setg(errp, "can't create backend with size 0");
++        return;
++    }
++    memory_region_init(&backend->mr, OBJECT(backend), "hostmem-xen",
++                       backend->size);
++    backend->mr.align = getpagesize();
++}
++
++static void xen_backend_class_init(ObjectClass *oc, void *data)
++{
++    HostMemoryBackendClass *bc = MEMORY_BACKEND_CLASS(oc);
++
++    bc->alloc = xen_backend_alloc;
++
++    object_class_property_add(oc, "host-addr", "int",
++                              xen_backend_get_host_addr,
++                              xen_backend_set_host_addr,
++                              NULL, NULL, &error_abort);
++}
++
++static const TypeInfo xen_backend_info = {
++    .name = TYPE_MEMORY_BACKEND_XEN,
++    .parent = TYPE_MEMORY_BACKEND,
++    .class_init = xen_backend_class_init,
++    .instance_size = sizeof(HostMemoryBackendXen),
++};
++
++static void register_types(void)
++{
++    type_register_static(&xen_backend_info);
++}
++
++type_init(register_types);
+diff --git a/backends/hostmem.c b/backends/hostmem.c
+index ee2c2d5bfd..ba13a52994 100644
+--- a/backends/hostmem.c
++++ b/backends/hostmem.c
+@@ -12,6 +12,7 @@
+ #include "qemu/osdep.h"
+ #include "sysemu/hostmem.h"
+ #include "hw/boards.h"
++#include "hw/xen/xen.h"
+ #include "qapi/error.h"
+ #include "qapi/visitor.h"
+ #include "qapi-types.h"
+@@ -277,6 +278,14 @@ host_memory_backend_memory_complete(UserCreatable *uc, Error **errp)
+             goto out;
+         }
  
- void xen_ram_alloc(ram_addr_t ram_addr, ram_addr_t size, MemoryRegion *mr,
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 8226904524..b65c5dd5ec 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -249,6 +249,7 @@ void pc_memory_init(PCMachineState *pcms,
-                     MemoryRegion *system_memory,
-                     MemoryRegion *rom_memory,
-                     MemoryRegion **ram_memory);
-+void pc_memory_hotplug_init(PCMachineState *pcms, MemoryRegion *system_memory);
- qemu_irq pc_allocate_cpu_irq(void);
- DeviceState *pc_vga_init(ISABus *isa_bus, PCIBus *pci_bus);
- void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
++        /*
++         * The backend storage of MEMORY_BACKEND_XEN is managed by Xen,
++         * so no further work in this function is needed.
++         */
++        if (xen_enabled() && !backend->mr.ram_block) {
++            goto out;
++        }
++
+         ptr = memory_region_get_ram_ptr(&backend->mr);
+         sz = memory_region_size(&backend->mr);
+ 
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index bdf6649083..7e1fe005ee 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -28,6 +28,7 @@
+ #include "sysemu/kvm.h"
+ #include "trace.h"
+ #include "hw/virtio/vhost.h"
++#include "hw/xen/xen.h"
+ 
+ typedef struct pc_dimms_capacity {
+      uint64_t size;
+@@ -108,7 +109,10 @@ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+     }
+ 
+     memory_region_add_subregion(&hpms->mr, addr - hpms->base, mr);
+-    vmstate_register_ram(vmstate_mr, dev);
++    /* memory-backend-xen is not backed by RAM. */
++    if (!xen_enabled()) {
++        vmstate_register_ram(vmstate_mr, dev);
++    }
+     numa_set_mem_node_id(addr, memory_region_size(mr), dimm->node);
+ 
+ out:
 -- 
 2.11.0
