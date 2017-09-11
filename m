@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drLgT-0006ZF-82
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:11:18 -0400
+	(envelope-from <bounces@canonical.com>) id 1drLgV-0006ZP-O1
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:11:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drLgR-0001J9-UW
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:11:17 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57890)
+	(envelope-from <bounces@canonical.com>) id 1drLgP-0001IB-Pr
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:11:19 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57849)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1drLgR-0001Is-JB
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:11:15 -0400
+	id 1drLgP-0001Hf-Jh
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:11:13 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1drLgQ-0003fV-Ge
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 10:11:14 +0000
+	id 1drLgN-0003V8-GP
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 10:11:11 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7A0B82E848D
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 10:11:14 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 6AC762E8493
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 10:11:11 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Sep 2017 09:59:17 -0000
+Date: Mon, 11 Sep 2017 09:55:34 -0000
 From: ChristianEhrhardt <1716028@bugs.launchpad.net>
 Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
-Message-Id: <150512395785.23596.4830153384434405787.malone@wampee.canonical.com>
+Message-Id: <150512373451.32018.13120147564363172829.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
  feature flag
@@ -39,15 +39,17 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Added a qemu task, this seems to be a use case affected by the file locking.
-In particular a (formerly working) case for multipath tests that use the sa=
-me image files multiple times intentionally.
+Thanks Ryan for filing this bug, as I said in IRC all the file locking is r=
+ather new and I think this is for upstream qemu to address.
+Might just be a missed use case for them as well.
 
-So far the workaround is to set file.locking=3Doff for all these, which mig=
-ht be just the right thing to do.
-But then as outlined by the reporter there currently is no way to query if =
-file locking is supported, nor if it is the current default - so at least a=
-dding that might be required to be added in qemu.
+I'll be adding an upstream qemu task to get their attention.
+@Rayn - It would be nice if - from the multipath tests - you could copy in =
+here a commandline that worked before but fails now.
+
+** Also affects: qemu
+   Importance: Undecided
+       Status: New
 
 -- =
 
