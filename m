@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47509)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1drPO4-0004WQ-41
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:08:38 -0400
+	(envelope-from <kwolf@redhat.com>) id 1drPOn-0004r6-0o
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:09:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1drPO0-0007FZ-Nw
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:08:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:1302)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1drPO0-0007EO-E6
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:08:28 -0400
-Date: Mon, 11 Sep 2017 16:08:18 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170911160818.1bd44a82@nial.brq.redhat.com>
-In-Reply-To: <20170911044157.15403-1-haozhong.zhang@intel.com>
-References: <20170911043820.14617-1-haozhong.zhang@intel.com>
-	<20170911044157.15403-1-haozhong.zhang@intel.com>
+	(envelope-from <kwolf@redhat.com>) id 1drPOl-0008JW-Rj
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:09:16 -0400
+Date: Mon, 11 Sep 2017 16:08:58 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170911140858.GA6951@localhost.localdomain>
+References: <1500993699-19299-1-git-send-email-pl@kamp.de>
+	<1500993699-19299-11-git-send-email-pl@kamp.de>
+	<546c49d1-57c3-7ba7-c0cf-558da609e7a7@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
- Xen HVM guest
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="gKMricLos+KVdGMg"
+Content-Disposition: inline
+In-Reply-To: <546c49d1-57c3-7ba7-c0cf-558da609e7a7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH V5 10/10] block/qcow2: add compress info to
+ image specific info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +26,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Haozhong Zhang <haozhong.zhang@intel.com>
-Cc: qemu-devel@nongnu.org, xen-devel@lists.xen.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
-
-On Mon, 11 Sep 2017 12:41:47 +0800
-Haozhong Zhang <haozhong.zhang@intel.com> wrote:
-
-> This is the QEMU part patches that works with the associated Xen
-> patches to enable vNVDIMM support for Xen HVM domains. Xen relies on
-> QEMU to build guest NFIT and NVDIMM namespace devices, and allocate
-> guest address space for vNVDIMM devices.
-> 
-> All patches can be found at
->   Xen:  https://github.com/hzzhan9/xen.git nvdimm-rfc-v3
->   QEMU: https://github.com/hzzhan9/qemu.git xen-nvdimm-rfc-v3
-> 
-> Patch 1 is to avoid dereferencing the NULL pointer to non-existing
-> label data, as the Xen side support for labels is not implemented yet.
-> 
-> Patch 2 & 3 add a memory backend dedicated for Xen usage and a hotplug
-> memory region for Xen guest, in order to make the existing nvdimm
-> device plugging path work on Xen.
-> 
-> Patch 4 - 10 build and cooy NFIT from QEMU to Xen guest, when QEMU is
-> used as the Xen device model.
-
-I've skimmed over patch-set and can't say that I'm happy with
-number of xen_enabled() invariants it introduced as well as
-with partial blobs it creates.
-
-I'd like to reduce above and a way to do this might be making xen 
- 1. use fw_cfg
- 2. fetch QEMU build acpi tables from fw_cfg
- 3. extract nvdim tables (which is trivial) and use them
-
-looking at xen_load_linux(), it seems possible to use fw_cfg.
-
-So what's stopping xen from using it elsewhere?,
-instead of adding more xen specific code to do 'the same'
-job and not reusing/sharing common code with tcg/kvm.
+To: Eric Blake <eblake@redhat.com>
+Cc: Peter Lieven <pl@kamp.de>, qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, berrange@redhat.com
 
 
-> Haozhong Zhang (10):
->   nvdimm: do not intiailize nvdimm->label_data if label size is zero
->   hw/xen-hvm: create the hotplug memory region on Xen
->   hostmem-xen: add a host memory backend for Xen
->   nvdimm acpi: do not use fw_cfg on Xen
->   hw/xen-hvm: initialize DM ACPI
->   hw/xen-hvm: add function to copy ACPI into guest memory
->   nvdimm acpi: copy NFIT to Xen guest
->   nvdimm acpi: copy ACPI namespace device of vNVDIMM to Xen guest
->   nvdimm acpi: do not build _FIT method on Xen
->   hw/xen-hvm: enable building DM ACPI if vNVDIMM is enabled
-> 
->  backends/Makefile.objs |   1 +
->  backends/hostmem-xen.c | 108 ++++++++++++++++++++++++++
->  backends/hostmem.c     |   9 +++
->  hw/acpi/aml-build.c    |  10 ++-
->  hw/acpi/nvdimm.c       |  79 ++++++++++++++-----
->  hw/i386/pc.c           | 102 ++++++++++++++-----------
->  hw/i386/xen/xen-hvm.c  | 204 ++++++++++++++++++++++++++++++++++++++++++++++++-
->  hw/mem/nvdimm.c        |  10 ++-
->  hw/mem/pc-dimm.c       |   6 +-
->  include/hw/i386/pc.h   |   1 +
->  include/hw/xen/xen.h   |  25 ++++++
->  stubs/xen-hvm.c        |  10 +++
->  12 files changed, 495 insertions(+), 70 deletions(-)
->  create mode 100644 backends/hostmem-xen.c
-> 
+--gKMricLos+KVdGMg
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Am 25.07.2017 um 23:55 hat Eric Blake geschrieben:
+> On 07/25/2017 09:41 AM, Peter Lieven wrote:
+> > Signed-off-by: Peter Lieven <pl@kamp.de>
+> > ---
+> >  block/qcow2.c        | 7 +++++++
+> >  qapi/block-core.json | 6 +++++-
+> >  2 files changed, 12 insertions(+), 1 deletion(-)
+> >=20
+> > +++ b/qapi/block-core.json
+> > @@ -68,6 +68,9 @@
+> >  # @encrypt: details about encryption parameters; only set if image
+> >  #           is encrypted (since 2.10)
+> >  #
+> > +# @compress: details about parameters for compressed clusters; only se=
+t if
+> > +#            the compress format header extension is present (since 2.=
+11)
+>=20
+> Thinking aloud:
+>=20
+> I still think this is better as "only set if the image uses compressed
+> headers" (similar to encrypt).  That is, I would like this output to be
+> present even when opening legacy deflate/0/12 images.
+>=20
+> But thinking more, what I am REALLY asking for is "if any cluster is
+> compressed, then this information is present; if nothing is compressed,
+> the choice of compression header doesn't matter".  But we don't have a
+> quick-and-dirty way to tell if an image has any compressed clusters,
+> short of examining every L2 map (including maps inside internal snapshots=
+).
+>=20
+> Hmm - we already have 'Dirty bit' and 'Corrupt bit' as
+> incompatible_features that can quickly identify certain image
+> properties; do we want another bit set to 1 for images known to use
+> compressed clusters?  Or even make it an auto-clear bit (or even a pair
+> of auto-clear bits: one to designate that this image was written by a
+> new-enough qemu that promises to mark the image if any compressed
+> clusters exist, and the other is set only if such clusters do exist;
+> that way, if both bits are clear, we know we have to walk L2 tables to
+> look for compressed clusters, but if the first bit is set, then the
+> second bit is reliable)?
+>=20
+> So maybe this means we are still debating spec ideas.  Kevin, do you
+> want to chime in?
+
+I'm not sure if this would be an useful extension. Adding feature bits
+is a relatively big change and I don't see what it actually buys us
+here.
+
+First of all, what use is the information that an image contains
+compressed clusters? For any practical use that I could imagine, there
+is a big difference between an image that contains one compressed
+cluster and an image that has 100% compressed clusters - much bigger
+than between the image with one compressed cluster and an image that is
+fully uncompressed.
+
+But if we assume for a moment that the information is useful: For old
+images, we would still be in the same situation as today and couldn't
+tell whether an image contains compressed clusters or not. For new
+images that are meant for new qemu versions, we can have the compression
+header, which is probably as close as we can get (at least I don't think
+you suggested something that would unset the compressed bit as soon as
+the last compressed cluster gets uncompressed through copy-on-write).
+
+That leaves us with images created by new qemu versions that are meant
+to be consumed by old versions so that we can't set the incompatible
+feature bit. If we are concerned about these, couldn't we simply specify
+that a compression header that contains the current defaults MAY exist
+even without the incompatible feature bit?
+
+Kevin
+
+--gKMricLos+KVdGMg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJZtpj6AAoJEH8JsnLIjy/WPVgP/i1GmtRg1ZbzGxO/b4qnSPQ2
+b7pimxKeYxL/7dCQA75YGRq9BPtXpczniSBuHjU8Nlwwp1BJj7K4qa3o0L9lTVgM
+hM+tu0awJkGL52HOgQJr9mxd0rGW1c7L1LAub0EpQFBUK5A85yDIruy7STJ1AgQT
+L+F5WMCCMcRIsK4OW2z92/mAWVh4OR/SxmA0vBVjipdLjKJ87OASHB+VPln8n8N6
+WYad1WMtf1EN7SwM+Z7LviX3VjnSus1svNzRWPjpv1tmtHRwSxuMAFzdSNOTPjsX
+rPP35x0hO4UC2WQLThg8TLyGf48oLhrwcFHRyfDjerq1GaXxi6FYdUieIoCJH8uR
+Fy0dCGx7DIMwDtjRK2T0FIoaxA0UNSlxgVwE6PkNdvm3CAkqjfCQ17Ic/Y0bw5Qz
+4Vok7/3Ai5UqApf7pHE6U3CVpsvNNOEZqi2hfCnYc2CIXyiavJsnxxN8kYQ5N1x9
+C+SBNwRv0JqoK1c0gVR0R6SofAOn6jmGkH1J/Si9kLAuWSi2YqOPhCwcB6WQxPOG
+LZMDfRPhRcXDPeLi85Z8Nsx3QwFJ4u/cbU7FdeK2ZUIKoQNk5pwIBNZScXfEiXIq
+Qrhmne9EWQXuDerPFxwMkQscdImHHRCUihJm5ES6XJbhg9cyl87n1kXqm6uPN/8U
+YN+g16VaAq6ITmvx13UT
+=J5YR
+-----END PGP SIGNATURE-----
+
+--gKMricLos+KVdGMg--
