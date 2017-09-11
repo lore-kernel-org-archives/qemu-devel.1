@@ -1,24 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53793)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jincheng.miao@gmail.com>) id 1drRQf-0003hO-6f
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:19:21 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1drRvV-0000r1-EP
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:51:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jincheng.miao@gmail.com>) id 1drRQa-0003Ik-52
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:19:21 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:38204)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jincheng.miao@gmail.com>)
-	id 1drRQZ-0003Hg-Uf
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:19:16 -0400
-Received: by mail-pg0-x244.google.com with SMTP id t3so4840359pgt.5
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 09:19:14 -0700 (PDT)
-From: jincheng.miao@gmail.com
-Date: Tue, 12 Sep 2017 08:17:39 +0800
-Message-Id: <1505175459-27177-1-git-send-email-jincheng.miao@gmail.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1drRvP-000345-IY
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:51:13 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <ce76e902-f048-1110-15cf-0dc7251322b2@virtuozzo.com>
+Date: Mon, 11 Sep 2017 19:51:00 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] tcg: Fix tci build
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] loading bitmaps in invalidate_cache fails
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,39 +21,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: rth@twiddle.net, peter.maydell@linaro.org, sw@weilnetz.de
-Cc: qemu-devel@nongnu.org, Jincheng Miao <jincheng.miao@gmail.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+Cc: Max Reitz <mreitz@redhat.com>
 
-From: Jincheng Miao <jincheng.miao@gmail.com>
+Hi Kevin!
 
-The previous commit 659ef5cbb8 enable LDST_LABELS in tci target,
-but which causes tci build error like:
-tcg/tcg.c:116:13: error: ‘tcg_out_ldst_finalize’ used but never defined [-Werror]
- static bool tcg_out_ldst_finalize(TCGContext *s);
-             ^
-cc1: all warnings being treated as errors
-make[1]: *** [tcg/tcg.o] Error 1
-make: *** [subdir-x86_64-softmmu] Error 2
+I'm confused with relations of permissions and invalidation, can you=20
+please help?
 
-If this macro is not used in tci, we could just delete it.
+Now dirty bitmaps are loaded in invalidate_cache. Here is a problem with=20
+migration:
 
-Signed-off-by: Jincheng Miao <jincheng.miao@gmail.com>
----
- tcg/tci/tcg-target.h | 4 ----
- 1 file changed, 4 deletions(-)
+1. destination starts (inactive)
 
-diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
-index 5d692e1..26140d7 100644
---- a/tcg/tci/tcg-target.h
-+++ b/tcg/tci/tcg-target.h
-@@ -206,8 +206,4 @@ static inline void tb_target_set_jmp_target(uintptr_t tc_ptr,
-     /* no need to flush icache explicitly */
- }
- 
--#ifdef CONFIG_SOFTMMU
--#define TCG_TARGET_NEED_LDST_LABELS
--#endif
--
- #endif /* TCG_TARGET_H */
--- 
-1.8.3.1
+2. load bitmaps readonly
+
+...
+
+3. invalidate_cache: here we should make our loaded bitmaps RW, ie set=20
+BdrvDirtyBitmap->readonly
+
+ =C2=A0 to false and set IN_USE bit in the image. But the latter goes int=
+o=20
+"bdrv_aligned_pwritev: Assertion `child->perm & BLK_PERM_WRITE' failed",
+
+ =C2=A0 because in bdrv_invalidate_cache we call bdrv_set_perm after=20
+drv->bdrv_invalidate_cache.
+
+
+What is the true way of fixing this?
+
+
+PS: actually current code calls qcow2_load_autoloading_dirty_bitmaps in=20
+(3.) instead of qcow2_reopen_bitmaps_rw, which leads to
+
+"Bitmap already exists" error - it's a bug which I am now fixing.
+
+
+--=20
+Best regards,
+Vladimir
