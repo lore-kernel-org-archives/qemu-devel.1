@@ -1,29 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45441)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1drUz1-00060Z-Kg
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:07:04 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47653)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1drV4I-0000Mc-Ae
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:12:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1drUz0-00008J-OF
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:07:03 -0400
-Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:33011)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1drUz0-00007X-Ho
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:07:02 -0400
-Received: by mail-wr0-x242.google.com with SMTP id b9so4917578wra.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 13:07:02 -0700 (PDT)
-MIME-Version: 1.0
-Sender: alistair23@gmail.com
-In-Reply-To: <CAKmqyKPk90_SfHv+1X0+gbPaSCG+WNwxzG7OrXgrxAEBbvrSwQ@mail.gmail.com>
-References: <cover.1503077821.git.alistair.francis@xilinx.com>
-	<06b2af89-9871-f121-7641-b2b1a0d8a02c@redhat.com>
-	<CAKmqyKPk90_SfHv+1X0+gbPaSCG+WNwxzG7OrXgrxAEBbvrSwQ@mail.gmail.com>
-From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Mon, 11 Sep 2017 13:06:30 -0700
-Message-ID: <CAKmqyKPCX5FK2iON7aO1rnz18y08F74n6p1i9Lpd6Ax9YzPXmA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v1 0/2] Remove libqemustub.a in order to
- improve error
+	(envelope-from <n54@gmx.com>) id 1drV4F-0002yO-2F
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 16:12:30 -0400
+From: Kamil Rytarowski <n54@gmx.com>
+Date: Mon, 11 Sep 2017 22:00:02 +0200
+Message-Id: <20170911200002.4511-1-n54@gmx.com>
+Subject: [Qemu-devel] [PATCH] Rename round_page() to round_pageq()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,50 +17,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>
+To: qemu-trivial@nongnu.org
+Cc: qemu-devel@nongnu.org, Kamil Rytarowski <n54@gmx.com>
 
-On Mon, Sep 11, 2017 at 9:36 AM, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> On Mon, Sep 11, 2017 at 2:57 AM, Paolo Bonzini <pbonzini@redhat.com> wrote:
->> On 18/08/2017 20:47, Alistair Francis wrote:
->>> As discussed with Paolo and Markus let's combine libqemustub.a into
->>> libqemuutil.a to avoid circular dependencies.
->>>
->>> Alistair Francis (2):
->>>   Makefile: Remove libqemustub.a
->>>   Convert remaining single line fprintf() to warn_report()
->>>
->>>  Makefile                    |  7 +++----
->>>  Makefile.target             |  2 +-
->>>  docs/devel/build-system.txt | 14 +++++---------
->>>  tests/Makefile.include      |  8 ++++----
->>>  util/cutils.c               |  3 ++-
->>>  5 files changed, 15 insertions(+), 19 deletions(-)
->>>
->>
->> Queued, thanks (with Philippe's adjustments to the comments).
->
-> Thanks Paolo.
->
-> I actually sent a new version with Philippe's comments, it's included
-> as part of the "More warning reporting fixed" series.
->
-> Version 5 of that has been reviewed by Markus, I will send it out
-> today. Can you take that instead?
+This change fixes conflict with the DragonFly BSD headers.
 
-Ah, I meant version 4.
+Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+---
+ hw/ppc/mac_newworld.c | 8 ++++----
+ hw/ppc/mac_oldworld.c | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-The series should be very close to being merged. If you want that
-whole series can go in or you can take this and I can rebase the
-larger series. Whatever is easiest for you.
-
-Thanks,
-Alistair
-
->
-> Thanks,
-> Alistair
->
->>
->> Paolo
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index d466634997..b9d4bca74f 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -124,7 +124,7 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
+     return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
+ }
+ 
+-static hwaddr round_page(hwaddr addr)
++static hwaddr round_pageq(hwaddr addr)
+ {
+     return (addr + TARGET_PAGE_SIZE - 1) & TARGET_PAGE_MASK;
+ }
+@@ -256,7 +256,7 @@ static void ppc_core99_init(MachineState *machine)
+         }
+         /* load initrd */
+         if (initrd_filename) {
+-            initrd_base = round_page(kernel_base + kernel_size + KERNEL_GAP);
++            initrd_base = round_pageq(kernel_base + kernel_size + KERNEL_GAP);
+             initrd_size = load_image_targphys(initrd_filename, initrd_base,
+                                               ram_size - initrd_base);
+             if (initrd_size < 0) {
+@@ -264,11 +264,11 @@ static void ppc_core99_init(MachineState *machine)
+                              initrd_filename);
+                 exit(1);
+             }
+-            cmdline_base = round_page(initrd_base + initrd_size);
++            cmdline_base = round_pageq(initrd_base + initrd_size);
+         } else {
+             initrd_base = 0;
+             initrd_size = 0;
+-            cmdline_base = round_page(kernel_base + kernel_size + KERNEL_GAP);
++            cmdline_base = round_pageq(kernel_base + kernel_size + KERNEL_GAP);
+         }
+         ppc_boot_device = 'm';
+     } else {
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index fcac399562..50fefb339b 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -66,7 +66,7 @@ static uint64_t translate_kernel_address(void *opaque, uint64_t addr)
+     return (addr & 0x0fffffff) + KERNEL_LOAD_ADDR;
+ }
+ 
+-static hwaddr round_page(hwaddr addr)
++static hwaddr round_pageq(hwaddr addr)
+ {
+     return (addr + TARGET_PAGE_SIZE - 1) & TARGET_PAGE_MASK;
+ }
+@@ -191,7 +191,7 @@ static void ppc_heathrow_init(MachineState *machine)
+         }
+         /* load initrd */
+         if (initrd_filename) {
+-            initrd_base = round_page(kernel_base + kernel_size + KERNEL_GAP);
++            initrd_base = round_pageq(kernel_base + kernel_size + KERNEL_GAP);
+             initrd_size = load_image_targphys(initrd_filename, initrd_base,
+                                               ram_size - initrd_base);
+             if (initrd_size < 0) {
+@@ -199,11 +199,11 @@ static void ppc_heathrow_init(MachineState *machine)
+                              initrd_filename);
+                 exit(1);
+             }
+-            cmdline_base = round_page(initrd_base + initrd_size);
++            cmdline_base = round_pageq(initrd_base + initrd_size);
+         } else {
+             initrd_base = 0;
+             initrd_size = 0;
+-            cmdline_base = round_page(kernel_base + kernel_size + KERNEL_GAP);
++            cmdline_base = round_pageq(kernel_base + kernel_size + KERNEL_GAP);
+         }
+         ppc_boot_device = 'm';
+     } else {
+-- 
+2.14.1
