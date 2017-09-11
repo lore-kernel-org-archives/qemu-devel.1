@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57630)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57640)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drS3p-0005vu-5y
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:59:50 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drS3q-0005wf-6n
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:59:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drS3m-00076W-2s
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:59:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45170)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drS3p-00077T-5Q
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:59:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60366)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1drS3l-00076K-RI
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:59:46 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
+	id 1drS3o-000778-SI
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:59:49 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CC190C0587D9
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:59:44 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id BABF4C00DBB0
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:59:47 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 11 Sep 2017 18:59:24 +0200
-Message-Id: <20170911165929.2791-3-marcandre.lureau@redhat.com>
+Date: Mon, 11 Sep 2017 18:59:25 +0200
+Message-Id: <20170911165929.2791-4-marcandre.lureau@redhat.com>
 In-Reply-To: <20170911165929.2791-1-marcandre.lureau@redhat.com>
 References: <20170911165929.2791-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
+Subject: [Qemu-devel] [PATCH v6 3/7] dump: add guest ELF note
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,241 +36,214 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: imammedo@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com, anderson@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-See docs/specs/vmcoreinfo.txt for details.
-
-"etc/vmcoreinfo" fw_cfg entry is added when using "-device vmcoreinfo".
+Read the guest ELF PT_NOTE from guest memory when fw_cfg
+etc/vmcoreinfo entry provides the location, and write it as an
+additional note in the dump.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/hw/misc/vmcoreinfo.h | 46 +++++++++++++++++++++
- hw/misc/vmcoreinfo.c         | 96 ++++++++++++++++++++++++++++++++++++++=
+ include/sysemu/dump.h |   2 +
+ dump.c                | 107 ++++++++++++++++++++++++++++++++++++++++++++=
 ++++++
- docs/specs/vmcoreinfo.txt    | 41 +++++++++++++++++++
- hw/misc/Makefile.objs        |  1 +
- 4 files changed, 184 insertions(+)
- create mode 100644 include/hw/misc/vmcoreinfo.h
- create mode 100644 hw/misc/vmcoreinfo.c
- create mode 100644 docs/specs/vmcoreinfo.txt
+ 2 files changed, 109 insertions(+)
 
-diff --git a/include/hw/misc/vmcoreinfo.h b/include/hw/misc/vmcoreinfo.h
-new file mode 100644
-index 0000000000..c3aa856545
---- /dev/null
-+++ b/include/hw/misc/vmcoreinfo.h
-@@ -0,0 +1,46 @@
-+/*
-+ * Virtual Machine coreinfo device
-+ *
-+ * Copyright (C) 2017 Red Hat, Inc.
-+ *
-+ * Authors: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+#ifndef VMCOREINFO_H
-+#define VMCOREINFO_H
-+
-+#include "hw/qdev.h"
-+
-+#define VMCOREINFO_DEVICE "vmcoreinfo"
-+#define VMCOREINFO(obj) OBJECT_CHECK(VMCoreInfoState, (obj), VMCOREINFO_=
-DEVICE)
-+
-+#define VMCOREINFO_FORMAT_NONE 0x0
-+#define VMCOREINFO_FORMAT_ELF 0x1
-+
-+/* all fields are little-endian */
-+typedef struct FWCfgVMCoreInfo {
-+    uint16_t host_format; /* set on reset */
-+    uint16_t guest_format;
-+    uint32_t size;
-+    uint64_t paddr;
-+} QEMU_PACKED FWCfgVMCoreInfo;
-+
-+typedef struct VMCoreInfoState {
-+    DeviceClass parent_obj;
-+
-+    bool has_vmcoreinfo;
-+    FWCfgVMCoreInfo vmcoreinfo;
-+} VMCoreInfoState;
-+
-+/* returns NULL unless there is exactly one device */
-+static inline VMCoreInfoState *vmcoreinfo_find(void)
-+{
-+    Object *o =3D object_resolve_path_type("", VMCOREINFO_DEVICE, NULL);
-+
-+    return o ? VMCOREINFO(o) : NULL;
-+}
-+
-+#endif
-diff --git a/hw/misc/vmcoreinfo.c b/hw/misc/vmcoreinfo.c
-new file mode 100644
-index 0000000000..a618e12677
---- /dev/null
-+++ b/hw/misc/vmcoreinfo.c
-@@ -0,0 +1,96 @@
-+/*
-+ * Virtual Machine coreinfo device
-+ *
-+ * Copyright (C) 2017 Red Hat, Inc.
-+ *
-+ * Authors: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ *
-+ */
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/nvram/fw_cfg.h"
+diff --git a/include/sysemu/dump.h b/include/sysemu/dump.h
+index 2672a15f8b..df43bd0e07 100644
+--- a/include/sysemu/dump.h
++++ b/include/sysemu/dump.h
+@@ -192,6 +192,8 @@ typedef struct DumpState {
+                                   * this could be used to calculate
+                                   * how much work we have
+                                   * finished. */
++    uint8_t *guest_note;         /* ELF note content */
++    size_t guest_note_size;
+ } DumpState;
+=20
+ uint16_t cpu_to_dump16(DumpState *s, uint16_t val);
+diff --git a/dump.c b/dump.c
+index a79773d0f7..3cec6a8c93 100644
+--- a/dump.c
++++ b/dump.c
+@@ -26,6 +26,8 @@
+ #include "qapi/qmp/qerror.h"
+ #include "qmp-commands.h"
+ #include "qapi-event.h"
++#include "qemu/error-report.h"
 +#include "hw/misc/vmcoreinfo.h"
+=20
+ #include <zlib.h>
+ #ifdef CONFIG_LZO
+@@ -38,6 +40,13 @@
+ #define ELF_MACHINE_UNAME "Unknown"
+ #endif
+=20
++#define MAX_GUEST_NOTE_SIZE (1 << 20) /* 1MB should be enough */
 +
-+static void fw_cfg_vmci_write(void *dev, off_t offset, size_t len)
++#define ELF_NOTE_SIZE(hdr_size, name_size, desc_size)   \
++    ((DIV_ROUND_UP((hdr_size), 4) +                     \
++      DIV_ROUND_UP((name_size), 4) +                    \
++      DIV_ROUND_UP((desc_size), 4)) * 4)
++
+ uint16_t cpu_to_dump16(DumpState *s, uint16_t val)
+ {
+     if (s->dump_info.d_endian =3D=3D ELFDATA2LSB) {
+@@ -76,6 +85,8 @@ static int dump_cleanup(DumpState *s)
+     guest_phys_blocks_free(&s->guest_phys_blocks);
+     memory_mapping_list_free(&s->list);
+     close(s->fd);
++    g_free(s->guest_note);
++    s->guest_note =3D NULL;
+     if (s->resume) {
+         if (s->detached) {
+             qemu_mutex_lock_iothread();
+@@ -235,6 +246,19 @@ static inline int cpu_index(CPUState *cpu)
+     return cpu->cpu_index + 1;
+ }
+=20
++static void write_guest_note(WriteCoreDumpFunction f, DumpState *s,
++                             Error **errp)
 +{
-+    VMCoreInfoState *s =3D VMCOREINFO(dev);
++    int ret;
 +
-+    s->has_vmcoreinfo =3D offset =3D=3D 0 && len =3D=3D sizeof(s->vmcore=
-info)
-+        && s->vmcoreinfo.guest_format !=3D VMCOREINFO_FORMAT_NONE;
++    if (s->guest_note) {
++        ret =3D f(s->guest_note, s->guest_note_size, s);
++        if (ret < 0) {
++            error_setg(errp, "dump: failed to write guest note");
++        }
++    }
 +}
 +
-+static void vmcoreinfo_reset(void *dev)
-+{
-+    VMCoreInfoState *s =3D VMCOREINFO(dev);
+ static void write_elf64_notes(WriteCoreDumpFunction f, DumpState *s,
+                               Error **errp)
+ {
+@@ -258,6 +282,8 @@ static void write_elf64_notes(WriteCoreDumpFunction f=
+, DumpState *s,
+             return;
+         }
+     }
 +
-+    s->has_vmcoreinfo =3D false;
-+    memset(&s->vmcoreinfo, 0, sizeof(s->vmcoreinfo));
-+    s->vmcoreinfo.host_format =3D cpu_to_le16(VMCOREINFO_FORMAT_ELF);
++    write_guest_note(f, s, errp);
+ }
+=20
+ static void write_elf32_note(DumpState *s, Error **errp)
+@@ -303,6 +329,8 @@ static void write_elf32_notes(WriteCoreDumpFunction f=
+, DumpState *s,
+             return;
+         }
+     }
++
++    write_guest_note(f, s, errp);
+ }
+=20
+ static void write_elf_section(DumpState *s, int type, Error **errp)
+@@ -714,6 +742,44 @@ static int buf_write_note(const void *buf, size_t si=
+ze, void *opaque)
+     return 0;
+ }
+=20
++/*
++ * This function retrieves various sizes from an elf header.
++ *
++ * @note has to be a valid ELF note. The return sizes are unmodified
++ * (not padded or rounded up to be multiple of 4).
++ */
++static void get_note_sizes(DumpState *s, const void *note,
++                           uint64_t *note_head_size,
++                           uint64_t *name_size,
++                           uint64_t *desc_size)
++{
++    uint64_t note_head_sz;
++    uint64_t name_sz;
++    uint64_t desc_sz;
++
++    if (s->dump_info.d_class =3D=3D ELFCLASS64) {
++        const Elf64_Nhdr *hdr =3D note;
++        note_head_sz =3D sizeof(Elf64_Nhdr);
++        name_sz =3D tswap64(hdr->n_namesz);
++        desc_sz =3D tswap64(hdr->n_descsz);
++    } else {
++        const Elf32_Nhdr *hdr =3D note;
++        note_head_sz =3D sizeof(Elf32_Nhdr);
++        name_sz =3D tswap32(hdr->n_namesz);
++        desc_sz =3D tswap32(hdr->n_descsz);
++    }
++
++    if (note_head_size) {
++        *note_head_size =3D note_head_sz;
++    }
++    if (name_size) {
++        *name_size =3D name_sz;
++    }
++    if (desc_size) {
++        *desc_size =3D desc_sz;
++    }
 +}
 +
-+static void vmcoreinfo_realize(DeviceState *dev, Error **errp)
-+{
-+    VMCoreInfoState *s =3D VMCOREINFO(dev);
-+    FWCfgState *fw_cfg =3D fw_cfg_find();
-+
-+    /* Given that this function is executing, there is at least one VMCO=
-REINFO
-+     * device. Check if there are several.
+ /* write common header, sub header and elf note to vmcore */
+ static void create_header32(DumpState *s, Error **errp)
+ {
+@@ -1492,6 +1558,7 @@ static void dump_init(DumpState *s, int fd, bool ha=
+s_format,
+                       DumpGuestMemoryFormat format, bool paging, bool ha=
+s_filter,
+                       int64_t begin, int64_t length, Error **errp)
+ {
++    VMCoreInfoState *vmci =3D vmcoreinfo_find();
+     CPUState *cpu;
+     int nr_cpus;
+     Error *err =3D NULL;
+@@ -1563,6 +1630,46 @@ static void dump_init(DumpState *s, int fd, bool h=
+as_format,
+         goto cleanup;
+     }
+=20
++    /*
++     * The goal of this block is to copy the guest note out of
++     * the guest.  Failure to do so is not fatal for dumping.
 +     */
-+    if (!vmcoreinfo_find()) {
-+        error_setg(errp, "at most one %s device is permitted",
-+                   VMCOREINFO_DEVICE);
-+        return;
-+    }
++    if (vmci) {
++        uint64_t addr, note_head_size, name_size, desc_size;
++        uint32_t size;
++        uint16_t format;
 +
-+    if (!fw_cfg || !fw_cfg->dma_enabled) {
-+        error_setg(errp, "%s device requires fw_cfg with DMA",
-+                   VMCOREINFO_DEVICE);
-+        return;
-+    }
++        note_head_size =3D s->dump_info.d_class =3D=3D ELFCLASS32 ?
++            sizeof(Elf32_Nhdr) : sizeof(Elf64_Nhdr);
 +
-+    fw_cfg_add_file_callback(fw_cfg, "etc/vmcoreinfo",
-+                             NULL, fw_cfg_vmci_write, s,
-+                             &s->vmcoreinfo, sizeof(s->vmcoreinfo), fals=
++        format =3D le16_to_cpu(vmci->vmcoreinfo.guest_format);
++        size =3D le32_to_cpu(vmci->vmcoreinfo.size);
++        addr =3D le64_to_cpu(vmci->vmcoreinfo.paddr);
++        if (!vmci->has_vmcoreinfo) {
++            warn_report("guest note is not present");
++        } else if (size < note_head_size || size > MAX_GUEST_NOTE_SIZE) =
+{
++            warn_report("guest note size is invalid: %" PRIu32, size);
++        } else if (format !=3D VMCOREINFO_FORMAT_ELF) {
++            warn_report("guest note format is unsupported: %" PRIu16, fo=
+rmat);
++        } else {
++            s->guest_note =3D g_malloc(size + 1); /* +1 for adding \0 */
++            cpu_physical_memory_read(addr, s->guest_note, size);
++
++            get_note_sizes(s, s->guest_note, NULL, &name_size, &desc_siz=
 e);
++            s->guest_note_size =3D ELF_NOTE_SIZE(note_head_size, name_si=
+ze,
++                                               desc_size);
++            if (name_size > MAX_GUEST_NOTE_SIZE ||
++                desc_size > MAX_GUEST_NOTE_SIZE ||
++                s->guest_note_size > size) {
++                warn_report("Invalid guest note header");
++                g_free(s->guest_note);
++                s->guest_note =3D NULL;
++            } else {
++                s->note_size +=3D s->guest_note_size;
++            }
++        }
++    }
 +
-+    qemu_register_reset(vmcoreinfo_reset, dev);
-+}
-+
-+static const VMStateDescription vmstate_vmcoreinfo =3D {
-+    .name =3D "vmcoreinfo",
-+    .version_id =3D 1,
-+    .minimum_version_id =3D 1,
-+    .fields =3D (VMStateField[]) {
-+        VMSTATE_BOOL(has_vmcoreinfo, VMCoreInfoState),
-+        VMSTATE_UINT16(vmcoreinfo.host_format, VMCoreInfoState),
-+        VMSTATE_UINT16(vmcoreinfo.guest_format, VMCoreInfoState),
-+        VMSTATE_UINT32(vmcoreinfo.size, VMCoreInfoState),
-+        VMSTATE_UINT64(vmcoreinfo.paddr, VMCoreInfoState),
-+        VMSTATE_END_OF_LIST()
-+    },
-+};
-+
-+static void vmcoreinfo_device_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc =3D DEVICE_CLASS(klass);
-+
-+    dc->vmsd =3D &vmstate_vmcoreinfo;
-+    dc->realize =3D vmcoreinfo_realize;
-+    dc->hotpluggable =3D false;
-+}
-+
-+static const TypeInfo vmcoreinfo_device_info =3D {
-+    .name          =3D VMCOREINFO_DEVICE,
-+    .parent        =3D TYPE_DEVICE,
-+    .instance_size =3D sizeof(VMCoreInfoState),
-+    .class_init    =3D vmcoreinfo_device_class_init,
-+};
-+
-+static void vmcoreinfo_register_types(void)
-+{
-+    type_register_static(&vmcoreinfo_device_info);
-+}
-+
-+type_init(vmcoreinfo_register_types)
-diff --git a/docs/specs/vmcoreinfo.txt b/docs/specs/vmcoreinfo.txt
-new file mode 100644
-index 0000000000..2868a77142
---- /dev/null
-+++ b/docs/specs/vmcoreinfo.txt
-@@ -0,0 +1,41 @@
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+VMCoreInfo device
-+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-+
-+The `-device vmcoreinfo` will create a fw_cfg entry for a guest to
-+store dump details.
-+
-+etc/vmcoreinfo
-+**************
-+
-+A guest may use this fw_cfg entry to add information details to qemu
-+dumps.
-+
-+The entry of 16 bytes has the following layout, in little-endian::
-+
-+#define VMCOREINFO_FORMAT_NONE 0x0
-+#define VMCOREINFO_FORMAT_ELF 0x1
-+
-+    struct FWCfgVMCoreInfo {
-+        uint16_t host_format;  /* formats host supports */
-+        uint16_t guest_format; /* format guest supplies */
-+        uint32_t size;         /* size of vmcoreinfo region */
-+        uint64_t paddr;        /* physical address of vmcoreinfo region =
-*/
-+    };
-+
-+Only full write (of 16 bytes) are considered valid for further
-+processing of entry values.
-+
-+A write of 0 in guest_format will disable further processing of
-+vmcoreinfo entry values & content.
-+
-+Format & content
-+****************
-+
-+As of qemu 2.11, only VMCOREINFO_FORMAT_ELF is supported.
-+
-+The entry gives location and size of an ELF note that is appended in
-+qemu dumps.
-+
-+The note format/class must be of the target bitness and the size must
-+be less than 1Mb.
-diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
-index 29fb922cef..052982f69b 100644
---- a/hw/misc/Makefile.objs
-+++ b/hw/misc/Makefile.objs
-@@ -9,6 +9,7 @@ common-obj-$(CONFIG_PCI_TESTDEV) +=3D pci-testdev.o
- common-obj-$(CONFIG_EDU) +=3D edu.o
-=20
- common-obj-y +=3D unimp.o
-+common-obj-y +=3D vmcoreinfo.o
-=20
- obj-$(CONFIG_VMPORT) +=3D vmport.o
-=20
+     /* get memory mapping */
+     if (paging) {
+         qemu_get_guest_memory_mapping(&s->list, &s->guest_phys_blocks, &=
+err);
 --=20
 2.14.1.146.gd35faa819
