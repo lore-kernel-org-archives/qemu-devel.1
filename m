@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60958)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drXFO-0000ZM-Af
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:32:07 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37228)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1drXV3-0004iH-VT
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:48:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drXFN-0000m5-6J
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:32:06 -0400
-Date: Mon, 11 Sep 2017 18:31:55 -0400 (EDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <595628230.5112107.1505169115739.JavaMail.zimbra@redhat.com>
-In-Reply-To: <a96ce163-a7ff-3aa2-866d-22d3bc2735ff@redhat.com>
-References: <20170809215510.22802-1-pbonzini@redhat.com>
-	<a96ce163-a7ff-3aa2-866d-22d3bc2735ff@redhat.com>
+	(envelope-from <n54@gmx.com>) id 1drXV0-0006ld-S7
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:48:18 -0400
+Received: from mout.gmx.net ([212.227.17.22]:54952)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1drXV0-0006lR-Gf
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:48:14 -0400
+References: <20170911213328.9701-1-f4bug@amsat.org>
+	<20170911213328.9701-6-f4bug@amsat.org>
+	<aa266e28-853b-4703-8495-8fa862aea106@gmx.com>
+	<9bdda758-c62c-cb04-15cd-1e93bd1664f7@amsat.org>
+From: Kamil Rytarowski <n54@gmx.com>
+Message-ID: <278d8d46-bda2-ea89-dd5c-3221c37ce478@gmx.com>
+Date: Tue, 12 Sep 2017 00:37:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 00/12] cleanup qemu-iotests
+In-Reply-To: <9bdda758-c62c-cb04-15cd-1e93bd1664f7@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="1cDvlqtbH4jRfFQepCoKxWpnJDM1eeEeR"
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] tcg: restrict i386 regs definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,59 +30,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--1cDvlqtbH4jRfFQepCoKxWpnJDM1eeEeR
+From: Kamil Rytarowski <n54@gmx.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>,
+ Peter Crosthwaite <crosthwaite.peter@gmail.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Message-ID: <278d8d46-bda2-ea89-dd5c-3221c37ce478@gmx.com>
+Subject: Re: [Qemu-devel] [PATCH v2 5/5] tcg: restrict i386 regs definitions
+References: <20170911213328.9701-1-f4bug@amsat.org>
+ <20170911213328.9701-6-f4bug@amsat.org>
+ <aa266e28-853b-4703-8495-8fa862aea106@gmx.com>
+ <9bdda758-c62c-cb04-15cd-1e93bd1664f7@amsat.org>
+In-Reply-To: <9bdda758-c62c-cb04-15cd-1e93bd1664f7@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 12.09.2017 00:13, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 09/11/2017 06:44 PM, Kamil Rytarowski wrote:
+>> On 11.09.2017 23:33, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>>> ---
+>>> cleaning while here :)
+>>>
+>>> =C2=A0 accel/tcg/user-exec.c | 18 +++++++++---------
+>>> =C2=A0 1 file changed, 9 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+>>> index 2a975eaf69..484a3f5f8f 100644
+>>> --- a/accel/tcg/user-exec.c
+>>> +++ b/accel/tcg/user-exec.c
+>>> @@ -25,15 +25,6 @@
+>>> =C2=A0 #include "exec/cpu_ldst.h"
+>>> =C2=A0 #include "translate-all.h"
+>>> =C2=A0 -#undef EAX
+>>> -#undef ECX
+>>> -#undef EDX
+>>> -#undef EBX
+>>> -#undef ESP
+>>> -#undef EBP
+>>> -#undef ESI
+>>> -#undef EDI
+>>> -#undef EIP
+>>> =C2=A0 #ifdef __linux__
+>>> =C2=A0 #include <sys/ucontext.h>
+>>> =C2=A0 #endif
+>>> @@ -131,6 +122,15 @@ static inline int handle_cpu_signal(uintptr_t
+>>> pc, unsigned long address,
+>>> =C2=A0 }
+>>> =C2=A0 =C2=A0 #if defined(__i386__)
+>>> +#undef EAX
+>>> +#undef ECX
+>>> +#undef EDX
+>>> +#undef EBX
+>>> +#undef ESP
+>>> +#undef EBP
+>>> +#undef ESI
+>>> +#undef EDI
+>>> +#undef EIP
+>>> =C2=A0 =C2=A0 #if defined(__NetBSD__)
+>>> =C2=A0 #include <ucontext.h>
+>>>
+>>
+>> Why to move under i386?
+>=20
+> I tracked the origin of these #defines in op-i386.c (7bfdb6d18c7b) and
+> thought the Exx naming was for i386 while the x86_64 uses the Rxx namin=
+g
+> (RAX .. RIP) so you'd only have them on i386 arch.
+> However it seems I didn't realize you can access x86_64 registers in
+> 32-bit mode via the EAX .. EIP naming, as you see I'm not confident wit=
+h
+> this CISC arch :S
+>=20
+> So I guess it's best to ignore this patch?
+>=20
+
+A typical 64-bit x86_64 OS can run 32-bit programs and reuse x86 32-bit
+headers.
+
+>>
+>> SmartOS pollutes namespace with these symbols on x86_64.
+>>
+>=20
+> you should provide some VM :P
+>=20
+
+Hope to see it too.
+
+> I plan to test this project soon:
+> https://www.packer.io/docs/builders/qemu.html
+>=20
+> Regards,
+>=20
+> Phil.
 
 
 
------ Original Message -----
-> From: "John Snow" <jsnow@redhat.com>
-> To: "Paolo Bonzini" <pbonzini@redhat.com>, qemu-devel@nongnu.org
-> Cc: kwolf@redhat.com, qemu-block@nongnu.org
-> Sent: Tuesday, September 12, 2017 12:22:26 AM
-> Subject: Re: [Qemu-block] [PATCH 00/12] cleanup qemu-iotests
-> 
-> 
-> 
-> On 08/09/2017 05:54 PM, Paolo Bonzini wrote:
-> > The purpose of this series is to separate the "check" sources from
-> > the tests.  After these patches, common.config is reduced to simple
-> > shell initialization, and common.rc is only included by the tests.
-> > 
-> > Along the way, a lot of dead code is removed too.
-> > 
-> > Paolo
-> > 
-> > Paolo Bonzini (12):
-> >   qemu-iotests: remove dead code
-> >   qemu-iotests: get rid of AWK_PROG
-> >   qemu-iotests: move "check" code out of common.rc
-> >   qemu-iotests: limit non-_PROG-suffixed variables to common.rc
-> >   qemu-iotests: do not include common.rc in "check"
-> >   qemu-iotests: do not do useless search for QEMU_*_PROG
-> >   qemu-iotests: disintegrate more parts of common.config
-> >   qemu-iotests: fix uninitialized variable
-> >   qemu-iotests: do not search for binaries in the current directory
-> >   qemu-iotests: get rid of $iam
-> >   qemu-iotests: include common.env and common.config early
-> >   qemu-iotests: merge "check" and "common"
-> > 
-> >  tests/qemu-iotests/039.out       |  10 +-
-> >  tests/qemu-iotests/061.out       |   4 +-
-> >  tests/qemu-iotests/137.out       |   2 +-
-> >  tests/qemu-iotests/check         | 551
-> >  ++++++++++++++++++++++++++++++++++-----
-> >  tests/qemu-iotests/common        | 459 --------------------------------
-> >  tests/qemu-iotests/common.config | 205 +--------------
-> >  tests/qemu-iotests/common.qemu   |   1 +
-> >  tests/qemu-iotests/common.rc     | 225 ++++++++--------
-> >  8 files changed, 615 insertions(+), 842 deletions(-)
-> >  delete mode 100644 tests/qemu-iotests/common
-> > 
-> 
-> Stale? Patchset is >1 month old now, doesn't look like it got merged.
+--1cDvlqtbH4jRfFQepCoKxWpnJDM1eeEeR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Yup, didn't get reviewed by Kevin either...  I was waiting for that
-before sending v2.
+-----BEGIN PGP SIGNATURE-----
 
-Paolo
+iQJABAEBCAAqFiEELaxVpweEzw+lMDwuS7MI6bAudmwFAlm3EDgMHG41NEBnbXgu
+Y29tAAoJEEuzCOmwLnZs+GkP/jLvNxhtER13fGvKUDu+4+Fo3mOcAPGz2iPT4Xt9
+eC6aecYtcsi0tiRF3zQAnlWzTe0g7mMyJaxMQqdsnJ487BOQodVaOUpZLgbCnByX
+WCS0jEaHGLNVnDAR9QWTQW5wm1fvj+umlTdMz0lVW4GXZdZnxs6HJ3eDDNjF/Klu
+Y1AQoipGCjbU54KCCgLrXa58Pnpm+E1kuD6uRIPCJKJE4wpTTgm2jtyXqLFB2vKx
+7H69epkKw9BYEstgkFGkcy0PnkTwTLJuSCyaxk4A/RWm02TaoLShN6guVEREBLpY
+mHE6otFwlwH0hugY/cZQfB0t+ctAxtiW0zKjF9GPjUIcDiCczz5cvE+ZIKZqS+Zj
+nLjnxrDAuOqFgozAn1gy3+/EDv5o3EwMZRzOu4LQ7NUtM4mQKFmjg30hd+SJ4A3H
+gmo2NhCYcNhSTbd13/PV3ZSiEqLLR+i6BrC1ZmL1AYSjKex72jYcRFSwLbcoca0g
+0TfXHFiEF7l5+/j4xVDWAEokcVUX/e438I8JEN8oBjpsFgP+55hI1/e+6L00eucr
+TYwRQlnvsfLzvt/i9lYRLI39dkXS0KqM1omBoV7k1z8aHLFCK/lCGix+v49i4dKD
+sSZelPdb3vW0lDCn5J8N9ghpchFSi1txpdsUG0ahRwCjWR6mvDllOSDpESWuE4ol
+uF1D
+=4ix5
+-----END PGP SIGNATURE-----
+
+--1cDvlqtbH4jRfFQepCoKxWpnJDM1eeEeR--
