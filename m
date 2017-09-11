@@ -1,19 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47766)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1drQU8-00020m-HF
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:18:54 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1drQW6-00037O-BQ
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:20:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <gengdongjiu@huawei.com>) id 1drQU7-0002XO-6Y
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:18:52 -0400
-From: gengdongjiu <gengdongjiu@huawei.com>
-Date: Mon, 11 Sep 2017 15:17:56 +0000
-Message-ID: <0184EA26B2509940AA629AE1405DD7F2015FE17F@DGGEMA503-MBX.china.huawei.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <arei.gonglei@huawei.com>) id 1drQW3-00065k-6e
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:20:54 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2264)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1drQW2-00060o-GC
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 11:20:51 -0400
+From: Gonglei <arei.gonglei@huawei.com>
+Date: Mon, 11 Sep 2017 23:20:27 +0800
+Message-ID: <1505143227-14324-1-git-send-email-arei.gonglei@huawei.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH v11 6/6] target-arm: kvm64: Handle SError
- interrupt for the guest OS
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH] i386/cpu/hyperv: support over 64 vcpus for
+ windows guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,107 +24,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo
-	Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will
-	Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, lkml -
-	Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, "devel@acpica.org" <devel@acpica.org>, John Garry <john.garry@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, huangdaode <huangdaode@hisilicon.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mtosatti@redhat.com, vrozenfe@redhat.com, weidong.huang@huawei.com, Gonglei <arei.gonglei@huawei.com>
 
-SGkgcGV0ZXIsDQoNCj4gDQo+IE9uIDE4IEF1Z3VzdCAyMDE3IGF0IDE1OjIzLCBEb25naml1IEdl
-bmcgPGdlbmdkb25naml1QGh1YXdlaS5jb20+IHdyb3RlOg0KPiA+IFdoZW4gZ3Vlc3QgT1MgaGFw
-cGVucyBTRXJyb3IgaW50ZXJydXB0KFNFSSksIGl0IHdpbGwgdHJhcCB0byBob3N0Lg0KPiA+IEhv
-c3QgZmlyc3RseSBjYWxscyBtZW1vcnkgZmFpbHVyZSB0byBkZWFsIHdpdGggdGhpcyBlcnJvciBh
-bmQgZGVjaWRlDQo+ID4gd2hldGhlciBpdCBuZWVkcyB0byBkZWxpdmVyIFNJR0JVUyBzaWduYWwg
-dG8gdXNlcnNwYWNlLiBUaGUgYWR2YW50YWdlDQo+ID4gdGhhdCB1c2luZyBzaWduYWwgdG8gbm90
-aWZ5IGlzIHRoYXQgaXQgY2FuIG1ha2UgdGhlIG5vdGlmaWNhdGlvbg0KPiA+IG1ldGhvZCBpcyBn
-ZW5lcmFsLCBub24tS1ZNIHVzZXIgY2FuIGFsc28gdXNlIGl0LiB3aGVuIHVzZXJzcGFjZSBnZXRz
-DQo+ID4gdGhpcyBzaWduYWwgYW5kIGtub3dzIHRoaXMgaXMgU0Vycm9yIGludGVycnVwdCwgaXQg
-d2lsbCB0cmFuc2xhdGUgdGhlDQo+ID4gZGVsaXZlcmVkIGhvc3QgVkEgdG8gUEEgYW5kIHJlY29y
-ZCB0aGlzIFBBIHRvIEdIRVMuDQo+ID4NCj4gPiBCZWNhdXNlIEFSTXY4LjIgYWRkcyBhbiBleHRl
-bnNpb24gdG8gUkFTIHRvIGFsbG93IHN5c3RlbSBzb2Z0d2FyZQ0KPiA+IGluc2VydCBpbXBsaWNp
-dCBFcnJvciBTeW5jaHJvbml6YXRpb24gQmFycmllciBvcGVyYXRpb25zIHRvIGlzb2xhdGUNCj4g
-PiB0aGUgZXJyb3IgYW5kIGFsbG93IHBhc3NlcyBzcGVjaWZpZWQgc3luZHJvbWUgdG8gZ3Vlc3Qg
-T1MsIHNvIGFmdGVyDQo+ID4gcmVjb3JkIHRoZSBDUEVSLCB1c2VyIHNwYWNlIGNhbGxzIElPQ1RM
-IHRvIHBhc3MgYSBzcGVjaWZpZWQgc3luZHJvbWUNCj4gPiB0byBLVk0sIHRoZW4gc3dpdGNoIHRv
-IGd1ZXN0IE9TLCBndWVzdCBPUyBjYW4gdXNlIHRoZSByZWNvcmRlZCBDUEVSDQo+ID4gcmVjb3Jk
-IGFuZCBzeW5kcm9tZSBpbmZvcm1hdGlvbiB0byBkbyB0aGUgcmVjb3ZlcnkuDQo+ID4NCj4gPiBU
-aGUgc3RlcHMgYXJlIHNob3duIGJlbG93Og0KPiA+IDEuIHRyYW5zbGF0ZSB0aGUgaG9zdCBWQSB0
-byBndWVzdCBPUyBQQSBhbmQgcmVjb3JkIHRoaXMgZXJyb3IgUEEgdG8gSEVTVCB0YWJsZS4NCj4g
-PiAyLiBzZXQgc3BlY2lmaWVkIHZpcnR1YWwgU0Vycm9yIHN5bmRyb21lIGFuZCBwYXNzIHRoZSB2
-YWx1ZSB0byBLVk0uDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBEb25naml1IEdlbmcgPGdlbmdk
-b25naml1QGh1YXdlaS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogUXVhbm1pbmcgV3UgPHd1cXVh
-bm1pbmdAaHVhd2VpLmNvbT4NCj4gPiAtLS0NCj4gPiAgbGludXgtaGVhZGVycy9saW51eC9rdm0u
-aCB8ICAxICsNCj4gPiAgdGFyZ2V0L2FybS9pbnRlcm5hbHMuaCAgICB8ICAxICsNCj4gPiAgdGFy
-Z2V0L2FybS9rdm02NC5jICAgICAgICB8IDI4ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysN
-Cj4gPiAgMyBmaWxlcyBjaGFuZ2VkLCAzMCBpbnNlcnRpb25zKCspDQo+ID4NCj4gPiBkaWZmIC0t
-Z2l0IGEvbGludXgtaGVhZGVycy9saW51eC9rdm0uaCBiL2xpbnV4LWhlYWRlcnMvbGludXgva3Zt
-LmgNCj4gPiBpbmRleCAyYWExNzZlLi4xMGRmY2FiIDEwMDY0NA0KPiA+IC0tLSBhL2xpbnV4LWhl
-YWRlcnMvbGludXgva3ZtLmgNCj4gPiArKysgYi9saW51eC1oZWFkZXJzL2xpbnV4L2t2bS5oDQo+
-ID4gQEAgLTEzNTYsNiArMTM1Niw3IEBAIHN0cnVjdCBrdm1fczM5MF91Y2FzX21hcHBpbmcgew0K
-PiA+ICAvKiBBdmFpbGFibGUgd2l0aCBLVk1fQ0FQX1MzOTBfQ01NQV9NSUdSQVRJT04gKi8NCj4g
-PiAgI2RlZmluZSBLVk1fUzM5MF9HRVRfQ01NQV9CSVRTICAgICAgX0lPV1IoS1ZNSU8sIDB4Yjgs
-IHN0cnVjdCBrdm1fczM5MF9jbW1hX2xvZykNCj4gPiAgI2RlZmluZSBLVk1fUzM5MF9TRVRfQ01N
-QV9CSVRTICAgICAgX0lPVyhLVk1JTywgMHhiOSwgc3RydWN0IGt2bV9zMzkwX2NtbWFfbG9nKQ0K
-PiA+ICsjZGVmaW5lIEtWTV9BUk1fU0VJICAgICAgICAgICAgICAgICBfSU8oS1ZNSU8sICAgMHhi
-MTApDQo+ID4NCj4gPiAgI2RlZmluZSBLVk1fREVWX0FTU0lHTl9FTkFCTEVfSU9NTVUgICAgKDEg
-PDwgMCkNCj4gPiAgI2RlZmluZSBLVk1fREVWX0FTU0lHTl9QQ0lfMl8zICAgICAgICAgKDEgPDwg
-MSkNCj4gPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L2FybS9pbnRlcm5hbHMuaCBiL3RhcmdldC9hcm0v
-aW50ZXJuYWxzLmggaW5kZXgNCj4gPiBmYzBhZDZkLi4xOGIxY2JjIDEwMDY0NA0KPiA+IC0tLSBh
-L3RhcmdldC9hcm0vaW50ZXJuYWxzLmgNCj4gPiArKysgYi90YXJnZXQvYXJtL2ludGVybmFscy5o
-DQo+ID4gQEAgLTIzNyw2ICsyMzcsNyBAQCBlbnVtIGFybV9leGNlcHRpb25fY2xhc3MgeyAgI2Rl
-ZmluZSBBUk1fRUxfSVNWICgxDQo+ID4gPDwgQVJNX0VMX0lTVl9TSElGVCkgICNkZWZpbmUgQVJN
-X0VMX0VDX01BU0sgICgoMHgzRikgPDwNCj4gPiBBUk1fRUxfRUNfU0hJRlQpICAjZGVmaW5lIEFS
-TV9FTF9GU0NfVFlQRSAoMHgzQykNCj4gPiArI2RlZmluZSBBUk1fRUxfSVNTX01BU0sgKCgxIDw8
-IEFSTV9FTF9JTF9TSElGVCkgLSAxKQ0KPiA+DQo+ID4gICNkZWZpbmUgRlNDX1NFQSAgICAgICAg
-ICgweDEwKQ0KPiA+ICAjZGVmaW5lIEZTQ19TRUFfVFRXMCAgICAoMHgxNCkNCj4gPiBkaWZmIC0t
-Z2l0IGEvdGFyZ2V0L2FybS9rdm02NC5jIGIvdGFyZ2V0L2FybS9rdm02NC5jIGluZGV4DQo+ID4g
-ZDNiZGFiMi4uYjg0Y2I0OSAxMDA2NDQNCj4gPiAtLS0gYS90YXJnZXQvYXJtL2t2bTY0LmMNCj4g
-PiArKysgYi90YXJnZXQvYXJtL2t2bTY0LmMNCj4gPiBAQCAtNjE2LDYgKzYxNiwyMiBAQCBzdGF0
-aWMgaW50IGt2bV9hcm1fY3ByZWdfdmFsdWUoQVJNQ1BVICpjcHUsIHB0cmRpZmZfdCBmaWVsZG9m
-ZnNldCkNCj4gPiAgICAgIHJldHVybiAtRUlOVkFMOw0KPiA+ICB9DQo+ID4NCj4gPiArc3RhdGlj
-IGludCBrdm1faW5qZWN0X2FybV9zZWkoQ1BVU3RhdGUgKmNzKSB7DQo+ID4gKyAgICBBUk1DUFUg
-KmNwdSA9IEFSTV9DUFUoY3MpOw0KPiA+ICsgICAgQ1BVQVJNU3RhdGUgKmVudiA9ICZjcHUtPmVu
-djsNCj4gPiArDQo+ID4gKyAgICB1bnNpZ25lZCBsb25nIHN5bmRyb21lID0gZW52LT5leGNlcHRp
-b24udmFkZHJlc3M7DQo+ID4gKyAgICAvKiBzZXQgdmlydHVhbCBTRXJyb3Igc3luZHJvbWUgKi8N
-Cj4gPiArICAgIGlmIChhcm1fZmVhdHVyZShlbnYsIEFSTV9GRUFUVVJFX1JBU19FWFRFTlNJT04p
-KSB7DQo+ID4gKyAgICAgICAgc3luZHJvbWUgPSBzeW5kcm9tZSAmIEFSTV9FTF9JU1NfTUFTSzsN
-Cj4gPiArICAgIH0gZWxzZSB7DQo+ID4gKyAgICAgICAgc3luZHJvbWUgPSAwOw0KPiA+ICsgICAg
-fQ0KPiA+ICsNCj4gPiArICAgIHJldHVybiAga3ZtX3ZjcHVfaW9jdGwoQ1BVKGNwdSksIEtWTV9B
-Uk1fU0VJLCAmc3luZHJvbWUpOw0KPiANCj4gVGhpcyBsb29rcyBvZGQuIElmIHdlIGRvbid0IGhh
-dmUgdGhlIFJBUyBleHRlbnNpb24gd2h5IGRvIHdlIG5lZWQgdG8gZG8gYW55dGhpbmcgYXQgYWxs
-IGhlcmUgPw0KDQpUaGlzIGlzIGJlY2F1c2UgUWVtdSBtYXkgbmVlZCB0byBzdXBwb3J0IG5vbi1S
-QVMgZXh0ZW5zaW9uIGFzIGRpc2N1c3NlZCB3aXRoIEFSTSBKYW1lcyBiZWZvcmUuDQpUaGF0IGlz
-IHRvIHNheSBob3N0IGhhcmR3YXJlIENQVSBkb2VzIG5vdCBzdXBwb3J0IFJBUywgYnV0IGd1ZXN0
-IHN1cHBvcnRzLg0KVGhhdCBpcyB1bmRlciBkaXNjdXNzaW9uLg0KV2hlbiBob3N0IGhhcmR3YXJl
-IHN1cHBvcnRzIFJBUywgc3BlY2lmeSB0aGUgc3luZHJvbWUgdG8gYSB2YWxpZCB2YWx1ZSwgb3Ro
-ZXJ3aXNlLCBzZXQgaXQgdG8gMC4NCg0KPiANCj4gPiArfQ0KPiA+ICsNCj4gPiAgLyogSW5qZWN0
-IHN5bmNocm9ub3VzIGV4dGVybmFsIGFib3J0ICovICBzdGF0aWMgaW50DQo+ID4ga3ZtX2luamVj
-dF9hcm1fc2VhKENQVVN0YXRlICpjKSAgeyBAQCAtMTAwNyw2ICsxMDIzLDE1IEBAIHN0YXRpYyBi
-b29sDQo+ID4gaXNfYWJvcnRfc2VhKHVuc2lnbmVkIGxvbmcgc3luZHJvbWUpDQo+ID4gICAgICB9
-DQo+ID4gIH0NCj4gPg0KPiA+ICtzdGF0aWMgYm9vbCBpc19hYm9ydF9zZWkodW5zaWduZWQgbG9u
-ZyBzeW5kcm9tZSkgew0KPiA+ICsgICAgdWludDhfdCBlYyA9ICgoc3luZHJvbWUgJiBBUk1fRUxf
-RUNfTUFTSykgPj4gQVJNX0VMX0VDX1NISUZUKTsNCj4gDQo+IFlvdSBkb24ndCBuZWVkIHRvIGJv
-dGhlciBtYXNraW5nIGhlcmUgLS0gaW4gb3RoZXIgcGxhY2VzIGluIFFFTVUgd2UgYXNzdW1lIHRo
-YXQgdGhlIEVDIGZpZWxkIGlzIGF0IHRoZSB0b3Agb2YgdGhlIHdvcmQsIHNvIGp1c3QgInN5bmRy
-b21lID4+DQo+IEFSTV9FTF9FQ19TSElGVCIgaXMgc3VmZmljaWVudC4NCg0KT0ssIHRoYW5rcyBm
-b3IgdGhlIHN1Z2dlc3Rpb24uDQoNCj4gDQo+ID4gKyAgICBpZiAoKGVjICE9IEVDX1NFUlJPUikp
-DQo+ID4gKyAgICAgICAgcmV0dXJuIGZhbHNlOw0KPiA+ICsgICAgZWxzZQ0KPiA+ICsgICAgICAg
-IHJldHVybiB0cnVlOw0KPiANCj4gc2NyaXB0cy9jaGVja3BhdGNoLnBsIHNob3VsZCB0ZWxsIHlv
-dSB0aGF0IHRoaXMgaWYgbmVlZHMgYnJhY2VzIChpdCdzIGdvb2QgdG8gZ2V0IGluIHRoZSBoYWJp
-dCBvZiBydW5uaW5nIGl0IG9uIGFsbCBwYXRjaGVzOyBpdCBpcyBub3QgYWx3YXlzDQo+IGNvcnJl
-Y3QsIHNvIGp1ZGdlbWVudCBpcyByZXF1aXJlZCwgYnV0IGl0IHdpbGwgZmxhZyB1cCBzb21lIGNv
-bW1vbiBtaXN0YWtlcykuDQo+IA0KPiBJbiB0aGlzIHBhcnRpY3VsYXIgY2FzZSwgeW91IHNob3Vs
-ZCBqdXN0DQo+ICAgIHJldHVybiBlYyA9PSBFQ19TRVJST1I7DQo+IHRob3VnaC4NCg0KR29vZCBz
-dWdnZXN0aW9uLg0KDQo+IA0KPiA+ICt9DQo+ID4gKw0KPiA+ICB2b2lkIGt2bV9hcmNoX29uX3Np
-Z2J1c192Y3B1KENQVVN0YXRlICpjLCBpbnQgY29kZSwgdm9pZCAqYWRkcikgIHsNCj4gPiAgICAg
-IHJhbV9hZGRyX3QgcmFtX2FkZHI7DQo+ID4gQEAgLTEwMjQsNiArMTA0OSw5IEBAIHZvaWQga3Zt
-X2FyY2hfb25fc2lnYnVzX3ZjcHUoQ1BVU3RhdGUgKmMsIGludCBjb2RlLCB2b2lkICphZGRyKQ0K
-PiA+ICAgICAgICAgICAgICBpZiAoaXNfYWJvcnRfc2VhKGVudi0+ZXhjZXB0aW9uLnN5bmRyb21l
-KSkgew0KPiA+ICAgICAgICAgICAgICAgICAgZ2hlc191cGRhdGVfZ3Vlc3QoQUNQSV9IRVNUX05P
-VElGWV9TRUEsIHBhZGRyKTsNCj4gPiAgICAgICAgICAgICAgICAgIGt2bV9pbmplY3RfYXJtX3Nl
-YShjKTsNCj4gPiArICAgICAgICAgICAgfSBlbHNlIGlmIChpc19hYm9ydF9zZWkoZW52LT5leGNl
-cHRpb24uc3luZHJvbWUpKSB7DQo+ID4gKyAgICAgICAgICAgICAgICBnaGVzX3VwZGF0ZV9ndWVz
-dChBQ1BJX0hFU1RfTk9USUZZX1NFSSwgcGFkZHIpOw0KPiA+ICsgICAgICAgICAgICAgICAga3Zt
-X2luamVjdF9hcm1fc2VpKGMpOw0KPiA+ICAgICAgICAgICAgICB9DQo+ID4gICAgICAgICAgICAg
-IHJldHVybjsNCj4gPiAgICAgICAgICB9DQo+ID4gLS0NCj4gPiAxLjguMy4xDQo+IA0KPiB0aGFu
-a3MNCj4gLS0gUE1NDQo=
+Starting with Windows Server 2012 and Windows 8, if
+CPUID.40000005.EAX contains a value of -1, Windows assumes specific
+limit to the number of VPs. In this case, Windows Server 2012
+guest VMs may use more than 64 VPs, up to the maximum supported
+number of processors applicable to the specific Windows
+version being used.
+
+https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
+
+For compatibility, Let's introduce a new property for X86CPU,
+named "x-hv-max-vps" as Eduardo's suggestion, and set it
+to 0x40 before machine 2.10.
+
+(The "x-" prefix indicates that the property is not supposed to
+be a stable user interface.)
+
+Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+---
+ include/hw/i386/pc.h |  5 +++++
+ target/i386/cpu.c    |  1 +
+ target/i386/cpu.h    |  2 ++
+ target/i386/kvm.c    | 15 ++++++++++++++-
+ 4 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 8226904..087d184 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -371,6 +371,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
+ 
+ #define PC_COMPAT_2_10 \
+     HW_COMPAT_2_10 \
++    {\
++        .driver   = TYPE_X86_CPU,\
++        .property = "x-hv-max-vps",\
++        .value    = "0x40",\
++    },
+ 
+ #define PC_COMPAT_2_9 \
+     HW_COMPAT_2_9 \
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 69676e1..2702485 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4145,6 +4145,7 @@ static Property x86_cpu_properties[] = {
+                      false),
+     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+     DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
++    DEFINE_PROP_INT32("x-hv-max-vps", X86CPU, hv_max_vps, -1),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 525d35d..5c726f3 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1282,6 +1282,8 @@ struct X86CPU {
+     int32_t socket_id;
+     int32_t core_id;
+     int32_t thread_id;
++
++    int32_t hv_max_vps;
+ };
+ 
+ static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 6db7783..a898bef 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -751,7 +751,20 @@ int kvm_arch_init_vcpu(CPUState *cs)
+ 
+         c = &cpuid_data.entries[cpuid_i++];
+         c->function = HYPERV_CPUID_IMPLEMENT_LIMITS;
+-        c->eax = 0x40;
++
++        /*
++         * From "Requirements for Implementing the Microsoft
++         * Hypervisor Interface":
++         * https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
++         *
++         * "Starting with Windows Server 2012 and Windows 8, if
++         * CPUID.40000005.EAX contains a value of -1, Windows assumes
++         * specific limit to the number of VPs. In this case, Windows
++         * Server 2012 guest VMs may use more than 64 VPs, up to the
++         * maximum supported number of processors applicable to the
++         * specific Windows version being used."
++         */
++        c->eax = cpu->hv_max_vps;
+         c->ebx = 0x40;
+ 
+         kvm_base = KVM_CPUID_SIGNATURE_NEXT;
+-- 
+1.8.3.1
