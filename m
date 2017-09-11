@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38384)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38409)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSOH-0007E2-V5
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:59 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSOI-0007FM-U2
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSOG-0001Ae-JF
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:57 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSOH-0001Ay-6V
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:58 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 11 Sep 2017 12:19:54 -0500
-Message-Id: <20170911172022.4738-11-eblake@redhat.com>
+Date: Mon, 11 Sep 2017 12:19:58 -0500
+Message-Id: <20170911172022.4738-15-eblake@redhat.com>
 In-Reply-To: <20170911172022.4738-1-eblake@redhat.com>
 References: <20170911172022.4738-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 10/38] libqos: Move/rename
- qpci_unplug_acpi_device_test() to pci.c
+Subject: [Qemu-devel] [PATCH v7 14/38] libqos: Use explicit QTestState for
+ rtas operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,179 +21,224 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, Jason Wang <jasowang@redhat.com>, Amit Shah <amit@kernel.org>, "open list:virtio-blk" <qemu-block@nongnu.org>
+Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:sPAPR" <qemu-ppc@nongnu.org>
 
-Commit 2f8b2767 originally added qpci_plug_device_test() and
-qpci_unplug_acpi_device_test() as a pair, both in pci-pc.c.
-Later, commit cf716b31 moved one half of the pair to pci.c
-when adding PPC64 support.  Keep the implementations of the
-two functions together, and shorten the name to
-qpci_unplug_device_test(), since all callers use the two
-functions in tandem.
+Drop one more client of global_qtest by teaching all rtas test
+functionality to pass in an explicit QTestState, adjusting all
+callers.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+
 ---
- tests/libqos/pci.h      |  2 +-
- tests/e1000e-test.c     |  2 +-
- tests/ivshmem-test.c    |  2 +-
- tests/libqos/pci-pc.c   | 23 -----------------------
- tests/libqos/pci.c      | 23 +++++++++++++++++++++++
- tests/virtio-blk-test.c |  2 +-
- tests/virtio-net-test.c |  2 +-
- tests/virtio-rng-test.c |  2 +-
- 8 files changed, 29 insertions(+), 29 deletions(-)
+v7: catch a couple more operations, drop R-b
+---
+ tests/libqos/rtas.h      |  9 ++++++---
+ tests/libqos/pci-spapr.c | 18 ++++++++++++------
+ tests/libqos/rtas.c      | 36 ++++++++++++++++++++----------------
+ tests/rtas-test.c        |  2 +-
+ 4 files changed, 39 insertions(+), 26 deletions(-)
 
-diff --git a/tests/libqos/pci.h b/tests/libqos/pci.h
-index 429c382282..fdda7eca6e 100644
---- a/tests/libqos/pci.h
-+++ b/tests/libqos/pci.h
-@@ -111,5 +111,5 @@ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr);
+diff --git a/tests/libqos/rtas.h b/tests/libqos/rtas.h
+index 498eb19230..e3d0f850a7 100644
+--- a/tests/libqos/rtas.h
++++ b/tests/libqos/rtas.h
+@@ -7,9 +7,12 @@
+ #define LIBQOS_RTAS_H
+ #include "libqos/malloc.h"
 
- void qpci_plug_device_test(const char *driver, const char *id,
-                            uint8_t slot, const char *opts);
--void qpci_unplug_acpi_device_test(const char *id, uint8_t slot);
-+void qpci_unplug_device_test(const char *id, uint8_t slot);
- #endif
-diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
-index d8085d944e..4c663a3019 100644
---- a/tests/e1000e-test.c
-+++ b/tests/e1000e-test.c
-@@ -461,7 +461,7 @@ static void test_e1000e_hotplug(gconstpointer data)
-     qtest_start("-device e1000e");
-
-     qpci_plug_device_test("e1000e", "e1000e_net", slot, NULL);
--    qpci_unplug_acpi_device_test("e1000e_net", slot);
-+    qpci_unplug_device_test("e1000e_net", slot);
-
-     qtest_end();
- }
-diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index 37763425ee..8c9ed6a568 100644
---- a/tests/ivshmem-test.c
-+++ b/tests/ivshmem-test.c
-@@ -427,7 +427,7 @@ static void test_ivshmem_hotplug(void)
-
-     qpci_plug_device_test("ivshmem", "iv1", PCI_SLOT_HP, opts);
-     if (strcmp(arch, "ppc64") != 0) {
--        qpci_unplug_acpi_device_test("iv1", PCI_SLOT_HP);
-+        qpci_unplug_device_test("iv1", PCI_SLOT_HP);
-     }
-
-     qtest_end();
-diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
-index e267fd1a44..6305d142a5 100644
---- a/tests/libqos/pci-pc.c
-+++ b/tests/libqos/pci-pc.c
-@@ -19,9 +19,6 @@
- #include "qemu-common.h"
-
-
--#define ACPI_PCIHP_ADDR         0xae00
--#define PCI_EJ_BASE             0x0008
--
- typedef struct QPCIBusPC
+-int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns);
+-uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
++int qrtas_get_time_of_day(QTestState *qts, QGuestAllocator *alloc,
++                          struct tm *tm, uint32_t *ns);
++uint32_t qrtas_ibm_read_pci_config(QTestState *qts, QGuestAllocator *alloc,
++                                   uint64_t buid,
+                                    uint32_t addr, uint32_t size);
+-int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
++int qrtas_ibm_write_pci_config(QTestState *qts, QGuestAllocator *alloc,
++                               uint64_t buid,
+                                uint32_t addr, uint32_t size, uint32_t val);
+ #endif /* LIBQOS_RTAS_H */
+diff --git a/tests/libqos/pci-spapr.c b/tests/libqos/pci-spapr.c
+index 9121913af6..4c29889b0b 100644
+--- a/tests/libqos/pci-spapr.c
++++ b/tests/libqos/pci-spapr.c
+@@ -108,21 +108,24 @@ static uint8_t qpci_spapr_config_readb(QPCIBus *bus, int devfn, uint8_t offset)
  {
-     QPCIBus bus;
-@@ -156,23 +153,3 @@ void qpci_free_pc(QPCIBus *bus)
-
-     g_free(s);
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+     uint32_t config_addr = (devfn << 8) | offset;
+-    return qrtas_ibm_read_pci_config(s->alloc, s->buid, config_addr, 1);
++    return qrtas_ibm_read_pci_config(bus->qts, s->alloc, s->buid,
++                                     config_addr, 1);
  }
--
--void qpci_unplug_acpi_device_test(const char *id, uint8_t slot)
--{
--    QDict *response;
--    char *cmd;
--
--    cmd = g_strdup_printf("{'execute': 'device_del',"
--                          " 'arguments': {"
--                          "   'id': '%s'"
--                          "}}", id);
--    response = qmp(cmd);
--    g_free(cmd);
--    g_assert(response);
--    g_assert(!qdict_haskey(response, "error"));
--    QDECREF(response);
--
--    outb(ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
--
--    qmp_eventwait("DEVICE_DELETED");
--}
-diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
-index 2dcdeade2a..9f36ec73ef 100644
---- a/tests/libqos/pci.c
-+++ b/tests/libqos/pci.c
-@@ -16,6 +16,9 @@
- #include "hw/pci/pci_regs.h"
- #include "qemu/host-utils.h"
 
-+#define ACPI_PCIHP_ADDR         0xae00
-+#define PCI_EJ_BASE             0x0008
-+
- void qpci_device_foreach(QPCIBus *bus, int vendor_id, int device_id,
-                          void (*func)(QPCIDevice *dev, int devfn, void *data),
-                          void *data)
-@@ -412,3 +415,23 @@ void qpci_plug_device_test(const char *driver, const char *id,
-     g_assert(!qdict_haskey(response, "error"));
-     QDECREF(response);
+ static uint16_t qpci_spapr_config_readw(QPCIBus *bus, int devfn, uint8_t offset)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+     uint32_t config_addr = (devfn << 8) | offset;
+-    return qrtas_ibm_read_pci_config(s->alloc, s->buid, config_addr, 2);
++    return qrtas_ibm_read_pci_config(bus->qts, s->alloc, s->buid,
++                                     config_addr, 2);
  }
-+
-+void qpci_unplug_device_test(const char *id, uint8_t slot)
-+{
-+    QDict *response;
-+    char *cmd;
-+
-+    cmd = g_strdup_printf("{'execute': 'device_del',"
-+                          " 'arguments': {"
-+                          "   'id': '%s'"
-+                          "}}", id);
-+    response = qmp(cmd);
-+    g_free(cmd);
-+    g_assert(response);
-+    g_assert(!qdict_haskey(response, "error"));
-+    QDECREF(response);
-+
-+    outb(ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
-+
-+    qmp_eventwait("DEVICE_DELETED");
-+}
-diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
-index ca4ee645b7..8441ab91ed 100644
---- a/tests/virtio-blk-test.c
-+++ b/tests/virtio-blk-test.c
-@@ -672,7 +672,7 @@ static void pci_hotplug(void)
 
-     /* unplug secondary disk */
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        qpci_unplug_acpi_device_test("drv1", PCI_SLOT_HP);
-+        qpci_unplug_device_test("drv1", PCI_SLOT_HP);
-     }
-     qtest_shutdown(qs);
+ static uint32_t qpci_spapr_config_readl(QPCIBus *bus, int devfn, uint8_t offset)
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+     uint32_t config_addr = (devfn << 8) | offset;
+-    return qrtas_ibm_read_pci_config(s->alloc, s->buid, config_addr, 4);
++    return qrtas_ibm_read_pci_config(bus->qts, s->alloc, s->buid,
++                                     config_addr, 4);
  }
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index 635b942c36..24e0f774f0 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -248,7 +248,7 @@ static void hotplug(void)
-     qpci_plug_device_test("virtio-net-pci", "net1", PCI_SLOT_HP, NULL);
 
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        qpci_unplug_acpi_device_test("net1", PCI_SLOT_HP);
-+        qpci_unplug_device_test("net1", PCI_SLOT_HP);
-     }
+ static void qpci_spapr_config_writeb(QPCIBus *bus, int devfn, uint8_t offset,
+@@ -130,7 +133,8 @@ static void qpci_spapr_config_writeb(QPCIBus *bus, int devfn, uint8_t offset,
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+     uint32_t config_addr = (devfn << 8) | offset;
+-    qrtas_ibm_write_pci_config(s->alloc, s->buid, config_addr, 1, value);
++    qrtas_ibm_write_pci_config(bus->qts, s->alloc, s->buid,
++                               config_addr, 1, value);
+ }
 
-     test_end();
-diff --git a/tests/virtio-rng-test.c b/tests/virtio-rng-test.c
-index dcecf77463..fc4a36474b 100644
---- a/tests/virtio-rng-test.c
-+++ b/tests/virtio-rng-test.c
-@@ -25,7 +25,7 @@ static void hotplug(void)
-     qpci_plug_device_test("virtio-rng-pci", "rng1", PCI_SLOT_HP, NULL);
+ static void qpci_spapr_config_writew(QPCIBus *bus, int devfn, uint8_t offset,
+@@ -138,7 +142,8 @@ static void qpci_spapr_config_writew(QPCIBus *bus, int devfn, uint8_t offset,
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+     uint32_t config_addr = (devfn << 8) | offset;
+-    qrtas_ibm_write_pci_config(s->alloc, s->buid, config_addr, 2, value);
++    qrtas_ibm_write_pci_config(bus->qts, s->alloc, s->buid,
++                               config_addr, 2, value);
+ }
 
-     if (strcmp(arch, "i386") == 0 || strcmp(arch, "x86_64") == 0) {
--        qpci_unplug_acpi_device_test("rng1", PCI_SLOT_HP);
-+        qpci_unplug_device_test("rng1", PCI_SLOT_HP);
+ static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
+@@ -146,7 +151,8 @@ static void qpci_spapr_config_writel(QPCIBus *bus, int devfn, uint8_t offset,
+ {
+     QPCIBusSPAPR *s = container_of(bus, QPCIBusSPAPR, bus);
+     uint32_t config_addr = (devfn << 8) | offset;
+-    qrtas_ibm_write_pci_config(s->alloc, s->buid, config_addr, 4, value);
++    qrtas_ibm_write_pci_config(bus->qts, s->alloc, s->buid,
++                               config_addr, 4, value);
+ }
+
+ #define SPAPR_PCI_BASE               (1ULL << 45)
+diff --git a/tests/libqos/rtas.c b/tests/libqos/rtas.c
+index 0269803ce0..d81ff4274d 100644
+--- a/tests/libqos/rtas.c
++++ b/tests/libqos/rtas.c
+@@ -7,26 +7,28 @@
+ #include "libqtest.h"
+ #include "libqos/rtas.h"
+
+-static void qrtas_copy_args(uint64_t target_args, uint32_t nargs,
+-                            uint32_t *args)
++static void qrtas_copy_args(QTestState *qts, uint64_t target_args,
++                            uint32_t nargs, uint32_t *args)
+ {
+     int i;
+
+     for (i = 0; i < nargs; i++) {
+-        writel(target_args + i * sizeof(uint32_t), args[i]);
++        qtest_writel(qts, target_args + i * sizeof(uint32_t), args[i]);
      }
  }
 
+-static void qrtas_copy_ret(uint64_t target_ret, uint32_t nret, uint32_t *ret)
++static void qrtas_copy_ret(QTestState *qts, uint64_t target_ret,
++                           uint32_t nret, uint32_t *ret)
+ {
+     int i;
+
+     for (i = 0; i < nret; i++) {
+-        ret[i] = readl(target_ret + i * sizeof(uint32_t));
++        ret[i] = qtest_readl(qts, target_ret + i * sizeof(uint32_t));
+     }
+ }
+
+-static uint64_t qrtas_call(QGuestAllocator *alloc, const char *name,
++static uint64_t qrtas_call(QTestState *qts, QGuestAllocator *alloc,
++                           const char *name,
+                            uint32_t nargs, uint32_t *args,
+                            uint32_t nret, uint32_t *ret)
+ {
+@@ -36,10 +38,9 @@ static uint64_t qrtas_call(QGuestAllocator *alloc, const char *name,
+     target_args = guest_alloc(alloc, nargs * sizeof(uint32_t));
+     target_ret = guest_alloc(alloc, nret * sizeof(uint32_t));
+
+-    qrtas_copy_args(target_args, nargs, args);
+-    res = qtest_rtas_call(global_qtest, name,
+-                          nargs, target_args, nret, target_ret);
+-    qrtas_copy_ret(target_ret, nret, ret);
++    qrtas_copy_args(qts, target_args, nargs, args);
++    res = qtest_rtas_call(qts, name, nargs, target_args, nret, target_ret);
++    qrtas_copy_ret(qts, target_ret, nret, ret);
+
+     guest_free(alloc, target_ret);
+     guest_free(alloc, target_args);
+@@ -47,12 +48,13 @@ static uint64_t qrtas_call(QGuestAllocator *alloc, const char *name,
+     return res;
+ }
+
+-int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns)
++int qrtas_get_time_of_day(QTestState *qts, QGuestAllocator *alloc,
++                          struct tm *tm, uint32_t *ns)
+ {
+     int res;
+     uint32_t ret[8];
+
+-    res = qrtas_call(alloc, "get-time-of-day", 0, NULL, 8, ret);
++    res = qrtas_call(qts, alloc, "get-time-of-day", 0, NULL, 8, ret);
+     if (res != 0) {
+         return res;
+     }
+@@ -70,7 +72,8 @@ int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns)
+     return res;
+ }
+
+-uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
++uint32_t qrtas_ibm_read_pci_config(QTestState *qts, QGuestAllocator *alloc,
++                                   uint64_t buid,
+                                    uint32_t addr, uint32_t size)
+ {
+     int res;
+@@ -80,7 +83,7 @@ uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
+     args[1] = buid >> 32;
+     args[2] = buid & 0xffffffff;
+     args[3] = size;
+-    res = qrtas_call(alloc, "ibm,read-pci-config", 4, args, 2, ret);
++    res = qrtas_call(qts, alloc, "ibm,read-pci-config", 4, args, 2, ret);
+     if (res != 0) {
+         return -1;
+     }
+@@ -92,7 +95,8 @@ uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
+     return ret[1];
+ }
+
+-int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
++int qrtas_ibm_write_pci_config(QTestState *qts, QGuestAllocator *alloc,
++                               uint64_t buid,
+                                uint32_t addr, uint32_t size, uint32_t val)
+ {
+     int res;
+@@ -103,7 +107,7 @@ int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
+     args[2] = buid & 0xffffffff;
+     args[3] = size;
+     args[4] = val;
+-    res = qrtas_call(alloc, "ibm,write-pci-config", 5, args, 1, ret);
++    res = qrtas_call(qts, alloc, "ibm,write-pci-config", 5, args, 1, ret);
+     if (res != 0) {
+         return -1;
+     }
+diff --git a/tests/rtas-test.c b/tests/rtas-test.c
+index 276c87ef84..34a692163f 100644
+--- a/tests/rtas-test.c
++++ b/tests/rtas-test.c
+@@ -16,7 +16,7 @@ static void test_rtas_get_time_of_day(void)
+     qs = qtest_spapr_boot("-machine pseries");
+
+     t1 = time(NULL);
+-    ret = qrtas_get_time_of_day(qs->alloc, &tm, &ns);
++    ret = qrtas_get_time_of_day(qs->qts, qs->alloc, &tm, &ns);
+     g_assert_cmpint(ret, ==, 0);
+     t2 = mktimegm(&tm);
+     g_assert(t2 - t1 < 5); /* 5 sec max to run the test */
 -- 
 2.13.5
