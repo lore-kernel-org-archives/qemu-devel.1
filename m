@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57065)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57989)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drLjW-0008V0-Mf
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:14:27 -0400
+	(envelope-from <no-reply@patchew.org>) id 1drLnL-0002LQ-U2
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:18:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drLjT-0002lY-Hu
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:14:26 -0400
-Received: from 12.mo1.mail-out.ovh.net ([87.98.162.229]:44411)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drLjT-0002kZ-BP
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:14:23 -0400
-Received: from player169.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id F1EB99308D
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 12:14:21 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Mon, 11 Sep 2017 12:14:19 +0200
-Message-ID: <150512485953.8642.2754721062817370406.stgit@bahia.lan>
+	(envelope-from <no-reply@patchew.org>) id 1drLnH-0004l1-HH
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 06:18:23 -0400
+Resent-Message-Id: <E1drLnH-0004l1-HH@eggs.gnu.org>
 In-Reply-To: <150512483616.8642.15831240906912354238.stgit@bahia.lan>
-References: <150512483616.8642.15831240906912354238.stgit@bahia.lan>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150512506547.225.9476838140098482777@6d89bd104fc3>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 2/2] spapr_pci: don't create 64-bit MMIO window
- if we don't need to
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 11 Sep 2017 03:17:45 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH 0/2] spapr_pci: some more cleanup
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +23,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: groug@kaod.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
 
-When running a pseries-2.2 or older machine type, we get the following
-lines in info mtree:
-
-address-space: memory
-...
-ffffffffffffffff-ffffffffffffffff (prio 0, i/o): alias
- pci@800000020000000.mmio64-alias @pci@800000020000000.mmio
-  ffffffffffffffff-ffffffffffffffff
-
-address-space: cpu-memory
-...
-ffffffffffffffff-ffffffffffffffff (prio 0, i/o): alias
- pci@800000020000000.mmio64-alias @pci@800000020000000.mmio
-  ffffffffffffffff-ffffffffffffffff
-
-The same thing occurs when running a pseries-2.7 with
-
-    -global spapr-pci-host-bridge.mem_win_size=2147483648
-
-This happens because we always create a 64-bit MMIO window, even if
-we didn't explicitely requested it (ie, mem64_win_size == 0) and the
-32-bit window is below 2GiB. It doesn't seem to have an impact on the
-guest though because spapr_populate_pci_dt() doesn't advertise the
-bogus windows when mem64_win_size == 0.
-
-Since these memory regions don't induce any state, we can safely
-choose to not create them when their address is equal to -1,
-without breaking migration from existing setups.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr_pci.c |   20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 7d84b9766ed2..cf54160526fa 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1622,13 +1622,19 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
-     memory_region_add_subregion(get_system_memory(), sphb->mem_win_addr,
-                                 &sphb->mem32window);
- 
--    namebuf = g_strdup_printf("%s.mmio64-alias", sphb->dtbusname);
--    memory_region_init_alias(&sphb->mem64window, OBJECT(sphb),
--                             namebuf, &sphb->memspace,
--                             sphb->mem64_win_pciaddr, sphb->mem64_win_size);
--    g_free(namebuf);
--    memory_region_add_subregion(get_system_memory(), sphb->mem64_win_addr,
--                                &sphb->mem64window);
-+    if (sphb->mem64_win_pciaddr != (hwaddr)-1) {
-+        namebuf = g_strdup_printf("%s.mmio64-alias", sphb->dtbusname);
-+        memory_region_init_alias(&sphb->mem64window, OBJECT(sphb),
-+                                 namebuf, &sphb->memspace,
-+                                 sphb->mem64_win_pciaddr, sphb->mem64_win_size);
-+        g_free(namebuf);
-+
-+        if (sphb->mem64_win_addr != (hwaddr)-1) {
-+            memory_region_add_subregion(get_system_memory(),
-+                                        sphb->mem64_win_addr,
-+                                        &sphb->mem64window);
-+        }
-+    }
- 
-     /* Initialize IO regions */
-     namebuf = g_strdup_printf("%s.io", sphb->dtbusname);
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCAwLzJdIHNwYXByX3BjaTogc29tZSBtb3JlIGNsZWFudXAKTWVzc2FnZS1p
+ZDogMTUwNTEyNDgzNjE2Ljg2NDIuMTU4MzEyNDA5MDY5MTIzNTQyMzguc3RnaXRAYmFoaWEubGFu
+ClR5cGU6IHNlcmllcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaAoKQkFT
+RT1iYXNlCm49MQp0b3RhbD0kKGdpdCBsb2cgLS1vbmVsaW5lICRCQVNFLi4gfCB3YyAtbCkKZmFp
+bGVkPTAKCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAt
+LWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCgpjb21taXRzPSIkKGdpdCBsb2cgLS1mb3JtYXQ9JUgg
+LS1yZXZlcnNlICRCQVNFLi4pIgpmb3IgYyBpbiAkY29tbWl0czsgZG8KICAgIGVjaG8gIkNoZWNr
+aW5nIFBBVENIICRuLyR0b3RhbDogJChnaXQgbG9nIC1uIDEgLS1mb3JtYXQ9JXMgJGMpLi4uIgog
+ICAgaWYgISBnaXQgc2hvdyAkYyAtLWZvcm1hdD1lbWFpbCB8IC4vc2NyaXB0cy9jaGVja3BhdGNo
+LnBsIC0tbWFpbGJhY2sgLTsgdGhlbgogICAgICAgIGZhaWxlZD0xCiAgICAgICAgZWNobwogICAg
+ZmkKICAgIG49JCgobisxKSkKZG9uZQoKZXhpdCAkZmFpbGVkCj09PSBURVNUIFNDUklQVCBFTkQg
+PT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZy
+b20gaHR0cHM6Ly9naXRodWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAg
+ICAgICAgICAgICAgIHBhdGNoZXcvMTUwNTEyNDgzNjE2Ljg2NDIuMTU4MzEyNDA5MDY5MTIzNTQy
+Mzguc3RnaXRAYmFoaWEubGFuIC0+IHBhdGNoZXcvMTUwNTEyNDgzNjE2Ljg2NDIuMTU4MzEyNDA5
+MDY5MTIzNTQyMzguc3RnaXRAYmFoaWEubGFuClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVz
+dCcKZGExZWM2NTgzYSBzcGFwcl9wY2k6IGRvbid0IGNyZWF0ZSA2NC1iaXQgTU1JTyB3aW5kb3cg
+aWYgd2UgZG9uJ3QgbmVlZCB0bwpmOWU5MTUwOTc3IHNwYXByX3BjaTogY29udmVydCBzcHJpbnRm
+KCkgdG8gZ19zdHJkdXBfcHJpbnRmKCkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBB
+VENIIDEvMjogc3BhcHJfcGNpOiBjb252ZXJ0IHNwcmludGYoKSB0byBnX3N0cmR1cF9wcmludGYo
+KS4uLgpDaGVja2luZyBQQVRDSCAyLzI6IHNwYXByX3BjaTogZG9uJ3QgY3JlYXRlIDY0LWJpdCBN
+TUlPIHdpbmRvdyBpZiB3ZSBkb24ndCBuZWVkIHRvLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
+YXJvdW5kIHRoYXQgJy0nIChjdHg6VnhWKQojNTQ6IEZJTEU6IGh3L3BwYy9zcGFwcl9wY2kuYzox
+NjUwOgorICAgIGlmIChzcGhiLT5tZW02NF93aW5fcGNpYWRkciAhPSAoaHdhZGRyKS0xKSB7CiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNl
+cyByZXF1aXJlZCBhcm91bmQgdGhhdCAnLScgKGN0eDpWeFYpCiM2MTogRklMRTogaHcvcHBjL3Nw
+YXByX3BjaS5jOjE2NTc6CisgICAgICAgIGlmIChzcGhiLT5tZW02NF93aW5fYWRkciAhPSAoaHdh
+ZGRyKS0xKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4K
+CnRvdGFsOiAyIGVycm9ycywgMCB3YXJuaW5ncywgMjYgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRj
+aCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJy
+b3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNl
+ZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNv
+bW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGlj
+YWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
+ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5vcmc=
