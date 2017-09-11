@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38539)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSOQ-0007Na-VB
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSOW-0007Ue-Nr
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSOP-0001Eu-Bs
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSOS-0001Fv-6u
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:12 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 11 Sep 2017 12:19:57 -0500
-Message-Id: <20170911172022.4738-14-eblake@redhat.com>
+Date: Mon, 11 Sep 2017 12:20:00 -0500
+Message-Id: <20170911172022.4738-17-eblake@redhat.com>
 In-Reply-To: <20170911172022.4738-1-eblake@redhat.com>
 References: <20170911172022.4738-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 13/38] libqos: Use explicit QTestState for
- fw_cfg operations
+Subject: [Qemu-devel] [PATCH v7 16/38] libqos: Use explicit QTestState for
+ ahci operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,352 +21,193 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, John Snow <jsnow@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:IDE" <qemu-block@nongnu.org>, "open list:sPAPR" <qemu-ppc@nongnu.org>
+Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, John Snow <jsnow@redhat.com>, "open list:IDE" <qemu-block@nongnu.org>
 
-Drop one more client of global_qtest by teaching all fw_cfg test
-functionality (invoked through alloc-pc) to pass in an explicit
-QTestState, adjusting all callers.  In particular, fw_cfg-test
-had to reorder things to create the test state prior to creating
-the fw_cfg (and drop a pointless strdup in the meantime), but that
-test now no longer depends on global_qtest.
+Drop one more client of global_qtest by teaching all ahci test
+functionality to pass in an explicit QTestState.  The state was
+already available, so no callers had to be adjusted.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v7: squash in typedef fixup as well as fw_cfg-test cleanup
+v7: split libqos changes from test-ahci
 ---
- tests/libqos/fw_cfg.h       | 10 ++++++----
- tests/libqos/libqos.h       |  2 +-
- tests/libqos/malloc-pc.h    |  4 ++--
- tests/libqos/malloc-spapr.h |  2 +-
- tests/libqos/malloc.h       |  1 +
- tests/boot-order-test.c     |  6 +++---
- tests/e1000e-test.c         |  2 +-
- tests/fw_cfg-test.c         | 13 ++++---------
- tests/ide-test.c            |  2 +-
- tests/libqos/fw_cfg.c       | 14 ++++++++------
- tests/libqos/libqos.c       |  2 +-
- tests/libqos/malloc-pc.c    |  8 ++++----
- tests/libqos/malloc-spapr.c |  4 ++--
- tests/vhost-user-test.c     |  2 +-
- 14 files changed, 36 insertions(+), 36 deletions(-)
+ tests/libqos/ahci.c | 45 +++++++++++++++++++++++----------------------
+ 1 file changed, 23 insertions(+), 22 deletions(-)
 
-diff --git a/tests/libqos/fw_cfg.h b/tests/libqos/fw_cfg.h
-index e8371b2317..0353416af0 100644
---- a/tests/libqos/fw_cfg.h
-+++ b/tests/libqos/fw_cfg.h
-@@ -13,12 +13,14 @@
- #ifndef LIBQOS_FW_CFG_H
- #define LIBQOS_FW_CFG_H
+diff --git a/tests/libqos/ahci.c b/tests/libqos/ahci.c
+index 790ef991b3..ba79cd77a0 100644
+--- a/tests/libqos/ahci.c
++++ b/tests/libqos/ahci.c
+@@ -283,7 +283,8 @@ void ahci_hba_enable(AHCIQState *ahci)
+         /* Allocate Memory for the Command List Buffer & FIS Buffer */
+         /* PxCLB space ... 0x20 per command, as in 4.2.2 p 36 */
+         ahci->port[i].clb = ahci_alloc(ahci, num_cmd_slots * 0x20);
+-        qmemset(ahci->port[i].clb, 0x00, num_cmd_slots * 0x20);
++        qtest_memset(ahci->parent->qts, ahci->port[i].clb, 0x00,
++                     num_cmd_slots * 0x20);
+         g_test_message("CLB: 0x%08" PRIx64, ahci->port[i].clb);
+         ahci_px_wreg(ahci, i, AHCI_PX_CLB, ahci->port[i].clb);
+         g_assert_cmphex(ahci->port[i].clb, ==,
+@@ -291,7 +292,7 @@ void ahci_hba_enable(AHCIQState *ahci)
 
-+#include "libqtest.h"
+         /* PxFB space ... 0x100, as in 4.2.1 p 35 */
+         ahci->port[i].fb = ahci_alloc(ahci, 0x100);
+-        qmemset(ahci->port[i].fb, 0x00, 0x100);
++        qtest_memset(ahci->parent->qts, ahci->port[i].fb, 0x00, 0x100);
+         g_test_message("FB: 0x%08" PRIx64, ahci->port[i].fb);
+         ahci_px_wreg(ahci, i, AHCI_PX_FB, ahci->port[i].fb);
+         g_assert_cmphex(ahci->port[i].fb, ==,
+@@ -397,7 +398,7 @@ void ahci_port_clear(AHCIQState *ahci, uint8_t port)
+     g_assert_cmphex(ahci_px_rreg(ahci, port, AHCI_PX_IS), ==, 0);
 
- typedef struct QFWCFG QFWCFG;
-
- struct QFWCFG
- {
-     uint64_t base;
-+    QTestState *qts;
-     void (*select)(QFWCFG *fw_cfg, uint16_t key);
-     void (*read)(QFWCFG *fw_cfg, void *data, size_t len);
- };
-@@ -30,12 +32,12 @@ uint16_t qfw_cfg_get_u16(QFWCFG *fw_cfg, uint16_t key);
- uint32_t qfw_cfg_get_u32(QFWCFG *fw_cfg, uint16_t key);
- uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key);
-
--QFWCFG *mm_fw_cfg_init(uint64_t base);
--QFWCFG *io_fw_cfg_init(uint16_t base);
-+QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base);
-+QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base);
-
--static inline QFWCFG *pc_fw_cfg_init(void)
-+static inline QFWCFG *pc_fw_cfg_init(QTestState *qts)
- {
--    return io_fw_cfg_init(0x510);
-+    return io_fw_cfg_init(qts, 0x510);
+     /* Wipe the FIS-Receive Buffer */
+-    qmemset(ahci->port[port].fb, 0x00, 0x100);
++    qtest_memset(ahci->parent->qts, ahci->port[port].fb, 0x00, 0x100);
  }
 
- #endif
-diff --git a/tests/libqos/libqos.h b/tests/libqos/libqos.h
-index 78e5c044a0..07d4b93d1d 100644
---- a/tests/libqos/libqos.h
-+++ b/tests/libqos/libqos.h
-@@ -8,7 +8,7 @@
- typedef struct QOSState QOSState;
+ /**
+@@ -466,7 +467,7 @@ void ahci_port_check_d2h_sanity(AHCIQState *ahci, uint8_t port, uint8_t slot)
+     RegD2HFIS *d2h = g_malloc0(0x20);
+     uint32_t reg;
 
- typedef struct QOSOps {
--    QGuestAllocator *(*init_allocator)(QAllocOpts);
-+    QGuestAllocator *(*init_allocator)(QTestState *qts, QAllocOpts);
-     void (*uninit_allocator)(QGuestAllocator *);
-     QPCIBus *(*qpci_init)(QTestState *qts, QGuestAllocator *alloc);
-     void (*qpci_free)(QPCIBus *bus);
-diff --git a/tests/libqos/malloc-pc.h b/tests/libqos/malloc-pc.h
-index 86ab9f0429..10f3da6cf2 100644
---- a/tests/libqos/malloc-pc.h
-+++ b/tests/libqos/malloc-pc.h
-@@ -15,8 +15,8 @@
+-    memread(ahci->port[port].fb + 0x40, d2h, 0x20);
++    qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x40, d2h, 0x20);
+     g_assert_cmphex(d2h->fis_type, ==, 0x34);
 
- #include "libqos/malloc.h"
+     reg = ahci_px_rreg(ahci, port, AHCI_PX_TFD);
+@@ -484,7 +485,7 @@ void ahci_port_check_pio_sanity(AHCIQState *ahci, uint8_t port,
+     /* We cannot check the Status or E_Status registers, because
+      * the status may have again changed between the PIO Setup FIS
+      * and the conclusion of the command with the D2H Register FIS. */
+-    memread(ahci->port[port].fb + 0x20, pio, 0x20);
++    qtest_memread(ahci->parent->qts, ahci->port[port].fb + 0x20, pio, 0x20);
+     g_assert_cmphex(pio->fis_type, ==, 0x5f);
 
--QGuestAllocator *pc_alloc_init(void);
--QGuestAllocator *pc_alloc_init_flags(QAllocOpts flags);
-+QGuestAllocator *pc_alloc_init(QTestState *qts);
-+QGuestAllocator *pc_alloc_init_flags(QTestState *qts, QAllocOpts flags);
- void pc_alloc_uninit(QGuestAllocator *allocator);
-
- #endif
-diff --git a/tests/libqos/malloc-spapr.h b/tests/libqos/malloc-spapr.h
-index 64d0e770d1..52a9346a26 100644
---- a/tests/libqos/malloc-spapr.h
-+++ b/tests/libqos/malloc-spapr.h
-@@ -11,7 +11,7 @@
- #include "libqos/malloc.h"
-
- QGuestAllocator *spapr_alloc_init(void);
--QGuestAllocator *spapr_alloc_init_flags(QAllocOpts flags);
-+QGuestAllocator *spapr_alloc_init_flags(QTestState *qts, QAllocOpts flags);
- void spapr_alloc_uninit(QGuestAllocator *allocator);
-
- #endif
-diff --git a/tests/libqos/malloc.h b/tests/libqos/malloc.h
-index ae9dac8f61..828fddabdb 100644
---- a/tests/libqos/malloc.h
-+++ b/tests/libqos/malloc.h
-@@ -14,6 +14,7 @@
- #define LIBQOS_MALLOC_H
-
- #include "qemu/queue.h"
-+#include "libqtest.h"
-
- typedef enum {
-     ALLOC_NO_FLAGS    = 0x00,
-diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
-index 9d516830dd..5fc2ca8e9e 100644
---- a/tests/boot-order-test.c
-+++ b/tests/boot-order-test.c
-@@ -135,7 +135,7 @@ static void test_prep_boot_order(void)
-
- static uint64_t read_boot_order_pmac(void)
+     /* BUG: PIO Setup FIS as utilized by QEMU tries to fit the entire
+@@ -516,7 +517,7 @@ void ahci_get_command_header(AHCIQState *ahci, uint8_t port,
  {
--    QFWCFG *fw_cfg = mm_fw_cfg_init(0xf0000510);
-+    QFWCFG *fw_cfg = mm_fw_cfg_init(global_qtest, 0xf0000510);
+     uint64_t ba = ahci->port[port].clb;
+     ba += slot * sizeof(AHCICommandHeader);
+-    memread(ba, cmd, sizeof(AHCICommandHeader));
++    qtest_memread(ahci->parent->qts, ba, cmd, sizeof(AHCICommandHeader));
 
-     return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
- }
-@@ -160,7 +160,7 @@ static void test_pmac_newworld_boot_order(void)
+     cmd->flags = le16_to_cpu(cmd->flags);
+     cmd->prdtl = le16_to_cpu(cmd->prdtl);
+@@ -537,7 +538,7 @@ void ahci_set_command_header(AHCIQState *ahci, uint8_t port,
+     tmp.prdbc = cpu_to_le32(cmd->prdbc);
+     tmp.ctba = cpu_to_le64(cmd->ctba);
 
- static uint64_t read_boot_order_sun4m(void)
- {
--    QFWCFG *fw_cfg = mm_fw_cfg_init(0xd00000510ULL);
-+    QFWCFG *fw_cfg = mm_fw_cfg_init(global_qtest, 0xd00000510ULL);
-
-     return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
- }
-@@ -172,7 +172,7 @@ static void test_sun4m_boot_order(void)
-
- static uint64_t read_boot_order_sun4u(void)
- {
--    QFWCFG *fw_cfg = io_fw_cfg_init(0x510);
-+    QFWCFG *fw_cfg = io_fw_cfg_init(global_qtest, 0x510);
-
-     return qfw_cfg_get_u16(fw_cfg, FW_CFG_BOOT_DEVICE);
- }
-diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
-index 3cc081941e..8645485c19 100644
---- a/tests/e1000e-test.c
-+++ b/tests/e1000e-test.c
-@@ -392,7 +392,7 @@ static void data_test_init(e1000e_device *d)
-     qtest_start(cmdline);
-     g_free(cmdline);
-
--    test_alloc = pc_alloc_init();
-+    test_alloc = pc_alloc_init(global_qtest);
-     g_assert_nonnull(test_alloc);
-
-     test_bus = qpci_init_pc(global_qtest, test_alloc);
-diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-index 688342bed5..3a8dc7a2cd 100644
---- a/tests/fw_cfg-test.c
-+++ b/tests/fw_cfg-test.c
-@@ -102,12 +102,13 @@ static void test_fw_cfg_boot_menu(void)
- int main(int argc, char **argv)
- {
-     QTestState *s;
--    char *cmdline;
-     int ret;
-
-     g_test_init(&argc, &argv, NULL);
-
--    fw_cfg = pc_fw_cfg_init();
-+    s = qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
-+
-+    fw_cfg = pc_fw_cfg_init(s);
-
-     qtest_add_func("fw_cfg/signature", test_fw_cfg_signature);
-     qtest_add_func("fw_cfg/id", test_fw_cfg_id);
-@@ -125,15 +126,9 @@ int main(int argc, char **argv)
-     qtest_add_func("fw_cfg/numa", test_fw_cfg_numa);
-     qtest_add_func("fw_cfg/boot_menu", test_fw_cfg_boot_menu);
-
--    cmdline = g_strdup_printf("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8 ");
--    s = qtest_start(cmdline);
--    g_free(cmdline);
--
-     ret = g_test_run();
-
--    if (s) {
--        qtest_quit(s);
--    }
-+    qtest_quit(s);
-
-     return ret;
- }
-diff --git a/tests/ide-test.c b/tests/ide-test.c
-index b2237b6158..084f6a5f96 100644
---- a/tests/ide-test.c
-+++ b/tests/ide-test.c
-@@ -125,7 +125,7 @@ static void ide_test_start(const char *cmdline_fmt, ...)
-     va_end(ap);
-
-     qtest_start(cmdline);
--    guest_malloc = pc_alloc_init();
-+    guest_malloc = pc_alloc_init(global_qtest);
-
-     g_free(cmdline);
- }
-diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
-index 4d9dc3fd0b..d0889d1e22 100644
---- a/tests/libqos/fw_cfg.c
-+++ b/tests/libqos/fw_cfg.c
-@@ -56,7 +56,7 @@ uint64_t qfw_cfg_get_u64(QFWCFG *fw_cfg, uint16_t key)
-
- static void mm_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
- {
--    writew(fw_cfg->base, key);
-+    qtest_writew(fw_cfg->qts, fw_cfg->base, key);
+-    memwrite(ba, &tmp, sizeof(AHCICommandHeader));
++    qtest_memwrite(ahci->parent->qts, ba, &tmp, sizeof(AHCICommandHeader));
  }
 
- static void mm_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
-@@ -65,15 +65,16 @@ static void mm_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
-     int i;
-
-     for (i = 0; i < len; i++) {
--        ptr[i] = readb(fw_cfg->base + 2);
-+        ptr[i] = qtest_readb(fw_cfg->qts, fw_cfg->base + 2);
-     }
- }
-
--QFWCFG *mm_fw_cfg_init(uint64_t base)
-+QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base)
- {
-     QFWCFG *fw_cfg = g_malloc0(sizeof(*fw_cfg));
-
-     fw_cfg->base = base;
-+    fw_cfg->qts = qts;
-     fw_cfg->select = mm_fw_cfg_select;
-     fw_cfg->read = mm_fw_cfg_read;
-
-@@ -82,7 +83,7 @@ QFWCFG *mm_fw_cfg_init(uint64_t base)
-
- static void io_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
- {
--    outw(fw_cfg->base, key);
-+    qtest_outw(fw_cfg->qts, fw_cfg->base, key);
- }
-
- static void io_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
-@@ -91,15 +92,16 @@ static void io_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
-     int i;
-
-     for (i = 0; i < len; i++) {
--        ptr[i] = inb(fw_cfg->base + 1);
-+        ptr[i] = qtest_inb(fw_cfg->qts, fw_cfg->base + 1);
-     }
- }
-
--QFWCFG *io_fw_cfg_init(uint16_t base)
-+QFWCFG *io_fw_cfg_init(QTestState *qts, uint16_t base)
- {
-     QFWCFG *fw_cfg = g_malloc0(sizeof(*fw_cfg));
-
-     fw_cfg->base = base;
-+    fw_cfg->qts = qts;
-     fw_cfg->select = io_fw_cfg_select;
-     fw_cfg->read = io_fw_cfg_read;
-
-diff --git a/tests/libqos/libqos.c b/tests/libqos/libqos.c
-index 7a76c1ef34..40018b9c07 100644
---- a/tests/libqos/libqos.c
-+++ b/tests/libqos/libqos.c
-@@ -23,7 +23,7 @@ QOSState *qtest_vboot(QOSOps *ops, const char *cmdline_fmt, va_list ap)
-     qs->qts = qtest_start(cmdline);
-     qs->ops = ops;
-     if (ops) {
--        qs->alloc = ops->init_allocator(ALLOC_NO_FLAGS);
-+        qs->alloc = ops->init_allocator(qs->qts, ALLOC_NO_FLAGS);
-         qs->pcibus = ops->qpci_init(qs->qts, qs->alloc);
+ void ahci_destroy_command(AHCIQState *ahci, uint8_t port, uint8_t slot)
+@@ -575,7 +576,7 @@ void ahci_write_fis(AHCIQState *ahci, AHCICommand *cmd)
+         tmp.count = cpu_to_le16(tmp.count);
      }
 
-diff --git a/tests/libqos/malloc-pc.c b/tests/libqos/malloc-pc.c
-index dd2b900c5f..634b9c288a 100644
---- a/tests/libqos/malloc-pc.c
-+++ b/tests/libqos/malloc-pc.c
-@@ -29,11 +29,11 @@ void pc_alloc_uninit(QGuestAllocator *allocator)
-     alloc_uninit(allocator);
+-    memwrite(addr, &tmp, sizeof(tmp));
++    qtest_memwrite(ahci->parent->qts, addr, &tmp, sizeof(tmp));
  }
 
--QGuestAllocator *pc_alloc_init_flags(QAllocOpts flags)
-+QGuestAllocator *pc_alloc_init_flags(QTestState *qts, QAllocOpts flags)
- {
-     QGuestAllocator *s;
-     uint64_t ram_size;
--    QFWCFG *fw_cfg = pc_fw_cfg_init();
-+    QFWCFG *fw_cfg = pc_fw_cfg_init(qts);
-
-     ram_size = qfw_cfg_get_u64(fw_cfg, FW_CFG_RAM_SIZE);
-     s = alloc_init_flags(flags, 1 << 20, MIN(ram_size, 0xE0000000));
-@@ -45,7 +45,7 @@ QGuestAllocator *pc_alloc_init_flags(QAllocOpts flags)
-     return s;
- }
-
--inline QGuestAllocator *pc_alloc_init(void)
-+inline QGuestAllocator *pc_alloc_init(QTestState *qts)
- {
--    return pc_alloc_init_flags(ALLOC_NO_FLAGS);
-+    return pc_alloc_init_flags(qts, ALLOC_NO_FLAGS);
- }
-diff --git a/tests/libqos/malloc-spapr.c b/tests/libqos/malloc-spapr.c
-index 006404af33..1c359cea6c 100644
---- a/tests/libqos/malloc-spapr.c
-+++ b/tests/libqos/malloc-spapr.c
-@@ -22,7 +22,7 @@ void spapr_alloc_uninit(QGuestAllocator *allocator)
-     alloc_uninit(allocator);
- }
-
--QGuestAllocator *spapr_alloc_init_flags(QAllocOpts flags)
-+QGuestAllocator *spapr_alloc_init_flags(QTestState *qts, QAllocOpts flags)
- {
-     QGuestAllocator *s;
-
-@@ -34,5 +34,5 @@ QGuestAllocator *spapr_alloc_init_flags(QAllocOpts flags)
-
- QGuestAllocator *spapr_alloc_init(void)
- {
--    return spapr_alloc_init_flags(ALLOC_NO_FLAGS);
-+    return spapr_alloc_init_flags(NULL, ALLOC_NO_FLAGS);
- }
-diff --git a/tests/vhost-user-test.c b/tests/vhost-user-test.c
-index f762b2ebc1..b041d2c6a2 100644
---- a/tests/vhost-user-test.c
-+++ b/tests/vhost-user-test.c
-@@ -896,7 +896,7 @@ static void test_multiqueue(void)
-     bus = qpci_init_pc(global_qtest, NULL);
-     dev = virtio_net_pci_init(bus, PCI_SLOT);
-
--    alloc = pc_alloc_init();
-+    alloc = pc_alloc_init(global_qtest);
-     for (i = 0; i < queues * 2; i++) {
-         vq[i] = (QVirtQueuePCI *)qvirtqueue_setup(&dev->vdev, alloc, i);
+ unsigned ahci_pick_cmd(AHCIQState *ahci, uint8_t port)
+@@ -636,7 +637,7 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
+     if (opts->size && !opts->buffer) {
+         opts->buffer = ahci_alloc(ahci, opts->size);
+         g_assert(opts->buffer);
+-        qmemset(opts->buffer, 0x00, opts->size);
++        qtest_memset(ahci->parent->qts, opts->buffer, 0x00, opts->size);
      }
+
+     /* Command creation */
+@@ -661,15 +662,15 @@ void ahci_exec(AHCIQState *ahci, uint8_t port,
+     ahci_command_commit(ahci, cmd, port);
+     ahci_command_issue_async(ahci, cmd);
+     if (opts->error) {
+-        qmp_eventwait("STOP");
++        qtest_qmp_eventwait(ahci->parent->qts, "STOP");
+     }
+     if (opts->mid_cb) {
+         rc = opts->mid_cb(ahci, cmd, opts);
+         g_assert_cmpint(rc, ==, 0);
+     }
+     if (opts->error) {
+-        qmp_async("{'execute':'cont' }");
+-        qmp_eventwait("RESUME");
++        qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
++        qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
+     }
+
+     /* Wait for command to complete and verify sanity */
+@@ -697,7 +698,7 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uint8_t port,
+     ahci_command_adjust(cmd, sector, buffer, bufsize, 0);
+     ahci_command_commit(ahci, cmd, port);
+     ahci_command_issue_async(ahci, cmd);
+-    qmp_eventwait("STOP");
++    qtest_qmp_eventwait(ahci->parent->qts, "STOP");
+
+     return cmd;
+ }
+@@ -706,8 +707,8 @@ AHCICommand *ahci_guest_io_halt(AHCIQState *ahci, uint8_t port,
+ void ahci_guest_io_resume(AHCIQState *ahci, AHCICommand *cmd)
+ {
+     /* Complete the command */
+-    qmp_async("{'execute':'cont' }");
+-    qmp_eventwait("RESUME");
++    qtest_async_qmp(ahci->parent->qts, "{'execute':'cont' }");
++    qtest_qmp_eventwait(ahci->parent->qts, "RESUME");
+     ahci_command_wait(ahci, cmd);
+     ahci_command_verify(ahci, cmd);
+     ahci_command_free(cmd);
+@@ -754,16 +755,16 @@ void ahci_io(AHCIQState *ahci, uint8_t port, uint8_t ide_cmd,
+     g_assert(props);
+     ptr = ahci_alloc(ahci, bufsize);
+     g_assert(!bufsize || ptr);
+-    qmemset(ptr, 0x00, bufsize);
++    qtest_memset(ahci->parent->qts, ptr, 0x00, bufsize);
+
+     if (bufsize && props->write) {
+-        bufwrite(ptr, buffer, bufsize);
++        qtest_bufwrite(ahci->parent->qts, ptr, buffer, bufsize);
+     }
+
+     ahci_guest_io(ahci, port, ide_cmd, ptr, bufsize, sector);
+
+     if (bufsize && props->read) {
+-        bufread(ptr, buffer, bufsize);
++        qtest_bufread(ahci->parent->qts, ptr, buffer, bufsize);
+     }
+
+     ahci_free(ahci, ptr);
+@@ -901,7 +902,7 @@ static int copy_buffer(AHCIQState *ahci, AHCICommand *cmd,
+                         const AHCIOpts *opts)
+ {
+     unsigned char *rx = opts->opaque;
+-    bufread(opts->buffer, rx, opts->size);
++    qtest_bufread(ahci->parent->qts, opts->buffer, rx, opts->size);
+     return 0;
+ }
+
+@@ -1141,7 +1142,7 @@ void ahci_command_commit(AHCIQState *ahci, AHCICommand *cmd, uint8_t port)
+     ahci_write_fis(ahci, cmd);
+     /* Then ATAPI CMD, if needed */
+     if (cmd->props->atapi) {
+-        memwrite(table_ptr + 0x40, cmd->atapi_cmd, 16);
++        qtest_memwrite(ahci->parent->qts, table_ptr + 0x40, cmd->atapi_cmd, 16);
+     }
+
+     /* Construct and write the PRDs to the command table */
+@@ -1162,8 +1163,8 @@ void ahci_command_commit(AHCIQState *ahci, AHCICommand *cmd, uint8_t port)
+         prd.dbc |= cpu_to_le32(0x80000000); /* Request DPS Interrupt */
+
+         /* Commit the PRD entry to the Command Table */
+-        memwrite(table_ptr + 0x80 + (i * sizeof(PRD)),
+-                 &prd, sizeof(PRD));
++        qtest_memwrite(ahci->parent->qts, table_ptr + 0x80 + (i * sizeof(PRD)),
++                       &prd, sizeof(PRD));
+     }
+
+     /* Bookmark the PRDTL and CTBA values */
 -- 
 2.13.5
