@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33316)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1drNML-00079r-EG
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:58:38 -0400
+	(envelope-from <no-reply@patchew.org>) id 1drNOJ-0000Fv-6M
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 08:00:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1drNMH-0002ov-Df
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:58:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40092)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1drNMH-0002oX-4Z
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:58:33 -0400
-Date: Mon, 11 Sep 2017 12:58:15 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170911115814.GC2150@work-vm>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-20-dgilbert@redhat.com>
-	<20170830052802.GB5920@pxdev.xzpeter.org>
+	(envelope-from <no-reply@patchew.org>) id 1drNOI-00049h-3m
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 08:00:39 -0400
+Resent-Message-Id: <E1drNOI-00049h-3m@eggs.gnu.org>
+In-Reply-To: <150512970330.16081.7553039475680302776.stgit@bahia>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150513120053.225.10218577654903291881@6d89bd104fc3>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170830052802.GB5920@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC v2 19/32] vhost+postcopy: Resolve client
- address
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Mon, 11 Sep 2017 05:00:01 -0700 (PDT)
+Subject: Re: [Qemu-devel] [RFC PATCH] spapr_pci: make index property
+ mandatory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,111 +24,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
+To: groug@kaod.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, aik@ozlabs.ru, qemu-ppc@nongnu.org, mdroth@linux.vnet.ibm.com, david@gibson.dropbear.id.au
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Thu, Aug 24, 2017 at 08:27:17PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Resolve fault addresses read off the clients UFD into RAMBlock
-> > and offset, and call back to the postcopy code to ask for the page.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  hw/virtio/trace-events |  3 +++
-> >  hw/virtio/vhost-user.c | 30 +++++++++++++++++++++++++++++-
-> >  2 files changed, 32 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> > index 5067dee19b..f7d4b831fe 100644
-> > --- a/hw/virtio/trace-events
-> > +++ b/hw/virtio/trace-events
-> > @@ -1,6 +1,9 @@
-> >  # See docs/devel/tracing.txt for syntax documentation.
-> >  
-> >  # hw/virtio/vhost-user.c
-> > +vhost_user_postcopy_fault_handler(const char *name, uint64_t fault_address, int nregions) "%s: @0x%"PRIx64" nregions:%d"
-> > +vhost_user_postcopy_fault_handler_loop(int i, uint64_t client_base, uint64_t size) "%d: client 0x%"PRIx64" +0x%"PRIx64
-> > +vhost_user_postcopy_fault_handler_found(int i, uint64_t region_offset, uint64_t rb_offset) "%d: region_offset: 0x%"PRIx64" rb_offset:0x%"PRIx64
-> >  vhost_user_postcopy_listen(void) ""
-> >  vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply %d region %d"
-> >  vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t memory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t offset) "%d:%s: size:0x%"PRIx64" GPA:0x%"PRIx64" QVA/userspace:0x%"PRIx64" RB offset:0x%"PRIx64
-> > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> > index fbe2743298..2897ff70b3 100644
-> > --- a/hw/virtio/vhost-user.c
-> > +++ b/hw/virtio/vhost-user.c
-> > @@ -816,7 +816,35 @@ out:
-> >  static int vhost_user_postcopy_fault_handler(struct PostCopyFD *pcfd,
-> >                                               void *ufd)
-> >  {
-> > -    return 0;
-> > +    struct vhost_dev *dev = pcfd->data;
-> > +    struct vhost_user *u = dev->opaque;
-> > +    struct uffd_msg *msg = ufd;
-> > +    uint64_t faultaddr = msg->arg.pagefault.address;
-> > +    RAMBlock *rb = NULL;
-> > +    uint64_t rb_offset;
-> > +    int i;
-> > +
-> > +    trace_vhost_user_postcopy_fault_handler(pcfd->idstr, faultaddr,
-> > +                                            dev->mem->nregions);
-> > +    for (i = 0; i < MIN(dev->mem->nregions, u->region_rb_len); i++) {
-> 
-> Should dev->mem->nregions always the same as u->region_rb_len?
-
-u->region_rb_len only gets updated when vhost_user_set_mem_table is
-called, so I think there are short periods of time when they don't
-quite match.
-(We do have to take some more care than we are at the moment during
-updates, because this address resolution happens off the postcopy
-thread)
-
-> > +        trace_vhost_user_postcopy_fault_handler_loop(i,
-> > +                u->postcopy_client_bases[i], dev->mem->regions[i].memory_size);
-> > +        if (faultaddr >= u->postcopy_client_bases[i]) {
-> > +            /* Ofset of the fault address in the vhost region */
-> > +            uint64_t region_offset = faultaddr - u->postcopy_client_bases[i];
-> > +            if (region_offset <= dev->mem->regions[i].memory_size) {
-> 
-> Should be "<" rather than "<="?  Say:
-> 
-> Region 1: [0, 1M), size 1M
-> Region 2: [1M, 2M), size 1M
-> 
-> Looks like otherwise faultaddr=1M will fall into region 1, while it
-> should be region 2?
-
-Fixed; thanks.
-
-> 
-> > +                rb_offset = region_offset + u->region_rb_offset[i];
-> > +                trace_vhost_user_postcopy_fault_handler_found(i,
-> > +                        region_offset, rb_offset);
-> > +                rb = u->region_rb[i];
-> 
-> Nit: this "rb" might be avoided if only used once.
-
-It's only a local, ok if it makes it a little more readable.
-
-Dave
-
-> > +                return postcopy_request_shared_page(pcfd, rb, faultaddr,
-> > +                                                    rb_offset);
-> > +            }
-> > +        }
-> > +    }
-> > +    error_report("%s: Failed to find region for fault %" PRIx64,
-> > +                 __func__, faultaddr);
-> > +    return -1;
-> >  }
-> >  
-> >  /*
-> > -- 
-> > 2.13.5
-> > 
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtSRkMgUEFUQ0hdIHNwYXByX3BjaTogbWFrZSBpbmRleCBwcm9wZXJ0eSBtYW5kYXRv
+cnkKTWVzc2FnZS1pZDogMTUwNTEyOTcwMzMwLjE2MDgxLjc1NTMwMzk0NzU2ODAzMDI3NzYuc3Rn
+aXRAYmFoaWEKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9i
+YXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdj
+IC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZv
+cm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNo
+byAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAk
+YykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2No
+ZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBl
+Y2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NS
+SVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3
+MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25l
+dyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTA1MTI5NzAzMzAuMTYwODEuNzU1MzAzOTQ3
+NTY4MDMwMjc3Ni5zdGdpdEBiYWhpYSAtPiBwYXRjaGV3LzE1MDUxMjk3MDMzMC4xNjA4MS43NTUz
+MDM5NDc1NjgwMzAyNzc2LnN0Z2l0QGJhaGlhCiB0IFt0YWcgdXBkYXRlXSAgICAgICAgICAgIHBh
+dGNoZXcvMjAxNzA5MTExMTAwMzcuNjU2Ny0xLWx2aXZpZXJAcmVkaGF0LmNvbSAtPiBwYXRjaGV3
+LzIwMTcwOTExMTEwMDM3LjY1NjctMS1sdml2aWVyQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBu
+ZXcgYnJhbmNoICd0ZXN0Jwo0Mzc5MDc4OTY2IHNwYXByX3BjaTogbWFrZSBpbmRleCBwcm9wZXJ0
+eSBtYW5kYXRvcnkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTogc3Bh
+cHJfcGNpOiBtYWtlIGluZGV4IHByb3BlcnR5IG1hbmRhdG9yeS4uLgpFUlJPUjogc3BhY2VzIHJl
+cXVpcmVkIGFyb3VuZCB0aGF0ICctJyAoY3R4OlZ4VikKIzEyNTogRklMRTogaHcvcHBjL3NwYXBy
+X3BjaS5jOjE5MjA6CisgICAgc3BoYi0+bWVtNjRfd2luX2FkZHIgPSAoaHdhZGRyKS0xOwogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogMSBlcnJvcnMsIDAgd2Fy
+bmluZ3MsIDkyIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
+bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
+IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
+TkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6
+IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDov
+L3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZl
+bEBmcmVlbGlzdHMub3Jn
