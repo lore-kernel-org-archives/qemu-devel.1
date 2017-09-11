@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38833)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41764)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1drIxr-00053Y-5r
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 03:17:04 -0400
+	(envelope-from <cohuck@redhat.com>) id 1drJ9p-0007fL-DN
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 03:29:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1drIxo-0007jp-1b
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 03:17:03 -0400
-Received: from chuckie.co.uk ([82.165.15.123]:35432
-	helo=s16892447.onlinehome-server.info)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mark.cave-ayland@ilande.co.uk>)
-	id 1drIxn-0007ic-Rj
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 03:16:59 -0400
-Date: Mon, 11 Sep 2017 08:12:42 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <20170911071242.GB16807@kentang.lan>
+	(envelope-from <cohuck@redhat.com>) id 1drJ9m-0004ds-Am
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 03:29:25 -0400
+Date: Mon, 11 Sep 2017 09:29:11 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170911092911.27e0886e.cohuck@redhat.com>
+In-Reply-To: <9058bb80-4e5c-3316-576f-1c21924a8a07@redhat.com>
+References: <1504100343-26607-1-git-send-email-thuth@redhat.com>
+	<b98a4c56-f386-f827-5aa7-9a00e6fdf790@amsat.org>
+	<CAFEAcA8O5T5cX8XqBVZqXLt5MPvF7qEcJK8Az2GBei07P0dZGQ@mail.gmail.com>
+	<20170910032413.GB2735@umbus.fritz.box>
+	<9058bb80-4e5c-3316-576f-1c21924a8a07@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Subject: [Qemu-devel] [PULL] Update OpenBIOS images
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH for-2.11] hw/misc/ivshmem: Fix
+ ivshmem_recv_msg() to also work on big endian systems
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,40 +27,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: Thomas Huth <thuth@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, Peter Maydell <peter.maydell@linaro.org>, Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>, QEMU Developers <qemu-devel@nongnu.org>, QEMU Trivial <qemu-trivial@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
 
-Hi Peter,
+On Mon, 11 Sep 2017 04:35:08 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-Here are the first set of OpenBIOS updates for 2.11. Please pull.
+> On 10.09.2017 05:24, David Gibson wrote:
+> > On Wed, Aug 30, 2017 at 03:59:07PM +0100, Peter Maydell wrote: =20
+> >> On 30 August 2017 at 15:53, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote: =20
+> >>> On 08/30/2017 10:39 AM, Thomas Huth wrote: =20
+> >>>> The problem is that the server side code in ivshmem_server_send_one_=
+msg()
+> >>>> correctly translates all messages IDs into little endian 64-bit valu=
+es,
+> >>>> but the client side code in the ivshmem_recv_msg() function does not=
+ swap
+> >>>> the byte order back. Fix it by passing the value through le64_to_cpu=
+(). =20
+> >>>
+> >>>
+> >>> Yes, we lack BE testing :( =20
+> >>
+> >> My pre-pull-request test set includes s390 and ppc64 bigendian.
+> >> This one was just missed because the 'slow' tests aren't in
+> >> 'make check'. =20
+> >=20
+> > I'm not what makes sense for staging this fix.  I could take it
+> > through my tree, but it's not an obvious match, since this isn't
+> > really related to ppc at all. =20
+>=20
+> There does not seem to be maintainer for ivshmem, as far as I can see,
+> so I'd say any tree that is distantly related is fine. So I think you
+> could either take it through your ppc tree (since the bug affects big
+> endian ppc machines), or maybe Cornelia could take it through the s390x
+> tree (since we've seen the problem on the big endian s390x machines,
+> too). Otherwise I have to wait and see whether it goes through misc or
+> trivial, I guess...
 
-
-ATB,
-
-Mark.
-
-
-The following changes since commit fcea73709b966a7ded9efa7b106ea50c7fe9025c:
-
-  Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2017-09-08 16:04:42 +0100)
-
-are available in the git repository at:
-
-
-  https://github.com/mcayland/qemu.git tags/qemu-openbios-signed
-
-for you to fetch changes up to 8722a719dea27818cb02709f3f72c2f9a996dadf:
-
-  Update OpenBIOS images to 314d4f8 built from submodule. (2017-09-11 07:43:34 +0100)
-
-----------------------------------------------------------------
-Update OpenBIOS images
-
-----------------------------------------------------------------
-Mark Cave-Ayland (1):
-      Update OpenBIOS images to 314d4f8 built from submodule.
-
- pc-bios/openbios-ppc     |  Bin 754936 -> 754936 bytes
- pc-bios/openbios-sparc32 |  Bin 382048 -> 382048 bytes
- pc-bios/openbios-sparc64 |  Bin 1593408 -> 1593408 bytes
- roms/openbios            |    2 +-
- 4 files changed, 1 insertion(+), 1 deletion(-)
+I'll queue it; and whoever sends the first pull request, 'wins' :)
