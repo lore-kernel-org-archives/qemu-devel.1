@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42474)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43446)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1drSXI-0008CI-Gk
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:30:17 -0400
+	(envelope-from <alistair23@gmail.com>) id 1drSaA-0002VY-8t
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:33:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1drSXH-0006ta-O3
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:30:16 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:33742)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1drSXH-0006ss-HQ
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:30:15 -0400
-Received: by mail-wr0-x244.google.com with SMTP id b9so4747961wra.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 10:30:15 -0700 (PDT)
+	(envelope-from <alistair23@gmail.com>) id 1drSa9-0000eh-0S
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:33:14 -0400
 MIME-Version: 1.0
-In-Reply-To: <1505175459-27177-1-git-send-email-jincheng.miao@gmail.com>
-References: <1505175459-27177-1-git-send-email-jincheng.miao@gmail.com>
+In-Reply-To: <2a61ae5a-dd09-d782-8cc1-66afd7a31559@amsat.org>
+References: <1505137930-13255-1-git-send-email-peter.maydell@linaro.org>
+	<1505137930-13255-2-git-send-email-peter.maydell@linaro.org>
+	<2a61ae5a-dd09-d782-8cc1-66afd7a31559@amsat.org>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Mon, 11 Sep 2017 10:29:43 -0700
-Message-ID: <CAKmqyKNzpD3nUcQHCFjerJ3Dy-dfqBdAP8BWC7qAdcEU5g6PTQ@mail.gmail.com>
+Date: Mon, 11 Sep 2017 10:32:38 -0700
+Message-ID: <CAKmqyKNrk_aBGwMs0gL_xf5PiA6BEL0x3xxxsFf+i3NJReEEaA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] tcg: Fix tci build
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/7] target/arm: Use
+ M_REG_NUM_BANKS rather than hardcoding 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +25,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jincheng.miao@gmail.com
-Cc: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>, Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-On Mon, Sep 11, 2017 at 5:17 PM,  <jincheng.miao@gmail.com> wrote:
-> From: Jincheng Miao <jincheng.miao@gmail.com>
+On Mon, Sep 11, 2017 at 7:59 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> On 09/11/2017 10:52 AM, Peter Maydell wrote:
+>>
+>> Use a symbolic constant M_REG_NUM_BANKS for the array size for
+>> registers which are banked by M profile security state, rather
+>> than hardcoding lots of 2s.
+>>
+>> Suggested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 >
-> The previous commit 659ef5cbb8 enable LDST_LABELS in tci target,
-> but which causes tci build error like:
-> tcg/tcg.c:116:13: error: =E2=80=98tcg_out_ldst_finalize=E2=80=99 used but=
- never defined [-Werror]
->  static bool tcg_out_ldst_finalize(TCGContext *s);
->              ^
-> cc1: all warnings being treated as errors
-> make[1]: *** [tcg/tcg.o] Error 1
-> make: *** [subdir-x86_64-softmmu] Error 2
 >
-> If this macro is not used in tci, we could just delete it.
->
-> Signed-off-by: Jincheng Miao <jincheng.miao@gmail.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Thank you for the patch!
-
-This looks good, unfortunately someone else had already sent the same
-fix. You can review their patch and add your Reviewed by line to that
-patch, that will help get the fix merged.
-
-You can see their patch here: https://patchwork.kernel.org/patch/9946503/
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
 Thanks,
 Alistair
 
-> ---
->  tcg/tci/tcg-target.h | 4 ----
->  1 file changed, 4 deletions(-)
 >
-> diff --git a/tcg/tci/tcg-target.h b/tcg/tci/tcg-target.h
-> index 5d692e1..26140d7 100644
-> --- a/tcg/tci/tcg-target.h
-> +++ b/tcg/tci/tcg-target.h
-> @@ -206,8 +206,4 @@ static inline void tb_target_set_jmp_target(uintptr_t=
- tc_ptr,
->      /* no need to flush icache explicitly */
->  }
+>> ---
+>> Philippe suggested this in review on the last round of
+>> patches but I forgot about it :-(
 >
-> -#ifdef CONFIG_SOFTMMU
-> -#define TCG_TARGET_NEED_LDST_LABELS
-> -#endif
-> -
->  #endif /* TCG_TARGET_H */
-> --
-> 1.8.3.1
 >
+> Thank you, it eases review and looks cleaner :)
+>
+>
+>> ---
+>>   target/arm/cpu.h | 35 +++++++++++++++++++----------------
+>>   1 file changed, 19 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+>> index 98b9b26..5a1f957 100644
+>> --- a/target/arm/cpu.h
+>> +++ b/target/arm/cpu.h
+>> @@ -81,8 +81,11 @@
+>>    * accessed via env->registerfield[env->v7m.secure] (whether the
+>> security
+>>    * extension is implemented or not).
+>>    */
+>> -#define M_REG_NS 0
+>> -#define M_REG_S 1
+>> +enum {
+>> +    M_REG_NS =3D 0,
+>> +    M_REG_S =3D 1,
+>> +    M_REG_NUM_BANKS =3D 2,
+>> +};
+>>     /* ARM-specific interrupt pending bits.  */
+>>   #define CPU_INTERRUPT_FIQ   CPU_INTERRUPT_TGT_EXT_1
+>> @@ -433,19 +436,19 @@ typedef struct CPUARMState {
+>>           uint32_t other_sp;
+>>           uint32_t other_ss_msp;
+>>           uint32_t other_ss_psp;
+>> -        uint32_t vecbase[2];
+>> -        uint32_t basepri[2];
+>> -        uint32_t control[2];
+>> -        uint32_t ccr[2]; /* Configuration and Control */
+>> -        uint32_t cfsr[2]; /* Configurable Fault Status */
+>> +        uint32_t vecbase[M_REG_NUM_BANKS];
+>> +        uint32_t basepri[M_REG_NUM_BANKS];
+>> +        uint32_t control[M_REG_NUM_BANKS];
+>> +        uint32_t ccr[M_REG_NUM_BANKS]; /* Configuration and Control */
+>> +        uint32_t cfsr[M_REG_NUM_BANKS]; /* Configurable Fault Status */
+>>           uint32_t hfsr; /* HardFault Status */
+>>           uint32_t dfsr; /* Debug Fault Status Register */
+>> -        uint32_t mmfar[2]; /* MemManage Fault Address */
+>> +        uint32_t mmfar[M_REG_NUM_BANKS]; /* MemManage Fault Address */
+>>           uint32_t bfar; /* BusFault Address */
+>> -        unsigned mpu_ctrl[2]; /* MPU_CTRL */
+>> +        unsigned mpu_ctrl[M_REG_NUM_BANKS]; /* MPU_CTRL */
+>>           int exception;
+>> -        uint32_t primask[2];
+>> -        uint32_t faultmask[2];
+>> +        uint32_t primask[M_REG_NUM_BANKS];
+>> +        uint32_t faultmask[M_REG_NUM_BANKS];
+>>           uint32_t secure; /* Is CPU in Secure state? (not guest visible=
+)
+>> */
+>>       } v7m;
+>>   @@ -546,7 +549,7 @@ typedef struct CPUARMState {
+>>           uint32_t *drbar;
+>>           uint32_t *drsr;
+>>           uint32_t *dracr;
+>> -        uint32_t rnr[2];
+>> +        uint32_t rnr[M_REG_NUM_BANKS];
+>>       } pmsav7;
+>>         /* PMSAv8 MPU */
+>> @@ -556,10 +559,10 @@ typedef struct CPUARMState {
+>>            *  pmsav7.rnr (region number register)
+>>            *  pmsav7_dregion (number of configured regions)
+>>            */
+>> -        uint32_t *rbar[2];
+>> -        uint32_t *rlar[2];
+>> -        uint32_t mair0[2];
+>> -        uint32_t mair1[2];
+>> +        uint32_t *rbar[M_REG_NUM_BANKS];
+>> +        uint32_t *rlar[M_REG_NUM_BANKS];
+>> +        uint32_t mair0[M_REG_NUM_BANKS];
+>> +        uint32_t mair1[M_REG_NUM_BANKS];
+>>       } pmsav8;
+>>         void *nvic;
+>>
 >
