@@ -1,26 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47943)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49180)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1drTpJ-0001NK-IE
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:52:58 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1drTuf-0004qz-11
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:58:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1drTpG-0004o0-BK
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:52:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37374)
+	(envelope-from <dgilbert@redhat.com>) id 1drTub-0006Ye-Qf
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:58:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39354)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1drTpG-0004mG-2d
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:52:54 -0400
-Date: Mon, 11 Sep 2017 11:52:50 -0700 (PDT)
-From: Stefano Stabellini <sstabellini@kernel.org>
-In-Reply-To: <20170911160818.1bd44a82@nial.brq.redhat.com>
-Message-ID: <alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
-References: <20170911043820.14617-1-haozhong.zhang@intel.com>
-	<20170911044157.15403-1-haozhong.zhang@intel.com>
-	<20170911160818.1bd44a82@nial.brq.redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1drTub-0006YS-K2
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:58:25 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 803D2347A50
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 18:58:24 +0000 (UTC)
+Date: Mon, 11 Sep 2017 19:58:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170911185818.GG2857@work-vm>
+References: <20170906115143.27451-1-quintela@redhat.com>
+	<20170906115143.27451-8-quintela@redhat.com>
+	<265f10bb-5718-aaac-d0fe-595a78acdf46@redhat.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
- Xen HVM guest
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <265f10bb-5718-aaac-d0fe-595a78acdf46@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 07/22] migration: Make
+ migrate_fd_error() the owner of the Error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,102 +35,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Haozhong Zhang <haozhong.zhang@intel.com>, qemu-devel@nongnu.org, xen-devel@lists.xen.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, ian.jackson@eu.citrix.com, wei.liu2@citrix.com, george.dunlap@citrix.com, JBeulich@suse.com, andrew.cooper3@citrix.com
+To: Eric Blake <eblake@redhat.com>
+Cc: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
 
-CC'ing xen-devel, and the Xen tools and x86 maintainers.
-
-On Mon, 11 Sep 2017, Igor Mammedov wrote:
-> On Mon, 11 Sep 2017 12:41:47 +0800
-> Haozhong Zhang <haozhong.zhang@intel.com> wrote:
+* Eric Blake (eblake@redhat.com) wrote:
+> On 09/06/2017 06:51 AM, Juan Quintela wrote:
+> > So far, we had to free the error after each caller, so just do it
+> > here.  Once there, tls.c was leaking the error.
 > 
-> > This is the QEMU part patches that works with the associated Xen
-> > patches to enable vNVDIMM support for Xen HVM domains. Xen relies on
-> > QEMU to build guest NFIT and NVDIMM namespace devices, and allocate
-> > guest address space for vNVDIMM devices.
-> > 
-> > All patches can be found at
-> >   Xen:  https://github.com/hzzhan9/xen.git nvdimm-rfc-v3
-> >   QEMU: https://github.com/hzzhan9/qemu.git xen-nvdimm-rfc-v3
-> > 
-> > Patch 1 is to avoid dereferencing the NULL pointer to non-existing
-> > label data, as the Xen side support for labels is not implemented yet.
-> > 
-> > Patch 2 & 3 add a memory backend dedicated for Xen usage and a hotplug
-> > memory region for Xen guest, in order to make the existing nvdimm
-> > device plugging path work on Xen.
-> > 
-> > Patch 4 - 10 build and cooy NFIT from QEMU to Xen guest, when QEMU is
-> > used as the Xen device model.
+> You mention tls.c,
 > 
-> I've skimmed over patch-set and can't say that I'm happy with
-> number of xen_enabled() invariants it introduced as well as
-> with partial blobs it creates.
-
-I have not read the series (Haozhong, please CC me, Anthony and
-xen-devel to the whole series next time), but yes, indeed. Let's not add
-more xen_enabled() if possible.
-
-Haozhong, was there a design document thread on xen-devel about this? If
-so, did it reach a conclusion? Was the design accepted? If so, please
-add a link to the design doc in the introductory email, so that
-everybody can read it and be on the same page.
-
-
-> I'd like to reduce above and a way to do this might be making xen 
->  1. use fw_cfg
->  2. fetch QEMU build acpi tables from fw_cfg
->  3. extract nvdim tables (which is trivial) and use them
-> 
-> looking at xen_load_linux(), it seems possible to use fw_cfg.
-> 
-> So what's stopping xen from using it elsewhere?,
-> instead of adding more xen specific code to do 'the same'
-> job and not reusing/sharing common code with tcg/kvm.
-
-So far, ACPI tables have not been generated by QEMU. Xen HVM machines
-rely on a firmware-like application called "hvmloader" that runs in
-guest context and generates the ACPI tables. I have no opinions on
-hvmloader and I'll let the Xen maintainers talk about it. However, keep
-in mind that with an HVM guest some devices are emulated by Xen and/or
-by other device emulators that can run alongside QEMU. QEMU doesn't have
-a full few of the system.
-
-Here the question is: does it have to be QEMU the one to generate the
-ACPI blobs for the nvdimm? It would be nicer if it was up to hvmloader
-like the rest, instead of introducing this split-brain design about
-ACPI. We need to see a design doc to fully understand this.
-
-If the design doc thread led into thinking that it has to be QEMU to
-generate them, then would it make the code nicer if we used fw_cfg to
-get the (full or partial) tables from QEMU, as Igor suggested?
-
-
-> > Haozhong Zhang (10):
-> >   nvdimm: do not intiailize nvdimm->label_data if label size is zero
-> >   hw/xen-hvm: create the hotplug memory region on Xen
-> >   hostmem-xen: add a host memory backend for Xen
-> >   nvdimm acpi: do not use fw_cfg on Xen
-> >   hw/xen-hvm: initialize DM ACPI
-> >   hw/xen-hvm: add function to copy ACPI into guest memory
-> >   nvdimm acpi: copy NFIT to Xen guest
-> >   nvdimm acpi: copy ACPI namespace device of vNVDIMM to Xen guest
-> >   nvdimm acpi: do not build _FIT method on Xen
-> >   hw/xen-hvm: enable building DM ACPI if vNVDIMM is enabled
 > > 
-> >  backends/Makefile.objs |   1 +
-> >  backends/hostmem-xen.c | 108 ++++++++++++++++++++++++++
-> >  backends/hostmem.c     |   9 +++
-> >  hw/acpi/aml-build.c    |  10 ++-
-> >  hw/acpi/nvdimm.c       |  79 ++++++++++++++-----
-> >  hw/i386/pc.c           | 102 ++++++++++++++-----------
-> >  hw/i386/xen/xen-hvm.c  | 204 ++++++++++++++++++++++++++++++++++++++++++++++++-
-> >  hw/mem/nvdimm.c        |  10 ++-
-> >  hw/mem/pc-dimm.c       |   6 +-
-> >  include/hw/i386/pc.h   |   1 +
-> >  include/hw/xen/xen.h   |  25 ++++++
-> >  stubs/xen-hvm.c        |  10 +++
-> >  12 files changed, 495 insertions(+), 70 deletions(-)
-> >  create mode 100644 backends/hostmem-xen.c
-> > 
+> > Signed-off-by: Juan Quintela <quintela@redhat.com>
+> > ---
+> >  migration/channel.c   |  1 -
+> >  migration/migration.c | 10 ++++------
+> >  migration/migration.h |  4 ++--
+> >  migration/socket.c    |  1 -
+> >  4 files changed, 6 insertions(+), 10 deletions(-)
 > 
+> but don't touch it.  Am I missing something?
+
+
+hmm well I see in migration/tls.c:
+
+    if (qio_task_propagate_error(task, &err)) {
+        trace_migration_tls_outgoing_handshake_error(error_get_pretty(err));
+        migrate_fd_error(s, err);
+        error_free(err);
+    } else {
+        trace_migration_tls_outgoing_handshake_complete();
+        migration_channel_connect(s, ioc, NULL);
+    }
+
+so I think that error_free has to go?
+
+Dave
+
+> >  
+> > -void migrate_fd_error(MigrationState *s, const Error *error)
+> > +void migrate_fd_error(MigrationState *s, Error *error)
+> >  {
+> 
+> No comments at definition,
+> 
+> > +++ b/migration/migration.h
+> > @@ -163,8 +163,8 @@ bool  migration_has_all_channels(void);
+> >  
+> >  uint64_t migrate_max_downtime(void);
+> >  
+> > -void migrate_set_error(MigrationState *s, const Error *error);
+> > -void migrate_fd_error(MigrationState *s, const Error *error);
+> > +void migrate_set_error(MigrationState *s, Error *error);
+> > +void migrate_fd_error(MigrationState *s, Error *error);
+> 
+> or at declaration. That would be worth adding at some point, but this
+> patch isn't making it worse.
+> 
+> The code looks okay in isolation, so if it is only the commit message
+> that needs fixing,
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+> 
+
+
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
