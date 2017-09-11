@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57630)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drS3k-0005sl-U6
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:59:46 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drS3p-0005vu-5y
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:59:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drS3j-00075e-H5
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:59:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49794)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drS3m-00076W-2s
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:59:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45170)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1drS3j-00074B-9I
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:59:43 -0400
+	id 1drS3l-00076K-RI
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:59:46 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id CC190C0587D9
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:59:44 +0000 (UTC)
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 11 Sep 2017 18:59:23 +0200
-Message-Id: <20170911165929.2791-2-marcandre.lureau@redhat.com>
+Date: Mon, 11 Sep 2017 18:59:24 +0200
+Message-Id: <20170911165929.2791-3-marcandre.lureau@redhat.com>
 In-Reply-To: <20170911165929.2791-1-marcandre.lureau@redhat.com>
 References: <20170911165929.2791-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 1/7] fw_cfg: add write callback
+Subject: [Qemu-devel] [PATCH v6 2/7] hw/misc: add vmcoreinfo device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,208 +34,243 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com, anderson@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Ben Warren <ben@skyportsystems.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: imammedo@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mst@redhat.com, anderson@redhat.com, lersek@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Reintroduce the write callback that was removed when write support was
-removed in commit 023e3148567ac898c7258138f8e86c3c2bb40d07.
+See docs/specs/vmcoreinfo.txt for details.
 
-Contrary to the previous callback implementation, the write_cb
-callback is called whenever a write happened, so handlers must be
-ready to handle partial write as necessary.
+"etc/vmcoreinfo" fw_cfg entry is added when using "-device vmcoreinfo".
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- include/hw/nvram/fw_cfg.h |  3 +++
- hw/acpi/vmgenid.c         |  2 +-
- hw/core/loader.c          |  2 +-
- hw/i386/acpi-build.c      |  2 +-
- hw/isa/lpc_ich9.c         |  4 ++--
- hw/nvram/fw_cfg.c         | 14 ++++++++++----
- 6 files changed, 18 insertions(+), 9 deletions(-)
+ include/hw/misc/vmcoreinfo.h | 46 +++++++++++++++++++++
+ hw/misc/vmcoreinfo.c         | 96 ++++++++++++++++++++++++++++++++++++++=
+++++++
+ docs/specs/vmcoreinfo.txt    | 41 +++++++++++++++++++
+ hw/misc/Makefile.objs        |  1 +
+ 4 files changed, 184 insertions(+)
+ create mode 100644 include/hw/misc/vmcoreinfo.h
+ create mode 100644 hw/misc/vmcoreinfo.c
+ create mode 100644 docs/specs/vmcoreinfo.txt
 
-diff --git a/include/hw/nvram/fw_cfg.h b/include/hw/nvram/fw_cfg.h
-index f50d068563..7ccbae5fba 100644
---- a/include/hw/nvram/fw_cfg.h
-+++ b/include/hw/nvram/fw_cfg.h
-@@ -45,6 +45,7 @@ typedef struct FWCfgDmaAccess {
- } QEMU_PACKED FWCfgDmaAccess;
+diff --git a/include/hw/misc/vmcoreinfo.h b/include/hw/misc/vmcoreinfo.h
+new file mode 100644
+index 0000000000..c3aa856545
+--- /dev/null
++++ b/include/hw/misc/vmcoreinfo.h
+@@ -0,0 +1,46 @@
++/*
++ * Virtual Machine coreinfo device
++ *
++ * Copyright (C) 2017 Red Hat, Inc.
++ *
++ * Authors: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++#ifndef VMCOREINFO_H
++#define VMCOREINFO_H
++
++#include "hw/qdev.h"
++
++#define VMCOREINFO_DEVICE "vmcoreinfo"
++#define VMCOREINFO(obj) OBJECT_CHECK(VMCoreInfoState, (obj), VMCOREINFO_=
+DEVICE)
++
++#define VMCOREINFO_FORMAT_NONE 0x0
++#define VMCOREINFO_FORMAT_ELF 0x1
++
++/* all fields are little-endian */
++typedef struct FWCfgVMCoreInfo {
++    uint16_t host_format; /* set on reset */
++    uint16_t guest_format;
++    uint32_t size;
++    uint64_t paddr;
++} QEMU_PACKED FWCfgVMCoreInfo;
++
++typedef struct VMCoreInfoState {
++    DeviceClass parent_obj;
++
++    bool has_vmcoreinfo;
++    FWCfgVMCoreInfo vmcoreinfo;
++} VMCoreInfoState;
++
++/* returns NULL unless there is exactly one device */
++static inline VMCoreInfoState *vmcoreinfo_find(void)
++{
++    Object *o =3D object_resolve_path_type("", VMCOREINFO_DEVICE, NULL);
++
++    return o ? VMCOREINFO(o) : NULL;
++}
++
++#endif
+diff --git a/hw/misc/vmcoreinfo.c b/hw/misc/vmcoreinfo.c
+new file mode 100644
+index 0000000000..a618e12677
+--- /dev/null
++++ b/hw/misc/vmcoreinfo.c
+@@ -0,0 +1,96 @@
++/*
++ * Virtual Machine coreinfo device
++ *
++ * Copyright (C) 2017 Red Hat, Inc.
++ *
++ * Authors: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "hw/nvram/fw_cfg.h"
++#include "hw/misc/vmcoreinfo.h"
++
++static void fw_cfg_vmci_write(void *dev, off_t offset, size_t len)
++{
++    VMCoreInfoState *s =3D VMCOREINFO(dev);
++
++    s->has_vmcoreinfo =3D offset =3D=3D 0 && len =3D=3D sizeof(s->vmcore=
+info)
++        && s->vmcoreinfo.guest_format !=3D VMCOREINFO_FORMAT_NONE;
++}
++
++static void vmcoreinfo_reset(void *dev)
++{
++    VMCoreInfoState *s =3D VMCOREINFO(dev);
++
++    s->has_vmcoreinfo =3D false;
++    memset(&s->vmcoreinfo, 0, sizeof(s->vmcoreinfo));
++    s->vmcoreinfo.host_format =3D cpu_to_le16(VMCOREINFO_FORMAT_ELF);
++}
++
++static void vmcoreinfo_realize(DeviceState *dev, Error **errp)
++{
++    VMCoreInfoState *s =3D VMCOREINFO(dev);
++    FWCfgState *fw_cfg =3D fw_cfg_find();
++
++    /* Given that this function is executing, there is at least one VMCO=
+REINFO
++     * device. Check if there are several.
++     */
++    if (!vmcoreinfo_find()) {
++        error_setg(errp, "at most one %s device is permitted",
++                   VMCOREINFO_DEVICE);
++        return;
++    }
++
++    if (!fw_cfg || !fw_cfg->dma_enabled) {
++        error_setg(errp, "%s device requires fw_cfg with DMA",
++                   VMCOREINFO_DEVICE);
++        return;
++    }
++
++    fw_cfg_add_file_callback(fw_cfg, "etc/vmcoreinfo",
++                             NULL, fw_cfg_vmci_write, s,
++                             &s->vmcoreinfo, sizeof(s->vmcoreinfo), fals=
+e);
++
++    qemu_register_reset(vmcoreinfo_reset, dev);
++}
++
++static const VMStateDescription vmstate_vmcoreinfo =3D {
++    .name =3D "vmcoreinfo",
++    .version_id =3D 1,
++    .minimum_version_id =3D 1,
++    .fields =3D (VMStateField[]) {
++        VMSTATE_BOOL(has_vmcoreinfo, VMCoreInfoState),
++        VMSTATE_UINT16(vmcoreinfo.host_format, VMCoreInfoState),
++        VMSTATE_UINT16(vmcoreinfo.guest_format, VMCoreInfoState),
++        VMSTATE_UINT32(vmcoreinfo.size, VMCoreInfoState),
++        VMSTATE_UINT64(vmcoreinfo.paddr, VMCoreInfoState),
++        VMSTATE_END_OF_LIST()
++    },
++};
++
++static void vmcoreinfo_device_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc =3D DEVICE_CLASS(klass);
++
++    dc->vmsd =3D &vmstate_vmcoreinfo;
++    dc->realize =3D vmcoreinfo_realize;
++    dc->hotpluggable =3D false;
++}
++
++static const TypeInfo vmcoreinfo_device_info =3D {
++    .name          =3D VMCOREINFO_DEVICE,
++    .parent        =3D TYPE_DEVICE,
++    .instance_size =3D sizeof(VMCoreInfoState),
++    .class_init    =3D vmcoreinfo_device_class_init,
++};
++
++static void vmcoreinfo_register_types(void)
++{
++    type_register_static(&vmcoreinfo_device_info);
++}
++
++type_init(vmcoreinfo_register_types)
+diff --git a/docs/specs/vmcoreinfo.txt b/docs/specs/vmcoreinfo.txt
+new file mode 100644
+index 0000000000..2868a77142
+--- /dev/null
++++ b/docs/specs/vmcoreinfo.txt
+@@ -0,0 +1,41 @@
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++VMCoreInfo device
++=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
++The `-device vmcoreinfo` will create a fw_cfg entry for a guest to
++store dump details.
++
++etc/vmcoreinfo
++**************
++
++A guest may use this fw_cfg entry to add information details to qemu
++dumps.
++
++The entry of 16 bytes has the following layout, in little-endian::
++
++#define VMCOREINFO_FORMAT_NONE 0x0
++#define VMCOREINFO_FORMAT_ELF 0x1
++
++    struct FWCfgVMCoreInfo {
++        uint16_t host_format;  /* formats host supports */
++        uint16_t guest_format; /* format guest supplies */
++        uint32_t size;         /* size of vmcoreinfo region */
++        uint64_t paddr;        /* physical address of vmcoreinfo region =
+*/
++    };
++
++Only full write (of 16 bytes) are considered valid for further
++processing of entry values.
++
++A write of 0 in guest_format will disable further processing of
++vmcoreinfo entry values & content.
++
++Format & content
++****************
++
++As of qemu 2.11, only VMCOREINFO_FORMAT_ELF is supported.
++
++The entry gives location and size of an ELF note that is appended in
++qemu dumps.
++
++The note format/class must be of the target bitness and the size must
++be less than 1Mb.
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 29fb922cef..052982f69b 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -9,6 +9,7 @@ common-obj-$(CONFIG_PCI_TESTDEV) +=3D pci-testdev.o
+ common-obj-$(CONFIG_EDU) +=3D edu.o
 =20
- typedef void (*FWCfgCallback)(void *opaque);
-+typedef void (*FWCfgWriteCallback)(void *opaque, off_t start, size_t len=
-);
+ common-obj-y +=3D unimp.o
++common-obj-y +=3D vmcoreinfo.o
 =20
- struct FWCfgState {
-     /*< private >*/
-@@ -183,6 +184,7 @@ void fw_cfg_add_file(FWCfgState *s, const char *filen=
-ame, void *data,
-  * @s: fw_cfg device being modified
-  * @filename: name of new fw_cfg file item
-  * @select_cb: callback function when selecting
-+ * @write_cb: callback function after a write
-  * @callback_opaque: argument to be passed into callback function
-  * @data: pointer to start of item data
-  * @len: size of item data
-@@ -202,6 +204,7 @@ void fw_cfg_add_file(FWCfgState *s, const char *filen=
-ame, void *data,
-  */
- void fw_cfg_add_file_callback(FWCfgState *s, const char *filename,
-                               FWCfgCallback select_cb,
-+                              FWCfgWriteCallback write_cb,
-                               void *callback_opaque,
-                               void *data, size_t len, bool read_only);
-=20
-diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
-index 2876d8a639..105044f666 100644
---- a/hw/acpi/vmgenid.c
-+++ b/hw/acpi/vmgenid.c
-@@ -124,7 +124,7 @@ void vmgenid_add_fw_cfg(VmGenIdState *vms, FWCfgState=
- *s, GArray *guid)
-     fw_cfg_add_file(s, VMGENID_GUID_FW_CFG_FILE, guid->data,
-                     VMGENID_FW_CFG_SIZE);
-     /* Create a read-write fw_cfg file for Address */
--    fw_cfg_add_file_callback(s, VMGENID_ADDR_FW_CFG_FILE, NULL, NULL,
-+    fw_cfg_add_file_callback(s, VMGENID_ADDR_FW_CFG_FILE, NULL, NULL, NU=
-LL,
-                              vms->vmgenid_addr_le,
-                              ARRAY_SIZE(vms->vmgenid_addr_le), false);
- }
-diff --git a/hw/core/loader.c b/hw/core/loader.c
-index 4593061445..91669d65aa 100644
---- a/hw/core/loader.c
-+++ b/hw/core/loader.c
-@@ -1023,7 +1023,7 @@ MemoryRegion *rom_add_blob(const char *name, const =
-void *blob, size_t len,
-         }
-=20
-         fw_cfg_add_file_callback(fw_cfg, fw_file_name,
--                                 fw_callback, callback_opaque,
-+                                 fw_callback, NULL, callback_opaque,
-                                  data, rom->datasize, read_only);
-     }
-     return mr;
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 4d19d91e1b..702a214369 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -2890,7 +2890,7 @@ void acpi_setup(void)
-=20
-         build_state->rsdp =3D g_memdup(tables.rsdp->data, rsdp_size);
-         fw_cfg_add_file_callback(pcms->fw_cfg, ACPI_BUILD_RSDP_FILE,
--                                 acpi_build_update, build_state,
-+                                 acpi_build_update, NULL, build_state,
-                                  build_state->rsdp, rsdp_size, true);
-         build_state->rsdp_mr =3D NULL;
-     } else {
-diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
-index ac8416d42b..de8fbb7260 100644
---- a/hw/isa/lpc_ich9.c
-+++ b/hw/isa/lpc_ich9.c
-@@ -402,12 +402,12 @@ void ich9_lpc_pm_init(PCIDevice *lpc_pci, bool smm_=
-enabled)
-          * just link them into fw_cfg here.
-          */
-         fw_cfg_add_file_callback(fw_cfg, "etc/smi/requested-features",
--                                 NULL, NULL,
-+                                 NULL, NULL, NULL,
-                                  lpc->smi_guest_features_le,
-                                  sizeof lpc->smi_guest_features_le,
-                                  false);
-         fw_cfg_add_file_callback(fw_cfg, "etc/smi/features-ok",
--                                 smi_features_ok_callback, lpc,
-+                                 smi_features_ok_callback, NULL, lpc,
-                                  &lpc->smi_features_ok,
-                                  sizeof lpc->smi_features_ok,
-                                  true);
-diff --git a/hw/nvram/fw_cfg.c b/hw/nvram/fw_cfg.c
-index e3bd626b8c..753ac0e4ea 100644
---- a/hw/nvram/fw_cfg.c
-+++ b/hw/nvram/fw_cfg.c
-@@ -56,6 +56,7 @@ struct FWCfgEntry {
-     uint8_t *data;
-     void *callback_opaque;
-     FWCfgCallback select_cb;
-+    FWCfgWriteCallback write_cb;
- };
-=20
- #define JPG_FILE 0
-@@ -370,6 +371,8 @@ static void fw_cfg_dma_transfer(FWCfgState *s)
-                     dma_memory_read(s->dma_as, dma.address,
-                                     &e->data[s->cur_offset], len)) {
-                     dma.control |=3D FW_CFG_DMA_CTL_ERROR;
-+                } else if (e->write_cb) {
-+                    e->write_cb(e->callback_opaque, s->cur_offset, len);
-                 }
-             }
-=20
-@@ -570,6 +573,7 @@ static const VMStateDescription vmstate_fw_cfg =3D {
-=20
- static void fw_cfg_add_bytes_callback(FWCfgState *s, uint16_t key,
-                                       FWCfgCallback select_cb,
-+                                      FWCfgWriteCallback write_cb,
-                                       void *callback_opaque,
-                                       void *data, size_t len,
-                                       bool read_only)
-@@ -584,6 +588,7 @@ static void fw_cfg_add_bytes_callback(FWCfgState *s, =
-uint16_t key,
-     s->entries[arch][key].data =3D data;
-     s->entries[arch][key].len =3D (uint32_t)len;
-     s->entries[arch][key].select_cb =3D select_cb;
-+    s->entries[arch][key].write_cb =3D write_cb;
-     s->entries[arch][key].callback_opaque =3D callback_opaque;
-     s->entries[arch][key].allow_write =3D !read_only;
- }
-@@ -610,7 +615,7 @@ static void *fw_cfg_modify_bytes_read(FWCfgState *s, =
-uint16_t key,
-=20
- void fw_cfg_add_bytes(FWCfgState *s, uint16_t key, void *data, size_t le=
-n)
- {
--    fw_cfg_add_bytes_callback(s, key, NULL, NULL, data, len, true);
-+    fw_cfg_add_bytes_callback(s, key, NULL, NULL, NULL, data, len, true)=
-;
- }
-=20
- void fw_cfg_add_string(FWCfgState *s, uint16_t key, const char *value)
-@@ -737,6 +742,7 @@ static int get_fw_cfg_order(FWCfgState *s, const char=
- *name)
-=20
- void fw_cfg_add_file_callback(FWCfgState *s,  const char *filename,
-                               FWCfgCallback select_cb,
-+                              FWCfgWriteCallback write_cb,
-                               void *callback_opaque,
-                               void *data, size_t len, bool read_only)
- {
-@@ -800,7 +806,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const c=
-har *filename,
-     }
-=20
-     fw_cfg_add_bytes_callback(s, FW_CFG_FILE_FIRST + index,
--                              select_cb,
-+                              select_cb, write_cb,
-                               callback_opaque, data, len,
-                               read_only);
-=20
-@@ -815,7 +821,7 @@ void fw_cfg_add_file_callback(FWCfgState *s,  const c=
-har *filename,
- void fw_cfg_add_file(FWCfgState *s,  const char *filename,
-                      void *data, size_t len)
- {
--    fw_cfg_add_file_callback(s, filename, NULL, NULL, data, len, true);
-+    fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len, t=
-rue);
- }
-=20
- void *fw_cfg_modify_file(FWCfgState *s, const char *filename,
-@@ -838,7 +844,7 @@ void *fw_cfg_modify_file(FWCfgState *s, const char *f=
-ilename,
-         }
-     }
-     /* add new one */
--    fw_cfg_add_file_callback(s, filename, NULL, NULL, data, len, true);
-+    fw_cfg_add_file_callback(s, filename, NULL, NULL, NULL, data, len, t=
-rue);
-     return NULL;
- }
+ obj-$(CONFIG_VMPORT) +=3D vmport.o
 =20
 --=20
 2.14.1.146.gd35faa819
