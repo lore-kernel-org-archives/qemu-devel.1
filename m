@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39037)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39127)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSPD-000880-DT
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:59 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSPL-0008E9-Cj
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSP9-0001YQ-UJ
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:21:55 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSPI-0001dT-RM
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:03 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 11 Sep 2017 12:20:13 -0500
-Message-Id: <20170911172022.4738-30-eblake@redhat.com>
+Date: Mon, 11 Sep 2017 12:20:16 -0500
+Message-Id: <20170911172022.4738-33-eblake@redhat.com>
 In-Reply-To: <20170911172022.4738-1-eblake@redhat.com>
 References: <20170911172022.4738-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 29/38] libqtest: Merge qtest_init() into
- qtest_start()
+Subject: [Qemu-devel] [PATCH v7 32/38] libqtest: Merge qtest_irq*() with
+ irq*()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,955 +21,578 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, John Snow <jsnow@redhat.com>, Keith Busch <keith.busch@intel.com>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "Michael S. Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>, "open list:sPAPR" <qemu-ppc@nongnu.org>
+Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, John Snow <jsnow@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>
 
-Remove the trivial wrapper qtest_init(), and change qtest_start()
-to no longer implicitly set global_qtest, to make it obvious in the
-rest of the testsuite where we are still relying on global_qtest.
-Everything now uses qtest_start() (and friends) and qtest_quit(),
-and explicitly tracks the QTestState between the two (although in
-many cases, this tracking is still done through global_qtest).
-Doing this makes it easier to see what remaining cleanups will be
-needed if we don't want an implicit dependency on global state.
-
-A few more places that were needlessly strdup'ing a temporary
-variable are cleaned up in the process.
-
-As mentioned in an earlier commit, the choice to get rid of
-qtest_init() also reduces confusion with the device initializer
-of the non-testsuite qtest.c device.
+Maintaining two layers of libqtest APIs, one that takes an explicit
+QTestState object, and the other that uses the implicit global_qtest,
+is annoying.  In the interest of getting rid of global implicit
+state and having less code to maintain, merge:
+ qtest_get_irq()
+ qtest_irq_intercept_in()
+ qtest_irq_intercept_out()
+with their short counterparts.  All callers that previously
+used the short form now make it explicit that they are relying on
+global_qtest, and later patches can then clean things up to remove
+the global variable.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.h               | 33 ++++-----------------------------
- tests/libqtest.c               |  4 ++--
- tests/ac97-test.c              |  2 +-
- tests/device-introspect-test.c | 12 ++++++------
- tests/display-vga-test.c       | 18 ++++++------------
- tests/drive_del-test.c         | 11 ++++++-----
- tests/es1370-test.c            |  2 +-
- tests/fdc-test.c               |  2 +-
- tests/fw_cfg-test.c            |  2 +-
- tests/hd-geo-test.c            |  8 ++++----
- tests/i440fx-test.c            |  2 +-
- tests/i82801b11-test.c         |  3 ++-
- tests/intel-hda-test.c         |  9 ++++-----
- tests/ioh3420-test.c           |  5 +++--
- tests/ipmi-kcs-test.c          |  7 ++-----
- tests/ipoctal232-test.c        |  3 ++-
- tests/ivshmem-test.c           |  2 +-
- tests/m48t59-test.c            |  2 +-
- tests/ne2000-test.c            |  2 +-
- tests/nvme-test.c              |  5 +++--
- tests/pcnet-test.c             |  2 +-
- tests/postcopy-test.c          |  4 ++--
- tests/pvpanic-test.c           |  2 +-
- tests/q35-test.c               |  4 ++--
- tests/qmp-test.c               |  4 ++--
- tests/rtc-test.c               |  2 +-
- tests/rtl8139-test.c           |  2 +-
- tests/spapr-phb-test.c         |  5 +++--
- tests/test-arm-mptimer.c       |  2 +-
- tests/test-x86-cpuid-compat.c  |  7 ++++---
- tests/tmp105-test.c            |  1 +
- tests/tpci200-test.c           |  2 +-
- tests/usb-hcd-ehci-test.c      | 23 ++++++++++++-----------
- tests/usb-hcd-ohci-test.c      |  2 +-
- tests/usb-hcd-xhci-test.c      |  5 +++--
- tests/virtio-balloon-test.c    |  2 +-
- tests/virtio-console-test.c    | 10 ++++------
- tests/virtio-net-test.c        |  2 +-
- tests/virtio-rng-test.c        |  2 +-
- tests/virtio-serial-test.c     |  2 +-
- tests/vmxnet3-test.c           |  2 +-
- tests/wdt_ib700-test.c         |  8 ++++----
- 42 files changed, 101 insertions(+), 128 deletions(-)
+ tests/libqtest.h         | 47 ++++++-----------------------------------------
+ tests/libqtest.c         |  6 +++---
+ tests/fdc-test.c         | 48 ++++++++++++++++++++++++------------------------
+ tests/ide-test.c         | 17 +++++++++--------
+ tests/ipmi-bt-test.c     |  6 +++---
+ tests/ipmi-kcs-test.c    |  8 ++++----
+ tests/libqos/libqos-pc.c |  2 +-
+ tests/rtc-test.c         | 10 +++++-----
+ tests/tco-test.c         |  2 +-
+ tests/wdt_ib700-test.c   |  8 ++++----
+ 10 files changed, 60 insertions(+), 94 deletions(-)
 
 diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 817e3a5580..2a21bf4605 100644
+index 26d5f37bc9..8398c0fd07 100644
 --- a/tests/libqtest.h
 +++ b/tests/libqtest.h
-@@ -27,7 +27,7 @@ extern QTestState *global_qtest;
-  * qtest_start_without_qmp_handshake:
-  * @extra_args: other arguments to pass to QEMU.
-  *
-- * Returns: #QTestState instance.  Does not affect #global_qtest.
-+ * Returns: #QTestState instance, handshaking not yet completed.
-  */
- QTestState *qtest_start_without_qmp_handshake(const char *extra_args);
-
-@@ -35,10 +35,7 @@ QTestState *qtest_start_without_qmp_handshake(const char *extra_args);
-  * qtest_start:
-  * @args: other arguments to pass to QEMU
-  *
-- * Start QEMU and assign the resulting #QTestState to #global_qtest.
-- * The global variable is used by "shortcut" functions documented below.
-- *
-- * Returns: #QTestState instance.
-+ * Returns: #QTestState instance, handshaking completed.
-  */
- QTestState *qtest_start(const char *args);
-
-@@ -47,10 +44,7 @@ QTestState *qtest_start(const char *args);
-  * @fmt...: Format for creating other arguments to pass to QEMU, formatted
-  * like sprintf().
-  *
-- * Start QEMU and return the resulting #QTestState (but unlike qtest_start(),
-- * #global_qtest is left at NULL).
-- *
-- * Returns: #QTestState instance.
-+ * Returns: #QTestState instance, handshaking completed.
-  */
- QTestState *qtest_startf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-
-@@ -60,30 +54,11 @@ QTestState *qtest_startf(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
-  * like vsprintf().
-  * @ap: Format arguments.
-  *
-- * Start QEMU and return the resulting #QTestState (but unlike qtest_start(),
-- * #global_qtest is left at NULL).
-- *
-- * Returns: #QTestState instance.
-+ * Returns: #QTestState instance, handshaking completed.
-  */
- QTestState *qtest_vstartf(const char *fmt, va_list ap) GCC_FMT_ATTR(1, 0);
+@@ -176,33 +176,33 @@ char *qtest_hmp(QTestState *s, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+ char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap);
 
  /**
-- * qtest_init:
-- * @extra_args: other arguments to pass to QEMU.
+- * qtest_get_irq:
++ * get_irq:
+  * @s: #QTestState instance to operate on.
+  * @num: Interrupt to observe.
+  *
+  * Returns: The level of the @num interrupt.
+  */
+-bool qtest_get_irq(QTestState *s, int num);
++bool get_irq(QTestState *s, int num);
+
+ /**
+- * qtest_irq_intercept_in:
++ * irq_intercept_in:
+  * @s: #QTestState instance to operate on.
+  * @string: QOM path of a device.
+  *
+  * Associate qtest irqs with the GPIO-in pins of the device
+  * whose path is specified by @string.
+  */
+-void qtest_irq_intercept_in(QTestState *s, const char *string);
++void irq_intercept_in(QTestState *s, const char *string);
+
+ /**
+- * qtest_irq_intercept_out:
++ * irq_intercept_out:
+  * @s: #QTestState instance to operate on.
+  * @string: QOM path of a device.
+  *
+  * Associate qtest irqs with the GPIO-out pins of the device
+  * whose path is specified by @string.
+  */
+-void qtest_irq_intercept_out(QTestState *s, const char *string);
++void irq_intercept_out(QTestState *s, const char *string);
+
+ /**
+  * qtest_outb:
+@@ -594,41 +594,6 @@ static inline QDict *qmp_eventwait_ref(const char *event)
+ char *hmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+
+ /**
+- * get_irq:
+- * @num: Interrupt to observe.
 - *
-- * Returns: #QTestState instance.  Does not affect #global_qtest.
+- * Returns: The level of the @num interrupt.
 - */
--static inline QTestState *qtest_init(const char *extra_args)
+-static inline bool get_irq(int num)
 -{
--    QTestState *s;
--
--    assert(!global_qtest);
--    s = qtest_start(extra_args);
--    global_qtest = NULL;
--    return s;
+-    return qtest_get_irq(global_qtest, num);
 -}
 -
 -/**
-  * qtest_quit:
-  * @s: #QTestState instance to operate on.
-  *
+- * irq_intercept_in:
+- * @string: QOM path of a device.
+- *
+- * Associate qtest irqs with the GPIO-in pins of the device
+- * whose path is specified by @string.
+- */
+-static inline void irq_intercept_in(const char *string)
+-{
+-    qtest_irq_intercept_in(global_qtest, string);
+-}
+-
+-/**
+- * qtest_irq_intercept_out:
+- * @string: QOM path of a device.
+- *
+- * Associate qtest irqs with the GPIO-out pins of the device
+- * whose path is specified by @string.
+- */
+-static inline void irq_intercept_out(const char *string)
+-{
+-    qtest_irq_intercept_out(global_qtest, string);
+-}
+-
+-/**
+  * outb:
+  * @addr: I/O port to write to.
+  * @value: Value being written.
 diff --git a/tests/libqtest.c b/tests/libqtest.c
-index b535d7768f..44c89813ff 100644
+index 9f5f2cb933..962432a27a 100644
 --- a/tests/libqtest.c
 +++ b/tests/libqtest.c
-@@ -242,7 +242,7 @@ QTestState *qtest_start(const char *extra_args)
-     qtest_qmp_discard_response(s, "{ 'execute': 'qmp_capabilities' }");
-
-     assert(!global_qtest);
--    return global_qtest = s;
-+    return s;
+@@ -648,7 +648,7 @@ const char *qtest_get_arch(void)
+     return end + strlen("/qemu-system-");
  }
 
- QTestState *qtest_vstartf(const char *fmt, va_list ap)
-@@ -988,7 +988,7 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine))
-     QString *qstr;
-     const char *mname;
-
--    qtest_start("-machine none");
-+    global_qtest = qtest_start("-machine none");
-     response = qmp("{ 'execute': 'query-machines' }");
-     g_assert(response);
-     list = qdict_get_qlist(response, "return");
-diff --git a/tests/ac97-test.c b/tests/ac97-test.c
-index ca9b3dce88..2f5fb10632 100644
---- a/tests/ac97-test.c
-+++ b/tests/ac97-test.c
-@@ -22,7 +22,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/ac97/nop", nop);
-
--    qtest_start("-device AC97");
-+    global_qtest = qtest_start("-device AC97");
-     ret = g_test_run();
-
-     qtest_quit(global_qtest);
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
-index b3227bd950..ed4f5f2eed 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -126,7 +126,7 @@ static void test_device_intro_list(void)
-     QList *types;
-     char *help;
-
--    qtest_start(common_args);
-+    global_qtest = qtest_start(common_args);
-
-     types = device_type_list(true);
-     QDECREF(types);
-@@ -167,7 +167,7 @@ static void test_qom_list_fields(void)
-     QList *non_abstract;
-     QListEntry *e;
-
--    qtest_start(common_args);
-+    global_qtest = qtest_start(common_args);
-
-     all_types = qom_list_types(NULL, true);
-     non_abstract = qom_list_types(NULL, false);
-@@ -194,14 +194,14 @@ static void test_qom_list_fields(void)
-
- static void test_device_intro_none(void)
+-bool qtest_get_irq(QTestState *s, int num)
++bool get_irq(QTestState *s, int num)
  {
--    qtest_start(common_args);
-+    global_qtest = qtest_start(common_args);
-     test_one_device("nonexistent");
-     qtest_quit(global_qtest);
+     /* dummy operation in order to make sure irq is up to date */
+     qtest_inb(s, 0);
+@@ -684,13 +684,13 @@ int64_t clock_set(QTestState *s, int64_t val)
+     return qtest_clock_rsp(s);
  }
 
- static void test_device_intro_abstract(void)
+-void qtest_irq_intercept_out(QTestState *s, const char *qom_path)
++void irq_intercept_out(QTestState *s, const char *qom_path)
  {
--    qtest_start(common_args);
-+    global_qtest = qtest_start(common_args);
-     test_one_device("device");
-     qtest_quit(global_qtest);
- }
-@@ -212,7 +212,7 @@ static void test_device_intro_concrete(void)
-     QListEntry *entry;
-     const char *type;
-
--    qtest_start(common_args);
-+    global_qtest = qtest_start(common_args);
-     types = device_type_list(false);
-
-     QLIST_FOREACH_ENTRY(types, entry) {
-@@ -232,7 +232,7 @@ static void test_abstract_interfaces(void)
-     QListEntry *e;
-     QDict *index;
-
--    qtest_start(common_args);
-+    global_qtest = qtest_start(common_args);
-
-     all_types = qom_list_types("interface", true);
-     index = qom_type_index(all_types);
-diff --git a/tests/display-vga-test.c b/tests/display-vga-test.c
-index 8667330e3c..d638f15ec3 100644
---- a/tests/display-vga-test.c
-+++ b/tests/display-vga-test.c
-@@ -12,39 +12,33 @@
-
- static void pci_cirrus(void)
- {
--    qtest_start("-vga none -device cirrus-vga");
--    qtest_quit(global_qtest);
-+    qtest_quit(qtest_start("-vga none -device cirrus-vga"));
+     qtest_sendf(s, "irq_intercept_out %s\n", qom_path);
+     qtest_rsp(s, 0);
  }
 
- static void pci_stdvga(void)
+-void qtest_irq_intercept_in(QTestState *s, const char *qom_path)
++void irq_intercept_in(QTestState *s, const char *qom_path)
  {
--    qtest_start("-vga none -device VGA");
--    qtest_quit(global_qtest);
-+    qtest_quit(qtest_start("-vga none -device VGA"));
- }
-
- static void pci_secondary(void)
- {
--    qtest_start("-vga none -device secondary-vga");
--    qtest_quit(global_qtest);
-+    qtest_quit(qtest_start("-vga none -device secondary-vga"));
- }
-
- static void pci_multihead(void)
- {
--    qtest_start("-vga none -device VGA -device secondary-vga");
--    qtest_quit(global_qtest);
-+    qtest_quit(qtest_start("-vga none -device VGA -device secondary-vga"));
- }
-
- static void pci_virtio_gpu(void)
- {
--    qtest_start("-vga none -device virtio-gpu-pci");
--    qtest_quit(global_qtest);
-+    qtest_quit(qtest_start("-vga none -device virtio-gpu-pci"));
- }
-
- #ifdef CONFIG_VIRTIO_VGA
- static void pci_virtio_vga(void)
- {
--    qtest_start("-vga none -device virtio-vga");
--    qtest_quit(global_qtest);
-+    qtest_quit(qtest_start("-vga none -device virtio-vga"));
- }
- #endif
-
-diff --git a/tests/drive_del-test.c b/tests/drive_del-test.c
-index 16d256fe64..f68c4bc176 100644
---- a/tests/drive_del-test.c
-+++ b/tests/drive_del-test.c
-@@ -45,7 +45,7 @@ static void device_del(void)
- static void test_drive_without_dev(void)
- {
-     /* Start with an empty drive */
--    qtest_start("-drive if=none,id=drive0");
-+    global_qtest = qtest_start("-drive if=none,id=drive0");
-
-     /* Delete the drive */
-     drive_del();
-@@ -63,7 +63,7 @@ static void test_after_failed_device_add(void)
-     QDict *response;
-     QDict *error;
-
--    qtest_start("-drive if=none,id=drive0");
-+    global_qtest = qtest_start("-drive if=none,id=drive0");
-
-     /* Make device_add fail.  If this leaks the virtio-blk-pci device then a
-      * reference to drive0 will also be held (via qdev properties).
-@@ -92,9 +92,10 @@ static void test_after_failed_device_add(void)
- static void test_drive_del_device_del(void)
- {
-     /* Start with a drive used by a device that unplugs instantaneously */
--    qtest_start("-drive if=none,id=drive0,file=null-co://,format=raw"
--                " -device virtio-scsi-pci"
--                " -device scsi-hd,drive=drive0,id=dev0");
-+    global_qtest = qtest_start(
-+        "-drive if=none,id=drive0,file=null-co://,format=raw"
-+        " -device virtio-scsi-pci"
-+        " -device scsi-hd,drive=drive0,id=dev0");
-
-     /*
-      * Delete the drive, and then the device
-diff --git a/tests/es1370-test.c b/tests/es1370-test.c
-index 5578ff94fa..ff6fdbfe57 100644
---- a/tests/es1370-test.c
-+++ b/tests/es1370-test.c
-@@ -22,7 +22,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/es1370/nop", nop);
-
--    qtest_start("-device ES1370");
-+    global_qtest = qtest_start("-device ES1370");
-     ret = g_test_run();
-
-     qtest_quit(global_qtest);
+     qtest_sendf(s, "irq_intercept_in %s\n", qom_path);
+     qtest_rsp(s, 0);
 diff --git a/tests/fdc-test.c b/tests/fdc-test.c
-index e63e93179a..ec83625db2 100644
+index e79cd0f3b5..584ad746ed 100644
 --- a/tests/fdc-test.c
 +++ b/tests/fdc-test.c
-@@ -564,7 +564,7 @@ int main(int argc, char **argv)
-     /* Run the tests */
-     g_test_init(&argc, &argv, NULL);
-
--    qtest_start("-device floppy,id=floppy0");
-+    global_qtest = qtest_start("-device floppy,id=floppy0");
-     qtest_irq_intercept_in(global_qtest, "ioapic");
-     qtest_add_func("/fdc/cmos", test_cmos);
-     qtest_add_func("/fdc/no_media_on_start", test_no_media_on_start);
-diff --git a/tests/fw_cfg-test.c b/tests/fw_cfg-test.c
-index 3a8dc7a2cd..37214fdf10 100644
---- a/tests/fw_cfg-test.c
-+++ b/tests/fw_cfg-test.c
-@@ -106,7 +106,7 @@ int main(int argc, char **argv)
-
-     g_test_init(&argc, &argv, NULL);
-
--    s = qtest_init("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
-+    s = qtest_start("-uuid 4600cb32-38ec-4b2f-8acb-81c6ea54f2d8");
-
-     fw_cfg = pc_fw_cfg_init(s);
-
-diff --git a/tests/hd-geo-test.c b/tests/hd-geo-test.c
-index 67d571ef13..406eea3c56 100644
---- a/tests/hd-geo-test.c
-+++ b/tests/hd-geo-test.c
-@@ -241,7 +241,7 @@ static void test_ide_none(void)
-
-     setup_common(argv, ARGV_SIZE);
-     args = g_strjoinv(" ", argv);
--    qtest_start(args);
-+    global_qtest = qtest_start(args);
-     g_strfreev(argv);
-     g_free(args);
-     test_cmos();
-@@ -263,7 +263,7 @@ static void test_ide_mbr(bool use_device, MBRcontents mbr)
-         argc = setup_ide(argc, argv, ARGV_SIZE, i, dev, i, mbr, "");
-     }
-     args = g_strjoinv(" ", argv);
--    qtest_start(args);
-+    global_qtest = qtest_start(args);
-     g_strfreev(argv);
-     g_free(args);
-     test_cmos();
-@@ -339,7 +339,7 @@ static void test_ide_drive_user(const char *dev, bool trans)
-                      dev ? "" : opts);
-     g_free(opts);
-     args = g_strjoinv(" ", argv);
--    qtest_start(args);
-+    global_qtest = qtest_start(args);
-     g_strfreev(argv);
-     g_free(args);
-     test_cmos();
-@@ -396,7 +396,7 @@ static void test_ide_drive_cd_0(void)
-                          ide_idx, NULL, i, mbr_blank, "");
-     }
-     args = g_strjoinv(" ", argv);
--    qtest_start(args);
-+    global_qtest = qtest_start(args);
-     g_strfreev(argv);
-     g_free(args);
-     test_cmos();
-diff --git a/tests/i440fx-test.c b/tests/i440fx-test.c
-index c282ded4ca..1d78089f8e 100644
---- a/tests/i440fx-test.c
-+++ b/tests/i440fx-test.c
-@@ -340,7 +340,7 @@ static void test_i440fx_firmware(FirmwareTestFixture *fixture,
-                                          : "-drive if=pflash,format=raw,file=",
-                               fw_pathname);
-     g_test_message("qemu cmdline: %s", cmdline);
--    qtest_start(cmdline);
-+    global_qtest = qtest_start(cmdline);
-     g_free(cmdline);
-
-     /* QEMU has loaded the firmware (because qtest_start() only returns after
-diff --git a/tests/i82801b11-test.c b/tests/i82801b11-test.c
-index 0c94876626..b76714ae16 100644
---- a/tests/i82801b11-test.c
-+++ b/tests/i82801b11-test.c
-@@ -22,7 +22,8 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/i82801b11/nop", nop);
-
--    qtest_start("-machine q35 -device i82801b11-bridge,bus=pcie.0,addr=1e.0");
-+    global_qtest = qtest_start("-machine q35 "
-+                               "-device i82801b11-bridge,bus=pcie.0,addr=1e.0");
-     ret = g_test_run();
-
-     qtest_quit(global_qtest);
-diff --git a/tests/intel-hda-test.c b/tests/intel-hda-test.c
-index ce24fbac1f..c97a7635ed 100644
---- a/tests/intel-hda-test.c
-+++ b/tests/intel-hda-test.c
-@@ -18,15 +18,14 @@
- /* Tests only initialization so far. TODO: Replace with functional tests */
- static void ich6_test(void)
+@@ -99,7 +99,7 @@ static void ack_irq(uint8_t *pcn)
  {
--    qtest_start("-device intel-hda,id=" HDA_ID CODEC_DEVICES);
--    qtest_quit(global_qtest);
-+    qtest_quit(qtest_start("-device intel-hda,id=" HDA_ID CODEC_DEVICES));
+     uint8_t ret;
+
+-    g_assert(get_irq(FLOPPY_IRQ));
++    g_assert(get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_send(CMD_SENSE_INT);
+     floppy_recv();
+
+@@ -108,7 +108,7 @@ static void ack_irq(uint8_t *pcn)
+         *pcn = ret;
+     }
+
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
  }
 
- static void ich9_test(void)
- {
--    qtest_start("-machine q35 -device ich9-intel-hda,bus=pcie.0,addr=1b.0,id="
--                HDA_ID CODEC_DEVICES);
--    qtest_quit(global_qtest);
-+    qtest_quit(qtest_start(
-+        "-machine q35 -device ich9-intel-hda,bus=pcie.0,addr=1b.0,id="
-+        HDA_ID CODEC_DEVICES));
- }
+ static uint8_t send_read_command(uint8_t cmd)
+@@ -129,7 +129,7 @@ static uint8_t send_read_command(uint8_t cmd)
 
- int main(int argc, char **argv)
-diff --git a/tests/ioh3420-test.c b/tests/ioh3420-test.c
-index f2ca373e87..aff569b99e 100644
---- a/tests/ioh3420-test.c
-+++ b/tests/ioh3420-test.c
-@@ -22,8 +22,9 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/ioh3420/nop", nop);
+     floppy_send(cmd);
+     floppy_send(head << 2 | drive);
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_send(cyl);
+     floppy_send(head);
+     floppy_send(sect_addr);
+@@ -185,7 +185,7 @@ static uint8_t send_read_no_dma_command(int nb_sect, uint8_t expected_st0)
 
--    qtest_start("-machine q35 -device ioh3420,bus=pcie.0,addr=1c.0,port=1,"
--                "chassis=1,multifunction=on");
-+    global_qtest = qtest_start(
-+        "-machine q35 -device ioh3420,bus=pcie.0,addr=1c.0,port=1,"
-+        "chassis=1,multifunction=on");
-     ret = g_test_run();
+     floppy_send(CMD_READ);
+     floppy_send(head << 2 | drive);
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_send(cyl);
+     floppy_send(head);
+     floppy_send(sect_addr);
+@@ -217,7 +217,7 @@ static uint8_t send_read_no_dma_command(int nb_sect, uint8_t expected_st0)
 
-     qtest_quit(global_qtest);
-diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
-index 178ffc1797..5acc0d9e35 100644
---- a/tests/ipmi-kcs-test.c
-+++ b/tests/ipmi-kcs-test.c
-@@ -264,7 +264,6 @@ static void test_enable_irq(void)
- int main(int argc, char **argv)
- {
-     const char *arch = qtest_get_arch();
--    char *cmdline;
-     int ret;
+     msr = inb(FLOPPY_BASE + reg_msr);
+     assert_bit_set(msr, BUSY | RQM | DIO);
+-    g_assert(get_irq(FLOPPY_IRQ));
++    g_assert(get_irq(global_qtest, FLOPPY_IRQ));
 
-     /* Check architecture */
-@@ -276,10 +275,8 @@ int main(int argc, char **argv)
-     /* Run the tests */
-     g_test_init(&argc, &argv, NULL);
+     st0 = floppy_recv();
+     if (st0 != expected_st0) {
+@@ -229,14 +229,14 @@ static uint8_t send_read_no_dma_command(int nb_sect, uint8_t expected_st0)
+     floppy_recv();
+     floppy_recv();
+     floppy_recv();
+-    g_assert(get_irq(FLOPPY_IRQ));
++    g_assert(get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_recv();
 
--    cmdline = g_strdup_printf("-device ipmi-bmc-sim,id=bmc0"
--                              " -device isa-ipmi-kcs,bmc=bmc0");
--    qtest_start(cmdline);
--    g_free(cmdline);
-+    global_qtest = qtest_start("-device ipmi-bmc-sim,id=bmc0"
-+                               " -device isa-ipmi-kcs,bmc=bmc0");
-     qtest_irq_intercept_in(global_qtest, "ioapic");
-     qtest_add_func("/ipmi/local/kcs_base", test_kcs_base);
-     qtest_add_func("/ipmi/local/kcs_abort", test_kcs_abort);
-diff --git a/tests/ipoctal232-test.c b/tests/ipoctal232-test.c
-index d17a93449f..90b683284a 100644
---- a/tests/ipoctal232-test.c
-+++ b/tests/ipoctal232-test.c
-@@ -22,7 +22,8 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/ipoctal232/tpci200/nop", nop);
-
--    qtest_start("-device tpci200,id=ipack0 -device ipoctal232,bus=ipack0.0");
-+    global_qtest = qtest_start("-device tpci200,id=ipack0 "
-+                               "-device ipoctal232,bus=ipack0.0");
-     ret = g_test_run();
-
-     qtest_quit(global_qtest);
-diff --git a/tests/ivshmem-test.c b/tests/ivshmem-test.c
-index 58eaf0cafb..aa5619c62c 100644
---- a/tests/ivshmem-test.c
-+++ b/tests/ivshmem-test.c
-@@ -407,7 +407,7 @@ static void test_ivshmem_hotplug(void)
-     gchar *opts;
-     QTestState *qts;
-
--    qts = qtest_init("");
-+    qts = qtest_start("");
-
-     opts = g_strdup_printf("'shm': '%s', 'size': '1M'", tmpshm);
-
-diff --git a/tests/m48t59-test.c b/tests/m48t59-test.c
-index 0f921ef38a..aadd770f4f 100644
---- a/tests/m48t59-test.c
-+++ b/tests/m48t59-test.c
-@@ -246,7 +246,7 @@ int main(int argc, char **argv)
-
-     g_test_init(&argc, &argv, NULL);
-
--    s = qtest_start("-rtc clock=vm");
-+    s = global_qtest = qtest_start("-rtc clock=vm");
-
-     qtest_add_func("/rtc/bcd/check-time", bcd_check_time);
-     qtest_add_func("/rtc/fuzz-registers", fuzz_registers);
-diff --git a/tests/ne2000-test.c b/tests/ne2000-test.c
-index cae83c5c4c..8e6f7b07c6 100644
---- a/tests/ne2000-test.c
-+++ b/tests/ne2000-test.c
-@@ -22,7 +22,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/ne2000/pci/nop", pci_nop);
-
--    qtest_start("-device ne2k_pci");
-+    global_qtest = qtest_start("-device ne2k_pci");
-     ret = g_test_run();
-
-     qtest_quit(global_qtest);
-diff --git a/tests/nvme-test.c b/tests/nvme-test.c
-index 3d6c0f39cf..b054ad6fcd 100644
---- a/tests/nvme-test.c
-+++ b/tests/nvme-test.c
-@@ -22,8 +22,9 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/nvme/nop", nop);
-
--    qtest_start("-drive id=drv0,if=none,file=null-co://,format=raw "
--                "-device nvme,drive=drv0,serial=foo");
-+    global_qtest = qtest_start(
-+        "-drive id=drv0,if=none,file=null-co://,format=raw "
-+        "-device nvme,drive=drv0,serial=foo");
-     ret = g_test_run();
-
-     qtest_quit(global_qtest);
-diff --git a/tests/pcnet-test.c b/tests/pcnet-test.c
-index 98246d3504..a58a5fd7bf 100644
---- a/tests/pcnet-test.c
-+++ b/tests/pcnet-test.c
-@@ -22,7 +22,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/pcnet/pci/nop", pci_nop);
-
--    qtest_start("-device pcnet");
-+    global_qtest = qtest_start("-device pcnet");
-     ret = g_test_run();
-
-     qtest_quit(global_qtest);
-diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
-index 0e5fe20a83..efee20a099 100644
---- a/tests/postcopy-test.c
-+++ b/tests/postcopy-test.c
-@@ -403,10 +403,10 @@ static void test_migrate(void)
-
-     g_free(bootpath);
-
--    from = qtest_init(cmd_src);
-+    from = qtest_start(cmd_src);
-     g_free(cmd_src);
-
--    to = qtest_init(cmd_dst);
-+    to = qtest_start(cmd_dst);
-     g_free(cmd_dst);
-
-     assert(!global_qtest);
-diff --git a/tests/pvpanic-test.c b/tests/pvpanic-test.c
-index 5d99b3d9e2..c09b3ddac6 100644
---- a/tests/pvpanic-test.c
-+++ b/tests/pvpanic-test.c
-@@ -37,7 +37,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/pvpanic/panic", test_panic);
-
--    qtest_start("-device pvpanic");
-+    global_qtest = qtest_start("-device pvpanic");
-     ret = g_test_run();
-
-     qtest_quit(global_qtest);
-diff --git a/tests/q35-test.c b/tests/q35-test.c
-index a8e24e5b71..4d90b9174e 100644
---- a/tests/q35-test.c
-+++ b/tests/q35-test.c
-@@ -84,7 +84,7 @@ static void test_smram_lock(void)
-     QPCIDevice *pcidev;
-     QDict *response;
-
--    qtest_start("-M q35");
-+    global_qtest = qtest_start("-M q35");
-
-     pcibus = qpci_init_pc(global_qtest, NULL);
-     g_assert(pcibus != NULL);
-@@ -141,7 +141,7 @@ static void test_tseg_size(const void *data)
-         cmdline = g_strdup_printf("-M q35 -m %uM",
-                                   TSEG_SIZE_TEST_GUEST_RAM_MBYTES);
-     }
--    qtest_start(cmdline);
-+    global_qtest = qtest_start(cmdline);
-     g_free(cmdline);
-
-     /* locate the DRAM controller */
-diff --git a/tests/qmp-test.c b/tests/qmp-test.c
-index 8985e7f9ec..6ea66211d4 100644
---- a/tests/qmp-test.c
-+++ b/tests/qmp-test.c
-@@ -172,7 +172,7 @@ static void test_query(const void *data)
-     QDict *resp, *error;
-     const char *error_class;
-
--    qtest_start(common_args);
-+    global_qtest = qtest_start(common_args);
-
-     resp = qmp("{ 'execute': %s }", cmd);
-     error = qdict_get_qdict(resp, "error");
-@@ -224,7 +224,7 @@ static void qmp_schema_init(QmpSchema *schema)
-     Visitor *qiv;
-     SchemaInfoList *tail;
-
--    qtest_start(common_args);
-+    global_qtest = qtest_start(common_args);
-     resp = qmp("{ 'execute': 'query-qmp-schema' }");
-
-     qiv = qobject_input_visitor_new(qdict_get(resp, "return"));
-diff --git a/tests/rtc-test.c b/tests/rtc-test.c
-index d7a96cbd79..dd5430dd2d 100644
---- a/tests/rtc-test.c
-+++ b/tests/rtc-test.c
-@@ -690,7 +690,7 @@ int main(int argc, char **argv)
-
-     g_test_init(&argc, &argv, NULL);
-
--    s = qtest_start("-rtc clock=vm");
-+    s = global_qtest = qtest_start("-rtc clock=vm");
-     qtest_irq_intercept_in(s, "ioapic");
-
-     qtest_add_func("/rtc/check-time/bcd", bcd_check_time);
-diff --git a/tests/rtl8139-test.c b/tests/rtl8139-test.c
-index 317eb586b5..1741f0ec47 100644
---- a/tests/rtl8139-test.c
-+++ b/tests/rtl8139-test.c
-@@ -197,7 +197,7 @@ int main(int argc, char **argv)
- {
-     int ret;
-
--    qtest_start("-device rtl8139");
-+    global_qtest = qtest_start("-device rtl8139");
-
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/rtl8139/nop", nop);
-diff --git a/tests/spapr-phb-test.c b/tests/spapr-phb-test.c
-index e76987ace9..5ab22f3ba6 100644
---- a/tests/spapr-phb-test.c
-+++ b/tests/spapr-phb-test.c
-@@ -21,15 +21,16 @@ static void test_phb_device(void)
- int main(int argc, char **argv)
- {
-     int ret;
-+    QTestState *qts;
-
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/spapr-phb/device", test_phb_device);
-
--    qtest_start("-device " TYPE_SPAPR_PCI_HOST_BRIDGE ",index=30");
-+    qts = qtest_start("-device " TYPE_SPAPR_PCI_HOST_BRIDGE ",index=30");
-
-     ret = g_test_run();
-
--    qtest_quit(global_qtest);
-+    qtest_quit(qts);
+     /* Check that we're back in command phase */
+     msr = inb(FLOPPY_BASE + reg_msr);
+     assert_bit_clear(msr, BUSY | DIO);
+     assert_bit_set(msr, RQM);
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
 
      return ret;
  }
-diff --git a/tests/test-arm-mptimer.c b/tests/test-arm-mptimer.c
-index 823db9ebc9..9631c55fe3 100644
---- a/tests/test-arm-mptimer.c
-+++ b/tests/test-arm-mptimer.c
-@@ -1097,7 +1097,7 @@ tests_with_prescaler_arg:
-         goto tests_with_prescaler_arg;
+@@ -248,7 +248,7 @@ static void send_seek(int cyl)
+
+     floppy_send(CMD_SEEK);
+     floppy_send(head << 2 | drive);
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_send(cyl);
+     ack_irq(NULL);
+ }
+@@ -363,7 +363,7 @@ static void test_sense_interrupt(void)
+
+     floppy_send(CMD_SEEK);
+     floppy_send(head << 2 | drive);
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_send(cyl);
+
+     floppy_send(CMD_SENSE_INT);
+@@ -385,7 +385,7 @@ static void test_relative_seek(void)
+     /* Send relative seek to increase track by 1 */
+     floppy_send(CMD_RELATIVE_SEEK_IN);
+     floppy_send(head << 2 | drive);
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_send(cyl);
+
+     ack_irq(&pcn);
+@@ -394,7 +394,7 @@ static void test_relative_seek(void)
+     /* Send relative seek to decrease track by 1 */
+     floppy_send(CMD_RELATIVE_SEEK_OUT);
+     floppy_send(head << 2 | drive);
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_send(cyl);
+
+     ack_irq(&pcn);
+@@ -413,16 +413,16 @@ static void test_read_id(void)
+     send_seek(0);
+
+     floppy_send(CMD_READ_ID);
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_send(head << 2 | drive);
+
+     msr = inb(FLOPPY_BASE + reg_msr);
+-    if (!get_irq(FLOPPY_IRQ)) {
++    if (!get_irq(global_qtest, FLOPPY_IRQ)) {
+         assert_bit_set(msr, BUSY);
+         assert_bit_clear(msr, RQM);
      }
 
--    qtest_start("-machine vexpress-a9");
-+    global_qtest = qtest_start("-machine vexpress-a9");
-     ret = g_test_run();
-     qtest_quit(global_qtest);
+-    while (!get_irq(FLOPPY_IRQ)) {
++    while (!get_irq(global_qtest, FLOPPY_IRQ)) {
+         /* qemu involves a timer with READ ID... */
+         clock_step(global_qtest, 1000000000LL / 50);
+     }
+@@ -436,9 +436,9 @@ static void test_read_id(void)
+     cyl = floppy_recv();
+     head = floppy_recv();
+     floppy_recv();
+-    g_assert(get_irq(FLOPPY_IRQ));
++    g_assert(get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_recv();
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
 
-diff --git a/tests/test-x86-cpuid-compat.c b/tests/test-x86-cpuid-compat.c
-index 4e88f9e4e2..84410c63b9 100644
---- a/tests/test-x86-cpuid-compat.c
-+++ b/tests/test-x86-cpuid-compat.c
-@@ -59,7 +59,7 @@ static void test_cpuid_prop(const void *data)
-     QNum *value;
-     int64_t val;
+     g_assert_cmpint(cyl, ==, 0);
+     g_assert_cmpint(head, ==, 0);
+@@ -450,22 +450,22 @@ static void test_read_id(void)
 
--    qtest_start(args->cmdline);
-+    global_qtest = qtest_start(args->cmdline);
-     path = get_cpu0_qom_path();
-     value = qobject_to_qnum(qom_get(path, args->property));
-     g_assert(qnum_get_try_int(value, &val));
-@@ -131,7 +131,7 @@ static void test_feature_flag(const void *data)
-     QList *present, *filtered;
-     uint32_t value;
+     floppy_send(CMD_SEEK);
+     floppy_send(head << 2 | drive);
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_send(cyl);
+-    g_assert(get_irq(FLOPPY_IRQ));
++    g_assert(get_irq(global_qtest, FLOPPY_IRQ));
+     ack_irq(NULL);
 
--    qtest_start(args->cmdline);
-+    global_qtest = qtest_start(args->cmdline);
-     path = get_cpu0_qom_path();
-     present = qobject_to_qlist(qom_get(path, "feature-words"));
-     filtered = qobject_to_qlist(qom_get(path, "filtered-features"));
-@@ -181,7 +181,8 @@ static void test_plus_minus_subprocess(void)
-      * Note: rules 1 and 2 are planned to be removed soon, and
-      * should generate a warning.
-      */
--    qtest_start("-cpu pentium,-fpu,+fpu,-mce,mce=on,+cx8,cx8=off,+sse4_1,sse4_2=on");
-+    global_qtest = qtest_start("-cpu pentium,-fpu,+fpu,-mce,mce=on,+cx8,"
-+                               "cx8=off,+sse4_1,sse4_2=on");
-     path = get_cpu0_qom_path();
+     floppy_send(CMD_READ_ID);
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_send(head << 2 | drive);
 
-     g_assert_false(qom_get_bool(path, "fpu"));
-diff --git a/tests/tmp105-test.c b/tests/tmp105-test.c
-index 382f88ba23..3f2cb3a864 100644
---- a/tests/tmp105-test.c
-+++ b/tests/tmp105-test.c
-@@ -154,6 +154,7 @@ int main(int argc, char **argv)
-     s = qtest_start("-machine n800 "
-                     "-device tmp105,bus=i2c-bus.0,id=" TMP105_TEST_ID
-                     ",address=0x49");
-+    global_qtest = s;
-     i2c = omap_i2c_create(s, OMAP2_I2C_1_BASE);
+     msr = inb(FLOPPY_BASE + reg_msr);
+-    if (!get_irq(FLOPPY_IRQ)) {
++    if (!get_irq(global_qtest, FLOPPY_IRQ)) {
+         assert_bit_set(msr, BUSY);
+         assert_bit_clear(msr, RQM);
+     }
 
-     qtest_add_func("/tmp105/tx-rx", send_and_receive);
-diff --git a/tests/tpci200-test.c b/tests/tpci200-test.c
-index 3b756d10f0..223d44da35 100644
---- a/tests/tpci200-test.c
-+++ b/tests/tpci200-test.c
-@@ -22,7 +22,7 @@ int main(int argc, char **argv)
+-    while (!get_irq(FLOPPY_IRQ)) {
++    while (!get_irq(global_qtest, FLOPPY_IRQ)) {
+         /* qemu involves a timer with READ ID... */
+         clock_step(global_qtest, 1000000000LL / 50);
+     }
+@@ -479,9 +479,9 @@ static void test_read_id(void)
+     cyl = floppy_recv();
+     head = floppy_recv();
+     floppy_recv();
+-    g_assert(get_irq(FLOPPY_IRQ));
++    g_assert(get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_recv();
+-    g_assert(!get_irq(FLOPPY_IRQ));
++    g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+
+     g_assert_cmpint(cyl, ==, 8);
+     g_assert_cmpint(head, ==, 1);
+@@ -565,7 +565,7 @@ int main(int argc, char **argv)
      g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/tpci200/nop", nop);
 
--    qtest_start("-device tpci200");
-+    global_qtest = qtest_start("-device tpci200");
-     ret = g_test_run();
+     global_qtest = qtest_start("-device floppy,id=floppy0");
+-    qtest_irq_intercept_in(global_qtest, "ioapic");
++    irq_intercept_in(global_qtest, "ioapic");
+     qtest_add_func("/fdc/cmos", test_cmos);
+     qtest_add_func("/fdc/no_media_on_start", test_no_media_on_start);
+     qtest_add_func("/fdc/read_without_media", test_read_without_media);
+diff --git a/tests/ide-test.c b/tests/ide-test.c
+index 32c8c40294..c22dde55c1 100644
+--- a/tests/ide-test.c
++++ b/tests/ide-test.c
+@@ -255,14 +255,15 @@ static int send_dma_request(int cmd, uint64_t sector, int nb_sectors,
+         status = qpci_io_readb(dev, bmdma_bar, bmreg_status);
+     } while ((status & (BM_STS_ACTIVE | BM_STS_INTR)) == BM_STS_ACTIVE);
 
-     qtest_quit(global_qtest);
-diff --git a/tests/usb-hcd-ehci-test.c b/tests/usb-hcd-ehci-test.c
-index 16d74512cc..c3568a1782 100644
---- a/tests/usb-hcd-ehci-test.c
-+++ b/tests/usb-hcd-ehci-test.c
-@@ -156,17 +156,18 @@ int main(int argc, char **argv)
-     qtest_add_func("/ehci/pci/ehci-port-2", pci_ehci_port_2);
-     qtest_add_func("/ehci/pci/ehci-port-3-hotplug", pci_ehci_port_hotplug);
+-    g_assert_cmpint(get_irq(IDE_PRIMARY_IRQ), ==, !!(status & BM_STS_INTR));
++    g_assert_cmpint(get_irq(global_qtest, IDE_PRIMARY_IRQ), ==,
++                    !!(status & BM_STS_INTR));
 
--    qtest_start("-machine q35 -device ich9-usb-ehci1,bus=pcie.0,addr=1d.7,"
--                "multifunction=on,id=ich9-ehci-1 "
--                "-device ich9-usb-uhci1,bus=pcie.0,addr=1d.0,"
--                "multifunction=on,masterbus=ich9-ehci-1.0,firstport=0 "
--                "-device ich9-usb-uhci2,bus=pcie.0,addr=1d.1,"
--                "multifunction=on,masterbus=ich9-ehci-1.0,firstport=2 "
--                "-device ich9-usb-uhci3,bus=pcie.0,addr=1d.2,"
--                "multifunction=on,masterbus=ich9-ehci-1.0,firstport=4 "
--                "-drive if=none,id=usbcdrom,media=cdrom "
--                "-device usb-tablet,bus=ich9-ehci-1.0,port=1,usb_version=1 "
--                "-device usb-storage,bus=ich9-ehci-1.0,port=2,drive=usbcdrom ");
-+    global_qtest = qtest_start(
-+        "-machine q35 -device ich9-usb-ehci1,bus=pcie.0,addr=1d.7,"
-+        "multifunction=on,id=ich9-ehci-1 "
-+        "-device ich9-usb-uhci1,bus=pcie.0,addr=1d.0,"
-+        "multifunction=on,masterbus=ich9-ehci-1.0,firstport=0 "
-+        "-device ich9-usb-uhci2,bus=pcie.0,addr=1d.1,"
-+        "multifunction=on,masterbus=ich9-ehci-1.0,firstport=2 "
-+        "-device ich9-usb-uhci3,bus=pcie.0,addr=1d.2,"
-+        "multifunction=on,masterbus=ich9-ehci-1.0,firstport=4 "
-+        "-drive if=none,id=usbcdrom,media=cdrom "
-+        "-device usb-tablet,bus=ich9-ehci-1.0,port=1,usb_version=1 "
-+        "-device usb-storage,bus=ich9-ehci-1.0,port=2,drive=usbcdrom ");
+     /* Check IDE status code */
+     assert_bit_set(qpci_io_readb(dev, ide_bar, reg_status), DRDY);
+     assert_bit_clear(qpci_io_readb(dev, ide_bar, reg_status), BSY | DRQ);
 
-     test_init();
-     ret = g_test_run();
-diff --git a/tests/usb-hcd-ohci-test.c b/tests/usb-hcd-ohci-test.c
-index aa38e44d03..62fd35f69a 100644
---- a/tests/usb-hcd-ohci-test.c
-+++ b/tests/usb-hcd-ohci-test.c
-@@ -31,7 +31,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/ohci/pci/init", test_ohci_init);
-     qtest_add_func("/ohci/pci/hotplug", test_ohci_hotplug);
+     /* Reading the status register clears the IRQ */
+-    g_assert(!get_irq(IDE_PRIMARY_IRQ));
++    g_assert(!get_irq(global_qtest, IDE_PRIMARY_IRQ));
 
--    qtest_start("-device pci-ohci,id=ohci");
-+    global_qtest = qtest_start("-device pci-ohci,id=ohci");
-     ret = g_test_run();
-     qtest_quit(global_qtest);
-
-diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
-index e45509741c..bd3c65ae85 100644
---- a/tests/usb-hcd-xhci-test.c
-+++ b/tests/usb-hcd-xhci-test.c
-@@ -80,8 +80,9 @@ int main(int argc, char **argv)
-     qtest_add_func("/xhci/pci/hotplug", test_xhci_hotplug);
-     qtest_add_func("/xhci/pci/hotplug/usb-uas", test_usb_uas_hotplug);
-
--    qtest_start("-device nec-usb-xhci,id=xhci"
--                " -drive id=drive0,if=none,file=null-co://,format=raw");
-+    global_qtest = qtest_start(
-+        "-device nec-usb-xhci,id=xhci"
-+        " -drive id=drive0,if=none,file=null-co://,format=raw");
-     ret = g_test_run();
-     qtest_quit(global_qtest);
-
-diff --git a/tests/virtio-balloon-test.c b/tests/virtio-balloon-test.c
-index 34ad718601..cca7b0e8fb 100644
---- a/tests/virtio-balloon-test.c
-+++ b/tests/virtio-balloon-test.c
-@@ -22,7 +22,7 @@ int main(int argc, char **argv)
-     g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/virtio/balloon/pci/nop", pci_nop);
-
--    qtest_start("-device virtio-balloon-pci");
-+    global_qtest = qtest_start("-device virtio-balloon-pci");
-     ret = g_test_run();
-
-     qtest_quit(global_qtest);
-diff --git a/tests/virtio-console-test.c b/tests/virtio-console-test.c
-index 5c036ce02a..07a5f26880 100644
---- a/tests/virtio-console-test.c
-+++ b/tests/virtio-console-test.c
-@@ -13,16 +13,14 @@
- /* Tests only initialization so far. TODO: Replace with functional tests */
- static void console_pci_nop(void)
- {
--    qtest_start("-device virtio-serial-pci,id=vser0 "
--                "-device virtconsole,bus=vser0.0");
--    qtest_quit(global_qtest);
-+    qtest_quit(qtest_start("-device virtio-serial-pci,id=vser0 "
-+                           "-device virtconsole,bus=vser0.0"));
+     /* Stop DMA transfer if still active */
+     if (status & BM_STS_ACTIVE) {
+@@ -458,7 +459,7 @@ static void test_bmdma_setup(void)
+         "-drive file=%s,if=ide,serial=%s,cache=writeback,format=raw "
+         "-global ide-hd.ver=%s",
+         tmp_path, "testdisk", "version");
+-    qtest_irq_intercept_in(global_qtest, "ioapic");
++    irq_intercept_in(global_qtest, "ioapic");
  }
 
- static void serialport_pci_nop(void)
+ static void test_bmdma_teardown(void)
+@@ -580,7 +581,7 @@ static void test_flush(void)
+
+     dev = get_pci_device(&bmdma_bar, &ide_bar);
+
+-    qtest_irq_intercept_in(global_qtest, "ioapic");
++    irq_intercept_in(global_qtest, "ioapic");
+
+     /* Dirty media so that CMD_FLUSH_CACHE will actually go to disk */
+     make_dirty(0);
+@@ -631,7 +632,7 @@ static void test_retry_flush(const char *machine)
+
+     dev = get_pci_device(&bmdma_bar, &ide_bar);
+
+-    qtest_irq_intercept_in(global_qtest, "ioapic");
++    irq_intercept_in(global_qtest, "ioapic");
+
+     /* Dirty media so that CMD_FLUSH_CACHE will actually go to disk */
+     make_dirty(0);
+@@ -784,7 +785,7 @@ static void ide_wait_intr(int irq)
+
+     time(&st);
+     while (true) {
+-        intr = get_irq(irq);
++        intr = get_irq(global_qtest, irq);
+         if (intr) {
+             return;
+         }
+@@ -822,7 +823,7 @@ static void cdrom_pio_impl(int nblocks)
+     ide_test_start("-drive if=none,file=%s,media=cdrom,format=raw,id=sr0,index=0 "
+                    "-device ide-cd,drive=sr0,bus=ide.0", tmp_path);
+     dev = get_pci_device(&bmdma_bar, &ide_bar);
+-    qtest_irq_intercept_in(global_qtest, "ioapic");
++    irq_intercept_in(global_qtest, "ioapic");
+
+     /* PACKET command on device 0 */
+     qpci_io_writeb(dev, ide_bar, reg_device, 0);
+@@ -905,7 +906,7 @@ static void test_cdrom_dma(void)
+
+     ide_test_start("-drive if=none,file=%s,media=cdrom,format=raw,id=sr0,index=0 "
+                    "-device ide-cd,drive=sr0,bus=ide.0", tmp_path);
+-    qtest_irq_intercept_in(global_qtest, "ioapic");
++    irq_intercept_in(global_qtest, "ioapic");
+
+     guest_buf = guest_alloc(guest_malloc, len);
+     prdt[0].addr = cpu_to_le32(guest_buf);
+diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
+index 8be18e3f42..f80a9a83c9 100644
+--- a/tests/ipmi-bt-test.c
++++ b/tests/ipmi-bt-test.c
+@@ -276,10 +276,10 @@ static void bt_cmd(uint8_t *cmd, unsigned int cmd_len,
+     bt_wait_b2h_atn();
+     if (bt_ints_enabled) {
+         g_assert((bt_get_irqreg() & 0x02) == 0x02);
+-        g_assert(get_irq(IPMI_IRQ));
++        g_assert(get_irq(global_qtest, IPMI_IRQ));
+         bt_write_irqreg(0x03);
+     } else {
+-        g_assert(!get_irq(IPMI_IRQ));
++        g_assert(!get_irq(global_qtest, IPMI_IRQ));
+     }
+     IPMI_BT_CTLREG_SET_H_BUSY();
+     IPMI_BT_CTLREG_SET_B2H_ATN();
+@@ -418,7 +418,7 @@ int main(int argc, char **argv)
+         " -chardev socket,id=ipmi0,host=localhost,port=%d,reconnect=10"
+         " -device ipmi-bmc-extern,chardev=ipmi0,id=bmc0"
+         " -device isa-ipmi-bt,bmc=bmc0", emu_port);
+-    qtest_irq_intercept_in(global_qtest, "ioapic");
++    irq_intercept_in(global_qtest, "ioapic");
+     qtest_add_func("/ipmi/extern/connect", test_connect);
+     qtest_add_func("/ipmi/extern/bt_base", test_bt_base);
+     qtest_add_func("/ipmi/extern/bt_enable_irq", test_enable_irq);
+diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
+index 5acc0d9e35..ddad8dd22f 100644
+--- a/tests/ipmi-kcs-test.c
++++ b/tests/ipmi-kcs-test.c
+@@ -89,14 +89,14 @@ static void kcs_wait_obf(void)
+ static void kcs_clear_obf(void)
  {
--    qtest_start("-device virtio-serial-pci,id=vser0 "
--                "-device virtserialport,bus=vser0.0");
--    qtest_quit(global_qtest);
-+    qtest_quit(qtest_start("-device virtio-serial-pci,id=vser0 "
-+                           "-device virtserialport,bus=vser0.0"));
+     if (kcs_ints_enabled) {
+-        g_assert(get_irq(IPMI_IRQ));
++        g_assert(get_irq(global_qtest, IPMI_IRQ));
+     } else {
+-        g_assert(!get_irq(IPMI_IRQ));
++        g_assert(!get_irq(global_qtest, IPMI_IRQ));
+     }
+     g_assert(IPMI_KCS_CMDREG_GET_OBF() == 1);
+     kcs_get_datareg();
+     g_assert(IPMI_KCS_CMDREG_GET_OBF() == 0);
+-    g_assert(!get_irq(IPMI_IRQ));
++    g_assert(!get_irq(global_qtest, IPMI_IRQ));
  }
 
- int main(int argc, char **argv)
-diff --git a/tests/virtio-net-test.c b/tests/virtio-net-test.c
-index e1085c7e77..9250c417a9 100644
---- a/tests/virtio-net-test.c
-+++ b/tests/virtio-net-test.c
-@@ -246,7 +246,7 @@ static void hotplug(void)
+ static void kcs_check_state(uint8_t state)
+@@ -277,7 +277,7 @@ int main(int argc, char **argv)
+
+     global_qtest = qtest_start("-device ipmi-bmc-sim,id=bmc0"
+                                " -device isa-ipmi-kcs,bmc=bmc0");
+-    qtest_irq_intercept_in(global_qtest, "ioapic");
++    irq_intercept_in(global_qtest, "ioapic");
+     qtest_add_func("/ipmi/local/kcs_base", test_kcs_base);
+     qtest_add_func("/ipmi/local/kcs_abort", test_kcs_abort);
+     qtest_add_func("/ipmi/local/kcs_enable_irq", test_enable_irq);
+diff --git a/tests/libqos/libqos-pc.c b/tests/libqos/libqos-pc.c
+index a9c1aceaa7..df97f0cd03 100644
+--- a/tests/libqos/libqos-pc.c
++++ b/tests/libqos/libqos-pc.c
+@@ -25,7 +25,7 @@ QOSState *qtest_pc_boot(const char *cmdline_fmt, ...)
+     qs = qtest_vboot(&qos_ops, cmdline_fmt, ap);
+     va_end(ap);
+
+-    qtest_irq_intercept_in(qs->qts, "ioapic");
++    irq_intercept_in(qs->qts, "ioapic");
+
+     return qs;
+ }
+diff --git a/tests/rtc-test.c b/tests/rtc-test.c
+index 9b98e2d494..8ff201993e 100644
+--- a/tests/rtc-test.c
++++ b/tests/rtc-test.c
+@@ -277,7 +277,7 @@ static void alarm_time(void)
+     /* set DEC mode */
+     cmos_write(RTC_REG_B, REG_B_24H | REG_B_DM);
+
+-    g_assert(!get_irq(RTC_ISA_IRQ));
++    g_assert(!get_irq(global_qtest, RTC_ISA_IRQ));
+     cmos_read(RTC_REG_C);
+
+     now.tm_sec = (now.tm_sec + 2) % 60;
+@@ -287,14 +287,14 @@ static void alarm_time(void)
+     cmos_write(RTC_REG_B, cmos_read(RTC_REG_B) | REG_B_AIE);
+
+     for (i = 0; i < 2 + wiggle; i++) {
+-        if (get_irq(RTC_ISA_IRQ)) {
++        if (get_irq(global_qtest, RTC_ISA_IRQ)) {
+             break;
+         }
+
+         clock_step(global_qtest, 1000000000);
+     }
+
+-    g_assert(get_irq(RTC_ISA_IRQ));
++    g_assert(get_irq(global_qtest, RTC_ISA_IRQ));
+     g_assert((cmos_read(RTC_REG_C) & REG_C_AF) != 0);
+     g_assert(cmos_read(RTC_REG_C) == 0);
+ }
+@@ -644,7 +644,7 @@ static void uip_stuck(void)
+
+ static uint64_t wait_periodic_interrupt(uint64_t real_time)
  {
-     const char *arch = qtest_get_arch();
+-    while (!get_irq(RTC_ISA_IRQ)) {
++    while (!get_irq(global_qtest, RTC_ISA_IRQ)) {
+         real_time = clock_step_next(global_qtest);
+     }
 
--    qtest_start("-device virtio-net-pci");
-+    global_qtest = qtest_start("-device virtio-net-pci");
-
-     qpci_plug_device_test(global_qtest, "virtio-net-pci", "net1",
-                           PCI_SLOT_HP, NULL);
-diff --git a/tests/virtio-rng-test.c b/tests/virtio-rng-test.c
-index a3a8bde491..e632281fa4 100644
---- a/tests/virtio-rng-test.c
-+++ b/tests/virtio-rng-test.c
-@@ -38,7 +38,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/virtio/rng/pci/nop", pci_nop);
-     qtest_add_func("/virtio/rng/pci/hotplug", hotplug);
-
--    qtest_start("-device virtio-rng-pci");
-+    global_qtest = qtest_start("-device virtio-rng-pci");
-     ret = g_test_run();
-
-     qtest_quit(global_qtest);
-diff --git a/tests/virtio-serial-test.c b/tests/virtio-serial-test.c
-index d0bbc2a8c9..1cc43465e6 100644
---- a/tests/virtio-serial-test.c
-+++ b/tests/virtio-serial-test.c
-@@ -49,7 +49,7 @@ int main(int argc, char **argv)
-     qtest_add_func("/virtio/serial/pci/nop", pci_nop);
-     qtest_add_func("/virtio/serial/pci/hotplug", hotplug);
-
--    qtest_start("-device virtio-serial-pci");
-+    global_qtest = qtest_start("-device virtio-serial-pci");
-     ret = g_test_run();
-
-     qtest_quit(global_qtest);
-diff --git a/tests/vmxnet3-test.c b/tests/vmxnet3-test.c
-index 631630b4d0..0b4b807616 100644
---- a/tests/vmxnet3-test.c
-+++ b/tests/vmxnet3-test.c
-@@ -22,7 +22,7 @@ int main(int argc, char **argv)
+@@ -691,7 +691,7 @@ int main(int argc, char **argv)
      g_test_init(&argc, &argv, NULL);
-     qtest_add_func("/vmxnet3/nop", nop);
 
--    qtest_start("-device vmxnet3");
-+    global_qtest = qtest_start("-device vmxnet3");
-     ret = g_test_run();
+     s = global_qtest = qtest_start("-rtc clock=vm");
+-    qtest_irq_intercept_in(s, "ioapic");
++    irq_intercept_in(s, "ioapic");
 
-     qtest_quit(global_qtest);
+     qtest_add_func("/rtc/check-time/bcd", bcd_check_time);
+     qtest_add_func("/rtc/check-time/dec", dec_check_time);
+diff --git a/tests/tco-test.c b/tests/tco-test.c
+index 27e982d8ac..c2abbeeaac 100644
+--- a/tests/tco-test.c
++++ b/tests/tco-test.c
+@@ -60,7 +60,7 @@ static void test_init(TestData *d)
+                       d->noreboot ? "" : "-global ICH9-LPC.noreboot=false",
+                       !d->args ? "" : d->args);
+     global_qtest = qs;
+-    qtest_irq_intercept_in(qs, "ioapic");
++    irq_intercept_in(qs, "ioapic");
+
+     d->bus = qpci_init_pc(qs, NULL);
+     d->dev = qpci_device_find(d->bus, QPCI_DEVFN(0x1f, 0x00));
 diff --git a/tests/wdt_ib700-test.c b/tests/wdt_ib700-test.c
-index 4bb8374011..a169265e16 100644
+index 05690e5159..5ce8f4a08a 100644
 --- a/tests/wdt_ib700-test.c
 +++ b/tests/wdt_ib700-test.c
-@@ -56,7 +56,7 @@ static QDict *ib700_program_and_wait(QTestState *s)
- static void ib700_pause(void)
- {
+@@ -58,7 +58,7 @@ static void ib700_pause(void)
      QDict *d;
--    QTestState *s = qtest_init("-watchdog-action pause -device ib700");
-+    QTestState *s = qtest_start("-watchdog-action pause -device ib700");
+     QTestState *s = qtest_start("-watchdog-action pause -device ib700");
 
-     qtest_irq_intercept_in(s, "ioapic");
+-    qtest_irq_intercept_in(s, "ioapic");
++    irq_intercept_in(s, "ioapic");
      d = ib700_program_and_wait(s);
-@@ -69,7 +69,7 @@ static void ib700_pause(void)
- static void ib700_reset(void)
- {
+     g_assert(!strcmp(qdict_get_str(d, "action"), "pause"));
+     QDECREF(d);
+@@ -71,7 +71,7 @@ static void ib700_reset(void)
      QDict *d;
--    QTestState *s = qtest_init("-watchdog-action reset -device ib700");
-+    QTestState *s = qtest_start("-watchdog-action reset -device ib700");
+     QTestState *s = qtest_start("-watchdog-action reset -device ib700");
 
-     qtest_irq_intercept_in(s, "ioapic");
-     d = ib700_program_and_wait(s);
-@@ -84,7 +84,7 @@ static void ib700_shutdown(void)
-     QDict *d;
-     QTestState *s;
-
--    s = qtest_init("-watchdog-action reset -no-reboot -device ib700");
-+    s = qtest_start("-watchdog-action reset -no-reboot -device ib700");
-     qtest_irq_intercept_in(s, "ioapic");
+-    qtest_irq_intercept_in(s, "ioapic");
++    irq_intercept_in(s, "ioapic");
      d = ib700_program_and_wait(s);
      g_assert(!strcmp(qdict_get_str(d, "action"), "reset"));
-@@ -96,7 +96,7 @@ static void ib700_shutdown(void)
- static void ib700_none(void)
- {
-     QDict *d;
--    QTestState *s = qtest_init("-watchdog-action none -device ib700");
-+    QTestState *s = qtest_start("-watchdog-action none -device ib700");
+     QDECREF(d);
+@@ -85,7 +85,7 @@ static void ib700_shutdown(void)
+     QTestState *s;
 
-     qtest_irq_intercept_in(s, "ioapic");
+     s = qtest_start("-watchdog-action reset -no-reboot -device ib700");
+-    qtest_irq_intercept_in(s, "ioapic");
++    irq_intercept_in(s, "ioapic");
      d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "reset"));
+     QDECREF(d);
+@@ -98,7 +98,7 @@ static void ib700_none(void)
+     QDict *d;
+     QTestState *s = qtest_start("-watchdog-action none -device ib700");
+
+-    qtest_irq_intercept_in(s, "ioapic");
++    irq_intercept_in(s, "ioapic");
+     d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "none"));
+     QDECREF(d);
 -- 
 2.13.5
