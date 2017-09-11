@@ -1,41 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54342)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55857)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drOSv-0001yo-2T
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:09:33 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drOZM-0003Ui-Mt
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:16:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drOSp-0002RS-AJ
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:09:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35636)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drOZH-0007en-9P
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:16:08 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33627)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1drOSp-0002QT-0a
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:09:23 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	id 1drOZH-0007eB-0W
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:16:03 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8BD9Ctt103015
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 09:09:21 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cwq82gwgp-1
+	v8BDEPZx010793
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 09:16:01 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cwssdf0ut-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 09:09:19 -0400
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 09:16:01 -0400
 Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Mon, 11 Sep 2017 14:08:54 +0100
+	Mon, 11 Sep 2017 14:15:58 +0100
 References: <20170908152446.14606-1-pasic@linux.vnet.ibm.com>
-	<20170908152446.14606-4-pasic@linux.vnet.ibm.com>
-	<20170911114841.408b5988.cohuck@redhat.com>
+	<20170908152446.14606-2-pasic@linux.vnet.ibm.com>
+	<20170911113314.45ef089e.cohuck@redhat.com>
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Mon, 11 Sep 2017 15:08:52 +0200
+Date: Mon, 11 Sep 2017 15:15:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170911114841.408b5988.cohuck@redhat.com>
+In-Reply-To: <20170911113314.45ef089e.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <90381836-c1ee-2d0b-86a5-117c2a86a74f@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 3/4] s390x/css: remove dubious error
- handling branch
+Content-Transfer-Encoding: 7bit
+Message-Id: <ea3f85ba-9413-12ed-9f0f-a3db93273e37@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/4] s390x/css: drop data-check in
+ interpretation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -49,60 +49,79 @@ Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.
 
 
 
-On 09/11/2017 11:48 AM, Cornelia Huck wrote:
-> On Fri,  8 Sep 2017 17:24:45 +0200
+On 09/11/2017 11:33 AM, Cornelia Huck wrote:
+> On Fri,  8 Sep 2017 17:24:43 +0200
 > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 > 
-> s/dubious/unused/
+>> The architecture says that channel-data check is indicating that
+>> an uncorrected storage (memory) error has been detected in regard
+>> to the data residing in main storage (memory) that is currently
+>> used for an I/O operation. The described detection is done using
+>> the CBC technology.
+>>
+>> The ccw interpretation code is however generating a channel-data check
+>> effectively when the (device specific) ccw_cb returns -EFAULT.  In case
+>> of virtio-ccw devices this happens when mapping memory fails, or when a
+>> NULL pointer is encountered. So this behavior is not architecture
+>> conform.
+>>
+>> Furthermore the best fit for these situations (null pointer, mapping a
+>> piece of guest memory fails) from architectural perspective the condition
+>> described as the channel subsystem refers to a location that is not
+>> available, which when encountered shall result in a channel-program
+>> check.
+>>
+>> To fix this, all we have to do is to get rid of the switch case matching
+>> -EFAULT: the default is generating a channel-program check.
+>>
+>> ---
+>>
+>> Was posted as stand alone patch. See:
+>> http://patchwork.ozlabs.org/patch/810995/
+>>
+>> If you are going to, *please review there*.
 > 
-
-Nod.
-
->> The case in question actually never happens. Let us get rid of the dead
->> code.
+> Countered. *Please review here*
 > 
-> I had tried to be complete in my initial implementation. With the
-> current implementation, it can never happen, yes. We can easily
-> resurrect it from git history should we need it in the future.
+> (It makes it easier for me.)
 > 
-
-I've tried to understand the branch but I failed. Weather the subchannel
-is busy or not should be already decided, and if the device is busy
-that is probably supposed to be indicated via device status (word 2 bit 3).
-
-So I wrote dubious because I could not figure it out. But unused
-is certainly nicer.
-
-I think shall the need emerge the preferred way of handling would
-be to use the custom handling (-EIO) branch.
-
-
 >>
 >> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> 
+> Your s-o-b should go before the triple-dash delimiter. I can fix that
+> up.
+
+Thanks! Btw. the original (there) was correct in this respect.
+
+> 
 >> ---
->>  hw/s390x/css.c | 7 -------
->>  1 file changed, 7 deletions(-)
+>>  hw/s390x/css.c | 9 ---------
+>>  1 file changed, 9 deletions(-)
 >>
 >> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
->> index a44d87ab3e..a9cdd54efc 100644
+>> index 901dc6a0f3..09f6ba0310 100644
 >> --- a/hw/s390x/css.c
 >> +++ b/hw/s390x/css.c
->> @@ -980,13 +980,6 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
+>> @@ -980,15 +980,6 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
 >>                      SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
 >>              s->cpa = sch->channel_prog + 8;
 >>              break;
->> -        case -EBUSY:
->> -            /* subchannel busy, generate deferred cc 1 */
->> -            s->flags &= ~SCSW_FLAGS_MASK_CC;
->> -            s->flags |= (1 << 8);
+>> -        case -EFAULT:
+>> -            /* memory problem, generate channel data check */
+>> -            s->ctrl &= ~SCSW_ACTL_START_PEND;
+>> -            s->cstat = SCSW_CSTAT_DATA_CHECK;
 >> -            s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
->> -            s->ctrl |= SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
+>> -            s->ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
+>> -                    SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
+>> -            s->cpa = sch->channel_prog + 8;
 >> -            break;
->>          case -EINPROGRESS:
->>              /* channel program has been suspended */
->>              s->ctrl &= ~SCSW_ACTL_START_PEND;
+>>          case -EBUSY:
+>>              /* subchannel busy, generate deferred cc 1 */
+>>              s->flags &= ~SCSW_FLAGS_MASK_CC;
 > 
-> Thanks, queued.
+> Looks reasonable. Queued.
 > 
 
 Thanks!
+
+Halil
