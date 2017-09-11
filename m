@@ -1,29 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46973)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47373)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1drSk5-0002bZ-Nc
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:43:30 -0400
+	(envelope-from <alistair23@gmail.com>) id 1drSl6-0003cH-4y
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:44:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1drSk0-0005Du-Qz
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:43:29 -0400
-Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:37751)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1drSk0-0005D6-LB
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:43:24 -0400
-Received: by mail-io0-x22f.google.com with SMTP id j141so31071420ioj.4
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 10:43:24 -0700 (PDT)
-Date: Mon, 11 Sep 2017 10:43:21 -0700
-From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-Message-Id: <1505151801.1214.2@smtp.gmail.com>
-In-Reply-To: <20170911173743.GV21444@redhat.com>
-References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
-	<20170908173801.15205-7-brandon.carpenter@cypherpath.com>
-	<20170911173743.GV21444@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1drSl5-0005aZ-2k
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:44:32 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"; format=flowed
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] io: Reply to ping frames
+In-Reply-To: <1505137930-13255-7-git-send-email-peter.maydell@linaro.org>
+References: <1505137930-13255-1-git-send-email-peter.maydell@linaro.org>
+	<1505137930-13255-7-git-send-email-peter.maydell@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Mon, 11 Sep 2017 10:43:56 -0700
+Message-ID: <CAKmqyKNCF+E7S2-gbVDo_T5V33Szj1VgNWFW6M4O_X2biqbG9A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 6/7] target/arm: Add and use defines for
+ EXCRET constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,42 +23,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Patch Tracking <patches@linaro.org>
 
-On Mon, Sep 11, 2017 at 10:37 AM, Daniel P. Berrange 
-<berrange@redhat.com> wrote:
-> At the time qio_channel_websock_decode_header is run, 'encinput' is 
-> only guaranteed to contain enough data to decode the header.
+On Mon, Sep 11, 2017 at 6:52 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> The exception-return magic values get some new bits in v8M, which
+> makes some bit definitions for them worthwhile.
+>
+> We don't use the bit definitions for the switch on the low bits
+> which checks the return type for v7M, because this is defined
+> in the v7M ARM ARM as a set of valid values rather than via
+> per-bit checks.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Because the PING opcode is a control frame, this bit of code earlier in 
-the function will ensure the entire frame has been read before the PING 
-processing occurs:
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 
->       if (ioc->encinput.offset < ioc->payload_remain) {
->             /* Wait for the entire payload before processing control 
-> frames
->              * because the payload will most likely be echoed back. */
->             if (ioc->opcode & 
-> QIO_CHANNEL_WEBSOCK_CONTROL_OPCODE_MASK) {
->                 return QIO_CHANNEL_ERR_BLOCK;
->             }
->             payload_len = ioc->encinput.offset - 
-> (ioc->encinput.offset % 4);
+Thanks,
+Alistair
 
---
-Brandon Carpenter | Software Engineer
-Cypherpath, Inc.
-400 Columbia Point Drive Ste 101 | Richland, Washington USA
-Office: (650) 713-3060
-
-
--- 
-
-
-CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is 
-for the sole use of the intended recipient(s) and may contain proprietary, 
-confidential or privileged information or otherwise be protected by law. 
-Any unauthorized review, use, disclosure or distribution is prohibited. If 
-you are not the intended recipient, please notify the sender and destroy 
-all copies and the original message.
+> ---
+>  target/arm/internals.h | 10 ++++++++++
+>  target/arm/helper.c    | 14 +++++++++-----
+>  2 files changed, 19 insertions(+), 5 deletions(-)
+>
+> diff --git a/target/arm/internals.h b/target/arm/internals.h
+> index a315354..18be370 100644
+> --- a/target/arm/internals.h
+> +++ b/target/arm/internals.h
+> @@ -61,6 +61,16 @@ FIELD(V7M_CONTROL, NPRIV, 0, 1)
+>  FIELD(V7M_CONTROL, SPSEL, 1, 1)
+>  FIELD(V7M_CONTROL, FPCA, 2, 1)
+>
+> +/* Bit definitions for v7M exception return payload */
+> +FIELD(V7M_EXCRET, ES, 0, 1)
+> +FIELD(V7M_EXCRET, RES0, 1, 1)
+> +FIELD(V7M_EXCRET, SPSEL, 2, 1)
+> +FIELD(V7M_EXCRET, MODE, 3, 1)
+> +FIELD(V7M_EXCRET, FTYPE, 4, 1)
+> +FIELD(V7M_EXCRET, DCRS, 5, 1)
+> +FIELD(V7M_EXCRET, S, 6, 1)
+> +FIELD(V7M_EXCRET, RES1, 7, 25) /* including the must-be-1 prefix */
+> +
+>  /*
+>   * For AArch64, map a given EL to an index in the banked_spsr array.
+>   * Note that this mapping and the AArch32 mapping defined in bank_number()
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index fdd5cc6..a502e4e 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -6242,7 +6242,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+>                    " previous exception %d\n",
+>                    type, env->v7m.exception);
+>
+> -    if (extract32(type, 5, 23) != extract32(-1, 5, 23)) {
+> +    if ((type & R_V7M_EXCRET_RES1_MASK) != R_V7M_EXCRET_RES1_MASK) {
+>          qemu_log_mask(LOG_GUEST_ERROR, "M profile: zero high bits in exception "
+>                        "exit PC value 0x%" PRIx32 " are UNPREDICTABLE\n", type);
+>      }
+> @@ -6255,7 +6255,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+>           * which security state's faultmask to clear. (v8M ARM ARM R_KBNF.)
+>           */
+>          if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+> -            int es = type & 1;
+> +            int es = type & R_V7M_EXCRET_ES_MASK;
+>              if (armv7m_nvic_raw_execution_priority(env->nvic) >= 0) {
+>                  env->v7m.faultmask[es] = 0;
+>              }
+> @@ -6491,12 +6491,16 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+>          return; /* Never happens.  Keep compiler happy.  */
+>      }
+>
+> -    lr = 0xfffffff1;
+> +    lr = R_V7M_EXCRET_RES1_MASK |
+> +        R_V7M_EXCRET_S_MASK |
+> +        R_V7M_EXCRET_DCRS_MASK |
+> +        R_V7M_EXCRET_FTYPE_MASK |
+> +        R_V7M_EXCRET_ES_MASK;
+>      if (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK) {
+> -        lr |= 4;
+> +        lr |= R_V7M_EXCRET_SPSEL_MASK;
+>      }
+>      if (!arm_v7m_is_handler_mode(env)) {
+> -        lr |= 8;
+> +        lr |= R_V7M_EXCRET_MODE_MASK;
+>      }
+>
+>      v7m_push_stack(cpu);
+> --
+> 2.7.4
+>
+>
