@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54384)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drRw2-0001Hx-HR
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:51:47 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1drRwg-0001yV-4i
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:52:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drRvw-0003Nl-Nh
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:51:46 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46702)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1drRvw-0003NQ-Gu
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:51:40 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1drRvt-0004fS-5j
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:51:37 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C02972E84A4
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 16:51:34 +0000 (UTC)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1drRwd-0003hR-32
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:52:26 -0400
+References: <1505054255-2990-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1505054255-2990-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170911105729.GC2784@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <1d0c4384-fc32-05bb-7e42-44480f51610f@ilande.co.uk>
+Date: Mon, 11 Sep 2017 17:52:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 11 Sep 2017 16:36:56 -0000
-From: Daniel Berrange <1715700@bugs.launchpad.net>
-Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150514781698.6029.17008787868080003145.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
- 2.10 (works on 2.9)
+In-Reply-To: <20170911105729.GC2784@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 3/4] ppc: add CPU access_type into the
+ migration stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,51 +26,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: aik@ozlabs.ru, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-The newer GCC compilers are more fussy - just add '--disable-werror'
-when running 'configure' to make it ignore the warning
+On 11/09/17 11:57, David Gibson wrote:
 
--- =
+> On Sun, Sep 10, 2017 at 03:37:34PM +0100, Mark Cave-Ayland wrote:
+>> This is referenced in cpu_ppc_handle_mmu_fault() and so should be included
+>> in the migration stream.
+> 
+> That is not, on its own, sufficient reason.
+> 
+>> Note: the vmstate_ppc version number has already been bumped by the previous
+>> patch in this series.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> 
+> As with 2/4 it breaks backwards migration.
+> 
+> But more, I really disklike the idea of migrating this.  It's internal
+> state for one, and it's also essentially transitory state.  Can we
+> avoid putting it in the otherwise persistent structure at all? Can we
+> derive the state from elsewhere?  Can we prevent migration from
+> occurring in the small windows where this data is live?
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715700
+>From what I can see references to access_type are scattered throughout
+mmu_helper.c although I'm not necessarily familiar enough with PPC to
+know whether this is something that can be derived elsewhere instead.
+And once again it was something that was removed by a90db15.
 
-Title:
-  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
+When pausing a VM, does execution stop at the end of the current TB
+rather than immediately? If so, perhaps someone could confirm that
+guarantee is good enough for access_type?
 
-Status in QEMU:
-  New
 
-Bug description:
-  Qemu version: 2.10 stable.
-  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
-st.
-  Command line:
-  qemu-system-x86_64 \
-      -nodefaults \
-      -nodefconfig \
-      -machine type=3Dq35,accel=3Dkvm \
-      -enable-kvm \
-      -cpu host \
-      -m 2048 \
-      -vga virtio \
-      -boot menu=3Don \
-      -smbios file=3D/path/dmidecode_BIOS.bin \
-      -acpitable file=3D/path/acpi_slic.bin \
-      -bios /path/OVMF_CODE.fd \
-      -net none \
-      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
-      -device pcie-root-port \
-      -device ich9-usb-ehci1 \
-      -device ich9-usb-uhci1 \
-      -device ich9-usb-uhci2 \
-      -device ich9-usb-uhci3
+ATB,
 
-  Windows hangs at boot with waving flag screen (flag doesn't freeze,
-  keeps waving indefinitely). Same command line boots fine with Qemu
-  2.9. I tried changing machine type to pc-q35-2.9 - same result.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
+Mark.
