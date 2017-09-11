@@ -1,25 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40539)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drST6-0003LC-PE
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:25:57 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41945)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
+	id 1drSWA-00075t-QJ
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:29:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drST3-0003aQ-M5
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:25:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:64522)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1drST3-0003Zl-DJ
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:25:53 -0400
-References: <1505202976-1784-1-git-send-email-changpeng.liu@intel.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <8de5a2a0-a4aa-4e81-4ede-b19d7f72bda3@redhat.com>
-Date: Mon, 11 Sep 2017 12:25:45 -0500
-MIME-Version: 1.0
-In-Reply-To: <1505202976-1784-1-git-send-email-changpeng.liu@intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="XELfSPk4sMnFcsmGFBxu4uJrI59s84CrJ"
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] *** Introduce a new vhost-user-blk
- host device to Qemu ***
+	(envelope-from <n54@gmx.com>) id 1drSW9-000625-NV
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:29:06 -0400
+From: Kamil Rytarowski <n54@gmx.com>
+Date: Mon, 11 Sep 2017 19:16:39 +0200
+Message-Id: <20170911171639.22005-1-n54@gmx.com>
+In-Reply-To: <20170903164952.26760-1-n54@gmx.com>
+References: <20170903164952.26760-1-n54@gmx.com>
+Subject: [Qemu-devel] [PATCH v2] Discover openpty(3) dynamically in configure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,61 +19,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Changpeng Liu <changpeng.liu@intel.com>, qemu-devel@nongnu.org
-Cc: james.r.harris@intel.com, mst@redhat.com, stefanha@gmail.com, pbonzini@redhat.com, felipe@nutanix.com, marcandre.lureau@redhat.com
+To: qemu-trivial@nongnu.org
+Cc: qemu-devel@nongnu.org, jperkin@joyent.com, peter.maydell@linaro.org, Kamil Rytarowski <n54@gmx.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XELfSPk4sMnFcsmGFBxu4uJrI59s84CrJ
-From: Eric Blake <eblake@redhat.com>
-To: Changpeng Liu <changpeng.liu@intel.com>, qemu-devel@nongnu.org
-Cc: james.r.harris@intel.com, mst@redhat.com, stefanha@gmail.com,
- pbonzini@redhat.com, felipe@nutanix.com, marcandre.lureau@redhat.com
-Message-ID: <8de5a2a0-a4aa-4e81-4ede-b19d7f72bda3@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/4] *** Introduce a new vhost-user-blk
- host device to Qemu ***
-References: <1505202976-1784-1-git-send-email-changpeng.liu@intel.com>
-In-Reply-To: <1505202976-1784-1-git-send-email-changpeng.liu@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+openpty(3) might:
+ - exists in libc (OSX)
+ - exists in libutil (GNU, BSD)
+ - does not exist (SmartOS)
 
-On 09/12/2017 02:56 AM, Changpeng Liu wrote:
-   ^^^^^^^^^^^^^^^^^^^
+Add a function to discover this function in the ./configure script.
+Add new config types: CONFIG_OPENPTY_LIBC and CONFIG_OPENPTY_LIBUTIL,
+respectively defined when openpts(3) links with -lc or -lutil.
 
-Wow, your system clock is off.  According to the mail headers:
+Replace the condition adding -lutil in tests (for openpty(3)) from
+CONFIG_POSIX to CONFIG_OPENPTY_LIBUTIL.
 
-> Received: from orsmga004.jf.intel.com ([10.7.209.38])
-> 	by fmsmga105.fm.intel.com with ESMTP; 11 Sep 2017 00:36:13 -0700
-=2E..
-> Date: Tue, 12 Sep 2017 15:56:12 +0800
+Replace the fallback openpty(3) impelementation comment from Solaris
+to SmartOS. Solaris is EOL'ed and it's confirmed that it does not work
+on Oracle Solaris.
+---
+ configure              | 25 +++++++++++++++++++++++++
+ tests/Makefile.include |  2 +-
+ util/qemu-openpty.c    |  4 ++--
+ 3 files changed, 28 insertions(+), 3 deletions(-)
 
-the intel.com machine received it at 7:36 UTC Monday, even though your
-computer sent it at 9:56 UTC Tuesday, 26 hours in the future.  Sending
-mail from the future messes with clients that like to display mail
-sorted by date of last activity in the thread.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---XELfSPk4sMnFcsmGFBxu4uJrI59s84CrJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm2xxkACgkQp6FrSiUn
-Q2p7iAf+ItVut5JuRF7VGrOHRuZkFJ0cXIHlayVwrR2DUqZeZloOj7V3yyR2depF
-Lwut/cWrC/H/z5PNbm2H9naTYUVuc/nzBajoGep2OdP2/GU/HEB1UwDxuAchsYl5
-DIH1Cc5D2ZDnye4DI0u8xRnRKYoHWIMQgMh2m368Lrv2WWs7OX4sSqXGAC8rmshk
-eYItVRmNfPho2+AUGe3X0Wz3n5qZbCOvoV7pa0zXgIz0tt4Be3yaBm+I5M7o65ym
-sw5Edo9i1i3Grwx0p/mw8Y8sM+jTokM3jX0lfAZ0kgmhw9JUkDJi9HvW0FavJW9M
-GFg+Ab3hdjVpmJo1dYnDF6DPsGKZUQ==
-=Mbsv
------END PGP SIGNATURE-----
-
---XELfSPk4sMnFcsmGFBxu4uJrI59s84CrJ--
+diff --git a/configure b/configure
+index fd7e3a5e81..a614adcd29 100755
+--- a/configure
++++ b/configure
+@@ -3819,6 +3819,25 @@ EOF
+   fi
+ fi
+ 
++##########################################
++# openpty probe
++openpty_libc=no
++openpty_libutil=no
++cat > $TMPC << EOF
++extern int openpty(int *amaster, int *aslave, char *name, void *termp, void *winp);
++
++int main(void)
++{
++    int master_fd, slave_fd;
++    return openpty(&master_fd, &slave_fd, 0, 0, 0) == 0;
++}
++EOF
++if compile_prog "" "" ; then
++  openpty_libc=yes
++elif compile_prog "" "-lutil" ; then
++  openpty_libutil=yes
++fi
++
+ ##########################################
+ # signalfd probe
+ signalfd="no"
+@@ -5788,6 +5807,12 @@ fi
+ if test "$fdt" = "yes" ; then
+   echo "CONFIG_FDT=y" >> $config_host_mak
+ fi
++if test "$openpty_libc" = "yes" ; then
++  echo "CONFIG_OPENPTY_LIBC=y" >> $config_host_mak
++fi
++if test "$openpty_libutil" = "yes" ; then
++  echo "CONFIG_OPENPTY_LIBUTIL=y" >> $config_host_mak
++fi
+ if test "$signalfd" = "yes" ; then
+   echo "CONFIG_SIGNALFD=y" >> $config_host_mak
+ fi
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index fae5715e9c..e7e0bc2724 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -814,7 +814,7 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
+ 	rm $(INITRD_WORK_DIR)/init
+ 	rmdir $(INITRD_WORK_DIR)
+ 
+-ifeq ($(CONFIG_POSIX),y)
++ifeq ($(CONFIG_OPENPTY_LIBUTIL),y)
+ LIBS += -lutil
+ endif
+ 
+diff --git a/util/qemu-openpty.c b/util/qemu-openpty.c
+index 2e8b43bdf5..62c87e5563 100644
+--- a/util/qemu-openpty.c
++++ b/util/qemu-openpty.c
+@@ -51,8 +51,8 @@
+ # include <termios.h>
+ #endif
+ 
+-#ifdef __sun__
+-/* Once Solaris has openpty(), this is going to be removed. */
++/* The fallback implementation is needed at least on SmartOS. */
++#if !defined(CONFIG_OPENPTY_LIBC) && !defined(CONFIG_OPENPTY_LIBUTIL)
+ static int openpty(int *amaster, int *aslave, char *name,
+                    struct termios *termp, struct winsize *winp)
+ {
+-- 
+2.14.1
