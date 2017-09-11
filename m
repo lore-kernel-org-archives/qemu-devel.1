@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39700)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1drNXk-0008Bz-FA
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 08:10:29 -0400
+	(envelope-from <berrange@redhat.com>) id 1drNbL-0001gR-8D
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 08:14:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1drNXf-0001xr-Jf
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 08:10:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32846)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1drNXf-0001xL-AC
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 08:10:19 -0400
-Date: Mon, 11 Sep 2017 14:10:16 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170911141016.2352b022@nial.brq.redhat.com>
-In-Reply-To: <CAFEAcA8H==oJGm=rkjHUG-DPTo+PhqLcb=RG-Gb6oG+dUYVi3Q@mail.gmail.com>
-References: <CAFEAcA_sk792HSvX7=6hnd2PEZ+FoVz=JEcBKu5CbLW5drzMhQ@mail.gmail.com>
-	<20170904213851.107ed8c8@Igors-MacBook-Pro.local>
-	<CAFEAcA8H==oJGm=rkjHUG-DPTo+PhqLcb=RG-Gb6oG+dUYVi3Q@mail.gmail.com>
+	(envelope-from <berrange@redhat.com>) id 1drNbG-0003n6-B1
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 08:14:07 -0400
+Date: Mon, 11 Sep 2017 13:13:56 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170911121356.GN21444@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170911110037.6567-1-lvivier@redhat.com>
+	<20170911110615.GK21444@redhat.com>
+	<20170911134158.1f046176.cohuck@redhat.com>
+	<20170911114347.GL21444@redhat.com> <20170911120441.GB2857@work-vm>
+	<616d2319-1198-5a20-ebf4-ac2c532352db@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] qdev_get_machine() can return something non-NULL
- but not TYPE_MACHINE
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <616d2319-1198-5a20-ebf4-ac2c532352db@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] hmp: fix "dump-quest-memory" segfault (ppc)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,61 +27,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On Tue, 5 Sep 2017 10:08:01 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On Mon, Sep 11, 2017 at 02:10:14PM +0200, Laurent Vivier wrote:
+> On 11/09/2017 14:04, Dr. David Alan Gilbert wrote:
+> > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> >> On Mon, Sep 11, 2017 at 01:41:58PM +0200, Cornelia Huck wrote:
+> >>> On Mon, 11 Sep 2017 12:06:15 +0100
+> >>> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+> >>>
+> >>>> On Mon, Sep 11, 2017 at 01:00:37PM +0200, Laurent Vivier wrote:
+> >>>>> Commit fd5d23babf (hmp: fix "dump-quest-memory" segfault)
+> >>>>> fixes the problem for i386, do the same for ppc.  
+> >>>>
+> >>>> What about all the other targets QEMU supports ?  Have you checked if they
+> >>>> are similarly affected, as we don't want to wait another 6 months to get a
+> >>>> bug report that s390 or aarch64 crash in exactly the same way too.
+> >>>
+> >>> This patch actually prompted me to check s390, and the mentioned
+> >>> command line works fine.
+> >>>
+> >>> However, if we start a qemu with no guest memory defined and then call
+> >>> dump-guest-memory without filtering, we get a core dump instead of a
+> >>> guest dump (s390x or x86_64, machine none).
+> >>>
+> >>> I can take a stab at fixing that, unless someone beats me to it.
+> >>
+> >> I wonder if someone wants to write a qtest job to run dump-guest-memory
+> >> across all machine types, on all targets. Seems we have enough crashiness
+> >> in this code to make it worthwhile to test
+> > 
+> > We do have - that's how we found this case;  it's part of test-hmp.
+> 
+> The test-hmp runs by default with 0 MB of memory, the problem can only
+> be found with some memory added to the machine.
+> 
+> Perhaps we can simply update the test to add memory?
 
-> On 4 September 2017 at 20:38, Igor Mammedov <imammedo@redhat.com> wrote:
-> > On Mon, 4 Sep 2017 17:36:59 +0100
-> > Peter Maydell <peter.maydell@linaro.org> wrote:
-> >  
-> >> I just got bitten by qdev_get_machine()'s behaviour on the user-only
-> >> emulators, where it can return something that isn't NULL and isn't
-> >> an instance of TYPE_MACHINE either.  
-> > user-only shouldn't get to qdev_get_machine() at all,
-> > issue probably in container_get().  
-> 
-> I need it in cpu_common_realizefn(), for
-> http://patchwork.ozlabs.org/patch/797940/
-Link might be broken (unable to connect to server)
+Probably best to run it twice, 0MB and with say 2MB, as they're both
+fairly magic values.
 
-Anyways I'd avoid using machine from cpu_*_realizefn(),
-instead of I'd add property to CPU that has needed data
-and set it from board code. Should work fine for *-user targets
-and maintain clear separation of device impl. and board details. 
-
-> 
-> > I'd try to fix wrong user if possible and maybe add ifdef build failure
-> > to qdev_get_machine() so it would not build in user mode.  
-> 
-> Can't ifdef, that source file is built once for all targets.
-> 
-> My fix (which I intend to send to the list today) is to make
-> it do the object_dynamic_cast() check -- if that doesn't give
-> a TYPE_MACHINE then we're in user mode and don't need to set
-> ignore_memory_transaction_failures on the cpu object anyway.
-> 
-> >> It looks like maybe this can happen in some cases in softmmu too,
-> >> judging by the way that qdev_get_hotplug_handler() does an
-> >> object_dynamic_cast() check that it really got back a TYPE_MACHINE.  
-> > As I recall only bus or machine provide hotplug_handler currently,
-> > but it's possible to extend to other objects if we find use-case.
-> >
-> > We could do static cast to machine instead dynamic there but
-> > in hotplug case it will abort QEMU if error happens,
-> > hence dynamic check to avoid be more resilient during hotplug.
-> > (well, if qdev_get_machine() returns not machine during startup
-> > we would be screwed anyways, but that should break much earlier)  
-> 
-> If this can't ever happen then we should be aborting; that's
-> the idea behind the cast macros doing assertions. I'm not
-> sure hotplug needs to be special here if it doesn't have
-> a genuine reason to think it might get back something of
-> the wrong type.
-Yep, we should abort.
-
-> 
-> thanks
-> -- PMM
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
