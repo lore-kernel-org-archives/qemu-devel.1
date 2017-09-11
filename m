@@ -1,24 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33662)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36722)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1drGrO-0001nT-HZ
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 01:02:15 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1drGzO-0004MW-JX
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 01:10:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1drGrL-0007BP-D7
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 01:02:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35414)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1drGrL-0007AT-4K
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 01:02:11 -0400
-Date: Mon, 11 Sep 2017 13:02:00 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170911050200.GB32341@lemon.lan>
-References: <1504888905-22396-1-git-send-email-chugh.ishani@research.iiit.ac.in>
-	<1504888905-22396-3-git-send-email-chugh.ishani@research.iiit.ac.in>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1drGzL-0004Rg-TU
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 01:10:30 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57340
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1drGzL-0004RC-OH
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 01:10:27 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8B58n6C106035
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 01:10:26 -0400
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cw40pqs10-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 01:10:26 -0400
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Mon, 11 Sep 2017 15:10:23 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20170909070212.GT2735@umbus.fritz.box>
+References: <20170906082748.28520-1-nikunj@linux.vnet.ibm.com>
+	<20170909070212.GT2735@umbus.fritz.box>
+Date: Mon, 11 Sep 2017 10:40:10 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1504888905-22396-3-git-send-email-chugh.ishani@research.iiit.ac.in>
-Subject: Re: [Qemu-devel] [PATCH v4 2/3] backup: Adds Backup Tool
+Content-Type: text/plain
+Message-Id: <87k2153jnx.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,96 +42,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
-Cc: qemu-devel@nongnu.org, jsnow@redhat.com, stefanha@redhat.com
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
-On Fri, 09/08 22:11, Ishani Chugh wrote:
-> +def build_parser():
-> +    backup_tool = BackupTool()
-> +    parser = ArgumentParser()
-> +    subparsers = parser.add_subparsers(title='Subcommands',
-> +                                       description='Valid Subcommands',
-> +                                       help='Subcommand help')
-> +    guest_parser = subparsers.add_parser('guest', help='Manage guest(s)')
-> +    guest_subparsers = guest_parser.add_subparsers(title='Guest Subparser')
-> +#   Guest list
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-Odd indentation of comments. Please align the # at 4th colume line other code
-lines.  The same to below.
+> On Wed, Sep 06, 2017 at 01:57:48PM +0530, Nikunj A Dadhania wrote:
+>> When the user does not provide the cpu topology, e.g. "-smp 4", machine fails to
+>> initialize 4 cpus. Compute the chip per cores depending on the number of chips
+>> and smt threads.
+>> 
+>> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+>
+> I don't understand why simply treating smp_cores as cores per chip is wrong.
 
-> +    guest_list_parser = guest_subparsers.add_parser('list',
-> +                                                    help='Lists all guests')
-> +    guest_list_parser.set_defaults(func=backup_tool.list)
-> +
-> +#   Guest add
-> +    guest_add_parser = guest_subparsers.add_parser('add', help='Adds a guest')
-> +    guest_add_required = guest_add_parser.add_argument_group('Required \
-> +                                                                Arguments')
-> +    guest_add_required.add_argument('--guest', action='store', type=str,
-> +                                    help='Name of the guest', required=True)
-> +    guest_add_required.add_argument('--qmp', action='store', type=str,
-> +                                    help='Path of socket', required=True)
-> +    guest_add_parser.set_defaults(func=backup_tool.guest_add_wrapper)
-> +
-> +#   Guest Remove
-> +    guest_remove_parser = guest_subparsers.add_parser('remove',
-> +                                                      help='Removes a guest')
-> +    guest_remove_required = guest_remove_parser.add_argument_group('Required \
-> +                                                                    Arguments')
-> +    guest_remove_required.add_argument('--guest', action='store', type=str,
-> +                                       help='Name of the guest', required=True)
-> +    guest_remove_parser.set_defaults(func=backup_tool.guest_remove_wrapper)
-> +
-> +    drive_parser = subparsers.add_parser('drive',
-> +                                         help='Adds drive(s) for backup')
-> +    drive_subparsers = drive_parser.add_subparsers(title='Add subparser',
-> +                                                   description='Drive \
-> +                                                                subparser')
-> +#   Drive Add
-> +    drive_add_parser = drive_subparsers.add_parser('add',
-> +                                                   help='Adds new \
-> +                                                         drive for backup')
-> +    drive_add_required = drive_add_parser.add_argument_group('Required \
-> +                                                                Arguments')
-> +    drive_add_required.add_argument('--guest', action='store', type=str,
-> +                                    help='Name of the guest', required=True)
-> +    drive_add_required.add_argument('--id', action='store',
-> +                                    type=str, help='Drive ID', required=True)
-> +    drive_add_parser.add_argument('--target', nargs='?',
-> +                                  default=None, help='Destination path')
-> +    drive_add_parser.set_defaults(func=backup_tool.drive_add_wrapper)
-> +
-> +    backup_parser = subparsers.add_parser('backup', help='Creates backup')
-> +
-> +#   Backup
-> +    backup_parser_required = backup_parser.add_argument_group('Required \
-> +                                                                Arguments')
-> +    backup_parser_required.add_argument('--guest', action='store', type=str,
-> +                                        help='Name of the guest',
-> +                                        required=True)
-> +    backup_parser.set_defaults(func=backup_tool.fullbackup_wrapper)
-> +
-> +#   Restore
-> +    restore_parser = subparsers.add_parser('restore', help='Restores drives')
-> +    restore_parser_required = restore_parser.add_argument_group('Required \
-> +                                                                Arguments')
-> +    restore_parser_required.add_argument('--guest', action='store',
-> +                                         type=str, help='Name of the guest',
-> +                                         required=True)
-> +    restore_parser.set_defaults(func=backup_tool.restore_wrapper)
-> +
-> +    return parser
-> +
-> +
-> +def main():
-> +    parser = build_parser()
-> +    args = parser.parse_args()
-> +    args.func(args)
-> +
-> +if __name__ == '__main__':
-> +    main()
-> --
-> 2.7.4
-> 
+We do not have SMT support and when "-smp 4" is passed, smp_cores is
+always set to 1. So only once core with one thread finally show up in
+the guest. Moreover, I see spapr too doing similar thing in
+spapr_init_cpus() with boot_cores_nr.
 
-Fam
+Regards
+Nikunj
