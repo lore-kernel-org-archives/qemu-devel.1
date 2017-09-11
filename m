@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42925)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drMYY-0005Oc-RG
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:11 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drMYe-0005U0-6h
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drMYV-0006JD-1o
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35284)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drMYd-0006QR-DQ
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33038)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1drMYU-0006Hy-T6
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:07 -0400
+	id 1drMYd-0006PH-7u
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:15 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 11 Sep 2017 13:05:47 +0200
-Message-Id: <20170911110623.24981-15-marcandre.lureau@redhat.com>
+Date: Mon, 11 Sep 2017 13:05:50 +0200
+Message-Id: <20170911110623.24981-18-marcandre.lureau@redhat.com>
 In-Reply-To: <20170911110623.24981-1-marcandre.lureau@redhat.com>
 References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 14/50] qapi-event: add #if conditions to
- events
+Subject: [Qemu-devel] [PATCH v3 17/50] qapi: do not define enumeration value
+ explicitely
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +31,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-Wrap generated code with #if/#endif using the ifcond_decorator.
+The C standard has the initial value at 0 and the subsequent values
+incremented by 1. No need to set this explicitely.
+
+This will prevent from artificial "gaps" when compiling out some enum
+values and having unnecessarily large MAX values & enums arrays.
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- scripts/qapi-event.py | 2 ++
- 1 file changed, 2 insertions(+)
+ scripts/qapi.py | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/qapi-event.py b/scripts/qapi-event.py
-index dda496e824..bef301dfe9 100644
---- a/scripts/qapi-event.py
-+++ b/scripts/qapi-event.py
-@@ -152,6 +152,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
-         self.decl =3D None
-         self.defn =3D None
-         self._event_names =3D None
-+        self.if_members =3D ['decl', 'defn']
+diff --git a/scripts/qapi.py b/scripts/qapi.py
+index 94b735d8d6..074ee221a1 100644
+--- a/scripts/qapi.py
++++ b/scripts/qapi.py
+@@ -1985,14 +1985,11 @@ typedef enum %(c_name)s {
+ ''',
+                 c_name=3Dc_name(name))
 =20
-     def visit_begin(self, schema):
-         self.decl =3D ''
-@@ -163,6 +164,7 @@ class QAPISchemaGenEventVisitor(QAPISchemaVisitor):
-         self.defn +=3D gen_enum_lookup(event_enum_name, self._event_name=
-s)
-         self._event_names =3D None
+-    i =3D 0
+     for value in enum_values:
+         ret +=3D mcgen('''
+-    %(c_enum)s =3D %(i)d,
++    %(c_enum)s,
+ ''',
+-                     c_enum=3Dc_enum_const(name, value, prefix),
+-                     i=3Di)
+-        i +=3D 1
++                     c_enum=3Dc_enum_const(name, value, prefix))
 =20
-+    @ifcond_decorator
-     def visit_event(self, name, info, ifcond, arg_type, boxed):
-         self.decl +=3D gen_event_send_decl(name, arg_type, boxed)
-         self.defn +=3D gen_event_send(name, arg_type, boxed)
+     ret +=3D mcgen('''
+ } %(c_name)s;
 --=20
 2.14.1.146.gd35faa819
