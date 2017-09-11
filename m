@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46626)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1drTlE-0007Bl-8Q
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:48:45 -0400
+	(envelope-from <anatol.pomozov@gmail.com>) id 1drTlx-0007cy-NZ
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:49:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <anatol.pomozov@gmail.com>) id 1drTlD-0002f2-7P
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:48:44 -0400
-Received: from mail-vk0-x243.google.com ([2607:f8b0:400c:c05::243]:33572)
+	(envelope-from <anatol.pomozov@gmail.com>) id 1drTlw-0002v3-Jt
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:49:29 -0400
+Received: from mail-ua0-x244.google.com ([2607:f8b0:400c:c08::244]:38668)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <anatol.pomozov@gmail.com>)
-	id 1drTlC-0002di-Vl
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:48:43 -0400
-Received: by mail-vk0-x243.google.com with SMTP id j189so2290558vka.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 11:48:41 -0700 (PDT)
+	id 1drTlw-0002uf-Ey
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:49:28 -0400
+Received: by mail-ua0-x244.google.com with SMTP id l24so2672226uaa.5
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 11:49:28 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <CAOMFOmWcYxQU7Vf4h+6Q3pxmin5sWH+gNHUFVWGPaMye14Y1ng@mail.gmail.com>
 References: <CAOMFOmXXRN02BT+8M+iKnrGmaTSR8uWoTYCu5A5gv+KTe9xAqg@mail.gmail.com>
@@ -24,8 +24,8 @@ References: <CAOMFOmXXRN02BT+8M+iKnrGmaTSR8uWoTYCu5A5gv+KTe9xAqg@mail.gmail.com>
 	<20170808150454.GM4850@dhcp-200-186.str.redhat.com>
 	<CAOMFOmWcYxQU7Vf4h+6Q3pxmin5sWH+gNHUFVWGPaMye14Y1ng@mail.gmail.com>
 From: Anatol Pomozov <anatol.pomozov@gmail.com>
-Date: Mon, 11 Sep 2017 11:48:40 -0700
-Message-ID: <CAOMFOmWWi_dEnneYQo2+d2V=uM0ne00OnYJEzFpyDRes_bvRfQ@mail.gmail.com>
+Date: Mon, 11 Sep 2017 11:49:27 -0700
+Message-ID: <CAOMFOmXzngg=mPbjy=v_QYVne0Z5255GnwjugLy0Mk1Y9FSPmQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Subject: Re: [Qemu-devel] How to make ELF headers/symbol sections available
  for multiboot?
@@ -41,15 +41,6 @@ To: Kevin Wolf <kwolf@redhat.com>
 Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>
 
 Hello
-
-I have these changes ready now
-http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg03265.html
-It added ELF parser functionality as discussed above. Are there any
-open questions? What is the best way to proceed forward with these
-patches?
-
-I also have interest in adding Multiboot2 support to qemu. But before
-going with it I would like to finish working on my current patchset.
 
 On Thu, Aug 17, 2017 at 1:54 PM, Anatol Pomozov
 <anatol.pomozov@gmail.com> wrote:
@@ -97,22 +88,13 @@ On Thu, Aug 17, 2017 at 1:54 PM, Anatol Pomozov
 >> given. In this case, the kernel image is to be treated as a flat binary
 >> and section headers can't be expected. I think your code breaks non-ELF
 >> kernels.
->
-> Ok, will revert this part back.
->
->>
->> As for loading the section headers, duplicating ELF parser code may be
->> functionally correct, but probably not the best way to implement things.
->> As I wrote in an earlier email, load_elf() already parses all the
->> information that you need. You really just need to store it somewhere,
->> which would probably just mean adding a new parameter to load_elf() and
->> the parser could then store a copy of the data there if it's non-NULL.
->
-> Loading section headers is actually a small part of my change. It also:
->   - calculates memory needed to load all sections into memory
->   - allocates memory
->   - loads sections
->
-> This "load all sections into memory" functionality is very multiboot
-> specific. But if you think if load_elf() is better place for it then I
-> can look at moving it to load_elf().
+
+
+I have these changes ready now
+http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg03265.html
+It added ELF parser functionality as discussed above. Are there any
+open questions? What is the best way to proceed forward with these
+patches?
+
+I also have interest in adding Multiboot2 support to qemu. But before
+going with it I would like to finish working on my current patchset.
