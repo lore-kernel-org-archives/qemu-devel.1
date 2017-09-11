@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39353)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39378)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSPj-0000Aw-HL
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:29 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSPk-0000C4-OC
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSPg-0001qp-QL
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:27 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSPf-0001qN-UZ
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:28 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 11 Sep 2017 12:20:22 -0500
-Message-Id: <20170911172022.4738-39-eblake@redhat.com>
+Date: Mon, 11 Sep 2017 12:20:21 -0500
+Message-Id: <20170911172022.4738-38-eblake@redhat.com>
 In-Reply-To: <20170911172022.4738-1-eblake@redhat.com>
 References: <20170911172022.4738-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 38/38] libqtest: Merge qtest_hmp() with hmp()
+Subject: [Qemu-devel] [PATCH v7 37/38] libqtest: Separate
+ qmp_discard_response() from command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,276 +21,364 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, John Snow <jsnow@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, "open list:IDE" <qemu-block@nongnu.org>
+Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, John Snow <jsnow@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "open list:IDE" <qemu-block@nongnu.org>
 
-Maintaining two layers of libqtest APIs, one that takes an explicit
-QTestState object, and the other that uses the implicit global_qtest,
-is annoying.  In the interest of getting rid of global implicit
-state and having less code to maintain, merge:
- qtest_hmp()
-with its short counterpart, and delete qtest_hmpv() as unused (not
-to mention that a 'v' suffix is unusual, when compared to the
-printf family or even our new qtest_vstartf() where the va_list
-counterpart uses 'v' as a prefix).  All callers that previously
-used the short form now make it explicit that they are relying on
-global_qtest, and later patches can then clean things up to remove
-the global variable.
+Upcoming patches will be adding new convenience methods for
+constructing QMP commands.  But making every variation of sending
+support every variation of response handling becomes unwieldy;
+it's easier to specify that discarding a JSON response is
+unassociated with sending the command, where qmp_async() already
+fits the bill for sending a command without tying up a reference
+to the response.
+
+Doing this renders qtest_qmpv_discard_response() unused.
+
+Bonus: gets rid of a non-literal format string in ide-test, which
+is a step towards compile-time format string checking without
+triggering -Wformat-nonliteral.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.h               | 27 ++-------------------------
- tests/libqtest.c               | 26 ++++----------------------
- tests/device-introspect-test.c |  6 +++---
- tests/drive_del-test.c         |  4 ++--
- tests/ide-test.c               |  4 ++--
- tests/numa-test.c              |  6 +++---
- tests/test-hmp.c               |  6 +++---
- 7 files changed, 19 insertions(+), 60 deletions(-)
+ tests/libqtest.h               | 20 ++++----------------
+ tests/libqtest.c               | 27 ++++++++-------------------
+ tests/ahci-test.c              | 26 +++++++++++++-------------
+ tests/boot-order-test.c        |  2 +-
+ tests/drive_del-test.c         |  5 +++--
+ tests/fdc-test.c               | 11 ++++++-----
+ tests/ide-test.c               |  5 ++---
+ tests/postcopy-test.c          |  3 ++-
+ tests/test-filter-mirror.c     |  3 ++-
+ tests/test-filter-redirector.c |  6 ++++--
+ tests/virtio-blk-test.c        | 21 ++++++++++++---------
+ 11 files changed, 57 insertions(+), 72 deletions(-)
 
 diff --git a/tests/libqtest.h b/tests/libqtest.h
-index b811394d4d..34986955d3 100644
+index 8f2946ff5e..b811394d4d 100644
 --- a/tests/libqtest.h
 +++ b/tests/libqtest.h
-@@ -140,7 +140,7 @@ void qtest_qmp_eventwait(QTestState *s, const char *event);
- QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
-
+@@ -69,11 +69,10 @@ void qtest_quit(QTestState *s);
  /**
-- * qtest_hmp:
-+ * hmp:
+  * qtest_qmp_discard_response:
   * @s: #QTestState instance to operate on.
-  * @fmt...: HMP command to send to QEMU, formats arguments like sprintf().
+- * @fmt...: QMP message to send to qemu
   *
-@@ -149,20 +149,7 @@ QDict *qtest_qmp_eventwait_ref(QTestState *s, const char *event);
-  *
-  * Returns: the command's output.  The caller should g_free() it.
+- * Sends a QMP message to QEMU and consumes the response.
++ * Read and discard a QMP response, typically after qtest_async_qmp().
   */
--char *qtest_hmp(QTestState *s, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
--
--/**
-- * qtest_hmpv:
-- * @s: #QTestState instance to operate on.
-- * @fmt: HMP command to send to QEMU
-- * @ap: HMP command arguments
-- *
-- * Send HMP command to QEMU via QMP's human-monitor-command.
-- * QMP events are discarded.
-- *
-- * Returns: the command's output.  The caller should g_free() it.
-- */
--char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap);
-+char *hmp(QTestState *s, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+-void qtest_qmp_discard_response(QTestState *s, const char *fmt, ...);
++void qtest_qmp_discard_response(QTestState *s);
 
  /**
-  * get_irq:
-@@ -570,16 +557,6 @@ static inline QDict *qmp_eventwait_ref(const char *event)
-     return qtest_qmp_eventwait_ref(global_qtest, event);
- }
+  * qtest_qmp:
+@@ -94,16 +93,6 @@ QDict *qtest_qmp(QTestState *s, const char *fmt, ...);
+ void qtest_async_qmp(QTestState *s, const char *fmt, ...);
 
--/**
-- * hmp:
-- * @fmt...: HMP command to send to QEMU, formats arguments like sprintf().
+ /**
+- * qtest_qmpv_discard_response:
+- * @s: #QTestState instance to operate on.
+- * @fmt: QMP message to send to QEMU
+- * @ap: QMP message arguments
 - *
-- * Send HMP command to QEMU via QMP's human-monitor-command.
-- *
-- * Returns: the command's output.  The caller should g_free() it.
+- * Sends a QMP message to QEMU and consumes the response.
 - */
--char *hmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+-void qtest_qmpv_discard_response(QTestState *s, const char *fmt, va_list ap);
 -
- QDict *qmp_fd_receive(int fd);
- void qmp_fd_sendv(int fd, const char *fmt, va_list ap);
- void qmp_fd_send(int fd, const char *fmt, ...);
+-/**
+  * qtest_qmpv:
+  * @s: #QTestState instance to operate on.
+  * @fmt: QMP message to send to QEMU
+@@ -543,11 +532,10 @@ void qmp_async(const char *fmt, ...);
+
+ /**
+  * qmp_discard_response:
+- * @fmt...: QMP message to send to qemu
+  *
+- * Sends a QMP message to QEMU and consumes the response.
++ * Read and discard a QMP response, typically after qmp_async().
+  */
+-void qmp_discard_response(const char *fmt, ...);
++void qmp_discard_response(void);
+
+ /**
+  * qmp_receive:
 diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 747411b5b5..1641c3ae4c 100644
+index ac38f6d4bb..747411b5b5 100644
 --- a/tests/libqtest.c
 +++ b/tests/libqtest.c
-@@ -596,13 +596,16 @@ void qtest_qmp_eventwait(QTestState *s, const char *event)
+@@ -238,8 +238,9 @@ QTestState *qtest_start(const char *extra_args)
+     QTestState *s = qtest_start_without_qmp_handshake(extra_args);
+
+     /* Read the QMP greeting and then do the handshake */
+-    qtest_qmp_discard_response(s, "");
+-    qtest_qmp_discard_response(s, "{ 'execute': 'qmp_capabilities' }");
++    qtest_qmp_discard_response(s);
++    qtest_async_qmp(s, "{ 'execute': 'qmp_capabilities' }");
++    qtest_qmp_discard_response(s);
+
+     assert(!global_qtest);
+     return s;
+@@ -566,20 +567,10 @@ void qtest_async_qmp(QTestState *s, const char *fmt, ...)
+     va_end(ap);
+ }
+
+-void qtest_qmpv_discard_response(QTestState *s, const char *fmt, va_list ap)
++void qtest_qmp_discard_response(QTestState *s)
+ {
+-    QDict *response = qtest_qmpv(s, fmt, ap);
+-    QDECREF(response);
+-}
++    QDict *response = qtest_qmp_receive(s);
+
+-void qtest_qmp_discard_response(QTestState *s, const char *fmt, ...)
+-{
+-    va_list ap;
+-    QDict *response;
+-
+-    va_start(ap, fmt);
+-    response = qtest_qmpv(s, fmt, ap);
+-    va_end(ap);
      QDECREF(response);
  }
 
--char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
-+char *hmp(QTestState *s, const char *fmt, ...)
- {
-+    va_list ap;
-     char *cmd;
-     QDict *resp;
-     char *ret;
-
-+    va_start(ap, fmt);
-     cmd = g_strdup_vprintf(fmt, ap);
-+    va_end(ap);
-     resp = qtest_qmp(s, "{'execute': 'human-monitor-command',"
-                      " 'arguments': {'command-line': %s}}",
-                      cmd);
-@@ -619,17 +622,6 @@ char *qtest_hmpv(QTestState *s, const char *fmt, va_list ap)
-     return ret;
+@@ -955,13 +946,11 @@ void qmp_async(const char *fmt, ...)
+     va_end(ap);
  }
 
--char *qtest_hmp(QTestState *s, const char *fmt, ...)
--{
--    va_list ap;
--    char *ret;
--
--    va_start(ap, fmt);
--    ret = qtest_hmpv(s, fmt, ap);
--    va_end(ap);
--    return ret;
--}
--
- const char *qtest_get_arch(void)
+-void qmp_discard_response(const char *fmt, ...)
++void qmp_discard_response(void)
  {
-     const char *qemu = getenv("QTEST_QEMU_BINARY");
-@@ -952,16 +944,6 @@ void qmp_discard_response(void)
+-    va_list ap;
++    QDict *response = qmp_receive();
 
-     QDECREF(response);
+-    va_start(ap, fmt);
+-    qtest_qmpv_discard_response(global_qtest, fmt, ap);
+-    va_end(ap);
++    QDECREF(response);
  }
--char *hmp(const char *fmt, ...)
--{
--    va_list ap;
--    char *ret;
--
--    va_start(ap, fmt);
--    ret = qtest_hmpv(global_qtest, fmt, ap);
--    va_end(ap);
--    return ret;
--}
-
- bool qtest_big_endian(QTestState *s)
+ char *hmp(const char *fmt, ...)
  {
-diff --git a/tests/device-introspect-test.c b/tests/device-introspect-test.c
-index ed4f5f2eed..7dbd27330a 100644
---- a/tests/device-introspect-test.c
-+++ b/tests/device-introspect-test.c
-@@ -110,14 +110,14 @@ static void test_one_device(const char *type)
-                type);
-     QDECREF(resp);
+diff --git a/tests/ahci-test.c b/tests/ahci-test.c
+index 18af01501f..a0ed334604 100644
+--- a/tests/ahci-test.c
++++ b/tests/ahci-test.c
+@@ -1589,9 +1589,10 @@ static void test_atapi_tray(void)
+     rsp = qtest_qmp_receive(ahci->parent->qts);
+     QDECREF(rsp);
 
--    help = hmp("device_add \"%s,help\"", type);
-+    help = hmp(global_qtest, "device_add \"%s,help\"", type);
-     g_free(help);
+-    qtest_qmp_discard_response(ahci->parent->qts,
+-                               "{'execute': 'x-blockdev-remove-medium', "
+-                               "'arguments': {'device': 'drive0'}}");
++    qtest_async_qmp(ahci->parent->qts,
++                    "{'execute': 'x-blockdev-remove-medium', "
++                    "'arguments': {'device': 'drive0'}}");
++    qtest_qmp_discard_response(ahci->parent->qts);
 
+     /* Test the tray without a medium */
+     ahci_atapi_load(ahci, port);
+@@ -1601,16 +1602,15 @@ static void test_atapi_tray(void)
+     atapi_wait_tray(ahci, true);
+
+     /* Re-insert media */
+-    qtest_qmp_discard_response(ahci->parent->qts,
+-                               "{'execute': 'blockdev-add', "
+-                               "'arguments': {'node-name': 'node0', "
+-                                        "'driver': 'raw', "
+-                                        "'file': { 'driver': 'file', "
+-                                                  "'filename': %s }}}", iso);
+-    qtest_qmp_discard_response(ahci->parent->qts,
+-                               "{'execute': 'x-blockdev-insert-medium',"
+-                               "'arguments': { 'device': 'drive0', "
+-                                         "'node-name': 'node0' }}");
++    qtest_async_qmp(ahci->parent->qts,
++                    "{'execute': 'blockdev-add', 'arguments': {"
++                    "  'node-name': 'node0', 'driver': 'raw', "
++                    "  'file': { 'driver': 'file', 'filename': %s }}}", iso);
++    qtest_qmp_discard_response(ahci->parent->qts);
++    qtest_async_qmp(ahci->parent->qts,
++                    "{'execute': 'x-blockdev-insert-medium',"
++                    "'arguments': {'device': 'drive0', 'node-name': 'node0'}}");
++    qtest_qmp_discard_response(ahci->parent->qts);
+
+     /* Again, the event shows up first */
+     qtest_async_qmp(ahci->parent->qts, "{'execute': 'blockdev-close-tray', "
+diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
+index 048c8721c6..5cd793e075 100644
+--- a/tests/boot-order-test.c
++++ b/tests/boot-order-test.c
+@@ -36,7 +36,7 @@ static void test_a_boot_order(const char *machine,
+                                 test_args);
+     actual = read_boot_order();
+     g_assert_cmphex(actual, ==, expected_boot);
+-    qmp_discard_response("{ 'execute': 'system_reset' }");
++    qmp_async("{ 'execute': 'system_reset' }");
      /*
-      * Some devices leave dangling pointers in QOM behind.
-      * "info qom-tree" has a good chance at crashing then
-      */
--    qom_tree = hmp("info qom-tree");
-+    qom_tree = hmp(global_qtest, "info qom-tree");
-     g_free(qom_tree);
- }
-
-@@ -131,7 +131,7 @@ static void test_device_intro_list(void)
-     types = device_type_list(true);
-     QDECREF(types);
-
--    help = hmp("device_add help");
-+    help = hmp(global_qtest, "device_add help");
-     g_free(help);
-
-     qtest_quit(global_qtest);
+      * system_reset only requests reset.  We get a RESET event after
+      * the actual reset completes.  Need to wait for that.
 diff --git a/tests/drive_del-test.c b/tests/drive_del-test.c
-index 0fde0c2040..6b53ac5a1a 100644
+index f68c4bc176..0fde0c2040 100644
 --- a/tests/drive_del-test.c
 +++ b/tests/drive_del-test.c
-@@ -15,7 +15,7 @@
+@@ -34,8 +34,9 @@ static void device_del(void)
+     QDict *response;
 
- static void drive_add(void)
- {
--    char *resp = hmp("drive_add 0 if=none,id=drive0");
-+    char *resp = hmp(global_qtest, "drive_add 0 if=none,id=drive0");
+     /* Complication: ignore DEVICE_DELETED event */
+-    qmp_discard_response("{'execute': 'device_del',"
+-                         " 'arguments': { 'id': 'dev0' } }");
++    qmp_async("{'execute': 'device_del',"
++              " 'arguments': { 'id': 'dev0' } }");
++    qmp_discard_response();
+     response = qmp_receive();
+     g_assert(response);
+     g_assert(qdict_haskey(response, "return"));
+diff --git a/tests/fdc-test.c b/tests/fdc-test.c
+index 7803ff2789..241b13e4de 100644
+--- a/tests/fdc-test.c
++++ b/tests/fdc-test.c
+@@ -298,9 +298,10 @@ static void test_media_insert(void)
 
-     g_assert_cmpstr(resp, ==, "OK\r\n");
-     g_free(resp);
-@@ -23,7 +23,7 @@ static void drive_add(void)
+     /* Insert media in drive. DSKCHK should not be reset until a step pulse
+      * is sent. */
+-    qmp_discard_response("{'execute':'blockdev-change-medium', 'arguments':{"
+-                         " 'id':'floppy0', 'filename': %s, 'format': 'raw' }}",
+-                         test_image);
++    qmp_async("{'execute':'blockdev-change-medium', 'arguments':{"
++              " 'id':'floppy0', 'filename': %s, 'format': 'raw' }}",
++              test_image);
++    qmp_discard_response();
 
- static void drive_del(void)
- {
--    char *resp = hmp("drive_del drive0");
-+    char *resp = hmp(global_qtest, "drive_del drive0");
+     dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
+@@ -329,8 +330,8 @@ static void test_media_change(void)
 
-     g_assert_cmpstr(resp, ==, "");
-     g_free(resp);
+     /* Eject the floppy and check that DSKCHG is set. Reading it out doesn't
+      * reset the bit. */
+-    qmp_discard_response("{'execute':'eject', 'arguments':{"
+-                         " 'id':'floppy0' }}");
++    qmp_async("{'execute':'eject', 'arguments':{ 'id':'floppy0' }}");
++    qmp_discard_response();
+
+     dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
 diff --git a/tests/ide-test.c b/tests/ide-test.c
-index 6ba3a8589d..5e7fa6e461 100644
+index c47cbb1949..6ba3a8589d 100644
 --- a/tests/ide-test.c
 +++ b/tests/ide-test.c
-@@ -587,7 +587,7 @@ static void test_flush(void)
-     make_dirty(0);
+@@ -621,7 +621,6 @@ static void test_retry_flush(const char *machine)
+     QPCIDevice *dev;
+     QPCIBar bmdma_bar, ide_bar;
+     uint8_t data;
+-    const char *s;
 
-     /* Delay the completion of the flush request until we explicitly do it */
--    g_free(hmp("qemu-io ide0-hd0 \"break flush_to_os A\""));
-+    g_free(hmp(global_qtest, "qemu-io ide0-hd0 \"break flush_to_os A\""));
+     prepare_blkdebug_script(debug_path, "flush_to_disk");
 
-     /* FLUSH CACHE command on device 0*/
-     qpci_io_writeb(dev, ide_bar, reg_device, 0);
-@@ -599,7 +599,7 @@ static void test_flush(void)
-     assert_bit_clear(data, DF | ERR | DRQ);
+@@ -649,8 +648,8 @@ static void test_retry_flush(const char *machine)
+     qmp_eventwait("STOP");
 
      /* Complete the command */
--    g_free(hmp("qemu-io ide0-hd0 \"resume A\""));
-+    g_free(hmp(global_qtest, "qemu-io ide0-hd0 \"resume A\""));
+-    s = "{'execute':'cont' }";
+-    qmp_discard_response(s);
++    qmp_async("{'execute':'cont' }");
++    qmp_discard_response();
 
      /* Check registers */
      data = qpci_io_readb(dev, ide_bar, reg_device);
-diff --git a/tests/numa-test.c b/tests/numa-test.c
-index e2f6c68be8..a7e2b183f7 100644
---- a/tests/numa-test.c
-+++ b/tests/numa-test.c
-@@ -21,7 +21,7 @@ static void test_mon_explicit(const void *data)
-                                 "-numa node,nodeid=0,cpus=0-3 "
-                                 "-numa node,nodeid=1,cpus=4-7 ", args);
+diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
+index 04889b8078..9c995ee3e5 100644
+--- a/tests/postcopy-test.c
++++ b/tests/postcopy-test.c
+@@ -478,7 +478,8 @@ static void test_migrate(void)
+         usleep(10 * 1000);
+     } while (dest_byte_a == dest_byte_b);
 
--    s = hmp("info numa");
-+    s = hmp(global_qtest, "info numa");
-     g_assert(strstr(s, "node 0 cpus: 0 1 2 3"));
-     g_assert(strstr(s, "node 1 cpus: 4 5 6 7"));
-     g_free(s);
-@@ -36,7 +36,7 @@ static void test_mon_default(const void *data)
+-    qtest_qmp_discard_response(to, "{ 'execute' : 'stop'}");
++    qtest_async_qmp(to, "{ 'execute' : 'stop'}");
++    qtest_qmp_discard_response(to);
+     /* With it stopped, check nothing changes */
+     memread(to, start_address, &dest_byte_c, 1);
+     sleep(1);
+diff --git a/tests/test-filter-mirror.c b/tests/test-filter-mirror.c
+index c590698991..3fc1211681 100644
+--- a/tests/test-filter-mirror.c
++++ b/tests/test-filter-mirror.c
+@@ -57,7 +57,8 @@ static void test_mirror(void)
+     };
 
-     global_qtest = qtest_startf("%s -smp 8 -numa node -numa node", args);
+     /* send a qmp command to guarantee that 'connected' is setting to true. */
+-    qmp_discard_response("{ 'execute' : 'query-status'}");
++    qmp_async("{ 'execute' : 'query-status'}");
++    qmp_discard_response();
+     ret = iov_send(send_sock[0], iov, 2, 0, sizeof(size) + sizeof(send_buf));
+     g_assert_cmpint(ret, ==, sizeof(send_buf) + sizeof(size));
+     close(send_sock[0]);
+diff --git a/tests/test-filter-redirector.c b/tests/test-filter-redirector.c
+index bcb338e7c1..a10649d4fc 100644
+--- a/tests/test-filter-redirector.c
++++ b/tests/test-filter-redirector.c
+@@ -104,7 +104,8 @@ static void test_redirector_tx(void)
+     g_assert_cmpint(recv_sock, !=, -1);
 
--    s = hmp("info numa");
-+    s = hmp(global_qtest, "info numa");
-     g_assert(strstr(s, "node 0 cpus: 0 2 4 6"));
-     g_assert(strstr(s, "node 1 cpus: 1 3 5 7"));
-     g_free(s);
-@@ -53,7 +53,7 @@ static void test_mon_partial(const void *data)
-                                 "-numa node,nodeid=0,cpus=0-1 "
-                                 "-numa node,nodeid=1,cpus=4-5 ", args);
+     /* send a qmp command to guarantee that 'connected' is setting to true. */
+-    qmp_discard_response("{ 'execute' : 'query-status'}");
++    qmp_async("{ 'execute' : 'query-status'}");
++    qmp_discard_response();
 
--    s = hmp("info numa");
-+    s = hmp(global_qtest, "info numa");
-     g_assert(strstr(s, "node 0 cpus: 0 1 2 3 6 7"));
-     g_assert(strstr(s, "node 1 cpus: 4 5"));
-     g_free(s);
-diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-index b3102daea1..e670a5ee6c 100644
---- a/tests/test-hmp.c
-+++ b/tests/test-hmp.c
-@@ -80,7 +80,7 @@ static void test_commands(void)
-         if (verbose) {
-             fprintf(stderr, "\t%s\n", hmp_cmds[i]);
-         }
--        response = hmp("%s", hmp_cmds[i]);
-+        response = hmp(global_qtest, "%s", hmp_cmds[i]);
-         g_free(response);
-     }
+     struct iovec iov[] = {
+         {
+@@ -182,7 +183,8 @@ static void test_redirector_rx(void)
+     send_sock = unix_connect(sock_path1, NULL);
+     g_assert_cmpint(send_sock, !=, -1);
+     /* send a qmp command to guarantee that 'connected' is setting to true. */
+-    qmp_discard_response("{ 'execute' : 'query-status'}");
++    qmp_async("{ 'execute' : 'query-status'}");
++    qmp_discard_response();
 
-@@ -91,7 +91,7 @@ static void test_info_commands(void)
- {
-     char *resp, *info, *info_buf, *endp;
+     ret = iov_send(send_sock, iov, 2, 0, sizeof(size) + sizeof(send_buf));
+     g_assert_cmpint(ret, ==, sizeof(send_buf) + sizeof(size));
+diff --git a/tests/virtio-blk-test.c b/tests/virtio-blk-test.c
+index ec582c8e1c..78ca44b520 100644
+--- a/tests/virtio-blk-test.c
++++ b/tests/virtio-blk-test.c
+@@ -410,9 +410,10 @@ static void pci_config(void)
 
--    info_buf = info = hmp("help info");
-+    info_buf = info = hmp(global_qtest, "help info");
+     qvirtio_set_driver_ok(&dev->vdev);
 
-     while (*info) {
-         /* Extract the info command, ignore parameters and description */
-@@ -103,7 +103,7 @@ static void test_info_commands(void)
-         if (verbose) {
-             fprintf(stderr, "\t%s\n", info);
-         }
--        resp = hmp("%s", info);
-+        resp = hmp(global_qtest, "%s", info);
-         g_free(resp);
-         /* And move forward to the next line */
-         info = strchr(endp + 1, '\n');
+-    qmp_discard_response("{ 'execute': 'block_resize', "
+-                         " 'arguments': { 'device': 'drive0', "
+-                         " 'size': %d } }", n_size);
++    qmp_async("{ 'execute': 'block_resize', "
++              " 'arguments': { 'device': 'drive0', "
++              " 'size': %d } }", n_size);
++    qmp_discard_response();
+     qvirtio_wait_config_isr(&dev->vdev, QVIRTIO_BLK_TIMEOUT_US);
+
+     capacity = qvirtio_config_readq(&dev->vdev, 0);
+@@ -460,9 +461,10 @@ static void pci_msix(void)
+
+     qvirtio_set_driver_ok(&dev->vdev);
+
+-    qmp_discard_response("{ 'execute': 'block_resize', "
+-                         " 'arguments': { 'device': 'drive0', "
+-                         " 'size': %d } }", n_size);
++    qmp_async("{ 'execute': 'block_resize', "
++              " 'arguments': { 'device': 'drive0', "
++              " 'size': %d } }", n_size);
++    qmp_discard_response();
+
+     qvirtio_wait_config_isr(&dev->vdev, QVIRTIO_BLK_TIMEOUT_US);
+
+@@ -702,9 +704,10 @@ static void mmio_basic(void)
+
+     test_basic(&dev->vdev, alloc, vq);
+
+-    qmp_discard_response("{ 'execute': 'block_resize', "
+-                         " 'arguments': { 'device': 'drive0', "
+-                         " 'size': %d } }", n_size);
++    qmp_async("{ 'execute': 'block_resize', "
++              " 'arguments': { 'device': 'drive0', "
++              " 'size': %d } }", n_size);
++    qmp_discard_response();
+
+     qvirtio_wait_queue_isr(&dev->vdev, vq, QVIRTIO_BLK_TIMEOUT_US);
+
 -- 
 2.13.5
