@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55188)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1drN8C-0004Eq-PK
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:44:01 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1drN9x-0005nn-O2
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:45:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1drN88-0006Tt-Ga
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:44:00 -0400
-Date: Mon, 11 Sep 2017 12:43:47 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170911114347.GL21444@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170911110037.6567-1-lvivier@redhat.com>
-	<20170911110615.GK21444@redhat.com>
-	<20170911134158.1f046176.cohuck@redhat.com>
+	(envelope-from <pbonzini@redhat.com>) id 1drN9t-0008Cy-0c
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:45:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36584)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drN9s-0008CP-Mb
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:45:44 -0400
+References: <20170903163615.15562-1-n54@gmx.com>
+	<20170909142116.26816-1-n54@gmx.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <6c7f02bd-40a8-de0b-ba73-31d54d99905a@redhat.com>
+Date: Mon, 11 Sep 2017 13:45:41 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170909142116.26816-1-n54@gmx.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170911134158.1f046176.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hmp: fix "dump-quest-memory" segfault (ppc)
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] scsi/esp: Rename the ESP macro to
+ ESP_STATE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,37 +29,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Kamil Rytarowski <n54@gmx.com>
+Cc: qemu-devel@nongnu.org
 
-On Mon, Sep 11, 2017 at 01:41:58PM +0200, Cornelia Huck wrote:
-> On Mon, 11 Sep 2017 12:06:15 +0100
-> "Daniel P. Berrange" <berrange@redhat.com> wrote:
+On 09/09/2017 16:21, Kamil Rytarowski wrote:
+> SunOS defines ESP (x86 register) in <sys/regset.h> as 7.
 > 
-> > On Mon, Sep 11, 2017 at 01:00:37PM +0200, Laurent Vivier wrote:
-> > > Commit fd5d23babf (hmp: fix "dump-quest-memory" segfault)
-> > > fixes the problem for i386, do the same for ppc.  
-> > 
-> > What about all the other targets QEMU supports ?  Have you checked if they
-> > are similarly affected, as we don't want to wait another 6 months to get a
-> > bug report that s390 or aarch64 crash in exactly the same way too.
+> This fixes build on SmartOS (Joyent).
 > 
-> This patch actually prompted me to check s390, and the mentioned
-> command line works fine.
+> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+> ---
+>  hw/scsi/esp.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 > 
-> However, if we start a qemu with no guest memory defined and then call
-> dump-guest-memory without filtering, we get a core dump instead of a
-> guest dump (s390x or x86_64, machine none).
+> diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
+> index eee831efeb..22c2d91e39 100644
+> --- a/hw/scsi/esp.c
+> +++ b/hw/scsi/esp.c
+> @@ -593,7 +593,7 @@ const VMStateDescription vmstate_esp = {
+>  };
+>  
+>  #define TYPE_ESP "esp"
+> -#define ESP(obj) OBJECT_CHECK(SysBusESPState, (obj), TYPE_ESP)
+> +#define ESP_STATE(obj) OBJECT_CHECK(SysBusESPState, (obj), TYPE_ESP)
+>  
+>  typedef struct {
+>      /*< private >*/
+> @@ -644,7 +644,7 @@ void esp_init(hwaddr espaddr, int it_shift,
+>      ESPState *esp;
+>  
+>      dev = qdev_create(NULL, TYPE_ESP);
+> -    sysbus = ESP(dev);
+> +    sysbus = ESP_STATE(dev);
+>      esp = &sysbus->esp;
+>      esp->dma_memory_read = dma_memory_read;
+>      esp->dma_memory_write = dma_memory_write;
+> @@ -672,7 +672,7 @@ static const struct SCSIBusInfo esp_scsi_info = {
+>  
+>  static void sysbus_esp_gpio_demux(void *opaque, int irq, int level)
+>  {
+> -    SysBusESPState *sysbus = ESP(opaque);
+> +    SysBusESPState *sysbus = ESP_STATE(opaque);
+>      ESPState *s = &sysbus->esp;
+>  
+>      switch (irq) {
+> @@ -688,7 +688,7 @@ static void sysbus_esp_gpio_demux(void *opaque, int irq, int level)
+>  static void sysbus_esp_realize(DeviceState *dev, Error **errp)
+>  {
+>      SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> -    SysBusESPState *sysbus = ESP(dev);
+> +    SysBusESPState *sysbus = ESP_STATE(dev);
+>      ESPState *s = &sysbus->esp;
+>  
+>      sysbus_init_irq(sbd, &s->irq);
+> @@ -706,7 +706,7 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
+>  
+>  static void sysbus_esp_hard_reset(DeviceState *dev)
+>  {
+> -    SysBusESPState *sysbus = ESP(dev);
+> +    SysBusESPState *sysbus = ESP_STATE(dev);
+>      esp_hard_reset(&sysbus->esp);
+>  }
+>  
 > 
-> I can take a stab at fixing that, unless someone beats me to it.
 
-I wonder if someone wants to write a qtest job to run dump-guest-memory
-across all machine types, on all targets. Seems we have enough crashiness
-in this code to make it worthwhile to test
+Queued, thanks.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Paolo
