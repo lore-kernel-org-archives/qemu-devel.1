@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39135)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39151)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSPM-0008FD-AK
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:07 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSPO-0008H5-Ap
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSPH-0001d4-Pm
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSPL-0001eM-0e
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:22:06 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 11 Sep 2017 12:20:15 -0500
-Message-Id: <20170911172022.4738-32-eblake@redhat.com>
+Date: Mon, 11 Sep 2017 12:20:17 -0500
+Message-Id: <20170911172022.4738-34-eblake@redhat.com>
 In-Reply-To: <20170911172022.4738-1-eblake@redhat.com>
 References: <20170911172022.4738-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 31/38] libqtest: Merge qtest_clock_*() with
- clock_*()
+Subject: [Qemu-devel] [PATCH v7 33/38] libqtest: Merge qtest_{in,
+ out}[bwl]() with {in, out}[bwl]()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,9 +27,12 @@ Maintaining two layers of libqtest APIs, one that takes an explicit
 QTestState object, and the other that uses the implicit global_qtest,
 is annoying.  In the interest of getting rid of global implicit
 state and having less code to maintain, merge:
- qtest_clock_set()
- qtest_clock_step()
- qtest_clock_step_next()
+ qtest_outb()
+ qtest_outw()
+ qtest_outl()
+ qtest_inb()
+ qtest_inw()
+ qtest_inl()
 with their short counterparts.  All callers that previously
 used the short form now make it explicit that they are relying on
 global_qtest, and later patches can then clean things up to remove
@@ -37,769 +40,903 @@ the global variable.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- tests/libqtest.h         | 50 ++++----------------------------
- tests/libqtest.c         |  6 ++--
- tests/e1000e-test.c      |  2 +-
- tests/fdc-test.c         |  4 +--
- tests/ide-test.c         |  2 +-
- tests/libqos/virtio.c    |  8 +++---
- tests/rtc-test.c         | 74 ++++++++++++++++++++++++------------------------
- tests/rtl8139-test.c     | 10 +++----
- tests/tco-test.c         | 22 +++++++-------
- tests/test-arm-mptimer.c | 25 +++++++++-------
- tests/wdt_ib700-test.c   | 12 ++++----
- 11 files changed, 90 insertions(+), 125 deletions(-)
+ tests/libqtest.h        | 99 ++++++-------------------------------------------
+ tests/multiboot/libc.h  |  2 +-
+ tests/libqtest.c        | 14 +++----
+ tests/boot-order-test.c |  4 +-
+ tests/endianness-test.c | 12 +++---
+ tests/fdc-test.c        | 77 ++++++++++++++++++++------------------
+ tests/hd-geo-test.c     |  4 +-
+ tests/ipmi-bt-test.c    | 12 +++---
+ tests/ipmi-kcs-test.c   |  8 ++--
+ tests/libqos/fw_cfg.c   |  4 +-
+ tests/libqos/pci-pc.c   | 44 +++++++++++-----------
+ tests/libqos/pci.c      |  2 +-
+ tests/m48t59-test.c     |  8 ++--
+ tests/multiboot/libc.c  |  2 +-
+ tests/pvpanic-test.c    |  4 +-
+ tests/rtc-test.c        |  8 ++--
+ tests/wdt_ib700-test.c  |  8 ++--
+ 17 files changed, 120 insertions(+), 192 deletions(-)
 
 diff --git a/tests/libqtest.h b/tests/libqtest.h
-index 5651b77d2f..26d5f37bc9 100644
+index 8398c0fd07..520f745e7b 100644
 --- a/tests/libqtest.h
 +++ b/tests/libqtest.h
-@@ -417,17 +417,17 @@ void qtest_bufwrite(QTestState *s, uint64_t addr,
- void qtest_memset(QTestState *s, uint64_t addr, uint8_t patt, size_t size);
+@@ -205,61 +205,61 @@ void irq_intercept_in(QTestState *s, const char *string);
+ void irq_intercept_out(QTestState *s, const char *string);
 
  /**
-- * qtest_clock_step_next:
-+ * clock_step_next:
+- * qtest_outb:
++ * outb:
   * @s: #QTestState instance to operate on.
+  * @addr: I/O port to write to.
+  * @value: Value being written.
   *
-  * Advance the QEMU_CLOCK_VIRTUAL to the next deadline.
-  *
-  * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
+  * Write an 8-bit value to an I/O port.
   */
--int64_t qtest_clock_step_next(QTestState *s);
-+int64_t clock_step_next(QTestState *s);
+-void qtest_outb(QTestState *s, uint16_t addr, uint8_t value);
++void outb(QTestState *s, uint16_t addr, uint8_t value);
 
  /**
-- * qtest_clock_step:
-+ * clock_step:
-  * @s: QTestState instance to operate on.
-  * @step: Number of nanoseconds to advance the clock by.
+- * qtest_outw:
++ * outw:
+  * @s: #QTestState instance to operate on.
+  * @addr: I/O port to write to.
+  * @value: Value being written.
   *
-@@ -435,10 +435,10 @@ int64_t qtest_clock_step_next(QTestState *s);
-  *
-  * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
+  * Write a 16-bit value to an I/O port.
   */
--int64_t qtest_clock_step(QTestState *s, int64_t step);
-+int64_t clock_step(QTestState *s, int64_t step);
+-void qtest_outw(QTestState *s, uint16_t addr, uint16_t value);
++void outw(QTestState *s, uint16_t addr, uint16_t value);
 
  /**
-- * qtest_clock_set:
-+ * clock_set:
-  * @s: QTestState instance to operate on.
-  * @val: Nanoseconds value to advance the clock to.
+- * qtest_outl:
++ * outl:
+  * @s: #QTestState instance to operate on.
+  * @addr: I/O port to write to.
+  * @value: Value being written.
   *
-@@ -446,7 +446,7 @@ int64_t qtest_clock_step(QTestState *s, int64_t step);
-  *
-  * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
+  * Write a 32-bit value to an I/O port.
   */
--int64_t qtest_clock_set(QTestState *s, int64_t val);
-+int64_t clock_set(QTestState *s, int64_t val);
+-void qtest_outl(QTestState *s, uint16_t addr, uint32_t value);
++void outl(QTestState *s, uint16_t addr, uint32_t value);
 
  /**
-  * qtest_big_endian:
-@@ -868,44 +868,6 @@ static inline void qmemset(uint64_t addr, uint8_t patt, size_t size)
-     qtest_memset(global_qtest, addr, patt, size);
+- * qtest_inb:
++ * inb:
+  * @s: #QTestState instance to operate on.
+  * @addr: I/O port to read from.
+  *
+  * Returns an 8-bit value from an I/O port.
+  */
+-uint8_t qtest_inb(QTestState *s, uint16_t addr);
++uint8_t inb(QTestState *s, uint16_t addr);
+
+ /**
+- * qtest_inw:
++ * inw:
+  * @s: #QTestState instance to operate on.
+  * @addr: I/O port to read from.
+  *
+  * Returns a 16-bit value from an I/O port.
+  */
+-uint16_t qtest_inw(QTestState *s, uint16_t addr);
++uint16_t inw(QTestState *s, uint16_t addr);
+
+ /**
+- * qtest_inl:
++ * inl:
+  * @s: #QTestState instance to operate on.
+  * @addr: I/O port to read from.
+  *
+  * Returns a 32-bit value from an I/O port.
+  */
+-uint32_t qtest_inl(QTestState *s, uint16_t addr);
++uint32_t inl(QTestState *s, uint16_t addr);
+
+ /**
+  * qtest_writeb:
+@@ -594,81 +594,6 @@ static inline QDict *qmp_eventwait_ref(const char *event)
+ char *hmp(const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+
+ /**
+- * outb:
+- * @addr: I/O port to write to.
+- * @value: Value being written.
+- *
+- * Write an 8-bit value to an I/O port.
+- */
+-static inline void outb(uint16_t addr, uint8_t value)
+-{
+-    qtest_outb(global_qtest, addr, value);
+-}
+-
+-/**
+- * outw:
+- * @addr: I/O port to write to.
+- * @value: Value being written.
+- *
+- * Write a 16-bit value to an I/O port.
+- */
+-static inline void outw(uint16_t addr, uint16_t value)
+-{
+-    qtest_outw(global_qtest, addr, value);
+-}
+-
+-/**
+- * outl:
+- * @addr: I/O port to write to.
+- * @value: Value being written.
+- *
+- * Write a 32-bit value to an I/O port.
+- */
+-static inline void outl(uint16_t addr, uint32_t value)
+-{
+-    qtest_outl(global_qtest, addr, value);
+-}
+-
+-/**
+- * inb:
+- * @addr: I/O port to read from.
+- *
+- * Reads an 8-bit value from an I/O port.
+- *
+- * Returns: Value read.
+- */
+-static inline uint8_t inb(uint16_t addr)
+-{
+-    return qtest_inb(global_qtest, addr);
+-}
+-
+-/**
+- * inw:
+- * @addr: I/O port to read from.
+- *
+- * Reads a 16-bit value from an I/O port.
+- *
+- * Returns: Value read.
+- */
+-static inline uint16_t inw(uint16_t addr)
+-{
+-    return qtest_inw(global_qtest, addr);
+-}
+-
+-/**
+- * inl:
+- * @addr: I/O port to read from.
+- *
+- * Reads a 32-bit value from an I/O port.
+- *
+- * Returns: Value read.
+- */
+-static inline uint32_t inl(uint16_t addr)
+-{
+-    return qtest_inl(global_qtest, addr);
+-}
+-
+-/**
+  * writeb:
+  * @addr: Guest address to write to.
+  * @value: Value being written.
+diff --git a/tests/multiboot/libc.h b/tests/multiboot/libc.h
+index 04c9922c27..05eb7eafd6 100644
+--- a/tests/multiboot/libc.h
++++ b/tests/multiboot/libc.h
+@@ -48,7 +48,7 @@ typedef __builtin_va_list       va_list;
+
+ /* Port I/O functions */
+
+-static inline void outb(uint16_t port, uint8_t data)
++static inline void outb(global_qtest, uint16_t port, uint8_t data)
+ {
+     asm volatile ("outb %0, %1" : : "a" (data), "Nd" (port));
  }
-
--/**
-- * clock_step_next:
-- *
-- * Advance the QEMU_CLOCK_VIRTUAL to the next deadline.
-- *
-- * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
-- */
--static inline int64_t clock_step_next(void)
--{
--    return qtest_clock_step_next(global_qtest);
--}
--
--/**
-- * clock_step:
-- * @step: Number of nanoseconds to advance the clock by.
-- *
-- * Advance the QEMU_CLOCK_VIRTUAL by @step nanoseconds.
-- *
-- * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
-- */
--static inline int64_t clock_step(int64_t step)
--{
--    return qtest_clock_step(global_qtest, step);
--}
--
--/**
-- * clock_set:
-- * @val: Nanoseconds value to advance the clock to.
-- *
-- * Advance the QEMU_CLOCK_VIRTUAL to @val nanoseconds since the VM was launched.
-- *
-- * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
-- */
--static inline int64_t clock_set(int64_t val)
--{
--    return qtest_clock_set(global_qtest, val);
--}
--
- QDict *qmp_fd_receive(int fd);
- void qmp_fd_sendv(int fd, const char *fmt, va_list ap);
- void qmp_fd_send(int fd, const char *fmt, ...);
 diff --git a/tests/libqtest.c b/tests/libqtest.c
-index 44c89813ff..9f5f2cb933 100644
+index 962432a27a..1db86b39f1 100644
 --- a/tests/libqtest.c
 +++ b/tests/libqtest.c
-@@ -666,19 +666,19 @@ static int64_t qtest_clock_rsp(QTestState *s)
-     return clock;
+@@ -651,7 +651,7 @@ const char *qtest_get_arch(void)
+ bool get_irq(QTestState *s, int num)
+ {
+     /* dummy operation in order to make sure irq is up to date */
+-    qtest_inb(s, 0);
++    inb(s, 0);
+
+     return s->irq_level[num];
+ }
+@@ -702,17 +702,17 @@ static void qtest_out(QTestState *s, const char *cmd, uint16_t addr, uint32_t va
+     qtest_rsp(s, 0);
  }
 
--int64_t qtest_clock_step_next(QTestState *s)
-+int64_t clock_step_next(QTestState *s)
+-void qtest_outb(QTestState *s, uint16_t addr, uint8_t value)
++void outb(QTestState *s, uint16_t addr, uint8_t value)
  {
-     qtest_sendf(s, "clock_step\n");
-     return qtest_clock_rsp(s);
+     qtest_out(s, "outb", addr, value);
  }
 
--int64_t qtest_clock_step(QTestState *s, int64_t step)
-+int64_t clock_step(QTestState *s, int64_t step)
+-void qtest_outw(QTestState *s, uint16_t addr, uint16_t value)
++void outw(QTestState *s, uint16_t addr, uint16_t value)
  {
-     qtest_sendf(s, "clock_step %"PRIi64"\n", step);
-     return qtest_clock_rsp(s);
+     qtest_out(s, "outw", addr, value);
  }
 
--int64_t qtest_clock_set(QTestState *s, int64_t val)
-+int64_t clock_set(QTestState *s, int64_t val)
+-void qtest_outl(QTestState *s, uint16_t addr, uint32_t value)
++void outl(QTestState *s, uint16_t addr, uint32_t value)
  {
-     qtest_sendf(s, "clock_set %"PRIi64"\n", val);
-     return qtest_clock_rsp(s);
-diff --git a/tests/e1000e-test.c b/tests/e1000e-test.c
-index 323aabb454..f4ead74f96 100644
---- a/tests/e1000e-test.c
-+++ b/tests/e1000e-test.c
-@@ -229,7 +229,7 @@ static void e1000e_wait_isr(e1000e_device *d, uint16_t msg_id)
-         if (qpci_msix_pending(d->pci_dev, msg_id)) {
-             return;
-         }
--        clock_step(10000);
-+        clock_step(global_qtest, 10000);
-     } while (g_get_monotonic_time() < end_time);
+     qtest_out(s, "outl", addr, value);
+ }
+@@ -732,17 +732,17 @@ static uint32_t qtest_in(QTestState *s, const char *cmd, uint16_t addr)
+     return value;
+ }
 
-     g_error("Timeout expired");
+-uint8_t qtest_inb(QTestState *s, uint16_t addr)
++uint8_t inb(QTestState *s, uint16_t addr)
+ {
+     return qtest_in(s, "inb", addr);
+ }
+
+-uint16_t qtest_inw(QTestState *s, uint16_t addr)
++uint16_t inw(QTestState *s, uint16_t addr)
+ {
+     return qtest_in(s, "inw", addr);
+ }
+
+-uint32_t qtest_inl(QTestState *s, uint16_t addr)
++uint32_t inl(QTestState *s, uint16_t addr)
+ {
+     return qtest_in(s, "inl", addr);
+ }
+diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
+index e70f5dedba..177aac95ad 100644
+--- a/tests/boot-order-test.c
++++ b/tests/boot-order-test.c
+@@ -63,8 +63,8 @@ static void test_boot_orders(const char *machine,
+
+ static uint8_t read_mc146818(uint16_t port, uint8_t reg)
+ {
+-    outb(port, reg);
+-    return inb(port + 1);
++    outb(global_qtest, port, reg);
++    return inb(global_qtest, port + 1);
+ }
+
+ static uint64_t read_boot_order_pc(void)
+diff --git a/tests/endianness-test.c b/tests/endianness-test.c
+index 546e0969e4..16b303525e 100644
+--- a/tests/endianness-test.c
++++ b/tests/endianness-test.c
+@@ -52,7 +52,7 @@ static uint8_t isa_inb(const TestCase *test, uint16_t addr)
+ {
+     uint8_t value;
+     if (test->isa_base == -1) {
+-        value = inb(addr);
++        value = inb(global_qtest, addr);
+     } else {
+         value = readb(test->isa_base + addr);
+     }
+@@ -63,7 +63,7 @@ static uint16_t isa_inw(const TestCase *test, uint16_t addr)
+ {
+     uint16_t value;
+     if (test->isa_base == -1) {
+-        value = inw(addr);
++        value = inw(global_qtest, addr);
+     } else {
+         value = readw(test->isa_base + addr);
+     }
+@@ -74,7 +74,7 @@ static uint32_t isa_inl(const TestCase *test, uint16_t addr)
+ {
+     uint32_t value;
+     if (test->isa_base == -1) {
+-        value = inl(addr);
++        value = inl(global_qtest, addr);
+     } else {
+         value = readl(test->isa_base + addr);
+     }
+@@ -84,7 +84,7 @@ static uint32_t isa_inl(const TestCase *test, uint16_t addr)
+ static void isa_outb(const TestCase *test, uint16_t addr, uint8_t value)
+ {
+     if (test->isa_base == -1) {
+-        outb(addr, value);
++        outb(global_qtest, addr, value);
+     } else {
+         writeb(test->isa_base + addr, value);
+     }
+@@ -94,7 +94,7 @@ static void isa_outw(const TestCase *test, uint16_t addr, uint16_t value)
+ {
+     value = test->bswap ? bswap16(value) : value;
+     if (test->isa_base == -1) {
+-        outw(addr, value);
++        outw(global_qtest, addr, value);
+     } else {
+         writew(test->isa_base + addr, value);
+     }
+@@ -104,7 +104,7 @@ static void isa_outl(const TestCase *test, uint16_t addr, uint32_t value)
+ {
+     value = test->bswap ? bswap32(value) : value;
+     if (test->isa_base == -1) {
+-        outl(addr, value);
++        outl(global_qtest, addr, value);
+     } else {
+         writel(test->isa_base + addr, value);
+     }
 diff --git a/tests/fdc-test.c b/tests/fdc-test.c
-index ec83625db2..e79cd0f3b5 100644
+index 584ad746ed..7803ff2789 100644
 --- a/tests/fdc-test.c
 +++ b/tests/fdc-test.c
-@@ -424,7 +424,7 @@ static void test_read_id(void)
-
-     while (!get_irq(FLOPPY_IRQ)) {
-         /* qemu involves a timer with READ ID... */
--        clock_step(1000000000LL / 50);
-+        clock_step(global_qtest, 1000000000LL / 50);
-     }
-
-     msr = inb(FLOPPY_BASE + reg_msr);
-@@ -467,7 +467,7 @@ static void test_read_id(void)
-
-     while (!get_irq(FLOPPY_IRQ)) {
-         /* qemu involves a timer with READ ID... */
--        clock_step(1000000000LL / 50);
-+        clock_step(global_qtest, 1000000000LL / 50);
-     }
-
-     msr = inb(FLOPPY_BASE + reg_msr);
-diff --git a/tests/ide-test.c b/tests/ide-test.c
-index e1650c0132..32c8c40294 100644
---- a/tests/ide-test.c
-+++ b/tests/ide-test.c
-@@ -749,7 +749,7 @@ static void nsleep(int64_t nsecs)
+@@ -77,21 +77,21 @@ static void floppy_send(uint8_t byte)
  {
-     const struct timespec val = { .tv_nsec = nsecs };
-     nanosleep(&val, NULL);
--    clock_set(nsecs);
-+    clock_set(global_qtest, nsecs);
+     uint8_t msr;
+
+-    msr = inb(FLOPPY_BASE + reg_msr);
++    msr = inb(global_qtest, FLOPPY_BASE + reg_msr);
+     assert_bit_set(msr, RQM);
+     assert_bit_clear(msr, DIO);
+
+-    outb(FLOPPY_BASE + reg_fifo, byte);
++    outb(global_qtest, FLOPPY_BASE + reg_fifo, byte);
  }
 
- static uint8_t ide_wait_clear(uint8_t flag)
-diff --git a/tests/libqos/virtio.c b/tests/libqos/virtio.c
-index 2212830742..92e47e78f2 100644
---- a/tests/libqos/virtio.c
-+++ b/tests/libqos/virtio.c
-@@ -97,7 +97,7 @@ void qvirtio_wait_queue_isr(QVirtioDevice *d,
-     gint64 start_time = g_get_monotonic_time();
+ static uint8_t floppy_recv(void)
+ {
+     uint8_t msr;
 
-     for (;;) {
--        qtest_clock_step(d->bus->qts, 100);
-+        clock_step(d->bus->qts, 100);
-         if (d->bus->get_queue_isr_status(d, vq)) {
-             return;
-         }
-@@ -119,7 +119,7 @@ uint8_t qvirtio_wait_status_byte_no_isr(QVirtioDevice *d,
-     uint8_t val;
+-    msr = inb(FLOPPY_BASE + reg_msr);
++    msr = inb(global_qtest, FLOPPY_BASE + reg_msr);
+     assert_bit_set(msr, RQM | DIO);
 
-     while ((val = qtest_readb(d->bus->qts, addr)) == 0xff) {
--        qtest_clock_step(d->bus->qts, 100);
-+        clock_step(d->bus->qts, 100);
-         g_assert(!d->bus->get_queue_isr_status(d, vq));
-         g_assert(g_get_monotonic_time() - start_time <= timeout_us);
-     }
-@@ -143,7 +143,7 @@ void qvirtio_wait_used_elem(QVirtioDevice *d,
-     for (;;) {
-         uint32_t got_desc_idx;
+-    return inb(FLOPPY_BASE + reg_fifo);
++    return inb(global_qtest, FLOPPY_BASE + reg_fifo);
+ }
 
--        qtest_clock_step(d->bus->qts, 100);
-+        clock_step(d->bus->qts, 100);
-
-         if (d->bus->get_queue_isr_status(d, vq) &&
-             qvirtqueue_get_buf(vq, &got_desc_idx)) {
-@@ -160,7 +160,7 @@ void qvirtio_wait_config_isr(QVirtioDevice *d, gint64 timeout_us)
-     gint64 start_time = g_get_monotonic_time();
-
-     for (;;) {
--        qtest_clock_step(d->bus->qts, 100);
-+        clock_step(d->bus->qts, 100);
-         if (d->bus->get_config_isr_status(d)) {
-             return;
-         }
-diff --git a/tests/rtc-test.c b/tests/rtc-test.c
-index dd5430dd2d..9b98e2d494 100644
---- a/tests/rtc-test.c
-+++ b/tests/rtc-test.c
-@@ -291,7 +291,7 @@ static void alarm_time(void)
+ /* pcn: Present Cylinder Number */
+@@ -141,7 +141,7 @@ static uint8_t send_read_command(uint8_t cmd)
+     uint8_t i = 0;
+     uint8_t n = 2;
+     for (; i < n; i++) {
+-        msr = inb(FLOPPY_BASE + reg_msr);
++        msr = inb(global_qtest, FLOPPY_BASE + reg_msr);
+         if (msr == 0xd0) {
              break;
          }
+@@ -197,7 +197,7 @@ static uint8_t send_read_no_dma_command(int nb_sect, uint8_t expected_st0)
+     uint16_t i = 0;
+     uint8_t n = 2;
+     for (; i < n; i++) {
+-        msr = inb(FLOPPY_BASE + reg_msr);
++        msr = inb(global_qtest, FLOPPY_BASE + reg_msr);
+         if (msr == (BUSY | NONDMA | DIO | RQM)) {
+             break;
+         }
+@@ -210,12 +210,12 @@ static uint8_t send_read_no_dma_command(int nb_sect, uint8_t expected_st0)
 
--        clock_step(1000000000);
-+        clock_step(global_qtest, 1000000000);
+     /* Non-DMA mode */
+     for (i = 0; i < 512 * 2 * nb_sect; i++) {
+-        msr = inb(FLOPPY_BASE + reg_msr);
++        msr = inb(global_qtest, FLOPPY_BASE + reg_msr);
+         assert_bit_set(msr, BUSY | RQM | DIO);
+-        inb(FLOPPY_BASE + reg_fifo);
++        inb(global_qtest, FLOPPY_BASE + reg_fifo);
      }
 
-     g_assert(get_irq(RTC_ISA_IRQ));
-@@ -371,35 +371,35 @@ static void basic_12h_bcd(void)
+-    msr = inb(FLOPPY_BASE + reg_msr);
++    msr = inb(global_qtest, FLOPPY_BASE + reg_msr);
+     assert_bit_set(msr, BUSY | RQM | DIO);
+     g_assert(get_irq(global_qtest, FLOPPY_IRQ));
+
+@@ -233,7 +233,7 @@ static uint8_t send_read_no_dma_command(int nb_sect, uint8_t expected_st0)
+     floppy_recv();
+
+     /* Check that we're back in command phase */
+-    msr = inb(FLOPPY_BASE + reg_msr);
++    msr = inb(global_qtest, FLOPPY_BASE + reg_msr);
+     assert_bit_clear(msr, BUSY | DIO);
+     assert_bit_set(msr, RQM);
+     g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+@@ -255,8 +255,8 @@ static void send_seek(int cyl)
+
+ static uint8_t cmos_read(uint8_t reg)
  {
-     /* set BCD 12 hour mode */
-     set_time(0, 0x81, 0x59, 0x00);
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_time(0x81, 0x59, 0x01);
--    clock_step(59000000000LL);
-+    clock_step(global_qtest, 59000000000LL);
-     assert_time(0x82, 0x00, 0x00);
-
-     /* test BCD wraparound */
-     set_time(0, 0x09, 0x59, 0x59);
--    clock_step(60000000000LL);
-+    clock_step(global_qtest, 60000000000LL);
-     assert_time(0x10, 0x00, 0x59);
-
-     /* 12 AM -> 1 AM */
-     set_time(0, 0x12, 0x59, 0x59);
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_time(0x01, 0x00, 0x00);
-
-     /* 12 PM -> 1 PM */
-     set_time(0, 0x92, 0x59, 0x59);
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_time(0x81, 0x00, 0x00);
-
-     /* 11 AM -> 12 PM */
-     set_time(0, 0x11, 0x59, 0x59);
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_time(0x92, 0x00, 0x00);
-     /* TODO: test day wraparound */
-
-     /* 11 PM -> 12 AM */
-     set_time(0, 0x91, 0x59, 0x59);
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_time(0x12, 0x00, 0x00);
-     /* TODO: test day wraparound */
- }
-@@ -408,29 +408,29 @@ static void basic_12h_dec(void)
- {
-     /* set decimal 12 hour mode */
-     set_time(REG_B_DM, 0x81, 59, 0);
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_time(0x81, 59, 1);
--    clock_step(59000000000LL);
-+    clock_step(global_qtest, 59000000000LL);
-     assert_time(0x82, 0, 0);
-
-     /* 12 PM -> 1 PM */
-     set_time(REG_B_DM, 0x8c, 59, 59);
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_time(0x81, 0, 0);
-
-     /* 12 AM -> 1 AM */
-     set_time(REG_B_DM, 0x0c, 59, 59);
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_time(0x01, 0, 0);
-
-     /* 11 AM -> 12 PM */
-     set_time(REG_B_DM, 0x0b, 59, 59);
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_time(0x8c, 0, 0);
-
-     /* 11 PM -> 12 AM */
-     set_time(REG_B_DM, 0x8b, 59, 59);
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_time(0x0c, 0, 0);
-     /* TODO: test day wraparound */
- }
-@@ -439,19 +439,19 @@ static void basic_24h_bcd(void)
- {
-     /* set BCD 24 hour mode */
-     set_time(REG_B_24H, 0x09, 0x59, 0x00);
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_time(0x09, 0x59, 0x01);
--    clock_step(59000000000LL);
-+    clock_step(global_qtest, 59000000000LL);
-     assert_time(0x10, 0x00, 0x00);
-
-     /* test BCD wraparound */
-     set_time(REG_B_24H, 0x09, 0x59, 0x00);
--    clock_step(60000000000LL);
-+    clock_step(global_qtest, 60000000000LL);
-     assert_time(0x10, 0x00, 0x00);
-
-     /* TODO: test day wraparound */
-     set_time(REG_B_24H, 0x23, 0x59, 0x00);
--    clock_step(60000000000LL);
-+    clock_step(global_qtest, 60000000000LL);
-     assert_time(0x00, 0x00, 0x00);
+-    outb(base + 0, reg);
+-    return inb(base + 1);
++    outb(global_qtest, base + 0, reg);
++    return inb(global_qtest, base + 1);
  }
 
-@@ -459,19 +459,19 @@ static void basic_24h_dec(void)
- {
-     /* set decimal 24 hour mode */
-     set_time(REG_B_24H | REG_B_DM, 9, 59, 0);
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_time(9, 59, 1);
--    clock_step(59000000000LL);
-+    clock_step(global_qtest, 59000000000LL);
-     assert_time(10, 0, 0);
+ static void test_cmos(void)
+@@ -273,14 +273,14 @@ static void test_no_media_on_start(void)
 
-     /* test BCD wraparound */
-     set_time(REG_B_24H | REG_B_DM, 9, 59, 0);
--    clock_step(60000000000LL);
-+    clock_step(global_qtest, 60000000000LL);
-     assert_time(10, 0, 0);
-
-     /* TODO: test day wraparound */
-     set_time(REG_B_24H | REG_B_DM, 23, 59, 0);
--    clock_step(60000000000LL);
-+    clock_step(global_qtest, 60000000000LL);
-     assert_time(0, 0, 0);
+     /* Media changed bit must be set all time after start if there is
+      * no media in drive. */
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
+     send_seek(1);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
  }
 
-@@ -493,7 +493,7 @@ static void am_pm_alarm(void)
-     cmos_write(RTC_REG_A, 0x26);
+@@ -302,22 +302,22 @@ static void test_media_insert(void)
+                          " 'id':'floppy0', 'filename': %s, 'format': 'raw' }}",
+                          test_image);
 
-     /* Check that alarm triggers when AM/PM is set.  */
--    clock_step(60000000000LL);
-+    clock_step(global_qtest, 60000000000LL);
-     g_assert(cmos_read(RTC_HOURS) == 0x82);
-     g_assert((cmos_read(RTC_REG_C) & REG_C_AF) != 0);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
 
-@@ -520,7 +520,7 @@ static void am_pm_alarm(void)
-     cmos_write(RTC_REG_A, 0x26);
+     send_seek(0);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
 
-     /* Check that alarm triggers.  */
--    clock_step(3600 * 11 * 1000000000LL);
-+    clock_step(global_qtest, 3600 * 11 * 1000000000LL);
-     g_assert(cmos_read(RTC_HOURS) == 0x82);
-     g_assert((cmos_read(RTC_REG_C) & REG_C_AF) != 0);
-
-@@ -534,7 +534,7 @@ static void am_pm_alarm(void)
-     cmos_write(RTC_REG_A, 0x26);
-
-     /* Check that alarm does not trigger if hours differ only by AM/PM.  */
--    clock_step(3600 * 11 * 1000000000LL);
-+    clock_step(global_qtest, 3600 * 11 * 1000000000LL);
-     g_assert(cmos_read(RTC_HOURS) == 0x82);
-     g_assert((cmos_read(RTC_REG_C) & REG_C_AF) == 0);
- }
-@@ -558,7 +558,7 @@ static void fuzz_registers(void)
- static void register_b_set_flag(void)
- {
-     if (cmos_read(RTC_REG_A) & REG_A_UIP) {
--        clock_step(UIP_HOLD_LENGTH + NANOSECONDS_PER_SECOND / 5);
-+        clock_step(global_qtest, UIP_HOLD_LENGTH + NANOSECONDS_PER_SECOND / 5);
-     }
-     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
-
-@@ -570,7 +570,7 @@ static void register_b_set_flag(void)
-     assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
-
-     /* Since SET flag is still enabled, time does not advance. */
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
-
-     /* Disable SET flag in Register B */
-@@ -579,7 +579,7 @@ static void register_b_set_flag(void)
-     assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
-
-     /* Since SET flag is disabled, the clock now advances.  */
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_datetime_bcd(0x02, 0x04, 0x59, 0x02, 0x02, 0x2011);
+     /* Step to next track should clear DSKCHG bit. */
+     send_seek(1);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_clear(dir, DSKCHG);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_clear(dir, DSKCHG);
  }
 
-@@ -595,18 +595,18 @@ static void divider_reset(void)
-     assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
+@@ -332,21 +332,21 @@ static void test_media_change(void)
+     qmp_discard_response("{'execute':'eject', 'arguments':{"
+                          " 'id':'floppy0' }}");
 
-     /* Since divider reset flag is still enabled, these are equality checks. */
--    clock_step(1000000000LL);
-+    clock_step(global_qtest, 1000000000LL);
-     assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
 
-     /* The first update ends 500 ms after divider reset */
-     cmos_write(RTC_REG_A, 0x26);
--    clock_step(500000000LL - UIP_HOLD_LENGTH - 1);
-+    clock_step(global_qtest, 500000000LL - UIP_HOLD_LENGTH - 1);
-     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
-     assert_datetime_bcd(0x02, 0x04, 0x58, 0x02, 0x02, 0x2011);
+     send_seek(0);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
 
--    clock_step(1);
-+    clock_step(global_qtest, 1);
-     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, !=, 0);
--    clock_step(UIP_HOLD_LENGTH);
-+    clock_step(global_qtest, UIP_HOLD_LENGTH);
-     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
-
-     assert_datetime_bcd(0x02, 0x04, 0x59, 0x02, 0x02, 0x2011);
-@@ -618,7 +618,7 @@ static void uip_stuck(void)
-
-     /* The first update ends 500 ms after divider reset */
-     (void)cmos_read(RTC_REG_C);
--    clock_step(500000000LL);
-+    clock_step(global_qtest, 500000000LL);
-     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
-     assert_datetime_bcd(0x02, 0x04, 0x59, 0x02, 0x02, 0x2011);
-
-@@ -628,12 +628,12 @@ static void uip_stuck(void)
-     cmos_write(RTC_SECONDS_ALARM, 0xC0);
-
-     /* Because the alarm will fire soon, reading register A will latch UIP.  */
--    clock_step(1000000000LL - UIP_HOLD_LENGTH / 2);
-+    clock_step(global_qtest, 1000000000LL - UIP_HOLD_LENGTH / 2);
-     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, !=, 0);
-
-     /* Move the alarm far away.  This must not cause UIP to remain stuck!  */
-     cmos_write(RTC_HOURS_ALARM, 0x03);
--    clock_step(UIP_HOLD_LENGTH);
-+    clock_step(global_qtest, UIP_HOLD_LENGTH);
-     g_assert_cmpint(cmos_read(RTC_REG_A) & REG_A_UIP, ==, 0);
+     send_seek(1);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
+-    dir = inb(FLOPPY_BASE + reg_dir);
++    dir = inb(global_qtest, FLOPPY_BASE + reg_dir);
+     assert_bit_set(dir, DSKCHG);
  }
 
-@@ -645,7 +645,7 @@ static void uip_stuck(void)
- static uint64_t wait_periodic_interrupt(uint64_t real_time)
- {
-     while (!get_irq(RTC_ISA_IRQ)) {
--        real_time = clock_step_next();
-+        real_time = clock_step_next(global_qtest);
+@@ -416,7 +416,7 @@ static void test_read_id(void)
+     g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_send(head << 2 | drive);
+
+-    msr = inb(FLOPPY_BASE + reg_msr);
++    msr = inb(global_qtest, FLOPPY_BASE + reg_msr);
+     if (!get_irq(global_qtest, FLOPPY_IRQ)) {
+         assert_bit_set(msr, BUSY);
+         assert_bit_clear(msr, RQM);
+@@ -427,7 +427,7 @@ static void test_read_id(void)
+         clock_step(global_qtest, 1000000000LL / 50);
      }
 
-     g_assert((cmos_read(RTC_REG_C) & REG_C_PF) != 0);
-@@ -664,7 +664,7 @@ static void periodic_timer(void)
-     /* enable periodic interrupt after properly configure the period. */
-     cmos_write(RTC_REG_B, cmos_read(RTC_REG_B) | REG_B_PIE);
+-    msr = inb(FLOPPY_BASE + reg_msr);
++    msr = inb(global_qtest, FLOPPY_BASE + reg_msr);
+     assert_bit_set(msr, BUSY | RQM | DIO);
 
--    start_time = real_time = clock_step_next();
-+    start_time = real_time = clock_step_next(global_qtest);
+     st0 = floppy_recv();
+@@ -459,7 +459,7 @@ static void test_read_id(void)
+     g_assert(!get_irq(global_qtest, FLOPPY_IRQ));
+     floppy_send(head << 2 | drive);
 
-     for (i = 0; i < RTC_PERIOD_TEST_NR; i++) {
-         cmos_write(RTC_REG_A, RTC_PERIOD_CODE1);
-diff --git a/tests/rtl8139-test.c b/tests/rtl8139-test.c
-index 1741f0ec47..d123245108 100644
---- a/tests/rtl8139-test.c
-+++ b/tests/rtl8139-test.c
-@@ -84,7 +84,7 @@ static void test_timer(void)
-         fatal("time too big %u\n", curr);
+-    msr = inb(FLOPPY_BASE + reg_msr);
++    msr = inb(global_qtest, FLOPPY_BASE + reg_msr);
+     if (!get_irq(global_qtest, FLOPPY_IRQ)) {
+         assert_bit_set(msr, BUSY);
+         assert_bit_clear(msr, RQM);
+@@ -470,7 +470,7 @@ static void test_read_id(void)
+         clock_step(global_qtest, 1000000000LL / 50);
      }
-     for (cnt = 0; ; ) {
--        clock_step(1 * NANOSECONDS_PER_SECOND);
-+        clock_step(global_qtest, 1 * NANOSECONDS_PER_SECOND);
-         prev = curr;
-         curr = in_Timer();
 
-@@ -106,7 +106,7 @@ static void test_timer(void)
-     /* Test 3. Setting TimerInt to 1 and Timer to 0 get interrupt */
-     out_TimerInt(1);
-     out_Timer(0);
--    clock_step(40);
-+    clock_step(global_qtest, 40);
-     if ((in_IntrStatus() & 0x4000) == 0) {
-         fatal("we should have an interrupt here!\n");
-     }
-@@ -123,7 +123,7 @@ static void test_timer(void)
-     out_IntrStatus(0x4000);
-     curr = in_Timer();
-     out_TimerInt(curr + 0.5 * CLK);
--    clock_step(1 * NANOSECONDS_PER_SECOND);
-+    clock_step(global_qtest, 1 * NANOSECONDS_PER_SECOND);
-     out_Timer(0);
-     if ((in_IntrStatus() & 0x4000) == 0) {
-         fatal("we should have an interrupt here!\n");
-@@ -135,7 +135,7 @@ static void test_timer(void)
-     out_IntrStatus(0x4000);
-     curr = in_Timer();
-     out_TimerInt(curr + 0.5 * CLK);
--    clock_step(1 * NANOSECONDS_PER_SECOND);
-+    clock_step(global_qtest, 1 * NANOSECONDS_PER_SECOND);
-     out_TimerInt(0);
-     if ((in_IntrStatus() & 0x4000) == 0) {
-         fatal("we should have an interrupt here!\n");
-@@ -146,7 +146,7 @@ static void test_timer(void)
-     next = curr + 5.0 * CLK;
-     out_TimerInt(next);
-     for (cnt = 0; ; ) {
--        clock_step(1 * NANOSECONDS_PER_SECOND);
-+        clock_step(global_qtest, 1 * NANOSECONDS_PER_SECOND);
-         prev = curr;
-         curr = in_Timer();
-         diff = (curr-prev) & 0xffffffffu;
-diff --git a/tests/tco-test.c b/tests/tco-test.c
-index b84a50927a..27e982d8ac 100644
---- a/tests/tco-test.c
-+++ b/tests/tco-test.c
-@@ -173,7 +173,7 @@ static void test_tco_timeout(void)
-     set_tco_timeout(&d, ticks);
-     load_tco(&d);
-     start_tco(&d);
--    clock_step(ticks * TCO_TICK_NSEC);
-+    clock_step(global_qtest, ticks * TCO_TICK_NSEC);
+-    msr = inb(FLOPPY_BASE + reg_msr);
++    msr = inb(global_qtest, FLOPPY_BASE + reg_msr);
+     assert_bit_set(msr, BUSY | RQM | DIO);
 
-     /* test first timeout */
-     val = qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS);
-@@ -188,7 +188,7 @@ static void test_tco_timeout(void)
+     st0 = floppy_recv();
+@@ -492,7 +492,8 @@ static void test_read_no_dma_1(void)
+ {
+     uint8_t ret;
+
+-    outb(FLOPPY_BASE + reg_dor, inb(FLOPPY_BASE + reg_dor) & ~0x08);
++    outb(global_qtest, FLOPPY_BASE + reg_dor,
++         inb(global_qtest, FLOPPY_BASE + reg_dor) & ~0x08);
+     send_seek(0);
+     ret = send_read_no_dma_command(1, 0x04);
      g_assert(ret == 0);
+@@ -502,7 +503,8 @@ static void test_read_no_dma_18(void)
+ {
+     uint8_t ret;
 
-     /* test second timeout */
--    clock_step(ticks * TCO_TICK_NSEC);
-+    clock_step(global_qtest, ticks * TCO_TICK_NSEC);
-     val = qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS);
-     ret = val & TCO_TIMEOUT ? 1 : 0;
-     g_assert(ret == 1);
-@@ -217,14 +217,14 @@ static void test_tco_max_timeout(void)
-     set_tco_timeout(&d, ticks);
-     load_tco(&d);
-     start_tco(&d);
--    clock_step(((ticks & TCO_TMR_MASK) - 1) * TCO_TICK_NSEC);
-+    clock_step(global_qtest, ((ticks & TCO_TMR_MASK) - 1) * TCO_TICK_NSEC);
-
-     val = qpci_io_readw(d.dev, d.tco_io_bar, TCO_RLD);
-     g_assert_cmpint(val & TCO_RLD_MASK, ==, 1);
-     val = qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS);
-     ret = val & TCO_TIMEOUT ? 1 : 0;
+-    outb(FLOPPY_BASE + reg_dor, inb(FLOPPY_BASE + reg_dor) & ~0x08);
++    outb(global_qtest, FLOPPY_BASE + reg_dor,
++         inb(global_qtest, FLOPPY_BASE + reg_dor) & ~0x08);
+     send_seek(0);
+     ret = send_read_no_dma_command(18, 0x04);
      g_assert(ret == 0);
--    clock_step(TCO_TICK_NSEC);
-+    clock_step(global_qtest, TCO_TICK_NSEC);
-     val = qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS);
-     ret = val & TCO_TIMEOUT ? 1 : 0;
-     g_assert(ret == 1);
-@@ -260,7 +260,7 @@ static void test_tco_second_timeout_pause(void)
-     set_tco_timeout(&td, TCO_SECS_TO_TICKS(16));
-     load_tco(&td);
-     start_tco(&td);
--    clock_step(ticks * TCO_TICK_NSEC * 2);
-+    clock_step(global_qtest, ticks * TCO_TICK_NSEC * 2);
-     ad = get_watchdog_action();
-     g_assert(!strcmp(qdict_get_str(ad, "action"), "pause"));
-     QDECREF(ad);
-@@ -285,7 +285,7 @@ static void test_tco_second_timeout_reset(void)
-     set_tco_timeout(&td, TCO_SECS_TO_TICKS(16));
-     load_tco(&td);
-     start_tco(&td);
--    clock_step(ticks * TCO_TICK_NSEC * 2);
-+    clock_step(global_qtest, ticks * TCO_TICK_NSEC * 2);
-     ad = get_watchdog_action();
-     g_assert(!strcmp(qdict_get_str(ad, "action"), "reset"));
-     QDECREF(ad);
-@@ -310,7 +310,7 @@ static void test_tco_second_timeout_shutdown(void)
-     set_tco_timeout(&td, ticks);
-     load_tco(&td);
-     start_tco(&td);
--    clock_step(ticks * TCO_TICK_NSEC * 2);
-+    clock_step(global_qtest, ticks * TCO_TICK_NSEC * 2);
-     ad = get_watchdog_action();
-     g_assert(!strcmp(qdict_get_str(ad, "action"), "shutdown"));
-     QDECREF(ad);
-@@ -335,7 +335,7 @@ static void test_tco_second_timeout_none(void)
-     set_tco_timeout(&td, ticks);
-     load_tco(&td);
-     start_tco(&td);
--    clock_step(ticks * TCO_TICK_NSEC * 2);
-+    clock_step(global_qtest, ticks * TCO_TICK_NSEC * 2);
-     ad = get_watchdog_action();
-     g_assert(!strcmp(qdict_get_str(ad, "action"), "none"));
-     QDECREF(ad);
-@@ -364,7 +364,7 @@ static void test_tco_ticks_counter(void)
-     do {
-         rld = qpci_io_readw(d.dev, d.tco_io_bar, TCO_RLD) & TCO_RLD_MASK;
-         g_assert_cmpint(rld, ==, ticks);
--        clock_step(TCO_TICK_NSEC);
-+        clock_step(global_qtest, TCO_TICK_NSEC);
-         ticks--;
-     } while (!(qpci_io_readw(d.dev, d.tco_io_bar, TCO1_STS) & TCO_TIMEOUT));
+@@ -512,7 +514,8 @@ static void test_read_no_dma_19(void)
+ {
+     uint8_t ret;
 
-@@ -407,7 +407,7 @@ static void test_tco1_status_bits(void)
-     set_tco_timeout(&d, ticks);
-     load_tco(&d);
-     start_tco(&d);
--    clock_step(ticks * TCO_TICK_NSEC);
-+    clock_step(global_qtest, ticks * TCO_TICK_NSEC);
+-    outb(FLOPPY_BASE + reg_dor, inb(FLOPPY_BASE + reg_dor) & ~0x08);
++    outb(global_qtest, FLOPPY_BASE + reg_dor,
++         inb(global_qtest, FLOPPY_BASE + reg_dor) & ~0x08);
+     send_seek(0);
+     ret = send_read_no_dma_command(19, 0x20);
+     g_assert(ret == 0);
+@@ -537,8 +540,8 @@ static void fuzz_registers(void)
+         reg = (uint8_t)g_test_rand_int_range(0, 8);
+         val = (uint8_t)g_test_rand_int_range(0, 256);
 
-     qpci_io_writeb(d.dev, d.tco_io_bar, TCO_DAT_IN, 0);
-     qpci_io_writeb(d.dev, d.tco_io_bar, TCO_DAT_OUT, 0);
-@@ -436,7 +436,7 @@ static void test_tco2_status_bits(void)
-     set_tco_timeout(&d, ticks);
-     load_tco(&d);
-     start_tco(&d);
--    clock_step(ticks * TCO_TICK_NSEC * 2);
-+    clock_step(global_qtest, ticks * TCO_TICK_NSEC * 2);
-
-     val = qpci_io_readw(d.dev, d.tco_io_bar, TCO2_STS);
-     ret = val & (TCO_SECOND_TO_STS | TCO_BOOT_STS) ? 1 : 0;
-diff --git a/tests/test-arm-mptimer.c b/tests/test-arm-mptimer.c
-index 9631c55fe3..0e6484a4a8 100644
---- a/tests/test-arm-mptimer.c
-+++ b/tests/test-arm-mptimer.c
-@@ -14,7 +14,8 @@
- #define TIMER_BLOCK_SCALE(s)    ((((s) & 0xff) + 1) * 10)
-
- #define TIMER_BLOCK_STEP(scaler, steps_nb) \
--    clock_step(TIMER_BLOCK_SCALE(scaler) * (int64_t)(steps_nb) + 1)
-+    clock_step(global_qtest, \
-+               TIMER_BLOCK_SCALE(scaler) * (int64_t)(steps_nb) + 1)
-
- #define TIMER_BASE_PHYS 0x1e000600
-
-@@ -185,12 +186,14 @@ static void test_timer_periodic(gconstpointer arg)
-     timer_start(PERIODIC, scaler);
-
-     while (repeat--) {
--        clock_step(TIMER_BLOCK_SCALE(scaler) * (101 + repeat) + 1);
-+        clock_step(global_qtest,
-+                   TIMER_BLOCK_SCALE(scaler) * (101 + repeat) + 1);
-
-         g_assert_cmpuint(timer_counter(), ==, 100 - repeat);
-         g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 1);
-
--        clock_step(TIMER_BLOCK_SCALE(scaler) * (101 - repeat) - 1);
-+        clock_step(global_qtest,
-+                   TIMER_BLOCK_SCALE(scaler) * (101 - repeat) - 1);
+-        outb(FLOPPY_BASE + reg, val);
+-        inb(FLOPPY_BASE + reg);
++        outb(global_qtest, FLOPPY_BASE + reg, val);
++        inb(global_qtest, FLOPPY_BASE + reg);
      }
  }
 
-@@ -686,10 +689,10 @@ static void test_periodic_counter(gconstpointer arg)
-     timer_load(test_load);
-     timer_start(PERIODIC, scaler);
+diff --git a/tests/hd-geo-test.c b/tests/hd-geo-test.c
+index 406eea3c56..98e6621e6c 100644
+--- a/tests/hd-geo-test.c
++++ b/tests/hd-geo-test.c
+@@ -82,8 +82,8 @@ static void test_cmos_byte(int reg, int expected)
+     enum { cmos_base = 0x70 };
+     int actual;
 
--    clock_step(1);
-+    clock_step(global_qtest, 1);
+-    outb(cmos_base + 0, reg);
+-    actual = inb(cmos_base + 1);
++    outb(global_qtest, cmos_base + 0, reg);
++    actual = inb(global_qtest, cmos_base + 1);
+     g_assert(actual == expected);
+ }
 
-     for (test_val = 0; test_val <= test_load; test_val++) {
--        clock_step(TIMER_BLOCK_SCALE(scaler) * test_load);
-+        clock_step(global_qtest, TIMER_BLOCK_SCALE(scaler) * test_load);
-         g_assert_cmpint(timer_counter(), ==, test_val);
+diff --git a/tests/ipmi-bt-test.c b/tests/ipmi-bt-test.c
+index f80a9a83c9..e25819fd4f 100644
+--- a/tests/ipmi-bt-test.c
++++ b/tests/ipmi-bt-test.c
+@@ -66,32 +66,32 @@ static int bt_ints_enabled;
+
+ static uint8_t bt_get_ctrlreg(void)
+ {
+-    return inb(IPMI_BT_BASE);
++    return inb(global_qtest, IPMI_BT_BASE);
+ }
+
+ static void bt_write_ctrlreg(uint8_t val)
+ {
+-    outb(IPMI_BT_BASE, val);
++    outb(global_qtest, IPMI_BT_BASE, val);
+ }
+
+ static uint8_t bt_get_buf(void)
+ {
+-    return inb(IPMI_BT_BASE + 1);
++    return inb(global_qtest, IPMI_BT_BASE + 1);
+ }
+
+ static void bt_write_buf(uint8_t val)
+ {
+-    outb(IPMI_BT_BASE + 1, val);
++    outb(global_qtest, IPMI_BT_BASE + 1, val);
+ }
+
+ static uint8_t bt_get_irqreg(void)
+ {
+-    return inb(IPMI_BT_BASE + 2);
++    return inb(global_qtest, IPMI_BT_BASE + 2);
+ }
+
+ static void bt_write_irqreg(uint8_t val)
+ {
+-    outb(IPMI_BT_BASE + 2, val);
++    outb(global_qtest, IPMI_BT_BASE + 2, val);
+ }
+
+ static void bt_wait_b_busy(void)
+diff --git a/tests/ipmi-kcs-test.c b/tests/ipmi-kcs-test.c
+index ddad8dd22f..d27b9de185 100644
+--- a/tests/ipmi-kcs-test.c
++++ b/tests/ipmi-kcs-test.c
+@@ -52,22 +52,22 @@ static int kcs_ints_enabled;
+
+ static uint8_t kcs_get_cmdreg(void)
+ {
+-    return inb(IPMI_KCS_BASE + 1);
++    return inb(global_qtest, IPMI_KCS_BASE + 1);
+ }
+
+ static void kcs_write_cmdreg(uint8_t val)
+ {
+-    outb(IPMI_KCS_BASE + 1, val);
++    outb(global_qtest, IPMI_KCS_BASE + 1, val);
+ }
+
+ static uint8_t kcs_get_datareg(void)
+ {
+-    return inb(IPMI_KCS_BASE);
++    return inb(global_qtest, IPMI_KCS_BASE);
+ }
+
+ static void kcs_write_datareg(uint8_t val)
+ {
+-    outb(IPMI_KCS_BASE, val);
++    outb(global_qtest, IPMI_KCS_BASE, val);
+ }
+
+ static void kcs_wait_ibf(void)
+diff --git a/tests/libqos/fw_cfg.c b/tests/libqos/fw_cfg.c
+index d0889d1e22..157d5190c6 100644
+--- a/tests/libqos/fw_cfg.c
++++ b/tests/libqos/fw_cfg.c
+@@ -83,7 +83,7 @@ QFWCFG *mm_fw_cfg_init(QTestState *qts, uint64_t base)
+
+ static void io_fw_cfg_select(QFWCFG *fw_cfg, uint16_t key)
+ {
+-    qtest_outw(fw_cfg->qts, fw_cfg->base, key);
++    outw(fw_cfg->qts, fw_cfg->base, key);
+ }
+
+ static void io_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
+@@ -92,7 +92,7 @@ static void io_fw_cfg_read(QFWCFG *fw_cfg, void *data, size_t len)
+     int i;
+
+     for (i = 0; i < len; i++) {
+-        ptr[i] = qtest_inb(fw_cfg->qts, fw_cfg->base + 1);
++        ptr[i] = inb(fw_cfg->qts, fw_cfg->base + 1);
      }
  }
-@@ -783,7 +786,7 @@ again:
-     timer_reset();
-     timer_start(mode, 255);
 
--    clock_step(100);
-+    clock_step(global_qtest, 100);
+diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+index e5af083f0c..4d8329bef0 100644
+--- a/tests/libqos/pci-pc.c
++++ b/tests/libqos/pci-pc.c
+@@ -26,44 +26,44 @@ typedef struct QPCIBusPC
 
-     g_assert_cmpuint(timer_counter(), ==, 0);
+ static uint8_t qpci_pc_pio_readb(QPCIBus *bus, uint32_t addr)
+ {
+-    return qtest_inb(bus->qts, addr);
++    return inb(bus->qts, addr);
+ }
 
-@@ -795,7 +798,7 @@ again:
-     timer_load(2);
-     timer_start(mode, 255);
+ static void qpci_pc_pio_writeb(QPCIBus *bus, uint32_t addr, uint8_t val)
+ {
+-    qtest_outb(bus->qts, addr, val);
++    outb(bus->qts, addr, val);
+ }
 
--    clock_step(100);
-+    clock_step(global_qtest, 100);
+ static uint16_t qpci_pc_pio_readw(QPCIBus *bus, uint32_t addr)
+ {
+-    return qtest_inw(bus->qts, addr);
++    return inw(bus->qts, addr);
+ }
 
-     g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 0);
+ static void qpci_pc_pio_writew(QPCIBus *bus, uint32_t addr, uint16_t val)
+ {
+-    qtest_outw(bus->qts, addr, val);
++    outw(bus->qts, addr, val);
+ }
 
-@@ -811,13 +814,13 @@ again:
-     timer_load(UINT32_MAX);
-     timer_start(mode, 255);
+ static uint32_t qpci_pc_pio_readl(QPCIBus *bus, uint32_t addr)
+ {
+-    return qtest_inl(bus->qts, addr);
++    return inl(bus->qts, addr);
+ }
 
--    clock_step(100);
-+    clock_step(global_qtest, 100);
+ static void qpci_pc_pio_writel(QPCIBus *bus, uint32_t addr, uint32_t val)
+ {
+-    qtest_outl(bus->qts, addr, val);
++    outl(bus->qts, addr, val);
+ }
 
-     g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 0);
+ static uint64_t qpci_pc_pio_readq(QPCIBus *bus, uint32_t addr)
+ {
+-    return (uint64_t)qtest_inl(bus->qts, addr) +
+-        ((uint64_t)qtest_inl(bus->qts, addr + 4) << 32);
++    return (uint64_t)inl(bus->qts, addr) +
++        ((uint64_t)inl(bus->qts, addr + 4) << 32);
+ }
 
-     timer_set_counter(0);
+ static void qpci_pc_pio_writeq(QPCIBus *bus, uint32_t addr, uint64_t val)
+ {
+-    qtest_outl(bus->qts, addr, val & 0xffffffff);
+-    qtest_outl(bus->qts, addr + 4, val >> 32);
++    outl(bus->qts, addr, val & 0xffffffff);
++    outl(bus->qts, addr + 4, val >> 32);
+ }
 
--    clock_step(100);
-+    clock_step(global_qtest, 100);
+ static void qpci_pc_memread(QPCIBus *bus, uint32_t addr, void *buf, size_t len)
+@@ -79,38 +79,38 @@ static void qpci_pc_memwrite(QPCIBus *bus, uint32_t addr,
 
-     g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 0);
+ static uint8_t qpci_pc_config_readb(QPCIBus *bus, int devfn, uint8_t offset)
+ {
+-    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
+-    return qtest_inb(bus->qts, 0xcfc);
++    outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
++    return inb(bus->qts, 0xcfc);
+ }
 
-@@ -829,13 +832,13 @@ again:
-     timer_load(UINT32_MAX);
-     timer_start(mode, 255);
+ static uint16_t qpci_pc_config_readw(QPCIBus *bus, int devfn, uint8_t offset)
+ {
+-    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
+-    return qtest_inw(bus->qts, 0xcfc);
++    outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
++    return inw(bus->qts, 0xcfc);
+ }
 
--    clock_step(100);
-+    clock_step(global_qtest, 100);
+ static uint32_t qpci_pc_config_readl(QPCIBus *bus, int devfn, uint8_t offset)
+ {
+-    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
+-    return qtest_inl(bus->qts, 0xcfc);
++    outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
++    return inl(bus->qts, 0xcfc);
+ }
 
-     g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 0);
+ static void qpci_pc_config_writeb(QPCIBus *bus, int devfn, uint8_t offset, uint8_t value)
+ {
+-    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
+-    qtest_outb(bus->qts, 0xcfc, value);
++    outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
++    outb(bus->qts, 0xcfc, value);
+ }
 
-     timer_load(0);
+ static void qpci_pc_config_writew(QPCIBus *bus, int devfn, uint8_t offset, uint16_t value)
+ {
+-    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
+-    qtest_outw(bus->qts, 0xcfc, value);
++    outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
++    outw(bus->qts, 0xcfc, value);
+ }
 
--    clock_step(100);
-+    clock_step(global_qtest, 100);
+ static void qpci_pc_config_writel(QPCIBus *bus, int devfn, uint8_t offset, uint32_t value)
+ {
+-    qtest_outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
+-    qtest_outl(bus->qts, 0xcfc, value);
++    outl(bus->qts, 0xcf8, (1U << 31) | (devfn << 8) | offset);
++    outl(bus->qts, 0xcfc, value);
+ }
 
-     g_assert_cmpuint(timer_get_and_clr_int_sts(), ==, 0);
+ QPCIBus *qpci_init_pc(QTestState *qts, QGuestAllocator *alloc)
+diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
+index d3ee21fdfd..aac42dc3d9 100644
+--- a/tests/libqos/pci.c
++++ b/tests/libqos/pci.c
+@@ -426,7 +426,7 @@ void qpci_unplug_device_test(QTestState *qts, const char *id, uint8_t slot)
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
 
+-    qtest_outb(qts, ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
++    outb(qts, ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
+
+     qtest_qmp_eventwait(qts, "DEVICE_DELETED");
+ }
+diff --git a/tests/m48t59-test.c b/tests/m48t59-test.c
+index aadd770f4f..7ef3e2d26a 100644
+--- a/tests/m48t59-test.c
++++ b/tests/m48t59-test.c
+@@ -44,14 +44,14 @@ static void cmos_write_mmio(uint8_t reg, uint8_t val)
+
+ static uint8_t cmos_read_ioio(uint8_t reg)
+ {
+-    outw(base + 0, reg_base + (uint16_t)reg);
+-    return inb(base + 3);
++    outw(global_qtest, base + 0, reg_base + (uint16_t)reg);
++    return inb(global_qtest, base + 3);
+ }
+
+ static void cmos_write_ioio(uint8_t reg, uint8_t val)
+ {
+-    outw(base + 0, reg_base + (uint16_t)reg);
+-    outb(base + 3, val);
++    outw(global_qtest, base + 0, reg_base + (uint16_t)reg);
++    outb(global_qtest, base + 3, val);
+ }
+
+ static uint8_t cmos_read(uint8_t reg)
+diff --git a/tests/multiboot/libc.c b/tests/multiboot/libc.c
+index 6df9bda96d..bf02987c5e 100644
+--- a/tests/multiboot/libc.c
++++ b/tests/multiboot/libc.c
+@@ -36,7 +36,7 @@ void* memcpy(void *dest, const void *src, int n)
+
+ static void print_char(char c)
+ {
+-    outb(0xe9, c);
++    outb(global_qtest, 0xe9, c);
+ }
+
+ static void print_str(char *s)
+diff --git a/tests/pvpanic-test.c b/tests/pvpanic-test.c
+index c09b3ddac6..6dce9e368a 100644
+--- a/tests/pvpanic-test.c
++++ b/tests/pvpanic-test.c
+@@ -15,10 +15,10 @@ static void test_panic(void)
+     uint8_t val;
+     QDict *response, *data;
+
+-    val = inb(0x505);
++    val = inb(global_qtest, 0x505);
+     g_assert_cmpuint(val, ==, 1);
+
+-    outb(0x505, 0x1);
++    outb(global_qtest, 0x505, 0x1);
+
+     response = qmp_receive();
+     g_assert(qdict_haskey(response, "event"));
+diff --git a/tests/rtc-test.c b/tests/rtc-test.c
+index 8ff201993e..aea7eaec9f 100644
+--- a/tests/rtc-test.c
++++ b/tests/rtc-test.c
+@@ -28,14 +28,14 @@ static int bcd2dec(int value)
+
+ static uint8_t cmos_read(uint8_t reg)
+ {
+-    outb(base + 0, reg);
+-    return inb(base + 1);
++    outb(global_qtest, base + 0, reg);
++    return inb(global_qtest, base + 1);
+ }
+
+ static void cmos_write(uint8_t reg, uint8_t val)
+ {
+-    outb(base + 0, reg);
+-    outb(base + 1, val);
++    outb(global_qtest, base + 0, reg);
++    outb(global_qtest, base + 1, val);
+ }
+
+ static int tm_cmp(struct tm *lhs, struct tm *rhs)
 diff --git a/tests/wdt_ib700-test.c b/tests/wdt_ib700-test.c
-index a169265e16..05690e5159 100644
+index 5ce8f4a08a..b2ff95bfd7 100644
 --- a/tests/wdt_ib700-test.c
 +++ b/tests/wdt_ib700-test.c
-@@ -22,29 +22,29 @@ static QDict *ib700_program_and_wait(QTestState *s)
- {
-     QDict *event, *data;
-
--    qtest_clock_step(s, NANOSECONDS_PER_SECOND * 40);
-+    clock_step(s, NANOSECONDS_PER_SECOND * 40);
+@@ -26,22 +26,22 @@ static QDict *ib700_program_and_wait(QTestState *s)
      qmp_check_no_event(s);
 
      /* 2 second limit */
-     qtest_outb(s, 0x443, 14);
+-    qtest_outb(s, 0x443, 14);
++    outb(s, 0x443, 14);
 
      /* Ping */
--    qtest_clock_step(s, NANOSECONDS_PER_SECOND);
-+    clock_step(s, NANOSECONDS_PER_SECOND);
+     clock_step(s, NANOSECONDS_PER_SECOND);
      qmp_check_no_event(s);
-     qtest_outb(s, 0x443, 14);
+-    qtest_outb(s, 0x443, 14);
++    outb(s, 0x443, 14);
 
      /* Disable */
--    qtest_clock_step(s, NANOSECONDS_PER_SECOND);
-+    clock_step(s, NANOSECONDS_PER_SECOND);
+     clock_step(s, NANOSECONDS_PER_SECOND);
      qmp_check_no_event(s);
-     qtest_outb(s, 0x441, 1);
--    qtest_clock_step(s, 3 * NANOSECONDS_PER_SECOND);
-+    clock_step(s, 3 * NANOSECONDS_PER_SECOND);
+-    qtest_outb(s, 0x441, 1);
++    outb(s, 0x441, 1);
+     clock_step(s, 3 * NANOSECONDS_PER_SECOND);
      qmp_check_no_event(s);
 
      /* Enable and let it fire */
-     qtest_outb(s, 0x443, 13);
--    qtest_clock_step(s, 3 * NANOSECONDS_PER_SECOND);
-+    clock_step(s, 3 * NANOSECONDS_PER_SECOND);
+-    qtest_outb(s, 0x443, 13);
++    outb(s, 0x443, 13);
+     clock_step(s, 3 * NANOSECONDS_PER_SECOND);
      qmp_check_no_event(s);
--    qtest_clock_step(s, 2 * NANOSECONDS_PER_SECOND);
-+    clock_step(s, 2 * NANOSECONDS_PER_SECOND);
-     event = qtest_qmp_eventwait_ref(s, "WATCHDOG");
-     data = qdict_get_qdict(event, "data");
-     QINCREF(data);
+     clock_step(s, 2 * NANOSECONDS_PER_SECOND);
 -- 
 2.13.5
