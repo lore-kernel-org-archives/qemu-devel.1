@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57909)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1drS4P-0006XW-LV
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:00:30 -0400
+	(envelope-from <bounces@canonical.com>) id 1drS5X-0007Wn-06
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:01:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1drS4O-0007LH-JJ
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:00:25 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46288)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1drS4O-0007L9-AR
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:00:24 -0400
-Date: Mon, 11 Sep 2017 18:00:03 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170911170002.GD2150@work-vm>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-8-dgilbert@redhat.com>
-	<20170829060206.GU14174@pxdev.xzpeter.org>
+	(envelope-from <bounces@canonical.com>) id 1drS5T-0007jB-UM
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:01:35 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50481)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1drS5T-0007iD-Oe
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:01:31 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1drS5R-0007k6-R3
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 17:01:30 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8033B2E84A5
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 17:01:29 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170829060206.GU14174@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC v2 07/32] postcopy: Add notifier chain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 Sep 2017 16:53:50 -0000
+From: Daniel Berrange <1716028@bugs.launchpad.net>
+Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
+Message-Id: <150514883069.31851.12414351275626495298.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
+ feature flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,180 +37,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
+To: qemu-devel@nongnu.org
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Thu, Aug 24, 2017 at 08:27:05PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Add a notifier chain for postcopy with a 'reason' flag
-> > and an opportunity for a notifier member to return an error.
-> > 
-> > Call it when enabling postcopy.
-> > 
-> > This will initially used to enable devices to declare they're unable
-> > to postcopy and later to notify of devices of stages within postcopy.
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
-> >  migration/postcopy-ram.c | 41 +++++++++++++++++++++++++++++++++++++++++
-> >  migration/postcopy-ram.h | 26 ++++++++++++++++++++++++++
-> >  vl.c                     |  2 ++
-> >  3 files changed, 69 insertions(+)
-> > 
-> > diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-> > index 640b72d86d..95007c00ef 100644
-> > --- a/migration/postcopy-ram.c
-> > +++ b/migration/postcopy-ram.c
-> > @@ -23,6 +23,8 @@
-> >  #include "savevm.h"
-> >  #include "postcopy-ram.h"
-> >  #include "ram.h"
-> > +#include "qapi/error.h"
-> > +#include "qemu/notify.h"
-> >  #include "sysemu/sysemu.h"
-> >  #include "sysemu/balloon.h"
-> >  #include "qemu/error-report.h"
-> > @@ -45,6 +47,38 @@ struct PostcopyDiscardState {
-> >      unsigned int nsentcmds;
-> >  };
-> >  
-> > +/* A notifier chain for postcopy
-> > + * The notifier should return 0 if it's OK, or a
-> > + * -errno on error.
-> > + * The notifier should expect an Error ** as it's data
-> 
-> "PostcopyNotifyData *" but not "Error **"?
+Having a single QEMU process open the same qcow2 file twice is just as
+dangerous as having two separate QEMU processes open the same qcow2 file
+concurrently. In both cases you have qcow2 state cached in a
+BlockDriverState and nothing is able to invalidate the cache in the
+other BlockDriverState.  So short-circuiting locking if the current pid
+matches would be wrong.
 
-Ah well spotted.
+-- =
 
-> Maybe we can just remove this block of comment since there is a
-> similar one in the header below.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716028
 
-Yes, that's what I've done.
+Title:
+  qemu 2.10 locks images with no feature flag
 
-> Besides:
-> 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  New
 
-Thanks.
+Bug description:
+  1) % lsb_release -rd
+  Description:	Ubuntu Artful Aardvark (development branch)
+  Release:	17.10
 
-Dave
+  2) % apt-cache policy qemu-system-x86
+  qemu-system-x86:
+    Installed: 1:2.10~rc3+dfsg-0ubuntu1
+    Candidate: 1:2.10+dfsg-0ubuntu1
+    Version table:
+       1:2.10+dfsg-0ubuntu1 500
+          500 http://archive.ubuntu.com//ubuntu devel/main amd64 Packages
+   *** 1:2.10~rc3+dfsg-0ubuntu1 100
+          100 /var/lib/dpkg/status
 
-> 
-> > + */
-> > +static NotifierWithReturnList postcopy_notifier_list;
-> > +
-> > +void postcopy_infrastructure_init(void)
-> > +{
-> > +    notifier_with_return_list_init(&postcopy_notifier_list);
-> > +}
-> > +
-> > +void postcopy_add_notifier(NotifierWithReturn *nn)
-> > +{
-> > +    notifier_with_return_list_add(&postcopy_notifier_list, nn);
-> > +}
-> > +
-> > +void postcopy_remove_notifier(NotifierWithReturn *n)
-> > +{
-> > +    notifier_with_return_remove(n);
-> > +}
-> > +
-> > +int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp)
-> > +{
-> > +    struct PostcopyNotifyData pnd;
-> > +    pnd.reason = reason;
-> > +    pnd.errp = errp;
-> > +
-> > +    return notifier_with_return_list_notify(&postcopy_notifier_list,
-> > +                                            &pnd);
-> > +}
-> > +
-> >  /* Postcopy needs to detect accesses to pages that haven't yet been copied
-> >   * across, and efficiently map new pages in, the techniques for doing this
-> >   * are target OS specific.
-> > @@ -133,6 +167,7 @@ bool postcopy_ram_supported_by_host(void)
-> >      struct uffdio_register reg_struct;
-> >      struct uffdio_range range_struct;
-> >      uint64_t feature_mask;
-> > +    Error *local_err = NULL;
-> >  
-> >      if (qemu_target_page_size() > pagesize) {
-> >          error_report("Target page size bigger than host page size");
-> > @@ -146,6 +181,12 @@ bool postcopy_ram_supported_by_host(void)
-> >          goto out;
-> >      }
-> >  
-> > +    /* Give devices a chance to object */
-> > +    if (postcopy_notify(POSTCOPY_NOTIFY_PROBE, &local_err)) {
-> > +        error_report_err(local_err);
-> > +        goto out;
-> > +    }
-> > +
-> >      /* Version and features check */
-> >      if (!ufd_version_check(ufd)) {
-> >          goto out;
-> > diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
-> > index 78a3591322..d688411674 100644
-> > --- a/migration/postcopy-ram.h
-> > +++ b/migration/postcopy-ram.h
-> > @@ -114,4 +114,30 @@ PostcopyState postcopy_state_get(void);
-> >  /* Set the state and return the old state */
-> >  PostcopyState postcopy_state_set(PostcopyState new_state);
-> >  
-> > +/*
-> > + * To be called once at the start before any device initialisation
-> > + */
-> > +void postcopy_infrastructure_init(void);
-> > +
-> > +/* Add a notifier to a list to be called when checking whether the devices
-> > + * can support postcopy.
-> > + * It's data is a *PostcopyNotifyData
-> > + * It should return 0 if OK, or a negative value on failure.
-> > + * On failure it must set the data->errp to an error.
-> > + *
-> > + */
-> > +enum PostcopyNotifyReason {
-> > +    POSTCOPY_NOTIFY_PROBE = 0,
-> > +};
-> > +
-> > +struct PostcopyNotifyData {
-> > +    enum PostcopyNotifyReason reason;
-> > +    Error **errp;
-> > +};
-> > +
-> > +void postcopy_add_notifier(NotifierWithReturn *nn);
-> > +void postcopy_remove_notifier(NotifierWithReturn *n);
-> > +/* Call the notifier list set by postcopy_add_start_notifier */
-> > +int postcopy_notify(enum PostcopyNotifyReason reason, Error **errp);
-> > +
-> >  #endif
-> > diff --git a/vl.c b/vl.c
-> > index 8e247cc2a2..65dd9dc324 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -95,6 +95,7 @@ int main(int argc, char **argv)
-> >  #include "audio/audio.h"
-> >  #include "sysemu/cpus.h"
-> >  #include "migration/colo.h"
-> > +#include "migration/postcopy-ram.h"
-> >  #include "sysemu/kvm.h"
-> >  #include "sysemu/hax.h"
-> >  #include "qapi/qobject-input-visitor.h"
-> > @@ -3082,6 +3083,7 @@ int main(int argc, char **argv, char **envp)
-> >      module_call_init(MODULE_INIT_OPTS);
-> >  
-> >      runstate_init();
-> > +    postcopy_infrastructure_init();
-> >  
-> >      if (qcrypto_init(&err) < 0) {
-> >          error_reportf_err(err, "cannot initialize crypto: ");
-> > -- 
-> > 2.13.5
-> > 
-> 
-> -- 
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+  3) qemu locks image files with no way to discover this feature nor how
+  to disable it
+
+  4) qemu provides a way to query if it supports image locking, and what
+  the default value is, and how to disable the locking via cli
+
+  qemu 2.10 now will lock image files and warn if an image is currently
+  locked.  This prevent qemu from running (and possibly corrupting said
+  image).
+
+  However, qemu does not provide any way to determine if a qemu binary
+  actually has this capability.  Normally behavior changing features are
+  exposed via some change to the qemu help menu or QMP/QAPI output of
+  capabilities.
+
+  I believe this slipped through since libvirt already does image
+  locking, but direct cli users will be caught by this change.
+
+  In particular, we have a use-case where we simulate multipath disks by
+  creating to disks which point to the same file which now breaks
+  without adding the 'file.locking=3Doff' to the -drive parameters;  which
+  is also completely undocumented and unexposed.
+
+  Some parts of the cli like -device allow querying of settable options
+  (qemu-system-x86 -device scsi_hd,?)  but nothing equivalent exists for
+  -drive parameters.
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 17.10
+  Package: qemu-system-x86 1:2.10~rc3+dfsg-0ubuntu1
+  ProcVersionSignature: Ubuntu 4.12.0-11.12-generic 4.12.5
+  Uname: Linux 4.12.0-11-generic x86_64
+  NonfreeKernelModules: zfs zunicode zavl zcommon znvpair
+  ApportVersion: 2.20.6-0ubuntu7
+  Architecture: amd64
+  Date: Fri Sep  8 12:56:53 2017
+  JournalErrors:
+   Hint: You are currently not seeing messages from other users and the sys=
+tem.
+         Users in groups 'adm', 'systemd-journal' can see all messages.
+         Pass -q to turn off this notice.
+   -- Logs begin at Mon 2017-01-30 11:56:02 CST, end at Fri 2017-09-08 12:5=
+6:46 CDT. --
+   -- No entries --
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: HP ProLiant DL360 Gen9
+  ProcEnviron:
+   TERM=3Dxterm
+   PATH=3D(custom, no user)
+   XDG_RUNTIME_DIR=3D<set>
+   LANG=3Den_US.UTF-8
+   SHELL=3D/bin/bash
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.12.0-11-generic root=3DUUID=3D=
+45354276-e0c0-4bf6-9083-f130b89411cc ro --- console=3DttyS1,115200
+  SourcePackage: qemu
+  UpgradeStatus: No upgrade log present (probably fresh install)
+  dmi.bios.date: 03/05/2015
+  dmi.bios.vendor: HP
+  dmi.bios.version: P89
+  dmi.chassis.type: 23
+  dmi.chassis.vendor: HP
+  dmi.modalias: dmi:bvnHP:bvrP89:bd03/05/2015:svnHP:pnProLiantDL360Gen9:pvr=
+:cvnHP:ct23:cvr:
+  dmi.product.family: ProLiant
+  dmi.product.name: ProLiant DL360 Gen9
+  dmi.sys.vendor: HP
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716028/+subscriptions
