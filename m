@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43170)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drMYr-0005k1-K4
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:33 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drMYs-0005kK-0z
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1drMYl-0006Y4-NE
+	(envelope-from <marcandre.lureau@redhat.com>) id 1drMYq-0006dQ-TA
 	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33218)
+Received: from mx1.redhat.com ([209.132.183.28]:35890)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1drMYl-0006Xa-FE
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:23 -0400
+	id 1drMYq-0006co-KL
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 07:07:28 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Mon, 11 Sep 2017 13:05:55 +0200
-Message-Id: <20170911110623.24981-23-marcandre.lureau@redhat.com>
+Date: Mon, 11 Sep 2017 13:05:57 +0200
+Message-Id: <20170911110623.24981-25-marcandre.lureau@redhat.com>
 In-Reply-To: <20170911110623.24981-1-marcandre.lureau@redhat.com>
 References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 22/50] tests: add some enum members tests
+Subject: [Qemu-devel] [PATCH v3 24/50] qapi: add some struct member tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,137 +32,109 @@ Cc: armbru@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@re
 
 Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 ---
- tests/Makefile.include                           | 3 +++
- tests/qapi-schema/enum-dict-member-invalid.err   | 1 +
- tests/qapi-schema/enum-dict-member-invalid.exit  | 1 +
- tests/qapi-schema/enum-dict-member-invalid.json  | 2 ++
- tests/qapi-schema/enum-dict-member-invalid.out   | 0
- tests/qapi-schema/enum-dict-member-invalid2.err  | 1 +
- tests/qapi-schema/enum-dict-member-invalid2.exit | 1 +
- tests/qapi-schema/enum-dict-member-invalid2.json | 2 ++
- tests/qapi-schema/enum-dict-member-invalid2.out  | 0
- tests/qapi-schema/enum-if-invalid.err            | 1 +
- tests/qapi-schema/enum-if-invalid.exit           | 1 +
- tests/qapi-schema/enum-if-invalid.json           | 3 +++
- tests/qapi-schema/enum-if-invalid.out            | 0
- 13 files changed, 16 insertions(+)
- create mode 100644 tests/qapi-schema/enum-dict-member-invalid.err
- create mode 100644 tests/qapi-schema/enum-dict-member-invalid.exit
- create mode 100644 tests/qapi-schema/enum-dict-member-invalid.json
- create mode 100644 tests/qapi-schema/enum-dict-member-invalid.out
- create mode 100644 tests/qapi-schema/enum-dict-member-invalid2.err
- create mode 100644 tests/qapi-schema/enum-dict-member-invalid2.exit
- create mode 100644 tests/qapi-schema/enum-dict-member-invalid2.json
- create mode 100644 tests/qapi-schema/enum-dict-member-invalid2.out
- create mode 100644 tests/qapi-schema/enum-if-invalid.err
- create mode 100644 tests/qapi-schema/enum-if-invalid.exit
- create mode 100644 tests/qapi-schema/enum-if-invalid.json
- create mode 100644 tests/qapi-schema/enum-if-invalid.out
+ tests/Makefile.include                    |  2 ++
+ tests/qapi-schema/struct-if-invalid.err   |  1 +
+ tests/qapi-schema/struct-if-invalid.exit  |  1 +
+ tests/qapi-schema/struct-if-invalid.json  |  3 +++
+ tests/qapi-schema/struct-if-invalid.out   |  0
+ tests/qapi-schema/struct-member-type.err  |  0
+ tests/qapi-schema/struct-member-type.exit |  1 +
+ tests/qapi-schema/struct-member-type.json |  2 ++
+ tests/qapi-schema/struct-member-type.out  | 12 ++++++++++++
+ 9 files changed, 22 insertions(+)
+ create mode 100644 tests/qapi-schema/struct-if-invalid.err
+ create mode 100644 tests/qapi-schema/struct-if-invalid.exit
+ create mode 100644 tests/qapi-schema/struct-if-invalid.json
+ create mode 100644 tests/qapi-schema/struct-if-invalid.out
+ create mode 100644 tests/qapi-schema/struct-member-type.err
+ create mode 100644 tests/qapi-schema/struct-member-type.exit
+ create mode 100644 tests/qapi-schema/struct-member-type.json
+ create mode 100644 tests/qapi-schema/struct-member-type.out
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index a9f0ddbe01..0aa532f029 100644
+index 0aa532f029..44a3d8895e 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -443,6 +443,9 @@ qapi-schema +=3D empty.json
- qapi-schema +=3D enum-bad-name.json
- qapi-schema +=3D enum-bad-prefix.json
- qapi-schema +=3D enum-clash-member.json
-+qapi-schema +=3D enum-dict-member-invalid.json
-+qapi-schema +=3D enum-dict-member-invalid2.json
-+qapi-schema +=3D enum-if-invalid.json
- qapi-schema +=3D enum-int-member.json
- qapi-schema +=3D enum-member-case.json
- qapi-schema +=3D enum-missing-data.json
-diff --git a/tests/qapi-schema/enum-dict-member-invalid.err b/tests/qapi-=
-schema/enum-dict-member-invalid.err
+@@ -520,7 +520,9 @@ qapi-schema +=3D returns-whitelist.json
+ qapi-schema +=3D struct-base-clash-deep.json
+ qapi-schema +=3D struct-base-clash.json
+ qapi-schema +=3D struct-data-invalid.json
++qapi-schema +=3D struct-if-invalid.json
+ qapi-schema +=3D struct-member-invalid.json
++qapi-schema +=3D struct-member-type.json
+ qapi-schema +=3D trailing-comma-list.json
+ qapi-schema +=3D trailing-comma-object.json
+ qapi-schema +=3D type-bypass-bad-gen.json
+diff --git a/tests/qapi-schema/struct-if-invalid.err b/tests/qapi-schema/=
+struct-if-invalid.err
 new file mode 100644
-index 0000000000..d12cca0df3
+index 0000000000..42245262a9
 --- /dev/null
-+++ b/tests/qapi-schema/enum-dict-member-invalid.err
++++ b/tests/qapi-schema/struct-if-invalid.err
 @@ -0,0 +1 @@
-+tests/qapi-schema/enum-dict-member-invalid.json:2: Dictionary member of =
-enum 'MyEnum' must have a 'name' key
-diff --git a/tests/qapi-schema/enum-dict-member-invalid.exit b/tests/qapi=
--schema/enum-dict-member-invalid.exit
++tests/qapi-schema/struct-if-invalid.json:2: Member 'bar' of 'data' for s=
+truct 'TestIfStruct' should be a type name
+diff --git a/tests/qapi-schema/struct-if-invalid.exit b/tests/qapi-schema=
+/struct-if-invalid.exit
 new file mode 100644
 index 0000000000..d00491fd7e
 --- /dev/null
-+++ b/tests/qapi-schema/enum-dict-member-invalid.exit
++++ b/tests/qapi-schema/struct-if-invalid.exit
 @@ -0,0 +1 @@
 +1
-diff --git a/tests/qapi-schema/enum-dict-member-invalid.json b/tests/qapi=
--schema/enum-dict-member-invalid.json
+diff --git a/tests/qapi-schema/struct-if-invalid.json b/tests/qapi-schema=
+/struct-if-invalid.json
 new file mode 100644
-index 0000000000..9cf8406867
+index 0000000000..466cdb61e1
 --- /dev/null
-+++ b/tests/qapi-schema/enum-dict-member-invalid.json
-@@ -0,0 +1,2 @@
-+# we reject any enum member that is not a string or a dict with 'name'
-+{ 'enum': 'MyEnum', 'data': [ { 'value': 'str' } ] }
-diff --git a/tests/qapi-schema/enum-dict-member-invalid.out b/tests/qapi-=
-schema/enum-dict-member-invalid.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/enum-dict-member-invalid2.err b/tests/qapi=
--schema/enum-dict-member-invalid2.err
-new file mode 100644
-index 0000000000..f7dc1a2b33
---- /dev/null
-+++ b/tests/qapi-schema/enum-dict-member-invalid2.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/enum-dict-member-invalid2.json:2: Dictionnary has unkn=
-own keys: bad-key (allowed: name, if)
-diff --git a/tests/qapi-schema/enum-dict-member-invalid2.exit b/tests/qap=
-i-schema/enum-dict-member-invalid2.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/enum-dict-member-invalid2.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/enum-dict-member-invalid2.json b/tests/qap=
-i-schema/enum-dict-member-invalid2.json
-new file mode 100644
-index 0000000000..6664c59201
---- /dev/null
-+++ b/tests/qapi-schema/enum-dict-member-invalid2.json
-@@ -0,0 +1,2 @@
-+# we reject any enum member that is not a string or a dict with 'name'
-+{ 'enum': 'MyEnum', 'data': [ { 'name': 'foo', 'bad-key': 'str' } ] }
-diff --git a/tests/qapi-schema/enum-dict-member-invalid2.out b/tests/qapi=
--schema/enum-dict-member-invalid2.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/enum-if-invalid.err b/tests/qapi-schema/en=
-um-if-invalid.err
-new file mode 100644
-index 0000000000..54c3cf887b
---- /dev/null
-+++ b/tests/qapi-schema/enum-if-invalid.err
-@@ -0,0 +1 @@
-+tests/qapi-schema/enum-if-invalid.json:2: 'if' condition must be a strin=
-g or a list of strings
-diff --git a/tests/qapi-schema/enum-if-invalid.exit b/tests/qapi-schema/e=
-num-if-invalid.exit
-new file mode 100644
-index 0000000000..d00491fd7e
---- /dev/null
-+++ b/tests/qapi-schema/enum-if-invalid.exit
-@@ -0,0 +1 @@
-+1
-diff --git a/tests/qapi-schema/enum-if-invalid.json b/tests/qapi-schema/e=
-num-if-invalid.json
-new file mode 100644
-index 0000000000..60bd0ef1d7
---- /dev/null
-+++ b/tests/qapi-schema/enum-if-invalid.json
++++ b/tests/qapi-schema/struct-if-invalid.json
 @@ -0,0 +1,3 @@
-+# check invalid 'if' type
-+{ 'enum': 'TestIfEnum', 'data':
-+  [ 'foo', { 'name' : 'bar', 'if': { 'val': 'foo' } } ] }
-diff --git a/tests/qapi-schema/enum-if-invalid.out b/tests/qapi-schema/en=
-um-if-invalid.out
++# check missing 'type'
++{ 'struct': 'TestIfStruct', 'data':
++  { 'foo': 'int', 'bar': { 'if': 'defined(TEST_IF_STRUCT_BAR)' } } }
+diff --git a/tests/qapi-schema/struct-if-invalid.out b/tests/qapi-schema/=
+struct-if-invalid.out
 new file mode 100644
 index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/struct-member-type.err b/tests/qapi-schema=
+/struct-member-type.err
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/tests/qapi-schema/struct-member-type.exit b/tests/qapi-schem=
+a/struct-member-type.exit
+new file mode 100644
+index 0000000000..573541ac97
+--- /dev/null
++++ b/tests/qapi-schema/struct-member-type.exit
+@@ -0,0 +1 @@
++0
+diff --git a/tests/qapi-schema/struct-member-type.json b/tests/qapi-schem=
+a/struct-member-type.json
+new file mode 100644
+index 0000000000..8b33027817
+--- /dev/null
++++ b/tests/qapi-schema/struct-member-type.json
+@@ -0,0 +1,2 @@
++# check member 'a' with 'type' key only
++{ 'struct': 'foo', 'data': { 'a': { 'type': 'str' } } }
+diff --git a/tests/qapi-schema/struct-member-type.out b/tests/qapi-schema=
+/struct-member-type.out
+new file mode 100644
+index 0000000000..04b969d2e3
+--- /dev/null
++++ b/tests/qapi-schema/struct-member-type.out
+@@ -0,0 +1,12 @@
++enum QType
++    prefix QTYPE
++    member none:
++    member qnull:
++    member qnum:
++    member qstring:
++    member qdict:
++    member qlist:
++    member qbool:
++object foo
++    member a: str optional=3DFalse
++object q_empty
 --=20
 2.14.1.146.gd35faa819
