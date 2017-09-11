@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1drP8H-0001qi-2h
+	(envelope-from <pm215@archaic.org.uk>) id 1drP8F-0001pK-Lw
 	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:52:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1drP8D-0002Ih-1L
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:52:13 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1drP8E-0002K4-Sv
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 09:52:11 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 11 Sep 2017 14:52:04 +0100
-Message-Id: <1505137930-13255-2-git-send-email-peter.maydell@linaro.org>
+Date: Mon, 11 Sep 2017 14:52:08 +0100
+Message-Id: <1505137930-13255-6-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1505137930-13255-1-git-send-email-peter.maydell@linaro.org>
 References: <1505137930-13255-1-git-send-email-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/7] target/arm: Use M_REG_NUM_BANKS rather
- than hardcoding 2
+Subject: [Qemu-devel] [PATCH 5/7] target/arm: Remove unnecessary '|
+ 0xf0000000' from do_v7m_exception_exit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,89 +23,38 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Use a symbolic constant M_REG_NUM_BANKS for the array size for
-registers which are banked by M profile security state, rather
-than hardcoding lots of 2s.
+In do_v7m_exception_exit(), there's no need to force the high 4
+bits of 'type' to 1 when calling v7m_exception_taken(), because
+we know that they're always 1 or we could not have got to this
+"handle return to magic exception return address" code. Remove
+the unnecessary ORs.
 
-Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
-Philippe suggested this in review on the last round of
-patches but I forgot about it :-(
----
- target/arm/cpu.h | 35 +++++++++++++++++++----------------
- 1 file changed, 19 insertions(+), 16 deletions(-)
+ target/arm/helper.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 98b9b26..5a1f957 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -81,8 +81,11 @@
-  * accessed via env->registerfield[env->v7m.secure] (whether the security
-  * extension is implemented or not).
-  */
--#define M_REG_NS 0
--#define M_REG_S 1
-+enum {
-+    M_REG_NS = 0,
-+    M_REG_S = 1,
-+    M_REG_NUM_BANKS = 2,
-+};
- 
- /* ARM-specific interrupt pending bits.  */
- #define CPU_INTERRUPT_FIQ   CPU_INTERRUPT_TGT_EXT_1
-@@ -433,19 +436,19 @@ typedef struct CPUARMState {
-         uint32_t other_sp;
-         uint32_t other_ss_msp;
-         uint32_t other_ss_psp;
--        uint32_t vecbase[2];
--        uint32_t basepri[2];
--        uint32_t control[2];
--        uint32_t ccr[2]; /* Configuration and Control */
--        uint32_t cfsr[2]; /* Configurable Fault Status */
-+        uint32_t vecbase[M_REG_NUM_BANKS];
-+        uint32_t basepri[M_REG_NUM_BANKS];
-+        uint32_t control[M_REG_NUM_BANKS];
-+        uint32_t ccr[M_REG_NUM_BANKS]; /* Configuration and Control */
-+        uint32_t cfsr[M_REG_NUM_BANKS]; /* Configurable Fault Status */
-         uint32_t hfsr; /* HardFault Status */
-         uint32_t dfsr; /* Debug Fault Status Register */
--        uint32_t mmfar[2]; /* MemManage Fault Address */
-+        uint32_t mmfar[M_REG_NUM_BANKS]; /* MemManage Fault Address */
-         uint32_t bfar; /* BusFault Address */
--        unsigned mpu_ctrl[2]; /* MPU_CTRL */
-+        unsigned mpu_ctrl[M_REG_NUM_BANKS]; /* MPU_CTRL */
-         int exception;
--        uint32_t primask[2];
--        uint32_t faultmask[2];
-+        uint32_t primask[M_REG_NUM_BANKS];
-+        uint32_t faultmask[M_REG_NUM_BANKS];
-         uint32_t secure; /* Is CPU in Secure state? (not guest visible) */
-     } v7m;
- 
-@@ -546,7 +549,7 @@ typedef struct CPUARMState {
-         uint32_t *drbar;
-         uint32_t *drsr;
-         uint32_t *dracr;
--        uint32_t rnr[2];
-+        uint32_t rnr[M_REG_NUM_BANKS];
-     } pmsav7;
- 
-     /* PMSAv8 MPU */
-@@ -556,10 +559,10 @@ typedef struct CPUARMState {
-          *  pmsav7.rnr (region number register)
-          *  pmsav7_dregion (number of configured regions)
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 1741e0d..fdd5cc6 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -6306,7 +6306,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
           */
--        uint32_t *rbar[2];
--        uint32_t *rlar[2];
--        uint32_t mair0[2];
--        uint32_t mair1[2];
-+        uint32_t *rbar[M_REG_NUM_BANKS];
-+        uint32_t *rlar[M_REG_NUM_BANKS];
-+        uint32_t mair0[M_REG_NUM_BANKS];
-+        uint32_t mair1[M_REG_NUM_BANKS];
-     } pmsav8;
- 
-     void *nvic;
+         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
+-        v7m_exception_taken(cpu, type | 0xf0000000);
++        v7m_exception_taken(cpu, type);
+         qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
+                       "stackframe: failed exception return integrity check\n");
+         return;
+@@ -6348,7 +6348,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+         armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
+         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
+         v7m_push_stack(cpu);
+-        v7m_exception_taken(cpu, type | 0xf0000000);
++        v7m_exception_taken(cpu, type);
+         qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on new stackframe: "
+                       "failed exception return integrity check\n");
+         return;
 -- 
 2.7.4
