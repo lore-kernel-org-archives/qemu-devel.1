@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53262)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drWp1-00080U-12
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:04:56 -0400
+	(envelope-from <groug@kaod.org>) id 1drWpM-0008EG-Lg
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:05:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drWow-0006JS-VI
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:04:51 -0400
-Received: from 15.mo1.mail-out.ovh.net ([188.165.38.232]:36492)
+	(envelope-from <groug@kaod.org>) id 1drWpI-0006Q1-Ik
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:05:12 -0400
+Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:59146)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drWow-0006JI-P5
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:04:46 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drWpI-0006OH-CK
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:05:08 -0400
 Received: from player169.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id F0521917B0
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 00:04:44 +0200 (CEST)
+	by mo1.mail-out.ovh.net (Postfix) with ESMTP id EBB1E917E5
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 00:05:06 +0200 (CEST)
+Date: Tue, 12 Sep 2017 00:04:58 +0200
 From: Greg Kurz <groug@kaod.org>
-Date: Tue, 12 Sep 2017 00:04:40 +0200
-Message-ID: <150516748034.6883.2205624415045931101.stgit@bahia.lan>
+Message-ID: <20170912000458.333f360f@bahia.lan>
+In-Reply-To: <20170911171235.29331-5-clg@kaod.org>
+References: <20170911171235.29331-1-clg@kaod.org>
+	<20170911171235.29331-5-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] xics: fix several error leaks
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/s6oiuobUCTOpFH2ENgkFFIv";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH v2 04/21] ppc/xive: provide
+ a link to the sPAPR ICS object under XIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +32,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Cedric Le Goater <clg@kaod.org>
+To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
-If object_property_get_link() fails then it allocates an error, which
-must be freed before returning. The error_get_pretty() function is
-merely an accessor to the error message and doesn't free anything.
+--Sig_/s6oiuobUCTOpFH2ENgkFFIv
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-The error.h header indicates how to do it right:
+On Mon, 11 Sep 2017 19:12:18 +0200
+C=C3=A9dric Le Goater <clg@kaod.org> wrote:
 
- * Pass an existing error to the caller with the message modified:
- *     error_propagate(errp, err);
- *     error_prepend(errp, "Could not frobnicate '%s': ", name);
+> The sPAPR machine first starts with a XICS interrupt model and
+> depending on the guest capabilities, the XIVE exploitation mode is
+> negotiated during CAS. A reset should then be performed to rebuild the
+> device tree but the same IRQ numbers which were allocated by the
+> devices prior to reset, when the XICS model was operating, are still
+> in use.
+>=20
+> For this purpose, we need a common IRQ number allocator for both the
+> interrupt models: XICS legacy or XIVE exploitation. This is what the
+> ICSIRQState array of the XICS interrupt source is used for. It also
+> contains the LSI/MSI flag of an interrupt which will we need later on.
+>=20
+> So, let's provide a link to the sPAPR ICS object under XIVE to make
+> use of it.
+>=20
+> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+> ---
+>  hw/intc/spapr_xive.c        | 12 ++++++++++++
+>  include/hw/ppc/spapr_xive.h |  4 ++++
+>  2 files changed, 16 insertions(+)
+>=20
+> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> index 6d98528fae68..1681affb0848 100644
+> --- a/hw/intc/spapr_xive.c
+> +++ b/hw/intc/spapr_xive.c
+> @@ -56,6 +56,8 @@ void spapr_xive_reset(void *dev)
+>  static void spapr_xive_realize(DeviceState *dev, Error **errp)
+>  {
+>      sPAPRXive *xive =3D SPAPR_XIVE(dev);
+> +    Object *obj;
+> +    Error *err =3D NULL;
+> =20
+>      if (!xive->nr_targets) {
+>          error_setg(errp, "Number of interrupt targets needs to be greate=
+r 0");
+> @@ -68,6 +70,16 @@ static void spapr_xive_realize(DeviceState *dev, Error=
+ **errp)
+>          return;
+>      }
+> =20
+> +    /* Retrieve SPAPR ICS source to share the IRQ number allocator */
+> +    obj =3D object_property_get_link(OBJECT(dev), "ics", &err);
+> +    if (!obj) {
+> +        error_setg(errp, "%s: required link 'ics' not found: %s",
+> +                   __func__, error_get_pretty(err));
+> +        return;
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/intc/xics.c |   12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+err is leaked if you do this way. Please do this instead:
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index a84ba51ad8ff..80c33be02e5e 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -306,8 +306,8 @@ static void icp_realize(DeviceState *dev, Error **errp)
- 
-     obj = object_property_get_link(OBJECT(dev), ICP_PROP_XICS, &err);
-     if (!obj) {
--        error_setg(errp, "%s: required link '" ICP_PROP_XICS "' not found: %s",
--                   __func__, error_get_pretty(err));
-+        error_propagate(errp, err);
-+        error_prepend(errp, "required link '" ICP_PROP_XICS "' not found: ");
-         return;
-     }
- 
-@@ -315,8 +315,8 @@ static void icp_realize(DeviceState *dev, Error **errp)
- 
-     obj = object_property_get_link(OBJECT(dev), ICP_PROP_CPU, &err);
-     if (!obj) {
--        error_setg(errp, "%s: required link '" ICP_PROP_CPU "' not found: %s",
--                   __func__, error_get_pretty(err));
-+        error_propagate(errp, err);
-+        error_prepend(errp, "required link '" ICP_PROP_CPU "' not found: ");
-         return;
-     }
- 
-@@ -641,8 +641,8 @@ static void ics_base_realize(DeviceState *dev, Error **errp)
- 
-     obj = object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &err);
-     if (!obj) {
--        error_setg(errp, "%s: required link '" ICS_PROP_XICS "' not found: %s",
--                   __func__, error_get_pretty(err));
-+        error_propagate(errp, err);
-+        error_prepend(errp, "required link '" ICS_PROP_XICS "' not found: ");
-         return;
-     }
-     ics->xics = XICS_FABRIC(obj);
+        error_propagate(errp, err);
+        error_prepend(errp, "required link 'ics' not found: ");
+
+Note: I've just sent a patch to fix the same error in XICS :)
+
+> +    }
+> +
+> +    xive->ics =3D ICS_BASE(obj);
+> +
+>      /* Allocate SBEs (State Bit Entry). 2 bits, so 4 entries per byte */
+>      xive->sbe_size =3D DIV_ROUND_UP(xive->nr_irqs, 4);
+>      xive->sbe =3D g_malloc0(xive->sbe_size);
+> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+> index b17dd4f17b0b..29112589b37f 100644
+> --- a/include/hw/ppc/spapr_xive.h
+> +++ b/include/hw/ppc/spapr_xive.h
+> @@ -24,6 +24,7 @@
+>  typedef struct sPAPRXive sPAPRXive;
+>  typedef struct XiveIVE XiveIVE;
+>  typedef struct XiveEQ XiveEQ;
+> +typedef struct ICSState ICSState;
+> =20
+>  #define TYPE_SPAPR_XIVE "spapr-xive"
+>  #define SPAPR_XIVE(obj) OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAPR_XIVE)
+> @@ -35,6 +36,9 @@ struct sPAPRXive {
+>      uint32_t     nr_targets;
+>      uint32_t     nr_irqs;
+> =20
+> +    /* IRQ */
+> +    ICSState     *ics;  /* XICS source inherited from the SPAPR machine =
+*/
+> +
+>      /* XIVE internal tables */
+>      uint8_t      *sbe;
+>      uint32_t     sbe_size;
+
+
+--Sig_/s6oiuobUCTOpFH2ENgkFFIv
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbcIiwAKCRAC/DrrAQHb
+wixrAJ9/0OOX/0EFBs+BCXWOEI08V4bm5QCfQRgIY3A7rTbFpERKRMYhLYE04QY=
+=ASYM
+-----END PGP SIGNATURE-----
+
+--Sig_/s6oiuobUCTOpFH2ENgkFFIv--
