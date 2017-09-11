@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49355)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1drRk6-0002PX-D5
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:39:27 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1drRlf-0003fp-JR
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:41:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1drRk5-0004Td-6Q
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:39:26 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:45180)
+	(envelope-from <peter.maydell@linaro.org>) id 1drRle-0005BU-PK
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:41:03 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:44516)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1drRk4-0004TC-W1
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:39:25 -0400
-Received: by mail-wm0-x229.google.com with SMTP id f199so44242941wme.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 09:39:24 -0700 (PDT)
+	id 1drRle-0005Ak-Ic
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 12:41:02 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id 189so9972245wmh.1
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 09:41:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <0184EA26B2509940AA629AE1405DD7F2015FE17F@DGGEMA503-MBX.china.huawei.com>
-References: <0184EA26B2509940AA629AE1405DD7F2015FE17F@DGGEMA503-MBX.china.huawei.com>
+In-Reply-To: <889d6ce7-073f-7860-e091-619c1202b1cd@redhat.com>
+References: <20170911142056.15643-1-lvivier@redhat.com>
+	<20170911142056.15643-3-lvivier@redhat.com>
+	<CAFEAcA_G8mEzB0Mox0TTz578LQKXgvhNHeZ8Bk7OwC4NbqiXPg@mail.gmail.com>
+	<889d6ce7-073f-7860-e091-619c1202b1cd@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 11 Sep 2017 17:39:03 +0100
-Message-ID: <CAFEAcA8J5wZ23kQypzcbUScUResjWnN6rDG0b0idD1rv7F5Fsw@mail.gmail.com>
+Date: Mon, 11 Sep 2017 17:40:40 +0100
+Message-ID: <CAFEAcA9Wmq+G6H78NdsVs5mKDrMcUkB30yY2d=3+KOnbT-pmAQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v11 6/6] target-arm: kvm64: Handle SError
- interrupt for the guest OS
+Subject: Re: [Qemu-devel] [PATCH v2 2/3] hmp: fix "dump-quest-memory"
+ segfault (arm)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,41 +32,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: gengdongjiu <gengdongjiu@huawei.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, James Morse <james.morse@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, "devel@acpica.org" <devel@acpica.org>, John Garry <john.garry@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, huangdaode <huangdaode@hisilicon.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, "Daniel P . Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-arm <qemu-arm@nongnu.org>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>
 
-On 11 September 2017 at 16:17, gengdongjiu <gengdongjiu@huawei.com> wrote:
->> On 18 August 2017 at 15:23, Dongjiu Geng <gengdongjiu@huawei.com> wrote:
->> > +static int kvm_inject_arm_sei(CPUState *cs) {
->> > +    ARMCPU *cpu = ARM_CPU(cs);
->> > +    CPUARMState *env = &cpu->env;
->> > +
->> > +    unsigned long syndrome = env->exception.vaddress;
->> > +    /* set virtual SError syndrome */
->> > +    if (arm_feature(env, ARM_FEATURE_RAS_EXTENSION)) {
->> > +        syndrome = syndrome & ARM_EL_ISS_MASK;
->> > +    } else {
->> > +        syndrome = 0;
->> > +    }
->> > +
->> > +    return  kvm_vcpu_ioctl(CPU(cpu), KVM_ARM_SEI, &syndrome);
+On 11 September 2017 at 15:45, Thomas Huth <thuth@redhat.com> wrote:
+> On 11.09.2017 16:39, Peter Maydell wrote:
+>> On 11 September 2017 at 15:20, Laurent Vivier <lvivier@redhat.com> wrote:
+>>> Commit fd5d23babf (hmp: fix "dump-quest-memory" segfault)
+>>> fixes the problem for i386, do the same for arm.
+>>>
+>>> Running QEMU with
+>>>     qemu-system-aarch64 -M none -nographic -m 256
+>>> and executing
+>>>     dump-guest-memory /dev/null 0 8192
+>>> results in segfault
+>>>
+>>> Fix by checking if we have CPU.
+>>>
+>>> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 >>
->> This looks odd. If we don't have the RAS extension why do we need to do anything at all here ?
+>> It seems a little arbitrary to assume that if there's no
+>> CPU what you wanted was a 32-bit little-endian dump.
+>>
+>> Why do we have a machine without a CPU anyway ?
 >
-> This is because Qemu may need to support non-RAS extension as discussed with ARM James before.
-> That is to say host hardware CPU does not support RAS, but guest supports.
-> That is under discussion.
-> When host hardware supports RAS, specify the syndrome to a valid value, otherwise, set it to 0.
+> The "none" machine is always started without a default CPU.
 
-If the guest CPU doesn't support the RAS extension then we have
-no mechanism for delivering it a notification about the
-memory problem at all, so setting the syndrome to anything
-doesn't make sense.
+If it has no CPU then how can we create a core dump for it?
+We don't (in theory) even know whether it's x86 or ARM.
+(One day we may support multiple CPU architectures in
+one QEMU binary...)
 
-I'm not sure what you should do in the case of "host
-supports telling us about a memory problem and has
-done so, but guest does not support being told about it",
-but I'm pretty sure it shouldn't be this.
+If the theory is hotplug-later then we're a bit stuck
+because we need to know information now that we can't
+know until the CPU is actually hotplugged.
 
 thanks
 -- PMM
