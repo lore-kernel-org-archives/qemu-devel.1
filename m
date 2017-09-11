@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48430)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1drWUi-0008HC-4c
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:43:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1drWYI-0001f3-JR
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:47:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1drWUd-0007i5-LK
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:43:52 -0400
-Received: from mailapp01.imgtec.com ([195.59.15.196]:39021)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <James.Hogan@imgtec.com>) id 1drWUd-0007dQ-Dy
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:43:47 -0400
-Date: Mon, 11 Sep 2017 22:43:43 +0100
-From: James Hogan <james.hogan@imgtec.com>
-Message-ID: <20170911214343.GC17077@jhogan-linux.le.imgtec.org>
-References: <cover.1505158760.git.alistair.francis@xilinx.com>
-	<e6acff8db6d264f913a18c86858b9aa600554e51.1505158760.git.alistair.francis@xilinx.com>
+	(envelope-from <pbonzini@redhat.com>) id 1drWYD-0004hY-LR
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:47:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38634)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drWYD-0004gS-C5
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 17:47:29 -0400
+Date: Mon, 11 Sep 2017 17:47:27 -0400 (EDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <1827777248.5103399.1505166447511.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170911213328.9701-4-f4bug@amsat.org>
+References: <20170911213328.9701-1-f4bug@amsat.org>
+	<20170911213328.9701-4-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="R+My9LyyhiUvIEro"
-Content-Disposition: inline
-In-Reply-To: <e6acff8db6d264f913a18c86858b9aa600554e51.1505158760.git.alistair.francis@xilinx.com>
-Subject: Re: [Qemu-devel] [PATCH v4 6/8] target/mips: Convert VM clock
- update prints to warn_report
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/5] tcg: move tcg-runtime to accel/tcg/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,86 +27,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel@nongnu.org, alistair23@gmail.com, armbru@redhat.com, pbonzini@redhat.com
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 
---R+My9LyyhiUvIEro
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 11, 2017 at 12:52:59PM -0700, Alistair Francis wrote:
-> Convert the fprintf() messages in kvm_mips_update_state() to use
-> warn_report() as they aren't errors, but are just warnings.
+
+----- Original Message -----
+> From: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>
+> To: "Paolo Bonzini" <pbonzini@redhat.com>, "Richard Henderson" <rth@twidd=
+le.net>, "Peter Crosthwaite"
+> <crosthwaite.peter@gmail.com>, "Thomas Huth" <thuth@redhat.com>
+> Cc: "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org>, qemu-devel@nongnu.or=
+g
+> Sent: Monday, September 11, 2017 11:33:26 PM
+> Subject: [PATCH v2 3/5] tcg: move tcg-runtime to accel/tcg/
 >=20
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> Cc: James Hogan <james.hogan@imgtec.com>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Acked-by: James Hogan <james.hogan@imgtec.com>
+To make this better, the "#ifndef CONFIG_SOFTMMU" part at the
+end of this should be moved to user-exec.c.  Feel free to just
+post a sixth patch for it.
 
-Thanks
-James
+Paolo
 
 > ---
+>  Makefile.target                  | 2 +-
+>  {tcg =3D> accel/tcg}/tcg-runtime.h | 0
+>  {tcg =3D> accel/tcg}/tcg-runtime.c | 0
+>  accel/tcg/Makefile.objs          | 1 +
+>  4 files changed, 2 insertions(+), 1 deletion(-)
+>  rename {tcg =3D> accel/tcg}/tcg-runtime.h (100%)
+>  rename {tcg =3D> accel/tcg}/tcg-runtime.c (100%)
 >=20
->  target/mips/kvm.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/target/mips/kvm.c b/target/mips/kvm.c
-> index a23aa438d2..3b7b1d962a 100644
-> --- a/target/mips/kvm.c
-> +++ b/target/mips/kvm.c
-> @@ -526,7 +526,7 @@ static void kvm_mips_update_state(void *opaque, int r=
-unning, RunState state)
->          if (!cs->vcpu_dirty) {
->              ret =3D kvm_mips_save_count(cs);
->              if (ret < 0) {
-> -                fprintf(stderr, "Failed saving count\n");
-> +                warn_report("Failed saving count");
->              }
->          }
->      } else {
-> @@ -535,14 +535,14 @@ static void kvm_mips_update_state(void *opaque, int=
- running, RunState state)
->          ret =3D kvm_mips_put_one_ureg64(cs, KVM_REG_MIPS_COUNT_RESUME,
->                                        &count_resume);
->          if (ret < 0) {
-> -            fprintf(stderr, "Failed setting COUNT_RESUME\n");
-> +            warn_report("Failed setting COUNT_RESUME");
->              return;
->          }
+> diff --git a/Makefile.target b/Makefile.target
+> index 520305b025..6361f957fb 100644
+> --- a/Makefile.target
+> +++ b/Makefile.target
+> @@ -94,7 +94,7 @@ all: $(PROGS) stap
+>  obj-y +=3D exec.o
+>  obj-y +=3D accel/
+>  obj-$(CONFIG_TCG) +=3D tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
+> -obj-$(CONFIG_TCG) +=3D tcg/tcg-common.o tcg/tcg-runtime.o
+> +obj-$(CONFIG_TCG) +=3D tcg/tcg-common.o
+>  obj-$(CONFIG_TCG_INTERPRETER) +=3D tcg/tci.o
+>  obj-$(CONFIG_TCG_INTERPRETER) +=3D disas/tci.o
+>  obj-y +=3D fpu/softfloat.o
+> diff --git a/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
+> similarity index 100%
+> rename from tcg/tcg-runtime.h
+> rename to accel/tcg/tcg-runtime.h
+> diff --git a/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
+> similarity index 100%
+> rename from tcg/tcg-runtime.c
+> rename to accel/tcg/tcg-runtime.c
+> diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
+> index f2422d0fb3..228cd84fa4 100644
+> --- a/accel/tcg/Makefile.objs
+> +++ b/accel/tcg/Makefile.objs
+> @@ -1,5 +1,6 @@
+>  obj-$(CONFIG_SOFTMMU) +=3D tcg-all.o
+>  obj-$(CONFIG_SOFTMMU) +=3D cputlb.o
+> +obj-y +=3D tcg-runtime.o
+>  obj-y +=3D cpu-exec.o cpu-exec-common.o translate-all.o
+>  obj-y +=3D translator.o
 > =20
->          if (!cs->vcpu_dirty) {
->              ret =3D kvm_mips_restore_count(cs);
->              if (ret < 0) {
-> -                fprintf(stderr, "Failed restoring count\n");
-> +                warn_report("Failed restoring count");
->              }
->          }
->      }
-> --=20
-> 2.11.0
+> --
+> 2.14.1
 >=20
-
---R+My9LyyhiUvIEro
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEd80NauSabkiESfLYbAtpk944dnoFAlm3A4gACgkQbAtpk944
-dnoHKRAAnzS2tky9R7fJFJwETDenimEHu4W0O5wYwnekH8Rg+le1iS/19g53tMbo
-B2e+WzUsRKcQDxcQqPwJdJsT80mX/0of057q4cIMKnJfF4vQdsacQzgui5KSEH7Z
-SGGCicMv2OX6NJw3K+Jr9JhIfsk2zbHnLt86e5NAQ3yxFkHZpd5oy619Kmeucnkp
-Au+FV5NjTnIlqI8Upm/1QMNMjRYa1s24awRdGN6cQPTEORqEudoBZBKMOFgKKtGV
-dCj8XHlih2cNgpMEhmoqBmhqkb1pfYmn0u6jToiUJ1bJZwKpVoiVm8y0LyVBPlfU
-4BFxkLWhqhC2FCprSZSRK/MF/oz4QRRYuqm/5t4tDfoDugYk8P3NiD6ZbXGXdekl
-sakQxzLQ/cnjCZ0S6a9k9c9HoUJC01j5f4xayOh/sdbB81cJWxM6mqmQDuv6SZhN
-ixXbtnVokZ8f56MJLreIJ+RdKleaX4dPXMZDBb0wU9qNfQyqmN9XO9rhep8Z3AzW
-5hl5QqtJFeCcZOyCHdhV/D6t9r/TPF/wzzl+4Xrjiy5kVIzGWZokdOd8HkhpGzHL
-fxwahW2smF0wY+6p99UJ3LW03OxwBmhFbvrbAJhdjd5n4D72i82NcsRNYMgGBSwC
-DJKBrhlHMWlLIl46Rdg/QV1Oo2ZA4kTzy8Y0Lztx2ZJyiY0fj7g=
-=ttNe
------END PGP SIGNATURE-----
-
---R+My9LyyhiUvIEro--
+>=20
