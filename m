@@ -1,29 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53386)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54924)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drWpM-0008EG-Lg
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:05:13 -0400
+	(envelope-from <bounces@canonical.com>) id 1drWuw-0002ER-2r
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:10:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drWpI-0006Q1-Ik
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:05:12 -0400
-Received: from 20.mo1.mail-out.ovh.net ([188.165.45.168]:59146)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drWpI-0006OH-CK
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:05:08 -0400
-Received: from player169.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id EBB1E917E5
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 00:05:06 +0200 (CEST)
-Date: Tue, 12 Sep 2017 00:04:58 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170912000458.333f360f@bahia.lan>
-In-Reply-To: <20170911171235.29331-5-clg@kaod.org>
-References: <20170911171235.29331-1-clg@kaod.org>
-	<20170911171235.29331-5-clg@kaod.org>
+	(envelope-from <bounces@canonical.com>) id 1drWus-00080P-S3
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:10:58 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44096)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1drWus-00080H-Ir
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:10:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1drWur-0007BK-GU
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 22:10:53 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 79D382E8486
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 22:10:53 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/s6oiuobUCTOpFH2ENgkFFIv";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH v2 04/21] ppc/xive: provide
- a link to the sPAPR ICS object under XIVE
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 11 Sep 2017 22:03:59 -0000
+From: Maciej Piechotka <uzytkownik2@gmail.com>
+Reply-To: Bug 1716510 <1716510@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150516743999.32018.10984089018227997839.malonedeb@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716510] [NEW] qemu 2.10.0 cannot boot Windows 10
+ familly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,111 +36,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
 
---Sig_/s6oiuobUCTOpFH2ENgkFFIv
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Public bug reported:
 
-On Mon, 11 Sep 2017 19:12:18 +0200
-C=C3=A9dric Le Goater <clg@kaod.org> wrote:
+On qemu 2.10.0 Windows 10 and Windows Server 2016 hangs during boot.
+Below is setup of Windows Server 2016. Downgrading to 2.9 fixes the
+problem.
 
-> The sPAPR machine first starts with a XICS interrupt model and
-> depending on the guest capabilities, the XIVE exploitation mode is
-> negotiated during CAS. A reset should then be performed to rebuild the
-> device tree but the same IRQ numbers which were allocated by the
-> devices prior to reset, when the XICS model was operating, are still
-> in use.
->=20
-> For this purpose, we need a common IRQ number allocator for both the
-> interrupt models: XICS legacy or XIVE exploitation. This is what the
-> ICSIRQState array of the XICS interrupt source is used for. It also
-> contains the LSI/MSI flag of an interrupt which will we need later on.
->=20
-> So, let's provide a link to the sPAPR ICS object under XIVE to make
-> use of it.
->=20
-> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> ---
->  hw/intc/spapr_xive.c        | 12 ++++++++++++
->  include/hw/ppc/spapr_xive.h |  4 ++++
->  2 files changed, 16 insertions(+)
->=20
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 6d98528fae68..1681affb0848 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -56,6 +56,8 @@ void spapr_xive_reset(void *dev)
->  static void spapr_xive_realize(DeviceState *dev, Error **errp)
->  {
->      sPAPRXive *xive =3D SPAPR_XIVE(dev);
-> +    Object *obj;
-> +    Error *err =3D NULL;
-> =20
->      if (!xive->nr_targets) {
->          error_setg(errp, "Number of interrupt targets needs to be greate=
-r 0");
-> @@ -68,6 +70,16 @@ static void spapr_xive_realize(DeviceState *dev, Error=
- **errp)
->          return;
->      }
-> =20
-> +    /* Retrieve SPAPR ICS source to share the IRQ number allocator */
-> +    obj =3D object_property_get_link(OBJECT(dev), "ics", &err);
-> +    if (!obj) {
-> +        error_setg(errp, "%s: required link 'ics' not found: %s",
-> +                   __func__, error_get_pretty(err));
-> +        return;
+/usr/bin/qemu-system-x86_64 -name guest=3D<name>,debug-threads=3Don -S
+-object
+secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-2-<=
+name
+>/master-key.aes -machine pc-q35-2.8,accel=3Dkvm,usb=3Doff,dump-guest-
+core=3Doff -cpu
+host,nx=3Don,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1000,hv_vpindex,hv_runtim=
+e,hv_synic,hv_reset,kvm=3Doff
+-drive file=3D/usr/local/share/edk2.git/ovmf-x64/OVMF-pure-
+efi.fd,if=3Dpflash,format=3Draw,unit=3D0 -drive
+file=3D/var/lib/libvirt/qemu/nvram/<name>_VARS.fd,if=3Dpflash,format=3Draw,=
+unit=3D1
+-m 4096 -realtime mlock=3Doff -smp 12,sockets=3D1,cores=3D6,threads=3D2 -ob=
+ject
+iothread,id=3Diothread1 -object iothread,id=3Diothread2 -object
+iothread,id=3Diothread3 -object iothread,id=3Diothread4 -object
+iothread,id=3Diothread5 -object iothread,id=3Diothread6 -object
+iothread,id=3Diothread7 -object iothread,id=3Diothread8 -object
+iothread,id=3Diothread9 -object iothread,id=3Diothread10 -object
+iothread,id=3Diothread11 -object iothread,id=3Diothread12 -uuid <uuid> -no-
+user-config -nodefaults -chardev
+socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-2-<name>/monito=
+r.sock,server,nowait
+-mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+base=3Dlocaltime,clock=3Dvm,driftfix=3Dslew -no-shutdown -boot strict=3Don
+-device
+ioh3420,port=3D0x10,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,multifunction=3Don,=
+addr=3D0x2
+-device ioh3420,port=3D0x11,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,addr=3D0x2.=
+0x1
+-device ioh3420,port=3D0x12,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,addr=3D0x2.=
+0x2
+-device ioh3420,port=3D0x13,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,addr=3D0x2.=
+0x3
+-device ioh3420,port=3D0x14,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,addr=3D0x2.=
+0x4
+-device ioh3420,port=3D0x15,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,addr=3D0x2.=
+0x5
+-device nec-usb-xhci,id=3Dusb,bus=3Dpci.3,addr=3D0x0 -drive
+if=3Dnone,media=3Dcdrom,id=3Ddrive-sata0-0-0,readonly=3Don -device ide-
+cd,bus=3Dide.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0,bootindex=3D2 -drive
+if=3Dnone,media=3Dcdrom,id=3Ddrive-sata0-0-1,readonly=3Don -device ide-
+cd,bus=3Dide.1,drive=3Ddrive-sata0-0-1,id=3Dsata0-0-1,bootindex=3D1 -drive
+file=3D/dev/mapper/<boot disk>,format=3Draw,if=3Dnone,id=3Ddrive-sata0-0-2
+-device ide-hd,bus=3Dide.2,drive=3Ddrive-sata0-0-2,id=3Dsata0-0-2,bootindex=
+=3D3
+-netdev tap,fd=3D21,id=3Dhostnet0,vhost=3Don,vhostfd=3D23 -device virtio-ne=
+t-
+pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D<mac>,bus=3Dpci.1,addr=3D0x0 -netdev
+tap,fd=3D24,id=3Dhostnet1,vhost=3Don,vhostfd=3D25 -device virtio-net-
+pci,netdev=3Dhostnet1,id=3Dnet1,mac=3D<mac>,bus=3Dpci.2,addr=3D0x0 -device =
+usb-
+tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -spice
+unix,addr=3D/var/lib/libvirt/qemu/domain-2-<name>/spice.sock,disable-
+ticketing,image-compression=3Dauto_glz,seamless-migration=3Don -vnc
+127.0.0.1:0 -device qxl-
+vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D16777216,vram64_size_mb=3D0=
+,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpcie.0,addr=3D0x1
+-device vhost-scsi-
+pci,wwpn=3D<wwpn>,vhostfd=3D26,id=3Dhostdev0,bus=3Dpcie.0,addr=3D0x9 -device
+virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.4,addr=3D0x0 -object rng-
+random,id=3Dobjrng0,filename=3D/dev/random -device virtio-rng-
+pci,rng=3Dobjrng0,id=3Drng0,max-bytes=3D1024,period=3D1000,bus=3Dpci.5,addr=
+=3D0x0
+-msg timestamp=3Do
 
-err is leaked if you do this way. Please do this instead:
+** Affects: qemu
+     Importance: Undecided
+         Status: New
 
-        error_propagate(errp, err);
-        error_prepend(errp, "required link 'ics' not found: ");
+-- =
 
-Note: I've just sent a patch to fix the same error in XICS :)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716510
 
-> +    }
-> +
-> +    xive->ics =3D ICS_BASE(obj);
-> +
->      /* Allocate SBEs (State Bit Entry). 2 bits, so 4 entries per byte */
->      xive->sbe_size =3D DIV_ROUND_UP(xive->nr_irqs, 4);
->      xive->sbe =3D g_malloc0(xive->sbe_size);
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index b17dd4f17b0b..29112589b37f 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -24,6 +24,7 @@
->  typedef struct sPAPRXive sPAPRXive;
->  typedef struct XiveIVE XiveIVE;
->  typedef struct XiveEQ XiveEQ;
-> +typedef struct ICSState ICSState;
-> =20
->  #define TYPE_SPAPR_XIVE "spapr-xive"
->  #define SPAPR_XIVE(obj) OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAPR_XIVE)
-> @@ -35,6 +36,9 @@ struct sPAPRXive {
->      uint32_t     nr_targets;
->      uint32_t     nr_irqs;
-> =20
-> +    /* IRQ */
-> +    ICSState     *ics;  /* XICS source inherited from the SPAPR machine =
-*/
-> +
->      /* XIVE internal tables */
->      uint8_t      *sbe;
->      uint32_t     sbe_size;
+Title:
+  qemu 2.10.0 cannot boot Windows 10 familly
 
+Status in QEMU:
+  New
 
---Sig_/s6oiuobUCTOpFH2ENgkFFIv
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Bug description:
+  On qemu 2.10.0 Windows 10 and Windows Server 2016 hangs during boot.
+  Below is setup of Windows Server 2016. Downgrading to 2.9 fixes the
+  problem.
 
------BEGIN PGP SIGNATURE-----
+  /usr/bin/qemu-system-x86_64 -name guest=3D<name>,debug-threads=3Don -S
+  -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-2=
+-<name
+  >/master-key.aes -machine pc-q35-2.8,accel=3Dkvm,usb=3Doff,dump-guest-
+  core=3Doff -cpu
+  host,nx=3Don,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1000,hv_vpindex,hv_runt=
+ime,hv_synic,hv_reset,kvm=3Doff
+  -drive file=3D/usr/local/share/edk2.git/ovmf-x64/OVMF-pure-
+  efi.fd,if=3Dpflash,format=3Draw,unit=3D0 -drive
+  file=3D/var/lib/libvirt/qemu/nvram/<name>_VARS.fd,if=3Dpflash,format=3Dra=
+w,unit=3D1
+  -m 4096 -realtime mlock=3Doff -smp 12,sockets=3D1,cores=3D6,threads=3D2
+  -object iothread,id=3Diothread1 -object iothread,id=3Diothread2 -object
+  iothread,id=3Diothread3 -object iothread,id=3Diothread4 -object
+  iothread,id=3Diothread5 -object iothread,id=3Diothread6 -object
+  iothread,id=3Diothread7 -object iothread,id=3Diothread8 -object
+  iothread,id=3Diothread9 -object iothread,id=3Diothread10 -object
+  iothread,id=3Diothread11 -object iothread,id=3Diothread12 -uuid <uuid>
+  -no-user-config -nodefaults -chardev
+  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-2-<name>/moni=
+tor.sock,server,nowait
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+  base=3Dlocaltime,clock=3Dvm,driftfix=3Dslew -no-shutdown -boot strict=3Don
+  -device
+  ioh3420,port=3D0x10,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,multifunction=3Do=
+n,addr=3D0x2
+  -device ioh3420,port=3D0x11,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,addr=3D0x=
+2.0x1
+  -device ioh3420,port=3D0x12,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,addr=3D0x=
+2.0x2
+  -device ioh3420,port=3D0x13,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,addr=3D0x=
+2.0x3
+  -device ioh3420,port=3D0x14,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,addr=3D0x=
+2.0x4
+  -device ioh3420,port=3D0x15,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,addr=3D0x=
+2.0x5
+  -device nec-usb-xhci,id=3Dusb,bus=3Dpci.3,addr=3D0x0 -drive
+  if=3Dnone,media=3Dcdrom,id=3Ddrive-sata0-0-0,readonly=3Don -device ide-
+  cd,bus=3Dide.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0,bootindex=3D2 -drive
+  if=3Dnone,media=3Dcdrom,id=3Ddrive-sata0-0-1,readonly=3Don -device ide-
+  cd,bus=3Dide.1,drive=3Ddrive-sata0-0-1,id=3Dsata0-0-1,bootindex=3D1 -drive
+  file=3D/dev/mapper/<boot disk>,format=3Draw,if=3Dnone,id=3Ddrive-sata0-0-2
+  -device ide-hd,bus=3Dide.2,drive=3Ddrive-
+  sata0-0-2,id=3Dsata0-0-2,bootindex=3D3 -netdev
+  tap,fd=3D21,id=3Dhostnet0,vhost=3Don,vhostfd=3D23 -device virtio-net-
+  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D<mac>,bus=3Dpci.1,addr=3D0x0 -netdev
+  tap,fd=3D24,id=3Dhostnet1,vhost=3Don,vhostfd=3D25 -device virtio-net-
+  pci,netdev=3Dhostnet1,id=3Dnet1,mac=3D<mac>,bus=3Dpci.2,addr=3D0x0 -devic=
+e usb-
+  tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -spice
+  unix,addr=3D/var/lib/libvirt/qemu/domain-2-<name>/spice.sock,disable-
+  ticketing,image-compression=3Dauto_glz,seamless-migration=3Don -vnc
+  127.0.0.1:0 -device qxl-
+  vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D16777216,vram64_size_mb=
+=3D0,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpcie.0,addr=3D0x1
+  -device vhost-scsi-
+  pci,wwpn=3D<wwpn>,vhostfd=3D26,id=3Dhostdev0,bus=3Dpcie.0,addr=3D0x9 -dev=
+ice
+  virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.4,addr=3D0x0 -object rng-
+  random,id=3Dobjrng0,filename=3D/dev/random -device virtio-rng-
+  pci,rng=3Dobjrng0,id=3Drng0,max-bytes=3D1024,period=3D1000,bus=3Dpci.5,ad=
+dr=3D0x0
+  -msg timestamp=3Do
 
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbcIiwAKCRAC/DrrAQHb
-wixrAJ9/0OOX/0EFBs+BCXWOEI08V4bm5QCfQRgIY3A7rTbFpERKRMYhLYE04QY=
-=ASYM
------END PGP SIGNATURE-----
-
---Sig_/s6oiuobUCTOpFH2ENgkFFIv--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716510/+subscriptions
