@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38143)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSNt-0006qP-8x
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1drSNx-0006uP-HZ
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drSNp-0000wJ-8f
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51026)
+	(envelope-from <eblake@redhat.com>) id 1drSNw-0000yh-6U
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37316)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1drSNp-0000w0-0H
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:29 -0400
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1drSNv-0000yT-TM
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 13:20:36 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2904816B1D2
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 17:20:28 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 0860127F343
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 17:20:35 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 11 Sep 2017 12:19:45 -0500
-Message-Id: <20170911172022.4738-2-eblake@redhat.com>
+Date: Mon, 11 Sep 2017 12:19:48 -0500
+Message-Id: <20170911172022.4738-5-eblake@redhat.com>
 In-Reply-To: <20170911172022.4738-1-eblake@redhat.com>
 References: <20170911172022.4738-1-eblake@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v7 01/38] test-qga: Kill broken and dead
- QGA_TEST_SIDE_EFFECTING code
+Subject: [Qemu-devel] [PATCH v7 04/38] tests: Clean up wait for event
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,156 +30,199 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com
+Cc: armbru@redhat.com, pbonzini@redhat.com, thuth@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 
-Back when the test was introduced, in commit 62c39b307, the
-test was set up to run qemu-ga directly on the host performing
-the test, and defaults to limiting itself to safe commands.  At
-the time, it was envisioned that setting QGA_TEST_SIDE_EFFECTING
-in the environment could cover a few more commands, while noting
-the potential danger of those side effects running in the host.
+From: Markus Armbruster <armbru@redhat.com>
 
-But this has NEVER been tested: if you enable the environment
-variable, the test WILL fail.  One obvious reason: if you are not
-running as root, you'll probably get a permission failure when
-trying to freeze the file systems, or when changing system time.
-Less obvious: if you run the test as root (wow, you're brave), you
-could end up hanging if the test tries to log things to a
-temporarily frozen filesystem.  But the cutest reason of all: if
-you get past the above hurdles, the test uses invalid JSON in
-test_qga_fstrim() (missing '' around the dictionary key 'minimum'),
-and will thus fail an assertion in qmp_fd().
+We still use hacks like qmp("") to wait for an event, even though we
+have qmp_eventwait() since commit 8fe941f, and qmp_eventwait_ref()
+since commit 7ffe312.  Both commits neglected to convert all the
+existing hacks.  Make up what they missed.
 
-Rather than leave this untested time-bomb in place, rip it out.
-Hopefully, as originally envisioned, we can find an opportunity
-to test an actual sandboxed guest where the guest-agent has
-full permissions and will not unduly affect the host running
-the test - if so, 'git revert' can be used if desired, for
-salvaging any useful parts of this attempt.
+Bonus: gets rid of empty format strings.  A step towards compile-time
+format string checking without triggering -Wformat-zero-length.
 
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <1500645206-13559-8-git-send-email-armbru@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+
 ---
- tests/test-qga.c | 90 --------------------------------------------------=
-------
- 1 file changed, 90 deletions(-)
+v4: hoist earlier in series
+---
+ tests/boot-order-test.c   |  2 +-
+ tests/libqos/pci-pc.c     |  6 +-----
+ tests/tco-test.c          |  3 +--
+ tests/usb-hcd-uhci-test.c |  6 +-----
+ tests/usb-hcd-xhci-test.c | 12 ++----------
+ tests/wdt_ib700-test.c    | 35 ++++++++++-------------------------
+ 6 files changed, 16 insertions(+), 48 deletions(-)
 
-diff --git a/tests/test-qga.c b/tests/test-qga.c
-index 06783e7585..fd6bc7690f 100644
---- a/tests/test-qga.c
-+++ b/tests/test-qga.c
-@@ -642,65 +642,6 @@ static void test_qga_get_time(gconstpointer fix)
-     QDECREF(ret);
+diff --git a/tests/boot-order-test.c b/tests/boot-order-test.c
+index fc1e7941f7..9d516830dd 100644
+--- a/tests/boot-order-test.c
++++ b/tests/boot-order-test.c
+@@ -43,7 +43,7 @@ static void test_a_boot_order(const char *machine,
+      * system_reset only requests reset.  We get a RESET event after
+      * the actual reset completes.  Need to wait for that.
+      */
+-    qmp_discard_response("");   /* HACK: wait for event */
++    qmp_eventwait("RESET");
+     actual = read_boot_order();
+     g_assert_cmphex(actual, ==, expected_reboot);
+     qtest_quit(global_qtest);
+diff --git a/tests/libqos/pci-pc.c b/tests/libqos/pci-pc.c
+index ded1c54c06..02ce49927a 100644
+--- a/tests/libqos/pci-pc.c
++++ b/tests/libqos/pci-pc.c
+@@ -173,9 +173,5 @@ void qpci_unplug_acpi_device_test(const char *id, uint8_t slot)
+
+     outb(ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
+
+-    response = qmp("");
+-    g_assert(response);
+-    g_assert(qdict_haskey(response, "event"));
+-    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
+-    QDECREF(response);
++    qmp_eventwait("DEVICE_DELETED");
+ }
+diff --git a/tests/tco-test.c b/tests/tco-test.c
+index c4c264eb3d..f2ed6ed91c 100644
+--- a/tests/tco-test.c
++++ b/tests/tco-test.c
+@@ -237,9 +237,8 @@ static void test_tco_max_timeout(void)
+
+ static QDict *get_watchdog_action(void)
+ {
+-    QDict *ev = qmp("");
++    QDict *ev = qmp_eventwait_ref("WATCHDOG");
+     QDict *data;
+-    g_assert(!strcmp(qdict_get_str(ev, "event"), "WATCHDOG"));
+
+     data = qdict_get_qdict(ev, "data");
+     QINCREF(data);
+diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
+index 5b500fedb0..0fb7f8d223 100644
+--- a/tests/usb-hcd-uhci-test.c
++++ b/tests/usb-hcd-uhci-test.c
+@@ -68,11 +68,7 @@ static void test_usb_storage_hotplug(void)
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+-    response = qmp("");
+-    g_assert(response);
+-    g_assert(qdict_haskey(response, "event"));
+-    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
+-    QDECREF(response);
++    qmp_eventwait("DEVICE_DELETED");
  }
 
--static void test_qga_set_time(gconstpointer fix)
--{
--    const TestFixture *fixture =3D fix;
--    QDict *ret;
--    int64_t current, time;
--    gchar *cmd;
+ int main(int argc, char **argv)
+diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
+index 031764da6d..c05a339894 100644
+--- a/tests/usb-hcd-xhci-test.c
++++ b/tests/usb-hcd-xhci-test.c
+@@ -57,11 +57,7 @@ static void test_usb_uas_hotplug(void)
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+-    response = qmp("");
+-    g_assert(qdict_haskey(response, "event"));
+-    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
+-    QDECREF(response);
 -
--    /* get current time */
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-get-time'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    current =3D qdict_get_int(ret, "return");
--    g_assert_cmpint(current, >, 0);
--    QDECREF(ret);
--
--    /* set some old time */
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-set-time',"
--                 " 'arguments': { 'time': 1000 } }");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    QDECREF(ret);
--
--    /* check old time */
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-get-time'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    time =3D qdict_get_int(ret, "return");
--    g_assert_cmpint(time / 1000, <, G_USEC_PER_SEC * 10);
--    QDECREF(ret);
--
--    /* set back current time */
--    cmd =3D g_strdup_printf("{'execute': 'guest-set-time',"
--                          " 'arguments': { 'time': %" PRId64 " } }",
--                          current + time * 1000);
--    ret =3D qmp_fd(fixture->fd, cmd);
--    g_free(cmd);
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    QDECREF(ret);
--}
--
--static void test_qga_fstrim(gconstpointer fix)
--{
--    const TestFixture *fixture =3D fix;
--    QDict *ret;
--    QList *list;
--    const QListEntry *entry;
--
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-fstrim',"
--                 " arguments: { minimum: 4194304 } }");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    list =3D qdict_get_qlist(ret, "return");
--    entry =3D qlist_first(list);
--    g_assert(qdict_haskey(qobject_to_qdict(entry->value), "paths"));
--
--    QDECREF(ret);
--}
--
- static void test_qga_blacklist(gconstpointer data)
- {
-     TestFixture fix;
-@@ -831,30 +772,6 @@ static void test_qga_fsfreeze_status(gconstpointer f=
-ix)
-     QDECREF(ret);
++    qmp_eventwait("DEVICE_DELETED");
+
+     response = qmp("{'execute': 'device_del',"
+                            " 'arguments': {"
+@@ -71,11 +67,7 @@ static void test_usb_uas_hotplug(void)
+     g_assert(!qdict_haskey(response, "error"));
+     QDECREF(response);
+
+-    response = qmp("");
+-    g_assert(response);
+-    g_assert(qdict_haskey(response, "event"));
+-    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
+-    QDECREF(response);
++    qmp_eventwait("DEVICE_DELETED");
  }
 
--static void test_qga_fsfreeze_and_thaw(gconstpointer fix)
--{
--    const TestFixture *fixture =3D fix;
--    QDict *ret;
--    const gchar *status;
--
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-fsfreeze-freeze'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    QDECREF(ret);
--
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-fsfreeze-status'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    status =3D qdict_get_try_str(ret, "return");
--    g_assert_cmpstr(status, =3D=3D, "frozen");
--    QDECREF(ret);
--
--    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-fsfreeze-thaw'}");
--    g_assert_nonnull(ret);
--    qmp_assert_no_error(ret);
--    QDECREF(ret);
--}
--
- static void test_qga_guest_exec(gconstpointer fix)
- {
-     const TestFixture *fixture =3D fix;
-@@ -1029,13 +946,6 @@ int main(int argc, char **argv)
-     g_test_add_data_func("/qga/guest-get-osinfo", &fix,
-                          test_qga_guest_get_osinfo);
+ int main(int argc, char **argv)
+diff --git a/tests/wdt_ib700-test.c b/tests/wdt_ib700-test.c
+index 49f4f0c221..4fc8eeae86 100644
+--- a/tests/wdt_ib700-test.c
++++ b/tests/wdt_ib700-test.c
+@@ -18,26 +18,10 @@ static void qmp_check_no_event(void)
+     QDECREF(resp);
+ }
 
--    if (g_getenv("QGA_TEST_SIDE_EFFECTING")) {
--        g_test_add_data_func("/qga/fsfreeze-and-thaw", &fix,
--                             test_qga_fsfreeze_and_thaw);
--        g_test_add_data_func("/qga/set-time", &fix, test_qga_set_time);
--        g_test_add_data_func("/qga/fstrim", &fix, test_qga_fstrim);
+-static QDict *qmp_get_event(const char *name)
+-{
+-    QDict *event = qmp("");
+-    QDict *data;
+-    g_assert(qdict_haskey(event, "event"));
+-    g_assert(!strcmp(qdict_get_str(event, "event"), name));
+-
+-    if (qdict_haskey(event, "data")) {
+-        data = qdict_get_qdict(event, "data");
+-        QINCREF(data);
+-    } else {
+-        data = NULL;
 -    }
 -
-     ret =3D g_test_run();
+-    QDECREF(event);
+-    return data;
+-}
+-
+ static QDict *ib700_program_and_wait(QTestState *s)
+ {
++    QDict *event, *data;
++
+     clock_step(NANOSECONDS_PER_SECOND * 40);
+     qmp_check_no_event();
 
-     fixture_tear_down(&fix, NULL);
---=20
+@@ -61,7 +45,11 @@ static QDict *ib700_program_and_wait(QTestState *s)
+     clock_step(3 * NANOSECONDS_PER_SECOND);
+     qmp_check_no_event();
+     clock_step(2 * NANOSECONDS_PER_SECOND);
+-    return qmp_get_event("WATCHDOG");
++    event = qmp_eventwait_ref("WATCHDOG");
++    data = qdict_get_qdict(event, "data");
++    QINCREF(data);
++    QDECREF(event);
++    return data;
+ }
+
+
+@@ -73,8 +61,7 @@ static void ib700_pause(void)
+     d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "pause"));
+     QDECREF(d);
+-    d = qmp_get_event("STOP");
+-    QDECREF(d);
++    qmp_eventwait("STOP");
+     qtest_end();
+ }
+
+@@ -86,8 +73,7 @@ static void ib700_reset(void)
+     d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "reset"));
+     QDECREF(d);
+-    d = qmp_get_event("RESET");
+-    QDECREF(d);
++    qmp_eventwait("RESET");
+     qtest_end();
+ }
+
+@@ -99,8 +85,7 @@ static void ib700_shutdown(void)
+     d = ib700_program_and_wait(s);
+     g_assert(!strcmp(qdict_get_str(d, "action"), "reset"));
+     QDECREF(d);
+-    d = qmp_get_event("SHUTDOWN");
+-    QDECREF(d);
++    qmp_eventwait("SHUTDOWN");
+     qtest_end();
+ }
+
+-- 
 2.13.5
