@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40289)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1drKlm-00086u-8X
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 05:12:48 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1drKng-0000dB-1q
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 05:14:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1drKlh-0004gR-A2
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 05:12:42 -0400
-Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:45214)
+	(envelope-from <pbonzini@redhat.com>) id 1drKnb-0006qV-3A
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 05:14:40 -0400
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:44860)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1drKlh-0004f5-3f
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 05:12:37 -0400
-Received: by mail-wm0-x229.google.com with SMTP id f199so34509275wme.0
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 02:12:37 -0700 (PDT)
-References: <20170817230114.3655-1-richard.henderson@linaro.org>
-	<20170817230114.3655-3-richard.henderson@linaro.org>
-	<877examon2.fsf@linaro.org>
-	<05363152-8a66-af3f-7c66-9627cbdc290b@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <05363152-8a66-af3f-7c66-9627cbdc290b@linaro.org>
-Date: Mon, 11 Sep 2017 10:12:34 +0100
-Message-ID: <8760cpbnul.fsf@linaro.org>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drKna-0006pm-TB
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 05:14:35 -0400
+Received: by mail-wm0-f52.google.com with SMTP id 189so6615694wmh.1
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 02:14:34 -0700 (PDT)
+References: <20170822131832.20191-1-pbonzini@redhat.com>
+	<20170822131832.20191-10-pbonzini@redhat.com>
+	<20170830163750.GY24565@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <49202119-02f9-af09-6a69-5360e747f91f@redhat.com>
+Date: Mon, 11 Sep 2017 11:14:31 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170830163750.GY24565@stefanha-x1.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 2/8] target/arm: Use generic vector
- infrastructure for aa64 add/sub/logic
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 09/10] scsi: add multipath
+ support to qemu-pr-helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,50 +32,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: famz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
+On 30/08/2017 18:37, Stefan Hajnoczi wrote:
+> 
+> The case statements asssume sz has a certain minimum value.  I didn't
+> see a check anywhere that guarantees this.  It may be easier to hide the
+> client's sz value and instead use sizeof(client->data).  The caller can
+> worry about sz.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+Makes sense.  OUT needs the client sz, but IN doesn't and it gets in the
+way.  This lets me just assert in multipath_pr_in that sz is large enough.
 
-> On 09/07/2017 09:58 AM, Alex Bennée wrote:
->>> +    switch (size + 4 * is_u) {
->>
->> Hmm I find this switch a little too magical. I mean I can see that the
->> encoding abuses size for the final opcode when I look at the manual but
->> it reads badly.
->>
->>> +    case 0: /* AND */
->>> +        gvec_op = tcg_gen_gvec_and8;
->>> +        goto do_gvec;
->>> +    case 1: /* BIC */
->>> +        gvec_op = tcg_gen_gvec_andc8;
->>> +        goto do_gvec;
->>> +    case 2: /* ORR */
->>> +        gvec_op = tcg_gen_gvec_or8;
->>> +        goto do_gvec;
->>> +    case 3: /* ORN */
->>> +        gvec_op = tcg_gen_gvec_orc8;
->>> +        goto do_gvec;
->>> +    case 4: /* EOR */
->>> +        gvec_op = tcg_gen_gvec_xor8;
->>> +        goto do_gvec;
->>> +    do_gvec:
->>> +        gvec_op(vec_full_reg_offset(s, rd),
->>> +                vec_full_reg_offset(s, rn),
->>> +                vec_full_reg_offset(s, rm),
->>> +                is_q ? 16 : 8, vec_full_reg_size(s));
->>> +        return;
->>
->> No default case (although I guess we just fall through). What's wrong
->> with just having a !is_u test with gvec_op = tbl[size] and skipping all
->> the goto stuff?
->
-> Because that would still leave EOR out in the woods.
-> I do think this is the cleanest way to filter out these 5 operations.
+>> +    /* Convert input data, especially transport IDs, to the structs
+>> +     * used by libmpathpersist (which, of course, will immediately
+>> +     * do the opposite).
+>> +     */
+>> +    memset(&paramp, 0, sizeof(paramp));
+>> +    memcpy(&paramp.key, &param[0], 8);
+>> +    memcpy(&paramp.sa_key, &param[8], 8);
+>> +    paramp.sa_flags = param[10];
+>> +    for (i = PR_OUT_FIXED_PARAM_SIZE, j = 0; i < sz; ) {
+>> +        struct transportid *id = (struct transportid *) &transportids[j];
+>> +        int len;
+>> +
+>> +        id->format_code = param[i] & 0xc0;
+>> +        id->protocol_id = param[i] & 0x0f;
+>> +        switch (param[i] & 0xcf) {
+> At this point we know sz > PR_OUT_FIXED_PARAM_SIZE && i < sz.  I think
+> the following case statements can read beyond the end of client->data[]
+> because nothing checks sz before accessing param[].
+> 
+> Missing sz checks?
 
-Is this going to look better if the other operations in this branch of
-the decode are converted as well?
+There is a transport id length field that has to be checked against sz,
+indeed.  After doing that, the for loop is fine (though the initial
+index is wrong, because PR_OUT_FIXED_PARAM_SIZE points to the length
+field and the transport ids are at PR_OUT_FIXED_PARAM_SIZE + 4).
 
---
-Alex Bennée
+>> +            /* iSCSI transport.  */
+>> +            len = lduw_be_p(&param[i + 2]);
+>> +            if (len > 252 || (len & 3)) {
+> 
+> int len can be negative here .  Please use the size_t type - it's
+> unsigned and used by memchr(3)/memcpy(3).
+
+Can it? lduw_be_p reads 16 bits (and it's unsigned as the name says).
+
+Paolo
