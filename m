@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36639)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1drQ4E-0007Rb-DL
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:52:12 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1drQBN-0001Sd-53
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:59:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1drQ4D-0007Oq-MD
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:52:06 -0400
-References: <20170911142056.15643-1-lvivier@redhat.com>
-	<20170911142056.15643-4-lvivier@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <1299bf0c-f887-bcfe-2e97-3c7103d407a1@redhat.com>
-Date: Mon, 11 Sep 2017 16:51:48 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1drQBK-0000iW-0w
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 10:59:29 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1505137930-13255-1-git-send-email-peter.maydell@linaro.org>
+	<1505137930-13255-2-git-send-email-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2a61ae5a-dd09-d782-8cc1-66afd7a31559@amsat.org>
+Date: Mon, 11 Sep 2017 11:59:21 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170911142056.15643-4-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1505137930-13255-2-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] tests/hmp: test "none" machine with
- memory
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/7] target/arm: Use
+ M_REG_NUM_BANKS rather than hardcoding 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,43 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: "Daniel P . Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-On 11.09.2017 16:20, Laurent Vivier wrote:
-> and add a test case of dump-guest-memory without
-> "[begin length]" parameters.
+On 09/11/2017 10:52 AM, Peter Maydell wrote:
+> Use a symbolic constant M_REG_NUM_BANKS for the array size for
+> registers which are banked by M profile security state, rather
+> than hardcoding lots of 2s.
 > 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
 > ---
->  tests/test-hmp.c | 5 +++++
->  1 file changed, 5 insertions(+)
+> Philippe suggested this in review on the last round of
+> patches but I forgot about it :-(
+
+Thank you, it eases review and looks cleaner :)
+
+> ---
+>   target/arm/cpu.h | 35 +++++++++++++++++++----------------
+>   1 file changed, 19 insertions(+), 16 deletions(-)
 > 
-> diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-> index 729c0339f7..90693c0ce2 100644
-> --- a/tests/test-hmp.c
-> +++ b/tests/test-hmp.c
-> @@ -35,6 +35,7 @@ static const char *hmp_cmds[] = {
->      "mouse_button 0",
->      "device_del mouse1",
->      "dump-guest-memory /dev/null 0 4096",
-> +    "dump-guest-memory /dev/null",
->      "gdbserver",
->      "host_net_add user id=net0",
->      "hostfwd_add tcp::43210-:43210",
-> @@ -159,5 +160,9 @@ int main(int argc, char **argv)
->  
->      qtest_cb_for_every_machine(add_machine_test_case);
->  
-> +    /* as none machine has no memory, add a test case with memory */
-> +
-
-Maybe remove the empty line after the comment?
-
-> +    qtest_add_data_func("hmp/none+2MB", g_strdup("none -m 2"), test_machine);
-> +
->      return g_test_run();
->  }
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index 98b9b26..5a1f957 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -81,8 +81,11 @@
+>    * accessed via env->registerfield[env->v7m.secure] (whether the security
+>    * extension is implemented or not).
+>    */
+> -#define M_REG_NS 0
+> -#define M_REG_S 1
+> +enum {
+> +    M_REG_NS = 0,
+> +    M_REG_S = 1,
+> +    M_REG_NUM_BANKS = 2,
+> +};
+>   
+>   /* ARM-specific interrupt pending bits.  */
+>   #define CPU_INTERRUPT_FIQ   CPU_INTERRUPT_TGT_EXT_1
+> @@ -433,19 +436,19 @@ typedef struct CPUARMState {
+>           uint32_t other_sp;
+>           uint32_t other_ss_msp;
+>           uint32_t other_ss_psp;
+> -        uint32_t vecbase[2];
+> -        uint32_t basepri[2];
+> -        uint32_t control[2];
+> -        uint32_t ccr[2]; /* Configuration and Control */
+> -        uint32_t cfsr[2]; /* Configurable Fault Status */
+> +        uint32_t vecbase[M_REG_NUM_BANKS];
+> +        uint32_t basepri[M_REG_NUM_BANKS];
+> +        uint32_t control[M_REG_NUM_BANKS];
+> +        uint32_t ccr[M_REG_NUM_BANKS]; /* Configuration and Control */
+> +        uint32_t cfsr[M_REG_NUM_BANKS]; /* Configurable Fault Status */
+>           uint32_t hfsr; /* HardFault Status */
+>           uint32_t dfsr; /* Debug Fault Status Register */
+> -        uint32_t mmfar[2]; /* MemManage Fault Address */
+> +        uint32_t mmfar[M_REG_NUM_BANKS]; /* MemManage Fault Address */
+>           uint32_t bfar; /* BusFault Address */
+> -        unsigned mpu_ctrl[2]; /* MPU_CTRL */
+> +        unsigned mpu_ctrl[M_REG_NUM_BANKS]; /* MPU_CTRL */
+>           int exception;
+> -        uint32_t primask[2];
+> -        uint32_t faultmask[2];
+> +        uint32_t primask[M_REG_NUM_BANKS];
+> +        uint32_t faultmask[M_REG_NUM_BANKS];
+>           uint32_t secure; /* Is CPU in Secure state? (not guest visible) */
+>       } v7m;
+>   
+> @@ -546,7 +549,7 @@ typedef struct CPUARMState {
+>           uint32_t *drbar;
+>           uint32_t *drsr;
+>           uint32_t *dracr;
+> -        uint32_t rnr[2];
+> +        uint32_t rnr[M_REG_NUM_BANKS];
+>       } pmsav7;
+>   
+>       /* PMSAv8 MPU */
+> @@ -556,10 +559,10 @@ typedef struct CPUARMState {
+>            *  pmsav7.rnr (region number register)
+>            *  pmsav7_dregion (number of configured regions)
+>            */
+> -        uint32_t *rbar[2];
+> -        uint32_t *rlar[2];
+> -        uint32_t mair0[2];
+> -        uint32_t mair1[2];
+> +        uint32_t *rbar[M_REG_NUM_BANKS];
+> +        uint32_t *rlar[M_REG_NUM_BANKS];
+> +        uint32_t mair0[M_REG_NUM_BANKS];
+> +        uint32_t mair1[M_REG_NUM_BANKS];
+>       } pmsav8;
+>   
+>       void *nvic;
 > 
-
-Reviewed-by: Thomas Huth <thuth@redhat.com>
