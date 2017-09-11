@@ -1,33 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55624)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58219)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drWxf-000341-0U
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:13:48 -0400
+	(envelope-from <jsnow@redhat.com>) id 1drX6C-0006At-3d
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:22:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drWxb-0000s7-Qq
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:13:46 -0400
-Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:34695)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drWxb-0000rr-LO
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:13:43 -0400
-Received: by mail-qt0-x243.google.com with SMTP id q8so6386650qtb.1
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 15:13:43 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170911213328.9701-1-f4bug@amsat.org>
-	<20170911213328.9701-6-f4bug@amsat.org>
-	<aa266e28-853b-4703-8495-8fa862aea106@gmx.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9bdda758-c62c-cb04-15cd-1e93bd1664f7@amsat.org>
-Date: Mon, 11 Sep 2017 19:13:39 -0300
+	(envelope-from <jsnow@redhat.com>) id 1drX6B-0004VW-8G
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 18:22:36 -0400
+References: <20170809215510.22802-1-pbonzini@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <a96ce163-a7ff-3aa2-866d-22d3bc2735ff@redhat.com>
+Date: Mon, 11 Sep 2017 18:22:26 -0400
 MIME-Version: 1.0
-In-Reply-To: <aa266e28-853b-4703-8495-8fa862aea106@gmx.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170809215510.22802-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 5/5] tcg: restrict i386 regs definitions
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 00/12] cleanup qemu-iotests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,76 +23,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kamil Rytarowski <n54@gmx.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
-On 09/11/2017 06:44 PM, Kamil Rytarowski wrote:
-> On 11.09.2017 23:33, Philippe Mathieu-Daudé wrote:
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->> cleaning while here :)
->>
->>   accel/tcg/user-exec.c | 18 +++++++++---------
->>   1 file changed, 9 insertions(+), 9 deletions(-)
->>
->> diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
->> index 2a975eaf69..484a3f5f8f 100644
->> --- a/accel/tcg/user-exec.c
->> +++ b/accel/tcg/user-exec.c
->> @@ -25,15 +25,6 @@
->>   #include "exec/cpu_ldst.h"
->>   #include "translate-all.h"
->>   
->> -#undef EAX
->> -#undef ECX
->> -#undef EDX
->> -#undef EBX
->> -#undef ESP
->> -#undef EBP
->> -#undef ESI
->> -#undef EDI
->> -#undef EIP
->>   #ifdef __linux__
->>   #include <sys/ucontext.h>
->>   #endif
->> @@ -131,6 +122,15 @@ static inline int handle_cpu_signal(uintptr_t pc, unsigned long address,
->>   }
->>   
->>   #if defined(__i386__)
->> +#undef EAX
->> +#undef ECX
->> +#undef EDX
->> +#undef EBX
->> +#undef ESP
->> +#undef EBP
->> +#undef ESI
->> +#undef EDI
->> +#undef EIP
->>   
->>   #if defined(__NetBSD__)
->>   #include <ucontext.h>
->>
+
+
+On 08/09/2017 05:54 PM, Paolo Bonzini wrote:
+> The purpose of this series is to separate the "check" sources from
+> the tests.  After these patches, common.config is reduced to simple
+> shell initialization, and common.rc is only included by the tests.
 > 
-> Why to move under i386?
-
-I tracked the origin of these #defines in op-i386.c (7bfdb6d18c7b) and 
-thought the Exx naming was for i386 while the x86_64 uses the Rxx naming 
-(RAX .. RIP) so you'd only have them on i386 arch.
-However it seems I didn't realize you can access x86_64 registers in 
-32-bit mode via the EAX .. EIP naming, as you see I'm not confident with 
-this CISC arch :S
-
-So I guess it's best to ignore this patch?
-
+> Along the way, a lot of dead code is removed too.
 > 
-> SmartOS pollutes namespace with these symbols on x86_64.
+> Paolo
+> 
+> Paolo Bonzini (12):
+>   qemu-iotests: remove dead code
+>   qemu-iotests: get rid of AWK_PROG
+>   qemu-iotests: move "check" code out of common.rc
+>   qemu-iotests: limit non-_PROG-suffixed variables to common.rc
+>   qemu-iotests: do not include common.rc in "check"
+>   qemu-iotests: do not do useless search for QEMU_*_PROG
+>   qemu-iotests: disintegrate more parts of common.config
+>   qemu-iotests: fix uninitialized variable
+>   qemu-iotests: do not search for binaries in the current directory
+>   qemu-iotests: get rid of $iam
+>   qemu-iotests: include common.env and common.config early
+>   qemu-iotests: merge "check" and "common"
+> 
+>  tests/qemu-iotests/039.out       |  10 +-
+>  tests/qemu-iotests/061.out       |   4 +-
+>  tests/qemu-iotests/137.out       |   2 +-
+>  tests/qemu-iotests/check         | 551 ++++++++++++++++++++++++++++++++++-----
+>  tests/qemu-iotests/common        | 459 --------------------------------
+>  tests/qemu-iotests/common.config | 205 +--------------
+>  tests/qemu-iotests/common.qemu   |   1 +
+>  tests/qemu-iotests/common.rc     | 225 ++++++++--------
+>  8 files changed, 615 insertions(+), 842 deletions(-)
+>  delete mode 100644 tests/qemu-iotests/common
 > 
 
-you should provide some VM :P
-
-I plan to test this project soon:
-https://www.packer.io/docs/builders/qemu.html
-
-Regards,
-
-Phil.
+Stale? Patchset is >1 month old now, doesn't look like it got merged.
