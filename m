@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1drTan-0002f0-BK
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:38:00 -0400
+	(envelope-from <anatol.pomozov@gmail.com>) id 1drTlE-0007Bl-8Q
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:48:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1drTak-0006Di-LJ
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:37:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35068)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1drTak-0006DI-CB
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:37:54 -0400
-Date: Mon, 11 Sep 2017 15:37:48 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170911183748.GS7570@localhost.localdomain>
-References: <1505143227-14324-1-git-send-email-arei.gonglei@huawei.com>
+	(envelope-from <anatol.pomozov@gmail.com>) id 1drTlD-0002f2-7P
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:48:44 -0400
+Received: from mail-vk0-x243.google.com ([2607:f8b0:400c:c05::243]:33572)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <anatol.pomozov@gmail.com>)
+	id 1drTlC-0002di-Vl
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 14:48:43 -0400
+Received: by mail-vk0-x243.google.com with SMTP id j189so2290558vka.0
+	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 11:48:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1505143227-14324-1-git-send-email-arei.gonglei@huawei.com>
-Subject: Re: [Qemu-devel] [PATCH] i386/cpu/hyperv: support over 64 vcpus for
- windows guests
+In-Reply-To: <CAOMFOmWcYxQU7Vf4h+6Q3pxmin5sWH+gNHUFVWGPaMye14Y1ng@mail.gmail.com>
+References: <CAOMFOmXXRN02BT+8M+iKnrGmaTSR8uWoTYCu5A5gv+KTe9xAqg@mail.gmail.com>
+	<20170730214231.GC16400@localhost.localdomain>
+	<CAOMFOmUwi+jF4w7ve4iV_rrPt2uAqZDe6PMZ0r0W047yjFi-gw@mail.gmail.com>
+	<f6024bcb-3dcb-609f-c2a7-3d425e738e33@twiddle.net>
+	<CAOMFOmVN74ghnqWGyfxHB_LqcSLC8XzRkrk88VXaPh4JRvYRNQ@mail.gmail.com>
+	<20170803083956.GD4456@dhcp-200-186.str.redhat.com>
+	<CAOMFOmWaFAbkSYj3m1AWMN6sjdpGMzugOFtfArPjzDLx495N3Q@mail.gmail.com>
+	<20170808150454.GM4850@dhcp-200-186.str.redhat.com>
+	<CAOMFOmWcYxQU7Vf4h+6Q3pxmin5sWH+gNHUFVWGPaMye14Y1ng@mail.gmail.com>
+From: Anatol Pomozov <anatol.pomozov@gmail.com>
+Date: Mon, 11 Sep 2017 11:48:40 -0700
+Message-ID: <CAOMFOmWWi_dEnneYQo2+d2V=uM0ne00OnYJEzFpyDRes_bvRfQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] How to make ELF headers/symbol sections available
+ for multiboot?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,110 +37,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gonglei <arei.gonglei@huawei.com>
-Cc: qemu-devel@nongnu.org, mst@redhat.com, pbonzini@redhat.com, rth@twiddle.net, mtosatti@redhat.com, vrozenfe@redhat.com, weidong.huang@huawei.com
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Alexander Graf <agraf@suse.de>
 
-On Mon, Sep 11, 2017 at 11:20:27PM +0800, Gonglei wrote:
-> Starting with Windows Server 2012 and Windows 8, if
-> CPUID.40000005.EAX contains a value of -1, Windows assumes specific
-> limit to the number of VPs. In this case, Windows Server 2012
-> guest VMs may use more than 64 VPs, up to the maximum supported
-> number of processors applicable to the specific Windows
-> version being used.
-> 
-> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
-> 
-> For compatibility, Let's introduce a new property for X86CPU,
-> named "x-hv-max-vps" as Eduardo's suggestion, and set it
-> to 0x40 before machine 2.10.
-> 
-> (The "x-" prefix indicates that the property is not supposed to
-> be a stable user interface.)
-> 
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> ---
->  include/hw/i386/pc.h |  5 +++++
->  target/i386/cpu.c    |  1 +
->  target/i386/cpu.h    |  2 ++
->  target/i386/kvm.c    | 15 ++++++++++++++-
->  4 files changed, 22 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> index 8226904..087d184 100644
-> --- a/include/hw/i386/pc.h
-> +++ b/include/hw/i386/pc.h
-> @@ -371,6 +371,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
->  
->  #define PC_COMPAT_2_10 \
->      HW_COMPAT_2_10 \
-> +    {\
-> +        .driver   = TYPE_X86_CPU,\
-> +        .property = "x-hv-max-vps",\
-> +        .value    = "0x40",\
-> +    },
->  
->  #define PC_COMPAT_2_9 \
->      HW_COMPAT_2_9 \
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 69676e1..2702485 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -4145,6 +4145,7 @@ static Property x86_cpu_properties[] = {
->                       false),
->      DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
->      DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
-> +    DEFINE_PROP_INT32("x-hv-max-vps", X86CPU, hv_max_vps, -1),
->      DEFINE_PROP_END_OF_LIST()
->  };
->  
-> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-> index 525d35d..5c726f3 100644
-> --- a/target/i386/cpu.h
-> +++ b/target/i386/cpu.h
-> @@ -1282,6 +1282,8 @@ struct X86CPU {
->      int32_t socket_id;
->      int32_t core_id;
->      int32_t thread_id;
-> +
-> +    int32_t hv_max_vps;
->  };
->  
->  static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 6db7783..a898bef 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -751,7 +751,20 @@ int kvm_arch_init_vcpu(CPUState *cs)
->  
->          c = &cpuid_data.entries[cpuid_i++];
->          c->function = HYPERV_CPUID_IMPLEMENT_LIMITS;
-> -        c->eax = 0x40;
-> +
-> +        /*
-> +         * From "Requirements for Implementing the Microsoft
-> +         * Hypervisor Interface":
-> +         * https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
-> +         *
-> +         * "Starting with Windows Server 2012 and Windows 8, if
-> +         * CPUID.40000005.EAX contains a value of -1, Windows assumes
-> +         * specific limit to the number of VPs. In this case, Windows
-> +         * Server 2012 guest VMs may use more than 64 VPs, up to the
-> +         * maximum supported number of processors applicable to the
-> +         * specific Windows version being used."
-> +         */
+Hello
 
-I would place this comment above the DEFINE_PROP_INT32
-declaration, as its purpose is to explain the -1 default.
+I have these changes ready now
+http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg03265.html
+It added ELF parser functionality as discussed above. Are there any
+open questions? What is the best way to proceed forward with these
+patches?
 
+I also have interest in adding Multiboot2 support to qemu. But before
+going with it I would like to finish working on my current patchset.
 
-> +        c->eax = cpu->hv_max_vps;
->          c->ebx = 0x40;
->  
->          kvm_base = KVM_CPUID_SIGNATURE_NEXT;
-> -- 
-> 1.8.3.1
-> 
-> 
-
--- 
-Eduardo
+On Thu, Aug 17, 2017 at 1:54 PM, Anatol Pomozov
+<anatol.pomozov@gmail.com> wrote:
+> Hi
+>
+> On Tue, Aug 8, 2017 at 8:04 AM, Kevin Wolf <kwolf@redhat.com> wrote:
+>> Am 04.08.2017 um 06:53 hat Anatol Pomozov geschrieben:
+>>> Hi Kevin
+>>>
+>>> Thanks for the information.
+>>>
+>>> So I sounds like we do want multiboot to load all sections regardless
+>>> of its segments info. To achieve it we need to read sections headers
+>>> and load all section that were not loaded yet.
+>>>
+>>> I have a working implementation here
+>>> https://github.com/anatol/qemu/commit/26773cf4f1f30b2d0d3fd89cce024f8e9c5603c5
+>>> Tested it with my multiboot OS image. The target iterates over all
+>>> sections and prints their names/address. The output result is the same
+>>> for QEMU and for VmWare+GRUB.
+>>>
+>>> Let me know if this idea looks good so I can send this patch to qemu maillist.
+>>
+>> I'm not sure if I'll find the time to review this in detail, but I'll
+>> just give it a quick look.
+>>
+>> You seem to attempt to add support for 64 bit ELF binaries. The
+>> Multiboot standard doesn't explicitly say that this is forbidden, but
+>> everything in it expects 32 bit binaries and I don't think GRUB (as the
+>> reference implementation for Multiboot) accepts 64 bit ELFs either. The
+>> boot state is 32 bit protected mode in any case. So unless I'm mistaken
+>> on GRUB's behaviour, I'd rather not support 64 bit ELFs.
+>
+> Grub actually does support ELF64 loading with multiboot. Here is the
+> GRUB code that implements it
+> https://github.com/coreos/grub/blob/master/grub-core/loader/multiboot.c#L210
+>
+> It would be great if QEMU behaved similar way.
+>
+> Actually I've been using qemu with ELF64 multiboot for a while and it
+> works great.
+>
+>>
+>> You shouldn't look at ELF headers at all if MULTIBOOT_AOUT_KLUDGE is
+>> given. In this case, the kernel image is to be treated as a flat binary
+>> and section headers can't be expected. I think your code breaks non-ELF
+>> kernels.
+>
+> Ok, will revert this part back.
+>
+>>
+>> As for loading the section headers, duplicating ELF parser code may be
+>> functionally correct, but probably not the best way to implement things.
+>> As I wrote in an earlier email, load_elf() already parses all the
+>> information that you need. You really just need to store it somewhere,
+>> which would probably just mean adding a new parameter to load_elf() and
+>> the parser could then store a copy of the data there if it's non-NULL.
+>
+> Loading section headers is actually a small part of my change. It also:
+>   - calculates memory needed to load all sections into memory
+>   - allocates memory
+>   - loads sections
+>
+> This "load all sections into memory" functionality is very multiboot
+> specific. But if you think if load_elf() is better place for it then I
+> can look at moving it to load_elf().
