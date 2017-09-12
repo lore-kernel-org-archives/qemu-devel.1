@@ -1,33 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39501)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1drpZY-00073L-G6
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:06:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1drpZo-0007ED-Hm
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:06:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1drpZS-0002Px-K1
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:06:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55292)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1drpZS-0002PE-BT
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:06:02 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AF6025F723
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 18:06:00 +0000 (UTC)
-Date: Tue, 12 Sep 2017 15:05:56 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170912180556.GD7570@localhost.localdomain>
-References: <1504776162-31400-1-git-send-email-thuth@redhat.com>
-	<20170911145344.4f2e192c@nial.brq.redhat.com>
-	<f62b660d-596a-f5ed-b4c7-d5adf58d2913@redhat.com>
-	<20170911170600.145e752d@nial.brq.redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1drpZl-0002dk-CN
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:06:24 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35383)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1drpZl-0002d8-6G
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:06:21 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1drpZk-000708-3p
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 18:06:20 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1B3502E8486
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 18:06:20 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170911170600.145e752d@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] hw/core/qdev: Do not allow hot-plugging
- without hotplug controller
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 12 Sep 2017 17:54:05 -0000
+From: John Snow <1716510@bugs.launchpad.net>
+Reply-To: Bug 1716510 <1716510@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150516743999.32018.10984089018227997839.malonedeb@soybean.canonical.com>
+Message-Id: <150523884520.5431.13011370774768629091.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716510] Re: qemu 2.10.0 cannot boot Windows 10
+ familly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,89 +37,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
+To: qemu-devel@nongnu.org
 
-On Mon, Sep 11, 2017 at 05:06:00PM +0200, Igor Mammedov wrote:
-> On Mon, 11 Sep 2017 16:31:39 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
-> > On 11.09.2017 14:53, Igor Mammedov wrote:
-> > > On Thu,  7 Sep 2017 11:22:42 +0200
-> > > Thomas Huth <thuth@redhat.com> wrote:
-> > >   
-> > >> qdev_unplug() bails out with an assertion if the user tries to device_del
-> > >> a hot-plugged device that does not have a hotplug controller. Unfortunately,
-> > >> our devices are all marked with hotpluggable = true by default (see the
-> > >> device_class_init() function in qdev.c), so it currently can happen that
-> > >> the user runs into this situation and QEMU gets terminated unexpectedly:
-> > >>
-> > >> $ qemu-system-aarch64 -M virt -nographic -nodefaults -monitor stdio -S
-> > >> QEMU 2.10.50 monitor - type 'help' for more information
-> > >> (qemu) device_add aux-to-i2c-bridge,id=x
-> > >> (qemu) device_del x
-> > >> **
-> > >> ERROR:qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_ctrl)
-> > >> Aborted (core dumped)
-> > >> Hotplugging devices without a hotplug controller does not make much sense,
-> > >> so we should disallow this during the device_add process already!
-> > >>
-> > >> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > >> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> > >> ---
-> > >>  hw/core/qdev.c | 5 +++++
-> > >>  1 file changed, 5 insertions(+)
-> > >>
-> > >> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> > >> index 606ab53..d9ccce6 100644
-> > >> --- a/hw/core/qdev.c
-> > >> +++ b/hw/core/qdev.c
-> > >> @@ -908,6 +908,11 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
-> > >>              if (local_err != NULL) {
-> > >>                  goto fail;
-> > >>              }
-> > >> +        } else if (dev->hotplugged) {
-> > >> +            /* Hot-plugged device without hotplug controller? No way! */
-> > >> +            error_setg(&local_err, QERR_DEVICE_NO_HOTPLUG,
-> > >> +                       object_get_typename(obj));
-> > >> +            goto fail;
-> > >>          }
-> > >>  
-> > >>          if (dc->realize) {  
-> > > 
-> > > maybe it should be other way around, i.e, fix device so that following would work
-> > > 
-> > >   device_set_realized()
-> > >     if (dev->hotplugged && !dc->hotpluggable) {                                  
-> > >         error_setg(errp, QERR_DEVICE_NO_HOTPLUG, object_get_typename(obj));      
-> > >         return;                                                                  
-> > >     }
-> > > 
-> > > instead of leaving device broken, like in yours
-> > >  84ebd3e watchdog/wdt_diag288: Mark diag288 watchdog as non-hotpluggable  
-> > 
-> > No, that apparently does not work right for new devices since people
-> > keep forgetting to set hotpluggable = false there. Both, Paolo and Peter
-> > suggested that we should not allow hot-plugging if there's no hot plug
-> > controller - it indeed does not make sense, so we should not allow it.
-> historically all devices were hotpluggble and conversion to hotplug
-> controller didn't fix it which os fine as far as user did not attempt
-> unreasonable things. However it should be fixedfor code to work correctly.
-> 
-> I'd suggest to flip default
->  dc->hotpluggable = false;
-> and set it to true explicitly for devices that support hotplug,
-> it obviously harder to do than this patch as it requires audit
-> of all devices, but it looks more correct than fixing symptoms of
-> incorrectly set dc->hotpluggable property.
+Possibly a duplicate of:
 
-I agree we should do this.  If we have any device-type that is
-not hotpluggable on any machine because no machine will return a
-hotplug controller for it, we shouldn't report it as hotpluggable
-through QMP and HMP.
+https://bugs.launchpad.net/qemu/+bug/1714331
+or
+https://bugs.launchpad.net/qemu/+bug/1715700
 
-But this patch also seems to be required, for cases where not all
-machine-types accept hotplug of a given device type.
+Can you share with us the version of OVMF you are using and potentially
+try a newer version (see lp 1714331) If not, keep your eye on lp 1715700
+for updates.
 
--- 
-Eduardo
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716510
+
+Title:
+  qemu 2.10.0 cannot boot Windows 10 familly
+
+Status in QEMU:
+  New
+
+Bug description:
+  On qemu 2.10.0 Windows 10 and Windows Server 2016 hangs during boot.
+  Below is setup of Windows Server 2016. Downgrading to 2.9 fixes the
+  problem.
+
+  /usr/bin/qemu-system-x86_64 -name guest=3D<name>,debug-threads=3Don -S
+  -object
+  secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/libvirt/qemu/domain-2=
+-<name
+  >/master-key.aes -machine pc-q35-2.8,accel=3Dkvm,usb=3Doff,dump-guest-
+  core=3Doff -cpu
+  host,nx=3Don,hv_relaxed,hv_vapic,hv_spinlocks=3D0x1000,hv_vpindex,hv_runt=
+ime,hv_synic,hv_reset,kvm=3Doff
+  -drive file=3D/usr/local/share/edk2.git/ovmf-x64/OVMF-pure-
+  efi.fd,if=3Dpflash,format=3Draw,unit=3D0 -drive
+  file=3D/var/lib/libvirt/qemu/nvram/<name>_VARS.fd,if=3Dpflash,format=3Dra=
+w,unit=3D1
+  -m 4096 -realtime mlock=3Doff -smp 12,sockets=3D1,cores=3D6,threads=3D2
+  -object iothread,id=3Diothread1 -object iothread,id=3Diothread2 -object
+  iothread,id=3Diothread3 -object iothread,id=3Diothread4 -object
+  iothread,id=3Diothread5 -object iothread,id=3Diothread6 -object
+  iothread,id=3Diothread7 -object iothread,id=3Diothread8 -object
+  iothread,id=3Diothread9 -object iothread,id=3Diothread10 -object
+  iothread,id=3Diothread11 -object iothread,id=3Diothread12 -uuid <uuid>
+  -no-user-config -nodefaults -chardev
+  socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/qemu/domain-2-<name>/moni=
+tor.sock,server,nowait
+  -mon chardev=3Dcharmonitor,id=3Dmonitor,mode=3Dcontrol -rtc
+  base=3Dlocaltime,clock=3Dvm,driftfix=3Dslew -no-shutdown -boot strict=3Don
+  -device
+  ioh3420,port=3D0x10,chassis=3D1,id=3Dpci.1,bus=3Dpcie.0,multifunction=3Do=
+n,addr=3D0x2
+  -device ioh3420,port=3D0x11,chassis=3D2,id=3Dpci.2,bus=3Dpcie.0,addr=3D0x=
+2.0x1
+  -device ioh3420,port=3D0x12,chassis=3D3,id=3Dpci.3,bus=3Dpcie.0,addr=3D0x=
+2.0x2
+  -device ioh3420,port=3D0x13,chassis=3D4,id=3Dpci.4,bus=3Dpcie.0,addr=3D0x=
+2.0x3
+  -device ioh3420,port=3D0x14,chassis=3D5,id=3Dpci.5,bus=3Dpcie.0,addr=3D0x=
+2.0x4
+  -device ioh3420,port=3D0x15,chassis=3D6,id=3Dpci.6,bus=3Dpcie.0,addr=3D0x=
+2.0x5
+  -device nec-usb-xhci,id=3Dusb,bus=3Dpci.3,addr=3D0x0 -drive
+  if=3Dnone,media=3Dcdrom,id=3Ddrive-sata0-0-0,readonly=3Don -device ide-
+  cd,bus=3Dide.0,drive=3Ddrive-sata0-0-0,id=3Dsata0-0-0,bootindex=3D2 -drive
+  if=3Dnone,media=3Dcdrom,id=3Ddrive-sata0-0-1,readonly=3Don -device ide-
+  cd,bus=3Dide.1,drive=3Ddrive-sata0-0-1,id=3Dsata0-0-1,bootindex=3D1 -drive
+  file=3D/dev/mapper/<boot disk>,format=3Draw,if=3Dnone,id=3Ddrive-sata0-0-2
+  -device ide-hd,bus=3Dide.2,drive=3Ddrive-
+  sata0-0-2,id=3Dsata0-0-2,bootindex=3D3 -netdev
+  tap,fd=3D21,id=3Dhostnet0,vhost=3Don,vhostfd=3D23 -device virtio-net-
+  pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D<mac>,bus=3Dpci.1,addr=3D0x0 -netdev
+  tap,fd=3D24,id=3Dhostnet1,vhost=3Don,vhostfd=3D25 -device virtio-net-
+  pci,netdev=3Dhostnet1,id=3Dnet1,mac=3D<mac>,bus=3Dpci.2,addr=3D0x0 -devic=
+e usb-
+  tablet,id=3Dinput0,bus=3Dusb.0,port=3D1 -spice
+  unix,addr=3D/var/lib/libvirt/qemu/domain-2-<name>/spice.sock,disable-
+  ticketing,image-compression=3Dauto_glz,seamless-migration=3Don -vnc
+  127.0.0.1:0 -device qxl-
+  vga,id=3Dvideo0,ram_size=3D67108864,vram_size=3D16777216,vram64_size_mb=
+=3D0,vgamem_mb=3D16,max_outputs=3D1,bus=3Dpcie.0,addr=3D0x1
+  -device vhost-scsi-
+  pci,wwpn=3D<wwpn>,vhostfd=3D26,id=3Dhostdev0,bus=3Dpcie.0,addr=3D0x9 -dev=
+ice
+  virtio-balloon-pci,id=3Dballoon0,bus=3Dpci.4,addr=3D0x0 -object rng-
+  random,id=3Dobjrng0,filename=3D/dev/random -device virtio-rng-
+  pci,rng=3Dobjrng0,id=3Drng0,max-bytes=3D1024,period=3D1000,bus=3Dpci.5,ad=
+dr=3D0x0
+  -msg timestamp=3Do
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716510/+subscriptions
