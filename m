@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1drl7e-0006UM-Cl
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:21:08 -0400
+	(envelope-from <bounces@canonical.com>) id 1drl7m-0006as-6a
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:21:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wei.w.wang@intel.com>) id 1drl7Y-0002Oe-8l
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:21:02 -0400
-Received: from mga05.intel.com ([192.55.52.43]:11625)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
-	id 1drl7Y-0002N6-0o
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:20:56 -0400
-Message-ID: <59B7DFED.6060502@intel.com>
-Date: Tue, 12 Sep 2017 21:23:57 +0800
-From: Wei Wang <wei.w.wang@intel.com>
+	(envelope-from <bounces@canonical.com>) id 1drl7i-0002Wl-Nh
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:21:10 -0400
+Received: from indium.canonical.com ([91.189.90.7]:33000)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1drl7i-0002W0-GZ
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:21:06 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1drl7e-0001QJ-Vz
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 13:21:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 8556D2E8500
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 13:20:56 +0000 (UTC)
 MIME-Version: 1.0
-References: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
-	<1503914913-28893-2-git-send-email-wei.w.wang@intel.com>
-	<20170911125455.GA32538@bombadil.infradead.org>
-In-Reply-To: <20170911125455.GA32538@bombadil.infradead.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v15 1/5] lib/xbitmap: Introduce xbitmap
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 12 Sep 2017 13:11:12 -0000
+From: Scott Moser <smoser@ubuntu.com>
+Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
+Message-Id: <150522187313.22438.18018057700251653602.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
+ feature flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +37,149 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Matthew Wilcox <willy@infradead.org>
-Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
+To: qemu-devel@nongnu.org
 
-On 09/11/2017 08:54 PM, Matthew Wilcox wrote:
-> On Mon, Aug 28, 2017 at 06:08:29PM +0800, Wei Wang wrote:
->> From: Matthew Wilcox <mawilcox@microsoft.com>
->>
->> The eXtensible Bitmap is a sparse bitmap representation which is
->> efficient for set bits which tend to cluster.  It supports up to
->> 'unsigned long' worth of bits, and this commit adds the bare bones --
->> xb_set_bit(), xb_clear_bit() and xb_test_bit().
->>
->> Signed-off-by: Matthew Wilcox <mawilcox@microsoft.com>
->> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
->> Cc: Andrew Morton <akpm@linux-foundation.org>
->> Cc: Michal Hocko <mhocko@kernel.org>
->> Cc: Michael S. Tsirkin <mst@redhat.com>
-> This is quite naughty of you.  You've modified the xbitmap implementation
-> without any indication in the changelog that you did so.
+Your example does work (using -blockdev), but I can't get it to work with
+-drive.
 
-This was changed in the previous version and included in that
-v13->v14 ChangeLog: https://lkml.org/lkml/2017/8/16/923
+$ qemu-system-x86_64 \
+   -drive id=3Dd01,file=3Ddisk1.img,format=3Dqcow2 \
+   -device drive=3Dd01,serial=3Ds01,driver=3Dvirtio-blk,index=3D1,share-rw=
+=3Don \
+   -device drive=3Dd01,serial=3Ds01,driver=3Dvirtio-blk,index=3D2,share-rw=
+=3Don
+warning: TCG doesn't support requested feature: CPUID.01H:ECX.vmx [bit 5]
+qemu-system-x86_64: -device drive=3Dd01,serial=3Ds01,driver=3Dvirtio-blk,in=
+dex=3D1,share-rw=3Don: Drive 'd01' is already in use because it has been au=
+tomatically connected to another device (did you need 'if=3Dnone' in the dr=
+ive options?)
 
 
-> I don't
-> think the modifications you made are an improvement, but without any
-> argumentation from you I don't know why you think they're an improvement.
+## ok, fix that error, add 'if=3Dnone' to the -drive.
 
-Probably it shouldn't be modified when the discussion is incomplete:
-https://lkml.org/lkml/2017/8/10/36
-Sorry about that. Hope we could get more feedback from you on the
-changes later.
+$ qemu-system-x86_64  \
+  -drive id=3Dd01,file=3Ddisk1.img,format=3Dqcow2,if=3Dnone \
+  -device virtio-blk,drive=3Dd01,serial=3Ds01,index=3D1,share-rw=3Don \
+  -device virtio-blk,drive=3Dd01,serial=3Ds01,index=3D2,share-rw=3Don
+qemu-system-x86_64: -device drive=3Dd01,serial=3Ds01,driver=3Dvirtio-blk,in=
+dex=3D1,share-rw=3Don: Property '.index' not found
 
-If you want, we can continue this part from the the v13 patch, which might
-be closer to the implementation that you like: 
-https://lkml.org/lkml/2017/8/3/60
+## ok, index belongs on the -drive (which I should have known from
+## the past, but which seems not the right place).  Try that anyway.
 
->> diff --git a/lib/xbitmap.c b/lib/xbitmap.c
->> new file mode 100644
->> index 0000000..8c55296
->> --- /dev/null
->> +++ b/lib/xbitmap.c
->> @@ -0,0 +1,176 @@
->> +#include <linux/slab.h>
->> +#include <linux/xbitmap.h>
->> +
->> +/*
->> + * The xbitmap implementation supports up to ULONG_MAX bits, and it is
->> + * implemented based on ida bitmaps. So, given an unsigned long index,
->> + * the high order XB_INDEX_BITS bits of the index is used to find the
->> + * corresponding item (i.e. ida bitmap) from the radix tree, and the low
->> + * order (i.e. ilog2(IDA_BITMAP_BITS)) bits of the index are indexed into
->> + * the ida bitmap to find the bit.
->> + */
->> +#define XB_INDEX_BITS		(BITS_PER_LONG - ilog2(IDA_BITMAP_BITS))
->> +#define XB_MAX_PATH		(DIV_ROUND_UP(XB_INDEX_BITS, \
->> +					      RADIX_TREE_MAP_SHIFT))
->> +#define XB_PRELOAD_SIZE		(XB_MAX_PATH * 2 - 1)
-> I don't understand why you moved the xb_preload code here from the
-> radix tree.  I want all the code which touches the preload implementation
-> together in one place, which is the radix tree.
+$ qemu-system-x86_64  \
+  -drive id=3Dd01,file=3Ddisk1.img,format=3Dqcow2,if=3Dnone,index=3D1  \
+  -device virtio-blk,drive=3Dd01,serial=3Ds01,share-rw=3Don \
+  -device virtio-blk,drive=3Dd01,serial=3Ds01,share-rw=3Don
+qemu-system-x86_64: -device drive=3Dd01,serial=3Ds01,driver=3Dvirtio-blk,sh=
+are-rw=3Don: Drive 'd01' is already in use by another device
 
-Based on the previous comments (put all the code to lib/xbitmap.c) and your
-comment here, I will move xb_preload() and the above Macro to radix-tree.c,
-while leaving the rest in xbitmap.c.
+## Huh?  Isn't that what I said to explicitly allow with share-rw=3Don?
 
-Would this be something you expected? Or would you like to move all back
-to radix-tree.c like that in v13?
+Note that I've also tried with 'format=3Draw'.  Is there something I'm
+missing to try to use -drive and -device ?
 
+Lastly (if you're still reading), how do  you specify the format of
+the file to -blockdev ?  adding 'format=3Dqcow2' makes qemu complain that
+"'format' is unexpected".
 
-Best,
-Wei
+Thanks for your time.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716028
+
+Title:
+  qemu 2.10 locks images with no feature flag
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  1) % lsb_release -rd
+  Description:	Ubuntu Artful Aardvark (development branch)
+  Release:	17.10
+
+  2) % apt-cache policy qemu-system-x86
+  qemu-system-x86:
+    Installed: 1:2.10~rc3+dfsg-0ubuntu1
+    Candidate: 1:2.10+dfsg-0ubuntu1
+    Version table:
+       1:2.10+dfsg-0ubuntu1 500
+          500 http://archive.ubuntu.com//ubuntu devel/main amd64 Packages
+   *** 1:2.10~rc3+dfsg-0ubuntu1 100
+          100 /var/lib/dpkg/status
+
+  3) qemu locks image files with no way to discover this feature nor how
+  to disable it
+
+  4) qemu provides a way to query if it supports image locking, and what
+  the default value is, and how to disable the locking via cli
+
+  qemu 2.10 now will lock image files and warn if an image is currently
+  locked.  This prevent qemu from running (and possibly corrupting said
+  image).
+
+  However, qemu does not provide any way to determine if a qemu binary
+  actually has this capability.  Normally behavior changing features are
+  exposed via some change to the qemu help menu or QMP/QAPI output of
+  capabilities.
+
+  I believe this slipped through since libvirt already does image
+  locking, but direct cli users will be caught by this change.
+
+  In particular, we have a use-case where we simulate multipath disks by
+  creating to disks which point to the same file which now breaks
+  without adding the 'file.locking=3Doff' to the -drive parameters;  which
+  is also completely undocumented and unexposed.
+
+  Some parts of the cli like -device allow querying of settable options
+  (qemu-system-x86 -device scsi_hd,?)  but nothing equivalent exists for
+  -drive parameters.
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 17.10
+  Package: qemu-system-x86 1:2.10~rc3+dfsg-0ubuntu1
+  ProcVersionSignature: Ubuntu 4.12.0-11.12-generic 4.12.5
+  Uname: Linux 4.12.0-11-generic x86_64
+  NonfreeKernelModules: zfs zunicode zavl zcommon znvpair
+  ApportVersion: 2.20.6-0ubuntu7
+  Architecture: amd64
+  Date: Fri Sep  8 12:56:53 2017
+  JournalErrors:
+   Hint: You are currently not seeing messages from other users and the sys=
+tem.
+         Users in groups 'adm', 'systemd-journal' can see all messages.
+         Pass -q to turn off this notice.
+   -- Logs begin at Mon 2017-01-30 11:56:02 CST, end at Fri 2017-09-08 12:5=
+6:46 CDT. --
+   -- No entries --
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: HP ProLiant DL360 Gen9
+  ProcEnviron:
+   TERM=3Dxterm
+   PATH=3D(custom, no user)
+   XDG_RUNTIME_DIR=3D<set>
+   LANG=3Den_US.UTF-8
+   SHELL=3D/bin/bash
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.12.0-11-generic root=3DUUID=3D=
+45354276-e0c0-4bf6-9083-f130b89411cc ro --- console=3DttyS1,115200
+  SourcePackage: qemu
+  UpgradeStatus: No upgrade log present (probably fresh install)
+  dmi.bios.date: 03/05/2015
+  dmi.bios.vendor: HP
+  dmi.bios.version: P89
+  dmi.chassis.type: 23
+  dmi.chassis.vendor: HP
+  dmi.modalias: dmi:bvnHP:bvrP89:bd03/05/2015:svnHP:pnProLiantDL360Gen9:pvr=
+:cvnHP:ct23:cvr:
+  dmi.product.family: ProLiant
+  dmi.product.name: ProLiant DL360 Gen9
+  dmi.sys.vendor: HP
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716028/+subscriptions
