@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drsay-0005Cl-Lq
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:19:49 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1drsdC-00060D-Ff
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:22:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drsav-0001m0-To
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:19:48 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:37543)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drsav-0001lh-PN
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:19:45 -0400
-Received: by mail-qk0-x241.google.com with SMTP id r66so7754150qke.4
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 14:19:45 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 12 Sep 2017 18:19:34 -0300
-Message-Id: <20170912211934.20919-1-f4bug@amsat.org>
+	(envelope-from <vilanova@ac.upc.edu>) id 1drsd9-0003du-Ng
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:22:06 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:50042)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1drsd9-0003dM-Cq
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:22:03 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 13 Sep 2017 00:21:53 +0300
+Message-Id: <150525131357.15988.12385200396782957884.stgit@frigg.lan>
+In-Reply-To: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
+References: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] accel/tcg: move USER code to user-exec.c
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 05/22] instrument: [bsd-user] Add command
+ line library loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,146 +27,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
-Based-on: 20170911213328.9701-5-f4bug@amsat.org
+ bsd-user/main.c    |   17 +++++++++++++++++
+ bsd-user/syscall.c |    5 +++++
+ 2 files changed, 22 insertions(+)
 
- accel/tcg/tcg-runtime.c | 54 -------------------------------------------------
- accel/tcg/user-exec.c   | 52 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 52 insertions(+), 54 deletions(-)
-
-diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
-index 3e23649dd7..aafb171294 100644
---- a/accel/tcg/tcg-runtime.c
-+++ b/accel/tcg/tcg-runtime.c
-@@ -178,57 +178,3 @@ void HELPER(exit_atomic)(CPUArchState *env)
- {
-     cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
- }
--
--#ifndef CONFIG_SOFTMMU
--/* The softmmu versions of these helpers are in cputlb.c.  */
--
--/* Do not allow unaligned operations to proceed.  Return the host address.  */
--static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
--                               int size, uintptr_t retaddr)
--{
--    /* Enforce qemu required alignment.  */
--    if (unlikely(addr & (size - 1))) {
--        cpu_loop_exit_atomic(ENV_GET_CPU(env), retaddr);
--    }
--    return g2h(addr);
--}
--
--/* Macro to call the above, with local variables from the use context.  */
--#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, GETPC())
--
--#define ATOMIC_NAME(X)   HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
--#define EXTRA_ARGS
--
--#define DATA_SIZE 1
--#include "atomic_template.h"
--
--#define DATA_SIZE 2
--#include "atomic_template.h"
--
--#define DATA_SIZE 4
--#include "atomic_template.h"
--
--#ifdef CONFIG_ATOMIC64
--#define DATA_SIZE 8
--#include "atomic_template.h"
--#endif
--
--/* The following is only callable from other helpers, and matches up
--   with the softmmu version.  */
--
--#ifdef CONFIG_ATOMIC128
--
--#undef EXTRA_ARGS
--#undef ATOMIC_NAME
--#undef ATOMIC_MMU_LOOKUP
--
--#define EXTRA_ARGS     , TCGMemOpIdx oi, uintptr_t retaddr
--#define ATOMIC_NAME(X) \
--    HELPER(glue(glue(glue(atomic_ ## X, SUFFIX), END), _mmu))
--#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, retaddr)
--
--#define DATA_SIZE 16
--#include "atomic_template.h"
--#endif /* CONFIG_ATOMIC128 */
--
--#endif /* !CONFIG_SOFTMMU */
-diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
-index 2a975eaf69..492ea0826c 100644
---- a/accel/tcg/user-exec.c
-+++ b/accel/tcg/user-exec.c
-@@ -24,6 +24,7 @@
- #include "qemu/bitops.h"
- #include "exec/cpu_ldst.h"
- #include "translate-all.h"
-+#include "exec/helper-proto.h"
- 
- #undef EAX
- #undef ECX
-@@ -573,3 +574,54 @@ int cpu_signal_handler(int host_signum, void *pinfo,
- #error host CPU specific signal handler needed
- 
- #endif
-+
-+/* The softmmu versions of these helpers are in cputlb.c.  */
-+
-+/* Do not allow unaligned operations to proceed.  Return the host address.  */
-+static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
-+                               int size, uintptr_t retaddr)
-+{
-+    /* Enforce qemu required alignment.  */
-+    if (unlikely(addr & (size - 1))) {
-+        cpu_loop_exit_atomic(ENV_GET_CPU(env), retaddr);
-+    }
-+    return g2h(addr);
-+}
-+
-+/* Macro to call the above, with local variables from the use context.  */
-+#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, GETPC())
-+
-+#define ATOMIC_NAME(X)   HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
-+#define EXTRA_ARGS
-+
-+#define DATA_SIZE 1
-+#include "atomic_template.h"
-+
-+#define DATA_SIZE 2
-+#include "atomic_template.h"
-+
-+#define DATA_SIZE 4
-+#include "atomic_template.h"
-+
-+#ifdef CONFIG_ATOMIC64
-+#define DATA_SIZE 8
-+#include "atomic_template.h"
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 8a6706a1c8..104844edfc 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -33,6 +33,7 @@
+ #include "exec/log.h"
+ #include "trace/control.h"
+ #include "glib-compat.h"
++#include "instrument/cmdline.h"
+=20
+ int singlestep;
+ unsigned long mmap_min_addr;
+@@ -667,6 +668,11 @@ static void usage(void)
+            "-B address        set guest_base address to address\n"
+            "-bsd type         select emulated BSD type FreeBSD/NetBSD/Op=
+enBSD (default)\n"
+            "\n"
++#if defined(CONFIG_INSTRUMENT)
++           "-instr [file=3D]<file>[,arg=3D<string>]\n"
++           "                  load an instrumentation library\n"
++           "\n"
 +#endif
+            "Debug options:\n"
+            "-d item1[,...]    enable logging of specified items\n"
+            "                  (use '-d help' for a list of log items)\n"
+@@ -738,6 +744,9 @@ int main(int argc, char **argv)
+     envlist_t *envlist =3D NULL;
+     char *trace_file =3D NULL;
+     bsd_type =3D target_openbsd;
++    char *instrument_path =3D NULL;
++    int instrument_argc =3D 0;
++    const char **instrument_argv =3D NULL;
+=20
+     if (argc <=3D 1)
+         usage();
+@@ -756,6 +765,9 @@ int main(int argc, char **argv)
+     cpu_model =3D NULL;
+=20
+     qemu_add_opts(&qemu_trace_opts);
++#if defined(CONFIG_INSTRUMENT)
++    qemu_add_opts(&qemu_instr_opts);
++#endif
+=20
+     optind =3D 1;
+     for (;;) {
+@@ -843,6 +855,9 @@ int main(int argc, char **argv)
+         } else if (!strcmp(r, "trace")) {
+             g_free(trace_file);
+             trace_file =3D trace_opt_parse(optarg);
++        } else if (!strcmp(r, "instr")) {
++            instr_opt_parse(optarg, &instrument_path,
++                            &instrument_argc, &instrument_argv);
+         } else {
+             usage();
+         }
+@@ -872,6 +887,8 @@ int main(int argc, char **argv)
+     }
+     trace_init_file(trace_file);
+=20
++    instr_init(instrument_path, instrument_argc, instrument_argv);
 +
-+/* The following is only callable from other helpers, and matches up
-+   with the softmmu version.  */
+     /* Zero out regs */
+     memset(regs, 0, sizeof(struct target_pt_regs));
+=20
+diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
+index 66492aaf5d..3230f722f3 100644
+--- a/bsd-user/syscall.c
++++ b/bsd-user/syscall.c
+@@ -26,6 +26,8 @@
+=20
+ #include "qemu.h"
+ #include "qemu-common.h"
++#include "instrument/cmdline.h"
 +
-+#ifdef CONFIG_ATOMIC128
-+
-+#undef EXTRA_ARGS
-+#undef ATOMIC_NAME
-+#undef ATOMIC_MMU_LOOKUP
-+
-+#define EXTRA_ARGS     , TCGMemOpIdx oi, uintptr_t retaddr
-+#define ATOMIC_NAME(X) \
-+    HELPER(glue(glue(glue(atomic_ ## X, SUFFIX), END), _mmu))
-+#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, retaddr)
-+
-+#define DATA_SIZE 16
-+#include "atomic_template.h"
-+#endif /* CONFIG_ATOMIC128 */
--- 
-2.14.1
+=20
+ //#define DEBUG
+=20
+@@ -332,6 +334,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, a=
+bi_long arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        instr_fini();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret =3D 0; /* avoid warning */
+@@ -430,6 +433,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, ab=
+i_long arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        instr_fini();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret =3D 0; /* avoid warning */
+@@ -505,6 +509,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, a=
+bi_long arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        instr_fini();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret =3D 0; /* avoid warning */
