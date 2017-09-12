@@ -1,34 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59864)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dri42-0004xv-KK
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:05:12 -0400
+	(envelope-from <thuth@redhat.com>) id 1driDv-00088t-Pp
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:15:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dri3x-0003co-MI
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:05:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53220)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dri3x-0003bj-GT
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:05:01 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dri3w-00072E-Gh
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 10:05:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 72D6E2E8486
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 10:05:00 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1driDu-0006bc-G9
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:15:19 -0400
+References: <20170911172022.4738-1-eblake@redhat.com>
+	<20170911172022.4738-29-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <52e5f270-4648-b3ce-bdaf-c4b59700ff01@redhat.com>
+Date: Tue, 12 Sep 2017 12:14:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20170911172022.4738-29-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Sep 2017 09:45:51 -0000
-From: Philosophish <philosophish@gmail.com>
-Reply-To: Bug 1135567 <1135567@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130228104653.3556.64942.malonedeb@soybean.canonical.com>
-Message-Id: <150520955157.32282.10731642024196215044.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1135567] Re: QXL crashes a Windows 7 guest if
- host goes into screensaver
+Subject: Re: [Qemu-devel] [PATCH v7 28/38] libqtest: Add qtest_[v]startf()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +24,178 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, pbonzini@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Ben Warren <ben@skyportsystems.com>, "open list:IDE" <qemu-block@nongnu.org>
 
-Hello,
+On 11.09.2017 19:20, Eric Blake wrote:
+> We have several callers that were formatting the argument strings
+> themselves; consolidate this effort by adding new convenience
+> functions directly in libqtest, and update all call-sites that
+> can benefit from it.
+[...]
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index e8c2e11817..b535d7768f 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -245,6 +245,27 @@ QTestState *qtest_start(const char *extra_args)
+>      return global_qtest =3D s;
+>  }
+>=20
+> +QTestState *qtest_vstartf(const char *fmt, va_list ap)
+> +{
+> +    char *args =3D g_strdup_vprintf(fmt, ap);
+> +    QTestState *s;
+> +
+> +    s =3D qtest_start(args);
+> +    global_qtest =3D NULL;
 
-Obviously my hardware configuration and versions etc. have changed.
+Don't you need a g_free(args) here?
 
-Also, I have taken to not using screensavers in the virtual machines
-anymore i.e. disabled.
+> +    return s;
+> +}
+> +
+> +QTestState *qtest_startf(const char *fmt, ...)
+> +{
+> +    va_list ap;
+> +    QTestState *s;
+> +
+> +    va_start(ap, fmt);
+> +    s =3D qtest_vstartf(fmt, ap);
+> +    va_end(ap);
+> +    return s;
+> +}
+[...]
+> diff --git a/tests/e1000-test.c b/tests/e1000-test.c
+> index 0c5fcdcc44..12bc526ad6 100644
+> --- a/tests/e1000-test.c
+> +++ b/tests/e1000-test.c
+> @@ -14,16 +14,8 @@
+>  static void test_device(gconstpointer data)
+>  {
+>      const char *model =3D data;
+> -    QTestState *s;
+> -    char *args;
+>=20
+> -    args =3D g_strdup_printf("-device %s", model);
+> -    s =3D qtest_start(args);
+> -
+> -    if (s) {
+> -        qtest_quit(s);
+> -    }
+> -    g_free(args);
+> +    qtest_quit(qtest_startf("-device %s", model));
 
-BUT: I have set it up as similarly as possible and the crash/freeze/hang
-up with current versions of the drivers seems to be gone.
+Just my personal taste, but I think I'd be nicer to keep this on
+separate lines:
 
-So I guess the ticket can be closed.
+    QTestState *s;
 
--- =
+    s =3D qtest_startf("-device %s", model);
+    qtest_quit(s);
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1135567
+>  }
+[...]
+> diff --git a/tests/eepro100-test.c b/tests/eepro100-test.c
+> index bdc8a67d57..fc9ea84d66 100644
+> --- a/tests/eepro100-test.c
+> +++ b/tests/eepro100-test.c
+> @@ -13,18 +13,9 @@
+>  static void test_device(gconstpointer data)
+>  {
+>      const char *model =3D data;
+> -    QTestState *s;
+> -    char *args;
+> -
+> -    args =3D g_strdup_printf("-device %s", model);
+> -    s =3D qtest_start(args);
+>=20
+>      /* Tests only initialization so far. TODO: Implement functional te=
+sts */
+> -
+> -    if (s) {
+> -        qtest_quit(s);
+> -    }
+> -    g_free(args);
+> +    qtest_quit(qtest_startf("-device %s", model));
+>  }
 
-Title:
-  QXL crashes a Windows 7 guest if host goes into screensaver
+dito
 
-Status in QEMU:
-  Incomplete
+[...]
+> diff --git a/tests/numa-test.c b/tests/numa-test.c
+> index fa21d26935..e2f6c68be8 100644
+> --- a/tests/numa-test.c
+> +++ b/tests/numa-test.c
+> @@ -12,20 +12,14 @@
+>  #include "qemu/osdep.h"
+>  #include "libqtest.h"
+>=20
+> -static char *make_cli(const char *generic_cli, const char *test_cli)
+> -{
+> -    return g_strdup_printf("%s %s", generic_cli ? generic_cli : "", te=
+st_cli);
+> -}
+> -
+>  static void test_mon_explicit(const void *data)
+>  {
+>      char *s;
+> -    char *cli;
+> +    const char *args =3D data;
+>=20
+> -    cli =3D make_cli(data, "-smp 8 "
+> -                   "-numa node,nodeid=3D0,cpus=3D0-3 "
+> -                   "-numa node,nodeid=3D1,cpus=3D4-7 ");
+> -    qtest_start(cli);
+> +    global_qtest =3D qtest_startf("%s -smp 8 "
+> +                                "-numa node,nodeid=3D0,cpus=3D0-3 "
+> +                                "-numa node,nodeid=3D1,cpus=3D4-7 ", a=
+rgs);
+>=20
+>      s =3D hmp("info numa");
+>      g_assert(strstr(s, "node 0 cpus: 0 1 2 3"));
+> @@ -33,16 +27,14 @@ static void test_mon_explicit(const void *data)
+>      g_free(s);
+>=20
+>      qtest_quit(global_qtest);
+> -    g_free(cli);
+>  }
+>=20
+>  static void test_mon_default(const void *data)
+>  {
+>      char *s;
+> -    char *cli;
+> +    const char *args =3D data;
+>=20
+> -    cli =3D make_cli(data, "-smp 8 -numa node -numa node");
+> -    qtest_start(cli);
+> +    global_qtest =3D qtest_startf("%s -smp 8 -numa node -numa node", a=
+rgs);
+>=20
+>      s =3D hmp("info numa");
+>      g_assert(strstr(s, "node 0 cpus: 0 2 4 6"));
+> @@ -50,18 +42,16 @@ static void test_mon_default(const void *data)
+>      g_free(s);
+>=20
+>      qtest_quit(global_qtest);
+> -    g_free(cli);
+>  }
+>=20
+>  static void test_mon_partial(const void *data)
+>  {
+>      char *s;
+> -    char *cli;
+> +    const char *args =3D data;
+>=20
+> -    cli =3D make_cli(data, "-smp 8 "
+> -                   "-numa node,nodeid=3D0,cpus=3D0-1 "
+> -                   "-numa node,nodeid=3D1,cpus=3D4-5 ");
+> -    qtest_start(cli);
+> +    global_qtest =3D qtest_startf("%s -smp 8 "
+> +                                "-numa node,nodeid=3D0,cpus=3D0-1 "
+> +                                "-numa node,nodeid=3D1,cpus=3D4-5 ", a=
+rgs);
 
-Bug description:
-  Note: if further information is required, I'll be glad to supply it.
+Does GCC emit a warning if you'd used data here directly? Otherwise I
+think you could simply do this without the local args variable...
 
-  I am using on the host
-  - HP z800 with 72GB RAM and 2x x5680
-  - Gentoo 64-bit host (3.7.9 kernel, FGLRX RADEON driver 13.1)
-  - LIBVIRT 1.0.2 with QEMU(-KVM) 1.4.0
-
-  The guest:
-  - Windows 7 32-bit
-  - 2GB allocated
-  - 2 CPU
-  - using virtio for everything (disk,net,memballoon)
-  - Display =3D SPICE with spice channel
-  - Video driver is qxl (ram says 64MB)
-  - Spice-guest-tools 0.52 installed
-
-  When I use QXL and  have the guest open in Virt-Manager/Virt-Viewer
-  and let the host go into screensaver mode, the Win7 crashes hard.
-
-  When I change video to VGA, it survives the screen saver,  no problem
-  at all ,smooth sailing.
-
-  regards
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1135567/+subscriptions
+ Thomas
