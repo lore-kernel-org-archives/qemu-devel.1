@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49610)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1drnEy-0007PB-Pn
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:36:45 -0400
+	(envelope-from <david@redhat.com>) id 1drnKm-00018O-3D
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:42:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1drnEy-0007Eq-1O
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:36:44 -0400
-Date: Tue, 12 Sep 2017 16:36:30 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170912153630.GC2225@work-vm>
-References: <20170912140149.7692-1-lvivier@redhat.com>
-	<20170912164644.2a0b6977@bahia.lan>
-	<6198350f-a694-cf1b-ec00-4c42ccce39a6@redhat.com>
+	(envelope-from <david@redhat.com>) id 1drnKi-00024Z-1o
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:42:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54100)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1drnKh-00023x-Ro
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:42:39 -0400
+References: <20170911152150.12535-1-david@redhat.com>
+	<20170911152150.12535-12-david@redhat.com>
+	<20170912144330.3f07b30b@nial.brq.redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <d086a0f8-5440-23ae-2644-8864e835cd84@redhat.com>
+Date: Tue, 12 Sep 2017 17:42:35 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6198350f-a694-cf1b-ec00-4c42ccce39a6@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] hmp: fix "dump-quest-memory"
- segfault
+In-Reply-To: <20170912144330.3f07b30b@nial.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 11/21] s390x: allow only 1 CPU with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, ehabkost@redhat.com
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
 
-* Thomas Huth (thuth@redhat.com) wrote:
-> On 12.09.2017 16:46, Greg Kurz wrote:
-> > On Tue, 12 Sep 2017 16:01:46 +0200
-> > Laurent Vivier <lvivier@redhat.com> wrote:
-> > 
-> >> Fix aarch64 and ppc when dump-guest-memory is
-> >> used with none machine type and no CPU.
-> >>
-> >> The other machine types don't have the problem.
-> >>
-> >> Update test-hmp, to test none machine type
-> >> with (2 MB) and without memory, and add a test
-> >> to test dump-quest-memory without filter parameters
-> >> (it needs the fix from Cornelia Huck to work)
-> >>
-> >> v3:
-> >>   - remove blank line after a comment
-> >>   - forbid memory dump when there is no CPU
-> >>
-> > 
-> > So in the end, we would forbid dump on aarch64 and
-> > ppc, while it is allowed on i386... I don't really
-> > care about which behavior is more appropriate but
-> > I guess they should be consistent at least.
+On 12.09.2017 14:43, Igor Mammedov wrote:
+> On Mon, 11 Sep 2017 17:21:40 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> It's kind of consistent: Allow it on architectures with fixed endianess,
-> but disallow it on architectures without fixed endianess ;-)
+>> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
+>> guest tries to bring these CPUs up but fails), because we don't support
+>> multiple CPUs on s390x under TCG.
+>>
+>> Let's bail out if more than 1 is specified, so we don't raise people's
+>> hope. Make it a define, so we can easily bump it up later.
+>>
+>> Tested-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/s390x/s390-virtio-ccw.c | 10 ++++++++++
+>>  1 file changed, 10 insertions(+)
+>>
+>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+>> index f67b4b5d58..f1198b2745 100644
+>> --- a/hw/s390x/s390-virtio-ccw.c
+>> +++ b/hw/s390x/s390-virtio-ccw.c
+>> @@ -23,6 +23,7 @@
+>>  #include "hw/s390x/css.h"
+>>  #include "virtio-ccw.h"
+>>  #include "qemu/config-file.h"
+>> +#include "qemu/error-report.h"
+>>  #include "s390-pci-bus.h"
+>>  #include "hw/s390x/storage-keys.h"
+>>  #include "hw/s390x/storage-attributes.h"
+>> @@ -47,6 +48,8 @@ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+>>      return cpu_states[cpu_addr];
+>>  }
+>>  
+>> +/* #define S390_TCG_SMP_SUPPORT */
+> I'd drop define and ifdef for something that doesn't exists
 
-Another way to put it is that you can dump unless you need
-information about the CPU.
+Conny requested it as we might see some work on that area (supporting
+smp) soon. So as long as there are no other opinions, I'll stick to the
+current version.
 
-It also makes me wonder what happens on those CPUs that can
-change their endianness dynamically.
+Thanks!
 
-(I'm not fussed either way as long as it doesn't crash;
-'none' is full of corner cases)
+-- 
 
-Dave
+Thanks,
 
-> Honestly, it should not matter - we're talking here about the "none"
-> machine without a CPU ... as long as it does not crash, there is no need
-> for a working "dump-guest-memory" function here.
-> 
->  Thomas
-> 
-
-
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+David
