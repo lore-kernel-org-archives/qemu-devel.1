@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51398)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drsIq-0008F7-E0
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:01:05 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1drsJp-0000id-3g
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:02:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drsIn-0005rr-3w
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:01:04 -0400
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:46039)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drsIm-0005rQ-T2
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:01:01 -0400
-Received: by mail-wm0-f43.google.com with SMTP id g206so100454wme.0
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 14:01:00 -0700 (PDT)
-References: <cover.1505158760.git.alistair.francis@xilinx.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <fd2345ad-b9de-c0d2-7ab5-e1cad759bbaa@redhat.com>
-Date: Tue, 12 Sep 2017 23:00:54 +0200
+	(envelope-from <vilanova@ac.upc.edu>) id 1drsJl-0006fe-Lj
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:02:05 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:45493)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1drsJl-0006ZB-6U
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:02:01 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 13 Sep 2017 00:01:42 +0300
+Message-Id: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <cover.1505158760.git.alistair.francis@xilinx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] More warning reporting fixed
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 00/22] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +25,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: alistair23@gmail.com, armbru@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On 11/09/2017 21:52, Alistair Francis wrote:
-> This series expands on my previous series by converting more existing
-> prints to use warn_report() instead of error_report() or fprintf().
-> 
-> As discussed with Paolo and Markus this series combines libqemustub.a into
-> libqemuutil.a to avoid circular dependencies.
-> 
-> V4:
->  - Improve some extra MIPs messages
->  - Fix build issues
->  - Fix i386 print message
-> V3:
->  - Small corrections as reported by Markus
->  - Rename patch 3 and 5 so they don't have the same name
->  - Combine libqemustub.a into libqemuutil.a
->  - Add an extra patch with general cleanups
-> 
-> V2:
->  - Fixup auto CC logic so everyone is CCed
-> 
-> 
-> 
-> Alistair Francis (8):
->   hw/i386: Improve some of the warning messages
->   Convert remaining error_report() to warn_report()
->   Convert single line fprintf(.../n) to warn_report()
->   Convert multi-line fprintf() to warn_report()
->   General warn report fixups
->   target/mips: Convert VM clock update prints to warn_report
->   Makefile: Remove libqemustub.a
->   Convert remaining single line fprintf() to warn_report()
-> 
->  Makefile                    |  7 +++----
->  Makefile.target             |  2 +-
->  accel/kvm/kvm-all.c         |  7 +++----
->  block/qcow2.c               |  9 +++++----
->  block/vvfat.c               |  7 ++++---
->  docs/devel/build-system.txt | 16 +++++++---------
->  hw/acpi/core.c              | 10 +++++-----
->  hw/arm/vexpress.c           |  4 ++--
->  hw/i386/acpi-build.c        | 15 ++++++++++-----
->  hw/i386/pc.c                |  9 ++++-----
->  hw/i386/pc_q35.c            |  8 +++++---
->  hw/i386/xen/xen-mapcache.c  |  5 +++--
->  hw/mips/mips_malta.c        |  4 ++--
->  hw/mips/mips_r4k.c          |  5 ++---
->  hw/misc/applesmc.c          |  2 +-
->  hw/s390x/s390-virtio.c      | 18 ++++++++++--------
->  hw/usb/hcd-ehci.c           |  5 +++--
->  hw/virtio/virtio-balloon.c  |  3 ++-
->  net/hub.c                   | 10 ++++------
->  net/net.c                   | 15 ++++++++-------
->  qga/vss-win32.c             |  2 +-
->  target/i386/cpu.c           | 12 ++++++------
->  target/i386/hax-mem.c       |  6 +++---
->  target/mips/kvm.c           | 10 +++++-----
->  target/ppc/translate_init.c | 17 ++++++++---------
->  target/s390x/kvm.c          |  4 ++--
->  tests/Makefile.include      |  8 ++++----
->  trace/control.c             |  4 ++--
->  trace/simple.c              |  3 ++-
->  ui/keymaps.c                | 10 +++++-----
->  ui/spice-display.c          |  2 +-
->  util/cutils.c               |  3 ++-
->  util/main-loop.c            |  6 +++---
->  33 files changed, 128 insertions(+), 120 deletions(-)
-> 
+This series adds an API to add instrumentation events.
 
-Queued, thanks.
+It also provides additional APIs for:
+* Controlling tracing events.
+* Peek/poke guest memory.
 
-Paolo
+TODO:
+* Replace qi_event_gen_* with generating calls to arbitrary functions (e.=
+g.,
+  qi_event_gen_call(num_args, va_list)).
+* Flush all TBs when an execution-time event is unset (to ensure it won't=
+ be
+  called in the future).
+* Flush all TBs when a translation-time event is set (to ensure no future=
+ events
+  will be lost).
+
+Undecided:
+* Alternatively to the two last points above, provide an API to request a=
+ TB
+  flush (much more flexible and can be more efficient, but requires instr=
+umentor
+  to clearly know differences between translation and execution).
+* Pass a user-provided pointer to events (i.e., to avoid using global
+  variables).
+* Provide something like tracing's per-vCPU trace states (i.e., so that e=
+ach
+  vCPU can have different instrumentation code). Useful mainly for sampli=
+ng
+  (enable/disable instrumentation multiple times without re-translating g=
+uest
+  code) and more complex use cases like tracing a guest process in softmm=
+u mode.
+  It's still not clear to me if we should extend the per-vCPU bitmap with
+  instrumentation events, or otherwise somehow reuse the bits in tracing =
+events
+  (since they're currently limited).
+* Allow multiple callbacks per event (both to support multiple callbacks
+  installed by a library, and multiple libraries at the same time).
+* Allow instr libraries to iterate on the list of guest CPUs (info is alr=
+eady
+  available through guest_cpu_enter/guest_cpu_exit, but forces libs to be
+  prepared for hot-plugging guest CPUs).
+
+Future APIs (for later series):
+* Peek/poke guest registers.
+* Add breakpoints to trigger instrumentation functions.
+* Trigger instrumentation functions from guest code (former hypertrace).
+* Add events for guest code translation/execution (once the respective tr=
+acing
+  events are accepted upstream).
+* Add events for exceptions/syscalls.
+* Add events for TB invalidation (necessary for libraries to deallocate a=
+ny data
+  they might have allocated for the TBs they instrumented).
+
+The instrumentation code is dynamically loaded as a library into QEMU eit=
+her
+when it starts or later using its remote control interfaces. The loaded c=
+ode
+only has access to function explicitly exported through the QI_VPUBLIC ma=
+cro.
+
+This series is branch 'devel-instrument' in
+https://code.gso.ac.upc.edu/git/qemu-dbi.
+
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+
+Changes in v5
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Rebase on fcea73709b.
+* Minor changes to pass checkpatch.
+* Fix symbol availability to external libraries by adding missing default=
+ symbol
+  visibility flag.
+* Use a string to identify instrumentation handles [Markus Armbruster].
+* Use stubs for command line initialization.
+* Use stubs to signal unsupported QAPI commands [Markus Armbruster].
+* Use error messages instead of codes in QAPI commands [Markus Armbruster=
+].
+* Move symbol visibility macros to internal "qemu/compiler.h" header.
+* Trigger event 'guest_cpu_enter' when library is loaded.
+* Trigger event 'guest_cpu_exit' and flush TBs when library is unloaded.
+* Rename instr_cpu_get/instr_cpu_set into clearer
+  instr_cpu_to_qicpu/instr_cpu_from_qicpu.
+* Rename handle_get/handle_put to clearer handle_new/handle_destroy.
+* Ensure qi_event_set_* are called only on the proper mode and targets.
+
+
+Changes in v4
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Add missing stub function.
+
+
+Changes in v3
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Use a separate event set for instrumentation (i.e., do not instrument t=
+racing
+  events) [Stefan Hajnoczi].
+* Add API for peek/poke guest memory.
+
+
+Changes in v2
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+* Update QEMU version in QAPI [Eric Blake].
+* Clarify 'msg' result in QAPI is for humans only.
+* Make 'msg' and 'handle' results optional in QAPI.
+* Use a list of 'str' in 'instr-load' QAPI command.
+* Update MAINTAINERS.
+* Add macros for error-reporting in API.
+
+
+Llu=C3=ADs Vilanova (22):
+      instrument: Add documentation
+      instrument: Add configure-time flag
+      instrument: Add generic library loader
+      instrument: [linux-user] Add command line library loader
+      instrument: [bsd-user] Add command line library loader
+      instrument: [softmmu] Add command line library loader
+      instrument: [qapi] Add library loader
+      instrument: [hmp] Add library loader
+      instrument: Add basic control interface
+      instrument: Add support for tracing events
+      instrument: Track vCPUs
+      instrument: Add event 'guest_cpu_enter'
+      instrument: Support synchronous modification of vCPU state
+      exec: Add function to synchronously flush TB on a stopped vCPU
+      instrument: Add event 'guest_cpu_exit'
+      instrument: Add event 'guest_cpu_reset'
+      trace: Introduce a proper structure to describe memory accesses
+      instrument: Add event 'guest_mem_before_trans'
+      instrument: Add event 'guest_mem_before_exec'
+      instrument: Add event 'guest_user_syscall'
+      instrument: Add event 'guest_user_syscall_ret'
+      instrument: Add API to manipulate guest memory
+
+
+ .gitignore                                |    1=20
+ MAINTAINERS                               |    8 +
+ Makefile                                  |    8 +
+ Makefile.objs                             |    4 +
+ Makefile.target                           |    1=20
+ accel/stubs/tcg-stub.c                    |    3=20
+ accel/tcg/translate-all.c                 |    7 +
+ bsd-user/main.c                           |   17 ++
+ bsd-user/syscall.c                        |   14 ++
+ configure                                 |   13 ++
+ cpus-common.c                             |    9 +
+ docs/instrument.txt                       |  173 ++++++++++++++++++++++
+ hmp-commands.hx                           |   32 ++++
+ include/exec/cpu_ldst_template.h          |   19 +-
+ include/exec/cpu_ldst_useronly_template.h |   19 +-
+ include/exec/exec-all.h                   |    1=20
+ include/exec/helper-gen.h                 |    1=20
+ include/exec/helper-proto.h               |    1=20
+ include/exec/helper-tcg.h                 |    1=20
+ include/qemu/compiler.h                   |   19 ++
+ instrument/Makefile.objs                  |    8 +
+ instrument/cmdline.c                      |  128 ++++++++++++++++
+ instrument/cmdline.h                      |   51 +++++++
+ instrument/control.c                      |  227 +++++++++++++++++++++++=
+++++++
+ instrument/control.h                      |  153 ++++++++++++++++++++
+ instrument/control.inc.h                  |   67 +++++++++
+ instrument/error.h                        |   34 ++++
+ instrument/events.h                       |   86 +++++++++++
+ instrument/events.inc.h                   |  109 ++++++++++++++
+ instrument/helpers.h                      |    2=20
+ instrument/load.c                         |  210 +++++++++++++++++++++++=
+++++
+ instrument/load.h                         |   88 +++++++++++
+ instrument/qemu-instr/control.h           |  177 +++++++++++++++++++++++
+ instrument/qemu-instr/state.h             |  104 +++++++++++++
+ instrument/qemu-instr/types.h             |  115 +++++++++++++++
+ instrument/qemu-instr/types.inc.h         |   15 ++
+ instrument/qmp.c                          |   82 ++++++++++
+ instrument/state.c                        |   73 +++++++++
+ instrument/trace.c                        |  125 ++++++++++++++++
+ linux-user/main.c                         |   21 +++
+ linux-user/syscall.c                      |    7 +
+ monitor.c                                 |   43 +++++
+ qapi-schema.json                          |    3=20
+ qapi/instrument.json                      |   49 ++++++
+ qemu-options.hx                           |   19 ++
+ qom/cpu.c                                 |    2=20
+ stubs/Makefile.objs                       |    1=20
+ stubs/instrument.c                        |   75 ++++++++++
+ tcg/tcg-op.c                              |   27 ++-
+ trace/control-target.c                    |    2=20
+ trace/control.c                           |    4 -
+ trace/control.h                           |   24 +++
+ trace/mem-internal.h                      |   22 ++-
+ trace/mem.h                               |    8 +
+ vl.c                                      |   15 ++
+ 55 files changed, 2487 insertions(+), 40 deletions(-)
+ create mode 100644 docs/instrument.txt
+ create mode 100644 instrument/Makefile.objs
+ create mode 100644 instrument/cmdline.c
+ create mode 100644 instrument/cmdline.h
+ create mode 100644 instrument/control.c
+ create mode 100644 instrument/control.h
+ create mode 100644 instrument/control.inc.h
+ create mode 100644 instrument/error.h
+ create mode 100644 instrument/events.h
+ create mode 100644 instrument/events.inc.h
+ create mode 100644 instrument/helpers.h
+ create mode 100644 instrument/load.c
+ create mode 100644 instrument/load.h
+ create mode 100644 instrument/qemu-instr/control.h
+ create mode 100644 instrument/qemu-instr/state.h
+ create mode 100644 instrument/qemu-instr/types.h
+ create mode 100644 instrument/qemu-instr/types.inc.h
+ create mode 100644 instrument/qmp.c
+ create mode 100644 instrument/state.c
+ create mode 100644 instrument/trace.c
+ create mode 100644 qapi/instrument.json
+ create mode 100644 stubs/instrument.c
+
+
+To: qemu-devel@nongnu.org
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Emilio G. Cota <cota@braap.org>
+Cc: Eric Blake <eblake@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>
