@@ -1,39 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42380)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1drikF-0005y0-1G
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:48:44 -0400
+	(envelope-from <thuth@redhat.com>) id 1drilZ-0006tp-SB
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:50:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1drikA-00083E-2K
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:48:43 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47520
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1drik9-00082d-Sm
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:48:38 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8CAhhEV098893
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 06:48:37 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cxc536ayd-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 06:48:37 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 12 Sep 2017 11:48:35 +0100
-References: <b0cd3b7a-fcc8-03ed-55dd-cbdba2ff59ec@linux.vnet.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 12 Sep 2017 12:48:32 +0200
+	(envelope-from <thuth@redhat.com>) id 1drilY-0000e3-VQ
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:50:05 -0400
+References: <20170911172022.4738-1-eblake@redhat.com>
+	<20170911172022.4738-34-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <fc568804-a418-fe3c-a3e5-69a52af267d4@redhat.com>
+Date: Tue, 12 Sep 2017 12:49:50 +0200
 MIME-Version: 1.0
-In-Reply-To: <b0cd3b7a-fcc8-03ed-55dd-cbdba2ff59ec@linux.vnet.ibm.com>
+In-Reply-To: <20170911172022.4738-34-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <af68fe00-1a59-54d3-e06e-123a19ff9495@de.ibm.com>
-Subject: Re: [Qemu-devel] Suggested Wiki Update
+Subject: Re: [Qemu-devel] [PATCH v7 33/38] libqtest: Merge qtest_{in,
+ out}[bwl]() with {in, out}[bwl]()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,48 +25,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, pbonzini@redhat.com, John Snow <jsnow@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>
 
-Looks good to me. I somehow lost my wiki password, so maybe Conny can do the
-update until this is fixed....
+On 11.09.2017 19:20, Eric Blake wrote:
+> Maintaining two layers of libqtest APIs, one that takes an explicit
+> QTestState object, and the other that uses the implicit global_qtest,
+> is annoying.  In the interest of getting rid of global implicit
+> state and having less code to maintain, merge:
+>  qtest_outb()
+>  qtest_outw()
+>  qtest_outl()
+>  qtest_inb()
+>  qtest_inw()
+>  qtest_inl()
+> with their short counterparts.  All callers that previously
+> used the short form now make it explicit that they are relying on
+> global_qtest, and later patches can then clean things up to remove
+> the global variable.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/libqtest.h        | 99 ++++++-------------------------------------------
+>  tests/multiboot/libc.h  |  2 +-
+>  tests/libqtest.c        | 14 +++----
+>  tests/boot-order-test.c |  4 +-
+>  tests/endianness-test.c | 12 +++---
+>  tests/fdc-test.c        | 77 ++++++++++++++++++++------------------
+>  tests/hd-geo-test.c     |  4 +-
+>  tests/ipmi-bt-test.c    | 12 +++---
+>  tests/ipmi-kcs-test.c   |  8 ++--
+>  tests/libqos/fw_cfg.c   |  4 +-
+>  tests/libqos/pci-pc.c   | 44 +++++++++++-----------
+>  tests/libqos/pci.c      |  2 +-
+>  tests/m48t59-test.c     |  8 ++--
+>  tests/multiboot/libc.c  |  2 +-
+>  tests/pvpanic-test.c    |  4 +-
+>  tests/rtc-test.c        |  8 ++--
+>  tests/wdt_ib700-test.c  |  8 ++--
+>  17 files changed, 120 insertions(+), 192 deletions(-)
+> 
+> diff --git a/tests/libqtest.h b/tests/libqtest.h
+> index 8398c0fd07..520f745e7b 100644
+> --- a/tests/libqtest.h
+> +++ b/tests/libqtest.h
+> @@ -205,61 +205,61 @@ void irq_intercept_in(QTestState *s, const char *string);
+>  void irq_intercept_out(QTestState *s, const char *string);
+> 
+>  /**
+> - * qtest_outb:
+> + * outb:
+>   * @s: #QTestState instance to operate on.
+>   * @addr: I/O port to write to.
+>   * @value: Value being written.
+>   *
+>   * Write an 8-bit value to an I/O port.
+>   */
+> -void qtest_outb(QTestState *s, uint16_t addr, uint8_t value);
+> +void outb(QTestState *s, uint16_t addr, uint8_t value);
 
-On 09/12/2017 10:57 AM, Viktor Mihajlovski wrote:
-> Hi,
-> 
-> the content of https://wiki.qemu.org/index.php/Features/S390xNetworkBoot
-> is slightly outdated since proper DHCP based netboot support for s390x
-> has been implemented by the series ending with commit 29d1221.
-> 
-> As it is still desirable to provide some instructions on building
-> network bootable images for the s390x architecture, I'd like to suggest
-> that the text is replaced (see proposal below). Conny, could I once more
-> request your help in that matter?
-> 
-> == Building a s390 network bootable binary ==
-> 
-> Since 2.10 QEMU offers network boot support which allows to load a
-> binary from a TFTP server and boot it. As s390 network bootable images
-> are not very common, this document gives a brief overview on how to
-> build one.
-> 
-> A s390 network bootable image can be built by bundling some shell
-> scripts, busybox and the kexec binary bundled into an initial ramdisk
-> and append that to a kernel image. An existing s390 system can be used
-> as source.
-> 
-> One way to do that is to take a kernel and an installer initial ramdisk
-> from a distribution's DVD/ISO and concatenate them. Some fixups are
-> necessary int the new binary, which can be done by using the script in
-> [https://github.com/ibm-s390-tools/s390-tools/blob/master/netboot/mk-s390image].
-> Booting this image would then start the installation process as if
-> booted from the DVD.
-> 
-> Another possible way is to build a binary that behaves similar to the
-> PXELINUX boot loader. In this case an initial ramdisk with an init
-> process triggering the PXELINUX-like processing has to be built as
-> described in
-> [https://github.com/ibm-s390-tools/s390-tools/tree/master/netboot]. The
-> site also contains a script assisting in the creation of such an initial
-> ramdisk.
-> 
+Could we please also keep the qtest prefix here? ... same applies for
+all your other following "Merge ..." patches in this series...
+
+ Thomas
