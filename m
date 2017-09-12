@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50757)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52076)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1drkXS-00068S-BE
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:43:42 -0400
+	(envelope-from <imammedo@redhat.com>) id 1drkaM-0000F6-Lu
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:46:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1drkXR-00065d-DB
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:43:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42164)
+	(envelope-from <imammedo@redhat.com>) id 1drkaH-0007Os-O3
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:46:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44362)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1drkXR-00065V-6i
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:43:37 -0400
-Date: Tue, 12 Sep 2017 14:43:30 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1drkaH-0007OU-HJ
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:46:33 -0400
+Date: Tue, 12 Sep 2017 14:46:23 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170912144330.3f07b30b@nial.brq.redhat.com>
-In-Reply-To: <20170911152150.12535-12-david@redhat.com>
+Message-ID: <20170912144623.13363403@nial.brq.redhat.com>
+In-Reply-To: <20170911152150.12535-13-david@redhat.com>
 References: <20170911152150.12535-1-david@redhat.com>
-	<20170911152150.12535-12-david@redhat.com>
+	<20170911152150.12535-13-david@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 11/21] s390x: allow only 1 CPU with TCG
+Subject: Re: [Qemu-devel] [PATCH v4 12/21] target/s390x: set cpu->id for
+ linux user when realizing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,55 +31,47 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: David Hildenbrand <david@redhat.com>
 Cc: qemu-devel@nongnu.org, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, 11 Sep 2017 17:21:40 +0200
+On Mon, 11 Sep 2017 17:21:41 +0200
 David Hildenbrand <david@redhat.com> wrote:
 
-> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
-> guest tries to bring these CPUs up but fails), because we don't support
-> multiple CPUs on s390x under TCG.
+> scc->next_cpu_id is updated when realizing. Setting it just before that
+> point looks cleaner.
 > 
-> Let's bail out if more than 1 is specified, so we don't raise people's
-> hope. Make it a define, so we can easily bump it up later.
-> 
-> Tested-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
+> Reviewed-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
 > Signed-off-by: David Hildenbrand <david@redhat.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
 > ---
->  hw/s390x/s390-virtio-ccw.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+>  target/s390x/cpu.c | 11 ++++-------
+>  1 file changed, 4 insertions(+), 7 deletions(-)
 > 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index f67b4b5d58..f1198b2745 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -23,6 +23,7 @@
->  #include "hw/s390x/css.h"
->  #include "virtio-ccw.h"
->  #include "qemu/config-file.h"
-> +#include "qemu/error-report.h"
->  #include "s390-pci-bus.h"
->  #include "hw/s390x/storage-keys.h"
->  #include "hw/s390x/storage-attributes.h"
-> @@ -47,6 +48,8 @@ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->      return cpu_states[cpu_addr];
+> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+> index 74b3e4fd0d..5f9315fb16 100644
+> --- a/target/s390x/cpu.c
+> +++ b/target/s390x/cpu.c
+> @@ -194,7 +194,11 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
+>                     ", max allowed: %d", cpu->id, max_cpus - 1);
+>          goto out;
+>      }
+> +#else
+> +    /* implicitly set for linux-user only */
+> +    cpu->id = scc->next_cpu_id;
+>  #endif
+> +
+>      if (cpu_exists(cpu->id)) {
+>          error_setg(&err, "Unable to add CPU: %" PRIi64
+>                     ", it already exists", cpu->id);
+> @@ -306,13 +310,6 @@ static void s390_cpu_initfn(Object *obj)
+>          inited = true;
+>          s390x_translate_init();
+>      }
+> -
+> -#if defined(CONFIG_USER_ONLY)
+> -    {
+> -        S390CPUClass *scc = S390_CPU_GET_CLASS(obj);
+> -        cpu->id = scc->next_cpu_id;
+> -    }
+> -#endif
 >  }
 >  
-> +/* #define S390_TCG_SMP_SUPPORT */
-I'd drop define and ifdef for something that doesn't exists
-
->  static void s390_init_cpus(MachineState *machine)
->  {
->      int i;
-> @@ -55,6 +58,13 @@ static void s390_init_cpus(MachineState *machine)
->      if (machine->cpu_model == NULL) {
->          machine->cpu_model = s390_default_cpu_model_name();
->      }
-> +#ifndef S390_TCG_SMP_SUPPORT
-> +    if (tcg_enabled() && max_cpus > 1) {
-> +        error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
-> +                     "supported by TCG (1) on s390x", max_cpus);
-> +        exit(1);
-> +    }
-> +#endif
->  
->      cpu_states = g_new0(S390CPU *, max_cpus);
->  
+>  static void s390_cpu_finalize(Object *obj)
