@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52981)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1droFB-0000Qy-J8
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:41:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1droFi-0000y4-C6
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:41:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1droF8-0008Bc-7B
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:41:01 -0400
-Resent-Message-Id: <E1droF8-0008Bc-7B@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21419)
+	(envelope-from <bounces@canonical.com>) id 1droFf-0000N0-1z
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:41:34 -0400
+Received: from indium.canonical.com ([91.189.90.7]:46461)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1droF7-0008AV-TS
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:40:58 -0400
-In-Reply-To: <20170912162513.21694-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150523443416.318.9747114777786337863@6d89bd104fc3>
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1droFe-0000MD-S0
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:41:31 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1droFb-00029v-GE
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 16:41:27 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 620DD2E84AF
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 16:41:26 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 12 Sep 2017 09:40:34 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 00/16] TCG vectorization and example
- conversion
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 12 Sep 2017 16:31:29 -0000
+From: Scott Moser <smoser@ubuntu.com>
+Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
+Message-Id: <150523388923.32282.43295239812051303.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
+ feature flag
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,159 +37,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, alex.bennee@linaro.org, f4bug@amsat.org
+To: qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2MiAwMC8xNl0gVENHIHZlY3Rvcml6YXRpb24gYW5kIGV4YW1wbGUgY29u
-dmVyc2lvbgpNZXNzYWdlLWlkOiAyMDE3MDkxMjE2MjUxMy4yMTY5NC0xLXJpY2hhcmQuaGVuZGVy
-c29uQGxpbmFyby5vcmcKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0Uu
-LiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
-MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxv
-ZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwog
-ICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1h
-dD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3Jp
-cHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAg
-ICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-IHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8xNTA1MjMyODM0LTIwODkwLTEtZ2l0
-LXNlbmQtZW1haWwtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMTUwNTIzMjgz
-NC0yMDg5MC0xLWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwogKiBbbmV3
-IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTcwOTEyMTYyNTEzLjIxNjk0LTEtcmljaGFy
-ZC5oZW5kZXJzb25AbGluYXJvLm9yZyAtPiBwYXRjaGV3LzIwMTcwOTEyMTYyNTEzLjIxNjk0LTEt
-cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
-c3QnCjc5ZGNjNTY4ZDkgdGNnL2FhcmNoNjQ6IEFkZCB2ZWN0b3Igb3BlcmF0aW9ucwoyNzc1ODQ1
-ZTk0IHRjZzogRml4IHR5cGVzIGluIHRjZ19yZWdzZXRfe3NldCwgcmVzZXR9X3JlZwphYmM2ZmUx
-Yzg2IHRjZzogUmVtb3ZlIHRjZ19yZWdzZXRfc2V0MzIKZmExMmYyYWE5NyB0Y2c6IFJlbW92ZSB0
-Y2dfcmVnc2V0X3tvciwgYW5kLCBhbmRub3QsIG5vdH0KZTI4NzQxZWE3OCB0Y2c6IFJlbW92ZSB0
-Y2dfcmVnc2V0X3NldAo0MTMwMGI1NDM1IHRjZzogUmVtb3ZlIHRjZ19yZWdzZXRfY2xlYXIKYWYw
-M2MzYTcyNiB0Y2cvYWFyY2g2NDogRnVsbHkgY29udmVydCB0Y2dfdGFyZ2V0X29wX2RlZgphMzk2
-M2YwMWU4IHRjZy9pMzg2OiBBZGQgdmVjdG9yIG9wZXJhdGlvbnMKY2IzMjVlYjA4NSB0YXJnZXQv
-YXJtOiBVc2UgdmVjdG9yIGluZnJhc3RydWN0dXJlIGZvciBhYTY0IGFkZC9zdWIvbG9naWMKZDQ3
-ZTAzZmIwMSB0YXJnZXQvYXJtOiBBbGlnbiB2ZWN0b3IgcmVnaXN0ZXJzCmZiYzI0NTY1YjggdGNn
-OiBBZGQgdmVjdG9yIGluZnJhc3RydWN0dXJlIGFuZCBvcHMgZm9yIGFkZC9zdWIvbG9naWMKZDcw
-N2NmMmVjOCB0Y2c6IEFkZCBJTkRFWF9vcF9pbnZhbGlkCmMxMWJiNzhmMmQgdGNnOiBBZGQgdGNn
-X29wX3N1cHBvcnRlZAozMmI3ZjY0Y2M5IHRjZzogQWRkIG9wZXJhdGlvbnMgZm9yIGhvc3QgdmVj
-dG9ycwo3OWY2MmUwYWVjIHRjZzogQWRkIHR5cGVzIGZvciBob3N0IHZlY3RvcnMKM2FhZjQxMGZh
-ZiB0Y2c6IEFkZCBleHBhbmRlcnMgZm9yIG91dC1vZi1saW5lIHZlY3RvciBoZWxwZXJzCgo9PT0g
-T1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE2OiB0Y2c6IEFkZCBleHBhbmRlcnMg
-Zm9yIG91dC1vZi1saW5lIHZlY3RvciBoZWxwZXJzLi4uCkNoZWNraW5nIFBBVENIIDIvMTY6IHRj
-ZzogQWRkIHR5cGVzIGZvciBob3N0IHZlY3RvcnMuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xNjogdGNn
-OiBBZGQgb3BlcmF0aW9ucyBmb3IgaG9zdCB2ZWN0b3JzLi4uCkNoZWNraW5nIFBBVENIIDQvMTY6
-IHRjZzogQWRkIHRjZ19vcF9zdXBwb3J0ZWQuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8xNjogdGNnOiBB
-ZGQgSU5ERVhfb3BfaW52YWxpZC4uLgpDaGVja2luZyBQQVRDSCA2LzE2OiB0Y2c6IEFkZCB2ZWN0
-b3IgaW5mcmFzdHJ1Y3R1cmUgYW5kIG9wcyBmb3IgYWRkL3N1Yi9sb2dpYy4uLgpFUlJPUjogc3Bh
-Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcmJyAoY3R4Old4TykKIzc3ODogRklMRTogdGNnL3Rj
-Zy1ydW50aW1lLWd2ZWMuYzoxNzg6CisgICAgICAgICoodmVjNjQgKikoZCArIGkpID0gKih2ZWM2
-NCAqKShhICsgaSkgJn4gKih2ZWM2NCAqKShiICsgaSk7CiAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIg
-dGhhdCAnficgKGN0eDpPeFcpCiM3Nzg6IEZJTEU6IHRjZy90Y2ctcnVudGltZS1ndmVjLmM6MTc4
-OgorICAgICAgICAqKHZlYzY0ICopKGQgKyBpKSA9ICoodmVjNjQgKikoYSArIGkpICZ+ICoodmVj
-NjQgKikoYiArIGkpOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICd8JyAoY3R4Old4TykK
-Izc4OTogRklMRTogdGNnL3RjZy1ydW50aW1lLWd2ZWMuYzoxODk6CisgICAgICAgICoodmVjNjQg
-KikoZCArIGkpID0gKih2ZWM2NCAqKShhICsgaSkgfH4gKih2ZWM2NCAqKShiICsgaSk7CiAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNl
-IHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAnficgKGN0eDpPeFcpCiM3ODk6IEZJTEU6IHRjZy90Y2ct
-cnVudGltZS1ndmVjLmM6MTg5OgorICAgICAgICAqKHZlYzY0ICopKGQgKyBpKSA9ICoodmVjNjQg
-KikoYSArIGkpIHx+ICoodmVjNjQgKikoYiArIGkpOwogICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICBeCgp0b3RhbDogNCBlcnJvcnMsIDAgd2FybmluZ3MsIDgw
-OCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJl
-dmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQg
-dGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpD
-aGVja2luZyBQQVRDSCA3LzE2OiB0YXJnZXQvYXJtOiBBbGlnbiB2ZWN0b3IgcmVnaXN0ZXJzLi4u
-CkNoZWNraW5nIFBBVENIIDgvMTY6IHRhcmdldC9hcm06IFVzZSB2ZWN0b3IgaW5mcmFzdHJ1Y3R1
-cmUgZm9yIGFhNjQgYWRkL3N1Yi9sb2dpYy4uLgpDaGVja2luZyBQQVRDSCA5LzE2OiB0Y2cvaTM4
-NjogQWRkIHZlY3RvciBvcGVyYXRpb25zLi4uCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZp
-YyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM1MDogRklMRTogdGNnL2kzODYvdGNnLXRhcmdl
-dC5oOjkzOgorI2lmZGVmIF9fU1NFMl9fCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMg
-ZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRlZAojNTU6IEZJTEU6IHRjZy9pMzg2L3RjZy10YXJnZXQu
-aDo5ODoKKyNpZmRlZiBfX0FWWDJfXwoKRVJST1I6IE1hY3JvcyB3aXRoIG11bHRpcGxlIHN0YXRl
-bWVudHMgc2hvdWxkIGJlIGVuY2xvc2VkIGluIGEgZG8gLSB3aGlsZSBsb29wCiM1NTg6IEZJTEU6
-IHRjZy9pMzg2L3RjZy10YXJnZXQuaW5jLmM6MjA1OToKKyNkZWZpbmUgT1BfMTI4XzI1Nih4KSBc
-CisgICAgICAgIGNhc2UgZ2x1ZShnbHVlKElOREVYX29wXywgeCksIF92MjU2KTogXAorICAgICAg
-ICAgICAgcmV4dyA9IFBfVkVYTDsgLyogRkFMTFRIUlUgKi8gICAgIFwKKyAgICAgICAgY2FzZSBn
-bHVlKGdsdWUoSU5ERVhfb3BfLCB4KSwgX3YxMjgpCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFy
-b3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzU3NDogRklMRTogdGNnL2kzODYvdGNnLXRhcmdldC5p
-bmMuYzoyNDYzOgorICAgIE9QXzY0XzEyOF8yNTYoYWRkOCk6CiAgICAgICAgICAgICAgICAgICAg
-ICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhFKQoj
-NTc3OiBGSUxFOiB0Y2cvaTM4Ni90Y2ctdGFyZ2V0LmluYy5jOjI0NjY6CisgICAgT1BfNjRfMTI4
-XzI1NihhZGQxNik6CiAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJl
-cXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzU4MDogRklMRTogdGNnL2kzODYvdGNn
-LXRhcmdldC5pbmMuYzoyNDY5OgorICAgIE9QXzY0XzEyOF8yNTYoYWRkMzIpOgogICAgICAgICAg
-ICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicg
-KGN0eDpWeEUpCiM1ODM6IEZJTEU6IHRjZy9pMzg2L3RjZy10YXJnZXQuaW5jLmM6MjQ3MjoKKyAg
-ICBPUF8xMjhfMjU2KGFkZDY0KToKICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFj
-ZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhFKQojNTg2OiBGSUxFOiB0Y2cvaTM4
-Ni90Y2ctdGFyZ2V0LmluYy5jOjI0NzU6CisgICAgT1BfNjRfMTI4XzI1NihzdWI4KToKICAgICAg
-ICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAn
-OicgKGN0eDpWeEUpCiM1ODk6IEZJTEU6IHRjZy9pMzg2L3RjZy10YXJnZXQuaW5jLmM6MjQ3ODoK
-KyAgICBPUF82NF8xMjhfMjU2KHN1YjE2KToKICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVS
-Uk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhFKQojNTkyOiBGSUxF
-OiB0Y2cvaTM4Ni90Y2ctdGFyZ2V0LmluYy5jOjI0ODE6CisgICAgT1BfNjRfMTI4XzI1NihzdWIz
-Mik6CiAgICAgICAgICAgICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFy
-b3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzU5NTogRklMRTogdGNnL2kzODYvdGNnLXRhcmdldC5p
-bmMuYzoyNDg0OgorICAgIE9QXzEyOF8yNTYoc3ViNjQpOgogICAgICAgICAgICAgICAgICAgICAg
-XgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeEUpCiM1OTg6
-IEZJTEU6IHRjZy9pMzg2L3RjZy10YXJnZXQuaW5jLmM6MjQ4NzoKKyAgICBPUF82NF8xMjhfMjU2
-KGFuZCk6CiAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
-cm91bmQgdGhhdCAnOicgKGN0eDpWeEUpCiM2MDE6IEZJTEU6IHRjZy9pMzg2L3RjZy10YXJnZXQu
-aW5jLmM6MjQ5MDoKKyAgICBPUF82NF8xMjhfMjU2KG9yKToKICAgICAgICAgICAgICAgICAgICAg
-IF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhFKQojNjA0
-OiBGSUxFOiB0Y2cvaTM4Ni90Y2ctdGFyZ2V0LmluYy5jOjI0OTM6CisgICAgT1BfNjRfMTI4XzI1
-Nih4b3IpOgogICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
-YXJvdW5kIHRoYXQgJzonIChjdHg6VnhFKQojNjEzOiBGSUxFOiB0Y2cvaTM4Ni90Y2ctdGFyZ2V0
-LmluYy5jOjI1MDI6CisgICAgT1BfNjRfMTI4XzI1NihhbmRjKToKICAgICAgICAgICAgICAgICAg
-ICAgICAgXgoKdG90YWw6IDEzIGVycm9ycywgMiB3YXJuaW5ncywgNzU1IGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDEw
-LzE2OiB0Y2cvYWFyY2g2NDogRnVsbHkgY29udmVydCB0Y2dfdGFyZ2V0X29wX2RlZi4uLgpDaGVj
-a2luZyBQQVRDSCAxMS8xNjogdGNnOiBSZW1vdmUgdGNnX3JlZ3NldF9jbGVhci4uLgpDaGVja2lu
-ZyBQQVRDSCAxMi8xNjogdGNnOiBSZW1vdmUgdGNnX3JlZ3NldF9zZXQuLi4KQ2hlY2tpbmcgUEFU
-Q0ggMTMvMTY6IHRjZzogUmVtb3ZlIHRjZ19yZWdzZXRfe29yLCBhbmQsIGFuZG5vdCwgbm90fS4u
-LgpDaGVja2luZyBQQVRDSCAxNC8xNjogdGNnOiBSZW1vdmUgdGNnX3JlZ3NldF9zZXQzMi4uLgpD
-aGVja2luZyBQQVRDSCAxNS8xNjogdGNnOiBGaXggdHlwZXMgaW4gdGNnX3JlZ3NldF97c2V0LCBy
-ZXNldH1fcmVnLi4uCkNoZWNraW5nIFBBVENIIDE2LzE2OiB0Y2cvYWFyY2g2NDogQWRkIHZlY3Rv
-ciBvcGVyYXRpb25zLi4uCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChj
-dHg6VnhFKQojNDY2OiBGSUxFOiB0Y2cvYWFyY2g2NC90Y2ctdGFyZ2V0LmluYy5jOjE5NDQ6Cisg
-ICAgVk9QKGFkZDE2KToKICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBh
-cm91bmQgdGhhdCAnOicgKGN0eDpWeEUpCiM0Njk6IEZJTEU6IHRjZy9hYXJjaDY0L3RjZy10YXJn
-ZXQuaW5jLmM6MTk0NzoKKyAgICBWT1AoYWRkMzIpOgogICAgICAgICAgICAgICBeCgpFUlJPUjog
-c3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzQ3NjogRklMRTogdGNn
-L2FhcmNoNjQvdGNnLXRhcmdldC5pbmMuYzoxOTU0OgorICAgIFZPUChzdWI4KToKICAgICAgICAg
-ICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkK
-IzQ3OTogRklMRTogdGNnL2FhcmNoNjQvdGNnLXRhcmdldC5pbmMuYzoxOTU3OgorICAgIFZPUChz
-dWIxNik6CiAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRo
-YXQgJzonIChjdHg6VnhFKQojNDgyOiBGSUxFOiB0Y2cvYWFyY2g2NC90Y2ctdGFyZ2V0LmluYy5j
-OjE5NjA6CisgICAgVk9QKHN1YjMyKToKICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBy
-ZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeEUpCiM0ODk6IEZJTEU6IHRjZy9hYXJjaDY0
-L3RjZy10YXJnZXQuaW5jLmM6MTk2NzoKKyAgICBWT1AobmVnOCk6CiAgICAgICAgICAgICAgXgoK
-RVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeEUpCiM0OTI6IEZJ
-TEU6IHRjZy9hYXJjaDY0L3RjZy10YXJnZXQuaW5jLmM6MTk3MDoKKyAgICBWT1AobmVnMTYpOgog
-ICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAo
-Y3R4OlZ4RSkKIzQ5NTogRklMRTogdGNnL2FhcmNoNjQvdGNnLXRhcmdldC5pbmMuYzoxOTczOgor
-ICAgIFZPUChuZWczMik6CiAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQg
-YXJvdW5kIHRoYXQgJzonIChjdHg6VnhFKQojNTAyOiBGSUxFOiB0Y2cvYWFyY2g2NC90Y2ctdGFy
-Z2V0LmluYy5jOjE5ODA6CisgICAgVk9QKGFuZCk6CiAgICAgICAgICAgICBeCgpFUlJPUjogc3Bh
-Y2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzUwNTogRklMRTogdGNnL2Fh
-cmNoNjQvdGNnLXRhcmdldC5pbmMuYzoxOTgzOgorICAgIFZPUChvcik6CiAgICAgICAgICAgIF4K
-CkVSUk9SOiBzcGFjZXMgcmVxdWlyZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhFKQojNTA4OiBG
-SUxFOiB0Y2cvYWFyY2g2NC90Y2ctdGFyZ2V0LmluYy5jOjE5ODY6CisgICAgVk9QKHhvcik6CiAg
-ICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4
-OlZ4RSkKIzUxMTogRklMRTogdGNnL2FhcmNoNjQvdGNnLXRhcmdldC5pbmMuYzoxOTg5OgorICAg
-IFZPUChhbmRjKToKICAgICAgICAgICAgICBeCgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3Vu
-ZCB0aGF0ICc6JyAoY3R4OlZ4RSkKIzUxNDogRklMRTogdGNnL2FhcmNoNjQvdGNnLXRhcmdldC5p
-bmMuYzoxOTkyOgorICAgIFZPUChvcmMpOgogICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBy
-ZXF1aXJlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeEUpCiM1MTc6IEZJTEU6IHRjZy9hYXJjaDY0
-L3RjZy10YXJnZXQuaW5jLmM6MTk5NToKKyAgICBWT1Aobm90KToKICAgICAgICAgICAgIF4KCnRv
-dGFsOiAxNCBlcnJvcnMsIDAgd2FybmluZ3MsIDU5NSBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNo
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZl
-ZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
+Kevin,
+thanks again.  You've provided enough support for me at this point.  I had =
+looked at trying to coalesce multiple -drive values into a single one, and =
+that can definitely be made to work with the newer qemu, but i'm not sure I=
+ can make it work with older.  =
+
+
+the goal there would be to do something like:
+$ qemu-system-x86_64   \
+   -drive id=3Dd01,file.filename=3Ddisk1.img,format=3Dqcow2,if=3Dnone -\
+   -device virtio-blk,drive=3Dd01,serial=3Ds01 \
+   -device virtio-blk,drive=3Dd01,serial=3Ds02
+
+on newer qemu, that works if i change 'id=3D' to 'node-name', but on older
+qemu I can't convince it to let me have 1 drive associated to multiple
+-device.
+
+What we ended up doing is at =
+
+  https://code.launchpad.net/~smoser/curtin/trunk.lp1716028-hack-file-locki=
+ng-in-qemu/+merge/330456
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716028
+
+Title:
+  qemu 2.10 locks images with no feature flag
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  New
+
+Bug description:
+  1) % lsb_release -rd
+  Description:	Ubuntu Artful Aardvark (development branch)
+  Release:	17.10
+
+  2) % apt-cache policy qemu-system-x86
+  qemu-system-x86:
+    Installed: 1:2.10~rc3+dfsg-0ubuntu1
+    Candidate: 1:2.10+dfsg-0ubuntu1
+    Version table:
+       1:2.10+dfsg-0ubuntu1 500
+          500 http://archive.ubuntu.com//ubuntu devel/main amd64 Packages
+   *** 1:2.10~rc3+dfsg-0ubuntu1 100
+          100 /var/lib/dpkg/status
+
+  3) qemu locks image files with no way to discover this feature nor how
+  to disable it
+
+  4) qemu provides a way to query if it supports image locking, and what
+  the default value is, and how to disable the locking via cli
+
+  qemu 2.10 now will lock image files and warn if an image is currently
+  locked.  This prevent qemu from running (and possibly corrupting said
+  image).
+
+  However, qemu does not provide any way to determine if a qemu binary
+  actually has this capability.  Normally behavior changing features are
+  exposed via some change to the qemu help menu or QMP/QAPI output of
+  capabilities.
+
+  I believe this slipped through since libvirt already does image
+  locking, but direct cli users will be caught by this change.
+
+  In particular, we have a use-case where we simulate multipath disks by
+  creating to disks which point to the same file which now breaks
+  without adding the 'file.locking=3Doff' to the -drive parameters;  which
+  is also completely undocumented and unexposed.
+
+  Some parts of the cli like -device allow querying of settable options
+  (qemu-system-x86 -device scsi_hd,?)  but nothing equivalent exists for
+  -drive parameters.
+
+  ProblemType: Bug
+  DistroRelease: Ubuntu 17.10
+  Package: qemu-system-x86 1:2.10~rc3+dfsg-0ubuntu1
+  ProcVersionSignature: Ubuntu 4.12.0-11.12-generic 4.12.5
+  Uname: Linux 4.12.0-11-generic x86_64
+  NonfreeKernelModules: zfs zunicode zavl zcommon znvpair
+  ApportVersion: 2.20.6-0ubuntu7
+  Architecture: amd64
+  Date: Fri Sep  8 12:56:53 2017
+  JournalErrors:
+   Hint: You are currently not seeing messages from other users and the sys=
+tem.
+         Users in groups 'adm', 'systemd-journal' can see all messages.
+         Pass -q to turn off this notice.
+   -- Logs begin at Mon 2017-01-30 11:56:02 CST, end at Fri 2017-09-08 12:5=
+6:46 CDT. --
+   -- No entries --
+  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
+  MachineType: HP ProLiant DL360 Gen9
+  ProcEnviron:
+   TERM=3Dxterm
+   PATH=3D(custom, no user)
+   XDG_RUNTIME_DIR=3D<set>
+   LANG=3Den_US.UTF-8
+   SHELL=3D/bin/bash
+  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.12.0-11-generic root=3DUUID=3D=
+45354276-e0c0-4bf6-9083-f130b89411cc ro --- console=3DttyS1,115200
+  SourcePackage: qemu
+  UpgradeStatus: No upgrade log present (probably fresh install)
+  dmi.bios.date: 03/05/2015
+  dmi.bios.vendor: HP
+  dmi.bios.version: P89
+  dmi.chassis.type: 23
+  dmi.chassis.vendor: HP
+  dmi.modalias: dmi:bvnHP:bvrP89:bd03/05/2015:svnHP:pnProLiantDL360Gen9:pvr=
+:cvnHP:ct23:cvr:
+  dmi.product.family: ProLiant
+  dmi.product.name: ProLiant DL360 Gen9
+  dmi.sys.vendor: HP
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716028/+subscriptions
