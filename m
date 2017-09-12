@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36924)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38276)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1driU2-0006d4-RT
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:31:59 -0400
+	(envelope-from <stefanha@gmail.com>) id 1driYV-0007yZ-Cr
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:36:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1driU1-0001gx-Ve
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:31:58 -0400
-Date: Tue, 12 Sep 2017 12:31:48 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170912103148.GE29136@localhost.localdomain>
-References: <20170809215510.22802-1-pbonzini@redhat.com>
-	<20170809215510.22802-5-pbonzini@redhat.com>
+	(envelope-from <stefanha@gmail.com>) id 1driYP-00071R-Af
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:36:35 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:45845)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1driYP-000704-4S
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:36:29 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id f199so56878457wme.0
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 03:36:28 -0700 (PDT)
+Date: Tue, 12 Sep 2017 11:36:25 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170912103625.GF6123@stefanha-x1.localdomain>
+References: <129545317.4985876.1504789379418.ref@mail.yahoo.com>
+	<129545317.4985876.1504789379418@mail.yahoo.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20170809215510.22802-5-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 04/12] qemu-iotests: limit
- non-_PROG-suffixed variables to common.rc
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <129545317.4985876.1504789379418@mail.yahoo.com>
+Subject: Re: [Qemu-devel] Converting host virtual addresses to guest physical
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,42 +30,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Padmanabhan S N <paddusn@yahoo.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-Am 09.08.2017 um 23:55 hat Paolo Bonzini geschrieben:
-> These are never used by "check", with one exception that does not need
-> $QEMU_OPTIONS.  Keep them in common.rc, which will be soon included only
-> by the tests.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Thu, Sep 07, 2017 at 01:02:59PM +0000, Padmanabhan S N via Qemu-devel wrote:
+> I'm developing a new block backend driver. Since my Guest RAM is coming out of shared memory (memory-backend-file,mem-path=/dev/shmem/foo), while performing the IO I would like to pass QEMUIOVector buffers directly to another user-space process running on the same host to enable zerocopy. Can someone help me understand the different memory regions that are mapped in the qemu process address space and how they map to each other ?
+> 1. My guest is configured with 1G RAM. /proc/<pid>/maps on the qemu process shows two 1G regions that are mapped. One of them is /dev/shmem/foo, which I believe corresponds to the guest physical memory. What is the other 1G region ? 
+> 2. The QEMUIOVector buffers point to this 'other' 1G region that I referred above. How do I convert these pointers to locations in the /dev/shmem/foo region ? My plan is to convert the QEMUIOVector buffer pointer to a region in /dev/shmem/foo and pass that pointer to another userspace process that also has the /dev/shmem/foo region mapped.
 
-> diff --git a/tests/qemu-iotests/common b/tests/qemu-iotests/common
-> index 50720f080f..f58e56fc40 100644
-> --- a/tests/qemu-iotests/common
-> +++ b/tests/qemu-iotests/common
-> @@ -454,11 +454,3 @@ fi
->  #
->  list=`sort $tmp.list`
->  rm -f $tmp.list $tmp.tmp $tmp.sed
-> -
-> -[ "$QEMU" = "" ] && _fatal "qemu not found"
-> -[ "$QEMU_IMG" = "" ] && _fatal "qemu-img not found"
-> -[ "$QEMU_IO" = "" ] && _fatal "qemu-io not found"
-> -
-> -if [ "$IMGPROTO" = "nbd" ] ; then
-> -    [ "$QEMU_NBD" = "" ] && _fatal "qemu-nbd not found"
-> -fi
+Please post the full QEMU command-line and /proc/<pid>/maps.
 
-Hm, does this mean that instead of ./check failing when a binary is
-missing, we try each test case now and each one fails with the same
-error message?
+> I understand vhost-user might be the right way to approach this problem. However I'm currently working with qemu-2.8 and it looks neither vhost-user-scsi nor vhost-user-blk are available in that version. If you believe there is a better approach to solve this problem, let me know.
 
-*tries it out*
+Are you sure that QEMU 2.8 will still be relevant by the time your block
+driver is production-ready?
 
-Okay, it's already broken today because the strings are never empty but
-contain the name of the wrapper functions, but it's still bad behaviour.
-Instead of just telling me that the binary is missing like it used to
-work, I get tons of test case diffs.
-
-Kevin
+Stefan
