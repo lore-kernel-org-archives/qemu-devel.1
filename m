@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35291)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1drcpS-0004fJ-Uk
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 00:29:44 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1drcpS-0004fL-VW
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 00:29:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1drcpP-0005O9-Qs
+	(envelope-from <dgibson@ozlabs.org>) id 1drcpP-0005OK-Sz
 	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 00:29:42 -0400
-Date: Tue, 12 Sep 2017 14:01:04 +1000
+Date: Tue, 12 Sep 2017 13:59:06 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170912040104.GD2774@umbus.fritz.box>
-References: <150516748034.6883.2205624415045931101.stgit@bahia.lan>
+Message-ID: <20170912035906.GC2774@umbus.fritz.box>
+References: <20170912025307.45376-1-aik@ozlabs.ru>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="a2FkP9tdjPU2nyhF"
+	protocol="application/pgp-signature"; boundary="6zdv2QT/q3FMhpsV"
 Content-Disposition: inline
-In-Reply-To: <150516748034.6883.2205624415045931101.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH] xics: fix several error leaks
+In-Reply-To: <20170912025307.45376-1-aik@ozlabs.ru>
+Subject: Re: [Qemu-devel] [PATCH qemu] vfio, spapr: Fix levels calculation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,81 +23,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Cedric Le Goater <clg@kaod.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
 
 
---a2FkP9tdjPU2nyhF
+--6zdv2QT/q3FMhpsV
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 12, 2017 at 12:04:40AM +0200, Greg Kurz wrote:
-> If object_property_get_link() fails then it allocates an error, which
-> must be freed before returning. The error_get_pretty() function is
-> merely an accessor to the error message and doesn't free anything.
+On Tue, Sep 12, 2017 at 12:53:07PM +1000, Alexey Kardashevskiy wrote:
+> The existing tries to round up the number of pages but @pages is always
+> calculated as the rounded up value minus one  which makes ctz64() always
+> return 0 and have create.levels always set 1.
 >=20
-> The error.h header indicates how to do it right:
+> This removes wrong "-1" and allows having more than 1 levels. This becomes
+> handy for >128GB guests with standard 64K pages as this requires blocks
+> with zone order 9 and the popular limit of CONFIG_FORCE_MAX_ZONEORDER=3D9
+> means that only blocks up to order 8 are allowed.
 >=20
->  * Pass an existing error to the caller with the message modified:
->  *     error_propagate(errp, err);
->  *     error_prepend(errp, "Could not frobnicate '%s': ", name);
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 
 Applied to ppc-for-2.11.
 
 > ---
->  hw/intc/xics.c |   12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+>  hw/vfio/spapr.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >=20
-> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-> index a84ba51ad8ff..80c33be02e5e 100644
-> --- a/hw/intc/xics.c
-> +++ b/hw/intc/xics.c
-> @@ -306,8 +306,8 @@ static void icp_realize(DeviceState *dev, Error **err=
-p)
+> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
+> index 32fd6a9b54..259397c002 100644
+> --- a/hw/vfio/spapr.c
+> +++ b/hw/vfio/spapr.c
+> @@ -163,7 +163,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
+>       */
+>      entries =3D create.window_size >> create.page_shift;
+>      pages =3D MAX((entries * sizeof(uint64_t)) / getpagesize(), 1);
+> -    pages =3D MAX(pow2ceil(pages) - 1, 1); /* Round up */
+> +    pages =3D MAX(pow2ceil(pages), 1); /* Round up */
+>      create.levels =3D ctz64(pages) / 6 + 1;
 > =20
->      obj =3D object_property_get_link(OBJECT(dev), ICP_PROP_XICS, &err);
->      if (!obj) {
-> -        error_setg(errp, "%s: required link '" ICP_PROP_XICS "' not foun=
-d: %s",
-> -                   __func__, error_get_pretty(err));
-> +        error_propagate(errp, err);
-> +        error_prepend(errp, "required link '" ICP_PROP_XICS "' not found=
-: ");
->          return;
->      }
-> =20
-> @@ -315,8 +315,8 @@ static void icp_realize(DeviceState *dev, Error **err=
-p)
-> =20
->      obj =3D object_property_get_link(OBJECT(dev), ICP_PROP_CPU, &err);
->      if (!obj) {
-> -        error_setg(errp, "%s: required link '" ICP_PROP_CPU "' not found=
-: %s",
-> -                   __func__, error_get_pretty(err));
-> +        error_propagate(errp, err);
-> +        error_prepend(errp, "required link '" ICP_PROP_CPU "' not found:=
- ");
->          return;
->      }
-> =20
-> @@ -641,8 +641,8 @@ static void ics_base_realize(DeviceState *dev, Error =
-**errp)
-> =20
->      obj =3D object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &err);
->      if (!obj) {
-> -        error_setg(errp, "%s: required link '" ICS_PROP_XICS "' not foun=
-d: %s",
-> -                   __func__, error_get_pretty(err));
-> +        error_propagate(errp, err);
-> +        error_prepend(errp, "required link '" ICS_PROP_XICS "' not found=
-: ");
->          return;
->      }
->      ics->xics =3D XICS_FABRIC(obj);
->=20
+>      ret =3D ioctl(container->fd, VFIO_IOMMU_SPAPR_TCE_CREATE, &create);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -105,24 +70,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---a2FkP9tdjPU2nyhF
+--6zdv2QT/q3FMhpsV
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm3XAAACgkQbDjKyiDZ
-s5LgaA/7BDYQh3Yg+trtjeF5oogQXrUEP9A8TYpmQ1pxOvEvl0tI0O/2mJJYtYny
-zw4eLlgxaOH+8VGOkAMZoeH11D+GNPqQQwwnuj/eV3JdY6g9jkJYvlNXVCmj8xh+
-7kBADl5VRtfJPTa6cqp+pg6bZ3rr69lVSzX+9WykFdnD/Ew+/Nbl+qZYM7+n09qw
-OjjXraSFpRn4ozAJHahjXKLNAx1hJeHras5cj4alG11PwARH+eckk3p0aJ/xxwgJ
-9PHEu768gGTYQcEnVJUYyA8fQqhk6g3FgqaVUuHC5n3+6gl25HzjDp3rAp/lfbwI
-FwkvQmrFh2TpvqdEw+6LavXh08ZXHCjiPuL2f1yRQiv8FgLkBhes+g3MHM/Oo+3D
-RysJFwP5xKbeYnFlIgwEeDZNLxvDKuFBoMbnbAM3F+1maeYL9cL9TBbznxClTm8K
-t/U2Z4FvOIOeaTjZlna6AQXDzFRyvaHb6wzIuad9lcQ7ALRKHTLf1O6Odja97ytU
-BJGDp01inEfGJ2u3QG5hJ+pt9dV9R56EUXsk24R9FmhKI3OVcYaw4/VCCvjzs8oV
-j8IHL2BxcPOiQCn52LITJKFe40p0qjvYuJ4NsD2I0FSeZVTjDWCcFqapnPMckLhx
-chV3+pWwbPCKR1O3UmN8NsqdmLZTNu2XBT8736gUEBm5SUcxhMQ=
-=dqHZ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm3W4oACgkQbDjKyiDZ
+s5K8vQ//Y7GFeDG0h3c0gbWj0fZmJC3UVnmMnfTKym2jUa1prhlwZ/u11s7QAKFU
+iUUFDQF+dwcz7NxhHnh6I4lzOqaQIQvQQyUF0uxipqgz/JcL4XkBLtxAcNZ1YuEJ
+Ubz2UTYpy0tcUaPP7NS6Ztz1GApjsKvqJHSK6wZdx6MXRbofL8LNuZTStR+yUmKG
+TkGrjo7Of8Vobo80UE7cm1EAn6vXODdlNzSY7pQm9pA3oMp1DiZVByRkZohbEefS
+2jJJUSoG/0Vq+TXe1cm+Oc813JvNLU3GkrvMA4B1yJkWJjZAS+A9/zL2XVMQrgRu
+ezVCXuAglU7EafqNRvl2cibZRS6rto6jbZRwP3czr/ppO8PGvYEqrwenwSv2Wf1x
+prKzdMX0DrdUosyDmZKbsQqWmB/8Z58GWCDhR7lWIPBuMZKxMszRvX7OIM90P9cI
+m/b7sFgR3N1OIf52Tl42QkFZw+UY+6vApBMKn3xgmTXOufbOuQ7AepaDMDm4HJD9
+BiUXbBdfZ8uXLkpXtOY2vfLnhg42GKudO66iirkJROkL3pA/lsx3INtpcn6xv/Ih
+QHimhF+nj3NaBP4n1n1qR4ZhVsVqrF/7n/Xgb3+U21+3s7Y6RxPeVBNGZETqRktI
+GVlNavAoX6zTlSTVw699lYzbveOnM9LVhDkqWPX5Wup6MwtkUxc=
+=raOj
 -----END PGP SIGNATURE-----
 
---a2FkP9tdjPU2nyhF--
+--6zdv2QT/q3FMhpsV--
