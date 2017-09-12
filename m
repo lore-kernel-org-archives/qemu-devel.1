@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43244)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1drpgx-0003Mw-Or
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:13:50 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1drpgx-0003MF-9i
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:13:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1drpgw-0006NR-9A
+	(envelope-from <pm215@archaic.org.uk>) id 1drpgw-0006NK-4P
 	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:13:47 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Sep 2017 19:13:51 +0100
-Message-Id: <1505240046-11454-5-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 12 Sep 2017 19:13:50 +0100
+Message-Id: <1505240046-11454-4-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1505240046-11454-1-git-send-email-peter.maydell@linaro.org>
 References: <1505240046-11454-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 04/19] nvic: Add cached vectpending_prio state
+Subject: [Qemu-devel] [PATCH 03/19] nvic: Add cached vectpending_is_s_banked
+ state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,135 +23,53 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Instead of looking up the pending priority
-in nvic_pending_prio(), cache it in a new state struct
-field. The calculation of the pending priority given
-the interrupt number is more complicated in v8M with
-the security extension, so the caching will be worthwhile.
-
-This changes nvic_pending_prio() from returning a full
-(group + subpriority) priority value to returning a group
-priority. This doesn't require changes to its callsites
-because we use it only in comparisons of the form
-  execution_prio > nvic_pending_prio()
-and execution priority is always a group priority, so
-a test (exec prio > full prio) is true if and only if
-(execprio > group_prio).
-
-(Architecturally the expected comparison is with the
-group priority for this sort of "would we preempt" test;
-we were only doing a test with a full priority as an
-optimisation to avoid the mask, which is possible
-precisely because the two comparisons always give the
-same answer.)
+With banked exceptions, just the exception number in
+s->vectpending is no longer sufficient to uniquely identify
+the pending exception. Add a vectpending_is_s_banked bool
+which is true if the exception is using the sec_vectors[]
+array.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/intc/armv7m_nvic.h |  2 ++
- hw/intc/armv7m_nvic.c         | 23 +++++++++++++----------
- hw/intc/trace-events          |  2 +-
- 3 files changed, 16 insertions(+), 11 deletions(-)
+ include/hw/intc/armv7m_nvic.h | 11 +++++++++--
+ hw/intc/armv7m_nvic.c         |  1 +
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/include/hw/intc/armv7m_nvic.h b/include/hw/intc/armv7m_nvic.h
-index 87c78b3..329774e 100644
+index 317601e..87c78b3 100644
 --- a/include/hw/intc/armv7m_nvic.h
 +++ b/include/hw/intc/armv7m_nvic.h
-@@ -62,6 +62,7 @@ typedef struct NVICState {
-      *  - vectpending
-      *  - vectpending_is_secure
-      *  - exception_prio
-+     *  - vectpending_prio
+@@ -57,10 +57,17 @@ typedef struct NVICState {
+     VecInfo sec_vectors[NVIC_INTERNAL_VECTORS];
+     uint32_t prigroup;
+ 
+-    /* vectpending and exception_prio are both cached state that can
+-     * be recalculated from the vectors[] array and the prigroup field.
++    /* The following fields are all cached state that can be recalculated
++     * from the vectors[] and sec_vectors[] arrays and the prigroup field:
++     *  - vectpending
++     *  - vectpending_is_secure
++     *  - exception_prio
       */
      unsigned int vectpending; /* highest prio pending enabled exception */
-     /* true if vectpending is a banked secure exception, ie it is in
-@@ -69,6 +70,7 @@ typedef struct NVICState {
-      */
-     bool vectpending_is_s_banked;
++    /* true if vectpending is a banked secure exception, ie it is in
++     * sec_vectors[] rather than vectors[]
++     */
++    bool vectpending_is_s_banked;
      int exception_prio; /* group prio of the highest prio active exception */
-+    int vectpending_prio; /* group prio of the exeception in vectpending */
  
      MemoryRegion sysregmem;
-     MemoryRegion sysreg_ns_mem;
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 417a456..8388d64 100644
+index 694b9e0..417a456 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -61,10 +61,10 @@ static const uint8_t nvic_id[] = {
+@@ -1250,6 +1250,7 @@ static void armv7m_nvic_reset(DeviceState *dev)
  
- static int nvic_pending_prio(NVICState *s)
- {
--    /* return the priority of the current pending interrupt,
-+    /* return the group priority of the current pending interrupt,
-      * or NVIC_NOEXC_PRIO if no interrupt is pending
-      */
--    return s->vectpending ? s->vectors[s->vectpending].prio : NVIC_NOEXC_PRIO;
-+    return s->vectpending_prio;
- }
- 
- /* Return the value of the ISCR RETTOBASE bit:
-@@ -156,10 +156,17 @@ static void nvic_recompute_state(NVICState *s)
-         active_prio &= nvic_gprio_mask(s);
-     }
- 
-+    if (pend_prio > 0) {
-+        pend_prio &= nvic_gprio_mask(s);
-+    }
-+
-     s->vectpending = pend_irq;
-+    s->vectpending_prio = pend_prio;
-     s->exception_prio = active_prio;
- 
--    trace_nvic_recompute_state(s->vectpending, s->exception_prio);
-+    trace_nvic_recompute_state(s->vectpending,
-+                               s->vectpending_prio,
-+                               s->exception_prio);
- }
- 
- /* Return the current execution priority of the CPU
-@@ -323,7 +330,6 @@ void armv7m_nvic_acknowledge_irq(void *opaque)
-     CPUARMState *env = &s->cpu->env;
-     const int pending = s->vectpending;
-     const int running = nvic_exec_prio(s);
--    int pendgroupprio;
-     VecInfo *vec;
- 
-     assert(pending > ARMV7M_EXCP_RESET && pending < s->num_irq);
-@@ -333,13 +339,9 @@ void armv7m_nvic_acknowledge_irq(void *opaque)
-     assert(vec->enabled);
-     assert(vec->pending);
- 
--    pendgroupprio = vec->prio;
--    if (pendgroupprio > 0) {
--        pendgroupprio &= nvic_gprio_mask(s);
--    }
--    assert(pendgroupprio < running);
-+    assert(s->vectpending_prio < running);
- 
--    trace_nvic_acknowledge_irq(pending, vec->prio);
-+    trace_nvic_acknowledge_irq(pending, s->vectpending_prio);
- 
-     vec->active = 1;
-     vec->pending = 0;
-@@ -1251,6 +1253,7 @@ static void armv7m_nvic_reset(DeviceState *dev)
      s->exception_prio = NVIC_NOEXC_PRIO;
      s->vectpending = 0;
-     s->vectpending_is_s_banked = false;
-+    s->vectpending_prio = NVIC_NOEXC_PRIO;
++    s->vectpending_is_s_banked = false;
  }
  
  static void nvic_systick_trigger(void *opaque, int n, int level)
-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index 4762329..5635a5f 100644
---- a/hw/intc/trace-events
-+++ b/hw/intc/trace-events
-@@ -167,7 +167,7 @@ gicv3_redist_set_irq(uint32_t cpu, int irq, int level) "GICv3 redistributor 0x%x
- gicv3_redist_send_sgi(uint32_t cpu, int irq) "GICv3 redistributor 0x%x pending SGI %d"
- 
- # hw/intc/armv7m_nvic.c
--nvic_recompute_state(int vectpending, int exception_prio) "NVIC state recomputed: vectpending %d exception_prio %d"
-+nvic_recompute_state(int vectpending, int vectpending_prio, int exception_prio) "NVIC state recomputed: vectpending %d vectpending_prio %d exception_prio %d"
- nvic_set_prio(int irq, uint8_t prio) "NVIC set irq %d priority %d"
- nvic_irq_update(int vectpending, int pendprio, int exception_prio, int level) "NVIC vectpending %d pending prio %d exception_prio %d: setting irq line to %d"
- nvic_escalate_prio(int irq, int irqprio, int runprio) "NVIC escalating irq %d to HardFault: insufficient priority %d >= %d"
 -- 
 2.7.4
