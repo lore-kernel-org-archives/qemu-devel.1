@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51298)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1drbfX-0001gi-6R
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 23:15:24 -0400
+	(envelope-from <peterx@redhat.com>) id 1drbxK-0007hJ-PP
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 23:33:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <haozhong.zhang@intel.com>) id 1drbfT-0008RY-88
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 23:15:23 -0400
-Received: from mga07.intel.com ([134.134.136.100]:44206)
+	(envelope-from <peterx@redhat.com>) id 1drbxH-0003vA-JE
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 23:33:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57274)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <haozhong.zhang@intel.com>)
-	id 1drbfS-0008QW-R7
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 23:15:19 -0400
-Date: Tue, 12 Sep 2017 11:15:09 +0800
-From: Haozhong Zhang <haozhong.zhang@intel.com>
-Message-ID: <20170912031509.vufszbju3s2v2bw3@hz-desktop>
-References: <20170911043820.14617-1-haozhong.zhang@intel.com>
-	<20170911044157.15403-1-haozhong.zhang@intel.com>
-	<20170911160818.1bd44a82@nial.brq.redhat.com>
-	<alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1drbxH-0003u6-DC
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 23:33:43 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 467985D5EB
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 03:33:42 +0000 (UTC)
+Date: Tue, 12 Sep 2017 11:33:33 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170912033333.GA29091@pxdev.xzpeter.org>
+References: <20170911132627.9505-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.10.1709111119480.19719@sstabellini-ThinkPad-X260>
-Subject: Re: [Qemu-devel] [RFC QEMU PATCH v3 00/10] Implement vNVDIMM for
- Xen HVM guest
+In-Reply-To: <20170911132627.9505-1-cohuck@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] dump: do not dump non-existent guest memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,114 +33,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefano Stabellini <sstabellini@kernel.org>
-Cc: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, xen-devel@lists.xen.org, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xiao Guangrong <xiaoguangrong.eric@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org, ian.jackson@eu.citrix.com, wei.liu2@citrix.com, george.dunlap@citrix.com, JBeulich@suse.com, andrew.cooper3@citrix.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, berrange@redhat.com, dgilbert@redhat.com
 
-On 09/11/17 11:52 -0700, Stefano Stabellini wrote:
-> CC'ing xen-devel, and the Xen tools and x86 maintainers.
-> 
-> On Mon, 11 Sep 2017, Igor Mammedov wrote:
-> > On Mon, 11 Sep 2017 12:41:47 +0800
-> > Haozhong Zhang <haozhong.zhang@intel.com> wrote:
-> > 
-> > > This is the QEMU part patches that works with the associated Xen
-> > > patches to enable vNVDIMM support for Xen HVM domains. Xen relies on
-> > > QEMU to build guest NFIT and NVDIMM namespace devices, and allocate
-> > > guest address space for vNVDIMM devices.
-> > > 
-> > > All patches can be found at
-> > >   Xen:  https://github.com/hzzhan9/xen.git nvdimm-rfc-v3
-> > >   QEMU: https://github.com/hzzhan9/qemu.git xen-nvdimm-rfc-v3
-> > > 
-> > > Patch 1 is to avoid dereferencing the NULL pointer to non-existing
-> > > label data, as the Xen side support for labels is not implemented yet.
-> > > 
-> > > Patch 2 & 3 add a memory backend dedicated for Xen usage and a hotplug
-> > > memory region for Xen guest, in order to make the existing nvdimm
-> > > device plugging path work on Xen.
-> > > 
-> > > Patch 4 - 10 build and cooy NFIT from QEMU to Xen guest, when QEMU is
-> > > used as the Xen device model.
-> > 
-> > I've skimmed over patch-set and can't say that I'm happy with
-> > number of xen_enabled() invariants it introduced as well as
-> > with partial blobs it creates.
-> 
-> I have not read the series (Haozhong, please CC me, Anthony and
-> xen-devel to the whole series next time), but yes, indeed. Let's not add
-> more xen_enabled() if possible.
-> 
-> Haozhong, was there a design document thread on xen-devel about this? If
-> so, did it reach a conclusion? Was the design accepted? If so, please
-> add a link to the design doc in the introductory email, so that
-> everybody can read it and be on the same page.
+On Mon, Sep 11, 2017 at 03:26:27PM +0200, Cornelia Huck wrote:
+> It does not really make sense to dump memory that is not there.
+>=20
+> Moreover, that fixes a segmentation fault when calling dump-guest-memor=
+y
+> with no filter for a machine with no memory defined.
+>=20
+> New behaviour is:
+>=20
+> (qemu) dump-guest-memory /dev/null
+> dump: no guest memory to dump
+> (qemu) dump-guest-memory /dev/null 0 4096
+> dump: no guest memory to dump
+>=20
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> ---
+>=20
+> Another unmaintained file. Joy. cc:ing some more-or-less random folks.
 
-Yes, there is a design [1] discussed and reviewed. Section 4.3 discussed
-the guest ACPI.
+I thought Marc-Andr=C3=A9 had proposed to be the maintainer? But indeed I
+didn't see the line in maintainer file.
 
-[1] https://lists.xenproject.org/archives/html/xen-devel/2016-07/msg01921.html
-
-> 
-> 
-> > I'd like to reduce above and a way to do this might be making xen 
-> >  1. use fw_cfg
-> >  2. fetch QEMU build acpi tables from fw_cfg
-> >  3. extract nvdim tables (which is trivial) and use them
-> > 
-> > looking at xen_load_linux(), it seems possible to use fw_cfg.
-> > 
-> > So what's stopping xen from using it elsewhere?,
-> > instead of adding more xen specific code to do 'the same'
-> > job and not reusing/sharing common code with tcg/kvm.
-> 
-> So far, ACPI tables have not been generated by QEMU. Xen HVM machines
-> rely on a firmware-like application called "hvmloader" that runs in
-> guest context and generates the ACPI tables. I have no opinions on
-> hvmloader and I'll let the Xen maintainers talk about it. However, keep
-> in mind that with an HVM guest some devices are emulated by Xen and/or
-> by other device emulators that can run alongside QEMU. QEMU doesn't have
-> a full few of the system.
-> 
-> Here the question is: does it have to be QEMU the one to generate the
-> ACPI blobs for the nvdimm? It would be nicer if it was up to hvmloader
-> like the rest, instead of introducing this split-brain design about
-> ACPI. We need to see a design doc to fully understand this.
->
-
-hvmloader runs in the guest and is responsible to build/load guest
-ACPI. However, it's not capable to build AML at runtime (for the lack
-of AML builder). If any guest ACPI object is needed (e.g. by guest
-DSDT), it has to be generated from ASL by iasl at Xen compile time and
-then be loaded by hvmloader at runtime.
-
-Xen includes an OperationRegion "BIOS" in the static generated guest
-DSDT, whose address is hardcoded and which contains a list of values
-filled by hvmloader at runtime. Other ACPI objects can refer to those
-values (e.g., the number of vCPUs). But it's not enough for generating
-guest NVDIMM ACPI objects at compile time and then being customized
-and loaded by hvmload, because its structure (i.e., the number of
-namespace devices) cannot be decided util the guest config is known.
-
-Alternatively, we may introduce an AML builder in hvmloader and build
-all guest ACPI completely in hvmloader. Looking at the similar
-implementation in QEMU, it would not be small, compared to the current
-size of hvmloader. Besides, I'm still going to let QEMU handle guest
-NVDIMM _DSM and _FIT calls, which is another reason I use QEMU to
-build NVDIMM ACPI.
-
-> If the design doc thread led into thinking that it has to be QEMU to
-> generate them, then would it make the code nicer if we used fw_cfg to
-> get the (full or partial) tables from QEMU, as Igor suggested?
-
-I'll have a look at the code (which I didn't notice) pointed by Igor.
-
-One possible issue to use fw_cfg is how to avoid the conflict between
-ACPI built by QEMU and ACPI built by hvmloader (e.g., both may use the
-same table signature / device names / ...). In my current design, QEMU
-will pass the table signatures and device names used in its ACPI to
-Xen, and Xen can check the conflict with its own ACPI. Perhaps we can
-add necessary functions in fw_cfg as well. Anyway, let me first look
-at the code.
+Anyway, if anyone think I am ok to maintain this single file
+(considering that I haven't posted patches on it for 2 years, and I
+haven't been working on any kind of maintainer job), please let me
+know. I'm glad to start with it (or with Marc-Andr=C3=A9).
 
 Thanks,
-Haozhong
+
+--=20
+Peter Xu
