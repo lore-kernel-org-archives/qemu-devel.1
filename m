@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56966)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drthj-0006De-8M
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:30:52 -0400
+	(envelope-from <no-reply@patchew.org>) id 1drtlV-0007RU-Vs
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:34:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drthf-0000K8-MB
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:30:51 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:48475)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drthe-0000Jf-Uz
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:30:47 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 13 Sep 2017 01:30:36 +0300
-Message-Id: <150525543616.15988.18238686972036900217.stgit@frigg.lan>
+	(envelope-from <no-reply@patchew.org>) id 1drtlS-0002lc-3c
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:34:46 -0400
+Resent-Message-Id: <E1drtlS-0002lc-3c@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21344)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1drtlR-0002kS-Rn
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:34:42 -0400
 In-Reply-To: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
-References: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150525566622.321.14749941518071789021@6d89bd104fc3>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 22/22] instrument: Add API to manipulate
- guest memory
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 12 Sep 2017 15:34:26 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v5 00/22] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,234 +29,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
+To: vilanova@ac.upc.edu
+Cc: famz@redhat.com, qemu-devel@nongnu.org, cota@braap.org, armbru@redhat.com, stefanha@redhat.com
 
-It includes access to the guest's memory and vCPU registers.
-
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- instrument/Makefile.objs      |    1=20
- instrument/qemu-instr/state.h |  104 +++++++++++++++++++++++++++++++++++=
-++++++
- instrument/state.c            |   73 +++++++++++++++++++++++++++++
- 3 files changed, 178 insertions(+)
- create mode 100644 instrument/qemu-instr/state.h
- create mode 100644 instrument/state.c
-
-diff --git a/instrument/Makefile.objs b/instrument/Makefile.objs
-index d7e6c760c3..ee482bdb45 100644
---- a/instrument/Makefile.objs
-+++ b/instrument/Makefile.objs
-@@ -5,3 +5,4 @@ target-obj-$(CONFIG_INSTRUMENT) +=3D load.o
- target-obj-$(CONFIG_INSTRUMENT) +=3D qmp.o
- target-obj-$(CONFIG_INSTRUMENT) +=3D control.o
- target-obj-$(CONFIG_INSTRUMENT) +=3D trace.o
-+target-obj-$(CONFIG_INSTRUMENT) +=3D state.o
-diff --git a/instrument/qemu-instr/state.h b/instrument/qemu-instr/state.=
-h
-new file mode 100644
-index 0000000000..0ae6255fe5
---- /dev/null
-+++ b/instrument/qemu-instr/state.h
-@@ -0,0 +1,104 @@
-+/*
-+ * Interface for accessing guest state.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef QI__STATE_H
-+#define QI__STATE_H
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+#include <qemu-instr/types.h>
-+
-+
-+/**
-+ * qi_mem_read_virt:
-+ * @vcpu: CPU to use for address translation.
-+ * @vaddr: Starting virtual address to read from.
-+ * @size: Number of bytes to read.
-+ * @buf: Buffer to write into.
-+ *
-+ * Read contents from virtual memory.
-+ *
-+ * Returns: Whether the range of virtual addresses to read could be tran=
-slated.
-+ *
-+ * Warning: Even on error, some of the destination buffer might have bee=
-n
-+ *          modified.
-+ *
-+ * Precondition: The output buffer has at least "size" bytes.
-+ */
-+bool qi_mem_read_virt(QICPU vcpu, uint64_t vaddr, size_t size, void *buf=
-);
-+
-+/**
-+ * qi_mem_write_virt:
-+ * @vcpu: CPU to use for address translation.
-+ * @vaddr: Starting virtual address to write into.
-+ * @size: Number of bytes to write.
-+ * @buf: Buffer with the contents to write from.
-+ *
-+ * Write contents into virtual memory.
-+ *
-+ * Returns: Whether the range of virtual addresses to write could be tra=
-nslated.
-+ *
-+ * Warning: Even on error, some of the destination memory might have bee=
-n
-+ *          modified.
-+ * Precondition: The input buffer has at least "size" bytes.
-+ */
-+bool qi_mem_write_virt(QICPU vcpu, uint64_t vaddr, size_t size, void *bu=
-f);
-+
-+/**
-+ * qi_mem_virt_to_phys:
-+ * @vcpu: CPU to use for address translation.
-+ * @vaddr: Virtual address to translate.
-+ * @paddr: Pointer to output physical address.
-+ *
-+ * Translate a virtual address into a physical address.
-+ *
-+ * Returns: Whether the address could be translated.
-+ */
-+bool qi_mem_virt_to_phys(QICPU vcpu, uint64_t vaddr, uint64_t *paddr);
-+
-+/**
-+ * qi_mem_read_phys:
-+ * @paddr: Starting physical address to read from.
-+ * @size: Number of bytes to read.
-+ * @buf: Buffer to write into.
-+ *
-+ * Read contents from physical memory.
-+ *
-+ * Returns: Whether the range of physical addresses is valid.
-+ *
-+ * Warning: Even on error, some of the destination buffer might have bee=
-n
-+ *          modified.
-+ * Precondition: The output buffer has at least "size" bytes.
-+ */
-+bool qi_mem_read_phys(uint64_t paddr, size_t size, void *buf);
-+
-+/**
-+ * qi_mem_write_phys:
-+ * @paddr: Starting physical address to write into.
-+ * @size: Number of bytes to write.
-+ * @buf: Buffer with the contents to write from.
-+ *
-+ * Write contents into virtual memory.
-+ *
-+ * Returns: Whether the range of physical addresses is valid.
-+ *
-+ * Warning: Even on error, some of the destination memory might have bee=
-n
-+ *          modified.
-+ *
-+ * Precondition: The input buffer has at least "size" bytes.
-+ */
-+bool qi_mem_write_phys(uint64_t paddr, size_t size, void *buf);
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+
-+#endif  /* QI__STATE_H */
-diff --git a/instrument/state.c b/instrument/state.c
-new file mode 100644
-index 0000000000..e76fd5fbcd
---- /dev/null
-+++ b/instrument/state.c
-@@ -0,0 +1,73 @@
-+/*
-+ * Interface for accessing guest state.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "qemu/compiler.h"
-+#include "cpu.h"
-+#include "exec/cpu-all.h"
-+#include "instrument/control.h"
-+#include "instrument/error.h"
-+#include "instrument/qemu-instr/state.h"
-+
-+
-+SYM_PUBLIC bool qi_mem_read_virt(QICPU vcpu, uint64_t vaddr,
-+                                 size_t size, void *buf)
-+{
-+    CPUState *vcpu_ =3D instr_cpu_from_qicpu(vcpu);
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
-+    return cpu_memory_rw_debug(vcpu_, vaddr, buf, size, 0) =3D=3D 0;
-+}
-+
-+SYM_PUBLIC bool qi_mem_write_virt(QICPU vcpu, uint64_t vaddr,
-+                                  size_t size, void *buf)
-+{
-+    CPUState *vcpu_ =3D instr_cpu_from_qicpu(vcpu);
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
-+    return cpu_memory_rw_debug(vcpu_, vaddr, buf, size, 1) =3D=3D 0;
-+}
-+
-+SYM_PUBLIC bool qi_mem_virt_to_phys(QICPU vcpu, uint64_t vaddr, uint64_t=
- *paddr)
-+{
-+    CPUState *vcpu_ =3D instr_cpu_from_qicpu(vcpu);
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
-+
-+#if defined(CONFIG_USER_ONLY)
-+    *paddr =3D vaddr;
-+    return true;
-+#else
-+    *paddr =3D cpu_get_phys_page_debug(vcpu_, vaddr);
-+    return *paddr !=3D -1;
-+#endif
-+}
-+
-+SYM_PUBLIC bool qi_mem_read_phys(uint64_t paddr, size_t size, void *buf)
-+{
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+#if defined(CONFIG_USER_ONLY)
-+    return cpu_memory_rw_debug(NULL, paddr, buf, size, 0) =3D=3D 0;
-+#else
-+    cpu_physical_memory_read(paddr, buf, size);
-+    return true;
-+#endif
-+}
-+
-+SYM_PUBLIC bool qi_mem_write_phys(uint64_t paddr, size_t size, void *buf=
-)
-+{
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+#if defined(CONFIG_USER_ONLY)
-+    return cpu_memory_rw_debug(NULL, paddr, buf, size, 1) =3D=3D 0;
-+#else
-+    cpu_physical_memory_write(paddr, buf, size);
-+    return true;
-+#endif
-+}
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2NSAwMC8yMl0gaW5zdHJ1bWVudDogQWRkIGJhc2ljIGV2ZW50IGluc3Ry
+dW1lbnRhdGlvbgpNZXNzYWdlLWlkOiAxNTA1MjUwMTAyMzkuMTU5ODguODE3MjU4NjYxODE5Nzg0
+OTYxOS5zdGdpdEBmcmlnZy5sYW4KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4g
+PT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUg
+JEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1l
+bGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQo
+Z2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRz
+OyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAt
+LWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwg
+Li9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVk
+PTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQK
+PT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFk
+ZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0
+L3FlbXUKICogW25ldyB0YWddICAgICAgICAgICAgICAgcGF0Y2hldy8xNTA1MjUwMTAyMzkuMTU5
+ODguODE3MjU4NjYxODE5Nzg0OTYxOS5zdGdpdEBmcmlnZy5sYW4gLT4gcGF0Y2hldy8xNTA1MjUw
+MTAyMzkuMTU5ODguODE3MjU4NjYxODE5Nzg0OTYxOS5zdGdpdEBmcmlnZy5sYW4KIHQgW3RhZyB1
+cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8yMDE3MDkxMjE0NDQ1OS4xMTM1OS0xLXBib256aW5p
+QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDkxMjE0NDQ1OS4xMTM1OS0xLXBib256aW5pQHJl
+ZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwoxYWI0OGFlOWI3IGluc3Ry
+dW1lbnQ6IEFkZCBBUEkgdG8gbWFuaXB1bGF0ZSBndWVzdCBtZW1vcnkKN2UwYmQyY2FkNyBpbnN0
+cnVtZW50OiBBZGQgZXZlbnQgJ2d1ZXN0X3VzZXJfc3lzY2FsbF9yZXQnCjMzNGNhZWY4OTkgaW5z
+dHJ1bWVudDogQWRkIGV2ZW50ICdndWVzdF91c2VyX3N5c2NhbGwnCjA5YTE3NzM3OTEgaW5zdHJ1
+bWVudDogQWRkIGV2ZW50ICdndWVzdF9tZW1fYmVmb3JlX2V4ZWMnCjJiZDY0NTYzZDMgaW5zdHJ1
+bWVudDogQWRkIGV2ZW50ICdndWVzdF9tZW1fYmVmb3JlX3RyYW5zJwo1YjM0NGVjMWMzIHRyYWNl
+OiBJbnRyb2R1Y2UgYSBwcm9wZXIgc3RydWN0dXJlIHRvIGRlc2NyaWJlIG1lbW9yeSBhY2Nlc3Nl
+cwowNGU1Yjg4M2IxIGluc3RydW1lbnQ6IEFkZCBldmVudCAnZ3Vlc3RfY3B1X3Jlc2V0Jwo3OTcx
+ZDBmMmE0IGluc3RydW1lbnQ6IEFkZCBldmVudCAnZ3Vlc3RfY3B1X2V4aXQnCjUzZGJjOWFkODgg
+ZXhlYzogQWRkIGZ1bmN0aW9uIHRvIHN5bmNocm9ub3VzbHkgZmx1c2ggVEIgb24gYSBzdG9wcGVk
+IHZDUFUKZDhiNTE1MTVkMiBpbnN0cnVtZW50OiBTdXBwb3J0IHN5bmNocm9ub3VzIG1vZGlmaWNh
+dGlvbiBvZiB2Q1BVIHN0YXRlCjA4ZDQ5MmUzNWYgaW5zdHJ1bWVudDogQWRkIGV2ZW50ICdndWVz
+dF9jcHVfZW50ZXInCjBiZTUyYjFiYmQgaW5zdHJ1bWVudDogVHJhY2sgdkNQVXMKN2FiMDFmMjBm
+NSBpbnN0cnVtZW50OiBBZGQgc3VwcG9ydCBmb3IgdHJhY2luZyBldmVudHMKNzg2NzZjZmYyZCBp
+bnN0cnVtZW50OiBBZGQgYmFzaWMgY29udHJvbCBpbnRlcmZhY2UKMDAxNzI5NzJhZSBpbnN0cnVt
+ZW50OiBbaG1wXSBBZGQgbGlicmFyeSBsb2FkZXIKMzRjY2Y4MzFlNiBpbnN0cnVtZW50OiBbcWFw
+aV0gQWRkIGxpYnJhcnkgbG9hZGVyCmQxYWI2NDhiMDAgaW5zdHJ1bWVudDogW3NvZnRtbXVdIEFk
+ZCBjb21tYW5kIGxpbmUgbGlicmFyeSBsb2FkZXIKMTUwYWQ0YTY1MSBpbnN0cnVtZW50OiBbYnNk
+LXVzZXJdIEFkZCBjb21tYW5kIGxpbmUgbGlicmFyeSBsb2FkZXIKYTA2NGIxNjIxYSBpbnN0cnVt
+ZW50OiBbbGludXgtdXNlcl0gQWRkIGNvbW1hbmQgbGluZSBsaWJyYXJ5IGxvYWRlcgphYTc4ZWU5
+ZjVhIGluc3RydW1lbnQ6IEFkZCBnZW5lcmljIGxpYnJhcnkgbG9hZGVyCmYxMDM1N2UzMTMgaW5z
+dHJ1bWVudDogQWRkIGNvbmZpZ3VyZS10aW1lIGZsYWcKNGQzMjRhZDYxOSBpbnN0cnVtZW50OiBB
+ZGQgZG9jdW1lbnRhdGlvbgoKPT09IE9VVFBVVCBCRUdJTiA9PT0KQ2hlY2tpbmcgUEFUQ0ggMS8y
+MjogaW5zdHJ1bWVudDogQWRkIGRvY3VtZW50YXRpb24uLi4KQ2hlY2tpbmcgUEFUQ0ggMi8yMjog
+aW5zdHJ1bWVudDogQWRkIGNvbmZpZ3VyZS10aW1lIGZsYWcuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8y
+MjogaW5zdHJ1bWVudDogQWRkIGdlbmVyaWMgbGlicmFyeSBsb2FkZXIuLi4KQ2hlY2tpbmcgUEFU
+Q0ggNC8yMjogaW5zdHJ1bWVudDogW2xpbnV4LXVzZXJdIEFkZCBjb21tYW5kIGxpbmUgbGlicmFy
+eSBsb2FkZXIuLi4KQ2hlY2tpbmcgUEFUQ0ggNS8yMjogaW5zdHJ1bWVudDogW2JzZC11c2VyXSBB
+ZGQgY29tbWFuZCBsaW5lIGxpYnJhcnkgbG9hZGVyLi4uCkNoZWNraW5nIFBBVENIIDYvMjI6IGlu
+c3RydW1lbnQ6IFtzb2Z0bW11XSBBZGQgY29tbWFuZCBsaW5lIGxpYnJhcnkgbG9hZGVyLi4uCkNo
+ZWNraW5nIFBBVENIIDcvMjI6IGluc3RydW1lbnQ6IFtxYXBpXSBBZGQgbGlicmFyeSBsb2FkZXIu
+Li4KRVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzI1NDogRklM
+RTogc3R1YnMvaW5zdHJ1bWVudC5jOjQwOgordm9pZCBxbXBfaW5zdHJfdW5sb2FkKGNvbnN0IGNo
+YXIgKmlkLCBFcnJvciAqKmVycnApOwoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAyMDQg
+bGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZp
+ZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRo
+ZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hl
+Y2tpbmcgUEFUQ0ggOC8yMjogaW5zdHJ1bWVudDogW2htcF0gQWRkIGxpYnJhcnkgbG9hZGVyLi4u
+CkNoZWNraW5nIFBBVENIIDkvMjI6IGluc3RydW1lbnQ6IEFkZCBiYXNpYyBjb250cm9sIGludGVy
+ZmFjZS4uLgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUg
+YXZvaWRlZAojNTI6IEZJTEU6IGluY2x1ZGUvcWVtdS9jb21waWxlci5oOjExOToKKyNpZiBkZWZp
+bmVkIF9XSU4zMiB8fCBkZWZpbmVkIF9fQ1lHV0lOX18KCldBUk5JTkc6IGFyY2hpdGVjdHVyZSBz
+cGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM1MzogRklMRTogaW5jbHVkZS9xZW11
+L2NvbXBpbGVyLmg6MTIwOgorICAjaWZkZWYgX19HTlVDX18KCldBUk5JTkc6IGFyY2hpdGVjdHVy
+ZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM1OTogRklMRTogaW5jbHVkZS9x
+ZW11L2NvbXBpbGVyLmg6MTI2OgorICAjaWYgX19HTlVDX18gPj0gNAoKV0FSTklORzogYXJjaGl0
+ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzM0MzogRklMRTogaW5z
+dHJ1bWVudC9xZW11LWluc3RyL2NvbnRyb2wuaDoxMzoKKyNpZmRlZiBfX2NwbHVzcGx1cwoKV0FS
+TklORzogYXJjaGl0ZWN0dXJlIHNwZWNpZmljIGRlZmluZXMgc2hvdWxkIGJlIGF2b2lkZWQKIzM3
+MjogRklMRTogaW5zdHJ1bWVudC9xZW11LWluc3RyL2NvbnRyb2wuaDo0MjoKKyNpZmRlZiBfX2Nw
+bHVzcGx1cwoKdG90YWw6IDAgZXJyb3JzLCA1IHdhcm5pbmdzLCAzMDkgbGluZXMgY2hlY2tlZAoK
+WW91ciBwYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
+dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
+YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgpDaGVja2luZyBQQVRDSCAxMC8y
+MjogaW5zdHJ1bWVudDogQWRkIHN1cHBvcnQgZm9yIHRyYWNpbmcgZXZlbnRzLi4uCldBUk5JTkc6
+IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVkCiM3NzogRklM
+RTogaW5zdHJ1bWVudC9xZW11LWluc3RyL3R5cGVzLmg6MTM6CisjaWZkZWYgX19jcGx1c3BsdXMK
+CldBUk5JTkc6IGFyY2hpdGVjdHVyZSBzcGVjaWZpYyBkZWZpbmVzIHNob3VsZCBiZSBhdm9pZGVk
+CiMxMTE6IEZJTEU6IGluc3RydW1lbnQvcWVtdS1pbnN0ci90eXBlcy5oOjQ3OgorI2lmZGVmIF9f
+Y3BsdXNwbHVzCgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDIyNSBsaW5lcyBjaGVja2Vk
+CgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCkNoZWNraW5nIFBBVENIIDEx
+LzIyOiBpbnN0cnVtZW50OiBUcmFjayB2Q1BVcy4uLgpDaGVja2luZyBQQVRDSCAxMi8yMjogaW5z
+dHJ1bWVudDogQWRkIGV2ZW50ICdndWVzdF9jcHVfZW50ZXInLi4uCkNoZWNraW5nIFBBVENIIDEz
+LzIyOiBpbnN0cnVtZW50OiBTdXBwb3J0IHN5bmNocm9ub3VzIG1vZGlmaWNhdGlvbiBvZiB2Q1BV
+IHN0YXRlLi4uCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3MzogRklMRTogaW5z
+dHJ1bWVudC9jb250cm9sLmM6ODU6CisgICAgICAgIGFzeW5jX3J1bl9vbl9jcHUoY3B1LCBpbnN0
+cl9jcHVfc3RvcF9hbGxfX2NiLCBSVU5fT05fQ1BVX0hPU1RfUFRSKGluZm8pKTsKCnRvdGFsOiAw
+IGVycm9ycywgMSB3YXJuaW5ncywgMTI3IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMTQvMjI6IGV4ZWM6IEFkZCBmdW5j
+dGlvbiB0byBzeW5jaHJvbm91c2x5IGZsdXNoIFRCIG9uIGEgc3RvcHBlZCB2Q1BVLi4uCkNoZWNr
+aW5nIFBBVENIIDE1LzIyOiBpbnN0cnVtZW50OiBBZGQgZXZlbnQgJ2d1ZXN0X2NwdV9leGl0Jy4u
+LgpDaGVja2luZyBQQVRDSCAxNi8yMjogaW5zdHJ1bWVudDogQWRkIGV2ZW50ICdndWVzdF9jcHVf
+cmVzZXQnLi4uCkNoZWNraW5nIFBBVENIIDE3LzIyOiB0cmFjZTogSW50cm9kdWNlIGEgcHJvcGVy
+IHN0cnVjdHVyZSB0byBkZXNjcmliZSBtZW1vcnkgYWNjZXNzZXMuLi4KRVJST1I6IHNwYWNlcyBw
+cm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4Old4VykKIzI0NDogRklMRTogdHJhY2UvbWVt
+Lmg6Mjk6CisgICAgICAgICAgICB1aW50OF90IHNpemVfc2hpZnQgOiAyOwogICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhh
+dCAnOicgKGN0eDpWeFcpCiMyNDU6IEZJTEU6IHRyYWNlL21lbS5oOjMwOgorICAgICAgICAgICAg
+Ym9vbCAgICBzaWduX2V4dGVuZDogMTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBe
+CgpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6V3hXKQojMjQ2
+OiBGSUxFOiB0cmFjZS9tZW0uaDozMToKKyAgICAgICAgICAgIHVpbnQ4X3QgZW5kaWFubmVzcyA6
+IDE7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBwcm9o
+aWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4Old4VykKIzI0NzogRklMRTogdHJhY2UvbWVtLmg6
+MzI6CisgICAgICAgICAgICBib29sICAgIHN0b3JlICAgICAgOiAxOwogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIF4KCnRvdGFsOiA0IGVycm9ycywgMCB3YXJuaW5ncywgMjI3IGxpbmVz
+IGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
+SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
+IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5n
+IFBBVENIIDE4LzIyOiBpbnN0cnVtZW50OiBBZGQgZXZlbnQgJ2d1ZXN0X21lbV9iZWZvcmVfdHJh
+bnMnLi4uCkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcp
+CiMzMDI6IEZJTEU6IGluc3RydW1lbnQvcWVtdS1pbnN0ci90eXBlcy5oOjY0OgorICAgICAgICAg
+ICAgdWludDhfdCBzaXplX3NoaWZ0IDogMjsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBeCgpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6VnhXKQoj
+MzAzOiBGSUxFOiBpbnN0cnVtZW50L3FlbXUtaW5zdHIvdHlwZXMuaDo2NToKKyAgICAgICAgICAg
+IGJvb2wgICAgc2lnbl9leHRlbmQ6IDE7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+XgoKRVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4Old4VykKIzMw
+NDogRklMRTogaW5zdHJ1bWVudC9xZW11LWluc3RyL3R5cGVzLmg6NjY6CisgICAgICAgICAgICB1
+aW50OF90IGVuZGlhbm5lc3MgOiAxOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4K
+CkVSUk9SOiBzcGFjZXMgcHJvaGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpXeFcpCiMzMDU6
+IEZJTEU6IGluc3RydW1lbnQvcWVtdS1pbnN0ci90eXBlcy5oOjY3OgorICAgICAgICAgICAgYm9v
+bCAgICBzdG9yZSAgICAgIDogMTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeCgpF
+UlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6V3hXKQojNDMwOiBG
+SUxFOiB0cmFjZS9jb250cm9sLmg6Mzc6CisgICAgICAgICAgICB1aW50OF90IHNpemVfc2hpZnQg
+OiAyOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBzcGFjZXMgcHJv
+aGliaXRlZCBhcm91bmQgdGhhdCAnOicgKGN0eDpWeFcpCiM0MzE6IEZJTEU6IHRyYWNlL2NvbnRy
+b2wuaDozODoKKyAgICAgICAgICAgIGJvb2wgICAgc2lnbl9leHRlbmQ6IDE7CiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlcyBwcm9oaWJpdGVkIGFyb3VuZCB0
+aGF0ICc6JyAoY3R4Old4VykKIzQzMjogRklMRTogdHJhY2UvY29udHJvbC5oOjM5OgorICAgICAg
+ICAgICAgdWludDhfdCBlbmRpYW5uZXNzIDogMTsKICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICBeCgpFUlJPUjogc3BhY2VzIHByb2hpYml0ZWQgYXJvdW5kIHRoYXQgJzonIChjdHg6V3hX
+KQojNDMzOiBGSUxFOiB0cmFjZS9jb250cm9sLmg6NDA6CisgICAgICAgICAgICBib29sICAgIHN0
+b3JlICAgICAgOiAxOwogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF4KCnRvdGFsOiA4
+IGVycm9ycywgMCB3YXJuaW5ncywgMzg5IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDE5LzIyOiBpbnN0cnVtZW50OiBB
+ZGQgZXZlbnQgJ2d1ZXN0X21lbV9iZWZvcmVfZXhlYycuLi4KRVJST1I6IGV4dGVybnMgc2hvdWxk
+IGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzMzNzogRklMRTogc3R1YnMvaW5zdHJ1bWVudC5jOjYx
+Ogordm9pZCBoZWxwZXJfaW5zdHJfZ3Vlc3RfbWVtX2JlZm9yZV9leGVjKAoKdG90YWw6IDEgZXJy
+b3JzLCAwIHdhcm5pbmdzLCAyNTggbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
+cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
+ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
+IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMjAvMjI6IGluc3RydW1lbnQ6IEFkZCBl
+dmVudCAnZ3Vlc3RfdXNlcl9zeXNjYWxsJy4uLgpDaGVja2luZyBQQVRDSCAyMS8yMjogaW5zdHJ1
+bWVudDogQWRkIGV2ZW50ICdndWVzdF91c2VyX3N5c2NhbGxfcmV0Jy4uLgpDaGVja2luZyBQQVRD
+SCAyMi8yMjogaW5zdHJ1bWVudDogQWRkIEFQSSB0byBtYW5pcHVsYXRlIGd1ZXN0IG1lbW9yeS4u
+LgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQgYmUgYXZvaWRl
+ZAojNDE6IEZJTEU6IGluc3RydW1lbnQvcWVtdS1pbnN0ci9zdGF0ZS5oOjEzOgorI2lmZGVmIF9f
+Y3BsdXNwbHVzCgpXQVJOSU5HOiBhcmNoaXRlY3R1cmUgc3BlY2lmaWMgZGVmaW5lcyBzaG91bGQg
+YmUgYXZvaWRlZAojMTI4OiBGSUxFOiBpbnN0cnVtZW50L3FlbXUtaW5zdHIvc3RhdGUuaDoxMDA6
+CisjaWZkZWYgX19jcGx1c3BsdXMKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTgxIGxp
+bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
+LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
+IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
+cmc=
