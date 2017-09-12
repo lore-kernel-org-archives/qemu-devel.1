@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drsRX-0006ck-3t
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:10:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1drsSa-0007Oi-Vm
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:11:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drsRS-0002WP-7v
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:10:03 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:34756 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drsRR-0002Vl-TK
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:09:58 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 13 Sep 2017 00:09:47 +0300
-Message-Id: <150525058710.15988.551646038781937708.stgit@frigg.lan>
-In-Reply-To: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
-References: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
+	(envelope-from <bounces@canonical.com>) id 1drsSY-0003EI-7C
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:11:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:49416)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1drsSY-0003Dp-0D
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:11:06 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1drsSV-0005Pi-Lv
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 21:11:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 7A4F12E8499
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 21:10:59 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 02/22] instrument: Add configure-time flag
+Date: Tue, 12 Sep 2017 20:59:12 -0000
+From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
+Reply-To: Bug 1716767 <1716767@bugs.launchpad.net>
+Sender: bounces@canonical.com
+Message-Id: <150524995294.5903.8871661765030368900.malonedeb@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716767] [NEW] file(1) fails with "Invalid
+ argument" on qemu-sh4-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +37,112 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- configure |    9 +++++++++
- 1 file changed, 9 insertions(+)
+Public bug reported:
 
-diff --git a/configure b/configure
-index fd7e3a5e81..a21d1bceb9 100755
---- a/configure
-+++ b/configure
-@@ -356,6 +356,7 @@ pie=3D""
- qom_cast_debug=3D"yes"
- trace_backends=3D"log"
- trace_file=3D"trace"
-+instrument=3D"no"
- spice=3D""
- rbd=3D""
- smartcard=3D""
-@@ -886,6 +887,8 @@ for opt do
-   ;;
-   --with-trace-file=3D*) trace_file=3D"$optarg"
-   ;;
-+  --enable-instrument) instrument=3D"yes"
-+  ;;
-   --enable-gprof) gprof=3D"yes"
-   ;;
-   --enable-gcov) gcov=3D"yes"
-@@ -1436,6 +1439,7 @@ Advanced options (experts only):
-                            Available backends: $trace_backend_list
-   --with-trace-file=3DNAME   Full PATH,NAME of file to store traces
-                            Default:trace-<pid>
-+  --enable-instrument      enable event instrumentation
-   --disable-slirp          disable SLIRP userspace network connectivity
-   --enable-tcg-interpreter enable TCG with bytecode interpreter (TCI)
-   --oss-lib                path to OSS library
-@@ -5366,6 +5370,7 @@ echo "Trace backends    $trace_backends"
- if have_backend "simple"; then
- echo "Trace output file $trace_file-<pid>"
- fi
-+echo "instrumentation   $instrument"
- echo "spice support     $spice $(echo_version $spice $spice_protocol_ver=
-sion/$spice_server_version)"
- echo "rbd support       $rbd"
- echo "xfsctl support    $xfs"
-@@ -6019,6 +6024,10 @@ if have_backend "syslog"; then
- fi
- echo "CONFIG_TRACE_FILE=3D$trace_file" >> $config_host_mak
-=20
-+if test "$instrument" =3D "yes"; then
-+  echo "CONFIG_INSTRUMENT=3Dy" >> $config_host_mak
-+fi
-+
- if test "$rdma" =3D "yes" ; then
-   echo "CONFIG_RDMA=3Dy" >> $config_host_mak
- fi
+We recently discovered that file(1) fails on qemu-sh4-user when running
+on an ELF file:
+
+(sid_sh4)root@vs94:/# file /bin/bash
+/bin/bash: ERROR: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV) e=
+rror reading (Invalid argument)
+(sid_sh4)root@vs94:/#
+
+Running with "-d" yields more output:
+
+(sid_sh4)root@vs94:/# file -d /bin/bash 2>&1 | tail
+322: >> 7 byte&,=3D97,"(ARM)"]
+0 =3D=3D 97 =3D 0
+mget(type=3D1, flag=3D0, offset=3D7, o=3D0, nbytes=3D863324, il=3D0, nc=3D1)
+mget/96 @7: \000\000\000\000\000\000\000\000\000\002\000*\000\001\000\000\0=
+00\250\317A\0004\000\000\000L(\r\000\027\000\000\0004\000 \000\n\000(\000\0=
+32\000\031\000\006\000\000\0004\000\000\0004\000@\0004\000@\000@\001\000\00=
+0@\001\000\000\005\000\000\000\004\000\000\000\003\000\000\000t\001\000\000=
+t\001@\000t\001@\000\023\000\000
+
+323: >> 7 byte&,=3D-1,"(embedded)"]
+0 =3D=3D 18446744073709551615 =3D 0
+[try softmagic 1]
+[try elf -1]
+/bin/bash: ERROR: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV) e=
+rror reading (Invalid argument)
+(sid_sh4)root@vs94:/#
+
+It seems that the comparison above has a bogus (overflown?) value.
+
+On actual hardware, it works:
+
+root@tirpitz:~> file /bin/bash
+/bin/bash: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV), dynamic=
+ally linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=3D4dd0e428175582=
+7d8bb6686fd481f8c80ea73e9a, for GNU/Linux 3.2.0, stripped
+root@tirpitz:~>
+
+I have uploaded a chroot with Debian unstable which allows to reproduce
+the issue:
+
+> https://people.debian.org/~glaubitz/sid-sh4-sbuild.tar.gz
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716767
+
+Title:
+  file(1) fails with "Invalid argument" on qemu-sh4-user
+
+Status in QEMU:
+  New
+
+Bug description:
+  We recently discovered that file(1) fails on qemu-sh4-user when
+  running on an ELF file:
+
+  (sid_sh4)root@vs94:/# file /bin/bash
+  /bin/bash: ERROR: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV)=
+ error reading (Invalid argument)
+  (sid_sh4)root@vs94:/#
+
+  Running with "-d" yields more output:
+
+  (sid_sh4)root@vs94:/# file -d /bin/bash 2>&1 | tail
+  322: >> 7 byte&,=3D97,"(ARM)"]
+  0 =3D=3D 97 =3D 0
+  mget(type=3D1, flag=3D0, offset=3D7, o=3D0, nbytes=3D863324, il=3D0, nc=
+=3D1)
+  mget/96 @7: \000\000\000\000\000\000\000\000\000\002\000*\000\001\000\000=
+\000\250\317A\0004\000\000\000L(\r\000\027\000\000\0004\000 \000\n\000(\000=
+\032\000\031\000\006\000\000\0004\000\000\0004\000@\0004\000@\000@\001\000\=
+000@\001\000\000\005\000\000\000\004\000\000\000\003\000\000\000t\001\000\0=
+00t\001@\000t\001@\000\023\000\000
+
+  323: >> 7 byte&,=3D-1,"(embedded)"]
+  0 =3D=3D 18446744073709551615 =3D 0
+  [try softmagic 1]
+  [try elf -1]
+  /bin/bash: ERROR: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV)=
+ error reading (Invalid argument)
+  (sid_sh4)root@vs94:/#
+
+  It seems that the comparison above has a bogus (overflown?) value.
+
+  On actual hardware, it works:
+
+  root@tirpitz:~> file /bin/bash
+  /bin/bash: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV), dynam=
+ically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=3D4dd0e4281755=
+827d8bb6686fd481f8c80ea73e9a, for GNU/Linux 3.2.0, stripped
+  root@tirpitz:~>
+
+  I have uploaded a chroot with Debian unstable which allows to
+  reproduce the issue:
+
+  > https://people.debian.org/~glaubitz/sid-sh4-sbuild.tar.gz
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716767/+subscriptions
