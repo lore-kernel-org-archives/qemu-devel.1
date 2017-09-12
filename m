@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43971)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1drmCJ-0002ox-Ec
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:29:56 -0400
+	(envelope-from <berrange@redhat.com>) id 1drmCf-00037W-Ok
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:30:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1drmCG-00063I-B5
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:29:55 -0400
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:43193)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1drmCG-000626-5S
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:29:52 -0400
-Received: by mail-wm0-f49.google.com with SMTP id a137so81540wma.0
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 07:29:51 -0700 (PDT)
-Date: Tue, 12 Sep 2017 16:29:47 +0200
-From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Message-ID: <20170912162947.130c2df2@fiorina>
-In-Reply-To: <59A557B1.7080704@intel.com>
-References: <20170827233033.7afa49b9@fiorina>
-	<20170829095726.GL25960@stefanha-x1.localdomain>
-	<59A557B1.7080704@intel.com>
+	(envelope-from <berrange@redhat.com>) id 1drmCc-0006Oc-El
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:30:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44622)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1drmCc-0006Nx-9O
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:30:14 -0400
+Date: Tue, 12 Sep 2017 15:30:07 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170912143007.GK17633@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170912123744.14730-1-berrange@redhat.com>
+	<1505223994.31639.20.camel@redhat.com>
+	<20170912141910.GJ17633@redhat.com>
+	<CAFEAcA-tdbzXBkyxXW_e15hVcbcfqSfKqke0PX6y-Cg6A62DzQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC] Buffers/caches in VirtIO Balloon driver stats
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA-tdbzXBkyxXW_e15hVcbcfqSfKqke0PX6y-Cg6A62DzQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v5 00/12] Convert over to use keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,74 +30,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Wei Wang <wei.w.wang@intel.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-On Tue, 29 Aug 2017 20:01:53 +0800
-Wei Wang <wei.w.wang@intel.com> wrote:
+On Tue, Sep 12, 2017 at 03:24:22PM +0100, Peter Maydell wrote:
+> On 12 September 2017 at 15:19, Daniel P. Berrange <berrange@redhat.com> wrote:
+> > My POV is that we should a) never check generated files into GIT, and
+> > we should use the submodule in such a way that it is indistinguish
+> > from the content of the submodule being part of the main GIT repo.
+> 
+> AFAICT this is impossible in that git submodules are broken
+> (checking out a different commit in the top level repo doesn't
+> check out the correct version of the submodule to go with it).
+> We put up with it for our current uses of submodules because
+> the submodule contents don't change very often...
 
-> On 08/29/2017 05:57 PM, Stefan Hajnoczi wrote:
-> > On Sun, Aug 27, 2017 at 11:30:33PM +0200, Tom=C3=A1=C5=A1 Golembiovsk=
-=C3=BD wrote: =20
-> >> Hi, =20
-> > I have CCed the relevant mailing lists and people most recently involved
-> > in virtio-balloon discussions.  Hopefully this will help get the right
-> > people to see your questions.
-> > =20
-> >> We'd like to include information about reclaimable memory into the
-> >> statistics in VirtiO Balloon driver. Namely, we'd like to include
-> >> counters for bufferes and caches of Linux kernel. The patch itself is
-> >> pretty trivial -- no problem there. But before we do that I'd like to
-> >> get some input from the QEMU community.
-> >>
-> >> 1) Is there any reason not to have the stats there? =20
->=20
-> Could you please share the usages of reclaimable memory via the stats?
+Yep, you need to have something in your build system which does
+a checkout of the git submodule at the "right" time.
 
-I'll go ahead then and start sending patches. What would be the proper
-course of action here? Send patch for the driver first, or send patch
-for QEMU first or send both patches right away?
+In autoconf world you can set things up so that 'autoreconf'
+gets retriggered when submodule hash changes, but that doesn't
+apply to qemu.
 
+I tried to put some magic in configure in v4 but that was
+flawed because I didn't take acount of people building
+from dist.
 
-> >>
-> >> 2) Considering the balloon device is multiplatform (Linux, BSD,
-> >> Windows), is there a problem with including buffers/caches? These seem
-> >> to be specific to the Linux virtual memory subsystem. Of course, other
-> >> OSes could just report zeros. Are there some internal stats on those
-> >> OSes that could be filled in? I don't now if such or similar statistic
-> >> are available on BSD. On Windows only SystemCache stat looks like
-> >> something relevant. Anyone familiar with those OSes has any suggestion=
-s?
-> >>
-> >>      =20
->=20
-> One of the solutions that I'm thinking about is to make virtio=20
-> platform-ware.
+I think a better approach is to have something in rules.mak
+that ensures the submodule is checked out correctly (only
+when building from GIT, not dist), and then have the rules
+which generate the keymap files depend on this.
 
-This is not necessary. IIUC the driver does not need to send all the
-stats. We can simply treat those stats as specific to Linux driver and
-other drivers will not send them. Then QEMU will treat them as if zero
-was reported.
-
->=20
-> That is, the device by default supports
-> VIRTIO_F_LINUX,
-> VIRTIO_F_WINDOWS,
-> VIRTIO_F_BSD.
->=20
-> For the Linux driver, only VIRTIO_F_LINUX is supported, then we can
-> have Linux specific driver implementations under that feature.
-
-
-Since there were no suggestions for similar stats on other OSes I'd say
-we treat the stats for buffers and caches as Linux specific. If there is
-any need to send similar stats for other OSes we will add new stat fields
-(specific for that particular OS).
-
-
-Thanks,
-
-    Tomas
-
---=20
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
