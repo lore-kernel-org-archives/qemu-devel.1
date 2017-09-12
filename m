@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drmWW-0000UR-Nn
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:50:55 -0400
+	(envelope-from <thuth@redhat.com>) id 1drmXy-0001nR-Dh
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:52:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drmWR-0004Zh-PB
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:50:48 -0400
-Received: from 10.mo1.mail-out.ovh.net ([178.32.96.102]:50969)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drmWR-0004Xw-08
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:50:43 -0400
-Received: from player691.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 8925093A4F
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 16:50:41 +0200 (CEST)
-Date: Tue, 12 Sep 2017 16:50:28 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170912165028.11ab5489@bahia.lan>
-In-Reply-To: <20170912140149.7692-3-lvivier@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1drmXt-0005Xg-JY
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:52:18 -0400
 References: <20170912140149.7692-1-lvivier@redhat.com>
-	<20170912140149.7692-3-lvivier@redhat.com>
+	<20170912164644.2a0b6977@bahia.lan>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6198350f-a694-cf1b-ec00-4c42ccce39a6@redhat.com>
+Date: Tue, 12 Sep 2017 16:51:46 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170912164644.2a0b6977@bahia.lan>
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/YIvikDq8zcY.vXy0KTjgMs/";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v3 2/3] hmp: fix "dump-quest-memory"
- segfault (arm)
+	protocol="application/pgp-signature";
+	boundary="eggrjUaxIGESK3G2WJO0XjI50UAhKdCh1"
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] hmp: fix "dump-quest-memory"
+ segfault
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,75 +25,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>
+Cc: qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, ehabkost@redhat.com
 
---Sig_/YIvikDq8zcY.vXy0KTjgMs/
-Content-Type: text/plain; charset=US-ASCII
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--eggrjUaxIGESK3G2WJO0XjI50UAhKdCh1
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 12 Sep 2017 16:01:48 +0200
-Laurent Vivier <lvivier@redhat.com> wrote:
-
-> Running QEMU with
->     qemu-system-aarch64 -M none -nographic -m 256
-> and executing
->     dump-guest-memory /dev/null 0 8192
-> results in segfault
+On 12.09.2017 16:46, Greg Kurz wrote:
+> On Tue, 12 Sep 2017 16:01:46 +0200
+> Laurent Vivier <lvivier@redhat.com> wrote:
 >=20
-> Fix by checking if we have CPU, and exit with
-> error if there is no CPU:
+>> Fix aarch64 and ppc when dump-guest-memory is
+>> used with none machine type and no CPU.
+>>
+>> The other machine types don't have the problem.
+>>
+>> Update test-hmp, to test none machine type
+>> with (2 MB) and without memory, and add a test
+>> to test dump-quest-memory without filter parameters
+>> (it needs the fix from Cornelia Huck to work)
+>>
+>> v3:
+>>   - remove blank line after a comment
+>>   - forbid memory dump when there is no CPU
+>>
 >=20
->     (qemu) dump-guest-memory /dev/null
->     this feature or command is not currently supported
->=20
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
+> So in the end, we would forbid dump on aarch64 and
+> ppc, while it is allowed on i386... I don't really
+> care about which behavior is more appropriate but
+> I guess they should be consistent at least.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+It's kind of consistent: Allow it on architectures with fixed endianess,
+but disallow it on architectures without fixed endianess ;-)
 
->  target/arm/arch_dump.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
->=20
-> diff --git a/target/arm/arch_dump.c b/target/arm/arch_dump.c
-> index 1a9861f69b..9e5b2fb31c 100644
-> --- a/target/arm/arch_dump.c
-> +++ b/target/arm/arch_dump.c
-> @@ -273,11 +273,18 @@ int arm_cpu_write_elf32_note(WriteCoreDumpFunction =
-f, CPUState *cs,
->  int cpu_get_dump_info(ArchDumpInfo *info,
->                        const GuestPhysBlockList *guest_phys_blocks)
->  {
-> -    ARMCPU *cpu =3D ARM_CPU(first_cpu);
-> -    CPUARMState *env =3D &cpu->env;
-> +    ARMCPU *cpu;
-> +    CPUARMState *env;
->      GuestPhysBlock *block;
->      hwaddr lowest_addr =3D ULLONG_MAX;
-> =20
-> +    if (first_cpu =3D=3D NULL) {
-> +        return -1;
-> +    }
-> +
-> +    cpu =3D ARM_CPU(first_cpu);
-> +    env =3D &cpu->env;
-> +
->      /* Take a best guess at the phys_base. If we get it wrong then crash
->       * will need '--machdep phys_offset=3D<phys-offset>' added to its co=
-mmand
->       * line, which isn't any worse than assuming we can use zero, but be=
-ing
+Honestly, it should not matter - we're talking here about the "none"
+machine without a CPU ... as long as it does not crash, there is no need
+for a working "dump-guest-memory" function here.
+
+ Thomas
 
 
---Sig_/YIvikDq8zcY.vXy0KTjgMs/
-Content-Type: application/pgp-signature
+--eggrjUaxIGESK3G2WJO0XjI50UAhKdCh1
+Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbf0NAAKCRAC/DrrAQHb
-wvwVAKCisrHB4G8tqrBeOEOPkbKZ9SJm6ACgp5XA/YUNgvi4CHc/X5FTe3KwHMM=
-=nu4D
+iQIcBAEBAgAGBQJZt/SLAAoJEC7Z13T+cC218JwP/A/xuZHyv6rt41+vANkwgTvc
+bxS8lPLh39txq8bZIT64n2QR3IHeQ3I/z2Ou8pinguVmzdmq36pYvjbTevxWWOlf
+AMYKYtBTJtO+52z4RqVNrxlJZBEZcxgFCrYm02s1O3DUhHEfUYY+CCYMvxitbQ4S
+6uoBcDQqi+SmPKCH4EcwJbdEsLJwJPfmKdUeNuCWZFYJ65ICf2O8Nho7JtkLs2xG
+sYeKYRBJw7KhWfdx+wW2BdzcWbznm9n2aXzEbLko1mlXFbRwDMeIU+GgSXtaHmSZ
+v3RfjSPC3vdm4BwbmyIjGtI2rRximeDuIco6+f5rFdQQ5HsdhvMCFkMCdeb84Ekm
+fp5HIra2FWY8NEH4+N8W5+agHt5VGqkXLphyz5MjbgQszjn7/zwN3l4X0gV5V6YA
+AitCSH+/UxOWjoEsaXOObT8TG/0e3Sw8lMz5rzGm3m9DtrJ0h3+C1KxAI4e9ubzi
+NimCo6Vhat1H0qUAkttTkjkDI4pyLhWdWM0goCPvD2P5fOSolZ5sF+7DGdV56Fmt
+idnQYtqHDLanSfH3avFfX4eEFsIQEjqCuPNeypFU7WYLFA8gdmNq6TzCDHzSBler
+RZ1NciilrAt+rcOviI3EaDUgjZ+lt/Bx4WnbiGvHjZzgw4A3CzmUzk62ZeRhVMuq
+VgK6AzcLutk08kQBjXtV
+=jCqC
 -----END PGP SIGNATURE-----
 
---Sig_/YIvikDq8zcY.vXy0KTjgMs/--
+--eggrjUaxIGESK3G2WJO0XjI50UAhKdCh1--
