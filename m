@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52242)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drtc6-000358-DF
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:25:08 -0400
+	(envelope-from <groug@kaod.org>) id 1drtcD-0003DW-So
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:25:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drtc1-0005ar-Sx
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:25:02 -0400
-Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:42428)
+	(envelope-from <groug@kaod.org>) id 1drtc8-0005hF-UD
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:25:09 -0400
+Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:40812)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drtc1-0005Za-JV
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:24:57 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drtc8-0005gW-Nz
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:25:04 -0400
 Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 523D3AA673
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 00:24:56 +0200 (CEST)
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id C4F9BAA9F7
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 00:25:03 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Wed, 13 Sep 2017 00:24:53 +0200
-Message-ID: <150525509384.11068.12660058285712851211.stgit@bahia.lan>
+Date: Wed, 13 Sep 2017 00:25:01 +0200
+Message-ID: <150525510133.11068.18348168748736729990.stgit@bahia.lan>
 In-Reply-To: <150525508489.11068.5231444460720976552.stgit@bahia.lan>
 References: <150525508489.11068.5231444460720976552.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2 1/2] spapr: introduce common helper to write
- HPT address to KVM PR
+Subject: [Qemu-devel] [PATCH v2 2/2] spapr: preserve SDR1 during migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,168 +32,136 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-When running with KVM PR, if a new HPT is allocated we need to inform
-KVM about the HPT address and size. This is currently done with a hack
-which is open-coded in several places.
+When running with KVM PR, a pseries machine needs to allocate an HPT
+in userspace and pass its address and size too KVM. This is done at
+machine reset time by hijacking SDR1.
 
-This patch consolidate the code in a dedicated helper that records
-the HPT address and size in the sPAPR context, and then does the
-magic for KVM PR.
+It is very likely that the destination QEMU will allocate the HPT at
+a different address, ie, the SDR1 value we get from the migration
+stream is wrong and the guest ends up badly broken.
 
-Note that ppc_spapr_reset() now resets all devices and CPUs before
-allocating the HPT. This allows to drop the hack from spapr_cpu_reset().
+Let's fix this by preserving the pre-load value of SDR1. Since this is
+a spapr specific hack, this is achieved by extending the PPC virtual
+hypervisor interface.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c          |   31 ++++++++++++++++++++++++++-----
- hw/ppc/spapr_cpu_core.c |   15 ---------------
- hw/ppc/spapr_hcall.c    |   16 +---------------
- include/hw/ppc/spapr.h  |    1 +
- 4 files changed, 28 insertions(+), 35 deletions(-)
+ hw/ppc/spapr.c       |   30 ++++++++++++++++++++++++++++++
+ target/ppc/cpu.h     |    5 +++++
+ target/ppc/machine.c |   18 ++++++++++++++++++
+ 3 files changed, 53 insertions(+)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f680f28a15ea..97f8afdbd7fe 100644
+index 97f8afdbd7fe..aa280c9d767f 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1309,6 +1309,25 @@ void spapr_free_hpt(sPAPRMachineState *spapr)
-     close_htab_fd(spapr);
+@@ -1200,6 +1200,34 @@ static uint64_t spapr_get_patbe(PPCVirtualHypervisor *vhyp)
+     return spapr->patb_entry;
  }
  
-+void spapr_install_hpt(sPAPRMachineState *spapr, void *htab, uint32_t shift)
++static void spapr_cpu_pre_load(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu)
 +{
-+    assert(htab);
++    sPAPRMachineState *spapr = SPAPR_MACHINE(vhyp);
 +
-+    spapr->htab = htab;
-+    spapr->htab_shift = shift;
-+
-+    /*
-+     * This is a hack for the benefit of KVM PR - it abuses the SDR1
-+     * slot in kvm_sregs to communicate the userspace address of the
-+     * HPT
++    /* This is a hack for KVM PR: SDR1 contains the address and size of the HPT
++     * allocated by QEMU. We must preserve it.
 +     */
-+    if (kvm_enabled()) {
-+        target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
-+            | (spapr->htab_shift - 18);
-+        kvmppc_update_sdr1(sdr1);
++    if (kvm_enabled() && spapr->htab) {
++        CPUPPCState *env = &cpu->env;
++
++        cpu->sdr1_kvm_pr = env->spr[SPR_SDR1];
 +    }
 +}
 +
- void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-                           Error **errp)
- {
-@@ -1339,16 +1358,17 @@ void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
-         /* kernel-side HPT not needed, allocate in userspace instead */
-         size_t size = 1ULL << shift;
-         int i;
-+        void *htab;
- 
--        spapr->htab = qemu_memalign(size, size);
--        if (!spapr->htab) {
-+        htab = qemu_memalign(size, size);
-+        if (!htab) {
-             error_setg_errno(errp, errno,
-                              "Could not allocate HPT of order %d", shift);
-             return;
-         }
- 
--        memset(spapr->htab, 0, size);
--        spapr->htab_shift = shift;
-+        memset(htab, 0, size);
-+        spapr_install_hpt(spapr, htab, shift);
- 
-         for (i = 0; i < size / HASH_PTE_SIZE_64; i++) {
-             DIRTY_HPTE(HPTE(spapr->htab, i));
-@@ -1405,6 +1425,8 @@ static void ppc_spapr_reset(void)
-     /* Check for unknown sysbus devices */
-     foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
- 
-+    qemu_devices_reset();
++static void spapr_cpu_post_load(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu)
++{
++    sPAPRMachineState *spapr = SPAPR_MACHINE(vhyp);
 +
-     if (kvm_enabled() && kvmppc_has_cap_mmu_radix()) {
-         /* If using KVM with radix mode available, VCPUs can be started
-          * without a HPT because KVM will start them in radix mode.
-@@ -1414,7 +1436,6 @@ static void ppc_spapr_reset(void)
-         spapr_setup_hpt_and_vrma(spapr);
-     }
++    /* This is a hack for KVM PR: SDR1 contains the address and size of the HPT
++     * allocated by QEMU. We must preserve it.
++     */
++    if (kvm_enabled() && spapr->htab) {
++        CPUPPCState *env = &cpu->env;
++
++        env->spr[SPR_SDR1] = cpu->sdr1_kvm_pr;
++    }
++}
++
+ #define HPTE(_table, _i)   (void *)(((uint64_t *)(_table)) + ((_i) * 2))
+ #define HPTE_VALID(_hpte)  (tswap64(*((uint64_t *)(_hpte))) & HPTE64_V_VALID)
+ #define HPTE_DIRTY(_hpte)  (tswap64(*((uint64_t *)(_hpte))) & HPTE64_V_HPTE_DIRTY)
+@@ -3624,6 +3652,8 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     vhc->unmap_hptes = spapr_unmap_hptes;
+     vhc->store_hpte = spapr_store_hpte;
+     vhc->get_patbe = spapr_get_patbe;
++    vhc->cpu_pre_load = spapr_cpu_pre_load;
++    vhc->cpu_post_load = spapr_cpu_post_load;
+     xic->ics_get = spapr_ics_get;
+     xic->ics_resend = spapr_ics_resend;
+     xic->icp_get = spapr_icp_get;
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index c9d3ffa89bcb..22ea2538d923 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1212,6 +1212,9 @@ struct PowerPCCPU {
+     uint64_t mig_insns_flags2;
+     uint32_t mig_nb_BATs;
+     bool pre_2_10_migration;
++
++    /* KVM PR hack to preserve SDR1 (HPT) */
++    target_ulong sdr1_kvm_pr;
+ };
  
--    qemu_devices_reset();
-     spapr_clear_pending_events(spapr);
+ static inline PowerPCCPU *ppc_env_get_cpu(CPUPPCState *env)
+@@ -1243,6 +1246,8 @@ struct PPCVirtualHypervisorClass {
+     void (*store_hpte)(PPCVirtualHypervisor *vhyp, hwaddr ptex,
+                        uint64_t pte0, uint64_t pte1);
+     uint64_t (*get_patbe)(PPCVirtualHypervisor *vhyp);
++    void (*cpu_pre_load)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
++    void (*cpu_post_load)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
+ };
  
-     /*
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index c08ee7571a50..c20b5c64b045 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -73,7 +73,6 @@ void spapr_cpu_parse_features(sPAPRMachineState *spapr)
- 
- static void spapr_cpu_reset(void *opaque)
- {
--    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     PowerPCCPU *cpu = opaque;
-     CPUState *cs = CPU(cpu);
-     CPUPPCState *env = &cpu->env;
-@@ -86,20 +85,6 @@ static void spapr_cpu_reset(void *opaque)
-     cs->halted = 1;
- 
-     env->spr[SPR_HIOR] = 0;
--
--    /*
--     * This is a hack for the benefit of KVM PR - it abuses the SDR1
--     * slot in kvm_sregs to communicate the userspace address of the
--     * HPT
--     */
--    if (kvm_enabled()) {
--        env->spr[SPR_SDR1] = (target_ulong)(uintptr_t)spapr->htab
--            | (spapr->htab_shift - 18);
--        if (kvmppc_put_books_sregs(cpu) < 0) {
--            error_report("Unable to update SDR1 in KVM");
--            exit(1);
--        }
--    }
+ #define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
+diff --git a/target/ppc/machine.c b/target/ppc/machine.c
+index e36b7100cb66..c4d32c886367 100644
+--- a/target/ppc/machine.c
++++ b/target/ppc/machine.c
+@@ -218,6 +218,19 @@ static bool pvr_match(PowerPCCPU *cpu, uint32_t pvr)
+     return pcc->pvr_match(pcc, pvr);
  }
  
- static void spapr_cpu_destroy(PowerPCCPU *cpu)
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 57bb411394ed..7892cd3e7ffa 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -730,15 +730,7 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
-                     pending->hpt, newsize);
-     if (rc == H_SUCCESS) {
-         qemu_vfree(spapr->htab);
--        spapr->htab = pending->hpt;
--        spapr->htab_shift = pending->shift;
--
--        if (kvm_enabled()) {
--            /* For KVM PR, update the HPT pointer */
--            target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
--                | (spapr->htab_shift - 18);
--            kvmppc_update_sdr1(sdr1);
--        }
-+        spapr_install_hpt(spapr, pending->hpt, pending->shift);
++static int cpu_pre_load(void *opaque)
++{
++    PowerPCCPU *cpu = opaque;
++
++    if (cpu->vhyp) {
++        PPCVirtualHypervisorClass *vhc =
++            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++        vhc->cpu_pre_load(cpu->vhyp, cpu);
++    }
++
++    return 0;
++}
++
+ static int cpu_post_load(void *opaque, int version_id)
+ {
+     PowerPCCPU *cpu = opaque;
+@@ -294,6 +307,10 @@ static int cpu_post_load(void *opaque, int version_id)
  
-         pending->hpt = NULL; /* so it's not free()d */
-     }
-@@ -1564,12 +1556,6 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-              * the point this is called, nothing should have been
-              * entered into the existing HPT */
-             spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
--            if (kvm_enabled()) {
--                /* For KVM PR, update the HPT pointer */
--                target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
--                    | (spapr->htab_shift - 18);
--                kvmppc_update_sdr1(sdr1);
--            }
-         }
+     if (!cpu->vhyp) {
+         ppc_store_sdr1(env, env->spr[SPR_SDR1]);
++    } else {
++        PPCVirtualHypervisorClass *vhc =
++            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++        vhc->cpu_post_load(cpu->vhyp, cpu);
      }
  
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index c1b365f56431..30e5805acca4 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -709,4 +709,5 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, run_on_cpu_data arg);
- int spapr_vcpu_id(PowerPCCPU *cpu);
- PowerPCCPU *spapr_find_cpu(int vcpu_id);
- 
-+void spapr_install_hpt(sPAPRMachineState *spapr, void *htab, uint32_t shift);
- #endif /* HW_SPAPR_H */
+     /* Invalidate all msr bits except MSR_TGPR/MSR_HVB before restoring */
+@@ -650,6 +667,7 @@ const VMStateDescription vmstate_ppc_cpu = {
+     .minimum_version_id_old = 4,
+     .load_state_old = cpu_load_old,
+     .pre_save = cpu_pre_save,
++    .pre_load = cpu_pre_load,
+     .post_load = cpu_post_load,
+     .fields = (VMStateField[]) {
+         VMSTATE_UNUSED(sizeof(target_ulong)), /* was _EQUAL(env.spr[SPR_PVR]) */
