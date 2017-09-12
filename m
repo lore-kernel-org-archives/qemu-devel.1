@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49624)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drfxQ-0000GS-ES
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:50:13 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1drg67-0003BI-8n
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:59:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drfxM-0003D1-AQ
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:50:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33870)
+	(envelope-from <pbonzini@redhat.com>) id 1drg63-0008Tg-Be
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:59:07 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58760)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drfxM-0003Cj-0d
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:50:04 -0400
-References: <cover.1505158760.git.alistair.francis@xilinx.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drg63-0008TA-2b
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:59:03 -0400
+References: <1505143227-14324-1-git-send-email-arei.gonglei@huawei.com>
+	<20170911183748.GS7570@localhost.localdomain>
+	<33183CC9F5247A488A2544077AF19020DA3AAD3B@DGGEMA505-MBX.china.huawei.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dfeb3c9c-72d6-8d74-9668-09ba11d73abd@redhat.com>
-Date: Tue, 12 Sep 2017 09:49:53 +0200
+Message-ID: <35ab2902-630c-b57f-77c2-10bf88798d81@redhat.com>
+Date: Tue, 12 Sep 2017 09:58:48 +0200
 MIME-Version: 1.0
-In-Reply-To: <cover.1505158760.git.alistair.francis@xilinx.com>
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA3AAD3B@DGGEMA505-MBX.china.huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 0/8] More warning reporting fixed
+Subject: Re: [Qemu-devel] [PATCH] i386/cpu/hyperv: support over 64 vcpus for
+ windows guests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +30,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
-Cc: alistair23@gmail.com, armbru@redhat.com
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "vrozenfe@redhat.com" <vrozenfe@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
 
-On 11/09/2017 21:52, Alistair Francis wrote:
-> This series expands on my previous series by converting more existing
-> prints to use warn_report() instead of error_report() or fprintf().
+On 12/09/2017 03:41, Gonglei (Arei) wrote:
 > 
-> As discussed with Paolo and Markus this series combines libqemustub.a into
-> libqemuutil.a to avoid circular dependencies.
-> 
-> V4:
->  - Improve some extra MIPs messages
->  - Fix build issues
->  - Fix i386 print message
-> V3:
->  - Small corrections as reported by Markus
->  - Rename patch 3 and 5 so they don't have the same name
->  - Combine libqemustub.a into libqemuutil.a
->  - Add an extra patch with general cleanups
-> 
-> V2:
->  - Fixup auto CC logic so everyone is CCed
-> 
-> 
-> 
-> Alistair Francis (8):
->   hw/i386: Improve some of the warning messages
->   Convert remaining error_report() to warn_report()
->   Convert single line fprintf(.../n) to warn_report()
->   Convert multi-line fprintf() to warn_report()
->   General warn report fixups
->   target/mips: Convert VM clock update prints to warn_report
->   Makefile: Remove libqemustub.a
->   Convert remaining single line fprintf() to warn_report()
-> 
->  Makefile                    |  7 +++----
->  Makefile.target             |  2 +-
->  accel/kvm/kvm-all.c         |  7 +++----
->  block/qcow2.c               |  9 +++++----
->  block/vvfat.c               |  7 ++++---
->  docs/devel/build-system.txt | 16 +++++++---------
->  hw/acpi/core.c              | 10 +++++-----
->  hw/arm/vexpress.c           |  4 ++--
->  hw/i386/acpi-build.c        | 15 ++++++++++-----
->  hw/i386/pc.c                |  9 ++++-----
->  hw/i386/pc_q35.c            |  8 +++++---
->  hw/i386/xen/xen-mapcache.c  |  5 +++--
->  hw/mips/mips_malta.c        |  4 ++--
->  hw/mips/mips_r4k.c          |  5 ++---
->  hw/misc/applesmc.c          |  2 +-
->  hw/s390x/s390-virtio.c      | 18 ++++++++++--------
->  hw/usb/hcd-ehci.c           |  5 +++--
->  hw/virtio/virtio-balloon.c  |  3 ++-
->  net/hub.c                   | 10 ++++------
->  net/net.c                   | 15 ++++++++-------
->  qga/vss-win32.c             |  2 +-
->  target/i386/cpu.c           | 12 ++++++------
->  target/i386/hax-mem.c       |  6 +++---
->  target/mips/kvm.c           | 10 +++++-----
->  target/ppc/translate_init.c | 17 ++++++++---------
->  target/s390x/kvm.c          |  4 ++--
->  tests/Makefile.include      |  8 ++++----
->  trace/control.c             |  4 ++--
->  trace/simple.c              |  3 ++-
->  ui/keymaps.c                | 10 +++++-----
->  ui/spice-display.c          |  2 +-
->  util/cutils.c               |  3 ++-
->  util/main-loop.c            |  6 +++---
->  33 files changed, 128 insertions(+), 120 deletions(-)
-> 
+>> -----Original Message-----
+>> From: Eduardo Habkost [mailto:ehabkost@redhat.com]
+>> Sent: Tuesday, September 12, 2017 2:38 AM
+>> To: Gonglei (Arei)
+>> Cc: qemu-devel@nongnu.org; mst@redhat.com; pbonzini@redhat.com;
+>> rth@twiddle.net; mtosatti@redhat.com; vrozenfe@redhat.com;
+>> Huangweidong (C)
+>> Subject: Re: [PATCH] i386/cpu/hyperv: support over 64 vcpus for windows
+>> guests
+>>
+>> On Mon, Sep 11, 2017 at 11:20:27PM +0800, Gonglei wrote:
+>>> Starting with Windows Server 2012 and Windows 8, if
+>>> CPUID.40000005.EAX contains a value of -1, Windows assumes specific
+>>> limit to the number of VPs. In this case, Windows Server 2012
+>>> guest VMs may use more than 64 VPs, up to the maximum supported
+>>> number of processors applicable to the specific Windows
+>>> version being used.
+>>>
+>>>
+>> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/referenc
+>> e/tlfs
+>>>
+>>> For compatibility, Let's introduce a new property for X86CPU,
+>>> named "x-hv-max-vps" as Eduardo's suggestion, and set it
+>>> to 0x40 before machine 2.10.
+>>>
+>>> (The "x-" prefix indicates that the property is not supposed to
+>>> be a stable user interface.)
+>>>
+>>> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
+>>> ---
+>>>  include/hw/i386/pc.h |  5 +++++
+>>>  target/i386/cpu.c    |  1 +
+>>>  target/i386/cpu.h    |  2 ++
+>>>  target/i386/kvm.c    | 15 ++++++++++++++-
+>>>  4 files changed, 22 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+>>> index 8226904..087d184 100644
+>>> --- a/include/hw/i386/pc.h
+>>> +++ b/include/hw/i386/pc.h
+>>> @@ -371,6 +371,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *,
+>> uint64_t *);
+>>>
+>>>  #define PC_COMPAT_2_10 \
+>>>      HW_COMPAT_2_10 \
+>>> +    {\
+>>> +        .driver   = TYPE_X86_CPU,\
+>>> +        .property = "x-hv-max-vps",\
+>>> +        .value    = "0x40",\
+>>> +    },
+>>>
+>>>  #define PC_COMPAT_2_9 \
+>>>      HW_COMPAT_2_9 \
+>>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>>> index 69676e1..2702485 100644
+>>> --- a/target/i386/cpu.c
+>>> +++ b/target/i386/cpu.c
+>>> @@ -4145,6 +4145,7 @@ static Property x86_cpu_properties[] = {
+>>>                       false),
+>>>      DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU,
+>> vmware_cpuid_freq, true),
+>>>      DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
+>>> +    DEFINE_PROP_INT32("x-hv-max-vps", X86CPU, hv_max_vps, -1),
+>>>      DEFINE_PROP_END_OF_LIST()
+>>>  };
+>>>
+>>> diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+>>> index 525d35d..5c726f3 100644
+>>> --- a/target/i386/cpu.h
+>>> +++ b/target/i386/cpu.h
+>>> @@ -1282,6 +1282,8 @@ struct X86CPU {
+>>>      int32_t socket_id;
+>>>      int32_t core_id;
+>>>      int32_t thread_id;
+>>> +
+>>> +    int32_t hv_max_vps;
+>>>  };
+>>>
+>>>  static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
+>>> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+>>> index 6db7783..a898bef 100644
+>>> --- a/target/i386/kvm.c
+>>> +++ b/target/i386/kvm.c
+>>> @@ -751,7 +751,20 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>>
+>>>          c = &cpuid_data.entries[cpuid_i++];
+>>>          c->function = HYPERV_CPUID_IMPLEMENT_LIMITS;
+>>> -        c->eax = 0x40;
+>>> +
+>>> +        /*
+>>> +         * From "Requirements for Implementing the Microsoft
+>>> +         * Hypervisor Interface":
+>>> +         *
+>> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/referenc
+>> e/tlfs
+>>> +         *
+>>> +         * "Starting with Windows Server 2012 and Windows 8, if
+>>> +         * CPUID.40000005.EAX contains a value of -1, Windows assumes
+>>> +         * specific limit to the number of VPs. In this case, Windows
+>>> +         * Server 2012 guest VMs may use more than 64 VPs, up to the
+>>> +         * maximum supported number of processors applicable to the
+>>> +         * specific Windows version being used."
+>>> +         */
+>>
+>> I would place this comment above the DEFINE_PROP_INT32
+>> declaration, as its purpose is to explain the -1 default.
+>>
+> Fine, do I need to send v2? Or you adjust it directly?
 
-Queued, thanks.
+Done, also changing the sentence to "Windows assumes that the hypervisor
+imposes no specific limit to the number of VPs" as in the Microsoft
+document.
 
 Paolo
+
+> 
+> Thanks,
+> -Gonglei
+>>
+>>> +        c->eax = cpu->hv_max_vps;
+>>>          c->ebx = 0x40;
+>>>
+>>>          kvm_base = KVM_CPUID_SIGNATURE_NEXT;
+>>> --
+>>> 1.8.3.1
+>>>
+>>>
+>>
+>> --
+>> Eduardo
