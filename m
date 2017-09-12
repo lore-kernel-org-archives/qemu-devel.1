@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48984)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50757)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1drkSj-0001Jc-Qv
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:38:47 -0400
+	(envelope-from <imammedo@redhat.com>) id 1drkXS-00068S-BE
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:43:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1drkSg-0003qP-Ke
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:38:45 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:4490)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <arei.gonglei@huawei.com>) id 1drkSf-0003n8-MZ
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:38:42 -0400
-From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Date: Tue, 12 Sep 2017 12:38:13 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DA3AC784@DGGEMA505-MBX.china.huawei.com>
-References: <1505143227-14324-1-git-send-email-arei.gonglei@huawei.com>
-	<20170911183748.GS7570@localhost.localdomain>
-	<33183CC9F5247A488A2544077AF19020DA3AAD3B@DGGEMA505-MBX.china.huawei.com>
-	<35ab2902-630c-b57f-77c2-10bf88798d81@redhat.com>
-In-Reply-To: <35ab2902-630c-b57f-77c2-10bf88798d81@redhat.com>
-Content-Language: zh-CN
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	(envelope-from <imammedo@redhat.com>) id 1drkXR-00065d-DB
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:43:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42164)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1drkXR-00065V-6i
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:43:37 -0400
+Date: Tue, 12 Sep 2017 14:43:30 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170912144330.3f07b30b@nial.brq.redhat.com>
+In-Reply-To: <20170911152150.12535-12-david@redhat.com>
+References: <20170911152150.12535-1-david@redhat.com>
+	<20170911152150.12535-12-david@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [Qemu-devel] [PATCH] i386/cpu/hyperv: support over 64 vcpus for
- windows guests
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 11/21] s390x: allow only 1 CPU with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +27,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "mst@redhat.com" <mst@redhat.com>, "rth@twiddle.net" <rth@twiddle.net>, "mtosatti@redhat.com" <mtosatti@redhat.com>, "vrozenfe@redhat.com" <vrozenfe@redhat.com>, "Huangweidong (C)" <weidong.huang@huawei.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
 
-PiANCj4gT24gMTIvMDkvMjAxNyAwMzo0MSwgR29uZ2xlaSAoQXJlaSkgd3JvdGU6DQo+ID4NCj4g
-Pj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPj4gRnJvbTogRWR1YXJkbyBIYWJrb3N0
-IFttYWlsdG86ZWhhYmtvc3RAcmVkaGF0LmNvbV0NCj4gPj4gU2VudDogVHVlc2RheSwgU2VwdGVt
-YmVyIDEyLCAyMDE3IDI6MzggQU0NCj4gPj4gVG86IEdvbmdsZWkgKEFyZWkpDQo+ID4+IENjOiBx
-ZW11LWRldmVsQG5vbmdudS5vcmc7IG1zdEByZWRoYXQuY29tOyBwYm9uemluaUByZWRoYXQuY29t
-Ow0KPiA+PiBydGhAdHdpZGRsZS5uZXQ7IG10b3NhdHRpQHJlZGhhdC5jb207IHZyb3plbmZlQHJl
-ZGhhdC5jb207DQo+ID4+IEh1YW5nd2VpZG9uZyAoQykNCj4gPj4gU3ViamVjdDogUmU6IFtQQVRD
-SF0gaTM4Ni9jcHUvaHlwZXJ2OiBzdXBwb3J0IG92ZXIgNjQgdmNwdXMgZm9yIHdpbmRvd3MNCj4g
-Pj4gZ3Vlc3RzDQo+ID4+DQo+ID4+IE9uIE1vbiwgU2VwIDExLCAyMDE3IGF0IDExOjIwOjI3UE0g
-KzA4MDAsIEdvbmdsZWkgd3JvdGU6DQo+ID4+PiBTdGFydGluZyB3aXRoIFdpbmRvd3MgU2VydmVy
-IDIwMTIgYW5kIFdpbmRvd3MgOCwgaWYNCj4gPj4+IENQVUlELjQwMDAwMDA1LkVBWCBjb250YWlu
-cyBhIHZhbHVlIG9mIC0xLCBXaW5kb3dzIGFzc3VtZXMgc3BlY2lmaWMNCj4gPj4+IGxpbWl0IHRv
-IHRoZSBudW1iZXIgb2YgVlBzLiBJbiB0aGlzIGNhc2UsIFdpbmRvd3MgU2VydmVyIDIwMTINCj4g
-Pj4+IGd1ZXN0IFZNcyBtYXkgdXNlIG1vcmUgdGhhbiA2NCBWUHMsIHVwIHRvIHRoZSBtYXhpbXVt
-IHN1cHBvcnRlZA0KPiA+Pj4gbnVtYmVyIG9mIHByb2Nlc3NvcnMgYXBwbGljYWJsZSB0byB0aGUg
-c3BlY2lmaWMgV2luZG93cw0KPiA+Pj4gdmVyc2lvbiBiZWluZyB1c2VkLg0KPiA+Pj4NCj4gPj4+
-DQo+ID4+DQo+IGh0dHBzOi8vZG9jcy5taWNyb3NvZnQuY29tL2VuLXVzL3ZpcnR1YWxpemF0aW9u
-L2h5cGVyLXYtb24td2luZG93cy9yZWZlcmVuYw0KPiA+PiBlL3RsZnMNCj4gPj4+DQo+ID4+PiBG
-b3IgY29tcGF0aWJpbGl0eSwgTGV0J3MgaW50cm9kdWNlIGEgbmV3IHByb3BlcnR5IGZvciBYODZD
-UFUsDQo+ID4+PiBuYW1lZCAieC1odi1tYXgtdnBzIiBhcyBFZHVhcmRvJ3Mgc3VnZ2VzdGlvbiwg
-YW5kIHNldCBpdA0KPiA+Pj4gdG8gMHg0MCBiZWZvcmUgbWFjaGluZSAyLjEwLg0KPiA+Pj4NCj4g
-Pj4+IChUaGUgIngtIiBwcmVmaXggaW5kaWNhdGVzIHRoYXQgdGhlIHByb3BlcnR5IGlzIG5vdCBz
-dXBwb3NlZCB0bw0KPiA+Pj4gYmUgYSBzdGFibGUgdXNlciBpbnRlcmZhY2UuKQ0KPiA+Pj4NCj4g
-Pj4+IFNpZ25lZC1vZmYtYnk6IEdvbmdsZWkgPGFyZWkuZ29uZ2xlaUBodWF3ZWkuY29tPg0KPiA+
-Pj4gLS0tDQo+ID4+PiAgaW5jbHVkZS9ody9pMzg2L3BjLmggfCAgNSArKysrKw0KPiA+Pj4gIHRh
-cmdldC9pMzg2L2NwdS5jICAgIHwgIDEgKw0KPiA+Pj4gIHRhcmdldC9pMzg2L2NwdS5oICAgIHwg
-IDIgKysNCj4gPj4+ICB0YXJnZXQvaTM4Ni9rdm0uYyAgICB8IDE1ICsrKysrKysrKysrKysrLQ0K
-PiA+Pj4gIDQgZmlsZXMgY2hhbmdlZCwgMjIgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0K
-PiA+Pj4NCj4gPj4+IGRpZmYgLS1naXQgYS9pbmNsdWRlL2h3L2kzODYvcGMuaCBiL2luY2x1ZGUv
-aHcvaTM4Ni9wYy5oDQo+ID4+PiBpbmRleCA4MjI2OTA0Li4wODdkMTg0IDEwMDY0NA0KPiA+Pj4g
-LS0tIGEvaW5jbHVkZS9ody9pMzg2L3BjLmgNCj4gPj4+ICsrKyBiL2luY2x1ZGUvaHcvaTM4Ni9w
-Yy5oDQo+ID4+PiBAQCAtMzcxLDYgKzM3MSwxMSBAQCBib29sIGU4MjBfZ2V0X2VudHJ5KGludCwg
-dWludDMyX3QsIHVpbnQ2NF90ICosDQo+ID4+IHVpbnQ2NF90ICopOw0KPiA+Pj4NCj4gPj4+ICAj
-ZGVmaW5lIFBDX0NPTVBBVF8yXzEwIFwNCj4gPj4+ICAgICAgSFdfQ09NUEFUXzJfMTAgXA0KPiA+
-Pj4gKyAgICB7XA0KPiA+Pj4gKyAgICAgICAgLmRyaXZlciAgID0gVFlQRV9YODZfQ1BVLFwNCj4g
-Pj4+ICsgICAgICAgIC5wcm9wZXJ0eSA9ICJ4LWh2LW1heC12cHMiLFwNCj4gPj4+ICsgICAgICAg
-IC52YWx1ZSAgICA9ICIweDQwIixcDQo+ID4+PiArICAgIH0sDQo+ID4+Pg0KPiA+Pj4gICNkZWZp
-bmUgUENfQ09NUEFUXzJfOSBcDQo+ID4+PiAgICAgIEhXX0NPTVBBVF8yXzkgXA0KPiA+Pj4gZGlm
-ZiAtLWdpdCBhL3RhcmdldC9pMzg2L2NwdS5jIGIvdGFyZ2V0L2kzODYvY3B1LmMNCj4gPj4+IGlu
-ZGV4IDY5Njc2ZTEuLjI3MDI0ODUgMTAwNjQ0DQo+ID4+PiAtLS0gYS90YXJnZXQvaTM4Ni9jcHUu
-Yw0KPiA+Pj4gKysrIGIvdGFyZ2V0L2kzODYvY3B1LmMNCj4gPj4+IEBAIC00MTQ1LDYgKzQxNDUs
-NyBAQCBzdGF0aWMgUHJvcGVydHkgeDg2X2NwdV9wcm9wZXJ0aWVzW10gPSB7DQo+ID4+PiAgICAg
-ICAgICAgICAgICAgICAgICAgZmFsc2UpLA0KPiA+Pj4gICAgICBERUZJTkVfUFJPUF9CT09MKCJ2
-bXdhcmUtY3B1aWQtZnJlcSIsIFg4NkNQVSwNCj4gPj4gdm13YXJlX2NwdWlkX2ZyZXEsIHRydWUp
-LA0KPiA+Pj4gICAgICBERUZJTkVfUFJPUF9CT09MKCJ0Y2ctY3B1aWQiLCBYODZDUFUsIGV4cG9z
-ZV90Y2csIHRydWUpLA0KPiA+Pj4gKyAgICBERUZJTkVfUFJPUF9JTlQzMigieC1odi1tYXgtdnBz
-IiwgWDg2Q1BVLCBodl9tYXhfdnBzLCAtMSksDQo+ID4+PiAgICAgIERFRklORV9QUk9QX0VORF9P
-Rl9MSVNUKCkNCj4gPj4+ICB9Ow0KPiA+Pj4NCj4gPj4+IGRpZmYgLS1naXQgYS90YXJnZXQvaTM4
-Ni9jcHUuaCBiL3RhcmdldC9pMzg2L2NwdS5oDQo+ID4+PiBpbmRleCA1MjVkMzVkLi41YzcyNmYz
-IDEwMDY0NA0KPiA+Pj4gLS0tIGEvdGFyZ2V0L2kzODYvY3B1LmgNCj4gPj4+ICsrKyBiL3Rhcmdl
-dC9pMzg2L2NwdS5oDQo+ID4+PiBAQCAtMTI4Miw2ICsxMjgyLDggQEAgc3RydWN0IFg4NkNQVSB7
-DQo+ID4+PiAgICAgIGludDMyX3Qgc29ja2V0X2lkOw0KPiA+Pj4gICAgICBpbnQzMl90IGNvcmVf
-aWQ7DQo+ID4+PiAgICAgIGludDMyX3QgdGhyZWFkX2lkOw0KPiA+Pj4gKw0KPiA+Pj4gKyAgICBp
-bnQzMl90IGh2X21heF92cHM7DQo+ID4+PiAgfTsNCj4gPj4+DQo+ID4+PiAgc3RhdGljIGlubGlu
-ZSBYODZDUFUgKng4Nl9lbnZfZ2V0X2NwdShDUFVYODZTdGF0ZSAqZW52KQ0KPiA+Pj4gZGlmZiAt
-LWdpdCBhL3RhcmdldC9pMzg2L2t2bS5jIGIvdGFyZ2V0L2kzODYva3ZtLmMNCj4gPj4+IGluZGV4
-IDZkYjc3ODMuLmE4OThiZWYgMTAwNjQ0DQo+ID4+PiAtLS0gYS90YXJnZXQvaTM4Ni9rdm0uYw0K
-PiA+Pj4gKysrIGIvdGFyZ2V0L2kzODYva3ZtLmMNCj4gPj4+IEBAIC03NTEsNyArNzUxLDIwIEBA
-IGludCBrdm1fYXJjaF9pbml0X3ZjcHUoQ1BVU3RhdGUgKmNzKQ0KPiA+Pj4NCj4gPj4+ICAgICAg
-ICAgIGMgPSAmY3B1aWRfZGF0YS5lbnRyaWVzW2NwdWlkX2krK107DQo+ID4+PiAgICAgICAgICBj
-LT5mdW5jdGlvbiA9IEhZUEVSVl9DUFVJRF9JTVBMRU1FTlRfTElNSVRTOw0KPiA+Pj4gLSAgICAg
-ICAgYy0+ZWF4ID0gMHg0MDsNCj4gPj4+ICsNCj4gPj4+ICsgICAgICAgIC8qDQo+ID4+PiArICAg
-ICAgICAgKiBGcm9tICJSZXF1aXJlbWVudHMgZm9yIEltcGxlbWVudGluZyB0aGUgTWljcm9zb2Z0
-DQo+ID4+PiArICAgICAgICAgKiBIeXBlcnZpc29yIEludGVyZmFjZSI6DQo+ID4+PiArICAgICAg
-ICAgKg0KPiA+Pg0KPiBodHRwczovL2RvY3MubWljcm9zb2Z0LmNvbS9lbi11cy92aXJ0dWFsaXph
-dGlvbi9oeXBlci12LW9uLXdpbmRvd3MvcmVmZXJlbmMNCj4gPj4gZS90bGZzDQo+ID4+PiArICAg
-ICAgICAgKg0KPiA+Pj4gKyAgICAgICAgICogIlN0YXJ0aW5nIHdpdGggV2luZG93cyBTZXJ2ZXIg
-MjAxMiBhbmQgV2luZG93cyA4LCBpZg0KPiA+Pj4gKyAgICAgICAgICogQ1BVSUQuNDAwMDAwMDUu
-RUFYIGNvbnRhaW5zIGEgdmFsdWUgb2YgLTEsIFdpbmRvd3MNCj4gYXNzdW1lcw0KPiA+Pj4gKyAg
-ICAgICAgICogc3BlY2lmaWMgbGltaXQgdG8gdGhlIG51bWJlciBvZiBWUHMuIEluIHRoaXMgY2Fz
-ZSwgV2luZG93cw0KPiA+Pj4gKyAgICAgICAgICogU2VydmVyIDIwMTIgZ3Vlc3QgVk1zIG1heSB1
-c2UgbW9yZSB0aGFuIDY0IFZQcywgdXAgdG8gdGhlDQo+ID4+PiArICAgICAgICAgKiBtYXhpbXVt
-IHN1cHBvcnRlZCBudW1iZXIgb2YgcHJvY2Vzc29ycyBhcHBsaWNhYmxlIHRvIHRoZQ0KPiA+Pj4g
-KyAgICAgICAgICogc3BlY2lmaWMgV2luZG93cyB2ZXJzaW9uIGJlaW5nIHVzZWQuIg0KPiA+Pj4g
-KyAgICAgICAgICovDQo+ID4+DQo+ID4+IEkgd291bGQgcGxhY2UgdGhpcyBjb21tZW50IGFib3Zl
-IHRoZSBERUZJTkVfUFJPUF9JTlQzMg0KPiA+PiBkZWNsYXJhdGlvbiwgYXMgaXRzIHB1cnBvc2Ug
-aXMgdG8gZXhwbGFpbiB0aGUgLTEgZGVmYXVsdC4NCj4gPj4NCj4gPiBGaW5lLCBkbyBJIG5lZWQg
-dG8gc2VuZCB2Mj8gT3IgeW91IGFkanVzdCBpdCBkaXJlY3RseT8NCj4gDQo+IERvbmUsIGFsc28g
-Y2hhbmdpbmcgdGhlIHNlbnRlbmNlIHRvICJXaW5kb3dzIGFzc3VtZXMgdGhhdCB0aGUgaHlwZXJ2
-aXNvcg0KPiBpbXBvc2VzIG5vIHNwZWNpZmljIGxpbWl0IHRvIHRoZSBudW1iZXIgb2YgVlBzIiBh
-cyBpbiB0aGUgTWljcm9zb2Z0DQo+IGRvY3VtZW50Lg0KPiANCj4gUGFvbG8NCj4gDQpOaWNlLCB0
-aGFua3MhDQoNClJlZ2FyZHMsDQotR29uZ2xlaQ0KDQo=
+On Mon, 11 Sep 2017 17:21:40 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
+> guest tries to bring these CPUs up but fails), because we don't support
+> multiple CPUs on s390x under TCG.
+> 
+> Let's bail out if more than 1 is specified, so we don't raise people's
+> hope. Make it a define, so we can easily bump it up later.
+> 
+> Tested-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index f67b4b5d58..f1198b2745 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -23,6 +23,7 @@
+>  #include "hw/s390x/css.h"
+>  #include "virtio-ccw.h"
+>  #include "qemu/config-file.h"
+> +#include "qemu/error-report.h"
+>  #include "s390-pci-bus.h"
+>  #include "hw/s390x/storage-keys.h"
+>  #include "hw/s390x/storage-attributes.h"
+> @@ -47,6 +48,8 @@ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
+>      return cpu_states[cpu_addr];
+>  }
+>  
+> +/* #define S390_TCG_SMP_SUPPORT */
+I'd drop define and ifdef for something that doesn't exists
+
+>  static void s390_init_cpus(MachineState *machine)
+>  {
+>      int i;
+> @@ -55,6 +58,13 @@ static void s390_init_cpus(MachineState *machine)
+>      if (machine->cpu_model == NULL) {
+>          machine->cpu_model = s390_default_cpu_model_name();
+>      }
+> +#ifndef S390_TCG_SMP_SUPPORT
+> +    if (tcg_enabled() && max_cpus > 1) {
+> +        error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
+> +                     "supported by TCG (1) on s390x", max_cpus);
+> +        exit(1);
+> +    }
+> +#endif
+>  
+>      cpu_states = g_new0(S390CPU *, max_cpus);
+>  
