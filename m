@@ -1,32 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60871)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drqIf-0007El-Eu
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:52:46 -0400
+	id 1drqIu-0007SN-IZ
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:53:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drqIb-0008T9-SR
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:52:45 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:35617)
+	id 1drqIr-0000DV-Fe
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:53:00 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:33774)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drqIb-0008Sw-Nq
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:52:41 -0400
-Received: by mail-qk0-x244.google.com with SMTP id o77so7705781qke.2
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 11:52:41 -0700 (PDT)
+	id 1drqIr-0000D9-BM
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:52:57 -0400
+Received: by mail-qk0-x241.google.com with SMTP id g128so7724960qke.0
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 11:52:57 -0700 (PDT)
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 References: <20170912162513.21694-1-richard.henderson@linaro.org>
-	<20170912162513.21694-13-richard.henderson@linaro.org>
+	<20170912162513.21694-14-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6f1f0e95-ca3e-d988-d5b9-05f29fd55053@amsat.org>
-Date: Tue, 12 Sep 2017 15:52:38 -0300
+Message-ID: <c07c1ee2-19c3-cd3f-c362-1053a150e168@amsat.org>
+Date: Tue, 12 Sep 2017 15:52:53 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170912162513.21694-13-richard.henderson@linaro.org>
+In-Reply-To: <20170912162513.21694-14-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 12/16] tcg: Remove tcg_regset_set
+Subject: Re: [Qemu-devel] [PATCH v2 13/16] tcg: Remove tcg_regset_{or, and,
+ andnot, not}
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,53 +45,36 @@ On 09/12/2017 01:25 PM, Richard Henderson wrote:
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->   tcg/tcg.h | 1 -
->   tcg/tcg.c | 8 ++++----
->   2 files changed, 4 insertions(+), 5 deletions(-)
+>   tcg/tcg.h | 4 ----
+>   tcg/tcg.c | 2 +-
+>   2 files changed, 1 insertion(+), 5 deletions(-)
 > 
 > diff --git a/tcg/tcg.h b/tcg/tcg.h
-> index 7226727ee4..e168bd2c44 100644
+> index e168bd2c44..8b4208ea03 100644
 > --- a/tcg/tcg.h
 > +++ b/tcg/tcg.h
-> @@ -210,7 +210,6 @@ typedef enum TCGOpcode {
->       NB_OPS,
->   } TCGOpcode;
->   
-> -#define tcg_regset_set(d, s) (d) = (s)
->   #define tcg_regset_set32(d, reg, val32) (d) |= (val32) << (reg)
+> @@ -214,10 +214,6 @@ typedef enum TCGOpcode {
 >   #define tcg_regset_set_reg(d, r) (d) |= 1L << (r)
 >   #define tcg_regset_reset_reg(d, r) (d) &= ~(1L << (r))
+>   #define tcg_regset_test_reg(d, r) (((d) >> (r)) & 1)
+> -#define tcg_regset_or(d, a, b) (d) = (a) | (b)
+> -#define tcg_regset_and(d, a, b) (d) = (a) & (b)
+> -#define tcg_regset_andnot(d, a, b) (d) = (a) & ~(b)
+> -#define tcg_regset_not(d, a) (d) = ~(a)
+>   
+>   #ifndef TCG_TARGET_INSN_UNIT_SIZE
+>   # error "Missing TCG_TARGET_INSN_UNIT_SIZE"
 > diff --git a/tcg/tcg.c b/tcg/tcg.c
-> index f40cce3364..873915925f 100644
+> index 873915925f..a19767b5ef 100644
 > --- a/tcg/tcg.c
 > +++ b/tcg/tcg.c
-> @@ -2452,7 +2452,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOpDef *def,
->       TCGTemp *ts, *ots;
->       TCGType otype, itype;
+> @@ -2306,7 +2306,7 @@ static TCGReg tcg_reg_alloc(TCGContext *s, TCGRegSet desired_regs,
+>       TCGReg reg;
+>       TCGRegSet reg_ct;
 >   
-> -    tcg_regset_set(allocated_regs, s->reserved_regs);
-> +    allocated_regs = s->reserved_regs;
->       ots = &s->temps[args[0]];
->       ts = &s->temps[args[1]];
+> -    tcg_regset_andnot(reg_ct, desired_regs, allocated_regs);
+> +    reg_ct = desired_regs & ~allocated_regs;
+>       order = rev ? indirect_reg_alloc_order : tcg_target_reg_alloc_order;
 >   
-> @@ -2540,8 +2540,8 @@ static void tcg_reg_alloc_op(TCGContext *s,
->              args + nb_oargs + nb_iargs,
->              sizeof(TCGArg) * def->nb_cargs);
->   
-> -    tcg_regset_set(i_allocated_regs, s->reserved_regs);
-> -    tcg_regset_set(o_allocated_regs, s->reserved_regs);
-> +    i_allocated_regs = s->reserved_regs;
-> +    o_allocated_regs = s->reserved_regs;
->   
->       /* satisfy input constraints */
->       for(k = 0; k < nb_iargs; k++) {
-> @@ -2741,7 +2741,7 @@ static void tcg_reg_alloc_call(TCGContext *s, int nb_oargs, int nb_iargs,
->       }
->       
->       /* assign input registers */
-> -    tcg_regset_set(allocated_regs, s->reserved_regs);
-> +    allocated_regs = s->reserved_regs;
->       for(i = 0; i < nb_regs; i++) {
->           arg = args[nb_oargs + i];
->           if (arg != TCG_CALL_DUMMY_ARG) {
+>       /* first try free registers */
 > 
