@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41299)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42576)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drk6I-000135-E0
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:15:40 -0400
+	(envelope-from <kwolf@redhat.com>) id 1drkBB-0002Tq-Fs
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:20:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drk6H-0002YS-Hk
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:15:34 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170911142056.15643-1-lvivier@redhat.com>
-	<20170911142056.15643-4-lvivier@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bdb63706-f9b5-fcec-3508-1a0807e44f0a@amsat.org>
-Date: Tue, 12 Sep 2017 09:15:11 -0300
+	(envelope-from <kwolf@redhat.com>) id 1drkB7-0000Sn-H0
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:20:37 -0400
+Date: Tue, 12 Sep 2017 14:20:24 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170912122024.GI29136@localhost.localdomain>
+References: <20170906085006.26983-1-rjones@redhat.com>
+	<20170906101905.GD3753@dhcp-200-186.str.redhat.com>
+	<20170906104451.GM20914@redhat.com>
+	<20170906113845.GE3753@dhcp-200-186.str.redhat.com>
+	<20170912094558.GO20914@redhat.com>
+	<20170912113205.GG29136@localhost.localdomain>
+	<20170912114344.GQ20914@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170911142056.15643-4-lvivier@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v2 3/3] tests/hmp: test "none"
- machine with memory
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170912114344.GQ20914@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH for-2.10] qemu-options: Document the -drive
+ locking parameter.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +29,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: "Richard W.M. Jones" <rjones@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, famz@redhat.com, qemu-trivial@nongnu.org, mjt@tls.msk.ru, berrange@redhat.com
 
-On 09/11/2017 11:20 AM, Laurent Vivier wrote:
-> and add a test case of dump-guest-memory without
-> "[begin length]" parameters.
+Am 12.09.2017 um 13:43 hat Richard W.M. Jones geschrieben:
+> On Tue, Sep 12, 2017 at 01:32:05PM +0200, Kevin Wolf wrote:
+> > Am 12.09.2017 um 11:45 hat Richard W.M. Jones geschrieben:
+> > > On Wed, Sep 06, 2017 at 01:38:45PM +0200, Kevin Wolf wrote:
+> > > > This command line fragment looks correct to me. For me, it seems to
+> > > > work. I'm starting a first qemu in the background with default locking
+> > > > options:
+> > > > 
+> > > >     $ x86_64-softmmu/qemu-system-x86_64 -hda /tmp/test.qcow2
+> > > > 
+> > > > And then starting a second one with a command line resembling yours:
+> > > > 
+> > > >     $ x86_64-softmmu/qemu-system-x86_64 -device virtio-scsi \
+> > > >       -drive file=/tmp/test.qcow2,cache=unsafe,format=qcow2,file.locking=off,id=hd0,if=none \
+> > > >       -device scsi-hd,drive=hd0
+> > > 
+> > > The problem is with overlays, where file.locking doesn't propagate to
+> > > the backing file.  Thus:
+> > > 
+> > >   $ qemu-system-x86_64 -drive file=backing,format=raw
+> > > 
+> > > while in another terminal:
+> > > 
+> > >   $ qemu-img create -b backing -f qcow2 overlay
+> > >   $ qemu-system-x86_64 -drive file=overlay,format=qcow2,file.locking=off
+> > >   qemu-system-x86_64: Failed to get shared "write" lock
+> > >   Is another process using the image?
+> > 
+> > locking=off isn't the right tool for the case. Try this:
+> > 
+> > $ qemu-system-x86_64 -drive file=overlay,if=none -device virtio-blk-pci,drive=none0,share-rw=on
+> > 
+> > Unless you're doing really evil things, just telling qemu that your
+> > guest can cope with concurrent writers to the same image is enough. This
+> > propagates through the whole chain as appropriate.
 > 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->   tests/test-hmp.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-> index 729c0339f7..90693c0ce2 100644
-> --- a/tests/test-hmp.c
-> +++ b/tests/test-hmp.c
-> @@ -35,6 +35,7 @@ static const char *hmp_cmds[] = {
->       "mouse_button 0",
->       "device_del mouse1",
->       "dump-guest-memory /dev/null 0 4096",
-> +    "dump-guest-memory /dev/null",
->       "gdbserver",
->       "host_net_add user id=net0",
->       "hostfwd_add tcp::43210-:43210",
-> @@ -159,5 +160,9 @@ int main(int argc, char **argv)
->   
->       qtest_cb_for_every_machine(add_machine_test_case);
->   
-> +    /* as none machine has no memory, add a test case with memory */
-> +
-> +    qtest_add_data_func("hmp/none+2MB", g_strdup("none -m 2"), test_machine);
+> Our guest certainly *cannot* cope with multiple writers to the backing
+> disk (file "raw" in my example).  In fact that would be a disaster.
 
-TIL:
+Your guest (the libguestfs one with the overlay) can cope with multiple
+writers to its disk. Or probably it can't, but you treat it as if it
+could and insist that this is correct enough. Otherwise you wouldn't be
+able to use a raw image that another VM writes to as its backing file.
 
-"-m 0",
-"none" machine is implemented in "null-machine.c",
-"none" machine default maps memory at 0x0.
+> The overlay protects the backing disk from ever seeing any writes.
 
-> +
->       return g_test_run();
->   }
-> 
+This is why the backing file is opened read-only and therefore
+compatible with the initial qemu instance that requires exclusive write
+access.
+
+This is all correctly represented in the locking. You wouldn't be able
+to directly use "raw" even with share-rw=on because the initial qemu
+instance doesn't support shared write access. But it works for a backing
+file.
+
+> In our case because the initial qemu instance (which we don't control)
+> opened the disk ("raw") with an exclusive lock, our only choice for
+> monitoring that disk is to turn off locking.
+
+No, you just need to make sure that the libguestfs instance doesn't
+need write access to the image of an exclusive writer. Which you already
+do.
+
+The only locking problem that you need to solve is that your libguestfs
+VM doesn't forbid other writers to its backing file. And this is exactly
+what share-rw=on achieves.
+
+Kevin
