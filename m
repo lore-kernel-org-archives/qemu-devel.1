@@ -1,36 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42578)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43971)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1drm95-0000Qx-To
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:26:37 -0400
+	(envelope-from <tgolembi@redhat.com>) id 1drmCJ-0002ox-Ec
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:29:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1drm90-0003hP-27
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:26:35 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40087)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
-	id 1drm8z-0003h5-QC
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:26:29 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8CEQFpa138023
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 10:26:28 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cxaumxus6-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 10:26:28 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
-	Tue, 12 Sep 2017 08:26:27 -0600
-From: Farhan Ali <alifm@linux.vnet.ibm.com>
-Date: Tue, 12 Sep 2017 10:26:20 -0400
-In-Reply-To: <cover.1505225353.git.alifm@linux.vnet.ibm.com>
-References: <cover.1505225353.git.alifm@linux.vnet.ibm.com>
-In-Reply-To: <cover.1505225353.git.alifm@linux.vnet.ibm.com>
-References: <cover.1505225353.git.alifm@linux.vnet.ibm.com>
-Message-Id: <0a156f413f67b1bf55c5516d8263a15db3ec42c3.1505225353.git.alifm@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v1 1/2] virtio_gpu: Handle endian conversion
+	(envelope-from <tgolembi@redhat.com>) id 1drmCG-00063I-B5
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:29:55 -0400
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:43193)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1drmCG-000626-5S
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:29:52 -0400
+Received: by mail-wm0-f49.google.com with SMTP id a137so81540wma.0
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 07:29:51 -0700 (PDT)
+Date: Tue, 12 Sep 2017 16:29:47 +0200
+From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Message-ID: <20170912162947.130c2df2@fiorina>
+In-Reply-To: <59A557B1.7080704@intel.com>
+References: <20170827233033.7afa49b9@fiorina>
+	<20170829095726.GL25960@stefanha-x1.localdomain>
+	<59A557B1.7080704@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC] Buffers/caches in VirtIO Balloon driver stats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,141 +30,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, thuth@redhat.com, cohuck@redhat.com, kraxel@redhat.com
+To: Wei Wang <wei.w.wang@intel.com>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>
 
-Virtio GPU code currently only supports litte endian format,
-and so using the Virtio GPU device on a big endian machine
-does not work.
+On Tue, 29 Aug 2017 20:01:53 +0800
+Wei Wang <wei.w.wang@intel.com> wrote:
 
-Let's fix it by supporting the correct host cpu byte order.
+> On 08/29/2017 05:57 PM, Stefan Hajnoczi wrote:
+> > On Sun, Aug 27, 2017 at 11:30:33PM +0200, Tom=C3=A1=C5=A1 Golembiovsk=
+=C3=BD wrote: =20
+> >> Hi, =20
+> > I have CCed the relevant mailing lists and people most recently involved
+> > in virtio-balloon discussions.  Hopefully this will help get the right
+> > people to see your questions.
+> > =20
+> >> We'd like to include information about reclaimable memory into the
+> >> statistics in VirtiO Balloon driver. Namely, we'd like to include
+> >> counters for bufferes and caches of Linux kernel. The patch itself is
+> >> pretty trivial -- no problem there. But before we do that I'd like to
+> >> get some input from the QEMU community.
+> >>
+> >> 1) Is there any reason not to have the stats there? =20
+>=20
+> Could you please share the usages of reclaimable memory via the stats?
 
-Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
----
- hw/display/virtio-gpu.c | 53 ++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 44 insertions(+), 9 deletions(-)
+I'll go ahead then and start sending patches. What would be the proper
+course of action here? Send patch for the driver first, or send patch
+for QEMU first or send both patches right away?
 
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 6aae147..36e2414 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -236,8 +236,8 @@ virtio_gpu_fill_display_info(VirtIOGPU *g,
-     for (i = 0; i < g->conf.max_outputs; i++) {
-         if (g->enabled_output_bitmask & (1 << i)) {
-             dpy_info->pmodes[i].enabled = 1;
--            dpy_info->pmodes[i].r.width = g->req_state[i].width;
--            dpy_info->pmodes[i].r.height = g->req_state[i].height;
-+            dpy_info->pmodes[i].r.width = cpu_to_le32(g->req_state[i].width);
-+            dpy_info->pmodes[i].r.height = cpu_to_le32(g->req_state[i].height);
-         }
-     }
- }
-@@ -287,6 +287,12 @@ static void virtio_gpu_resource_create_2d(VirtIOGPU *g,
-     struct virtio_gpu_resource_create_2d c2d;
- 
-     VIRTIO_GPU_FILL_CMD(c2d);
-+
-+    c2d.resource_id = le32_to_cpu(c2d.resource_id);
-+    c2d.format = le32_to_cpu(c2d.format);
-+    c2d.width = le32_to_cpu(c2d.width);
-+    c2d.height = le32_to_cpu(c2d.height);
-+
-     trace_virtio_gpu_cmd_res_create_2d(c2d.resource_id, c2d.format,
-                                        c2d.width, c2d.height);
- 
-@@ -383,6 +389,14 @@ static void virtio_gpu_transfer_to_host_2d(VirtIOGPU *g,
-     struct virtio_gpu_transfer_to_host_2d t2d;
- 
-     VIRTIO_GPU_FILL_CMD(t2d);
-+
-+    t2d.r.x = le32_to_cpu(t2d.r.x);
-+    t2d.r.y = le32_to_cpu(t2d.r.y);
-+    t2d.r.width = le32_to_cpu(t2d.r.width);
-+    t2d.r.height = le32_to_cpu(t2d.r.height);
-+    t2d.resource_id = le32_to_cpu(t2d.resource_id);
-+    t2d.offset = le64_to_cpu(t2d.offset);
-+
-     trace_virtio_gpu_cmd_res_xfer_toh_2d(t2d.resource_id);
- 
-     res = virtio_gpu_find_resource(g, t2d.resource_id);
-@@ -439,6 +453,13 @@ static void virtio_gpu_resource_flush(VirtIOGPU *g,
-     int i;
- 
-     VIRTIO_GPU_FILL_CMD(rf);
-+
-+    rf.resource_id = le32_to_cpu(rf.resource_id);
-+    rf.r.width = le32_to_cpu(rf.r.width);
-+    rf.r.height = le32_to_cpu(rf.r.height);
-+    rf.r.x = le32_to_cpu(rf.r.x);
-+    rf.r.y = le32_to_cpu(rf.r.y);
-+
-     trace_virtio_gpu_cmd_res_flush(rf.resource_id,
-                                    rf.r.width, rf.r.height, rf.r.x, rf.r.y);
- 
-@@ -511,6 +532,14 @@ static void virtio_gpu_set_scanout(VirtIOGPU *g,
-     struct virtio_gpu_set_scanout ss;
- 
-     VIRTIO_GPU_FILL_CMD(ss);
-+
-+    ss.scanout_id = le32_to_cpu(ss.scanout_id);
-+    ss.resource_id = le32_to_cpu(ss.resource_id);
-+    ss.r.width = le32_to_cpu(ss.r.width);
-+    ss.r.height = le32_to_cpu(ss.r.height);
-+    ss.r.x = le32_to_cpu(ss.r.x);
-+    ss.r.y = le32_to_cpu(ss.r.y);
-+
-     trace_virtio_gpu_cmd_set_scanout(ss.scanout_id, ss.resource_id,
-                                      ss.r.width, ss.r.height, ss.r.x, ss.r.y);
- 
-@@ -633,13 +662,15 @@ int virtio_gpu_create_mapping_iov(struct virtio_gpu_resource_attach_backing *ab,
-         *addr = g_malloc0(sizeof(uint64_t) * ab->nr_entries);
-     }
-     for (i = 0; i < ab->nr_entries; i++) {
--        hwaddr len = ents[i].length;
--        (*iov)[i].iov_len = ents[i].length;
--        (*iov)[i].iov_base = cpu_physical_memory_map(ents[i].addr, &len, 1);
-+        uint64_t a = le64_to_cpu(ents[i].addr);
-+        uint32_t l = le32_to_cpu(ents[i].length);
-+        hwaddr len = l;
-+        (*iov)[i].iov_len = l;
-+        (*iov)[i].iov_base = cpu_physical_memory_map(a, &len, 1);
-         if (addr) {
--            (*addr)[i] = ents[i].addr;
-+            (*addr)[i] = a;
-         }
--        if (!(*iov)[i].iov_base || len != ents[i].length) {
-+        if (!(*iov)[i].iov_base || len != l) {
-             qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to map MMIO memory for"
-                           " resource %d element %d\n",
-                           __func__, ab->resource_id, i);
-@@ -686,6 +717,10 @@ virtio_gpu_resource_attach_backing(VirtIOGPU *g,
-     int ret;
- 
-     VIRTIO_GPU_FILL_CMD(ab);
-+
-+    ab.resource_id = le32_to_cpu(ab.resource_id);
-+    ab.nr_entries = le32_to_cpu(ab.nr_entries);
-+
-     trace_virtio_gpu_cmd_res_back_attach(ab.resource_id);
- 
-     res = virtio_gpu_find_resource(g, ab.resource_id);
-@@ -735,7 +770,7 @@ static void virtio_gpu_simple_process_cmd(VirtIOGPU *g,
- {
-     VIRTIO_GPU_FILL_CMD(cmd->cmd_hdr);
- 
--    switch (cmd->cmd_hdr.type) {
-+    switch (le32_to_cpu(cmd->cmd_hdr.type)) {
-     case VIRTIO_GPU_CMD_GET_DISPLAY_INFO:
-         virtio_gpu_get_display_info(g, cmd);
-         break;
-@@ -1135,7 +1170,7 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
-     }
- 
-     g->config_size = sizeof(struct virtio_gpu_config);
--    g->virtio_config.num_scanouts = g->conf.max_outputs;
-+    g->virtio_config.num_scanouts = cpu_to_le32(g->conf.max_outputs);
-     virtio_init(VIRTIO_DEVICE(g), "virtio-gpu", VIRTIO_ID_GPU,
-                 g->config_size);
- 
--- 
-1.9.1
+
+> >>
+> >> 2) Considering the balloon device is multiplatform (Linux, BSD,
+> >> Windows), is there a problem with including buffers/caches? These seem
+> >> to be specific to the Linux virtual memory subsystem. Of course, other
+> >> OSes could just report zeros. Are there some internal stats on those
+> >> OSes that could be filled in? I don't now if such or similar statistic
+> >> are available on BSD. On Windows only SystemCache stat looks like
+> >> something relevant. Anyone familiar with those OSes has any suggestion=
+s?
+> >>
+> >>      =20
+>=20
+> One of the solutions that I'm thinking about is to make virtio=20
+> platform-ware.
+
+This is not necessary. IIUC the driver does not need to send all the
+stats. We can simply treat those stats as specific to Linux driver and
+other drivers will not send them. Then QEMU will treat them as if zero
+was reported.
+
+>=20
+> That is, the device by default supports
+> VIRTIO_F_LINUX,
+> VIRTIO_F_WINDOWS,
+> VIRTIO_F_BSD.
+>=20
+> For the Linux driver, only VIRTIO_F_LINUX is supported, then we can
+> have Linux specific driver implementations under that feature.
+
+
+Since there were no suggestions for similar stats on other OSes I'd say
+we treat the stats for buffers and caches as Linux specific. If there is
+any need to send similar stats for other OSes we will add new stat fields
+(specific for that particular OS).
+
+
+Thanks,
+
+    Tomas
+
+--=20
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
