@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38307)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <n54@gmx.com>)
-	id 1drmvC-0002AF-H5
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:16:24 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40485)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1drn13-0004jd-5I
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:22:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <n54@gmx.com>) id 1drmv9-00024G-AR
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:16:18 -0400
-Received: from mout.gmx.net ([212.227.15.19]:64469)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <n54@gmx.com>) id 1drmv8-000232-Tw
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:16:15 -0400
-References: <20170830165650.1528-1-n54@gmx.com>
-From: Kamil Rytarowski <n54@gmx.com>
-Message-ID: <b0271f28-fd7d-95d9-445e-b815faf530ee@gmx.com>
-Date: Tue, 12 Sep 2017 17:18:30 +0200
+	(envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1drn12-00071B-7B
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:22:21 -0400
+Received: from mail-pg0-x231.google.com ([2607:f8b0:400e:c05::231]:37854)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1drn12-00070d-0q
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:22:20 -0400
+Received: by mail-pg0-x231.google.com with SMTP id d8so21859067pgt.4
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 08:22:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170830165650.1528-1-n54@gmx.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="se5r6jMNSfsAF4jwVDUUkDPpVJTsuRPpv"
-Subject: Re: [Qemu-devel] [PATCH] Add BSD systems to the download section
+From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
+Date: Tue, 12 Sep 2017 08:21:49 -0700
+Message-Id: <20170912152153.7729-4-brandon.carpenter@cypherpath.com>
+In-Reply-To: <20170912152153.7729-1-brandon.carpenter@cypherpath.com>
+References: <20170912152153.7729-1-brandon.carpenter@cypherpath.com>
+Content-Type: text/plain; charset="US-ASCII"
+Subject: [Qemu-devel] [PATCH v3 3/7] io: Add support for fragmented
+ websocket binary frames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,129 +32,91 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+Cc: berrange@redhat.com, brandon.carpenter@cypherpath.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---se5r6jMNSfsAF4jwVDUUkDPpVJTsuRPpv
-From: Kamil Rytarowski <n54@gmx.com>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
-Message-ID: <b0271f28-fd7d-95d9-445e-b815faf530ee@gmx.com>
-Subject: Re: [PATCH] Add BSD systems to the download section
-References: <20170830165650.1528-1-n54@gmx.com>
-In-Reply-To: <20170830165650.1528-1-n54@gmx.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Allows fragmented binary frames by saving the previous opcode. Handles
+the case where an intermediary (i.e., web proxy) fragments frames
+originally sent unfragmented by the client.
 
-ping
+Signed-off-by: Brandon Carpenter <brandon.carpenter@cypherpath.com>
+---
+ include/io/channel-websock.h |  1 +
+ io/channel-websock.c         | 26 ++++++++++++++++++--------
+ 2 files changed, 19 insertions(+), 8 deletions(-)
 
-On 30.08.2017 18:56, Kamil Rytarowski wrote:
-> Add basic notes about FreeBSD, NetBSD and OpenBSD.
->=20
-> Add BSD link to source code subsection.
->=20
-> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-> ---
->  _download/bsd.md      | 19 +++++++++++++++++++
->  _download/source.html |  1 +
->  download.html         |  8 ++++++++
->  3 files changed, 28 insertions(+)
->  create mode 100644 _download/bsd.md
->=20
-> diff --git a/_download/bsd.md b/_download/bsd.md
-> new file mode 100644
-> index 0000000..bbbd8a0
-> --- /dev/null
-> +++ b/_download/bsd.md
-> @@ -0,0 +1,19 @@
-> +QEMU is packaged by modern BSD systems.
-> +
-> +Installation can be performed from prebuilt packages or from package b=
-uild system (aka ports).
-> +
-> +Prebuilt binary packages:
-> +
-> +* <strong>FreeBSD</strong> `pkg install qemu`
-> +
-> +* <strong>NetBSD</strong> `pkgin install qemu`
-> +
-> +* <strong>OpenBSD</strong> `pkg_add qemu`
-> +
-> +Package build system:
-> +
-> +* <strong>FreeBSD</strong> `cd /usr/ports/emulators/qemu && make insta=
-ll`
-> +
-> +* <strong>NetBSD</strong> `cd /usr/pkgsrc/emulators/qemu && make insta=
-ll`
-> +
-> +* <strong>OpenBSD</strong> `cd /usr/ports/emulators/qemu && make insta=
-ll`
-> diff --git a/_download/source.html b/_download/source.html
-> index d090a5e..6949daa 100644
-> --- a/_download/source.html
-> +++ b/_download/source.html
-> @@ -2,6 +2,7 @@
->  	<p>Grab the source code for the latest releases and compile it yourse=
-lf!
->  	Detailed compilation instructions can be found in the wiki for
->  		<a href=3D"http://wiki.qemu-project.org/Hosts/Linux">Linux</a>,
-> +		<a href=3D"http://wiki.qemu-project.org/Hosts/BSD">BSD</a>,
->  		<a href=3D"http://wiki.qemu-project.org/Hosts/Windows">Win32</a> and=
-
->  		<a href=3D"http://wiki.qemu-project.org/Hosts/Mac">macOS</a>.</p>
-> =20
-> diff --git a/download.html b/download.html
-> index 5a1e4ea..2dd0044 100644
-> --- a/download.html
-> +++ b/download.html
-> @@ -6,6 +6,7 @@ permalink: /download/
->  <div class=3D"horiz-menu">
->  <ul style=3D"display: none;">
->  <li><a href=3D"#linux">Linux</a></li>
-> +<li><a href=3D"#bsd">BSD</a></li>
->  <li><a href=3D"#macos">macOS</a></li>
->  <li><a href=3D"#windows">Windows</a></li>
->  <li><a href=3D"#source">Source code</a></li>
-> @@ -18,6 +19,13 @@ permalink: /download/
->  	{% markdown_relative _download/linux.md %}
->  </article>
-> =20
-> +<article id=3D"bsd" class=3D"active">
-> +	<header>
-> +	<h2>BSD</h2>
-> +	</header>
-> +	{% markdown_relative _download/bsd.md %}
-> +</article>
-> +
->  <article id=3D"macos" class=3D"active">
->  	<header>
->  	<h2>macOS</h2>
->=20
+diff --git a/include/io/channel-websock.h b/include/io/channel-websock.h
+index 3c9ff84727..7c896557c5 100644
+--- a/include/io/channel-websock.h
++++ b/include/io/channel-websock.h
+@@ -65,6 +65,7 @@ struct QIOChannelWebsock {
+     guint io_tag;
+     Error *io_err;
+     gboolean io_eof;
++    uint8_t opcode;
+ };
+ 
+ /**
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index 185bd31be5..ced24135ec 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -542,28 +542,38 @@ static int qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
+     has_mask = header->b1 & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_HAS_MASK;
+     payload_len = header->b1 & QIO_CHANNEL_WEBSOCK_HEADER_FIELD_PAYLOAD_LEN;
+ 
++    /* Save or restore opcode. */
++    if (opcode) {
++        ioc->opcode = opcode;
++    } else {
++        opcode = ioc->opcode;
++    }
++
+     if (opcode == QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE) {
+         /* disconnect */
+         return 0;
+     }
+ 
+     /* Websocket frame sanity check:
+-     * * Websocket fragmentation is not supported.
+-     * * All  websockets frames sent by a client have to be masked.
++     * * Fragmentation is only supported for binary frames.
++     * * All frames sent by a client MUST be masked.
+      * * Only binary encoding is supported.
+      */
+     if (!fin) {
+-        error_setg(errp, "websocket fragmentation is not supported");
+-        return -1;
++        if (opcode != QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
++            error_setg(errp, "only binary websocket frames may be fragmented");
++            return -1;
++        }
++    } else {
++        if (opcode != QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
++            error_setg(errp, "only binary websocket frames are supported");
++            return -1;
++        }
+     }
+     if (!has_mask) {
+         error_setg(errp, "client websocket frames must be masked");
+         return -1;
+     }
+-    if (opcode != QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
+-        error_setg(errp, "only binary websocket frames are supported");
+-        return -1;
+-    }
+ 
+     if (payload_len < QIO_CHANNEL_WEBSOCK_PAYLOAD_LEN_MAGIC_16_BIT) {
+         ioc->payload_remain = payload_len;
+-- 
+2.14.1
 
 
+-- 
 
---se5r6jMNSfsAF4jwVDUUkDPpVJTsuRPpv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJZt/rTAAoJEEuzCOmwLnZsVKgQAKdvR5W07zX4Bb9UHOryv0x8
-b/GGgUF1Bnn4PMDn4Zskt9IGwPabZM0v+RimR+m5hfKPW1wY4cLxDdhNsDLIA2WT
-QR1Eb86vryd8LfEEedPlE4WkLYcJ775uNmLEFMlkqhB0hK+pkLKOvt0FkXZgUQzg
-FYUiA/+8BITzUqlEgyS4VN7aZ7M0pDlAPkprFHOmxT2AAKETjpQe3uD6FZrKOfXY
-yNaejLvP8wjgg+uZvuHB4QFchQ3mf0t7USLJOvKAUbGw+jnYenNwKIvujZxrPOgX
-uZmIT9cJDU4clNwObI10tTj4tEnkm6PfC2Fvc/UAoEI8tQ0hAsdPbaTEOBKUrmvF
-Enf8Yg8evJMINpQOJ2djVOEMyHinWNobGENiHRSL1Y31kaeA/eiaBXwEhzbUMsMa
-IZzKCiBsmkJJjwfQwLxG0VysLxAsUkPti1LEbFhXOA63x4wGy5sBhWtVoj00I+Pg
-PM1bgHHrTPCwRXaEj66Ehrn6IbrHuvmt7OM0OMd+ovmzDWYnwIgmV/PUAYyYImqi
-5F1GD709ZMpC0RsxNMPQwq9A/H9TldtHQ2B42R2/llsuboAOQucsXWMmWNuwWjJv
-pJ+4SvuR8Vb8c+b36WbLvaGJkOpGitooSbVCkNUlvmEJ8HCGrUMrkkNbOKgygi0T
-7KQoHz0U/LyFIJXc1vGO
-=vjXo
------END PGP SIGNATURE-----
-
---se5r6jMNSfsAF4jwVDUUkDPpVJTsuRPpv--
+CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is 
+for the sole use of the intended recipient(s) and may contain proprietary, 
+confidential or privileged information or otherwise be protected by law. 
+Any unauthorized review, use, disclosure or distribution is prohibited. If 
+you are not the intended recipient, please notify the sender and destroy 
+all copies and the original message.
