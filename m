@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43159)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1drkBB-0002Tq-Fs
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:20:43 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1drkCj-0003Io-KY
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:22:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1drkB7-0000Sn-H0
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:20:37 -0400
-Date: Tue, 12 Sep 2017 14:20:24 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170912122024.GI29136@localhost.localdomain>
-References: <20170906085006.26983-1-rjones@redhat.com>
-	<20170906101905.GD3753@dhcp-200-186.str.redhat.com>
-	<20170906104451.GM20914@redhat.com>
-	<20170906113845.GE3753@dhcp-200-186.str.redhat.com>
-	<20170912094558.GO20914@redhat.com>
-	<20170912113205.GG29136@localhost.localdomain>
-	<20170912114344.GQ20914@redhat.com>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1drkCf-0002Hi-9g
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:22:13 -0400
+Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:34458)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1drkCf-0002H7-6N
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:22:09 -0400
+Received: by mail-qt0-x242.google.com with SMTP id q8so7234307qtb.1
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 05:22:09 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170823162004.27337-1-marcandre.lureau@redhat.com>
+	<20170823162004.27337-2-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <44c779e6-e50d-f111-3b3f-3f416884d8f4@amsat.org>
+Date: Tue, 12 Sep 2017 09:22:04 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170912114344.GQ20914@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] qemu-options: Document the -drive
- locking parameter.
+In-Reply-To: <20170823162004.27337-2-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 01/27] glib-compat: move
+ G_SOURCE_CONTINUE/REMOVE there
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +36,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, famz@redhat.com, qemu-trivial@nongnu.org, mjt@tls.msk.ru, berrange@redhat.com
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: changpeng.liu@intel.com, felipe@nutanix.com
 
-Am 12.09.2017 um 13:43 hat Richard W.M. Jones geschrieben:
-> On Tue, Sep 12, 2017 at 01:32:05PM +0200, Kevin Wolf wrote:
-> > Am 12.09.2017 um 11:45 hat Richard W.M. Jones geschrieben:
-> > > On Wed, Sep 06, 2017 at 01:38:45PM +0200, Kevin Wolf wrote:
-> > > > This command line fragment looks correct to me. For me, it seems to
-> > > > work. I'm starting a first qemu in the background with default locking
-> > > > options:
-> > > > 
-> > > >     $ x86_64-softmmu/qemu-system-x86_64 -hda /tmp/test.qcow2
-> > > > 
-> > > > And then starting a second one with a command line resembling yours:
-> > > > 
-> > > >     $ x86_64-softmmu/qemu-system-x86_64 -device virtio-scsi \
-> > > >       -drive file=/tmp/test.qcow2,cache=unsafe,format=qcow2,file.locking=off,id=hd0,if=none \
-> > > >       -device scsi-hd,drive=hd0
-> > > 
-> > > The problem is with overlays, where file.locking doesn't propagate to
-> > > the backing file.  Thus:
-> > > 
-> > >   $ qemu-system-x86_64 -drive file=backing,format=raw
-> > > 
-> > > while in another terminal:
-> > > 
-> > >   $ qemu-img create -b backing -f qcow2 overlay
-> > >   $ qemu-system-x86_64 -drive file=overlay,format=qcow2,file.locking=off
-> > >   qemu-system-x86_64: Failed to get shared "write" lock
-> > >   Is another process using the image?
-> > 
-> > locking=off isn't the right tool for the case. Try this:
-> > 
-> > $ qemu-system-x86_64 -drive file=overlay,if=none -device virtio-blk-pci,drive=none0,share-rw=on
-> > 
-> > Unless you're doing really evil things, just telling qemu that your
-> > guest can cope with concurrent writers to the same image is enough. This
-> > propagates through the whole chain as appropriate.
+On 08/23/2017 01:19 PM, Marc-André Lureau wrote:
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+
+Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>   include/glib-compat.h                     | 7 +++++++
+>   contrib/vhost-user-scsi/vhost-user-scsi.c | 8 --------
+>   2 files changed, 7 insertions(+), 8 deletions(-)
 > 
-> Our guest certainly *cannot* cope with multiple writers to the backing
-> disk (file "raw" in my example).  In fact that would be a disaster.
-
-Your guest (the libguestfs one with the overlay) can cope with multiple
-writers to its disk. Or probably it can't, but you treat it as if it
-could and insist that this is correct enough. Otherwise you wouldn't be
-able to use a raw image that another VM writes to as its backing file.
-
-> The overlay protects the backing disk from ever seeing any writes.
-
-This is why the backing file is opened read-only and therefore
-compatible with the initial qemu instance that requires exclusive write
-access.
-
-This is all correctly represented in the locking. You wouldn't be able
-to directly use "raw" even with share-rw=on because the initial qemu
-instance doesn't support shared write access. But it works for a backing
-file.
-
-> In our case because the initial qemu instance (which we don't control)
-> opened the disk ("raw") with an exclusive lock, our only choice for
-> monitoring that disk is to turn off locking.
-
-No, you just need to make sure that the libguestfs instance doesn't
-need write access to the image of an exclusive writer. Which you already
-do.
-
-The only locking problem that you need to solve is that your libguestfs
-VM doesn't forbid other writers to its backing file. And this is exactly
-what share-rw=on achieves.
-
-Kevin
+> diff --git a/include/glib-compat.h b/include/glib-compat.h
+> index fcffcd3f07..d35d641b7f 100644
+> --- a/include/glib-compat.h
+> +++ b/include/glib-compat.h
+> @@ -354,5 +354,12 @@ g_test_add_data_func_full(const char *path,
+>   }
+>   #endif
+>   
+> +/* Small compat shim from glib 2.32 */
+> +#ifndef G_SOURCE_CONTINUE
+> +#define G_SOURCE_CONTINUE TRUE
+> +#endif
+> +#ifndef G_SOURCE_REMOVE
+> +#define G_SOURCE_REMOVE FALSE
+> +#endif
+>   
+>   #endif
+> diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-user-scsi/vhost-user-scsi.c
+> index b5ae02c96f..78bcc65f5a 100644
+> --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
+> +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
+> @@ -17,14 +17,6 @@
+>   
+>   #include <glib.h>
+>   
+> -/* Small compat shim from glib 2.32 */
+> -#ifndef G_SOURCE_CONTINUE
+> -#define G_SOURCE_CONTINUE TRUE
+> -#endif
+> -#ifndef G_SOURCE_REMOVE
+> -#define G_SOURCE_REMOVE FALSE
+> -#endif
+> -
+>   /* #define VUS_DEBUG 1 */
+>   
+>   /** Log helpers **/
+> 
