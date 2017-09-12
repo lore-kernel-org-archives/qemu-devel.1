@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drtcD-0003DW-So
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:25:11 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1drtdt-0004W9-N3
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:26:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drtc8-0005hF-UD
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:25:09 -0400
-Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:40812)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drtc8-0005gW-Nz
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:25:04 -0400
-Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id C4F9BAA9F7
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 00:25:03 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 13 Sep 2017 00:25:01 +0200
-Message-ID: <150525510133.11068.18348168748736729990.stgit@bahia.lan>
-In-Reply-To: <150525508489.11068.5231444460720976552.stgit@bahia.lan>
-References: <150525508489.11068.5231444460720976552.stgit@bahia.lan>
+	(envelope-from <vilanova@ac.upc.edu>) id 1drtdq-0006r1-3o
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:26:53 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:56010)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1drtdp-0006qb-PD
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:26:50 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 13 Sep 2017 01:26:30 +0300
+Message-Id: <150525519047.15988.7515219035767609489.stgit@frigg.lan>
+In-Reply-To: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
+References: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH v2 2/2] spapr: preserve SDR1 during migration
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 21/22] instrument: Add event
+ 'guest_user_syscall_ret'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,138 +28,172 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>
 
-When running with KVM PR, a pseries machine needs to allocate an HPT
-in userspace and pass its address and size too KVM. This is done at
-machine reset time by hijacking SDR1.
-
-It is very likely that the destination QEMU will allocate the HPT at
-a different address, ie, the SDR1 value we get from the migration
-stream is wrong and the guest ends up badly broken.
-
-Let's fix this by preserving the pre-load value of SDR1. Since this is
-a spapr specific hack, this is achieved by extending the PPC virtual
-hypervisor interface.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- hw/ppc/spapr.c       |   30 ++++++++++++++++++++++++++++++
- target/ppc/cpu.h     |    5 +++++
- target/ppc/machine.c |   18 ++++++++++++++++++
- 3 files changed, 53 insertions(+)
+ bsd-user/syscall.c              |    3 +++
+ instrument/control.c            |   15 +++++++++++++++
+ instrument/events.h             |    5 +++++
+ instrument/events.inc.h         |   13 +++++++++++++
+ instrument/load.c               |    1 +
+ instrument/qemu-instr/control.h |   13 +++++++++++++
+ linux-user/syscall.c            |    1 +
+ stubs/instrument.c              |    2 ++
+ 8 files changed, 53 insertions(+)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 97f8afdbd7fe..aa280c9d767f 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1200,6 +1200,34 @@ static uint64_t spapr_get_patbe(PPCVirtualHypervisor *vhyp)
-     return spapr->patb_entry;
+diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
+index 0d92eaf8c4..fb468c0574 100644
+--- a/bsd-user/syscall.c
++++ b/bsd-user/syscall.c
+@@ -407,6 +407,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, a=
+bi_long arg1,
+ #endif
+     if (do_strace)
+         print_freebsd_syscall_ret(num, ret);
++    instr_guest_user_syscall_ret(cpu, num, ret);
+     trace_guest_user_syscall_ret(cpu, num, ret);
+     return ret;
+  efault:
+@@ -485,6 +486,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, ab=
+i_long arg1,
+ #endif
+     if (do_strace)
+         print_netbsd_syscall_ret(num, ret);
++    instr_guest_user_syscall_ret(cpu, num, ret);
+     trace_guest_user_syscall_ret(cpu, num, ret);
+     return ret;
+  efault:
+@@ -563,6 +565,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, a=
+bi_long arg1,
+ #endif
+     if (do_strace)
+         print_openbsd_syscall_ret(num, ret);
++    instr_guest_user_syscall_ret(cpu, num, ret);
+     trace_guest_user_syscall_ret(cpu, num, ret);
+     return ret;
+  efault:
+diff --git a/instrument/control.c b/instrument/control.c
+index b3ef03798e..b5b1e0503d 100644
+--- a/instrument/control.c
++++ b/instrument/control.c
+@@ -210,3 +210,18 @@ SYM_PUBLIC void qi_event_set_guest_user_syscall(
+ #endif
+     instr_set_event(guest_user_syscall, fn);
  }
- 
-+static void spapr_cpu_pre_load(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu)
++
++
++void (*instr_event__guest_user_syscall_ret)(
++    QICPU vcpu, uint64_t num, uint64_t ret);
++
++SYM_PUBLIC void qi_event_set_guest_user_syscall_ret(
++    void (*fn)(QICPU vcpu, uint64_t num, uint64_t ret))
 +{
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(vhyp);
-+
-+    /* This is a hack for KVM PR: SDR1 contains the address and size of the HPT
-+     * allocated by QEMU. We must preserve it.
-+     */
-+    if (kvm_enabled() && spapr->htab) {
-+        CPUPPCState *env = &cpu->env;
-+
-+        cpu->sdr1_kvm_pr = env->spr[SPR_SDR1];
-+    }
++    ERROR_IF(!instr_get_state(), "called outside instrumentation");
++    ERROR_IF(!tcg_enabled(), "called without TCG");
++#if !defined(CONFIG_USER_ONLY)
++    ERROR_IF(true, "called in full-system mode");
++#endif
++    instr_set_event(guest_user_syscall_ret, fn);
 +}
+diff --git a/instrument/events.h b/instrument/events.h
+index 8c944e1f91..6197ece466 100644
+--- a/instrument/events.h
++++ b/instrument/events.h
+@@ -75,6 +75,11 @@ static inline void instr_guest_user_syscall(
+     CPUState *vcpu, uint64_t num, uint64_t arg1, uint64_t arg2, uint64_t=
+ arg3,
+     uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t arg7, uint64_t=
+ arg8);
+=20
++extern void (*instr_event__guest_user_syscall_ret)(
++    QICPU vcpu, uint64_t num, uint64_t ret);
++static inline void instr_guest_user_syscall_ret(
++    CPUState *vcpu, uint64_t num, uint64_t ret);
 +
-+static void spapr_cpu_post_load(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu)
-+{
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(vhyp);
-+
-+    /* This is a hack for KVM PR: SDR1 contains the address and size of the HPT
-+     * allocated by QEMU. We must preserve it.
-+     */
-+    if (kvm_enabled() && spapr->htab) {
-+        CPUPPCState *env = &cpu->env;
-+
-+        env->spr[SPR_SDR1] = cpu->sdr1_kvm_pr;
-+    }
-+}
-+
- #define HPTE(_table, _i)   (void *)(((uint64_t *)(_table)) + ((_i) * 2))
- #define HPTE_VALID(_hpte)  (tswap64(*((uint64_t *)(_hpte))) & HPTE64_V_VALID)
- #define HPTE_DIRTY(_hpte)  (tswap64(*((uint64_t *)(_hpte))) & HPTE64_V_HPTE_DIRTY)
-@@ -3624,6 +3652,8 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     vhc->unmap_hptes = spapr_unmap_hptes;
-     vhc->store_hpte = spapr_store_hpte;
-     vhc->get_patbe = spapr_get_patbe;
-+    vhc->cpu_pre_load = spapr_cpu_pre_load;
-+    vhc->cpu_post_load = spapr_cpu_post_load;
-     xic->ics_get = spapr_ics_get;
-     xic->ics_resend = spapr_ics_resend;
-     xic->icp_get = spapr_icp_get;
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index c9d3ffa89bcb..22ea2538d923 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1212,6 +1212,9 @@ struct PowerPCCPU {
-     uint64_t mig_insns_flags2;
-     uint32_t mig_nb_BATs;
-     bool pre_2_10_migration;
-+
-+    /* KVM PR hack to preserve SDR1 (HPT) */
-+    target_ulong sdr1_kvm_pr;
- };
- 
- static inline PowerPCCPU *ppc_env_get_cpu(CPUPPCState *env)
-@@ -1243,6 +1246,8 @@ struct PPCVirtualHypervisorClass {
-     void (*store_hpte)(PPCVirtualHypervisor *vhyp, hwaddr ptex,
-                        uint64_t pte0, uint64_t pte1);
-     uint64_t (*get_patbe)(PPCVirtualHypervisor *vhyp);
-+    void (*cpu_pre_load)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
-+    void (*cpu_post_load)(PPCVirtualHypervisor *vhyp, PowerPCCPU *cpu);
- };
- 
- #define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
-diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-index e36b7100cb66..c4d32c886367 100644
---- a/target/ppc/machine.c
-+++ b/target/ppc/machine.c
-@@ -218,6 +218,19 @@ static bool pvr_match(PowerPCCPU *cpu, uint32_t pvr)
-     return pcc->pvr_match(pcc, pvr);
- }
- 
-+static int cpu_pre_load(void *opaque)
-+{
-+    PowerPCCPU *cpu = opaque;
-+
-+    if (cpu->vhyp) {
-+        PPCVirtualHypervisorClass *vhc =
-+            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-+        vhc->cpu_pre_load(cpu->vhyp, cpu);
-+    }
-+
-+    return 0;
-+}
-+
- static int cpu_post_load(void *opaque, int version_id)
- {
-     PowerPCCPU *cpu = opaque;
-@@ -294,6 +307,10 @@ static int cpu_post_load(void *opaque, int version_id)
- 
-     if (!cpu->vhyp) {
-         ppc_store_sdr1(env, env->spr[SPR_SDR1]);
-+    } else {
-+        PPCVirtualHypervisorClass *vhc =
-+            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-+        vhc->cpu_post_load(cpu->vhyp, cpu);
+=20
+ #include "instrument/events.inc.h"
+=20
+diff --git a/instrument/events.inc.h b/instrument/events.inc.h
+index e2f4315fb0..d31dec54b8 100644
+--- a/instrument/events.inc.h
++++ b/instrument/events.inc.h
+@@ -94,3 +94,16 @@ static inline void instr_guest_user_syscall(
+         instr_set_state(INSTR_STATE_DISABLE);
      }
- 
-     /* Invalidate all msr bits except MSR_TGPR/MSR_HVB before restoring */
-@@ -650,6 +667,7 @@ const VMStateDescription vmstate_ppc_cpu = {
-     .minimum_version_id_old = 4,
-     .load_state_old = cpu_load_old,
-     .pre_save = cpu_pre_save,
-+    .pre_load = cpu_pre_load,
-     .post_load = cpu_post_load,
-     .fields = (VMStateField[]) {
-         VMSTATE_UNUSED(sizeof(target_ulong)), /* was _EQUAL(env.spr[SPR_PVR]) */
+ }
++
++static inline void instr_guest_user_syscall_ret(
++    CPUState *vcpu, uint64_t num, uint64_t ret)
++{
++    void (*cb)(QICPU vcpu, uint64_t num, uint64_t ret)
++        =3D instr_get_event(guest_user_syscall_ret);
++    if (cb) {
++        instr_set_state(INSTR_STATE_ENABLE);
++        QICPU vcpu_ =3D instr_cpu_to_qicpu(vcpu);
++        (*cb)(vcpu_, num, ret);
++        instr_set_state(INSTR_STATE_DISABLE);
++    }
++}
+diff --git a/instrument/load.c b/instrument/load.c
+index a76f76e1d1..be13a90286 100644
+--- a/instrument/load.c
++++ b/instrument/load.c
+@@ -165,6 +165,7 @@ InstrUnloadError instr_unload(const char *id)
+     instr_set_event(guest_mem_before_trans, NULL);
+     instr_set_event(guest_mem_before_exec, NULL);
+     instr_set_event(guest_user_syscall, NULL);
++    instr_set_event(guest_user_syscall_ret, NULL);
+=20
+     instr_cpu_stop_all_end(&info);
+     cpu_list_unlock();
+diff --git a/instrument/qemu-instr/control.h b/instrument/qemu-instr/cont=
+rol.h
+index 136058af4f..bc4e49bef1 100644
+--- a/instrument/qemu-instr/control.h
++++ b/instrument/qemu-instr/control.h
+@@ -157,6 +157,19 @@ void qi_event_set_guest_user_syscall(
+                uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg=
+6,
+                uint64_t arg7, uint64_t arg8));
+=20
++/*
++ * Finish executing a guest system call in syscall emulation mode.
++ *
++ * @num: System call number.
++ * @ret: System call result value.
++ *
++ * Mode: user
++ * Targets: TCG(all)
++ * Time: exec
++ */
++void qi_event_set_guest_user_syscall_ret(
++    void (*fn)(QICPU vcpu, uint64_t num, uint64_t ret));
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index c9f0b9fa56..44b91e3c52 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -12398,6 +12398,7 @@ fail:
+ #endif
+     if(do_strace)
+         print_syscall_ret(num, ret);
++    instr_guest_user_syscall_ret(cpu, num, ret);
+     trace_guest_user_syscall_ret(cpu, num, ret);
+     return ret;
+ efault:
+diff --git a/stubs/instrument.c b/stubs/instrument.c
+index 77c9861b71..5c56c1a322 100644
+--- a/stubs/instrument.c
++++ b/stubs/instrument.c
+@@ -71,3 +71,5 @@ void (*instr_event__guest_mem_before_exec)(
+ void (*instr_event__guest_user_syscall)(
+     QICPU vcpu, uint64_t num, uint64_t arg1, uint64_t arg2, uint64_t arg=
+3,
+     uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t arg7, uint64_t=
+ arg8);
++void (*instr_event__guest_user_syscall_ret)(
++    QICPU vcpu, uint64_t num, uint64_t ret);
