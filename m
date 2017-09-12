@@ -1,35 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44003)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drlAn-0000se-R3
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:24:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1drlEl-0003e9-GE
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:28:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drlAh-0005Cm-IU
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:24:17 -0400
-Received: from mail-qk0-x242.google.com ([2607:f8b0:400d:c09::242]:38004)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drlAh-0005Cb-EY
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:24:11 -0400
-Received: by mail-qk0-x242.google.com with SMTP id c69so7163404qke.5
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 06:24:11 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170823162004.27337-1-marcandre.lureau@redhat.com>
-	<20170823162004.27337-3-marcandre.lureau@redhat.com>
-	<e8957d78-66ec-ffeb-fbcd-a35d60190dc2@amsat.org>
-	<1091717998.13779657.1505221996382.JavaMail.zimbra@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4426cb39-3c78-6b74-cf74-f5c587807bff@amsat.org>
-Date: Tue, 12 Sep 2017 10:24:03 -0300
+	(envelope-from <eblake@redhat.com>) id 1drlEh-0007rc-Fk
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:28:23 -0400
+References: <20170911172022.4738-1-eblake@redhat.com>
+	<20170911172022.4738-10-eblake@redhat.com>
+	<8c2d1317-5b95-b8de-cf97-0b2618c86b25@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <c70cd17a-4d29-8f23-e5dd-bb409182ac55@redhat.com>
+Date: Tue, 12 Sep 2017 08:28:05 -0500
 MIME-Version: 1.0
-In-Reply-To: <1091717998.13779657.1505221996382.JavaMail.zimbra@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 02/27] libvhost-user: drop dependency on
- glib
+In-Reply-To: <8c2d1317-5b95-b8de-cf97-0b2618c86b25@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="NLQdxkVLx4D8sfgJMii7XAIbrk7oafVPN"
+Subject: Re: [Qemu-devel] [PATCH v7 09/38] libqos: Track QTestState with
+ QVirtioBus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,104 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, changpeng liu <changpeng.liu@intel.com>, felipe@nutanix.com
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, pbonzini@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>, "open list:virtio-blk" <qemu-block@nongnu.org>
 
-On 09/12/2017 10:13 AM, Marc-André Lureau wrote:
-> Hi
-> 
-> ----- Original Message -----
->> Hi Marc-André,
->>
->> On 08/23/2017 01:19 PM, Marc-André Lureau wrote:
->>> libvhost-user is meant to be free of glib dependency. Make sure it is
->>> by droping qemu/osdep.h (which included glib.h)
->>>
->>> This fixes a bad malloc()/g_free() pair.
->>>
->>> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
->>> ---
->>>    contrib/libvhost-user/libvhost-user.c | 25 ++++++++++++++++++++++---
->>>    1 file changed, 22 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/contrib/libvhost-user/libvhost-user.c
->>> b/contrib/libvhost-user/libvhost-user.c
->>> index 35fa0c5e56..bb294c6ef7 100644
->>> --- a/contrib/libvhost-user/libvhost-user.c
->>> +++ b/contrib/libvhost-user/libvhost-user.c
->>> @@ -13,11 +13,22 @@
->>>     * later.  See the COPYING file in the top-level directory.
->>>     */
->>>    
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--NLQdxkVLx4D8sfgJMii7XAIbrk7oafVPN
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, pbonzini@redhat.com,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ "open list:virtio-blk" <qemu-block@nongnu.org>
+Message-ID: <c70cd17a-4d29-8f23-e5dd-bb409182ac55@redhat.com>
+Subject: Re: [PATCH v7 09/38] libqos: Track QTestState with QVirtioBus
+References: <20170911172022.4738-1-eblake@redhat.com>
+ <20170911172022.4738-10-eblake@redhat.com>
+ <8c2d1317-5b95-b8de-cf97-0b2618c86b25@redhat.com>
+In-Reply-To: <8c2d1317-5b95-b8de-cf97-0b2618c86b25@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-/* this code avoids GLib dependency */
+On 09/12/2017 02:21 AM, Thomas Huth wrote:
+> On 11.09.2017 19:19, Eric Blake wrote:
+>> When initializing a QVirtioDevice (which always has an associated
+>> QVirtioBus), we want to track which QTestState to use for all
+>> I/O processed through that bus and device.  Copy the paradigm
+>> used for QPCIBus, and track the test state at the bus level; this
+>> in turn requires a separate bus object per device (and associated
+>> cleanup) rather than just sharing a const version of the dispatch
+>> table.
+> I fail to see why we need a separate bus object here for each device.
+> The bus is only available one time, not multiple times, isn't it? So
+> there should also only be one bus object floating around, not multiple
+> ones... or do I miss something?
 
->>> -#include <qemu/osdep.h>
->>> +#include <stdlib.h>
->>> +#include <stdio.h>
->>> +#include <unistd.h>
->>> +#include <stdarg.h>
->>> +#include <errno.h>
->>> +#include <string.h>
->>> +#include <assert.h>
->>> +#include <inttypes.h>
->>> +#include <sys/types.h>
->>> +#include <sys/socket.h>
->>>    #include <sys/eventfd.h>
->>> +#include <sys/mman.h>
->>>    #include <linux/vhost.h>
->>>    
->>>    #include "qemu/atomic.h"
->>> +#include "qemu/compiler.h"
->>>    
->>>    #include "libvhost-user.h"
->>>    
->>> @@ -34,6 +45,14 @@
->>>            }                                       \
->>>        } while (0)
->>>    
->>> +#ifndef MIN
+You are right that there is only one bus for the machine - the problem
+is that the object representing the bus is dynamically created on the
+fly at the point where the device is first grabbed, rather than up front
+as part of creating the machine (in other words, the device search is
+not performed on a pre-existing bus object).
 
-/* usually provided by GLib */
+Contrast qpci_device_find() (lookup based on a pre-existing bus) with
+qvirtio_mmio_init_device() (lookup that did not use a pre-existing bus);
+also note that qvirtio_pci_device_find() takes a pre-existing QPCIBus
+(since on that architecture, the QVirtioBus is itself a device on the
+QPCIBus).
 
->>> +#define MIN(x, y) ({                            \
->>> +        typeof(x) _min1 = (x);                  \
->>> +        typeof(y) _min2 = (y);                  \
->>> +        (void) (&_min1 == &_min2);              \
->>> +        _min1 < _min2 ? _min1 : _min2; })
->>
->> why not add this in qemu/compiler.h instead?
-> 
-> It's a special case here, because libvhost-user doesn't depend on glib. The rest of qemu does. Since MIN/MAX is defined by glib, I don't think qemu/compiler.h should define it.
+I suppose that we could indeed refactor the code to require callers to
+create the QVirtioBus object up front, and then make the device lookup
+(both qvirtio_mmio_init_device() and qvirtio_pci_device_find()) take a
+QVirtioBus parameter instead of QTestState or QPCIBus.  That's slightly
+more work, but I'm happy to attempt it if you think it will be better.
 
-OK, with some comments about GLib Independence:
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-> 
->>
->>> +#endif
->>> +
->>>    static const char *
->>>    vu_request_to_string(int req)
->>>    {
->>> @@ -81,7 +100,7 @@ vu_panic(VuDev *dev, const char *msg, ...)
->>>        va_list ap;
->>>    
->>>        va_start(ap, msg);
->>> -    buf = g_strdup_vprintf(msg, ap);
->>> +    vasprintf(&buf, msg, ap);
->>>        va_end(ap);
->>>    
->>>        dev->broken = true;
->>> @@ -840,7 +859,7 @@ vu_dispatch(VuDev *dev)
->>>        success = true;
->>>    
->>>    end:
->>> -    g_free(vmsg.data);
->>> +    free(vmsg.data);
->>>        return success;
->>>    }
->>>    
->>>
->>
+--NLQdxkVLx4D8sfgJMii7XAIbrk7oafVPN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm34OUACgkQp6FrSiUn
+Q2o8tggAn01J7hxuJKtH8Jz0BVSlApjCbpmruK3ScPu/OkZ2jTvl3DCltoShGSgt
+gf9+UL2UsHbr2Q+/ygXfLMR1ChDjMOPg8Gyn1i4sYUBnIHFJpsBqeHSqW5uN3x5I
+nUcoVgRZ1HFhmkq/HXlT576Fz8D3Cc86V20/52gdkaqHcXVm19O5EbpoEVhPwoii
+YqGt536K1SMrJXAkSIToZixRdJb185mS9dBIAWTe5xeWYPAqiDPtNtdKXH4V/1Xt
+1N38CciyIG7jCjpwuKnLRkkNA/y/I9gy96SlVQiP6GN4iv2Fi+wHVwjtRaIpqBTN
+xqTYro40ojZnxWNQJVG/6BipXVMuRg==
+=xHyO
+-----END PGP SIGNATURE-----
+
+--NLQdxkVLx4D8sfgJMii7XAIbrk7oafVPN--
