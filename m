@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1druAw-000297-Mv
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 19:01:06 -0400
+	(envelope-from <bounces@canonical.com>) id 1druUS-0001Rq-0L
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 19:21:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1druAs-0006b7-8K
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 19:01:02 -0400
-Received: from indium.canonical.com ([91.189.90.7]:35909)
+	(envelope-from <bounces@canonical.com>) id 1druUO-0002Ja-Ry
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 19:21:11 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39618)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1druAs-0006aR-1u
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 19:00:58 -0400
+	id 1druUO-0002Hz-LD
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 19:21:08 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1druAp-0003oJ-Td
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 23:00:55 +0000
+	id 1druUM-0004hn-0z
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 23:21:06 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id B32092E848B
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 23:00:55 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id DC9452E8494
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 23:20:57 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Sep 2017 22:48:19 -0000
+Date: Tue, 12 Sep 2017 23:07:07 -0000
 From: James Clarke <jrtc27@jrtc27.com>
 Reply-To: Bug 1716767 <1716767@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150524995294.5903.8871661765030368900.malonedeb@wampee.canonical.com>
-Message-Id: <150525649944.23063.248656149090805485.malone@wampee.canonical.com>
+Message-Id: <150525762729.29398.2324380142058624951.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1716767] Re: file(1) fails with "Invalid
  argument" on qemu-sh4-user
@@ -39,9 +39,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-(Currently regpairs_aligned gets checked, but this, rightly, returns
-false for SH; alignment is not a requirement of the SH ABI, but
-p{read,write}64 are an exception for it.)
+Bah, and that's "read *from an offset of* 0x340000000000000000 bytes"; I
+got confused between count and pos midway through that paragraph.
 
 -- =
 
