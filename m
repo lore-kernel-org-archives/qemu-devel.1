@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52981)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53062)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1droFi-0000y4-C6
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:41:35 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1droFp-00016u-Vz
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:41:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1droFf-0000N0-1z
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:41:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46461)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1droFe-0000MD-S0
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:41:31 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1droFb-00029v-GE
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 16:41:27 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 620DD2E84AF
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 16:41:26 +0000 (UTC)
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1droFp-0000TC-4x
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:41:42 -0400
+References: <1505054255-2990-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1505054255-2990-3-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170911095059.101e0cfc@bahia.lan> <20170911093032.GA2857@work-vm>
+	<20170911104854.GB2784@umbus.fritz.box> <20170912162100.GD2225@work-vm>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <1bb6a27d-89a5-2e70-6976-74ab24430ec4@ilande.co.uk>
+Date: Tue, 12 Sep 2017 17:41:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Sep 2017 16:31:29 -0000
-From: Scott Moser <smoser@ubuntu.com>
-Reply-To: Bug 1716028 <1716028@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150489404292.23034.16812601554685741285.malonedeb@wampee.canonical.com>
-Message-Id: <150523388923.32282.43295239812051303.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1716028] Re: qemu 2.10 locks images with no
- feature flag
+In-Reply-To: <20170912162100.GD2225@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PATCH 2/4] ppc: add CPU IRQ state to
+ PPC VMStateDescription
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,125 +27,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Cc: lvivier@redhat.com, aik@ozlabs.ru, Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-Kevin,
-thanks again.  You've provided enough support for me at this point.  I had =
-looked at trying to coalesce multiple -drive values into a single one, and =
-that can definitely be made to work with the newer qemu, but i'm not sure I=
- can make it work with older.  =
+On 12/09/17 17:21, Dr. David Alan Gilbert wrote:
+
+>> Right, a subsection is certainly necessary to avoid breaking backwards
+>> migration.
+>>
+>> But apart from that I want to understand better exactly why this is
+>> necessary.  What's the state that's being lost, and is it really not
+>> recoverable from anywhere else.
+>>
+>> The other thing that concerns me is how we're encoding the
+>> information.  These are essentially internal fields, not reflecting
+>> something with an architected encoding - adding those to the migration
+>> stream is often a bad idea - it inhibits our ability to rework
+>> internal encodings.
+> 
+> Yes, agreed, where possible the contents of the stream should reflect
+> 'real' state that's actually being modelled and be as independent of
+> the implementation as possible.
+
+Oh sure. However I should re-iterate that I'm not trying to add new
+fields into the migration stream, merely reinstate the ones that were
+dropped without warning in commit a90db15 by Alexey since without them
+TCG state doesn't restore correctly in my local tests.
+
+The commit message mentions that prior to the conversion some CPU state
+was missing but it doesn't mention anything about dropping existing
+fields as part of the conversion process so I suspect that this was an
+accidental side-effect.
+
+I can definitely look at re-implementing the patch using a subsection in
+order to preserve backwards compatibility though.
 
 
-the goal there would be to do something like:
-$ qemu-system-x86_64   \
-   -drive id=3Dd01,file.filename=3Ddisk1.img,format=3Dqcow2,if=3Dnone -\
-   -device virtio-blk,drive=3Dd01,serial=3Ds01 \
-   -device virtio-blk,drive=3Dd01,serial=3Ds02
+ATB,
 
-on newer qemu, that works if i change 'id=3D' to 'node-name', but on older
-qemu I can't convince it to let me have 1 drive associated to multiple
--device.
-
-What we ended up doing is at =
-
-  https://code.launchpad.net/~smoser/curtin/trunk.lp1716028-hack-file-locki=
-ng-in-qemu/+merge/330456
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1716028
-
-Title:
-  qemu 2.10 locks images with no feature flag
-
-Status in QEMU:
-  New
-Status in qemu package in Ubuntu:
-  New
-
-Bug description:
-  1) % lsb_release -rd
-  Description:	Ubuntu Artful Aardvark (development branch)
-  Release:	17.10
-
-  2) % apt-cache policy qemu-system-x86
-  qemu-system-x86:
-    Installed: 1:2.10~rc3+dfsg-0ubuntu1
-    Candidate: 1:2.10+dfsg-0ubuntu1
-    Version table:
-       1:2.10+dfsg-0ubuntu1 500
-          500 http://archive.ubuntu.com//ubuntu devel/main amd64 Packages
-   *** 1:2.10~rc3+dfsg-0ubuntu1 100
-          100 /var/lib/dpkg/status
-
-  3) qemu locks image files with no way to discover this feature nor how
-  to disable it
-
-  4) qemu provides a way to query if it supports image locking, and what
-  the default value is, and how to disable the locking via cli
-
-  qemu 2.10 now will lock image files and warn if an image is currently
-  locked.  This prevent qemu from running (and possibly corrupting said
-  image).
-
-  However, qemu does not provide any way to determine if a qemu binary
-  actually has this capability.  Normally behavior changing features are
-  exposed via some change to the qemu help menu or QMP/QAPI output of
-  capabilities.
-
-  I believe this slipped through since libvirt already does image
-  locking, but direct cli users will be caught by this change.
-
-  In particular, we have a use-case where we simulate multipath disks by
-  creating to disks which point to the same file which now breaks
-  without adding the 'file.locking=3Doff' to the -drive parameters;  which
-  is also completely undocumented and unexposed.
-
-  Some parts of the cli like -device allow querying of settable options
-  (qemu-system-x86 -device scsi_hd,?)  but nothing equivalent exists for
-  -drive parameters.
-
-  ProblemType: Bug
-  DistroRelease: Ubuntu 17.10
-  Package: qemu-system-x86 1:2.10~rc3+dfsg-0ubuntu1
-  ProcVersionSignature: Ubuntu 4.12.0-11.12-generic 4.12.5
-  Uname: Linux 4.12.0-11-generic x86_64
-  NonfreeKernelModules: zfs zunicode zavl zcommon znvpair
-  ApportVersion: 2.20.6-0ubuntu7
-  Architecture: amd64
-  Date: Fri Sep  8 12:56:53 2017
-  JournalErrors:
-   Hint: You are currently not seeing messages from other users and the sys=
-tem.
-         Users in groups 'adm', 'systemd-journal' can see all messages.
-         Pass -q to turn off this notice.
-   -- Logs begin at Mon 2017-01-30 11:56:02 CST, end at Fri 2017-09-08 12:5=
-6:46 CDT. --
-   -- No entries --
-  KvmCmdLine: COMMAND         STAT  EUID  RUID   PID  PPID %CPU COMMAND
-  MachineType: HP ProLiant DL360 Gen9
-  ProcEnviron:
-   TERM=3Dxterm
-   PATH=3D(custom, no user)
-   XDG_RUNTIME_DIR=3D<set>
-   LANG=3Den_US.UTF-8
-   SHELL=3D/bin/bash
-  ProcKernelCmdLine: BOOT_IMAGE=3D/vmlinuz-4.12.0-11-generic root=3DUUID=3D=
-45354276-e0c0-4bf6-9083-f130b89411cc ro --- console=3DttyS1,115200
-  SourcePackage: qemu
-  UpgradeStatus: No upgrade log present (probably fresh install)
-  dmi.bios.date: 03/05/2015
-  dmi.bios.vendor: HP
-  dmi.bios.version: P89
-  dmi.chassis.type: 23
-  dmi.chassis.vendor: HP
-  dmi.modalias: dmi:bvnHP:bvrP89:bd03/05/2015:svnHP:pnProLiantDL360Gen9:pvr=
-:cvnHP:ct23:cvr:
-  dmi.product.family: ProLiant
-  dmi.product.name: ProLiant DL360 Gen9
-  dmi.sys.vendor: HP
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1716028/+subscriptions
+Mark.
