@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33997)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35270)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1drcjU-0002pe-66
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 00:23:33 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1drcpR-0004f3-5z
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 00:29:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1drcjR-0001FJ-0r
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 00:23:32 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:38852)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1drcjQ-0001Ew-Qk
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 00:23:28 -0400
-Received: by mail-pg0-x244.google.com with SMTP id m30so657220pgn.5
-	for <qemu-devel@nongnu.org>; Mon, 11 Sep 2017 21:23:28 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170911204936.5020-1-f4bug@amsat.org>
-	<CAFEAcA_61iw+u7aMp+vA-CNpmAPjvJ_ynUfHu8Y+p8jmgvbcdw@mail.gmail.com>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <d9f5a569-42e1-4123-0290-12413936ca8a@twiddle.net>
-Date: Mon, 11 Sep 2017 21:23:25 -0700
+	(envelope-from <dgibson@ozlabs.org>) id 1drcpP-0005OS-Sh
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 00:29:41 -0400
+Date: Tue, 12 Sep 2017 14:10:20 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170912041020.GE2774@umbus.fritz.box>
+References: <150516312603.27897.5390701685108186266.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_61iw+u7aMp+vA-CNpmAPjvJ_ynUfHu8Y+p8jmgvbcdw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/ppc: disable atomic write check on
- ppc32
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="JBi0ZxuS5uaEhkUZ"
+Content-Disposition: inline
+In-Reply-To: <150516312603.27897.5390701685108186266.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] spapr_cpu_core: fail gracefully with
+ non-pseries machine types
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,56 +24,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
-
-On 09/11/2017 02:37 PM, Peter Maydell wrote:
-> On 11 September 2017 at 21:49, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> this fixes building for ppc64 on ppc32 (changed in 5964fca8a12c):
->>
->>   qemu/tcg/ppc/tcg-target.inc.c: In function 'tb_target_set_jmp_target':
->>   qemu/include/qemu/compiler.h:86:30: error: static assertion failed: "not expecting: sizeof(*(uint64_t *)jmp_addr) > ATOMIC_REG_SIZE"
->>        QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
->>        ^
->>   qemu/tcg/ppc/tcg-target.inc.c:1377:9: note: in expansion of macro 'atomic_set'
->>            atomic_set((uint64_t *)jmp_addr, pair);
->>            ^
->>
->> Suggested-by: Richard Henderson <rth@twiddle.net>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->> This fixes Shippable builds, see:
->> https://app.shippable.com/github/qemu/qemu/runs/434/10/console
->>
->>  tcg/ppc/tcg-target.inc.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
->> index 21d764c102..0417901289 100644
->> --- a/tcg/ppc/tcg-target.inc.c
->> +++ b/tcg/ppc/tcg-target.inc.c
->> @@ -1374,7 +1374,7 @@ void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
->>          pair = (uint64_t)i2 << 32 | i1;
->>  #endif
->>
->> -        atomic_set((uint64_t *)jmp_addr, pair);
->> +        atomic_set__nocheck((uint64_t *)jmp_addr, pair);
->>          flush_icache_range(jmp_addr, jmp_addr + 8);
->>      } else {
->>          intptr_t diff = addr - jmp_addr;
-> 
-> Can you explain why this is the right thing? On the
-> face of it it looks correct to insist that we don't
-> try to do an atomic set of something that's bigger
-> than the host can actually handle...
-
-It is the correct thing because ppc32 is handled earlier in the function; only
-ppc64 can reach here, therefore a 64-bit atomic_set is always available.
-
-However, I wrote the function intending to minimize the ifdefs so that we can
-be sure that it all compiles -- especially the ppc32 bits which I cannot test
-on gcc cfarm machines.  I didn't think about the fact that ppc32 could not
-compile the _Static_assert within the 64-bit atomic_set here in the ppc64 section.
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sam Bobroff <sam.bobroff@au1.ibm.com>
 
 
-r~
+--JBi0ZxuS5uaEhkUZ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Sep 11, 2017 at 10:52:06PM +0200, Greg Kurz wrote:
+> Since commit 7cca3e466eb0 ("ppc: spapr: Move VCPU ID calculation into
+> sPAPR"), QEMU aborts when started with a *-spapr-cpu-core device and
+> a non-pseries machine.
+>=20
+> Let's rely on the already existing call to object_dynamic_cast() instead
+> of using the SPAPR_MACHINE() macro.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+
+Applied to ppc-for-2.11.
+
+> ---
+>  hw/ppc/spapr_cpu_core.c |    5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index d04d1e0d8164..dc9df0d393d1 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -201,7 +201,7 @@ error:
+> =20
+>  static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+>  {
+> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+> +    sPAPRMachineState *spapr;
+>      sPAPRCPUCore *sc =3D SPAPR_CPU_CORE(OBJECT(dev));
+>      sPAPRCPUCoreClass *scc =3D SPAPR_CPU_CORE_GET_CLASS(OBJECT(dev));
+>      CPUCore *cc =3D CPU_CORE(OBJECT(dev));
+> @@ -211,7 +211,8 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
+Error **errp)
+>      void *obj;
+>      int i, j;
+> =20
+> -    if (!object_dynamic_cast(qdev_get_machine(), TYPE_SPAPR_MACHINE)) {
+> +    spapr =3D (sPAPRMachineState *) qdev_get_machine();
+> +    if (!object_dynamic_cast((Object *) spapr, TYPE_SPAPR_MACHINE)) {
+>          error_setg(errp, "spapr-cpu-core needs a pseries machine");
+>          return;
+>      }
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--JBi0ZxuS5uaEhkUZ
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm3XisACgkQbDjKyiDZ
+s5KW5Q/+N8KY7vGjWa4ht3MkgpYHEjEPXMkbP2WHxVja1AV+dgwlH209N+7mcdap
+Tpb9LpiaPZnGYwobESxN3tMg6920oegRR290e6vACV0kTzFiDcZLcuiZFl9U6IDx
+asMYZ99rlkKRXMk8fL+RIGEZrbhsZAY4aXmT6oKwatpEkuQiaOlapL4sxo7uvcxU
+PQ0/dVnZ/biBx2/uVeF2T+FWB7SQ3F03B4fx/SDN32xoP7Yu6qHwOdfMS5wHFoC5
+PuxoiYlnzFP7wSrc8hZPjO9y8ZpDuVIEpPqSwBS6kt3CGod6nFTYZGssh8V2Hg+z
+k7jYejbxyeCYExCkTVmNTBIJ9zaYQyqsBJmC7li57AtpFFAGb1hRbfe9o6pRoND0
++GV15AIIeXaScxXgZIzgSjHtD7Z7D5h3ehYcuSk9yNCvIzeJjRtp2M477zo4fi3T
+GcxP+qCuD/puaXFFGqofNbtu1U9u2TZXLauTj1mkmCh4ChXn5WPpzrVC8LOK6929
+KHHQKXsXrKYMq0wBmEukBWCWQl6jRlomRo76FmppIIZeZhomRAjU7cji3mWzR8A9
+rwKzsKBXeSVZqev71m8DF/gV5LOjkC1Pp93kZoJIzpxMpznvDOf+mToSk3P6LJHV
+39CD5Twri1F4ZobxlT14lfAlpDa08UVmQTa6/cyPz8t8Xugds/k=
+=q1fF
+-----END PGP SIGNATURE-----
+
+--JBi0ZxuS5uaEhkUZ--
