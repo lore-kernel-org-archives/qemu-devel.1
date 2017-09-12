@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49406)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51587)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drpuj-0000lT-MP
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:28:02 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1drpyI-0004Wx-SY
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:31:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1drpuf-0004Sb-OS
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:28:01 -0400
-Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:41091)
+	(envelope-from <dgilbert@redhat.com>) id 1drpyE-0006mH-Pf
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:31:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:1152)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drpuf-0004S6-He
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:27:57 -0400
-Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 16E8CAA8F7
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 20:27:55 +0200 (CEST)
-Date: Tue, 12 Sep 2017 20:27:42 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170912202742.6e16b5d0@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <CAFEAcA_geEmuB5mdTZ2BrvpwOve5w9++eAfRXmNTZh+36__VqA@mail.gmail.com>
-References: <20170908103558.31632-1-david@gibson.dropbear.id.au>
-	<20170908103558.31632-3-david@gibson.dropbear.id.au>
-	<CAFEAcA_geEmuB5mdTZ2BrvpwOve5w9++eAfRXmNTZh+36__VqA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1drpyE-0006lH-H2
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:31:38 -0400
+Date: Tue, 12 Sep 2017 19:31:34 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170912183133.GF2225@work-vm>
+References: <CAOE=1Z0PxGGAkpO50rk1UtUDdLYX7kZZCLpb9rf87gZNVmGmLA@mail.gmail.com>
+	<CAOE=1Z2=dQ_HNjokhXb_Kvf=63YTjoNeX=-aUvDA_VfmSW0i8Q@mail.gmail.com>
+	<CAOE=1Z0O9fWKYVaHtb5aws4DrvqKYc2cSZDTU_7Qrz5ZzfT6ew@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/qIdKMWqFS1GOFc4M5K_cn8v";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 02/40] hw/ppc: clear
- pending_events on machine reset
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOE=1Z0O9fWKYVaHtb5aws4DrvqKYc2cSZDTU_7Qrz5ZzfT6ew@mail.gmail.com>
+Subject: Re: [Qemu-devel] Monitor socket will close after parse command
+ error. Qemu-2.6.2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +29,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Sam Bobroff <sam.bobroff@au1.ibm.com>
+To: Sam <batmanustc@gmail.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
---Sig_/qIdKMWqFS1GOFc4M5K_cn8v
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+* Sam (batmanustc@gmail.com) wrote:
+> [gangyewei-3@yf-mos-test-net07 tests]$ telnet 127.0.0.1 55919
+> Trying 127.0.0.1...
+> Connected to 127.0.0.1.
+> Escape character is '^]'.
+> QEMU 2.6.2 monitor - type 'help' for more information
+> (qemu) chardev-add
+> socket,id=char-test_intf1,path=/usr/local/var/run/openvswitch/test_intf1,server=on
+> chardev-add
+> socket,id=char-test_intf1,path=/usr/local/var/run/openvswitch/test_intf1,server=on
+> (qemu)
+> (qemu) netdev_add
+> vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=on
+> netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=on
+> (qemu)
+> (qemu) device_add
+> virtio-net-pci,netdev=test_intf1,mac=00:22:79:29:d2:6c,id=netdev-test_intf1
+> device_add
+> virtio-net-pci,netdev=test_intf1,mac=00:22:79:29:d2:6c,id=netdev-test_intf1
+> (qemu)
+> (qemu) device_del netdev-test_intf1
+> device_del netdev-test_intf1
+> (qemu)
+> (qemu) netdev_del test_intf1
+> netdev_del test_intf1
+> (qemu)
+> (qemu) chardev-remove char-test_intf1
+> chardev-remove char-test_intf1
+> Chardev 'char-test_intf1' is busy
+> (qemu)
+> (qemu) chardev-remove char-test_intf1
+> chardev-remove char-test_intf1
+> Chardev 'char-test_intf1' is busy
+> (qemu)
+> (qemu) chardev-remove char-test_intf1
+> chardev-remove char-test_intf1
+> Chardev 'char-test_intf1' is busy
+> (qemu)
+> (qemu) chardev-add
+> socket,id=char-test_intf1,path=/usr/local/var/run/openvswitch/test_intf1,server=on
+> chardev-add
+> socket,id=char-test_intf1,path=/usr/local/var/run/openvswitch/test_intf1,server=on
+> Duplicate ID 'char-test_intf1' for chardev
+> Parsing chardev args failed
+> (qemu)
+> (qemu) ^[[A^[[A
+> chardev-remove char-test_intf1
+> Chardev 'char-test_intf1' is busy
+> (qemu)
+> (qemu)
+> 
+> (qemu)
+> (qemu)
+> 
+> (qemu)
+> (qemu) netdev_add
+> vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=on
+> netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=on
+> Connection closed by foreign host.
 
-On Tue, 12 Sep 2017 18:28:04 +0100
-Peter Maydell <peter.maydell@linaro.org> wrote:
+Is QEMU just crashing at that point?  i.e. segfaulting or aborting?
 
-> On 8 September 2017 at 11:35, David Gibson <david@gibson.dropbear.id.au> =
-wrote:
-> > From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+Dave
+
+> 2017-09-08 11:32 GMT+08:00 Sam <batmanustc@gmail.com>:
+> 
+> > BTW, same result while using `telnet 127.0.0.1 55919`, which means also
+> > have the two problem in the email before.
 > >
-> > The sPAPR machine isn't clearing up the pending events QTAILQ on
-> > machine reboot. This allows for unprocessed hotplug/epow events
-> > to persist in the queue after reset and, when reasserting the IRQs in
-> > check_exception later on, these will be being processed by the OS.
+> > 2017-09-08 11:23 GMT+08:00 Sam <batmanustc@gmail.com>:
 > >
-> > This patch implements a new function called 'spapr_clear_pending_events'
-> > that clears up the pending_events QTAILQ. This helper is then called
-> > inside ppc_spapr_reset to clear up the events queue, preventing
-> > old/deprecated events from persisting after a reset.
+> >> Hi all,
+> >>
+> >> I'm using HMP socket to send command to add netdev, my command like this:
+> >>
+> >> [gangyewei-3@yf-mos-test-net07 tests]$ sudo  python monitor.py 55919
+> >>> (qemu):
+> >>>  Connected to qemu monitor ...
+> >>> on_monitor_open
+> >>> ds
+> >>> (qemu):
+> >>> {'return': ["unknown command: 'ds'"]}
+> >>> chardev-add socket,id=char-test_intf1,path=/usr/local/var/run/openvswitc
+> >>> h/test_intf1,server=on
+> >>> (qemu):
+> >>> \{'return': []}
+> >>> netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=
+> >>> on
+> >>> (qemu):
+> >>> {'return': ["unknown command: '\\netdev_add'"]}
+> >>> netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=
+> >>> on
+> >>> (qemu):
+> >>> {'return': []}
+> >>> device_add virtio-net-pci,netdev=test_intf1,mac=00:22:79:29:d2:6c,id=
+> >>> netdev-test_intf1
+> >>> (qemu):
+> >>> {'return': []}
+> >>> device_del netdev-test_intf1
+> >>> (qemu):
+> >>> {'return': []}
+> >>> netdev_del test_intf1
+> >>> (qemu):
+> >>> {'return': []}
+> >>> chardev-remove char-test_intf1
+> >>> (qemu):
+> >>> {'return': ["Chardev 'char-test_intf1' is busy"]}
+> >>> chardev-remove char-test_intf1
+> >>> (qemu):
+> >>> {'return': ["Chardev 'char-test_intf1' is busy"]}
+> >>> ds
+> >>> (qemu):
+> >>> {'return': ["unknown command: 'ds'"]}
+> >>> chardev-add socket,id=char-test_intf1,path=/usr/local/var/run/openvswitc
+> >>> h/test_intf1,server=on
+> >>> (qemu):
+> >>> {'return': ["Duplicate ID 'char-test_intf1' for chardev", 'Parsing
+> >>> chardev args failed']}
+> >>> netdev_add vhost-user,id=test_intf1,chardev=char-test_intf1,vhostforce=
+> >>> on
+> >>> (qemu):
+> >>> on_monitor_close
+> >>> Disconnect ...
+> >>> Bye...
+> >>> [gangyewei-3@yf-mos-test-net07 tests]$ telnet 127.0.0.1 55919
+> >>> Trying 127.0.0.1...
+> >>> telnet: connect to address 127.0.0.1: Connection refused
+> >>
+> >>
+> >> the monitor.py is same like telnet, which send command to 127.0.0.1:55919
+> >> socket.
+> >> At the last 5th line, you could see "on_monitor_close", this is because
+> >> server side of 127.0.0.1:55919 socket is down.
+> >>
+> >> I have few questions:
+> >> 1. Why I got "{'return': ["Chardev 'char-test_intf1' is busy"]}" while
+> >> using "chardev-remove char-test_intf1"?
+> >> 2. Why the server side will close while get "{'return': ["Duplicate ID
+> >> 'char-test_intf1' for chardev", 'Parsing chardev args failed']}" and then
+> >> send same command?
+> >>
+> >> Thank you~
+> >>
 > >
-> > Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au> =20
->=20
-> > +void spapr_clear_pending_events(sPAPRMachineState *spapr)
-> > +{
-> > +    sPAPREventLogEntry *entry =3D NULL;
-> > +
-> > +    QTAILQ_FOREACH(entry, &spapr->pending_events, next) {
-> > +        QTAILQ_REMOVE(&spapr->pending_events, entry, next);
-> > +        g_free(entry->extended_log);
-> > +        g_free(entry);
-> > +    }
-> > +} =20
->=20
-> Coverity points out that this is a use-after-free error,
-> because QTAILQ_FOREACH will access the list pointers of
-> entry after the loop body has freed it. You want
-> QTAILQ_FOREACH_SAFE, I think. (CID 1381017)
->=20
-
-Yes indeed, QTAILQ_FOREACH_SAFE() is needed when removing
-the current element from the list. I'll send a patch.
-
-> thanks
-> -- PMM
->=20
-
-
---Sig_/qIdKMWqFS1GOFc4M5K_cn8v
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbgnHgAKCRAC/DrrAQHb
-whgjAJ41B2DVGh+oUzYJ7S60p5Bmb2CKywCfV2vxgK4nZa85VLcfzMXYfwjE5mo=
-=YXYj
------END PGP SIGNATURE-----
-
---Sig_/qIdKMWqFS1GOFc4M5K_cn8v--
+> >
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
