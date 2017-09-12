@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50886)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drsIX-000844-Ht
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:00:46 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1drsIq-0008F7-E0
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:01:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drsIU-0005hL-83
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:00:45 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:36105)
+	(envelope-from <pbonzini@redhat.com>) id 1drsIn-0005rr-3w
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:01:04 -0400
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:46039)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drsIU-0005hA-14
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:00:42 -0400
-Received: by mail-qt0-x244.google.com with SMTP id t46so2305184qtj.3
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 14:00:41 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170911204936.5020-1-f4bug@amsat.org>
-	<e4be431e-0c31-baf7-7e0b-8419fa507478@twiddle.net>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <0fa28753-c353-8f64-81f4-ccd992455641@amsat.org>
-Date: Tue, 12 Sep 2017 18:00:38 -0300
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drsIm-0005rQ-T2
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:01:01 -0400
+Received: by mail-wm0-f43.google.com with SMTP id g206so100454wme.0
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 14:01:00 -0700 (PDT)
+References: <cover.1505158760.git.alistair.francis@xilinx.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <fd2345ad-b9de-c0d2-7ab5-e1cad759bbaa@redhat.com>
+Date: Tue, 12 Sep 2017 23:00:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <e4be431e-0c31-baf7-7e0b-8419fa507478@twiddle.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <cover.1505158760.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/ppc: disable atomic write check on
- ppc32
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/8] More warning reporting fixed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,18 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>, Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, armbru@redhat.com
 
-On 09/12/2017 02:01 PM, Richard Henderson wrote:
-> On 09/11/2017 01:49 PM, Philippe Mathieu-Daudé wrote:
->> -        atomic_set((uint64_t *)jmp_addr, pair);
->> +        atomic_set__nocheck((uint64_t *)jmp_addr, pair);
->>           flush_icache_range(jmp_addr, jmp_addr + 8);
->>       } else {
->>           intptr_t diff = addr - jmp_addr;
->>
+On 11/09/2017 21:52, Alistair Francis wrote:
+> This series expands on my previous series by converting more existing
+> prints to use warn_report() instead of error_report() or fprintf().
 > 
-> Queued, thanks.
+> As discussed with Paolo and Markus this series combines libqemustub.a into
+> libqemuutil.a to avoid circular dependencies.
+> 
+> V4:
+>  - Improve some extra MIPs messages
+>  - Fix build issues
+>  - Fix i386 print message
+> V3:
+>  - Small corrections as reported by Markus
+>  - Rename patch 3 and 5 so they don't have the same name
+>  - Combine libqemustub.a into libqemuutil.a
+>  - Add an extra patch with general cleanups
+> 
+> V2:
+>  - Fixup auto CC logic so everyone is CCed
+> 
+> 
+> 
+> Alistair Francis (8):
+>   hw/i386: Improve some of the warning messages
+>   Convert remaining error_report() to warn_report()
+>   Convert single line fprintf(.../n) to warn_report()
+>   Convert multi-line fprintf() to warn_report()
+>   General warn report fixups
+>   target/mips: Convert VM clock update prints to warn_report
+>   Makefile: Remove libqemustub.a
+>   Convert remaining single line fprintf() to warn_report()
+> 
+>  Makefile                    |  7 +++----
+>  Makefile.target             |  2 +-
+>  accel/kvm/kvm-all.c         |  7 +++----
+>  block/qcow2.c               |  9 +++++----
+>  block/vvfat.c               |  7 ++++---
+>  docs/devel/build-system.txt | 16 +++++++---------
+>  hw/acpi/core.c              | 10 +++++-----
+>  hw/arm/vexpress.c           |  4 ++--
+>  hw/i386/acpi-build.c        | 15 ++++++++++-----
+>  hw/i386/pc.c                |  9 ++++-----
+>  hw/i386/pc_q35.c            |  8 +++++---
+>  hw/i386/xen/xen-mapcache.c  |  5 +++--
+>  hw/mips/mips_malta.c        |  4 ++--
+>  hw/mips/mips_r4k.c          |  5 ++---
+>  hw/misc/applesmc.c          |  2 +-
+>  hw/s390x/s390-virtio.c      | 18 ++++++++++--------
+>  hw/usb/hcd-ehci.c           |  5 +++--
+>  hw/virtio/virtio-balloon.c  |  3 ++-
+>  net/hub.c                   | 10 ++++------
+>  net/net.c                   | 15 ++++++++-------
+>  qga/vss-win32.c             |  2 +-
+>  target/i386/cpu.c           | 12 ++++++------
+>  target/i386/hax-mem.c       |  6 +++---
+>  target/mips/kvm.c           | 10 +++++-----
+>  target/ppc/translate_init.c | 17 ++++++++---------
+>  target/s390x/kvm.c          |  4 ++--
+>  tests/Makefile.include      |  8 ++++----
+>  trace/control.c             |  4 ++--
+>  trace/simple.c              |  3 ++-
+>  ui/keymaps.c                | 10 +++++-----
+>  ui/spice-display.c          |  2 +-
+>  util/cutils.c               |  3 ++-
+>  util/main-loop.c            |  6 +++---
+>  33 files changed, 128 insertions(+), 120 deletions(-)
+> 
 
-Thanks Richard for adding the comment requested by Peter!
+Queued, thanks.
+
+Paolo
