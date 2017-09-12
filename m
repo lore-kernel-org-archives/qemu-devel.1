@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52042)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1droz5-0006uR-82
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 13:28:28 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1drp7t-00037y-Vp
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 13:37:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1droz4-0006fo-CZ
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 13:28:27 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:37352)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1droz4-0006fM-62
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 13:28:26 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id k20so24183513wre.4
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 10:28:26 -0700 (PDT)
+	(envelope-from <ehabkost@redhat.com>) id 1drp7p-0003cu-2Z
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 13:37:34 -0400
+Date: Tue, 12 Sep 2017 14:37:23 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170912173723.GA7570@localhost.localdomain>
+References: <1504605227-5124-1-git-send-email-thuth@redhat.com>
+	<871snlwev0.fsf@dusky.pond.sub.org> <20170905164835.GF2112@work-vm>
+	<6e03aa82-3663-c251-c8e1-ac2e7eb0e7e7@redhat.com>
+	<87mv68e2i3.fsf@dusky.pond.sub.org>
+	<20170909204133.GH7570@localhost.localdomain>
+	<825b29f3-7857-558e-9092-855c9f75463e@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170908103558.31632-3-david@gibson.dropbear.id.au>
-References: <20170908103558.31632-1-david@gibson.dropbear.id.au>
-	<20170908103558.31632-3-david@gibson.dropbear.id.au>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Sep 2017 18:28:04 +0100
-Message-ID: <CAFEAcA_geEmuB5mdTZ2BrvpwOve5w9++eAfRXmNTZh+36__VqA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 02/40] hw/ppc: clear pending_events on
- machine reset
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <825b29f3-7857-558e-9092-855c9f75463e@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH] tests: Add a device_add/del
+ HMP test
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alexander Graf <agraf@suse.de>, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Sam Bobroff <sam.bobroff@au1.ibm.com>, Igor Mammedov <imammedo@redhat.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-On 8 September 2017 at 11:35, David Gibson <david@gibson.dropbear.id.au> wrote:
-> From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
->
-> The sPAPR machine isn't clearing up the pending events QTAILQ on
-> machine reboot. This allows for unprocessed hotplug/epow events
-> to persist in the queue after reset and, when reasserting the IRQs in
-> check_exception later on, these will be being processed by the OS.
->
-> This patch implements a new function called 'spapr_clear_pending_events'
-> that clears up the pending_events QTAILQ. This helper is then called
-> inside ppc_spapr_reset to clear up the events queue, preventing
-> old/deprecated events from persisting after a reset.
->
-> Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+On Mon, Sep 11, 2017 at 08:13:21AM +0200, Thomas Huth wrote:
+> On 09.09.2017 22:41, Eduardo Habkost wrote:
+> > On Wed, Sep 06, 2017 at 08:59:32AM +0200, Markus Armbruster wrote:
+> >> Thomas Huth <thuth@redhat.com> writes:
+> >>
+> >>> On 05.09.2017 18:48, Dr. David Alan Gilbert wrote:
+> >>>> * Markus Armbruster (armbru@redhat.com) wrote:
+> >>>>> Thomas Huth <thuth@redhat.com> writes:
+> >>>>>
+> >>>>>> People tend to forget to mark internal devices with "user_creatable = false
+> >>>>>> or hotpluggable = false, and these devices can crash QEMU if added via the
+> >>>>>> HMP monitor. So let's add a test to run through all devices and that tries
+> >>>>>> to add them blindly (without arguments) to see whether this could crash the
+> >>>>>> QEMU instance.
+> [...]
+> >>>>> * The device supports only cold plug with -device, not hot plug with
+> >>>>>   device_add.
+> >>>
+> >>> We've got Eduardo's scripts/device-crash-test script for that already,
+> >>> so no need to cover that here.
+> >>
+> >> Point taken.  So this test is really about hot plug / unplug.  Suggest
+> >> to clarify the commit message: s/add them blindly/hotplug and unplug
+> >> them blindly/.
+> > 
+> > We could extend device-crash-test to test device_add too, as it
+> > already has extra code to deal with known crashes and testing
+> > multiple machine-types.  Also, any additional code we write to
+> > ensure we add mandatory arguments or plug only to valid buses
+> > would apply to both -device and device_add.  I also think Python
+> > test code is easier to maintain and extend, but that's just my
+> > personal preference.
+> 
+> Adding device_add/del support to device-crash-test is certainly an
+> option. The problem is that nobody runs it by default, so this won't
+> help to avoid that new problems are being committed to the repository.
+> 
+> I think we really should have a test for "make check", too. So would my
+> test be acceptable if I'd rewrite it to use QMP instead (I don't think I
+> could do the full list that Markus mentioned, but at least a basic test
+> via QMP as a start)?
 
-> +void spapr_clear_pending_events(sPAPRMachineState *spapr)
-> +{
-> +    sPAPREventLogEntry *entry = NULL;
-> +
-> +    QTAILQ_FOREACH(entry, &spapr->pending_events, next) {
-> +        QTAILQ_REMOVE(&spapr->pending_events, entry, next);
-> +        g_free(entry->extended_log);
-> +        g_free(entry);
-> +    }
-> +}
+We can run device-crash-test on "make check", we just need to
+choose what's the subset of tests we want to run (because testing
+all machine+device+target combinations would take too long).
 
-Coverity points out that this is a use-after-free error,
-because QTAILQ_FOREACH will access the list pointers of
-entry after the loop body has freed it. You want
-QTAILQ_FOREACH_SAFE, I think. (CID 1381017)
+But while device-crash-test doesn't support hotplug, I think your
+test code would be good too.
 
-thanks
--- PMM
+-- 
+Eduardo
