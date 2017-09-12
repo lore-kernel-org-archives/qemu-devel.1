@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32942)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drsZS-0004Qe-2V
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:18:15 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1drsay-0005Cl-Lq
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:19:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drsZP-0000hx-9r
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:18:14 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:49895)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drsZO-0000h6-VH
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:18:11 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 13 Sep 2017 00:17:51 +0300
-Message-Id: <150525107140.15988.6826863421661463025.stgit@frigg.lan>
-In-Reply-To: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
-References: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1drsav-0001m0-To
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:19:48 -0400
+Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:37543)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1drsav-0001lh-PN
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:19:45 -0400
+Received: by mail-qk0-x241.google.com with SMTP id r66so7754150qke.4
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 14:19:45 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 12 Sep 2017 18:19:34 -0300
+Message-Id: <20170912211934.20919-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 04/22] instrument: [linux-user] Add command
- line library loader
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] accel/tcg: move USER code to user-exec.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +31,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- linux-user/main.c    |   21 +++++++++++++++++++++
- linux-user/syscall.c |    4 ++++
- 2 files changed, 25 insertions(+)
+Based-on: 20170911213328.9701-5-f4bug@amsat.org
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 03666ef657..ac5c30c1fb 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -36,6 +36,7 @@
- #include "exec/log.h"
- #include "trace/control.h"
- #include "glib-compat.h"
-+#include "instrument/cmdline.h"
-=20
- char *exec_path;
-=20
-@@ -4017,6 +4018,17 @@ static void handle_arg_trace(const char *arg)
-     trace_file =3D trace_opt_parse(arg);
+ accel/tcg/tcg-runtime.c | 54 -------------------------------------------------
+ accel/tcg/user-exec.c   | 52 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+), 54 deletions(-)
+
+diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
+index 3e23649dd7..aafb171294 100644
+--- a/accel/tcg/tcg-runtime.c
++++ b/accel/tcg/tcg-runtime.c
+@@ -178,57 +178,3 @@ void HELPER(exit_atomic)(CPUArchState *env)
+ {
+     cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
  }
-=20
-+static char *instrument_path;
-+static int instrument_argc;
-+static const char **instrument_argv;
-+#if defined(CONFIG_INSTRUMENT)
-+static void handle_arg_instrument(const char *arg)
+-
+-#ifndef CONFIG_SOFTMMU
+-/* The softmmu versions of these helpers are in cputlb.c.  */
+-
+-/* Do not allow unaligned operations to proceed.  Return the host address.  */
+-static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+-                               int size, uintptr_t retaddr)
+-{
+-    /* Enforce qemu required alignment.  */
+-    if (unlikely(addr & (size - 1))) {
+-        cpu_loop_exit_atomic(ENV_GET_CPU(env), retaddr);
+-    }
+-    return g2h(addr);
+-}
+-
+-/* Macro to call the above, with local variables from the use context.  */
+-#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, GETPC())
+-
+-#define ATOMIC_NAME(X)   HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
+-#define EXTRA_ARGS
+-
+-#define DATA_SIZE 1
+-#include "atomic_template.h"
+-
+-#define DATA_SIZE 2
+-#include "atomic_template.h"
+-
+-#define DATA_SIZE 4
+-#include "atomic_template.h"
+-
+-#ifdef CONFIG_ATOMIC64
+-#define DATA_SIZE 8
+-#include "atomic_template.h"
+-#endif
+-
+-/* The following is only callable from other helpers, and matches up
+-   with the softmmu version.  */
+-
+-#ifdef CONFIG_ATOMIC128
+-
+-#undef EXTRA_ARGS
+-#undef ATOMIC_NAME
+-#undef ATOMIC_MMU_LOOKUP
+-
+-#define EXTRA_ARGS     , TCGMemOpIdx oi, uintptr_t retaddr
+-#define ATOMIC_NAME(X) \
+-    HELPER(glue(glue(glue(atomic_ ## X, SUFFIX), END), _mmu))
+-#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, retaddr)
+-
+-#define DATA_SIZE 16
+-#include "atomic_template.h"
+-#endif /* CONFIG_ATOMIC128 */
+-
+-#endif /* !CONFIG_SOFTMMU */
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index 2a975eaf69..492ea0826c 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -24,6 +24,7 @@
+ #include "qemu/bitops.h"
+ #include "exec/cpu_ldst.h"
+ #include "translate-all.h"
++#include "exec/helper-proto.h"
+ 
+ #undef EAX
+ #undef ECX
+@@ -573,3 +574,54 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+ #error host CPU specific signal handler needed
+ 
+ #endif
++
++/* The softmmu versions of these helpers are in cputlb.c.  */
++
++/* Do not allow unaligned operations to proceed.  Return the host address.  */
++static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
++                               int size, uintptr_t retaddr)
 +{
-+    instr_opt_parse(arg, &instrument_path,
-+                    &instrument_argc, &instrument_argv);
++    /* Enforce qemu required alignment.  */
++    if (unlikely(addr & (size - 1))) {
++        cpu_loop_exit_atomic(ENV_GET_CPU(env), retaddr);
++    }
++    return g2h(addr);
 +}
++
++/* Macro to call the above, with local variables from the use context.  */
++#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, GETPC())
++
++#define ATOMIC_NAME(X)   HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
++#define EXTRA_ARGS
++
++#define DATA_SIZE 1
++#include "atomic_template.h"
++
++#define DATA_SIZE 2
++#include "atomic_template.h"
++
++#define DATA_SIZE 4
++#include "atomic_template.h"
++
++#ifdef CONFIG_ATOMIC64
++#define DATA_SIZE 8
++#include "atomic_template.h"
 +#endif
 +
- struct qemu_argument {
-     const char *argv;
-     const char *env;
-@@ -4066,6 +4078,10 @@ static const struct qemu_argument arg_table[] =3D =
-{
-      "",           "Seed for pseudo-random number generator"},
-     {"trace",      "QEMU_TRACE",       true,  handle_arg_trace,
-      "",           "[[enable=3D]<pattern>][,events=3D<file>][,file=3D<fi=
-le>]"},
-+#if defined(CONFIG_INSTRUMENT)
-+    {"instr",      "QEMU_INSTR",       true,  handle_arg_instrument,
-+     "",           "[file=3D]<file>[,arg=3D<string>]"},
-+#endif
-     {"version",    "QEMU_VERSION",     false, handle_arg_version,
-      "",           "display version information and exit"},
-     {NULL, NULL, false, NULL, NULL, NULL}
-@@ -4257,6 +4273,9 @@ int main(int argc, char **argv, char **envp)
-     srand(time(NULL));
-=20
-     qemu_add_opts(&qemu_trace_opts);
-+#if defined(CONFIG_INSTRUMENT)
-+    qemu_add_opts(&qemu_instr_opts);
-+#endif
-=20
-     optind =3D parse_args(argc, argv);
-=20
-@@ -4265,6 +4284,8 @@ int main(int argc, char **argv, char **envp)
-     }
-     trace_init_file(trace_file);
-=20
-+    instr_init(instrument_path, instrument_argc, instrument_argv);
++/* The following is only callable from other helpers, and matches up
++   with the softmmu version.  */
 +
-     /* Zero out regs */
-     memset(regs, 0, sizeof(struct target_pt_regs));
-=20
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9b6364a266..e73a07fa6f 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -115,6 +115,8 @@ int __clone2(int (*fn)(void *), void *child_stack_bas=
-e,
- #include "uname.h"
-=20
- #include "qemu.h"
-+#include "instrument/cmdline.h"
++#ifdef CONFIG_ATOMIC128
 +
-=20
- #ifndef CLONE_IO
- #define CLONE_IO                0x80000000      /* Clone io context */
-@@ -7765,6 +7767,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
-g arg1,
-         _mcleanup();
- #endif
-         gdb_exit(cpu_env, arg1);
-+        instr_fini();
-         _exit(arg1);
-         ret =3D 0; /* avoid warning */
-         break;
-@@ -9821,6 +9824,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
-g arg1,
-         _mcleanup();
- #endif
-         gdb_exit(cpu_env, arg1);
-+        instr_fini();
-         ret =3D get_errno(exit_group(arg1));
-         break;
- #endif
++#undef EXTRA_ARGS
++#undef ATOMIC_NAME
++#undef ATOMIC_MMU_LOOKUP
++
++#define EXTRA_ARGS     , TCGMemOpIdx oi, uintptr_t retaddr
++#define ATOMIC_NAME(X) \
++    HELPER(glue(glue(glue(atomic_ ## X, SUFFIX), END), _mmu))
++#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, retaddr)
++
++#define DATA_SIZE 16
++#include "atomic_template.h"
++#endif /* CONFIG_ATOMIC128 */
+-- 
+2.14.1
