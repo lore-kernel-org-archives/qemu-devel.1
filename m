@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37990)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1drjvh-0004oY-4Z
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:04:41 -0400
+	(envelope-from <berrange@redhat.com>) id 1drjxQ-0005iU-NY
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:06:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1drjvf-0007nK-OI
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:04:37 -0400
-Date: Tue, 12 Sep 2017 09:04:27 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170912120427.GV7570@localhost.localdomain>
-References: <1504533662-198084-1-git-send-email-imammedo@redhat.com>
-	<1504533662-198084-7-git-send-email-imammedo@redhat.com>
-	<20170905213152.GG17184@localhost.localdomain>
-	<CAKmqyKPWDmVYJceYao7NkD5svWqN_fYbDoUJ4uLNFdAhv+kFwg@mail.gmail.com>
-	<20170912130235.2353dec3@nial.brq.redhat.com>
+	(envelope-from <berrange@redhat.com>) id 1drjxP-0001FH-0D
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:06:24 -0400
+Date: Tue, 12 Sep 2017 13:06:03 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170912120603.GE17633@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170912112855.24269-1-berrange@redhat.com>
+	<20170912112855.24269-6-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170912130235.2353dec3@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 6/6] arm: drop intermadiate cpu_model ->
- cpu type parsing and use cpu type directly
+In-Reply-To: <20170912112855.24269-6-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: convert crypto driver to
+ bdrv_co_preadv|pwritev
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,115 +25,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: Alistair Francis <alistair23@gmail.com>, Rob Herring <robh@kernel.org>, Andrew Jones <drjones@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
-On Tue, Sep 12, 2017 at 01:02:35PM +0200, Igor Mammedov wrote:
-> On Tue, 5 Sep 2017 14:47:52 -0700
-> Alistair Francis <alistair23@gmail.com> wrote:
+On Tue, Sep 12, 2017 at 12:28:53PM +0100, Daniel P. Berrange wrote:
+> Make the crypto driver implement the bdrv_co_preadv|pwritev
+> callbacks, and also use bdrv_co_preadv|pwritev for I/O
+> with the protocol driver beneath.
 > 
-> > On Tue, Sep 5, 2017 at 2:31 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> > > On Mon, Sep 04, 2017 at 04:01:02PM +0200, Igor Mammedov wrote:  
-> > >> there are 2 use cases to deal with:
-> > >>   1: fixed CPU models per board/soc
-> > >>   2: boards with user configurable cpu_model and fallback to
-> > >>      default cpu_model if user hasn't specified one explicitly
-> > >>
-> > >> For the 1st
-> > >>   drop intermediate cpu_model parsing and use const cpu type
-> > >>   directly, which replaces:
-> > >>      typename = object_class_get_name(
-> > >>            cpu_class_by_name(TYPE_ARM_CPU, cpu_model))
-> > >>      object_new(typename)
-> > >>   with
-> > >>      object_new(FOO_CPU_TYPE_NAME)
-> > >>   or
-> > >>      cpu_generic_init(BASE_CPU_TYPE, "my cpu model")
-> > >>   with
-> > >>      cpu_create(FOO_CPU_TYPE_NAME)
-> > >>
-> > >> as result 1st use case doesn't have to invoke not necessary
-> > >> translation and not needed code is removed.
-> > >>
-> > >> For the 2nd
-> > >>  1: set default cpu type with MachineClass::default_cpu_type and
-> > >>  2: use generic cpu_model parsing that done before machine_init()
-> > >>     is run and:
-> > >>     2.1: drop custom cpu_model parsing where pattern is:
-> > >>        typename = object_class_get_name(
-> > >>            cpu_class_by_name(TYPE_ARM_CPU, cpu_model))
-> > >>        [parse_features(typename, cpu_model, &err) ]
-> > >>
-> > >>     2.2: or replace cpu_generic_init() which does what
-> > >>          2.1 does + create_cpu(typename) with just
-> > >>          create_cpu(machine->cpu_type)
-> > >> as result cpu_name -> cpu_type translation is done using
-> > >> generic machine code one including parsing optional features
-> > >> if supported/present (removes a bunch of duplicated cpu_model
-> > >> parsing code) and default cpu type is defined in an uniform way
-> > >> within machine_class_init callbacks instead of adhoc places
-> > >> in boadr's machine_init code.
-> > >>
-> > >> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > >> ---
-> > >> CC: Peter Maydell <peter.maydell@linaro.org>
-> > >> CC: Igor Mitsyanko <i.mitsyanko@gmail.com>
-> > >> CC: Rob Herring <robh@kernel.org>
-> > >> CC: Andrzej Zaborowski <balrogg@gmail.com>
-> > >> CC: Jan Kiszka <jan.kiszka@web.de>
-> > >> CC: Alistair Francis <alistair@alistair23.me>
-> > >> CC: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-> > >> CC: qemu-arm@nongnu.org
-> > >> ---
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  block/crypto.c | 104 +++++++++++++++++++++++++++++++--------------------------
+>  1 file changed, 56 insertions(+), 48 deletions(-)
 > 
-> [...]
-> 
-> > >>
-> > >>  static const TypeInfo lm3s6965evb_type = {
-> > >> diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
-> > >> index f61e735..1cd6374 100644
-> > >> --- a/hw/arm/stm32f205_soc.c
-> > >> +++ b/hw/arm/stm32f205_soc.c
-> > >> @@ -112,7 +112,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
-> > >>
-> > >>      armv7m = DEVICE(&s->armv7m);
-> > >>      qdev_prop_set_uint32(armv7m, "num-irq", 96);
-> > >> -    qdev_prop_set_string(armv7m, "cpu-model", s->cpu_model);
-> > >> +    qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
-> > >>      object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
-> > >>                                       "memory", &error_abort);
-> > >>      object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
-> > >> @@ -200,7 +200,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
-> > >>  }
-> > >>
-> > >>  static Property stm32f205_soc_properties[] = {
-> > >> -    DEFINE_PROP_STRING("cpu-model", STM32F205State, cpu_model),
-> > >> +    DEFINE_PROP_STRING("cpu-type", STM32F205State, cpu_type),  
-> > >
-> > > Same as armv7m: are we 100% sure users are not setting this
-> > > manually?  
-> > 
-> > In an embedded board like this it really doesn't make sense to let the
-> > user overwrite the CPU. The SoC will take it as an option, but the
-> > board (which creates the SoC) just blindly always uses the same CPU.
-> > That feature is more for QOMificatoion then any real reason though.
-> If SoC has fixed cpu type then I'd drop property.
-> I'd leave it upto board maintainers to cleanup not really needed
-> properties and make soc with fixed cpu type where it makes sense.
-> 
-> > In saying that I think a warning if the user tries to set the CPU
-> > would make sense. I know that this issues comes up in other ARM boards
-> > (Zynq-7000 has the same issue as well) so maybe a machine property
-> > saying that the board doesn't accept custom CPUs would be a good idea.
-> > 
-> > Overall I think this patch is moving in the right direction though and
-> > this CPU option being ignored existed before this series.
-> right, this series just removes cpu_generic_init()/cpu_model in boards
-> everything else should be done as separate series.
+> diff --git a/block/crypto.c b/block/crypto.c
+> index 49d6d4c058..d004e9cef4 100644
+> --- a/block/crypto.c
+> +++ b/block/crypto.c
+> @@ -383,19 +383,23 @@ static void block_crypto_close(BlockDriverState *bs)
+>  #define BLOCK_CRYPTO_MAX_SECTORS 2048
+>  
+>  static coroutine_fn int
+> -block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
+> -                      int remaining_sectors, QEMUIOVector *qiov)
+> +block_crypto_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+> +                       QEMUIOVector *qiov, int flags)
+>  {
+>      BlockCrypto *crypto = bs->opaque;
+> -    int cur_nr_sectors; /* number of sectors in current iteration */
+> +    uint64_t cur_bytes; /* number of bytes in current iteration */
+>      uint64_t bytes_done = 0;
+>      uint8_t *cipher_data = NULL;
+>      QEMUIOVector hd_qiov;
+>      int ret = 0;
+>      uint64_t sector_size = qcrypto_block_get_sector_size(crypto->block);
+> -    uint64_t payload_offset =
+> -        qcrypto_block_get_payload_offset(crypto->block) / sector_size;
+> -    assert(payload_offset < (INT64_MAX / 512));
+> +    size_t payload_offset = qcrypto_block_get_payload_offset(crypto->block);
 
-Agreed.  Except for actual bugs and opportunities to document
-these cases in comments or commit messages, these things can be
-done by other series.
+Opps, rebase merge error - that should be uint64_t - this is what the
+patchew failure complained about.
 
+> +    uint64_t sector_num = offset / sector_size;
+> +
+> +    assert(!flags);
+> +    assert(payload_offset < INT64_MAX);
+> +    assert(QEMU_IS_ALIGNED(offset, sector_size));
+> +    assert(QEMU_IS_ALIGNED(bytes, sector_size));
+>  
+>      qemu_iovec_init(&hd_qiov, qiov->niov);
+>  
+> @@ -410,37 +414,33 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
+>          goto cleanup;
+>      }
+>  
+> -    while (remaining_sectors) {
+> -        cur_nr_sectors = remaining_sectors;
+> +    while (bytes) {
+> +        cur_bytes = bytes;
+>  
+> -        if (cur_nr_sectors > BLOCK_CRYPTO_MAX_SECTORS) {
+> -            cur_nr_sectors = BLOCK_CRYPTO_MAX_SECTORS;
+> +        if (cur_bytes > (BLOCK_CRYPTO_MAX_SECTORS * sector_size)) {
+> +            cur_bytes = BLOCK_CRYPTO_MAX_SECTORS * sector_size;
+>          }
+>  
+>          qemu_iovec_reset(&hd_qiov);
+> -        qemu_iovec_add(&hd_qiov, cipher_data, cur_nr_sectors * sector_size);
+> +        qemu_iovec_add(&hd_qiov, cipher_data, cur_bytes);
+>  
+> -        ret = bdrv_co_readv(bs->file,
+> -                            payload_offset + sector_num,
+> -                            cur_nr_sectors, &hd_qiov);
+> +        ret = bdrv_co_preadv(bs->file, payload_offset + offset + bytes_done,
+> +                             cur_bytes, &hd_qiov, 0);
+>          if (ret < 0) {
+>              goto cleanup;
+>          }
+>  
+> -        if (qcrypto_block_decrypt(crypto->block,
+> -                                  sector_num,
+> -                                  cipher_data, cur_nr_sectors * sector_size,
+> -                                  NULL) < 0) {
+> +        if (qcrypto_block_decrypt(crypto->block, sector_num, cipher_data,
+> +                                  cur_bytes, NULL) < 0) {
+>              ret = -EIO;
+>              goto cleanup;
+>          }
+>  
+> -        qemu_iovec_from_buf(qiov, bytes_done,
+> -                            cipher_data, cur_nr_sectors * sector_size);
+> +        qemu_iovec_from_buf(qiov, bytes_done, cipher_data, cur_bytes);
+>  
+> -        remaining_sectors -= cur_nr_sectors;
+> -        sector_num += cur_nr_sectors;
+> -        bytes_done += cur_nr_sectors * sector_size;
+> +        sector_num += cur_bytes / sector_size;
+> +        bytes -= cur_bytes;
+> +        bytes_done += cur_bytes;
+>      }
+>  
+>   cleanup:
+> @@ -452,19 +452,23 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
+>  
+>  
+>  static coroutine_fn int
+> -block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
+> -                       int remaining_sectors, QEMUIOVector *qiov)
+> +block_crypto_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+> +                        QEMUIOVector *qiov, int flags)
+>  {
+>      BlockCrypto *crypto = bs->opaque;
+> -    int cur_nr_sectors; /* number of sectors in current iteration */
+> +    uint64_t cur_bytes; /* number of bytes in current iteration */
+>      uint64_t bytes_done = 0;
+>      uint8_t *cipher_data = NULL;
+>      QEMUIOVector hd_qiov;
+>      int ret = 0;
+>      uint64_t sector_size = qcrypto_block_get_sector_size(crypto->block);
+> -    uint64_t payload_offset =
+> -        qcrypto_block_get_payload_offset(crypto->block) / sector_size;
+> -    assert(payload_offset < (INT64_MAX / 512));
+> +    uint64_t payload_offset = qcrypto_block_get_payload_offset(crypto->block);
+> +    uint64_t sector_num = offset / sector_size;
+> +
+> +    assert(!flags);
+> +    assert(payload_offset < INT64_MAX);
+> +    assert(QEMU_IS_ALIGNED(offset, sector_size));
+> +    assert(QEMU_IS_ALIGNED(bytes, sector_size));
+>  
+>      qemu_iovec_init(&hd_qiov, qiov->niov);
+>  
+> @@ -479,37 +483,33 @@ block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
+>          goto cleanup;
+>      }
+>  
+> -    while (remaining_sectors) {
+> -        cur_nr_sectors = remaining_sectors;
+> +    while (bytes) {
+> +        cur_bytes = bytes;
+>  
+> -        if (cur_nr_sectors > BLOCK_CRYPTO_MAX_SECTORS) {
+> -            cur_nr_sectors = BLOCK_CRYPTO_MAX_SECTORS;
+> +        if (cur_bytes > (BLOCK_CRYPTO_MAX_SECTORS * sector_size)) {
+> +            cur_bytes = BLOCK_CRYPTO_MAX_SECTORS * sector_size;
+>          }
+>  
+> -        qemu_iovec_to_buf(qiov, bytes_done,
+> -                          cipher_data, cur_nr_sectors * sector_size);
+> +        qemu_iovec_to_buf(qiov, bytes_done, cipher_data, cur_bytes);
+>  
+> -        if (qcrypto_block_encrypt(crypto->block,
+> -                                  sector_num,
+> -                                  cipher_data, cur_nr_sectors * sector_size,
+> -                                  NULL) < 0) {
+> +        if (qcrypto_block_encrypt(crypto->block, sector_num, cipher_data,
+> +                                  cur_bytes, NULL) < 0) {
+>              ret = -EIO;
+>              goto cleanup;
+>          }
+>  
+>          qemu_iovec_reset(&hd_qiov);
+> -        qemu_iovec_add(&hd_qiov, cipher_data, cur_nr_sectors * sector_size);
+> +        qemu_iovec_add(&hd_qiov, cipher_data, cur_bytes);
+>  
+> -        ret = bdrv_co_writev(bs->file,
+> -                             payload_offset + sector_num,
+> -                             cur_nr_sectors, &hd_qiov);
+> +        ret = bdrv_co_pwritev(bs->file, payload_offset + offset + bytes_done,
+> +                              cur_bytes, &hd_qiov, 0);
+>          if (ret < 0) {
+>              goto cleanup;
+>          }
+>  
+> -        remaining_sectors -= cur_nr_sectors;
+> -        sector_num += cur_nr_sectors;
+> -        bytes_done += cur_nr_sectors * sector_size;
+> +        sector_num += cur_bytes / sector_size;
+> +        bytes -= cur_bytes;
+> +        bytes_done += cur_bytes;
+>      }
+>  
+>   cleanup:
+> @@ -519,6 +519,13 @@ block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
+>      return ret;
+>  }
+>  
+> +static void block_crypto_refresh_limits(BlockDriverState *bs, Error **errp)
+> +{
+> +    BlockCrypto *crypto = bs->opaque;
+> +    uint64_t sector_size = qcrypto_block_get_sector_size(crypto->block);
+> +    bs->bl.request_alignment = sector_size; /* No sub-sector I/O */
+> +}
+> +
+>  
+>  static int64_t block_crypto_getlength(BlockDriverState *bs)
+>  {
+> @@ -618,8 +625,9 @@ BlockDriver bdrv_crypto_luks = {
+>      .bdrv_truncate      = block_crypto_truncate,
+>      .create_opts        = &block_crypto_create_opts_luks,
+>  
+> -    .bdrv_co_readv      = block_crypto_co_readv,
+> -    .bdrv_co_writev     = block_crypto_co_writev,
+> +    .bdrv_refresh_limits = block_crypto_refresh_limits,
+> +    .bdrv_co_preadv     = block_crypto_co_preadv,
+> +    .bdrv_co_pwritev    = block_crypto_co_pwritev,
+>      .bdrv_getlength     = block_crypto_getlength,
+>      .bdrv_get_info      = block_crypto_get_info_luks,
+>      .bdrv_get_specific_info = block_crypto_get_specific_info_luks,
+> -- 
+> 2.13.5
+> 
+
+Regards,
+Daniel
 -- 
-Eduardo
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
