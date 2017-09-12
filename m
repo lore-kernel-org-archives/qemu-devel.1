@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1drhFi-00035h-I4
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:13:10 -0400
+	(envelope-from <sw@weilnetz.de>) id 1drhMf-0004o6-Mp
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:20:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1drhFh-0002ZX-Mk
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:13:06 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:36644)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1drhFh-0002Xx-GR
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:13:05 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id o42so19428325wrb.3
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 02:13:05 -0700 (PDT)
+	(envelope-from <sw@weilnetz.de>) id 1drhMb-0001nb-N9
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:20:17 -0400
+Received: from smtp.mail.uni-mannheim.de ([134.155.96.80]:35179)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1drhMb-0001m4-GD
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:20:13 -0400
+From: Stefan Weil <sw@weilnetz.de>
+References: <20170911022839.23231-1-f4bug@amsat.org>
+	<1c72c0c6-bd29-5228-d4ad-b26b11afa712@linaro.org>
+	<CAFEAcA9+iDKf7UmQ2tevR9KQb_F2fJoBY03zrMMwM7ypFUdeAw@mail.gmail.com>
+	<cff16e31-4be0-9665-62d7-88a12b6d0b56@weilnetz.de>
+Message-ID: <15608989-cb43-a522-9a7d-b57b3a393155@weilnetz.de>
+Date: Tue, 12 Sep 2017 11:20:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAF6HrYym9698mDgQWmKd+q6dVxn1e4DHSm39boaK5mp8CJR0NQ@mail.gmail.com>
-References: <CAF6HrYxj5BoTQpQjz95Z1_N_p615jpEE12xh_afuuqE4fcTyLg@mail.gmail.com>
-	<CAFEAcA9YNO7kgC8yzZ_RUKck=+98pUET0ogVZ7TvC1kxV+_fFA@mail.gmail.com>
-	<CAF6HrYwT7WP_i7cVhvEyRvqSK7J+bLnKU4b+WrMQfVkLaNDrvQ@mail.gmail.com>
-	<CAFEAcA9kEEyUj7=7Wd-jNbVOWwfgkj0a201q+L4e5CDR22JUgw@mail.gmail.com>
-	<CAF6HrYw9B1ns0ZVtU_gxqJZxOe0dG03UQiAV7FHxBB-wQh6kNQ@mail.gmail.com>
-	<CAF6HrYym57hZjSFE=iExPkp8vBX82zqXvTxh8GJDYNPL1FTSqA@mail.gmail.com>
-	<CAFEAcA_iKqs_QXz_qSwsOw6A-Z1BJjVN3WPAgaERejWQXrQhNw@mail.gmail.com>
-	<CAF6HrYx6_uv-K3JouTb4WTrEEkX25VrhkjAVg8mWG3iarvA=AA@mail.gmail.com>
-	<CAF6HrYym9698mDgQWmKd+q6dVxn1e4DHSm39boaK5mp8CJR0NQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Sep 2017 10:12:43 +0100
-Message-ID: <CAFEAcA9PMECsYCPm+6iFv1COOcUz4XGGi2p9PPdEgrqhoQAOgQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Questions regarding emulated UART in VersatilePB
- board
+In-Reply-To: <cff16e31-4be0-9665-62d7-88a12b6d0b56@weilnetz.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tcg/tci: do not use ldst label (never
+ implemented)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,21 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Ramy Sameh <ramysameh26@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Ahmed Aly <ahmedaly50@gmail.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
-On 12 September 2017 at 08:49, Ramy Sameh <ramysameh26@gmail.com> wrote:
-> Hello Peter,
->
-> Any suggestions regarding this topic ?
+Am 12.09.2017 um 10:52 schrieb Stefan Weil:
+> Am 11.09.2017 um 20:24 schrieb Peter Maydell:
+>> I've also turned on a tci compile check on my pre-merge tests.
+>> (It doesn't pass "make check" for me, though...) thanks -- PMM
+> 
+> "make check-qtest-ppc64" fails for me, too.
+> 
+> Thomas, this seems to be again the well known timing problem
+> in tests/prom-env-test.c. The time for the test had been
+> changedfrom 30 s to 10 s to 120 s in the past.
 
-No, I think at this point you're into the stuff that
-you need to think about yourself, ie what exactly
-you want fault injection to do.
+... changed from 10 s to 30 s to 120 s ...
 
-PS: your emails would be easier to read if you followed
-the usual convention of putting replies at the bottom
-of or interspersed with the quoted text rather than the top.
+> For TCI, even that latest value is not sufficient when
+> testing with pseries. Of course that also depends on other
+> parameters (speed of test machine, compiler flags).
+> 
+> In my test pseries took nearly 5 minutes, so the test passes
+> when the loop upper limit is increased to 30000.
 
-thanks
--- PMM
+Timing data for prom-env-test with TCI on another test machine:
+
+mac99:   78 s
+g3beige: 74 s
+pseries: 477 s
+
+> 
+> Is there a better way to handle this test? Why does pseries
+> still need much more time than the other machines
+> (not only with TCI)?
+> 
+> Regards,
+> Stefan
