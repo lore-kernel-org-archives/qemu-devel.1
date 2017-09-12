@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38582)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drslM-00016o-MW
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:30:33 -0400
+	(envelope-from <bounces@canonical.com>) id 1drslj-0001Pj-9m
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:30:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drslL-0002oI-QN
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:30:32 -0400
-References: <20170912144459.11359-1-pbonzini@redhat.com>
-	<20170912144459.11359-9-pbonzini@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0df82bae-77a8-816c-b157-32655005d368@redhat.com>
-Date: Tue, 12 Sep 2017 16:30:21 -0500
+	(envelope-from <bounces@canonical.com>) id 1drsle-00031G-Vu
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:30:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53543)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1drsle-00030S-Oz
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:30:50 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1drsld-0000P7-NT
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 21:30:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 815A82E848B
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 21:30:49 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170912144459.11359-9-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JbtRPQU6doq9nOSD9u6vBmPCglcn6SOp0"
-Subject: Re: [Qemu-devel] [PATCH 08/10] qemu-iotests: fix uninitialized
- variable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 12 Sep 2017 21:18:04 -0000
+From: James Clarke <jrtc27@jrtc27.com>
+Reply-To: Bug 1716767 <1716767@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150524995294.5903.8871661765030368900.malonedeb@wampee.canonical.com>
+Message-Id: <150525108414.24490.800013632974661653.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1716767] Re: file(1) fails with "Invalid
+ argument" on qemu-sh4-user
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,69 +37,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JbtRPQU6doq9nOSD9u6vBmPCglcn6SOp0
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <0df82bae-77a8-816c-b157-32655005d368@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 08/10] qemu-iotests: fix uninitialized
- variable
-References: <20170912144459.11359-1-pbonzini@redhat.com>
- <20170912144459.11359-9-pbonzini@redhat.com>
-In-Reply-To: <20170912144459.11359-9-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The "0 =3D=3D 18446744073709551615 =3D 0" is actually fine, it's just print=
+ing
+"-1" as a 64-bit unsigned integer. Could you please upload the fill
+output of `file -d /bin/bash 2>&1`?
 
-On 09/12/2017 09:44 AM, Paolo Bonzini wrote:
-> The variable is used in "common" but defined only after the file
-> is sourced.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tests/qemu-iotests/check  | 2 --
->  tests/qemu-iotests/common | 2 ++
->  2 files changed, 2 insertions(+), 2 deletions(-)
->=20
+-- =
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1716767
 
-> +tmp=3D"${TEST_DIR}"/$$
+Title:
+  file(1) fails with "Invalid argument" on qemu-sh4-user
 
-Pre-existing to your code motion, but would we be any safer if $tmp also
-included a use of $RANDOM?  (The $$ already protects us from collisions
-with a parallel run, but it is easy to guess, so if $tmp is used to
-create any file that an attacker can access, running the testsuite may
-expose a machine to a symlink or other attack - but we probably have
-lots of those things to audit for before we can recommend running the
-testsuite in an untrusted environment).
+Status in QEMU:
+  New
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Bug description:
+  We recently discovered that file(1) fails on qemu-sh4-user when
+  running on an ELF file:
 
+  (sid_sh4)root@vs94:/# file /bin/bash
+  /bin/bash: ERROR: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV)=
+ error reading (Invalid argument)
+  (sid_sh4)root@vs94:/#
 
---JbtRPQU6doq9nOSD9u6vBmPCglcn6SOp0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  Running with "-d" yields more output:
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+  (sid_sh4)root@vs94:/# file -d /bin/bash 2>&1 | tail
+  322: >> 7 byte&,=3D97,"(ARM)"]
+  0 =3D=3D 97 =3D 0
+  mget(type=3D1, flag=3D0, offset=3D7, o=3D0, nbytes=3D863324, il=3D0, nc=
+=3D1)
+  mget/96 @7: \000\000\000\000\000\000\000\000\000\002\000*\000\001\000\000=
+\000\250\317A\0004\000\000\000L(\r\000\027\000\000\0004\000 \000\n\000(\000=
+\032\000\031\000\006\000\000\0004\000\000\0004\000@\0004\000@\000@\001\000\=
+000@\001\000\000\005\000\000\000\004\000\000\000\003\000\000\000t\001\000\0=
+00t\001@\000t\001@\000\023\000\000
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm4Ue0ACgkQp6FrSiUn
-Q2qpeAf/QPY6fr/cr6VqGv/cKOtcVEV0y1zsIeMEEzI7RpRpwbFK+B08a8Boq6Xf
-+na+sbhV0gPX6MD4JZqRXMDvv/uToe0Zd+dQ/wom97Zq3HiCvHSuIg8yradh9mAS
-Iny5w2hnjQTsGzZQXsBKFQEPH7snoKfeRLCa74zGCsxTIsOKZqGt75EAn9zzKsVi
-VXQiPAD3GGrTKq6a2FhQHnwqDiJWtlBUimotr0zfxu0lpAd2Y5SbSl5qh5C2ACN4
-hkMfmvPAzTnVBLq8nK7GvHBwcCOI3NrWkkQpzyK591rPk/2IOxgbmqwq1M/GPuTa
-XSRZsI6A7YMqxHdXlgaOc6YU97cf5g==
-=AYuY
------END PGP SIGNATURE-----
+  323: >> 7 byte&,=3D-1,"(embedded)"]
+  0 =3D=3D 18446744073709551615 =3D 0
+  [try softmagic 1]
+  [try elf -1]
+  /bin/bash: ERROR: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV)=
+ error reading (Invalid argument)
+  (sid_sh4)root@vs94:/#
 
---JbtRPQU6doq9nOSD9u6vBmPCglcn6SOp0--
+  It seems that the comparison above has a bogus (overflown?) value.
+
+  On actual hardware, it works:
+
+  root@tirpitz:~> file /bin/bash
+  /bin/bash: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV), dynam=
+ically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=3D4dd0e4281755=
+827d8bb6686fd481f8c80ea73e9a, for GNU/Linux 3.2.0, stripped
+  root@tirpitz:~>
+
+  I have uploaded a chroot with Debian unstable which allows to
+  reproduce the issue:
+
+  > https://people.debian.org/~glaubitz/sid-sh4-sbuild.tar.gz
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1716767/+subscriptions
