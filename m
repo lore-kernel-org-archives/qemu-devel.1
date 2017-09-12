@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47367)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49406)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1drpq1-00044A-4V
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:23:09 -0400
+	(envelope-from <groug@kaod.org>) id 1drpuj-0000lT-MP
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:28:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1drppw-00020o-6v
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:23:09 -0400
-Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:32867)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1drppw-00020h-1A
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:23:04 -0400
-Received: by mail-pg0-x22f.google.com with SMTP id u18so6165192pgo.0
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 11:23:03 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <20170911213328.9701-1-f4bug@amsat.org>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <8a8b104d-a2db-4f8a-0e51-11a21b4bc156@twiddle.net>
-Date: Tue, 12 Sep 2017 11:22:58 -0700
+	(envelope-from <groug@kaod.org>) id 1drpuf-0004Sb-OS
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:28:01 -0400
+Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:41091)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1drpuf-0004S6-He
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:27:57 -0400
+Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 16E8CAA8F7
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 20:27:55 +0200 (CEST)
+Date: Tue, 12 Sep 2017 20:27:42 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170912202742.6e16b5d0@bahia.lab.toulouse-stg.fr.ibm.com>
+In-Reply-To: <CAFEAcA_geEmuB5mdTZ2BrvpwOve5w9++eAfRXmNTZh+36__VqA@mail.gmail.com>
+References: <20170908103558.31632-1-david@gibson.dropbear.id.au>
+	<20170908103558.31632-3-david@gibson.dropbear.id.au>
+	<CAFEAcA_geEmuB5mdTZ2BrvpwOve5w9++eAfRXmNTZh+36__VqA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170911213328.9701-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 0/5] move user-exec, tcg-runtime,
- atomic_template.h to accel/tcg/
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/qIdKMWqFS1GOFc4M5K_cn8v";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [Qemu-ppc] [PULL 02/40] hw/ppc: clear
+ pending_events on machine reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,21 +33,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, QEMU Developers <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>, Sam Bobroff <sam.bobroff@au1.ibm.com>
 
-On 09/11/2017 02:33 PM, Philippe Mathieu-Daudé wrote:
-> 
-> Philippe Mathieu-Daudé (4):
->   tcg: move user-exec
->   tcg: move tcg-runtime to accel/tcg/
->   tcg: move atomic_template.h to accel/tcg/
->   tcg: restrict i386 regs definitions
-> 
-> Thomas Huth (1):
->   tcg: Move softmmu_template.h to the accel/tcg/ folder
+--Sig_/qIdKMWqFS1GOFc4M5K_cn8v
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Queued 1-4.
+On Tue, 12 Sep 2017 18:28:04 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
+
+> On 8 September 2017 at 11:35, David Gibson <david@gibson.dropbear.id.au> =
+wrote:
+> > From: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> >
+> > The sPAPR machine isn't clearing up the pending events QTAILQ on
+> > machine reboot. This allows for unprocessed hotplug/epow events
+> > to persist in the queue after reset and, when reasserting the IRQs in
+> > check_exception later on, these will be being processed by the OS.
+> >
+> > This patch implements a new function called 'spapr_clear_pending_events'
+> > that clears up the pending_events QTAILQ. This helper is then called
+> > inside ppc_spapr_reset to clear up the events queue, preventing
+> > old/deprecated events from persisting after a reset.
+> >
+> > Signed-off-by: Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+> > Signed-off-by: David Gibson <david@gibson.dropbear.id.au> =20
+>=20
+> > +void spapr_clear_pending_events(sPAPRMachineState *spapr)
+> > +{
+> > +    sPAPREventLogEntry *entry =3D NULL;
+> > +
+> > +    QTAILQ_FOREACH(entry, &spapr->pending_events, next) {
+> > +        QTAILQ_REMOVE(&spapr->pending_events, entry, next);
+> > +        g_free(entry->extended_log);
+> > +        g_free(entry);
+> > +    }
+> > +} =20
+>=20
+> Coverity points out that this is a use-after-free error,
+> because QTAILQ_FOREACH will access the list pointers of
+> entry after the loop body has freed it. You want
+> QTAILQ_FOREACH_SAFE, I think. (CID 1381017)
+>=20
+
+Yes indeed, QTAILQ_FOREACH_SAFE() is needed when removing
+the current element from the list. I'll send a patch.
+
+> thanks
+> -- PMM
+>=20
 
 
-r~
+--Sig_/qIdKMWqFS1GOFc4M5K_cn8v
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbgnHgAKCRAC/DrrAQHb
+whgjAJ41B2DVGh+oUzYJ7S60p5Bmb2CKywCfV2vxgK4nZa85VLcfzMXYfwjE5mo=
+=YXYj
+-----END PGP SIGNATURE-----
+
+--Sig_/qIdKMWqFS1GOFc4M5K_cn8v--
