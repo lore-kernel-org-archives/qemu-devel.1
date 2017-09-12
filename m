@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40140)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dridZ-0002ag-LR
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:41:50 -0400
+	(envelope-from <thuth@redhat.com>) id 1drihL-0004Ul-W6
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:45:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dridT-0002Zb-QN
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:41:49 -0400
-Date: Tue, 12 Sep 2017 20:23:31 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170912102331.GB7550@umbus.fritz.box>
-References: <150519908146.11227.1999305745123047542.stgit@bahia.lan>
+	(envelope-from <thuth@redhat.com>) id 1drihK-0005jk-Fc
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:45:43 -0400
+References: <20170911172022.4738-1-eblake@redhat.com>
+	<20170911172022.4738-32-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <1a629362-ebc5-7d28-463c-f6ec4639d29b@redhat.com>
+Date: Tue, 12 Sep 2017 12:45:26 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="i0/AhcQY5QxfSsSZ"
-Content-Disposition: inline
-In-Reply-To: <150519908146.11227.1999305745123047542.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH v3] spapr_cpu_core: cleaning up
- qdev_get_machine() calls
+In-Reply-To: <20170911172022.4738-32-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 31/38] libqtest: Merge qtest_clock_*()
+ with clock_*()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,89 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Daniel Henrique Barboza <danielhb@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, pbonzini@redhat.com, John Snow <jsnow@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>
 
-
---i0/AhcQY5QxfSsSZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Sep 12, 2017 at 08:51:21AM +0200, Greg Kurz wrote:
-> This patch removes the qdev_get_machine() calls that are made
-> in spapr_cpu_core.c in situations where we can get an existing
-> pointer for the MachineState by either passing it as an argument
-> to the function or by using other already available pointers.
->=20
-> Credits to Daniel Henrique Barboza for the idea and the changelog
-> text.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-
-Applied to ppc-for-2.11.
-
+On 11.09.2017 19:20, Eric Blake wrote:
+> Maintaining two layers of libqtest APIs, one that takes an explicit
+> QTestState object, and the other that uses the implicit global_qtest,
+> is annoying.  In the interest of getting rid of global implicit
+> state and having less code to maintain, merge:
+>  qtest_clock_set()
+>  qtest_clock_step()
+>  qtest_clock_step_next()
+> with their short counterparts.  All callers that previously
+> used the short form now make it explicit that they are relying on
+> global_qtest, and later patches can then clean things up to remove
+> the global variable.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > ---
-> v3: - dropped spapr_cpu_reset() hunk
-> ---
->  hw/ppc/spapr_cpu_core.c |    6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-> index dc9df0d393d1..dea298a796c4 100644
-> --- a/hw/ppc/spapr_cpu_core.c
-> +++ b/hw/ppc/spapr_cpu_core.c
-> @@ -162,10 +162,10 @@ static void spapr_cpu_core_unrealizefn(DeviceState =
-*dev, Error **errp)
->      g_free(sc->threads);
->  }
-> =20
-> -static void spapr_cpu_core_realize_child(Object *child, Error **errp)
-> +static void spapr_cpu_core_realize_child(Object *child,
-> +                                         sPAPRMachineState *spapr, Error=
- **errp)
->  {
->      Error *local_err =3D NULL;
-> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
->      CPUState *cs =3D CPU(child);
->      PowerPCCPU *cpu =3D POWERPC_CPU(cs);
->      Object *obj;
-> @@ -254,7 +254,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
-Error **errp)
->      for (j =3D 0; j < cc->nr_threads; j++) {
->          obj =3D sc->threads + j * size;
-> =20
-> -        spapr_cpu_core_realize_child(obj, &local_err);
-> +        spapr_cpu_core_realize_child(obj, spapr, &local_err);
->          if (local_err) {
->              goto err;
->          }
->=20
+>  tests/libqtest.h         | 50 ++++----------------------------
+>  tests/libqtest.c         |  6 ++--
+>  tests/e1000e-test.c      |  2 +-
+>  tests/fdc-test.c         |  4 +--
+>  tests/ide-test.c         |  2 +-
+>  tests/libqos/virtio.c    |  8 +++---
+>  tests/rtc-test.c         | 74 ++++++++++++++++++++++++------------------------
+>  tests/rtl8139-test.c     | 10 +++----
+>  tests/tco-test.c         | 22 +++++++-------
+>  tests/test-arm-mptimer.c | 25 +++++++++-------
+>  tests/wdt_ib700-test.c   | 12 ++++----
+>  11 files changed, 90 insertions(+), 125 deletions(-)
+> 
+> diff --git a/tests/libqtest.h b/tests/libqtest.h
+> index 5651b77d2f..26d5f37bc9 100644
+> --- a/tests/libqtest.h
+> +++ b/tests/libqtest.h
+> @@ -417,17 +417,17 @@ void qtest_bufwrite(QTestState *s, uint64_t addr,
+>  void qtest_memset(QTestState *s, uint64_t addr, uint8_t patt, size_t size);
+> 
+>  /**
+> - * qtest_clock_step_next:
+> + * clock_step_next:
+>   * @s: #QTestState instance to operate on.
+>   *
+>   * Advance the QEMU_CLOCK_VIRTUAL to the next deadline.
+>   *
+>   * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
+>   */
+> -int64_t qtest_clock_step_next(QTestState *s);
+> +int64_t clock_step_next(QTestState *s);
+> 
+>  /**
+> - * qtest_clock_step:
+> + * clock_step:
+>   * @s: QTestState instance to operate on.
+>   * @step: Number of nanoseconds to advance the clock by.
+>   *
+> @@ -435,10 +435,10 @@ int64_t qtest_clock_step_next(QTestState *s);
+>   *
+>   * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
+>   */
+> -int64_t qtest_clock_step(QTestState *s, int64_t step);
+> +int64_t clock_step(QTestState *s, int64_t step);
+> 
+>  /**
+> - * qtest_clock_set:
+> + * clock_set:
+>   * @s: QTestState instance to operate on.
+>   * @val: Nanoseconds value to advance the clock to.
+>   *
+> @@ -446,7 +446,7 @@ int64_t qtest_clock_step(QTestState *s, int64_t step);
+>   *
+>   * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanoseconds.
+>   */
+> -int64_t qtest_clock_set(QTestState *s, int64_t val);
+> +int64_t clock_set(QTestState *s, int64_t val);
+ Could we please keep the "qtest" prefix here and rather get rid of the
+other ones? Even if it's more to type, I prefer to have a proper prefix
+here so that it is clear at the first sight that the functions belong to
+the qtest framework.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---i0/AhcQY5QxfSsSZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm3taEACgkQbDjKyiDZ
-s5LwyA/9HdifXrw/gOtOkHysp5YzGZjBYbxt3ADBz6lzhDFGSGcXa4cqHNruD2Ll
-+p23K+E6M3tFxl4kX+kfaQkNEl8314cPEenFWcyqR8L947xvu70QaFFA3te4VyYV
-G+HfqM7vH0l8SSwdMZP1H8mvSdtDXhVTrDXprAAEaWtiBRxQACKGpDsZ750chc5a
-1FQAR5+8ogiGQmSNpiNO6+UHoVcDvys1aouErFDnfJisLz7s7yuAEhPlt7AR+jiQ
-a5ugzH27W3jws4cCoxa9rbmNeD8NsfW0Ef0Zpn5PFGFzE+XiF6Rh17DMThyejnkW
-xY6245Ss+Bj5yEA4fOzMrswZ4B5+DzKNsBvEYqOMuJIUfMKn58Za+BOpRP06NPm+
-MhRUbG+7UK1X2P8N1TTl7d6V7zUm/cETx4TU1e0FbM2aQikd0Lib01c2nhyDcAEz
-n17cxAUSttmR8aTe5oWP6e1MiYnle+A7jxlvGbdryTB1KOTRW65X1ClsmD00+z6F
-/ZUBSGhfx+yAygo+IVaT7VIgMHEL4sokaiIOC2JPQcDdRQu8ObbGYrXEkk5P8me8
-IrpljLIn6YMzYpHJedTU3z1s6LT0m48uGRFEA8cjwkVFCzuywa1OBSSpn6oZHi5x
-cMEzMYBqXjXKHQj2Y64lV3Dr6FS277bP1YfEji+85GhXDGEZ4i0=
-=X0FY
------END PGP SIGNATURE-----
-
---i0/AhcQY5QxfSsSZ--
+ Thomas
