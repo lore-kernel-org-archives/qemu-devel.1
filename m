@@ -1,25 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46699)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47114)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drfv6-00078A-GA
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:47:45 -0400
+	(envelope-from <ramysameh26@gmail.com>) id 1drfwa-0008Do-34
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:49:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drfv1-0001xk-LQ
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:47:44 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44920)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drfv1-0001uH-Fx
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:47:39 -0400
-References: <20170911210129.5874-1-f4bug@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8a100b98-79d2-d209-ee7f-9a46ae74b11e@redhat.com>
-Date: Tue, 12 Sep 2017 09:47:25 +0200
+	(envelope-from <ramysameh26@gmail.com>) id 1drfwZ-0002po-1I
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:49:16 -0400
+Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:36464)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ramysameh26@gmail.com>)
+	id 1drfwY-0002ox-Pq
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:49:14 -0400
+Received: by mail-io0-x235.google.com with SMTP id d16so41590527ioj.3
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 00:49:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170911210129.5874-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] test-qga: add missing qemu-ga tool
- dependency
+In-Reply-To: <CAF6HrYx6_uv-K3JouTb4WTrEEkX25VrhkjAVg8mWG3iarvA=AA@mail.gmail.com>
+References: <CAF6HrYxj5BoTQpQjz95Z1_N_p615jpEE12xh_afuuqE4fcTyLg@mail.gmail.com>
+	<CAFEAcA9YNO7kgC8yzZ_RUKck=+98pUET0ogVZ7TvC1kxV+_fFA@mail.gmail.com>
+	<CAF6HrYwT7WP_i7cVhvEyRvqSK7J+bLnKU4b+WrMQfVkLaNDrvQ@mail.gmail.com>
+	<CAFEAcA9kEEyUj7=7Wd-jNbVOWwfgkj0a201q+L4e5CDR22JUgw@mail.gmail.com>
+	<CAF6HrYw9B1ns0ZVtU_gxqJZxOe0dG03UQiAV7FHxBB-wQh6kNQ@mail.gmail.com>
+	<CAF6HrYym57hZjSFE=iExPkp8vBX82zqXvTxh8GJDYNPL1FTSqA@mail.gmail.com>
+	<CAFEAcA_iKqs_QXz_qSwsOw6A-Z1BJjVN3WPAgaERejWQXrQhNw@mail.gmail.com>
+	<CAF6HrYx6_uv-K3JouTb4WTrEEkX25VrhkjAVg8mWG3iarvA=AA@mail.gmail.com>
+From: Ramy Sameh <ramysameh26@gmail.com>
+Date: Tue, 12 Sep 2017 09:49:11 +0200
+Message-ID: <CAF6HrYym9698mDgQWmKd+q6dVxn1e4DHSm39boaK5mp8CJR0NQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] Questions regarding emulated UART in VersatilePB
+ board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +36,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Michael Roth <mdroth@linux.vnet.ibm.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, Eric Blake <eblake@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Ahmed Aly <ahmedaly50@gmail.com>
 
-On 11/09/2017 23:01, Philippe Mathieu-Daud=C3=A9 wrote:
-> this fixes running 'make check-unit' without running 'make all' beforeh=
-and:
->=20
-> $ make check-unit
->   ...
->   GTESTER tests/test-qga
-> **
-> ERROR:tests/test-qga.c:73:fixture_setup: assertion failed (error =3D=3D=
- NULL): Failed to execute child process "/build/qemu/qemu-ga" (No such fi=
-le or directory) (g-exec-error-quark, 8)
+Hello Peter,
 
-Queued, thanks.
+Any suggestions regarding this topic ?
 
-Paolo
+On Sun, Sep 10, 2017 at 8:33 PM, Ramy Sameh <ramysameh26@gmail.com> wrote:
 
-> make: *** [check-tests/test-qga] Error 1
->=20
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> ---
-> occured trying to split Travis jobs to run more/faster
->=20
->  tests/Makefile.include | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->=20
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index fae5715e9c..59e027f6ea 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -832,7 +832,8 @@ endif
->  qtest-obj-y =3D tests/libqtest.o $(test-util-obj-y)
->  $(check-qtest-y): $(qtest-obj-y)
-> =20
-> -tests/test-qga: tests/test-qga.o $(qtest-obj-y)
-> +tests/test-qga$(EXESUF): qemu-ga$(EXESUF)
-> +tests/test-qga$(EXESUF): tests/test-qga.o $(qtest-obj-y)
-> =20
->  SPEED =3D quick
->  GTESTER_OPTIONS =3D -k $(if $(V),--verbose,-q)
->=20
+> Thanks Peter.
+>
+> I have made a program to read a string from the UART, then write it again
+> to the UART.
+> I made a function to manipulate values in the pl011 registers (bit
+> flipping the flags inside the registers).
+> The target is to simulate hardware fault injection.
+>
+> For each run of the program, I made a bit-flip in *only one flag* in *one
+> register*, and I observed the output of the program.
+>
+> *My question is*: where to invoke the call of this fault injection
+> function to cause *the maximum effect* on the program's output?
+>
+> *p.s.* I invoked it once inside pl011_read function, and the program gave
+> a certain output, and I invoked it again in pl011_update, and it gave
+> another output.
+> When I invoked the function in pl011_write, the faults injected had no
+> effect on the output of the program!
+>
+> Do you have an explanation for this behaviour?
+>
+> Thanks in advance.
+>
+>
+> On Wed, Sep 6, 2017 at 2:18 PM, Peter Maydell <peter.maydell@linaro.org>
+> wrote:
+>
+>> On 6 September 2017 at 13:12, Ramy Sameh <ramysameh26@gmail.com> wrote:
+>> > Do the emulated baud rate registers have any effect? (I think they would
+>> > have no effect, because there is no real clock that can be used to
+>> produce
+>> > the baud rate).
+>>
+>> No, they don't have any effect. (In this UART model we don't implement
+>> the feature that you can connect a guest serial port to a host serial
+>> port and have the guest baud rate etc settings propagate through.
+>> We do that in other UART models and maybe one day we'll add it here,
+>> but for now, baud rate settings are ignored.)
+>>
+>> thanks
+>> -- PMM
+>>
+>
+>
+>
+> --
+> Best Regards,
+> Ramy Sameh
+> Embedded Software Engineer
+> +2-010-172-777-14
+>
+
+
+
+-- 
+Best Regards,
+Ramy Sameh
+Embedded Software Engineer
++2-010-172-777-14
