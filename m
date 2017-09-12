@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45447)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drfnl-0004q9-DQ
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:40:10 -0400
+	(envelope-from <imammedo@redhat.com>) id 1drfnl-0004q8-DK
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:40:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drfng-0008EL-Hb
+	(envelope-from <imammedo@redhat.com>) id 1drfnh-0008ET-3D
 	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:40:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37214)
+Received: from mx1.redhat.com ([209.132.183.28]:10328)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drfng-0008Dy-B4
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:40:04 -0400
-References: <20170911174933.20789-1-david@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <55ff3bc7-6e83-5347-4a7d-e77058e84abc@redhat.com>
-Date: Tue, 12 Sep 2017 09:39:50 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1drfng-0008EF-Se
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:40:05 -0400
+Date: Tue, 12 Sep 2017 09:40:01 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170912094001.04e7a84a@nial.brq.redhat.com>
+In-Reply-To: <CAFEAcA_41Dkh4EdvCWWcnFHZaspOBA0FewKKK22kQ0v97pKG0Q@mail.gmail.com>
+References: <CAFEAcA_sk792HSvX7=6hnd2PEZ+FoVz=JEcBKu5CbLW5drzMhQ@mail.gmail.com>
+	<20170904213851.107ed8c8@Igors-MacBook-Pro.local>
+	<CAFEAcA8H==oJGm=rkjHUG-DPTo+PhqLcb=RG-Gb6oG+dUYVi3Q@mail.gmail.com>
+	<20170911141016.2352b022@nial.brq.redhat.com>
+	<CAFEAcA_41Dkh4EdvCWWcnFHZaspOBA0FewKKK22kQ0v97pKG0Q@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170911174933.20789-1-david@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 0/6] QEMU: kvm: cleanup kvm_slot handling
+Subject: Re: [Qemu-devel] qdev_get_machine() can return something non-NULL
+ but not TYPE_MACHINE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +31,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, kvm@vger.kernel.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
 
-On 11/09/2017 19:49, David Hildenbrand wrote:
-> We can heavily simplify the kvm_slot code. Flatview will make sure that we
-> don't have to deal with overlapping slots. E.g. when a memory section is
-> resized, we are first notified about the removal and then about the new
-> memory section.
-> 
-> So basically, we can directly always map one memory section to one
-> kvm slot (if the fixed up size is > 0).
-> 
-> 
-> RFC -> v1:
-> - minor changes to avoid changing indentation, therefore making it easier
->   to review
+On Mon, 11 Sep 2017 14:33:03 +0100
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-Queued, thanks!
+> On 11 September 2017 at 13:10, Igor Mammedov <imammedo@redhat.com> wrote:
+> > On Tue, 5 Sep 2017 10:08:01 +0100
+> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> >  
+> >> On 4 September 2017 at 20:38, Igor Mammedov <imammedo@redhat.com> wrote:  
+> >> > On Mon, 4 Sep 2017 17:36:59 +0100
+> >> > Peter Maydell <peter.maydell@linaro.org> wrote:
+> >> >  
+> >> >> I just got bitten by qdev_get_machine()'s behaviour on the user-only
+> >> >> emulators, where it can return something that isn't NULL and isn't
+> >> >> an instance of TYPE_MACHINE either.  
+> >> > user-only shouldn't get to qdev_get_machine() at all,
+> >> > issue probably in container_get().  
+> >>
+> >> I need it in cpu_common_realizefn(), for
+> >> http://patchwork.ozlabs.org/patch/797940/  
+> > Link might be broken (unable to connect to server)  
+> 
+> Works for me, but it is in master now anyway, commit
+> ed860129acd3fcd0b1.
+> 
+> > Anyways I'd avoid using machine from cpu_*_realizefn(),
+> > instead of I'd add property to CPU that has needed data
+> > and set it from board code. Should work fine for *-user targets
+> > and maintain clear separation of device impl. and board details.  
+> 
+> It's not possible in all cases to set a CPU property from the
+> top level board code. In quite a lot of cases the CPU
+> object is created by an SoC object which is in turn
+> created by the board code, and there is no plumbing
+> there to pass arbitrary properties through to the CPU
+> object...
+there is a cleaner way without cpu accessing machine,
+make it property of cpu and use compat machinery that
+was invented for fixing up stuff of this kind.
 
-Paolo
+SET_MACHINE_COMPAT(MachineClass,
+                   { .driver = "arm-cpu",
+                     .property = "foo",
+                     .value    = "off",
+                   }
+                  )
 
 > 
-> David Hildenbrand (6):
->   kvm: require JOIN_MEMORY_REGIONS_WORKS
->   kvm: factor out alignment of memory section
->   kvm: use start + size for memory ranges
->   kvm: we never have overlapping slots in kvm_set_phys_mem()
->   kvm: kvm_log_start/stop are only called with known sections
->   kvm: kvm_log_sync() is only called with known memory sections
-> 
->  accel/kvm/kvm-all.c | 235 +++++++++++++++-------------------------------------
->  1 file changed, 68 insertions(+), 167 deletions(-)
-> 
+> thanks
+> -- PMM
