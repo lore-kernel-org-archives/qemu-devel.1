@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drsp2-0004HB-Vy
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:34:21 -0400
+	(envelope-from <eblake@redhat.com>) id 1drspl-0004ui-4w
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:35:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drsoy-0004pt-NR
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:34:21 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:51449)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drsoy-0004pU-CK
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:34:16 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 13 Sep 2017 00:34:01 +0300
-Message-Id: <150525204093.15988.8421573656094243079.stgit@frigg.lan>
-In-Reply-To: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
-References: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
+	(envelope-from <eblake@redhat.com>) id 1drspk-0005OP-5x
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:35:05 -0400
+References: <20170912144459.11359-1-pbonzini@redhat.com>
+	<20170912144459.11359-5-pbonzini@redhat.com>
+	<7d63b366-37a4-bfbe-790b-9a1ceb0d2893@redhat.com>
+	<1767007484.5449466.1505251616671.JavaMail.zimbra@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <732c98f0-a771-ef6f-e674-a11366653162@redhat.com>
+Date: Tue, 12 Sep 2017 16:34:55 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 08/22] instrument: [hmp] Add library loader
+In-Reply-To: <1767007484.5449466.1505251616671.JavaMail.zimbra@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KKkSQiAhkoV5KTGhTl84ogu1KNxDTxI3f"
+Subject: Re: [Qemu-devel] [PATCH 04/10] qemu-iotests: cleanup and fix search
+ for programs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,106 +27,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- hmp-commands.hx |   32 ++++++++++++++++++++++++++++++++
- monitor.c       |   39 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 71 insertions(+)
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KKkSQiAhkoV5KTGhTl84ogu1KNxDTxI3f
+From: Eric Blake <eblake@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org
+Message-ID: <732c98f0-a771-ef6f-e674-a11366653162@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 04/10] qemu-iotests: cleanup and fix search
+ for programs
+References: <20170912144459.11359-1-pbonzini@redhat.com>
+ <20170912144459.11359-5-pbonzini@redhat.com>
+ <7d63b366-37a4-bfbe-790b-9a1ceb0d2893@redhat.com>
+ <1767007484.5449466.1505251616671.JavaMail.zimbra@redhat.com>
+In-Reply-To: <1767007484.5449466.1505251616671.JavaMail.zimbra@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 1941e19932..2e8ebe8422 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1858,6 +1858,38 @@ ETEXI
-         .sub_table  =3D info_cmds,
-     },
-=20
-+#ifdef CONFIG_INSTRUMENT
-+    {
-+        .name       =3D "instr-load",
-+        .args_type  =3D "path:F,id:s?,arg:s?",
-+        .params     =3D "path [id] [arg]",
-+        .help       =3D "load an instrumentation library",
-+        .cmd        =3D hmp_instr_load,
-+    },
-+#endif
-+
-+STEXI
-+@item instr-load @var{path} [@var{id}] [@var{arg}]
-+@findex instr-load
-+Load an instrumentation library.
-+ETEXI
-+
-+#ifdef CONFIG_INSTRUMENT
-+    {
-+        .name       =3D "instr-unload",
-+        .args_type  =3D "id:s",
-+        .params     =3D "id",
-+        .help       =3D "unload an instrumentation library",
-+        .cmd        =3D hmp_instr_unload,
-+    },
-+#endif
-+
-+STEXI
-+@item instr-unload
-+@findex instr-unload
-+Unload an instrumentation library.
-+ETEXI
-+
- STEXI
- @end table
- ETEXI
-diff --git a/monitor.c b/monitor.c
-index e031aa2687..7b80d5351f 100644
---- a/monitor.c
-+++ b/monitor.c
-@@ -2323,6 +2323,45 @@ int monitor_fd_param(Monitor *mon, const char *fdn=
-ame, Error **errp)
-     return fd;
- }
-=20
-+#ifdef CONFIG_INSTRUMENT
-+static void hmp_instr_load(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err =3D NULL;
-+    const char *path =3D qdict_get_str(qdict, "path");
-+    const char *id =3D qdict_get_try_str(qdict, "id");
-+    const char *str =3D qdict_get_try_str(qdict, "arg");
-+    strList args;
-+
-+    args.value =3D (char *)str;
-+    args.next =3D NULL;
-+
-+    InstrLoadResult *res =3D qmp_instr_load(path,
-+                                          id !=3D NULL, id,
-+                                          args.value !=3D NULL, &args,
-+                                          &err);
-+    if (err) {
-+        error_report_err(err);
-+    } else {
-+        monitor_printf(mon, "Handle: %s\n", res->id);
-+        monitor_printf(mon, "OK\n");
-+    }
-+    qapi_free_InstrLoadResult(res);
-+}
-+
-+static void hmp_instr_unload(Monitor *mon, const QDict *qdict)
-+{
-+    Error *err =3D NULL;
-+    const char *id =3D qdict_get_str(qdict, "id");
-+
-+    qmp_instr_unload(id, &err);
-+    if (err) {
-+        error_report_err(err);
-+    } else {
-+        monitor_printf(mon, "OK\n");
-+    }
-+}
-+#endif
-+
- /* Please update hmp-commands.hx when adding or changing commands */
- static mon_cmd_t info_cmds[] =3D {
- #include "hmp-commands-info.h"
+On 09/12/2017 04:26 PM, Paolo Bonzini wrote:
+>=20
+>=20
+>>> +then
+>>> +    if [ -x "$build_iotests/qemu" ]; then
+>>> +        export QEMU_PROG=3D"$build_iotests/qemu"
+>>> +    elif [ -x "$build_root/$arch-softmmu/qemu-system-$arch" ]; then
+>>> +        export QEMU_PROG=3D"$build_root/$arch-softmmu/qemu-system-$a=
+rch"
+>>> +    else
+>>> +        pushd "$build_root" > /dev/null
+>>
+>> Shouldn't you check for failure to change directories?
+>> =20
+>>>  export PWD=3D`pwd`
+>>> =20
+>>> @@ -30,28 +31,6 @@ export _QEMU_HANDLE=3D0
+>>>  # make sure we have a standard umask
+>>>  umask 022
+>>> =20
+>>> -# $1 =3D prog to look for, $2* =3D default pathnames if not found in=
+ $PATH
+>>> -set_prog_path()
+>>> -{
+>>> -    p=3D`command -v $1 2> /dev/null`
+>>> -    if [ -n "$p" -a -x "$p" ]; then
+>>
+>> Urrgh - your use of [ -a ] was pre-existing, and you just moved it.
+>=20
+> And same for pushd...
+
+True - since this patch is just code motion, we can do the cleanups in a
+different patch, so you can have:
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--KKkSQiAhkoV5KTGhTl84ogu1KNxDTxI3f
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm4Uv8ACgkQp6FrSiUn
+Q2qmYAf/ZF/HJ6r5uJFewQY8pL/udpLaxQKiR05g/YsmA+08BEMcsbYp/Gmynr2S
+cWP10bQJlxPrwXI5GcWSOujkpzff3dlDxwkViuzboBWI7o0W9FfpgrM229lgUYrH
+L1I3QoNSZJs4m5Fj3h3GnOddMIMsXYGYsfHzxism7Oq6kVlxoBSF7Fv23y+FEjvt
+91+awpoxoe11NgiGvUnDNyyoxHKKWFBHCCeyDri9RCILx5KeFO1k4PmmaKEFBlDN
+QZUicrG0vIRl1BUyb1PI6pY8JlMRf0Fb7TbtztZS60jOUG6hpH/LAu+Mce2x9f2D
+OmgcfR1aYiIXh5VA+48a5SrayvdsKA==
+=ph6Z
+-----END PGP SIGNATURE-----
+
+--KKkSQiAhkoV5KTGhTl84ogu1KNxDTxI3f--
