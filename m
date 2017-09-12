@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44752)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44993)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1drhMf-0004o6-Mp
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:20:18 -0400
+	(envelope-from <stefanha@redhat.com>) id 1drhNQ-0005AG-Tr
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:21:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1drhMb-0001nb-N9
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:20:17 -0400
-Received: from smtp.mail.uni-mannheim.de ([134.155.96.80]:35179)
+	(envelope-from <stefanha@redhat.com>) id 1drhNL-0002Qw-AK
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:21:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36426)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <sw@weilnetz.de>) id 1drhMb-0001m4-GD
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:20:13 -0400
-From: Stefan Weil <sw@weilnetz.de>
-References: <20170911022839.23231-1-f4bug@amsat.org>
-	<1c72c0c6-bd29-5228-d4ad-b26b11afa712@linaro.org>
-	<CAFEAcA9+iDKf7UmQ2tevR9KQb_F2fJoBY03zrMMwM7ypFUdeAw@mail.gmail.com>
-	<cff16e31-4be0-9665-62d7-88a12b6d0b56@weilnetz.de>
-Message-ID: <15608989-cb43-a522-9a7d-b57b3a393155@weilnetz.de>
-Date: Tue, 12 Sep 2017 11:20:12 +0200
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1drhNL-0002QL-4o
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:20:59 -0400
+Date: Tue, 12 Sep 2017 10:20:51 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170912092051.GB6123@stefanha-x1.localdomain>
+References: <1504888905-22396-1-git-send-email-chugh.ishani@research.iiit.ac.in>
 MIME-Version: 1.0
-In-Reply-To: <cff16e31-4be0-9665-62d7-88a12b6d0b56@weilnetz.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/tci: do not use ldst label (never
- implemented)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1504888905-22396-1-git-send-email-chugh.ishani@research.iiit.ac.in>
+Subject: Re: [Qemu-devel] [PATCH v4 0/3] QEMU Backup Tool
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +26,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Ishani Chugh <chugh.ishani@research.iiit.ac.in>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, famz@redhat.com
 
-Am 12.09.2017 um 10:52 schrieb Stefan Weil:
-> Am 11.09.2017 um 20:24 schrieb Peter Maydell:
->> I've also turned on a tci compile check on my pre-merge tests.
->> (It doesn't pass "make check" for me, though...) thanks -- PMM
+On Fri, Sep 08, 2017 at 10:11:42PM +0530, Ishani Chugh wrote:
+> This patch series is intended to introduce QEMU Backup tool.
+> qemu-backup will be a command-line tool for performing full and
+> incremental disk backups on running VMs. It is intended as a
+> reference implementation for management stack and backup developers
+> to see QEMU's backup features in action.
+> This patch series contains three patches,
+>                1) QEMU Backup command line tool.
+>                2) Test for full backup.
+>                3) Manpage for the tool.
+> v4:
+> * Reorganize patch structure.
+> * Modify commit message for backup tool commit.
+> * Organize examples by subcommands.
+> * Add checks for required arguments.
+> * Adds required arguments group to mandatory arguments.
+> * Add checks for validating socket path.
 > 
-> "make check-qtest-ppc64" fails for me, too.
+> Ishani Chugh (3):
+>   Add manpage for QEMU Backup Tool
+>   backup: Adds Backup Tool
+>   Test for full Backup
 > 
-> Thomas, this seems to be again the well known timing problem
-> in tests/prom-env-test.c. The time for the test had been
-> changedfrom 30 s to 10 s to 120 s in the past.
-
-... changed from 10 s to 30 s to 120 s ...
-
-> For TCI, even that latest value is not sufficient when
-> testing with pseries. Of course that also depends on other
-> parameters (speed of test machine, compiler flags).
+>  Makefile                        |  14 +-
+>  contrib/backup/qemu-backup.py   | 373 ++++++++++++++++++++++++++++++++++++++++
+>  contrib/backup/qemu-backup.texi | 142 +++++++++++++++
+>  tests/qemu-iotests/191          |  86 +++++++++
+>  tests/qemu-iotests/191.out      |  35 ++++
+>  tests/qemu-iotests/group        |   1 +
+>  6 files changed, 647 insertions(+), 4 deletions(-)
+>  create mode 100755 contrib/backup/qemu-backup.py
+>  create mode 100644 contrib/backup/qemu-backup.texi
+>  create mode 100755 tests/qemu-iotests/191
+>  create mode 100644 tests/qemu-iotests/191.out
 > 
-> In my test pseries took nearly 5 minutes, so the test passes
-> when the loop upper limit is increased to 30000.
+> --
+> 2.7.4
 
-Timing data for prom-env-test with TCI on another test machine:
+Aside from Fam's comment:
 
-mac99:   78 s
-g3beige: 74 s
-pseries: 477 s
-
-> 
-> Is there a better way to handle this test? Why does pseries
-> still need much more time than the other machines
-> (not only with TCI)?
-> 
-> Regards,
-> Stefan
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
