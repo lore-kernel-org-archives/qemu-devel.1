@@ -1,24 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49657)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49819)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1drnKq-0001A8-8K
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:42:50 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drnLH-0001eX-PT
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:43:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1drnKo-00028N-5D
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:42:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53150)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1drnKn-00027y-Rx
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:42:46 -0400
-Date: Tue, 12 Sep 2017 17:42:37 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170912174237.2b994ef5@Igors-MacBook-Pro.local>
-In-Reply-To: <20170904185622.24520-1-ehabkost@redhat.com>
-References: <20170904185622.24520-1-ehabkost@redhat.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1drnLD-0002KP-Nz
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:43:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41034)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1drnLD-0002Jw-EV
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:43:11 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8CFgcKW040070
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 11:43:09 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cxe6ff4hp-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 11:43:09 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 12 Sep 2017 16:43:06 +0100
+References: <20170908152446.14606-1-pasic@linux.vnet.ibm.com>
+	<20170908152446.14606-5-pasic@linux.vnet.ibm.com>
+	<20170911120722.17236996.cohuck@redhat.com>
+	<81215214-82a2-801f-3b5b-f649726f00c6@linux.vnet.ibm.com>
+	<20170912163724.08a73a63.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 12 Sep 2017 17:43:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] i386: Use designated initializers on
- feat_names arrays
+In-Reply-To: <20170912163724.08a73a63.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <5b0495da-df9b-22b5-afc4-66b6a4f33122@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] s390x/css: fix incorrect length
+ indication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,343 +46,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Mon,  4 Sep 2017 15:56:22 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-> Using designated initializers for feat_names allows us to omit
-> NULL entries, and makes mistakes easier to spot (especially when
-> cherry-picking or merging commits).
+
+On 09/12/2017 04:37 PM, Cornelia Huck wrote:
+> On Mon, 11 Sep 2017 13:36:29 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 > 
-> Arrays that have very few entries were changed to have a
-> designator for every element.  Arrays that have almost every item
-> present were changed to have one designator every 4 entries.
-> Arrays that had only NULL entries had the initializers completely
-> removed.
+>> On 09/11/2017 12:07 PM, Cornelia Huck wrote:
+>>> On Fri,  8 Sep 2017 17:24:46 +0200
+>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+>>>   
+>>>> We report incorrect length via SCSW program check instead of incorrect
+>>>> length check (SCWS word 2 bit 10 instead of bit 9). Since we have there
+>>>> is no fitting errno for incorrect length, and since I don't like what we
+>>>> do with the errno's, as part of the fix, errnos used for control flow in
+>>>> ccw interpretation are replaced with an enum using more speaking names.  
+>>>
+>>> I'm not sure whether this is the way to go. I mainly dislike the size
+>>> of the patch (and the fact that it mixes a fix and a change of function
+>>> signature).  
+>>
+>> Do you agree that we should move away from POSIX errno codes? I think
+>> if we do, this cant' get much smaller.
 > 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-I'm getting build errors with it on MacOS,
-here is one for example:
-
-qemu/target/i386/cpu.c:342:14: error: use of undeclared identifier 'KVM_FEATURE_CLOCKSOURCE'
-            [KVM_FEATURE_CLOCKSOURCE] = "kvmclock",
-
->  target/i386/cpu.c | 215 ++++++++++++++++++------------------------------------
->  1 file changed, 73 insertions(+), 142 deletions(-)
+> I'm not really a fan of defining our own return values, tbh.
 > 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 69676e13e1..9da5915dde 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -268,28 +268,28 @@ typedef struct FeatureWordInfo {
->  static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->      [FEAT_1_EDX] = {
->          .feat_names = {
-> -            "fpu", "vme", "de", "pse",
-> -            "tsc", "msr", "pae", "mce",
-> -            "cx8", "apic", NULL, "sep",
-> -            "mtrr", "pge", "mca", "cmov",
-> -            "pat", "pse36", "pn" /* Intel psn */, "clflush" /* Intel clfsh */,
-> -            NULL, "ds" /* Intel dts */, "acpi", "mmx",
-> -            "fxsr", "sse", "sse2", "ss",
-> -            "ht" /* Intel htt */, "tm", "ia64", "pbe",
-> +            [0] = "fpu", "vme", "de", "pse",
-> +            [4] = "tsc", "msr", "pae", "mce",
-> +            [8] = "cx8", "apic", NULL, "sep",
-> +            [12] = "mtrr", "pge", "mca", "cmov",
-> +            [16] = "pat", "pse36", "pn", "clflush",
-> +            [20] = NULL, "ds" /* Intel dts */, "acpi", "mmx",
-> +            [24] = "fxsr", "sse", "sse2", "ss",
-> +            [28] = "ht", "tm", "ia64", "pbe",
->          },
->          .cpuid_eax = 1, .cpuid_reg = R_EDX,
->          .tcg_features = TCG_FEATURES,
->      },
->      [FEAT_1_ECX] = {
->          .feat_names = {
-> -            "pni" /* Intel,AMD sse3 */, "pclmulqdq", "dtes64", "monitor",
-> -            "ds-cpl", "vmx", "smx", "est",
-> -            "tm2", "ssse3", "cid", NULL,
-> -            "fma", "cx16", "xtpr", "pdcm",
-> -            NULL, "pcid", "dca", "sse4.1",
-> -            "sse4.2", "x2apic", "movbe", "popcnt",
-> -            "tsc-deadline", "aes", "xsave", "osxsave",
-> -            "avx", "f16c", "rdrand", "hypervisor",
-> +            [0] = "pni" /* Intel,AMD sse3 */, "pclmulqdq", "dtes64", "monitor",
-> +            [4] = "ds-cpl", "vmx", "smx", "est",
-> +            [8] = "tm2", "ssse3", "cid", NULL,
-> +            [12] = "fma", "cx16", "xtpr", "pdcm",
-> +            [16] = NULL, "pcid", "dca", "sse4.1",
-> +            [20] = "sse4.2", "x2apic", "movbe", "popcnt",
-> +            [24] = "tsc-deadline", "aes", "xsave", "osxsave",
-> +            [28] = "avx", "f16c", "rdrand", "hypervisor",
->          },
->          .cpuid_eax = 1, .cpuid_reg = R_ECX,
->          .tcg_features = TCG_EXT_FEATURES,
-> @@ -301,131 +301,87 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->       */
->      [FEAT_8000_0001_EDX] = {
->          .feat_names = {
-> -            NULL /* fpu */, NULL /* vme */, NULL /* de */, NULL /* pse */,
-> -            NULL /* tsc */, NULL /* msr */, NULL /* pae */, NULL /* mce */,
-> -            NULL /* cx8 */, NULL /* apic */, NULL, "syscall",
-> -            NULL /* mtrr */, NULL /* pge */, NULL /* mca */, NULL /* cmov */,
-> -            NULL /* pat */, NULL /* pse36 */, NULL, NULL /* Linux mp */,
-> -            "nx", NULL, "mmxext", NULL /* mmx */,
-> -            NULL /* fxsr */, "fxsr-opt", "pdpe1gb", "rdtscp",
-> -            NULL, "lm", "3dnowext", "3dnow",
-> +            [11] = "syscall",
-> +            [20] = "nx",
-> +            [22] = "mmxext",
-> +            [25] = "fxsr-opt",
-> +            [26] = "pdpe1gb",
-> +            [27] = "rdtscp",
-> +            [29] = "lm",
-> +            [30] = "3dnowext",
-> +            [31] = "3dnow",
->          },
->          .cpuid_eax = 0x80000001, .cpuid_reg = R_EDX,
->          .tcg_features = TCG_EXT2_FEATURES,
->      },
->      [FEAT_8000_0001_ECX] = {
->          .feat_names = {
-> -            "lahf-lm", "cmp-legacy", "svm", "extapic",
-> -            "cr8legacy", "abm", "sse4a", "misalignsse",
-> -            "3dnowprefetch", "osvw", "ibs", "xop",
-> -            "skinit", "wdt", NULL, "lwp",
-> -            "fma4", "tce", NULL, "nodeid-msr",
-> -            NULL, "tbm", "topoext", "perfctr-core",
-> -            "perfctr-nb", NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> +            [0] = "lahf-lm", "cmp-legacy", "svm", "extapic",
-> +            [4] = "cr8legacy", "abm", "sse4a", "misalignsse",
-> +            [8] = "3dnowprefetch", "osvw", "ibs", "xop",
-> +            [12] = "skinit", "wdt", NULL, "lwp",
-> +            [16] = "fma4", "tce", NULL, "nodeid-msr",
-> +            [20] = NULL, "tbm", "topoext", "perfctr-core",
-> +            [24] = "perfctr-nb", NULL, NULL, NULL,
->          },
->          .cpuid_eax = 0x80000001, .cpuid_reg = R_ECX,
->          .tcg_features = TCG_EXT3_FEATURES,
->      },
->      [FEAT_C000_0001_EDX] = {
->          .feat_names = {
-> -            NULL, NULL, "xstore", "xstore-en",
-> -            NULL, NULL, "xcrypt", "xcrypt-en",
-> -            "ace2", "ace2-en", "phe", "phe-en",
-> -            "pmm", "pmm-en", NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> +            [0] = NULL, NULL, "xstore", "xstore-en",
-> +            [4] = NULL, NULL, "xcrypt", "xcrypt-en",
-> +            [8] = "ace2", "ace2-en", "phe", "phe-en",
-> +            [12] = "pmm", "pmm-en", NULL, NULL,
->          },
->          .cpuid_eax = 0xC0000001, .cpuid_reg = R_EDX,
->          .tcg_features = TCG_EXT4_FEATURES,
->      },
->      [FEAT_KVM] = {
->          .feat_names = {
-> -            "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
-> -            "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhalt",
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            "kvmclock-stable-bit", NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> +            [KVM_FEATURE_CLOCKSOURCE] = "kvmclock",
-> +            [KVM_FEATURE_NOP_IO_DELAY] = "kvm-nopiodelay",
-> +            [KVM_FEATURE_MMU_OP] = "kvm-mmu",
-> +            [KVM_FEATURE_CLOCKSOURCE2] = "kvmclock",
-> +            [KVM_FEATURE_ASYNC_PF] = "kvm-asyncpf",
-> +            [KVM_FEATURE_STEAL_TIME] = "kvm-steal-time",
-> +            [KVM_FEATURE_PV_EOI] = "kvm-pv-eoi",
-> +            [KVM_FEATURE_PV_UNHALT] = "kvm-pv-unhalt",
-> +            [KVM_FEATURE_CLOCKSOURCE_STABLE_BIT] = "kvmclock-stable-bit",
->          },
->          .cpuid_eax = KVM_CPUID_FEATURES, .cpuid_reg = R_EAX,
->          .tcg_features = TCG_KVM_FEATURES,
->      },
->      [FEAT_HYPERV_EAX] = {
-> -        .feat_names = {
-> -            NULL /* hv_msr_vp_runtime_access */, NULL /* hv_msr_time_refcount_access */,
-> -            NULL /* hv_msr_synic_access */, NULL /* hv_msr_stimer_access */,
-> -            NULL /* hv_msr_apic_access */, NULL /* hv_msr_hypercall_access */,
-> -            NULL /* hv_vpindex_access */, NULL /* hv_msr_reset_access */,
-> -            NULL /* hv_msr_stats_access */, NULL /* hv_reftsc_access */,
-> -            NULL /* hv_msr_idle_access */, NULL /* hv_msr_frequency_access */,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -        },
->          .cpuid_eax = 0x40000003, .cpuid_reg = R_EAX,
->      },
->      [FEAT_HYPERV_EBX] = {
-> -        .feat_names = {
-> -            NULL /* hv_create_partitions */, NULL /* hv_access_partition_id */,
-> -            NULL /* hv_access_memory_pool */, NULL /* hv_adjust_message_buffers */,
-> -            NULL /* hv_post_messages */, NULL /* hv_signal_events */,
-> -            NULL /* hv_create_port */, NULL /* hv_connect_port */,
-> -            NULL /* hv_access_stats */, NULL, NULL, NULL /* hv_debugging */,
-> -            NULL /* hv_cpu_power_management */, NULL /* hv_configure_profiler */,
-> -            NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -        },
->          .cpuid_eax = 0x40000003, .cpuid_reg = R_EBX,
->      },
->      [FEAT_HYPERV_EDX] = {
-> -        .feat_names = {
-> -            NULL /* hv_mwait */, NULL /* hv_guest_debugging */,
-> -            NULL /* hv_perf_monitor */, NULL /* hv_cpu_dynamic_part */,
-> -            NULL /* hv_hypercall_params_xmm */, NULL /* hv_guest_idle_state */,
-> -            NULL, NULL,
-> -            NULL, NULL, NULL /* hv_guest_crash_msr */, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -        },
->          .cpuid_eax = 0x40000003, .cpuid_reg = R_EDX,
->      },
->      [FEAT_SVM] = {
->          .feat_names = {
-> -            "npt", "lbrv", "svm-lock", "nrip-save",
-> -            "tsc-scale", "vmcb-clean",  "flushbyasid", "decodeassists",
-> -            NULL, NULL, "pause-filter", NULL,
-> -            "pfthreshold", NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> +            [0] = "npt", "lbrv", "svm-lock", "nrip-save",
-> +            [4] = "tsc-scale", "vmcb-clean",  "flushbyasid", "decodeassists",
-> +            [8] = NULL, NULL, "pause-filter", NULL,
-> +            [12] = "pfthreshold", NULL, NULL, NULL,
-> +
->          },
->          .cpuid_eax = 0x8000000A, .cpuid_reg = R_EDX,
->          .tcg_features = TCG_SVM_FEATURES,
->      },
->      [FEAT_7_0_EBX] = {
->          .feat_names = {
-> -            "fsgsbase", "tsc-adjust", NULL, "bmi1",
-> -            "hle", "avx2", NULL, "smep",
-> -            "bmi2", "erms", "invpcid", "rtm",
-> -            NULL, NULL, "mpx", NULL,
-> -            "avx512f", "avx512dq", "rdseed", "adx",
-> -            "smap", "avx512ifma", "pcommit", "clflushopt",
-> -            "clwb", NULL, "avx512pf", "avx512er",
-> -            "avx512cd", "sha-ni", "avx512bw", "avx512vl",
-> +            [0] = "fsgsbase", "tsc-adjust", NULL, "bmi1",
-> +            [4] = "hle", "avx2", NULL, "smep",
-> +            [8] = "bmi2", "erms", "invpcid", "rtm",
-> +            [12] = NULL, NULL, "mpx", NULL,
-> +            [16] = "avx512f", "avx512dq", "rdseed", "adx",
-> +            [20] = "smap", "avx512ifma", "pcommit", "clflushopt",
-> +            [24] = "clwb", NULL, "avx512pf", "avx512er",
-> +            [28] = "avx512cd", "sha-ni", "avx512bw", "avx512vl",
->          },
->          .cpuid_eax = 7,
->          .cpuid_needs_ecx = true, .cpuid_ecx = 0,
-> @@ -434,14 +390,13 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->      },
->      [FEAT_7_0_ECX] = {
->          .feat_names = {
-> -            NULL, "avx512vbmi", "umip", "pku",
-> -            "ospke", NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, "avx512-vpopcntdq", NULL,
-> -            "la57", NULL, NULL, NULL,
-> -            NULL, NULL, "rdpid", NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> +            [1] = "avx512vbmi",
-> +            [2] = "umip",
-> +            [3] = "pku",
-> +            [4] = "ospke",
-> +            [14] = "avx512-vpopcntdq",
-> +            [16] = "la57",
-> +            [22] = "rdpid",
->          },
->          .cpuid_eax = 7,
->          .cpuid_needs_ecx = true, .cpuid_ecx = 0,
-> @@ -450,14 +405,8 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->      },
->      [FEAT_7_0_EDX] = {
->          .feat_names = {
-> -            NULL, NULL, "avx512-4vnniw", "avx512-4fmaps",
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> +            [2] = "avx512-4vnniw",
-> +            [3] = "avx512-4fmaps",
->          },
->          .cpuid_eax = 7,
->          .cpuid_needs_ecx = true, .cpuid_ecx = 0,
-> @@ -466,14 +415,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->      },
->      [FEAT_8000_0007_EDX] = {
->          .feat_names = {
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            "invtsc", NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> +            [8] = "invtsc",
->          },
->          .cpuid_eax = 0x80000007,
->          .cpuid_reg = R_EDX,
-> @@ -482,14 +424,10 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->      },
->      [FEAT_XSAVE] = {
->          .feat_names = {
-> -            "xsaveopt", "xsavec", "xgetbv1", "xsaves",
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> +            [0] = "xsaveopt",
-> +            [1] = "xsavec",
-> +            [2] = "xgetbv1",
-> +            [3] = "xsaves",
->          },
->          .cpuid_eax = 0xd,
->          .cpuid_needs_ecx = true, .cpuid_ecx = 1,
-> @@ -498,14 +436,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
->      },
->      [FEAT_6_EAX] = {
->          .feat_names = {
-> -            NULL, NULL, "arat", NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> -            NULL, NULL, NULL, NULL,
-> +            [2] = "arat",
->          },
->          .cpuid_eax = 6, .cpuid_reg = R_EAX,
->          .tcg_features = TCG_6_EAX_FEATURES,
+
+I've suspected. But your statement, although being useful, does
+not answer my question. I think we need to agree on this question
+before proceeding.
+
+In my opinion both the EIO bug and this bug are great examples
+why the POSIX errno codes are sub-optimal and misleading, but
+that's my opinion.
+
+>>
+>>>
+>>> Can we instead choose a mapping for incorrect length, and defer a
+>>> possible rework?
+>>>   
+>>
+>> In the commit message, I say that I don't have a fitting errno.
+>> If you tell me which one to use, I would be glad to split this up.
+>> I don't like mixing re-factoring and changing behavior myself.
+>>
+>> Can I have your position on the re-factoring (that is let us
+>> imagine I did not change handling for incorrect length)?
+> 
+> If there is no return code that can be made to fit, we probably won't
+> be able to get around some kind of refactoring... but then I'd prefer
+> to do the refactoring first and the fix second.
+> 
+
+That is a can do. I dislike refactoring known bugs, because fixing
+bugs is usually higher priority than making the code nicer, or even
+marginally faster. (Btw I found these while trying to refactor.)
+This however is a weak principle of mine and can be easily overpowered
+by a maintainer request for example.
+
+>>
+>>> (Another idea would be to have the callback prepare the scsw via helper
+>>> functions. We'd just keep -EAGAIN to keep processing a chain and 0 to
+>>> stop.)
+>>>   
+>>
+>> That was my first idea how to improve on this. I should still have the
+>> code (patches), but I'm not sure whether it's clean or lumped together
+>> with other experiments.
+>>
+>> After pushing the handling down the call chain (caller would use
+>> inline functions to manipulate SCSW), I've realized that it does
+>> not buy us much/anything expect the better names, while we get
+>> the machine code manipulating the SCSW generated in multiple
+>> instead of in one place. I also showed the results to Dong Jia and
+>> he was ambivalent too: said something like it does look better,
+>> but it ain't better enough to make it worthwhile.
+>>
+>> This is why I've decided to go with a less intrusive approach:
+>> just change the names so that it's obvious what's happening.
+> 
+> Something like return channel_program_check(...); or so would be quite
+> obvious, I think.
+> 
+> But yes, it will be easier to evaluate this for an actual patch ;)
+> 
+
+OK, I will look into this, and probably send an RFC these days.
+
+>>>> For virtio, if incorrect length checking is suppressed we keep the
+>>>> current behavior (channel-program check).  
+>>>
+>>> Confused. If it is suppressed, there should not be an error, no?  
+>>
+>> No.
+>>
+>> From VIRTIO 1.0 4.3.1.2  Device Requirements: Basic Concepts
+>>
+>> "If a driver did suppress length checks for a channel command, the device
+>> MUST present a check condition if the transmitted data does not contain
+>> enough data to process the command."
+>> (http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-1230001)
+>>
+>> So for virtio we have to present a check condition. Architecturally it
+>> might look better if the one refusing is the device and not the CSS, but
+>> for that we would have to change the VIRTIO spec. With the given
+>> constraints a program check is IMHO the best fit.
+> 
+> Ah, but that's not general length checking for virtio-ccw :)
+
+What is general length checking for virtio-ccw? Did I say it
+was general length checking for virtio-ccw?
+
+> 
+> Reword the sentence to use 'short data with incorrect length checking
+> suppressed' or so?
+> 
+
+Could you provide a whole sentence? I think my original sentence is OK
+(purpose: indicate that virtio is special, and that we have to bend the
+architecture a bit), but I agree, being a little more verbose may be a
+good idea. I just can't come up with a nice sentence.
+
+Halil
