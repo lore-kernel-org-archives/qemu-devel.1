@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50071)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51821)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drt0g-0004RF-31
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:46:23 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1drt4a-0006Z5-Fn
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:50:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drt0c-0002qr-ML
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:46:22 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:35374)
+	(envelope-from <vilanova@ac.upc.edu>) id 1drt4X-0007dB-2E
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:50:24 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:38353)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1drt0c-0002pi-BK
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:46:18 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1drt4W-0007cJ-Iu
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:50:20 -0400
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 13 Sep 2017 00:46:07 +0300
-Message-Id: <150525276755.15988.10713051972672554822.stgit@frigg.lan>
+Date: Wed, 13 Sep 2017 00:50:10 +0300
+Message-Id: <150525300993.15988.4392688345407178657.stgit@frigg.lan>
 In-Reply-To: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
 References: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v5 11/22] instrument: Track vCPUs
+Subject: [Qemu-devel] [PATCH v5 12/22] instrument: Add event
+ 'guest_cpu_enter'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,174 +28,214 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
-
-Keep a translation between instrumentation's QICPU and CPUState objects t=
-o avoid
-exposing QEMU's internals to instrumentation clients.
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- cpus-common.c            |    9 +++++++++
- instrument/control.c     |   23 +++++++++++++++++++++++
- instrument/control.h     |   36 ++++++++++++++++++++++++++++++++++++
- instrument/control.inc.h |   23 +++++++++++++++++++++++
- 4 files changed, 91 insertions(+)
+ instrument/control.c            |    9 ++++++++
+ instrument/events.h             |    5 ++++
+ instrument/events.inc.h         |   11 +++++++++
+ instrument/load.c               |    9 ++++++++
+ instrument/qemu-instr/control.h |   46 +++++++++++++++++++++++++++++++++=
+++++++
+ stubs/instrument.c              |    1 +
+ trace/control-target.c          |    2 ++
+ 7 files changed, 83 insertions(+)
 
-diff --git a/cpus-common.c b/cpus-common.c
-index 59f751ecf9..ec5f46cc3d 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -22,6 +22,9 @@
- #include "exec/cpu-common.h"
- #include "qom/cpu.h"
- #include "sysemu/cpus.h"
-+#if defined(CONFIG_INSTRUMENT)
-+#include "instrument/control.h"
-+#endif
-=20
- static QemuMutex qemu_cpu_list_lock;
- static QemuCond exclusive_cond;
-@@ -84,6 +87,9 @@ void cpu_list_add(CPUState *cpu)
-     } else {
-         assert(!cpu_index_auto_assigned);
-     }
-+#if defined(CONFIG_INSTRUMENT)
-+    instr_cpu_add(cpu);
-+#endif
-     QTAILQ_INSERT_TAIL(&cpus, cpu, node);
-     qemu_mutex_unlock(&qemu_cpu_list_lock);
-=20
-@@ -102,6 +108,9 @@ void cpu_list_remove(CPUState *cpu)
-     assert(!(cpu_index_auto_assigned && cpu !=3D QTAILQ_LAST(&cpus, CPUT=
-ailQ)));
-=20
-     QTAILQ_REMOVE(&cpus, cpu, node);
-+#if defined(CONFIG_INSTRUMENT)
-+    instr_cpu_remove(cpu);
-+#endif
-     cpu->cpu_index =3D UNASSIGNED_CPU_INDEX;
-     qemu_mutex_unlock(&qemu_cpu_list_lock);
- }
 diff --git a/instrument/control.c b/instrument/control.c
-index 3630d6b3be..8cf2b4f967 100644
+index 8cf2b4f967..c4b3ca0440 100644
 --- a/instrument/control.c
 +++ b/instrument/control.c
-@@ -13,10 +13,33 @@
- #include "instrument/load.h"
+@@ -49,3 +49,12 @@ SYM_PUBLIC void qi_set_fini(qi_fini_fn fn, void *data)
+     instr_set_event(fini_fn, fn);
+     instr_set_event(fini_data, data);
+ }
++
++
++void (*instr_event__guest_cpu_enter)(QICPU vcpu);
++
++SYM_PUBLIC void qi_event_set_guest_cpu_enter(void (*fn)(QICPU vcpu))
++{
++    ERROR_IF(!instr_get_state(), "called outside instrumentation");
++    instr_set_event(guest_cpu_enter, fn);
++}
+diff --git a/instrument/events.h b/instrument/events.h
+index 82ad0bd827..947f120aa9 100644
+--- a/instrument/events.h
++++ b/instrument/events.h
+@@ -11,6 +11,7 @@
+ #define INSTRUMENT__EVENTS_H
+=20
  #include "instrument/qemu-instr/control.h"
- #include "qemu/compiler.h"
-+#include "qom/cpu.h"
-+
-=20
- __thread InstrState instr_cur_state;
-=20
-=20
-+unsigned int instr_cpus_count;
-+CPUState **instr_cpus;
-+
-+void instr_cpu_add(CPUState *vcpu)
-+{
-+    unsigned int idx =3D vcpu->cpu_index;
-+    if (idx >=3D instr_cpus_count) {
-+        instr_cpus_count =3D idx + 1;
-+        instr_cpus =3D realloc(instr_cpus,
-+                             sizeof(*instr_cpus) * instr_cpus_count);
-+    }
-+    instr_cpus[idx] =3D vcpu;
-+}
-+
-+void instr_cpu_remove(CPUState *vcpu)
-+{
-+    unsigned int idx =3D vcpu->cpu_index;
-+    instr_cpus[idx] =3D NULL;
-+}
-+
-+
- qi_fini_fn instr_event__fini_fn;
- void *instr_event__fini_data;
-=20
-diff --git a/instrument/control.h b/instrument/control.h
-index f2b085f69b..57cea07fa7 100644
---- a/instrument/control.h
-+++ b/instrument/control.h
-@@ -10,6 +10,42 @@
- #ifndef INSTRUMENT__CONTROL_H
- #define INSTRUMENT__CONTROL_H
-=20
-+#include "qemu/typedefs.h"
 +#include "instrument/qemu-instr/types.h"
-+
-+
-+/**
-+ * instr_cpu_add:
-+ *
-+ * Make @vcpu available to instrumentation clients.
-+ *
-+ * Precondition: cpu_list_lock().
-+ */
-+void instr_cpu_add(CPUState *vcpu);
-+
-+/**
-+ * instr_cpu_remove:
-+ *
-+ * Make @vcpu unavailable to instrumentation clients.
-+ *
-+ * Precondition: cpu_list_lock().
-+ */
-+void instr_cpu_remove(CPUState *vcpu);
-+
-+/**
-+ * instr_cpu_to_qicpu:
-+ *
-+ * Get the #QICPU corresponding to the given #CPUState.
-+ */
-+static inline QICPU instr_cpu_to_qicpu(CPUState *vcpu);
-+
-+/**
-+ * instr_cpu_from_qicpu:
-+ *
-+ * Get the #CPUState corresponding to the given #QICPU.
-+ */
-+static inline CPUState *instr_cpu_from_qicpu(QICPU vcpu);
-+
 =20
  /**
-  * InstrState:
-diff --git a/instrument/control.inc.h b/instrument/control.inc.h
-index 0f649f4caa..45daae7d1d 100644
---- a/instrument/control.inc.h
-+++ b/instrument/control.inc.h
-@@ -7,9 +7,32 @@
+  * instr_get_event:
+@@ -32,6 +33,10 @@
+ extern qi_fini_fn instr_event__fini_fn;
+ extern void *instr_event__fini_data;
+=20
++extern void (*instr_event__guest_cpu_enter)(QICPU vcpu);
++static inline void instr_guest_cpu_enter(CPUState *vcpu);
++
++
+ #include "instrument/events.inc.h"
+=20
+ #endif  /* INSTRUMENT__EVENTS_H */
+diff --git a/instrument/events.inc.h b/instrument/events.inc.h
+index 8b1ce7fcb2..e3f8024716 100644
+--- a/instrument/events.inc.h
++++ b/instrument/events.inc.h
+@@ -7,5 +7,16 @@
   * See the COPYING file in the top-level directory.
   */
 =20
-+#include "qemu/osdep.h"
- #include "qemu/atomic.h"
- #include "qemu/compiler.h"
-+#include "qom/cpu.h"
- #include <stdbool.h>
-+#include <stdint.h>
-+
-+
-+extern unsigned int instr_cpus_count;
-+extern CPUState **instr_cpus;
-+
-+static inline QICPU instr_cpu_to_qicpu(CPUState *vcpu)
++#include "instrument/control.h"
+=20
+=20
++static inline void instr_guest_cpu_enter(CPUState *vcpu)
 +{
-+    uintptr_t idx =3D vcpu->cpu_index;
-+    return (QICPU)idx;
-+}
-+
-+static inline CPUState *instr_cpu_from_qicpu(QICPU vcpu)
-+{
-+    unsigned int idx =3D (uintptr_t)vcpu;
-+    if (idx >=3D instr_cpus_count) {
-+        return NULL;
-+    } else {
-+        return instr_cpus[idx];
++    void (*cb)(QICPU vcpu) =3D instr_get_event(guest_cpu_enter);
++    if (cb) {
++        QICPU vcpu_ =3D instr_cpu_to_qicpu(vcpu);
++        instr_set_state(INSTR_STATE_ENABLE);
++        (*cb)(vcpu_);
++        instr_set_state(INSTR_STATE_DISABLE);
 +    }
 +}
+diff --git a/instrument/load.c b/instrument/load.c
+index a01d66a4d4..218bca74b2 100644
+--- a/instrument/load.c
++++ b/instrument/load.c
+@@ -11,6 +11,7 @@
+ #include "qemu-common.h"
+=20
+ #include <dlfcn.h>
++#include "exec/cpu-common.h"
+ #include "instrument/control.h"
+ #include "instrument/events.h"
+ #include "instrument/load.h"
+@@ -109,6 +110,13 @@ InstrLoadError instr_load(const char *path, int argc=
+, const char **argv,
+         goto err;
+     }
+=20
++    cpu_list_lock();
++    CPUState *cpu;
++    CPU_FOREACH(cpu) {
++        instr_guest_cpu_enter(cpu);
++    }
++    cpu_list_unlock();
++
+     res =3D INSTR_LOAD_OK;
+     goto out;
+=20
+@@ -138,6 +146,7 @@ InstrUnloadError instr_unload(const char *id)
+     }
+=20
+     instr_set_event(fini_fn, NULL);
++    instr_set_event(guest_cpu_enter, NULL);
+=20
+     /* this should never fail */
+     if (dlclose(handle->dlhandle) < 0) {
+diff --git a/instrument/qemu-instr/control.h b/instrument/qemu-instr/cont=
+rol.h
+index b841afaa31..f61e7a2b6e 100644
+--- a/instrument/qemu-instr/control.h
++++ b/instrument/qemu-instr/control.h
+@@ -16,6 +16,7 @@ extern "C" {
+=20
+ #include <stdbool.h>
+ #include <stddef.h>
++#include <qemu-instr/types.h>
 =20
 =20
- extern __thread InstrState instr_cur_state;
+ /**
+@@ -39,6 +40,51 @@ typedef void (*qi_fini_fn)(void *arg);
+  */
+ void qi_set_fini(qi_fini_fn fn, void *data);
+=20
++
++/*
++ * Set callbacks for available events. Each event has a short descriptio=
+n and
++ * various indicators of when it can be triggered:
++ *
++ * - Mode :: user
++ *   Triggered in QEMU user application emulation (e.g., linux-user).
++ *
++ * - Mode :: softmmy
++ *   Triggered in QEMU full-system emulation.
++ *
++ *
++ * - Targets :: all
++ *   Triggered on all targets, both using TCG or native hardware virtual=
+ization
++ *   (e.g., KVM).
++ *
++ * - Targets :: TCG(<arch>)
++ *   Triggered on the given guest target architectures when executing wi=
+th TCG
++ *   (no native hardware virtualization).
++ *
++ *
++ * - Time :: exec
++ *   Triggered when the guest executes the described operation.
++ *
++ * - Time :: trans
++ *   Triggered when QEMU translates a guest operation. This is only avai=
+lable
++ *   when executing with TCG. Guest instructions are decompiled and tran=
+slated
++ *   into the intermediate TCG language (when "Time: trans" events are
++ *   triggered). Then, the TCG compiler translates TCG code into the nat=
+ive host
++ *   code that QEMU will execute to emulate the guest (when "Time: exec"=
+ events
++ *   are triggered). As QEMU uses a cache of translated code, the same
++ *   instruction might be translated more than once (when the cache over=
+flows).
++ */
++
++/*
++ * Hot-plug a new virtual (guest) CPU.
++ *
++ * Also triggered on each CPU when an instrumentation library is loaded.
++ *
++ * Mode: user, softmmu
++ * Targets: all
++ * Time: exec
++ */
++void qi_event_set_guest_cpu_enter(void (*fn)(QICPU vcpu));
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/stubs/instrument.c b/stubs/instrument.c
+index 9498fcdfe5..6b59ba9a7a 100644
+--- a/stubs/instrument.c
++++ b/stubs/instrument.c
+@@ -46,3 +46,4 @@ void qmp_instr_unload(const char *id, Error **errp)
+=20
+=20
+ __thread InstrState instr_cur_state;
++void (*instr_event__guest_cpu_enter)(QICPU *vcpu);
+diff --git a/trace/control-target.c b/trace/control-target.c
+index 706b2cee9d..f22688bcd5 100644
+--- a/trace/control-target.c
++++ b/trace/control-target.c
+@@ -9,6 +9,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "cpu.h"
++#include "instrument/events.h"
+ #include "trace-root.h"
+ #include "trace/control.h"
+ #include "translate-all.h"
+@@ -146,5 +147,6 @@ void trace_init_vcpu(CPUState *vcpu)
+             }
+         }
+     }
++    instr_guest_cpu_enter(vcpu);
+     trace_guest_cpu_enter(vcpu);
+ }
