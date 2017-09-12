@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44082)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1drZ7J-0002S3-31
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 20:31:53 -0400
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1drZfn-000240-R7
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 21:07:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1drZ7I-0000Yt-CI
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 20:31:53 -0400
-References: <20170911172022.4738-1-eblake@redhat.com>
-	<20170911172022.4738-27-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <5b23e7b5-b8f7-72c2-a7b7-73ba504abd06@redhat.com>
-Date: Mon, 11 Sep 2017 20:31:36 -0400
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1drZfk-0002Ae-Nk
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 21:07:31 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:48674
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1drZfk-000267-CM
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 21:07:28 -0400
+References: <20170901154542.5687-1-cascardo@canonical.com>
+	<20170901161118.GQ7570@localhost.localdomain>
+	<2ab3aaef-c6d7-ae3d-808b-f947dcb3ed1c@cn.fujitsu.com>
+	<20170904130814.GR7570@localhost.localdomain>
+	<e970608d-fb97-210c-72e9-bf4f43a3e54c@cn.fujitsu.com>
+	<20170911125814.27a8d496@nial.brq.redhat.com>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <70fffb76-2273-7184-6dea-2b5788ec3b57@cn.fujitsu.com>
+Date: Tue, 12 Sep 2017 08:58:49 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170911172022.4738-27-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20170911125814.27a8d496@nial.brq.redhat.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 26/38] libqtest: Merge qtest_end() into
- qtest_quit()
+Subject: Re: [Qemu-devel] [PATCH] x86/acpi: build SRAT when memory hotplug
+ is enabled
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,28 +32,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, "open list:Floppy" <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Amit Shah <amit@kernel.org>, armbru@redhat.com, Alexander Graf <agraf@suse.de>, Keith Busch <keith.busch@intel.com>, "open list:sPAPR" <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Thadeu Lima de Souza Cascardo <cascardo@canonical.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+Hi Igor,
 
+At 09/11/2017 06:58 PM, Igor Mammedov wrote:
+>>> > >
+>>> > > Igor's suggestion to enable NUMA implicitly sounds safer to me.
+>>> > >
+>> >
+>> > I agree with Igor too.
+>> >
+>> > Is anybody doing this? If not, may I make a patch to enable adding NUMA
+>> > node implicitly first. let's see what it looks like.
+> As far as I'm aware nobody is doing it, so fill free to look into it.
+>
 
-On 09/11/2017 01:20 PM, Eric Blake wrote:
-> Rather than have two similar shutdown functions, where one requires
-> the use of global_qtest in the header, it is better to have a single
-> shutdown function that still takes care of cleaning up global_qtest
-> if it is set.  All callers are updated.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  tests/libqtest.h               | 11 -----------
->  tests/libqtest.c               |  6 +++++-
-[...]
->  tests/fdc-test.c               |  2 +-
-[...]
->  tests/ide-test.c               |  2 +-
+Got it!  I will do it right now.
 
-Reviewed-by: John Snow <jsnow@redhat.com>
+Thanks,
+	dou.
 
-The rest: "ACK." Change looks sane and I assume the rest of the patch is
-fairly straightforward mechanical changes. Everything still compiles and
-runs successfully.
+>> >
+>> > Thanks,
+>> > 	dou.
+>> >
+>> >
