@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1drm79-0007Fw-Q9
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:24:36 -0400
+	(envelope-from <JBeulich@suse.com>) id 1drm76-0007CU-Bf
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:24:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1drm74-0002gt-9v
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:24:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45424)
+	(envelope-from <JBeulich@suse.com>) id 1drm71-0002fl-GK
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:24:32 -0400
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:58956)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1drm74-0002gQ-0y
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:24:30 -0400
-References: <20170911152150.12535-1-david@redhat.com>
-	<20170911152150.12535-19-david@redhat.com>
-	<20170912154313.3616c2bf@nial.brq.redhat.com>
-	<9e1ea879-6c89-23bc-b775-062343d782af@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <ea0882b4-a2c9-416a-7728-0b1a7ca0ff27@redhat.com>
-Date: Tue, 12 Sep 2017 16:24:11 +0200
-MIME-Version: 1.0
-In-Reply-To: <9e1ea879-6c89-23bc-b775-062343d782af@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 18/21] s390x: implement
- query-hotpluggable-cpus
+	(Exim 4.71) (envelope-from <JBeulich@suse.com>) id 1drm71-0002ex-A5
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:24:27 -0400
+Message-Id: <59B80A35020000780017A344@prv-mh.provo.novell.com>
+Date: Tue, 12 Sep 2017 08:24:21 -0600
+From: "Jan Beulich" <JBeulich@suse.com>
+References: <59B80A35020000780017A344@prv-mh.provo.novell.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Subject: [Qemu-devel] [PATCH] xen_disk: avoid use of g_malloc0_n()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,69 +26,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>, xen-devel <xen-devel@lists.xenproject.org>
 
-On 12.09.2017 16:03, David Hildenbrand wrote:
-> On 12.09.2017 15:43, Igor Mammedov wrote:
->> On Mon, 11 Sep 2017 17:21:47 +0200
->> David Hildenbrand <david@redhat.com> wrote:
->>
->>> CPU hotplug is only possible on a per core basis on s390x.
->>>
->>> As we now have ms->possible_cpus, we can get rid of the global variable
->>> cpu_states.
->>>
->>> While rewriting s390_cpu_addr2state() completely to be based on
->>> possible_cpus, move it to cpu.c, as it is independent of the virtio-ccw
->>> machine.
->> I'd split patch on
->>  1) introduce possible cpus 
->>  2) rewrite s390_cpu_addr2state() using #2
-> 
-> Than I have to keep the global variable + setting it for one patch.
-> Might not be worth the trouble. Will have a look.
-> 
-> [...]
->>>  
->>> +static CPUArchId *s390_find_cpu_slot(MachineState *ms, uint32_t core_id,
->>> +                                     int *idx)
->>> +{
->>> +    if (core_id >= ms->possible_cpus->len) {
->>> +        return NULL;
->>> +    }
->>> +    /* core_id corresponds to the index */
->>> +    if (idx) {
->>> +        *idx = core_id;
->>> +    }
->>> +    return &ms->possible_cpus->cpus[core_id];
->>> +}
->> it looks like cpu_index == core_id == idx in possible_cpus,
->> is this helper really necessary?
->> (we have it in x86 because of possible not 1:1 mapping)
->>
->> I'd drop it and just access array directly
-> 
-> Just kept this because the other architectures also have this. I can of
-> course drop it. The nice thing about this helper is the comment :)
-> 
-> [...]
->>>  }
->>> +
->>> +S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->>> +{
->> target/cpu.c and cpu itself preferably shouldn't pull in
->> or depend on machine, so I'd keep s390_cpu_addr2state() where it's now
->> or somewhere in board related files
-> 
-> Thomas requested this. I actually don't care., but it looks like a
-> generic "get_cpu_by_arch_id" function. But I don't really want to go
-> that additional path now. And also I don't want to move this back and forth.
-> 
-> Thomas, what's your opinion?
+Prefer g_new() / g_new0() to be farther backwards compatible with older
+glib versions. As there's no point in zeroing the allocation here (the
+loop right afterwards fully initializes the memory), use the former.
 
-Hmm, since the new version uses MachineState now, it's maybe really
-better to leave it in the hw/s390x/ directory, I guess. Sorry for the
-inconvenience ...
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
 
- Thomas
+--- a/hw/block/xen_disk.c
++++ b/hw/block/xen_disk.c
+@@ -1232,7 +1232,7 @@ static int blk_connect(struct XenDevice
+         return -1;
+     }
+=20
+-    domids =3D g_malloc0_n(blkdev->nr_ring_ref, sizeof(uint32_t));
++    domids =3D g_new(uint32_t, blkdev->nr_ring_ref);
+     for (i =3D 0; i < blkdev->nr_ring_ref; i++) {
+         domids[i] =3D blkdev->xendev.dom;
+     }
