@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58181)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drtEy-0004BC-NF
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:01:09 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1drtGI-00055S-VY
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:02:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1drtEw-0007tA-0v
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:01:08 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59985)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1drtEv-0007sg-Rx
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:01:05 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1drtEu-0003Pe-6R
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 22:01:04 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 2F7F62E8492
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 22:01:04 +0000 (UTC)
+	(envelope-from <vilanova@ac.upc.edu>) id 1drtGG-0000Iu-6H
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:02:31 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:43378)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1drtGF-0000I2-NR
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 18:02:28 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 13 Sep 2017 01:02:16 +0300
+Message-Id: <150525373641.15988.12142967916976724761.stgit@frigg.lan>
+In-Reply-To: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
+References: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 12 Sep 2017 21:47:20 -0000
-From: James Clarke <jrtc27@jrtc27.com>
-Reply-To: Bug 1716767 <1716767@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150524995294.5903.8871661765030368900.malonedeb@wampee.canonical.com>
-Message-Id: <150525284073.29079.14299492241937433886.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1716767] Re: file(1) fails with "Invalid
- argument" on qemu-sh4-user
+Subject: [Qemu-devel] [PATCH v5 15/22] instrument: Add event 'guest_cpu_exit'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,70 +27,180 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>
 
-I just ran it myself inside and outside the sh4 chroot. The logging
-output is the same, with the exception of the final line. Something is
-happening once it's decided it's elf; looking at file_tryelf, my guess
-is the fstat call is failing[0].
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ instrument/control.c            |    9 +++++++++
+ instrument/events.h             |    3 +++
+ instrument/events.inc.h         |   11 +++++++++++
+ instrument/load.c               |   17 +++++++++++++++++
+ instrument/qemu-instr/control.h |   11 +++++++++++
+ stubs/instrument.c              |    1 +
+ trace/control.c                 |    4 +++-
+ 7 files changed, 55 insertions(+), 1 deletion(-)
 
-[0] http://sources.debian.net/src/file/1:5.31-1/src/readelf.c/#L1609
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1716767
-
-Title:
-  file(1) fails with "Invalid argument" on qemu-sh4-user
-
-Status in QEMU:
-  New
-
-Bug description:
-  We recently discovered that file(1) fails on qemu-sh4-user when
-  running on an ELF file:
-
-  (sid_sh4)root@vs94:/# file /bin/bash
-  /bin/bash: ERROR: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV)=
- error reading (Invalid argument)
-  (sid_sh4)root@vs94:/#
-
-  Running with "-d" yields more output:
-
-  (sid_sh4)root@vs94:/# file -d /bin/bash 2>&1 | tail
-  322: >> 7 byte&,=3D97,"(ARM)"]
-  0 =3D=3D 97 =3D 0
-  mget(type=3D1, flag=3D0, offset=3D7, o=3D0, nbytes=3D863324, il=3D0, nc=
-=3D1)
-  mget/96 @7: \000\000\000\000\000\000\000\000\000\002\000*\000\001\000\000=
-\000\250\317A\0004\000\000\000L(\r\000\027\000\000\0004\000 \000\n\000(\000=
-\032\000\031\000\006\000\000\0004\000\000\0004\000@\0004\000@\000@\001\000\=
-000@\001\000\000\005\000\000\000\004\000\000\000\003\000\000\000t\001\000\0=
-00t\001@\000t\001@\000\023\000\000
-
-  323: >> 7 byte&,=3D-1,"(embedded)"]
-  0 =3D=3D 18446744073709551615 =3D 0
-  [try softmagic 1]
-  [try elf -1]
-  /bin/bash: ERROR: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV)=
- error reading (Invalid argument)
-  (sid_sh4)root@vs94:/#
-
-  It seems that the comparison above has a bogus (overflown?) value.
-
-  On actual hardware, it works:
-
-  root@tirpitz:~> file /bin/bash
-  /bin/bash: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV), dynam=
-ically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=3D4dd0e4281755=
-827d8bb6686fd481f8c80ea73e9a, for GNU/Linux 3.2.0, stripped
-  root@tirpitz:~>
-
-  I have uploaded a chroot with Debian unstable which allows to
-  reproduce the issue:
-
-  > https://people.debian.org/~glaubitz/sid-sh4-sbuild.tar.gz
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1716767/+subscriptions
+diff --git a/instrument/control.c b/instrument/control.c
+index 20ddffdc28..0be8065409 100644
+--- a/instrument/control.c
++++ b/instrument/control.c
+@@ -124,3 +124,12 @@ SYM_PUBLIC void qi_event_set_guest_cpu_enter(void (*=
+fn)(QICPU vcpu))
+     ERROR_IF(!instr_get_state(), "called outside instrumentation");
+     instr_set_event(guest_cpu_enter, fn);
+ }
++
++
++void (*instr_event__guest_cpu_exit)(QICPU vcpu);
++
++SYM_PUBLIC void qi_event_set_guest_cpu_exit(void (*fn)(QICPU vcpu))
++{
++    ERROR_IF(!instr_get_state(), "called outside instrumentation");
++    instr_set_event(guest_cpu_exit, fn);
++}
+diff --git a/instrument/events.h b/instrument/events.h
+index 947f120aa9..c743cb8180 100644
+--- a/instrument/events.h
++++ b/instrument/events.h
+@@ -36,6 +36,9 @@ extern void *instr_event__fini_data;
+ extern void (*instr_event__guest_cpu_enter)(QICPU vcpu);
+ static inline void instr_guest_cpu_enter(CPUState *vcpu);
+=20
++extern void (*instr_event__guest_cpu_exit)(QICPU vcpu);
++static inline void instr_guest_cpu_exit(CPUState *vcpu);
++
+=20
+ #include "instrument/events.inc.h"
+=20
+diff --git a/instrument/events.inc.h b/instrument/events.inc.h
+index e3f8024716..c88df7e42f 100644
+--- a/instrument/events.inc.h
++++ b/instrument/events.inc.h
+@@ -20,3 +20,14 @@ static inline void instr_guest_cpu_enter(CPUState *vcp=
+u)
+         instr_set_state(INSTR_STATE_DISABLE);
+     }
+ }
++
++static inline void instr_guest_cpu_exit(CPUState *vcpu)
++{
++    void (*cb)(QICPU vcpu) =3D instr_get_event(guest_cpu_exit);
++    if (cb) {
++        QICPU vcpu_ =3D instr_cpu_to_qicpu(vcpu);
++        instr_set_state(INSTR_STATE_ENABLE);
++        (*cb)(vcpu_);
++        instr_set_state(INSTR_STATE_DISABLE);
++    }
++}
+diff --git a/instrument/load.c b/instrument/load.c
+index 218bca74b2..6808d361b5 100644
+--- a/instrument/load.c
++++ b/instrument/load.c
+@@ -11,7 +11,9 @@
+ #include "qemu-common.h"
+=20
+ #include <dlfcn.h>
++#include "cpu.h"
+ #include "exec/cpu-common.h"
++#include "exec/exec-all.h"
+ #include "instrument/control.h"
+ #include "instrument/events.h"
+ #include "instrument/load.h"
+@@ -127,6 +129,13 @@ out:
+     return res;
+ }
+=20
++
++static void instr_unload__cb(CPUState *cpu, void *data)
++{
++    tb_flush_sync(cpu);
++    instr_guest_cpu_exit(cpu);
++}
++
+ InstrUnloadError instr_unload(const char *id)
+ {
+     InstrUnloadError res;
+@@ -139,6 +148,10 @@ InstrUnloadError instr_unload(const char *id)
+         goto out;
+     }
+=20
++    InstrCPUStop info;
++    cpu_list_lock();
++    instr_cpu_stop_all_begin(&info, instr_unload__cb, NULL);
++
+     qi_fini_fn fini_fn =3D instr_get_event(fini_fn);
+     if (fini_fn) {
+         void *fini_data =3D instr_get_event(fini_data);
+@@ -147,6 +160,10 @@ InstrUnloadError instr_unload(const char *id)
+=20
+     instr_set_event(fini_fn, NULL);
+     instr_set_event(guest_cpu_enter, NULL);
++    instr_set_event(guest_cpu_exit, NULL);
++
++    instr_cpu_stop_all_end(&info);
++    cpu_list_unlock();
+=20
+     /* this should never fail */
+     if (dlclose(handle->dlhandle) < 0) {
+diff --git a/instrument/qemu-instr/control.h b/instrument/qemu-instr/cont=
+rol.h
+index f61e7a2b6e..107ee8afe0 100644
+--- a/instrument/qemu-instr/control.h
++++ b/instrument/qemu-instr/control.h
+@@ -85,6 +85,17 @@ void qi_set_fini(qi_fini_fn fn, void *data);
+  */
+ void qi_event_set_guest_cpu_enter(void (*fn)(QICPU vcpu));
+=20
++/*
++ * Hot-unplug a virtual (guest) CPU.
++ *
++ * Also triggered on each CPU when an instrumentation library is unloade=
+d.
++ *
++ * Mode: user, softmmu
++ * Targets: all
++ * Time: exec
++ */
++void qi_event_set_guest_cpu_exit(void (*fn)(QICPU vcpu));
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/stubs/instrument.c b/stubs/instrument.c
+index 6b59ba9a7a..c4b1c791d9 100644
+--- a/stubs/instrument.c
++++ b/stubs/instrument.c
+@@ -47,3 +47,4 @@ void qmp_instr_unload(const char *id, Error **errp)
+=20
+ __thread InstrState instr_cur_state;
+ void (*instr_event__guest_cpu_enter)(QICPU *vcpu);
++void (*instr_event__guest_cpu_exit)(QICPU *vcpu);
+diff --git a/trace/control.c b/trace/control.c
+index 82d8989c4d..946a0af818 100644
+--- a/trace/control.c
++++ b/trace/control.c
+@@ -1,13 +1,14 @@
+ /*
+  * Interface for configuring and controlling the state of tracing events.
+  *
+- * Copyright (C) 2011-2016 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ * Copyright (C) 2011-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+  *
+  * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
+  * See the COPYING file in the top-level directory.
+  */
+=20
+ #include "qemu/osdep.h"
++#include "instrument/events.h"
+ #include "trace/control.h"
+ #include "qemu/help_option.h"
+ #ifdef CONFIG_TRACE_SIMPLE
+@@ -272,6 +273,7 @@ void trace_fini_vcpu(CPUState *vcpu)
+     TraceEventIter iter;
+     TraceEvent *ev;
+=20
++    instr_guest_cpu_exit(vcpu);
+     trace_guest_cpu_exit(vcpu);
+=20
+     trace_event_iter_init(&iter, NULL);
