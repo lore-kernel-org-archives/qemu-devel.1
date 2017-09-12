@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47114)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47560)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ramysameh26@gmail.com>) id 1drfwa-0008Do-34
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:49:17 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1drfxQ-0000GS-ES
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:50:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ramysameh26@gmail.com>) id 1drfwZ-0002po-1I
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:49:16 -0400
-Received: from mail-io0-x235.google.com ([2607:f8b0:4001:c06::235]:36464)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <ramysameh26@gmail.com>)
-	id 1drfwY-0002ox-Pq
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:49:14 -0400
-Received: by mail-io0-x235.google.com with SMTP id d16so41590527ioj.3
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 00:49:13 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1drfxM-0003D1-AQ
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:50:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33870)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drfxM-0003Cj-0d
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 03:50:04 -0400
+References: <cover.1505158760.git.alistair.francis@xilinx.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <dfeb3c9c-72d6-8d74-9668-09ba11d73abd@redhat.com>
+Date: Tue, 12 Sep 2017 09:49:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAF6HrYx6_uv-K3JouTb4WTrEEkX25VrhkjAVg8mWG3iarvA=AA@mail.gmail.com>
-References: <CAF6HrYxj5BoTQpQjz95Z1_N_p615jpEE12xh_afuuqE4fcTyLg@mail.gmail.com>
-	<CAFEAcA9YNO7kgC8yzZ_RUKck=+98pUET0ogVZ7TvC1kxV+_fFA@mail.gmail.com>
-	<CAF6HrYwT7WP_i7cVhvEyRvqSK7J+bLnKU4b+WrMQfVkLaNDrvQ@mail.gmail.com>
-	<CAFEAcA9kEEyUj7=7Wd-jNbVOWwfgkj0a201q+L4e5CDR22JUgw@mail.gmail.com>
-	<CAF6HrYw9B1ns0ZVtU_gxqJZxOe0dG03UQiAV7FHxBB-wQh6kNQ@mail.gmail.com>
-	<CAF6HrYym57hZjSFE=iExPkp8vBX82zqXvTxh8GJDYNPL1FTSqA@mail.gmail.com>
-	<CAFEAcA_iKqs_QXz_qSwsOw6A-Z1BJjVN3WPAgaERejWQXrQhNw@mail.gmail.com>
-	<CAF6HrYx6_uv-K3JouTb4WTrEEkX25VrhkjAVg8mWG3iarvA=AA@mail.gmail.com>
-From: Ramy Sameh <ramysameh26@gmail.com>
-Date: Tue, 12 Sep 2017 09:49:11 +0200
-Message-ID: <CAF6HrYym9698mDgQWmKd+q6dVxn1e4DHSm39boaK5mp8CJR0NQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] Questions regarding emulated UART in VersatilePB
- board
+In-Reply-To: <cover.1505158760.git.alistair.francis@xilinx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 0/8] More warning reporting fixed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,72 +27,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Ahmed Aly <ahmedaly50@gmail.com>
+To: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel@nongnu.org
+Cc: alistair23@gmail.com, armbru@redhat.com
 
-Hello Peter,
+On 11/09/2017 21:52, Alistair Francis wrote:
+> This series expands on my previous series by converting more existing
+> prints to use warn_report() instead of error_report() or fprintf().
+> 
+> As discussed with Paolo and Markus this series combines libqemustub.a into
+> libqemuutil.a to avoid circular dependencies.
+> 
+> V4:
+>  - Improve some extra MIPs messages
+>  - Fix build issues
+>  - Fix i386 print message
+> V3:
+>  - Small corrections as reported by Markus
+>  - Rename patch 3 and 5 so they don't have the same name
+>  - Combine libqemustub.a into libqemuutil.a
+>  - Add an extra patch with general cleanups
+> 
+> V2:
+>  - Fixup auto CC logic so everyone is CCed
+> 
+> 
+> 
+> Alistair Francis (8):
+>   hw/i386: Improve some of the warning messages
+>   Convert remaining error_report() to warn_report()
+>   Convert single line fprintf(.../n) to warn_report()
+>   Convert multi-line fprintf() to warn_report()
+>   General warn report fixups
+>   target/mips: Convert VM clock update prints to warn_report
+>   Makefile: Remove libqemustub.a
+>   Convert remaining single line fprintf() to warn_report()
+> 
+>  Makefile                    |  7 +++----
+>  Makefile.target             |  2 +-
+>  accel/kvm/kvm-all.c         |  7 +++----
+>  block/qcow2.c               |  9 +++++----
+>  block/vvfat.c               |  7 ++++---
+>  docs/devel/build-system.txt | 16 +++++++---------
+>  hw/acpi/core.c              | 10 +++++-----
+>  hw/arm/vexpress.c           |  4 ++--
+>  hw/i386/acpi-build.c        | 15 ++++++++++-----
+>  hw/i386/pc.c                |  9 ++++-----
+>  hw/i386/pc_q35.c            |  8 +++++---
+>  hw/i386/xen/xen-mapcache.c  |  5 +++--
+>  hw/mips/mips_malta.c        |  4 ++--
+>  hw/mips/mips_r4k.c          |  5 ++---
+>  hw/misc/applesmc.c          |  2 +-
+>  hw/s390x/s390-virtio.c      | 18 ++++++++++--------
+>  hw/usb/hcd-ehci.c           |  5 +++--
+>  hw/virtio/virtio-balloon.c  |  3 ++-
+>  net/hub.c                   | 10 ++++------
+>  net/net.c                   | 15 ++++++++-------
+>  qga/vss-win32.c             |  2 +-
+>  target/i386/cpu.c           | 12 ++++++------
+>  target/i386/hax-mem.c       |  6 +++---
+>  target/mips/kvm.c           | 10 +++++-----
+>  target/ppc/translate_init.c | 17 ++++++++---------
+>  target/s390x/kvm.c          |  4 ++--
+>  tests/Makefile.include      |  8 ++++----
+>  trace/control.c             |  4 ++--
+>  trace/simple.c              |  3 ++-
+>  ui/keymaps.c                | 10 +++++-----
+>  ui/spice-display.c          |  2 +-
+>  util/cutils.c               |  3 ++-
+>  util/main-loop.c            |  6 +++---
+>  33 files changed, 128 insertions(+), 120 deletions(-)
+> 
 
-Any suggestions regarding this topic ?
+Queued, thanks.
 
-On Sun, Sep 10, 2017 at 8:33 PM, Ramy Sameh <ramysameh26@gmail.com> wrote:
-
-> Thanks Peter.
->
-> I have made a program to read a string from the UART, then write it again
-> to the UART.
-> I made a function to manipulate values in the pl011 registers (bit
-> flipping the flags inside the registers).
-> The target is to simulate hardware fault injection.
->
-> For each run of the program, I made a bit-flip in *only one flag* in *one
-> register*, and I observed the output of the program.
->
-> *My question is*: where to invoke the call of this fault injection
-> function to cause *the maximum effect* on the program's output?
->
-> *p.s.* I invoked it once inside pl011_read function, and the program gave
-> a certain output, and I invoked it again in pl011_update, and it gave
-> another output.
-> When I invoked the function in pl011_write, the faults injected had no
-> effect on the output of the program!
->
-> Do you have an explanation for this behaviour?
->
-> Thanks in advance.
->
->
-> On Wed, Sep 6, 2017 at 2:18 PM, Peter Maydell <peter.maydell@linaro.org>
-> wrote:
->
->> On 6 September 2017 at 13:12, Ramy Sameh <ramysameh26@gmail.com> wrote:
->> > Do the emulated baud rate registers have any effect? (I think they would
->> > have no effect, because there is no real clock that can be used to
->> produce
->> > the baud rate).
->>
->> No, they don't have any effect. (In this UART model we don't implement
->> the feature that you can connect a guest serial port to a host serial
->> port and have the guest baud rate etc settings propagate through.
->> We do that in other UART models and maybe one day we'll add it here,
->> but for now, baud rate settings are ignored.)
->>
->> thanks
->> -- PMM
->>
->
->
->
-> --
-> Best Regards,
-> Ramy Sameh
-> Embedded Software Engineer
-> +2-010-172-777-14
->
-
-
-
--- 
-Best Regards,
-Ramy Sameh
-Embedded Software Engineer
-+2-010-172-777-14
+Paolo
