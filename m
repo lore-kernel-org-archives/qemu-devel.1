@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55614)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1drp7t-00037y-Vp
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 13:37:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1drp8J-0003Pe-NF
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 13:38:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1drp7p-0003cu-2Z
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 13:37:34 -0400
-Date: Tue, 12 Sep 2017 14:37:23 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170912173723.GA7570@localhost.localdomain>
-References: <1504605227-5124-1-git-send-email-thuth@redhat.com>
-	<871snlwev0.fsf@dusky.pond.sub.org> <20170905164835.GF2112@work-vm>
-	<6e03aa82-3663-c251-c8e1-ac2e7eb0e7e7@redhat.com>
-	<87mv68e2i3.fsf@dusky.pond.sub.org>
-	<20170909204133.GH7570@localhost.localdomain>
-	<825b29f3-7857-558e-9092-855c9f75463e@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1drp8H-00044K-Uy
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 13:37:59 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:45581)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1drp8H-00042E-NI
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 13:37:57 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id f199so529740wme.0
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 10:37:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <825b29f3-7857-558e-9092-855c9f75463e@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH] tests: Add a device_add/del
- HMP test
+In-Reply-To: <20170831082210.8362-6-stefanha@redhat.com>
+References: <20170831082210.8362-1-stefanha@redhat.com>
+	<20170831082210.8362-6-stefanha@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 12 Sep 2017 18:37:35 +0100
+Message-ID: <CAFEAcA-HadCNoZc_WU50BxBHiGTsuTF9fWtXLTNZo02XVy52fA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL for-2.10 05/15] throttle: Remove
+ throttle_fix_bucket() / throttle_unfix_bucket()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +30,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alberto Garcia <berto@igalia.com>
 
-On Mon, Sep 11, 2017 at 08:13:21AM +0200, Thomas Huth wrote:
-> On 09.09.2017 22:41, Eduardo Habkost wrote:
-> > On Wed, Sep 06, 2017 at 08:59:32AM +0200, Markus Armbruster wrote:
-> >> Thomas Huth <thuth@redhat.com> writes:
-> >>
-> >>> On 05.09.2017 18:48, Dr. David Alan Gilbert wrote:
-> >>>> * Markus Armbruster (armbru@redhat.com) wrote:
-> >>>>> Thomas Huth <thuth@redhat.com> writes:
-> >>>>>
-> >>>>>> People tend to forget to mark internal devices with "user_creatable = false
-> >>>>>> or hotpluggable = false, and these devices can crash QEMU if added via the
-> >>>>>> HMP monitor. So let's add a test to run through all devices and that tries
-> >>>>>> to add them blindly (without arguments) to see whether this could crash the
-> >>>>>> QEMU instance.
-> [...]
-> >>>>> * The device supports only cold plug with -device, not hot plug with
-> >>>>>   device_add.
-> >>>
-> >>> We've got Eduardo's scripts/device-crash-test script for that already,
-> >>> so no need to cover that here.
-> >>
-> >> Point taken.  So this test is really about hot plug / unplug.  Suggest
-> >> to clarify the commit message: s/add them blindly/hotplug and unplug
-> >> them blindly/.
-> > 
-> > We could extend device-crash-test to test device_add too, as it
-> > already has extra code to deal with known crashes and testing
-> > multiple machine-types.  Also, any additional code we write to
-> > ensure we add mandatory arguments or plug only to valid buses
-> > would apply to both -device and device_add.  I also think Python
-> > test code is easier to maintain and extend, but that's just my
-> > personal preference.
-> 
-> Adding device_add/del support to device-crash-test is certainly an
-> option. The problem is that nobody runs it by default, so this won't
-> help to avoid that new problems are being committed to the repository.
-> 
-> I think we really should have a test for "make check", too. So would my
-> test be acceptable if I'd rewrite it to use QMP instead (I don't think I
-> could do the full list that Markus mentioned, but at least a basic test
-> via QMP as a start)?
+On 31 August 2017 at 09:22, Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> From: Alberto Garcia <berto@igalia.com>
+>
+> The throttling code can change internally the value of bkt->max if it
+> hasn't been set by the user. The problem with this is that if we want
+> to retrieve the original value we have to undo this change first. This
+> is ugly and unnecessary: this patch removes the throttle_fix_bucket()
+> and throttle_unfix_bucket() functions completely and moves the logic
+> to throttle_compute_wait().
+>
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+> Message-id: 5b0b9e1ac6eb208d709eddc7b09e7669a523bff3.1503580370.git.berto@igalia.com
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  util/throttle.c | 62 +++++++++++++++++++++------------------------------------
+>  1 file changed, 23 insertions(+), 39 deletions(-)
+>
+> diff --git a/util/throttle.c b/util/throttle.c
+> index bde56fe3de..4e80a7ea54 100644
+> --- a/util/throttle.c
+> +++ b/util/throttle.c
+> @@ -95,23 +95,36 @@ static int64_t throttle_do_compute_wait(double limit, double extra)
+>  int64_t throttle_compute_wait(LeakyBucket *bkt)
+>  {
+>      double extra; /* the number of extra units blocking the io */
+> +    double bucket_size;   /* I/O before throttling to bkt->avg */
+> +    double burst_bucket_size; /* Before throttling to bkt->max */
+>
+>      if (!bkt->avg) {
+>          return 0;
+>      }
+>
+> -    /* If the bucket is full then we have to wait */
+> -    extra = bkt->level - bkt->max * bkt->burst_length;
+> +    if (!bkt->max) {
+> +        /* If bkt->max is 0 we still want to allow short bursts of I/O
+> +         * from the guest, otherwise every other request will be throttled
+> +         * and performance will suffer considerably. */
+> +        bucket_size = bkt->avg / 10;
+> +        burst_bucket_size = 0;
+> +    } else {
+> +        /* If we have a burst limit then we have to wait until all I/O
+> +         * at burst rate has finished before throttling to bkt->avg */
+> +        bucket_size = bkt->max * bkt->burst_length;
+> +        burst_bucket_size = bkt->max / 10;
+> +    }
+> +
+> +    /* If the main bucket is full then we have to wait */
+> +    extra = bkt->level - bucket_size;
+>      if (extra > 0) {
+>          return throttle_do_compute_wait(bkt->avg, extra);
+>      }
+>
+> -    /* If the bucket is not full yet we have to make sure that we
+> -     * fulfill the goal of bkt->max units per second. */
+> +    /* If the main bucket is not full yet we still have to check the
+> +     * burst bucket in order to enforce the burst limit */
+>      if (bkt->burst_length > 1) {
+> -        /* We use 1/10 of the max value to smooth the throttling.
+> -         * See throttle_fix_bucket() for more details. */
+> -        extra = bkt->burst_level - bkt->max / 10;
+> +        extra = bkt->burst_level - burst_bucket_size;
+>          if (extra > 0) {
+>              return throttle_do_compute_wait(bkt->max, extra);
+>          }
 
-We can run device-crash-test on "make check", we just need to
-choose what's the subset of tests we want to run (because testing
-all machine+device+target combinations would take too long).
+Coverity thinks there's a division-by-zero issue here: bkt->max could
+be zero (we have a test for that up above), but we can here pass it
+to throttle_do_compute_wait(), which uses it as a divisor.
 
-But while device-crash-test doesn't support hotplug, I think your
-test code would be good too.
+Since this is all double arithmetic, the division isn't going
+to cause a crash, but the implicit cast of the resulting infinity
+to int64_t to return it is undefined behaviour.
 
--- 
-Eduardo
+This is CID 1381016.
+
+thanks
+-- PMM
