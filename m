@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37990)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1drjxQ-0005iU-NY
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:06:26 -0400
+	(envelope-from <imammedo@redhat.com>) id 1drk3D-0008Co-1H
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:12:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1drjxP-0001FH-0D
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:06:24 -0400
-Date: Tue, 12 Sep 2017 13:06:03 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170912120603.GE17633@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170912112855.24269-1-berrange@redhat.com>
-	<20170912112855.24269-6-berrange@redhat.com>
+	(envelope-from <imammedo@redhat.com>) id 1drk38-0007cb-TT
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 08:12:22 -0400
+Date: Tue, 12 Sep 2017 14:11:59 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170912141159.22c63bce@nial.brq.redhat.com>
+In-Reply-To: <20170905213152.GG17184@localhost.localdomain>
+References: <1504533662-198084-1-git-send-email-imammedo@redhat.com>
+	<1504533662-198084-7-git-send-email-imammedo@redhat.com>
+	<20170905213152.GG17184@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170912112855.24269-6-berrange@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: convert crypto driver to
- bdrv_co_preadv|pwritev
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 6/6] arm: drop intermadiate cpu_model ->
+ cpu type parsing and use cpu type directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,222 +25,289 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>, Rob Herring <robh@kernel.org>, Igor Mitsyanko <i.mitsyanko@gmail.com>, Alistair Francis <alistair@alistair23.me>, qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Sep 12, 2017 at 12:28:53PM +0100, Daniel P. Berrange wrote:
-> Make the crypto driver implement the bdrv_co_preadv|pwritev
-> callbacks, and also use bdrv_co_preadv|pwritev for I/O
-> with the protocol driver beneath.
+On Tue, 5 Sep 2017 18:31:52 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
+
+> On Mon, Sep 04, 2017 at 04:01:02PM +0200, Igor Mammedov wrote:
+> > there are 2 use cases to deal with:
+> >   1: fixed CPU models per board/soc
+> >   2: boards with user configurable cpu_model and fallback to
+> >      default cpu_model if user hasn't specified one explicitly
+> > 
+> > For the 1st
+> >   drop intermediate cpu_model parsing and use const cpu type
+> >   directly, which replaces:
+> >      typename = object_class_get_name(
+> >            cpu_class_by_name(TYPE_ARM_CPU, cpu_model))
+> >      object_new(typename)
+> >   with
+> >      object_new(FOO_CPU_TYPE_NAME)
+> >   or
+> >      cpu_generic_init(BASE_CPU_TYPE, "my cpu model")
+> >   with
+> >      cpu_create(FOO_CPU_TYPE_NAME)
+> > 
+> > as result 1st use case doesn't have to invoke not necessary
+> > translation and not needed code is removed.
+> > 
+> > For the 2nd
+> >  1: set default cpu type with MachineClass::default_cpu_type and
+> >  2: use generic cpu_model parsing that done before machine_init()
+> >     is run and:
+> >     2.1: drop custom cpu_model parsing where pattern is:
+> >        typename = object_class_get_name(
+> >            cpu_class_by_name(TYPE_ARM_CPU, cpu_model))
+> >        [parse_features(typename, cpu_model, &err) ]
+> > 
+> >     2.2: or replace cpu_generic_init() which does what
+> >          2.1 does + create_cpu(typename) with just
+> >          create_cpu(machine->cpu_type)
+> > as result cpu_name -> cpu_type translation is done using
+> > generic machine code one including parsing optional features
+> > if supported/present (removes a bunch of duplicated cpu_model
+> > parsing code) and default cpu type is defined in an uniform way
+> > within machine_class_init callbacks instead of adhoc places
+> > in boadr's machine_init code.
+> > 
+> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+> > ---
+[...]
+
+> > @@ -285,20 +259,16 @@ static void armv7m_reset(void *opaque)
+> >     Returns the ARMv7M device.  */
+> >  
+> >  DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+> > -                      const char *kernel_filename, const char *cpu_model)
+> > +                      const char *kernel_filename, const char *cpu_type)
+> >  {
+> >      DeviceState *armv7m;
+> >  
+> > -    if (cpu_model == NULL) {
+> > -        cpu_model = "cortex-m3";
+> > -    }
+> > -  
 > 
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  block/crypto.c | 104 +++++++++++++++++++++++++++++++--------------------------
->  1 file changed, 56 insertions(+), 48 deletions(-)
+> I was going to suggest doing the default_cpu_type stuff in a
+> separate patch, but it might require touching those lines twice.
+> So I guess this is OK.
+I've have tried it, but yes it's more changes and there is also
+chicken/egg problem, cleanest way I've stopped at is to get rid of
+cpu_model fallback + cpu_generic_init() in one go.
+
+ 
+> >      armv7m = qdev_create(NULL, "armv7m");
+> >      qdev_prop_set_uint32(armv7m, "num-irq", num_irq);
+> > -    qdev_prop_set_string(armv7m, "cpu-model", cpu_model);
+> > +    qdev_prop_set_string(armv7m, "cpu-type", cpu_type);
+> >      object_property_set_link(OBJECT(armv7m), OBJECT(get_system_memory()),
+> >                                       "memory", &error_abort);
+> > -    /* This will exit with an error if the user passed us a bad cpu_model */
+> > +    /* This will exit with an error if the user passed us a bad cpu_type */
+> >      qdev_init_nofail(armv7m);
+> >  
+> >      armv7m_load_kernel(ARM_CPU(first_cpu), kernel_filename, mem_size);
+[...]
+
+> > diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
+> > index 20e60f1..0d7190a 100644
+> > --- a/hw/arm/highbank.c
+> > +++ b/hw/arm/highbank.c
+> > @@ -219,7 +219,6 @@ enum cxmachines {
+> >  static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
+> >  {
+> >      ram_addr_t ram_size = machine->ram_size;
+> > -    const char *cpu_model = machine->cpu_model;
+> >      const char *kernel_filename = machine->kernel_filename;
+> >      const char *kernel_cmdline = machine->kernel_cmdline;
+> >      const char *initrd_filename = machine->initrd_filename;
+> > @@ -236,19 +235,20 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
+> >  
+> >      switch (machine_id) {
+> >      case CALXEDA_HIGHBANK:
+> > -        cpu_model = "cortex-a9";
+> > +        machine->cpu_type = ARM_CPU_TYPE_NAME("cortex-a9");
+> >          break;
+> >      case CALXEDA_MIDWAY:
+> > -        cpu_model = "cortex-a15";
+> > +        machine->cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+> >          break;
+> > +    default:
+> > +        assert(0);
+> >      }  
 > 
-> diff --git a/block/crypto.c b/block/crypto.c
-> index 49d6d4c058..d004e9cef4 100644
-> --- a/block/crypto.c
-> +++ b/block/crypto.c
-> @@ -383,19 +383,23 @@ static void block_crypto_close(BlockDriverState *bs)
->  #define BLOCK_CRYPTO_MAX_SECTORS 2048
->  
->  static coroutine_fn int
-> -block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
-> -                      int remaining_sectors, QEMUIOVector *qiov)
-> +block_crypto_co_preadv(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-> +                       QEMUIOVector *qiov, int flags)
->  {
->      BlockCrypto *crypto = bs->opaque;
-> -    int cur_nr_sectors; /* number of sectors in current iteration */
-> +    uint64_t cur_bytes; /* number of bytes in current iteration */
->      uint64_t bytes_done = 0;
->      uint8_t *cipher_data = NULL;
->      QEMUIOVector hd_qiov;
->      int ret = 0;
->      uint64_t sector_size = qcrypto_block_get_sector_size(crypto->block);
-> -    uint64_t payload_offset =
-> -        qcrypto_block_get_payload_offset(crypto->block) / sector_size;
-> -    assert(payload_offset < (INT64_MAX / 512));
-> +    size_t payload_offset = qcrypto_block_get_payload_offset(crypto->block);
+> Why not delete this switch statement completely and set
+> default_cpu_type at midway_class_init() and
+> highbank_class_init()?
+it would allow '-cpu foo' to take effect which isn't what current code does,
+as series doesn't add valid_cpus[] check at the same time.
 
-Opps, rebase merge error - that should be uint64_t - this is what the
-patchew failure complained about.
+So here we do pretty much strait-forward conversion from cpu_model
+to cpu_type and nothing else.
 
-> +    uint64_t sector_num = offset / sector_size;
-> +
-> +    assert(!flags);
-> +    assert(payload_offset < INT64_MAX);
-> +    assert(QEMU_IS_ALIGNED(offset, sector_size));
-> +    assert(QEMU_IS_ALIGNED(bytes, sector_size));
->  
->      qemu_iovec_init(&hd_qiov, qiov->niov);
->  
-> @@ -410,37 +414,33 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
->          goto cleanup;
->      }
->  
-> -    while (remaining_sectors) {
-> -        cur_nr_sectors = remaining_sectors;
-> +    while (bytes) {
-> +        cur_bytes = bytes;
->  
-> -        if (cur_nr_sectors > BLOCK_CRYPTO_MAX_SECTORS) {
-> -            cur_nr_sectors = BLOCK_CRYPTO_MAX_SECTORS;
-> +        if (cur_bytes > (BLOCK_CRYPTO_MAX_SECTORS * sector_size)) {
-> +            cur_bytes = BLOCK_CRYPTO_MAX_SECTORS * sector_size;
->          }
->  
->          qemu_iovec_reset(&hd_qiov);
-> -        qemu_iovec_add(&hd_qiov, cipher_data, cur_nr_sectors * sector_size);
-> +        qemu_iovec_add(&hd_qiov, cipher_data, cur_bytes);
->  
-> -        ret = bdrv_co_readv(bs->file,
-> -                            payload_offset + sector_num,
-> -                            cur_nr_sectors, &hd_qiov);
-> +        ret = bdrv_co_preadv(bs->file, payload_offset + offset + bytes_done,
-> +                             cur_bytes, &hd_qiov, 0);
->          if (ret < 0) {
->              goto cleanup;
->          }
->  
-> -        if (qcrypto_block_decrypt(crypto->block,
-> -                                  sector_num,
-> -                                  cipher_data, cur_nr_sectors * sector_size,
-> -                                  NULL) < 0) {
-> +        if (qcrypto_block_decrypt(crypto->block, sector_num, cipher_data,
-> +                                  cur_bytes, NULL) < 0) {
->              ret = -EIO;
->              goto cleanup;
->          }
->  
-> -        qemu_iovec_from_buf(qiov, bytes_done,
-> -                            cipher_data, cur_nr_sectors * sector_size);
-> +        qemu_iovec_from_buf(qiov, bytes_done, cipher_data, cur_bytes);
->  
-> -        remaining_sectors -= cur_nr_sectors;
-> -        sector_num += cur_nr_sectors;
-> -        bytes_done += cur_nr_sectors * sector_size;
-> +        sector_num += cur_bytes / sector_size;
-> +        bytes -= cur_bytes;
-> +        bytes_done += cur_bytes;
->      }
->  
->   cleanup:
-> @@ -452,19 +452,23 @@ block_crypto_co_readv(BlockDriverState *bs, int64_t sector_num,
->  
->  
->  static coroutine_fn int
-> -block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
-> -                       int remaining_sectors, QEMUIOVector *qiov)
-> +block_crypto_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
-> +                        QEMUIOVector *qiov, int flags)
->  {
->      BlockCrypto *crypto = bs->opaque;
-> -    int cur_nr_sectors; /* number of sectors in current iteration */
-> +    uint64_t cur_bytes; /* number of bytes in current iteration */
->      uint64_t bytes_done = 0;
->      uint8_t *cipher_data = NULL;
->      QEMUIOVector hd_qiov;
->      int ret = 0;
->      uint64_t sector_size = qcrypto_block_get_sector_size(crypto->block);
-> -    uint64_t payload_offset =
-> -        qcrypto_block_get_payload_offset(crypto->block) / sector_size;
-> -    assert(payload_offset < (INT64_MAX / 512));
-> +    uint64_t payload_offset = qcrypto_block_get_payload_offset(crypto->block);
-> +    uint64_t sector_num = offset / sector_size;
-> +
-> +    assert(!flags);
-> +    assert(payload_offset < INT64_MAX);
-> +    assert(QEMU_IS_ALIGNED(offset, sector_size));
-> +    assert(QEMU_IS_ALIGNED(bytes, sector_size));
->  
->      qemu_iovec_init(&hd_qiov, qiov->niov);
->  
-> @@ -479,37 +483,33 @@ block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
->          goto cleanup;
->      }
->  
-> -    while (remaining_sectors) {
-> -        cur_nr_sectors = remaining_sectors;
-> +    while (bytes) {
-> +        cur_bytes = bytes;
->  
-> -        if (cur_nr_sectors > BLOCK_CRYPTO_MAX_SECTORS) {
-> -            cur_nr_sectors = BLOCK_CRYPTO_MAX_SECTORS;
-> +        if (cur_bytes > (BLOCK_CRYPTO_MAX_SECTORS * sector_size)) {
-> +            cur_bytes = BLOCK_CRYPTO_MAX_SECTORS * sector_size;
->          }
->  
-> -        qemu_iovec_to_buf(qiov, bytes_done,
-> -                          cipher_data, cur_nr_sectors * sector_size);
-> +        qemu_iovec_to_buf(qiov, bytes_done, cipher_data, cur_bytes);
->  
-> -        if (qcrypto_block_encrypt(crypto->block,
-> -                                  sector_num,
-> -                                  cipher_data, cur_nr_sectors * sector_size,
-> -                                  NULL) < 0) {
-> +        if (qcrypto_block_encrypt(crypto->block, sector_num, cipher_data,
-> +                                  cur_bytes, NULL) < 0) {
->              ret = -EIO;
->              goto cleanup;
->          }
->  
->          qemu_iovec_reset(&hd_qiov);
-> -        qemu_iovec_add(&hd_qiov, cipher_data, cur_nr_sectors * sector_size);
-> +        qemu_iovec_add(&hd_qiov, cipher_data, cur_bytes);
->  
-> -        ret = bdrv_co_writev(bs->file,
-> -                             payload_offset + sector_num,
-> -                             cur_nr_sectors, &hd_qiov);
-> +        ret = bdrv_co_pwritev(bs->file, payload_offset + offset + bytes_done,
-> +                              cur_bytes, &hd_qiov, 0);
->          if (ret < 0) {
->              goto cleanup;
->          }
->  
-> -        remaining_sectors -= cur_nr_sectors;
-> -        sector_num += cur_nr_sectors;
-> -        bytes_done += cur_nr_sectors * sector_size;
-> +        sector_num += cur_bytes / sector_size;
-> +        bytes -= cur_bytes;
-> +        bytes_done += cur_bytes;
->      }
->  
->   cleanup:
-> @@ -519,6 +519,13 @@ block_crypto_co_writev(BlockDriverState *bs, int64_t sector_num,
->      return ret;
->  }
->  
-> +static void block_crypto_refresh_limits(BlockDriverState *bs, Error **errp)
-> +{
-> +    BlockCrypto *crypto = bs->opaque;
-> +    uint64_t sector_size = qcrypto_block_get_sector_size(crypto->block);
-> +    bs->bl.request_alignment = sector_size; /* No sub-sector I/O */
-> +}
-> +
->  
->  static int64_t block_crypto_getlength(BlockDriverState *bs)
->  {
-> @@ -618,8 +625,9 @@ BlockDriver bdrv_crypto_luks = {
->      .bdrv_truncate      = block_crypto_truncate,
->      .create_opts        = &block_crypto_create_opts_luks,
->  
-> -    .bdrv_co_readv      = block_crypto_co_readv,
-> -    .bdrv_co_writev     = block_crypto_co_writev,
-> +    .bdrv_refresh_limits = block_crypto_refresh_limits,
-> +    .bdrv_co_preadv     = block_crypto_co_preadv,
-> +    .bdrv_co_pwritev    = block_crypto_co_pwritev,
->      .bdrv_getlength     = block_crypto_getlength,
->      .bdrv_get_info      = block_crypto_get_info_luks,
->      .bdrv_get_specific_info = block_crypto_get_specific_info_luks,
-> -- 
-> 2.13.5
 > 
+> 
+> >  
+> >      for (n = 0; n < smp_cpus; n++) {
+> > -        ObjectClass *oc = cpu_class_by_name(TYPE_ARM_CPU, cpu_model);
+> >          Object *cpuobj;
+> >          ARMCPU *cpu;
+> >  
+> > -        cpuobj = object_new(object_class_get_name(oc));
+> > +        cpuobj = object_new(machine->cpu_type);
+> >          cpu = ARM_CPU(cpuobj);
+> >  
+> >          object_property_set_int(cpuobj, QEMU_PSCI_CONDUIT_SMC,
+[...]
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> > diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
+> > index c16657d..79b317a 100644
+> > --- a/hw/arm/pxa2xx.c
+> > +++ b/hw/arm/pxa2xx.c
+> > @@ -2052,21 +2052,19 @@ static void pxa2xx_reset(void *opaque, int line, int level)
+> >  
+> >  /* Initialise a PXA270 integrated chip (ARM based core).  */
+> >  PXA2xxState *pxa270_init(MemoryRegion *address_space,
+> > -                         unsigned int sdram_size, const char *revision)
+> > +                         unsigned int sdram_size, const char *cpu_type)
+> >  {
+> >      PXA2xxState *s;
+> >      int i;
+> >      DriveInfo *dinfo;
+> >      s = g_new0(PXA2xxState, 1);
+> >  
+> > -    if (revision && strncmp(revision, "pxa27", 5)) {
+> > +    if (strncmp(cpu_type, ARM_CPU_TYPE_NAME("pxa27"), 5)) {  
+> 
+> Why are you using ARM_CPU_TYPE_NAME here, if you are only
+> checking if cpu_type starts with "pxa27"?
+mainly to show that we are dealing with types here,
+I can leave plain "pxa27" if you prefer.
+
+
+> I suggest adding a TODO here noting that we implement this using
+> either a TYPE_ARM_PXA27 subclass (so we can use
+> object_class_dynamic_cast()), or a ARMCPUClass field to identify
+> if the CPU is pxa27.
+dynamic cast would be nice, but ("pxa27", 5) cover a range of cpu types
+starting with this prefix, to use cast class structure should be reorganized
+to make all pxa27 based cpus have a common pxa27 ancestor.
+Or just use more verbose complete list of valid_cpus[]
+
+It's out of scope of this patch including TODO comment,
+all boards should be audited anyways to make proper use of valid_cpus[]
+and adding not related TODO comments here doesn't seem right.
+
+
+> >          fprintf(stderr, "Machine requires a PXA27x processor.\n");
+> >          exit(1);
+> >      }  
+> 
+> This would be another use case for a generic CPU model validation
+> mechanism in MachineClass.
+yep, just applied to a range of cpus instead of typical leaf class.
+
+[...]
+
+> > diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
+> > index c1145dd..3d1a231 100644
+> > --- a/hw/arm/strongarm.c
+> > +++ b/hw/arm/strongarm.c
+> > @@ -1581,23 +1581,19 @@ static const TypeInfo strongarm_ssp_info = {
+> >  
+> >  /* Main CPU functions */
+> >  StrongARMState *sa1110_init(MemoryRegion *sysmem,
+> > -                            unsigned int sdram_size, const char *rev)
+> > +                            unsigned int sdram_size, const char *cpu_type)
+> >  {
+> >      StrongARMState *s;
+> >      int i;
+> >  
+> >      s = g_new0(StrongARMState, 1);
+> >  
+> > -    if (!rev) {
+> > -        rev = "sa1110-b5";
+> > -    }
+> > -
+> > -    if (strncmp(rev, "sa1110", 6)) {
+> > +    if (strncmp(cpu_type, "sa1110", 6)) {
+> >          error_report("Machine requires a SA1110 processor.");
+> >          exit(1);  
+> 
+> Same suggestion as on pxa270_init(): adding a TODO here noting
+> that we implement this using either object_class_dynamic_cast(),
+> or a ARMCPUClass field to identify if the CPU is sa1110.
+same as pxa27, it's a case of range of cpus,
+TODO is orthogonal to patch topic, so I'd prefer not to add it here.
+
+> 
+> 
+> >      }
+> >  
+> > -    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, rev));
+> > +    s->cpu = ARM_CPU(cpu_create(cpu_type));
+> >  
+> >      memory_region_allocate_system_memory(&s->sdram, NULL, "strongarm.sdram",
+> >                                           sdram_size);
+> > diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
+> > index 8b757ff..75631f6 100644
+> > --- a/hw/arm/tosa.c
+> > +++ b/hw/arm/tosa.c
+> > @@ -219,7 +219,6 @@ static struct arm_boot_info tosa_binfo = {
+> >  
+> >  static void tosa_init(MachineState *machine)
+> >  {
+> > -    const char *cpu_model = machine->cpu_model;
+> >      const char *kernel_filename = machine->kernel_filename;
+> >      const char *kernel_cmdline = machine->kernel_cmdline;
+> >      const char *initrd_filename = machine->initrd_filename;
+> > @@ -229,9 +228,6 @@ static void tosa_init(MachineState *machine)
+> >      TC6393xbState *tmio;
+> >      DeviceState *scp0, *scp1;
+> >  
+> > -    if (!cpu_model)
+> > -        cpu_model = "pxa255";
+> > -  
+> 
+> Don't we need to set mc->default_cpu_type at
+> tosapda_machine_init() to replace this?
+board doesn't actually take user input and above remove code does nothing,
+look into pxa255_init() where it uses hardcoded cpu model
+  cpu_generic_init(TYPE_ARM_CPU, "pxa255")
+
+another user connex_init() of pxa255_init() were already cleaned up
+or didn't have junk to begin with
+
+> >      mpu = pxa255_init(address_space_mem, tosa_binfo.ram_size);
+> >  
+> >      memory_region_init_ram(rom, NULL, "tosa.rom", TOSA_ROM, &error_fatal);
+[...]
+
+> > diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> > index 05c038b..feeeeb2 100644
+> > --- a/target/arm/cpu.c
+> > +++ b/target/arm/cpu.c
+> > @@ -867,7 +867,7 @@ static ObjectClass *arm_cpu_class_by_name(const char *cpu_model)
+> >      }
+> >  
+> >      cpuname = g_strsplit(cpu_model, ",", 1);
+> > -    typename = g_strdup_printf("%s-" TYPE_ARM_CPU, cpuname[0]);
+> > +    typename = g_strdup_printf("%s" ARM_CPU_TYPE_SUFFIX, cpuname[0]);  
+> 
+> What about doing the same we do in x86 and s390:
+> 
+>    g_strdup_printf(ARM_CPU_TYPE_NAME("%s"), cpuname[0]);
+sure
+
+> 
+> >      oc = object_class_by_name(typename);
+> >      g_strfreev(cpuname);
+> >      g_free(typename);
+> > -- 
+> > 2.7.4
+> > 
+> >   
+> 
+> 
