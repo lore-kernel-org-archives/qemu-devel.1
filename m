@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drlLk-0000hV-UD
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:35:41 -0400
+	(envelope-from <wangjie88@huawei.com>) id 1drlOd-0002tH-Uc
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:38:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drlLj-0003x4-Mn
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:35:36 -0400
-References: <20170911172022.4738-1-eblake@redhat.com>
-	<20170911172022.4738-32-eblake@redhat.com>
-	<1a629362-ebc5-7d28-463c-f6ec4639d29b@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <2bd66aa2-6052-bf14-4f7d-c30fdcaff07d@redhat.com>
-Date: Tue, 12 Sep 2017 08:35:21 -0500
+	(envelope-from <wangjie88@huawei.com>) id 1drlOZ-0005tk-B6
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:38:35 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2318)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <wangjie88@huawei.com>) id 1drlOS-0005hR-SA
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:38:31 -0400
+References: <59B7C252.1070004@huawei.com>
+From: "WangJie (Captain)" <wangjie88@huawei.com>
+Message-ID: <59B7E305.6080302@huawei.com>
+Date: Tue, 12 Sep 2017 21:37:09 +0800
 MIME-Version: 1.0
-In-Reply-To: <1a629362-ebc5-7d28-463c-f6ec4639d29b@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="QGK3iQNGj2j9K6FRKd9MssJo4qpEPBgUs"
-Subject: Re: [Qemu-devel] [PATCH v7 31/38] libqtest: Merge qtest_clock_*()
- with clock_*()
+In-Reply-To: <59B7C252.1070004@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?question=EF=BC=9A_I_found_a_bug_which_wil?=
+ =?utf-8?q?l_lead_to_qemu_crash?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,85 +28,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, John Snow <jsnow@redhat.com>, "open list:Floppy" <qemu-block@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com
+Cc: berto@igalia.com, stefanha@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---QGK3iQNGj2j9K6FRKd9MssJo4qpEPBgUs
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: armbru@redhat.com, pbonzini@redhat.com, John Snow <jsnow@redhat.com>,
- "open list:Floppy" <qemu-block@nongnu.org>
-Message-ID: <2bd66aa2-6052-bf14-4f7d-c30fdcaff07d@redhat.com>
-Subject: Re: [PATCH v7 31/38] libqtest: Merge qtest_clock_*() with clock_*()
-References: <20170911172022.4738-1-eblake@redhat.com>
- <20170911172022.4738-32-eblake@redhat.com>
- <1a629362-ebc5-7d28-463c-f6ec4639d29b@redhat.com>
-In-Reply-To: <1a629362-ebc5-7d28-463c-f6ec4639d29b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi, Eric
+I used git-bisect and fount the patch you commited（throttle: Remove block from group on hot-unplug） fixed the bug which I presented to Kevin
 
-On 09/12/2017 05:45 AM, Thomas Huth wrote:
-> On 11.09.2017 19:20, Eric Blake wrote:
->> Maintaining two layers of libqtest APIs, one that takes an explicit
->> QTestState object, and the other that uses the implicit global_qtest,
->> is annoying.  In the interest of getting rid of global implicit
->> state and having less code to maintain, merge:
->>  qtest_clock_set()
->>  qtest_clock_step()
->>  qtest_clock_step_next()
->> with their short counterparts.  All callers that previously
->> used the short form now make it explicit that they are relying on
->> global_qtest, and later patches can then clean things up to remove
->> the global variable.
->>
-
->> @@ -446,7 +446,7 @@ int64_t qtest_clock_step(QTestState *s, int64_t st=
-ep);
->>   *
->>   * Returns: The current value of the QEMU_CLOCK_VIRTUAL in nanosecond=
-s.
->>   */
->> -int64_t qtest_clock_set(QTestState *s, int64_t val);
->> +int64_t clock_set(QTestState *s, int64_t val);
->  Could we please keep the "qtest" prefix here and rather get rid of the=
-
-> other ones? Even if it's more to type, I prefer to have a proper prefix=
-
-> here so that it is clear at the first sight that the functions belong t=
-o
-> the qtest framework.
-
-I suppose we can, although it makes more lines that are likely to bump
-up against 80 columns, and thus slightly more churn to reformat things
-to keep checkpatch happy.  I like the shorter name, because less typing
-is easier to remember.  I'd prefer a second opinion on naming before
-doing anything about it though - Markus or Paolo, do you have any
-preference?
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+the patch which fixed the bug is： https://github.com/qemu/qemu/commit/1606e4cf8a976513ecac70ad6642a7ec45744cf5#diff-7cb66df56045598b75a219eebc27efb6
 
 
---QGK3iQNGj2j9K6FRKd9MssJo4qpEPBgUs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+But the condition which I made to causes crash is differ in the condition you  described in patch info, is it the same reason?
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+I feel very confused, please tell me, thank you :>
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm34pkACgkQp6FrSiUn
-Q2pbqAf+PB+2XfclPnX+va6eBtPtUqsjel7rlfW7emQHUK9ei4nSq4W4rsdj7CTs
-/78W9NC3KNO6KTfnHHR6yOJ6wXHGnSGvPJAcBUFx4WQmEX0VvEHrEcXOQnibnERE
-KFnoHKWz81DELZNkc9g4cjBbF0DWAp8TsruE+i0bo6GAQcjrUxii4E+lY1zwQEHZ
-64j+qpCVvgXil/fFrg80Nmbwjo98dURd5qn6hZ2VSsJuoq8Z305/D8HLZLNg2s9f
-n2dkGe5lFhfKUqBlDuiXZQOHWwMEfjiEBpoKMG46VQTwYDmxelNV46ZahJWRP8As
-b/PEazN63a8YTfkWUnaN+WqAeW9c+g==
-=FslS
------END PGP SIGNATURE-----
 
---QGK3iQNGj2j9K6FRKd9MssJo4qpEPBgUs--
+On 2017/9/12 19:17, WangJie (Captain) wrote:
+> Hi, Kevin.
+>
+> I found a bug about qemu-kvm(version 2.7.0-rc0 adn 2.8.1). but qemu 2.6.0 and current master is OK.
+> So I git-bisect the master branch，and I found the patch you commited (block: Decouple throttling from BlockDriverState) lead the bug into qemu.
+>
+> The patch which lead the bug into qemu: (https://github.com/qemu/qemu/commit/7ca7f0f6db1fedd28d490795d778cf23979a2aa7#diff-ea36ba0f79150cc299732696a069caba)
+>
+> Because the current master is OK. So I think you had fixed it , can you tell me which patch fixed the bug?        Thank you :>
+>
+>
+> the bug is that: qemu will crash when loop to attach and detach a disk which configured qos to a VM for a while.
+>
+>
+> *Segmentation fault info(qemu 2.7.0-rc0):*
+> Using host libthread_db library "/lib64/libthread_db.so.1".
+> Core was generated by `/usr/bin/qemu-kvm -name guest=wangjie-i-clone203_rhel_7.3_64_guestosdev,debug-t'.
+> Program terminated with signal 11, Segmentation fault.
+> #0  0x00007fe960413e3c in throttle_group_next_blk (blk=0x11) at block/throttle-groups.c:160
+> 160        ThrottleState *ts = blkp->throttle_state;
+> Missing separate debuginfos, use: debuginfo-install glib2-2.40.0-4.x86_64 glibc-2.17-157.h5.x86_64 libaio-0.3.109-13.x86_64 libgcc-4.8.3-10.h1.x86_64 nettle-2.7.1-4.h1.x86_64 numactl-libs-2.0.9-4.x86_64 pixman-0.32.4-3.x86_64 zlib-1.2.7-14.x86_64
+> (gdb) bt
+> #0  0x00007fe960413e3c in throttle_group_next_blk (blk=0x11) at block/throttle-groups.c:160
+> #1  0x00007fe960413eff in next_throttle_token (blk=0x7fe963f5c400, is_write=false) at block/throttle-groups.c:192
+> #2  0x00007fe9604141a8 in throttle_group_co_io_limits_intercept (blk=0x7fe963f5c400, bytes=512, is_write=false)
+>     at block/throttle-groups.c:303
+> #3  0x00007fe960400048 in blk_co_preadv (blk=0x7fe963f5c400, offset=0, bytes=512, qiov=0x7ffc37ee8aa0, flags=(unknown: 0))
+>     at block/block-backend.c:728
+> #4  0x00007fe960400159 in blk_read_entry (opaque=0x7ffc37ee8ac0) at block/block-backend.c:769
+> #5  0x00007fe96048f4d7 in coroutine_trampoline (i0=1678853408, i1=32745) at util/coroutine-ucontext.c:78
+> #6  0x00007fe95dfdacf0 in ?? () from /lib64/libc.so.6
+> #7  0x00007ffc37ee9c00 in ?? ()
+> #8  0x0000000000000000 in ?? ()
+>
+>
+>
+> *Segmentation fault info(qemu 2.8.1):*
+> Program received signal SIGSEGV, Segmentation fault.
+> 0x00007f5469220607 in blk_has_pending_reqs (blk=0x7f54672a0032, is_write=false) at block/throttle-groups.c:184
+> 184        return blkp->pending_reqs[is_write];
+> (gdb) bt
+> #0  0x00007f5469220607 in blk_has_pending_reqs (blk=0x7f54672a0032, is_write=false) at block/throttle-groups.c:184
+> #1  0x00007f54692206a8 in next_throttle_token (blk=0x7f546b6cd120, is_write=false) at block/throttle-groups.c:207
+> #2  0x00007f5469220984 in throttle_group_co_io_limits_intercept (blk=0x7f546b6cd120, bytes=512, is_write=false)
+>     at block/throttle-groups.c:322
+> #3  0x00007f546920bc79 in blk_co_preadv (blk=0x7f546b6cd120, offset=0, bytes=512, qiov=0x7ffcc7355060, flags=0)
+>     at block/block-backend.c:815
+> #4  0x00007f546920bddf in blk_read_entry (opaque=0x7ffcc7355080) at block/block-backend.c:865
+> #5  0x00007f54692a00f0 in coroutine_trampoline (i0=-588050448, i1=32595) at util/coroutine-ucontext.c:79
+> #6  0x00007f5466f34cf0 in ?? () from /lib64/libc.so.6
+> #7  0x00007f53f27fa9e0 in ?? ()
+> #8  0x0000000000000000 in ?? ()
+>
+>
+> *The way how to find the bug as follows:*
+> *1、start a VM*
+>
+>
+> *2、attach and detach a disk for a while，the configure of the disk (add-1.xml) as follows*
+> <disk device="disk" type="file">
+> <driver cache="none" io="native" name="qemu" type="raw" />
+> <source file="/mnt/sdb/wangjie-kvm/core/fk8b42zr-oz" />
+> <target bus="virtio" dev="vdb" />
+> <iotune>
+> <read_iops_sec>3000</read_iops_sec>
+> <write_iops_sec>3000</write_iops_sec>
+> <read_bytes_sec>120000000</read_bytes_sec>
+> <write_bytes_sec>120000000</write_bytes_sec>
+> </iotune>
+> </disk>
+>
+>
+> *3、run below script for a while，the qemu process of  VM will crash*
+> ret=1
+> while [ $ret -ne 0 ]; do
+>         virsh attach-device i-clone203_rhel_7.3_64_guestosdev add-1.xml
+>         sleep 2
+>         virsh detach-device i-clone203_rhel_7.3_64_guestosdev add-1.xml
+> done
+>
