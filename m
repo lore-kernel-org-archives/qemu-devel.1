@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49032)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49478)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1droBX-0004t5-9f
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:37:16 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1droCN-0005mR-0P
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:38:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1droBW-0006B5-BY
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:37:15 -0400
-References: <20170912144459.11359-1-pbonzini@redhat.com>
-	<20170912144459.11359-3-pbonzini@redhat.com>
-	<1a8dff3e-1519-e092-4619-934a584ee12a@amsat.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <df6cffe6-7f1f-5362-5010-2255afc53b34@redhat.com>
-Date: Tue, 12 Sep 2017 18:36:54 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1droCI-0006Sh-Tr
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:38:07 -0400
+Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:34316)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1droCI-0006SE-PZ
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:38:02 -0400
+Received: by mail-qt0-x241.google.com with SMTP id q8so7665092qtb.1
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 09:38:02 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <20170823162004.27337-1-marcandre.lureau@redhat.com>
+	<20170823162004.27337-6-marcandre.lureau@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <c9f1c67f-dd9d-1738-d100-6b6e686bfc19@amsat.org>
+Date: Tue, 12 Sep 2017 13:37:59 -0300
 MIME-Version: 1.0
-In-Reply-To: <1a8dff3e-1519-e092-4619-934a584ee12a@amsat.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170823162004.27337-6-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 02/10] qemu-iotests: get rid of AWK_PROG
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 05/27] vhost-user-scsi: connect unix socket
+ before allocating
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,80 +36,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, Eric Blake <eblake@redhat.com>
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: changpeng.liu@intel.com, felipe@nutanix.com
 
-On 12/09/2017 18:30, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Paolo,
->=20
-> Hmm did you just resend your v1? Except the cover the patches don't hav=
-e
-> "v2" and I remember reviewing this one (also Eric Blake replied with hi=
-s
-> R-b).
+On 08/23/2017 01:19 PM, Marc-André Lureau wrote:
+> This simplify a little bit memory management in the following patches.
+> 
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+> ---
+>   contrib/vhost-user-scsi/vhost-user-scsi.c | 18 +++++++++---------
+>   1 file changed, 9 insertions(+), 9 deletions(-)
+> 
+> diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-user-scsi/vhost-user-scsi.c
+> index 1fb57da2da..cddaaf8995 100644
+> --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
+> +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
+> @@ -715,11 +715,11 @@ static void vdev_scsi_deinit(vhost_scsi_dev_t *vdev_scsi)
+>       }
+>   }
+>   
+> -static vhost_scsi_dev_t *vdev_scsi_new(char *unix_fn)
+> +static vhost_scsi_dev_t *vdev_scsi_new(int server_sock)
+>   {
+>       vhost_scsi_dev_t *vdev_scsi = NULL;
+>   
+> -    assert(unix_fn);
+> +    assert(server_sock >= 0);
 
-I didn't include the R-bs, sorry (most of the later patches had
-non-trivial context changes, this one is the exception).
+This assert() can't happen anymore.
 
-But it's definitely v2, because v1 had 12 patches. :)
+Removing it:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Paolo
-
-
-> On 09/12/2017 11:44 AM, Paolo Bonzini wrote:
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>   tests/qemu-iotests/check         | 4 ++--
->>   tests/qemu-iotests/common        | 2 +-
->>   tests/qemu-iotests/common.config | 3 ---
->>   3 files changed, 3 insertions(+), 6 deletions(-)
->>
->> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
->> index 4a6ed67b42..5c0d0c51dc 100755
->> --- a/tests/qemu-iotests/check
->> +++ b/tests/qemu-iotests/check
->> @@ -128,7 +128,7 @@ tmp=3D"${TEST_DIR}"/$$
->>     _wallclock()
->>   {
->> -    date "+%H %M %S" | $AWK_PROG '{ print $1*3600 + $2*60 + $3 }'
->> +    date "+%H %M %S" | awk '{ print $1*3600 + $2*60 + $3 }'
->>   }
->>     _timestamp()
->> @@ -147,7 +147,7 @@ _wrapup()
->>           if [ -f $TIMESTAMP_FILE -a -f $tmp.time ]
->>           then
->>               cat $TIMESTAMP_FILE $tmp.time \
->> -            | $AWK_PROG '
->> +            | awk '
->>           { t[$1] =3D $2 }
->>   END        { if (NR > 0) {
->>               for (i in t) print i " " t[i]
->> diff --git a/tests/qemu-iotests/common b/tests/qemu-iotests/common
->> index 867918895b..130f647a4d 100644
->> --- a/tests/qemu-iotests/common
->> +++ b/tests/qemu-iotests/common
->> @@ -366,7 +366,7 @@ testlist options
->>       if $xpand
->>       then
->>           have_test_arg=3Dtrue
->> -        $AWK_PROG </dev/null '
->> +        awk </dev/null '
->>   BEGIN        { for (t=3D'$start'; t<=3D'$end'; t++) printf "%03d\n",=
-t }' \
->>           | while read id
->>           do
->> diff --git a/tests/qemu-iotests/common.config
->> b/tests/qemu-iotests/common.config
->> index b599c72211..0f571d46eb 100644
->> --- a/tests/qemu-iotests/common.config
->> +++ b/tests/qemu-iotests/common.config
->> @@ -56,9 +56,6 @@ _fatal()
->>       exit 1
->>   }
->>   -export AWK_PROG=3D"`set_prog_path awk`"
->> -[ "$AWK_PROG" =3D "" ] && _fatal "awk not found"
->> -
->>   if [ -z "$QEMU_PROG" ]; then
->>       export QEMU_PROG=3D"`set_prog_path qemu`"
->>   fi
->>
+>   
+>       vdev_scsi = calloc(1, sizeof(vhost_scsi_dev_t));
+>       if (!vdev_scsi) {
+> @@ -727,11 +727,7 @@ static vhost_scsi_dev_t *vdev_scsi_new(char *unix_fn)
+>           return NULL;
+>       }
+>   
+> -    vdev_scsi->server_sock = unix_sock_new(unix_fn);
+> -    if (vdev_scsi->server_sock < 0) {
+> -        goto err;
+> -    }
+> -
+> +    vdev_scsi->server_sock = server_sock;
+>       vdev_scsi->loop = g_main_loop_new(NULL, FALSE);
+>       if (!vdev_scsi->loop) {
+>           PERR("Error creating glib event loop");
+> @@ -815,7 +811,7 @@ int main(int argc, char **argv)
+>       vhost_scsi_dev_t *vdev_scsi = NULL;
+>       char *unix_fn = NULL;
+>       char *iscsi_uri = NULL;
+> -    int opt, err = EXIT_SUCCESS;
+> +    int sock, opt, err = EXIT_SUCCESS;
+>   
+>       while ((opt = getopt(argc, argv, "u:i:")) != -1) {
+>           switch (opt) {
+> @@ -835,7 +831,11 @@ int main(int argc, char **argv)
+>           goto help;
+>       }
+>   
+> -    vdev_scsi = vdev_scsi_new(unix_fn);
+> +    sock = unix_sock_new(unix_fn);
+> +    if (sock < 0) {
+> +        goto err;
+> +    }
+> +    vdev_scsi = vdev_scsi_new(sock);
+>       if (!vdev_scsi) {
+>           goto err;
+>       }
+> 
