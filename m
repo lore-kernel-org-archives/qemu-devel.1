@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40476)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40530)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1drn12-0004jY-J9
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:22:24 -0400
+	id 1drn18-0004mG-9E
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:22:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1drn10-0006zk-23
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:22:20 -0400
-Received: from mail-pf0-x230.google.com ([2607:f8b0:400e:c00::230]:35018)
+	id 1drn14-00072Y-8H
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:22:26 -0400
+Received: from mail-pg0-x22e.google.com ([2607:f8b0:400e:c05::22e]:33058)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
-	id 1drn0z-0006zA-Rg
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:22:17 -0400
-Received: by mail-pf0-x230.google.com with SMTP id q76so5570352pfq.2
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 08:22:17 -0700 (PDT)
+	id 1drn14-000727-1e
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 11:22:22 -0400
+Received: by mail-pg0-x22e.google.com with SMTP id u18so5254446pgo.0
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 08:22:21 -0700 (PDT)
 MIME-Version: 1.0
 From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-Date: Tue, 12 Sep 2017 08:21:47 -0700
-Message-Id: <20170912152153.7729-2-brandon.carpenter@cypherpath.com>
+Date: Tue, 12 Sep 2017 08:21:50 -0700
+Message-Id: <20170912152153.7729-5-brandon.carpenter@cypherpath.com>
 In-Reply-To: <20170912152153.7729-1-brandon.carpenter@cypherpath.com>
 References: <20170912152153.7729-1-brandon.carpenter@cypherpath.com>
 Content-Type: text/plain; charset="US-ASCII"
-Subject: [Qemu-devel] [PATCH v3 1/7] io: Always remove an old channel watch
- before adding a new one
+Subject: [Qemu-devel] [PATCH v3 4/7] io: Allow empty websocket payload
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,77 +33,93 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, brandon.carpenter@cypherpath.com
 
-Also set saved handle to zero when removing without adding a new watch.
+Some browsers send pings/pongs with no payload, so allow empty payloads
+instead of closing the connection.
 
 Signed-off-by: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 ---
- ui/vnc-auth-vencrypt.c | 3 +++
- ui/vnc-ws.c            | 6 ++++++
- ui/vnc.c               | 4 ++++
- 3 files changed, 13 insertions(+)
+ io/channel-websock.c | 62 +++++++++++++++++++++++++---------------------------
+ 1 file changed, 30 insertions(+), 32 deletions(-)
 
-diff --git a/ui/vnc-auth-vencrypt.c b/ui/vnc-auth-vencrypt.c
-index ffaab57550..c3eece4fa7 100644
---- a/ui/vnc-auth-vencrypt.c
-+++ b/ui/vnc-auth-vencrypt.c
-@@ -77,6 +77,9 @@ static void vnc_tls_handshake_done(QIOTask *task,
-         vnc_client_error(vs);
-         error_free(err);
-     } else {
-+        if (vs->ioc_tag) {
-+            g_source_remove(vs->ioc_tag);
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index ced24135ec..3183aeff77 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -603,44 +603,42 @@ static int qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
+                                               Error **errp)
+ {
+     size_t i;
+-    size_t payload_len;
++    size_t payload_len = 0;
+     uint32_t *payload32;
+ 
+-    if (!ioc->payload_remain) {
+-        error_setg(errp,
+-                   "Decoding payload but no bytes of payload remain");
+-        return -1;
+-    }
+-
+-    /* If we aren't at the end of the payload, then drop
+-     * off the last bytes, so we're always multiple of 4
+-     * for purpose of unmasking, except at end of payload
+-     */
+-    if (ioc->encinput.offset < ioc->payload_remain) {
+-        payload_len = ioc->encinput.offset - (ioc->encinput.offset % 4);
+-    } else {
+-        payload_len = ioc->payload_remain;
+-    }
+-    if (payload_len == 0) {
+-        return QIO_CHANNEL_ERR_BLOCK;
+-    }
++    if (ioc->payload_remain) {
++        /* If we aren't at the end of the payload, then drop
++         * off the last bytes, so we're always multiple of 4
++         * for purpose of unmasking, except at end of payload
++         */
++        if (ioc->encinput.offset < ioc->payload_remain) {
++            payload_len = ioc->encinput.offset - (ioc->encinput.offset % 4);
++        } else {
++            payload_len = ioc->payload_remain;
 +        }
-         vs->ioc_tag = qio_channel_add_watch(
-             vs->ioc, G_IO_IN | G_IO_OUT, vnc_client_io, vs, NULL);
-         start_auth_vencrypt_subauth(vs);
-diff --git a/ui/vnc-ws.c b/ui/vnc-ws.c
-index f530cd5474..eaf309553c 100644
---- a/ui/vnc-ws.c
-+++ b/ui/vnc-ws.c
-@@ -36,6 +36,9 @@ static void vncws_tls_handshake_done(QIOTask *task,
-         error_free(err);
-     } else {
-         VNC_DEBUG("TLS handshake complete, starting websocket handshake\n");
-+        if (vs->ioc_tag) {
-+            g_source_remove(vs->ioc_tag);
++        if (payload_len == 0) {
++            return QIO_CHANNEL_ERR_BLOCK;
 +        }
-         vs->ioc_tag = qio_channel_add_watch(
-             QIO_CHANNEL(vs->ioc), G_IO_IN, vncws_handshake_io, vs, NULL);
-     }
-@@ -97,6 +100,9 @@ static void vncws_handshake_done(QIOTask *task,
-     } else {
-         VNC_DEBUG("Websock handshake complete, starting VNC protocol\n");
-         vnc_start_protocol(vs);
-+        if (vs->ioc_tag) {
-+            g_source_remove(vs->ioc_tag);
+ 
+-    ioc->payload_remain -= payload_len;
++        ioc->payload_remain -= payload_len;
+ 
+-    /* unmask frame */
+-    /* process 1 frame (32 bit op) */
+-    payload32 = (uint32_t *)ioc->encinput.buffer;
+-    for (i = 0; i < payload_len / 4; i++) {
+-        payload32[i] ^= ioc->mask.u;
+-    }
+-    /* process the remaining bytes (if any) */
+-    for (i *= 4; i < payload_len; i++) {
+-        ioc->encinput.buffer[i] ^= ioc->mask.c[i % 4];
++        /* unmask frame */
++        /* process 1 frame (32 bit op) */
++        payload32 = (uint32_t *)ioc->encinput.buffer;
++        for (i = 0; i < payload_len / 4; i++) {
++            payload32[i] ^= ioc->mask.u;
 +        }
-         vs->ioc_tag = qio_channel_add_watch(
-             vs->ioc, G_IO_IN, vnc_client_io, vs, NULL);
++        /* process the remaining bytes (if any) */
++        for (i *= 4; i < payload_len; i++) {
++            ioc->encinput.buffer[i] ^= ioc->mask.c[i % 4];
++        }
      }
-diff --git a/ui/vnc.c b/ui/vnc.c
-index 0b5dbc62e4..62f7a3f30a 100644
---- a/ui/vnc.c
-+++ b/ui/vnc.c
-@@ -1121,6 +1121,7 @@ static void vnc_disconnect_start(VncState *vs)
-     vnc_set_share_mode(vs, VNC_SHARE_MODE_DISCONNECTED);
-     if (vs->ioc_tag) {
-         g_source_remove(vs->ioc_tag);
-+        vs->ioc_tag = 0;
-     }
-     qio_channel_close(vs->ioc, NULL);
-     vs->disconnecting = TRUE;
-@@ -2931,6 +2932,9 @@ static void vnc_connect(VncDisplay *vd, QIOChannelSocket *sioc,
-     VNC_DEBUG("New client on socket %p\n", vs->sioc);
-     update_displaychangelistener(&vd->dcl, VNC_REFRESH_INTERVAL_BASE);
-     qio_channel_set_blocking(vs->ioc, false, NULL);
-+    if (vs->ioc_tag) {
-+        g_source_remove(vs->ioc_tag);
+ 
+-    buffer_reserve(&ioc->rawinput, payload_len);
+-    buffer_append(&ioc->rawinput, ioc->encinput.buffer, payload_len);
+-    buffer_advance(&ioc->encinput, payload_len);
++    if (payload_len) {
++        buffer_reserve(&ioc->rawinput, payload_len);
++        buffer_append(&ioc->rawinput, ioc->encinput.buffer, payload_len);
++        buffer_advance(&ioc->encinput, payload_len);
 +    }
-     if (websocket) {
-         vs->websocket = 1;
-         if (vd->tlscreds) {
+     return 0;
+ }
+ 
 -- 
 2.14.1
 
