@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drsX6-0002mA-Tr
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:15:49 -0400
+	(envelope-from <eblake@redhat.com>) id 1drsY8-0003LT-1x
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:16:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drsX5-0006dg-Ph
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:15:48 -0400
+	(envelope-from <eblake@redhat.com>) id 1drsY7-0007gF-2d
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:16:52 -0400
 References: <20170912144459.11359-1-pbonzini@redhat.com>
-	<20170912144459.11359-6-pbonzini@redhat.com>
+	<20170912144459.11359-7-pbonzini@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <dcb2f6b9-e30c-34f2-5cfd-088dd90fcc84@redhat.com>
-Date: Tue, 12 Sep 2017 16:15:39 -0500
+Message-ID: <166503a6-1fac-2ff4-4f35-d8024b9f7d94@redhat.com>
+Date: Tue, 12 Sep 2017 16:16:45 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170912144459.11359-6-pbonzini@redhat.com>
+In-Reply-To: <20170912144459.11359-7-pbonzini@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="NX434OEEWfrgSLD06TLbXwP9Ex0kaUM4M"
-Subject: Re: [Qemu-devel] [PATCH 05/10] qemu-iotests: limit
- non-_PROG-suffixed variables to common.rc
+	boundary="oHATjejlE1vE49HehjbqkK3DLWwOXoUjg"
+Subject: Re: [Qemu-devel] [PATCH 06/10] qemu-iotests: do not include
+ common.rc in "check"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +29,28 @@ To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---NX434OEEWfrgSLD06TLbXwP9Ex0kaUM4M
+--oHATjejlE1vE49HehjbqkK3DLWwOXoUjg
 From: Eric Blake <eblake@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <dcb2f6b9-e30c-34f2-5cfd-088dd90fcc84@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 05/10] qemu-iotests: limit non-_PROG-suffixed
- variables to common.rc
+Message-ID: <166503a6-1fac-2ff4-4f35-d8024b9f7d94@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 06/10] qemu-iotests: do not include common.rc
+ in "check"
 References: <20170912144459.11359-1-pbonzini@redhat.com>
- <20170912144459.11359-6-pbonzini@redhat.com>
-In-Reply-To: <20170912144459.11359-6-pbonzini@redhat.com>
+ <20170912144459.11359-7-pbonzini@redhat.com>
+In-Reply-To: <20170912144459.11359-7-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 09/12/2017 09:44 AM, Paolo Bonzini wrote:
-> These are never used by "check", with one exception that does not need
-> $QEMU_OPTIONS.  Keep them in common.rc, which will be soon included onl=
-y
-> by the tests.
+> It only provides functions used by the test programs.
 >=20
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  tests/qemu-iotests/039.out       | 10 +++---
->  tests/qemu-iotests/061.out       |  4 +--
->  tests/qemu-iotests/137.out       |  2 +-
->  tests/qemu-iotests/common.config | 69 ++------------------------------=
---------
->  tests/qemu-iotests/common.rc     | 65 ++++++++++++++++++++++++++++++++=
-+++++
->  5 files changed, 75 insertions(+), 75 deletions(-)
-
-It may be worth tweaking scripts/git.orderfile to prioritize
-tests/qemu-iotests/common* above the rest of tests/qemu-iotests (I have
-that tweak locally, at any rate).  But that's a separate issue.
+>  tests/qemu-iotests/check     |  6 ------
+>  tests/qemu-iotests/common.rc | 13 +++++--------
+>  2 files changed, 5 insertions(+), 14 deletions(-)
+>=20
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -71,7 +60,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---NX434OEEWfrgSLD06TLbXwP9Ex0kaUM4M
+--oHATjejlE1vE49HehjbqkK3DLWwOXoUjg
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -80,14 +69,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm4TnwACgkQp6FrSiUn
-Q2qFuwf8CpqSwvQ4ooVqWciv9p2GngvNggUNz2HIHEUjGfB8bQ5VAjjWuj16Cs04
-8Wbsowp5RJNQQKe+uK8d6FKCoMrEAN9zwdlUiVoJ+8rqwvhvg96kRmCo6/5rOh1l
-b7XQqQTiZFXZNEMp0qCYKULxypvcNG1qv/2sGDJp7VY9Vi/Q9d0tz9IhaB9poC/8
-IWd7/b0ppcS/T43xsiLdqcooJSMS6aDfJyRpPM/d9riBJ2AizwN5KHN2GbJC9Hi8
-iW2fPHga2hpvfOgS7qb2mU8PF6PmVZTBkRqs+fml3ntI1x98ZHY09kQdtwwkuQ+Z
-VM2BXCVT/1qXHciyEOam4wroQCTP3g==
-=e/Kq
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm4Tr0ACgkQp6FrSiUn
+Q2p02AgAjh+O9nnvbh2BuJB1IS6ARr28OgKfCM//j6w/Z0UjVGc1IapIw6v8voap
+e9G7y/N/qvPNnScFSCJIOKmtXIpUaLxc9naTQAeuorVyeI0wsrBqZdojtif0Puf5
+rPAJZrwFxP2d98vLHtwQcA/EK6f/wBwsdBGj8oZ74ZVQSXbkawAulzvcl+rhxRhH
+UfgFRTNaqNnhF4YFRo1K3iarMmdCsSnn3yeQn0SSbOYLrVE3Ui4oBmXbR4/KBkBh
+P+oSI3vV2WtyTwsVKRqkai8tqor5L4kRnBY0l3NIE4j/SARkS1Hu+m7MUJcVfE6m
+dUNSAT0pi+iCCFumziPcEz/xMZYQdQ==
+=7nEv
 -----END PGP SIGNATURE-----
 
---NX434OEEWfrgSLD06TLbXwP9Ex0kaUM4M--
+--oHATjejlE1vE49HehjbqkK3DLWwOXoUjg--
