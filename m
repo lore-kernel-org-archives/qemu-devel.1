@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34094)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1drYxV-0007oQ-Lp
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 20:21:46 -0400
+	(envelope-from <jsnow@redhat.com>) id 1drZ7J-0002S3-31
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 20:31:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1drYxU-0004e0-O9
-	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 20:21:45 -0400
-From: John Snow <jsnow@redhat.com>
+	(envelope-from <jsnow@redhat.com>) id 1drZ7I-0000Yt-CI
+	for qemu-devel@nongnu.org; Mon, 11 Sep 2017 20:31:53 -0400
 References: <20170911172022.4738-1-eblake@redhat.com>
-	<20170911172022.4738-19-eblake@redhat.com>
-	<b583b7ea-42e3-cf4b-10aa-7cc16f41356e@redhat.com>
-Message-ID: <abb11f66-2b9e-0dc5-5641-dc9f8b1ae4e9@redhat.com>
-Date: Mon, 11 Sep 2017 20:21:35 -0400
+	<20170911172022.4738-27-eblake@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <5b23e7b5-b8f7-72c2-a7b7-73ba504abd06@redhat.com>
+Date: Mon, 11 Sep 2017 20:31:36 -0400
 MIME-Version: 1.0
-In-Reply-To: <b583b7ea-42e3-cf4b-10aa-7cc16f41356e@redhat.com>
+In-Reply-To: <20170911172022.4738-27-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v7 18/38] ahci-test: Drop dependence on
- global_qtest
+Subject: Re: [Qemu-devel] [PATCH v7 26/38] libqtest: Merge qtest_end() into
+ qtest_quit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,49 +26,27 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, thuth@redhat.com, armbru@redhat.com, "open list:IDE" <qemu-block@nongnu.org>
+Cc: thuth@redhat.com, "open list:Floppy" <qemu-block@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Amit Shah <amit@kernel.org>, armbru@redhat.com, Alexander Graf <agraf@suse.de>, Keith Busch <keith.busch@intel.com>, "open list:sPAPR" <qemu-ppc@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 
 
 
-On 09/11/2017 08:20 PM, John Snow wrote:
+On 09/11/2017 01:20 PM, Eric Blake wrote:
+> Rather than have two similar shutdown functions, where one requires
+> the use of global_qtest in the header, it is better to have a single
+> shutdown function that still takes care of cleaning up global_qtest
+> if it is set.  All callers are updated.
 > 
-> 
-> On 09/11/2017 01:20 PM, Eric Blake wrote:
->> Managing parallel connections to two different monitors via
->> the implicit global_qtest makes it hard to copy-and-paste code
->> to tests that are not aware of the implicit state; the
->> management of global_qtest is even harder to follow because
->> it was masked behind set_context().
->>
->> Instead, explicitly pass QTestState* around (generally, by
->> reusing the member already present in ahci->parent QOSState),
->> and call explicit qtest_* functions on all places that
->> interact with a monitor.
->>
->> We can assert that the conversion is correct by checking that
->> global_qtest remains NULL throughout the test (a later patch
->> that changes global_qtest to not be a public global variable
->> will drop the assertions).
->>
->> Bonus: there was one spots that was creating a needless temporary
->> variable to execute the 'cont' command, rather than just directly
->> passing the literal command through qtest_qmp().  Fixing that
->> gets us one step closer to enabling -Wformat checking on
->> constructed JSON.
->>
->> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> still LGTM, you can probably still see why I was a little iffy about
-> making the global qstate ubiquitous instead of doing it this way.
-> 
-> (Though it does make the calls a little more verbose, they are IMO a lot
-> easier to reason about in tests that deal with mixed-state and
-> migrations and so on, which -- most of my qtest experience was from AHCI
-> -- there is a lot of here. (Sorry Markus, I'm a
-lol! I hit send too soon, I tabbed away to look for Markus' previous
-email which used some German term to refer to people who preferred
-explicit state.
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  tests/libqtest.h               | 11 -----------
+>  tests/libqtest.c               |  6 +++++-
+[...]
+>  tests/fdc-test.c               |  2 +-
+[...]
+>  tests/ide-test.c               |  2 +-
 
-I wound up not finding it and then getting distracted.
+Reviewed-by: John Snow <jsnow@redhat.com>
 
-Enjoy.
+The rest: "ACK." Change looks sane and I assume the rest of the patch is
+fairly straightforward mechanical changes. Everything still compiles and
+runs successfully.
