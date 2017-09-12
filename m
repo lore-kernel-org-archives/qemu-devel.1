@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1drpgy-0003Nb-8m
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:13:49 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1drph3-0003SS-4J
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:13:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1drpgx-0006OM-3M
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:13:48 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1drph1-0006Rv-Rf
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 14:13:53 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 12 Sep 2017 19:13:53 +0100
-Message-Id: <1505240046-11454-7-git-send-email-peter.maydell@linaro.org>
+Date: Tue, 12 Sep 2017 19:13:58 +0100
+Message-Id: <1505240046-11454-12-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1505240046-11454-1-git-send-email-peter.maydell@linaro.org>
 References: <1505240046-11454-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 06/19] nvic: Make ICSR.RETTOBASE handle banked
- exceptions
+Subject: [Qemu-devel] [PATCH 11/19] nvic: Compare group priority for
+ escalation to HF
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,31 +23,35 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Update the code in nvic_rettobase() so that it checks the
-sec_vectors[] array as well as the vectors[] array if needed.
+In armv7m_nvic_set_pending() we have to compare the
+priority of an exception against the execution priority
+to decide whether it needs to be escalated to HardFault.
+In the specification this is a comparison against the
+exception's group priority; for v7M we implemented it
+as a comparison against the raw exception priority
+because the two comparisons will always give the
+same answer. For v8M the existence of AIRCR.PRIS and
+the possibility of different PRIGROUP values for secure
+and nonsecure exceptions means we need to explicitly
+calculate the vector's group priority for this check.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/intc/armv7m_nvic.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ hw/intc/armv7m_nvic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 585b1a7..edaf60c 100644
+index 00c03b4..3361a28 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -84,9 +84,12 @@ static int nvic_pending_prio(NVICState *s)
- static bool nvic_rettobase(NVICState *s)
- {
-     int irq, nhand = 0;
-+    bool check_sec = arm_feature(&s->cpu->env, ARM_FEATURE_M_SECURITY);
+@@ -478,7 +478,7 @@ void armv7m_nvic_set_pending(void *opaque, int irq, bool secure)
+         int running = nvic_exec_prio(s);
+         bool escalate = false;
  
-     for (irq = ARMV7M_EXCP_RESET; irq < s->num_irq; irq++) {
--        if (s->vectors[irq].active) {
-+        if (s->vectors[irq].active ||
-+            (check_sec && irq < NVIC_INTERNAL_VECTORS &&
-+             s->sec_vectors[irq].active)) {
-             nhand++;
-             if (nhand == 2) {
-                 return 0;
+-        if (vec->prio >= running) {
++        if (exc_group_prio(s, vec->prio, secure) >= running) {
+             trace_nvic_escalate_prio(irq, vec->prio, running);
+             escalate = true;
+         } else if (!vec->enabled) {
 -- 
 2.7.4
