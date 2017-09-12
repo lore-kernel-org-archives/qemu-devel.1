@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36164)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36198)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drsh5-0006z1-Mq
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:26:08 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1drshA-00073A-3s
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:26:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drsh4-0007DK-K8
+	(envelope-from <vilanova@ac.upc.edu>) id 1drsh5-0007Eh-OR
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:26:12 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:47898)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1drsh5-0007Dn-CD
 	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:26:07 -0400
-References: <20170912144459.11359-1-pbonzini@redhat.com>
-	<20170912144459.11359-8-pbonzini@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <aa875409-615c-ce28-c292-86a870c8c971@redhat.com>
-Date: Tue, 12 Sep 2017 16:25:57 -0500
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 13 Sep 2017 00:25:56 +0300
+Message-Id: <150525155585.15988.1048249945691112897.stgit@frigg.lan>
+In-Reply-To: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
+References: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170912144459.11359-8-pbonzini@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="o3sOgARMeNEICbEGe3CFPOrqqc2Dh0cWb"
-Subject: Re: [Qemu-devel] [PATCH 07/10] qemu-iotests: disintegrate more
- parts of common.config
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 06/22] instrument: [softmmu] Add command
+ line library loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +27,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---o3sOgARMeNEICbEGe3CFPOrqqc2Dh0cWb
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, qemu-block@nongnu.org
-Message-ID: <aa875409-615c-ce28-c292-86a870c8c971@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 07/10] qemu-iotests: disintegrate more parts
- of common.config
-References: <20170912144459.11359-1-pbonzini@redhat.com>
- <20170912144459.11359-8-pbonzini@redhat.com>
-In-Reply-To: <20170912144459.11359-8-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ qemu-options.hx |   19 +++++++++++++++++++
+ vl.c            |   15 +++++++++++++++
+ 2 files changed, 34 insertions(+)
 
-On 09/12/2017 09:44 AM, Paolo Bonzini wrote:
-> Split "check" parts from tests part.
->=20
-> For the directory setup, the actual computation of directories goes
-> in "check", while the sanity checks go in the tests.
->=20
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  tests/qemu-iotests/common        | 24 ++++++++++++++++++++
->  tests/qemu-iotests/common.config | 49 --------------------------------=
---------
->  tests/qemu-iotests/common.qemu   |  1 +
->  tests/qemu-iotests/common.rc     | 25 ++++++++++++++++++++
->  4 files changed, 50 insertions(+), 49 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/common b/tests/qemu-iotests/common
-> index abacc24114..ee313af92f 100644
-> --- a/tests/qemu-iotests/common
-> +++ b/tests/qemu-iotests/common
-> @@ -48,6 +48,14 @@ set_prog_path()
->      fi
->  }
-> =20
-> +if [ -z "$TEST_DIR" ]; then
-> +        TEST_DIR=3D`pwd`/scratch
-
-8-space indent looks odd compared to the rest of the file.
-
-> @@ -153,6 +158,26 @@ else
->  fi
->  ORIG_TEST_IMG=3D"$TEST_IMG"
-> =20
-> +if [ -z "$TEST_DIR" ]; then
-> +        TEST_DIR=3D`pwd`/scratch
-
-We probably ought to clean things up to use $PWD instead of `pwd`
-everywhere as a minor optimization (why fork, when bash already has the
-right information for you?) - but that can be separate.
-
-Split looks okay to me,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---o3sOgARMeNEICbEGe3CFPOrqqc2Dh0cWb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm4UOYACgkQp6FrSiUn
-Q2pQLAf/ThFrM01rz51WU2c7tZcMBuOvbr/qYNflIih4N1tuzzMlIvTNX+GpiFOj
-8ymkLAlUxSaVFOOyOaz2VjuE/p6cIA7Kg30S49MchvyDWS7sSav6abiktdBCAQfx
-YqPXa3k/WWhisfOyGDMkjDtCVx/md8Wy1GnYIXl+qqSP3fCFh9QFLN0JV1DYOta1
-EOtHkbsFpqnGMoAFg/OgkKknFg2p6xDK6fj/DQERq+QLD68CBjMu2IsMdBptPU0e
-FXvQSINIEWt8ZxwLWAsV8EROPWg0L04cIR5QEEDaRXC5+xnf8qG0gifrh1Uerqlz
-6jGjgQXgNfWA8HY5QJkUQ/2iGMjYGg==
-=/enM
------END PGP SIGNATURE-----
-
---o3sOgARMeNEICbEGe3CFPOrqqc2Dh0cWb--
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 9f6e2adfff..6947388aab 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4077,6 +4077,25 @@ HXCOMM HX does not support conditional compilation=
+ of text.
+ @findex -trace
+ @include qemu-option-trace.texi
+ ETEXI
++#if defined(CONFIG_INSTRUMENT)
++DEF("instr", HAS_ARG, QEMU_OPTION_instr,
++    "-instr [file=3D]<file>[,arg=3D<string>]\n"
++    "                load an instrumentation library\n",
++    QEMU_ARCH_ALL)
++#endif
++STEXI
++@item -instr file=3D@var{file}[,arg=3D@var{string}]
++@findex -instr
++
++Load a dynamic trace instrumentation library.
++
++@table @option
++@item file=3D@var{file}
++Load the given dynamic trace instrumentation library.
++@item arg=3D@var{string}
++String argument passed as to the library's @code{qi_init} routine (can b=
+e given multiple times).
++@end table
++ETEXI
+=20
+ HXCOMM Internal use
+ DEF("qtest", HAS_ARG, QEMU_OPTION_qtest, "", QEMU_ARCH_ALL)
+diff --git a/vl.c b/vl.c
+index fb1f05b937..aea05ed4cc 100644
+--- a/vl.c
++++ b/vl.c
+@@ -118,6 +118,7 @@ int main(int argc, char **argv)
+=20
+ #include "trace-root.h"
+ #include "trace/control.h"
++#include "instrument/cmdline.h"
+ #include "qemu/queue.h"
+ #include "sysemu/arch_init.h"
+=20
+@@ -3037,6 +3038,9 @@ int main(int argc, char **argv, char **envp)
+     } BlockdevOptions_queue;
+     QSIMPLEQ_HEAD(, BlockdevOptions_queue) bdo_queue
+         =3D QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
++    char *instrument_path =3D NULL;
++    int instrument_argc =3D 0;
++    const char **instrument_argv =3D NULL;
+=20
+     module_call_init(MODULE_INIT_TRACE);
+=20
+@@ -3064,6 +3068,9 @@ int main(int argc, char **argv, char **envp)
+     qemu_add_opts(&qemu_global_opts);
+     qemu_add_opts(&qemu_mon_opts);
+     qemu_add_opts(&qemu_trace_opts);
++#if defined(CONFIG_INSTRUMENT)
++    qemu_add_opts(&qemu_instr_opts);
++#endif
+     qemu_add_opts(&qemu_option_rom_opts);
+     qemu_add_opts(&qemu_machine_opts);
+     qemu_add_opts(&qemu_accel_opts);
+@@ -4009,6 +4016,12 @@ int main(int argc, char **argv, char **envp)
+                 g_free(trace_file);
+                 trace_file =3D trace_opt_parse(optarg);
+                 break;
++#if defined(CONFIG_INSTRUMENT)
++            case QEMU_OPTION_instr:
++                instr_opt_parse(optarg, &instrument_path,
++                                &instrument_argc, &instrument_argv);
++                break;
++#endif
+             case QEMU_OPTION_readconfig:
+                 {
+                     int ret =3D qemu_read_config_file(optarg);
+@@ -4196,6 +4209,8 @@ int main(int argc, char **argv, char **envp)
+     }
+     trace_init_file(trace_file);
+=20
++    instr_init(instrument_path, instrument_argc, instrument_argv);
++
+     /* Open the logfile at this point and set the log mask if necessary.
+      */
+     if (log_file) {
