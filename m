@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54756)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1drjQM-0005lY-KC
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 07:32:15 -0400
+	(envelope-from <kwolf@redhat.com>) id 1drjVY-0001vf-VC
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 07:37:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1drjQL-0006Q0-NN
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 07:32:14 -0400
-Date: Tue, 12 Sep 2017 13:32:05 +0200
+	(envelope-from <kwolf@redhat.com>) id 1drjVW-0000Xw-CR
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 07:37:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58916)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1drjVW-0000Xh-6M
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 07:37:34 -0400
+Date: Tue, 12 Sep 2017 13:37:22 +0200
 From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170912113205.GG29136@localhost.localdomain>
-References: <20170906085006.26983-1-rjones@redhat.com>
-	<20170906101905.GD3753@dhcp-200-186.str.redhat.com>
-	<20170906104451.GM20914@redhat.com>
-	<20170906113845.GE3753@dhcp-200-186.str.redhat.com>
-	<20170912094558.GO20914@redhat.com>
+Message-ID: <20170912113722.GH29136@localhost.localdomain>
+References: <59B7C252.1070004@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170912094558.GO20914@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH for-2.10] qemu-options: Document the -drive
- locking parameter.
+In-Reply-To: <59B7C252.1070004@huawei.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel]
+ =?utf-8?q?question=EF=BC=9A_I_found_a_bug_which_wil?=
+ =?utf-8?q?l_lead_to_qemu_crash?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,41 +29,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Richard W.M. Jones" <rjones@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, famz@redhat.com, qemu-trivial@nongnu.org, mjt@tls.msk.ru, berrange@redhat.com
+To: "WangJie (Captain)" <wangjie88@huawei.com>
+Cc: berto@igalia.com, stefanha@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com
 
-Am 12.09.2017 um 11:45 hat Richard W.M. Jones geschrieben:
-> On Wed, Sep 06, 2017 at 01:38:45PM +0200, Kevin Wolf wrote:
-> > This command line fragment looks correct to me. For me, it seems to
-> > work. I'm starting a first qemu in the background with default locking
-> > options:
-> > 
-> >     $ x86_64-softmmu/qemu-system-x86_64 -hda /tmp/test.qcow2
-> > 
-> > And then starting a second one with a command line resembling yours:
-> > 
-> >     $ x86_64-softmmu/qemu-system-x86_64 -device virtio-scsi \
-> >       -drive file=/tmp/test.qcow2,cache=unsafe,format=qcow2,file.locking=off,id=hd0,if=none \
-> >       -device scsi-hd,drive=hd0
-> 
-> The problem is with overlays, where file.locking doesn't propagate to
-> the backing file.  Thus:
-> 
->   $ qemu-system-x86_64 -drive file=backing,format=raw
-> 
-> while in another terminal:
-> 
->   $ qemu-img create -b backing -f qcow2 overlay
->   $ qemu-system-x86_64 -drive file=overlay,format=qcow2,file.locking=off
->   qemu-system-x86_64: Failed to get shared "write" lock
->   Is another process using the image?
+Am 12.09.2017 um 13:17 hat WangJie (Captain) geschrieben:
+> Hi, Kevin.
+>=20
+> I found a bug about qemu-kvm(version 2.7.0-rc0 adn 2.8.1). but qemu 2.6=
+.0 and current master is OK.
+> So I git-bisect the master branch=EF=BC=8Cand I found the patch you com=
+mited (block: Decouple throttling from BlockDriverState) lead the bug int=
+o qemu.
+>=20
+> The patch which lead the bug into qemu: (https://github.com/qemu/qemu/c=
+ommit/7ca7f0f6db1fedd28d490795d778cf23979a2aa7#diff-ea36ba0f79150cc299732=
+696a069caba)
+>=20
+> Because the current master is OK. So I think you had fixed it , can you=
+ tell me which patch fixed the bug?        Thank you :>
 
-locking=off isn't the right tool for the case. Try this:
-
-$ qemu-system-x86_64 -drive file=overlay,if=none -device virtio-blk-pci,drive=none0,share-rw=on
-
-Unless you're doing really evil things, just telling qemu that your
-guest can cope with concurrent writers to the same image is enough. This
-propagates through the whole chain as appropriate.
+I can't tell offhand which fix this was, but you can use 'git bisect'
+not only to find which commit introduced the bug, but also to find the
+fix. You just bisect between a broken commit and master, and then use
+the reversed meaning of 'good' and 'bad' (i.e. 'good' means that the bug
+is still there, 'bad' means it is already fixed).
 
 Kevin
