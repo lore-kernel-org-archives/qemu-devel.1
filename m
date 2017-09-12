@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56679)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1drlmZ-0007nu-9j
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:03:23 -0400
+	(envelope-from <cohuck@redhat.com>) id 1drloN-0000qK-Vc
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:05:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1drlmT-0003ga-B1
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:03:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42600)
+	(envelope-from <cohuck@redhat.com>) id 1drloI-0005Jb-0x
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:05:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1drlmT-0003gO-4V
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:03:13 -0400
-References: <20170911152150.12535-1-david@redhat.com>
-	<20170911152150.12535-19-david@redhat.com>
-	<20170912154313.3616c2bf@nial.brq.redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <9e1ea879-6c89-23bc-b775-062343d782af@redhat.com>
-Date: Tue, 12 Sep 2017 16:03:04 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1drloH-0005Ih-Rt
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 10:05:05 -0400
+Date: Tue, 12 Sep 2017 16:05:01 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170912160501.78b2ca81.cohuck@redhat.com>
+In-Reply-To: <90381836-c1ee-2d0b-86a5-117c2a86a74f@linux.vnet.ibm.com>
+References: <20170908152446.14606-1-pasic@linux.vnet.ibm.com>
+	<20170908152446.14606-4-pasic@linux.vnet.ibm.com>
+	<20170911114841.408b5988.cohuck@redhat.com>
+	<90381836-c1ee-2d0b-86a5-117c2a86a74f@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170912154313.3616c2bf@nial.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 18/21] s390x: implement
- query-hotpluggable-cpus
+Subject: Re: [Qemu-devel] [PATCH 3/4] s390x/css: remove dubious error
+ handling branch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +30,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: qemu-devel@nongnu.org, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 12.09.2017 15:43, Igor Mammedov wrote:
-> On Mon, 11 Sep 2017 17:21:47 +0200
-> David Hildenbrand <david@redhat.com> wrote:
+On Mon, 11 Sep 2017 15:08:52 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+
+> On 09/11/2017 11:48 AM, Cornelia Huck wrote:
+> > On Fri,  8 Sep 2017 17:24:45 +0200
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+
+> >> The case in question actually never happens. Let us get rid of the dead
+> >> code.  
+> > 
+> > I had tried to be complete in my initial implementation. With the
+> > current implementation, it can never happen, yes. We can easily
+> > resurrect it from git history should we need it in the future.
+> >   
 > 
->> CPU hotplug is only possible on a per core basis on s390x.
->>
->> As we now have ms->possible_cpus, we can get rid of the global variable
->> cpu_states.
->>
->> While rewriting s390_cpu_addr2state() completely to be based on
->> possible_cpus, move it to cpu.c, as it is independent of the virtio-ccw
->> machine.
-> I'd split patch on
->  1) introduce possible cpus 
->  2) rewrite s390_cpu_addr2state() using #2
-
-Than I have to keep the global variable + setting it for one patch.
-Might not be worth the trouble. Will have a look.
-
-[...]
->>  
->> +static CPUArchId *s390_find_cpu_slot(MachineState *ms, uint32_t core_id,
->> +                                     int *idx)
->> +{
->> +    if (core_id >= ms->possible_cpus->len) {
->> +        return NULL;
->> +    }
->> +    /* core_id corresponds to the index */
->> +    if (idx) {
->> +        *idx = core_id;
->> +    }
->> +    return &ms->possible_cpus->cpus[core_id];
->> +}
-> it looks like cpu_index == core_id == idx in possible_cpus,
-> is this helper really necessary?
-> (we have it in x86 because of possible not 1:1 mapping)
+> I've tried to understand the branch but I failed. Weather the subchannel
+> is busy or not should be already decided, and if the device is busy
+> that is probably supposed to be indicated via device status (word 2 bit 3).
 > 
-> I'd drop it and just access array directly
+> So I wrote dubious because I could not figure it out. But unused
+> is certainly nicer.
+> 
+> I think shall the need emerge the preferred way of handling would
+> be to use the custom handling (-EIO) branch.
 
-Just kept this because the other architectures also have this. I can of
-course drop it. The nice thing about this helper is the comment :)
+What this is trying to do is deferred cc 1 handling. On a real system,
+a ssch may return with cc 0 to indicate that the channel program has
+been accepted; but when the channel subsystem actually tries to execute
+it, a status is already pending. Basically, it's a race condition:
+Therefore the 'deferred' cc 1.
 
-[...]
->>  }
->> +
->> +S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->> +{
-> target/cpu.c and cpu itself preferably shouldn't pull in
-> or depend on machine, so I'd keep s390_cpu_addr2state() where it's now
-> or somewhere in board related files
-
-Thomas requested this. I actually don't care., but it looks like a
-generic "get_cpu_by_arch_id" function. But I don't really want to go
-that additional path now. And also I don't want to move this back and forth.
-
-Thomas, what's your opinion?
-
-Thanks!
-
-
--- 
-
-Thanks,
-
-David
+Maybe I should have called this 'deferred subchannel busy'... but
+anyway, this cannot happen in our current implementation.
