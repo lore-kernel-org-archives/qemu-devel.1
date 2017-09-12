@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40078)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40860)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1drl5g-0005Ae-5q
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:19:04 -0400
+	(envelope-from <wei.w.wang@intel.com>) id 1drl7e-0006UM-Cl
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:21:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1drl5f-0001Hb-2c
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:19:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38626)
+	(envelope-from <wei.w.wang@intel.com>) id 1drl7Y-0002Oe-8l
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:21:02 -0400
+Received: from mga05.intel.com ([192.55.52.43]:11625)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1drl5e-0001HJ-R6
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:18:59 -0400
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Tue, 12 Sep 2017 14:18:46 +0100
-Message-Id: <20170912131847.27684-3-berrange@redhat.com>
-In-Reply-To: <20170912131847.27684-1-berrange@redhat.com>
-References: <20170912131847.27684-1-berrange@redhat.com>
+	(Exim 4.71) (envelope-from <wei.w.wang@intel.com>)
+	id 1drl7Y-0002N6-0o
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:20:56 -0400
+Message-ID: <59B7DFED.6060502@intel.com>
+Date: Tue, 12 Sep 2017 21:23:57 +0800
+From: Wei Wang <wei.w.wang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v4 2/3] io: include full error message in
- websocket handshake trace
+References: <1503914913-28893-1-git-send-email-wei.w.wang@intel.com>
+	<1503914913-28893-2-git-send-email-wei.w.wang@intel.com>
+	<20170911125455.GA32538@bombadil.infradead.org>
+In-Reply-To: <20170911125455.GA32538@bombadil.infradead.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v15 1/5] lib/xbitmap: Introduce xbitmap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +29,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Eric Blake <eblake@redhat.com>, Brian Rak <brak@vultr.com>, "Daniel P. Berrange" <berrange@redhat.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: virtio-dev@lists.oasis-open.org, linux-kernel@vger.kernel.org, qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org, kvm@vger.kernel.org, linux-mm@kvack.org, mst@redhat.com, mhocko@kernel.org, akpm@linux-foundation.org, mawilcox@microsoft.com, david@redhat.com, cornelia.huck@de.ibm.com, mgorman@techsingularity.net, aarcange@redhat.com, amit.shah@redhat.com, pbonzini@redhat.com, liliang.opensource@gmail.com, yang.zhang.wz@gmail.com, quan.xu@aliyun.com
 
-When the websocket handshake fails it is useful to log the real
-error message via the trace points for debugging purposes.
+On 09/11/2017 08:54 PM, Matthew Wilcox wrote:
+> On Mon, Aug 28, 2017 at 06:08:29PM +0800, Wei Wang wrote:
+>> From: Matthew Wilcox <mawilcox@microsoft.com>
+>>
+>> The eXtensible Bitmap is a sparse bitmap representation which is
+>> efficient for set bits which tend to cluster.  It supports up to
+>> 'unsigned long' worth of bits, and this commit adds the bare bones --
+>> xb_set_bit(), xb_clear_bit() and xb_test_bit().
+>>
+>> Signed-off-by: Matthew Wilcox <mawilcox@microsoft.com>
+>> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+>> Cc: Andrew Morton <akpm@linux-foundation.org>
+>> Cc: Michal Hocko <mhocko@kernel.org>
+>> Cc: Michael S. Tsirkin <mst@redhat.com>
+> This is quite naughty of you.  You've modified the xbitmap implementation
+> without any indication in the changelog that you did so.
 
-Fixes bug: #1715186
+This was changed in the previous version and included in that
+v13->v14 ChangeLog: https://lkml.org/lkml/2017/8/16/923
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- io/channel-websock.c | 7 ++++---
- io/trace-events      | 2 +-
- 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/io/channel-websock.c b/io/channel-websock.c
-index f5fac5b422..6ddcec1549 100644
---- a/io/channel-websock.c
-+++ b/io/channel-websock.c
-@@ -507,7 +507,7 @@ static gboolean qio_channel_websock_handshake_send(QI=
-OChannel *ioc,
-                             &err);
-=20
-     if (ret < 0) {
--        trace_qio_channel_websock_handshake_fail(ioc);
-+        trace_qio_channel_websock_handshake_fail(ioc, error_get_pretty(e=
-rr));
-         qio_task_set_error(task, err);
-         qio_task_complete(task);
-         return FALSE;
-@@ -516,7 +516,8 @@ static gboolean qio_channel_websock_handshake_send(QI=
-OChannel *ioc,
-     buffer_advance(&wioc->encoutput, ret);
-     if (wioc->encoutput.offset =3D=3D 0) {
-         if (wioc->io_err) {
--            trace_qio_channel_websock_handshake_fail(ioc);
-+            trace_qio_channel_websock_handshake_fail(
-+                ioc, error_get_pretty(wioc->io_err));
-             qio_task_set_error(task, wioc->io_err);
-             wioc->io_err =3D NULL;
-             qio_task_complete(task);
-@@ -547,7 +548,7 @@ static gboolean qio_channel_websock_handshake_io(QIOC=
-hannel *ioc,
-          * client connection, as most of the time we have an
-          * HTTP 4xx err response to send instead
-          */
--        trace_qio_channel_websock_handshake_fail(ioc);
-+        trace_qio_channel_websock_handshake_fail(ioc, error_get_pretty(e=
-rr));
-         qio_task_set_error(task, err);
-         qio_task_complete(task);
-         return FALSE;
-diff --git a/io/trace-events b/io/trace-events
-index 3d233698d0..6459f71f5b 100644
---- a/io/trace-events
-+++ b/io/trace-events
-@@ -46,7 +46,7 @@ qio_channel_websock_new_server(void *ioc, void *master)=
- "Websock new client ioc=3D
- qio_channel_websock_handshake_start(void *ioc) "Websock handshake start =
-ioc=3D%p"
- qio_channel_websock_handshake_pending(void *ioc, int status) "Websock ha=
-ndshake pending ioc=3D%p status=3D%d"
- qio_channel_websock_handshake_reply(void *ioc) "Websock handshake reply =
-ioc=3D%p"
--qio_channel_websock_handshake_fail(void *ioc) "Websock handshake fail io=
-c=3D%p"
-+qio_channel_websock_handshake_fail(void *ioc, const char *msg) "Websock =
-handshake fail ioc=3D%p err=3D%s"
- qio_channel_websock_handshake_complete(void *ioc) "Websock handshake com=
-plete ioc=3D%p"
-=20
- # io/channel-command.c
---=20
-2.13.5
+> I don't
+> think the modifications you made are an improvement, but without any
+> argumentation from you I don't know why you think they're an improvement.
+
+Probably it shouldn't be modified when the discussion is incomplete:
+https://lkml.org/lkml/2017/8/10/36
+Sorry about that. Hope we could get more feedback from you on the
+changes later.
+
+If you want, we can continue this part from the the v13 patch, which might
+be closer to the implementation that you like: 
+https://lkml.org/lkml/2017/8/3/60
+
+>> diff --git a/lib/xbitmap.c b/lib/xbitmap.c
+>> new file mode 100644
+>> index 0000000..8c55296
+>> --- /dev/null
+>> +++ b/lib/xbitmap.c
+>> @@ -0,0 +1,176 @@
+>> +#include <linux/slab.h>
+>> +#include <linux/xbitmap.h>
+>> +
+>> +/*
+>> + * The xbitmap implementation supports up to ULONG_MAX bits, and it is
+>> + * implemented based on ida bitmaps. So, given an unsigned long index,
+>> + * the high order XB_INDEX_BITS bits of the index is used to find the
+>> + * corresponding item (i.e. ida bitmap) from the radix tree, and the low
+>> + * order (i.e. ilog2(IDA_BITMAP_BITS)) bits of the index are indexed into
+>> + * the ida bitmap to find the bit.
+>> + */
+>> +#define XB_INDEX_BITS		(BITS_PER_LONG - ilog2(IDA_BITMAP_BITS))
+>> +#define XB_MAX_PATH		(DIV_ROUND_UP(XB_INDEX_BITS, \
+>> +					      RADIX_TREE_MAP_SHIFT))
+>> +#define XB_PRELOAD_SIZE		(XB_MAX_PATH * 2 - 1)
+> I don't understand why you moved the xb_preload code here from the
+> radix tree.  I want all the code which touches the preload implementation
+> together in one place, which is the radix tree.
+
+Based on the previous comments (put all the code to lib/xbitmap.c) and your
+comment here, I will move xb_preload() and the above Macro to radix-tree.c,
+while leaving the rest in xbitmap.c.
+
+Would this be something you expected? Or would you like to move all back
+to radix-tree.c like that in v13?
+
+
+Best,
+Wei
