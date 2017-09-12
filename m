@@ -1,23 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51363)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1drjD8-0007wp-A9
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 07:18:35 -0400
+	(envelope-from <wangjie88@huawei.com>) id 1drjDQ-00085Z-08
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 07:18:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1drjD5-0008Oj-0j
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 07:18:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53240)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1drjD4-0008OP-Qj
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 07:18:30 -0400
-Date: Tue, 12 Sep 2017 13:18:23 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170912131823.1f7a9e03.cohuck@redhat.com>
-In-Reply-To: <b0cd3b7a-fcc8-03ed-55dd-cbdba2ff59ec@linux.vnet.ibm.com>
-References: <b0cd3b7a-fcc8-03ed-55dd-cbdba2ff59ec@linux.vnet.ibm.com>
+	(envelope-from <wangjie88@huawei.com>) id 1drjDM-0008UV-Mc
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 07:18:52 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2317)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <wangjie88@huawei.com>) id 1drjDL-0008RR-NE
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 07:18:48 -0400
+From: "WangJie (Captain)" <wangjie88@huawei.com>
+Message-ID: <59B7C252.1070004@huawei.com>
+Date: Tue, 12 Sep 2017 19:17:38 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] Suggested Wiki Update
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] =?utf-8?q?question=EF=BC=9A_I_found_a_bug_which_will?=
+ =?utf-8?q?_lead_to_qemu_crash?=
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,53 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Kevin Wolf <kwolf@redhat.com>, berto@igalia.com, stefanha@redhat.com, famz@redhat.com, wangjie88@huawei.com
+Cc: qemu-devel@nongnu.org, pbonzini@redhat.com
 
-On Tue, 12 Sep 2017 10:57:14 +0200
-Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com> wrote:
+Hi, Kevin.
 
-> Hi,
-> 
-> the content of https://wiki.qemu.org/index.php/Features/S390xNetworkBoot
-> is slightly outdated since proper DHCP based netboot support for s390x
-> has been implemented by the series ending with commit 29d1221.
-> 
-> As it is still desirable to provide some instructions on building
-> network bootable images for the s390x architecture, I'd like to suggest
-> that the text is replaced (see proposal below). Conny, could I once more
-> request your help in that matter?
-> 
-> == Building a s390 network bootable binary ==
-> 
-> Since 2.10 QEMU offers network boot support which allows to load a
-> binary from a TFTP server and boot it. As s390 network bootable images
-> are not very common, this document gives a brief overview on how to
-> build one.
-> 
-> A s390 network bootable image can be built by bundling some shell
-> scripts, busybox and the kexec binary bundled into an initial ramdisk
-> and append that to a kernel image. An existing s390 system can be used
-> as source.
-> 
-> One way to do that is to take a kernel and an installer initial ramdisk
-> from a distribution's DVD/ISO and concatenate them. Some fixups are
-> necessary int the new binary, which can be done by using the script in
-> [https://github.com/ibm-s390-tools/s390-tools/blob/master/netboot/mk-s390image].
-> Booting this image would then start the installation process as if
-> booted from the DVD.
-> 
-> Another possible way is to build a binary that behaves similar to the
-> PXELINUX boot loader. In this case an initial ramdisk with an init
-> process triggering the PXELINUX-like processing has to be built as
-> described in
-> [https://github.com/ibm-s390-tools/s390-tools/tree/master/netboot]. The
-> site also contains a script assisting in the creation of such an initial
-> ramdisk.
-> 
+I found a bug about qemu-kvm(version 2.7.0-rc0 adn 2.8.1). but qemu 2.6.0 and current master is OK.
+So I git-bisect the master branch，and I found the patch you commited (block: Decouple throttling from BlockDriverState) lead the bug into qemu.
 
-Looks good.
+The patch which lead the bug into qemu: (https://github.com/qemu/qemu/commit/7ca7f0f6db1fedd28d490795d778cf23979a2aa7#diff-ea36ba0f79150cc299732696a069caba)
 
-Can you perhaps add a sentence that the base support is available with
-2.9 and netboot with 2.10? ('Overview' looks like a good place for
-that.)
+Because the current master is OK. So I think you had fixed it , can you tell me which patch fixed the bug?        Thank you :>
+
+
+the bug is that: qemu will crash when loop to attach and detach a disk which configured qos to a VM for a while.
+
+
+*Segmentation fault info(qemu 2.7.0-rc0):*
+Using host libthread_db library "/lib64/libthread_db.so.1".
+Core was generated by `/usr/bin/qemu-kvm -name guest=wangjie-i-clone203_rhel_7.3_64_guestosdev,debug-t'.
+Program terminated with signal 11, Segmentation fault.
+#0  0x00007fe960413e3c in throttle_group_next_blk (blk=0x11) at block/throttle-groups.c:160
+160        ThrottleState *ts = blkp->throttle_state;
+Missing separate debuginfos, use: debuginfo-install glib2-2.40.0-4.x86_64 glibc-2.17-157.h5.x86_64 libaio-0.3.109-13.x86_64 libgcc-4.8.3-10.h1.x86_64 nettle-2.7.1-4.h1.x86_64 numactl-libs-2.0.9-4.x86_64 pixman-0.32.4-3.x86_64 zlib-1.2.7-14.x86_64
+(gdb) bt
+#0  0x00007fe960413e3c in throttle_group_next_blk (blk=0x11) at block/throttle-groups.c:160
+#1  0x00007fe960413eff in next_throttle_token (blk=0x7fe963f5c400, is_write=false) at block/throttle-groups.c:192
+#2  0x00007fe9604141a8 in throttle_group_co_io_limits_intercept (blk=0x7fe963f5c400, bytes=512, is_write=false)
+    at block/throttle-groups.c:303
+#3  0x00007fe960400048 in blk_co_preadv (blk=0x7fe963f5c400, offset=0, bytes=512, qiov=0x7ffc37ee8aa0, flags=(unknown: 0))
+    at block/block-backend.c:728
+#4  0x00007fe960400159 in blk_read_entry (opaque=0x7ffc37ee8ac0) at block/block-backend.c:769
+#5  0x00007fe96048f4d7 in coroutine_trampoline (i0=1678853408, i1=32745) at util/coroutine-ucontext.c:78
+#6  0x00007fe95dfdacf0 in ?? () from /lib64/libc.so.6
+#7  0x00007ffc37ee9c00 in ?? ()
+#8  0x0000000000000000 in ?? ()
+
+
+
+*Segmentation fault info(qemu 2.8.1):*
+Program received signal SIGSEGV, Segmentation fault.
+0x00007f5469220607 in blk_has_pending_reqs (blk=0x7f54672a0032, is_write=false) at block/throttle-groups.c:184
+184        return blkp->pending_reqs[is_write];
+(gdb) bt
+#0  0x00007f5469220607 in blk_has_pending_reqs (blk=0x7f54672a0032, is_write=false) at block/throttle-groups.c:184
+#1  0x00007f54692206a8 in next_throttle_token (blk=0x7f546b6cd120, is_write=false) at block/throttle-groups.c:207
+#2  0x00007f5469220984 in throttle_group_co_io_limits_intercept (blk=0x7f546b6cd120, bytes=512, is_write=false)
+    at block/throttle-groups.c:322
+#3  0x00007f546920bc79 in blk_co_preadv (blk=0x7f546b6cd120, offset=0, bytes=512, qiov=0x7ffcc7355060, flags=0)
+    at block/block-backend.c:815
+#4  0x00007f546920bddf in blk_read_entry (opaque=0x7ffcc7355080) at block/block-backend.c:865
+#5  0x00007f54692a00f0 in coroutine_trampoline (i0=-588050448, i1=32595) at util/coroutine-ucontext.c:79
+#6  0x00007f5466f34cf0 in ?? () from /lib64/libc.so.6
+#7  0x00007f53f27fa9e0 in ?? ()
+#8  0x0000000000000000 in ?? ()
+
+
+*The way how to find the bug as follows:*
+*1、start a VM*
+
+
+*2、attach and detach a disk for a while，the configure of the disk (add-1.xml) as follows*
+<disk device="disk" type="file">
+<driver cache="none" io="native" name="qemu" type="raw" />
+<source file="/mnt/sdb/wangjie-kvm/core/fk8b42zr-oz" />
+<target bus="virtio" dev="vdb" />
+<iotune>
+<read_iops_sec>3000</read_iops_sec>
+<write_iops_sec>3000</write_iops_sec>
+<read_bytes_sec>120000000</read_bytes_sec>
+<write_bytes_sec>120000000</write_bytes_sec>
+</iotune>
+</disk>
+
+
+*3、run below script for a while，the qemu process of  VM will crash*
+ret=1
+while [ $ret -ne 0 ]; do
+        virsh attach-device i-clone203_rhel_7.3_64_guestosdev add-1.xml
+        sleep 2
+        virsh detach-device i-clone203_rhel_7.3_64_guestosdev add-1.xml
+done
