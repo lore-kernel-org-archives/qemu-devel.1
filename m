@@ -1,25 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36453)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37210)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drnxG-0007gT-NN
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:22:31 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1drnzI-000168-Rw
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:24:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1drnxF-0005Uz-T4
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:22:30 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1505232834-20890-1-git-send-email-peter.maydell@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ca218563-0789-f11d-fa7b-895998a1a84d@amsat.org>
-Date: Tue, 12 Sep 2017 13:22:19 -0300
+	(envelope-from <pbonzini@redhat.com>) id 1drnzH-0006Uy-Rl
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:24:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59898)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drnzH-0006Ug-Kv
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 12:24:35 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id AED454E028
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 16:24:34 +0000 (UTC)
+References: <20170912104626.8386-1-berrange@redhat.com>
+	<810971dc-0a17-cf41-c11a-db991a17317a@redhat.com>
+	<20170912161252.GM17633@redhat.com>
+	<5994d2c2-77b3-6698-c9e0-c737c84caf68@redhat.com>
+	<20170912162223.GN17633@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <76f6207d-165d-d1dd-652f-67038e9f2509@redhat.com>
+Date: Tue, 12 Sep 2017 18:24:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <1505232834-20890-1-git-send-email-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170912162223.GN17633@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] mps2-an511: Fix wiring of UART overflow
- interrupt lines
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] scripts: let checkpatch.pl process an
+ entire GIT branch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +38,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, patches@linaro.org, qemu-arm@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-(CC'ed qemu-arm)
-
-Hi Peter,
-
-On 09/12/2017 01:13 PM, Peter Maydell wrote:
-> Fix an error that meant we were wiring every UART's overflow
-> interrupts into the same inputs 0 and 1 of the OR gate,
-> rather than giving each its own input.
-
-oops tricky to catch
-
+On 12/09/2017 18:22, Daniel P. Berrange wrote:
+> On Tue, Sep 12, 2017 at 06:14:57PM +0200, Paolo Bonzini wrote:
+>> On 12/09/2017 18:12, Daniel P. Berrange wrote:
+>>> On Tue, Sep 12, 2017 at 05:52:18PM +0200, Paolo Bonzini wrote:
+>>>> On 12/09/2017 12:46, Daniel P. Berrange wrote:
+>>>>> Currently before submitting a series, devs should run checkpatch.pl
+>>>>> across each patch to be submitted. This can be automated using a
+>>>>> command such as:
+>>>>>
+>>>>>   git rebase -i master -x 'git show | ./scripts/checkpatch.pl -'
+>>>>>
+>>>>> This is rather long winded to type, so this patch introduces a new
+>>>>> flag '--branch' to checkpatch.pl which instructs it to check every
+>>>>> patch on the current GIT branch.
+>>>>
+>>>> Great idea, though I'm not sure about having a default.  And to keep it
+>>>> easy to invoke, having a sole argument that ends with ".." might DWIM
+>>>> and enable --branch too...
+>>>
+>>> I think it is beneficial to have a default, as I figure the majority
+>>> of contributors are working on a branch that's rebased against master..
+>>> Half as many characters to type in the common case :-)
+>>
+>> With the DWIM option "--branch" and "master.." are exactly the same
+>> length. :)
 > 
-> Cc: qemu-stable@nongnu.org
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->   hw/arm/mps2.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-> index abb0ab6..769cff8 100644
-> --- a/hw/arm/mps2.c
-> +++ b/hw/arm/mps2.c
+> Oh hang on. I think I misunderstood what you suggested. I thought you
+> meant  'checkpatch.pl --branch master..', but IIUC you actually mean
+> 'checkpatch.pl master..' with no flag. That would work with me.
 
-         /* The overflow IRQs for all UARTs are ORed together.
-          * Tx and Rx IRQs for each UART are ORed together.
-          */
+Yes, basically if length(argv) == 1 and argv[0] ends with ".." then
+enable branch.  The default for --branch with no ARGV could be
+"origin/master.."---or it could ask git-config for the upstream tracking
+branch but maybe that's too much to ask.
 
-can you update this comment?
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-> @@ -287,8 +287,8 @@ static void mps2_common_init(MachineState *machine)
->               cmsdk_apb_uart_create(uartbase[i],
->                                     qdev_get_gpio_in(txrx_orgate_dev, 0),
->                                     qdev_get_gpio_in(txrx_orgate_dev, 1),
-> -                                  qdev_get_gpio_in(orgate_dev, 0),
-> -                                  qdev_get_gpio_in(orgate_dev, 1),
-> +                                  qdev_get_gpio_in(orgate_dev, i * 2),
-> +                                  qdev_get_gpio_in(orgate_dev, i * 2 + 1),
->                                     NULL,
->                                     uartchr, SYSCLK_FRQ);
->           }
-> 
+Paolo
