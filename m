@@ -1,36 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1drh0Z-0003jI-Bs
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 04:57:28 -0400
+	(envelope-from <berrange@redhat.com>) id 1drh14-0004Bl-VY
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 04:58:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mihajlov@linux.vnet.ibm.com>) id 1drh0U-0007hd-GQ
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 04:57:27 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59148)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mihajlov@linux.vnet.ibm.com>)
-	id 1drh0U-0007ga-8R
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 04:57:22 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8C8sHQ6093025
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 04:57:21 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cxaumdryf-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 04:57:20 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <mihajlov@linux.vnet.ibm.com>;
-	Tue, 12 Sep 2017 09:57:18 +0100
-From: Viktor Mihajlovski <mihajlov@linux.vnet.ibm.com>
-Date: Tue, 12 Sep 2017 10:57:14 +0200
+	(envelope-from <berrange@redhat.com>) id 1drh11-0008CZ-1h
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 04:57:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60810)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1drh10-0008B4-Sg
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 04:57:54 -0400
+Date: Tue, 12 Sep 2017 09:57:50 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170912085750.GA17633@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
+	<20170908173801.15205-7-brandon.carpenter@cypherpath.com>
+	<20170911085043.GE21444@redhat.com>
+	<1505149415.1214.1@smtp.gmail.com>
+	<20170911171015.GU21444@redhat.com>
+	<1505156655.1214.3@smtp.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Message-Id: <b0cd3b7a-fcc8-03ed-55dd-cbdba2ff59ec@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] Suggested Wiki Update
+Content-Disposition: inline
+In-Reply-To: <1505156655.1214.3@smtp.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2 6/6] io: Reply to ping frames
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,55 +32,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>, Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Brandon Carpenter <brandon.carpenter@cypherpath.com>
+Cc: qemu-devel@nongnu.org
 
-Hi,
+On Mon, Sep 11, 2017 at 12:04:15PM -0700, Brandon Carpenter wrote:
+> On Mon, Sep 11, 2017 at 10:10 AM, Daniel P. Berrange <berrange@redhat.com>
+> wrote:
+> > It feels like this is still dangerous - the client simply has to
+> > interleave each "ping" with a 1 byte binary frame to get around this
+> > limit. We need to make sure we have an absolute cap on the output buffer
+> > size.
+> 
+> Okay. I see that now that I look at it more closely. This breed of
+> asynchronous I/O is tricky because the conditions for reading/writing are
+> all over the place. There's a lot of context to keep in your head.
+> 
+> I have a fix. And I realized that I was missing a patch in the series for
+> RFC-compliant closing of websocket connections, which I must have lost
+> during a rebase. Should I submit v3 of the patch series or just add those
+> patches to this thread?
 
-the content of https://wiki.qemu.org/index.php/Features/S390xNetworkBoot
-is slightly outdated since proper DHCP based netboot support for s390x
-has been implemented by the series ending with commit 29d1221.
+It is generally preferred practice to submit new top level threads, rather
+than sending more patches to a previous thread.
 
-As it is still desirable to provide some instructions on building
-network bootable images for the s390x architecture, I'd like to suggest
-that the text is replaced (see proposal below). Conny, could I once more
-request your help in that matter?
-
-=3D=3D Building a s390 network bootable binary =3D=3D
-
-Since 2.10 QEMU offers network boot support which allows to load a
-binary from a TFTP server and boot it. As s390 network bootable images
-are not very common, this document gives a brief overview on how to
-build one.
-
-A s390 network bootable image can be built by bundling some shell
-scripts, busybox and the kexec binary bundled into an initial ramdisk
-and append that to a kernel image. An existing s390 system can be used
-as source.
-
-One way to do that is to take a kernel and an installer initial ramdisk
-from a distribution's DVD/ISO and concatenate them. Some fixups are
-necessary int the new binary, which can be done by using the script in
-[https://github.com/ibm-s390-tools/s390-tools/blob/master/netboot/mk-s390=
-image].
-Booting this image would then start the installation process as if
-booted from the DVD.
-
-Another possible way is to build a binary that behaves similar to the
-PXELINUX boot loader. In this case an initial ramdisk with an init
-process triggering the PXELINUX-like processing has to be built as
-described in
-[https://github.com/ibm-s390-tools/s390-tools/tree/master/netboot]. The
-site also contains a script assisting in the creation of such an initial
-ramdisk.
-
---=20
-
-Mit freundlichen Gr=C3=BC=C3=9Fen/Kind Regards
-   Viktor Mihajlovski
-
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Martina K=C3=B6deritz
-Gesch=C3=A4ftsf=C3=BChrung: Dirk Wittkopp
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
