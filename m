@@ -1,25 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51513)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51846)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1drlbU-0008Me-JS
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:51:53 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1drlcR-0000Ug-PV
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:52:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1drlbR-0004tl-IA
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:51:52 -0400
-Received: from fanzine.igalia.com ([91.117.99.155]:33256)
+	(envelope-from <richard.henderson@linaro.org>) id 1drlcO-0005gi-Nx
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:52:51 -0400
+Received: from mail-pg0-x22d.google.com ([2607:f8b0:400e:c05::22d]:33041)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <berto@igalia.com>) id 1drlbR-0004qS-5a
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:51:49 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <59B7E305.6080302@huawei.com>
-References: <59B7C252.1070004@huawei.com> <59B7E305.6080302@huawei.com>
-Date: Tue, 12 Sep 2017 15:51:36 +0200
-Message-ID: <w51efrcm3dj.fsf@maestria.local.igalia.com>
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1drlcO-0005gR-Hc
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 09:52:48 -0400
+Received: by mail-pg0-x22d.google.com with SMTP id u18so4771181pgo.0
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 06:52:48 -0700 (PDT)
+References: <20170817230114.3655-1-richard.henderson@linaro.org>
+	<20170817230114.3655-9-richard.henderson@linaro.org>
+	<87377xijkt.fsf@linaro.org> <871snhibdr.fsf@linaro.org>
+	<889b3e05-64f6-8eb6-0c22-87b09b86b7b8@linaro.org>
+	<877ex5bo31.fsf@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <54b956b7-0fbc-a71e-2dd3-38f77abd4aa5@linaro.org>
+Date: Tue, 12 Sep 2017 06:52:44 -0700
 MIME-Version: 1.0
+In-Reply-To: <877ex5bo31.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel]
- =?utf-8?q?question=EF=BC=9A_I_found_a_bug_which_wil?=
- =?utf-8?q?l_lead_to_qemu_crash?=
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 8/8] tcg/i386: Add vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +34,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "WangJie (Captain)" <wangjie88@huawei.com>, Kevin Wolf <kwolf@redhat.com>, eblake@redhat.com
-Cc: stefanha@redhat.com, famz@redhat.com, qemu-devel@nongnu.org, pbonzini@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-On Tue 12 Sep 2017 03:37:09 PM CEST, WangJie (Captain) wrote:
-> the patch which fixed the bug is=EF=BC=9A https://github.com/qemu/qemu/co=
-mmit/1606e4cf8a976513ecac70ad6642a7ec45744cf5#diff-7cb66df56045598b75a219ee=
-bc27efb6
+On 09/11/2017 02:07 AM, Alex Bennée wrote:
+> 
+> Richard Henderson <richard.henderson@linaro.org> writes:
+> 
+>> On 09/08/2017 06:10 AM, Alex Bennée wrote:
+>>> Also this commit breaks RISU:
+>>>
+>>>  qemu-aarch64 build/aarch64-linux-gnu/risu
+>>>     testcases.aarch64/insn_ANDSi_RES8_ANDS_RES_ANDv_ASRV__INC.risu.bin \
+>>>     -t testcases.aarch64/insn_ANDSi_RES8_ANDS_RES_ANDv_ASRV__INC.risu.bin.trace
+>>>
+>>> Gives:
+>>>
+>>> mismatch detail (master : apprentice):
+>>>   V29   : 000000000000000005388083c1444242 vs 00000000000000002a000e0416a30018
+>>>
+>>> The insn is:
+>>>
+>>>   37c:       6f56a29d        umull2  v29.4s, v20.8h, v6.h[1]
+>>>
+>>> Which is odd because I didn't think we'd touched that.
+>>
+>> Indeed we didn't.  Still, I'll check it out next week.
+> 
+> OK it would help if I had objdumped the right file:
+> 
+>      36c:       0e781fdd        bic     v29.8b, v30.8b, v24.8b
+>      370:       00005af0        .inst   0x00005af0 ; undefined
 
-Oh, now I remember. Here's the bug report:
+Thanks.  The sse pandn operand order is ... surprising.
+Even though I know that I still managed to get it wrong.
+Fixed for v2.
 
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1428810
 
-> But the condition which I made to causes crash is differ in the
-> condition you described in patch info, is it the same reason?
-
-How is it different? Doesn't the script that you posted do exactly that?
-(hot-unplug)
-
->> *3=E3=80=81run below script for a while=EF=BC=8Cthe qemu process of  VM =
-will crash*
->> ret=3D1
->> while [ $ret -ne 0 ]; do
->>         virsh attach-device i-clone203_rhel_7.3_64_guestosdev add-1.xml
->>         sleep 2
->>         virsh detach-device i-clone203_rhel_7.3_64_guestosdev add-1.xml
->> done
-
-It makes total sense that that patch fixes the problem. Without it, a
-deleted BlockBackend remains in a throttling group, which explains your
-backtrace.
-
-Berto
+r~
