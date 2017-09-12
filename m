@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52371)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drsM7-00033U-K6
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:04:30 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1drsNb-0004Dt-TY
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:06:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1drsM4-0007ta-7C
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:04:27 -0400
-Received: from mail-wr0-f171.google.com ([209.85.128.171]:37655)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1drsM4-0007tN-14
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:04:24 -0400
-Received: by mail-wr0-f171.google.com with SMTP id k20so25082746wre.4
-	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 14:04:23 -0700 (PDT)
-References: <20170911204936.5020-1-f4bug@amsat.org>
-	<CAFEAcA_61iw+u7aMp+vA-CNpmAPjvJ_ynUfHu8Y+p8jmgvbcdw@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4eddca72-c75e-0cbc-e07d-280c1cd0f095@redhat.com>
-Date: Tue, 12 Sep 2017 23:04:15 +0200
+	(envelope-from <vilanova@ac.upc.edu>) id 1drsNX-0008Ty-OX
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:05:59 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:48722)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1drsNX-0008Td-Ca
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 17:05:55 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 13 Sep 2017 00:05:45 +0300
+Message-Id: <150525034497.15988.15470574509428976971.stgit@frigg.lan>
+In-Reply-To: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
+References: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_61iw+u7aMp+vA-CNpmAPjvJ_ynUfHu8Y+p8jmgvbcdw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/ppc: disable atomic write check on
- ppc32
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v5 01/22] instrument: Add documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,54 +26,224 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
 
-On 11/09/2017 23:37, Peter Maydell wrote:
-> On 11 September 2017 at 21:49, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->> this fixes building for ppc64 on ppc32 (changed in 5964fca8a12c):
->>
->>   qemu/tcg/ppc/tcg-target.inc.c: In function 'tb_target_set_jmp_target':
->>   qemu/include/qemu/compiler.h:86:30: error: static assertion failed: "not expecting: sizeof(*(uint64_t *)jmp_addr) > ATOMIC_REG_SIZE"
->>        QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
->>        ^
->>   qemu/tcg/ppc/tcg-target.inc.c:1377:9: note: in expansion of macro 'atomic_set'
->>            atomic_set((uint64_t *)jmp_addr, pair);
->>            ^
->>
->> Suggested-by: Richard Henderson <rth@twiddle.net>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->> This fixes Shippable builds, see:
->> https://app.shippable.com/github/qemu/qemu/runs/434/10/console
->>
->>  tcg/ppc/tcg-target.inc.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
->> index 21d764c102..0417901289 100644
->> --- a/tcg/ppc/tcg-target.inc.c
->> +++ b/tcg/ppc/tcg-target.inc.c
->> @@ -1374,7 +1374,7 @@ void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
->>          pair = (uint64_t)i2 << 32 | i1;
->>  #endif
->>
->> -        atomic_set((uint64_t *)jmp_addr, pair);
->> +        atomic_set__nocheck((uint64_t *)jmp_addr, pair);
->>          flush_icache_range(jmp_addr, jmp_addr + 8);
->>      } else {
->>          intptr_t diff = addr - jmp_addr;
-> 
-> Can you explain why this is the right thing? On the
-> face of it it looks correct to insist that we don't
-> try to do an atomic set of something that's bigger
-> than the host can actually handle...
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ MAINTAINERS         |    6 ++
+ docs/instrument.txt |  173 +++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+ 2 files changed, 179 insertions(+)
+ create mode 100644 docs/instrument.txt
 
-Probably because this code is guarded by "if (TCG_TARGET_REG_BITS ==
-64)", so actually it only ever runs with 64-bit targets.
-
-I wonder if QEMU_BUILD_BUG_ON (at least in atomics) should not use a
-static assertion, but rather the 'error ("MESSAGE")' attribute instead.
-This way, if the code is dead it does not cause a build failure.
-
-Paolo
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 36eeb42d19..fb0eaee06a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1486,6 +1486,12 @@ F: scripts/tracetool/
+ F: docs/tracing.txt
+ T: git git://github.com/stefanha/qemu.git tracing
+=20
++Event instrumentation
++M: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++M: Stefan Hajnoczi <stefanha@redhat.com>
++S: Maintained
++F: docs/instrument.txt
++
+ TPM
+ S: Orphan
+ F: tpm.c
+diff --git a/docs/instrument.txt b/docs/instrument.txt
+new file mode 100644
+index 0000000000..24a0d21fc7
+--- /dev/null
++++ b/docs/instrument.txt
+@@ -0,0 +1,173 @@
++=3D Event instrumentation =3D
++
++=3D=3D Introduction =3D=3D
++
++Event instrumentation allows users to execute their own host-native code=
+ on a
++set of pre-defined events provided by QEMU. QEMU also exposes other
++functionality to peek/poke at the guest state (e.g., memory or registers=
+), as
++well as interacting with tracing events. For those familiar with the ter=
+m, this
++provides dynamic binary instrumentation, works on all QEMU-supported
++architectures, as well as works in both 'user' (standalone application) =
+and
++'system' (full-system emulation) modes.
++
++Look at the headers installed by QEMU on the "qemu-instr" directory for =
+further
++information beyond this document.
++
++
++=3D=3D Loading an instrumentation library =3D=3D
++
++Instrumentation code can be bundled into a dynamic library, which can be=
+ later
++loaded into QEMU:
++
++* Using the command-line "-instr" argument.
++
++* Using the "instr-load" and "instr-unload" commands in the HMP and QMP
++  interfaces.
++
++
++=3D=3D Example =3D=3D
++
++1. Configure QEMU with event instrumentation:
++
++    # instrument guest_cpu_enter and guest_mem_before
++    mkdir -p /path/to/qemu-build
++    cd /path/to/qemu-build
++    /path/to/qemu-source/configure \
++      --enable-instrument \
++      --prefix=3D/path/to/qemu-install
++
++2. Build and install QEMU:
++
++    make install
++
++3. Create the "Makefile" to build the instrumentation library:
++
++    mkdir -p /tmp/my-instrument
++   =20
++    cat > /tmp/my-instrument/Makefile <<EOF
++    QEMU_PATH=3D/tmp/qemu-install/
++   =20
++    CFLAGS +=3D -g
++    CFLAGS +=3D -O3
++    CFLAGS +=3D -Werror -Wall
++    CFLAGS +=3D -I$(QEMU_PATH)/include
++   =20
++    all: libtrace-instrument.la
++   =20
++    libtrace-instrument.la: instrument.lo
++            libtool --mode=3Dlink --tag=3DCC $(CC) -module -rpath /usr/l=
+ocal/lib -o $@ $^
++   =20
++    %.lo: %.c
++            libtool --mode=3Dcompile --tag=3DCC $(CC) $(CFLAGS) -c $^
++   =20
++    clean:
++            $(RM) -f *.o *.so *.lo
++            $(RM) -Rf .libs
++    EOF
++
++4. Write your instrumentation library:
++
++    cat > /tmp/my-instrument/instrument.c <<EOF
++    #include <stdio.h>
++    #include <assert.h>
++   =20
++    #include <qemu-instr/control.h>         /* manipulate events */
++    #include <qemu-instr/trace.h>           /* manipulate tracing */
++   =20
++    /* the address for the memory access is not known at translation tim=
+e */
++    void guest_mem_before_trans(QICPU vcpu_trans, QITCGv_cpu vcpu_exec,
++                                QITCGv vaddr, QIMemInfo info)
++    {
++        printf("%s: %p %p %p %d %d %d %d\n", __func__, vcpu_trans, vcpu_=
+exec, vaddr,
++               1 << info.size_shift, info.sign_extend, info.endianness, =
+info.store);
++        if (info.store) {
++            /* generate at execution time only for memory writes */
++            qi_event_gen_guest_mem_before_exec(vcpu_exec, vaddr, info);
++        }
++    }
++   =20
++    /* called when QEMU executes a memory access */
++    void guest_mem_before_exec(QICPU vcpu, uint64_t vaddr, QIMemInfo inf=
+o)
++    {
++        if (info.store) {
++            /* if called by TCG code, we'll only get writes (see above) =
+*/
++            printf("%s: %p %lx %d %d %d %d\n", __func__, vcpu, vaddr,
++                   1 << info.size_shift, info.sign_extend, info.endianne=
+ss, info.store);
++        }
++    }
++   =20
++    /* called every time QEMU hotplugs a CPU */
++    void guest_cpu_enter(QICPU vcpu)
++    {
++        printf("%s: %p\n", __func__, vcpu);
++   =20
++        /* disable instrumentation and tracing after the first call */
++        static bool found =3D false;
++        if (found) {
++            qi_event_set_guest_cpu_enter(NULL);
++            QITraceEvent *ev =3D qi_trace_event_name("guest_cpu_enter");
++            assert(ev);
++            qi_trace_event_set_state_dynamic(ev, true);
++        } else {
++            found =3D true;
++        }
++    }
++   =20
++    static void fini(void *data)
++    {
++        /* diable all tracing events */
++        QITraceEventIter iter;
++        qi_trace_event_iter_init(&iter, NULL);
++        QITraceEvent *ev;
++        while ((ev =3D qi_trace_event_iter_next(&iter)) !=3D NULL) {
++            if (qi_trace_event_get_state_static(ev)) {
++                qi_trace_event_set_state_dynamic(ev, false);
++            }
++        }
++   =20
++        /* instrumentation callbacks are automatically reset by QEMU */
++    }
++   =20
++    /* mandatory initialization function */
++    int main(int argc, const char **argv)
++    {
++        int i;
++        printf("init!\n");
++        printf("    argc :: %d\n", argc);
++        for (i =3D 0; i < argc; i++) {
++            printf("            -> %s\n", argv[i]);
++        }
++   =20
++        qi_set_fini(fini, NULL);
++   =20
++        /* instrument and trace events */
++        QITraceEvent *ev;
++   =20
++        qi_event_set_guest_cpu_enter(guest_cpu_enter);
++        ev =3D qi_trace_event_name("guest_cpu_enter");
++        assert(ev);
++        qi_trace_event_set_state_dynamic(ev, true);
++   =20
++        qi_event_set_guest_mem_before_trans(guest_mem_before_trans);
++        ev =3D qi_trace_event_name("guest_mem_before_trans");
++        assert(ev);
++        qi_trace_event_set_state_dynamic(ev, true);
++   =20
++        qi_event_set_guest_mem_before_exec(guest_mem_before_exec);
++        ev =3D qi_trace_event_name("guest_mem_before_exec");
++        assert(ev);
++        qi_trace_event_set_state_dynamic(ev, true);
++   =20
++        return 0;
++    }
++    EOF
++
++5. Compile the instrumentation library:
++
++    make -C /tmp/my-instrument
++
++6. Start QEMU with the instrumentation library:
++
++    /tmp/qemu-install/bin/qemu-system-x86_64 \
++        -instr file=3D/tmp/my-dinstrument/.libs/libtrace-instrument.so, =
+\
++               arg=3Dfoo,arg=3Dbar
