@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56189)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1drhzW-0003mL-45
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:00:32 -0400
+	(envelope-from <bounces@canonical.com>) id 1dri42-0004xv-KK
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:05:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1drhzR-000724-Dt
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:00:26 -0400
-Date: Tue, 12 Sep 2017 12:00:08 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170912100008.GD29136@localhost.localdomain>
-References: <20170809215510.22802-1-pbonzini@redhat.com>
-	<20170809215510.22802-2-pbonzini@redhat.com>
-	<eeba95b4-23a2-51da-2c41-be5ee262c965@redhat.com>
-	<186485494.2838970.1502318620647.JavaMail.zimbra@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1dri3x-0003co-MI
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:05:06 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53220)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dri3x-0003bj-GT
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 06:05:01 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dri3w-00072E-Gh
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 10:05:00 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 72D6E2E8486
+	for <qemu-devel@nongnu.org>; Tue, 12 Sep 2017 10:05:00 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <186485494.2838970.1502318620647.JavaMail.zimbra@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 01/12] qemu-iotests: remove dead code
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 12 Sep 2017 09:45:51 -0000
+From: Philosophish <philosophish@gmail.com>
+Reply-To: Bug 1135567 <1135567@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130228104653.3556.64942.malonedeb@soybean.canonical.com>
+Message-Id: <150520955157.32282.10731642024196215044.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1135567] Re: QXL crashes a Windows 7 guest if
+ host goes into screensaver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,55 +37,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: qemu-devel@nongnu.org
 
-Am 10.08.2017 um 00:43 hat Paolo Bonzini geschrieben:
-> 
-> 
-> ----- Original Message -----
-> > From: "Eric Blake" <eblake@redhat.com>
-> > To: "Paolo Bonzini" <pbonzini@redhat.com>, qemu-devel@nongnu.org
-> > Cc: kwolf@redhat.com, qemu-block@nongnu.org
-> > Sent: Thursday, August 10, 2017 12:18:54 AM
-> > Subject: Re: [Qemu-devel] [PATCH 01/12] qemu-iotests: remove dead code
-> > 
-> > On 08/09/2017 04:54 PM, Paolo Bonzini wrote:
-> > > This includes shell function, shell variables, command line options
-> > > (randomize.awk does not exist) and conditions that can never be true
-> > > (./qemu does not exist anymore).
-> > 
-> > Can we point to a commit id where we stopped making ./qemu?
-> 
-> commit 9aed1e036dc0de49d08d713f9e5c4655e94acb56
-> Author: Anthony Liguori <aliguori@us.ibm.com>
-> Date:   Mon Aug 29 09:55:36 2011 -0500
-> 
->     Rename qemu -> qemu-system-i386
->     
->     This has been discussed before in the past.  The special casing really makes no
->     sense anymore.  This seems like a good change to make for 1.0.
->     
->     Signed-off-by: Anthony Liguori <aliguori@us.ibm.com>
+Hello,
 
-This is not related to ./qemu in the qemu-iotests directory. It's just
-the name of the binary that is created in i386-softmmu/, but that has
-never been the working directory for qemu-iotests.
+Obviously my hardware configuration and versions etc. have changed.
 
-> > Is it still worth supporting a local symlink?
-> 
-> Not sure who would have one...
+Also, I have taken to not using screensavers in the virtual machines
+anymore i.e. disabled.
 
-I have always been using symlinks in the qemu-iotests directory. And, as
-you probably expect now, ./qemu does exist in my setup.
+BUT: I have set it up as similarly as possible and the crash/freeze/hang
+up with current versions of the drivers seems to be gone.
 
-Now, I must admit that I haven't actually made real use of it recently
-because the symlinks only point to the binaries that qemu-iotests would
-pick up anyway. But when running qemu-iotests against a different qemu
-version or installed binaries instead of whatever is in the build tree,
-I always found the symlinks more convenient that setting up a bunch of
-environment variables.
+So I guess the ticket can be closed.
 
-So maybe supporting them isn't completely useless.
+-- =
 
-Kevin
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1135567
+
+Title:
+  QXL crashes a Windows 7 guest if host goes into screensaver
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  Note: if further information is required, I'll be glad to supply it.
+
+  I am using on the host
+  - HP z800 with 72GB RAM and 2x x5680
+  - Gentoo 64-bit host (3.7.9 kernel, FGLRX RADEON driver 13.1)
+  - LIBVIRT 1.0.2 with QEMU(-KVM) 1.4.0
+
+  The guest:
+  - Windows 7 32-bit
+  - 2GB allocated
+  - 2 CPU
+  - using virtio for everything (disk,net,memballoon)
+  - Display =3D SPICE with spice channel
+  - Video driver is qxl (ram says 64MB)
+  - Spice-guest-tools 0.52 installed
+
+  When I use QXL and  have the guest open in Virt-Manager/Virt-Viewer
+  and let the host go into screensaver mode, the Win7 crashes hard.
+
+  When I change video to VGA, it survives the screen saver,  no problem
+  at all ,smooth sailing.
+
+  regards
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1135567/+subscriptions
