@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39545)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drrqZ-0001nU-AN
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 16:31:52 -0400
+	(envelope-from <eblake@redhat.com>) id 1drrqh-0001sU-4k
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 16:32:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1drrqY-0005rC-41
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 16:31:51 -0400
+	(envelope-from <eblake@redhat.com>) id 1drrqg-00065o-2w
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 16:31:59 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 12 Sep 2017 15:31:08 -0500
-Message-Id: <20170912203119.24166-10-eblake@redhat.com>
+Date: Tue, 12 Sep 2017 15:31:10 -0500
+Message-Id: <20170912203119.24166-12-eblake@redhat.com>
 In-Reply-To: <20170912203119.24166-1-eblake@redhat.com>
 References: <20170912203119.24166-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 09/20] qcow2: Switch
- sectors_covered_by_bitmap_cluster() to byte-based
+Subject: [Qemu-devel] [PATCH v7 11/20] dirty-bitmap: Change
+ bdrv_dirty_iter_next() to report byte offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,92 +21,103 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
 
-We are gradually converting to byte-based interfaces, as they are
-easier to reason about than sector-based.  Change the qcow2 bitmap
-helper function sectors_covered_by_bitmap_cluster(), renaming it
-to bytes_covered_by_bitmap_cluster() in the process.
+Thanks to recent cleanups, most callers were scaling a return value
+of sectors into bytes (the exception, in qcow2-bitmap, will be
+converted to byte-based iteration later).  Update the interface to
+do the scaling internally instead.
+
+In qcow2-bitmap, the code was specifically checking for an error
+to be -1; it is more robust to treat all negative values as an
+error, but at the same time it is also easy enough to ensure we
+return -1 (and not -512) on error.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
 
 ---
-v5: no change
-v4: new patch
+v7: return -1, not -512; and fix qcow2-bitmap to check all negatives [Kevin]
+v5-v6: no change
+v4: rebase to persistent bitmap
+v3: no change
+v2: no change
 ---
- block/qcow2-bitmap.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ block/backup.c       | 2 +-
+ block/dirty-bitmap.c | 3 ++-
+ block/mirror.c       | 8 ++++----
+ block/qcow2-bitmap.c | 2 +-
+ 4 files changed, 8 insertions(+), 7 deletions(-)
 
+diff --git a/block/backup.c b/block/backup.c
+index ac9c018717..06ddbfd03d 100644
+--- a/block/backup.c
++++ b/block/backup.c
+@@ -375,7 +375,7 @@ static int coroutine_fn backup_run_incremental(BackupBlockJob *job)
+     dbi = bdrv_dirty_iter_new(job->sync_bitmap);
+
+     /* Find the next dirty sector(s) */
+-    while ((offset = bdrv_dirty_iter_next(dbi) * BDRV_SECTOR_SIZE) >= 0) {
++    while ((offset = bdrv_dirty_iter_next(dbi)) >= 0) {
+         cluster = offset / job->cluster_size;
+
+         /* Fake progress updates for any clusters we skipped */
+diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
+index d50c46621d..49229fd501 100644
+--- a/block/dirty-bitmap.c
++++ b/block/dirty-bitmap.c
+@@ -508,7 +508,8 @@ void bdrv_dirty_iter_free(BdrvDirtyBitmapIter *iter)
+
+ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter)
+ {
+-    return hbitmap_iter_next(&iter->hbi);
++    int64_t ret = hbitmap_iter_next(&iter->hbi);
++    return ret < 0 ? -1 : ret * BDRV_SECTOR_SIZE;
+ }
+
+ /* Called within bdrv_dirty_bitmap_lock..unlock */
+diff --git a/block/mirror.c b/block/mirror.c
+index 0b063b3c20..77bf5aa3a4 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -336,10 +336,10 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+     int max_io_bytes = MAX(s->buf_size / MAX_IN_FLIGHT, MAX_IO_BYTES);
+
+     bdrv_dirty_bitmap_lock(s->dirty_bitmap);
+-    offset = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
++    offset = bdrv_dirty_iter_next(s->dbi);
+     if (offset < 0) {
+         bdrv_set_dirty_iter(s->dbi, 0);
+-        offset = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
++        offset = bdrv_dirty_iter_next(s->dbi);
+         trace_mirror_restart_iter(s, bdrv_get_dirty_count(s->dirty_bitmap) *
+                                   BDRV_SECTOR_SIZE);
+         assert(offset >= 0);
+@@ -370,11 +370,11 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+             break;
+         }
+
+-        next_dirty = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
++        next_dirty = bdrv_dirty_iter_next(s->dbi);
+         if (next_dirty > next_offset || next_dirty < 0) {
+             /* The bitmap iterator's cache is stale, refresh it */
+             bdrv_set_dirty_iter(s->dbi, next_offset);
+-            next_dirty = bdrv_dirty_iter_next(s->dbi) * BDRV_SECTOR_SIZE;
++            next_dirty = bdrv_dirty_iter_next(s->dbi);
+         }
+         assert(next_dirty == next_offset);
+         nb_chunks++;
 diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index 92098bfa49..4475273d8c 100644
+index 44329fc74f..b09010b1d3 100644
 --- a/block/qcow2-bitmap.c
 +++ b/block/qcow2-bitmap.c
-@@ -269,18 +269,16 @@ static int free_bitmap_clusters(BlockDriverState *bs, Qcow2BitmapTable *tb)
-     return 0;
- }
+@@ -1109,7 +1109,7 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
+     sbc = limit >> BDRV_SECTOR_BITS;
+     assert(DIV_ROUND_UP(bm_size, limit) == tb_size);
 
--/* This function returns the number of disk sectors covered by a single qcow2
-- * cluster of bitmap data. */
--static uint64_t sectors_covered_by_bitmap_cluster(const BDRVQcow2State *s,
--                                                  const BdrvDirtyBitmap *bitmap)
-+/* Return the disk size covered by a single qcow2 cluster of bitmap data. */
-+static uint64_t bytes_covered_by_bitmap_cluster(const BDRVQcow2State *s,
-+                                                const BdrvDirtyBitmap *bitmap)
- {
--    uint64_t sector_granularity =
--            bdrv_dirty_bitmap_granularity(bitmap) >> BDRV_SECTOR_BITS;
--    uint64_t sbc = sector_granularity * (s->cluster_size << 3);
-+    uint64_t granularity = bdrv_dirty_bitmap_granularity(bitmap);
-+    uint64_t limit = granularity * (s->cluster_size << 3);
-
--    assert(QEMU_IS_ALIGNED(sbc << BDRV_SECTOR_BITS,
-+    assert(QEMU_IS_ALIGNED(limit,
-                            bdrv_dirty_bitmap_serialization_align(bitmap)));
--    return sbc;
-+    return limit;
- }
-
- /* load_bitmap_data
-@@ -293,7 +291,7 @@ static int load_bitmap_data(BlockDriverState *bs,
- {
-     int ret = 0;
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t sector, sbc;
-+    uint64_t sector, limit, sbc;
-     uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
-     uint64_t bm_sectors = DIV_ROUND_UP(bm_size, BDRV_SECTOR_SIZE);
-     uint8_t *buf = NULL;
-@@ -306,7 +304,8 @@ static int load_bitmap_data(BlockDriverState *bs,
-     }
-
-     buf = g_malloc(s->cluster_size);
--    sbc = sectors_covered_by_bitmap_cluster(s, bitmap);
-+    limit = bytes_covered_by_bitmap_cluster(s, bitmap);
-+    sbc = limit >> BDRV_SECTOR_BITS;
-     for (i = 0, sector = 0; i < tab_size; ++i, sector += sbc) {
-         uint64_t count = MIN(bm_sectors - sector, sbc);
-         uint64_t entry = bitmap_table[i];
-@@ -1080,7 +1079,7 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
-     int ret;
-     BDRVQcow2State *s = bs->opaque;
-     int64_t sector;
--    uint64_t sbc;
-+    uint64_t limit, sbc;
-     uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
-     uint64_t bm_sectors = DIV_ROUND_UP(bm_size, BDRV_SECTOR_SIZE);
-     const char *bm_name = bdrv_dirty_bitmap_name(bitmap);
-@@ -1106,8 +1105,9 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
-
-     dbi = bdrv_dirty_iter_new(bitmap, 0);
-     buf = g_malloc(s->cluster_size);
--    sbc = sectors_covered_by_bitmap_cluster(s, bitmap);
--    assert(DIV_ROUND_UP(bm_sectors, sbc) == tb_size);
-+    limit = bytes_covered_by_bitmap_cluster(s, bitmap);
-+    sbc = limit >> BDRV_SECTOR_BITS;
-+    assert(DIV_ROUND_UP(bm_size, limit) == tb_size);
-
-     while ((sector = bdrv_dirty_iter_next(dbi)) != -1) {
+-    while ((sector = bdrv_dirty_iter_next(dbi)) != -1) {
++    while ((sector = bdrv_dirty_iter_next(dbi) >> BDRV_SECTOR_BITS) >= 0) {
          uint64_t cluster = sector / sbc;
+         uint64_t end, write_size;
+         int64_t off;
 -- 
 2.13.5
