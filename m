@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37939)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38045)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1drh4E-0005gv-8V
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:01:19 -0400
+	(envelope-from <thuth@redhat.com>) id 1drh4g-0005sI-70
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:01:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1drh48-0002Ye-Mg
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:01:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41194)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1drh48-0002Xv-H4
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:01:08 -0400
-Date: Tue, 12 Sep 2017 10:01:04 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170912090104.GB17633@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170724184217.21381-1-brandon.carpenter@cypherpath.com>
-	<20170908173801.15205-7-brandon.carpenter@cypherpath.com>
-	<20170911173743.GV21444@redhat.com>
-	<1505151801.1214.2@smtp.gmail.com>
+	(envelope-from <thuth@redhat.com>) id 1drh4a-0002zR-UA
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 05:01:41 -0400
+References: <20170911172022.4738-1-eblake@redhat.com>
+	<20170911172022.4738-15-eblake@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <35e6815c-79d7-1ffe-eece-82b035d00e85@redhat.com>
+Date: Tue, 12 Sep 2017 11:01:29 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170911172022.4738-15-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1505151801.1214.2@smtp.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v2 6/6] io: Reply to ping frames
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 14/38] libqos: Use explicit QTestState
+ for rtas operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,36 +25,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Brandon Carpenter <brandon.carpenter@cypherpath.com>
-Cc: qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: armbru@redhat.com, pbonzini@redhat.com, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:sPAPR" <qemu-ppc@nongnu.org>
 
-On Mon, Sep 11, 2017 at 10:43:21AM -0700, Brandon Carpenter wrote:
-> On Mon, Sep 11, 2017 at 10:37 AM, Daniel P. Berrange <berrange@redhat.com>
-> wrote:
-> > At the time qio_channel_websock_decode_header is run, 'encinput' is only
-> > guaranteed to contain enough data to decode the header.
+On 11.09.2017 19:19, Eric Blake wrote:
+> Drop one more client of global_qtest by teaching all rtas test
+> functionality to pass in an explicit QTestState, adjusting all
+> callers.
 > 
-> Because the PING opcode is a control frame, this bit of code earlier in the
-> function will ensure the entire frame has been read before the PING
-> processing occurs:
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > 
-> >       if (ioc->encinput.offset < ioc->payload_remain) {
-> >             /* Wait for the entire payload before processing control
-> > frames
-> >              * because the payload will most likely be echoed back. */
-> >             if (ioc->opcode & QIO_CHANNEL_WEBSOCK_CONTROL_OPCODE_MASK) {
-> >                 return QIO_CHANNEL_ERR_BLOCK;
-> >             }
-> >             payload_len = ioc->encinput.offset - (ioc->encinput.offset %
-> > 4);
+> ---
+> v7: catch a couple more operations, drop R-b
+> ---
+>  tests/libqos/rtas.h      |  9 ++++++---
+>  tests/libqos/pci-spapr.c | 18 ++++++++++++------
+>  tests/libqos/rtas.c      | 36 ++++++++++++++++++++----------------
+>  tests/rtas-test.c        |  2 +-
+>  4 files changed, 39 insertions(+), 26 deletions(-)
+> 
+> diff --git a/tests/libqos/rtas.h b/tests/libqos/rtas.h
+> index 498eb19230..e3d0f850a7 100644
+> --- a/tests/libqos/rtas.h
+> +++ b/tests/libqos/rtas.h
+> @@ -7,9 +7,12 @@
+>  #define LIBQOS_RTAS_H
+>  #include "libqos/malloc.h"
+> 
+> -int qrtas_get_time_of_day(QGuestAllocator *alloc, struct tm *tm, uint32_t *ns);
+> -uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
+> +int qrtas_get_time_of_day(QTestState *qts, QGuestAllocator *alloc,
+> +                          struct tm *tm, uint32_t *ns);
+> +uint32_t qrtas_ibm_read_pci_config(QTestState *qts, QGuestAllocator *alloc,
+> +                                   uint64_t buid,
+>                                     uint32_t addr, uint32_t size);
+> -int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
+> +int qrtas_ibm_write_pci_config(QTestState *qts, QGuestAllocator *alloc,
+> +                               uint64_t buid,
+>                                 uint32_t addr, uint32_t size, uint32_t val);
 
-The problem is in the qio_channel_websock_read_wire method we refuse
-to read more than 4k into encinput. So if the ping payload is greater
-than 4k this will just loop forever.
+Nit: I'd prefer if you rather put hte "uint32_t val" on a separate line
+instead of the "buid".
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+[...]
+> @@ -92,7 +95,8 @@ uint32_t qrtas_ibm_read_pci_config(QGuestAllocator *alloc, uint64_t buid,
+>      return ret[1];
+>  }
+> 
+> -int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
+> +int qrtas_ibm_write_pci_config(QTestState *qts, QGuestAllocator *alloc,
+> +                               uint64_t buid,
+>                                 uint32_t addr, uint32_t size, uint32_t val)
+
+dito
+
+>  {
+>      int res;
+> @@ -103,7 +107,7 @@ int qrtas_ibm_write_pci_config(QGuestAllocator *alloc, uint64_t buid,
+>      args[2] = buid & 0xffffffff;
+>      args[3] = size;
+>      args[4] = val;
+> -    res = qrtas_call(alloc, "ibm,write-pci-config", 5, args, 1, ret);
+> +    res = qrtas_call(qts, alloc, "ibm,write-pci-config", 5, args, 1, ret);
+>      if (res != 0) {
+>          return -1;
+>      }
+> diff --git a/tests/rtas-test.c b/tests/rtas-test.c
+> index 276c87ef84..34a692163f 100644
+> --- a/tests/rtas-test.c
+> +++ b/tests/rtas-test.c
+> @@ -16,7 +16,7 @@ static void test_rtas_get_time_of_day(void)
+>      qs = qtest_spapr_boot("-machine pseries");
+> 
+>      t1 = time(NULL);
+> -    ret = qrtas_get_time_of_day(qs->alloc, &tm, &ns);
+> +    ret = qrtas_get_time_of_day(qs->qts, qs->alloc, &tm, &ns);
+>      g_assert_cmpint(ret, ==, 0);
+>      t2 = mktimegm(&tm);
+>      g_assert(t2 - t1 < 5); /* 5 sec max to run the test */
+> 
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
