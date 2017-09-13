@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ds7fI-0005Pz-24
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:20 -0400
+	(envelope-from <david@redhat.com>) id 1ds7fM-0005TL-6P
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ds7fB-0002n6-NT
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47268)
+	(envelope-from <david@redhat.com>) id 1ds7fL-0002zR-9C
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47702)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1ds7fB-0002lX-EJ
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:09 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1ds7fL-0002yk-2c
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:19 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 13 Sep 2017 15:24:02 +0200
-Message-Id: <20170913132417.24384-8-david@redhat.com>
+Date: Wed, 13 Sep 2017 15:24:05 +0200
+Message-Id: <20170913132417.24384-11-david@redhat.com>
 In-Reply-To: <20170913132417.24384-1-david@redhat.com>
 References: <20170913132417.24384-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 07/22] target/s390x: move some s390x
- typedefs to cpu-qom.h
+Subject: [Qemu-devel] [PATCH v5 10/22] target/s390x: use program_interrupt()
+ in per_check_exception()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,109 +27,41 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-This allows us to drop inclusion of cpu_models.h in cpu-qom.h, and
-prepares for using cpu-qom.h as a s390 specific version of typedefs.h
+Clean it up by reusing program_interrupt(). Add a concern regarding
+ilen.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu-qom.h    | 5 ++++-
- target/s390x/cpu.h        | 5 +++--
- target/s390x/cpu_models.h | 8 ++++----
- 3 files changed, 11 insertions(+), 7 deletions(-)
+ target/s390x/misc_helper.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
-index 4e936e7788..2435cd8390 100644
---- a/target/s390x/cpu-qom.h
-+++ b/target/s390x/cpu-qom.h
-@@ -21,7 +21,6 @@
- #define QEMU_S390_CPU_QOM_H
- 
- #include "qom/cpu.h"
--#include "cpu_models.h"
- 
- #define TYPE_S390_CPU "s390-cpu"
- 
-@@ -32,6 +31,9 @@
- #define S390_CPU_GET_CLASS(obj) \
-     OBJECT_GET_CLASS(S390CPUClass, (obj), TYPE_S390_CPU)
- 
-+typedef struct S390CPUModel S390CPUModel;
-+typedef struct S390CPUDef S390CPUDef;
-+
- /**
-  * S390CPUClass:
-  * @parent_realize: The parent class' realize handler.
-@@ -62,5 +64,6 @@ typedef struct S390CPUClass {
- } S390CPUClass;
- 
- typedef struct S390CPU S390CPU;
-+typedef struct CPUS390XState CPUS390XState;
- 
- #endif
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 372f7d8885..4a0a59dfbc 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -25,6 +25,7 @@
- 
- #include "qemu-common.h"
- #include "cpu-qom.h"
-+#include "cpu_models.h"
- 
- #define TARGET_LONG_BITS 64
- 
-@@ -80,7 +81,7 @@ typedef struct MchkQueue {
-     uint16_t type;
- } MchkQueue;
- 
--typedef struct CPUS390XState {
-+struct CPUS390XState {
-     uint64_t regs[16];     /* GP registers */
-     /*
-      * The floating point registers are part of the vector registers.
-@@ -174,7 +175,7 @@ typedef struct CPUS390XState {
-     /* currently processed sigp order */
-     uint8_t sigp_order;
- 
--} CPUS390XState;
-+};
- 
- static inline CPU_DoubleU *get_freg(CPUS390XState *cs, int nr)
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 8b07535b02..f3624d75eb 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -447,14 +447,17 @@ void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
+ #ifndef CONFIG_USER_ONLY
+ void HELPER(per_check_exception)(CPUS390XState *env)
  {
-diff --git a/target/s390x/cpu_models.h b/target/s390x/cpu_models.h
-index c0bee15d7a..4c6dee1871 100644
---- a/target/s390x/cpu_models.h
-+++ b/target/s390x/cpu_models.h
-@@ -17,7 +17,7 @@
- #include "qom/cpu.h"
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
++    uint32_t ilen;
  
- /* static CPU definition */
--typedef struct S390CPUDef {
-+struct S390CPUDef {
-     const char *name;       /* name exposed to the user */
-     const char *desc;       /* description exposed to the user */
-     uint8_t gen;            /* hw generation identification */
-@@ -37,10 +37,10 @@ typedef struct S390CPUDef {
-     S390FeatBitmap full_feat;
-     /* used to init full_feat from generated data */
-     S390FeatInit full_init;
--} S390CPUDef;
-+};
+     if (env->per_perc_atmid) {
+-        env->int_pgm_code = PGM_PER;
+-        env->int_pgm_ilen = get_ilen(cpu_ldub_code(env, env->per_address));
+-
+-        cs->exception_index = EXCP_PGM;
+-        cpu_loop_exit(cs);
++        /*
++         * FIXME: ILEN_AUTO is most probably the right thing to use. ilen
++         * always has to match the instruction referenced in the PSW. E.g.
++         * if a PER interrupt is triggered via EXECUTE, we have to use ilen
++         * of EXECUTE, while per_address contains the target of EXECUTE.
++         */
++        ilen = get_ilen(cpu_ldub_code(env, env->per_address));
++        program_interrupt(env, PGM_PER, ilen);
+     }
+ }
  
- /* CPU model based on a CPU definition */
--typedef struct S390CPUModel {
-+struct S390CPUModel {
-     const S390CPUDef *def;
-     S390FeatBitmap features;
-     /* values copied from the "host" model, can change during migration */
-@@ -48,7 +48,7 @@ typedef struct S390CPUModel {
-     uint32_t cpu_id;        /* CPU id */
-     uint8_t cpu_id_format;  /* CPU id format bit */
-     uint8_t cpu_ver;        /* CPU version, usually "ff" for kvm */
--} S390CPUModel;
-+};
- 
- /*
-  * CPU ID
 -- 
 2.13.5
