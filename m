@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59599)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33813)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ds584-0001bb-Gb
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:42:49 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1ds5Bc-0004hX-Sm
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:46:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ds580-0005mW-IB
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:42:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41664)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ds580-0005lq-CB
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:42:44 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 5C23D461E0
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 10:42:43 +0000 (UTC)
-Date: Wed, 13 Sep 2017 18:42:35 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170913104235.GG3617@pxdev.xzpeter.org>
-References: <1505295366-25295-1-git-send-email-peterx@redhat.com>
-	<f7707221-5365-8074-7a83-ac108059aecc@redhat.com>
-	<20170913102842.GE3617@pxdev.xzpeter.org>
-	<3652b029-7a6d-af98-47e0-2e894f471b46@redhat.com>
+	(envelope-from <vilanova@ac.upc.edu>) id 1ds5BY-0000f9-Tj
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:46:28 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:59429)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1ds5BY-0000eT-I2
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:46:24 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 13 Sep 2017 13:46:09 +0300
+Message-Id: <150529956916.10902.377591821566438337.stgit@frigg.lan>
+In-Reply-To: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <3652b029-7a6d-af98-47e0-2e894f471b46@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 0/4] qtest: fix "device_del" out-of-order
- events
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 13/22] instrument: Support synchronous
+ modification of vCPU state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,34 +27,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
 
-On Wed, Sep 13, 2017 at 12:35:17PM +0200, Thomas Huth wrote:
+Stops all vCPUs to allow performing management operations like TB
+invalidations. These are later necessary to ensure translated code does n=
+ot
+reference unloaded instrumentation libraries.
 
-[...]
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ instrument/control.c     |   67 ++++++++++++++++++++++++++++++++++++++++=
+++++++
+ instrument/control.h     |   26 ++++++++++++++++++
+ instrument/control.inc.h |   11 ++++++++
+ 3 files changed, 104 insertions(+)
 
-> >> As far as I know, some test currently use QMP in a bad way, for example
-> >> usb_test_hotplug() only checks for the DEVICE_DELETED at the end, but
-> >> forgets to read back the final return value. That return value is then
-> >> presented to the next part of the code that uses QMP instead ... it
-> >> currently only works more or less by accident, but as soon as you try to
-> >> add new code inbetween, it certainly will fail.
-> >> ==> We really got to clean this up (either with my patch or your patch
-> >> series).
-> > 
-> > Agree.
-> > 
-> > I think your patch is nicer on the interface (as you have mentioned in
-> > the other reply), I can try to review it later.
-> > 
-> > However it seems that your patch didn't really solve the problem I
-> > encountered (mis-ordered message arrivals).  It would be good if you
-> > want to solve it together, or I can draft patch upon yours.
-> 
-> True, I'll try to respin my patch, including the ideas from your patch...
-
-That would be great.  I've left some comments there already.  Thanks!
-
--- 
-Peter Xu
+diff --git a/instrument/control.c b/instrument/control.c
+index c4b3ca0440..4f9c138ccf 100644
+--- a/instrument/control.c
++++ b/instrument/control.c
+@@ -13,6 +13,7 @@
+ #include "instrument/load.h"
+ #include "instrument/qemu-instr/control.h"
+ #include "qemu/compiler.h"
++#include "qemu/main-loop.h"
+ #include "qom/cpu.h"
+=20
+=20
+@@ -40,6 +41,72 @@ void instr_cpu_remove(CPUState *vcpu)
+ }
+=20
+=20
++static void instr_cpu_stop_all__cb(CPUState *cpu, run_on_cpu_data data)
++{
++    InstrCPUStop *info =3D data.host_ptr;
++    /* run posted function */
++    if (info->fun) {
++        info->fun(cpu, info->data);
++    }
++#if !defined(CONFIG_USER_ONLY)
++    /* signal we're out of the main vCPU loop */
++    unsigned int count =3D atomic_load_acquire(&info->count);
++    atomic_store_release(&info->count, count + 1);
++    atomic_store_release(&info->stopped, true);
++    /* wait until we're good to go again */
++    qemu_cond_wait(&info->cond, &info->mutex);
++    count =3D atomic_load_acquire(&info->count);
++    atomic_store_release(&info->count, count - 1);
++    qemu_mutex_unlock(&info->mutex);
++#endif
++}
++
++void instr_cpu_stop_all_begin(InstrCPUStop *info,
++                              instr_cpu_stop_fun fun, void *data)
++{
++    CPUState *cpu;
++
++    info->fun =3D fun;
++    info->data =3D data;
++
++#if !defined(CONFIG_USER_ONLY)
++    info->count =3D 0;
++    qemu_cond_init(&info->cond);
++    qemu_mutex_init(&info->mutex);
++
++    /* main dispatch loop and run_on_cpu() lock the BQL */
++    qemu_mutex_unlock_iothread();
++#endif
++
++    CPU_FOREACH(cpu) {
++#if !defined(CONFIG_USER_ONLY)
++        atomic_store_release(&info->stopped, false);
++        qemu_mutex_lock(&info->mutex);
++        async_run_on_cpu(cpu, instr_cpu_stop_all__cb,
++                         RUN_ON_CPU_HOST_PTR(info));
++        while (!atomic_load_acquire(&info->stopped)) {
++            /* wait for vCPU to signal it's stopped */
++        }
++#else
++        instr_cpu_stop_all__cb(cpu, RUN_ON_CPU_HOST_PTR(info));
++#endif
++    }
++}
++
++void instr_cpu_stop_all_end(InstrCPUStop *info)
++{
++#if !defined(CONFIG_USER_ONLY)
++    qemu_cond_broadcast(&info->cond);
++    while (atomic_load_acquire(&info->count)) {
++        /* wait for all vCPUs to continue before we can destroy info */
++    }
++    qemu_cond_destroy(&info->cond);
++    qemu_mutex_destroy(&info->mutex);
++    qemu_mutex_lock_iothread();
++#endif
++}
++
++
+ qi_fini_fn instr_event__fini_fn;
+ void *instr_event__fini_data;
+=20
+diff --git a/instrument/control.h b/instrument/control.h
+index 57cea07fa7..03e87b2b8f 100644
+--- a/instrument/control.h
++++ b/instrument/control.h
+@@ -46,6 +46,32 @@ static inline QICPU instr_cpu_to_qicpu(CPUState *vcpu)=
+;
+  */
+ static inline CPUState *instr_cpu_from_qicpu(QICPU vcpu);
+=20
++typedef struct InstrCPUStop InstrCPUStop;
++typedef void (*instr_cpu_stop_fun)(CPUState *cpu, void *data);
++
++/**
++ * instr_cpu_stop_all_begin:
++ * @info: Opaque structure describing the operation.
++ * @fun: Function to run on the context of each vCPU once stopped.
++ * @data: Pointer to pass to @fun.
++ *
++ * Ensure all vCPUs stop executing guest code, and execute @fun on their=
+ context
++ * in turn. Returns with all vCPUs still stopped.
++ *
++ * Assumes cpu_list_lock() and that the QBL is locked before calling.
++ */
++void instr_cpu_stop_all_begin(InstrCPUStop *info,
++                              instr_cpu_stop_fun fun, void *data);
++
++/**
++ * instr_cpu_stop_all_end:
++ * @info: Opaque structure passed to a previous instr_cpu_stop_all_begin=
+()
++ *     call.
++ *
++ * Resume execution on all vCPUs stopped by instr_cpu_stop_all_begin().
++ */
++void instr_cpu_stop_all_end(InstrCPUStop *info);
++
+=20
+ /**
+  * InstrState:
+diff --git a/instrument/control.inc.h b/instrument/control.inc.h
+index 45daae7d1d..6d65b23ead 100644
+--- a/instrument/control.inc.h
++++ b/instrument/control.inc.h
+@@ -15,6 +15,17 @@
+ #include <stdint.h>
+=20
+=20
++struct InstrCPUStop {
++    instr_cpu_stop_fun fun;
++    void *data;
++#if !defined(CONFIG_USER_ONLY)
++    bool stopped;
++    unsigned int count;
++    QemuCond cond;
++    QemuMutex mutex;
++#endif
++};
++
+ extern unsigned int instr_cpus_count;
+ extern CPUState **instr_cpus;
+=20
