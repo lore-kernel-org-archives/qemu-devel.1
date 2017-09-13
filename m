@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50828)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ds98D-0008CP-Ck
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:59:14 -0400
+	(envelope-from <thuth@redhat.com>) id 1ds9Dk-0001qX-Aq
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:05:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ds98A-0006hg-CF
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:59:13 -0400
-Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:58724)
+	(envelope-from <thuth@redhat.com>) id 1ds9Dh-0001GY-6f
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:04:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57746)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ds98A-0006fj-6Y
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:59:10 -0400
-Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 27010ABA7F
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 16:59:07 +0200 (CEST)
-Date: Wed, 13 Sep 2017 16:59:02 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170913165902.3d907b10@bahia.lan>
-In-Reply-To: <1505312203-6319-1-git-send-email-jan.dakinevich@gmail.com>
-References: <1505312203-6319-1-git-send-email-jan.dakinevich@gmail.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ds9Dh-0001GH-0f
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:04:53 -0400
+References: <20170913132417.24384-1-david@redhat.com>
+	<20170913132417.24384-8-david@redhat.com>
+	<d75bd287-b96f-6e18-5d2b-3f024354eeab@redhat.com>
+	<18cfdcde-da7f-cf42-2d44-a1ea866fde0c@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <d6391a75-0d68-1634-0756-b5c38d547e4b@redhat.com>
+Date: Wed, 13 Sep 2017 17:04:43 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_//1PMdsM_+KQ0ieHDQUKrO5u";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] virtio-9p: don't break device on
- marshaling fail
+In-Reply-To: <18cfdcde-da7f-cf42-2d44-a1ea866fde0c@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v5 07/22] target/s390x: move some s390x
+ typedefs to cpu-qom.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,94 +31,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Dakinevich <jan.dakinevich@gmail.com>
-Cc: qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>, "Aneesh
-	Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
---Sig_//1PMdsM_+KQ0ieHDQUKrO5u
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 13.09.2017 16:44, David Hildenbrand wrote:
+> On 13.09.2017 16:27, Thomas Huth wrote:
+>> On 13.09.2017 15:24, David Hildenbrand wrote:
+>>> This allows us to drop inclusion of cpu_models.h in cpu-qom.h, and
+>>> prepares for using cpu-qom.h as a s390 specific version of typedefs.h
+>>>
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
+>>>  target/s390x/cpu-qom.h    | 5 ++++-
+>>>  target/s390x/cpu.h        | 5 +++--
+>>>  target/s390x/cpu_models.h | 8 ++++----
+>>>  3 files changed, 11 insertions(+), 7 deletions(-)
+>> [...]
+>>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+>>> index 372f7d8885..4a0a59dfbc 100644
+>>> --- a/target/s390x/cpu.h
+>>> +++ b/target/s390x/cpu.h
+>>> @@ -25,6 +25,7 @@
+>>>  
+>>>  #include "qemu-common.h"
+>>>  #include "cpu-qom.h"
+>>> +#include "cpu_models.h"
+>>
+>> Do we really need to include cpu_models.h here? Looking at your changes
+>> below, it does not seem to be necessary?
+> 
+> Yes, due to s390_has_feat(), and I want to avoid cleaning all the other
+> calling places up in this patch.
 
-On Wed, 13 Sep 2017 17:16:43 +0300
-Jan Dakinevich <jan.dakinevich@gmail.com> wrote:
+OK, I just checked and it indeed blows up in a lot of places, so I think
+this include here is justified.
 
-> Fix regression from commit 8d37de41cab145cbba250a8f1f1372b0a5cdf26f.
->=20
-> The situation when pdu_marshal returns an error should be considered
-> valid. At least `v9fs_do_readdir_with_stat' relies on that to place in
-> responce buffer as much data as can fit.
->=20
-
-Indeed, that's embarrassing... but since v9fs_do_readdir_with_stat() is the
-only guy that does that, I'd prefer you send a patch to handle this special
-case instead of reverting 8d37de41ca. Please add a new transport operation
-for this.
-
-Thanks!
-
-> Signed-off-by: Jan Dakinevich <jan.dakinevich@gmail.com>
-> ---
->  hw/9pfs/virtio-9p-device.c | 19 ++-----------------
->  1 file changed, 2 insertions(+), 17 deletions(-)
->=20
-> diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
-> index 62650b0..c3e5935 100644
-> --- a/hw/9pfs/virtio-9p-device.c
-> +++ b/hw/9pfs/virtio-9p-device.c
-> @@ -146,16 +146,8 @@ static ssize_t virtio_pdu_vmarshal(V9fsPDU *pdu, siz=
-e_t offset,
->      V9fsState *s =3D pdu->s;
->      V9fsVirtioState *v =3D container_of(s, V9fsVirtioState, state);
->      VirtQueueElement *elem =3D v->elems[pdu->idx];
-> -    ssize_t ret;
-> =20
-> -    ret =3D v9fs_iov_vmarshal(elem->in_sg, elem->in_num, offset, 1, fmt,=
- ap);
-> -    if (ret < 0) {
-> -        VirtIODevice *vdev =3D VIRTIO_DEVICE(v);
-> -
-> -        virtio_error(vdev, "Failed to encode VirtFS reply type %d",
-> -                     pdu->id + 1);
-> -    }
-> -    return ret;
-> +    return v9fs_iov_vmarshal(elem->in_sg, elem->in_num, offset, 1, fmt, =
-ap);
->  }
-> =20
->  static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, size_t offset,
-> @@ -164,15 +156,8 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, s=
-ize_t offset,
->      V9fsState *s =3D pdu->s;
->      V9fsVirtioState *v =3D container_of(s, V9fsVirtioState, state);
->      VirtQueueElement *elem =3D v->elems[pdu->idx];
-> -    ssize_t ret;
-> =20
-> -    ret =3D v9fs_iov_vunmarshal(elem->out_sg, elem->out_num, offset, 1, =
-fmt, ap);
-> -    if (ret < 0) {
-> -        VirtIODevice *vdev =3D VIRTIO_DEVICE(v);
-> -
-> -        virtio_error(vdev, "Failed to decode VirtFS request type %d", pd=
-u->id);
-> -    }
-> -    return ret;
-> +    return v9fs_iov_vunmarshal(elem->out_sg, elem->out_num, offset, 1, f=
-mt, ap);
->  }
-> =20
->  static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec **pio=
-v,
-
-
---Sig_//1PMdsM_+KQ0ieHDQUKrO5u
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWblHtgAKCRAC/DrrAQHb
-woezAKCV1st4Dtcn0b5Tia3W1TIaIdrzfwCgjIGoW5sJteeOrMsAwnPrWv98Vts=
-=jubK
------END PGP SIGNATURE-----
-
---Sig_//1PMdsM_+KQ0ieHDQUKrO5u--
+Reviewed-by: Thomas Huth <thuth@redhat.com>
