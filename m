@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37893)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37949)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dsCIa-0001FP-E2
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:22:09 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dsCId-0001JG-4v
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:22:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dsCIW-0006e5-8e
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:22:08 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dsCIb-0006hg-UX
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:22:11 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 13 Sep 2017 20:19:08 +0200
-Message-Id: <20170913181910.29688-17-mreitz@redhat.com>
+Date: Wed, 13 Sep 2017 20:19:09 +0200
+Message-Id: <20170913181910.29688-18-mreitz@redhat.com>
 In-Reply-To: <20170913181910.29688-1-mreitz@redhat.com>
 References: <20170913181910.29688-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 16/18] block/mirror: Add copy mode QAPI
- interface
+Subject: [Qemu-devel] [PATCH 17/18] qemu-io: Add background write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,187 +22,163 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-This patch allows the user to specify whether to use active or only
-passive mode for mirror block jobs.  Currently, this setting will remain
-constant for the duration of the entire block job.
+Add a new parameter -B to qemu-io's write command.  When used, qemu-io
+will not wait for the result of the operation and instead execute it in
+the background.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- qapi/block-core.json      | 11 +++++++++--
- include/block/block_int.h |  4 +++-
- block/mirror.c            | 11 ++++++-----
- blockdev.c                |  9 ++++++++-
- 4 files changed, 26 insertions(+), 9 deletions(-)
+ qemu-io-cmds.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 77 insertions(+), 6 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index e072cfa67c..40204d367a 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -1578,6 +1578,9 @@
- #         written. Both will result in identical contents.
- #         Default is true. (Since 2.4)
- #
-+# @copy-mode: when to copy data to the destination; defaults to 'passive'
-+#             (Since: 2.11)
-+#
- # Since: 1.3
- ##
- { 'struct': 'DriveMirror',
-@@ -1587,7 +1590,7 @@
-             '*speed': 'int', '*granularity': 'uint32',
-             '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
-             '*on-target-error': 'BlockdevOnError',
--            '*unmap': 'bool' } }
-+            '*unmap': 'bool', '*copy-mode': 'MirrorCopyMode' } }
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 2811a89099..c635a248f5 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -481,6 +481,62 @@ static int do_pwrite(BlockBackend *blk, char *buf, int64_t offset,
+ typedef struct {
+     BlockBackend *blk;
+     int64_t offset;
++    int bytes;
++    char *buf;
++    int flags;
++} CoBackgroundWrite;
++
++static void coroutine_fn co_background_pwrite_entry(void *opaque)
++{
++    CoBackgroundWrite *data = opaque;
++    QEMUIOVector qiov;
++    int ret;
++
++    qemu_iovec_init(&qiov, 1);
++    qemu_iovec_add(&qiov, data->buf, data->bytes);
++
++    ret = blk_co_pwritev(data->blk, data->offset, data->bytes, &qiov,
++                         data->flags);
++
++    qemu_iovec_destroy(&qiov);
++    g_free(data->buf);
++
++    if (ret < 0) {
++        Error *err;
++        error_setg_errno(&err, -ret, "Background write failed");
++        error_report_err(err);
++    }
++}
++
++/* Takes ownership of @buf */
++static int do_background_pwrite(BlockBackend *blk, char *buf, int64_t offset,
++                                int64_t bytes, int flags)
++{
++    Coroutine *co;
++    CoBackgroundWrite *data;
++
++    if (bytes > INT_MAX) {
++        return -ERANGE;
++    }
++
++    data = g_new(CoBackgroundWrite, 1);
++    *data = (CoBackgroundWrite){
++        .blk    = blk,
++        .offset = offset,
++        .bytes  = bytes,
++        .buf    = buf,
++        .flags  = flags,
++    };
++
++    co = qemu_coroutine_create(co_background_pwrite_entry, data);
++    bdrv_coroutine_enter(blk_bs(blk), co);
++
++    return bytes;
++}
++
++typedef struct {
++    BlockBackend *blk;
++    int64_t offset;
+     int64_t bytes;
+     int64_t *total;
+     int flags;
+@@ -931,6 +987,7 @@ static void write_help(void)
+ " Writes into a segment of the currently open file, using a buffer\n"
+ " filled with a set pattern (0xcdcdcdcd).\n"
+ " -b, -- write to the VM state rather than the virtual disk\n"
++" -B, -- just start a background write, do not wait for the result\n"
+ " -c, -- write compressed data with blk_write_compressed\n"
+ " -f, -- use Force Unit Access semantics\n"
+ " -p, -- ignored for backwards compatibility\n"
+@@ -951,7 +1008,7 @@ static const cmdinfo_t write_cmd = {
+     .perm       = BLK_PERM_WRITE,
+     .argmin     = 2,
+     .argmax     = -1,
+-    .args       = "[-bcCfquz] [-P pattern] off len",
++    .args       = "[-bBcCfquz] [-P pattern] off len",
+     .oneline    = "writes a number of bytes at a specified offset",
+     .help       = write_help,
+ };
+@@ -961,6 +1018,7 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+     struct timeval t1, t2;
+     bool Cflag = false, qflag = false, bflag = false;
+     bool Pflag = false, zflag = false, cflag = false;
++    bool background = false;
+     int flags = 0;
+     int c, cnt;
+     char *buf = NULL;
+@@ -970,11 +1028,14 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+     int64_t total = 0;
+     int pattern = 0xcd;
  
- ##
- # @BlockDirtyBitmap:
-@@ -1766,6 +1769,9 @@
- #                    above @device. If this option is not given, a node name is
- #                    autogenerated. (Since: 2.9)
- #
-+# @copy-mode: when to copy data to the destination; defaults to 'passive'
-+#             (Since: 2.11)
-+#
- # Returns: nothing on success.
- #
- # Since: 2.6
-@@ -1786,7 +1792,8 @@
-             '*speed': 'int', '*granularity': 'uint32',
-             '*buf-size': 'int', '*on-source-error': 'BlockdevOnError',
-             '*on-target-error': 'BlockdevOnError',
--            '*filter-node-name': 'str' } }
-+            '*filter-node-name': 'str',
-+            '*copy-mode': 'MirrorCopyMode' } }
- 
- ##
- # @block_set_io_throttle:
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index fa8bbf1f8b..517b2680ce 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -934,6 +934,7 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-  * @filter_node_name: The node name that should be assigned to the filter
-  * driver that the mirror job inserts into the graph above @bs. NULL means that
-  * a node name should be autogenerated.
-+ * @copy_mode: When to trigger writes to the target.
-  * @errp: Error object.
-  *
-  * Start a mirroring operation on @bs.  Clusters that are allocated
-@@ -947,7 +948,8 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-                   MirrorSyncMode mode, BlockMirrorBackingMode backing_mode,
-                   BlockdevOnError on_source_error,
-                   BlockdevOnError on_target_error,
--                  bool unmap, const char *filter_node_name, Error **errp);
-+                  bool unmap, const char *filter_node_name,
-+                  MirrorCopyMode copy_mode, Error **errp);
- 
- /*
-  * backup_job_create:
-diff --git a/block/mirror.c b/block/mirror.c
-index c429aa77bb..8a67935cc4 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1464,7 +1464,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-                              const BlockJobDriver *driver,
-                              bool is_none_mode, BlockDriverState *base,
-                              bool auto_complete, const char *filter_node_name,
--                             bool is_mirror,
-+                             bool is_mirror, MirrorCopyMode copy_mode,
-                              Error **errp)
- {
-     MirrorBlockJob *s;
-@@ -1574,7 +1574,7 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
-     s->on_target_error = on_target_error;
-     s->is_none_mode = is_none_mode;
-     s->backing_mode = backing_mode;
--    s->copy_mode = MIRROR_COPY_MODE_PASSIVE;
-+    s->copy_mode = copy_mode;
-     s->base = base;
-     s->granularity = granularity;
-     s->buf_size = ROUND_UP(buf_size, granularity);
-@@ -1643,7 +1643,8 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-                   MirrorSyncMode mode, BlockMirrorBackingMode backing_mode,
-                   BlockdevOnError on_source_error,
-                   BlockdevOnError on_target_error,
--                  bool unmap, const char *filter_node_name, Error **errp)
-+                  bool unmap, const char *filter_node_name,
-+                  MirrorCopyMode copy_mode, Error **errp)
- {
-     bool is_none_mode;
-     BlockDriverState *base;
-@@ -1658,7 +1659,7 @@ void mirror_start(const char *job_id, BlockDriverState *bs,
-                      speed, granularity, buf_size, backing_mode,
-                      on_source_error, on_target_error, unmap, NULL, NULL,
-                      &mirror_job_driver, is_none_mode, base, false,
--                     filter_node_name, true, errp);
-+                     filter_node_name, true, copy_mode, errp);
- }
- 
- void commit_active_start(const char *job_id, BlockDriverState *bs,
-@@ -1681,7 +1682,7 @@ void commit_active_start(const char *job_id, BlockDriverState *bs,
-                      MIRROR_LEAVE_BACKING_CHAIN,
-                      on_error, on_error, true, cb, opaque,
-                      &commit_active_job_driver, false, base, auto_complete,
--                     filter_node_name, false, &local_err);
-+                     filter_node_name, false, MIRROR_COPY_MODE_PASSIVE, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto error_restore_flags;
-diff --git a/blockdev.c b/blockdev.c
-index 56a6b24a0b..7f9c215e98 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -3408,6 +3408,7 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-                                    bool has_unmap, bool unmap,
-                                    bool has_filter_node_name,
-                                    const char *filter_node_name,
-+                                   bool has_copy_mode, MirrorCopyMode copy_mode,
-                                    Error **errp)
- {
- 
-@@ -3432,6 +3433,9 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-     if (!has_filter_node_name) {
-         filter_node_name = NULL;
+-    while ((c = getopt(argc, argv, "bcCfpP:quz")) != -1) {
++    while ((c = getopt(argc, argv, "bBcCfpP:quz")) != -1) {
+         switch (c) {
+         case 'b':
+             bflag = true;
+             break;
++        case 'B':
++            background = true;
++            break;
+         case 'c':
+             cflag = true;
+             break;
+@@ -1032,6 +1093,11 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+         return 0;
      }
-+    if (!has_copy_mode) {
-+        copy_mode = MIRROR_COPY_MODE_PASSIVE;
+ 
++    if (background && (bflag || cflag || zflag)) {
++        printf("-B cannot be specified together with -b, -c, or -z\n");
++        return 0;
++    }
++
+     offset = cvtnum(argv[optind]);
+     if (offset < 0) {
+         print_cvtnum_err(offset, argv[optind]);
+@@ -1074,6 +1140,8 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+         cnt = do_co_pwrite_zeroes(blk, offset, count, flags, &total);
+     } else if (cflag) {
+         cnt = do_write_compressed(blk, buf, offset, count, &total);
++    } else if (background) {
++        cnt = do_background_pwrite(blk, buf, offset, count, flags);
+     } else {
+         cnt = do_pwrite(blk, buf, offset, count, flags, &total);
+     }
+@@ -1088,12 +1156,15 @@ static int write_f(BlockBackend *blk, int argc, char **argv)
+         goto out;
+     }
+ 
+-    /* Finally, report back -- -C gives a parsable format */
+-    t2 = tsub(t2, t1);
+-    print_report("wrote", &t2, offset, count, total, cnt, Cflag);
++    if (!background) {
++        /* Finally, report back -- -C gives a parsable format */
++        t2 = tsub(t2, t1);
++        print_report("wrote", &t2, offset, count, total, cnt, Cflag);
 +    }
  
-     if (granularity != 0 && (granularity < 512 || granularity > 1048576 * 64)) {
-         error_setg(errp, QERR_INVALID_PARAMETER_VALUE, "granularity",
-@@ -3462,7 +3466,7 @@ static void blockdev_mirror_common(const char *job_id, BlockDriverState *bs,
-                  has_replaces ? replaces : NULL,
-                  speed, granularity, buf_size, sync, backing_mode,
-                  on_source_error, on_target_error, unmap, filter_node_name,
--                 errp);
-+                 copy_mode, errp);
- }
- 
- void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-@@ -3603,6 +3607,7 @@ void qmp_drive_mirror(DriveMirror *arg, Error **errp)
-                            arg->has_on_target_error, arg->on_target_error,
-                            arg->has_unmap, arg->unmap,
-                            false, NULL,
-+                           arg->has_copy_mode, arg->copy_mode,
-                            &local_err);
-     bdrv_unref(target_bs);
-     error_propagate(errp, local_err);
-@@ -3623,6 +3628,7 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-                          BlockdevOnError on_target_error,
-                          bool has_filter_node_name,
-                          const char *filter_node_name,
-+                         bool has_copy_mode, MirrorCopyMode copy_mode,
-                          Error **errp)
- {
-     BlockDriverState *bs;
-@@ -3655,6 +3661,7 @@ void qmp_blockdev_mirror(bool has_job_id, const char *job_id,
-                            has_on_target_error, on_target_error,
-                            true, true,
-                            has_filter_node_name, filter_node_name,
-+                           has_copy_mode, copy_mode,
-                            &local_err);
-     error_propagate(errp, local_err);
+ out:
+-    if (!zflag) {
++    /* do_background_pwrite() takes ownership of the buffer */
++    if (!zflag && !background) {
+         qemu_io_free(buf);
+     }
  
 -- 
 2.13.5
