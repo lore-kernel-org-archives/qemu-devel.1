@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33978)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1ds3cK-0001SV-6Q
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1ds3cO-0001Wm-ID
 	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:06:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1ds3cA-0007Kd-Kz
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:05:56 -0400
-Received: from mail-ua0-x242.google.com ([2607:f8b0:400c:c08::242]:36251)
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1ds3cN-0007Ww-1k
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:06:00 -0400
+Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:37926)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1ds3cA-0007K3-7k
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:05:46 -0400
-Received: by mail-ua0-x242.google.com with SMTP id k23so3890707uaf.3
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 02:05:46 -0700 (PDT)
+	id 1ds3cM-0007WK-SK
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:05:58 -0400
+Received: by mail-vk0-x242.google.com with SMTP id o22so3314246vke.5
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 02:05:58 -0700 (PDT)
 From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Date: Wed, 13 Sep 2017 04:05:11 -0500
-Message-Id: <20170913090522.4022-4-Sergio.G.DelReal@gmail.com>
+Date: Wed, 13 Sep 2017 04:05:17 -0500
+Message-Id: <20170913090522.4022-10-Sergio.G.DelReal@gmail.com>
 In-Reply-To: <20170913090522.4022-1-Sergio.G.DelReal@gmail.com>
 References: <20170913090522.4022-1-Sergio.G.DelReal@gmail.com>
-Subject: [Qemu-devel] [PATCH v4 03/14] hvf: fix licensing issues;
- isolate task handling code (GPL v2-only)
+Subject: [Qemu-devel] [PATCH v4 09/14] hvf: use new helper functions for
+ put/get xsave
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,939 +30,102 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, stefanha@gmail.com, Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 
-This patch replaces the license header for those files that were either
-GPL v2-or-v3, or GPL v2-only; the replacing license is GPL v2-or-later.
-The code for task switching/handling, which is derived from KVM and
-hence is GPL v2-only, is isolated in the new files (with this license)
-x86_task.c/.h, and the corresponding compilation rule is added to
-target/i386/hvf-utils/Makefile.objs.
-Note that rules for compiling are still missing from
-target/i386/Makefile.objs; they will be added later in this patchset.
+This patch makes use of the helper functions for handling xsave in
+xsave_helper.c, which are shared with kvm.
 
 Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 ---
- target/i386/hvf-all.c               | 173 +++----------------------------
- target/i386/hvf-utils/Makefile.objs |   2 +-
- target/i386/hvf-utils/vmx.h         |  14 +--
- target/i386/hvf-utils/x86.c         |  14 +--
- target/i386/hvf-utils/x86.h         |  14 +--
- target/i386/hvf-utils/x86_cpuid.c   |   6 +-
- target/i386/hvf-utils/x86_cpuid.h   |  14 +--
- target/i386/hvf-utils/x86_decode.c  |  14 +--
- target/i386/hvf-utils/x86_decode.h  |  14 +--
- target/i386/hvf-utils/x86_descr.c   |  14 +--
- target/i386/hvf-utils/x86_descr.h   |  14 +--
- target/i386/hvf-utils/x86_emu.c     |  14 +--
- target/i386/hvf-utils/x86_emu.h     |  14 +--
- target/i386/hvf-utils/x86_gen.h     |  14 +--
- target/i386/hvf-utils/x86_mmu.c     |  14 +--
- target/i386/hvf-utils/x86_mmu.h     |  14 +--
- target/i386/hvf-utils/x86_task.c    | 201 ++++++++++++++++++++++++++++++++++++
- target/i386/hvf-utils/x86_task.h    |  18 ++++
- target/i386/hvf-utils/x86hvf.c      |  14 +--
- target/i386/hvf-utils/x86hvf.h      |  14 +--
- 20 files changed, 340 insertions(+), 270 deletions(-)
- create mode 100644 target/i386/hvf-utils/x86_task.c
- create mode 100644 target/i386/hvf-utils/x86_task.h
+ target/i386/hvf-utils/x86hvf.c | 63 ++++++------------------------------------
+ 1 file changed, 8 insertions(+), 55 deletions(-)
 
-diff --git a/target/i386/hvf-all.c b/target/i386/hvf-all.c
-index d5e18faa68..270ec56b8d 100644
---- a/target/i386/hvf-all.c
-+++ b/target/i386/hvf-all.c
-@@ -5,15 +5,19 @@
- // Copyright 2017 The Android Open Source Project
- // 
- // QEMU Hypervisor.framework support
--// 
--// This software is licensed under the terms of the GNU General Public
--// License version 2, as published by the Free Software Foundation, and
--// may be copied, distributed, and modified under those terms.
--// 
-+//
-+// This program is free software; you can redistribute it and/or
-+// modify it under the terms of the GNU Lesser General Public
-+// License as published by the Free Software Foundation; either
-+// version 2 of the License, or (at your option) any later version.
-+//
- // This program is distributed in the hope that it will be useful,
- // but WITHOUT ANY WARRANTY; without even the implied warranty of
--// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--// GNU General Public License for more details.
-+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+// Lesser General Public License for more details.
-+//
-+// You should have received a copy of the GNU Lesser General Public
-+// License along with this program; if not, see <http://www.gnu.org/licenses/>.
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "qemu/error-report.h"
-@@ -28,6 +32,7 @@
- #include "hvf-utils/x86_decode.h"
- #include "hvf-utils/x86_emu.h"
- #include "hvf-utils/x86_cpuid.h"
-+#include "hvf-utils/x86_task.h"
- #include "hvf-utils/x86hvf.h"
- 
- #include <Hypervisor/hv.h>
-@@ -224,160 +229,6 @@ void update_apic_tpr(CPUState *cpu)
- 
- #define VECTORING_INFO_VECTOR_MASK     0xff
- 
--// TODO: taskswitch handling
--static void save_state_to_tss32(CPUState *cpu, struct x86_tss_segment32 *tss)
--{
--    /* CR3 and ldt selector are not saved intentionally */
--    tss->eip = EIP(cpu);
--    tss->eflags = EFLAGS(cpu);
--    tss->eax = EAX(cpu);
--    tss->ecx = ECX(cpu);
--    tss->edx = EDX(cpu);
--    tss->ebx = EBX(cpu);
--    tss->esp = ESP(cpu);
--    tss->ebp = EBP(cpu);
--    tss->esi = ESI(cpu);
--    tss->edi = EDI(cpu);
--
--    tss->es = vmx_read_segment_selector(cpu, REG_SEG_ES).sel;
--    tss->cs = vmx_read_segment_selector(cpu, REG_SEG_CS).sel;
--    tss->ss = vmx_read_segment_selector(cpu, REG_SEG_SS).sel;
--    tss->ds = vmx_read_segment_selector(cpu, REG_SEG_DS).sel;
--    tss->fs = vmx_read_segment_selector(cpu, REG_SEG_FS).sel;
--    tss->gs = vmx_read_segment_selector(cpu, REG_SEG_GS).sel;
--}
--
--static void load_state_from_tss32(CPUState *cpu, struct x86_tss_segment32 *tss)
--{
--    wvmcs(cpu->hvf_fd, VMCS_GUEST_CR3, tss->cr3);
--
--    RIP(cpu) = tss->eip;
--    EFLAGS(cpu) = tss->eflags | 2;
--
--    /* General purpose registers */
--    RAX(cpu) = tss->eax;
--    RCX(cpu) = tss->ecx;
--    RDX(cpu) = tss->edx;
--    RBX(cpu) = tss->ebx;
--    RSP(cpu) = tss->esp;
--    RBP(cpu) = tss->ebp;
--    RSI(cpu) = tss->esi;
--    RDI(cpu) = tss->edi;
--
--    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->ldt}}, REG_SEG_LDTR);
--    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->es}}, REG_SEG_ES);
--    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->cs}}, REG_SEG_CS);
--    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->ss}}, REG_SEG_SS);
--    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->ds}}, REG_SEG_DS);
--    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->fs}}, REG_SEG_FS);
--    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->gs}}, REG_SEG_GS);
--
--#if 0
--    load_segment(cpu, REG_SEG_LDTR, tss->ldt);
--    load_segment(cpu, REG_SEG_ES, tss->es);
--    load_segment(cpu, REG_SEG_CS, tss->cs);
--    load_segment(cpu, REG_SEG_SS, tss->ss);
--    load_segment(cpu, REG_SEG_DS, tss->ds);
--    load_segment(cpu, REG_SEG_FS, tss->fs);
--    load_segment(cpu, REG_SEG_GS, tss->gs);
--#endif
--}
--
--static int task_switch_32(CPUState *cpu, x68_segment_selector tss_sel, x68_segment_selector old_tss_sel,
--                          uint64_t old_tss_base, struct x86_segment_descriptor *new_desc)
--{
--    struct x86_tss_segment32 tss_seg;
--    uint32_t new_tss_base = x86_segment_base(new_desc);
--    uint32_t eip_offset = offsetof(struct x86_tss_segment32, eip);
--    uint32_t ldt_sel_offset = offsetof(struct x86_tss_segment32, ldt);
--
--    vmx_read_mem(cpu, &tss_seg, old_tss_base, sizeof(tss_seg));
--    save_state_to_tss32(cpu, &tss_seg);
--
--    vmx_write_mem(cpu, old_tss_base + eip_offset, &tss_seg.eip, ldt_sel_offset - eip_offset);
--    vmx_read_mem(cpu, &tss_seg, new_tss_base, sizeof(tss_seg));
--
--    if (old_tss_sel.sel != 0xffff) {
--        tss_seg.prev_tss = old_tss_sel.sel;
--
--        vmx_write_mem(cpu, new_tss_base, &tss_seg.prev_tss, sizeof(tss_seg.prev_tss));
--    }
--    load_state_from_tss32(cpu, &tss_seg);
--    return 0;
--}
--
--static void vmx_handle_task_switch(CPUState *cpu, x68_segment_selector tss_sel, int reason, bool gate_valid, uint8_t gate, uint64_t gate_type)
--{
--    uint64_t rip = rreg(cpu->hvf_fd, HV_X86_RIP);
--    if (!gate_valid || (gate_type != VMCS_INTR_T_HWEXCEPTION &&
--                        gate_type != VMCS_INTR_T_HWINTR &&
--                        gate_type != VMCS_INTR_T_NMI)) {
--        int ins_len = rvmcs(cpu->hvf_fd, VMCS_EXIT_INSTRUCTION_LENGTH);
--        macvm_set_rip(cpu, rip + ins_len);
--        return;
--    }
--
--    load_regs(cpu);
--
--    struct x86_segment_descriptor curr_tss_desc, next_tss_desc;
--    int ret;
--    x68_segment_selector old_tss_sel = vmx_read_segment_selector(cpu, REG_SEG_TR);
--    uint64_t old_tss_base = vmx_read_segment_base(cpu, REG_SEG_TR);
--    uint32_t desc_limit;
--    struct x86_call_gate task_gate_desc;
--    struct vmx_segment vmx_seg;
--
--    x86_read_segment_descriptor(cpu, &next_tss_desc, tss_sel);
--    x86_read_segment_descriptor(cpu, &curr_tss_desc, old_tss_sel);
--
--    if (reason == TSR_IDT_GATE && gate_valid) {
--        int dpl;
--
--        ret = x86_read_call_gate(cpu, &task_gate_desc, gate);
--
--        dpl = task_gate_desc.dpl;
--        x68_segment_selector cs = vmx_read_segment_selector(cpu, REG_SEG_CS);
--        if (tss_sel.rpl > dpl || cs.rpl > dpl)
--            ;//DPRINTF("emulate_gp");
--    }
--
--    desc_limit = x86_segment_limit(&next_tss_desc);
--    if (!next_tss_desc.p || ((desc_limit < 0x67 && (next_tss_desc.type & 8)) || desc_limit < 0x2b)) {
--        VM_PANIC("emulate_ts");
--    }
--
--    if (reason == TSR_IRET || reason == TSR_JMP) {
--        curr_tss_desc.type &= ~(1 << 1); /* clear busy flag */
--        x86_write_segment_descriptor(cpu, &curr_tss_desc, old_tss_sel);
--    }
--
--    if (reason == TSR_IRET)
--        EFLAGS(cpu) &= ~RFLAGS_NT;
--
--    if (reason != TSR_CALL && reason != TSR_IDT_GATE)
--        old_tss_sel.sel = 0xffff;
--
--    if (reason != TSR_IRET) {
--        next_tss_desc.type |= (1 << 1); /* set busy flag */
--        x86_write_segment_descriptor(cpu, &next_tss_desc, tss_sel);
--    }
--
--    if (next_tss_desc.type & 8)
--        ret = task_switch_32(cpu, tss_sel, old_tss_sel, old_tss_base, &next_tss_desc);
--    else
--        //ret = task_switch_16(cpu, tss_sel, old_tss_sel, old_tss_base, &next_tss_desc);
--        VM_PANIC("task_switch_16");
--
--    macvm_set_cr0(cpu->hvf_fd, rvmcs(cpu->hvf_fd, VMCS_GUEST_CR0) | CR0_TS);
--    x86_segment_descriptor_to_vmx(cpu, tss_sel, &next_tss_desc, &vmx_seg);
--    vmx_write_segment_descriptor(cpu, &vmx_seg, REG_SEG_TR);
--
--    store_regs(cpu);
--
--    hv_vcpu_invalidate_tlb(cpu->hvf_fd);
--    hv_vcpu_flush(cpu->hvf_fd);
--}
--
- static void hvf_handle_interrupt(CPUState * cpu, int mask)
- {
-     cpu->interrupt_request |= mask;
-diff --git a/target/i386/hvf-utils/Makefile.objs b/target/i386/hvf-utils/Makefile.objs
-index 7df219ad9c..79d8969ca8 100644
---- a/target/i386/hvf-utils/Makefile.objs
-+++ b/target/i386/hvf-utils/Makefile.objs
-@@ -1 +1 @@
--obj-y += x86.o x86_cpuid.o x86_decode.o x86_descr.o x86_emu.o x86_flags.o x86_mmu.o x86hvf.o
-+obj-y += x86.o x86_cpuid.o x86_decode.o x86_descr.o x86_emu.o x86_flags.o x86_mmu.o x86hvf.o x86_task.o
-diff --git a/target/i386/hvf-utils/vmx.h b/target/i386/hvf-utils/vmx.h
-index 8a080e6777..e5359df87f 100644
---- a/target/i386/hvf-utils/vmx.h
-+++ b/target/i386/hvf-utils/vmx.h
-@@ -6,17 +6,17 @@
-  * Interfaces to Hypervisor.framework to read/write X86 registers and VMCS.
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
- #ifndef VMX_H
-diff --git a/target/i386/hvf-utils/x86.c b/target/i386/hvf-utils/x86.c
-index e3db2c9c8b..4debbff31c 100644
---- a/target/i386/hvf-utils/x86.c
-+++ b/target/i386/hvf-utils/x86.c
-@@ -3,17 +3,17 @@
-  * Copyright (C) 2017 Google Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
- #include "qemu/osdep.h"
-diff --git a/target/i386/hvf-utils/x86.h b/target/i386/hvf-utils/x86.h
-index 5dffdd6568..d433d15ea4 100644
---- a/target/i386/hvf-utils/x86.h
-+++ b/target/i386/hvf-utils/x86.h
-@@ -3,17 +3,17 @@
-  * Copyright (C) 2017 Veertu Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
- #pragma once
-diff --git a/target/i386/hvf-utils/x86_cpuid.c b/target/i386/hvf-utils/x86_cpuid.c
-index e496cf001c..4abeb5c2da 100644
---- a/target/i386/hvf-utils/x86_cpuid.c
-+++ b/target/i386/hvf-utils/x86_cpuid.c
-@@ -4,18 +4,18 @@
-  *  Copyright (c) 2003 Fabrice Bellard
-  *  Copyright (c) 2017 Google Inc.
-  *
-- * This library is free software; you can redistribute it and/or
-+ * This program is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-  * version 2 of the License, or (at your option) any later version.
-  *
-- * This library is distributed in the hope that it will be useful,
-+ * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  * Lesser General Public License for more details.
-  *
-  * You should have received a copy of the GNU Lesser General Public
-- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  *
-  * cpuid
-  */
-diff --git a/target/i386/hvf-utils/x86_cpuid.h b/target/i386/hvf-utils/x86_cpuid.h
-index 02f2f115b0..b84a2f08df 100644
---- a/target/i386/hvf-utils/x86_cpuid.h
-+++ b/target/i386/hvf-utils/x86_cpuid.h
-@@ -2,17 +2,17 @@
-  * Copyright (C) 2016 Veertu Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- #ifndef __CPUID_H__
- #define __CPUID_H__
-diff --git a/target/i386/hvf-utils/x86_decode.c b/target/i386/hvf-utils/x86_decode.c
-index b4d8e22449..8deaab11d2 100644
---- a/target/i386/hvf-utils/x86_decode.c
-+++ b/target/i386/hvf-utils/x86_decode.c
-@@ -3,17 +3,17 @@
-  * Copyright (C) 2017 Google Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
- #include "qemu/osdep.h"
-diff --git a/target/i386/hvf-utils/x86_decode.h b/target/i386/hvf-utils/x86_decode.h
-index 3a22d7d1a5..fde524f819 100644
---- a/target/i386/hvf-utils/x86_decode.h
-+++ b/target/i386/hvf-utils/x86_decode.h
-@@ -2,17 +2,17 @@
-  * Copyright (C) 2016 Veertu Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
- #pragma once
-diff --git a/target/i386/hvf-utils/x86_descr.c b/target/i386/hvf-utils/x86_descr.c
-index c3b089aaa8..0b9562818f 100644
---- a/target/i386/hvf-utils/x86_descr.c
-+++ b/target/i386/hvf-utils/x86_descr.c
-@@ -3,17 +3,17 @@
-  * Copyright (C) 2017 Google Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
- #include "qemu/osdep.h"
-diff --git a/target/i386/hvf-utils/x86_descr.h b/target/i386/hvf-utils/x86_descr.h
-index 78fb1bc420..9917585aeb 100644
---- a/target/i386/hvf-utils/x86_descr.h
-+++ b/target/i386/hvf-utils/x86_descr.h
-@@ -3,17 +3,17 @@
-  * Copyright (C) 2017 Google Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
- #pragma once
-diff --git a/target/i386/hvf-utils/x86_emu.c b/target/i386/hvf-utils/x86_emu.c
-index 8b5efc76f0..76680921d1 100644
---- a/target/i386/hvf-utils/x86_emu.c
-+++ b/target/i386/hvf-utils/x86_emu.c
-@@ -3,17 +3,17 @@
-  * Copyright (C) 2017 Google Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- 
- /////////////////////////////////////////////////////////////////////////
-diff --git a/target/i386/hvf-utils/x86_emu.h b/target/i386/hvf-utils/x86_emu.h
-index 42cc5e4296..f6feff5553 100644
---- a/target/i386/hvf-utils/x86_emu.h
-+++ b/target/i386/hvf-utils/x86_emu.h
-@@ -3,17 +3,17 @@
-  * Copyright (C) 2017 Google Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- #ifndef __X86_EMU_H__
- #define __X86_EMU_H__
-diff --git a/target/i386/hvf-utils/x86_gen.h b/target/i386/hvf-utils/x86_gen.h
-index e4340fa244..2045b0e69d 100644
---- a/target/i386/hvf-utils/x86_gen.h
-+++ b/target/i386/hvf-utils/x86_gen.h
-@@ -3,17 +3,17 @@
-  * Copyright (C) 2017 Google Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- #ifndef __X86_GEN_H__
- #define __X86_GEN_H__
-diff --git a/target/i386/hvf-utils/x86_mmu.c b/target/i386/hvf-utils/x86_mmu.c
-index 00fae735be..95b3d15b94 100644
---- a/target/i386/hvf-utils/x86_mmu.c
-+++ b/target/i386/hvf-utils/x86_mmu.c
-@@ -3,17 +3,17 @@
-  * Copyright (C) 2017 Google Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- #include "qemu/osdep.h"
- 
-diff --git a/target/i386/hvf-utils/x86_mmu.h b/target/i386/hvf-utils/x86_mmu.h
-index f794d04b3d..aa0fcfafd2 100644
---- a/target/i386/hvf-utils/x86_mmu.h
-+++ b/target/i386/hvf-utils/x86_mmu.h
-@@ -3,17 +3,17 @@
-  * Copyright (C) 2017 Google Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- #ifndef __X86_MMU_H__
- #define __X86_MMU_H__
-diff --git a/target/i386/hvf-utils/x86_task.c b/target/i386/hvf-utils/x86_task.c
-new file mode 100644
-index 0000000000..1a2646437a
---- /dev/null
-+++ b/target/i386/hvf-utils/x86_task.c
-@@ -0,0 +1,201 @@
-+// This software is licensed under the terms of the GNU General Public
-+// License version 2, as published by the Free Software Foundation, and
-+// may be copied, distributed, and modified under those terms.
-+// 
-+// This program is distributed in the hope that it will be useful,
-+// but WITHOUT ANY WARRANTY; without even the implied warranty of
-+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+// GNU General Public License for more details.
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/error-report.h"
-+
-+#include "sysemu/hvf.h"
-+#include "hvf-i386.h"
-+#include "hvf-utils/vmcs.h"
-+#include "hvf-utils/vmx.h"
-+#include "hvf-utils/x86.h"
-+#include "hvf-utils/x86_descr.h"
-+#include "hvf-utils/x86_mmu.h"
-+#include "hvf-utils/x86_decode.h"
-+#include "hvf-utils/x86_emu.h"
-+#include "hvf-utils/x86_cpuid.h"
-+#include "hvf-utils/x86_task.h"
-+#include "hvf-utils/x86hvf.h"
-+
-+#include <Hypervisor/hv.h>
-+#include <Hypervisor/hv_vmx.h>
-+
-+#include "exec/address-spaces.h"
-+#include "exec/exec-all.h"
-+#include "exec/ioport.h"
-+#include "hw/i386/apic_internal.h"
-+#include "hw/boards.h"
-+#include "qemu/main-loop.h"
-+#include "strings.h"
-+#include "sysemu/accel.h"
-+#include "sysemu/sysemu.h"
-+#include "target/i386/cpu.h"
-+
-+// TODO: taskswitch handling
-+static void save_state_to_tss32(CPUState *cpu, struct x86_tss_segment32 *tss)
-+{
-+    X86CPU *x86_cpu = X86_CPU(cpu);
-+    CPUX86State *env = &x86_cpu->env;
-+
-+    /* CR3 and ldt selector are not saved intentionally */
-+    tss->eip = EIP(env);
-+    tss->eflags = EFLAGS(env);
-+    tss->eax = EAX(env);
-+    tss->ecx = ECX(env);
-+    tss->edx = EDX(env);
-+    tss->ebx = EBX(env);
-+    tss->esp = ESP(env);
-+    tss->ebp = EBP(env);
-+    tss->esi = ESI(env);
-+    tss->edi = EDI(env);
-+
-+    tss->es = vmx_read_segment_selector(cpu, REG_SEG_ES).sel;
-+    tss->cs = vmx_read_segment_selector(cpu, REG_SEG_CS).sel;
-+    tss->ss = vmx_read_segment_selector(cpu, REG_SEG_SS).sel;
-+    tss->ds = vmx_read_segment_selector(cpu, REG_SEG_DS).sel;
-+    tss->fs = vmx_read_segment_selector(cpu, REG_SEG_FS).sel;
-+    tss->gs = vmx_read_segment_selector(cpu, REG_SEG_GS).sel;
-+}
-+
-+static void load_state_from_tss32(CPUState *cpu, struct x86_tss_segment32 *tss)
-+{
-+    X86CPU *x86_cpu = X86_CPU(cpu);
-+    CPUX86State *env = &x86_cpu->env;
-+
-+    wvmcs(cpu->hvf_fd, VMCS_GUEST_CR3, tss->cr3);
-+
-+    RIP(env) = tss->eip;
-+    EFLAGS(env) = tss->eflags | 2;
-+
-+    /* General purpose registers */
-+    RAX(env) = tss->eax;
-+    RCX(env) = tss->ecx;
-+    RDX(env) = tss->edx;
-+    RBX(env) = tss->ebx;
-+    RSP(env) = tss->esp;
-+    RBP(env) = tss->ebp;
-+    RSI(env) = tss->esi;
-+    RDI(env) = tss->edi;
-+
-+    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->ldt}}, REG_SEG_LDTR);
-+    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->es}}, REG_SEG_ES);
-+    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->cs}}, REG_SEG_CS);
-+    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->ss}}, REG_SEG_SS);
-+    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->ds}}, REG_SEG_DS);
-+    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->fs}}, REG_SEG_FS);
-+    vmx_write_segment_selector(cpu, (x68_segment_selector){{tss->gs}}, REG_SEG_GS);
-+
-+#if 0
-+    load_segment(cpu, REG_SEG_LDTR, tss->ldt);
-+    load_segment(cpu, REG_SEG_ES, tss->es);
-+    load_segment(cpu, REG_SEG_CS, tss->cs);
-+    load_segment(cpu, REG_SEG_SS, tss->ss);
-+    load_segment(cpu, REG_SEG_DS, tss->ds);
-+    load_segment(cpu, REG_SEG_FS, tss->fs);
-+    load_segment(cpu, REG_SEG_GS, tss->gs);
-+#endif
-+}
-+
-+static int task_switch_32(CPUState *cpu, x68_segment_selector tss_sel, x68_segment_selector old_tss_sel,
-+                          uint64_t old_tss_base, struct x86_segment_descriptor *new_desc)
-+{
-+    struct x86_tss_segment32 tss_seg;
-+    uint32_t new_tss_base = x86_segment_base(new_desc);
-+    uint32_t eip_offset = offsetof(struct x86_tss_segment32, eip);
-+    uint32_t ldt_sel_offset = offsetof(struct x86_tss_segment32, ldt);
-+
-+    vmx_read_mem(cpu, &tss_seg, old_tss_base, sizeof(tss_seg));
-+    save_state_to_tss32(cpu, &tss_seg);
-+
-+    vmx_write_mem(cpu, old_tss_base + eip_offset, &tss_seg.eip, ldt_sel_offset - eip_offset);
-+    vmx_read_mem(cpu, &tss_seg, new_tss_base, sizeof(tss_seg));
-+
-+    if (old_tss_sel.sel != 0xffff) {
-+        tss_seg.prev_tss = old_tss_sel.sel;
-+
-+        vmx_write_mem(cpu, new_tss_base, &tss_seg.prev_tss, sizeof(tss_seg.prev_tss));
-+    }
-+    load_state_from_tss32(cpu, &tss_seg);
-+    return 0;
-+}
-+
-+void vmx_handle_task_switch(CPUState *cpu, x68_segment_selector tss_sel, int reason, bool gate_valid, uint8_t gate, uint64_t gate_type)
-+{
-+    uint64_t rip = rreg(cpu->hvf_fd, HV_X86_RIP);
-+    if (!gate_valid || (gate_type != VMCS_INTR_T_HWEXCEPTION &&
-+                        gate_type != VMCS_INTR_T_HWINTR &&
-+                        gate_type != VMCS_INTR_T_NMI)) {
-+        int ins_len = rvmcs(cpu->hvf_fd, VMCS_EXIT_INSTRUCTION_LENGTH);
-+        macvm_set_rip(cpu, rip + ins_len);
-+        return;
-+    }
-+
-+    load_regs(cpu);
-+
-+    struct x86_segment_descriptor curr_tss_desc, next_tss_desc;
-+    int ret;
-+    x68_segment_selector old_tss_sel = vmx_read_segment_selector(cpu, REG_SEG_TR);
-+    uint64_t old_tss_base = vmx_read_segment_base(cpu, REG_SEG_TR);
-+    uint32_t desc_limit;
-+    struct x86_call_gate task_gate_desc;
-+    struct vmx_segment vmx_seg;
-+
-+    X86CPU *x86_cpu = X86_CPU(cpu);
-+    CPUX86State *env = &x86_cpu->env;
-+
-+    x86_read_segment_descriptor(cpu, &next_tss_desc, tss_sel);
-+    x86_read_segment_descriptor(cpu, &curr_tss_desc, old_tss_sel);
-+
-+    if (reason == TSR_IDT_GATE && gate_valid) {
-+        int dpl;
-+
-+        ret = x86_read_call_gate(cpu, &task_gate_desc, gate);
-+
-+        dpl = task_gate_desc.dpl;
-+        x68_segment_selector cs = vmx_read_segment_selector(cpu, REG_SEG_CS);
-+        if (tss_sel.rpl > dpl || cs.rpl > dpl)
-+            ;//DPRINTF("emulate_gp");
-+    }
-+
-+    desc_limit = x86_segment_limit(&next_tss_desc);
-+    if (!next_tss_desc.p || ((desc_limit < 0x67 && (next_tss_desc.type & 8)) || desc_limit < 0x2b)) {
-+        VM_PANIC("emulate_ts");
-+    }
-+
-+    if (reason == TSR_IRET || reason == TSR_JMP) {
-+        curr_tss_desc.type &= ~(1 << 1); /* clear busy flag */
-+        x86_write_segment_descriptor(cpu, &curr_tss_desc, old_tss_sel);
-+    }
-+
-+    if (reason == TSR_IRET)
-+        EFLAGS(env) &= ~RFLAGS_NT;
-+
-+    if (reason != TSR_CALL && reason != TSR_IDT_GATE)
-+        old_tss_sel.sel = 0xffff;
-+
-+    if (reason != TSR_IRET) {
-+        next_tss_desc.type |= (1 << 1); /* set busy flag */
-+        x86_write_segment_descriptor(cpu, &next_tss_desc, tss_sel);
-+    }
-+
-+    if (next_tss_desc.type & 8)
-+        ret = task_switch_32(cpu, tss_sel, old_tss_sel, old_tss_base, &next_tss_desc);
-+    else
-+        //ret = task_switch_16(cpu, tss_sel, old_tss_sel, old_tss_base, &next_tss_desc);
-+        VM_PANIC("task_switch_16");
-+
-+    macvm_set_cr0(cpu->hvf_fd, rvmcs(cpu->hvf_fd, VMCS_GUEST_CR0) | CR0_TS);
-+    x86_segment_descriptor_to_vmx(cpu, tss_sel, &next_tss_desc, &vmx_seg);
-+    vmx_write_segment_descriptor(cpu, &vmx_seg, REG_SEG_TR);
-+
-+    store_regs(cpu);
-+
-+    hv_vcpu_invalidate_tlb(cpu->hvf_fd);
-+    hv_vcpu_flush(cpu->hvf_fd);
-+}
-diff --git a/target/i386/hvf-utils/x86_task.h b/target/i386/hvf-utils/x86_task.h
-new file mode 100644
-index 0000000000..4f1b188d2e
---- /dev/null
-+++ b/target/i386/hvf-utils/x86_task.h
-@@ -0,0 +1,18 @@
-+/* This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 or
-+ * (at your option) version 3 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+#ifndef HVF_TASK
-+#define HVF_TASK
-+void vmx_handle_task_switch(CPUState *cpu, x68_segment_selector tss_sel,
-+        int reason, bool gate_valid, uint8_t gate, uint64_t gate_type);
-+#endif
 diff --git a/target/i386/hvf-utils/x86hvf.c b/target/i386/hvf-utils/x86hvf.c
-index d5668df37f..aba8983dc7 100644
+index 1e687f4f89..dd0710d056 100644
 --- a/target/i386/hvf-utils/x86hvf.c
 +++ b/target/i386/hvf-utils/x86hvf.c
-@@ -4,17 +4,17 @@
-  * Copyright (C) 2017 Google Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
+@@ -76,36 +76,13 @@ void hvf_get_segment(SegmentCache *qseg, struct vmx_segment *vmx_seg)
+ void hvf_put_xsave(CPUState *cpu_state)
+ {
  
- #include "qemu/osdep.h"
-diff --git a/target/i386/hvf-utils/x86hvf.h b/target/i386/hvf-utils/x86hvf.h
-index fbc2158a2b..0c5bc3dcf8 100644
---- a/target/i386/hvf-utils/x86hvf.h
-+++ b/target/i386/hvf-utils/x86hvf.h
-@@ -3,17 +3,17 @@
-  * Copyright (C) 2017 Google Inc,
-  *
-  * This program is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU General Public License as
-- * published by the Free Software Foundation; either version 2 or
-- * (at your option) version 3 of the License.
-+ * modify it under the terms of the GNU Lesser General Public
-+ * License as published by the Free Software Foundation; either
-+ * version 2 of the License, or (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-- * GNU General Public License for more details.
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * Lesser General Public License for more details.
-  *
-- * You should have received a copy of the GNU General Public License along
-- * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ * You should have received a copy of the GNU Lesser General Public
-+ * License along with this program; if not, see <http://www.gnu.org/licenses/>.
-  */
- #ifndef X86HVF_H
- #define X86HVF_H
+-    int x;
+     struct hvf_xsave_buf *xsave;
+-    
++
+     xsave = X86_CPU(cpu_state)->env.kvm_xsave_buf;
+-    memset(xsave, 0, sizeof(*xsave)); 
+-    
+-    memcpy(&xsave->data[4], &X86_CPU(cpu_state)->env.fpdp, sizeof(X86_CPU(cpu_state)->env.fpdp));
+-    memcpy(&xsave->data[2], &X86_CPU(cpu_state)->env.fpip, sizeof(X86_CPU(cpu_state)->env.fpip));
+-    memcpy(&xsave->data[8], &X86_CPU(cpu_state)->env.fpregs, sizeof(X86_CPU(cpu_state)->env.fpregs));
+-    memcpy(&xsave->data[144], &X86_CPU(cpu_state)->env.ymmh_regs, sizeof(X86_CPU(cpu_state)->env.ymmh_regs));
+-    memcpy(&xsave->data[288], &X86_CPU(cpu_state)->env.zmmh_regs, sizeof(X86_CPU(cpu_state)->env.zmmh_regs));
+-    memcpy(&xsave->data[272], &X86_CPU(cpu_state)->env.opmask_regs, sizeof(X86_CPU(cpu_state)->env.opmask_regs));
+-    memcpy(&xsave->data[240], &X86_CPU(cpu_state)->env.bnd_regs, sizeof(X86_CPU(cpu_state)->env.bnd_regs));
+-    memcpy(&xsave->data[256], &X86_CPU(cpu_state)->env.bndcs_regs, sizeof(X86_CPU(cpu_state)->env.bndcs_regs));
+-    memcpy(&xsave->data[416], &X86_CPU(cpu_state)->env.hi16_zmm_regs, sizeof(X86_CPU(cpu_state)->env.hi16_zmm_regs));
+-    
+-    xsave->data[0] = (uint16_t)X86_CPU(cpu_state)->env.fpuc;
+-    xsave->data[0] |= (X86_CPU(cpu_state)->env.fpus << 16);
+-    xsave->data[0] |= (X86_CPU(cpu_state)->env.fpstt & 7) << 11;
+-    
+-    for (x = 0; x < 8; ++x)
+-        xsave->data[1] |= ((!X86_CPU(cpu_state)->env.fptags[x]) << x);
+-    xsave->data[1] |= (uint32_t)(X86_CPU(cpu_state)->env.fpop << 16);
+-    
+-    memcpy(&xsave->data[40], &X86_CPU(cpu_state)->env.xmm_regs, sizeof(X86_CPU(cpu_state)->env.xmm_regs));
+-    
+-    xsave->data[6] = X86_CPU(cpu_state)->env.mxcsr;
+-    *(uint64_t *)&xsave->data[128] = X86_CPU(cpu_state)->env.xstate_bv;
+-    
+-    if (hv_vcpu_write_fpstate(cpu_state->hvf_fd, xsave->data, 4096)){
++
++    x86_cpu_xsave_all_areas(X86_CPU(cpu_state), xsave);
++
++    if (hv_vcpu_write_fpstate(cpu_state->hvf_fd, xsave->data, 4096)) {
+         abort();
+     }
+ }
+@@ -187,39 +164,15 @@ void hvf_put_msrs(CPUState *cpu_state)
+ 
+ void hvf_get_xsave(CPUState *cpu_state)
+ {
+-    int x;
+     struct hvf_xsave_buf *xsave;
+-    
++
+     xsave = X86_CPU(cpu_state)->env.kvm_xsave_buf;
+-    
++
+     if (hv_vcpu_read_fpstate(cpu_state->hvf_fd, xsave->data, 4096)) {
+         abort();
+     }
+ 
+-    memcpy(&X86_CPU(cpu_state)->env.fpdp, &xsave->data[4], sizeof(X86_CPU(cpu_state)->env.fpdp));
+-    memcpy(&X86_CPU(cpu_state)->env.fpip, &xsave->data[2], sizeof(X86_CPU(cpu_state)->env.fpip));
+-    memcpy(&X86_CPU(cpu_state)->env.fpregs, &xsave->data[8], sizeof(X86_CPU(cpu_state)->env.fpregs));
+-    memcpy(&X86_CPU(cpu_state)->env.ymmh_regs, &xsave->data[144], sizeof(X86_CPU(cpu_state)->env.ymmh_regs));
+-    memcpy(&X86_CPU(cpu_state)->env.zmmh_regs, &xsave->data[288], sizeof(X86_CPU(cpu_state)->env.zmmh_regs));
+-    memcpy(&X86_CPU(cpu_state)->env.opmask_regs, &xsave->data[272], sizeof(X86_CPU(cpu_state)->env.opmask_regs));
+-    memcpy(&X86_CPU(cpu_state)->env.bnd_regs, &xsave->data[240], sizeof(X86_CPU(cpu_state)->env.bnd_regs));
+-    memcpy(&X86_CPU(cpu_state)->env.bndcs_regs, &xsave->data[256], sizeof(X86_CPU(cpu_state)->env.bndcs_regs));
+-    memcpy(&X86_CPU(cpu_state)->env.hi16_zmm_regs, &xsave->data[416], sizeof(X86_CPU(cpu_state)->env.hi16_zmm_regs));
+-    
+-    
+-    X86_CPU(cpu_state)->env.fpuc = (uint16_t)xsave->data[0];
+-    X86_CPU(cpu_state)->env.fpus = (uint16_t)(xsave->data[0] >> 16);
+-    X86_CPU(cpu_state)->env.fpstt = (X86_CPU(cpu_state)->env.fpus >> 11) & 7;
+-    X86_CPU(cpu_state)->env.fpop = (uint16_t)(xsave->data[1] >> 16);
+-    
+-    for (x = 0; x < 8; ++x)
+-       X86_CPU(cpu_state)->env.fptags[x] =
+-        ((((uint16_t)xsave->data[1] >> x) & 1) == 0);
+-    
+-    memcpy(&X86_CPU(cpu_state)->env.xmm_regs, &xsave->data[40], sizeof(X86_CPU(cpu_state)->env.xmm_regs));
+-
+-    X86_CPU(cpu_state)->env.mxcsr = xsave->data[6];
+-    X86_CPU(cpu_state)->env.xstate_bv = *(uint64_t *)&xsave->data[128];
++    x86_cpu_xrstor_all_areas(X86_CPU(cpu_state), xsave);
+ }
+ 
+ void hvf_get_segments(CPUState *cpu_state)
 -- 
 2.14.1
