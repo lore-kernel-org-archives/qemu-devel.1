@@ -1,22 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57222)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ds8KG-0003qS-5r
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:07:41 -0400
+	(envelope-from <mlureau@redhat.com>) id 1ds8Kv-0004hA-V6
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:08:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1ds8K9-00040b-Qo
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:07:36 -0400
-Date: Wed, 13 Sep 2017 16:07:18 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170913140717.GC5319@localhost.localdomain>
-References: <59B91B00.20208@oracle.com> <59B91DCA.5080405@oracle.com>
-	<20170913122005.GB5319@localhost.localdomain>
-	<59B93376.1070108@oracle.com>
+	(envelope-from <mlureau@redhat.com>) id 1ds8Kr-0004O4-VV
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:08:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59216)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1ds8Kr-0004NC-Pk
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:08:13 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 77BDCC04B924
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 14:08:11 +0000 (UTC)
+Date: Wed, 13 Sep 2017 10:08:10 -0400 (EDT)
+From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Message-ID: <752107234.14989591.1505311690362.JavaMail.zimbra@redhat.com>
+In-Reply-To: <60e9ce8a-9473-cf55-5429-f70902bc59c2@redhat.com>
+References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
+	<20170911110623.24981-2-marcandre.lureau@redhat.com>
+	<60e9ce8a-9473-cf55-5429-f70902bc59c2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <59B93376.1070108@oracle.com>
-Subject: Re: [Qemu-devel] [Qemu-block] Q: Report of leaked clusters with
- qcow2 when disk is resized with a live VM
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v3 01/50] qlit: add qobject_from_qlit()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,74 +34,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Darren Kenny <darren.kenny@oracle.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, armbru@redhat.com
 
-Am 13.09.2017 um 15:32 hat Darren Kenny geschrieben:
-> Hi Kevin,
-> 
-> Thanks for getting back to me so quickly.
-> 
-> Kevin Wolf wrote:
-> > Am 13.09.2017 um 14:00 hat Darren Kenny geschrieben:
-> > > [Cross-posted from qemu-devel, meant to send here first]
-> > 
-> > Just keep both lists in the CC for the same email.
-> 
-> Will do.
-> > There is an issue here, which is that you are accessing the image at the
-> > same time from two separate processes. qemu is using writeback caches in
-> > order to improve performance, so only after the guest has issued a flush
-> > command to its disk or after you shut down or at least pause qemu, the
-> > changes are fully written to the image file. In qemu 2.10, you would
-> > probably see this instead: $ qemu-img check ./test.qcow2 qemu-img: Could
-> > not open './test.qcow2': Failed to get shared "write" lock Is another
-> > process using the image? This lock can be overridden, but at least it
-> > shows clearly that you are doing something that you probably shouldn't
-> > be doing.
-> 
-> Hmm, I've just updated to the HEAD of the Git repo, and I didn't see this
-> locking behaviour, it still did the same thing as before.
-> 
-> Does the disk need to be formatted/mounted before it's seen as locked?
-> Or even a configure option?
-> 
-> The version that have is:
-> 
->     $ qemu-img --version
->     qemu-img version 2.10.50 (v2.10.0-476-g04ef330)
->     Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-> 
->     $ qemu-system-x86_64 --version
->     QEMU emulator version 2.10.50 (v2.10.0-476-g04ef330)
->     Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
-> 
-> The last commit I have is (as in the version string):
-> 
->     04ef330 tcg/tci: do not use ldst label (never implemented)
 
-This should have the locking code. It only works with relatively new
-Linux kernels, though (it needs F_OFD_SETLK support). If you don't have
-that, no locking is used even in qemu 2.10.
 
-You could try enforcing some locking by adding file.locking=on to your
--drive option. If you're running an old kernel, this should print a
-warning message (and use some less safe locking variant).
+----- Original Message -----
+> On 09/11/2017 06:05 AM, Marc-Andr=C3=A9 Lureau wrote:
+> > Instanciate a QObject* form a literal QLitObject.
+>=20
+> s/Instanciate/Instantiate/
+> s/form/from/
 
-> > Doing a flush here wouldn't be wrong, but it's also unnecessary and
-> > would slow down the operation a bit.
-> Sure, but how often does a resize/truncate get done? Would seem like a
-> small impact to do it - but I agree w.r.t. the single-process access
-> as a better solution.
+thanks
 
-The thing is, truncate isn't the only operation that will lead to
-qemu-img check reporting failure. Any cluster allocation in the image
-can cause the same symptom, and there it is actually very important for
-performance that we use the cache and do a batched write only later.
+>=20
+> >=20
+> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> > ---
+> >  include/qapi/qmp/qlit.h |  2 ++
+> >  qobject/qlit.c          | 36 ++++++++++++++++++++++++++++++++++++
+> >  tests/check-qlit.c      | 26 ++++++++++++++++++++++++++
+> >  3 files changed, 64 insertions(+)
+>=20
+> > +QObject *qobject_from_qlit(const QLitObject *qlit)
+> > +{
+> > +    switch (qlit->type) {
+> > +    case QTYPE_QNULL:
+> > +        return QOBJECT(qnull());
+> > +    case QTYPE_QNUM:
+> > +        return QOBJECT(qnum_from_int(qlit->value.qnum));
+>=20
+> Is this going to work for all QNum values?
+>=20
+> > +++ b/tests/check-qlit.c
+> > @@ -64,11 +64,37 @@ static void qlit_equal_qobject_test(void)
+> >      qobject_decref(qobj);
+> >  }
+> > =20
+> > +static void qobject_from_qlit_test(void)
+> > +{
+> > +    QObject *obj, *qobj =3D qobject_from_qlit(&qlit);
+> > +    QDict *qdict;
+> > +    QList *bee;
+> > +
+> > +    qdict =3D qobject_to_qdict(qobj);
+> > +    g_assert_cmpint(qdict_get_int(qdict, "foo"), =3D=3D, 42);
+> > +    g_assert_cmpstr(qdict_get_str(qdict, "bar"), =3D=3D, "hello world"=
+);
+> > +    g_assert(qobject_type(qdict_get(qdict, "baz")) =3D=3D QTYPE_QNULL)=
+;
+>=20
+> Related to my question above - you pass because there are no floating
+> point values in qlit.  Is that something we want supported?
 
-So changing truncate so that this specific operation looks as if
-accessing the image from a second process were okay wouldn't actually
-make a big difference for the overall state. Maybe it's in fact better
-to have such attempts fail consistently.
+Markus had some remarks about it when reviewing #define QLIT_QNUM. Only i64=
+ are supported at this point, so it's left for whoever requires it in the f=
+uture.
 
-Kevin
+>=20
+> --
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+>=20
+>=20
