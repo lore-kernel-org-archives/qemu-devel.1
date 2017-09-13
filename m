@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34002)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ds0UF-0001oI-3b
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 01:45:24 -0400
+	(envelope-from <peterx@redhat.com>) id 1ds0uk-0000fo-Qb
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 02:12:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ds0UB-0002vX-8H
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 01:45:23 -0400
-References: <1504605227-5124-1-git-send-email-thuth@redhat.com>
-	<871snlwev0.fsf@dusky.pond.sub.org> <20170905164835.GF2112@work-vm>
-	<6e03aa82-3663-c251-c8e1-ac2e7eb0e7e7@redhat.com>
-	<87mv68e2i3.fsf@dusky.pond.sub.org>
-	<20170909204133.GH7570@localhost.localdomain>
-	<825b29f3-7857-558e-9092-855c9f75463e@redhat.com>
-	<20170912173723.GA7570@localhost.localdomain>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <808c097f-a422-3aba-2e0d-d8360425f75b@redhat.com>
-Date: Wed, 13 Sep 2017 07:45:11 +0200
+	(envelope-from <peterx@redhat.com>) id 1ds0uh-0005Er-Mb
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 02:12:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41446)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ds0uh-0005Bb-Ft
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 02:12:43 -0400
+Date: Wed, 13 Sep 2017 14:12:37 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170913061237.GD3617@pxdev.xzpeter.org>
+References: <20170911132627.9505-1-cohuck@redhat.com>
+	<20170912033333.GA29091@pxdev.xzpeter.org>
+	<CAJ+F1CLYrsOXO74nV4zpKffJgMkSPmBi84ARs22EJGAe0xTC0A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170912173723.GA7570@localhost.localdomain>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
+In-Reply-To: <CAJ+F1CLYrsOXO74nV4zpKffJgMkSPmBi84ARs22EJGAe0xTC0A@mail.gmail.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH] tests: Add a device_add/del
- HMP test
+Subject: Re: [Qemu-devel] [PATCH] dump: do not dump non-existent guest memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,67 +29,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, =?UTF-8?Q?Andreas_F=c3=a4rber?= <afaerber@suse.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <lvivier@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-On 12.09.2017 19:37, Eduardo Habkost wrote:
-> On Mon, Sep 11, 2017 at 08:13:21AM +0200, Thomas Huth wrote:
->> On 09.09.2017 22:41, Eduardo Habkost wrote:
->>> On Wed, Sep 06, 2017 at 08:59:32AM +0200, Markus Armbruster wrote:
->>>> Thomas Huth <thuth@redhat.com> writes:
->>>>
->>>>> On 05.09.2017 18:48, Dr. David Alan Gilbert wrote:
->>>>>> * Markus Armbruster (armbru@redhat.com) wrote:
->>>>>>> Thomas Huth <thuth@redhat.com> writes:
->>>>>>>
->>>>>>>> People tend to forget to mark internal devices with "user_creata=
-ble =3D false
->>>>>>>> or hotpluggable =3D false, and these devices can crash QEMU if a=
-dded via the
->>>>>>>> HMP monitor. So let's add a test to run through all devices and =
-that tries
->>>>>>>> to add them blindly (without arguments) to see whether this coul=
-d crash the
->>>>>>>> QEMU instance.
->> [...]
->>>>>>> * The device supports only cold plug with -device, not hot plug w=
-ith
->>>>>>>   device_add.
->>>>>
->>>>> We've got Eduardo's scripts/device-crash-test script for that alrea=
-dy,
->>>>> so no need to cover that here.
->>>>
->>>> Point taken.  So this test is really about hot plug / unplug.  Sugge=
-st
->>>> to clarify the commit message: s/add them blindly/hotplug and unplug
->>>> them blindly/.
->>>
->>> We could extend device-crash-test to test device_add too, as it
->>> already has extra code to deal with known crashes and testing
->>> multiple machine-types.  Also, any additional code we write to
->>> ensure we add mandatory arguments or plug only to valid buses
->>> would apply to both -device and device_add.  I also think Python
->>> test code is easier to maintain and extend, but that's just my
->>> personal preference.
->>
->> Adding device_add/del support to device-crash-test is certainly an
->> option. The problem is that nobody runs it by default, so this won't
->> help to avoid that new problems are being committed to the repository.
->>
->> I think we really should have a test for "make check", too. So would m=
-y
->> test be acceptable if I'd rewrite it to use QMP instead (I don't think=
- I
->> could do the full list that Markus mentioned, but at least a basic tes=
-t
->> via QMP as a start)?
+On Tue, Sep 12, 2017 at 12:17:51PM +0200, Marc-Andr=C3=A9 Lureau wrote:
+> Hi Peter
 >=20
-> We can run device-crash-test on "make check", we just need to
-> choose what's the subset of tests we want to run (because testing
-> all machine+device+target combinations would take too long).
+> On Tue, Sep 12, 2017 at 5:33 AM, Peter Xu <peterx@redhat.com> wrote:
+> > On Mon, Sep 11, 2017 at 03:26:27PM +0200, Cornelia Huck wrote:
+> >> It does not really make sense to dump memory that is not there.
+> >>
+> >> Moreover, that fixes a segmentation fault when calling dump-guest-me=
+mory
+> >> with no filter for a machine with no memory defined.
+> >>
+> >> New behaviour is:
+> >>
+> >> (qemu) dump-guest-memory /dev/null
+> >> dump: no guest memory to dump
+> >> (qemu) dump-guest-memory /dev/null 0 4096
+> >> dump: no guest memory to dump
+> >>
+> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >> ---
+> >>
+> >> Another unmaintained file. Joy. cc:ing some more-or-less random folk=
+s.
+> >
+> > I thought Marc-Andr=C3=A9 had proposed to be the maintainer? But inde=
+ed I
+> > didn't see the line in maintainer file.
+> >
+> > Anyway, if anyone think I am ok to maintain this single file
+> > (considering that I haven't posted patches on it for 2 years, and I
+> > haven't been working on any kind of maintainer job), please let me
+> > know. I'm glad to start with it (or with Marc-Andr=C3=A9).
+> >
+>=20
+> That would be great!
+> thanks
 
-Maybe we should just run it one time for every machine - and try to add
-all available devices at once?
+Let me try to draft a maintainer file change for this, to see whether
+there are objections.  Thanks!
 
- Thomas
+--=20
+Peter Xu
