@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33554)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds4Qh-0007Qt-MM
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:58:04 -0400
+	(envelope-from <cohuck@redhat.com>) id 1ds4Qz-0007c5-CO
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:58:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds4Qd-0005cD-Ms
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:57:59 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:35864)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds4Qd-0005bd-Ac
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:57:55 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 13 Sep 2017 12:57:45 +0300
-Message-Id: <150529666493.10902.14830445134051381968.stgit@frigg.lan>
-In-Reply-To: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
-References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+	(envelope-from <cohuck@redhat.com>) id 1ds4Qv-0005pw-EA
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:58:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51316)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ds4Qv-0005pT-55
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:58:13 -0400
+Date: Wed, 13 Sep 2017 11:58:08 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170913115808.4a8d263b.cohuck@redhat.com>
+In-Reply-To: <b4351b30-455a-7247-30f2-9a2b2c21ae17@linux.vnet.ibm.com>
+References: <20170905111645.18068-1-pasic@linux.vnet.ibm.com>
+	<20170905111645.18068-5-pasic@linux.vnet.ibm.com>
+	<20170906151028.545f208e.cohuck@redhat.com>
+	<b4351b30-455a-7247-30f2-9a2b2c21ae17@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/5] s390x/css: support ccw IDA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,224 +29,180 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- MAINTAINERS         |    6 ++
- docs/instrument.txt |  173 +++++++++++++++++++++++++++++++++++++++++++++=
-++++++
- 2 files changed, 179 insertions(+)
- create mode 100644 docs/instrument.txt
+On Mon, 11 Sep 2017 20:08:16 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 36eeb42d19..fb0eaee06a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1486,6 +1486,12 @@ F: scripts/tracetool/
- F: docs/tracing.txt
- T: git git://github.com/stefanha/qemu.git tracing
-=20
-+Event instrumentation
-+M: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+M: Stefan Hajnoczi <stefanha@redhat.com>
-+S: Maintained
-+F: docs/instrument.txt
-+
- TPM
- S: Orphan
- F: tpm.c
-diff --git a/docs/instrument.txt b/docs/instrument.txt
-new file mode 100644
-index 0000000000..24a0d21fc7
---- /dev/null
-+++ b/docs/instrument.txt
-@@ -0,0 +1,173 @@
-+=3D Event instrumentation =3D
-+
-+=3D=3D Introduction =3D=3D
-+
-+Event instrumentation allows users to execute their own host-native code=
- on a
-+set of pre-defined events provided by QEMU. QEMU also exposes other
-+functionality to peek/poke at the guest state (e.g., memory or registers=
-), as
-+well as interacting with tracing events. For those familiar with the ter=
-m, this
-+provides dynamic binary instrumentation, works on all QEMU-supported
-+architectures, as well as works in both 'user' (standalone application) =
-and
-+'system' (full-system emulation) modes.
-+
-+Look at the headers installed by QEMU on the "qemu-instr" directory for =
-further
-+information beyond this document.
-+
-+
-+=3D=3D Loading an instrumentation library =3D=3D
-+
-+Instrumentation code can be bundled into a dynamic library, which can be=
- later
-+loaded into QEMU:
-+
-+* Using the command-line "-instr" argument.
-+
-+* Using the "instr-load" and "instr-unload" commands in the HMP and QMP
-+  interfaces.
-+
-+
-+=3D=3D Example =3D=3D
-+
-+1. Configure QEMU with event instrumentation:
-+
-+    # instrument guest_cpu_enter and guest_mem_before
-+    mkdir -p /path/to/qemu-build
-+    cd /path/to/qemu-build
-+    /path/to/qemu-source/configure \
-+      --enable-instrument \
-+      --prefix=3D/path/to/qemu-install
-+
-+2. Build and install QEMU:
-+
-+    make install
-+
-+3. Create the "Makefile" to build the instrumentation library:
-+
-+    mkdir -p /tmp/my-instrument
-+   =20
-+    cat > /tmp/my-instrument/Makefile <<EOF
-+    QEMU_PATH=3D/tmp/qemu-install/
-+   =20
-+    CFLAGS +=3D -g
-+    CFLAGS +=3D -O3
-+    CFLAGS +=3D -Werror -Wall
-+    CFLAGS +=3D -I$(QEMU_PATH)/include
-+   =20
-+    all: libtrace-instrument.la
-+   =20
-+    libtrace-instrument.la: instrument.lo
-+            libtool --mode=3Dlink --tag=3DCC $(CC) -module -rpath /usr/l=
-ocal/lib -o $@ $^
-+   =20
-+    %.lo: %.c
-+            libtool --mode=3Dcompile --tag=3DCC $(CC) $(CFLAGS) -c $^
-+   =20
-+    clean:
-+            $(RM) -f *.o *.so *.lo
-+            $(RM) -Rf .libs
-+    EOF
-+
-+4. Write your instrumentation library:
-+
-+    cat > /tmp/my-instrument/instrument.c <<EOF
-+    #include <stdio.h>
-+    #include <assert.h>
-+   =20
-+    #include <qemu-instr/control.h>         /* manipulate events */
-+    #include <qemu-instr/trace.h>           /* manipulate tracing */
-+   =20
-+    /* the address for the memory access is not known at translation tim=
-e */
-+    void guest_mem_before_trans(QICPU vcpu_trans, QITCGv_cpu vcpu_exec,
-+                                QITCGv vaddr, QIMemInfo info)
-+    {
-+        printf("%s: %p %p %p %d %d %d %d\n", __func__, vcpu_trans, vcpu_=
-exec, vaddr,
-+               1 << info.size_shift, info.sign_extend, info.endianness, =
-info.store);
-+        if (info.store) {
-+            /* generate at execution time only for memory writes */
-+            qi_event_gen_guest_mem_before_exec(vcpu_exec, vaddr, info);
-+        }
-+    }
-+   =20
-+    /* called when QEMU executes a memory access */
-+    void guest_mem_before_exec(QICPU vcpu, uint64_t vaddr, QIMemInfo inf=
-o)
-+    {
-+        if (info.store) {
-+            /* if called by TCG code, we'll only get writes (see above) =
-*/
-+            printf("%s: %p %lx %d %d %d %d\n", __func__, vcpu, vaddr,
-+                   1 << info.size_shift, info.sign_extend, info.endianne=
-ss, info.store);
-+        }
-+    }
-+   =20
-+    /* called every time QEMU hotplugs a CPU */
-+    void guest_cpu_enter(QICPU vcpu)
-+    {
-+        printf("%s: %p\n", __func__, vcpu);
-+   =20
-+        /* disable instrumentation and tracing after the first call */
-+        static bool found =3D false;
-+        if (found) {
-+            qi_event_set_guest_cpu_enter(NULL);
-+            QITraceEvent *ev =3D qi_trace_event_name("guest_cpu_enter");
-+            assert(ev);
-+            qi_trace_event_set_state_dynamic(ev, true);
-+        } else {
-+            found =3D true;
-+        }
-+    }
-+   =20
-+    static void fini(void *data)
-+    {
-+        /* diable all tracing events */
-+        QITraceEventIter iter;
-+        qi_trace_event_iter_init(&iter, NULL);
-+        QITraceEvent *ev;
-+        while ((ev =3D qi_trace_event_iter_next(&iter)) !=3D NULL) {
-+            if (qi_trace_event_get_state_static(ev)) {
-+                qi_trace_event_set_state_dynamic(ev, false);
-+            }
-+        }
-+   =20
-+        /* instrumentation callbacks are automatically reset by QEMU */
-+    }
-+   =20
-+    /* mandatory initialization function */
-+    int main(int argc, const char **argv)
-+    {
-+        int i;
-+        printf("init!\n");
-+        printf("    argc :: %d\n", argc);
-+        for (i =3D 0; i < argc; i++) {
-+            printf("            -> %s\n", argv[i]);
-+        }
-+   =20
-+        qi_set_fini(fini, NULL);
-+   =20
-+        /* instrument and trace events */
-+        QITraceEvent *ev;
-+   =20
-+        qi_event_set_guest_cpu_enter(guest_cpu_enter);
-+        ev =3D qi_trace_event_name("guest_cpu_enter");
-+        assert(ev);
-+        qi_trace_event_set_state_dynamic(ev, true);
-+   =20
-+        qi_event_set_guest_mem_before_trans(guest_mem_before_trans);
-+        ev =3D qi_trace_event_name("guest_mem_before_trans");
-+        assert(ev);
-+        qi_trace_event_set_state_dynamic(ev, true);
-+   =20
-+        qi_event_set_guest_mem_before_exec(guest_mem_before_exec);
-+        ev =3D qi_trace_event_name("guest_mem_before_exec");
-+        assert(ev);
-+        qi_trace_event_set_state_dynamic(ev, true);
-+   =20
-+        return 0;
-+    }
-+    EOF
-+
-+5. Compile the instrumentation library:
-+
-+    make -C /tmp/my-instrument
-+
-+6. Start QEMU with the instrumentation library:
-+
-+    /tmp/qemu-install/bin/qemu-system-x86_64 \
-+        -instr file=3D/tmp/my-dinstrument/.libs/libtrace-instrument.so, =
-\
-+               arg=3Dfoo,arg=3Dbar
+> On 09/06/2017 03:10 PM, Cornelia Huck wrote:
+> > On Tue,  5 Sep 2017 13:16:44 +0200
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> >   
+> >> Let's add indirect data addressing support for our virtual channel
+> >> subsystem. This implementation does no prefetching, but steps
+> >> trough the idal as we go.
+> >>
+> >> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> >> ---
+> >>  hw/s390x/css.c | 110 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+> >>  1 file changed, 109 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> >> index c1bc9944e6..9d8f9fd7ea 100644
+> >> --- a/hw/s390x/css.c
+> >> +++ b/hw/s390x/css.c
+> >> @@ -819,6 +819,114 @@ incr:
+> >>      return 0;
+> >>  }
+> >>  
+> >> +/* retuns values between 1 and bs, where bs is a power of 2 */  
+> > 
+> > 'bs' is 'block size'?  
+> 
+> Yes.
+
+The first thing that popped up in my head was something else, that's
+why I asked :) Maybe bsz would be better.
+
+In any case, s/retuns/returns/
+
+> 
+> >   
+> >> +static inline uint16_t ida_continuous_left(hwaddr cda, uint64_t bs)
+> >> +{
+> >> +    return bs - (cda & (bs - 1));
+> >> +}
+
+> >> +static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int len,
+> >> +                              CcwDataStreamOp op)
+> >> +{
+> >> +    uint64_t bs = ccw_ida_block_size(cds->flags);
+> >> +    int ret = 0;
+> >> +    uint16_t cont_left, iter_len;
+> >> +
+> >> +    ret = cds_check_len(cds, len);
+> >> +    if (ret <= 0) {
+> >> +        return ret;
+> >> +    }
+> >> +    if (!cds->at_idaw) {
+> >> +        /* read first idaw */
+> >> +        ret = ida_read_next_idaw(cds);
+> >> +        if (ret) {
+> >> +            goto err;
+> >> +        }
+> >> +        cont_left = ida_continuous_left(cds->cda, bs);
+> >> +    } else {
+> >> +        cont_left = ida_continuous_left(cds->cda, bs);
+> >> +        if (cont_left == bs) {
+> >> +            ret = ida_read_next_idaw(cds);
+> >> +            if (ret) {
+> >> +                goto err;
+> >> +            }
+> >> +            if (cds->cda & (bs - 1)) {
+> >> +                ret = -EINVAL; /* chanel program check */
+> >> +                goto err;
+> >> +            }
+> >> +        }
+> >> +    }
+> >> +do_iter_len:
+> >> +    iter_len = MIN(len, cont_left);
+> >> +    if (op == CDS_OP_A) {
+> >> +        goto incr;
+> >> +    }
+> >> +    ret = address_space_rw(&address_space_memory, cds->cda,
+> >> +                           MEMTXATTRS_UNSPECIFIED, buff, iter_len, op);
+> >> +    if (ret != MEMTX_OK) {
+> >> +        /* assume inaccessible address */
+> >> +        ret = -EINVAL; /* chanel program check */
+> >> +        goto err;
+> >> +    }
+> >> +incr:
+> >> +    cds->at_byte += iter_len;
+> >> +    cds->cda += iter_len;
+> >> +    len -= iter_len;
+> >> +    if (len) {
+> >> +        ret = ida_read_next_idaw(cds);
+> >> +        if (ret) {
+> >> +            goto err;
+> >> +        }
+> >> +        cont_left = bs;
+> >> +        goto do_iter_len;
+> >> +    }
+> >> +    return ret;
+> >> +err:
+> >> +    cds->flags |= CDS_F_STREAM_BROKEN;
+> >> +    return ret;
+> >> +}  
+> > 
+> > I'm not so happy about the many gotos (excepting the err ones). Any
+> > chance to get around these?
+> >   
+> Certainly possible:
+> 
+> static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int len,          
+>                               CcwDataStreamOp op)                               
+> {                                                                               
+>     uint64_t bs = ccw_ida_block_size(cds->flags);                               
+>     int ret = 0;                                                                
+>     uint16_t cont_left, iter_len;                                               
+>                                                                                 
+>     ret = cds_check_len(cds, len);                                              
+>     if (ret <= 0) {                                                             
+>         return ret;                                                             
+>     }                                                                           
+>     if (!cds->at_idaw) {                                                        
+>         /* read first idaw */                                                   
+>         ret = ida_read_next_idaw(cds);                                          
+>         if (ret) {                                                              
+>             goto err;                                                           
+>         }                                                                       
+>         cont_left = ida_continuous_left(cds->cda, bs);                          
+>     } else {                                                                    
+>         cont_left = ida_continuous_left(cds->cda, bs);                          
+>         if (cont_left == bs) {                                                  
+>             ret = ida_read_next_idaw(cds);                                      
+>             if (ret) {                                                          
+>                 goto err;                                                       
+>             }                                                                   
+>             if (cds->cda & (bs - 1)) {                                          
+>                 ret = -EINVAL; /* channel program check */                      
+>                 goto err;                                                       
+>             }                                                                   
+>         }                                                                       
+>     }                                                                           
+>     do {                                                                        
+>         iter_len = MIN(len, cont_left);                                         
+>         if (op != CDS_OP_A) {                                                   
+>             ret = address_space_rw(&address_space_memory, cds->cda,             
+>                                    MEMTXATTRS_UNSPECIFIED, buff, iter_len, op); 
+>             if (ret != MEMTX_OK) {                                              
+>                 /* assume inaccessible address */                               
+>                 ret = -EINVAL; /* channel program check */                      
+>                 goto err;                                                       
+>             }                                                                   
+>         }                                                                       
+>         cds->at_byte += iter_len;                                               
+>         cds->cda += iter_len;                                                   
+>         len -= iter_len;                                                        
+>         if (!len) {                                                             
+>             break;                                                              
+>         }                                                                       
+>         ret = ida_read_next_idaw(cds);                                          
+>         if (ret) {                                                              
+>             goto err;                                                           
+>         }                                                                       
+>         cont_left = bs;                                                         
+>     } while (true);                                                             
+>     return ret;                                                                 
+> err:                                                                            
+>     cds->flags |= CDS_F_STREAM_BROKEN;                                          
+>     return ret;                                                                 
+> }
+> 
+> My idea was decrease indentation level and at the same time make
+> labels tell us something about the purpose of code pieces. Which
+> one do you prefer?
+
+I do not really like either much :( Any chance to make this better via
+some kind of helper functions?
