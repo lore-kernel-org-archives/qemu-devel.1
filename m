@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58562)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58444)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ds56p-0000PJ-2d
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:41:33 -0400
+	(envelope-from <groug@kaod.org>) id 1ds56d-0000KI-Fs
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:41:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ds56l-0004cW-1j
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:41:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39102)
+	(envelope-from <groug@kaod.org>) id 1ds56Z-0004Qp-G9
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:41:19 -0400
+Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:57807)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ds56k-0004bH-Ot
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:41:26 -0400
-Date: Wed, 13 Sep 2017 18:41:18 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170913104118.GF3617@pxdev.xzpeter.org>
-References: <1502788964-30517-1-git-send-email-thuth@redhat.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ds56Z-0004PD-6y
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:41:15 -0400
+Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id ACC95A9602
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 12:41:12 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Wed, 13 Sep 2017 12:41:07 +0200
+Message-ID: <150529882490.818.398056435765712294.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1502788964-30517-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH for 2.11] tests: Introduce generic
- device hot-plug/hot-unplug functions
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] spapr: fix the value of SDR1 in
+ kvmppc_put_books_sregs()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,413 +28,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Amit Shah <amit@kernel.org>
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Sam Bobroff <sam.bobroff@au1.ibm.com>
 
-On Tue, Aug 15, 2017 at 11:22:44AM +0200, Thomas Huth wrote:
-> A lot of tests provide code for adding and removing a device via the
-> device_add and device_del QMP commands. Maintaining this code in so
-> many places is cumbersome and error-prone (some of the code parts
-> check the responses in an incorrect way, for example), so let's
-> provide some proper generic qtest functions for adding and removing a
-> device instead.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  I'm planning to use qtest_hot_plug_device() in a bigger patch series
->  that I'm currently preparing. But since this clean-up patch is valid on
->  its own already, I'd like to get some feedback (or even a Reviewed-by)
->  for this patch here already if possible...
-> 
->  tests/libqos/pci.c         | 19 ++-------------
->  tests/libqos/usb.c         | 30 +++++------------------
->  tests/libqtest.c           | 60 ++++++++++++++++++++++++++++++++++++++++++++++
->  tests/libqtest.h           | 19 +++++++++++++++
->  tests/usb-hcd-uhci-test.c  | 26 ++------------------
->  tests/usb-hcd-xhci-test.c  | 52 ++++------------------------------------
->  tests/virtio-scsi-test.c   | 24 ++-----------------
->  tests/virtio-serial-test.c | 25 +++----------------
->  8 files changed, 98 insertions(+), 157 deletions(-)
-> 
-> diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
-> index 2dcdead..aada753 100644
-> --- a/tests/libqos/pci.c
-> +++ b/tests/libqos/pci.c
-> @@ -394,21 +394,6 @@ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr)
->  void qpci_plug_device_test(const char *driver, const char *id,
->                             uint8_t slot, const char *opts)
->  {
-> -    QDict *response;
-> -    char *cmd;
-> -
-> -    cmd = g_strdup_printf("{'execute': 'device_add',"
-> -                          " 'arguments': {"
-> -                          "   'driver': '%s',"
-> -                          "   'addr': '%d',"
-> -                          "   %s%s"
-> -                          "   'id': '%s'"
-> -                          "}}", driver, slot,
-> -                          opts ? opts : "", opts ? "," : "",
-> -                          id);
-> -    response = qmp(cmd);
-> -    g_free(cmd);
-> -    g_assert(response);
-> -    g_assert(!qdict_haskey(response, "error"));
-> -    QDECREF(response);
-> +    qtest_hot_plug_device(driver, id, "'addr': '%d'%s%s", slot,
-> +                          opts ? ", " : "", opts ? opts : "");
->  }
-> diff --git a/tests/libqos/usb.c b/tests/libqos/usb.c
-> index 0cdfaec..f8d0190 100644
-> --- a/tests/libqos/usb.c
-> +++ b/tests/libqos/usb.c
-> @@ -40,34 +40,16 @@ void uhci_port_test(struct qhc *hc, int port, uint16_t expect)
->  void usb_test_hotplug(const char *hcd_id, const int port,
->                        void (*port_check)(void))
->  {
-> -    QDict *response;
-> -    char  *cmd;
-> +    char  *id = g_strdup_printf("usbdev%d", port);
->  
-> -    cmd = g_strdup_printf("{'execute': 'device_add',"
-> -                          " 'arguments': {"
-> -                          "   'driver': 'usb-tablet',"
-> -                          "   'port': '%d',"
-> -                          "   'bus': '%s.0',"
-> -                          "   'id': 'usbdev%d'"
-> -                          "}}", port, hcd_id, port);
-> -    response = qmp(cmd);
-> -    g_free(cmd);
-> -    g_assert(response);
-> -    g_assert(!qdict_haskey(response, "error"));
-> -    QDECREF(response);
-> +    qtest_hot_plug_device("usb-tablet", id, "'port': '%d', 'bus': '%s.0'",
-> +                          port, hcd_id);
->  
->      if (port_check) {
->          port_check();
->      }
->  
-> -    cmd = g_strdup_printf("{'execute': 'device_del',"
-> -                           " 'arguments': {"
-> -                           "   'id': 'usbdev%d'"
-> -                           "}}", port);
-> -    response = qmp(cmd);
-> -    g_free(cmd);
-> -    g_assert(response);
-> -    g_assert(qdict_haskey(response, "event"));
-> -    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
-> -    QDECREF(response);
-> +    qtest_hot_unplug_device(id);
-> +
-> +    g_free(id);
->  }
-> diff --git a/tests/libqtest.c b/tests/libqtest.c
-> index b9a1f18..4339d97 100644
-> --- a/tests/libqtest.c
-> +++ b/tests/libqtest.c
-> @@ -987,3 +987,63 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine))
->      qtest_end();
->      QDECREF(response);
->  }
-> +
-> +/**
-> + * Generic hot-plugging test via the device_add QMP command
-> + */
-> +void qtest_hot_plug_device(const char *driver, const char *id,
-> +                           const char *fmt, ...)
-> +{
-> +    QDict *response;
-> +    char *cmd, *opts = NULL;
-> +    va_list va;
-> +
-> +    if (fmt) {
-> +        va_start(va, fmt);
-> +        opts = g_strdup_vprintf(fmt, va);
-> +        va_end(va);
-> +    }
-> +
-> +    cmd = g_strdup_printf("{'execute': 'device_add',"
-> +                          " 'arguments': { 'driver': '%s', 'id': '%s'%s%s }}",
-> +                          driver, id, opts ? ", " : "", opts ? opts : "");
-> +    g_free(opts);
-> +
-> +    response = qmp(cmd);
-> +    g_free(cmd);
-> +    g_assert(response);
-> +    while (qdict_haskey(response, "event")) {
-> +        /* We can get DEVICE_DELETED events in case something went wrong */
-> +        g_assert_cmpstr(qdict_get_str(response, "event"), !=, "DEVICE_DELETED");
-> +        QDECREF(response);
-> +        response = qmp("");
-> +        g_assert(response);
-> +    }
+When running with KVM PR, if a new HPT is allocated we need to inform
+KVM about the HPT address and size. This is currently done by hacking
+the value of SDR1 and pushing it to KVM in several places.
 
-I guess we don't need this block for hot plug? :-)
+Also, migration breaks the guest since it is very unlikely the HPT has
+the same address in source and destination, but we push the incoming
+value of SDR1 to KVM anyway.
 
-> +    g_assert(!qdict_haskey(response, "error"));
-> +    QDECREF(response);
-> +}
-> +
-> +/**
-> + * Generic hot-unplugging test via the device_del QMP command
-> + */
-> +void qtest_hot_unplug_device(const char *id)
-> +{
-> +    QDict *response;
-> +    char *cmd;
-> +
-> +    cmd = g_strdup_printf("{'execute': 'device_del',"
-> +                          " 'arguments': { 'id': '%s' }}", id);
-> +
-> +    response = qmp(cmd);
-> +    g_free(cmd);
-> +    g_assert(response);
-> +    while (qdict_haskey(response, "event")) {
-> +        /* We should get DEVICE_DELETED event first */
+This patch introduces a new virtual hypervisor hook so that the spapr
+code can provide the correct value of SDR1 to be pushed to KVM each
+time kvmppc_put_books_sregs() is called.
 
-So here is the mis-order thing: could the "return: {}" arrive earlier?
-IHMO it can.  If so, we'll leave the event in the buffer without
-reading it.
+It allows to get rid of all the hacking in the spapr/kvmppc code and
+it fixes migration of nested KVM PR.
 
-If you see my patch, I do two reads (assuming we will only get exactly
-one "return: {}" and a DELETED event), and take care of the ordering.
-Would that be better?
+Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
 
-> +        g_assert_cmpstr(qdict_get_str(response, "event"), ==, "DEVICE_DELETED");
-> +        QDECREF(response);
-> +        response = qmp("");
-> +        g_assert(response);
-> +    }
-> +    g_assert(!qdict_haskey(response, "error"));
-> +    QDECREF(response);
-> +}
-> diff --git a/tests/libqtest.h b/tests/libqtest.h
-> index 3ae5709..9c1006f 100644
-> --- a/tests/libqtest.h
-> +++ b/tests/libqtest.h
-> @@ -927,4 +927,23 @@ QDict *qmp_fd(int fd, const char *fmt, ...);
->   */
->  void qtest_cb_for_every_machine(void (*cb)(const char *machine));
->  
-> +/**
-> + * qtest_hot_plug_device:
-> + * @driver: Name of the device that should be added
-> + * @id: Identification string
-> + * @fmt: printf-like format string for further options to device_add
-> + *
-> + * Generic hot-plugging test via the device_add QMP command.
-> + */
-> +void qtest_hot_plug_device(const char *driver, const char *id,
-> +                           const char *fmt, ...) GCC_FMT_ATTR(3, 4);
-> +
-> +/**
-> + * qtest_hot_unplug_device:
-> + * @id: Identification string
-> + *
-> + * Generic hot-unplugging test via the device_del QMP command.
-> + */
-> +void qtest_hot_unplug_device(const char *id);
-> +
->  #endif
-> diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
-> index 5b500fe..7465bfd 100644
-> --- a/tests/usb-hcd-uhci-test.c
-> +++ b/tests/usb-hcd-uhci-test.c
-> @@ -48,31 +48,9 @@ static void test_uhci_hotplug(void)
->  
->  static void test_usb_storage_hotplug(void)
->  {
-> -    QDict *response;
-> +    qtest_hot_plug_device("usb-storage", "usbdev0", "'drive': 'drive0'");
->  
-> -    response = qmp("{'execute': 'device_add',"
-> -                   " 'arguments': {"
-> -                   "   'driver': 'usb-storage',"
-> -                   "   'drive': 'drive0',"
-> -                   "   'id': 'usbdev0'"
-> -                   "}}");
-> -    g_assert(response);
-> -    g_assert(!qdict_haskey(response, "error"));
-> -    QDECREF(response);
-> -
-> -    response = qmp("{'execute': 'device_del',"
-> -                           " 'arguments': {"
-> -                           "   'id': 'usbdev0'"
-> -                           "}}");
-> -    g_assert(response);
-> -    g_assert(!qdict_haskey(response, "error"));
-> -    QDECREF(response);
-> -
-> -    response = qmp("");
-> -    g_assert(response);
-> -    g_assert(qdict_haskey(response, "event"));
-> -    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
-> -    QDECREF(response);
-> +    qtest_hot_unplug_device("usbdev0");
->  }
->  
->  int main(int argc, char **argv)
-> diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
-> index 031764d..ae89362 100644
-> --- a/tests/usb-hcd-xhci-test.c
-> +++ b/tests/usb-hcd-xhci-test.c
-> @@ -11,7 +11,6 @@
->  #include "libqtest.h"
->  #include "libqos/usb.h"
->  
-> -
+Unfortunately, this doesn't fix migration when using KVM PR on baremetal.
+I get tons of instruction emulation errors in the console when the guest
+resumes execution at the destination:
 
-Nit: useless change
+[  833.585957] Couldn't emulate instruction 0x00000000 (op 0 xop 0)
+[  833.586818] kvmppc_exit_pr_progint: emulation at 60000000600e5bfc failed
+ (00000000)
+[  833.674684] Couldn't emulate instruction 0x00000000 (op 0 xop 0)
+[  833.675370] kvmppc_exit_pr_progint: emulation at 60000000600e5bfc failed
+ (00000000)
+[  833.676297] Couldn't emulate instruction 0x00000000 (op 0 xop 0)
 
-Other than these, it looks quite good to me.  Thanks,
+I still don't know what's happening here but I guess this is an issue in
+KVM.
 
->  static void test_xhci_init(void)
->  {
->  }
-> @@ -23,59 +22,16 @@ static void test_xhci_hotplug(void)
->  
->  static void test_usb_uas_hotplug(void)
->  {
-> -    QDict *response;
-> -
-> -    response = qmp("{'execute': 'device_add',"
-> -                   " 'arguments': {"
-> -                   "   'driver': 'usb-uas',"
-> -                   "   'id': 'uas'"
-> -                   "}}");
-> -    g_assert(response);
-> -    g_assert(!qdict_haskey(response, "error"));
-> -    QDECREF(response);
-> -
-> -    response = qmp("{'execute': 'device_add',"
-> -                   " 'arguments': {"
-> -                   "   'driver': 'scsi-hd',"
-> -                   "   'drive': 'drive0',"
-> -                   "   'id': 'scsi-hd'"
-> -                   "}}");
-> -    g_assert(response);
-> -    g_assert(!qdict_haskey(response, "error"));
-> -    QDECREF(response);
-> +    qtest_hot_plug_device("usb-uas", "uas", NULL);
-> +    qtest_hot_plug_device("scsi-hd", "scsihd", "'drive': 'drive0'");
->  
->      /* TODO:
->          UAS HBA driver in libqos, to check that
->          added disk is visible after BUS rescan
->      */
->  
-> -    response = qmp("{'execute': 'device_del',"
-> -                           " 'arguments': {"
-> -                           "   'id': 'scsi-hd'"
-> -                           "}}");
-> -    g_assert(response);
-> -    g_assert(!qdict_haskey(response, "error"));
-> -    QDECREF(response);
-> -
-> -    response = qmp("");
-> -    g_assert(qdict_haskey(response, "event"));
-> -    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
-> -    QDECREF(response);
-> -
-> -
-> -    response = qmp("{'execute': 'device_del',"
-> -                           " 'arguments': {"
-> -                           "   'id': 'uas'"
-> -                           "}}");
-> -    g_assert(response);
-> -    g_assert(!qdict_haskey(response, "error"));
-> -    QDECREF(response);
-> -
-> -    response = qmp("");
-> -    g_assert(response);
-> -    g_assert(qdict_haskey(response, "event"));
-> -    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
-> -    QDECREF(response);
-> +    qtest_hot_unplug_device("scsihd");
-> +    qtest_hot_unplug_device("uas");
->  }
->  
->  int main(int argc, char **argv)
-> diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
-> index 87a3b6e..6e7ba6f 100644
-> --- a/tests/virtio-scsi-test.c
-> +++ b/tests/virtio-scsi-test.c
-> @@ -192,32 +192,12 @@ static void pci_nop(void)
->  
->  static void hotplug(void)
->  {
-> -    QDict *response;
->      QOSState *qs;
->  
->      qs = qvirtio_scsi_start(
->              "-drive id=drv1,if=none,file=null-co://,format=raw");
-> -    response = qmp("{\"execute\": \"device_add\","
-> -                   " \"arguments\": {"
-> -                   "   \"driver\": \"scsi-hd\","
-> -                   "   \"id\": \"scsi-hd\","
-> -                   "   \"drive\": \"drv1\""
-> -                   "}}");
-> -
-> -    g_assert(response);
-> -    g_assert(!qdict_haskey(response, "error"));
-> -    QDECREF(response);
-> -
-> -    response = qmp("{\"execute\": \"device_del\","
-> -                   " \"arguments\": {"
-> -                   "   \"id\": \"scsi-hd\""
-> -                   "}}");
-> -
-> -    g_assert(response);
-> -    g_assert(!qdict_haskey(response, "error"));
-> -    g_assert(qdict_haskey(response, "event"));
-> -    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
-> -    QDECREF(response);
-> +    qtest_hot_plug_device("scsi-hd", "scsihd", "'drive': 'drv1'");
-> +    qtest_hot_unplug_device("scsihd");
->      qvirtio_scsi_stop(qs);
->  }
->  
-> diff --git a/tests/virtio-serial-test.c b/tests/virtio-serial-test.c
-> index b14d943..97f8f52 100644
-> --- a/tests/virtio-serial-test.c
-> +++ b/tests/virtio-serial-test.c
-> @@ -17,28 +17,9 @@ static void pci_nop(void)
->  
->  static void hotplug(void)
->  {
-> -    QDict *response;
-> -
-> -    response = qmp("{\"execute\": \"device_add\","
-> -                   " \"arguments\": {"
-> -                   "   \"driver\": \"virtserialport\","
-> -                   "   \"id\": \"hp-port\""
-> -                   "}}");
-> -
-> -    g_assert(response);
-> -    g_assert(!qdict_haskey(response, "error"));
-> -    QDECREF(response);
-> -
-> -    response = qmp("{\"execute\": \"device_del\","
-> -                   " \"arguments\": {"
-> -                   "   \"id\": \"hp-port\""
-> -                   "}}");
-> -
-> -    g_assert(response);
-> -    g_assert(!qdict_haskey(response, "error"));
-> -    g_assert(qdict_haskey(response, "event"));
-> -    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
-> -    QDECREF(response);
-> +    qtest_hot_plug_device("virtserialport", "hp-port", NULL);
-> +
-> +    qtest_hot_unplug_device("hp-port");
->  }
->  
->  int main(int argc, char **argv)
-> -- 
-> 1.8.3.1
-> 
-> 
+ hw/ppc/spapr.c          |   13 +++++++++++++
+ hw/ppc/spapr_cpu_core.c |   15 ---------------
+ hw/ppc/spapr_hcall.c    |   14 --------------
+ target/ppc/cpu.h        |    2 ++
+ target/ppc/kvm.c        |   30 +++++-------------------------
+ target/ppc/kvm_ppc.h    |    6 ------
+ 6 files changed, 20 insertions(+), 60 deletions(-)
 
--- 
-Peter Xu
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f680f28a15ea..7e7ae585a1b6 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -1239,6 +1239,18 @@ static hwaddr spapr_hpt_mask(PPCVirtualHypervisor *vhyp)
+     return HTAB_SIZE(spapr) / HASH_PTEG_SIZE_64 - 1;
+ }
+ 
++static void spapr_encode_hpt_for_kvm_pr(PPCVirtualHypervisor *vhyp,
++                                        target_ulong *hpt)
++{
++    sPAPRMachineState *spapr = SPAPR_MACHINE(vhyp);
++
++    assert(kvm_enabled());
++
++    if (spapr->htab) {
++        *hpt = (target_ulong)(uintptr_t)spapr->htab | (spapr->htab_shift - 18);
++    }
++}
++
+ static const ppc_hash_pte64_t *spapr_map_hptes(PPCVirtualHypervisor *vhyp,
+                                                 hwaddr ptex, int n)
+ {
+@@ -3603,6 +3615,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     vhc->unmap_hptes = spapr_unmap_hptes;
+     vhc->store_hpte = spapr_store_hpte;
+     vhc->get_patbe = spapr_get_patbe;
++    vhc->encode_hpt_for_kvm_pr = spapr_encode_hpt_for_kvm_pr;
+     xic->ics_get = spapr_ics_get;
+     xic->ics_resend = spapr_ics_resend;
+     xic->icp_get = spapr_icp_get;
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index c08ee7571a50..c20b5c64b045 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -73,7 +73,6 @@ void spapr_cpu_parse_features(sPAPRMachineState *spapr)
+ 
+ static void spapr_cpu_reset(void *opaque)
+ {
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     PowerPCCPU *cpu = opaque;
+     CPUState *cs = CPU(cpu);
+     CPUPPCState *env = &cpu->env;
+@@ -86,20 +85,6 @@ static void spapr_cpu_reset(void *opaque)
+     cs->halted = 1;
+ 
+     env->spr[SPR_HIOR] = 0;
+-
+-    /*
+-     * This is a hack for the benefit of KVM PR - it abuses the SDR1
+-     * slot in kvm_sregs to communicate the userspace address of the
+-     * HPT
+-     */
+-    if (kvm_enabled()) {
+-        env->spr[SPR_SDR1] = (target_ulong)(uintptr_t)spapr->htab
+-            | (spapr->htab_shift - 18);
+-        if (kvmppc_put_books_sregs(cpu) < 0) {
+-            error_report("Unable to update SDR1 in KVM");
+-            exit(1);
+-        }
+-    }
+ }
+ 
+ static void spapr_cpu_destroy(PowerPCCPU *cpu)
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 57bb411394ed..840abff0e371 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -732,14 +732,6 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
+         qemu_vfree(spapr->htab);
+         spapr->htab = pending->hpt;
+         spapr->htab_shift = pending->shift;
+-
+-        if (kvm_enabled()) {
+-            /* For KVM PR, update the HPT pointer */
+-            target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
+-                | (spapr->htab_shift - 18);
+-            kvmppc_update_sdr1(sdr1);
+-        }
+-
+         pending->hpt = NULL; /* so it's not free()d */
+     }
+ 
+@@ -1564,12 +1556,6 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+              * the point this is called, nothing should have been
+              * entered into the existing HPT */
+             spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
+-            if (kvm_enabled()) {
+-                /* For KVM PR, update the HPT pointer */
+-                target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
+-                    | (spapr->htab_shift - 18);
+-                kvmppc_update_sdr1(sdr1);
+-            }
+         }
+     }
+ 
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index c9d3ffa89bcb..12e0b6e74876 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1243,6 +1243,8 @@ struct PPCVirtualHypervisorClass {
+     void (*store_hpte)(PPCVirtualHypervisor *vhyp, hwaddr ptex,
+                        uint64_t pte0, uint64_t pte1);
+     uint64_t (*get_patbe)(PPCVirtualHypervisor *vhyp);
++    void (*encode_hpt_for_kvm_pr)(PPCVirtualHypervisor *vhyp,
++                                  target_ulong *hpt);
+ };
+ 
+ #define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 6442dfcb95b3..8edc05fc6a83 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -941,7 +941,11 @@ int kvmppc_put_books_sregs(PowerPCCPU *cpu)
+ 
+     sregs.pvr = env->spr[SPR_PVR];
+ 
+-    sregs.u.s.sdr1 = env->spr[SPR_SDR1];
++    if (cpu->vhyp) {
++        PPCVirtualHypervisorClass *vhc =
++            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
++        vhc->encode_hpt_for_kvm_pr(cpu->vhyp, &sregs.u.s.sdr1);
++    }
+ 
+     /* Sync SLB */
+ #ifdef TARGET_PPC64
+@@ -2806,30 +2810,6 @@ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift)
+     return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_COMMIT, &rhpt);
+ }
+ 
+-static void kvmppc_pivot_hpt_cpu(CPUState *cs, run_on_cpu_data arg)
+-{
+-    target_ulong sdr1 = arg.target_ptr;
+-    PowerPCCPU *cpu = POWERPC_CPU(cs);
+-    CPUPPCState *env = &cpu->env;
+-
+-    /* This is just for the benefit of PR KVM */
+-    cpu_synchronize_state(cs);
+-    env->spr[SPR_SDR1] = sdr1;
+-    if (kvmppc_put_books_sregs(cpu) < 0) {
+-        error_report("Unable to update SDR1 in KVM");
+-        exit(1);
+-    }
+-}
+-
+-void kvmppc_update_sdr1(target_ulong sdr1)
+-{
+-    CPUState *cs;
+-
+-    CPU_FOREACH(cs) {
+-        run_on_cpu(cs, kvmppc_pivot_hpt_cpu, RUN_ON_CPU_TARGET_PTR(sdr1));
+-    }
+-}
+-
+ /*
+  * This is a helper function to detect a post migration scenario
+  * in which a guest, running as KVM-HV, freezes in cpu_post_load because
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index f780e6ec7b72..21571edd7910 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -68,7 +68,6 @@ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+ void kvmppc_check_papr_resize_hpt(Error **errp);
+ int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
+ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
+-void kvmppc_update_sdr1(target_ulong sdr1);
+ bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
+ 
+ bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
+@@ -331,11 +330,6 @@ static inline int kvmppc_resize_hpt_commit(PowerPCCPU *cpu,
+     return -ENOSYS;
+ }
+ 
+-static inline void kvmppc_update_sdr1(target_ulong sdr1)
+-{
+-    abort();
+-}
+-
+ #endif
+ 
+ #ifndef CONFIG_KVM
