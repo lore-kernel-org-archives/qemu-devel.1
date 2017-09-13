@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36893)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dsCGw-0008LA-G5
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:20:27 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dsCH7-0008VD-87
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:20:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dsCGv-0005FA-7y
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:20:26 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dsCH5-0005Ma-EV
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:20:37 -0400
 From: Max Reitz <mreitz@redhat.com>
-Date: Wed, 13 Sep 2017 20:18:58 +0200
-Message-Id: <20170913181910.29688-7-mreitz@redhat.com>
+Date: Wed, 13 Sep 2017 20:18:59 +0200
+Message-Id: <20170913181910.29688-8-mreitz@redhat.com>
 In-Reply-To: <20170913181910.29688-1-mreitz@redhat.com>
 References: <20170913181910.29688-1-mreitz@redhat.com>
-Subject: [Qemu-devel] [PATCH 06/18] block/mirror: Use CoQueue to wait on
- in-flight ops
+Subject: [Qemu-devel] [PATCH 07/18] block/mirror: Wait for in-flight op
+ conflicts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,134 +23,191 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-Attach a CoQueue to each in-flight operation so if we need to wait for
-any we can use it to wait instead of just blindly yielding and hoping
-for some operation to wake us.
-
-A later patch will use this infrastructure to allow requests accessing
-the same area of the virtual disk to specifically wait for each other.
+This patch makes the mirror code differentiate between simply waiting
+for any operation to complete (mirror_wait_for_free_in_flight_slot())
+and specifically waiting for all operations touching a certain range of
+the virtual disk to complete (mirror_wait_on_conflicts()).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/mirror.c | 34 +++++++++++++++++++++++-----------
- 1 file changed, 23 insertions(+), 11 deletions(-)
+ block/mirror.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 70 insertions(+), 15 deletions(-)
 
 diff --git a/block/mirror.c b/block/mirror.c
-index 2b3297aa61..81253fbad1 100644
+index 81253fbad1..2ece38094d 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -13,6 +13,7 @@
- 
+@@ -14,6 +14,7 @@
  #include "qemu/osdep.h"
  #include "qemu/cutils.h"
-+#include "qemu/coroutine.h"
+ #include "qemu/coroutine.h"
++#include "qemu/range.h"
  #include "trace.h"
  #include "block/blockjob_int.h"
  #include "block/block_int.h"
-@@ -34,6 +35,8 @@ typedef struct MirrorBuffer {
-     QSIMPLEQ_ENTRY(MirrorBuffer) next;
- } MirrorBuffer;
- 
-+typedef struct MirrorOp MirrorOp;
-+
- typedef struct MirrorBlockJob {
-     BlockJob common;
-     RateLimit limit;
-@@ -67,15 +70,15 @@ typedef struct MirrorBlockJob {
-     unsigned long *in_flight_bitmap;
-     int in_flight;
-     int64_t bytes_in_flight;
-+    QTAILQ_HEAD(MirrorOpList, MirrorOp) ops_in_flight;
-     int ret;
-     bool unmap;
--    bool waiting_for_io;
-     int target_cluster_size;
-     int max_iov;
-     bool initial_zeroing_ongoing;
- } MirrorBlockJob;
- 
--typedef struct MirrorOp {
-+struct MirrorOp {
-     MirrorBlockJob *s;
-     QEMUIOVector qiov;
-     int64_t offset;
-@@ -83,7 +86,11 @@ typedef struct MirrorOp {
- 
-     /* Set by mirror_co_read() before yielding for the first time */
-     uint64_t bytes_copied;
--} MirrorOp;
-+
-+    CoQueue waiting_requests;
-+
-+    QTAILQ_ENTRY(MirrorOp) next;
-+};
- 
- typedef enum MirrorMethod {
-     MIRROR_METHOD_COPY,
-@@ -124,7 +131,9 @@ static void coroutine_fn mirror_iteration_done(MirrorOp *op, int ret)
- 
-     chunk_num = op->offset / s->granularity;
-     nb_chunks = DIV_ROUND_UP(op->bytes, s->granularity);
-+
-     bitmap_clear(s->in_flight_bitmap, chunk_num, nb_chunks);
-+    QTAILQ_REMOVE(&s->ops_in_flight, op, next);
-     if (ret >= 0) {
-         if (s->cow_bitmap) {
-             bitmap_set(s->cow_bitmap, chunk_num, nb_chunks);
-@@ -134,11 +143,9 @@ static void coroutine_fn mirror_iteration_done(MirrorOp *op, int ret)
-         }
+@@ -111,6 +112,41 @@ static BlockErrorAction mirror_error_action(MirrorBlockJob *s, bool read,
      }
-     qemu_iovec_destroy(&op->qiov);
--    g_free(op);
- 
--    if (s->waiting_for_io) {
--        qemu_coroutine_enter(s->common.co);
--    }
-+    qemu_co_queue_restart_all(&op->waiting_requests);
-+    g_free(op);
  }
  
- static void coroutine_fn mirror_write_complete(MirrorOp *op, int ret)
-@@ -233,10 +240,11 @@ static int mirror_cow_align(MirrorBlockJob *s, int64_t *offset,
- 
- static inline void mirror_wait_for_io(MirrorBlockJob *s)
++static void coroutine_fn mirror_wait_on_conflicts(MirrorOp *self,
++                                                  MirrorBlockJob *s,
++                                                  uint64_t offset,
++                                                  uint64_t bytes)
++{
++    uint64_t self_start_chunk = offset / s->granularity;
++    uint64_t self_end_chunk = DIV_ROUND_UP(offset + bytes, s->granularity);
++    uint64_t self_nb_chunks = self_end_chunk - self_start_chunk;
++
++    while (find_next_bit(s->in_flight_bitmap, self_end_chunk,
++                         self_start_chunk) < self_end_chunk &&
++           s->ret >= 0)
++    {
++        MirrorOp *op;
++
++        QTAILQ_FOREACH(op, &s->ops_in_flight, next) {
++            uint64_t op_start_chunk = op->offset / s->granularity;
++            uint64_t op_nb_chunks = DIV_ROUND_UP(op->offset + op->bytes,
++                                                 s->granularity) -
++                                    op_start_chunk;
++
++            if (op == self) {
++                continue;
++            }
++
++            if (ranges_overlap(self_start_chunk, self_nb_chunks,
++                               op_start_chunk, op_nb_chunks))
++            {
++                qemu_co_queue_wait(&op->waiting_requests, NULL);
++                break;
++            }
++        }
++    }
++}
++
+ static void coroutine_fn mirror_iteration_done(MirrorOp *op, int ret)
  {
--    assert(!s->waiting_for_io);
--    s->waiting_for_io = true;
--    qemu_coroutine_yield();
--    s->waiting_for_io = false;
-+    MirrorOp *op;
-+
-+    op = QTAILQ_FIRST(&s->ops_in_flight);
-+    assert(op);
-+    qemu_co_queue_wait(&op->waiting_requests, NULL);
+     MirrorBlockJob *s = op->s;
+@@ -238,7 +274,7 @@ static int mirror_cow_align(MirrorBlockJob *s, int64_t *offset,
+     return ret;
  }
  
- /* Submit async read while handling COW.
-@@ -342,6 +350,7 @@ static unsigned mirror_perform(MirrorBlockJob *s, int64_t offset,
-         .offset = offset,
-         .bytes  = bytes,
-     };
-+    qemu_co_queue_init(&op->waiting_requests);
+-static inline void mirror_wait_for_io(MirrorBlockJob *s)
++static inline void mirror_wait_for_free_in_flight_slot(MirrorBlockJob *s)
+ {
+     MirrorOp *op;
  
-     switch (mirror_method) {
-     case MIRROR_METHOD_COPY:
-@@ -357,6 +366,7 @@ static unsigned mirror_perform(MirrorBlockJob *s, int64_t offset,
-         abort();
+@@ -287,7 +323,7 @@ static void coroutine_fn mirror_co_read(void *opaque)
+ 
+     while (s->buf_free_count < nb_chunks) {
+         trace_mirror_yield_in_flight(s, op->offset, s->in_flight);
+-        mirror_wait_for_io(s);
++        mirror_wait_for_free_in_flight_slot(s);
      }
  
-+    QTAILQ_INSERT_TAIL(&s->ops_in_flight, op, next);
-     qemu_coroutine_enter(co);
+     /* Now make a QEMUIOVector taking enough granularity-sized chunks
+@@ -381,8 +417,9 @@ static unsigned mirror_perform(MirrorBlockJob *s, int64_t offset,
+ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+ {
+     BlockDriverState *source = s->source;
+-    int64_t offset, first_chunk;
+-    uint64_t delay_ns = 0;
++    MirrorOp *pseudo_op;
++    int64_t offset;
++    uint64_t delay_ns = 0, ret = 0;
+     /* At least the first dirty chunk is mirrored in one iteration. */
+     int nb_chunks = 1;
+     int sectors_per_chunk = s->granularity >> BDRV_SECTOR_BITS;
+@@ -400,11 +437,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+     }
+     bdrv_dirty_bitmap_unlock(s->dirty_bitmap);
  
-     if (mirror_method == MIRROR_METHOD_COPY) {
-@@ -1292,6 +1302,8 @@ static void mirror_start_job(const char *job_id, BlockDriverState *bs,
+-    first_chunk = offset / s->granularity;
+-    while (test_bit(first_chunk, s->in_flight_bitmap)) {
+-        trace_mirror_yield_in_flight(s, offset, s->in_flight);
+-        mirror_wait_for_io(s);
+-    }
++    mirror_wait_on_conflicts(NULL, s, offset, 1);
+ 
+     block_job_pause_point(&s->common);
+ 
+@@ -442,6 +475,20 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+                                    nb_chunks * sectors_per_chunk);
+     bdrv_dirty_bitmap_unlock(s->dirty_bitmap);
+ 
++    /* Before claiming an area in the in-flight bitmap, we have to
++     * create a MirrorOp for it so that conflicting requests can wait
++     * for it.  mirror_perform() will create the real MirrorOps later,
++     * for now we just create a pseudo operation that will wake up all
++     * conflicting requests once all real operations have been
++     * launched. */
++    pseudo_op = g_new(MirrorOp, 1);
++    *pseudo_op = (MirrorOp){
++        .offset = offset,
++        .bytes  = nb_chunks * s->granularity,
++    };
++    qemu_co_queue_init(&pseudo_op->waiting_requests);
++    QTAILQ_INSERT_TAIL(&s->ops_in_flight, pseudo_op, next);
++
+     bitmap_set(s->in_flight_bitmap, offset / s->granularity, nb_chunks);
+     while (nb_chunks > 0 && offset < s->bdev_length) {
+         int64_t ret;
+@@ -481,11 +528,12 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+ 
+         while (s->in_flight >= MAX_IN_FLIGHT) {
+             trace_mirror_yield_in_flight(s, offset, s->in_flight);
+-            mirror_wait_for_io(s);
++            mirror_wait_for_free_in_flight_slot(s);
+         }
+ 
+         if (s->ret < 0) {
+-            return 0;
++            ret = 0;
++            goto fail;
+         }
+ 
+         io_bytes = mirror_clip_bytes(s, offset, io_bytes);
+@@ -502,7 +550,14 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+             delay_ns = ratelimit_calculate_delay(&s->limit, io_bytes_acct);
          }
      }
- 
-+    QTAILQ_INIT(&s->ops_in_flight);
+-    return delay_ns;
 +
-     trace_mirror_start(bs, s, opaque);
-     block_job_start(&s->common);
-     return;
++    ret = delay_ns;
++fail:
++    QTAILQ_REMOVE(&s->ops_in_flight, pseudo_op, next);
++    qemu_co_queue_restart_all(&pseudo_op->waiting_requests);
++    g_free(pseudo_op);
++
++    return ret;
+ }
+ 
+ static void mirror_free_init(MirrorBlockJob *s)
+@@ -529,7 +584,7 @@ static void mirror_free_init(MirrorBlockJob *s)
+ static void mirror_wait_for_all_io(MirrorBlockJob *s)
+ {
+     while (s->in_flight > 0) {
+-        mirror_wait_for_io(s);
++        mirror_wait_for_free_in_flight_slot(s);
+     }
+ }
+ 
+@@ -685,7 +740,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+             if (s->in_flight >= MAX_IN_FLIGHT) {
+                 trace_mirror_yield(s, UINT64_MAX, s->buf_free_count,
+                                    s->in_flight);
+-                mirror_wait_for_io(s);
++                mirror_wait_for_free_in_flight_slot(s);
+                 continue;
+             }
+ 
+@@ -868,7 +923,7 @@ static void coroutine_fn mirror_run(void *opaque)
+                 (cnt == 0 && s->in_flight > 0)) {
+                 trace_mirror_yield(s, cnt * BDRV_SECTOR_SIZE,
+                                    s->buf_free_count, s->in_flight);
+-                mirror_wait_for_io(s);
++                mirror_wait_for_free_in_flight_slot(s);
+                 continue;
+             } else if (cnt != 0) {
+                 delay_ns = mirror_iteration(s);
 -- 
 2.13.5
