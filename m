@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57483)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ds8Kv-0004hA-V6
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:08:22 -0400
+	(envelope-from <jan.dakinevich@gmail.com>) id 1ds8Ru-0002sa-ST
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:15:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1ds8Kr-0004O4-VV
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:08:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59216)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1ds8Kr-0004NC-Pk
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:08:13 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 77BDCC04B924
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 14:08:11 +0000 (UTC)
-Date: Wed, 13 Sep 2017 10:08:10 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <752107234.14989591.1505311690362.JavaMail.zimbra@redhat.com>
-In-Reply-To: <60e9ce8a-9473-cf55-5429-f70902bc59c2@redhat.com>
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-2-marcandre.lureau@redhat.com>
-	<60e9ce8a-9473-cf55-5429-f70902bc59c2@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 01/50] qlit: add qobject_from_qlit()
+	(envelope-from <jan.dakinevich@gmail.com>) id 1ds8Ro-0000NU-Ri
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:15:30 -0400
+Received: from mail-lf0-x243.google.com ([2a00:1450:4010:c07::243]:37748)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jan.dakinevich@gmail.com>)
+	id 1ds8Ro-0000MI-KO
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 10:15:24 -0400
+Received: by mail-lf0-x243.google.com with SMTP id q132so180538lfe.4
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:15:23 -0700 (PDT)
+From: Jan Dakinevich <jan.dakinevich@gmail.com>
+Date: Wed, 13 Sep 2017 17:16:43 +0300
+Message-Id: <1505312203-6319-1-git-send-email-jan.dakinevich@gmail.com>
+Subject: [Qemu-devel] [PATCH] virtio-9p: don't break device on marshaling
+ fail
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,68 +25,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, armbru@redhat.com
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Jan Dakinevich <jan.dakinevich@gmail.com>
 
+Fix regression from commit 8d37de41cab145cbba250a8f1f1372b0a5cdf26f.
 
+The situation when pdu_marshal returns an error should be considered
+valid. At least `v9fs_do_readdir_with_stat' relies on that to place in
+responce buffer as much data as can fit.
 
------ Original Message -----
-> On 09/11/2017 06:05 AM, Marc-Andr=C3=A9 Lureau wrote:
-> > Instanciate a QObject* form a literal QLitObject.
->=20
-> s/Instanciate/Instantiate/
-> s/form/from/
+Signed-off-by: Jan Dakinevich <jan.dakinevich@gmail.com>
+---
+ hw/9pfs/virtio-9p-device.c | 19 ++-----------------
+ 1 file changed, 2 insertions(+), 17 deletions(-)
 
-thanks
-
->=20
-> >=20
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
-> >  include/qapi/qmp/qlit.h |  2 ++
-> >  qobject/qlit.c          | 36 ++++++++++++++++++++++++++++++++++++
-> >  tests/check-qlit.c      | 26 ++++++++++++++++++++++++++
-> >  3 files changed, 64 insertions(+)
->=20
-> > +QObject *qobject_from_qlit(const QLitObject *qlit)
-> > +{
-> > +    switch (qlit->type) {
-> > +    case QTYPE_QNULL:
-> > +        return QOBJECT(qnull());
-> > +    case QTYPE_QNUM:
-> > +        return QOBJECT(qnum_from_int(qlit->value.qnum));
->=20
-> Is this going to work for all QNum values?
->=20
-> > +++ b/tests/check-qlit.c
-> > @@ -64,11 +64,37 @@ static void qlit_equal_qobject_test(void)
-> >      qobject_decref(qobj);
-> >  }
-> > =20
-> > +static void qobject_from_qlit_test(void)
-> > +{
-> > +    QObject *obj, *qobj =3D qobject_from_qlit(&qlit);
-> > +    QDict *qdict;
-> > +    QList *bee;
-> > +
-> > +    qdict =3D qobject_to_qdict(qobj);
-> > +    g_assert_cmpint(qdict_get_int(qdict, "foo"), =3D=3D, 42);
-> > +    g_assert_cmpstr(qdict_get_str(qdict, "bar"), =3D=3D, "hello world"=
-);
-> > +    g_assert(qobject_type(qdict_get(qdict, "baz")) =3D=3D QTYPE_QNULL)=
-;
->=20
-> Related to my question above - you pass because there are no floating
-> point values in qlit.  Is that something we want supported?
-
-Markus had some remarks about it when reviewing #define QLIT_QNUM. Only i64=
- are supported at this point, so it's left for whoever requires it in the f=
-uture.
-
->=20
-> --
-> Eric Blake, Principal Software Engineer
-> Red Hat, Inc.           +1-919-301-3266
-> Virtualization:  qemu.org | libvirt.org
->=20
->=20
+diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+index 62650b0..c3e5935 100644
+--- a/hw/9pfs/virtio-9p-device.c
++++ b/hw/9pfs/virtio-9p-device.c
+@@ -146,16 +146,8 @@ static ssize_t virtio_pdu_vmarshal(V9fsPDU *pdu, size_t offset,
+     V9fsState *s = pdu->s;
+     V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
+     VirtQueueElement *elem = v->elems[pdu->idx];
+-    ssize_t ret;
+ 
+-    ret = v9fs_iov_vmarshal(elem->in_sg, elem->in_num, offset, 1, fmt, ap);
+-    if (ret < 0) {
+-        VirtIODevice *vdev = VIRTIO_DEVICE(v);
+-
+-        virtio_error(vdev, "Failed to encode VirtFS reply type %d",
+-                     pdu->id + 1);
+-    }
+-    return ret;
++    return v9fs_iov_vmarshal(elem->in_sg, elem->in_num, offset, 1, fmt, ap);
+ }
+ 
+ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, size_t offset,
+@@ -164,15 +156,8 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, size_t offset,
+     V9fsState *s = pdu->s;
+     V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
+     VirtQueueElement *elem = v->elems[pdu->idx];
+-    ssize_t ret;
+ 
+-    ret = v9fs_iov_vunmarshal(elem->out_sg, elem->out_num, offset, 1, fmt, ap);
+-    if (ret < 0) {
+-        VirtIODevice *vdev = VIRTIO_DEVICE(v);
+-
+-        virtio_error(vdev, "Failed to decode VirtFS request type %d", pdu->id);
+-    }
+-    return ret;
++    return v9fs_iov_vunmarshal(elem->out_sg, elem->out_num, offset, 1, fmt, ap);
+ }
+ 
+ static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
+-- 
+2.1.4
