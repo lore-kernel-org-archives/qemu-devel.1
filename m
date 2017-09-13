@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45694)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1drxxR-0005qO-0e
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 23:03:23 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dry9F-0006Vo-Ug
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 23:15:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1drxxQ-0001Fy-4o
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 23:03:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46158)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1drxxP-0001FW-V2
-	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 23:03:20 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Wed, 13 Sep 2017 11:01:19 +0800
-Message-Id: <20170913030119.3957-14-famz@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1dry9B-0001Sl-NA
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 23:15:33 -0400
+Resent-Message-Id: <E1dry9B-0001Sl-NA@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21449)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dry9B-0001SA-Eh
+	for qemu-devel@nongnu.org; Tue, 12 Sep 2017 23:15:29 -0400
 In-Reply-To: <20170913030119.3957-1-famz@redhat.com>
-References: <20170913030119.3957-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v7 13/13] docker: Use archive-source.py
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150527250819.321.3518047184213665168@6d89bd104fc3>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 12 Sep 2017 20:15:08 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v7 00/13] tests: Add VM based build tests
+ (for non-x86_64 and/or non-Linux)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,64 +29,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: famz@redhat.com
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, crosa@redhat.com, f4bug@amsat.org, kamil@netbsd.org, stefanha@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/docker/Makefile.include | 15 ++-------------
- tests/docker/run              |  8 +-------
- 2 files changed, 3 insertions(+), 20 deletions(-)
-
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index aaab1a4208..7a027d5bd6 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -17,24 +17,13 @@ DOCKER_TOOLS := travis
- TESTS ?= %
- IMAGES ?= %
- 
--# Make archive from git repo $1 to tar.gz $2
--make-archive-maybe = $(if $(wildcard $1/*), \
--	$(call quiet-command, \
--		(cd $1; if git diff-index --quiet HEAD -- &>/dev/null; then \
--			git archive -1 HEAD --format=tar.gz; \
--		else \
--			git archive -1 $$(git stash create) --format=tar.gz; \
--		fi) > $2, \
--		"ARCHIVE","$(notdir $2)"))
--
- CUR_TIME := $(shell date +%Y-%m-%d-%H.%M.%S.$$$$)
- DOCKER_SRC_COPY := docker-src.$(CUR_TIME)
- 
- $(DOCKER_SRC_COPY):
- 	@mkdir $@
--	$(call make-archive-maybe, $(SRC_PATH), $@/qemu.tgz)
--	$(call make-archive-maybe, $(SRC_PATH)/dtc, $@/dtc.tgz)
--	$(call make-archive-maybe, $(SRC_PATH)/pixman, $@/pixman.tgz)
-+	$(call quiet-command, $(SRC_PATH)/scripts/archive-source.sh $@/qemu.tar, \
-+		"GEN", "$@/qemu.tar")
- 	$(call quiet-command, cp $(SRC_PATH)/tests/docker/run $@/run, \
- 		"COPY","RUNNER")
- 
-diff --git a/tests/docker/run b/tests/docker/run
-index c1e4513bce..9eb9165f76 100755
---- a/tests/docker/run
-+++ b/tests/docker/run
-@@ -32,13 +32,7 @@ export TEST_DIR=/tmp/qemu-test
- mkdir -p $TEST_DIR/{src,build,install}
- 
- # Extract the source tarballs
--tar -C $TEST_DIR/src -xzf $BASE/qemu.tgz
--for p in dtc pixman; do
--    if test -f $BASE/$p.tgz; then
--        tar -C $TEST_DIR/src/$p -xzf $BASE/$p.tgz
--        export FEATURES="$FEATURES $p"
--    fi
--done
-+tar -C $TEST_DIR/src -xf $BASE/qemu.tar
- 
- if test -n "$SHOW_ENV"; then
-     if test -f /packages.txt; then
--- 
-2.13.5
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2NyAwMC8xM10gdGVzdHM6IEFkZCBWTSBiYXNlZCBidWlsZCB0ZXN0cyAo
+Zm9yIG5vbi14ODZfNjQgYW5kL29yIG5vbi1MaW51eCkKTWVzc2FnZS1pZDogMjAxNzA5MTMwMzAx
+MTkuMzk1Ny0xLWZhbXpAcmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBC
+RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
+bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0
+cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
+bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
+biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
+aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
+YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
+aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
+NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXBy
+b2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzE1MDQ4MTIyNTEt
+MjM0MzgtMS1naXQtc2VuZC1lbWFpbC1zdW5kZWVwLmxrbWxAZ21haWwuY29tIC0+IHBhdGNoZXcv
+MTUwNDgxMjI1MS0yMzQzOC0xLWdpdC1zZW5kLWVtYWlsLXN1bmRlZXAubGttbEBnbWFpbC5jb20K
+IHQgW3RhZyB1cGRhdGVdICAgICAgICAgICAgcGF0Y2hldy8xNTA1MjMyODM0LTIwODkwLTEtZ2l0
+LXNlbmQtZW1haWwtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMTUwNTIzMjgz
+NC0yMDg5MC0xLWdpdC1zZW5kLWVtYWlsLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZwogKiBbbmV3
+IHRhZ10gICAgICAgICAgICAgICBwYXRjaGV3LzIwMTcwOTEzMDMwMTE5LjM5NTctMS1mYW16QHJl
+ZGhhdC5jb20gLT4gcGF0Y2hldy8yMDE3MDkxMzAzMDExOS4zOTU3LTEtZmFtekByZWRoYXQuY29t
+ClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMmEwOTNiNWI5MSBkb2NrZXI6IFVzZSBh
+cmNoaXZlLXNvdXJjZS5weQpkMjU5M2ZhMDljIHRlc3RzOiBBZGQgUkVBRE1FIGZvciB2bSB0ZXN0
+cwpmYjNhY2Q3OGRmIE1BSU5UQUlORVJTOiBBZGQgdGVzdHMvdm0gZW50cnkKOTBlZDEyMDAzNSBN
+YWtlZmlsZTogQWRkIHJ1bGVzIHRvIHJ1biB2bSB0ZXN0cwowY2U4ODgzMWEzIHRlc3RzOiBBZGQg
+T3BlbkJTRCBpbWFnZQpkNWYxMzNlY2YyIHRlc3RzOiBBZGQgTmV0QlNEIGltYWdlCmRhNzgwNzVl
+MjAgdGVzdHM6IEFkZCBGcmVlQlNEIGltYWdlCmQxZjRhM2E3NjggdGVzdHM6IEFkZCB1YnVudHUu
+aTM4NiBpbWFnZQplY2I4ZWExNGNhIHRlc3RzOiBBZGQgdm0gdGVzdCBsaWIKZmIxZWQ2OWVjYyB0
+ZXN0czogQWRkIGEgdGVzdCBrZXkgcGFpcgphYjYzZGQ5YjM4IHNjcmlwdHM6IEFkZCBhcmNoaXZl
+LXNvdXJjZS5zaAoxYzRiY2Y2Mzg5IHFlbXUucHk6IEFkZCAid2FpdCgpIiBtZXRob2QKNjM3NmY3
+ZDBiYiBnaXRpZ25vcmU6IElnbm9yZSB2bSB0ZXN0IGltYWdlcwoKPT09IE9VVFBVVCBCRUdJTiA9
+PT0KQ2hlY2tpbmcgUEFUQ0ggMS8xMzogZ2l0aWdub3JlOiBJZ25vcmUgdm0gdGVzdCBpbWFnZXMu
+Li4KQ2hlY2tpbmcgUEFUQ0ggMi8xMzogcWVtdS5weTogQWRkICJ3YWl0KCkiIG1ldGhvZC4uLgpD
+aGVja2luZyBQQVRDSCAzLzEzOiBzY3JpcHRzOiBBZGQgYXJjaGl2ZS1zb3VyY2Uuc2guLi4KQ2hl
+Y2tpbmcgUEFUQ0ggNC8xMzogdGVzdHM6IEFkZCBhIHRlc3Qga2V5IHBhaXIuLi4KQ2hlY2tpbmcg
+UEFUQ0ggNS8xMzogdGVzdHM6IEFkZCB2bSB0ZXN0IGxpYi4uLgpXQVJOSU5HOiBsaW5lIG92ZXIg
+ODAgY2hhcmFjdGVycwojNzE6IEZJTEU6IHRlc3RzL3ZtL2Jhc2V2bS5weTo0NjoKKyAgICAgICAg
+c2VsZi5fdG1wZGlyID0gdGVtcGZpbGUubWtkdGVtcChwcmVmaXg9InZtLXRlc3QtIiwgc3VmZml4
+PSIudG1wIiwgZGlyPSIuIikKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNjI6
+IEZJTEU6IHRlc3RzL3ZtL2Jhc2V2bS5weToxMzc6CisgICAgICAgIGxvZ2dpbmcuZGVidWcoIkNy
+ZWF0aW5nIGFyY2hpdmUgJXMgZm9yIHNyY19kaXIgZGlyOiAlcyIsIHRhcmZpbGUsIHNyY19kaXIp
+CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTY3OiBGSUxFOiB0ZXN0cy92bS9i
+YXNldm0ucHk6MTQyOgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICJmaWxlPSVzLGlmPW5v
+bmUsaWQ9JXMsY2FjaGU9d3JpdGViYWNrLGZvcm1hdD1yYXciICUgXAoKV0FSTklORzogbGluZSBv
+dmVyIDgwIGNoYXJhY3RlcnMKIzE3MDogRklMRTogdGVzdHMvdm0vYmFzZXZtLnB5OjE0NToKKyAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAidmlydGlvLWJsayxkcml2ZT0lcyxzZXJpYWw9JXMs
+Ym9vdGluZGV4PTEiICUgKG5hbWUsIG5hbWUpXQoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0
+ZXJzCiMyMjU6IEZJTEU6IHRlc3RzL3ZtL2Jhc2V2bS5weToyMDA6CisgICAgVk0gdGVzdCB1dGls
+aXR5LiAgRXhpdCBjb2RlczogMCA9IHN1Y2Nlc3MsIDEgPSBjb21tYW5kIGxpbmUgZXJyb3IsIDIg
+PSBlbnZpcm9ubWVudCBpbml0aWFsaXphdGlvbiBmYWlsZWQsIDMgPSB0ZXN0IGNvbW1hbmQgZmFp
+bGVkIiIiKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIzMjogRklMRTogdGVz
+dHMvdm0vYmFzZXZtLnB5OjIwNzoKKyAgICBwYXJzZXIuYWRkX29wdGlvbigiLS1qb2JzIiwgdHlw
+ZT1pbnQsIGRlZmF1bHQ9bXVsdGlwcm9jZXNzaW5nLmNwdV9jb3VudCgpIC8gMiwKCnRvdGFsOiAx
+IGVycm9ycywgNSB3YXJuaW5ncywgMjU2IGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0
+eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
+ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
+QVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDYvMTM6IHRlc3RzOiBBZGQgdWJ1
+bnR1LmkzODYgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggNy8xMzogdGVzdHM6IEFkZCBGcmVlQlNE
+IGltYWdlLi4uCkNoZWNraW5nIFBBVENIIDgvMTM6IHRlc3RzOiBBZGQgTmV0QlNEIGltYWdlLi4u
+CkNoZWNraW5nIFBBVENIIDkvMTM6IHRlc3RzOiBBZGQgT3BlbkJTRCBpbWFnZS4uLgpDaGVja2lu
+ZyBQQVRDSCAxMC8xMzogTWFrZWZpbGU6IEFkZCBydWxlcyB0byBydW4gdm0gdGVzdHMuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTEvMTM6IE1BSU5UQUlORVJTOiBBZGQgdGVzdHMvdm0gZW50cnkuLi4KQ2hl
+Y2tpbmcgUEFUQ0ggMTIvMTM6IHRlc3RzOiBBZGQgUkVBRE1FIGZvciB2bSB0ZXN0cy4uLgpDaGVj
+a2luZyBQQVRDSCAxMy8xMzogZG9ja2VyOiBVc2UgYXJjaGl2ZS1zb3VyY2UucHkuLi4KPT09IE9V
+VFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKCi0tLQpFbWFp
+bCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0Y2hldy5vcmcv
+XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZyZWVsaXN0cy5v
+cmc=
