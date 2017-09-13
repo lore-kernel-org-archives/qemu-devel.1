@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49594)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57386)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ds04W-0000HE-0H
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 01:18:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ds0L7-0005k2-7W
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 01:35:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ds04S-0000Pc-Qb
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 01:18:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35336)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ds04S-0000JR-HQ
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 01:18:44 -0400
-Date: Wed, 13 Sep 2017 13:18:29 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170913051829.GC3617@pxdev.xzpeter.org>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-20-dgilbert@redhat.com>
-	<20170830052802.GB5920@pxdev.xzpeter.org>
-	<20170911115814.GC2150@work-vm>
+	(envelope-from <dgibson@ozlabs.org>) id 1ds0L3-0004IY-6z
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 01:35:57 -0400
+Date: Wed, 13 Sep 2017 14:40:24 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170913044024.GD7550@umbus.fritz.box>
+References: <150525508489.11068.5231444460720976552.stgit@bahia.lan>
+	<150525509384.11068.12660058285712851211.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="6WlEvdN9Dv0WHSBl"
 Content-Disposition: inline
-In-Reply-To: <20170911115814.GC2150@work-vm>
-Subject: Re: [Qemu-devel] [RFC v2 19/32] vhost+postcopy: Resolve client
- address
+In-Reply-To: <150525509384.11068.12660058285712851211.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] spapr: introduce common helper to
+ write HPT address to KVM PR
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,160 +25,235 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
 
-On Mon, Sep 11, 2017 at 12:58:15PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Thu, Aug 24, 2017 at 08:27:17PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > 
-> > > Resolve fault addresses read off the clients UFD into RAMBlock
-> > > and offset, and call back to the postcopy code to ask for the page.
-> > > 
-> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > ---
-> > >  hw/virtio/trace-events |  3 +++
-> > >  hw/virtio/vhost-user.c | 30 +++++++++++++++++++++++++++++-
-> > >  2 files changed, 32 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> > > index 5067dee19b..f7d4b831fe 100644
-> > > --- a/hw/virtio/trace-events
-> > > +++ b/hw/virtio/trace-events
-> > > @@ -1,6 +1,9 @@
-> > >  # See docs/devel/tracing.txt for syntax documentation.
-> > >  
-> > >  # hw/virtio/vhost-user.c
-> > > +vhost_user_postcopy_fault_handler(const char *name, uint64_t fault_address, int nregions) "%s: @0x%"PRIx64" nregions:%d"
-> > > +vhost_user_postcopy_fault_handler_loop(int i, uint64_t client_base, uint64_t size) "%d: client 0x%"PRIx64" +0x%"PRIx64
-> > > +vhost_user_postcopy_fault_handler_found(int i, uint64_t region_offset, uint64_t rb_offset) "%d: region_offset: 0x%"PRIx64" rb_offset:0x%"PRIx64
-> > >  vhost_user_postcopy_listen(void) ""
-> > >  vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply %d region %d"
-> > >  vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t memory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t offset) "%d:%s: size:0x%"PRIx64" GPA:0x%"PRIx64" QVA/userspace:0x%"PRIx64" RB offset:0x%"PRIx64
-> > > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> > > index fbe2743298..2897ff70b3 100644
-> > > --- a/hw/virtio/vhost-user.c
-> > > +++ b/hw/virtio/vhost-user.c
-> > > @@ -816,7 +816,35 @@ out:
-> > >  static int vhost_user_postcopy_fault_handler(struct PostCopyFD *pcfd,
-> > >                                               void *ufd)
-> > >  {
-> > > -    return 0;
-> > > +    struct vhost_dev *dev = pcfd->data;
-> > > +    struct vhost_user *u = dev->opaque;
-> > > +    struct uffd_msg *msg = ufd;
-> > > +    uint64_t faultaddr = msg->arg.pagefault.address;
-> > > +    RAMBlock *rb = NULL;
-> > > +    uint64_t rb_offset;
-> > > +    int i;
-> > > +
-> > > +    trace_vhost_user_postcopy_fault_handler(pcfd->idstr, faultaddr,
-> > > +                                            dev->mem->nregions);
-> > > +    for (i = 0; i < MIN(dev->mem->nregions, u->region_rb_len); i++) {
-> > 
-> > Should dev->mem->nregions always the same as u->region_rb_len?
-> 
-> u->region_rb_len only gets updated when vhost_user_set_mem_table is
-> called, so I think there are short periods of time when they don't
-> quite match.
-> (We do have to take some more care than we are at the moment during
-> updates, because this address resolution happens off the postcopy
-> thread)
 
-I see, so memory layout can change along the way...
+--6WlEvdN9Dv0WHSBl
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-But I still doubt whether this single MIN() can work.
+On Wed, Sep 13, 2017 at 12:24:53AM +0200, Greg Kurz wrote:
+> When running with KVM PR, if a new HPT is allocated we need to inform
+> KVM about the HPT address and size. This is currently done with a hack
+> which is open-coded in several places.
+>=20
+> This patch consolidate the code in a dedicated helper that records
+> the HPT address and size in the sPAPR context, and then does the
+> magic for KVM PR.
+>=20
+> Note that ppc_spapr_reset() now resets all devices and CPUs before
+> allocating the HPT. This allows to drop the hack from spapr_cpu_reset().
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-Say, we have these arrays already:
+I like this more than the previous spin, but while discussing stuff
+with SamB, I thought up a different approach, which I think will be
+both cleaner and simpler.
 
-- array A: dev->mem->regions[]
-- array B: u->region_rb[]
-- array C: u->postcopy_client_bases[]
+It basically doesn't make sense to put the userspace HPT pointer into
+env->spr[SDR1], we only do it to make kvmppc_put_books_sregs() do the
+right thing.
 
-These arrays should always be aligned with each other (index "i" of
-array "A/B/C" will always describe the same memory region).  But since
-we can change the memory layout dynamically during postcopy, then
-array A can grow/shrink/change in following path:
+Instead, we can have kvmppc_put_books_sregs() populate the "SDR1"
+field in kvm_sregs from a vhyp hook.  We already have the reverse side
+in that kvmppc_get_books_sregs() doesn't update the internal SDR1
+value if vhyp is set.
 
-  vhost_region_{add|delete}
-    updates array A              (1)
-  vhost_region_{add|delete}
-    updates array A              (2)
-  vhost_region_{add|delete}
-    updates array A              (3)
-  ...
-  vhost_commit
-    vhost_set_mem_table
-      align arrays B/C with A    (4)
+In any case the spapr hook would compute the correct value direct from
+spapr->htab.
 
-IMHO array A may not really match B/C during step (1)-(3), until step
-(4) to re-align them?  And if they are not aligned with each other, I
-guess a single MIN() won't help much? (Since the indexing below would
-be problematic?)
+After incoming migration I'm not sure we need to do anything - I think
+we already do a pretty thorough register resync with KVM.
 
-(Hmm, can we just disallow memory change during postcopy for now?)
+> ---
+>  hw/ppc/spapr.c          |   31 ++++++++++++++++++++++++++-----
+>  hw/ppc/spapr_cpu_core.c |   15 ---------------
+>  hw/ppc/spapr_hcall.c    |   16 +---------------
+>  include/hw/ppc/spapr.h  |    1 +
+>  4 files changed, 28 insertions(+), 35 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index f680f28a15ea..97f8afdbd7fe 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1309,6 +1309,25 @@ void spapr_free_hpt(sPAPRMachineState *spapr)
+>      close_htab_fd(spapr);
+>  }
+> =20
+> +void spapr_install_hpt(sPAPRMachineState *spapr, void *htab, uint32_t sh=
+ift)
+> +{
+> +    assert(htab);
+> +
+> +    spapr->htab =3D htab;
+> +    spapr->htab_shift =3D shift;
+> +
+> +    /*
+> +     * This is a hack for the benefit of KVM PR - it abuses the SDR1
+> +     * slot in kvm_sregs to communicate the userspace address of the
+> +     * HPT
+> +     */
+> +    if (kvm_enabled()) {
+> +        target_ulong sdr1 =3D (target_ulong)(uintptr_t)spapr->htab
+> +            | (spapr->htab_shift - 18);
+> +        kvmppc_update_sdr1(sdr1);
+> +    }
+> +}
+> +
+>  void spapr_reallocate_hpt(sPAPRMachineState *spapr, int shift,
+>                            Error **errp)
+>  {
+> @@ -1339,16 +1358,17 @@ void spapr_reallocate_hpt(sPAPRMachineState *spap=
+r, int shift,
+>          /* kernel-side HPT not needed, allocate in userspace instead */
+>          size_t size =3D 1ULL << shift;
+>          int i;
+> +        void *htab;
+> =20
+> -        spapr->htab =3D qemu_memalign(size, size);
+> -        if (!spapr->htab) {
+> +        htab =3D qemu_memalign(size, size);
+> +        if (!htab) {
+>              error_setg_errno(errp, errno,
+>                               "Could not allocate HPT of order %d", shift=
+);
+>              return;
+>          }
+> =20
+> -        memset(spapr->htab, 0, size);
+> -        spapr->htab_shift =3D shift;
+> +        memset(htab, 0, size);
+> +        spapr_install_hpt(spapr, htab, shift);
+> =20
+>          for (i =3D 0; i < size / HASH_PTE_SIZE_64; i++) {
+>              DIRTY_HPTE(HPTE(spapr->htab, i));
+> @@ -1405,6 +1425,8 @@ static void ppc_spapr_reset(void)
+>      /* Check for unknown sysbus devices */
+>      foreach_dynamic_sysbus_device(find_unknown_sysbus_device, NULL);
+> =20
+> +    qemu_devices_reset();
+> +
+>      if (kvm_enabled() && kvmppc_has_cap_mmu_radix()) {
+>          /* If using KVM with radix mode available, VCPUs can be started
+>           * without a HPT because KVM will start them in radix mode.
+> @@ -1414,7 +1436,6 @@ static void ppc_spapr_reset(void)
+>          spapr_setup_hpt_and_vrma(spapr);
+>      }
+> =20
+> -    qemu_devices_reset();
+>      spapr_clear_pending_events(spapr);
+> =20
+>      /*
+> diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+> index c08ee7571a50..c20b5c64b045 100644
+> --- a/hw/ppc/spapr_cpu_core.c
+> +++ b/hw/ppc/spapr_cpu_core.c
+> @@ -73,7 +73,6 @@ void spapr_cpu_parse_features(sPAPRMachineState *spapr)
+> =20
+>  static void spapr_cpu_reset(void *opaque)
+>  {
+> -    sPAPRMachineState *spapr =3D SPAPR_MACHINE(qdev_get_machine());
+>      PowerPCCPU *cpu =3D opaque;
+>      CPUState *cs =3D CPU(cpu);
+>      CPUPPCState *env =3D &cpu->env;
+> @@ -86,20 +85,6 @@ static void spapr_cpu_reset(void *opaque)
+>      cs->halted =3D 1;
+> =20
+>      env->spr[SPR_HIOR] =3D 0;
+> -
+> -    /*
+> -     * This is a hack for the benefit of KVM PR - it abuses the SDR1
+> -     * slot in kvm_sregs to communicate the userspace address of the
+> -     * HPT
+> -     */
+> -    if (kvm_enabled()) {
+> -        env->spr[SPR_SDR1] =3D (target_ulong)(uintptr_t)spapr->htab
+> -            | (spapr->htab_shift - 18);
+> -        if (kvmppc_put_books_sregs(cpu) < 0) {
+> -            error_report("Unable to update SDR1 in KVM");
+> -            exit(1);
+> -        }
+> -    }
+>  }
+> =20
+>  static void spapr_cpu_destroy(PowerPCCPU *cpu)
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 57bb411394ed..7892cd3e7ffa 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -730,15 +730,7 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *=
+cpu,
+>                      pending->hpt, newsize);
+>      if (rc =3D=3D H_SUCCESS) {
+>          qemu_vfree(spapr->htab);
+> -        spapr->htab =3D pending->hpt;
+> -        spapr->htab_shift =3D pending->shift;
+> -
+> -        if (kvm_enabled()) {
+> -            /* For KVM PR, update the HPT pointer */
+> -            target_ulong sdr1 =3D (target_ulong)(uintptr_t)spapr->htab
+> -                | (spapr->htab_shift - 18);
+> -            kvmppc_update_sdr1(sdr1);
+> -        }
+> +        spapr_install_hpt(spapr, pending->hpt, pending->shift);
+> =20
+>          pending->hpt =3D NULL; /* so it's not free()d */
+>      }
+> @@ -1564,12 +1556,6 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+>               * the point this is called, nothing should have been
+>               * entered into the existing HPT */
+>              spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
+> -            if (kvm_enabled()) {
+> -                /* For KVM PR, update the HPT pointer */
+> -                target_ulong sdr1 =3D (target_ulong)(uintptr_t)spapr->ht=
+ab
+> -                    | (spapr->htab_shift - 18);
+> -                kvmppc_update_sdr1(sdr1);
+> -            }
+>          }
+>      }
+> =20
+> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+> index c1b365f56431..30e5805acca4 100644
+> --- a/include/hw/ppc/spapr.h
+> +++ b/include/hw/ppc/spapr.h
+> @@ -709,4 +709,5 @@ void spapr_do_system_reset_on_cpu(CPUState *cs, run_o=
+n_cpu_data arg);
+>  int spapr_vcpu_id(PowerPCCPU *cpu);
+>  PowerPCCPU *spapr_find_cpu(int vcpu_id);
+> =20
+> +void spapr_install_hpt(sPAPRMachineState *spapr, void *htab, uint32_t sh=
+ift);
+>  #endif /* HW_SPAPR_H */
+>=20
 
-> 
-> > > +        trace_vhost_user_postcopy_fault_handler_loop(i,
-> > > +                u->postcopy_client_bases[i], dev->mem->regions[i].memory_size);
-> > > +        if (faultaddr >= u->postcopy_client_bases[i]) {
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Ah, wait...
+--6WlEvdN9Dv0WHSBl
+Content-Type: application/pgp-signature; name="signature.asc"
 
-postcopy_client_bases[] is now defined with static size
-VHOST_MEMORY_MAX_NREGIONS.  Shouldn't it be dynamically allocated as
-well with dev->mem->nregions, just like vhost_user.region_rb[]?
+-----BEGIN PGP SIGNATURE-----
 
-Maybe we want to leave the postcopy_client_bases[i] be zeros when
-dev->mem->regions[i] it's not a vhost-user supported region (without
-"fd")?
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm4trYACgkQbDjKyiDZ
+s5Kiuw//bAw88WzzH4vFkRR0viIXoaAtKA0rcWxFmFp/9Xz6jcTKqQoo3dskezG/
+5r+w4JhUNL2V4mD97wuVun0+hjjVVDcjKj8DZ6RUgtk0+8SVL6CvjD06jfJsqBcC
+BYWKgOLQxCGjqRJwUAZFF3VEqNVqBbkBvnJBrl1oghNL4PUv6Lxhl6bHXNg4WklH
+vjdJ1I1SPdpbtBoluFBj+V1YJyPBBSMKzODoRNTk9OJ5vlXY2zn9Su8Tb2sDFNyP
+7dqXMzeyzwbCv50w0upHhUw6QU3yeFVDF0WtmXeR49f2MXRlmocGNO6yluYrHsMy
+DbLnKiIuXV6twFW0+T5OX8SWaULAkkdAIckj4jAr/X098xNRT2yi0cHSyGoU1cwq
+aqM25/AZ5kYQ2XTu+Nk8xzbHX9divCQXPI6XfLjvGTnYb/ckYaUjNSf0XbO+t/T8
+uEN+6fNzomq+NDG5vZqPhnrtlyxQAWaMb/4jINfPBvVkKD498A0Fs8n5zWJJbNou
+4CQZmFm64PKf8xdV82P77FbjwAD8cgJZhVtGHuiBaxXRV9gop6hrD+QDZe3oqHCu
+atPJfmKy7TXRBnFnHQtcUPJBbQz1c8iOiAl0u8SPOm/jleLw0aC3IRtKoFLJRRLr
+b25yHDOO6OV8SkUPPg+ExVVul7jqis0+TxsSimqyhbCHhF2egKI=
+=X7xl
+-----END PGP SIGNATURE-----
 
-> > > +            /* Ofset of the fault address in the vhost region */
-> > > +            uint64_t region_offset = faultaddr - u->postcopy_client_bases[i];
-> > > +            if (region_offset <= dev->mem->regions[i].memory_size) {
-> > 
-> > Should be "<" rather than "<="?  Say:
-> > 
-> > Region 1: [0, 1M), size 1M
-> > Region 2: [1M, 2M), size 1M
-> > 
-> > Looks like otherwise faultaddr=1M will fall into region 1, while it
-> > should be region 2?
-> 
-> Fixed; thanks.
-> 
-> > 
-> > > +                rb_offset = region_offset + u->region_rb_offset[i];
-> > > +                trace_vhost_user_postcopy_fault_handler_found(i,
-> > > +                        region_offset, rb_offset);
-> > > +                rb = u->region_rb[i];
-> > 
-> > Nit: this "rb" might be avoided if only used once.
-> 
-> It's only a local, ok if it makes it a little more readable.
-> 
-> Dave
-> 
-> > > +                return postcopy_request_shared_page(pcfd, rb, faultaddr,
-> > > +                                                    rb_offset);
-> > > +            }
-> > > +        }
-> > > +    }
-> > > +    error_report("%s: Failed to find region for fault %" PRIx64,
-> > > +                 __func__, faultaddr);
-> > > +    return -1;
-> > >  }
-> > >  
-> > >  /*
-> > > -- 
-> > > 2.13.5
-> > > 
-> > 
-> > -- 
-> > Peter Xu
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
--- 
-Peter Xu
+--6WlEvdN9Dv0WHSBl--
