@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56915)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ds6VO-0004PY-Dv
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 08:11:04 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ds6Yb-0006hY-7Q
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 08:14:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ds6VN-0001Te-Cw
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 08:10:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37446)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1ds6VN-0001Ss-4N
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 08:10:57 -0400
-References: <20170911152150.12535-1-david@redhat.com>
-	<20170911152150.12535-12-david@redhat.com>
-	<20170912144330.3f07b30b@nial.brq.redhat.com>
-	<d086a0f8-5440-23ae-2644-8864e835cd84@redhat.com>
-	<20170913091959.336e86f3@nial.brq.redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <ae8a191e-327d-0986-bfa3-2fe7bb22e103@redhat.com>
-Date: Wed, 13 Sep 2017 14:10:53 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1ds6YX-0003zH-VX
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 08:14:17 -0400
+Date: Wed, 13 Sep 2017 22:14:03 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170913121403.GA3972@umbus.fritz.box>
+References: <150529882490.818.398056435765712294.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170913091959.336e86f3@nial.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v4 11/21] s390x: allow only 1 CPU with TCG
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="EVF5PPMfhYS0aIcm"
+Content-Disposition: inline
+In-Reply-To: <150529882490.818.398056435765712294.stgit@bahia.lan>
+Subject: Re: [Qemu-devel] [PATCH] spapr: fix the value of SDR1 in
+ kvmppc_put_books_sregs()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,67 +24,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, cohuck@redhat.com
-Cc: Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Alexander Graf <agraf@suse.de>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, borntraeger@de.ibm.com, Paolo Bonzini <pbonzini@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sam Bobroff <sam.bobroff@au1.ibm.com>
 
-On 13.09.2017 09:19, Igor Mammedov wrote:
-> On Tue, 12 Sep 2017 17:42:35 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 12.09.2017 14:43, Igor Mammedov wrote:
->>> On Mon, 11 Sep 2017 17:21:40 +0200
->>> David Hildenbrand <david@redhat.com> wrote:
->>>   
->>>> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
->>>> guest tries to bring these CPUs up but fails), because we don't support
->>>> multiple CPUs on s390x under TCG.
->>>>
->>>> Let's bail out if more than 1 is specified, so we don't raise people's
->>>> hope. Make it a define, so we can easily bump it up later.
->>>>
->>>> Tested-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
->>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>> ---
->>>>  hw/s390x/s390-virtio-ccw.c | 10 ++++++++++
->>>>  1 file changed, 10 insertions(+)
->>>>
->>>> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->>>> index f67b4b5d58..f1198b2745 100644
->>>> --- a/hw/s390x/s390-virtio-ccw.c
->>>> +++ b/hw/s390x/s390-virtio-ccw.c
->>>> @@ -23,6 +23,7 @@
->>>>  #include "hw/s390x/css.h"
->>>>  #include "virtio-ccw.h"
->>>>  #include "qemu/config-file.h"
->>>> +#include "qemu/error-report.h"
->>>>  #include "s390-pci-bus.h"
->>>>  #include "hw/s390x/storage-keys.h"
->>>>  #include "hw/s390x/storage-attributes.h"
->>>> @@ -47,6 +48,8 @@ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr)
->>>>      return cpu_states[cpu_addr];
->>>>  }
->>>>  
->>>> +/* #define S390_TCG_SMP_SUPPORT */  
->>> I'd drop define and ifdef for something that doesn't exists  
->>
->> Conny requested it as we might see some work on that area (supporting
->> smp) soon. So as long as there are no other opinions, I'll stick to the
->> current version.
->>
->> Thanks!
->>
-> I've just removed a bunch of TODO cpu models in PPC with
-> corresponding macro, my guess they were also introduced
-> with similar intent but ended up as dead code.
-> 
-> So it's better to add new code when it actually is needed,
-> instead of just in case.
-> 
-v1 of this patch had no ifdef at all. So I'll let Conny decide whether
-to keep it like this or whether to drop the ifdef again.
 
--- 
+--EVF5PPMfhYS0aIcm
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On Wed, Sep 13, 2017 at 12:41:07PM +0200, Greg Kurz wrote:
+> When running with KVM PR, if a new HPT is allocated we need to inform
+> KVM about the HPT address and size. This is currently done by hacking
+> the value of SDR1 and pushing it to KVM in several places.
+>=20
+> Also, migration breaks the guest since it is very unlikely the HPT has
+> the same address in source and destination, but we push the incoming
+> value of SDR1 to KVM anyway.
+>=20
+> This patch introduces a new virtual hypervisor hook so that the spapr
+> code can provide the correct value of SDR1 to be pushed to KVM each
+> time kvmppc_put_books_sregs() is called.
+>=20
+> It allows to get rid of all the hacking in the spapr/kvmppc code and
+> it fixes migration of nested KVM PR.
+>=20
+> Suggested-by: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>=20
+> Unfortunately, this doesn't fix migration when using KVM PR on baremetal.
+> I get tons of instruction emulation errors in the console when the guest
+> resumes execution at the destination:
+>=20
+> [  833.585957] Couldn't emulate instruction 0x00000000 (op 0 xop 0)
+> [  833.586818] kvmppc_exit_pr_progint: emulation at 60000000600e5bfc fail=
+ed
+>  (00000000)
+> [  833.674684] Couldn't emulate instruction 0x00000000 (op 0 xop 0)
+> [  833.675370] kvmppc_exit_pr_progint: emulation at 60000000600e5bfc fail=
+ed
+>  (00000000)
+> [  833.676297] Couldn't emulate instruction 0x00000000 (op 0 xop 0)
+>=20
+> I still don't know what's happening here but I guess this is an issue in
+> KVM.
 
-David
+Not necessarily, those could just be because we don't have meaningful
+hash table.  It's possible we're just not pushing the sregs info to
+KVM after the incoming migration.  I still think whatever fix we'll
+need for that will be simpler than the earlier versions.
+
+I'll need to test this with HPT resizing (unless you already have).  I
+think there is a small problem..
+
+[snip]
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index 57bb411394ed..840abff0e371 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -732,14 +732,6 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *=
+cpu,
+>          qemu_vfree(spapr->htab);
+>          spapr->htab =3D pending->hpt;
+>          spapr->htab_shift =3D pending->shift;
+> -
+> -        if (kvm_enabled()) {
+> -            /* For KVM PR, update the HPT pointer */
+> -            target_ulong sdr1 =3D (target_ulong)(uintptr_t)spapr->htab
+> -                | (spapr->htab_shift - 18);
+> -            kvmppc_update_sdr1(sdr1);
+> -        }
+> -
+
+I don't think we can completely eliminate this for KVM PR.  The sregs
+aren't written back to KVM on every re-entry, only rarely.  So we'll
+still need to force a writeback of all the sregs stuff in order to get
+PR updated properly.
+
+>          pending->hpt =3D NULL; /* so it's not free()d */
+>      }
+> =20
+> @@ -1564,12 +1556,6 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+>               * the point this is called, nothing should have been
+>               * entered into the existing HPT */
+>              spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
+> -            if (kvm_enabled()) {
+> -                /* For KVM PR, update the HPT pointer */
+> -                target_ulong sdr1 =3D (target_ulong)(uintptr_t)spapr->ht=
+ab
+> -                    | (spapr->htab_shift - 18);
+> -                kvmppc_update_sdr1(sdr1);
+> -            }
+>          }
+>      }
+> =20
+> diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+> index c9d3ffa89bcb..12e0b6e74876 100644
+> --- a/target/ppc/cpu.h
+> +++ b/target/ppc/cpu.h
+> @@ -1243,6 +1243,8 @@ struct PPCVirtualHypervisorClass {
+>      void (*store_hpte)(PPCVirtualHypervisor *vhyp, hwaddr ptex,
+>                         uint64_t pte0, uint64_t pte1);
+>      uint64_t (*get_patbe)(PPCVirtualHypervisor *vhyp);
+> +    void (*encode_hpt_for_kvm_pr)(PPCVirtualHypervisor *vhyp,
+> +                                  target_ulong *hpt);
+>  };
+> =20
+>  #define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
+> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+> index 6442dfcb95b3..8edc05fc6a83 100644
+> --- a/target/ppc/kvm.c
+> +++ b/target/ppc/kvm.c
+> @@ -941,7 +941,11 @@ int kvmppc_put_books_sregs(PowerPCCPU *cpu)
+> =20
+>      sregs.pvr =3D env->spr[SPR_PVR];
+> =20
+> -    sregs.u.s.sdr1 =3D env->spr[SPR_SDR1];
+> +    if (cpu->vhyp) {
+> +        PPCVirtualHypervisorClass *vhc =3D
+> +            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
+> +        vhc->encode_hpt_for_kvm_pr(cpu->vhyp, &sregs.u.s.sdr1);
+> +    }
+> =20
+>      /* Sync SLB */
+>  #ifdef TARGET_PPC64
+> @@ -2806,30 +2810,6 @@ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, targ=
+et_ulong flags, int shift)
+>      return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_COMMIT, &rhpt);
+>  }
+> =20
+> -static void kvmppc_pivot_hpt_cpu(CPUState *cs, run_on_cpu_data arg)
+> -{
+> -    target_ulong sdr1 =3D arg.target_ptr;
+> -    PowerPCCPU *cpu =3D POWERPC_CPU(cs);
+> -    CPUPPCState *env =3D &cpu->env;
+> -
+> -    /* This is just for the benefit of PR KVM */
+> -    cpu_synchronize_state(cs);
+> -    env->spr[SPR_SDR1] =3D sdr1;
+> -    if (kvmppc_put_books_sregs(cpu) < 0) {
+> -        error_report("Unable to update SDR1 in KVM");
+> -        exit(1);
+> -    }
+> -}
+> -
+> -void kvmppc_update_sdr1(target_ulong sdr1)
+> -{
+> -    CPUState *cs;
+> -
+> -    CPU_FOREACH(cs) {
+> -        run_on_cpu(cs, kvmppc_pivot_hpt_cpu, RUN_ON_CPU_TARGET_PTR(sdr1)=
+);
+> -    }
+> -}
+> -
+>  /*
+>   * This is a helper function to detect a post migration scenario
+>   * in which a guest, running as KVM-HV, freezes in cpu_post_load because
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index f780e6ec7b72..21571edd7910 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -68,7 +68,6 @@ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
+>  void kvmppc_check_papr_resize_hpt(Error **errp);
+>  int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int s=
+hift);
+>  int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int sh=
+ift);
+> -void kvmppc_update_sdr1(target_ulong sdr1);
+>  bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
+> =20
+>  bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
+> @@ -331,11 +330,6 @@ static inline int kvmppc_resize_hpt_commit(PowerPCCP=
+U *cpu,
+>      return -ENOSYS;
+>  }
+> =20
+> -static inline void kvmppc_update_sdr1(target_ulong sdr1)
+> -{
+> -    abort();
+> -}
+> -
+>  #endif
+> =20
+>  #ifndef CONFIG_KVM
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--EVF5PPMfhYS0aIcm
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm5IQcACgkQbDjKyiDZ
+s5LdRA/+IxW4ZCU4609/BtonXW8YCASNlMyzGLd3D6uiJ4wjgREmO3/9xgOi7aEs
+f4Ermct9R726F4+xmsUox8m6xd6o1G9/IoxPR4llbnmkG2uZGz10aEoFwMoNUacy
+Pf61jgu7B7ifuNu7n/yNYN3Ux+TNXfA9/Ehi7dl9DXcb2C3cipu4KB4i7sQvLcl1
+BttGlecnOlyS4qG4leJhlVgoNL7Af3v+Awfee/9NP+gLjaSu3co78w73M7krgmnJ
+yaQFL7zZRBZrjno8I/Fs42dAHcBifdmhui7mhW5No8yv1PdqGVeLbUaZznJWwMMF
+xEJJVNXRvvfzfAAwNeoEMKe9zASxiIxmsdfbXSEcT3tlZi7lkjKOeEK6GYkLsYQa
+ziBXqmdP45D0lOjXWotvEQQq6CwM3jlTw1iJ79XtldKbHaZhIcVpZCqqIJRQ1zeB
+J+60NENqWwMJWh8xZ7e9ZBG893kgwpEL07nzkIAQRbZ4UA8tbJPyo9KFDesGrnz9
+/cAPP6zFagGd/wHIxpWtUsGpjrP0It6zW1TaKExDn8LF/vZn0QZxbrPUtFO+3HTL
+yaS39L7bvkQczApNfYoro6dn801sQ7O3aaGClIXZWrAwJvk6KfR0BlXj0jDegk9a
+J5Tz7TXJcR1hvNgOA3dgD/QVSCotVEjpFdtZ3H6B+Al2o/I/8M8=
+=jqs4
+-----END PGP SIGNATURE-----
+
+--EVF5PPMfhYS0aIcm--
