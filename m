@@ -1,34 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44433)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1ds6Bv-0000Tt-PU
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:50:56 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1ds6Dt-00028Q-6v
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:52:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1ds6Br-0005Vr-1V
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:50:51 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44610)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1ds6Bq-0005V4-Fg
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:50:46 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8DBniXE112306
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:50:45 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cy24cp0tg-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:50:45 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 13 Sep 2017 12:50:42 +0100
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 13 Sep 2017 13:50:28 +0200
-In-Reply-To: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
-References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20170913115029.47626-4-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v2 3/4] virtio-ccw: use ccw data stream
+	(envelope-from <gengdongjiu@huawei.com>) id 1ds6Ds-00079I-AP
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:52:53 -0400
+References: <0184EA26B2509940AA629AE1405DD7F2015FE17F@DGGEMA503-MBX.china.huawei.com>
+	<CAFEAcA8J5wZ23kQypzcbUScUResjWnN6rDG0b0idD1rv7F5Fsw@mail.gmail.com>
+	<5552cf68-b998-686b-8e7e-710399c2b014@huawei.com>
+	<CAFEAcA_zO_-kDYb0MkW=p5oY6tQPk4PpCqZoG0_01pn=sa3upw@mail.gmail.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <c105c670-6aec-32cd-d32b-30642819323e@huawei.com>
+Date: Wed, 13 Sep 2017 19:51:56 +0800
+MIME-Version: 1.0
+In-Reply-To: <CAFEAcA_zO_-kDYb0MkW=p5oY6tQPk4PpCqZoG0_01pn=sa3upw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 6/6] target-arm: kvm64: Handle SError
+ interrupt for the guest OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,321 +26,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: James Morse <james.morse@arm.com>, "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>, QEMU
+	Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will Deacon <will.deacon@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, lkml -
+	Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, "devel@acpica.org" <devel@acpica.org>, John Garry <john.garry@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, huangdaode <huangdaode@hisilicon.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>
 
-Replace direct access which implicitly assumes no IDA
-or MIDA with the new ccw data stream interface which should
-cope with these transparently in the future.
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 
----
+On 2017/9/13 18:52, Peter Maydell wrote:
+> This question seems to be not really related to the review
+> comment that it is responding to.
+> 
+> (1) If the host does not support notifying us about
+> errors, then there is clearly nothing to do in this
+> code, because we will never get a notification.
+> 
+> (2) If the host does support notifying us about errors,
+> but we choose not to expose RAS to the guest, then
+> there's not much to do either. We probably just want
+> to take whatever the default behaviour is for any
+> application when it touches memory that's bad.
+> We definitely don't want to tell the guest anything.
+> 
+> (3) If the host supports notification, and we choose
+> to expose RAS to the guest, then we need to do
+> whatever we have to do to notify the guest.
+> 
+> If we're in this signal handler and also
+> arm_feature(env, ARM_FEATURE_RAS) is false then that
+> is case (2), and my point is that doing anything with
+> the guest 'syndrome' value looks like the wrong thing.
 
-v1 --> v2:
-Removed todo comments on possible errno change as with
-https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg02441.html
-applied it does not matter any more.
-
-Error handling: At the moment we ignore errors reported
-by stream ops to keep the change minimal. An add-on
-patch improving on this is to be expected later.
----
- hw/s390x/virtio-ccw.c | 156 +++++++++++++++-----------------------------------
- 1 file changed, 46 insertions(+), 110 deletions(-)
-
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index b1976fdd19..a9baf6f7ab 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -287,49 +287,19 @@ static int virtio_ccw_handle_set_vq(SubchDev *sch, CCW1 ccw, bool check_len,
-         return -EFAULT;
-     }
-     if (is_legacy) {
--        linfo.queue = address_space_ldq_be(&address_space_memory, ccw.cda,
--                                           MEMTXATTRS_UNSPECIFIED, NULL);
--        linfo.align = address_space_ldl_be(&address_space_memory,
--                                           ccw.cda + sizeof(linfo.queue),
--                                           MEMTXATTRS_UNSPECIFIED,
--                                           NULL);
--        linfo.index = address_space_lduw_be(&address_space_memory,
--                                            ccw.cda + sizeof(linfo.queue)
--                                            + sizeof(linfo.align),
--                                            MEMTXATTRS_UNSPECIFIED,
--                                            NULL);
--        linfo.num = address_space_lduw_be(&address_space_memory,
--                                          ccw.cda + sizeof(linfo.queue)
--                                          + sizeof(linfo.align)
--                                          + sizeof(linfo.index),
--                                          MEMTXATTRS_UNSPECIFIED,
--                                          NULL);
-+        ccw_dstream_read(&sch->cds, linfo);
-+        be64_to_cpus(&linfo.queue);
-+        be32_to_cpus(&linfo.align);
-+        be16_to_cpus(&linfo.index);
-+        be16_to_cpus(&linfo.num);
-         ret = virtio_ccw_set_vqs(sch, NULL, &linfo);
-     } else {
--        info.desc = address_space_ldq_be(&address_space_memory, ccw.cda,
--                                           MEMTXATTRS_UNSPECIFIED, NULL);
--        info.index = address_space_lduw_be(&address_space_memory,
--                                           ccw.cda + sizeof(info.desc)
--                                           + sizeof(info.res0),
--                                           MEMTXATTRS_UNSPECIFIED, NULL);
--        info.num = address_space_lduw_be(&address_space_memory,
--                                         ccw.cda + sizeof(info.desc)
--                                         + sizeof(info.res0)
--                                         + sizeof(info.index),
--                                         MEMTXATTRS_UNSPECIFIED, NULL);
--        info.avail = address_space_ldq_be(&address_space_memory,
--                                          ccw.cda + sizeof(info.desc)
--                                          + sizeof(info.res0)
--                                          + sizeof(info.index)
--                                          + sizeof(info.num),
--                                          MEMTXATTRS_UNSPECIFIED, NULL);
--        info.used = address_space_ldq_be(&address_space_memory,
--                                         ccw.cda + sizeof(info.desc)
--                                         + sizeof(info.res0)
--                                         + sizeof(info.index)
--                                         + sizeof(info.num)
--                                         + sizeof(info.avail),
--                                         MEMTXATTRS_UNSPECIFIED, NULL);
-+        ccw_dstream_read(&sch->cds, info);
-+        be64_to_cpus(&info.desc);
-+        be16_to_cpus(&info.index);
-+        be16_to_cpus(&info.num);
-+        be64_to_cpus(&info.avail);
-+        be64_to_cpus(&info.used);
-         ret = virtio_ccw_set_vqs(sch, &info, NULL);
-     }
-     sch->curr_status.scsw.count = 0;
-@@ -342,15 +312,13 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-     VirtioRevInfo revinfo;
-     uint8_t status;
-     VirtioFeatDesc features;
--    void *config;
-     hwaddr indicators;
-     VqConfigBlock vq_config;
-     VirtioCcwDevice *dev = sch->driver_data;
-     VirtIODevice *vdev = virtio_ccw_get_vdev(sch);
-     bool check_len;
-     int len;
--    hwaddr hw_len;
--    VirtioThinintInfo *thinint;
-+    VirtioThinintInfo thinint;
- 
-     if (!dev) {
-         return -EINVAL;
-@@ -394,11 +362,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         } else {
-             VirtioDeviceClass *vdc = VIRTIO_DEVICE_GET_CLASS(vdev);
- 
--            features.index = address_space_ldub(&address_space_memory,
--                                                ccw.cda
--                                                + sizeof(features.features),
--                                                MEMTXATTRS_UNSPECIFIED,
--                                                NULL);
-+            ccw_dstream_advance(&sch->cds, sizeof(features.features));
-+            ccw_dstream_read(&sch->cds, features.index);
-             if (features.index == 0) {
-                 if (dev->revision >= 1) {
-                     /* Don't offer legacy features for modern devices. */
-@@ -417,9 +382,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-                 /* Return zeroes if the guest supports more feature bits. */
-                 features.features = 0;
-             }
--            address_space_stl_le(&address_space_memory, ccw.cda,
--                                 features.features, MEMTXATTRS_UNSPECIFIED,
--                                 NULL);
-+            ccw_dstream_rewind(&sch->cds);
-+            cpu_to_le32s(&features.features);
-+            ccw_dstream_write(&sch->cds, features.features);
-             sch->curr_status.scsw.count = ccw.count - sizeof(features);
-             ret = 0;
-         }
-@@ -438,15 +403,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else {
--            features.index = address_space_ldub(&address_space_memory,
--                                                ccw.cda
--                                                + sizeof(features.features),
--                                                MEMTXATTRS_UNSPECIFIED,
--                                                NULL);
--            features.features = address_space_ldl_le(&address_space_memory,
--                                                     ccw.cda,
--                                                     MEMTXATTRS_UNSPECIFIED,
--                                                     NULL);
-+            ccw_dstream_read(&sch->cds, features);
-+            le32_to_cpus(&features.features);
-             if (features.index == 0) {
-                 virtio_set_features(vdev,
-                                     (vdev->guest_features & 0xffffffff00000000ULL) |
-@@ -488,7 +446,7 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         } else {
-             virtio_bus_get_vdev_config(&dev->bus, vdev->config);
-             /* XXX config space endianness */
--            cpu_physical_memory_write(ccw.cda, vdev->config, len);
-+            ccw_dstream_write_buf(&sch->cds, vdev->config, len);
-             sch->curr_status.scsw.count = ccw.count - len;
-             ret = 0;
-         }
-@@ -501,21 +459,13 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-             }
-         }
-         len = MIN(ccw.count, vdev->config_len);
--        hw_len = len;
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else {
--            config = cpu_physical_memory_map(ccw.cda, &hw_len, 0);
--            if (!config) {
--                ret = -EFAULT;
--            } else {
--                len = hw_len;
--                /* XXX config space endianness */
--                memcpy(vdev->config, config, len);
--                cpu_physical_memory_unmap(config, hw_len, 0, hw_len);
-+            ret = ccw_dstream_read_buf(&sch->cds, vdev->config, len);
-+            if (!ret) {
-                 virtio_bus_set_vdev_config(&dev->bus, vdev->config);
-                 sch->curr_status.scsw.count = ccw.count - len;
--                ret = 0;
-             }
-         }
-         break;
-@@ -553,8 +503,7 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else {
--            status = address_space_ldub(&address_space_memory, ccw.cda,
--                                        MEMTXATTRS_UNSPECIFIED, NULL);
-+            ccw_dstream_read(&sch->cds, status);
-             if (!(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
-                 virtio_ccw_stop_ioeventfd(dev);
-             }
-@@ -597,8 +546,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else {
--            indicators = address_space_ldq_be(&address_space_memory, ccw.cda,
--                                              MEMTXATTRS_UNSPECIFIED, NULL);
-+            ccw_dstream_read(&sch->cds, indicators);
-+            be64_to_cpus(&indicators);
-             dev->indicators = get_indicator(indicators, sizeof(uint64_t));
-             sch->curr_status.scsw.count = ccw.count - sizeof(indicators);
-             ret = 0;
-@@ -618,8 +567,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else {
--            indicators = address_space_ldq_be(&address_space_memory, ccw.cda,
--                                              MEMTXATTRS_UNSPECIFIED, NULL);
-+            ccw_dstream_read(&sch->cds, indicators);
-+            be64_to_cpus(&indicators);
-             dev->indicators2 = get_indicator(indicators, sizeof(uint64_t));
-             sch->curr_status.scsw.count = ccw.count - sizeof(indicators);
-             ret = 0;
-@@ -639,67 +588,58 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else {
--            vq_config.index = address_space_lduw_be(&address_space_memory,
--                                                    ccw.cda,
--                                                    MEMTXATTRS_UNSPECIFIED,
--                                                    NULL);
-+            ccw_dstream_read(&sch->cds, vq_config.index);
-+            be16_to_cpus(&vq_config.index);
-             if (vq_config.index >= VIRTIO_QUEUE_MAX) {
-                 ret = -EINVAL;
-                 break;
-             }
-             vq_config.num_max = virtio_queue_get_num(vdev,
-                                                      vq_config.index);
--            address_space_stw_be(&address_space_memory,
--                                 ccw.cda + sizeof(vq_config.index),
--                                 vq_config.num_max,
--                                 MEMTXATTRS_UNSPECIFIED,
--                                 NULL);
-+            cpu_to_be16s(&vq_config.num_max);
-+            ccw_dstream_write(&sch->cds, vq_config.num_max);
-             sch->curr_status.scsw.count = ccw.count - sizeof(vq_config);
-             ret = 0;
-         }
-         break;
-     case CCW_CMD_SET_IND_ADAPTER:
-         if (check_len) {
--            if (ccw.count != sizeof(*thinint)) {
-+            if (ccw.count != sizeof(thinint)) {
-                 ret = -EINVAL;
-                 break;
-             }
--        } else if (ccw.count < sizeof(*thinint)) {
-+        } else if (ccw.count < sizeof(thinint)) {
-             /* Can't execute command. */
-             ret = -EINVAL;
-             break;
-         }
--        len = sizeof(*thinint);
--        hw_len = len;
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else if (dev->indicators && !sch->thinint_active) {
-             /* Trigger a command reject. */
-             ret = -ENOSYS;
-         } else {
--            thinint = cpu_physical_memory_map(ccw.cda, &hw_len, 0);
--            if (!thinint) {
-+            if (ccw_dstream_read(&sch->cds, thinint)) {
-                 ret = -EFAULT;
-             } else {
--                uint64_t ind_bit = ldq_be_p(&thinint->ind_bit);
-+                be64_to_cpus(&thinint.ind_bit);
-+                be64_to_cpus(&thinint.summary_indicator);
-+                be64_to_cpus(&thinint.device_indicator);
- 
--                len = hw_len;
-                 dev->summary_indicator =
--                    get_indicator(ldq_be_p(&thinint->summary_indicator),
--                                  sizeof(uint8_t));
-+                    get_indicator(thinint.summary_indicator, sizeof(uint8_t));
-                 dev->indicators =
--                    get_indicator(ldq_be_p(&thinint->device_indicator),
--                                  ind_bit / 8 + 1);
--                dev->thinint_isc = thinint->isc;
--                dev->routes.adapter.ind_offset = ind_bit;
-+                    get_indicator(thinint.device_indicator,
-+                                  thinint.ind_bit / 8 + 1);
-+                dev->thinint_isc = thinint.isc;
-+                dev->routes.adapter.ind_offset = thinint.ind_bit;
-                 dev->routes.adapter.summary_offset = 7;
--                cpu_physical_memory_unmap(thinint, hw_len, 0, hw_len);
-                 dev->routes.adapter.adapter_id = css_get_adapter_id(
-                                                  CSS_IO_ADAPTER_VIRTIO,
-                                                  dev->thinint_isc);
-                 sch->thinint_active = ((dev->indicators != NULL) &&
-                                        (dev->summary_indicator != NULL));
--                sch->curr_status.scsw.count = ccw.count - len;
-+                sch->curr_status.scsw.count = ccw.count - sizeof(thinint);
-                 ret = 0;
-             }
-         }
-@@ -714,13 +654,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-             ret = -EFAULT;
-             break;
-         }
--        revinfo.revision =
--            address_space_lduw_be(&address_space_memory, ccw.cda,
--                                  MEMTXATTRS_UNSPECIFIED, NULL);
--        revinfo.length =
--            address_space_lduw_be(&address_space_memory,
--                                  ccw.cda + sizeof(revinfo.revision),
--                                  MEMTXATTRS_UNSPECIFIED, NULL);
-+        ccw_dstream_read_buf(&sch->cds, &revinfo, 4);
-+        be16_to_cpus(&revinfo.revision);
-+        be16_to_cpus(&revinfo.length);
-         if (ccw.count < len + revinfo.length ||
-             (check_len && ccw.count > len + revinfo.length)) {
-             ret = -EINVAL;
--- 
-2.13.5
+Peter,
+  your explanation is clear. OK, understand, thanks.
