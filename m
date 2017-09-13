@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42247)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44484)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ds2Q5-0002qk-Gg
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:49:14 -0400
+	(envelope-from <gengdongjiu@huawei.com>) id 1ds2Tw-00060d-NU
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:53:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ds2Q4-0005hC-MU
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:49:13 -0400
-Date: Wed, 13 Sep 2017 09:48:59 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170913094859.55905d00.cohuck@redhat.com>
-In-Reply-To: <20170911110623.24981-51-marcandre.lureau@redhat.com>
-References: <20170911110623.24981-1-marcandre.lureau@redhat.com>
-	<20170911110623.24981-51-marcandre.lureau@redhat.com>
+	(envelope-from <gengdongjiu@huawei.com>) id 1ds2Ts-0001jI-QT
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:53:12 -0400
+References: <0184EA26B2509940AA629AE1405DD7F2015FE17F@DGGEMA503-MBX.china.huawei.com>
+	<CAFEAcA8J5wZ23kQypzcbUScUResjWnN6rDG0b0idD1rv7F5Fsw@mail.gmail.com>
+From: gengdongjiu <gengdongjiu@huawei.com>
+Message-ID: <5552cf68-b998-686b-8e7e-710399c2b014@huawei.com>
+Date: Wed, 13 Sep 2017 15:52:14 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v3 50/50] qapi: make query-cpu-definitions
- depend on specific targets
+In-Reply-To: <CAFEAcA8J5wZ23kQypzcbUScUResjWnN6rDG0b0idD1rv7F5Fsw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 6/6] target-arm: kvm64: Handle SError
+ interrupt for the guest OS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,28 +24,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, armbru@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Alexander Graf <agraf@suse.de>, "open list:ARM" <qemu-arm@nongnu.org>, "open list:PowerPC" <qemu-ppc@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Richard Henderson <rth@twiddle.net>
+To: Peter Maydell <peter.maydell@linaro.org>, james.morse@arm.com
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Igor Mammedov <imammedo@redhat.com>, Zhaoshenglong <zhaoshenglong@huawei.com>, Paolo
+	Bonzini <pbonzini@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, kvm-devel <kvm@vger.kernel.org>, "edk2-devel@lists.01.org" <edk2-devel@lists.01.org>, Christoffer Dall <christoffer.dall@linaro.org>, Marc Zyngier <marc.zyngier@arm.com>, Will
+	Deacon <will.deacon@arm.com>, Tyler Baicar <tbaicar@codeaurora.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Ingo Molnar <mingo@kernel.org>, "bp@suse.de" <bp@suse.de>, Shiju Jose <shiju.jose@huawei.com>, "zjzhang@codeaurora.org" <zjzhang@codeaurora.org>, arm-mail-list <linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>, lkml -
+	Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-acpi@vger.kernel.org" <linux-acpi@vger.kernel.org>, "devel@acpica.org" <devel@acpica.org>, John Garry <john.garry@huawei.com>, Jonathan Cameron <jonathan.cameron@huawei.com>, Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>, huangdaode <huangdaode@hisilicon.com>, "Wangzhou (B)" <wangzhou1@hisilicon.com>, Huangshaoyu <huangshaoyu@huawei.com>, Wuquanming <wuquanming@huawei.com>, Linuxarm <linuxarm@huawei.com>, "Zhengqiang (turing)" <zhengqiang10@huawei.com>
 
-On Mon, 11 Sep 2017 13:06:23 +0200
-Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> wrote:
 
-> It depends on TARGET_PPC || TARGET_ARM || TARGET_I386 || TARGET_S390X.
->=20
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  qapi-schema.json            | 11 -----------
->  qapi/target.json            | 12 ++++++++++++
->  include/sysemu/arch_init.h  |  1 -
->  monitor.c                   | 22 ----------------------
->  qmp.c                       |  5 -----
->  stubs/arch-query-cpu-def.c  | 10 ----------
->  target/arm/helper.c         |  3 ++-
->  target/i386/cpu.c           |  2 +-
->  target/ppc/translate_init.c |  3 ++-
->  target/s390x/cpu_models.c   |  2 +-
->  stubs/Makefile.objs         |  1 -
->  11 files changed, 18 insertions(+), 54 deletions(-)
->  delete mode 100644 stubs/arch-query-cpu-def.c
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
+On 2017/9/12 0:39, Peter Maydell wrote:
+>>>> +    return  kvm_vcpu_ioctl(CPU(cpu), KVM_ARM_SEI, &syndrome);
+>>> This looks odd. If we don't have the RAS extension why do we need to do anything at all here ?
+>> This is because Qemu may need to support non-RAS extension as discussed with ARM James before.
+>> That is to say host hardware CPU does not support RAS, but guest supports.
+>> That is under discussion.
+>> When host hardware supports RAS, specify the syndrome to a valid value, otherwise, set it to 0.
+> If the guest CPU doesn't support the RAS extension then we have
+> no mechanism for delivering it a notification about the
+> memory problem at all, so setting the syndrome to anything
+> doesn't make sense.
+> 
+> I'm not sure what you should do in the case of "host
+> supports telling us about a memory problem and has
+> done so, but guest does not support being told about it",
+> but I'm pretty sure it shouldn't be this.
+Hi peter,
+   thanks for the comments.
+
+   in short, if the hardware CPU does not support RAS extension, do you think whether the Qemu or guest OS
+needs to support RAS(generate APEI table / record CPER / Error recovery).
+
+CC James,
+
+Hi James,
+  you ever have below comments:
+
+-----------------------------------------------------------------------
+But you can use APEI in a guest on CPUs without the RAS extensions: the host may
+signal memory errors to Qemu for any number of reasons.
+------------------------------------------------------------------
+
+in fact, I have a concern about it. If CPU without the RAS extension, the host should not deliver the sigbus.
+in which case in your test that host still deliver sigbus without RAS?
