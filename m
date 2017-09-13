@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33073)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ds2rL-0002xm-1p
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:17:23 -0400
+	(envelope-from <berto@igalia.com>) id 1ds32N-0000A2-Kf
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:28:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ds2rG-00009n-1Q
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:17:23 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45610)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ds2rF-00007z-Rm
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:17:17 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ds2rE-0004Jn-QX
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 08:17:16 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C53B12E8486
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 08:17:16 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 13 Sep 2017 07:56:26 -0000
-From: Thomas Huth <932490@bugs.launchpad.net>
-Reply-To: Bug 932490 <932490@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20120215021135.22747.33099.malonedeb@soybean.canonical.com>
-Message-Id: <150528938664.29603.470027703805471940.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 932490] Re: Qemu fails on -fda /dev/fd0 when no
- medium is present
+	(envelope-from <berto@igalia.com>) id 1ds32J-0000pN-KH
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:28:47 -0400
+From: Alberto Garcia <berto@igalia.com>
+Date: Wed, 13 Sep 2017 11:28:17 +0300
+Message-Id: <20170913082817.24731-1-berto@igalia.com>
+Subject: [Qemu-devel] [PATCH] throttle: Assert that bkt->max is valid in
+ throttle_compute_wait()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,36 +19,31 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-Is this still an issue with the latest version of QEMU (currently
-v2.10), or could we close this ticket nowadays?
+If bkt->max == 0 and bkt->burst_length > 1 then we could have a
+division by 0 in throttle_do_compute_wait(). That configuration is
+however not permitted and is already detected by throttle_is_valid(),
+but let's assert it in throttle_compute_wait() to make it explicit.
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Found by Coverity (CID: 1381016).
 
--- =
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ util/throttle.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/932490
-
-Title:
-  Qemu fails on -fda /dev/fd0 when no medium is present
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  # qemu-system-x86_64 --version
-  QEMU emulator version 1.0 (qemu-kvm-1.0), Copyright (c) 2003-2008 Fabrice=
- Bellard
-
-  # qemu-system-x86_64 -fda /dev/fd0
-  qemu-system-x86_64: -fda /dev/fd0: could not open disk image /dev/fd0: No=
- such device or address
-
-  Starting with a medium (floppy disk) inserted, then removing or
-  changing the medium works fine.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/932490/+subscriptions
+diff --git a/util/throttle.c b/util/throttle.c
+index 06bf916adc..b38e742da5 100644
+--- a/util/throttle.c
++++ b/util/throttle.c
+@@ -124,6 +124,7 @@ int64_t throttle_compute_wait(LeakyBucket *bkt)
+     /* If the main bucket is not full yet we still have to check the
+      * burst bucket in order to enforce the burst limit */
+     if (bkt->burst_length > 1) {
++        assert(bkt->max > 0); /* see throttle_is_valid() */
+         extra = bkt->burst_level - burst_bucket_size;
+         if (extra > 0) {
+             return throttle_do_compute_wait(bkt->max, extra);
+-- 
+2.11.0
