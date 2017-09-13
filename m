@@ -1,22 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57167)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ds25i-0005cQ-Ci
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:28:11 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1ds25i-0005cR-D0
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:28:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ds25e-0001QR-By
+	(envelope-from <dgibson@ozlabs.org>) id 1ds25e-0001QS-Bh
 	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:28:10 -0400
-Date: Wed, 13 Sep 2017 17:12:49 +1000
+Date: Wed, 13 Sep 2017 17:19:55 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170913071249.GI7550@umbus.fritz.box>
+Message-ID: <20170913071955.GJ7550@umbus.fritz.box>
 References: <1505054255-2990-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1505054255-2990-5-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1505054255-2990-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170911105729.GC2784@umbus.fritz.box>
+	<1d0c4384-fc32-05bb-7e42-44480f51610f@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ZY5CS28jBCfb727c"
+	protocol="application/pgp-signature"; boundary="zOcTNEe3AzgCmdo9"
 Content-Disposition: inline
-In-Reply-To: <1505054255-2990-5-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 4/4] ppc: ensure we update the decrementer
- value during migration
+In-Reply-To: <1d0c4384-fc32-05bb-7e42-44480f51610f@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 3/4] ppc: add CPU access_type into the
+ migration stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,70 +28,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru, lvivier@redhat.com
+Cc: aik@ozlabs.ru, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
 
---ZY5CS28jBCfb727c
+--zOcTNEe3AzgCmdo9
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Sep 10, 2017 at 03:37:35PM +0100, Mark Cave-Ayland wrote:
-> During local testing with TCG, intermittent errors were found when trying=
- to
-> migrate Darwin OS images.
+On Mon, Sep 11, 2017 at 05:52:10PM +0100, Mark Cave-Ayland wrote:
+> On 11/09/17 11:57, David Gibson wrote:
 >=20
-> The underlying cause was that Darwin resets the decrementer value to fair=
-ly
-> small values on each interrupt. cpu_ppc_set_tb_clk() sets the default val=
-ue
-> of the decrementer to 0xffffffff during initialisation which typically
-> corresponds to several seconds. Hence when restoring the image, the guest
-> would effectively "lose" decrementer interrupts during this time causing
-> confusion in the guest.
+> > On Sun, Sep 10, 2017 at 03:37:34PM +0100, Mark Cave-Ayland wrote:
+> >> This is referenced in cpu_ppc_handle_mmu_fault() and so should be incl=
+uded
+> >> in the migration stream.
+> >=20
+> > That is not, on its own, sufficient reason.
+> >=20
+> >> Note: the vmstate_ppc version number has already been bumped by the pr=
+evious
+> >> patch in this series.
+> >>
+> >> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> >=20
+> > As with 2/4 it breaks backwards migration.
+> >=20
+> > But more, I really disklike the idea of migrating this.  It's internal
+> > state for one, and it's also essentially transitory state.  Can we
+> > avoid putting it in the otherwise persistent structure at all? Can we
+> > derive the state from elsewhere?  Can we prevent migration from
+> > occurring in the small windows where this data is live?
 >=20
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> >From what I can see references to access_type are scattered throughout
+> mmu_helper.c although I'm not necessarily familiar enough with PPC to
+> know whether this is something that can be derived elsewhere instead.
+> And once again it was something that was removed by a90db15.
 
-This is subtly incorrect.  It sets the DECR on load to exactly the
-value that was saved.  That effectively means that the DECR is frozen
-for the migration downtime, which probably isn't what we want.
+Right, but the migration code prior to a90db15 was a complete mess.
+It definitely included a number of things it didn't need to and
+shouldn't as well as being missing other things that were needed.
+It's not a good model.  And although it might have more-or-less worked
+for certain machines like the ones you're reviving here, it was never
+properly tested
 
-Instead we need to save the DECR as an offset from the timebase, and
-restore it relative to the (downtime adjusted) timebase on the
-destination.
+> When pausing a VM, does execution stop at the end of the current TB
+> rather than immediately? If so, perhaps someone could confirm that
+> guarantee is good enough for access_type?
 
-The complication with that is that the timebase is generally migrated
-at the machine level, not the cpu level: the timebase is generally
-synchronized between cpus in the machine, and migrating it at the
-individual cpu could break that.  Which means we probably need a
-machine level hook to handle the decrementer too, even though it
-logically *is* per-cpu, because otherwise we'll be trying to restore
-it before the timebase is restored.
+I'm pretty sure it has to; we'd have to come up out of an individual
+TB in order to get to the main loop where we check the "please pause"
+flag.  I'm not sure if that helps us here though - I *think* access
+type is about carrying information from the point where we trigger an
+exception to the point where we actually start processing the
+exception.
 
-> ---
->  target/ppc/machine.c |    2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/target/ppc/machine.c b/target/ppc/machine.c
-> index 10b3c41..a16a856 100644
-> --- a/target/ppc/machine.c
-> +++ b/target/ppc/machine.c
-> @@ -176,6 +176,7 @@ static void cpu_pre_save(void *opaque)
->      env->spr[SPR_CFAR] =3D env->cfar;
->  #endif
->      env->spr[SPR_BOOKE_SPEFSCR] =3D env->spe_fscr;
-> +    env->spr[SPR_DECR] =3D cpu_ppc_load_decr(env);
-> =20
->      for (i =3D 0; (i < 4) && (i < env->nb_BATs); i++) {
->          env->spr[SPR_DBAT0U + 2*i] =3D env->DBAT[0][i];
-> @@ -280,6 +281,7 @@ static int cpu_post_load(void *opaque, int version_id)
->      env->cfar =3D env->spr[SPR_CFAR];
->  #endif
->      env->spe_fscr =3D env->spr[SPR_BOOKE_SPEFSCR];
-> +    cpu_ppc_store_decr(env, env->spr[SPR_DECR]);
-> =20
->      for (i =3D 0; (i < 4) && (i < env->nb_BATs); i++) {
->          env->DBAT[0][i] =3D env->spr[SPR_DBAT0U + 2*i];
+This code is really ugly and I've never understood it well :(. It's
+always seemed bogus to me that we have an essentially global variable
+to carry information over that small gap, though.  Unfortunately it's
+unlikely that I'd be able to dive into this and work out if it's
+really needed any time soon.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -97,24 +95,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ZY5CS28jBCfb727c
+--zOcTNEe3AzgCmdo9
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm42nEACgkQbDjKyiDZ
-s5LtJxAAuVRJw7DhvokMaN1zifZX6I/PAQGnbV03hC50h/EuYqbNndTBz+t21eYS
-cbepiP7op5j05MzaQ4wWdwg9XdDsOrpSljxbxGhmbFySv5EfXI9Kp8g+nOyk4d1v
-LY6A1qKd/tUjpqeb/Kc2uzPdfqepdkMDv62dYHdpOxPR78UasfRrt33JYFtBlOUE
-Ui2NznVYyKqwzLHpScQyCDZ5h/6cM8vOT/b3OvhkkTHmLB8tHXfMnN7J8ubVjOVr
-IpJcVs/bpyHBa5NsEKNPAT2UxyabQhzu+39+Ae9e5RUiPkM1YduLPqSly0LZ+HHh
-nox+s8ttKIAIxHPS/8yA6Z8St5mU3slxmHnPrgYblHyBvef1DldyCPmyo4FarFV8
-jvfxFOgMf6ZWQ3rT9Dr+OV3Y5uyDsVdrycrGlW2/3/eKnWRRySr2wCRb8bLQqIq+
-HE7UhxAbzFjNqW3xO/IS9RGHjbPfjy3g7U7FBQVMN4945FrUDJInjOJcaMk3YLiF
-BR3MmVZf1VNpuIpV8Khna0rrD0PBCTw1Ng0/oI6VVvNbfH/+VaLgXB7wNaLsifZo
-st5E/Lc4LF/IQc1NG5p6CfEgvLudHwerChzz3g89CcC0nvjyQhWhefAKGwF59iLt
-q3mCWay50lfK38fVTuh3SQkEJVC1ksGI7tN7qat2sT2EM5UI/aU=
-=eWne
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm43BsACgkQbDjKyiDZ
+s5LF2RAA2ixud+TRDA+pT43bDhM406xmAphQ5o3Q51ZXPtEn4ssLMHUco26ZBebs
+R2bfHgghj+ULJDLzRG1ix7UvKsobijOKfBdBwc47hK6m7H9AmbtBvkahxFLG25EX
+lg/8Gp+TbYhfbHpBCTtPcvxqg+xsqOFAlqC4HZ/RvRqIbxzZUaPOYMJ5mm3BvGcc
++hdjhgMpNIjR9qaO70ZjKfeJnKSZtCfqH9+k2uq/s9+c4iAzA8toqvlJCm+bDLUH
+w5mxdpoNsn0xwhwnR0tAgPAOSvzYtEDpCQcp7HP3QdAdBziunOapxtMJCyDe8Zrl
+pCL+BBYTSwmKeOHLu7fbNujuIV0rI+UaHyiTLVryeUmgU+9ZPYJqgaRKoPlPS6Gq
+oIOjgNOfhOV+RUardOkE+xfzNBnO4kp7ej0KvJopAObXo7bN3IkJHhreWK1LlraC
+MAI/5qyJGoKbzq2Ri7YOHXOpkFJ73hRLCfarqDsX1gUJh4QO3kDZwn+QB7b3lY67
++4BexZUpSnr7C25/ZcjxHgMHzG+LL1Ht8FX2SLT2brt/SZVayScdY5G/2h+dWuno
+J8NaA36pdXqEzrEKuoyZrI6Eb8VLDqpzGxii0817ioWV1YFUEz/zn8AQ/AYUBidX
+cN6w5LPE138vwGNhDt/YaJ2OUwSaZHem5F3UXtgZGboPwGYuN/M=
+=mht4
 -----END PGP SIGNATURE-----
 
---ZY5CS28jBCfb727c--
+--zOcTNEe3AzgCmdo9--
