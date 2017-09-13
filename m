@@ -1,39 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55382)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dsD4A-0006eF-FH
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 15:11:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsDIx-0006jH-8m
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 15:26:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dsD45-0008MS-Gj
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 15:11:18 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52156
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
-	id 1dsD45-0008Lj-Ad
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 15:11:13 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8DJ92FN054644
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 15:11:12 -0400
-Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2cy7p01udc-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 15:11:12 -0400
-Received: from localhost
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
-	Wed, 13 Sep 2017 13:11:11 -0600
-References: <cover.1505225353.git.alifm@linux.vnet.ibm.com>
-	<edda99a2-37b3-7428-027c-18f27a315056@redhat.com>
-From: Farhan Ali <alifm@linux.vnet.ibm.com>
-Date: Wed, 13 Sep 2017 15:11:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsDIw-0004t2-6S
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 15:26:35 -0400
+References: <20170913160333.23622-1-eblake@redhat.com>
+	<20170913160333.23622-22-eblake@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <bffcf3f2-86a5-388e-0ad3-a1fbcec51c7a@redhat.com>
+Date: Wed, 13 Sep 2017 14:26:19 -0500
 MIME-Version: 1.0
-In-Reply-To: <edda99a2-37b3-7428-027c-18f27a315056@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <f321fb90-cd47-0b63-dbd5-87d825bc3288@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v1 0/2] Virtio GPU for S390
+In-Reply-To: <20170913160333.23622-22-eblake@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="vU6dL22Hkrx27xjxT4Eq44kkiPxbVKJtE"
+Subject: Re: [Qemu-devel] [PATCH v4 21/23] block: Align block status requests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,66 +24,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, cohuck@redhat.com, kraxel@redhat.com
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, jsnow@redhat.com
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--vU6dL22Hkrx27xjxT4Eq44kkiPxbVKJtE
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, famz@redhat.com, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ jsnow@redhat.com
+Message-ID: <bffcf3f2-86a5-388e-0ad3-a1fbcec51c7a@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 21/23] block: Align block status requests
+References: <20170913160333.23622-1-eblake@redhat.com>
+ <20170913160333.23622-22-eblake@redhat.com>
+In-Reply-To: <20170913160333.23622-22-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 09/13/2017 11:03 AM, Eric Blake wrote:
+> Any device that has request_alignment greater than 512 should be
+> unable to report status at a finer granularity; it may also be
+> simpler for such devices to be guaranteed that the block layer
+> has rounded things out to the granularity boundary (the way the
+> block layer already rounds all other I/O out).  Besides, getting
+> the code correct for super-sector alignment also benefits us
+> for the fact that our public interface now has byte granularity,
+> even though none of our drivers have byte-level callbacks.
+>=20
+> Add an assertion in blkdebug that proves that the block layer
+> never requests status of unaligned sections, similar to what it
+> does on other requests (while still keeping the generic helper
+> in place for when future patches add a throttle driver).  Note
+> that iotest 177 already covers this (it would fail if you use
+> just the blkdebug.c hunk without the io.c changes).  Meanwhile,
+> we can drop assertions in callers that no longer have to pass
+> in sector-aligned addresses.
+
+Bummer - 'git bisect' says this patch causes iotests 190 to hang.  I'm
+investigating root cause, but I'll have to post a fixup once I figure it
+out.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--vU6dL22Hkrx27xjxT4Eq44kkiPxbVKJtE
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-On 09/13/2017 03:00 PM, Thomas Huth wrote:
-> On 12.09.2017 16:26, Farhan Ali wrote:
->> These patches wire up the virtio-gpu device for CCW bus for S390.
->>
->> For the S390 architecture which does not natively support any
->> graphics device, virtio gpu in 2D mode could be used to emulate a
->> simple graphics card and use VNC as the display.
->>
->> eg: qemu-system-s390x ... -device virtio-gpu-ccw,devno=fe.0.0101
->> -vnc host_ip_addr:5900
->>
->> Note, to actually see any display content the guest kernel needs to
->> support DRM layer, Virtio GPU driver, the Virtual Terminal layer
->> etc.
->
-> Do you have a list of CONFIG options that need to be enabled there?
-> Are there also any patches to the guest kernel driver required? Or
-> did that work out of the box once you've enabled the right CONFIG
-> options?
->
-It required some kernel hacking. You need to enable the VT layer for
-S390 to get any kind of graphics displayed.
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-I experimented on the guest side to enable the VT layer and run a
-framebuffer console and also the Xfce desktop :)
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm5hlsACgkQp6FrSiUn
+Q2q/lAf/cnnAHzYPLGgKGUvtfHVbaLJPn9jgm7OS/3uGZxtDHY0kj9RPEIxljUqP
+w1uhbDKX2jtQfbgahPXXQA9tCGC/s/M5M4qIUkmSAtjy0YrqZLAoGcHOprJbtghR
+cLKd1Oirp5j8+9HC2mkjmBXCgUU7o39gl6+JcKVPE7YmPqWhz+yaC+9l6zcGMfxx
+WIzLK2BpIHnj4X3vmsJY3vbgNAwoZkoxs2wNFAIRa82AyuXKeXXTDy1+w/RCNaYD
+tRFH4+mk+ulFgF4xBI0p96ehgn4Y7RVTN0pF1gKhsc2fDmxEAntEjbsRLHjgpQWJ
+hXBVmoUKsRWqgAoJ6YCihDmxRanjAw==
+=mTXH
+-----END PGP SIGNATURE-----
 
-Anyway the CONFIG options I used are:
-
-The DRM configs to enable the DRM layer and virtio-gpu. I went with the 
-default options for DRM layer.
-
-CONFIG_DRM
-
-CONFIG_DRM_VIRTIO_GPU
-
-We also need to enable configs for the VT layer
-
-CONFIG_VT
-
-CONFIG_DUMMY_CONSOLE
-
-And to display a framebuffer console for the guest
-
-CONFIG_FRAMEBUFFER_CONSOLE
-
-
-
->> I would appreciate any feedback on these patches, specially the
->> first patch.
->
-> Patches look good to me, but I'm not at all familiar with the
-> virtio-gpu code, so that likely does not count...
->
-> Anyway, thanks a lot for tackling this! It's pretty cool to finally
-> have a graphics card on s390x, too :-)
->
-> Thomas
->
+--vU6dL22Hkrx27xjxT4Eq44kkiPxbVKJtE--
