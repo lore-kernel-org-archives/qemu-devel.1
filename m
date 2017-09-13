@@ -1,29 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37266)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dsBP7-0004zI-RJ
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 13:24:54 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dsBTx-0007qh-KT
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 13:29:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dsBP6-00051T-UZ
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 13:24:49 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1504812251-23438-1-git-send-email-sundeep.lkml@gmail.com>
-	<1504812251-23438-5-git-send-email-sundeep.lkml@gmail.com>
-	<26693abe-07a2-1744-1a8d-4d08941837c5@amsat.org>
-	<CALHRZurB_6GT+KccybDgWb8bPdU89Ey1si46HnbQgsLuHYCh_w@mail.gmail.com>
-	<CALHRZurVQzOX+U7OioHGiMKSoZNSOA77zqhyEGgp=H_5fKC7qg@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f5ac4d0e-dc40-8ca4-c0a2-a7b34752549b@amsat.org>
-Date: Wed, 13 Sep 2017 14:24:39 -0300
-MIME-Version: 1.0
-In-Reply-To: <CALHRZurVQzOX+U7OioHGiMKSoZNSOA77zqhyEGgp=H_5fKC7qg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu devel v8 PATCH 4/5] msf2: Add Smartfusion2
- SoC
+	(envelope-from <cohuck@redhat.com>) id 1dsBTu-0002jG-89
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 13:29:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45716)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dsBTu-0002hM-0Z
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 13:29:46 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Wed, 13 Sep 2017 19:29:41 +0200
+Message-Id: <20170913172941.5470-1-cohuck@redhat.com>
+Subject: [Qemu-devel] [PATCH v2] accel: default to an actually available
+ accelerator
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,31 +22,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sundeep subbaraya <sundeep.lkml@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>
+To: qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, pbonzini@redhat.com, thuth@redhat.com, mreitz@redhat.com, kwolf@redhat.com, richard.henderson@linaro.org, peter.maydell@linaro.org, Cornelia Huck <cohuck@redhat.com>
 
-Hi Sundeep,
+configure_accelerator() falls back to tcg if no accelerator has
+been specified. Formerly, we could be sure that tcg is always
+available; however, with --disable-tcg, this is not longer true,
+and you are not able to start qemu without explicitly specifying
+another accelerator on those builds.
 
-On 09/13/2017 06:21 AM, sundeep subbaraya wrote:
-> All patches got Reviewed-by. Do you want me to change alias to remap and
-> send
+Instead, choose an accelerator in the order tcg->kvm->hax.
 
-This is just cosmetic for the "alias MSF2.eNVM.alias":
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+---
+RFC->v2:
+- drop xen from the list of fallbacks
+- use comma-delimited list of accelerators (much easier)
+- changed one place in qemu-options.hx that had been missed
+---
+ accel/accel.c   | 3 +--
+ qemu-options.hx | 8 +++++---
+ 2 files changed, 6 insertions(+), 5 deletions(-)
 
-(qemu) info mtree
-address-space: cpu-memory
-   0000000000000000-ffffffffffffffff (prio 0, i/o): armv7m-container
-     0000000000000000-ffffffffffffffff (prio -1, i/o): system
-       0000000000000000-000000000003ffff (prio 0, i/o): alias 
-MSF2.eNVM.alias @MSF2.eNVM 0000000000000000-000000000003ffff
-       0000000020000000-000000002000ffff (prio 0, ram): MSF2.eSRAM
-       0000000060000000-000000006003ffff (prio 0, rom): MSF2.eNVM
-       00000000a0000000-00000000a3ffffff (prio 0, ram): ddr-ram
-
- > v9 or wait so that you get time to review?
-
-I have a draft for your patch 2, I'll send within the day.
-
-Regards,
-
-Phil.
+diff --git a/accel/accel.c b/accel/accel.c
+index 8ae40e1e13..e8a3121d06 100644
+--- a/accel/accel.c
++++ b/accel/accel.c
+@@ -79,8 +79,7 @@ void configure_accelerator(MachineState *ms)
+ 
+     accel = qemu_opt_get(qemu_get_machine_opts(), "accel");
+     if (accel == NULL) {
+-        /* Use the default "accelerator", tcg */
+-        accel = "tcg";
++        accel = "tcg:kvm:hax";
+     }
+ 
+     p = accel;
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 9f6e2adfff..2ff88389e0 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -31,7 +31,7 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
+     "-machine [type=]name[,prop[=value][,...]]\n"
+     "                selects emulated machine ('-machine help' for list)\n"
+     "                property accel=accel1[:accel2[:...]] selects accelerator\n"
+-    "                supported accelerators are kvm, xen, hax or tcg (default: tcg)\n"
++    "                supported accelerators are kvm, xen, hax or tcg (default: tcg:kvm:hax)\n"
+     "                kernel_irqchip=on|off|split controls accelerated irqchip support (default=off)\n"
+     "                vmport=on|off|auto controls emulation of vmport (default: auto)\n"
+     "                kvm_shadow_mem=size of KVM shadow MMU in bytes\n"
+@@ -66,7 +66,8 @@ Supported machine properties are:
+ @table @option
+ @item accel=@var{accels1}[:@var{accels2}[:...]]
+ This is used to enable an accelerator. Depending on the target architecture,
+-kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
++kvm, xen, hax or tcg can be available. By default, the first one available
++out of tcg, kvm, hax (in that order) is used. If there is
+ more than one accelerator specified, the next one is used if the previous one
+ fails to initialize.
+ @item kernel_irqchip=on|off
+@@ -126,7 +127,8 @@ STEXI
+ @item -accel @var{name}[,prop=@var{value}[,...]]
+ @findex -accel
+ This is used to enable an accelerator. Depending on the target architecture,
+-kvm, xen, hax or tcg can be available. By default, tcg is used. If there is
++kvm, xen, hax or tcg can be available. By default, the first one available
++out of tcg, kvm, hax (in that order) is used. If there is
+ more than one accelerator specified, the next one is used if the previous one
+ fails to initialize.
+ @table @option
+-- 
+2.13.5
