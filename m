@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ds9Vt-0003K7-7q
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:23:42 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1ds9ae-0005k8-RX
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:28:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ds9Vq-0007WX-3i
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:23:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43616)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1ds9Vp-0007Vz-UE
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:23:38 -0400
-References: <20170913132417.24384-1-david@redhat.com>
-	<20170913132417.24384-9-david@redhat.com>
-	<fb0909ad-19bb-3a92-27c6-652bf4d32277@redhat.com>
-	<20170913172115.1b7fb95d.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <42ef2f55-aced-077e-00d5-35b444fd5653@redhat.com>
-Date: Wed, 13 Sep 2017 17:23:33 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1ds9aZ-0001rt-UE
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:28:36 -0400
+Received: from mail-pf0-x229.google.com ([2607:f8b0:400e:c00::229]:46876)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ds9aZ-0001rV-NI
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:28:31 -0400
+Received: by mail-pf0-x229.google.com with SMTP id e199so789018pfh.3
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 08:28:31 -0700 (PDT)
+References: <20170912162513.21694-1-richard.henderson@linaro.org>
+	<20170912162513.21694-8-richard.henderson@linaro.org>
+	<d1f97f10-921e-1c50-9407-2007b1cbe169@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <4262b16c-fd18-b551-a510-30833df414ad@linaro.org>
+Date: Wed, 13 Sep 2017 08:28:28 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170913172115.1b7fb95d.cohuck@redhat.com>
+In-Reply-To: <d1f97f10-921e-1c50-9407-2007b1cbe169@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 08/22] s390x: move sclp_service_call()
- to sclp.h
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 07/16] target/arm: Align vector registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,33 +32,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org
 
-On 13.09.2017 17:21, Cornelia Huck wrote:
-> On Wed, 13 Sep 2017 16:29:23 +0200
-> Thomas Huth <thuth@redhat.com> wrote:
-> 
->> On 13.09.2017 15:24, David Hildenbrand wrote:
->>> Implemented in sclp.c, so let's move it to the right include file.
->>> Fix up one include. Do a forward declaration of struct CPUS390XState to
->>> fix the two sclp consoles complaining.  
+On 09/12/2017 11:50 AM, Philippe Mathieu-Daudé wrote:
 >>
->> Is that sentence about the forward declaration still valid? I did not
->> see that anymore here...
+>> -        float64 regs[64];
+>> +        float64 regs[64] __attribute__((aligned(16)));
 > 
-> Indeed. I can fix this up to:
-> 
-> "Implemented in sclp.c, so let's move it to the right include file.
-> Also adjust some includes."
-> 
-> ?
+> I understand this should be aligned to the biggest vector register the host
+> support, i.e. for AVX-512 this would be QEMU_ALIGNED(64), is it correct?
 
-You know how to use just the right words ;) Thanks!
+No.
+
+Alignment of 16 is sufficient for "older" vector extensions, like altivec,
+which require alignment in load/store insns.  But (so far at least) newer
+vector extensions with larger vector sizes (AVX2, AVX512, ARM SVE) handle
+unaligned load/store operations just fine.
+
+Which means we need not require excessive alignment within the cpu struct.
+
+The rule for this is documented in tcg/tcg-op-gvec.h, iirc.
 
 
--- 
-
-Thanks,
-
-David
+r~
