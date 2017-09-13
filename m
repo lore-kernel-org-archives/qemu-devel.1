@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ds7fA-0005AT-Cm
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:09 -0400
+	(envelope-from <david@redhat.com>) id 1ds7fK-0005S6-Oz
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ds7f7-0002jK-NU
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:30863)
+	(envelope-from <david@redhat.com>) id 1ds7fJ-0002wI-1e
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43202)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1ds7f7-0002j3-H2
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:05 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1ds7fI-0002sx-SD
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:16 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 13 Sep 2017 15:24:01 +0200
-Message-Id: <20170913132417.24384-7-david@redhat.com>
+Date: Wed, 13 Sep 2017 15:24:04 +0200
+Message-Id: <20170913132417.24384-10-david@redhat.com>
 In-Reply-To: <20170913132417.24384-1-david@redhat.com>
 References: <20170913132417.24384-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 06/22] s390x: move subsystem_reset() to
- s390-virtio-ccw.h
+Subject: [Qemu-devel] [PATCH v5 09/22] target/s390x: use
+ trigger_pgm_exception() in s390_cpu_handle_mmu_fault()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,52 +27,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-Implemented in s390-virtio-ccw.c, so move it to the right header.
-We can also drop the extern. Fix up one include.
+This looks cleaner. linux-user will not use the ilen field, so setting
+it doesn't do any harm.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- include/hw/s390x/s390-virtio-ccw.h | 2 ++
- target/s390x/cpu.h                 | 1 -
- target/s390x/diag.c                | 1 +
- 3 files changed, 3 insertions(+), 1 deletion(-)
+ target/s390x/excp_helper.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-index 41a9d2862b..a9a90c2022 100644
---- a/include/hw/s390x/s390-virtio-ccw.h
-+++ b/include/hw/s390x/s390-virtio-ccw.h
-@@ -56,4 +56,6 @@ bool gs_allowed(void);
-  */
- bool css_migration_enabled(void);
- 
-+void subsystem_reset(void);
-+
- #endif
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 7073fa59e9..372f7d8885 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -721,7 +721,6 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
- 
- /* outside of target/s390x/ */
- S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
--extern void subsystem_reset(void);
- int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
- 
- #endif
-diff --git a/target/s390x/diag.c b/target/s390x/diag.c
-index e6b5e6de37..82a623948d 100644
---- a/target/s390x/diag.c
-+++ b/target/s390x/diag.c
-@@ -20,6 +20,7 @@
- #include "hw/watchdog/wdt_diag288.h"
- #include "sysemu/cpus.h"
- #include "hw/s390x/ipl.h"
-+#include "hw/s390x/s390-virtio-ccw.h"
- 
- static int modified_clear_reset(S390CPU *cpu)
+diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
+index 361f970db3..14d3160e92 100644
+--- a/target/s390x/excp_helper.c
++++ b/target/s390x/excp_helper.c
+@@ -59,8 +59,7 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
  {
+     S390CPU *cpu = S390_CPU(cs);
+ 
+-    cs->exception_index = EXCP_PGM;
+-    cpu->env.int_pgm_code = PGM_ADDRESSING;
++    trigger_pgm_exception(&cpu->env, PGM_ADDRESSING, ILEN_AUTO);
+     /* On real machines this value is dropped into LowMem.  Since this
+        is userland, simply put this someplace that cpu_loop can find it.  */
+     cpu->env.__excp_addr = address;
 -- 
 2.13.5
