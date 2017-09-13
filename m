@@ -1,34 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dsClB-0004c2-5g
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:51:42 -0400
+	(envelope-from <thuth@redhat.com>) id 1dsCuO-0002Mz-3y
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 15:01:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dsCl8-0003XV-47
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:51:41 -0400
-Received: from indium.canonical.com ([91.189.90.7]:48572)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dsCl7-0003Wq-UK
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:51:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dsCl5-00033T-Vs
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 18:51:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id C33C32E8492
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 18:51:33 +0000 (UTC)
+	(envelope-from <thuth@redhat.com>) id 1dsCuJ-0001VX-4m
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 15:01:12 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37126)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dsCuI-0001US-Va
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 15:01:07 -0400
+References: <cover.1505225353.git.alifm@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <edda99a2-37b3-7428-027c-18f27a315056@redhat.com>
+Date: Wed, 13 Sep 2017 21:00:53 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <cover.1505225353.git.alifm@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 13 Sep 2017 18:37:21 -0000
-From: James Clarke <jrtc27@jrtc27.com>
-Reply-To: Bug 1716767 <1716767@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150524995294.5903.8871661765030368900.malonedeb@wampee.canonical.com>
-Message-Id: <150532784171.23106.17881126432658501179.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1716767] Re: file(1) fails with "Invalid
- argument" on qemu-sh4-user
+Subject: Re: [Qemu-devel] [PATCH v1 0/2] Virtio GPU for S390
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,76 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Farhan Ali <alifm@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, kraxel@redhat.com
 
-With the attached patch, qemu-sh4-static now works for file:
+On 12.09.2017 16:26, Farhan Ali wrote:
+> These patches wire up the virtio-gpu device for CCW bus for
+> S390.
+>=20
+> For the S390 architecture which does not natively support any graphics
+> device, virtio gpu in 2D mode could be used to emulate a simple graphic=
+s
+> card and use VNC as the display.
+>=20
+> eg: qemu-system-s390x ... -device virtio-gpu-ccw,devno=3Dfe.0.0101
+>     -vnc host_ip_addr:5900
+>=20
+> Note, to actually see any display content the
+> guest kernel needs to support DRM layer, Virtio GPU driver,
+> the Virtual Terminal layer etc.
 
-root@debian:/# /usr/bin/qemu-sh4-static.new2 /usr/bin/file /bin/bash
-/bin/bash: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV), dynamic=
-ally linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=3D579b7ca73585e3=
-0c022e6dec83666ecc746f7499, for GNU/Linux 3.2.0, stripped
+Do you have a list of CONFIG options that need to be enabled there?
+Are there also any patches to the guest kernel driver required? Or did
+that work out of the box once you've enabled the right CONFIG options?
 
-** Patch added: "0001-linux-user-syscall.c-Handle-SH4-s-exceptional-alignm.=
-patch"
-   https://bugs.launchpad.net/qemu/+bug/1716767/+attachment/4949652/+files/=
-0001-linux-user-syscall.c-Handle-SH4-s-exceptional-alignm.patch
+> I would appreciate any feedback on these patches, specially the
+> first patch.
 
--- =
+Patches look good to me, but I'm not at all familiar with the virtio-gpu
+code, so that likely does not count...
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1716767
+Anyway, thanks a lot for tackling this! It's pretty cool to finally have
+a graphics card on s390x, too :-)
 
-Title:
-  file(1) fails with "Invalid argument" on qemu-sh4-user
-
-Status in QEMU:
-  New
-
-Bug description:
-  We recently discovered that file(1) fails on qemu-sh4-user when
-  running on an ELF file:
-
-  (sid_sh4)root@vs94:/# file /bin/bash
-  /bin/bash: ERROR: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV)=
- error reading (Invalid argument)
-  (sid_sh4)root@vs94:/#
-
-  Running with "-d" yields more output:
-
-  (sid_sh4)root@vs94:/# file -d /bin/bash 2>&1 | tail
-  322: >> 7 byte&,=3D97,"(ARM)"]
-  0 =3D=3D 97 =3D 0
-  mget(type=3D1, flag=3D0, offset=3D7, o=3D0, nbytes=3D863324, il=3D0, nc=
-=3D1)
-  mget/96 @7: \000\000\000\000\000\000\000\000\000\002\000*\000\001\000\000=
-\000\250\317A\0004\000\000\000L(\r\000\027\000\000\0004\000 \000\n\000(\000=
-\032\000\031\000\006\000\000\0004\000\000\0004\000@\0004\000@\000@\001\000\=
-000@\001\000\000\005\000\000\000\004\000\000\000\003\000\000\000t\001\000\0=
-00t\001@\000t\001@\000\023\000\000
-
-  323: >> 7 byte&,=3D-1,"(embedded)"]
-  0 =3D=3D 18446744073709551615 =3D 0
-  [try softmagic 1]
-  [try elf -1]
-  /bin/bash: ERROR: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV)=
- error reading (Invalid argument)
-  (sid_sh4)root@vs94:/#
-
-  It seems that the comparison above has a bogus (overflown?) value.
-
-  On actual hardware, it works:
-
-  root@tirpitz:~> file /bin/bash
-  /bin/bash: ELF 32-bit LSB executable, Renesas SH, version 1 (SYSV), dynam=
-ically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=3D4dd0e4281755=
-827d8bb6686fd481f8c80ea73e9a, for GNU/Linux 3.2.0, stripped
-  root@tirpitz:~>
-
-  I have uploaded a chroot with Debian unstable which allows to
-  reproduce the issue:
-
-  > https://people.debian.org/~glaubitz/sid-sh4-sbuild.tar.gz
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1716767/+subscriptions
+ Thomas
