@@ -1,23 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34146)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35093)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1ds3cT-0001d2-Jv
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:06:11 -0400
+	(envelope-from <thuth@redhat.com>) id 1ds3dk-0003Bq-H8
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:07:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1ds3cQ-0007Zp-Bz
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:06:05 -0400
-Received: from mail-vk0-x241.google.com ([2607:f8b0:400c:c05::241]:37927)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1ds3cQ-0007ZZ-73
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:06:02 -0400
-Received: by mail-vk0-x241.google.com with SMTP id o22so3314276vke.5
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 02:06:02 -0700 (PDT)
-From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Date: Wed, 13 Sep 2017 04:05:20 -0500
-Message-Id: <20170913090522.4022-13-Sergio.G.DelReal@gmail.com>
-In-Reply-To: <20170913090522.4022-1-Sergio.G.DelReal@gmail.com>
-References: <20170913090522.4022-1-Sergio.G.DelReal@gmail.com>
-Subject: [Qemu-devel] [PATCH v4 12/14] hvf: implement vga dirty page tracking
+	(envelope-from <thuth@redhat.com>) id 1ds3dg-0000R6-Kn
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:07:24 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Wed, 13 Sep 2017 11:07:17 +0200
+Message-Id: <1505293637-10450-1-git-send-email-thuth@redhat.com>
+Subject: [Qemu-devel] [PATCH] hw/isa/pc87312: Mark the device with
+ user_creatable = false
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,166 +18,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, stefanha@gmail.com, Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
+To: =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, qemu-ppc@nongnu.org
+Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, qemu-trivial@nongnu.org
 
-This patch implements setting the tracking of dirty vga pages, using hvf's
-interface to protect guest memory. It uses the MemoryListener callback
-mechanism through .log_start/stop/sync
+QEMU currently aborts if you try to use the device at the command
+line:
 
-Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
+$ ppc64-softmmu/qemu-system-ppc64 -S -machine prep -device pc87312
+Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
+qemu-system-ppc64: -device pc87312: Device 'parallel0' is in use
+Aborted (core dumped)
+
+It uses parallel_hds in its realize function, so I can not be
+instantiated by the user again.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/sysemu/hvf.h  |  5 ++++
- target/i386/hvf-all.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 72 insertions(+), 7 deletions(-)
+ hw/isa/pc87312.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/sysemu/hvf.h b/include/sysemu/hvf.h
-index 9230c13851..f54e043955 100644
---- a/include/sysemu/hvf.h
-+++ b/include/sysemu/hvf.h
-@@ -34,11 +34,16 @@ uint32_t hvf_get_supported_cpuid(uint32_t func, uint32_t idx,
- #define hvf_get_supported_cpuid(func, idx, reg) 0
- #endif
- 
-+/* hvf_slot flags */
-+#define HVF_SLOT_LOG (1 << 0)
-+
- typedef struct hvf_slot {
-     uint64_t start;
-     uint64_t size;
-     uint8_t *mem;
-     int slot_id;
-+    uint32_t flags;
-+    MemoryRegion *region;
- } hvf_slot;
- 
- typedef struct hvf_vcpu_caps {
-diff --git a/target/i386/hvf-all.c b/target/i386/hvf-all.c
-index 97f4ded673..e8466e6f47 100644
---- a/target/i386/hvf-all.c
-+++ b/target/i386/hvf-all.c
-@@ -195,6 +195,7 @@ void hvf_set_phys_mem(MemoryRegionSection *section, bool add)
-     mem->size = int128_get64(section->size);
-     mem->mem = memory_region_get_ram_ptr(area) + section->offset_within_region;
-     mem->start = section->offset_within_address_space;
-+    mem->region = area;
- 
-     if (do_hvf_set_memory(mem)) {
-         error_report("Error registering new memory slot\n");
-@@ -291,8 +292,7 @@ void hvf_cpu_synchronize_post_init(CPUState *cpu_state)
-     run_on_cpu(cpu_state, _hvf_cpu_synchronize_post_init, RUN_ON_CPU_NULL);
+diff --git a/hw/isa/pc87312.c b/hw/isa/pc87312.c
+index 5ce9f0a..48b29e3 100644
+--- a/hw/isa/pc87312.c
++++ b/hw/isa/pc87312.c
+@@ -386,6 +386,8 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
+     dc->reset = pc87312_reset;
+     dc->vmsd = &vmstate_pc87312;
+     dc->props = pc87312_properties;
++    /* Reason: Uses parallel_hds[0] in realize(), so it can't be used twice */
++    dc->user_creatable = false;
  }
  
--/* TODO: ept fault handlig */
--static bool ept_emulation_fault(uint64_t ept_qual)
-+static bool ept_emulation_fault(hvf_slot *slot, addr_t gpa, uint64_t ept_qual)
- {
-     int read, write;
- 
-@@ -308,6 +308,14 @@ static bool ept_emulation_fault(uint64_t ept_qual)
-         return false;
-     }
- 
-+    if (write && slot) {
-+        if (slot->flags & HVF_SLOT_LOG) {
-+            memory_region_set_dirty(slot->region, gpa - slot->start, 1);
-+            hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
-+                          HV_MEMORY_READ | HV_MEMORY_WRITE);
-+        }
-+    }
-+
-     /*
-      * The EPT violation must have been caused by accessing a
-      * guest-physical address that is a translation of a guest-linear
-@@ -318,7 +326,59 @@ static bool ept_emulation_fault(uint64_t ept_qual)
-         return false;
-     }
- 
--    return true;
-+    return !slot;
-+}
-+
-+static void hvf_set_dirty_tracking(MemoryRegionSection *section, bool on)
-+{
-+    struct mac_slot *macslot;
-+    hvf_slot *slot;
-+
-+    slot = hvf_find_overlap_slot(
-+            section->offset_within_address_space,
-+            section->offset_within_address_space + int128_get64(section->size));
-+
-+    /* protect region against writes; begin tracking it */
-+    if (on) {
-+        slot->flags |= HVF_SLOT_LOG;
-+        hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
-+                      HV_MEMORY_READ);
-+    /* stop tracking region*/
-+    } else {
-+        slot->flags &= ~HVF_SLOT_LOG;
-+        hv_vm_protect((hv_gpaddr_t)slot->start, (size_t)slot->size,
-+                      HV_MEMORY_READ | HV_MEMORY_WRITE);
-+    }
-+}
-+
-+static void hvf_log_start(MemoryListener *listener,
-+                          MemoryRegionSection *section, int old, int new)
-+{
-+    if (old != 0) {
-+        return;
-+    }
-+
-+    hvf_set_dirty_tracking(section, 1);
-+}
-+
-+static void hvf_log_stop(MemoryListener *listener,
-+                         MemoryRegionSection *section, int old, int new)
-+{
-+    if (new != 0) {
-+        return;
-+    }
-+
-+    hvf_set_dirty_tracking(section, 0);
-+}
-+
-+static void hvf_log_sync(MemoryListener *listener,
-+                         MemoryRegionSection *section)
-+{
-+    /*
-+     * sync of dirty pages is handled elsewhere; just make sure we keep
-+     * tracking the region.
-+     */
-+    hvf_set_dirty_tracking(section, 1);
- }
- 
- static void hvf_region_add(MemoryListener *listener,
-@@ -337,6 +397,9 @@ static MemoryListener hvf_memory_listener = {
-     .priority = 10,
-     .region_add = hvf_region_add,
-     .region_del = hvf_region_del,
-+    .log_start = hvf_log_start,
-+    .log_stop = hvf_log_stop,
-+    .log_sync = hvf_log_sync,
- };
- 
- void hvf_reset_vcpu(CPUState *cpu) {
-@@ -609,7 +672,7 @@ int hvf_vcpu_exec(CPUState *cpu)
- 
-             slot = hvf_find_overlap_slot(gpa, gpa);
-             /* mmio */
--            if (ept_emulation_fault(exit_qual) && !slot) {
-+            if (ept_emulation_fault(slot, gpa, exit_qual)) {
-                 struct x86_decode decode;
- 
-                 load_regs(cpu);
-@@ -620,9 +683,6 @@ int hvf_vcpu_exec(CPUState *cpu)
-                 store_regs(cpu);
-                 break;
-             }
--#ifdef DIRTY_VGA_TRACKING
--            /* TODO: handle dirty page tracking */
--#endif
-             break;
-         }
-         case EXIT_REASON_INOUT:
+ static const TypeInfo pc87312_type_info = {
 -- 
-2.14.1
+1.8.3.1
