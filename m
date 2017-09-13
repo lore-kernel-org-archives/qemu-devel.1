@@ -1,21 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46729)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ds2Ud-0006kN-L4
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:53:56 -0400
+	(envelope-from <bounces@canonical.com>) id 1ds2XW-0000Zr-Fc
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ds2Uc-0002g8-Rc
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:53:55 -0400
-Date: Wed, 13 Sep 2017 09:53:41 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170913095341.6505861c.cohuck@redhat.com>
-In-Reply-To: <20170912140149.7692-4-lvivier@redhat.com>
-References: <20170912140149.7692-1-lvivier@redhat.com>
-	<20170912140149.7692-4-lvivier@redhat.com>
+	(envelope-from <bounces@canonical.com>) id 1ds2XT-00064T-9N
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:56:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43862)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ds2XT-00063B-3H
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:56:51 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ds2XQ-000495-Ut
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:56:49 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 335FC2E84B1
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:56:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 3/3] tests/hmp: test "none" machine with
- memory
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 13 Sep 2017 07:41:24 -0000
+From: Thomas Huth <894037@bugs.launchpad.net>
+Reply-To: Bug 894037 <894037@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20111123154622.32156.92088.malonedeb@gac.canonical.com>
+Message-Id: <150528848440.13201.13494172444926246211.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 894037] Re: With VNC,
+ "-usbdevice tablet" no longer makes mouse pointers line up
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,48 +37,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <lvivier@redhat.com>
-Cc: qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>, Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
 
-On Tue, 12 Sep 2017 16:01:49 +0200
-Laurent Vivier <lvivier@redhat.com> wrote:
+There hasn't been a reply to my question in the last comment within
+months, so I assume nobody cares about this anymore. So I'm closing this
+ticket now...
 
-> and add a test case of dump-guest-memory without
-> "[begin length]" parameters.
-> 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/test-hmp.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/tests/test-hmp.c b/tests/test-hmp.c
-> index 729c0339f7..6b2dd5f8b8 100644
-> --- a/tests/test-hmp.c
-> +++ b/tests/test-hmp.c
-> @@ -35,6 +35,7 @@ static const char *hmp_cmds[] = {
->      "mouse_button 0",
->      "device_del mouse1",
->      "dump-guest-memory /dev/null 0 4096",
-> +    "dump-guest-memory /dev/null",
->      "gdbserver",
->      "host_net_add user id=net0",
->      "hostfwd_add tcp::43210-:43210",
-> @@ -159,5 +160,8 @@ int main(int argc, char **argv)
->  
->      qtest_cb_for_every_machine(add_machine_test_case);
->  
-> +    /* as none machine has no memory, add a test case with memory */
+** Changed in: qemu
+       Status: Incomplete =3D> Fix Released
 
-s/no memory/no memory by default/
+-- =
 
-?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/894037
 
-> +    qtest_add_data_func("hmp/none+2MB", g_strdup("none -m 2"), test_machine);
-> +
->      return g_test_run();
->  }
+Title:
+  With VNC, "-usbdevice tablet" no longer makes mouse pointers line up
 
-Regardless,
+Status in QEMU:
+  Fix Released
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Bug description:
+  I use qemu in VNC mode.  In order to get the client and server mouse
+  pointers to line up, I've had to use the "-usbdevice tablet" option.
+  This no longer works, and it behaves the same as if the option is not
+  there.  This makes my VMs unusable to me.
+
+  Here's how I'm booting WinXP:
+
+  qemu-system-x86_64 -vga std -drive
+  cache=3Dwriteback,index=3D0,media=3Ddisk,file=3Dwinxp.img -k en-us -m 2048
+  -smp 2 -vnc :3101 -usbdevice tablet -boot c -enable-kvm &
+
+  The Windows install hasn't changed, only qemu.
+
+  I'm running this version of QEMU:
+
+  QEMU emulator version 0.15.0 (qemu-kvm-0.15.0), Copyright (c)
+  2003-2008 Fabrice Bellard
+
+  I'll see about upgrading to 0.15.1, but since I haven't seen other
+  reports of this particular problem in your DB, I'm assuming that this
+  problem has not been fixed between 0.15.0 and 0.15.1.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/894037/+subscriptions
