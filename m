@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ds3EG-0006Cm-Aj
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:41:05 -0400
+	(envelope-from <kraxel@redhat.com>) id 1ds3EF-0006Ck-PZ
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:41:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ds3E6-0000t4-Dr
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:41:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51724)
+	(envelope-from <kraxel@redhat.com>) id 1ds3E7-0000tg-4p
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:40:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51756)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ds3E6-0000sD-8S
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:40:54 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ds3E6-0000sy-Sz
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:40:55 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 37050101709
+	by mx1.redhat.com (Postfix) with ESMTPS id EB703101702
 	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 08:40:53 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 13 Sep 2017 10:40:49 +0200
-Message-Id: <20170913084051.21378-3-kraxel@redhat.com>
+Date: Wed, 13 Sep 2017 10:40:48 +0200
+Message-Id: <20170913084051.21378-2-kraxel@redhat.com>
 In-Reply-To: <20170913084051.21378-1-kraxel@redhat.com>
 References: <20170913084051.21378-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 2/4] pixman: drop configure switches
+Subject: [Qemu-devel] [PULL 1/4] pixman: drop submodule
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +32,145 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Remove pixman switches from configure, should not be needed any more,
-configure can figure by itself whenever pixman is needed or not.
+Drop pixman submodule and support for the "internal" pixman build.
+pixman should be reasonably well established meanwhile so we don't
+need the fallback submodule any more.  While being at it also drop
+some #ifdefs for pixman versions older than what we require in
+configure anyway.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20170905140116.28181-3-kraxel@redhat.com
+Message-id: 20170905140116.28181-2-kraxel@redhat.com
 ---
- configure | 24 ++----------------------
- 1 file changed, 2 insertions(+), 22 deletions(-)
+ configure        | 20 ++------------------
+ Makefile         | 10 ----------
+ ui/qemu-pixman.c |  4 ----
+ .gitmodules      |  3 ---
+ pixman           |  1 -
+ 5 files changed, 2 insertions(+), 36 deletions(-)
+ delete mode 160000 pixman
 
 diff --git a/configure b/configure
-index ee32ad0530..7ea9cb3247 100755
+index fd7e3a5e81..ee32ad0530 100755
 --- a/configure
 +++ b/configure
-@@ -287,7 +287,6 @@ curses=""
- docs=""
- fdt=""
- netmap="no"
--pixman=""
- sdl=""
- sdlabi=""
- virtfs=""
-@@ -923,10 +922,6 @@ for opt do
-     # configure to be used by RPM and similar macros that set
-     # lots of directory switches by default.
+@@ -925,8 +925,6 @@ for opt do
    ;;
--  --with-system-pixman) pixman="system"
+   --with-system-pixman) pixman="system"
+   ;;
+-  --without-system-pixman) pixman="internal"
 -  ;;
--  --without-pixman) pixman="none"
--  ;;
+   --without-pixman) pixman="none"
+   ;;
    --disable-sdl) sdl="no"
-   ;;
-   --enable-sdl) sdl="yes"
-@@ -3293,24 +3288,10 @@ fi
- ##########################################
- # pixman support probe
- 
--if test "$pixman" = ""; then
--  if test "$want_tools" = "no" -a "$softmmu" = "no"; then
--    pixman="none"
--  elif $pkg_config --atleast-version=0.21.8 pixman-1 > /dev/null 2>&1; then
--    pixman="system"
--  fi
--fi
--if test "$pixman" = "none"; then
--  if test "$want_tools" != "no" -o "$softmmu" != "no"; then
--    error_exit "pixman disabled but system emulation or tools build" \
--        "enabled.  You can turn off pixman only if you also" \
--        "disable all system emulation targets and the tools" \
--        "build with '--disable-tools --disable-system'."
--  fi
-+if test "$want_tools" = "no" -a "$softmmu" = "no"; then
-   pixman_cflags=
-   pixman_libs=
--elif test "$pixman" = "system"; then
--  # pixman version has been checked above
-+elif $pkg_config --atleast-version=0.21.8 pixman-1 > /dev/null 2>&1; then
+@@ -3300,8 +3298,6 @@ if test "$pixman" = ""; then
+     pixman="none"
+   elif $pkg_config --atleast-version=0.21.8 pixman-1 > /dev/null 2>&1; then
+     pixman="system"
+-  else
+-    pixman="internal"
+   fi
+ fi
+ if test "$pixman" = "none"; then
+@@ -3318,16 +3314,8 @@ elif test "$pixman" = "system"; then
    pixman_cflags=$($pkg_config --cflags pixman-1)
    pixman_libs=$($pkg_config --libs pixman-1)
  else
-@@ -5288,7 +5269,6 @@ echo "static build      $static"
- if test "$darwin" = "yes" ; then
-     echo "Cocoa support     $cocoa"
+-  if test ! -d ${source_path}/pixman/pixman; then
+-    error_exit "pixman >= 0.21.8 not present. Your options:" \
+-        "  (1) Preferred: Install the pixman devel package (any recent" \
+-        "      distro should have packages as Xorg needs pixman too)." \
+-        "  (2) Fetch the pixman submodule, using:" \
+-        "      git submodule update --init pixman"
+-  fi
+-  mkdir -p pixman/pixman
+-  pixman_cflags="-I\$(SRC_PATH)/pixman/pixman -I\$(BUILD_DIR)/pixman/pixman"
+-  pixman_libs="-L\$(BUILD_DIR)/pixman/pixman/.libs -lpixman-1"
++  error_exit "pixman >= 0.21.8 not present." \
++      "Please install the pixman devel package."
  fi
--echo "pixman            $pixman"
- echo "SDL support       $sdl $(echo_version $sdl $sdlversion)"
- echo "GTK support       $gtk $(echo_version $gtk $gtk_version)"
- echo "GTK GL support    $gtk_gl"
+ 
+ ##########################################
+@@ -6529,10 +6517,6 @@ echo "QEMU_CFLAGS+=$cflags" >> $config_target_mak
+ 
+ done # for target in $targets
+ 
+-if [ "$pixman" = "internal" ]; then
+-  echo "config-host.h: subdir-pixman" >> $config_host_mak
+-fi
+-
+ if [ "$dtc_internal" = "yes" ]; then
+   echo "config-host.h: subdir-dtc" >> $config_host_mak
+ fi
+diff --git a/Makefile b/Makefile
+index 337a1f6f9b..b53fc69a60 100644
+--- a/Makefile
++++ b/Makefile
+@@ -325,15 +325,6 @@ $(SOFTMMU_SUBDIR_RULES): config-all-devices.mak
+ subdir-%:
+ 	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $* V="$(V)" TARGET_DIR="$*/" all,)
+ 
+-subdir-pixman: pixman/Makefile
+-	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C pixman V="$(V)" all,)
+-
+-pixman/Makefile: $(SRC_PATH)/pixman/configure
+-	(cd pixman; CFLAGS="$(CFLAGS) -fPIC $(extra_cflags) $(extra_ldflags)" $(SRC_PATH)/pixman/configure $(AUTOCONF_HOST) --disable-gtk --disable-shared --enable-static)
+-
+-$(SRC_PATH)/pixman/configure:
+-	(cd $(SRC_PATH)/pixman; autoreconf -v --install)
+-
+ DTC_MAKE_ARGS=-I$(SRC_PATH)/dtc VPATH=$(SRC_PATH)/dtc -C dtc V="$(V)" LIBFDT_srcdir=$(SRC_PATH)/dtc/libfdt
+ DTC_CFLAGS=$(CFLAGS) $(QEMU_CFLAGS)
+ DTC_CPPFLAGS=-I$(BUILD_DIR)/dtc -I$(SRC_PATH)/dtc -I$(SRC_PATH)/dtc/libfdt
+@@ -541,7 +532,6 @@ distclean: clean
+ 	rm -rf $$d || exit 1 ; \
+         done
+ 	rm -Rf .sdk
+-	if test -f pixman/config.log; then $(MAKE) -C pixman distclean; fi
+ 	if test -f dtc/version_gen.h; then $(MAKE) $(DTC_MAKE_ARGS) clean; fi
+ 
+ KEYMAPS=da     en-gb  et  fr     fr-ch  is  lt  modifiers  no  pt-br  sv \
+diff --git a/ui/qemu-pixman.c b/ui/qemu-pixman.c
+index 6e8b83add6..6e591ab821 100644
+--- a/ui/qemu-pixman.c
++++ b/ui/qemu-pixman.c
+@@ -96,17 +96,13 @@ int qemu_pixman_get_type(int rshift, int gshift, int bshift)
+         if (bshift == 0) {
+             type = PIXMAN_TYPE_ARGB;
+         } else {
+-#if PIXMAN_VERSION >= PIXMAN_VERSION_ENCODE(0, 21, 8)
+             type = PIXMAN_TYPE_RGBA;
+-#endif
+         }
+     } else if (rshift < gshift && gshift < bshift) {
+         if (rshift == 0) {
+             type = PIXMAN_TYPE_ABGR;
+         } else {
+-#if PIXMAN_VERSION >= PIXMAN_VERSION_ENCODE(0, 16, 0)
+             type = PIXMAN_TYPE_BGRA;
+-#endif
+         }
+     }
+     return type;
+diff --git a/.gitmodules b/.gitmodules
+index 5b0c212622..84c54cdc49 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -22,9 +22,6 @@
+ [submodule "roms/sgabios"]
+ 	path = roms/sgabios
+ 	url = git://git.qemu-project.org/sgabios.git
+-[submodule "pixman"]
+-	path = pixman
+-	url = git://anongit.freedesktop.org/pixman
+ [submodule "dtc"]
+ 	path = dtc
+ 	url = git://git.qemu-project.org/dtc.git
+diff --git a/pixman b/pixman
+deleted file mode 160000
+index 87eea99e44..0000000000
+--- a/pixman
++++ /dev/null
+@@ -1 +0,0 @@
+-Subproject commit 87eea99e443b389c978cf37efc52788bf03a0ee0
 -- 
 2.9.3
