@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42416)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds4cW-0006HB-T1
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:10:14 -0400
+	(envelope-from <quintela@redhat.com>) id 1ds4f1-0007KR-Sa
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:12:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds4cS-0003Ua-PL
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:10:12 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:59112)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds4cS-0003T6-Dd
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:10:08 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 13 Sep 2017 13:09:51 +0300
-Message-Id: <150529739097.10902.15025735917991693713.stgit@frigg.lan>
-In-Reply-To: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
-References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+	(envelope-from <quintela@redhat.com>) id 1ds4ey-0005eG-MZ
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:12:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60642)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ds4ey-0005dn-GN
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:12:44 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A1DD7356F6
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 10:12:43 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170811145601.GP2554@redhat.com> (Daniel P. Berrange's message
+	of "Fri, 11 Aug 2017 15:56:01 +0100")
+References: <20170808162629.32493-1-quintela@redhat.com>
+	<20170808162629.32493-8-quintela@redhat.com>
+	<20170811145601.GP2554@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 13 Sep 2017 12:12:39 +0200
+Message-ID: <87d16uewko.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 04/22] instrument: [linux-user] Add command
- line library loader
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 07/19] migration: Create
+ x-multifd-threads parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +36,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- linux-user/main.c    |   21 +++++++++++++++++++++
- linux-user/syscall.c |    4 ++++
- 2 files changed, 25 insertions(+)
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
+> On Tue, Aug 08, 2017 at 06:26:17PM +0200, Juan Quintela wrote:
+>> Indicates the number of threads that we would create.  By default we
+>> create 2 threads.
+>>  # 	migrated and the destination must already have access to the
+>>  # 	same backing chain as was used on the source.  (since 2.10)
+>>  #
+>> +# @x-multifd-threads: Number of threads used to migrate data in
+>> +#                     parallel. This is the same number that the
+>> +#                     number of sockets used for migration.
+>> +#                     The default value is 2 (since 2.11)
+>
+> The feature is called "multifd" but we're configuring number of threads,
+> with the implicit suggestion that number of threads == number of sockets.
+>
+> I wonder if its better to call this  "x-multifd-connections" so that it
+> is explicit that we're determining the number of socket connections.
+>
+> This leaves room for adapting code to use a different number of threads,
+> but same number of sockets. eg with post-copy, there's potential to have
+> 2 threads for each socket (1 reading, 1 writing).
 
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 03666ef657..ac5c30c1fb 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -36,6 +36,7 @@
- #include "exec/log.h"
- #include "trace/control.h"
- #include "glib-compat.h"
-+#include "instrument/cmdline.h"
-=20
- char *exec_path;
-=20
-@@ -4017,6 +4018,17 @@ static void handle_arg_trace(const char *arg)
-     trace_file =3D trace_opt_parse(arg);
- }
-=20
-+static char *instrument_path;
-+static int instrument_argc;
-+static const char **instrument_argv;
-+#if defined(CONFIG_INSTRUMENT)
-+static void handle_arg_instrument(const char *arg)
-+{
-+    instr_opt_parse(arg, &instrument_path,
-+                    &instrument_argc, &instrument_argv);
-+}
-+#endif
-+
- struct qemu_argument {
-     const char *argv;
-     const char *env;
-@@ -4066,6 +4078,10 @@ static const struct qemu_argument arg_table[] =3D =
-{
-      "",           "Seed for pseudo-random number generator"},
-     {"trace",      "QEMU_TRACE",       true,  handle_arg_trace,
-      "",           "[[enable=3D]<pattern>][,events=3D<file>][,file=3D<fi=
-le>]"},
-+#if defined(CONFIG_INSTRUMENT)
-+    {"instr",      "QEMU_INSTR",       true,  handle_arg_instrument,
-+     "",           "[file=3D]<file>[,arg=3D<string>]"},
-+#endif
-     {"version",    "QEMU_VERSION",     false, handle_arg_version,
-      "",           "display version information and exit"},
-     {NULL, NULL, false, NULL, NULL, NULL}
-@@ -4257,6 +4273,9 @@ int main(int argc, char **argv, char **envp)
-     srand(time(NULL));
-=20
-     qemu_add_opts(&qemu_trace_opts);
-+#if defined(CONFIG_INSTRUMENT)
-+    qemu_add_opts(&qemu_instr_opts);
-+#endif
-=20
-     optind =3D parse_args(argc, argv);
-=20
-@@ -4265,6 +4284,8 @@ int main(int argc, char **argv, char **envp)
-     }
-     trace_init_file(trace_file);
-=20
-+    instr_init(instrument_path, instrument_argc, instrument_argv);
-+
-     /* Zero out regs */
-     memset(regs, 0, sizeof(struct target_pt_regs));
-=20
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9b6364a266..e73a07fa6f 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -115,6 +115,8 @@ int __clone2(int (*fn)(void *), void *child_stack_bas=
-e,
- #include "uname.h"
-=20
- #include "qemu.h"
-+#include "instrument/cmdline.h"
-+
-=20
- #ifndef CLONE_IO
- #define CLONE_IO                0x80000000      /* Clone io context */
-@@ -7765,6 +7767,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
-g arg1,
-         _mcleanup();
- #endif
-         gdb_exit(cpu_env, arg1);
-+        instr_fini();
-         _exit(arg1);
-         ret =3D 0; /* avoid warning */
-         break;
-@@ -9821,6 +9824,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_lon=
-g arg1,
-         _mcleanup();
- #endif
-         gdb_exit(cpu_env, arg1);
-+        instr_fini();
-         ret =3D get_errno(exit_group(arg1));
-         break;
- #endif
+Changed to channels, is that ok for you?
+
+Later, Juan.
