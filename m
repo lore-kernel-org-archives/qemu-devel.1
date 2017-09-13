@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52751)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55071)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ds9Dk-0001qX-Aq
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:05:01 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1ds9KZ-0004rw-SQ
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:12:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ds9Dh-0001GY-6f
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:04:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57746)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1ds9Dh-0001GH-0f
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:04:53 -0400
-References: <20170913132417.24384-1-david@redhat.com>
-	<20170913132417.24384-8-david@redhat.com>
-	<d75bd287-b96f-6e18-5d2b-3f024354eeab@redhat.com>
-	<18cfdcde-da7f-cf42-2d44-a1ea866fde0c@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <d6391a75-0d68-1634-0756-b5c38d547e4b@redhat.com>
-Date: Wed, 13 Sep 2017 17:04:43 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1ds9KU-0004p2-Am
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:11:59 -0400
+Received: from mail-pg0-x233.google.com ([2607:f8b0:400e:c05::233]:44282)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1ds9KU-0004mh-4D
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 11:11:54 -0400
+Received: by mail-pg0-x233.google.com with SMTP id j16so941518pga.1
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 08:11:52 -0700 (PDT)
+References: <20170912211934.20919-1-f4bug@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <cc987ea5-cc15-19ee-d912-6b1feb4cfb82@linaro.org>
+Date: Wed, 13 Sep 2017 08:11:48 -0700
 MIME-Version: 1.0
-In-Reply-To: <18cfdcde-da7f-cf42-2d44-a1ea866fde0c@redhat.com>
+In-Reply-To: <20170912211934.20919-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v5 07/22] target/s390x: move some s390x
- typedefs to cpu-qom.h
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] accel/tcg: move USER code to user-exec.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,39 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 13.09.2017 16:44, David Hildenbrand wrote:
-> On 13.09.2017 16:27, Thomas Huth wrote:
->> On 13.09.2017 15:24, David Hildenbrand wrote:
->>> This allows us to drop inclusion of cpu_models.h in cpu-qom.h, and
->>> prepares for using cpu-qom.h as a s390 specific version of typedefs.h
->>>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>  target/s390x/cpu-qom.h    | 5 ++++-
->>>  target/s390x/cpu.h        | 5 +++--
->>>  target/s390x/cpu_models.h | 8 ++++----
->>>  3 files changed, 11 insertions(+), 7 deletions(-)
->> [...]
->>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->>> index 372f7d8885..4a0a59dfbc 100644
->>> --- a/target/s390x/cpu.h
->>> +++ b/target/s390x/cpu.h
->>> @@ -25,6 +25,7 @@
->>>  
->>>  #include "qemu-common.h"
->>>  #include "cpu-qom.h"
->>> +#include "cpu_models.h"
->>
->> Do we really need to include cpu_models.h here? Looking at your changes
->> below, it does not seem to be necessary?
+On 09/12/2017 02:19 PM, Philippe Mathieu-Daudé wrote:
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+> Based-on: 20170911213328.9701-5-f4bug@amsat.org
 > 
-> Yes, due to s390_has_feat(), and I want to avoid cleaning all the other
-> calling places up in this patch.
+>  accel/tcg/tcg-runtime.c | 54 -------------------------------------------------
+>  accel/tcg/user-exec.c   | 52 +++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 52 insertions(+), 54 deletions(-)
 
-OK, I just checked and it indeed blows up in a lot of places, so I think
-this include here is justified.
+Queued, thanks.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+r~
