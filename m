@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58562)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds53l-0006Dw-B0
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:38:23 -0400
+	(envelope-from <peterx@redhat.com>) id 1ds56p-0000PJ-2d
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:41:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds53g-0001Zz-Ai
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:38:21 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:35492 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds53g-0001YZ-0X
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:38:16 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 13 Sep 2017 13:38:05 +0300
-Message-Id: <150529908530.10902.11619586029850482917.stgit@frigg.lan>
-In-Reply-To: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
-References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+	(envelope-from <peterx@redhat.com>) id 1ds56l-0004cW-1j
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:41:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39102)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ds56k-0004bH-Ot
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:41:26 -0400
+Date: Wed, 13 Sep 2017 18:41:18 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170913104118.GF3617@pxdev.xzpeter.org>
+References: <1502788964-30517-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 11/22] instrument: Track vCPUs
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1502788964-30517-1-git-send-email-thuth@redhat.com>
+Subject: Re: [Qemu-devel] [RFC PATCH for 2.11] tests: Introduce generic
+ device hot-plug/hot-unplug functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,175 +27,413 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>, Amit Shah <amit@kernel.org>
 
-Keep a translation between instrumentation's QICPU and CPUState objects t=
-o avoid
-exposing QEMU's internals to instrumentation clients.
+On Tue, Aug 15, 2017 at 11:22:44AM +0200, Thomas Huth wrote:
+> A lot of tests provide code for adding and removing a device via the
+> device_add and device_del QMP commands. Maintaining this code in so
+> many places is cumbersome and error-prone (some of the code parts
+> check the responses in an incorrect way, for example), so let's
+> provide some proper generic qtest functions for adding and removing a
+> device instead.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  I'm planning to use qtest_hot_plug_device() in a bigger patch series
+>  that I'm currently preparing. But since this clean-up patch is valid on
+>  its own already, I'd like to get some feedback (or even a Reviewed-by)
+>  for this patch here already if possible...
+> 
+>  tests/libqos/pci.c         | 19 ++-------------
+>  tests/libqos/usb.c         | 30 +++++------------------
+>  tests/libqtest.c           | 60 ++++++++++++++++++++++++++++++++++++++++++++++
+>  tests/libqtest.h           | 19 +++++++++++++++
+>  tests/usb-hcd-uhci-test.c  | 26 ++------------------
+>  tests/usb-hcd-xhci-test.c  | 52 ++++------------------------------------
+>  tests/virtio-scsi-test.c   | 24 ++-----------------
+>  tests/virtio-serial-test.c | 25 +++----------------
+>  8 files changed, 98 insertions(+), 157 deletions(-)
+> 
+> diff --git a/tests/libqos/pci.c b/tests/libqos/pci.c
+> index 2dcdead..aada753 100644
+> --- a/tests/libqos/pci.c
+> +++ b/tests/libqos/pci.c
+> @@ -394,21 +394,6 @@ QPCIBar qpci_legacy_iomap(QPCIDevice *dev, uint16_t addr)
+>  void qpci_plug_device_test(const char *driver, const char *id,
+>                             uint8_t slot, const char *opts)
+>  {
+> -    QDict *response;
+> -    char *cmd;
+> -
+> -    cmd = g_strdup_printf("{'execute': 'device_add',"
+> -                          " 'arguments': {"
+> -                          "   'driver': '%s',"
+> -                          "   'addr': '%d',"
+> -                          "   %s%s"
+> -                          "   'id': '%s'"
+> -                          "}}", driver, slot,
+> -                          opts ? opts : "", opts ? "," : "",
+> -                          id);
+> -    response = qmp(cmd);
+> -    g_free(cmd);
+> -    g_assert(response);
+> -    g_assert(!qdict_haskey(response, "error"));
+> -    QDECREF(response);
+> +    qtest_hot_plug_device(driver, id, "'addr': '%d'%s%s", slot,
+> +                          opts ? ", " : "", opts ? opts : "");
+>  }
+> diff --git a/tests/libqos/usb.c b/tests/libqos/usb.c
+> index 0cdfaec..f8d0190 100644
+> --- a/tests/libqos/usb.c
+> +++ b/tests/libqos/usb.c
+> @@ -40,34 +40,16 @@ void uhci_port_test(struct qhc *hc, int port, uint16_t expect)
+>  void usb_test_hotplug(const char *hcd_id, const int port,
+>                        void (*port_check)(void))
+>  {
+> -    QDict *response;
+> -    char  *cmd;
+> +    char  *id = g_strdup_printf("usbdev%d", port);
+>  
+> -    cmd = g_strdup_printf("{'execute': 'device_add',"
+> -                          " 'arguments': {"
+> -                          "   'driver': 'usb-tablet',"
+> -                          "   'port': '%d',"
+> -                          "   'bus': '%s.0',"
+> -                          "   'id': 'usbdev%d'"
+> -                          "}}", port, hcd_id, port);
+> -    response = qmp(cmd);
+> -    g_free(cmd);
+> -    g_assert(response);
+> -    g_assert(!qdict_haskey(response, "error"));
+> -    QDECREF(response);
+> +    qtest_hot_plug_device("usb-tablet", id, "'port': '%d', 'bus': '%s.0'",
+> +                          port, hcd_id);
+>  
+>      if (port_check) {
+>          port_check();
+>      }
+>  
+> -    cmd = g_strdup_printf("{'execute': 'device_del',"
+> -                           " 'arguments': {"
+> -                           "   'id': 'usbdev%d'"
+> -                           "}}", port);
+> -    response = qmp(cmd);
+> -    g_free(cmd);
+> -    g_assert(response);
+> -    g_assert(qdict_haskey(response, "event"));
+> -    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
+> -    QDECREF(response);
+> +    qtest_hot_unplug_device(id);
+> +
+> +    g_free(id);
+>  }
+> diff --git a/tests/libqtest.c b/tests/libqtest.c
+> index b9a1f18..4339d97 100644
+> --- a/tests/libqtest.c
+> +++ b/tests/libqtest.c
+> @@ -987,3 +987,63 @@ void qtest_cb_for_every_machine(void (*cb)(const char *machine))
+>      qtest_end();
+>      QDECREF(response);
+>  }
+> +
+> +/**
+> + * Generic hot-plugging test via the device_add QMP command
+> + */
+> +void qtest_hot_plug_device(const char *driver, const char *id,
+> +                           const char *fmt, ...)
+> +{
+> +    QDict *response;
+> +    char *cmd, *opts = NULL;
+> +    va_list va;
+> +
+> +    if (fmt) {
+> +        va_start(va, fmt);
+> +        opts = g_strdup_vprintf(fmt, va);
+> +        va_end(va);
+> +    }
+> +
+> +    cmd = g_strdup_printf("{'execute': 'device_add',"
+> +                          " 'arguments': { 'driver': '%s', 'id': '%s'%s%s }}",
+> +                          driver, id, opts ? ", " : "", opts ? opts : "");
+> +    g_free(opts);
+> +
+> +    response = qmp(cmd);
+> +    g_free(cmd);
+> +    g_assert(response);
+> +    while (qdict_haskey(response, "event")) {
+> +        /* We can get DEVICE_DELETED events in case something went wrong */
+> +        g_assert_cmpstr(qdict_get_str(response, "event"), !=, "DEVICE_DELETED");
+> +        QDECREF(response);
+> +        response = qmp("");
+> +        g_assert(response);
+> +    }
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- cpus-common.c            |    9 +++++++++
- instrument/control.c     |   23 +++++++++++++++++++++++
- instrument/control.h     |   36 ++++++++++++++++++++++++++++++++++++
- instrument/control.inc.h |   23 +++++++++++++++++++++++
- 4 files changed, 91 insertions(+)
+I guess we don't need this block for hot plug? :-)
 
-diff --git a/cpus-common.c b/cpus-common.c
-index 59f751ecf9..ec5f46cc3d 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -22,6 +22,9 @@
- #include "exec/cpu-common.h"
- #include "qom/cpu.h"
- #include "sysemu/cpus.h"
-+#if defined(CONFIG_INSTRUMENT)
-+#include "instrument/control.h"
-+#endif
-=20
- static QemuMutex qemu_cpu_list_lock;
- static QemuCond exclusive_cond;
-@@ -84,6 +87,9 @@ void cpu_list_add(CPUState *cpu)
-     } else {
-         assert(!cpu_index_auto_assigned);
-     }
-+#if defined(CONFIG_INSTRUMENT)
-+    instr_cpu_add(cpu);
-+#endif
-     QTAILQ_INSERT_TAIL(&cpus, cpu, node);
-     qemu_mutex_unlock(&qemu_cpu_list_lock);
-=20
-@@ -102,6 +108,9 @@ void cpu_list_remove(CPUState *cpu)
-     assert(!(cpu_index_auto_assigned && cpu !=3D QTAILQ_LAST(&cpus, CPUT=
-ailQ)));
-=20
-     QTAILQ_REMOVE(&cpus, cpu, node);
-+#if defined(CONFIG_INSTRUMENT)
-+    instr_cpu_remove(cpu);
-+#endif
-     cpu->cpu_index =3D UNASSIGNED_CPU_INDEX;
-     qemu_mutex_unlock(&qemu_cpu_list_lock);
- }
-diff --git a/instrument/control.c b/instrument/control.c
-index 3630d6b3be..8cf2b4f967 100644
---- a/instrument/control.c
-+++ b/instrument/control.c
-@@ -13,10 +13,33 @@
- #include "instrument/load.h"
- #include "instrument/qemu-instr/control.h"
- #include "qemu/compiler.h"
-+#include "qom/cpu.h"
-+
-=20
- __thread InstrState instr_cur_state;
-=20
-=20
-+unsigned int instr_cpus_count;
-+CPUState **instr_cpus;
-+
-+void instr_cpu_add(CPUState *vcpu)
-+{
-+    unsigned int idx =3D vcpu->cpu_index;
-+    if (idx >=3D instr_cpus_count) {
-+        instr_cpus_count =3D idx + 1;
-+        instr_cpus =3D realloc(instr_cpus,
-+                             sizeof(*instr_cpus) * instr_cpus_count);
-+    }
-+    instr_cpus[idx] =3D vcpu;
-+}
-+
-+void instr_cpu_remove(CPUState *vcpu)
-+{
-+    unsigned int idx =3D vcpu->cpu_index;
-+    instr_cpus[idx] =3D NULL;
-+}
-+
-+
- qi_fini_fn instr_event__fini_fn;
- void *instr_event__fini_data;
-=20
-diff --git a/instrument/control.h b/instrument/control.h
-index f2b085f69b..57cea07fa7 100644
---- a/instrument/control.h
-+++ b/instrument/control.h
-@@ -10,6 +10,42 @@
- #ifndef INSTRUMENT__CONTROL_H
- #define INSTRUMENT__CONTROL_H
-=20
-+#include "qemu/typedefs.h"
-+#include "instrument/qemu-instr/types.h"
-+
-+
-+/**
-+ * instr_cpu_add:
-+ *
-+ * Make @vcpu available to instrumentation clients.
-+ *
-+ * Precondition: cpu_list_lock().
-+ */
-+void instr_cpu_add(CPUState *vcpu);
-+
-+/**
-+ * instr_cpu_remove:
-+ *
-+ * Make @vcpu unavailable to instrumentation clients.
-+ *
-+ * Precondition: cpu_list_lock().
-+ */
-+void instr_cpu_remove(CPUState *vcpu);
-+
-+/**
-+ * instr_cpu_to_qicpu:
-+ *
-+ * Get the #QICPU corresponding to the given #CPUState.
-+ */
-+static inline QICPU instr_cpu_to_qicpu(CPUState *vcpu);
-+
-+/**
-+ * instr_cpu_from_qicpu:
-+ *
-+ * Get the #CPUState corresponding to the given #QICPU.
-+ */
-+static inline CPUState *instr_cpu_from_qicpu(QICPU vcpu);
-+
-=20
- /**
-  * InstrState:
-diff --git a/instrument/control.inc.h b/instrument/control.inc.h
-index 0f649f4caa..45daae7d1d 100644
---- a/instrument/control.inc.h
-+++ b/instrument/control.inc.h
-@@ -7,9 +7,32 @@
-  * See the COPYING file in the top-level directory.
-  */
-=20
-+#include "qemu/osdep.h"
- #include "qemu/atomic.h"
- #include "qemu/compiler.h"
-+#include "qom/cpu.h"
- #include <stdbool.h>
-+#include <stdint.h>
-+
-+
-+extern unsigned int instr_cpus_count;
-+extern CPUState **instr_cpus;
-+
-+static inline QICPU instr_cpu_to_qicpu(CPUState *vcpu)
-+{
-+    uintptr_t idx =3D vcpu->cpu_index;
-+    return (QICPU)idx;
-+}
-+
-+static inline CPUState *instr_cpu_from_qicpu(QICPU vcpu)
-+{
-+    unsigned int idx =3D (uintptr_t)vcpu;
-+    if (idx >=3D instr_cpus_count) {
-+        return NULL;
-+    } else {
-+        return instr_cpus[idx];
-+    }
-+}
-=20
-=20
- extern __thread InstrState instr_cur_state;
+> +    g_assert(!qdict_haskey(response, "error"));
+> +    QDECREF(response);
+> +}
+> +
+> +/**
+> + * Generic hot-unplugging test via the device_del QMP command
+> + */
+> +void qtest_hot_unplug_device(const char *id)
+> +{
+> +    QDict *response;
+> +    char *cmd;
+> +
+> +    cmd = g_strdup_printf("{'execute': 'device_del',"
+> +                          " 'arguments': { 'id': '%s' }}", id);
+> +
+> +    response = qmp(cmd);
+> +    g_free(cmd);
+> +    g_assert(response);
+> +    while (qdict_haskey(response, "event")) {
+> +        /* We should get DEVICE_DELETED event first */
+
+So here is the mis-order thing: could the "return: {}" arrive earlier?
+IHMO it can.  If so, we'll leave the event in the buffer without
+reading it.
+
+If you see my patch, I do two reads (assuming we will only get exactly
+one "return: {}" and a DELETED event), and take care of the ordering.
+Would that be better?
+
+> +        g_assert_cmpstr(qdict_get_str(response, "event"), ==, "DEVICE_DELETED");
+> +        QDECREF(response);
+> +        response = qmp("");
+> +        g_assert(response);
+> +    }
+> +    g_assert(!qdict_haskey(response, "error"));
+> +    QDECREF(response);
+> +}
+> diff --git a/tests/libqtest.h b/tests/libqtest.h
+> index 3ae5709..9c1006f 100644
+> --- a/tests/libqtest.h
+> +++ b/tests/libqtest.h
+> @@ -927,4 +927,23 @@ QDict *qmp_fd(int fd, const char *fmt, ...);
+>   */
+>  void qtest_cb_for_every_machine(void (*cb)(const char *machine));
+>  
+> +/**
+> + * qtest_hot_plug_device:
+> + * @driver: Name of the device that should be added
+> + * @id: Identification string
+> + * @fmt: printf-like format string for further options to device_add
+> + *
+> + * Generic hot-plugging test via the device_add QMP command.
+> + */
+> +void qtest_hot_plug_device(const char *driver, const char *id,
+> +                           const char *fmt, ...) GCC_FMT_ATTR(3, 4);
+> +
+> +/**
+> + * qtest_hot_unplug_device:
+> + * @id: Identification string
+> + *
+> + * Generic hot-unplugging test via the device_del QMP command.
+> + */
+> +void qtest_hot_unplug_device(const char *id);
+> +
+>  #endif
+> diff --git a/tests/usb-hcd-uhci-test.c b/tests/usb-hcd-uhci-test.c
+> index 5b500fe..7465bfd 100644
+> --- a/tests/usb-hcd-uhci-test.c
+> +++ b/tests/usb-hcd-uhci-test.c
+> @@ -48,31 +48,9 @@ static void test_uhci_hotplug(void)
+>  
+>  static void test_usb_storage_hotplug(void)
+>  {
+> -    QDict *response;
+> +    qtest_hot_plug_device("usb-storage", "usbdev0", "'drive': 'drive0'");
+>  
+> -    response = qmp("{'execute': 'device_add',"
+> -                   " 'arguments': {"
+> -                   "   'driver': 'usb-storage',"
+> -                   "   'drive': 'drive0',"
+> -                   "   'id': 'usbdev0'"
+> -                   "}}");
+> -    g_assert(response);
+> -    g_assert(!qdict_haskey(response, "error"));
+> -    QDECREF(response);
+> -
+> -    response = qmp("{'execute': 'device_del',"
+> -                           " 'arguments': {"
+> -                           "   'id': 'usbdev0'"
+> -                           "}}");
+> -    g_assert(response);
+> -    g_assert(!qdict_haskey(response, "error"));
+> -    QDECREF(response);
+> -
+> -    response = qmp("");
+> -    g_assert(response);
+> -    g_assert(qdict_haskey(response, "event"));
+> -    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
+> -    QDECREF(response);
+> +    qtest_hot_unplug_device("usbdev0");
+>  }
+>  
+>  int main(int argc, char **argv)
+> diff --git a/tests/usb-hcd-xhci-test.c b/tests/usb-hcd-xhci-test.c
+> index 031764d..ae89362 100644
+> --- a/tests/usb-hcd-xhci-test.c
+> +++ b/tests/usb-hcd-xhci-test.c
+> @@ -11,7 +11,6 @@
+>  #include "libqtest.h"
+>  #include "libqos/usb.h"
+>  
+> -
+
+Nit: useless change
+
+Other than these, it looks quite good to me.  Thanks,
+
+>  static void test_xhci_init(void)
+>  {
+>  }
+> @@ -23,59 +22,16 @@ static void test_xhci_hotplug(void)
+>  
+>  static void test_usb_uas_hotplug(void)
+>  {
+> -    QDict *response;
+> -
+> -    response = qmp("{'execute': 'device_add',"
+> -                   " 'arguments': {"
+> -                   "   'driver': 'usb-uas',"
+> -                   "   'id': 'uas'"
+> -                   "}}");
+> -    g_assert(response);
+> -    g_assert(!qdict_haskey(response, "error"));
+> -    QDECREF(response);
+> -
+> -    response = qmp("{'execute': 'device_add',"
+> -                   " 'arguments': {"
+> -                   "   'driver': 'scsi-hd',"
+> -                   "   'drive': 'drive0',"
+> -                   "   'id': 'scsi-hd'"
+> -                   "}}");
+> -    g_assert(response);
+> -    g_assert(!qdict_haskey(response, "error"));
+> -    QDECREF(response);
+> +    qtest_hot_plug_device("usb-uas", "uas", NULL);
+> +    qtest_hot_plug_device("scsi-hd", "scsihd", "'drive': 'drive0'");
+>  
+>      /* TODO:
+>          UAS HBA driver in libqos, to check that
+>          added disk is visible after BUS rescan
+>      */
+>  
+> -    response = qmp("{'execute': 'device_del',"
+> -                           " 'arguments': {"
+> -                           "   'id': 'scsi-hd'"
+> -                           "}}");
+> -    g_assert(response);
+> -    g_assert(!qdict_haskey(response, "error"));
+> -    QDECREF(response);
+> -
+> -    response = qmp("");
+> -    g_assert(qdict_haskey(response, "event"));
+> -    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
+> -    QDECREF(response);
+> -
+> -
+> -    response = qmp("{'execute': 'device_del',"
+> -                           " 'arguments': {"
+> -                           "   'id': 'uas'"
+> -                           "}}");
+> -    g_assert(response);
+> -    g_assert(!qdict_haskey(response, "error"));
+> -    QDECREF(response);
+> -
+> -    response = qmp("");
+> -    g_assert(response);
+> -    g_assert(qdict_haskey(response, "event"));
+> -    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
+> -    QDECREF(response);
+> +    qtest_hot_unplug_device("scsihd");
+> +    qtest_hot_unplug_device("uas");
+>  }
+>  
+>  int main(int argc, char **argv)
+> diff --git a/tests/virtio-scsi-test.c b/tests/virtio-scsi-test.c
+> index 87a3b6e..6e7ba6f 100644
+> --- a/tests/virtio-scsi-test.c
+> +++ b/tests/virtio-scsi-test.c
+> @@ -192,32 +192,12 @@ static void pci_nop(void)
+>  
+>  static void hotplug(void)
+>  {
+> -    QDict *response;
+>      QOSState *qs;
+>  
+>      qs = qvirtio_scsi_start(
+>              "-drive id=drv1,if=none,file=null-co://,format=raw");
+> -    response = qmp("{\"execute\": \"device_add\","
+> -                   " \"arguments\": {"
+> -                   "   \"driver\": \"scsi-hd\","
+> -                   "   \"id\": \"scsi-hd\","
+> -                   "   \"drive\": \"drv1\""
+> -                   "}}");
+> -
+> -    g_assert(response);
+> -    g_assert(!qdict_haskey(response, "error"));
+> -    QDECREF(response);
+> -
+> -    response = qmp("{\"execute\": \"device_del\","
+> -                   " \"arguments\": {"
+> -                   "   \"id\": \"scsi-hd\""
+> -                   "}}");
+> -
+> -    g_assert(response);
+> -    g_assert(!qdict_haskey(response, "error"));
+> -    g_assert(qdict_haskey(response, "event"));
+> -    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
+> -    QDECREF(response);
+> +    qtest_hot_plug_device("scsi-hd", "scsihd", "'drive': 'drv1'");
+> +    qtest_hot_unplug_device("scsihd");
+>      qvirtio_scsi_stop(qs);
+>  }
+>  
+> diff --git a/tests/virtio-serial-test.c b/tests/virtio-serial-test.c
+> index b14d943..97f8f52 100644
+> --- a/tests/virtio-serial-test.c
+> +++ b/tests/virtio-serial-test.c
+> @@ -17,28 +17,9 @@ static void pci_nop(void)
+>  
+>  static void hotplug(void)
+>  {
+> -    QDict *response;
+> -
+> -    response = qmp("{\"execute\": \"device_add\","
+> -                   " \"arguments\": {"
+> -                   "   \"driver\": \"virtserialport\","
+> -                   "   \"id\": \"hp-port\""
+> -                   "}}");
+> -
+> -    g_assert(response);
+> -    g_assert(!qdict_haskey(response, "error"));
+> -    QDECREF(response);
+> -
+> -    response = qmp("{\"execute\": \"device_del\","
+> -                   " \"arguments\": {"
+> -                   "   \"id\": \"hp-port\""
+> -                   "}}");
+> -
+> -    g_assert(response);
+> -    g_assert(!qdict_haskey(response, "error"));
+> -    g_assert(qdict_haskey(response, "event"));
+> -    g_assert(!strcmp(qdict_get_str(response, "event"), "DEVICE_DELETED"));
+> -    QDECREF(response);
+> +    qtest_hot_plug_device("virtserialport", "hp-port", NULL);
+> +
+> +    qtest_hot_unplug_device("hp-port");
+>  }
+>  
+>  int main(int argc, char **argv)
+> -- 
+> 1.8.3.1
+> 
+> 
+
+-- 
+Peter Xu
