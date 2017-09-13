@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ds2DR-0002Yh-Iz
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:36:10 -0400
+	(envelope-from <kraxel@redhat.com>) id 1ds2Iu-00058V-UJ
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:41:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ds2DM-0001y7-MN
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:36:09 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39146)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ds2DM-0001wA-Fs
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:36:04 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ds2DK-0005Ax-30
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:36:02 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 6A59D2E84C2
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:35:59 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 13 Sep 2017 07:25:24 -0000
-From: Thomas Huth <1129571@bugs.launchpad.net>
-Reply-To: Bug 1129571 <1129571@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20130218230633.21029.10708.malonedeb@wampee.canonical.com>
-Message-Id: <150528752441.5685.179986693805276427.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1129571] Re: libreoffice armhf FTBFS
+	(envelope-from <kraxel@redhat.com>) id 1ds2Ir-0003HK-55
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:41:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36510)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ds2Iq-0003FR-VR
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:41:45 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id E5DD18553E
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:41:43 +0000 (UTC)
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 13 Sep 2017 09:41:35 +0200
+Message-Id: <20170913074140.5160-2-kraxel@redhat.com>
+In-Reply-To: <20170913074140.5160-1-kraxel@redhat.com>
+References: <20170913074140.5160-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 1/6] vga: fix display update region calculation
+ (split screen)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +31,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>
 
-There hasn't been a reply to my question in comment #32 within
-months, so I assume nobody cares about this anymore. So I'm closing this
-ticket now...
+vga display update mis-calculated the region for the dirty bitmap
+snapshot in case split screen mode is used.  This can trigger an
+assert in cpu_physical_memory_snapshot_get_dirty().
 
-** Changed in: qemu
-       Status: Incomplete =3D> Won't Fix
+Impact:  DoS for privileged guest users.
 
--- =
+Fixes: CVE-2017-13673
+Fixes: fec5e8c92becad223df9d972770522f64aafdb72
+Cc: P J P <ppandit@redhat.com>
+Reported-by: David Buchanan <d@vidbuchanan.co.uk>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20170828123307.15392-1-kraxel@redhat.com
+---
+ hw/display/vga.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1129571
-
-Title:
-  libreoffice armhf FTBFS
-
-Status in QEMU:
-  Won't Fix
-Status in qemu package in Ubuntu:
-  Confirmed
-
-Bug description:
-  We have been experiencing FTBFS of LibreOffice 3.5.7, 12.04, armhf in
-  the launchpad buildds. We believe this is likely due to an error in
-  qemu.
-
-  While we do not have a small test case yet, we do have a build log
-  (attaching here).
-
-  The relevant snippet from the build log is:
-
-  3.5.7/solver/unxlngr.pro/bin/jaxp.jar:/build/buildd/libreoffice-3.5.7/sol=
-ver/unxlngr.pro/bin/juh.jar:/build/buildd/libreoffice-3.5.7/solver/unxlngr.=
-pro/bin/parser.jar:/build/buildd/libreoffice-3.5.7/solver/unxlngr.pro/bin/x=
-t.jar:/build/buildd/libreoffice-3.5.7/solver/unxlngr.pro/bin/unoil.jar:/bui=
-ld/buildd/libreoffice-3.5.7/solver/unxlngr.pro/bin/ridl.jar:/build/buildd/l=
-ibreoffice-3.5.7/solver/unxlngr.pro/bin/jurt.jar:/build/buildd/libreoffice-=
-3.5.7/solver/unxlngr.pro/bin/xmlsearch.jar:/build/buildd/libreoffice-3.5.7/=
-solver/unxlngr.pro/bin/LuceneHelpWrapper.jar:/build/buildd/libreoffice-3.5.=
-7/solver/unxlngr.pro/bin/HelpIndexerTool.jar:/build/buildd/libreoffice-3.5.=
-7/solver/unxlngr.pro/bin/lucene-core-2.3.jar:/build/buildd/libreoffice-3.5.=
-7/solver/unxlngr.pro/bin/lucene-analyzers-2.3.jar" com.sun.star.help.HelpIn=
-dexerTool -lang cs -mod swriter -zipdir ../../unxlngr.pro/misc/ziptmpswrite=
-r_cs -o ../../unxlngr.pro/bin/swriter_cs.zip.unxlngr.pro
-  dmake:  Error code 132, while making '../../unxlngr.pro/bin/swriter_cs.zi=
-p'
-
-  We believe this is from bash error code 128 + 4, where 4 is illegal
-  instruction, thus leading us to suspect qemu.
-
-  Any help in tracking this down would be appreciated.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1129571/+subscriptions
+diff --git a/hw/display/vga.c b/hw/display/vga.c
+index 3433102ef3..ad7a46563c 100644
+--- a/hw/display/vga.c
++++ b/hw/display/vga.c
+@@ -1628,9 +1628,15 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+     y1 = 0;
+ 
+     if (!full_update) {
++        ram_addr_t region_start = addr1;
++        ram_addr_t region_end = addr1 + line_offset * height;
+         vga_sync_dirty_bitmap(s);
+-        snap = memory_region_snapshot_and_clear_dirty(&s->vram, addr1,
+-                                                      line_offset * height,
++        if (s->line_compare < height) {
++            /* split screen mode */
++            region_start = 0;
++        }
++        snap = memory_region_snapshot_and_clear_dirty(&s->vram, region_start,
++                                                      region_end - region_start,
+                                                       DIRTY_MEMORY_VGA);
+     }
+ 
+-- 
+2.9.3
