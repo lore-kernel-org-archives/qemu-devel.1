@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56272)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58195)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds5ko-0001Al-MJ
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:22:52 -0400
+	(envelope-from <quintela@redhat.com>) id 1ds5o8-0003v1-KI
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:26:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds5kl-0001O3-Eh
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:22:50 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:47411)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds5kk-0001NR-VU
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:22:47 -0400
-From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 13 Sep 2017 14:22:37 +0300
-Message-Id: <150530175686.10902.13435538263886289800.stgit@frigg.lan>
-In-Reply-To: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
-References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+	(envelope-from <quintela@redhat.com>) id 1ds5o2-0003ve-Es
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:26:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36716)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ds5o2-0003ue-62
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:26:10 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+	[10.5.11.11])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 242DF13A49
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 11:26:09 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+In-Reply-To: <20170811152949.GU2554@redhat.com> (Daniel P. Berrange's message
+	of "Fri, 11 Aug 2017 16:29:49 +0100")
+References: <20170808162629.32493-1-quintela@redhat.com>
+	<20170808162629.32493-16-quintela@redhat.com>
+	<20170811152949.GU2554@redhat.com>
+Reply-To: quintela@redhat.com
+Date: Wed, 13 Sep 2017 13:26:07 +0200
+Message-ID: <87r2vadels.fsf@secure.laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 22/22] instrument: Add API to manipulate
- guest memory
+Content-Type: text/plain
+Subject: Re: [Qemu-devel] [PATCH v6 15/19] migration: Create thread
+ infrastructure for multifd recv side
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,234 +36,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-It includes access to the guest's memory and vCPU registers.
+"Daniel P. Berrange" <berrange@redhat.com> wrote:
+> On Tue, Aug 08, 2017 at 06:26:25PM +0200, Juan Quintela wrote:
+>> We make the locking and the transfer of information specific, even if we
+>> are still receiving things through the main thread.
+>> 
+>> Signed-off-by: Juan Quintela <quintela@redhat.com>
+>> 
+>> --
+>> 
+>> We split when we create the main channel and where we start the main
+>> migration thread, so we wait for the creation of the other threads.
+>> 
+>> Use multifd_clear_group().
+>> ---
+>>  migration/migration.c |  7 ++++---
+>>  migration/migration.h |  1 +
+>>  migration/ram.c       | 55 +++++++++++++++++++++++++++++++++++++++++++++++----
+>>  migration/socket.c    |  2 +-
+>>  4 files changed, 57 insertions(+), 8 deletions(-)
+>
+>
+>> diff --git a/migration/socket.c b/migration/socket.c
+>> index 5dd6f42..3af9f7c 100644
+>> --- a/migration/socket.c
+>> +++ b/migration/socket.c
+>> @@ -183,12 +183,12 @@ static gboolean
+>> socket_accept_incoming_migration(QIOChannel *ioc,
+>>  
+>>      qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming");
+>>      migration_channel_process_incoming(QIO_CHANNEL(sioc));
+>> -    object_unref(OBJECT(sioc));
+>
+> AFAICT, migration_channel_process_incoming() acquires its own reference
+> on 'sioc', so removing this object_unref means the code is now leaking a
+> reference
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
----
- instrument/Makefile.objs      |    1=20
- instrument/qemu-instr/state.h |  104 +++++++++++++++++++++++++++++++++++=
-++++++
- instrument/state.c            |   73 +++++++++++++++++++++++++++++
- 3 files changed, 178 insertions(+)
- create mode 100644 instrument/qemu-instr/state.h
- create mode 100644 instrument/state.c
+Nack.
 
-diff --git a/instrument/Makefile.objs b/instrument/Makefile.objs
-index d7e6c760c3..ee482bdb45 100644
---- a/instrument/Makefile.objs
-+++ b/instrument/Makefile.objs
-@@ -5,3 +5,4 @@ target-obj-$(CONFIG_INSTRUMENT) +=3D load.o
- target-obj-$(CONFIG_INSTRUMENT) +=3D qmp.o
- target-obj-$(CONFIG_INSTRUMENT) +=3D control.o
- target-obj-$(CONFIG_INSTRUMENT) +=3D trace.o
-+target-obj-$(CONFIG_INSTRUMENT) +=3D state.o
-diff --git a/instrument/qemu-instr/state.h b/instrument/qemu-instr/state.=
-h
-new file mode 100644
-index 0000000000..0ae6255fe5
---- /dev/null
-+++ b/instrument/qemu-instr/state.h
-@@ -0,0 +1,104 @@
-+/*
-+ * Interface for accessing guest state.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef QI__STATE_H
-+#define QI__STATE_H
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+#include <qemu-instr/types.h>
-+
-+
-+/**
-+ * qi_mem_read_virt:
-+ * @vcpu: CPU to use for address translation.
-+ * @vaddr: Starting virtual address to read from.
-+ * @size: Number of bytes to read.
-+ * @buf: Buffer to write into.
-+ *
-+ * Read contents from virtual memory.
-+ *
-+ * Returns: Whether the range of virtual addresses to read could be tran=
-slated.
-+ *
-+ * Warning: Even on error, some of the destination buffer might have bee=
-n
-+ *          modified.
-+ *
-+ * Precondition: The output buffer has at least "size" bytes.
-+ */
-+bool qi_mem_read_virt(QICPU vcpu, uint64_t vaddr, size_t size, void *buf=
-);
-+
-+/**
-+ * qi_mem_write_virt:
-+ * @vcpu: CPU to use for address translation.
-+ * @vaddr: Starting virtual address to write into.
-+ * @size: Number of bytes to write.
-+ * @buf: Buffer with the contents to write from.
-+ *
-+ * Write contents into virtual memory.
-+ *
-+ * Returns: Whether the range of virtual addresses to write could be tra=
-nslated.
-+ *
-+ * Warning: Even on error, some of the destination memory might have bee=
-n
-+ *          modified.
-+ * Precondition: The input buffer has at least "size" bytes.
-+ */
-+bool qi_mem_write_virt(QICPU vcpu, uint64_t vaddr, size_t size, void *bu=
-f);
-+
-+/**
-+ * qi_mem_virt_to_phys:
-+ * @vcpu: CPU to use for address translation.
-+ * @vaddr: Virtual address to translate.
-+ * @paddr: Pointer to output physical address.
-+ *
-+ * Translate a virtual address into a physical address.
-+ *
-+ * Returns: Whether the address could be translated.
-+ */
-+bool qi_mem_virt_to_phys(QICPU vcpu, uint64_t vaddr, uint64_t *paddr);
-+
-+/**
-+ * qi_mem_read_phys:
-+ * @paddr: Starting physical address to read from.
-+ * @size: Number of bytes to read.
-+ * @buf: Buffer to write into.
-+ *
-+ * Read contents from physical memory.
-+ *
-+ * Returns: Whether the range of physical addresses is valid.
-+ *
-+ * Warning: Even on error, some of the destination buffer might have bee=
-n
-+ *          modified.
-+ * Precondition: The output buffer has at least "size" bytes.
-+ */
-+bool qi_mem_read_phys(uint64_t paddr, size_t size, void *buf);
-+
-+/**
-+ * qi_mem_write_phys:
-+ * @paddr: Starting physical address to write into.
-+ * @size: Number of bytes to write.
-+ * @buf: Buffer with the contents to write from.
-+ *
-+ * Write contents into virtual memory.
-+ *
-+ * Returns: Whether the range of physical addresses is valid.
-+ *
-+ * Warning: Even on error, some of the destination memory might have bee=
-n
-+ *          modified.
-+ *
-+ * Precondition: The input buffer has at least "size" bytes.
-+ */
-+bool qi_mem_write_phys(uint64_t paddr, size_t size, void *buf);
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+
-+#endif  /* QI__STATE_H */
-diff --git a/instrument/state.c b/instrument/state.c
-new file mode 100644
-index 0000000000..e76fd5fbcd
---- /dev/null
-+++ b/instrument/state.c
-@@ -0,0 +1,73 @@
-+/*
-+ * Interface for accessing guest state.
-+ *
-+ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or la=
-ter.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+
-+#include "qemu/compiler.h"
-+#include "cpu.h"
-+#include "exec/cpu-all.h"
-+#include "instrument/control.h"
-+#include "instrument/error.h"
-+#include "instrument/qemu-instr/state.h"
-+
-+
-+SYM_PUBLIC bool qi_mem_read_virt(QICPU vcpu, uint64_t vaddr,
-+                                 size_t size, void *buf)
-+{
-+    CPUState *vcpu_ =3D instr_cpu_from_qicpu(vcpu);
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
-+    return cpu_memory_rw_debug(vcpu_, vaddr, buf, size, 0) =3D=3D 0;
-+}
-+
-+SYM_PUBLIC bool qi_mem_write_virt(QICPU vcpu, uint64_t vaddr,
-+                                  size_t size, void *buf)
-+{
-+    CPUState *vcpu_ =3D instr_cpu_from_qicpu(vcpu);
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
-+    return cpu_memory_rw_debug(vcpu_, vaddr, buf, size, 1) =3D=3D 0;
-+}
-+
-+SYM_PUBLIC bool qi_mem_virt_to_phys(QICPU vcpu, uint64_t vaddr, uint64_t=
- *paddr)
-+{
-+    CPUState *vcpu_ =3D instr_cpu_from_qicpu(vcpu);
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
-+
-+#if defined(CONFIG_USER_ONLY)
-+    *paddr =3D vaddr;
-+    return true;
-+#else
-+    *paddr =3D cpu_get_phys_page_debug(vcpu_, vaddr);
-+    return *paddr !=3D -1;
-+#endif
-+}
-+
-+SYM_PUBLIC bool qi_mem_read_phys(uint64_t paddr, size_t size, void *buf)
-+{
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+#if defined(CONFIG_USER_ONLY)
-+    return cpu_memory_rw_debug(NULL, paddr, buf, size, 0) =3D=3D 0;
-+#else
-+    cpu_physical_memory_read(paddr, buf, size);
-+    return true;
-+#endif
-+}
-+
-+SYM_PUBLIC bool qi_mem_write_phys(uint64_t paddr, size_t size, void *buf=
-)
-+{
-+    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
-ion");
-+#if defined(CONFIG_USER_ONLY)
-+    return cpu_memory_rw_debug(NULL, paddr, buf, size, 1) =3D=3D 0;
-+#else
-+    cpu_physical_memory_write(paddr, buf, size);
-+    return true;
-+#endif
-+}
+I did it and ended with a segmentation fault because reference count was
+bad.
+
+(qemu) 
+Thread 6 "multifdrecv_0" received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x7fff9f9ff700 (LWP 10065)]
+0x00005555559c12f8 in type_is_ancestor (type=0xb60f18247c894860, 
+    target_type=0x555556531b30) at /mnt/kvm/qemu/cleanup/qom/object.c:217
+217	    while (type) {
+(gdb) bt
+#0  0x00005555559c12f8 in type_is_ancestor (type=0xb60f18247c894860, target_type=0x555556531b30) at /mnt/kvm/qemu/cleanup/qom/object.c:217
+#1  0x00005555559c1dbb in object_class_dynamic_cast (class=class@entry=0x7ffff2cb3ce8 <main_arena+520>, typename=typename@entry=0x555555aa6d91 "qio-channel")
+    at /mnt/kvm/qemu/cleanup/qom/object.c:691
+#2  0x00005555559c1ed2 in object_class_dynamic_cast_assert (class=0x7ffff2cb3ce8 <main_arena+520>, typename=typename@entry=0x555555aa6d91 "qio-channel", file=file@entry=0x555555b88208 "/mnt/kvm/qemu/cleanup/io/channel.c", line=line@entry=56, func=func@entry=0x555555b884e0 <__func__.22671> "qio_channel_readv_full")
+    at /mnt/kvm/qemu/cleanup/qom/object.c:723
+#3  0x0000555555a3d4d7 in qio_channel_readv_full (ioc=0x5555568c5a00, iov=0x7fff900008c0, niov=15, fds=0x0, nfds=0x0, errp=0x7fff9f9fe950)
+    at /mnt/kvm/qemu/cleanup/io/channel.c:56
+#4  0x0000555555a3ddc2 in qio_channel_readv (errp=0x7fff9f9fe950, niov=<optimized out>, iov=<optimized out>, ioc=0x5555568c5a00)
+    at /mnt/kvm/qemu/cleanup/io/channel.c:197
+#5  0x0000555555a3ddc2 in qio_channel_readv_all_eof (ioc=0x5555568c5a00, iov=<optimized out>, niov=<optimized out>, errp=errp@entry=0x7fff9f9fe950)
+    at /mnt/kvm/qemu/cleanup/io/channel.c:106
+#6  0x0000555555a3de79 in qio_channel_readv_all (ioc=<optimized out>, iov=<optimized out>, niov=<optimized out>, errp=errp@entry=0x7fff9f9fe950)
+    at /mnt/kvm/qemu/cleanup/io/channel.c:142
+#7  0x0000555555794768 in multifd_recv_thread (opaque=0x5555570e5e00)
+---Type <return> to continue, or q <return> to quit---up
+    at /mnt/kvm/qemu/cleanup/migration/ram.c:722
+#8  0x00007ffff2cc036d in start_thread (arg=0x7fff9f9ff700)
+    at pthread_create.c:456
+#9  0x00007ffff29f8bbf in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:97
+(gdb) up
+
+Removing this unref fixed things, so I think that the accounting is good
+(famous last words).
+
+Later, Juan.
