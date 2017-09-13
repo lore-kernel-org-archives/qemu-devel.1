@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45472)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45523)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsA8q-00014N-3Z
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:04:00 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsA8w-0001AL-Eu
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:04:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsA8j-0005gP-Bu
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:03:56 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsA8q-0005n0-J0
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:04:02 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Wed, 13 Sep 2017 11:03:11 -0500
-Message-Id: <20170913160333.23622-2-eblake@redhat.com>
+Date: Wed, 13 Sep 2017 11:03:13 -0500
+Message-Id: <20170913160333.23622-4-eblake@redhat.com>
 In-Reply-To: <20170913160333.23622-1-eblake@redhat.com>
 References: <20170913160333.23622-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v4 01/23] block: Allow NULL file for
- bdrv_get_block_status()
+Subject: [Qemu-devel] [PATCH v4 03/23] block: Make bdrv_round_to_clusters()
+ signature more useful
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,303 +23,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Jeff Cody <jcody@redhat.com>
 
-Not all callers care about which BDS owns the mapping for a given
-range of the file.  This patch merely simplifies the callers by
-consolidating the logic in the common call point, while guaranteeing
-a non-NULL file to all the driver callbacks, for no semantic change.
-The only caller that does not care about pnum is bdrv_is_allocated,
-as invoked by vvfat; we can likewise add assertions that the rest
-of the stack does not have to worry about a NULL pnum.
-
-Furthermore, this will also set the stage for a future cleanup: when
-a caller does not care about which BDS owns an offset, it would be
-nice to allow the driver to optimize things to not have to return
-BDRV_BLOCK_OFFSET_VALID in the first place.  In the case of fragmented
-allocation (for example, it's fairly easy to create a qcow2 image
-where consecutive guest addresses are not at consecutive host
-addresses), the current contract requires bdrv_get_block_status()
-to clamp *pnum to the limit where host addresses are no longer
-consecutive, but allowing a NULL file means that *pnum could be
-set to the full length of known-allocated data.
+In the process of converting sector-based interfaces to bytes,
+I'm finding it easier to represent a byte count as a 64-bit
+integer at the block layer (even if we are internally capped
+by SIZE_MAX or even INT_MAX for individual transactions, it's
+still nicer to not have to worry about truncation/overflow
+issues on as many variables).  Update the signature of
+bdrv_round_to_clusters() to uniformly use int64_t, matching
+the signature already chosen for bdrv_is_allocated and the
+fact that off_t is also a signed type, then adjust clients
+according to the required fallout.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Fam Zheng <famz@redhat.com>
 
 ---
 v4: only context changes
-v3: rebase to recent changes (qcow2_measure), dropped R-b
-v2: use local variable and final transfer, rather than assignment
-of parameter to local
-[previously in different series]:
-v2: new patch, https://lists.gnu.org/archive/html/qemu-devel/2017-05/msg05645.html
+v3: no change
+v2: fix commit message [John], rebase to earlier changes, including
+mirror_clip_bytes() signature update
 ---
- include/block/block_int.h | 10 ++++++----
- block/io.c                | 44 ++++++++++++++++++++++++++++----------------
- block/mirror.c            |  3 +--
- block/qcow2.c             |  8 ++------
- qemu-img.c                | 10 ++++------
- 5 files changed, 41 insertions(+), 34 deletions(-)
+ include/block/block.h | 4 ++--
+ block/io.c            | 7 ++++---
+ block/mirror.c        | 7 +++----
+ block/trace-events    | 2 +-
+ 4 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 55c5d573d4..7f71c585a0 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -202,10 +202,12 @@ struct BlockDriver {
-         int64_t offset, int bytes);
+diff --git a/include/block/block.h b/include/block/block.h
+index 2ad18775af..bb3b95d491 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -475,9 +475,9 @@ int bdrv_get_flags(BlockDriverState *bs);
+ int bdrv_get_info(BlockDriverState *bs, BlockDriverInfo *bdi);
+ ImageInfoSpecific *bdrv_get_specific_info(BlockDriverState *bs);
+ void bdrv_round_to_clusters(BlockDriverState *bs,
+-                            int64_t offset, unsigned int bytes,
++                            int64_t offset, int64_t bytes,
+                             int64_t *cluster_offset,
+-                            unsigned int *cluster_bytes);
++                            int64_t *cluster_bytes);
 
-     /*
--     * Building block for bdrv_block_status[_above]. The driver should
--     * answer only according to the current layer, and should not
--     * set BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See block.h
--     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.
-+     * Building block for bdrv_block_status[_above] and
-+     * bdrv_is_allocated[_above].  The driver should answer only
-+     * according to the current layer, and should not set
-+     * BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See block.h
-+     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  The block
-+     * layer guarantees non-NULL pnum and file.
-      */
-     int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
-         int64_t sector_num, int nb_sectors, int *pnum,
+ const char *bdrv_get_encrypted_filename(BlockDriverState *bs);
+ void bdrv_get_backing_filename(BlockDriverState *bs,
 diff --git a/block/io.c b/block/io.c
-index 8a0cd8835a..f250029395 100644
+index 6509c804d4..b362b46e3d 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -695,7 +695,6 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
- {
-     int64_t target_sectors, ret, nb_sectors, sector_num = 0;
-     BlockDriverState *bs = child->bs;
--    BlockDriverState *file;
-     int n;
-
-     target_sectors = bdrv_nb_sectors(bs);
-@@ -708,7 +707,7 @@ int bdrv_make_zero(BdrvChild *child, BdrvRequestFlags flags)
-         if (nb_sectors <= 0) {
-             return 0;
-         }
--        ret = bdrv_get_block_status(bs, sector_num, nb_sectors, &n, &file);
-+        ret = bdrv_get_block_status(bs, sector_num, nb_sectors, &n, NULL);
-         if (ret < 0) {
-             error_report("error getting block status at sector %" PRId64 ": %s",
-                          sector_num, strerror(-ret));
-@@ -1755,8 +1754,9 @@ int64_t coroutine_fn bdrv_co_get_block_status_from_backing(BlockDriverState *bs,
-  * beyond the end of the disk image it will be clamped; if 'pnum' is set to
-  * the end of the image, then the returned value will include BDRV_BLOCK_EOF.
-  *
-- * If returned value is positive and BDRV_BLOCK_OFFSET_VALID bit is set, 'file'
-- * points to the BDS which the sector range is allocated in.
-+ * If returned value is positive, BDRV_BLOCK_OFFSET_VALID bit is set, and
-+ * 'file' is non-NULL, then '*file' points to the BDS which the sector range
-+ * is allocated in.
+@@ -446,9 +446,9 @@ static void mark_request_serialising(BdrvTrackedRequest *req, uint64_t align)
+  * Round a region to cluster boundaries
   */
- static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
-                                                      int64_t sector_num,
-@@ -1766,15 +1766,22 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
-     int64_t total_sectors;
-     int64_t n;
-     int64_t ret, ret2;
-+    BlockDriverState *local_file = NULL;
-
--    *file = NULL;
-+    assert(pnum);
-     total_sectors = bdrv_nb_sectors(bs);
-     if (total_sectors < 0) {
-+        if (file) {
-+            *file = NULL;
-+        }
-         return total_sectors;
-     }
-
-     if (sector_num >= total_sectors) {
-         *pnum = 0;
-+        if (file) {
-+            *file = NULL;
-+        }
-         return BDRV_BLOCK_EOF;
-     }
-
-@@ -1791,23 +1798,27 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
-         }
-         if (bs->drv->protocol_name) {
-             ret |= BDRV_BLOCK_OFFSET_VALID | (sector_num * BDRV_SECTOR_SIZE);
--            *file = bs;
-+            if (file) {
-+                *file = bs;
-+            }
-+        } else if (file) {
-+            *file = NULL;
-         }
-         return ret;
-     }
-
-     bdrv_inc_in_flight(bs);
-     ret = bs->drv->bdrv_co_get_block_status(bs, sector_num, nb_sectors, pnum,
--                                            file);
-+                                            &local_file);
-     if (ret < 0) {
-         *pnum = 0;
-         goto out;
-     }
-
-     if (ret & BDRV_BLOCK_RAW) {
--        assert(ret & BDRV_BLOCK_OFFSET_VALID && *file);
--        ret = bdrv_co_get_block_status(*file, ret >> BDRV_SECTOR_BITS,
--                                       *pnum, pnum, file);
-+        assert(ret & BDRV_BLOCK_OFFSET_VALID && local_file);
-+        ret = bdrv_co_get_block_status(local_file, ret >> BDRV_SECTOR_BITS,
-+                                       *pnum, pnum, &local_file);
-         goto out;
-     }
-
-@@ -1825,14 +1836,13 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
-         }
-     }
-
--    if (*file && *file != bs &&
-+    if (local_file && local_file != bs &&
-         (ret & BDRV_BLOCK_DATA) && !(ret & BDRV_BLOCK_ZERO) &&
-         (ret & BDRV_BLOCK_OFFSET_VALID)) {
--        BlockDriverState *file2;
-         int file_pnum;
-
--        ret2 = bdrv_co_get_block_status(*file, ret >> BDRV_SECTOR_BITS,
--                                        *pnum, &file_pnum, &file2);
-+        ret2 = bdrv_co_get_block_status(local_file, ret >> BDRV_SECTOR_BITS,
-+                                        *pnum, &file_pnum, NULL);
-         if (ret2 >= 0) {
-             /* Ignore errors.  This is just providing extra information, it
-              * is useful but not necessary.
-@@ -1854,6 +1864,9 @@ static int64_t coroutine_fn bdrv_co_get_block_status(BlockDriverState *bs,
-     }
-
- out:
-+    if (file) {
-+        *file = local_file;
-+    }
-     bdrv_dec_in_flight(bs);
-     if (ret >= 0 && sector_num + *pnum == total_sectors) {
-         ret |= BDRV_BLOCK_EOF;
-@@ -1957,7 +1970,6 @@ int64_t bdrv_get_block_status(BlockDriverState *bs,
- int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
-                                    int64_t bytes, int64_t *pnum)
+ void bdrv_round_to_clusters(BlockDriverState *bs,
+-                            int64_t offset, unsigned int bytes,
++                            int64_t offset, int64_t bytes,
+                             int64_t *cluster_offset,
+-                            unsigned int *cluster_bytes)
++                            int64_t *cluster_bytes)
  {
--    BlockDriverState *file;
-     int64_t sector_num = offset >> BDRV_SECTOR_BITS;
-     int nb_sectors = bytes >> BDRV_SECTOR_BITS;
-     int64_t ret;
-@@ -1966,7 +1978,7 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
-     assert(QEMU_IS_ALIGNED(offset, BDRV_SECTOR_SIZE));
-     assert(QEMU_IS_ALIGNED(bytes, BDRV_SECTOR_SIZE) && bytes < INT_MAX);
-     ret = bdrv_get_block_status(bs, sector_num, nb_sectors, &psectors,
--                                &file);
-+                                NULL);
-     if (ret < 0) {
-         return ret;
-     }
+     BlockDriverInfo bdi;
+
+@@ -946,7 +946,7 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+     struct iovec iov;
+     QEMUIOVector bounce_qiov;
+     int64_t cluster_offset;
+-    unsigned int cluster_bytes;
++    int64_t cluster_bytes;
+     size_t skip_bytes;
+     int ret;
+
+@@ -967,6 +967,7 @@ static int coroutine_fn bdrv_co_do_copy_on_readv(BdrvChild *child,
+     trace_bdrv_co_do_copy_on_readv(bs, offset, bytes,
+                                    cluster_offset, cluster_bytes);
+
++    assert(cluster_bytes < SIZE_MAX);
+     iov.iov_len = cluster_bytes;
+     iov.iov_base = bounce_buffer = qemu_try_blockalign(bs, iov.iov_len);
+     if (bounce_buffer == NULL) {
 diff --git a/block/mirror.c b/block/mirror.c
-index 5cdaaed7be..032cfe91fa 100644
+index 032cfe91fa..67f45cec4e 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -390,7 +390,6 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+@@ -190,10 +190,9 @@ static int mirror_cow_align(MirrorBlockJob *s, int64_t *offset,
+     bool need_cow;
+     int ret = 0;
+     int64_t align_offset = *offset;
+-    unsigned int align_bytes = *bytes;
++    int64_t align_bytes = *bytes;
+     int max_bytes = s->granularity * s->max_iov;
+
+-    assert(*bytes < INT_MAX);
+     need_cow = !test_bit(*offset / s->granularity, s->cow_bitmap);
+     need_cow |= !test_bit((*offset + *bytes - 1) / s->granularity,
+                           s->cow_bitmap);
+@@ -388,7 +387,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+     while (nb_chunks > 0 && offset < s->bdev_length) {
+         int64_t ret;
          int io_sectors;
-         unsigned int io_bytes;
+-        unsigned int io_bytes;
++        int64_t io_bytes;
          int64_t io_bytes_acct;
--        BlockDriverState *file;
          enum MirrorMethod {
              MIRROR_METHOD_COPY,
-             MIRROR_METHOD_ZERO,
-@@ -401,7 +400,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
-         ret = bdrv_get_block_status_above(source, NULL,
-                                           offset >> BDRV_SECTOR_BITS,
-                                           nb_chunks * sectors_per_chunk,
--                                          &io_sectors, &file);
-+                                          &io_sectors, NULL);
-         io_bytes = io_sectors * BDRV_SECTOR_SIZE;
-         if (ret < 0) {
-             io_bytes = MIN(nb_chunks * s->granularity, max_io_bytes);
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 64dcd98a91..9a7b5cd41f 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2975,7 +2975,6 @@ static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
-                             uint32_t count)
- {
-     int nr;
--    BlockDriverState *file;
-     int64_t res;
+@@ -413,7 +412,7 @@ static uint64_t coroutine_fn mirror_iteration(MirrorBlockJob *s)
+             io_bytes = s->granularity;
+         } else if (ret >= 0 && !(ret & BDRV_BLOCK_DATA)) {
+             int64_t target_offset;
+-            unsigned int target_bytes;
++            int64_t target_bytes;
+             bdrv_round_to_clusters(blk_bs(s->target), offset, io_bytes,
+                                    &target_offset, &target_bytes);
+             if (target_offset == offset &&
+diff --git a/block/trace-events b/block/trace-events
+index 25dd5a3026..4c6586f156 100644
+--- a/block/trace-events
++++ b/block/trace-events
+@@ -12,7 +12,7 @@ blk_co_pwritev(void *blk, void *bs, int64_t offset, unsigned int bytes, int flag
+ bdrv_co_preadv(void *bs, int64_t offset, int64_t nbytes, unsigned int flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
+ bdrv_co_pwritev(void *bs, int64_t offset, int64_t nbytes, unsigned int flags) "bs %p offset %"PRId64" nbytes %"PRId64" flags 0x%x"
+ bdrv_co_pwrite_zeroes(void *bs, int64_t offset, int count, int flags) "bs %p offset %"PRId64" count %d flags 0x%x"
+-bdrv_co_do_copy_on_readv(void *bs, int64_t offset, unsigned int bytes, int64_t cluster_offset, unsigned int cluster_bytes) "bs %p offset %"PRId64" bytes %u cluster_offset %"PRId64" cluster_bytes %u"
++bdrv_co_do_copy_on_readv(void *bs, int64_t offset, int64_t bytes, int64_t cluster_offset, unsigned int cluster_bytes) "bs %p offset %"PRId64" bytes %"PRId64" cluster_offset %"PRId64" cluster_bytes %u"
 
-     if (start + count > bs->total_sectors) {
-@@ -2985,8 +2984,7 @@ static bool is_zero_sectors(BlockDriverState *bs, int64_t start,
-     if (!count) {
-         return true;
-     }
--    res = bdrv_get_block_status_above(bs, NULL, start, count,
--                                      &nr, &file);
-+    res = bdrv_get_block_status_above(bs, NULL, start, count, &nr, NULL);
-     return res >= 0 && (res & BDRV_BLOCK_ZERO) && nr == count;
- }
-
-@@ -3654,13 +3652,11 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
-                  offset += pnum * BDRV_SECTOR_SIZE) {
-                 int nb_sectors = MIN(ssize - offset,
-                                      BDRV_REQUEST_MAX_BYTES) / BDRV_SECTOR_SIZE;
--                BlockDriverState *file;
-                 int64_t ret;
-
-                 ret = bdrv_get_block_status_above(in_bs, NULL,
-                                                   offset >> BDRV_SECTOR_BITS,
--                                                  nb_sectors,
--                                                  &pnum, &file);
-+                                                  nb_sectors, &pnum, NULL);
-                 if (ret < 0) {
-                     error_setg_errno(&local_err, -ret,
-                                      "Unable to get block status");
-diff --git a/qemu-img.c b/qemu-img.c
-index df984b11b9..0c12e1c240 100644
---- a/qemu-img.c
-+++ b/qemu-img.c
-@@ -1374,7 +1374,6 @@ static int img_compare(int argc, char **argv)
-
-     for (;;) {
-         int64_t status1, status2;
--        BlockDriverState *file;
-
-         nb_sectors = sectors_to_process(total_sectors, sector_num);
-         if (nb_sectors <= 0) {
-@@ -1382,7 +1381,7 @@ static int img_compare(int argc, char **argv)
-         }
-         status1 = bdrv_get_block_status_above(bs1, NULL, sector_num,
-                                               total_sectors1 - sector_num,
--                                              &pnum1, &file);
-+                                              &pnum1, NULL);
-         if (status1 < 0) {
-             ret = 3;
-             error_report("Sector allocation test failed for %s", filename1);
-@@ -1392,7 +1391,7 @@ static int img_compare(int argc, char **argv)
-
-         status2 = bdrv_get_block_status_above(bs2, NULL, sector_num,
-                                               total_sectors2 - sector_num,
--                                              &pnum2, &file);
-+                                              &pnum2, NULL);
-         if (status2 < 0) {
-             ret = 3;
-             error_report("Sector allocation test failed for %s", filename2);
-@@ -1598,15 +1597,14 @@ static int convert_iteration_sectors(ImgConvertState *s, int64_t sector_num)
-     n = MIN(s->total_sectors - sector_num, BDRV_REQUEST_MAX_SECTORS);
-
-     if (s->sector_next_status <= sector_num) {
--        BlockDriverState *file;
-         if (s->target_has_backing) {
-             ret = bdrv_get_block_status(blk_bs(s->src[src_cur]),
-                                         sector_num - src_cur_offset,
--                                        n, &n, &file);
-+                                        n, &n, NULL);
-         } else {
-             ret = bdrv_get_block_status_above(blk_bs(s->src[src_cur]), NULL,
-                                               sector_num - src_cur_offset,
--                                              n, &n, &file);
-+                                              n, &n, NULL);
-         }
-         if (ret < 0) {
-             return ret;
+ # block/stream.c
+ stream_one_iteration(void *s, int64_t offset, uint64_t bytes, int is_allocated) "s %p offset %" PRId64 " bytes %" PRIu64 " is_allocated %d"
 -- 
 2.13.5
