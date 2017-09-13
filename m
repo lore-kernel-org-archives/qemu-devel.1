@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39086)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39080)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ds7fI-0005Qq-Qn
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:18 -0400
+	(envelope-from <david@redhat.com>) id 1ds7fI-0005Pz-24
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1ds7fE-0002re-QQ
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43024)
+	(envelope-from <david@redhat.com>) id 1ds7fB-0002n6-NT
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47268)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1ds7fE-0002qx-K5
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:12 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1ds7fB-0002lX-EJ
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:25:09 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 13 Sep 2017 15:24:03 +0200
-Message-Id: <20170913132417.24384-9-david@redhat.com>
+Date: Wed, 13 Sep 2017 15:24:02 +0200
+Message-Id: <20170913132417.24384-8-david@redhat.com>
 In-Reply-To: <20170913132417.24384-1-david@redhat.com>
 References: <20170913132417.24384-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v5 08/22] s390x: move sclp_service_call() to
- sclp.h
+Subject: [Qemu-devel] [PATCH v5 07/22] target/s390x: move some s390x
+ typedefs to cpu-qom.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,58 +27,109 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-Implemented in sclp.c, so let's move it to the right include file.
-Fix up one include. Do a forward declaration of struct CPUS390XState to
-fix the two sclp consoles complaining.
+This allows us to drop inclusion of cpu_models.h in cpu-qom.h, and
+prepares for using cpu-qom.h as a s390 specific version of typedefs.h
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- include/hw/s390x/sclp.h    | 2 ++
- target/s390x/cpu.h         | 1 -
- target/s390x/misc_helper.c | 1 +
- 3 files changed, 3 insertions(+), 1 deletion(-)
+ target/s390x/cpu-qom.h    | 5 ++++-
+ target/s390x/cpu.h        | 5 +++--
+ target/s390x/cpu_models.h | 8 ++++----
+ 3 files changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
-index a72d096081..847ff32f85 100644
---- a/include/hw/s390x/sclp.h
-+++ b/include/hw/s390x/sclp.h
-@@ -16,6 +16,7 @@
+diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
+index 4e936e7788..2435cd8390 100644
+--- a/target/s390x/cpu-qom.h
++++ b/target/s390x/cpu-qom.h
+@@ -21,7 +21,6 @@
+ #define QEMU_S390_CPU_QOM_H
  
- #include "hw/sysbus.h"
- #include "hw/qdev.h"
-+#include "target/s390x/cpu-qom.h"
+ #include "qom/cpu.h"
+-#include "cpu_models.h"
  
- #define SCLP_CMD_CODE_MASK                      0xffff00ff
+ #define TYPE_S390_CPU "s390-cpu"
  
-@@ -242,5 +243,6 @@ sclpMemoryHotplugDev *init_sclp_memory_hotplug_dev(void);
- sclpMemoryHotplugDev *get_sclp_memory_hotplug_dev(void);
- void sclp_service_interrupt(uint32_t sccb);
- void raise_irq_cpu_hotplug(void);
-+int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
+@@ -32,6 +31,9 @@
+ #define S390_CPU_GET_CLASS(obj) \
+     OBJECT_GET_CLASS(S390CPUClass, (obj), TYPE_S390_CPU)
+ 
++typedef struct S390CPUModel S390CPUModel;
++typedef struct S390CPUDef S390CPUDef;
++
+ /**
+  * S390CPUClass:
+  * @parent_realize: The parent class' realize handler.
+@@ -62,5 +64,6 @@ typedef struct S390CPUClass {
+ } S390CPUClass;
+ 
+ typedef struct S390CPU S390CPU;
++typedef struct CPUS390XState CPUS390XState;
  
  #endif
 diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 4a0a59dfbc..5295bd3c66 100644
+index 372f7d8885..4a0a59dfbc 100644
 --- a/target/s390x/cpu.h
 +++ b/target/s390x/cpu.h
-@@ -722,6 +722,5 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
+@@ -25,6 +25,7 @@
  
- /* outside of target/s390x/ */
- S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
--int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
+ #include "qemu-common.h"
+ #include "cpu-qom.h"
++#include "cpu_models.h"
  
- #endif
-diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
-index b142db71c6..8b07535b02 100644
---- a/target/s390x/misc_helper.c
-+++ b/target/s390x/misc_helper.c
-@@ -35,6 +35,7 @@
- #include "sysemu/sysemu.h"
- #include "hw/s390x/ebcdic.h"
- #include "hw/s390x/s390-virtio-hcall.h"
-+#include "hw/s390x/sclp.h"
- #endif
+ #define TARGET_LONG_BITS 64
  
- /* #define DEBUG_HELPER */
+@@ -80,7 +81,7 @@ typedef struct MchkQueue {
+     uint16_t type;
+ } MchkQueue;
+ 
+-typedef struct CPUS390XState {
++struct CPUS390XState {
+     uint64_t regs[16];     /* GP registers */
+     /*
+      * The floating point registers are part of the vector registers.
+@@ -174,7 +175,7 @@ typedef struct CPUS390XState {
+     /* currently processed sigp order */
+     uint8_t sigp_order;
+ 
+-} CPUS390XState;
++};
+ 
+ static inline CPU_DoubleU *get_freg(CPUS390XState *cs, int nr)
+ {
+diff --git a/target/s390x/cpu_models.h b/target/s390x/cpu_models.h
+index c0bee15d7a..4c6dee1871 100644
+--- a/target/s390x/cpu_models.h
++++ b/target/s390x/cpu_models.h
+@@ -17,7 +17,7 @@
+ #include "qom/cpu.h"
+ 
+ /* static CPU definition */
+-typedef struct S390CPUDef {
++struct S390CPUDef {
+     const char *name;       /* name exposed to the user */
+     const char *desc;       /* description exposed to the user */
+     uint8_t gen;            /* hw generation identification */
+@@ -37,10 +37,10 @@ typedef struct S390CPUDef {
+     S390FeatBitmap full_feat;
+     /* used to init full_feat from generated data */
+     S390FeatInit full_init;
+-} S390CPUDef;
++};
+ 
+ /* CPU model based on a CPU definition */
+-typedef struct S390CPUModel {
++struct S390CPUModel {
+     const S390CPUDef *def;
+     S390FeatBitmap features;
+     /* values copied from the "host" model, can change during migration */
+@@ -48,7 +48,7 @@ typedef struct S390CPUModel {
+     uint32_t cpu_id;        /* CPU id */
+     uint8_t cpu_id_format;  /* CPU id format bit */
+     uint8_t cpu_ver;        /* CPU version, usually "ff" for kvm */
+-} S390CPUModel;
++};
+ 
+ /*
+  * CPU ID
 -- 
 2.13.5
