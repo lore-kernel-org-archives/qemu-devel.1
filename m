@@ -1,23 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44452)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47318)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1ds3rv-0001Bl-P8
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:22:06 -0400
+	(envelope-from <cohuck@redhat.com>) id 1ds3xS-00052J-Px
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:27:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1ds3rs-0003m9-CI
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:22:03 -0400
+	(envelope-from <cohuck@redhat.com>) id 1ds3xP-0008NU-KK
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:27:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42464)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ds3xP-0008ME-AB
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:27:43 -0400
+Date: Wed, 13 Sep 2017 11:27:38 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170913112738.40e20115.cohuck@redhat.com>
+In-Reply-To: <634ee6a4-535c-f342-b1ea-0ceb92abc9a1@linux.vnet.ibm.com>
+References: <20170908152446.14606-1-pasic@linux.vnet.ibm.com>
+	<20170908152446.14606-5-pasic@linux.vnet.ibm.com>
+	<20170911120722.17236996.cohuck@redhat.com>
+	<81215214-82a2-801f-3b5b-f649726f00c6@linux.vnet.ibm.com>
+	<20170912163724.08a73a63.cohuck@redhat.com>
+	<5b0495da-df9b-22b5-afc4-66b6a4f33122@linux.vnet.ibm.com>
+	<20170912175922.6724712f.cohuck@redhat.com>
+	<634ee6a4-535c-f342-b1ea-0ceb92abc9a1@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <CALHRZurB_6GT+KccybDgWb8bPdU89Ey1si46HnbQgsLuHYCh_w@mail.gmail.com>
-References: <1504812251-23438-1-git-send-email-sundeep.lkml@gmail.com>
-	<1504812251-23438-5-git-send-email-sundeep.lkml@gmail.com>
-	<26693abe-07a2-1744-1a8d-4d08941837c5@amsat.org>
-	<CALHRZurB_6GT+KccybDgWb8bPdU89Ey1si46HnbQgsLuHYCh_w@mail.gmail.com>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Wed, 13 Sep 2017 14:51:58 +0530
-Message-ID: <CALHRZurVQzOX+U7OioHGiMKSoZNSOA77zqhyEGgp=H_5fKC7qg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu devel v8 PATCH 4/5] msf2: Add Smartfusion2
- SoC
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 4/4] s390x/css: fix incorrect length
+ indication
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,415 +34,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Hi Philippe,
+On Tue, 12 Sep 2017 19:19:56 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-All patches got Reviewed-by. Do you want me to change alias to remap and
-send
-v9 or wait so that you get time to review?
+> On 09/12/2017 05:59 PM, Cornelia Huck wrote:
+> > On Tue, 12 Sep 2017 17:43:03 +0200
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> >   
+> >> On 09/12/2017 04:37 PM, Cornelia Huck wrote:  
+> >>> On Mon, 11 Sep 2017 13:36:29 +0200
+> >>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> >>>     
+> >>>> On 09/11/2017 12:07 PM, Cornelia Huck wrote:    
+> >>>>> On Fri,  8 Sep 2017 17:24:46 +0200
+> >>>>> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> >>>>>       
+> >>>>>> We report incorrect length via SCSW program check instead of incorrect
+> >>>>>> length check (SCWS word 2 bit 10 instead of bit 9). Since we have there
+> >>>>>> is no fitting errno for incorrect length, and since I don't like what we
+> >>>>>> do with the errno's, as part of the fix, errnos used for control flow in
+> >>>>>> ccw interpretation are replaced with an enum using more speaking names.      
+> >>>>>
+> >>>>> I'm not sure whether this is the way to go. I mainly dislike the size
+> >>>>> of the patch (and the fact that it mixes a fix and a change of function
+> >>>>> signature).      
+> >>>>
+> >>>> Do you agree that we should move away from POSIX errno codes? I think
+> >>>> if we do, this cant' get much smaller.    
+> >>>
+> >>> I'm not really a fan of defining our own return values, tbh.
+> >>>     
+> >>
+> >> I've suspected. But your statement, although being useful, does
+> >> not answer my question. I think we need to agree on this question
+> >> before proceeding.
+> >>
+> >> In my opinion both the EIO bug and this bug are great examples
+> >> why the POSIX errno codes are sub-optimal and misleading, but
+> >> that's my opinion.  
+> > 
+> > It depends. I prefer them over home-grown ones.
+> > 
+> > (And I tend to dislike absolute statements.)
+> >   
+> 
+> Ah, we may have a misunderstanding here. POSIX errno codes are great
+> if they are used for what they are supposed to. The context was meant
+> to be implicitly included in the statement limiting it's scope.
+> 
+> Other than spotting a possible misunderstanding (I hope I did
+> not misunderstand what do you mean by absolute statements myself) this
+> did not bring me any further.
 
-Thanks,
-Sundeep
+As said, I'd probably prefer the alternative approach, as I'm not
+really a fan of defining a set of return codes.
 
-On Fri, Sep 8, 2017 at 12:56 PM, sundeep subbaraya <sundeep.lkml@gmail.com>
-wrote:
 
-> Hi Philippe,
->
-> On Fri, Sep 8, 2017 at 3:08 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.=
-org>
-> wrote:
->
->> On 09/07/2017 04:24 PM, Subbaraya Sundeep wrote:
->>
->>> Smartfusion2 SoC has hardened Microcontroller subsystem
->>> and flash based FPGA fabric. This patch adds support for
->>> Microcontroller subsystem in the SoC.
->>>
->>> Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
->>> Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
->>> ---
->>>   default-configs/arm-softmmu.mak |   1 +
->>>   hw/arm/Makefile.objs            |   1 +
->>>   hw/arm/msf2-soc.c               | 218 ++++++++++++++++++++++++++++++
->>> ++++++++++
->>>   include/hw/arm/msf2-soc.h       |  66 ++++++++++++
->>>   4 files changed, 286 insertions(+)
->>>   create mode 100644 hw/arm/msf2-soc.c
->>>   create mode 100644 include/hw/arm/msf2-soc.h
->>>
->>> diff --git a/default-configs/arm-softmmu.mak
->>> b/default-configs/arm-softmmu.mak
->>> index bbdd3c1..5059d13 100644
->>> --- a/default-configs/arm-softmmu.mak
->>> +++ b/default-configs/arm-softmmu.mak
->>> @@ -129,3 +129,4 @@ CONFIG_ACPI=3Dy
->>>   CONFIG_SMBIOS=3Dy
->>>   CONFIG_ASPEED_SOC=3Dy
->>>   CONFIG_GPIO_KEY=3Dy
->>> +CONFIG_MSF2=3Dy
->>> diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
->>> index a2e56ec..df36a03 100644
->>> --- a/hw/arm/Makefile.objs
->>> +++ b/hw/arm/Makefile.objs
->>> @@ -19,3 +19,4 @@ obj-$(CONFIG_FSL_IMX31) +=3D fsl-imx31.o kzm.o
->>>   obj-$(CONFIG_FSL_IMX6) +=3D fsl-imx6.o sabrelite.o
->>>   obj-$(CONFIG_ASPEED_SOC) +=3D aspeed_soc.o aspeed.o
->>>   obj-$(CONFIG_MPS2) +=3D mps2.o
->>> +obj-$(CONFIG_MSF2) +=3D msf2-soc.o
->>> diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
->>> new file mode 100644
->>> index 0000000..47fffa4
->>> --- /dev/null
->>> +++ b/hw/arm/msf2-soc.c
->>> @@ -0,0 +1,218 @@
->>> +/*
->>> + * SmartFusion2 SoC emulation.
->>> + *
->>> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
->>> + *
->>> + * Permission is hereby granted, free of charge, to any person
->>> obtaining a copy
->>> + * of this software and associated documentation files (the
->>> "Software"), to deal
->>> + * in the Software without restriction, including without limitation
->>> the rights
->>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/o=
-r
->>> sell
->>> + * copies of the Software, and to permit persons to whom the Software =
-is
->>> + * furnished to do so, subject to the following conditions:
->>> + *
->>> + * The above copyright notice and this permission notice shall be
->>> included in
->>> + * all copies or substantial portions of the Software.
->>> + *
->>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
->>> EXPRESS OR
->>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
->>> MERCHANTABILITY,
->>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
->>> SHALL
->>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES O=
-R
->>> OTHER
->>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
->>> ARISING FROM,
->>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
->>> DEALINGS IN
->>> + * THE SOFTWARE.
->>> + */
->>> +
->>> +#include "qemu/osdep.h"
->>> +#include "qapi/error.h"
->>> +#include "qemu-common.h"
->>> +#include "hw/arm/arm.h"
->>> +#include "exec/address-spaces.h"
->>> +#include "hw/char/serial.h"
->>> +#include "hw/boards.h"
->>> +#include "sysemu/block-backend.h"
->>> +#include "qemu/cutils.h"
->>> +#include "hw/arm/msf2-soc.h"
->>> +
->>> +#define MSF2_TIMER_BASE       0x40004000
->>> +#define MSF2_SYSREG_BASE      0x40038000
->>> +
->>> +#define ENVM_BASE_ADDRESS     0x60000000
->>> +
->>> +#define SRAM_BASE_ADDRESS     0x20000000
->>> +
->>> +#define MSF2_ENVM_MAX_SIZE        (512 * K_BYTE)
->>> +
->>> +/*
->>> + * eSRAM max size is 80k without SECDED(Single error correction and
->>> + * dual error detection) feature and 64k with SECDED.
->>> + * We do not support SECDED now.
->>> + */
->>> +#define MSF2_ESRAM_MAX_SIZE       (80 * K_BYTE)
->>> +
->>> +static const uint32_t spi_addr[MSF2_NUM_SPIS] =3D { 0x40001000 ,
->>> 0x40011000 };
->>> +static const uint32_t uart_addr[MSF2_NUM_UARTS] =3D { 0x40000000 ,
->>> 0x40010000 };
->>> +
->>> +static const int spi_irq[MSF2_NUM_SPIS] =3D { 2, 3 };
->>> +static const int uart_irq[MSF2_NUM_UARTS] =3D { 10, 11 };
->>> +static const int timer_irq[MSF2_NUM_TIMERS] =3D { 14, 15 };
->>> +
->>> +static void m2sxxx_soc_initfn(Object *obj)
->>> +{
->>> +    MSF2State *s =3D MSF2_SOC(obj);
->>> +    int i;
->>> +
->>> +    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
->>> +    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
->>> +
->>> +    object_initialize(&s->sysreg, sizeof(s->sysreg), TYPE_MSF2_SYSREG)=
-;
->>> +    qdev_set_parent_bus(DEVICE(&s->sysreg), sysbus_get_default());
->>> +
->>> +    object_initialize(&s->timer, sizeof(s->timer), TYPE_MSS_TIMER);
->>> +    qdev_set_parent_bus(DEVICE(&s->timer), sysbus_get_default());
->>> +
->>> +    for (i =3D 0; i < MSF2_NUM_SPIS; i++) {
->>> +        object_initialize(&s->spi[i], sizeof(s->spi[i]),
->>> +                          TYPE_MSS_SPI);
->>> +        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
->>> +    }
->>> +}
->>> +
->>> +static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
->>> +{
->>> +    MSF2State *s =3D MSF2_SOC(dev_soc);
->>> +    DeviceState *dev, *armv7m;
->>> +    SysBusDevice *busdev;
->>> +    Error *err =3D NULL;
->>> +    int i;
->>> +
->>> +    MemoryRegion *system_memory =3D get_system_memory();
->>> +    MemoryRegion *nvm =3D g_new(MemoryRegion, 1);
->>> +    MemoryRegion *nvm_alias =3D g_new(MemoryRegion, 1);
->>> +    MemoryRegion *sram =3D g_new(MemoryRegion, 1);
->>> +
->>> +    memory_region_init_rom(nvm, NULL, "MSF2.eNVM", s->envm_size,
->>> +                           &error_fatal);
->>> +    /*
->>> +     * On power-on, the eNVM region 0x60000000 is automatically
->>> +     * remapped to the Cortex-M3 processor executable region
->>> +     * start address (0x0). We do not support remapping other eNVM,
->>> +     * eSRAM and DDR regions by guest(via Sysreg) currently.
->>> +     */
->>> +    memory_region_init_alias(nvm_alias, NULL, "MSF2.eNVM.alias",
->>>
->>
->> you can drop the ".alias", this function already prepends "alias "
->
->
-> .remap sounds good?
->
-> Thanks,
-> Sundeep
->
->>
->>
->> +                             nvm, 0, s->envm_size);
->>> +
->>> +    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm)=
-;
->>> +    memory_region_add_subregion(system_memory, 0, nvm_alias);
->>> +
->>> +    memory_region_init_ram(sram, NULL, "MSF2.eSRAM", s->esram_size,
->>> +                           &error_fatal);
->>> +    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS,
->>> sram);
->>> +
->>> +    armv7m =3D DEVICE(&s->armv7m);
->>> +    qdev_prop_set_uint32(armv7m, "num-irq", 81);
->>> +    qdev_prop_set_string(armv7m, "cpu-model", "cortex-m3");
->>> +    object_property_set_link(OBJECT(&s->armv7m),
->>> OBJECT(get_system_memory()),
->>> +                                     "memory", &error_abort);
->>> +    object_property_set_bool(OBJECT(&s->armv7m), true, "realized",
->>> &err);
->>> +    if (err !=3D NULL) {
->>> +        error_propagate(errp, err);
->>> +        return;
->>> +    }
->>> +
->>> +    system_clock_scale =3D NANOSECONDS_PER_SECOND / s->m3clk;
->>> +
->>> +    for (i =3D 0; i < MSF2_NUM_UARTS; i++) {
->>> +        if (serial_hds[i]) {
->>> +            serial_mm_init(get_system_memory(), uart_addr[i], 2,
->>> +                           qdev_get_gpio_in(armv7m, uart_irq[i]),
->>> +                           115200, serial_hds[i], DEVICE_NATIVE_ENDIAN=
-);
->>> +        }
->>> +    }
->>> +
->>> +    dev =3D DEVICE(&s->timer);
->>> +    /* APB0 clock is the timer input clock */
->>> +    qdev_prop_set_uint32(dev, "clock-frequency", s->m3clk / s->apb0div=
-);
->>> +    object_property_set_bool(OBJECT(&s->timer), true, "realized",
->>> &err);
->>> +    if (err !=3D NULL) {
->>> +        error_propagate(errp, err);
->>> +        return;
->>> +    }
->>> +    busdev =3D SYS_BUS_DEVICE(dev);
->>> +    sysbus_mmio_map(busdev, 0, MSF2_TIMER_BASE);
->>> +    sysbus_connect_irq(busdev, 0,
->>> +                           qdev_get_gpio_in(armv7m, timer_irq[0]));
->>> +    sysbus_connect_irq(busdev, 1,
->>> +                           qdev_get_gpio_in(armv7m, timer_irq[1]));
->>> +
->>> +    dev =3D DEVICE(&s->sysreg);
->>> +    qdev_prop_set_uint32(dev, "apb0divisor", s->apb0div);
->>> +    qdev_prop_set_uint32(dev, "apb1divisor", s->apb1div);
->>> +    object_property_set_bool(OBJECT(&s->sysreg), true, "realized",
->>> &err);
->>> +    if (err !=3D NULL) {
->>> +        error_propagate(errp, err);
->>> +        return;
->>> +    }
->>> +    busdev =3D SYS_BUS_DEVICE(dev);
->>> +    sysbus_mmio_map(busdev, 0, MSF2_SYSREG_BASE);
->>> +
->>> +    for (i =3D 0; i < MSF2_NUM_SPIS; i++) {
->>> +        gchar *bus_name;
->>> +
->>> +        object_property_set_bool(OBJECT(&s->spi[i]), true, "realized",
->>> &err);
->>> +        if (err !=3D NULL) {
->>> +            error_propagate(errp, err);
->>> +            return;
->>> +        }
->>> +
->>> +        sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0, spi_addr[i]);
->>> +        sysbus_connect_irq(SYS_BUS_DEVICE(&s->spi[i]), 0,
->>> +                           qdev_get_gpio_in(armv7m, spi_irq[i]));
->>> +
->>> +        /* Alias controller SPI bus to the SoC itself */
->>> +        bus_name =3D g_strdup_printf("spi%d", i);
->>> +        object_property_add_alias(OBJECT(s), bus_name,
->>> +                                  OBJECT(&s->spi[i]), "spi",
->>> +                                  &error_abort);
->>> +        g_free(bus_name);
->>> +    }
->>> +}
->>> +
->>> +static Property m2sxxx_soc_properties[] =3D {
->>> +    /*
->>> +     * part name specifies the type of SmartFusion2 device variant(thi=
-s
->>> +     * property is for information purpose only.
->>> +     */
->>> +    DEFINE_PROP_STRING("part-name", MSF2State, part_name),
->>> +    DEFINE_PROP_UINT64("eNVM-size", MSF2State, envm_size,
->>> MSF2_ENVM_MAX_SIZE),
->>> +    DEFINE_PROP_UINT64("eSRAM-size", MSF2State, esram_size,
->>> +                        MSF2_ESRAM_MAX_SIZE),
->>> +    /* Libero GUI shows 100Mhz as default for clocks */
->>> +    DEFINE_PROP_UINT32("m3clk", MSF2State, m3clk, 100 * 1000000),
->>> +    /* default divisors in Libero GUI */
->>> +    DEFINE_PROP_UINT32("apb0div", MSF2State, apb0div, 2),
->>> +    DEFINE_PROP_UINT32("apb1div", MSF2State, apb1div, 2),
->>> +    DEFINE_PROP_END_OF_LIST(),
->>> +};
->>> +
->>> +static void m2sxxx_soc_class_init(ObjectClass *klass, void *data)
->>> +{
->>> +    DeviceClass *dc =3D DEVICE_CLASS(klass);
->>> +
->>> +    dc->realize =3D m2sxxx_soc_realize;
->>> +    dc->props =3D m2sxxx_soc_properties;
->>> +}
->>> +
->>> +static const TypeInfo m2sxxx_soc_info =3D {
->>> +    .name          =3D TYPE_MSF2_SOC,
->>> +    .parent        =3D TYPE_SYS_BUS_DEVICE,
->>> +    .instance_size =3D sizeof(MSF2State),
->>> +    .instance_init =3D m2sxxx_soc_initfn,
->>> +    .class_init    =3D m2sxxx_soc_class_init,
->>> +};
->>> +
->>> +static void m2sxxx_soc_types(void)
->>> +{
->>> +    type_register_static(&m2sxxx_soc_info);
->>> +}
->>> +
->>> +type_init(m2sxxx_soc_types)
->>> diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
->>> new file mode 100644
->>> index 0000000..eb239fa
->>> --- /dev/null
->>> +++ b/include/hw/arm/msf2-soc.h
->>> @@ -0,0 +1,66 @@
->>> +/*
->>> + * Microsemi Smartfusion2 SoC
->>> + *
->>> + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
->>> + *
->>> + * Permission is hereby granted, free of charge, to any person
->>> obtaining a copy
->>> + * of this software and associated documentation files (the
->>> "Software"), to deal
->>> + * in the Software without restriction, including without limitation
->>> the rights
->>> + * to use, copy, modify, merge, publish, distribute, sublicense, and/o=
-r
->>> sell
->>> + * copies of the Software, and to permit persons to whom the Software =
-is
->>> + * furnished to do so, subject to the following conditions:
->>> + *
->>> + * The above copyright notice and this permission notice shall be
->>> included in
->>> + * all copies or substantial portions of the Software.
->>> + *
->>> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
->>> EXPRESS OR
->>> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
->>> MERCHANTABILITY,
->>> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT
->>> SHALL
->>> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES O=
-R
->>> OTHER
->>> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
->>> ARISING FROM,
->>> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
->>> DEALINGS IN
->>> + * THE SOFTWARE.
->>> + */
->>> +
->>> +#ifndef HW_ARM_MSF2_SOC_H
->>> +#define HW_ARM_MSF2_SOC_H
->>> +
->>> +#include "hw/arm/armv7m.h"
->>> +#include "hw/timer/mss-timer.h"
->>> +#include "hw/misc/msf2-sysreg.h"
->>> +#include "hw/ssi/mss-spi.h"
->>> +
->>> +#define TYPE_MSF2_SOC     "msf2-soc"
->>> +#define MSF2_SOC(obj)     OBJECT_CHECK(MSF2State, (obj), TYPE_MSF2_SOC=
-)
->>> +
->>> +#define MSF2_NUM_SPIS         2
->>> +#define MSF2_NUM_UARTS        2
->>> +
->>> +/*
->>> + * System timer consists of two programmable 32-bit
->>> + * decrementing counters that generate individual interrupts to
->>> + * the Cortex-M3 processor
->>> + */
->>> +#define MSF2_NUM_TIMERS       2
->>> +
->>> +typedef struct MSF2State {
->>> +    /*< private >*/
->>> +    SysBusDevice parent_obj;
->>> +    /*< public >*/
->>> +
->>> +    ARMv7MState armv7m;
->>> +
->>> +    char *part_name;
->>> +    uint64_t envm_size;
->>> +    uint64_t esram_size;
->>> +
->>> +    uint32_t m3clk;
->>> +    uint32_t apb0div;
->>> +    uint32_t apb1div;
->>> +
->>> +    MSF2SysregState sysreg;
->>> +    MSSTimerState timer;
->>> +    MSSSpiState spi[MSF2_NUM_SPIS];
->>> +} MSF2State;
->>> +
->>> +#endif
->>>
->>>
->
+> >>>>>> For virtio, if incorrect length checking is suppressed we keep the
+> >>>>>> current behavior (channel-program check).      
+> >>>>>
+> >>>>> Confused. If it is suppressed, there should not be an error, no?      
+> >>>>
+> >>>> No.
+> >>>>
+> >>>> From VIRTIO 1.0 4.3.1.2  Device Requirements: Basic Concepts
+> >>>>
+> >>>> "If a driver did suppress length checks for a channel command, the device
+> >>>> MUST present a check condition if the transmitted data does not contain
+> >>>> enough data to process the command."
+> >>>> (http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-1230001)
+> >>>>
+> >>>> So for virtio we have to present a check condition. Architecturally it
+> >>>> might look better if the one refusing is the device and not the CSS, but
+> >>>> for that we would have to change the VIRTIO spec. With the given
+> >>>> constraints a program check is IMHO the best fit.    
+> >>>
+> >>> Ah, but that's not general length checking for virtio-ccw :)    
+> >>
+> >> What is general length checking for virtio-ccw? Did I say it
+> >> was general length checking for virtio-ccw?  
+> > 
+> > Hm? Generally, suppressing is supposed to allow incorrect length
+> > specifications. For virtio-ccw, that only applies to 'too much' and not
+> > 'not enough'.
+> > 
+> > Also, reading the statement in the spec: It only talks about a 'check
+> > condition', not _which_ one - so there's no requirement to keep a
+> > channel-program check (other than possibly confusing guests)?
+> >   
+> .
+> You are right, and I was wrong. We could also present an unit-check
+> (that's also check  -- and is the only one in device status. The spec
+> even says the 'device must present', although I device is in virtio sense
+> and not in PoP sense here, and does not use 'present subchannel status'
+> as in the previous sentence.  For a unit check I would have expected the
+> some sense bit specified to though (like it's specified that under
+> certain conditions we have to do an unit check with a command reject
+> (that is sense bit 0). What shall we do in your opinion?
+
+Whatever matches both the architecture and the qemu code flow best ;)
+
+If we can present an incorrect-length check on short data even with
+suppression set, that seems like the most consistent one.
+
+Else I would keep the current behaviour. Defining a sense bit (we'd
+need to spec that) seems like overkill to me.
