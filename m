@@ -1,33 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ds5o8-0003v1-KI
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:26:17 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1ds5xN-00072p-5Z
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:35:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ds5o2-0003ve-Es
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:26:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36716)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ds5o2-0003ue-62
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:26:10 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 242DF13A49
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 11:26:09 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170811152949.GU2554@redhat.com> (Daniel P. Berrange's message
-	of "Fri, 11 Aug 2017 16:29:49 +0100")
-References: <20170808162629.32493-1-quintela@redhat.com>
-	<20170808162629.32493-16-quintela@redhat.com>
-	<20170811152949.GU2554@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 13 Sep 2017 13:26:07 +0200
-Message-ID: <87r2vadels.fsf@secure.laptop>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1ds5xJ-0001AT-OT
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:35:49 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36843)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1ds5xJ-00019B-FE
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:35:45 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8DBZMPk120664
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:35:44 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cy388t92g-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:35:43 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 13 Sep 2017 12:35:41 +0100
+References: <20170905111645.18068-1-pasic@linux.vnet.ibm.com>
+	<20170905111645.18068-2-pasic@linux.vnet.ibm.com>
+	<20170906141846.0be413fb.cohuck@redhat.com>
+	<bd30a18f-6d22-e5a7-6e8c-08f628466cc4@linux.vnet.ibm.com>
+	<20170906145158.252cf0cd.cohuck@redhat.com>
+	<27c027c4-58b4-9031-648e-9fd2fa1e5fa8@linux.vnet.ibm.com>
+	<20170913115335.58995e36.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 13 Sep 2017 13:35:36 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 15/19] migration: Create thread
- infrastructure for multifd recv side
+In-Reply-To: <20170913115335.58995e36.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <e356920f-f35f-2dc8-bdf2-6febce2c340d@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/5] s390x/css: introduce css data stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,80 +47,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-"Daniel P. Berrange" <berrange@redhat.com> wrote:
-> On Tue, Aug 08, 2017 at 06:26:25PM +0200, Juan Quintela wrote:
->> We make the locking and the transfer of information specific, even if we
->> are still receiving things through the main thread.
->> 
->> Signed-off-by: Juan Quintela <quintela@redhat.com>
->> 
->> --
->> 
->> We split when we create the main channel and where we start the main
->> migration thread, so we wait for the creation of the other threads.
->> 
->> Use multifd_clear_group().
->> ---
->>  migration/migration.c |  7 ++++---
->>  migration/migration.h |  1 +
->>  migration/ram.c       | 55 +++++++++++++++++++++++++++++++++++++++++++++++----
->>  migration/socket.c    |  2 +-
->>  4 files changed, 57 insertions(+), 8 deletions(-)
->
->
->> diff --git a/migration/socket.c b/migration/socket.c
->> index 5dd6f42..3af9f7c 100644
->> --- a/migration/socket.c
->> +++ b/migration/socket.c
->> @@ -183,12 +183,12 @@ static gboolean
->> socket_accept_incoming_migration(QIOChannel *ioc,
->>  
->>      qio_channel_set_name(QIO_CHANNEL(sioc), "migration-socket-incoming");
->>      migration_channel_process_incoming(QIO_CHANNEL(sioc));
->> -    object_unref(OBJECT(sioc));
->
-> AFAICT, migration_channel_process_incoming() acquires its own reference
-> on 'sioc', so removing this object_unref means the code is now leaking a
-> reference
 
-Nack.
 
-I did it and ended with a segmentation fault because reference count was
-bad.
+On 09/13/2017 11:53 AM, Cornelia Huck wrote:
+> On Mon, 11 Sep 2017 18:36:00 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> On 09/06/2017 02:51 PM, Cornelia Huck wrote:
+>>>>>> +void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
+>>>>>> +{
+>>>>>> +    /*
+>>>>>> +     * We don't support MIDA (an optional facility) yet and we
+>>>>>> +     * catch this earlier. Just for expressing the precondition.
+>>>>>> +     */
+>>>>>> +    assert(!(orb->ctrl1 & ORB_CTRL1_MASK_MIDAW));    
+>>>>> I don't know, this is infrastructure, should it trust its callers? If
+>>>>> you keep the assert, please make it g_assert().    
+>>>>
+>>>> Why g_assert? I think g_assert comes form a test framework, this is not
+>>>> test code.  
+>>> g_assert() is glib, no?
+>>>   
+>>
+>> It lives in GLib > GLib Utilities > Testing:
+>> https://developer.gnome.org/glib/stable/glib-Testing.html
+>>
+>> The description of "Testing" starts like this: "GLib provides a framework
+>> for writing and maintaining unit tests in parallel to the code they are
+>> testing. The API is designed according to established concepts found in
+>> the other test frameworks (JUnit, NUnit, RUnit), which in turn is based
+>> on smalltalk unit testing concepts."
+>>
+>> So yes, it's both glib and testing framework. This is why I
+>> ask why should one use g_assert in not-unit-test code.
+> 
+> I have searched the archives, but unfortunately was not able to come to
+> a conclusion. Checkpatch advises against using anything but g_assert or
+> g_assert_not_reached in anything but test code, but that is because
+> those other g_asserts can be made non-fatal. g_assert_not_reached does
+> not seem to have a non-glib equivalent.
+> 
 
-(qemu) 
-Thread 6 "multifdrecv_0" received signal SIGSEGV, Segmentation fault.
-[Switching to Thread 0x7fff9f9ff700 (LWP 10065)]
-0x00005555559c12f8 in type_is_ancestor (type=0xb60f18247c894860, 
-    target_type=0x555556531b30) at /mnt/kvm/qemu/cleanup/qom/object.c:217
-217	    while (type) {
-(gdb) bt
-#0  0x00005555559c12f8 in type_is_ancestor (type=0xb60f18247c894860, target_type=0x555556531b30) at /mnt/kvm/qemu/cleanup/qom/object.c:217
-#1  0x00005555559c1dbb in object_class_dynamic_cast (class=class@entry=0x7ffff2cb3ce8 <main_arena+520>, typename=typename@entry=0x555555aa6d91 "qio-channel")
-    at /mnt/kvm/qemu/cleanup/qom/object.c:691
-#2  0x00005555559c1ed2 in object_class_dynamic_cast_assert (class=0x7ffff2cb3ce8 <main_arena+520>, typename=typename@entry=0x555555aa6d91 "qio-channel", file=file@entry=0x555555b88208 "/mnt/kvm/qemu/cleanup/io/channel.c", line=line@entry=56, func=func@entry=0x555555b884e0 <__func__.22671> "qio_channel_readv_full")
-    at /mnt/kvm/qemu/cleanup/qom/object.c:723
-#3  0x0000555555a3d4d7 in qio_channel_readv_full (ioc=0x5555568c5a00, iov=0x7fff900008c0, niov=15, fds=0x0, nfds=0x0, errp=0x7fff9f9fe950)
-    at /mnt/kvm/qemu/cleanup/io/channel.c:56
-#4  0x0000555555a3ddc2 in qio_channel_readv (errp=0x7fff9f9fe950, niov=<optimized out>, iov=<optimized out>, ioc=0x5555568c5a00)
-    at /mnt/kvm/qemu/cleanup/io/channel.c:197
-#5  0x0000555555a3ddc2 in qio_channel_readv_all_eof (ioc=0x5555568c5a00, iov=<optimized out>, niov=<optimized out>, errp=errp@entry=0x7fff9f9fe950)
-    at /mnt/kvm/qemu/cleanup/io/channel.c:106
-#6  0x0000555555a3de79 in qio_channel_readv_all (ioc=<optimized out>, iov=<optimized out>, niov=<optimized out>, errp=errp@entry=0x7fff9f9fe950)
-    at /mnt/kvm/qemu/cleanup/io/channel.c:142
-#7  0x0000555555794768 in multifd_recv_thread (opaque=0x5555570e5e00)
----Type <return> to continue, or q <return> to quit---up
-    at /mnt/kvm/qemu/cleanup/migration/ram.c:722
-#8  0x00007ffff2cc036d in start_thread (arg=0x7fff9f9ff700)
-    at pthread_create.c:456
-#9  0x00007ffff29f8bbf in clone ()
-    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:97
-(gdb) up
+I think the standard library equivalent of g_assert_not_reached is
+assert(false).
 
-Removing this unref fixed things, so I think that the accounting is good
-(famous last words).
+Yeah, checkpatch does not advise against using g_assert and
+g_assert_not_reached in non-test code, but it does not advise against
+using standard lib assert.
 
-Later, Juan.
+> I have it somewhere in the back of my mind that g_assert should be
+> preferred...
+> 
+
+OK, I will use g_assert.
