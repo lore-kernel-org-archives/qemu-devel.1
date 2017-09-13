@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37636)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ds3hI-00072A-1c
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:11:05 -0400
+	(envelope-from <cohuck@redhat.com>) id 1ds3hM-000768-3V
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:11:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1ds3hD-0003zX-Op
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:11:03 -0400
+	(envelope-from <cohuck@redhat.com>) id 1ds3hI-000442-3t
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:11:07 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Wed, 13 Sep 2017 11:10:37 +0200
-Message-Id: <20170913091038.2900-3-cohuck@redhat.com>
+Date: Wed, 13 Sep 2017 11:10:38 +0200
+Message-Id: <20170913091038.2900-4-cohuck@redhat.com>
 In-Reply-To: <20170913091038.2900-1-cohuck@redhat.com>
 References: <20170913091038.2900-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PATCH v2 2/3] iotests: use -ccw on s390x for 051
+Subject: [Qemu-devel] [PATCH v2 3/3] iotests: use virtio aliases for 067
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +24,50 @@ Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@
 
 The default cpu model on s390x does not provide zPCI, which is
 not yet wired up on tcg. Moreover, virtio-ccw is the standard
-on s390x, so use the -ccw instead of the -pci versions of virtio
-devices on s390x.
+on s390x.
+
+Using virtio-scsi will implicitly pick the right device, so just
+switch to that for simplicity.
 
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- tests/qemu-iotests/051        | 12 +++++++++++-
- tests/qemu-iotests/051.out    |  2 +-
- tests/qemu-iotests/051.pc.out |  2 +-
- 3 files changed, 13 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/067     | 3 ++-
+ tests/qemu-iotests/067.out | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-index c8cfc764bc..dba8816c9f 100755
---- a/tests/qemu-iotests/051
-+++ b/tests/qemu-iotests/051
-@@ -103,7 +103,17 @@ echo
- echo === Device without drive ===
+diff --git a/tests/qemu-iotests/067 b/tests/qemu-iotests/067
+index 5d4ca4bc61..cbb3da286a 100755
+--- a/tests/qemu-iotests/067
++++ b/tests/qemu-iotests/067
+@@ -141,7 +141,7 @@ echo
+ echo === Empty drive with -device and device_del ===
  echo
  
--run_qemu -device virtio-scsi-pci -device scsi-hd
-+case "$QEMU_DEFAULT_MACHINE" in
-+  s390-ccw-virtio)
-+      virtio_scsi=virtio-scsi-ccw
-+      ;;
-+  *)
-+      virtio_scsi=virtio-scsi-pci
-+      ;;
-+esac
+-run_qemu -device virtio-scsi-pci -device scsi-cd,id=cd0 <<EOF
++run_qemu -device virtio-scsi -device scsi-cd,id=cd0 <<EOF
+ { "execute": "qmp_capabilities" }
+ { "execute": "query-block" }
+ { "execute": "device_del", "arguments": { "id": "cd0" } }
+@@ -150,6 +150,7 @@ run_qemu -device virtio-scsi-pci -device scsi-cd,id=cd0 <<EOF
+ { "execute": "quit" }
+ EOF
+ 
 +
-+run_qemu -device $virtio_scsi -device scsi-hd |
-+    sed -e "s/$virtio_scsi/VIRTIO_SCSI/"
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/067.out b/tests/qemu-iotests/067.out
+index bd70557ddc..58e83c4505 100644
+--- a/tests/qemu-iotests/067.out
++++ b/tests/qemu-iotests/067.out
+@@ -419,7 +419,7 @@ Testing:
  
- echo
- echo === Overriding backing file ===
-diff --git a/tests/qemu-iotests/051.out b/tests/qemu-iotests/051.out
-index 4d3b1ff316..e3c6eaba57 100644
---- a/tests/qemu-iotests/051.out
-+++ b/tests/qemu-iotests/051.out
-@@ -49,7 +49,7 @@ QEMU_PROG: -drive file=TEST_DIR/t.qcow2,driver=qcow2,format=qcow2: Cannot specif
+ === Empty drive with -device and device_del ===
  
- === Device without drive ===
- 
--Testing: -device virtio-scsi-pci -device scsi-hd
-+Testing: -device VIRTIO_SCSI -device scsi-hd
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) QEMU_PROG: -device scsi-hd: drive property not set
- 
-diff --git a/tests/qemu-iotests/051.pc.out b/tests/qemu-iotests/051.pc.out
-index 76d7205460..ae7801b44b 100644
---- a/tests/qemu-iotests/051.pc.out
-+++ b/tests/qemu-iotests/051.pc.out
-@@ -49,7 +49,7 @@ QEMU_PROG: -drive file=TEST_DIR/t.qcow2,driver=qcow2,format=qcow2: Cannot specif
- 
- === Device without drive ===
- 
--Testing: -device virtio-scsi-pci -device scsi-hd
-+Testing: -device VIRTIO_SCSI -device scsi-hd
- QEMU X.Y.Z monitor - type 'help' for more information
- (qemu) QEMU_PROG: -device scsi-hd: drive property not set
- 
+-Testing: -device virtio-scsi-pci -device scsi-cd,id=cd0
++Testing: -device virtio-scsi -device scsi-cd,id=cd0
+ {
+     QMP_VERSION
+ }
 -- 
 2.13.5
