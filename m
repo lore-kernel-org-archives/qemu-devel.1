@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41884)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ds5Ov-00067n-Mk
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:14 -0400
+	(envelope-from <quintela@redhat.com>) id 1ds5PI-0006Qd-K3
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ds5Oq-0006Dy-5e
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38386)
+	(envelope-from <quintela@redhat.com>) id 1ds5P8-0006gz-HF
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42810)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ds5Oq-0006Bf-0o
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:08 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ds5P8-0006gO-90
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:26 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 0629CC058EAF
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 11:00:07 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 4426F461DB
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 11:00:25 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 13 Sep 2017 12:59:36 +0200
-Message-Id: <20170913105953.13760-4-quintela@redhat.com>
+Date: Wed, 13 Sep 2017 12:59:41 +0200
+Message-Id: <20170913105953.13760-9-quintela@redhat.com>
 In-Reply-To: <20170913105953.13760-1-quintela@redhat.com>
 References: <20170913105953.13760-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 03/20] migration: Add comments to channel
- functions
+Subject: [Qemu-devel] [PATCH v8 08/20] migration: Create x-multifd-channels
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,44 +33,211 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
----
- migration/channel.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Indicates the number of channels that we will create.  By default we
+create 2 channels.
 
-diff --git a/migration/channel.c b/migration/channel.c
-index edceebdb7b..70ec7ea3b7 100644
---- a/migration/channel.c
-+++ b/migration/channel.c
-@@ -19,6 +19,14 @@
- #include "qapi/error.h"
- #include "io/channel-tls.h"
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+--
+
+Catch inconsistent defaults (eric).
+Improve comment stating that number of threads is the same than number
+of sockets
+Use new DEFIN_PROP_*
+Rename x-multifd-threads to x-multifd-threads
+---
+ hmp.c                 |  7 +++++++
+ migration/migration.c | 26 ++++++++++++++++++++++++++
+ migration/migration.h |  1 +
+ qapi/migration.json   | 24 +++++++++++++++++++++---
+ 4 files changed, 55 insertions(+), 3 deletions(-)
+
+diff --git a/hmp.c b/hmp.c
+index cd046c6d71..1f9e39529f 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -336,6 +336,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "%s: %s\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_BLOCK_INCREMENTAL),
+             params->block_incremental ? "on" : "off");
++        monitor_printf(mon, "%s: %" PRId64 "\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_X_MULTIFD_CHANNELS),
++            params->x_multifd_channels);
+     }
  
-+/**
-+ * @migration_channel_process_incoming - Create new incoming migration channel
-+ *
-+ * Notice that TLS is special.  For it we listen in a listener socket,
-+ * and then create a new client socket from the TLS library.
-+ *
-+ * @ioc: Channel to which we are connecting
-+ */
- void migration_channel_process_incoming(QIOChannel *ioc)
- {
-     MigrationState *s = migrate_get_current();
-@@ -41,6 +49,13 @@ void migration_channel_process_incoming(QIOChannel *ioc)
+     qapi_free_MigrationParameters(params);
+@@ -1621,6 +1624,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+         p->has_block_incremental = true;
+         visit_type_bool(v, param, &p->block_incremental, &err);
+         break;
++    case MIGRATION_PARAMETER_X_MULTIFD_CHANNELS:
++        p->has_x_multifd_channels = true;
++        visit_type_int(v, param, &p->x_multifd_channels, &err);
++        break;
+     default:
+         assert(0);
+     }
+diff --git a/migration/migration.c b/migration/migration.c
+index ef5ce6c55d..021586f9f8 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -77,6 +77,7 @@
+  * Note: Please change this default value to 10000 when we support hybrid mode.
+  */
+ #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
++#define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
+ 
+ static NotifierList migration_state_notifiers =
+     NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
+@@ -481,6 +482,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+     params->x_checkpoint_delay = s->parameters.x_checkpoint_delay;
+     params->has_block_incremental = true;
+     params->block_incremental = s->parameters.block_incremental;
++    params->has_x_multifd_channels = true;
++    params->x_multifd_channels = s->parameters.x_multifd_channels;
+ 
+     return params;
+ }
+@@ -762,6 +765,13 @@ static bool migrate_params_check(MigrationParameters *params, Error **errp)
+                     "is invalid, it should be positive");
+         return false;
+     }
++    if (params->has_x_multifd_channels &&
++        (params->x_multifd_channels < 1 || params->x_multifd_channels > 255)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++                   "multifd_channels",
++                   "is invalid, it should be in the range of 1 to 255");
++        return false;
++    }
+ 
+     return true;
+ }
+@@ -880,6 +890,9 @@ static void migrate_params_apply(MigrateSetParameters *params)
+     if (params->has_block_incremental) {
+         s->parameters.block_incremental = params->block_incremental;
+     }
++    if (params->has_x_multifd_channels) {
++        s->parameters.x_multifd_channels = params->x_multifd_channels;
++    }
  }
  
+ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+@@ -1467,6 +1480,15 @@ bool migrate_use_multifd(void)
+     return s->enabled_capabilities[MIGRATION_CAPABILITY_X_MULTIFD];
+ }
  
-+/**
-+ * @migration_channel_connect - Create new outgoing migration channel
-+ *
-+ * @s: Current migration state
-+ * @ioc: Channel to which we are connecting
-+ * @hostname: Where we want to connect
-+ */
- void migration_channel_connect(MigrationState *s,
-                                QIOChannel *ioc,
-                                const char *hostname)
++int migrate_multifd_channels(void)
++{
++    MigrationState *s;
++
++    s = migrate_get_current();
++
++    return s->parameters.x_multifd_channels;
++}
++
+ int migrate_use_xbzrle(void)
+ {
+     MigrationState *s;
+@@ -2232,6 +2254,9 @@ static Property migration_properties[] = {
+     DEFINE_PROP_INT64("x-checkpoint-delay", MigrationState,
+                       parameters.x_checkpoint_delay,
+                       DEFAULT_MIGRATE_X_CHECKPOINT_DELAY),
++    DEFINE_PROP_INT64("x-multifd-channels", MigrationState,
++                      parameters.x_multifd_channels,
++                      DEFAULT_MIGRATE_MULTIFD_CHANNELS),
+ 
+     /* Migration capabilities */
+     DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
+@@ -2291,6 +2316,7 @@ static void migration_instance_init(Object *obj)
+     params->has_downtime_limit = true;
+     params->has_x_checkpoint_delay = true;
+     params->has_block_incremental = true;
++    params->has_x_multifd_channels = true;
+ }
+ 
+ /*
+diff --git a/migration/migration.h b/migration/migration.h
+index 023b14aa08..a6a7c41823 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -180,6 +180,7 @@ bool migrate_zero_blocks(void);
+ 
+ bool migrate_auto_converge(void);
+ bool migrate_use_multifd(void);
++int migrate_multifd_channels(void);
+ 
+ int migrate_use_xbzrle(void);
+ int64_t migrate_xbzrle_cache_size(void);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index ec4a88a43a..c766fb1e52 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -466,13 +466,19 @@
+ # 	migrated and the destination must already have access to the
+ # 	same backing chain as was used on the source.  (since 2.10)
+ #
++# @x-multifd-channels: Number of channels used to migrate data in
++#                     parallel. This is the same number that the
++#                     number of sockets used for migration.  The
++#                     default value is 2 (since 2.11)
++#
+ # Since: 2.4
+ ##
+ { 'enum': 'MigrationParameter',
+   'data': ['compress-level', 'compress-threads', 'decompress-threads',
+            'cpu-throttle-initial', 'cpu-throttle-increment',
+            'tls-creds', 'tls-hostname', 'max-bandwidth',
+-           'downtime-limit', 'x-checkpoint-delay', 'block-incremental' ] }
++           'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
++           'x-multifd-channels'] }
+ 
+ ##
+ # @MigrateSetParameters:
+@@ -528,6 +534,11 @@
+ # 	migrated and the destination must already have access to the
+ # 	same backing chain as was used on the source.  (since 2.10)
+ #
++# @x-multifd-channels: Number of channels used to migrate data in
++#                     parallel. This is the same number that the
++#                     number of sockets used for migration.  The
++#                     default value is 2 (since 2.11)
++#
+ # Since: 2.4
+ ##
+ # TODO either fuse back into MigrationParameters, or make
+@@ -543,7 +554,8 @@
+             '*max-bandwidth': 'int',
+             '*downtime-limit': 'int',
+             '*x-checkpoint-delay': 'int',
+-            '*block-incremental': 'bool' } }
++            '*block-incremental': 'bool',
++            '*x-multifd-channels': 'int' } }
+ 
+ ##
+ # @migrate-set-parameters:
+@@ -614,6 +626,11 @@
+ # 	migrated and the destination must already have access to the
+ # 	same backing chain as was used on the source.  (since 2.10)
+ #
++# @x-multifd-channels: Number of channels used to migrate data in
++#                     parallel. This is the same number that the
++#                     number of sockets used for migration.
++#                     The default value is 2 (since 2.11)
++#
+ # Since: 2.4
+ ##
+ { 'struct': 'MigrationParameters',
+@@ -627,7 +644,8 @@
+             '*max-bandwidth': 'int',
+             '*downtime-limit': 'int',
+             '*x-checkpoint-delay': 'int',
+-            '*block-incremental': 'bool' } }
++            '*block-incremental': 'bool' ,
++            '*x-multifd-channels': 'int' } }
+ 
+ ##
+ # @query-migrate-parameters:
 -- 
 2.13.5
