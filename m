@@ -1,34 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46226)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dsA9x-0002Np-6X
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:05:12 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dsAA1-0002Pw-St
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:05:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dsA9u-0006ZH-EH
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:05:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:6448)
+	(envelope-from <imammedo@redhat.com>) id 1dsA9w-0006ar-WE
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:05:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dsA9u-0006YW-2d
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:05:02 -0400
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dsA9w-0006a6-Ka
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:05:04 -0400
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
 	[10.5.11.14])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2C3FEC0587E5
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 16:05:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B8D5FEEAC3
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 16:05:03 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
 	(dell-r430-03.lab.eng.brq.redhat.com [10.34.112.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 7DC625D963
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 16:05:00 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 115CD5D963
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 16:05:02 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 13 Sep 2017 18:04:54 +0200
-Message-Id: <1505318697-77161-3-git-send-email-imammedo@redhat.com>
+Date: Wed, 13 Sep 2017 18:04:57 +0200
+Message-Id: <1505318697-77161-6-git-send-email-imammedo@redhat.com>
 In-Reply-To: <1505318697-77161-1-git-send-email-imammedo@redhat.com>
 References: <1505318697-77161-1-git-send-email-imammedo@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 2/5] cpu: make cpu_generic_init() abort QEMU
- on error
+Subject: [Qemu-devel] [PATCH v2 5/5] arm: drop intermediate cpu_model -> cpu
+ type parsing and use cpu type directly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,747 +36,1453 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Almost every user of cpu_generic_init() checks for
-returned NULL and then reports failure in a custom way
-and aborts process.
-Some users assume that call can't fail and don't check
-for failure, though they should have checked for it.
+there are 2 use cases to deal with:
+  1: fixed CPU models per board/soc
+  2: boards with user configurable cpu_model and fallback to
+     default cpu_model if user hasn't specified one explicitly
 
-In either cases cpu_generic_init() failure is fatal,
-so instead of checking for failure and reporting
-it various ways, make cpu_generic_init() report
-errors in consistent way and terminate QEMU on failure.
+For the 1st
+  drop intermediate cpu_model parsing and use const cpu type
+  directly, which replaces:
+     typename = object_class_get_name(
+           cpu_class_by_name(TYPE_ARM_CPU, cpu_model))
+     object_new(typename)
+  with
+     object_new(FOO_CPU_TYPE_NAME)
+  or
+     cpu_generic_init(BASE_CPU_TYPE, "my cpu model")
+  with
+     cpu_create(FOO_CPU_TYPE_NAME)
+
+as result 1st use case doesn't have to invoke not necessary
+translation and not needed code is removed.
+
+For the 2nd
+ 1: set default cpu type with MachineClass::default_cpu_type and
+ 2: use generic cpu_model parsing that done before machine_init()
+    is run and:
+    2.1: drop custom cpu_model parsing where pattern is:
+       typename = object_class_get_name(
+           cpu_class_by_name(TYPE_ARM_CPU, cpu_model))
+       [parse_features(typename, cpu_model, &err) ]
+
+    2.2: or replace cpu_generic_init() which does what
+         2.1 does + create_cpu(typename) with just
+         create_cpu(machine->cpu_type)
+as result cpu_name -> cpu_type translation is done using
+generic machine code one including parsing optional features
+if supported/present (removes a bunch of duplicated cpu_model
+parsing code) and default cpu type is defined in an uniform way
+within machine_class_init callbacks instead of adhoc places
+in boadr's machine_init code.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Even though it's tree wide change, it's trivial so all
-affected call sites are included within one patch.
-
 v2:
-  - drop not needed assert
-  - instead of checking error/reporting/exiting explicitly
-    use error_fatal which will do all of it for us
+ - fix merge conflicts with ignore_memory_transaction_failures
+ - fix couple merge conflicts where SoC type string where replaced by type macro
+ - keep plain prefix string in: strncmp(cpu_type, "pxa27", 5)
+ - s/"%s" ARM_CPU_TYPE_SUFFIX/ARM_CPU_TYPE_NAME("%s")/
 ---
- include/qom/cpu.h              |  3 ++-
- bsd-user/main.c                |  4 ----
- hw/alpha/dp264.c               |  4 ----
- hw/arm/musicpal.c              |  4 ----
- hw/arm/omap1.c                 |  4 ----
- hw/arm/omap2.c                 |  4 ----
- hw/arm/pxa2xx.c                |  8 --------
- hw/arm/strongarm.c             |  5 -----
- hw/lm32/lm32_boards.c          |  8 --------
- hw/lm32/milkymist.c            |  4 ----
- hw/m68k/an5206.c               |  4 ----
- hw/m68k/mcf5208.c              |  4 ----
- hw/mips/cps.c                  |  4 ----
- hw/mips/mips_fulong2e.c        |  4 ----
- hw/mips/mips_jazz.c            |  4 ----
- hw/mips/mips_malta.c           |  4 ----
- hw/mips/mips_mipssim.c         |  4 ----
- hw/mips/mips_r4k.c             |  4 ----
- hw/moxie/moxiesim.c            |  4 ----
- hw/openrisc/openrisc_sim.c     |  4 ----
- hw/ppc/e500.c                  |  4 ----
- hw/ppc/mac_newworld.c          |  4 ----
- hw/ppc/mac_oldworld.c          |  4 ----
- hw/ppc/ppc440_bamboo.c         |  4 ----
- hw/ppc/ppc4xx_devs.c           |  5 -----
- hw/ppc/prep.c                  |  9 ---------
- hw/ppc/virtex_ml507.c          |  4 ----
- hw/sh4/r2d.c                   |  4 ----
- hw/sh4/shix.c                  |  4 ----
- hw/sparc/leon3.c               |  4 ----
- hw/sparc/sun4m.c               |  4 ----
- hw/sparc64/sparc64.c           |  4 ----
- hw/tricore/tricore_testboard.c |  4 ----
- hw/unicore32/puv3.c            |  4 ----
- hw/xtensa/sim.c                |  5 -----
- hw/xtensa/xtfpga.c             |  5 -----
- linux-user/main.c              |  4 ----
- qom/cpu.c                      | 19 +++++--------------
- 38 files changed, 7 insertions(+), 176 deletions(-)
+ include/hw/arm/armv7m.h        |  2 +-
+ include/hw/arm/aspeed_soc.h    |  2 +-
+ include/hw/arm/stm32f205_soc.h |  2 +-
+ target/arm/cpu.h               |  3 +++
+ hw/arm/armv7m.c                | 40 +++++-------------------------------
+ hw/arm/aspeed_soc.c            | 13 +++++-------
+ hw/arm/collie.c                | 10 +++------
+ hw/arm/exynos4210.c            |  6 +-----
+ hw/arm/gumstix.c               |  5 +++--
+ hw/arm/highbank.c              | 10 ++++-----
+ hw/arm/integratorcp.c          | 30 ++-------------------------
+ hw/arm/mainstone.c             |  9 ++++-----
+ hw/arm/mps2.c                  | 17 +++++++---------
+ hw/arm/musicpal.c              |  7 ++-----
+ hw/arm/netduino2.c             |  2 +-
+ hw/arm/nseries.c               |  4 +++-
+ hw/arm/omap1.c                 |  7 ++-----
+ hw/arm/omap2.c                 |  4 ++--
+ hw/arm/omap_sx1.c              |  5 ++++-
+ hw/arm/palm.c                  |  5 +++--
+ hw/arm/pxa2xx.c                | 10 ++++-----
+ hw/arm/realview.c              | 25 +++++------------------
+ hw/arm/spitz.c                 | 12 ++++++-----
+ hw/arm/stellaris.c             | 16 +++++++--------
+ hw/arm/stm32f205_soc.c         |  4 ++--
+ hw/arm/strongarm.c             | 10 +++------
+ hw/arm/tosa.c                  |  4 ----
+ hw/arm/versatilepb.c           | 15 +++-----------
+ hw/arm/vexpress.c              | 32 +++++++++--------------------
+ hw/arm/virt.c                  | 46 +++++++++---------------------------------
+ hw/arm/xilinx_zynq.c           | 10 ++-------
+ hw/arm/z2.c                    |  9 +++------
+ target/arm/cpu.c               |  2 +-
+ 33 files changed, 114 insertions(+), 264 deletions(-)
 
-diff --git a/include/qom/cpu.h b/include/qom/cpu.h
-index 885276c..6d33cf1 100644
---- a/include/qom/cpu.h
-+++ b/include/qom/cpu.h
-@@ -661,7 +661,8 @@ CPUState *cpu_create(const char *typename);
-  *
-  * processes optional parameters and registers them as global properties
-  *
-- * Returns: type of CPU to create or %NULL if an error occurred.
-+ * Returns: type of CPU to create or prints error and terminates process
-+ *          if an error occurred.
-  */
- const char *cpu_parse_cpu_model(const char *typename, const char *cpu_mo=
-del);
-=20
-diff --git a/bsd-user/main.c b/bsd-user/main.c
-index 8a6706a..836daac 100644
---- a/bsd-user/main.c
-+++ b/bsd-user/main.c
-@@ -902,10 +902,6 @@ int main(int argc, char **argv)
-     /* NOTE: we need to init the CPU at this stage to get
-        qemu_host_page_size */
-     cpu =3D cpu_init(cpu_model);
--    if (!cpu) {
+diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
+index 10eb058..68cb30d 100644
+--- a/include/hw/arm/armv7m.h
++++ b/include/hw/arm/armv7m.h
+@@ -55,7 +55,7 @@ typedef struct ARMv7MState {
+     MemoryRegion container;
+ 
+     /* Properties */
+-    char *cpu_model;
++    char *cpu_type;
+     /* MemoryRegion the board provides to us (with its devices, RAM, etc) */
+     MemoryRegion *board_memory;
+ } ARMv7MState;
+diff --git a/include/hw/arm/aspeed_soc.h b/include/hw/arm/aspeed_soc.h
+index 0b88baa..f26914a 100644
+--- a/include/hw/arm/aspeed_soc.h
++++ b/include/hw/arm/aspeed_soc.h
+@@ -49,7 +49,7 @@ typedef struct AspeedSoCState {
+ 
+ typedef struct AspeedSoCInfo {
+     const char *name;
+-    const char *cpu_model;
++    const char *cpu_type;
+     uint32_t silicon_rev;
+     hwaddr sdram_base;
+     uint64_t sram_size;
+diff --git a/include/hw/arm/stm32f205_soc.h b/include/hw/arm/stm32f205_soc.h
+index e2dce11..922a733 100644
+--- a/include/hw/arm/stm32f205_soc.h
++++ b/include/hw/arm/stm32f205_soc.h
+@@ -52,7 +52,7 @@ typedef struct STM32F205State {
+     SysBusDevice parent_obj;
+     /*< public >*/
+ 
+-    char *cpu_model;
++    char *cpu_type;
+ 
+     ARMv7MState armv7m;
+ 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 98b9b26..1bfdd8d 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -2088,6 +2088,9 @@ static inline bool arm_excp_unmasked(CPUState *cs, unsigned int excp_idx,
+ 
+ #define cpu_init(cpu_model) cpu_generic_init(TYPE_ARM_CPU, cpu_model)
+ 
++#define ARM_CPU_TYPE_SUFFIX "-" TYPE_ARM_CPU
++#define ARM_CPU_TYPE_NAME(name) (name ARM_CPU_TYPE_SUFFIX)
++
+ #define cpu_signal_handler cpu_arm_signal_handler
+ #define cpu_list arm_cpu_list
+ 
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index b64a409..57a6806 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -151,10 +151,6 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+     SysBusDevice *sbd;
+     Error *err = NULL;
+     int i;
+-    char **cpustr;
+-    ObjectClass *oc;
+-    const char *typename;
+-    CPUClass *cc;
+ 
+     if (!s->board_memory) {
+         error_setg(errp, "memory property was not set");
+@@ -163,29 +159,7 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+ 
+     memory_region_add_subregion_overlap(&s->container, 0, s->board_memory, -1);
+ 
+-    cpustr = g_strsplit(s->cpu_model, ",", 2);
+-
+-    oc = cpu_class_by_name(TYPE_ARM_CPU, cpustr[0]);
+-    if (!oc) {
+-        error_setg(errp, "Unknown CPU model %s", cpustr[0]);
+-        g_strfreev(cpustr);
+-        return;
+-    }
+-
+-    cc = CPU_CLASS(oc);
+-    typename = object_class_get_name(oc);
+-    cc->parse_features(typename, cpustr[1], &err);
+-    g_strfreev(cpustr);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return;
+-    }
+-
+-    s->cpu = ARM_CPU(object_new(typename));
+-    if (!s->cpu) {
+-        error_setg(errp, "Unknown CPU model %s", s->cpu_model);
+-        return;
+-    }
++    s->cpu = ARM_CPU(object_new(s->cpu_type));
+ 
+     object_property_set_link(OBJECT(s->cpu), OBJECT(&s->container), "memory",
+                              &error_abort);
+@@ -241,7 +215,7 @@ static void armv7m_realize(DeviceState *dev, Error **errp)
+ }
+ 
+ static Property armv7m_properties[] = {
+-    DEFINE_PROP_STRING("cpu-model", ARMv7MState, cpu_model),
++    DEFINE_PROP_STRING("cpu-type", ARMv7MState, cpu_type),
+     DEFINE_PROP_LINK("memory", ARMv7MState, board_memory, TYPE_MEMORY_REGION,
+                      MemoryRegion *),
+     DEFINE_PROP_END_OF_LIST(),
+@@ -275,20 +249,16 @@ static void armv7m_reset(void *opaque)
+    Returns the ARMv7M device.  */
+ 
+ DeviceState *armv7m_init(MemoryRegion *system_memory, int mem_size, int num_irq,
+-                      const char *kernel_filename, const char *cpu_model)
++                         const char *kernel_filename, const char *cpu_type)
+ {
+     DeviceState *armv7m;
+ 
+-    if (cpu_model == NULL) {
+-        cpu_model = "cortex-m3";
+-    }
+-
+     armv7m = qdev_create(NULL, TYPE_ARMV7M);
+     qdev_prop_set_uint32(armv7m, "num-irq", num_irq);
+-    qdev_prop_set_string(armv7m, "cpu-model", cpu_model);
++    qdev_prop_set_string(armv7m, "cpu-type", cpu_type);
+     object_property_set_link(OBJECT(armv7m), OBJECT(get_system_memory()),
+                                      "memory", &error_abort);
+-    /* This will exit with an error if the user passed us a bad cpu_model */
++    /* This will exit with an error if the user passed us a bad cpu_type */
+     qdev_init_nofail(armv7m);
+ 
+     armv7m_load_kernel(ARM_CPU(first_cpu), kernel_filename, mem_size);
+diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+index 13c6393..5aa3d2d 100644
+--- a/hw/arm/aspeed_soc.c
++++ b/hw/arm/aspeed_soc.c
+@@ -54,7 +54,7 @@ static const char *aspeed_soc_ast2500_typenames[] = {
+ static const AspeedSoCInfo aspeed_socs[] = {
+     {
+         .name         = "ast2400-a0",
+-        .cpu_model    = "arm926",
++        .cpu_type     = ARM_CPU_TYPE_NAME("arm926"),
+         .silicon_rev  = AST2400_A0_SILICON_REV,
+         .sdram_base   = AST2400_SDRAM_BASE,
+         .sram_size    = 0x8000,
+@@ -65,7 +65,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
+         .wdts_num     = 2,
+     }, {
+         .name         = "ast2400-a1",
+-        .cpu_model    = "arm926",
++        .cpu_type     = ARM_CPU_TYPE_NAME("arm926"),
+         .silicon_rev  = AST2400_A1_SILICON_REV,
+         .sdram_base   = AST2400_SDRAM_BASE,
+         .sram_size    = 0x8000,
+@@ -76,7 +76,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
+         .wdts_num     = 2,
+     }, {
+         .name         = "ast2400",
+-        .cpu_model    = "arm926",
++        .cpu_type     = ARM_CPU_TYPE_NAME("arm926"),
+         .silicon_rev  = AST2400_A0_SILICON_REV,
+         .sdram_base   = AST2400_SDRAM_BASE,
+         .sram_size    = 0x8000,
+@@ -87,7 +87,7 @@ static const AspeedSoCInfo aspeed_socs[] = {
+         .wdts_num     = 2,
+     }, {
+         .name         = "ast2500-a1",
+-        .cpu_model    = "arm1176",
++        .cpu_type     = ARM_CPU_TYPE_NAME("arm1176"),
+         .silicon_rev  = AST2500_A1_SILICON_REV,
+         .sdram_base   = AST2500_SDRAM_BASE,
+         .sram_size    = 0x9000,
+@@ -128,13 +128,10 @@ static void aspeed_soc_init(Object *obj)
+ {
+     AspeedSoCState *s = ASPEED_SOC(obj);
+     AspeedSoCClass *sc = ASPEED_SOC_GET_CLASS(s);
+-    char *cpu_typename;
+     int i;
+ 
+-    cpu_typename = g_strdup_printf("%s-" TYPE_ARM_CPU, sc->info->cpu_model);
+-    object_initialize(&s->cpu, sizeof(s->cpu), cpu_typename);
++    object_initialize(&s->cpu, sizeof(s->cpu), sc->info->cpu_type);
+     object_property_add_child(obj, "cpu", OBJECT(&s->cpu), NULL);
+-    g_free(cpu_typename);
+ 
+     object_initialize(&s->vic, sizeof(s->vic), TYPE_ASPEED_VIC);
+     object_property_add_child(obj, "vic", OBJECT(&s->vic), NULL);
+diff --git a/hw/arm/collie.c b/hw/arm/collie.c
+index 8830192..f8c566e 100644
+--- a/hw/arm/collie.c
++++ b/hw/arm/collie.c
+@@ -18,7 +18,7 @@
+ #include "hw/block/flash.h"
+ #include "sysemu/block-backend.h"
+ #include "exec/address-spaces.h"
+-#include "qom/cpu.h"
++#include "cpu.h"
+ 
+ static struct arm_boot_info collie_binfo = {
+     .loader_start = SA_SDCS0,
+@@ -27,7 +27,6 @@ static struct arm_boot_info collie_binfo = {
+ 
+ static void collie_init(MachineState *machine)
+ {
+-    const char *cpu_model = machine->cpu_model;
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
+@@ -35,11 +34,7 @@ static void collie_init(MachineState *machine)
+     DriveInfo *dinfo;
+     MemoryRegion *sysmem = get_system_memory();
+ 
+-    if (!cpu_model) {
+-        cpu_model = "sa1110";
+-    }
+-
+-    s = sa1110_init(sysmem, collie_binfo.ram_size, cpu_model);
++    s = sa1110_init(sysmem, collie_binfo.ram_size, machine->cpu_type);
+ 
+     dinfo = drive_get(IF_PFLASH, 0, 0);
+     pflash_cfi01_register(SA_CS0, NULL, "collie.fl1", 0x02000000,
+@@ -65,6 +60,7 @@ static void collie_machine_init(MachineClass *mc)
+     mc->desc = "Sharp SL-5500 (Collie) PDA (SA-1110)";
+     mc->init = collie_init;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("sa1110");
+ }
+ 
+ DEFINE_MACHINE("collie", collie_machine_init)
+diff --git a/hw/arm/exynos4210.c b/hw/arm/exynos4210.c
+index ee1438a..e8e1d81 100644
+--- a/hw/arm/exynos4210.c
++++ b/hw/arm/exynos4210.c
+@@ -169,15 +169,11 @@ Exynos4210State *exynos4210_init(MemoryRegion *system_mem)
+     Exynos4210State *s = g_new(Exynos4210State, 1);
+     qemu_irq gate_irq[EXYNOS4210_NCPUS][EXYNOS4210_IRQ_GATE_NINPUTS];
+     SysBusDevice *busdev;
+-    ObjectClass *cpu_oc;
+     DeviceState *dev;
+     int i, n;
+ 
+-    cpu_oc = cpu_class_by_name(TYPE_ARM_CPU, "cortex-a9");
+-    assert(cpu_oc);
+-
+     for (n = 0; n < EXYNOS4210_NCPUS; n++) {
+-        Object *cpuobj = object_new(object_class_get_name(cpu_oc));
++        Object *cpuobj = object_new(ARM_CPU_TYPE_NAME("cortex-a9"));
+ 
+         /* By default A9 CPUs have EL3 enabled.  This board does not currently
+          * support EL3 so the CPU EL3 property is disabled before realization.
+diff --git a/hw/arm/gumstix.c b/hw/arm/gumstix.c
+index 092ce36..bba9e9f 100644
+--- a/hw/arm/gumstix.c
++++ b/hw/arm/gumstix.c
+@@ -44,6 +44,7 @@
+ #include "sysemu/block-backend.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/qtest.h"
++#include "cpu.h"
+ 
+ static const int sector_len = 128 * 1024;
+ 
+@@ -86,7 +87,6 @@ static void connex_init(MachineState *machine)
+ 
+ static void verdex_init(MachineState *machine)
+ {
+-    const char *cpu_model = machine->cpu_model;
+     PXA2xxState *cpu;
+     DriveInfo *dinfo;
+     int be;
+@@ -95,7 +95,7 @@ static void verdex_init(MachineState *machine)
+     uint32_t verdex_rom = 0x02000000;
+     uint32_t verdex_ram = 0x10000000;
+ 
+-    cpu = pxa270_init(address_space_mem, verdex_ram, cpu_model ?: "pxa270-c0");
++    cpu = pxa270_init(address_space_mem, verdex_ram, machine->cpu_type);
+ 
+     dinfo = drive_get(IF_PFLASH, 0, 0);
+     if (!dinfo && !qtest_enabled()) {
+@@ -144,6 +144,7 @@ static void verdex_class_init(ObjectClass *oc, void *data)
+     mc->desc = "Gumstix Verdex (PXA270)";
+     mc->init = verdex_init;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("pxa270-c0");
+ }
+ 
+ static const TypeInfo verdex_type = {
+diff --git a/hw/arm/highbank.c b/hw/arm/highbank.c
+index ba27789..354c6b2 100644
+--- a/hw/arm/highbank.c
++++ b/hw/arm/highbank.c
+@@ -222,7 +222,6 @@ enum cxmachines {
+ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
+ {
+     ram_addr_t ram_size = machine->ram_size;
+-    const char *cpu_model = machine->cpu_model;
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
+@@ -239,19 +238,20 @@ static void calxeda_init(MachineState *machine, enum cxmachines machine_id)
+ 
+     switch (machine_id) {
+     case CALXEDA_HIGHBANK:
+-        cpu_model = "cortex-a9";
++        machine->cpu_type = ARM_CPU_TYPE_NAME("cortex-a9");
+         break;
+     case CALXEDA_MIDWAY:
+-        cpu_model = "cortex-a15";
++        machine->cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+         break;
++    default:
++        assert(0);
+     }
+ 
+     for (n = 0; n < smp_cpus; n++) {
+-        ObjectClass *oc = cpu_class_by_name(TYPE_ARM_CPU, cpu_model);
+         Object *cpuobj;
+         ARMCPU *cpu;
+ 
+-        cpuobj = object_new(object_class_get_name(oc));
++        cpuobj = object_new(machine->cpu_type);
+         cpu = ARM_CPU(cpuobj);
+ 
+         object_property_set_int(cpuobj, QEMU_PSCI_CONDUIT_SMC,
+diff --git a/hw/arm/integratorcp.c b/hw/arm/integratorcp.c
+index d603af9..e8303b8 100644
+--- a/hw/arm/integratorcp.c
++++ b/hw/arm/integratorcp.c
+@@ -572,46 +572,19 @@ static struct arm_boot_info integrator_binfo = {
+ static void integratorcp_init(MachineState *machine)
+ {
+     ram_addr_t ram_size = machine->ram_size;
+-    const char *cpu_model = machine->cpu_model;
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
+-    char **cpustr;
+-    ObjectClass *cpu_oc;
+-    CPUClass *cc;
+     Object *cpuobj;
+     ARMCPU *cpu;
+-    const char *typename;
+     MemoryRegion *address_space_mem = get_system_memory();
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+     MemoryRegion *ram_alias = g_new(MemoryRegion, 1);
+     qemu_irq pic[32];
+     DeviceState *dev, *sic, *icp;
+     int i;
+-    Error *err = NULL;
+ 
+-    if (!cpu_model) {
+-        cpu_model = "arm926";
+-    }
+-
+-    cpustr = g_strsplit(cpu_model, ",", 2);
+-
+-    cpu_oc = cpu_class_by_name(TYPE_ARM_CPU, cpustr[0]);
+-    if (!cpu_oc) {
 -        fprintf(stderr, "Unable to find CPU definition\n");
 -        exit(1);
 -    }
-     env =3D cpu->env_ptr;
- #if defined(TARGET_SPARC) || defined(TARGET_PPC)
-     cpu_reset(cpu);
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index 1c5a177..1b12130 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -68,10 +68,6 @@ static void clipper_init(MachineState *machine)
-     memset(cpus, 0, sizeof(cpus));
-     for (i =3D 0; i < smp_cpus; ++i) {
-         cpus[i] =3D ALPHA_CPU(cpu_generic_init(TYPE_ALPHA_CPU, cpu_model=
-));
--        if (!cpus[i]) {
--            error_report("Unable to find CPU definition");
--            exit(1);
--        }
+-    typename = object_class_get_name(cpu_oc);
+-
+-    cc = CPU_CLASS(cpu_oc);
+-    cc->parse_features(typename, cpustr[1], &err);
+-    g_strfreev(cpustr);
+-    if (err) {
+-        error_report_err(err);
+-        exit(1);
+-    }
+-
+-    cpuobj = object_new(typename);
++    cpuobj = object_new(machine->cpu_type);
+ 
+     /* By default ARM1176 CPUs have EL3 enabled.  This board does not
+      * currently support EL3 so the CPU EL3 property is disabled before
+@@ -682,6 +655,7 @@ static void integratorcp_machine_init(MachineClass *mc)
+     mc->desc = "ARM Integrator/CP (ARM926EJ-S)";
+     mc->init = integratorcp_init;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("arm926");
+ }
+ 
+ DEFINE_MACHINE("integratorcp", integratorcp_machine_init)
+diff --git a/hw/arm/mainstone.c b/hw/arm/mainstone.c
+index 637f52c..d07972a 100644
+--- a/hw/arm/mainstone.c
++++ b/hw/arm/mainstone.c
+@@ -24,6 +24,7 @@
+ #include "hw/sysbus.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/qtest.h"
++#include "cpu.h"
+ 
+ /* Device addresses */
+ #define MST_FPGA_PHYS	0x08000000
+@@ -121,13 +122,10 @@ static void mainstone_common_init(MemoryRegion *address_space_mem,
+     int i;
+     int be;
+     MemoryRegion *rom = g_new(MemoryRegion, 1);
+-    const char *cpu_model = machine->cpu_model;
+-
+-    if (!cpu_model)
+-        cpu_model = "pxa270-c5";
+ 
+     /* Setup CPU & memory */
+-    mpu = pxa270_init(address_space_mem, mainstone_binfo.ram_size, cpu_model);
++    mpu = pxa270_init(address_space_mem, mainstone_binfo.ram_size,
++                      machine->cpu_type);
+     memory_region_init_ram(rom, NULL, "mainstone.rom", MAINSTONE_ROM,
+                            &error_fatal);
+     memory_region_set_readonly(rom, true);
+@@ -197,6 +195,7 @@ static void mainstone2_machine_init(MachineClass *mc)
+     mc->desc = "Mainstone II (PXA27x)";
+     mc->init = mainstone_init;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("pxa270-c5");
+ }
+ 
+ DEFINE_MACHINE("mainstone", mainstone2_machine_init)
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index abb0ab6..aeaad80 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -46,7 +46,6 @@ typedef enum MPS2FPGAType {
+ typedef struct {
+     MachineClass parent;
+     MPS2FPGAType fpga_type;
+-    const char *cpu_model;
+     uint32_t scc_id;
+ } MPS2MachineClass;
+ 
+@@ -107,14 +106,12 @@ static void mps2_common_init(MachineState *machine)
+     MPS2MachineState *mms = MPS2_MACHINE(machine);
+     MPS2MachineClass *mmc = MPS2_MACHINE_GET_CLASS(machine);
+     MemoryRegion *system_memory = get_system_memory();
++    MachineClass *mc = MACHINE_GET_CLASS(machine);
+     DeviceState *armv7m, *sccdev;
+ 
+-    if (!machine->cpu_model) {
+-        machine->cpu_model = mmc->cpu_model;
+-    }
+-
+-    if (strcmp(machine->cpu_model, mmc->cpu_model) != 0) {
+-        error_report("This board can only be used with CPU %s", mmc->cpu_model);
++    if (strcmp(machine->cpu_type, mc->default_cpu_type) != 0) {
++        error_report("This board can only be used with CPU %s",
++                     mc->default_cpu_type);
+         exit(1);
      }
-=20
-     cpus[0]->env.trap_arg0 =3D ram_size;
+ 
+@@ -188,7 +185,7 @@ static void mps2_common_init(MachineState *machine)
+     default:
+         g_assert_not_reached();
+     }
+-    qdev_prop_set_string(armv7m, "cpu-model", machine->cpu_model);
++    qdev_prop_set_string(armv7m, "cpu-type", machine->cpu_type);
+     object_property_set_link(OBJECT(&mms->armv7m), OBJECT(system_memory),
+                              "memory", &error_abort);
+     object_property_set_bool(OBJECT(&mms->armv7m), true, "realized",
+@@ -339,7 +336,7 @@ static void mps2_an385_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "ARM MPS2 with AN385 FPGA image for Cortex-M3";
+     mmc->fpga_type = FPGA_AN385;
+-    mmc->cpu_model = "cortex-m3";
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
+     mmc->scc_id = 0x41040000 | (385 << 4);
+ }
+ 
+@@ -350,7 +347,7 @@ static void mps2_an511_class_init(ObjectClass *oc, void *data)
+ 
+     mc->desc = "ARM MPS2 with AN511 DesignStart FPGA image for Cortex-M3";
+     mmc->fpga_type = FPGA_AN511;
+-    mmc->cpu_model = "cortex-m3";
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
+     mmc->scc_id = 0x4104000 | (511 << 4);
+ }
+ 
 diff --git a/hw/arm/musicpal.c b/hw/arm/musicpal.c
-index ab4ba31..7a6c0a6 100644
+index 7a6c0a6..b648770 100644
 --- a/hw/arm/musicpal.c
 +++ b/hw/arm/musicpal.c
-@@ -1594,10 +1594,6 @@ static void musicpal_init(MachineState *machine)
-         cpu_model =3D "arm926";
-     }
-     cpu =3D ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, cpu_model));
--    if (!cpu) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(1);
+@@ -1570,7 +1570,6 @@ static struct arm_boot_info musicpal_binfo = {
+ 
+ static void musicpal_init(MachineState *machine)
+ {
+-    const char *cpu_model = machine->cpu_model;
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
+@@ -1590,10 +1589,7 @@ static void musicpal_init(MachineState *machine)
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+     MemoryRegion *sram = g_new(MemoryRegion, 1);
+ 
+-    if (!cpu_model) {
+-        cpu_model = "arm926";
 -    }
-=20
+-    cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, cpu_model));
++    cpu = ARM_CPU(cpu_create(machine->cpu_type));
+ 
      /* For now we use a fixed - the original - RAM size */
      memory_region_allocate_system_memory(ram, NULL, "musicpal.ram",
+@@ -1715,6 +1711,7 @@ static void musicpal_machine_init(MachineClass *mc)
+     mc->desc = "Marvell 88w8618 / MusicPal (ARM926EJ-S)";
+     mc->init = musicpal_init;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("arm926");
+ }
+ 
+ DEFINE_MACHINE("musicpal", musicpal_machine_init)
+diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
+index 9d34d4c..f936017 100644
+--- a/hw/arm/netduino2.c
++++ b/hw/arm/netduino2.c
+@@ -34,7 +34,7 @@ static void netduino2_init(MachineState *machine)
+     DeviceState *dev;
+ 
+     dev = qdev_create(NULL, TYPE_STM32F205_SOC);
+-    qdev_prop_set_string(dev, "cpu-model", "cortex-m3");
++    qdev_prop_set_string(dev, "cpu-type", ARM_CPU_TYPE_NAME("cortex-m3"));
+     object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
+ 
+     armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
+diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
+index a32ac82..58005b6 100644
+--- a/hw/arm/nseries.c
++++ b/hw/arm/nseries.c
+@@ -1310,7 +1310,7 @@ static void n8x0_init(MachineState *machine,
+     struct n800_s *s = (struct n800_s *) g_malloc0(sizeof(*s));
+     int sdram_size = binfo->ram_size;
+ 
+-    s->mpu = omap2420_mpu_init(sysmem, sdram_size, machine->cpu_model);
++    s->mpu = omap2420_mpu_init(sysmem, sdram_size, machine->cpu_type);
+ 
+     /* Setup peripherals
+      *
+@@ -1426,6 +1426,7 @@ static void n800_class_init(ObjectClass *oc, void *data)
+     mc->init = n800_init;
+     mc->default_boot_order = "";
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("arm1136-r2");
+ }
+ 
+ static const TypeInfo n800_type = {
+@@ -1442,6 +1443,7 @@ static void n810_class_init(ObjectClass *oc, void *data)
+     mc->init = n810_init;
+     mc->default_boot_order = "";
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("arm1136-r2");
+ }
+ 
+ static const TypeInfo n810_type = {
 diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
-index 400ba30..04e65ce 100644
+index 04e65ce..b3e7625 100644
 --- a/hw/arm/omap1.c
 +++ b/hw/arm/omap1.c
-@@ -3864,10 +3864,6 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRe=
-gion *system_memory,
+@@ -3850,7 +3850,7 @@ static int omap_validate_tipb_mpui_addr(struct omap_mpu_state_s *s,
+ 
+ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegion *system_memory,
+                 unsigned long sdram_size,
+-                const char *core)
++                const char *cpu_type)
+ {
+     int i;
+     struct omap_mpu_state_s *s = g_new0(struct omap_mpu_state_s, 1);
+@@ -3858,12 +3858,9 @@ struct omap_mpu_state_s *omap310_mpu_init(MemoryRegion *system_memory,
+     DriveInfo *dinfo;
+     SysBusDevice *busdev;
+ 
+-    if (!core)
+-        core = "ti925t";
+-
      /* Core */
-     s->mpu_model =3D omap310;
-     s->cpu =3D ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, core));
--    if (s->cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(1);
--    }
-     s->sdram_size =3D sdram_size;
-     s->sram_size =3D OMAP15XX_SRAM_SIZE;
-=20
+     s->mpu_model = omap310;
+-    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, core));
++    s->cpu = ARM_CPU(cpu_create(cpu_type));
+     s->sdram_size = sdram_size;
+     s->sram_size = OMAP15XX_SRAM_SIZE;
+ 
 diff --git a/hw/arm/omap2.c b/hw/arm/omap2.c
-index ece25ae..5821477 100644
+index 5821477..3f6076e 100644
 --- a/hw/arm/omap2.c
 +++ b/hw/arm/omap2.c
-@@ -2262,10 +2262,6 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryR=
-egion *sysmem,
+@@ -2250,7 +2250,7 @@ static const struct dma_irq_map omap2_dma_irq_map[] = {
+ 
+ struct omap_mpu_state_s *omap2420_mpu_init(MemoryRegion *sysmem,
+                 unsigned long sdram_size,
+-                const char *core)
++                const char *cpu_type)
+ {
+     struct omap_mpu_state_s *s = g_new0(struct omap_mpu_state_s, 1);
+     qemu_irq dma_irqs[4];
+@@ -2261,7 +2261,7 @@ struct omap_mpu_state_s *omap2420_mpu_init(MemoryRegion *sysmem,
+ 
      /* Core */
-     s->mpu_model =3D omap2420;
-     s->cpu =3D ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, core ?: "arm1136-r=
-2"));
--    if (s->cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(1);
--    }
-     s->sdram_size =3D sdram_size;
-     s->sram_size =3D OMAP242X_SRAM_SIZE;
-=20
+     s->mpu_model = omap2420;
+-    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, core ?: "arm1136-r2"));
++    s->cpu = ARM_CPU(cpu_create(cpu_type));
+     s->sdram_size = sdram_size;
+     s->sram_size = OMAP242X_SRAM_SIZE;
+ 
+diff --git a/hw/arm/omap_sx1.c b/hw/arm/omap_sx1.c
+index 4535617..9a14270 100644
+--- a/hw/arm/omap_sx1.c
++++ b/hw/arm/omap_sx1.c
+@@ -36,6 +36,7 @@
+ #include "sysemu/block-backend.h"
+ #include "sysemu/qtest.h"
+ #include "exec/address-spaces.h"
++#include "cpu.h"
+ 
+ /*****************************************************************************/
+ /* Siemens SX1 Cellphone V1 */
+@@ -120,7 +121,7 @@ static void sx1_init(MachineState *machine, const int version)
+     }
+ 
+     mpu = omap310_mpu_init(address_space, sx1_binfo.ram_size,
+-                           machine->cpu_model);
++                           machine->cpu_type);
+ 
+     /* External Flash (EMIFS) */
+     memory_region_init_ram(flash, NULL, "omap_sx1.flash0-0", flash_size,
+@@ -224,6 +225,7 @@ static void sx1_machine_v2_class_init(ObjectClass *oc, void *data)
+     mc->desc = "Siemens SX1 (OMAP310) V2";
+     mc->init = sx1_init_v2;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("ti925t");
+ }
+ 
+ static const TypeInfo sx1_machine_v2_type = {
+@@ -239,6 +241,7 @@ static void sx1_machine_v1_class_init(ObjectClass *oc, void *data)
+     mc->desc = "Siemens SX1 (OMAP310) V1";
+     mc->init = sx1_init_v1;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("ti925t");
+ }
+ 
+ static const TypeInfo sx1_machine_v1_type = {
+diff --git a/hw/arm/palm.c b/hw/arm/palm.c
+index bf070a2..b8753e2 100644
+--- a/hw/arm/palm.c
++++ b/hw/arm/palm.c
+@@ -29,6 +29,7 @@
+ #include "hw/devices.h"
+ #include "hw/loader.h"
+ #include "exec/address-spaces.h"
++#include "cpu.h"
+ 
+ static uint32_t static_readb(void *opaque, hwaddr offset)
+ {
+@@ -195,7 +196,6 @@ static struct arm_boot_info palmte_binfo = {
+ 
+ static void palmte_init(MachineState *machine)
+ {
+-    const char *cpu_model = machine->cpu_model;
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
+@@ -211,7 +211,7 @@ static void palmte_init(MachineState *machine)
+     MemoryRegion *flash = g_new(MemoryRegion, 1);
+     MemoryRegion *cs = g_new(MemoryRegion, 4);
+ 
+-    mpu = omap310_mpu_init(address_space_mem, sdram_size, cpu_model);
++    mpu = omap310_mpu_init(address_space_mem, sdram_size, machine->cpu_type);
+ 
+     /* External Flash (EMIFS) */
+     memory_region_init_ram(flash, NULL, "palmte.flash", flash_size,
+@@ -275,6 +275,7 @@ static void palmte_machine_init(MachineClass *mc)
+     mc->desc = "Palm Tungsten|E aka. Cheetah PDA (OMAP310)";
+     mc->init = palmte_init;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("ti925t");
+ }
+ 
+ DEFINE_MACHINE("cheetah", palmte_machine_init)
 diff --git a/hw/arm/pxa2xx.c b/hw/arm/pxa2xx.c
-index b0ac3cf..c16657d 100644
+index c16657d..cf07234 100644
 --- a/hw/arm/pxa2xx.c
 +++ b/hw/arm/pxa2xx.c
-@@ -2067,10 +2067,6 @@ PXA2xxState *pxa270_init(MemoryRegion *address_spa=
-ce,
-         revision =3D "pxa270";
-=20
-     s->cpu =3D ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, revision));
--    if (s->cpu =3D=3D NULL) {
+@@ -2052,21 +2052,19 @@ static void pxa2xx_reset(void *opaque, int line, int level)
+ 
+ /* Initialise a PXA270 integrated chip (ARM based core).  */
+ PXA2xxState *pxa270_init(MemoryRegion *address_space,
+-                         unsigned int sdram_size, const char *revision)
++                         unsigned int sdram_size, const char *cpu_type)
+ {
+     PXA2xxState *s;
+     int i;
+     DriveInfo *dinfo;
+     s = g_new0(PXA2xxState, 1);
+ 
+-    if (revision && strncmp(revision, "pxa27", 5)) {
++    if (strncmp(cpu_type, "pxa27", 5)) {
+         fprintf(stderr, "Machine requires a PXA27x processor.\n");
+         exit(1);
+     }
+-    if (!revision)
+-        revision = "pxa270";
+ 
+-    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, revision));
++    s->cpu = ARM_CPU(cpu_create(cpu_type));
+     s->reset = qemu_allocate_irq(pxa2xx_reset, s, 0);
+ 
+     /* SDRAM & Internal Memory Storage */
+@@ -2192,7 +2190,7 @@ PXA2xxState *pxa255_init(MemoryRegion *address_space, unsigned int sdram_size)
+ 
+     s = g_new0(PXA2xxState, 1);
+ 
+-    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, "pxa255"));
++    s->cpu = ARM_CPU(cpu_create(ARM_CPU_TYPE_NAME("pxa255")));
+     s->reset = qemu_allocate_irq(pxa2xx_reset, s, 0);
+ 
+     /* SDRAM & Internal Memory Storage */
+diff --git a/hw/arm/realview.c b/hw/arm/realview.c
+index f3a49b6..87cd1e5 100644
+--- a/hw/arm/realview.c
++++ b/hw/arm/realview.c
+@@ -57,7 +57,6 @@ static void realview_init(MachineState *machine,
+ {
+     ARMCPU *cpu = NULL;
+     CPUARMState *env;
+-    ObjectClass *cpu_oc;
+     MemoryRegion *sysmem = get_system_memory();
+     MemoryRegion *ram_lo;
+     MemoryRegion *ram_hi = g_new(MemoryRegion, 1);
+@@ -98,14 +97,8 @@ static void realview_init(MachineState *machine,
+         break;
+     }
+ 
+-    cpu_oc = cpu_class_by_name(TYPE_ARM_CPU, machine->cpu_model);
+-    if (!cpu_oc) {
 -        fprintf(stderr, "Unable to find CPU definition\n");
 -        exit(1);
 -    }
-     s->reset =3D qemu_allocate_irq(pxa2xx_reset, s, 0);
-=20
-     /* SDRAM & Internal Memory Storage */
-@@ -2197,10 +2193,6 @@ PXA2xxState *pxa255_init(MemoryRegion *address_spa=
-ce, unsigned int sdram_size)
-     s =3D g_new0(PXA2xxState, 1);
-=20
-     s->cpu =3D ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, "pxa255"));
--    if (s->cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(1);
+-
+     for (n = 0; n < smp_cpus; n++) {
+-        Object *cpuobj = object_new(object_class_get_name(cpu_oc));
++        Object *cpuobj = object_new(machine->cpu_type);
+ 
+         /* By default A9,A15 and ARM1176 CPUs have EL3 enabled.  This board
+          * does not currently support EL3 so the CPU EL3 property is disabled
+@@ -361,33 +354,21 @@ static void realview_init(MachineState *machine,
+ 
+ static void realview_eb_init(MachineState *machine)
+ {
+-    if (!machine->cpu_model) {
+-        machine->cpu_model = "arm926";
 -    }
-     s->reset =3D qemu_allocate_irq(pxa2xx_reset, s, 0);
-=20
-     /* SDRAM & Internal Memory Storage */
+     realview_init(machine, BOARD_EB);
+ }
+ 
+ static void realview_eb_mpcore_init(MachineState *machine)
+ {
+-    if (!machine->cpu_model) {
+-        machine->cpu_model = "arm11mpcore";
+-    }
+     realview_init(machine, BOARD_EB_MPCORE);
+ }
+ 
+ static void realview_pb_a8_init(MachineState *machine)
+ {
+-    if (!machine->cpu_model) {
+-        machine->cpu_model = "cortex-a8";
+-    }
+     realview_init(machine, BOARD_PB_A8);
+ }
+ 
+ static void realview_pbx_a9_init(MachineState *machine)
+ {
+-    if (!machine->cpu_model) {
+-        machine->cpu_model = "cortex-a9";
+-    }
+     realview_init(machine, BOARD_PBX_A9);
+ }
+ 
+@@ -399,6 +380,7 @@ static void realview_eb_class_init(ObjectClass *oc, void *data)
+     mc->init = realview_eb_init;
+     mc->block_default_type = IF_SCSI;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("arm926");
+ }
+ 
+ static const TypeInfo realview_eb_type = {
+@@ -416,6 +398,7 @@ static void realview_eb_mpcore_class_init(ObjectClass *oc, void *data)
+     mc->block_default_type = IF_SCSI;
+     mc->max_cpus = 4;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("arm11mpcore");
+ }
+ 
+ static const TypeInfo realview_eb_mpcore_type = {
+@@ -431,6 +414,7 @@ static void realview_pb_a8_class_init(ObjectClass *oc, void *data)
+     mc->desc = "ARM RealView Platform Baseboard for Cortex-A8";
+     mc->init = realview_pb_a8_init;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a8");
+ }
+ 
+ static const TypeInfo realview_pb_a8_type = {
+@@ -447,6 +431,7 @@ static void realview_pbx_a9_class_init(ObjectClass *oc, void *data)
+     mc->init = realview_pbx_a9_init;
+     mc->max_cpus = 4;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a9");
+ }
+ 
+ static const TypeInfo realview_pbx_a9_type = {
+diff --git a/hw/arm/spitz.c b/hw/arm/spitz.c
+index 6406421..feccdb0 100644
+--- a/hw/arm/spitz.c
++++ b/hw/arm/spitz.c
+@@ -30,6 +30,7 @@
+ #include "hw/sysbus.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/sysemu.h"
++#include "cpu.h"
+ 
+ #undef REG_FMT
+ #define REG_FMT			"0x%02lx"
+@@ -909,13 +910,10 @@ static void spitz_common_init(MachineState *machine,
+     DeviceState *scp0, *scp1 = NULL;
+     MemoryRegion *address_space_mem = get_system_memory();
+     MemoryRegion *rom = g_new(MemoryRegion, 1);
+-    const char *cpu_model = machine->cpu_model;
+-
+-    if (!cpu_model)
+-        cpu_model = (model == terrier) ? "pxa270-c5" : "pxa270-c0";
+ 
+     /* Setup CPU & memory */
+-    mpu = pxa270_init(address_space_mem, spitz_binfo.ram_size, cpu_model);
++    mpu = pxa270_init(address_space_mem, spitz_binfo.ram_size,
++                      machine->cpu_type);
+ 
+     sl_flash_register(mpu, (model == spitz) ? FLASH_128M : FLASH_1024M);
+ 
+@@ -984,6 +982,7 @@ static void akitapda_class_init(ObjectClass *oc, void *data)
+     mc->desc = "Sharp SL-C1000 (Akita) PDA (PXA270)";
+     mc->init = akita_init;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("pxa270-c0");
+ }
+ 
+ static const TypeInfo akitapda_type = {
+@@ -1000,6 +999,7 @@ static void spitzpda_class_init(ObjectClass *oc, void *data)
+     mc->init = spitz_init;
+     mc->block_default_type = IF_IDE;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("pxa270-c0");
+ }
+ 
+ static const TypeInfo spitzpda_type = {
+@@ -1016,6 +1016,7 @@ static void borzoipda_class_init(ObjectClass *oc, void *data)
+     mc->init = borzoi_init;
+     mc->block_default_type = IF_IDE;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("pxa270-c0");
+ }
+ 
+ static const TypeInfo borzoipda_type = {
+@@ -1032,6 +1033,7 @@ static void terrierpda_class_init(ObjectClass *oc, void *data)
+     mc->init = terrier_init;
+     mc->block_default_type = IF_IDE;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("pxa270-c5");
+ }
+ 
+ static const TypeInfo terrierpda_type = {
+diff --git a/hw/arm/stellaris.c b/hw/arm/stellaris.c
+index b3aad23..de7c0fc 100644
+--- a/hw/arm/stellaris.c
++++ b/hw/arm/stellaris.c
+@@ -22,6 +22,7 @@
+ #include "sysemu/sysemu.h"
+ #include "hw/char/pl011.h"
+ #include "hw/misc/unimp.h"
++#include "cpu.h"
+ 
+ #define GPIO_A 0
+ #define GPIO_B 1
+@@ -1225,8 +1226,7 @@ static stellaris_board_info stellaris_boards[] = {
+   }
+ };
+ 
+-static void stellaris_init(const char *kernel_filename, const char *cpu_model,
+-                           stellaris_board_info *board)
++static void stellaris_init(MachineState *ms, stellaris_board_info *board)
+ {
+     static const int uart_irq[] = {5, 6, 33, 34};
+     static const int timer_irq[] = {19, 21, 23, 35};
+@@ -1298,7 +1298,7 @@ static void stellaris_init(const char *kernel_filename, const char *cpu_model,
+     memory_region_add_subregion(system_memory, 0x20000000, sram);
+ 
+     nvic = armv7m_init(system_memory, flash_size, NUM_IRQ_LINES,
+-                      kernel_filename, cpu_model);
++                       ms->kernel_filename, ms->cpu_type);
+ 
+     qdev_connect_gpio_out_named(nvic, "SYSRESETREQ", 0,
+                                 qemu_allocate_irq(&do_sys_reset, NULL, 0));
+@@ -1435,16 +1435,12 @@ static void stellaris_init(const char *kernel_filename, const char *cpu_model,
+ /* FIXME: Figure out how to generate these from stellaris_boards.  */
+ static void lm3s811evb_init(MachineState *machine)
+ {
+-    const char *cpu_model = machine->cpu_model;
+-    const char *kernel_filename = machine->kernel_filename;
+-    stellaris_init(kernel_filename, cpu_model, &stellaris_boards[0]);
++    stellaris_init(machine, &stellaris_boards[0]);
+ }
+ 
+ static void lm3s6965evb_init(MachineState *machine)
+ {
+-    const char *cpu_model = machine->cpu_model;
+-    const char *kernel_filename = machine->kernel_filename;
+-    stellaris_init(kernel_filename, cpu_model, &stellaris_boards[1]);
++    stellaris_init(machine, &stellaris_boards[1]);
+ }
+ 
+ static void lm3s811evb_class_init(ObjectClass *oc, void *data)
+@@ -1454,6 +1450,7 @@ static void lm3s811evb_class_init(ObjectClass *oc, void *data)
+     mc->desc = "Stellaris LM3S811EVB";
+     mc->init = lm3s811evb_init;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
+ }
+ 
+ static const TypeInfo lm3s811evb_type = {
+@@ -1469,6 +1466,7 @@ static void lm3s6965evb_class_init(ObjectClass *oc, void *data)
+     mc->desc = "Stellaris LM3S6965EVB";
+     mc->init = lm3s6965evb_init;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
+ }
+ 
+ static const TypeInfo lm3s6965evb_type = {
+diff --git a/hw/arm/stm32f205_soc.c b/hw/arm/stm32f205_soc.c
+index f61e735..1cd6374 100644
+--- a/hw/arm/stm32f205_soc.c
++++ b/hw/arm/stm32f205_soc.c
+@@ -112,7 +112,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+ 
+     armv7m = DEVICE(&s->armv7m);
+     qdev_prop_set_uint32(armv7m, "num-irq", 96);
+-    qdev_prop_set_string(armv7m, "cpu-model", s->cpu_model);
++    qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
+     object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
+                                      "memory", &error_abort);
+     object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
+@@ -200,7 +200,7 @@ static void stm32f205_soc_realize(DeviceState *dev_soc, Error **errp)
+ }
+ 
+ static Property stm32f205_soc_properties[] = {
+-    DEFINE_PROP_STRING("cpu-model", STM32F205State, cpu_model),
++    DEFINE_PROP_STRING("cpu-type", STM32F205State, cpu_type),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
 diff --git a/hw/arm/strongarm.c b/hw/arm/strongarm.c
-index 884242b..c1145dd 100644
+index c1145dd..3d1a231 100644
 --- a/hw/arm/strongarm.c
 +++ b/hw/arm/strongarm.c
-@@ -1599,11 +1599,6 @@ StrongARMState *sa1110_init(MemoryRegion *sysmem,
-=20
-     s->cpu =3D ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, rev));
-=20
--    if (!s->cpu) {
--        error_report("Unable to find CPU definition");
--        exit(1);
--    }
--
-     memory_region_allocate_system_memory(&s->sdram, NULL, "strongarm.sdr=
-am",
-                                          sdram_size);
-     memory_region_add_subregion(sysmem, SA_SDCS0, &s->sdram);
-diff --git a/hw/lm32/lm32_boards.c b/hw/lm32/lm32_boards.c
-index eccf0ac..b0bb3ef 100644
---- a/hw/lm32/lm32_boards.c
-+++ b/hw/lm32/lm32_boards.c
-@@ -105,10 +105,6 @@ static void lm32_evr_init(MachineState *machine)
-         cpu_model =3D "lm32-full";
-     }
-     cpu =3D LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "qemu: unable to find CPU '%s'\n", cpu_model);
--        exit(1);
--    }
-=20
-     env =3D &cpu->env;
-     reset_info->cpu =3D cpu;
-@@ -206,10 +202,6 @@ static void lm32_uclinux_init(MachineState *machine)
-         cpu_model =3D "lm32-full";
-     }
-     cpu =3D LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "qemu: unable to find CPU '%s'\n", cpu_model);
--        exit(1);
--    }
-=20
-     env =3D &cpu->env;
-     reset_info->cpu =3D cpu;
-diff --git a/hw/lm32/milkymist.c b/hw/lm32/milkymist.c
-index dffd879..4db4d2d 100644
---- a/hw/lm32/milkymist.c
-+++ b/hw/lm32/milkymist.c
-@@ -112,10 +112,6 @@ milkymist_init(MachineState *machine)
-         cpu_model =3D "lm32-full";
-     }
-     cpu =3D LM32_CPU(cpu_generic_init(TYPE_LM32_CPU, cpu_model));
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "qemu: unable to find CPU '%s'\n", cpu_model);
--        exit(1);
--    }
-=20
-     env =3D &cpu->env;
-     reset_info->cpu =3D cpu;
-diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
-index 7b9b15d..9002c46 100644
---- a/hw/m68k/an5206.c
-+++ b/hw/m68k/an5206.c
-@@ -43,10 +43,6 @@ static void an5206_init(MachineState *machine)
-         cpu_model =3D "m5206";
-     }
-     cpu =3D M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
--    if (!cpu) {
--        error_report("Unable to find m68k CPU definition");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     /* Initialize CPU registers.  */
-diff --git a/hw/m68k/mcf5208.c b/hw/m68k/mcf5208.c
-index 1a0f180..b9dde75 100644
---- a/hw/m68k/mcf5208.c
-+++ b/hw/m68k/mcf5208.c
-@@ -233,10 +233,6 @@ static void mcf5208evb_init(MachineState *machine)
-         cpu_model =3D "m5208";
-     }
-     cpu =3D M68K_CPU(cpu_generic_init(TYPE_M68K_CPU, cpu_model));
--    if (!cpu) {
--        fprintf(stderr, "Unable to find m68k CPU definition\n");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     /* Initialize CPU registers.  */
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index 4ef337d..79d4c5e 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -72,10 +72,6 @@ static void mips_cps_realize(DeviceState *dev, Error *=
-*errp)
-=20
-     for (i =3D 0; i < s->num_vp; i++) {
-         cpu =3D cpu_mips_init(s->cpu_model);
--        if (cpu =3D=3D NULL) {
--            error_setg(errp, "%s: CPU initialization failed",  __func__)=
-;
--            return;
--        }
-=20
-         /* Init internal devices */
-         cpu_mips_irq_init_cpu(cpu);
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 3532399..439a3d7 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -281,10 +281,6 @@ static void mips_fulong2e_init(MachineState *machine=
-)
-         cpu_model =3D "Loongson-2E";
-     }
-     cpu =3D cpu_mips_init(cpu_model);
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     qemu_register_reset(main_cpu_reset, cpu);
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index df2262a..ae10670 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -152,10 +152,6 @@ static void mips_jazz_init(MachineState *machine,
-         cpu_model =3D "R4000";
-     }
-     cpu =3D cpu_mips_init(cpu_model);
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(1);
--    }
-     env =3D &cpu->env;
-     qemu_register_reset(main_cpu_reset, cpu);
-=20
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index af678f5..c82e0af 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -932,10 +932,6 @@ static void create_cpu_without_cps(const char *cpu_m=
-odel,
-=20
-     for (i =3D 0; i < smp_cpus; i++) {
-         cpu =3D cpu_mips_init(cpu_model);
--        if (cpu =3D=3D NULL) {
--            fprintf(stderr, "Unable to find CPU definition\n");
--            exit(1);
--        }
-=20
-         /* Init internal devices */
-         cpu_mips_irq_init_cpu(cpu);
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index 07fc4c2..49cd38d 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -164,10 +164,6 @@ mips_mipssim_init(MachineState *machine)
- #endif
-     }
-     cpu =3D cpu_mips_init(cpu_model);
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     reset_info =3D g_malloc0(sizeof(ResetData));
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index 2f5ced7..60da607 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -194,10 +194,6 @@ void mips_r4k_init(MachineState *machine)
- #endif
-     }
-     cpu =3D cpu_mips_init(cpu_model);
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     reset_info =3D g_malloc0(sizeof(ResetData));
-diff --git a/hw/moxie/moxiesim.c b/hw/moxie/moxiesim.c
-index 4c27b45..5ea8dd3 100644
---- a/hw/moxie/moxiesim.c
-+++ b/hw/moxie/moxiesim.c
-@@ -119,10 +119,6 @@ static void moxiesim_init(MachineState *machine)
-         cpu_model =3D "MoxieLite-moxie-cpu";
-     }
-     cpu =3D MOXIE_CPU(cpu_generic_init(TYPE_MOXIE_CPU, cpu_model));
--    if (!cpu) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     qemu_register_reset(main_cpu_reset, cpu);
-diff --git a/hw/openrisc/openrisc_sim.c b/hw/openrisc/openrisc_sim.c
-index 243d802..86bf284 100644
---- a/hw/openrisc/openrisc_sim.c
-+++ b/hw/openrisc/openrisc_sim.c
-@@ -110,10 +110,6 @@ static void openrisc_sim_init(MachineState *machine)
-=20
-     for (n =3D 0; n < smp_cpus; n++) {
-         cpu =3D OPENRISC_CPU(cpu_generic_init(TYPE_OPENRISC_CPU, cpu_mod=
-el));
--        if (cpu =3D=3D NULL) {
--            fprintf(stderr, "Unable to find CPU definition!\n");
--            exit(1);
--        }
-         qemu_register_reset(main_cpu_reset, cpu);
-         main_cpu_reset(cpu);
-     }
-diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
-index 55cad78..db0e49a 100644
---- a/hw/ppc/e500.c
-+++ b/hw/ppc/e500.c
-@@ -817,10 +817,6 @@ void ppce500_init(MachineState *machine, PPCE500Para=
-ms *params)
-=20
-         cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
-                                            machine->cpu_model));
--        if (cpu =3D=3D NULL) {
--            fprintf(stderr, "Unable to initialize CPU!\n");
--            exit(1);
--        }
-         env =3D &cpu->env;
-         cs =3D CPU(cpu);
-=20
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index d466634..33b46cb 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -189,10 +189,6 @@ static void ppc_core99_init(MachineState *machine)
-     for (i =3D 0; i < smp_cpus; i++) {
-         cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
-                                            machine->cpu_model));
--        if (cpu =3D=3D NULL) {
--            fprintf(stderr, "Unable to find PowerPC CPU definition\n");
--            exit(1);
--        }
-         env =3D &cpu->env;
-=20
-         /* Set time-base frequency to 100 Mhz */
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index fcac399..193b904 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -118,10 +118,6 @@ static void ppc_heathrow_init(MachineState *machine)
-     for (i =3D 0; i < smp_cpus; i++) {
-         cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
-                                            machine->cpu_model));
--        if (cpu =3D=3D NULL) {
--            fprintf(stderr, "Unable to find PowerPC CPU definition\n");
--            exit(1);
--        }
-         env =3D &cpu->env;
-=20
-         /* Set time-base frequency to 16.6 Mhz */
-diff --git a/hw/ppc/ppc440_bamboo.c b/hw/ppc/ppc440_bamboo.c
-index ca26398..f92d47f 100644
---- a/hw/ppc/ppc440_bamboo.c
-+++ b/hw/ppc/ppc440_bamboo.c
-@@ -187,10 +187,6 @@ static void bamboo_init(MachineState *machine)
-         machine->cpu_model =3D "440EP";
-     }
-     cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, machine->cpu_=
-model));
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to initialize CPU!\n");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     if (env->mmu_model !=3D POWERPC_MMU_BOOKE) {
-diff --git a/hw/ppc/ppc4xx_devs.c b/hw/ppc/ppc4xx_devs.c
-index ec90f13..6d7f785 100644
---- a/hw/ppc/ppc4xx_devs.c
-+++ b/hw/ppc/ppc4xx_devs.c
-@@ -57,11 +57,6 @@ PowerPCCPU *ppc4xx_init(const char *cpu_model,
-=20
-     /* init CPUs */
-     cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to find PowerPC %s CPU definition\n",
--                cpu_model);
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     cpu_clk->cb =3D NULL; /* We don't care about CPU clock frequency cha=
-nges */
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index 00f3321..94138a4 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -522,10 +522,6 @@ static void ppc_prep_init(MachineState *machine)
-     for (i =3D 0; i < smp_cpus; i++) {
-         cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU,
-                                            machine->cpu_model));
--        if (cpu =3D=3D NULL) {
--            fprintf(stderr, "Unable to find PowerPC CPU definition\n");
--            exit(1);
--        }
-         env =3D &cpu->env;
-=20
-         if (env->flags & POWERPC_FLAG_RTC_CLK) {
-@@ -726,11 +722,6 @@ static void ibm_40p_init(MachineState *machine)
-         machine->cpu_model =3D "604";
-     }
-     cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, machine->cpu_=
-model));
--    if (!cpu) {
--        error_report("could not initialize CPU '%s'",
--                     machine->cpu_model);
--        exit(1);
--    }
-     env =3D &cpu->env;
-     if (PPC_INPUT(env) !=3D PPC_FLAGS_INPUT_6xx) {
-         error_report("only 6xx bus is supported on this machine");
-diff --git a/hw/ppc/virtex_ml507.c b/hw/ppc/virtex_ml507.c
-index d5fdc16..ed9b406 100644
---- a/hw/ppc/virtex_ml507.c
-+++ b/hw/ppc/virtex_ml507.c
-@@ -97,10 +97,6 @@ static PowerPCCPU *ppc440_init_xilinx(ram_addr_t *ram_=
-size,
-     qemu_irq *irqs;
-=20
-     cpu =3D POWERPC_CPU(cpu_generic_init(TYPE_POWERPC_CPU, cpu_model));
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to initialize CPU!\n");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     ppc_booke_timers_init(cpu, sysclk, 0/* no flags */);
-diff --git a/hw/sh4/r2d.c b/hw/sh4/r2d.c
-index 22bc534..16b9ed2 100644
---- a/hw/sh4/r2d.c
-+++ b/hw/sh4/r2d.c
-@@ -247,10 +247,6 @@ static void r2d_init(MachineState *machine)
-     }
-=20
-     cpu =3D SUPERH_CPU(cpu_generic_init(TYPE_SUPERH_CPU, cpu_model));
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     reset_info =3D g_malloc0(sizeof(ResetData));
-diff --git a/hw/sh4/shix.c b/hw/sh4/shix.c
-index 7f8a4b6..50ee36a 100644
---- a/hw/sh4/shix.c
-+++ b/hw/sh4/shix.c
-@@ -57,10 +57,6 @@ static void shix_init(MachineState *machine)
-         cpu_model =3D "any";
-=20
-     cpu =3D SUPERH_CPU(cpu_generic_init(TYPE_SUPERH_CPU, cpu_model));
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(1);
--    }
-=20
-     /* Allocate memory space */
-     memory_region_init_ram(rom, NULL, "shix.rom", 0x4000, &error_fatal);
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index 56512ec..ec2816b 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -127,10 +127,6 @@ static void leon3_generic_hw_init(MachineState *mach=
-ine)
-     }
-=20
-     cpu =3D SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "qemu: Unable to find Sparc CPU definition\n");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     cpu_sparc_set_id(env, 0);
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index cf47dca..e1bdd48 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -798,10 +798,6 @@ static void cpu_devinit(const char *cpu_model, unsig=
-ned int id,
-     CPUSPARCState *env;
-=20
-     cpu =3D SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "qemu: Unable to find Sparc CPU definition\n");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     cpu_sparc_set_id(env, id);
-diff --git a/hw/sparc64/sparc64.c b/hw/sparc64/sparc64.c
-index ecf38a4..097d529 100644
---- a/hw/sparc64/sparc64.c
-+++ b/hw/sparc64/sparc64.c
-@@ -354,10 +354,6 @@ SPARCCPU *sparc64_cpu_devinit(const char *cpu_model,
-         cpu_model =3D default_cpu_model;
-     }
-     cpu =3D SPARC_CPU(cpu_generic_init(TYPE_SPARC_CPU, cpu_model));
--    if (cpu =3D=3D NULL) {
--        fprintf(stderr, "Unable to find Sparc CPU definition\n");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     env->tick =3D cpu_timer_create("tick", cpu, tick_irq,
-diff --git a/hw/tricore/tricore_testboard.c b/hw/tricore/tricore_testboar=
-d.c
-index 3fcd8bb..0486f8a 100644
---- a/hw/tricore/tricore_testboard.c
-+++ b/hw/tricore/tricore_testboard.c
-@@ -75,10 +75,6 @@ static void tricore_testboard_init(MachineState *machi=
-ne, int board_id)
-         machine->cpu_model =3D "tc1796";
-     }
-     cpu =3D TRICORE_CPU(cpu_generic_init(TYPE_TRICORE_CPU, machine->cpu_=
-model));
--    if (!cpu) {
--        error_report("Unable to find CPU definition");
--        exit(1);
--    }
-     env =3D &cpu->env;
-     memory_region_init_ram(ext_cram, NULL, "powerlink_ext_c.ram",
-                            2 * 1024 * 1024, &error_fatal);
-diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
-index eb9862f..504ea46 100644
---- a/hw/unicore32/puv3.c
-+++ b/hw/unicore32/puv3.c
-@@ -128,10 +128,6 @@ static void puv3_init(MachineState *machine)
-     }
-=20
-     cpu =3D UNICORE32_CPU(cpu_generic_init(TYPE_UNICORE32_CPU, cpu_model=
-));
--    if (!cpu) {
--        error_report("Unable to find CPU definition");
--        exit(1);
--    }
-     env =3D &cpu->env;
-=20
-     puv3_soc_init(env);
-diff --git a/hw/xtensa/sim.c b/hw/xtensa/sim.c
-index 1b4767f..b3580b1 100644
---- a/hw/xtensa/sim.c
-+++ b/hw/xtensa/sim.c
-@@ -85,11 +85,6 @@ static void xtensa_sim_init(MachineState *machine)
-=20
-     for (n =3D 0; n < smp_cpus; n++) {
-         cpu =3D XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model))=
-;
--        if (cpu =3D=3D NULL) {
--            error_report("unable to find CPU definition '%s'",
--                         cpu_model);
--            exit(EXIT_FAILURE);
--        }
-         env =3D &cpu->env;
-=20
-         env->sregs[PRID] =3D n;
-diff --git a/hw/xtensa/xtfpga.c b/hw/xtensa/xtfpga.c
-index 182ec1e..a19cceb 100644
---- a/hw/xtensa/xtfpga.c
-+++ b/hw/xtensa/xtfpga.c
-@@ -233,11 +233,6 @@ static void lx_init(const LxBoardDesc *board, Machin=
-eState *machine)
-=20
-     for (n =3D 0; n < smp_cpus; n++) {
-         cpu =3D XTENSA_CPU(cpu_generic_init(TYPE_XTENSA_CPU, cpu_model))=
-;
--        if (cpu =3D=3D NULL) {
--            error_report("unable to find CPU definition '%s'",
--                         cpu_model);
--            exit(EXIT_FAILURE);
--        }
-         env =3D &cpu->env;
-=20
-         env->sregs[PRID] =3D n;
-diff --git a/linux-user/main.c b/linux-user/main.c
-index 03666ef..829f974 100644
---- a/linux-user/main.c
-+++ b/linux-user/main.c
-@@ -4323,10 +4323,6 @@ int main(int argc, char **argv, char **envp)
-     /* NOTE: we need to init the CPU at this stage to get
-        qemu_host_page_size */
-     cpu =3D cpu_init(cpu_model);
--    if (!cpu) {
--        fprintf(stderr, "Unable to find CPU definition\n");
--        exit(EXIT_FAILURE);
--    }
-     env =3D cpu->env_ptr;
-     cpu_reset(cpu);
-=20
-diff --git a/qom/cpu.c b/qom/cpu.c
-index 483f26a..94fa8fe 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -62,7 +62,7 @@ CPUState *cpu_create(const char *typename)
-     if (err !=3D NULL) {
-         error_report_err(err);
-         object_unref(OBJECT(cpu));
--        return NULL;
-+        exit(EXIT_FAILURE);
-     }
-     return cpu;
- }
-@@ -71,7 +71,6 @@ const char *cpu_parse_cpu_model(const char *typename, c=
-onst char *cpu_model)
+@@ -1581,23 +1581,19 @@ static const TypeInfo strongarm_ssp_info = {
+ 
+ /* Main CPU functions */
+ StrongARMState *sa1110_init(MemoryRegion *sysmem,
+-                            unsigned int sdram_size, const char *rev)
++                            unsigned int sdram_size, const char *cpu_type)
  {
-     ObjectClass *oc;
-     CPUClass *cc;
--    Error *err =3D NULL;
-     gchar **model_pieces;
-     const char *cpu_type;
-=20
-@@ -79,18 +78,15 @@ const char *cpu_parse_cpu_model(const char *typename,=
- const char *cpu_model)
-=20
-     oc =3D cpu_class_by_name(typename, model_pieces[0]);
-     if (oc =3D=3D NULL) {
-+        error_report("unable to find CPU model '%s'", model_pieces[0]);
-         g_strfreev(model_pieces);
--        return NULL;
-+        exit(EXIT_FAILURE);
-     }
-=20
-     cpu_type =3D object_class_get_name(oc);
-     cc =3D CPU_CLASS(oc);
--    cc->parse_features(cpu_type, model_pieces[1], &err);
-+    cc->parse_features(cpu_type, model_pieces[1], &error_fatal);
-     g_strfreev(model_pieces);
--    if (err !=3D NULL) {
--        error_report_err(err);
--        return NULL;
+     StrongARMState *s;
+     int i;
+ 
+     s = g_new0(StrongARMState, 1);
+ 
+-    if (!rev) {
+-        rev = "sa1110-b5";
 -    }
-     return cpu_type;
- }
-=20
-@@ -99,12 +95,7 @@ CPUState *cpu_generic_init(const char *typename, const=
- char *cpu_model)
-     /* TODO: all callers of cpu_generic_init() need to be converted to
-      * call cpu_parse_features() only once, before calling cpu_generic_i=
-nit().
-      */
--    const char *cpu_type =3D cpu_parse_cpu_model(typename, cpu_model);
 -
--    if (cpu_type) {
--        return cpu_create(cpu_type);
+-    if (strncmp(rev, "sa1110", 6)) {
++    if (strncmp(cpu_type, "sa1110", 6)) {
+         error_report("Machine requires a SA1110 processor.");
+         exit(1);
+     }
+ 
+-    s->cpu = ARM_CPU(cpu_generic_init(TYPE_ARM_CPU, rev));
++    s->cpu = ARM_CPU(cpu_create(cpu_type));
+ 
+     memory_region_allocate_system_memory(&s->sdram, NULL, "strongarm.sdram",
+                                          sdram_size);
+diff --git a/hw/arm/tosa.c b/hw/arm/tosa.c
+index 1134cf7..0447963 100644
+--- a/hw/arm/tosa.c
++++ b/hw/arm/tosa.c
+@@ -219,7 +219,6 @@ static struct arm_boot_info tosa_binfo = {
+ 
+ static void tosa_init(MachineState *machine)
+ {
+-    const char *cpu_model = machine->cpu_model;
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
+@@ -229,9 +228,6 @@ static void tosa_init(MachineState *machine)
+     TC6393xbState *tmio;
+     DeviceState *scp0, *scp1;
+ 
+-    if (!cpu_model)
+-        cpu_model = "pxa255";
+-
+     mpu = pxa255_init(address_space_mem, tosa_binfo.ram_size);
+ 
+     memory_region_init_ram(rom, NULL, "tosa.rom", TOSA_ROM, &error_fatal);
+diff --git a/hw/arm/versatilepb.c b/hw/arm/versatilepb.c
+index 76664e4..418792c 100644
+--- a/hw/arm/versatilepb.c
++++ b/hw/arm/versatilepb.c
+@@ -181,7 +181,6 @@ static struct arm_boot_info versatile_binfo;
+ 
+ static void versatile_init(MachineState *machine, int board_id)
+ {
+-    ObjectClass *cpu_oc;
+     Object *cpuobj;
+     ARMCPU *cpu;
+     MemoryRegion *sysmem = get_system_memory();
+@@ -207,17 +206,7 @@ static void versatile_init(MachineState *machine, int board_id)
+         exit(1);
+     }
+ 
+-    if (!machine->cpu_model) {
+-        machine->cpu_model = "arm926";
 -    }
--    return NULL;
-+    return cpu_create(cpu_parse_cpu_model(typename, cpu_model));
+-
+-    cpu_oc = cpu_class_by_name(TYPE_ARM_CPU, machine->cpu_model);
+-    if (!cpu_oc) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+-
+-    cpuobj = object_new(object_class_get_name(cpu_oc));
++    cpuobj = object_new(machine->cpu_type);
+ 
+     /* By default ARM1176 CPUs have EL3 enabled.  This board does not
+      * currently support EL3 so the CPU EL3 property is disabled before
+@@ -404,6 +393,7 @@ static void versatilepb_class_init(ObjectClass *oc, void *data)
+     mc->init = vpb_init;
+     mc->block_default_type = IF_SCSI;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("arm926");
  }
-=20
- bool cpu_paging_enabled(const CPUState *cpu)
---=20
+ 
+ static const TypeInfo versatilepb_type = {
+@@ -420,6 +410,7 @@ static void versatileab_class_init(ObjectClass *oc, void *data)
+     mc->init = vab_init;
+     mc->block_default_type = IF_SCSI;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("arm926");
+ }
+ 
+ static const TypeInfo versatileab_type = {
+diff --git a/hw/arm/vexpress.c b/hw/arm/vexpress.c
+index e3acab6..2e5f670 100644
+--- a/hw/arm/vexpress.c
++++ b/hw/arm/vexpress.c
+@@ -186,7 +186,7 @@ typedef struct {
+ 
+ typedef void DBoardInitFn(const VexpressMachineState *machine,
+                           ram_addr_t ram_size,
+-                          const char *cpu_model,
++                          const char *cpu_type,
+                           qemu_irq *pic);
+ 
+ struct VEDBoardInfo {
+@@ -202,22 +202,16 @@ struct VEDBoardInfo {
+     DBoardInitFn *init;
+ };
+ 
+-static void init_cpus(const char *cpu_model, const char *privdev,
++static void init_cpus(const char *cpu_type, const char *privdev,
+                       hwaddr periphbase, qemu_irq *pic, bool secure)
+ {
+-    ObjectClass *cpu_oc = cpu_class_by_name(TYPE_ARM_CPU, cpu_model);
+     DeviceState *dev;
+     SysBusDevice *busdev;
+     int n;
+ 
+-    if (!cpu_oc) {
+-        fprintf(stderr, "Unable to find CPU definition\n");
+-        exit(1);
+-    }
+-
+     /* Create the actual CPUs */
+     for (n = 0; n < smp_cpus; n++) {
+-        Object *cpuobj = object_new(object_class_get_name(cpu_oc));
++        Object *cpuobj = object_new(cpu_type);
+ 
+         if (!secure) {
+             object_property_set_bool(cpuobj, false, "has_el3", NULL);
+@@ -262,7 +256,7 @@ static void init_cpus(const char *cpu_model, const char *privdev,
+ 
+ static void a9_daughterboard_init(const VexpressMachineState *vms,
+                                   ram_addr_t ram_size,
+-                                  const char *cpu_model,
++                                  const char *cpu_type,
+                                   qemu_irq *pic)
+ {
+     MemoryRegion *sysmem = get_system_memory();
+@@ -270,10 +264,6 @@ static void a9_daughterboard_init(const VexpressMachineState *vms,
+     MemoryRegion *lowram = g_new(MemoryRegion, 1);
+     ram_addr_t low_ram_size;
+ 
+-    if (!cpu_model) {
+-        cpu_model = "cortex-a9";
+-    }
+-
+     if (ram_size > 0x40000000) {
+         /* 1GB is the maximum the address space permits */
+         fprintf(stderr, "vexpress-a9: cannot model more than 1GB RAM\n");
+@@ -295,7 +285,7 @@ static void a9_daughterboard_init(const VexpressMachineState *vms,
+     memory_region_add_subregion(sysmem, 0x60000000, ram);
+ 
+     /* 0x1e000000 A9MPCore (SCU) private memory region */
+-    init_cpus(cpu_model, TYPE_A9MPCORE_PRIV, 0x1e000000, pic, vms->secure);
++    init_cpus(cpu_type, TYPE_A9MPCORE_PRIV, 0x1e000000, pic, vms->secure);
+ 
+     /* Daughterboard peripherals : 0x10020000 .. 0x20000000 */
+ 
+@@ -351,17 +341,13 @@ static VEDBoardInfo a9_daughterboard = {
+ 
+ static void a15_daughterboard_init(const VexpressMachineState *vms,
+                                    ram_addr_t ram_size,
+-                                   const char *cpu_model,
++                                   const char *cpu_type,
+                                    qemu_irq *pic)
+ {
+     MemoryRegion *sysmem = get_system_memory();
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+     MemoryRegion *sram = g_new(MemoryRegion, 1);
+ 
+-    if (!cpu_model) {
+-        cpu_model = "cortex-a15";
+-    }
+-
+     {
+         /* We have to use a separate 64 bit variable here to avoid the gcc
+          * "comparison is always false due to limited range of data type"
+@@ -380,7 +366,7 @@ static void a15_daughterboard_init(const VexpressMachineState *vms,
+     memory_region_add_subregion(sysmem, 0x80000000, ram);
+ 
+     /* 0x2c000000 A15MPCore private memory region (GIC) */
+-    init_cpus(cpu_model, TYPE_A15MPCORE_PRIV, 0x2c000000, pic, vms->secure);
++    init_cpus(cpu_type, TYPE_A15MPCORE_PRIV, 0x2c000000, pic, vms->secure);
+ 
+     /* A15 daughterboard peripherals: */
+ 
+@@ -560,7 +546,7 @@ static void vexpress_common_init(MachineState *machine)
+     const hwaddr *map = daughterboard->motherboard_map;
+     int i;
+ 
+-    daughterboard->init(vms, machine->ram_size, machine->cpu_model, pic);
++    daughterboard->init(vms, machine->ram_size, machine->cpu_type, pic);
+ 
+     /*
+      * If a bios file was provided, attempt to map it into memory
+@@ -761,6 +747,7 @@ static void vexpress_a9_class_init(ObjectClass *oc, void *data)
+     VexpressMachineClass *vmc = VEXPRESS_MACHINE_CLASS(oc);
+ 
+     mc->desc = "ARM Versatile Express for Cortex-A9";
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a9");
+ 
+     vmc->daughterboard = &a9_daughterboard;
+ }
+@@ -771,6 +758,7 @@ static void vexpress_a15_class_init(ObjectClass *oc, void *data)
+     VexpressMachineClass *vmc = VEXPRESS_MACHINE_CLASS(oc);
+ 
+     mc->desc = "ARM Versatile Express for Cortex-A15";
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+ 
+     vmc->daughterboard = &a15_daughterboard;
+ }
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index fe96557..fe26e99 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -163,13 +163,13 @@ static const int a15irqmap[] = {
+ };
+ 
+ static const char *valid_cpus[] = {
+-    "cortex-a15",
+-    "cortex-a53",
+-    "cortex-a57",
+-    "host",
++    ARM_CPU_TYPE_NAME("cortex-a15"),
++    ARM_CPU_TYPE_NAME("cortex-a53"),
++    ARM_CPU_TYPE_NAME("cortex-a57"),
++    ARM_CPU_TYPE_NAME("host"),
+ };
+ 
+-static bool cpuname_valid(const char *cpu)
++static bool cpu_type_valid(const char *cpu)
+ {
+     int i;
+ 
+@@ -1258,18 +1258,8 @@ static void machvirt_init(MachineState *machine)
+     MemoryRegion *secure_sysmem = NULL;
+     int n, virt_max_cpus;
+     MemoryRegion *ram = g_new(MemoryRegion, 1);
+-    const char *cpu_model = machine->cpu_model;
+-    char **cpustr;
+-    ObjectClass *oc;
+-    const char *typename;
+-    CPUClass *cc;
+-    Error *err = NULL;
+     bool firmware_loaded = bios_name || drive_get(IF_PFLASH, 0, 0);
+ 
+-    if (!cpu_model) {
+-        cpu_model = "cortex-a15";
+-    }
+-
+     /* We can probe only here because during property set
+      * KVM is not available yet
+      */
+@@ -1286,11 +1276,8 @@ static void machvirt_init(MachineState *machine)
+         }
+     }
+ 
+-    /* Separate the actual CPU model name from any appended features */
+-    cpustr = g_strsplit(cpu_model, ",", 2);
+-
+-    if (!cpuname_valid(cpustr[0])) {
+-        error_report("mach-virt: CPU %s not supported", cpustr[0]);
++    if (!cpu_type_valid(machine->cpu_type)) {
++        error_report("mach-virt: CPU type %s not supported", machine->cpu_type);
+         exit(1);
+     }
+ 
+@@ -1360,22 +1347,6 @@ static void machvirt_init(MachineState *machine)
+ 
+     create_fdt(vms);
+ 
+-    oc = cpu_class_by_name(TYPE_ARM_CPU, cpustr[0]);
+-    if (!oc) {
+-        error_report("Unable to find CPU definition");
+-        exit(1);
+-    }
+-    typename = object_class_get_name(oc);
+-
+-    /* convert -smp CPU options specified by the user into global props */
+-    cc = CPU_CLASS(oc);
+-    cc->parse_features(typename, cpustr[1], &err);
+-    g_strfreev(cpustr);
+-    if (err) {
+-        error_report_err(err);
+-        exit(1);
+-    }
+-
+     possible_cpus = mc->possible_cpu_arch_ids(machine);
+     for (n = 0; n < possible_cpus->len; n++) {
+         Object *cpuobj;
+@@ -1385,7 +1356,7 @@ static void machvirt_init(MachineState *machine)
+             break;
+         }
+ 
+-        cpuobj = object_new(typename);
++        cpuobj = object_new(machine->cpu_type);
+         object_property_set_int(cpuobj, possible_cpus->cpus[n].arch_id,
+                                 "mp-affinity", NULL);
+ 
+@@ -1630,6 +1601,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     mc->minimum_page_bits = 12;
+     mc->possible_cpu_arch_ids = virt_possible_cpu_arch_ids;
+     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+ }
+ 
+ static const TypeInfo virt_machine_info = {
+diff --git a/hw/arm/xilinx_zynq.c b/hw/arm/xilinx_zynq.c
+index 3759cf8..1836a4e 100644
+--- a/hw/arm/xilinx_zynq.c
++++ b/hw/arm/xilinx_zynq.c
+@@ -158,11 +158,9 @@ static inline void zynq_init_spi_flashes(uint32_t base_addr, qemu_irq irq,
+ static void zynq_init(MachineState *machine)
+ {
+     ram_addr_t ram_size = machine->ram_size;
+-    const char *cpu_model = machine->cpu_model;
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
+-    ObjectClass *cpu_oc;
+     ARMCPU *cpu;
+     MemoryRegion *address_space_mem = get_system_memory();
+     MemoryRegion *ext_ram = g_new(MemoryRegion, 1);
+@@ -174,12 +172,7 @@ static void zynq_init(MachineState *machine)
+     qemu_irq pic[64];
+     int n;
+ 
+-    if (!cpu_model) {
+-        cpu_model = "cortex-a9";
+-    }
+-    cpu_oc = cpu_class_by_name(TYPE_ARM_CPU, cpu_model);
+-
+-    cpu = ARM_CPU(object_new(object_class_get_name(cpu_oc)));
++    cpu = ARM_CPU(object_new(machine->cpu_type));
+ 
+     /* By default A9 CPUs have EL3 enabled.  This board does not
+      * currently support EL3 so the CPU EL3 property is disabled before
+@@ -327,6 +320,7 @@ static void zynq_machine_init(MachineClass *mc)
+     mc->max_cpus = 1;
+     mc->no_sdcard = 1;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a9");
+ }
+ 
+ DEFINE_MACHINE("xilinx-zynq-a9", zynq_machine_init)
+diff --git a/hw/arm/z2.c b/hw/arm/z2.c
+index 417bc1a..60561c7 100644
+--- a/hw/arm/z2.c
++++ b/hw/arm/z2.c
+@@ -26,6 +26,7 @@
+ #include "audio/audio.h"
+ #include "exec/address-spaces.h"
+ #include "sysemu/qtest.h"
++#include "cpu.h"
+ 
+ #ifdef DEBUG_Z2
+ #define DPRINTF(fmt, ...) \
+@@ -296,7 +297,6 @@ static const TypeInfo aer915_info = {
+ 
+ static void z2_init(MachineState *machine)
+ {
+-    const char *cpu_model = machine->cpu_model;
+     const char *kernel_filename = machine->kernel_filename;
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
+@@ -309,12 +309,8 @@ static void z2_init(MachineState *machine)
+     I2CBus *bus;
+     DeviceState *wm;
+ 
+-    if (!cpu_model) {
+-        cpu_model = "pxa270-c5";
+-    }
+-
+     /* Setup CPU & memory */
+-    mpu = pxa270_init(address_space_mem, z2_binfo.ram_size, cpu_model);
++    mpu = pxa270_init(address_space_mem, z2_binfo.ram_size, machine->cpu_type);
+ 
+ #ifdef TARGET_WORDS_BIGENDIAN
+     be = 1;
+@@ -371,6 +367,7 @@ static void z2_machine_init(MachineClass *mc)
+     mc->desc = "Zipit Z2 (PXA27x)";
+     mc->init = z2_init;
+     mc->ignore_memory_transaction_failures = true;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("pxa270-c5");
+ }
+ 
+ DEFINE_MACHINE("z2", z2_machine_init)
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index a1acce3..ff7ff28 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -905,7 +905,7 @@ static ObjectClass *arm_cpu_class_by_name(const char *cpu_model)
+     }
+ 
+     cpuname = g_strsplit(cpu_model, ",", 1);
+-    typename = g_strdup_printf("%s-" TYPE_ARM_CPU, cpuname[0]);
++    typename = g_strdup_printf(ARM_CPU_TYPE_NAME("%s"), cpuname[0]);
+     oc = object_class_by_name(typename);
+     g_strfreev(cpuname);
+     g_free(typename);
+-- 
 2.7.4
