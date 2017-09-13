@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54062)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56272)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds5h1-0006b6-1A
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:18:56 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1ds5ko-0001Al-MJ
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:22:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds5gx-0007CL-RF
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:18:54 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:47205)
+	(envelope-from <vilanova@ac.upc.edu>) id 1ds5kl-0001O3-Eh
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:22:50 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:47411)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1ds5gx-0007Bv-G2
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:18:51 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1ds5kk-0001NR-VU
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:22:47 -0400
 From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
-Date: Wed, 13 Sep 2017 14:18:35 +0300
-Message-Id: <150530151489.10902.6711543027869901344.stgit@frigg.lan>
+Date: Wed, 13 Sep 2017 14:22:37 +0300
+Message-Id: <150530175686.10902.13435538263886289800.stgit@frigg.lan>
 In-Reply-To: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
 References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v6 21/22] instrument: Add event
- 'guest_user_syscall_ret'
+Subject: [Qemu-devel] [PATCH v6 22/22] instrument: Add API to manipulate
+ guest memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,172 +28,233 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>
+
+It includes access to the guest's memory and vCPU registers.
 
 Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
- bsd-user/syscall.c              |    3 +++
- instrument/control.c            |   15 +++++++++++++++
- instrument/events.h             |    5 +++++
- instrument/events.inc.h         |   13 +++++++++++++
- instrument/load.c               |    1 +
- instrument/qemu-instr/control.h |   13 +++++++++++++
- linux-user/syscall.c            |    1 +
- stubs/instrument.c              |    2 ++
- 8 files changed, 53 insertions(+)
+ instrument/Makefile.objs      |    1=20
+ instrument/qemu-instr/state.h |  104 +++++++++++++++++++++++++++++++++++=
+++++++
+ instrument/state.c            |   73 +++++++++++++++++++++++++++++
+ 3 files changed, 178 insertions(+)
+ create mode 100644 instrument/qemu-instr/state.h
+ create mode 100644 instrument/state.c
 
-diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
-index 0d92eaf8c4..fb468c0574 100644
---- a/bsd-user/syscall.c
-+++ b/bsd-user/syscall.c
-@@ -407,6 +407,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, a=
-bi_long arg1,
- #endif
-     if (do_strace)
-         print_freebsd_syscall_ret(num, ret);
-+    instr_guest_user_syscall_ret(cpu, num, ret);
-     trace_guest_user_syscall_ret(cpu, num, ret);
-     return ret;
-  efault:
-@@ -485,6 +486,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, ab=
-i_long arg1,
- #endif
-     if (do_strace)
-         print_netbsd_syscall_ret(num, ret);
-+    instr_guest_user_syscall_ret(cpu, num, ret);
-     trace_guest_user_syscall_ret(cpu, num, ret);
-     return ret;
-  efault:
-@@ -563,6 +565,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, a=
-bi_long arg1,
- #endif
-     if (do_strace)
-         print_openbsd_syscall_ret(num, ret);
-+    instr_guest_user_syscall_ret(cpu, num, ret);
-     trace_guest_user_syscall_ret(cpu, num, ret);
-     return ret;
-  efault:
-diff --git a/instrument/control.c b/instrument/control.c
-index 45efeef7ac..e58a38b7db 100644
---- a/instrument/control.c
-+++ b/instrument/control.c
-@@ -211,3 +211,18 @@ SYM_PUBLIC void qi_event_set_guest_user_syscall(
- #endif
-     instr_set_event(guest_user_syscall, fn);
- }
-+
-+
-+void (*instr_event__guest_user_syscall_ret)(
-+    QICPU vcpu, uint64_t num, uint64_t ret);
-+
-+SYM_PUBLIC void qi_event_set_guest_user_syscall_ret(
-+    void (*fn)(QICPU vcpu, uint64_t num, uint64_t ret))
-+{
-+    ERROR_IF(!instr_get_state(), "called outside instrumentation");
-+    ERROR_IF(!tcg_enabled(), "called without TCG");
-+#if !defined(CONFIG_USER_ONLY)
-+    ERROR_IF(true, "called in full-system mode");
-+#endif
-+    instr_set_event(guest_user_syscall_ret, fn);
-+}
-diff --git a/instrument/events.h b/instrument/events.h
-index 8c944e1f91..6197ece466 100644
---- a/instrument/events.h
-+++ b/instrument/events.h
-@@ -75,6 +75,11 @@ static inline void instr_guest_user_syscall(
-     CPUState *vcpu, uint64_t num, uint64_t arg1, uint64_t arg2, uint64_t=
- arg3,
-     uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t arg7, uint64_t=
- arg8);
-=20
-+extern void (*instr_event__guest_user_syscall_ret)(
-+    QICPU vcpu, uint64_t num, uint64_t ret);
-+static inline void instr_guest_user_syscall_ret(
-+    CPUState *vcpu, uint64_t num, uint64_t ret);
-+
-=20
- #include "instrument/events.inc.h"
-=20
-diff --git a/instrument/events.inc.h b/instrument/events.inc.h
-index e2f4315fb0..d31dec54b8 100644
---- a/instrument/events.inc.h
-+++ b/instrument/events.inc.h
-@@ -94,3 +94,16 @@ static inline void instr_guest_user_syscall(
-         instr_set_state(INSTR_STATE_DISABLE);
-     }
- }
-+
-+static inline void instr_guest_user_syscall_ret(
-+    CPUState *vcpu, uint64_t num, uint64_t ret)
-+{
-+    void (*cb)(QICPU vcpu, uint64_t num, uint64_t ret)
-+        =3D instr_get_event(guest_user_syscall_ret);
-+    if (cb) {
-+        instr_set_state(INSTR_STATE_ENABLE);
-+        QICPU vcpu_ =3D instr_cpu_to_qicpu(vcpu);
-+        (*cb)(vcpu_, num, ret);
-+        instr_set_state(INSTR_STATE_DISABLE);
-+    }
-+}
-diff --git a/instrument/load.c b/instrument/load.c
-index a76f76e1d1..be13a90286 100644
---- a/instrument/load.c
-+++ b/instrument/load.c
-@@ -165,6 +165,7 @@ InstrUnloadError instr_unload(const char *id)
-     instr_set_event(guest_mem_before_trans, NULL);
-     instr_set_event(guest_mem_before_exec, NULL);
-     instr_set_event(guest_user_syscall, NULL);
-+    instr_set_event(guest_user_syscall_ret, NULL);
-=20
-     instr_cpu_stop_all_end(&info);
-     cpu_list_unlock();
-diff --git a/instrument/qemu-instr/control.h b/instrument/qemu-instr/cont=
-rol.h
-index 136058af4f..bc4e49bef1 100644
---- a/instrument/qemu-instr/control.h
-+++ b/instrument/qemu-instr/control.h
-@@ -157,6 +157,19 @@ void qi_event_set_guest_user_syscall(
-                uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg=
-6,
-                uint64_t arg7, uint64_t arg8));
-=20
+diff --git a/instrument/Makefile.objs b/instrument/Makefile.objs
+index d7e6c760c3..ee482bdb45 100644
+--- a/instrument/Makefile.objs
++++ b/instrument/Makefile.objs
+@@ -5,3 +5,4 @@ target-obj-$(CONFIG_INSTRUMENT) +=3D load.o
+ target-obj-$(CONFIG_INSTRUMENT) +=3D qmp.o
+ target-obj-$(CONFIG_INSTRUMENT) +=3D control.o
+ target-obj-$(CONFIG_INSTRUMENT) +=3D trace.o
++target-obj-$(CONFIG_INSTRUMENT) +=3D state.o
+diff --git a/instrument/qemu-instr/state.h b/instrument/qemu-instr/state.=
+h
+new file mode 100644
+index 0000000000..0ae6255fe5
+--- /dev/null
++++ b/instrument/qemu-instr/state.h
+@@ -0,0 +1,104 @@
 +/*
-+ * Finish executing a guest system call in syscall emulation mode.
++ * Interface for accessing guest state.
 + *
-+ * @num: System call number.
-+ * @ret: System call result value.
++ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 + *
-+ * Mode: user
-+ * Targets: TCG(all)
-+ * Time: exec
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
 + */
-+void qi_event_set_guest_user_syscall_ret(
-+    void (*fn)(QICPU vcpu, uint64_t num, uint64_t ret));
 +
- #ifdef __cplusplus
- }
- #endif
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index c9f0b9fa56..44b91e3c52 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -12398,6 +12398,7 @@ fail:
- #endif
-     if(do_strace)
-         print_syscall_ret(num, ret);
-+    instr_guest_user_syscall_ret(cpu, num, ret);
-     trace_guest_user_syscall_ret(cpu, num, ret);
-     return ret;
- efault:
-diff --git a/stubs/instrument.c b/stubs/instrument.c
-index bb585c69ce..ae581174db 100644
---- a/stubs/instrument.c
-+++ b/stubs/instrument.c
-@@ -69,3 +69,5 @@ void (*instr_event__guest_mem_before_exec)(
- void (*instr_event__guest_user_syscall)(
-     QICPU vcpu, uint64_t num, uint64_t arg1, uint64_t arg2, uint64_t arg=
-3,
-     uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t arg7, uint64_t=
- arg8);
-+void (*instr_event__guest_user_syscall_ret)(
-+    QICPU vcpu, uint64_t num, uint64_t ret);
++#ifndef QI__STATE_H
++#define QI__STATE_H
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++
++#include <qemu-instr/types.h>
++
++
++/**
++ * qi_mem_read_virt:
++ * @vcpu: CPU to use for address translation.
++ * @vaddr: Starting virtual address to read from.
++ * @size: Number of bytes to read.
++ * @buf: Buffer to write into.
++ *
++ * Read contents from virtual memory.
++ *
++ * Returns: Whether the range of virtual addresses to read could be tran=
+slated.
++ *
++ * Warning: Even on error, some of the destination buffer might have bee=
+n
++ *          modified.
++ *
++ * Precondition: The output buffer has at least "size" bytes.
++ */
++bool qi_mem_read_virt(QICPU vcpu, uint64_t vaddr, size_t size, void *buf=
+);
++
++/**
++ * qi_mem_write_virt:
++ * @vcpu: CPU to use for address translation.
++ * @vaddr: Starting virtual address to write into.
++ * @size: Number of bytes to write.
++ * @buf: Buffer with the contents to write from.
++ *
++ * Write contents into virtual memory.
++ *
++ * Returns: Whether the range of virtual addresses to write could be tra=
+nslated.
++ *
++ * Warning: Even on error, some of the destination memory might have bee=
+n
++ *          modified.
++ * Precondition: The input buffer has at least "size" bytes.
++ */
++bool qi_mem_write_virt(QICPU vcpu, uint64_t vaddr, size_t size, void *bu=
+f);
++
++/**
++ * qi_mem_virt_to_phys:
++ * @vcpu: CPU to use for address translation.
++ * @vaddr: Virtual address to translate.
++ * @paddr: Pointer to output physical address.
++ *
++ * Translate a virtual address into a physical address.
++ *
++ * Returns: Whether the address could be translated.
++ */
++bool qi_mem_virt_to_phys(QICPU vcpu, uint64_t vaddr, uint64_t *paddr);
++
++/**
++ * qi_mem_read_phys:
++ * @paddr: Starting physical address to read from.
++ * @size: Number of bytes to read.
++ * @buf: Buffer to write into.
++ *
++ * Read contents from physical memory.
++ *
++ * Returns: Whether the range of physical addresses is valid.
++ *
++ * Warning: Even on error, some of the destination buffer might have bee=
+n
++ *          modified.
++ * Precondition: The output buffer has at least "size" bytes.
++ */
++bool qi_mem_read_phys(uint64_t paddr, size_t size, void *buf);
++
++/**
++ * qi_mem_write_phys:
++ * @paddr: Starting physical address to write into.
++ * @size: Number of bytes to write.
++ * @buf: Buffer with the contents to write from.
++ *
++ * Write contents into virtual memory.
++ *
++ * Returns: Whether the range of physical addresses is valid.
++ *
++ * Warning: Even on error, some of the destination memory might have bee=
+n
++ *          modified.
++ *
++ * Precondition: The input buffer has at least "size" bytes.
++ */
++bool qi_mem_write_phys(uint64_t paddr, size_t size, void *buf);
++
++#ifdef __cplusplus
++}
++#endif
++
++#endif  /* QI__STATE_H */
+diff --git a/instrument/state.c b/instrument/state.c
+new file mode 100644
+index 0000000000..e76fd5fbcd
+--- /dev/null
++++ b/instrument/state.c
+@@ -0,0 +1,73 @@
++/*
++ * Interface for accessing guest state.
++ *
++ * Copyright (C) 2012-2017 Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or la=
+ter.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++
++#include "qemu/compiler.h"
++#include "cpu.h"
++#include "exec/cpu-all.h"
++#include "instrument/control.h"
++#include "instrument/error.h"
++#include "instrument/qemu-instr/state.h"
++
++
++SYM_PUBLIC bool qi_mem_read_virt(QICPU vcpu, uint64_t vaddr,
++                                 size_t size, void *buf)
++{
++    CPUState *vcpu_ =3D instr_cpu_from_qicpu(vcpu);
++    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
+ion");
++    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
++    return cpu_memory_rw_debug(vcpu_, vaddr, buf, size, 0) =3D=3D 0;
++}
++
++SYM_PUBLIC bool qi_mem_write_virt(QICPU vcpu, uint64_t vaddr,
++                                  size_t size, void *buf)
++{
++    CPUState *vcpu_ =3D instr_cpu_from_qicpu(vcpu);
++    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
+ion");
++    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
++    return cpu_memory_rw_debug(vcpu_, vaddr, buf, size, 1) =3D=3D 0;
++}
++
++SYM_PUBLIC bool qi_mem_virt_to_phys(QICPU vcpu, uint64_t vaddr, uint64_t=
+ *paddr)
++{
++    CPUState *vcpu_ =3D instr_cpu_from_qicpu(vcpu);
++    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
+ion");
++    ERROR_IF_RET(!vcpu_, false, "invalid QICPU");
++
++#if defined(CONFIG_USER_ONLY)
++    *paddr =3D vaddr;
++    return true;
++#else
++    *paddr =3D cpu_get_phys_page_debug(vcpu_, vaddr);
++    return *paddr !=3D -1;
++#endif
++}
++
++SYM_PUBLIC bool qi_mem_read_phys(uint64_t paddr, size_t size, void *buf)
++{
++    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
+ion");
++#if defined(CONFIG_USER_ONLY)
++    return cpu_memory_rw_debug(NULL, paddr, buf, size, 0) =3D=3D 0;
++#else
++    cpu_physical_memory_read(paddr, buf, size);
++    return true;
++#endif
++}
++
++SYM_PUBLIC bool qi_mem_write_phys(uint64_t paddr, size_t size, void *buf=
+)
++{
++    ERROR_IF_RET(!instr_get_state(), false, "called outside instrumentat=
+ion");
++#if defined(CONFIG_USER_ONLY)
++    return cpu_memory_rw_debug(NULL, paddr, buf, size, 1) =3D=3D 0;
++#else
++    cpu_physical_memory_write(paddr, buf, size);
++    return true;
++#endif
++}
