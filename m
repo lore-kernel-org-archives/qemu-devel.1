@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33073)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ds2o7-0001J4-Dh
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:14:04 -0400
+	(envelope-from <bounces@canonical.com>) id 1ds2rL-0002xm-1p
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:17:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1ds2o2-0005LQ-Dh
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:14:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52160)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1ds2o2-0005K9-7D
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:13:58 -0400
-Message-ID: <1505290435.22749.3.camel@redhat.com>
-From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Wed, 13 Sep 2017 10:13:55 +0200
-In-Reply-To: <0a156f413f67b1bf55c5516d8263a15db3ec42c3.1505225353.git.alifm@linux.vnet.ibm.com>
-References: <cover.1505225353.git.alifm@linux.vnet.ibm.com>
-	<0a156f413f67b1bf55c5516d8263a15db3ec42c3.1505225353.git.alifm@linux.vnet.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	(envelope-from <bounces@canonical.com>) id 1ds2rG-00009n-1Q
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:17:23 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45610)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ds2rF-00007z-Rm
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 04:17:17 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ds2rE-0004Jn-QX
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 08:17:16 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id C53B12E8486
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 08:17:16 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1 1/2] virtio_gpu: Handle endian conversion
+Date: Wed, 13 Sep 2017 07:56:26 -0000
+From: Thomas Huth <932490@bugs.launchpad.net>
+Reply-To: Bug 932490 <932490@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120215021135.22747.33099.malonedeb@soybean.canonical.com>
+Message-Id: <150528938664.29603.470027703805471940.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 932490] Re: Qemu fails on -fda /dev/fd0 when no
+ medium is present
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,36 +37,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, thuth@redhat.com, cohuck@redhat.com
+To: qemu-devel@nongnu.org
 
-  Hi,
+Is this still an issue with the latest version of QEMU (currently
+v2.10), or could we close this ticket nowadays?
 
-> @@ -287,6 +287,12 @@ static void
-> virtio_gpu_resource_create_2d(VirtIOGPU *g,
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct virtio_gpu_resource_create_2d c2d;
-> =C2=A0
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0VIRTIO_GPU_FILL_CMD(c2d);
-> +
-> +=C2=A0=C2=A0=C2=A0=C2=A0c2d.resource_id =3D le32_to_cpu(c2d.resource_i=
-d);
-> +=C2=A0=C2=A0=C2=A0=C2=A0c2d.format =3D le32_to_cpu(c2d.format);
-> +=C2=A0=C2=A0=C2=A0=C2=A0c2d.width =3D le32_to_cpu(c2d.width);
-> +=C2=A0=C2=A0=C2=A0=C2=A0c2d.height =3D le32_to_cpu(c2d.height);
-> +
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-Please move this to a helper function, maybe by updating the
-VIRTIO_GPU_FILL_CMD macro.
+-- =
 
-The header fields should be byteswapped too.  As most structs have
-32bit fields only (with the exception of hdr.fence_id) you should be
-able to create a generic byteswap function which only needs the struct
-size as argument and handles all structs without addresses/offsets
-(which are 64bit fields).
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/932490
 
-The conversion looks incomplete, at least virtio_gpu_ctrl_response will
-need adaptions too.  It probably works by luck because the guest driver
-uses fences only in virgl (3d) mode.
+Title:
+  Qemu fails on -fda /dev/fd0 when no medium is present
 
-cheers,
-  Gerd
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  # qemu-system-x86_64 --version
+  QEMU emulator version 1.0 (qemu-kvm-1.0), Copyright (c) 2003-2008 Fabrice=
+ Bellard
+
+  # qemu-system-x86_64 -fda /dev/fd0
+  qemu-system-x86_64: -fda /dev/fd0: could not open disk image /dev/fd0: No=
+ such device or address
+
+  Starting with a medium (floppy disk) inserted, then removing or
+  changing the medium works fine.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/932490/+subscriptions
