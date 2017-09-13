@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dsEtq-0000n3-KN
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 17:08:47 -0400
+	(envelope-from <jdillama@redhat.com>) id 1dsF5t-0005lQ-7m
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 17:21:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <hpoussin@reactos.org>) id 1dsEtl-0001A3-IF
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 17:08:46 -0400
-Received: from iserv.reactos.org ([2a01:4f8:221:4c5::3]:53240)
+	(envelope-from <jdillama@redhat.com>) id 1dsF5p-0005Fm-5j
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 17:21:13 -0400
+Received: from mail-qk0-f170.google.com ([209.85.220.170]:48716)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <hpoussin@reactos.org>)
-	id 1dsEtl-00016t-4s
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 17:08:41 -0400
-References: <1505293637-10450-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>
-Message-ID: <67cd5928-8afa-ede8-039b-a0204e504df7@reactos.org>
-Date: Wed, 13 Sep 2017 23:08:35 +0200
-MIME-Version: 1.0
-In-Reply-To: <1505293637-10450-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] hw/isa/pc87312: Mark the device with
- user_creatable = false
+	(Exim 4.71) (envelope-from <jdillama@redhat.com>) id 1dsF5p-0005En-0q
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 17:21:09 -0400
+Received: by mail-qk0-f170.google.com with SMTP id a128so3578022qkc.5
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 14:21:07 -0700 (PDT)
+Message-ID: <1505337665.15211.3.camel@redhat.com>
+From: Jason Dillaman <jdillama@redhat.com>
+Reply-To: dillaman@redhat.com
+Date: Wed, 13 Sep 2017 17:21:05 -0400
+In-Reply-To: <20170913164424.32129-1-awg@digitalocean.com>
+References: <20170913164424.32129-1-awg@digitalocean.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] rbd: Detect rbd image resizes
+ and propagate them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,45 +30,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-ppc@nongnu.org
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, qemu-trivial@nongnu.org
+To: Adam Wolfe Gordon <awg@digitalocean.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-Le 13/09/2017 à 11:07, Thomas Huth a écrit :
-> QEMU currently aborts if you try to use the device at the command
-> line:
+On Wed, 2017-09-13 at 10:44 -0600, Adam Wolfe Gordon wrote:
+> Register a watcher with rbd so that we get notified when an image is
+> resized. Propagate resizes to parent block devices so that guest devices
+> get resized without user intervention.
 > 
-> $ ppc64-softmmu/qemu-system-ppc64 -S -machine prep -device pc87312
-> Unexpected error in qemu_chr_fe_init() at chardev/char-fe.c:222:
-> qemu-system-ppc64: -device pc87312: Device 'parallel0' is in use
-> Aborted (core dumped)
-> 
-> It uses parallel_hds in its realize function, so I can not be
-> instantiated by the user again.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-
-However, a better solution would probably to not directly use parallel_hds[0], but to add some Chardev properties to the device, and to fill them in the mainboard code.
-This is noted as a "Future incompatible change" in changelog since 2.8
-
-Hervé
-
+> Signed-off-by: Adam Wolfe Gordon <awg@digitalocean.com>
 > ---
->   hw/isa/pc87312.c | 2 ++
->   1 file changed, 2 insertions(+)
+> Hello!
 > 
-> diff --git a/hw/isa/pc87312.c b/hw/isa/pc87312.c
-> index 5ce9f0a..48b29e3 100644
-> --- a/hw/isa/pc87312.c
-> +++ b/hw/isa/pc87312.c
-> @@ -386,6 +386,8 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
->       dc->reset = pc87312_reset;
->       dc->vmsd = &vmstate_pc87312;
->       dc->props = pc87312_properties;
-> +    /* Reason: Uses parallel_hds[0] in realize(), so it can't be used twice */
-> +    dc->user_creatable = false;
->   }
->   
->   static const TypeInfo pc87312_type_info = {
+> We are using this patch in production at DigitalOcean and have tested it fairly
+> extensively. However, we use the same block device configuration everywhere, so
+> I'd be interested to get an answer to the question I've left in the code:
 > 
+> > /* NOTE: This assumes there's only one layer between us and the
+> >    block-backend. Is this always true? */
+> 
+> If that isn't true, this patch will need a bit of work to traverse up the block
+> device tree and find the block-backend.
+> 
+> Of course, any other feedback would be welcome too - this is my first foray into
+> the qemu code.
+> 
+> Regards,
+> Adam
+> 
+>  block/rbd.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 80 insertions(+)
+> 
+> diff --git a/block/rbd.c b/block/rbd.c
+> index 144f350e1f..1c9fcbec1f 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -96,6 +96,8 @@ typedef struct BDRVRBDState {
+>      rbd_image_t image;
+>      char *image_name;
+>      char *snap;
+> +    uint64_t watcher_handle;
+> +    uint64_t size_bytes;
+>  } BDRVRBDState;
+>  
+>  static char *qemu_rbd_next_tok(char *src, char delim, char **p)
+> @@ -540,6 +542,67 @@ out:
+>      return rados_str;
+>  }
+>  
+> +/* BH for when rbd notifies us of an update. */
+> +static void qemu_rbd_update_bh(void *arg)
+> +{
+> +    BlockDriverState *parent, *bs = arg;
+> +    BDRVRBDState *s = bs->opaque;
+> +    bool was_variable_length;
+> +    uint64_t new_size_bytes;
+> +    int64_t new_parent_len;
+> +    BdrvChild *c;
+> +    int r;
+> +
+> +    r = rbd_get_size(s->image, &new_size_bytes);
+> +    if (r < 0) {
+> +        error_report("error reading size for %s: %s", s->name, strerror(-r));
+> +        return;
+> +    }
+> +
+> +    /* Avoid no-op resizes on non-resize notifications. */
+> +    if (new_size_bytes == s->size_bytes) {
+> +        error_printf("skipping non-resize rbd cb\n");
+
+Image update callbacks can be invoked for any number of reasons, not
+just resize events. Therefore, you probably don't want to have an error
+message printed out here.
+
+> +        return;
+> +    }
+> +
+> +    /* NOTE: This assumes there's only one layer between us and the
+> +       block-backend. Is this always true? */
+
+I don't think that can be assumed to be true.
+
+> +    parent = bs->inherits_from;
+> +    if (parent == NULL) {
+> +        error_report("bs %s does not have parent", bdrv_get_device_or_node_name(bs));
+> +        return;
+> +    }
+> +
+> +    /* Force parents to re-read our size. */
+
+Can you just invoke blk_truncate instead? 
+
+> +    was_variable_length = bs->drv->has_variable_length;
+> +    bs->drv->has_variable_length = true;
+> +    new_parent_len = bdrv_getlength(parent);
+> +    if (new_parent_len < 0) {
+> +        error_report("getlength failed on parent %s", bdrv_get_device_or_node_name(parent));
+> +        bs->drv->has_variable_length = was_variable_length;
+> +        return;
+> +    }
+> +    bs->drv->has_variable_length = was_variable_length;
+> +
+> +    /* Notify block backends that that we have resized.
+> +       Copied from bdrv_parent_cb_resize. */
+> +    QLIST_FOREACH(c, &parent->parents, next_parent) {
+> +        if (c->role->resize) {
+> +            c->role->resize(c);
+> +        }
+> +    }
+> +
+> +    s->size_bytes = new_size_bytes;
+> +}
+> +
+> +/* Called from non-qemu thread - careful! */
+> +static void qemu_rbd_update_cb(void *arg)
+> +{
+> +    BlockDriverState *bs = arg;
+> +
+> +    aio_bh_schedule_oneshot(bdrv_get_aio_context(bs), qemu_rbd_update_bh, bs);
+> +}
+> +
+>  static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>                           Error **errp)
+>  {
+> @@ -672,9 +735,25 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>          }
+>      }
+>  
+> +    r = rbd_update_watch(s->image, &s->watcher_handle, qemu_rbd_update_cb, bs);
+
+This API method was only added in the Ceph Jewel release just over a
+year ago. This should probably gracefully degrade if compiled against an
+older version of the librbd API.
+
+> +    if (r < 0) {
+> +        error_setg_errno(errp, -r, "error registering watcher on %s", s->name);
+> +        goto failed_watch;
+> +    }
+> +
+> +    r = rbd_get_size(s->image, &s->size_bytes);
+> +    if (r < 0) {
+> +        error_setg_errno(errp, -r, "error reading size for %s", s->name);
+> +        goto failed_sz;
+> +    }
+> +
+>      qemu_opts_del(opts);
+>      return 0;
+>  
+> +failed_sz:
+> +    rbd_update_unwatch(s->image, s->watcher_handle);
+> +failed_watch:
+> +    rbd_close(s->image);
+>  failed_open:
+>      rados_ioctx_destroy(s->io_ctx);
+>  failed_shutdown:
+> @@ -712,6 +791,7 @@ static void qemu_rbd_close(BlockDriverState *bs)
+>  {
+>      BDRVRBDState *s = bs->opaque;
+>  
+> +    rbd_update_unwatch(s->image, s->watcher_handle);
+>      rbd_close(s->image);
+>      rados_ioctx_destroy(s->io_ctx);
+>      g_free(s->snap);
