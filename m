@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41789)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41840)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ds5Oo-0005uN-MZ
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:12 -0400
+	(envelope-from <quintela@redhat.com>) id 1ds5Ot-00062Y-9U
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ds5Ok-00062i-5K
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51132)
+	(envelope-from <quintela@redhat.com>) id 1ds5Os-0006Iv-7i
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38566)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ds5Ok-000625-0T
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:02 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ds5Os-0006Gi-2a
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:10 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 063CD7EA8B
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 11:00:01 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 138BFC0587DF
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 11:00:09 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 13 Sep 2017 12:59:35 +0200
-Message-Id: <20170913105953.13760-3-quintela@redhat.com>
+Date: Wed, 13 Sep 2017 12:59:37 +0200
+Message-Id: <20170913105953.13760-5-quintela@redhat.com>
 In-Reply-To: <20170913105953.13760-1-quintela@redhat.com>
 References: <20170913105953.13760-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 02/20] migration: Teach it about
- G_SOURCE_REMOVE
+Subject: [Qemu-devel] [PATCH v8 04/20] migration: Create
+ migration_has_all_channels
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +33,70 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-As this is defined on glib 2.32, add compatibility macros for older glibs.
+This function allows us to decide when to close the listener socket.
+For now, we only need one connection.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
 ---
- include/glib-compat.h | 2 ++
- migration/exec.c      | 2 +-
- migration/fd.c        | 2 +-
- migration/socket.c    | 2 +-
- 4 files changed, 5 insertions(+), 3 deletions(-)
+ migration/migration.c | 11 +++++++++++
+ migration/migration.h |  2 ++
+ migration/socket.c    | 10 +++++++---
+ 3 files changed, 20 insertions(+), 3 deletions(-)
 
-diff --git a/include/glib-compat.h b/include/glib-compat.h
-index fcffcd3f07..e15aca2d40 100644
---- a/include/glib-compat.h
-+++ b/include/glib-compat.h
-@@ -223,6 +223,8 @@ static inline gboolean g_hash_table_contains(GHashTable *hash_table,
- {
-     return g_hash_table_lookup_extended(hash_table, key, NULL, NULL);
- }
-+#define G_SOURCE_CONTINUE TRUE
-+#define G_SOURCE_REMOVE FALSE
- #endif
- 
- #ifndef g_assert_true
-diff --git a/migration/exec.c b/migration/exec.c
-index 08b599e0e2..f3be1baf2e 100644
---- a/migration/exec.c
-+++ b/migration/exec.c
-@@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
- {
-     migration_channel_process_incoming(ioc);
-     object_unref(OBJECT(ioc));
--    return FALSE; /* unregister */
-+    return G_SOURCE_REMOVE;
+diff --git a/migration/migration.c b/migration/migration.c
+index 2d4c56e612..bac4a99277 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -384,6 +384,17 @@ void migration_ioc_process_incoming(QIOChannel *ioc)
+     /* We still only have a single channel.  Nothing to do here yet */
  }
  
- void exec_start_incoming_migration(const char *command, Error **errp)
-diff --git a/migration/fd.c b/migration/fd.c
-index 30f5258a6a..30de4b9847 100644
---- a/migration/fd.c
-+++ b/migration/fd.c
-@@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
- {
-     migration_channel_process_incoming(ioc);
-     object_unref(OBJECT(ioc));
--    return FALSE; /* unregister */
-+    return G_SOURCE_REMOVE;
- }
++/**
++ * @migration_has_all_channels: We have received all channels that we need
++ *
++ * Returns true when we have got connections to all the channels that
++ * we need for migration.
++ */
++bool migration_has_all_channels(void)
++{
++    return true;
++}
++
+ /*
+  * Send a 'SHUT' message on the return channel with the given value
+  * to indicate that we've finished with the RP.  Non-0 value indicates
+diff --git a/migration/migration.h b/migration/migration.h
+index 99c398d484..1881e4a754 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -155,6 +155,8 @@ void migrate_set_state(int *state, int old_state, int new_state);
+ void migration_fd_process_incoming(QEMUFile *f);
+ void migration_ioc_process_incoming(QIOChannel *ioc);
  
- void fd_start_incoming_migration(const char *infd, Error **errp)
++bool  migration_has_all_channels(void);
++
+ uint64_t migrate_max_downtime(void);
+ 
+ void migrate_fd_error(MigrationState *s, const Error *error);
 diff --git a/migration/socket.c b/migration/socket.c
-index 757d3821a1..b02d37d7a3 100644
+index b02d37d7a3..dee869044a 100644
 --- a/migration/socket.c
 +++ b/migration/socket.c
-@@ -154,7 +154,7 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+@@ -152,9 +152,13 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+     object_unref(OBJECT(sioc));
+ 
  out:
-     /* Close listening socket as its no longer needed */
-     qio_channel_close(ioc, NULL);
--    return FALSE; /* unregister */
-+    return G_SOURCE_REMOVE;
+-    /* Close listening socket as its no longer needed */
+-    qio_channel_close(ioc, NULL);
+-    return G_SOURCE_REMOVE;
++    if (migration_has_all_channels()) {
++        /* Close listening socket as its no longer needed */
++        qio_channel_close(ioc, NULL);
++        return G_SOURCE_REMOVE;
++    } else {
++        return G_SOURCE_CONTINUE;
++    }
  }
  
  
