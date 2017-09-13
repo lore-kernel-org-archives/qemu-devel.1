@@ -1,33 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46411)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dsAA5-0002ZO-Ii
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:05:19 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsAAF-0002oz-6f
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:05:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dsA9v-0006Zx-Te
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:05:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38274)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dsA9v-0006ZU-Kj
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:05:03 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id BDD1C81E10
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 16:05:02 +0000 (UTC)
-Received: from dell-r430-03.lab.eng.brq.redhat.com
-	(dell-r430-03.lab.eng.brq.redhat.com [10.34.112.60])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 42B145D963
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 16:05:02 +0000 (UTC)
-From: Igor Mammedov <imammedo@redhat.com>
-Date: Wed, 13 Sep 2017 18:04:56 +0200
-Message-Id: <1505318697-77161-5-git-send-email-imammedo@redhat.com>
-In-Reply-To: <1505318697-77161-1-git-send-email-imammedo@redhat.com>
-References: <1505318697-77161-1-git-send-email-imammedo@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 4/5] pc: use generic cpu_model parsing
+	(envelope-from <eblake@redhat.com>) id 1dsAAA-0006pv-G0
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:05:23 -0400
+From: Eric Blake <eblake@redhat.com>
+Date: Wed, 13 Sep 2017 11:03:30 -0500
+Message-Id: <20170913160333.23622-21-eblake@redhat.com>
+In-Reply-To: <20170913160333.23622-1-eblake@redhat.com>
+References: <20170913160333.23622-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 20/23] qemu-img: Change img_compare() to be
+ byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,173 +21,272 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: famz@redhat.com, jsnow@redhat.com, kwolf@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-define default CPU type in generic way in pc_machine_class_init()
-and let common machine code to handle cpu_model parsing
+In the continuing quest to make more things byte-based, change
+the internal iteration of img_compare().  We can finally drop the
+TODO assertion added earlier, now that the entire algorithm is
+byte-based and no longer has to shift from bytes to sectors.
 
-Patch also introduces TARGET_DEFAULT_CPU_TYPE define for 2 purposes:
-  * make foo_machine_class_init() look uniform on every target
-  * use define in [bsd|linux]-user targets to pick default
-    cpu type
+Most of the change is mechanical ('total_sectors' becomes
+'total_size', 'sector_num' becomes 'offset', 'nb_sectors' becomes
+'chunk', 'progress_base' goes from sectors to bytes); some of it
+is also a cleanup (sectors_to_bytes() is now unused, loss of
+variable 'count' added earlier in commit 51b0a488).
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+Signed-off-by: Eric Blake <eblake@redhat.com>
+
 ---
- target/i386/cpu.h |  9 +++++++++
- hw/i386/pc.c      | 41 +++++------------------------------------
- hw/i386/pc_piix.c |  4 +---
- target/i386/cpu.c |  3 ---
- 4 files changed, 15 insertions(+), 42 deletions(-)
+v3: new patch
+---
+ qemu-img.c | 119 ++++++++++++++++++++++++-------------------------------------
+ 1 file changed, 46 insertions(+), 73 deletions(-)
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 525d35d..4035a11 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1508,6 +1508,15 @@ uint64_t cpu_get_tsc(CPUX86State *env);
-=20
- #define cpu_init(cpu_model) cpu_generic_init(TYPE_X86_CPU, cpu_model)
-=20
-+#define X86_CPU_TYPE_SUFFIX "-" TYPE_X86_CPU
-+#define X86_CPU_TYPE_NAME(name) (name X86_CPU_TYPE_SUFFIX)
-+
-+#ifdef TARGET_X86_64
-+#define TARGET_DEFAULT_CPU_TYPE X86_CPU_TYPE_NAME("qemu64")
-+#else
-+#define TARGET_DEFAULT_CPU_TYPE X86_CPU_TYPE_NAME("qemu32")
-+#endif
-+
- #define cpu_signal_handler cpu_x86_signal_handler
- #define cpu_list x86_cpu_list
-=20
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2108104..2247ac0 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1107,7 +1107,6 @@ static void pc_new_cpu(const char *typename, int64_=
-t apic_id, Error **errp)
-=20
- void pc_hot_add_cpu(const int64_t id, Error **errp)
- {
--    ObjectClass *oc;
-     MachineState *ms =3D MACHINE(qdev_get_machine());
-     int64_t apic_id =3D x86_cpu_apic_id_from_index(id);
-     Error *local_err =3D NULL;
-@@ -1124,9 +1123,7 @@ void pc_hot_add_cpu(const int64_t id, Error **errp)
-         return;
+diff --git a/qemu-img.c b/qemu-img.c
+index 028c34a2cc..ef7062649d 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -1185,11 +1185,6 @@ static int compare_buffers(const uint8_t *buf1, const uint8_t *buf2,
+
+ #define IO_BUF_SIZE (2 * 1024 * 1024)
+
+-static int64_t sectors_to_bytes(int64_t sectors)
+-{
+-    return sectors << BDRV_SECTOR_BITS;
+-}
+-
+ /*
+  * Check if passed sectors are empty (not allocated or contain only 0 bytes)
+  *
+@@ -1240,7 +1235,7 @@ static int img_compare(int argc, char **argv)
+     const char *fmt1 = NULL, *fmt2 = NULL, *cache, *filename1, *filename2;
+     BlockBackend *blk1, *blk2;
+     BlockDriverState *bs1, *bs2;
+-    int64_t total_sectors1, total_sectors2;
++    int64_t total_size1, total_size2;
+     uint8_t *buf1 = NULL, *buf2 = NULL;
+     int64_t pnum1, pnum2;
+     int allocated1, allocated2;
+@@ -1248,9 +1243,9 @@ static int img_compare(int argc, char **argv)
+     bool progress = false, quiet = false, strict = false;
+     int flags;
+     bool writethrough;
+-    int64_t total_sectors;
+-    int64_t sector_num = 0;
+-    int64_t nb_sectors;
++    int64_t total_size;
++    int64_t offset = 0;
++    int64_t chunk;
+     int c;
+     uint64_t progress_base;
+     bool image_opts = false;
+@@ -1364,39 +1359,36 @@ static int img_compare(int argc, char **argv)
+
+     buf1 = blk_blockalign(blk1, IO_BUF_SIZE);
+     buf2 = blk_blockalign(blk2, IO_BUF_SIZE);
+-    total_sectors1 = blk_nb_sectors(blk1);
+-    if (total_sectors1 < 0) {
++    total_size1 = blk_getlength(blk1);
++    if (total_size1 < 0) {
+         error_report("Can't get size of %s: %s",
+-                     filename1, strerror(-total_sectors1));
++                     filename1, strerror(-total_size1));
+         ret = 4;
+         goto out;
      }
-=20
--    assert(ms->possible_cpus->cpus[0].cpu); /* BSP is always present */
--    oc =3D OBJECT_CLASS(CPU_GET_CLASS(ms->possible_cpus->cpus[0].cpu));
--    pc_new_cpu(object_class_get_name(oc), apic_id, &local_err);
-+    pc_new_cpu(ms->cpu_type, apic_id, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-@@ -1136,39 +1133,10 @@ void pc_hot_add_cpu(const int64_t id, Error **err=
-p)
- void pc_cpus_init(PCMachineState *pcms)
- {
-     int i;
--    CPUClass *cc;
--    ObjectClass *oc;
--    const char *typename;
--    gchar **model_pieces;
-     const CPUArchIdList *possible_cpus;
--    MachineState *machine =3D MACHINE(pcms);
-+    MachineState *ms =3D MACHINE(pcms);
-     MachineClass *mc =3D MACHINE_GET_CLASS(pcms);
-=20
--    /* init CPUs */
--    if (machine->cpu_model =3D=3D NULL) {
--#ifdef TARGET_X86_64
--        machine->cpu_model =3D "qemu64";
--#else
--        machine->cpu_model =3D "qemu32";
--#endif
--    }
--
--    model_pieces =3D g_strsplit(machine->cpu_model, ",", 2);
--    if (!model_pieces[0]) {
--        error_report("Invalid/empty CPU model name");
--        exit(1);
--    }
--
--    oc =3D cpu_class_by_name(TYPE_X86_CPU, model_pieces[0]);
--    if (oc =3D=3D NULL) {
--        error_report("Unable to find CPU definition: %s", model_pieces[0=
-]);
--        exit(1);
--    }
--    typename =3D object_class_get_name(oc);
--    cc =3D CPU_CLASS(oc);
--    cc->parse_features(typename, model_pieces[1], &error_fatal);
--    g_strfreev(model_pieces);
--
-     /* Calculates the limit to CPU APIC ID values
-      *
-      * Limit for the APIC ID value, so that all
-@@ -1177,9 +1145,9 @@ void pc_cpus_init(PCMachineState *pcms)
-      * This is used for FW_CFG_MAX_CPUS. See comments on bochs_bios_init=
-().
-      */
-     pcms->apic_id_limit =3D x86_cpu_apic_id_from_index(max_cpus - 1) + 1=
-;
--    possible_cpus =3D mc->possible_cpu_arch_ids(machine);
-+    possible_cpus =3D mc->possible_cpu_arch_ids(ms);
-     for (i =3D 0; i < smp_cpus; i++) {
--        pc_new_cpu(typename, possible_cpus->cpus[i].arch_id, &error_fata=
-l);
-+        pc_new_cpu(ms->cpu_type, possible_cpus->cpus[i].arch_id, &error_=
-fatal);
+-    total_sectors2 = blk_nb_sectors(blk2);
+-    if (total_sectors2 < 0) {
++    total_size2 = blk_getlength(blk2);
++    if (total_size2 < 0) {
+         error_report("Can't get size of %s: %s",
+-                     filename2, strerror(-total_sectors2));
++                     filename2, strerror(-total_size2));
+         ret = 4;
+         goto out;
      }
- }
-=20
-@@ -2360,6 +2328,7 @@ static void pc_machine_class_init(ObjectClass *oc, =
-void *data)
-     hc->unplug_request =3D pc_machine_device_unplug_request_cb;
-     hc->unplug =3D pc_machine_device_unplug_cb;
-     nc->nmi_monitor_handler =3D x86_nmi;
-+    mc->default_cpu_type =3D TARGET_DEFAULT_CPU_TYPE;
-=20
-     object_class_property_add(oc, PC_MACHINE_MEMHP_REGION_SIZE, "int",
-         pc_machine_get_hotplug_memory_region_size, NULL,
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index b03cc04..9ff79b1 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -378,9 +378,6 @@ static void pc_compat_0_13(MachineState *machine)
-=20
- static void pc_init_isa(MachineState *machine)
- {
--    if (!machine->cpu_model) {
--        machine->cpu_model =3D "486";
--    }
-     x86_cpu_change_kvm_default("kvm-pv-eoi", NULL);
-     enable_compat_apic_id_mode();
-     pc_init1(machine, TYPE_I440FX_PCI_HOST_BRIDGE, TYPE_I440FX_PCI_DEVIC=
-E);
-@@ -1113,6 +1110,7 @@ static void isapc_machine_options(MachineClass *m)
-     pcmc->gigabyte_align =3D false;
-     pcmc->smbios_legacy_mode =3D true;
-     pcmc->has_reserved_memory =3D false;
-+    m->default_cpu_type =3D X86_CPU_TYPE_NAME("486");
- }
-=20
- DEFINE_PC_MACHINE(isapc, "isapc", pc_init_isa,
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 69676e1..d0000e4 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -705,9 +705,6 @@ void host_vendor_fms(char *vendor, int *family, int *=
-model, int *stepping)
-=20
- /* CPU class name definitions: */
-=20
--#define X86_CPU_TYPE_SUFFIX "-" TYPE_X86_CPU
--#define X86_CPU_TYPE_NAME(name) (name X86_CPU_TYPE_SUFFIX)
+-    total_sectors = MIN(total_sectors1, total_sectors2);
+-    progress_base = MAX(total_sectors1, total_sectors2);
++    total_size = MIN(total_size1, total_size2);
++    progress_base = MAX(total_size1, total_size2);
+
+     qemu_progress_print(0, 100);
+
+-    if (strict && total_sectors1 != total_sectors2) {
++    if (strict && total_size1 != total_size2) {
+         ret = 1;
+         qprintf(quiet, "Strict mode: Image size mismatch!\n");
+         goto out;
+     }
+
+-    while (sector_num < total_sectors) {
++    while (offset < total_size) {
+         int64_t status1, status2;
+
+-        status1 = bdrv_block_status_above(bs1, NULL,
+-                                          sector_num * BDRV_SECTOR_SIZE,
+-                                          (total_sectors1 - sector_num) *
+-                                          BDRV_SECTOR_SIZE,
+-                                          &pnum1, NULL);
++        status1 = bdrv_block_status_above(bs1, NULL, offset,
++                                          total_size1 - offset, &pnum1, NULL);
+         if (status1 < 0) {
+             ret = 3;
+             error_report("Sector allocation test failed for %s", filename1);
+@@ -1404,11 +1396,8 @@ static int img_compare(int argc, char **argv)
+         }
+         allocated1 = status1 & BDRV_BLOCK_ALLOCATED;
+
+-        status2 = bdrv_block_status_above(bs2, NULL,
+-                                          sector_num * BDRV_SECTOR_SIZE,
+-                                          (total_sectors2 - sector_num) *
+-                                          BDRV_SECTOR_SIZE,
+-                                          &pnum2, NULL);
++        status2 = bdrv_block_status_above(bs2, NULL, offset,
++                                          total_size2 - offset, &pnum2, NULL);
+         if (status2 < 0) {
+             ret = 3;
+             error_report("Sector allocation test failed for %s", filename2);
+@@ -1417,15 +1406,14 @@ static int img_compare(int argc, char **argv)
+         allocated2 = status2 & BDRV_BLOCK_ALLOCATED;
+
+         assert(pnum1 && pnum2);
+-        nb_sectors = DIV_ROUND_UP(MIN(pnum1, pnum2), BDRV_SECTOR_SIZE);
++        chunk = MIN(pnum1, pnum2);
+
+         if (strict) {
+             if ((status1 & ~BDRV_BLOCK_OFFSET_MASK) !=
+                 (status2 & ~BDRV_BLOCK_OFFSET_MASK)) {
+                 ret = 1;
+                 qprintf(quiet, "Strict mode: Offset %" PRId64
+-                        " block status mismatch!\n",
+-                        sectors_to_bytes(sector_num));
++                        " block status mismatch!\n", offset);
+                 goto out;
+             }
+         }
+@@ -1435,59 +1423,54 @@ static int img_compare(int argc, char **argv)
+             if (allocated1) {
+                 int64_t pnum;
+
+-                nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
+-                ret = blk_pread(blk1, sector_num << BDRV_SECTOR_BITS, buf1,
+-                                nb_sectors << BDRV_SECTOR_BITS);
++                chunk = MIN(chunk, IO_BUF_SIZE);
++                ret = blk_pread(blk1, offset, buf1, chunk);
+                 if (ret < 0) {
+-                    error_report("Error while reading offset %" PRId64 " of %s:"
+-                                 " %s", sectors_to_bytes(sector_num), filename1,
+-                                 strerror(-ret));
++                    error_report("Error while reading offset %" PRId64
++                                 " of %s: %s",
++                                 offset, filename1, strerror(-ret));
+                     ret = 4;
+                     goto out;
+                 }
+-                ret = blk_pread(blk2, sector_num << BDRV_SECTOR_BITS, buf2,
+-                                nb_sectors << BDRV_SECTOR_BITS);
++                ret = blk_pread(blk2, offset, buf2, chunk);
+                 if (ret < 0) {
+                     error_report("Error while reading offset %" PRId64
+-                                 " of %s: %s", sectors_to_bytes(sector_num),
+-                                 filename2, strerror(-ret));
++                                 " of %s: %s",
++                                 offset, filename2, strerror(-ret));
+                     ret = 4;
+                     goto out;
+                 }
+-                ret = compare_buffers(buf1, buf2,
+-                                      nb_sectors * BDRV_SECTOR_SIZE, &pnum);
+-                if (ret || pnum != nb_sectors * BDRV_SECTOR_SIZE) {
++                ret = compare_buffers(buf1, buf2, chunk, &pnum);
++                if (ret || pnum != chunk) {
+                     qprintf(quiet, "Content mismatch at offset %" PRId64 "!\n",
+-                            sectors_to_bytes(sector_num) + (ret ? 0 : pnum));
++                            offset + (ret ? 0 : pnum));
+                     ret = 1;
+                     goto out;
+                 }
+             }
+         } else {
+-            nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
++            chunk = MIN(chunk, IO_BUF_SIZE);
+             if (allocated1) {
+-                ret = check_empty_sectors(blk1, sector_num * BDRV_SECTOR_SIZE,
+-                                          nb_sectors * BDRV_SECTOR_SIZE,
++                ret = check_empty_sectors(blk1, offset, chunk,
+                                           filename1, buf1, quiet);
+             } else {
+-                ret = check_empty_sectors(blk2, sector_num * BDRV_SECTOR_SIZE,
+-                                          nb_sectors * BDRV_SECTOR_SIZE,
++                ret = check_empty_sectors(blk2, offset, chunk,
+                                           filename2, buf1, quiet);
+             }
+             if (ret) {
+                 goto out;
+             }
+         }
+-        sector_num += nb_sectors;
+-        qemu_progress_print(((float) nb_sectors / progress_base)*100, 100);
++        offset += chunk;
++        qemu_progress_print(((float) chunk / progress_base) * 100, 100);
+     }
+
+-    if (total_sectors1 != total_sectors2) {
++    if (total_size1 != total_size2) {
+         BlockBackend *blk_over;
+         const char *filename_over;
+
+         qprintf(quiet, "Warning: Image size mismatch!\n");
+-        if (total_sectors1 > total_sectors2) {
++        if (total_size1 > total_size2) {
+             blk_over = blk1;
+             filename_over = filename1;
+         } else {
+@@ -1495,14 +1478,10 @@ static int img_compare(int argc, char **argv)
+             filename_over = filename2;
+         }
+
+-        while (sector_num < progress_base) {
+-            int64_t count;
 -
- /* Return type name for a given CPU model name
-  * Caller is responsible for freeing the returned string.
-  */
---=20
-2.7.4
+-            ret = bdrv_block_status_above(blk_bs(blk_over), NULL,
+-                                          sector_num * BDRV_SECTOR_SIZE,
+-                                          (progress_base - sector_num) *
+-                                          BDRV_SECTOR_SIZE,
+-                                          &count, NULL);
++        while (offset < progress_base) {
++            ret = bdrv_block_status_above(blk_bs(blk_over), NULL, offset,
++                                          progress_base - offset, &chunk,
++                                          NULL);
+             if (ret < 0) {
+                 ret = 3;
+                 error_report("Sector allocation test failed for %s",
+@@ -1510,22 +1489,16 @@ static int img_compare(int argc, char **argv)
+                 goto out;
+
+             }
+-            /* TODO relax this once bdrv_block_status_above does not enforce
+-             * sector alignment */
+-            assert(QEMU_IS_ALIGNED(count, BDRV_SECTOR_SIZE));
+-            nb_sectors = count >> BDRV_SECTOR_BITS;
+             if (ret & BDRV_BLOCK_ALLOCATED && !(ret & BDRV_BLOCK_ZERO)) {
+-                nb_sectors = MIN(nb_sectors, IO_BUF_SIZE >> BDRV_SECTOR_BITS);
+-                ret = check_empty_sectors(blk_over,
+-                                          sector_num * BDRV_SECTOR_SIZE,
+-                                          nb_sectors * BDRV_SECTOR_SIZE,
++                chunk = MIN(chunk, IO_BUF_SIZE);
++                ret = check_empty_sectors(blk_over, offset, chunk,
+                                           filename_over, buf1, quiet);
+                 if (ret) {
+                     goto out;
+                 }
+             }
+-            sector_num += nb_sectors;
+-            qemu_progress_print(((float) nb_sectors / progress_base)*100, 100);
++            offset += chunk;
++            qemu_progress_print(((float) chunk / progress_base) * 100, 100);
+         }
+     }
+
+-- 
+2.13.5
