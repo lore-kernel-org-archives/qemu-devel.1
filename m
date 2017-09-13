@@ -1,24 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45381)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46850)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ds1om-0002W8-VU
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:10:42 -0400
+	(envelope-from <imammedo@redhat.com>) id 1ds1qD-0003Jy-Fk
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:12:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1ds1ol-0005do-O2
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:10:40 -0400
-References: <20170911172022.4738-1-eblake@redhat.com>
-	<20170911172022.4738-10-eblake@redhat.com>
-	<8c2d1317-5b95-b8de-cf97-0b2618c86b25@redhat.com>
-	<c70cd17a-4d29-8f23-e5dd-bb409182ac55@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e9e76b67-3490-8c1d-3062-960889ba9cd4@redhat.com>
-Date: Wed, 13 Sep 2017 09:10:22 +0200
+	(envelope-from <imammedo@redhat.com>) id 1ds1qA-000741-AQ
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:12:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40054)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1ds1qA-00073a-1o
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:12:06 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 3057C80F75
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:12:05 +0000 (UTC)
+Date: Wed, 13 Sep 2017 09:12:00 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170913091200.0403be99@nial.brq.redhat.com>
+In-Reply-To: <20170912180556.GD7570@localhost.localdomain>
+References: <1504776162-31400-1-git-send-email-thuth@redhat.com>
+	<20170911145344.4f2e192c@nial.brq.redhat.com>
+	<f62b660d-596a-f5ed-b4c7-d5adf58d2913@redhat.com>
+	<20170911170600.145e752d@nial.brq.redhat.com>
+	<20170912180556.GD7570@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <c70cd17a-4d29-8f23-e5dd-bb409182ac55@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="geA4qVppOWPvv7GEVqqfX8bDCmhKV7Isx"
-Subject: Re: [Qemu-devel] [PATCH v7 09/38] libqos: Track QTestState with
- QVirtioBus
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/core/qdev: Do not allow hot-plugging
+ without hotplug controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,75 +37,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, "open list:virtio-blk" <qemu-block@nongnu.org>, armbru@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---geA4qVppOWPvv7GEVqqfX8bDCmhKV7Isx
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+On Tue, 12 Sep 2017 15:05:56 -0300
+Eduardo Habkost <ehabkost@redhat.com> wrote:
 
-On 12.09.2017 15:28, Eric Blake wrote:
-> On 09/12/2017 02:21 AM, Thomas Huth wrote:
-[...]
->> I fail to see why we need a separate bus object here for each device.
->> The bus is only available one time, not multiple times, isn't it? So
->> there should also only be one bus object floating around, not multiple=
+> On Mon, Sep 11, 2017 at 05:06:00PM +0200, Igor Mammedov wrote:
+> > On Mon, 11 Sep 2017 16:31:39 +0200
+> > Thomas Huth <thuth@redhat.com> wrote:
+> >   
+> > > On 11.09.2017 14:53, Igor Mammedov wrote:  
+> > > > On Thu,  7 Sep 2017 11:22:42 +0200
+> > > > Thomas Huth <thuth@redhat.com> wrote:
+> > > >     
+> > > >> qdev_unplug() bails out with an assertion if the user tries to device_del
+> > > >> a hot-plugged device that does not have a hotplug controller. Unfortunately,
+> > > >> our devices are all marked with hotpluggable = true by default (see the
+> > > >> device_class_init() function in qdev.c), so it currently can happen that
+> > > >> the user runs into this situation and QEMU gets terminated unexpectedly:
+> > > >>
+> > > >> $ qemu-system-aarch64 -M virt -nographic -nodefaults -monitor stdio -S
+> > > >> QEMU 2.10.50 monitor - type 'help' for more information
+> > > >> (qemu) device_add aux-to-i2c-bridge,id=x
+> > > >> (qemu) device_del x
+> > > >> **
+> > > >> ERROR:qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_ctrl)
+> > > >> Aborted (core dumped)
+> > > >> Hotplugging devices without a hotplug controller does not make much sense,
+> > > >> so we should disallow this during the device_add process already!
+> > > >>
+> > > >> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> > > >> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> > > >> ---
+> > > >>  hw/core/qdev.c | 5 +++++
+> > > >>  1 file changed, 5 insertions(+)
+> > > >>
+> > > >> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> > > >> index 606ab53..d9ccce6 100644
+> > > >> --- a/hw/core/qdev.c
+> > > >> +++ b/hw/core/qdev.c
+> > > >> @@ -908,6 +908,11 @@ static void device_set_realized(Object *obj, bool value, Error **errp)
+> > > >>              if (local_err != NULL) {
+> > > >>                  goto fail;
+> > > >>              }
+> > > >> +        } else if (dev->hotplugged) {
+> > > >> +            /* Hot-plugged device without hotplug controller? No way! */
+> > > >> +            error_setg(&local_err, QERR_DEVICE_NO_HOTPLUG,
+> > > >> +                       object_get_typename(obj));
+> > > >> +            goto fail;
+> > > >>          }
+> > > >>  
+> > > >>          if (dc->realize) {    
+> > > > 
+> > > > maybe it should be other way around, i.e, fix device so that following would work
+> > > > 
+> > > >   device_set_realized()
+> > > >     if (dev->hotplugged && !dc->hotpluggable) {                                  
+> > > >         error_setg(errp, QERR_DEVICE_NO_HOTPLUG, object_get_typename(obj));      
+> > > >         return;                                                                  
+> > > >     }
+> > > > 
+> > > > instead of leaving device broken, like in yours
+> > > >  84ebd3e watchdog/wdt_diag288: Mark diag288 watchdog as non-hotpluggable    
+> > > 
+> > > No, that apparently does not work right for new devices since people
+> > > keep forgetting to set hotpluggable = false there. Both, Paolo and Peter
+> > > suggested that we should not allow hot-plugging if there's no hot plug
+> > > controller - it indeed does not make sense, so we should not allow it.  
+> > historically all devices were hotpluggble and conversion to hotplug
+> > controller didn't fix it which os fine as far as user did not attempt
+> > unreasonable things. However it should be fixedfor code to work correctly.
+> > 
+> > I'd suggest to flip default
+> >  dc->hotpluggable = false;
+> > and set it to true explicitly for devices that support hotplug,
+> > it obviously harder to do than this patch as it requires audit
+> > of all devices, but it looks more correct than fixing symptoms of
+> > incorrectly set dc->hotpluggable property.  
+> 
+> I agree we should do this.  If we have any device-type that is
+> not hotpluggable on any machine because no machine will return a
+> hotplug controller for it, we shouldn't report it as hotpluggable
+> through QMP and HMP.
+> 
+> But this patch also seems to be required, for cases where not all
+> machine-types accept hotplug of a given device type.
+Agreed,
 
->> ones... or do I miss something?
->=20
-> You are right that there is only one bus for the machine - the problem
-> is that the object representing the bus is dynamically created on the
-> fly at the point where the device is first grabbed, rather than up fron=
-t
-> as part of creating the machine (in other words, the device search is
-> not performed on a pre-existing bus object).
->=20
-> Contrast qpci_device_find() (lookup based on a pre-existing bus) with
-> qvirtio_mmio_init_device() (lookup that did not use a pre-existing bus)=
-;
-> also note that qvirtio_pci_device_find() takes a pre-existing QPCIBus
-> (since on that architecture, the QVirtioBus is itself a device on the
-> QPCIBus).
->=20
-> I suppose that we could indeed refactor the code to require callers to
-> create the QVirtioBus object up front, and then make the device lookup
-> (both qvirtio_mmio_init_device() and qvirtio_pci_device_find()) take a
-> QVirtioBus parameter instead of QTestState or QPCIBus.  That's slightly=
-
-> more work, but I'm happy to attempt it if you think it will be better.
-
-At least to me, that sounds like the right way to go. I guess we might
-run into other problems later if we have multiple instances of the bus
-object floating around ... so sorry if this is extra work, but I'd say
-let's better do it properly now instead of having to rework this again
-later.
-
- Thomas
-
-
---geA4qVppOWPvv7GEVqqfX8bDCmhKV7Isx
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIcBAEBAgAGBQJZuNnjAAoJEC7Z13T+cC21ZakQAJESihByGGDbwGQX85WJdbCy
-ZsPWNbH3rgMZ30R4DqHx/HRMNsx3RiFPabAt7pwH5Bojefk404qCbdKCvFh2rIaL
-w+n170Y0jrauybm0QgcLGCX3zlUHIHs0nj+2QdomZcGXox8mh/K9hQe2Nrw4oDk6
-fscrs0fSfKdMg+oAjLV1LXGwQLRnMOKdJdKSCVU+oRnnWMplMDpN++MSoQbBWMNe
-PEZi9FKlg6JvzeScK4jnGkh/G3kUPYZX0TI3HFatOfvk1abweuxT1Z0z2SkjjVhy
-c5suLpgDqpWwI+W2zB+kaOK3EBR6azJdpeU4tw1+m0ODYBxR/qqE8vADabzoKg5Q
-YOYC17ISXh/PL9EFXMX9zugHpIfk891Pw5451MQNWLcgDG4clN3z0ZwNZANA233G
-b3b0udN2E/fC0/C0rQTrCCtq6JeEflVBYa46oZngx7SmtHQcrpuebrZ1v8roRby7
-WHgBJRFVe20idWrXaCNUFcRhteiinaMXO3eF2bscOZKe9/QXzF/u7ZXEyj7k9fzU
-F/q2VFkgZjU7VJltd6AG2+kexU90syHIjfI5m7xhM03qgss6G4ZW3jNE30WOVcWe
-utR7vxrHO9eO2uYp8hhpmiDwZ4w4TneNPkxzR5JMKV0qCrDSnSs6+3tcvyUBz1hm
-GLZdOTnsfVVpl5aTa9IA
-=gvUy
------END PGP SIGNATURE-----
-
---geA4qVppOWPvv7GEVqqfX8bDCmhKV7Isx--
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
