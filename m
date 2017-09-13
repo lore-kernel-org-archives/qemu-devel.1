@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34104)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34147)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1ds3cQ-0001ZY-Oq
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:06:08 -0400
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1ds3cT-0001d3-Ju
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:06:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sergio.g.delreal@gmail.com>) id 1ds3cP-0007Yr-8j
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:06:02 -0400
-Received: from mail-vk0-x242.google.com ([2607:f8b0:400c:c05::242]:34485)
+	(envelope-from <sergio.g.delreal@gmail.com>) id 1ds3cR-0007bC-Lm
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:06:05 -0400
+Received: from mail-vk0-x241.google.com ([2607:f8b0:400c:c05::241]:36913)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <sergio.g.delreal@gmail.com>)
-	id 1ds3cP-0007Yd-41
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:06:01 -0400
-Received: by mail-vk0-x242.google.com with SMTP id v203so3321032vkv.1
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 02:06:01 -0700 (PDT)
+	id 1ds3cR-0007ap-FC
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 05:06:03 -0400
+Received: by mail-vk0-x241.google.com with SMTP id 184so3319697vkn.4
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 02:06:03 -0700 (PDT)
 From: Sergio Andres Gomez Del Real <sergio.g.delreal@gmail.com>
-Date: Wed, 13 Sep 2017 04:05:19 -0500
-Message-Id: <20170913090522.4022-12-Sergio.G.DelReal@gmail.com>
+Date: Wed, 13 Sep 2017 04:05:21 -0500
+Message-Id: <20170913090522.4022-14-Sergio.G.DelReal@gmail.com>
 In-Reply-To: <20170913090522.4022-1-Sergio.G.DelReal@gmail.com>
 References: <20170913090522.4022-1-Sergio.G.DelReal@gmail.com>
-Subject: [Qemu-devel] [PATCH v4 11/14] hvf: refactor cpuid code
+Subject: [Qemu-devel] [PATCH v4 13/14] hvf: refactor event injection code
+ for hvf
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,246 +30,292 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, stefanha@gmail.com, Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 
-This patch generalizes some code in cpu.c, sharing code and data between
-hvf and kvm. It also begins calling the new hvf_get_supported_cpuid
-where appropriate.
+This patch refactors the event-injection code for hvf by using the
+appropriate fields already provided by CPUX86State. At vmexit, it fills
+these fields so that hvf_inject_interrupts can just retrieve them without
+calling into hvf.
 
 Signed-off-by: Sergio Andres Gomez Del Real <Sergio.G.DelReal@gmail.com>
 ---
- target/i386/cpu-qom.h |  4 +--
- target/i386/cpu.c     | 77 ++++++++++++++++++++++++++++++++++++++-------------
- 2 files changed, 59 insertions(+), 22 deletions(-)
+ target/i386/cpu.c              |  3 ++
+ target/i386/cpu.h              |  1 +
+ target/i386/hvf-all.c          | 57 ++++++++++++++++++++++++++++++++----
+ target/i386/hvf-utils/vmcs.h   |  3 ++
+ target/i386/hvf-utils/vmx.h    |  8 ++++++
+ target/i386/hvf-utils/x86hvf.c | 65 ++++++++++++++++++++----------------------
+ target/i386/kvm.c              |  2 --
+ 7 files changed, 98 insertions(+), 41 deletions(-)
 
-diff --git a/target/i386/cpu-qom.h b/target/i386/cpu-qom.h
-index c2205e6077..22f95eb3a4 100644
---- a/target/i386/cpu-qom.h
-+++ b/target/i386/cpu-qom.h
-@@ -47,7 +47,7 @@ typedef struct X86CPUDefinition X86CPUDefinition;
- /**
-  * X86CPUClass:
-  * @cpu_def: CPU model definition
-- * @kvm_required: Whether CPU model requires KVM to be enabled.
-+ * @host_cpuid_required: Whether CPU model requires cpuid from host.
-  * @ordering: Ordering on the "-cpu help" CPU model list.
-  * @migration_safe: See CpuDefinitionInfo::migration_safe
-  * @static_model: See CpuDefinitionInfo::static
-@@ -66,7 +66,7 @@ typedef struct X86CPUClass {
-      */
-     X86CPUDefinition *cpu_def;
- 
--    bool kvm_required;
-+    bool host_cpuid_required;
-     int ordering;
-     bool migration_safe;
-     bool static_model;
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index ddc45abd70..2bf8c0ce0f 100644
+index 2bf8c0ce0f..76bfcc23f3 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -22,6 +22,7 @@
- #include "cpu.h"
- #include "exec/exec-all.h"
- #include "sysemu/kvm.h"
-+#include "sysemu/hvf.h"
- #include "sysemu/cpus.h"
- #include "kvm_i386.h"
+@@ -3247,6 +3247,9 @@ static void x86_cpu_reset(CPUState *s)
+     memset(env->mtrr_var, 0, sizeof(env->mtrr_var));
+     memset(env->mtrr_fixed, 0, sizeof(env->mtrr_fixed));
  
-@@ -613,6 +614,11 @@ static uint32_t xsave_area_size(uint64_t mask)
-     return ret;
++    env->interrupt_injected = -1;
++    env->exception_injected = -1;
++    env->nmi_injected = false;
+ #if !defined(CONFIG_USER_ONLY)
+     /* We hard-wire the BSP to the first CPU. */
+     apic_designate_bsp(cpu->apic_state, s->cpu_index == 0);
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 630a4c2c0a..81e3f511a6 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1188,6 +1188,7 @@ typedef struct CPUX86State {
+     int32_t interrupt_injected;
+     uint8_t soft_interrupt;
+     uint8_t has_error_code;
++    uint32_t ins_len;
+     uint32_t sipi_vector;
+     bool tsc_valid;
+     int64_t tsc_khz;
+diff --git a/target/i386/hvf-all.c b/target/i386/hvf-all.c
+index e8466e6f47..105a63ad4f 100644
+--- a/target/i386/hvf-all.c
++++ b/target/i386/hvf-all.c
+@@ -589,6 +589,55 @@ void hvf_disable(int shouldDisable)
+     hvf_disabled = shouldDisable;
  }
  
-+static inline bool accel_uses_host_cpuid(void)
++static void hvf_store_events(CPUState *cpu, uint32_t ins_len, uint64_t idtvec_info)
 +{
-+    return kvm_enabled() || hvf_enabled();
++    X86CPU *x86_cpu = X86_CPU(cpu);
++    CPUX86State *env = &x86_cpu->env;
++
++    env->exception_injected = -1;
++    env->interrupt_injected = -1;
++    env->nmi_injected = false;
++    if (idtvec_info & VMCS_IDT_VEC_VALID) {
++        switch (idtvec_info & VMCS_IDT_VEC_TYPE) {
++        case VMCS_IDT_VEC_HWINTR:
++        case VMCS_IDT_VEC_SWINTR:
++            env->interrupt_injected = idtvec_info & VMCS_IDT_VEC_VECNUM;
++            break;
++        case VMCS_IDT_VEC_NMI:
++            env->nmi_injected = true;
++            break;
++        case VMCS_IDT_VEC_HWEXCEPTION:
++        case VMCS_IDT_VEC_SWEXCEPTION:
++            env->exception_injected = idtvec_info & VMCS_IDT_VEC_VECNUM;
++            break;
++        case VMCS_IDT_VEC_PRIV_SWEXCEPTION:
++        default:
++            abort();
++        }
++        if ((idtvec_info & VMCS_IDT_VEC_TYPE) == VMCS_IDT_VEC_SWEXCEPTION ||
++            (idtvec_info & VMCS_IDT_VEC_TYPE) == VMCS_IDT_VEC_SWINTR) {
++            env->ins_len = ins_len;
++        }
++        if (idtvec_info & VMCS_INTR_DEL_ERRCODE) {
++            env->has_error_code = true;
++            env->error_code = rvmcs(cpu->hvf_fd, VMCS_IDT_VECTORING_ERROR);
++        }
++    }
++    if ((rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY) &
++        VMCS_INTERRUPTIBILITY_NMI_BLOCKING)) {
++        env->hflags2 |= HF2_NMI_MASK;
++    } else {
++        env->hflags2 &= ~HF2_NMI_MASK;
++    }
++    if (rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY) &
++         (VMCS_INTERRUPTIBILITY_STI_BLOCKING |
++         VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING)) {
++        env->hflags |= HF_INHIBIT_IRQ_MASK;
++    } else {
++        env->hflags &= ~HF_INHIBIT_IRQ_MASK;
++    }
 +}
 +
- static inline uint64_t x86_cpu_xsave_components(X86CPU *cpu)
+ int hvf_vcpu_exec(CPUState *cpu)
  {
-     return ((uint64_t)cpu->env.features[FEAT_XSAVE_COMP_HI]) << 32 |
-@@ -1643,10 +1649,15 @@ static void max_x86_cpu_initfn(Object *obj)
-      */
-     cpu->max_features = true;
+     X86CPU *x86_cpu = X86_CPU(cpu);
+@@ -608,11 +657,6 @@ int hvf_vcpu_exec(CPUState *cpu)
+             cpu->vcpu_dirty = false;
+         }
  
--    if (kvm_enabled()) {
-+    if (accel_uses_host_cpuid()) {
-         char vendor[CPUID_VENDOR_SZ + 1] = { 0 };
-         char model_id[CPUID_MODEL_ID_SZ + 1] = { 0 };
-         int family, model, stepping;
-+        X86CPUDefinition host_cpudef = { };
-+        uint32_t eax = 0, ebx = 0, ecx = 0, edx = 0;
-+
-+        host_cpuid(0x0, 0, &eax, &ebx, &ecx, &edx);
-+        x86_cpu_vendor_words2str(host_cpudef.vendor, ebx, edx, ecx);
- 
-         host_vendor_fms(vendor, &family, &model, &stepping);
- 
-@@ -1660,12 +1671,21 @@ static void max_x86_cpu_initfn(Object *obj)
-         object_property_set_str(OBJECT(cpu), model_id, "model-id",
-                                 &error_abort);
- 
--        env->cpuid_min_level =
--            kvm_arch_get_supported_cpuid(s, 0x0, 0, R_EAX);
--        env->cpuid_min_xlevel =
--            kvm_arch_get_supported_cpuid(s, 0x80000000, 0, R_EAX);
--        env->cpuid_min_xlevel2 =
--            kvm_arch_get_supported_cpuid(s, 0xC0000000, 0, R_EAX);
-+        if (kvm_enabled()) {
-+            env->cpuid_min_level =
-+                kvm_arch_get_supported_cpuid(s, 0x0, 0, R_EAX);
-+            env->cpuid_min_xlevel =
-+                kvm_arch_get_supported_cpuid(s, 0x80000000, 0, R_EAX);
-+            env->cpuid_min_xlevel2 =
-+                kvm_arch_get_supported_cpuid(s, 0xC0000000, 0, R_EAX);
-+        } else {
-+            env->cpuid_min_level =
-+                hvf_get_supported_cpuid(0x0, 0, R_EAX);
-+            env->cpuid_min_xlevel =
-+                hvf_get_supported_cpuid(0x80000000, 0, R_EAX);
-+            env->cpuid_min_xlevel2 =
-+                hvf_get_supported_cpuid(0xC0000000, 0, R_EAX);
-+        }
- 
-         if (lmce_supported()) {
-             object_property_set_bool(OBJECT(cpu), true, "lmce", &error_abort);
-@@ -1691,18 +1711,21 @@ static const TypeInfo max_x86_cpu_type_info = {
-     .class_init = max_x86_cpu_class_init,
- };
- 
--#ifdef CONFIG_KVM
+-        env->hvf_emul->interruptable =
+-            !(rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY) &
+-             (VMCS_INTERRUPTIBILITY_STI_BLOCKING |
+-             VMCS_INTERRUPTIBILITY_MOVSS_BLOCKING));
 -
-+#if defined(CONFIG_KVM) || defined(CONFIG_HVF)
- static void host_x86_cpu_class_init(ObjectClass *oc, void *data)
+         hvf_inject_interrupts(cpu);
+         vmx_update_tpr(cpu);
+ 
+@@ -631,7 +675,10 @@ int hvf_vcpu_exec(CPUState *cpu)
+         uint64_t exit_qual = rvmcs(cpu->hvf_fd, VMCS_EXIT_QUALIFICATION);
+         uint32_t ins_len = (uint32_t)rvmcs(cpu->hvf_fd,
+                                            VMCS_EXIT_INSTRUCTION_LENGTH);
++
+         uint64_t idtvec_info = rvmcs(cpu->hvf_fd, VMCS_IDT_VECTORING_INFO);
++
++        hvf_store_events(cpu, ins_len, idtvec_info);
+         rip = rreg(cpu->hvf_fd, HV_X86_RIP);
+         RFLAGS(env) = rreg(cpu->hvf_fd, HV_X86_RFLAGS);
+         env->eflags = RFLAGS(env);
+diff --git a/target/i386/hvf-utils/vmcs.h b/target/i386/hvf-utils/vmcs.h
+index c410dcfaaa..0fae73dce5 100644
+--- a/target/i386/hvf-utils/vmcs.h
++++ b/target/i386/hvf-utils/vmcs.h
+@@ -299,6 +299,7 @@
+ /*
+  * VMCS IDT-Vectoring information fields
+  */
++#define VMCS_IDT_VEC_VECNUM 0xFF
+ #define VMCS_IDT_VEC_VALID (1U << 31)
+ #define VMCS_IDT_VEC_TYPE 0x700
+ #define VMCS_IDT_VEC_ERRCODE_VALID (1U << 11)
+@@ -306,6 +307,8 @@
+ #define VMCS_IDT_VEC_NMI (2 << 8)
+ #define VMCS_IDT_VEC_HWEXCEPTION (3 << 8)
+ #define VMCS_IDT_VEC_SWINTR (4 << 8)
++#define VMCS_IDT_VEC_PRIV_SWEXCEPTION (5 << 8)
++#define VMCS_IDT_VEC_SWEXCEPTION (6 << 8)
+ 
+ /*
+  * VMCS Guest interruptibility field
+diff --git a/target/i386/hvf-utils/vmx.h b/target/i386/hvf-utils/vmx.h
+index 44a5c6d554..102075d0d4 100644
+--- a/target/i386/hvf-utils/vmx.h
++++ b/target/i386/hvf-utils/vmx.h
+@@ -181,6 +181,10 @@ static inline void macvm_set_rip(CPUState *cpu, uint64_t rip)
+ 
+ static inline void vmx_clear_nmi_blocking(CPUState *cpu)
  {
-     X86CPUClass *xcc = X86_CPU_CLASS(oc);
++    X86CPU *x86_cpu = X86_CPU(cpu);
++    CPUX86State *env = &x86_cpu->env;
++
++    env->hflags2 &= ~HF2_NMI_MASK;
+     uint32_t gi = (uint32_t) rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY);
+     gi &= ~VMCS_INTERRUPTIBILITY_NMI_BLOCKING;
+     wvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY, gi);
+@@ -188,6 +192,10 @@ static inline void vmx_clear_nmi_blocking(CPUState *cpu)
  
--    xcc->kvm_required = true;
-+    xcc->host_cpuid_required = true;
-     xcc->ordering = 8;
- 
--    xcc->model_description =
--        "KVM processor with all supported host features "
--        "(only available in KVM mode)";
-+    if (kvm_enabled()) {
-+        xcc->model_description =
-+            "KVM processor with all supported host features ";
-+    } else if (hvf_enabled()) {
-+        xcc->model_description =
-+            "HVF processor with all supported host features ";
-+    }
- }
- 
- static const TypeInfo host_x86_cpu_type_info = {
-@@ -1724,7 +1747,7 @@ static void report_unavailable_features(FeatureWord w, uint32_t mask)
-             assert(reg);
-             fprintf(stderr, "warning: %s doesn't support requested feature: "
-                 "CPUID.%02XH:%s%s%s [bit %d]\n",
--                kvm_enabled() ? "host" : "TCG",
-+                accel_uses_host_cpuid() ? "host" : "TCG",
-                 f->cpuid_eax, reg,
-                 f->feat_names[i] ? "." : "",
-                 f->feat_names[i] ? f->feat_names[i] : "", i);
-@@ -2175,7 +2198,7 @@ static void x86_cpu_class_check_missing_features(X86CPUClass *xcc,
-     Error *err = NULL;
-     strList **next = missing_feats;
- 
--    if (xcc->kvm_required && !kvm_enabled()) {
-+    if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
-         strList *new = g_new0(strList, 1);
-         new->value = g_strdup("kvm");;
-         *missing_feats = new;
-@@ -2337,6 +2360,10 @@ static uint32_t x86_cpu_get_supported_feature_word(FeatureWord w,
-         r = kvm_arch_get_supported_cpuid(kvm_state, wi->cpuid_eax,
-                                                     wi->cpuid_ecx,
-                                                     wi->cpuid_reg);
-+    } else if (hvf_enabled()) {
-+        r = hvf_get_supported_cpuid(wi->cpuid_eax,
-+                                    wi->cpuid_ecx,
-+                                    wi->cpuid_reg);
-     } else if (tcg_enabled()) {
-         r = wi->tcg_features;
-     } else {
-@@ -2396,6 +2423,7 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
-     }
- 
-     /* Special cases not set in the X86CPUDefinition structs: */
-+    /* TODO: in-kernel irqchip for hvf */
-     if (kvm_enabled()) {
-         if (!kvm_irqchip_in_kernel()) {
-             x86_cpu_change_kvm_default("x2apic", "off");
-@@ -2416,7 +2444,7 @@ static void x86_cpu_load_def(X86CPU *cpu, X86CPUDefinition *def, Error **errp)
-      * when doing cross vendor migration
-      */
-     vendor = def->vendor;
--    if (kvm_enabled()) {
-+    if (accel_uses_host_cpuid()) {
-         uint32_t  ebx = 0, ecx = 0, edx = 0;
-         host_cpuid(0, 0, NULL, &ebx, &ecx, &edx);
-         x86_cpu_vendor_words2str(host_vendor, ebx, edx, ecx);
-@@ -2872,6 +2900,11 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-             *ebx = kvm_arch_get_supported_cpuid(s, 0xA, count, R_EBX);
-             *ecx = kvm_arch_get_supported_cpuid(s, 0xA, count, R_ECX);
-             *edx = kvm_arch_get_supported_cpuid(s, 0xA, count, R_EDX);
-+        } else if (hvf_enabled() && cpu->enable_pmu) {
-+            *eax = hvf_get_supported_cpuid(0xA, count, R_EAX);
-+            *ebx = hvf_get_supported_cpuid(0xA, count, R_EBX);
-+            *ecx = hvf_get_supported_cpuid(0xA, count, R_ECX);
-+            *edx = hvf_get_supported_cpuid(0xA, count, R_EDX);
-         } else {
-             *eax = 0;
-             *ebx = 0;
-@@ -3223,6 +3256,9 @@ static void x86_cpu_reset(CPUState *s)
-     if (kvm_enabled()) {
-         kvm_arch_reset_vcpu(cpu);
-     }
-+    else if (hvf_enabled()) {
-+        hvf_reset_vcpu(s);
-+    }
- #endif
- }
- 
-@@ -3262,6 +3298,7 @@ APICCommonClass *apic_get_class(void)
+ static inline void vmx_set_nmi_blocking(CPUState *cpu)
  {
-     const char *apic_type = "apic";
++    X86CPU *x86_cpu = X86_CPU(cpu);
++    CPUX86State *env = &x86_cpu->env;
++
++    env->hflags2 |= HF2_NMI_MASK;
+     uint32_t gi = (uint32_t)rvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY);
+     gi |= VMCS_INTERRUPTIBILITY_NMI_BLOCKING;
+     wvmcs(cpu->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY, gi);
+diff --git a/target/i386/hvf-utils/x86hvf.c b/target/i386/hvf-utils/x86hvf.c
+index dd0710d056..83eb3be065 100644
+--- a/target/i386/hvf-utils/x86hvf.c
++++ b/target/i386/hvf-utils/x86hvf.c
+@@ -356,50 +356,47 @@ void vmx_clear_int_window_exiting(CPUState *cpu)
  
-+    /* TODO: in-kernel irqchip for hvf */
-     if (kvm_apic_in_kernel()) {
-         apic_type = "kvm-apic";
-     } else if (xen_enabled()) {
-@@ -3575,7 +3612,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-     Error *local_err = NULL;
-     static bool ht_warned;
+ void hvf_inject_interrupts(CPUState *cpu_state)
+ {
+-    int allow_nmi = !(rvmcs(cpu_state->hvf_fd, VMCS_GUEST_INTERRUPTIBILITY) &
+-                VMCS_INTERRUPTIBILITY_NMI_BLOCKING);
+     X86CPU *x86cpu = X86_CPU(cpu_state);
+     CPUX86State *env = &x86cpu->env;
  
--    if (xcc->kvm_required && !kvm_enabled()) {
-+    if (xcc->host_cpuid_required && !accel_uses_host_cpuid()) {
-         char *name = x86_cpu_class_get_model_name(xcc);
-         error_setg(&local_err, "CPU model '%s' requires KVM", name);
-         g_free(name);
-@@ -3597,7 +3634,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-         x86_cpu_report_filtered_features(cpu);
-         if (cpu->enforce_cpuid) {
-             error_setg(&local_err,
--                       kvm_enabled() ?
-+                       accel_uses_host_cpuid() ?
-                            "Host doesn't support requested features" :
-                            "TCG doesn't support requested features");
-             goto out;
-@@ -3620,7 +3657,7 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
-      * consumer AMD devices but nothing else.
-      */
-     if (env->features[FEAT_8000_0001_EDX] & CPUID_EXT2_LM) {
--        if (kvm_enabled()) {
-+        if (accel_uses_host_cpuid()) {
-             uint32_t host_phys_bits = x86_host_phys_bits();
-             static bool warned;
- 
-@@ -4207,7 +4244,7 @@ static void x86_cpu_register_types(void)
+-    uint64_t idt_info = rvmcs(cpu_state->hvf_fd, VMCS_IDT_VECTORING_INFO);
++    uint8_t vector;
++    uint64_t intr_type;
++    bool have_event = true;
++    if (env->interrupt_injected != -1) {
++        vector = env->interrupt_injected;
++        intr_type = VMCS_INTR_T_SWINTR;
++    } else if (env->exception_injected != -1) {
++        vector = env->exception_injected;
++        if (vector == EXCP03_INT3 || vector == EXCP04_INTO) {
++            intr_type = VMCS_INTR_T_SWEXCEPTION;
++        } else {
++            intr_type = VMCS_INTR_T_HWEXCEPTION;
++        }
++    } else if (env->nmi_injected) {
++        vector = NMI_VEC;
++        intr_type = VMCS_INTR_T_NMI;
++    } else {
++        have_event = false;
++    }
++
+     uint64_t info = 0;
+-    
+-    if (idt_info & VMCS_IDT_VEC_VALID) {
+-        uint8_t vector = idt_info & 0xff;
+-        uint64_t intr_type = idt_info & VMCS_INTR_T_MASK;
+-        info = idt_info;
+-        
++    if (have_event) {
++        info = vector | intr_type | VMCS_INTR_VALID;
+         uint64_t reason = rvmcs(cpu_state->hvf_fd, VMCS_EXIT_REASON);
+-        if (intr_type == VMCS_INTR_T_NMI && reason != EXIT_REASON_TASK_SWITCH) {
+-            allow_nmi = 1;
++        if (env->nmi_injected && reason != EXIT_REASON_TASK_SWITCH) {
+             vmx_clear_nmi_blocking(cpu_state);
+         }
+-        
+-        if ((allow_nmi || intr_type != VMCS_INTR_T_NMI)) {
++
++        if (!(env->hflags2 & HF2_NMI_MASK) || intr_type != VMCS_INTR_T_NMI) {
+             info &= ~(1 << 12); /* clear undefined bit */
+             if (intr_type == VMCS_INTR_T_SWINTR ||
+-                intr_type == VMCS_INTR_T_PRIV_SWEXCEPTION ||
+                 intr_type == VMCS_INTR_T_SWEXCEPTION) {
+-                uint64_t ins_len = rvmcs(cpu_state->hvf_fd,
+-                                         VMCS_EXIT_INSTRUCTION_LENGTH);
+-                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INST_LENGTH, ins_len);
+-            }
+-            if (vector == EXCEPTION_BP || vector == EXCEPTION_OF) {
+-                /*
+-                 * VT-x requires #BP and #OF to be injected as software
+-                 * exceptions.
+-                 */
+-                info &= ~VMCS_INTR_T_MASK;
+-                info |= VMCS_INTR_T_SWEXCEPTION;
+-                uint64_t ins_len = rvmcs(cpu_state->hvf_fd,
+-                                         VMCS_EXIT_INSTRUCTION_LENGTH);
+-                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INST_LENGTH, ins_len);
++                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INST_LENGTH, env->ins_len);
+             }
+             
+-            uint64_t err = 0;
+-            if (idt_info & VMCS_INTR_DEL_ERRCODE) {
+-                err = rvmcs(cpu_state->hvf_fd, VMCS_IDT_VECTORING_ERROR);
+-                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_EXCEPTION_ERROR, err);
++            if (env->has_error_code) {
++                wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_EXCEPTION_ERROR,
++                      env->error_code);
+             }
+             /*printf("reinject  %lx err %d\n", info, err);*/
+             wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INTR_INFO, info);
+@@ -407,7 +404,7 @@ void hvf_inject_interrupts(CPUState *cpu_state)
      }
-     type_register_static(&max_x86_cpu_type_info);
-     type_register_static(&x86_base_cpu_type_info);
--#ifdef CONFIG_KVM
-+#if defined(CONFIG_KVM) || defined(CONFIG_HVF)
-     type_register_static(&host_x86_cpu_type_info);
- #endif
- }
+ 
+     if (cpu_state->interrupt_request & CPU_INTERRUPT_NMI) {
+-        if (allow_nmi && !(info & VMCS_INTR_VALID)) {
++        if (!(env->hflags2 & HF2_NMI_MASK) && !(info & VMCS_INTR_VALID)) {
+             cpu_state->interrupt_request &= ~CPU_INTERRUPT_NMI;
+             info = VMCS_INTR_VALID | VMCS_INTR_T_NMI | NMI_VEC;
+             wvmcs(cpu_state->hvf_fd, VMCS_ENTRY_INTR_INFO, info);
+@@ -416,7 +413,7 @@ void hvf_inject_interrupts(CPUState *cpu_state)
+         }
+     }
+ 
+-    if (env->hvf_emul->interruptable &&
++    if (!(env->hflags & HF_INHIBIT_IRQ_MASK) &&
+         (cpu_state->interrupt_request & CPU_INTERRUPT_HARD) &&
+         (EFLAGS(env) & IF_MASK) && !(info & VMCS_INTR_VALID)) {
+         int line = cpu_get_pic_interrupt(&x86cpu->env);
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 6db7783edc..a695b8cd4e 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1030,8 +1030,6 @@ void kvm_arch_reset_vcpu(X86CPU *cpu)
+ {
+     CPUX86State *env = &cpu->env;
+ 
+-    env->exception_injected = -1;
+-    env->interrupt_injected = -1;
+     env->xcr0 = 1;
+     if (kvm_irqchip_in_kernel()) {
+         env->mp_state = cpu_is_bsp(cpu) ? KVM_MP_STATE_RUNNABLE :
 -- 
 2.14.1
