@@ -1,23 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33359)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ds2Co-0002EP-BG
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:35:31 -0400
+	(envelope-from <bounces@canonical.com>) id 1ds2DR-0002Yh-Iz
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:36:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1ds2Cn-0000xK-8k
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:35:30 -0400
-Date: Wed, 13 Sep 2017 17:35:19 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170913073519.GK7550@umbus.fritz.box>
-References: <20170906082748.28520-1-nikunj@linux.vnet.ibm.com>
-	<20170909070212.GT2735@umbus.fritz.box>
-	<87k2153jnx.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	(envelope-from <bounces@canonical.com>) id 1ds2DM-0001y7-MN
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:36:09 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39146)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1ds2DM-0001wA-Fs
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:36:04 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1ds2DK-0005Ax-30
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:36:02 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6A59D2E84C2
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:35:59 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="jITzwD3HDGXid3BE"
-Content-Disposition: inline
-In-Reply-To: <87k2153jnx.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
- cpus
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 13 Sep 2017 07:25:24 -0000
+From: Thomas Huth <1129571@bugs.launchpad.net>
+Reply-To: Bug 1129571 <1129571@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20130218230633.21029.10708.malonedeb@wampee.canonical.com>
+Message-Id: <150528752441.5685.179986693805276427.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1129571] Re: libreoffice armhf FTBFS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +36,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
+To: qemu-devel@nongnu.org
 
+There hasn't been a reply to my question in comment #32 within
+months, so I assume nobody cares about this anymore. So I'm closing this
+ticket now...
 
---jITzwD3HDGXid3BE
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: Incomplete =3D> Won't Fix
 
-On Mon, Sep 11, 2017 at 10:40:10AM +0530, Nikunj A Dadhania wrote:
-> David Gibson <david@gibson.dropbear.id.au> writes:
->=20
-> > On Wed, Sep 06, 2017 at 01:57:48PM +0530, Nikunj A Dadhania wrote:
-> >> When the user does not provide the cpu topology, e.g. "-smp 4", machin=
-e fails to
-> >> initialize 4 cpus. Compute the chip per cores depending on the number =
-of chips
-> >> and smt threads.
-> >>=20
-> >> Signed-off-by: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-> >
-> > I don't understand why simply treating smp_cores as cores per chip is w=
-rong.
->=20
-> We do not have SMT support and when "-smp 4" is passed, smp_cores is
-> always set to 1. So only once core with one thread finally show up in
-> the guest. Moreover, I see spapr too doing similar thing in
-> spapr_init_cpus() with boot_cores_nr.
+-- =
 
-I'm ok with adding an error if smp_threads > 1, since that won't
-work.  Breaking the identity that smp_cores is the number of cores per
-socket (which should correspond to one chip) is not ok, though.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1129571
 
-I think you're misinterpreting the boot_cores_nr stuff - that's just
-about translating the number of initially online vcpus into a number
-of initially online cores.
+Title:
+  libreoffice armhf FTBFS
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Status in QEMU:
+  Won't Fix
+Status in qemu package in Ubuntu:
+  Confirmed
 
---jITzwD3HDGXid3BE
-Content-Type: application/pgp-signature; name="signature.asc"
+Bug description:
+  We have been experiencing FTBFS of LibreOffice 3.5.7, 12.04, armhf in
+  the launchpad buildds. We believe this is likely due to an error in
+  qemu.
 
------BEGIN PGP SIGNATURE-----
+  While we do not have a small test case yet, we do have a build log
+  (attaching here).
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm437YACgkQbDjKyiDZ
-s5KcWQ/8C/C01cFTGSzcDK0fW6MJTGssstIboJy+pPHAcqr7N6kGuTlMffhuwb4a
-j3+Eqf+owJc0ohj+onUPj5oJ7cwPC3+Xd8TlA3F9I8eYdnCyt82wfhmYDU7MSvft
-g/GehzKt6Tkq+7d8zY5wFNcXNt/9Ji8Rfv45DB0JVJL9spUoZV/Cd3WCXG9PLeSW
-29X3oKQW7ToTBH+jLw7sqLofo+giPgm8zTpjaK3T8TgzBa5mERMU00JMc8yxdG0w
-L06tIwqVdVW4kBebPU0AONZPmhXzorgC9ruLRyGCkHr7wQWcQICCR52kp/CfZAUm
-WHnXlm4RoVuMtPOeXd0JaLRQ2w0u0g/Yi5R4stj63nQdbmtaAdSJw88H6suD3lz6
-bN22N1LS4+7Pj1Tj1fpIoZOSBRIbWvc0j5RUJXfduS6OOXLoVW8T+CCbO05Ahl1U
-RDMjYjhKZlCZPrsDBDTMyuwuo1JCwZH2W1dauzwoWdDseeLFlPJCCn+AW4mbWnGS
-2iUDrfTZvA4ID1ohsYr4mlDxyhklG2/BrtnS9TaFRbULXYdFtwB5UaTE1cU6KMUC
-tIW3U9mlUOXuq7nDf8T9kBfpKlUcRYORqDTLFnc5ePCY/4digdueHDZtgTyJCDFT
-kFJXmBrU/RZlq0scriaWDJPLwmGKlFk17ka3fJjU04rZ7zDiyTA=
-=WX7/
------END PGP SIGNATURE-----
+  The relevant snippet from the build log is:
 
---jITzwD3HDGXid3BE--
+  3.5.7/solver/unxlngr.pro/bin/jaxp.jar:/build/buildd/libreoffice-3.5.7/sol=
+ver/unxlngr.pro/bin/juh.jar:/build/buildd/libreoffice-3.5.7/solver/unxlngr.=
+pro/bin/parser.jar:/build/buildd/libreoffice-3.5.7/solver/unxlngr.pro/bin/x=
+t.jar:/build/buildd/libreoffice-3.5.7/solver/unxlngr.pro/bin/unoil.jar:/bui=
+ld/buildd/libreoffice-3.5.7/solver/unxlngr.pro/bin/ridl.jar:/build/buildd/l=
+ibreoffice-3.5.7/solver/unxlngr.pro/bin/jurt.jar:/build/buildd/libreoffice-=
+3.5.7/solver/unxlngr.pro/bin/xmlsearch.jar:/build/buildd/libreoffice-3.5.7/=
+solver/unxlngr.pro/bin/LuceneHelpWrapper.jar:/build/buildd/libreoffice-3.5.=
+7/solver/unxlngr.pro/bin/HelpIndexerTool.jar:/build/buildd/libreoffice-3.5.=
+7/solver/unxlngr.pro/bin/lucene-core-2.3.jar:/build/buildd/libreoffice-3.5.=
+7/solver/unxlngr.pro/bin/lucene-analyzers-2.3.jar" com.sun.star.help.HelpIn=
+dexerTool -lang cs -mod swriter -zipdir ../../unxlngr.pro/misc/ziptmpswrite=
+r_cs -o ../../unxlngr.pro/bin/swriter_cs.zip.unxlngr.pro
+  dmake:  Error code 132, while making '../../unxlngr.pro/bin/swriter_cs.zi=
+p'
+
+  We believe this is from bash error code 128 + 4, where 4 is illegal
+  instruction, thus leading us to suspect qemu.
+
+  Any help in tracking this down would be appreciated.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1129571/+subscriptions
