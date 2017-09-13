@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <awolfegordon@digitalocean.com>) id 1dsFeE-0002vV-3f
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 17:56:43 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dsFna-0006vr-DF
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 18:06:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <awolfegordon@digitalocean.com>) id 1dsFeD-0006yn-6M
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 17:56:42 -0400
-Received: from mail-it0-x22f.google.com ([2607:f8b0:4001:c0b::22f]:47284)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <awolfegordon@digitalocean.com>)
-	id 1dsFeD-0006yJ-15
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 17:56:41 -0400
-Received: by mail-it0-x22f.google.com with SMTP id o200so688636itg.0
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 14:56:40 -0700 (PDT)
+	(envelope-from <pbonzini@redhat.com>) id 1dsFnZ-00079C-DT
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 18:06:22 -0400
+References: <20170912144459.11359-1-pbonzini@redhat.com>
+	<83c3006b-d62e-441b-57f1-dea64b141c11@redhat.com>
+	<20170913075914.GA3929@lemon>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <3c085442-744b-e08c-279c-fc0c74559551@redhat.com>
+Date: Thu, 14 Sep 2017 00:06:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <1505337665.15211.3.camel@redhat.com>
-References: <20170913164424.32129-1-awg@digitalocean.com>
-	<1505337665.15211.3.camel@redhat.com>
-From: Adam Wolfe Gordon <awg@digitalocean.com>
-Date: Wed, 13 Sep 2017 15:56:39 -0600
-Message-ID: <CAE9i+tDpajGDhT5R3p+vAk_-YQ6hvVFUjJ=vPiYUKXSfuYR+9A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] rbd: Detect rbd image resizes
- and propagate them
+In-Reply-To: <20170913075914.GA3929@lemon>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/10] cleanup qemu-iotests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +25,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: dillaman@redhat.com
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, qemu-block@nongnu.org
 
-On Wed, Sep 13, 2017 at 3:21 PM, Jason Dillaman <jdillama@redhat.com> wrote:
-> On Wed, 2017-09-13 at 10:44 -0600, Adam Wolfe Gordon wrote:
->> +    parent = bs->inherits_from;
->> +    if (parent == NULL) {
->> +        error_report("bs %s does not have parent", bdrv_get_device_or_node_name(bs));
->> +        return;
->> +    }
->> +
->> +    /* Force parents to re-read our size. */
->
-> Can you just invoke blk_truncate instead?
+On 13/09/2017 09:59, Fam Zheng wrote:
+> On Wed, 09/13 08:47, Thomas Huth wrote:
+>> Meta comment: Could we maybe also rename "tests/qemu-iotests" to
+>> "tests/iotests" ? The "qemu" prefix sounds always very superfluous to me
+>> here...
+> 
+> Sounds good, and saves typing for when this path is manually entered. But maybe
+> keep tests/qemu-iotests as a symlink to keep old scripts happy?
 
-blk_truncate will end up calling qemu_rbd_truncate, which does an
-rbd_resize. The goal of this patch is to avoid calling rbd_resize from
-qemu, since we do resizes from an external orchestration service.
+The simplest way to keep old scripts happy would be too keep the prefix
+:) even though it does sound unnecessary.
 
-That said, this patch also introduces a cache of the size (in
-BDRVRBDState.size_bytes), so it would be possible for
-qemu_rbd_truncate to avoid calling rbd_resize when the image is
-already the right size. If I did that, we could use blk_truncate when
-we detect a resize as well. Would that be a desirable change?
+Paolo
