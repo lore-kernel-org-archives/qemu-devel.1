@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51899)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51991)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ds87I-0005hk-A5
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:54:13 -0400
+	(envelope-from <stefanha@redhat.com>) id 1ds87Z-0005uf-Eu
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:54:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1ds87H-00088d-7y
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:54:12 -0400
-References: <20170913082817.24731-1-berto@igalia.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <a01f3fe2-6315-34d4-6f68-c0e1f38e4e1e@redhat.com>
-Date: Wed, 13 Sep 2017 08:54:01 -0500
+	(envelope-from <stefanha@redhat.com>) id 1ds87U-0008Fd-IS
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:54:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60970)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1ds87U-0008Ey-Cp
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 09:54:24 -0400
+Date: Wed, 13 Sep 2017 14:54:18 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170913135418.GA14243@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170913082817.24731-1-berto@igalia.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="FLfiQXoECgfGxwst3V32VE8j4DBTXwXlh"
-Subject: Re: [Qemu-devel] [PATCH] throttle: Assert that bkt->max is valid in
- throttle_compute_wait()
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] QEMU -M nvdimm=on and hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +24,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+To: mprivozn@redhat.com
+Cc: Haozhong Zhang <haozhong.zhang@intel.com>, libvir-list@redhat.com, qemu-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---FLfiQXoECgfGxwst3V32VE8j4DBTXwXlh
-From: Eric Blake <eblake@redhat.com>
-To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>
-Message-ID: <a01f3fe2-6315-34d4-6f68-c0e1f38e4e1e@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] throttle: Assert that bkt->max is valid in
- throttle_compute_wait()
-References: <20170913082817.24731-1-berto@igalia.com>
-In-Reply-To: <20170913082817.24731-1-berto@igalia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Michal,
+You asked how NVDIMM hotplug should work if the domain was launched
+without -M nvdimm=on.  I'm not very familiar with ACPI so this may be
+incorrect.
 
-On 09/13/2017 03:28 AM, Alberto Garcia wrote:
-> If bkt->max =3D=3D 0 and bkt->burst_length > 1 then we could have a
-> division by 0 in throttle_do_compute_wait(). That configuration is
-> however not permitted and is already detected by throttle_is_valid(),
-> but let's assert it in throttle_compute_wait() to make it explicit.
->=20
-> Found by Coverity (CID: 1381016).
->=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  util/throttle.c | 1 +
->  1 file changed, 1 insertion(+)
+Hotplug relies on the presence of ACPI tables (SSDT Device=NVDR
+_HID=ACPI0012) added by -M nvdimm=on.  The ACPI tables contain the
+interface needed to handle hotplug events.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+The device_add command fails with the following message if -M nvdimm=on
+is missing:
 
->=20
-> diff --git a/util/throttle.c b/util/throttle.c
-> index 06bf916adc..b38e742da5 100644
-> --- a/util/throttle.c
-> +++ b/util/throttle.c
-> @@ -124,6 +124,7 @@ int64_t throttle_compute_wait(LeakyBucket *bkt)
->      /* If the main bucket is not full yet we still have to check the
->       * burst bucket in order to enforce the burst limit */
->      if (bkt->burst_length > 1) {
-> +        assert(bkt->max > 0); /* see throttle_is_valid() */
->          extra =3D bkt->burst_level - burst_bucket_size;
->          if (extra > 0) {
->              return throttle_do_compute_wait(bkt->max, extra);
->=20
+  nvdimm is not enabled: missing 'nvdimm' in '-M'
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+I'm not sure if ACPI allows SSDT tables to be dynamically added but in
+any case the current QEMU code doesn't support that.
 
+Options for libvirt:
 
---FLfiQXoECgfGxwst3V32VE8j4DBTXwXlh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+1. Rely on QEMU's device_add error.
+   Pro: If QEMU behavior ever changes then libvirt will also start
+        working without code changes.
+   Cons: Does libvirt interpret QMP error strings?
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+2. Only allow NVDIMM hotplug if the domain was started with -M
+   nvdimm=on.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm5OHkACgkQp6FrSiUn
-Q2pT5wf/Sc+rVU7LVeM3tFbvtSX2fMG+ZpLtB8OIskFV70d/Y/UIDLSVUN2fNKXj
-/TDTmj+aYyCY5SNYGkeUH49hi7/VvnIqmp361d0D9wxcxqrEd+ZzsmNdViSj/OVH
-HU6jKrNPlRvdAqoqpjbQcon5Bia9ApZl/30R+AocGXcUcKJ92iHCBLDoJRCALyeW
-KRxMBZOWOhee0tnjSSwDK3DjvscbtqX/NUnUbCSfzBsDkP7RWtUN6D8Y16QJGZzK
-Rg0wPVRNR5TG7dsOrgo9jyewG/2d/TlXMCosMWlHT61grLP1MNnRICYE5DdPQFzN
-HRKGNiz7R9aeAb4x6c42drx8Q9jrCQ==
-=doCj
------END PGP SIGNATURE-----
+I think QEMU will not add -M nvdimm=on to the "pc" machine type by
+default since it adds the NVDIMM DSM hardware interface that increases
+the security attack surface.
 
---FLfiQXoECgfGxwst3V32VE8j4DBTXwXlh--
+Stefan
