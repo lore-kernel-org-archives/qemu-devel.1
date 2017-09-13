@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43344)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ds5Pa-0006gt-1Y
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:59 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1ds5Qu-00080R-Ui
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:02:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ds5PU-00075e-Iy
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44160)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ds5PU-000757-Bb
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:48 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 57E42C04B944
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 11:00:47 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 13 Sep 2017 12:59:51 +0200
-Message-Id: <20170913105953.13760-19-quintela@redhat.com>
-In-Reply-To: <20170913105953.13760-1-quintela@redhat.com>
-References: <20170913105953.13760-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 18/20] migration: Rename initial_bytes
+	(envelope-from <peter.maydell@linaro.org>) id 1ds5Qo-0000bj-SA
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:02:16 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:35936)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1ds5Qo-0000Z8-MT
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:02:10 -0400
+Received: by mail-wr0-x236.google.com with SMTP id o42so27957069wrb.3
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 04:02:10 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <59B8DE5A.9000301@ispras.ru>
+References: <59B7EBC5.9060908@ispras.ru>
+	<CAFEAcA-to=vWWBHoxZRX-ExcbDe0OTMwpHunE7HXaYA0GE+ccw@mail.gmail.com>
+	<59B7F503.8010703@ispras.ru>
+	<CAFEAcA97i97_aoq8xNKtP8Z+i-u5Hq+_e6N80=T=WspSEW+A7A@mail.gmail.com>
+	<59B8DE5A.9000301@ispras.ru>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 13 Sep 2017 12:01:48 +0100
+Message-ID: <CAFEAcA8UTVr-jO4Eh=uaUokYBhF0EYTuBoXdLyrKZ=GrjPFtmQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] MIPS 'move' insn emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +32,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Sergey Smolov <smolov@ispras.ru>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-Now it is called qemu_file_bytes that reflects better what it does,
-and we create qemu_file_bytes_now to not have to call qemu_ftell() twice.
+On 13 September 2017 at 08:29, Sergey Smolov <smolov@ispras.ru> wrote:
+> -d options are a bit high-level for me, because I just see the execution
+> result for every instruction. So it will be a mistake to think that every
+> change of some register's value is just a new value writing.
+>
+> As I understand, at "translate time" QEMU creates a TCG model that can be
+> run as x86 code on the host machine. May be it is possible to find some
+> mapping in this model between x86 and MIPS registers? Having such a mapping,
+> one can detect that some value has been written in a x86 register that
+> conforms to some GPR MIPS register. Am I right?
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/migration.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+No. The process of code generation does not care about
+having consistent mapping between MIPS registers and
+x86 registers -- all it does is ensure that architecturally
+the right values are in the guest-visible registers when
+they are visible to the guest.
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 674c254c3f..67f3375ddc 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -2065,13 +2065,13 @@ static void *migration_thread(void *opaque)
-     /* Used by the bandwidth calcs, updated later */
-     int64_t initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-     int64_t setup_start = qemu_clock_get_ms(QEMU_CLOCK_HOST);
--    int64_t initial_bytes = 0;
-     /*
-      * The final stage happens when the remaining data is smaller than
-      * this threshold; it's calculated from the requested downtime and
-      * measured bandwidth
-      */
-     int64_t threshold_size = 0;
-+    int64_t qemu_file_bytes = 0;
-     int64_t start_time = initial_time;
-     int64_t end_time;
-     bool old_vm_running = false;
-@@ -2159,8 +2159,9 @@ static void *migration_thread(void *opaque)
-         }
-         current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-         if (current_time >= initial_time + BUFFER_DELAY) {
--            uint64_t transferred_bytes = qemu_ftell(s->to_dst_file) -
--                                         initial_bytes;
-+            uint64_t qemu_file_bytes_now = qemu_ftell(s->to_dst_file);
-+            uint64_t transferred_bytes =
-+                qemu_file_bytes_now - qemu_file_bytes;
-             uint64_t time_spent = current_time - initial_time;
-             double bandwidth = (double)transferred_bytes / time_spent;
-             threshold_size = bandwidth * s->parameters.downtime_limit;
-@@ -2179,7 +2180,7 @@ static void *migration_thread(void *opaque)
- 
-             qemu_file_reset_rate_limit(s->to_dst_file);
-             initial_time = current_time;
--            initial_bytes = qemu_ftell(s->to_dst_file);
-+            qemu_file_bytes = qemu_file_bytes_now;
-         }
-         if (qemu_file_rate_limit(s->to_dst_file)) {
-             /* usleep expects microseconds */
--- 
-2.13.5
+As I say, we may some day have a tracing API that allows you
+to look at things at the level of detail that you want;
+for now -d is the best we have.
+
+thanks
+-- PMM
