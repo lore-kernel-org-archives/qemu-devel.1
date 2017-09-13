@@ -1,31 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55275)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dsEVV-0007PO-0l
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 16:43:38 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dsEf8-0002pj-2t
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 16:53:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dsEVR-0006wF-Rf
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 16:43:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51838)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dsEVR-0006v3-Iu
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 16:43:33 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 90DEF4E4CA
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 20:43:31 +0000 (UTC)
-References: <20170913120937.5645-1-kraxel@redhat.com>
-	<20170913120937.5645-3-kraxel@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <47d72e62-8ebb-3b45-3efe-ab5f98ed4f39@redhat.com>
-Date: Wed, 13 Sep 2017 22:43:22 +0200
+	(envelope-from <jsnow@redhat.com>) id 1dsEf6-0004SS-KU
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 16:53:34 -0400
+References: <20170913164424.32129-1-awg@digitalocean.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <820405a5-32e9-43e4-f41f-184e3bbb00a7@redhat.com>
+Date: Wed, 13 Sep 2017 16:53:24 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170913120937.5645-3-kraxel@redhat.com>
+In-Reply-To: <20170913164424.32129-1-awg@digitalocean.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] Add --firmwarepath to configure
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] rbd: Detect rbd image resizes
+ and propagate them
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,97 +24,165 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Adam Wolfe Gordon <awg@digitalocean.com>, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, "open list:All patches CC here" <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>
 
-On 13/09/2017 14:09, Gerd Hoffmann wrote:
-> Add a firmware path config option to configure.  Multiple directories
-> are accepted, with the usual colon as separator.  Default value is
-> ${prefix}/share/qemu-firmware.  The path is searched in addition to the
-> current search path (typically ${prefix}/share/qemu).
+
+
+On 09/13/2017 12:44 PM, Adam Wolfe Gordon wrote:
+> Register a watcher with rbd so that we get notified when an image is
+> resized. Propagate resizes to parent block devices so that guest devices
+> get resized without user intervention.
 > 
-> This prepares qemu for the planned split of the prebuilt firmware blobs
-> into a separate project.
-> 
-> Distributions can also use this to get rid of the firmware symlink farm
-> and add -- for example -- /usr/share/seabios to the firmware path
-> instead.
-> 
-> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Signed-off-by: Adam Wolfe Gordon <awg@digitalocean.com>
 > ---
->  configure             |  6 ++++++
->  vl.c                  | 12 +++++++++---
->  scripts/create_config |  2 +-
->  3 files changed, 16 insertions(+), 4 deletions(-)
+> Hello!
 > 
-> diff --git a/configure b/configure
-> index fd7e3a5e81..870bdbd3e4 100755
-> --- a/configure
-> +++ b/configure
-> @@ -332,6 +332,7 @@ modules="no"
->  prefix="/usr/local"
->  mandir="\${prefix}/share/man"
->  datadir="\${prefix}/share"
-> +firmwarepath="\${prefix}/share/qemu-firmware"
->  qemu_docdir="\${prefix}/share/doc/qemu"
->  bindir="\${prefix}/bin"
->  libdir="\${prefix}/lib"
-> @@ -915,6 +916,8 @@ for opt do
->    ;;
->    --localstatedir=*) local_statedir="$optarg"
->    ;;
-> +  --firmwarepath=*) firmwarepath="$optarg"
-> +  ;;
->    --sbindir=*|--sharedstatedir=*|\
->    --oldincludedir=*|--datarootdir=*|--infodir=*|--localedir=*|\
->    --htmldir=*|--dvidir=*|--pdfdir=*|--psdir=*)
-> @@ -1418,6 +1421,7 @@ Advanced options (experts only):
->    --libdir=PATH            install libraries in PATH
->    --sysconfdir=PATH        install config in PATH$confsuffix
->    --localstatedir=PATH     install local state in PATH (set at runtime on win32)
-> +  --firmwarepath=PATH      search PATH for firmware files
+> We are using this patch in production at DigitalOcean and have tested it fairly
+> extensively. However, we use the same block device configuration everywhere, so
+> I'd be interested to get an answer to the question I've left in the code:>
+>> /* NOTE: This assumes there's only one layer between us and the
+>>    block-backend. Is this always true? */
+> 
 
-Maybe --firmwaredir or --with-firmwaredir (because firmwaredir is not
-one of the "standard" directories)?
+Even if it were always true presently, the fact that the block layer
+storage graph can be configured in arbitrary ways suggests that it might
+not always be true in the future.
 
-> @@ -4232,11 +4233,16 @@ int main(int argc, char **argv, char **envp)
->          qemu_set_log(0);
->      }
+Probably in practice MOST drives are configured like
+[BB]<--[Format]<--[Protocol], but the block layer is adding a lot of fun
+stuff like filter nodes for throttling or debugging, so it's probably
+too much to assert that the length of the chain will ALWAYS be exactly two.
+
+Can I play dumb and ask what you are trying to accomplish? The concept
+of a drive deciding to resize itself is not something I have a model for
+understanding, presently...
+
+> If that isn't true, this patch will need a bit of work to traverse up the block
+> device tree and find the block-backend.
+> 
+> Of course, any other feedback would be welcome too - this is my first foray into
+> the qemu code.
+> 
+> Regards,
+> Adam
+> 
+>  block/rbd.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 80 insertions(+)
+> 
+> diff --git a/block/rbd.c b/block/rbd.c
+> index 144f350e1f..1c9fcbec1f 100644
+> --- a/block/rbd.c
+> +++ b/block/rbd.c
+> @@ -96,6 +96,8 @@ typedef struct BDRVRBDState {
+>      rbd_image_t image;
+>      char *image_name;
+>      char *snap;
+> +    uint64_t watcher_handle;
+> +    uint64_t size_bytes;
+>  } BDRVRBDState;
 >  
-> -    /* If no data_dir is specified then try to find it relative to the
-> -       executable path.  */
-> +    /* add configured firmware directories */
-> +    dirs = g_strsplit(CONFIG_QEMU_FIRMWAREPATH, ":", 0);
-
-Windows probably wants to use ; here, so you can use
-G_SEARCHPATH_SEPARATOR_S instead of ":".
-
-Thanks,
-
-Paolo
-
-> +    for (i = 0; dirs[i] != NULL; i++) {
-> +        qemu_add_data_dir(dirs[i]);
+>  static char *qemu_rbd_next_tok(char *src, char delim, char **p)
+> @@ -540,6 +542,67 @@ out:
+>      return rados_str;
+>  }
+>  
+> +/* BH for when rbd notifies us of an update. */
+> +static void qemu_rbd_update_bh(void *arg)
+> +{
+> +    BlockDriverState *parent, *bs = arg;
+> +    BDRVRBDState *s = bs->opaque;
+> +    bool was_variable_length;
+> +    uint64_t new_size_bytes;
+> +    int64_t new_parent_len;
+> +    BdrvChild *c;
+> +    int r;
+> +
+> +    r = rbd_get_size(s->image, &new_size_bytes);
+> +    if (r < 0) {
+> +        error_report("error reading size for %s: %s", s->name, strerror(-r));
+> +        return;
 > +    }
 > +
-> +    /* try to find datadir relative to the executable path */
->      qemu_add_data_dir(os_find_datadir());
+> +    /* Avoid no-op resizes on non-resize notifications. */
+> +    if (new_size_bytes == s->size_bytes) {
+> +        error_printf("skipping non-resize rbd cb\n");
+> +        return;
+> +    }
+> +
+> +    /* NOTE: This assumes there's only one layer between us and the
+> +       block-backend. Is this always true? */
+> +    parent = bs->inherits_from;
+> +    if (parent == NULL) {
+> +        error_report("bs %s does not have parent", bdrv_get_device_or_node_name(bs));
+> +        return;
+> +    }
+> +
+> +    /* Force parents to re-read our size. */
+> +    was_variable_length = bs->drv->has_variable_length;
+> +    bs->drv->has_variable_length = true;
+> +    new_parent_len = bdrv_getlength(parent);
+> +    if (new_parent_len < 0) {
+> +        error_report("getlength failed on parent %s", bdrv_get_device_or_node_name(parent));
+> +        bs->drv->has_variable_length = was_variable_length;
+> +        return;
+> +    }
+> +    bs->drv->has_variable_length = was_variable_length;
+> +
+> +    /* Notify block backends that that we have resized.
+> +       Copied from bdrv_parent_cb_resize. */
+> +    QLIST_FOREACH(c, &parent->parents, next_parent) {
+> +        if (c->role->resize) {
+> +            c->role->resize(c);
+> +        }
+> +    }
+> +
+> +    s->size_bytes = new_size_bytes;
+> +}
+> +
+> +/* Called from non-qemu thread - careful! */
+> +static void qemu_rbd_update_cb(void *arg)
+> +{
+> +    BlockDriverState *bs = arg;
+> +
+> +    aio_bh_schedule_oneshot(bdrv_get_aio_context(bs), qemu_rbd_update_bh, bs);
+> +}
+> +
+>  static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>                           Error **errp)
+>  {
+> @@ -672,9 +735,25 @@ static int qemu_rbd_open(BlockDriverState *bs, QDict *options, int flags,
+>          }
+>      }
 >  
-> -    /* If all else fails use the install path specified when building. */
-> +    /* add the datadir specified when building */
->      qemu_add_data_dir(CONFIG_QEMU_DATADIR);
+> +    r = rbd_update_watch(s->image, &s->watcher_handle, qemu_rbd_update_cb, bs);
+> +    if (r < 0) {
+> +        error_setg_errno(errp, -r, "error registering watcher on %s", s->name);
+> +        goto failed_watch;
+> +    }
+> +
+> +    r = rbd_get_size(s->image, &s->size_bytes);
+> +    if (r < 0) {
+> +        error_setg_errno(errp, -r, "error reading size for %s", s->name);
+> +        goto failed_sz;
+> +    }
+> +
+>      qemu_opts_del(opts);
+>      return 0;
 >  
->      /* -L help lists the data directories and exits. */
-> diff --git a/scripts/create_config b/scripts/create_config
-> index e6929dd61e..603b826886 100755
-> --- a/scripts/create_config
-> +++ b/scripts/create_config
-> @@ -15,7 +15,7 @@ case $line in
->      echo "#define QEMU_VERSION_MINOR $minor"
->      echo "#define QEMU_VERSION_MICRO $micro"
->      ;;
-> - qemu_*dir=*) # qemu-specific directory configuration
-> + qemu_*dir=* | qemu_*path=*) # qemu-specific directory configuration
->      name=${line%=*}
->      value=${line#*=}
->      define_name=$(echo $name | LC_ALL=C tr '[a-z]' '[A-Z]')
+> +failed_sz:
+> +    rbd_update_unwatch(s->image, s->watcher_handle);
+> +failed_watch:
+> +    rbd_close(s->image);
+>  failed_open:
+>      rados_ioctx_destroy(s->io_ctx);
+>  failed_shutdown:
+> @@ -712,6 +791,7 @@ static void qemu_rbd_close(BlockDriverState *bs)
+>  {
+>      BDRVRBDState *s = bs->opaque;
+>  
+> +    rbd_update_unwatch(s->image, s->watcher_handle);
+>      rbd_close(s->image);
+>      rados_ioctx_destroy(s->io_ctx);
+>      g_free(s->snap);
 > 
