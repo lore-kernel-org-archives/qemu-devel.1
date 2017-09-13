@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49130)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dsAnA-0007wE-Nj
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:45:37 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dsAwL-00023D-HV
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:55:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dsAn7-0004rw-IK
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:45:36 -0400
-Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:47572)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dsAn7-0004rJ-Cf
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:45:33 -0400
-Received: by mail-pg0-x22f.google.com with SMTP id d8so1389246pgt.4
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 09:45:33 -0700 (PDT)
-References: <20170911204936.5020-1-f4bug@amsat.org>
-	<CAFEAcA_61iw+u7aMp+vA-CNpmAPjvJ_ynUfHu8Y+p8jmgvbcdw@mail.gmail.com>
-	<4eddca72-c75e-0cbc-e07d-280c1cd0f095@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5dac3293-15ec-95e7-e8e7-4a16fb2dcfc4@linaro.org>
-Date: Wed, 13 Sep 2017 09:45:29 -0700
+	(envelope-from <cohuck@redhat.com>) id 1dsAwI-0006hO-DB
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:55:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39934)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dsAwI-0006fc-6n
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 12:55:02 -0400
+Date: Wed, 13 Sep 2017 18:54:53 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170913185453.675bedac.cohuck@redhat.com>
+In-Reply-To: <17d817d4-bfce-98aa-7841-2136cb8dcfc6@redhat.com>
+References: <20170913132417.24384-1-david@redhat.com>
+	<20170913132417.24384-4-david@redhat.com>
+	<17d817d4-bfce-98aa-7841-2136cb8dcfc6@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <4eddca72-c75e-0cbc-e07d-280c1cd0f095@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tcg/ppc: disable atomic write check on
- ppc32
+Subject: Re: [Qemu-devel] [PATCH v5 03/22] s390x: get rid of s390-virtio.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,15 +28,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Eduardo Habkost <ehabkost@redhat.com>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On 09/12/2017 02:04 PM, Paolo Bonzini wrote:
-> I wonder if QEMU_BUILD_BUG_ON (at least in atomics) should not use a
-> static assertion, but rather the 'error ("MESSAGE")' attribute instead.
-> This way, if the code is dead it does not cause a build failure.
+On Wed, 13 Sep 2017 18:34:27 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-I think that would be an excellent idea.
+> On 13.09.2017 15:23, David Hildenbrand wrote:
+> > It is a leftover from the days where we had still the !ccw virtio
+> > machine. As this one is long gone, let's move everything to> s390-virtio-ccw.c.  
+> 
+> Whoops, another thing to fix up:
+> 
+> hw/s390x/s390-virtio.c is not compiled any more but not completely deleted.
 
+No worries, fixed up.
 
-r~
+> 
+> > 
+> > Suggested-by: Cornelia Huck <cohuck@redhat.com>
+> > Reviewed-by: Thomas Huth <thuth@redhat.com>
+> > Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
+> > ---
+> >  hw/s390x/Makefile.objs     |   1 -
+> >  hw/s390x/s390-virtio-ccw.c | 157 ++++++++++++++++++++++++++++++++++++++++++++-
+> >  hw/s390x/s390-virtio.c     |  37 -----------
+> >  hw/s390x/s390-virtio.h     |  15 -----
+> >  4 files changed, 156 insertions(+), 54 deletions(-)
