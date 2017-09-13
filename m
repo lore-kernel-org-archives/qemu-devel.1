@@ -1,29 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59570)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dsBA3-0001YW-Py
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 13:09:16 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dsBCN-00057p-E8
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 13:11:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dsBA1-0007UT-3F
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 13:09:15 -0400
-Received: from mail-pf0-x235.google.com ([2607:f8b0:400e:c00::235]:46716)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dsBA0-0007TD-T9
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 13:09:13 -0400
-Received: by mail-pf0-x235.google.com with SMTP id e199so1194469pfh.3
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 10:09:12 -0700 (PDT)
-References: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
-	<150506083546.19604.543091497330269756.stgit@frigg.lan>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <169db8d7-fe49-05c4-aca7-ad818b12c9c5@linaro.org>
-Date: Wed, 13 Sep 2017 10:09:09 -0700
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dsBCH-00013F-Fd
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 13:11:39 -0400
+References: <1505054255-2990-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1505054255-2990-5-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<20170913071249.GI7550@umbus.fritz.box>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <03027eb0-6528-22c6-dcc1-d20323399ec9@ilande.co.uk>
+Date: Wed, 13 Sep 2017 18:11:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <150506083546.19604.543091497330269756.stgit@frigg.lan>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170913071249.GI7550@umbus.fritz.box>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/7] tcg: Add support for "inlining"
- regions of code
+Subject: Re: [Qemu-devel] [PATCH 4/4] ppc: ensure we update the decrementer
+ value during migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,24 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Llu=c3=ads_Vilanova?= <vilanova@ac.upc.edu>, qemu-devel@nongnu.org
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: aik@ozlabs.ru, lvivier@redhat.com, qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 
-On 09/10/2017 09:27 AM, Lluís Vilanova wrote:
-> TCG BBLs and instructions have multiple exit points from where to raise
-> tracing events, but some of the necessary information in the generic
-> disassembly infrastructure is not available until after generating these
-> exit points.
+On 13/09/17 08:12, David Gibson wrote:
+
+> This is subtly incorrect.  It sets the DECR on load to exactly the
+> value that was saved.  That effectively means that the DECR is frozen
+> for the migration downtime, which probably isn't what we want.
 > 
-> This patch adds support for "inline points" (where the tracing code will
-> be placed), and "inline regions" (which identify the TCG code that must
-> be inlined). The TCG compiler will basically copy each inline region to
-> any inline points that reference it.
+> Instead we need to save the DECR as an offset from the timebase, and
+> restore it relative to the (downtime adjusted) timebase on the
+> destination.
+> 
+> The complication with that is that the timebase is generally migrated
+> at the machine level, not the cpu level: the timebase is generally
+> synchronized between cpus in the machine, and migrating it at the
+> individual cpu could break that.  Which means we probably need a
+> machine level hook to handle the decrementer too, even though it
+> logically *is* per-cpu, because otherwise we'll be trying to restore
+> it before the timebase is restored.
 
-I am not keen on this.
+I know that we discussed this in-depth last year, however I was working
+along the lines that Laurent's patch fixed this along the lines of our
+previous discussion:
+https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg00338.html (and
+indeed Laurent's analysis at
+https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg01489.html).
 
-Is there a reason you can't just emit the tracing code at the appropriate place
-to begin with?  Perhaps I have to wait to see how this is used...
+However looking again at the this patch in the context you mentioned
+above, I'm starting to wonder if the right solution now is for the
+machine init function for g3beige/mac99 to do the same as spapr, e.g.
+add cpu_ppc_clock_vm_state_change() as a vm_change_state_handler and
+then add VMSTATE_PPC_TIMEBASE_V from the machine PPCTimeBase into my new
+subsection?
+
+Laurent, do you think that your state change handler would work
+correctly in this way?
 
 
-r~
+ATB,
+
+Mark.
