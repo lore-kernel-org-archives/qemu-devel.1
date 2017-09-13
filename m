@@ -1,28 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dsC67-0001XK-0m
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:09:15 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dsCBS-0005SI-OK
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:14:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dsC63-00033a-Sc
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:09:14 -0400
-Received: from mail-qt0-x232.google.com ([2607:f8b0:400d:c0d::232]:45813)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dsC63-00033O-OZ
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:09:11 -0400
-Received: by mail-qt0-x232.google.com with SMTP id t46so2481268qtj.2
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 11:09:11 -0700 (PDT)
-References: <20170913172941.5470-1-cohuck@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c26e207a-c522-3441-75cc-02c6fa287b4e@linaro.org>
-Date: Wed, 13 Sep 2017 11:09:04 -0700
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dsCBN-00018v-LM
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:14:46 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49702
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dsCBN-00018M-Fu
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 14:14:41 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8DIEbjS038124
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 14:14:40 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cy7nyxdpq-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 14:14:39 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 13 Sep 2017 19:14:13 +0100
+References: <1505092240-10864-1-git-send-email-longpeng2@huawei.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 13 Sep 2017 20:14:05 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170913172941.5470-1-cohuck@redhat.com>
+In-Reply-To: <1505092240-10864-1-git-send-email-longpeng2@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] accel: default to an actually available
- accelerator
+Content-Transfer-Encoding: 8bit
+Message-Id: <2d8ae3d3-438b-da84-4959-cf63f4f4ce99@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [RFC 0/8] virtio-crypto: add multiplexing mode
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,26 +43,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, pbonzini@redhat.com, thuth@redhat.com, mreitz@redhat.com, kwolf@redhat.com, peter.maydell@linaro.org
+To: "Longpeng(Mike)" <longpeng2@huawei.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
+Cc: weidong.huang@huawei.com, mst@redhat.com, jasowang@redhat.com, john.griffin@intel.com, Varun.Sethi@freescale.com, denglingli@chinamobile.com, arei.gonglei@hotmail.com, agraf@suse.de, arei.gonglei@huawei.com, vincent.jardin@6wind.com, Ola.Liljedahl@arm.com, luonengjun@huawei.com, xin.zeng@intel.com, liang.j.ma@intel.com, stefanha@redhat.com, Jani.Kokkonen@huawei.com, brian.a.keating@intel.com, wangxinxin.wang@huawei.com, cohuck@redhat.com, mike.caraman@nxp.com
 
-On 09/13/2017 10:29 AM, Cornelia Huck wrote:
-> configure_accelerator() falls back to tcg if no accelerator has
-> been specified. Formerly, we could be sure that tcg is always
-> available; however, with --disable-tcg, this is not longer true,
-> and you are not able to start qemu without explicitly specifying
-> another accelerator on those builds.
+
+
+On 09/11/2017 03:10 AM, Longpeng(Mike) wrote:
+> *NOTE*
+> The code realization is based on the latest virtio crypto spec:
+>  [PATCH v19 0/2] virtio-crypto: virtio crypto device specification
+>    https://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg05217.html
 > 
-> Instead, choose an accelerator in the order tcg->kvm->hax.
+> In session mode, the process of create/close a session
+> makes we have a least one full round-trip cost from guest to host to guest
+> to be able to send any data for symmetric algorithms. It gets ourself into
+> synchronization troubles in some scenarios like a web server handling lots
+> of small requests whose algorithms and keys are different.
 > 
-> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> ---
-> RFC->v2:
-> - drop xen from the list of fallbacks
-> - use comma-delimited list of accelerators (much easier)
-> - changed one place in qemu-options.hx that had been missed
+> We can support one-blob request (no sessions) as well for symmetric
+> algorithms, including HASH, MAC services. The benefit is obvious for
+> HASH service because it's usually a one-blob operation.
+> 
 
-Queued to tcg-next.  Thanks,
+Hi!
+
+I've just started looking at this. Patch #1 modifies linux/virtio_crypto.h
+which if I compare with the (almost) latest linux master is different. Thus
+I would expect a corresponding kernel patch set too, but I haven't received
+one, nor did I find a reference in the cover letter.
+
+I think if I want to test the new features I need the kernel counter-part
+too, or?
+
+Could you point me to the kernel counterpart?
+
+Regards,
+Halil
 
 
-r~
+> Gonglei (3):
+>   virtio-crypto: add stateless crypto request handler
+>   cryptodev: extract one util function
+>   virtio-crypto: add host feature bits support
+> 
+> Longpeng(Mike) (5):
+>   virtio-crypto: add new definations for multiplexing mode
+>   virtio-crypto: add session creation logic for mux mode
+>   virtio-crypto: add dataq operation logic for mux mode
+>   cryptodev: add stateless mode cipher support
+>   cryptodev-builtin: add stateless cipher support
+> 
+>  backends/cryptodev-builtin.c                   | 189 ++++++++---
+>  backends/cryptodev.c                           |  21 ++
+>  hw/virtio/virtio-crypto.c                      | 433 +++++++++++++++++++++++--
+>  include/hw/virtio/virtio-crypto.h              |   2 +
+>  include/standard-headers/linux/virtio_crypto.h | 182 ++++++++++-
+>  include/sysemu/cryptodev.h                     |  21 ++
+>  6 files changed, 774 insertions(+), 74 deletions(-)
+> 
