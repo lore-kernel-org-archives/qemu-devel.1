@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42383)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42458)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ds5PP-0006Wr-KQ
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:46 -0400
+	(envelope-from <quintela@redhat.com>) id 1ds5PW-0006dp-UM
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ds5PO-00070h-LB
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56322)
+	(envelope-from <quintela@redhat.com>) id 1ds5PT-00074R-08
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43596)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ds5PO-00070K-Eb
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:42 -0400
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ds5PS-00073e-Eg
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 07:00:46 -0400
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
 	[10.5.11.16])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 698A9883A2
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 11:00:41 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id 69EB7155DF
+	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 11:00:45 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 13 Sep 2017 12:59:48 +0200
-Message-Id: <20170913105953.13760-16-quintela@redhat.com>
+Date: Wed, 13 Sep 2017 12:59:50 +0200
+Message-Id: <20170913105953.13760-18-quintela@redhat.com>
 In-Reply-To: <20170913105953.13760-1-quintela@redhat.com>
 References: <20170913105953.13760-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 15/20] migration: Send the fd number which
- we are going to use for this page
+Subject: [Qemu-devel] [PATCH v8 17/20] migration: Test new fd infrastructure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,67 +32,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-We are still sending the page through the main channel, that would
-change later in the series
+We just send the address through the alternate channels and test that it
+is ok.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+--
+
+Use qio_channel_*all functions
 ---
- migration/ram.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ migration/ram.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
 diff --git a/migration/ram.c b/migration/ram.c
-index 179b45eea7..3f60f7e40c 100644
+index d6aa516f6d..1b1e346ae0 100644
 --- a/migration/ram.c
 +++ b/migration/ram.c
-@@ -597,7 +597,7 @@ static uint16_t multifd_send_page(uint8_t *address, bool last_page)
-     qemu_mutex_unlock(&p->mutex);
-     qemu_sem_post(&p->sem);
- 
--    return 0;
-+    return i;
- }
- 
- struct MultiFDRecvParams {
-@@ -1186,6 +1186,7 @@ static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
-                             bool last_stage)
- {
-     int pages;
-+    uint16_t fd_num;
-     uint8_t *p;
-     RAMBlock *block = pss->block;
-     ram_addr_t offset = pss->page << TARGET_PAGE_BITS;
-@@ -1197,8 +1198,10 @@ static int ram_multifd_page(RAMState *rs, PageSearchStatus *pss,
-         ram_counters.transferred +=
-             save_page_header(rs, rs->f, block,
-                              offset | RAM_SAVE_FLAG_MULTIFD_PAGE);
-+        fd_num = multifd_send_page(p, rs->migration_dirty_pages == 1);
-+        qemu_put_be16(rs->f, fd_num);
-+        ram_counters.transferred += 2; /* size of fd_num */
-         qemu_put_buffer(rs->f, p, TARGET_PAGE_SIZE);
--        multifd_send_page(p, rs->migration_dirty_pages == 1);
-         ram_counters.transferred += TARGET_PAGE_SIZE;
-         pages = 1;
-         ram_counters.normal++;
-@@ -2948,6 +2951,7 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
-     while (!postcopy_running && !ret && !(flags & RAM_SAVE_FLAG_EOS)) {
-         ram_addr_t addr, total_ram_bytes;
-         void *host = NULL;
-+        uint16_t fd_num;
-         uint8_t ch;
- 
-         addr = qemu_get_be64(f);
-@@ -3058,6 +3062,11 @@ static int ram_load(QEMUFile *f, void *opaque, int version_id)
+@@ -496,8 +496,24 @@ static void *multifd_send_thread(void *opaque)
              break;
- 
-         case RAM_SAVE_FLAG_MULTIFD_PAGE:
-+            fd_num = qemu_get_be16(f);
-+            if (fd_num != 0) {
-+                /* this is yet an unused variable, changed later */
-+                fd_num = fd_num;
+         }
+         if (p->pages.num) {
++            Error *local_err = NULL;
++            size_t ret;
++            int i;
++            int num;
++
++            num = p->pages.num;
+             p->pages.num = 0;
+             qemu_mutex_unlock(&p->mutex);
++
++            for (i = 0; i < num; i++) {
++                ret = qio_channel_write_all(p->c,
++                         (const char *)&p->pages.iov[i].iov_base,
++                         sizeof(uint8_t *), &local_err);
++                if (ret != 0) {
++                    terminate_multifd_send_threads(local_err);
++                    return NULL;
++                }
 +            }
-             qemu_get_buffer(f, host, TARGET_PAGE_SIZE);
-             break;
+             qemu_mutex_lock(&multifd_send_state->mutex);
+             p->done = true;
+             qemu_mutex_unlock(&multifd_send_state->mutex);
+@@ -679,6 +695,7 @@ int multifd_load_cleanup(Error **errp)
+ static void *multifd_recv_thread(void *opaque)
+ {
+     MultiFDRecvParams *p = opaque;
++    uint8_t *recv_address;
  
+     qemu_sem_post(&p->ready);
+     while (true) {
+@@ -688,7 +705,29 @@ static void *multifd_recv_thread(void *opaque)
+             break;
+         }
+         if (p->pages.num) {
++            Error *local_err = NULL;
++            size_t ret;
++            int i;
++            int num;
++
++            num = p->pages.num;
+             p->pages.num = 0;
++
++            for (i = 0; i < num; i++) {
++                ret = qio_channel_read_all(p->c, (char *)&recv_address,
++                                           sizeof(uint8_t *), &local_err);
++                if (ret != 0) {
++                    terminate_multifd_recv_threads(local_err);
++                    return NULL;
++                }
++                if (recv_address != p->pages.iov[i].iov_base) {
++                    error_setg(&local_err, "received %p and expecting %p (%d)",
++                               recv_address, p->pages.iov[i].iov_base, i);
++                    terminate_multifd_recv_threads(local_err);
++                    return NULL;
++                }
++            }
++
+             p->done = true;
+             qemu_mutex_unlock(&p->mutex);
+             qemu_sem_post(&p->ready);
 -- 
 2.13.5
