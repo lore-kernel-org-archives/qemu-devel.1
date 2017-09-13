@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58444)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59267)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ds56d-0000KI-Fs
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:41:21 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1ds57e-00016g-F1
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:42:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1ds56Z-0004Qp-G9
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:41:19 -0400
-Received: from 4.mo2.mail-out.ovh.net ([87.98.172.75]:57807)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1ds56Z-0004PD-6y
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:41:15 -0400
-Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id ACC95A9602
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 12:41:12 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Wed, 13 Sep 2017 12:41:07 +0200
-Message-ID: <150529882490.818.398056435765712294.stgit@bahia.lan>
+	(envelope-from <vilanova@ac.upc.edu>) id 1ds57a-0005Qz-ER
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:42:22 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:35527)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1ds57a-0005PN-0R
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:42:18 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 13 Sep 2017 13:42:07 +0300
+Message-Id: <150529932725.10902.6569724074050775920.stgit@frigg.lan>
+In-Reply-To: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] spapr: fix the value of SDR1 in
- kvmppc_put_books_sregs()
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 12/22] instrument: Add event
+ 'guest_cpu_enter'
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,228 +28,214 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Sam Bobroff <sam.bobroff@au1.ibm.com>
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Paolo Bonzini <pbonzini@redhat.com>
 
-When running with KVM PR, if a new HPT is allocated we need to inform
-KVM about the HPT address and size. This is currently done by hacking
-the value of SDR1 and pushing it to KVM in several places.
-
-Also, migration breaks the guest since it is very unlikely the HPT has
-the same address in source and destination, but we push the incoming
-value of SDR1 to KVM anyway.
-
-This patch introduces a new virtual hypervisor hook so that the spapr
-code can provide the correct value of SDR1 to be pushed to KVM each
-time kvmppc_put_books_sregs() is called.
-
-It allows to get rid of all the hacking in the spapr/kvmppc code and
-it fixes migration of nested KVM PR.
-
-Suggested-by: David Gibson <david@gibson.dropbear.id.au>
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
 ---
+ instrument/control.c            |    9 ++++++++
+ instrument/events.h             |    5 ++++
+ instrument/events.inc.h         |   11 +++++++++
+ instrument/load.c               |    9 ++++++++
+ instrument/qemu-instr/control.h |   46 +++++++++++++++++++++++++++++++++=
+++++++
+ stubs/instrument.c              |    1 +
+ trace/control-target.c          |    2 ++
+ 7 files changed, 83 insertions(+)
 
-Unfortunately, this doesn't fix migration when using KVM PR on baremetal.
-I get tons of instruction emulation errors in the console when the guest
-resumes execution at the destination:
-
-[  833.585957] Couldn't emulate instruction 0x00000000 (op 0 xop 0)
-[  833.586818] kvmppc_exit_pr_progint: emulation at 60000000600e5bfc failed
- (00000000)
-[  833.674684] Couldn't emulate instruction 0x00000000 (op 0 xop 0)
-[  833.675370] kvmppc_exit_pr_progint: emulation at 60000000600e5bfc failed
- (00000000)
-[  833.676297] Couldn't emulate instruction 0x00000000 (op 0 xop 0)
-
-I still don't know what's happening here but I guess this is an issue in
-KVM.
-
- hw/ppc/spapr.c          |   13 +++++++++++++
- hw/ppc/spapr_cpu_core.c |   15 ---------------
- hw/ppc/spapr_hcall.c    |   14 --------------
- target/ppc/cpu.h        |    2 ++
- target/ppc/kvm.c        |   30 +++++-------------------------
- target/ppc/kvm_ppc.h    |    6 ------
- 6 files changed, 20 insertions(+), 60 deletions(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f680f28a15ea..7e7ae585a1b6 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1239,6 +1239,18 @@ static hwaddr spapr_hpt_mask(PPCVirtualHypervisor *vhyp)
-     return HTAB_SIZE(spapr) / HASH_PTEG_SIZE_64 - 1;
+diff --git a/instrument/control.c b/instrument/control.c
+index 8cf2b4f967..c4b3ca0440 100644
+--- a/instrument/control.c
++++ b/instrument/control.c
+@@ -49,3 +49,12 @@ SYM_PUBLIC void qi_set_fini(qi_fini_fn fn, void *data)
+     instr_set_event(fini_fn, fn);
+     instr_set_event(fini_data, data);
  }
- 
-+static void spapr_encode_hpt_for_kvm_pr(PPCVirtualHypervisor *vhyp,
-+                                        target_ulong *hpt)
++
++
++void (*instr_event__guest_cpu_enter)(QICPU vcpu);
++
++SYM_PUBLIC void qi_event_set_guest_cpu_enter(void (*fn)(QICPU vcpu))
 +{
-+    sPAPRMachineState *spapr = SPAPR_MACHINE(vhyp);
++    ERROR_IF(!instr_get_state(), "called outside instrumentation");
++    instr_set_event(guest_cpu_enter, fn);
++}
+diff --git a/instrument/events.h b/instrument/events.h
+index 82ad0bd827..947f120aa9 100644
+--- a/instrument/events.h
++++ b/instrument/events.h
+@@ -11,6 +11,7 @@
+ #define INSTRUMENT__EVENTS_H
+=20
+ #include "instrument/qemu-instr/control.h"
++#include "instrument/qemu-instr/types.h"
+=20
+ /**
+  * instr_get_event:
+@@ -32,6 +33,10 @@
+ extern qi_fini_fn instr_event__fini_fn;
+ extern void *instr_event__fini_data;
+=20
++extern void (*instr_event__guest_cpu_enter)(QICPU vcpu);
++static inline void instr_guest_cpu_enter(CPUState *vcpu);
 +
-+    assert(kvm_enabled());
 +
-+    if (spapr->htab) {
-+        *hpt = (target_ulong)(uintptr_t)spapr->htab | (spapr->htab_shift - 18);
+ #include "instrument/events.inc.h"
+=20
+ #endif  /* INSTRUMENT__EVENTS_H */
+diff --git a/instrument/events.inc.h b/instrument/events.inc.h
+index 8b1ce7fcb2..e3f8024716 100644
+--- a/instrument/events.inc.h
++++ b/instrument/events.inc.h
+@@ -7,5 +7,16 @@
+  * See the COPYING file in the top-level directory.
+  */
+=20
++#include "instrument/control.h"
+=20
+=20
++static inline void instr_guest_cpu_enter(CPUState *vcpu)
++{
++    void (*cb)(QICPU vcpu) =3D instr_get_event(guest_cpu_enter);
++    if (cb) {
++        QICPU vcpu_ =3D instr_cpu_to_qicpu(vcpu);
++        instr_set_state(INSTR_STATE_ENABLE);
++        (*cb)(vcpu_);
++        instr_set_state(INSTR_STATE_DISABLE);
 +    }
 +}
-+
- static const ppc_hash_pte64_t *spapr_map_hptes(PPCVirtualHypervisor *vhyp,
-                                                 hwaddr ptex, int n)
- {
-@@ -3603,6 +3615,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
-     vhc->unmap_hptes = spapr_unmap_hptes;
-     vhc->store_hpte = spapr_store_hpte;
-     vhc->get_patbe = spapr_get_patbe;
-+    vhc->encode_hpt_for_kvm_pr = spapr_encode_hpt_for_kvm_pr;
-     xic->ics_get = spapr_ics_get;
-     xic->ics_resend = spapr_ics_resend;
-     xic->icp_get = spapr_icp_get;
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index c08ee7571a50..c20b5c64b045 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -73,7 +73,6 @@ void spapr_cpu_parse_features(sPAPRMachineState *spapr)
- 
- static void spapr_cpu_reset(void *opaque)
- {
--    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
-     PowerPCCPU *cpu = opaque;
-     CPUState *cs = CPU(cpu);
-     CPUPPCState *env = &cpu->env;
-@@ -86,20 +85,6 @@ static void spapr_cpu_reset(void *opaque)
-     cs->halted = 1;
- 
-     env->spr[SPR_HIOR] = 0;
--
--    /*
--     * This is a hack for the benefit of KVM PR - it abuses the SDR1
--     * slot in kvm_sregs to communicate the userspace address of the
--     * HPT
--     */
--    if (kvm_enabled()) {
--        env->spr[SPR_SDR1] = (target_ulong)(uintptr_t)spapr->htab
--            | (spapr->htab_shift - 18);
--        if (kvmppc_put_books_sregs(cpu) < 0) {
--            error_report("Unable to update SDR1 in KVM");
--            exit(1);
--        }
--    }
- }
- 
- static void spapr_cpu_destroy(PowerPCCPU *cpu)
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index 57bb411394ed..840abff0e371 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -732,14 +732,6 @@ static target_ulong h_resize_hpt_commit(PowerPCCPU *cpu,
-         qemu_vfree(spapr->htab);
-         spapr->htab = pending->hpt;
-         spapr->htab_shift = pending->shift;
--
--        if (kvm_enabled()) {
--            /* For KVM PR, update the HPT pointer */
--            target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
--                | (spapr->htab_shift - 18);
--            kvmppc_update_sdr1(sdr1);
--        }
--
-         pending->hpt = NULL; /* so it's not free()d */
+diff --git a/instrument/load.c b/instrument/load.c
+index a01d66a4d4..218bca74b2 100644
+--- a/instrument/load.c
++++ b/instrument/load.c
+@@ -11,6 +11,7 @@
+ #include "qemu-common.h"
+=20
+ #include <dlfcn.h>
++#include "exec/cpu-common.h"
+ #include "instrument/control.h"
+ #include "instrument/events.h"
+ #include "instrument/load.h"
+@@ -109,6 +110,13 @@ InstrLoadError instr_load(const char *path, int argc=
+, const char **argv,
+         goto err;
      }
- 
-@@ -1564,12 +1556,6 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-              * the point this is called, nothing should have been
-              * entered into the existing HPT */
-             spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
--            if (kvm_enabled()) {
--                /* For KVM PR, update the HPT pointer */
--                target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
--                    | (spapr->htab_shift - 18);
--                kvmppc_update_sdr1(sdr1);
--            }
+=20
++    cpu_list_lock();
++    CPUState *cpu;
++    CPU_FOREACH(cpu) {
++        instr_guest_cpu_enter(cpu);
++    }
++    cpu_list_unlock();
++
+     res =3D INSTR_LOAD_OK;
+     goto out;
+=20
+@@ -138,6 +146,7 @@ InstrUnloadError instr_unload(const char *id)
+     }
+=20
+     instr_set_event(fini_fn, NULL);
++    instr_set_event(guest_cpu_enter, NULL);
+=20
+     /* this should never fail */
+     if (dlclose(handle->dlhandle) < 0) {
+diff --git a/instrument/qemu-instr/control.h b/instrument/qemu-instr/cont=
+rol.h
+index b841afaa31..f61e7a2b6e 100644
+--- a/instrument/qemu-instr/control.h
++++ b/instrument/qemu-instr/control.h
+@@ -16,6 +16,7 @@ extern "C" {
+=20
+ #include <stdbool.h>
+ #include <stddef.h>
++#include <qemu-instr/types.h>
+=20
+=20
+ /**
+@@ -39,6 +40,51 @@ typedef void (*qi_fini_fn)(void *arg);
+  */
+ void qi_set_fini(qi_fini_fn fn, void *data);
+=20
++
++/*
++ * Set callbacks for available events. Each event has a short descriptio=
+n and
++ * various indicators of when it can be triggered:
++ *
++ * - Mode :: user
++ *   Triggered in QEMU user application emulation (e.g., linux-user).
++ *
++ * - Mode :: softmmy
++ *   Triggered in QEMU full-system emulation.
++ *
++ *
++ * - Targets :: all
++ *   Triggered on all targets, both using TCG or native hardware virtual=
+ization
++ *   (e.g., KVM).
++ *
++ * - Targets :: TCG(<arch>)
++ *   Triggered on the given guest target architectures when executing wi=
+th TCG
++ *   (no native hardware virtualization).
++ *
++ *
++ * - Time :: exec
++ *   Triggered when the guest executes the described operation.
++ *
++ * - Time :: trans
++ *   Triggered when QEMU translates a guest operation. This is only avai=
+lable
++ *   when executing with TCG. Guest instructions are decompiled and tran=
+slated
++ *   into the intermediate TCG language (when "Time: trans" events are
++ *   triggered). Then, the TCG compiler translates TCG code into the nat=
+ive host
++ *   code that QEMU will execute to emulate the guest (when "Time: exec"=
+ events
++ *   are triggered). As QEMU uses a cache of translated code, the same
++ *   instruction might be translated more than once (when the cache over=
+flows).
++ */
++
++/*
++ * Hot-plug a new virtual (guest) CPU.
++ *
++ * Also triggered on each CPU when an instrumentation library is loaded.
++ *
++ * Mode: user, softmmu
++ * Targets: all
++ * Time: exec
++ */
++void qi_event_set_guest_cpu_enter(void (*fn)(QICPU vcpu));
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/stubs/instrument.c b/stubs/instrument.c
+index 560844469c..abed583a56 100644
+--- a/stubs/instrument.c
++++ b/stubs/instrument.c
+@@ -42,3 +42,4 @@ void qmp_instr_unload(const char *id, Error **errp)
+=20
+=20
+ __thread InstrState instr_cur_state;
++void (*instr_event__guest_cpu_enter)(QICPU *vcpu);
+diff --git a/trace/control-target.c b/trace/control-target.c
+index 706b2cee9d..f22688bcd5 100644
+--- a/trace/control-target.c
++++ b/trace/control-target.c
+@@ -9,6 +9,7 @@
+=20
+ #include "qemu/osdep.h"
+ #include "cpu.h"
++#include "instrument/events.h"
+ #include "trace-root.h"
+ #include "trace/control.h"
+ #include "translate-all.h"
+@@ -146,5 +147,6 @@ void trace_init_vcpu(CPUState *vcpu)
+             }
          }
      }
- 
-diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
-index c9d3ffa89bcb..12e0b6e74876 100644
---- a/target/ppc/cpu.h
-+++ b/target/ppc/cpu.h
-@@ -1243,6 +1243,8 @@ struct PPCVirtualHypervisorClass {
-     void (*store_hpte)(PPCVirtualHypervisor *vhyp, hwaddr ptex,
-                        uint64_t pte0, uint64_t pte1);
-     uint64_t (*get_patbe)(PPCVirtualHypervisor *vhyp);
-+    void (*encode_hpt_for_kvm_pr)(PPCVirtualHypervisor *vhyp,
-+                                  target_ulong *hpt);
- };
- 
- #define TYPE_PPC_VIRTUAL_HYPERVISOR "ppc-virtual-hypervisor"
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 6442dfcb95b3..8edc05fc6a83 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -941,7 +941,11 @@ int kvmppc_put_books_sregs(PowerPCCPU *cpu)
- 
-     sregs.pvr = env->spr[SPR_PVR];
- 
--    sregs.u.s.sdr1 = env->spr[SPR_SDR1];
-+    if (cpu->vhyp) {
-+        PPCVirtualHypervisorClass *vhc =
-+            PPC_VIRTUAL_HYPERVISOR_GET_CLASS(cpu->vhyp);
-+        vhc->encode_hpt_for_kvm_pr(cpu->vhyp, &sregs.u.s.sdr1);
-+    }
- 
-     /* Sync SLB */
- #ifdef TARGET_PPC64
-@@ -2806,30 +2810,6 @@ int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift)
-     return kvm_vm_ioctl(cs->kvm_state, KVM_PPC_RESIZE_HPT_COMMIT, &rhpt);
++    instr_guest_cpu_enter(vcpu);
+     trace_guest_cpu_enter(vcpu);
  }
- 
--static void kvmppc_pivot_hpt_cpu(CPUState *cs, run_on_cpu_data arg)
--{
--    target_ulong sdr1 = arg.target_ptr;
--    PowerPCCPU *cpu = POWERPC_CPU(cs);
--    CPUPPCState *env = &cpu->env;
--
--    /* This is just for the benefit of PR KVM */
--    cpu_synchronize_state(cs);
--    env->spr[SPR_SDR1] = sdr1;
--    if (kvmppc_put_books_sregs(cpu) < 0) {
--        error_report("Unable to update SDR1 in KVM");
--        exit(1);
--    }
--}
--
--void kvmppc_update_sdr1(target_ulong sdr1)
--{
--    CPUState *cs;
--
--    CPU_FOREACH(cs) {
--        run_on_cpu(cs, kvmppc_pivot_hpt_cpu, RUN_ON_CPU_TARGET_PTR(sdr1));
--    }
--}
--
- /*
-  * This is a helper function to detect a post migration scenario
-  * in which a guest, running as KVM-HV, freezes in cpu_post_load because
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index f780e6ec7b72..21571edd7910 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -68,7 +68,6 @@ PowerPCCPUClass *kvm_ppc_get_host_cpu_class(void);
- void kvmppc_check_papr_resize_hpt(Error **errp);
- int kvmppc_resize_hpt_prepare(PowerPCCPU *cpu, target_ulong flags, int shift);
- int kvmppc_resize_hpt_commit(PowerPCCPU *cpu, target_ulong flags, int shift);
--void kvmppc_update_sdr1(target_ulong sdr1);
- bool kvmppc_pvr_workaround_required(PowerPCCPU *cpu);
- 
- bool kvmppc_is_mem_backend_page_size_ok(const char *obj_path);
-@@ -331,11 +330,6 @@ static inline int kvmppc_resize_hpt_commit(PowerPCCPU *cpu,
-     return -ENOSYS;
- }
- 
--static inline void kvmppc_update_sdr1(target_ulong sdr1)
--{
--    abort();
--}
--
- #endif
- 
- #ifndef CONFIG_KVM
