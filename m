@@ -1,34 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ds2XW-0000Zr-Fc
+	(envelope-from <bounces@canonical.com>) id 1ds2XW-0000Zl-Fb
 	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:56:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ds2XT-00064T-9N
+	(envelope-from <bounces@canonical.com>) id 1ds2XT-00064r-H7
 	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:56:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43862)
+Received: from indium.canonical.com ([91.189.90.7]:43876)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ds2XT-00063B-3H
+	id 1ds2XT-00063c-Bf
 	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:56:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ds2XQ-000495-Ut
+	id 1ds2XR-00048k-GN
 	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:56:49 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 335FC2E84B1
+	by loganberry.canonical.com (Postfix) with ESMTP id BDDB32E84A3
 	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:56:48 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 13 Sep 2017 07:41:24 -0000
-From: Thomas Huth <894037@bugs.launchpad.net>
-Reply-To: Bug 894037 <894037@bugs.launchpad.net>
+Date: Wed, 13 Sep 2017 07:43:58 -0000
+From: Thomas Huth <839790@bugs.launchpad.net>
+Reply-To: Bug 839790 <839790@bugs.launchpad.net>
 Sender: bounces@canonical.com
-References: <20111123154622.32156.92088.malonedeb@gac.canonical.com>
-Message-Id: <150528848440.13201.13494172444926246211.malone@gac.canonical.com>
+References: <20110902181253.1208.72905.malonedeb@wampee.canonical.com>
+Message-Id: <150528863897.29215.14714501127935004053.malone@chaenomeles.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 894037] Re: With VNC,
- "-usbdevice tablet" no longer makes mouse pointers line up
+Subject: [Qemu-devel] [Bug 839790] Re: -usbdevice tablet broken on win XP
+ client
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,9 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-There hasn't been a reply to my question in the last comment within
-months, so I assume nobody cares about this anymore. So I'm closing this
-ticket now...
+According to the Fedora bug, this has been fixed. And since there wasn't
+any reply to the question in my last comment, I assume nobody
+experiences this issue anymore. So closing this ticket now...
 
 ** Changed in: qemu
        Status: Incomplete =3D> Fix Released
@@ -50,36 +50,37 @@ ticket now...
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/894037
+https://bugs.launchpad.net/bugs/839790
 
 Title:
-  With VNC, "-usbdevice tablet" no longer makes mouse pointers line up
+  -usbdevice tablet broken on win XP client
 
 Status in QEMU:
   Fix Released
 
 Bug description:
-  I use qemu in VNC mode.  In order to get the client and server mouse
-  pointers to line up, I've had to use the "-usbdevice tablet" option.
-  This no longer works, and it behaves the same as if the option is not
-  there.  This makes my VMs unusable to me.
+  I'm using the qemu-kvm package from arch (not the qemu package), and
+  on prior versions of qemu-kvm I was able to use -usbdevide tablet
+  without problems.  The absolute mouse position is great...  With
+  current version of qemu-kvm, when I use -usbdevice tablet, I got no
+  mouse at all.  As my client is windows XP, it's not good to try do
+  anything without mouse, :-)
 
-  Here's how I'm booting WinXP:
+  I searched in current bugs, and didn't find any bug which subject
+  included "tablet", so I'm submitting this bug...
 
-  qemu-system-x86_64 -vga std -drive
-  cache=3Dwriteback,index=3D0,media=3Ddisk,file=3Dwinxp.img -k en-us -m 2048
-  -smp 2 -vnc :3101 -usbdevice tablet -boot c -enable-kvm &
+  Current qemu-kvm package in arch I'm using is:
 
-  The Windows install hasn't changed, only qemu.
+  % pacman -Ss qemu-kvm
+  extra/qemu-kvm 0.15.0-2 [installed]
+      Latest KVM QEMU is a generic and open source processor emulator which=
+ achieves a good emulation speed by using dynamic translation.
 
-  I'm running this version of QEMU:
+  Please notice I do not get any error, just the mouse broken...
 
-  QEMU emulator version 0.15.0 (qemu-kvm-0.15.0), Copyright (c)
-  2003-2008 Fabrice Bellard
+  thanks,
 
-  I'll see about upgrading to 0.15.1, but since I haven't seen other
-  reports of this particular problem in your DB, I'm assuming that this
-  problem has not been fixed between 0.15.0 and 0.15.1.
+  Javier.
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/894037/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/839790/+subscriptions
