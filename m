@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42416)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ds4f1-0007KR-Sa
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:12:48 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1ds4gJ-000889-PN
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:14:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1ds4ey-0005eG-MZ
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:12:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60642)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1ds4ey-0005dn-GN
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:12:44 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A1DD7356F6
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 10:12:43 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170811145601.GP2554@redhat.com> (Daniel P. Berrange's message
-	of "Fri, 11 Aug 2017 15:56:01 +0100")
-References: <20170808162629.32493-1-quintela@redhat.com>
-	<20170808162629.32493-8-quintela@redhat.com>
-	<20170811145601.GP2554@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 13 Sep 2017 12:12:39 +0200
-Message-ID: <87d16uewko.fsf@secure.laptop>
+	(envelope-from <vilanova@ac.upc.edu>) id 1ds4gF-0006bs-Kj
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:14:07 -0400
+Received: from roura.ac.upc.es ([147.83.33.10]:59537)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <vilanova@ac.upc.edu>) id 1ds4gF-0006bK-98
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 06:14:03 -0400
+From: =?utf-8?b?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>
+Date: Wed, 13 Sep 2017 13:13:53 +0300
+Message-Id: <150529763287.10902.10736733334663967708.stgit@frigg.lan>
+In-Reply-To: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH v6 07/19] migration: Create
- x-multifd-threads parameter
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v6 05/22] instrument: [bsd-user] Add command
+ line library loader
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,31 +27,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: qemu-devel@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, "Emilio G. Cota" <cota@braap.org>, Stefan Hajnoczi <stefanha@redhat.com>
 
-"Daniel P. Berrange" <berrange@redhat.com> wrote:
-> On Tue, Aug 08, 2017 at 06:26:17PM +0200, Juan Quintela wrote:
->> Indicates the number of threads that we would create.  By default we
->> create 2 threads.
->>  # 	migrated and the destination must already have access to the
->>  # 	same backing chain as was used on the source.  (since 2.10)
->>  #
->> +# @x-multifd-threads: Number of threads used to migrate data in
->> +#                     parallel. This is the same number that the
->> +#                     number of sockets used for migration.
->> +#                     The default value is 2 (since 2.11)
->
-> The feature is called "multifd" but we're configuring number of threads,
-> with the implicit suggestion that number of threads == number of sockets.
->
-> I wonder if its better to call this  "x-multifd-connections" so that it
-> is explicit that we're determining the number of socket connections.
->
-> This leaves room for adapting code to use a different number of threads,
-> but same number of sockets. eg with post-copy, there's potential to have
-> 2 threads for each socket (1 reading, 1 writing).
+Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+---
+ bsd-user/main.c    |   17 +++++++++++++++++
+ bsd-user/syscall.c |    5 +++++
+ 2 files changed, 22 insertions(+)
 
-Changed to channels, is that ok for you?
-
-Later, Juan.
+diff --git a/bsd-user/main.c b/bsd-user/main.c
+index 8a6706a1c8..104844edfc 100644
+--- a/bsd-user/main.c
++++ b/bsd-user/main.c
+@@ -33,6 +33,7 @@
+ #include "exec/log.h"
+ #include "trace/control.h"
+ #include "glib-compat.h"
++#include "instrument/cmdline.h"
+=20
+ int singlestep;
+ unsigned long mmap_min_addr;
+@@ -667,6 +668,11 @@ static void usage(void)
+            "-B address        set guest_base address to address\n"
+            "-bsd type         select emulated BSD type FreeBSD/NetBSD/Op=
+enBSD (default)\n"
+            "\n"
++#if defined(CONFIG_INSTRUMENT)
++           "-instr [file=3D]<file>[,arg=3D<string>]\n"
++           "                  load an instrumentation library\n"
++           "\n"
++#endif
+            "Debug options:\n"
+            "-d item1[,...]    enable logging of specified items\n"
+            "                  (use '-d help' for a list of log items)\n"
+@@ -738,6 +744,9 @@ int main(int argc, char **argv)
+     envlist_t *envlist =3D NULL;
+     char *trace_file =3D NULL;
+     bsd_type =3D target_openbsd;
++    char *instrument_path =3D NULL;
++    int instrument_argc =3D 0;
++    const char **instrument_argv =3D NULL;
+=20
+     if (argc <=3D 1)
+         usage();
+@@ -756,6 +765,9 @@ int main(int argc, char **argv)
+     cpu_model =3D NULL;
+=20
+     qemu_add_opts(&qemu_trace_opts);
++#if defined(CONFIG_INSTRUMENT)
++    qemu_add_opts(&qemu_instr_opts);
++#endif
+=20
+     optind =3D 1;
+     for (;;) {
+@@ -843,6 +855,9 @@ int main(int argc, char **argv)
+         } else if (!strcmp(r, "trace")) {
+             g_free(trace_file);
+             trace_file =3D trace_opt_parse(optarg);
++        } else if (!strcmp(r, "instr")) {
++            instr_opt_parse(optarg, &instrument_path,
++                            &instrument_argc, &instrument_argv);
+         } else {
+             usage();
+         }
+@@ -872,6 +887,8 @@ int main(int argc, char **argv)
+     }
+     trace_init_file(trace_file);
+=20
++    instr_init(instrument_path, instrument_argc, instrument_argv);
++
+     /* Zero out regs */
+     memset(regs, 0, sizeof(struct target_pt_regs));
+=20
+diff --git a/bsd-user/syscall.c b/bsd-user/syscall.c
+index 66492aaf5d..3230f722f3 100644
+--- a/bsd-user/syscall.c
++++ b/bsd-user/syscall.c
+@@ -26,6 +26,8 @@
+=20
+ #include "qemu.h"
+ #include "qemu-common.h"
++#include "instrument/cmdline.h"
++
+=20
+ //#define DEBUG
+=20
+@@ -332,6 +334,7 @@ abi_long do_freebsd_syscall(void *cpu_env, int num, a=
+bi_long arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        instr_fini();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret =3D 0; /* avoid warning */
+@@ -430,6 +433,7 @@ abi_long do_netbsd_syscall(void *cpu_env, int num, ab=
+i_long arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        instr_fini();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret =3D 0; /* avoid warning */
+@@ -505,6 +509,7 @@ abi_long do_openbsd_syscall(void *cpu_env, int num, a=
+bi_long arg1,
+         _mcleanup();
+ #endif
+         gdb_exit(cpu_env, arg1);
++        instr_fini();
+         /* XXX: should free thread stack and CPU env */
+         _exit(arg1);
+         ret =3D 0; /* avoid warning */
