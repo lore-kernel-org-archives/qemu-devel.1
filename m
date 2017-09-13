@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ds114-0003yT-On
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 02:19:19 -0400
+	(envelope-from <thuth@redhat.com>) id 1ds1SZ-00031h-1L
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 02:47:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1ds111-0002nC-L0
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 02:19:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33858)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1ds111-0002m8-Eq
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 02:19:15 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 3C6ABC04B31B
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 06:19:14 +0000 (UTC)
-From: Peter Xu <peterx@redhat.com>
-Date: Wed, 13 Sep 2017 14:19:04 +0800
-Message-Id: <1505283544-25892-1-git-send-email-peterx@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1ds1SY-0005Bw-6U
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 02:47:43 -0400
+References: <20170912144459.11359-1-pbonzini@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <83c3006b-d62e-441b-57f1-dea64b141c11@redhat.com>
+Date: Wed, 13 Sep 2017 08:47:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] MAINTAINERS: add DUMP entry
+In-Reply-To: <20170912144459.11359-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 00/10] cleanup qemu-iotests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,33 +23,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peterx@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org
 
-Add Marc-Andr=C3=A9 Lureau and Peter Xu as dump maintainers.
+On 12.09.2017 16:44, Paolo Bonzini wrote:
+> The purpose of this series is to separate the "check" sources from
+> the tests.  After these patches, common.config is reduced to simple
+> shell initialization, and common.rc is only included by the tests.
+> 
+> Along the way, a lot of dead code is removed too.
+> 
+> In v2, the following patches:
+> 
+>   qemu-iotests: do not do useless search for QEMU_*_PROG
+>   qemu-iotests: do not search for binaries in the current directory
+>   qemu-iotests: include common.env and common.config early
+> 
+> have been replaced by "qemu-iotests: cleanup and fix search for programs",
+> which also preserves the behavior of searching for programs as symlinks
+> in the current directory.
+> 
+> Paolo
+> 
+> Paolo Bonzini (10):
+>   qemu-iotests: remove dead code
+>   qemu-iotests: get rid of AWK_PROG
+>   qemu-iotests: move "check" code out of common.rc
+>   qemu-iotests: cleanup and fix search for programs
+>   qemu-iotests: limit non-_PROG-suffixed variables to common.rc
+>   qemu-iotests: do not include common.rc in "check"
+>   qemu-iotests: disintegrate more parts of common.config
+>   qemu-iotests: fix uninitialized variable
+>   qemu-iotests: get rid of $iam
+>   qemu-iotests: merge "check" and "common"
+> 
+>  tests/qemu-iotests/039.out       |  10 +-
+>  tests/qemu-iotests/061.out       |   4 +-
+>  tests/qemu-iotests/137.out       |   2 +-
+>  tests/qemu-iotests/check         | 575 ++++++++++++++++++++++++++++++++++-----
+>  tests/qemu-iotests/common        | 459 -------------------------------
+>  tests/qemu-iotests/common.config | 206 +-------------
+>  tests/qemu-iotests/common.qemu   |   1 +
+>  tests/qemu-iotests/common.rc     | 205 +++++++-------
 
-CC: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
+Meta comment: Could we maybe also rename "tests/qemu-iotests" to
+"tests/iotests" ? The "qemu" prefix sounds always very superfluous to me
+here...
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 36eeb42..31ede5f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1248,6 +1248,12 @@ F: docs/bitmaps.md
- T: git git://github.com/famz/qemu.git bitmaps
- T: git git://github.com/jnsnow/qemu.git bitmaps
-=20
-+DUMP
-+M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-+M: Peter Xu <peterx@redhat.com
-+S: Maintained
-+F: dump.c
-+
- Character device backends
- M: Paolo Bonzini <pbonzini@redhat.com>
- M: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
---=20
-2.7.4
+ Thomas
