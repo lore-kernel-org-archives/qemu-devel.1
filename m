@@ -1,34 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46731)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47607)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ds2XW-0000Zu-Fe
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:56:55 -0400
+	(envelope-from <cohuck@redhat.com>) id 1ds2Yn-00036v-NH
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:58:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1ds2XU-00065y-Bl
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:56:54 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43898)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1ds2XT-00064O-SI
-	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:56:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1ds2XS-00048e-74
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:56:50 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 829712E84A7
-	for <qemu-devel@nongnu.org>; Wed, 13 Sep 2017 07:56:49 +0000 (UTC)
+	(envelope-from <cohuck@redhat.com>) id 1ds2Yj-0007cG-5j
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:58:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45718)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1ds2Yi-0007bO-Ul
+	for qemu-devel@nongnu.org; Wed, 13 Sep 2017 03:58:09 -0400
+Date: Wed, 13 Sep 2017 09:58:04 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170913095804.4871ffc9.cohuck@redhat.com>
+In-Reply-To: <CAJ+F1CLYrsOXO74nV4zpKffJgMkSPmBi84ARs22EJGAe0xTC0A@mail.gmail.com>
+References: <20170911132627.9505-1-cohuck@redhat.com>
+	<20170912033333.GA29091@pxdev.xzpeter.org>
+	<CAJ+F1CLYrsOXO74nV4zpKffJgMkSPmBi84ARs22EJGAe0xTC0A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Wed, 13 Sep 2017 07:45:38 -0000
-From: Thomas Huth <808588@bugs.launchpad.net>
-Reply-To: Bug 808588 <808588@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20110711030201.19964.12865.malonedeb@gac.canonical.com>
-Message-Id: <150528873894.31818.3946146637738497300.malone@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 808588] Re: Netperf tests cause i82551 network
- down
+Subject: Re: [Qemu-devel] [PATCH] dump: do not dump non-existent guest memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,89 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@gmail.com>
+Cc: Peter Xu <peterx@redhat.com>, Laurent Vivier <lvivier@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-There hasn't been a reply to my question in the last comment within
-months, so I assume nobody cares about this anymore. So I'm closing this
-ticket now...
+On Tue, 12 Sep 2017 12:17:51 +0200
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
 
-** Changed in: qemu
-       Status: Incomplete =3D> Fix Released
+> Hi Peter
+>=20
+> On Tue, Sep 12, 2017 at 5:33 AM, Peter Xu <peterx@redhat.com> wrote:
+> > On Mon, Sep 11, 2017 at 03:26:27PM +0200, Cornelia Huck wrote: =20
+> >> It does not really make sense to dump memory that is not there.
+> >>
+> >> Moreover, that fixes a segmentation fault when calling dump-guest-memo=
+ry
+> >> with no filter for a machine with no memory defined.
+> >>
+> >> New behaviour is:
+> >>
+> >> (qemu) dump-guest-memory /dev/null
+> >> dump: no guest memory to dump
+> >> (qemu) dump-guest-memory /dev/null 0 4096
+> >> dump: no guest memory to dump
+> >>
+> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >> ---
+> >>
+> >> Another unmaintained file. Joy. cc:ing some more-or-less random folks.=
+ =20
+> >
+> > I thought Marc-Andr=C3=A9 had proposed to be the maintainer? But indeed=
+ I
+> > didn't see the line in maintainer file.
+> >
+> > Anyway, if anyone think I am ok to maintain this single file
+> > (considering that I haven't posted patches on it for 2 years, and I
+> > haven't been working on any kind of maintainer job), please let me
+> > know. I'm glad to start with it (or with Marc-Andr=C3=A9).
+> > =20
+>=20
+> That would be great!
+> thanks
 
--- =
+Now on to the most important question: Will you merge this patch? :)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/808588
-
-Title:
-  Netperf tests cause i82551 network down
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  1. boot up a guest with 82551 nic
-  # qemu-kvm -net nic,model=3Di82551 ...
-  2. launch netperf server in the guest
-  3.on the host =
-
-  for b in 32 64 128 256 512 1024 1460 2048 4096 8192  9000 16384 32768  65=
-495 65507
-  do ./netperf -t TCP_STREAM -f m -H <guest ip> -P 0 -l 10 -- -m $b
-  done
-
-  for b in 32 64 128 256 512 1024 1460 2048 4096 8192  9000 16384 32768  65=
-495 65507
-  do ./netperf -t UDP_STREAM -f m -H <guest ip> -P 0 -l 10 -- -m $b
-  done
-
-  =
-
-  Result:
-  Guest network becomes down
-
-  =
-
-  netperf client output:
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 32
-   87380  16384     32    10.97      19.61
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 64
-   87380  16384     64    11.55      79.68
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 128
-   87380  16384    128    10.16      14.20
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 256
-   87380  16384    256    11.17      12.85
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 512
-   87380  16384    512    10.01      16.38
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 1024
-  Interrupted system call
-  netperf: remote error 4./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l=
- 10 -- -m 1460
-  establish control: are you sure there is a netserver listening on 10.66.9=
-.39 at port 12865?
-  establish_control could not establish the control connection from 0.0.0.0=
- port 0 address family AF_UNSPEC to 10.66.9.39 port 12865 address family AF=
-_UNSPEC
-  ./netperf -t TCP_STREAM -f m -H 10.66.9.39 -P 0 -l 10 -- -m 2048
-
-  =
-
-  qemu debug message:
-  ....
-  EE100   nic_receive             command 0x0000, link 0x3d3e6822, addr 0xf=
-fffffff, size 1518
-  EE100   nic_can_receive         0x29a0180
-  EE100   nic_receive             0x29a0180 received broadcast, len=3D60
-  EE100   nic_receive             Receive buffer (0 bytes) too small for da=
-ta (60 bytes); data truncated
-  EE100   nic_receive             command 0x8000, link 0x37b32022, addr 0xf=
-fffffff, size 0
-                                                   ^^^^^^^^^^^^^^^^^^^^^^^^=
-^^^^^^^^^^^^^^^^^^^^^^
-  EE100   nic_receive             receive: Running out of frames
-                                                   ^^^^^^^^^^^^^^^^^^^^^^^^
-  EE100   eepro100_write1         addr=3DCommand/Status+1 val=3D0x20
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/808588/+subscriptions
+(It should probably go together with "tests/hmp: test "none" machine
+with memory".)
