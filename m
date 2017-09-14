@@ -1,28 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59035)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59571)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dsTM9-00071B-GN
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:34:58 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dsTNS-0007lp-NX
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:36:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dsTM8-0001Mx-Bb
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:34:57 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:47982)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dsTM8-0001Jv-3y
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:34:56 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id 13so593524wmq.2
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 05:34:55 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <633f5a2d-a333-5c78-1e0c-3af2a4c896f9@linaro.org>
-References: <CGME20170908110212eucas1p27c5eecf44c5501d23b322d3679a4f12d@eucas1p2.samsung.com>
-	<001801d32891$ec40b930$c4c22b90$@samsung.com>
-	<633f5a2d-a333-5c78-1e0c-3af2a4c896f9@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Sep 2017 13:34:34 +0100
-Message-ID: <CAFEAcA91W=NxnVkacqD+vH-73H+aGej2E+qm_YQMY9rpF8aMsw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/1] AArch64: Fix single
- stepping of ERET instruction
+	(envelope-from <dgilbert@redhat.com>) id 1dsTNN-0004ZG-QN
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:36:18 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52390)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dsTNN-0004X9-LG
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:36:13 -0400
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Thu, 14 Sep 2017 13:36:09 +0100
+Message-Id: <20170914123609.497-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PATCH] sparc: Fix typedef clash
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,24 +21,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: Jaroslaw Pelczar <j.pelczar@samsung.com>, QEMU Developers <qemu-devel@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com, imammedo@redhat.com
 
-On 8 September 2017 at 17:58, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> On 09/08/2017 04:02 AM, Jaroslaw Pelczar wrote:
->> Previously when single stepping through ERET instruction via GDB
->> would result in debugger entering the "next" PC after ERET instruction.
->> When debugging in kernel mode, this will also cause unintended behavior,
->> because debugger will try to access memory from EL0 point of view.
->>
->> Signed-off-by: Jaroslaw Pelczar <j.pelczar@samsung.com>
->> ---
->>  target/arm/translate-a64.c | 1 +
->>  1 file changed, 1 insertion(+)
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Applied, thanks.
+Older compilers (rhel6) don't like redefinition of typedefs
 
--- PMM
+Fixes: 12a6c15ef31c98ecefa63e91ac36955383038384
+
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ target/sparc/cpu.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index b45cfb4708..1598f65927 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -240,7 +240,7 @@ typedef struct trap_state {
+ #endif
+ #define TARGET_INSN_START_EXTRA_WORDS 1
+ 
+-typedef struct sparc_def_t {
++struct sparc_def_t {
+     const char *name;
+     target_ulong iu_version;
+     uint32_t fpu_version;
+@@ -254,7 +254,7 @@ typedef struct sparc_def_t {
+     uint32_t features;
+     uint32_t nwindows;
+     uint32_t maxtl;
+-} sparc_def_t;
++};
+ 
+ #define CPU_FEATURE_FLOAT        (1 << 0)
+ #define CPU_FEATURE_FLOAT128     (1 << 1)
+-- 
+2.13.5
