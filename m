@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56820)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dsRZi-0006q0-15
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:40:51 -0400
+	(envelope-from <groug@kaod.org>) id 1dsRgt-0005Dz-5X
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:48:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dsRZc-0001wo-VE
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:40:50 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:37125)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
-	id 1dsRZc-0001tf-4g
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:40:44 -0400
-Received: by mail-wm0-x242.google.com with SMTP id f4so2872766wmh.4
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 03:40:42 -0700 (PDT)
-From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Date: Thu, 14 Sep 2017 06:40:04 -0400
-Message-Id: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Subject: [Qemu-devel] [PATCH v11 0/6] fsdev: qmp interface for io throttling
+	(envelope-from <groug@kaod.org>) id 1dsRgp-0008NZ-1n
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:48:15 -0400
+Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:47414)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dsRgo-0008MA-Rb
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:48:10 -0400
+Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 45C83A2DA7
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 12:48:09 +0200 (CEST)
+From: Greg Kurz <groug@kaod.org>
+Date: Thu, 14 Sep 2017 12:48:04 +0200
+Message-ID: <150538608438.12346.9391407971434352383.stgit@bahia.lan>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Subject: [Qemu-devel] [PATCH] ppc/kvm: use kvm_vm_check_extension() in
+ kvmppc_is_pr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,99 +28,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
 
-These patches provide the qmp interface, to query the io throttle 
-status of the all fsdev devices that are present in a vm.
-also, it provides an interface to set the io throttle parameters of a
-fsdev to a required value. Some of the patches also remove the
-duplicate code that was present in block and fsdev files. 
+If the host has both KVM PR and KVM HV loaded and we pass:
 
-Pradeep Jagadeesh (6):
-  throttle: factor out duplicate code
-  qmp: Use ThrottleLimits structure
-  qmp: factor out throttle code to reuse code
-  hmp: create a throttle initialization function for code reuse
-  fsdev: QMP interface for throttling
-  fsdev: hmp interface for throttling
+	-machine pseries,accel=kvm,kvm-type=PR
 
- Makefile                        |   3 +-
- blockdev.c                      |  97 ++--------------------------
- fsdev/qemu-fsdev-dummy.c        |  11 ++++
- fsdev/qemu-fsdev-throttle.c     | 140 ++++++++++++++++++++++++++--------------
- fsdev/qemu-fsdev-throttle.h     |   9 ++-
- fsdev/qemu-fsdev.c              |  30 +++++++++
- hmp-commands-info.hx            |  18 ++++++
- hmp-commands.hx                 |  19 ++++++
- hmp.c                           |  79 +++++++++++++++++++++--
- hmp.h                           |   4 ++
- include/qemu/throttle-options.h |   3 +
- include/qemu/throttle.h         |   4 +-
- include/qemu/typedefs.h         |   1 +
- monitor.c                       |   5 ++
- qapi-schema.json                |   4 ++
- qapi/block-core.json            |  78 ++--------------------
- qapi/fsdev.json                 |  81 +++++++++++++++++++++++
- qmp.c                           |  14 ++++
- util/throttle.c                 |  52 +++++++++++++++
- 19 files changed, 426 insertions(+), 226 deletions(-)
- create mode 100644 qapi/fsdev.json
+the kvmppc_is_pr() returns false instead of true. Since the helper
+is mostly used as fallback, it doesn't have any real impact with
+recent kernels. A notable exception is the workaround to allow
+migration between compatible hosts with different PVRs (eg, POWER8
+and POWER8E), since KVM still doesn't provide a way to check if a
+specific PVR is supported (see commit c363a37a450f for details).
 
-v0 -> v1:
- Addressed comments from Eric Blake, Greg Kurz and Daniel P.Berrange
- Mainly renaming the functions and removing the redundant code.
+According to the official KVM API documentation [1], KVM_PPC_GET_PVINFO
+is "vm ioctl", but we check it as a global ioctl. The following function
+in KVM is hence called with kvm == NULL and considers we're in HV mode.
 
-v1 -> v2:
- Addressed comments from Eric Blake and Greg Kurz.
- As per the suggestion I split the patches into smaller patches.
- Removed some more duplicate code.
+int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+{
+	int r;
+	/* Assume we're using HV mode when the HV module is loaded */
+	int hv_enabled = kvmppc_hv_ops ? 1 : 0;
 
-v2 -> v3:
- Addresssed comments from Alberto Garcia.
- Changed the comment from block to iothrottle in the iothrottle.json 
- Added the dummy functions in qemu-fsdev-dummy.c to address the compilation
- issues that were observed.
+	if (kvm) {
+		/*
+		 * Hooray - we know which VM type we're running on. Depend on
+		 * that rather than the guess above.
+		 */
+		hv_enabled = is_kvmppc_hv_enabled(kvm);
+	}
 
-v3 -> v4:
- Addressed comments from Eric Blake and Greg Kurz
- Re-ordered the patches
- Added the dummy functions in qmp.c to address the cross compilation issues
+Let's use kvm_vm_check_extension() to fix the issue.
 
-v4 -> v5:
-  Addressed comments from Eric Blake and Greg Kurz
-  Split the fsdev qmp patch into hmp and qmp related patches
-  Moved the common functionalities to throttle.c instead of creating
-  a new file
+[1] https://www.kernel.org/doc/Documentation/virtual/kvm/api.txt
 
-v5 -> v6:
-  Addressed comments from Greg Kurz and Markus Armbruster
-  Split the commits to specific to hmp and throttle as suggested by Greg
-  Moved ThrottleConfig typedef to qemu/typedefs.h
-  Addressed compilation issue on FreeBSD by adding flags in qmp.c
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+ target/ppc/kvm.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-v6 -> v7:
-  Addressed comments from Albert Garcia and Dr. David Alan Gilbert
-  Fixed the hmp-commands-info.hx and hmp-commands.hx as per Dr. David's
-  comments.
-  Fixed the bug with the hmp fsdev_set_io_throttle and info fsdev_iothrottle  
-
-v7 -> v8:
-  Addressed comments from Markus Armbruster and Eric Blake
-  Removed unwanted headers from qmp-fsdev-throttle.h
-
-v8 -> v9:
-  Addressed comments from Markus Armbruster and Eric Blake
-  Removed the iothrottle.json and pushed the iothrottle struct to
-  block-core.json
-
-v9 -> v10:
-  Addressed comments from Albert Garcia
-  Fixed issue related to dynamically passing throttle configuration
-  Removed some unused code
-
-v10 -> v11:
-  Addressed the comments from Markus Armbruster and Eric Blake
-  Rebased the patches over 2.10
--- 
-1.8.3.1
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 6442dfcb95b3..1deaf106d2b9 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -120,7 +120,7 @@ static void kvm_kick_cpu(void *opaque)
+ static bool kvmppc_is_pr(KVMState *ks)
+ {
+     /* Assume KVM-PR if the GET_PVINFO capability is available */
+-    return kvm_check_extension(ks, KVM_CAP_PPC_GET_PVINFO) != 0;
++    return kvm_vm_check_extension(ks, KVM_CAP_PPC_GET_PVINFO) != 0;
+ }
+ 
+ static int kvm_ppc_register_host_cpu_type(void);
