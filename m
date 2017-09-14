@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46591)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46563)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dsYJc-00088P-9P
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:41 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dsYJb-00083i-EE
+	(envelope-from <pm215@archaic.org.uk>) id 1dsYJb-00087X-LJ
 	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:40 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37364)
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pm215@archaic.org.uk>) id 1dsYJa-00081M-GM
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:39 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37368)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dsYJb-0007iP-5b
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:39 -0400
+	id 1dsYJa-0007x0-8U
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:38 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dsYJO-0005o6-O3
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 18:52:26 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dsYJQ-0005pS-O2
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 18:52:28 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Sep 2017 18:52:38 +0100
-Message-Id: <1505411573-27848-4-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 14 Sep 2017 18:52:41 +0100
+Message-Id: <1505411573-27848-7-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1505411573-27848-1-git-send-email-peter.maydell@linaro.org>
 References: <1505411573-27848-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 03/18] target/arm: Get PRECISERR and IBUSERR the
- right way round
+Subject: [Qemu-devel] [PULL 06/18] target/arm: Add and use defines for
+ EXCRET constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +30,84 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-For a bus fault, the M profile BFSR bit PRECISERR means a bus
-fault on a data access, and IBUSERR means a bus fault on an
-instruction access. We had these the wrong way around; fix this.
+The exception-return magic values get some new bits in v8M, which
+makes some bit definitions for them worthwhile.
+
+We don't use the bit definitions for the switch on the low bits
+which checks the return type for v7M, because this is defined
+in the v7M ARM ARM as a set of valid values rather than via
+per-bit checks.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1505137930-13255-4-git-send-email-peter.maydell@linaro.org
+Message-id: 1505137930-13255-7-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/helper.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ target/arm/internals.h | 10 ++++++++++
+ target/arm/helper.c    | 14 +++++++++-----
+ 2 files changed, 19 insertions(+), 5 deletions(-)
 
+diff --git a/target/arm/internals.h b/target/arm/internals.h
+index a315354..18be370 100644
+--- a/target/arm/internals.h
++++ b/target/arm/internals.h
+@@ -61,6 +61,16 @@ FIELD(V7M_CONTROL, NPRIV, 0, 1)
+ FIELD(V7M_CONTROL, SPSEL, 1, 1)
+ FIELD(V7M_CONTROL, FPCA, 2, 1)
+ 
++/* Bit definitions for v7M exception return payload */
++FIELD(V7M_EXCRET, ES, 0, 1)
++FIELD(V7M_EXCRET, RES0, 1, 1)
++FIELD(V7M_EXCRET, SPSEL, 2, 1)
++FIELD(V7M_EXCRET, MODE, 3, 1)
++FIELD(V7M_EXCRET, FTYPE, 4, 1)
++FIELD(V7M_EXCRET, DCRS, 5, 1)
++FIELD(V7M_EXCRET, S, 6, 1)
++FIELD(V7M_EXCRET, RES1, 7, 25) /* including the must-be-1 prefix */
++
+ /*
+  * For AArch64, map a given EL to an index in the banked_spsr array.
+  * Note that this mapping and the AArch32 mapping defined in bank_number()
 diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 668e367..1741e0d 100644
+index fdd5cc6..a502e4e 100644
 --- a/target/arm/helper.c
 +++ b/target/arm/helper.c
-@@ -6430,15 +6430,15 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-         case 0x8: /* External Abort */
-             switch (cs->exception_index) {
-             case EXCP_PREFETCH_ABORT:
--                env->v7m.cfsr[M_REG_NS] |= R_V7M_CFSR_PRECISERR_MASK;
--                qemu_log_mask(CPU_LOG_INT, "...with CFSR.PRECISERR\n");
-+                env->v7m.cfsr[M_REG_NS] |= R_V7M_CFSR_IBUSERR_MASK;
-+                qemu_log_mask(CPU_LOG_INT, "...with CFSR.IBUSERR\n");
-                 break;
-             case EXCP_DATA_ABORT:
-                 env->v7m.cfsr[M_REG_NS] |=
--                    (R_V7M_CFSR_IBUSERR_MASK | R_V7M_CFSR_BFARVALID_MASK);
-+                    (R_V7M_CFSR_PRECISERR_MASK | R_V7M_CFSR_BFARVALID_MASK);
-                 env->v7m.bfar = env->exception.vaddress;
-                 qemu_log_mask(CPU_LOG_INT,
--                              "...with CFSR.IBUSERR and BFAR 0x%x\n",
-+                              "...with CFSR.PRECISERR and BFAR 0x%x\n",
-                               env->v7m.bfar);
-                 break;
+@@ -6242,7 +6242,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+                   " previous exception %d\n",
+                   type, env->v7m.exception);
+ 
+-    if (extract32(type, 5, 23) != extract32(-1, 5, 23)) {
++    if ((type & R_V7M_EXCRET_RES1_MASK) != R_V7M_EXCRET_RES1_MASK) {
+         qemu_log_mask(LOG_GUEST_ERROR, "M profile: zero high bits in exception "
+                       "exit PC value 0x%" PRIx32 " are UNPREDICTABLE\n", type);
+     }
+@@ -6255,7 +6255,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
+          * which security state's faultmask to clear. (v8M ARM ARM R_KBNF.)
+          */
+         if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+-            int es = type & 1;
++            int es = type & R_V7M_EXCRET_ES_MASK;
+             if (armv7m_nvic_raw_execution_priority(env->nvic) >= 0) {
+                 env->v7m.faultmask[es] = 0;
              }
+@@ -6491,12 +6491,16 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
+         return; /* Never happens.  Keep compiler happy.  */
+     }
+ 
+-    lr = 0xfffffff1;
++    lr = R_V7M_EXCRET_RES1_MASK |
++        R_V7M_EXCRET_S_MASK |
++        R_V7M_EXCRET_DCRS_MASK |
++        R_V7M_EXCRET_FTYPE_MASK |
++        R_V7M_EXCRET_ES_MASK;
+     if (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK) {
+-        lr |= 4;
++        lr |= R_V7M_EXCRET_SPSEL_MASK;
+     }
+     if (!arm_v7m_is_handler_mode(env)) {
+-        lr |= 8;
++        lr |= R_V7M_EXCRET_MODE_MASK;
+     }
+ 
+     v7m_push_stack(cpu);
 -- 
 2.7.4
