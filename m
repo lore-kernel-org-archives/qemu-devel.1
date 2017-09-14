@@ -1,30 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46629)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48252)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dsWp4-0006mX-PV
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:17:03 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dsWsK-0000DI-CQ
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:20:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rth7680@gmail.com>) id 1dsWp1-00008m-JD
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:17:02 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:38423)
+	(envelope-from <alex.bennee@linaro.org>) id 1dsWsH-0003St-6h
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:20:24 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:49679)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dsWp1-000087-Di
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:16:59 -0400
-Received: by mail-pg0-x241.google.com with SMTP id m30so1926967pgn.5
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 09:16:59 -0700 (PDT)
-Sender: Richard Henderson <rth7680@gmail.com>
-References: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
-	<150506107741.19604.8328467942268087647.stgit@frigg.lan>
-	<3fb9d3ac-db86-2ff7-d6e1-988982d1eb18@linaro.org>
-	<8760clpaqv.fsf@frigg.lan>
-From: Richard Henderson <rth@twiddle.net>
-Message-ID: <e1370c9b-0807-07d6-ff39-f3473933e3dd@twiddle.net>
-Date: Thu, 14 Sep 2017 09:16:56 -0700
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dsWsG-0003Qn-VT
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:20:21 -0400
+Received: by mail-wm0-x236.google.com with SMTP id e71so1897198wmg.4
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 09:20:19 -0700 (PDT)
+References: <20170912162513.21694-1-richard.henderson@linaro.org>
+	<20170912162513.21694-10-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170912162513.21694-10-richard.henderson@linaro.org>
+Date: Thu, 14 Sep 2017 17:20:16 +0100
+Message-ID: <871sn99rr3.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <8760clpaqv.fsf@frigg.lan>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 5/7] trace: Add event "guest_bbl_after"
+Subject: Re: [Qemu-devel] [PATCH v2 09/16] tcg/i386: Add vector operations
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,16 +30,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
-
-On 09/14/2017 08:20 AM, Lluís Vilanova wrote:
->> I don't understand why you wouldn't just modify tcg_gen_goto_tb and
->> tcg_gen_exit_tb instead.
-> 
-> I prefer to keep all generic translation-related tracing on a single file, where
-> it is easier to reason about.
-
-My point here was more about the inline_points.  Discussed elsewhere now.
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org
 
 
-r~
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  tcg/i386/tcg-target.h     |  46 ++++-
+>  tcg/i386/tcg-target.inc.c | 438 +++++++++++++++++++++++++++++++++++++++++-----
+>  2 files changed, 438 insertions(+), 46 deletions(-)
+
+My compiler doesn't like you ;-)
+
+In file included from /home/alex/lsrc/qemu/qemu.git/tcg/tcg.c:254:0:
+/home/alex/lsrc/qemu/qemu.git/tcg/tcg.c: In function ‘tcg_gen_code’:
+/home/alex/lsrc/qemu/qemu.git/tcg/i386/tcg-target.inc.c:2494:13: error: ‘c’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+             tcg_out_modrm(s, c, a0, a1);
+             ^
+In file included from /home/alex/lsrc/qemu/qemu.git/tcg/tcg.c:254:0:
+/home/alex/lsrc/qemu/qemu.git/tcg/i386/tcg-target.inc.c:2035:9: note: ‘c’ was declared here
+     int c, const_a2, vexop, rexw = 0;
+         ^
+cc1: all warnings being treated as errors
+
+--
+Alex Bennée
