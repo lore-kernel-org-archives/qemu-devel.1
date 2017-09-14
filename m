@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40115)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dsRyO-0005B4-Re
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:06:24 -0400
+	(envelope-from <groug@kaod.org>) id 1dsS50-0000rL-8o
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:13:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dsRyK-0000dT-9e
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:06:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42912)
+	(envelope-from <groug@kaod.org>) id 1dsS4t-0007DZ-AC
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:13:10 -0400
+Received: from 6.mo2.mail-out.ovh.net ([87.98.165.38]:33348)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dsRyK-0000cr-1c
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:06:16 -0400
-Date: Thu, 14 Sep 2017 12:06:08 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170914110607.GD3982@work-vm>
-References: <20170829153022.27004-1-vadim.galitsyn@profitbricks.com>
-	<20170829153022.27004-3-vadim.galitsyn@profitbricks.com>
-	<20170914115746.382cf947@nial.brq.redhat.com>
-	<20170914102628.GC3982@work-vm>
-	<CAPHE7NqL1VHz2k_Gep5-eE2HhDy3iQLG9AWa2dRaM9nD9s9uCA@mail.gmail.com>
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dsS4t-0007Bp-0c
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:13:03 -0400
+Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 98775ABF9E
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 13:13:00 +0200 (CEST)
+Date: Thu, 14 Sep 2017 13:12:51 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170914131251.0881b755@bahia.lan>
+In-Reply-To: <1505385610-35529-2-git-send-email-pradeep.jagadeesh@huawei.com>
+References: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1505385610-35529-2-git-send-email-pradeep.jagadeesh@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAPHE7NqL1VHz2k_Gep5-eE2HhDy3iQLG9AWa2dRaM9nD9s9uCA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v7 2/3] qmp: introduce
- query-memory-size-summary command
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/2t04RV.kNT/ZyDmpOLnaVAU";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v11 1/6] throttle: factor out duplicate code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,209 +31,296 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-Cc: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org, Vasilis Liaskovitis <vasilis.liaskovitis@profitbricks.com>, Mohammed Gamal <mohammed.gamal@profitbricks.com>, Eduardo Otubo <eduardo.otubo@profitbricks.com>
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: eric blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-* Vadim Galitsyn (vadim.galitsyn@profitbricks.com) wrote:
-> I think I made a typo here. It should be:
-> 
-> +# @plugged-memory: size *of* memory that can be hot-unplugged. This field
-> +#                  is omitted if target does *not* support memory hotplug
-> +#                  (i.e. CONFIG_MEM_HOTPLUG not defined on build time).
+--Sig_/2t04RV.kNT/ZyDmpOLnaVAU
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-'of' added, took the 'don't' from Igor's review.
+On Thu, 14 Sep 2017 06:40:05 -0400
+Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
 
-Dave
+> This patch factors out the duplicate throttle code that was still
+> present in block and fsdev devices.
+>=20
+> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 
-> 
-> 
-> 
-> On Thu, Sep 14, 2017 at 12:26 PM, Dr. David Alan Gilbert <
-> dgilbert@redhat.com> wrote:
-> 
-> > * Igor Mammedov (imammedo@redhat.com) wrote:
-> > > On Tue, 29 Aug 2017 17:30:21 +0200
-> > > Vadim Galitsyn <vadim.galitsyn@profitbricks.com> wrote:
-> > >
-> > > > Add a new query-memory-size-summary command which provides the
-> > > > following memory information in bytes:
-> > > >
-> > > >   * base-memory - size of "base" memory specified with command line
-> > option -m.
-> > > >
-> > > >   * plugged-memory - amount of memory that was hot-plugged.
-> > > >     If target does not have CONFIG_MEM_HOTPLUG enabled, no
-> > > >     value is reported.
-> > > >
-> > > > Signed-off-by: Vasilis Liaskovitis <vasilis.liaskovitis@
-> > profitbricks.com>
-> > > > Signed-off-by: Mohammed Gamal <mohammed.gamal@profitbricks.com>
-> > > > Signed-off-by: Eduardo Otubo <eduardo.otubo@profitbricks.com>
-> > > > Signed-off-by: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
-> > > > Reviewed-by: Eugene Crosser <evgenii.cherkashin@profitbricks.com>
-> > > > Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > > Cc: Markus Armbruster <armbru@redhat.com>
-> > > > Cc: Igor Mammedov <imammedo@redhat.com>
-> > > > Cc: Eric Blake <eblake@redhat.com>
-> > > > Cc: qemu-devel@nongnu.org
-> > > > ---
-> > > >  qapi-schema.json                                   | 32
-> > ++++++++++++++++++++++
-> > > >  include/hw/mem/pc-dimm.h                           |  1 +
-> > > >  hw/mem/pc-dimm.c                                   |  5 ++++
-> > > >  qmp.c                                              | 13 +++++++++
-> > > >  stubs/{qmp_pc_dimm_device_list.c => qmp_pc_dimm.c} |  5 ++++
-> > > >  stubs/Makefile.objs                                |  2 +-
-> > > >  6 files changed, 57 insertions(+), 1 deletion(-)
-> > > >  rename stubs/{qmp_pc_dimm_device_list.c => qmp_pc_dimm.c} (68%)
-> > > >
-> > > > diff --git a/qapi-schema.json b/qapi-schema.json
-> > > > index 802ea53d00..9402ac3b3a 100644
-> > > > --- a/qapi-schema.json
-> > > > +++ b/qapi-schema.json
-> > > > @@ -4407,6 +4407,38 @@
-> > > >    'data': { 'name': 'str', '*migration-safe': 'bool', 'static':
-> > 'bool',
-> > > >              '*unavailable-features': [ 'str' ], 'typename': 'str' } }
-> > > >
-> > > > +##
-> > > > +# @MemoryInfo:
-> > > > +#
-> > > > +# Actual memory information in bytes.
-> > > > +#
-> > > > +# @base-memory: size of "base" memory specified with command line
-> > > > +#               option -m.
-> > > > +#
-> > > > +# @plugged-memory: size memory that can be hot-unplugged. This field
-> > > > +#                  is omitted if target does support memory hotplug
-> > > > +#                  (i.e. CONFIG_MEM_HOTPLUG not defined on build
-> > time).
-> > > field description doesn't match what's actually reported.
-> > > s/cat be/is/
-> >
-> > Are you sure about that? That would read:
-> >       size memory that is hot-unplugged
-> >
-> > which doesn't sound right, since it's not be hot-unplugged
-> > yet.
-> >
-> > Dave
-> >
-> > > s/does/doesn't/
-> > >
-> > > > +#
-> > > > +# Since: 2.11.0
-> > > > +##
-> > > > +{ 'struct': 'MemoryInfo',
-> > > > +  'data'  : { 'base-memory': 'size', '*plugged-memory': 'size' } }
-> > > > +
-> > > > +##
-> > > > +# @query-memory-size-summary:
-> > > > +#
-> > > > +# Return the amount of initially allocated and hot-plugged (if
-> > > > +# enabled) memory in bytes.
-> > > it could count dimm's on CLI, so not only hotplugged
-> > >
-> > > s/hot-plugged/present hotpluggable/
-> > >
-> > > > +#
-> > > > +# Example:
-> > > > +#
-> > > > +# -> { "execute": "query-memory-size-summary" }
-> > > > +# <- { "return": { "base-memory": 4294967296, "plugged-memory": 0 } }
-> > > > +#
-> > > > +# Since: 2.11.0
-> > > > +##
-> > > > +{ 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
-> > > > +
-> > > >  ##
-> > > >  # @query-cpu-definitions:
-> > > >  #
-> > > > diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> > > > index 6f8c3eb1b3..d83b957829 100644
-> > > > --- a/include/hw/mem/pc-dimm.h
-> > > > +++ b/include/hw/mem/pc-dimm.h
-> > > > @@ -95,6 +95,7 @@ int pc_dimm_get_free_slot(const int *hint, int
-> > max_slots, Error **errp);
-> > > >
-> > > >  int qmp_pc_dimm_device_list(Object *obj, void *opaque);
-> > > >  uint64_t pc_existing_dimms_capacity(Error **errp);
-> > > > +uint64_t get_plugged_memory_size(void);
-> > > >  void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
-> > > >                           MemoryRegion *mr, uint64_t align, Error
-> > **errp);
-> > > >  void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState
-> > *hpms,
-> > > > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> > > > index bdf6649083..66eace5a5c 100644
-> > > > --- a/hw/mem/pc-dimm.c
-> > > > +++ b/hw/mem/pc-dimm.c
-> > > > @@ -159,6 +159,11 @@ uint64_t pc_existing_dimms_capacity(Error **errp)
-> > > >      return cap.size;
-> > > >  }
-> > > >
-> > > > +uint64_t get_plugged_memory_size(void)
-> > > > +{
-> > > > +    return pc_existing_dimms_capacity(&error_abort);
-> > > > +}
-> > > > +
-> > > >  int qmp_pc_dimm_device_list(Object *obj, void *opaque)
-> > > >  {
-> > > >      MemoryDeviceInfoList ***prev = opaque;
-> > > > diff --git a/qmp.c b/qmp.c
-> > > > index b86201e349..e8c303116a 100644
-> > > > --- a/qmp.c
-> > > > +++ b/qmp.c
-> > > > @@ -709,3 +709,16 @@ ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error
-> > **errp)
-> > > >
-> > > >      return head;
-> > > >  }
-> > > > +
-> > > > +MemoryInfo *qmp_query_memory_size_summary(Error **errp)
-> > > > +{
-> > > > +    MemoryInfo *mem_info = g_malloc0(sizeof(MemoryInfo));
-> > > > +
-> > > > +    mem_info->base_memory = ram_size;
-> > > > +
-> > > > +    mem_info->plugged_memory = get_plugged_memory_size();
-> > > > +    mem_info->has_plugged_memory =
-> > > > +        mem_info->plugged_memory != (uint64_t)-1;
-> > > > +
-> > > > +    return mem_info;
-> > > > +}
-> > > > diff --git a/stubs/qmp_pc_dimm_device_list.c b/stubs/qmp_pc_dimm.c
-> > > > similarity index 68%
-> > > > rename from stubs/qmp_pc_dimm_device_list.c
-> > > > rename to stubs/qmp_pc_dimm.c
-> > > > index def211564d..9ddc4f619a 100644
-> > > > --- a/stubs/qmp_pc_dimm_device_list.c
-> > > > +++ b/stubs/qmp_pc_dimm.c
-> > > > @@ -6,3 +6,8 @@ int qmp_pc_dimm_device_list(Object *obj, void *opaque)
-> > > >  {
-> > > >     return 0;
-> > > >  }
-> > > > +
-> > > > +uint64_t get_plugged_memory_size(void)
-> > > > +{
-> > > > +    return (uint64_t)-1;
-> > > > +}
-> > > > diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
-> > > > index e69c217aff..f5f139f310 100644
-> > > > --- a/stubs/Makefile.objs
-> > > > +++ b/stubs/Makefile.objs
-> > > > @@ -33,7 +33,7 @@ stub-obj-y += uuid.o
-> > > >  stub-obj-y += vm-stop.o
-> > > >  stub-obj-y += vmstate.o
-> > > >  stub-obj-$(CONFIG_WIN32) += fd-register.o
-> > > > -stub-obj-y += qmp_pc_dimm_device_list.o
-> > > > +stub-obj-y += qmp_pc_dimm.o
-> > > >  stub-obj-y += target-monitor-defs.o
-> > > >  stub-obj-y += target-get-monitor-def.o
-> > > >  stub-obj-y += pc_madt_cpu_entry.o
-> > >
-> > --
-> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-> >
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+I see you took my remarks into account, except for the patch title
+which is still the very same as commit:
+
+a2a7862ca9ab throttle: factor out duplicate code
+
+:-\
+
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> ---
+>  blockdev.c                      | 44 +---------------------------------
+>  fsdev/qemu-fsdev-throttle.c     | 44 ++--------------------------------
+>  include/qemu/throttle-options.h |  3 +++
+>  include/qemu/throttle.h         |  4 ++--
+>  include/qemu/typedefs.h         |  1 +
+>  util/throttle.c                 | 52 +++++++++++++++++++++++++++++++++++=
+++++++
+>  6 files changed, 61 insertions(+), 87 deletions(-)
+>=20
+> diff --git a/blockdev.c b/blockdev.c
+> index 56a6b24..9d33c25 100644
+> --- a/blockdev.c
+> +++ b/blockdev.c
+> @@ -387,49 +387,7 @@ static void extract_common_blockdev_options(QemuOpts=
+ *opts, int *bdrv_flags,
+>      }
+> =20
+>      if (throttle_cfg) {
+> -        throttle_config_init(throttle_cfg);
+> -        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].avg =3D
+> -            qemu_opt_get_number(opts, "throttling.bps-total", 0);
+> -        throttle_cfg->buckets[THROTTLE_BPS_READ].avg  =3D
+> -            qemu_opt_get_number(opts, "throttling.bps-read", 0);
+> -        throttle_cfg->buckets[THROTTLE_BPS_WRITE].avg =3D
+> -            qemu_opt_get_number(opts, "throttling.bps-write", 0);
+> -        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].avg =3D
+> -            qemu_opt_get_number(opts, "throttling.iops-total", 0);
+> -        throttle_cfg->buckets[THROTTLE_OPS_READ].avg =3D
+> -            qemu_opt_get_number(opts, "throttling.iops-read", 0);
+> -        throttle_cfg->buckets[THROTTLE_OPS_WRITE].avg =3D
+> -            qemu_opt_get_number(opts, "throttling.iops-write", 0);
+> -
+> -        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].max =3D
+> -            qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+> -        throttle_cfg->buckets[THROTTLE_BPS_READ].max  =3D
+> -            qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+> -        throttle_cfg->buckets[THROTTLE_BPS_WRITE].max =3D
+> -            qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+> -        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].max =3D
+> -            qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+> -        throttle_cfg->buckets[THROTTLE_OPS_READ].max =3D
+> -            qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+> -        throttle_cfg->buckets[THROTTLE_OPS_WRITE].max =3D
+> -            qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+> -
+> -        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].burst_length =3D
+> -            qemu_opt_get_number(opts, "throttling.bps-total-max-length",=
+ 1);
+> -        throttle_cfg->buckets[THROTTLE_BPS_READ].burst_length  =3D
+> -            qemu_opt_get_number(opts, "throttling.bps-read-max-length", =
+1);
+> -        throttle_cfg->buckets[THROTTLE_BPS_WRITE].burst_length =3D
+> -            qemu_opt_get_number(opts, "throttling.bps-write-max-length",=
+ 1);
+> -        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].burst_length =3D
+> -            qemu_opt_get_number(opts, "throttling.iops-total-max-length"=
+, 1);
+> -        throttle_cfg->buckets[THROTTLE_OPS_READ].burst_length =3D
+> -            qemu_opt_get_number(opts, "throttling.iops-read-max-length",=
+ 1);
+> -        throttle_cfg->buckets[THROTTLE_OPS_WRITE].burst_length =3D
+> -            qemu_opt_get_number(opts, "throttling.iops-write-max-length"=
+, 1);
+> -
+> -        throttle_cfg->op_size =3D
+> -            qemu_opt_get_number(opts, "throttling.iops-size", 0);
+> -
+> +        throttle_parse_options(throttle_cfg, opts);
+>          if (!throttle_is_valid(throttle_cfg, errp)) {
+>              return;
+>          }
+> diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
+> index 49eebb5..0e6fb86 100644
+> --- a/fsdev/qemu-fsdev-throttle.c
+> +++ b/fsdev/qemu-fsdev-throttle.c
+> @@ -16,6 +16,7 @@
+>  #include "qemu/error-report.h"
+>  #include "qemu-fsdev-throttle.h"
+>  #include "qemu/iov.h"
+> +#include "qemu/throttle-options.h"
+> =20
+>  static void fsdev_throttle_read_timer_cb(void *opaque)
+>  {
+> @@ -31,48 +32,7 @@ static void fsdev_throttle_write_timer_cb(void *opaque)
+> =20
+>  void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error **=
+errp)
+>  {
+> -    throttle_config_init(&fst->cfg);
+> -    fst->cfg.buckets[THROTTLE_BPS_TOTAL].avg =3D
+> -        qemu_opt_get_number(opts, "throttling.bps-total", 0);
+> -    fst->cfg.buckets[THROTTLE_BPS_READ].avg  =3D
+> -        qemu_opt_get_number(opts, "throttling.bps-read", 0);
+> -    fst->cfg.buckets[THROTTLE_BPS_WRITE].avg =3D
+> -        qemu_opt_get_number(opts, "throttling.bps-write", 0);
+> -    fst->cfg.buckets[THROTTLE_OPS_TOTAL].avg =3D
+> -        qemu_opt_get_number(opts, "throttling.iops-total", 0);
+> -    fst->cfg.buckets[THROTTLE_OPS_READ].avg =3D
+> -        qemu_opt_get_number(opts, "throttling.iops-read", 0);
+> -    fst->cfg.buckets[THROTTLE_OPS_WRITE].avg =3D
+> -        qemu_opt_get_number(opts, "throttling.iops-write", 0);
+> -
+> -    fst->cfg.buckets[THROTTLE_BPS_TOTAL].max =3D
+> -        qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+> -    fst->cfg.buckets[THROTTLE_BPS_READ].max  =3D
+> -        qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+> -    fst->cfg.buckets[THROTTLE_BPS_WRITE].max =3D
+> -        qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+> -    fst->cfg.buckets[THROTTLE_OPS_TOTAL].max =3D
+> -        qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+> -    fst->cfg.buckets[THROTTLE_OPS_READ].max =3D
+> -        qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+> -    fst->cfg.buckets[THROTTLE_OPS_WRITE].max =3D
+> -        qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+> -
+> -    fst->cfg.buckets[THROTTLE_BPS_TOTAL].burst_length =3D
+> -        qemu_opt_get_number(opts, "throttling.bps-total-max-length", 1);
+> -    fst->cfg.buckets[THROTTLE_BPS_READ].burst_length  =3D
+> -        qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1);
+> -    fst->cfg.buckets[THROTTLE_BPS_WRITE].burst_length =3D
+> -        qemu_opt_get_number(opts, "throttling.bps-write-max-length", 1);
+> -    fst->cfg.buckets[THROTTLE_OPS_TOTAL].burst_length =3D
+> -        qemu_opt_get_number(opts, "throttling.iops-total-max-length", 1);
+> -    fst->cfg.buckets[THROTTLE_OPS_READ].burst_length =3D
+> -        qemu_opt_get_number(opts, "throttling.iops-read-max-length", 1);
+> -    fst->cfg.buckets[THROTTLE_OPS_WRITE].burst_length =3D
+> -        qemu_opt_get_number(opts, "throttling.iops-write-max-length", 1);
+> -    fst->cfg.op_size =3D
+> -        qemu_opt_get_number(opts, "throttling.iops-size", 0);
+> -
+> +    throttle_parse_options(&fst->cfg, opts);
+>      throttle_is_valid(&fst->cfg, errp);
+>  }
+> =20
+> diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-opti=
+ons.h
+> index 3528a8f..9709dcd 100644
+> --- a/include/qemu/throttle-options.h
+> +++ b/include/qemu/throttle-options.h
+> @@ -9,6 +9,7 @@
+>   */
+>  #ifndef THROTTLE_OPTIONS_H
+>  #define THROTTLE_OPTIONS_H
+> +#include "typedefs.h"
+> =20
+>  #define QEMU_OPT_IOPS_TOTAL "iops-total"
+>  #define QEMU_OPT_IOPS_TOTAL_MAX "iops-total-max"
+> @@ -111,4 +112,6 @@
+>              .help =3D "when limiting by iops max size of an I/O in bytes=
+",\
+>          }
+> =20
+> +void throttle_parse_options(ThrottleConfig *, QemuOpts *);
+> +
+>  #endif
+> diff --git a/include/qemu/throttle.h b/include/qemu/throttle.h
+> index 8c93237..b6ebc6d 100644
+> --- a/include/qemu/throttle.h
+> +++ b/include/qemu/throttle.h
+> @@ -89,10 +89,10 @@ typedef struct LeakyBucket {
+>   * However it allows to keep the code clean and the bucket field is rese=
+t to
+>   * zero at the right time.
+>   */
+> -typedef struct ThrottleConfig {
+> +struct ThrottleConfig {
+>      LeakyBucket buckets[BUCKETS_COUNT]; /* leaky buckets */
+>      uint64_t op_size;         /* size of an operation in bytes */
+> -} ThrottleConfig;
+> +};
+> =20
+>  typedef struct ThrottleState {
+>      ThrottleConfig cfg;       /* configuration */
+> diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+> index 39bc835..90fe0f9 100644
+> --- a/include/qemu/typedefs.h
+> +++ b/include/qemu/typedefs.h
+> @@ -100,6 +100,7 @@ typedef struct uWireSlave uWireSlave;
+>  typedef struct VirtIODevice VirtIODevice;
+>  typedef struct Visitor Visitor;
+>  typedef struct node_info NodeInfo;
+> +typedef struct ThrottleConfig ThrottleConfig;
+>  typedef void SaveStateHandler(QEMUFile *f, void *opaque);
+>  typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
+> =20
+> diff --git a/util/throttle.c b/util/throttle.c
+> index 06bf916..9ef28c4 100644
+> --- a/util/throttle.c
+> +++ b/util/throttle.c
+> @@ -27,6 +27,7 @@
+>  #include "qemu/throttle.h"
+>  #include "qemu/timer.h"
+>  #include "block/aio.h"
+> +#include "qemu/throttle-options.h"
+> =20
+>  /* This function make a bucket leak
+>   *
+> @@ -635,3 +636,54 @@ void throttle_config_to_limits(ThrottleConfig *cfg, =
+ThrottleLimits *var)
+>      var->has_iops_write_max_length =3D true;
+>      var->has_iops_size =3D true;
+>  }
+> +
+> +/* parse the throttle options
+> + *
+> + * @opts: qemu options
+> + * @throttle_cfg: throttle configuration
+> + */
+> +void throttle_parse_options(ThrottleConfig *throttle_cfg, QemuOpts *opts)
+> +{
+> +    throttle_config_init(throttle_cfg);
+> +    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].avg =3D
+> +        qemu_opt_get_number(opts, "throttling.bps-total", 0);
+> +    throttle_cfg->buckets[THROTTLE_BPS_READ].avg  =3D
+> +        qemu_opt_get_number(opts, "throttling.bps-read", 0);
+> +    throttle_cfg->buckets[THROTTLE_BPS_WRITE].avg =3D
+> +        qemu_opt_get_number(opts, "throttling.bps-write", 0);
+> +    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].avg =3D
+> +        qemu_opt_get_number(opts, "throttling.iops-total", 0);
+> +    throttle_cfg->buckets[THROTTLE_OPS_READ].avg =3D
+> +        qemu_opt_get_number(opts, "throttling.iops-read", 0);
+> +    throttle_cfg->buckets[THROTTLE_OPS_WRITE].avg =3D
+> +        qemu_opt_get_number(opts, "throttling.iops-write", 0);
+> +
+> +    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].max =3D
+> +        qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+> +    throttle_cfg->buckets[THROTTLE_BPS_READ].max  =3D
+> +        qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+> +    throttle_cfg->buckets[THROTTLE_BPS_WRITE].max =3D
+> +        qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+> +    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].max =3D
+> +        qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+> +    throttle_cfg->buckets[THROTTLE_OPS_READ].max =3D
+> +        qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+> +    throttle_cfg->buckets[THROTTLE_OPS_WRITE].max =3D
+> +        qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+> +
+> +    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].burst_length =3D
+> +        qemu_opt_get_number(opts, "throttling.bps-total-max-length", 1);
+> +    throttle_cfg->buckets[THROTTLE_BPS_READ].burst_length  =3D
+> +        qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1);
+> +    throttle_cfg->buckets[THROTTLE_BPS_WRITE].burst_length =3D
+> +        qemu_opt_get_number(opts, "throttling.bps-write-max-length", 1);
+> +    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].burst_length =3D
+> +        qemu_opt_get_number(opts, "throttling.iops-total-max-length", 1);
+> +    throttle_cfg->buckets[THROTTLE_OPS_READ].burst_length =3D
+> +        qemu_opt_get_number(opts, "throttling.iops-read-max-length", 1);
+> +    throttle_cfg->buckets[THROTTLE_OPS_WRITE].burst_length =3D
+> +        qemu_opt_get_number(opts, "throttling.iops-write-max-length", 1);
+> +
+> +    throttle_cfg->op_size =3D
+> +        qemu_opt_get_number(opts, "throttling.iops-size", 0);
+> +}
+
+
+--Sig_/2t04RV.kNT/ZyDmpOLnaVAU
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbpkMwAKCRAC/DrrAQHb
+wtdFAJ9JUuu/6tqiLQD9NMHEBgDzUCIGDACeNHJWL1R3NTFX9swAe10eJmttGXw=
+=M2p6
+-----END PGP SIGNATURE-----
+
+--Sig_/2t04RV.kNT/ZyDmpOLnaVAU--
