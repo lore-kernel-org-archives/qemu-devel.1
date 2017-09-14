@@ -1,30 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38838)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dsXlV-0000K9-Cu
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:17:26 -0400
+	(envelope-from <bounces@canonical.com>) id 1dsY92-0002v2-Ge
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:41:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dsXlU-0002MW-J6
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:17:25 -0400
-Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:43236)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dsXlU-0002LU-DF
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:17:24 -0400
-Received: by mail-wr0-x22e.google.com with SMTP id a43so12073wrc.0
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 10:17:24 -0700 (PDT)
+	(envelope-from <bounces@canonical.com>) id 1dsY8z-00088w-CS
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:41:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38453)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dsY8z-00088U-5Q
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:41:41 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dsY8w-0006aU-3L
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 17:41:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 1E0F52E84DA
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 17:41:35 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKONrzpGxwvirPcb+-XZk=9WhwWKcSD_=BicmTQ2ZLQFEA@mail.gmail.com>
-References: <1504812251-23438-1-git-send-email-sundeep.lkml@gmail.com>
-	<2b183ac5-36d8-1da6-cbac-4c6366f23261@amsat.org>
-	<CALHRZuoJjSkSYaM9xz8xo2R-=oQEx5a1bkhSirc=NmEpxeG2AQ@mail.gmail.com>
-	<28d6a84f-3a32-78ea-7a87-055fb14e1641@amsat.org>
-	<CAKmqyKONrzpGxwvirPcb+-XZk=9WhwWKcSD_=BicmTQ2ZLQFEA@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Sep 2017 18:17:02 +0100
-Message-ID: <CAFEAcA-Dz_xw3pXTHg9kV2qT+fw=jfgrdw63QeWHCnSxKb0e+w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu devel v8 PATCH 0/5] Add support for
- Smartfusion2 SoC
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 14 Sep 2017 17:21:08 -0000
+From: John Snow <932490@bugs.launchpad.net>
+Reply-To: Bug 932490 <932490@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20120215021135.22747.33099.malonedeb@soybean.canonical.com>
+Message-Id: <150540966851.12951.12662216254232775729.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 932490] Re: Qemu fails on -fda /dev/fd0 when no
+ medium is present
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,17 +37,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, sundeep subbaraya <sundeep.lkml@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org
 
-On 14 September 2017 at 18:06, Alistair Francis <alistair23@gmail.com> wrote:
-> Once you have all the devices there you can enable bus access errors
-> as well. That's a future patch set though.
+Likely the bug as reported still exists, because this attempts to use
+the disk image, not the floppy drive as a whole. If there's no floppy
+inserted, there's no disk image to use. Later versions of QEMU even
+explicitly remove support for pass-through floppy disks.
 
-Ah, I hadn't noticed this code was opting out of bus access
-errors; I don't want to permit new boards which do that,
-so we do need to fix that in this round. (I just sent an
-email to that effect in reply to patch 1.)
+Basically, what you want to do is to create a normal emulated floppy
+drive in QEMU, and then use the block device add commands to use the
+/dev/fd0 as a media which can then be virtually inserted into the
+virtual floppy device.
 
-thanks
--- PMM
+QEMU does not have support for doing pass-through of the floppy
+controller / drive itself presently. (Uh, unless you have a PCI floppy
+controller or something, but... you probably don't!)
+
+We can close this bug as WONTFIX, essentially.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/932490
+
+Title:
+  Qemu fails on -fda /dev/fd0 when no medium is present
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  # qemu-system-x86_64 --version
+  QEMU emulator version 1.0 (qemu-kvm-1.0), Copyright (c) 2003-2008 Fabrice=
+ Bellard
+
+  # qemu-system-x86_64 -fda /dev/fd0
+  qemu-system-x86_64: -fda /dev/fd0: could not open disk image /dev/fd0: No=
+ such device or address
+
+  Starting with a medium (floppy disk) inserted, then removing or
+  changing the medium works fine.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/932490/+subscriptions
