@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43455)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dsOiY-0006f5-HL
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 03:37:47 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dsOm2-0007yI-T5
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 03:41:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dsOiU-0002cI-Km
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 03:37:46 -0400
-References: <20170328184959.5550-1-sw@weilnetz.de>
-	<6a5b9248-312c-cb66-c189-9a3e1651013a@weilnetz.de>
+	(envelope-from <mjt@tls.msk.ru>) id 1dsOlz-00061M-0J
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 03:41:22 -0400
+References: <20170911200002.4511-1-n54@gmx.com>
+	<20170911201610.15204-1-n54@gmx.com>
 From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <4c4af348-80c7-0f9f-5d00-be5e555ea463@msgid.tls.msk.ru>
-Date: Thu, 14 Sep 2017 10:37:30 +0300
+Message-ID: <e2230002-e063-ee4a-6e66-b4bd8c08de06@msgid.tls.msk.ru>
+Date: Thu, 14 Sep 2017 10:41:17 +0300
 MIME-Version: 1.0
-In-Reply-To: <6a5b9248-312c-cb66-c189-9a3e1651013a@weilnetz.de>
+In-Reply-To: <20170911201610.15204-1-n54@gmx.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH for-2.9?] configure: Remove unused code
- (found by shellcheck)
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH v2] Replace round_page()
+ with TARGET_PAGE_ALIGN()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,23 +25,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Weil <sw@weilnetz.de>, Peter Maydell <peter.maydell@linaro.org>, QEMU Trivial <qemu-trivial@nongnu.org>
-Cc: qemu-devel@nongnu.org
+To: Kamil Rytarowski <n54@gmx.com>, qemu-trivial@nongnu.org
+Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, "list@suse.de:PowerPC list:PowerPC" <qemu-ppc@nongnu.org>
 
-16.08.2017 15:57, Stefan Weil =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
-> It looks like this patch got lost somehow.
->=20
-> Stefan
->=20
-> See also https://patchwork.codeaurora.org/patch/210129/
->=20
->=20
-> Am 28.03.2017 um 20:49 schrieb Stefan Weil:
->> smartcard_cflags is no longer needed since commit
->> 0b22ef0f57a8910d849602bef0940edcd0553d2c.
+11.09.2017 23:16, Kamil Rytarowski =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> This change fixes conflict with the DragonFly BSD headers.
 
-Applied to -trivial.. finally :)
-
-Thank you!
+Applied to -trivial, thanks!
 
 /mjt
