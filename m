@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41526)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dsYCd-0004sN-R6
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:45:28 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dsYJW-00084d-MF
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dsYCd-0002f0-2s
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:45:27 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1504812251-23438-1-git-send-email-sundeep.lkml@gmail.com>
-	<1504812251-23438-6-git-send-email-sundeep.lkml@gmail.com>
-	<CAFEAcA_D=4M2vyo4m2xPi_hFDCmoKHk5kLY3s1ota602ywgHTQ@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ac9843a0-7121-57df-681f-fc5321b6d4c6@amsat.org>
-Date: Thu, 14 Sep 2017 14:45:16 -0300
+	(envelope-from <pm215@archaic.org.uk>) id 1dsYJV-0007ut-Kn
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:34 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37364)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1dsYJV-0007iP-DM
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:33 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1dsYJN-0005n5-8C
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 18:52:25 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Sep 2017 18:52:36 +0100
+Message-Id: <1505411573-27848-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1505411573-27848-1-git-send-email-peter.maydell@linaro.org>
+References: <1505411573-27848-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_D=4M2vyo4m2xPi_hFDCmoKHk5kLY3s1ota602ywgHTQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu devel v8 PATCH 5/5] msf2: Add Emcraft's
- Smartfusion2 SOM kit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 01/18] target/arm: Use M_REG_NUM_BANKS rather
+ than hardcoding 2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,38 +31,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Subbaraya Sundeep <sundeep.lkml@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>
+To: qemu-devel@nongnu.org
 
-On 09/14/2017 02:14 PM, Peter Maydell wrote:
-> On 7 September 2017 at 20:24, Subbaraya Sundeep <sundeep.lkml@gmail.com> wrote:
->> Emulated Emcraft's Smartfusion2 System On Module starter
->> kit.
->> +static void emcraft_sf2_machine_init(MachineClass *mc)
->> +{
->> +    mc->desc = "SmartFusion2 SOM kit from Emcraft (M2S010)";
->> +    mc->init = emcraft_sf2_s2s010_init;
->> +    mc->ignore_memory_transaction_failures = true;
-> 
-> Please don't set ignore_memory_transaction_failures in new boards.
-> This is a legacy-old-code-only flag.
-What about adding a such check in scripts/checkpatch.pl ?
+Use a symbolic constant M_REG_NUM_BANKS for the array size for
+registers which are banked by M profile security state, rather
+than hardcoding lots of 2s.
 
-     if ($line =~ /ignore_memory_transaction_failures\s+=/) {
-         ERROR("ignore_memory_transaction_failures() is a 
-legacy-old-code-only flag\n" . $herecurr);
-     }
+Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Message-id: 1505137930-13255-2-git-send-email-peter.maydell@linaro.org
+---
+ target/arm/cpu.h | 35 +++++++++++++++++++----------------
+ 1 file changed, 19 insertions(+), 16 deletions(-)
 
-> 
-> New boards should define enough devices, either properly
-> or using create_unimplemented_device(), to make whatever code
-> they're being tested against run.
-> 
-> This is a firm requirement for this code to go into master,
-> because once we let a board in with the flag set it's almost
-> impossible to clear it because we don't know what guest
-> code that previously worked on the board will now break.
-> 
-> thanks
-> -- PMM
-> 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 98b9b26..5a1f957 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -81,8 +81,11 @@
+  * accessed via env->registerfield[env->v7m.secure] (whether the security
+  * extension is implemented or not).
+  */
+-#define M_REG_NS 0
+-#define M_REG_S 1
++enum {
++    M_REG_NS = 0,
++    M_REG_S = 1,
++    M_REG_NUM_BANKS = 2,
++};
+ 
+ /* ARM-specific interrupt pending bits.  */
+ #define CPU_INTERRUPT_FIQ   CPU_INTERRUPT_TGT_EXT_1
+@@ -433,19 +436,19 @@ typedef struct CPUARMState {
+         uint32_t other_sp;
+         uint32_t other_ss_msp;
+         uint32_t other_ss_psp;
+-        uint32_t vecbase[2];
+-        uint32_t basepri[2];
+-        uint32_t control[2];
+-        uint32_t ccr[2]; /* Configuration and Control */
+-        uint32_t cfsr[2]; /* Configurable Fault Status */
++        uint32_t vecbase[M_REG_NUM_BANKS];
++        uint32_t basepri[M_REG_NUM_BANKS];
++        uint32_t control[M_REG_NUM_BANKS];
++        uint32_t ccr[M_REG_NUM_BANKS]; /* Configuration and Control */
++        uint32_t cfsr[M_REG_NUM_BANKS]; /* Configurable Fault Status */
+         uint32_t hfsr; /* HardFault Status */
+         uint32_t dfsr; /* Debug Fault Status Register */
+-        uint32_t mmfar[2]; /* MemManage Fault Address */
++        uint32_t mmfar[M_REG_NUM_BANKS]; /* MemManage Fault Address */
+         uint32_t bfar; /* BusFault Address */
+-        unsigned mpu_ctrl[2]; /* MPU_CTRL */
++        unsigned mpu_ctrl[M_REG_NUM_BANKS]; /* MPU_CTRL */
+         int exception;
+-        uint32_t primask[2];
+-        uint32_t faultmask[2];
++        uint32_t primask[M_REG_NUM_BANKS];
++        uint32_t faultmask[M_REG_NUM_BANKS];
+         uint32_t secure; /* Is CPU in Secure state? (not guest visible) */
+     } v7m;
+ 
+@@ -546,7 +549,7 @@ typedef struct CPUARMState {
+         uint32_t *drbar;
+         uint32_t *drsr;
+         uint32_t *dracr;
+-        uint32_t rnr[2];
++        uint32_t rnr[M_REG_NUM_BANKS];
+     } pmsav7;
+ 
+     /* PMSAv8 MPU */
+@@ -556,10 +559,10 @@ typedef struct CPUARMState {
+          *  pmsav7.rnr (region number register)
+          *  pmsav7_dregion (number of configured regions)
+          */
+-        uint32_t *rbar[2];
+-        uint32_t *rlar[2];
+-        uint32_t mair0[2];
+-        uint32_t mair1[2];
++        uint32_t *rbar[M_REG_NUM_BANKS];
++        uint32_t *rlar[M_REG_NUM_BANKS];
++        uint32_t mair0[M_REG_NUM_BANKS];
++        uint32_t mair1[M_REG_NUM_BANKS];
+     } pmsav8;
+ 
+     void *nvic;
+-- 
+2.7.4
