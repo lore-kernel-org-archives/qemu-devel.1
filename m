@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1dsMl2-0002tF-LO
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 01:32:16 -0400
+	(envelope-from <peterx@redhat.com>) id 1dsMtD-00083s-PJ
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 01:40:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bsd@redhat.com>) id 1dsMkz-0006Ow-Jq
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 01:32:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34736)
+	(envelope-from <peterx@redhat.com>) id 1dsMtC-0005Fj-NP
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 01:40:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33862)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bsd@redhat.com>) id 1dsMkz-0006JE-BH
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 01:32:09 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
-	[10.5.11.13])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id CFCC581DE3
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 05:32:07 +0000 (UTC)
-From: Bandan Das <bsd@redhat.com>
-Date: Thu, 14 Sep 2017 01:31:44 -0400
-Message-Id: <20170914053148.2512-2-bsd@redhat.com>
-In-Reply-To: <20170914053148.2512-1-bsd@redhat.com>
-References: <20170914053148.2512-1-bsd@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/5] usb-mtp: Add one more argument when
- building results
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dsMtC-0005F2-7Y
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 01:40:38 -0400
+Date: Thu, 14 Sep 2017 13:40:33 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170914054033.GJ3617@pxdev.xzpeter.org>
+References: <20170911132627.9505-1-cohuck@redhat.com>
+	<20170912033333.GA29091@pxdev.xzpeter.org>
+	<CAJ+F1CLYrsOXO74nV4zpKffJgMkSPmBi84ARs22EJGAe0xTC0A@mail.gmail.com>
+	<20170913095804.4871ffc9.cohuck@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170913095804.4871ffc9.cohuck@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] dump: do not dump non-existent guest memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,217 +30,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kraxel@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Laurent Vivier <lvivier@redhat.com>, QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-From: Bandan Das <bsd@makefile.in>
+On Wed, Sep 13, 2017 at 09:58:04AM +0200, Cornelia Huck wrote:
+> On Tue, 12 Sep 2017 12:17:51 +0200
+> Marc-Andr=C3=A9 Lureau <marcandre.lureau@gmail.com> wrote:
+>=20
+> > Hi Peter
+> >=20
+> > On Tue, Sep 12, 2017 at 5:33 AM, Peter Xu <peterx@redhat.com> wrote:
+> > > On Mon, Sep 11, 2017 at 03:26:27PM +0200, Cornelia Huck wrote: =20
+> > >> It does not really make sense to dump memory that is not there.
+> > >>
+> > >> Moreover, that fixes a segmentation fault when calling dump-guest-=
+memory
+> > >> with no filter for a machine with no memory defined.
+> > >>
+> > >> New behaviour is:
+> > >>
+> > >> (qemu) dump-guest-memory /dev/null
+> > >> dump: no guest memory to dump
+> > >> (qemu) dump-guest-memory /dev/null 0 4096
+> > >> dump: no guest memory to dump
+> > >>
+> > >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > >> ---
+> > >>
+> > >> Another unmaintained file. Joy. cc:ing some more-or-less random fo=
+lks. =20
+> > >
+> > > I thought Marc-Andr=C3=A9 had proposed to be the maintainer? But in=
+deed I
+> > > didn't see the line in maintainer file.
+> > >
+> > > Anyway, if anyone think I am ok to maintain this single file
+> > > (considering that I haven't posted patches on it for 2 years, and I
+> > > haven't been working on any kind of maintainer job), please let me
+> > > know. I'm glad to start with it (or with Marc-Andr=C3=A9).
+> > > =20
+> >=20
+> > That would be great!
+> > thanks
+>=20
+> Now on to the most important question: Will you merge this patch? :)
+>=20
+> (It should probably go together with "tests/hmp: test "none" machine
+> with memory".)
 
-The response to a SendObjectInfo consists of the storageid,
-parent obejct handle anad the handle reserved for the new
-incoming object
+I posted a RFC to maintain this file with Marc-Andr=C3=A9 Lureau, but not
+getting any acks yet, so I guess at least I don't have that
+permission, yet...
 
-Signed-off-by: Bandan Das <bsd@makefile.in>
----
- hw/usb/dev-mtp.c | 50 +++++++++++++++++++++++++++-----------------------
- 1 file changed, 27 insertions(+), 23 deletions(-)
+And I see Laruent posted this already:
 
-diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
-index 94c2e94..b55aa82 100644
---- a/hw/usb/dev-mtp.c
-+++ b/hw/usb/dev-mtp.c
-@@ -765,7 +765,8 @@ static void usb_mtp_add_time(MTPData *data, time_t time)
- /* ----------------------------------------------------------------------- */
- 
- static void usb_mtp_queue_result(MTPState *s, uint16_t code, uint32_t trans,
--                                 int argc, uint32_t arg0, uint32_t arg1)
-+                                 int argc, uint32_t arg0, uint32_t arg1,
-+                                 uint32_t arg2)
- {
-     MTPControl *c = g_new0(MTPControl, 1);
- 
-@@ -778,6 +779,9 @@ static void usb_mtp_queue_result(MTPState *s, uint16_t code, uint32_t trans,
-     if (argc > 1) {
-         c->argv[1] = arg1;
-     }
-+    if (argc > 2) {
-+        c->argv[2] = arg2;
-+    }
- 
-     assert(s->result == NULL);
-     s->result = c;
-@@ -1119,7 +1123,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-     /* sanity checks */
-     if (c->code >= CMD_CLOSE_SESSION && s->session == 0) {
-         usb_mtp_queue_result(s, RES_SESSION_NOT_OPEN,
--                             c->trans, 0, 0, 0);
-+                             c->trans, 0, 0, 0, 0);
-         return;
-     }
- 
-@@ -1131,12 +1135,12 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-     case CMD_OPEN_SESSION:
-         if (s->session) {
-             usb_mtp_queue_result(s, RES_SESSION_ALREADY_OPEN,
--                                 c->trans, 1, s->session, 0);
-+                                 c->trans, 1, s->session, 0, 0);
-             return;
-         }
-         if (c->argv[0] == 0) {
-             usb_mtp_queue_result(s, RES_INVALID_PARAMETER,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         trace_usb_mtp_op_open_session(s->dev.addr);
-@@ -1165,7 +1169,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         if (c->argv[0] != QEMU_STORAGE_ID &&
-             c->argv[0] != 0xffffffff) {
-             usb_mtp_queue_result(s, RES_INVALID_STORAGE_ID,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         data_in = usb_mtp_get_storage_info(s, c);
-@@ -1175,12 +1179,12 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         if (c->argv[0] != QEMU_STORAGE_ID &&
-             c->argv[0] != 0xffffffff) {
-             usb_mtp_queue_result(s, RES_INVALID_STORAGE_ID,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         if (c->argv[1] != 0x00000000) {
-             usb_mtp_queue_result(s, RES_SPEC_BY_FORMAT_UNSUPPORTED,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         if (c->argv[2] == 0x00000000 ||
-@@ -1191,12 +1195,12 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         }
-         if (o == NULL) {
-             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         if (o->format != FMT_ASSOCIATION) {
-             usb_mtp_queue_result(s, RES_INVALID_PARENT_OBJECT,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         usb_mtp_object_readdir(s, o);
-@@ -1212,7 +1216,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         o = usb_mtp_object_lookup(s, c->argv[0]);
-         if (o == NULL) {
-             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         data_in = usb_mtp_get_object_info(s, c, o);
-@@ -1221,18 +1225,18 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         o = usb_mtp_object_lookup(s, c->argv[0]);
-         if (o == NULL) {
-             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         if (o->format == FMT_ASSOCIATION) {
-             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         data_in = usb_mtp_get_object(s, c, o);
-         if (data_in == NULL) {
-             usb_mtp_queue_result(s, RES_GENERAL_ERROR,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         break;
-@@ -1240,18 +1244,18 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         o = usb_mtp_object_lookup(s, c->argv[0]);
-         if (o == NULL) {
-             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         if (o->format == FMT_ASSOCIATION) {
-             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         data_in = usb_mtp_get_partial_object(s, c, o);
-         if (data_in == NULL) {
-             usb_mtp_queue_result(s, RES_GENERAL_ERROR,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         nres = 1;
-@@ -1261,7 +1265,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         if (c->argv[0] != FMT_UNDEFINED_OBJECT &&
-             c->argv[0] != FMT_ASSOCIATION) {
-             usb_mtp_queue_result(s, RES_INVALID_OBJECT_FORMAT_CODE,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         data_in = usb_mtp_get_object_props_supported(s, c);
-@@ -1270,13 +1274,13 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         if (c->argv[1] != FMT_UNDEFINED_OBJECT &&
-             c->argv[1] != FMT_ASSOCIATION) {
-             usb_mtp_queue_result(s, RES_INVALID_OBJECT_FORMAT_CODE,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         data_in = usb_mtp_get_object_prop_desc(s, c);
-         if (data_in == NULL) {
-             usb_mtp_queue_result(s, RES_INVALID_OBJECT_PROP_CODE,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         break;
-@@ -1284,20 +1288,20 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         o = usb_mtp_object_lookup(s, c->argv[0]);
-         if (o == NULL) {
-             usb_mtp_queue_result(s, RES_INVALID_OBJECT_HANDLE,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         data_in = usb_mtp_get_object_prop_value(s, c, o);
-         if (data_in == NULL) {
-             usb_mtp_queue_result(s, RES_INVALID_OBJECT_PROP_CODE,
--                                 c->trans, 0, 0, 0);
-+                                 c->trans, 0, 0, 0, 0);
-             return;
-         }
-         break;
-     default:
-         trace_usb_mtp_op_unknown(s->dev.addr, c->code);
-         usb_mtp_queue_result(s, RES_OPERATION_NOT_SUPPORTED,
--                             c->trans, 0, 0, 0);
-+                             c->trans, 0, 0, 0, 0);
-         return;
-     }
- 
-@@ -1306,7 +1310,7 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
-         assert(s->data_in == NULL);
-         s->data_in = data_in;
-     }
--    usb_mtp_queue_result(s, RES_OK, c->trans, nres, res0, 0);
-+    usb_mtp_queue_result(s, RES_OK, c->trans, nres, res0, 0, 0);
- }
- 
- /* ----------------------------------------------------------------------- */
--- 
-2.9.4
+  [Qemu-devel] [PATCH v4 0/4] hmp: fix "dump-quest-memory" segfault
+
+So I assume all these four patches can go with Dave's tree.  Thanks,
+
+--=20
+Peter Xu
