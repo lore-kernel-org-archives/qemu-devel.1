@@ -1,18 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59571)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34303)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dsTNS-0007lp-NX
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:36:19 -0400
+	(envelope-from <berrange@redhat.com>) id 1dsTSB-0001lv-TS
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:41:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dsTNN-0004ZG-QN
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:36:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52390)
+	(envelope-from <berrange@redhat.com>) id 1dsTS7-0000LH-Uy
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:41:11 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55044)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dsTNN-0004X9-LG
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:36:13 -0400
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu, 14 Sep 2017 13:36:09 +0100
-Message-Id: <20170914123609.497-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH] sparc: Fix typedef clash
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dsTS7-0000Jx-OQ
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:41:07 -0400
+Date: Thu, 14 Sep 2017 13:40:59 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170914124059.GD15518@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170912123744.14730-1-berrange@redhat.com>
+	<1505223994.31639.20.camel@redhat.com>
+	<20170912141910.GJ17633@redhat.com>
+	<CAFEAcA-tdbzXBkyxXW_e15hVcbcfqSfKqke0PX6y-Cg6A62DzQ@mail.gmail.com>
+	<20170912143007.GK17633@redhat.com>
+	<1505390103.31557.11.camel@redhat.com>
+	<CAFEAcA9JEGbiwKeSMyvnLrdE+2WrkRbYLcVJ+UpFnU1RymC1vQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA9JEGbiwKeSMyvnLrdE+2WrkRbYLcVJ+UpFnU1RymC1vQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v5 00/12] Convert over to use keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,40 +33,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, mark.cave-ayland@ilande.co.uk, atar4qemu@gmail.com, imammedo@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Thu, Sep 14, 2017 at 12:58:26PM +0100, Peter Maydell wrote:
+> On 14 September 2017 at 12:55, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> >   Hi,
+> >
+> >> I think a better approach is to have something in rules.mak
+> >> that ensures the submodule is checked out correctly (only
+> >> when building from GIT, not dist), and then have the rules
+> >> which generate the keymap files depend on this.
+> >
+> > Care sending a patch doing that for dtc?
+> 
+> It sounds awfully fiddly. Maybe it is the best we can do
+> given the mess that is git submodules, but is it really
+> the common approach?
 
-Older compilers (rhel6) don't like redefinition of typedefs
+I'll do a prototype so we can see something concrete working and
+evaluate how pleasant (or not) it is
 
-Fixes: 12a6c15ef31c98ecefa63e91ac36955383038384
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- target/sparc/cpu.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
-index b45cfb4708..1598f65927 100644
---- a/target/sparc/cpu.h
-+++ b/target/sparc/cpu.h
-@@ -240,7 +240,7 @@ typedef struct trap_state {
- #endif
- #define TARGET_INSN_START_EXTRA_WORDS 1
- 
--typedef struct sparc_def_t {
-+struct sparc_def_t {
-     const char *name;
-     target_ulong iu_version;
-     uint32_t fpu_version;
-@@ -254,7 +254,7 @@ typedef struct sparc_def_t {
-     uint32_t features;
-     uint32_t nwindows;
-     uint32_t maxtl;
--} sparc_def_t;
-+};
- 
- #define CPU_FEATURE_FLOAT        (1 << 0)
- #define CPU_FEATURE_FLOAT128     (1 << 1)
+Regards,
+Daniel
 -- 
-2.13.5
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
