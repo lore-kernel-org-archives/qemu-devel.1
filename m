@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46992)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsVKi-0006DF-4I
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:41 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsVKn-0006Jt-7L
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsVKd-0002v9-Vb
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:36 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsVKj-00031R-LA
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:41 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 14 Sep 2017 09:40:26 -0500
-Message-Id: <20170914144032.14945-15-eblake@redhat.com>
+Date: Thu, 14 Sep 2017 09:40:28 -0500
+Message-Id: <20170914144032.14945-17-eblake@redhat.com>
 In-Reply-To: <20170914144032.14945-1-eblake@redhat.com>
 References: <20170914144032.14945-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 14/20] sheepdog: Switch to
- .bdrv_co_block_status()
+Subject: [Qemu-devel] [PATCH v3 16/20] vdi: Switch to .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,86 +20,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Hitoshi Mitake <mitake.hitoshi@lab.ntt.co.jp>, Liu Yuan <namei.unix@gmail.com>, Jeff Cody <jcody@redhat.com>, Max Reitz <mreitz@redhat.com>, "open list:Sheepdog" <sheepdog@lists.wpkg.org>
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the sheepdog driver accordingly.
+byte-based.  Update the vdi driver accordingly.  Note that the
+TODO is already covered (the block layer guarantees bounds of its
+requests), and that we can remove the now-unused s->block_sectors.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
 v2: rebase to mapping flag
 ---
- block/sheepdog.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+ block/vdi.c | 28 +++++++++++-----------------
+ 1 file changed, 11 insertions(+), 17 deletions(-)
 
-diff --git a/block/sheepdog.c b/block/sheepdog.c
-index 696a71442a..09c431decc 100644
---- a/block/sheepdog.c
-+++ b/block/sheepdog.c
-@@ -2989,18 +2989,17 @@ static coroutine_fn int sd_co_pdiscard(BlockDriverState *bs, int64_t offset,
+diff --git a/block/vdi.c b/block/vdi.c
+index 6f83221ddc..b571832127 100644
+--- a/block/vdi.c
++++ b/block/vdi.c
+@@ -171,8 +171,6 @@ typedef struct {
+     uint32_t *bmap;
+     /* Size of block (bytes). */
+     uint32_t block_size;
+-    /* Size of block (sectors). */
+-    uint32_t block_sectors;
+     /* First sector of block map. */
+     uint32_t bmap_sector;
+     /* VDI header (converted to host endianness). */
+@@ -462,7 +460,6 @@ static int vdi_open(BlockDriverState *bs, QDict *options, int flags,
+     bs->total_sectors = header.disk_size / SECTOR_SIZE;
+
+     s->block_size = header.block_size;
+-    s->block_sectors = header.block_size / SECTOR_SIZE;
+     s->bmap_sector = header.offset_bmap / SECTOR_SIZE;
+     s->header = header;
+
+@@ -508,23 +505,20 @@ static int vdi_reopen_prepare(BDRVReopenState *state,
+     return 0;
  }
 
- static coroutine_fn int64_t
--sd_co_get_block_status(BlockDriverState *bs, int64_t sector_num, int nb_sectors,
--                       int *pnum, BlockDriverState **file)
-+sd_co_block_status(BlockDriverState *bs, bool mapping, int64_t offset,
-+                   int64_t bytes, int64_t *pnum, BlockDriverState **file)
+-static int64_t coroutine_fn vdi_co_get_block_status(BlockDriverState *bs,
+-        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
++static int64_t coroutine_fn vdi_co_block_status(BlockDriverState *bs,
++                                                bool mapping,
++                                                int64_t offset, int64_t bytes,
++                                                int64_t *pnum,
++                                                BlockDriverState **file)
  {
-     BDRVSheepdogState *s = bs->opaque;
-     SheepdogInode *inode = &s->inode;
-     uint32_t object_size = (UINT32_C(1) << inode->block_size_shift);
--    uint64_t offset = sector_num * BDRV_SECTOR_SIZE;
-     unsigned long start = offset / object_size,
--                  end = DIV_ROUND_UP((sector_num + nb_sectors) *
--                                     BDRV_SECTOR_SIZE, object_size);
-+                  end = DIV_ROUND_UP(offset + bytes, object_size);
-     unsigned long idx;
--    int64_t ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
-+    int64_t ret = BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID |
-+        (offset & BDRV_BLOCK_OFFSET_MASK);
+-    /* TODO: Check for too large sector_num (in bdrv_is_allocated or here). */
+     BDRVVdiState *s = (BDRVVdiState *)bs->opaque;
+-    size_t bmap_index = sector_num / s->block_sectors;
+-    size_t sector_in_block = sector_num % s->block_sectors;
+-    int n_sectors = s->block_sectors - sector_in_block;
++    size_t bmap_index = offset / s->block_size;
++    size_t index_in_block = offset % s->block_size;
+     uint32_t bmap_entry = le32_to_cpu(s->bmap[bmap_index]);
+-    uint64_t offset;
+     int result;
 
-     for (idx = start; idx < end; idx++) {
-         if (inode->data_vdi_id[idx] == 0) {
-@@ -3017,9 +3016,9 @@ sd_co_get_block_status(BlockDriverState *bs, int64_t sector_num, int nb_sectors,
-         }
-     }
+-    logout("%p, %" PRId64 ", %d, %p\n", bs, sector_num, nb_sectors, pnum);
+-    if (n_sectors > nb_sectors) {
+-        n_sectors = nb_sectors;
+-    }
+-    *pnum = n_sectors;
++    logout("%p, %" PRId64 ", %" PRId64 ", %p\n", bs, offset, bytes, pnum);
++    *pnum = MIN(s->block_size, bytes);
+     result = VDI_IS_ALLOCATED(bmap_entry);
+     if (!result) {
+         return 0;
+@@ -532,7 +526,7 @@ static int64_t coroutine_fn vdi_co_get_block_status(BlockDriverState *bs,
 
--    *pnum = (idx - start) * object_size / BDRV_SECTOR_SIZE;
--    if (*pnum > nb_sectors) {
--        *pnum = nb_sectors;
-+    *pnum = (idx - start) * object_size;
-+    if (*pnum > bytes) {
-+        *pnum = bytes;
-     }
-     if (ret > 0 && ret & BDRV_BLOCK_OFFSET_VALID) {
-         *file = bs;
-@@ -3097,7 +3096,7 @@ static BlockDriver bdrv_sheepdog = {
-     .bdrv_co_writev = sd_co_writev,
-     .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
-     .bdrv_co_pdiscard = sd_co_pdiscard,
--    .bdrv_co_get_block_status = sd_co_get_block_status,
-+    .bdrv_co_block_status   = sd_co_block_status,
+     offset = s->header.offset_data +
+                               (uint64_t)bmap_entry * s->block_size +
+-                              sector_in_block * SECTOR_SIZE;
++                              (index_in_block & BDRV_BLOCK_OFFSET_MASK);
+     *file = bs->file->bs;
+     return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID | offset;
+ }
+@@ -902,7 +896,7 @@ static BlockDriver bdrv_vdi = {
+     .bdrv_child_perm          = bdrv_format_default_perms,
+     .bdrv_create = vdi_create,
+     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+-    .bdrv_co_get_block_status = vdi_co_get_block_status,
++    .bdrv_co_block_status = vdi_co_block_status,
+     .bdrv_make_empty = vdi_make_empty,
 
-     .bdrv_snapshot_create   = sd_snapshot_create,
-     .bdrv_snapshot_goto     = sd_snapshot_goto,
-@@ -3133,7 +3132,7 @@ static BlockDriver bdrv_sheepdog_tcp = {
-     .bdrv_co_writev = sd_co_writev,
-     .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
-     .bdrv_co_pdiscard = sd_co_pdiscard,
--    .bdrv_co_get_block_status = sd_co_get_block_status,
-+    .bdrv_co_block_status   = sd_co_block_status,
-
-     .bdrv_snapshot_create   = sd_snapshot_create,
-     .bdrv_snapshot_goto     = sd_snapshot_goto,
-@@ -3169,7 +3168,7 @@ static BlockDriver bdrv_sheepdog_unix = {
-     .bdrv_co_writev = sd_co_writev,
-     .bdrv_co_flush_to_disk  = sd_co_flush_to_disk,
-     .bdrv_co_pdiscard = sd_co_pdiscard,
--    .bdrv_co_get_block_status = sd_co_get_block_status,
-+    .bdrv_co_block_status   = sd_co_block_status,
-
-     .bdrv_snapshot_create   = sd_snapshot_create,
-     .bdrv_snapshot_goto     = sd_snapshot_goto,
+     .bdrv_co_preadv     = vdi_co_preadv,
 -- 
 2.13.5
