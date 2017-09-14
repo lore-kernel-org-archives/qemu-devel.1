@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46603)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46476)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dsYJc-00088Z-GZ
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:41 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dsYJZ-00085b-OF
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dsYJb-00083Z-Do
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:40 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37368)
+	(envelope-from <pm215@archaic.org.uk>) id 1dsYJY-0007xk-Fz
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:37 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37364)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dsYJb-0007x0-5h
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:39 -0400
+	id 1dsYJY-0007iP-7e
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:36 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dsYJN-0005nI-TW
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 18:52:25 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dsYJT-0005rd-Vp
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 18:52:31 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Sep 2017 18:52:37 +0100
-Message-Id: <1505411573-27848-3-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 14 Sep 2017 18:52:46 +0100
+Message-Id: <1505411573-27848-12-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1505411573-27848-1-git-send-email-peter.maydell@linaro.org>
 References: <1505411573-27848-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 02/18] target/arm: Clear exclusive monitor on
- v7M reset, exception entry/exit
+Subject: [Qemu-devel] [PULL 11/18] xlnx-zcu102: Add a machine level
+ virtualization property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +30,129 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-For M profile we must clear the exclusive monitor on reset, exception
-entry and exception exit.  We weren't doing any of these things; fix
-this bug.
+From: Alistair Francis <alistair.francis@xilinx.com>
 
+Add a machine level virtualization property. This defaults to false and can be
+set to true using this machine command line argument:
+    -machine xlnx-zcu102,virtualization=on
+
+This follows what the ARM virt machine does.
+
+This property only applies to the ZCU102 machine. The EP108 machine does
+not have this property.
+
+Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1505137930-13255-3-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/internals.h | 10 ++++++++++
- target/arm/cpu.c       |  6 ++++++
- target/arm/helper.c    |  2 ++
- target/arm/op_helper.c |  2 +-
- 4 files changed, 19 insertions(+), 1 deletion(-)
+ include/hw/arm/xlnx-zynqmp.h |  2 ++
+ hw/arm/xlnx-zcu102.c         | 30 +++++++++++++++++++++++++++++-
+ hw/arm/xlnx-zynqmp.c         |  3 ++-
+ 3 files changed, 33 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index 5d7f24c..a315354 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -444,6 +444,16 @@ void arm_handle_psci_call(ARMCPU *cpu);
- #endif
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index c2931bf..6eff81a 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -91,6 +91,8 @@ typedef struct XlnxZynqMPState {
  
- /**
-+ * arm_clear_exclusive: clear the exclusive monitor
-+ * @env: CPU env
-+ * Clear the CPU's exclusive monitor, like the guest CLREX instruction.
-+ */
-+static inline void arm_clear_exclusive(CPUARMState *env)
-+{
-+    env->exclusive_addr = -1;
-+}
-+
-+/**
-  * ARMMMUFaultInfo: Information describing an ARM MMU Fault
-  * @s2addr: Address that caused a fault at stage 2
-  * @stage2: True if we faulted at stage 2
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index a1acce3..412e94c 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -235,6 +235,12 @@ static void arm_cpu_reset(CPUState *s)
-         env->regs[15] = 0xFFFF0000;
-     }
+     /* Has the ARM Security extensions?  */
+     bool secure;
++    /* Has the ARM Virtualization extensions?  */
++    bool virt;
+     /* Has the RPU subsystem?  */
+     bool has_rpu;
+ }  XlnxZynqMPState;
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index bd573c4..42deefd 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -32,6 +32,7 @@ typedef struct XlnxZCU102 {
+     MemoryRegion ddr_ram;
  
-+    /* M profile requires that reset clears the exclusive monitor;
-+     * A profile does not, but clearing it makes more sense than having it
-+     * set with an exclusive access on address zero.
-+     */
-+    arm_clear_exclusive(env);
-+
-     env->vfp.xregs[ARM_VFP_FPEXC] = 0;
- #endif
+     bool secure;
++    bool virt;
+ } XlnxZCU102;
  
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index 329e517..668e367 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6175,6 +6175,7 @@ static void v7m_exception_taken(ARMCPU *cpu, uint32_t lr)
- 
-     armv7m_nvic_acknowledge_irq(env->nvic);
-     switch_v7m_sp(env, 0);
-+    arm_clear_exclusive(env);
-     /* Clear IT bits */
-     env->condexec_bits = 0;
-     env->regs[14] = lr;
-@@ -6354,6 +6355,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-     }
- 
-     /* Otherwise, we have a successful exception exit. */
-+    arm_clear_exclusive(env);
-     qemu_log_mask(CPU_LOG_INT, "...successful exception return\n");
+ #define TYPE_ZCU102_MACHINE   MACHINE_TYPE_NAME("xlnx-zcu102")
+@@ -58,6 +59,20 @@ static void zcu102_set_secure(Object *obj, bool value, Error **errp)
+     s->secure = value;
  }
  
-diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-index d1bca46..6a60464 100644
---- a/target/arm/op_helper.c
-+++ b/target/arm/op_helper.c
-@@ -1022,7 +1022,7 @@ void HELPER(exception_return)(CPUARMState *env)
++static bool zcu102_get_virt(Object *obj, Error **errp)
++{
++    XlnxZCU102 *s = ZCU102_MACHINE(obj);
++
++    return s->virt;
++}
++
++static void zcu102_set_virt(Object *obj, bool value, Error **errp)
++{
++    XlnxZCU102 *s = ZCU102_MACHINE(obj);
++
++    s->virt = value;
++}
++
+ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
+ {
+     int i;
+@@ -87,6 +102,8 @@ static void xlnx_zynqmp_init(XlnxZCU102 *s, MachineState *machine)
+                          "ddr-ram", &error_abort);
+     object_property_set_bool(OBJECT(&s->soc), s->secure, "secure",
+                              &error_fatal);
++    object_property_set_bool(OBJECT(&s->soc), s->virt, "virtualization",
++                             &error_fatal);
  
-     aarch64_save_sp(env, cur_el);
+     object_property_set_bool(OBJECT(&s->soc), true, "realized", &error_fatal);
  
--    env->exclusive_addr = -1;
-+    arm_clear_exclusive(env);
+@@ -154,8 +171,9 @@ static void xlnx_ep108_machine_instance_init(Object *obj)
+ {
+     XlnxZCU102 *s = EP108_MACHINE(obj);
  
-     /* We must squash the PSTATE.SS bit to zero unless both of the
-      * following hold:
+-    /* EP108, we don't support setting secure */
++    /* EP108, we don't support setting secure or virt */
+     s->secure = false;
++    s->virt = false;
+ }
+ 
+ static void xlnx_ep108_machine_class_init(ObjectClass *oc, void *data)
+@@ -201,6 +219,16 @@ static void xlnx_zcu102_machine_instance_init(Object *obj)
+                                     "Set on/off to enable/disable the ARM "
+                                     "Security Extensions (TrustZone)",
+                                     NULL);
++
++    /* Default to virt (EL2) being disabled */
++    s->virt = false;
++    object_property_add_bool(obj, "virtualization", zcu102_get_virt,
++                             zcu102_set_virt, NULL);
++    object_property_set_description(obj, "virtualization",
++                                    "Set on/off to enable/disable emulating a "
++                                    "guest CPU which implements the ARM "
++                                    "Virtualization Extensions",
++                                    NULL);
+ }
+ 
+ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 22c2a33..2b27daf 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -255,7 +255,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+         object_property_set_bool(OBJECT(&s->apu_cpu[i]),
+                                  s->secure, "has_el3", NULL);
+         object_property_set_bool(OBJECT(&s->apu_cpu[i]),
+-                                 false, "has_el2", NULL);
++                                 s->virt, "has_el2", NULL);
+         object_property_set_int(OBJECT(&s->apu_cpu[i]), GIC_BASE_ADDR,
+                                 "reset-cbar", &error_abort);
+         object_property_set_bool(OBJECT(&s->apu_cpu[i]), true, "realized",
+@@ -427,6 +427,7 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+ static Property xlnx_zynqmp_props[] = {
+     DEFINE_PROP_STRING("boot-cpu", XlnxZynqMPState, boot_cpu),
+     DEFINE_PROP_BOOL("secure", XlnxZynqMPState, secure, false),
++    DEFINE_PROP_BOOL("virtualization", XlnxZynqMPState, virt, false),
+     DEFINE_PROP_BOOL("has_rpu", XlnxZynqMPState, has_rpu, false),
+     DEFINE_PROP_LINK("ddr-ram", XlnxZynqMPState, ddr_ram, TYPE_MEMORY_REGION,
+                      MemoryRegion *),
 -- 
 2.7.4
