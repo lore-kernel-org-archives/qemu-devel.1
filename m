@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41212)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42496)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dsS7J-0002ZZ-Uc
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:15:39 -0400
+	(envelope-from <thuth@redhat.com>) id 1dsS9e-0004Ai-4n
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:18:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dsS7F-000160-81
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:15:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58700)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dsS7F-00014x-1U
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:15:29 -0400
-Date: Thu, 14 Sep 2017 13:15:24 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170914131524.3a24ff46.cohuck@redhat.com>
-In-Reply-To: <20170914105535.47941-1-pasic@linux.vnet.ibm.com>
-References: <20170914105535.47941-1-pasic@linux.vnet.ibm.com>
+	(envelope-from <thuth@redhat.com>) id 1dsS9Y-0003Cm-7j
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:17:58 -0400
+References: <150538608438.12346.9391407971434352383.stgit@bahia.lan>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <0cb6cfca-05e6-d2e2-7345-541fa21490dd@redhat.com>
+Date: Thu, 14 Sep 2017 13:17:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] virtio-ccw: remove stale comments on
- endiannes
+In-Reply-To: <150538608438.12346.9391407971434352383.stgit@bahia.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] ppc/kvm: use kvm_vm_check_extension() in
+ kvmppc_is_pr()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,28 +24,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
 
-On Thu, 14 Sep 2017 12:55:35 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On 14.09.2017 12:48, Greg Kurz wrote:
+> If the host has both KVM PR and KVM HV loaded and we pass:
+>=20
+> 	-machine pseries,accel=3Dkvm,kvm-type=3DPR
+>=20
+> the kvmppc_is_pr() returns false instead of true. Since the helper
+> is mostly used as fallback, it doesn't have any real impact with
+> recent kernels. A notable exception is the workaround to allow
+> migration between compatible hosts with different PVRs (eg, POWER8
+> and POWER8E), since KVM still doesn't provide a way to check if a
+> specific PVR is supported (see commit c363a37a450f for details).
+>=20
+> According to the official KVM API documentation [1], KVM_PPC_GET_PVINFO
+> is "vm ioctl", but we check it as a global ioctl. The following functio=
+n
+> in KVM is hence called with kvm =3D=3D NULL and considers we're in HV m=
+ode.
+>=20
+> int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+> {
+> 	int r;
+> 	/* Assume we're using HV mode when the HV module is loaded */
+> 	int hv_enabled =3D kvmppc_hv_ops ? 1 : 0;
+>=20
+> 	if (kvm) {
+> 		/*
+> 		 * Hooray - we know which VM type we're running on. Depend on
+> 		 * that rather than the guess above.
+> 		 */
+> 		hv_enabled =3D is_kvmppc_hv_enabled(kvm);
+> 	}
+>=20
+> Let's use kvm_vm_check_extension() to fix the issue.
 
-> We have two stale comments suggesting one should think about virtio
-> config space endiannes a bit longer. We have just done that, and came to
-> the conclusion we are fine as is: it's the responsibility of the virtio
-> device and not of the transport (and that is how it works now). Putting
-> the responsibility into the transport isn't even possible, because the
-> transport would have to know about the config space layout of each
-> device.
+By the way, what about the other CAPs that rely on hv_enabled? grepping
+through the QEMU sources, I can see:
 
-s/endianes/endianess/
+ cap_ppc_smt =3D kvm_check_extension(s, KVM_CAP_PPC_SMT);
 
-> Let us remove the stale comments.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Suggested-by: Cornelia Huck <cohuck@redhat.com>
-> ---
->  hw/s390x/virtio-ccw.c | 2 --
->  1 file changed, 2 deletions(-)
+ cap_htab_fd =3D kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
 
-Thanks, applied.
+ int ret =3D kvm_check_extension(s, KVM_CAP_NR_VCPUS);
+
+ return kvm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
+
+ !kvm_check_extension(cs->kvm_state, KVM_CAP_SW_TLB)) {
+
+... do we need to fix them, too?
+
+ Thomas
