@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54773)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dsVXX-0004ba-U9
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:54:53 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dsVYS-0005ik-NO
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:55:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dsVXW-0002tI-W1
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:54:52 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:48085)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dsVXW-0002sO-OE
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:54:50 -0400
-Received: by mail-wr0-x234.google.com with SMTP id k20so6111264wre.4
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 07:54:50 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1dsVYO-0003hJ-HU
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:55:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33018)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dsVYO-0003gl-7P
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:55:44 -0400
+Date: Thu, 14 Sep 2017 16:55:18 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170914165518.3f36c96e.cohuck@redhat.com>
+In-Reply-To: <1505385363-27717-1-git-send-email-thuth@redhat.com>
+References: <1505385363-27717-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
-References: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Sep 2017 15:54:28 +0100
-Message-ID: <CAFEAcA-rmX=gUdYTLK4g5TAWVTkCfkbkXXfCxmaaivv8XGdMXg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v5 00/22] instrument: Add basic event
- instrumentation
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] configure: Allow --enable-seccomp on s390x, too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Eduardo Otubo <otubo@redhat.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>
 
-On 12 September 2017 at 22:01, Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> wr=
-ote:
-> This series adds an API to add instrumentation events.
->
-> It also provides additional APIs for:
-> * Controlling tracing events.
-> * Peek/poke guest memory.
+On Thu, 14 Sep 2017 12:36:03 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-> Future APIs (for later series):
-> * Peek/poke guest registers.
-> * Add breakpoints to trigger instrumentation functions.
-> * Trigger instrumentation functions from guest code (former hypertrace).
-> * Add events for guest code translation/execution (once the respective tr=
-acing
->   events are accepted upstream).
-> * Add events for exceptions/syscalls.
-> * Add events for TB invalidation (necessary for libraries to deallocate a=
-ny data
->   they might have allocated for the TBs they instrumented).
->
-> The instrumentation code is dynamically loaded as a library into QEMU eit=
-her
-> when it starts or later using its remote control interfaces. The loaded c=
-ode
-> only has access to function explicitly exported through the QI_VPUBLIC ma=
-cro.
->
-> This series is branch 'devel-instrument' in
-> https://code.gso.ac.upc.edu/git/qemu-dbi.
+> libseccomp supports s390x since version 2.3.0, and I was able to start
+> a VM with "-sandbox on" without any obvious problems by using this patch,
+> so it should be safe to allow --enable-seccomp on s390x nowadays, too.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/configure b/configure
+> index fd7e3a5..83ba64e 100755
+> --- a/configure
+> +++ b/configure
+> @@ -2032,7 +2032,7 @@ if test "$seccomp" != "no" ; then
+>      arm|aarch64)
+>          libseccomp_minver="2.2.3"
+>          ;;
+> -    ppc|ppc64)
+> +    ppc|ppc64|s390x)
+>          libseccomp_minver="2.3.0"
+>          ;;
+>      *)
 
-To parallel the comment I sent on Emilio's series: I think the
-first thing we should do here is work out the API we want to
-present to the instrumentation plugin, because that's permanent
-and we want to get it right. Then we can figure out the
-implementation details later.
-
-Particular notes:
- * putting things in the instrumentation plugin API that basically
-   parallel some existing trace points is something I'm wary of,
-   because a lot of our existing tracing is "output something at
-   a point and in a way that's convenient for our internal
-   implementation", rather than "what is the right clean interface
-   to provide this sort of information". I'd rather we started
-   with a blank piece of paper and designed an API, and then
-   implemented it.
- * I definitely don't think we should expose to the instrumentation
-   the distinction between translate time and execute time
-
-thanks
--- PMM
+Thanks, applied.
