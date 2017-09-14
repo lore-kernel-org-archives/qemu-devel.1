@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53572)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.dakinevich@gmail.com>) id 1dsX1m-0005z6-0Q
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:30:11 -0400
+	(envelope-from <smolov@ispras.ru>) id 1dsX49-00080Q-UK
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:32:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.dakinevich@gmail.com>) id 1dsX1h-0003sk-0R
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:30:10 -0400
-Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:37666)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jan.dakinevich@gmail.com>)
-	id 1dsX1g-0003qU-Q3
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:30:04 -0400
-Received: by mail-lf0-x244.google.com with SMTP id q132so1862013lfe.4
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 09:30:03 -0700 (PDT)
-From: Jan Dakinevich <jan.dakinevich@gmail.com>
-Date: Thu, 14 Sep 2017 19:31:36 +0300
-Message-Id: <1505406696-2260-1-git-send-email-jan.dakinevich@gmail.com>
-Subject: [Qemu-devel] [PATCH] 9pfs: check the size of transport buffer
- before marshaling
+	(envelope-from <smolov@ispras.ru>) id 1dsX44-000720-TK
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:32:37 -0400
+Received: from bran.ispras.ru ([83.149.199.196]:42568 helo=smtp.ispras.ru)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <smolov@ispras.ru>) id 1dsX44-00070I-KY
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:32:32 -0400
+Message-ID: <59BAAF1D.8070801@ispras.ru>
+Date: Thu, 14 Sep 2017 19:32:29 +0300
+From: Sergey Smolov <smolov@ispras.ru>
+MIME-Version: 1.0
+References: <59B7EBC5.9060908@ispras.ru>
+	<CAFEAcA-to=vWWBHoxZRX-ExcbDe0OTMwpHunE7HXaYA0GE+ccw@mail.gmail.com>
+	<59B7F503.8010703@ispras.ru>
+	<CAFEAcA97i97_aoq8xNKtP8Z+i-u5Hq+_e6N80=T=WspSEW+A7A@mail.gmail.com>
+	<59B8DE5A.9000301@ispras.ru>
+	<CAFEAcA8UTVr-jO4Eh=uaUokYBhF0EYTuBoXdLyrKZ=GrjPFtmQ@mail.gmail.com>
+	<0c3db1e3-1638-cfbe-8c97-0d1aa87547b0@imgtec.com>
+	<59BA88D1.9080202@ispras.ru>
+	<CAFEAcA_HRwa_XFv8M3h_5dK0p6Xiuu1FfF32TPOhEop80wT30A@mail.gmail.com>
+	<59BA8F4E.6060600@ispras.ru>
+	<5cea7ccd-97b3-ecbf-22c1-72b329c467fc@imgtec.com>
+In-Reply-To: <5cea7ccd-97b3-ecbf-22c1-72b329c467fc@imgtec.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] MIPS 'move' insn emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,121 +36,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Jan Dakinevich <jan.dakinevich@gmail.com>
+To: Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
 
-v9fs_do_readdir_with_stat() and v9fs_do_readdir() stores as much data in
-the buffer as can fit unless marshaling erorr occurs. However, after
-commit 23a006d the behavior pdu_marshal was changed, and on error the
-routine assumes that buffers are misconfigured and breaks communication.
 
-Signed-off-by: Jan Dakinevich <jan.dakinevich@gmail.com>
----
- hw/9pfs/9p.c | 44 ++++++++++++++++++++++++++++++++------------
- 1 file changed, 32 insertions(+), 12 deletions(-)
+On 14.09.2017 17:23, Yongbok Kim wrote:
+>
+> On 14/09/2017 15:16, Sergey Smolov wrote:
+>> On 14.09.2017 16:58, Peter Maydell wrote:
+>>> At translate time it is generating some extra code which at runtime
+>>> will call the helper_trace_reg_access() function, passing it the
+>>> values in the registers at this point. This will result in poor
+>>> performance if you do it for frequently executed instructions.
+> Yes indeed. it will be hitting the performance critically the instruction
+> is quite often used. :)
+>
+>> Ok, thank you.
+>>
+>>> That looks like it ought to work. Check you really did save all your
+>>> files in your editor before compiling? :-)
+>> Yes, I did. These warnings are very suspicious, because they come with
+>> strange numbers of MIPS GPR registers that I receive for my program.
+>>
+>> Here is the program:
+>>
+>> .text
+>>      addiu $8, $zero, 0x7
+>>      move $9, $8
+>>      sll $8, $8, 3
+>>      add $8, $8, $9
+>>
+>> Here is the log that helper functions provide:
+>>
+>> $0 00000007
+>> $7 00000007
+>> $0 00000038
+>> $0 0000003f
+>>
+>> The first value is register name, the second is the value to be written.
+>> Values are ok, but I expect to see $8 and $9  registers here.
+>>
+>>> PS: there's no point passing the env pointer into the function if
+>>> you're not going to use it...
+> Yes you're right. I had further use of the env but it has been chopped for
+> the example.
+>
+>> I thought that I need to pass env pointer to helper function because of
+>> some convention. Again, thank you for the note.
+>>
+> Sergey,
+>
+> The reason why your modification is failed is because you passed wrong
+> argument. Remember that you are not just calling the helper function from
+> translate.c but you are generating some code to let call the helper
+> function on run time. You have to create a temporal TCGv to pass the
+> register number.
+> You could do it like,
+> TCGv_i32 tmp = tcg_const_i32(rd)
+> gen_helper_trace_reg_access(cpu_env, tmp, cpu_gpr[rs);
+> tcg_temp_free_i32(tmp);
+>
+> or simply use the predefined macro and fix the order of the arguments.
+>
+> gen_helper_0e1i(trace_reg_access, cpu_gpr[rs], rd);
+>
+> Regards,
+> Yongbok
 
-diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-index 1e38109..8e0b87e 100644
---- a/hw/9pfs/9p.c
-+++ b/hw/9pfs/9p.c
-@@ -1679,6 +1679,16 @@ static void v9fs_init_qiov_from_pdu(QEMUIOVector *qiov, V9fsPDU *pdu,
-     qemu_iovec_concat(qiov, &elem, skip, size);
- }
- 
-+static size_t v9fs_marshal_size(V9fsPDU *pdu)
-+{
-+    struct iovec *iov;
-+    unsigned int niov;
-+
-+    pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, 0);
-+
-+    return iov_size(iov, niov);
-+}
-+
- static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
-                            uint64_t off, uint32_t max_count)
- {
-@@ -1725,6 +1735,10 @@ static int coroutine_fn v9fs_do_readdir_with_stat(V9fsPDU *pdu,
-     off_t saved_dir_pos;
-     struct dirent *dent;
- 
-+    /* 11 = 7 + 4 (7 = start offset, 4 = space for storing count) */
-+    size_t offset = 11;
-+    size_t marshal_size = v9fs_marshal_size(pdu);
-+
-     /* save the directory position */
-     saved_dir_pos = v9fs_co_telldir(pdu, fidp);
-     if (saved_dir_pos < 0) {
-@@ -1752,18 +1766,23 @@ static int coroutine_fn v9fs_do_readdir_with_stat(V9fsPDU *pdu,
-         if (err < 0) {
-             break;
-         }
--        /* 11 = 7 + 4 (7 = start offset, 4 = space for storing count) */
--        len = pdu_marshal(pdu, 11 + count, "S", &v9stat);
- 
--        v9fs_readdir_unlock(&fidp->fs.dir);
-+        if (v9stat.size + 2 > MIN(marshal_size - offset, max_count - count)) {
-+            v9fs_readdir_unlock(&fidp->fs.dir);
- 
--        if ((len != (v9stat.size + 2)) || ((count + len) > max_count)) {
-             /* Ran out of buffer. Set dir back to old position and return */
-             v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
-             v9fs_stat_free(&v9stat);
-             v9fs_path_free(&path);
-             return count;
-         }
-+
-+        len = pdu_marshal(pdu, offset, "S", &v9stat);
-+        BUG_ON(len != v9stat.size + 2);
-+
-+        v9fs_readdir_unlock(&fidp->fs.dir);
-+
-+        offset += len;
-         count += len;
-         v9fs_stat_free(&v9stat);
-         v9fs_path_free(&path);
-@@ -1884,6 +1903,10 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
-     off_t saved_dir_pos;
-     struct dirent *dent;
- 
-+    /* 11 = 7 + 4 (7 = start offset, 4 = space for storing count) */
-+    size_t offset = 11;
-+    size_t marshal_size = v9fs_marshal_size(pdu);
-+
-     /* save the directory position */
-     saved_dir_pos = v9fs_co_telldir(pdu, fidp);
-     if (saved_dir_pos < 0) {
-@@ -1899,7 +1922,8 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
-         }
-         v9fs_string_init(&name);
-         v9fs_string_sprintf(&name, "%s", dent->d_name);
--        if ((count + v9fs_readdir_data_size(&name)) > max_count) {
-+        if (v9fs_readdir_data_size(&name) > MIN(marshal_size - offset,
-+                                                max_count - count)) {
-             v9fs_readdir_unlock(&fidp->fs.dir);
- 
-             /* Ran out of buffer. Set dir back to old position and return */
-@@ -1918,18 +1942,14 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU *pdu, V9fsFidState *fidp,
-         qid.type = 0;
-         qid.version = 0;
- 
--        /* 11 = 7 + 4 (7 = start offset, 4 = space for storing count) */
--        len = pdu_marshal(pdu, 11 + count, "Qqbs",
-+        len = pdu_marshal(pdu, offset, "Qqbs",
-                           &qid, dent->d_off,
-                           dent->d_type, &name);
-+        BUG_ON(len != v9fs_readdir_data_size(&name));
- 
-         v9fs_readdir_unlock(&fidp->fs.dir);
- 
--        if (len < 0) {
--            v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
--            v9fs_string_free(&name);
--            return len;
--        }
-+        offset += len;
-         count += len;
-         v9fs_string_free(&name);
-         saved_dir_pos = dent->d_off;
+It helps!
+
+Thank you both for detailed explanations:-)
+
 -- 
-2.1.4
+Sincerely yours,
+Sergey Smolov
