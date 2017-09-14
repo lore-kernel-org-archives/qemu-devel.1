@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49739)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dsYz6-0000Rd-5H
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 14:35:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dsYzB-0000X5-7b
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 14:35:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dsYz5-0000at-6R
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 14:35:32 -0400
-Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:55977)
+	(envelope-from <richard.henderson@linaro.org>) id 1dsYz7-0000et-Qc
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 14:35:37 -0400
+Received: from mail-pg0-x22b.google.com ([2607:f8b0:400e:c05::22b]:43507)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dsYz5-0000a7-0k
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 14:35:31 -0400
-Received: by mail-pg0-x22f.google.com with SMTP id b11so108961pgn.12
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 11:35:30 -0700 (PDT)
-Received: from bigtime.twiddle.net (97-126-103-167.tukw.qwest.net.
-	[97.126.103.167]) by smtp.gmail.com with ESMTPSA id
-	l85sm32473848pfb.176.2017.09.14.11.35.28 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 14 Sep 2017 11:35:28 -0700 (PDT)
+	id 1dsYz7-0000dS-Jb
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 14:35:33 -0400
+Received: by mail-pg0-x22b.google.com with SMTP id u18so127516pgo.0
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 11:35:33 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 14 Sep 2017 11:35:14 -0700
-Message-Id: <20170914183516.19537-9-richard.henderson@linaro.org>
+Date: Thu, 14 Sep 2017 11:35:16 -0700
+Message-Id: <20170914183516.19537-11-richard.henderson@linaro.org>
 In-Reply-To: <20170914183516.19537-1-richard.henderson@linaro.org>
 References: <20170914183516.19537-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 08/10] target/s390x: Support Capstone in
+Subject: [Qemu-devel] [PATCH 10/10] target/mips: Support Capstone in
  disas_set_info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -33,31 +28,90 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>
 
+Cc: Aurelien Jarno <aurelien@aurel32.net>
+Cc: Yongbok Kim <yongbok.kim@imgtec.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/s390x/cpu.c | 2 ++
- 1 file changed, 2 insertions(+)
+ target/mips/cpu.h            |  2 ++
+ target/mips/cpu.c            |  8 --------
+ target/mips/translate_init.c | 36 ++++++++++++++++++++++++++++++++++++
+ 3 files changed, 38 insertions(+), 8 deletions(-)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 74b3e4fd0d..a4f7ff3da8 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -42,6 +42,7 @@
- #include "sysemu/sysemu.h"
- #include "hw/s390x/sclp.h"
- #endif
-+#include "disas/capstone.h"
- 
- #define CR0_RESET       0xE0UL
- #define CR14_RESET      0xC2000000UL;
-@@ -172,6 +173,7 @@ static void s390_cpu_disas_set_info(CPUState *cpu, disassemble_info *info)
- {
-     info->mach = bfd_mach_s390_64;
-     info->print_insn = print_insn_s390;
-+    info->cap_arch = CS_ARCH_SYSZ;
+diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+index 74f6a5b098..dca713825d 100644
+--- a/target/mips/cpu.h
++++ b/target/mips/cpu.h
+@@ -1118,4 +1118,6 @@ static inline void QEMU_NORETURN do_raise_exception(CPUMIPSState *env,
+     do_raise_exception_err(env, exception, 0, pc);
  }
  
- static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
++void mips_cpu_disas_set_info(CPUState *s, disassemble_info *info);
++
+ #endif /* MIPS_CPU_H */
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index 1bb66b7a5a..898f1b3759 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -111,14 +111,6 @@ static void mips_cpu_reset(CPUState *s)
+ #endif
+ }
+ 
+-static void mips_cpu_disas_set_info(CPUState *s, disassemble_info *info) {
+-#ifdef TARGET_WORDS_BIGENDIAN
+-    info->print_insn = print_insn_big_mips;
+-#else
+-    info->print_insn = print_insn_little_mips;
+-#endif
+-}
+-
+ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
+ {
+     CPUState *cs = CPU(dev);
+diff --git a/target/mips/translate_init.c b/target/mips/translate_init.c
+index 255d25bacd..1d43b3c36d 100644
+--- a/target/mips/translate_init.c
++++ b/target/mips/translate_init.c
+@@ -947,3 +947,39 @@ static void msa_reset(CPUMIPSState *env)
+     /* set proper signanling bit meaning ("1" means "quiet") */
+     set_snan_bit_is_one(0, &env->active_tc.msa_fp_status);
+ }
++
++#include "disas/capstone.h"
++
++void mips_cpu_disas_set_info(CPUState *s, disassemble_info *info)
++{
++    MIPSCPU *cpu = MIPS_CPU(s);
++    CPUMIPSState *env = &cpu->env;
++    int insn_flags = env->cpu_model->insn_flags;
++    int cap_mode;
++
++#ifdef TARGET_WORDS_BIGENDIAN
++    info->print_insn = print_insn_big_mips;
++#else
++    info->print_insn = print_insn_little_mips;
++#endif
++
++    cap_mode = 0;
++    if (insn_flags & ISA_MIPS3) {
++        cap_mode |= CS_MODE_MIPS3;
++    }
++    if (insn_flags & ISA_MIPS32) {
++        cap_mode |= CS_MODE_MIPS32;
++    }
++    if (insn_flags & ISA_MIPS64) {
++        cap_mode |= CS_MODE_MIPS64;
++    }
++    if (insn_flags & ISA_MIPS32R6) {
++        cap_mode |= CS_MODE_MIPS32R6;
++    }
++#ifdef TARGET_MIPS64
++    cap_mode |= CS_MODE_MIPSGP64;
++#endif
++
++    info->cap_arch = CS_ARCH_MIPS;
++    info->cap_mode = cap_mode;
++}
 -- 
 2.13.5
