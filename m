@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46500)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46423)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dsYJa-00086G-CE
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:39 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dsYJY-00084m-6B
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dsYJZ-0007zX-GQ
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:38 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37364)
+	(envelope-from <pm215@archaic.org.uk>) id 1dsYJX-0007wN-6n
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:36 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37366)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dsYJZ-0007iP-8g
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:37 -0400
+	id 1dsYJW-0007vb-Vd
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 13:52:35 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dsYJX-0005u1-UM
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 18:52:35 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dsYJV-0005t0-U7
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 18:52:33 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Sep 2017 18:52:52 +0100
-Message-Id: <1505411573-27848-18-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 14 Sep 2017 18:52:49 +0100
+Message-Id: <1505411573-27848-15-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1505411573-27848-1-git-send-email-peter.maydell@linaro.org>
 References: <1505411573-27848-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 17/18] hw/pci-host/gpex: Implement PCI INTx
- routing
+Subject: [Qemu-devel] [PULL 14/18] target/arm: Avoid an extra temporary for
+ store_exclusive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,52 +30,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-From: Pranavkumar Sawargaonkar <pranavkumar@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Now we are able to retrieve the gsi from the INTx pin, let's
-enable intx_to_irq routing. From that point on, irqfd becomes
-usable along with INTx when assigning a PCIe device.
+Instead of copying addr to a local temp, reuse the value (which we
+have just compared as equal) already saved in cpu_exclusive_addr.
 
-Signed-off-by: Pranavkumar Sawargaonkar <pranavkumar@linaro.org>
-Signed-off-by: Tushar Jagad <tushar.jagad@linaro.org>
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Reviewed-by: Andrew Jones <drjones@redhat.com>
-Tested-by: Feng Kan <fkan@apm.com>
-Message-id: 1505296004-6798-4-git-send-email-eric.auger@redhat.com
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Message-id: 20170908163859.29820-1-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/pci-host/gpex.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ target/arm/translate-a64.c | 26 +++++++++-----------------
+ 1 file changed, 9 insertions(+), 17 deletions(-)
 
-diff --git a/hw/pci-host/gpex.c b/hw/pci-host/gpex.c
-index 41a884d..be25245 100644
---- a/hw/pci-host/gpex.c
-+++ b/hw/pci-host/gpex.c
-@@ -53,6 +53,17 @@ int gpex_set_irq_num(GPEXHost *s, int index, int gsi)
-     return 0;
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 1bc12d9..083568c 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -1894,7 +1894,7 @@ static void gen_load_exclusive(DisasContext *s, int rt, int rt2,
  }
  
-+static PCIINTxRoute gpex_route_intx_pin_to_irq(void *opaque, int pin)
-+{
-+    PCIINTxRoute route;
-+    GPEXHost *s = opaque;
-+
-+    route.mode = PCI_INTX_ENABLED;
-+    route.irq = s->irq_num[pin];
-+
-+    return route;
-+}
-+
- static void gpex_host_realize(DeviceState *dev, Error **errp)
+ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+-                                TCGv_i64 inaddr, int size, int is_pair)
++                                TCGv_i64 addr, int size, int is_pair)
  {
-     PCIHostState *pci = PCI_HOST_BRIDGE(dev);
-@@ -77,6 +88,7 @@ static void gpex_host_realize(DeviceState *dev, Error **errp)
-                                 &s->io_ioport, 0, 4, TYPE_PCIE_BUS);
+     /* if (env->exclusive_addr == addr && env->exclusive_val == [addr]
+      *     && (!is_pair || env->exclusive_high == [addr + datasize])) {
+@@ -1910,13 +1910,8 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+      */
+     TCGLabel *fail_label = gen_new_label();
+     TCGLabel *done_label = gen_new_label();
+-    TCGv_i64 addr = tcg_temp_local_new_i64();
+     TCGv_i64 tmp;
  
-     qdev_set_parent_bus(DEVICE(&s->gpex_root), BUS(pci->bus));
-+    pci_bus_set_route_irq_fn(pci->bus, gpex_route_intx_pin_to_irq);
-     qdev_init_nofail(DEVICE(&s->gpex_root));
- }
+-    /* Copy input into a local temp so it is not trashed when the
+-     * basic block ends at the branch insn.
+-     */
+-    tcg_gen_mov_i64(addr, inaddr);
+     tcg_gen_brcond_i64(TCG_COND_NE, addr, cpu_exclusive_addr, fail_label);
  
+     tmp = tcg_temp_new_i64();
+@@ -1927,27 +1922,24 @@ static void gen_store_exclusive(DisasContext *s, int rd, int rt, int rt2,
+             } else {
+                 tcg_gen_concat32_i64(tmp, cpu_reg(s, rt2), cpu_reg(s, rt));
+             }
+-            tcg_gen_atomic_cmpxchg_i64(tmp, addr, cpu_exclusive_val, tmp,
++            tcg_gen_atomic_cmpxchg_i64(tmp, cpu_exclusive_addr,
++                                       cpu_exclusive_val, tmp,
+                                        get_mem_index(s),
+                                        MO_64 | MO_ALIGN | s->be_data);
+             tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
+         } else if (s->be_data == MO_LE) {
+-            gen_helper_paired_cmpxchg64_le(tmp, cpu_env, addr, cpu_reg(s, rt),
+-                                           cpu_reg(s, rt2));
++            gen_helper_paired_cmpxchg64_le(tmp, cpu_env, cpu_exclusive_addr,
++                                           cpu_reg(s, rt), cpu_reg(s, rt2));
+         } else {
+-            gen_helper_paired_cmpxchg64_be(tmp, cpu_env, addr, cpu_reg(s, rt),
+-                                           cpu_reg(s, rt2));
++            gen_helper_paired_cmpxchg64_be(tmp, cpu_env, cpu_exclusive_addr,
++                                           cpu_reg(s, rt), cpu_reg(s, rt2));
+         }
+     } else {
+-        TCGv_i64 val = cpu_reg(s, rt);
+-        tcg_gen_atomic_cmpxchg_i64(tmp, addr, cpu_exclusive_val, val,
+-                                   get_mem_index(s),
++        tcg_gen_atomic_cmpxchg_i64(tmp, cpu_exclusive_addr, cpu_exclusive_val,
++                                   cpu_reg(s, rt), get_mem_index(s),
+                                    size | MO_ALIGN | s->be_data);
+         tcg_gen_setcond_i64(TCG_COND_NE, tmp, tmp, cpu_exclusive_val);
+     }
+-
+-    tcg_temp_free_i64(addr);
+-
+     tcg_gen_mov_i64(cpu_reg(s, rd), tmp);
+     tcg_temp_free_i64(tmp);
+     tcg_gen_br(done_label);
 -- 
 2.7.4
