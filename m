@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48252)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48294)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dsWsK-0000DI-CQ
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:20:25 -0400
+	(envelope-from <lersek@redhat.com>) id 1dsWsP-0000G9-89
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:20:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dsWsH-0003St-6h
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:20:24 -0400
-Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:49679)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dsWsG-0003Qn-VT
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:20:21 -0400
-Received: by mail-wm0-x236.google.com with SMTP id e71so1897198wmg.4
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 09:20:19 -0700 (PDT)
-References: <20170912162513.21694-1-richard.henderson@linaro.org>
-	<20170912162513.21694-10-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170912162513.21694-10-richard.henderson@linaro.org>
-Date: Thu, 14 Sep 2017 17:20:16 +0100
-Message-ID: <871sn99rr3.fsf@linaro.org>
+	(envelope-from <lersek@redhat.com>) id 1dsWsL-0003W2-5f
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:20:29 -0400
+References: <20170914134923.2479-1-eblake@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <fba0ccfb-73ca-eb0a-d92a-70a85289fb33@redhat.com>
+Date: Thu, 14 Sep 2017 18:20:16 +0200
 MIME-Version: 1.0
+In-Reply-To: <20170914134923.2479-1-eblake@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 09/16] tcg/i386: Add vector operations
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] osdep: Fix ROUND_UP(64-bit, 32-bit)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,30 +23,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, f4bug@amsat.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-block@nongnu.org, qemu-trivial@nongnu.org, qemu-stable@nongnu.org
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+On 09/14/17 15:49, Eric Blake wrote:
+> When using bit-wise operations that exploit the power-of-two
+> nature of the second argument of ROUND_UP(), we still need to
+> ensure that the mask is as wide as the first argument (done
+> by using a ternary to force proper arithmetic promotion).
+> Unpatched, ROUND_UP(2ULL*1024*1024*1024*1024, 512U) produces 0,
+> instead of the intended 2TiB, because negation of an unsigned
+> 32-bit quantity followed by widening to 64-bits does not
+> sign-extend the mask.
+> 
+> Broken since its introduction in commit 292c8e50 (v1.5.0).
+> Callers that passed the same width type to both macro parameters,
+> or that had other code to ensure the first parameter's maximum
+> runtime value did not exceed the second parameter's width, are
+> unaffected, but I did not audit to see which (if any) existing
+> clients of the macro could trigger incorrect behavior (I found
+> the bug while adding a new use of the macro).
+> 
+> While preparing the patch, checkpatch complained about poor
+> spacing, so I also fixed that here and in the nearby DIV_ROUND_UP.
+> 
+> CC: qemu-trivial@nongnu.org
+> CC: qemu-stable@nongnu.org
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> 
 > ---
->  tcg/i386/tcg-target.h     |  46 ++++-
->  tcg/i386/tcg-target.inc.c | 438 +++++++++++++++++++++++++++++++++++++++++-----
->  2 files changed, 438 insertions(+), 46 deletions(-)
+> v2: use ternary instead of addition of 0 [Laszlo], improve commit message
+> ---
+>  include/qemu/osdep.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
+> index 6855b94bbf..f4ff372d41 100644
+> --- a/include/qemu/osdep.h
+> +++ b/include/qemu/osdep.h
+> @@ -189,13 +189,13 @@ extern int daemon(int, int);
+> 
+>  /* Round number up to multiple. Requires that d be a power of 2 (see
+>   * QEMU_ALIGN_UP for a safer but slower version on arbitrary
+> - * numbers) */
+> + * numbers); works even if d is a smaller type than n.  */
+>  #ifndef ROUND_UP
+> -#define ROUND_UP(n,d) (((n) + (d) - 1) & -(d))
+> +#define ROUND_UP(n, d) (((n) + (d) - 1) & -(0 ? (n) : (d)))
+>  #endif
+> 
+>  #ifndef DIV_ROUND_UP
+> -#define DIV_ROUND_UP(n,d) (((n) + (d) - 1) / (d))
+> +#define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
+>  #endif
+> 
+>  /*
+> 
 
-My compiler doesn't like you ;-)
-
-In file included from /home/alex/lsrc/qemu/qemu.git/tcg/tcg.c:254:0:
-/home/alex/lsrc/qemu/qemu.git/tcg/tcg.c: In function ‘tcg_gen_code’:
-/home/alex/lsrc/qemu/qemu.git/tcg/i386/tcg-target.inc.c:2494:13: error: ‘c’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
-             tcg_out_modrm(s, c, a0, a1);
-             ^
-In file included from /home/alex/lsrc/qemu/qemu.git/tcg/tcg.c:254:0:
-/home/alex/lsrc/qemu/qemu.git/tcg/i386/tcg-target.inc.c:2035:9: note: ‘c’ was declared here
-     int c, const_a2, vexop, rexw = 0;
-         ^
-cc1: all warnings being treated as errors
-
---
-Alex Bennée
+Reviewed-by: Laszlo Ersek <lersek@redhat.com>
