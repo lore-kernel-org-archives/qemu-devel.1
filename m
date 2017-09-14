@@ -1,28 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39031)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40366)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dsPJM-0003Di-KJ
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 04:15:56 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dsPMD-0004u7-F1
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 04:18:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dsPJL-0006x4-4d
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 04:15:48 -0400
-Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33553)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dsPJK-0006v9-GO
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 04:15:46 -0400
-Received: by mail-pg0-x241.google.com with SMTP id i130so1350508pgc.0
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 01:15:45 -0700 (PDT)
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dsPM8-0001HY-FO
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 04:18:45 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44983)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1dsPM8-0001FD-5k
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 04:18:40 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8E8E9PW022464
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 04:18:37 -0400
+Received: from e23smtp02.au.ibm.com (e23smtp02.au.ibm.com [202.81.31.144])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cygtme5yp-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 04:18:36 -0400
+Received: from localhost
+	by e23smtp02.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Thu, 14 Sep 2017 18:18:34 +1000
+Received: from d23av06.au.ibm.com (d23av06.au.ibm.com [9.190.235.151])
+	by d23relay06.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v8E8IWrJ42729632
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 18:18:32 +1000
+Received: from d23av06.au.ibm.com (localhost [127.0.0.1])
+	by d23av06.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v8E8IVJ2015799
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 18:18:32 +1000
+Date: Thu, 14 Sep 2017 13:48:26 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reply-To: bharata@linux.vnet.ibm.com
+References: <20170914070118.GA8181@in.ibm.com>
+	<20170914100011.296185d2@nial.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f95c0dd1-45f2-d5bf-c7c5-0afbaf8e8950@redhat.com>
-References: <1503012801-10855-1-git-send-email-zuban32s@gmail.com>
-	<CAKSfGUCz8oa2gLE7C1xvWP7PB8jjA+0recj1=MeJwD7NONdc2Q@mail.gmail.com>
-	<f95c0dd1-45f2-d5bf-c7c5-0afbaf8e8950@redhat.com>
-From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Thu, 14 Sep 2017 11:15:43 +0300
-Message-ID: <CAKSfGUD+Zdb=0xOoJRi=HpqZJG6d9ZbU=4JKCZ=nVxz3gmO3kg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH RESEND v7 0/3] Red Hat PCI bridge resource
- reserve capability
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170914100011.296185d2@nial.brq.redhat.com>
+Message-Id: <20170914081826.GA23373@in.ibm.com>
+Subject: Re: [Qemu-devel] QEMU terminates during reboot after memory unplug
+ with vhost=on
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,170 +51,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: seabios@seabios.org, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-devel@nongnu.org, mst@redhat.com, groug@kaod.org, david@gibson.dropbear.id.au
 
-2017-09-10 22:40 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
-> On 10/09/2017 21:34, Aleksandr Bezzubikov wrote:
->>
->>
->> =D0=BF=D1=82, 18 =D0=B0=D0=B2=D0=B3. 2017 =D0=B3. =D0=B2 2:33, Aleksandr=
- Bezzubikov <zuban32s@gmail.com
->> <mailto:zuban32s@gmail.com>>:
->>
->>
->>     Now PCI bridges get a bus range number on a system init,
->>     basing on currently plugged devices. That's why when one wants to
->>     hotplug another bridge,
->>     it needs his child bus, which the parent is unable to provide
->>     (speaking about virtual device).
->>     The suggested workaround is to have vendor-specific capability in
->>     Red Hat PCI bridges
->>     that contains number of additional bus to reserve (as well as
->>     IO/MEM/PREF space limit hints)
->>     on BIOS PCI init.
->>     So this capability is intended only for pure QEMU->SeaBIOS usage.
->>
->>     Considering all aforesaid, this series is directly connected with
->>     QEMU series "Generic PCIE-PCI Bridge".
->>
->>     Although the new PCI capability is supposed to contain various
->>     limits along with
->>     bus number to reserve, now only its full layout is proposed. And
->>     only bus_reserve field is used in QEMU and BIOS. Limits usage
->>     is still a subject for implementation as now
->>     the main goal of this series to provide necessary support from the
->>     firmware side to PCIE-PCI bridge hotplug.
->>
->>     Changes v6->v7:
->>     0. Resend - fix a bug with incorrect subordinate bus default value.
->>     1. Do not use alignment in case of IO reservation cap usage.
->>     2. Log additional buses reservation events.
->>
->>     Changes v5->v6:
->>     1. Remove unnecessary indents and line breaks (addresses Marcel's
->>     comments)
->>     2. Count IO/MEM/PREF region size as a maximum of necessary size and
->>     one provide in
->>              RESOURCE_RESERVE capability (addresses Marcel's comment).
->>     3. Make the cap debug message more detailed (addresses Marcel's
->>     comment).
->>     4. Change pref_32 and pref_64 cap fields comment.
->>
->>     Changes v4->v5:
->>     1. Rename capability-related #defines
->>     2. Move capability IO/MEM/PREF fields values usage to the regions
->>     creation stage (addresses Marcel's comment)
->>     3. The capability layout change: separate pref_mem into pref_mem_32
->>     and pref_mem_64 fields (QEMU side has the same changes) (addresses
->>     Laszlo's comment)
->>     4. Extract the capability lookup and check to the separate function
->>     (addresses Marcel's comment)
->>              - despite of Marcel's comment do not extract field check
->>     for -1 since it increases code length
->>                and doesn't look nice because of different field types
->>     5. Fix the capability's comment (addresses Marcel's comment)
->>     6. Fix the 3rd patch message
->>
->>     Changes v3->v4:
->>     1. Use all QEMU PCI capability fields - addresses Michael's comment
->>     2. Changes of the capability layout (QEMU side has the same changes)=
-:
->>              - change reservation fields types: bus_res - uint32_t,
->>     others - uint64_t
->>              - interpret -1 value as 'ignore'
->>
->>     Changes v2->v3:
->>     1. Merge commit 2 (Red Hat vendor ID) into commit 4 - addresses
->>     Marcel's comment,
->>              and add Generic PCIE Root Port device ID - addresses
->>     Michael's comment.
->>     2. Changes of the capability layout  (QEMU side has the same changes=
-):
->>              - add 'type' field to distinguish multiple
->>                      RedHat-specific capabilities - addresses Michael's
->>     comment
->>              - do not mimi=D1=81 PCI Config space register layout, but u=
-se
->>     mutually exclusive differently
->>                      sized fields for IO and prefetchable memory limits
->>     - addresses Laszlo's comment
->>              - use defines instead of structure and offsetof - addresses
->>     Michael's comment
->>     3. Interpret 'bus_reserve' field as a minimum necessary
->>               range to reserve - addresses Gerd's comment
->>     4. pci_find_capability moved to pci.c - addresses Kevin's comment
->>     5. Move capability layout header to src/fw/dev-pci.h - addresses
->>     Kevin's comment
->>     6. Add the capability documentation - addresses Michael's comment
->>     7. Add capability length and bus_reserve field sanity checks -
->>     addresses Michael's comment
->>
->>     Changes v1->v2:
->>     1. New #define for Red Hat vendor added (addresses Konrad's comment)=
-.
->>     2. Refactored pci_find_capability function (addresses Marcel's
->> comment).
->>     3. Capability reworked:
->>              - data type added;
->>              - reserve space in a structure for IO, memory and
->>                prefetchable memory limits.
->>
->>
->>     Aleksandr Bezzubikov (3):
->>        pci: refactor pci_find_capapibilty to get bdf as the first argume=
-nt
->>          instead of the whole pci_device
->>        pci: add QEMU-specific PCI capability structure
->>        pci: enable RedHat PCI bridges to reserve additional resources on
->> PCI
->>          init
->>
->>       src/fw/dev-pci.h    |  53 ++++++++++++++++++++++++++
->>       src/fw/pciinit.c    | 108
->>     +++++++++++++++++++++++++++++++++++++++++++++++++---
->>       src/hw/pci.c        |  25 ++++++++++++
->>       src/hw/pci.h        |   1 +
->>       src/hw/pci_ids.h    |   3 ++
->>       src/hw/pcidevice.c  |  24 ------------
->>       src/hw/pcidevice.h  |   1 -
->>       src/hw/virtio-pci.c |   6 +--
->>       8 files changed, 188 insertions(+), 33 deletions(-)
->>       create mode 100644 src/fw/dev-pci.h
->>
->>     --
->>     2.7.4
->>
->>
->> And what about this series? The matching QEMU series has been applied,
->> that's why there should be no problems with picking this series up for
->> SeaBIOS
->>
->
-> Hi Aleksandr,
->
-> Since SeaBIOS is a different project, we need to monitor the QEMU
-> patches by ourselves and only then ask the maintainer to merge the
-> patches if he has no objections, of course. (no automated process)
->
-> Can you please verify the series still applies to SeaBIOS AS IS
-> and run a quick test against today's QEMU master branch?
-> Can you please give Kevin your OK before he proceeds with the merge?
+On Thu, Sep 14, 2017 at 10:00:11AM +0200, Igor Mammedov wrote:
+> On Thu, 14 Sep 2017 12:31:18 +0530
+> Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
+> 
+> > Hi,
+> > 
+> > QEMU hits the below assert
+> > 
+> > qemu-system-ppc64: used ring relocated for ring 2
+> > qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion `r >= 0' failed.
+> > 
+> > in the following scenario:
+> > 
+> > 1. Boot guest with vhost=on
+> >   -netdev tap,id=mynet0,script=qemu-ifup,downscript=qemu-ifdown,vhost=on -device virtio-net-pci,netdev=mynet0
+> > 2. Hot add a DIMM device 
+> > 3. Reboot
+> >    When the guest reboots, we can see
+> >    vhost_virtqueue_start:vq->used_phys getting assigned an address that
+> >    falls in the hotplugged memory range.
+> > 4. Remove the DIMM device
+> >    Guest refuses the removal as the hotplugged memory is under use.
+> > 5. Reboot
+> 
+> >    QEMU forces the removal of the DIMM device during reset and that's
+> >    when we hit the above assert.
+> I don't recall implementing forced removal om DIMM,
+> could you point out to the related code, pls?
 
-Just did it, it's sitll OK and works fine. That's why this series can
-be merged AS IS.
+This is ppc specific. We have DR Connector objects for each LMB (multiple
+LMBs make up one DIMM device) and during reset we invoke the
+release routine for these LMBs which will further invoke
+pc_dimm_memory_unplug().
 
->
-> Thanks,
-> Marcel
->
->>
->> --
->> Aleksandr Bezzubikov
->
->
+See hw/ppc/spapr_drc.c: spapr_drc_reset()
+hw/ppc/spapr.c: spapr_lmb_release()
 
+> 
+> > Any pointers on why we are hitting this assert ? Shouldn't vhost be
+> > done with using the hotplugged memory when we hit reset ?
+> 
+> >From another point of view,
+> DIMM shouldn't be removed unless guest explicitly ejects it
+> (at least that should be so in x86 case).
 
+While that is true for ppc also, shouldn't we start fresh from reset ?
 
---=20
-Aleksandr Bezzubikov
+Related comment from hw/ppc/spapr_drc.c: spapr_drc_reset()
+
+    /* immediately upon reset we can safely assume DRCs whose devices
+     * are pending removal can be safely removed.
+     */
+    if (drc->unplug_requested) {
+        spapr_drc_release(drc);
+    }
+
+So essentially in the scenario I listed, the unplug request is rejected
+by the guest, but during next reboot, QEMU excersies the above code
+and removes any devices (memory, CPU etc) that are marked for removal.
+
+Regards,
+Bharata.
