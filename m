@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60656)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dsViI-0007Px-6h
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:05:59 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dsViF-0007Nr-Ud
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:06:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dsViH-00032Z-3k
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:05:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38538)
+	(envelope-from <dgilbert@redhat.com>) id 1dsViC-0002xK-Gr
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:05:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45136)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dsViG-000311-Rc
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:05:57 -0400
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dsViB-0002wo-V3
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:05:52 -0400
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Thu, 14 Sep 2017 16:04:47 +0100
-Message-Id: <20170914150447.19352-8-dgilbert@redhat.com>
+Date: Thu, 14 Sep 2017 16:04:46 +0100
+Message-Id: <20170914150447.19352-7-dgilbert@redhat.com>
 In-Reply-To: <20170914150447.19352-1-dgilbert@redhat.com>
 References: <20170914150447.19352-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PULL 7/7] hmp: introduce 'info memory_size_summary'
+Subject: [Qemu-devel] [PULL 6/7] qmp: introduce query-memory-size-summary
  command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,8 +29,7 @@ Cc: imammedo@redhat.com, thuth@redhat.com, peterx@redhat.com, groug@kaod.org
 
 From: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>
 
-Add 'info memory_size_summary' command which is a sibling
-of QMP command query-memory-size-summary. It provides the
+Add a new query-memory-size-summary command which provides the
 following memory information in bytes:
 
   * base-memory - size of "base" memory specified with command line option -m.
@@ -49,79 +48,141 @@ Cc: Markus Armbruster <armbru@redhat.com>
 Cc: Igor Mammedov <imammedo@redhat.com>
 Cc: Eric Blake <eblake@redhat.com>
 Cc: qemu-devel@nongnu.org
-Message-Id: <20170829153022.27004-4-vadim.galitsyn@profitbricks.com>
+Message-Id: <20170829153022.27004-3-vadim.galitsyn@profitbricks.com>
 Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-  Fixed up comments from Igor's review
+  Fixup comments as per Igor's review
+  Added 'of' from Vadim's reply
 ---
- hmp-commands-info.hx | 16 ++++++++++++++++
- hmp.c                | 18 ++++++++++++++++++
- hmp.h                |  1 +
- 3 files changed, 35 insertions(+)
+ hw/mem/pc-dimm.c                                   |  5 ++++
+ include/hw/mem/pc-dimm.h                           |  1 +
+ qapi-schema.json                                   | 32 ++++++++++++++++++++++
+ qmp.c                                              | 13 +++++++++
+ stubs/Makefile.objs                                |  2 +-
+ stubs/{qmp_pc_dimm_device_list.c => qmp_pc_dimm.c} |  5 ++++
+ 6 files changed, 57 insertions(+), 1 deletion(-)
+ rename stubs/{qmp_pc_dimm_device_list.c => qmp_pc_dimm.c} (68%)
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index 4ab7fcee98..1c6772597d 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -851,6 +851,22 @@ ETEXI
-     },
+diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+index bdf6649083..66eace5a5c 100644
+--- a/hw/mem/pc-dimm.c
++++ b/hw/mem/pc-dimm.c
+@@ -159,6 +159,11 @@ uint64_t pc_existing_dimms_capacity(Error **errp)
+     return cap.size;
+ }
  
- STEXI
-+@item info memory_size_summary
-+@findex memory_size_summary
-+Display the amount of initially allocated and present hotpluggable (if
-+enabled) memory in bytes.
-+ETEXI
++uint64_t get_plugged_memory_size(void)
++{
++    return pc_existing_dimms_capacity(&error_abort);
++}
 +
-+    {
-+        .name       = "memory_size_summary",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "show the amount of initially allocated and "
-+                      "present hotpluggable (if enabled) memory in bytes.",
-+        .cmd        = hmp_info_memory_size_summary,
-+    },
-+
-+STEXI
- @end table
- ETEXI
+ int qmp_pc_dimm_device_list(Object *obj, void *opaque)
+ {
+     MemoryDeviceInfoList ***prev = opaque;
+diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+index 6f8c3eb1b3..d83b957829 100644
+--- a/include/hw/mem/pc-dimm.h
++++ b/include/hw/mem/pc-dimm.h
+@@ -95,6 +95,7 @@ int pc_dimm_get_free_slot(const int *hint, int max_slots, Error **errp);
  
-diff --git a/hmp.c b/hmp.c
-index cd046c6d71..0fb2bc7043 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -2862,3 +2862,21 @@ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
-     qapi_free_GuidInfo(info);
+ int qmp_pc_dimm_device_list(Object *obj, void *opaque);
+ uint64_t pc_existing_dimms_capacity(Error **errp);
++uint64_t get_plugged_memory_size(void);
+ void pc_dimm_memory_plug(DeviceState *dev, MemoryHotplugState *hpms,
+                          MemoryRegion *mr, uint64_t align, Error **errp);
+ void pc_dimm_memory_unplug(DeviceState *dev, MemoryHotplugState *hpms,
+diff --git a/qapi-schema.json b/qapi-schema.json
+index f3af2cb851..cdff39a456 100644
+--- a/qapi-schema.json
++++ b/qapi-schema.json
+@@ -1966,6 +1966,38 @@
+             '*unavailable-features': [ 'str' ], 'typename': 'str' } }
+ 
+ ##
++# @MemoryInfo:
++#
++# Actual memory information in bytes.
++#
++# @base-memory: size of "base" memory specified with command line
++#               option -m.
++#
++# @plugged-memory: size of memory that can be hot-unplugged. This field
++#                  is omitted if target doesn't support memory hotplug
++#                  (i.e. CONFIG_MEM_HOTPLUG not defined on build time).
++#
++# Since: 2.11.0
++##
++{ 'struct': 'MemoryInfo',
++  'data'  : { 'base-memory': 'size', '*plugged-memory': 'size' } }
++
++##
++# @query-memory-size-summary:
++#
++# Return the amount of initially allocated and present hotpluggable (if
++# enabled) memory in bytes.
++#
++# Example:
++#
++# -> { "execute": "query-memory-size-summary" }
++# <- { "return": { "base-memory": 4294967296, "plugged-memory": 0 } }
++#
++# Since: 2.11.0
++##
++{ 'command': 'query-memory-size-summary', 'returns': 'MemoryInfo' }
++
++##
+ # @query-cpu-definitions:
+ #
+ # Return a list of supported virtual CPU definitions
+diff --git a/qmp.c b/qmp.c
+index b86201e349..e8c303116a 100644
+--- a/qmp.c
++++ b/qmp.c
+@@ -709,3 +709,16 @@ ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error **errp)
+ 
+     return head;
  }
 +
-+void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict)
++MemoryInfo *qmp_query_memory_size_summary(Error **errp)
 +{
-+    Error *err = NULL;
-+    MemoryInfo *info = qmp_query_memory_size_summary(&err);
-+    if (info) {
-+        monitor_printf(mon, "base memory: %" PRIu64 "\n",
-+                       info->base_memory);
++    MemoryInfo *mem_info = g_malloc0(sizeof(MemoryInfo));
 +
-+        if (info->has_plugged_memory) {
-+            monitor_printf(mon, "plugged memory: %" PRIu64 "\n",
-+                           info->plugged_memory);
-+        }
++    mem_info->base_memory = ram_size;
 +
-+        qapi_free_MemoryInfo(info);
-+    }
-+    hmp_handle_error(mon, &err);
++    mem_info->plugged_memory = get_plugged_memory_size();
++    mem_info->has_plugged_memory =
++        mem_info->plugged_memory != (uint64_t)-1;
++
++    return mem_info;
 +}
-diff --git a/hmp.h b/hmp.h
-index 1ff455295e..3605003e4c 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -145,5 +145,6 @@ void hmp_info_dump(Monitor *mon, const QDict *qdict);
- void hmp_info_ramblock(Monitor *mon, const QDict *qdict);
- void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
- void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
-+void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
- 
- #endif
+diff --git a/stubs/Makefile.objs b/stubs/Makefile.objs
+index 4a33495911..c7594796c3 100644
+--- a/stubs/Makefile.objs
++++ b/stubs/Makefile.objs
+@@ -33,7 +33,7 @@ stub-obj-y += uuid.o
+ stub-obj-y += vm-stop.o
+ stub-obj-y += vmstate.o
+ stub-obj-$(CONFIG_WIN32) += fd-register.o
+-stub-obj-y += qmp_pc_dimm_device_list.o
++stub-obj-y += qmp_pc_dimm.o
+ stub-obj-y += target-monitor-defs.o
+ stub-obj-y += target-get-monitor-def.o
+ stub-obj-y += pc_madt_cpu_entry.o
+diff --git a/stubs/qmp_pc_dimm_device_list.c b/stubs/qmp_pc_dimm.c
+similarity index 68%
+rename from stubs/qmp_pc_dimm_device_list.c
+rename to stubs/qmp_pc_dimm.c
+index def211564d..9ddc4f619a 100644
+--- a/stubs/qmp_pc_dimm_device_list.c
++++ b/stubs/qmp_pc_dimm.c
+@@ -6,3 +6,8 @@ int qmp_pc_dimm_device_list(Object *obj, void *opaque)
+ {
+    return 0;
+ }
++
++uint64_t get_plugged_memory_size(void)
++{
++    return (uint64_t)-1;
++}
 -- 
 2.13.5
