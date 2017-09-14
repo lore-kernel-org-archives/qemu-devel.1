@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59003)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dsP6q-0001ZT-A5
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 04:02:56 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dsPJM-0003Di-KJ
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 04:15:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mjt@tls.msk.ru>) id 1dsP6n-0003LU-8H
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 04:02:52 -0400
-References: <20170823152736.21814-1-lyan@suse.com>
-From: Michael Tokarev <mjt@tls.msk.ru>
-Message-ID: <27ab4e98-1b7a-e944-cf2a-ef6dad426ea4@msgid.tls.msk.ru>
-Date: Thu, 14 Sep 2017 11:02:47 +0300
+	(envelope-from <zuban32s@gmail.com>) id 1dsPJL-0006x4-4d
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 04:15:48 -0400
+Received: from mail-pg0-x241.google.com ([2607:f8b0:400e:c05::241]:33553)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dsPJK-0006v9-GO
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 04:15:46 -0400
+Received: by mail-pg0-x241.google.com with SMTP id i130so1350508pgc.0
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 01:15:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170823152736.21814-1-lyan@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] hw/display/xenfb.c: Add
- trace_xenfb_key_event
+In-Reply-To: <f95c0dd1-45f2-d5bf-c7c5-0afbaf8e8950@redhat.com>
+References: <1503012801-10855-1-git-send-email-zuban32s@gmail.com>
+	<CAKSfGUCz8oa2gLE7C1xvWP7PB8jjA+0recj1=MeJwD7NONdc2Q@mail.gmail.com>
+	<f95c0dd1-45f2-d5bf-c7c5-0afbaf8e8950@redhat.com>
+From: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Date: Thu, 14 Sep 2017 11:15:43 +0300
+Message-ID: <CAKSfGUD+Zdb=0xOoJRi=HpqZJG6d9ZbU=4JKCZ=nVxz3gmO3kg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH RESEND v7 0/3] Red Hat PCI bridge resource
+ reserve capability
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,16 +31,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Liang Yan <lyan@suse.com>, sstabellini@kernel.org, anthony.perard@citrix.com
-Cc: qemu-trivial@nongnu.org, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: seabios@seabios.org, Kevin OConnor <kevin@koconnor.net>, Gerd Hoffmann <kraxel@redhat.com>, Laszlo Ersek <lersek@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org
 
-23.08.2017 18:27, Liang Yan wrote:
-> It may be better to add a trace event to monitor the last moment of
-> a key event from QEMU to guest VM
+2017-09-10 22:40 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
+> On 10/09/2017 21:34, Aleksandr Bezzubikov wrote:
+>>
+>>
+>> =D0=BF=D1=82, 18 =D0=B0=D0=B2=D0=B3. 2017 =D0=B3. =D0=B2 2:33, Aleksandr=
+ Bezzubikov <zuban32s@gmail.com
+>> <mailto:zuban32s@gmail.com>>:
+>>
+>>
+>>     Now PCI bridges get a bus range number on a system init,
+>>     basing on currently plugged devices. That's why when one wants to
+>>     hotplug another bridge,
+>>     it needs his child bus, which the parent is unable to provide
+>>     (speaking about virtual device).
+>>     The suggested workaround is to have vendor-specific capability in
+>>     Red Hat PCI bridges
+>>     that contains number of additional bus to reserve (as well as
+>>     IO/MEM/PREF space limit hints)
+>>     on BIOS PCI init.
+>>     So this capability is intended only for pure QEMU->SeaBIOS usage.
+>>
+>>     Considering all aforesaid, this series is directly connected with
+>>     QEMU series "Generic PCIE-PCI Bridge".
+>>
+>>     Although the new PCI capability is supposed to contain various
+>>     limits along with
+>>     bus number to reserve, now only its full layout is proposed. And
+>>     only bus_reserve field is used in QEMU and BIOS. Limits usage
+>>     is still a subject for implementation as now
+>>     the main goal of this series to provide necessary support from the
+>>     firmware side to PCIE-PCI bridge hotplug.
+>>
+>>     Changes v6->v7:
+>>     0. Resend - fix a bug with incorrect subordinate bus default value.
+>>     1. Do not use alignment in case of IO reservation cap usage.
+>>     2. Log additional buses reservation events.
+>>
+>>     Changes v5->v6:
+>>     1. Remove unnecessary indents and line breaks (addresses Marcel's
+>>     comments)
+>>     2. Count IO/MEM/PREF region size as a maximum of necessary size and
+>>     one provide in
+>>              RESOURCE_RESERVE capability (addresses Marcel's comment).
+>>     3. Make the cap debug message more detailed (addresses Marcel's
+>>     comment).
+>>     4. Change pref_32 and pref_64 cap fields comment.
+>>
+>>     Changes v4->v5:
+>>     1. Rename capability-related #defines
+>>     2. Move capability IO/MEM/PREF fields values usage to the regions
+>>     creation stage (addresses Marcel's comment)
+>>     3. The capability layout change: separate pref_mem into pref_mem_32
+>>     and pref_mem_64 fields (QEMU side has the same changes) (addresses
+>>     Laszlo's comment)
+>>     4. Extract the capability lookup and check to the separate function
+>>     (addresses Marcel's comment)
+>>              - despite of Marcel's comment do not extract field check
+>>     for -1 since it increases code length
+>>                and doesn't look nice because of different field types
+>>     5. Fix the capability's comment (addresses Marcel's comment)
+>>     6. Fix the 3rd patch message
+>>
+>>     Changes v3->v4:
+>>     1. Use all QEMU PCI capability fields - addresses Michael's comment
+>>     2. Changes of the capability layout (QEMU side has the same changes)=
+:
+>>              - change reservation fields types: bus_res - uint32_t,
+>>     others - uint64_t
+>>              - interpret -1 value as 'ignore'
+>>
+>>     Changes v2->v3:
+>>     1. Merge commit 2 (Red Hat vendor ID) into commit 4 - addresses
+>>     Marcel's comment,
+>>              and add Generic PCIE Root Port device ID - addresses
+>>     Michael's comment.
+>>     2. Changes of the capability layout  (QEMU side has the same changes=
+):
+>>              - add 'type' field to distinguish multiple
+>>                      RedHat-specific capabilities - addresses Michael's
+>>     comment
+>>              - do not mimi=D1=81 PCI Config space register layout, but u=
+se
+>>     mutually exclusive differently
+>>                      sized fields for IO and prefetchable memory limits
+>>     - addresses Laszlo's comment
+>>              - use defines instead of structure and offsetof - addresses
+>>     Michael's comment
+>>     3. Interpret 'bus_reserve' field as a minimum necessary
+>>               range to reserve - addresses Gerd's comment
+>>     4. pci_find_capability moved to pci.c - addresses Kevin's comment
+>>     5. Move capability layout header to src/fw/dev-pci.h - addresses
+>>     Kevin's comment
+>>     6. Add the capability documentation - addresses Michael's comment
+>>     7. Add capability length and bus_reserve field sanity checks -
+>>     addresses Michael's comment
+>>
+>>     Changes v1->v2:
+>>     1. New #define for Red Hat vendor added (addresses Konrad's comment)=
+.
+>>     2. Refactored pci_find_capability function (addresses Marcel's
+>> comment).
+>>     3. Capability reworked:
+>>              - data type added;
+>>              - reserve space in a structure for IO, memory and
+>>                prefetchable memory limits.
+>>
+>>
+>>     Aleksandr Bezzubikov (3):
+>>        pci: refactor pci_find_capapibilty to get bdf as the first argume=
+nt
+>>          instead of the whole pci_device
+>>        pci: add QEMU-specific PCI capability structure
+>>        pci: enable RedHat PCI bridges to reserve additional resources on
+>> PCI
+>>          init
+>>
+>>       src/fw/dev-pci.h    |  53 ++++++++++++++++++++++++++
+>>       src/fw/pciinit.c    | 108
+>>     +++++++++++++++++++++++++++++++++++++++++++++++++---
+>>       src/hw/pci.c        |  25 ++++++++++++
+>>       src/hw/pci.h        |   1 +
+>>       src/hw/pci_ids.h    |   3 ++
+>>       src/hw/pcidevice.c  |  24 ------------
+>>       src/hw/pcidevice.h  |   1 -
+>>       src/hw/virtio-pci.c |   6 +--
+>>       8 files changed, 188 insertions(+), 33 deletions(-)
+>>       create mode 100644 src/fw/dev-pci.h
+>>
+>>     --
+>>     2.7.4
+>>
+>>
+>> And what about this series? The matching QEMU series has been applied,
+>> that's why there should be no problems with picking this series up for
+>> SeaBIOS
+>>
+>
+> Hi Aleksandr,
+>
+> Since SeaBIOS is a different project, we need to monitor the QEMU
+> patches by ourselves and only then ask the maintainer to merge the
+> patches if he has no objections, of course. (no automated process)
+>
+> Can you please verify the series still applies to SeaBIOS AS IS
+> and run a quick test against today's QEMU master branch?
+> Can you please give Kevin your OK before he proceeds with the merge?
 
-The patch looks okay, hopefully it is also useful - I haven't dealt with
-xen and with keys it sends to a guest :)
+Just did it, it's sitll OK and works fine. That's why this series can
+be merged AS IS.
 
-Applied to -trivial, thanks!
+>
+> Thanks,
+> Marcel
+>
+>>
+>> --
+>> Aleksandr Bezzubikov
+>
+>
 
-/mjt
+
+
+--=20
+Aleksandr Bezzubikov
