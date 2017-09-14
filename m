@@ -1,25 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60256)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dsRgt-0005Dz-5X
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:48:16 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dsRoC-0000eW-Cl
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:55:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dsRgp-0008NZ-1n
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:48:15 -0400
-Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:47414)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dsRgo-0008MA-Rb
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:48:10 -0400
-Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 45C83A2DA7
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 12:48:09 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Thu, 14 Sep 2017 12:48:04 +0200
-Message-ID: <150538608438.12346.9391407971434352383.stgit@bahia.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH] ppc/kvm: use kvm_vm_check_extension() in
- kvmppc_is_pr()
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dsRo8-00066k-2T
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:55:48 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35444
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dsRo7-00066A-Jz
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:55:43 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8EAstmC062189
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 06:55:42 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2cyq8m50ca-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 06:55:42 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 14 Sep 2017 11:55:41 +0100
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 14 Sep 2017 12:55:35 +0200
+Message-Id: <20170914105535.47941-1-pasic@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 1/1] virtio-ccw: remove stale comments on
+ endiannes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,57 +37,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
 
-If the host has both KVM PR and KVM HV loaded and we pass:
+We have two stale comments suggesting one should think about virtio
+config space endiannes a bit longer. We have just done that, and came to
+the conclusion we are fine as is: it's the responsibility of the virtio
+device and not of the transport (and that is how it works now). Putting
+the responsibility into the transport isn't even possible, because the
+transport would have to know about the config space layout of each
+device.
 
-	-machine pseries,accel=kvm,kvm-type=PR
+Let us remove the stale comments.
 
-the kvmppc_is_pr() returns false instead of true. Since the helper
-is mostly used as fallback, it doesn't have any real impact with
-recent kernels. A notable exception is the workaround to allow
-migration between compatible hosts with different PVRs (eg, POWER8
-and POWER8E), since KVM still doesn't provide a way to check if a
-specific PVR is supported (see commit c363a37a450f for details).
-
-According to the official KVM API documentation [1], KVM_PPC_GET_PVINFO
-is "vm ioctl", but we check it as a global ioctl. The following function
-in KVM is hence called with kvm == NULL and considers we're in HV mode.
-
-int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-{
-	int r;
-	/* Assume we're using HV mode when the HV module is loaded */
-	int hv_enabled = kvmppc_hv_ops ? 1 : 0;
-
-	if (kvm) {
-		/*
-		 * Hooray - we know which VM type we're running on. Depend on
-		 * that rather than the guess above.
-		 */
-		hv_enabled = is_kvmppc_hv_enabled(kvm);
-	}
-
-Let's use kvm_vm_check_extension() to fix the issue.
-
-[1] https://www.kernel.org/doc/Documentation/virtual/kvm/api.txt
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Suggested-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/ppc/kvm.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/s390x/virtio-ccw.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 6442dfcb95b3..1deaf106d2b9 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -120,7 +120,7 @@ static void kvm_kick_cpu(void *opaque)
- static bool kvmppc_is_pr(KVMState *ks)
- {
-     /* Assume KVM-PR if the GET_PVINFO capability is available */
--    return kvm_check_extension(ks, KVM_CAP_PPC_GET_PVINFO) != 0;
-+    return kvm_vm_check_extension(ks, KVM_CAP_PPC_GET_PVINFO) != 0;
- }
- 
- static int kvm_ppc_register_host_cpu_type(void);
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index b1976fdd19..2262b0cc9a 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -487,7 +487,6 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+             ret = -EFAULT;
+         } else {
+             virtio_bus_get_vdev_config(&dev->bus, vdev->config);
+-            /* XXX config space endianness */
+             cpu_physical_memory_write(ccw.cda, vdev->config, len);
+             sch->curr_status.scsw.count = ccw.count - len;
+             ret = 0;
+@@ -510,7 +509,6 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+                 ret = -EFAULT;
+             } else {
+                 len = hw_len;
+-                /* XXX config space endianness */
+                 memcpy(vdev->config, config, len);
+                 cpu_physical_memory_unmap(config, hw_len, 0, hw_len);
+                 virtio_bus_set_vdev_config(&dev->bus, vdev->config);
+-- 
+2.13.5
