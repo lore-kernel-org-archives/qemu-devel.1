@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52197)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52192)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dsRZi-0006q1-19
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:40:51 -0400
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dsRZh-0006pt-Qh
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:40:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeepkiruvale@gmail.com>) id 1dsRZg-000212-Pb
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:40:50 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33675)
+	(envelope-from <pradeepkiruvale@gmail.com>) id 1dsRZd-0001xH-9T
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:40:49 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:34288)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <pradeepkiruvale@gmail.com>)
-	id 1dsRZg-0001zr-F0
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:40:48 -0400
-Received: by mail-wm0-x242.google.com with SMTP id 187so2884675wmn.0
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 03:40:48 -0700 (PDT)
+	id 1dsRZc-0001ul-S8
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:40:45 -0400
+Received: by mail-wm0-x243.google.com with SMTP id i131so2887433wma.1
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 03:40:43 -0700 (PDT)
 From: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Date: Thu, 14 Sep 2017 06:40:10 -0400
-Message-Id: <1505385610-35529-7-git-send-email-pradeep.jagadeesh@huawei.com>
+Date: Thu, 14 Sep 2017 06:40:05 -0400
+Message-Id: <1505385610-35529-2-git-send-email-pradeep.jagadeesh@huawei.com>
 In-Reply-To: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
 References: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
-Subject: [Qemu-devel] [PATCH v11 6/6] fsdev: hmp interface for throttling
+Subject: [Qemu-devel] [PATCH v11 1/6] throttle: factor out duplicate code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,163 +27,255 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>
-Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+Cc: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, alberto garcia <berto@igalia.com>, Markus Armbruster <armbru@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-This patch introduces hmp interfaces for the fsdev
-devices.
+This patch factors out the duplicate throttle code that was still
+present in block and fsdev devices.
 
 Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- hmp-commands-info.hx | 18 ++++++++++++++++
- hmp-commands.hx      | 19 +++++++++++++++++
- hmp.c                | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- hmp.h                |  4 ++++
- 4 files changed, 100 insertions(+)
+ blockdev.c                      | 44 +---------------------------------
+ fsdev/qemu-fsdev-throttle.c     | 44 ++--------------------------------
+ include/qemu/throttle-options.h |  3 +++
+ include/qemu/throttle.h         |  4 ++--
+ include/qemu/typedefs.h         |  1 +
+ util/throttle.c                 | 52 +++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 61 insertions(+), 87 deletions(-)
 
-diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
-index 4ab7fce..54f1968 100644
---- a/hmp-commands-info.hx
-+++ b/hmp-commands-info.hx
-@@ -84,6 +84,24 @@ STEXI
- Show block device statistics.
- ETEXI
+diff --git a/blockdev.c b/blockdev.c
+index 56a6b24..9d33c25 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -387,49 +387,7 @@ static void extract_common_blockdev_options(QemuOpts *opts, int *bdrv_flags,
+     }
  
-+#if defined(CONFIG_VIRTFS)
-+
-+    {
-+        .name       = "fsdev_iothrottle",
-+        .args_type  = "",
-+        .params     = "",
-+        .help       = "show fsdev iothrottle information",
-+        .cmd        = hmp_info_fsdev_iothrottle,
-+    },
-+
-+#endif
-+
-+STEXI
-+@item info fsdev_iothrottle
-+@findex fsdev_iothrottle
-+Show fsdev device throttle info.
-+ETEXI
-+
-     {
-         .name       = "block-jobs",
-         .args_type  = "",
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index 1941e19..aef9f79 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1680,6 +1680,25 @@ STEXI
- Change I/O throttle limits for a block drive to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
- ETEXI
+     if (throttle_cfg) {
+-        throttle_config_init(throttle_cfg);
+-        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].avg =
+-            qemu_opt_get_number(opts, "throttling.bps-total", 0);
+-        throttle_cfg->buckets[THROTTLE_BPS_READ].avg  =
+-            qemu_opt_get_number(opts, "throttling.bps-read", 0);
+-        throttle_cfg->buckets[THROTTLE_BPS_WRITE].avg =
+-            qemu_opt_get_number(opts, "throttling.bps-write", 0);
+-        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].avg =
+-            qemu_opt_get_number(opts, "throttling.iops-total", 0);
+-        throttle_cfg->buckets[THROTTLE_OPS_READ].avg =
+-            qemu_opt_get_number(opts, "throttling.iops-read", 0);
+-        throttle_cfg->buckets[THROTTLE_OPS_WRITE].avg =
+-            qemu_opt_get_number(opts, "throttling.iops-write", 0);
+-
+-        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].max =
+-            qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+-        throttle_cfg->buckets[THROTTLE_BPS_READ].max  =
+-            qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+-        throttle_cfg->buckets[THROTTLE_BPS_WRITE].max =
+-            qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+-        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].max =
+-            qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+-        throttle_cfg->buckets[THROTTLE_OPS_READ].max =
+-            qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+-        throttle_cfg->buckets[THROTTLE_OPS_WRITE].max =
+-            qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+-
+-        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].burst_length =
+-            qemu_opt_get_number(opts, "throttling.bps-total-max-length", 1);
+-        throttle_cfg->buckets[THROTTLE_BPS_READ].burst_length  =
+-            qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1);
+-        throttle_cfg->buckets[THROTTLE_BPS_WRITE].burst_length =
+-            qemu_opt_get_number(opts, "throttling.bps-write-max-length", 1);
+-        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].burst_length =
+-            qemu_opt_get_number(opts, "throttling.iops-total-max-length", 1);
+-        throttle_cfg->buckets[THROTTLE_OPS_READ].burst_length =
+-            qemu_opt_get_number(opts, "throttling.iops-read-max-length", 1);
+-        throttle_cfg->buckets[THROTTLE_OPS_WRITE].burst_length =
+-            qemu_opt_get_number(opts, "throttling.iops-write-max-length", 1);
+-
+-        throttle_cfg->op_size =
+-            qemu_opt_get_number(opts, "throttling.iops-size", 0);
+-
++        throttle_parse_options(throttle_cfg, opts);
+         if (!throttle_is_valid(throttle_cfg, errp)) {
+             return;
+         }
+diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
+index 49eebb5..0e6fb86 100644
+--- a/fsdev/qemu-fsdev-throttle.c
++++ b/fsdev/qemu-fsdev-throttle.c
+@@ -16,6 +16,7 @@
+ #include "qemu/error-report.h"
+ #include "qemu-fsdev-throttle.h"
+ #include "qemu/iov.h"
++#include "qemu/throttle-options.h"
  
-+#if defined(CONFIG_VIRTFS)
-+
-+    {
-+        .name       = "fsdev_set_io_throttle",
-+        .args_type  = "device:B,bps:l,bps_rd:l,bps_wr:l,iops:l,iops_rd:l,iops_wr:l",
-+        .params     = "device bps bps_rd bps_wr iops iops_rd iops_wr",
-+        .help       = "change I/O throttle limits for a fs devices",
-+        .cmd        = hmp_fsdev_set_io_throttle,
-+    },
-+
-+#endif
-+
-+STEXI
-+@item fsdev_set_io_throttle @var{device} @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
-+@findex fsdev_set_io_throttle
-+Change I/O throttle limits for a fs devices to @var{bps} @var{bps_rd} @var{bps_wr} @var{iops} @var{iops_rd} @var{iops_wr}
-+ETEXI
-+
-+
-     {
-         .name       = "set_password",
-         .args_type  = "protocol:s,password:s,connected:s?",
-diff --git a/hmp.c b/hmp.c
-index acaf0e6..ceec6c9 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -1778,6 +1778,65 @@ void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict)
-     hmp_handle_error(mon, &err);
+ static void fsdev_throttle_read_timer_cb(void *opaque)
+ {
+@@ -31,48 +32,7 @@ static void fsdev_throttle_write_timer_cb(void *opaque)
+ 
+ void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error **errp)
+ {
+-    throttle_config_init(&fst->cfg);
+-    fst->cfg.buckets[THROTTLE_BPS_TOTAL].avg =
+-        qemu_opt_get_number(opts, "throttling.bps-total", 0);
+-    fst->cfg.buckets[THROTTLE_BPS_READ].avg  =
+-        qemu_opt_get_number(opts, "throttling.bps-read", 0);
+-    fst->cfg.buckets[THROTTLE_BPS_WRITE].avg =
+-        qemu_opt_get_number(opts, "throttling.bps-write", 0);
+-    fst->cfg.buckets[THROTTLE_OPS_TOTAL].avg =
+-        qemu_opt_get_number(opts, "throttling.iops-total", 0);
+-    fst->cfg.buckets[THROTTLE_OPS_READ].avg =
+-        qemu_opt_get_number(opts, "throttling.iops-read", 0);
+-    fst->cfg.buckets[THROTTLE_OPS_WRITE].avg =
+-        qemu_opt_get_number(opts, "throttling.iops-write", 0);
+-
+-    fst->cfg.buckets[THROTTLE_BPS_TOTAL].max =
+-        qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+-    fst->cfg.buckets[THROTTLE_BPS_READ].max  =
+-        qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+-    fst->cfg.buckets[THROTTLE_BPS_WRITE].max =
+-        qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+-    fst->cfg.buckets[THROTTLE_OPS_TOTAL].max =
+-        qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+-    fst->cfg.buckets[THROTTLE_OPS_READ].max =
+-        qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+-    fst->cfg.buckets[THROTTLE_OPS_WRITE].max =
+-        qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+-
+-    fst->cfg.buckets[THROTTLE_BPS_TOTAL].burst_length =
+-        qemu_opt_get_number(opts, "throttling.bps-total-max-length", 1);
+-    fst->cfg.buckets[THROTTLE_BPS_READ].burst_length  =
+-        qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1);
+-    fst->cfg.buckets[THROTTLE_BPS_WRITE].burst_length =
+-        qemu_opt_get_number(opts, "throttling.bps-write-max-length", 1);
+-    fst->cfg.buckets[THROTTLE_OPS_TOTAL].burst_length =
+-        qemu_opt_get_number(opts, "throttling.iops-total-max-length", 1);
+-    fst->cfg.buckets[THROTTLE_OPS_READ].burst_length =
+-        qemu_opt_get_number(opts, "throttling.iops-read-max-length", 1);
+-    fst->cfg.buckets[THROTTLE_OPS_WRITE].burst_length =
+-        qemu_opt_get_number(opts, "throttling.iops-write-max-length", 1);
+-    fst->cfg.op_size =
+-        qemu_opt_get_number(opts, "throttling.iops-size", 0);
+-
++    throttle_parse_options(&fst->cfg, opts);
+     throttle_is_valid(&fst->cfg, errp);
  }
  
-+#ifdef CONFIG_VIRTFS
+diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-options.h
+index 3528a8f..9709dcd 100644
+--- a/include/qemu/throttle-options.h
++++ b/include/qemu/throttle-options.h
+@@ -9,6 +9,7 @@
+  */
+ #ifndef THROTTLE_OPTIONS_H
+ #define THROTTLE_OPTIONS_H
++#include "typedefs.h"
+ 
+ #define QEMU_OPT_IOPS_TOTAL "iops-total"
+ #define QEMU_OPT_IOPS_TOTAL_MAX "iops-total-max"
+@@ -111,4 +112,6 @@
+             .help = "when limiting by iops max size of an I/O in bytes",\
+         }
+ 
++void throttle_parse_options(ThrottleConfig *, QemuOpts *);
 +
-+void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict)
+ #endif
+diff --git a/include/qemu/throttle.h b/include/qemu/throttle.h
+index 8c93237..b6ebc6d 100644
+--- a/include/qemu/throttle.h
++++ b/include/qemu/throttle.h
+@@ -89,10 +89,10 @@ typedef struct LeakyBucket {
+  * However it allows to keep the code clean and the bucket field is reset to
+  * zero at the right time.
+  */
+-typedef struct ThrottleConfig {
++struct ThrottleConfig {
+     LeakyBucket buckets[BUCKETS_COUNT]; /* leaky buckets */
+     uint64_t op_size;         /* size of an operation in bytes */
+-} ThrottleConfig;
++};
+ 
+ typedef struct ThrottleState {
+     ThrottleConfig cfg;       /* configuration */
+diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+index 39bc835..90fe0f9 100644
+--- a/include/qemu/typedefs.h
++++ b/include/qemu/typedefs.h
+@@ -100,6 +100,7 @@ typedef struct uWireSlave uWireSlave;
+ typedef struct VirtIODevice VirtIODevice;
+ typedef struct Visitor Visitor;
+ typedef struct node_info NodeInfo;
++typedef struct ThrottleConfig ThrottleConfig;
+ typedef void SaveStateHandler(QEMUFile *f, void *opaque);
+ typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
+ 
+diff --git a/util/throttle.c b/util/throttle.c
+index 06bf916..9ef28c4 100644
+--- a/util/throttle.c
++++ b/util/throttle.c
+@@ -27,6 +27,7 @@
+ #include "qemu/throttle.h"
+ #include "qemu/timer.h"
+ #include "block/aio.h"
++#include "qemu/throttle-options.h"
+ 
+ /* This function make a bucket leak
+  *
+@@ -635,3 +636,54 @@ void throttle_config_to_limits(ThrottleConfig *cfg, ThrottleLimits *var)
+     var->has_iops_write_max_length = true;
+     var->has_iops_size = true;
+ }
++
++/* parse the throttle options
++ *
++ * @opts: qemu options
++ * @throttle_cfg: throttle configuration
++ */
++void throttle_parse_options(ThrottleConfig *throttle_cfg, QemuOpts *opts)
 +{
-+    Error *err = NULL;
-+    ThrottleLimits throttle = {
-+        .has_id = true,
-+        .id = (char *) qdict_get_str(qdict, "device"),
-+    };
++    throttle_config_init(throttle_cfg);
++    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].avg =
++        qemu_opt_get_number(opts, "throttling.bps-total", 0);
++    throttle_cfg->buckets[THROTTLE_BPS_READ].avg  =
++        qemu_opt_get_number(opts, "throttling.bps-read", 0);
++    throttle_cfg->buckets[THROTTLE_BPS_WRITE].avg =
++        qemu_opt_get_number(opts, "throttling.bps-write", 0);
++    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].avg =
++        qemu_opt_get_number(opts, "throttling.iops-total", 0);
++    throttle_cfg->buckets[THROTTLE_OPS_READ].avg =
++        qemu_opt_get_number(opts, "throttling.iops-read", 0);
++    throttle_cfg->buckets[THROTTLE_OPS_WRITE].avg =
++        qemu_opt_get_number(opts, "throttling.iops-write", 0);
 +
-+    hmp_initialize_throttle_limits(&throttle, qdict);
-+    qmp_fsdev_set_io_throttle(&throttle, &err);
-+    hmp_handle_error(mon, &err);
++    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].max =
++        qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
++    throttle_cfg->buckets[THROTTLE_BPS_READ].max  =
++        qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
++    throttle_cfg->buckets[THROTTLE_BPS_WRITE].max =
++        qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
++    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].max =
++        qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
++    throttle_cfg->buckets[THROTTLE_OPS_READ].max =
++        qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
++    throttle_cfg->buckets[THROTTLE_OPS_WRITE].max =
++        qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
++
++    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].burst_length =
++        qemu_opt_get_number(opts, "throttling.bps-total-max-length", 1);
++    throttle_cfg->buckets[THROTTLE_BPS_READ].burst_length  =
++        qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1);
++    throttle_cfg->buckets[THROTTLE_BPS_WRITE].burst_length =
++        qemu_opt_get_number(opts, "throttling.bps-write-max-length", 1);
++    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].burst_length =
++        qemu_opt_get_number(opts, "throttling.iops-total-max-length", 1);
++    throttle_cfg->buckets[THROTTLE_OPS_READ].burst_length =
++        qemu_opt_get_number(opts, "throttling.iops-read-max-length", 1);
++    throttle_cfg->buckets[THROTTLE_OPS_WRITE].burst_length =
++        qemu_opt_get_number(opts, "throttling.iops-write-max-length", 1);
++
++    throttle_cfg->op_size =
++        qemu_opt_get_number(opts, "throttling.iops-size", 0);
 +}
-+
-+static void print_fsdev_throttle_config(Monitor *mon, ThrottleLimits *fscfg)
-+{
-+    monitor_printf(mon, "%s", fscfg->id);
-+    monitor_printf(mon, "    I/O throttling:"
-+                   " bps=%" PRId64
-+                   " bps_rd=%" PRId64  " bps_wr=%" PRId64
-+                   " bps_max=%" PRId64
-+                   " bps_rd_max=%" PRId64
-+                   " bps_wr_max=%" PRId64
-+                   " iops=%" PRId64 " iops_rd=%" PRId64
-+                   " iops_wr=%" PRId64
-+                   " iops_max=%" PRId64
-+                   " iops_rd_max=%" PRId64
-+                   " iops_wr_max=%" PRId64
-+                   " iops_size=%" PRId64
-+                   "\n",
-+                   fscfg->bps_total,
-+                   fscfg->bps_read,
-+                   fscfg->bps_write,
-+                   fscfg->bps_total_max,
-+                   fscfg->bps_read_max,
-+                   fscfg->bps_write_max,
-+                   fscfg->iops_total,
-+                   fscfg->iops_read,
-+                   fscfg->iops_write,
-+                   fscfg->iops_total_max,
-+                   fscfg->iops_read_max,
-+                   fscfg->iops_write_max,
-+                   fscfg->iops_size);
-+}
-+
-+void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict)
-+{
-+    ThrottleLimitsList *fsdev_list, *info;
-+    fsdev_list = qmp_query_fsdev_io_throttle(NULL);
-+
-+    for (info = fsdev_list; info; info = info->next) {
-+        print_fsdev_throttle_config(mon, info->value);
-+    }
-+    qapi_free_ThrottleLimitsList(fsdev_list);
-+}
-+
-+#endif
-+
- void hmp_block_stream(Monitor *mon, const QDict *qdict)
- {
-     Error *error = NULL;
-diff --git a/hmp.h b/hmp.h
-index 1ff4552..d700d7d 100644
---- a/hmp.h
-+++ b/hmp.h
-@@ -81,6 +81,10 @@ void hmp_set_password(Monitor *mon, const QDict *qdict);
- void hmp_expire_password(Monitor *mon, const QDict *qdict);
- void hmp_eject(Monitor *mon, const QDict *qdict);
- void hmp_change(Monitor *mon, const QDict *qdict);
-+#ifdef CONFIG_VIRTFS
-+void hmp_fsdev_set_io_throttle(Monitor *mon, const QDict *qdict);
-+void hmp_info_fsdev_iothrottle(Monitor *mon, const QDict *qdict);
-+#endif
- void hmp_block_set_io_throttle(Monitor *mon, const QDict *qdict);
- void hmp_block_stream(Monitor *mon, const QDict *qdict);
- void hmp_block_job_set_speed(Monitor *mon, const QDict *qdict);
 -- 
 1.8.3.1
