@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50317)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50544)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsWve-0002Wa-Bj
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:23:51 -0400
+	(envelope-from <prvs=423eedb09=anthony.perard@citrix.com>)
+	id 1dsWw1-0002m1-5x
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:24:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsWvb-0006n9-6K
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:23:50 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:50510 helo=roura.ac.upc.es)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsWva-0006mB-QQ
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:23:47 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
-	<150506131942.19604.1306593039321280342.stgit@frigg.lan>
-	<418914ee-c8bf-2576-3cea-4a3eb2a9d4f7@linaro.org>
-Date: Thu, 14 Sep 2017 19:23:34 +0300
-In-Reply-To: <418914ee-c8bf-2576-3cea-4a3eb2a9d4f7@linaro.org> (Richard
-	Henderson's message of "Wed, 13 Sep 2017 11:01:39 -0700")
-Message-ID: <877ex1nta1.fsf@frigg.lan>
+	(envelope-from <prvs=423eedb09=anthony.perard@citrix.com>)
+	id 1dsWvy-00072b-0X
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:24:13 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:19797)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=423eedb09=anthony.perard@citrix.com>)
+	id 1dsWvx-0006y1-NX
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 12:24:09 -0400
+Date: Thu, 14 Sep 2017 17:23:43 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170914162343.GI1544@perard.uk.xensource.com>
+References: <59B80A35020000780017A344@prv-mh.provo.novell.com>
+	<59B80A35020000780017A344@prv-mh.provo.novell.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 6/7] trace: Add event "guest_inst_after"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <59B80A35020000780017A344@prv-mh.provo.novell.com>
+Subject: Re: [Qemu-devel] [PATCH] xen_disk: avoid use of g_malloc0_n()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,96 +30,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Jan Beulich <JBeulich@suse.com>
+Cc: qemu-devel@nongnu.org, xen-devel <xen-devel@lists.xenproject.org>, Paul Durrant <paul.durrant@citrix.com>, Stefano Stabellini <sstabellini@kernel.org>
 
-Richard Henderson writes:
+On Tue, Sep 12, 2017 at 08:24:21AM -0600, Jan Beulich wrote:
+> Prefer g_new() / g_new0() to be farther backwards compatible with older
+> glib versions. As there's no point in zeroing the allocation here (the
+> loop right afterwards fully initializes the memory), use the former.
+> 
+> Signed-off-by: Jan Beulich <jbeulich@suse.com>
 
-> On 09/10/2017 09:35 AM, Llu=C3=ADs Vilanova wrote:
->> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
->> ---
->> accel/tcg/translator.c |   23 ++++++++++++++++++-----
->> trace-events           |    8 ++++++++
->> 2 files changed, 26 insertions(+), 5 deletions(-)
->>=20
->> diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
->> index d66d601c89..c010aeee45 100644
->> --- a/accel/tcg/translator.c
->> +++ b/accel/tcg/translator.c
->> @@ -35,7 +35,8 @@ void translator_loop_temp_check(DisasContextBase *db)
->> void translator_loop(const TranslatorOps *ops, DisasContextBase *db,
->> CPUState *cpu, TranslationBlock *tb)
->> {
->> -    target_ulong pc_bbl;
->> +    target_ulong pc_bbl, pc_insn =3D 0;
->> +    bool translated_insn =3D false;
->> int max_insns;
->>=20
->> /* Initialize DisasContext */
->> @@ -75,10 +76,15 @@ void translator_loop(const TranslatorOps *ops, Disas=
-ContextBase *db,
->> tcg_debug_assert(db->is_jmp =3D=3D DISAS_NEXT);  /* no early exit */
->>=20
->> while (true) {
->> -        target_ulong pc_insn =3D db->pc_next;
->> TCGv_i32 insn_size_tcg =3D 0;
->> int insn_size_opcode_idx;
->>=20
->> +        /* Tracing after (previous instruction) */
->> +        if (db->num_insns > 0) {
->> +            trace_guest_inst_after_tcg(cpu, tcg_ctx.tcg_env, pc_insn);
->> +        }
+Acked-by: Anthony PERARD <anthony.perard@citrix.com>
 
-> How does this differ from "guest_inst"?  Why would you need two trace poi=
-nts?
+> --- a/hw/block/xen_disk.c
+> +++ b/hw/block/xen_disk.c
+> @@ -1232,7 +1232,7 @@ static int blk_connect(struct XenDevice
+>          return -1;
+>      }
+>  
+> -    domids = g_malloc0_n(blkdev->nr_ring_ref, sizeof(uint32_t));
+> +    domids = g_new(uint32_t, blkdev->nr_ring_ref);
+>      for (i = 0; i < blkdev->nr_ring_ref; i++) {
+>          domids[i] = blkdev->xendev.dom;
+>      }
+> 
+> 
+> 
+> 
 
-I assume you mean how it differs from guest_inst_before. The two main ideas=
- are:
-
-* To be able to get a trace an execution-time event only after the instruct=
-ion
-  or TB have finished executing successfully (i.e., there could be an excep=
-tion).
-* Some values are only known *after* the instruction is translated (like the
-  instruction size, or other extra information we might add in the future),=
- so
-  an efficient way to collect that is to trace guest_bbl_* and guest_insn_a=
-fter
-  at translation time (to build a TB "dictionary" as some call it), and tra=
-ce
-  guest_bbl_before at execution time (and use the detailed info above that =
-you
-  got at translation time).
-
-
-> Why are you placing this at the beginning of the while loop rather than t=
-he end?
-
-Yeah, that'll be much clearer.
-
-
->> @@ -164,6 +172,9 @@ void translator_loop(const TranslatorOps *ops, Disas=
-ContextBase *db,
->>=20
->> gen_set_inline_region_begin(tcg_ctx.disas.inline_label);
->>=20
->> +        if (TRACE_GUEST_INST_AFTER_ENABLED && translated_insn) {
->> +            trace_guest_inst_after_tcg(cpu, tcg_ctx.tcg_env, pc_insn);
->> +        }
->> if (TRACE_GUEST_BBL_AFTER_ENABLED) {
->> trace_guest_bbl_after_tcg(cpu, tcg_ctx.tcg_env, pc_bbl);
->> }
-
-> I think I'm finally beginning to understand what you're after with your
-> inlining.  But I still think this should be doable in the appropriate opc=
-ode
-> generating functions.
-
-I'm not sure we can if we want to avoid having the duplicate translation-ti=
-me
-events I said in a previous response (since TB can have two exit points and
-we're detecting them through goto_tb).
-
-
-Thanks,
-  Lluis
+-- 
+Anthony PERARD
