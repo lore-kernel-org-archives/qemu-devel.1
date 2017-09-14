@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35972)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38283)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dsane-0005oh-Ap
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 16:31:51 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dsarC-0000QE-Rz
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 16:35:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dsanb-0005Tx-8s
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 16:31:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47244)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dsanb-0005TC-2R
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 16:31:47 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id D542D883D1
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 20:31:45 +0000 (UTC)
-Date: Thu, 14 Sep 2017 17:31:38 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170914203138.GD23492@localhost.localdomain>
-References: <1505420311-23744-1-git-send-email-mgamal@redhat.com>
-	<96709f6f-b4c8-f752-fd0d-f73de9023bcc@redhat.com>
+	(envelope-from <alistair23@gmail.com>) id 1dsarB-0001oX-VO
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 16:35:30 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <96709f6f-b4c8-f752-fd0d-f73de9023bcc@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] amd_iommu: Return error on machines with
- no PCI
+Sender: alistair23@gmail.com
+In-Reply-To: <CAFEAcA-A78rWzUeBh3M_k2SUmu3A8LwROQKCmw78D8PyE2neJA@mail.gmail.com>
+References: <cover.1504293917.git.alistair.francis@xilinx.com>
+	<26b702658b5bf9984edaecb22b1190be0a9d7052.1504293917.git.alistair.francis@xilinx.com>
+	<CAFEAcA-A78rWzUeBh3M_k2SUmu3A8LwROQKCmw78D8PyE2neJA@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Thu, 14 Sep 2017 13:34:57 -0700
+Message-ID: <CAKmqyKOYqQeu31Ewb8E1AKKAeaG2kBgmwMGUxne_6yVxTKtQsQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] aarch64-softmmu.mak: Use an ARM
+ specific config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,54 +25,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Mohammed Gamal <mgamal@redhat.com>, qemu-devel@nongnu.org, pbonzini@redhat.com, mst@redhat.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-arm <qemu-arm@nongnu.org>
 
-On Thu, Sep 14, 2017 at 10:24:23PM +0200, Thomas Huth wrote:
-> On 14.09.2017 22:18, Mohammed Gamal wrote:
-> > Starting the following command line causes a segfault
-> > qemu-system-x86_64 -S -machine isapc,accel=kvm -device amd-iommu
-> > 
-> > This is due to the fact that the machine type 'isapc' doesn't have
-> > a PCI bus, while amd_iommu doesn't check if the machine has PCI support
-> > and subsequently does a null-pointer access. AMD IOMMU shouldn't even work
-> > if the target machine doesn't have PCI.
-> > 
-> > Add a check for PCI on the given machine type and return an error if PCI
-> > is not supported.
-> > 
-> > Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
-> > ---
-> >  hw/i386/amd_iommu.c | 7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-> > index 334938a..9a667b7 100644
-> > --- a/hw/i386/amd_iommu.c
-> > +++ b/hw/i386/amd_iommu.c
-> > @@ -1153,6 +1153,13 @@ static void amdvi_realize(DeviceState *dev, Error **err)
-> >      }
-> >  
-> >      bus = pcms->bus;
-> > +
-> > +    if (!bus) {
-> > +        error_setg(err, "Machine-type '%s' does not support PCI",
-> > +                   mc->name);
-> > +        return;
-> > +    }
-> > +
-> >      s->iotlb = g_hash_table_new_full(amdvi_uint64_hash,
-> >                                       amdvi_uint64_equal, g_free, g_free);
-> >  
-> > 
-> 
-> Patch looks fine to me, but I think it would also be sufficient to
-> change the check at the beginning of the function to test "if (!pcms ||
-> !pcms->bus)" instead of just "if (!pcms)" ... the error message
-> "Machine-type 'xxx' not supported by amd-iommu" is also adequate if
-> there is no PCI bus available on the system.
+On Thu, Sep 14, 2017 at 5:50 AM, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 1 September 2017 at 22:00, Alistair Francis
+> <alistair.francis@xilinx.com> wrote:
+>> In preperation for having an ARM and MicroBlaze ZynqMP machine let's
+>> split out the current ARM specific config options.
+>>
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>
+> Acked-by: Peter Maydell <peter.maydell@linaro.org>
 
-I agree this would be much simpler.
+Thanks Peter.
 
--- 
-Eduardo
+>
+> I'm assuming this series is going be reviewed and go into
+> master via a microblaze tree, not the arm one...
+
+I talked to Edgar and that is the plan.
+
+Thanks,
+Alistair
+
+>
+> thanks
+> -- PMM
