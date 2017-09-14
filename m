@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46267)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46263)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsVK5-0005Zf-2e
+	(envelope-from <eblake@redhat.com>) id 1dsVK5-0005Zd-1G
 	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:40:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsVK0-0002Na-KK
+	(envelope-from <eblake@redhat.com>) id 1dsVK1-0002OB-7B
 	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:40:57 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 14 Sep 2017 09:40:13 -0500
-Message-Id: <20170914144032.14945-2-eblake@redhat.com>
+Date: Thu, 14 Sep 2017 09:40:15 -0500
+Message-Id: <20170914144032.14945-4-eblake@redhat.com>
 In-Reply-To: <20170914144032.14945-1-eblake@redhat.com>
 References: <20170914144032.14945-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 01/20] block: Add .bdrv_co_block_status()
- callback
+Subject: [Qemu-devel] [PATCH v3 03/20] file-posix: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,122 +21,129 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based. Now that the block layer exposes byte-based allocation,
-it's time to tackle the drivers.  Add a new callback that operates
-on as small as byte boundaries. Subsequent patches will then update
-individual drivers, then finally remove .bdrv_co_get_block_status().
-The old code now uses a goto in order to minimize churn at that later
-removal.
-
-The new code also passes through the 'mapping' hint, which will
-allow subsequent patches to further optimize callers that only care
-about how much of the image is allocated, rather than which offsets
-the allocation actually maps to.
-
-Note that most drivers give sector-aligned answers, except at
-end-of-file, even when request_alignment is smaller than a sector.
-However, bdrv_getlength() is sector-aligned (even though it gives a
-byte answer), often by exceeding the actual file size.  If we were to
-give back strict results, at least file-posix.c would report a
-transition from DATA to HOLE at the end of a file even in the middle
-of a sector, which can throw off callers; so we intentionally lie and
-state that any partial sector at the end of a file has the same
-status for the entire sector.
+byte-based.  Update the file protocol driver accordingly.  In mapping
+mode, note that the entire file is reported as allocated, so we can
+take a shortcut and skip lseek().
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v2: improve alignment handling, ensure all iotests still pass
+v2: tweak comment, add mapping support
 ---
- include/block/block_int.h | 11 ++++++++---
- block/io.c                | 27 ++++++++++++++++++++++++---
- 2 files changed, 32 insertions(+), 6 deletions(-)
+ block/file-posix.c | 57 ++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 32 insertions(+), 25 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index b1ceffba78..0ba57dc35c 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -206,13 +206,18 @@ struct BlockDriver {
-      * bdrv_is_allocated[_above].  The driver should answer only
-      * according to the current layer, and should not set
-      * BDRV_BLOCK_ALLOCATED, but may set BDRV_BLOCK_RAW.  See block.h
--     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  The block
--     * layer guarantees input aligned to request_alignment, as well as
--     * non-NULL pnum and file.
-+     * for the meaning of _DATA, _ZERO, and _OFFSET_VALID.  As a hint,
-+     * the flag mapping is true if the caller cares more about precise
-+     * mappings (favor _OFFSET_VALID) or false for overall allocation
-+     * (favor larger *pnum).  The block layer guarantees input aligned
-+     * to request_alignment, as well as non-NULL pnum and file.
-      */
-     int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
-         int64_t sector_num, int nb_sectors, int *pnum,
-         BlockDriverState **file);
-+    int64_t coroutine_fn (*bdrv_co_block_status)(BlockDriverState *bd,
-+        bool mapping, int64_t offset, int64_t bytes, int64_t *pnum,
-+        BlockDriverState **file);
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 72ecfbb0e0..6813059867 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -2107,24 +2107,25 @@ static int find_allocation(BlockDriverState *bs, off_t start,
+ }
 
-     /*
-      * Invalidate any cached meta-data.
-diff --git a/block/io.c b/block/io.c
-index e0f9bca7e2..4fb544d25c 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1794,7 +1794,7 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-         bytes = n;
+ /*
+- * Returns the allocation status of the specified sectors.
++ * Returns the allocation status of the specified offset.
+  *
+- * If 'sector_num' is beyond the end of the disk image the return value is 0
++ * If 'offset' is beyond the end of the disk image the return value is 0
+  * and 'pnum' is set to 0.
+  *
+- * 'pnum' is set to the number of sectors (including and immediately following
+- * the specified sector) that are known to be in the same
++ * 'pnum' is set to the number of bytes (including and immediately following
++ * the specified offset) that are known to be in the same
+  * allocated/unallocated state.
+  *
+- * 'nb_sectors' is the max value 'pnum' should be set to.  If nb_sectors goes
++ * 'bytes' is the max value 'pnum' should be set to.  If bytes goes
+  * beyond the end of the disk image it will be clamped.
+  */
+-static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+-                                                    int64_t sector_num,
+-                                                    int nb_sectors, int *pnum,
+-                                                    BlockDriverState **file)
++static int64_t coroutine_fn raw_co_block_status(BlockDriverState *bs,
++                                                bool mapping,
++                                                int64_t offset,
++                                                int64_t bytes, int64_t *pnum,
++                                                BlockDriverState **file)
+ {
+-    off_t start, data = 0, hole = 0;
++    off_t data = 0, hole = 0;
+     int64_t total_size;
+     int ret;
+
+@@ -2133,39 +2134,45 @@ static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+         return ret;
      }
 
--    if (!bs->drv->bdrv_co_get_block_status) {
-+    if (!bs->drv->bdrv_co_get_block_status && !bs->drv->bdrv_co_block_status) {
-         *pnum = bytes;
-         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
-         if (offset + bytes == total_size) {
-@@ -1814,11 +1814,14 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-     bdrv_inc_in_flight(bs);
-
-     /* Round out to request_alignment boundaries */
--    align = MAX(bs->bl.request_alignment, BDRV_SECTOR_SIZE);
-+    align = bs->bl.request_alignment;
-+    if (bs->drv->bdrv_co_get_block_status && align < BDRV_SECTOR_SIZE) {
-+        align = BDRV_SECTOR_SIZE;
-+    }
-     aligned_offset = QEMU_ALIGN_DOWN(offset, align);
-     aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
-
--    {
-+    if (bs->drv->bdrv_co_get_block_status) {
-         int count; /* sectors */
-
-         assert(QEMU_IS_ALIGNED(aligned_offset | aligned_bytes,
-@@ -1832,8 +1835,26 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-             goto out;
-         }
-         *pnum = count * BDRV_SECTOR_SIZE;
-+        goto refine;
+-    start = sector_num * BDRV_SECTOR_SIZE;
+     total_size = bdrv_getlength(bs);
+     if (total_size < 0) {
+         return total_size;
+-    } else if (start >= total_size) {
++    } else if (offset >= total_size) {
+         *pnum = 0;
+         return 0;
+-    } else if (start + nb_sectors * BDRV_SECTOR_SIZE > total_size) {
+-        nb_sectors = DIV_ROUND_UP(total_size - start, BDRV_SECTOR_SIZE);
++    } else if (offset + bytes > total_size) {
++        bytes = total_size - offset;
      }
 
-+    ret = bs->drv->bdrv_co_block_status(bs, mapping, aligned_offset,
-+                                        aligned_bytes, pnum, &local_file);
-+    if (ret < 0) {
-+        *pnum = 0;
-+        goto out;
+-    ret = find_allocation(bs, start, &data, &hole);
++    if (!mapping) {
++        *pnum = bytes;
++        *file = bs;
++        return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID |
++            (offset & BDRV_BLOCK_OFFSET_MASK);
 +    }
 +
-+    /*
-+     * total_size is always sector-aligned, by sometimes exceeding actual
-+     * file size. Expand pnum if it lands mid-sector due to end-of-file.
-+     */
-+    if (QEMU_ALIGN_UP(*pnum + aligned_offset,
-+                      BDRV_SECTOR_SIZE) == total_size) {
-+        *pnum = total_size - aligned_offset;
-+    }
-+
-+ refine:
-     /* Clamp pnum and ret to original request */
-     assert(QEMU_IS_ALIGNED(*pnum, align));
-     *pnum -= offset - aligned_offset;
++    ret = find_allocation(bs, offset, &data, &hole);
+     if (ret == -ENXIO) {
+         /* Trailing hole */
+-        *pnum = nb_sectors;
++        *pnum = bytes;
+         ret = BDRV_BLOCK_ZERO;
+     } else if (ret < 0) {
+         /* No info available, so pretend there are no holes */
+-        *pnum = nb_sectors;
++        *pnum = bytes;
+         ret = BDRV_BLOCK_DATA;
+-    } else if (data == start) {
+-        /* On a data extent, compute sectors to the end of the extent,
++    } else if (data == offset) {
++        /* On a data extent, compute bytes to the end of the extent,
+          * possibly including a partial sector at EOF. */
+-        *pnum = MIN(nb_sectors, DIV_ROUND_UP(hole - start, BDRV_SECTOR_SIZE));
++        *pnum = MIN(bytes, hole - offset);
+         ret = BDRV_BLOCK_DATA;
+     } else {
+-        /* On a hole, compute sectors to the beginning of the next extent.  */
+-        assert(hole == start);
+-        *pnum = MIN(nb_sectors, (data - start) / BDRV_SECTOR_SIZE);
++        /* On a hole, compute bytes to the beginning of the next extent.  */
++        assert(hole == offset);
++        *pnum = MIN(bytes, data - offset);
+         ret = BDRV_BLOCK_ZERO;
+     }
+     *file = bs;
+-    return ret | BDRV_BLOCK_OFFSET_VALID | start;
++    return ret | BDRV_BLOCK_OFFSET_VALID | (offset & BDRV_BLOCK_OFFSET_MASK);
+ }
+
+ static coroutine_fn BlockAIOCB *raw_aio_pdiscard(BlockDriverState *bs,
+@@ -2259,7 +2266,7 @@ BlockDriver bdrv_file = {
+     .bdrv_close = raw_close,
+     .bdrv_create = raw_create,
+     .bdrv_has_zero_init = bdrv_has_zero_init_1,
+-    .bdrv_co_get_block_status = raw_co_get_block_status,
++    .bdrv_co_block_status = raw_co_block_status,
+     .bdrv_co_pwrite_zeroes = raw_co_pwrite_zeroes,
+
+     .bdrv_co_preadv         = raw_co_preadv,
 -- 
 2.13.5
