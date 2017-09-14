@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39098)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39994)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dsTav-000614-AY
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:50:19 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dsTbw-0006jf-Oc
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:51:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dsTas-00063Y-6p
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:50:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49966)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dsTar-00060n-U0
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:50:10 -0400
-Date: Thu, 14 Sep 2017 14:49:59 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170914144959.1568da20@nial.brq.redhat.com>
-In-Reply-To: <671fbddb-c201-75d2-249b-00d53a609d57@redhat.com>
-References: <20170913135418.GA14243@stefanha-x1.localdomain>
-	<dbd4caa3-71e2-5ea0-c7b1-8aee774eec30@redhat.com>
-	<20170914003341.h4t7swxcgkum7twi@hz-desktop>
-	<671fbddb-c201-75d2-249b-00d53a609d57@redhat.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dsTbr-0006wJ-AE
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:51:16 -0400
+Received: from mail-wr0-x230.google.com ([2a00:1450:400c:c0c::230]:56275)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dsTbr-0006vO-39
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:51:11 -0400
+Received: by mail-wr0-x230.google.com with SMTP id l39so231056wrl.12
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 05:51:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [libvirt] QEMU -M nvdimm=on and hotplug
+In-Reply-To: <26b702658b5bf9984edaecb22b1190be0a9d7052.1504293917.git.alistair.francis@xilinx.com>
+References: <cover.1504293917.git.alistair.francis@xilinx.com>
+	<26b702658b5bf9984edaecb22b1190be0a9d7052.1504293917.git.alistair.francis@xilinx.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Sep 2017 13:50:49 +0100
+Message-ID: <CAFEAcA-A78rWzUeBh3M_k2SUmu3A8LwROQKCmw78D8PyE2neJA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 3/6] aarch64-softmmu.mak: Use an ARM
+ specific config
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,32 +30,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michal Privoznik <mprivozn@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>
+To: Alistair Francis <alistair.francis@xilinx.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Edgar Iglesias <edgar.iglesias@xilinx.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair23@gmail.com>, qemu-arm <qemu-arm@nongnu.org>
 
-On Thu, 14 Sep 2017 13:51:45 +0200
-Michal Privoznik <mprivozn@redhat.com> wrote:
+On 1 September 2017 at 22:00, Alistair Francis
+<alistair.francis@xilinx.com> wrote:
+> In preperation for having an ARM and MicroBlaze ZynqMP machine let's
+> split out the current ARM specific config options.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 
-> On 09/14/2017 02:33 AM, Haozhong Zhang wrote:
-> > On 09/13/17 17:28 +0200, Michal Privoznik wrote:  
-> >>
-> >> BTW: I ran a migration from no nvdimm qemu to one that had -M nvdimm=on
-> >> and guest migrated happily. So looks like guest ABI is stable (or at
-> >> least stable enough not to crash). But since ACPI table is changed I
-> >> doubt that.  
-> > 
-> > One example that may cause trouble is that
-> > 1/ Guest OS got a pointer to an ACPI table A on the source host (w/o nvdimm=on)
-> > 2/ After migrating to the destination host (w/ nvdimm=on), the
-> >    location of ACPI table A is occupied by NFIT. If guest OS tries to
-> >    access ACPI table A via the pointer in step 1/, then it will access
-> >    the wrong table.
-> >   
-> 
-> Ah, you're right. So it a guest ABI breakage to add nvdimm=on. IOW,
-> libvirt can't safely add that onto command line. Well we could for
-> freshly started guest and not those which are just being migrated. But
-> that increases attack surface so it's not safe either. Okay, I'll stick
-> with the latest proposal (expose this in domain XML and let users turn
-> it on if they want to).
-also note that it depends on memory hotplug being enabled '-m xxx,slots+maxmem'
+Acked-by: Peter Maydell <peter.maydell@linaro.org>
+
+I'm assuming this series is going be reviewed and go into
+master via a microblaze tree, not the arm one...
+
+thanks
+-- PMM
