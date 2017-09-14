@@ -1,17 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47107)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsVKs-0006Vx-Nc
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:49 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dsVL7-0006jC-SP
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:42:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsVKr-00038N-Of
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:46 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Thu, 14 Sep 2017 09:40:32 -0500
-Message-Id: <20170914144032.14945-21-eblake@redhat.com>
-In-Reply-To: <20170914144032.14945-1-eblake@redhat.com>
-References: <20170914144032.14945-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 20/20] block: Drop unused
- .bdrv_co_get_block_status()
+	(envelope-from <peter.maydell@linaro.org>) id 1dsVL6-0003J9-7x
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:42:01 -0400
+Received: from mail-wr0-x236.google.com ([2a00:1450:400c:c0c::236]:53726)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dsVL5-0003Hz-Ul
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:42:00 -0400
+Received: by mail-wr0-x236.google.com with SMTP id l22so528547wrc.10
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 07:41:59 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <150529666493.10902.14830445134051381968.stgit@frigg.lan>
+References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+	<150529666493.10902.14830445134051381968.stgit@frigg.lan>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Sep 2017 15:41:38 +0100
+Message-ID: <CAFEAcA9p9B8AFaaSaSOOSsFsEhHW=XPLBFs5MrozWq=7p4_9Zg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,87 +30,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: =?UTF-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-We are gradually moving away from sector-based interfaces, towards
-byte-based.  Now that all drivers have been updated to provide the
-byte-based .bdrv_co_block_status(), we can delete the sector-based
-interface.
+On 13 September 2017 at 10:57, Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> wr=
+ote:
+> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+> ---
+>  MAINTAINERS         |    6 ++
+>  docs/instrument.txt |  173 +++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  2 files changed, 179 insertions(+)
+>  create mode 100644 docs/instrument.txt
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 36eeb42d19..fb0eaee06a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1486,6 +1486,12 @@ F: scripts/tracetool/
+>  F: docs/tracing.txt
+>  T: git git://github.com/stefanha/qemu.git tracing
+>
+> +Event instrumentation
+> +M: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+> +M: Stefan Hajnoczi <stefanha@redhat.com>
+> +S: Maintained
+> +F: docs/instrument.txt
+> +
+>  TPM
+>  S: Orphan
+>  F: tpm.c
+> diff --git a/docs/instrument.txt b/docs/instrument.txt
+> new file mode 100644
+> index 0000000000..24a0d21fc7
+> --- /dev/null
+> +++ b/docs/instrument.txt
+> @@ -0,0 +1,173 @@
+> +=3D Event instrumentation =3D
+> +
+> +=3D=3D Introduction =3D=3D
+> +
+> +Event instrumentation allows users to execute their own host-native code=
+ on a
+> +set of pre-defined events provided by QEMU. QEMU also exposes other
+> +functionality to peek/poke at the guest state (e.g., memory or registers=
+), as
+> +well as interacting with tracing events. For those familiar with the ter=
+m, this
+> +provides dynamic binary instrumentation, works on all QEMU-supported
+> +architectures, as well as works in both 'user' (standalone application) =
+and
+> +'system' (full-system emulation) modes.
+> +
+> +Look at the headers installed by QEMU on the "qemu-instr" directory for =
+further
+> +information beyond this document.
+> +
+> +
+> +=3D=3D Loading an instrumentation library =3D=3D
+> +
+> +Instrumentation code can be bundled into a dynamic library, which can be=
+ later
+> +loaded into QEMU:
+> +
+> +* Using the command-line "-instr" argument.
+> +
+> +* Using the "instr-load" and "instr-unload" commands in the HMP and QMP
+> +  interfaces.
+> +
+> +
+> +=3D=3D Example =3D=3D
+> +
+> +1. Configure QEMU with event instrumentation:
+> +
+> +    # instrument guest_cpu_enter and guest_mem_before
+> +    mkdir -p /path/to/qemu-build
+> +    cd /path/to/qemu-build
+> +    /path/to/qemu-source/configure \
+> +      --enable-instrument \
+> +      --prefix=3D/path/to/qemu-install
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
+Ideally instrumentation should be cost-free in the case where
+we're not using it, so we can default it to enabled.
 
----
-v2: rebase to earlier changes
----
- include/block/block_int.h |  3 ---
- block/io.c                | 23 +----------------------
- 2 files changed, 1 insertion(+), 25 deletions(-)
+> +
+> +2. Build and install QEMU:
+> +
+> +    make install
+> +
+> +3. Create the "Makefile" to build the instrumentation library:
+> +
+> +    mkdir -p /tmp/my-instrument
+> +
+> +    cat > /tmp/my-instrument/Makefile <<EOF
+> +    QEMU_PATH=3D/tmp/qemu-install/
+> +
+> +    CFLAGS +=3D -g
+> +    CFLAGS +=3D -O3
+> +    CFLAGS +=3D -Werror -Wall
+> +    CFLAGS +=3D -I$(QEMU_PATH)/include
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index ba5c2f9f1f..0bb5e9ebe0 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -212,9 +212,6 @@ struct BlockDriver {
-      * (favor larger *pnum).  The block layer guarantees input aligned
-      * to request_alignment, as well as non-NULL pnum and file.
-      */
--    int64_t coroutine_fn (*bdrv_co_get_block_status)(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum,
--        BlockDriverState **file);
-     int64_t coroutine_fn (*bdrv_co_block_status)(BlockDriverState *bd,
-         bool mapping, int64_t offset, int64_t bytes, int64_t *pnum,
-         BlockDriverState **file);
-diff --git a/block/io.c b/block/io.c
-index 85c01b2800..e58da6f81a 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -1796,7 +1796,7 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-         bytes = n;
-     }
+Plugins shouldn't have or need access to all of the QEMU source
+tree or its include files. We want to be able to provide them
+with one header file which defines all they need (and all they
+get), under a suitably non-restrictive license like 2-clause-BSD.
 
--    if (!bs->drv->bdrv_co_get_block_status && !bs->drv->bdrv_co_block_status) {
-+    if (!bs->drv->bdrv_co_block_status) {
-         *pnum = bytes;
-         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
-         if (offset + bytes == total_size) {
-@@ -1817,29 +1817,9 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+> +
+> +    all: libtrace-instrument.la
+> +
+> +    libtrace-instrument.la: instrument.lo
+> +            libtool --mode=3Dlink --tag=3DCC $(CC) -module -rpath /usr/l=
+ocal/lib -o $@ $^
 
-     /* Round out to request_alignment boundaries */
-     align = bs->bl.request_alignment;
--    if (bs->drv->bdrv_co_get_block_status && align < BDRV_SECTOR_SIZE) {
--        align = BDRV_SECTOR_SIZE;
--    }
-     aligned_offset = QEMU_ALIGN_DOWN(offset, align);
-     aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
+-rpath ?
 
--    if (bs->drv->bdrv_co_get_block_status) {
--        int count; /* sectors */
--
--        assert(QEMU_IS_ALIGNED(aligned_offset | aligned_bytes,
--                               BDRV_SECTOR_SIZE));
--        ret = bs->drv->bdrv_co_get_block_status(
--            bs, aligned_offset >> BDRV_SECTOR_BITS,
--            MIN(INT_MAX, aligned_bytes) >> BDRV_SECTOR_BITS, &count,
--            &local_file);
--        if (ret < 0) {
--            *pnum = 0;
--            goto out;
--        }
--        *pnum = count * BDRV_SECTOR_SIZE;
--        goto refine;
--    }
--
-     ret = bs->drv->bdrv_co_block_status(bs, mapping, aligned_offset,
-                                         aligned_bytes, pnum, &local_file);
-     if (ret < 0) {
-@@ -1856,7 +1836,6 @@ static int64_t coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-         *pnum = total_size - aligned_offset;
-     }
+> +
+> +    %.lo: %.c
+> +            libtool --mode=3Dcompile --tag=3DCC $(CC) $(CFLAGS) -c $^
+> +
+> +    clean:
+> +            $(RM) -f *.o *.so *.lo
+> +            $(RM) -Rf .libs
+> +    EOF
+> +
+> +4. Write your instrumentation library:
+> +
+> +    cat > /tmp/my-instrument/instrument.c <<EOF
+> +    #include <stdio.h>
+> +    #include <assert.h>
+> +
+> +    #include <qemu-instr/control.h>         /* manipulate events */
+> +    #include <qemu-instr/trace.h>           /* manipulate tracing */
+> +
+> +    /* the address for the memory access is not known at translation tim=
+e */
+> +    void guest_mem_before_trans(QICPU vcpu_trans, QITCGv_cpu vcpu_exec,
+> +                                QITCGv vaddr, QIMemInfo info)
+> +    {
+> +        printf("%s: %p %p %p %d %d %d %d\n", __func__, vcpu_trans, vcpu_=
+exec, vaddr,
+> +               1 << info.size_shift, info.sign_extend, info.endianness, =
+info.store);
+> +        if (info.store) {
+> +            /* generate at execution time only for memory writes */
+> +            qi_event_gen_guest_mem_before_exec(vcpu_exec, vaddr, info);
+> +        }
+> +    }
+> +
+> +    /* called when QEMU executes a memory access */
+> +    void guest_mem_before_exec(QICPU vcpu, uint64_t vaddr, QIMemInfo inf=
+o)
+> +    {
+> +        if (info.store) {
+> +            /* if called by TCG code, we'll only get writes (see above) =
+*/
+> +            printf("%s: %p %lx %d %d %d %d\n", __func__, vcpu, vaddr,
+> +                   1 << info.size_shift, info.sign_extend, info.endianne=
+ss, info.store);
+> +        }
+> +    }
 
-- refine:
-     /* Clamp pnum and ret to original request */
-     assert(QEMU_IS_ALIGNED(*pnum, align));
-     *pnum -= offset - aligned_offset;
--- 
-2.13.5
+This looks like it's exposing too much implementation detail.
+We should just provide an API for "hook to be called for
+memory writes" which gets all the information when it
+is called. I don't think we should expose any kind of
+"this hook is called at translation time" at all.
+
+I guess the API docs are in doc comments in a header somewhere,
+so I'll go look in the other patches.
+
+thanks
+-- PMM
