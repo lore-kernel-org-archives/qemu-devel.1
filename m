@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57047)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dsTIK-0004pT-T0
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:31:06 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dsTM9-00071B-GN
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:34:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dsTIJ-0003Pl-TH
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:31:00 -0400
-Received: from mail-wm0-x230.google.com ([2a00:1450:400c:c09::230]:45809)
+	(envelope-from <peter.maydell@linaro.org>) id 1dsTM8-0001Mx-Bb
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:34:57 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:47982)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dsTIJ-0003OV-O3
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:30:59 -0400
-Received: by mail-wm0-x230.google.com with SMTP id g206so619211wme.0
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 05:30:59 -0700 (PDT)
+	id 1dsTM8-0001Jv-3y
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:34:56 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id 13so593524wmq.2
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 05:34:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAKmqyKNrbdGJ2n=HHeUfJOq-EUmwbY_330DGL+BD++BtrSwnxA@mail.gmail.com>
-References: <cover.1504222314.git.alistair.francis@xilinx.com>
-	<20170907213525.GJ5763@toto>
-	<CAKmqyKNrbdGJ2n=HHeUfJOq-EUmwbY_330DGL+BD++BtrSwnxA@mail.gmail.com>
+In-Reply-To: <633f5a2d-a333-5c78-1e0c-3af2a4c896f9@linaro.org>
+References: <CGME20170908110212eucas1p27c5eecf44c5501d23b322d3679a4f12d@eucas1p2.samsung.com>
+	<001801d32891$ec40b930$c4c22b90$@samsung.com>
+	<633f5a2d-a333-5c78-1e0c-3af2a4c896f9@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 14 Sep 2017 13:30:37 +0100
-Message-ID: <CAFEAcA_SG5sPt9xnFJPSbM0L_Zzg0P0XvPA08ERXQoDq59dsKQ@mail.gmail.com>
+Date: Thu, 14 Sep 2017 13:34:34 +0100
+Message-ID: <CAFEAcA91W=NxnVkacqD+vH-73H+aGej2E+qm_YQMY9rpF8aMsw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH Resend v2 0/5] Expose the secure and virt
- properties to the
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 1/1] AArch64: Fix single
+ stepping of ERET instruction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,36 +31,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Edgar Iglesias <edgar.iglesias@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: Jaroslaw Pelczar <j.pelczar@samsung.com>, QEMU Developers <qemu-devel@nongnu.org>, "open list:ARM" <qemu-arm@nongnu.org>
 
-On 7 September 2017 at 22:44, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> On Thu, Sep 7, 2017 at 2:35 PM, Edgar E. Iglesias
-> <edgar.iglesias@xilinx.com> wrote:
->> On Thu, Sep 07, 2017 at 08:56:55AM -0700, Alistair Francis wrote:
->>>
->>> The EL2 and EL3 work is working well now and interanlly we now have
->>> tests that expect to start in EL3 and transition through EL2 to EL1. To
->>> make this easy to run let's expose the secure property to the machine
->>> and also add a virt property that can enable EL2.
->>>
->>> This series also does some machine/name tidying up and makes the first
->>> move to deprecating the EP108 machine, which was just an early access
->>> development board.
->>>
->>> V2:
->>>  - Add a virt option for setting EL2
+On 8 September 2017 at 17:58, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> On 09/08/2017 04:02 AM, Jaroslaw Pelczar wrote:
+>> Previously when single stepping through ERET instruction via GDB
+>> would result in debugger entering the "next" PC after ERET instruction.
+>> When debugging in kernel mode, this will also cause unintended behavior,
+>> because debugger will try to access memory from EL0 point of view.
 >>
->>
->> Thanks Alistair!
->> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+>> Signed-off-by: Jaroslaw Pelczar <j.pelczar@samsung.com>
+>> ---
+>>  target/arm/translate-a64.c | 1 +
+>>  1 file changed, 1 insertion(+)
 >
-> Thanks Edgar.
->
-> @Peter I updated the patches on the git branch I pasted earlier to
-> include Edgar's review.
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Thanks. I've applied the patches to target-arm.next.
+Applied, thanks.
 
 -- PMM
