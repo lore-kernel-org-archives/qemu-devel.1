@@ -1,22 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53035)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wangjie88@huawei.com>) id 1dsQfe-00054g-Cg
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 05:42:55 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dsQlV-0006eH-1Y
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 05:48:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wangjie88@huawei.com>) id 1dsQfb-0006mN-AB
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 05:42:54 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2322)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <wangjie88@huawei.com>) id 1dsQfa-0006S1-BR
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 05:42:51 -0400
-From: "WangJie (Captain)" <wangjie88@huawei.com>
-Message-ID: <59BA4ED4.6070108@huawei.com>
-Date: Thu, 14 Sep 2017 17:41:40 +0800
+	(envelope-from <dgilbert@redhat.com>) id 1dsQlU-0001uu-4o
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 05:48:57 -0400
+Date: Thu, 14 Sep 2017 10:48:38 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170914094838.GA3982@work-vm>
+References: <20170913142036.2469-1-lvivier@redhat.com>
+	<20170913142036.2469-4-lvivier@redhat.com>
+	<20170913162709.3933352d.cohuck@redhat.com>
+	<32c345ab-ce02-fe29-1587-db863fb21209@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] =?utf-8?q?question=EF=BC=9Aa_question_about_throttle?=
- =?utf-8?q?_and_hot-unplug?=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <32c345ab-ce02-fe29-1587-db863fb21209@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v4 3/4] dump: do not dump non-existent
+ guest memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,22 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: berto@igalia.com, stefanha@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: Laurent Vivier <lvivier@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-devel@nongnu.org, "Daniel P . Berrange" <berrange@redhat.com>, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
 
-Hi, Kevin
+* Laurent Vivier (lvivier@redhat.com) wrote:
+> On 13/09/2017 16:27, Cornelia Huck wrote:
+> > On Wed, 13 Sep 2017 16:20:35 +0200
+> > Laurent Vivier <lvivier@redhat.com> wrote:
+> > 
+> >> From: Cornelia Huck <cohuck@redhat.com>
+> >>
+> >> It does not really make sense to dump memory that is not there.
+> >>
+> >> Moreover, that fixes a segmentation fault when calling dump-guest-memory
+> >> with no filter for a machine with no memory defined.
+> >>
+> >> New behaviour is:
+> >>
+> >> (qemu) dump-guest-memory /dev/null
+> >> dump: no guest memory to dump
+> >> (qemu) dump-guest-memory /dev/null 0 4096
+> >> dump: no guest memory to dump
+> >>
+> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> >> Tested-by: Laurent Vivier <lvivier@redhat.com>
+> >> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> >> Reviewed-by: Greg Kurz <groug@kaod.org>
+> >> Reviewed-by: Peter Xu <peterx@redhat.com>
+> >> ---
+> >>  dump.c | 6 ++++++
+> >>  1 file changed, 6 insertions(+)
+> > 
+> > You need to supply your s-o-b as well, no?
+> > 
+> 
+> I was wondering... theoretically, yes, so:
+> 
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-the patch you commited: https://github.com/qemu/qemu/commit/7ca7f0f6db1fedd28d490795d778cf23979a2aa7#diff-ea36ba0f79150cc299732696a069caba
+Thanks.
 
-remove blk_io_limits_disable from blk_remove_bs
+Dave
 
-Then, if a disk which configured qos hot-unplug from VM, the backend of the disk reminds in throttle group.
-
-So when I hot-unplug and hot-plug a disk, and use the same throttle group name, will lead to qemu crash.
-
-
-and Eric committed a path as fallow fixed the bug on qemu-kvm 2.9.0-rc4:
-https://github.com/qemu/qemu/commit/1606e4cf8a976513ecac70ad6642a7ec45744cf5#diff-7cb66df56045598b75a219eebc27efb6
-
-
-Is what I said as below correct? I just want to make sure it. Thank you :）
+> Thanks,
+> Laurent
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
