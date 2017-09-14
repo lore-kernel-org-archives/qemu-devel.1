@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47104)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsVKp-0006Ou-7G
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:44 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsVKs-0006Vf-J6
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsVKo-00034t-Co
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:43 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsVKr-000389-Kj
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:46 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 14 Sep 2017 09:40:31 -0500
-Message-Id: <20170914144032.14945-20-eblake@redhat.com>
+Date: Thu, 14 Sep 2017 09:40:29 -0500
+Message-Id: <20170914144032.14945-18-eblake@redhat.com>
 In-Reply-To: <20170914144032.14945-1-eblake@redhat.com>
 References: <20170914144032.14945-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 19/20] vvfat: Switch to
+Subject: [Qemu-devel] [PATCH v3 17/20] vmdk: Switch to
  .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -24,52 +24,85 @@ To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the vvfat driver accordingly.  Note that we
-can rely on the block driver having already clamped limits to our
-block size, and simplify accordingly.
+byte-based.  Update the vmdk driver accordingly.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 
 ---
-v2: rebase to earlier changes, simplify
+v2: rebase to mapping flag
 ---
- block/vvfat.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ block/vmdk.c | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/block/vvfat.c b/block/vvfat.c
-index c54fa94651..6a08d68ae3 100644
---- a/block/vvfat.c
-+++ b/block/vvfat.c
-@@ -3090,15 +3090,13 @@ vvfat_co_pwritev(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+diff --git a/block/vmdk.c b/block/vmdk.c
+index c665bcc977..68b9da419a 100644
+--- a/block/vmdk.c
++++ b/block/vmdk.c
+@@ -1303,25 +1303,27 @@ static inline uint64_t vmdk_find_index_in_cluster(VmdkExtent *extent,
+     return offset / BDRV_SECTOR_SIZE;
+ }
+
+-static int64_t coroutine_fn vmdk_co_get_block_status(BlockDriverState *bs,
+-        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
++static int64_t coroutine_fn vmdk_co_block_status(BlockDriverState *bs,
++                                                 bool mapping,
++                                                 int64_t offset, int64_t bytes,
++                                                 int64_t *pnum,
++                                                 BlockDriverState **file)
+ {
+     BDRVVmdkState *s = bs->opaque;
+     int64_t index_in_cluster, n, ret;
+-    uint64_t offset;
++    uint64_t cluster_offset;
+     VmdkExtent *extent;
+
+-    extent = find_extent(s, sector_num, NULL);
++    extent = find_extent(s, offset >> BDRV_SECTOR_BITS, NULL);
+     if (!extent) {
+         return 0;
+     }
+     qemu_co_mutex_lock(&s->lock);
+-    ret = get_cluster_offset(bs, extent, NULL,
+-                             sector_num * 512, false, &offset,
++    ret = get_cluster_offset(bs, extent, NULL, offset, false, &cluster_offset,
+                              0, 0);
+     qemu_co_mutex_unlock(&s->lock);
+
+-    index_in_cluster = vmdk_find_index_in_cluster(extent, sector_num);
++    index_in_cluster = vmdk_find_offset_in_cluster(extent, offset);
+     switch (ret) {
+     case VMDK_ERROR:
+         ret = -EIO;
+@@ -1336,18 +1338,15 @@ static int64_t coroutine_fn vmdk_co_get_block_status(BlockDriverState *bs,
+         ret = BDRV_BLOCK_DATA;
+         if (!extent->compressed) {
+             ret |= BDRV_BLOCK_OFFSET_VALID;
+-            ret |= (offset + (index_in_cluster << BDRV_SECTOR_BITS))
++            ret |= (cluster_offset + index_in_cluster)
+                     & BDRV_BLOCK_OFFSET_MASK;
+         }
+         *file = extent->file->bs;
+         break;
+     }
+
+-    n = extent->cluster_sectors - index_in_cluster;
+-    if (n > nb_sectors) {
+-        n = nb_sectors;
+-    }
+-    *pnum = n;
++    n = extent->cluster_sectors * BDRV_SECTOR_SIZE - index_in_cluster;
++    *pnum = MIN(n, bytes);
      return ret;
  }
 
--static int64_t coroutine_fn vvfat_co_get_block_status(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *n, BlockDriverState **file)
-+static int64_t coroutine_fn vvfat_co_block_status(BlockDriverState *bs,
-+                                                  bool mapping,
-+                                                  int64_t offset,
-+                                                  int64_t bytes, int64_t *n,
-+                                                  BlockDriverState **file)
- {
--    *n = bs->total_sectors - sector_num;
--    if (*n > nb_sectors) {
--        *n = nb_sectors;
--    } else if (*n < 0) {
--        return 0;
--    }
-+    *n = bytes;
-     return BDRV_BLOCK_DATA;
- }
-
-@@ -3258,7 +3256,7 @@ static BlockDriver bdrv_vvfat = {
-
-     .bdrv_co_preadv         = vvfat_co_preadv,
-     .bdrv_co_pwritev        = vvfat_co_pwritev,
--    .bdrv_co_get_block_status = vvfat_co_get_block_status,
-+    .bdrv_co_block_status   = vvfat_co_block_status,
- };
-
- static void bdrv_vvfat_init(void)
+@@ -2393,7 +2392,7 @@ static BlockDriver bdrv_vmdk = {
+     .bdrv_close                   = vmdk_close,
+     .bdrv_create                  = vmdk_create,
+     .bdrv_co_flush_to_disk        = vmdk_co_flush,
+-    .bdrv_co_get_block_status     = vmdk_co_get_block_status,
++    .bdrv_co_block_status         = vmdk_co_block_status,
+     .bdrv_get_allocated_file_size = vmdk_get_allocated_file_size,
+     .bdrv_has_zero_init           = vmdk_has_zero_init,
+     .bdrv_get_specific_info       = vmdk_get_specific_info,
 -- 
 2.13.5
