@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52974)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dsOwt-00080D-VZ
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 03:52:36 -0400
+	(envelope-from <mjt@tls.msk.ru>) id 1dsOxR-0008VG-QT
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 03:53:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dsOwq-0000Dg-OY
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 03:52:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:7502)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dsOwq-0000Bh-IY
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 03:52:32 -0400
-From: Peter Xu <peterx@redhat.com>
-Date: Thu, 14 Sep 2017 15:50:36 +0800
-Message-Id: <1505375436-28439-16-git-send-email-peterx@redhat.com>
-In-Reply-To: <1505375436-28439-1-git-send-email-peterx@redhat.com>
-References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
-Subject: [Qemu-devel] [RFC 15/15] qmp: let migrate-incoming allow out-of-band
+	(envelope-from <mjt@tls.msk.ru>) id 1dsOxM-0001Sm-Fx
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 03:53:09 -0400
+References: <1504613972-15847-1-git-send-email-peter.maydell@linaro.org>
+From: Michael Tokarev <mjt@tls.msk.ru>
+Message-ID: <e44bc9c8-abc8-44d4-54ef-6083aa833fd9@msgid.tls.msk.ru>
+Date: Thu, 14 Sep 2017 10:53:03 +0300
+MIME-Version: 1.0
+In-Reply-To: <1504613972-15847-1-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] util/qemu-thread-posix.c: Replace OS
+ ifdefs with CONFIG_HAVE_SEM_TIMEDWAIT
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,29 +24,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, peterx@redhat.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org
+Cc: patches@linaro.org
 
-So it can get rid of being run on main thread.
+05.09.2017 15:19, Peter Maydell wrote:
+> In qemu-thread-posix.c we have two implementations of the
+> various qemu_sem_* functions, one of which uses native POSIX
+> sem_* and the other of which emulates them with pthread conditions.
+> This is necessary because not all our host OSes support
+> sem_timedwait().
+..
 
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- qapi/migration.json | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Applied to -trivial, thanks!
 
-diff --git a/qapi/migration.json b/qapi/migration.json
-index ee2b3b8..dedc4f8 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -986,7 +986,8 @@
- # <- { "return": {} }
- #
- ##
--{ 'command': 'migrate-incoming', 'data': {'uri': 'str' } }
-+{ 'command': 'migrate-incoming', 'data': {'uri': 'str' },
-+  'allow-oob': true }
- 
- ##
- # @xen-save-devices-state:
--- 
-2.7.4
+/mjt
