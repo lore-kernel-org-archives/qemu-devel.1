@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dsS9e-0004Ai-4n
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:18:08 -0400
+	(envelope-from <groug@kaod.org>) id 1dsSBj-00052D-2N
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:20:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dsS9Y-0003Cm-7j
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:17:58 -0400
-References: <150538608438.12346.9391407971434352383.stgit@bahia.lan>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <0cb6cfca-05e6-d2e2-7345-541fa21490dd@redhat.com>
-Date: Thu, 14 Sep 2017 13:17:48 +0200
+	(envelope-from <groug@kaod.org>) id 1dsSBf-0005B9-Tp
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:20:07 -0400
+Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:50357)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dsSBf-00059l-Kh
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:20:03 -0400
+Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 4D0FBAC03F
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 13:20:02 +0200 (CEST)
+Date: Thu, 14 Sep 2017 13:19:55 +0200
+From: Greg Kurz <groug@kaod.org>
+Message-ID: <20170914131955.380099a8@bahia.lan>
+In-Reply-To: <1505385610-35529-3-git-send-email-pradeep.jagadeesh@huawei.com>
+References: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1505385610-35529-3-git-send-email-pradeep.jagadeesh@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <150538608438.12346.9391407971434352383.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ppc/kvm: use kvm_vm_check_extension() in
- kvmppc_is_pr()
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	boundary="Sig_/JCL6l=3LiFeOHgNZhMwiIl2";
+	protocol="application/pgp-signature"
+Subject: Re: [Qemu-devel] [PATCH v11 2/6] qmp: Use ThrottleLimits structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,56 +31,158 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: eric blake <eblake@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, alberto garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, qemu-devel@nongnu.org
 
-On 14.09.2017 12:48, Greg Kurz wrote:
-> If the host has both KVM PR and KVM HV loaded and we pass:
+--Sig_/JCL6l=3LiFeOHgNZhMwiIl2
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, 14 Sep 2017 06:40:06 -0400
+Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
+
+> This patch factors out code to use the ThrottleLimits
+> strurcture.
 >=20
-> 	-machine pseries,accel=3Dkvm,kvm-type=3DPR
+> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+> Reviewed-by: Greg Kurz <groug@kaod.org>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: Alberto Garcia <berto@igalia.com>
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  qapi/block-core.json | 78 +++-------------------------------------------=
+------
+
+Uhhh... what happened here ? Where did the lines go ? I've never reviewed t=
+his
+patch before...
+
+>  1 file changed, 4 insertions(+), 74 deletions(-)
 >=20
-> the kvmppc_is_pr() returns false instead of true. Since the helper
-> is mostly used as fallback, it doesn't have any real impact with
-> recent kernels. A notable exception is the workaround to allow
-> migration between compatible hosts with different PVRs (eg, POWER8
-> and POWER8E), since KVM still doesn't provide a way to check if a
-> specific PVR is supported (see commit c363a37a450f for details).
->=20
-> According to the official KVM API documentation [1], KVM_PPC_GET_PVINFO
-> is "vm ioctl", but we check it as a global ioctl. The following functio=
-n
-> in KVM is hence called with kvm =3D=3D NULL and considers we're in HV m=
-ode.
->=20
-> int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> {
-> 	int r;
-> 	/* Assume we're using HV mode when the HV module is loaded */
-> 	int hv_enabled =3D kvmppc_hv_ops ? 1 : 0;
->=20
-> 	if (kvm) {
-> 		/*
-> 		 * Hooray - we know which VM type we're running on. Depend on
-> 		 * that rather than the guess above.
-> 		 */
-> 		hv_enabled =3D is_kvmppc_hv_enabled(kvm);
-> 	}
->=20
-> Let's use kvm_vm_check_extension() to fix the issue.
+> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> index bb11815..d0ccfda 100644
+> --- a/qapi/block-core.json
+> +++ b/qapi/block-core.json
+> @@ -1826,84 +1826,13 @@
+>  #
+>  # @device: Block device name (deprecated, use @id instead)
+>  #
+> -# @id: The name or QOM path of the guest device (since: 2.8)
+> -#
+> -# @bps: total throughput limit in bytes per second
+> -#
+> -# @bps_rd: read throughput limit in bytes per second
+> -#
+> -# @bps_wr: write throughput limit in bytes per second
+> -#
+> -# @iops: total I/O operations per second
+> -#
+> -# @iops_rd: read I/O operations per second
+> -#
+> -# @iops_wr: write I/O operations per second
+> -#
+> -# @bps_max: total throughput limit during bursts,
+> -#                     in bytes (Since 1.7)
+> -#
+> -# @bps_rd_max: read throughput limit during bursts,
+> -#                        in bytes (Since 1.7)
+> -#
+> -# @bps_wr_max: write throughput limit during bursts,
+> -#                        in bytes (Since 1.7)
+> -#
+> -# @iops_max: total I/O operations per second during bursts,
+> -#                      in bytes (Since 1.7)
+> -#
+> -# @iops_rd_max: read I/O operations per second during bursts,
+> -#                         in bytes (Since 1.7)
+> -#
+> -# @iops_wr_max: write I/O operations per second during bursts,
+> -#                         in bytes (Since 1.7)
+> -#
+> -# @bps_max_length: maximum length of the @bps_max burst
+> -#                            period, in seconds. It must only
+> -#                            be set if @bps_max is set as well.
+> -#                            Defaults to 1. (Since 2.6)
+> -#
+> -# @bps_rd_max_length: maximum length of the @bps_rd_max
+> -#                               burst period, in seconds. It must only
+> -#                               be set if @bps_rd_max is set as well.
+> -#                               Defaults to 1. (Since 2.6)
+> -#
+> -# @bps_wr_max_length: maximum length of the @bps_wr_max
+> -#                               burst period, in seconds. It must only
+> -#                               be set if @bps_wr_max is set as well.
+> -#                               Defaults to 1. (Since 2.6)
+> -#
+> -# @iops_max_length: maximum length of the @iops burst
+> -#                             period, in seconds. It must only
+> -#                             be set if @iops_max is set as well.
+> -#                             Defaults to 1. (Since 2.6)
+> -#
+> -# @iops_rd_max_length: maximum length of the @iops_rd_max
+> -#                                burst period, in seconds. It must only
+> -#                                be set if @iops_rd_max is set as well.
+> -#                                Defaults to 1. (Since 2.6)
+> -#
+> -# @iops_wr_max_length: maximum length of the @iops_wr_max
+> -#                                burst period, in seconds. It must only
+> -#                                be set if @iops_wr_max is set as well.
+> -#                                Defaults to 1. (Since 2.6)
+> -#
+> -# @iops_size: an I/O size in bytes (Since 1.7)
+> -#
+>  # @group: throttle group name (Since 2.4)
+>  #
+>  # Since: 1.1
+>  ##
+>  { 'struct': 'BlockIOThrottle',
+> -  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int=
+',
+> -            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr':=
+ 'int',
+> -            '*bps_max': 'int', '*bps_rd_max': 'int',
+> -            '*bps_wr_max': 'int', '*iops_max': 'int',
+> -            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+> -            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+> -            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+> -            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+> -            '*iops_size': 'int', '*group': 'str' } }
+> +  'base': 'ThrottleLimits',
+> +  'data': { '*device': 'str', '*group': 'str' } }
+> =20
+>  ##
+>  # @ThrottleLimits:
+> @@ -1913,6 +1842,7 @@
+>  # transaction. All fields are optional. When setting limits, if a field =
+is
+>  # missing the current value is not changed.
+>  #
+> +# @id:                     device id
+>  # @iops-total:             limit total I/O operations per second
+>  # @iops-total-max:         I/O operations burst
+>  # @iops-total-max-length:  length of the iops-total-max burst period, in=
+ seconds
+> @@ -1942,7 +1872,7 @@
+>  # Since: 2.11
+>  ##
+>  { 'struct': 'ThrottleLimits',
+> -  'data': { '*iops-total' : 'int', '*iops-total-max' : 'int',
+> +  'data': { '*id' : 'str', '*iops-total' : 'int', '*iops-total-max' : 'i=
+nt',
+>              '*iops-total-max-length' : 'int', '*iops-read' : 'int',
+>              '*iops-read-max' : 'int', '*iops-read-max-length' : 'int',
+>              '*iops-write' : 'int', '*iops-write-max' : 'int',
 
-By the way, what about the other CAPs that rely on hv_enabled? grepping
-through the QEMU sources, I can see:
 
- cap_ppc_smt =3D kvm_check_extension(s, KVM_CAP_PPC_SMT);
+--Sig_/JCL6l=3LiFeOHgNZhMwiIl2
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
- cap_htab_fd =3D kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
+-----BEGIN PGP SIGNATURE-----
 
- int ret =3D kvm_check_extension(s, KVM_CAP_NR_VCPUS);
+iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbpl2wAKCRAC/DrrAQHb
+wqA1AKCKjnU19Gf4+t67aCz4RRqR16d+OQCeLreoVSxwOs+PeuZutO5b+eT21XM=
+=/M9v
+-----END PGP SIGNATURE-----
 
- return kvm_check_extension(kvm_state, KVM_CAP_SYNC_MMU);
-
- !kvm_check_extension(cs->kvm_state, KVM_CAP_SW_TLB)) {
-
-... do we need to fix them, too?
-
- Thomas
+--Sig_/JCL6l=3LiFeOHgNZhMwiIl2--
