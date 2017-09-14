@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35328)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dsTSB-0001lv-TS
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:41:13 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dsTUc-0002h9-9X
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:43:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dsTS7-0000LH-Uy
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:41:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55044)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dsTS7-0000Jx-OQ
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:41:07 -0400
-Date: Thu, 14 Sep 2017 13:40:59 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170914124059.GD15518@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170912123744.14730-1-berrange@redhat.com>
-	<1505223994.31639.20.camel@redhat.com>
-	<20170912141910.GJ17633@redhat.com>
-	<CAFEAcA-tdbzXBkyxXW_e15hVcbcfqSfKqke0PX6y-Cg6A62DzQ@mail.gmail.com>
-	<20170912143007.GK17633@redhat.com>
-	<1505390103.31557.11.camel@redhat.com>
-	<CAFEAcA9JEGbiwKeSMyvnLrdE+2WrkRbYLcVJ+UpFnU1RymC1vQ@mail.gmail.com>
+	(envelope-from <peter.maydell@linaro.org>) id 1dsTUb-0001pk-Ct
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:43:42 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:49256)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dsTUb-0001pG-5k
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:43:41 -0400
+Received: by mail-wr0-x229.google.com with SMTP id u96so212849wrb.6
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 05:43:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA9JEGbiwKeSMyvnLrdE+2WrkRbYLcVJ+UpFnU1RymC1vQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v5 00/12] Convert over to use keycodemapdb
+In-Reply-To: <20170913074140.5160-1-kraxel@redhat.com>
+References: <20170913074140.5160-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 14 Sep 2017 13:43:19 +0100
+Message-ID: <CAFEAcA9E6LVCTQSpJ8UjfHamkTJ599eK-N2So64Xxz6zvSR0fg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/6] Vga 20170913 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,30 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On Thu, Sep 14, 2017 at 12:58:26PM +0100, Peter Maydell wrote:
-> On 14 September 2017 at 12:55, Gerd Hoffmann <kraxel@redhat.com> wrote:
-> >   Hi,
-> >
-> >> I think a better approach is to have something in rules.mak
-> >> that ensures the submodule is checked out correctly (only
-> >> when building from GIT, not dist), and then have the rules
-> >> which generate the keymap files depend on this.
-> >
-> > Care sending a patch doing that for dtc?
-> 
-> It sounds awfully fiddly. Maybe it is the best we can do
-> given the mess that is git submodules, but is it really
-> the common approach?
+On 13 September 2017 at 08:41, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> The following changes since commit 223cd0e13f2e46078d7b573f0b8402bfbee339be:
+>
+>   Merge remote-tracking branch 'remotes/elmarco/tags/tidy-pull-request' into staging (2017-08-31 15:52:43 +0100)
+>
+> are available in the git repository at:
+>
+>   git://git.kraxel.org/qemu tags/vga-20170913-pull-request
+>
+> for you to fetch changes up to 79d16c21a565927943486b26789caa62413ff371:
+>
+>   virtio-gpu: don't clear QemuUIInfo information on reset (2017-09-13 09:39:32 +0200)
+>
+> ----------------------------------------------------------------
+> vga: bugfixes.
+> qxl: chunked cursor support.
+>
 
-I'll do a prototype so we can see something concrete working and
-evaluate how pleasant (or not) it is
+Applied, thanks.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+-- PMM
