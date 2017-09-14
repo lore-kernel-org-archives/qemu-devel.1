@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33314)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dsZvQ-0006wH-04
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 15:35:49 -0400
+	(envelope-from <asegundo@redhat.com>) id 1dsZxr-00006n-F7
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 15:38:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dsZvM-0004uc-QG
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 15:35:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42062)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dsZvM-0004tx-IS
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 15:35:44 -0400
-Date: Thu, 14 Sep 2017 16:35:40 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170914193540.GB25664@localhost.localdomain>
-References: <20170824192315.5897-1-ehabkost@redhat.com>
+	(envelope-from <asegundo@redhat.com>) id 1dsZxo-0007C4-7P
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 15:38:19 -0400
+Received: from mail-io0-f178.google.com ([209.85.223.178]:55418)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <asegundo@redhat.com>) id 1dsZxo-0007Ay-2b
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 15:38:16 -0400
+Received: by mail-io0-f178.google.com with SMTP id z187so3191367ioz.12
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 12:38:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170824192315.5897-1-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/3] hostmem-file: Add "discard-data"
- option
+In-Reply-To: <20170905031853.GN22515@lemon.lan>
+References: <20170901112829.2571-1-apahim@redhat.com>
+	<20170901112829.2571-7-apahim@redhat.com>
+	<20170905031853.GN22515@lemon.lan>
+From: Amador Pahim <apahim@redhat.com>
+Date: Thu, 14 Sep 2017 21:38:13 +0200
+Message-ID: <CALAZnb1Lxu8jHWYM6f76RWGOOrGgq9L8sfKVceR4ygZC1NxyXQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v8 06/13] qemu.py: make sure we only remove
+ files we create
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,56 +30,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Zack Cornelius <zack.cornelius@kove.net>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Igor Mammedov <imammedo@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@gmail.com>, Daniel Berrange <berrange@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>, Cleber Rosa <crosa@redhat.com>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>
 
-Series queued on machine-next.
+On Tue, Sep 5, 2017 at 5:18 AM, Fam Zheng <famz@redhat.com> wrote:
+> On Fri, 09/01 13:28, Amador Pahim wrote:
+>> To launch a VM, we need to create basically two files: the monitor
+>> socket (if it's a UNIX socket) and the qemu log file.
+>>
+>> For the qemu log file, we currently just open the path, which will
+>> create the file if it does not exist or overwrite the file if it does
+>> exist.
+>>
+>> For the monitor socket, if it already exists, we are currently removing
+>> it, even if it's not created by us.
+>>
+>> This patch moves to pre_launch() the responsibility to make sure we only
+>> create files that are not pre-existent and to populate a list of
+>> controlled files. This list will then be used as the reference of
+>> files to remove during the cleanup (post_shutdown()).
+>>
+>> Signed-off-by: Amador Pahim <apahim@redhat.com>
+>> ---
+>>  scripts/qemu.py | 30 +++++++++++++++++++++++-------
+>>  1 file changed, 23 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/scripts/qemu.py b/scripts/qemu.py
+>> index 3ebe5ee0a4..c26e1412f9 100644
+>> --- a/scripts/qemu.py
+>> +++ b/scripts/qemu.py
+>> @@ -41,6 +41,7 @@ class QEMUMachine(object):
+>>              monitor_address = os.path.join(test_dir, name + "-monitor.sock")
+>>          self._monitor_address = monitor_address
+>>          self._qemu_log_path = os.path.join(test_dir, name + ".log")
+>> +        self._qemu_log_fd = None
+>>          self._popen = None
+>>          self._binary = binary
+>>          self._args = list(args) # Force copy args in case we modify them
+>> @@ -50,6 +51,7 @@ class QEMUMachine(object):
+>>          self._socket_scm_helper = socket_scm_helper
+>>          self._debug = debug
+>>          self._qemu_full_args = None
+>> +        self._created_files = []
+>>
+>>      # This can be used to add an unused monitor instance.
+>>      def add_monitor_telnet(self, ip, port):
+>> @@ -128,30 +130,44 @@ class QEMUMachine(object):
+>>                  '-display', 'none', '-vga', 'none']
+>>
+>>      def _pre_launch(self):
+>> -        self._qmp = qmp.qmp.QEMUMonitorProtocol(self._monitor_address, server=True,
+>> -                                                debug=self._debug)
+>> +        try:
+>> +            self._qmp = qmp.qmp.QEMUMonitorProtocol(self._monitor_address,
+>> +                                                    server=True,
+>> +                                                    debug=self._debug)
+>> +        except:
+>> +            raise
+>
+> What's the point of "except: raise"? It seems useless.
 
-On Thu, Aug 24, 2017 at 04:23:12PM -0300, Eduardo Habkost wrote:
-> This series adds a new "discard-data" option to
-> memory-backend-file.  The new option will be useful if somebody
-> is sharing RAM contents on a pre-existing file using share=on,
-> but don't need data to be flushed to disk when QEMU exits.
-> 
-> Internally, it will trigger a madvise(MADV_REMOVE) call when the
-> memory backend is removed or when QEMU exits.
-> 
-> To make we actually trigger the new code when QEMU exits, the
-> first patch in the series ensures we destroy all user-created
-> objects when exiting QEMU.
-> 
-> Changes v1 -> v2:
-> * Original subject line of v1 was:
->   '[PATCH 0/5] hostmem-file: Add "persistent" option'
-> * Replaced 'persistent=no' with 'discard-data=yes', to make it
->   clear that the flag will destroy data on the backing file.
-> * Use qemu_madvise() instead of madvise()
->   * New patch added to series: "osdep: define QEMU_MADV_REMOVE"
-> * Call qemu_madvise() directly from the backend unparent()
->   method, insteead of adding a new flag to the memory API and
->   reusing ram_block_discard_range()
->   * In addition to simplifying the code a lot, this fixes a bug,
->     because v1 relied on getting the memory region reference
->     count back to 0, which doesn't happen when QEMU is exiting
->     because there's no machine cleanup code to ensure that.
-> 
-> Eduardo Habkost (3):
->   vl: Clean up user-creatable objects when exiting
->   osdep: Define QEMU_MADV_REMOVE
->   hostmem-file: Add "discard-data" option
-> 
->  include/qemu/osdep.h            |  7 +++++++
->  include/qom/object_interfaces.h |  8 ++++++++
->  backends/hostmem-file.c         | 29 +++++++++++++++++++++++++++++
->  qom/object_interfaces.c         |  5 +++++
->  vl.c                            |  1 +
->  qemu-options.hx                 |  5 ++++-
->  6 files changed, 54 insertions(+), 1 deletion(-)
-> 
-> -- 
-> 2.9.4
-> 
-> 
+The point is to execute the block in the else only when no exception
+happens. When some exception happens, I want to raise it without
+executing the else block.
 
--- 
-Eduardo
+>
+>> +        else:
+>> +            if not isinstance(self._monitor_address, tuple):
+>> +                self._created_files.append(self._monitor_address)
+>> +
+>> +        try:
+>> +            flags = os.O_CREAT | os.O_EXCL | os.O_WRONLY
+>> +            os.open(self._qemu_log_path, flags)
+>
+> Why change to os.open() instead of open()?
+
+I want to create the file only if it does not exist. The open() flag
+'x' is available only in python 3.3. For python <3.3, we need the
+os.open() to have that feature.
+
+>
+>> +        except:
+>> +            raise
+>> +        else:
+>> +            self._created_files.append(self._qemu_log_path)
+>> +            self._qemu_log_fd = open(self._qemu_log_path, 'wb')
+>>
+>>      def _post_launch(self):
+>>          self._qmp.accept()
+>>
+>>      def _post_shutdown(self):
+>> -        if not isinstance(self._monitor_address, tuple):
+>> -            self._remove_if_exists(self._monitor_address)
+>> -        self._remove_if_exists(self._qemu_log_path)
+>> +        while self._created_files:
+>> +            self._remove_if_exists(self._created_files.pop())
+>>
+>>      def launch(self):
+>>          '''Launch the VM and establish a QMP connection'''
+>>          self._iolog = None
+>>          self._qemu_full_args = None
+>>          devnull = open(os.path.devnull, 'rb')
+>> -        qemulog = open(self._qemu_log_path, 'wb')
+>>          try:
+>>              self._pre_launch()
+>>              self._qemu_full_args = (self._wrapper + [self._binary] +
+>>                                      self._base_args() + self._args)
+>>              self._popen = subprocess.Popen(self._qemu_full_args,
+>>                                             stdin=devnull,
+>> -                                           stdout=qemulog,
+>> +                                           stdout=self._qemu_log_fd,
+>>                                             stderr=subprocess.STDOUT,
+>>                                             shell=False)
+>>              self._post_launch()
+>> --
+>> 2.13.5
+>>
+>
+> Fam
