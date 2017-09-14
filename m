@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37860)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39506)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dsZNs-0003fp-2M
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 15:01:14 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dsZQ0-0006f5-JR
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 15:03:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dsZNn-0006My-75
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 15:01:08 -0400
-Received: from mail-pf0-x22f.google.com ([2607:f8b0:400e:c00::22f]:54742)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dsZNm-0006LX-TU
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 15:01:03 -0400
-Received: by mail-pf0-x22f.google.com with SMTP id d187so143822pfg.11
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 12:01:02 -0700 (PDT)
-Received: from bigtime.twiddle.net (97-126-103-167.tukw.qwest.net.
-	[97.126.103.167]) by smtp.gmail.com with ESMTPSA id
-	m24sm32941520pfj.28.2017.09.14.12.00.59 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-	Thu, 14 Sep 2017 12:00:59 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-Date: Thu, 14 Sep 2017 12:00:53 -0700
-Message-Id: <20170914190053.27625-5-richard.henderson@linaro.org>
-In-Reply-To: <20170914190053.27625-1-richard.henderson@linaro.org>
-References: <20170914190053.27625-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH 4/4] tcg/mips: Fully convert tcg_target_op_def
+	(envelope-from <dgilbert@redhat.com>) id 1dsZPv-0007vk-O2
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 15:03:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57698)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dsZPv-0007uq-Ig
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 15:03:15 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 5B7CA356F0
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 19:03:14 +0000 (UTC)
+Date: Thu, 14 Sep 2017 20:03:07 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170914190306.GC3280@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Subject: [Qemu-devel] 087 failing without aio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,353 +30,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: kwolf@redhat.com
+Cc: qemu-devel@nongnu.org
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/mips/tcg-target.inc.c | 324 ++++++++++++++++++++++++----------------------
- 1 file changed, 170 insertions(+), 154 deletions(-)
+Hi Kevin,
+  087 fails if you've not built with aio, do we have
+any easy tests that let us skip it?
 
-diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-index 1c09ec7d5b..ce4030602f 100644
---- a/tcg/mips/tcg-target.inc.c
-+++ b/tcg/mips/tcg-target.inc.c
-@@ -2163,166 +2163,182 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
-     }
- }
- 
--static const TCGTargetOpDef mips_op_defs[] = {
--    { INDEX_op_exit_tb, { } },
--    { INDEX_op_goto_tb, { } },
--    { INDEX_op_br, { } },
--    { INDEX_op_goto_ptr, { "r" } },
--
--    { INDEX_op_ld8u_i32, { "r", "r" } },
--    { INDEX_op_ld8s_i32, { "r", "r" } },
--    { INDEX_op_ld16u_i32, { "r", "r" } },
--    { INDEX_op_ld16s_i32, { "r", "r" } },
--    { INDEX_op_ld_i32, { "r", "r" } },
--    { INDEX_op_st8_i32, { "rZ", "r" } },
--    { INDEX_op_st16_i32, { "rZ", "r" } },
--    { INDEX_op_st_i32, { "rZ", "r" } },
--
--    { INDEX_op_add_i32, { "r", "rZ", "rJ" } },
--    { INDEX_op_mul_i32, { "r", "rZ", "rZ" } },
--#if !use_mips32r6_instructions
--    { INDEX_op_muls2_i32, { "r", "r", "rZ", "rZ" } },
--    { INDEX_op_mulu2_i32, { "r", "r", "rZ", "rZ" } },
--#endif
--    { INDEX_op_mulsh_i32, { "r", "rZ", "rZ" } },
--    { INDEX_op_muluh_i32, { "r", "rZ", "rZ" } },
--    { INDEX_op_div_i32, { "r", "rZ", "rZ" } },
--    { INDEX_op_divu_i32, { "r", "rZ", "rZ" } },
--    { INDEX_op_rem_i32, { "r", "rZ", "rZ" } },
--    { INDEX_op_remu_i32, { "r", "rZ", "rZ" } },
--    { INDEX_op_sub_i32, { "r", "rZ", "rN" } },
--
--    { INDEX_op_and_i32, { "r", "rZ", "rIK" } },
--    { INDEX_op_nor_i32, { "r", "rZ", "rZ" } },
--    { INDEX_op_not_i32, { "r", "rZ" } },
--    { INDEX_op_or_i32, { "r", "rZ", "rIZ" } },
--    { INDEX_op_xor_i32, { "r", "rZ", "rIZ" } },
--
--    { INDEX_op_shl_i32, { "r", "rZ", "ri" } },
--    { INDEX_op_shr_i32, { "r", "rZ", "ri" } },
--    { INDEX_op_sar_i32, { "r", "rZ", "ri" } },
--    { INDEX_op_rotr_i32, { "r", "rZ", "ri" } },
--    { INDEX_op_rotl_i32, { "r", "rZ", "ri" } },
--    { INDEX_op_clz_i32,  { "r", "r", "rWZ" } },
--
--    { INDEX_op_bswap16_i32, { "r", "r" } },
--    { INDEX_op_bswap32_i32, { "r", "r" } },
--
--    { INDEX_op_ext8s_i32, { "r", "rZ" } },
--    { INDEX_op_ext16s_i32, { "r", "rZ" } },
--
--    { INDEX_op_deposit_i32, { "r", "0", "rZ" } },
--    { INDEX_op_extract_i32, { "r", "r" } },
--
--    { INDEX_op_brcond_i32, { "rZ", "rZ" } },
--#if use_mips32r6_instructions
--    { INDEX_op_movcond_i32, { "r", "rZ", "rZ", "rZ", "rZ" } },
--#else
--    { INDEX_op_movcond_i32, { "r", "rZ", "rZ", "rZ", "0" } },
--#endif
--    { INDEX_op_setcond_i32, { "r", "rZ", "rZ" } },
-+static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
-+{
-+    static const TCGTargetOpDef r = { .args_ct_str = { "r" } };
-+    static const TCGTargetOpDef r_r = { .args_ct_str = { "r", "r" } };
-+    static const TCGTargetOpDef r_L = { .args_ct_str = { "r", "L" } };
-+    static const TCGTargetOpDef rZ_r = { .args_ct_str = { "rZ", "r" } };
-+    static const TCGTargetOpDef SZ_S = { .args_ct_str = { "SZ", "S" } };
-+    static const TCGTargetOpDef rZ_rZ = { .args_ct_str = { "rZ", "rZ" } };
-+    static const TCGTargetOpDef r_r_L = { .args_ct_str = { "r", "r", "L" } };
-+    static const TCGTargetOpDef r_L_L = { .args_ct_str = { "r", "L", "L" } };
-+    static const TCGTargetOpDef r_r_ri = { .args_ct_str = { "r", "r", "ri" } };
-+    static const TCGTargetOpDef r_r_rI = { .args_ct_str = { "r", "r", "rI" } };
-+    static const TCGTargetOpDef r_r_rJ = { .args_ct_str = { "r", "r", "rJ" } };
-+    static const TCGTargetOpDef SZ_S_S = { .args_ct_str = { "SZ", "S", "S" } };
-+    static const TCGTargetOpDef SZ_SZ_S
-+        = { .args_ct_str = { "SZ", "SZ", "S" } };
-+    static const TCGTargetOpDef SZ_SZ_S_S
-+        = { .args_ct_str = { "SZ", "SZ", "S", "S" } };
-+    static const TCGTargetOpDef r_rZ_rN
-+        = { .args_ct_str = { "r", "rZ", "rN" } };
-+    static const TCGTargetOpDef r_rZ_rZ
-+        = { .args_ct_str = { "r", "rZ", "rZ" } };
-+    static const TCGTargetOpDef r_r_rIK
-+        = { .args_ct_str = { "r", "r", "rIK" } };
-+    static const TCGTargetOpDef r_r_rWZ
-+        = { .args_ct_str = { "r", "r", "rWZ" } };
-+    static const TCGTargetOpDef r_r_r_r
-+        = { .args_ct_str = { "r", "r", "r", "r" } };
-+    static const TCGTargetOpDef r_r_L_L
-+        = { .args_ct_str = { "r", "r", "L", "L" } };
-+    static const TCGTargetOpDef dep
-+        = { .args_ct_str = { "r", "0", "rZ" } };
-+    static const TCGTargetOpDef movc
-+        = { .args_ct_str = { "r", "rZ", "rZ", "rZ", "0" } };
-+    static const TCGTargetOpDef movc_r6
-+        = { .args_ct_str = { "r", "rZ", "rZ", "rZ", "rZ" } };
-+    static const TCGTargetOpDef add2
-+        = { .args_ct_str = { "r", "r", "rZ", "rZ", "rN", "rN" } };
-+    static const TCGTargetOpDef br2
-+        = { .args_ct_str = { "rZ", "rZ", "rZ", "rZ" } };
-+    static const TCGTargetOpDef setc2
-+        = { .args_ct_str = { "r", "rZ", "rZ", "rZ", "rZ" } };
-+
-+    switch (op) {
-+    case INDEX_op_goto_ptr:
-+        return &r;
- 
--#if TCG_TARGET_REG_BITS == 32
--    { INDEX_op_add2_i32, { "r", "r", "rZ", "rZ", "rN", "rN" } },
--    { INDEX_op_sub2_i32, { "r", "r", "rZ", "rZ", "rN", "rN" } },
--    { INDEX_op_setcond2_i32, { "r", "rZ", "rZ", "rZ", "rZ" } },
--    { INDEX_op_brcond2_i32, { "rZ", "rZ", "rZ", "rZ" } },
--#endif
-+    case INDEX_op_ld8u_i32:
-+    case INDEX_op_ld8s_i32:
-+    case INDEX_op_ld16u_i32:
-+    case INDEX_op_ld16s_i32:
-+    case INDEX_op_ld_i32:
-+    case INDEX_op_not_i32:
-+    case INDEX_op_bswap16_i32:
-+    case INDEX_op_bswap32_i32:
-+    case INDEX_op_ext8s_i32:
-+    case INDEX_op_ext16s_i32:
-+    case INDEX_op_extract_i32:
-+    case INDEX_op_ld8u_i64:
-+    case INDEX_op_ld8s_i64:
-+    case INDEX_op_ld16u_i64:
-+    case INDEX_op_ld16s_i64:
-+    case INDEX_op_ld32s_i64:
-+    case INDEX_op_ld32u_i64:
-+    case INDEX_op_ld_i64:
-+    case INDEX_op_not_i64:
-+    case INDEX_op_bswap16_i64:
-+    case INDEX_op_bswap32_i64:
-+    case INDEX_op_bswap64_i64:
-+    case INDEX_op_ext8s_i64:
-+    case INDEX_op_ext16s_i64:
-+    case INDEX_op_ext32s_i64:
-+    case INDEX_op_ext32u_i64:
-+    case INDEX_op_ext_i32_i64:
-+    case INDEX_op_extu_i32_i64:
-+    case INDEX_op_extrl_i64_i32:
-+    case INDEX_op_extrh_i64_i32:
-+    case INDEX_op_extract_i64:
-+        return &r_r;
- 
--#if TCG_TARGET_REG_BITS == 64
--    { INDEX_op_ld8u_i64, { "r", "r" } },
--    { INDEX_op_ld8s_i64, { "r", "r" } },
--    { INDEX_op_ld16u_i64, { "r", "r" } },
--    { INDEX_op_ld16s_i64, { "r", "r" } },
--    { INDEX_op_ld32s_i64, { "r", "r" } },
--    { INDEX_op_ld32u_i64, { "r", "r" } },
--    { INDEX_op_ld_i64, { "r", "r" } },
--    { INDEX_op_st8_i64, { "rZ", "r" } },
--    { INDEX_op_st16_i64, { "rZ", "r" } },
--    { INDEX_op_st32_i64, { "rZ", "r" } },
--    { INDEX_op_st_i64, { "rZ", "r" } },
--
--    { INDEX_op_add_i64, { "r", "rZ", "rJ" } },
--    { INDEX_op_mul_i64, { "r", "rZ", "rZ" } },
--#if !use_mips32r6_instructions
--    { INDEX_op_muls2_i64, { "r", "r", "rZ", "rZ" } },
--    { INDEX_op_mulu2_i64, { "r", "r", "rZ", "rZ" } },
--#endif
--    { INDEX_op_mulsh_i64, { "r", "rZ", "rZ" } },
--    { INDEX_op_muluh_i64, { "r", "rZ", "rZ" } },
--    { INDEX_op_div_i64, { "r", "rZ", "rZ" } },
--    { INDEX_op_divu_i64, { "r", "rZ", "rZ" } },
--    { INDEX_op_rem_i64, { "r", "rZ", "rZ" } },
--    { INDEX_op_remu_i64, { "r", "rZ", "rZ" } },
--    { INDEX_op_sub_i64, { "r", "rZ", "rN" } },
--
--    { INDEX_op_and_i64, { "r", "rZ", "rIK" } },
--    { INDEX_op_nor_i64, { "r", "rZ", "rZ" } },
--    { INDEX_op_not_i64, { "r", "rZ" } },
--    { INDEX_op_or_i64, { "r", "rZ", "rI" } },
--    { INDEX_op_xor_i64, { "r", "rZ", "rI" } },
--
--    { INDEX_op_shl_i64, { "r", "rZ", "ri" } },
--    { INDEX_op_shr_i64, { "r", "rZ", "ri" } },
--    { INDEX_op_sar_i64, { "r", "rZ", "ri" } },
--    { INDEX_op_rotr_i64, { "r", "rZ", "ri" } },
--    { INDEX_op_rotl_i64, { "r", "rZ", "ri" } },
--    { INDEX_op_clz_i64,  { "r", "r", "rWZ" } },
--
--    { INDEX_op_bswap16_i64, { "r", "r" } },
--    { INDEX_op_bswap32_i64, { "r", "r" } },
--    { INDEX_op_bswap64_i64, { "r", "r" } },
--
--    { INDEX_op_ext8s_i64, { "r", "rZ" } },
--    { INDEX_op_ext16s_i64, { "r", "rZ" } },
--    { INDEX_op_ext32s_i64, { "r", "rZ" } },
--    { INDEX_op_ext32u_i64, { "r", "rZ" } },
--    { INDEX_op_ext_i32_i64, { "r", "rZ" } },
--    { INDEX_op_extu_i32_i64, { "r", "rZ" } },
--    { INDEX_op_extrl_i64_i32, { "r", "rZ" } },
--    { INDEX_op_extrh_i64_i32, { "r", "rZ" } },
--
--    { INDEX_op_deposit_i64, { "r", "0", "rZ" } },
--    { INDEX_op_extract_i64, { "r", "r" } },
--
--    { INDEX_op_brcond_i64, { "rZ", "rZ" } },
--#if use_mips32r6_instructions
--    { INDEX_op_movcond_i64, { "r", "rZ", "rZ", "rZ", "rZ" } },
--#else
--    { INDEX_op_movcond_i64, { "r", "rZ", "rZ", "rZ", "0" } },
--#endif
--    { INDEX_op_setcond_i64, { "r", "rZ", "rZ" } },
--
--    { INDEX_op_qemu_ld_i32, { "r", "LZ" } },
--    { INDEX_op_qemu_st_i32, { "SZ", "SZ" } },
--    { INDEX_op_qemu_ld_i64, { "r", "LZ" } },
--    { INDEX_op_qemu_st_i64, { "SZ", "SZ" } },
--#elif TARGET_LONG_BITS == 32
--    { INDEX_op_qemu_ld_i32, { "r", "LZ" } },
--    { INDEX_op_qemu_st_i32, { "SZ", "SZ" } },
--    { INDEX_op_qemu_ld_i64, { "r", "r", "LZ" } },
--    { INDEX_op_qemu_st_i64, { "SZ", "SZ", "SZ" } },
--#else
--    { INDEX_op_qemu_ld_i32, { "r", "LZ", "LZ" } },
--    { INDEX_op_qemu_st_i32, { "SZ", "SZ", "SZ" } },
--    { INDEX_op_qemu_ld_i64, { "r", "r", "LZ", "LZ" } },
--    { INDEX_op_qemu_st_i64, { "SZ", "SZ", "SZ", "SZ" } },
--#endif
-+    case INDEX_op_st8_i32:
-+    case INDEX_op_st16_i32:
-+    case INDEX_op_st_i32:
-+    case INDEX_op_st8_i64:
-+    case INDEX_op_st16_i64:
-+    case INDEX_op_st32_i64:
-+    case INDEX_op_st_i64:
-+        return &rZ_r;
- 
--    { INDEX_op_mb, { } },
--    { -1 },
--};
-+    case INDEX_op_add_i32:
-+    case INDEX_op_add_i64:
-+        return &r_r_rJ;
-+    case INDEX_op_sub_i32:
-+    case INDEX_op_sub_i64:
-+        return &r_rZ_rN;
-+    case INDEX_op_mul_i32:
-+    case INDEX_op_mulsh_i32:
-+    case INDEX_op_muluh_i32:
-+    case INDEX_op_div_i32:
-+    case INDEX_op_divu_i32:
-+    case INDEX_op_rem_i32:
-+    case INDEX_op_remu_i32:
-+    case INDEX_op_nor_i32:
-+    case INDEX_op_setcond_i32:
-+    case INDEX_op_mul_i64:
-+    case INDEX_op_mulsh_i64:
-+    case INDEX_op_muluh_i64:
-+    case INDEX_op_div_i64:
-+    case INDEX_op_divu_i64:
-+    case INDEX_op_rem_i64:
-+    case INDEX_op_remu_i64:
-+    case INDEX_op_nor_i64:
-+    case INDEX_op_setcond_i64:
-+        return &r_rZ_rZ;
-+    case INDEX_op_muls2_i32:
-+    case INDEX_op_mulu2_i32:
-+    case INDEX_op_muls2_i64:
-+    case INDEX_op_mulu2_i64:
-+        return &r_r_r_r;
-+    case INDEX_op_and_i32:
-+    case INDEX_op_and_i64:
-+        return &r_r_rIK;
-+    case INDEX_op_or_i32:
-+    case INDEX_op_xor_i32:
-+    case INDEX_op_or_i64:
-+    case INDEX_op_xor_i64:
-+        return &r_r_rI;
-+    case INDEX_op_shl_i32:
-+    case INDEX_op_shr_i32:
-+    case INDEX_op_sar_i32:
-+    case INDEX_op_rotr_i32:
-+    case INDEX_op_rotl_i32:
-+    case INDEX_op_shl_i64:
-+    case INDEX_op_shr_i64:
-+    case INDEX_op_sar_i64:
-+    case INDEX_op_rotr_i64:
-+    case INDEX_op_rotl_i64:
-+        return &r_r_ri;
-+    case INDEX_op_clz_i32:
-+    case INDEX_op_clz_i64:
-+        return &r_r_rWZ;
- 
--static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
--{
--    int i, n = ARRAY_SIZE(mips_op_defs);
-+    case INDEX_op_deposit_i32:
-+    case INDEX_op_deposit_i64:
-+        return &dep;
-+    case INDEX_op_brcond_i32:
-+    case INDEX_op_brcond_i64:
-+        return &rZ_rZ;
-+    case INDEX_op_movcond_i32:
-+    case INDEX_op_movcond_i64:
-+        return use_mips32r6_instructions ? &movc_r6 : &movc;
- 
--    for (i = 0; i < n; ++i) {
--        if (mips_op_defs[i].op == op) {
--            return &mips_op_defs[i];
--        }
-+    case INDEX_op_add2_i32:
-+    case INDEX_op_sub2_i32:
-+        return &add2;
-+    case INDEX_op_setcond2_i32:
-+        return &setc2;
-+    case INDEX_op_brcond2_i32:
-+        return &br2;
-+
-+    case INDEX_op_qemu_ld_i32:
-+        return (TCG_TARGET_REG_BITS == 64 || TARGET_LONG_BITS == 32
-+                ? &r_L : &r_L_L);
-+    case INDEX_op_qemu_st_i32:
-+        return (TCG_TARGET_REG_BITS == 64 || TARGET_LONG_BITS == 32
-+                ? &SZ_S : &SZ_S_S);
-+    case INDEX_op_qemu_ld_i64:
-+        return (TCG_TARGET_REG_BITS == 64 ? &r_L
-+                : TARGET_LONG_BITS == 32 ? &r_r_L : &r_r_L_L);
-+    case INDEX_op_qemu_st_i64:
-+        return (TCG_TARGET_REG_BITS == 64 ? &SZ_S
-+                : TARGET_LONG_BITS == 32 ? &SZ_SZ_S : &SZ_SZ_S_S);
-+
-+    default:
-+        return NULL;
-     }
--    return NULL;
- }
- 
- static int tcg_target_callee_save_regs[] = {
--- 
-2.13.5
+(I was building on a cleanly installed borrowed farm box for a different
+architecture and hadn't installed the full set).
+
+=== aio=native without O_DIRECT ===
+
+Testing:
+QMP_VERSION
+{"return": {}}
+{"error": {"class": "GenericError", "desc": "aio=native was specified, but is not supported in this build."}}
+{"return": {}}
+{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false}}
+
+
+Dave
+
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
