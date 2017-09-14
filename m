@@ -1,38 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35230)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35541)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dsSkS-0000SO-3o
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:56:01 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsSkw-0000na-6s
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:56:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dsSkO-0002wZ-9A
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:56:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56886)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dsSkN-0002uo-W4
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:55:56 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8EBswGZ097692
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 07:55:54 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2cyqvb68uu-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 07:55:53 -0400
-Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Thu, 14 Sep 2017 12:55:51 +0100
-References: <1505385363-27717-1-git-send-email-thuth@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Thu, 14 Sep 2017 13:55:46 +0200
+	(envelope-from <eblake@redhat.com>) id 1dsSkv-0003Yq-4y
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:56:30 -0400
+References: <20170912203119.24166-1-eblake@redhat.com>
+	<20170912203119.24166-6-eblake@redhat.com>
+	<84d98f85-958f-ad74-6951-68fd4241fcdf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <bb5ad4ab-1b47-2488-1787-2536b62568ad@redhat.com>
+Date: Thu, 14 Sep 2017 06:56:13 -0500
 MIME-Version: 1.0
-In-Reply-To: <1505385363-27717-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <473d7e2e-2313-3228-259c-b00fd6b1356c@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] configure: Allow --enable-seccomp on s390x, too
+In-Reply-To: <84d98f85-958f-ad74-6951-68fd4241fcdf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="g651pGaWqKfeEjFlFd3fhdHJbp1h2FNsB"
+Subject: Re: [Qemu-devel] [PATCH v7 05/20] dirty-bitmap: Check for size
+ query failure during truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,34 +26,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Cornelia Huck <cohuck@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, Claudio Imbrenda <imbrenda@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Farhan Ali <alifm@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Jason J Herne <jjherne@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Eduardo Otubo <otubo@redhat.com>, Christian Ehrhardt <christian.ehrhardt@canonical.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 09/14/2017 12:36 PM, Thomas Huth wrote:
-> libseccomp supports s390x since version 2.3.0, and I was able to start
-> a VM with "-sandbox on" without any obvious problems by using this patch,
-> so it should be safe to allow --enable-seccomp on s390x nowadays, too.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--g651pGaWqKfeEjFlFd3fhdHJbp1h2FNsB
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, Fam Zheng <famz@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <bb5ad4ab-1b47-2488-1787-2536b62568ad@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 05/20] dirty-bitmap: Check for size query
+ failure during truncate
+References: <20170912203119.24166-1-eblake@redhat.com>
+ <20170912203119.24166-6-eblake@redhat.com>
+ <84d98f85-958f-ad74-6951-68fd4241fcdf@redhat.com>
+In-Reply-To: <84d98f85-958f-ad74-6951-68fd4241fcdf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Seems to work fine on s390x.
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+On 09/13/2017 06:27 PM, John Snow wrote:
+>=20
+>=20
+> On 09/12/2017 04:31 PM, Eric Blake wrote:
+>> We've previously fixed several places where we failed to account
+>> for possible errors from bdrv_nb_sectors().  Fix another one by
+>> making bdrv_dirty_bitmap_truncate() report the error rather then
+>> silently resizing bitmaps to -1.  Then adjust the sole caller
+>=20
+> Nice failure mode. It was not immediately obvious to me that this could=
 
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  configure | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/configure b/configure
-> index fd7e3a5..83ba64e 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2032,7 +2032,7 @@ if test "$seccomp" != "no" ; then
->      arm|aarch64)
->          libseccomp_minver="2.2.3"
->          ;;
-> -    ppc|ppc64)
-> +    ppc|ppc64|s390x)
->          libseccomp_minver="2.3.0"
->          ;;
->      *)
-> 
+> fail, but here we all are.
+>=20
+>> bdrv_truncate() to both reduce the likelihood of failure (blindly
+>> calling bdrv_dirty_bitmap_truncate() after refresh_total_sectors()
+>> fails was not nice) as well as propagate any actual failures.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>>
+
+>>      ret =3D drv->bdrv_truncate(bs, offset, prealloc, errp);
+>> -    if (ret =3D=3D 0) {
+>> -        ret =3D refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS)=
+;
+>> -        bdrv_dirty_bitmap_truncate(bs);
+>> -        bdrv_parent_cb_resize(bs);
+>> -        atomic_inc(&bs->write_gen);
+>> +    if (ret < 0) {
+>> +        return ret;
+>>      }
+>> +    ret =3D refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
+>> +    if (ret < 0) {
+>> +        error_setg_errno(errp, -ret, "Could not refresh total sector =
+count");
+>> +        return ret;
+>> +    }
+>> +    ret =3D bdrv_dirty_bitmap_truncate(bs);
+>> +    if (ret < 0) {
+>> +        error_setg_errno(errp, -ret, "Could not refresh total sector =
+count");
+>=20
+> You probably meant to write a different error message here.
+>=20
+> Also, what happens if the actual truncate call works, but the bitmap
+> resizing fails? What state does that leave us in?
+
+Another option: bdrv_dirty_bitmap_truncate() can only fail if
+bdrv_nb_sectors() can fail.  We WANT to use the actual size of the
+device (which might be slightly different than the requested size passed
+to bdrv_truncate in the first place), but we could change
+bdrv_dirty_bitmap_truncate() to take an actual size as a parameter
+instead of having to query bdrv_nb_sectors() for the size; and we can
+change the contract of refresh_total_sectors() to query the actual size
+before returning (remember, offset >> BDRV_SECTOR_BITS is only the hint
+size, and may differ from the actual size).  That way, if
+refresh_total_sectors() succeeds, then bdrv_dirty_bitmap_truncate()
+cannot fail.
+
+I'm not sure, however, how invasive it will be to make
+refresh_total_sectors() guarantee that it can return the actual size
+that was set even when that size differs from the hint.  Still, it
+sounds like the right approach to take, so I'll play with it.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--g651pGaWqKfeEjFlFd3fhdHJbp1h2FNsB
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm6bl0ACgkQp6FrSiUn
+Q2r16Qf/e1qudX6FwKSvp1VRyYmG08Ced4lN0e4wQRwXa2xIphz3040B+zWk4BkM
+i7YPaMW4K1OIx/lchFP6NrnFuRP4dRN6z9yDbcKTfxJjAlZCJAPRKTKo/KbvorCE
+qGw3vhmBbE0UnSy8BktyFT8OUupKL53S3k8TMm9pv/A4oj7L6/1Amj2v5pIP9KRt
+ZKLYDoFI42sKDxgdi5smjRwUAcyorOx6Ydna3cUlqmNqojceN/3XVVZv9BYfeqwF
+Swe8U0oZCM7a88Giow2mWMTxoWJnRFT1TGT4YQmDA4wzKJXdZ1SGG+2qz1IuUakm
+8rsMzSiszTofwJVB4Furc0eNXHLBjQ==
+=b7X4
+-----END PGP SIGNATURE-----
+
+--g651pGaWqKfeEjFlFd3fhdHJbp1h2FNsB--
