@@ -1,29 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57792)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37135)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dsYW4-00006X-TU
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 14:05:34 -0400
+	(envelope-from <david@redhat.com>) id 1dsYeI-00065p-F3
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 14:14:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dsYW3-00080c-JG
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 14:05:32 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1504812251-23438-1-git-send-email-sundeep.lkml@gmail.com>
-	<1504812251-23438-3-git-send-email-sundeep.lkml@gmail.com>
-	<a9891f10-9643-96ee-7f99-7a384b9ea302@amsat.org>
-	<CAFEAcA8KUtG=2Cr_PndUqOxp5PN6bTJR_t=s+Ch+Y2WVfHVjQg@mail.gmail.com>
-	<CALHRZupPj2cJJAr57n+E6Q0xF1qpsewHsDzS03mQmoHfL98j6g@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <99bf0b39-f889-7873-55cf-05ac3a55a55e@amsat.org>
-Date: Thu, 14 Sep 2017 15:05:21 -0300
+	(envelope-from <david@redhat.com>) id 1dsYeE-0007KA-Fl
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 14:14:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49942)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dsYeE-0007JC-AA
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 14:13:58 -0400
+References: <20170904154316.4148-1-david@redhat.com>
+	<20170904154316.4148-12-david@redhat.com>
+	<2c620927-0406-2fc1-895c-09ffc2e44a4e@linux.vnet.ibm.com>
+	<6b3e9c2b-4cb7-fdf8-5f9b-ff7ebbf52d1e@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <24e458ff-39c8-7407-62ad-46568e150c5d@redhat.com>
+Date: Thu, 14 Sep 2017 20:13:49 +0200
 MIME-Version: 1.0
-In-Reply-To: <CALHRZupPj2cJJAr57n+E6Q0xF1qpsewHsDzS03mQmoHfL98j6g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <6b3e9c2b-4cb7-fdf8-5f9b-ff7ebbf52d1e@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu devel v8 PATCH 2/5] msf2: Microsemi
- Smartfusion2 System Register block
+Subject: Re: [Qemu-devel] [PATCH v2 11/19] s390x: allow only 1 CPU with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,103 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: sundeep subbaraya <sundeep.lkml@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Alistair Francis <alistair23@gmail.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Aurelien Jarno <aurelien@aurel32.net>
 
->>>> +static uint64_t msf2_sysreg_read(void *opaque, hwaddr offset,
->>>> +    unsigned size)
->>>> +{
->>>> +    MSF2SysregState *s = opaque;
->>>> +    uint32_t ret = 0;
->>>> +
->>>> +    offset >>= 2;
->>>> +    if (offset < ARRAY_SIZE(s->regs)) {
+On 06.09.2017 23:20, Richard Henderson wrote:
+> On 09/06/2017 11:16 AM, Matthew Rosato wrote:
+>> On 09/04/2017 11:43 AM, David Hildenbrand wrote:
+>>> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
+>>> guest tries to bring these CPUs up but fails), because we don't support
+>>> multiple CPUs on s390x under TCG.
 >>>
+>>> Let's bail out if more than 1 is specified, so we don't raise people's
+>>> hope. Make it a define, so we can easily bump it up later.
 >>>
->>> This comment is controversial, I'll let Peter nod.
->>>
->>> The SYSREG behaves differently regarding which bus access it (CPU, AHB).
->>> You are implementing CPU access to the SYSREG, the registers have
->> different
->>> permissions when accessed by the CPU. (see the SmartFusion2 User Guide:
->>> Table 21-1 "Register Types" and Table 21-2 "Register Map").
+>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>> ---
 >>
+>> Makes sense.  Ran the described environment without this patch (errors)
+>> and again with this patch (graceful exit w/ message).
+>>
+>> Tested-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
 > 
-> CPU is also one of the bus masters in AHB matrix (Fig 6.1 in page 248).
-
-I was worried about Fabric access but Peter remembered me QEMU doesn't 
-model it ;)
-
->>> I'd think of this stub:
->>>
->>> switch(reg) {
->>> case register_supported1:
->>> case register_supported2:
->>> case register_supported3:
->>>             ret = s->regs[offset];
->>>             trace_msf2_sysreg_read(offset, ret);
->>>             break;
->>> case RO-U:
->>>             qemu_log_mask(LOG_GUEST_ERROR, "Illegal AHB access 0x%08"...
->>>             break;
->>> case W1P:
->>>             qemu_log_mask(LOG_GUEST_ERROR, "Illegal read access ...
->>>             break;
->>> case RW:
->>> case RW-P:
->>> case RO:
->>> case RO-P:
->>> default:
->>>             ret = s->regs[offset];
->>>             qemu_log_mask(LOG_UNIMP, "...
->>>             break;
->>> }
->>
+> Can someone review
 > 
-> This sounds good to me and will fix later by rearranging registers in enum
-> sorted
-> based on type (RO, RW, etc.,) and use those ranges in switch case.
-
-The Register API (hw/register.h) is helpful to check such properties but 
-might turn your code harder to read.
-
->>
->> This doesn't look entirely right, since this is the read interface.
->> Shouldn't we be allowing pretty much all of these register types
->> except maybe W1P to do a read?
->>
+>   http://patchwork.ozlabs.org/patch/760010/
 > 
-> Peter, some of the registers are not allowed to access by CPU and are only
-> set during
-> device programming. For those registers Philippe is suggesting to log
-> "Illegal AHB access"
-> when guest is trying to read/write.
+> which does at least start to add the SIGP support.
 
-I was worried about accessing those registers when the flash 
-WriteProtect bit is set, however the eNVM flash library is not Open 
-Source, it is unlikely a guest access those registers, and if it is the 
-library then MicroSemi already tried it on real hardware.
-There is probably no need to worry about "Illegal AHB access" :)
+FWIW, I started factoring out today KVM SIGP code to make it usable by TCG.
 
->> On the other hand, in the write function we should probably not allow
->> writes to registers documented as read only.
+I also started adding the missing SIGP instructions the kernel handles
+for KVM. I dropped the old TCG SIGP handling code and completely reuse
+the new SIGP code. I already got boot/reboot/shutdown  properly running
+(implementing STOP and RESTART interrupts like KVM has).
 
-Surely.
+But its still quite hacky and there are is a bunch of stuff to clean up,
+especially:
+- external interrupt handling (the queue approach we have right now is
+  no good for external calls and emergency signals)
+- floating interrupt support (io interrupts always going to CPU 0 is a
+  hack)
 
-trace_msf2_sysreg_write(offset, s->regs[offset], ret);
+I think I can at least implement SIGP properly and fix the external call
+stuff. floating interrupts might require more thought.
 
-switch(reg) {
-case register_supported1:
-case register_supported2:
-case register_supported3:
-            s->regs[offset] = ret;
-            break;
-case RO:
-case RO-P:
-case RO-U:
-            qemu_log_mask(LOG_GUEST_ERROR, "Illegal write access on RO...
-            break;
-default:
-            qemu_log_mask(LOG_UNIMP, "...
-            break;
-}
+Aurelien, please tell me if you are currently still working on this, so
+we can coordinate.
+
+Thanks!
+
+> 
+> Once tcg can bring up 2 cpus, I see no reason it couldn't bring up N.  I don't
+> see the point of the define.
+> 
+> 
+> r~
+> 
+
+
+-- 
+
+Thanks,
+
+David
