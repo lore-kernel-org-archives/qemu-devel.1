@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37930)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39098)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <wlfightup@gmail.com>) id 1dsTZf-00050n-8w
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:48:57 -0400
+	(envelope-from <imammedo@redhat.com>) id 1dsTav-000614-AY
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:50:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <wlfightup@gmail.com>) id 1dsTZc-000527-AX
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:48:55 -0400
-Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:37898)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <wlfightup@gmail.com>) id 1dsTZc-000515-3o
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:48:52 -0400
-Received: by mail-yw0-x244.google.com with SMTP id t127so1660504ywg.5
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 05:48:50 -0700 (PDT)
+	(envelope-from <imammedo@redhat.com>) id 1dsTas-00063Y-6p
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:50:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49966)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dsTar-00060n-U0
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 08:50:10 -0400
+Date: Thu, 14 Sep 2017 14:49:59 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+Message-ID: <20170914144959.1568da20@nial.brq.redhat.com>
+In-Reply-To: <671fbddb-c201-75d2-249b-00d53a609d57@redhat.com>
+References: <20170913135418.GA14243@stefanha-x1.localdomain>
+	<dbd4caa3-71e2-5ea0-c7b1-8aee774eec30@redhat.com>
+	<20170914003341.h4t7swxcgkum7twi@hz-desktop>
+	<671fbddb-c201-75d2-249b-00d53a609d57@redhat.com>
 MIME-Version: 1.0
-From: Paul Schlacter <wlfightup@gmail.com>
-Date: Thu, 14 Sep 2017 20:48:49 +0800
-Message-ID: <CADak6y79L+eUYg3LmO2MGTf5BKxHZ8rG5zHBJ9UKPhKHNxsFkQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] host doesn't support requested feature:
- CPUID.01H:EDX.ds [bit 21] Does this warn affect virtual machine performance
- or use?
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [libvirt] QEMU -M nvdimm=on and hotplug
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,120 +29,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Michal Privoznik <mprivozn@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, libvir-list@redhat.com, qemu-devel@nongnu.org, Haozhong Zhang <haozhong.zhang@intel.com>
 
-this is my stackoverflow question:
-https://stackoverflow.com/questions/46219552/host-doesnt-support-requested-=
-feature-cpuid-01hedx-ds-bit-21-does-this-warn
+On Thu, 14 Sep 2017 13:51:45 +0200
+Michal Privoznik <mprivozn@redhat.com> wrote:
 
-
-I found a lot of warning from the VM qemu log, Does this warn affect
-virtual machine performance or use? , is my libvirt.xml file problem? Or
-support hot-plug will have these warnings
-
-This is my libvirt xml configuration:
-
-<domain type=3D'kvm' id=3D'315'>
-  <name>instance-000005b2</name>
-  <uuid>793fe065-36a6-4840-80cf-840ebed41d3e</uuid>
-  <maxMemory slots=3D'32' unit=3D'KiB'>68719476736</maxMemory>
-  <memory unit=3D'KiB'>2097152</memory>
-  <currentMemory unit=3D'KiB'>2097152</currentMemory>
-  <vcpu placement=3D'auto'>8</vcpu>
-  <vcpus>
-    <vcpu id=3D'0' enabled=3D'yes' hotpluggable=3D'no' order=3D'1'/>
-    <vcpu id=3D'1' enabled=3D'yes' hotpluggable=3D'yes' order=3D'2'/>
-    <vcpu id=3D'2' enabled=3D'yes' hotpluggable=3D'yes' order=3D'3'/>
-    <vcpu id=3D'3' enabled=3D'yes' hotpluggable=3D'yes' order=3D'4'/>
-    <vcpu id=3D'4' enabled=3D'yes' hotpluggable=3D'yes' order=3D'5'/>
-    <vcpu id=3D'5' enabled=3D'yes' hotpluggable=3D'yes' order=3D'6'/>
-    <vcpu id=3D'6' enabled=3D'yes' hotpluggable=3D'yes' order=3D'7'/>
-    <vcpu id=3D'7' enabled=3D'yes' hotpluggable=3D'yes' order=3D'8'/>
-  </vcpus>
-  <cputune>
-    <shares>2048</shares>
-    <vcpupin vcpu=3D'0' cpuset=3D'0-9,20-29'/>
-    <vcpupin vcpu=3D'1' cpuset=3D'0-9,20-29'/>
-    <emulatorpin cpuset=3D'0-9,20-29'/>
-  </cputune>
-  <numatune>
-    <memory mode=3D'strict' nodeset=3D'0'/>
-    <memnode cellid=3D'0' mode=3D'strict' nodeset=3D'0'/>
-  </numatune>
-  <resource>
-    <partition>/machine</partition>
-  </resource>
-  <os>
-    <type arch=3D'x86_64' machine=3D'pc-i440fx-rhel7.3.0'>hvm</type>
-    <boot dev=3D'hd'/>
-  </os>
-  <features>
-    <acpi/>
-    <apic/>
-  </features>
-  <cpu mode=3D'host-model'>
-    <model fallback=3D'allow'/>
-    <numa>
-      <cell id=3D'0' cpus=3D'0-1' memory=3D'2097152' unit=3D'KiB'/>
-    </numa>
-  </cpu>
-  <devices>
-    <emulator>/usr/libexec/qemu-kvm</emulator>
-    <controller type=3D'virtio-serial' index=3D'0'>
-      <alias name=3D'virtio-serial0'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x04'
-function=3D'0x0'/>
-    </controller>
-    <memballoon model=3D'virtio'>
-      <alias name=3D'balloon0'/>
-      <address type=3D'pci' domain=3D'0x0000' bus=3D'0x00' slot=3D'0x06'
-function=3D'0x0'/>
-    </memballoon>
-  </devices>
-</domain>
-
-
-
-
-The following warn log=EF=BC=9A
-
-
-2017-09-14T12:16:03.441702Z qemu-kvm: warning: CPU(s) not present in
-any NUMA nodes: 2 3 4 5 6 7
-2017-09-14T12:16:03.441773Z qemu-kvm: warning: All CPU(s) up to
-maxcpus should be described in NUMA config
-warning: host doesn't support requested feature: CPUID.01H:EDX.ds [bit 21]
-warning: host doesn't support requested feature: CPUID.01H:EDX.acpi [bit 22=
-]
-warning: host doesn't support requested feature: CPUID.01H:EDX.ht [bit 28]
-warning: host doesn't support requested feature: CPUID.01H:EDX.tm [bit 29]
-warning: host doesn't support requested feature: CPUID.01H:EDX.pbe [bit 31]
-warning: host doesn't support requested feature: CPUID.01H:ECX.dtes64 [bit =
-2]
-warning: host doesn't support requested feature: CPUID.01H:ECX.monitor [bit=
- 3]
-warning: host doesn't support requested feature: CPUID.01H:ECX.ds_cpl [bit =
-4]
-warning: host doesn't support requested feature: CPUID.01H:ECX.vmx [bit 5]
-warning: host doesn't support requested feature: CPUID.01H:ECX.smx [bit 6]
-warning: host doesn't support requested feature: CPUID.01H:ECX.est [bit 7]
-warning: host doesn't support requested feature: CPUID.01H:ECX.tm2 [bit 8]
-warning: host doesn't support requested feature: CPUID.01H:ECX.xtpr [bit 14=
-]
-warning: host doesn't support requested feature: CPUID.01H:ECX.pdcm [bit 15=
-]
-warning: host doesn't support requested feature: CPUID.01H:ECX.dca [bit 18]
-warning: host doesn't support requested feature: CPUID.01H:ECX.osxsave [bit=
- 27]
-warning: host doesn't support requested feature: CPUID.01H:EDX.ds [bit 21]
-warning: host doesn't support requested feature: CPUID.01H:EDX.acpi [bit 22=
-]
-warning: host doesn't support requested feature: CPUID.01H:EDX.ht [bit 28]
-warning: host doesn't support requested feature: CPUID.01H:EDX.tm [bit 29]
-warning: host doesn't support requested feature: CPUID.01H:EDX.pbe [bit 31]
-warning: host doesn't support requested feature: CPUID.01H:ECX.dtes64 [bit =
-2]
-warning: host doesn't support requested feature: CPUID.01H:ECX.monitor [bit=
- 3]
-warning: host doesn't support requested feature: CPUID.01H:ECX.ds_cpl [bit =
-4]
+> On 09/14/2017 02:33 AM, Haozhong Zhang wrote:
+> > On 09/13/17 17:28 +0200, Michal Privoznik wrote:  
+> >>
+> >> BTW: I ran a migration from no nvdimm qemu to one that had -M nvdimm=on
+> >> and guest migrated happily. So looks like guest ABI is stable (or at
+> >> least stable enough not to crash). But since ACPI table is changed I
+> >> doubt that.  
+> > 
+> > One example that may cause trouble is that
+> > 1/ Guest OS got a pointer to an ACPI table A on the source host (w/o nvdimm=on)
+> > 2/ After migrating to the destination host (w/ nvdimm=on), the
+> >    location of ACPI table A is occupied by NFIT. If guest OS tries to
+> >    access ACPI table A via the pointer in step 1/, then it will access
+> >    the wrong table.
+> >   
+> 
+> Ah, you're right. So it a guest ABI breakage to add nvdimm=on. IOW,
+> libvirt can't safely add that onto command line. Well we could for
+> freshly started guest and not those which are just being migrated. But
+> that increases attack surface so it's not safe either. Okay, I'll stick
+> with the latest proposal (expose this in domain XML and let users turn
+> it on if they want to).
+also note that it depends on memory hotplug being enabled '-m xxx,slots+maxmem'
