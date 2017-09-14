@@ -1,26 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35506)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37072)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsV1L-00025h-Nt
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:21:41 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dsV3n-0004En-9D
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:24:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsV1I-0004h5-GB
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:21:35 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:44608 helo=roura.ac.upc.es)
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dsV3j-0006HV-83
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:24:07 -0400
+Received: from mailapp01.imgtec.com ([195.59.15.196]:1527)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsV1I-0004eu-3R
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:21:32 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
-	<150506010962.19604.7773376130922107594.stgit@frigg.lan>
-	<c4f6b95c-e548-cd78-e3fa-345d534f273f@linaro.org>
-Date: Thu, 14 Sep 2017 17:21:20 +0300
-In-Reply-To: <c4f6b95c-e548-cd78-e3fa-345d534f273f@linaro.org> (Richard
-	Henderson's message of "Wed, 13 Sep 2017 09:59:09 -0700")
-Message-ID: <8760clqs2n.fsf@frigg.lan>
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1dsV3j-0006Eu-1k
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:24:03 -0400
+References: <59B7EBC5.9060908@ispras.ru>
+	<CAFEAcA-to=vWWBHoxZRX-ExcbDe0OTMwpHunE7HXaYA0GE+ccw@mail.gmail.com>
+	<59B7F503.8010703@ispras.ru>
+	<CAFEAcA97i97_aoq8xNKtP8Z+i-u5Hq+_e6N80=T=WspSEW+A7A@mail.gmail.com>
+	<59B8DE5A.9000301@ispras.ru>
+	<CAFEAcA8UTVr-jO4Eh=uaUokYBhF0EYTuBoXdLyrKZ=GrjPFtmQ@mail.gmail.com>
+	<0c3db1e3-1638-cfbe-8c97-0d1aa87547b0@imgtec.com>
+	<59BA88D1.9080202@ispras.ru>
+	<CAFEAcA_HRwa_XFv8M3h_5dK0p6Xiuu1FfF32TPOhEop80wT30A@mail.gmail.com>
+	<59BA8F4E.6060600@ispras.ru>
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Message-ID: <5cea7ccd-97b3-ecbf-22c1-72b329c467fc@imgtec.com>
+Date: Thu, 14 Sep 2017 15:23:57 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <59BA8F4E.6060600@ispras.ru>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-GB
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 1/7] trace: Add event "guest_bbl_before"
+Subject: Re: [Qemu-devel] MIPS 'move' insn emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +36,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
-
-Richard Henderson writes:
-
-> On 09/10/2017 09:15 AM, Llu=C3=ADs Vilanova wrote:
->> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
->> ---
->> accel/tcg/translator.c |    6 ++++++
->> trace-events           |   11 +++++++++++
->> 2 files changed, 17 insertions(+)
->>=20
->> diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
->> index afa3af478a..91b3b0da32 100644
->> --- a/accel/tcg/translator.c
->> +++ b/accel/tcg/translator.c
->> @@ -13,6 +13,7 @@
->> #include "cpu.h"
->> #include "tcg/tcg.h"
->> #include "tcg/tcg-op.h"
->> +#include "trace-tcg.h"
->> #include "exec/exec-all.h"
->> #include "exec/gen-icount.h"
->> #include "exec/log.h"
->> @@ -91,6 +92,11 @@ void translator_loop(const TranslatorOps *ops, DisasC=
-ontextBase *db,
->> }
->> }
->>=20
->> +        /* Tracing before */
->> +        if (db->num_insns =3D=3D 1) {
->> +            trace_guest_bbl_before_tcg(cpu, tcg_ctx.tcg_env, db->pc_fir=
-st);
->> +        }
-
-> Why not place this before the loop, so that you don't
-> have to check num_insns =3D=3D 1?
-
-In case the translation hits a breakpoint. I do not want the BBL/TB to appe=
-ar
-once before breaking, and then again after continuing.
+To: Sergey Smolov <smolov@ispras.ru>, Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
 
->> +vcpu tcg guest_bbl_before(uint64_t vaddr) "vaddr=3D0x%016"PRIx64, "vadd=
-r=3D0x%016"PRIx64
 
-> You're really going to print both ENV and PC tagged with "vaddr"?
-> That just seems confusing.
+On 14/09/2017 15:16, Sergey Smolov wrote:
+>=20
+> On 14.09.2017 16:58, Peter Maydell wrote:
+>> At translate time it is generating some extra code which at runtime
+>> will call the helper_trace_reg_access() function, passing it the
+>> values in the registers at this point. This will result in poor
+>> performance if you do it for frequently executed instructions.
 
-I'm not sure I follow. The ENV/CPUState is automatically added to the print
-format (due to the "vcpu" property). The two format strings are necessary d=
-ue to
-the "tcg" property (translation-time format and execution-time format, since
-TCGv arguments are not passed to the tracing function at translation time).
+Yes indeed. it will be hitting the performance critically the instruction
+is quite often used. :)
 
-I'm not sure if this addresses your issue.
+>=20
+> Ok, thank you.
+>=20
+>> That looks like it ought to work. Check you really did save all your
+>> files in your editor before compiling? :-)
+>=20
+> Yes, I did. These warnings are very suspicious, because they come with
+> strange numbers of MIPS GPR registers that I receive for my program.
+>=20
+> Here is the program:
+>=20
+> .text
+> =C2=A0=C2=A0=C2=A0 addiu $8, $zero, 0x7
+> =C2=A0=C2=A0=C2=A0 move $9, $8
+> =C2=A0=C2=A0=C2=A0 sll $8, $8, 3
+> =C2=A0=C2=A0=C2=A0 add $8, $8, $9
+>=20
+> Here is the log that helper functions provide:
+>=20
+> $0 00000007
+> $7 00000007
+> $0 00000038
+> $0 0000003f
+>=20
+> The first value is register name, the second is the value to be written=
+.
+> Values are ok, but I expect to see $8 and $9=C2=A0 registers here.
+>=20
+>>
+>> PS: there's no point passing the env pointer into the function if
+>> you're not going to use it...
 
+Yes you're right. I had further use of the env but it has been chopped fo=
+r
+the example.
 
-> Also, terminology.  A "basic block" ("bb" by preference, not "bbl"), has a
-> specific meaning (https://en.wikipedia.org/wiki/Basic_block).  What we're
-> generating here is a TranslationBlock (which may consist of many basic bl=
-ocks),
-> and oft contracted within the source as "tb".
+>=20
+> I thought that I need to pass env pointer to helper function because of
+> some convention. Again, thank you for the note.
+>=20
 
-Yes, I got carried away by the naming used by some binary analysis tools li=
-ke
-pin. I will change it to TB and that will probably make it clearer.
+Sergey,
 
+The reason why your modification is failed is because you passed wrong
+argument. Remember that you are not just calling the helper function from
+translate.c but you are generating some code to let call the helper
+function on run time. You have to create a temporal TCGv to pass the
+register number.
+You could do it like,
+TCGv_i32 tmp =3D tcg_const_i32(rd)
+gen_helper_trace_reg_access(cpu_env, tmp, cpu_gpr[rs);
+tcg_temp_free_i32(tmp);
 
-Thanks,
-  Lluis
+or simply use the predefined macro and fix the order of the arguments.
+
+gen_helper_0e1i(trace_reg_access, cpu_gpr[rs], rd);
+
+Regards,
+Yongbok
