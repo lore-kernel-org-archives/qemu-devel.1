@@ -1,31 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60175)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dsWRa-0007p9-Rn
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:52:48 -0400
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dsWU7-0001df-Jm
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:55:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dsWRX-0004Vn-3d
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:52:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37986)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dsWRW-0004VP-TI
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:52:43 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id DDC86C047B97
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 15:52:41 +0000 (UTC)
-Date: Thu, 14 Sep 2017 16:52:35 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170914155235.GH11763@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170908114407.25906-1-otubo@redhat.com>
-	<20170914153215.GA9252@vader>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170914153215.GA9252@vader>
-Subject: Re: [Qemu-devel] [PATCHv6 0/6] seccomp: feature refactoring
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dsWU2-0006Ze-NP
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:55:23 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60543)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
+	id 1dsWU2-0006Z0-E4
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:55:18 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8EFsTaS048479
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 11:55:16 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cyr8e4cbh-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 11:55:15 -0400
+Received: from localhost
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
+	Thu, 14 Sep 2017 09:55:14 -0600
+From: Farhan Ali <alifm@linux.vnet.ibm.com>
+Date: Thu, 14 Sep 2017 11:55:07 -0400
+Message-Id: <cover.1505403478.git.alifm@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v2 0/2] Virtio GPU for S390
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,72 +35,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Otubo <otubo@redhat.com>
-Cc: qemu-devel@nongnu.org, thuth@redhat.com
+To: qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, thuth@redhat.com, kraxel@redhat.com, cohuck@redhat.com
 
-On Thu, Sep 14, 2017 at 05:32:15PM +0200, Eduardo Otubo wrote:
-> On Fri, Sep 08, 2017 at 01:44:02PM +0200, Eduardo Otubo wrote:
-> > v6:
-> >     * remove switch-case
-> >     * invert obsolete option logic at vl.c
-> >     * remove debug info
-> > v5:
-> >     * replaced strcmp by g_str_equal
-> >     * removed useless goto
-> >     * fixed style problems
-> > 
-> > v4:
-> >     * include another field on the struct for the modes
-> >     * remove priority
-> >     * fixed typos
-> >     * error handling for prctl
-> >     * add allow|deny values for all options
-> >     * error hanlding for wrong values for all options
-> >     * change how binary values are treated
-> >     * reformat help text
-> > 
-> > v3:
-> >     * Style problems fixed
-> > 
-> > v2:
-> >     * The semantics of the options "allow/deny" instead of booleans "on/off" remains. 
-> >     * Added option 'children' to elevateprivileges
-> >     * Added documentation to docs/
-> > 
-> > v1:
-> >     * First version based on the discussion
-> >       https://lists.gnu.org/archive/html/qemu-devel/2017-02/msg03348.html
-> > 
-> > Eduardo Otubo (6):
-> >   seccomp: changing from whitelist to blacklist
-> >   seccomp: add obsolete argument to command line
-> >   seccomp: add elevateprivileges argument to command line
-> >   seccomp: add spawn argument to command line
-> >   seccomp: add resourcecontrol argument to command line
-> >   seccomp: adding documentation to new seccomp model
-> > 
-> >  docs/seccomp.txt         |  31 +++++
-> >  include/sysemu/seccomp.h |   8 +-
-> >  qemu-options.hx          |  26 +++-
-> >  qemu-seccomp.c           | 325 ++++++++++++++---------------------------------
-> >  vl.c                     |  82 +++++++++++-
-> >  5 files changed, 235 insertions(+), 237 deletions(-)
-> >  create mode 100644 docs/seccomp.txt
-> > 
-> > -- 
-> > 2.13.5
-> > 
-> > 
-> 
-> Daniel or anyone else interested in reviewing, any comment left for
-> this patchset? If not I'll send the pull request tomorrow.
+These patches wire up the virtio-gpu device for CCW bus for
+S390.
 
-Only one trivial bug in patch 2 - just fix it when sending the pull
-request - no need for more review.
+For the S390 architecture which does not natively support any graphics
+device, virtio gpu in 2D mode could be used to emulate a simple graphics
+card and use VNC as the display.
 
-Regards,
-Daniel
+eg: qemu-system-s390x ... -device virtio-gpu-ccw,devno=fe.0.0101
+    -vnc host_ip_addr:5900
+
+Note, to actually see any display content the
+guest kernel needs to support DRM layer, Virtio GPU driver,
+the Virtual Terminal layer etc.
+
+I would appreciate any feedback on these patches, specially the
+first patch.
+
+ChangeLog
+--------
+v1 -> v2
+    - remove error_propagate (patch 2)
+    - Add byteswap functions (patch 1)
+    - Handle endian conversion for virtio_gpu_ctrl_response (patch 1)
+
+
+Thank you
+Farhan
+
+
+Farhan Ali (2):
+  virtio-gpu: Handle endian conversion
+  virtio-gpu-ccw: Create a virtio gpu device for the ccw bus
+
+ hw/display/virtio-gpu.c | 75 +++++++++++++++++++++++++++++++++++++++++++------
+ hw/s390x/virtio-ccw.c   | 49 ++++++++++++++++++++++++++++++++
+ hw/s390x/virtio-ccw.h   | 10 +++++++
+ 3 files changed, 126 insertions(+), 8 deletions(-)
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+1.9.1
