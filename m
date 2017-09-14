@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42422)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dsQIW-0001oL-Nk
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 05:19:02 -0400
+	(envelope-from <linuc.decode@gmail.com>) id 1dsQRZ-0005CY-M3
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 05:28:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dsQIS-0000mO-FO
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 05:19:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53976)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dsQIS-0000ls-7P
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 05:18:56 -0400
-Date: Thu, 14 Sep 2017 11:18:32 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170914111832.7edc9268@nial.brq.redhat.com>
-In-Reply-To: <20170824192730.8440-31-dgilbert@redhat.com>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-31-dgilbert@redhat.com>
+	(envelope-from <linuc.decode@gmail.com>) id 1dsQRY-0000La-I7
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 05:28:21 -0400
+Date: Thu, 14 Sep 2017 14:57:52 +0530
+From: Linu Cherian <linuc.decode@gmail.com>
+Message-ID: <20170914092751.GA3336@virtx40>
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<1504286483-23327-14-git-send-email-eric.auger@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC v2 30/32] vhost: Merge neighbouring hugepage
- regions where appropriate
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1504286483-23327-14-git-send-email-eric.auger@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 13/20] hw/arm/smmuv3:
+ Implement IOMMU memory region replay callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,206 +24,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com, peterx@redhat.com, quintela@redhat.com
+To: Eric Auger <eric.auger@redhat.com>
+Cc: eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, tn@semihalf.com, will.deacon@arm.com, robin.murphy@arm.com, peterx@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, wtownsen@redhat.com, linu.cherian@cavium.com
 
-On Thu, 24 Aug 2017 20:27:28 +0100
-"Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+Hi Eric,
 
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On Fri Sep 01, 2017 at 07:21:16PM +0200, Eric Auger wrote:
+> memory_region_iommu_replay() is used for VFIO integration.
 > 
-> Where two regions are created with a gap such that when aligned
-> to hugepage boundaries, the two regions overlap, merge them.
-why only hugepage boundaries, it should be applicable any alignment
-
-I'd say the patch isn't what I've had in mind when we discussed issue,
-it builds on already existing merging code and complicates
-code even more.
-
-Have you looked into possibility to rebuild memory map from scratch
-every time vhost_region_add/vhost_region_del is called or even at
-vhost_commit() time to reduce rebuild from a set of memory sections
-that vhost tracks?
-That should simplify algorithm a lot as memory sections are coming
-from flat view and never overlap compared to current merged memory
-map in vhost_dev::mem, so it won't have to deal with first splitting
-and then merging back every time flatview changes.
-
-> I also add quite a few trace events to see what's going on.
+> However its default implementation is not adapted to SMMUv3
+> IOMMU memory region. Indeed the input address range is too
+> huge and its execution is too slow as it calls the translate()
+> callback on each granule.
 > 
-> Note: This doesn't handle all the cases, but does handle the common
-> case on a PC due to the 640k hole.
+> Let's implement the replay callback which hierarchically walk
+> over the page table structure and notify only the segments
+> that are populated with valid entries.
 > 
-> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > ---
->  hw/virtio/trace-events | 11 +++++++
->  hw/virtio/vhost.c      | 79 +++++++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 89 insertions(+), 1 deletion(-)
+>  hw/arm/smmuv3.c     | 36 ++++++++++++++++++++++++++++++++++++
+>  hw/arm/trace-events |  1 +
+>  2 files changed, 37 insertions(+)
 > 
-> diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> index 5b599617a1..f98efb39fd 100644
-> --- a/hw/virtio/trace-events
-> +++ b/hw/virtio/trace-events
-> @@ -1,5 +1,16 @@
->  # See docs/devel/tracing.txt for syntax documentation.
->  
-> +# hw/virtio/vhost.c
-> +vhost_dev_assign_memory_merged(int from, int to, uint64_t size, uint64_t start_addr, uint64_t uaddr) "f/t=%d/%d 0x%"PRIx64" @ P: 0x%"PRIx64" U: 0x%"PRIx64
-> +vhost_dev_assign_memory_not_merged(uint64_t size, uint64_t start_addr, uint64_t uaddr) "0x%"PRIx64" @ P: 0x%"PRIx64" U: 0x%"PRIx64
-> +vhost_dev_assign_memory_entry(uint64_t size, uint64_t start_addr, uint64_t uaddr) "0x%"PRIx64" @ P: 0x%"PRIx64" U: 0x%"PRIx64
-> +vhost_dev_assign_memory_exit(uint32_t nregions) "%"PRId32
-> +vhost_huge_page_stretch_and_merge_entry(uint32_t nregions) "%"PRId32
-> +vhost_huge_page_stretch_and_merge_can(void) ""
-> +vhost_huge_page_stretch_and_merge_size_align(int d, uint64_t gpa, uint64_t align) "%d: gpa: 0x%"PRIx64" align: 0x%"PRIx64
-> +vhost_huge_page_stretch_and_merge_start_align(int d, uint64_t gpa, uint64_t align) "%d: gpa: 0x%"PRIx64" align: 0x%"PRIx64
-> +vhost_section(const char *name, int r) "%s:%d"
-> +
->  # hw/virtio/vhost-user.c
->  vhost_user_postcopy_end_entry(void) ""
->  vhost_user_postcopy_end_exit(void) ""
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 6eddb099b0..fb506e747f 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -27,6 +27,7 @@
->  #include "hw/virtio/virtio-access.h"
->  #include "migration/blocker.h"
->  #include "sysemu/dma.h"
-> +#include "trace.h"
->  
->  /* enabled until disconnected backend stabilizes */
->  #define _VHOST_DEBUG 1
-> @@ -250,6 +251,8 @@ static void vhost_dev_assign_memory(struct vhost_dev *dev,
->  {
->      int from, to;
->      struct vhost_memory_region *merged = NULL;
-> +    trace_vhost_dev_assign_memory_entry(size, start_addr, uaddr);
-> +
->      for (from = 0, to = 0; from < dev->mem->nregions; ++from, ++to) {
->          struct vhost_memory_region *reg = dev->mem->regions + to;
->          uint64_t prlast, urlast;
-> @@ -293,11 +296,13 @@ static void vhost_dev_assign_memory(struct vhost_dev *dev,
->          uaddr = merged->userspace_addr = u;
->          start_addr = merged->guest_phys_addr = s;
->          size = merged->memory_size = e - s + 1;
-> +        trace_vhost_dev_assign_memory_merged(from, to, size, start_addr, uaddr);
->          assert(merged->memory_size);
->      }
->  
->      if (!merged) {
->          struct vhost_memory_region *reg = dev->mem->regions + to;
-> +        trace_vhost_dev_assign_memory_not_merged(size, start_addr, uaddr);
->          memset(reg, 0, sizeof *reg);
->          reg->memory_size = size;
->          assert(reg->memory_size);
-> @@ -307,6 +312,7 @@ static void vhost_dev_assign_memory(struct vhost_dev *dev,
->      }
->      assert(to <= dev->mem->nregions + 1);
->      dev->mem->nregions = to;
-> +    trace_vhost_dev_assign_memory_exit(to);
+> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+> index 8e7d10d..c43bd93 100644
+> --- a/hw/arm/smmuv3.c
+> +++ b/hw/arm/smmuv3.c
+> @@ -657,6 +657,41 @@ static int smmuv3_notify_entry(IOMMUTLBEntry *entry, void *private)
+>      return 0;
 >  }
 >  
->  static uint64_t vhost_get_log_size(struct vhost_dev *dev)
-> @@ -610,8 +616,12 @@ static void vhost_set_memory(MemoryListener *listener,
->  
->  static bool vhost_section(MemoryRegionSection *section)
->  {
-> -    return memory_region_is_ram(section->mr) &&
-> +    bool result;
-> +    result = memory_region_is_ram(section->mr) &&
->          !memory_region_is_rom(section->mr);
-> +
-> +    trace_vhost_section(section->mr->name, result);
-> +    return result;
->  }
->  
->  static void vhost_begin(MemoryListener *listener)
-> @@ -622,6 +632,68 @@ static void vhost_begin(MemoryListener *listener)
->      dev->mem_changed_start_addr = -1;
->  }
->  
-> +/* Look for regions that are hugepage backed but not aligned
-> + * and fix them up to be aligned.
-> + * TODO: For now this is just enough to deal with the 640k hole
-> + */
-> +static bool vhost_huge_page_stretch_and_merge(struct vhost_dev *dev)
+> +/* Unmap the whole notifier's range */
+> +static void smmuv3_unmap_notifier_range(IOMMUNotifier *n)
 > +{
-> +    int i, j;
-> +    bool result = true;
-> +    trace_vhost_huge_page_stretch_and_merge_entry(dev->mem->nregions);
+> +    IOMMUTLBEntry entry;
+> +    hwaddr size = n->end - n->start + 1;
 > +
-> +    for (i = 0; i < dev->mem->nregions; i++) {
-> +        struct vhost_memory_region *reg = dev->mem->regions + i;
-> +        ram_addr_t offset;
-> +        RAMBlock *rb = qemu_ram_block_from_host((void *)reg->userspace_addr,
-> +                                                false, &offset);
-> +        size_t pagesize = qemu_ram_pagesize(rb);
-> +        uint64_t alignage;
-> +        alignage = reg->guest_phys_addr & (pagesize - 1);
-> +        if (alignage) {
+> +    entry.target_as = &address_space_memory;
+> +    entry.iova = n->start & ~(size - 1);
+> +    entry.perm = IOMMU_NONE;
+> +    entry.addr_mask = size - 1;
 > +
-> +            trace_vhost_huge_page_stretch_and_merge_start_align(i,
-> +                                                (uint64_t)reg->guest_phys_addr,
-> +                                                alignage);
-> +            for (j = 0; j < dev->mem->nregions; j++) {
-> +                struct vhost_memory_region *oreg = dev->mem->regions + j;
-> +                if (j == i) {
-> +                    continue;
-> +                }
-> +
-> +                if (oreg->guest_phys_addr ==
-> +                        (reg->guest_phys_addr - alignage) &&
-> +                    oreg->userspace_addr ==
-> +                         (reg->userspace_addr - alignage)) {
-> +                    struct vhost_memory_region treg = *reg;
-> +                    trace_vhost_huge_page_stretch_and_merge_can();
-> +                    vhost_dev_unassign_memory(dev, oreg->guest_phys_addr,
-> +                                              oreg->memory_size);
-> +                    vhost_dev_unassign_memory(dev, treg.guest_phys_addr,
-> +                                              treg.memory_size);
-> +                    vhost_dev_assign_memory(dev,
-> +                                            treg.guest_phys_addr - alignage,
-> +                                            treg.memory_size + alignage,
-> +                                            treg.userspace_addr - alignage);
-> +                    return vhost_huge_page_stretch_and_merge(dev);
-> +                }
-> +            }
-> +        }
-> +        alignage = reg->memory_size & (pagesize - 1);
-> +        if (alignage) {
-> +            trace_vhost_huge_page_stretch_and_merge_size_align(i,
-> +                                               (uint64_t)reg->guest_phys_addr,
-> +                                               alignage);
-> +            /* We ignore this if we find something else to merge,
-> +             * so we only return false if we're left with this
-> +             */
-> +            result = false;
-> +        }
-> +    }
-> +
-> +    return result;
+> +    memory_region_notify_one(n, &entry);
 > +}
 > +
->  static void vhost_commit(MemoryListener *listener)
->  {
->      struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-> @@ -641,6 +713,7 @@ static void vhost_commit(MemoryListener *listener)
->          return;
->      }
->  
-> +    vhost_huge_page_stretch_and_merge(dev);
->      if (dev->started) {
->          start_addr = dev->mem_changed_start_addr;
->          size = dev->mem_changed_end_addr - dev->mem_changed_start_addr + 1;
-> @@ -1512,6 +1585,10 @@ int vhost_dev_start(struct vhost_dev *hdev, VirtIODevice *vdev)
->          goto fail_features;
->      }
->  
-> +    if (!vhost_huge_page_stretch_and_merge(hdev)) {
-> +        VHOST_OPS_DEBUG("vhost_huge_page_stretch_and_merge failed");
-> +        goto fail_mem;
+> +static void smmuv3_replay(IOMMUMemoryRegion *mr, IOMMUNotifier *n)
+> +{
+> +    SMMUTransCfg cfg = {};
+> +    int ret;
+> +
+> +    trace_smmuv3_replay(mr->parent_obj.name, n, n->start, n->end);
+> +    smmuv3_unmap_notifier_range(n);
+> +
+> +    ret = smmuv3_decode_config(mr, &cfg);
+> +    if (ret) {
+> +        error_report("%s error decoding the configuration for iommu mr=%s",
+> +                     __func__, mr->parent_obj.name);
 > +    }
->      if (vhost_dev_has_iommu(hdev)) {
->          memory_listener_register(&hdev->iommu_listener, vdev->dma_as);
->      }
+> 
+
+On an invalid config being found, shouldnt we return rather than proceeding with
+page table walk. For example on an invalid Stream table entry.
+
++
+> +    if (cfg.disabled || cfg.bypassed) {
+> +        return;
+> +    }
+> +    /* walk the page tables and replay valid entries */
+> +    smmu_page_walk(&cfg, 0, (1ULL << (64 - cfg.tsz)) - 1, false,
+> +                   smmuv3_notify_entry, n);
+> +}
+>  static void smmuv3_notify_iova_range(IOMMUMemoryRegion *mr, IOMMUNotifier *n,
+>                                       uint64_t iova, size_t size)
+>  {
+> @@ -1095,6 +1130,7 @@ static void smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
+>  
+>      imrc->translate = smmuv3_translate;
+>      imrc->notify_flag_changed = smmuv3_notify_flag_changed;
+> +    imrc->replay = smmuv3_replay;
+>  }
+>  
+>  static const TypeInfo smmuv3_type_info = {
+> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+> index 4ac264d..15f84d6 100644
+> --- a/hw/arm/trace-events
+> +++ b/hw/arm/trace-events
+> @@ -46,5 +46,6 @@ smmuv3_cfg_stage(int s, uint32_t oas, uint32_t tsz, uint64_t ttbr, bool aa64, ui
+>  smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
+>  smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
+>  smmuv3_replay_mr(const char *name) "iommu mr=%s"
+> +smmuv3_replay(const char *name, void *n, hwaddr start, hwaddr end) "iommu mr=%s notifier=%p [0x%"PRIx64",0x%"PRIx64"]"
+>  smmuv3_notify_entry(hwaddr iova, hwaddr pa, hwaddr mask, int perm) "iova=0x%"PRIx64" pa=0x%" PRIx64" mask=0x%"PRIx64" perm=%d"
+>  smmuv3_notify_iova_range(const char *name, uint64_t iova, size_t size, void *n) "iommu mr=%s iova=0x%"PRIx64" size=0x%lx n=%p"
+> -- 
+> 2.5.5
+> 
+> 
+
+-- 
+Linu cherian
