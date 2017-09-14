@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57410)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60149)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsVcm-0002T0-Ek
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:00:20 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dsVhL-0006G3-NM
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:05:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsVcg-000746-Fl
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:00:16 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:43158)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsVcg-00071k-5d
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:00:10 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
-	<150506059354.19604.5050182852156612042.stgit@frigg.lan>
-	<0250ce97-bef3-1feb-d9a9-4e4a91084fa7@linaro.org>
-Date: Thu, 14 Sep 2017 17:59:57 +0300
-In-Reply-To: <0250ce97-bef3-1feb-d9a9-4e4a91084fa7@linaro.org> (Richard
-	Henderson's message of "Wed, 13 Sep 2017 10:07:44 -0700")
-Message-ID: <87inglpbpu.fsf@frigg.lan>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 3/7] trace: Add event
- "guest_inst_info_before"
+	(envelope-from <dgilbert@redhat.com>) id 1dsVhK-0002Bq-NY
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:04:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33868)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dsVhK-0002B3-Hp
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 11:04:58 -0400
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Date: Thu, 14 Sep 2017 16:04:42 +0100
+Message-Id: <20170914150447.19352-3-dgilbert@redhat.com>
+In-Reply-To: <20170914150447.19352-1-dgilbert@redhat.com>
+References: <20170914150447.19352-1-dgilbert@redhat.com>
+Subject: [Qemu-devel] [PULL 2/7] hmp: fix "dump-quest-memory" segfault (arm)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,69 +23,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Crosthwaite <crosthwaite.peter@gmail.com>
+To: qemu-devel@nongnu.org, lvivier@redhat.com, cohuck@redhat.com, vadim.galitsyn@profitbricks.com
+Cc: imammedo@redhat.com, thuth@redhat.com, peterx@redhat.com, groug@kaod.org
 
-Richard Henderson writes:
+From: Laurent Vivier <lvivier@redhat.com>
 
-> On 09/10/2017 09:23 AM, Llu=C3=ADs Vilanova wrote:
->> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
->> ---
->> accel/tcg/translator.c |   18 ++++++++++++++++++
->> trace-events           |    9 +++++++++
->> 2 files changed, 27 insertions(+)
->>=20
->> diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
->> index 287d27b4f7..6598931171 100644
->> --- a/accel/tcg/translator.c
->> +++ b/accel/tcg/translator.c
->> @@ -70,6 +70,8 @@ void translator_loop(const TranslatorOps *ops, DisasCo=
-ntextBase *db,
->>=20
->> while (true) {
->> target_ulong pc_insn =3D db->pc_next;
->> +        TCGv_i32 insn_size_tcg =3D 0;
->> +        int insn_size_opcode_idx;
+Running QEMU with
+    qemu-system-aarch64 -M none -nographic -m 256
+and executing
+    dump-guest-memory /dev/null 0 8192
+results in segfault
 
-> Initializing a TCGv_i32 is wrong.
-> And surely insn_size_opcode is surely uninitialized?
+Fix by checking if we have CPU, and exit with
+error if there is no CPU:
 
->> +        if (TRACE_GUEST_INST_INFO_BEFORE_EXEC_ENABLED) {
->> +            insn_size_tcg =3D tcg_temp_new_i32();
->> +            insn_size_opcode_idx =3D tcg_op_buf_count();
->> +            tcg_gen_movi_i32(insn_size_tcg, 0xdeadbeef);
->> +
->> +            trace_guest_inst_info_before_tcg(
->> +                cpu, tcg_ctx.tcg_env, pc_insn, insn_size_tcg);
->> +
->> +            tcg_temp_free_i32(insn_size_tcg);
+    (qemu) dump-guest-memory /dev/null
+    this feature or command is not currently supported
 
-> There's no reason you can't declare insn_size_tcg right here and avoid the
-> incorrect initialization above.
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Message-Id: <20170913142036.2469-3-lvivier@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Tested-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ target/arm/arch_dump.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-Yes, I guess I did not move the declaration here by error after refactoring=
- the
-code.
-
-
-> Is there a reason to have both "guest_insn" and "guest_insn_info"?
-
-I initially wanted to have a bare-bones event with simple information, and =
-an
-*_info variant with more detailed information like register usage and physi=
-cal
- addresses (which would be disabled by default to avoid performance impact).
-
-We had a discussion long time ago that led to decide that register usage
-information as I implemented it was only partial (it did not capture regist=
-er
-usage helpers), and thus was not worth adding.
-
-Since physical address information is not gonna be added in this series (if=
- at
-all), what do you say about hoisting instruction length info into
-guest_insn_before/after and dropping the *_info variants?
-
-
-Thanks,
-  Lluis
+diff --git a/target/arm/arch_dump.c b/target/arm/arch_dump.c
+index 1a9861f69b..9e5b2fb31c 100644
+--- a/target/arm/arch_dump.c
++++ b/target/arm/arch_dump.c
+@@ -273,11 +273,18 @@ int arm_cpu_write_elf32_note(WriteCoreDumpFunction f, CPUState *cs,
+ int cpu_get_dump_info(ArchDumpInfo *info,
+                       const GuestPhysBlockList *guest_phys_blocks)
+ {
+-    ARMCPU *cpu = ARM_CPU(first_cpu);
+-    CPUARMState *env = &cpu->env;
++    ARMCPU *cpu;
++    CPUARMState *env;
+     GuestPhysBlock *block;
+     hwaddr lowest_addr = ULLONG_MAX;
+ 
++    if (first_cpu == NULL) {
++        return -1;
++    }
++
++    cpu = ARM_CPU(first_cpu);
++    env = &cpu->env;
++
+     /* Take a best guess at the phys_base. If we get it wrong then crash
+      * will need '--machdep phys_offset=<phys-offset>' added to its command
+      * line, which isn't any worse than assuming we can use zero, but being
+-- 
+2.13.5
