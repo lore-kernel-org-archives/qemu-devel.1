@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44493)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45526)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dsSDl-0006aG-E5
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:22:14 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dsSFg-0007jb-BB
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:24:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dsSDh-00076r-6b
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:22:13 -0400
-Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:45109)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dsSDg-00075P-Vs
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:22:09 -0400
-Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id BB080AA975
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 13:22:07 +0200 (CEST)
-Date: Thu, 14 Sep 2017 13:22:00 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170914132200.6d9dd860@bahia.lan>
-In-Reply-To: <1505385610-35529-4-git-send-email-pradeep.jagadeesh@huawei.com>
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dsSFd-00011c-6w
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:24:12 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:23711)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dsSFc-0000uC-O0
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:24:09 -0400
 References: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1505385610-35529-4-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1505385610-35529-3-git-send-email-pradeep.jagadeesh@huawei.com>
+	<20170914131955.380099a8@bahia.lan>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <5c139703-11ee-e7e2-9db2-201a208bf1d0@huawei.com>
+Date: Thu, 14 Sep 2017 13:23:08 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/L+cPxva5Yk+RHB=FUZCik8u";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v11 3/6] qmp: factor out throttle code to
- reuse code
+In-Reply-To: <20170914131955.380099a8@bahia.lan>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 2/6] qmp: Use ThrottleLimits structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,118 +28,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
-Cc: eric blake <eblake@redhat.com>, qemu-devel@nongnu.org, jani kokkonen <jani.kokkonen@huawei.com>, alberto garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Markus Armbruster <armbru@redhat.com>
+To: Greg Kurz <groug@kaod.org>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: eric blake <eblake@redhat.com>, jani kokkonen <jani.kokkonen@huawei.com>, alberto garcia <berto@igalia.com>, qemu-devel@nongnu.org
 
---Sig_/L+cPxva5Yk+RHB=FUZCik8u
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 9/14/2017 1:19 PM, Greg Kurz wrote:
+> On Thu, 14 Sep 2017 06:40:06 -0400
+> Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
+>
+>> This patch factors out code to use the ThrottleLimits
+>> strurcture.
+>>
+>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+>> Reviewed-by: Greg Kurz <groug@kaod.org>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  qapi/block-core.json | 78 +++-------------------------------------------------
+>
+> Uhhh... what happened here ? Where did the lines go ? I've never reviewed this
+> patch before...
 
-On Thu, 14 Sep 2017 06:40:07 -0400
-Pradeep Jagadeesh <pradeepkiruvale@gmail.com> wrote:
+I did rebase the code on 2.10
+Now I am using the ThrottleLimits structure that was introduced IN 2.10.
+This is same as the IOThrottle structure.
+So, many things got changed in this version.
 
-> This patch reuses the code to set throttle limits.
->=20
-> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-> Reviewed-by: Alberto Garcia <berto@igalia.com>
-> Reviewed-by: Greg Kurz <groug@kaod.org>
-> ---
->  blockdev.c | 53 +++--------------------------------------------------
+-Pradeep
 
-Same remarks as for the previous patch...
-
->  1 file changed, 3 insertions(+), 50 deletions(-)
->=20
-> diff --git a/blockdev.c b/blockdev.c
-> index 9d33c25..2bd8ebd 100644
-> --- a/blockdev.c
-> +++ b/blockdev.c
-> @@ -2569,6 +2569,7 @@ void qmp_block_set_io_throttle(BlockIOThrottle *arg=
-, Error **errp)
->      BlockDriverState *bs;
->      BlockBackend *blk;
->      AioContext *aio_context;
-> +    ThrottleLimits *tlimit;
-> =20
->      blk =3D qmp_get_blk(arg->has_device ? arg->device : NULL,
->                        arg->has_id ? arg->id : NULL,
-> @@ -2586,56 +2587,8 @@ void qmp_block_set_io_throttle(BlockIOThrottle *ar=
-g, Error **errp)
->          goto out;
->      }
-> =20
-> -    throttle_config_init(&cfg);
-> -    cfg.buckets[THROTTLE_BPS_TOTAL].avg =3D arg->bps;
-> -    cfg.buckets[THROTTLE_BPS_READ].avg  =3D arg->bps_rd;
-> -    cfg.buckets[THROTTLE_BPS_WRITE].avg =3D arg->bps_wr;
-> -
-> -    cfg.buckets[THROTTLE_OPS_TOTAL].avg =3D arg->iops;
-> -    cfg.buckets[THROTTLE_OPS_READ].avg  =3D arg->iops_rd;
-> -    cfg.buckets[THROTTLE_OPS_WRITE].avg =3D arg->iops_wr;
-> -
-> -    if (arg->has_bps_max) {
-> -        cfg.buckets[THROTTLE_BPS_TOTAL].max =3D arg->bps_max;
-> -    }
-> -    if (arg->has_bps_rd_max) {
-> -        cfg.buckets[THROTTLE_BPS_READ].max =3D arg->bps_rd_max;
-> -    }
-> -    if (arg->has_bps_wr_max) {
-> -        cfg.buckets[THROTTLE_BPS_WRITE].max =3D arg->bps_wr_max;
-> -    }
-> -    if (arg->has_iops_max) {
-> -        cfg.buckets[THROTTLE_OPS_TOTAL].max =3D arg->iops_max;
-> -    }
-> -    if (arg->has_iops_rd_max) {
-> -        cfg.buckets[THROTTLE_OPS_READ].max =3D arg->iops_rd_max;
-> -    }
-> -    if (arg->has_iops_wr_max) {
-> -        cfg.buckets[THROTTLE_OPS_WRITE].max =3D arg->iops_wr_max;
-> -    }
-> -
-> -    if (arg->has_bps_max_length) {
-> -        cfg.buckets[THROTTLE_BPS_TOTAL].burst_length =3D arg->bps_max_le=
-ngth;
-> -    }
-> -    if (arg->has_bps_rd_max_length) {
-> -        cfg.buckets[THROTTLE_BPS_READ].burst_length =3D arg->bps_rd_max_=
-length;
-> -    }
-> -    if (arg->has_bps_wr_max_length) {
-> -        cfg.buckets[THROTTLE_BPS_WRITE].burst_length =3D arg->bps_wr_max=
-_length;
-> -    }
-> -    if (arg->has_iops_max_length) {
-> -        cfg.buckets[THROTTLE_OPS_TOTAL].burst_length =3D arg->iops_max_l=
-ength;
-> -    }
-> -    if (arg->has_iops_rd_max_length) {
-> -        cfg.buckets[THROTTLE_OPS_READ].burst_length =3D arg->iops_rd_max=
-_length;
-> -    }
-> -    if (arg->has_iops_wr_max_length) {
-> -        cfg.buckets[THROTTLE_OPS_WRITE].burst_length =3D arg->iops_wr_ma=
-x_length;
-> -    }
-> -
-> -    if (arg->has_iops_size) {
-> -        cfg.op_size =3D arg->iops_size;
-> -    }
-> +    tlimit =3D qapi_BlockIOThrottle_base(arg);
-> +    throttle_config_to_limits(&cfg, tlimit);
-> =20
->      if (!throttle_is_valid(&cfg, errp)) {
->          goto out;
-
-
---Sig_/L+cPxva5Yk+RHB=FUZCik8u
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbpmWAAKCRAC/DrrAQHb
-wv3/AKCaAQlQ8mYRYdeKXaqj3Zvc37glqQCeOYriJe/9Z+Jszt3rMtOSgvOdYck=
-=sCTa
------END PGP SIGNATURE-----
-
---Sig_/L+cPxva5Yk+RHB=FUZCik8u--
+>
+>>  1 file changed, 4 insertions(+), 74 deletions(-)
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index bb11815..d0ccfda 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -1826,84 +1826,13 @@
+>>  #
+>>  # @device: Block device name (deprecated, use @id instead)
+>>  #
+>> -# @id: The name or QOM path of the guest device (since: 2.8)
+>> -#
+>> -# @bps: total throughput limit in bytes per second
+>> -#
+>> -# @bps_rd: read throughput limit in bytes per second
+>> -#
+>> -# @bps_wr: write throughput limit in bytes per second
+>> -#
+>> -# @iops: total I/O operations per second
+>> -#
+>> -# @iops_rd: read I/O operations per second
+>> -#
+>> -# @iops_wr: write I/O operations per second
+>> -#
+>> -# @bps_max: total throughput limit during bursts,
+>> -#                     in bytes (Since 1.7)
+>> -#
+>> -# @bps_rd_max: read throughput limit during bursts,
+>> -#                        in bytes (Since 1.7)
+>> -#
+>> -# @bps_wr_max: write throughput limit during bursts,
+>> -#                        in bytes (Since 1.7)
+>> -#
+>> -# @iops_max: total I/O operations per second during bursts,
+>> -#                      in bytes (Since 1.7)
+>> -#
+>> -# @iops_rd_max: read I/O operations per second during bursts,
+>> -#                         in bytes (Since 1.7)
+>> -#
+>> -# @iops_wr_max: write I/O operations per second during bursts,
+>> -#                         in bytes (Since 1.7)
+>> -#
+>> -# @bps_max_length: maximum length of the @bps_max burst
+>> -#                            period, in seconds. It must only
+>> -#                            be set if @bps_max is set as well.
+>> -#                            Defaults to 1. (Since 2.6)
+>> -#
+>> -# @bps_rd_max_length: maximum length of the @bps_rd_max
+>> -#                               burst period, in seconds. It must only
+>> -#                               be set if @bps_rd_max is set as well.
+>> -#                               Defaults to 1. (Since 2.6)
+>> -#
+>> -# @bps_wr_max_length: maximum length of the @bps_wr_max
+>> -#                               burst period, in seconds. It must only
+>> -#                               be set if @bps_wr_max is set as well.
+>> -#                               Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_max_length: maximum length of the @iops burst
+>> -#                             period, in seconds. It must only
+>> -#                             be set if @iops_max is set as well.
+>> -#                             Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_rd_max_length: maximum length of the @iops_rd_max
+>> -#                                burst period, in seconds. It must only
+>> -#                                be set if @iops_rd_max is set as well.
+>> -#                                Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_wr_max_length: maximum length of the @iops_wr_max
+>> -#                                burst period, in seconds. It must only
+>> -#                                be set if @iops_wr_max is set as well.
+>> -#                                Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_size: an I/O size in bytes (Since 1.7)
+>> -#
+>>  # @group: throttle group name (Since 2.4)
+>>  #
+>>  # Since: 1.1
+>>  ##
+>>  { 'struct': 'BlockIOThrottle',
+>> -  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd': 'int',
+>> -            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int', 'iops_wr': 'int',
+>> -            '*bps_max': 'int', '*bps_rd_max': 'int',
+>> -            '*bps_wr_max': 'int', '*iops_max': 'int',
+>> -            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+>> -            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+>> -            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>> -            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+>> -            '*iops_size': 'int', '*group': 'str' } }
+>> +  'base': 'ThrottleLimits',
+>> +  'data': { '*device': 'str', '*group': 'str' } }
+>>
+>>  ##
+>>  # @ThrottleLimits:
+>> @@ -1913,6 +1842,7 @@
+>>  # transaction. All fields are optional. When setting limits, if a field is
+>>  # missing the current value is not changed.
+>>  #
+>> +# @id:                     device id
+>>  # @iops-total:             limit total I/O operations per second
+>>  # @iops-total-max:         I/O operations burst
+>>  # @iops-total-max-length:  length of the iops-total-max burst period, in seconds
+>> @@ -1942,7 +1872,7 @@
+>>  # Since: 2.11
+>>  ##
+>>  { 'struct': 'ThrottleLimits',
+>> -  'data': { '*iops-total' : 'int', '*iops-total-max' : 'int',
+>> +  'data': { '*id' : 'str', '*iops-total' : 'int', '*iops-total-max' : 'int',
+>>              '*iops-total-max-length' : 'int', '*iops-read' : 'int',
+>>              '*iops-read-max' : 'int', '*iops-read-max-length' : 'int',
+>>              '*iops-write' : 'int', '*iops-write-max' : 'int',
+>
