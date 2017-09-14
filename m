@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54138)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dsSSl-0005WD-UB
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:37:44 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dsSVd-0006qd-58
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:40:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dsSSh-0005mk-2Z
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:37:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51936)
+	(envelope-from <pbonzini@redhat.com>) id 1dsSVY-0001hO-OP
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:40:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56552)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dsSSg-0005lU-SV
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:37:38 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id E2A9D5F73A
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 11:37:37 +0000 (UTC)
-References: <20170913120937.5645-1-kraxel@redhat.com>
-	<20170913120937.5645-3-kraxel@redhat.com>
-	<47d72e62-8ebb-3b45-3efe-ab5f98ed4f39@redhat.com>
-	<1505378205.31557.3.camel@redhat.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dsSVY-0001fo-J7
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 07:40:36 -0400
+References: <20170913221149.30382-1-f4bug@amsat.org>
+	<2acadeb5-41e1-ce09-6e3b-37001dd57042@weilnetz.de>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <67d1511b-a3aa-7c59-35f8-133bac9cc5cc@redhat.com>
-Date: Thu, 14 Sep 2017 13:37:30 +0200
+Message-ID: <e9714f5a-b328-8f6c-6cca-725f0851bc66@redhat.com>
+Date: Thu, 14 Sep 2017 13:40:31 +0200
 MIME-Version: 1.0
-In-Reply-To: <1505378205.31557.3.camel@redhat.com>
+In-Reply-To: <2acadeb5-41e1-ce09-6e3b-37001dd57042@weilnetz.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] Add --firmwarepath to configure
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] accel/hax: move hax-stub.c to accel/stubs/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,33 +28,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+To: Stefan Weil <sw@weilnetz.de>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Richard Henderson <rth@twiddle.net>, Jiang Yunhong <yunhong.jiang@intel.com>, Vincent Palatin <vpalatin@chromium.org>
+Cc: qemu-devel@nongnu.org
 
-On 14/09/2017 10:36, Gerd Hoffmann wrote:
->   Hi,
-> 
->>> +  --firmwarepath=PATH      search PATH for firmware files
+On 14/09/2017 05:30, Stefan Weil wrote:
+> Am 14.09.2017 um 00:11 schrieb Philippe Mathieu-Daud=C3=A9:
+>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>> ---
+>>  Makefile.target                      | 1 -
+>>  hax-stub.c =3D> accel/stubs/hax-stub.c | 0
+>>  accel/stubs/Makefile.objs            | 1 +
+>>  3 files changed, 1 insertion(+), 1 deletion(-)
+>>  rename hax-stub.c =3D> accel/stubs/hax-stub.c (100%)
 >>
->> Maybe --firmwaredir or --with-firmwaredir (because firmwaredir is not
->> one of the "standard" directories)?
-> 
-> I've intentionally named this "path" because it can actually have
-> multiple directories.
-> 
-> Or do you mean something else?  If so --verbose please.
+>> diff --git a/Makefile.target b/Makefile.target
+>> index 6361f957fb..af4b60d012 100644
+>> --- a/Makefile.target
+>> +++ b/Makefile.target
+>> @@ -101,7 +101,6 @@ obj-y +=3D fpu/softfloat.o
+>>  obj-y +=3D target/$(TARGET_BASE_ARCH)/
+>>  obj-y +=3D disas.o
+>>  obj-$(call notempty,$(TARGET_XML_FILES)) +=3D gdbstub-xml.o
+>> -obj-$(call lnot,$(CONFIG_HAX)) +=3D hax-stub.o
+>> =20
+>>  obj-$(CONFIG_LIBDECNUMBER) +=3D libdecnumber/decContext.o
+>>  obj-$(CONFIG_LIBDECNUMBER) +=3D libdecnumber/decNumber.o
+>> diff --git a/hax-stub.c b/accel/stubs/hax-stub.c
+>> similarity index 100%
+>> rename from hax-stub.c
+>> rename to accel/stubs/hax-stub.c
+>> diff --git a/accel/stubs/Makefile.objs b/accel/stubs/Makefile.objs
+>> index fdfbf7332c..8038ad6553 100644
+>> --- a/accel/stubs/Makefile.objs
+>> +++ b/accel/stubs/Makefile.objs
+>> @@ -1,2 +1,3 @@
+>>  obj-$(call lnot,$(CONFIG_KVM)) +=3D kvm-stub.o
+>>  obj-$(call lnot,$(CONFIG_TCG)) +=3D tcg-stub.o
+>> +obj-$(call lnot,$(CONFIG_HAX)) +=3D hax-stub.o
+>=20
+> Reviewed-by: Stefan Weil <sw@weilnetz.de>
+>=20
+> Personally, I like alphabetic order for such lines.
+> Maybe that can be done when it is applied.
 
-No, you're right.
+Done and queued, thanks both.
 
 Paolo
-
->>> +    /* add configured firmware directories */
->>> +    dirs = g_strsplit(CONFIG_QEMU_FIRMWAREPATH, ":", 0);
->>
->> Windows probably wants to use ; here, so you can use
->> G_SEARCHPATH_SEPARATOR_S instead of ":".
-> 
-> Ah, cool, didn't know this exists.  Fixing ...
-> 
-> cheers,
->   Gerd
-> 
