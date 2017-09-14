@@ -1,26 +1,50 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dsR5g-0007wk-UC
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:09:50 -0400
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dsRGR-0003kk-3I
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:20:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dsR5c-0003kW-Sh
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:09:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:32964)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dsR5c-0003jo-Jq
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:09:44 -0400
-Date: Thu, 14 Sep 2017 11:09:37 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170914100936.GF2153@work-vm>
-References: <20170829153022.27004-1-vadim.galitsyn@profitbricks.com>
-	<CAPHE7NpcDn4oOxZV4Bhz1P15HDg2sc0JftBtojaGSOTvm3=cHQ@mail.gmail.com>
-	<20170914120207.2dafdbfc@nial.brq.redhat.com>
+	(envelope-from <bharata@linux.vnet.ibm.com>) id 1dsRGM-0005zJ-0x
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:20:53 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57508)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bharata@linux.vnet.ibm.com>)
+	id 1dsRGL-0005yH-LP
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 06:20:49 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8EAKiTH138182
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 06:20:48 -0400
+Received: from e23smtp04.au.ibm.com (e23smtp04.au.ibm.com [202.81.31.146])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2cyqru0ug1-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 06:20:47 -0400
+Received: from localhost
+	by e23smtp04.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bharata@linux.vnet.ibm.com>;
+	Thu, 14 Sep 2017 20:20:45 +1000
+Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
+	by d23relay06.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+	v8EAKhcJ37421258
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 20:20:43 +1000
+Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
+	by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id
+	v8EAKjCn029416
+	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 20:20:45 +1000
+Date: Thu, 14 Sep 2017 15:50:37 +0530
+From: Bharata B Rao <bharata@linux.vnet.ibm.com>
+Reply-To: bharata@linux.vnet.ibm.com
+References: <20170914070118.GA8181@in.ibm.com>
+	<20170914100011.296185d2@nial.brq.redhat.com>
+	<20170914081826.GA23373@in.ibm.com>
+	<20170914105905.7e509ef4@nial.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170914120207.2dafdbfc@nial.brq.redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v7 0/3] hmp, qmp: 'info memory_size_summary',
- 'query-memory-size-summary', 'info numa' updates
+In-Reply-To: <20170914105905.7e509ef4@nial.brq.redhat.com>
+Message-Id: <20170914102037.GB23373@in.ibm.com>
+Subject: Re: [Qemu-devel] QEMU terminates during reboot after memory unplug
+ with vhost=on
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,138 +54,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Igor Mammedov <imammedo@redhat.com>
-Cc: Vadim Galitsyn <vadim.galitsyn@profitbricks.com>, Eduardo Habkost <ehabkost@redhat.com>, David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>, Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-devel@nongnu.org, mst@redhat.com, groug@kaod.org, david@gibson.dropbear.id.au
 
-* Igor Mammedov (imammedo@redhat.com) wrote:
-> On Thu, 14 Sep 2017 11:35:36 +0200
-> Vadim Galitsyn <vadim.galitsyn@profitbricks.com> wrote:
+On Thu, Sep 14, 2017 at 10:59:05AM +0200, Igor Mammedov wrote:
+> On Thu, 14 Sep 2017 13:48:26 +0530
+> Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
 > 
-> > Hi Guys,
+> > On Thu, Sep 14, 2017 at 10:00:11AM +0200, Igor Mammedov wrote:
+> > > On Thu, 14 Sep 2017 12:31:18 +0530
+> > > Bharata B Rao <bharata@linux.vnet.ibm.com> wrote:
+> > >   
+> > > > Hi,
+> > > > 
+> > > > QEMU hits the below assert
+> > > > 
+> > > > qemu-system-ppc64: used ring relocated for ring 2
+> > > > qemu-system-ppc64: qemu/hw/virtio/vhost.c:649: vhost_commit: Assertion `r >= 0' failed.
+> > > > 
+> > > > in the following scenario:
+> > > > 
+> > > > 1. Boot guest with vhost=on
+> > > >   -netdev tap,id=mynet0,script=qemu-ifup,downscript=qemu-ifdown,vhost=on -device virtio-net-pci,netdev=mynet0
+> > > > 2. Hot add a DIMM device 
+> > > > 3. Reboot
+> > > >    When the guest reboots, we can see
+> > > >    vhost_virtqueue_start:vq->used_phys getting assigned an address that
+> > > >    falls in the hotplugged memory range.
+> > > > 4. Remove the DIMM device
+> > > >    Guest refuses the removal as the hotplugged memory is under use.
+> > > > 5. Reboot  
+> > >   
+> > > >    QEMU forces the removal of the DIMM device during reset and that's
+> > > >    when we hit the above assert.  
+> > > I don't recall implementing forced removal om DIMM,
+> > > could you point out to the related code, pls?  
 > > 
-> > Could you please let me know if you have an update on this topic?
-> Series looks good to me.
-> so with comments I've made fixed up
-
-OK, I can fix those comment comments up in a pull.
-
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-Thanks,
-
-Dave
-
+> > This is ppc specific. We have DR Connector objects for each LMB (multiple
+> > LMBs make up one DIMM device) and during reset we invoke the
+> > release routine for these LMBs which will further invoke
+> > pc_dimm_memory_unplug().
+> > 
+> > See hw/ppc/spapr_drc.c: spapr_drc_reset()
+> > hw/ppc/spapr.c: spapr_lmb_release()
+> > 
+> > >   
+> > > > Any pointers on why we are hitting this assert ? Shouldn't vhost be
+> > > > done with using the hotplugged memory when we hit reset ?  
+> > >   
+> > > >From another point of view,  
+> > > DIMM shouldn't be removed unless guest explicitly ejects it
+> > > (at least that should be so in x86 case).  
+> > 
+> > While that is true for ppc also, shouldn't we start fresh from reset ?
+> we should.
 > 
-> > 
-> > Thank you,
-> > Vadim
-> > 
-> > On Tue, Aug 29, 2017 at 5:30 PM, Vadim Galitsyn <
-> > vadim.galitsyn@profitbricks.com> wrote:  
-> > 
-> > > Hi Guys,
-> > >
-> > > Sorry for the delay. This is continuation of
-> > >   http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg02937.html.
-> > >
-> > > I tried to update all the things according to your input
-> > > regarding to v6 series. I am attaching all the versions
-> > > history here in cover letter.
-> > >
-> > > Best regards,
-> > > Vadim
-> > >
-> > > v7:
-> > >  * hmp: 'info numa': 'struct numa_node_mem' ->
-> > >    'struct NumaNodeMem' (Eric);
-> > >
-> > >  * hmp: 'info numa': 'numa_node_mem.node_hotpluggable_mem' ->
-> > >    'NumaNodeMem.node_plugged_mem' (in order to follow the same
-> > >    naming schema as in the rest patches from this series);
-> > >
-> > >  * hmp: hmp_info_memory_size_summary() no longer
-> > >    uses &error_abort (David);
-> > >
-> > >  * qmp: documented when @plugged-memory info is omitted (Eric);
-> > >
-> > >  * qmp: added example usage of @query-memory-size-summary (Eric);
-> > >
-> > >  * qmp: 'Since: 2.10.0' -> 'Since: 2.11.0' (Eric);
-> > >
-> > >  * All commit messages updated according to Eric's recomendation.
-> > >
-> > > v6:
-> > >  * qmp: Renamed get_existing_hotpluggable_memory_size() ->
-> > >    get_plugged_memory_size();
-> > >
-> > >  * qmp: Renamed MemoryInfo.hotunpluggable_memory ->
-> > >    MemoryInfo.plugged_memory;
-> > >
-> > >  * qmp: Dropped superfluous parenthesis around the
-> > >    comparison while evaluating MemoryInfo.has_plugged_memory.
-> > >
-> > >  * hmp: Renamed 'info memory-size-summary' ->
-> > >    'info memory_size_summary'
-> > >
-> > > v5:
-> > >  * hmp: Updated description and '.help' message for
-> > >    'info memory-size-summary' command.
-> > >
-> > >  * hmp: Removed '-' characters from
-> > >    'info memory-size-summary' output.
-> > >
-> > >  * Dropped ballooned memory information.
-> > >
-> > >  * get_existing_hotpluggable_memory_size() assumed
-> > >    to never fail; routine now has no arguments and
-> > >    returns uint64_t; in case if target does not support
-> > >    memory hotplug, (uint64_t)-1 is returned.
-> > >
-> > >  * MemoryInfo structure:
-> > >    * Removed @balloon-actual-memory field.
-> > >    * Field @hotpluggable-memory renamed
-> > >      to @hotunpluggable-memory.
-> > >    * Updated description for fields.
-> > >
-> > >  * qmp: Updated description for
-> > >    query-memory-size-summary.
-> > >
-> > >  * Patch v4 splitted into series.
-> > >
-> > > v4:
-> > >  * Commands "info memory" and "query-memory" were renamed
-> > >    to "info memory-size-summary" and "query-memory-size-summary"
-> > >    correspondingly.
-> > >  * Descriptions for both commands as well as MemoryInfo structure
-> > >    fields were updated/renamed according to
-> > >    http://lists.nongnu.org/archive/html/qemu-devel/2017-06/msg05972.html.
-> > >  * In MemoryInfo structure following fields are now optional:
-> > >    hotpluggable-memory and balloon-actual-memory.
-> > >  * Field "hotpluggable-memory" now not displayed in HMP if target
-> > >    has no CONFIG_MEM_HOTPLUG enabled.
-> > >  * Field "balloon-actual-memory" now not displayed in HMP if
-> > >    ballooning not enabled.
-> > >  * qapi_free_MemoryInfo() used in order to free corresponding memory
-> > >    instead of g_free().
-> > >  * #ifdef CONFIG_MEM_HOTPLUG was removed and replaced with stubs/ approach.
-> > >    get_exiting_hotpluggable_memory_size() function was introduced in
-> > >    hw/mem/pc-dimm.c (available for all targets which have
-> > > CONFIG_MEM_HOTPLUG
-> > >    enabled). For other targets, there is a stub in stubs/qmp_pc_dimm.c.
-> > >    In addition, stubs/qmp_pc_dimm_device_list.c was renamed to
-> > >    stubs/qmp_pc_dimm.c in order to reflect actual source file content.
-> > >  * Commit message was updated in order to reflect what was changed.
-> > >
-> > > v3:
-> > >  * Use PRIu64 instead of 'lu' when printing results via HMP.
-> > >  * Report zero hot-plugged memory instead of reporting error
-> > >    when target architecture has no CONFIG_MEM_HOTPLUG enabled.
-> > >
-> > > v2:
-> > >  * Fixed build for targets which do not have CONFIG_MEM_HOTPLUG
-> > >    enabled.
-> > >
-> > >
-> > >  
+> when it aborts vhost should print out error from vhost_verify_ring_mappings()
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>    if (r == -ENOMEM) {
+>        error_report("Unable to map %s for ring %d", part_name[j], i);           
+>    } else if (r == -EBUSY) {                                                    
+>        error_report("%s relocated for ring %d", part_name[j], i);    
+> 
+> that might give a clue where that memory stuck in.
+
+As I mentioned above, it fails here:
+
+> > > qemu-system-ppc64: used ring relocated for ring 2
+
+Regards,
+Bharata.
