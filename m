@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46487)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46513)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsVKK-0005ps-B7
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:13 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsVKM-0005rq-44
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsVKJ-0002by-Cp
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsVKI-0002b0-5r
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 10:41:14 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Thu, 14 Sep 2017 09:40:21 -0500
-Message-Id: <20170914144032.14945-10-eblake@redhat.com>
+Date: Thu, 14 Sep 2017 09:40:20 -0500
+Message-Id: <20170914144032.14945-9-eblake@redhat.com>
 In-Reply-To: <20170914144032.14945-1-eblake@redhat.com>
 References: <20170914144032.14945-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 09/20] parallels: Switch to
+Subject: [Qemu-devel] [PATCH v3 08/20] null: Switch to
  .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -21,71 +21,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Denis V. Lunev" <den@openvz.org>, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
 We are gradually moving away from sector-based interfaces, towards
-byte-based.  Update the parallels driver accordingly.  Note that
-the internal function block_status() is still sector-based, because
-it is still in use by other sector-based functions; but that's okay
-because request_alignment is 512 as a result of those functions.
-For now, no optimizations are added based on the mapping hint.
+byte-based.  Update the null driver accordingly.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Denis V. Lunev <den@openvz.org>
 
 ---
-v2: rebase to mapping parameter; it is ignored, so R-b kept
+v2: rebase to mapping parameter
 ---
- block/parallels.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+ block/null.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/block/parallels.c b/block/parallels.c
-index 2b6c6e5709..37dddfd2e9 100644
---- a/block/parallels.c
-+++ b/block/parallels.c
-@@ -278,22 +278,29 @@ static coroutine_fn int parallels_co_flush_to_os(BlockDriverState *bs)
+diff --git a/block/null.c b/block/null.c
+index dd9c13f9ba..d34c482066 100644
+--- a/block/null.c
++++ b/block/null.c
+@@ -223,22 +223,22 @@ static int null_reopen_prepare(BDRVReopenState *reopen_state,
+     return 0;
  }
 
-
--static int64_t coroutine_fn parallels_co_get_block_status(BlockDriverState *bs,
--        int64_t sector_num, int nb_sectors, int *pnum, BlockDriverState **file)
-+static int64_t coroutine_fn parallels_co_block_status(BlockDriverState *bs,
-+                                                      bool mapping,
-+                                                      int64_t offset,
-+                                                      int64_t bytes,
-+                                                      int64_t *pnum,
-+                                                      BlockDriverState **file)
+-static int64_t coroutine_fn null_co_get_block_status(BlockDriverState *bs,
+-                                                     int64_t sector_num,
+-                                                     int nb_sectors, int *pnum,
+-                                                     BlockDriverState **file)
++static int64_t coroutine_fn null_co_block_status(BlockDriverState *bs,
++                                                 bool mapping,
++                                                 int64_t offset,
++                                                 int64_t bytes, int64_t *pnum,
++                                                 BlockDriverState **file)
  {
-     BDRVParallelsState *s = bs->opaque;
--    int64_t offset;
-+    int count;
+     BDRVNullState *s = bs->opaque;
+-    off_t start = sector_num * BDRV_SECTOR_SIZE;
++    int64_t ret = BDRV_BLOCK_OFFSET_VALID | (offset & BDRV_BLOCK_OFFSET_MASK);
 
-+    assert(QEMU_IS_ALIGNED(offset | bytes, BDRV_SECTOR_SIZE));
-     qemu_co_mutex_lock(&s->lock);
--    offset = block_status(s, sector_num, nb_sectors, pnum);
-+    offset = block_status(s, offset >> BDRV_SECTOR_BITS,
-+                          bytes >> BDRV_SECTOR_BITS, &count);
-     qemu_co_mutex_unlock(&s->lock);
+-    *pnum = nb_sectors;
++    *pnum = bytes;
+     *file = bs;
 
-     if (offset < 0) {
-         return 0;
+     if (s->read_zeroes) {
+-        return BDRV_BLOCK_OFFSET_VALID | start | BDRV_BLOCK_ZERO;
+-    } else {
+-        return BDRV_BLOCK_OFFSET_VALID | start;
++        ret |= BDRV_BLOCK_ZERO;
      }
-
-+    *pnum = count * BDRV_SECTOR_SIZE;
-     *file = bs->file->bs;
--    return (offset << BDRV_SECTOR_BITS) |
-+    return (offset & BDRV_BLOCK_OFFSET_MASK) |
-         BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID;
++    return ret;
  }
 
-@@ -781,7 +788,7 @@ static BlockDriver bdrv_parallels = {
-     .bdrv_open		= parallels_open,
-     .bdrv_close		= parallels_close,
-     .bdrv_child_perm          = bdrv_format_default_perms,
--    .bdrv_co_get_block_status = parallels_co_get_block_status,
-+    .bdrv_co_block_status     = parallels_co_block_status,
-     .bdrv_has_zero_init       = bdrv_has_zero_init_1,
-     .bdrv_co_flush_to_os      = parallels_co_flush_to_os,
-     .bdrv_co_readv  = parallels_co_readv,
+ static void null_refresh_filename(BlockDriverState *bs, QDict *opts)
+@@ -270,7 +270,7 @@ static BlockDriver bdrv_null_co = {
+     .bdrv_co_flush_to_disk  = null_co_flush,
+     .bdrv_reopen_prepare    = null_reopen_prepare,
+
+-    .bdrv_co_get_block_status   = null_co_get_block_status,
++    .bdrv_co_block_status   = null_co_block_status,
+
+     .bdrv_refresh_filename  = null_refresh_filename,
+ };
+@@ -290,7 +290,7 @@ static BlockDriver bdrv_null_aio = {
+     .bdrv_aio_flush         = null_aio_flush,
+     .bdrv_reopen_prepare    = null_reopen_prepare,
+
+-    .bdrv_co_get_block_status   = null_co_get_block_status,
++    .bdrv_co_block_status   = null_co_block_status,
+
+     .bdrv_refresh_filename  = null_refresh_filename,
+ };
 -- 
 2.13.5
