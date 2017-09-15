@@ -1,33 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38755)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dsiWR-00022F-Oy
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 00:46:37 -0400
+	(envelope-from <peterx@redhat.com>) id 1dsiWT-00022c-Ht
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 00:46:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dsiWO-0002EC-Fh
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 00:46:35 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:33613)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dsiWO-0002E5-92
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 00:46:32 -0400
-Received: by mail-qt0-x242.google.com with SMTP id b1so855393qtc.0
-	for <qemu-devel@nongnu.org>; Thu, 14 Sep 2017 21:46:32 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170914183516.19537-1-richard.henderson@linaro.org>
-	<20170914183516.19537-5-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3897b0b2-8da9-8921-1380-57380e6f0879@amsat.org>
-Date: Fri, 15 Sep 2017 01:46:28 -0300
+	(envelope-from <peterx@redhat.com>) id 1dsiWQ-0002F3-Ap
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 00:46:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51178)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dsiWQ-0002E9-0f
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 00:46:34 -0400
+Date: Fri, 15 Sep 2017 12:46:22 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170915044622.GO3617@pxdev.xzpeter.org>
+References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
+	<CAJ+F1CL1CekcYq2xnrkhsjyx17FDSgppP1C+YqL0iNgv8HbwYQ@mail.gmail.com>
+	<20170914185314.GA3280@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <20170914183516.19537-5-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 04/10] disas: Support the Capstone
- disassembler library
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170914185314.GA3280@work-vm>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 00/15] QMP: out-of-band (OOB) execution
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,365 +30,340 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Hi Richard,
+On Thu, Sep 14, 2017 at 07:53:15PM +0100, Dr. David Alan Gilbert wrote:
+> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
+> > Hi
+> >=20
+> > On Thu, Sep 14, 2017 at 9:50 AM, Peter Xu <peterx@redhat.com> wrote:
+> > > This series was born from this one:
+> > >
+> > >   https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04310.ht=
+ml
+> > >
+> > > The design comes from Markus, and also the whole-bunch-of discussio=
+ns
+> > > in previous thread.  My heartful thanks to Markus, Daniel, Dave,
+> > > Stefan, etc. on discussing the topic (...again!), providing shiny
+> > > ideas and suggestions.  Finally we got such a solution that seems t=
+o
+> > > satisfy everyone.
+> > >
+> > > I re-started the versioning since this series is totally different
+> > > from previous one.  Now it's version 1.
+> > >
+> > > In case new reviewers come along the way without reading previous
+> > > discussions, I will try to do a summary on what this is all about.
+> > >
+> > > What is OOB execution?
+> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > >
+> > > It's the shortcut of Out-Of-Band execution, its name is given by
+> > > Markus.  It's a way to quickly execute a QMP request.  Say, origina=
+lly
+> > > QMP is going throw these steps:
+> > >
+> > >       JSON Parser --> QMP Dispatcher --> Respond
+> > >           /|\    (2)                (3)     |
+> > >        (1) |                               \|/ (4)
+> > >            +---------  main thread  --------+
+> > >
+> > > The requests are executed by the so-called QMP-dispatcher after the
+> > > JSON is parsed.  If OOB is on, we run the command directly in the
+> > > parser and quickly returns.
+> >=20
+> > All commands should have the "id" field mandatory in this case, else
+> > the client will not distinguish the replies coming from the last/oob
+> > and the previous commands.
+> >=20
+> > This should probably be enforced upfront by client capability checks,
+> > more below.
 
-see inlined comments.
+Hmm yes since the oob commands are actually running in async way,
+request ID should be needed here.  However I'm not sure whether
+enabling the whole "request ID" thing is too big for this "try to be
+small" oob change... And IMHO it suites better to be part of the whole
+async work (no matter which implementation we'll use).
 
-On 09/14/2017 03:35 PM, Richard Henderson wrote:
-> If configured, prefer this over our rather dated copy of the
-> GPLv2-only binutils.  This will be especially apparent with
-> the proposed vector extensions to TCG, as disas/i386.c does
-> not handle AVX.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->   include/disas/bfd.h      |  4 ++
->   include/disas/capstone.h | 38 +++++++++++++++++++
->   disas.c                  | 99 ++++++++++++++++++++++++++++++++++++++++++------
->   configure                | 17 +++++++++
->   4 files changed, 146 insertions(+), 12 deletions(-)
->   create mode 100644 include/disas/capstone.h
-> 
-> diff --git a/include/disas/bfd.h b/include/disas/bfd.h
-> index b01e002b4c..0f4ecdeb88 100644
-> --- a/include/disas/bfd.h
-> +++ b/include/disas/bfd.h
-> @@ -377,6 +377,10 @@ typedef struct disassemble_info {
->     /* Command line options specific to the target disassembler.  */
->     char * disassembler_options;
->   
-> +  /* Options for Capstone disassembly.  */
-> +  int cap_arch;
-> +  int cap_mode;
-> +
->   } disassemble_info;
->   
->   
+How about this: we make "id" mandatory for "run-oob" requests only.
+For oob commands, they will always have ID then no ordering issue, and
+we can do it async; for the rest of non-oob commands, we still allow
+them to go without ID, and since they are not oob, they'll always be
+done in order as well.  Would this work?
 
-> diff --git a/include/disas/capstone.h b/include/disas/capstone.h
-> new file mode 100644
-> index 0000000000..84e214956d
-> --- /dev/null
-> +++ b/include/disas/capstone.h
-> @@ -0,0 +1,38 @@
-> +#ifndef QEMU_CAPSTONE_H
-> +#define QEMU_CAPSTONE_H 1
-> +
-> +#ifdef CONFIG_CAPSTONE
-> +
-> +#include <capstone.h>
-> +
-> +#else
-> +
-> +/* Just enough to allow backends to init without ifdefs.  */
-> +
-> +#define CS_ARCH_ARM     -1
-> +#define CS_ARCH_ARM64   -1
-> +#define CS_ARCH_MIPS    -1
-> +#define CS_ARCH_X86     -1
-> +#define CS_ARCH_PPC     -1
-> +#define CS_ARCH_SPARC   -1
-> +#define CS_ARCH_SYSZ    -1
-> +
-> +#define CS_MODE_LITTLE_ENDIAN    0
-> +#define CS_MODE_BIG_ENDIAN       0
-> +#define CS_MODE_ARM              0
-> +#define CS_MODE_16               0
-> +#define CS_MODE_32               0
-> +#define CS_MODE_64               0
-> +#define CS_MODE_THUMB            0
-> +#define CS_MODE_MCLASS           0
-> +#define CS_MODE_V8               0
-> +#define CS_MODE_MICRO            0
-> +#define CS_MODE_MIPS3            0
-> +#define CS_MODE_MIPS32R6         0
-> +#define CS_MODE_MIPSGP64         0
-> +#define CS_MODE_V9               0
-> +#define CS_MODE_MIPS32           0
-> +#define CS_MODE_MIPS64           0
-> +
-> +#endif /* CONFIG_CAPSTONE */
-> +#endif /* QEMU_CAPSTONE_H */
-> diff --git a/disas.c b/disas.c
-> index ad675dc361..76ea76b026 100644
-> --- a/disas.c
-> +++ b/disas.c
-> @@ -6,6 +6,7 @@
->   
->   #include "cpu.h"
->   #include "disas/disas.h"
-> +#include "disas/capstone.h"
->   
->   typedef struct CPUDebug {
->       struct disassemble_info info;
-> @@ -171,6 +172,57 @@ static int print_insn_od_target(bfd_vma pc, disassemble_info *info)
->       return print_insn_objdump(pc, info, "OBJD-T");
->   }
->   
-> +static bool cap_disas(disassemble_info *info, uint64_t pc, size_t size)
+> >=20
+> > > Yeah I know in current code the parser calls dispatcher directly
+> > > (please see handle_qmp_command()).  However it's not true again aft=
+er
+> > > this series (parser will has its own IO thread, and dispatcher will
+> > > still be run in main thread).  So this OOB does brings something
+> > > different.
+> > >
+> > > There are more details on why OOB and the difference/relationship
+> > > between OOB, async QMP, block/general jobs, etc.. but IMHO that's
+> > > slightly out of topic (and believe me, it's not easy for me to
+> > > summarize that).  For more information, please refers to [1].
+> > >
+> > > Summary ends here.
+> > >
+> > > Some Implementation Details
+> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> > >
+> > > Again, I mentioned that the old QMP workflow is this:
+> > >
+> > >       JSON Parser --> QMP Dispatcher --> Respond
+> > >           /|\    (2)                (3)     |
+> > >        (1) |                               \|/ (4)
+> > >            +---------  main thread  --------+
+> > >
+> > > What this series does is, firstly:
+> > >
+> > >       JSON Parser     QMP Dispatcher --> Respond
+> > >           /|\ |           /|\       (4)     |
+> > >            |  | (2)        | (3)            |  (5)
+> > >        (1) |  +----->      |               \|/
+> > >            +---------  main thread  <-------+
+> > >
+> > > And further:
+> > >
+> > >                queue/kick
+> > >      JSON Parser =3D=3D=3D=3D=3D=3D> QMP Dispatcher --> Respond
+> > >          /|\ |     (3)       /|\        (4)    |
+> > >       (1) |  | (2)            |                |  (5)
+> > >           | \|/               |               \|/
+> > >         IO thread         main thread  <-------+
+> >=20
+> > Is the queue per monitor or per client?
 
-I'd rather use:
+The queue is currently global. I think yes maybe at least we can do it
+per monitor, but I am not sure whether that is urgent or can be
+postponed.  After all now QMPRequest (please refer to patch 11) is
+defined as (mon, id, req) tuple, so at least "id" namespace is
+per-monitor.
 
-..,, target_ulong code, ...
-> +{
+> > And is the dispatching going
+> > to be processed even if the client is disconnected, and are new
+> > clients going to receive the replies from previous clients
+> > commands?
 
-uint64_t pc = (uint64_t)code;
+[1]
 
-> +    bool ret = false;
+(will discuss together below)
 
-Isn't it cleaner to have a stubs/disas_capstone.c?
+> > I
+> > believe there should be a per-client context, so there won't be "id"
+> > request conflicts.
 
-> +#ifdef CONFIG_CAPSTONE
+I'd say I am not familiar with this "client" idea, since after all
+IMHO one monitor is currently designed to mostly work with a single
+client. Say, unix sockets, telnet, all these backends are only single
+channeled, and one monitor instance can only work with one client at a
+time.  Then do we really need to add this client layer upon it?  IMHO
+the user can just provide more monitors if they wants more clients
+(and at least these clients should know the existance of the others or
+there might be problem, otherwise user2 will fail a migration, finally
+noticed that user1 has already triggered one), and the user should
+manage them well.
 
-this check here once:
+> >=20
+> > >
+> > > Then it introduced the "allow-oob" parameter in QAPI schema to defi=
+ne
+> > > commands, and "run-oob" flag to let oob-allowed command to run in t=
+he
+> > > parser.
+> >=20
+> > From a protocol point of view, I find that "run-oob" distinction per
+> > command a bit pointless. It helps with legacy client that wouldn't
+> > expect out-of-order replies if qemu were to run oob commands oob by
+> > default though.
 
-     if (info->cap_arch < 0) {
-         return false;
-     }
+After all oob somehow breaks existing rules or sync execution.  I
+thought the more important goal was at least to keep the legacy
+behaviors when adding new things, no?
 
-> +    csh handle;
+> > Clients shouldn't care about how/where a command is
+> > being queued or not. If they send a command, they want it processed a=
+s
+> > quickly as possible. However, it can be interesting to know if the
+> > implementation of the command will be able to deliver oob, so that
+> > data in the introspection could be useful.
+> >=20
+> > I would rather propose a client/server capability in qmp_capabilities=
+,
+> > call it "oob":
+> >=20
+> > This capability indicates oob commands support.
+>=20
+> The problem is indicating which commands support oob as opposed to
+> indicating whether oob is present at all.  Future versions will
+> probably make more commands oob-able and a client will want to know
+> whether it can rely on a particular command being non-blocking.
 
-     cs_err err;
+Yes.
 
-> +    cs_insn *insn;
-> +    uint8_t *buf;
-> +    const uint8_t *cbuf;
-> +    uint64_t pc_start;
-> +    cs_mode cap_mode = info->cap_mode;
-> +
-> +    cap_mode += (info->endian == BFD_ENDIAN_BIG ? CS_MODE_BIG_ENDIAN
-> +                 : CS_MODE_LITTLE_ENDIAN);
-> +
+And IMHO we don't urgently need that "whether the server globally
+supports oob" thing.  Client can just know that from query-qmp-schema
+already - there will always be the "allow-oob" new field for command
+typed entries.  IMHO that's a solid hint.
 
-     assert(size); ?
+But I don't object to return it as well in qmp_capabilities.
 
-> +    if (cs_open(info->cap_arch, cap_mode, &handle) != CS_ERR_OK) {
+>=20
+> > An oob command is a regular client message request with the "id"
+> > member mandatory, but the reply may be delivered
+> > out of order by the server if the client supports
+> > it too.
+> >=20
+> > If both the server and the client have the "oob" capability, the
+> > server can handle new client requests while previous requests are bei=
+ng
+> > processed.
+> >=20
+> > If the client doesn't have the "oob" capability, it may still call
+> > an oob command, and make multiple outstanding calls. In this case,
+> > the commands are processed in order, so the replies will also be in
+> > order. The "id" member isn't mandatory in this case.
+> >=20
+> > The client should match the replies with the "id" member associated
+> > with the requests.
+> >=20
+> > When a client is disconnected, the pending commands are not
+> > necessarily cancelled. But the future clients will not get replies fr=
+om
+> > commands they didn't make (they might, however, receive side-effects
+> > events).
+>=20
+> What's the behaviour on the current monitor?
 
-     err = cs_open(info->cap_arch, cap_mode, &handle);
-     if (err != CS_ERR_OK) {
-         (*info->fprintf_func)(info->stream, "Capstone: %s\n",
-                               cs_strerror(err));
+Yeah I want to ask the same question, along with questioning about
+above [1].
 
-> +        goto err0;
-> +    }
-> +
-> +    /* ??? There probably ought to be a better place to put this.  */
+IMHO this series will not change the behaviors of these, so IMHO the
+behaviors will be the same before/after this series. E.g., when client
+dropped right after the command is executed, I think we will still
+execute the command, though we should encounter something odd in
+monitor_json_emitter() somewhere when we want to respond.  And it will
+happen the same after this series.
 
-looks fine.
+>=20
+>=20
+> > Note that without "oob" support, a client may still receive
+> >  messages (or events) from the server between the time a
+> > request is handled by the server and the reply is received. It must
+> > thus be prepared to handle dispatching both events and reply after
+> > sending a request.
+> >=20
+> >=20
+> > (see also https://lists.gnu.org/archive/html/qemu-devel/2017-01/msg03=
+641.html)
+> >=20
+> >=20
+> > > The last patch enables this for "migrate-incoming" command.
+> > >
+> > > Please review.  Thanks.
+> > >
+> > > [1] https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04310.=
+html
+> > >
+> > > Peter Xu (15):
+> > >   char-io: fix possible race on IOWatchPoll
+> > >   qobject: allow NULL for qstring_get_str()
+> > >   qobject: introduce qobject_to_str()
+> > >   monitor: move skip_flush into monitor_data_init
+> > >   qjson: add "opaque" field to JSONMessageParser
+> > >   monitor: move the cur_mon hack deeper for QMP
+> > >   monitor: unify global init
+> > >   monitor: create IO thread
+> > >   monitor: allow to use IO thread for parsing
+> > >   monitor: introduce monitor_qmp_respond()
+> > >   monitor: separate QMP parser and dispatcher
+> >=20
+> > There should be a limit in the number of requests the thread can
+> > queue. Before the patch, the limit was enforced by system socket
+> > buffering I think. Now, should oob commands still be processed even i=
+f
+> > the queue is full? If so, the thread can't be suspended.
+>=20
+> I think the previous discussion was expecting a pair of queues
+> per client and perhaps a pair of central queues; each pair being
+> for normal command and oob commands.
+> (I'm not expecting these queues to be deep; IMHO '1' is the
+> right size for this type of queue in both cases).
 
-> +    if (info->cap_arch == CS_ARCH_X86) {
-> +        /* We don't care about errors (if for some reason the library
-> +           is compiled without AT&T syntax); the user will just have
-> +           to deal with the Intel syntax.  */
-> +        cs_option(handle, CS_OPT_SYNTAX, CS_OPT_SYNTAX_ATT);
-> +    }
-> +
-> +    insn = cs_malloc(handle);
-> +    if (insn == NULL) {
-> +        goto err1;
-> +    }
-> +
-> +    cbuf = buf = g_malloc(size);
+Yes.  One thing to mention is that, if we see the graph above, I
+didn't really introduce two queues (input/output), but only one input
+queue.  The response is still handled in dispatcher for now, since I
+think that's quite enough at least for OOB, and I didn't see much
+benefit now to split that 2nd queue.
 
-     if (buf == NULL) {
-         goto err2;
-     }
+So I am thinking whether we can just quickly respond an event when the
+queue is full, as I proposed in the other reply.
 
-> +    info->read_memory_func(pc, buf, size, info);
-> +
-> +    pc_start = pc;
-> +    while (cs_disasm_iter(handle, &cbuf, &size, &pc, insn)) {
-> +        (*info->fprintf_func)(info->stream,
-> +                              "0x%08" PRIx64 ":  %-12s %s\n",
-> +                              pc_start, insn->mnemonic, insn->op_str);
-> +        pc_start = pc;
-> +    }
-> +    ret = true;
-> +
+Regarding to queue size: I am afraid max_size=3D1 may not suffice?
+Otherwise a simple batch of:
 
-     cs_free(insn, 1);
-err2:
+{"execute": "query-status"} {"execute": "query-status"}
 
-> +    g_free(buf);
-> + err1:
-> +    cs_close(&handle);
-> + err0:
-> +#endif /* CONFIG_CAPSTONE */
-> +    return ret;
-> +}
-> +
->   /* Disassemble this for me please... (debugging).  */
->   void target_disas(FILE *out, CPUState *cpu, target_ulong code,
->                     target_ulong size)
-> @@ -188,6 +240,8 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
->       s.info.buffer_vma = code;
->       s.info.buffer_length = size;
->       s.info.print_address_func = generic_print_address;
-> +    s.info.cap_arch = -1;
-> +    s.info.cap_mode = 0;
->   
->   #ifdef TARGET_WORDS_BIGENDIAN
->       s.info.endian = BFD_ENDIAN_BIG;
-> @@ -199,6 +253,10 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
->           cc->disas_set_info(cpu, &s.info);
->       }
->   
-> +    if (s.info.cap_arch >= 0 && cap_disas(&s.info, code, size)) {
-> +        return;
-> +    }
-> +
->       if (s.info.print_insn == NULL) {
->           s.info.print_insn = print_insn_od_target;
->       }
-> @@ -206,18 +264,6 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
->       for (pc = code; size > 0; pc += count, size -= count) {
->   	fprintf(out, "0x" TARGET_FMT_lx ":  ", pc);
->   	count = s.info.print_insn(pc, &s.info);
-> -#if 0
-> -        {
-> -            int i;
-> -            uint8_t b;
-> -            fprintf(out, " {");
-> -            for(i = 0; i < count; i++) {
-> -                target_read_memory(pc + i, &b, 1, &s.info);
-> -                fprintf(out, " %02x", b);
-> -            }
-> -            fprintf(out, " }");
-> -        }
-> -#endif
->   	fprintf(out, "\n");
->   	if (count < 0)
->   	    break;
-> @@ -245,6 +291,8 @@ void disas(FILE *out, void *code, unsigned long size)
->       s.info.buffer = code;
->       s.info.buffer_vma = (uintptr_t)code;
->       s.info.buffer_length = size;
-> +    s.info.cap_arch = -1;
-> +    s.info.cap_mode = 0;
->   
->   #ifdef HOST_WORDS_BIGENDIAN
->       s.info.endian = BFD_ENDIAN_BIG;
-> @@ -256,21 +304,34 @@ void disas(FILE *out, void *code, unsigned long size)
->   #elif defined(__i386__)
->       s.info.mach = bfd_mach_i386_i386;
->       print_insn = print_insn_i386;
-> +    s.info.cap_arch = CS_ARCH_X86;
-> +    s.info.cap_mode = CS_MODE_32;
->   #elif defined(__x86_64__)
->       s.info.mach = bfd_mach_x86_64;
->       print_insn = print_insn_i386;
-> +    s.info.cap_arch = CS_ARCH_X86;
-> +    s.info.cap_mode = CS_MODE_64;
->   #elif defined(_ARCH_PPC)
->       s.info.disassembler_options = (char *)"any";
->       print_insn = print_insn_ppc;
-> +    s.info.cap_arch = CS_ARCH_PPC;
-> +# ifdef _ARCH_PPC64
-> +    s.info.cap_mode = CS_MODE_64;
-> +# endif
->   #elif defined(__aarch64__) && defined(CONFIG_ARM_A64_DIS)
->       print_insn = print_insn_arm_a64;
-> +    s.info.cap_arch = CS_ARCH_ARM64;
->   #elif defined(__alpha__)
->       print_insn = print_insn_alpha;
->   #elif defined(__sparc__)
->       print_insn = print_insn_sparc;
->       s.info.mach = bfd_mach_sparc_v9b;
-> +    s.info.cap_arch = CS_ARCH_SPARC;
-> +    s.info.cap_mode = CS_MODE_V9;
->   #elif defined(__arm__)
->       print_insn = print_insn_arm;
-> +    s.info.cap_arch = CS_ARCH_ARM;
-> +    /* TCG only generates code for arm mode.  */
->   #elif defined(__MIPSEB__)
->       print_insn = print_insn_big_mips;
->   #elif defined(__MIPSEL__)
-> @@ -279,9 +340,15 @@ void disas(FILE *out, void *code, unsigned long size)
->       print_insn = print_insn_m68k;
->   #elif defined(__s390__)
->       print_insn = print_insn_s390;
-> +    s.info.cap_arch = CS_ARCH_SYSZ;
->   #elif defined(__hppa__)
->       print_insn = print_insn_hppa;
->   #endif
-> +
-> +    if (s.info.cap_arch >= 0 && cap_disas(&s.info, (uintptr_t)code, size)) {
+Will trigger the failure.  But I definitely agree it should not be
+something very large.  The total memory will be this:
 
-(target_ulong)(uintptr_t)code, ?
+  json limit * queue length limit * monitor count limit
+      (X)            (Y)                    (Z)
 
-> +        return;
-> +    }
-> +
->       if (print_insn == NULL) {
->           print_insn = print_insn_od_host;
->       }
-> @@ -357,6 +424,14 @@ void monitor_disas(Monitor *mon, CPUState *cpu,
->           cc->disas_set_info(cpu, &s.info);
->       }
->   
-> +    /* ??? Capstone requires that we copy the data into a host-addressable
-> +       buffer first and has no call-back to read more.  Therefore we need
-> +       an estimate of buffer size.  This will work for most RISC, but we'll
-> +       need to figure out something else for variable-length ISAs.  */
-> +    if (s.info.cap_arch >= 0 && cap_disas(&s.info, pc, 4 * nb_insn)) {
+Now we have (X) already (in form of a few tunables for JSON token
+counts, etc.), we don't have (Z), and we definitely need (Y).
 
-.., MIN(16 * nb_insn, TARGET_PAGE_SIZE))) ?
+How about we add limits on Y=3D16 and Z=3D8?
 
-> +        return;
-> +    }
-> +
->       if (!s.info.print_insn) {
->           monitor_printf(mon, "0x" TARGET_FMT_lx
->                          ": Asm output not supported on this arch\n", pc);
-> diff --git a/configure b/configure
-> index fd7e3a5e81..a55a8eda8a 100755
-> --- a/configure
-> +++ b/configure
-> @@ -366,6 +366,7 @@ opengl_dmabuf="no"
->   cpuid_h="no"
->   avx2_opt="no"
->   zlib="yes"
-> +capstone=""
->   lzo=""
->   snappy=""
->   bzip2=""
-> @@ -4381,6 +4382,18 @@ EOF
->   fi
->   
->   ##########################################
-> +# capstone
-> +
-> +if test "$capstone" != no; then
-> +  capstone=no
-> +  if $pkg_config capstone; then
-> +    capstone=yes
-> +    QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags capstone)"
-> +    LDFLAGS="$LDFLAGS $($pkg_config --libs capstone)"
-> +  fi
-> +fi
-> +
-> +##########################################
->   # check if we have fdatasync
->   
->   fdatasync=no
-> @@ -5402,6 +5415,7 @@ echo "jemalloc support  $jemalloc"
->   echo "avx2 optimization $avx2_opt"
->   echo "replication support $replication"
->   echo "VxHS block device $vxhs"
-> +echo "capstone          $capstone"
->   
->   if test "$sdl_too_old" = "yes"; then
->   echo "-> Your SDL version is too old - please upgrade to have SDL support"
-> @@ -6050,6 +6064,9 @@ fi
->   if test "$ivshmem" = "yes" ; then
->     echo "CONFIG_IVSHMEM=y" >> $config_host_mak
->   fi
-> +if test "$capstone" = "yes" ; then
-> +  echo "CONFIG_CAPSTONE=y" >> $config_host_mak
-> +fi
->   
->   # Hold two types of flag:
->   #   CONFIG_THREAD_SETNAME_BYTHREAD  - we've got a way of setting the name on
-> 
+We can do some math if we want some more exact number though.
+
+>=20
+> Dave
+>=20
+> > >   monitor: enable IO thread for (qmp & !mux) typed
+> > >   qapi: introduce new cmd option "allow-oob"
+> > >   qmp: support out-of-band (oob) execution
+> > >   qmp: let migrate-incoming allow out-of-band
+> > >
+> > >  chardev/char-io.c                |  15 ++-
+> > >  docs/devel/qapi-code-gen.txt     |  51 ++++++-
+> > >  include/monitor/monitor.h        |   2 +-
+> > >  include/qapi/qmp/dispatch.h      |   2 +
+> > >  include/qapi/qmp/json-streamer.h |   8 +-
+> > >  include/qapi/qmp/qstring.h       |   1 +
+> > >  monitor.c                        | 283 +++++++++++++++++++++++++++=
+++++--------
+> > >  qapi/introspect.json             |   6 +-
+> > >  qapi/migration.json              |   3 +-
+> > >  qapi/qmp-dispatch.c              |  34 +++++
+> > >  qga/main.c                       |   5 +-
+> > >  qobject/json-streamer.c          |   7 +-
+> > >  qobject/qjson.c                  |   5 +-
+> > >  qobject/qstring.c                |  13 +-
+> > >  scripts/qapi-commands.py         |  19 ++-
+> > >  scripts/qapi-introspect.py       |  10 +-
+> > >  scripts/qapi.py                  |  15 ++-
+> > >  scripts/qapi2texi.py             |   2 +-
+> > >  tests/libqtest.c                 |   5 +-
+> > >  tests/qapi-schema/test-qapi.py   |   2 +-
+> > >  trace-events                     |   2 +
+> > >  vl.c                             |   3 +-
+> > >  22 files changed, 398 insertions(+), 95 deletions(-)
+> > >
+> > > --
+> > > 2.7.4
+> > >
+> >=20
+> >=20
+> >=20
+> > --=20
+> > Marc-Andr=C3=A9 Lureau
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
+--=20
+Peter Xu
