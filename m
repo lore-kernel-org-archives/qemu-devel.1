@@ -1,26 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56259)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56289)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dsmsw-0001Cw-GR
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:26:07 -0400
+	(envelope-from <otubo@redhat.com>) id 1dsmt8-0001Ly-8S
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:26:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dsmss-0003sj-Gk
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:26:06 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45222)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dsmss-0003sF-7u
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:26:02 -0400
-References: <20170915084030.40988-1-aik@ozlabs.ru>
-	<20170915084030.40988-12-aik@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <165a7fa9-6ebb-3e95-2d95-7df2f550f1de@redhat.com>
-Date: Fri, 15 Sep 2017 11:25:59 +0200
+	(envelope-from <otubo@redhat.com>) id 1dsmt4-0003xR-Aq
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:26:18 -0400
+Date: Fri, 15 Sep 2017 11:26:07 +0200
+From: Eduardo Otubo <otubo@redhat.com>
+Message-ID: <20170915092607.GA6835@vader>
+References: <20170915090643.6043-1-otubo@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170915084030.40988-12-aik@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu v2 11/13] memory: Share FlatView's and
- dispatch trees between address spaces
+Content-Disposition: inline
+In-Reply-To: <20170915090643.6043-1-otubo@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] dma/i82374: avoid double
+ creation of i82374 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,106 +23,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, pbonzini@redhat.com
 
-On 15/09/2017 10:40, Alexey Kardashevskiy wrote:
-> +
-> +static bool flatview_can_share(FlatView *old_view, FlatView *new_view)
-> +{
-> +    MemoryRegion *old_root =3D memory_region_unalias_entire(old_view->=
-root);
-> +    MemoryRegion *new_root =3D memory_region_unalias_entire(new_view->=
-root);
-> +
-> +    if (old_root =3D=3D new_root) {
-> +        return true;
-> +    }
-> +
-> +    if (!old_root->enabled && !new_root->enabled) {
-> +        return true;
-> +    }
-> +
-> +    return false;
-> +}
-> +
+(oups, forgot the v2 on Subject)
 
-I think you can improve this by keeping the root in the address space
-(removing the previous patch).  Instead, the FlatView's root can be the
-one with resolved aliases.  Then old_root is just old_view->root, and if
-an empty FlatView has a NULL root this just becomes
-
-   the_other_view->root =3D=3D memory_region_unalias_entire(as->root);
-
->=20
-> +
-> +    /* Build list of unique FlatViews, FV::root is the key */
-> +    QTAILQ_FOREACH(old_view, &flat_views, flat_views_link) {
-> +        found =3D false;
-> +        QTAILQ_FOREACH(new_view, &fvs_tmp, flat_views_link) {
-> +            if (flatview_can_share(old_view, new_view)) {
-> +                found =3D true;
-> +                break;
-> +            }
-> +        }
-> +        if (found) {
-> +            continue;
-> +        }
-> +
-> +        new_view =3D generate_memory_topology(old_view->root);
-> +        flatview_render_new(old_view, new_view);
-> +        QTAILQ_INSERT_TAIL(&fvs_tmp, new_view, flat_views_link);
-> +    }
-
-I don't understand the algorithm here.  Why is it visiting &flat_views
-rather than the list of address spaces?  I would have thought it enough
-to do
-
-   for each address space
-        if there is a (new) flat view that we can share
-            add a reference
-        else
-            render a new flat view and add it to fvs_tmp
-
-   flat_views =3D fvs_tmp;
-
-   for each address space
-        old_view =3D address_space_to_flatview(as);
-        find the new flat view to use in fvs_tmp
-        address_space_update_topology_pass(..., false);
-        address_space_update_topology_pass(..., true);
-        QTAILQ_REMOVE(&old_view->address_spaces, ...);
-        atomic_rcu_set(&as->current_map, new_view);
-        flatview_unref(old_view);
-        QTAILQ_INSERT_TAIL(&new_view->address_spaces, ...);
-
-
-It's also not clear to me what you need the FlatView's address_spaces
-list for.  (It's probably something trivial that I'm missing, or maybe
-it goes away with the previous change).
-
->=20
->  AddressSpace *address_space_init_shareable(MemoryRegion *root, const c=
-har *name)
->  {
->      AddressSpace *as;
-> =20
-> -    QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
-> -        if (root =3D=3D address_space_root(as) && as->malloced) {
-> -            as->ref_count++;
-> -            return as;
-> -        }
-> -    }
-> -
->      as =3D g_malloc0(sizeof *as);
->      address_space_init(as, root, name);
-> -    as->malloced =3D true;
-> +
->      return as;
+On Fri, Sep 15, 2017 at 11:06:43AM +0200, Eduardo Otubo wrote:
+> QEMU fails when used with the following command line:
+> 
+>   ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
+>   qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
+>   Aborted (core dumped)
+> 
+> The 40p machine type already creates the device i82374. If specified in the
+> command line, it will try to create it again, hence generating the error. The
+> function isa_bus_dma() isn't supposed to be called twice for the same bus. One
+> way to avoid this problem is to set user_creatable=false.
+> 
+> A possible fix in a near future would be making
+> isa_bus_dma()/DMA_init()/i82374_realize() return an error instead of asserting
+> as well.
+> 
+> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> ---
+>  hw/dma/i82374.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
+> index 6c0f975df0..e76dea8dc7 100644
+> --- a/hw/dma/i82374.c
+> +++ b/hw/dma/i82374.c
+> @@ -139,6 +139,11 @@ static void i82374_class_init(ObjectClass *klass, void *data)
+>      dc->realize = i82374_realize;
+>      dc->vmsd = &vmstate_i82374;
+>      dc->props = i82374_properties;
+> +    dc->user_creatable = false;
+> +    /*
+> +     * Reason: i82374_realize() crashes (assertion failure inside isa_bus_dma()
+> +     *         if the device is instantiated twice.
+> +     */
 >  }
-> =20
+>  
+>  static const TypeInfo i82374_info = {
+> -- 
+> 2.13.5
+> 
+> 
 
-This belongs in the next patch; leaving as->malloced in
-do_address_space_destroy and the reference count in
-address_space_destroy is not a big complication.
-
-Paolo
+-- 
+Eduardo Otubo
+Senior Software Engineer @ RedHat
