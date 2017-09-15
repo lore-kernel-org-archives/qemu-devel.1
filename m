@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dsuaz-0003qv-KK
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:40:06 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsufS-0006NH-5W
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:44:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dsuay-0005LM-IV
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:40:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49774)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dsuay-0005LE-CS
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:40:04 -0400
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Date: Fri, 15 Sep 2017 18:39:50 +0100
-Message-Id: <20170915173950.21404-2-stefanha@redhat.com>
-In-Reply-To: <20170915173950.21404-1-stefanha@redhat.com>
-References: <20170915173950.21404-1-stefanha@redhat.com>
+	(envelope-from <eblake@redhat.com>) id 1dsufR-0007W2-88
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:44:42 -0400
+References: <20170915101008.16646-1-kwolf@redhat.com>
+	<20170915101008.16646-2-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f2b847ce-acab-dfa8-0cbe-6f647c2d88ca@redhat.com>
+Date: Fri, 15 Sep 2017 12:44:30 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 1/1] trace: Immediately apply per-vCPU state
- changes if a vCPU is being created
+In-Reply-To: <20170915101008.16646-2-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="Qxc8mv9OVlC4d4v63rpeRUj36IOXqfkm3"
+Subject: Re: [Qemu-devel] [PATCH 1/6] qemu-io: Reset qemuio_blk permissions
+ before each command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +25,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
-From: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Qxc8mv9OVlC4d4v63rpeRUj36IOXqfkm3
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Message-ID: <f2b847ce-acab-dfa8-0cbe-6f647c2d88ca@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/6] qemu-io: Reset qemuio_blk permissions
+ before each command
+References: <20170915101008.16646-1-kwolf@redhat.com>
+ <20170915101008.16646-2-kwolf@redhat.com>
+In-Reply-To: <20170915101008.16646-2-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Right now, function trace_event_set_vcpu_state_dynamic() asynchronously e=
-nables
-events in the case a vCPU is executing TCG code. If the vCPU is being cre=
-ated
-this makes some events like "guest_cpu_enter" to not be traced.
+On 09/15/2017 05:10 AM, Kevin Wolf wrote:
+> qemu-io provides a 'reopen' command that allows switching from writable=
 
-Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-Reviewed-by: Emilio G. Cota <cota@braap.org>
-Message-id: 150525662577.19850.13767570977540117247.stgit@frigg.lan
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- trace/control-target.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+> to read-only access. We need to make sure that we don't try to keep
+> write permissions to a BlockBackend that becomes read-only, otherwise
+> things are going to fail.
+>=20
+> command() already makes sure to request any additional permissions that=
 
-diff --git a/trace/control-target.c b/trace/control-target.c
-index 4e36101997..706b2cee9d 100644
---- a/trace/control-target.c
-+++ b/trace/control-target.c
-@@ -88,13 +88,17 @@ void trace_event_set_vcpu_state_dynamic(CPUState *vcp=
-u,
-             clear_bit(vcpu_id, vcpu->trace_dstate_delayed);
-             (*ev->dstate)--;
-         }
--        /*
--         * Delay changes until next TB; we want all TBs to be built from=
- a
--         * single set of dstate values to ensure consistency of generate=
-d
--         * tracing code.
--         */
--        async_run_on_cpu(vcpu, trace_event_synchronize_vcpu_state_dynami=
-c,
--                         RUN_ON_CPU_NULL);
-+        if (vcpu->created) {
-+            /*
-+             * Delay changes until next TB; we want all TBs to be built =
-from a
-+             * single set of dstate values to ensure consistency of gene=
-rated
-+             * tracing code.
-+             */
-+            async_run_on_cpu(vcpu, trace_event_synchronize_vcpu_state_dy=
-namic,
-+                             RUN_ON_CPU_NULL);
-+        } else {
-+            trace_event_synchronize_vcpu_state_dynamic(vcpu, RUN_ON_CPU_=
-NULL);
-+        }
-     }
- }
-=20
+> a qemu-io command requires, so just resetting the permissions to values=
+
+> that are safe for read-only images is enough to fix this.
+>=20
+> As a side effect, this makes the output of qemu-iotests case 187 more
+> consistent.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qemu-io.c                  | 13 +++++++++++++
+>  tests/qemu-iotests/187.out |  2 +-
+>  2 files changed, 14 insertions(+), 1 deletion(-)
+>=20
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
 --=20
-2.13.5
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--Qxc8mv9OVlC4d4v63rpeRUj36IOXqfkm3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm8EX4ACgkQp6FrSiUn
+Q2rZxAf9EkZPUbyy7FueIIoxJNvMEy9gRzlCCHTGoEvWEM7DrgI97ESUhs0SPHgN
+4uRAIJv27bHzGB4pHmEf45lacYfblX+87q0uqfJvl38qlZuPG7pyNxJOgp1kMc2E
+CdI6zf4TLuYeg0NcREkkicEezAg5jllkqYueyAZQSKHTrFaB8K2y9BKvQxjoQWVJ
+AFe8qG4rjsKJQ+srR0ZOTYARIw0NUrTsmJA4zUy8OI+3UkirvRfISjDypm2qJiJT
+J4J5cztae0S00VR415q5iVHAxATl1UTE9ycNrVH1xb0uWz8LySH946GOScC6kkew
+SlplsB52Qf2CNSdWGz7IAGoZuj6YBA==
+=gUlW
+-----END PGP SIGNATURE-----
+
+--Qxc8mv9OVlC4d4v63rpeRUj36IOXqfkm3--
