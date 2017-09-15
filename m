@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53574)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jdenemar@redhat.com>) id 1dslW2-0005lP-5b
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:58:23 -0400
+	(envelope-from <peterx@redhat.com>) id 1dslWm-00067J-FZ
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:59:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jdenemar@redhat.com>) id 1dslVy-0007Bf-9x
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:58:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47830)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jdenemar@redhat.com>) id 1dslVy-0007A6-4K
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:58:18 -0400
-Date: Fri, 15 Sep 2017 09:58:14 +0200
-From: Jiri Denemark <jdenemar@redhat.com>
-Message-ID: <20170915075814.GC5256@orkuz.home>
-References: <CADak6y79L+eUYg3LmO2MGTf5BKxHZ8rG5zHBJ9UKPhKHNxsFkQ@mail.gmail.com>
+	(envelope-from <peterx@redhat.com>) id 1dslWi-0007RA-Jf
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:59:08 -0400
+Date: Fri, 15 Sep 2017 15:58:57 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170915075857.GR3617@pxdev.xzpeter.org>
+References: <20170915054404.19914-1-famz@redhat.com>
+	<20170915054404.19914-2-famz@redhat.com>
+	<20170915064132.GP3617@pxdev.xzpeter.org>
+	<20170915064907.GD17199@lemon>
+	<20170915065627.GQ3617@pxdev.xzpeter.org>
+	<20170915070232.GF17199@lemon>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CADak6y79L+eUYg3LmO2MGTf5BKxHZ8rG5zHBJ9UKPhKHNxsFkQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] host doesn't support requested feature:
- CPUID.01H:EDX.ds [bit 21] Does this warn affect virtual machine performance
- or use?
+In-Reply-To: <20170915070232.GF17199@lemon>
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Allow ram_save_cleanup to
+ be called with empty state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,43 +28,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paul Schlacter <wlfightup@gmail.com>
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org
 
-On Thu, Sep 14, 2017 at 20:48:49 +0800, Paul Schlacter wrote:
-> this is my stackoverflow question:
-> https://stackoverflow.com/questions/46219552/host-doesnt-support-requested-feature-cpuid-01hedx-ds-bit-21-does-this-warn
+On Fri, Sep 15, 2017 at 03:02:32PM +0800, Fam Zheng wrote:
+> On Fri, 09/15 14:56, Peter Xu wrote:
+> > On Fri, Sep 15, 2017 at 02:49:07PM +0800, Fam Zheng wrote:
+> > > On Fri, 09/15 14:41, Peter Xu wrote:
+> > > > On Fri, Sep 15, 2017 at 01:44:02PM +0800, Fam Zheng wrote:
+> > > > > So that we can do cleanup unconditionally at the end of main().
+> > > > > 
+> > > > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > > > > ---
+> > > > >  migration/ram.c | 3 +++
+> > > > >  1 file changed, 3 insertions(+)
+> > > > > 
+> > > > > diff --git a/migration/ram.c b/migration/ram.c
+> > > > > index e18b3e2d4f..37e6a71241 100644
+> > > > > --- a/migration/ram.c
+> > > > > +++ b/migration/ram.c
+> > > > > @@ -1365,6 +1365,9 @@ static void ram_save_cleanup(void *opaque)
+> > > > >      RAMState **rsp = opaque;
+> > > > >      RAMBlock *block;
+> > > > >  
+> > > > > +    if (!rsp || !*rsp) {
+> > > > > +        return;
+> > > > > +    }
+> > > > >      /* caller have hold iothread lock or is in a bh, so there is
+> > > > >       * no writing race against this migration_bitmap
+> > > > >       */
+> > > > > -- 
+> > > > > 2.13.5
+> > > > > 
+> > > > 
+> > > > Instead of take special care on RAM, how about check in
+> > > > migrate_fd_cancel(), and return directly if migration_is_idle()?
+> > > 
+> > > This is not from migrate_fd_cancel(), but from qemu_savevm_state_cleanup(), so
+> > > that doesn't work.
+> > 
+> > Yeh I see the point.  But my logic still stands - we don't need to
+> > cleanup anything if the migration is not really there.
+> > 
+> > I'm thinking whether we can put qemu_savevm_state_cleanup() into
+> > migrate_fd_cancel() in some way, though I am still not 100% sure on
+> > the colo part.  Anyway, I feel like a bit confusing we have two
+> > cleanup functions.
 > 
-> 
-> I found a lot of warning from the VM qemu log, Does this warn affect
-> virtual machine performance or use? , is my libvirt.xml file problem? Or
-> support hot-plug will have these warnings
-> 
-> This is my libvirt xml configuration:
-> 
-> <domain type='kvm' id='315'>
-...
->   <cpu mode='host-model'>
->     <model fallback='allow'/>
->     <numa>
->       <cell id='0' cpus='0-1' memory='2097152' unit='KiB'/>
->     </numa>
->   </cpu>
-...
-> 2017-09-14T12:16:03.441702Z qemu-kvm: warning: CPU(s) not present in
-> any NUMA nodes: 2 3 4 5 6 7
-> 2017-09-14T12:16:03.441773Z qemu-kvm: warning: All CPU(s) up to
-> maxcpus should be described in NUMA config
-> warning: host doesn't support requested feature: CPUID.01H:EDX.ds [bit 21]
-> warning: host doesn't support requested feature: CPUID.01H:EDX.acpi [bit 22]
-> warning: host doesn't support requested feature: CPUID.01H:EDX.ht [bit 28]
-> warning: host doesn't support requested feature: CPUID.01H:EDX.tm [bit 29]
-...
+> I agree, but I don't know what is the best way to clean this up: savevm and
+> migration seem a little independent from each other.
 
-Similar warnings are expected with host-model CPUs on older libvirt
-which didn't know how to ask QEMU what CPU features are supported on the
-host. Thus libvirt just used CPUID and asked for everything and QEMU
-filtered a lot of them. You need a recent QEMU and libvirt to avoid
-these warnings.
+After a 2nd thought I think this single patch is ok, at least it
+allows qemu_savevm_state_cleanup() to be run without caring much about
+migration state.  So:
 
-Jirka
+Reviewed-by: Peter Xu <peterx@redhat.com>
+
+Thanks,
+
+-- 
+Peter Xu
