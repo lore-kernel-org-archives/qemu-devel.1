@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41992)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dsqTc-0002gn-KF
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:16:16 -0400
+	(envelope-from <groug@kaod.org>) id 1dsqTk-0002ni-Du
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:16:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dsqTY-0003sW-K4
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:16:12 -0400
-Received: from 7.mo2.mail-out.ovh.net ([188.165.48.182]:37196)
+	(envelope-from <groug@kaod.org>) id 1dsqTg-0003vx-CH
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:16:20 -0400
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:45929)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dsqTY-0003sG-D0
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:16:08 -0400
+	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dsqTg-0003ve-61
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:16:16 -0400
 Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id AB816A9AE1
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 15:16:05 +0200 (CEST)
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 3174BA9D56
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 15:16:15 +0200 (CEST)
 From: Greg Kurz <groug@kaod.org>
-Date: Fri, 15 Sep 2017 15:16:01 +0200
-Message-ID: <150548136111.5945.6437882724141726495.stgit@bahia.lan>
+Date: Fri, 15 Sep 2017 15:16:10 +0200
+Message-ID: <150548137066.5945.3950849052176752689.stgit@bahia.lan>
 In-Reply-To: <150548133297.5945.7401220081077343726.stgit@bahia.lan>
 References: <150548133297.5945.7401220081077343726.stgit@bahia.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 2/4] spapr: introduce helpers to migrate HPT
- chunks and the end marker
+Subject: [Qemu-devel] [PATCH 3/4] ppc/kvm: change kvmppc_get_htab_fd() to
+ return -errno on error
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,87 +33,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
 
-This consolidates some duplicated code in a single helper.
+When kvmppc_get_htab_fd() fails, its return value is propagated up to
+qemu_savevm_state_iterate() or to qemu_savevm_state_complete_precopy().
+All savevm handlers expect to receive a negative errno on error.
+
+Let's patch kvmppc_get_htab_fd() accordingly.
+
+While here, let's change htab_load() in the spapr code to also
+propagate the error, since it doesn't make sense to abort() if
+we couldn't get the htab fd from KVM.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c |   38 +++++++++++++++++++++-----------------
- 1 file changed, 21 insertions(+), 17 deletions(-)
+ hw/ppc/spapr.c   |    5 +++--
+ target/ppc/kvm.c |   10 ++++++++--
+ 2 files changed, 11 insertions(+), 4 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index f680f28a15ea..841117f6d185 100644
+index 841117f6d185..1ae79326d1ac 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1708,6 +1708,23 @@ static int htab_save_setup(QEMUFile *f, void *opaque)
-     return 0;
- }
+@@ -1218,7 +1218,7 @@ static int get_htab_fd(sPAPRMachineState *spapr)
+     spapr->htab_fd = kvmppc_get_htab_fd(false);
+     if (spapr->htab_fd < 0) {
+         error_report("Unable to open fd for reading hash table from KVM: %s",
+-                     strerror(errno));
++                     strerror(spapr->htab_fd));
+     }
  
-+static void htab_save_chunk(QEMUFile *f, sPAPRMachineState *spapr,
-+                            int chunkstart, int n_valid, int n_invalid)
-+{
-+    qemu_put_be32(f, chunkstart);
-+    qemu_put_be16(f, n_valid);
-+    qemu_put_be16(f, n_invalid);
-+    if (spapr) {
-+        qemu_put_buffer(f, HPTE(spapr->htab, chunkstart),
-+                        HASH_PTE_SIZE_64 * n_valid);
+     return spapr->htab_fd;
+@@ -1962,7 +1962,8 @@ static int htab_load(QEMUFile *f, void *opaque, int version_id)
+         fd = kvmppc_get_htab_fd(true);
+         if (fd < 0) {
+             error_report("Unable to open fd to restore KVM hash table: %s",
+-                         strerror(errno));
++                         strerror(fd));
++            return fd;
+         }
+     }
+ 
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 00d7029b8d7a..09d7dea79e2d 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2556,13 +2556,19 @@ int kvmppc_get_htab_fd(bool write)
+         .flags = write ? KVM_GET_HTAB_WRITE : 0,
+         .start_index = 0,
+     };
++    int ret;
+ 
+     if (!cap_htab_fd) {
+         fprintf(stderr, "KVM version doesn't support saving the hash table\n");
+-        return -1;
++        return -ENOTSUP;
 +    }
-+}
 +
-+static void htab_save_end_marker(QEMUFile *f)
-+{
-+    htab_save_chunk(f, NULL, 0, 0, 0);
-+}
-+
- static void htab_save_first_pass(QEMUFile *f, sPAPRMachineState *spapr,
-                                  int64_t max_ns)
- {
-@@ -1739,11 +1756,7 @@ static void htab_save_first_pass(QEMUFile *f, sPAPRMachineState *spapr,
-         if (index > chunkstart) {
-             int n_valid = index - chunkstart;
- 
--            qemu_put_be32(f, chunkstart);
--            qemu_put_be16(f, n_valid);
--            qemu_put_be16(f, 0);
--            qemu_put_buffer(f, HPTE(spapr->htab, chunkstart),
--                            HASH_PTE_SIZE_64 * n_valid);
-+            htab_save_chunk(f, spapr, chunkstart, n_valid, 0);
- 
-             if (has_timeout &&
-                 (qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - starttime) > max_ns) {
-@@ -1805,11 +1818,7 @@ static int htab_save_later_pass(QEMUFile *f, sPAPRMachineState *spapr,
-             int n_valid = invalidstart - chunkstart;
-             int n_invalid = index - invalidstart;
- 
--            qemu_put_be32(f, chunkstart);
--            qemu_put_be16(f, n_valid);
--            qemu_put_be16(f, n_invalid);
--            qemu_put_buffer(f, HPTE(spapr->htab, chunkstart),
--                            HASH_PTE_SIZE_64 * n_valid);
-+            htab_save_chunk(f, spapr, chunkstart, n_valid, n_invalid);
-             sent += index - chunkstart;
- 
-             if (!final && (qemu_clock_get_ns(QEMU_CLOCK_REALTIME) - starttime) > max_ns) {
-@@ -1872,10 +1881,7 @@ static int htab_save_iterate(QEMUFile *f, void *opaque)
-         rc = htab_save_later_pass(f, spapr, MAX_ITERATION_NS);
++    ret = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &s);
++    if (ret < 0) {
++        return -errno;
      }
  
--    /* End marker */
--    qemu_put_be32(f, 0);
--    qemu_put_be16(f, 0);
--    qemu_put_be16(f, 0);
-+    htab_save_end_marker(f);
- 
-     return rc;
+-    return kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &s);
++    return ret;
  }
-@@ -1915,9 +1921,7 @@ static int htab_save_complete(QEMUFile *f, void *opaque)
-     }
  
-     /* End marker */
--    qemu_put_be32(f, 0);
--    qemu_put_be16(f, 0);
--    qemu_put_be16(f, 0);
-+    htab_save_end_marker(f);
- 
-     return 0;
- }
+ int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns)
