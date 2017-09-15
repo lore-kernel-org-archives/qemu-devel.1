@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40215)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsv7R-0004cz-UX
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:13:38 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dsvBh-0008FW-Pr
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:18:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsv7R-0001Xl-2A
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:13:37 -0400
-References: <20170915054526.20588-1-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0289d143-4862-e812-3f5d-0a0bc74a05e7@redhat.com>
-Date: Fri, 15 Sep 2017 13:13:26 -0500
+	(envelope-from <no-reply@patchew.org>) id 1dsvBg-0003DU-Ip
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:18:01 -0400
+Resent-Message-Id: <E1dsvBg-0003DU-Ip@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21471)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dsvBg-0003DJ-AR
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:18:00 -0400
+In-Reply-To: <1505498999-17427-1-git-send-email-ian.jackson@eu.citrix.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150549947282.36.16369833326552913963@69b6ddf88678>
 MIME-Version: 1.0
-In-Reply-To: <20170915054526.20588-1-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="KrILAUb8heGuRHR53LGPOXbHcs8w8af1p"
-Subject: Re: [Qemu-devel] [PATCH] iotests: Print full path of bad output if
- mismatch
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 15 Sep 2017 11:17:53 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH RFC 0/6] xen: xen-domid-restrict
+ improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +29,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: ian.jackson@eu.citrix.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, jgross@suse.com, sstabellini@kernel.org, xen-devel@nongnu.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KrILAUb8heGuRHR53LGPOXbHcs8w8af1p
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-Message-ID: <0289d143-4862-e812-3f5d-0a0bc74a05e7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] iotests: Print full path of bad output if
- mismatch
-References: <20170915054526.20588-1-famz@redhat.com>
-In-Reply-To: <20170915054526.20588-1-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/15/2017 12:45 AM, Fam Zheng wrote:
-> So it is easier to copy paste the path.
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/qemu-iotests/check | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> index d504b6e455..4583a0c269 100755
-> --- a/tests/qemu-iotests/check
-> +++ b/tests/qemu-iotests/check
-> @@ -353,7 +353,7 @@ do
->                  else
->                      echo " - output mismatch (see $seq.out.bad)"
->                      mv $tmp.out $seq.out.bad
-> -                    $diff -w "$reference" $seq.out.bad
-> +                    $diff -w "$reference" $(realpath $seq.out.bad)
-
-Realpath collapses symlinks, and $() costs a process.  Also, your patch
-fails miserably if the current working directory contains spaces; you
-forgot to quote $().  It would be simpler, and more correct, to do:
-
-$diff -w "$reference" "$PWD/$seq.out.bad"
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---KrILAUb8heGuRHR53LGPOXbHcs8w8af1p
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm8GEYACgkQp6FrSiUn
-Q2pZ4QgAqaGQdIh7r7A/e8X6rWV2IffaKw/mNgjJwv4xZ3KwYVoKopezLI4TgQDL
-efGl91ARP4R9LmgLCZ659N1SfejVcqIReCxXCGiuE8sbvKgi+a/8hR+zGh9/4MBW
-dpSMcdAj1UaU+IyJ9agK866Het2Pgb8zL7ENjvd5WkS8HBFxqzlScZsDHU7Q5EU3
-uFIXE+dL7AtztebOlM2ufFFEcxHS+JvNcvvlWuZRCF2kP2rchdQxTn5j894RFp3c
-0AAuML6DAakYfSh7HdKS025Fkl4bMKusF6CsKC5690hcbg7dqUKXmVITveJ32BYV
-kV65FS1Ajz3a/bMmXFqAqKGO+fwssA==
-=gR/j
------END PGP SIGNATURE-----
-
---KrILAUb8heGuRHR53LGPOXbHcs8w8af1p--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCBSRkMgMC82XSB4ZW46IHhlbi1kb21pZC1yZXN0cmljdCBpbXByb3ZlbWVu
+dHMKTWVzc2FnZS1pZDogMTUwNTQ5ODk5OS0xNzQyNy0xLWdpdC1zZW5kLWVtYWlsLWlhbi5qYWNr
+c29uQGV1LmNpdHJpeC5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJB
+U0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGlt
+aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0
+IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBk
+bwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZv
+cm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9z
+Y3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEK
+ICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09
+IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3
+ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkMGJmODU3ZTA2
+IG9zLXBvc2l4OiBQcm92aWRlIG5ldyAtcnVuYXNpZCBvcHRpb24KNTY5YmEwMGU4ZiB4ZW46IGRl
+c3Ryb3lfaHZtX2RvbWFpbjogVHJ5IHhlbmRldmljZW1vZGVsX3NodXRkb3duCjFlZjIzYTEyZDIg
+eGVuOiBkZXN0cm95X2h2bV9kb21haW46IE1vdmUgcmVhc29uIGludG8gYSB2YXJpYWJsZQphZjdh
+YWM0MDU1IHhlbjogcmVzdHJpY3Q6IHVzZSB4ZW50b29sY29yZV9yZXN0cmljdF9hbGwKYjg0YzQ5
+ZTQ2YSB4ZW46IGRlZmVyIGNhbGwgdG8geGVuX3Jlc3RyaWN0IHVudGlsIHJ1bm5pbmcKMjkzYjZi
+MDE0NiB4ZW46IGxpbmsgYWdhaW5zdCB4ZW50b29sY29yZQoKPT09IE9VVFBVVCBCRUdJTiA9PT0K
+Q2hlY2tpbmcgUEFUQ0ggMS82OiB4ZW46IGxpbmsgYWdhaW5zdCB4ZW50b29sY29yZS4uLgpDaGVj
+a2luZyBQQVRDSCAyLzY6IHhlbjogZGVmZXIgY2FsbCB0byB4ZW5fcmVzdHJpY3QgdW50aWwgcnVu
+bmluZy4uLgpDaGVja2luZyBQQVRDSCAzLzY6IHhlbjogcmVzdHJpY3Q6IHVzZSB4ZW50b29sY29y
+ZV9yZXN0cmljdF9hbGwuLi4KQ2hlY2tpbmcgUEFUQ0ggNC82OiB4ZW46IGRlc3Ryb3lfaHZtX2Rv
+bWFpbjogTW92ZSByZWFzb24gaW50byBhIHZhcmlhYmxlLi4uCkNoZWNraW5nIFBBVENIIDUvNjog
+eGVuOiBkZXN0cm95X2h2bV9kb21haW46IFRyeSB4ZW5kZXZpY2Vtb2RlbF9zaHV0ZG93bi4uLgpF
+UlJPUjogYnJhY2VzIHt9IGFyZSBuZWNlc3NhcnkgZm9yIGFsbCBhcm1zIG9mIHRoaXMgc3RhdGVt
+ZW50CiMyNzogRklMRTogaHcvaTM4Ni94ZW4veGVuLWh2bS5jOjEzOTU6CisgICAgICAgIGlmICgh
+cmMpClsuLi5dCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDE4IGxpbmVzIGNoZWNrZWQK
+CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
+IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
+dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBBVENIIDYv
+Njogb3MtcG9zaXg6IFByb3ZpZGUgbmV3IC1ydW5hc2lkIG9wdGlvbi4uLgpFUlJPUjogY29uc2lk
+ZXIgdXNpbmcgcWVtdV9zdHJ0b3VsIGluIHByZWZlcmVuY2UgdG8gc3RydG91bAojNDE6IEZJTEU6
+IG9zLXBvc2l4LmM6MTU5OgorICAgICAgICBsdiA9IHN0cnRvdWwob3B0YXJnLCAmZXAsIDApOwoK
+RVJST1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzQyOiBGSUxFOiBv
+cy1wb3NpeC5jOjE2MDoKKyAgICAgICAgaWYgKGVycm5vIHx8ICplcCAhPSAnLicgfHwgKHVzZXJf
+dWlkID0gbHYpICE9IGx2CgpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICcrJyAo
+Y3R4OlZ4VikKIzQ4OiBGSUxFOiBvcy1wb3NpeC5jOjE2NjoKKyAgICAgICAgbHYgPSBzdHJ0b3Vs
+KGVwKzEsICZlcCwgMCk7CiAgICAgICAgICAgICAgICAgICAgICAgIF4KCkVSUk9SOiBjb25zaWRl
+ciB1c2luZyBxZW11X3N0cnRvdWwgaW4gcHJlZmVyZW5jZSB0byBzdHJ0b3VsCiM0ODogRklMRTog
+b3MtcG9zaXguYzoxNjY6CisgICAgICAgIGx2ID0gc3RydG91bChlcCsxLCAmZXAsIDApOwoKRVJS
+T1I6IGRvIG5vdCB1c2UgYXNzaWdubWVudCBpbiBpZiBjb25kaXRpb24KIzQ5OiBGSUxFOiBvcy1w
+b3NpeC5jOjE2NzoKKyAgICAgICAgaWYgKGVycm5vIHx8ICplcCB8fCAodXNlcl9naWQgPSBsdikg
+IT0gbHYKCkVSUk9SOiBzcGFjZSByZXF1aXJlZCBhZnRlciB0aGF0ICcsJyAoY3R4Old4VikKIzUx
+OiBGSUxFOiBvcy1wb3NpeC5jOjE2OToKKyAgICAgICAgICAgIGZwcmludGYoc3RkZXJyICwiQ291
+bGQgbm90IG9idGFpbiBnaWQgZnJvbSBcIiVzXCIiLCBvcHRhcmcpOwogICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgXgoKdG90YWw6IDYgZXJyb3JzLCAwIHdhcm5pbmdzLCA3OSBsaW5lcyBjaGVj
+a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVO
+RCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVy
+YXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVh
+c2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
