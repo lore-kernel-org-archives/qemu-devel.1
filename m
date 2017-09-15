@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56491)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dt0Br-0005TB-NM
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:38:32 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dt0C0-0005Yi-GC
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:38:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dt0Bq-0001sE-RM
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:38:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52232)
+	(envelope-from <ehabkost@redhat.com>) id 1dt0Bx-000273-DI
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:38:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52370)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dt0Bq-0001rz-Kw
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:38:30 -0400
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dt0Bx-000243-7x
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:38:37 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 15 Sep 2017 20:37:33 -0300
-Message-Id: <20170915233739.26860-10-ehabkost@redhat.com>
+Date: Fri, 15 Sep 2017 20:37:34 -0300
+Message-Id: <20170915233739.26860-11-ehabkost@redhat.com>
 In-Reply-To: <20170915233739.26860-1-ehabkost@redhat.com>
 References: <20170915233739.26860-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 09/15] qmp.py: Avoid overriding a builtin object
+Subject: [Qemu-devel] [PULL 10/15] qtest.py: Few pylint/style fixes
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,47 +31,52 @@ Cc: =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, Stefan Hajnoczi <
 
 From: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
 
-The "id" is a builtin method to get object's identity and should not be
-overridden. This might bring some issues in case someone was directly
-calling "cmd(..., id=3Did)" but I haven't found such usage on brief searc=
-h
-for "cmd\(.*id=3D".
+No actual code changes, just few pylint/style fixes.
 
 Signed-off-by: Luk=C3=A1=C5=A1 Doktor <ldoktor@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20170818142613.32394-10-ldoktor@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-Id: <20170818142613.32394-11-ldoktor@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- scripts/qmp/qmp.py | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ scripts/qtest.py | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/scripts/qmp/qmp.py b/scripts/qmp/qmp.py
-index f2f5a9b296..ef12e8a1a0 100644
---- a/scripts/qmp/qmp.py
-+++ b/scripts/qmp/qmp.py
-@@ -177,19 +177,19 @@ class QEMUMonitorProtocol(object):
-             print >>sys.stderr, "QMP:<<< %s" % resp
-         return resp
+diff --git a/scripts/qtest.py b/scripts/qtest.py
+index ab183c0635..df0daf26ca 100644
+--- a/scripts/qtest.py
++++ b/scripts/qtest.py
+@@ -11,14 +11,11 @@
+ # Based on qmp.py.
+ #
 =20
--    def cmd(self, name, args=3DNone, id=3DNone):
-+    def cmd(self, name, args=3DNone, cmd_id=3DNone):
+-import errno
+ import socket
+-import string
+ import os
+-import subprocess
+-import qmp.qmp
+ import qemu
+=20
++
+ class QEMUQtestProtocol(object):
+     def __init__(self, address, server=3DFalse):
          """
-         Build a QMP command and send it to the QMP Monitor.
+@@ -83,8 +80,10 @@ class QEMUQtestMachine(qemu.QEMUMachine):
+                  socket_scm_helper=3DNone):
+         if name is None:
+             name =3D "qemu-%d" % os.getpid()
+-        super(QEMUQtestMachine, self).__init__(binary, args, name=3Dname=
+, test_dir=3Dtest_dir,
+-                                               socket_scm_helper=3Dsocke=
+t_scm_helper)
++        super(QEMUQtestMachine,
++              self).__init__(binary, args, name=3Dname, test_dir=3Dtest_=
+dir,
++                             socket_scm_helper=3Dsocket_scm_helper)
++        self._qtest =3D None
+         self._qtest_path =3D os.path.join(test_dir, name + "-qtest.sock"=
+)
 =20
-         @param name: command name (string)
-         @param args: command arguments (dict)
--        @param id: command id (dict, list, string or int)
-+        @param cmd_id: command id (dict, list, string or int)
-         """
-         qmp_cmd =3D {'execute': name}
-         if args:
-             qmp_cmd['arguments'] =3D args
--        if id:
--            qmp_cmd['id'] =3D id
-+        if cmd_id:
-+            qmp_cmd['id'] =3D cmd_id
-         return self.cmd_obj(qmp_cmd)
-=20
-     def command(self, cmd, **kwds):
+     def _base_args(self):
 --=20
 2.13.5
