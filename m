@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45346)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46030)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dskz4-0007hV-4e
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:24:19 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dsl2C-0000Iy-Gx
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:27:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dskz3-0006Sl-0I
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:24:18 -0400
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<1504286483-23327-14-git-send-email-eric.auger@redhat.com>
-	<20170914092751.GA3336@virtx40>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <403a9798-fed2-671f-fc6e-7cc0fd53c90c@redhat.com>
-Date: Fri, 15 Sep 2017 09:23:57 +0200
+	(envelope-from <laurent@vivier.eu>) id 1dsl29-0007eu-DJ
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:27:32 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:59711)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dsl29-0007eJ-3J
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:27:29 -0400
+References: <20170915065821.16600-1-jrtc27@jrtc27.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <269767d5-b02b-f3dc-235e-1d7629baf4d5@vivier.eu>
+Date: Fri, 15 Sep 2017 09:27:22 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170914092751.GA3336@virtx40>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 13/20] hw/arm/smmuv3:
- Implement IOMMU memory region replay callback
+In-Reply-To: <20170915065821.16600-1-jrtc27@jrtc27.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user/syscall.c: Handle SH4's
+ exceptional alignment for p{read, write}64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,109 +28,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Linu Cherian <linuc.decode@gmail.com>
-Cc: peter.maydell@linaro.org, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mohun106@gmail.com, jean-philippe.brucker@arm.com, tn@semihalf.com, bharat.bhushan@nxp.com, mst@redhat.com, will.deacon@arm.com, qemu-devel@nongnu.org, peterx@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org, christoffer.dall@linaro.org, linu.cherian@cavium.com, wtownsen@redhat.com, robin.murphy@arm.com, prem.mallappa@gmail.com, eric.auger.pro@gmail.com
+To: James Clarke <jrtc27@jrtc27.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Peter Maydell <peter.maydell@linaro.org>
 
-Hi Linu,
+Le 15/09/2017 à 08:58, James Clarke a écrit :
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1716767
+> Signed-off-by: James Clarke <jrtc27@jrtc27.com>
+> ---
+>  linux-user/syscall.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 9b6364a266..24d6a81c21 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -10495,20 +10495,32 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>  #endif
+>  #ifdef TARGET_NR_pread64
+>      case TARGET_NR_pread64:
+> +#if defined(TARGET_SH4)
+> +        /* SH4 doesn't align register pairs, except for p{read,write}64 */
+> +        arg4 = arg5;
+> +        arg5 = arg6;
+> +#else
+>          if (regpairs_aligned(cpu_env)) {
+>              arg4 = arg5;
+>              arg5 = arg6;
+>          }
+> +#endif
+>          if (!(p = lock_user(VERIFY_WRITE, arg2, arg3, 0)))
+>              goto efault;
+>          ret = get_errno(pread64(arg1, p, arg3, target_offset64(arg4, arg5)));
+>          unlock_user(p, arg2, ret);
+>          break;
+>      case TARGET_NR_pwrite64:
+> +#if defined(TARGET_SH4)
+> +        /* SH4 doesn't align register pairs, except for p{read,write}64 */
+> +        arg4 = arg5;
+> +        arg5 = arg6;
+> +#else
+>          if (regpairs_aligned(cpu_env)) {
+>              arg4 = arg5;
+>              arg5 = arg6;
+>          }
+> +#endif
+>          if (!(p = lock_user(VERIFY_READ, arg2, arg3, 1)))
+>              goto efault;
+>          ret = get_errno(pwrite64(arg1, p, arg3, target_offset64(arg4, arg5)));
+> --
+> 2.13.2
+> 
 
-On 14/09/2017 11:27, Linu Cherian wrote:
-> Hi Eric,
-> 
-> On Fri Sep 01, 2017 at 07:21:16PM +0200, Eric Auger wrote:
->> memory_region_iommu_replay() is used for VFIO integration.
->>
->> However its default implementation is not adapted to SMMUv3
->> IOMMU memory region. Indeed the input address range is too
->> huge and its execution is too slow as it calls the translate()
->> callback on each granule.
->>
->> Let's implement the replay callback which hierarchically walk
->> over the page table structure and notify only the segments
->> that are populated with valid entries.
->>
->> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->> ---
->>  hw/arm/smmuv3.c     | 36 ++++++++++++++++++++++++++++++++++++
->>  hw/arm/trace-events |  1 +
->>  2 files changed, 37 insertions(+)
->>
->> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
->> index 8e7d10d..c43bd93 100644
->> --- a/hw/arm/smmuv3.c
->> +++ b/hw/arm/smmuv3.c
->> @@ -657,6 +657,41 @@ static int smmuv3_notify_entry(IOMMUTLBEntry *entry, void *private)
->>      return 0;
->>  }
->>  
->> +/* Unmap the whole notifier's range */
->> +static void smmuv3_unmap_notifier_range(IOMMUNotifier *n)
->> +{
->> +    IOMMUTLBEntry entry;
->> +    hwaddr size = n->end - n->start + 1;
->> +
->> +    entry.target_as = &address_space_memory;
->> +    entry.iova = n->start & ~(size - 1);
->> +    entry.perm = IOMMU_NONE;
->> +    entry.addr_mask = size - 1;
->> +
->> +    memory_region_notify_one(n, &entry);
->> +}
->> +
->> +static void smmuv3_replay(IOMMUMemoryRegion *mr, IOMMUNotifier *n)
->> +{
->> +    SMMUTransCfg cfg = {};
->> +    int ret;
->> +
->> +    trace_smmuv3_replay(mr->parent_obj.name, n, n->start, n->end);
->> +    smmuv3_unmap_notifier_range(n);
->> +
->> +    ret = smmuv3_decode_config(mr, &cfg);
->> +    if (ret) {
->> +        error_report("%s error decoding the configuration for iommu mr=%s",
->> +                     __func__, mr->parent_obj.name);
->> +    }
->>
-> 
-> On an invalid config being found, shouldnt we return rather than proceeding with
-> page table walk. For example on an invalid Stream table entry.
-Yes that's correct. I am going to fix that.
-
-Thanks!
-
-Eric
-> 
-> +
->> +    if (cfg.disabled || cfg.bypassed) {
->> +        return;
->> +    }
->> +    /* walk the page tables and replay valid entries */
->> +    smmu_page_walk(&cfg, 0, (1ULL << (64 - cfg.tsz)) - 1, false,
->> +                   smmuv3_notify_entry, n);
->> +}
->>  static void smmuv3_notify_iova_range(IOMMUMemoryRegion *mr, IOMMUNotifier *n,
->>                                       uint64_t iova, size_t size)
->>  {
->> @@ -1095,6 +1130,7 @@ static void smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
->>  
->>      imrc->translate = smmuv3_translate;
->>      imrc->notify_flag_changed = smmuv3_notify_flag_changed;
->> +    imrc->replay = smmuv3_replay;
->>  }
->>  
->>  static const TypeInfo smmuv3_type_info = {
->> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
->> index 4ac264d..15f84d6 100644
->> --- a/hw/arm/trace-events
->> +++ b/hw/arm/trace-events
->> @@ -46,5 +46,6 @@ smmuv3_cfg_stage(int s, uint32_t oas, uint32_t tsz, uint64_t ttbr, bool aa64, ui
->>  smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
->>  smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
->>  smmuv3_replay_mr(const char *name) "iommu mr=%s"
->> +smmuv3_replay(const char *name, void *n, hwaddr start, hwaddr end) "iommu mr=%s notifier=%p [0x%"PRIx64",0x%"PRIx64"]"
->>  smmuv3_notify_entry(hwaddr iova, hwaddr pa, hwaddr mask, int perm) "iova=0x%"PRIx64" pa=0x%" PRIx64" mask=0x%"PRIx64" perm=%d"
->>  smmuv3_notify_iova_range(const char *name, uint64_t iova, size_t size, void *n) "iommu mr=%s iova=0x%"PRIx64" size=0x%lx n=%p"
->> -- 
->> 2.5.5
->>
->>
-> 
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
