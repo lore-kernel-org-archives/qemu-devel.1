@@ -1,41 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35926)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dst2Q-00024P-5U
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 12:00:28 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dst8W-00076e-Cg
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 12:06:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dst2L-0007tI-4D
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 12:00:18 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:41711
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dst2K-0007sZ-VF
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 12:00:13 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8FG09vi123698
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 12:00:12 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2d0hac22h7-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 12:00:11 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 15 Sep 2017 17:00:06 +0100
-References: <1505092362-10544-1-git-send-email-longpeng2@huawei.com>
-	<1505092362-10544-2-git-send-email-longpeng2@huawei.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri, 15 Sep 2017 17:59:57 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dst8P-000648-6N
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 12:06:36 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:43261)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dst8O-00063n-Oh
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 12:06:29 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id a43so2206482wrc.0
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 09:06:28 -0700 (PDT)
+References: <20170915150849.23557-1-peter.maydell@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170915150849.23557-1-peter.maydell@linaro.org>
+Date: Fri, 15 Sep 2017 17:06:24 +0100
+Message-ID: <87k2107xq7.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1505092362-10544-2-git-send-email-longpeng2@huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Message-Id: <67d5549e-84de-ee85-00a7-37edc52234c4@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH REPOST v19 1/2] virtio-crypto: Add virtio
- crypto device specification
+Subject: Re: [Qemu-devel] [PATCH] target/arm: Remove out of date ARM ARM
+ section references in A64 decoder
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,408 +30,876 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Longpeng(Mike)" <longpeng2@huawei.com>, qemu-devel@nongnu.org, virtio-dev@lists.oasis-open.org
-Cc: weidong.huang@huawei.com, mst@redhat.com, jasowang@redhat.com, john.griffin@intel.com, Varun.Sethi@freescale.com, denglingli@chinamobile.com, arei.gonglei@hotmail.com, agraf@suse.de, arei.gonglei@huawei.com, vincent.jardin@6wind.com, Ola.Liljedahl@arm.com, luonengjun@huawei.com, xin.zeng@intel.com, liang.j.ma@intel.com, stefanha@redhat.com, Jani.Kokkonen@huawei.com, brian.a.keating@intel.com, wangxinxin.wang@huawei.com, cohuck@redhat.com, mike.caraman@nxp.com
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, patches@linaro.org
 
 
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-On 09/11/2017 03:12 AM, Longpeng(Mike) wrote:
-> From: Gonglei <arei.gonglei@huawei.com>
-> 
-> The virtio crypto device is a virtual crypto device (ie. hardware
-> crypto accelerator card). Currently, the virtio crypto device provides
-> the following crypto services: CIPHER, MAC, HASH, and AEAD.
-> 
-> In this patch, CIPHER, MAC, HASH, AEAD services are introduced.
-> 
-> VIRTIO-153
-> 
-> Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> ---
-[..]
-
-
-> +\subsubsection{Control Virtqueue}\label{sec:Device Types / Crypto Device / Device Operation / Control Virtqueue}
-> +
-> +The driver uses the control virtqueue to send control commands to the
-> +device, such as session operations (See \ref{sec:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation}).
-> +
-> +The header for controlq is of the following form:
-> +\begin{lstlisting}
-> +#define VIRTIO_CRYPTO_OPCODE(service, op)   (((service) << 8) | (op))
-> +
-> +struct virtio_crypto_ctrl_header {
-> +#define VIRTIO_CRYPTO_CIPHER_CREATE_SESSION \
-> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_CIPHER, 0x02)
-> +#define VIRTIO_CRYPTO_CIPHER_DESTROY_SESSION \
-> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_CIPHER, 0x03)
-> +#define VIRTIO_CRYPTO_HASH_CREATE_SESSION \
-> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_HASH, 0x02)
-> +#define VIRTIO_CRYPTO_HASH_DESTROY_SESSION \
-> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_HASH, 0x03)
-> +#define VIRTIO_CRYPTO_MAC_CREATE_SESSION \
-> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_MAC, 0x02)
-> +#define VIRTIO_CRYPTO_MAC_DESTROY_SESSION \
-> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_MAC, 0x03)
-> +#define VIRTIO_CRYPTO_AEAD_CREATE_SESSION \
-> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x02)
-> +#define VIRTIO_CRYPTO_AEAD_DESTROY_SESSION \
-> +       VIRTIO_CRYPTO_OPCODE(VIRTIO_CRYPTO_SERVICE_AEAD, 0x03)
-> +    le32 opcode;
-> +    /* algo should be service-specific algorithms */
-> +    le32 algo;
-> +    le32 flag;
-> +    /* data virtqueue id */
-> +    le32 queue_id;
-> +};
-> +\end{lstlisting}
-> +
-> +The format of the controlq request depends on the VIRTIO_CRYPTO_F_MUX_MODE feature bit:
-> +
-> +\begin{itemize*}
-> +\item If the VIRTIO_CRYPTO_F_MUX_MODE feature bit is NOT negotiated the controlq request is
-> +    a fixed-size structure of form:
-> +\begin{lstlisting}
-> +struct virtio_crypto_op_ctrl_req {
-> +    struct virtio_crypto_ctrl_header header;
-> +
-> +    union {
-> +        struct virtio_crypto_sym_create_session_req   sym_create_session;
-> +        struct virtio_crypto_hash_create_session_req  hash_create_session;
-> +        struct virtio_crypto_mac_create_session_req   mac_create_session;
-> +        struct virtio_crypto_aead_create_session_req  aead_create_session;
-> +        struct virtio_crypto_destroy_session_req      destroy_session;
-> +    } u;
-> +};
-> +\end{lstlisting}
-> +The header is the general header, and the union is of the algorithm-specific type or the
-> +virtio_crypto_destroy_session_req structure, which is set by the driver. All the properties
-> +in the union are shown as follows.
-> +
-> +\item If the VIRTIO_CRYPTO_F_MUX_MODE feature bit is negotiated the controlq request is composed
-> +    of two parts, the additional paramenters are preceded by the general header.
-> +
-> +\begin{lstlisting}
-> +struct virtio_crypto_op_ctrl_req_mux {
-> +    struct virtio_crypto_ctrl_header header;
-> +
-> +    /* additional paramenter */
-> +    u8 additional_para[addl_para_len];
-> +};
-> +\end{lstlisting}
-> +
-> +The additional paramenters are stored in a virtio_crypto_destroy_session_req structure or
-> +in a algorithm-specific structure:
-> +\begin{itemize*}
-> +\item struct virtio_crypto_sym_create_session_req
-> +\item struct virtio_crypto_hash_create_session_req
-> +\item struct virtio_crypto_mac_create_session_req
-> +\item struct virtio_crypto_aead_create_session_req
-> +\end{itemize*}
-> +All of the structures above are shown as follows.
-> +\end{itemize*}
-> +
-> +\paragraph{Session operation}\label{sec:Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation}
-> +
-> +The session is a
-> +handle which describes the cryptographic parameters to be applied to
-> +a number of buffers.
-> +
-> +The following structure stores the result of session creation set by the device:
-> +
-> +\begin{lstlisting}
-> +struct virtio_crypto_session_input {
-> +    /* Device-writable part */
-> +    le64 session_id;
-> +    le32 status;
-> +    le32 padding;
-> +};
-> +\end{lstlisting}
-> +
-> +A request to destroy a session includes the following information:
-> +
-> +\begin{lstlisting}
-> +struct virtio_crypto_destroy_session_req {
-> +    /* Device-readable part */
-> +    le64  session_id;
-> +    /* Device-writable part */
-> +    le32  status;
-> +    le32  padding;
-> +};
-> +\end{lstlisting}
-> +
-> +\subparagraph{Session operation: HASH session}\label{sec:Device Types / Crypto Device / Device
-> +Operation / Control Virtqueue / Session operation / Session operation: HASH session}
-> +
-> +HASH session requests are as follows:
-> +
-> +\begin{lstlisting}
-> +struct virtio_crypto_hash_session_para {
-> +    /* See VIRTIO_CRYPTO_HASH_* above */
-> +    le32 algo;
-> +    /* hash result length */
-> +    le32 hash_result_len;
-> +};
-> +struct virtio_crypto_hash_create_session_req {
-> +    /* Device-readable part */
-> +    struct virtio_crypto_hash_session_para para;
-> +    /* Device-writable part */
-> +    struct virtio_crypto_session_input input;
-> +};
-> +\end{lstlisting}
-> +
-> +The information required by HASH session creation is stored in the virtio_crypto_hash_create_session_req
-> +structure, including the hash parameters stored in \field{para}. \field{input} stores the result of this operation.
-> +
-> +\subparagraph{Session operation: MAC session}\label{sec:Device Types / Crypto Device / Device
-> +Operation / Control Virtqueue / Session operation / Session operation: MAC session}
-> +
-> +MAC session requests are as follows:
-> +
-> +\begin{lstlisting}
-> +struct virtio_crypto_mac_session_para {
-> +    /* See VIRTIO_CRYPTO_MAC_* above */
-> +    le32 algo;
-> +    /* hash result length */
-> +    le32 hash_result_len;
-> +    /* length of authenticated key */
-> +    le32 auth_key_len;
-> +    le32 padding;
-> +};
-> +
-> +struct virtio_crypto_mac_create_session_req {
-> +    /* Device-readable part */
-> +    struct virtio_crypto_mac_session_para para;
-> +    /* The authenticated key */
-> +    u8 auth_key[auth_key_len];
-> +
-> +    /* Device-writable part */
-> +    struct virtio_crypto_session_input input;
-> +};
-> +\end{lstlisting}
-> +
-> +The information required by MAC session creation is stored in the virtio_crypto_mac_create_session_req
-> +structure, including the mac parameters stored in \field{para} and the authenticated key in \field{auth_key}.
-> +\field{input} stores the result of this operation.
-> +
-> +\subparagraph{Session operation: Symmetric algorithms session}\label{sec:Device Types / Crypto Device / Device
-> +Operation / Control Virtqueue / Session operation / Session operation: Symmetric algorithms session}
-> +
-> +The request of symmetric session includes two parts, CIPHER algorithms and chain
-> +algorithms (chaining CIPHER and HASH/MAC).
-> +
-> +CIPHER session requests are as follows:
-> +
-> +\begin{lstlisting}
-> +struct virtio_crypto_cipher_session_para {
-> +    /* See VIRTIO_CRYPTO_CIPHER* above */
-> +    le32 algo;
-> +    /* length of key */
-> +    le32 keylen;
-> +#define VIRTIO_CRYPTO_OP_ENCRYPT  1
-> +#define VIRTIO_CRYPTO_OP_DECRYPT  2
-> +    /* encryption or decryption */
-> +    le32 op;
-> +    le32 padding;
-> +};
-> +
-> +struct virtio_crypto_cipher_session_req {
-> +    /* Device-readable part */
-> +    struct virtio_crypto_cipher_session_para para;
-> +    /* The cipher key */
-> +    u8 cipher_key[keylen];
-> +
-> +    /* Device-writable part */
-> +    struct virtio_crypto_session_input input;that
-> +};
-> +\end{lstlisting}
-> +
-> +Algorithm chaining requests are as follows:
-> +
-> +\begin{lstlisting}
-> +struct virtio_crypto_alg_chain_session_para {
-> +#define VIRTIO_CRYPTO_SYM_ALG_CHAIN_ORDER_HASH_THEN_CIPHER  1
-> +#define VIRTIO_CRYPTO_SYM_ALG_CHAIN_ORDER_CIPHER_THEN_HASH  2
-> +    le32 alg_chain_order;
-> +/* Plain hash */
-> +#define VIRTIO_CRYPTO_SYM_HASH_MODE_PLAIN    1
-> +/* Authenticated hash (mac) */
-> +#define VIRTIO_CRYPTO_SYM_HASH_MODE_AUTH     2
-> +/* Nested hash */
-> +#define VIRTIO_CRYPTO_SYM_HASH_MODE_NESTED   3
-> +    le32 hash_mode;
-> +    struct virtio_crypto_cipher_session_para cipher_param;
-> +    union {
-> +        struct virtio_crypto_hash_session_para hash_param;
-> +        struct virtio_crypto_mac_session_para mac_param;
-> +    } u;
-> +    /* length of the additional authenticated data (AAD) in bytes */
-> +    le32 aad_len;
-> +    le32 padding;
-> +};
-> +
-> +struct virtio_crypto_alg_chain_session_req {
-> +    /* Device-readable part */
-> +    struct virtio_crypto_alg_chain_session_para para;
-> +    /* The cipher key */
-> +    u8 cipher_key[keylen];
-> +    /* The authenticated key */
-> +    u8 auth_key[auth_key_len];
-> +
-> +    /* Device-writable part */
-> +    struct virtio_crypto_session_input input;
-> +};
-> +\end{lstlisting}
-> +
-> +Symmetric algorithm requests are as follows:
-> +
-> +\begin{lstlisting}
-> +struct virtio_crypto_sym_create_session_req {
-> +    union {
-> +        struct virtio_crypto_cipher_session_req cipher;
-> +        struct virtio_crypto_alg_chain_session_req chain;
-> +    } u;
-> +
-> +    /* Device-readable part */
-> +
-> +/* No operation */
-> +#define VIRTIO_CRYPTO_SYM_OP_NONE  0
-> +/* Cipher only operation on the data */
-> +#define VIRTIO_CRYPTO_SYM_OP_CIPHER  1
-> +/* Chain any cipher with any hash or mac operation. The order
-> +   depends on the value of alg_chain_order param */
-> +#define VIRTIO_CRYPTO_SYM_OP_ALGORITHM_CHAINING  2
-> +    le32 op_type;
-> +    le32 padding;
-> +};
-> +\end{lstlisting}
-> +
-> +The information required by symmetric algorithms session creation is stored in the
-> +virtio_crypto_sym_create_session_req structure, including the symmetric operation
-> +type in \field{op_type} and the cipher parameters stored in \field{cipher} or the
-> +algorithm chaining paramenters in \field{chain}.
-> +
-> +The driver can set the \field{op_type} field in struct virtio_crypto_sym_create_session_req
-> +as follows: VIRTIO_CRYPTO_SYM_OP_NONE: no operation; VIRTIO_CRYPTO_SYM_OP_CIPHER: Cipher only
-> +operation on the data; VIRTIO_CRYPTO_SYM_OP_ALGORITHM_CHAINING: Chain any cipher with any hash
-> +or mac operation.
-> +
-> +\subparagraph{Session operation: AEAD session}\label{sec:Device Types / Crypto Device / Device
-> +Operation / Control Virtqueue / Session operation / Session operation: AEAD session}
-> +
-> +AEAD session requests are as follows:
-> +
-> +\begin{lstlisting}
-> +struct virtio_crypto_aead_session_para {
-> +    /* See VIRTIO_CRYPTO_AEAD_* above */
-> +    le32 algo;
-> +    /* length of key */
-> +    le32 key_len;
-> +    /* Authentication tag length */
-> +    le32 tag_len;
-> +    /* The length of the additional authenticated data (AAD) in bytes */
-> +    le32 aad_len;
-> +    /* encryption or decryption, See above VIRTIO_CRYPTO_OP_* */
-> +    le32 op;
-> +    le32 padding;
-> +};
-> +
-> +struct virtio_crypto_aead_create_session_req {
-> +    /* Device-readable part */
-> +    struct virtio_crypto_aead_session_para para;
-> +    u8 key[key_len];
-> +
-> +    /* Device-writeable part */
-> +    struct virtio_crypto_session_input input;
-> +};
-> +\end{lstlisting}
-> +
-> +The information required by AEAD session creation is stored in the virtio_crypto_aead_create_session_req
-> +structure, including the aead parameters stored in \field{para} and the cipher key in \field{key}.
-> +\field{input} stores the result of this operation.
-> +
-> +\drivernormative{\subparagraph}{Session operation: create session}{Device Types / Crypto Device / Device Operation / Control Virtqueue / Session operation / Session operation: create session}
-> +
-> +\begin{itemize*}
-> +\item The driver MUST set the control general header and the corresponding algorithm-specific structure.
-> +    See \ref{sec:Device Types / Crypto Device / Device Operation / Control Virtqueue}.
-> +\item The driver MUST set the \field{opcode} field based on service type: CIPHER, HASH, MAC, or AEAD.
-> +\item The driver MUST set the \field{queue_id} field to show used dataq.
-
-I've failed to figure out the semantic behind queue_id. This could mean,
-that sessions and session_id's are queue scoped. But then we should be
-(IMHO) more explicit on this -- my guess is that session_id's aren't
-dataqueue scoped.
-
-> +\end{itemize*}
-> +
-> +\devicenormative{\subparagraph}{Session operation: create session}{Device Types / Crypto Device / Device
-> +Operation / Control Virtqueue / Session operation / Session operation: create session}
-> +
-> +\begin{itemize*}
-> +\item The device MUST use the corresponding algorithm-specific structure according to the
-> +    \field{opcode} in the control general header.
-> +\item The device MUST set the \field{status} field to one of the following values of enum
-> +    VIRTIO_CRYPTO_STATUS after finish a session creation:
-> +\begin{itemize*}
-> +\item VIRTIO_CRYPTO_OK if a session is created successfully.
-> +\item VIRTIO_CRYPTO_NOTSUPP if the requested algorithm or operation is unsupported.
-> +\item VIRTIO_CRYPTO_NOSPC if no free session ID (only when the VIRTIO_CRYPTO_F_MUX_MODE
-> +    feature bit is negotiated).
-> +\item VIRTIO_CRYPTO_ERR if failure not mentioned above occurs.
-
-I guess an invalid queue_id would be among these.
-
-> +\end{itemize*}
-> +\item The device MUST set the \field{session_id} field to a unique session identifieronly
-s/identifieronly/identifier only
-> +    if the status is set to VIRTIO_CRYPTO_OK.
-> +\end{itemize*}
-> +
-> +\drivernormative{\subparagraph}{Session operation: destroy session}{Device Types / Crypto Device / Device
-> +Operation / Control Virtqueue / Session operation / Session operation: destroy session}
-> +
-> +\begin{itemize*}
-> +\item The driver MUST set the \field{opcode} field based on service type: CIPHER, HASH, MAC, or AEAD.
-> +\item The driver MUST set the \field{session_id} to a valid value assigned by the device
-> +    when the session was created.
-
-Destroy does not need to specify queue_id. That means session_id's aren't
-queue scoped from namespace perspective. The question remains what is
-queue_id good for, and whether a session type op request should be
-rejected if the the session id originates from a session creation
-request specifying a different dataqueue (not the dataqueue containing
-the given request)? 
-
-> +\end{itemize*}
-> +
-> +\devicenormative{\subparagraph}{Session operation: destroy session}{Device Types / Crypto Device / Device
-> +Operation / Control Virtqueue / Session operation / Session operation: destroy session}
-> +
-> +\begin{itemize*}
-> +\item The device MUST set the \field{status} field to one of the following values of enum VIRTIO_CRYPTO_STATUS.
-> +\begin{itemize*}
-> +\item VIRTIO_CRYPTO_OK if a session is created successfully.
-> +\item VIRTIO_CRYPTO_ERR if any failure occurs.
-> +\end{itemize*}
-> +\end{itemize*}
-> +
-> +\subsubsection{Data Virtqueue}\label{sec:Device Types / Crypto Device / Device Operation / Data Virtqueue}
+> In the A64 decoder, we have a lot of references to section numbers
+> from version A.a of the v8A ARM ARM (DDI0487). This version of the
+> document is now long obsolete (we are currently on revision B.a),
+> and various intervening versions renumbered all the sections.
 >
+> The most recent B.a version of the document doesn't assign
+> section numbers at all to the individual instruction classes
+> in the way that the various A.x versions did. The simplest thing
+> to do is just to delete all the out of date C.x.x references.
+>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Definitely a Friday afternoon kind of a patch...
 
-[..]
+With a Friday afternoon review ;-)
 
-I've run through the rest. It some stuff seems very repetitive. I wonder if
-we can do better.
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-I also dislike this 5.7.7.5.3 Steps of Operation part. I also don't
-understand why is symmetric special in this respect (HASH, MAC and
-AEAD don't have a 'Steps of Operation' section.
+>
+>  target/arm/translate-a64.c | 227 +++++++++++++++++++++++----------------------
+>  1 file changed, 114 insertions(+), 113 deletions(-)
+>
+> diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+> index 9017e30510..e04007376c 100644
+> --- a/target/arm/translate-a64.c
+> +++ b/target/arm/translate-a64.c
+> @@ -1203,12 +1203,14 @@ static inline AArch64DecodeFn *lookup_disas_fn(const AArch64DecodeTable *table,
+>  }
+>
+>  /*
+> - * the instruction disassembly implemented here matches
+> - * the instruction encoding classifications in chapter 3 (C3)
+> - * of the ARM Architecture Reference Manual (DDI0487A_a)
+> + * The instruction disassembly implemented here matches
+> + * the instruction encoding classifications in chapter C4
+> + * of the ARM Architecture Reference Manual (DDI0487B_a);
+> + * classification names and decode diagrams here should generally
+> + * match up with those in the manual.
+>   */
+>
+> -/* C3.2.7 Unconditional branch (immediate)
+> +/* Unconditional branch (immediate)
+>   *   31  30       26 25                                  0
+>   * +----+-----------+-------------------------------------+
+>   * | op | 0 0 1 0 1 |                 imm26               |
+> @@ -1219,15 +1221,15 @@ static void disas_uncond_b_imm(DisasContext *s, uint32_t insn)
+>      uint64_t addr = s->pc + sextract32(insn, 0, 26) * 4 - 4;
+>
+>      if (insn & (1U << 31)) {
+> -        /* C5.6.26 BL Branch with link */
+> +        /* BL Branch with link */
+>          tcg_gen_movi_i64(cpu_reg(s, 30), s->pc);
+>      }
+>
+> -    /* C5.6.20 B Branch / C5.6.26 BL Branch with link */
+> +    /* B Branch / BL Branch with link */
+>      gen_goto_tb(s, 0, addr);
+>  }
+>
+> -/* C3.2.1 Compare & branch (immediate)
+> +/* Compare and branch (immediate)
+>   *   31  30         25  24  23                  5 4      0
+>   * +----+-------------+----+---------------------+--------+
+>   * | sf | 0 1 1 0 1 0 | op |         imm19       |   Rt   |
+> @@ -1256,7 +1258,7 @@ static void disas_comp_b_imm(DisasContext *s, uint32_t insn)
+>      gen_goto_tb(s, 1, addr);
+>  }
+>
+> -/* C3.2.5 Test & branch (immediate)
+> +/* Test and branch (immediate)
+>   *   31  30         25  24  23   19 18          5 4    0
+>   * +----+-------------+----+-------+-------------+------+
+>   * | b5 | 0 1 1 0 1 1 | op |  b40  |    imm14    |  Rt  |
+> @@ -1285,7 +1287,7 @@ static void disas_test_b_imm(DisasContext *s, uint32_t insn)
+>      gen_goto_tb(s, 1, addr);
+>  }
+>
+> -/* C3.2.2 / C5.6.19 Conditional branch (immediate)
+> +/* Conditional branch (immediate)
+>   *  31           25  24  23                  5   4  3    0
+>   * +---------------+----+---------------------+----+------+
+>   * | 0 1 0 1 0 1 0 | o1 |         imm19       | o0 | cond |
+> @@ -1316,7 +1318,7 @@ static void disas_cond_b_imm(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C5.6.68 HINT */
+> +/* HINT instruction group, including various allocated HINTs */
+>  static void handle_hint(DisasContext *s, uint32_t insn,
+>                          unsigned int op1, unsigned int op2, unsigned int crm)
+>  {
+> @@ -1401,7 +1403,7 @@ static void handle_sync(DisasContext *s, uint32_t insn,
+>      }
+>  }
+>
+> -/* C5.6.130 MSR (immediate) - move immediate to processor state field */
+> +/* MSR (immediate) - move immediate to processor state field */
+>  static void handle_msr_i(DisasContext *s, uint32_t insn,
+>                           unsigned int op1, unsigned int op2, unsigned int crm)
+>  {
+> @@ -1477,10 +1479,10 @@ static void gen_set_nzcv(TCGv_i64 tcg_rt)
+>      tcg_temp_free_i32(nzcv);
+>  }
+>
+> -/* C5.6.129 MRS - move from system register
+> - * C5.6.131 MSR (register) - move to system register
+> - * C5.6.204 SYS
+> - * C5.6.205 SYSL
+> +/* MRS - move from system register
+> + * MSR (register) - move to system register
+> + * SYS
+> + * SYSL
+>   * These are all essentially the same insn in 'read' and 'write'
+>   * versions, with varying op0 fields.
+>   */
+> @@ -1603,7 +1605,7 @@ static void handle_sys(DisasContext *s, uint32_t insn, bool isread,
+>      }
+>  }
+>
+> -/* C3.2.4 System
+> +/* System
+>   *  31                 22 21  20 19 18 16 15   12 11    8 7   5 4    0
+>   * +---------------------+---+-----+-----+-------+-------+-----+------+
+>   * | 1 1 0 1 0 1 0 1 0 0 | L | op0 | op1 |  CRn  |  CRm  | op2 |  Rt  |
+> @@ -1626,13 +1628,13 @@ static void disas_system(DisasContext *s, uint32_t insn)
+>              return;
+>          }
+>          switch (crn) {
+> -        case 2: /* C5.6.68 HINT */
+> +        case 2: /* HINT (including allocated hints like NOP, YIELD, etc) */
+>              handle_hint(s, insn, op1, op2, crm);
+>              break;
+>          case 3: /* CLREX, DSB, DMB, ISB */
+>              handle_sync(s, insn, op1, op2, crm);
+>              break;
+> -        case 4: /* C5.6.130 MSR (immediate) */
+> +        case 4: /* MSR (immediate) */
+>              handle_msr_i(s, insn, op1, op2, crm);
+>              break;
+>          default:
+> @@ -1644,7 +1646,7 @@ static void disas_system(DisasContext *s, uint32_t insn)
+>      handle_sys(s, insn, l, op0, op1, op2, crn, crm, rt);
+>  }
+>
+> -/* C3.2.3 Exception generation
+> +/* Exception generation
+>   *
+>   *  31             24 23 21 20                     5 4   2 1  0
+>   * +-----------------+-----+------------------------+-----+----+
+> @@ -1751,7 +1753,7 @@ static void disas_exc(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.2.7 Unconditional branch (register)
+> +/* Unconditional branch (register)
+>   *  31           25 24   21 20   16 15   10 9    5 4     0
+>   * +---------------+-------+-------+-------+------+-------+
+>   * | 1 1 0 1 0 1 1 |  opc  |  op2  |  op3  |  Rn  |  op4  |
+> @@ -1806,7 +1808,7 @@ static void disas_uncond_b_reg(DisasContext *s, uint32_t insn)
+>      s->base.is_jmp = DISAS_JUMP;
+>  }
+>
+> -/* C3.2 Branches, exception generating and system instructions */
+> +/* Branches, exception generating and system instructions */
+>  static void disas_b_exc_sys(DisasContext *s, uint32_t insn)
+>  {
+>      switch (extract32(insn, 25, 7)) {
+> @@ -1974,7 +1976,7 @@ static bool disas_ldst_compute_iss_sf(int size, bool is_signed, int opc)
+>      return regsize == 64;
+>  }
+>
+> -/* C3.3.6 Load/store exclusive
+> +/* Load/store exclusive
+>   *
+>   *  31 30 29         24  23  22   21  20  16  15  14   10 9    5 4    0
+>   * +-----+-------------+----+---+----+------+----+-------+------+------+
+> @@ -2051,7 +2053,7 @@ static void disas_ldst_excl(DisasContext *s, uint32_t insn)
+>  }
+>
+>  /*
+> - * C3.3.5 Load register (literal)
+> + * Load register (literal)
+>   *
+>   *  31 30 29   27  26 25 24 23                5 4     0
+>   * +-----+-------+---+-----+-------------------+-------+
+> @@ -2107,15 +2109,15 @@ static void disas_ld_lit(DisasContext *s, uint32_t insn)
+>  }
+>
+>  /*
+> - * C5.6.80 LDNP (Load Pair - non-temporal hint)
+> - * C5.6.81 LDP (Load Pair - non vector)
+> - * C5.6.82 LDPSW (Load Pair Signed Word - non vector)
+> - * C5.6.176 STNP (Store Pair - non-temporal hint)
+> - * C5.6.177 STP (Store Pair - non vector)
+> - * C6.3.165 LDNP (Load Pair of SIMD&FP - non-temporal hint)
+> - * C6.3.165 LDP (Load Pair of SIMD&FP)
+> - * C6.3.284 STNP (Store Pair of SIMD&FP - non-temporal hint)
+> - * C6.3.284 STP (Store Pair of SIMD&FP)
+> + * LDNP (Load Pair - non-temporal hint)
+> + * LDP (Load Pair - non vector)
+> + * LDPSW (Load Pair Signed Word - non vector)
+> + * STNP (Store Pair - non-temporal hint)
+> + * STP (Store Pair - non vector)
+> + * LDNP (Load Pair of SIMD&FP - non-temporal hint)
+> + * LDP (Load Pair of SIMD&FP)
+> + * STNP (Store Pair of SIMD&FP - non-temporal hint)
+> + * STP (Store Pair of SIMD&FP)
+>   *
+>   *  31 30 29   27  26  25 24   23  22 21   15 14   10 9    5 4    0
+>   * +-----+-------+---+---+-------+---+-----------------------------+
+> @@ -2261,9 +2263,9 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
+>  }
+>
+>  /*
+> - * C3.3.8 Load/store (immediate post-indexed)
+> - * C3.3.9 Load/store (immediate pre-indexed)
+> - * C3.3.12 Load/store (unscaled immediate)
+> + * Load/store (immediate post-indexed)
+> + * Load/store (immediate pre-indexed)
+> + * Load/store (unscaled immediate)
+>   *
+>   * 31 30 29   27  26 25 24 23 22 21  20    12 11 10 9    5 4    0
+>   * +----+-------+---+-----+-----+---+--------+-----+------+------+
+> @@ -2379,7 +2381,7 @@ static void disas_ldst_reg_imm9(DisasContext *s, uint32_t insn,
+>  }
+>
+>  /*
+> - * C3.3.10 Load/store (register offset)
+> + * Load/store (register offset)
+>   *
+>   * 31 30 29   27  26 25 24 23 22 21  20  16 15 13 12 11 10 9  5 4  0
+>   * +----+-------+---+-----+-----+---+------+-----+--+-----+----+----+
+> @@ -2476,7 +2478,7 @@ static void disas_ldst_reg_roffset(DisasContext *s, uint32_t insn,
+>  }
+>
+>  /*
+> - * C3.3.13 Load/store (unsigned immediate)
+> + * Load/store (unsigned immediate)
+>   *
+>   * 31 30 29   27  26 25 24 23 22 21        10 9     5
+>   * +----+-------+---+-----+-----+------------+-------+------+
+> @@ -2587,14 +2589,14 @@ static void disas_ldst_reg(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.3.1 AdvSIMD load/store multiple structures
+> +/* AdvSIMD load/store multiple structures
+>   *
+>   *  31  30  29           23 22  21         16 15    12 11  10 9    5 4    0
+>   * +---+---+---------------+---+-------------+--------+------+------+------+
+>   * | 0 | Q | 0 0 1 1 0 0 0 | L | 0 0 0 0 0 0 | opcode | size |  Rn  |  Rt  |
+>   * +---+---+---------------+---+-------------+--------+------+------+------+
+>   *
+> - * C3.3.2 AdvSIMD load/store multiple structures (post-indexed)
+> + * AdvSIMD load/store multiple structures (post-indexed)
+>   *
+>   *  31  30  29           23 22  21  20     16 15    12 11  10 9    5 4    0
+>   * +---+---+---------------+---+---+---------+--------+------+------+------+
+> @@ -2719,14 +2721,14 @@ static void disas_ldst_multiple_struct(DisasContext *s, uint32_t insn)
+>      tcg_temp_free_i64(tcg_addr);
+>  }
+>
+> -/* C3.3.3 AdvSIMD load/store single structure
+> +/* AdvSIMD load/store single structure
+>   *
+>   *  31  30  29           23 22 21 20       16 15 13 12  11  10 9    5 4    0
+>   * +---+---+---------------+-----+-----------+-----+---+------+------+------+
+>   * | 0 | Q | 0 0 1 1 0 1 0 | L R | 0 0 0 0 0 | opc | S | size |  Rn  |  Rt  |
+>   * +---+---+---------------+-----+-----------+-----+---+------+------+------+
+>   *
+> - * C3.3.4 AdvSIMD load/store single structure (post-indexed)
+> + * AdvSIMD load/store single structure (post-indexed)
+>   *
+>   *  31  30  29           23 22 21 20       16 15 13 12  11  10 9    5 4    0
+>   * +---+---+---------------+-----+-----------+-----+---+------+------+------+
+> @@ -2869,7 +2871,7 @@ static void disas_ldst_single_struct(DisasContext *s, uint32_t insn)
+>      tcg_temp_free_i64(tcg_addr);
+>  }
+>
+> -/* C3.3 Loads and stores */
+> +/* Loads and stores */
+>  static void disas_ldst(DisasContext *s, uint32_t insn)
+>  {
+>      switch (extract32(insn, 24, 6)) {
+> @@ -2899,7 +2901,7 @@ static void disas_ldst(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.4.6 PC-rel. addressing
+> +/* PC-rel. addressing
+>   *   31  30   29 28       24 23                5 4    0
+>   * +----+-------+-----------+-------------------+------+
+>   * | op | immlo | 1 0 0 0 0 |       immhi       |  Rd  |
+> @@ -2928,7 +2930,7 @@ static void disas_pc_rel_adr(DisasContext *s, uint32_t insn)
+>  }
+>
+>  /*
+> - * C3.4.1 Add/subtract (immediate)
+> + * Add/subtract (immediate)
+>   *
+>   *  31 30 29 28       24 23 22 21         10 9   5 4   0
+>   * +--+--+--+-----------+-----+-------------+-----+-----+
+> @@ -3078,7 +3080,7 @@ static bool logic_imm_decode_wmask(uint64_t *result, unsigned int immn,
+>      return true;
+>  }
+>
+> -/* C3.4.4 Logical (immediate)
+> +/* Logical (immediate)
+>   *   31  30 29 28         23 22  21  16 15  10 9    5 4    0
+>   * +----+-----+-------------+---+------+------+------+------+
+>   * | sf | opc | 1 0 0 1 0 0 | N | immr | imms |  Rn  |  Rd  |
+> @@ -3151,7 +3153,7 @@ static void disas_logic_imm(DisasContext *s, uint32_t insn)
+>  }
+>
+>  /*
+> - * C3.4.5 Move wide (immediate)
+> + * Move wide (immediate)
+>   *
+>   *  31 30 29 28         23 22 21 20             5 4    0
+>   * +--+-----+-------------+-----+----------------+------+
+> @@ -3203,7 +3205,7 @@ static void disas_movw_imm(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.4.2 Bitfield
+> +/* Bitfield
+>   *   31  30 29 28         23 22  21  16 15  10 9    5 4    0
+>   * +----+-----+-------------+---+------+------+------+------+
+>   * | sf | opc | 1 0 0 1 1 0 | N | immr | imms |  Rn  |  Rd  |
+> @@ -3281,7 +3283,7 @@ static void disas_bitfield(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.4.3 Extract
+> +/* Extract
+>   *   31  30  29 28         23 22   21  20  16 15    10 9    5 4    0
+>   * +----+------+-------------+---+----+------+--------+------+------+
+>   * | sf | op21 | 1 0 0 1 1 1 | N | o0 |  Rm  |  imms  |  Rn  |  Rd  |
+> @@ -3341,7 +3343,7 @@ static void disas_extract(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.4 Data processing - immediate */
+> +/* Data processing - immediate */
+>  static void disas_data_proc_imm(DisasContext *s, uint32_t insn)
+>  {
+>      switch (extract32(insn, 23, 6)) {
+> @@ -3435,7 +3437,7 @@ static void shift_reg_imm(TCGv_i64 dst, TCGv_i64 src, int sf,
+>      }
+>  }
+>
+> -/* C3.5.10 Logical (shifted register)
+> +/* Logical (shifted register)
+>   *   31  30 29 28       24 23   22 21  20  16 15    10 9    5 4    0
+>   * +----+-----+-----------+-------+---+------+--------+------+------+
+>   * | sf | opc | 0 1 0 1 0 | shift | N |  Rm  |  imm6  |  Rn  |  Rd  |
+> @@ -3526,7 +3528,7 @@ static void disas_logic_reg(DisasContext *s, uint32_t insn)
+>  }
+>
+>  /*
+> - * C3.5.1 Add/subtract (extended register)
+> + * Add/subtract (extended register)
+>   *
+>   *  31|30|29|28       24|23 22|21|20   16|15  13|12  10|9  5|4  0|
+>   * +--+--+--+-----------+-----+--+-------+------+------+----+----+
+> @@ -3599,7 +3601,7 @@ static void disas_add_sub_ext_reg(DisasContext *s, uint32_t insn)
+>  }
+>
+>  /*
+> - * C3.5.2 Add/subtract (shifted register)
+> + * Add/subtract (shifted register)
+>   *
+>   *  31 30 29 28       24 23 22 21 20   16 15     10 9    5 4    0
+>   * +--+--+--+-----------+-----+--+-------+---------+------+------+
+> @@ -3662,13 +3664,12 @@ static void disas_add_sub_reg(DisasContext *s, uint32_t insn)
+>      tcg_temp_free_i64(tcg_result);
+>  }
+>
+> -/* C3.5.9 Data-processing (3 source)
+> -
+> -   31 30  29 28       24 23 21  20  16  15  14  10 9    5 4    0
+> -  +--+------+-----------+------+------+----+------+------+------+
+> -  |sf| op54 | 1 1 0 1 1 | op31 |  Rm  | o0 |  Ra  |  Rn  |  Rd  |
+> -  +--+------+-----------+------+------+----+------+------+------+
+> -
+> +/* Data-processing (3 source)
+> + *
+> + *    31 30  29 28       24 23 21  20  16  15  14  10 9    5 4    0
+> + *  +--+------+-----------+------+------+----+------+------+------+
+> + *  |sf| op54 | 1 1 0 1 1 | op31 |  Rm  | o0 |  Ra  |  Rn  |  Rd  |
+> + *  +--+------+-----------+------+------+----+------+------+------+
+>   */
+>  static void disas_data_proc_3src(DisasContext *s, uint32_t insn)
+>  {
+> @@ -3761,7 +3762,7 @@ static void disas_data_proc_3src(DisasContext *s, uint32_t insn)
+>      tcg_temp_free_i64(tcg_tmp);
+>  }
+>
+> -/* C3.5.3 - Add/subtract (with carry)
+> +/* Add/subtract (with carry)
+>   *  31 30 29 28 27 26 25 24 23 22 21  20  16  15   10  9    5 4   0
+>   * +--+--+--+------------------------+------+---------+------+-----+
+>   * |sf|op| S| 1  1  0  1  0  0  0  0 |  rm  | opcode2 |  Rn  |  Rd |
+> @@ -3803,7 +3804,7 @@ static void disas_adc_sbc(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.5.4 - C3.5.5 Conditional compare (immediate / register)
+> +/* Conditional compare (immediate / register)
+>   *  31 30 29 28 27 26 25 24 23 22 21  20    16 15  12  11  10  9   5  4 3   0
+>   * +--+--+--+------------------------+--------+------+----+--+------+--+-----+
+>   * |sf|op| S| 1  1  0  1  0  0  1  0 |imm5/rm | cond |i/r |o2|  Rn  |o3|nzcv |
+> @@ -3908,7 +3909,7 @@ static void disas_cc(DisasContext *s, uint32_t insn)
+>      tcg_temp_free_i32(tcg_t2);
+>  }
+>
+> -/* C3.5.6 Conditional select
+> +/* Conditional select
+>   *   31   30  29  28             21 20  16 15  12 11 10 9    5 4    0
+>   * +----+----+---+-----------------+------+------+-----+------+------+
+>   * | sf | op | S | 1 1 0 1 0 1 0 0 |  Rm  | cond | op2 |  Rn  |  Rd  |
+> @@ -4019,7 +4020,7 @@ static void handle_rbit(DisasContext *s, unsigned int sf,
+>      }
+>  }
+>
+> -/* C5.6.149 REV with sf==1, opcode==3 ("REV64") */
+> +/* REV with sf==1, opcode==3 ("REV64") */
+>  static void handle_rev64(DisasContext *s, unsigned int sf,
+>                           unsigned int rn, unsigned int rd)
+>  {
+> @@ -4030,8 +4031,8 @@ static void handle_rev64(DisasContext *s, unsigned int sf,
+>      tcg_gen_bswap64_i64(cpu_reg(s, rd), cpu_reg(s, rn));
+>  }
+>
+> -/* C5.6.149 REV with sf==0, opcode==2
+> - * C5.6.151 REV32 (sf==1, opcode==2)
+> +/* REV with sf==0, opcode==2
+> + * REV32 (sf==1, opcode==2)
+>   */
+>  static void handle_rev32(DisasContext *s, unsigned int sf,
+>                           unsigned int rn, unsigned int rd)
+> @@ -4056,7 +4057,7 @@ static void handle_rev32(DisasContext *s, unsigned int sf,
+>      }
+>  }
+>
+> -/* C5.6.150 REV16 (opcode==1) */
+> +/* REV16 (opcode==1) */
+>  static void handle_rev16(DisasContext *s, unsigned int sf,
+>                           unsigned int rn, unsigned int rd)
+>  {
+> @@ -4075,7 +4076,7 @@ static void handle_rev16(DisasContext *s, unsigned int sf,
+>      tcg_temp_free_i64(tcg_tmp);
+>  }
+>
+> -/* C3.5.7 Data-processing (1 source)
+> +/* Data-processing (1 source)
+>   *   31  30  29  28             21 20     16 15    10 9    5 4    0
+>   * +----+---+---+-----------------+---------+--------+------+------+
+>   * | sf | 1 | S | 1 1 0 1 0 1 1 0 | opcode2 | opcode |  Rn  |  Rd  |
+> @@ -4144,7 +4145,7 @@ static void handle_div(DisasContext *s, bool is_signed, unsigned int sf,
+>      }
+>  }
+>
+> -/* C5.6.115 LSLV, C5.6.118 LSRV, C5.6.17 ASRV, C5.6.154 RORV */
+> +/* LSLV, LSRV, ASRV, RORV */
+>  static void handle_shift_reg(DisasContext *s,
+>                               enum a64_shift_type shift_type, unsigned int sf,
+>                               unsigned int rm, unsigned int rn, unsigned int rd)
+> @@ -4206,7 +4207,7 @@ static void handle_crc32(DisasContext *s,
+>      tcg_temp_free_i32(tcg_bytes);
+>  }
+>
+> -/* C3.5.8 Data-processing (2 source)
+> +/* Data-processing (2 source)
+>   *   31   30  29 28             21 20  16 15    10 9    5 4    0
+>   * +----+---+---+-----------------+------+--------+------+------+
+>   * | sf | 0 | S | 1 1 0 1 0 1 1 0 |  Rm  | opcode |  Rn  |  Rd  |
+> @@ -4265,7 +4266,7 @@ static void disas_data_proc_2src(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.5 Data processing - register */
+> +/* Data processing - register */
+>  static void disas_data_proc_reg(DisasContext *s, uint32_t insn)
+>  {
+>      switch (extract32(insn, 24, 5)) {
+> @@ -4359,7 +4360,7 @@ static void handle_fp_compare(DisasContext *s, bool is_double,
+>      tcg_temp_free_i64(tcg_flags);
+>  }
+>
+> -/* C3.6.22 Floating point compare
+> +/* Floating point compare
+>   *   31  30  29 28       24 23  22  21 20  16 15 14 13  10    9    5 4     0
+>   * +---+---+---+-----------+------+---+------+-----+---------+------+-------+
+>   * | M | 0 | S | 1 1 1 1 0 | type | 1 |  Rm  | op  | 1 0 0 0 |  Rn  |  op2  |
+> @@ -4389,7 +4390,7 @@ static void disas_fp_compare(DisasContext *s, uint32_t insn)
+>      handle_fp_compare(s, type, rn, rm, opc & 1, opc & 2);
+>  }
+>
+> -/* C3.6.23 Floating point conditional compare
+> +/* Floating point conditional compare
+>   *   31  30  29 28       24 23  22  21 20  16 15  12 11 10 9    5  4   3    0
+>   * +---+---+---+-----------+------+---+------+------+-----+------+----+------+
+>   * | M | 0 | S | 1 1 1 1 0 | type | 1 |  Rm  | cond | 0 1 |  Rn  | op | nzcv |
+> @@ -4437,7 +4438,7 @@ static void disas_fp_ccomp(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.6.24 Floating point conditional select
+> +/* Floating point conditional select
+>   *   31  30  29 28       24 23  22  21 20  16 15  12 11 10 9    5 4    0
+>   * +---+---+---+-----------+------+---+------+------+-----+------+------+
+>   * | M | 0 | S | 1 1 1 1 0 | type | 1 |  Rm  | cond | 1 1 |  Rn  |  Rd  |
+> @@ -4484,7 +4485,7 @@ static void disas_fp_csel(DisasContext *s, uint32_t insn)
+>      tcg_temp_free_i64(t_true);
+>  }
+>
+> -/* C3.6.25 Floating-point data-processing (1 source) - single precision */
+> +/* Floating-point data-processing (1 source) - single precision */
+>  static void handle_fp_1src_single(DisasContext *s, int opcode, int rd, int rn)
+>  {
+>      TCGv_ptr fpst;
+> @@ -4540,7 +4541,7 @@ static void handle_fp_1src_single(DisasContext *s, int opcode, int rd, int rn)
+>      tcg_temp_free_i32(tcg_res);
+>  }
+>
+> -/* C3.6.25 Floating-point data-processing (1 source) - double precision */
+> +/* Floating-point data-processing (1 source) - double precision */
+>  static void handle_fp_1src_double(DisasContext *s, int opcode, int rd, int rn)
+>  {
+>      TCGv_ptr fpst;
+> @@ -4662,7 +4663,7 @@ static void handle_fp_fcvt(DisasContext *s, int opcode,
+>      }
+>  }
+>
+> -/* C3.6.25 Floating point data-processing (1 source)
+> +/* Floating point data-processing (1 source)
+>   *   31  30  29 28       24 23  22  21 20    15 14       10 9    5 4    0
+>   * +---+---+---+-----------+------+---+--------+-----------+------+------+
+>   * | M | 0 | S | 1 1 1 1 0 | type | 1 | opcode | 1 0 0 0 0 |  Rn  |  Rd  |
+> @@ -4720,7 +4721,7 @@ static void disas_fp_1src(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.6.26 Floating-point data-processing (2 source) - single precision */
+> +/* Floating-point data-processing (2 source) - single precision */
+>  static void handle_fp_2src_single(DisasContext *s, int opcode,
+>                                    int rd, int rn, int rm)
+>  {
+> @@ -4773,7 +4774,7 @@ static void handle_fp_2src_single(DisasContext *s, int opcode,
+>      tcg_temp_free_i32(tcg_res);
+>  }
+>
+> -/* C3.6.26 Floating-point data-processing (2 source) - double precision */
+> +/* Floating-point data-processing (2 source) - double precision */
+>  static void handle_fp_2src_double(DisasContext *s, int opcode,
+>                                    int rd, int rn, int rm)
+>  {
+> @@ -4826,7 +4827,7 @@ static void handle_fp_2src_double(DisasContext *s, int opcode,
+>      tcg_temp_free_i64(tcg_res);
+>  }
+>
+> -/* C3.6.26 Floating point data-processing (2 source)
+> +/* Floating point data-processing (2 source)
+>   *   31  30  29 28       24 23  22  21 20  16 15    12 11 10 9    5 4    0
+>   * +---+---+---+-----------+------+---+------+--------+-----+------+------+
+>   * | M | 0 | S | 1 1 1 1 0 | type | 1 |  Rm  | opcode | 1 0 |  Rn  |  Rd  |
+> @@ -4863,7 +4864,7 @@ static void disas_fp_2src(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.6.27 Floating-point data-processing (3 source) - single precision */
+> +/* Floating-point data-processing (3 source) - single precision */
+>  static void handle_fp_3src_single(DisasContext *s, bool o0, bool o1,
+>                                    int rd, int rn, int rm, int ra)
+>  {
+> @@ -4901,7 +4902,7 @@ static void handle_fp_3src_single(DisasContext *s, bool o0, bool o1,
+>      tcg_temp_free_i32(tcg_res);
+>  }
+>
+> -/* C3.6.27 Floating-point data-processing (3 source) - double precision */
+> +/* Floating-point data-processing (3 source) - double precision */
+>  static void handle_fp_3src_double(DisasContext *s, bool o0, bool o1,
+>                                    int rd, int rn, int rm, int ra)
+>  {
+> @@ -4939,7 +4940,7 @@ static void handle_fp_3src_double(DisasContext *s, bool o0, bool o1,
+>      tcg_temp_free_i64(tcg_res);
+>  }
+>
+> -/* C3.6.27 Floating point data-processing (3 source)
+> +/* Floating point data-processing (3 source)
+>   *   31  30  29 28       24 23  22  21  20  16  15  14  10 9    5 4    0
+>   * +---+---+---+-----------+------+----+------+----+------+------+------+
+>   * | M | 0 | S | 1 1 1 1 1 | type | o1 |  Rm  | o0 |  Ra  |  Rn  |  Rd  |
+> @@ -4973,7 +4974,7 @@ static void disas_fp_3src(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.6.28 Floating point immediate
+> +/* Floating point immediate
+>   *   31  30  29 28       24 23  22  21 20        13 12   10 9    5 4    0
+>   * +---+---+---+-----------+------+---+------------+-------+------+------+
+>   * | M | 0 | S | 1 1 1 1 0 | type | 1 |    imm8    | 1 0 0 | imm5 |  Rd  |
+> @@ -5144,7 +5145,7 @@ static void handle_fpfpcvt(DisasContext *s, int rd, int rn, int opcode,
+>      tcg_temp_free_i32(tcg_shift);
+>  }
+>
+> -/* C3.6.29 Floating point <-> fixed point conversions
+> +/* Floating point <-> fixed point conversions
+>   *   31   30  29 28       24 23  22  21 20   19 18    16 15   10 9    5 4    0
+>   * +----+---+---+-----------+------+---+-------+--------+-------+------+------+
+>   * | sf | 0 | S | 1 1 1 1 0 | type | 0 | rmode | opcode | scale |  Rn  |  Rd  |
+> @@ -5244,7 +5245,7 @@ static void handle_fmov(DisasContext *s, int rd, int rn, int type, bool itof)
+>      }
+>  }
+>
+> -/* C3.6.30 Floating point <-> integer conversions
+> +/* Floating point <-> integer conversions
+>   *   31   30  29 28       24 23  22  21 20   19 18 16 15         10 9  5 4  0
+>   * +----+---+---+-----------+------+---+-------+-----+-------------+----+----+
+>   * | sf | 0 | S | 1 1 1 1 0 | type | 1 | rmode | opc | 0 0 0 0 0 0 | Rn | Rd |
+> @@ -5379,7 +5380,7 @@ static void do_ext64(DisasContext *s, TCGv_i64 tcg_left, TCGv_i64 tcg_right,
+>      tcg_temp_free_i64(tcg_tmp);
+>  }
+>
+> -/* C3.6.1 EXT
+> +/* EXT
+>   *   31  30 29         24 23 22  21 20  16 15  14  11 10  9    5 4    0
+>   * +---+---+-------------+-----+---+------+---+------+---+------+------+
+>   * | 0 | Q | 1 0 1 1 1 0 | op2 | 0 |  Rm  | 0 | imm4 | 0 |  Rn  |  Rd  |
+> @@ -5452,7 +5453,7 @@ static void disas_simd_ext(DisasContext *s, uint32_t insn)
+>      tcg_temp_free_i64(tcg_resh);
+>  }
+>
+> -/* C3.6.2 TBL/TBX
+> +/* BL/TBX
+>   *   31  30 29         24 23 22  21 20  16 15  14 13  12  11 10 9    5 4    0
+>   * +---+---+-------------+-----+---+------+---+-----+----+-----+------+------+
+>   * | 0 | Q | 0 0 1 1 1 0 | op2 | 0 |  Rm  | 0 | len | op | 0 0 |  Rn  |  Rd  |
+> @@ -5520,7 +5521,7 @@ static void disas_simd_tb(DisasContext *s, uint32_t insn)
+>      tcg_temp_free_i64(tcg_resh);
+>  }
+>
+> -/* C3.6.3 ZIP/UZP/TRN
+> +/* ZIP/UZP/TRN
+>   *   31  30 29         24 23  22  21 20   16 15 14 12 11 10 9    5 4    0
+>   * +---+---+-------------+------+---+------+---+------------------+------+
+>   * | 0 | Q | 0 0 1 1 1 0 | size | 0 |  Rm  | 0 | opc | 1 0 |  Rn  |  Rd  |
+> @@ -5632,7 +5633,7 @@ static void do_minmaxop(DisasContext *s, TCGv_i32 tcg_elt1, TCGv_i32 tcg_elt2,
+>      }
+>  }
+>
+> -/* C3.6.4 AdvSIMD across lanes
+> +/* AdvSIMD across lanes
+>   *   31  30  29 28       24 23  22 21       17 16    12 11 10 9    5 4    0
+>   * +---+---+---+-----------+------+-----------+--------+-----+------+------+
+>   * | 0 | Q | U | 0 1 1 1 0 | size | 1 1 0 0 0 | opcode | 1 0 |  Rn  |  Rd  |
+> @@ -5799,7 +5800,7 @@ static void disas_simd_across_lanes(DisasContext *s, uint32_t insn)
+>      tcg_temp_free_i64(tcg_res);
+>  }
+>
+> -/* C6.3.31 DUP (Element, Vector)
+> +/* DUP (Element, Vector)
+>   *
+>   *  31  30   29              21 20    16 15        10  9    5 4    0
+>   * +---+---+-------------------+--------+-------------+------+------+
+> @@ -5842,7 +5843,7 @@ static void handle_simd_dupe(DisasContext *s, int is_q, int rd, int rn,
+>      tcg_temp_free_i64(tmp);
+>  }
+>
+> -/* C6.3.31 DUP (element, scalar)
+> +/* DUP (element, scalar)
+>   *  31                   21 20    16 15        10  9    5 4    0
+>   * +-----------------------+--------+-------------+------+------+
+>   * | 0 1 0 1 1 1 1 0 0 0 0 |  imm5  | 0 0 0 0 0 1 |  Rn  |  Rd  |
+> @@ -5875,7 +5876,7 @@ static void handle_simd_dupes(DisasContext *s, int rd, int rn,
+>      tcg_temp_free_i64(tmp);
+>  }
+>
+> -/* C6.3.32 DUP (General)
+> +/* DUP (General)
+>   *
+>   *  31  30   29              21 20    16 15        10  9    5 4    0
+>   * +---+---+-------------------+--------+-------------+------+------+
+> @@ -5909,7 +5910,7 @@ static void handle_simd_dupg(DisasContext *s, int is_q, int rd, int rn,
+>      }
+>  }
+>
+> -/* C6.3.150 INS (Element)
+> +/* INS (Element)
+>   *
+>   *  31                   21 20    16 15  14    11  10 9    5 4    0
+>   * +-----------------------+--------+------------+---+------+------+
+> @@ -5947,7 +5948,7 @@ static void handle_simd_inse(DisasContext *s, int rd, int rn,
+>  }
+>
+>
+> -/* C6.3.151 INS (General)
+> +/* INS (General)
+>   *
+>   *  31                   21 20    16 15        10  9    5 4    0
+>   * +-----------------------+--------+-------------+------+------+
+> @@ -5976,8 +5977,8 @@ static void handle_simd_insg(DisasContext *s, int rd, int rn, int imm5)
+>  }
+>
+>  /*
+> - * C6.3.321 UMOV (General)
+> - * C6.3.237 SMOV (General)
+> + * UMOV (General)
+> + * SMOV (General)
+>   *
+>   *  31  30   29              21 20    16 15    12   10 9    5 4    0
+>   * +---+---+-------------------+--------+-------------+------+------+
+> @@ -6022,7 +6023,7 @@ static void handle_simd_umov_smov(DisasContext *s, int is_q, int is_signed,
+>      }
+>  }
+>
+> -/* C3.6.5 AdvSIMD copy
+> +/* AdvSIMD copy
+>   *   31  30  29  28             21 20  16 15  14  11 10  9    5 4    0
+>   * +---+---+----+-----------------+------+---+------+---+------+------+
+>   * | 0 | Q | op | 0 1 1 1 0 0 0 0 | imm5 | 0 | imm4 | 1 |  Rn  |  Rd  |
+> @@ -6074,7 +6075,7 @@ static void disas_simd_copy(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.6.6 AdvSIMD modified immediate
+> +/* AdvSIMD modified immediate
+>   *  31  30   29  28                 19 18 16 15   12  11  10  9     5 4    0
+>   * +---+---+----+---------------------+-----+-------+----+---+-------+------+
+>   * | 0 | Q | op | 0 1 1 1 1 0 0 0 0 0 | abc | cmode | o2 | 1 | defgh |  Rd  |
+> @@ -6207,7 +6208,7 @@ static void disas_simd_mod_imm(DisasContext *s, uint32_t insn)
+>      tcg_temp_free_i64(tcg_imm);
+>  }
+>
+> -/* C3.6.7 AdvSIMD scalar copy
+> +/* AdvSIMD scalar copy
+>   *  31 30  29  28             21 20  16 15  14  11 10  9    5 4    0
+>   * +-----+----+-----------------+------+---+------+---+------+------+
+>   * | 0 1 | op | 1 1 1 1 0 0 0 0 | imm5 | 0 | imm4 | 1 |  Rn  |  Rd  |
+> @@ -6230,7 +6231,7 @@ static void disas_simd_scalar_copy(DisasContext *s, uint32_t insn)
+>      handle_simd_dupes(s, rd, rn, imm5);
+>  }
+>
+> -/* C3.6.8 AdvSIMD scalar pairwise
+> +/* AdvSIMD scalar pairwise
+>   *  31 30  29 28       24 23  22 21       17 16    12 11 10 9    5 4    0
+>   * +-----+---+-----------+------+-----------+--------+-----+------+------+
+>   * | 0 1 | U | 1 1 1 1 0 | size | 1 1 0 0 0 | opcode | 1 0 |  Rn  |  Rd  |
+> @@ -6956,7 +6957,7 @@ static void handle_simd_shift_fpint_conv(DisasContext *s, bool is_scalar,
+>      tcg_temp_free_i32(tcg_rmode);
+>  }
+>
+> -/* C3.6.9 AdvSIMD scalar shift by immediate
+> +/* AdvSIMD scalar shift by immediate
+>   *  31 30  29 28         23 22  19 18  16 15    11  10 9    5 4    0
+>   * +-----+---+-------------+------+------+--------+---+------+------+
+>   * | 0 1 | U | 1 1 1 1 1 0 | immh | immb | opcode | 1 |  Rn  |  Rd  |
+> @@ -7031,7 +7032,7 @@ static void disas_simd_scalar_shift_imm(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.6.10 AdvSIMD scalar three different
+> +/* AdvSIMD scalar three different
+>   *  31 30  29 28       24 23  22  21 20  16 15    12 11 10 9    5 4    0
+>   * +-----+---+-----------+------+---+------+--------+-----+------+------+
+>   * | 0 1 | U | 1 1 1 1 0 | size | 1 |  Rm  | opcode | 0 0 |  Rn  |  Rd  |
+> @@ -7418,7 +7419,7 @@ static void handle_3same_float(DisasContext *s, int size, int elements,
+>      }
+>  }
+>
+> -/* C3.6.11 AdvSIMD scalar three same
+> +/* AdvSIMD scalar three same
+>   *  31 30  29 28       24 23  22  21 20  16 15    11  10 9    5 4    0
+>   * +-----+---+-----------+------+---+------+--------+---+------+------+
+>   * | 0 1 | U | 1 1 1 1 0 | size | 1 |  Rm  | opcode | 1 |  Rn  |  Rd  |
+> @@ -8087,7 +8088,7 @@ static void handle_2misc_satacc(DisasContext *s, bool is_scalar, bool is_u,
+>      }
+>  }
+>
+> -/* C3.6.12 AdvSIMD scalar two reg misc
+> +/* AdvSIMD scalar two reg misc
+>   *  31 30  29 28       24 23  22 21       17 16    12 11 10 9    5 4    0
+>   * +-----+---+-----------+------+-----------+--------+-----+------+------+
+>   * | 0 1 | U | 1 1 1 1 0 | size | 1 0 0 0 0 | opcode | 1 0 |  Rn  |  Rd  |
+> @@ -8515,7 +8516,7 @@ static void handle_vec_simd_shrn(DisasContext *s, bool is_q,
+>  }
+>
+>
+> -/* C3.6.14 AdvSIMD shift by immediate
+> +/* AdvSIMD shift by immediate
+>   *  31  30   29 28         23 22  19 18  16 15    11  10 9    5 4    0
+>   * +---+---+---+-------------+------+------+--------+---+------+------+
+>   * | 0 | Q | U | 0 1 1 1 1 0 | immh | immb | opcode | 1 |  Rn  |  Rd  |
+> @@ -8934,7 +8935,7 @@ static void handle_pmull_64(DisasContext *s, int is_q, int rd, int rn, int rm)
+>      tcg_temp_free_i64(tcg_res);
+>  }
+>
+> -/* C3.6.15 AdvSIMD three different
+> +/* AdvSIMD three different
+>   *   31  30  29 28       24 23  22  21 20  16 15    12 11 10 9    5 4    0
+>   * +---+---+---+-----------+------+---+------+--------+-----+------+------+
+>   * | 0 | Q | U | 0 1 1 1 0 | size | 1 |  Rm  | opcode | 0 0 |  Rn  |  Rd  |
+> @@ -9671,7 +9672,7 @@ static void disas_simd_3same_int(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.6.16 AdvSIMD three same
+> +/* AdvSIMD three same
+>   *  31  30  29  28       24 23  22  21 20  16 15    11  10 9    5 4    0
+>   * +---+---+---+-----------+------+---+------+--------+---+------+------+
+>   * | 0 | Q | U | 0 1 1 1 0 | size | 1 |  Rm  | opcode | 1 |  Rn  |  Rd  |
+> @@ -9940,7 +9941,7 @@ static void handle_shll(DisasContext *s, bool is_q, int size, int rn, int rd)
+>      }
+>  }
+>
+> -/* C3.6.17 AdvSIMD two reg misc
+> +/* AdvSIMD two reg misc
+>   *   31  30  29 28       24 23  22 21       17 16    12 11 10 9    5 4    0
+>   * +---+---+---+-----------+------+-----------+--------+-----+------+------+
+>   * | 0 | Q | U | 0 1 1 1 0 | size | 1 0 0 0 0 | opcode | 1 0 |  Rn  |  Rd  |
+> @@ -10452,12 +10453,12 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.6.13 AdvSIMD scalar x indexed element
+> +/* AdvSIMD scalar x indexed element
+>   *  31 30  29 28       24 23  22 21  20  19  16 15 12  11  10 9    5 4    0
+>   * +-----+---+-----------+------+---+---+------+-----+---+---+------+------+
+>   * | 0 1 | U | 1 1 1 1 1 | size | L | M |  Rm  | opc | H | 0 |  Rn  |  Rd  |
+>   * +-----+---+-----------+------+---+---+------+-----+---+---+------+------+
+> - * C3.6.18 AdvSIMD vector x indexed element
+> + * AdvSIMD vector x indexed element
+>   *   31  30  29 28       24 23  22 21  20  19  16 15 12  11  10 9    5 4    0
+>   * +---+---+---+-----------+------+---+---+------+-----+---+---+------+------+
+>   * | 0 | Q | U | 0 1 1 1 1 | size | L | M |  Rm  | opc | H | 0 |  Rn  |  Rd  |
+> @@ -10907,7 +10908,7 @@ static void disas_simd_indexed(DisasContext *s, uint32_t insn)
+>      }
+>  }
+>
+> -/* C3.6.19 Crypto AES
+> +/* Crypto AES
+>   *  31             24 23  22 21       17 16    12 11 10 9    5 4    0
+>   * +-----------------+------+-----------+--------+-----+------+------+
+>   * | 0 1 0 0 1 1 1 0 | size | 1 0 1 0 0 | opcode | 1 0 |  Rn  |  Rd  |
+> @@ -10970,7 +10971,7 @@ static void disas_crypto_aes(DisasContext *s, uint32_t insn)
+>      tcg_temp_free_i32(tcg_decrypt);
+>  }
+>
+> -/* C3.6.20 Crypto three-reg SHA
+> +/* Crypto three-reg SHA
+>   *  31             24 23  22  21 20  16  15 14    12 11 10 9    5 4    0
+>   * +-----------------+------+---+------+---+--------+-----+------+------+
+>   * | 0 1 0 1 1 1 1 0 | size | 0 |  Rm  | 0 | opcode | 0 0 |  Rn  |  Rd  |
+> @@ -11042,7 +11043,7 @@ static void disas_crypto_three_reg_sha(DisasContext *s, uint32_t insn)
+>      tcg_temp_free_i32(tcg_rm_regno);
+>  }
+>
+> -/* C3.6.21 Crypto two-reg SHA
+> +/* Crypto two-reg SHA
+>   *  31             24 23  22 21       17 16    12 11 10 9    5 4    0
+>   * +-----------------+------+-----------+--------+-----+------+------+
+>   * | 0 1 0 1 1 1 1 0 | size | 1 0 1 0 0 | opcode | 1 0 |  Rn  |  Rd  |
 
-I would like to try some things out with the reference implementation.
-Depending on how that goes I may or may not end up providing a detailed
-review for the rest before discussing what I've already addressed.
 
-Regards,
-Halil
+--
+Alex Bennée
