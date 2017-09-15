@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48466)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50796)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsqq2-0000d3-VQ
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:39:24 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dsqwR-0003n9-RF
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:46:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsqpz-0003z8-RB
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:39:23 -0400
-Received: from roura.ac.upc.edu ([147.83.33.10]:33411 helo=roura.ac.upc.es)
+	(envelope-from <vilanova@ac.upc.edu>) id 1dsqwO-0000M9-My
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:45:59 -0400
+Received: from roura.ac.upc.edu ([147.83.33.10]:58397 helo=roura.ac.upc.es)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsqpz-0003tW-C6
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:39:19 -0400
+	(envelope-from <vilanova@ac.upc.edu>) id 1dsqwO-0000Lt-Ap
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:45:56 -0400
 From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
-	<150529666493.10902.14830445134051381968.stgit@frigg.lan>
-	<CAFEAcA9p9B8AFaaSaSOOSsFsEhHW=XPLBFs5MrozWq=7p4_9Zg@mail.gmail.com>
-Date: Fri, 15 Sep 2017 16:39:02 +0300
-In-Reply-To: <CAFEAcA9p9B8AFaaSaSOOSsFsEhHW=XPLBFs5MrozWq=7p4_9Zg@mail.gmail.com>
-	(Peter Maydell's message of "Thu, 14 Sep 2017 15:41:38 +0100")
-Message-ID: <87poasgjyh.fsf@frigg.lan>
+References: <150525010239.15988.8172586618197849619.stgit@frigg.lan>
+	<CAFEAcA-rmX=gUdYTLK4g5TAWVTkCfkbkXXfCxmaaivv8XGdMXg@mail.gmail.com>
+Date: Fri, 15 Sep 2017 16:45:42 +0300
+In-Reply-To: <CAFEAcA-rmX=gUdYTLK4g5TAWVTkCfkbkXXfCxmaaivv8XGdMXg@mail.gmail.com>
+	(Peter Maydell's message of "Thu, 14 Sep 2017 15:54:28 +0100")
+Message-ID: <877ex0gjnd.fsf@frigg.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
+Subject: Re: [Qemu-devel] [PATCH v5 00/22] instrument: Add basic event
+ instrumentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,204 +30,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Emilio G. Cota" <cota@braap.org>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
 Peter Maydell writes:
 
-> On 13 September 2017 at 10:57, Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> =
+> On 12 September 2017 at 22:01, Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> =
 wrote:
->> Signed-off-by: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
->> ---
->> MAINTAINERS         |    6 ++
->> docs/instrument.txt |  173 +++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->> 2 files changed, 179 insertions(+)
->> create mode 100644 docs/instrument.txt
+>> This series adds an API to add instrumentation events.
 >>=20
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 36eeb42d19..fb0eaee06a 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -1486,6 +1486,12 @@ F: scripts/tracetool/
->> F: docs/tracing.txt
->> T: git git://github.com/stefanha/qemu.git tracing
+>> It also provides additional APIs for:
+>> * Controlling tracing events.
+>> * Peek/poke guest memory.
+
+>> Future APIs (for later series):
+>> * Peek/poke guest registers.
+>> * Add breakpoints to trigger instrumentation functions.
+>> * Trigger instrumentation functions from guest code (former hypertrace).
+>> * Add events for guest code translation/execution (once the respective t=
+racing
+>> events are accepted upstream).
+>> * Add events for exceptions/syscalls.
+>> * Add events for TB invalidation (necessary for libraries to deallocate =
+any data
+>> they might have allocated for the TBs they instrumented).
 >>=20
->> +Event instrumentation
->> +M: Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
->> +M: Stefan Hajnoczi <stefanha@redhat.com>
->> +S: Maintained
->> +F: docs/instrument.txt
->> +
->> TPM
->> S: Orphan
->> F: tpm.c
->> diff --git a/docs/instrument.txt b/docs/instrument.txt
->> new file mode 100644
->> index 0000000000..24a0d21fc7
->> --- /dev/null
->> +++ b/docs/instrument.txt
->> @@ -0,0 +1,173 @@
->> +=3D Event instrumentation =3D
->> +
->> +=3D=3D Introduction =3D=3D
->> +
->> +Event instrumentation allows users to execute their own host-native cod=
-e on a
->> +set of pre-defined events provided by QEMU. QEMU also exposes other
->> +functionality to peek/poke at the guest state (e.g., memory or register=
-s), as
->> +well as interacting with tracing events. For those familiar with the te=
-rm, this
->> +provides dynamic binary instrumentation, works on all QEMU-supported
->> +architectures, as well as works in both 'user' (standalone application)=
- and
->> +'system' (full-system emulation) modes.
->> +
->> +Look at the headers installed by QEMU on the "qemu-instr" directory for=
- further
->> +information beyond this document.
->> +
->> +
->> +=3D=3D Loading an instrumentation library =3D=3D
->> +
->> +Instrumentation code can be bundled into a dynamic library, which can b=
-e later
->> +loaded into QEMU:
->> +
->> +* Using the command-line "-instr" argument.
->> +
->> +* Using the "instr-load" and "instr-unload" commands in the HMP and QMP
->> +  interfaces.
->> +
->> +
->> +=3D=3D Example =3D=3D
->> +
->> +1. Configure QEMU with event instrumentation:
->> +
->> +    # instrument guest_cpu_enter and guest_mem_before
->> +    mkdir -p /path/to/qemu-build
->> +    cd /path/to/qemu-build
->> +    /path/to/qemu-source/configure \
->> +      --enable-instrument \
->> +      --prefix=3D/path/to/qemu-install
+>> The instrumentation code is dynamically loaded as a library into QEMU ei=
+ther
+>> when it starts or later using its remote control interfaces. The loaded =
+code
+>> only has access to function explicitly exported through the QI_VPUBLIC m=
+acro.
+>>=20
+>> This series is branch 'devel-instrument' in
+>> https://code.gso.ac.upc.edu/git/qemu-dbi.
 
-> Ideally instrumentation should be cost-free in the case where
-> we're not using it, so we can default it to enabled.
+> To parallel the comment I sent on Emilio's series: I think the
+> first thing we should do here is work out the API we want to
+> present to the instrumentation plugin, because that's permanent
+> and we want to get it right. Then we can figure out the
+> implementation details later.
 
-I wasn't sure if everyone would want it enabled by default on the first rel=
-ease,
-but I can easily change that.
+> Particular notes:
+>  * putting things in the instrumentation plugin API that basically
+>    parallel some existing trace points is something I'm wary of,
+>    because a lot of our existing tracing is "output something at
+>    a point and in a way that's convenient for our internal
+>    implementation", rather than "what is the right clean interface
+>    to provide this sort of information". I'd rather we started
+>    with a blank piece of paper and designed an API, and then
+>    implemented it.
+
+Do you have an opinion on specific trace points, or an observation in gener=
+al?
+
+I wanted to have the following events:
+
+* cpu hotplug/hotunplug
+* cpu reset
+* memory access translation/execution
+* BBL/TB translation/execution
+* instruction translation/execution
+* exceptions / syscalls
 
 
->> +
->> +2. Build and install QEMU:
->> +
->> +    make install
->> +
->> +3. Create the "Makefile" to build the instrumentation library:
->> +
->> +    mkdir -p /tmp/my-instrument
->> +
->> +    cat > /tmp/my-instrument/Makefile <<EOF
->> +    QEMU_PATH=3D/tmp/qemu-install/
->> +
->> +    CFLAGS +=3D -g
->> +    CFLAGS +=3D -O3
->> +    CFLAGS +=3D -Werror -Wall
->> +    CFLAGS +=3D -I$(QEMU_PATH)/include
+>  * I definitely don't think we should expose to the instrumentation
+>    the distinction between translate time and execute time
 
-> Plugins shouldn't have or need access to all of the QEMU source
-> tree or its include files. We want to be able to provide them
-> with one header file which defines all they need (and all they
-> get), under a suitably non-restrictive license like 2-clause-BSD.
+Please see my response to your email in v6.
 
-Variable QEMU_PATH refers to the *installation* path of QEMU.
-
-I can change the API headers to use some other license.
-
-
->> +
->> +    all: libtrace-instrument.la
->> +
->> +    libtrace-instrument.la: instrument.lo
->> +            libtool --mode=3Dlink --tag=3DCC $(CC) -module -rpath /usr/=
-local/lib -o $@ $^
-
-> -rpath ?
-
-I couldn't make libtool to generate a .so file without it. I can change the
-example to directly use gcc instead of libtool.
-
-
->> +
->> +    %.lo: %.c
->> +            libtool --mode=3Dcompile --tag=3DCC $(CC) $(CFLAGS) -c $^
->> +
->> +    clean:
->> +            $(RM) -f *.o *.so *.lo
->> +            $(RM) -Rf .libs
->> +    EOF
->> +
->> +4. Write your instrumentation library:
->> +
->> +    cat > /tmp/my-instrument/instrument.c <<EOF
->> +    #include <stdio.h>
->> +    #include <assert.h>
->> +
->> +    #include <qemu-instr/control.h>         /* manipulate events */
->> +    #include <qemu-instr/trace.h>           /* manipulate tracing */
->> +
->> +    /* the address for the memory access is not known at translation ti=
-me */
->> +    void guest_mem_before_trans(QICPU vcpu_trans, QITCGv_cpu vcpu_exec,
->> +                                QITCGv vaddr, QIMemInfo info)
->> +    {
->> +        printf("%s: %p %p %p %d %d %d %d\n", __func__, vcpu_trans, vcpu=
-_exec, vaddr,
->> +               1 << info.size_shift, info.sign_extend, info.endianness,=
- info.store);
->> +        if (info.store) {
->> +            /* generate at execution time only for memory writes */
->> +            qi_event_gen_guest_mem_before_exec(vcpu_exec, vaddr, info);
->> +        }
->> +    }
->> +
->> +    /* called when QEMU executes a memory access */
->> +    void guest_mem_before_exec(QICPU vcpu, uint64_t vaddr, QIMemInfo in=
-fo)
->> +    {
->> +        if (info.store) {
->> +            /* if called by TCG code, we'll only get writes (see above)=
- */
->> +            printf("%s: %p %lx %d %d %d %d\n", __func__, vcpu, vaddr,
->> +                   1 << info.size_shift, info.sign_extend, info.endiann=
-ess, info.store);
->> +        }
->> +    }
-
-> This looks like it's exposing too much implementation detail.
-> We should just provide an API for "hook to be called for
-> memory writes" which gets all the information when it
-> is called. I don't think we should expose any kind of
-> "this hook is called at translation time" at all.
-
-The differentiation between translation-time and execution-time is key to
-perform certain analysis efficiently.
-
-The simplest example is probably a BBL trace (e.g., as used by SimPoint
-[1]). For each BBL (or, rather, TB) that you translate, you collect what
-instructions are in it (addresses, length, opcodes, etc). Then, at execution
-time you only need to collect the starting address of each executed BBL/TB,
-since its information was already collected before at translation time
-(therefore making it more efficient).
-
-[1] https://cseweb.ucsd.edu/~calder/simpoint/
-
-
-> I guess the API docs are in doc comments in a header somewhere,
-> so I'll go look in the other patches.
-
-Yes, you can look at headers in instrument/qemu-instr/.
+Also, I forgot an even simpler case, like instrumenting a subset of memory
+accesses (e.g., only writes).
 
 
 Thanks,
