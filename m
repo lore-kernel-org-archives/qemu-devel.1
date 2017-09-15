@@ -1,31 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52940)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dszpv-0008CT-Lq
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:15:53 -0400
+	(envelope-from <bounces@canonical.com>) id 1dszze-0002I0-MW
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:25:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dszps-0001DR-Gm
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:15:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43285)
+	(envelope-from <bounces@canonical.com>) id 1dszzb-0004j7-D4
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:25:54 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44067)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dszps-0001Bp-7T
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:15:48 -0400
+	id 1dszzb-0004ib-6p
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:25:51 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dszpq-0004V1-IO
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 23:15:46 +0000
+	id 1dszza-0005UD-4W
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 23:25:50 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 808002E846D
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 23:15:46 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id 1844B2E846C
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 23:25:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Sep 2017 23:02:08 -0000
+Date: Fri, 15 Sep 2017 23:08:04 -0000
 From: James Clarke <jrtc27@jrtc27.com>
 Reply-To: Bug 1594394 <1594394@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <20160620140124.12349.60184.malonedeb@wampee.canonical.com>
-Message-Id: <150551652853.29673.12752573811964275953.malone@chaenomeles.canonical.com>
+Message-Id: <150551688452.31599.18054112881631628633.malone@soybean.canonical.com>
 Errors-To: bounces@canonical.com
 Subject: [Qemu-devel] [Bug 1594394] Re: Using setreuid / setegid crashes
  x86_64 user-mode target
@@ -39,8 +39,9 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-What's the status of this? This is causing aptitude in Debian chroots to
-reliably segfault under qemu-arm-user.
+And to confirm, while somewhat of a hack, that patch does indeed fix
+aptitude as expected (as well as my minimal test case I wrote when
+debugging this before stumbling upon this bug report).
 
 -- =
 
