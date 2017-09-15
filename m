@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46891)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47021)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsvWT-0000sY-CS
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:39:30 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dsvWu-00016Q-FV
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:39:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsvWS-0008Ld-CN
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:39:29 -0400
-References: <20170915101008.16646-1-kwolf@redhat.com>
-	<20170915101008.16646-4-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7ec4e7ce-e748-1676-ff81-590321b1379b@redhat.com>
-Date: Fri, 15 Sep 2017 13:39:17 -0500
+	(envelope-from <laurent@vivier.eu>) id 1dsvWp-0000G8-II
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:39:56 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:57290)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dsvWp-0000Ee-8N
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:39:51 -0400
+References: <20170915065821.16600-1-jrtc27@jrtc27.com>
+	<2f7283ca-6ecd-165f-c572-a0f2a781aba7@amsat.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <bd55c9d1-36f6-0a2b-8608-c58ce060737f@vivier.eu>
+Date: Fri, 15 Sep 2017 20:39:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170915101008.16646-4-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="lVptb4qcNjfm0S8LjX3FSAsqegGk09KnF"
-Subject: Re: [Qemu-devel] [PATCH 3/6] block: Add reopen queue to
- bdrv_check_perm()
+In-Reply-To: <2f7283ca-6ecd-165f-c572-a0f2a781aba7@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user/syscall.c: Handle SH4's
+ exceptional alignment for p{read, write}64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,60 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, James Clarke <jrtc27@jrtc27.com>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---lVptb4qcNjfm0S8LjX3FSAsqegGk09KnF
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
-Message-ID: <7ec4e7ce-e748-1676-ff81-590321b1379b@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 3/6] block: Add reopen queue to
- bdrv_check_perm()
-References: <20170915101008.16646-1-kwolf@redhat.com>
- <20170915101008.16646-4-kwolf@redhat.com>
-In-Reply-To: <20170915101008.16646-4-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Le 15/09/2017 à 17:41, Philippe Mathieu-Daudé a écrit :
+> On 09/15/2017 03:58 AM, James Clarke wrote:
+>> Fixes: https://bugs.launchpad.net/qemu/+bug/1716767
+>> Signed-off-by: James Clarke <jrtc27@jrtc27.com>
+> 
+> Congratulations! You have won yourself a R: entry (Designated reviewer)
+> in the "Linux user" and "SH4" sections of MAINTAINERS!
+> 
+>> ---
+>>   linux-user/syscall.c | 12 ++++++++++++
+>>   1 file changed, 12 insertions(+)
+>>
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index 9b6364a266..24d6a81c21 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -10495,20 +10495,32 @@ abi_long do_syscall(void *cpu_env, int num,
+>> abi_long arg1,
+>>   #endif
+>>   #ifdef TARGET_NR_pread64
+>>       case TARGET_NR_pread64:
+>> +#if defined(TARGET_SH4)
+>> +        /* SH4 doesn't align register pairs, except for
+>> p{read,write}64 */
+>> +        arg4 = arg5;
+>> +        arg5 = arg6;
+>> +#else
+>>           if (regpairs_aligned(cpu_env)) {
+>>               arg4 = arg5;
+>>               arg5 = arg6;
+>>           }
+>> +#endif
+> 
+> I'd rather use arch_type from "sysemu/arch_init.h":
+> 
+>   case TARGET_NR_pwrite64:
+>       /* SH4 doesn't align register pairs, except for p{read,write}64 */
+>       if (arch_type == QEMU_ARCH_SH4 || regpairs_aligned(cpu_env)) {
+>           arg4 = arg5;
+>           arg5 = arg6;
+>       }
+> 
+> What do you think?
 
-On 09/15/2017 05:10 AM, Kevin Wolf wrote:
-> In the context of bdrv_reopen(), we'll have to look at the state of the=
+For the moment, arch_type is only available for system targets.
 
-> graph as it will be after the reopen. This interface addition is in
-> preparation for the change.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  block.c | 34 +++++++++++++++++++---------------
->  1 file changed, 19 insertions(+), 15 deletions(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---lVptb4qcNjfm0S8LjX3FSAsqegGk09KnF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm8HlYACgkQp6FrSiUn
-Q2qotwf9GP50tQZnSK8nIAnHbzyd76oJYQN0ZAaaG7KwxrSg2fxaabR5jeMamJmi
-vyNFsT9PTBdS2MuA0LBVqhrnAXQ4fVP+BV/fdRdB+dHQCLt7uGx5iIuRrxBbZCmh
-wOXCz4+ghWFOKMFTC3cXfvgmX80zulrx9oqaIXU5p1d0Bcvt+mOnY4ReUxPCbltw
-gB1Xmj5CHnKHjTcKFKYZo7g/IAjcP6U6vRMRGfDs9GyoM44LJgMlBzSYxqMhj+LZ
-CiGKjSnnYXvVeh83onTMdNRrtA2KnXtUswHzXQEKYOKGFASKbbM4Eib0FyLPDBcs
-L6bxZzjclAdNenO+/8WL+zve0eim+g==
-=2NJl
------END PGP SIGNATURE-----
-
---lVptb4qcNjfm0S8LjX3FSAsqegGk09KnF--
+Laurent
