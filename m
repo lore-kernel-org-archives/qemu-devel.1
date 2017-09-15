@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43305)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45346)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dskoa-0003MV-Bn
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:13:29 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dskz4-0007hV-4e
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:24:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dskoX-0006HW-4T
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:13:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50188)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dskoW-0006Gz-UR
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:13:25 -0400
-References: <1503049022-14749-1-git-send-email-hare@suse.de>
-	<09f093ef-a073-7374-0f40-330febc7c196@redhat.com>
-	<04707d3f-118b-aeaa-0c4c-89ccb1475820@redhat.com>
-	<150543488598.22700.2165222026626673271@loki>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4672dd08-eed4-914b-f4b3-bf886021cf1b@redhat.com>
-Date: Fri, 15 Sep 2017 09:13:19 +0200
+	(envelope-from <eric.auger@redhat.com>) id 1dskz3-0006Sl-0I
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:24:18 -0400
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<1504286483-23327-14-git-send-email-eric.auger@redhat.com>
+	<20170914092751.GA3336@virtx40>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <403a9798-fed2-671f-fc6e-7cc0fd53c90c@redhat.com>
+Date: Fri, 15 Sep 2017 09:23:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <150543488598.22700.2165222026626673271@loki>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20170914092751.GA3336@virtx40>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] scsi-bus: correct responses for INQUIRY
- and REQUEST SENSE
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 13/20] hw/arm/smmuv3:
+ Implement IOMMU memory region replay callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +25,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, Hannes Reinecke <hare@suse.de>, Laszlo Ersek <lersek@redhat.com>
-Cc: Hannes Reinecke <hare@suse.com>, qemu-devel@nongnu.org
+To: Linu Cherian <linuc.decode@gmail.com>
+Cc: peter.maydell@linaro.org, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mohun106@gmail.com, jean-philippe.brucker@arm.com, tn@semihalf.com, bharat.bhushan@nxp.com, mst@redhat.com, will.deacon@arm.com, qemu-devel@nongnu.org, peterx@redhat.com, alex.williamson@redhat.com, qemu-arm@nongnu.org, christoffer.dall@linaro.org, linu.cherian@cavium.com, wtownsen@redhat.com, robin.murphy@arm.com, prem.mallappa@gmail.com, eric.auger.pro@gmail.com
 
-On 15/09/2017 02:21, Michael Roth wrote:
-> Quoting Paolo Bonzini (2017-08-22 08:20:23)
->> On 19/08/2017 00:55, Laszlo Ersek wrote:
->>> Reported-by: Laszlo Ersek <lersek@redhat.com>
->>> Fixes: ded6ddc5a7b95217557fa360913d1213e12d4a6d
->>
->> And also:
->>
->> Cc: qemu-stable@nongnu.org
+Hi Linu,
+
+On 14/09/2017 11:27, Linu Cherian wrote:
+> Hi Eric,
 > 
-> FYI patch freeze for v2.10.1 is Sep 25th. Hannes, were you planning to
-> resend with the suggested commit msg changes? (Or maybe having a willing
-> maintainer add them?)
+> On Fri Sep 01, 2017 at 07:21:16PM +0200, Eric Auger wrote:
+>> memory_region_iommu_replay() is used for VFIO integration.
+>>
+>> However its default implementation is not adapted to SMMUv3
+>> IOMMU memory region. Indeed the input address range is too
+>> huge and its execution is too slow as it calls the translate()
+>> callback on each granule.
+>>
+>> Let's implement the replay callback which hierarchically walk
+>> over the page table structure and notify only the segments
+>> that are populated with valid entries.
+>>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>> ---
+>>  hw/arm/smmuv3.c     | 36 ++++++++++++++++++++++++++++++++++++
+>>  hw/arm/trace-events |  1 +
+>>  2 files changed, 37 insertions(+)
+>>
+>> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+>> index 8e7d10d..c43bd93 100644
+>> --- a/hw/arm/smmuv3.c
+>> +++ b/hw/arm/smmuv3.c
+>> @@ -657,6 +657,41 @@ static int smmuv3_notify_entry(IOMMUTLBEntry *entry, void *private)
+>>      return 0;
+>>  }
+>>  
+>> +/* Unmap the whole notifier's range */
+>> +static void smmuv3_unmap_notifier_range(IOMMUNotifier *n)
+>> +{
+>> +    IOMMUTLBEntry entry;
+>> +    hwaddr size = n->end - n->start + 1;
+>> +
+>> +    entry.target_as = &address_space_memory;
+>> +    entry.iova = n->start & ~(size - 1);
+>> +    entry.perm = IOMMU_NONE;
+>> +    entry.addr_mask = size - 1;
+>> +
+>> +    memory_region_notify_one(n, &entry);
+>> +}
+>> +
+>> +static void smmuv3_replay(IOMMUMemoryRegion *mr, IOMMUNotifier *n)
+>> +{
+>> +    SMMUTransCfg cfg = {};
+>> +    int ret;
+>> +
+>> +    trace_smmuv3_replay(mr->parent_obj.name, n, n->start, n->end);
+>> +    smmuv3_unmap_notifier_range(n);
+>> +
+>> +    ret = smmuv3_decode_config(mr, &cfg);
+>> +    if (ret) {
+>> +        error_report("%s error decoding the configuration for iommu mr=%s",
+>> +                     __func__, mr->parent_obj.name);
+>> +    }
+>>
+> 
+> On an invalid config being found, shouldnt we return rather than proceeding with
+> page table walk. For example on an invalid Stream table entry.
+Yes that's correct. I am going to fix that.
 
-I'm sending the pull request today or monday.
+Thanks!
 
-Paolo
+Eric
+> 
+> +
+>> +    if (cfg.disabled || cfg.bypassed) {
+>> +        return;
+>> +    }
+>> +    /* walk the page tables and replay valid entries */
+>> +    smmu_page_walk(&cfg, 0, (1ULL << (64 - cfg.tsz)) - 1, false,
+>> +                   smmuv3_notify_entry, n);
+>> +}
+>>  static void smmuv3_notify_iova_range(IOMMUMemoryRegion *mr, IOMMUNotifier *n,
+>>                                       uint64_t iova, size_t size)
+>>  {
+>> @@ -1095,6 +1130,7 @@ static void smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
+>>  
+>>      imrc->translate = smmuv3_translate;
+>>      imrc->notify_flag_changed = smmuv3_notify_flag_changed;
+>> +    imrc->replay = smmuv3_replay;
+>>  }
+>>  
+>>  static const TypeInfo smmuv3_type_info = {
+>> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+>> index 4ac264d..15f84d6 100644
+>> --- a/hw/arm/trace-events
+>> +++ b/hw/arm/trace-events
+>> @@ -46,5 +46,6 @@ smmuv3_cfg_stage(int s, uint32_t oas, uint32_t tsz, uint64_t ttbr, bool aa64, ui
+>>  smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node for iommu mr=%s"
+>>  smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node for iommu mr=%s"
+>>  smmuv3_replay_mr(const char *name) "iommu mr=%s"
+>> +smmuv3_replay(const char *name, void *n, hwaddr start, hwaddr end) "iommu mr=%s notifier=%p [0x%"PRIx64",0x%"PRIx64"]"
+>>  smmuv3_notify_entry(hwaddr iova, hwaddr pa, hwaddr mask, int perm) "iova=0x%"PRIx64" pa=0x%" PRIx64" mask=0x%"PRIx64" perm=%d"
+>>  smmuv3_notify_iova_range(const char *name, uint64_t iova, size_t size, void *n) "iommu mr=%s iova=0x%"PRIx64" size=0x%lx n=%p"
+>> -- 
+>> 2.5.5
+>>
+>>
+> 
