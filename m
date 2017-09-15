@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53574)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54675)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dslWm-00067J-FZ
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:59:09 -0400
+	(envelope-from <thuth@redhat.com>) id 1dslaC-0007iX-HL
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:02:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dslWi-0007RA-Jf
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:59:08 -0400
-Date: Fri, 15 Sep 2017 15:58:57 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170915075857.GR3617@pxdev.xzpeter.org>
-References: <20170915054404.19914-1-famz@redhat.com>
-	<20170915054404.19914-2-famz@redhat.com>
-	<20170915064132.GP3617@pxdev.xzpeter.org>
-	<20170915064907.GD17199@lemon>
-	<20170915065627.GQ3617@pxdev.xzpeter.org>
-	<20170915070232.GF17199@lemon>
+	(envelope-from <thuth@redhat.com>) id 1dsla9-0000YH-Ce
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:02:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51018)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dsla9-0000Y5-6i
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:02:37 -0400
+From: Thomas Huth <thuth@redhat.com>
+Date: Fri, 15 Sep 2017 10:02:20 +0200
+Message-Id: <1505462549-27298-1-git-send-email-thuth@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170915070232.GF17199@lemon>
-Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Allow ram_save_cleanup to
- be called with empty state
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 0/9] Fixes and improvements for various qtests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +24,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, John Snow <jsnow@redhat.com>
 
-On Fri, Sep 15, 2017 at 03:02:32PM +0800, Fam Zheng wrote:
-> On Fri, 09/15 14:56, Peter Xu wrote:
-> > On Fri, Sep 15, 2017 at 02:49:07PM +0800, Fam Zheng wrote:
-> > > On Fri, 09/15 14:41, Peter Xu wrote:
-> > > > On Fri, Sep 15, 2017 at 01:44:02PM +0800, Fam Zheng wrote:
-> > > > > So that we can do cleanup unconditionally at the end of main().
-> > > > > 
-> > > > > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > > > > ---
-> > > > >  migration/ram.c | 3 +++
-> > > > >  1 file changed, 3 insertions(+)
-> > > > > 
-> > > > > diff --git a/migration/ram.c b/migration/ram.c
-> > > > > index e18b3e2d4f..37e6a71241 100644
-> > > > > --- a/migration/ram.c
-> > > > > +++ b/migration/ram.c
-> > > > > @@ -1365,6 +1365,9 @@ static void ram_save_cleanup(void *opaque)
-> > > > >      RAMState **rsp = opaque;
-> > > > >      RAMBlock *block;
-> > > > >  
-> > > > > +    if (!rsp || !*rsp) {
-> > > > > +        return;
-> > > > > +    }
-> > > > >      /* caller have hold iothread lock or is in a bh, so there is
-> > > > >       * no writing race against this migration_bitmap
-> > > > >       */
-> > > > > -- 
-> > > > > 2.13.5
-> > > > > 
-> > > > 
-> > > > Instead of take special care on RAM, how about check in
-> > > > migrate_fd_cancel(), and return directly if migration_is_idle()?
-> > > 
-> > > This is not from migrate_fd_cancel(), but from qemu_savevm_state_cleanup(), so
-> > > that doesn't work.
-> > 
-> > Yeh I see the point.  But my logic still stands - we don't need to
-> > cleanup anything if the migration is not really there.
-> > 
-> > I'm thinking whether we can put qemu_savevm_state_cleanup() into
-> > migrate_fd_cancel() in some way, though I am still not 100% sure on
-> > the colo part.  Anyway, I feel like a bit confusing we have two
-> > cleanup functions.
-> 
-> I agree, but I don't know what is the best way to clean this up: savevm and
-> migration seem a little independent from each other.
+The following changes since commit 3dabde1128b671f36ac6cb36b97b2731399644=
+20:
 
-After a 2nd thought I think this single patch is ok, at least it
-allows qemu_savevm_state_cleanup() to be run without caring much about
-migration state.  So:
+  Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20170914' =
+into staging (2017-09-14 16:33:02 +0100)
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+are available in the git repository at:
 
-Thanks,
+  git://github.com/huth/qemu.git tags/check-20170915
 
--- 
-Peter Xu
+for you to fetch changes up to 7b899f4dd596dbb7d271f7fab36fbfffec84868e:
+
+  qtest: Avoid passing raw strings through hmp() (2017-09-15 09:05:19 +02=
+00)
+
+----------------------------------------------------------------
+Some fixes and improvements for various qtests by Eric and me.
+
+----------------------------------------------------------------
+Eric Blake (5):
+      test-qga: Kill broken and dead QGA_TEST_SIDE_EFFECTING code
+      qtest: Don't perform side effects inside assertion
+      numa-test: Use hmp()
+      libqtest: Remove dead qtest_instances variable
+      qtest: Avoid passing raw strings through hmp()
+
+Thomas Huth (4):
+      tests: Introduce generic device hot-plug/hot-unplug functions
+      tests/test-hmp: Remove puv3 and tricore_testboard from the blacklis=
+t
+      tests/libqtest: Use a proper error message if QTEST_QEMU_BINARY is =
+missing
+      tests: Fix broken ivshmem-server-msi/-irq tests
+
+ qtest.c                    |  82 ++++++++++++++++++++++++-----------
+ tests/libqos/pci.c         |  26 ++++-------
+ tests/libqos/usb.c         |  30 +++----------
+ tests/libqtest.c           | 105 +++++++++++++++++++++++++++++++++++++++=
+------
+ tests/libqtest.h           |  27 ++++++++++--
+ tests/numa-test.c          |  21 ++-------
+ tests/test-hmp.c           |   7 ++-
+ tests/test-qga.c           |  90 --------------------------------------
+ tests/usb-hcd-uhci-test.c  |  26 +----------
+ tests/usb-hcd-xhci-test.c  |  51 ++--------------------
+ tests/virtio-scsi-test.c   |  24 +----------
+ tests/virtio-serial-test.c |  25 ++---------
+ 12 files changed, 203 insertions(+), 311 deletions(-)
