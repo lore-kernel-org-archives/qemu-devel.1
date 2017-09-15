@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53889)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dsheV-0005Sc-Bw
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:50:52 -0400
+	(envelope-from <Tomasz.Nowicki@cavium.com>) id 1dso5W-0005Hz-1T
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:43:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dsheS-0002pL-6n
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:50:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51804)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dsheS-0002p6-0c
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:50:48 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dsheP-0005l0-Qe
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 03:50:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id BF9F02E8488
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 03:50:45 +0000 (UTC)
+	(envelope-from <Tomasz.Nowicki@cavium.com>) id 1dso5V-0005Ux-1J
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:43:10 -0400
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<1504286483-23327-14-git-send-email-eric.auger@redhat.com>
+	<20170914092751.GA3336@virtx40>
+	<4dbbccae-64e1-f4ac-4dcc-3abd9766f324@caviumnetworks.com>
+	<795d99ba-e492-04ce-dda4-709682baf6cd@caviumnetworks.com>
+	<4f9fc697-9e6c-5dd7-65c7-92326135aa56@redhat.com>
+From: tn <Tomasz.Nowicki@caviumnetworks.com>
+Date: Fri, 15 Sep 2017 12:42:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Sep 2017 03:40:58 -0000
-From: Iordan Iordanov <iiordanov@gmail.com>
-Reply-To: Bug 1717414 <1717414@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150544685826.29673.14944456813287969209.malonedeb@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1717414] [NEW] Sending certain keysyms results in
- wrong symbol input
+In-Reply-To: <4f9fc697-9e6c-5dd7-65c7-92326135aa56@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Message-ID: <MWHPR0701MB3660656E62CF668F057621A7F36C0@MWHPR0701MB3660.namprd07.prod.outlook.com>
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 13/20] hw/arm/smmuv3:
+ Implement IOMMU memory region replay callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,92 +29,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Auger Eric <eric.auger@redhat.com>, Tomasz Nowicki <tnowicki@caviumnetworks.com>, Linu Cherian <linuc.decode@gmail.com>
+Cc: eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, peterx@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, wtownsen@redhat.com, linu.cherian@cavium.com
 
-Public bug reported:
+Hi Eric,
 
-I develop bVNC, an Android VNC client. I noticed that when I connect to
-qemu VMs that have a VNC console, Keysyms that are usually sent over
-with SHIFT modifier when connecting from a PC have wrong symbols typed
-within the VM. A very short list of examples:
+On 15.09.2017 09:30, Auger Eric wrote:
+> Hi Tomasz,
+> 
+> On 14/09/2017 16:43, Tomasz Nowicki wrote:
+>> On 14.09.2017 16:31, Tomasz Nowicki wrote:
+>>> Hi Eric,
+>>>
+>>> On 14.09.2017 11:27, Linu Cherian wrote:
+>>>> Hi Eric,
+>>>>
+>>>> On Fri Sep 01, 2017 at 07:21:16PM +0200, Eric Auger wrote:
+>>>>> memory_region_iommu_replay() is used for VFIO integration.
+>>>>>
+>>>>> However its default implementation is not adapted to SMMUv3
+>>>>> IOMMU memory region. Indeed the input address range is too
+>>>>> huge and its execution is too slow as it calls the translate()
+>>>>> callback on each granule.
+>>>>>
+>>>>> Let's implement the replay callback which hierarchically walk
+>>>>> over the page table structure and notify only the segments
+>>>>> that are populated with valid entries.
+>>>>>
+>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>> ---
+>>>>>    hw/arm/smmuv3.c     | 36 ++++++++++++++++++++++++++++++++++++
+>>>>>    hw/arm/trace-events |  1 +
+>>>>>    2 files changed, 37 insertions(+)
+>>>>>
+>>>>> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+>>>>> index 8e7d10d..c43bd93 100644
+>>>>> --- a/hw/arm/smmuv3.c
+>>>>> +++ b/hw/arm/smmuv3.c
+>>>>> @@ -657,6 +657,41 @@ static int smmuv3_notify_entry(IOMMUTLBEntry
+>>>>> *entry, void *private)
+>>>>>        return 0;
+>>>>>    }
+>>>>> +/* Unmap the whole notifier's range */
+>>>>> +static void smmuv3_unmap_notifier_range(IOMMUNotifier *n)
+>>>>> +{
+>>>>> +    IOMMUTLBEntry entry;
+>>>>> +    hwaddr size = n->end - n->start + 1;
+>>>>> +
+>>>>> +    entry.target_as = &address_space_memory;
+>>>>> +    entry.iova = n->start & ~(size - 1);
+>>>>> +    entry.perm = IOMMU_NONE;
+>>>>> +    entry.addr_mask = size - 1;
+>>>>> +
+>>>>> +    memory_region_notify_one(n, &entry);
+>>>>> +}
+>>>>> +
+>>>>> +static void smmuv3_replay(IOMMUMemoryRegion *mr, IOMMUNotifier *n)
+>>>>> +{
+>>>>> +    SMMUTransCfg cfg = {};
+>>>>> +    int ret;
+>>>>> +
+>>>>> +    trace_smmuv3_replay(mr->parent_obj.name, n, n->start, n->end);
+>>>>> +    smmuv3_unmap_notifier_range(n);
+>>>>> +
+>>>>> +    ret = smmuv3_decode_config(mr, &cfg);
+>>>>> +    if (ret) {
+>>>>> +        error_report("%s error decoding the configuration for iommu
+>>>>> mr=%s",
+>>>>> +                     __func__, mr->parent_obj.name);
+>>>>> +    }
+>>>>>
+>>>>
+>>>> On an invalid config being found, shouldnt we return rather than
+>>>> proceeding with
+>>>> page table walk. For example on an invalid Stream table entry.
+>>>
+>>> Indeed, without return here vhost case is not working for me.
+>>
+>> I was just lucky one time. return here has no influence. Vhost still not
+>> working. Sorry for noise.
+> 
+> As far as I understand the replay() callback only is called in VFIO use
+> case. So this shouldn't impact vhost.
+> 
+> I can't reproduce your vhost issue on my side. I will review the
+> invalidate code again and compare against the last version.
+> 
+> What is the page size used by your guest?
 
-exclam                              33     0x0021
+64K page size for guest as well as for host.
 
-results in "1" typed in the VM.
+However, I've just checked 4K page size for guest and then vhost is 
+working fine.
 
-at                                  64     0x0040
-
-results in "2"
-
-plus                                43     0x002b
-
-results in "=3D"
-
-asterisk                            42     0x002a
-
-results in "8"
-
-On Android, KEYCODEs that correspond to the above keysyms do not come
-with SHIFT metastate. Therefore, the keysyms that they correspond to are
-not sent over with any modifiers and must just work.
-
-The issue was reproduced with bVNC and RealVNC viewers connecting to
-many versions of qemu (Ubuntu 14.04, oVirt 3.4, oVirt 4.1, etc.). The
-qemu version that comes with oVirt 4.1 is 2.6.0, commit hash
-bfc766d38e1fae5767d43845c15c79ac8fa6d6af.
-
-Sincerely,
-iordan
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1717414
-
-Title:
-  Sending certain keysyms results in wrong symbol input
-
-Status in QEMU:
-  New
-
-Bug description:
-  I develop bVNC, an Android VNC client. I noticed that when I connect
-  to qemu VMs that have a VNC console, Keysyms that are usually sent
-  over with SHIFT modifier when connecting from a PC have wrong symbols
-  typed within the VM. A very short list of examples:
-
-  exclam                              33     0x0021
-
-  results in "1" typed in the VM.
-
-  at                                  64     0x0040
-
-  results in "2"
-
-  plus                                43     0x002b
-
-  results in "=3D"
-
-  asterisk                            42     0x002a
-
-  results in "8"
-
-  On Android, KEYCODEs that correspond to the above keysyms do not come
-  with SHIFT metastate. Therefore, the keysyms that they correspond to
-  are not sent over with any modifiers and must just work.
-
-  The issue was reproduced with bVNC and RealVNC viewers connecting to
-  many versions of qemu (Ubuntu 14.04, oVirt 3.4, oVirt 4.1, etc.). The
-  qemu version that comes with oVirt 4.1 is 2.6.0, commit hash
-  bfc766d38e1fae5767d43845c15c79ac8fa6d6af.
-
-  Sincerely,
-  iordan
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1717414/+subscriptions
+Thanks,
+Tomasz
