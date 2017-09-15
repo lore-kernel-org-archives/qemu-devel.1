@@ -1,20 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dshfK-0006e1-Pn
+	(envelope-from <dgibson@ozlabs.org>) id 1dshfK-0006dF-Iz
 	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:51:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dshfJ-0003Mq-KC
+	(envelope-from <dgibson@ozlabs.org>) id 1dshfJ-0003MZ-Bb
 	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:51:42 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 15 Sep 2017 13:51:16 +1000
-Message-Id: <20170915035130.8354-5-david@gibson.dropbear.id.au>
+Date: Fri, 15 Sep 2017 13:51:18 +1000
+Message-Id: <20170915035130.8354-7-david@gibson.dropbear.id.au>
 In-Reply-To: <20170915035130.8354-1-david@gibson.dropbear.id.au>
 References: <20170915035130.8354-1-david@gibson.dropbear.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 04/18] spapr_pci: drop useless check in
- spapr_populate_pci_child_dt()
+Subject: [Qemu-devel] [PULL 06/18] spapr: only update SDR1 once per-cpu
+ during CAS
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +25,47 @@ Cc: agraf@suse.de, gkurz@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, a
 
 From: Greg Kurz <groug@kaod.org>
 
-spapr_phb_get_loc_code() either returns a non-null pointer, or aborts
-if g_strdup_printf() failed to allocate memory.
+Commit b55d295e3ec9 added the possibility to support HPT resizing with KVM.
+In the case of PR, we need to pass the userspace address of the HPT to KVM
+using the SDR1 slot.
+This is handled by kvmppc_update_sdr1() which uses CPU_FOREACH() to update
+all CPUs. It is hence not needed to call kvmppc_update_sdr1() for each CPU.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-[dwg: Grammatical fix to commit message]
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_pci.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ hw/ppc/spapr_hcall.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index ef982f2ef3..cd8efb1812 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1282,12 +1282,8 @@ static int spapr_populate_pci_child_dt(PCIDevice *=
-dev, void *fdt, int offset,
-                             pci_find_device_name((ccode >> 16) & 0xff,
-                                                  (ccode >> 8) & 0xff,
-                                                  ccode & 0xff)));
--    buf =3D spapr_phb_get_loc_code(sphb, dev);
--    if (!buf) {
--        error_report("Failed setting the ibm,loc-code");
--        return -1;
--    }
-=20
-+    buf =3D spapr_phb_get_loc_code(sphb, dev);
-     err =3D fdt_setprop_string(fdt, offset, "ibm,loc-code", buf);
-     g_free(buf);
-     if (err < 0) {
---=20
+diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+index 8b3c0e17e7..6ab8c188f3 100644
+--- a/hw/ppc/spapr_hcall.c
++++ b/hw/ppc/spapr_hcall.c
+@@ -1559,20 +1559,16 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
+         }
+ 
+         if (spapr->htab_shift < maxshift) {
+-            CPUState *cs;
+-
+             /* Guest doesn't know about HPT resizing, so we
+              * pre-emptively resize for the maximum permitted RAM.  At
+              * the point this is called, nothing should have been
+              * entered into the existing HPT */
+             spapr_reallocate_hpt(spapr, maxshift, &error_fatal);
+-            CPU_FOREACH(cs) {
+-                if (kvm_enabled()) {
+-                    /* For KVM PR, update the HPT pointer */
+-                    target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
+-                        | (spapr->htab_shift - 18);
+-                    kvmppc_update_sdr1(sdr1);
+-                }
++            if (kvm_enabled()) {
++                /* For KVM PR, update the HPT pointer */
++                target_ulong sdr1 = (target_ulong)(uintptr_t)spapr->htab
++                    | (spapr->htab_shift - 18);
++                kvmppc_update_sdr1(sdr1);
+             }
+         }
+     }
+-- 
 2.13.5
