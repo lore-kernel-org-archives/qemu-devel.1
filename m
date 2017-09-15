@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53431)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsvrt-00066p-Gv
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 15:01:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsvws-0007PK-So
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 15:06:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsvrs-0005aL-Jh
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 15:01:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsvwr-0006xL-N8
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 15:06:46 -0400
 References: <20170915101008.16646-1-kwolf@redhat.com>
-	<20170915101008.16646-6-kwolf@redhat.com>
+	<20170915101008.16646-7-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <9211ef34-f8ef-5174-661c-478ad533bfe2@redhat.com>
-Date: Fri, 15 Sep 2017 14:01:26 -0500
+Message-ID: <726a7ef6-820b-2695-4ce5-ffa06da078d1@redhat.com>
+Date: Fri, 15 Sep 2017 14:06:34 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170915101008.16646-6-kwolf@redhat.com>
+In-Reply-To: <20170915101008.16646-7-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="bDeicsrLKiL6oE1c5h6xDhpX1uns9A4cr"
-Subject: Re: [Qemu-devel] [PATCH 5/6] block: reopen: Queue children after
- their parents
+	boundary="bLiElVtbVOmtmSVVts722p4TDBuHMAQBj"
+Subject: Re: [Qemu-devel] [PATCH 6/6] block: Fix permissions after
+ bdrv_reopen()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,34 +29,50 @@ To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---bDeicsrLKiL6oE1c5h6xDhpX1uns9A4cr
+--bLiElVtbVOmtmSVVts722p4TDBuHMAQBj
 From: Eric Blake <eblake@redhat.com>
 To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
-Message-ID: <9211ef34-f8ef-5174-661c-478ad533bfe2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/6] block: reopen: Queue children after
- their parents
+Message-ID: <726a7ef6-820b-2695-4ce5-ffa06da078d1@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 6/6] block: Fix permissions after
+ bdrv_reopen()
 References: <20170915101008.16646-1-kwolf@redhat.com>
- <20170915101008.16646-6-kwolf@redhat.com>
-In-Reply-To: <20170915101008.16646-6-kwolf@redhat.com>
+ <20170915101008.16646-7-kwolf@redhat.com>
+In-Reply-To: <20170915101008.16646-7-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 09/15/2017 05:10 AM, Kevin Wolf wrote:
-> We will calculate the required new permissions in the prepare stage of =
-a
-> reopen. Required permissions of children can be influenced by the
-> changes made to their parents, but parents are independent from their
-> children. This means that permissions need to be calculated top-down. I=
-n
-> order to achieve this, queue parents before their children rather than
-> queuing the children first.
+> If we switch between read-only and read-write, the permissions that
+> image format drivers need on bs->file change, too. Make sure to update
+> the permissions during bdrv_reopen().
 >=20
 > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 > ---
->  block.c | 26 +++++++++++++-------------
->  1 file changed, 13 insertions(+), 13 deletions(-)
+>  include/block/block.h |  1 +
+>  block.c               | 64 +++++++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  2 files changed, 65 insertions(+)
 >=20
+
+> +static BlockReopenQueueEntry *find_parent_in_reopen_queue(BlockReopenQ=
+ueue *q,
+> +                                                          BdrvChild *c=
+)
+> +{
+> +    BlockReopenQueueEntry *entry;
+> +
+> +    QSIMPLEQ_FOREACH(entry, q, entry) {
+> +        BlockDriverState *bs =3D entry->state.bs;
+> +        BdrvChild *child;
+> +
+> +        QLIST_FOREACH(child, &bs->children, next) {
+> +            if (child =3D=3D c) {
+> +                return entry;
+
+An O(n^2) loop. Is it going to bite us at any point in the future, or
+are we generally dealing with a small enough queue size and BDS graph to
+not worry about it?
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -66,7 +82,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---bDeicsrLKiL6oE1c5h6xDhpX1uns9A4cr
+--bLiElVtbVOmtmSVVts722p4TDBuHMAQBj
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -75,14 +91,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm8I4YACgkQp6FrSiUn
-Q2r9kQf/eVPK70H5+iNXBX0e7dbsl79Mf1iYF/S3yeaP8oBommJxoy9LksmLOIdx
-vb+o7zn0aSqoibDiwQ8FxKx/6gObGj/Vr/7vxvJMtvMg+M0PzZ6QCxc85DaGa3vW
-+CUjmucJCTDBqVue7yzHpM/wmFP14vGXChObjQzcVtNGPjmKVAkhW105WKcOzqW0
-9uOnGGcfWKurwV/5ygvUm49GRmqNiY8W4mFX7UVuMh1dGOhF1GDz6F2OqDdr3YCp
-9zq/aCNWgrA5pIasa3btpGFvpWgVYMjrr1ld6REDagFZAigj/QFzKrrVHFHGk6S4
-Ab+09xY+ILpN0DIWn9yztrXJoXfA1w==
-=00N9
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm8JLoACgkQp6FrSiUn
+Q2qzpQgArssYSA7HBeRkJDwcYGwrjtoTmVNPiZ5oRFpyu3h9cqVKKT/f6xWGeWgL
+ZvlAq6/r2YEz7gHoKgZ0yNjJpNHeIrgJ4PA18hBIIm6h0nlqxCozirH1lbzOWVVu
+osNqyb/7QAHGahyumUdej6DEu+3fuUMfkeAfb5x4JWI/kLYFnpfJnoT5Qq9/F84y
+P0E2iTL/EHkX4S2MUOub/VSav6MRN3xThPD0kXMtluJ77hphJFJZH/5gP4rDRdS5
+FBy+jYN+KQHH1Y7XD+TZd7VH/VFDI8aiAxjZn6yLjCU5cuoseVLhCiFr6QLNdGtT
+ubh4Uv9WB/5FdAvJv8NV5oOJBPwxag==
+=3qT2
 -----END PGP SIGNATURE-----
 
---bDeicsrLKiL6oE1c5h6xDhpX1uns9A4cr--
+--bLiElVtbVOmtmSVVts722p4TDBuHMAQBj--
