@@ -1,18 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51137)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dsziI-0006ZB-RW
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:07:59 -0400
+	(envelope-from <bounces@canonical.com>) id 1dszpv-0008CT-Lq
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:15:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dsziF-0004Qk-LR
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:07:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46024)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dsziF-0004QC-G2
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:07:55 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Fri, 15 Sep 2017 20:07:44 -0300
-Message-Id: <20170915230744.22942-1-ehabkost@redhat.com>
-Subject: [Qemu-devel] [PATCH] MAINTAINERS: Add Python scripts
+	(envelope-from <bounces@canonical.com>) id 1dszps-0001DR-Gm
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:15:51 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43285)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dszps-0001Bp-7T
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:15:48 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dszpq-0004V1-IO
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 23:15:46 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 808002E846D
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 23:15:46 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 15 Sep 2017 23:02:08 -0000
+From: James Clarke <jrtc27@jrtc27.com>
+Reply-To: Bug 1594394 <1594394@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20160620140124.12349.60184.malonedeb@wampee.canonical.com>
+Message-Id: <150551652853.29673.12752573811964275953.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1594394] Re: Using setreuid / setegid crashes
+ x86_64 user-mode target
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,39 +38,90 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Amador Pahim <apahim@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, John Snow <jsnow@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Cleber and I are volunteering to review and queue patches for the
-Python scripts and modules in scripts/.
+What's the status of this? This is causing aptitude in Debian chroots to
+reliably segfault under qemu-arm-user.
 
-I'm setting "M: Odd fixes" because not all scripts are actively
-maintained.
+-- =
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Even before this patch is merged, I plan to send a pull request
-including some patches for the Python code soon.
----
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1594394
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 2c333aba21..2c3b8ecde7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1390,6 +1390,13 @@ S: Maintained
- F: include/sysemu/cryptodev*.h
- F: backends/cryptodev*.c
- 
-+Python scripts
-+M: Eduardo Habkost <ehabkost@redhat.com>
-+M: Cleber Rosa <crosa@redhat.com>
-+S: Odd fixes
-+F: scripts/qmp/*
-+F: scripts/*.py
-+
- QAPI
- M: Markus Armbruster <armbru@redhat.com>
- M: Michael Roth <mdroth@linux.vnet.ibm.com>
--- 
-2.13.5
+Title:
+  Using setreuid / setegid crashes x86_64 user-mode target
+
+Status in QEMU:
+  New
+
+Bug description:
+  When setreuid() or setegid() are called from x86_64 target code in
+  user mode, qemu crashes inside the NPTL signal handlers.  x86 targets
+  do not directly use a syscall to handle setreuid() / setegid();
+  instead the x86 NPTL implementation sets up a temporary data region in
+  memory (__xidcmd) and issues a signal (SIGRT1) to all threads,
+  allowing the handler for that signal to issue the syscall.  Under
+  qemu, __xidcmd remains null (see variable display below backtrace).
+
+  Backtrace:
+  Program received signal SIGSEGV, Segmentation fault.
+  [Switching to Thread 0x3fff85c74fc0 (LWP 74517)]
+  0x000000006017491c in sighandler_setxid (sig=3D33, si=3D0x3fff85c72d08, c=
+tx=3D0x3fff85c71f90) at nptl-init.c:263
+  263     nptl-init.c: No such file or directory.
+  (gdb) thread apply all bt
+
+  Thread 3 (Thread 0x3fff87e8efc0 (LWP 74515)):
+  #0  0x00000000601cc430 in syscall ()
+  #1  0x0000000060109080 in futex_wait (val=3D<optimized out>, ev=3D<optimi=
+zed out>) at /build/qemu/util/qemu-thread-posix.c:292
+  #2  qemu_event_wait (ev=3D0x62367bb0 <rcu_call_ready_event>) at /build/qe=
+mu/util/qemu-thread-posix.c:399
+  #3  0x000000006010f73c in call_rcu_thread (opaque=3D<optimized out>) at /=
+build/qemu/util/rcu.c:250
+  #4  0x0000000060176f8c in start_thread (arg=3D0x3fff87e8efc0) at pthread_=
+create.c:336
+  #5  0x00000000601cebf4 in clone ()
+
+  Thread 2 (Thread 0x3fff85c74fc0 (LWP 74517)):
+  #0  0x000000006017491c in sighandler_setxid (sig=3D33, si=3D0x3fff85c72d0=
+8, ctx=3D0x3fff85c71f90) at nptl-init.c:263
+  #1  <signal handler called>
+  #2  0x00000000601cc42c in syscall ()
+  #3  0x0000000060044b08 in safe_futex (val3=3D<optimized out>, uaddr2=3D0x=
+0, timeout=3D<optimized out>, val=3D<optimized out>, op=3D128, uaddr=3D<opt=
+imized out>) at /build/qemu/linux-user/syscall.c:748
+  #4  do_futex (val3=3D<optimized out>, uaddr2=3D275186650880, timeout=3D0,=
+ val=3D1129, op=3D128, uaddr=3D275186651116) at /build/qemu/linux-user/sysc=
+all.c:6201
+  #5  do_syscall (cpu_env=3D0x1000abfd350, num=3D<optimized out>, arg1=3D27=
+5186651116, arg2=3D<optimized out>, arg3=3D1129, arg4=3D0, arg5=3D275186650=
+880, arg6=3D<optimized out>, arg7=3D0, arg8=3D0)
+      at /build/qemu/linux-user/syscall.c:10651
+  #6  0x00000000600347b8 in cpu_loop (env=3D0x1000abfd350) at /build/qemu/l=
+inux-user/main.c:317
+  #7  0x0000000060036ae0 in clone_func (arg=3D0x3fffc4c2ca38) at /build/qem=
+u/linux-user/syscall.c:5445
+  #8  0x0000000060176f8c in start_thread (arg=3D0x3fff85c74fc0) at pthread_=
+create.c:336
+  #9  0x00000000601cebf4 in clone ()
+
+  Thread 1 (Thread 0x1000aa05000 (LWP 74511)):
+  #0  0x00000000601cc430 in syscall ()
+  #1  0x0000000060044b08 in safe_futex (val3=3D<optimized out>, uaddr2=3D0x=
+0, timeout=3D<optimized out>, val=3D<optimized out>, op=3D128, uaddr=3D<opt=
+imized out>) at /build/qemu/linux-user/syscall.c:748
+  #2  do_futex (val3=3D<optimized out>, uaddr2=3D1, timeout=3D0, val=3D1, o=
+p=3D128, uaddr=3D275078324992) at /build/qemu/linux-user/syscall.c:6201
+  #3  do_syscall (cpu_env=3D0x1000aa23890, num=3D<optimized out>, arg1=3D27=
+5078324992, arg2=3D<optimized out>, arg3=3D1, arg4=3D0, arg5=3D1, arg6=3D<o=
+ptimized out>, arg7=3D0, arg8=3D0) at /build/qemu/linux-user/syscall.c:10651
+  #4  0x00000000600347b8 in cpu_loop (env=3D0x1000aa23890) at /build/qemu/l=
+inux-user/main.c:317
+  #5  0x00000000600020e4 in main (argc=3D<optimized out>, argv=3D<optimized=
+ out>, envp=3D<optimized out>) at /build/qemu/linux-user/main.c:4779
+  (gdb) p __xidcmd
+  $1 =3D (struct xid_command *) 0x0
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1594394/+subscriptions
