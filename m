@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47774)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dsmX3-0006PO-Sd
+	(envelope-from <famz@redhat.com>) id 1dsmX2-0006OP-CG
 	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dsmWl-0002hX-Hx
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48840)
+	(envelope-from <famz@redhat.com>) id 1dsmWX-0002Z6-M7
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53266)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dsmWl-0002gz-96
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:11 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dsmWX-0002Yd-Aw
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:02:57 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 15 Sep 2017 17:02:47 +0800
-Message-Id: <20170915090253.12201-6-famz@redhat.com>
-In-Reply-To: <20170915090253.12201-1-famz@redhat.com>
-References: <20170915090253.12201-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL v4 14/38] tests: Add FreeBSD image
+Date: Fri, 15 Sep 2017 17:02:42 +0800
+Message-Id: <20170915090253.12201-1-famz@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v4 00/38] Test and build patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,64 +27,111 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-The image is prepared following instructions as in:
+The following changes since commit 04ef33052c205170c92df21ca0b4be4f3b1021=
+88:
 
-https://wiki.qemu.org/Hosts/BSD
+  tcg/tci: do not use ldst label (never implemented) (2017-09-11 19:24:05=
+ +0100)
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170913030119.3957-8-famz@redhat.com>
----
- tests/vm/freebsd | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+are available in the git repository at:
+
+  git://github.com/famz/qemu.git tags/test-and-build-pull-request
+
+for you to fetch changes up to be78fe670401af14e6d63fce5c5467f751207871:
+
+  buildsys: Move rdma libs to per object (2017-09-15 15:05:24 +0800)
+
+----------------------------------------------------------------
+
+----------------------------------------------------------------
+
+Alex Benn=C3=A9e (4):
+  docker: ensure NOUSER for travis images
+  docker: docker.py make --no-cache skip checksum test
+  docker: don't install device-tree-compiler build-deps in travis.docker
+  docker: reduce noise when building travis.docker
+
+Fam Zheng (34):
+  docker: Update ubuntu image
+  docker: Enable features explicitly in test-full
+  tests/docker: Clean up paths
+  gitignore: Ignore vm test images
+  qemu.py: Add "wait()" method
+  scripts: Add archive-source.sh
+  tests: Add a test key pair
+  tests: Add vm test lib
+  tests: Add ubuntu.i386 image
+  tests: Add FreeBSD image
+  tests: Add NetBSD image
+  tests: Add OpenBSD image
+  Makefile: Add rules to run vm tests
+  MAINTAINERS: Add tests/vm entry
+  tests: Add README for vm tests
+  docker: Use archive-source.py
+  docker: Fix return code of build_qemu()
+  docker: Add test_fail and prep_fail
+  docker: Use unconfined security profile
+  docker: Add nettle-devel to fedora image
+  docker: Add test-block
+  docker: Drop 'set -e' from run script
+  vl: Don't include vde header
+  buildsys: Move vde libs to per object
+  buildsys: Move gtk/vte cflags/libs to per object
+  buildsys: Move sdl cflags/libs to per object
+  buildsys: Move vnc cflags/libs to per object
+  buildsys: Move audio libs to per object
+  buildsys: Move curese cflags/libs to per object
+  buildsys: Move libcacard cflags/libs to per object
+  buildsys: Move libusb cflags/libs to per object
+  buildsys: Move usb redir cflags/libs to per object
+  buildsys: Move brlapi libs to per object
+  buildsys: Move rdma libs to per object
+
+ .gitignore                             |   1 +
+ MAINTAINERS                            |   1 +
+ Makefile                               |   2 +
+ audio/Makefile.objs                    |   6 +
+ chardev/Makefile.objs                  |   1 +
+ configure                              |  61 ++++----
+ hw/usb/Makefile.objs                   |  13 +-
+ migration/Makefile.objs                |   1 +
+ net/Makefile.objs                      |   2 +
+ scripts/archive-source.sh              |  33 +++++
+ scripts/qemu.py                        |   7 +
+ tests/.gitignore                       |   1 +
+ tests/docker/Makefile.include          |  17 +--
+ tests/docker/common.rc                 |  20 ++-
+ tests/docker/docker.py                 |   3 +-
+ tests/docker/dockerfiles/fedora.docker |   1 +
+ tests/docker/dockerfiles/travis.docker |   6 +-
+ tests/docker/dockerfiles/ubuntu.docker |  11 +-
+ tests/docker/run                       |  18 +--
+ tests/docker/test-block                |  21 +++
+ tests/docker/test-full                 |  82 ++++++++++-
+ tests/keys/id_rsa                      |  27 ++++
+ tests/keys/id_rsa.pub                  |   1 +
+ tests/vm/Makefile.include              |  42 ++++++
+ tests/vm/README                        |  63 ++++++++
+ tests/vm/basevm.py                     | 256 +++++++++++++++++++++++++++=
+++++++
+ tests/vm/freebsd                       |  42 ++++++
+ tests/vm/netbsd                        |  42 ++++++
+ tests/vm/openbsd                       |  43 ++++++
+ tests/vm/ubuntu.i386                   |  88 ++++++++++++
+ ui/Makefile.objs                       |  29 ++--
+ vl.c                                   |   4 -
+ 32 files changed, 860 insertions(+), 85 deletions(-)
+ create mode 100755 scripts/archive-source.sh
+ create mode 100755 tests/docker/test-block
+ create mode 100644 tests/keys/id_rsa
+ create mode 100644 tests/keys/id_rsa.pub
+ create mode 100644 tests/vm/Makefile.include
+ create mode 100644 tests/vm/README
+ create mode 100755 tests/vm/basevm.py
  create mode 100755 tests/vm/freebsd
+ create mode 100755 tests/vm/netbsd
+ create mode 100755 tests/vm/openbsd
+ create mode 100755 tests/vm/ubuntu.i386
 
-diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-new file mode 100755
-index 0000000000..039dad8f69
---- /dev/null
-+++ b/tests/vm/freebsd
-@@ -0,0 +1,42 @@
-+#!/usr/bin/env python
-+#
-+# FreeBSD VM image
-+#
-+# Copyright 2017 Red Hat Inc.
-+#
-+# Authors:
-+#  Fam Zheng <famz@redhat.com>
-+#
-+# This code is licensed under the GPL version 2 or later.  See
-+# the COPYING file in the top-level directory.
-+#
-+
-+import os
-+import sys
-+import subprocess
-+import basevm
-+
-+class FreeBSDVM(basevm.BaseVM):
-+    name = "freebsd"
-+    BUILD_SCRIPT = """
-+        set -e;
-+        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-+        tar -xf /dev/vtbd1;
-+        ./configure {configure_opts};
-+        gmake -j{jobs};
-+        gmake check;
-+    """
-+
-+    def build_image(self, img):
-+        cimg = self._download_with_cache("http://download.patchew.org/freebsd-11.1-amd64.img.xz",
-+                sha256sum='adcb771549b37bc63826c501f05121a206ed3d9f55f49145908f7e1432d65891')
-+        img_tmp_xz = img + ".tmp.xz"
-+        img_tmp = img + ".tmp"
-+        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
-+        subprocess.check_call(["xz", "-df", img_tmp_xz])
-+        if os.path.exists(img):
-+            os.remove(img)
-+        os.rename(img_tmp, img)
-+
-+if __name__ == "__main__":
-+    sys.exit(basevm.main(FreeBSDVM))
--- 
+--=20
 2.13.5
