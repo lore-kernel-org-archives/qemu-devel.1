@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54788)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dslaV-0007vf-4M
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:03:00 -0400
+	(envelope-from <thuth@redhat.com>) id 1dslaV-0007ve-43
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:03:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dslaR-0000kx-WB
+	(envelope-from <thuth@redhat.com>) id 1dslaL-0000hA-7a
 	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:02:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49612)
+Received: from mx1.redhat.com ([209.132.183.28]:46658)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dslaR-0000ko-Ne
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:02:55 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dslaK-0000gM-Vz
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:02:49 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 15 Sep 2017 10:02:26 +0200
-Message-Id: <1505462549-27298-7-git-send-email-thuth@redhat.com>
+Date: Fri, 15 Sep 2017 10:02:25 +0200
+Message-Id: <1505462549-27298-6-git-send-email-thuth@redhat.com>
 In-Reply-To: <1505462549-27298-1-git-send-email-thuth@redhat.com>
 References: <1505462549-27298-1-git-send-email-thuth@redhat.com>
-Subject: [Qemu-devel] [PULL 6/9] qtest: Don't perform side effects inside
- assertion
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 5/9] test-qga: Kill broken and dead
+ QGA_TEST_SIDE_EFFECTING code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,206 +32,155 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, "D
 
 From: Eric Blake <eblake@redhat.com>
 
-Assertions should be separate from the side effects, since in
-theory, g_assert() can be disabled (in practice, we can't really
-ever do that).
+Back when the test was introduced, in commit 62c39b307, the
+test was set up to run qemu-ga directly on the host performing
+the test, and defaults to limiting itself to safe commands.  At
+the time, it was envisioned that setting QGA_TEST_SIDE_EFFECTING
+in the environment could cover a few more commands, while noting
+the potential danger of those side effects running in the host.
+
+But this has NEVER been tested: if you enable the environment
+variable, the test WILL fail.  One obvious reason: if you are not
+running as root, you'll probably get a permission failure when
+trying to freeze the file systems, or when changing system time.
+Less obvious: if you run the test as root (wow, you're brave), you
+could end up hanging if the test tries to log things to a
+temporarily frozen filesystem.  But the cutest reason of all: if
+you get past the above hurdles, the test uses invalid JSON in
+test_qga_fstrim() (missing '' around the dictionary key 'minimum'),
+and will thus fail an assertion in qmp_fd().
+
+Rather than leave this untested time-bomb in place, rip it out.
+Hopefully, as originally envisioned, we can find an opportunity
+to test an actual sandboxed guest where the guest-agent has
+full permissions and will not unduly affect the host running
+the test - if so, 'git revert' can be used if desired, for
+salvaging any useful parts of this attempt.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- qtest.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 58 insertions(+), 24 deletions(-)
+ tests/test-qga.c | 90 --------------------------------------------------=
+------
+ 1 file changed, 90 deletions(-)
 
-diff --git a/qtest.c b/qtest.c
-index 88a09e9..cbbfb71 100644
---- a/qtest.c
-+++ b/qtest.c
-@@ -332,10 +332,13 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-                strcmp(words[0], "outl") == 0) {
-         unsigned long addr;
-         unsigned long value;
-+        int ret;
- 
-         g_assert(words[1] && words[2]);
--        g_assert(qemu_strtoul(words[1], NULL, 0, &addr) == 0);
--        g_assert(qemu_strtoul(words[2], NULL, 0, &value) == 0);
-+        ret = qemu_strtoul(words[1], NULL, 0, &addr);
-+        g_assert(ret == 0);
-+        ret = qemu_strtoul(words[2], NULL, 0, &value);
-+        g_assert(ret == 0);
-         g_assert(addr <= 0xffff);
- 
-         if (words[0][3] == 'b') {
-@@ -352,9 +355,11 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-         strcmp(words[0], "inl") == 0) {
-         unsigned long addr;
-         uint32_t value = -1U;
-+        int ret;
- 
-         g_assert(words[1]);
--        g_assert(qemu_strtoul(words[1], NULL, 0, &addr) == 0);
-+        ret = qemu_strtoul(words[1], NULL, 0, &addr);
-+        g_assert(ret == 0);
-         g_assert(addr <= 0xffff);
- 
-         if (words[0][2] == 'b') {
-@@ -372,10 +377,13 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-                strcmp(words[0], "writeq") == 0) {
-         uint64_t addr;
-         uint64_t value;
-+        int ret;
- 
-         g_assert(words[1] && words[2]);
--        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
--        g_assert(qemu_strtou64(words[2], NULL, 0, &value) == 0);
-+        ret = qemu_strtou64(words[1], NULL, 0, &addr);
-+        g_assert(ret == 0);
-+        ret = qemu_strtou64(words[2], NULL, 0, &value);
-+        g_assert(ret == 0);
- 
-         if (words[0][5] == 'b') {
-             uint8_t data = value;
-@@ -401,9 +409,11 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-                strcmp(words[0], "readq") == 0) {
-         uint64_t addr;
-         uint64_t value = UINT64_C(-1);
-+        int ret;
- 
-         g_assert(words[1]);
--        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
-+        ret = qemu_strtou64(words[1], NULL, 0, &addr);
-+        g_assert(ret == 0);
- 
-         if (words[0][4] == 'b') {
-             uint8_t data;
-@@ -427,10 +437,13 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-         uint64_t addr, len, i;
-         uint8_t *data;
-         char *enc;
-+        int ret;
- 
-         g_assert(words[1] && words[2]);
--        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
--        g_assert(qemu_strtou64(words[2], NULL, 0, &len) == 0);
-+        ret = qemu_strtou64(words[1], NULL, 0, &addr);
-+        g_assert(ret == 0);
-+        ret = qemu_strtou64(words[2], NULL, 0, &len);
-+        g_assert(ret == 0);
-         /* We'd send garbage to libqtest if len is 0 */
-         g_assert(len);
- 
-@@ -451,10 +464,13 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-         uint64_t addr, len;
-         uint8_t *data;
-         gchar *b64_data;
-+        int ret;
- 
-         g_assert(words[1] && words[2]);
--        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
--        g_assert(qemu_strtou64(words[2], NULL, 0, &len) == 0);
-+        ret = qemu_strtou64(words[1], NULL, 0, &addr);
-+        g_assert(ret == 0);
-+        ret = qemu_strtou64(words[2], NULL, 0, &len);
-+        g_assert(ret == 0);
- 
-         data = g_malloc(len);
-         cpu_physical_memory_read(addr, data, len);
-@@ -468,10 +484,13 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-         uint64_t addr, len, i;
-         uint8_t *data;
-         size_t data_len;
-+        int ret;
- 
-         g_assert(words[1] && words[2] && words[3]);
--        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
--        g_assert(qemu_strtou64(words[2], NULL, 0, &len) == 0);
-+        ret = qemu_strtou64(words[1], NULL, 0, &addr);
-+        g_assert(ret == 0);
-+        ret = qemu_strtou64(words[2], NULL, 0, &len);
-+        g_assert(ret == 0);
- 
-         data_len = strlen(words[3]);
-         if (data_len < 3) {
-@@ -497,11 +516,15 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-         uint64_t addr, len;
-         uint8_t *data;
-         unsigned long pattern;
-+        int ret;
- 
-         g_assert(words[1] && words[2] && words[3]);
--        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
--        g_assert(qemu_strtou64(words[2], NULL, 0, &len) == 0);
--        g_assert(qemu_strtoul(words[3], NULL, 0, &pattern) == 0);
-+        ret = qemu_strtou64(words[1], NULL, 0, &addr);
-+        g_assert(ret == 0);
-+        ret = qemu_strtou64(words[2], NULL, 0, &len);
-+        g_assert(ret == 0);
-+        ret = qemu_strtoul(words[3], NULL, 0, &pattern);
-+        g_assert(ret == 0);
- 
-         if (len) {
-             data = g_malloc(len);
-@@ -517,10 +540,13 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-         uint8_t *data;
-         size_t data_len;
-         gsize out_len;
-+        int ret;
- 
-         g_assert(words[1] && words[2] && words[3]);
--        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
--        g_assert(qemu_strtou64(words[2], NULL, 0, &len) == 0);
-+        ret = qemu_strtou64(words[1], NULL, 0, &addr);
-+        g_assert(ret == 0);
-+        ret = qemu_strtou64(words[2], NULL, 0, &len);
-+        g_assert(ret == 0);
- 
-         data_len = strlen(words[3]);
-         if (data_len < 3) {
-@@ -551,11 +577,16 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-     } else if (strcmp(words[0], "rtas") == 0) {
-         uint64_t res, args, ret;
-         unsigned long nargs, nret;
+diff --git a/tests/test-qga.c b/tests/test-qga.c
+index 06783e7..fd6bc76 100644
+--- a/tests/test-qga.c
++++ b/tests/test-qga.c
+@@ -642,65 +642,6 @@ static void test_qga_get_time(gconstpointer fix)
+     QDECREF(ret);
+ }
+=20
+-static void test_qga_set_time(gconstpointer fix)
+-{
+-    const TestFixture *fixture =3D fix;
+-    QDict *ret;
+-    int64_t current, time;
+-    gchar *cmd;
 -
--        g_assert(qemu_strtoul(words[2], NULL, 0, &nargs) == 0);
--        g_assert(qemu_strtou64(words[3], NULL, 0, &args) == 0);
--        g_assert(qemu_strtoul(words[4], NULL, 0, &nret) == 0);
--        g_assert(qemu_strtou64(words[5], NULL, 0, &ret) == 0);
-+        int rc;
-+
-+        rc = qemu_strtoul(words[2], NULL, 0, &nargs);
-+        g_assert(rc == 0);
-+        rc = qemu_strtou64(words[3], NULL, 0, &args);
-+        g_assert(rc == 0);
-+        rc = qemu_strtoul(words[4], NULL, 0, &nret);
-+        g_assert(rc == 0);
-+        rc = qemu_strtou64(words[5], NULL, 0, &ret);
-+        g_assert(rc == 0);
-         res = qtest_rtas_call(words[1], nargs, args, nret, ret);
- 
-         qtest_send_prefix(chr);
-@@ -565,7 +596,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-         int64_t ns;
- 
-         if (words[1]) {
--            g_assert(qemu_strtoi64(words[1], NULL, 0, &ns) == 0);
-+            int ret = qemu_strtoi64(words[1], NULL, 0, &ns);
-+            g_assert(ret == 0);
-         } else {
-             ns = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
-         }
-@@ -575,9 +607,11 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
-                     (int64_t)qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
-     } else if (qtest_enabled() && strcmp(words[0], "clock_set") == 0) {
-         int64_t ns;
-+        int ret;
- 
-         g_assert(words[1]);
--        g_assert(qemu_strtoi64(words[1], NULL, 0, &ns) == 0);
-+        ret = qemu_strtoi64(words[1], NULL, 0, &ns);
-+        g_assert(ret == 0);
-         qtest_clock_warp(ns);
-         qtest_send_prefix(chr);
-         qtest_sendf(chr, "OK %"PRIi64"\n",
--- 
+-    /* get current time */
+-    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-get-time'}");
+-    g_assert_nonnull(ret);
+-    qmp_assert_no_error(ret);
+-    current =3D qdict_get_int(ret, "return");
+-    g_assert_cmpint(current, >, 0);
+-    QDECREF(ret);
+-
+-    /* set some old time */
+-    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-set-time',"
+-                 " 'arguments': { 'time': 1000 } }");
+-    g_assert_nonnull(ret);
+-    qmp_assert_no_error(ret);
+-    QDECREF(ret);
+-
+-    /* check old time */
+-    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-get-time'}");
+-    g_assert_nonnull(ret);
+-    qmp_assert_no_error(ret);
+-    time =3D qdict_get_int(ret, "return");
+-    g_assert_cmpint(time / 1000, <, G_USEC_PER_SEC * 10);
+-    QDECREF(ret);
+-
+-    /* set back current time */
+-    cmd =3D g_strdup_printf("{'execute': 'guest-set-time',"
+-                          " 'arguments': { 'time': %" PRId64 " } }",
+-                          current + time * 1000);
+-    ret =3D qmp_fd(fixture->fd, cmd);
+-    g_free(cmd);
+-    g_assert_nonnull(ret);
+-    qmp_assert_no_error(ret);
+-    QDECREF(ret);
+-}
+-
+-static void test_qga_fstrim(gconstpointer fix)
+-{
+-    const TestFixture *fixture =3D fix;
+-    QDict *ret;
+-    QList *list;
+-    const QListEntry *entry;
+-
+-    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-fstrim',"
+-                 " arguments: { minimum: 4194304 } }");
+-    g_assert_nonnull(ret);
+-    qmp_assert_no_error(ret);
+-    list =3D qdict_get_qlist(ret, "return");
+-    entry =3D qlist_first(list);
+-    g_assert(qdict_haskey(qobject_to_qdict(entry->value), "paths"));
+-
+-    QDECREF(ret);
+-}
+-
+ static void test_qga_blacklist(gconstpointer data)
+ {
+     TestFixture fix;
+@@ -831,30 +772,6 @@ static void test_qga_fsfreeze_status(gconstpointer f=
+ix)
+     QDECREF(ret);
+ }
+=20
+-static void test_qga_fsfreeze_and_thaw(gconstpointer fix)
+-{
+-    const TestFixture *fixture =3D fix;
+-    QDict *ret;
+-    const gchar *status;
+-
+-    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-fsfreeze-freeze'}");
+-    g_assert_nonnull(ret);
+-    qmp_assert_no_error(ret);
+-    QDECREF(ret);
+-
+-    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-fsfreeze-status'}");
+-    g_assert_nonnull(ret);
+-    qmp_assert_no_error(ret);
+-    status =3D qdict_get_try_str(ret, "return");
+-    g_assert_cmpstr(status, =3D=3D, "frozen");
+-    QDECREF(ret);
+-
+-    ret =3D qmp_fd(fixture->fd, "{'execute': 'guest-fsfreeze-thaw'}");
+-    g_assert_nonnull(ret);
+-    qmp_assert_no_error(ret);
+-    QDECREF(ret);
+-}
+-
+ static void test_qga_guest_exec(gconstpointer fix)
+ {
+     const TestFixture *fixture =3D fix;
+@@ -1029,13 +946,6 @@ int main(int argc, char **argv)
+     g_test_add_data_func("/qga/guest-get-osinfo", &fix,
+                          test_qga_guest_get_osinfo);
+=20
+-    if (g_getenv("QGA_TEST_SIDE_EFFECTING")) {
+-        g_test_add_data_func("/qga/fsfreeze-and-thaw", &fix,
+-                             test_qga_fsfreeze_and_thaw);
+-        g_test_add_data_func("/qga/set-time", &fix, test_qga_set_time);
+-        g_test_add_data_func("/qga/fstrim", &fix, test_qga_fstrim);
+-    }
+-
+     ret =3D g_test_run();
+=20
+     fixture_tear_down(&fix, NULL);
+--=20
 1.8.3.1
