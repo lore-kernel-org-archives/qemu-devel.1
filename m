@@ -1,29 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36682)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36896)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsq9s-0000VY-Nc
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 08:55:49 -0400
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dsqAu-0001ML-4s
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 08:56:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsq9n-0004oC-Hm
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 08:55:48 -0400
-Received: from roura.ac.upc.es ([147.83.33.10]:54984)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vilanova@ac.upc.edu>) id 1dsq9m-0004nG-T2
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 08:55:43 -0400
-From: =?utf-8?Q?Llu=C3=ADs_Vilanova?= <vilanova@ac.upc.edu>
-References: <150505986682.19604.11937392314067517230.stgit@frigg.lan>
-	<150506083546.19604.543091497330269756.stgit@frigg.lan>
-	<169db8d7-fe49-05c4-aca7-ad818b12c9c5@linaro.org>
-	<87a81xpasb.fsf@frigg.lan>
-	<7e4260a8-89a3-9c52-4f09-afe9035ceac2@twiddle.net>
-Date: Fri, 15 Sep 2017 15:55:33 +0300
-In-Reply-To: <7e4260a8-89a3-9c52-4f09-afe9035ceac2@twiddle.net> (Richard
-	Henderson's message of "Thu, 14 Sep 2017 09:15:18 -0700")
-Message-ID: <87ingki0je.fsf@frigg.lan>
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dsqAp-0005gE-6m
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 08:56:52 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38083)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
+	id 1dsqAo-0005fN-Sv
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 08:56:47 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8FCsR60006746
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 08:56:45 -0400
+Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d0cn37qte-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 08:56:45 -0400
+Received: from localhost
+	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
+	Fri, 15 Sep 2017 08:56:44 -0400
+References: <cover.1505403478.git.alifm@linux.vnet.ibm.com>
+	<f6c9e7ec8ad585ce7c8f401aae2ec1fddf157fd7.1505403478.git.alifm@linux.vnet.ibm.com>
+	<1505460680.18776.1.camel@redhat.com>
+From: Farhan Ali <alifm@linux.vnet.ibm.com>
+Date: Fri, 15 Sep 2017 08:56:41 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 4/7] tcg: Add support for "inlining"
- regions of code
+In-Reply-To: <1505460680.18776.1.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <2d100ec2-a09b-159c-5d8e-68b2a845b36a@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 1/2] virtio-gpu: Handle endian conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,88 +42,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <rth@twiddle.net>
-Cc: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
-
-Richard Henderson writes:
-
-> On 09/14/2017 08:20 AM, Llu=C3=ADs Vilanova wrote:
->> Richard Henderson writes:
->>=20
->>> On 09/10/2017 09:27 AM, Llu=C3=ADs Vilanova wrote:
->>>> TCG BBLs and instructions have multiple exit points from where to raise
->>>> tracing events, but some of the necessary information in the generic
->>>> disassembly infrastructure is not available until after generating the=
-se
->>>> exit points.
->>>>=20
->>>> This patch adds support for "inline points" (where the tracing code wi=
-ll
->>>> be placed), and "inline regions" (which identify the TCG code that must
->>>> be inlined). The TCG compiler will basically copy each inline region to
->>>> any inline points that reference it.
->>=20
->>> I am not keen on this.
->>=20
->>> Is there a reason you can't just emit the tracing code at the appropria=
-te place
->>> to begin with?  Perhaps I have to wait to see how this is used...
->>=20
->> As I tried to briefly explain on next patch, the main problem without in=
-lining
->> is that we will see guest_tb_after_trans twice on the trace for each TB =
-in
->> conditional instructions on the guest, since they have two exit points (=
-which we
->> capture when emitting goto_tb in TCG).
-
-> Without seeing the code, I suspect this is because you didn't examine the
-> argument to tcg_gen_exit_tb.  You can tell when goto_tb must have been em=
-itted
-> and avoid logging twice.
-
-The generated tracing code for 'guest_*_after' must be right before the
-"goto_tb" opcode at the end of a TB (AFAIU generated by
-tcg_gen_lookup_and_goto_ptr()), and we have two of those when decoding a gu=
-est
-conditional jump.
-
-If we couple this with the semantics of the trace_*_tcg functions (trace the
-event at translation time, and generate TCG code to trace the event at exec=
-ution
-time), we get the case I described (we don't want to call trace_tb_after_tc=
-g()
-or trace_insn_after_tcg() twice for the same TB or instruction).
-
-That is, unless I've missed something.
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, thuth@redhat.com, cohuck@redhat.com
 
 
-The only alternative I can think of is changing tracetool to offer an addit=
-ional
-API that provides separate functions for translation-time tracing and
-execution-time generation. So from this:
 
-  static inline void trace_event_tcg(CPUState *cpu, TCGv_env env, ...)
-  {
-      trace_event_trans(cpu, ...);
-      if (trace_event_get_vcpu_state(cpu, EVENT_EXEC)) {
-          gen_helper_trace_event_exec(env, ...);
-      }
-  }
+On 09/15/2017 03:31 AM, Gerd Hoffmann wrote:
+>   Hi,
+>
+>> +static void
+>> +virtio_gpu_ctrl_hdr_bswap_cpu(struct virtio_gpu_ctrl_hdr *hdr)
+>> +{
+>> +    hdr->type =  le32_to_cpu(hdr->type);
+>> +    hdr->flags = le32_to_cpu(hdr->flags);
+>> +    hdr->fence_id = le64_to_cpu(hdr->fence_id);
+>> +    hdr->ctx_id = le32_to_cpu(hdr->ctx_id);
+>> +    hdr->padding = le32_to_cpu(hdr->padding);
+>> +}
+>> +
+>> +static void
+>> +virtio_gpu_ctrl_hdr_bswap_le(struct virtio_gpu_ctrl_hdr *hdr)
+>> +{
+>> +    hdr->type =  cpu_to_le32(hdr->type);
+>> +    hdr->flags = cpu_to_le32(hdr->flags);
+>> +    hdr->fence_id = cpu_to_le64(hdr->fence_id);
+>> +    hdr->ctx_id = cpu_to_le32(hdr->ctx_id);
+>> +    hdr->padding = cpu_to_le32(hdr->padding);
+>> +}
+>
+> These two functions do exactly the same thing because cpu_to_le32 and
+> le32_to_cpu are the same operation.  The two variants only exist to
+> make the code more readable.  So this isn't needed twice.  I'd suggest
+> to just call the functions "*_bswap" and drop any _le or _cpu postfix.
+> Note that there are also variants for in-place swapping.
+>
+> Have a look at the comments in include/qemu/bswap.h
+>
+Thanks for pointing that out. I will re-spin another version.
 
-We can extend it into this:
+>> +
+>> +static void virtio_gpu_bswap_cpu_32(void *ptr,
+>> +                                    size_t size)
+>> +{
+>
+> #ifdef HOST_WORDS_BIGENDIAN
+>
+>> +    size_t i;
+>> +    struct virtio_gpu_ctrl_hdr *hdr = (struct virtio_gpu_ctrl_hdr *)
+>> ptr;
+>> +
+>> +    virtio_gpu_ctrl_hdr_bswap_cpu(hdr);
+>> +
+>> +    i = sizeof(struct virtio_gpu_ctrl_hdr);
+>> +    while (i < size) {
+>> +        *(uint32_t *)(ptr + i) = le32_to_cpu(*(uint32_t *)(ptr +
+>> i));
+>> +        i = i + sizeof(uint32_t);
+>> +    }
+>
+> #endif
+>
+> I suspect the compiler isn't clever enough to figure the whole function
+> is a nop on little endian hosts.
 
-  static inline void gen_trace_event_exec(TCGv_env env, ...)
-      if (trace_event_get_vcpu_state(cpu, EVENT_EXEC)) {
-          gen_helper_trace_event_exec(env, ...);
-      }
-  }
-  static inline void trace_event_tcg(CPUState *cpu, TCGv_env env, ...)
-  {
-      trace_event_trans(cpu, ...);
-      gen_trace_event_exec(env, ...);
-  }
+This makes sense.
 
-
-Cheers,
-  Lluis
+Thanks
+Farhan
+>
+> cheers,
+>   Gerd
+>
