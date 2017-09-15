@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34910)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34736)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dskNl-00044a-6a
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:45:50 -0400
+	(envelope-from <famz@redhat.com>) id 1dskNU-0003jj-2L
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:45:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dskNk-0004k4-3o
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:45:45 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60764)
+	(envelope-from <famz@redhat.com>) id 1dskNS-0004YM-58
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:45:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47668)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dskNj-0004jb-Qx
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:45:44 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dskNR-0004Xt-VL
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:45:26 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 15 Sep 2017 14:45:15 +0800
-Message-Id: <20170915064518.3436-11-famz@redhat.com>
+Date: Fri, 15 Sep 2017 14:45:06 +0800
+Message-Id: <20170915064518.3436-2-famz@redhat.com>
 In-Reply-To: <20170915064518.3436-1-famz@redhat.com>
 References: <20170915064518.3436-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL v3 17/38] Makefile: Add rules to run vm tests
+Subject: [Qemu-devel] [PULL v3 08/38] gitignore: Ignore vm test images
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,94 +27,32 @@ To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170913030119.3957-11-famz@redhat.com>
+Message-Id: <20170913030119.3957-2-famz@redhat.com>
 ---
- Makefile                  |  2 ++
- configure                 |  2 +-
- tests/vm/Makefile.include | 42 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 45 insertions(+), 1 deletion(-)
- create mode 100644 tests/vm/Makefile.include
+ .gitignore       | 1 +
+ tests/.gitignore | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 337a1f6f9b..946eb2ce35 100644
---- a/Makefile
-+++ b/Makefile
-@@ -822,6 +822,7 @@ endif
- -include $(wildcard *.d tests/*.d)
- 
- include $(SRC_PATH)/tests/docker/Makefile.include
-+include $(SRC_PATH)/tests/vm/Makefile.include
- 
- .PHONY: help
- help:
-@@ -845,6 +846,7 @@ help:
- 	@echo  'Test targets:'
- 	@echo  '  check           - Run all tests (check-help for details)'
- 	@echo  '  docker          - Help about targets running tests inside Docker containers'
-+	@echo  '  vm-test         - Help about targets running tests inside VM'
- 	@echo  ''
- 	@echo  'Documentation targets:'
- 	@echo  '  html info pdf txt'
-diff --git a/configure b/configure
-index fd7e3a5e81..3918c47cd8 100755
---- a/configure
-+++ b/configure
-@@ -6546,7 +6546,7 @@ if test "$ccache_cpp2" = "yes"; then
- fi
- 
- # build tree in object directory in case the source is not in the current directory
--DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests"
-+DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests tests/vm"
- DIRS="$DIRS docs docs/interop fsdev"
- DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
- DIRS="$DIRS roms/seabios roms/vgabios"
-diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-new file mode 100644
-index 0000000000..5daa2a3b73
---- /dev/null
-+++ b/tests/vm/Makefile.include
-@@ -0,0 +1,42 @@
-+# Makefile for VM tests
-+
-+.PHONY: vm-build-all
-+
-+IMAGES := ubuntu.i386 freebsd netbsd openbsd
-+IMAGE_FILES := $(patsubst %, tests/vm/%.img, $(IMAGES))
-+
-+.PRECIOUS: $(IMAGE_FILES)
-+
-+vm-test:
-+	@echo "vm-test: Test QEMU in preconfigured virtual machines"
-+	@echo
-+	@echo "  vm-build-ubuntu.i386            - Build QEMU in ubuntu i386 VM"
-+	@echo "  vm-build-freebsd                - Build QEMU in FreeBSD VM"
-+	@echo "  vm-build-netbsd                 - Build QEMU in NetBSD VM"
-+	@echo "  vm-build-openbsd                - Build QEMU in OpenBSD VM"
-+
-+vm-build-all: $(addprefix vm-build-, $(IMAGES))
-+
-+tests/vm/%.img: $(SRC_PATH)/tests/vm/% \
-+		$(SRC_PATH)/tests/vm/basevm.py \
-+		$(SRC_PATH)/tests/vm/Makefile.include
-+	$(call quiet-command, \
-+		$< \
-+		$(if $(V)$(DEBUG), --debug) \
-+		--image "$@" \
-+		--force \
-+		--build-image $@, \
-+		"  VM-IMAGE $*")
-+
-+
-+# Build in VM $(IMAGE)
-+vm-build-%: tests/vm/%.img
-+	$(call quiet-command, \
-+		$(SRC_PATH)/tests/vm/$* \
-+		$(if $(V)$(DEBUG), --debug) \
-+		$(if $(DEBUG), --interactive) \
-+		$(if $(J),--jobs $(J)) \
-+		--image "$<" \
-+		--build-qemu $(SRC_PATH), \
-+		"  VM-BUILD $*")
-+
+diff --git a/.gitignore b/.gitignore
+index cf65316863..40acfcb9e2 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -52,6 +52,7 @@
+ /vscclient
+ /vhost-user-scsi
+ /fsdev/virtfs-proxy-helper
++*.tmp
+ *.[1-9]
+ *.a
+ *.aux
+diff --git a/tests/.gitignore b/tests/.gitignore
+index fed0189a5a..cf6d99c91e 100644
+--- a/tests/.gitignore
++++ b/tests/.gitignore
+@@ -95,3 +95,4 @@ test-filter-mirror
+ test-filter-redirector
+ *-test
+ qapi-schema/*.test.*
++vm/*.img
 -- 
 2.13.5
