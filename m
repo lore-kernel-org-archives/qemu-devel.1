@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54790)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54788)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dslaV-0007vg-4d
+	(envelope-from <thuth@redhat.com>) id 1dslaV-0007vf-4M
 	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:03:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dslaU-0000lU-2o
+	(envelope-from <thuth@redhat.com>) id 1dslaR-0000kx-WB
 	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:02:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46902)
+Received: from mx1.redhat.com ([209.132.183.28]:49612)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dslaT-0000lL-TG
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:02:58 -0400
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dslaR-0000ko-Ne
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:02:55 -0400
 From: Thomas Huth <thuth@redhat.com>
-Date: Fri, 15 Sep 2017 10:02:27 +0200
-Message-Id: <1505462549-27298-8-git-send-email-thuth@redhat.com>
+Date: Fri, 15 Sep 2017 10:02:26 +0200
+Message-Id: <1505462549-27298-7-git-send-email-thuth@redhat.com>
 In-Reply-To: <1505462549-27298-1-git-send-email-thuth@redhat.com>
 References: <1505462549-27298-1-git-send-email-thuth@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 7/9] numa-test: Use hmp()
+Subject: [Qemu-devel] [PULL 6/9] qtest: Don't perform side effects inside
+ assertion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,71 +29,206 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Eric Blake <eblake@redhat.com>, "D
 
 From: Eric Blake <eblake@redhat.com>
 
-Don't open-code something that has a convenient helper available.
+Assertions should be separate from the side effects, since in
+theory, g_assert() can be disabled (in practice, we can't really
+ever do that).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/numa-test.c | 21 +++------------------
- 1 file changed, 3 insertions(+), 18 deletions(-)
+ qtest.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 58 insertions(+), 24 deletions(-)
 
-diff --git a/tests/numa-test.c b/tests/numa-test.c
-index 3f63684..e1b6152 100644
---- a/tests/numa-test.c
-+++ b/tests/numa-test.c
-@@ -17,21 +17,6 @@ static char *make_cli(const char *generic_cli, const c=
-har *test_cli)
-     return g_strdup_printf("%s %s", generic_cli ? generic_cli : "", test=
-_cli);
- }
-=20
--static char *hmp_info_numa(void)
--{
--    QDict *resp;
--    char *s;
+diff --git a/qtest.c b/qtest.c
+index 88a09e9..cbbfb71 100644
+--- a/qtest.c
++++ b/qtest.c
+@@ -332,10 +332,13 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+                strcmp(words[0], "outl") == 0) {
+         unsigned long addr;
+         unsigned long value;
++        int ret;
+ 
+         g_assert(words[1] && words[2]);
+-        g_assert(qemu_strtoul(words[1], NULL, 0, &addr) == 0);
+-        g_assert(qemu_strtoul(words[2], NULL, 0, &value) == 0);
++        ret = qemu_strtoul(words[1], NULL, 0, &addr);
++        g_assert(ret == 0);
++        ret = qemu_strtoul(words[2], NULL, 0, &value);
++        g_assert(ret == 0);
+         g_assert(addr <= 0xffff);
+ 
+         if (words[0][3] == 'b') {
+@@ -352,9 +355,11 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+         strcmp(words[0], "inl") == 0) {
+         unsigned long addr;
+         uint32_t value = -1U;
++        int ret;
+ 
+         g_assert(words[1]);
+-        g_assert(qemu_strtoul(words[1], NULL, 0, &addr) == 0);
++        ret = qemu_strtoul(words[1], NULL, 0, &addr);
++        g_assert(ret == 0);
+         g_assert(addr <= 0xffff);
+ 
+         if (words[0][2] == 'b') {
+@@ -372,10 +377,13 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+                strcmp(words[0], "writeq") == 0) {
+         uint64_t addr;
+         uint64_t value;
++        int ret;
+ 
+         g_assert(words[1] && words[2]);
+-        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
+-        g_assert(qemu_strtou64(words[2], NULL, 0, &value) == 0);
++        ret = qemu_strtou64(words[1], NULL, 0, &addr);
++        g_assert(ret == 0);
++        ret = qemu_strtou64(words[2], NULL, 0, &value);
++        g_assert(ret == 0);
+ 
+         if (words[0][5] == 'b') {
+             uint8_t data = value;
+@@ -401,9 +409,11 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+                strcmp(words[0], "readq") == 0) {
+         uint64_t addr;
+         uint64_t value = UINT64_C(-1);
++        int ret;
+ 
+         g_assert(words[1]);
+-        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
++        ret = qemu_strtou64(words[1], NULL, 0, &addr);
++        g_assert(ret == 0);
+ 
+         if (words[0][4] == 'b') {
+             uint8_t data;
+@@ -427,10 +437,13 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+         uint64_t addr, len, i;
+         uint8_t *data;
+         char *enc;
++        int ret;
+ 
+         g_assert(words[1] && words[2]);
+-        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
+-        g_assert(qemu_strtou64(words[2], NULL, 0, &len) == 0);
++        ret = qemu_strtou64(words[1], NULL, 0, &addr);
++        g_assert(ret == 0);
++        ret = qemu_strtou64(words[2], NULL, 0, &len);
++        g_assert(ret == 0);
+         /* We'd send garbage to libqtest if len is 0 */
+         g_assert(len);
+ 
+@@ -451,10 +464,13 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+         uint64_t addr, len;
+         uint8_t *data;
+         gchar *b64_data;
++        int ret;
+ 
+         g_assert(words[1] && words[2]);
+-        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
+-        g_assert(qemu_strtou64(words[2], NULL, 0, &len) == 0);
++        ret = qemu_strtou64(words[1], NULL, 0, &addr);
++        g_assert(ret == 0);
++        ret = qemu_strtou64(words[2], NULL, 0, &len);
++        g_assert(ret == 0);
+ 
+         data = g_malloc(len);
+         cpu_physical_memory_read(addr, data, len);
+@@ -468,10 +484,13 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+         uint64_t addr, len, i;
+         uint8_t *data;
+         size_t data_len;
++        int ret;
+ 
+         g_assert(words[1] && words[2] && words[3]);
+-        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
+-        g_assert(qemu_strtou64(words[2], NULL, 0, &len) == 0);
++        ret = qemu_strtou64(words[1], NULL, 0, &addr);
++        g_assert(ret == 0);
++        ret = qemu_strtou64(words[2], NULL, 0, &len);
++        g_assert(ret == 0);
+ 
+         data_len = strlen(words[3]);
+         if (data_len < 3) {
+@@ -497,11 +516,15 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+         uint64_t addr, len;
+         uint8_t *data;
+         unsigned long pattern;
++        int ret;
+ 
+         g_assert(words[1] && words[2] && words[3]);
+-        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
+-        g_assert(qemu_strtou64(words[2], NULL, 0, &len) == 0);
+-        g_assert(qemu_strtoul(words[3], NULL, 0, &pattern) == 0);
++        ret = qemu_strtou64(words[1], NULL, 0, &addr);
++        g_assert(ret == 0);
++        ret = qemu_strtou64(words[2], NULL, 0, &len);
++        g_assert(ret == 0);
++        ret = qemu_strtoul(words[3], NULL, 0, &pattern);
++        g_assert(ret == 0);
+ 
+         if (len) {
+             data = g_malloc(len);
+@@ -517,10 +540,13 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+         uint8_t *data;
+         size_t data_len;
+         gsize out_len;
++        int ret;
+ 
+         g_assert(words[1] && words[2] && words[3]);
+-        g_assert(qemu_strtou64(words[1], NULL, 0, &addr) == 0);
+-        g_assert(qemu_strtou64(words[2], NULL, 0, &len) == 0);
++        ret = qemu_strtou64(words[1], NULL, 0, &addr);
++        g_assert(ret == 0);
++        ret = qemu_strtou64(words[2], NULL, 0, &len);
++        g_assert(ret == 0);
+ 
+         data_len = strlen(words[3]);
+         if (data_len < 3) {
+@@ -551,11 +577,16 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+     } else if (strcmp(words[0], "rtas") == 0) {
+         uint64_t res, args, ret;
+         unsigned long nargs, nret;
 -
--    resp =3D qmp("{ 'execute': 'human-monitor-command', 'arguments': "
--                      "{ 'command-line': 'info numa '} }");
--    g_assert(resp);
--    g_assert(qdict_haskey(resp, "return"));
--    s =3D g_strdup(qdict_get_str(resp, "return"));
--    g_assert(s);
--    QDECREF(resp);
--    return s;
--}
--
- static void test_mon_explicit(const void *data)
- {
-     char *s;
-@@ -42,7 +27,7 @@ static void test_mon_explicit(const void *data)
-                    "-numa node,nodeid=3D1,cpus=3D4-7 ");
-     qtest_start(cli);
-=20
--    s =3D hmp_info_numa();
-+    s =3D hmp("info numa");
-     g_assert(strstr(s, "node 0 cpus: 0 1 2 3"));
-     g_assert(strstr(s, "node 1 cpus: 4 5 6 7"));
-     g_free(s);
-@@ -59,7 +44,7 @@ static void test_mon_default(const void *data)
-     cli =3D make_cli(data, "-smp 8 -numa node -numa node");
-     qtest_start(cli);
-=20
--    s =3D hmp_info_numa();
-+    s =3D hmp("info numa");
-     g_assert(strstr(s, "node 0 cpus: 0 2 4 6"));
-     g_assert(strstr(s, "node 1 cpus: 1 3 5 7"));
-     g_free(s);
-@@ -78,7 +63,7 @@ static void test_mon_partial(const void *data)
-                    "-numa node,nodeid=3D1,cpus=3D4-5 ");
-     qtest_start(cli);
-=20
--    s =3D hmp_info_numa();
-+    s =3D hmp("info numa");
-     g_assert(strstr(s, "node 0 cpus: 0 1 2 3 6 7"));
-     g_assert(strstr(s, "node 1 cpus: 4 5"));
-     g_free(s);
---=20
+-        g_assert(qemu_strtoul(words[2], NULL, 0, &nargs) == 0);
+-        g_assert(qemu_strtou64(words[3], NULL, 0, &args) == 0);
+-        g_assert(qemu_strtoul(words[4], NULL, 0, &nret) == 0);
+-        g_assert(qemu_strtou64(words[5], NULL, 0, &ret) == 0);
++        int rc;
++
++        rc = qemu_strtoul(words[2], NULL, 0, &nargs);
++        g_assert(rc == 0);
++        rc = qemu_strtou64(words[3], NULL, 0, &args);
++        g_assert(rc == 0);
++        rc = qemu_strtoul(words[4], NULL, 0, &nret);
++        g_assert(rc == 0);
++        rc = qemu_strtou64(words[5], NULL, 0, &ret);
++        g_assert(rc == 0);
+         res = qtest_rtas_call(words[1], nargs, args, nret, ret);
+ 
+         qtest_send_prefix(chr);
+@@ -565,7 +596,8 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+         int64_t ns;
+ 
+         if (words[1]) {
+-            g_assert(qemu_strtoi64(words[1], NULL, 0, &ns) == 0);
++            int ret = qemu_strtoi64(words[1], NULL, 0, &ns);
++            g_assert(ret == 0);
+         } else {
+             ns = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL);
+         }
+@@ -575,9 +607,11 @@ static void qtest_process_command(CharBackend *chr, gchar **words)
+                     (int64_t)qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL));
+     } else if (qtest_enabled() && strcmp(words[0], "clock_set") == 0) {
+         int64_t ns;
++        int ret;
+ 
+         g_assert(words[1]);
+-        g_assert(qemu_strtoi64(words[1], NULL, 0, &ns) == 0);
++        ret = qemu_strtoi64(words[1], NULL, 0, &ns);
++        g_assert(ret == 0);
+         qtest_clock_warp(ns);
+         qtest_send_prefix(chr);
+         qtest_sendf(chr, "OK %"PRIi64"\n",
+-- 
 1.8.3.1
