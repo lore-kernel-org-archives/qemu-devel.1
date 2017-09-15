@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42589)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1dszEb-0000Rr-Nb
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 18:37:18 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dsziI-0006ZB-RW
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:07:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jcmvbkbc@gmail.com>) id 1dszEb-0006zW-0N
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 18:37:17 -0400
-Received: from mail-yw0-x244.google.com ([2607:f8b0:4002:c05::244]:37587)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <jcmvbkbc@gmail.com>) id 1dszEa-0006z3-RG
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 18:37:16 -0400
-Received: by mail-yw0-x244.google.com with SMTP id v137so2444830ywg.4
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 15:37:15 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <134bcf2e2c0bb9160aa822ddfbc46d9bd51c4305.1505512474.git.alistair.francis@xilinx.com>
-References: <134bcf2e2c0bb9160aa822ddfbc46d9bd51c4305.1505512474.git.alistair.francis@xilinx.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Fri, 15 Sep 2017 15:37:14 -0700
-Message-ID: <CAMo8BfJp=dLbgGsqu8rKAoKxTkMNRHeAUcT74pQSdCpKWqxLPg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2 1/1] target/xtensa: Use the pre-defined
- MEMTXATTRS_UNSPECIFIED macro
+	(envelope-from <ehabkost@redhat.com>) id 1dsziF-0004Qk-LR
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:07:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46024)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dsziF-0004QC-G2
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 19:07:55 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Fri, 15 Sep 2017 20:07:44 -0300
+Message-Id: <20170915230744.22942-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PATCH] MAINTAINERS: Add Python scripts
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,28 +21,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alistair Francis <alistair.francis@xilinx.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, alistair23@gmail.com
+To: qemu-devel@nongnu.org
+Cc: Amador Pahim <apahim@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, =?UTF-8?q?Luk=C3=A1=C5=A1=20Doktor?= <ldoktor@redhat.com>, John Snow <jsnow@redhat.com>, Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Fri, Sep 15, 2017 at 2:56 PM, Alistair Francis
-<alistair.francis@xilinx.com> wrote:
-> Instead of using the hardcoded (MemTxAttrs){0} for no memory attributes
-> let's use the already defined MEMTXATTRS_UNSPECIFIED macro instead.
->
-> This is technically a change of behaviour as MEMTXATTRS_UNSPECIFIED sets
-> the unspecified field to 1, but it doesn't look like anything is
-> checking this field.
->
-> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-> ---
-> V2:
->  - Update commit message to indicate the change in behaviour
->
->  target/xtensa/op_helper.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+Cleber and I are volunteering to review and queue patches for the
+Python scripts and modules in scripts/.
 
-Acked-by: Max Filippov <jcmvbkbc@gmail.com>
+I'm setting "M: Odd fixes" because not all scripts are actively
+maintained.
 
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+Even before this patch is merged, I plan to send a pull request
+including some patches for the Python code soon.
+---
+ MAINTAINERS | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 2c333aba21..2c3b8ecde7 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1390,6 +1390,13 @@ S: Maintained
+ F: include/sysemu/cryptodev*.h
+ F: backends/cryptodev*.c
+ 
++Python scripts
++M: Eduardo Habkost <ehabkost@redhat.com>
++M: Cleber Rosa <crosa@redhat.com>
++S: Odd fixes
++F: scripts/qmp/*
++F: scripts/*.py
++
+ QAPI
+ M: Markus Armbruster <armbru@redhat.com>
+ M: Michael Roth <mdroth@linux.vnet.ibm.com>
 -- 
-Thanks.
--- Max
+2.13.5
