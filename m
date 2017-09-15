@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54293)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56983)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dshfO-0006r9-Uf
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:51:49 -0400
+	(envelope-from <peterx@redhat.com>) id 1dshlu-0001q3-Qb
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:58:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dshfN-0003RS-6e
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:51:46 -0400
-From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 15 Sep 2017 13:51:26 +1000
-Message-Id: <20170915035130.8354-15-david@gibson.dropbear.id.au>
-In-Reply-To: <20170915035130.8354-1-david@gibson.dropbear.id.au>
-References: <20170915035130.8354-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 14/18] spapr_pci: convert sprintf() to
- g_strdup_printf()
+	(envelope-from <peterx@redhat.com>) id 1dshlr-0000rg-QF
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:58:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51348)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dshlr-0000pq-Km
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:58:27 -0400
+Date: Fri, 15 Sep 2017 11:58:17 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170915035817.GN3617@pxdev.xzpeter.org>
+References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
+	<20170914185603.GB3280@work-vm>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170914185603.GB3280@work-vm>
+Subject: Re: [Qemu-devel] [RFC 00/15] QMP: out-of-band (OOB) execution
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,80 +28,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: peter.maydell@linaro.org
-Cc: agraf@suse.de, gkurz@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, aik@ozlabs.ru, Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>
 
-From: Greg Kurz <groug@kaod.org>
+On Thu, Sep 14, 2017 at 07:56:04PM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > This series was born from this one:
+> > 
+> >   https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04310.html
+> 
+> Are patches 1..6 separable and mergable without the rest ?
 
-In order to follow a QEMU common practice.
+Yes I think so.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- hw/ppc/spapr_pci.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+(I was always trying to put pre-requisite patches like these ones at
+ the front of any of my series rather than separating them into more
+ series, since I thought it is convenient for me to manage them (or
+ add new ones when respin), and also easier for reviewers (so people
+ don't need to try to find the dependencies).  And since I put them at
+ the head, we can easily merge them without rebasing issue when they
+ are good while the rest may still need further work.  Hopefully this
+ is the right thing to do.)
 
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 75cd939223..7d84b9766e 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1609,34 +1609,37 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
- 
-     sphb->dtbusname = g_strdup_printf("pci@%" PRIx64, sphb->buid);
- 
--    namebuf = alloca(strlen(sphb->dtbusname) + 32);
--
-     /* Initialize memory regions */
--    sprintf(namebuf, "%s.mmio", sphb->dtbusname);
-+    namebuf = g_strdup_printf("%s.mmio", sphb->dtbusname);
-     memory_region_init(&sphb->memspace, OBJECT(sphb), namebuf, UINT64_MAX);
-+    g_free(namebuf);
- 
--    sprintf(namebuf, "%s.mmio32-alias", sphb->dtbusname);
-+    namebuf = g_strdup_printf("%s.mmio32-alias", sphb->dtbusname);
-     memory_region_init_alias(&sphb->mem32window, OBJECT(sphb),
-                              namebuf, &sphb->memspace,
-                              SPAPR_PCI_MEM_WIN_BUS_OFFSET, sphb->mem_win_size);
-+    g_free(namebuf);
-     memory_region_add_subregion(get_system_memory(), sphb->mem_win_addr,
-                                 &sphb->mem32window);
- 
--    sprintf(namebuf, "%s.mmio64-alias", sphb->dtbusname);
-+    namebuf = g_strdup_printf("%s.mmio64-alias", sphb->dtbusname);
-     memory_region_init_alias(&sphb->mem64window, OBJECT(sphb),
-                              namebuf, &sphb->memspace,
-                              sphb->mem64_win_pciaddr, sphb->mem64_win_size);
-+    g_free(namebuf);
-     memory_region_add_subregion(get_system_memory(), sphb->mem64_win_addr,
-                                 &sphb->mem64window);
- 
-     /* Initialize IO regions */
--    sprintf(namebuf, "%s.io", sphb->dtbusname);
-+    namebuf = g_strdup_printf("%s.io", sphb->dtbusname);
-     memory_region_init(&sphb->iospace, OBJECT(sphb),
-                        namebuf, SPAPR_PCI_IO_WIN_SIZE);
-+    g_free(namebuf);
- 
--    sprintf(namebuf, "%s.io-alias", sphb->dtbusname);
-+    namebuf = g_strdup_printf("%s.io-alias", sphb->dtbusname);
-     memory_region_init_alias(&sphb->iowindow, OBJECT(sphb), namebuf,
-                              &sphb->iospace, 0, SPAPR_PCI_IO_WIN_SIZE);
-+    g_free(namebuf);
-     memory_region_add_subregion(get_system_memory(), sphb->io_win_addr,
-                                 &sphb->iowindow);
- 
-@@ -1654,10 +1657,10 @@ static void spapr_phb_realize(DeviceState *dev, Error **errp)
-      * Later the guest might want to create another DMA window
-      * which will become another memory subregion.
-      */
--    sprintf(namebuf, "%s.iommu-root", sphb->dtbusname);
--
-+    namebuf = g_strdup_printf("%s.iommu-root", sphb->dtbusname);
-     memory_region_init(&sphb->iommu_root, OBJECT(sphb),
-                        namebuf, UINT64_MAX);
-+    g_free(namebuf);
-     address_space_init(&sphb->iommu_as, &sphb->iommu_root,
-                        sphb->dtbusname);
- 
 -- 
-2.13.5
+Peter Xu
