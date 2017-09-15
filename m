@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46742)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dsl2j-0000a1-R0
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:28:09 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dsl5L-0001pB-34
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:30:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dsl2i-0007qA-OI
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:28:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57090)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dsl2i-0007pt-Ew
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:28:04 -0400
-Date: Fri, 15 Sep 2017 09:27:58 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170915092758.16ea52fc.cohuck@redhat.com>
-In-Reply-To: <0b42ef59-4366-175f-8dc7-bc3ed02e2fb4@linux.vnet.ibm.com>
-References: <20170913132752.8484-1-pasic@linux.vnet.ibm.com>
-	<20170913132752.8484-2-pasic@linux.vnet.ibm.com>
-	<20170914162603.1cdabd09.cohuck@redhat.com>
-	<0b42ef59-4366-175f-8dc7-bc3ed02e2fb4@linux.vnet.ibm.com>
+	(envelope-from <eric.auger@redhat.com>) id 1dsl5J-0000HY-Pr
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:30:47 -0400
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<1504286483-23327-14-git-send-email-eric.auger@redhat.com>
+	<20170914092751.GA3336@virtx40>
+	<4dbbccae-64e1-f4ac-4dcc-3abd9766f324@caviumnetworks.com>
+	<795d99ba-e492-04ce-dda4-709682baf6cd@caviumnetworks.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <4f9fc697-9e6c-5dd7-65c7-92326135aa56@redhat.com>
+Date: Fri, 15 Sep 2017 09:30:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <795d99ba-e492-04ce-dda4-709682baf6cd@caviumnetworks.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/ccs: add ccw-tester emulated
- device
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 13/20] hw/arm/smmuv3:
+ Implement IOMMU memory region replay callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,91 +27,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
+To: Tomasz Nowicki <tnowicki@caviumnetworks.com>, Linu Cherian <linuc.decode@gmail.com>
+Cc: eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, peterx@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, wtownsen@redhat.com, linu.cherian@cavium.com
 
-On Thu, 14 Sep 2017 18:50:29 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+Hi Tomasz,
 
-> On 09/14/2017 04:26 PM, Cornelia Huck wrote:
-> > On Wed, 13 Sep 2017 15:27:51 +0200
-> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-
-> >> +static Property ccw_tester_properties[] = {
-> >> +    DEFINE_PROP_UINT16("cu_type", CcwTesterDevice, cu_type,
-> >> +                        0x3831),  
-> > 
-> > 0x4711 would be nice :)  
+On 14/09/2017 16:43, Tomasz Nowicki wrote:
+> On 14.09.2017 16:31, Tomasz Nowicki wrote:
+>> Hi Eric,
+>>
+>> On 14.09.2017 11:27, Linu Cherian wrote:
+>>> Hi Eric,
+>>>
+>>> On Fri Sep 01, 2017 at 07:21:16PM +0200, Eric Auger wrote:
+>>>> memory_region_iommu_replay() is used for VFIO integration.
+>>>>
+>>>> However its default implementation is not adapted to SMMUv3
+>>>> IOMMU memory region. Indeed the input address range is too
+>>>> huge and its execution is too slow as it calls the translate()
+>>>> callback on each granule.
+>>>>
+>>>> Let's implement the replay callback which hierarchically walk
+>>>> over the page table structure and notify only the segments
+>>>> that are populated with valid entries.
+>>>>
+>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>> ---
+>>>>   hw/arm/smmuv3.c     | 36 ++++++++++++++++++++++++++++++++++++
+>>>>   hw/arm/trace-events |  1 +
+>>>>   2 files changed, 37 insertions(+)
+>>>>
+>>>> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+>>>> index 8e7d10d..c43bd93 100644
+>>>> --- a/hw/arm/smmuv3.c
+>>>> +++ b/hw/arm/smmuv3.c
+>>>> @@ -657,6 +657,41 @@ static int smmuv3_notify_entry(IOMMUTLBEntry
+>>>> *entry, void *private)
+>>>>       return 0;
+>>>>   }
+>>>> +/* Unmap the whole notifier's range */
+>>>> +static void smmuv3_unmap_notifier_range(IOMMUNotifier *n)
+>>>> +{
+>>>> +    IOMMUTLBEntry entry;
+>>>> +    hwaddr size = n->end - n->start + 1;
+>>>> +
+>>>> +    entry.target_as = &address_space_memory;
+>>>> +    entry.iova = n->start & ~(size - 1);
+>>>> +    entry.perm = IOMMU_NONE;
+>>>> +    entry.addr_mask = size - 1;
+>>>> +
+>>>> +    memory_region_notify_one(n, &entry);
+>>>> +}
+>>>> +
+>>>> +static void smmuv3_replay(IOMMUMemoryRegion *mr, IOMMUNotifier *n)
+>>>> +{
+>>>> +    SMMUTransCfg cfg = {};
+>>>> +    int ret;
+>>>> +
+>>>> +    trace_smmuv3_replay(mr->parent_obj.name, n, n->start, n->end);
+>>>> +    smmuv3_unmap_notifier_range(n);
+>>>> +
+>>>> +    ret = smmuv3_decode_config(mr, &cfg);
+>>>> +    if (ret) {
+>>>> +        error_report("%s error decoding the configuration for iommu
+>>>> mr=%s",
+>>>> +                     __func__, mr->parent_obj.name);
+>>>> +    }
+>>>>
+>>>
+>>> On an invalid config being found, shouldnt we return rather than
+>>> proceeding with
+>>> page table walk. For example on an invalid Stream table entry.
+>>
+>> Indeed, without return here vhost case is not working for me.
 > 
-> I don't understand the joke/pun/whatever if there is one,
-> but I'm fine with changing this too.
+> I was just lucky one time. return here has no influence. Vhost still not
+> working. Sorry for noise.
 
-https://en.wikipedia.org/wiki/4711
+As far as I understand the replay() callback only is called in VFIO use
+case. So this shouldn't impact vhost.
 
-That's my default if I need a four-digit number :)
+I can't reproduce your vhost issue on my side. I will review the
+invalidate code again and compare against the last version.
 
+What is the page size used by your guest?
+
+Thanks
+
+Eric
 > 
-> > 
-> > If we want to follow up on that testdev idea (and I think we should),
-> > it might make sense to have a proper type reserve to prevent accidental
-> > clashes.  
+> Tomasz
 > 
-> I agree. Although I would still keep the cu_type configurable,
-> because it might make sense to test a particular 'real' driver
-> (and not a test driver like here). I haven't really thought
-> this through, but it was an idea I had while agonizing over
-> not having a proper type reserved.
-> 
-> I suppose you did something like that for virtio, or? I'm in dark
-> when it comes to the question what process do we/I have to go to
-> get a type,for example 0x4711, reserved.
-
-4711 is more a joke :) It might be worth trying the same channels as
-for virtio-ccw.
-
-Christian should know more about that.
-
-> 
-> > 
-> > (Or is there already something reserved for "hypervisor use" or
-> > whatever?)  
-> 
-> Not that I know. I can't recall encountering a list of reserved
-> types. Honestly I've hoped to leverage your experience (again
-> because of virtio-ccw).
-
-My thought was that the z/VM folks already might have something
-(type-wise) that we could use as well. There's a surprising amount of
-values that are reserved for one use or the other. But obviously, I
-can't find out about that.
-
-> 
-> >   
-> >> +    DEFINE_PROP_UINT8("chpid_type", CcwTesterDevice, chpid_type,
-> >> +                       0x98),
-
-This might also need re-evaluation - we should not really need a new
-chpid type.
-
-> >> +    DEFINE_PROP_END_OF_LIST(),
-> >> +};  
-> > 
-> > IIUC, pci-testdev provides some unit tests to testers (like kvm-tests)
-> > itself. This might be an idea to follow up on for ccw as well.
-> >   
-> 
-> I've just had a first look at pci-testdev, and it does appear to be a similar
-> concept. 
-> 
-> > There's quite some potential in this. We may want to make this a
-> > permanent addition.
-> >   
-> 
-> I'm happy to contribute! I'm not sure how shall we proceed though.
-> Maybe with making a todo list?
-
-I think the first step would be to figure out the ids so we don't step
-on anyone's toes. Then maybe refactor a bit so that other testers can
-be added easily.
-
-For ideas about things to be tested, maybe put a list into the wiki?
+>>
+>> Thanks,
+>> Tomasz
+>>
+>>>
+>>> +
+>>>> +    if (cfg.disabled || cfg.bypassed) {
+>>>> +        return;
+>>>> +    }
+>>>> +    /* walk the page tables and replay valid entries */
+>>>> +    smmu_page_walk(&cfg, 0, (1ULL << (64 - cfg.tsz)) - 1, false,
+>>>> +                   smmuv3_notify_entry, n);
+>>>> +}
+>>>>   static void smmuv3_notify_iova_range(IOMMUMemoryRegion *mr,
+>>>> IOMMUNotifier *n,
+>>>>                                        uint64_t iova, size_t size)
+>>>>   {
+>>>> @@ -1095,6 +1130,7 @@ static void
+>>>> smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
+>>>>       imrc->translate = smmuv3_translate;
+>>>>       imrc->notify_flag_changed = smmuv3_notify_flag_changed;
+>>>> +    imrc->replay = smmuv3_replay;
+>>>>   }
+>>>>   static const TypeInfo smmuv3_type_info = {
+>>>> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
+>>>> index 4ac264d..15f84d6 100644
+>>>> --- a/hw/arm/trace-events
+>>>> +++ b/hw/arm/trace-events
+>>>> @@ -46,5 +46,6 @@ smmuv3_cfg_stage(int s, uint32_t oas, uint32_t
+>>>> tsz, uint64_t ttbr, bool aa64, ui
+>>>>   smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node
+>>>> for iommu mr=%s"
+>>>>   smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node
+>>>> for iommu mr=%s"
+>>>>   smmuv3_replay_mr(const char *name) "iommu mr=%s"
+>>>> +smmuv3_replay(const char *name, void *n, hwaddr start, hwaddr end)
+>>>> "iommu mr=%s notifier=%p [0x%"PRIx64",0x%"PRIx64"]"
+>>>>   smmuv3_notify_entry(hwaddr iova, hwaddr pa, hwaddr mask, int perm)
+>>>> "iova=0x%"PRIx64" pa=0x%" PRIx64" mask=0x%"PRIx64" perm=%d"
+>>>>   smmuv3_notify_iova_range(const char *name, uint64_t iova, size_t
+>>>> size, void *n) "iommu mr=%s iova=0x%"PRIx64" size=0x%lx n=%p"
+>>>> -- 
+>>>> 2.5.5
+>>>>
+>>>>
+>>>
