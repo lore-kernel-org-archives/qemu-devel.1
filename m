@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56717)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dsxQD-0000Lv-7o
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 16:41:10 -0400
+	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dsxU7-0001xG-Ug
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 16:45:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dsxQA-0001py-2p
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 16:41:09 -0400
-Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:47059)
+	(envelope-from <glaubitz@physik.fu-berlin.de>) id 1dsxU4-0003FL-RH
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 16:45:12 -0400
+Received: from outpost1.zedat.fu-berlin.de ([130.133.4.66]:57827)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <glaubitz@physik.fu-berlin.de>)
-	id 1dsxQ9-0001p6-T8
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 16:41:06 -0400
+	id 1dsxU4-0003DO-L7
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 16:45:08 -0400
 References: <20170915065821.16600-1-jrtc27@jrtc27.com>
 	<20170915193313.86362-1-jrtc27@jrtc27.com>
 From: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
-Message-ID: <60e4aee8-18bc-b9fc-9286-cb87f95a046f@physik.fu-berlin.de>
-Date: Fri, 15 Sep 2017 22:41:01 +0200
+Message-ID: <83eef12d-0118-8ece-bb38-4b8ed4e1aa78@physik.fu-berlin.de>
+Date: Fri, 15 Sep 2017 22:45:05 +0200
 MIME-Version: 1.0
 In-Reply-To: <20170915193313.86362-1-jrtc27@jrtc27.com>
 Content-Type: text/plain; charset=utf-8
@@ -33,69 +33,137 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: James Clarke <jrtc27@jrtc27.com>, QEMU Developers <qemu-devel@nongnu.org>
 Cc: Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+(re-sent because GPG messed up the line endings)
 
 On 09/15/2017 09:33 PM, James Clarke wrote:
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1716767 Signed-off-by: James Clarke <jrtc27@jrtc27.com> ---
+> Fixes: https://bugs.launchpad.net/qemu/+bug/1716767
+> Signed-off-by: James Clarke <jrtc27@jrtc27.com>
+> ---
 > 
-> Changes since v2: * Fixed opening curly brace formatting, both for my new SH4-specific regpairs_aligned function, as well as the Arm one I touched, to
-> appease checkpatch.pl
+> Changes since v2:
+>  * Fixed opening curly brace formatting, both for my new SH4-specific
+>    regpairs_aligned function, as well as the Arm one I touched, to appease
+>    checkpatch.pl
 > 
-> Changes since v1: * Removed all changes in v1 :) * Added syscall num argument to regpairs_aligned * Added SH4-specific implementation of regpairs_aligned
-> to return 1 for p{read,write}64
+> Changes since v1:
+>  * Removed all changes in v1 :)
+>  * Added syscall num argument to regpairs_aligned
+>  * Added SH4-specific implementation of regpairs_aligned to return 1 for
+>    p{read,write}64
 > 
-> linux-user/syscall.c | 36 +++++++++++++++++++++++++----------- 1 file changed, 25 insertions(+), 11 deletions(-)
+>  linux-user/syscall.c | 36 +++++++++++++++++++++++++-----------
+>  1 file changed, 25 insertions(+), 11 deletions(-)
 > 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c index 9b6364a266..0c1bd80bed 100644 --- a/linux-user/syscall.c +++ b/linux-user/syscall.c @@
-> -667,18 +667,32 @@ static inline int next_free_host_timer(void)
-> 
-> /* ARM EABI and MIPS expect 64bit types aligned even on pairs or registers */ #ifdef TARGET_ARM -static inline int regpairs_aligned(void *cpu_env) { 
-> +static inline int regpairs_aligned(void *cpu_env, int num) +{ return ((((CPUARMState *)cpu_env)->eabi) == 1) ; } #elif defined(TARGET_MIPS) &&
-> (TARGET_ABI_BITS == 32) -static inline int regpairs_aligned(void *cpu_env) { return 1; } +static inline int regpairs_aligned(void *cpu_env, int num) {
-> return 1; } #elif defined(TARGET_PPC) && !defined(TARGET_PPC64) /* SysV AVI for PPC32 expects 64bit parameters to be passed on odd/even pairs * of
-> registers which translates to the same as ARM/MIPS, because we start with * r3 as arg1 */ -static inline int regpairs_aligned(void *cpu_env) { return 1; } 
-> +static inline int regpairs_aligned(void *cpu_env, int num) { return 1; } +#elif defined(TARGET_SH4) +/* SH4 doesn't align register pairs, except for
-> p{read,write}64 */ +static inline int regpairs_aligned(void *cpu_env, int num) +{ +    switch (num) { +    case TARGET_NR_pread64: +    case
-> TARGET_NR_pwrite64: +        return 1; + +    default: +        return 0; +    } +} #else -static inline int regpairs_aligned(void *cpu_env) { return 0; } 
-> +static inline int regpairs_aligned(void *cpu_env, int num) { return 0; } #endif
-> 
-> #define ERRNO_TABLE_SIZE 1200 @@ -6857,7 +6871,7 @@ static inline abi_long target_truncate64(void *cpu_env, const char *arg1, abi_long arg3, abi_long
-> arg4) { -    if (regpairs_aligned(cpu_env)) { +    if (regpairs_aligned(cpu_env, TARGET_NR_truncate64)) { arg2 = arg3; arg3 = arg4; } @@ -6871,7 +6885,7 @@
-> static inline abi_long target_ftruncate64(void *cpu_env, abi_long arg1, abi_long arg3, abi_long arg4) { -    if (regpairs_aligned(cpu_env)) { +    if
-> (regpairs_aligned(cpu_env, TARGET_NR_ftruncate64)) { arg2 = arg3; arg3 = arg4; } @@ -10495,7 +10509,7 @@ abi_long do_syscall(void *cpu_env, int num,
-> abi_long arg1, #endif #ifdef TARGET_NR_pread64 case TARGET_NR_pread64: -        if (regpairs_aligned(cpu_env)) { +        if (regpairs_aligned(cpu_env,
-> num)) { arg4 = arg5; arg5 = arg6; } @@ -10505,7 +10519,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1, unlock_user(p, arg2, ret); break; 
-> case TARGET_NR_pwrite64: -        if (regpairs_aligned(cpu_env)) { +        if (regpairs_aligned(cpu_env, num)) { arg4 = arg5; arg5 = arg6; } @@ -11275,7
-> +11289,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1, arg6 = ret; #else /* 6 args: fd, offset (high, low), len (high, low), advice */ -
-> if (regpairs_aligned(cpu_env)) { +        if (regpairs_aligned(cpu_env, num)) { /* offset is in (3,4), len in (5,6) and advice in 7 */ arg2 = arg3; arg3 =
-> arg4; @@ -11294,7 +11308,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1, #ifdef TARGET_NR_fadvise64 case TARGET_NR_fadvise64: /* 5 args:
-> fd, offset (high, low), len, advice */ -        if (regpairs_aligned(cpu_env)) { +        if (regpairs_aligned(cpu_env, num)) { /* offset is in (3,4), len
-> in 5 and advice in 6 */ arg2 = arg3; arg3 = arg4; @@ -11407,7 +11421,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1, #ifdef
-> TARGET_NR_readahead case TARGET_NR_readahead: #if TARGET_ABI_BITS == 32 -        if (regpairs_aligned(cpu_env)) { +        if (regpairs_aligned(cpu_env,
-> num)) { arg2 = arg3; arg3 = arg4; arg4 = arg5;
+> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+> index 9b6364a266..0c1bd80bed 100644
+> --- a/linux-user/syscall.c
+> +++ b/linux-user/syscall.c
+> @@ -667,18 +667,32 @@ static inline int next_free_host_timer(void)
+>  
+>  /* ARM EABI and MIPS expect 64bit types aligned even on pairs or registers */
+>  #ifdef TARGET_ARM
+> -static inline int regpairs_aligned(void *cpu_env) {
+> +static inline int regpairs_aligned(void *cpu_env, int num)
+> +{
+>      return ((((CPUARMState *)cpu_env)->eabi) == 1) ;
+>  }
+>  #elif defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
+> -static inline int regpairs_aligned(void *cpu_env) { return 1; }
+> +static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
+>  #elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
+>  /* SysV AVI for PPC32 expects 64bit parameters to be passed on odd/even pairs
+>   * of registers which translates to the same as ARM/MIPS, because we start with
+>   * r3 as arg1 */
+> -static inline int regpairs_aligned(void *cpu_env) { return 1; }
+> +static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
+> +#elif defined(TARGET_SH4)
+> +/* SH4 doesn't align register pairs, except for p{read,write}64 */
+> +static inline int regpairs_aligned(void *cpu_env, int num)
+> +{
+> +    switch (num) {
+> +    case TARGET_NR_pread64:
+> +    case TARGET_NR_pwrite64:
+> +        return 1;
+> +
+> +    default:
+> +        return 0;
+> +    }
+> +}
+>  #else
+> -static inline int regpairs_aligned(void *cpu_env) { return 0; }
+> +static inline int regpairs_aligned(void *cpu_env, int num) { return 0; }
+>  #endif
+>  
+>  #define ERRNO_TABLE_SIZE 1200
+> @@ -6857,7 +6871,7 @@ static inline abi_long target_truncate64(void *cpu_env, const char *arg1,
+>                                           abi_long arg3,
+>                                           abi_long arg4)
+>  {
+> -    if (regpairs_aligned(cpu_env)) {
+> +    if (regpairs_aligned(cpu_env, TARGET_NR_truncate64)) {
+>          arg2 = arg3;
+>          arg3 = arg4;
+>      }
+> @@ -6871,7 +6885,7 @@ static inline abi_long target_ftruncate64(void *cpu_env, abi_long arg1,
+>                                            abi_long arg3,
+>                                            abi_long arg4)
+>  {
+> -    if (regpairs_aligned(cpu_env)) {
+> +    if (regpairs_aligned(cpu_env, TARGET_NR_ftruncate64)) {
+>          arg2 = arg3;
+>          arg3 = arg4;
+>      }
+> @@ -10495,7 +10509,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>  #endif
+>  #ifdef TARGET_NR_pread64
+>      case TARGET_NR_pread64:
+> -        if (regpairs_aligned(cpu_env)) {
+> +        if (regpairs_aligned(cpu_env, num)) {
+>              arg4 = arg5;
+>              arg5 = arg6;
+>          }
+> @@ -10505,7 +10519,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>          unlock_user(p, arg2, ret);
+>          break;
+>      case TARGET_NR_pwrite64:
+> -        if (regpairs_aligned(cpu_env)) {
+> +        if (regpairs_aligned(cpu_env, num)) {
+>              arg4 = arg5;
+>              arg5 = arg6;
+>          }
+> @@ -11275,7 +11289,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>          arg6 = ret;
+>  #else
+>          /* 6 args: fd, offset (high, low), len (high, low), advice */
+> -        if (regpairs_aligned(cpu_env)) {
+> +        if (regpairs_aligned(cpu_env, num)) {
+>              /* offset is in (3,4), len in (5,6) and advice in 7 */
+>              arg2 = arg3;
+>              arg3 = arg4;
+> @@ -11294,7 +11308,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>  #ifdef TARGET_NR_fadvise64
+>      case TARGET_NR_fadvise64:
+>          /* 5 args: fd, offset (high, low), len, advice */
+> -        if (regpairs_aligned(cpu_env)) {
+> +        if (regpairs_aligned(cpu_env, num)) {
+>              /* offset is in (3,4), len in 5 and advice in 6 */
+>              arg2 = arg3;
+>              arg3 = arg4;
+> @@ -11407,7 +11421,7 @@ abi_long do_syscall(void *cpu_env, int num, abi_long arg1,
+>  #ifdef TARGET_NR_readahead
+>      case TARGET_NR_readahead:
+>  #if TARGET_ABI_BITS == 32
+> -        if (regpairs_aligned(cpu_env)) {
+> +        if (regpairs_aligned(cpu_env, num)) {
+>              arg2 = arg3;
+>              arg3 = arg4;
+>              arg4 = arg5;
 > 
 
 Tested-By: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-- -- 
+-- 
  .''`.  John Paul Adrian Glaubitz
 : :' :  Debian Developer - glaubitz@debian.org
 `. `'   Freie Universitaet Berlin - glaubitz@physik.fu-berlin.de
   `-    GPG: 62FF 8A75 84E0 2956 9546  0006 7426 3B37 F5B5 F913
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEYv+KdYTgKVaVRgAGdCY7N/W1+RMFAlm8OtoACgkQdCY7N/W1
-+RNU1RAAjlDrSn79gJNhsCXBykjVU5i5GrOS5kGSxvs1P494ntprMyraMpcKfFlj
-r2jbn9UjTshiHi9GZjsNKQF6FusNYNOPqKIIiY5Cd63yNjymTEvF+p9vlhNhr4TS
-fjDZKKWJ9Xs3hzUqRTu6rfbLaG+56Yzd1pkE9iocfGT/r0zXHaSWPnKIBe0uPkkp
-AR6L8lGLLeX0I4i8E2Bp9OZM8oWqn+PMQgajgPVAgaTVAWneAIwYZW2m1Ci0bSM2
-7UE+/fQ8spX/MT7cOO5Yhpr+KQk9zbYWNaqyj20gbuA4TMKeH106VomZL1SrVCWg
-fIUhS4Hc8AA5DXhi3Ed4o9fuZklModBw1EFzssBEVTtdmO8P6kA931AcSF0XIjLV
-zhcXJLlXpjiHY9AfugapUY2JVVMUbUAX3HLZCgLqH0hqK8bjiUquioTHIwaK3FvD
-pZgUj2kF5gMFFslq9Rx2DW1FlxHjHyUooaUtkmlUGcz3pVTdrmY9ngEyaI5Enh6o
-Mfr0ptfJ43Zarg5FdGYur7WbunX5TSdeeCek/PKj8Xxin7y3l4/eFvAwsuhXOPWi
-+kFF4dYFZsNKGwIeiPpT/YPPqf0g0tYcicG9OTR0NYy4ngPNGq0NEvI7Yuow6gAk
-XZLEgzwLJLLq6kTETdMEJPCWCLGa7JIREv66drphV7EZ4sxBo0k=
-=4pba
------END PGP SIGNATURE-----
