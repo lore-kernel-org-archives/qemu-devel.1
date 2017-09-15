@@ -1,15 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50413)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dsmaS-0001GA-1N
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:07:01 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dsmcy-0003wN-7T
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dsmaN-0005KS-4b
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:07:00 -0400
-From: Eduardo Otubo <otubo@redhat.com>
-Date: Fri, 15 Sep 2017 11:06:43 +0200
-Message-Id: <20170915090643.6043-1-otubo@redhat.com>
-Subject: [Qemu-devel] [PATCH] dma/i82374: avoid double creation of i82374
- device
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dsmcu-0006iv-0i
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:09:36 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60335)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1dsmct-0006ia-ON
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:09:31 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8F94QWN050454
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 05:09:30 -0400
+Received: from e23smtp04.au.ibm.com (e23smtp04.au.ibm.com [202.81.31.146])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d084u284b-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 05:09:30 -0400
+Received: from localhost
+	by e23smtp04.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Fri, 15 Sep 2017 19:09:27 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20170915085115.GN5250@umbus.fritz.box>
+References: <20170906082748.28520-1-nikunj@linux.vnet.ibm.com>
+	<20170909070212.GT2735@umbus.fritz.box>
+	<87k2153jnx.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170913073519.GK7550@umbus.fritz.box>
+	<8760clsw17.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170915064830.GI5250@umbus.fritz.box>
+	<87377omkuk.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170915085115.GN5250@umbus.fritz.box>
+Date: Fri, 15 Sep 2017 14:39:16 +0530
+MIME-Version: 1.0
+Content-Type: text/plain
+Message-Id: <87y3pgl45f.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -18,44 +47,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, pbonzini@redhat.com, ehabkost@redhat.com, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
-QEMU fails when used with the following command line:
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-  ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
-  qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
-  Aborted (core dumped)
+> On Fri, Sep 15, 2017 at 01:53:15PM +0530, Nikunj A Dadhania wrote:
+>> David Gibson <david@gibson.dropbear.id.au> writes:
+>> 
+>> >> 
+>> >> I thought, I am doing the same here for PowerNV, number of online cores
+>> >> is equal to initial online vcpus / threads per core
+>> >> 
+>> >>    int boot_cores_nr = smp_cpus / smp_threads;
+>> >> 
+>> >> Only difference that I see in PowerNV is that we have multiple chips
+>> >> (max 2, at the moment)
+>> >> 
+>> >>         cores_per_chip = smp_cpus / (smp_threads * pnv->num_chips);
+>> >
+>> > This doesn't make sense to me.  Cores per chip should *always* equal
+>> > smp_cores, you shouldn't need another calculation for it.
+>> >
+>> >> And in case user has provided sane smp_cores, we use it.
+>> >
+>> > If smp_cores isn't sane, you should simply reject it, not try to fix
+>> > it.  That's just asking for confusion.
+>> 
+>> This is the case where the user does not provide a topology(which is a
+>> valid scenario), not sure we should reject it. So qemu defaults
+>> smp_cores/smt_threads to 1. I think it makes sense to over-ride.
+>
+> If you can find a way to override it by altering smp_cores when it's
+> not explicitly specified, then ok.
 
-The 40p machine type already creates the device i82374. If specified in the
-command line, it will try to create it again, hence generating the error. The
-function isa_bus_dma() isn't supposed to be called twice for the same bus. One
-way to avoid this problem is to set user_creatable=false.
+Should I change the global smp_cores here as well ?
 
-A possible fix in a near future would be making
-isa_bus_dma()/DMA_init()/i82374_realize() return an error instead of asserting
-as well.
+> But overriding smp_cores with a different variable that's the "real"
+> number of cores is not acceptable. If that means the user has to
+> specify cores explicitly, so be it.
 
-Signed-off-by: Eduardo Otubo <otubo@redhat.com>
----
- hw/dma/i82374.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Right, we would error out in case there is mismatch.
 
-diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
-index 6c0f975df0..e76dea8dc7 100644
---- a/hw/dma/i82374.c
-+++ b/hw/dma/i82374.c
-@@ -139,6 +139,11 @@ static void i82374_class_init(ObjectClass *klass, void *data)
-     dc->realize = i82374_realize;
-     dc->vmsd = &vmstate_i82374;
-     dc->props = i82374_properties;
-+    dc->user_creatable = false;
-+    /*
-+     * Reason: i82374_realize() crashes (assertion failure inside isa_bus_dma()
-+     *         if the device is instantiated twice.
-+     */
- }
- 
- static const TypeInfo i82374_info = {
--- 
-2.13.5
+> Slight awkwardness in command line is preferable to breaking the
+> assumption that smp_cores == (# of cores per next level up cpu object)
+> which is used all over the place.
+
+Regards
+Nikunj
