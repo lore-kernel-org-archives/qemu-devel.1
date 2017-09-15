@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36447)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dsm43-0002Z7-PG
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:33:33 -0400
+	(envelope-from <peterx@redhat.com>) id 1dsm7w-0005Yp-AH
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:37:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dsm40-0008Cn-LI
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:33:31 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:19664
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dsm3z-0008C8-Rx
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:33:28 -0400
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Date: Fri, 15 Sep 2017 16:33:18 +0800
-Message-ID: <1505464398-28897-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	(envelope-from <peterx@redhat.com>) id 1dsm7t-0000t5-8B
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:37:32 -0400
+Date: Fri, 15 Sep 2017 16:37:21 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170915083721.GT3617@pxdev.xzpeter.org>
+References: <20170915054404.19914-1-famz@redhat.com>
+	<20170915054404.19914-3-famz@redhat.com>
+	<20170915080350.GS3617@pxdev.xzpeter.org>
+	<20170915082026.GG17199@lemon>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [RFC PATCH] NUMA: Enable adding NUMA node implicitly
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170915082026.GG17199@lemon>
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Cancel migration at exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,126 +25,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Dou Liyang <douly.fnst@cn.fujitsu.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>, David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>, Alistair Francis <alistair23@gmail.com>, f4bug@amsat.org, Takao Indoh <indou.takao@jp.fujitsu.com>, Izumi Taku <izumi.taku@jp.fujitsu.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-stable@nongnu.org, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-In QEMU, if we enable NUMA and have nodes, QEMU will build ACPI SRAT table
-for transfering NUMA configuration to the guest. So, the maximum memory in
-SRAT can be used to determine whether to use the swiotlb for IOMMU or not.
+On Fri, Sep 15, 2017 at 04:20:26PM +0800, Fam Zheng wrote:
 
-However, if QEmu doesn't enable NUMA explicitly on CLI, The SRAT will
-never be built. When memory hotplug is enabled, some guest's devices may
-start failing due to SWIOTLB is disabled.
+[...]
 
-Add numa_implicit_add_node0 in struct MachineClass, Invoke it before QEMU
-parse NUMA options to enable adding NUMA node implicitly.
+> > >  void qmp_migrate_set_cache_size(int64_t value, Error **errp)
+> > >  {
+> > >      MigrationState *s = migrate_get_current();
+> > > diff --git a/vl.c b/vl.c
+> > > index fb1f05b937..abbe61f40b 100644
+> > > --- a/vl.c
+> > > +++ b/vl.c
+> > > @@ -87,6 +87,7 @@ int main(int argc, char **argv)
+> > >  #include "sysemu/blockdev.h"
+> > >  #include "hw/block/block.h"
+> > >  #include "migration/misc.h"
+> > > +#include "migration/savevm.h"
+> > >  #include "migration/snapshot.h"
+> > >  #include "migration/global_state.h"
+> > >  #include "sysemu/tpm.h"
+> > > @@ -4799,6 +4800,8 @@ int main(int argc, char **argv, char **envp)
+> > >      iothread_stop_all();
+> > >  
+> > >      pause_all_vcpus();
+> > > +    migrate_cancel();
+> > 
+> > IIUC this is an async cancel, so when reach here the migration thread
+> > can still be alive.  Then...
+> > 
+> > > +    qemu_savevm_state_cleanup();
+> > 
+> > ... Here calling qemu_savevm_state_cleanup() may be problematic if
+> > migration thread has not yet quitted.
+> > 
+> > I'm thinking whether we should make migrate_fd_cancel() wait until the
+> > migration thread finishes (state change to CANCELLED).  Then the
+> > migration thread will do the cleanup, and here we can avoid calling
+> > qemu_savevm_state_cleanup() as well.
+> 
+> But if the migration thread is stuck and CANCELLED is never reached, we'll hang
+> here?
 
-Reported-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-Suggested-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Eduardo Habkost <ehabkost@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Igor Mammedov <imammedo@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: Alistair Francis <alistair23@gmail.com>
-Cc: f4bug@amsat.org
-Cc: Takao Indoh <indou.takao@jp.fujitsu.com>
-Cc: Izumi Taku <izumi.taku@jp.fujitsu.com>
+Maybe we can add timeout. Anyway, if it gets stuck, I do see it a
+migration bug, and in that case I'm not sure force return after
+timeout would be anything wiser.
 
----
- hw/i386/pc.c        |  6 ++++++
- include/hw/boards.h |  4 ++++
- vl.c                | 14 ++++++++++++++
- 3 files changed, 24 insertions(+)
+Dave/Juan may have better idea though.
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 2108104..3c40117 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -2308,6 +2308,11 @@ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
-     return ms->possible_cpus;
- }
- 
-+static void numa_implicit_add_node0(void)
-+{
-+    qemu_opts_parse_noisily(qemu_find_opts("numa"), "node", true);
-+}
-+
- static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
- {
-     /* cpu index isn't used */
-@@ -2349,6 +2354,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-     mc->get_hotplug_handler = pc_get_hotpug_handler;
-     mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
-     mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
-+    mc->numa_implicit_add_node0 = numa_implicit_add_node0;
-     mc->has_hotpluggable_cpus = true;
-     mc->default_boot_order = "cad";
-     mc->hot_add_cpu = pc_hot_add_cpu;
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 7f044d1..898d841 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -141,6 +141,8 @@ typedef struct {
-  *    should instead use "unimplemented-device" for all memory ranges where
-  *    the guest will attempt to probe for a device that QEMU doesn't
-  *    implement and a stub device is required.
-+ * @numa_implicit_add_node0:
-+ *    Enable NUMA implicitly by add a NUMA node.
-  */
- struct MachineClass {
-     /*< private >*/
-@@ -191,6 +193,8 @@ struct MachineClass {
-     CpuInstanceProperties (*cpu_index_to_instance_props)(MachineState *machine,
-                                                          unsigned cpu_index);
-     const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
-+
-+    void (*numa_implicit_add_node0)(void);
- };
- 
- /**
-diff --git a/vl.c b/vl.c
-index fb1f05b..814a5fa 100644
---- a/vl.c
-+++ b/vl.c
-@@ -3030,6 +3030,7 @@ int main(int argc, char **argv, char **envp)
-     Error *main_loop_err = NULL;
-     Error *err = NULL;
-     bool list_data_dirs = false;
-+    bool has_numa_config_in_CLI = false;
-     typedef struct BlockdevOptions_queue {
-         BlockdevOptions *bdo;
-         Location loc;
-@@ -3293,6 +3294,7 @@ int main(int argc, char **argv, char **envp)
-                 if (!opts) {
-                     exit(1);
-                 }
-+                has_numa_config_in_CLI = true;
-                 break;
-             case QEMU_OPTION_display:
-                 display_type = select_display(optarg);
-@@ -4585,6 +4587,18 @@ int main(int argc, char **argv, char **envp)
-     default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
-     default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
- 
-+    /*
-+     * If memory hotplug is enabled i.e. slots > 0 and user hasn't add
-+     * NUMA nodes explicitly on CLI
-+     *
-+     * Enable NUMA implicitly for guest to know the maximum memory
-+     * from ACPI SRAT table, which is used for SWIOTLB.
-+     */
-+    if (ram_slots > 0 && !has_numa_config_in_CLI) {
-+        if (machine_class->numa_implicit_add_node0) {
-+            machine_class->numa_implicit_add_node0();
-+        }
-+    }
-     parse_numa_opts(current_machine);
- 
-     if (qemu_opts_foreach(qemu_find_opts("mon"),
 -- 
-2.5.5
+Peter Xu
