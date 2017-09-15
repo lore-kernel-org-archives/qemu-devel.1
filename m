@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38896)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39121)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dsmCb-0000b0-Cd
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:42:22 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dsmD1-0001UA-6w
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:42:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dsmCY-0003C2-9o
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:42:21 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37134)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dsmCY-0003Ah-0i
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:42:18 -0400
-From: Eduardo Otubo <otubo@redhat.com>
-Date: Fri, 15 Sep 2017 10:41:37 +0200
-Message-Id: <20170915084139.4481-5-otubo@redhat.com>
-In-Reply-To: <20170915084139.4481-1-otubo@redhat.com>
-References: <20170915084139.4481-1-otubo@redhat.com>
-Subject: [Qemu-devel] [PULL 04/06] seccomp: add spawn argument to command
- line
+	(envelope-from <dgilbert@redhat.com>) id 1dsmCy-0003U6-53
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:42:47 -0400
+Date: Fri, 15 Sep 2017 09:42:35 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170915084234.GA2170@work-vm>
+References: <20170915054404.19914-1-famz@redhat.com>
+	<20170915054404.19914-3-famz@redhat.com>
+	<20170915080350.GS3617@pxdev.xzpeter.org>
+	<20170915082026.GG17199@lemon>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170915082026.GG17199@lemon>
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Cancel migration at exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,119 +25,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-stable@nongnu.org, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
-This patch adds [,spawn=deny] argument to `-sandbox on' option. It
-blacklists fork and execve system calls, avoiding Qemu to spawn new
-threads or processes.
+* Fam Zheng (famz@redhat.com) wrote:
+> On Fri, 09/15 16:03, Peter Xu wrote:
+> > On Fri, Sep 15, 2017 at 01:44:03PM +0800, Fam Zheng wrote:
+> > > bdrv_close_all() would abort() due to op blockers added by BMDS, clean
+> > > up migration states when main loop quits to avoid that.
+> > > 
+> > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > > ---
+> > >  include/migration/misc.h | 1 +
+> > >  migration/migration.c    | 7 ++++++-
+> > >  vl.c                     | 3 +++
+> > >  3 files changed, 10 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/include/migration/misc.h b/include/migration/misc.h
+> > > index c079b7771b..b9a26b0898 100644
+> > > --- a/include/migration/misc.h
+> > > +++ b/include/migration/misc.h
+> > > @@ -54,5 +54,6 @@ bool migration_has_failed(MigrationState *);
+> > >  /* ...and after the device transmission */
+> > >  bool migration_in_postcopy_after_devices(MigrationState *);
+> > >  void migration_global_dump(Monitor *mon);
+> > > +void migrate_cancel(void);
+> > >  
+> > >  #endif
+> > > diff --git a/migration/migration.c b/migration/migration.c
+> > > index 959e8ec88e..2c844945c7 100644
+> > > --- a/migration/migration.c
+> > > +++ b/migration/migration.c
+> > > @@ -1274,11 +1274,16 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+> > >      }
+> > >  }
+> > >  
+> > > -void qmp_migrate_cancel(Error **errp)
+> > > +void migrate_cancel(void)
+> > >  {
+> > >      migrate_fd_cancel(migrate_get_current());
+> > >  }
+> > >  
+> > > +void qmp_migrate_cancel(Error **errp)
+> > > +{
+> > > +    migrate_cancel();
+> > > +}
+> > > +
+> > 
+> > Nit: I would prefer just call migrate_fd_cancel() below, since I don't
+> > see much point to introduce migrate_cancel() which only calls
+> > migrate_fd_cancel()...
+> 
+> migrate_get_current() is a migration internal IMHO. But that can be moved to
+> migrate_fd_cancel() so the parameter is dropped.
+> 
+> > 
+> > >  void qmp_migrate_set_cache_size(int64_t value, Error **errp)
+> > >  {
+> > >      MigrationState *s = migrate_get_current();
+> > > diff --git a/vl.c b/vl.c
+> > > index fb1f05b937..abbe61f40b 100644
+> > > --- a/vl.c
+> > > +++ b/vl.c
+> > > @@ -87,6 +87,7 @@ int main(int argc, char **argv)
+> > >  #include "sysemu/blockdev.h"
+> > >  #include "hw/block/block.h"
+> > >  #include "migration/misc.h"
+> > > +#include "migration/savevm.h"
+> > >  #include "migration/snapshot.h"
+> > >  #include "migration/global_state.h"
+> > >  #include "sysemu/tpm.h"
+> > > @@ -4799,6 +4800,8 @@ int main(int argc, char **argv, char **envp)
+> > >      iothread_stop_all();
+> > >  
+> > >      pause_all_vcpus();
+> > > +    migrate_cancel();
+> > 
+> > IIUC this is an async cancel, so when reach here the migration thread
+> > can still be alive.  Then...
+> > 
+> > > +    qemu_savevm_state_cleanup();
+> > 
+> > ... Here calling qemu_savevm_state_cleanup() may be problematic if
+> > migration thread has not yet quitted.
+> > 
+> > I'm thinking whether we should make migrate_fd_cancel() wait until the
+> > migration thread finishes (state change to CANCELLED).  Then the
+> > migration thread will do the cleanup, and here we can avoid calling
+> > qemu_savevm_state_cleanup() as well.
+> 
+> But if the migration thread is stuck and CANCELLED is never reached, we'll hang
+> here?
 
-Signed-off-by: Eduardo Otubo <otubo@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
----
- include/sysemu/seccomp.h |  1 +
- qemu-options.hx          |  9 +++++++--
- qemu-seccomp.c           |  4 ++++
- vl.c                     | 16 ++++++++++++++++
- 4 files changed, 28 insertions(+), 2 deletions(-)
+I'm not sure I see an easy fix; I agree with Peter that calling
+migrate_cancel() followed by qemu_savevm_state_cleanup() is racy,
+because the cancel just forces the state to CANCELLING before coming
+back to you, and the migration thread asynchronously starts to
+fail/cleanup.
 
-diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
-index 4a9e63c7cd..3ab5fc4f61 100644
---- a/include/sysemu/seccomp.h
-+++ b/include/sysemu/seccomp.h
-@@ -18,6 +18,7 @@
- #define QEMU_SECCOMP_SET_DEFAULT     (1 << 0)
- #define QEMU_SECCOMP_SET_OBSOLETE    (1 << 1)
- #define QEMU_SECCOMP_SET_PRIVILEGED  (1 << 2)
-+#define QEMU_SECCOMP_SET_SPAWN       (1 << 3)
- 
- #include <seccomp.h>
- 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 5c1b163fb5..2b04b9f170 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4018,6 +4018,7 @@ ETEXI
- 
- DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
-     "-sandbox on[,obsolete=allow|deny][,elevateprivileges=allow|deny|children]\n" \
-+    "          [,spawn=allow|deny]\n" \
-     "                Enable seccomp mode 2 system call filter (default 'off').\n" \
-     "                use 'obsolete' to allow obsolete system calls that are provided\n" \
-     "                    by the kernel, but typically no longer used by modern\n" \
-@@ -4025,10 +4026,12 @@ DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
-     "                use 'elevateprivileges' to allow or deny QEMU process to elevate\n" \
-     "                    its privileges by blacklisting all set*uid|gid system calls.\n" \
-     "                    The value 'children' will deny set*uid|gid system calls for\n" \
--    "                    main QEMU process but will allow forks and execves to run unprivileged\n",
-+    "                    main QEMU process but will allow forks and execves to run unprivileged\n" \
-+    "                use 'spawn' to avoid QEMU to spawn new threads or processes by\n" \
-+    "                     blacklisting *fork and execve\n",
-     QEMU_ARCH_ALL)
- STEXI
--@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}]
-+@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}][,spawn=@var{string}]
- @findex -sandbox
- Enable Seccomp mode 2 system call filter. 'on' will enable syscall filtering and 'off' will
- disable it.  The default is 'off'.
-@@ -4037,6 +4040,8 @@ disable it.  The default is 'off'.
- Enable Obsolete system calls
- @item elevateprivileges=@var{string}
- Disable set*uid|gid system calls
-+@item spawn=@var{string}
-+Disable *fork and execve
- @end table
- ETEXI
- 
-diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-index 978d66bd28..f3878a5e29 100644
---- a/qemu-seccomp.c
-+++ b/qemu-seccomp.c
-@@ -78,6 +78,10 @@ static const struct QemuSeccompSyscall blacklist[] = {
-     { SCMP_SYS(setresgid),              QEMU_SECCOMP_SET_PRIVILEGED },
-     { SCMP_SYS(setfsuid),               QEMU_SECCOMP_SET_PRIVILEGED },
-     { SCMP_SYS(setfsgid),               QEMU_SECCOMP_SET_PRIVILEGED },
-+    /* spawn */
-+    { SCMP_SYS(fork),                   QEMU_SECCOMP_SET_SPAWN },
-+    { SCMP_SYS(vfork),                  QEMU_SECCOMP_SET_SPAWN },
-+    { SCMP_SYS(execve),                 QEMU_SECCOMP_SET_SPAWN },
- };
- 
- 
-diff --git a/vl.c b/vl.c
-index d59b560276..984db0c399 100644
---- a/vl.c
-+++ b/vl.c
-@@ -280,6 +280,10 @@ static QemuOptsList qemu_sandbox_opts = {
-             .name = "elevateprivileges",
-             .type = QEMU_OPT_STRING,
-         },
-+        {
-+            .name = "spawn",
-+            .type = QEMU_OPT_STRING,
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -1083,6 +1087,18 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
-             }
-         }
- 
-+        value = qemu_opt_get(opts, "spawn");
-+        if (value) {
-+            if (g_str_equal(value, "deny")) {
-+                seccomp_opts |= QEMU_SECCOMP_SET_SPAWN;
-+            } else if (g_str_equal(value, "allow")) {
-+                /* default value */
-+            } else {
-+                error_report("invalid argument for spawn");
-+                return -1;
-+            }
-+        }
-+
-         if (seccomp_start(seccomp_opts) < 0) {
-             error_report("failed to install seccomp syscall filter "
-                          "in the kernel");
--- 
-2.13.5
+migrate_cancel() can forcibly unblock some cases because it calls
+shutdown(2) on the network fd, but there are other ways for a migration
+to hang.
+
+Having said that,  the migration thread does it's calls
+to qemu_savevm_state_cleanup under the lock_iothread;
+Do we have that lock at this point?
+
+Dave
+
+> Fam
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
