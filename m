@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50019)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dstxw-0005Tb-Bu
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 12:59:45 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dstzc-00070f-Tr
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:01:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1dstxu-00045X-Ms
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 12:59:44 -0400
-From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Date: Fri, 15 Sep 2017 22:29:13 +0530
-Message-Id: <1505494753-10837-6-git-send-email-sundeep.lkml@gmail.com>
-In-Reply-To: <1505494753-10837-1-git-send-email-sundeep.lkml@gmail.com>
-References: <1505494753-10837-1-git-send-email-sundeep.lkml@gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1dstzY-0005PK-Qn
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:01:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:40620)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dstzY-0005O3-KU
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:01:24 -0400
+Date: Fri, 15 Sep 2017 19:01:18 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170915190118.03dc1b57.cohuck@redhat.com>
+In-Reply-To: <20170915092758.16ea52fc.cohuck@redhat.com>
+References: <20170913132752.8484-1-pasic@linux.vnet.ibm.com>
+	<20170913132752.8484-2-pasic@linux.vnet.ibm.com>
+	<20170914162603.1cdabd09.cohuck@redhat.com>
+	<0b42ef59-4366-175f-8dc7-bc3ed02e2fb4@linux.vnet.ibm.com>
+	<20170915092758.16ea52fc.cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [Qemu devel v9 PATCH 5/5] msf2: Add Emcraft's
- Smartfusion2 SOM kit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/ccs: add ccw-tester emulated
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,129 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com, f4bug@amsat.org, Subbaraya Sundeep <sundeep.lkml@gmail.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>
 
-Emulated Emcraft's Smartfusion2 System On Module starter
-kit.
+On Fri, 15 Sep 2017 09:27:58 +0200
+Cornelia Huck <cohuck@redhat.com> wrote:
 
-Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/Makefile.objs |  2 +-
- hw/arm/msf2-som.c    | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 95 insertions(+), 1 deletion(-)
- create mode 100644 hw/arm/msf2-som.c
+> On Thu, 14 Sep 2017 18:50:29 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+> > On 09/14/2017 04:26 PM, Cornelia Huck wrote:  
 
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index df36a03..e81a7dc 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -19,4 +19,4 @@ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
- obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
- obj-$(CONFIG_MPS2) += mps2.o
--obj-$(CONFIG_MSF2) += msf2-soc.o
-+obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
-diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
-new file mode 100644
-index 0000000..d395696
---- /dev/null
-+++ b/hw/arm/msf2-som.c
-@@ -0,0 +1,94 @@
-+/*
-+ * SmartFusion2 SOM starter kit(from Emcraft) emulation.
-+ *
-+ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/boards.h"
-+#include "hw/arm/arm.h"
-+#include "exec/address-spaces.h"
-+#include "qemu/cutils.h"
-+#include "hw/arm/msf2-soc.h"
-+
-+#define DDR_BASE_ADDRESS      0xA0000000
-+#define DDR_SIZE              (64 * M_BYTE)
-+
-+#define M2S010_ENVM_SIZE      (256 * K_BYTE)
-+#define M2S010_ESRAM_SIZE     (64 * K_BYTE)
-+
-+static void emcraft_sf2_s2s010_init(MachineState *machine)
-+{
-+    DeviceState *dev;
-+    DeviceState *spi_flash;
-+    MSF2State *soc;
-+    DriveInfo *dinfo = drive_get_next(IF_MTD);
-+    qemu_irq cs_line;
-+    SSIBus *spi_bus;
-+    MemoryRegion *sysmem = get_system_memory();
-+    MemoryRegion *ddr = g_new(MemoryRegion, 1);
-+
-+    memory_region_init_ram(ddr, NULL, "ddr-ram", DDR_SIZE,
-+                           &error_fatal);
-+    memory_region_add_subregion(sysmem, DDR_BASE_ADDRESS, ddr);
-+
-+    dev = qdev_create(NULL, TYPE_MSF2_SOC);
-+    qdev_prop_set_string(dev, "part-name", "M2S010");
-+    qdev_prop_set_uint64(dev, "eNVM-size", M2S010_ENVM_SIZE);
-+    qdev_prop_set_uint64(dev, "eSRAM-size", M2S010_ESRAM_SIZE);
-+
-+    /*
-+     * CPU clock and peripheral clocks(APB0, APB1)are configurable
-+     * in Libero. CPU clock is divided by APB0 and APB1 divisors for
-+     * peripherals. Emcraft's SoM kit comes with these settings by default.
-+     */
-+    qdev_prop_set_uint32(dev, "m3clk", 142 * 1000000);
-+    qdev_prop_set_uint32(dev, "apb0div", 2);
-+    qdev_prop_set_uint32(dev, "apb1div", 2);
-+
-+    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-+
-+    soc = MSF2_SOC(dev);
-+
-+    /* Attach SPI flash to SPI0 controller */
-+    spi_bus = (SSIBus *)qdev_get_child_bus(dev, "spi0");
-+    spi_flash = ssi_create_slave_no_init(spi_bus, "s25sl12801");
-+    qdev_prop_set_uint8(spi_flash, "spansion-cr2nv", 1);
-+    if (dinfo) {
-+        qdev_prop_set_drive(spi_flash, "drive", blk_by_legacy_dinfo(dinfo),
-+                                    &error_fatal);
-+    }
-+    qdev_init_nofail(spi_flash);
-+    cs_line = qdev_get_gpio_in_named(spi_flash, SSI_GPIO_CS, 0);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
-+
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-+                       soc->envm_size);
-+}
-+
-+static void emcraft_sf2_machine_init(MachineClass *mc)
-+{
-+    mc->desc = "SmartFusion2 SOM kit from Emcraft (M2S010)";
-+    mc->init = emcraft_sf2_s2s010_init;
-+}
-+
-+DEFINE_MACHINE("emcraft-sf2", emcraft_sf2_machine_init)
--- 
-2.5.0
+> > > There's quite some potential in this. We may want to make this a
+> > > permanent addition.
+> > >     
+> > 
+> > I'm happy to contribute! I'm not sure how shall we proceed though.
+> > Maybe with making a todo list?  
+> 
+> I think the first step would be to figure out the ids so we don't step
+> on anyone's toes. Then maybe refactor a bit so that other testers can
+> be added easily.
+> 
+> For ideas about things to be tested, maybe put a list into the wiki?
+
+OK, I've created https://wiki.qemu.org/Testing/CCWTestDevice - let me
+know if you need an account.
