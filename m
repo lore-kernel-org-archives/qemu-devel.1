@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38410)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dsyw9-0004bX-85
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 18:18:14 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dsyzD-0005Yk-8S
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 18:21:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dsyw6-0004sO-34
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 18:18:13 -0400
-Date: Fri, 15 Sep 2017 19:18:02 -0300
+	(envelope-from <ehabkost@redhat.com>) id 1dsyz8-0008HJ-A1
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 18:21:23 -0400
+Date: Fri, 15 Sep 2017 19:21:13 -0300
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170915221802.GA10621@localhost.localdomain>
-References: <1504605227-5124-1-git-send-email-thuth@redhat.com>
-	<871snlwev0.fsf@dusky.pond.sub.org> <20170905164835.GF2112@work-vm>
-	<6e03aa82-3663-c251-c8e1-ac2e7eb0e7e7@redhat.com>
-	<87mv68e2i3.fsf@dusky.pond.sub.org>
-	<20170909204133.GH7570@localhost.localdomain>
-	<825b29f3-7857-558e-9092-855c9f75463e@redhat.com>
-	<20170912173723.GA7570@localhost.localdomain>
-	<808c097f-a422-3aba-2e0d-d8360425f75b@redhat.com>
+Message-ID: <20170915222113.GB10621@localhost.localdomain>
+References: <20170915090643.6043-1-otubo@redhat.com>
+	<0d4bdcbb-3153-0064-d280-d9ca4f0671e4@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <808c097f-a422-3aba-2e0d-d8360425f75b@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-ppc] [RFC PATCH] tests: Add a device_add/del
- HMP test
+In-Reply-To: <0d4bdcbb-3153-0064-d280-d9ca4f0671e4@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] dma/i82374: avoid double creation of
+ i82374 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,63 +24,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>, John Snow <jsnow@redhat.com>, Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>
 
-On Wed, Sep 13, 2017 at 07:45:11AM +0200, Thomas Huth wrote:
-> On 12.09.2017 19:37, Eduardo Habkost wrote:
-> > On Mon, Sep 11, 2017 at 08:13:21AM +0200, Thomas Huth wrote:
-> >> On 09.09.2017 22:41, Eduardo Habkost wrote:
-> >>> On Wed, Sep 06, 2017 at 08:59:32AM +0200, Markus Armbruster wrote:
-> >>>> Thomas Huth <thuth@redhat.com> writes:
-> >>>>
-> >>>>> On 05.09.2017 18:48, Dr. David Alan Gilbert wrote:
-> >>>>>> * Markus Armbruster (armbru@redhat.com) wrote:
-> >>>>>>> Thomas Huth <thuth@redhat.com> writes:
-> >>>>>>>
-> >>>>>>>> People tend to forget to mark internal devices with "user_creatable = false
-> >>>>>>>> or hotpluggable = false, and these devices can crash QEMU if added via the
-> >>>>>>>> HMP monitor. So let's add a test to run through all devices and that tries
-> >>>>>>>> to add them blindly (without arguments) to see whether this could crash the
-> >>>>>>>> QEMU instance.
-> >> [...]
-> >>>>>>> * The device supports only cold plug with -device, not hot plug with
-> >>>>>>>   device_add.
-> >>>>>
-> >>>>> We've got Eduardo's scripts/device-crash-test script for that already,
-> >>>>> so no need to cover that here.
-> >>>>
-> >>>> Point taken.  So this test is really about hot plug / unplug.  Suggest
-> >>>> to clarify the commit message: s/add them blindly/hotplug and unplug
-> >>>> them blindly/.
-> >>>
-> >>> We could extend device-crash-test to test device_add too, as it
-> >>> already has extra code to deal with known crashes and testing
-> >>> multiple machine-types.  Also, any additional code we write to
-> >>> ensure we add mandatory arguments or plug only to valid buses
-> >>> would apply to both -device and device_add.  I also think Python
-> >>> test code is easier to maintain and extend, but that's just my
-> >>> personal preference.
-> >>
-> >> Adding device_add/del support to device-crash-test is certainly an
-> >> option. The problem is that nobody runs it by default, so this won't
-> >> help to avoid that new problems are being committed to the repository.
-> >>
-> >> I think we really should have a test for "make check", too. So would my
-> >> test be acceptable if I'd rewrite it to use QMP instead (I don't think I
-> >> could do the full list that Markus mentioned, but at least a basic test
-> >> via QMP as a start)?
+On Fri, Sep 15, 2017 at 12:18:11PM +0200, Paolo Bonzini wrote:
+> On 15/09/2017 11:06, Eduardo Otubo wrote:
+> > QEMU fails when used with the following command line:
 > > 
-> > We can run device-crash-test on "make check", we just need to
-> > choose what's the subset of tests we want to run (because testing
-> > all machine+device+target combinations would take too long).
+> >   ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
+> >   qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
+> >   Aborted (core dumped)
+> > 
+> > The 40p machine type already creates the device i82374. If specified in the
+> > command line, it will try to create it again, hence generating the error. The
+> > function isa_bus_dma() isn't supposed to be called twice for the same bus. One
+> > way to avoid this problem is to set user_creatable=false.
+> > 
+> > A possible fix in a near future would be making
+> > isa_bus_dma()/DMA_init()/i82374_realize() return an error instead of asserting
+> > as well.
+> > 
+> > Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> > ---
+> >  hw/dma/i82374.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
+> > index 6c0f975df0..e76dea8dc7 100644
+> > --- a/hw/dma/i82374.c
+> > +++ b/hw/dma/i82374.c
+> > @@ -139,6 +139,11 @@ static void i82374_class_init(ObjectClass *klass, void *data)
+> >      dc->realize = i82374_realize;
+> >      dc->vmsd = &vmstate_i82374;
+> >      dc->props = i82374_properties;
+> > +    dc->user_creatable = false;
+> > +    /*
+> > +     * Reason: i82374_realize() crashes (assertion failure inside isa_bus_dma()
+> > +     *         if the device is instantiated twice.
+> > +     */
+> >  }
+> >  
+> >  static const TypeInfo i82374_info = {
+> > 
 > 
-> Maybe we should just run it one time for every machine - and try to add
-> all available devices at once?
+> This breaks "make check", doesn't it?
 
-Yes, it makes sense.  I will keep that in mind when trying to
-implement device_add support on device-crash-test (but if anybody
-wants to volunteer to implement it, be my guest).
+Why would it?  I don't see any test code using -device i82374.
+(endianness-test uses -device i82378).
+
+> 
+> v2 should be the one that returns an error instead of asserting.
+
+I agree that returning an error is better.
 
 -- 
 Eduardo
