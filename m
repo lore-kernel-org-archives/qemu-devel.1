@@ -1,22 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsw4T-0001yu-K1
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 15:14:38 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dswDz-0004nG-TL
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 15:24:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsw4S-0003rp-El
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 15:14:37 -0400
-References: <20170915101008.16646-1-kwolf@redhat.com>
-	<20170915170204.14023-1-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <97519d8d-e00e-97f6-aa13-98ba06faca88@redhat.com>
-Date: Fri, 15 Sep 2017 14:14:26 -0500
+	(envelope-from <no-reply@patchew.org>) id 1dswDv-0000ro-NK
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 15:24:27 -0400
+Resent-Message-Id: <E1dswDv-0000ro-NK@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21404)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dswDv-0000qr-G8
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 15:24:23 -0400
+In-Reply-To: <20170915190748.82389-1-jrtc27@jrtc27.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150550344628.36.3236693333533070993@69b6ddf88678>
 MIME-Version: 1.0
-In-Reply-To: <20170915170204.14023-1-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="DMjGRWttnJ4jOPaldhW1hNMjvRhVndqtg"
-Subject: Re: [Qemu-devel] [PATCH 7/6] qemu-iotests: Test change-backing-file
- command
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Fri, 15 Sep 2017 12:24:06 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v2] linux-user/syscall.c: Handle SH4's
+ exceptional alignment for p{read, write}64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,125 +29,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com, Jeff Cody <jcody@redhat.com>
+To: jrtc27@jrtc27.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org, richard.henderson@linaro.org, f4bug@amsat.org, laurent@vivier.eu, glaubitz@physik.fu-berlin.de
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DMjGRWttnJ4jOPaldhW1hNMjvRhVndqtg
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com,
- Jeff Cody <jcody@redhat.com>
-Message-ID: <97519d8d-e00e-97f6-aa13-98ba06faca88@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 7/6] qemu-iotests: Test change-backing-file
- command
-References: <20170915101008.16646-1-kwolf@redhat.com>
- <20170915170204.14023-1-kwolf@redhat.com>
-In-Reply-To: <20170915170204.14023-1-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/15/2017 12:02 PM, Kevin Wolf wrote:
-> This involves a temporary read-write reopen if the backing file link in=
-
-> the middle of a backing file chain should be changed and is therefore a=
-
-> good test for the latest bdrv_reopen() vs. op blockers fixes.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->=20
-> I actually managed to find a simple case that reproduces the bug that
-> is fixed in this series, but outside of my commit job improvements that=
-
-> originally led me to this work.
->=20
->  tests/qemu-iotests/195     | 92 ++++++++++++++++++++++++++++++++++++++=
-++++++++
->  tests/qemu-iotests/195.out | 78 ++++++++++++++++++++++++++++++++++++++=
-+
->  tests/qemu-iotests/group   |  1 +
-
-The usual collision in test numbering ;)
-
-
-> +_cleanup()
-> +{
-> +    _cleanup_test_img
-> +    rm -f "$TEST_IMG.mid"
-> +}
-> +trap "_cleanup; exit \$status" 0 1 2 3 15
-
-Semantic conflict with Jeff's work to add './check -s' to save
-intermediate files in a per-test temp directory.
-
-> +
-> +echo
-> +echo "Change backing file of mid (opened read-only)"
-> +echo
-> +
-> +run_qemu -drive if=3Dnone,file=3D"$TEST_IMG",backing.node-name=3Dmid <=
-<EOF
-> +{"execute":"qmp_capabilities"}
-> +{"execute":"change-backing-file", "arguments":{"device":"none0","image=
--node-name":"mid","backing-file":"/dev/null"}}
-
-Since the images don't contain any content, I guess this works.  But
-another possible change would be rewriting the backing file to alternate
-between absolute and relative (or even between 'file' and './file') (so
-that it's pointing to the same file at all times, just by different names=
-)
-
-> +{"execute":"quit"}
-> +EOF
-> +
-> +TEST_IMG=3D"$TEST_IMG.mid" _img_info
-> +
-> +echo
-> +echo "Change backing file of top (opened writable)"
-> +echo
-> +
-> +TEST_IMG=3D"$TEST_IMG.mid" _make_test_img -b "$TEST_IMG.base"
-> +
-> +run_qemu -drive if=3Dnone,file=3D"$TEST_IMG",node-name=3Dtop <<EOF
-> +{"execute":"qmp_capabilities"}
-> +{"execute":"change-backing-file", "arguments":{"device":"none0","image=
--node-name":"top","backing-file":"/dev/null"}}
-> +{"execute":"quit"}
-
-You've quit qemu between runs.  Would we get any further coverage by doin=
-g:
-
-change mid
-change active
-change mid
-
-all within a single run? (That is, make SURE that actions on one part of
-the graph don't interfere with later actions elsewhere)
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---DMjGRWttnJ4jOPaldhW1hNMjvRhVndqtg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm8JpIACgkQp6FrSiUn
-Q2qv8gf+LEVsj7CSxujI+fpWateRI8mAk6kwyscFOEqpCtq3gfLHz6Uqe54C6lAN
-fflXVVEScRh+01wZcy+FvPXX+4/ynp30EBvAXaWeTcRomhaXk5cqdMBBzdPAKkNU
-OO4S+Dt6G7jQ18fpGcfVH21pvbpJ9VQSKIX0S3JD9hpc4iWUK1OaDCHB/rQz0Ke5
-ClI5EheGsb/nICIdgJYxXEcy715QL8/oRKSKa1cjYhJu7/v+kATSv/X+yAz1Iy8M
-I7xG88JzkVYvZCeVD0L9AbiZcikjnt3mdgUnshLMmco98FfjGmb3SqGxLT2GdpXq
-0mNbAOtS+W712Yzc/zELnHA1UHnEFw==
-=PkIV
------END PGP SIGNATURE-----
-
---DMjGRWttnJ4jOPaldhW1hNMjvRhVndqtg--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2Ml0gbGludXgtdXNlci9zeXNjYWxsLmM6IEhhbmRsZSBTSDQncyBleGNl
+cHRpb25hbCBhbGlnbm1lbnQgZm9yIHB7cmVhZCwgd3JpdGV9NjQKTWVzc2FnZS1pZDogMjAxNzA5
+MTUxOTA3NDguODIzODktMS1qcnRjMjdAanJ0YzI3LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNU
+IFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQg
+bG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9j
+YWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1
+ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9y
+IGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQo
+Z2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1m
+b3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4K
+ICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUK
+CmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTlj
+MjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9w
+YXRjaGV3LXByb2plY3QvcWVtdQogdCBbdGFnIHVwZGF0ZV0gICAgICAgICAgICBwYXRjaGV3LzE1
+MDQ4ODg5MDUtMjIzOTYtMS1naXQtc2VuZC1lbWFpbC1jaHVnaC5pc2hhbmlAcmVzZWFyY2guaWlp
+dC5hYy5pbiAtPiBwYXRjaGV3LzE1MDQ4ODg5MDUtMjIzOTYtMS1naXQtc2VuZC1lbWFpbC1jaHVn
+aC5pc2hhbmlAcmVzZWFyY2guaWlpdC5hYy5pbgpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCjVjNGEzMzhlMTIgbGludXgtdXNlci9zeXNjYWxsLmM6IEhhbmRsZSBTSDQncyBleGNlcHRp
+b25hbCBhbGlnbm1lbnQgZm9yIHB7cmVhZCwgd3JpdGV9NjQKCj09PSBPVVRQVVQgQkVHSU4gPT09
+CkNoZWNraW5nIFBBVENIIDEvMTogbGludXgtdXNlci9zeXNjYWxsLmM6IEhhbmRsZSBTSDQncyBl
+eGNlcHRpb25hbCBhbGlnbm1lbnQgZm9yIHB7cmVhZCwgd3JpdGV9NjQuLi4KRVJST1I6IG9wZW4g
+YnJhY2UgJ3snIGZvbGxvd2luZyBmdW5jdGlvbiBkZWNsYXJhdGlvbnMgZ28gb24gdGhlIG5leHQg
+bGluZQojMjA6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjY3MDoKK3N0YXRpYyBpbmxpbmUg
+aW50IHJlZ3BhaXJzX2FsaWduZWQodm9pZCAqY3B1X2VudiwgaW50IG51bSkgewoKRVJST1I6IG9w
+ZW4gYnJhY2UgJ3snIGZvbGxvd2luZyBmdW5jdGlvbiBkZWNsYXJhdGlvbnMgZ28gb24gdGhlIG5l
+eHQgbGluZQojMzQ6IEZJTEU6IGxpbnV4LXVzZXIvc3lzY2FsbC5jOjY4MjoKK3N0YXRpYyBpbmxp
+bmUgaW50IHJlZ3BhaXJzX2FsaWduZWQodm9pZCAqY3B1X2VudiwgaW50IG51bSkgewoKdG90YWw6
+IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA5MCBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBz
+dHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJl
+IGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNL
+UEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBl
+eGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5
+IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNr
+IHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxpc3RzLm9yZw==
