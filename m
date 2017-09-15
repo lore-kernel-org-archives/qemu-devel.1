@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53141)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dsu7U-00069O-8l
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:09:37 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dsuAz-0008Ah-Kw
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:13:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dsu7Q-0003XT-Tb
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:09:36 -0400
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:51142)
+	(envelope-from <richard.henderson@linaro.org>) id 1dsuAw-0004hS-EZ
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:13:13 -0400
+Received: from mail-pf0-x231.google.com ([2607:f8b0:400e:c00::231]:49900)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dsu7Q-0003Wf-Mg
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:09:32 -0400
-Received: by mail-wm0-f48.google.com with SMTP id v142so9910182wmv.5
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 10:09:32 -0700 (PDT)
-References: <20170707142138.411-1-pbutsykin@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <55a8a300-2247-dadb-40b3-0c1d4e651e08@redhat.com>
-Date: Fri, 15 Sep 2017 19:09:28 +0200
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dsuAw-0004h0-7n
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:13:10 -0400
+Received: by mail-pf0-x231.google.com with SMTP id l188so1753604pfc.6
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 10:13:10 -0700 (PDT)
+References: <20170915065821.16600-1-jrtc27@jrtc27.com>
+	<2f7283ca-6ecd-165f-c572-a0f2a781aba7@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <cc5d79bb-a56a-08a6-c054-b194e6a5a833@linaro.org>
+Date: Fri, 15 Sep 2017 10:13:06 -0700
 MIME-Version: 1.0
-In-Reply-To: <20170707142138.411-1-pbutsykin@virtuozzo.com>
+In-Reply-To: <2f7283ca-6ecd-165f-c572-a0f2a781aba7@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio-serial: add enable_backend callback
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] linux-user/syscall.c: Handle SH4's
+ exceptional alignment for p{read, write}64
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +32,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, dgilbert@redhat.com, amit@kernel.org, den@openvz.org
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, James Clarke <jrtc27@jrtc27.com>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>
+Cc: Peter Maydell <peter.maydell@linaro.org>, John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>
 
-On 07/07/2017 16:21, Pavel Butsykin wrote:
-> We should guarantee that RAM will not be modified while VM has a stopped
-> state, otherwise it can lead to negative consequences during post-copy
-> migration. In RUN_STATE_FINISH_MIGRATE step, it's expected that RAM on
-> source side will not be modified as this could lead to non-consistent vm state
-> on the destination side. Also RAM access during postcopy-ram migration with
-> enabled release-ram capability can lead to sad consequences.
+On 09/15/2017 08:41 AM, Philippe Mathieu-Daudé wrote:
+> On 09/15/2017 03:58 AM, James Clarke wrote:
+>> Fixes: https://bugs.launchpad.net/qemu/+bug/1716767
+>> Signed-off-by: James Clarke <jrtc27@jrtc27.com>
 > 
-> Let's add enable_backend() callback to avoid undesirable virtioqueue changes
-> in the guest memory.
+> Congratulations! You have won yourself a R: entry (Designated reviewer) in the
+> "Linux user" and "SH4" sections of MAINTAINERS!
 > 
-> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-
-To understand the patch better this doesn't fix _all_ stopped states,
-only migration, right?  That said it's a valid bugfix even independent
-of the effects for stopped runstate.
-
-Thanks,
-
-Paolo
-
-> ---
->  hw/char/virtio-console.c          | 21 +++++++++++++++++++++
->  hw/char/virtio-serial-bus.c       |  7 +++++++
->  include/hw/virtio/virtio-serial.h |  3 +++
->  3 files changed, 31 insertions(+)
+>> ---
+>>   linux-user/syscall.c | 12 ++++++++++++
+>>   1 file changed, 12 insertions(+)
+>>
+>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+>> index 9b6364a266..24d6a81c21 100644
+>> --- a/linux-user/syscall.c
+>> +++ b/linux-user/syscall.c
+>> @@ -10495,20 +10495,32 @@ abi_long do_syscall(void *cpu_env, int num,
+>> abi_long arg1,
+>>   #endif
+>>   #ifdef TARGET_NR_pread64
+>>       case TARGET_NR_pread64:
+>> +#if defined(TARGET_SH4)
+>> +        /* SH4 doesn't align register pairs, except for p{read,write}64 */
+>> +        arg4 = arg5;
+>> +        arg5 = arg6;
+>> +#else
+>>           if (regpairs_aligned(cpu_env)) {
+>>               arg4 = arg5;
+>>               arg5 = arg6;
+>>           }
+>> +#endif
 > 
-> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
-> index 0cb1668c8a..b55905892e 100644
-> --- a/hw/char/virtio-console.c
-> +++ b/hw/char/virtio-console.c
-> @@ -163,6 +163,26 @@ static void chr_event(void *opaque, int event)
->      }
->  }
->  
-> +static void virtconsole_enable_backend(VirtIOSerialPort *port, bool enable)
-> +{
-> +    VirtConsole *vcon = VIRTIO_CONSOLE(port);
-> +
-> +    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
-> +        return;
-> +    }
-> +
-> +    if (enable) {
-> +        VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
-> +
-> +        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
-> +                                 k->is_console ? NULL : chr_event,
-> +                                 vcon, NULL, false);
-> +    } else {
-> +        qemu_chr_fe_set_handlers(&vcon->chr, NULL, NULL,
-> +                                 NULL, NULL, NULL, false);
-> +    }
-> +}
-> +
->  static void virtconsole_realize(DeviceState *dev, Error **errp)
->  {
->      VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
-> @@ -233,6 +253,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
->      k->unrealize = virtconsole_unrealize;
->      k->have_data = flush_buf;
->      k->set_guest_connected = set_guest_connected;
-> +    k->enable_backend = virtconsole_enable_backend;
->      k->guest_writable = guest_writable;
->      dc->props = virtserialport_properties;
->  }
-> diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
-> index f5bc173844..f0f18c8e7c 100644
-> --- a/hw/char/virtio-serial-bus.c
-> +++ b/hw/char/virtio-serial-bus.c
-> @@ -637,6 +637,13 @@ static void set_status(VirtIODevice *vdev, uint8_t status)
->      if (!(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
->          guest_reset(vser);
->      }
-> +
-> +    QTAILQ_FOREACH(port, &vser->ports, next) {
-> +        VirtIOSerialPortClass *vsc = VIRTIO_SERIAL_PORT_GET_CLASS(port);
-> +        if (vsc->enable_backend) {
-> +            vsc->enable_backend(port, vdev->vm_running);
-> +        }
-> +    }
->  }
->  
->  static void vser_reset(VirtIODevice *vdev)
-> diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio-serial.h
-> index b19c44727f..12657a9f39 100644
-> --- a/include/hw/virtio/virtio-serial.h
-> +++ b/include/hw/virtio/virtio-serial.h
-> @@ -58,6 +58,9 @@ typedef struct VirtIOSerialPortClass {
->          /* Guest opened/closed device. */
->      void (*set_guest_connected)(VirtIOSerialPort *port, int guest_connected);
->  
-> +    /* Enable/disable backend for virtio serial port */
-> +    void (*enable_backend)(VirtIOSerialPort *port, bool enable);
-> +
->          /* Guest is now ready to accept data (virtqueues set up). */
->      void (*guest_ready)(VirtIOSerialPort *port);
->  
+> I'd rather use arch_type from "sysemu/arch_init.h":
 > 
+>   case TARGET_NR_pwrite64:
+>       /* SH4 doesn't align register pairs, except for p{read,write}64 */
+>       if (arch_type == QEMU_ARCH_SH4 || regpairs_aligned(cpu_env)) {
+>           arg4 = arg5;
+>           arg5 = arg6;
+>       }
+> 
+> What do you think?
+
+I'd rather change the interface of regpairs_aligned to take the syscall number,
+and add an instance for SH4 above.
+
+
+r~
