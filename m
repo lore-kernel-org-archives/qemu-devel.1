@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47821)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47847)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dsmX6-0006Qs-2d
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:39 -0400
+	(envelope-from <famz@redhat.com>) id 1dsmX7-0006R1-2c
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dsmWr-0002lp-6N
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:32 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:8742)
+	(envelope-from <famz@redhat.com>) id 1dsmWv-0002pV-Ck
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60034)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dsmWq-0002kY-Th
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:17 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dsmWv-0002ol-66
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:21 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 15 Sep 2017 17:02:49 +0800
-Message-Id: <20170915090253.12201-8-famz@redhat.com>
+Date: Fri, 15 Sep 2017 17:02:51 +0800
+Message-Id: <20170915090253.12201-10-famz@redhat.com>
 In-Reply-To: <20170915090253.12201-1-famz@redhat.com>
 References: <20170915090253.12201-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL v4 16/38] tests: Add OpenBSD image
+Subject: [Qemu-devel] [PULL v4 18/38] MAINTAINERS: Add tests/vm entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +26,24 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-The image is prepared following instructions as in:
-
-https://wiki.qemu.org/Hosts/BSD
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170913030119.3957-10-famz@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20170913030119.3957-12-famz@redhat.com>
 ---
- tests/vm/openbsd | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
- create mode 100755 tests/vm/openbsd
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-new file mode 100755
-index 0000000000..6ae16d97fd
---- /dev/null
-+++ b/tests/vm/openbsd
-@@ -0,0 +1,43 @@
-+#!/usr/bin/env python
-+#
-+# OpenBSD VM image
-+#
-+# Copyright 2017 Red Hat Inc.
-+#
-+# Authors:
-+#  Fam Zheng <famz@redhat.com>
-+#
-+# This code is licensed under the GPL version 2 or later.  See
-+# the COPYING file in the top-level directory.
-+#
-+
-+import os
-+import sys
-+import subprocess
-+import basevm
-+
-+class OpenBSDVM(basevm.BaseVM):
-+    name = "openbsd"
-+    BUILD_SCRIPT = """
-+        set -e;
-+        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-+        tar -xf /dev/rsd1c;
-+        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
-+        gmake -j{jobs};
-+        # XXX: "gmake check" seems to always hang or fail
-+        #gmake check;
-+    """
-+
-+    def build_image(self, img):
-+        cimg = self._download_with_cache("http://download.patchew.org/openbsd-6.1-amd64.img.xz",
-+                sha256sum='8c6cedc483e602cfee5e04f0406c64eb99138495e8ca580bc0293bcf0640c1bf')
-+        img_tmp_xz = img + ".tmp.xz"
-+        img_tmp = img + ".tmp"
-+        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
-+        subprocess.check_call(["xz", "-df", img_tmp_xz])
-+        if os.path.exists(img):
-+            os.remove(img)
-+        os.rename(img_tmp, img)
-+
-+if __name__ == "__main__":
-+    sys.exit(basevm.main(OpenBSDVM))
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 36eeb42d19..42f5454311 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1891,6 +1891,7 @@ S: Maintained
+ F: .travis.yml
+ F: .shippable.yml
+ F: tests/docker/
++F: tests/vm/
+ W: https://travis-ci.org/qemu/qemu
+ W: https://app.shippable.com/github/qemu/qemu
+ W: http://patchew.org/QEMU/
 -- 
 2.13.5
