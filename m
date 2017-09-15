@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38379)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38434)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dsmBQ-0007G7-6U
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:41:12 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dsmBU-0007Jz-1p
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:41:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dsmBN-0002d2-4f
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:41:08 -0400
-Received: from ozlabs.ru ([107.173.13.209]:44984)
+	(envelope-from <aik@ozlabs.ru>) id 1dsmBO-0002df-Dp
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:41:12 -0400
+Received: from ozlabs.ru ([107.173.13.209]:44990)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dsmBM-0002cy-UK
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:41:05 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dsmBO-0002dY-7S
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:41:06 -0400
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Fri, 15 Sep 2017 18:40:17 +1000
-Message-Id: <20170915084030.40988-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v2 00/13] memory: Reduce memory use
+Date: Fri, 15 Sep 2017 18:40:18 +1000
+Message-Id: <20170915084030.40988-2-aik@ozlabs.ru>
+In-Reply-To: <20170915084030.40988-1-aik@ozlabs.ru>
+References: <20170915084030.40988-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v2 01/13] memory: Postpone flatview and
+ dispatch tree building till all devices are added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +27,61 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
+Most devices use at least one address space and every time a new address
+space is added, flat views and dispatch trees are rebuild for all address
+spaces. This is not a problem for a relatively small amount of devices but
+even 50 virtio-pci devices use more than 8GB of RAM.
 
-This was inspired by https://bugzilla.redhat.com/show_bug.cgi?id=1481593
-Previous spin: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01559.html
+What happens that on every flatview/dispatch rebuild, new arrays are
+allocated and old ones release but the release is done via RCU so until
+an entire machine is build, they are not released.
 
-This patchset tries to reduce amount of memory used by FlatViews
-and tries share as many FVs between address spaces as possible.
+This wraps devices creation into memory_region_transaction_begin/commit
+to massively reduce amount of flat view/dispatch tree (re)allocations.
 
-Changelog:
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+---
+Changes:
 v2:
-* total rework
+* wrapped qemu_run_machine_init_done_notifiers() as well
+---
+ vl.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-
-This is based on sha1
-3dabde1128 Peter Maydell "Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20170914' into staging".
-
-Please comment. Thanks.
-
-
-
-Alexey Kardashevskiy (13):
-  memory: Postpone flatview and dispatch tree building till all devices
-    are added
-  exec: Explicitely export target AS from
-    address_space_translate_internal
-  memory: Open code FlatView rendering
-  memory: Move FlatView allocation to a helper
-  memory: Move AddressSpaceDispatch from AddressSpace to FlatView
-  memory: Remove AddressSpace pointer from AddressSpaceDispatch
-  memory: Switch memory from using AddressSpace to FlatView
-  memory: Cleanup after switching to FlatView
-  memory: Rename mem_begin/mem_commit/mem_add helpers
-  memory: Move root MR from AddressSpace to FlatView
-  memory: Share FlatView's and dispatch trees between address spaces
-  memory: Get rid of address_space_init_shareable
-  memory: Add flat views to HMP "info mtree"
-
- include/exec/memory-internal.h |  17 ++-
- include/exec/memory.h          |  79 +++++-----
- include/hw/arm/armv7m.h        |   2 +-
- cpus.c                         |   5 +-
- exec.c                         | 327 +++++++++++++++++++++++++----------------
- hw/arm/armv7m.c                |   9 +-
- hw/intc/openpic_kvm.c          |   2 +-
- hw/pci/pci.c                   |   3 +-
- memory.c                       | 322 +++++++++++++++++++++++++++++-----------
- monitor.c                      |   3 +-
- target/arm/cpu.c               |  16 +-
- target/i386/cpu.c              |   5 +-
- vl.c                           |   9 ++
- hmp-commands-info.hx           |   7 +-
- 14 files changed, 525 insertions(+), 281 deletions(-)
-
+diff --git a/vl.c b/vl.c
+index fb1f05b937..ee3cc7db48 100644
+--- a/vl.c
++++ b/vl.c
+@@ -4661,12 +4661,16 @@ int main(int argc, char **argv, char **envp)
+     igd_gfx_passthru();
+ 
+     /* init generic devices */
++    memory_region_transaction_begin();
++
+     rom_set_order_override(FW_CFG_ORDER_OVERRIDE_DEVICE);
+     if (qemu_opts_foreach(qemu_find_opts("device"),
+                           device_init_func, NULL, NULL)) {
+         exit(1);
+     }
+ 
++    memory_region_transaction_commit();
++
+     cpu_synchronize_all_post_init();
+ 
+     rom_reset_order_override();
+@@ -4749,8 +4753,13 @@ int main(int argc, char **argv, char **envp)
+     /* TODO: once all bus devices are qdevified, this should be done
+      * when bus is created by qdev.c */
+     qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
++
++    memory_region_transaction_begin();
++
+     qemu_run_machine_init_done_notifiers();
+ 
++    memory_region_transaction_commit();
++
+     if (rom_check_and_register_reset() != 0) {
+         error_report("rom check and register reset failed");
+         exit(1);
 -- 
 2.11.0
