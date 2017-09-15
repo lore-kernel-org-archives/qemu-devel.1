@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38840)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38895)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dsmCX-0000Wy-7D
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:42:18 -0400
+	(envelope-from <otubo@redhat.com>) id 1dsmCb-0000az-CN
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:42:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <otubo@redhat.com>) id 1dsmCV-00039S-VL
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:42:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52522)
+	(envelope-from <otubo@redhat.com>) id 1dsmCa-0003FE-6f
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:42:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49298)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dsmCV-00037n-MN
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:42:15 -0400
+	(Exim 4.71) (envelope-from <otubo@redhat.com>) id 1dsmCZ-0003EG-U8
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:42:20 -0400
 From: Eduardo Otubo <otubo@redhat.com>
-Date: Fri, 15 Sep 2017 10:41:36 +0200
-Message-Id: <20170915084139.4481-4-otubo@redhat.com>
+Date: Fri, 15 Sep 2017 10:41:38 +0200
+Message-Id: <20170915084139.4481-6-otubo@redhat.com>
 In-Reply-To: <20170915084139.4481-1-otubo@redhat.com>
 References: <20170915084139.4481-1-otubo@redhat.com>
-Subject: [Qemu-devel] [PULL 03/06] seccomp: add elevateprivileges argument
- to command line
+Subject: [Qemu-devel] [PULL 05/06] seccomp: add resourcecontrol argument to
+ command line
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,135 +27,117 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>, Fam Zheng <famz@redhat.com>, Thomas Huth <thuth@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>
 
-This patch introduces the new argument
-[,elevateprivileges=allow|deny|children] to the `-sandbox on'. It allows
-or denies Qemu process to elevate its privileges by blacklisting all
-set*uid|gid system calls. The 'children' option will let forks and
-execves run unprivileged.
+This patch adds [,resourcecontrol=deny] to `-sandbox on' option. It
+blacklists all process affinity and scheduler priority system calls to
+avoid any bigger of the process.
 
 Signed-off-by: Eduardo Otubo <otubo@redhat.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
 ---
  include/sysemu/seccomp.h |  1 +
- qemu-options.hx          | 12 +++++++++---
+ qemu-options.hx          |  9 ++++++---
  qemu-seccomp.c           | 11 +++++++++++
- vl.c                     | 27 +++++++++++++++++++++++++++
- 4 files changed, 48 insertions(+), 3 deletions(-)
+ vl.c                     | 16 ++++++++++++++++
+ 4 files changed, 34 insertions(+), 3 deletions(-)
 
 diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
-index 215138a372..4a9e63c7cd 100644
+index 3ab5fc4f61..e67c2dc840 100644
 --- a/include/sysemu/seccomp.h
 +++ b/include/sysemu/seccomp.h
-@@ -17,6 +17,7 @@
- 
- #define QEMU_SECCOMP_SET_DEFAULT     (1 << 0)
+@@ -19,6 +19,7 @@
  #define QEMU_SECCOMP_SET_OBSOLETE    (1 << 1)
-+#define QEMU_SECCOMP_SET_PRIVILEGED  (1 << 2)
+ #define QEMU_SECCOMP_SET_PRIVILEGED  (1 << 2)
+ #define QEMU_SECCOMP_SET_SPAWN       (1 << 3)
++#define QEMU_SECCOMP_SET_RESOURCECTL (1 << 4)
  
  #include <seccomp.h>
  
 diff --git a/qemu-options.hx b/qemu-options.hx
-index 72150c6b84..5c1b163fb5 100644
+index 2b04b9f170..600614f6e5 100644
 --- a/qemu-options.hx
 +++ b/qemu-options.hx
-@@ -4017,20 +4017,26 @@ Old param mode (ARM only).
- ETEXI
+@@ -4018,7 +4018,7 @@ ETEXI
  
  DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
--    "-sandbox on[,obsolete=allow|deny]\n" \
-+    "-sandbox on[,obsolete=allow|deny][,elevateprivileges=allow|deny|children]\n" \
+     "-sandbox on[,obsolete=allow|deny][,elevateprivileges=allow|deny|children]\n" \
+-    "          [,spawn=allow|deny]\n" \
++    "          [,spawn=allow|deny][,resourcecontrol=allow|deny]\n" \
      "                Enable seccomp mode 2 system call filter (default 'off').\n" \
      "                use 'obsolete' to allow obsolete system calls that are provided\n" \
      "                    by the kernel, but typically no longer used by modern\n" \
--    "                    C library implementations.\n",
-+    "                    C library implementations.\n" \
-+    "                use 'elevateprivileges' to allow or deny QEMU process to elevate\n" \
-+    "                    its privileges by blacklisting all set*uid|gid system calls.\n" \
-+    "                    The value 'children' will deny set*uid|gid system calls for\n" \
-+    "                    main QEMU process but will allow forks and execves to run unprivileged\n",
+@@ -4028,10 +4028,11 @@ DEF("sandbox", HAS_ARG, QEMU_OPTION_sandbox, \
+     "                    The value 'children' will deny set*uid|gid system calls for\n" \
+     "                    main QEMU process but will allow forks and execves to run unprivileged\n" \
+     "                use 'spawn' to avoid QEMU to spawn new threads or processes by\n" \
+-    "                     blacklisting *fork and execve\n",
++    "                     blacklisting *fork and execve\n" \
++    "                use 'resourcecontrol' to disable process affinity and schedular priority\n",
      QEMU_ARCH_ALL)
  STEXI
--@item -sandbox @var{arg}[,obsolete=@var{string}]
-+@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}]
+-@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}][,spawn=@var{string}]
++@item -sandbox @var{arg}[,obsolete=@var{string}][,elevateprivileges=@var{string}][,spawn=@var{string}][,resourcecontrol=@var{string}]
  @findex -sandbox
  Enable Seccomp mode 2 system call filter. 'on' will enable syscall filtering and 'off' will
  disable it.  The default is 'off'.
- @table @option
- @item obsolete=@var{string}
- Enable Obsolete system calls
-+@item elevateprivileges=@var{string}
-+Disable set*uid|gid system calls
+@@ -4042,6 +4043,8 @@ Enable Obsolete system calls
+ Disable set*uid|gid system calls
+ @item spawn=@var{string}
+ Disable *fork and execve
++@item resourcecontrol=@var{string}
++Disable process affinity and schedular priority
  @end table
  ETEXI
  
 diff --git a/qemu-seccomp.c b/qemu-seccomp.c
-index 8a5fbd2ff1..978d66bd28 100644
+index f3878a5e29..b770a77d33 100644
 --- a/qemu-seccomp.c
 +++ b/qemu-seccomp.c
-@@ -67,6 +67,17 @@ static const struct QemuSeccompSyscall blacklist[] = {
-     { SCMP_SYS(sysfs),                  QEMU_SECCOMP_SET_OBSOLETE },
-     { SCMP_SYS(uselib),                 QEMU_SECCOMP_SET_OBSOLETE },
-     { SCMP_SYS(ustat),                  QEMU_SECCOMP_SET_OBSOLETE },
-+    /* privileged */
-+    { SCMP_SYS(setuid),                 QEMU_SECCOMP_SET_PRIVILEGED },
-+    { SCMP_SYS(setgid),                 QEMU_SECCOMP_SET_PRIVILEGED },
-+    { SCMP_SYS(setpgid),                QEMU_SECCOMP_SET_PRIVILEGED },
-+    { SCMP_SYS(setsid),                 QEMU_SECCOMP_SET_PRIVILEGED },
-+    { SCMP_SYS(setreuid),               QEMU_SECCOMP_SET_PRIVILEGED },
-+    { SCMP_SYS(setregid),               QEMU_SECCOMP_SET_PRIVILEGED },
-+    { SCMP_SYS(setresuid),              QEMU_SECCOMP_SET_PRIVILEGED },
-+    { SCMP_SYS(setresgid),              QEMU_SECCOMP_SET_PRIVILEGED },
-+    { SCMP_SYS(setfsuid),               QEMU_SECCOMP_SET_PRIVILEGED },
-+    { SCMP_SYS(setfsgid),               QEMU_SECCOMP_SET_PRIVILEGED },
+@@ -82,6 +82,17 @@ static const struct QemuSeccompSyscall blacklist[] = {
+     { SCMP_SYS(fork),                   QEMU_SECCOMP_SET_SPAWN },
+     { SCMP_SYS(vfork),                  QEMU_SECCOMP_SET_SPAWN },
+     { SCMP_SYS(execve),                 QEMU_SECCOMP_SET_SPAWN },
++    /* resource control */
++    { SCMP_SYS(getpriority),            QEMU_SECCOMP_SET_RESOURCECTL },
++    { SCMP_SYS(setpriority),            QEMU_SECCOMP_SET_RESOURCECTL },
++    { SCMP_SYS(sched_setparam),         QEMU_SECCOMP_SET_RESOURCECTL },
++    { SCMP_SYS(sched_getparam),         QEMU_SECCOMP_SET_RESOURCECTL },
++    { SCMP_SYS(sched_setscheduler),     QEMU_SECCOMP_SET_RESOURCECTL },
++    { SCMP_SYS(sched_getscheduler),     QEMU_SECCOMP_SET_RESOURCECTL },
++    { SCMP_SYS(sched_setaffinity),      QEMU_SECCOMP_SET_RESOURCECTL },
++    { SCMP_SYS(sched_getaffinity),      QEMU_SECCOMP_SET_RESOURCECTL },
++    { SCMP_SYS(sched_get_priority_max), QEMU_SECCOMP_SET_RESOURCECTL },
++    { SCMP_SYS(sched_get_priority_min), QEMU_SECCOMP_SET_RESOURCECTL },
  };
  
  
 diff --git a/vl.c b/vl.c
-index 57c5e93c1a..d59b560276 100644
+index 984db0c399..9e62e92aea 100644
 --- a/vl.c
 +++ b/vl.c
-@@ -29,6 +29,7 @@
- 
- #ifdef CONFIG_SECCOMP
- #include "sysemu/seccomp.h"
-+#include "sys/prctl.h"
- #endif
- 
- #if defined(CONFIG_VDE)
-@@ -275,6 +276,10 @@ static QemuOptsList qemu_sandbox_opts = {
-             .name = "obsolete",
+@@ -284,6 +284,10 @@ static QemuOptsList qemu_sandbox_opts = {
+             .name = "spawn",
              .type = QEMU_OPT_STRING,
          },
 +        {
-+            .name = "elevateprivileges",
++            .name = "resourcecontrol",
 +            .type = QEMU_OPT_STRING,
 +        },
          { /* end of list */ }
      },
  };
-@@ -1056,6 +1061,28 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
+@@ -1099,6 +1103,18 @@ static int parse_sandbox(void *opaque, QemuOpts *opts, Error **errp)
              }
          }
  
-+        value = qemu_opt_get(opts, "elevateprivileges");
++        value = qemu_opt_get(opts, "resourcecontrol");
 +        if (value) {
 +            if (g_str_equal(value, "deny")) {
-+                seccomp_opts |= QEMU_SECCOMP_SET_PRIVILEGED;
-+            } else if (g_str_equal(value, "children")) {
-+                seccomp_opts |= QEMU_SECCOMP_SET_PRIVILEGED;
-+
-+                /* calling prctl directly because we're
-+                 * not sure if host has CAP_SYS_ADMIN set*/
-+                if (prctl(PR_SET_NO_NEW_PRIVS, 1)) {
-+                    error_report("failed to set no_new_privs "
-+                                 "aborting");
-+                    return -1;
-+                }
++                seccomp_opts |= QEMU_SECCOMP_SET_RESOURCECTL;
 +            } else if (g_str_equal(value, "allow")) {
 +                /* default value */
 +            } else {
-+                error_report("invalid argument for elevateprivileges");
++                error_report("invalid argument for resourcecontrol");
 +                return -1;
 +            }
 +        }
