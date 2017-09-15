@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54254)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54265)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dshfN-0006mb-Tb
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:51:47 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dshfO-0006p6-BP
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:51:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dshfM-0003QT-AX
-	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:51:45 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dshfM-0003Q7-6i
+	for qemu-devel@nongnu.org; Thu, 14 Sep 2017 23:51:46 -0400
 From: David Gibson <david@gibson.dropbear.id.au>
-Date: Fri, 15 Sep 2017 13:51:24 +1000
-Message-Id: <20170915035130.8354-13-david@gibson.dropbear.id.au>
+Date: Fri, 15 Sep 2017 13:51:28 +1000
+Message-Id: <20170915035130.8354-17-david@gibson.dropbear.id.au>
 In-Reply-To: <20170915035130.8354-1-david@gibson.dropbear.id.au>
 References: <20170915035130.8354-1-david@gibson.dropbear.id.au>
-Subject: [Qemu-devel] [PULL 12/18] xics: fix several error leaks
+Subject: [Qemu-devel] [PULL 16/18] spapr_cpu_core: cleaning up
+ qdev_get_machine() calls
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +25,45 @@ Cc: agraf@suse.de, gkurz@kaod.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, a
 
 From: Greg Kurz <groug@kaod.org>
 
-If object_property_get_link() fails then it allocates an error, which
-must be freed before returning. The error_get_pretty() function is
-merely an accessor to the error message and doesn't free anything.
+This patch removes the qdev_get_machine() calls that are made
+in spapr_cpu_core.c in situations where we can get an existing
+pointer for the MachineState by either passing it as an argument
+to the function or by using other already available pointers.
 
-The error.h header indicates how to do it right:
-
- * Pass an existing error to the caller with the message modified:
- *     error_propagate(errp, err);
- *     error_prepend(errp, "Could not frobnicate '%s': ", name);
+Credits to Daniel Henrique Barboza for the idea and the changelog
+text.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/xics.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ hw/ppc/spapr_cpu_core.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index a84ba51ad8..80c33be02e 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -306,8 +306,8 @@ static void icp_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index 3f7ef20910..c08ee7571a 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -174,10 +174,10 @@ static void spapr_cpu_core_unrealizefn(DeviceState *dev, Error **errp)
+     g_free(sc->threads);
+ }
  
-     obj = object_property_get_link(OBJECT(dev), ICP_PROP_XICS, &err);
-     if (!obj) {
--        error_setg(errp, "%s: required link '" ICP_PROP_XICS "' not found: %s",
--                   __func__, error_get_pretty(err));
-+        error_propagate(errp, err);
-+        error_prepend(errp, "required link '" ICP_PROP_XICS "' not found: ");
-         return;
-     }
+-static void spapr_cpu_core_realize_child(Object *child, Error **errp)
++static void spapr_cpu_core_realize_child(Object *child,
++                                         sPAPRMachineState *spapr, Error **errp)
+ {
+     Error *local_err = NULL;
+-    sPAPRMachineState *spapr = SPAPR_MACHINE(qdev_get_machine());
+     CPUState *cs = CPU(child);
+     PowerPCCPU *cpu = POWERPC_CPU(cs);
+     Object *obj;
+@@ -266,7 +266,7 @@ static void spapr_cpu_core_realize(DeviceState *dev, Error **errp)
+     for (j = 0; j < cc->nr_threads; j++) {
+         obj = sc->threads + j * size;
  
-@@ -315,8 +315,8 @@ static void icp_realize(DeviceState *dev, Error **errp)
- 
-     obj = object_property_get_link(OBJECT(dev), ICP_PROP_CPU, &err);
-     if (!obj) {
--        error_setg(errp, "%s: required link '" ICP_PROP_CPU "' not found: %s",
--                   __func__, error_get_pretty(err));
-+        error_propagate(errp, err);
-+        error_prepend(errp, "required link '" ICP_PROP_CPU "' not found: ");
-         return;
-     }
- 
-@@ -641,8 +641,8 @@ static void ics_base_realize(DeviceState *dev, Error **errp)
- 
-     obj = object_property_get_link(OBJECT(dev), ICS_PROP_XICS, &err);
-     if (!obj) {
--        error_setg(errp, "%s: required link '" ICS_PROP_XICS "' not found: %s",
--                   __func__, error_get_pretty(err));
-+        error_propagate(errp, err);
-+        error_prepend(errp, "required link '" ICS_PROP_XICS "' not found: ");
-         return;
-     }
-     ics->xics = XICS_FABRIC(obj);
+-        spapr_cpu_core_realize_child(obj, &local_err);
++        spapr_cpu_core_realize_child(obj, spapr, &local_err);
+         if (local_err) {
+             goto err;
+         }
 -- 
 2.13.5
