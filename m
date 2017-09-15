@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dslCg-0005gc-GD
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:38:23 -0400
+	(envelope-from <thuth@redhat.com>) id 1dslEm-0006tx-3l
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:40:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dslCb-0003uL-JT
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:38:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45344)
+	(envelope-from <thuth@redhat.com>) id 1dslEh-0004qK-7X
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:40:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47564)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dslCb-0003uF-DC
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:38:17 -0400
-Date: Fri, 15 Sep 2017 09:38:08 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170915093808.4cd4d0ae.cohuck@redhat.com>
-In-Reply-To: <24e458ff-39c8-7407-62ad-46568e150c5d@redhat.com>
-References: <20170904154316.4148-1-david@redhat.com>
-	<20170904154316.4148-12-david@redhat.com>
-	<2c620927-0406-2fc1-895c-09ffc2e44a4e@linux.vnet.ibm.com>
-	<6b3e9c2b-4cb7-fdf8-5f9b-ff7ebbf52d1e@linaro.org>
-	<24e458ff-39c8-7407-62ad-46568e150c5d@redhat.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dslEh-0004pB-0y
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:40:27 -0400
+References: <cover.1505403478.git.alifm@linux.vnet.ibm.com>
+	<b9b4d8a8c1d17bf3f086b120fdf04c925da0f331.1505403478.git.alifm@linux.vnet.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ee7ba6d5-b97a-cf3d-9190-21e97628d51a@redhat.com>
+Date: Fri, 15 Sep 2017 09:40:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <b9b4d8a8c1d17bf3f086b120fdf04c925da0f331.1505403478.git.alifm@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 11/19] s390x: allow only 1 CPU with TCG
+Subject: Re: [Qemu-devel] [PATCH v2 2/2] virtio-gpu-ccw: Create a virtio gpu
+ device for the ccw bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,35 +29,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: Richard Henderson <richard.henderson@linaro.org>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, qemu-devel@nongnu.org, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Aurelien Jarno <aurelien@aurel32.net>
+To: Farhan Ali <alifm@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+Cc: borntraeger@de.ibm.com, kraxel@redhat.com, cohuck@redhat.com
 
-On Thu, 14 Sep 2017 20:13:49 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> FWIW, I started factoring out today KVM SIGP code to make it usable by TCG.
+On 14.09.2017 17:55, Farhan Ali wrote:
+> Wire up the virtio-gpu device for the CCW bus. The virtio-gpu
+> is a virtio-1 device, so disable revision 0.
 > 
-> I also started adding the missing SIGP instructions the kernel handles
-> for KVM. I dropped the old TCG SIGP handling code and completely reuse
-> the new SIGP code. I already got boot/reboot/shutdown  properly running
-> (implementing STOP and RESTART interrupts like KVM has).
+> Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> ---
+>  hw/s390x/virtio-ccw.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/virtio-ccw.h | 10 ++++++++++
 
-Cool!
-
-> 
-> But its still quite hacky and there are is a bunch of stuff to clean up,
-> especially:
-> - external interrupt handling (the queue approach we have right now is
->   no good for external calls and emergency signals)
-> - floating interrupt support (io interrupts always going to CPU 0 is a
->   hack)
-> 
-> I think I can at least implement SIGP properly and fix the external call
-> stuff. floating interrupts might require more thought.
-
-I'm wondering whether something should move into the qemu version of
-the flic. I'm also wondering whether we should look to the kvm floating
-interrupt code for inspiration.
-
-(I have 'look at floating interrupts with tcg' on my todo list as
-well :)
+Reviewed-by: Thomas Huth <thuth@redhat.com>
