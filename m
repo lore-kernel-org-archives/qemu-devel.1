@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42803)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43430)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dsqVG-0004vu-6x
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:17:55 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dsqX3-0006DX-3b
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:19:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dsqVC-0004jK-UQ
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:17:54 -0400
-References: <150548133297.5945.7401220081077343726.stgit@bahia.lan>
-	<150548135159.5945.17545667206379508322.stgit@bahia.lan>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <53a49b18-5b56-d931-b6f1-15df77186dfc@redhat.com>
-Date: Fri, 15 Sep 2017 15:17:45 +0200
+	(envelope-from <eric.auger@redhat.com>) id 1dsqX1-00062j-Vr
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:19:45 -0400
+References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
+	<1504286483-23327-14-git-send-email-eric.auger@redhat.com>
+	<20170914092751.GA3336@virtx40>
+	<4dbbccae-64e1-f4ac-4dcc-3abd9766f324@caviumnetworks.com>
+	<795d99ba-e492-04ce-dda4-709682baf6cd@caviumnetworks.com>
+	<4f9fc697-9e6c-5dd7-65c7-92326135aa56@redhat.com>
+	<MWHPR0701MB3660656E62CF668F057621A7F36C0@MWHPR0701MB3660.namprd07.prod.outlook.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <fedcd7ff-9b4a-a274-972e-3ca2c51b563d@redhat.com>
+Date: Fri, 15 Sep 2017 15:19:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <150548135159.5945.17545667206379508322.stgit@bahia.lan>
+In-Reply-To: <MWHPR0701MB3660656E62CF668F057621A7F36C0@MWHPR0701MB3660.namprd07.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/4] ppc/kvm: drop kvmppc_has_cap_htab_fd()
+Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 13/20] hw/arm/smmuv3:
+ Implement IOMMU memory region replay callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,58 +29,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: tn <Tomasz.Nowicki@caviumnetworks.com>, Tomasz Nowicki <tnowicki@caviumnetworks.com>, Linu Cherian <linuc.decode@gmail.com>
+Cc: eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, peterx@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, wtownsen@redhat.com, linu.cherian@cavium.com
 
-On 15.09.2017 15:15, Greg Kurz wrote:
-> It never got used since its introduction (commit 7c43bca004af).
+Hi Tomasz,
+On 15/09/2017 12:42, tn wrote:
+> Hi Eric,
 > 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  target/ppc/kvm.c     |    5 -----
->  target/ppc/kvm_ppc.h |    6 ------
->  2 files changed, 11 deletions(-)
+> On 15.09.2017 09:30, Auger Eric wrote:
+>> Hi Tomasz,
+>>
+>> On 14/09/2017 16:43, Tomasz Nowicki wrote:
+>>> On 14.09.2017 16:31, Tomasz Nowicki wrote:
+>>>> Hi Eric,
+>>>>
+>>>> On 14.09.2017 11:27, Linu Cherian wrote:
+>>>>> Hi Eric,
+>>>>>
+>>>>> On Fri Sep 01, 2017 at 07:21:16PM +0200, Eric Auger wrote:
+>>>>>> memory_region_iommu_replay() is used for VFIO integration.
+>>>>>>
+>>>>>> However its default implementation is not adapted to SMMUv3
+>>>>>> IOMMU memory region. Indeed the input address range is too
+>>>>>> huge and its execution is too slow as it calls the translate()
+>>>>>> callback on each granule.
+>>>>>>
+>>>>>> Let's implement the replay callback which hierarchically walk
+>>>>>> over the page table structure and notify only the segments
+>>>>>> that are populated with valid entries.
+>>>>>>
+>>>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+>>>>>> ---
+>>>>>>    hw/arm/smmuv3.c     | 36 ++++++++++++++++++++++++++++++++++++
+>>>>>>    hw/arm/trace-events |  1 +
+>>>>>>    2 files changed, 37 insertions(+)
+>>>>>>
+>>>>>> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+>>>>>> index 8e7d10d..c43bd93 100644
+>>>>>> --- a/hw/arm/smmuv3.c
+>>>>>> +++ b/hw/arm/smmuv3.c
+>>>>>> @@ -657,6 +657,41 @@ static int smmuv3_notify_entry(IOMMUTLBEntry
+>>>>>> *entry, void *private)
+>>>>>>        return 0;
+>>>>>>    }
+>>>>>> +/* Unmap the whole notifier's range */
+>>>>>> +static void smmuv3_unmap_notifier_range(IOMMUNotifier *n)
+>>>>>> +{
+>>>>>> +    IOMMUTLBEntry entry;
+>>>>>> +    hwaddr size = n->end - n->start + 1;
+>>>>>> +
+>>>>>> +    entry.target_as = &address_space_memory;
+>>>>>> +    entry.iova = n->start & ~(size - 1);
+>>>>>> +    entry.perm = IOMMU_NONE;
+>>>>>> +    entry.addr_mask = size - 1;
+>>>>>> +
+>>>>>> +    memory_region_notify_one(n, &entry);
+>>>>>> +}
+>>>>>> +
+>>>>>> +static void smmuv3_replay(IOMMUMemoryRegion *mr, IOMMUNotifier *n)
+>>>>>> +{
+>>>>>> +    SMMUTransCfg cfg = {};
+>>>>>> +    int ret;
+>>>>>> +
+>>>>>> +    trace_smmuv3_replay(mr->parent_obj.name, n, n->start, n->end);
+>>>>>> +    smmuv3_unmap_notifier_range(n);
+>>>>>> +
+>>>>>> +    ret = smmuv3_decode_config(mr, &cfg);
+>>>>>> +    if (ret) {
+>>>>>> +        error_report("%s error decoding the configuration for iommu
+>>>>>> mr=%s",
+>>>>>> +                     __func__, mr->parent_obj.name);
+>>>>>> +    }
+>>>>>>
+>>>>>
+>>>>> On an invalid config being found, shouldnt we return rather than
+>>>>> proceeding with
+>>>>> page table walk. For example on an invalid Stream table entry.
+>>>>
+>>>> Indeed, without return here vhost case is not working for me.
+>>>
+>>> I was just lucky one time. return here has no influence. Vhost still not
+>>> working. Sorry for noise.
+>>
+>> As far as I understand the replay() callback only is called in VFIO use
+>> case. So this shouldn't impact vhost.
+>>
+>> I can't reproduce your vhost issue on my side. I will review the
+>> invalidate code again and compare against the last version.
+>>
+>> What is the page size used by your guest?
 > 
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 1deaf106d2b9..00d7029b8d7a 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2448,11 +2448,6 @@ bool kvmppc_has_cap_epr(void)
->      return cap_epr;
->  }
->  
-> -bool kvmppc_has_cap_htab_fd(void)
-> -{
-> -    return cap_htab_fd;
-> -}
-> -
->  bool kvmppc_has_cap_fixup_hcalls(void)
->  {
->      return cap_fixup_hcalls;
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index f780e6ec7b72..08aab46c5a56 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -51,7 +51,6 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift);
->  #endif /* !CONFIG_USER_ONLY */
->  bool kvmppc_has_cap_epr(void);
->  int kvmppc_define_rtas_kernel_token(uint32_t token, const char *function);
-> -bool kvmppc_has_cap_htab_fd(void);
->  int kvmppc_get_htab_fd(bool write);
->  int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns);
->  int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
-> @@ -246,11 +245,6 @@ static inline int kvmppc_define_rtas_kernel_token(uint32_t token,
->      return -1;
->  }
->  
-> -static inline bool kvmppc_has_cap_htab_fd(void)
-> -{
-> -    return false;
-> -}
-> -
->  static inline int kvmppc_get_htab_fd(bool write)
->  {
->      return -1;
+> 64K page size for guest as well as for host.
 > 
+> However, I've just checked 4K page size for guest and then vhost is
+> working fine.
+I can reproduce the issue with vhost on 64KB page guest. Currently
+investigating...
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Thanks!
+
+Eric
+> 
+> Thanks,
+> Tomasz
