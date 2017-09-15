@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dskY4-0007M7-Kz
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:56:25 -0400
+	(envelope-from <peterx@redhat.com>) id 1dskYG-0008Hs-7d
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:56:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dskY0-0002Q8-QS
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:56:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48350)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dskY0-0002Oj-KR
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:56:20 -0400
-Date: Fri, 15 Sep 2017 14:56:16 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170915065616.GE17199@lemon>
-References: <20170915064518.3436-1-famz@redhat.com>
+	(envelope-from <peterx@redhat.com>) id 1dskYF-0002j1-EJ
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:56:36 -0400
+Date: Fri, 15 Sep 2017 14:56:27 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170915065627.GQ3617@pxdev.xzpeter.org>
+References: <20170915054404.19914-1-famz@redhat.com>
+	<20170915054404.19914-2-famz@redhat.com>
+	<20170915064132.GP3617@pxdev.xzpeter.org>
+	<20170915064907.GD17199@lemon>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170915064518.3436-1-famz@redhat.com>
-Subject: Re: [Qemu-devel] [PULL v3 00/38] Test and build patches
+In-Reply-To: <20170915064907.GD17199@lemon>
+Subject: Re: [Qemu-devel] [PATCH 1/3] migration: Allow ram_save_cleanup to
+ be called with empty state
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,18 +26,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org
 
-On Fri, 09/15 14:45, Fam Zheng wrote:
-> The following changes since commit 04ef33052c205170c92df21ca0b4be4f3b102188:
+On Fri, Sep 15, 2017 at 02:49:07PM +0800, Fam Zheng wrote:
+> On Fri, 09/15 14:41, Peter Xu wrote:
+> > On Fri, Sep 15, 2017 at 01:44:02PM +0800, Fam Zheng wrote:
+> > > So that we can do cleanup unconditionally at the end of main().
+> > > 
+> > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > > ---
+> > >  migration/ram.c | 3 +++
+> > >  1 file changed, 3 insertions(+)
+> > > 
+> > > diff --git a/migration/ram.c b/migration/ram.c
+> > > index e18b3e2d4f..37e6a71241 100644
+> > > --- a/migration/ram.c
+> > > +++ b/migration/ram.c
+> > > @@ -1365,6 +1365,9 @@ static void ram_save_cleanup(void *opaque)
+> > >      RAMState **rsp = opaque;
+> > >      RAMBlock *block;
+> > >  
+> > > +    if (!rsp || !*rsp) {
+> > > +        return;
+> > > +    }
+> > >      /* caller have hold iothread lock or is in a bh, so there is
+> > >       * no writing race against this migration_bitmap
+> > >       */
+> > > -- 
+> > > 2.13.5
+> > > 
+> > 
+> > Instead of take special care on RAM, how about check in
+> > migrate_fd_cancel(), and return directly if migration_is_idle()?
 > 
->   tcg/tci: do not use ldst label (never implemented) (2017-09-11 19:24:05 +0100)
-> 
-> are available in the git repository at:
-> 
->   git://github.com/famz/qemu.git tags/test-and-build-pull-request
+> This is not from migrate_fd_cancel(), but from qemu_savevm_state_cleanup(), so
+> that doesn't work.
 
-NACK, please ignore this one, it's a broken one.
+Yeh I see the point.  But my logic still stands - we don't need to
+cleanup anything if the migration is not really there.
 
-Fam
+I'm thinking whether we can put qemu_savevm_state_cleanup() into
+migrate_fd_cancel() in some way, though I am still not 100% sure on
+the colo part.  Anyway, I feel like a bit confusing we have two
+cleanup functions.
+
+-- 
+Peter Xu
