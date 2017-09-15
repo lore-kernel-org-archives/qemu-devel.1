@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38217)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38268)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dsmB6-0006ye-Ia
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:40:51 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dsmB9-00071d-On
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:40:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dsmB5-0002XC-9F
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:40:48 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dsmB7-0002Yr-DQ
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:40:51 -0400
 Received: from ozlabs.ru ([107.173.13.209]:44668)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dsmB4-0002Ql-Rx
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:40:47 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dsmB7-0002Ql-4J
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:40:49 -0400
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Fri, 15 Sep 2017 18:40:27 +1000
-Message-Id: <20170915084030.40988-11-aik@ozlabs.ru>
+Date: Fri, 15 Sep 2017 18:40:29 +1000
+Message-Id: <20170915084030.40988-13-aik@ozlabs.ru>
 In-Reply-To: <20170915084030.40988-1-aik@ozlabs.ru>
 References: <20170915084030.40988-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v2 10/13] memory: Move root MR from
- AddressSpace to FlatView
+Subject: [Qemu-devel] [PATCH qemu v2 12/13] memory: Get rid of
+ address_space_init_shareable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,185 +27,204 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
+Since FlatViews are shared now and ASes not, this gets rid of
+address_space_init_shareable().
+
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- include/exec/memory.h |  2 +-
- hw/pci/pci.c          |  3 ++-
- memory.c              | 30 ++++++++++++++++--------------
- 3 files changed, 19 insertions(+), 16 deletions(-)
+
+Squash to the previous one? It is a separate patch to make review easier,
+mostly.
+---
+ include/exec/memory.h   | 17 -----------------
+ include/hw/arm/armv7m.h |  2 +-
+ cpus.c                  |  5 +++--
+ hw/arm/armv7m.c         |  9 ++++-----
+ memory.c                | 10 ----------
+ target/arm/cpu.c        | 16 ++++++++--------
+ target/i386/cpu.c       |  5 +++--
+ 7 files changed, 19 insertions(+), 45 deletions(-)
 
 diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 7816e5d655..be8cc1ccd3 100644
+index 04993f8eca..a550dc21e5 100644
 --- a/include/exec/memory.h
 +++ b/include/exec/memory.h
-@@ -308,7 +308,6 @@ struct AddressSpace {
-     /* All fields are private. */
-     struct rcu_head rcu;
-     char *name;
--    MemoryRegion *root;
-     int ref_count;
-     bool malloced;
- 
-@@ -322,6 +321,7 @@ struct AddressSpace {
- };
- 
- FlatView *address_space_to_flatview(AddressSpace *as);
-+MemoryRegion *address_space_root(AddressSpace *as);
+@@ -1584,23 +1584,6 @@ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
+ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name);
  
  /**
-  * MemoryRegionSection: describes a fragment of a #MemoryRegion
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 353195d154..7bf82aac9f 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -90,7 +90,8 @@ static void pci_init_bus_master(PCIDevice *pci_dev)
- 
-     memory_region_init_alias(&pci_dev->bus_master_enable_region,
-                              OBJECT(pci_dev), "bus master",
--                             dma_as->root, 0, memory_region_size(dma_as->root));
-+                             address_space_root(dma_as), 0,
-+                             memory_region_size(address_space_root(dma_as)));
-     memory_region_set_enabled(&pci_dev->bus_master_enable_region, false);
-     memory_region_add_subregion(&pci_dev->bus_master_container_region, 0,
-                                 &pci_dev->bus_master_enable_region);
-diff --git a/memory.c b/memory.c
-index 0651be49ac..29f8588945 100644
---- a/memory.c
-+++ b/memory.c
-@@ -231,6 +231,7 @@ struct FlatView {
-     unsigned nr;
-     unsigned nr_allocated;
-     struct AddressSpaceDispatch *dispatch;
-+    MemoryRegion *root;
- };
- 
- typedef struct AddressSpaceOps AddressSpaceOps;
-@@ -260,12 +261,14 @@ static bool flatrange_equal(FlatRange *a, FlatRange *b)
-         && a->readonly == b->readonly;
- }
- 
--static FlatView *flatview_alloc(void)
-+static FlatView *flatview_alloc(MemoryRegion *mr_root)
- {
-     FlatView *view;
- 
-     view = g_new0(FlatView, 1);
-     view->ref = 1;
-+    view->root = mr_root;
-+    memory_region_ref(mr_root);
- 
-     return view;
- }
-@@ -298,6 +301,7 @@ static void flatview_destroy(FlatView *view)
-         memory_region_unref(view->ranges[i].mr);
-     }
-     g_free(view->ranges);
-+    memory_region_unref(view->root);
-     g_free(view);
- }
- 
-@@ -629,7 +633,7 @@ static AddressSpace *memory_region_to_address_space(MemoryRegion *mr)
-         mr = mr->container;
-     }
-     QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
--        if (mr == as->root) {
-+        if (mr == as->current_map->root) {
-             return as;
-         }
-     }
-@@ -728,7 +732,7 @@ static FlatView *generate_memory_topology(MemoryRegion *mr)
- {
-     FlatView *view;
- 
--    view = flatview_alloc();
-+    view = flatview_alloc(mr);
- 
-     if (mr) {
-         render_memory_region(view, mr, int128_zero(),
-@@ -952,7 +956,7 @@ static void flatview_render_new(FlatView *old_view, FlatView *new_view)
- static void address_space_update_topology(AddressSpace *as)
- {
-     FlatView *old_view = address_space_get_flatview(as);
--    FlatView *new_view = generate_memory_topology(as->root);
-+    FlatView *new_view = generate_memory_topology(old_view->root);
- 
-     flatview_render_new(old_view, new_view);
-     address_space_update_topology_pass(as, old_view, new_view, false);
-@@ -2680,12 +2684,10 @@ void memory_region_invalidate_mmio_ptr(MemoryRegion *mr, hwaddr offset,
- 
- void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
- {
--    memory_region_ref(root);
-     memory_region_transaction_begin();
-     as->ref_count = 1;
--    as->root = root;
-     as->malloced = false;
--    as->current_map = flatview_alloc();
-+    as->current_map = flatview_alloc(root);
-     as->ioeventfd_nb = 0;
-     as->ioeventfds = NULL;
-     QTAILQ_INIT(&as->listeners);
-@@ -2695,6 +2697,11 @@ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
-     memory_region_transaction_commit();
- }
- 
-+MemoryRegion *address_space_root(AddressSpace *as)
-+{
-+    return as->current_map->root;
-+}
-+
- static void do_address_space_destroy(AddressSpace *as)
- {
-     bool do_free = as->malloced;
-@@ -2704,7 +2711,6 @@ static void do_address_space_destroy(AddressSpace *as)
-     flatview_unref(as->current_map);
-     g_free(as->name);
-     g_free(as->ioeventfds);
--    memory_region_unref(as->root);
-     if (do_free) {
-         g_free(as);
-     }
-@@ -2715,7 +2721,7 @@ AddressSpace *address_space_init_shareable(MemoryRegion *root, const char *name)
-     AddressSpace *as;
- 
-     QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
--        if (root == as->root && as->malloced) {
-+        if (root == address_space_root(as) && as->malloced) {
-             as->ref_count++;
-             return as;
-         }
-@@ -2729,15 +2735,12 @@ AddressSpace *address_space_init_shareable(MemoryRegion *root, const char *name)
- 
- void address_space_destroy(AddressSpace *as)
- {
--    MemoryRegion *root = as->root;
+- * address_space_init_shareable: return an address space for a memory region,
+- *                               creating it if it does not already exist
+- *
+- * @root: a #MemoryRegion that routes addresses for the address space
+- * @name: an address space name.  The name is only used for debugging
+- *        output.
+- *
+- * This function will return a pointer to an existing AddressSpace
+- * which was initialized with the specified MemoryRegion, or it will
+- * create and initialize one if it does not already exist. The ASes
+- * are reference-counted, so the memory will be freed automatically
+- * when the AddressSpace is destroyed via address_space_destroy.
+- */
+-AddressSpace *address_space_init_shareable(MemoryRegion *root,
+-                                           const char *name);
 -
-     as->ref_count--;
-     if (as->ref_count) {
+-/**
+  * address_space_destroy: destroy an address space
+  *
+  * Releases all resources associated with an address space.  After an address space
+diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
+index 10eb058027..008000fe11 100644
+--- a/include/hw/arm/armv7m.h
++++ b/include/hw/arm/armv7m.h
+@@ -21,7 +21,7 @@ typedef struct {
+     SysBusDevice parent_obj;
+     /*< public >*/
+ 
+-    AddressSpace *source_as;
++    AddressSpace source_as;
+     MemoryRegion iomem;
+     uint32_t base;
+     MemoryRegion *source_memory;
+diff --git a/cpus.c b/cpus.c
+index 9bed61eefc..c9a624003a 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1764,8 +1764,9 @@ void qemu_init_vcpu(CPUState *cpu)
+         /* If the target cpu hasn't set up any address spaces itself,
+          * give it the default one.
+          */
+-        AddressSpace *as = address_space_init_shareable(cpu->memory,
+-                                                        "cpu-memory");
++        AddressSpace *as = g_new0(AddressSpace, 1);
++
++        address_space_init(as, cpu->memory, "cpu-memory");
+         cpu->num_ases = 1;
+         cpu_address_space_init(cpu, as, 0);
+     }
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index b64a409b40..4900339646 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -41,7 +41,7 @@ static MemTxResult bitband_read(void *opaque, hwaddr offset,
+ 
+     /* Find address in underlying memory and round down to multiple of size */
+     addr = bitband_addr(s, offset) & (-size);
+-    res = address_space_read(s->source_as, addr, attrs, buf, size);
++    res = address_space_read(&s->source_as, addr, attrs, buf, size);
+     if (res) {
+         return res;
+     }
+@@ -66,7 +66,7 @@ static MemTxResult bitband_write(void *opaque, hwaddr offset, uint64_t value,
+ 
+     /* Find address in underlying memory and round down to multiple of size */
+     addr = bitband_addr(s, offset) & (-size);
+-    res = address_space_read(s->source_as, addr, attrs, buf, size);
++    res = address_space_read(&s->source_as, addr, attrs, buf, size);
+     if (res) {
+         return res;
+     }
+@@ -79,7 +79,7 @@ static MemTxResult bitband_write(void *opaque, hwaddr offset, uint64_t value,
+     } else {
+         buf[bitpos >> 3] &= ~bit;
+     }
+-    return address_space_write(s->source_as, addr, attrs, buf, size);
++    return address_space_write(&s->source_as, addr, attrs, buf, size);
+ }
+ 
+ static const MemoryRegionOps bitband_ops = {
+@@ -111,8 +111,7 @@ static void bitband_realize(DeviceState *dev, Error **errp)
          return;
      }
-     /* Flush out anything from MemoryListeners listening in on this */
-     memory_region_transaction_begin();
--    as->root = NULL;
-     memory_region_transaction_commit();
-     QTAILQ_REMOVE(&address_spaces, as, address_spaces_link);
  
-@@ -2745,7 +2748,6 @@ void address_space_destroy(AddressSpace *as)
-      * entries that the guest should never use.  Wait for the old
-      * values to expire before freeing the data.
-      */
--    as->root = root;
-     call_rcu(as, do_address_space_destroy, rcu);
+-    s->source_as = address_space_init_shareable(s->source_memory,
+-                                                "bitband-source");
++    address_space_init(&s->source_as, s->source_memory, "bitband-source");
  }
  
-@@ -2934,7 +2936,7 @@ void mtree_info(fprintf_function mon_printf, void *f, bool flatview)
+ /* Board init.  */
+diff --git a/memory.c b/memory.c
+index f3da9379df..06052e63a0 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2793,16 +2793,6 @@ static void do_address_space_destroy(AddressSpace *as)
+     g_free(as);
+ }
  
-     QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
-         mon_printf(f, "address-space: %s\n", as->name);
--        mtree_print_mr(mon_printf, f, as->root, 1, 0, &ml_head);
-+        mtree_print_mr(mon_printf, f, address_space_root(as), 1, 0, &ml_head);
-         mon_printf(f, "\n");
+-AddressSpace *address_space_init_shareable(MemoryRegion *root, const char *name)
+-{
+-    AddressSpace *as;
+-
+-    as = g_malloc0(sizeof *as);
+-    address_space_init(as, root, name);
+-
+-    return as;
+-}
+-
+ void address_space_destroy(AddressSpace *as)
+ {
+     /* Flush out anything from MemoryListeners listening in on this */
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index a1acce3c7a..8874763b4b 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -678,6 +678,9 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     CPUARMState *env = &cpu->env;
+     int pagebits;
+     Error *local_err = NULL;
++#ifndef CONFIG_USER_ONLY
++    AddressSpace *as;
++#endif
+ 
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err != NULL) {
+@@ -868,24 +871,21 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+ 
+ #ifndef CONFIG_USER_ONLY
+     if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+-        AddressSpace *as;
++        as = g_new0(AddressSpace, 1);
+ 
+         cs->num_ases = 2;
+ 
+         if (!cpu->secure_memory) {
+             cpu->secure_memory = cs->memory;
+         }
+-        as = address_space_init_shareable(cpu->secure_memory,
+-                                          "cpu-secure-memory");
++        address_space_init(as, cpu->secure_memory, "cpu-secure-memory");
+         cpu_address_space_init(cs, as, ARMASIdx_S);
+     } else {
+         cs->num_ases = 1;
      }
+-
+-    cpu_address_space_init(cs,
+-                           address_space_init_shareable(cs->memory,
+-                                                        "cpu-memory"),
+-                           ARMASIdx_NS);
++    as = g_new0(AddressSpace, 1);
++    address_space_init(as, cs->memory, "cpu-memory");
++    cpu_address_space_init(cs, as, ARMASIdx_NS);
+ #endif
+ 
+     qemu_init_vcpu(cs);
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 69676e13e1..11178300ee 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3741,10 +3741,11 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+ 
+ #ifndef CONFIG_USER_ONLY
+     if (tcg_enabled()) {
+-        AddressSpace *as_normal = address_space_init_shareable(cs->memory,
+-                                                               "cpu-memory");
++        AddressSpace *as_normal = g_new0(AddressSpace, 1);
+         AddressSpace *as_smm = g_new(AddressSpace, 1);
+ 
++        address_space_init(as_normal, cs->memory, "cpu-memory");
++
+         cpu->cpu_as_mem = g_new(MemoryRegion, 1);
+         cpu->cpu_as_root = g_new(MemoryRegion, 1);
  
 -- 
 2.11.0
