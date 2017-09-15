@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46891)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsvSP-0007AA-Eb
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:35:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsvWT-0000sY-CS
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:39:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dsvSK-0004Dc-RJ
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:35:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34250)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dsvSK-0004C3-9e
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:35:12 -0400
-References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
-	<1505375436-28439-15-git-send-email-peterx@redhat.com>
-	<20170914153334.GC7370@stefanha-x1.localdomain>
-	<20170915025947.GL3617@pxdev.xzpeter.org>
+	(envelope-from <eblake@redhat.com>) id 1dsvWS-0008Ld-CN
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:39:29 -0400
+References: <20170915101008.16646-1-kwolf@redhat.com>
+	<20170915101008.16646-4-kwolf@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <a43ad04c-77f8-928c-949e-48129711154c@redhat.com>
-Date: Fri, 15 Sep 2017 13:34:24 -0500
+Message-ID: <7ec4e7ce-e748-1676-ff81-590321b1379b@redhat.com>
+Date: Fri, 15 Sep 2017 13:39:17 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170915025947.GL3617@pxdev.xzpeter.org>
+In-Reply-To: <20170915101008.16646-4-kwolf@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="XQUpnnWSVFxirpX6fLoH5vBd5Jxos9CjS"
-Subject: Re: [Qemu-devel] [RFC 14/15] qmp: support out-of-band (oob)
- execution
+	boundary="lVptb4qcNjfm0S8LjX3FSAsqegGk09KnF"
+Subject: Re: [Qemu-devel] [PATCH 3/6] block: Add reopen queue to
+ bdrv_check_perm()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,50 +25,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---XQUpnnWSVFxirpX6fLoH5vBd5Jxos9CjS
+--lVptb4qcNjfm0S8LjX3FSAsqegGk09KnF
 From: Eric Blake <eblake@redhat.com>
-To: Peter Xu <peterx@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>,
- Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com,
- Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <a43ad04c-77f8-928c-949e-48129711154c@redhat.com>
-Subject: Re: [RFC 14/15] qmp: support out-of-band (oob) execution
-References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
- <1505375436-28439-15-git-send-email-peterx@redhat.com>
- <20170914153334.GC7370@stefanha-x1.localdomain>
- <20170915025947.GL3617@pxdev.xzpeter.org>
-In-Reply-To: <20170915025947.GL3617@pxdev.xzpeter.org>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: famz@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
+Message-ID: <7ec4e7ce-e748-1676-ff81-590321b1379b@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 3/6] block: Add reopen queue to
+ bdrv_check_perm()
+References: <20170915101008.16646-1-kwolf@redhat.com>
+ <20170915101008.16646-4-kwolf@redhat.com>
+In-Reply-To: <20170915101008.16646-4-kwolf@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 09/14/2017 09:59 PM, Peter Xu wrote:
-> On Thu, Sep 14, 2017 at 04:33:34PM +0100, Stefan Hajnoczi wrote:
->> On Thu, Sep 14, 2017 at 03:50:35PM +0800, Peter Xu wrote:
->>> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.=
-txt
->>> index 61fa167..47d16bb 100644
->>> --- a/docs/devel/qapi-code-gen.txt
->>> +++ b/docs/devel/qapi-code-gen.txt
+On 09/15/2017 05:10 AM, Kevin Wolf wrote:
+> In the context of bdrv_reopen(), we'll have to look at the state of the=
 
->>
->> Is there a more relevant place to document QMP run-oob behavior than t=
-he
->> "How to use the QAPI code generator document"?
+> graph as it will be after the reopen. This interface addition is in
+> preparation for the change.
 >=20
-> I agree, but I don't really know it. :(
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  block.c | 34 +++++++++++++++++++---------------
+>  1 file changed, 19 insertions(+), 15 deletions(-)
 >=20
-> Markus, could you provide a hint?
 
-I'm not Markus, but I suggest docs/interop/qmp-spec.txt
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 --=20
 Eric Blake, Principal Software Engineer
@@ -82,7 +62,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---XQUpnnWSVFxirpX6fLoH5vBd5Jxos9CjS
+--lVptb4qcNjfm0S8LjX3FSAsqegGk09KnF
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -91,14 +71,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm8HTAACgkQp6FrSiUn
-Q2pqeQf+NdZp2wJ0sulAvXpZNc5Aja/qOmT8utDZfTU1Us/Y5Fms3M3PVN4yEfjT
-K3pE4kY/Tc8u7gYX+OUSXMZiEFCbSDTO023FvRhv2W0rb3u8ICc21debEzfsNI0T
-pIna21QwcKF/jnW3FTqK5iZtpBNwoYX5rIta49N1ZRHxEdXuOlbHellC8HCwx60z
-+0/nHmEQ7fqV2BB7ErXZqA4kiS5GE9juy2eU/JvjtRrxgbZUsSZea8RvNzOU91Bk
-oVcvPI/AB/G1t6RIR0xowFkIsUU5oHcB8CZKFeS7Q6wI8KOiBPxCB4FKjGY5B/yE
-n5/Hfd+F4ZguHjQ2WvzcM540vkD0/A==
-=a+tO
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm8HlYACgkQp6FrSiUn
+Q2qotwf9GP50tQZnSK8nIAnHbzyd76oJYQN0ZAaaG7KwxrSg2fxaabR5jeMamJmi
+vyNFsT9PTBdS2MuA0LBVqhrnAXQ4fVP+BV/fdRdB+dHQCLt7uGx5iIuRrxBbZCmh
+wOXCz4+ghWFOKMFTC3cXfvgmX80zulrx9oqaIXU5p1d0Bcvt+mOnY4ReUxPCbltw
+gB1Xmj5CHnKHjTcKFKYZo7g/IAjcP6U6vRMRGfDs9GyoM44LJgMlBzSYxqMhj+LZ
+CiGKjSnnYXvVeh83onTMdNRrtA2KnXtUswHzXQEKYOKGFASKbbM4Eib0FyLPDBcs
+L6bxZzjclAdNenO+/8WL+zve0eim+g==
+=2NJl
 -----END PGP SIGNATURE-----
 
---XQUpnnWSVFxirpX6fLoH5vBd5Jxos9CjS--
+--lVptb4qcNjfm0S8LjX3FSAsqegGk09KnF--
