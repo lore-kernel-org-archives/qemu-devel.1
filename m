@@ -1,28 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55237)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dsmnO-0004yX-9R
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:20:25 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dsmpr-0007b0-L3
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:22:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dsmnK-0006sV-9N
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:20:22 -0400
-Received: from mail-eopbgr00099.outbound.protection.outlook.com
-	([40.107.0.99]:4848
-	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
-	id 1dsmnJ-0006qk-U4
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:20:18 -0400
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-References: <20170707142138.411-1-pbutsykin@virtuozzo.com>
-	<382ad117-4a3e-6737-c93e-c2ca4cb20789@virtuozzo.com>
-Message-ID: <3fb5716f-ca40-3e20-8e73-25c87a4c2b5c@virtuozzo.com>
-Date: Fri, 15 Sep 2017 12:20:08 +0300
+	(envelope-from <dgilbert@redhat.com>) id 1dsmpn-0000Wg-L8
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:22:55 -0400
+Date: Fri, 15 Sep 2017 10:22:43 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170915092242.GB2170@work-vm>
+References: <20170915054404.19914-1-famz@redhat.com>
+	<20170915054404.19914-3-famz@redhat.com>
+	<20170915080350.GS3617@pxdev.xzpeter.org>
+	<20170915082026.GG17199@lemon> <20170915084234.GA2170@work-vm>
+	<20170915085247.GH17199@lemon>
 MIME-Version: 1.0
-In-Reply-To: <382ad117-4a3e-6737-c93e-c2ca4cb20789@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio-serial: add enable_backend callback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170915085247.GH17199@lemon>
+Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Cancel migration at exit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,105 +26,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: amit@kernel.org, mst@redhat.com, pbonzini@redhat.com, dgilbert@redhat.com, den@openvz.org
+To: Fam Zheng <famz@redhat.com>
+Cc: Peter Xu <peterx@redhat.com>, qemu-stable@nongnu.org, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
 
-On 17.07.2017 16:56, Pavel Butsykin wrote:
-> On 07.07.2017 17:21, Pavel Butsykin wrote:
->> We should guarantee that RAM will not be modified while VM has a stopped
->> state, otherwise it can lead to negative consequences during post-copy
->> migration. In RUN_STATE_FINISH_MIGRATE step, it's expected that RAM on
->> source side will not be modified as this could lead to non-consistent 
->> vm state
->> on the destination side. Also RAM access during postcopy-ram migration 
->> with
->> enabled release-ram capability can lead to sad consequences.
->>
->> Let's add enable_backend() callback to avoid undesirable virtioqueue 
->> changes
->> in the guest memory.
->>
->> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
->> ---
->>   hw/char/virtio-console.c          | 21 +++++++++++++++++++++
->>   hw/char/virtio-serial-bus.c       |  7 +++++++
->>   include/hw/virtio/virtio-serial.h |  3 +++
->>   3 files changed, 31 insertions(+)
->>
->> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
->> index 0cb1668c8a..b55905892e 100644
->> --- a/hw/char/virtio-console.c
->> +++ b/hw/char/virtio-console.c
->> @@ -163,6 +163,26 @@ static void chr_event(void *opaque, int event)
->>       }
->>   }
->> +static void virtconsole_enable_backend(VirtIOSerialPort *port, bool 
->> enable)
->> +{
->> +    VirtConsole *vcon = VIRTIO_CONSOLE(port);
->> +
->> +    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
->> +        return;
->> +    }
->> +
->> +    if (enable) {
->> +        VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
->> +
->> +        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
->> +                                 k->is_console ? NULL : chr_event,
->> +                                 vcon, NULL, false);
->> +    } else {
->> +        qemu_chr_fe_set_handlers(&vcon->chr, NULL, NULL,
->> +                                 NULL, NULL, NULL, false);
->> +    }
->> +}
->> +
->>   static void virtconsole_realize(DeviceState *dev, Error **errp)
->>   {
->>       VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
->> @@ -233,6 +253,7 @@ static void virtserialport_class_init(ObjectClass 
->> *klass, void *data)
->>       k->unrealize = virtconsole_unrealize;
->>       k->have_data = flush_buf;
->>       k->set_guest_connected = set_guest_connected;
->> +    k->enable_backend = virtconsole_enable_backend;
->>       k->guest_writable = guest_writable;
->>       dc->props = virtserialport_properties;
->>   }
->> diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
->> index f5bc173844..f0f18c8e7c 100644
->> --- a/hw/char/virtio-serial-bus.c
->> +++ b/hw/char/virtio-serial-bus.c
->> @@ -637,6 +637,13 @@ static void set_status(VirtIODevice *vdev, 
->> uint8_t status)
->>       if (!(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
->>           guest_reset(vser);
->>       }
->> +
->> +    QTAILQ_FOREACH(port, &vser->ports, next) {
->> +        VirtIOSerialPortClass *vsc = VIRTIO_SERIAL_PORT_GET_CLASS(port);
->> +        if (vsc->enable_backend) {
->> +            vsc->enable_backend(port, vdev->vm_running);
->> +        }
->> +    }
->>   }
->>   static void vser_reset(VirtIODevice *vdev)
->> diff --git a/include/hw/virtio/virtio-serial.h 
->> b/include/hw/virtio/virtio-serial.h
->> index b19c44727f..12657a9f39 100644
->> --- a/include/hw/virtio/virtio-serial.h
->> +++ b/include/hw/virtio/virtio-serial.h
->> @@ -58,6 +58,9 @@ typedef struct VirtIOSerialPortClass {
->>           /* Guest opened/closed device. */
->>       void (*set_guest_connected)(VirtIOSerialPort *port, int 
->> guest_connected);
->> +    /* Enable/disable backend for virtio serial port */
->> +    void (*enable_backend)(VirtIOSerialPort *port, bool enable);
->> +
->>           /* Guest is now ready to accept data (virtqueues set up). */
->>       void (*guest_ready)(VirtIOSerialPort *port);
->>
+* Fam Zheng (famz@redhat.com) wrote:
+> On Fri, 09/15 09:42, Dr. David Alan Gilbert wrote:
+> > * Fam Zheng (famz@redhat.com) wrote:
+> > > On Fri, 09/15 16:03, Peter Xu wrote:
+> > > > On Fri, Sep 15, 2017 at 01:44:03PM +0800, Fam Zheng wrote:
+> > > > > bdrv_close_all() would abort() due to op blockers added by BMDS, clean
+> > > > > up migration states when main loop quits to avoid that.
+> > > > > 
+> > > > > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > > > > ---
+> > > > >  include/migration/misc.h | 1 +
+> > > > >  migration/migration.c    | 7 ++++++-
+> > > > >  vl.c                     | 3 +++
+> > > > >  3 files changed, 10 insertions(+), 1 deletion(-)
+> > > > > 
+> > > > > diff --git a/include/migration/misc.h b/include/migration/misc.h
+> > > > > index c079b7771b..b9a26b0898 100644
+> > > > > --- a/include/migration/misc.h
+> > > > > +++ b/include/migration/misc.h
+> > > > > @@ -54,5 +54,6 @@ bool migration_has_failed(MigrationState *);
+> > > > >  /* ...and after the device transmission */
+> > > > >  bool migration_in_postcopy_after_devices(MigrationState *);
+> > > > >  void migration_global_dump(Monitor *mon);
+> > > > > +void migrate_cancel(void);
+> > > > >  
+> > > > >  #endif
+> > > > > diff --git a/migration/migration.c b/migration/migration.c
+> > > > > index 959e8ec88e..2c844945c7 100644
+> > > > > --- a/migration/migration.c
+> > > > > +++ b/migration/migration.c
+> > > > > @@ -1274,11 +1274,16 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
+> > > > >      }
+> > > > >  }
+> > > > >  
+> > > > > -void qmp_migrate_cancel(Error **errp)
+> > > > > +void migrate_cancel(void)
+> > > > >  {
+> > > > >      migrate_fd_cancel(migrate_get_current());
+> > > > >  }
+> > > > >  
+> > > > > +void qmp_migrate_cancel(Error **errp)
+> > > > > +{
+> > > > > +    migrate_cancel();
+> > > > > +}
+> > > > > +
+> > > > 
+> > > > Nit: I would prefer just call migrate_fd_cancel() below, since I don't
+> > > > see much point to introduce migrate_cancel() which only calls
+> > > > migrate_fd_cancel()...
+> > > 
+> > > migrate_get_current() is a migration internal IMHO. But that can be moved to
+> > > migrate_fd_cancel() so the parameter is dropped.
+> > > 
+> > > > 
+> > > > >  void qmp_migrate_set_cache_size(int64_t value, Error **errp)
+> > > > >  {
+> > > > >      MigrationState *s = migrate_get_current();
+> > > > > diff --git a/vl.c b/vl.c
+> > > > > index fb1f05b937..abbe61f40b 100644
+> > > > > --- a/vl.c
+> > > > > +++ b/vl.c
+> > > > > @@ -87,6 +87,7 @@ int main(int argc, char **argv)
+> > > > >  #include "sysemu/blockdev.h"
+> > > > >  #include "hw/block/block.h"
+> > > > >  #include "migration/misc.h"
+> > > > > +#include "migration/savevm.h"
+> > > > >  #include "migration/snapshot.h"
+> > > > >  #include "migration/global_state.h"
+> > > > >  #include "sysemu/tpm.h"
+> > > > > @@ -4799,6 +4800,8 @@ int main(int argc, char **argv, char **envp)
+> > > > >      iothread_stop_all();
+> > > > >  
+> > > > >      pause_all_vcpus();
+> > > > > +    migrate_cancel();
+> > > > 
+> > > > IIUC this is an async cancel, so when reach here the migration thread
+> > > > can still be alive.  Then...
+> > > > 
+> > > > > +    qemu_savevm_state_cleanup();
+> > > > 
+> > > > ... Here calling qemu_savevm_state_cleanup() may be problematic if
+> > > > migration thread has not yet quitted.
+> > > > 
+> > > > I'm thinking whether we should make migrate_fd_cancel() wait until the
+> > > > migration thread finishes (state change to CANCELLED).  Then the
+> > > > migration thread will do the cleanup, and here we can avoid calling
+> > > > qemu_savevm_state_cleanup() as well.
+> > > 
+> > > But if the migration thread is stuck and CANCELLED is never reached, we'll hang
+> > > here?
+> > 
+> > I'm not sure I see an easy fix; I agree with Peter that calling
+> > migrate_cancel() followed by qemu_savevm_state_cleanup() is racy,
+> > because the cancel just forces the state to CANCELLING before coming
+> > back to you, and the migration thread asynchronously starts to
+> > fail/cleanup.
+> > 
+> > migrate_cancel() can forcibly unblock some cases because it calls
+> > shutdown(2) on the network fd, but there are other ways for a migration
+> > to hang.
+> > 
+> > Having said that,  the migration thread does it's calls
+> > to qemu_savevm_state_cleanup under the lock_iothread;
+> > Do we have that lock at this point?
 > 
-> ping
+> Yes we do.  Main loop releases the lock only during poll(), other parts of
+> main() all have the lock.
 
-ping^2
+Having said that though this is pretty confusing; because at this point
+we're after main_loop has exited.
+I don't think the migration thread will exit without having taken the
+iothread lock; so if we've got it at this point then the migration
+thread will never exit, and it will never call qemu_savevm_state_cleanup
+itself - so that race might not exist?
+
+However, assuming the migration is at an earlier point, it might be
+calling one of the state handlers that you're cleaning up, and that's
+racy in individual devices.
+
+If we have the lock I don't think we can wait for the migration to
+complete/cancel.   The transition from cancelling->cancelled happens
+in migrate_fd_cleanup() - and that's run of a bh which I assume don't
+work any more at this point.
+
+Perhaps the answer is to move this to qemu_system_shutdown_request prior
+to the point where shutdown_requested is set?  At that point we've
+still got the main loop, although hmm I'm not convinced if it's
+consistent whether that's called with or without the lock held.
+
+Dave
+
+> Fam
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
