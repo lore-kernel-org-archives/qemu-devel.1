@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47013)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47550)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dsoBl-0006zv-QT
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:49:38 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dsoDZ-0007jV-J8
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:51:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dsoBi-00005k-OY
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:49:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44506)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dsoBi-000058-FO
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:49:34 -0400
-Date: Fri, 15 Sep 2017 11:49:26 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170915104926.GA14994@stefanha-x1.localdomain>
-References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
-	<CAJ+F1CL1CekcYq2xnrkhsjyx17FDSgppP1C+YqL0iNgv8HbwYQ@mail.gmail.com>
-	<20170914151911.GB7370@stefanha-x1.localdomain>
-	<20170915035057.GM3617@pxdev.xzpeter.org>
+	(envelope-from <alex.bennee@linaro.org>) id 1dsoDW-0000ta-FY
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:51:29 -0400
+Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:53761)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dsoDW-0000t8-8B
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:51:26 -0400
+Received: by mail-wr0-x22f.google.com with SMTP id l22so1507678wrc.10
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 03:51:26 -0700 (PDT)
+References: <20170913030119.3957-1-famz@redhat.com>
+	<20170913030119.3957-5-famz@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170913030119.3957-5-famz@redhat.com>
+Date: Fri, 15 Sep 2017 11:51:23 +0100
+Message-ID: <87y3pg8cb8.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170915035057.GM3617@pxdev.xzpeter.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 00/15] QMP: out-of-band (OOB) execution
- support
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v7 04/13] tests: Add a test key pair
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,56 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, Philippe =?utf-8?Q?Mathieu?= =?utf-8?Q?-Daud=C3=A9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-On Fri, Sep 15, 2017 at 11:50:57AM +0800, Peter Xu wrote:
-> On Thu, Sep 14, 2017 at 04:19:11PM +0100, Stefan Hajnoczi wrote:
-> > On Thu, Sep 14, 2017 at 01:15:09PM +0200, Marc-Andr=E9 Lureau wrote:
-> > > There should be a limit in the number of requests the thread can
-> > > queue. Before the patch, the limit was enforced by system socket
-> > > buffering I think. Now, should oob commands still be processed even=
- if
-> > > the queue is full? If so, the thread can't be suspended.
-> >=20
-> > I agree.
-> >=20
-> > Memory usage must be bounded.  The number of requests is less importa=
-nt
-> > than the amount of memory consumed by them.
-> >=20
-> > Existing QMP clients that send multiple QMP commands without waiting =
-for
-> > replies need to rethink their strategy because OOB commands cannot be
-> > processed if queued non-OOB commands consume too much memory.
->=20
-> Thanks for pointing out this.  Yes the memory usage problem is valid,
-> as Markus pointed out as well in previous discussions (in "Flow
-> Control" section of that long reply).  Hopefully this series basically
-> can work from design prospective, then I'll add this flow control in
-> next version.
->=20
-> Regarding to what we should do if the limit is reached: Markus
-> provided a few options, but the one I prefer most is that we don't
-> respond, but send an event showing that a command is dropped.
-> However, I would like it not queued, but a direct reply (after all,
-> it's an event, and we should not need to care much on ordering of it).
-> Then we can get rid of the babysitting of those "to be failed"
-> requests asap, meanwhile we don't lose anything IMHO.
->=20
-> I think I also missed at least a unit test for this new interface.
-> Again, I'll add it after the whole idea is proved solid.  Thanks,
 
-Another solution: the server reports available receive buffer space to
-the client.  The server only guarantees immediate OOB processing when
-the client stays within the receive buffer size.
+Fam Zheng <famz@redhat.com> writes:
 
-Clients wishing to take advantage of OOB must query the receive buffer
-size and make sure to leave enough room.
+> This will be used by setup test user ssh.
+>
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-The advantage of this approach is that the semantics are backwards
-compatible (existing clients may continue to queue as many commands as
-they wish) and it requires no new behavior in the client (no new QMP
-event code path).
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-Stefan
+> ---
+>  tests/keys/id_rsa     | 27 +++++++++++++++++++++++++++
+>  tests/keys/id_rsa.pub |  1 +
+>  2 files changed, 28 insertions(+)
+>  create mode 100644 tests/keys/id_rsa
+>  create mode 100644 tests/keys/id_rsa.pub
+>
+> diff --git a/tests/keys/id_rsa b/tests/keys/id_rsa
+> new file mode 100644
+> index 0000000000..3a3787154b
+> --- /dev/null
+> +++ b/tests/keys/id_rsa
+> @@ -0,0 +1,27 @@
+> +----BEGIN RSA PRIVATE KEY-----
+> +MIIEowIBAAKCAQEAopAuOlmLV6LVHdFBj8/eeOwI9CqguIJPp7eAQSZvOiB4Ag/R
+> +coEhl/RBbrV5Yc/SmSD4PTpJO/iM10RwliNjDb4a3I8q3sykRJu9c9PI/YsH8WN9
+> ++NH2NjKPtJIcKTu287IM5JYxyB6nDoOzILbTyJ1TDR/xH6qYEfBAyiblggdjcvhA
+> +RTf93QIn39F/xLypXvT1K2O9BJEsnJ8lEUvB2UXhKo/JTfSeZF8wPBeowaP9EONk
+> +7b+nuJOWHGg68Ji6wVi62tjwl2Szch6lxIhZBpnV7QNRKMfYHP6eIyF4pusazzZq
+> +Telsq6xI2ghecWLzb/MF5A+rklsGx2FNuJSAJwIDAQABAoIBAHHi4o/8VZNivz0x
+> +cWXn8erzKV6tUoWQvW85Lj/2RiwJvSlsnYZDkx5af1CpEE2HA/pFT8PNRqsd+MWC
+> +7AEy710cVsM4BYerBFYQaYxwzblaoojo88LSjVPw3h5Z0iLM8+IMVd36nwuc9dpE
+> +R8TecMZ1+U4Tl6BgqkK+9xToZRdPKdjS8L5MoFhGN+xY0vRbbJbGaV9Q0IHxLBkB
+> +rEBV7T1mUynneCHRUQlJQEwJmKpT8MH3IjsUXlG5YvnuuvcQJSNTaW2iDLxuOKp8
+> +cxW8+qL88zpb1D5dppoIu6rlrugN0azSq70ruFJQPc/A8GQrDKoGgRQiagxNY3u+
+> +vHZzXlECgYEA0dKO3gfkSxsDBb94sQwskMScqLhcKhztEa8kPxTx6Yqh+x8/scx3
+> +XhJyOt669P8U1v8a/2Al+s81oZzzfQSzO1Q7gEwSrgBcRMSIoRBUw9uYcy02ngb/
+> +j/ng3DGivfJztjjiSJwb46FHkJ2JR8mF2UisC6UMXk3NgFY/3vWQx78CgYEAxlcG
+> +T3hfSWSmTgKRczMJuHQOX9ULfTBIqwP5VqkkkiavzigGRirzb5lgnmuTSPTpF0LB
+> +XVPjR2M4q+7gzP0Dca3pocrvLEoxjwIKnCbYKnyyvnUoE9qHv4Kr+vDbgWpa2LXG
+> +JbLmE7tgTCIp20jOPPT4xuDvlbzQZBJ5qCQSoZkCgYEAgrotSSihlCnAOFSTXbu4
+> +CHp3IKe8xIBBNENq0eK61kcJpOxTQvOha3sSsJsU4JAM6+cFaxb8kseHIqonCj1j
+> +bhOM/uJmwQJ4el/4wGDsbxriYOBKpyq1D38gGhDS1IW6kk3erl6VAb36WJ/OaGum
+> +eTpN9vNeQWM4Jj2WjdNx4QECgYAwTdd6mU1TmZCrJRL5ZG+0nYc2rbMrnQvFoqUi
+> +BvWiJovggHzur90zy73tNzPaq9Ls2FQxf5G1vCN8NCRJqEEjeYCR59OSDMu/EXc2
+> +CnvQ9SevHOdS1oEDEjcCWZCMFzPi3XpRih1gptzQDe31uuiHjf3cqcGPzTlPdfRt
+> +D8P92QKBgC4UaBvIRwREVJsdZzpIzm224Bpe8LOmA7DeTnjlT0b3lkGiBJ36/Q0p
+> +VhYh/6cjX4/iuIs7gJbGon7B+YPB8scmOi3fj0+nkJAONue1mMfBNkba6qQTc6Y2
+> +5mEKw2/O7/JpND7ucU3OK9plcw/qnrWDgHxl0Iz95+OzUIIagxne
+> +-----END RSA PRIVATE KEY-----
+> diff --git a/tests/keys/id_rsa.pub b/tests/keys/id_rsa.pub
+> new file mode 100644
+> index 0000000000..d9888e312f
+> --- /dev/null
+> +++ b/tests/keys/id_rsa.pub
+> @@ -0,0 +1 @@
+> +ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCikC46WYtXotUd0UGPz9547Aj0KqC4gk+nt4BBJm86IHgCD9FygSGX9EFutXlhz9KZIPg9Okk7+IzXRHCWI2MNvhrcjyrezKREm71z08j9iwfxY3340fY2Mo+0khwpO7bzsgzkljHIHqcOg7MgttPInVMNH/EfqpgR8EDKJuWCB2Ny+EBFN/3dAiff0X/EvKle9PUrY70EkSycnyURS8HZReEqj8lN9J5kXzA8F6jBo/0Q42Ttv6e4k5YcaDrwmLrBWLra2PCXZLNyHqXEiFkGmdXtA1Eox9gc/p4jIXim6xrPNmpN6WyrrEjaCF5xYvNv8wXkD6uSWwbHYU24lIAn qemu-test
+
+
+--
+Alex Bennée
