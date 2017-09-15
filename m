@@ -1,26 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39231)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40215)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=4248f5c51=Ian.Jackson@citrix.com>)
-	id 1dsv4H-0000rV-9i
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:10:22 -0400
+	(envelope-from <eblake@redhat.com>) id 1dsv7R-0004cz-UX
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:13:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=4248f5c51=Ian.Jackson@citrix.com>)
-	id 1dsv4D-0006zu-1e
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:10:21 -0400
-Received: from smtp.citrix.com ([66.165.176.89]:59596)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=4248f5c51=Ian.Jackson@citrix.com>)
-	id 1dsv4C-0006yi-Rr
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:10:16 -0400
-From: Ian Jackson <ian.jackson@eu.citrix.com>
-Date: Fri, 15 Sep 2017 19:09:58 +0100
-Message-ID: <1505498999-17427-6-git-send-email-ian.jackson@eu.citrix.com>
-In-Reply-To: <1505498999-17427-1-git-send-email-ian.jackson@eu.citrix.com>
-References: <1505498999-17427-1-git-send-email-ian.jackson@eu.citrix.com>
+	(envelope-from <eblake@redhat.com>) id 1dsv7R-0001Xl-2A
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 14:13:37 -0400
+References: <20170915054526.20588-1-famz@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <0289d143-4862-e812-3f5d-0a0bc74a05e7@redhat.com>
+Date: Fri, 15 Sep 2017 13:13:26 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH RFC 5/6] xen: destroy_hvm_domain: Try
- xendevicemodel_shutdown
+In-Reply-To: <20170915054526.20588-1-famz@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="KrILAUb8heGuRHR53LGPOXbHcs8w8af1p"
+Subject: Re: [Qemu-devel] [PATCH] iotests: Print full path of bad output if
+ mismatch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,40 +24,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: xen-devel@nongnu.org, Juergen Gross <jgross@suse.com>, Stefano Stabellini <sstabellini@kernel.org>, Ian Jackson <ian.jackson@eu.citrix.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-xc_interface_open etc. is not going to work if we have dropped
-privilege, but xendevicemodel_shutdown will if everything is new
-enough.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--KrILAUb8heGuRHR53LGPOXbHcs8w8af1p
+From: Eric Blake <eblake@redhat.com>
+To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+Message-ID: <0289d143-4862-e812-3f5d-0a0bc74a05e7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] iotests: Print full path of bad output if
+ mismatch
+References: <20170915054526.20588-1-famz@redhat.com>
+In-Reply-To: <20170915054526.20588-1-famz@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Ian Jackson <Ian.Jackson@eu.citrix.com>
----
- hw/i386/xen/xen-hvm.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+On 09/15/2017 12:45 AM, Fam Zheng wrote:
+> So it is easier to copy paste the path.
+>=20
+> Signed-off-by: Fam Zheng <famz@redhat.com>
+> ---
+>  tests/qemu-iotests/check | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+> index d504b6e455..4583a0c269 100755
+> --- a/tests/qemu-iotests/check
+> +++ b/tests/qemu-iotests/check
+> @@ -353,7 +353,7 @@ do
+>                  else
+>                      echo " - output mismatch (see $seq.out.bad)"
+>                      mv $tmp.out $seq.out.bad
+> -                    $diff -w "$reference" $seq.out.bad
+> +                    $diff -w "$reference" $(realpath $seq.out.bad)
 
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index 83420cd..639425a 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -1386,9 +1386,18 @@ void destroy_hvm_domain(bool reboot)
- {
-     xc_interface *xc_handle;
-     int sts;
-+    int rc;
- 
-     unsigned int reason = reboot ? SHUTDOWN_reboot : SHUTDOWN_poweroff;
- 
-+    if (xen_dmod) {
-+        rc = xendevicemodel_shutdown(xen_dmod, xen_domid, reason);
-+        if (!rc)
-+            return;
-+        perror("xendevicemodel_shutdown failed");
-+        /* well, try the old thing then */
-+    }
-+
-     xc_handle = xc_interface_open(0, 0, 0);
-     if (xc_handle == NULL) {
-         fprintf(stderr, "Cannot acquire xenctrl handle\n");
--- 
-2.1.4
+Realpath collapses symlinks, and $() costs a process.  Also, your patch
+fails miserably if the current working directory contains spaces; you
+forgot to quote $().  It would be simpler, and more correct, to do:
+
+$diff -w "$reference" "$PWD/$seq.out.bad"
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--KrILAUb8heGuRHR53LGPOXbHcs8w8af1p
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm8GEYACgkQp6FrSiUn
+Q2pZ4QgAqaGQdIh7r7A/e8X6rWV2IffaKw/mNgjJwv4xZ3KwYVoKopezLI4TgQDL
+efGl91ARP4R9LmgLCZ659N1SfejVcqIReCxXCGiuE8sbvKgi+a/8hR+zGh9/4MBW
+dpSMcdAj1UaU+IyJ9agK866Het2Pgb8zL7ENjvd5WkS8HBFxqzlScZsDHU7Q5EU3
+uFIXE+dL7AtztebOlM2ufFFEcxHS+JvNcvvlWuZRCF2kP2rchdQxTn5j894RFp3c
+0AAuML6DAakYfSh7HdKS025Fkl4bMKusF6CsKC5690hcbg7dqUKXmVITveJ32BYV
+kV65FS1Ajz3a/bMmXFqAqKGO+fwssA==
+=gR/j
+-----END PGP SIGNATURE-----
+
+--KrILAUb8heGuRHR53LGPOXbHcs8w8af1p--
