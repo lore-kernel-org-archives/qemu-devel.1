@@ -1,28 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41118)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dss2k-0006ek-O3
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:56:35 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dss2v-0006w6-LB
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:56:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dss2h-00066T-JP
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:56:34 -0400
-Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:47539)
+	(envelope-from <stefanha@redhat.com>) id 1dss2s-0006MO-Jr
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:56:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43382)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dss2h-00065A-9h
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:56:31 -0400
-Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id A8793AB560
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 16:56:28 +0200 (CEST)
-Date: Fri, 15 Sep 2017 16:56:24 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170915165624.1e9b51c2@bahia.lan>
-In-Reply-To: <1505406696-2260-1-git-send-email-jan.dakinevich@gmail.com>
-References: <1505406696-2260-1-git-send-email-jan.dakinevich@gmail.com>
+	(Exim 4.71) (envelope-from <stefanha@redhat.com>) id 1dss2s-0006Lu-Aw
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:56:42 -0400
+Date: Fri, 15 Sep 2017 15:56:32 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170915145632.GD18767@stefanha-x1.localdomain>
+References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
+	<CAJ+F1CL1CekcYq2xnrkhsjyx17FDSgppP1C+YqL0iNgv8HbwYQ@mail.gmail.com>
+	<20170914151911.GB7370@stefanha-x1.localdomain>
+	<20170915035057.GM3617@pxdev.xzpeter.org>
+	<20170915104926.GA14994@stefanha-x1.localdomain>
+	<20170915113428.GF13610@redhat.com> <20170915120643.GN2170@work-vm>
+	<20170915121433.GI13610@redhat.com> <20170915121956.GO2170@work-vm>
+	<20170915122913.GJ13610@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/VEVTccEPAUCBKS0lHAtlnXV";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH] 9pfs: check the size of transport buffer
- before marshaling
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170915122913.GJ13610@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 00/15] QMP: out-of-band (OOB) execution
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,174 +35,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Dakinevich <jan.dakinevich@gmail.com>
-Cc: qemu-devel@nongnu.org, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
---Sig_/VEVTccEPAUCBKS0lHAtlnXV
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, 14 Sep 2017 19:31:36 +0300
-Jan Dakinevich <jan.dakinevich@gmail.com> wrote:
-
-> v9fs_do_readdir_with_stat() and v9fs_do_readdir() stores as much data in
-> the buffer as can fit unless marshaling erorr occurs. However, after
-> commit 23a006d the behavior pdu_marshal was changed, and on error the
-> routine assumes that buffers are misconfigured and breaks communication.
+On Fri, Sep 15, 2017 at 01:29:13PM +0100, Daniel P. Berrange wrote:
+> On Fri, Sep 15, 2017 at 01:19:56PM +0100, Dr. David Alan Gilbert wrote:
+> > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > On Fri, Sep 15, 2017 at 01:06:44PM +0100, Dr. David Alan Gilbert wr=
+ote:
+> > > > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > > > On Fri, Sep 15, 2017 at 11:49:26AM +0100, Stefan Hajnoczi wrote=
+:
+> > > > > > On Fri, Sep 15, 2017 at 11:50:57AM +0800, Peter Xu wrote:
+> > > > > > > On Thu, Sep 14, 2017 at 04:19:11PM +0100, Stefan Hajnoczi w=
+rote:
+> > > > > > > > On Thu, Sep 14, 2017 at 01:15:09PM +0200, Marc-Andr=E9 Lu=
+reau wrote:
+> > > > > > > > > There should be a limit in the number of requests the t=
+hread can
+> > > > > > > > > queue. Before the patch, the limit was enforced by syst=
+em socket
+> > > > > > > > > buffering I think. Now, should oob commands still be pr=
+ocessed even if
+> > > > > > > > > the queue is full? If so, the thread can't be suspended=
+.
+> > > > > > > >=20
+> > > > > > > > I agree.
+> > > > > > > >=20
+> > > > > > > > Memory usage must be bounded.  The number of requests is =
+less important
+> > > > > > > > than the amount of memory consumed by them.
+> > > > > > > >=20
+> > > > > > > > Existing QMP clients that send multiple QMP commands with=
+out waiting for
+> > > > > > > > replies need to rethink their strategy because OOB comman=
+ds cannot be
+> > > > > > > > processed if queued non-OOB commands consume too much mem=
+ory.
+> > > > > > >=20
+> > > > > > > Thanks for pointing out this.  Yes the memory usage problem=
+ is valid,
+> > > > > > > as Markus pointed out as well in previous discussions (in "=
+Flow
+> > > > > > > Control" section of that long reply).  Hopefully this serie=
+s basically
+> > > > > > > can work from design prospective, then I'll add this flow c=
+ontrol in
+> > > > > > > next version.
+> > > > > > >=20
+> > > > > > > Regarding to what we should do if the limit is reached: Mar=
+kus
+> > > > > > > provided a few options, but the one I prefer most is that w=
+e don't
+> > > > > > > respond, but send an event showing that a command is droppe=
+d.
+> > > > > > > However, I would like it not queued, but a direct reply (af=
+ter all,
+> > > > > > > it's an event, and we should not need to care much on order=
+ing of it).
+> > > > > > > Then we can get rid of the babysitting of those "to be fail=
+ed"
+> > > > > > > requests asap, meanwhile we don't lose anything IMHO.
+> > > > > > >=20
+> > > > > > > I think I also missed at least a unit test for this new int=
+erface.
+> > > > > > > Again, I'll add it after the whole idea is proved solid.  T=
+hanks,
+> > > > > >=20
+> > > > > > Another solution: the server reports available receive buffer=
+ space to
+> > > > > > the client.  The server only guarantees immediate OOB process=
+ing when
+> > > > > > the client stays within the receive buffer size.
+> > > > > >=20
+> > > > > > Clients wishing to take advantage of OOB must query the recei=
+ve buffer
+> > > > > > size and make sure to leave enough room.
+> > > > >=20
+> > > > > I don't think having to query it ahead of time is particularly =
+nice,
+> > > > > and of course it is inherantly racy.
+> > > > >=20
+> > > > > I would just have QEMU emit an event when it pausing processing=
+ of the
+> > > > > incoming commands due to a full queue.  If the event includes t=
+he ID
+> > > > > of the last queued command, the client will know which (if any)=
+ of
+> > > > > its outstanding commands are delayed. Another even can be sent =
+when
+> > > > > it restarts reading.
+> > > >=20
+> > > > Hmm and now we're implementing flow control!
+> > > >=20
+> > > > a) What exactly is the current semantics/buffer sizes?
+> > > > b) When do clients send multiple QMP commands on one channel with=
+out
+> > > > waiting for the response to the previous command?
+> > > > c) Would one queue entry for each class of commands/channel work
+> > > >   (Where a class of commands is currently 'normal' and 'oob')
+> > >=20
+> > > I do wonder if we need to worry about request limiting at all from =
+the
+> > > client side.  For non-OOB commands clients will wait for a reply be=
+fore
+> > > sending a 2nd non-OOB command, so you'll never get a deep queue for=
+.
+> > >=20
+> > > OOB commands are supposed to be things which can be handled quickly
+> > > without blocking, so even if a client sent several commands at once
+> > > without waiting for replies, they're going to be processed quickly,
+> > > so whether we temporarily block reading off the wire is a minor
+> > > detail.
+> >=20
+> > Lets just define it so that it can't - you send an OOB command and wa=
+it
+> > for it's response before sending another on that channel.
+> >=20
+> > > IOW, I think we could just have a fixed 10 command queue and apps j=
+ust
+> > > pretend that there's an infinite queue and nothing bad would happen=
+ from
+> > > the app's POV.
+> >=20
+> > Can you justify 10 as opposed to 1?
 >=20
+> Semantically I don't think it makes a difference if the OOB commands ar=
+e
+> being processed sequentially by their thread. A >1 length queue would o=
+nly
+> matter for non-OOB commands if an app was filling the pipeline with non=
+-OOB
+> requests, as then that could block reading of OOB commands.=20
 
-I agree and I could easily reproduce with a linux guest using 9p2000.u, ie,=
- the
-v9fs_do_readdir_with_stat() case, but I couldn't find a way to break transp=
-ort
-with 9p2000.L. Do you have a reproducer for the latter ?
+To summarize:
 
-I ask because I would appreciate to see some more details in the changelog,
-for the records.
+The QMP server has a lookahead of 1 command so it can dispatch
+out-of-band commands.  If 2 or more non-OOB commands are queued at the
+same time then OOB processing will not occur.
 
-> Signed-off-by: Jan Dakinevich <jan.dakinevich@gmail.com>
-> ---
+Is that right?
 
-Anyway the patch looks fine, but I'll wait for your answer before pushing
-to 9p-next.
-
-Cheers,
-
---
-Greg
-
->  hw/9pfs/9p.c | 44 ++++++++++++++++++++++++++++++++------------
->  1 file changed, 32 insertions(+), 12 deletions(-)
->=20
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 1e38109..8e0b87e 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -1679,6 +1679,16 @@ static void v9fs_init_qiov_from_pdu(QEMUIOVector *=
-qiov, V9fsPDU *pdu,
->      qemu_iovec_concat(qiov, &elem, skip, size);
->  }
-> =20
-> +static size_t v9fs_marshal_size(V9fsPDU *pdu)
-> +{
-> +    struct iovec *iov;
-> +    unsigned int niov;
-> +
-> +    pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, 0);
-> +
-> +    return iov_size(iov, niov);
-> +}
-> +
->  static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fid=
-p,
->                             uint64_t off, uint32_t max_count)
->  {
-> @@ -1725,6 +1735,10 @@ static int coroutine_fn v9fs_do_readdir_with_stat(=
-V9fsPDU *pdu,
->      off_t saved_dir_pos;
->      struct dirent *dent;
-> =20
-> +    /* 11 =3D 7 + 4 (7 =3D start offset, 4 =3D space for storing count) =
-*/
-> +    size_t offset =3D 11;
-> +    size_t marshal_size =3D v9fs_marshal_size(pdu);
-> +
->      /* save the directory position */
->      saved_dir_pos =3D v9fs_co_telldir(pdu, fidp);
->      if (saved_dir_pos < 0) {
-> @@ -1752,18 +1766,23 @@ static int coroutine_fn v9fs_do_readdir_with_stat=
-(V9fsPDU *pdu,
->          if (err < 0) {
->              break;
->          }
-> -        /* 11 =3D 7 + 4 (7 =3D start offset, 4 =3D space for storing cou=
-nt) */
-> -        len =3D pdu_marshal(pdu, 11 + count, "S", &v9stat);
-> =20
-> -        v9fs_readdir_unlock(&fidp->fs.dir);
-> +        if (v9stat.size + 2 > MIN(marshal_size - offset, max_count - cou=
-nt)) {
-> +            v9fs_readdir_unlock(&fidp->fs.dir);
-> =20
-> -        if ((len !=3D (v9stat.size + 2)) || ((count + len) > max_count))=
- {
->              /* Ran out of buffer. Set dir back to old position and retur=
-n */
->              v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
->              v9fs_stat_free(&v9stat);
->              v9fs_path_free(&path);
->              return count;
->          }
-> +
-> +        len =3D pdu_marshal(pdu, offset, "S", &v9stat);
-> +        BUG_ON(len !=3D v9stat.size + 2);
-> +
-> +        v9fs_readdir_unlock(&fidp->fs.dir);
-> +
-> +        offset +=3D len;
->          count +=3D len;
->          v9fs_stat_free(&v9stat);
->          v9fs_path_free(&path);
-> @@ -1884,6 +1903,10 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU *p=
-du, V9fsFidState *fidp,
->      off_t saved_dir_pos;
->      struct dirent *dent;
-> =20
-> +    /* 11 =3D 7 + 4 (7 =3D start offset, 4 =3D space for storing count) =
-*/
-> +    size_t offset =3D 11;
-> +    size_t marshal_size =3D v9fs_marshal_size(pdu);
-> +
->      /* save the directory position */
->      saved_dir_pos =3D v9fs_co_telldir(pdu, fidp);
->      if (saved_dir_pos < 0) {
-> @@ -1899,7 +1922,8 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU *pd=
-u, V9fsFidState *fidp,
->          }
->          v9fs_string_init(&name);
->          v9fs_string_sprintf(&name, "%s", dent->d_name);
-> -        if ((count + v9fs_readdir_data_size(&name)) > max_count) {
-> +        if (v9fs_readdir_data_size(&name) > MIN(marshal_size - offset,
-> +                                                max_count - count)) {
->              v9fs_readdir_unlock(&fidp->fs.dir);
-> =20
->              /* Ran out of buffer. Set dir back to old position and retur=
-n */
-> @@ -1918,18 +1942,14 @@ static int coroutine_fn v9fs_do_readdir(V9fsPDU *=
-pdu, V9fsFidState *fidp,
->          qid.type =3D 0;
->          qid.version =3D 0;
-> =20
-> -        /* 11 =3D 7 + 4 (7 =3D start offset, 4 =3D space for storing cou=
-nt) */
-> -        len =3D pdu_marshal(pdu, 11 + count, "Qqbs",
-> +        len =3D pdu_marshal(pdu, offset, "Qqbs",
->                            &qid, dent->d_off,
->                            dent->d_type, &name);
-> +        BUG_ON(len !=3D v9fs_readdir_data_size(&name));
-> =20
->          v9fs_readdir_unlock(&fidp->fs.dir);
-> =20
-> -        if (len < 0) {
-> -            v9fs_co_seekdir(pdu, fidp, saved_dir_pos);
-> -            v9fs_string_free(&name);
-> -            return len;
-> -        }
-> +        offset +=3D len;
->          count +=3D len;
->          v9fs_string_free(&name);
->          saved_dir_pos =3D dent->d_off;
-
-
---Sig_/VEVTccEPAUCBKS0lHAtlnXV
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWbvqGAAKCRAC/DrrAQHb
-wrzjAJ9pyt1gUteUQ427GNDHw8iwFWBcqwCgmVkNsW0ctryzGSXEKg031upAUzY=
-=3GMz
------END PGP SIGNATURE-----
-
---Sig_/VEVTccEPAUCBKS0lHAtlnXV--
+Stefan
