@@ -1,33 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42426)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dsxsN-0002p6-UW
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 17:10:16 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dsyEb-0000Jw-Jt
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 17:33:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dsxsJ-0003B8-Tu
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 17:10:15 -0400
-Received: from mail-qt0-x232.google.com ([2607:f8b0:400d:c0d::232]:43899)
+	(envelope-from <peter.maydell@linaro.org>) id 1dsyEa-0008El-Ok
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 17:33:13 -0400
+Received: from mail-wm0-x22d.google.com ([2a00:1450:400c:c09::22d]:49974)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dsxsJ-0003Ak-Pe
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 17:10:11 -0400
-Received: by mail-qt0-x232.google.com with SMTP id i50so3308088qtf.0
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 14:10:11 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170915065821.16600-1-jrtc27@jrtc27.com>
-	<20170915193313.86362-1-jrtc27@jrtc27.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f9965e38-5e75-0d3a-33cb-ce1d8c21ab1d@amsat.org>
-Date: Fri, 15 Sep 2017 18:10:07 -0300
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dsyEa-0008EP-Hh
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 17:33:12 -0400
+Received: by mail-wm0-x22d.google.com with SMTP id e71so11275509wmg.4
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 14:33:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170915193313.86362-1-jrtc27@jrtc27.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v3] linux-user/syscall.c: Handle SH4's
- exceptional alignment for p{read, write}64
+In-Reply-To: <1505462549-27298-1-git-send-email-thuth@redhat.com>
+References: <1505462549-27298-1-git-send-email-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 15 Sep 2017 22:32:50 +0100
+Message-ID: <CAFEAcA9dHX1bv8ZuBBsvdkC21HuTirAaYPHXHUZkxP4GgROwjQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 0/9] Fixes and improvements for various
+ qtests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,24 +29,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: James Clarke <jrtc27@jrtc27.com>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>, Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Eric Blake <eblake@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Peter Xu <peterx@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>, John Snow <jsnow@redhat.com>
 
-On 09/15/2017 04:33 PM, James Clarke wrote:
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1716767
-> Signed-off-by: James Clarke <jrtc27@jrtc27.com>
+On 15 September 2017 at 09:02, Thomas Huth <thuth@redhat.com> wrote:
+> The following changes since commit 3dabde1128b671f36ac6cb36b97b273139964420:
+>
+>   Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20170914' into staging (2017-09-14 16:33:02 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/huth/qemu.git tags/check-20170915
+>
+> for you to fetch changes up to 7b899f4dd596dbb7d271f7fab36fbfffec84868e:
+>
+>   qtest: Avoid passing raw strings through hmp() (2017-09-15 09:05:19 +0200)
+>
+> ----------------------------------------------------------------
+> Some fixes and improvements for various qtests by Eric and me.
+>
+> ----------------------------------------------------------------
+> Eric Blake (5):
+>       test-qga: Kill broken and dead QGA_TEST_SIDE_EFFECTING code
+>       qtest: Don't perform side effects inside assertion
+>       numa-test: Use hmp()
+>       libqtest: Remove dead qtest_instances variable
+>       qtest: Avoid passing raw strings through hmp()
+>
+> Thomas Huth (4):
+>       tests: Introduce generic device hot-plug/hot-unplug functions
+>       tests/test-hmp: Remove puv3 and tricore_testboard from the blacklist
+>       tests/libqtest: Use a proper error message if QTEST_QEMU_BINARY is missing
+>       tests: Fix broken ivshmem-server-msi/-irq tests
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Applied, thanks.
 
-> ---
-> 
-> Changes since v2:
->   * Fixed opening curly brace formatting, both for my new SH4-specific
->     regpairs_aligned function, as well as the Arm one I touched, to appease
->     checkpatch.pl
-> 
-> Changes since v1:
->   * Removed all changes in v1 :)
->   * Added syscall num argument to regpairs_aligned
->   * Added SH4-specific implementation of regpairs_aligned to return 1 for
->     p{read,write}64
+-- PMM
