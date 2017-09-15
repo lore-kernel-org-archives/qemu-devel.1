@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34953)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dskNj-00042o-C3
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:45:44 -0400
+	(envelope-from <famz@redhat.com>) id 1dskNq-00049H-DZ
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:45:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dskNi-0004jB-72
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:45:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56020)
+	(envelope-from <famz@redhat.com>) id 1dskNo-0004mG-0k
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:45:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49790)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dskNi-0004ih-0t
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:45:42 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dskNn-0004ls-Hi
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:45:47 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 15 Sep 2017 14:45:14 +0800
-Message-Id: <20170915064518.3436-10-famz@redhat.com>
+Date: Fri, 15 Sep 2017 14:45:17 +0800
+Message-Id: <20170915064518.3436-13-famz@redhat.com>
 In-Reply-To: <20170915064518.3436-1-famz@redhat.com>
 References: <20170915064518.3436-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL v3 16/38] tests: Add OpenBSD image
+Subject: [Qemu-devel] [PULL v3 19/38] tests: Add README for vm tests
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,65 +26,81 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-The image is prepared following instructions as in:
-
-https://wiki.qemu.org/Hosts/BSD
-
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170913030119.3957-10-famz@redhat.com>
+Message-Id: <20170913030119.3957-13-famz@redhat.com>
 ---
- tests/vm/openbsd | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
- create mode 100755 tests/vm/openbsd
+ tests/vm/README | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
+ create mode 100644 tests/vm/README
 
-diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-new file mode 100755
-index 0000000000..6ae16d97fd
+diff --git a/tests/vm/README b/tests/vm/README
+new file mode 100644
+index 0000000000..7d2fe4ac8d
 --- /dev/null
-+++ b/tests/vm/openbsd
-@@ -0,0 +1,43 @@
-+#!/usr/bin/env python
-+#
-+# OpenBSD VM image
-+#
-+# Copyright 2017 Red Hat Inc.
-+#
-+# Authors:
-+#  Fam Zheng <famz@redhat.com>
-+#
-+# This code is licensed under the GPL version 2 or later.  See
-+# the COPYING file in the top-level directory.
-+#
++++ b/tests/vm/README
+@@ -0,0 +1,63 @@
++=== VM test suite to run build in guests ===
 +
-+import os
-+import sys
-+import subprocess
-+import basevm
++== Intro ==
 +
-+class OpenBSDVM(basevm.BaseVM):
-+    name = "openbsd"
-+    BUILD_SCRIPT = """
-+        set -e;
-+        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-+        tar -xf /dev/rsd1c;
-+        ./configure --cc=x86_64-unknown-openbsd6.1-gcc-4.9.4 --python=python2.7 {configure_opts};
-+        gmake -j{jobs};
-+        # XXX: "gmake check" seems to always hang or fail
-+        #gmake check;
-+    """
++This test suite contains scripts that bootstrap various guest images that have
++necessary packages to build QEMU. The basic usage is documented in Makefile
++help which is displayed with "make vm-test".
 +
-+    def build_image(self, img):
-+        cimg = self._download_with_cache("http://download.patchew.org/openbsd-6.1-amd64.img.xz",
-+                sha256sum='8c6cedc483e602cfee5e04f0406c64eb99138495e8ca580bc0293bcf0640c1bf')
-+        img_tmp_xz = img + ".tmp.xz"
-+        img_tmp = img + ".tmp"
-+        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
-+        subprocess.check_call(["xz", "-df", img_tmp_xz])
-+        if os.path.exists(img):
-+            os.remove(img)
-+        os.rename(img_tmp, img)
++== Quick start ==
 +
-+if __name__ == "__main__":
-+    sys.exit(basevm.main(OpenBSDVM))
++Run "make vm-test" to list available make targets.
++
++== Manual invocation ==
++
++Each guest script is an executable script with the same command line options.
++For example to work with the netbsd guest, use $QEMU_SRC/tests/vm/netbsd:
++
++    $ cd $QEMU_SRC/tests/vm
++
++    # To bootstrap the image
++    $ ./netbsd --build-image --image /var/tmp/netbsd.img
++    <...>
++
++    # To run an arbitrary command in guest (the output will not be echoed unless
++    # --debug is added)
++    $ ./netbsd --debug --image /var/tmp/netbsd.img uname -a
++
++    # To build QEMU in guest
++    $ ./netbsd --debug --image /var/tmp/netbsd.img --build-qemu $QEMU_SRC
++
++    # To get to an interactive shell
++    $ ./netbsd --interactive --image /var/tmp/netbsd.img sh
++
++== Adding new guests ==
++
++Please look at existing guest scripts for how to add new guests.
++
++Most importantly, create a subclass of BaseVM and implement build_image()
++method and define BUILD_SCRIPT, then finally call basevm.main() from the
++script's main().
++
++  - Usually in build_image(), a template image is downloaded from a predefined
++    URL. BaseVM._download_with_cache() takes care of the cache and the
++    checksum, so consider using it.
++
++  - Once the image is downloaded, users, SSH server and QEMU build deps should
++    be set up:
++
++    * Root password set to BaseVM.ROOT_PASS
++    * User BaseVM.GUEST_USER is created, and password set to BaseVM.GUEST_PASS
++    * SSH service is enabled and started on boot, BaseVM.SSH_PUB_KEY is added
++      to authorized_keys of both root and the normal user
++    * DHCP client service is enabled and started on boot, so that it can
++      automatically configure the virtio-net-pci NIC and communicate with QEMU
++      user net (10.0.2.2)
++    * Necessary packages are installed to untar the source tarball and build
++      QEMU
++
++  - Write a proper BUILD_SCRIPT template, which should be a shell script that
++    untars a raw virtio-blk block device, which is the tarball data blob of the
++    QEMU source tree, then configure/build it. Running "make check" is also
++    recommended.
++
 -- 
 2.13.5
