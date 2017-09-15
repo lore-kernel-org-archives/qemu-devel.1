@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52620)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53141)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dsu5e-0004wo-8s
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:07:43 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dsu7U-00069O-8l
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:09:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dsu5b-0002Gw-3Z
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:07:42 -0400
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:46607)
+	(envelope-from <pbonzini@redhat.com>) id 1dsu7Q-0003XT-Tb
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:09:36 -0400
+Received: from mail-wm0-f48.google.com ([74.125.82.48]:51142)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dsu5a-0002ET-Sr
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:07:39 -0400
-Received: by mail-wm0-f51.google.com with SMTP id i189so9964855wmf.1
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 10:07:38 -0700 (PDT)
-References: <35eda6a9-086e-f899-e131-288f2346effe@wiesinger.com>
-	<ce477c53-25bc-e6dd-3e05-c74af1f33c2d@wiesinger.com>
-	<3e1f41a8-faff-1858-6f0d-154694dff02d@wiesinger.com>
-	<CABgObfYzngJPgS9agXMrRENVD_e+3Hm=y+KD5dp9na8jNwuumw@mail.gmail.com>
-	<CABgObfZFwJMpU_D8SMkuiEhb0qBokHL0jpwmuzdE73TReHMFkg@mail.gmail.com>
-	<0e69cbad-f658-03be-0191-1b6fe588147b@wiesinger.com>
-	<CABgObfaw_bMQ=Dpfs=vh_AweaidqCZSBy4bDtsddk5DSKpRP8A@mail.gmail.com>
-	<1b37b04c-349f-28f7-fb6c-fbbbe8415b33@wiesinger.com>
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dsu7Q-0003Wf-Mg
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:09:32 -0400
+Received: by mail-wm0-f48.google.com with SMTP id v142so9910182wmv.5
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 10:09:32 -0700 (PDT)
+References: <20170707142138.411-1-pbutsykin@virtuozzo.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <7757e373-c892-2824-d710-27ca57d479c4@redhat.com>
-Date: Fri, 15 Sep 2017 19:07:35 +0200
+Message-ID: <55a8a300-2247-dadb-40b3-0c1d4e651e08@redhat.com>
+Date: Fri, 15 Sep 2017 19:09:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <1b37b04c-349f-28f7-fb6c-fbbbe8415b33@wiesinger.com>
+In-Reply-To: <20170707142138.411-1-pbutsykin@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] kvm_intel fails to load on Conroe CPUs running
- Linux 4.12
+Subject: Re: [Qemu-devel] [PATCH] virtio-serial: add enable_backend callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,34 +29,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerhard Wiesinger <lists@wiesinger.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, dgilbert@redhat.com, amit@kernel.org, den@openvz.org
 
-On 15/09/2017 16:43, Gerhard Wiesinger wrote:
-> On 27.08.2017 20:55, Paolo Bonzini wrote:
->>
->>
->> Il 27 ago 2017 4:48 PM, "Gerhard Wiesinger" <lists@wiesinger.com
->> <mailto:lists@wiesinger.com>> ha scritto:
->>
->>     On 27.08.2017 14 <tel:27.08.2017%2014>:03, Paolo Bonzini wrote:
->>
->>
->>         We will revert the patch, but 4.13.0 will not have the fix.
->>         Expect it in later stable kernels (because vacations).
->>
->>
->>     Thnx. Why will 4.13.0 NOT have the fix?
->>
->>
->> Because maintainers are on vacation! :-)
->>
->>
+On 07/07/2017 16:21, Pavel Butsykin wrote:
+> We should guarantee that RAM will not be modified while VM has a stopped
+> state, otherwise it can lead to negative consequences during post-copy
+> migration. In RUN_STATE_FINISH_MIGRATE step, it's expected that RAM on
+> source side will not be modified as this could lead to non-consistent vm state
+> on the destination side. Also RAM access during postcopy-ram migration with
+> enabled release-ram capability can lead to sad consequences.
 > 
-> Hello Paolo,
+> Let's add enable_backend() callback to avoid undesirable virtioqueue changes
+> in the guest memory.
 > 
-> Any update on this for 4.12 and 4.13 kernels?
+> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 
-A late fix is better than a wrong fix.  Hope to get to it next week!
+To understand the patch better this doesn't fix _all_ stopped states,
+only migration, right?  That said it's a valid bugfix even independent
+of the effects for stopped runstate.
+
+Thanks,
 
 Paolo
+
+> ---
+>  hw/char/virtio-console.c          | 21 +++++++++++++++++++++
+>  hw/char/virtio-serial-bus.c       |  7 +++++++
+>  include/hw/virtio/virtio-serial.h |  3 +++
+>  3 files changed, 31 insertions(+)
+> 
+> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
+> index 0cb1668c8a..b55905892e 100644
+> --- a/hw/char/virtio-console.c
+> +++ b/hw/char/virtio-console.c
+> @@ -163,6 +163,26 @@ static void chr_event(void *opaque, int event)
+>      }
+>  }
+>  
+> +static void virtconsole_enable_backend(VirtIOSerialPort *port, bool enable)
+> +{
+> +    VirtConsole *vcon = VIRTIO_CONSOLE(port);
+> +
+> +    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
+> +        return;
+> +    }
+> +
+> +    if (enable) {
+> +        VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
+> +
+> +        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
+> +                                 k->is_console ? NULL : chr_event,
+> +                                 vcon, NULL, false);
+> +    } else {
+> +        qemu_chr_fe_set_handlers(&vcon->chr, NULL, NULL,
+> +                                 NULL, NULL, NULL, false);
+> +    }
+> +}
+> +
+>  static void virtconsole_realize(DeviceState *dev, Error **errp)
+>  {
+>      VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
+> @@ -233,6 +253,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
+>      k->unrealize = virtconsole_unrealize;
+>      k->have_data = flush_buf;
+>      k->set_guest_connected = set_guest_connected;
+> +    k->enable_backend = virtconsole_enable_backend;
+>      k->guest_writable = guest_writable;
+>      dc->props = virtserialport_properties;
+>  }
+> diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+> index f5bc173844..f0f18c8e7c 100644
+> --- a/hw/char/virtio-serial-bus.c
+> +++ b/hw/char/virtio-serial-bus.c
+> @@ -637,6 +637,13 @@ static void set_status(VirtIODevice *vdev, uint8_t status)
+>      if (!(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
+>          guest_reset(vser);
+>      }
+> +
+> +    QTAILQ_FOREACH(port, &vser->ports, next) {
+> +        VirtIOSerialPortClass *vsc = VIRTIO_SERIAL_PORT_GET_CLASS(port);
+> +        if (vsc->enable_backend) {
+> +            vsc->enable_backend(port, vdev->vm_running);
+> +        }
+> +    }
+>  }
+>  
+>  static void vser_reset(VirtIODevice *vdev)
+> diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio-serial.h
+> index b19c44727f..12657a9f39 100644
+> --- a/include/hw/virtio/virtio-serial.h
+> +++ b/include/hw/virtio/virtio-serial.h
+> @@ -58,6 +58,9 @@ typedef struct VirtIOSerialPortClass {
+>          /* Guest opened/closed device. */
+>      void (*set_guest_connected)(VirtIOSerialPort *port, int guest_connected);
+>  
+> +    /* Enable/disable backend for virtio serial port */
+> +    void (*enable_backend)(VirtIOSerialPort *port, bool enable);
+> +
+>          /* Guest is now ready to accept data (virtqueues set up). */
+>      void (*guest_ready)(VirtIOSerialPort *port);
+>  
+> 
