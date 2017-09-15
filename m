@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56865)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dsjtQ-0003pK-KZ
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:14:25 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dskA3-0007qI-OJ
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:31:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dsjtN-00025O-G5
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:14:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35116)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dsjtN-00025F-9Q
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:14:21 -0400
-Date: Fri, 15 Sep 2017 14:14:15 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170915061415.GC17199@lemon>
-References: <20170913030119.3957-1-famz@redhat.com>
-	<20170913030119.3957-4-famz@redhat.com>
-	<CAFEAcA_BfVKDOs3R6hv+-VY5MUcfi97g0RuLwNL2-Zxb+0yK6Q@mail.gmail.com>
+	(envelope-from <sundeep.lkml@gmail.com>) id 1dskA2-0003fS-D5
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 02:31:35 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_BfVKDOs3R6hv+-VY5MUcfi97g0RuLwNL2-Zxb+0yK6Q@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH v7 03/13] scripts: Add archive-source.sh
+In-Reply-To: <CAFEAcA_D=4M2vyo4m2xPi_hFDCmoKHk5kLY3s1ota602ywgHTQ@mail.gmail.com>
+References: <1504812251-23438-1-git-send-email-sundeep.lkml@gmail.com>
+	<1504812251-23438-6-git-send-email-sundeep.lkml@gmail.com>
+	<CAFEAcA_D=4M2vyo4m2xPi_hFDCmoKHk5kLY3s1ota602ywgHTQ@mail.gmail.com>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Fri, 15 Sep 2017 12:01:33 +0530
+Message-ID: <CALHRZuoviT4xbYLVWPybVTkASZquxhcQU=h4+YC1KK=1SW=VWQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [Qemu devel v8 PATCH 5/5] msf2: Add Emcraft's
+ Smartfusion2 SOM kit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,31 +25,42 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Peter Maydell <peter.maydell@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Daniel P. Berrange" <berrange@redhat.com>, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>, Eric Blake <eblake@redhat.com>, Kamil Rytarowski <kamil@netbsd.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 
-On Wed, 09/13 11:55, Peter Maydell wrote:
-> On 13 September 2017 at 04:01, Fam Zheng <famz@redhat.com> wrote:
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >  scripts/archive-source.sh | 33 +++++++++++++++++++++++++++++++++
-> >  1 file changed, 33 insertions(+)
-> >  create mode 100755 scripts/archive-source.sh
-> >
-> > diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
-> > new file mode 100755
-> > index 0000000000..8b373e3090
-> > --- /dev/null
-> > +++ b/scripts/archive-source.sh
-> > @@ -0,0 +1,33 @@
-> > +#!/bin/sh
-> > +#
-> > +# Author: Fam Zheng <famz@redhat.com>
-> > +#
-> > +# Archive source tree, including submodules. This is created for test code to
-> > +# export the source files, in order to be built in a different enviornment,
-> 
-> "environment"
+Hi Peter,
 
-Fixed, thanks.
+On Thu, Sep 14, 2017 at 10:44 PM, Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
-Fam
+> On 7 September 2017 at 20:24, Subbaraya Sundeep <sundeep.lkml@gmail.com>
+> wrote:
+> > Emulated Emcraft's Smartfusion2 System On Module starter
+> > kit.
+> > +static void emcraft_sf2_machine_init(MachineClass *mc)
+> > +{
+> > +    mc->desc = "SmartFusion2 SOM kit from Emcraft (M2S010)";
+> > +    mc->init = emcraft_sf2_s2s010_init;
+> > +    mc->ignore_memory_transaction_failures = true;
+>
+> Please don't set ignore_memory_transaction_failures in new boards.
+> This is a legacy-old-code-only flag.
+>
+> New boards should define enough devices, either properly
+> or using create_unimplemented_device(), to make whatever code
+> they're being tested against run.
+>
+> This is a firm requirement for this code to go into master,
+> because once we let a board in with the flag set it's almost
+> impossible to clear it because we don't know what guest
+> code that previously worked on the board will now break.
+>
+
+Ok. I am working on it and will send next spin with this fix.
+
+Thanks,
+Sundeep
+
+
+> thanks
+> -- PMM
+>
