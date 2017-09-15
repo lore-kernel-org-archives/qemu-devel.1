@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49618)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dslFn-0007SS-CY
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:41:36 -0400
+	(envelope-from <jdenemar@redhat.com>) id 1dslW2-0005lP-5b
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:58:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dslFm-000689-0d
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:41:35 -0400
-References: <1504286483-23327-1-git-send-email-eric.auger@redhat.com>
-	<1504286483-23327-14-git-send-email-eric.auger@redhat.com>
-	<20170914092751.GA3336@virtx40>
-	<4dbbccae-64e1-f4ac-4dcc-3abd9766f324@caviumnetworks.com>
-	<795d99ba-e492-04ce-dda4-709682baf6cd@caviumnetworks.com>
-	<4f9fc697-9e6c-5dd7-65c7-92326135aa56@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <d82cdb08-e5fe-edb1-c7a7-ca5262448f1f@redhat.com>
-Date: Fri, 15 Sep 2017 09:41:12 +0200
+	(envelope-from <jdenemar@redhat.com>) id 1dslVy-0007Bf-9x
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:58:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47830)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jdenemar@redhat.com>) id 1dslVy-0007A6-4K
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 03:58:18 -0400
+Date: Fri, 15 Sep 2017 09:58:14 +0200
+From: Jiri Denemark <jdenemar@redhat.com>
+Message-ID: <20170915075814.GC5256@orkuz.home>
+References: <CADak6y79L+eUYg3LmO2MGTf5BKxHZ8rG5zHBJ9UKPhKHNxsFkQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <4f9fc697-9e6c-5dd7-65c7-92326135aa56@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH v7 13/20] hw/arm/smmuv3:
- Implement IOMMU memory region replay callback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADak6y79L+eUYg3LmO2MGTf5BKxHZ8rG5zHBJ9UKPhKHNxsFkQ@mail.gmail.com>
+Subject: Re: [Qemu-devel] host doesn't support requested feature:
+ CPUID.01H:EDX.ds [bit 21] Does this warn affect virtual machine performance
+ or use?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,149 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Tomasz Nowicki <tnowicki@caviumnetworks.com>, Linu Cherian <linuc.decode@gmail.com>
-Cc: eric.auger.pro@gmail.com, peter.maydell@linaro.org, qemu-arm@nongnu.org, qemu-devel@nongnu.org, prem.mallappa@gmail.com, alex.williamson@redhat.com, mohun106@gmail.com, drjones@redhat.com, tcain@qti.qualcomm.com, Radha.Chintakuntla@cavium.com, Sunil.Goutham@cavium.com, mst@redhat.com, jean-philippe.brucker@arm.com, will.deacon@arm.com, robin.murphy@arm.com, peterx@redhat.com, bharat.bhushan@nxp.com, christoffer.dall@linaro.org, wtownsen@redhat.com, linu.cherian@cavium.com
+To: Paul Schlacter <wlfightup@gmail.com>
+Cc: qemu-devel@nongnu.org
 
+On Thu, Sep 14, 2017 at 20:48:49 +0800, Paul Schlacter wrote:
+> this is my stackoverflow question:
+> https://stackoverflow.com/questions/46219552/host-doesnt-support-requested-feature-cpuid-01hedx-ds-bit-21-does-this-warn
+> 
+> 
+> I found a lot of warning from the VM qemu log, Does this warn affect
+> virtual machine performance or use? , is my libvirt.xml file problem? Or
+> support hot-plug will have these warnings
+> 
+> This is my libvirt xml configuration:
+> 
+> <domain type='kvm' id='315'>
+...
+>   <cpu mode='host-model'>
+>     <model fallback='allow'/>
+>     <numa>
+>       <cell id='0' cpus='0-1' memory='2097152' unit='KiB'/>
+>     </numa>
+>   </cpu>
+...
+> 2017-09-14T12:16:03.441702Z qemu-kvm: warning: CPU(s) not present in
+> any NUMA nodes: 2 3 4 5 6 7
+> 2017-09-14T12:16:03.441773Z qemu-kvm: warning: All CPU(s) up to
+> maxcpus should be described in NUMA config
+> warning: host doesn't support requested feature: CPUID.01H:EDX.ds [bit 21]
+> warning: host doesn't support requested feature: CPUID.01H:EDX.acpi [bit 22]
+> warning: host doesn't support requested feature: CPUID.01H:EDX.ht [bit 28]
+> warning: host doesn't support requested feature: CPUID.01H:EDX.tm [bit 29]
+...
 
+Similar warnings are expected with host-model CPUs on older libvirt
+which didn't know how to ask QEMU what CPU features are supported on the
+host. Thus libvirt just used CPUID and asked for everything and QEMU
+filtered a lot of them. You need a recent QEMU and libvirt to avoid
+these warnings.
 
-On 15/09/2017 09:30, Auger Eric wrote:
-> Hi Tomasz,
-> 
-> On 14/09/2017 16:43, Tomasz Nowicki wrote:
->> On 14.09.2017 16:31, Tomasz Nowicki wrote:
->>> Hi Eric,
->>>
->>> On 14.09.2017 11:27, Linu Cherian wrote:
->>>> Hi Eric,
->>>>
->>>> On Fri Sep 01, 2017 at 07:21:16PM +0200, Eric Auger wrote:
->>>>> memory_region_iommu_replay() is used for VFIO integration.
->>>>>
->>>>> However its default implementation is not adapted to SMMUv3
->>>>> IOMMU memory region. Indeed the input address range is too
->>>>> huge and its execution is too slow as it calls the translate()
->>>>> callback on each granule.
->>>>>
->>>>> Let's implement the replay callback which hierarchically walk
->>>>> over the page table structure and notify only the segments
->>>>> that are populated with valid entries.
->>>>>
->>>>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
->>>>> ---
->>>>>   hw/arm/smmuv3.c     | 36 ++++++++++++++++++++++++++++++++++++
->>>>>   hw/arm/trace-events |  1 +
->>>>>   2 files changed, 37 insertions(+)
->>>>>
->>>>> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
->>>>> index 8e7d10d..c43bd93 100644
->>>>> --- a/hw/arm/smmuv3.c
->>>>> +++ b/hw/arm/smmuv3.c
->>>>> @@ -657,6 +657,41 @@ static int smmuv3_notify_entry(IOMMUTLBEntry
->>>>> *entry, void *private)
->>>>>       return 0;
->>>>>   }
->>>>> +/* Unmap the whole notifier's range */
->>>>> +static void smmuv3_unmap_notifier_range(IOMMUNotifier *n)
->>>>> +{
->>>>> +    IOMMUTLBEntry entry;
->>>>> +    hwaddr size = n->end - n->start + 1;
->>>>> +
->>>>> +    entry.target_as = &address_space_memory;
->>>>> +    entry.iova = n->start & ~(size - 1);
->>>>> +    entry.perm = IOMMU_NONE;
->>>>> +    entry.addr_mask = size - 1;
->>>>> +
->>>>> +    memory_region_notify_one(n, &entry);
->>>>> +}
->>>>> +
->>>>> +static void smmuv3_replay(IOMMUMemoryRegion *mr, IOMMUNotifier *n)
->>>>> +{
->>>>> +    SMMUTransCfg cfg = {};
->>>>> +    int ret;
->>>>> +
->>>>> +    trace_smmuv3_replay(mr->parent_obj.name, n, n->start, n->end);
->>>>> +    smmuv3_unmap_notifier_range(n);
->>>>> +
->>>>> +    ret = smmuv3_decode_config(mr, &cfg);
->>>>> +    if (ret) {
->>>>> +        error_report("%s error decoding the configuration for iommu
->>>>> mr=%s",
->>>>> +                     __func__, mr->parent_obj.name);
->>>>> +    }
->>>>>
->>>>
->>>> On an invalid config being found, shouldnt we return rather than
->>>> proceeding with
->>>> page table walk. For example on an invalid Stream table entry.
->>>
->>> Indeed, without return here vhost case is not working for me.
->>
->> I was just lucky one time. return here has no influence. Vhost still not
->> working. Sorry for noise.
-> 
-> As far as I understand the replay() callback only is called in VFIO use
-> case. So this shouldn't impact vhost.
-Forget that, that's potentially called from some invalidation commands
-also in vhost case.
-
-Thanks
-
-Eric
-> 
-> I can't reproduce your vhost issue on my side. I will review the
-> invalidate code again and compare against the last version.
-> 
-> What is the page size used by your guest?
-> 
-> Thanks
-> 
-> Eric
->>
->> Tomasz
->>
->>>
->>> Thanks,
->>> Tomasz
->>>
->>>>
->>>> +
->>>>> +    if (cfg.disabled || cfg.bypassed) {
->>>>> +        return;
->>>>> +    }
->>>>> +    /* walk the page tables and replay valid entries */
->>>>> +    smmu_page_walk(&cfg, 0, (1ULL << (64 - cfg.tsz)) - 1, false,
->>>>> +                   smmuv3_notify_entry, n);
->>>>> +}
->>>>>   static void smmuv3_notify_iova_range(IOMMUMemoryRegion *mr,
->>>>> IOMMUNotifier *n,
->>>>>                                        uint64_t iova, size_t size)
->>>>>   {
->>>>> @@ -1095,6 +1130,7 @@ static void
->>>>> smmuv3_iommu_memory_region_class_init(ObjectClass *klass,
->>>>>       imrc->translate = smmuv3_translate;
->>>>>       imrc->notify_flag_changed = smmuv3_notify_flag_changed;
->>>>> +    imrc->replay = smmuv3_replay;
->>>>>   }
->>>>>   static const TypeInfo smmuv3_type_info = {
->>>>> diff --git a/hw/arm/trace-events b/hw/arm/trace-events
->>>>> index 4ac264d..15f84d6 100644
->>>>> --- a/hw/arm/trace-events
->>>>> +++ b/hw/arm/trace-events
->>>>> @@ -46,5 +46,6 @@ smmuv3_cfg_stage(int s, uint32_t oas, uint32_t
->>>>> tsz, uint64_t ttbr, bool aa64, ui
->>>>>   smmuv3_notify_flag_add(const char *iommu) "ADD SMMUNotifier node
->>>>> for iommu mr=%s"
->>>>>   smmuv3_notify_flag_del(const char *iommu) "DEL SMMUNotifier node
->>>>> for iommu mr=%s"
->>>>>   smmuv3_replay_mr(const char *name) "iommu mr=%s"
->>>>> +smmuv3_replay(const char *name, void *n, hwaddr start, hwaddr end)
->>>>> "iommu mr=%s notifier=%p [0x%"PRIx64",0x%"PRIx64"]"
->>>>>   smmuv3_notify_entry(hwaddr iova, hwaddr pa, hwaddr mask, int perm)
->>>>> "iova=0x%"PRIx64" pa=0x%" PRIx64" mask=0x%"PRIx64" perm=%d"
->>>>>   smmuv3_notify_iova_range(const char *name, uint64_t iova, size_t
->>>>> size, void *n) "iommu mr=%s iova=0x%"PRIx64" size=0x%lx n=%p"
->>>>> -- 
->>>>> 2.5.5
->>>>>
->>>>>
->>>>
+Jirka
