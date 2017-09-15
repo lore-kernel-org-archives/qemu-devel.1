@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38391)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38379)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dsmBQ-0007Gf-PV
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:41:09 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dsmBQ-0007G7-6U
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:41:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dsmBP-0002e3-MV
+	(envelope-from <aik@ozlabs.ru>) id 1dsmBN-0002d2-4f
 	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:41:08 -0400
-Received: from ozlabs.ru ([107.173.13.209]:45004)
+Received: from ozlabs.ru ([107.173.13.209]:44984)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dsmBP-0002dp-F9
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:41:07 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dsmBM-0002cy-UK
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:41:05 -0400
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Fri, 15 Sep 2017 18:40:19 +1000
-Message-Id: <20170915084030.40988-3-aik@ozlabs.ru>
-In-Reply-To: <20170915084030.40988-1-aik@ozlabs.ru>
-References: <20170915084030.40988-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v2 02/13] exec: Explicitely export target
- AS from address_space_translate_internal
+Date: Fri, 15 Sep 2017 18:40:17 +1000
+Message-Id: <20170915084030.40988-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v2 00/13] memory: Reduce memory use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,65 +24,57 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
-This is not so mechanical change in order to move to shared FlatViews
-so make it a separate patch. The first argument of
-address_space_do_translate() will become a FlatView, however since
-address_space_get_iotlb_entry() still wants AS, hence this change.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
- exec.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+This was inspired by https://bugzilla.redhat.com/show_bug.cgi?id=1481593
+Previous spin: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01559.html
 
-diff --git a/exec.c b/exec.c
-index d20c34ca83..bd94248390 100644
---- a/exec.c
-+++ b/exec.c
-@@ -477,7 +477,8 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
-                                                       hwaddr *xlat,
-                                                       hwaddr *plen,
-                                                       bool is_write,
--                                                      bool is_mmio)
-+                                                      bool is_mmio,
-+                                                      AddressSpace **target_as)
- {
-     IOMMUTLBEntry iotlb;
-     MemoryRegionSection *section;
-@@ -504,6 +505,7 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
-         }
- 
-         as = iotlb.target_as;
-+        *target_as = iotlb.target_as;
-     }
- 
-     *xlat = addr;
-@@ -526,7 +528,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
- 
-     /* This can never be MMIO. */
-     section = address_space_do_translate(as, addr, &xlat, &plen,
--                                         is_write, false);
-+                                         is_write, false, &as);
- 
-     /* Illegal translation */
-     if (section.mr == &io_mem_unassigned) {
-@@ -549,7 +551,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-     plen -= 1;
- 
-     return (IOMMUTLBEntry) {
--        .target_as = section.address_space,
-+        .target_as = as,
-         .iova = addr & ~plen,
-         .translated_addr = xlat & ~plen,
-         .addr_mask = plen,
-@@ -570,7 +572,8 @@ MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
-     MemoryRegionSection section;
- 
-     /* This can be MMIO, so setup MMIO bit. */
--    section = address_space_do_translate(as, addr, xlat, plen, is_write, true);
-+    section = address_space_do_translate(as, addr, xlat, plen, is_write, true,
-+                                         &as);
-     mr = section.mr;
- 
-     if (xen_enabled() && memory_access_is_direct(mr, is_write)) {
+This patchset tries to reduce amount of memory used by FlatViews
+and tries share as many FVs between address spaces as possible.
+
+Changelog:
+v2:
+* total rework
+
+
+This is based on sha1
+3dabde1128 Peter Maydell "Merge remote-tracking branch 'remotes/dgilbert/tags/pull-hmp-20170914' into staging".
+
+Please comment. Thanks.
+
+
+
+Alexey Kardashevskiy (13):
+  memory: Postpone flatview and dispatch tree building till all devices
+    are added
+  exec: Explicitely export target AS from
+    address_space_translate_internal
+  memory: Open code FlatView rendering
+  memory: Move FlatView allocation to a helper
+  memory: Move AddressSpaceDispatch from AddressSpace to FlatView
+  memory: Remove AddressSpace pointer from AddressSpaceDispatch
+  memory: Switch memory from using AddressSpace to FlatView
+  memory: Cleanup after switching to FlatView
+  memory: Rename mem_begin/mem_commit/mem_add helpers
+  memory: Move root MR from AddressSpace to FlatView
+  memory: Share FlatView's and dispatch trees between address spaces
+  memory: Get rid of address_space_init_shareable
+  memory: Add flat views to HMP "info mtree"
+
+ include/exec/memory-internal.h |  17 ++-
+ include/exec/memory.h          |  79 +++++-----
+ include/hw/arm/armv7m.h        |   2 +-
+ cpus.c                         |   5 +-
+ exec.c                         | 327 +++++++++++++++++++++++++----------------
+ hw/arm/armv7m.c                |   9 +-
+ hw/intc/openpic_kvm.c          |   2 +-
+ hw/pci/pci.c                   |   3 +-
+ memory.c                       | 322 +++++++++++++++++++++++++++++-----------
+ monitor.c                      |   3 +-
+ target/arm/cpu.c               |  16 +-
+ target/i386/cpu.c              |   5 +-
+ vl.c                           |   9 ++
+ hmp-commands-info.hx           |   7 +-
+ 14 files changed, 525 insertions(+), 281 deletions(-)
+
 -- 
 2.11.0
