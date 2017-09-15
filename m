@@ -1,21 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33357)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34201)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dslra-0006Eo-V4
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:20:40 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dsluX-0008KF-Ne
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:23:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dslrV-0007cl-Qm
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:20:38 -0400
-Date: Fri, 15 Sep 2017 16:20:26 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170915082026.GG17199@lemon>
-References: <20170915054404.19914-1-famz@redhat.com>
-	<20170915054404.19914-3-famz@redhat.com>
-	<20170915080350.GS3617@pxdev.xzpeter.org>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1dsluS-0001BS-Uc
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:23:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40689)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1dsluS-0001B7-NF
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:23:36 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8F8KaEM143331
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 04:23:34 -0400
+Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d06ffcpy6-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 04:23:34 -0400
+Received: from localhost
+	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Fri, 15 Sep 2017 18:23:32 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20170915064830.GI5250@umbus.fritz.box>
+References: <20170906082748.28520-1-nikunj@linux.vnet.ibm.com>
+	<20170909070212.GT2735@umbus.fritz.box>
+	<87k2153jnx.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170913073519.GK7550@umbus.fritz.box>
+	<8760clsw17.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170915064830.GI5250@umbus.fritz.box>
+Date: Fri, 15 Sep 2017 13:53:15 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170915080350.GS3617@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH 2/3] migration: Cancel migration at exit
+Content-Type: text/plain
+Message-Id: <87377omkuk.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,95 +45,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-stable@nongnu.org, Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
-On Fri, 09/15 16:03, Peter Xu wrote:
-> On Fri, Sep 15, 2017 at 01:44:03PM +0800, Fam Zheng wrote:
-> > bdrv_close_all() would abort() due to op blockers added by BMDS, clean
-> > up migration states when main loop quits to avoid that.
-> > 
-> > Signed-off-by: Fam Zheng <famz@redhat.com>
-> > ---
-> >  include/migration/misc.h | 1 +
-> >  migration/migration.c    | 7 ++++++-
-> >  vl.c                     | 3 +++
-> >  3 files changed, 10 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/include/migration/misc.h b/include/migration/misc.h
-> > index c079b7771b..b9a26b0898 100644
-> > --- a/include/migration/misc.h
-> > +++ b/include/migration/misc.h
-> > @@ -54,5 +54,6 @@ bool migration_has_failed(MigrationState *);
-> >  /* ...and after the device transmission */
-> >  bool migration_in_postcopy_after_devices(MigrationState *);
-> >  void migration_global_dump(Monitor *mon);
-> > +void migrate_cancel(void);
-> >  
-> >  #endif
-> > diff --git a/migration/migration.c b/migration/migration.c
-> > index 959e8ec88e..2c844945c7 100644
-> > --- a/migration/migration.c
-> > +++ b/migration/migration.c
-> > @@ -1274,11 +1274,16 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
-> >      }
-> >  }
-> >  
-> > -void qmp_migrate_cancel(Error **errp)
-> > +void migrate_cancel(void)
-> >  {
-> >      migrate_fd_cancel(migrate_get_current());
-> >  }
-> >  
-> > +void qmp_migrate_cancel(Error **errp)
-> > +{
-> > +    migrate_cancel();
-> > +}
-> > +
-> 
-> Nit: I would prefer just call migrate_fd_cancel() below, since I don't
-> see much point to introduce migrate_cancel() which only calls
-> migrate_fd_cancel()...
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-migrate_get_current() is a migration internal IMHO. But that can be moved to
-migrate_fd_cancel() so the parameter is dropped.
+>> 
+>> I thought, I am doing the same here for PowerNV, number of online cores
+>> is equal to initial online vcpus / threads per core
+>> 
+>>    int boot_cores_nr = smp_cpus / smp_threads;
+>> 
+>> Only difference that I see in PowerNV is that we have multiple chips
+>> (max 2, at the moment)
+>> 
+>>         cores_per_chip = smp_cpus / (smp_threads * pnv->num_chips);
+>
+> This doesn't make sense to me.  Cores per chip should *always* equal
+> smp_cores, you shouldn't need another calculation for it.
+>
+>> And in case user has provided sane smp_cores, we use it.
+>
+> If smp_cores isn't sane, you should simply reject it, not try to fix
+> it.  That's just asking for confusion.
 
-> 
-> >  void qmp_migrate_set_cache_size(int64_t value, Error **errp)
-> >  {
-> >      MigrationState *s = migrate_get_current();
-> > diff --git a/vl.c b/vl.c
-> > index fb1f05b937..abbe61f40b 100644
-> > --- a/vl.c
-> > +++ b/vl.c
-> > @@ -87,6 +87,7 @@ int main(int argc, char **argv)
-> >  #include "sysemu/blockdev.h"
-> >  #include "hw/block/block.h"
-> >  #include "migration/misc.h"
-> > +#include "migration/savevm.h"
-> >  #include "migration/snapshot.h"
-> >  #include "migration/global_state.h"
-> >  #include "sysemu/tpm.h"
-> > @@ -4799,6 +4800,8 @@ int main(int argc, char **argv, char **envp)
-> >      iothread_stop_all();
-> >  
-> >      pause_all_vcpus();
-> > +    migrate_cancel();
-> 
-> IIUC this is an async cancel, so when reach here the migration thread
-> can still be alive.  Then...
-> 
-> > +    qemu_savevm_state_cleanup();
-> 
-> ... Here calling qemu_savevm_state_cleanup() may be problematic if
-> migration thread has not yet quitted.
-> 
-> I'm thinking whether we should make migrate_fd_cancel() wait until the
-> migration thread finishes (state change to CANCELLED).  Then the
-> migration thread will do the cleanup, and here we can avoid calling
-> qemu_savevm_state_cleanup() as well.
+This is the case where the user does not provide a topology(which is a
+valid scenario), not sure we should reject it. So qemu defaults
+smp_cores/smt_threads to 1. I think it makes sense to over-ride.
 
-But if the migration thread is stuck and CANCELLED is never reached, we'll hang
-here?
-
-Fam
+Regards
+Nikunj
