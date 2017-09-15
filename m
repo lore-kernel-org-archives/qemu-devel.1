@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32843)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dslmY-0001SC-2h
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:15:27 -0400
+	(envelope-from <thuth@redhat.com>) id 1dslq7-0005Am-6E
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:19:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dslmU-0004Rf-MT
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:15:26 -0400
-Date: Fri, 15 Sep 2017 16:34:39 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170915063439.GE5250@umbus.fritz.box>
+	(envelope-from <thuth@redhat.com>) id 1dslpx-0006GB-OE
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 04:19:02 -0400
 References: <150541711102.1616.2690784964841960181.stgit@bahia.lan>
 	<150541714343.1616.11893912014879112098.stgit@bahia.lan>
+	<19f09a67-5b16-6bdf-5c72-c2df84537ea7@redhat.com>
+	<20170915063540.GF5250@umbus.fritz.box>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <fff9daba-393f-a226-4b9d-467e7a6f47a0@redhat.com>
+Date: Fri, 15 Sep 2017 10:18:49 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="qFgkTsE6LiHkLPZw"
-Content-Disposition: inline
-In-Reply-To: <150541714343.1616.11893912014879112098.stgit@bahia.lan>
+In-Reply-To: <20170915063540.GF5250@umbus.fritz.box>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="UPpDfpwETGsD99h2IoNgO9C16rSIGWedD"
 Subject: Re: [Qemu-devel] [PATCH 3/3] ppc/kvm: check some capabilities with
  kvm_vm_check_extension()
 List-Id: <qemu-devel.nongnu.org>
@@ -25,105 +27,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Sam Bobroff <sam.bobroff@au1.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Sam Bobroff <sam.bobroff@au1.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-
---qFgkTsE6LiHkLPZw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--UPpDfpwETGsD99h2IoNgO9C16rSIGWedD
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 14, 2017 at 09:25:43PM +0200, Greg Kurz wrote:
-> The following capabilities are VM specific:
-> - KVM_CAP_PPC_SMT_POSSIBLE
-> - KVM_CAP_PPC_HTAB_FD
-> - KVM_CAP_PPC_ALLOC_HTAB
+On 15.09.2017 08:35, David Gibson wrote:
+> On Fri, Sep 15, 2017 at 07:15:41AM +0200, Thomas Huth wrote:
+>> On 14.09.2017 21:25, Greg Kurz wrote:
+>>> The following capabilities are VM specific:
+>>> - KVM_CAP_PPC_SMT_POSSIBLE
+>>> - KVM_CAP_PPC_HTAB_FD
+>>
+>> BTW, looks like kvmppc_has_cap_htab_fd() is dead code ... should we
+>> either remove it or check it somewhere?
 >=20
-> If both KVM HV and KVM PR are present, checking them always return
-> the HV value, even if we explicitely requested to use PR.
->=20
-> This has no visible effect for KVM_CAP_PPC_ALLOC_HTAB, because we also
-> try the KVM_PPC_ALLOCATE_HTAB ioctl which is only suppored by HV. As
-> a consequence, the spapr code doesn't even check KVM_CAP_PPC_HTAB_FD.
->=20
-> However, this will cause kvmppc_hint_smt_possible(), introduced by
-> commit fa98fbfcdfcb9, to report several VSMT modes (eg, Available
-> VSMT modes: 8 4 2 1) whereas PR only support mode 1.
->=20
-> This patch fixes all three anyway to use kvm_vm_check_extension(). It
-> is okay since the VM is already created at the time kvm_arch_init() or
-> kvmppc_reset_htab() is called.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> It's checked in kvmppc_get_htab_fd().
 
-Applied to ppc-for-2.11.
+That function checks the "cap_htab_fd" variable, but is not using the
+kvmppc_has_cap_htab_fd() function which I was referring to.
 
-> ---
->  target/ppc/kvm.c |    6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 1deaf106d2b9..208c70e81426 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -131,7 +131,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->      cap_interrupt_level =3D kvm_check_extension(s, KVM_CAP_PPC_IRQ_LEVEL=
-);
->      cap_segstate =3D kvm_check_extension(s, KVM_CAP_PPC_SEGSTATE);
->      cap_booke_sregs =3D kvm_check_extension(s, KVM_CAP_PPC_BOOKE_SREGS);
-> -    cap_ppc_smt_possible =3D kvm_check_extension(s, KVM_CAP_PPC_SMT_POSS=
-IBLE);
-> +    cap_ppc_smt_possible =3D kvm_vm_check_extension(s, KVM_CAP_PPC_SMT_P=
-OSSIBLE);
->      cap_ppc_rma =3D kvm_check_extension(s, KVM_CAP_PPC_RMA);
->      cap_spapr_tce =3D kvm_check_extension(s, KVM_CAP_SPAPR_TCE);
->      cap_spapr_tce_64 =3D kvm_check_extension(s, KVM_CAP_SPAPR_TCE_64);
-> @@ -143,7 +143,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->      cap_ppc_watchdog =3D kvm_check_extension(s, KVM_CAP_PPC_BOOKE_WATCHD=
-OG);
->      /* Note: we don't set cap_papr here, because this capability is
->       * only activated after this by kvmppc_set_papr() */
-> -    cap_htab_fd =3D kvm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
-> +    cap_htab_fd =3D kvm_vm_check_extension(s, KVM_CAP_PPC_HTAB_FD);
->      cap_fixup_hcalls =3D kvm_check_extension(s, KVM_CAP_PPC_FIXUP_HCALL);
->      cap_ppc_smt =3D kvm_vm_check_extension(s, KVM_CAP_PPC_SMT);
->      cap_htm =3D kvm_vm_check_extension(s, KVM_CAP_PPC_HTM);
-> @@ -2353,7 +2353,7 @@ int kvmppc_reset_htab(int shift_hint)
->          /* Full emulation, tell caller to allocate htab itself */
->          return 0;
->      }
-> -    if (kvm_check_extension(kvm_state, KVM_CAP_PPC_ALLOC_HTAB)) {
-> +    if (kvm_vm_check_extension(kvm_state, KVM_CAP_PPC_ALLOC_HTAB)) {
->          int ret;
->          ret =3D kvm_vm_ioctl(kvm_state, KVM_PPC_ALLOCATE_HTAB, &shift);
->          if (ret =3D=3D -ENOTTY) {
->=20
+ Thomas
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---qFgkTsE6LiHkLPZw
+--UPpDfpwETGsD99h2IoNgO9C16rSIGWedD
 Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm7dH0ACgkQbDjKyiDZ
-s5IczxAAvLtIdyfkyuRlyl3pLhrtHYyzhFtQIUgvL08L34enl9ln89UH0yiioTvE
-4eTxN98rMJh1ZeO3pqH9j433WGIepGWe9pMbuoZaXWY1YviBTncwvfg4MVXKgIPZ
-m0Ywhf16lldJVT/qBLL5i8gLI0Kz9CH7r/JXZ0LNHVsnUTqDiGZH9pWqGBXqQwC3
-Fj/ugKIc+KfKQuwBzu1UDxE4mjYWGyMeKWdxYg+QF7neH7yWbQlG7bkEoyZoeLJQ
-IoPlkD6LtWUqPJibspT6/R8hJUYh5TwUuMMu44SloYFnFIuBHzp5o+vQh2F3dThF
-vkPP/8yeZDJvNgMcIzES3q5Avkibi38kgMO9Bcimfit+lVYYaOvKHGgoDDbGHC5Z
-KJ17SgdNQUay2226oyOor8yOGLaDdUXGPGyfEM2oDnydeQbHMjdwBasXSurbQCkE
-dVWnRj1OtOt/K3nQ6exZugv+cam1FidZHnuiUg6bK0owO1S5XIskCCcj2qu6zLI+
-tlCoS/jbybNh7qcXqpPVnxILw+tVQbmNPfe19ptv4WnzaeD6ri7OzhLj+aaO48f3
-pimQ/BAlM0KmNgHa30mQ+bxtsKMW1KmoLv4Aoa1K/RDvyPv8Q1dChJwcVAFm9ND1
-XLH4WIE3n6SDVfJWYvTCrryKtRtP53o0G+ekUApUzpkmdBG3cG4=
-=jWhI
+iQIcBAEBAgAGBQJZu4ztAAoJEC7Z13T+cC21TZ4P/AgIaUyLNarQbUMrUZH3Kbbm
+IN9OgMawEcGzLbo9Mwq99C55FIUrCaaadA/kJtVjm6ilz/iyIPW4DbgtyWBEY6j5
+QvJj9nYx/45DOaffX+VG/DzLBYn5iRucqcyAMC42yNr7MvnHNLS7NyOUGK22VZMP
+K0hvLXsob6pH6MMTf6xR9RFsMjIl28UW9gSt+oqyOx+ilKcG4Lf8aoXk3G2Oz408
+w2kUseMChIm300+1YglW6ALH09AaRZT84jgvohD7x9IhTc0UGhFJgtWPJjENcPXq
+RvG2cx0+p8q8CxPkuHWSYM+EBZgnFzJazG1BYV22OWrfrTG0Z1lLpnH+1ZOBJ3o7
+pK1/ptzCsrpYP66gy+F2i8Xmw6SCDa6y7YrKWxnrszOyT4wi2hL283Nr+dpSAJhR
+zRD+U2stKsOIQGZeS/5YAtvX7DsZEX4OVHAvz5qYIJFgYGzJlsl1b/KRINcKc27r
+ontTYQLFEywh1Ukq4ZSZMbzT93Cmj6KgtCcuN27KFTfzU+GqcbLhX/JRAy+cTU30
+ni0yxFiFBQndIV3/T8hEd+nEPwrvfdyhpGVT6PP0dRgfmcyCW26gU8gZhxKwQ0+R
+ky8Ja3+tx9lJ78n+aRwLF/E+i3L29+g+GT9BTMoSkHx3IF7AUQgbmaIpzkhjyKFl
+8vOP/2jgmw2t6j4zWpik
+=0/p4
 -----END PGP SIGNATURE-----
 
---qFgkTsE6LiHkLPZw--
+--UPpDfpwETGsD99h2IoNgO9C16rSIGWedD--
