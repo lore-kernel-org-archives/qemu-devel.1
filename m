@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33314)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33858)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dsowU-0003dr-Ck
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 07:37:56 -0400
+	(envelope-from <berrange@redhat.com>) id 1dsoyj-0004Z5-SS
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 07:40:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dsowR-0006qb-5E
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 07:37:54 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:49657)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dsowQ-0006qI-S4
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 07:37:51 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id e71so7530747wmg.4
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 04:37:50 -0700 (PDT)
-References: <20170913030119.3957-1-famz@redhat.com>
-	<20170913030119.3957-6-famz@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170913030119.3957-6-famz@redhat.com>
-Date: Fri, 15 Sep 2017 12:37:47 +0100
-Message-ID: <87wp508a5w.fsf@linaro.org>
+	(envelope-from <berrange@redhat.com>) id 1dsoyg-00088V-Jr
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 07:40:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34092)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dsoyg-00087g-Bf
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 07:40:10 -0400
+Date: Fri, 15 Sep 2017 12:40:01 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170915114001.GG13610@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170915090253.12201-1-famz@redhat.com>
+	<CAFEAcA_b71j3v5Ag7uSTPBgUT2_Qej+KJxH57cKV+6QdRgCw9A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v7 05/13] tests: Add vm test lib
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA_b71j3v5Ag7uSTPBgUT2_Qej+KJxH57cKV+6QdRgCw9A@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PULL v4 00/38] Test and build patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,307 +29,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, Philippe =?utf-8?Q?Mathieu?= =?utf-8?Q?-Daud=C3=A9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: Fam Zheng <famz@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
+On Fri, Sep 15, 2017 at 11:55:44AM +0100, Peter Maydell wrote:
+> On 15 September 2017 at 10:02, Fam Zheng <famz@redhat.com> wrote:
+> > The following changes since commit 04ef33052c205170c92df21ca0b4be4f3b=
+102188:
+> >
+> >   tcg/tci: do not use ldst label (never implemented) (2017-09-11 19:2=
+4:05 +0100)
+> >
+> > are available in the git repository at:
+> >
+> >   git://github.com/famz/qemu.git tags/test-and-build-pull-request
+> >
+> > for you to fetch changes up to be78fe670401af14e6d63fce5c5467f7512078=
+71:
+> >
+> >   buildsys: Move rdma libs to per object (2017-09-15 15:05:24 +0800)
+> >
+> > ----------------------------------------------------------------
+> >
+> > ----------------------------------------------------------------
+> >
+> > Alex Benn=C3=A9e (4):
+> >   docker: ensure NOUSER for travis images
+> >   docker: docker.py make --no-cache skip checksum test
+> >   docker: don't install device-tree-compiler build-deps in travis.doc=
+ker
+> >   docker: reduce noise when building travis.docker
+> >
+> > Fam Zheng (34):
+> >   docker: Update ubuntu image
+> >   docker: Enable features explicitly in test-full
+> >   tests/docker: Clean up paths
+> >   gitignore: Ignore vm test images
+> >   qemu.py: Add "wait()" method
+> >   scripts: Add archive-source.sh
+> >   tests: Add a test key pair
+>=20
+> So, before I commit an ssh private key to our git repo,
+> can you explain why it's ok that this is public? The
+> commit message for the relevant patch doesn't really say.
 
-Fam Zheng <famz@redhat.com> writes:
+IIUC, the public part of the key gets exposed to the guest images via
+cloud-init metadata. During boot the guest read this metadata and add
+the public key to authorized_keys. The private key is used by the test
+suite on the host so that it can now login to the guests.
 
-> This is the common code to implement a "VM test" to
->
->   1) Download and initialize a pre-defined VM that has necessary
->   dependencies to build QEMU and SSH access.
->
->   2) Archive $SRC_PATH to a .tar file.
->
->   3) Boot the VM, and pass the source tar file to the guest.
->
->   4) SSH into the VM, untar the source tarball, build from the source.
->
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/vm/basevm.py | 256 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 256 insertions(+)
->  create mode 100755 tests/vm/basevm.py
->
-> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-> new file mode 100755
-> index 0000000000..e4603f3fba
-> --- /dev/null
-> +++ b/tests/vm/basevm.py
-> @@ -0,0 +1,256 @@
-> +#!/usr/bin/env python
-> +#
-> +# VM testing base class
-> +#
-> +# Copyright 2017 Red Hat Inc.
-> +#
-> +# Authors:
-> +#  Fam Zheng <famz@redhat.com>
-> +#
-> +# This code is licensed under the GPL version 2 or later.  See
-> +# the COPYING file in the top-level directory.
-> +#
-> +
-> +import os
-> +import sys
-> +import logging
-> +import time
-> +import datetime
-> +sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
-> +from qemu import QEMUMachine
-> +import subprocess
-> +import hashlib
-> +import optparse
-> +import atexit
-> +import tempfile
-> +import shutil
-> +import multiprocessing
-> +import traceback
-> +
-> +SSH_KEY = open(os.path.join(od.path.dirname(__file__),
-> +               "..", "keys", "id_rsa")).read()
-> +SSH_PUB_KEY = open(os.path.join(od.path.dirname(__file__),
-> +                   "..", "keys", "id_rsa.pub")).read()
+So the risk here is that if these guests were exposed to the LAN in any
+way, someone could grab our private key and login to these guests.
 
-Hmm I don't think this was tested:
+What saves us is that the VMs are run with user mode slirp networking
+so AFAICT, aren't exposed to the LAN.  So as long as we don't change
+this to any kind of real networking, I think its acceptable to have
+the private key in it and doesn't expose developer's workstations to
+undue risk and avoids consuming system entropy to generate new keys
+during build.
 
-12:35:56 [alex@zen:~/l/q/qemu.git] review/fam-vm-build-test-v7(+2/-2) ± make vm-build-netbsd
-        CHK version_gen.h
-    VM-IMAGE netbsd
-Traceback (most recent call last):
-  File "/home/alex/lsrc/qemu/qemu.git/tests/vm/netbsd", line 17, in <module>
-    import basevm
-  File "/home/alex/lsrc/qemu/qemu.git/tests/vm/basevm.py", line 30, in <module>
-    SSH_KEY = open(os.path.join(od.path.dirname(__file__),
-NameError: name 'od' is not defined
-/home/alex/lsrc/qemu/qemu.git/tests/vm/Makefile.include:23: recipe for target 'tests/vm/netbsd.img' failed
-
-
-> +
-> +class BaseVM(object):
-> +    GUEST_USER = "qemu"
-> +    GUEST_PASS = "qemupass"
-> +    ROOT_PASS = "qemupass"
-> +
-> +    # The script to run in the guest that builds QEMU
-> +    BUILD_SCRIPT = ""
-> +    # The guest name, to be overridden by subclasses
-> +    name = "#base"
-> +    def __init__(self, debug=False, vcpus=None):
-> +        self._guest = None
-> +        self._tmpdir = tempfile.mkdtemp(prefix="vm-test-", suffix=".tmp", dir=".")
-> +        atexit.register(shutil.rmtree, self._tmpdir)
-> +
-> +        self._ssh_key_file = os.path.join(self._tmpdir, "id_rsa")
-> +        open(self._ssh_key_file, "w").write(SSH_KEY)
-> +        subprocess.check_call(["chmod", "600", self._ssh_key_file])
-> +
-> +        self._ssh_pub_key_file = os.path.join(self._tmpdir, "id_rsa.pub")
-> +        open(self._ssh_pub_key_file, "w").write(SSH_PUB_KEY)
-> +
-> +        self.debug = debug
-> +        self._stderr = sys.stderr
-> +        self._devnull = open(os.devnull, "w")
-> +        if self.debug:
-> +            self._stdout = sys.stdout
-> +        else:
-> +            self._stdout = self._devnull
-> +        self._args = [ \
-> +            "-nodefaults", "-m", "2G",
-> +            "-cpu", "host",
-> +            "-netdev", "user,id=vnet,hostfwd=:0.0.0.0:0-:22",
-> +            "-device", "virtio-net-pci,netdev=vnet",
-> +            "-vnc", ":0,to=20",
-> +            "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
-> +        if vcpus:
-> +            self._args += ["-smp", str(vcpus)]
-> +        if os.access("/dev/kvm", os.R_OK | os.W_OK):
-> +            self._args += ["-enable-kvm"]
-> +        else:
-> +            logging.info("KVM not available, not using -enable-kvm")
-> +        self._data_args = []
-> +
-> +    def _download_with_cache(self, url, sha256sum=None):
-> +        def check_sha256sum(fname):
-> +            if not sha256sum:
-> +                return True
-> +            checksum = subprocess.check_output(["sha256sum", fname]).split()[0]
-> +            return sha256sum == checksum
-> +
-> +        cache_dir = os.path.expanduser("~/.cache/qemu-vm/download")
-> +        if not os.path.exists(cache_dir):
-> +            os.makedirs(cache_dir)
-> +        fname = os.path.join(cache_dir, hashlib.sha1(url).hexdigest())
-> +        if os.path.exists(fname) and check_sha256sum(fname):
-> +            return fname
-> +        logging.debug("Downloading %s to %s...", url, fname)
-> +        subprocess.check_call(["wget", "-c", url, "-O", fname + ".download"],
-> +                              stdout=self._stdout, stderr=self._stderr)
-> +        os.rename(fname + ".download", fname)
-> +        return fname
-> +
-> +    def _ssh_do(self, user, cmd, check, interactive=False):
-> +        ssh_cmd = ["ssh", "-q",
-> +                   "-o", "StrictHostKeyChecking=no",
-> +                   "-o", "UserKnownHostsFile=" + os.devnull,
-> +                   "-o", "ConnectTimeout=1",
-> +                   "-p", self.ssh_port, "-i", self._ssh_key_file]
-> +        if interactive:
-> +            ssh_cmd += ['-t']
-> +        assert not isinstance(cmd, str)
-> +        ssh_cmd += ["%s@127.0.0.1" % user] + list(cmd)
-> +        logging.debug("ssh_cmd: %s", " ".join(ssh_cmd))
-> +        r = subprocess.call(ssh_cmd,
-> +                            stdin=sys.stdin if interactive else self._devnull,
-> +                            stdout=sys.stdout if interactive else self._stdout,
-> +                            stderr=sys.stderr if interactive else self._stderr)
-> +        if check and r != 0:
-> +            raise Exception("SSH command failed: %s" % cmd)
-> +        return r
-> +
-> +    def ssh(self, *cmd):
-> +        return self._ssh_do(self.GUEST_USER, cmd, False)
-> +
-> +    def ssh_interactive(self, *cmd):
-> +        return self._ssh_do(self.GUEST_USER, cmd, False, True)
-> +
-> +    def ssh_root(self, *cmd):
-> +        return self._ssh_do("root", cmd, False)
-> +
-> +    def ssh_check(self, *cmd):
-> +        self._ssh_do(self.GUEST_USER, cmd, True)
-> +
-> +    def ssh_root_check(self, *cmd):
-> +        self._ssh_do("root", cmd, True)
-> +
-> +    def build_image(self, img):
-> +        raise NotImplementedError
-> +
-> +    def add_source_dir(self, src_dir):
-> +        name = "data-" + hashlib.sha1(src_dir).hexdigest()[:5]
-> +        tarfile = os.path.join(self._tmpdir, name + ".tar")
-> +        logging.debug("Creating archive %s for src_dir dir: %s", tarfile, src_dir)
-> +        subprocess.check_call(["./scripts/archive-source.sh", tarfile],
-> +                              cwd=src_dir, stdin=self._devnull,
-> +                              stdout=self._stdout, stderr=self._stderr)
-> +        self._data_args += ["-drive",
-> +                            "file=%s,if=none,id=%s,cache=writeback,format=raw" % \
-> +                                    (tarfile, name),
-> +                            "-device",
-> +                            "virtio-blk,drive=%s,serial=%s,bootindex=1" % (name, name)]
-> +
-> +    def boot(self, img, extra_args=[]):
-> +        args = self._args + [
-> +            "-device", "VGA",
-> +            "-drive", "file=%s,if=none,id=drive0,cache=writeback" % img,
-> +            "-device", "virtio-blk,drive=drive0,bootindex=0"]
-> +        args += self._data_args + extra_args
-> +        logging.debug("QEMU args: %s", " ".join(args))
-> +        qemu_bin = os.environ.get("QEMU", "qemu-system-x86_64")
-> +        guest = QEMUMachine(binary=qemu_bin, args=args)
-> +        try:
-> +            guest.launch()
-> +        except:
-> +            logging.error("Failed to launch QEMU, command line:")
-> +            logging.error(" ".join([qemu_bin] + args))
-> +            logging.error("Log:")
-> +            logging.error(guest.get_log())
-> +            logging.error("QEMU version >= 2.10 is required")
-> +            raise
-> +        atexit.register(self.shutdown)
-> +        self._guest = guest
-> +        usernet_info = guest.qmp("human-monitor-command",
-> +                                 command_line="info usernet")
-> +        self.ssh_port = None
-> +        for l in usernet_info["return"].splitlines():
-> +            fields = l.split()
-> +            if "TCP[HOST_FORWARD]" in fields and "22" in fields:
-> +                self.ssh_port = l.split()[3]
-> +        if not self.ssh_port:
-> +            raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
-> +                            usernet_info)
-> +
-> +    def wait_ssh(self, seconds=120):
-> +        starttime = datetime.datetime.now()
-> +        guest_up = False
-> +        while (datetime.datetime.now() - starttime).total_seconds() < seconds:
-> +            if self.ssh("exit 0") == 0:
-> +                guest_up = True
-> +                break
-> +            time.sleep(1)
-> +        if not guest_up:
-> +            raise Exception("Timeout while waiting for guest ssh")
-> +
-> +    def shutdown(self):
-> +        self._guest.shutdown()
-> +
-> +    def wait(self):
-> +        self._guest.wait()
-> +
-> +    def qmp(self, *args, **kwargs):
-> +        return self._guest.qmp(*args, **kwargs)
-> +
-> +def parse_args(vm_name):
-> +    parser = optparse.OptionParser(description="""
-> +    VM test utility.  Exit codes: 0 = success, 1 = command line error, 2 = environment initialization failed, 3 = test command failed""")
-> +    parser.add_option("--debug", "-D", action="store_true",
-> +                      help="enable debug output")
-> +    parser.add_option("--image", "-i", default="%s.img" % vm_name,
-> +                      help="image file name")
-> +    parser.add_option("--force", "-f", action="store_true",
-> +                      help="force build image even if image exists")
-> +    parser.add_option("--jobs", type=int, default=multiprocessing.cpu_count() / 2,
-> +                      help="number of virtual CPUs")
-> +    parser.add_option("--build-image", "-b", action="store_true",
-> +                      help="build image")
-> +    parser.add_option("--build-qemu",
-> +                      help="build QEMU from source in guest")
-> +    parser.add_option("--interactive", "-I", action="store_true",
-> +                      help="Interactively run command")
-> +    parser.disable_interspersed_args()
-> +    return parser.parse_args()
-> +
-> +def main(vmcls):
-> +    try:
-> +        args, argv = parse_args(vmcls.name)
-> +        if not argv and not args.build_qemu and not args.build_image:
-> +            print "Nothing to do?"
-> +            return 1
-> +        if args.debug:
-> +            logging.getLogger().setLevel(logging.DEBUG)
-> +        vm = vmcls(debug=args.debug, vcpus=args.jobs)
-> +        if args.build_image:
-> +            if os.path.exists(args.image) and not args.force:
-> +                sys.stderr.writelines(["Image file exists: %s\n" % args.image,
-> +                                      "Use --force option to overwrite\n"])
-> +                return 1
-> +            return vm.build_image(args.image)
-> +        if args.build_qemu:
-> +            vm.add_source_dir(args.build_qemu)
-> +            cmd = [vm.BUILD_SCRIPT.format(
-> +                   configure_opts = " ".join(argv),
-> +                   jobs=args.jobs)]
-> +        else:
-> +            cmd = argv
-> +        vm.boot(args.image + ",snapshot=on")
-> +        vm.wait_ssh()
-> +    except Exception as e:
-> +        if isinstance(e, SystemExit) and e.code == 0:
-> +            return 0
-> +        sys.stderr.write("Failed to prepare guest environment\n")
-> +        traceback.print_exc()
-> +        return 2
-> +
-> +    if args.interactive:
-> +        if vm.ssh_interactive(*cmd) == 0:
-> +            return 0
-> +        vm.ssh_interactive()
-> +        return 3
-> +    else:
-> +        if vm.ssh(*cmd) != 0:
-> +            return 3
-
-
---
-Alex Bennée
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
