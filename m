@@ -1,34 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36080)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36179)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dsrnD-0003k5-Ua
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:40:37 -0400
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dsrnO-0003s6-Ci
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:40:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1dsrn8-0003pu-Rv
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:40:31 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57809)
+	(envelope-from <alifm@linux.vnet.ibm.com>) id 1dsrnL-0003vL-8I
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:40:42 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57248
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1dsrn8-0003pe-LJ
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:40:26 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1dsrn7-0000GB-F2
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 14:40:25 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 667D32E8037
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 14:40:25 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 15 Sep 2017 14:24:45 -0000
-From: Thomas Huth <1384892@bugs.launchpad.net>
-Reply-To: Bug 1384892 <1384892@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <20141023194249.8096.62457.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150548548534.29770.9531568139075199372.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1384892] Re: RTL8168 NIC VFIO not working anymore
- since QEMU 2.1
+	(Exim 4.71) (envelope-from <alifm@linux.vnet.ibm.com>)
+	id 1dsrnL-0003v6-2s
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:40:39 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8FEd2xY011032
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 10:40:38 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2d0fxk2ryg-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 10:40:37 -0400
+Received: from localhost
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <alifm@linux.vnet.ibm.com>;
+	Fri, 15 Sep 2017 08:40:37 -0600
+From: Farhan Ali <alifm@linux.vnet.ibm.com>
+Date: Fri, 15 Sep 2017 10:40:31 -0400
+In-Reply-To: <cover.1505485574.git.alifm@linux.vnet.ibm.com>
+References: <cover.1505485574.git.alifm@linux.vnet.ibm.com>
+In-Reply-To: <cover.1505485574.git.alifm@linux.vnet.ibm.com>
+References: <cover.1505485574.git.alifm@linux.vnet.ibm.com>
+Message-Id: <dc748e15f36db808f90b4f2393bc29ba7556a9f6.1505485574.git.alifm@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH v3 1/2] virtio-gpu: Handle endian conversion
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,56 +41,192 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: kraxel@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com, thuth@redhat.com, pasic@linux.vnet.ibm.com
 
-The patch that has been mentioned in the last comment has been included her=
-e:
-https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D31e6a7b17b35711eb44f0e
-... and has been released with QEMU v2.8 already, so marking this as "fix r=
-eleased" now.
+Virtio GPU code currently only supports litte endian format,
+and so using the Virtio GPU device on a big endian machine
+does not work.
 
-** Changed in: qemu
-       Status: New =3D> Fix Released
+Let's fix it by supporting the correct host cpu byte order.
 
--- =
+Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+---
+ hw/display/virtio-gpu.c | 70 +++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 62 insertions(+), 8 deletions(-)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1384892
-
-Title:
-  RTL8168 NIC VFIO not working anymore since QEMU 2.1
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  After upgrading QEMU from 2.0 to 2.1 (and libiscsi from 1.7.0 to 1.12 as =
-a dependency) my two RTL8168 NICs stopped working.
-  The NICs do not respond to any command and even the LEDs on the network c=
-onnection turn off, a few seconds after the VM started.
-  To get them back running I had to downgrade to 2.0 and restart the system.
-  Unfortunately, I have no clue what to do or how to debug this problem sin=
-ce there are no specific errors logged.
-  I tried two different VMs: Debian Wheezy and IPFire (see attachment for f=
-urther details).
-  The QEMU 2.1 changelog states "Support for RTL8168 NICs." so there were s=
-ome major changes done, I guess.
-
-  On the IPFire guest the kernel log shows many of these lines:
-  r8169 0000:00:07.0 green1: rtl_eriar_cond =3D=3D 1 (loop: 100, delay: 100)
-  r8169 0000:00:07.0 green1: rtl_phy_reset_cond =3D=3D 1 (loop: 100, delay:=
- 1)
-
-  On the Debian guest there is only:
-  r8169 0000:00:07.0: firmware: agent loaded rtl_nic/rtl8168e-3.fw into mem=
-ory
-  r8169 0000:00:07.0: lan0: link down
-  ADDRCONF(NETDEV_UP): lan0: link is not ready
-
-  The commandline for IPFire can be seen in the attachment. It is the same =
-for Debian.
-  There are also the complete kernel logs for the working (2.0) and non-wor=
-king (2.1) cases.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1384892/+subscriptions
+diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
+index 6aae147..0ef7e5c 100644
+--- a/hw/display/virtio-gpu.c
++++ b/hw/display/virtio-gpu.c
+@@ -30,6 +30,48 @@ virtio_gpu_find_resource(VirtIOGPU *g, uint32_t resource_id);
+ 
+ static void virtio_gpu_cleanup_mapping(struct virtio_gpu_simple_resource *res);
+ 
++static void
++virtio_gpu_ctrl_hdr_bswap(struct virtio_gpu_ctrl_hdr *hdr)
++{
++    le32_to_cpus(&hdr->type);
++    le32_to_cpus(&hdr->flags);
++    le64_to_cpus(&hdr->fence_id);
++    le32_to_cpus(&hdr->ctx_id);
++    le32_to_cpus(&hdr->padding);
++}
++
++static void virtio_gpu_bswap_32(void *ptr,
++                                size_t size)
++{
++#ifdef HOST_WORDS_BIGENDIAN
++
++    size_t i;
++    struct virtio_gpu_ctrl_hdr *hdr = (struct virtio_gpu_ctrl_hdr *) ptr;
++
++    virtio_gpu_ctrl_hdr_bswap(hdr);
++
++    i = sizeof(struct virtio_gpu_ctrl_hdr);
++    while (i < size) {
++        le32_to_cpus((uint32_t *)(ptr + i));
++        i = i + sizeof(uint32_t);
++    }
++
++#endif
++}
++
++static void
++virtio_gpu_t2d_bswap(struct virtio_gpu_transfer_to_host_2d *t2d)
++{
++    virtio_gpu_ctrl_hdr_bswap(&t2d->hdr);
++    le32_to_cpus(&t2d->r.x);
++    le32_to_cpus(&t2d->r.y);
++    le32_to_cpus(&t2d->r.width);
++    le32_to_cpus(&t2d->r.height);
++    le64_to_cpus(&t2d->offset);
++    le32_to_cpus(&t2d->resource_id);
++    le32_to_cpus(&t2d->padding);
++}
++
+ #ifdef CONFIG_VIRGL
+ #include <virglrenderer.h>
+ #define VIRGL(_g, _virgl, _simple, ...)                     \
+@@ -205,6 +247,7 @@ void virtio_gpu_ctrl_response(VirtIOGPU *g,
+         resp->fence_id = cmd->cmd_hdr.fence_id;
+         resp->ctx_id = cmd->cmd_hdr.ctx_id;
+     }
++    virtio_gpu_ctrl_hdr_bswap(resp);
+     s = iov_from_buf(cmd->elem.in_sg, cmd->elem.in_num, 0, resp, resp_len);
+     if (s != resp_len) {
+         qemu_log_mask(LOG_GUEST_ERROR,
+@@ -236,8 +279,8 @@ virtio_gpu_fill_display_info(VirtIOGPU *g,
+     for (i = 0; i < g->conf.max_outputs; i++) {
+         if (g->enabled_output_bitmask & (1 << i)) {
+             dpy_info->pmodes[i].enabled = 1;
+-            dpy_info->pmodes[i].r.width = g->req_state[i].width;
+-            dpy_info->pmodes[i].r.height = g->req_state[i].height;
++            dpy_info->pmodes[i].r.width = cpu_to_le32(g->req_state[i].width);
++            dpy_info->pmodes[i].r.height = cpu_to_le32(g->req_state[i].height);
+         }
+     }
+ }
+@@ -287,6 +330,7 @@ static void virtio_gpu_resource_create_2d(VirtIOGPU *g,
+     struct virtio_gpu_resource_create_2d c2d;
+ 
+     VIRTIO_GPU_FILL_CMD(c2d);
++    virtio_gpu_bswap_32(&c2d, sizeof(c2d));
+     trace_virtio_gpu_cmd_res_create_2d(c2d.resource_id, c2d.format,
+                                        c2d.width, c2d.height);
+ 
+@@ -360,6 +404,7 @@ static void virtio_gpu_resource_unref(VirtIOGPU *g,
+     struct virtio_gpu_resource_unref unref;
+ 
+     VIRTIO_GPU_FILL_CMD(unref);
++    virtio_gpu_bswap_32(&unref, sizeof(unref));
+     trace_virtio_gpu_cmd_res_unref(unref.resource_id);
+ 
+     res = virtio_gpu_find_resource(g, unref.resource_id);
+@@ -383,6 +428,7 @@ static void virtio_gpu_transfer_to_host_2d(VirtIOGPU *g,
+     struct virtio_gpu_transfer_to_host_2d t2d;
+ 
+     VIRTIO_GPU_FILL_CMD(t2d);
++    virtio_gpu_t2d_bswap(&t2d);
+     trace_virtio_gpu_cmd_res_xfer_toh_2d(t2d.resource_id);
+ 
+     res = virtio_gpu_find_resource(g, t2d.resource_id);
+@@ -439,6 +485,7 @@ static void virtio_gpu_resource_flush(VirtIOGPU *g,
+     int i;
+ 
+     VIRTIO_GPU_FILL_CMD(rf);
++    virtio_gpu_bswap_32(&rf, sizeof(rf));
+     trace_virtio_gpu_cmd_res_flush(rf.resource_id,
+                                    rf.r.width, rf.r.height, rf.r.x, rf.r.y);
+ 
+@@ -511,6 +558,7 @@ static void virtio_gpu_set_scanout(VirtIOGPU *g,
+     struct virtio_gpu_set_scanout ss;
+ 
+     VIRTIO_GPU_FILL_CMD(ss);
++    virtio_gpu_bswap_32(&ss, sizeof(ss));
+     trace_virtio_gpu_cmd_set_scanout(ss.scanout_id, ss.resource_id,
+                                      ss.r.width, ss.r.height, ss.r.x, ss.r.y);
+ 
+@@ -633,13 +681,15 @@ int virtio_gpu_create_mapping_iov(struct virtio_gpu_resource_attach_backing *ab,
+         *addr = g_malloc0(sizeof(uint64_t) * ab->nr_entries);
+     }
+     for (i = 0; i < ab->nr_entries; i++) {
+-        hwaddr len = ents[i].length;
+-        (*iov)[i].iov_len = ents[i].length;
+-        (*iov)[i].iov_base = cpu_physical_memory_map(ents[i].addr, &len, 1);
++        uint64_t a = le64_to_cpu(ents[i].addr);
++        uint32_t l = le32_to_cpu(ents[i].length);
++        hwaddr len = l;
++        (*iov)[i].iov_len = l;
++        (*iov)[i].iov_base = cpu_physical_memory_map(a, &len, 1);
+         if (addr) {
+-            (*addr)[i] = ents[i].addr;
++            (*addr)[i] = a;
+         }
+-        if (!(*iov)[i].iov_base || len != ents[i].length) {
++        if (!(*iov)[i].iov_base || len != l) {
+             qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to map MMIO memory for"
+                           " resource %d element %d\n",
+                           __func__, ab->resource_id, i);
+@@ -686,6 +736,7 @@ virtio_gpu_resource_attach_backing(VirtIOGPU *g,
+     int ret;
+ 
+     VIRTIO_GPU_FILL_CMD(ab);
++    virtio_gpu_bswap_32(&ab, sizeof(ab));
+     trace_virtio_gpu_cmd_res_back_attach(ab.resource_id);
+ 
+     res = virtio_gpu_find_resource(g, ab.resource_id);
+@@ -718,6 +769,7 @@ virtio_gpu_resource_detach_backing(VirtIOGPU *g,
+     struct virtio_gpu_resource_detach_backing detach;
+ 
+     VIRTIO_GPU_FILL_CMD(detach);
++    virtio_gpu_bswap_32(&detach, sizeof(detach));
+     trace_virtio_gpu_cmd_res_back_detach(detach.resource_id);
+ 
+     res = virtio_gpu_find_resource(g, detach.resource_id);
+@@ -734,6 +786,7 @@ static void virtio_gpu_simple_process_cmd(VirtIOGPU *g,
+                                           struct virtio_gpu_ctrl_command *cmd)
+ {
+     VIRTIO_GPU_FILL_CMD(cmd->cmd_hdr);
++    virtio_gpu_ctrl_hdr_bswap(&cmd->cmd_hdr);
+ 
+     switch (cmd->cmd_hdr.type) {
+     case VIRTIO_GPU_CMD_GET_DISPLAY_INFO:
+@@ -879,6 +932,7 @@ static void virtio_gpu_handle_cursor(VirtIODevice *vdev, VirtQueue *vq)
+                           "%s: cursor size incorrect %zu vs %zu\n",
+                           __func__, s, sizeof(cursor_info));
+         } else {
++            virtio_gpu_bswap_32(&cursor_info, sizeof(cursor_info));
+             update_cursor(g, &cursor_info);
+         }
+         virtqueue_push(vq, elem, 0);
+@@ -1135,7 +1189,7 @@ static void virtio_gpu_device_realize(DeviceState *qdev, Error **errp)
+     }
+ 
+     g->config_size = sizeof(struct virtio_gpu_config);
+-    g->virtio_config.num_scanouts = g->conf.max_outputs;
++    g->virtio_config.num_scanouts = cpu_to_le32(g->conf.max_outputs);
+     virtio_init(VIRTIO_DEVICE(g), "virtio-gpu", VIRTIO_ID_GPU,
+                 g->config_size);
+ 
+-- 
+1.9.1
