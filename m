@@ -1,20 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47942)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49470)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dsmXB-0006T1-8f
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:48 -0400
+	(envelope-from <otubo@redhat.com>) id 1dsmaS-0001GA-1N
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:07:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dsmWy-0002tx-Vz
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33626)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dsmWy-0002sg-MO
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:03:24 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Fri, 15 Sep 2017 17:02:53 +0800
-Message-Id: <20170915090253.12201-12-famz@redhat.com>
-In-Reply-To: <20170915090253.12201-1-famz@redhat.com>
-References: <20170915090253.12201-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL v4 20/38] docker: Use archive-source.py
+	(envelope-from <otubo@redhat.com>) id 1dsmaN-0005KS-4b
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 05:07:00 -0400
+From: Eduardo Otubo <otubo@redhat.com>
+Date: Fri, 15 Sep 2017 11:06:43 +0200
+Message-Id: <20170915090643.6043-1-otubo@redhat.com>
+Subject: [Qemu-devel] [PATCH] dma/i82374: avoid double creation of i82374
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +19,43 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, pbonzini@redhat.com, ehabkost@redhat.com, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170913030119.3957-14-famz@redhat.com>
+QEMU fails when used with the following command line:
+
+  ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
+  qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
+  Aborted (core dumped)
+
+The 40p machine type already creates the device i82374. If specified in the
+command line, it will try to create it again, hence generating the error. The
+function isa_bus_dma() isn't supposed to be called twice for the same bus. One
+way to avoid this problem is to set user_creatable=false.
+
+A possible fix in a near future would be making
+isa_bus_dma()/DMA_init()/i82374_realize() return an error instead of asserting
+as well.
+
+Signed-off-by: Eduardo Otubo <otubo@redhat.com>
 ---
- tests/docker/Makefile.include | 15 ++-------------
- tests/docker/run              |  8 +-------
- 2 files changed, 3 insertions(+), 20 deletions(-)
+ hw/dma/i82374.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.include
-index d7dafdbd27..4bb02b1bb5 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -17,24 +17,13 @@ DOCKER_TOOLS := travis
- TESTS ?= %
- IMAGES ?= %
+diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
+index 6c0f975df0..e76dea8dc7 100644
+--- a/hw/dma/i82374.c
++++ b/hw/dma/i82374.c
+@@ -139,6 +139,11 @@ static void i82374_class_init(ObjectClass *klass, void *data)
+     dc->realize = i82374_realize;
+     dc->vmsd = &vmstate_i82374;
+     dc->props = i82374_properties;
++    dc->user_creatable = false;
++    /*
++     * Reason: i82374_realize() crashes (assertion failure inside isa_bus_dma()
++     *         if the device is instantiated twice.
++     */
+ }
  
--# Make archive from git repo $1 to tar.gz $2
--make-archive-maybe = $(if $(wildcard $1/*), \
--	$(call quiet-command, \
--		(cd $1; if git diff-index --quiet HEAD -- &>/dev/null; then \
--			git archive -1 HEAD --format=tar.gz; \
--		else \
--			git archive -1 $$(git stash create) --format=tar.gz; \
--		fi) > $2, \
--		"ARCHIVE","$(notdir $2)"))
--
- CUR_TIME := $(shell date +%Y-%m-%d-%H.%M.%S.$$$$)
- DOCKER_SRC_COPY := docker-src.$(CUR_TIME)
- 
- $(DOCKER_SRC_COPY):
- 	@mkdir $@
--	$(call make-archive-maybe, $(SRC_PATH), $@/qemu.tgz)
--	$(call make-archive-maybe, $(SRC_PATH)/dtc, $@/dtc.tgz)
--	$(call make-archive-maybe, $(SRC_PATH)/pixman, $@/pixman.tgz)
-+	$(call quiet-command, $(SRC_PATH)/scripts/archive-source.sh $@/qemu.tar, \
-+		"GEN", "$@/qemu.tar")
- 	$(call quiet-command, cp $(SRC_PATH)/tests/docker/run $@/run, \
- 		"COPY","RUNNER")
- 
-diff --git a/tests/docker/run b/tests/docker/run
-index ec2541cbd9..52b76e443d 100755
---- a/tests/docker/run
-+++ b/tests/docker/run
-@@ -32,13 +32,7 @@ export TEST_DIR=/tmp/qemu-test
- mkdir -p $TEST_DIR/{src,build,install}
- 
- # Extract the source tarballs
--tar -C $TEST_DIR/src -xzf $BASE/qemu.tgz
--for p in dtc pixman; do
--    if test -f $BASE/$p.tgz; then
--        tar -C $TEST_DIR/src/$p -xzf $BASE/$p.tgz
--        export FEATURES="$FEATURES $p"
--    fi
--done
-+tar -C $TEST_DIR/src -xf $BASE/qemu.tar
- 
- if test -n "$SHOW_ENV"; then
-     if test -f /packages.txt; then
+ static const TypeInfo i82374_info = {
 -- 
 2.13.5
