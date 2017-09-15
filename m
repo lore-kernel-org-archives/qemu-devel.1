@@ -1,21 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39637)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40427)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dsnhS-0001JO-Vf
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:18:19 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dsnkB-0004Ar-TD
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:21:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dsnhR-0005BT-N1
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:18:18 -0400
-References: <20170915090643.6043-1-otubo@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0d4bdcbb-3153-0064-d280-d9ca4f0671e4@redhat.com>
-Date: Fri, 15 Sep 2017 12:18:11 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1dsnk7-00024M-UG
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:21:07 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:57175)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dsnk7-00023T-Nl
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 06:21:03 -0400
+Received: by mail-wr0-x233.google.com with SMTP id r74so1421111wrb.13
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 03:21:03 -0700 (PDT)
+References: <20170912162513.21694-1-richard.henderson@linaro.org>
+	<20170912162513.21694-13-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170912162513.21694-13-richard.henderson@linaro.org>
+Date: Fri, 15 Sep 2017 11:21:01 +0100
+Message-ID: <87zi9w8dpu.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170915090643.6043-1-otubo@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] dma/i82374: avoid double creation of
- i82374 device
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 12/16] tcg: Remove tcg_regset_set
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,50 +30,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, ehabkost@redhat.com, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org
 
-On 15/09/2017 11:06, Eduardo Otubo wrote:
-> QEMU fails when used with the following command line:
-> 
->   ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device i82374
->   qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion `!bus->dma[0] && !bus->dma[1]' failed.
->   Aborted (core dumped)
-> 
-> The 40p machine type already creates the device i82374. If specified in the
-> command line, it will try to create it again, hence generating the error. The
-> function isa_bus_dma() isn't supposed to be called twice for the same bus. One
-> way to avoid this problem is to set user_creatable=false.
-> 
-> A possible fix in a near future would be making
-> isa_bus_dma()/DMA_init()/i82374_realize() return an error instead of asserting
-> as well.
-> 
-> Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+
+Richard Henderson <richard.henderson@linaro.org> writes:
+
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+This breaks the mips cross build:
+
+In file included from /tmp/qemu-test/src/tcg/tcg.c:254:0:
+/tmp/qemu-test/src/tcg/mips/tcg-target.inc.c: In function 'target_parse_constraint':
+/tmp/qemu-test/src/tcg/mips/tcg-target.inc.c:198:9: error: implicit
+declaration of function 'tcg_regset_set' [-Werror=implicit-function-declaration]
+
+         tcg_regset_set(ct->u.regs, 0xffffffff);                                                                                                                                      ^~~~~~~~~~~~~~                                                                                                                                                      /tmp/qemu-test/src/tcg/mips/tcg-target.inc.c:198:9: error: nested extern declaration of 'tcg_regset_set' [-Werror=nested-externs]
+
+Via:
+
+  make docker-test-build@debian-mips-cross V=1 J=9 TARGET_LIST=mips-softmmu,mipsel-linux-user
+
 > ---
->  hw/dma/i82374.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
-> index 6c0f975df0..e76dea8dc7 100644
-> --- a/hw/dma/i82374.c
-> +++ b/hw/dma/i82374.c
-> @@ -139,6 +139,11 @@ static void i82374_class_init(ObjectClass *klass, void *data)
->      dc->realize = i82374_realize;
->      dc->vmsd = &vmstate_i82374;
->      dc->props = i82374_properties;
-> +    dc->user_creatable = false;
-> +    /*
-> +     * Reason: i82374_realize() crashes (assertion failure inside isa_bus_dma()
-> +     *         if the device is instantiated twice.
-> +     */
->  }
->  
->  static const TypeInfo i82374_info = {
-> 
+>  tcg/tcg.h | 1 -
+>  tcg/tcg.c | 8 ++++----
+>  2 files changed, 4 insertions(+), 5 deletions(-)
+>
+> diff --git a/tcg/tcg.h b/tcg/tcg.h
+> index 7226727ee4..e168bd2c44 100644
+> --- a/tcg/tcg.h
+> +++ b/tcg/tcg.h
+> @@ -210,7 +210,6 @@ typedef enum TCGOpcode {
+>      NB_OPS,
+>  } TCGOpcode;
+>
+> -#define tcg_regset_set(d, s) (d) = (s)
+>  #define tcg_regset_set32(d, reg, val32) (d) |= (val32) << (reg)
+>  #define tcg_regset_set_reg(d, r) (d) |= 1L << (r)
+>  #define tcg_regset_reset_reg(d, r) (d) &= ~(1L << (r))
+> diff --git a/tcg/tcg.c b/tcg/tcg.c
+> index f40cce3364..873915925f 100644
+> --- a/tcg/tcg.c
+> +++ b/tcg/tcg.c
+> @@ -2452,7 +2452,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOpDef *def,
+>      TCGTemp *ts, *ots;
+>      TCGType otype, itype;
+>
+> -    tcg_regset_set(allocated_regs, s->reserved_regs);
+> +    allocated_regs = s->reserved_regs;
+>      ots = &s->temps[args[0]];
+>      ts = &s->temps[args[1]];
+>
+> @@ -2540,8 +2540,8 @@ static void tcg_reg_alloc_op(TCGContext *s,
+>             args + nb_oargs + nb_iargs,
+>             sizeof(TCGArg) * def->nb_cargs);
+>
+> -    tcg_regset_set(i_allocated_regs, s->reserved_regs);
+> -    tcg_regset_set(o_allocated_regs, s->reserved_regs);
+> +    i_allocated_regs = s->reserved_regs;
+> +    o_allocated_regs = s->reserved_regs;
+>
+>      /* satisfy input constraints */
+>      for(k = 0; k < nb_iargs; k++) {
+> @@ -2741,7 +2741,7 @@ static void tcg_reg_alloc_call(TCGContext *s, int nb_oargs, int nb_iargs,
+>      }
+>
+>      /* assign input registers */
+> -    tcg_regset_set(allocated_regs, s->reserved_regs);
+> +    allocated_regs = s->reserved_regs;
+>      for(i = 0; i < nb_regs; i++) {
+>          arg = args[nb_oargs + i];
+>          if (arg != TCG_CALL_DUMMY_ARG) {
 
-This breaks "make check", doesn't it?
 
-v2 should be the one that returns an error instead of asserting.
-
-Paolo
+--
+Alex Bennée
