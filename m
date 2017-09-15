@@ -1,22 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48650)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dsjHQ-00069c-5n
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 01:35:09 -0400
+	(envelope-from <famz@redhat.com>) id 1dsjQI-0000ZS-46
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 01:44:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1dsjHM-0008Uz-7S
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 01:35:08 -0400
-References: <150541711102.1616.2690784964841960181.stgit@bahia.lan>
-	<150541713284.1616.15291547955159941369.stgit@bahia.lan>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <abd784d6-ae05-e248-5f81-c6df281d01bb@redhat.com>
-Date: Fri, 15 Sep 2017 07:34:59 +0200
-MIME-Version: 1.0
-In-Reply-To: <150541713284.1616.15291547955159941369.stgit@bahia.lan>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] kvm: check KVM_CAP_NR_VCPUS with
- kvm_vm_check_extension()
+	(envelope-from <famz@redhat.com>) id 1dsjQE-0007MY-7V
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 01:44:18 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Fri, 15 Sep 2017 13:44:01 +0800
+Message-Id: <20170915054404.19914-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/3] migration: Fix crash by cleaning up before
+ quit
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,121 +18,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Sam Bobroff <sam.bobroff@au1.ibm.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, qemu-stable@nongnu.org, peterx@redhat.com
 
-On 14.09.2017 21:25, Greg Kurz wrote:
-> On a modern server-class ppc host with the following CPU topology:
-> 
-> Architecture:          ppc64le
-> Byte Order:            Little Endian
-> CPU(s):                32
-> On-line CPU(s) list:   0,8,16,24
-> Off-line CPU(s) list:  1-7,9-15,17-23,25-31
-> Thread(s) per core:    1
-> 
-> If both KVM PR and KVM HV loaded and we pass:
-> 
->         -machine pseries,accel=kvm,kvm-type=PR -smp 8
-> 
-> We expect QEMU to warn that this exceeds the number of online CPUs:
-> 
-> Warning: Number of SMP cpus requested (8) exceeds the recommended
->  cpus supported by KVM (4)
-> Warning: Number of hotpluggable cpus requested (8) exceeds the
->  recommended cpus supported by KVM (4)
-> 
-> but nothing is printed...
-> 
-> This happens because on ppc the KVM_CAP_NR_VCPUS capability is VM
-> specific  ndreally depends on the KVM type, but we currently use it
-> as a global capability. And KVM returns a fallback value based on
-> KVM HV being present. Maybe KVM on POWER shouldn't presume anything
-> as long as it doesn't have a VM, but in all cases, we should call
-> KVM_CREATE_VM first and use KVM_CAP_NR_VCPUS as a VM capability.
-> 
-> This patch hence changes kvm_recommended_vcpus() accordingly and
-> moves the sanity checking of smp_cpus after the VM creation.
-> 
-> It is okay for the other archs that also implement KVM_CAP_NR_VCPUS,
-> ie, mips, s390, x86 and arm, because they don't depend on the VM
-> being created or not.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  accel/kvm/kvm-all.c |   45 +++++++++++++++++++++++----------------------
->  1 file changed, 23 insertions(+), 22 deletions(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 323c567cfb68..d10534de2da1 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -1533,7 +1533,7 @@ static void kvm_irqchip_create(MachineState *machine, KVMState *s)
->   */
->  static int kvm_recommended_vcpus(KVMState *s)
->  {
-> -    int ret = kvm_check_extension(s, KVM_CAP_NR_VCPUS);
-> +    int ret = kvm_vm_check_extension(s, KVM_CAP_NR_VCPUS);
->      return (ret) ? ret : 4;
->  }
->  
-> @@ -1623,27 +1623,6 @@ static int kvm_init(MachineState *ms)
->          s->nr_slots = 32;
->      }
->  
-> -    /* check the vcpu limits */
-> -    soft_vcpus_limit = kvm_recommended_vcpus(s);
-> -    hard_vcpus_limit = kvm_max_vcpus(s);
-> -
-> -    while (nc->name) {
-> -        if (nc->num > soft_vcpus_limit) {
-> -            fprintf(stderr,
-> -                    "Warning: Number of %s cpus requested (%d) exceeds "
-> -                    "the recommended cpus supported by KVM (%d)\n",
-> -                    nc->name, nc->num, soft_vcpus_limit);
-> -
-> -            if (nc->num > hard_vcpus_limit) {
-> -                fprintf(stderr, "Number of %s cpus requested (%d) exceeds "
-> -                        "the maximum cpus supported by KVM (%d)\n",
-> -                        nc->name, nc->num, hard_vcpus_limit);
-> -                exit(1);
-> -            }
-> -        }
-> -        nc++;
-> -    }
-> -
->      kvm_type = qemu_opt_get(qemu_get_machine_opts(), "kvm-type");
->      if (mc->kvm_type) {
->          type = mc->kvm_type(kvm_type);
-> @@ -1678,6 +1657,28 @@ static int kvm_init(MachineState *ms)
->      }
->  
->      s->vmfd = ret;
-> +
-> +    /* check the vcpu limits */
-> +    soft_vcpus_limit = kvm_recommended_vcpus(s);
-> +    hard_vcpus_limit = kvm_max_vcpus(s);
-> +
-> +    while (nc->name) {
-> +        if (nc->num > soft_vcpus_limit) {
-> +            fprintf(stderr,
-> +                    "Warning: Number of %s cpus requested (%d) exceeds "
-> +                    "the recommended cpus supported by KVM (%d)\n",
-> +                    nc->name, nc->num, soft_vcpus_limit);
-> +
-> +            if (nc->num > hard_vcpus_limit) {
-> +                fprintf(stderr, "Number of %s cpus requested (%d) exceeds "
-> +                        "the maximum cpus supported by KVM (%d)\n",
-> +                        nc->name, nc->num, hard_vcpus_limit);
-> +                exit(1);
-> +            }
-> +        }
-> +        nc++;
-> +    }
-> +
->      missing_cap = kvm_check_extension_list(s, kvm_required_capabilites);
->      if (!missing_cap) {
->          missing_cap =
-> 
+Quit command causes asssertion failure in block layer due to op blockers added
+by BMDS, if there is an active block migration.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Fixing this by calling migration cleaning up functions at the end of main()
+before bdrv_close_all() is called.
+
+Fam Zheng (3):
+  migration: Allow ram_save_cleanup to be called with empty state
+  migration: Cancel migration at exit
+  iotests: Add "quit during block migration" case 195
+
+ include/migration/misc.h   |  1 +
+ migration/migration.c      |  7 +++-
+ migration/ram.c            |  3 ++
+ tests/qemu-iotests/195     | 97 ++++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/195.out | 19 +++++++++
+ tests/qemu-iotests/group   |  1 +
+ vl.c                       |  3 ++
+ 7 files changed, 130 insertions(+), 1 deletion(-)
+ create mode 100755 tests/qemu-iotests/195
+ create mode 100644 tests/qemu-iotests/195.out
+
+-- 
+2.13.5
