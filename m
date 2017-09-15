@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42209)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42564)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dsqTu-0002uv-5Y
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:16:31 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dsqUg-0004TX-0E
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:17:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1dsqTq-0003zc-2b
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:16:30 -0400
-Received: from 3.mo2.mail-out.ovh.net ([46.105.58.226]:54022)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1dsqTp-0003zJ-PV
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:16:25 -0400
-Received: from player770.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id D2BE0AA04F
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 15:16:24 +0200 (CEST)
-From: Greg Kurz <groug@kaod.org>
-Date: Fri, 15 Sep 2017 15:16:20 +0200
-Message-ID: <150548138021.5945.4408791416827487125.stgit@bahia.lan>
-In-Reply-To: <150548133297.5945.7401220081077343726.stgit@bahia.lan>
-References: <150548133297.5945.7401220081077343726.stgit@bahia.lan>
+	(envelope-from <alex.bennee@linaro.org>) id 1dsqUb-0004O5-UD
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:17:17 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:48543)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dsqUb-0004MP-N4
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:17:13 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id r68so8254915wmg.3
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 06:17:13 -0700 (PDT)
+References: <20170913132417.24384-1-david@redhat.com>
+	<20170913132417.24384-12-david@redhat.com>
+	<87lglia85d.fsf@linaro.org>
+	<febf18fb-7437-0ce0-6669-1c7e964eea07@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <febf18fb-7437-0ce0-6669-1c7e964eea07@redhat.com>
+Date: Fri, 15 Sep 2017 14:17:11 +0100
+Message-ID: <87vakk85k8.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Subject: [Qemu-devel] [PATCH 4/4] ppc/kvm: generalize the use of
- kvmppc_get_htab_fd()
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v5 11/22] s390x: allow only 1 CPU with TCG
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,187 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, Eduardo Habkost <ehabkost@redhat.com>, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, Markus Armbruster <armbru@redhat.com>, borntraeger@de.ibm.com, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-The use of KVM_PPC_GET_HTAB_FD is open-coded in kvmppc_read_hptes()
-and kvmppc_write_hpte().
 
-This patch modifies kvmppc_get_htab_fd() so that it can be used
-everywhere we need to access the in-kernel htab:
-- add an index argument
-  => only kvmppc_read_hptes() passes an actual index, all other users
-     pass 0
-- add an errp argument to propagate error messages to the caller.
-  => spapr migration code prints the error
-  => hpte helpers pass &error_abort to keep the current behavior
-     of hw_error()
+David Hildenbrand <david@redhat.com> writes:
 
-While here, this also fixes a bug in kvmppc_write_hpte() so that it
-opens the htab fd for writing instead of reading as it currently does.
-This never broke anything because we currently never call this code,
-as explained in the changelog of commit c1385933804bb:
+> On 13.09.2017 18:13, Alex Bennée wrote:
+>>
+>> David Hildenbrand <david@redhat.com> writes:
+>>
+>>> Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
+>>> guest tries to bring these CPUs up but fails), because we don't support
+>>> multiple CPUs on s390x under TCG.
+>>>
+>>> Let's bail out if more than 1 is specified, so we don't raise people's
+>>> hope.
+>>
+>> Why does this restriction exist? Without MTTCG enabled -smp > 1 should
+>> be safe from any races.
+>
+> Because the actual SIGP code (instruction to start/stop ... CPUs) is not
+> implemented yet.
 
-"This support updating htab managed by the hypervisor. Currently
- we don't have any user for this feature. This actually bring the
- store_hpte interface in-line with the load_hpte one. We may want
- to use this when we want to emulate henter hcall in qemu for HV
- kvm."
+Ahh OK, I assume something like ARM's PCSI interface then.
 
-The above is still true today.
+When you do get around to implementing just ensure you use the async
+mechanism to initialise the target processor state to avoid races in
+MTTCG. Essentially you queue the work up on the target and then it is
+run before the powered up vCPU starts running code.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c       |   15 +++++++--------
- target/ppc/kvm.c     |   27 +++++++++------------------
- target/ppc/kvm_ppc.h |    4 ++--
- 3 files changed, 18 insertions(+), 28 deletions(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 1ae79326d1ac..eeef549fbc15 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -1211,14 +1211,15 @@ static uint64_t spapr_get_patbe(PPCVirtualHypervisor *vhyp)
-  */
- static int get_htab_fd(sPAPRMachineState *spapr)
- {
-+    Error *local_err = NULL;
-+
-     if (spapr->htab_fd >= 0) {
-         return spapr->htab_fd;
-     }
- 
--    spapr->htab_fd = kvmppc_get_htab_fd(false);
-+    spapr->htab_fd = kvmppc_get_htab_fd(false, 0, &local_err);
-     if (spapr->htab_fd < 0) {
--        error_report("Unable to open fd for reading hash table from KVM: %s",
--                     strerror(spapr->htab_fd));
-+        error_report_err(local_err);
-     }
- 
-     return spapr->htab_fd;
-@@ -1931,6 +1932,7 @@ static int htab_load(QEMUFile *f, void *opaque, int version_id)
-     sPAPRMachineState *spapr = opaque;
-     uint32_t section_hdr;
-     int fd = -1;
-+    Error *local_err = NULL;
- 
-     if (version_id < 1 || version_id > 1) {
-         error_report("htab_load() bad version");
-@@ -1945,8 +1947,6 @@ static int htab_load(QEMUFile *f, void *opaque, int version_id)
-     }
- 
-     if (section_hdr) {
--        Error *local_err = NULL;
--
-         /* First section gives the htab size */
-         spapr_reallocate_hpt(spapr, section_hdr, &local_err);
-         if (local_err) {
-@@ -1959,10 +1959,9 @@ static int htab_load(QEMUFile *f, void *opaque, int version_id)
-     if (!spapr->htab) {
-         assert(kvm_enabled());
- 
--        fd = kvmppc_get_htab_fd(true);
-+        fd = kvmppc_get_htab_fd(true, 0, &local_err);
-         if (fd < 0) {
--            error_report("Unable to open fd to restore KVM hash table: %s",
--                         strerror(fd));
-+            error_report_err(local_err);
-             return fd;
-         }
-     }
-diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-index 09d7dea79e2d..c37d74941085 100644
---- a/target/ppc/kvm.c
-+++ b/target/ppc/kvm.c
-@@ -2550,21 +2550,25 @@ int kvmppc_define_rtas_kernel_token(uint32_t token, const char *function)
-     return kvm_vm_ioctl(kvm_state, KVM_PPC_RTAS_DEFINE_TOKEN, &args);
- }
- 
--int kvmppc_get_htab_fd(bool write)
-+int kvmppc_get_htab_fd(bool write, uint64_t index, Error **errp)
- {
-     struct kvm_get_htab_fd s = {
-         .flags = write ? KVM_GET_HTAB_WRITE : 0,
--        .start_index = 0,
-+        .start_index = index,
-     };
-     int ret;
- 
-     if (!cap_htab_fd) {
--        fprintf(stderr, "KVM version doesn't support saving the hash table\n");
-+        error_setg(errp, "KVM version doesn't support %s the HPT",
-+                   write ? "writing" : "reading");
-         return -ENOTSUP;
-     }
- 
-     ret = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &s);
-     if (ret < 0) {
-+        error_setg(errp, "Unable to open fd for %s HPT %s KVM: %s",
-+                   write ? "writing" : "reading", write ? "to" : "from",
-+                   strerror(errno));
-         return -errno;
-     }
- 
-@@ -2648,17 +2652,10 @@ void kvm_arch_init_irq_routing(KVMState *s)
- 
- void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n)
- {
--    struct kvm_get_htab_fd ghf = {
--        .flags = 0,
--        .start_index = ptex,
--    };
-     int fd, rc;
-     int i;
- 
--    fd = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &ghf);
--    if (fd < 0) {
--        hw_error("kvmppc_read_hptes: Unable to open HPT fd");
--    }
-+    fd = kvmppc_get_htab_fd(false, ptex, &error_abort);
- 
-     i = 0;
-     while (i < n) {
-@@ -2700,19 +2697,13 @@ void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n)
- void kvmppc_write_hpte(hwaddr ptex, uint64_t pte0, uint64_t pte1)
- {
-     int fd, rc;
--    struct kvm_get_htab_fd ghf;
-     struct {
-         struct kvm_get_htab_header hdr;
-         uint64_t pte0;
-         uint64_t pte1;
-     } buf;
- 
--    ghf.flags = 0;
--    ghf.start_index = 0;     /* Ignored */
--    fd = kvm_vm_ioctl(kvm_state, KVM_PPC_GET_HTAB_FD, &ghf);
--    if (fd < 0) {
--        hw_error("kvmppc_write_hpte: Unable to open HPT fd");
--    }
-+    fd = kvmppc_get_htab_fd(true, 0 /* Ignored */, &error_abort);
- 
-     buf.hdr.n_valid = 1;
-     buf.hdr.n_invalid = 0;
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index 08aab46c5a56..349f892631bf 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -51,7 +51,7 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigned int hash_shift);
- #endif /* !CONFIG_USER_ONLY */
- bool kvmppc_has_cap_epr(void);
- int kvmppc_define_rtas_kernel_token(uint32_t token, const char *function);
--int kvmppc_get_htab_fd(bool write);
-+int kvmppc_get_htab_fd(bool write, uint64_t index, Error **errp);
- int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns);
- int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
-                            uint16_t n_valid, uint16_t n_invalid);
-@@ -245,7 +245,7 @@ static inline int kvmppc_define_rtas_kernel_token(uint32_t token,
-     return -1;
- }
- 
--static inline int kvmppc_get_htab_fd(bool write)
-+static inline int kvmppc_get_htab_fd(bool write, uint64_t index, Error **errp)
- {
-     return -1;
- }
+--
+Alex Bennée
