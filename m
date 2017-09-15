@@ -1,32 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53669)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58676)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dsr65-0000sn-JA
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:55:58 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dsrQQ-0001IC-No
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:16:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dsr62-0008NU-Ac
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:55:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57432)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dsr61-0008LM-MY
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 09:55:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 4CE154A6FB
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 13:55:52 +0000 (UTC)
-Date: Fri, 15 Sep 2017 21:55:43 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170915135543.GX3617@pxdev.xzpeter.org>
-References: <1505474026-13151-1-git-send-email-mgamal@redhat.com>
-	<1505474026-13151-2-git-send-email-mgamal@redhat.com>
-	<20170915135223.GV3617@pxdev.xzpeter.org>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dsrQL-00033s-P0
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:16:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51642)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dsrQL-00033E-GF
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 10:16:53 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8FEG9Ht142728
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 10:16:51 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d0drygnqh-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 10:16:51 -0400
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Fri, 15 Sep 2017 15:16:48 +0100
+References: <20170915101406.27823-1-cohuck@redhat.com>
+	<20170915101406.27823-2-cohuck@redhat.com>
+	<37791e7b-c096-3e88-4121-4f1739615367@redhat.com>
+	<20170915150705.359a5356.cohuck@redhat.com>
+	<cdd8e227-c7c6-2753-5ae7-b667d6e63280@redhat.com>
+	<20170915152229.3a955efa.cohuck@redhat.com>
+	<17bff893-985b-96eb-8677-0a32a918b607@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Fri, 15 Sep 2017 16:16:46 +0200
 MIME-Version: 1.0
+In-Reply-To: <17bff893-985b-96eb-8677-0a32a918b607@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170915135223.GV3617@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [PATCH 1/2] x86_iommu: Move machine check to
- x86_iommu_realize()
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <adee6520-ceac-aeb5-1ca0-68ecb32208bc@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH RFC 1/1] s390x/ccw: create s390 phb for
+ compat reasons as well
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,126 +48,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mohammed Gamal <mgamal@redhat.com>
-Cc: qemu-devel@nongnu.org, ehabkost@redhat.com, mst@redhat.com, thuth@redhat.com
+To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: thuth@redhat.com, zyimin@linux.vnet.ibm.com, pmorel@linux.vnet.ibm.com, qemu-devel@nongnu.org, agraf@suse.de, borntraeger@de.ibm.com
 
-On Fri, Sep 15, 2017 at 09:52:23PM +0800, Peter Xu wrote:
-> On Fri, Sep 15, 2017 at 01:13:45PM +0200, Mohammed Gamal wrote:
-> > Instead of having the same error checks in vtd_realize()
-> > and amdvi_realize(), move that over to the generic
-> > x86_iommu_realize().
-> > 
-> > Signed-off-by: Mohammed Gamal <mgamal@redhat.com>
-> > ---
-> >  hw/i386/amd_iommu.c   | 10 +---------
-> >  hw/i386/intel_iommu.c | 10 +---------
-> >  hw/i386/x86-iommu.c   | 13 +++++++++++++
-> >  3 files changed, 15 insertions(+), 18 deletions(-)
-> > 
-> > diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
-> > index 334938a..839f01f 100644
-> > --- a/hw/i386/amd_iommu.c
-> > +++ b/hw/i386/amd_iommu.c
-> > @@ -1141,18 +1141,10 @@ static void amdvi_realize(DeviceState *dev, Error **err)
-> >      AMDVIState *s = AMD_IOMMU_DEVICE(dev);
-> >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
-> >      MachineState *ms = MACHINE(qdev_get_machine());
-> > -    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> >      PCMachineState *pcms =
-> >          PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
-> > -    PCIBus *bus;
-> > +    PCIBus *bus = pcms->bus;
-> >  
-> > -    if (!pcms) {
-> > -        error_setg(err, "Machine-type '%s' not supported by amd-iommu",
-> > -                   mc->name);
-> > -        return;
-> > -    }
-> > -
-> > -    bus = pcms->bus;
-> >      s->iotlb = g_hash_table_new_full(amdvi_uint64_hash,
-> >                                       amdvi_uint64_equal, g_free, g_free);
-> >  
-> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> > index 3a5bb0b..aa01812 100644
-> > --- a/hw/i386/intel_iommu.c
-> > +++ b/hw/i386/intel_iommu.c
-> > @@ -3027,20 +3027,12 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
-> >  static void vtd_realize(DeviceState *dev, Error **errp)
-> >  {
-> >      MachineState *ms = MACHINE(qdev_get_machine());
-> > -    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> >      PCMachineState *pcms =
-> >          PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
-> > -    PCIBus *bus;
-> > +    PCIBus *bus = pcms->bus;
-> >      IntelIOMMUState *s = INTEL_IOMMU_DEVICE(dev);
-> >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
-> >  
-> > -    if (!pcms) {
-> > -        error_setg(errp, "Machine-type '%s' not supported by intel-iommu",
-> > -                   mc->name);
-> > -        return;
-> > -    }
-> > -
-> > -    bus = pcms->bus;
-> >      x86_iommu->type = TYPE_INTEL;
-> >  
-> >      if (!vtd_decide_config(s, errp)) {
-> > diff --git a/hw/i386/x86-iommu.c b/hw/i386/x86-iommu.c
-> > index 293caf8..4d17e1f 100644
-> > --- a/hw/i386/x86-iommu.c
-> > +++ b/hw/i386/x86-iommu.c
-> > @@ -21,6 +21,8 @@
-> >  #include "hw/sysbus.h"
-> >  #include "hw/boards.h"
-> >  #include "hw/i386/x86-iommu.h"
-> > +#include "hw/i386/pc.h"
-> > +#include "qapi/error.h"
-> >  #include "qemu/error-report.h"
-> >  #include "trace.h"
-> >  
-> > @@ -80,7 +82,18 @@ static void x86_iommu_realize(DeviceState *dev, Error **errp)
-> >  {
-> >      X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(dev);
-> >      X86IOMMUClass *x86_class = X86_IOMMU_GET_CLASS(dev);
-> > +    MachineState *ms = MACHINE(qdev_get_machine());
-> > +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> > +    PCMachineState *pcms =
-> > +        PC_MACHINE(object_dynamic_cast(OBJECT(ms), TYPE_PC_MACHINE));
-> >      QLIST_INIT(&x86_iommu->iec_notifiers);
-> > +
-> > +    if (!pcms) {
-> > +        error_setg(errp, "Machine-type '%s' not supported by iommu",
-> 
-> When moving it, maybe also fix the English? :)
-> 
->   "Machine-type '%s' does not support IOMMU."
 
-I was wrong.  I changed the correct thing into error.  E.g., ppc64
-obviously supports IOMMU... Please ignore my comment and just pick my
-r-b.  Sorry for the noise.
+
+On 09/15/2017 03:37 PM, David Hildenbrand wrote:
+> On 15.09.2017 15:22, Cornelia Huck wrote:
+>> On Fri, 15 Sep 2017 15:09:02 +0200
+>> David Hildenbrand <david@redhat.com> wrote:
+>>
+>>> On 15.09.2017 15:07, Cornelia Huck wrote:
+>>>> On Fri, 15 Sep 2017 13:57:40 +0200
+>>>> David Hildenbrand <david@redhat.com> wrote:
+>>>>   
+>>>>> As an alternative, simply
+>>>>>
+>>>>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+>>>>> index 0f28ebd162..0f22efc3b6 100644
+>>>>> --- a/target/s390x/cpu_models.c
+>>>>> +++ b/target/s390x/cpu_models.c
+>>>>> @@ -195,6 +195,8 @@ bool s390_has_feat(S390Feat feat)
+>>>>>                  return true;
+>>>>>              }
+>>>>>          }
+>>>>> +        if (feat == S390_FEAT_ZPCI)
+>>>>> +            return true;  
+>>>>
+>>>> Move that out of the CONFIG_KVM #ifdef?
+>>>>   
+>>>
+>>> Should not make a difference I think, cpu models are not shielded off
+>>> for TCG I think (maybe we should fix that, but doesn't look that easy -
+>>> they have no host model which would allow cpu->model = NULL).
+>>
+>> It just looks odd to have it inside the define...
+> 
+> sure, you can then also just move it into kvm_enable() next to the other
+> ones.
+> 
+>>
+>>>
+>>>> (Also, we still have the issue with pci support :/ - depend on
+>>>> pci_available?)  
+>>>
+>>> hm ....
+>>
+>> Should we maybe disallow compat machines if CONFIG_PCI is off, and
+>> think about something for the 2.11 machine? Otherwise, I cannot see
+>> that end well :/
+> 
+> If they required PCI, than that is the only way to do it.
+> 
+>>
+>> But I'll just draw up a v2 for now.
+>>
+
+Sorry for not contributing anything here. I don't have the whole
+thing in my head, so I can't quite follow without digging into this.
+
+I don't think I will be able to join today -- maybe I could have a
+look next week .
+
+Halil 
 
 > 
-> Otherwise:
 > 
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> 
-> Thanks,
-> 
-> > +                   mc->name);
-> > +        return;
-> > +    }
-> > +
-> >      if (x86_class->realize) {
-> >          x86_class->realize(dev, errp);
-> >      }
-> > -- 
-> > 1.8.3.1
-> > 
-> 
-> -- 
-> Peter Xu
-
--- 
-Peter Xu
