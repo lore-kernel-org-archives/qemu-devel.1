@@ -1,29 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52620)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dsu1v-0001Sh-LG
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:03:52 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dsu5e-0004wo-8s
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:07:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dsu1s-0006X3-IU
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:03:51 -0400
-Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:52017)
+	(envelope-from <pbonzini@redhat.com>) id 1dsu5b-0002Gw-3Z
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:07:42 -0400
+Received: from mail-wm0-f51.google.com ([74.125.82.51]:46607)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dsu1s-0006Wr-8p
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:03:48 -0400
-Received: by mail-pg0-x22f.google.com with SMTP id k193so1846399pgc.8
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 10:03:48 -0700 (PDT)
-References: <20170912162513.21694-1-richard.henderson@linaro.org>
-	<20170912162513.21694-13-richard.henderson@linaro.org>
-	<87zi9w8dpu.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <93cffc82-7621-7d7d-addd-859a8813cc2e@linaro.org>
-Date: Fri, 15 Sep 2017 10:03:43 -0700
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dsu5a-0002ET-Sr
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 13:07:39 -0400
+Received: by mail-wm0-f51.google.com with SMTP id i189so9964855wmf.1
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 10:07:38 -0700 (PDT)
+References: <35eda6a9-086e-f899-e131-288f2346effe@wiesinger.com>
+	<ce477c53-25bc-e6dd-3e05-c74af1f33c2d@wiesinger.com>
+	<3e1f41a8-faff-1858-6f0d-154694dff02d@wiesinger.com>
+	<CABgObfYzngJPgS9agXMrRENVD_e+3Hm=y+KD5dp9na8jNwuumw@mail.gmail.com>
+	<CABgObfZFwJMpU_D8SMkuiEhb0qBokHL0jpwmuzdE73TReHMFkg@mail.gmail.com>
+	<0e69cbad-f658-03be-0191-1b6fe588147b@wiesinger.com>
+	<CABgObfaw_bMQ=Dpfs=vh_AweaidqCZSBy4bDtsddk5DSKpRP8A@mail.gmail.com>
+	<1b37b04c-349f-28f7-fb6c-fbbbe8415b33@wiesinger.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7757e373-c892-2824-d710-27ca57d479c4@redhat.com>
+Date: Fri, 15 Sep 2017 19:07:35 +0200
 MIME-Version: 1.0
-In-Reply-To: <87zi9w8dpu.fsf@linaro.org>
+In-Reply-To: <1b37b04c-349f-28f7-fb6c-fbbbe8415b33@wiesinger.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 12/16] tcg: Remove tcg_regset_set
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] kvm_intel fails to load on Conroe CPUs running
+ Linux 4.12
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +37,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org, f4bug@amsat.org
+To: Gerhard Wiesinger <lists@wiesinger.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "Kernel Mailing List, Linux" <linux-kernel@vger.kernel.org>
 
-On 09/15/2017 03:21 AM, Alex Bennée wrote:
+On 15/09/2017 16:43, Gerhard Wiesinger wrote:
+> On 27.08.2017 20:55, Paolo Bonzini wrote:
+>>
+>>
+>> Il 27 ago 2017 4:48 PM, "Gerhard Wiesinger" <lists@wiesinger.com
+>> <mailto:lists@wiesinger.com>> ha scritto:
+>>
+>>     On 27.08.2017 14 <tel:27.08.2017%2014>:03, Paolo Bonzini wrote:
+>>
+>>
+>>         We will revert the patch, but 4.13.0 will not have the fix.
+>>         Expect it in later stable kernels (because vacations).
+>>
+>>
+>>     Thnx. Why will 4.13.0 NOT have the fix?
+>>
+>>
+>> Because maintainers are on vacation! :-)
+>>
+>>
 > 
-> Richard Henderson <richard.henderson@linaro.org> writes:
+> Hello Paolo,
 > 
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> 
-> This breaks the mips cross build:
-> 
-> In file included from /tmp/qemu-test/src/tcg/tcg.c:254:0:
-> /tmp/qemu-test/src/tcg/mips/tcg-target.inc.c: In function 'target_parse_constraint':
-> /tmp/qemu-test/src/tcg/mips/tcg-target.inc.c:198:9: error: implicit
-> declaration of function 'tcg_regset_set' [-Werror=implicit-function-declaration]
-> 
->          tcg_regset_set(ct->u.regs, 0xffffffff);     
+> Any update on this for 4.12 and 4.13 kernels?
 
-Yes, I found this myself yesterday.
-Fixed in tcg-next.
+A late fix is better than a wrong fix.  Hope to get to it next week!
 
-Thanks,
-
-
-r~
+Paolo
