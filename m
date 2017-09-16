@@ -1,17 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42177)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48316)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dtDlp-0006fg-T7
-	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:08:35 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dtE2M-0004l0-C0
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:25:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <balaton@eik.bme.hu>) id 1dtDln-0003T3-2G
-	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:08:33 -0400
-Message-Id: <e418fc44a06a331eaf533605dfa0d6befd91857b.1505570561.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1505570561.git.balaton@eik.bme.hu>
-References: <cover.1505570561.git.balaton@eik.bme.hu>
-From: BALATON Zoltan <balaton@eik.bme.hu>
-Date: Sat, 16 Sep 2017 16:02:41 +0200
-Subject: [Qemu-devel] [PATCH v2 1/4] ohci: Allow sysbus version to be used
- as a companion
+	(envelope-from <peter.maydell@linaro.org>) id 1dtE2L-0006bZ-FQ
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:25:38 -0400
+Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:46773)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dtE2L-0006ao-7J
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:25:37 -0400
+Received: by mail-wm0-x22f.google.com with SMTP id i189so13766310wmf.1
+	for <qemu-devel@nongnu.org>; Sat, 16 Sep 2017 07:25:37 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20170915233739.26860-1-ehabkost@redhat.com>
+References: <20170915233739.26860-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 16 Sep 2017 15:25:15 +0100
+Message-ID: <CAFEAcA-_btwgRxVwGMF3xto2fH39Xmt_S-4imK3VYTzPRuG-NA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/15] Python queue, 2017-09-15
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,63 +28,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
-Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Francois Revol <revol@free.fr>, Gerd Hoffmann <kraxel@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?B?THVrw6HFoSBEb2t0b3I=?= <ldoktor@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Amador Pahim <apahim@redhat.com>
 
-Some PPC SoCs have an EHCI with OHCI companion USB controller. To
-emulate this allow the sysbus version of OHCI to be used as a companion.
+On 16 September 2017 at 00:37, Eduardo Habkost <ehabkost@redhat.com> wrote:
+> I have been queueing some patches for Python modules and scripts,
+> recently, and submitted a MAINTAINERS patch to include Cleber and
+> me as maintainers.
+>
+> However, I don't want to delay this pull request to avoid
+> conflicts if people send additional patches for those scripts, so
+> I'm sending this pull request before the MAINTAINERS patch is
+> applied.
+>
+> The following changes since commit 5faf2d376af3cb4eb92da44c2580e08d39832caa:
+>
+>   Merge remote-tracking branch 'remotes/huth/tags/check-20170915' into staging (2017-09-15 20:29:44 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/python-next-pull-request
+>
+> for you to fetch changes up to b92a0011b1220aff549ae82c6104014d25e339ef:
+>
+>   qemu.py: include debug information on launch error (2017-09-15 20:12:00 -0300)
+>
+> ----------------------------------------------------------------
+> Python queue, 2017-09-15
+>
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
----
-v2: Added R-b from http://lists.nongnu.org/archive/html/qemu-ppc/2017-08/msg00346.html
+Applied, thanks.
 
- hw/usb/hcd-ohci.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
-
-diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
-index 267982e..17beedd 100644
---- a/hw/usb/hcd-ohci.c
-+++ b/hw/usb/hcd-ohci.c
-@@ -1999,7 +1999,9 @@ typedef struct {
-     /*< public >*/
- 
-     OHCIState ohci;
-+    char *masterbus;
-     uint32_t num_ports;
-+    uint32_t firstport;
-     dma_addr_t dma_offset;
- } OHCISysBusState;
- 
-@@ -2007,10 +2009,15 @@ static void ohci_realize_pxa(DeviceState *dev, Error **errp)
- {
-     OHCISysBusState *s = SYSBUS_OHCI(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
-+    Error *err = NULL;
- 
--    /* Cannot fail as we pass NULL for masterbus */
--    usb_ohci_init(&s->ohci, dev, s->num_ports, s->dma_offset, NULL, 0,
--                  &address_space_memory, &error_abort);
-+    usb_ohci_init(&s->ohci, dev, s->num_ports, s->dma_offset,
-+                  s->masterbus, s->firstport,
-+                  &address_space_memory, &err);
-+    if (err) {
-+        error_propagate(errp, err);
-+        return;
-+    }
-     sysbus_init_irq(sbd, &s->ohci.irq);
-     sysbus_init_mmio(sbd, &s->ohci.mem);
- }
-@@ -2142,7 +2149,9 @@ static const TypeInfo ohci_pci_info = {
- };
- 
- static Property ohci_sysbus_properties[] = {
-+    DEFINE_PROP_STRING("masterbus", OHCISysBusState, masterbus),
-     DEFINE_PROP_UINT32("num-ports", OHCISysBusState, num_ports, 3),
-+    DEFINE_PROP_UINT32("firstport", OHCISysBusState, firstport, 0),
-     DEFINE_PROP_DMAADDR("dma-offset", OHCISysBusState, dma_offset, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
--- 
-2.7.6
+-- PMM
