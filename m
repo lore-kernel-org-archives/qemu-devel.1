@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dt1WE-0005Ai-RO
+	(envelope-from <jsnow@redhat.com>) id 1dt1WE-0005Ad-6U
 	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 21:03:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dt1WD-0006A0-Cf
+	(envelope-from <jsnow@redhat.com>) id 1dt1WB-000679-3B
 	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 21:03:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47840)
+Received: from mx1.redhat.com ([209.132.183.28]:57616)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dt1WD-000694-3A
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 21:03:37 -0400
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dt1WA-00065r-T3
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 21:03:35 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Fri, 15 Sep 2017 21:03:24 -0400
-Message-Id: <20170916010330.10435-6-jsnow@redhat.com>
+Date: Fri, 15 Sep 2017 21:03:20 -0400
+Message-Id: <20170916010330.10435-2-jsnow@redhat.com>
 In-Reply-To: <20170916010330.10435-1-jsnow@redhat.com>
 References: <20170916010330.10435-1-jsnow@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 05/11] IDE: add tracing for data ports
+Subject: [Qemu-devel] [PULL 01/11] ide: ahci: unparent children buses before
+ freeing their memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,114 +28,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, jsnow@redhat.com
+Cc: peter.maydell@linaro.org, jsnow@redhat.com, Igor Mammedov <imammedo@redhat.com>
 
-To be used sparingly, but still interesting in the case of small
-firmwares designed to reproduce bugs in QEMU IDE.
+From: Igor Mammedov <imammedo@redhat.com>
 
-Signed-off-by: John Snow <jsnow@redhat.com>
+Fixes read after freeing error reported
+  https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg04243.html
+  Message-Id: <59a56959-ca12-ea75-33fa-ff07eba1b090@redhat.com>
+
+ich9-ahci device creates ide buses and attaches them as QOM children
+at realize time, however it forgets to properly clean them up
+at unrealize time and frees memory containing these children,
+with following call-chain:
+
+   qdev_device_add()
+     object_property_set_bool('realized', true)
+       device_set_realized()
+          ...
+          pci_qdev_realize() -> pci_ich9_ahci_realize() -> ahci_realize()
+               ...
+               s->dev =3D g_new0(AHCIDevice, ports);
+               ...
+                  AHCIDevice *ad =3D &s->dev[i];
+                  ide_bus_new(&ad->port, sizeof(ad->port), qdev, i, 1);
+                  ^^^ creates bus in memory allocated by above gnew()
+                      and adds it as child propety to ahci device
+          ...
+          hotplug_handler_plug(); -> goto post_realize_fail;
+          pci_qdev_unrealize() -> pci_ich9_uninit() -> ahci_uninit()
+              ...
+               g_free(s->dev);
+               ^^^ free memory that holds children busses
+
+          return with error from device_set_realized()
+
+As result later when qdev_device_add() tries to unparent ich9-ahci
+after failed device_set_realized(),
+    object_unparent() -> object_property_del_child()
+iterates over existing QOM children including buses added by
+ide_bus_new() and tries to unparent them, which causes access to
+freed memory where they where located.
+
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Message-id: 20170901001502.29915-4-jsnow@redhat.com
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
+Message-id: 1503938085-169486-1-git-send-email-imammedo@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- hw/ide/core.c       | 12 +++++++++++-
- hw/ide/trace-events |  5 +++++
- 2 files changed, 16 insertions(+), 1 deletion(-)
+ hw/ide/ahci.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index cb250e6..82a19b1 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -2259,6 +2259,8 @@ void ide_data_writew(void *opaque, uint32_t addr, u=
-int32_t val)
-     IDEState *s =3D idebus_active_if(bus);
-     uint8_t *p;
+diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+index 406a1b5..ccbe091 100644
+--- a/hw/ide/ahci.c
++++ b/hw/ide/ahci.c
+@@ -1495,6 +1495,7 @@ void ahci_uninit(AHCIState *s)
 =20
-+    trace_ide_data_writew(addr, val, bus, s);
-+
-     /* PIO data access allowed only when DRQ bit is set. The result of a=
- write
-      * during PIO out is indeterminate, just ignore it. */
-     if (!(s->status & DRQ_STAT) || ide_is_pio_out(s)) {
-@@ -2304,6 +2306,8 @@ uint32_t ide_data_readw(void *opaque, uint32_t addr=
-)
-         s->status &=3D ~DRQ_STAT;
-         s->end_transfer_func(s);
-     }
-+
-+    trace_ide_data_readw(addr, ret, bus, s);
-     return ret;
- }
-=20
-@@ -2313,6 +2317,8 @@ void ide_data_writel(void *opaque, uint32_t addr, u=
-int32_t val)
-     IDEState *s =3D idebus_active_if(bus);
-     uint8_t *p;
-=20
-+    trace_ide_data_writel(addr, val, bus, s);
-+
-     /* PIO data access allowed only when DRQ bit is set. The result of a=
- write
-      * during PIO out is indeterminate, just ignore it. */
-     if (!(s->status & DRQ_STAT) || ide_is_pio_out(s)) {
-@@ -2343,7 +2349,8 @@ uint32_t ide_data_readl(void *opaque, uint32_t addr=
-)
-     /* PIO data access allowed only when DRQ bit is set. The result of a=
- read
-      * during PIO in is indeterminate, return 0 and don't move forward. =
-*/
-     if (!(s->status & DRQ_STAT) || !ide_is_pio_out(s)) {
--        return 0;
-+        ret =3D 0;
-+        goto out;
+             ide_exit(s);
+         }
++        object_unparent(OBJECT(&ad->port));
      }
 =20
-     p =3D s->data_ptr;
-@@ -2358,6 +2365,9 @@ uint32_t ide_data_readl(void *opaque, uint32_t addr=
-)
-         s->status &=3D ~DRQ_STAT;
-         s->end_transfer_func(s);
-     }
-+
-+out:
-+    trace_ide_data_readl(addr, ret, bus, s);
-     return ret;
- }
-=20
-diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-index bff8f39..17bc6f1 100644
---- a/hw/ide/trace-events
-+++ b/hw/ide/trace-events
-@@ -6,6 +6,11 @@ ide_ioport_read(uint32_t addr, const char *reg, uint32_t=
- val, void *bus, void *s
- ide_ioport_write(uint32_t addr, const char *reg, uint32_t val, void *bus=
-, void *s) "IDE PIO wr @ 0x%"PRIx32" (%s); val 0x%02"PRIx32"; bus %p IDES=
-tate %p"
- ide_status_read(uint32_t addr, uint32_t val, void *bus, void *s)        =
-           "IDE PIO rd @ 0x%"PRIx32" (Alt Status); val 0x%02"PRIx32"; bus=
- %p; IDEState %p"
- ide_cmd_write(uint32_t addr, uint32_t val, void *bus)                   =
-           "IDE PIO wr @ 0x%"PRIx32" (Device Control); val 0x%02"PRIx32";=
- bus %p"
-+# Warning: verbose
-+ide_data_readw(uint32_t addr, uint32_t val, void *bus, void *s)         =
-           "IDE PIO rd @ 0x%"PRIx32" (Data: Word); val 0x%04"PRIx32"; bus=
- %p; IDEState %p"
-+ide_data_writew(uint32_t addr, uint32_t val, void *bus, void *s)        =
-           "IDE PIO wr @ 0x%"PRIx32" (Data: Word); val 0x%04"PRIx32"; bus=
- %p; IDEState %p"
-+ide_data_readl(uint32_t addr, uint32_t val, void *bus, void *s)         =
-           "IDE PIO rd @ 0x%"PRIx32" (Data: Long); val 0x%08"PRIx32"; bus=
- %p; IDEState %p"
-+ide_data_writel(uint32_t addr, uint32_t val, void *bus, void *s)        =
-           "IDE PIO wr @ 0x%"PRIx32" (Data: Long); val 0x%08"PRIx32"; bus=
- %p; IDEState %p"
- # misc
- ide_exec_cmd(void *bus, void *state, uint32_t cmd) "IDE exec cmd: bus %p=
-; state %p; cmd 0x%02x"
- ide_cancel_dma_sync_buffered(void *fn, void *req) "invoking cb %p of buf=
-fered request %p with -ECANCELED"
+     g_free(s->dev);
 --=20
 2.9.5
