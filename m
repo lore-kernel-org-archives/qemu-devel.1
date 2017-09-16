@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dtGN4-0006fG-DE
-	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 12:55:11 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dtGep-0004TE-Na
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 13:13:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dtGN3-0003op-CB
-	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 12:55:10 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dtGeo-0003M9-Pn
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 13:13:31 -0400
 References: <20170912112855.24269-1-berrange@redhat.com>
-	<20170912112855.24269-6-berrange@redhat.com>
+	<20170912112855.24269-7-berrange@redhat.com>
 From: Max Reitz <mreitz@redhat.com>
-Message-ID: <bca76897-ec7d-035e-9473-b304b63f5d7b@redhat.com>
-Date: Sat, 16 Sep 2017 18:54:58 +0200
+Message-ID: <a2bfde8b-e06f-9e52-2932-c027efeaf114@redhat.com>
+Date: Sat, 16 Sep 2017 19:13:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170912112855.24269-6-berrange@redhat.com>
+In-Reply-To: <20170912112855.24269-7-berrange@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="fOv7uXqRUivpuBJHD4knEv44teVmeNjKt"
-Subject: Re: [Qemu-devel] [PATCH v3 5/7] block: convert crypto driver to
- bdrv_co_preadv|pwritev
+	boundary="VOCjrngj2WRoPmTqfIUsPSD1sdqHfiqGp"
+Subject: Re: [Qemu-devel] [PATCH v3 6/7] block: convert
+ qcrypto_block_encrypt|decrypt to take bytes offset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,93 +29,95 @@ To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fOv7uXqRUivpuBJHD4knEv44teVmeNjKt
+--VOCjrngj2WRoPmTqfIUsPSD1sdqHfiqGp
 From: Max Reitz <mreitz@redhat.com>
 To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
  Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <bca76897-ec7d-035e-9473-b304b63f5d7b@redhat.com>
-Subject: Re: [PATCH v3 5/7] block: convert crypto driver to
- bdrv_co_preadv|pwritev
+Message-ID: <a2bfde8b-e06f-9e52-2932-c027efeaf114@redhat.com>
+Subject: Re: [PATCH v3 6/7] block: convert qcrypto_block_encrypt|decrypt to
+ take bytes offset
 References: <20170912112855.24269-1-berrange@redhat.com>
- <20170912112855.24269-6-berrange@redhat.com>
-In-Reply-To: <20170912112855.24269-6-berrange@redhat.com>
+ <20170912112855.24269-7-berrange@redhat.com>
+In-Reply-To: <20170912112855.24269-7-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 2017-09-12 13:28, Daniel P. Berrange wrote:
-> Make the crypto driver implement the bdrv_co_preadv|pwritev
-> callbacks, and also use bdrv_co_preadv|pwritev for I/O
-> with the protocol driver beneath.
+> Instead of sector offset, take the bytes offset when encrypting
+> or decrypting data.
 >=20
 > Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
 > ---
->  block/crypto.c | 104 +++++++++++++++++++++++++++++++------------------=
---------
->  1 file changed, 56 insertions(+), 48 deletions(-)
-
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-
-Some notes below.
-
-> diff --git a/block/crypto.c b/block/crypto.c
-> index 49d6d4c058..d004e9cef4 100644
-> --- a/block/crypto.c
-> +++ b/block/crypto.c
+>  block/crypto.c         | 12 ++++--------
+>  block/qcow.c           |  7 +++++--
+>  block/qcow2-cluster.c  |  8 +++-----
+>  block/qcow2.c          |  4 ++--
+>  crypto/block-luks.c    | 12 ++++++++----
+>  crypto/block-qcow.c    | 12 ++++++++----
+>  crypto/block.c         | 20 ++++++++++++++------
+>  crypto/blockpriv.h     |  4 ++--
+>  include/crypto/block.h | 14 ++++++++------
+>  9 files changed, 54 insertions(+), 39 deletions(-)
 
 [...]
 
-> @@ -410,37 +414,33 @@ block_crypto_co_readv(BlockDriverState *bs, int64=
-_t sector_num,
->          goto cleanup;
->      }
-> =20
-> -    while (remaining_sectors) {
-> -        cur_nr_sectors =3D remaining_sectors;
-> +    while (bytes) {
-> +        cur_bytes =3D bytes;
-> =20
-> -        if (cur_nr_sectors > BLOCK_CRYPTO_MAX_SECTORS) {
-> -            cur_nr_sectors =3D BLOCK_CRYPTO_MAX_SECTORS;
-> +        if (cur_bytes > (BLOCK_CRYPTO_MAX_SECTORS * sector_size)) {
-> +            cur_bytes =3D BLOCK_CRYPTO_MAX_SECTORS * sector_size;
+> diff --git a/block/qcow.c b/block/qcow.c
+> index f450b00cfc..d242301ed2 100644
+> --- a/block/qcow.c
+> +++ b/block/qcow.c
+> @@ -478,7 +478,9 @@ static int get_cluster_offset(BlockDriverState *bs,=
 
-It's a bit weird that now the bounce buffer's size is now no longer
-fixed at 1 MB but variable depending on the crypto driver's block size.
-It also doesn't seem too intentional when looking at the first patch's
-commit message...
+>                      for(i =3D 0; i < s->cluster_sectors; i++) {
+>                          if (i < n_start || i >=3D n_end) {
+>                              memset(s->cluster_data, 0x00, 512);
+> -                            if (qcrypto_block_encrypt(s->crypto, start=
+_sect + i,
+> +                            if (qcrypto_block_encrypt(s->crypto,
+> +                                                      (start_sect + i)=
+ *
+> +                                                      BDRV_SECTOR_SIZE=
+,
+>                                                        s->cluster_data,=
 
-In any case, that would be an issue in the previous patch, though.  In
-general, I'm wondering whether maybe you should squash this patch into
-the previous one...  Yes, that would make the for a larger patch, but it
-wouldn't leave some not-quite-right state in between where sector_size
-is generally assumed to be equal to BDRV_SECTOR_SIZE -- which it is in
-practice, but not necessarily in theory.
+>                                                        BDRV_SECTOR_SIZE=
+,
+>                                                        NULL) < 0) {
+> @@ -668,7 +670,8 @@ static coroutine_fn int qcow_co_readv(BlockDriverSt=
+ate *bs, int64_t sector_num,
+>              }
+>              if (bs->encrypted) {
+>                  assert(s->crypto);
+> -                if (qcrypto_block_decrypt(s->crypto, sector_num, buf,
+> +                if (qcrypto_block_decrypt(s->crypto,
+> +                                          sector_num * BDRV_SECTOR_SIZ=
+E, buf,
+>                                            n * BDRV_SECTOR_SIZE, NULL) =
+< 0) {
+>                      ret =3D -EIO;
+>                      break;
 
->          }
-
-Also, just a note: It would be shorter with a MIN(). :-)
-
-(cur_bytes =3D MIN(bytes, BLOCK_CRYPTO_MAX_SECTORS * sector_size))
+There's another instance of qcrypto_block_encrypt() in qcow_co_writev()
+that needs to be changed.
 
 Max
 
 
---fOv7uXqRUivpuBJHD4knEv44teVmeNjKt
+--VOCjrngj2WRoPmTqfIUsPSD1sdqHfiqGp
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlm9V2ISHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AfAcH/1Dr2MF0AZxSSrDlZ8kb8wMsKTvOwz3A
-mLS3knUrW42pPDuFgPU8AGSw913gaXF5WXizTjvgfNM/cKLznlayj8EBWxmBLkdF
-T113FIltFhFjj2P3kBn/wYcp8rRVJBUIvxPB5N3jZMApxtFOEd8p/oayd84NJlPx
-1jGMdtq8Ev7kwhcJyg2mxv+RXxNm2qqfX8Z1ELSwdt47uwKz35j3b/t16JgpyDdk
-pcAynb1R2uhv4laMUue29cihI+8FmCFxc4q85weeok64ZQ7WtTOE+0xe2MBICyHi
-ZczVdv2wbyRoAeRW84c+0iUTimYZryWh2jwz7zpDjWTgqWtNDV8cT20=
-=3Fi4
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlm9W7ASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9AEV0IAIq34SWF1LG/SBWuKnXNaldcqpi/RZ5B
+ZZslAuio4ePocHxFPGV5aK7rDbBy3YPZm91YWVdfPpu5+L5V1cZUC80OOXNINOQ4
+g54xcBAXCARgh+95xNcF6BEt8Xo3YJjK6JSyb7sOM3twJPQ0wXvkpR8tjbLn2bhT
+Qmdl/LYVgo3k9hMn08yxxKoajudo90NXjj9m/SjV/6JY8R3XFFHfZlMMXnqXqwfT
+lzFnnfSLrwYTRZ3FIdifZZ2xGSZTm+58ZU9WLNGVtKX8lfPDqZYA64Zs0Ln6kjNs
+dkDR3bcZ+0JPKV1wMWsaEyb0vf17kAms/cUxdEGgeb2endZTCrl7g0g=
+=qUGq
 -----END PGP SIGNATURE-----
 
---fOv7uXqRUivpuBJHD4knEv44teVmeNjKt--
+--VOCjrngj2WRoPmTqfIUsPSD1sdqHfiqGp--
