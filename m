@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52621)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52627)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dtGEG-0008Fh-PE
-	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 12:46:05 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dtGEG-0008Fx-Ru
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 12:46:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dtGEF-0007AR-VK
+	(envelope-from <pm215@archaic.org.uk>) id 1dtGEF-0007Ac-Vv
 	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 12:46:04 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 16 Sep 2017 17:46:17 +0100
-Message-Id: <1505580378-9044-6-git-send-email-peter.maydell@linaro.org>
+Date: Sat, 16 Sep 2017 17:46:16 +0100
+Message-Id: <1505580378-9044-5-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1505580378-9044-1-git-send-email-peter.maydell@linaro.org>
 References: <1505580378-9044-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 5/6] hw/i2c/omap_i2c.c: Don't use old_mmio
+Subject: [Qemu-devel] [PATCH 4/6] hw/timer/omap_gptimer: Don't use old_mmio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,64 +22,69 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Don't use old_mmio in the memory region ops struct.
+Don't use the old_mmio struct in memory region ops.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/i2c/omap_i2c.c | 44 ++++++++++++++++++++++++++++++++------------
- 1 file changed, 32 insertions(+), 12 deletions(-)
+ hw/timer/omap_gptimer.c | 49 +++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 37 insertions(+), 12 deletions(-)
 
-diff --git a/hw/i2c/omap_i2c.c b/hw/i2c/omap_i2c.c
-index f6e80be..12264ee 100644
---- a/hw/i2c/omap_i2c.c
-+++ b/hw/i2c/omap_i2c.c
-@@ -430,19 +430,39 @@ static void omap_i2c_writeb(void *opaque, hwaddr addr,
-     }
+diff --git a/hw/timer/omap_gptimer.c b/hw/timer/omap_gptimer.c
+index 5e3e8a6..6d7c8a3 100644
+--- a/hw/timer/omap_gptimer.c
++++ b/hw/timer/omap_gptimer.c
+@@ -450,19 +450,44 @@ static void omap_gp_timer_writeh(void *opaque, hwaddr addr,
+         s->writeh = (uint16_t) value;
  }
  
-+static uint64_t omap_i2c_readfn(void *opaque, hwaddr addr,
-+                                unsigned size)
-+{
-+    switch (size) {
-+    case 2:
-+        return omap_i2c_read(opaque, addr);
-+    default:
-+        return omap_badwidth_read16(opaque, addr);
-+    }
-+}
-+
-+static void omap_i2c_writefn(void *opaque, hwaddr addr,
-+                             uint64_t value, unsigned size)
++static uint64_t omap_gp_timer_readfn(void *opaque, hwaddr addr,
++                                     unsigned size)
 +{
 +    switch (size) {
 +    case 1:
-+        /* Only the last fifo write can be 8 bit. */
-+        omap_i2c_writeb(opaque, addr, value);
-+        break;
++        return omap_badwidth_read32(opaque, addr);
 +    case 2:
-+        omap_i2c_write(opaque, addr, value);
-+        break;
++        return omap_gp_timer_readh(opaque, addr);
++    case 4:
++        return omap_gp_timer_readw(opaque, addr);
 +    default:
-+        omap_badwidth_write16(opaque, addr, value);
-+        break;
++        g_assert_not_reached();
 +    }
 +}
 +
- static const MemoryRegionOps omap_i2c_ops = {
++static void omap_gp_timer_writefn(void *opaque, hwaddr addr,
++                                  uint64_t value, unsigned size)
++{
++    switch (size) {
++    case 1:
++        omap_badwidth_write32(opaque, addr, value);
++        break;
++    case 2:
++        omap_gp_timer_writeh(opaque, addr, value);
++        break;
++    case 4:
++        omap_gp_timer_write(opaque, addr, value);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++}
++
+ static const MemoryRegionOps omap_gp_timer_ops = {
 -    .old_mmio = {
 -        .read = {
--            omap_badwidth_read16,
--            omap_i2c_read,
--            omap_badwidth_read16,
+-            omap_badwidth_read32,
+-            omap_gp_timer_readh,
+-            omap_gp_timer_readw,
 -        },
 -        .write = {
--            omap_i2c_writeb, /* Only the last fifo write can be 8 bit.  */
--            omap_i2c_write,
--            omap_badwidth_write16,
+-            omap_badwidth_write32,
+-            omap_gp_timer_writeh,
+-            omap_gp_timer_write,
 -        },
 -    },
-+    .read = omap_i2c_readfn,
-+    .write = omap_i2c_writefn,
++    .read = omap_gp_timer_readfn,
++    .write = omap_gp_timer_writefn,
 +    .valid.min_access_size = 1,
 +    .valid.max_access_size = 4,
      .endianness = DEVICE_NATIVE_ENDIAN,
