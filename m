@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dtEBd-0007iJ-Af
-	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:35:14 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dtEWW-0004dp-NZ
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:56:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dtEBc-0005XI-89
-	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:35:13 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:49580)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dtEBc-0005Wc-1N
-	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:35:12 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id u96so3509779wrb.6
-	for <qemu-devel@nongnu.org>; Sat, 16 Sep 2017 07:35:11 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1dtEWV-0000RE-QK
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:56:48 -0400
+References: <20170817091542.9403-1-pbutsykin@virtuozzo.com>
+	<9e6b08b2-6f01-3d35-2644-a86955770844@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <f67eb552-e0d1-c566-a798-2e9c73a69cd2@redhat.com>
+Date: Sat, 16 Sep 2017 16:56:32 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170916010330.10435-1-jsnow@redhat.com>
-References: <20170916010330.10435-1-jsnow@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 16 Sep 2017 15:34:50 +0100
-Message-ID: <CAFEAcA8un6eescSDzd+P+jqEGuGkuQXgfjm+1=CPOydg6WQSnQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/11] Ide patches
+In-Reply-To: <9e6b08b2-6f01-3d35-2644-a86955770844@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="7voR1JQP4QlSLKpsflKBmEuFIKV5MGsun"
+Subject: Re: [Qemu-devel] [PATCH v7 0/4] Add shrink image for qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +24,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: John Snow <jsnow@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, den@openvz.org
 
-On 16 September 2017 at 02:03, John Snow <jsnow@redhat.com> wrote:
-> The following changes since commit 5faf2d376af3cb4eb92da44c2580e08d39832caa:
->
->   Merge remote-tracking branch 'remotes/huth/tags/check-20170915' into staging (2017-09-15 20:29:44 +0100)
->
-> are available in the git repository at:
->
->   https://github.com/jnsnow/qemu.git tags/ide-pull-request
->
-> for you to fetch changes up to 2a94e34d3ecef91727f467cc012587c632099d40:
->
->   AHCI: remove DPRINTF macro (2017-09-15 20:36:18 -0400)
->
-> ----------------------------------------------------------------
->
-> ----------------------------------------------------------------
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--7voR1JQP4QlSLKpsflKBmEuFIKV5MGsun
+From: Max Reitz <mreitz@redhat.com>
+To: John Snow <jsnow@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, den@openvz.org
+Message-ID: <f67eb552-e0d1-c566-a798-2e9c73a69cd2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v7 0/4] Add shrink image for qcow2
+References: <20170817091542.9403-1-pbutsykin@virtuozzo.com>
+ <9e6b08b2-6f01-3d35-2644-a86955770844@redhat.com>
+In-Reply-To: <9e6b08b2-6f01-3d35-2644-a86955770844@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi; I'm afraid this doesn't build with clang:
+On 2017-08-22 01:31, John Snow wrote:
+>=20
+>=20
+> On 08/17/2017 05:15 AM, Pavel Butsykin wrote:
+>> This patch add shrinking of the image file for qcow2. As a result, thi=
+s allows
+>> us to reduce the virtual image size and free up space on the disk with=
+out
+>> copying the image. Image can be fragmented and shrink is done by punch=
+ing holes
+>> in the image file.
+>>
+>> # ./qemu-img create -f qcow2 image.qcow2 4G
+>> Formatting 'image.qcow2', fmt=3Dqcow2 size=3D4294967296 encryption=3Do=
+ff cluster_size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
+>>
+>> # ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
+>> wrote 1073741824/1073741824 bytes at offset 0
+>> 1 GiB, 1 ops; 0:00:04.59 (222.886 MiB/sec and 0.2177 ops/sec)
+>>
+>> # ./qemu-img resize image.qcow2 512M
+>> warning: qemu-img: Shrinking an image will delete all data beyond the =
+shrunken image's end. Before performing such an operation, make sure ther=
+e is no important data there.
+>> error: qemu-img: Use the --shrink option to perform a shrink operation=
+=2E
+>>
+>> # ./qemu-img resize --shrink image.qcow2 128M
+>> Image resized.
+>>
+>> # ./qemu-img info image.qcow2
+>> image: image.qcow2
+>> file format: qcow2
+>> virtual size: 128M (134217728 bytes)
+>> disk size: 128M
+>> cluster_size: 65536
+>> Format specific information:
+>>     compat: 1.1
+>>     lazy refcounts: false
+>>     refcount bits: 16
+>>     corrupt: false
+>>
+>> # du -h image.qcow2
+>> 129M    image.qcow2
+>>
+>=20
+> It looks sane to me, and already has a full set of R-Bs from Max. Are w=
+e
+> waiting for Kevin?
 
-/home/petmay01/linaro/qemu-for-merges/hw/ide/core.c:70:15: error:
-comparison of unsigned enum expression >= 0 is always true
-[-Werror,-Wtautological-compare]
-    if (enval >= 0 && enval < IDE_DMA__COUNT) {
-        ~~~~~ ^  ~
-1 error generated.
+Now I found that I was waiting for my own R-b for patch 3.  I hadn't yet
+reviewed that patch in its current state (I had reviewed it for v5, but
+it has changed quite a bit in v6).
 
-(It's impdef whether an enum with all positive values is
-a signed type or unsigned type, so just deleting the
-comparison against 0 would also be wrong...)
+Max
 
-thanks
--- PMM
+
+--7voR1JQP4QlSLKpsflKBmEuFIKV5MGsun
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlm9O6ASHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9A17EH/0q9nhM33zRaqMmfHzld9EhTNOCfZIwI
+BfaQan3FECbOj/9MrX0K1HNe0JC7m2hiGk37+IWqDqG0KSmmkaVnMgRpv2GYUIlR
+ai/+7BEb8QaFAq2IGlluIncFbxsCnTLJgy6meVqaWrE/xUSCKc3txL6Ed6zopomW
+UGVwIQQDkTSgG88KDpcAI8D0gsoVUvLV3EEYdhpl4Nn89afDw/yO1hLDxMzTBbBU
+3FMcIcb+62e+0gLk6sk2MmjCZ70cMcR3D8lBE3LloxjA9hLA0daXgyrfQzVKaEoM
+Pcn9CY8bI/QE/DSHr07j7K0WRAFa5I4Wd56Gkqz3gLdwX3Gbx1D3PYg=
+=i1Vl
+-----END PGP SIGNATURE-----
+
+--7voR1JQP4QlSLKpsflKBmEuFIKV5MGsun--
