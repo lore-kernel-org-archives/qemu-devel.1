@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53341)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35708)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dt1v4-0007oU-3i
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 21:29:19 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dt2w6-0001Sp-U0
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 22:34:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dt1uz-0007Ps-9v
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 21:29:18 -0400
-Resent-Message-Id: <E1dt1uz-0007Ps-9v@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21463)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dt1uz-0007OP-0J
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 21:29:13 -0400
-In-Reply-To: <20170916010330.10435-1-jsnow@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150552534557.36.6298260689683979204@69b6ddf88678>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Fri, 15 Sep 2017 18:29:06 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PULL 00/11] Ide patches
+	(envelope-from <richard.henderson@linaro.org>) id 1dt2w5-0007j1-Bn
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 22:34:26 -0400
+Received: from mail-pf0-x22b.google.com ([2607:f8b0:400e:c00::22b]:46961)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dt2w5-0007id-5f
+	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 22:34:25 -0400
+Received: by mail-pf0-x22b.google.com with SMTP id e199so2322350pfh.3
+	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 19:34:25 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+Date: Fri, 15 Sep 2017 19:34:14 -0700
+Message-Id: <20170916023417.14599-4-richard.henderson@linaro.org>
+In-Reply-To: <20170916023417.14599-1-richard.henderson@linaro.org>
+References: <20170916023417.14599-1-richard.henderson@linaro.org>
+Subject: [Qemu-devel] [PATCH v3 3/6] target/arm: Align vector registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +26,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: jsnow@redhat.com
-Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
+To: qemu-devel@nongnu.org
+Cc: alex.bennee@linaro.org, f4bug@amsat.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQVUxMIDAwLzExXSBJZGUgcGF0Y2hlcwpNZXNzYWdlLWlkOiAyMDE3MDkxNjAxMDMz
-MC4xMDQzNS0xLWpzbm93QHJlZGhhdC5jb20KVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQg
-QkVHSU4gPT09CiMhL2Jpbi9iYXNoCgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9u
-ZWxpbmUgJEJBU0UuLiB8IHdjIC1sKQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYu
-cmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1p
-dHM9IiQoZ2l0IGxvZyAtLWZvcm1hdD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRj
-b21taXRzOyBkbwogICAgZWNobyAiQ2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cg
-LW4gMSAtLWZvcm1hdD0lcyAkYykuLi4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVt
-YWlsIHwgLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAg
-ZmFpbGVkPTEKICAgICAgICBlY2hvCiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRm
-YWlsZWQKPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwpi
-YzYxNzJkYzk0IEFIQ0k6IHJlbW92ZSBEUFJJTlRGIG1hY3JvCjJlYTliOTI2ZTMgQUhDSTogcHJl
-dHR5LXByaW50IEZJUyB0byBidWZmZXIgaW5zdGVhZCBvZiBzdGRlcnIKZDIzZDc3OTQyYiBBSENJ
-OiBSZXdvcmsgSVJRIGNvbnN0YW50cwpjM2UzODgzZDUzIEFIQ0k6IFJlcGxhY2UgRFBSSU5URiB3
-aXRoIHRyYWNlLWV2ZW50cwphM2Y4ZGM1ZDNjIElERTogcmVwbGFjZSBERUJVR19BSU8gd2l0aCB0
-cmFjZSBldmVudHMKM2M5OTJkOGE5OCBBVEFQSTogUmVwbGFjZSBERUJVR19JREVfQVRBUEkgd2l0
-aCB0cmFjaW5nIGV2ZW50cwozYmVhYTNmOTM5IElERTogYWRkIHRyYWNpbmcgZm9yIGRhdGEgcG9y
-dHMKMTk5NGU0OWNjNyBJREU6IEFkZCByZWdpc3RlciBoaW50cyB0byB0cmFjaW5nCmE0NDY5NDhl
-YTMgSURFOiByZXBsYWNlIERFQlVHX0lERSB3aXRoIHRyYWNpbmcgc3lzdGVtCjhkMmIxM2QzZGEg
-aHcvaWRlL21pY3JvZHJpdmU6IE1hcmsgdGhlIGRzY20xeHh4eCBkZXZpY2Ugd2l0aCB1c2VyX2Ny
-ZWF0YWJsZSA9IGZhbHNlCjliYzU2MDc4NjQgaWRlOiBhaGNpOiB1bnBhcmVudCBjaGlsZHJlbiBi
-dXNlcyBiZWZvcmUgZnJlZWluZyB0aGVpciBtZW1vcnkKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNo
-ZWNraW5nIFBBVENIIDEvMTE6IGlkZTogYWhjaTogdW5wYXJlbnQgY2hpbGRyZW4gYnVzZXMgYmVm
-b3JlIGZyZWVpbmcgdGhlaXIgbWVtb3J5Li4uCkNoZWNraW5nIFBBVENIIDIvMTE6IGh3L2lkZS9t
-aWNyb2RyaXZlOiBNYXJrIHRoZSBkc2NtMXh4eHggZGV2aWNlIHdpdGggdXNlcl9jcmVhdGFibGUg
-PSBmYWxzZS4uLgpDaGVja2luZyBQQVRDSCAzLzExOiBJREU6IHJlcGxhY2UgREVCVUdfSURFIHdp
-dGggdHJhY2luZyBzeXN0ZW0uLi4KRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAn
-fCcgKGN0eDpWeFYpCiMxNDY6IEZJTEU6IGh3L2lkZS9jb3JlLmM6MTE5NzoKKyAgICBpZiAocmVn
-X251bSAhPSA3ICYmIChzLT5zdGF0dXMgJiAoQlVTWV9TVEFUfERSUV9TVEFUKSkpIHsKICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJy
-b3JzLCAwIHdhcm5pbmdzLCAzMzcgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBoYXMgc3R5bGUg
-cHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxz
-ZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENI
-IGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggNC8xMTogSURFOiBBZGQgcmVnaXN0ZXIg
-aGludHMgdG8gdHJhY2luZy4uLgpDaGVja2luZyBQQVRDSCA1LzExOiBJREU6IGFkZCB0cmFjaW5n
-IGZvciBkYXRhIHBvcnRzLi4uCkNoZWNraW5nIFBBVENIIDYvMTE6IEFUQVBJOiBSZXBsYWNlIERF
-QlVHX0lERV9BVEFQSSB3aXRoIHRyYWNpbmcgZXZlbnRzLi4uCkNoZWNraW5nIFBBVENIIDcvMTE6
-IElERTogcmVwbGFjZSBERUJVR19BSU8gd2l0aCB0cmFjZSBldmVudHMuLi4KQ2hlY2tpbmcgUEFU
-Q0ggOC8xMTogQUhDSTogUmVwbGFjZSBEUFJJTlRGIHdpdGggdHJhY2UtZXZlbnRzLi4uCkVSUk9S
-OiBIZXggbnVtYmVycyBtdXN0IGJlIHByZWZpeGVkIHdpdGggJzB4JwojNTQ4OiBGSUxFOiBody9p
-ZGUvdHJhY2UtZXZlbnRzOjkxOgoraGFuZGxlX3JlZ19oMmRfZmlzX3BtcCh2b2lkICpzLCBpbnQg
-cG9ydCwgY2hhciBiMCwgY2hhciBiMSwgY2hhciBiMikgImFoY2koJXApWyVkXTogUG9ydCBNdWx0
-aXBsaWVyIG5vdCBzdXBwb3J0ZWQsIEZJUzogMHglMDJ4LSUwMngtJTAyeCIKCkVSUk9SOiBIZXgg
-bnVtYmVycyBtdXN0IGJlIHByZWZpeGVkIHdpdGggJzB4JwojNTQ5OiBGSUxFOiBody9pZGUvdHJh
-Y2UtZXZlbnRzOjkyOgoraGFuZGxlX3JlZ19oMmRfZmlzX3Jlcyh2b2lkICpzLCBpbnQgcG9ydCwg
-Y2hhciBiMCwgY2hhciBiMSwgY2hhciBiMikgImFoY2koJXApWyVkXTogUmVzZXJ2ZWQgZmxhZ3Mg
-c2V0IGluIEgyRCBSZWdpc3RlciBGSVMsIEZJUzogMHglMDJ4LSUwMngtJTAyeCIKCkVSUk9SOiBI
-ZXggbnVtYmVycyBtdXN0IGJlIHByZWZpeGVkIHdpdGggJzB4JwojNTU1OiBGSUxFOiBody9pZGUv
-dHJhY2UtZXZlbnRzOjk4OgoraGFuZGxlX2NtZF91bmhhbmRsZWRfZmlzKHZvaWQgKnMsIGludCBw
-b3J0LCB1aW50OF90IGIwLCB1aW50OF90IGIxLCB1aW50OF90IGIyKSAiYWhjaSglcClbJWRdOiB1
-bmhhbmRsZWQgRklTIHR5cGUuIGNtZF9maXM6IDB4JTAyeC0lMDJ4LSUwMngiCgp0b3RhbDogMyBl
-cnJvcnMsIDAgd2FybmluZ3MsIDQ5NiBsaW5lcyBjaGVja2VkCgpZb3VyIHBhdGNoIGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRDSCA5LzExOiBBSENJOiBSZXdvcmsgSVJR
-IGNvbnN0YW50cy4uLgpDaGVja2luZyBQQVRDSCAxMC8xMTogQUhDSTogcHJldHR5LXByaW50IEZJ
-UyB0byBidWZmZXIgaW5zdGVhZCBvZiBzdGRlcnIuLi4KV0FSTklORzogbGluZSBvdmVyIDgwIGNo
-YXJhY3RlcnMKIzYwOiBGSUxFOiBody9pZGUvYWhjaS5jOjEyMDY6CisgICAgICAgICAgICBjaGFy
-ICpwcmV0dHlfZmlzID0gYWhjaV9wcmV0dHlfYnVmZmVyX2ZpcyhpZGVfc3RhdGUtPmlvX2J1ZmZl
-ciwgMHgxMCk7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDYwIGxpbmVzIGNoZWNrZWQK
-CllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KQ2hlY2tpbmcgUEFUQ0ggMTEv
-MTE6IEFIQ0k6IHJlbW92ZSBEUFJJTlRGIG1hY3JvLi4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVz
-dCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9t
-YXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/arm/cpu.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 98b9b26fd3..c346bd148f 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -486,7 +486,7 @@ typedef struct CPUARMState {
+          * the two execution states, and means we do not need to explicitly
+          * map these registers when changing states.
+          */
+-        float64 regs[64];
++        float64 regs[64] QEMU_ALIGNED(16);
+ 
+         uint32_t xregs[16];
+         /* We store these fpcsr fields separately for convenience.  */
+-- 
+2.13.5
