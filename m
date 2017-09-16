@@ -1,22 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34242)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51061)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dtGjM-0005Yp-O9
-	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 13:18:14 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dtHtm-0001q6-BP
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 14:33:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dtGjM-000581-0N
-	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 13:18:12 -0400
-References: <20170912112855.24269-1-berrange@redhat.com>
-	<20170912112855.24269-8-berrange@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1858c2fd-ef9b-85b3-b51b-bebc56b6192c@redhat.com>
-Date: Sat, 16 Sep 2017 19:18:02 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dtHtl-0000ai-Gc
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 14:33:02 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:55285)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dtHtl-0000aV-9I
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 14:33:01 -0400
+Received: by mail-wr0-x233.google.com with SMTP id g29so3717191wrg.11
+	for <qemu-devel@nongnu.org>; Sat, 16 Sep 2017 11:33:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170912112855.24269-8-berrange@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nmFnMHVEkDRGUHOPnMdMw8S9ixOBGj1Di"
-Subject: Re: [Qemu-devel] [PATCH v3 7/7] block: support passthrough of
- BDRV_REQ_FUA in crypto driver
+In-Reply-To: <20170914183516.19537-5-richard.henderson@linaro.org>
+References: <20170914183516.19537-1-richard.henderson@linaro.org>
+	<20170914183516.19537-5-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Sat, 16 Sep 2017 19:32:39 +0100
+Message-ID: <CAFEAcA_QTwDnqQsYKMMHYQmE9kJdPaRafDadGksM_QofPOmboQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH 04/10] disas: Support the Capstone
+ disassembler library
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +30,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nmFnMHVEkDRGUHOPnMdMw8S9ixOBGj1Di
-From: Max Reitz <mreitz@redhat.com>
-To: "Daniel P. Berrange" <berrange@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
- Eric Blake <eblake@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <1858c2fd-ef9b-85b3-b51b-bebc56b6192c@redhat.com>
-Subject: Re: [PATCH v3 7/7] block: support passthrough of BDRV_REQ_FUA in
- crypto driver
-References: <20170912112855.24269-1-berrange@redhat.com>
- <20170912112855.24269-8-berrange@redhat.com>
-In-Reply-To: <20170912112855.24269-8-berrange@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 14 September 2017 at 19:35, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+> If configured, prefer this over our rather dated copy of the
+> GPLv2-only binutils.  This will be especially apparent with
+> the proposed vector extensions to TCG, as disas/i386.c does
+> not handle AVX.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
-On 2017-09-12 13:28, Daniel P. Berrange wrote:
-> The BDRV_REQ_FUA flag can trivially be allowed in the crypt driver
-> as a passthrough to the underlying block driver.
->=20
-> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
-> ---
->  block/crypto.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> diff --git a/configure b/configure
+> index fd7e3a5e81..a55a8eda8a 100755
+> --- a/configure
+> +++ b/configure
+> @@ -366,6 +366,7 @@ opengl_dmabuf="no"
+>  cpuid_h="no"
+>  avx2_opt="no"
+>  zlib="yes"
+> +capstone=""
+>  lzo=""
+>  snappy=""
+>  bzip2=""
+> @@ -4381,6 +4382,18 @@ EOF
+>  fi
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+We should have the usual --enable-capstone/--disable-capstone
+option flags so distros can enforce that configure fails
+if it can't find the dependency.
 
+It's also tempting to suggesting making it into a submodule
+so that we can dump the old binutils code entirely (or
+just requiring capstone if you want the debug logging to
+be any good).
 
---nmFnMHVEkDRGUHOPnMdMw8S9ixOBGj1Di
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlm9XMoSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Azi8IALONivAAOX6SGcFOL5VIteVjxcoSNO/x
-RLhxg1Oak4Ktv0jkcCMiWOpNm0Bk0iwoLf9ffRXbvwBeXhtx1KIHPDyJmInBNJL+
-Ixhqs1gQru88vQ7gnngF18TbE+68plhkPHid37crdBCUUxQ5L2GDyLgV2bFbdUqw
-6HIZw5pXoGcUOaE6d6CdIizYTTNscIQx7fDYF5f1idzb76hZo00NSJ/cKB3XORc4
-BI6/RzkjRYURS+QzDxmTLXQNRKTbEXGzsgAOy7XdNvwEWo0RGsLOvk/Lnq93lha8
-fjk3W1Zt1/Ty9FIJyUrZmi0Y70GxJox5OPxP6MMOqbHLBq8zOHPLfWI=
-=rCeH
------END PGP SIGNATURE-----
-
---nmFnMHVEkDRGUHOPnMdMw8S9ixOBGj1Di--
+thanks
+-- PMM
