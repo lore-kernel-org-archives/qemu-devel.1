@@ -1,22 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40852)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42168)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dtDge-0005Fy-Ku
-	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:03:13 -0400
+	(envelope-from <balaton@eik.bme.hu>) id 1dtDlp-0006fY-Rf
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:08:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dtDgd-0000ar-LU
-	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:03:12 -0400
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170914154221.GD7370@stefanha-x1.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <ff9cac4f-5dba-666c-fc0d-8c1e3f23e6c9@redhat.com>
-Date: Sat, 16 Sep 2017 16:02:45 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170914154221.GD7370@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="UIFLOJWKsSLTLNsTKqXVTGf47TMWAsK7a"
-Subject: Re: [Qemu-devel] [PATCH 00/18] block/mirror: Add active-sync
- mirroring
+	(envelope-from <balaton@eik.bme.hu>) id 1dtDln-0003TM-Pq
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:08:33 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:41146)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <balaton@eik.bme.hu>) id 1dtDln-0003Sl-Ia
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 10:08:31 -0400
+Message-Id: <e2316c11d48279f3fff70ffc28d44854ace1d716.1505570561.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1505570561.git.balaton@eik.bme.hu>
+References: <cover.1505570561.git.balaton@eik.bme.hu>
+From: BALATON Zoltan <balaton@eik.bme.hu>
+Date: Sat, 16 Sep 2017 16:02:41 +0200
+Subject: [Qemu-devel] [PATCH v2 3/4] ppc4xx: Add more PLB registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,82 +23,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Fam Zheng <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+Cc: Alexander Graf <agraf@suse.de>, David Gibson <david@gibson.dropbear.id.au>, Francois Revol <revol@free.fr>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---UIFLOJWKsSLTLNsTKqXVTGf47TMWAsK7a
-From: Max Reitz <mreitz@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Fam Zheng
- <famz@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- John Snow <jsnow@redhat.com>
-Message-ID: <ff9cac4f-5dba-666c-fc0d-8c1e3f23e6c9@redhat.com>
-Subject: Re: [PATCH 00/18] block/mirror: Add active-sync mirroring
-References: <20170913181910.29688-1-mreitz@redhat.com>
- <20170914154221.GD7370@stefanha-x1.localdomain>
-In-Reply-To: <20170914154221.GD7370@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+These registers are present in 440 SoCs (and maybe in others too) and
+U-Boot accesses them when printing register info. We don't emulate
+these but add them to avoid crashing when they are read or written.
 
-On 2017-09-14 17:42, Stefan Hajnoczi wrote:
-> On Wed, Sep 13, 2017 at 08:18:52PM +0200, Max Reitz wrote:
->> There may be a couple of things to do on top of this series:
->> - Allow switching between active and passive mode at runtime: This
->>   should not be too difficult to implement, the main question is how t=
-o
->>   expose it to the user.
->>   (I seem to recall we wanted some form of block-job-set-option
->>   command...?)
->>
->> - Implement an asynchronous active mode: May be detrimental when it
->>   comes to convergence, but it might be nice to have anyway.  May or m=
-ay
->>   not be complicated to implement.
->=20
-> Ideally the user doesn't have to know about async vs sync.  It's an
-> implementation detail.
->=20
-> Async makes sense during the bulk copy phase (e.g. sync=3Dfull) because=
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+---
+v2: No change, discussed in: http://lists.nongnu.org/archive/html/qemu-ppc/2017-08/msg00385.html
 
-> guest read/write latencies are mostly unaffected.  Once the entire
-> device has been copied there are probably still dirty blocks left
-> because the guest touched them while the mirror job was running.  At
-> that point it definitely makes sense to switch to synchronous mirroring=
+ hw/ppc/ppc405_uc.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-> in order to converge.
-
-Makes sense, but I'm not sure whether it really is just an
-implementation detail.  If you're in the bulk copy phase in active/async
-mode and you have enough write requests with the target being slow
-enough, I suspect you might still not get convergence then (because the
-writes to the target yield for a long time while ever more write
-requests pile up) -- so then you'd just shift the dirty tracking from
-the bitmap to a list of requests in progress.
-
-And I think we do want the bulk copy phase to guarantee convergence,
-too, usually (when active/foreground/synchronous mode is selected).  If
-we don't, then that's a policy decision and would be up to libvirt, as I
-see it.
-
-Max
-
-
---UIFLOJWKsSLTLNsTKqXVTGf47TMWAsK7a
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlm9LwUSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AAG4H/R4Wqw9NyEty87fP+DP/L1OnBw0eqJh/
-d2FxqNYXkyeNY66xKac2+f6FKwSBd3u+CvKL7sYktuLYcLKWNrYW7z3M7J8eTfGQ
-ciuz19eqq12vzJzMnUYvxR7HNd/HbKk0Kr4iYFiMXRe/Y1/Ach10YMtBLtxgpvFI
-umfGvqv76f7ZAwI35k5zqDoNghGwFKVE8JJerB8dHFdoDEoYSjKhyGOniTSlJOvw
-0sHD+Ys/FLzfCozZ5NMeOsuqS3qTM/9Q1/zHaU4hoVNBWFmPUH1yEYF4Hm/BWVcg
-k0ogGrb9wApLXPzKEHcUlDH8Sb+pDSSCegj0lXq/sSr28WxreGO7Y3s=
-=XzJI
------END PGP SIGNATURE-----
-
---UIFLOJWKsSLTLNsTKqXVTGf47TMWAsK7a--
+diff --git a/hw/ppc/ppc405_uc.c b/hw/ppc/ppc405_uc.c
+index e621d0a..8e58065 100644
+--- a/hw/ppc/ppc405_uc.c
++++ b/hw/ppc/ppc405_uc.c
+@@ -105,9 +105,12 @@ ram_addr_t ppc405_set_bootinfo (CPUPPCState *env, ppc4xx_bd_info_t *bd,
+ /*****************************************************************************/
+ /* Peripheral local bus arbitrer */
+ enum {
+-    PLB0_BESR = 0x084,
+-    PLB0_BEAR = 0x086,
+-    PLB0_ACR  = 0x087,
++    PLB3A0_ACR = 0x077,
++    PLB4A0_ACR = 0x081,
++    PLB0_BESR  = 0x084,
++    PLB0_BEAR  = 0x086,
++    PLB0_ACR   = 0x087,
++    PLB4A1_ACR = 0x089,
+ };
+ 
+ typedef struct ppc4xx_plb_t ppc4xx_plb_t;
+@@ -179,9 +182,12 @@ void ppc4xx_plb_init(CPUPPCState *env)
+     ppc4xx_plb_t *plb;
+ 
+     plb = g_malloc0(sizeof(ppc4xx_plb_t));
++    ppc_dcr_register(env, PLB3A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
++    ppc_dcr_register(env, PLB4A0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+     ppc_dcr_register(env, PLB0_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+     ppc_dcr_register(env, PLB0_BEAR, plb, &dcr_read_plb, &dcr_write_plb);
+     ppc_dcr_register(env, PLB0_BESR, plb, &dcr_read_plb, &dcr_write_plb);
++    ppc_dcr_register(env, PLB4A1_ACR, plb, &dcr_read_plb, &dcr_write_plb);
+     qemu_register_reset(ppc4xx_plb_reset, plb);
+ }
+ 
+-- 
+2.7.6
