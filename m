@@ -1,28 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36060)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dt2xO-0002XZ-NO
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 22:35:49 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dt8AH-0007KQ-5K
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 04:09:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dt2xK-0008JP-HY
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 22:35:46 -0400
-Received: from mail-pg0-x234.google.com ([2607:f8b0:400e:c05::234]:51309)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dt2xK-0008J8-Bd
-	for qemu-devel@nongnu.org; Fri, 15 Sep 2017 22:35:42 -0400
-Received: by mail-pg0-x234.google.com with SMTP id k193so2451933pgc.8
-	for <qemu-devel@nongnu.org>; Fri, 15 Sep 2017 19:35:42 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-References: <20170916023417.14599-1-richard.henderson@linaro.org>
-Message-ID: <b9d0cfa7-f5a4-3c96-8592-52ee380c381c@linaro.org>
-Date: Fri, 15 Sep 2017 19:35:38 -0700
+	(envelope-from <pbonzini@redhat.com>) id 1dt8AC-0002Jr-66
+	for qemu-devel@nongnu.org; Sat, 16 Sep 2017 04:09:25 -0400
+Date: Sat, 16 Sep 2017 04:09:15 -0400 (EDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2144615425.6261195.1505549355346.JavaMail.zimbra@redhat.com>
+In-Reply-To: <20170915222113.GB10621@localhost.localdomain>
+References: <20170915090643.6043-1-otubo@redhat.com>
+	<0d4bdcbb-3153-0064-d280-d9ca4f0671e4@redhat.com>
+	<20170915222113.GB10621@localhost.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170916023417.14599-1-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] TCG vectorization and example
- conversion
+Subject: Re: [Qemu-devel] [PATCH] dma/i82374: avoid double creation of
+ i82374 device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,23 +25,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: alex.bennee@linaro.org, f4bug@amsat.org
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Eduardo Otubo <otubo@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>, Markus Armbruster <armbru@redhat.com>, Alexander Graf <agraf@suse.de>
 
-On 09/15/2017 07:34 PM, Richard Henderson wrote:
-> Now addressing the complex vector op issue.  I now expose TCGv_vec
-> to target front-ends, but opaque wrt the vector size.  One can thus
-> compose vector operations, as demonstrated in target/arm/.
+
+
+----- Original Message -----
+> From: "Eduardo Habkost" <ehabkost@redhat.com>
+> To: "Paolo Bonzini" <pbonzini@redhat.com>
+> Cc: "Eduardo Otubo" <otubo@redhat.com>, qemu-devel@nongnu.org, qemu-trivial@nongnu.org, "Michael Tokarev"
+> <mjt@tls.msk.ru>, "Markus Armbruster" <armbru@redhat.com>, "Alexander Graf" <agraf@suse.de>
+> Sent: Saturday, September 16, 2017 12:21:13 AM
+> Subject: Re: [PATCH] dma/i82374: avoid double creation of i82374 device
 > 
-> The actual host vector length now becomes an argument to the *_vec
-> opcodes.  It's a little awkward, but does prevent an explosion of
-> opcode values.
+> On Fri, Sep 15, 2017 at 12:18:11PM +0200, Paolo Bonzini wrote:
+> > On 15/09/2017 11:06, Eduardo Otubo wrote:
+> > > QEMU fails when used with the following command line:
+> > > 
+> > >   ./ppc64-softmmu/qemu-system-ppc64 -S -machine 40p,accel=tcg -device
+> > >   i82374
+> > >   qemu-system-ppc64: hw/isa/isa-bus.c:110: isa_bus_dma: Assertion
+> > >   `!bus->dma[0] && !bus->dma[1]' failed.
+> > >   Aborted (core dumped)
+> > > 
+> > > The 40p machine type already creates the device i82374. If specified in
+> > > the
+> > > command line, it will try to create it again, hence generating the error.
+> > > The
+> > > function isa_bus_dma() isn't supposed to be called twice for the same
+> > > bus. One
+> > > way to avoid this problem is to set user_creatable=false.
+> > > 
+> > > A possible fix in a near future would be making
+> > > isa_bus_dma()/DMA_init()/i82374_realize() return an error instead of
+> > > asserting
+> > > as well.
+> > > 
+> > > Signed-off-by: Eduardo Otubo <otubo@redhat.com>
+> > > ---
+> > >  hw/dma/i82374.c | 5 +++++
+> > >  1 file changed, 5 insertions(+)
+> > > 
+> > > diff --git a/hw/dma/i82374.c b/hw/dma/i82374.c
+> > > index 6c0f975df0..e76dea8dc7 100644
+> > > --- a/hw/dma/i82374.c
+> > > +++ b/hw/dma/i82374.c
+> > > @@ -139,6 +139,11 @@ static void i82374_class_init(ObjectClass *klass,
+> > > void *data)
+> > >      dc->realize = i82374_realize;
+> > >      dc->vmsd = &vmstate_i82374;
+> > >      dc->props = i82374_properties;
+> > > +    dc->user_creatable = false;
+> > > +    /*
+> > > +     * Reason: i82374_realize() crashes (assertion failure inside
+> > > isa_bus_dma()
+> > > +     *         if the device is instantiated twice.
+> > > +     */
+> > >  }
+> > >  
+> > >  static const TypeInfo i82374_info = {
+> > > 
+> > 
+> > This breaks "make check", doesn't it?
 > 
-> All R-b dropped because all patches rewritten or heavily modified.
+> Why would it?  I don't see any test code using -device i82374.
+> (endianness-test uses -device i82378).
 
-Bah.  Forgot to mention that this depends on tcg-next.  Full tree at
+You're right, both Aurelien and I were confused.  If you want to
+accept this patch it would be fine then, even if giving an error may
+be preferrable.
 
-  git://github.com/rth7680/qemu.git native-vector-registers-3
-
-
-r~
+Paolo
