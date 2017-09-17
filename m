@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55745)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dtjEV-000371-M1
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:44:19 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dtjRO-0005gA-2e
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:57:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dtjEQ-00063P-Rf
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:44:15 -0400
-Resent-Message-Id: <E1dtjEQ-00063P-Rf@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dtjEQ-00061a-Kg
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:44:10 -0400
-In-Reply-To: <20170917232010.14183-1-f4bug@amsat.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150569180005.36.9005014267144366755@69b6ddf88678>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dtjRN-00069H-3M
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:57:34 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+References: <1504812251-23438-1-git-send-email-sundeep.lkml@gmail.com>
+	<1504812251-23438-3-git-send-email-sundeep.lkml@gmail.com>
+	<a9891f10-9643-96ee-7f99-7a384b9ea302@amsat.org>
+Message-ID: <3618281c-b4f9-3a1a-8b6f-f87dfeb54e45@amsat.org>
+Date: Sun, 17 Sep 2017 20:57:23 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 17 Sep 2017 16:43:20 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v3 0/6] QOMify MIPS cpu
+In-Reply-To: <a9891f10-9643-96ee-7f99-7a384b9ea302@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu devel v8 PATCH 2/5] msf2: Microsemi
+ Smartfusion2 System Register block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,53 +30,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: f4bug@amsat.org
-Cc: famz@redhat.com, imammedo@redhat.com, ehabkost@redhat.com, aurelien@aurel32.net, yongbok.kim@imgtec.com, marcel@redhat.com, thuth@redhat.com, james.hogan@imgtec.com, hpoussin@reactos.org, qemu-devel@nongnu.org
+To: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, peter.maydell@linaro.org, alistair23@gmail.com, crosthwaite.peter@gmail.com
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2MyAwLzZdIFFPTWlmeSBNSVBTIGNwdQpNZXNzYWdlLWlkOiAyMDE3MDkx
-NzIzMjAxMC4xNDE4My0xLWY0YnVnQGFtc2F0Lm9yZwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFND
-UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
-IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwg
-ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoK
-Y29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMg
-aW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0
-IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3Jt
-YXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAg
-ICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4
-aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
-Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
-c3QnCmU4MjJmZTBjNWQgbWlwczogcmVwbGFjZSBjcHVfbWlwc19pbml0KCkgd2l0aCBjcHVfZ2Vu
-ZXJpY19pbml0KCkKNDk2ZjM4YWM0YSBtaXBzOiBNSVBTQ1BVIG1vZGVsIHN1YmNsYXNzZXMKZTg4
-NTUyMDZlYyBtaXBzOiBjYWxsIGNwdV9taXBzX3JlYWxpemVfZW52KCkgZnJvbSBtaXBzX2NwdV9y
-ZWFsaXplZm4oKQplOWVjMTY1ZDM5IG1pcHM6IHNwbGl0IGNwdV9taXBzX3JlYWxpemVfZW52KCkg
-b3V0IG9mIGNwdV9taXBzX2luaXQoKQoyOTIzMTkzODMyIG1pcHM6IGludHJvZHVjZSBpbnRlcm5h
-bC5oIGFuZCBjbGVhbnVwIGNwdS5oCjE0NmY0MDU5ZWEgbWlwczogbW92ZSBody9taXBzL2NwdXRp
-bWVyLmMgdG8gdGFyZ2V0L21pcHMvCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
-SCAxLzY6IG1pcHM6IG1vdmUgaHcvbWlwcy9jcHV0aW1lci5jIHRvIHRhcmdldC9taXBzLy4uLgpD
-aGVja2luZyBQQVRDSCAyLzY6IG1pcHM6IGludHJvZHVjZSBpbnRlcm5hbC5oIGFuZCBjbGVhbnVw
-IGNwdS5oLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgJyYnIChjdHg6V3hX
-KQojNzI4OiBGSUxFOiB0YXJnZXQvbWlwcy9pbnRlcm5hbC5oOjIzMDoKKyAgICBpZiAoKGVudi0+
-Q1AwX1ZQQ29udHJvbCA+PiBDUDBWUEN0bF9ESVMpICYgMSkgewogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0
-ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiM3MzY6IEZJTEU6IHRhcmdldC9taXBzL2ludGVybmFsLmg6
-MjM4OgorICAgICAgICAgICAgKChvdGhlcl9jcHUtPmVudi5DUDBfVlBDb250cm9sID4+IENQMFZQ
-Q3RsX0RJUykgJiAxKSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhh
-dCAnJicgKGN0eDpXeFcpCiM3NTY6IEZJTEU6IHRhcmdldC9taXBzL2ludGVybmFsLmg6MjU4Ogor
-ICAgICAgICBlbnYtPmhmbGFncyB8PSAoZW52LT5DUDBfU3RhdHVzID4+IENQMFN0X0tTVSkgJiBN
-SVBTX0hGTEFHX0tTVTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIF4KCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgODQyIGxpbmVzIGNo
-ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
-VENIIDMvNjogbWlwczogc3BsaXQgY3B1X21pcHNfcmVhbGl6ZV9lbnYoKSBvdXQgb2YgY3B1X21p
-cHNfaW5pdCgpLi4uCkNoZWNraW5nIFBBVENIIDQvNjogbWlwczogY2FsbCBjcHVfbWlwc19yZWFs
-aXplX2VudigpIGZyb20gbWlwc19jcHVfcmVhbGl6ZWZuKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNS82
-OiBtaXBzOiBNSVBTQ1BVIG1vZGVsIHN1YmNsYXNzZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNi82OiBt
-aXBzOiByZXBsYWNlIGNwdV9taXBzX2luaXQoKSB3aXRoIGNwdV9nZW5lcmljX2luaXQoKS4uLgo9
-PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0t
-CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
-Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxp
-c3RzLm9yZw==
+Hi Sundeep,
+
+On 09/14/2017 01:36 AM, Philippe Mathieu-Daudé wrote:
+> On 09/07/2017 04:24 PM, Subbaraya Sundeep wrote:
+[...]
+>> +static inline int msf2_divbits(uint32_t div)
+> 
+> Please directly use ctz32() instead of msf2_divbits()
+
+It seems you missed this review comment in your v9.
+
+> 
+>> +{
+>> +    int ret = 0;
+>> +
+>> +    switch (div) {
+>> +    case 1:
+>> +        ret = 0;
+>> +        break;
+>> +    case 2:
+>> +        ret = 1;
+>> +        break;
+>> +    case 4:
+>> +        ret = 2;
+>> +        break;
+>> +    case 8:
+>> +        ret = 4;
+>> +        break;
+>> +    case 16:
+>> +        ret = 5;
+>> +        break;
+>> +    case 32:
+>> +        ret = 6;
+>> +        break;
+>> +    default:
+>> +        break;
+>> +    }
+>> +
+>> +    return ret;
+>> +}
