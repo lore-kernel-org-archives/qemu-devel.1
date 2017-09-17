@@ -1,25 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55609)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45670)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dtcYx-0004N5-JC
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 12:37:00 -0400
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dtdAy-00065K-LU
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 13:16:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dtcYt-0002Vr-7J
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 12:36:55 -0400
-Received: from mail-wr0-x235.google.com ([2a00:1450:400c:c0c::235]:48166)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dtcYs-0002VS-Vh
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 12:36:51 -0400
-Received: by mail-wr0-x235.google.com with SMTP id 108so4634374wra.5
-	for <qemu-devel@nongnu.org>; Sun, 17 Sep 2017 09:36:49 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170917150535.8284-1-richard.henderson@linaro.org>
-References: <20170917150535.8284-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sun, 17 Sep 2017 17:36:27 +0100
-Message-ID: <CAFEAcA-DHGUcv79Ck-mKwGU-vseYXgfNAxQNvc=9--BDfjc87g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL 00/17] TCG queued patches
+	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1dtdAt-0006AU-QG
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 13:16:12 -0400
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Date: Sun, 17 Sep 2017 18:15:40 +0100
+Message-Id: <1505668548-16616-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: [Qemu-devel] [PATCH 0/8] ppc: more Mac-related fixups
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,33 +17,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, benh@kernel.crashing.org
 
-On 17 September 2017 at 16:05, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> One build fix (ppc32), a collection of minor cleanups, and
-> extracts from some of my other tcg-related patch sets.
->
->
-> r~
->
->
-> The following changes since commit 5ee53d1593dfc071275b13b1228c70bb88f4aaee:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/python-next-pull-request' into staging (2017-09-16 14:36:16 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/rth7680/qemu.git tags/pull-tcg-20170917
->
-> for you to fetch changes up to 89b2e37e6506d92b00ac478e7953be6ddd7a86a9:
->
->   tcg/mips: Fully convert tcg_target_op_def (2017-09-17 06:52:19 -0700)
->
-> ----------------------------------------------------------------
-> tcg queued patches
+Here is the latest set of Mac-related PPC patches based upon Ben's earlier
+work to improve MacOS compatibility, with various fixups and other odds and
+ends from me.
 
-Applied, thanks.
+Note this patch bumps the vmstate_openpic_timer version as it includes extra
+fields, however I don't see this currently being an issue since migration of
+the Mac machines is fairly unreliable right now.
 
--- PMM
+With many thanks to Howard Spoelstra over at emaculation for helping test
+against a larger set of images than I currently have available myself.
+
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+
+Benjamin Herrenschmidt (5):
+  ppc/mac: Advertise a high clock frequency for NewWorld Macs
+  ppc/ide/macio: Add missing registers
+  ppc/mac: More rework of the DBDMA emulation
+  ppc: Fix OpenPIC model
+  openpic: Fix problem when IRQ transitions from edge to level
+
+Mark Cave-Ayland (3):
+  ppc: QOMify g3beige machine
+  macio: convert pmac_ide_ops from old_mmio
+  openpic: add missing timer fields to vmstate_openpic_timer
+
+ hw/ide/macio.c            |  170 ++++++++++++++++++++--------------------
+ hw/intc/openpic.c         |   76 ++++++++++++++++--
+ hw/misc/macio/mac_dbdma.c |  191 +++++++++++++++++++++++++++++++++------------
+ hw/ppc/mac.h              |    6 +-
+ hw/ppc/mac_newworld.c     |    4 +-
+ hw/ppc/mac_oldworld.c     |   17 +++-
+ include/hw/ppc/openpic.h  |    1 +
+ 7 files changed, 313 insertions(+), 152 deletions(-)
+
+-- 
+1.7.10.4
