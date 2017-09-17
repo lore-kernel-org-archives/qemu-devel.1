@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52467)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dtb8r-0007yv-PB
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:05:57 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dtb8u-0007zQ-Dd
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:06:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dtb8m-00088d-RP
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:05:53 -0400
-Received: from mail-oi0-x229.google.com ([2607:f8b0:4003:c06::229]:44063)
+	(envelope-from <richard.henderson@linaro.org>) id 1dtb8s-0008B7-0Y
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:05:56 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:49536)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dtb8m-00088I-M1
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:05:48 -0400
-Received: by mail-oi0-x229.google.com with SMTP id l74so3684278oih.1
-	for <qemu-devel@nongnu.org>; Sun, 17 Sep 2017 08:05:48 -0700 (PDT)
+	id 1dtb8r-0008Ar-RE
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:05:53 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id t21so3682310oih.6
+	for <qemu-devel@nongnu.org>; Sun, 17 Sep 2017 08:05:53 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 17 Sep 2017 08:05:21 -0700
-Message-Id: <20170917150535.8284-4-richard.henderson@linaro.org>
+Date: Sun, 17 Sep 2017 08:05:24 -0700
+Message-Id: <20170917150535.8284-7-richard.henderson@linaro.org>
 In-Reply-To: <20170917150535.8284-1-richard.henderson@linaro.org>
 References: <20170917150535.8284-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 03/17] accel/tcg: move user-exec to accel/tcg/
+Subject: [Qemu-devel] [PULL 06/17] accel/tcg: move USER code to user-exec.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,72 +36,141 @@ From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20170911213328.9701-3-f4bug@amsat.org>
+Message-Id: <20170912211934.20919-1-f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- Makefile.target                                | 4 ++--
- user-exec-stub.c => accel/tcg/user-exec-stub.c | 0
- user-exec.c => accel/tcg/user-exec.c           | 0
- MAINTAINERS                                    | 3 +--
- accel/tcg/Makefile.objs                        | 3 +++
- 5 files changed, 6 insertions(+), 4 deletions(-)
- rename user-exec-stub.c => accel/tcg/user-exec-stub.c (100%)
- rename user-exec.c => accel/tcg/user-exec.c (100%)
+ accel/tcg/tcg-runtime.c | 54 -------------------------------------------------
+ accel/tcg/user-exec.c   | 52 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+), 54 deletions(-)
 
-diff --git a/Makefile.target b/Makefile.target
-index 7f42c45db8..520305b025 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -119,7 +119,7 @@ QEMU_CFLAGS+=-I$(SRC_PATH)/linux-user/$(TARGET_ABI_DIR) \
-              -I$(SRC_PATH)/linux-user
+diff --git a/accel/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
+index 3e23649dd7..aafb171294 100644
+--- a/accel/tcg/tcg-runtime.c
++++ b/accel/tcg/tcg-runtime.c
+@@ -178,57 +178,3 @@ void HELPER(exit_atomic)(CPUArchState *env)
+ {
+     cpu_loop_exit_atomic(ENV_GET_CPU(env), GETPC());
+ }
+-
+-#ifndef CONFIG_SOFTMMU
+-/* The softmmu versions of these helpers are in cputlb.c.  */
+-
+-/* Do not allow unaligned operations to proceed.  Return the host address.  */
+-static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
+-                               int size, uintptr_t retaddr)
+-{
+-    /* Enforce qemu required alignment.  */
+-    if (unlikely(addr & (size - 1))) {
+-        cpu_loop_exit_atomic(ENV_GET_CPU(env), retaddr);
+-    }
+-    return g2h(addr);
+-}
+-
+-/* Macro to call the above, with local variables from the use context.  */
+-#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, GETPC())
+-
+-#define ATOMIC_NAME(X)   HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
+-#define EXTRA_ARGS
+-
+-#define DATA_SIZE 1
+-#include "atomic_template.h"
+-
+-#define DATA_SIZE 2
+-#include "atomic_template.h"
+-
+-#define DATA_SIZE 4
+-#include "atomic_template.h"
+-
+-#ifdef CONFIG_ATOMIC64
+-#define DATA_SIZE 8
+-#include "atomic_template.h"
+-#endif
+-
+-/* The following is only callable from other helpers, and matches up
+-   with the softmmu version.  */
+-
+-#ifdef CONFIG_ATOMIC128
+-
+-#undef EXTRA_ARGS
+-#undef ATOMIC_NAME
+-#undef ATOMIC_MMU_LOOKUP
+-
+-#define EXTRA_ARGS     , TCGMemOpIdx oi, uintptr_t retaddr
+-#define ATOMIC_NAME(X) \
+-    HELPER(glue(glue(glue(atomic_ ## X, SUFFIX), END), _mmu))
+-#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, retaddr)
+-
+-#define DATA_SIZE 16
+-#include "atomic_template.h"
+-#endif /* CONFIG_ATOMIC128 */
+-
+-#endif /* !CONFIG_SOFTMMU */
+diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+index 2a975eaf69..492ea0826c 100644
+--- a/accel/tcg/user-exec.c
++++ b/accel/tcg/user-exec.c
+@@ -24,6 +24,7 @@
+ #include "qemu/bitops.h"
+ #include "exec/cpu_ldst.h"
+ #include "translate-all.h"
++#include "exec/helper-proto.h"
  
- obj-y += linux-user/
--obj-y += gdbstub.o thunk.o user-exec.o user-exec-stub.o
-+obj-y += gdbstub.o thunk.o
+ #undef EAX
+ #undef ECX
+@@ -573,3 +574,54 @@ int cpu_signal_handler(int host_signum, void *pinfo,
+ #error host CPU specific signal handler needed
  
- endif #CONFIG_LINUX_USER
- 
-@@ -132,7 +132,7 @@ QEMU_CFLAGS+=-I$(SRC_PATH)/bsd-user -I$(SRC_PATH)/bsd-user/$(TARGET_ABI_DIR) \
- 			 -I$(SRC_PATH)/bsd-user/$(HOST_VARIANT_DIR)
- 
- obj-y += bsd-user/
--obj-y += gdbstub.o user-exec.o user-exec-stub.o
-+obj-y += gdbstub.o
- 
- endif #CONFIG_BSD_USER
- 
-diff --git a/user-exec-stub.c b/accel/tcg/user-exec-stub.c
-similarity index 100%
-rename from user-exec-stub.c
-rename to accel/tcg/user-exec-stub.c
-diff --git a/user-exec.c b/accel/tcg/user-exec.c
-similarity index 100%
-rename from user-exec.c
-rename to accel/tcg/user-exec.c
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 2127bb241a..4bd1797330 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1603,8 +1603,7 @@ Overall
- M: Riku Voipio <riku.voipio@iki.fi>
- S: Maintained
- F: thunk.c
--F: user-exec.c
--F: user-exec-stub.c
-+F: accel/tcg/user-exec*.c
- 
- BSD user
- S: Orphan
-diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
-index 22642e6f75..f2422d0fb3 100644
---- a/accel/tcg/Makefile.objs
-+++ b/accel/tcg/Makefile.objs
-@@ -2,3 +2,6 @@ obj-$(CONFIG_SOFTMMU) += tcg-all.o
- obj-$(CONFIG_SOFTMMU) += cputlb.o
- obj-y += cpu-exec.o cpu-exec-common.o translate-all.o
- obj-y += translator.o
+ #endif
 +
-+obj-$(CONFIG_USER_ONLY) += user-exec.o
-+obj-$(call lnot,$(CONFIG_SOFTMMU)) += user-exec-stub.o
++/* The softmmu versions of these helpers are in cputlb.c.  */
++
++/* Do not allow unaligned operations to proceed.  Return the host address.  */
++static void *atomic_mmu_lookup(CPUArchState *env, target_ulong addr,
++                               int size, uintptr_t retaddr)
++{
++    /* Enforce qemu required alignment.  */
++    if (unlikely(addr & (size - 1))) {
++        cpu_loop_exit_atomic(ENV_GET_CPU(env), retaddr);
++    }
++    return g2h(addr);
++}
++
++/* Macro to call the above, with local variables from the use context.  */
++#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, GETPC())
++
++#define ATOMIC_NAME(X)   HELPER(glue(glue(atomic_ ## X, SUFFIX), END))
++#define EXTRA_ARGS
++
++#define DATA_SIZE 1
++#include "atomic_template.h"
++
++#define DATA_SIZE 2
++#include "atomic_template.h"
++
++#define DATA_SIZE 4
++#include "atomic_template.h"
++
++#ifdef CONFIG_ATOMIC64
++#define DATA_SIZE 8
++#include "atomic_template.h"
++#endif
++
++/* The following is only callable from other helpers, and matches up
++   with the softmmu version.  */
++
++#ifdef CONFIG_ATOMIC128
++
++#undef EXTRA_ARGS
++#undef ATOMIC_NAME
++#undef ATOMIC_MMU_LOOKUP
++
++#define EXTRA_ARGS     , TCGMemOpIdx oi, uintptr_t retaddr
++#define ATOMIC_NAME(X) \
++    HELPER(glue(glue(glue(atomic_ ## X, SUFFIX), END), _mmu))
++#define ATOMIC_MMU_LOOKUP  atomic_mmu_lookup(env, addr, DATA_SIZE, retaddr)
++
++#define DATA_SIZE 16
++#include "atomic_template.h"
++#endif /* CONFIG_ATOMIC128 */
 -- 
 2.13.5
