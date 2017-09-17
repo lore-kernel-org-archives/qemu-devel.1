@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52396)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dtb8o-0007yf-DY
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:05:55 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dtb8t-0007z0-2m
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:05:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dtb8j-00086j-GY
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:05:50 -0400
-Received: from mail-oi0-x22b.google.com ([2607:f8b0:4003:c06::22b]:56901)
+	(envelope-from <richard.henderson@linaro.org>) id 1dtb8o-00089K-CK
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:05:55 -0400
+Received: from mail-oi0-x235.google.com ([2607:f8b0:4003:c06::235]:52998)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dtb8j-00085s-A1
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:05:45 -0400
-Received: by mail-oi0-x22b.google.com with SMTP id y195so3686575oia.13
-	for <qemu-devel@nongnu.org>; Sun, 17 Sep 2017 08:05:45 -0700 (PDT)
+	id 1dtb8o-00088v-1T
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:05:50 -0400
+Received: by mail-oi0-x235.google.com with SMTP id p126so3670856oih.9
+	for <qemu-devel@nongnu.org>; Sun, 17 Sep 2017 08:05:49 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 17 Sep 2017 08:05:19 -0700
-Message-Id: <20170917150535.8284-2-richard.henderson@linaro.org>
+Date: Sun, 17 Sep 2017 08:05:22 -0700
+Message-Id: <20170917150535.8284-5-richard.henderson@linaro.org>
 In-Reply-To: <20170917150535.8284-1-richard.henderson@linaro.org>
 References: <20170917150535.8284-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 01/17] tcg/ppc: disable atomic write check on
- ppc32
+Subject: [Qemu-devel] [PULL 04/17] accel/tcg: move tcg-runtime to accel/tcg/
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,40 +34,50 @@ Cc: peter.maydell@linaro.org, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@a
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-This fixes building for ppc64 on ppc32 (changed in 5964fca8a12c):
-
-tcg/ppc/tcg-target.inc.c: In function 'tb_target_set_jmp_target':
-include/qemu/compiler.h:86:30: error: static assertion failed: \
-  "not expecting: sizeof(*(uint64_t *)jmp_addr) > ATOMIC_REG_SIZE"
-	QEMU_BUILD_BUG_ON(sizeof(*ptr) > ATOMIC_REG_SIZE); \
-	^
-tcg/ppc/tcg-target.inc.c:1377:9: note: in expansion of macro 'atomic_set'
-	atomic_set((uint64_t *)jmp_addr, pair);
-	^
-
-Suggested-by: Richard Henderson <rth@twiddle.net>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20170911204936.5020-1-f4bug@amsat.org>
-[rth: Added commentary requested by pmm.]
+Message-Id: <20170911213328.9701-4-f4bug@amsat.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/ppc/tcg-target.inc.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ Makefile.target                  | 2 +-
+ {tcg => accel/tcg}/tcg-runtime.h | 0
+ {tcg => accel/tcg}/tcg-runtime.c | 0
+ accel/tcg/Makefile.objs          | 1 +
+ 4 files changed, 2 insertions(+), 1 deletion(-)
+ rename {tcg => accel/tcg}/tcg-runtime.h (100%)
+ rename {tcg => accel/tcg}/tcg-runtime.c (100%)
 
-diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
-index 21d764c102..3c9355844a 100644
---- a/tcg/ppc/tcg-target.inc.c
-+++ b/tcg/ppc/tcg-target.inc.c
-@@ -1374,7 +1374,9 @@ void tb_target_set_jmp_target(uintptr_t tc_ptr, uintptr_t jmp_addr,
-         pair = (uint64_t)i2 << 32 | i1;
- #endif
+diff --git a/Makefile.target b/Makefile.target
+index 520305b025..6361f957fb 100644
+--- a/Makefile.target
++++ b/Makefile.target
+@@ -94,7 +94,7 @@ all: $(PROGS) stap
+ obj-y += exec.o
+ obj-y += accel/
+ obj-$(CONFIG_TCG) += tcg/tcg.o tcg/tcg-op.o tcg/optimize.o
+-obj-$(CONFIG_TCG) += tcg/tcg-common.o tcg/tcg-runtime.o
++obj-$(CONFIG_TCG) += tcg/tcg-common.o
+ obj-$(CONFIG_TCG_INTERPRETER) += tcg/tci.o
+ obj-$(CONFIG_TCG_INTERPRETER) += disas/tci.o
+ obj-y += fpu/softfloat.o
+diff --git a/tcg/tcg-runtime.h b/accel/tcg/tcg-runtime.h
+similarity index 100%
+rename from tcg/tcg-runtime.h
+rename to accel/tcg/tcg-runtime.h
+diff --git a/tcg/tcg-runtime.c b/accel/tcg/tcg-runtime.c
+similarity index 100%
+rename from tcg/tcg-runtime.c
+rename to accel/tcg/tcg-runtime.c
+diff --git a/accel/tcg/Makefile.objs b/accel/tcg/Makefile.objs
+index f2422d0fb3..228cd84fa4 100644
+--- a/accel/tcg/Makefile.objs
++++ b/accel/tcg/Makefile.objs
+@@ -1,5 +1,6 @@
+ obj-$(CONFIG_SOFTMMU) += tcg-all.o
+ obj-$(CONFIG_SOFTMMU) += cputlb.o
++obj-y += tcg-runtime.o
+ obj-y += cpu-exec.o cpu-exec-common.o translate-all.o
+ obj-y += translator.o
  
--        atomic_set((uint64_t *)jmp_addr, pair);
-+        /* As per the enclosing if, this is ppc64.  Avoid the _Static_assert
-+           within atomic_set that would fail to build a ppc32 host.  */
-+        atomic_set__nocheck((uint64_t *)jmp_addr, pair);
-         flush_icache_range(jmp_addr, jmp_addr + 8);
-     } else {
-         intptr_t diff = addr - jmp_addr;
 -- 
 2.13.5
