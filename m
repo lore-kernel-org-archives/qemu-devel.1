@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42742)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46258)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dtiru-0003WM-FS
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:20:56 -0400
+	id 1dtizo-0008FU-TH
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:29:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dtirp-0007dg-CT
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:20:54 -0400
-Received: from mail-qk0-x244.google.com ([2607:f8b0:400d:c09::244]:33399)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dtirp-0007dP-7K
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:20:49 -0400
-Received: by mail-qk0-x244.google.com with SMTP id g128so4581394qke.0
-	for <qemu-devel@nongnu.org>; Sun, 17 Sep 2017 16:20:49 -0700 (PDT)
+	id 1dtizk-00056p-9c
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:29:04 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 17 Sep 2017 20:20:10 -0300
-Message-Id: <20170917232010.14183-7-f4bug@amsat.org>
-In-Reply-To: <20170917232010.14183-1-f4bug@amsat.org>
-References: <20170917232010.14183-1-f4bug@amsat.org>
+Date: Sun, 17 Sep 2017 20:28:42 -0300
+Message-Id: <20170917232842.14544-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3 6/6] mips: replace cpu_mips_init() with
- cpu_generic_init()
+Subject: [Qemu-devel] [PATCH] qom/cpu: move cpu_model null check to
+ cpu_class_by_name()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,152 +25,252 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, James Hogan <james.hogan@imgtec.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Chris Wulff <crwulff@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, Peter Maydell <peter.maydell@linaro.org>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@imgtec.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-From: Igor Mammedov <imammedo@redhat.com>
+and clean every implementation.
 
-now cpu_mips_init() reimplements subset of cpu_generic_init()
-tasks, so just drop it and use cpu_generic_init() directly.
-
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[PMD: use internal.h instead of cpu.h]
-Tested-by: James Hogan <james.hogan@imgtec.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- target/mips/cpu.h       |  3 +--
- hw/mips/cps.c           |  2 +-
- hw/mips/mips_fulong2e.c |  2 +-
- hw/mips/mips_jazz.c     |  2 +-
- hw/mips/mips_malta.c    |  2 +-
- hw/mips/mips_mipssim.c  |  2 +-
- hw/mips/mips_r4k.c      |  2 +-
- target/mips/translate.c | 17 -----------------
- 8 files changed, 7 insertions(+), 25 deletions(-)
+Based-on: 20170917232010.14183-7-f4bug@amsat.org
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 2f81e0f950..66265e4eb6 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -737,10 +737,9 @@ enum {
-  */
- #define CPU_INTERRUPT_WAKE CPU_INTERRUPT_TGT_INT_0
+ qom/cpu.c              | 7 ++++++-
+ target/alpha/cpu.c     | 6 +-----
+ target/arm/cpu.c       | 4 ----
+ target/cris/cpu.c      | 4 ----
+ target/lm32/cpu.c      | 4 ----
+ target/m68k/cpu.c      | 4 ----
+ target/mips/cpu.c      | 4 ----
+ target/moxie/cpu.c     | 8 +-------
+ target/openrisc/cpu.c  | 4 ----
+ target/sh4/cpu.c       | 3 ---
+ target/sparc/cpu.c     | 4 ----
+ target/tricore/cpu.c   | 4 ----
+ target/unicore32/cpu.c | 4 ----
+ target/xtensa/cpu.c    | 4 ----
+ 14 files changed, 8 insertions(+), 56 deletions(-)
+
+diff --git a/qom/cpu.c b/qom/cpu.c
+index dc5392dbeb..411d8cdd2b 100644
+--- a/qom/cpu.c
++++ b/qom/cpu.c
+@@ -311,7 +311,12 @@ static bool cpu_common_has_work(CPUState *cs)
  
--MIPSCPU *cpu_mips_init(const char *cpu_model);
- int cpu_mips_signal_handler(int host_signum, void *pinfo, void *puc);
+ ObjectClass *cpu_class_by_name(const char *typename, const char *cpu_model)
+ {
+-    CPUClass *cc = CPU_CLASS(object_class_by_name(typename));
++    CPUClass *cc;
++
++    if (!cpu_model) {
++        return NULL;
++    }
++    cc = CPU_CLASS(object_class_by_name(typename));
  
--#define cpu_init(cpu_model) CPU(cpu_mips_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_MIPS_CPU, cpu_model)
- bool cpu_supports_cps_smp(const char *cpu_model);
- bool cpu_supports_isa(const char *cpu_model, unsigned int isa);
- void cpu_set_exception_base(int vp_index, target_ulong address);
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index 4ef337d5c4..708899cf92 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -71,7 +71,7 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-     bool itu_present = false;
+     return cc->class_by_name(cpu_model);
+ }
+diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
+index e6c6aabdf0..b8a21f4e01 100644
+--- a/target/alpha/cpu.c
++++ b/target/alpha/cpu.c
+@@ -127,14 +127,10 @@ static const AlphaCPUAlias alpha_cpu_aliases[] = {
  
-     for (i = 0; i < s->num_vp; i++) {
--        cpu = cpu_mips_init(s->cpu_model);
-+        cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, s->cpu_model));
-         if (cpu == NULL) {
-             error_setg(errp, "%s: CPU initialization failed",  __func__);
-             return;
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 3532399a13..5d9462ec35 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -280,7 +280,7 @@ static void mips_fulong2e_init(MachineState *machine)
-     if (cpu_model == NULL) {
-         cpu_model = "Loongson-2E";
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "Unable to find CPU definition\n");
-         exit(1);
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index df2262a2a8..c1402de1ce 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -151,7 +151,7 @@ static void mips_jazz_init(MachineState *machine,
-     if (cpu_model == NULL) {
-         cpu_model = "R4000";
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "Unable to find CPU definition\n");
-         exit(1);
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index af678f5784..9ecdc818b1 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -931,7 +931,7 @@ static void create_cpu_without_cps(const char *cpu_model,
+ static ObjectClass *alpha_cpu_class_by_name(const char *cpu_model)
+ {
+-    ObjectClass *oc = NULL;
++    ObjectClass *oc;
+     char *typename;
      int i;
  
-     for (i = 0; i < smp_cpus; i++) {
--        cpu = cpu_mips_init(cpu_model);
-+        cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-         if (cpu == NULL) {
-             fprintf(stderr, "Unable to find CPU definition\n");
-             exit(1);
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index 07fc4c2300..1166834f54 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -163,7 +163,7 @@ mips_mipssim_init(MachineState *machine)
-         cpu_model = "24Kf";
- #endif
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "Unable to find CPU definition\n");
-         exit(1);
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index 2f5ced7409..de212f5c13 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -193,7 +193,7 @@ void mips_r4k_init(MachineState *machine)
-         cpu_model = "24Kf";
- #endif
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     if (cpu == NULL) {
-         fprintf(stderr, "Unable to find CPU definition\n");
-         exit(1);
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index f7128bc91d..d16d879df7 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -20523,23 +20523,6 @@ void cpu_mips_realize_env(CPUMIPSState *env)
-     mvp_init(env, env->cpu_model);
- }
- 
--MIPSCPU *cpu_mips_init(const char *cpu_model)
--{
--    ObjectClass *oc;
--    MIPSCPU *cpu;
--
--    oc = cpu_class_by_name(TYPE_MIPS_CPU, cpu_model);
--    if (oc == NULL) {
+-    if (cpu_model == NULL) {
 -        return NULL;
 -    }
 -
--    cpu = MIPS_CPU(object_new(object_class_get_name(oc)));
+     oc = object_class_by_name(cpu_model);
+     if (oc != NULL && object_class_dynamic_cast(oc, TYPE_ALPHA_CPU) != NULL &&
+         !object_class_is_abstract(oc)) {
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 412e94c7ad..ea219c2dde 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -906,10 +906,6 @@ static ObjectClass *arm_cpu_class_by_name(const char *cpu_model)
+     char *typename;
+     char **cpuname;
+ 
+-    if (!cpu_model) {
+-        return NULL;
+-    }
 -
--    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
+     cpuname = g_strsplit(cpu_model, ",", 1);
+     typename = g_strdup_printf("%s-" TYPE_ARM_CPU, cpuname[0]);
+     oc = object_class_by_name(typename);
+diff --git a/target/cris/cpu.c b/target/cris/cpu.c
+index ceebfed79b..88d93f2d11 100644
+--- a/target/cris/cpu.c
++++ b/target/cris/cpu.c
+@@ -69,10 +69,6 @@ static ObjectClass *cris_cpu_class_by_name(const char *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+ 
+-    if (cpu_model == NULL) {
+-        return NULL;
+-    }
 -
--    return cpu;
--}
+ #if defined(CONFIG_USER_ONLY)
+     if (strcasecmp(cpu_model, "any") == 0) {
+         return object_class_by_name("crisv32-" TYPE_CRIS_CPU);
+diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
+index 2b8c36b6d0..bf081f56d2 100644
+--- a/target/lm32/cpu.c
++++ b/target/lm32/cpu.c
+@@ -246,10 +246,6 @@ static ObjectClass *lm32_cpu_class_by_name(const char *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+ 
+-    if (cpu_model == NULL) {
+-        return NULL;
+-    }
 -
- bool cpu_supports_cps_smp(const char *cpu_model)
+     typename = g_strdup_printf("%s-" TYPE_LM32_CPU, cpu_model);
+     oc = object_class_by_name(typename);
+     g_free(typename);
+diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
+index 55bf24bae6..8c70e0805c 100644
+--- a/target/m68k/cpu.c
++++ b/target/m68k/cpu.c
+@@ -87,10 +87,6 @@ static ObjectClass *m68k_cpu_class_by_name(const char *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+ 
+-    if (cpu_model == NULL) {
+-        return NULL;
+-    }
+-
+     typename = g_strdup_printf("%s-" TYPE_M68K_CPU, cpu_model);
+     oc = object_class_by_name(typename);
+     g_free(typename);
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index 1a9a3ed94d..c15b894362 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -166,10 +166,6 @@ static ObjectClass *mips_cpu_class_by_name(const char *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+ 
+-    if (cpu_model == NULL) {
+-        return NULL;
+-    }
+-
+     typename = mips_cpu_type_name(cpu_model);
+     oc = object_class_by_name(typename);
+     g_free(typename);
+diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
+index 748d02f29e..30bd44fcad 100644
+--- a/target/moxie/cpu.c
++++ b/target/moxie/cpu.c
+@@ -89,13 +89,7 @@ static void moxie_cpu_initfn(Object *obj)
+ 
+ static ObjectClass *moxie_cpu_class_by_name(const char *cpu_model)
  {
-     const mips_def_t *def = cpu_mips_find_by_name(cpu_model);
+-    ObjectClass *oc;
+-
+-    if (cpu_model == NULL) {
+-        return NULL;
+-    }
+-
+-    oc = object_class_by_name(cpu_model);
++    ObjectClass *oc = object_class_by_name(cpu_model);
+     if (oc != NULL && (!object_class_dynamic_cast(oc, TYPE_MOXIE_CPU) ||
+                        object_class_is_abstract(oc))) {
+         return NULL;
+diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
+index a979f0bf8b..af9cdcc102 100644
+--- a/target/openrisc/cpu.c
++++ b/target/openrisc/cpu.c
+@@ -108,10 +108,6 @@ static ObjectClass *openrisc_cpu_class_by_name(const char *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+ 
+-    if (cpu_model == NULL) {
+-        return NULL;
+-    }
+-
+     typename = g_strdup_printf("%s-" TYPE_OPENRISC_CPU, cpu_model);
+     oc = object_class_by_name(typename);
+     g_free(typename);
+diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
+index 6ce7cba5a9..252440e019 100644
+--- a/target/sh4/cpu.c
++++ b/target/sh4/cpu.c
+@@ -133,9 +133,6 @@ static ObjectClass *superh_cpu_class_by_name(const char *cpu_model)
+     ObjectClass *oc;
+     GSList *list, *item;
+ 
+-    if (cpu_model == NULL) {
+-        return NULL;
+-    }
+     if (strcasecmp(cpu_model, "any") == 0) {
+         return object_class_by_name(TYPE_SH7750R_CPU);
+     }
+diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
+index 0806d699e6..beab90f3e6 100644
+--- a/target/sparc/cpu.c
++++ b/target/sparc/cpu.c
+@@ -730,10 +730,6 @@ static ObjectClass *sparc_cpu_class_by_name(const char *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+ 
+-    if (cpu_model == NULL) {
+-        return NULL;
+-    }
+-
+     typename = sparc_cpu_type_name(cpu_model);
+     oc = object_class_by_name(typename);
+     g_free(typename);
+diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
+index 5ab5b56454..871eb35453 100644
+--- a/target/tricore/cpu.c
++++ b/target/tricore/cpu.c
+@@ -120,10 +120,6 @@ static ObjectClass *tricore_cpu_class_by_name(const char *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+ 
+-    if (!cpu_model) {
+-        return NULL;
+-    }
+-
+     typename = g_strdup_printf("%s-" TYPE_TRICORE_CPU, cpu_model);
+     oc = object_class_by_name(typename);
+     g_free(typename);
+diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
+index c9b78ce68e..138acc9dd8 100644
+--- a/target/unicore32/cpu.c
++++ b/target/unicore32/cpu.c
+@@ -44,10 +44,6 @@ static ObjectClass *uc32_cpu_class_by_name(const char *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+ 
+-    if (cpu_model == NULL) {
+-        return NULL;
+-    }
+-
+     typename = g_strdup_printf("%s-" TYPE_UNICORE32_CPU, cpu_model);
+     oc = object_class_by_name(typename);
+     g_free(typename);
+diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+index 85897df0a8..dcdc765a86 100644
+--- a/target/xtensa/cpu.c
++++ b/target/xtensa/cpu.c
+@@ -83,10 +83,6 @@ static ObjectClass *xtensa_cpu_class_by_name(const char *cpu_model)
+     ObjectClass *oc;
+     char *typename;
+ 
+-    if (cpu_model == NULL) {
+-        return NULL;
+-    }
+-
+     typename = g_strdup_printf("%s-" TYPE_XTENSA_CPU, cpu_model);
+     oc = object_class_by_name(typename);
+     g_free(typename);
 -- 
 2.14.1
