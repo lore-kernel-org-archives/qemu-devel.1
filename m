@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52588)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dtb8z-00082B-AQ
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:06:02 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dtb92-00083k-VB
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:06:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dtb8v-0008DI-UP
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:06:01 -0400
-Received: from mail-oi0-x230.google.com ([2607:f8b0:4003:c06::230]:45116)
+	(envelope-from <richard.henderson@linaro.org>) id 1dtb8z-0008FJ-72
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:06:03 -0400
+Received: from mail-oi0-x22f.google.com ([2607:f8b0:4003:c06::22f]:51295)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dtb8v-0008CY-Mw
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:05:57 -0400
-Received: by mail-oi0-x230.google.com with SMTP id z73so3685527oia.2
-	for <qemu-devel@nongnu.org>; Sun, 17 Sep 2017 08:05:57 -0700 (PDT)
+	id 1dtb8y-0008FA-Vo
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 11:06:01 -0400
+Received: by mail-oi0-x22f.google.com with SMTP id i6so3680616oih.8
+	for <qemu-devel@nongnu.org>; Sun, 17 Sep 2017 08:06:00 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Sun, 17 Sep 2017 08:05:27 -0700
-Message-Id: <20170917150535.8284-10-richard.henderson@linaro.org>
+Date: Sun, 17 Sep 2017 08:05:29 -0700
+Message-Id: <20170917150535.8284-12-richard.henderson@linaro.org>
 In-Reply-To: <20170917150535.8284-1-richard.henderson@linaro.org>
 References: <20170917150535.8284-1-richard.henderson@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 09/17] tcg: Remove tcg_regset_set
+Subject: [Qemu-devel] [PULL 11/17] tcg: Remove tcg_regset_set32
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,134 +29,410 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+It's not even clear what the interface REG and VAL32 were supposed to mean.
+All uses had REG = 0 and VAL32 was the bitset assigned to the destination.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/tcg.h                 |  1 -
- tcg/mips/tcg-target.inc.c | 47 ++++++++++++++++++++++++-----------------------
- tcg/tcg.c                 |  8 ++++----
- 3 files changed, 28 insertions(+), 28 deletions(-)
+ tcg/tcg.h                    |  1 -
+ tcg/aarch64/tcg-target.inc.c | 33 +++++++++++++++---------------
+ tcg/arm/tcg-target.inc.c     | 23 +++++++++++----------
+ tcg/i386/tcg-target.inc.c    | 26 +++++++-----------------
+ tcg/ppc/tcg-target.inc.c     | 37 +++++++++++++++++-----------------
+ tcg/s390/tcg-target.inc.c    | 14 ++++++-------
+ tcg/sparc/tcg-target.inc.c   | 48 ++++++++++++++++++++++----------------------
+ tcg/tci/tcg-target.inc.c     | 11 ++++------
+ 8 files changed, 90 insertions(+), 103 deletions(-)
 
 diff --git a/tcg/tcg.h b/tcg/tcg.h
-index 6525e51c21..5bf67678d5 100644
+index 006e988788..50dfd7c77f 100644
 --- a/tcg/tcg.h
 +++ b/tcg/tcg.h
 @@ -186,7 +186,6 @@ typedef enum TCGOpcode {
      NB_OPS,
  } TCGOpcode;
  
--#define tcg_regset_set(d, s) (d) = (s)
- #define tcg_regset_set32(d, reg, val32) (d) |= (val32) << (reg)
+-#define tcg_regset_set32(d, reg, val32) (d) |= (val32) << (reg)
  #define tcg_regset_set_reg(d, r) (d) |= 1L << (r)
  #define tcg_regset_reset_reg(d, r) (d) &= ~(1L << (r))
-diff --git a/tcg/mips/tcg-target.inc.c b/tcg/mips/tcg-target.inc.c
-index 85c1abd14b..1c09ec7d5b 100644
---- a/tcg/mips/tcg-target.inc.c
-+++ b/tcg/mips/tcg-target.inc.c
-@@ -195,11 +195,11 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
-     switch(*ct_str++) {
+ #define tcg_regset_test_reg(d, r) (((d) >> (r)) & 1)
+diff --git a/tcg/aarch64/tcg-target.inc.c b/tcg/aarch64/tcg-target.inc.c
+index 75d819258e..704fcddd9b 100644
+--- a/tcg/aarch64/tcg-target.inc.c
++++ b/tcg/aarch64/tcg-target.inc.c
+@@ -121,11 +121,11 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+     switch (*ct_str++) {
      case 'r':
          ct->ct |= TCG_CT_REG;
--        tcg_regset_set(ct->u.regs, 0xffffffff);
-+        ct->u.regs = 0xffffffff;
+-        tcg_regset_set32(ct->u.regs, 0, (1ULL << TCG_TARGET_NB_REGS) - 1);
++        ct->u.regs = 0xffffffffu;
          break;
-     case 'L': /* qemu_ld input arg constraint */
+     case 'l': /* qemu_ld / qemu_st address, data_reg */
          ct->ct |= TCG_CT_REG;
--        tcg_regset_set(ct->u.regs, 0xffffffff);
-+        ct->u.regs = 0xffffffff;
-         tcg_regset_reset_reg(ct->u.regs, TCG_REG_A0);
- #if defined(CONFIG_SOFTMMU)
-         if (TCG_TARGET_REG_BITS < TARGET_LONG_BITS) {
-@@ -209,7 +209,7 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
-         break;
-     case 'S': /* qemu_st constraint */
-         ct->ct |= TCG_CT_REG;
--        tcg_regset_set(ct->u.regs, 0xffffffff);
-+        ct->u.regs = 0xffffffff;
-         tcg_regset_reset_reg(ct->u.regs, TCG_REG_A0);
- #if defined(CONFIG_SOFTMMU)
-         if (TCG_TARGET_REG_BITS < TARGET_LONG_BITS) {
-@@ -2607,27 +2607,28 @@ static void tcg_target_qemu_prologue(TCGContext *s)
+-        tcg_regset_set32(ct->u.regs, 0, (1ULL << TCG_TARGET_NB_REGS) - 1);
++        ct->u.regs = 0xffffffffu;
+ #ifdef CONFIG_SOFTMMU
+         /* x0 and x1 will be overwritten when reading the tlb entry,
+            and x2, and x3 for helper args, better to avoid using them. */
+@@ -1925,20 +1925,21 @@ static const TCGTargetOpDef *tcg_target_op_def(TCGOpcode op)
+ 
  static void tcg_target_init(TCGContext *s)
  {
-     tcg_target_detect_isa();
--    tcg_regset_set(tcg_target_available_regs[TCG_TYPE_I32], 0xffffffff);
-+    tcg_target_available_regs[TCG_TYPE_I32] = 0xffffffff;
-     if (TCG_TARGET_REG_BITS == 64) {
--        tcg_regset_set(tcg_target_available_regs[TCG_TYPE_I64], 0xffffffff);
--    }
--    tcg_regset_set(tcg_target_call_clobber_regs,
--                   (1 << TCG_REG_V0) |
--                   (1 << TCG_REG_V1) |
--                   (1 << TCG_REG_A0) |
--                   (1 << TCG_REG_A1) |
--                   (1 << TCG_REG_A2) |
--                   (1 << TCG_REG_A3) |
--                   (1 << TCG_REG_T0) |
--                   (1 << TCG_REG_T1) |
--                   (1 << TCG_REG_T2) |
--                   (1 << TCG_REG_T3) |
--                   (1 << TCG_REG_T4) |
--                   (1 << TCG_REG_T5) |
--                   (1 << TCG_REG_T6) |
--                   (1 << TCG_REG_T7) |
--                   (1 << TCG_REG_T8) |
--                   (1 << TCG_REG_T9));
-+        tcg_target_available_regs[TCG_TYPE_I64] = 0xffffffff;
-+    }
+-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0, 0xffffffff);
+-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I64], 0, 0xffffffff);
+-
+-    tcg_regset_set32(tcg_target_call_clobber_regs, 0,
+-                     (1 << TCG_REG_X0) | (1 << TCG_REG_X1) |
+-                     (1 << TCG_REG_X2) | (1 << TCG_REG_X3) |
+-                     (1 << TCG_REG_X4) | (1 << TCG_REG_X5) |
+-                     (1 << TCG_REG_X6) | (1 << TCG_REG_X7) |
+-                     (1 << TCG_REG_X8) | (1 << TCG_REG_X9) |
+-                     (1 << TCG_REG_X10) | (1 << TCG_REG_X11) |
+-                     (1 << TCG_REG_X12) | (1 << TCG_REG_X13) |
+-                     (1 << TCG_REG_X14) | (1 << TCG_REG_X15) |
+-                     (1 << TCG_REG_X16) | (1 << TCG_REG_X17) |
+-                     (1 << TCG_REG_X18) | (1 << TCG_REG_X30));
++    tcg_target_available_regs[TCG_TYPE_I32] = 0xffffffffu;
++    tcg_target_available_regs[TCG_TYPE_I64] = 0xffffffffu;
 +
-+    tcg_target_call_clobber_regs = 0;
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V0);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_V1);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_A0);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_A1);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_A2);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_A3);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_T0);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_T1);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_T2);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_T3);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_T4);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_T5);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_T6);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_T7);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_T8);
-+    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_T9);
++    tcg_target_call_clobber_regs = 0xfffffffu;
++    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_X19);
++    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_X20);
++    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_X21);
++    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_X22);
++    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_X23);
++    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_X24);
++    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_X25);
++    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_X26);
++    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_X27);
++    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_X28);
++    tcg_regset_reset_reg(tcg_target_call_clobber_regs, TCG_REG_X29);
  
      s->reserved_regs = 0;
-     tcg_regset_set_reg(s->reserved_regs, TCG_REG_ZERO); /* zero register */
-diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 9eeaba9529..a4badcc85f 100644
---- a/tcg/tcg.c
-+++ b/tcg/tcg.c
-@@ -2362,7 +2362,7 @@ static void tcg_reg_alloc_mov(TCGContext *s, const TCGOpDef *def,
-     TCGTemp *ts, *ots;
-     TCGType otype, itype;
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_SP);
+diff --git a/tcg/arm/tcg-target.inc.c b/tcg/arm/tcg-target.inc.c
+index f0c176554b..14599a8685 100644
+--- a/tcg/arm/tcg-target.inc.c
++++ b/tcg/arm/tcg-target.inc.c
+@@ -264,13 +264,13 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
  
--    tcg_regset_set(allocated_regs, s->reserved_regs);
-+    allocated_regs = s->reserved_regs;
-     ots = &s->temps[args[0]];
-     ts = &s->temps[args[1]];
+     case 'r':
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, (1 << TCG_TARGET_NB_REGS) - 1);
++        ct->u.regs = 0xffff;
+         break;
  
-@@ -2450,8 +2450,8 @@ static void tcg_reg_alloc_op(TCGContext *s,
-            args + nb_oargs + nb_iargs, 
-            sizeof(TCGArg) * def->nb_cargs);
- 
--    tcg_regset_set(i_allocated_regs, s->reserved_regs);
--    tcg_regset_set(o_allocated_regs, s->reserved_regs);
-+    i_allocated_regs = s->reserved_regs;
-+    o_allocated_regs = s->reserved_regs;
- 
-     /* satisfy input constraints */ 
-     for(k = 0; k < nb_iargs; k++) {
-@@ -2651,7 +2651,7 @@ static void tcg_reg_alloc_call(TCGContext *s, int nb_oargs, int nb_iargs,
+     /* qemu_ld address */
+     case 'l':
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, (1 << TCG_TARGET_NB_REGS) - 1);
++        ct->u.regs = 0xffff;
+ #ifdef CONFIG_SOFTMMU
+         /* r0-r2,lr will be overwritten when reading the tlb entry,
+            so don't use these. */
+@@ -284,7 +284,7 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+     /* qemu_st address & data */
+     case 's':
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, (1 << TCG_TARGET_NB_REGS) - 1);
++        ct->u.regs = 0xffff;
+         /* r0-r2 will be overwritten when reading the tlb entry (softmmu only)
+            and r0-r1 doing the byte swapping, so don't use these. */
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_R0);
+@@ -2164,14 +2164,15 @@ static void tcg_target_init(TCGContext *s)
+         }
      }
-     
-     /* assign input registers */
--    tcg_regset_set(allocated_regs, s->reserved_regs);
-+    allocated_regs = s->reserved_regs;
-     for(i = 0; i < nb_regs; i++) {
-         arg = args[nb_oargs + i];
-         if (arg != TCG_CALL_DUMMY_ARG) {
+ 
+-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0, 0xffff);
+-    tcg_regset_set32(tcg_target_call_clobber_regs, 0,
+-                     (1 << TCG_REG_R0) |
+-                     (1 << TCG_REG_R1) |
+-                     (1 << TCG_REG_R2) |
+-                     (1 << TCG_REG_R3) |
+-                     (1 << TCG_REG_R12) |
+-                     (1 << TCG_REG_R14));
++    tcg_target_available_regs[TCG_TYPE_I32] = 0xffff;
++
++    tcg_target_call_clobber_regs = 0;
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R0);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R1);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R2);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R3);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R12);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R14);
+ 
+     s->reserved_regs = 0;
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_CALL_STACK);
+diff --git a/tcg/i386/tcg-target.inc.c b/tcg/i386/tcg-target.inc.c
+index 0c19ab7cc2..69e49c9f58 100644
+--- a/tcg/i386/tcg-target.inc.c
++++ b/tcg/i386/tcg-target.inc.c
+@@ -193,23 +193,15 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+         break;
+     case 'q':
+         ct->ct |= TCG_CT_REG;
+-        if (TCG_TARGET_REG_BITS == 64) {
+-            tcg_regset_set32(ct->u.regs, 0, 0xffff);
+-        } else {
+-            tcg_regset_set32(ct->u.regs, 0, 0xf);
+-        }
++        ct->u.regs = TCG_TARGET_REG_BITS == 64 ? 0xffff : 0xf;
+         break;
+     case 'Q':
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, 0xf);
++        ct->u.regs = 0xf;
+         break;
+     case 'r':
+         ct->ct |= TCG_CT_REG;
+-        if (TCG_TARGET_REG_BITS == 64) {
+-            tcg_regset_set32(ct->u.regs, 0, 0xffff);
+-        } else {
+-            tcg_regset_set32(ct->u.regs, 0, 0xff);
+-        }
++        ct->u.regs = TCG_TARGET_REG_BITS == 64 ? 0xffff : 0xff;
+         break;
+     case 'W':
+         /* With TZCNT/LZCNT, we can have operand-size as an input.  */
+@@ -219,11 +211,7 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+         /* qemu_ld/st address constraint */
+     case 'L':
+         ct->ct |= TCG_CT_REG;
+-        if (TCG_TARGET_REG_BITS == 64) {
+-            tcg_regset_set32(ct->u.regs, 0, 0xffff);
+-        } else {
+-            tcg_regset_set32(ct->u.regs, 0, 0xff);
+-        }
++        ct->u.regs = TCG_TARGET_REG_BITS == 64 ? 0xffff : 0xff;
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_L0);
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_L1);
+         break;
+@@ -2643,10 +2631,10 @@ static void tcg_target_init(TCGContext *s)
+ #endif /* CONFIG_CPUID_H */
+ 
+     if (TCG_TARGET_REG_BITS == 64) {
+-        tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0, 0xffff);
+-        tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I64], 0, 0xffff);
++        tcg_target_available_regs[TCG_TYPE_I32] = 0xffff;
++        tcg_target_available_regs[TCG_TYPE_I64] = 0xffff;
+     } else {
+-        tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0, 0xff);
++        tcg_target_available_regs[TCG_TYPE_I32] = 0xff;
+     }
+ 
+     tcg_target_call_clobber_regs = 0;
+diff --git a/tcg/ppc/tcg-target.inc.c b/tcg/ppc/tcg-target.inc.c
+index 44305ba9e8..8ffc7a7205 100644
+--- a/tcg/ppc/tcg-target.inc.c
++++ b/tcg/ppc/tcg-target.inc.c
+@@ -260,11 +260,11 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+         break;
+     case 'r':
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, 0xffffffff);
++        ct->u.regs = 0xffffffff;
+         break;
+     case 'L':                   /* qemu_ld constraint */
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, 0xffffffff);
++        ct->u.regs = 0xffffffff;
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_R3);
+ #ifdef CONFIG_SOFTMMU
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_R4);
+@@ -273,7 +273,7 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+         break;
+     case 'S':                   /* qemu_st constraint */
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, 0xffffffff);
++        ct->u.regs = 0xffffffff;
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_R3);
+ #ifdef CONFIG_SOFTMMU
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_R4);
+@@ -2772,21 +2772,22 @@ static void tcg_target_init(TCGContext *s)
+     }
+ #endif
+ 
+-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0, 0xffffffff);
+-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I64], 0, 0xffffffff);
+-    tcg_regset_set32(tcg_target_call_clobber_regs, 0,
+-                     (1 << TCG_REG_R0) |
+-                     (1 << TCG_REG_R2) |
+-                     (1 << TCG_REG_R3) |
+-                     (1 << TCG_REG_R4) |
+-                     (1 << TCG_REG_R5) |
+-                     (1 << TCG_REG_R6) |
+-                     (1 << TCG_REG_R7) |
+-                     (1 << TCG_REG_R8) |
+-                     (1 << TCG_REG_R9) |
+-                     (1 << TCG_REG_R10) |
+-                     (1 << TCG_REG_R11) |
+-                     (1 << TCG_REG_R12));
++    tcg_target_available_regs[TCG_TYPE_I32] = 0xffffffff;
++    tcg_target_available_regs[TCG_TYPE_I64] = 0xffffffff;
++
++    tcg_target_call_clobber_regs = 0;
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R0);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R2);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R3);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R4);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R5);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R6);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R7);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R8);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R9);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R10);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R11);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R12);
+ 
+     s->reserved_regs = 0;
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_R0); /* tcg temp */
+diff --git a/tcg/s390/tcg-target.inc.c b/tcg/s390/tcg-target.inc.c
+index 01baa33673..38a7cdab75 100644
+--- a/tcg/s390/tcg-target.inc.c
++++ b/tcg/s390/tcg-target.inc.c
+@@ -402,14 +402,14 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+     switch (*ct_str++) {
+     case 'r':                  /* all registers */
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, 0xffff);
++        ct->u.regs = 0xffff;
+         break;
+     case 'L':                  /* qemu_ld/st constraint */
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, 0xffff);
+-        tcg_regset_reset_reg (ct->u.regs, TCG_REG_R2);
+-        tcg_regset_reset_reg (ct->u.regs, TCG_REG_R3);
+-        tcg_regset_reset_reg (ct->u.regs, TCG_REG_R4);
++        ct->u.regs = 0xffff;
++        tcg_regset_reset_reg(ct->u.regs, TCG_REG_R2);
++        tcg_regset_reset_reg(ct->u.regs, TCG_REG_R3);
++        tcg_regset_reset_reg(ct->u.regs, TCG_REG_R4);
+         break;
+     case 'a':                  /* force R2 for division */
+         ct->ct |= TCG_CT_REG;
+@@ -2519,8 +2519,8 @@ static void tcg_target_init(TCGContext *s)
+ {
+     query_s390_facilities();
+ 
+-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0, 0xffff);
+-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I64], 0, 0xffff);
++    tcg_target_available_regs[TCG_TYPE_I32] = 0xffff;
++    tcg_target_available_regs[TCG_TYPE_I64] = 0xffff;
+ 
+     tcg_target_call_clobber_regs = 0;
+     tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_R0);
+diff --git a/tcg/sparc/tcg-target.inc.c b/tcg/sparc/tcg-target.inc.c
+index ccd83205d5..1da4debbaf 100644
+--- a/tcg/sparc/tcg-target.inc.c
++++ b/tcg/sparc/tcg-target.inc.c
+@@ -343,16 +343,15 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+     switch (*ct_str++) {
+     case 'r':
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, 0xffffffff);
++        ct->u.regs = 0xffffffff;
+         break;
+     case 'R':
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, ALL_64);
++        ct->u.regs = ALL_64;
+         break;
+     case 'A': /* qemu_ld/st address constraint */
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0,
+-                         TARGET_LONG_BITS == 64 ? ALL_64 : 0xffffffff);
++        ct->u.regs = TARGET_LONG_BITS == 64 ? ALL_64 : 0xffffffff;
+     reserve_helpers:
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_O0);
+         tcg_regset_reset_reg(ct->u.regs, TCG_REG_O1);
+@@ -360,11 +359,11 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+         break;
+     case 's': /* qemu_st data 32-bit constraint */
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, 0xffffffff);
++        ct->u.regs = 0xffffffff;
+         goto reserve_helpers;
+     case 'S': /* qemu_st data 64-bit constraint */
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, ALL_64);
++        ct->u.regs = ALL_64;
+         goto reserve_helpers;
+     case 'I':
+         ct->ct |= TCG_CT_CONST_S11;
+@@ -1752,24 +1751,25 @@ static void tcg_target_init(TCGContext *s)
+     }
+ #endif
+ 
+-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0, 0xffffffff);
+-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I64], 0, ALL_64);
+-
+-    tcg_regset_set32(tcg_target_call_clobber_regs, 0,
+-                     (1 << TCG_REG_G1) |
+-                     (1 << TCG_REG_G2) |
+-                     (1 << TCG_REG_G3) |
+-                     (1 << TCG_REG_G4) |
+-                     (1 << TCG_REG_G5) |
+-                     (1 << TCG_REG_G6) |
+-                     (1 << TCG_REG_G7) |
+-                     (1 << TCG_REG_O0) |
+-                     (1 << TCG_REG_O1) |
+-                     (1 << TCG_REG_O2) |
+-                     (1 << TCG_REG_O3) |
+-                     (1 << TCG_REG_O4) |
+-                     (1 << TCG_REG_O5) |
+-                     (1 << TCG_REG_O7));
++    tcg_target_available_regs[TCG_TYPE_I32] = 0xffffffff;
++    tcg_target_available_regs[TCG_TYPE_I64] = ALL_64;
++
++    tcg_target_call_clobber_regs = 0;
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_G1);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_G2);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_G3);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_G4);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_G5);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_G6);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_G7);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_O0);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_O1);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_O2);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_O3);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_O4);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_O5);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_O6);
++    tcg_regset_set_reg(tcg_target_call_clobber_regs, TCG_REG_O7);
+ 
+     s->reserved_regs = 0;
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_G0); /* zero */
+diff --git a/tcg/tci/tcg-target.inc.c b/tcg/tci/tcg-target.inc.c
+index f9644334cc..913c3802a3 100644
+--- a/tcg/tci/tcg-target.inc.c
++++ b/tcg/tci/tcg-target.inc.c
+@@ -390,7 +390,7 @@ static const char *target_parse_constraint(TCGArgConstraint *ct,
+     case 'L':                   /* qemu_ld constraint */
+     case 'S':                   /* qemu_st constraint */
+         ct->ct |= TCG_CT_REG;
+-        tcg_regset_set32(ct->u.regs, 0, BIT(TCG_TARGET_NB_REGS) - 1);
++        ct->u.regs = BIT(TCG_TARGET_NB_REGS) - 1;
+         break;
+     default:
+         return NULL;
+@@ -870,14 +870,11 @@ static void tcg_target_init(TCGContext *s)
+     tcg_debug_assert(tcg_op_defs_max <= UINT8_MAX);
+ 
+     /* Registers available for 32 bit operations. */
+-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0,
+-                     BIT(TCG_TARGET_NB_REGS) - 1);
++    tcg_target_available_regs[TCG_TYPE_I32] = BIT(TCG_TARGET_NB_REGS) - 1;
+     /* Registers available for 64 bit operations. */
+-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I64], 0,
+-                     BIT(TCG_TARGET_NB_REGS) - 1);
++    tcg_target_available_regs[TCG_TYPE_I64] = BIT(TCG_TARGET_NB_REGS) - 1;
+     /* TODO: Which registers should be set here? */
+-    tcg_regset_set32(tcg_target_call_clobber_regs, 0,
+-                     BIT(TCG_TARGET_NB_REGS) - 1);
++    tcg_target_call_clobber_regs = BIT(TCG_TARGET_NB_REGS) - 1;
+ 
+     s->reserved_regs = 0;
+     tcg_regset_set_reg(s->reserved_regs, TCG_REG_CALL_STACK);
 -- 
 2.13.5
