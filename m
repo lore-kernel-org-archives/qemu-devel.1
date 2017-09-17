@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46258)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51335)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dtizo-0008FU-TH
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:29:07 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dtjEV-000371-M1
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:44:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dtizk-00056p-9c
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:29:04 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Sun, 17 Sep 2017 20:28:42 -0300
-Message-Id: <20170917232842.14544-1-f4bug@amsat.org>
+	(envelope-from <no-reply@patchew.org>) id 1dtjEQ-00063P-Rf
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:44:15 -0400
+Resent-Message-Id: <E1dtjEQ-00063P-Rf@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21390)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dtjEQ-00061a-Kg
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 19:44:10 -0400
+In-Reply-To: <20170917232010.14183-1-f4bug@amsat.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150569180005.36.9005014267144366755@69b6ddf88678>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] qom/cpu: move cpu_model null check to
- cpu_class_by_name()
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 17 Sep 2017 16:43:20 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v3 0/6] QOMify MIPS cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,252 +28,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?q?Llu=C3=ADs=20Vilanova?= <vilanova@ac.upc.edu>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Chris Wulff <crwulff@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, Peter Maydell <peter.maydell@linaro.org>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@imgtec.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+To: f4bug@amsat.org
+Cc: famz@redhat.com, imammedo@redhat.com, ehabkost@redhat.com, aurelien@aurel32.net, yongbok.kim@imgtec.com, marcel@redhat.com, thuth@redhat.com, james.hogan@imgtec.com, hpoussin@reactos.org, qemu-devel@nongnu.org
 
-and clean every implementation.
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-Based-on: 20170917232010.14183-7-f4bug@amsat.org
-
- qom/cpu.c              | 7 ++++++-
- target/alpha/cpu.c     | 6 +-----
- target/arm/cpu.c       | 4 ----
- target/cris/cpu.c      | 4 ----
- target/lm32/cpu.c      | 4 ----
- target/m68k/cpu.c      | 4 ----
- target/mips/cpu.c      | 4 ----
- target/moxie/cpu.c     | 8 +-------
- target/openrisc/cpu.c  | 4 ----
- target/sh4/cpu.c       | 3 ---
- target/sparc/cpu.c     | 4 ----
- target/tricore/cpu.c   | 4 ----
- target/unicore32/cpu.c | 4 ----
- target/xtensa/cpu.c    | 4 ----
- 14 files changed, 8 insertions(+), 56 deletions(-)
-
-diff --git a/qom/cpu.c b/qom/cpu.c
-index dc5392dbeb..411d8cdd2b 100644
---- a/qom/cpu.c
-+++ b/qom/cpu.c
-@@ -311,7 +311,12 @@ static bool cpu_common_has_work(CPUState *cs)
- 
- ObjectClass *cpu_class_by_name(const char *typename, const char *cpu_model)
- {
--    CPUClass *cc = CPU_CLASS(object_class_by_name(typename));
-+    CPUClass *cc;
-+
-+    if (!cpu_model) {
-+        return NULL;
-+    }
-+    cc = CPU_CLASS(object_class_by_name(typename));
- 
-     return cc->class_by_name(cpu_model);
- }
-diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
-index e6c6aabdf0..b8a21f4e01 100644
---- a/target/alpha/cpu.c
-+++ b/target/alpha/cpu.c
-@@ -127,14 +127,10 @@ static const AlphaCPUAlias alpha_cpu_aliases[] = {
- 
- static ObjectClass *alpha_cpu_class_by_name(const char *cpu_model)
- {
--    ObjectClass *oc = NULL;
-+    ObjectClass *oc;
-     char *typename;
-     int i;
- 
--    if (cpu_model == NULL) {
--        return NULL;
--    }
--
-     oc = object_class_by_name(cpu_model);
-     if (oc != NULL && object_class_dynamic_cast(oc, TYPE_ALPHA_CPU) != NULL &&
-         !object_class_is_abstract(oc)) {
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 412e94c7ad..ea219c2dde 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -906,10 +906,6 @@ static ObjectClass *arm_cpu_class_by_name(const char *cpu_model)
-     char *typename;
-     char **cpuname;
- 
--    if (!cpu_model) {
--        return NULL;
--    }
--
-     cpuname = g_strsplit(cpu_model, ",", 1);
-     typename = g_strdup_printf("%s-" TYPE_ARM_CPU, cpuname[0]);
-     oc = object_class_by_name(typename);
-diff --git a/target/cris/cpu.c b/target/cris/cpu.c
-index ceebfed79b..88d93f2d11 100644
---- a/target/cris/cpu.c
-+++ b/target/cris/cpu.c
-@@ -69,10 +69,6 @@ static ObjectClass *cris_cpu_class_by_name(const char *cpu_model)
-     ObjectClass *oc;
-     char *typename;
- 
--    if (cpu_model == NULL) {
--        return NULL;
--    }
--
- #if defined(CONFIG_USER_ONLY)
-     if (strcasecmp(cpu_model, "any") == 0) {
-         return object_class_by_name("crisv32-" TYPE_CRIS_CPU);
-diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
-index 2b8c36b6d0..bf081f56d2 100644
---- a/target/lm32/cpu.c
-+++ b/target/lm32/cpu.c
-@@ -246,10 +246,6 @@ static ObjectClass *lm32_cpu_class_by_name(const char *cpu_model)
-     ObjectClass *oc;
-     char *typename;
- 
--    if (cpu_model == NULL) {
--        return NULL;
--    }
--
-     typename = g_strdup_printf("%s-" TYPE_LM32_CPU, cpu_model);
-     oc = object_class_by_name(typename);
-     g_free(typename);
-diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-index 55bf24bae6..8c70e0805c 100644
---- a/target/m68k/cpu.c
-+++ b/target/m68k/cpu.c
-@@ -87,10 +87,6 @@ static ObjectClass *m68k_cpu_class_by_name(const char *cpu_model)
-     ObjectClass *oc;
-     char *typename;
- 
--    if (cpu_model == NULL) {
--        return NULL;
--    }
--
-     typename = g_strdup_printf("%s-" TYPE_M68K_CPU, cpu_model);
-     oc = object_class_by_name(typename);
-     g_free(typename);
-diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-index 1a9a3ed94d..c15b894362 100644
---- a/target/mips/cpu.c
-+++ b/target/mips/cpu.c
-@@ -166,10 +166,6 @@ static ObjectClass *mips_cpu_class_by_name(const char *cpu_model)
-     ObjectClass *oc;
-     char *typename;
- 
--    if (cpu_model == NULL) {
--        return NULL;
--    }
--
-     typename = mips_cpu_type_name(cpu_model);
-     oc = object_class_by_name(typename);
-     g_free(typename);
-diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
-index 748d02f29e..30bd44fcad 100644
---- a/target/moxie/cpu.c
-+++ b/target/moxie/cpu.c
-@@ -89,13 +89,7 @@ static void moxie_cpu_initfn(Object *obj)
- 
- static ObjectClass *moxie_cpu_class_by_name(const char *cpu_model)
- {
--    ObjectClass *oc;
--
--    if (cpu_model == NULL) {
--        return NULL;
--    }
--
--    oc = object_class_by_name(cpu_model);
-+    ObjectClass *oc = object_class_by_name(cpu_model);
-     if (oc != NULL && (!object_class_dynamic_cast(oc, TYPE_MOXIE_CPU) ||
-                        object_class_is_abstract(oc))) {
-         return NULL;
-diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-index a979f0bf8b..af9cdcc102 100644
---- a/target/openrisc/cpu.c
-+++ b/target/openrisc/cpu.c
-@@ -108,10 +108,6 @@ static ObjectClass *openrisc_cpu_class_by_name(const char *cpu_model)
-     ObjectClass *oc;
-     char *typename;
- 
--    if (cpu_model == NULL) {
--        return NULL;
--    }
--
-     typename = g_strdup_printf("%s-" TYPE_OPENRISC_CPU, cpu_model);
-     oc = object_class_by_name(typename);
-     g_free(typename);
-diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-index 6ce7cba5a9..252440e019 100644
---- a/target/sh4/cpu.c
-+++ b/target/sh4/cpu.c
-@@ -133,9 +133,6 @@ static ObjectClass *superh_cpu_class_by_name(const char *cpu_model)
-     ObjectClass *oc;
-     GSList *list, *item;
- 
--    if (cpu_model == NULL) {
--        return NULL;
--    }
-     if (strcasecmp(cpu_model, "any") == 0) {
-         return object_class_by_name(TYPE_SH7750R_CPU);
-     }
-diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-index 0806d699e6..beab90f3e6 100644
---- a/target/sparc/cpu.c
-+++ b/target/sparc/cpu.c
-@@ -730,10 +730,6 @@ static ObjectClass *sparc_cpu_class_by_name(const char *cpu_model)
-     ObjectClass *oc;
-     char *typename;
- 
--    if (cpu_model == NULL) {
--        return NULL;
--    }
--
-     typename = sparc_cpu_type_name(cpu_model);
-     oc = object_class_by_name(typename);
-     g_free(typename);
-diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
-index 5ab5b56454..871eb35453 100644
---- a/target/tricore/cpu.c
-+++ b/target/tricore/cpu.c
-@@ -120,10 +120,6 @@ static ObjectClass *tricore_cpu_class_by_name(const char *cpu_model)
-     ObjectClass *oc;
-     char *typename;
- 
--    if (!cpu_model) {
--        return NULL;
--    }
--
-     typename = g_strdup_printf("%s-" TYPE_TRICORE_CPU, cpu_model);
-     oc = object_class_by_name(typename);
-     g_free(typename);
-diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
-index c9b78ce68e..138acc9dd8 100644
---- a/target/unicore32/cpu.c
-+++ b/target/unicore32/cpu.c
-@@ -44,10 +44,6 @@ static ObjectClass *uc32_cpu_class_by_name(const char *cpu_model)
-     ObjectClass *oc;
-     char *typename;
- 
--    if (cpu_model == NULL) {
--        return NULL;
--    }
--
-     typename = g_strdup_printf("%s-" TYPE_UNICORE32_CPU, cpu_model);
-     oc = object_class_by_name(typename);
-     g_free(typename);
-diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
-index 85897df0a8..dcdc765a86 100644
---- a/target/xtensa/cpu.c
-+++ b/target/xtensa/cpu.c
-@@ -83,10 +83,6 @@ static ObjectClass *xtensa_cpu_class_by_name(const char *cpu_model)
-     ObjectClass *oc;
-     char *typename;
- 
--    if (cpu_model == NULL) {
--        return NULL;
--    }
--
-     typename = g_strdup_printf("%s-" TYPE_XTENSA_CPU, cpu_model);
-     oc = object_class_by_name(typename);
-     g_free(typename);
--- 
-2.14.1
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2MyAwLzZdIFFPTWlmeSBNSVBTIGNwdQpNZXNzYWdlLWlkOiAyMDE3MDkx
+NzIzMjAxMC4xNDE4My0xLWY0YnVnQGFtc2F0Lm9yZwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFND
+UklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9n
+IC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwg
+ZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoK
+Y29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMg
+aW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0
+IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3Jt
+YXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAg
+ICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4
+aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
+Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rl
+c3QnCmU4MjJmZTBjNWQgbWlwczogcmVwbGFjZSBjcHVfbWlwc19pbml0KCkgd2l0aCBjcHVfZ2Vu
+ZXJpY19pbml0KCkKNDk2ZjM4YWM0YSBtaXBzOiBNSVBTQ1BVIG1vZGVsIHN1YmNsYXNzZXMKZTg4
+NTUyMDZlYyBtaXBzOiBjYWxsIGNwdV9taXBzX3JlYWxpemVfZW52KCkgZnJvbSBtaXBzX2NwdV9y
+ZWFsaXplZm4oKQplOWVjMTY1ZDM5IG1pcHM6IHNwbGl0IGNwdV9taXBzX3JlYWxpemVfZW52KCkg
+b3V0IG9mIGNwdV9taXBzX2luaXQoKQoyOTIzMTkzODMyIG1pcHM6IGludHJvZHVjZSBpbnRlcm5h
+bC5oIGFuZCBjbGVhbnVwIGNwdS5oCjE0NmY0MDU5ZWEgbWlwczogbW92ZSBody9taXBzL2NwdXRp
+bWVyLmMgdG8gdGFyZ2V0L21pcHMvCgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRD
+SCAxLzY6IG1pcHM6IG1vdmUgaHcvbWlwcy9jcHV0aW1lci5jIHRvIHRhcmdldC9taXBzLy4uLgpD
+aGVja2luZyBQQVRDSCAyLzY6IG1pcHM6IGludHJvZHVjZSBpbnRlcm5hbC5oIGFuZCBjbGVhbnVw
+IGNwdS5oLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGFmdGVyIHRoYXQgJyYnIChjdHg6V3hX
+KQojNzI4OiBGSUxFOiB0YXJnZXQvbWlwcy9pbnRlcm5hbC5oOjIzMDoKKyAgICBpZiAoKGVudi0+
+Q1AwX1ZQQ29udHJvbCA+PiBDUDBWUEN0bF9ESVMpICYgMSkgewogICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0
+ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiM3MzY6IEZJTEU6IHRhcmdldC9taXBzL2ludGVybmFsLmg6
+MjM4OgorICAgICAgICAgICAgKChvdGhlcl9jcHUtPmVudi5DUDBfVlBDb250cm9sID4+IENQMFZQ
+Q3RsX0RJUykgJiAxKSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgXgoKRVJST1I6IHNwYWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhh
+dCAnJicgKGN0eDpXeFcpCiM3NTY6IEZJTEU6IHRhcmdldC9taXBzL2ludGVybmFsLmg6MjU4Ogor
+ICAgICAgICBlbnYtPmhmbGFncyB8PSAoZW52LT5DUDBfU3RhdHVzID4+IENQMFN0X0tTVSkgJiBN
+SVBTX0hGTEFHX0tTVTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgIF4KCnRvdGFsOiAzIGVycm9ycywgMCB3YXJuaW5ncywgODQyIGxpbmVzIGNo
+ZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
+YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
+ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCkNoZWNraW5nIFBB
+VENIIDMvNjogbWlwczogc3BsaXQgY3B1X21pcHNfcmVhbGl6ZV9lbnYoKSBvdXQgb2YgY3B1X21p
+cHNfaW5pdCgpLi4uCkNoZWNraW5nIFBBVENIIDQvNjogbWlwczogY2FsbCBjcHVfbWlwc19yZWFs
+aXplX2VudigpIGZyb20gbWlwc19jcHVfcmVhbGl6ZWZuKCkuLi4KQ2hlY2tpbmcgUEFUQ0ggNS82
+OiBtaXBzOiBNSVBTQ1BVIG1vZGVsIHN1YmNsYXNzZXMuLi4KQ2hlY2tpbmcgUEFUQ0ggNi82OiBt
+aXBzOiByZXBsYWNlIGNwdV9taXBzX2luaXQoKSB3aXRoIGNwdV9nZW5lcmljX2luaXQoKS4uLgo9
+PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKLS0t
+CkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHA6Ly9wYXRjaGV3
+Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAZnJlZWxp
+c3RzLm9yZw==
