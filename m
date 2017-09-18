@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54704)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1du42q-0002VA-S9
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 17:57:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1du46B-0004GC-1A
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 18:01:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1du42m-0007qi-OE
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 17:57:36 -0400
-Received: from mail-qk0-x241.google.com ([2607:f8b0:400d:c09::241]:37390)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1du42m-0007qV-JZ
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 17:57:32 -0400
-Received: by mail-qk0-x241.google.com with SMTP id r66so1176452qke.4
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 14:57:32 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 18 Sep 2017 18:57:19 -0300
-Message-Id: <20170918215719.16415-1-f4bug@amsat.org>
+	(envelope-from <eblake@redhat.com>) id 1du46A-0001AL-4b
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 18:01:03 -0400
+References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
+	<20170918135935.255591-5-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <3107b1aa-d708-0c3f-8bb7-be2e631dff1d@redhat.com>
+Date: Mon, 18 Sep 2017 17:00:52 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [RFC PATCH] vl.c: add is_system_on_chip flag to force
- board default cpu
+In-Reply-To: <20170918135935.255591-5-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="FxBHrsVTkBMElAiKQ7xwv1HEk8mw6jJhc"
+Subject: Re: [Qemu-devel] [PATCH v2 4/7] block/nbd-client: drop reply field
+ from NBDClientSession
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,66 +25,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-add a property to restrict the CPU for SoCs once on machine creation and avoid
-duplicate code in each board.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--FxBHrsVTkBMElAiKQ7xwv1HEk8mw6jJhc
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <3107b1aa-d708-0c3f-8bb7-be2e631dff1d@redhat.com>
+Subject: Re: [PATCH v2 4/7] block/nbd-client: drop reply field from
+ NBDClientSession
+References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
+ <20170918135935.255591-5-vsementsov@virtuozzo.com>
+In-Reply-To: <20170918135935.255591-5-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-Based-on: 1505318697-77161-6-git-send-email-imammedo@redhat.com
+On 09/18/2017 08:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Drop 'reply' from NBDClientSession. It's used to only deliver request
+> return code to receiving coroutine. Instead introduce per-request ret
+> variable to simplify the scheme and make further refactoring possible.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/nbd-client.h |  2 +-
+>  block/nbd-client.c | 22 +++++++++-------------
+>  2 files changed, 10 insertions(+), 14 deletions(-)
+>=20
+> diff --git a/block/nbd-client.h b/block/nbd-client.h
+> index 3f97d31013..4bc8fe3993 100644
+> --- a/block/nbd-client.h
+> +++ b/block/nbd-client.h
+> @@ -22,6 +22,7 @@ typedef struct {
+>      bool receiving;         /* waiting for read_reply_co? */
+>      NBDRequest *request;
+>      QEMUIOVector *qiov;
+> +    int ret;
+>  } NBDClientRequest;
 
- include/hw/boards.h |  3 +++
- vl.c                | 11 +++++++++++
- 2 files changed, 14 insertions(+)
+I like this idea.  However, I note that:
 
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index 6b67adaef6..20dc0a0ab9 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -129,6 +129,8 @@ typedef struct {
-  *    specifies default CPU_TYPE, which will be used for parsing target
-  *    specific features and for creating CPUs if CPU name wasn't provided
-  *    explicitly at CLI
-+ * @is_system_on_chip:
-+ *    If true, board does not support other CPUs than default_cpu_type.
-  * @minimum_page_bits:
-  *    If non-zero, the board promises never to create a CPU with a page size
-  *    smaller than this, so QEMU can use a more efficient larger page
-@@ -182,6 +184,7 @@ struct MachineClass {
-     const char *hw_version;
-     ram_addr_t default_ram_size;
-     const char *default_cpu_type;
-+    bool is_system_on_chip;
-     bool option_rom_has_mr;
-     bool rom_file_has_mr;
-     int minimum_page_bits;
-diff --git a/vl.c b/vl.c
-index fb6a700e55..6e59ffa856 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4717,10 +4717,21 @@ int main(int argc, char **argv, char **envp)
-     current_machine->cpu_model = cpu_model;
- 
- 
-+    if (machine_class->is_system_on_chip && !machine_class->default_cpu_type) {
-+        error_report("System-on-Chip must have a default CPU type");
-+        exit(1);
-+    }
-     /* parse features once if machine provides default cpu_type */
-     if (machine_class->default_cpu_type) {
-         current_machine->cpu_type = machine_class->default_cpu_type;
-         if (cpu_model) {
-+            if (machine_class->is_system_on_chip) {
-+                if (strcmp(cpu_model, machine_class->default_cpu_type) != 0) {
-+                    error_report("This board can only be used with CPU %s",
-+                                 machine_class->default_cpu_type);
-+                    exit(1);
-+                }
-+            }
-             current_machine->cpu_type =
-                 cpu_parse_cpu_model(machine_class->default_cpu_type, cpu_model);
-         }
--- 
-2.14.1
+> @@ -211,11 +211,7 @@ static int nbd_co_receive_reply(NBDClientSession *=
+s, NBDRequest *request)
+>      if (!s->ioc || s->quit) {
+>          ret =3D -EIO;
+>      } else {
+> -        assert(s->reply.handle =3D=3D request->handle);
+> -        ret =3D -s->reply.error;
+> -
+> -        /* Tell the read handler to read another header.  */
+> -        s->reply.handle =3D 0;
+> +        ret =3D s->requests[i].ret;
+
+you are removing the assert you added in 2/7, where I questioned whether
+we needed NBDClientRequest.request in the first place.  So there may be
+some rebase churn, depending on how that conversation pans out.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--FxBHrsVTkBMElAiKQ7xwv1HEk8mw6jJhc
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnAQhQACgkQp6FrSiUn
+Q2pSoQf/ehgJvqj+T2cO8sbymtrm2p60h8lwWN3s+pvUIWpDy75uD5Nuxhi4ERJw
+T6bvHC1PqQgQmFThWrkbCC1E6n98AxByYkKfhJrU1DcVjyf688PLXvZw0EMGo7Gd
+tzDDCKGxL633fuGOg7yVRidrT++fSE0+GjmVtwkaWm+LIH+J9DVpQPai5sRqRQbv
+JAA9YWNLqCinkfq7x8QB3yelEEVPW7XFZv1CB/idyTgXb34s/A+YMAtNXkCa46qZ
+OTY9oPbbEr32PVVEhNrDiysy06T/h8MEVQyqCwiasdVpOLwp63E3Qmidta7+12Y8
+pn02894plfH92IKbGe2Efg+tgK1yyg==
+=/V4l
+-----END PGP SIGNATURE-----
+
+--FxBHrsVTkBMElAiKQ7xwv1HEk8mw6jJhc--
