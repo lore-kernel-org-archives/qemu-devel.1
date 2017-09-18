@@ -1,22 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38437)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38910)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dtwaR-0001iL-A0
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:59:51 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dtwbA-0002WZ-0b
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dtwaN-0001QQ-Ms
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:59:47 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:37069 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dtwaN-0001P3-B3
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:59:43 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Date: Mon, 18 Sep 2017 16:59:29 +0300
-Message-Id: <20170918135935.255591-2-vsementsov@virtuozzo.com>
-In-Reply-To: <20170918135935.255591-1-vsementsov@virtuozzo.com>
-References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
-Subject: [Qemu-devel] [PATCH v2 1/7] block/nbd-client: refactor
- nbd_co_receive_reply
+	(envelope-from <alex.bennee@linaro.org>) id 1dtwb5-0001sE-VL
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:00:32 -0400
+Received: from mail-wr0-x22a.google.com ([2a00:1450:400c:c0c::22a]:50405)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dtwb5-0001qx-KL
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:00:27 -0400
+Received: by mail-wr0-x22a.google.com with SMTP id w12so568878wrc.7
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 07:00:26 -0700 (PDT)
+References: <20170224112109.3147-1-alex.bennee@linaro.org>
+	<20170224112109.3147-23-alex.bennee@linaro.org>
+	<7468f944-914c-de89-66fb-f8ad49eb59c1@gmail.com>
+	<87poapbgt0.fsf@linaro.org>
+	<e511a895-b1e3-150f-6555-12ba1fa16273@gmail.com>
+	<87a81sjp15.fsf@linaro.org>
+	<70057789-ab76-1150-ab2e-b5a3239a0209@gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <70057789-ab76-1150-ab2e-b5a3239a0209@gmail.com>
+Date: Mon, 18 Sep 2017 15:00:23 +0100
+Message-ID: <87d16ods3s.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 22/24] target-arm: ensure all cross vCPUs
+ TLB flushes complete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,91 +36,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com
+To: Dmitry Osipenko <digetx@gmail.com>
+Cc: peter.maydell@linaro.org, "open list:ARM" <qemu-arm@nongnu.org>, qemu-devel@nongnu.org
 
-"NBDReply *reply" parameter of nbd_co_receive_reply is used only
-to pass return value for nbd_co_request (reply.error). Remove it
-and use function return value instead.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/nbd-client.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+Dmitry Osipenko <digetx@gmail.com> writes:
 
-diff --git a/block/nbd-client.c b/block/nbd-client.c
-index ee7f758e68..acd8e5d007 100644
---- a/block/nbd-client.c
-+++ b/block/nbd-client.c
-@@ -178,26 +178,26 @@ err:
-     return rc;
- }
- 
--static void nbd_co_receive_reply(NBDClientSession *s,
--                                 NBDRequest *request,
--                                 NBDReply *reply,
--                                 QEMUIOVector *qiov)
-+static int nbd_co_receive_reply(NBDClientSession *s,
-+                                NBDRequest *request,
-+                                QEMUIOVector *qiov)
- {
-+    int ret;
-     int i = HANDLE_TO_INDEX(s, request->handle);
- 
-     /* Wait until we're woken up by nbd_read_reply_entry.  */
-     s->requests[i].receiving = true;
-     qemu_coroutine_yield();
-     s->requests[i].receiving = false;
--    *reply = s->reply;
--    if (reply->handle != request->handle || !s->ioc || s->quit) {
--        reply->error = EIO;
-+    if (s->reply.handle != request->handle || !s->ioc || s->quit) {
-+        ret = -EIO;
-     } else {
--        if (qiov && reply->error == 0) {
-+        ret = -s->reply.error;
-+        if (qiov && s->reply.error == 0) {
-             assert(request->len == iov_size(qiov->iov, qiov->niov));
-             if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
-                                       NULL) < 0) {
--                reply->error = EIO;
-+                ret = -EIO;
-                 s->quit = true;
-             }
-         }
-@@ -217,6 +217,8 @@ static void nbd_co_receive_reply(NBDClientSession *s,
-     s->in_flight--;
-     qemu_co_queue_next(&s->free_sema);
-     qemu_co_mutex_unlock(&s->send_mutex);
-+
-+    return ret;
- }
- 
- static int nbd_co_request(BlockDriverState *bs,
-@@ -224,7 +226,6 @@ static int nbd_co_request(BlockDriverState *bs,
-                           QEMUIOVector *qiov)
- {
-     NBDClientSession *client = nbd_get_client_session(bs);
--    NBDReply reply;
-     int ret;
- 
-     assert(!qiov || request->type == NBD_CMD_WRITE ||
-@@ -232,12 +233,11 @@ static int nbd_co_request(BlockDriverState *bs,
-     ret = nbd_co_send_request(bs, request,
-                               request->type == NBD_CMD_WRITE ? qiov : NULL);
-     if (ret < 0) {
--        reply.error = -ret;
--    } else {
--        nbd_co_receive_reply(client, request, &reply,
--                             request->type == NBD_CMD_READ ? qiov : NULL);
-+        return ret;
-     }
--    return -reply.error;
-+
-+    return nbd_co_receive_reply(client, request,
-+                                request->type == NBD_CMD_READ ? qiov : NULL);
- }
- 
- int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
--- 
-2.11.1
+> On 18.09.2017 13:10, Alex Bennée wrote:
+>>
+>> Dmitry Osipenko <digetx@gmail.com> writes:
+>>
+>>> On 17.09.2017 16:22, Alex Bennée wrote:
+>>>>
+>>>> Dmitry Osipenko <digetx@gmail.com> writes:
+>>>>
+>>>>> On 24.02.2017 14:21, Alex Bennée wrote:
+>>>>>> Previously flushes on other vCPUs would only get serviced when they
+>>>>>> exited their TranslationBlocks. While this isn't overly problematic it
+>>>>>> violates the semantics of TLB flush from the point of view of source
+>>>>>> vCPU.
+>>>>>>
+>>>>>> To solve this we call the cputlb *_all_cpus_synced() functions to do
+>>>>>> the flushes which ensures all flushes are completed by the time the
+>>>>>> vCPU next schedules its own work. As the TLB instructions are modelled
+>>>>>> as CP writes the TB ends at this point meaning cpu->exit_request will
+>>>>>> be checked before the next instruction is executed.
+>>>>>>
+>>>>>> Deferring the work until the architectural sync point is a possible
+>>>>>> future optimisation.
+>>>>>>
+>>>>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>>>>> Reviewed-by: Richard Henderson <rth@twiddle.net>
+>>>>>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>>>>>> ---
+>>>>>>  target/arm/helper.c | 165 ++++++++++++++++++++++------------------------------
+>>>>>>  1 file changed, 69 insertions(+), 96 deletions(-)
+>>>>>>
+>>>>>
+>>>>> Hello,
+>>>>>
+>>>>> I have an issue with Linux kernel stopping to boot on a SMP 32bit ARM (haven't
+>>>>> checked 64bit) in a single-threaded TCG mode. Kernel reaches point where it
+>>>>> should mount rootfs over NFS and vCPUs stop. This issue is reproducible with any
+>>>>> 32bit ARM machine type. Kernel boots fine with a MTTCG accel, only
+>>>>> single-threaded TCG is affected. Git bisection lead to this patch, any
+>>>>> ideas?
+>>>>
+>>>> It shouldn't cause a problem but can you obtain a backtrace of the
+>>>> system when hung?
+>>>>
+>>>
+>>> Actually, it looks like TCG enters infinite loop. Do you mean backtrace of QEMU
+>>> by 'backtrace of the system'? If so, here it is:
+>>>
+>>> Thread 4 (Thread 0x7ffa37f10700 (LWP 20716)):
+>>>
+>>> #0  0x00007ffa601888bd in poll () at ../sysdeps/unix/syscall-template.S:84
+>>>
+>>> #1  0x00007ffa5e3aa561 in poll (__timeout=-1, __nfds=2, __fds=0x7ffa30006dc0) at
+>>> /usr/include/bits/poll2.h:46
+>>> #2  poll_func (ufds=0x7ffa30006dc0, nfds=2, timeout=-1, userdata=0x557bd603eae0)
+>>> at
+>>> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/thread-mainloop.c:69
+>>> #3  0x00007ffa5e39bbb1 in pa_mainloop_poll (m=m@entry=0x557bd60401f0) at
+>>> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/mainloop.c:844
+>>> #4  0x00007ffa5e39c24e in pa_mainloop_iterate (m=0x557bd60401f0,
+>>> block=<optimized out>, retval=0x0) at
+>>> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/mainloop.c:926
+>>> #5  0x00007ffa5e39c300 in pa_mainloop_run (m=0x557bd60401f0,
+>>> retval=retval@entry=0x0) at
+>>> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/mainloop.c:944
+>>>
+>>> #6  0x00007ffa5e3aa4a9 in thread (userdata=0x557bd60400f0) at
+>>> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/thread-mainloop.c:100
+>>>
+>>> #7  0x00007ffa599eea38 in internal_thread_func (userdata=0x557bd603e090) at
+>>> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulsecore/thread-posix.c:81
+>>>
+>>> #8  0x00007ffa60453657 in start_thread (arg=0x7ffa37f10700) at
+>>> pthread_create.c:456
+>>>
+>>> #9  0x00007ffa60193c5f in clone () at
+>>> ../sysdeps/unix/sysv/linux/x86_64/clone.S:97
+>>>
+>>>
+>>>
+>>>
+>>>
+>>> Thread 3 (Thread 0x7ffa4adff700 (LWP 20715)):
+>>>
+>>>
+>>> #0  0x00007ffa53e51caf in code_gen_buffer ()
+>>>
+>>
+>> Well it's not locked up in servicing any flush tasks as it's executing
+>> code. Maybe the guest code is spinning on something?
+>>
+>
+> Indeed, I should have used 'exec' instead of 'in_asm'.
+>
+>> In the monitor:
+>>
+>>   info registers
+>>
+>> Will show you where things are, see if the ip is moving each time. Also
+>> you can do a disassemble dump from there to see what code it is stuck
+>> on.
+>>
+>
+> I've attached with GDB to QEMU to see where it got stuck. Turned out it is
+> caused by CONFIG_STRICT_KERNEL_RWX=y of the Linux kernel. Upon boot completion
+> kernel changes memory permissions and that changing is executed on a dedicated
+> CPU, while other CPUs are 'stopped' in a busy loop.
+>
+> This patch just introduced a noticeable performance regression for a
+> single-threaded TCG, which is probably fine since MTTCG is the default now.
+> Thank you very much for the suggestions and all your work on MTTCG!
+
+Hmm well it would be nice to know the exact mechanism for that failure.
+If we just end up with a very long list of tasks in
+cpu->queued_work_first then I guess that explains it but it would be
+nice to quantify the problem.
+
+I had trouble seeing where this loop is in the kernel code, got a pointer?
+
+--
+Alex Bennée
