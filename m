@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37544)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37559)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1du250-00070D-EK
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:51:43 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1du250-00070y-Vt
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:51:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1du24z-0006Na-5q
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:51:42 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1du24z-0006Np-J4
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:51:43 -0400
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 18 Sep 2017 12:50:53 -0700
-Message-Id: <20170918195100.17593-11-andrew.smirnov@gmail.com>
+Date: Mon, 18 Sep 2017 12:50:56 -0700
+Message-Id: <20170918195100.17593-14-andrew.smirnov@gmail.com>
 In-Reply-To: <20170918195100.17593-1-andrew.smirnov@gmail.com>
 References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
-Subject: [Qemu-devel] [PATCH 10/17] sdhci: Add i.MX specific subtype of SDHCI
+Subject: [Qemu-devel] [PATCH 13/17] i.MX: Add code to emulate i.MX2 watchdog
+ IP block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,11 +23,8 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-IP block found on several generations of i.MX family does not use
-vanilla SDHCI implementation and it comes with a number of quirks.
-
-Introduce i.MX SDHCI subtype of SDHCI block to add code necessary to
-support unmodified Linux guest driver.
+Add enough code to emulate i.MX2 watchdog IP block so it would be
+possible to reboot the machine running Linux Guest.
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org
@@ -34,234 +32,189 @@ Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/sd/sdhci-internal.h |  15 ++++++
- hw/sd/sdhci.c          | 123 ++++++++++++++++++++++++++++++++++++++++++++++++-
- include/hw/sd/sdhci.h  |   8 ++++
- 3 files changed, 144 insertions(+), 2 deletions(-)
+ hw/misc/Makefile.objs      |   1 +
+ hw/misc/imx2_wdt.c         | 117 +++++++++++++++++++++++++++++++++++++++++++++
+ include/hw/misc/imx2_wdt.h |  36 ++++++++++++++
+ 3 files changed, 154 insertions(+)
+ create mode 100644 hw/misc/imx2_wdt.c
+ create mode 100644 include/hw/misc/imx2_wdt.h
 
-diff --git a/hw/sd/sdhci-internal.h b/hw/sd/sdhci-internal.h
-index 161177cf39..7b9ed06c36 100644
---- a/hw/sd/sdhci-internal.h
-+++ b/hw/sd/sdhci-internal.h
-@@ -91,6 +91,8 @@
- #define SDHC_CTRL_ADMA2_32             0x10
- #define SDHC_CTRL_ADMA2_64             0x18
- #define SDHC_DMA_TYPE(x)               ((x) & SDHC_CTRL_DMA_CHECK_MASK)
-+#define SDHC_CTRL_4BITBUS              0x02
-+#define SDHC_CTRL_8BITBUS              0x20
- 
- /* R/W Power Control Register 0x0 */
- #define SDHC_PWRCON                    0x29
-@@ -229,4 +231,17 @@ enum {
- 
- extern const VMStateDescription sdhci_vmstate;
- 
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index ac1be05a03..c393a93456 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -35,6 +35,7 @@ obj-$(CONFIG_IMX) += imx25_ccm.o
+ obj-$(CONFIG_IMX) += imx6_ccm.o
+ obj-$(CONFIG_IMX) += imx6_src.o
+ obj-$(CONFIG_IMX) += imx7_ccm.o
++obj-$(CONFIG_IMX) += imx2_wdt.o
+ obj-$(CONFIG_MILKYMIST) += milkymist-hpdmc.o
+ obj-$(CONFIG_MILKYMIST) += milkymist-pfpu.o
+ obj-$(CONFIG_MAINSTONE) += mst_fpga.o
+diff --git a/hw/misc/imx2_wdt.c b/hw/misc/imx2_wdt.c
+new file mode 100644
+index 0000000000..9d97a19511
+--- /dev/null
++++ b/hw/misc/imx2_wdt.c
+@@ -0,0 +1,117 @@
++/*
++ * Copyright (c) 2017, Impinj, Inc.
++ *
++ * i.MX2 Watchdog IP block
++ *
++ * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+#define ESDHC_MIX_CTRL			0x48
-+#define ESDHC_VENDOR_SPEC		0xc0
-+#define ESDHC_DLL_CTRL			0x60
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "hw/hw.h"
++#include "exec/memory.h"
++#include "exec/address-spaces.h"
++#include "hw/sysbus.h"
++#include "qemu/log.h"
++#include "qemu/timer.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/watchdog.h"
++#include "qemu/error-report.h"
++#include "qemu/sizes.h"
 +
-+#define ESDHC_TUNING_CTRL		0xcc
-+#define ESDHC_TUNE_CTRL_STATUS		0x68
-+#define ESDHC_WTMK_LVL			0x44
-+
-+#define ESDHC_CTRL_4BITBUS		(0x1 << 1)
-+#define ESDHC_CTRL_8BITBUS		(0x2 << 1)
++#include "hw/misc/imx2_wdt.h"
 +
 +
- #endif
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 6d6a791ee9..73e7910ba9 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -265,7 +265,8 @@ static void sdhci_send_command(SDHCIState *s)
-             }
-         }
- 
--        if ((s->norintstsen & SDHC_NISEN_TRSCMP) &&
-+        if (!(s->quirks & SDHCI_QUIRK_NO_BUSY_IRQ) &&
-+            (s->norintstsen & SDHC_NISEN_TRSCMP) &&
-             (s->cmdreg & SDHC_CMD_RESPONSE) == SDHC_CMD_RSP_WITH_BUSY) {
-             s->norintsts |= SDHC_NIS_TRSCMP;
-         }
-@@ -1191,6 +1192,8 @@ static void sdhci_initfn(SDHCIState *s)
- 
-     s->insert_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_raise_insertion_irq, s);
-     s->transfer_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sdhci_data_transfer, s);
++#define IMX2_WDT_WCR_WDA	BIT(5)		/* -> External Reset WDOG_B */
++#define IMX2_WDT_WCR_SRS	BIT(4)		/* -> Software Reset Signal */
 +
-+    s->io_ops = &sdhci_mmio_ops;
- }
- 
- static void sdhci_uninitfn(SDHCIState *s)
-@@ -1347,7 +1350,7 @@ static void sdhci_sysbus_realize(DeviceState *dev, Error ** errp)
-     s->buf_maxsz = sdhci_get_fifolen(s);
-     s->fifo_buffer = g_malloc0(s->buf_maxsz);
-     sysbus_init_irq(sbd, &s->irq);
--    memory_region_init_io(&s->iomem, OBJECT(s), &sdhci_mmio_ops, s, "sdhci",
-+    memory_region_init_io(&s->iomem, OBJECT(s), s->io_ops, s, "sdhci",
-             SDHC_REGISTERS_MAP_SIZE);
-     sysbus_init_mmio(sbd, &s->iomem);
- }
-@@ -1386,11 +1389,127 @@ static const TypeInfo sdhci_bus_info = {
-     .class_init = sdhci_bus_class_init,
- };
- 
-+static uint64_t usdhc_read(void *opaque, hwaddr offset, unsigned size)
++static uint64_t imx2_wdt_read(void *opaque, hwaddr addr,
++                              unsigned int size)
 +{
-+    SDHCIState *s = SYSBUS_SDHCI(opaque);
-+    uint32_t ret;
-+    uint16_t hostctl;
++    IMX2WdtState *s = opaque;
++    const size_t index = addr / sizeof(s->reg[0]);
 +
-+    switch (offset) {
++    if (index < ARRAY_SIZE(s->reg))
++        return s->reg[index];
++    else
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
++
++    return 0xDEADBEEF;
++}
++
++static void imx2_wdt_write(void *opaque, hwaddr addr,
++                           uint64_t val64, unsigned int size)
++{
++    uint16_t value  = val64;
++    IMX2WdtState *s = opaque;
++    const size_t index = addr / sizeof(s->reg[0]);
++
++    switch (index) {
++    case IMX2_WDT_WCR:
++        if (value & (IMX2_WDT_WCR_WDA | IMX2_WDT_WCR_SRS))
++            watchdog_perform_action();
 +    default:
-+        return sdhci_read(opaque, offset, size);
-+
-+    case SDHC_HOSTCTL:
-+        hostctl = SDHC_DMA_TYPE(s->hostctl) << 5;
-+
-+        if (s->hostctl & SDHC_CTRL_8BITBUS)
-+            hostctl |= ESDHC_CTRL_8BITBUS;
-+
-+        if (s->hostctl & SDHC_CTRL_4BITBUS)
-+            hostctl |= ESDHC_CTRL_4BITBUS;
-+
-+        ret = hostctl | (s->blkgap << 16) |
-+            (s->wakcon << 24);
-+
-+        break;
-+
-+    case ESDHC_DLL_CTRL:
-+    case ESDHC_TUNE_CTRL_STATUS:
-+    case 0x6c:
-+    case ESDHC_TUNING_CTRL:
-+    case ESDHC_VENDOR_SPEC:
-+    case ESDHC_MIX_CTRL:
-+    case ESDHC_WTMK_LVL:
-+        ret = 0;
-+        break;
-+    }
-+
-+    return ret;
-+}
-+
-+static void
-+usdhc_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
-+{
-+    SDHCIState *s = SYSBUS_SDHCI(opaque);
-+    uint8_t hostctl = 0;
-+    uint32_t value = (uint32_t)val;
-+
-+    switch (offset) {
-+    case ESDHC_DLL_CTRL:
-+    case ESDHC_TUNE_CTRL_STATUS:
-+    case 0x6c:
-+    case ESDHC_TUNING_CTRL:
-+    case ESDHC_WTMK_LVL:
-+    case ESDHC_VENDOR_SPEC:
-+        break;
-+
-+    case SDHC_HOSTCTL:
-+        if (value & ESDHC_CTRL_8BITBUS)
-+            hostctl |= SDHC_CTRL_8BITBUS;
-+
-+        if (value & ESDHC_CTRL_4BITBUS)
-+            hostctl |= ESDHC_CTRL_4BITBUS;
-+
-+        hostctl |= SDHC_DMA_TYPE(value >> 5);
-+
-+        value &= ~0xFE;
-+        value |= hostctl;
-+        value &= ~0xFF00;
-+        value |= s->pwrcon;
-+
-+        sdhci_write(opaque, offset, value, size);
-+        break;
-+
-+    case ESDHC_MIX_CTRL:
-+        /*
-+         * The layout of the register is slightly different, but we
-+         * don't care about those bits
-+         */
-+        s->trnmod = value & 0xFFFF;
-+        break;
-+    case SDHC_TRNMOD:
-+        sdhci_write(opaque, offset, val | s->trnmod, size);
-+        break;
-+    case SDHC_BLKSIZE:
-+        val |= 0x7 << 12;
-+    default:                    /* FALLTHROUGH */
-+        sdhci_write(opaque, offset, val, size);
-+        break;
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: Bad offset 0x%"HWADDR_PRIx"\n", __func__, addr);
 +    }
 +}
 +
-+
-+static const MemoryRegionOps usdhc_mmio_ops = {
-+    .read = usdhc_read,
-+    .write = usdhc_write,
++static const MemoryRegionOps imx2_wdt_ops = {
++    .read  = imx2_wdt_read,
++    .write = imx2_wdt_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
 +    .valid = {
-+        .min_access_size = 1,
++        /*
++         * Our device would not work correctly if the guest was doing
++         * unaligned access. This might not be a limitation on the real
++         * device but in practice there is no reason for a guest to access
++         * this device unaligned.
++         */
++        .min_access_size = 4,
 +        .max_access_size = 4,
-+        .unaligned = false
++        .unaligned = false,
 +    },
-+    .endianness = DEVICE_LITTLE_ENDIAN,
 +};
 +
-+static void imx_usdhc_init(Object *obj)
++static void imx2_wdt_realize(DeviceState *dev, Error **errp)
 +{
-+    SDHCIState *s = SYSBUS_SDHCI(obj);
++    IMX2WdtState *s = IMX2_WDT(dev);
 +
-+    s->io_ops = &usdhc_mmio_ops;
-+    s->quirks = SDHCI_QUIRK_NO_BUSY_IRQ;
++    memory_region_init_io(&s->mmio, OBJECT(dev),
++                          &imx2_wdt_ops, s,
++                          TYPE_IMX2_WDT".mmio", SZ_64K);
++    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
 +}
 +
-+static const TypeInfo imx_usdhc_info = {
-+    .name = TYPE_IMX_USDHC,
-+    .parent = TYPE_SYSBUS_SDHCI,
-+    .instance_init = imx_usdhc_init,
++static void imx2_wdt_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = imx2_wdt_realize;
++
++    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
++}
++
++static const TypeInfo imx2_wdt_info = {
++    .name          = TYPE_IMX2_WDT,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(IMX2WdtState),
++    .class_init    = imx2_wdt_class_init,
 +};
 +
- static void sdhci_register_types(void)
- {
-     type_register_static(&sdhci_pci_info);
-     type_register_static(&sdhci_sysbus_info);
-     type_register_static(&sdhci_bus_info);
-+    type_register_static(&imx_usdhc_info);
- }
- 
- type_init(sdhci_register_types)
-diff --git a/include/hw/sd/sdhci.h b/include/hw/sd/sdhci.h
-index 0f0c3f1e64..903472c901 100644
---- a/include/hw/sd/sdhci.h
-+++ b/include/hw/sd/sdhci.h
-@@ -39,6 +39,7 @@ typedef struct SDHCIState {
-     };
-     SDBus sdbus;
-     MemoryRegion iomem;
-+    const MemoryRegionOps *io_ops;
- 
-     QEMUTimer *insert_timer;       /* timer for 'changing' sd card. */
-     QEMUTimer *transfer_timer;
-@@ -83,8 +84,13 @@ typedef struct SDHCIState {
-     /* Force Event Auto CMD12 Error Interrupt Reg - write only */
-     /* Force Event Error Interrupt Register- write only */
-     /* RO Host Controller Version Register always reads as 0x2401 */
++static WatchdogTimerModel model = {
++    .wdt_name = "imx2-watchdog",
++    .wdt_description = "i.MX2 Watchdog",
++};
 +
-+    unsigned long quirks;
- } SDHCIState;
- 
-+/* Controller does not provide transfer-complete interrupt when not busy */
-+#define SDHCI_QUIRK_NO_BUSY_IRQ				(1<<14)
++static void imx2_wdt_register_type(void)
++{
++    watchdog_add_model(&model);
++    type_register_static(&imx2_wdt_info);
++}
++type_init(imx2_wdt_register_type)
+diff --git a/include/hw/misc/imx2_wdt.h b/include/hw/misc/imx2_wdt.h
+new file mode 100644
+index 0000000000..3a30ed1ef8
+--- /dev/null
++++ b/include/hw/misc/imx2_wdt.h
+@@ -0,0 +1,36 @@
++/*
++ * Copyright (c) 2017, Impinj, Inc.
++ *
++ * i.MX2 Watchdog IP block
++ *
++ * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
- #define TYPE_PCI_SDHCI "sdhci-pci"
- #define PCI_SDHCI(obj) OBJECT_CHECK(SDHCIState, (obj), TYPE_PCI_SDHCI)
- 
-@@ -92,4 +98,6 @@ typedef struct SDHCIState {
- #define SYSBUS_SDHCI(obj)                               \
-      OBJECT_CHECK(SDHCIState, (obj), TYPE_SYSBUS_SDHCI)
- 
-+#define TYPE_IMX_USDHC "imx-usdhc"
++#ifndef IMX2_WDT_H
++#define IMX2_WDT_H
 +
- #endif /* SDHCI_H */
++#include "qemu/bitops.h"
++#include "hw/sysbus.h"
++
++#define TYPE_IMX2_WDT "imx2.wdt"
++#define IMX2_WDT(obj) OBJECT_CHECK(IMX2WdtState, (obj), TYPE_IMX2_WDT)
++
++enum IMX2WdtRegisters {
++    IMX2_WDT_WCR,
++    IMX2_WDT_REG_NUM
++};
++
++
++typedef struct IMX2WdtState {
++    /* <private> */
++    SysBusDevice parent_obj;
++
++    MemoryRegion mmio;
++
++    uint16_t reg[IMX2_WDT_REG_NUM];
++} IMX2WdtState;
++
++#endif /* IMX7_SNVS_H */
 -- 
 2.13.5
