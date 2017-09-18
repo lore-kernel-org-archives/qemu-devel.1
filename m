@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42465)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45917)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dtyfq-0000z1-Lk
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:13:31 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dtynm-00005O-Ui
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:21:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dtyfp-0006LW-Cj
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:13:30 -0400
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170913181910.29688-3-mreitz@redhat.com>
-	<20170918034431.GA15551@lemon.lan>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <85fd9e96-4135-a62d-76ff-631104cd02f1@redhat.com>
-Date: Mon, 18 Sep 2017 18:13:03 +0200
+	(envelope-from <el13635@mail.ntua.gr>) id 1dtyni-0007iX-Ou
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:21:42 -0400
+Received: from smtp1.ntua.gr ([2001:648:2000:de::183]:45009)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <el13635@mail.ntua.gr>) id 1dtyni-0007fm-7p
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:21:38 -0400
+Date: Mon, 18 Sep 2017 19:20:33 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170918162033.ee7fuarojpkwp5wr@postretch>
+References: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1505385610-35529-2-git-send-email-pradeep.jagadeesh@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20170918034431.GA15551@lemon.lan>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="k1CgRqXMoES3PRuC9eWiJKxjrIKJMxOko"
-Subject: Re: [Qemu-devel] [PATCH 02/18] block: BDS deletion during
- bdrv_drain_recurse
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="jhsjxyjhaxfjd4nl"
+Content-Disposition: inline
+In-Reply-To: <1505385610-35529-2-git-send-email-pradeep.jagadeesh@huawei.com>
+Subject: Re: [Qemu-devel] [PATCH v11 1/6] throttle: factor out duplicate code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,100 +28,308 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: Pradeep Jagadeesh <pradeepkiruvale@gmail.com>
+Cc: eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, qemu-devel@nongnu.org, jani kokkonen <jani.kokkonen@huawei.com>, alberto garcia <berto@igalia.com>, Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Markus Armbruster <armbru@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---k1CgRqXMoES3PRuC9eWiJKxjrIKJMxOko
-From: Max Reitz <mreitz@redhat.com>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- John Snow <jsnow@redhat.com>
-Message-ID: <85fd9e96-4135-a62d-76ff-631104cd02f1@redhat.com>
-Subject: Re: [PATCH 02/18] block: BDS deletion during bdrv_drain_recurse
-References: <20170913181910.29688-1-mreitz@redhat.com>
- <20170913181910.29688-3-mreitz@redhat.com> <20170918034431.GA15551@lemon.lan>
-In-Reply-To: <20170918034431.GA15551@lemon.lan>
-Content-Type: text/plain; charset=utf-8
+
+--jhsjxyjhaxfjd4nl
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-09-18 05:44, Fam Zheng wrote:
-> On Wed, 09/13 20:18, Max Reitz wrote:
->> Drainined a BDS child may lead to both the original BDS and/or its oth=
-er
->> children being deleted (e.g. if the original BDS represents a block
->> job).  We should prepare for this in both bdrv_drain_recurse() and
->> bdrv_drained_begin() by monitoring whether the BDS we are about to dra=
-in
->> still exists at all.
->=20
-> Can the deletion happen when IOThread calls
-> bdrv_drain_recurse/bdrv_drained_begin?
-
-I don't think so, because (1) my issue was draining a block job and that
-can only be completed in the main loop, and (2) I would like to think
-it's always impossible, considering that bdrv_unref() may only be called
-with the BQL.
-
->                                         If not, is it enough to do
->=20
->     ...
->     if (in_main_loop) {
->         bdrv_ref(bs);
+On Thu, Sep 14, 2017 at 06:40:05AM -0400, Pradeep Jagadeesh wrote:
+>This patch factors out the duplicate throttle code that was still
+>present in block and fsdev devices.
+>
+>Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+>Reviewed-by: Alberto Garcia <berto@igalia.com>
+>Reviewed-by: Greg Kurz <groug@kaod.org>
+>Reviewed-by: Eric Blake <eblake@redhat.com>
+>---
+> blockdev.c                      | 44 +---------------------------------
+> fsdev/qemu-fsdev-throttle.c     | 44 ++--------------------------------
+> include/qemu/throttle-options.h |  3 +++
+> include/qemu/throttle.h         |  4 ++--
+> include/qemu/typedefs.h         |  1 +
+> util/throttle.c                 | 52 ++++++++++++++++++++++++++++++++++++=
++++++
+> 6 files changed, 61 insertions(+), 87 deletions(-)
+>
+>diff --git a/blockdev.c b/blockdev.c
+>index 56a6b24..9d33c25 100644
+>--- a/blockdev.c
+>+++ b/blockdev.c
+>@@ -387,49 +387,7 @@ static void extract_common_blockdev_options(QemuOpts =
+*opts, int *bdrv_flags,
 >     }
->     ...
->     if (in_main_loop) {
->         bdrv_unref(bs);
->     }
->=20
-> to protect the main loop case? So the BdrvDeletedStatus state is not ne=
-eded.
+>
+>     if (throttle_cfg) {
+>-        throttle_config_init(throttle_cfg);
+>-        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].avg =3D
+>-            qemu_opt_get_number(opts, "throttling.bps-total", 0);
+>-        throttle_cfg->buckets[THROTTLE_BPS_READ].avg  =3D
+>-            qemu_opt_get_number(opts, "throttling.bps-read", 0);
+>-        throttle_cfg->buckets[THROTTLE_BPS_WRITE].avg =3D
+>-            qemu_opt_get_number(opts, "throttling.bps-write", 0);
+>-        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].avg =3D
+>-            qemu_opt_get_number(opts, "throttling.iops-total", 0);
+>-        throttle_cfg->buckets[THROTTLE_OPS_READ].avg =3D
+>-            qemu_opt_get_number(opts, "throttling.iops-read", 0);
+>-        throttle_cfg->buckets[THROTTLE_OPS_WRITE].avg =3D
+>-            qemu_opt_get_number(opts, "throttling.iops-write", 0);
+>-
+>-        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].max =3D
+>-            qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+>-        throttle_cfg->buckets[THROTTLE_BPS_READ].max  =3D
+>-            qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+>-        throttle_cfg->buckets[THROTTLE_BPS_WRITE].max =3D
+>-            qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+>-        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].max =3D
+>-            qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+>-        throttle_cfg->buckets[THROTTLE_OPS_READ].max =3D
+>-            qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+>-        throttle_cfg->buckets[THROTTLE_OPS_WRITE].max =3D
+>-            qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+>-
+>-        throttle_cfg->buckets[THROTTLE_BPS_TOTAL].burst_length =3D
+>-            qemu_opt_get_number(opts, "throttling.bps-total-max-length", =
+1);
+>-        throttle_cfg->buckets[THROTTLE_BPS_READ].burst_length  =3D
+>-            qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1=
+);
+>-        throttle_cfg->buckets[THROTTLE_BPS_WRITE].burst_length =3D
+>-            qemu_opt_get_number(opts, "throttling.bps-write-max-length", =
+1);
+>-        throttle_cfg->buckets[THROTTLE_OPS_TOTAL].burst_length =3D
+>-            qemu_opt_get_number(opts, "throttling.iops-total-max-length",=
+ 1);
+>-        throttle_cfg->buckets[THROTTLE_OPS_READ].burst_length =3D
+>-            qemu_opt_get_number(opts, "throttling.iops-read-max-length", =
+1);
+>-        throttle_cfg->buckets[THROTTLE_OPS_WRITE].burst_length =3D
+>-            qemu_opt_get_number(opts, "throttling.iops-write-max-length",=
+ 1);
+>-
+>-        throttle_cfg->op_size =3D
+>-            qemu_opt_get_number(opts, "throttling.iops-size", 0);
+>-
+>+        throttle_parse_options(throttle_cfg, opts);
+>         if (!throttle_is_valid(throttle_cfg, errp)) {
+>             return;
+>         }
+>diff --git a/fsdev/qemu-fsdev-throttle.c b/fsdev/qemu-fsdev-throttle.c
+>index 49eebb5..0e6fb86 100644
+>--- a/fsdev/qemu-fsdev-throttle.c
+>+++ b/fsdev/qemu-fsdev-throttle.c
+>@@ -16,6 +16,7 @@
+> #include "qemu/error-report.h"
+> #include "qemu-fsdev-throttle.h"
+> #include "qemu/iov.h"
+>+#include "qemu/throttle-options.h"
+>
+> static void fsdev_throttle_read_timer_cb(void *opaque)
+> {
+>@@ -31,48 +32,7 @@ static void fsdev_throttle_write_timer_cb(void *opaque)
+>
+> void fsdev_throttle_parse_opts(QemuOpts *opts, FsThrottle *fst, Error **e=
+rrp)
+> {
+>-    throttle_config_init(&fst->cfg);
+>-    fst->cfg.buckets[THROTTLE_BPS_TOTAL].avg =3D
+>-        qemu_opt_get_number(opts, "throttling.bps-total", 0);
+>-    fst->cfg.buckets[THROTTLE_BPS_READ].avg  =3D
+>-        qemu_opt_get_number(opts, "throttling.bps-read", 0);
+>-    fst->cfg.buckets[THROTTLE_BPS_WRITE].avg =3D
+>-        qemu_opt_get_number(opts, "throttling.bps-write", 0);
+>-    fst->cfg.buckets[THROTTLE_OPS_TOTAL].avg =3D
+>-        qemu_opt_get_number(opts, "throttling.iops-total", 0);
+>-    fst->cfg.buckets[THROTTLE_OPS_READ].avg =3D
+>-        qemu_opt_get_number(opts, "throttling.iops-read", 0);
+>-    fst->cfg.buckets[THROTTLE_OPS_WRITE].avg =3D
+>-        qemu_opt_get_number(opts, "throttling.iops-write", 0);
+>-
+>-    fst->cfg.buckets[THROTTLE_BPS_TOTAL].max =3D
+>-        qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+>-    fst->cfg.buckets[THROTTLE_BPS_READ].max  =3D
+>-        qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+>-    fst->cfg.buckets[THROTTLE_BPS_WRITE].max =3D
+>-        qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+>-    fst->cfg.buckets[THROTTLE_OPS_TOTAL].max =3D
+>-        qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+>-    fst->cfg.buckets[THROTTLE_OPS_READ].max =3D
+>-        qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+>-    fst->cfg.buckets[THROTTLE_OPS_WRITE].max =3D
+>-        qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+>-
+>-    fst->cfg.buckets[THROTTLE_BPS_TOTAL].burst_length =3D
+>-        qemu_opt_get_number(opts, "throttling.bps-total-max-length", 1);
+>-    fst->cfg.buckets[THROTTLE_BPS_READ].burst_length  =3D
+>-        qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1);
+>-    fst->cfg.buckets[THROTTLE_BPS_WRITE].burst_length =3D
+>-        qemu_opt_get_number(opts, "throttling.bps-write-max-length", 1);
+>-    fst->cfg.buckets[THROTTLE_OPS_TOTAL].burst_length =3D
+>-        qemu_opt_get_number(opts, "throttling.iops-total-max-length", 1);
+>-    fst->cfg.buckets[THROTTLE_OPS_READ].burst_length =3D
+>-        qemu_opt_get_number(opts, "throttling.iops-read-max-length", 1);
+>-    fst->cfg.buckets[THROTTLE_OPS_WRITE].burst_length =3D
+>-        qemu_opt_get_number(opts, "throttling.iops-write-max-length", 1);
+>-    fst->cfg.op_size =3D
+>-        qemu_opt_get_number(opts, "throttling.iops-size", 0);
+>-
+>+    throttle_parse_options(&fst->cfg, opts);
+>     throttle_is_valid(&fst->cfg, errp);
+> }
+>
+>diff --git a/include/qemu/throttle-options.h b/include/qemu/throttle-optio=
+ns.h
+>index 3528a8f..9709dcd 100644
+>--- a/include/qemu/throttle-options.h
+>+++ b/include/qemu/throttle-options.h
+>@@ -9,6 +9,7 @@
+>  */
+> #ifndef THROTTLE_OPTIONS_H
+> #define THROTTLE_OPTIONS_H
+>+#include "typedefs.h"
+>
+> #define QEMU_OPT_IOPS_TOTAL "iops-total"
+> #define QEMU_OPT_IOPS_TOTAL_MAX "iops-total-max"
+>@@ -111,4 +112,6 @@
+>             .help =3D "when limiting by iops max size of an I/O in bytes"=
+,\
+>         }
+>
+>+void throttle_parse_options(ThrottleConfig *, QemuOpts *);
+>+
+> #endif
+>diff --git a/include/qemu/throttle.h b/include/qemu/throttle.h
+>index 8c93237..b6ebc6d 100644
+>--- a/include/qemu/throttle.h
+>+++ b/include/qemu/throttle.h
+>@@ -89,10 +89,10 @@ typedef struct LeakyBucket {
+>  * However it allows to keep the code clean and the bucket field is reset=
+ to
+>  * zero at the right time.
+>  */
+>-typedef struct ThrottleConfig {
+>+struct ThrottleConfig {
+>     LeakyBucket buckets[BUCKETS_COUNT]; /* leaky buckets */
+>     uint64_t op_size;         /* size of an operation in bytes */
+>-} ThrottleConfig;
+>+};
+>
+> typedef struct ThrottleState {
+>     ThrottleConfig cfg;       /* configuration */
+>diff --git a/include/qemu/typedefs.h b/include/qemu/typedefs.h
+>index 39bc835..90fe0f9 100644
+>--- a/include/qemu/typedefs.h
+>+++ b/include/qemu/typedefs.h
+>@@ -100,6 +100,7 @@ typedef struct uWireSlave uWireSlave;
+> typedef struct VirtIODevice VirtIODevice;
+> typedef struct Visitor Visitor;
+> typedef struct node_info NodeInfo;
+>+typedef struct ThrottleConfig ThrottleConfig;
 
-We already have that in bdrv_drained_recurse(), don't we?
+Is this really needed? Just include include/qemu/throttle.h wherever you=20
+need.
 
-The issue here is, though, that QLIST_FOREACH_SAFE() stores the next
-child pointer to @tmp.  However, once the current child @child is
-drained, @tmp may no longer be valid -- it may have been detached from
-@bs, and it may even have been deleted.
+> typedef void SaveStateHandler(QEMUFile *f, void *opaque);
+> typedef int LoadStateHandler(QEMUFile *f, void *opaque, int version_id);
+>
+>diff --git a/util/throttle.c b/util/throttle.c
+>index 06bf916..9ef28c4 100644
+>--- a/util/throttle.c
+>+++ b/util/throttle.c
+>@@ -27,6 +27,7 @@
+> #include "qemu/throttle.h"
+> #include "qemu/timer.h"
+> #include "block/aio.h"
+>+#include "qemu/throttle-options.h"
+>
+> /* This function make a bucket leak
+>  *
+>@@ -635,3 +636,54 @@ void throttle_config_to_limits(ThrottleConfig *cfg, T=
+hrottleLimits *var)
+>     var->has_iops_write_max_length =3D true;
+>     var->has_iops_size =3D true;
+> }
+>+
+>+/* parse the throttle options
+>+ *
+>+ * @opts: qemu options
+>+ * @throttle_cfg: throttle configuration
+>+ */
+>+void throttle_parse_options(ThrottleConfig *throttle_cfg, QemuOpts *opts)
+>+{
+>+    throttle_config_init(throttle_cfg);
+>+    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].avg =3D
+>+        qemu_opt_get_number(opts, "throttling.bps-total", 0);
+>+    throttle_cfg->buckets[THROTTLE_BPS_READ].avg  =3D
+>+        qemu_opt_get_number(opts, "throttling.bps-read", 0);
+>+    throttle_cfg->buckets[THROTTLE_BPS_WRITE].avg =3D
+>+        qemu_opt_get_number(opts, "throttling.bps-write", 0);
+>+    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].avg =3D
+>+        qemu_opt_get_number(opts, "throttling.iops-total", 0);
+>+    throttle_cfg->buckets[THROTTLE_OPS_READ].avg =3D
+>+        qemu_opt_get_number(opts, "throttling.iops-read", 0);
+>+    throttle_cfg->buckets[THROTTLE_OPS_WRITE].avg =3D
+>+        qemu_opt_get_number(opts, "throttling.iops-write", 0);
+>+
+>+    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].max =3D
+>+        qemu_opt_get_number(opts, "throttling.bps-total-max", 0);
+>+    throttle_cfg->buckets[THROTTLE_BPS_READ].max  =3D
+>+        qemu_opt_get_number(opts, "throttling.bps-read-max", 0);
+>+    throttle_cfg->buckets[THROTTLE_BPS_WRITE].max =3D
+>+        qemu_opt_get_number(opts, "throttling.bps-write-max", 0);
+>+    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].max =3D
+>+        qemu_opt_get_number(opts, "throttling.iops-total-max", 0);
+>+    throttle_cfg->buckets[THROTTLE_OPS_READ].max =3D
+>+        qemu_opt_get_number(opts, "throttling.iops-read-max", 0);
+>+    throttle_cfg->buckets[THROTTLE_OPS_WRITE].max =3D
+>+        qemu_opt_get_number(opts, "throttling.iops-write-max", 0);
+>+
+>+    throttle_cfg->buckets[THROTTLE_BPS_TOTAL].burst_length =3D
+>+        qemu_opt_get_number(opts, "throttling.bps-total-max-length", 1);
+>+    throttle_cfg->buckets[THROTTLE_BPS_READ].burst_length  =3D
+>+        qemu_opt_get_number(opts, "throttling.bps-read-max-length", 1);
+>+    throttle_cfg->buckets[THROTTLE_BPS_WRITE].burst_length =3D
+>+        qemu_opt_get_number(opts, "throttling.bps-write-max-length", 1);
+>+    throttle_cfg->buckets[THROTTLE_OPS_TOTAL].burst_length =3D
+>+        qemu_opt_get_number(opts, "throttling.iops-total-max-length", 1);
+>+    throttle_cfg->buckets[THROTTLE_OPS_READ].burst_length =3D
+>+        qemu_opt_get_number(opts, "throttling.iops-read-max-length", 1);
+>+    throttle_cfg->buckets[THROTTLE_OPS_WRITE].burst_length =3D
+>+        qemu_opt_get_number(opts, "throttling.iops-write-max-length", 1);
+>+
+>+    throttle_cfg->op_size =3D
+>+        qemu_opt_get_number(opts, "throttling.iops-size", 0);
+>+}
 
-We could work around the latter by increasing the next child's reference
-somehow (but BdrvChild doesn't really have a refcount, and in order to
-do so, we would probably have to emulate being a parent or
-something...), but then you'd still have the issue of @tmp being
-detached from the children list we're trying to iterate over.  So
-tmp->next is no longer valid.
+You should reuse the #define's in include/qemu/throttle-options.h
+See throttle_extract_options() in this patch:=20
+http://patchwork.ozlabs.org/patch/803919/ Disregard the UINT_MAX checks,=20
+unsigned ints in LeakyBucket were replaced by uint64_t.
 
-Anyway, so the latter is the reason why I decided to introduce the bs_lis=
-t.
+Don't forget to drop the reviews when you change a patch! The original=20
+reviews will probably not be valid anymore.
 
-But maybe that actually saves us from having to fiddle with BdrvChild...
- Since it's just a list of BDSs now, it may be enough to simply
-bdrv_ref() all of the BDSs in that list before draining any of them.  So
- we'd keep creating the bs_list and then we'd move the existing
-bdrv_ref() from the drain loop into the loop filling bs_list.
-
-And adding a bdrv_ref()/bdrv_unref() pair to bdrv_drained_begin() should
-hopefully work there, too.
-
-Max
-
-
---k1CgRqXMoES3PRuC9eWiJKxjrIKJMxOko
+--jhsjxyjhaxfjd4nl
 Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlm/8I8SHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AcXYIALhaI0RonCNj7cH+vleGjHDAhIXJIUwk
-lhgYMY5WH4S8Gdl7PQM3psJD7kBPNitpfkfGYP/njs7tmco9H6RyiCQ+WSuJb3t0
-mQLVxGthD9XxWK7GpDJn1wdf8h+ldw/eOBCS5JTYZMPsGlga8iMBkNUgwLzKsddJ
-DmfeIAxcU1pMLe/5igZbmQI+txXkbRSdN+bUIexEFWq573pl1OJvqN5ExSuoFr7a
-vI0kNvMeUKBM2PT5JjI1ziXiZBqNhRQa8MBqI2ZQJUvp0CvebzFzh/qaDgHbW2sm
-fIiNj7+PAJ8uv/FdEBSyWf9fzjHRrd57MTG2UwGmfXVLOWCGXf1ROsg=
-=+W0U
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlm/8lEACgkQc2J8L2kN
+9xDR5w/+JXi1UMYGkApml4XepMI+9YBPXSh+/LlVTLKON1kGLJSDVA+U1p0lfgGP
+IC7tVcy2LAWGw3Ld9uBsyDvbgcivavakUViKD+E0+EFnarx12xHCBB1p+ZM8VkjL
+KOII6s6UKKu40wG1zJ/tmqwrIqSdqHsFZto2MMvC/JkvUZpzryuKhMghry8cRlIr
+7iHQOZEjOrhG3yDaULNGr40ghJ5L5i3K4j9KhVLhdx7hbo1HE1V3vXerwxOJBi3Q
+5E9hTp/gTlcHDYkp3kx2xKqcdTfcMj6epAVtYC8NqoJENgSYDBR3TAebGrmBlnoz
+6dUURl/TiDXIswf7/JfXX3jQNCS1hY64ekL2O7rExylWXfcPdnadTY3GZyf/70dU
+ifzTk3GJNQDj4iT4T+13r4txpLt7e59iGIZ19phWPJ3NcXutm5UCTWxLukSJSraU
+4Xs77uZVGJbWOomfT55ta+qb9JV8RNZwXXcSxNtXqlFiBhS0Sg+K00nMob1tNW1M
+lHP4v0GT4i24sZ7+h+Idtc4inbso20tUr03YcanTT6715+2OGuniuZ2TjLiqLHyh
+ADQElgjpqV4+6oZMZe8fBY6MgYbcRV6lv4FnH399pue2FEnXgjM2JJKXsd/h3RT0
+aKnG9rq+I4kI/wRurjBE8pwnfBc8XC6RoZAXDSG32WRhwgE5DcQ=
+=YvRV
 -----END PGP SIGNATURE-----
 
---k1CgRqXMoES3PRuC9eWiJKxjrIKJMxOko--
+--jhsjxyjhaxfjd4nl--
