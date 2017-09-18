@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34467)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1du0mH-0001vb-N7
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:28:19 -0400
+	(envelope-from <alistair23@gmail.com>) id 1du0pn-0002n7-NZ
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:31:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1du0mE-0007Gb-Hv
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:28:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52326)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1du0mE-0007GG-9b
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:28:14 -0400
-References: <20170918160012.4317-1-david@redhat.com>
-	<5c6f8432-84ec-e06a-22fe-9ddc24998adf@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <0947e406-e38d-a8ad-9ff5-bdca998fa3f9@redhat.com>
-Date: Mon, 18 Sep 2017 20:28:09 +0200
+	(envelope-from <alistair23@gmail.com>) id 1du0pm-0008Pg-OF
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:31:55 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:37630)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
+	id 1du0pm-0008PQ-HZ
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:31:54 -0400
+Received: by mail-wr0-x244.google.com with SMTP id u48so873549wrf.4
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 11:31:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <5c6f8432-84ec-e06a-22fe-9ddc24998adf@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 00/27] s390x: SMP for TCG (+ cleanups)
+Sender: alistair23@gmail.com
+In-Reply-To: <CAMo8BfJp=dLbgGsqu8rKAoKxTkMNRHeAUcT74pQSdCpKWqxLPg@mail.gmail.com>
+References: <134bcf2e2c0bb9160aa822ddfbc46d9bd51c4305.1505512474.git.alistair.francis@xilinx.com>
+	<CAMo8BfJp=dLbgGsqu8rKAoKxTkMNRHeAUcT74pQSdCpKWqxLPg@mail.gmail.com>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Mon, 18 Sep 2017 11:31:21 -0700
+Message-ID: <CAKmqyKP0Z7nPer_cZxVjwU4iaR9yxJz2sR09bfghF7ykZXoT2Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v2 1/1] target/xtensa: Use the pre-defined
+ MEMTXATTRS_UNSPECIFIED macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,152 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: Max Filippov <jcmvbkbc@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, qemu-devel <qemu-devel@nongnu.org>
 
-On 18.09.2017 19:31, Christian Borntraeger wrote:
-> David,
-> 
-> can you outline how much you tested KVM after these changes?  I assume we should
-> review/test the whole series properly?
-
-Related to my tests:
-
-I did the usual shutdown/reboot/system_reset/online-offline test with
-KVM. I remember also playing with CPU hotplug again. However, no
-kvm-unit-tests so far (also not in my pipeline).
-
-
-Related to the patches:
-
-I tried to modify as little KVM code as possible. Most stuff really is
-just moving code around. But still, subtle errors can happen.
-
-E.g. for all new SIGP instructions, I keep existing behavior for KVM by
-checking for tcg/kvm directly at the start at the handlers. So most
-s390x/tcg patches should have no influence.
-
-So reviewing all s390x/kvm patches and !tcg patches would be great. I
-will certainly not complain if some IBM folks would also review the TCG
-patches ;)
-
-Special care should need:
-- "target/s390x: proper cpu->be convertion in s390_store_status()"
--- to make sure I haven't done any stupid mistakes while converting
-   (just realized s/convertion/conversion/ :) )
-- "s390x/kvm: factor out SIGP code into sigp.c"
--- to make sure the new kvm_s390_handle_sigp() and handle_sigp() do the
-   same thing as handle_sigp() did before.
-
-"s390x/tcg: STOPPED cpus can never wake up" and
-"s390x/tcg: implement STOP and RESET interrupts for TCG" modify a
-function called also for kvm (s390_cpu_has_work()). It is expected to
-return always "false" for kvm. This behavior should still be that way.
-
-Thanks!
-
-> 
-> On 09/18/2017 05:59 PM, David Hildenbrand wrote:
->> This series contains:
->> - properly implement local external interrupts for TCG
->> - factor out KVM SIGP handling code into common code
->> - implement missing SIGP orders for TCG handled by the kernel for KVM
->>   (including STOP and RESTART interrupts)
->> - make TCG use the new SIGP code - experimental SMP support for s390x TCG
->> - refactor STFL(E) implementation for TCG
->> - bunch of cleanups
+On Fri, Sep 15, 2017 at 3:37 PM, Max Filippov <jcmvbkbc@gmail.com> wrote:
+> On Fri, Sep 15, 2017 at 2:56 PM, Alistair Francis
+> <alistair.francis@xilinx.com> wrote:
+>> Instead of using the hardcoded (MemTxAttrs){0} for no memory attributes
+>> let's use the already defined MEMTXATTRS_UNSPECIFIED macro instead.
 >>
->> Basically all SIGP instructions are fully supported.
+>> This is technically a change of behaviour as MEMTXATTRS_UNSPECIFIED sets
+>> the unspecified field to 1, but it doesn't look like anything is
+>> checking this field.
 >>
->> Thanks to Aurelien Jarno for the initital prototype and showcasing that
->> supporting experimental SMP code can be implemented quite easily.
+>> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
+>> ---
+>> V2:
+>>  - Update commit message to indicate the change in behaviour
 >>
->> TCG SMP on s390x - what works?
->> - "-smp X,maxcpus=X" with both, single and multi threaded TCG
->> - "-smp ... -device qemu-s390-cpu,id=cpuX,core-id=X"
->> - system_powerdown, system_reset, shutdown, reboot, NMI
->> - online/offline of CPUs from inside the guest
->>
->> TCG SMP on s390x - what does not work?
->> - Floating interrupts all target CPU 0. Don't offline it.
->> - CPU hotplug after the machine/main loop has been fully setup
->> -- the new CPU comes up, answers and sends emergency signals, but suddenly
->>    the VM gets stuck. This is strange, as ordinary online/offline works
->>    just fine.
->> -- can be triggered by "cpu-add 1" + "system_reset". The system will hang
->>    when trying to online CPUs. (note: in Linux code they are fully up and
->>    running and already executed code)
->> -- also if hotplugging with "-S", before anything has run. This is strange,
->>    as "-device qemu-s390-cpu" works just fine.
->> -- does not seem to be related to CPU setup/reset code, I checked that
->> -- seems to be related to some TCG internals (as broken for single and
->>    multi threaded TCG).
->> -- common code seems to be somehow broken, not sure if this is even
->>    expected to work (e.g. for single threaded TCG, hotplugged CPUs will
->>    never get set "cpu->created = true". But doesn't seem to be related to
->>    this)
->>
->>
->> Based on: https://github.com/cohuck/qemu.git s390-next
->> Available on: git@github.com:davidhildenbrand/qemu.git s390x-queue
->>
->>
->> David Hildenbrand (27):
->>   s390x: raise CPU hotplug irq after really hotplugged
->>   s390x/cpumodel: fix max STFL(E) bit number
->>   target/s390x: get rid of next_core_id
->>   s390x: introduce and use S390_MAX_CPUS
->>   s390/tcg: turn INTERRUPT_EXT into a mask
->>   s390x/tcg: injection of emergency signals and extarnal calls
->>   s390x/tcg: STOPPED cpus can never wake up
->>   s390x/tcg: a CPU cannot switch state due to an interrupt
->>   target/s390x: factor out handling of WAIT PSW into handle_wait()
->>   s390x/kvm: pass ipb directly into handle_sigp()
->>   s390x/kvm: generalize SIGP stop and restart interrupt injection
->>   s390x/kvm: factor out storing of CPU status
->>   target/s390x: proper cpu->be convertion in s390_store_status()
->>   s390x/kvm: factor out storing of adtl CPU status
->>   s390x/kvm: drop two debug prints
->>   s390x/kvm: factor out SIGP code into sigp.c
->>   s390x/kvm: factor out actual handling of STOP interrupts
->>   s390x/tcg: implement SIGP SENSE RUNNING STATUS
->>   s390x/tcg: implement SIGP SENSE
->>   s390x/tcg: implement SIGP EXTERNAL CALL
->>   s390x/tcg: implement SIGP EMERGENCY SIGNAL
->>   s390x/tcg: implement SIGP CONDITIONAL EMERGENCY SIGNAL
->>   s390x/tcg: implement STOP and RESET interrupts for TCG
->>   s390x/tcg: flush the tlb on SIGP SET PREFIX
->>   s390x/tcg: switch to new SIGP handling code
->>   s390x/tcg: unlock NMI
->>   s390x/tcg: refactor stfl(e) to use s390_get_feat_block()
->>
->>  hw/s390x/s390-virtio-ccw.c  |  17 +-
->>  target/s390x/Makefile.objs  |   1 +
->>  target/s390x/cpu-qom.h      |   2 -
->>  target/s390x/cpu.c          |  40 ++--
->>  target/s390x/cpu.h          |  36 +++-
->>  target/s390x/cpu_features.c |   2 +-
->>  target/s390x/cpu_models.c   |   2 +
->>  target/s390x/excp_helper.c  |  98 ++++++---
->>  target/s390x/helper.c       | 115 ++++++++--
->>  target/s390x/helper.h       |   4 +-
->>  target/s390x/internal.h     |  15 ++
->>  target/s390x/interrupt.c    |  70 +++++-
->>  target/s390x/kvm-stub.c     |  13 +-
->>  target/s390x/kvm.c          | 470 +++--------------------------------------
->>  target/s390x/kvm_s390x.h    |   3 +-
->>  target/s390x/misc_helper.c  | 114 ++++------
->>  target/s390x/sigp.c         | 504 ++++++++++++++++++++++++++++++++++++++++++++
->>  target/s390x/trace-events   |   4 +-
->>  target/s390x/translate.c    |   6 +-
->>  19 files changed, 896 insertions(+), 620 deletions(-)
->>  create mode 100644 target/s390x/sigp.c
->>
-> 
+>>  target/xtensa/op_helper.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> Acked-by: Max Filippov <jcmvbkbc@gmail.com>
 
+Thanks Max,
 
--- 
+Are you going to take this Max? Otherwise can it go through Peter?
 
 Thanks,
+Alistair
 
-David
+>
+> --
+> Thanks.
+> -- Max
