@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37297)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dtvSY-00076P-4B
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:47:40 -0400
+	(envelope-from <bounces@canonical.com>) id 1dtvfo-0003aS-9Q
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:01:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dtvST-0005hr-6Q
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:47:34 -0400
-Received: from mail-qt0-x242.google.com ([2607:f8b0:400d:c0d::242]:36686)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dtvST-0005hE-24
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:47:29 -0400
-Received: by mail-qt0-x242.google.com with SMTP id t46so240168qtj.3
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 05:47:28 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170918104624.14743-1-laurent@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a882044e-08e5-25f4-478e-06aa348e2863@amsat.org>
-Date: Mon, 18 Sep 2017 09:47:24 -0300
+	(envelope-from <bounces@canonical.com>) id 1dtvfk-00049k-Ab
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:01:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59273)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dtvfk-000498-4j
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:01:12 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dtvfh-0001NV-EP
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 13:01:09 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 6B6212E848B
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 13:01:09 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20170918104624.14743-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] softfloat: rename make_float[x80|128]_init
- to const_float[x80|128]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 18 Sep 2017 12:49:41 -0000
+From: Shannon Zhao <shannon.zhaosl@gmail.com>
+Reply-To: Bug 1717708 <1717708@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150558614762.29770.16367876405044972592.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150573898184.13585.2725444918706560244.malone@gac.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1717708] Re: QEMU aarch64 can't run Windows ARM64
+ iso's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,110 +37,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-devel@nongnu.org
 
-On 09/18/2017 07:46 AM, Laurent Vivier wrote:
-> We already have const_float16(), const_float32() and const_float64(),
-> so rename make_floatx80_init() and make_float128_init() as
-> const_floatx80() and const_float128().
-> 
-> Redefine make_floatx80() and make_float128() as make_float16(),
-> make_float32() and make_float64() using a variable and not only
-> a cast.
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
->   include/fpu/softfloat.h  | 10 ++++++----
->   target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
->   2 files changed, 28 insertions(+), 26 deletions(-)
-> 
-> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-> index 0f96a0edd1..2e1a79ebf7 100644
-> --- a/include/fpu/softfloat.h
-> +++ b/include/fpu/softfloat.h
-> @@ -146,8 +146,9 @@ typedef struct {
->       uint64_t low;
->       uint16_t high;
->   } floatx80;
-> -#define make_floatx80(exp, mant) ((floatx80) { mant, exp })
-> -#define make_floatx80_init(exp, mant) { .low = mant, .high = exp }
-> +#define make_floatx80(exp, mant) __extension__ \
-> +    ({ floatx80 f80_val = { .low = mant, .high = exp }; f80_val; })
-> +#define const_floatx80(exp, mant) { .low = mant, .high = exp }
+The virtio-gpu is not Linux specific. If windows could include the
+device driver, it can be used on windows as well like other virtio
+devices on windows x86.
 
-cleaner.
+I'm not sure what's the requirements for booting Windows on ARM64 virt
+machine since the OS is not open source. So it would be better someone
+from MS solves this problem or points what we missed for support
+Windows.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+-- =
 
->   typedef struct {
->   #ifdef HOST_WORDS_BIGENDIAN
->       uint64_t high, low;
-> @@ -155,8 +156,9 @@ typedef struct {
->       uint64_t low, high;
->   #endif
->   } float128;
-> -#define make_float128(high_, low_) ((float128) { .high = high_, .low = low_ })
-> -#define make_float128_init(high_, low_) { .high = high_, .low = low_ }
-> +#define make_float128(high_, low_) __extension__ \
-> +    ({float128 f128_val = { .high = high_, .low = low_ }; f128_val; })
-> +#define const_float128(high_, low_) { .high = high_, .low = low_ }
->   
->   /*----------------------------------------------------------------------------
->   | Software IEC/IEEE floating-point underflow tininess-detection mode.
-> diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-> index 665e7609af..bf62cf8003 100644
-> --- a/target/m68k/fpu_helper.c
-> +++ b/target/m68k/fpu_helper.c
-> @@ -29,28 +29,28 @@
->    */
->   
->   static const floatx80 fpu_rom[128] = {
-> -    [0x00] = make_floatx80_init(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
-> -    [0x0b] = make_floatx80_init(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
-> -    [0x0c] = make_floatx80_init(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
-> -    [0x0d] = make_floatx80_init(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
-> -    [0x0e] = make_floatx80_init(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
-> -    [0x0f] = make_floatx80_init(0x0000, 0x0000000000000000ULL),  /* Zero     */
-> -    [0x30] = make_floatx80_init(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
-> -    [0x31] = make_floatx80_init(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
-> -    [0x32] = make_floatx80_init(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
-> -    [0x33] = make_floatx80_init(0x4002, 0xa000000000000000ULL),  /* 10^1     */
-> -    [0x34] = make_floatx80_init(0x4005, 0xc800000000000000ULL),  /* 10^2     */
-> -    [0x35] = make_floatx80_init(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
-> -    [0x36] = make_floatx80_init(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
-> -    [0x37] = make_floatx80_init(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
-> -    [0x38] = make_floatx80_init(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
-> -    [0x39] = make_floatx80_init(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
-> -    [0x3a] = make_floatx80_init(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
-> -    [0x3b] = make_floatx80_init(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
-> -    [0x3c] = make_floatx80_init(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
-> -    [0x3d] = make_floatx80_init(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
-> -    [0x3e] = make_floatx80_init(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
-> -    [0x3f] = make_floatx80_init(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
-> +    [0x00] = const_floatx80(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
-> +    [0x0b] = const_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
-> +    [0x0c] = const_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
-> +    [0x0d] = const_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
-> +    [0x0e] = const_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
-> +    [0x0f] = const_floatx80(0x0000, 0x0000000000000000ULL),  /* Zero     */
-> +    [0x30] = const_floatx80(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
-> +    [0x31] = const_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
-> +    [0x32] = const_floatx80(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
-> +    [0x33] = const_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
-> +    [0x34] = const_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
-> +    [0x35] = const_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
-> +    [0x36] = const_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
-> +    [0x37] = const_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
-> +    [0x38] = const_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
-> +    [0x39] = const_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
-> +    [0x3a] = const_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
-> +    [0x3b] = const_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
-> +    [0x3c] = const_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
-> +    [0x3d] = const_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
-> +    [0x3e] = const_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
-> +    [0x3f] = const_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
->   };
->   
->   int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
-> 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1717708
+
+Title:
+  QEMU aarch64 can't run Windows ARM64 iso's
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+  recently Windows ARM64 ISOs have been posted on the internet..
+  just checked with latest QEMU 2.10 release from =
+
+  https://qemu.weilnetz.de/w64/qemu-w64-setup-20170830.exe =
+
+  "h:\qemu\qemu-system-aarch64.exe" -boot d -cdrom h:\iso\16353.1000.170825=
+-1423.RS_PRERELEASE_CLIENTPRO_OEMRET_ARM64FRE_ES-ES.ISO -m 2048 -cpu cortex=
+-a57 -smp 1 -machine virt
+  seems no video output..
+  checked various machine options for example versatilepb (says guest has n=
+ot initialized the guest)..
+
+  so don't know if it's a QEMU bug or lacking feature but can support
+  running Windows ARM64 builds (would be nice if you can add a
+  Snapdragon835 machine type which is which first machines will be
+  running..)
+
+  =
+
+  note running a Windows x64 ISO with similar parameters works (removing -c=
+pu and -machine as not needed)
+
+  thanks..
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1717708/+subscriptions
