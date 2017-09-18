@@ -1,27 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51585)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1du2YE-0007fz-7c
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 16:21:55 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1du2cc-0000J9-5Z
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 16:26:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1du2Y5-0004OK-Lt
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 16:21:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49592)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1du2Y5-0004Mj-Fa
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 16:21:45 -0400
-From: David Hildenbrand <david@redhat.com>
-References: <20170918160012.4317-1-david@redhat.com>
-	<20170918160012.4317-24-david@redhat.com>
-	<651594b8-0d18-fd61-f0e9-287ad098306d@redhat.com>
-Message-ID: <17cdabba-97ac-50b0-678d-e48ff903553e@redhat.com>
-Date: Mon, 18 Sep 2017 22:21:41 +0200
-MIME-Version: 1.0
-In-Reply-To: <651594b8-0d18-fd61-f0e9-287ad098306d@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 23/27] s390x/tcg: implement STOP and
- RESET interrupts for TCG
+	(envelope-from <el13635@mail.ntua.gr>) id 1du2cY-0006nf-4B
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 16:26:26 -0400
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Date: Mon, 18 Sep 2017 23:25:29 +0300
+Message-Id: <20170918202529.28379-1-el13635@mail.ntua.gr>
+Subject: [Qemu-devel] [PATCH] block/throttle-groups.c: allocate RestartData
+ on the heap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,46 +18,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Matthew Rosato <mjrosato@linux.vnet.ibm.com>, thuth@redhat.com, cohuck@redhat.com, Richard Henderson <richard.henderson@linaro.org>, Alexander Graf <agraf@suse.de>, borntraeger@de.ibm.com, Igor Mammedov <imammedo@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>
+To: qemu-block <qemu-block@nongnu.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>, Alberto Garcia <berto@igalia.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-On 18.09.2017 22:00, David Hildenbrand wrote:
-> 
->>  static void cpu_inject_io(S390CPU *cpu, uint16_t subchannel_id,
->> diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
->> index ce8fda9d01..521dcc75f3 100644
->> --- a/target/s390x/sigp.c
->> +++ b/target/s390x/sigp.c
->> @@ -498,6 +498,7 @@ void do_stop_interrupt(CPUS390XState *env)
->>          s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);
->>      }
->>      env->sigp_order = 0;
->> +    env->pending_int &= ~INTERRUPT_STOP;
-> 
-> The *awesome* kvm-unit-tests (yes, the single sigp_stop() we do when
-> shutting down) just found a missing cpu_loop_exit()
-> 
-> diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-> index ce8fda9d01..9aadc3ffdd 100644
-> --- a/target/s390x/sigp.c
-> +++ b/target/s390x/sigp.c
-> @@ -498,6 +498,11 @@ void do_stop_interrupt(CPUS390XState *env)
->          s390_store_status(cpu, S390_STORE_STATUS_DEF_ADDR, true);
->      }
->      env->sigp_order = 0;
-> +    env->pending_int &= ~INTERRUPT_STOP;
-> +#ifdef CONFIG_TCG
-> +    /* the CPU has been stopped, we must immediately go out of the loop */
-> +    cpu_loop_exit(CPU(s390_env_get_cpu(env)));
-> +#endif
->  }
-> 
+RestartData is the opaque data of the throttle_group_restart_queue_entry
+coroutine. By being stack allocated, it isn't available anymore if
+aio_co_enter schedules the coroutine with a bottom halve and runs after
+throttle_group_restart_queue returns.
 
-if (tcg_enabled()) of course ...
+Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+---
+ block/throttle-groups.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index 6ba992c8d7..b291a88481 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -403,17 +403,19 @@ static void coroutine_fn throttle_group_restart_queue_entry(void *opaque)
+         schedule_next_request(tgm, is_write);
+         qemu_mutex_unlock(&tg->lock);
+     }
++
++    g_free(data);
+ }
+ 
+ static void throttle_group_restart_queue(ThrottleGroupMember *tgm, bool is_write)
+ {
+     Coroutine *co;
+-    RestartData rd = {
+-        .tgm = tgm,
+-        .is_write = is_write
+-    };
++    RestartData *rd = g_new0(RestartData, 1);
+ 
+-    co = qemu_coroutine_create(throttle_group_restart_queue_entry, &rd);
++    rd->tgm = tgm;
++    rd->is_write = is_write;
++
++    co = qemu_coroutine_create(throttle_group_restart_queue_entry, rd);
+     aio_co_enter(tgm->aio_context, co);
+ }
+ 
 -- 
-
-Thanks,
-
-David
+2.11.0
