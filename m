@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45225)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60110)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhuohaofan@126.com>) id 1dtroW-0005py-MM
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:54:01 -0400
+	(envelope-from <eskultet@redhat.com>) id 1dtsb2-0008Ox-MN
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:44:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zhuohaofan@126.com>) id 1dtroT-0007bf-HW
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:54:00 -0400
-Received: from m15-29.126.com ([220.181.15.29]:15899)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zhuohaofan@126.com>) id 1dtroS-0006tG-Fs
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:53:57 -0400
-Date: Mon, 18 Sep 2017 16:22:58 +0800 (CST)
-From: netsurfed <zhuohaofan@126.com>
-Content-Type: multipart/mixed;
-	boundary="----=_Part_150388_887058655.1505722978074"
+	(envelope-from <eskultet@redhat.com>) id 1dtsaz-0005fk-Jw
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:44:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:21511)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1dtsaz-0005f8-B6
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:44:05 -0400
+Date: Mon, 18 Sep 2017 11:43:57 +0200
+From: Erik Skultety <eskultet@redhat.com>
+Message-ID: <20170918094357.GB24642@erzo-ntb>
+References: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
+	<20170908131555.GD32645@redhat.com>
+	<9BF693FD-B1CD-4813-86B4-4A909D8847A1@amd.com>
+	<20170908145201.GJ32645@redhat.com>
 MIME-Version: 1.0
-Message-ID: <1b88979d.9f0e.15e94154f1a.Coremail.zhuohaofan@126.com>
-Subject: [Qemu-devel] viostor fails with DRIVER_IRQL_NOT_LESS_OR_EQUAL BOSD
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170908145201.GJ32645@redhat.com>
+Subject: Re: [Qemu-devel] [libvirt]  libvirt/QEMU/SEV interaction
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,82 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: "Relph, Richard" <Richard.Relph@amd.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "Singh, Brijesh" <brijesh.singh@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-------=_Part_150388_887058655.1505722978074
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
+[...]
 
-SGkgQWxsOgoKCkRlc2NyaXB0aW9uIG9mIHByb2JsZW06CnZpb3N0b3IgZmFpbHMgd2l0aCBEUklW
-RVJfSVJRTF9OT1RfTEVTU19PUl9FUVVBTCBCT1NEIHVuZGVyIGF0dGFjaCBpbnRlcmZhY2UuCgoK
-VmVyc2lvbi1SZWxlYXNlIG51bWJlciBvZiBzZWxlY3RlZCBjb21wb25lbnQgKGlmIGFwcGxpY2Fi
-bGUpOgp2aXJ0aW8td2luIDogdmlydGlvLXdpbi0wLjEuMTI2Cmhvc3QgOiB4ODZfNjQsIGxpbnV4
-LCA0LjQuMC02Mi1nZW5lcmljLCB1YnVudHUgMTYuMDQgU2VydmVyCmd1ZXN0IDogd2luZG93cy0x
-MC14NjQKcWVtdSA6IDIuOS4wCmxpYnZpcnQgOiAzLjQuMAoKCkhvdyByZXByb2R1Y2libGU6ClN0
-ZXBzIHRvIFJlcHJvZHVjZToKMS4gTGF1bmNoIGEgbmV3IGd1ZXN0IGRvbWFpbiwgYmFzZWQgb24g
-YW4gWE1MIGRlc2NyaXB0aW9uIGxpa2VzIGF0dGFjaG1lbnQgZmlsZSAiZG9tYWluLTAxLnhtbCIs
-IGJ5IGxpYnZpcnQgQVBJIHZpckRvbWFpbkNyZWF0ZVhNTC4gVGhlIGRvbWFpbiBpcyBub3QgcGVy
-c2lzdGVudC4KMi4gRml4ICJCYWxsb29uIiwgIk5ldEtWTSIgYW5kICJ2aW9zdG9yIiwgYW5kIHRo
-ZW4gZml4IHdpbmRvd3Mgb3BlcmF0aW9uCjMuIFNodXRvZmYgZG9tYWluLiBUaGUgZG9tYWluIGlz
-IG5vdCBwZXJzaXN0ZW50LCBzbyBpdCB3aWxsIGJlIGRlc3Ryb3llZC4KNC4gTGF1bmNoIHRoZSBn
-dWVzdCBkb21haW4gYWdhaW4sIGJhc2VkIG9uIGFuIG5ldyBYTUwgZGVzY3JpcHRpb24gbGlrZXMg
-YXR0YWNobWVudCBmaWxlICJkb21haW4tMDIueG1sIiB3aGljaCBpcyB0d28gaW50ZXJmYWNlcyBt
-b3JlIHRoYW4gdGhlIGxhc3QgdGltZSwgYnkgbGlidmlydCBBUEkgdmlyRG9tYWluQ3JlYXRlWE1M
-Lgo1LiBQcm9ibGVtIGlzIHJlcHJvZHVjZS4gdmlvc3RvciBmYWlscyB3aXRoIERSSVZFUl9JUlFM
-X05PVF9MRVNTX09SX0VRVUFMIEJPU0QKCgpBY3R1YWwgcmVzdWx0czoKdmlvc3RvciBmYWlscyB3
-aXRoIERSSVZFUl9JUlFMX05PVF9MRVNTX09SX0VRVUFMIEJPU0QKCgpFeHBlY3RlZCByZXN1bHRz
-OgpubyBhbnkgZmFpbHMKCgpBZGRpdGlvbmFsIGluZm86CkkgZmluZCB0aGlzIGJ1ZyB3YXMgZml4
-ZWQgb24gRGF0ZSAwOCBBcHJpbCAyMDEyLiBIb3dldmVyLCAwLjEuMTI2IHZlcnNpb24gcmVwcm9k
-dWNlLgpCdWcgODEwNjk0IC0gdmlvc3RvciBmYWlscyB3aXRoIERSSVZFUl9JUlFMX05PVF9MRVNT
-X09SX0VRVUFMIEJPU0QgdW5kZXIgaGVhdnkgcmFuZG9tIHdyaXRlIGxvYWQKaHR0cHM6Ly9wdmUu
-cHJveG1veC5jb20vd2lraS9XaW5kb3dzX1ZpcnRJT19Ecml2ZXJzL0NoYW5nZWxvZyN2aXJ0aW8t
-d2luLTAuMS0xMDA=
-------=_Part_150388_887058655.1505722978074
-Content-Type: application/octet-stream; name="domain-xml.rar"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="domain-xml.rar"
+> >
+> >     > c) what existing communicate interface can be used between libvirt and qemu
+> >     > to get the measurement ? can we add a new qemu monitor command
+> >     > 'get_sev_measurement' to get the measurement ? (step 10)
+> >
+> >     Yes, QMP commands seeem most likely.
+> >
+> >     > d) how to pass the secret blob from libvirt to qemu ? should we consider
+> >     > adding a new object (sev-guest-secret) -- libvirt can add the object through
+> >     > qemu monitor.
+> >
+> >     Yeah, that looks like a viable option too.
+>
+> So I could see a flow like the following:
+>
+>
+>   1. mgmt tool calls  virConnectGetCapabilities. This returns an XML
+>      document that includes the following
+>
+>       <host>
+>          ...other bits...
+>         <sev>
+> 	  <platform-key>...hex encoded PDH key...</platform-key>
+> 	</sev>
+>       </host>
+>
+>   2. mgmt tool requests to start a guest calling virCreateXML(),
+>      passing VIR_DOMAIN_START_PAUSED. The XML would include
+>
+>       <sev>
+>         <owner-key>...hex encode DH key...</owner-key>
+> 	<session-info>..hex encode info...</session-info>
+> 	<policy>...int32 value..</policy>
+>       </sev>
+>
+>
+>      if <sev> is provided and VIR_DOMAIN_START_PAUSED is missing,
+>      libvirt would report an error and refuse to start the guest
+>
+>   3. Libvirt generates the QEMU cli arg to enable SEV using
+>      the XML data and starts QEMU, leaving CPUs paused
+>
+>   4. QEMU emits a SEV_MEASURE event containing the measurement
+>      blob
 
-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
-mP3buBCgT9IpVQGaJxUft/qAxD17AEAHAA==
-------=_Part_150388_887058655.1505722978074--
+Speaking of which, I expect QEMU to have a QMP command to retrieve the
+measurement, in which case I think libvirt has to provide an API for the user
+to retrieve the measurement in case libvirtd crashes somewhere between setting
+up QEMU and waiting for the measurement event from QEMU, or simply because the
+GO missed the event for some unspecified reason.
+
+>
+>   5. Libvirt catches the QEMU event and emits its own
+>      VIR_CONNECT_DOMAIN_EVENT_SEV_MEASURE event containing
+>      the measurement blob
+>
+>   6. GO does its validation of the measurement
+>
+>   7a  If validation failed, then virDomainDestroy() to stop QEMU
+>
+>   7b  If validation succeeed
+>
+>      Optionally call
+>
+>          virDomainSetSEVSecret()
+
+Given the fact that we're likely introducing a new <sev> element to the XML
+config, I'm more inclined to utilizing the existing virSecret interfaces (as
+was originally suggested) instead of creating a vendor-specific API. You could
+have an optional secret sub-element within the <sev> element and libvirt would
+simply check if that secret has a value set, once the GO issues
+virDomainResume(). Any particular reason for having a specific API for this that
+I'm missing?
+
+Other than that I like the initial proposal for the design.
+
+Erik
