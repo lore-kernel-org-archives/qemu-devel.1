@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37422)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dtyTw-0006yU-QY
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:01:17 -0400
+	(envelope-from <david@redhat.com>) id 1dtyU4-00078U-Ic
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dtyTt-0007rd-2T
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:01:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43622)
+	(envelope-from <david@redhat.com>) id 1dtyTy-0007vd-Ti
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:01:20 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48112)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dtyTs-0007rE-TC
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:01:09 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dtyTy-0007vR-Mj
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:01:14 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 18 Sep 2017 17:59:52 +0200
-Message-Id: <20170918160012.4317-8-david@redhat.com>
+Date: Mon, 18 Sep 2017 17:59:54 +0200
+Message-Id: <20170918160012.4317-10-david@redhat.com>
 In-Reply-To: <20170918160012.4317-1-david@redhat.com>
 References: <20170918160012.4317-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 07/27] s390x/tcg: STOPPED cpus can never
- wake up
+Subject: [Qemu-devel] [PATCH v1 09/27] target/s390x: factor out handling of
+ WAIT PSW into handle_wait()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,30 +27,114 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-Interrupts can't wake such CPUs up. SIGP from other CPUs has to be used
-to toggle the state.
+This will now also detect crashes under TCG. We can directly use
+cpu->env.psw.addr instead of kvm_run, as we do a
+cpu_synchronize_state().
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- target/s390x/cpu.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ target/s390x/helper.c   | 28 ++++++++++++++++++++++------
+ target/s390x/internal.h |  1 +
+ target/s390x/kvm.c      | 15 +--------------
+ 3 files changed, 24 insertions(+), 20 deletions(-)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index f42e28ea25..64db086702 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -58,6 +58,12 @@ static bool s390_cpu_has_work(CPUState *cs)
-     S390CPU *cpu = S390_CPU(cs);
-     CPUS390XState *env = &cpu->env;
- 
-+    /* STOPPED cpus can never wake up */
-+    if (s390_cpu_get_state(cpu) != CPU_STATE_LOAD &&
-+        s390_cpu_get_state(cpu) != CPU_STATE_OPERATING) {
-+        return false;
-+    }
-+
-     return (cs->interrupt_request & CPU_INTERRUPT_HARD) &&
-            (env->psw.mask & PSW_MASK_EXT);
+diff --git a/target/s390x/helper.c b/target/s390x/helper.c
+index e22b93258b..75ceb0bf2b 100644
+--- a/target/s390x/helper.c
++++ b/target/s390x/helper.c
+@@ -26,6 +26,7 @@
+ #include "qemu/timer.h"
+ #include "exec/exec-all.h"
+ #include "hw/s390x/ioinst.h"
++#include "sysemu/hw_accel.h"
+ #ifndef CONFIG_USER_ONLY
+ #include "sysemu/sysemu.h"
+ #endif
+@@ -113,6 +114,26 @@ hwaddr s390_cpu_get_phys_addr_debug(CPUState *cs, vaddr vaddr)
+     return phys_addr;
  }
+ 
++static inline bool is_special_wait_psw(uint64_t psw_addr)
++{
++    /* signal quiesce */
++    return psw_addr == 0xfffUL;
++}
++
++void handle_wait(S390CPU *cpu)
++{
++    cpu_synchronize_state(CPU(cpu));
++    if (s390_cpu_halt(cpu) == 0) {
++#ifndef CONFIG_USER_ONLY
++        if (is_special_wait_psw(cpu->env.psw.addr)) {
++            qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++        } else {
++            qemu_system_guest_panicked(NULL);
++        }
++#endif
++    }
++}
++
+ void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr)
+ {
+     uint64_t old_mask = env->psw.mask;
+@@ -128,12 +149,7 @@ void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr)
+     }
+ 
+     if (mask & PSW_MASK_WAIT) {
+-        S390CPU *cpu = s390_env_get_cpu(env);
+-        if (s390_cpu_halt(cpu) == 0) {
+-#ifndef CONFIG_USER_ONLY
+-            qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+-#endif
+-        }
++        handle_wait(s390_env_get_cpu(env));
+     }
+ }
+ 
+diff --git a/target/s390x/internal.h b/target/s390x/internal.h
+index 15743ec40f..cb331f35ea 100644
+--- a/target/s390x/internal.h
++++ b/target/s390x/internal.h
+@@ -280,6 +280,7 @@ const char *cc_name(enum cc_op cc_op);
+ void load_psw(CPUS390XState *env, uint64_t mask, uint64_t addr);
+ uint32_t calc_cc(CPUS390XState *env, uint32_t cc_op, uint64_t src, uint64_t dst,
+                  uint64_t vr);
++void handle_wait(S390CPU *cpu);
+ 
+ 
+ /* cpu.c */
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 3f9983154f..14f864697d 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1936,12 +1936,6 @@ static int handle_instruction(S390CPU *cpu, struct kvm_run *run)
+     return r;
+ }
+ 
+-static bool is_special_wait_psw(CPUState *cs)
+-{
+-    /* signal quiesce */
+-    return cs->kvm_run->psw_addr == 0xfffUL;
+-}
+-
+ static void unmanageable_intercept(S390CPU *cpu, const char *str, int pswoffset)
+ {
+     CPUState *cs = CPU(cpu);
+@@ -2012,14 +2006,7 @@ static int handle_intercept(S390CPU *cpu)
+             break;
+         case ICPT_WAITPSW:
+             /* disabled wait, since enabled wait is handled in kernel */
+-            cpu_synchronize_state(cs);
+-            if (s390_cpu_halt(cpu) == 0) {
+-                if (is_special_wait_psw(cs)) {
+-                    qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
+-                } else {
+-                    qemu_system_guest_panicked(NULL);
+-                }
+-            }
++            handle_wait(cpu);
+             r = EXCP_HALTED;
+             break;
+         case ICPT_CPU_STOP:
 -- 
 2.13.5
