@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53457)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54594)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1du1bZ-0003Ul-0h
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:21:18 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1du1dr-0004Uc-1p
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:23:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1du1bU-0000bP-33
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:21:17 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40169)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1du1bT-0000b6-Sm
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:21:12 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
-	id 1du1bR-0004Fc-1l
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 19:21:09 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 515762E84DB
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 19:20:58 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 18 Sep 2017 19:12:01 -0000
-From: Aleksei Kovura <alex3kov@zoho.com>
-Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150576192164.12050.16013230758617385104.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
- 2.10 (works on 2.9)
+	(envelope-from <sundeep.lkml@gmail.com>) id 1du1dm-00023l-9G
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:23:39 -0400
+From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Date: Tue, 19 Sep 2017 00:53:16 +0530
+Message-Id: <1505762601-27143-1-git-send-email-sundeep.lkml@gmail.com>
+Subject: [Qemu-devel] [Qemu devel v10 PATCH 0/5] Add support for
+ Smartfusion2 SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,56 +18,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
+Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com, f4bug@amsat.org, Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-Just did a test to be sure: pulled latest git
-(a9158a5cba955b79d580a252cc58ff44d154e370) - guest didn't launch.
-Reverted 208fa0e43645edd0b0d8f838857dfc79daff40a8 - guest launched
-successfully.
+Hi Qemu-devel,
 
-Can someone please take a look at this? I don't want to get stuck at
-2.9.0 :)
+I am trying to add Smartfusion2 SoC.
+SoC is from Microsemi and System on Module(SOM)
+board is from Emcraft systems. Smartfusion2 has hardened
+Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
+At the moment only system timer, sysreg and SPI
+controller are modelled.
 
--- =
+Testing:
+./arm-softmmu/qemu-system-arm -M emcraft-sf2 -serial mon:stdio \
+-kernel u-boot.bin -display none -drive file=spi.bin,if=mtd,format=raw
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715700
+Binaries u-boot.bin and spi.bin are at:
+https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git
 
-Title:
-  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
+U-boot is from Emcraft with modified
+    - SPI driver not to use PDMA.
+    - ugly hack to pass dtb to kernel in r1.
+@
+https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git
 
-Status in QEMU:
-  New
+Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource
+driver added by myself @
+https://github.com/Subbaraya-Sundeep/linux.git
 
-Bug description:
-  Qemu version: 2.10 stable.
-  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
-st.
-  Command line:
-  qemu-system-x86_64 \
-      -nodefaults \
-      -nodefconfig \
-      -machine type=3Dq35,accel=3Dkvm \
-      -enable-kvm \
-      -cpu host \
-      -m 2048 \
-      -vga virtio \
-      -boot menu=3Don \
-      -smbios file=3D/path/dmidecode_BIOS.bin \
-      -acpitable file=3D/path/acpi_slic.bin \
-      -bios /path/OVMF_CODE.fd \
-      -net none \
-      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
-      -device pcie-root-port \
-      -device ich9-usb-ehci1 \
-      -device ich9-usb-uhci1 \
-      -device ich9-usb-uhci2 \
-      -device ich9-usb-uhci3
+v10:
+	Added msf2_sysreg_realize in msf2-sysreg.c
+	modified unimplemented devices names:
+		pdma->dma and hpdma->hs-dma
+	used uint8_t for apb divisors properties
+	simplified msf2_divbits() using ctz32()
 
-  Windows hangs at boot with waving flag screen (flag doesn't freeze,
-  keeps waving indefinitely). Same command line boots fine with Qemu
-  2.9. I tried changing machine type to pc-q35-2.9 - same result.
+v9:
+	used trace instead of DB_PRINT in msf2-sysreg.c
+	used LOG_UNIMP for non guest errors in msf2-sysreg.c
+	added unimplemented devices in msf2-soc.c
+	removed .alias suffix in alias memory region name for eNVM
+	removed mc->ignore_memory_transaction_failures in msf2-som.c
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
+v8:
+	memory_region_init_ram to memory_region_init_rom in soc
+	%s/emcraft_sf2_init/emcraft_sf2_s2s010_init/g in som
+	Added mc->ignore_memory_transaction_failures = true in som
+		as per latest commit.
+	Code simplifications as suggested by Alistair in sysreg and ssi.
+
+v7:
+	Removed vmstate_register_ram_global as per latest commit
+	Moved header files to C which are local to C source files
+	Removed abort() from msf2-sysreg.c
+	Added VMStateDescription in mss-timer.c
+
+v6:
+    Moved some defines from header files to source files
+    Added properties m3clk, apb0div, apb0div1 properties
+    to soc.
+    Added properties apb0divisor, apb1divisor to sysreg
+    Update system_clock_source in msf2-soc.c
+    Changed machine name smartfusion2-som->emcraft-sf2
+
+v5
+    As per Philippe comments:
+        Added abort in Sysreg if guest tries to remap memory
+        other than default mapping.
+        Use of CONFIG_MSF2 in Makefile for soc.c
+        Fixed incorrect logic in timer model.
+        Renamed msf2-timer.c -> mss-timer.c
+                msf2-spi.c -> mss-spi.c also type names
+        Renamed function msf2_init->emcraft_sf2_init in msf2-som.c
+        Added part-name,eNVM-size,eSRAM-size,pclk0 and pclk1
+            properties to soc.
+        Pass soc part-name,memory size and clock rate properties from som.
+v4:
+    Fixed build failure by using PRIx macros.
+v3:
+    Added SoC file and board file as per Alistair comments.
+v2:
+    Added SPI controller so that u-boot loads kernel from spi flash.
+v1:
+    Initial patch set with timer and sysreg
+
+Thanks,
+Sundeep
+
+
+Subbaraya Sundeep (5):
+  msf2: Add Smartfusion2 System timer
+  msf2: Microsemi Smartfusion2 System Register block
+  msf2: Add Smartfusion2 SPI controller
+  msf2: Add Smartfusion2 SoC
+  msf2: Add Emcraft's Smartfusion2 SOM kit
+
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/Makefile.objs            |   1 +
+ hw/arm/msf2-soc.c               | 232 +++++++++++++++++++++++
+ hw/arm/msf2-som.c               |  94 ++++++++++
+ hw/misc/Makefile.objs           |   1 +
+ hw/misc/msf2-sysreg.c           | 160 ++++++++++++++++
+ hw/misc/trace-events            |   5 +
+ hw/ssi/Makefile.objs            |   1 +
+ hw/ssi/mss-spi.c                | 404 ++++++++++++++++++++++++++++++++++++++++
+ hw/timer/Makefile.objs          |   1 +
+ hw/timer/mss-timer.c            | 289 ++++++++++++++++++++++++++++
+ include/hw/arm/msf2-soc.h       |  66 +++++++
+ include/hw/misc/msf2-sysreg.h   |  77 ++++++++
+ include/hw/ssi/mss-spi.h        |  58 ++++++
+ include/hw/timer/mss-timer.h    |  64 +++++++
+ 15 files changed, 1454 insertions(+)
+ create mode 100644 hw/arm/msf2-soc.c
+ create mode 100644 hw/arm/msf2-som.c
+ create mode 100644 hw/misc/msf2-sysreg.c
+ create mode 100644 hw/ssi/mss-spi.c
+ create mode 100644 hw/timer/mss-timer.c
+ create mode 100644 include/hw/arm/msf2-soc.h
+ create mode 100644 include/hw/misc/msf2-sysreg.h
+ create mode 100644 include/hw/ssi/mss-spi.h
+ create mode 100644 include/hw/timer/mss-timer.h
+
+-- 
+2.5.0
