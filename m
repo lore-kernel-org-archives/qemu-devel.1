@@ -1,18 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37054)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37207)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dtyTK-0006Si-Em
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:00:35 -0400
+	(envelope-from <david@redhat.com>) id 1dtyTe-0006j4-Ug
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:00:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dtyTH-0007aT-SG
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:00:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45290)
+	(envelope-from <david@redhat.com>) id 1dtyTc-0007jj-DJ
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:00:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52344)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dtyTH-0007a4-J6
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:00:31 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dtyTc-0007jR-7A
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:00:52 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Mon, 18 Sep 2017 17:59:45 +0200
-Message-Id: <20170918160012.4317-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 00/27] s390x: SMP for TCG (+ cleanups)
+Date: Mon, 18 Sep 2017 17:59:47 +0200
+Message-Id: <20170918160012.4317-3-david@redhat.com>
+In-Reply-To: <20170918160012.4317-1-david@redhat.com>
+References: <20170918160012.4317-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 02/27] s390x/cpumodel: fix max STFL(E) bit
+ number
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,100 +27,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This series contains:
-- properly implement local external interrupts for TCG
-- factor out KVM SIGP handling code into common code
-- implement missing SIGP orders for TCG handled by the kernel for KVM
-  (including STOP and RESTART interrupts)
-- make TCG use the new SIGP code - experimental SMP support for s390x TCG
-- refactor STFL(E) implementation for TCG
-- bunch of cleanups
+Not that it would matter in the near future, but it is actually 2048
+bytes, therefore 16384 possible bits.
 
-Basically all SIGP instructions are fully supported.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
+ target/s390x/cpu_features.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks to Aurelien Jarno for the initital prototype and showcasing that
-supporting experimental SMP code can be implemented quite easily.
-
-TCG SMP on s390x - what works?
-- "-smp X,maxcpus=X" with both, single and multi threaded TCG
-- "-smp ... -device qemu-s390-cpu,id=cpuX,core-id=X"
-- system_powerdown, system_reset, shutdown, reboot, NMI
-- online/offline of CPUs from inside the guest
-
-TCG SMP on s390x - what does not work?
-- Floating interrupts all target CPU 0. Don't offline it.
-- CPU hotplug after the machine/main loop has been fully setup
--- the new CPU comes up, answers and sends emergency signals, but suddenly
-   the VM gets stuck. This is strange, as ordinary online/offline works
-   just fine.
--- can be triggered by "cpu-add 1" + "system_reset". The system will hang
-   when trying to online CPUs. (note: in Linux code they are fully up and
-   running and already executed code)
--- also if hotplugging with "-S", before anything has run. This is strange,
-   as "-device qemu-s390-cpu" works just fine.
--- does not seem to be related to CPU setup/reset code, I checked that
--- seems to be related to some TCG internals (as broken for single and
-   multi threaded TCG).
--- common code seems to be somehow broken, not sure if this is even
-   expected to work (e.g. for single threaded TCG, hotplugged CPUs will
-   never get set "cpu->created = true". But doesn't seem to be related to
-   this)
-
-
-Based on: https://github.com/cohuck/qemu.git s390-next
-Available on: git@github.com:davidhildenbrand/qemu.git s390x-queue
-
-
-David Hildenbrand (27):
-  s390x: raise CPU hotplug irq after really hotplugged
-  s390x/cpumodel: fix max STFL(E) bit number
-  target/s390x: get rid of next_core_id
-  s390x: introduce and use S390_MAX_CPUS
-  s390/tcg: turn INTERRUPT_EXT into a mask
-  s390x/tcg: injection of emergency signals and extarnal calls
-  s390x/tcg: STOPPED cpus can never wake up
-  s390x/tcg: a CPU cannot switch state due to an interrupt
-  target/s390x: factor out handling of WAIT PSW into handle_wait()
-  s390x/kvm: pass ipb directly into handle_sigp()
-  s390x/kvm: generalize SIGP stop and restart interrupt injection
-  s390x/kvm: factor out storing of CPU status
-  target/s390x: proper cpu->be convertion in s390_store_status()
-  s390x/kvm: factor out storing of adtl CPU status
-  s390x/kvm: drop two debug prints
-  s390x/kvm: factor out SIGP code into sigp.c
-  s390x/kvm: factor out actual handling of STOP interrupts
-  s390x/tcg: implement SIGP SENSE RUNNING STATUS
-  s390x/tcg: implement SIGP SENSE
-  s390x/tcg: implement SIGP EXTERNAL CALL
-  s390x/tcg: implement SIGP EMERGENCY SIGNAL
-  s390x/tcg: implement SIGP CONDITIONAL EMERGENCY SIGNAL
-  s390x/tcg: implement STOP and RESET interrupts for TCG
-  s390x/tcg: flush the tlb on SIGP SET PREFIX
-  s390x/tcg: switch to new SIGP handling code
-  s390x/tcg: unlock NMI
-  s390x/tcg: refactor stfl(e) to use s390_get_feat_block()
-
- hw/s390x/s390-virtio-ccw.c  |  17 +-
- target/s390x/Makefile.objs  |   1 +
- target/s390x/cpu-qom.h      |   2 -
- target/s390x/cpu.c          |  40 ++--
- target/s390x/cpu.h          |  36 +++-
- target/s390x/cpu_features.c |   2 +-
- target/s390x/cpu_models.c   |   2 +
- target/s390x/excp_helper.c  |  98 ++++++---
- target/s390x/helper.c       | 115 ++++++++--
- target/s390x/helper.h       |   4 +-
- target/s390x/internal.h     |  15 ++
- target/s390x/interrupt.c    |  70 +++++-
- target/s390x/kvm-stub.c     |  13 +-
- target/s390x/kvm.c          | 470 +++--------------------------------------
- target/s390x/kvm_s390x.h    |   3 +-
- target/s390x/misc_helper.c  | 114 ++++------
- target/s390x/sigp.c         | 504 ++++++++++++++++++++++++++++++++++++++++++++
- target/s390x/trace-events   |   4 +-
- target/s390x/translate.c    |   6 +-
- 19 files changed, 896 insertions(+), 620 deletions(-)
- create mode 100644 target/s390x/sigp.c
-
+diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+index 1d3a036393..31a4676f05 100644
+--- a/target/s390x/cpu_features.c
++++ b/target/s390x/cpu_features.c
+@@ -381,7 +381,7 @@ void s390_add_from_feat_block(S390FeatBitmap features, S390FeatType type,
+ 
+     switch (type) {
+     case S390_FEAT_TYPE_STFL:
+-       nr_bits = 2048;
++       nr_bits = 16384;
+        break;
+     case S390_FEAT_TYPE_PLO:
+        nr_bits = 256;
 -- 
 2.13.5
