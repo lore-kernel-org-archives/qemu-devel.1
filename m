@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36485)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dtxWS-00011C-7Z
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:59:45 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dtxWc-000175-0v
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:59:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dtxWO-00010F-V8
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:59:44 -0400
-Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:50825)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dtxWO-0000zr-Ln
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:59:40 -0400
-Received: by mail-wm0-x22a.google.com with SMTP id v142so3494548wmv.5
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 07:59:40 -0700 (PDT)
-Date: Mon, 18 Sep 2017 15:59:36 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170918145936.GE4141@stefanha-x1.localdomain>
-References: <1504729728-23279-1-git-send-email-cota@braap.org>
+	(envelope-from <pbonzini@redhat.com>) id 1dtxWY-00015X-Qx
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:59:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:61933)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dtxWY-00015A-KY
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:59:50 -0400
+References: <20170918101709.30421-1-aik@ozlabs.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c7702271-0af0-d33d-5ebe-364ce75a68df@redhat.com>
+Date: Mon, 18 Sep 2017 16:59:47 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1504729728-23279-1-git-send-email-cota@braap.org>
-Subject: Re: [Qemu-devel] [RFC 0/6] initial plugin support
+In-Reply-To: <20170918101709.30421-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v3 00/13] memory: Reduce memory use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +27,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Emilio G. Cota" <cota@braap.org>
-Cc: qemu-devel@nongnu.org, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
 
-On Wed, Sep 06, 2017 at 04:28:42PM -0400, Emilio G. Cota wrote:
-> Related threads:
->   [PATCH 00/13] instrument: Add basic event instrumentation
->   Date: Mon, 24 Jul 2017 20:02:24 +0300
->   https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07419.html
-> and
->   [PATCH v4 00/20] instrument: Add basic event instrumentation
->   Date:	Wed, 6 Sep 2017 20:22:41 +0300
->   https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07419.html
+On 18/09/2017 12:16, Alexey Kardashevskiy wrote:
+> This was inspired by https://bugzilla.redhat.com/show_bug.cgi?id=1481593
+> Previous versions:
+> v1: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01559.html
+> v2: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04069.html
 > 
-> This set does something similar to the instrumentation patches by Lluis,
-> but with a different implementation (and for now less events).
+> This patchset tries to reduce amount of memory used by FlatViews
+> and tries share as many FVs between address spaces as possible.
 > 
-> My focus has been on working on the skeleton of a (pseudo) stable API,
-> as Stefan requested. Of course more events would have to be added, but
-> before spending more time on this I'd like to get some feedback on the
-> core of the design. Patch 2 has all the details.
-> 
-> Note: yes, patch 1 is not used in the series, but this is an RFC. It's there
-> because it will be needed to get the tb->plugin_mask when deciding whether
-> to generate a mem_cb helper when generating loads/stores from TCG.
-> 
-> This set applies on top of:
->   https://github.com/cota/qemu/tree/tcg-generic-15%2Bmulti-tcg-v4-parallel
-> 
-> The tree can be fetched from:
->   https://github.com/cota/qemu/tree/plugins
+> Changelog:
+> v3:
+> * addressed comments from v2, mainly simplified the code
 
-Hi Emilio,
-Thanks for sending this!  Could you and Lluís collaborate on a single
-instrumentation plugin API?
+Looks almost ready.  I had a couple comments on patch 11.  However, if
+they are wrong, I can just queue patches 2-13 immediately.  Your work on
+other optimizations can then continue on top.
 
-Let's have a discussion with Lluís, Peter, myself, and potentially
-others then we can use the QEMU Developer Conference Call that is
-scheduled every 2 weeks.
+Thanks!
 
-The next call time slot is Tue 26 Sept at 13:00 UTC:
-https://www.timeanddate.com/worldclock/fixedtime.html?iso=20170926T140000&p1=136
+Paolo
 
-Stefan
+> v2:
+> * total rework
+> 
+> 
+> 
+> 
+> This is based on sha1
+> 4f2058ded4 Peter Maydell "Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20170917' into staging".
+> 
+> Please comment. Thanks.
+> 
+> 
+> 
+> Alexey Kardashevskiy (13):
+>   memory: Postpone flatview and dispatch tree building till all devices
+>     are added
+>   exec: Explicitely export target AS from
+>     address_space_translate_internal
+>   memory: Open code FlatView rendering
+>   memory: Move FlatView allocation to a helper
+>   memory: Move AddressSpaceDispatch from AddressSpace to FlatView
+>   memory: Remove AddressSpace pointer from AddressSpaceDispatch
+>   memory: Switch memory from using AddressSpace to FlatView
+>   memory: Cleanup after switching to FlatView
+>   memory: Rename mem_begin/mem_commit/mem_add helpers
+>   memory: Store physical root MR in FlatView
+>   memory: Share FlatView's and dispatch trees between address spaces
+>   memory: Get rid of address_space_init_shareable
+>   memory: Add flat views to HMP "info mtree"
+> 
+>  include/exec/memory-internal.h |  16 +-
+>  include/exec/memory.h          |  76 +++++-----
+>  include/hw/arm/armv7m.h        |   2 +-
+>  cpus.c                         |   5 +-
+>  exec.c                         | 330 +++++++++++++++++++++++++----------------
+>  hw/arm/armv7m.c                |   9 +-
+>  hw/intc/openpic_kvm.c          |   2 +-
+>  memory.c                       | 271 +++++++++++++++++++++++----------
+>  monitor.c                      |   3 +-
+>  target/arm/cpu.c               |  16 +-
+>  target/i386/cpu.c              |   5 +-
+>  vl.c                           |   9 ++
+>  hmp-commands-info.hx           |   7 +-
+>  13 files changed, 478 insertions(+), 273 deletions(-)
+> 
