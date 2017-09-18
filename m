@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35309)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dtu3q-0005MS-ML
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:17:59 -0400
+	(envelope-from <kraxel@redhat.com>) id 1dtu3q-0005MR-Lv
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:18:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kraxel@redhat.com>) id 1dtu3m-00054x-KQ
+	(envelope-from <kraxel@redhat.com>) id 1dtu3n-00055V-RW
 	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:17:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39854)
+Received: from mx1.redhat.com ([209.132.183.28]:39794)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dtu3m-00054e-EF
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:17:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1dtu3n-000559-LO
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:17:55 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 8DFC4356F6
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 11:17:53 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id C33F3C0587C6
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 11:17:54 +0000 (UTC)
 From: Gerd Hoffmann <kraxel@redhat.com>
-Date: Mon, 18 Sep 2017 13:17:49 +0200
-Message-Id: <20170918111750.15965-2-kraxel@redhat.com>
-In-Reply-To: <20170918111750.15965-1-kraxel@redhat.com>
-References: <20170918111750.15965-1-kraxel@redhat.com>
-Subject: [Qemu-devel] [PULL 1/2] wm8750: add record buffer underrun check
+Date: Mon, 18 Sep 2017 13:17:48 +0200
+Message-Id: <20170918111750.15965-1-kraxel@redhat.com>
+Subject: [Qemu-devel] [PULL 0/2] Audio 20170918 patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,30 +30,32 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-Reported-by: niuguoxiang@huawei.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20170901131409.6712-1-kraxel@redhat.com
----
- hw/audio/wm8750.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+The following changes since commit f75637badd76ae0f3bd51a128e1a2da0d2bb1d6b:
 
-diff --git a/hw/audio/wm8750.c b/hw/audio/wm8750.c
-index f8b5bebfc2..d2bf2e1da1 100644
---- a/hw/audio/wm8750.c
-+++ b/hw/audio/wm8750.c
-@@ -680,8 +680,12 @@ uint32_t wm8750_adc_dat(void *opaque)
-     WM8750State *s = (WM8750State *) opaque;
-     uint32_t *data;
- 
--    if (s->idx_in >= sizeof(s->data_in))
-+    if (s->idx_in >= sizeof(s->data_in)) {
-         wm8750_in_load(s);
-+        if (s->idx_in >= sizeof(s->data_in)) {
-+            return 0x80008000; /* silence in AUD_FMT_S16 sample format */
-+        }
-+    }
- 
-     data = (uint32_t *) &s->data_in[s->idx_in];
-     s->req_in -= 4;
+  qemu.py: Fix syntax error (2017-09-18 11:32:22 +0100)
+
+are available in the git repository at:
+
+  git://git.kraxel.org/qemu tags/audio-20170918-pull-request
+
+for you to fetch changes up to a6b0bdc8fb4ca57a4274205659bbe91d78c23f22:
+
+  audio: intel-hda: do not use old_mmio accesses (2017-09-18 13:13:32 +0200)
+
+----------------------------------------------------------------
+audio: bugfixes for wm8750 and intel-hda.
+
+----------------------------------------------------------------
+
+Gerd Hoffmann (1):
+  wm8750: add record buffer underrun check
+
+Matt Parker (1):
+  audio: intel-hda: do not use old_mmio accesses
+
+ hw/audio/intel-hda.c | 58 ++++++++++------------------------------------------
+ hw/audio/wm8750.c    |  6 +++++-
+ 2 files changed, 16 insertions(+), 48 deletions(-)
+
 -- 
 2.9.3
