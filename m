@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60163)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60789)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dtsb7-0008Rx-SP
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:44:17 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dtscn-00012a-Uz
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:46:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dtsb6-0005hz-PE
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:44:13 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37668)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dtsb6-0005hj-GR
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:44:12 -0400
-Date: Mon, 18 Sep 2017 10:44:00 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170918094400.GC2951@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170915233739.26860-1-ehabkost@redhat.com>
-	<20170915233739.26860-15-ehabkost@redhat.com>
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dtsck-0006Lj-Sd
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:45:58 -0400
+References: <20170817091542.9403-1-pbutsykin@virtuozzo.com>
+	<9e6b08b2-6f01-3d35-2644-a86955770844@redhat.com>
+	<f67eb552-e0d1-c566-a798-2e9c73a69cd2@redhat.com>
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Message-ID: <ead8f62b-8fb5-b7c0-9432-c6c7a424a088@virtuozzo.com>
+Date: Mon, 18 Sep 2017 12:45:36 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170915233739.26860-15-ehabkost@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 14/15] qemu.py: improve message on negative
- exit code
+In-Reply-To: <f67eb552-e0d1-c566-a798-2e9c73a69cd2@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 0/4] Add shrink image for qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +25,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Amador Pahim <apahim@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Max Reitz <mreitz@redhat.com>, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, den@openvz.org
 
-On Fri, Sep 15, 2017 at 08:37:38PM -0300, Eduardo Habkost wrote:
-> From: Amador Pahim <apahim@redhat.com>
+On 16.09.2017 17:56, Max Reitz wrote:
+> On 2017-08-22 01:31, John Snow wrote:
+>>
+>>
+>> On 08/17/2017 05:15 AM, Pavel Butsykin wrote:
+>>> This patch add shrinking of the image file for qcow2. As a result, this allows
+>>> us to reduce the virtual image size and free up space on the disk without
+>>> copying the image. Image can be fragmented and shrink is done by punching holes
+>>> in the image file.
+>>>
+>>> # ./qemu-img create -f qcow2 image.qcow2 4G
+>>> Formatting 'image.qcow2', fmt=qcow2 size=4294967296 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
+>>>
+>>> # ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
+>>> wrote 1073741824/1073741824 bytes at offset 0
+>>> 1 GiB, 1 ops; 0:00:04.59 (222.886 MiB/sec and 0.2177 ops/sec)
+>>>
+>>> # ./qemu-img resize image.qcow2 512M
+>>> warning: qemu-img: Shrinking an image will delete all data beyond the shrunken image's end. Before performing such an operation, make sure there is no important data there.
+>>> error: qemu-img: Use the --shrink option to perform a shrink operation.
+>>>
+>>> # ./qemu-img resize --shrink image.qcow2 128M
+>>> Image resized.
+>>>
+>>> # ./qemu-img info image.qcow2
+>>> image: image.qcow2
+>>> file format: qcow2
+>>> virtual size: 128M (134217728 bytes)
+>>> disk size: 128M
+>>> cluster_size: 65536
+>>> Format specific information:
+>>>      compat: 1.1
+>>>      lazy refcounts: false
+>>>      refcount bits: 16
+>>>      corrupt: false
+>>>
+>>> # du -h image.qcow2
+>>> 129M    image.qcow2
+>>>
+>>
+>> It looks sane to me, and already has a full set of R-Bs from Max. Are we
+>> waiting for Kevin?
 > 
-> The current message shows 'self._args', which contains only part of the
-> options used in the Qemu command line.
-> 
-> This patch makes the qemu full args list an instance variable and then
-> uses it in the negative exit code message.
-> 
-> Message was moved outside the 'if is_running' block to make sure it will
-> be logged if the VM finishes before the call to shutdown().
-> 
-> Signed-off-by: Amador Pahim <apahim@redhat.com>
-> Message-Id: <20170901112829.2571-5-apahim@redhat.com>
-> [ehabkost: removed superfluous parenthesis]
-> Reviewed-by: Fam Zheng <famz@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  scripts/qemu.py | 24 +++++++++++++++++-------
->  1 file changed, 17 insertions(+), 7 deletions(-)
-> 
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index c9bcaafe41..9440261ac3 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -87,6 +87,7 @@ class QEMUMachine(object):
->          self._socket_scm_helper = socket_scm_helper
->          self._debug = debug
->          self._qmp = None
-> +        self._qemu_full_args = None
->  
->      def __enter__(self):
->          return self
-> @@ -186,13 +187,16 @@ class QEMUMachine(object):
->  
->      def launch(self):
->          '''Launch the VM and establish a QMP connection'''
-> +        self._qemu_full_args = None
->          devnull = open(os.path.devnull, 'rb')
->          qemulog = open(self._qemu_log_path, 'wb')
->          try:
->              self._pre_launch()
-> -            args = (self._wrapper + [self._binary] + self._base_args() +
-> -                    self._args)
-> -            self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
-> +            self._qemu_full_args = self._wrapper + [self._binary] +
-> +                                    self._base_args() + self._args
+> Now I found that I was waiting for my own R-b for patch 3.  I hadn't yet
+> reviewed that patch in its current state (I had reviewed it for v5, but
+> it has changed quite a bit in v6)
 
-FYI, this change causes a syntax error because you need either the ()
-brackets, or an explicit \ continuation. Unfortunately this wasn't
-caught by Peter's merge tests, since this code is only execised by
-the qemu iotests which aren't run from a 'make check'.
+I decided that small changes are not considered :) I'm sorry for the
+confusion with the R-b.
 
-If someone has cycles, it would be great to write some unit tests
-directly targetting the qemu.py and qmp.py code, so that we get test
-coverage of it independantly of the iotest execution.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> Max
+> 
