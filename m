@@ -1,31 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1du04l-0003JT-Ts
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 13:43:21 -0400
+	(envelope-from <mreitz@redhat.com>) id 1du0EY-0005x6-Nx
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 13:53:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1du04k-0003cA-Sc
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 13:43:20 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:46488)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1du04k-0003ZN-LB
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 13:43:18 -0400
-Received: by mail-wm0-x235.google.com with SMTP id i189so4827944wmf.1
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 10:43:17 -0700 (PDT)
+	(envelope-from <mreitz@redhat.com>) id 1du0EW-0007hf-HC
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 13:53:26 -0400
+References: <20170913181910.29688-1-mreitz@redhat.com>
+	<20170913181910.29688-18-mreitz@redhat.com>
+	<20170918064613.GG15551@lemon.lan>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <87b2b2f4-ecc0-3436-a5af-6d2c9d858b8f@redhat.com>
+Date: Mon, 18 Sep 2017 19:53:06 +0200
 MIME-Version: 1.0
-In-Reply-To: <87d16o53xr.fsf@frigg.lan>
-References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
-	<150529666493.10902.14830445134051381968.stgit@frigg.lan>
-	<CAFEAcA9p9B8AFaaSaSOOSsFsEhHW=XPLBFs5MrozWq=7p4_9Zg@mail.gmail.com>
-	<87poasgjyh.fsf@frigg.lan>
-	<CAFEAcA8XP+8Jz9Dn-mEQ3CCrVj00t3HA0praQ-OSggtQGAmQ5Q@mail.gmail.com>
-	<87d16o53xr.fsf@frigg.lan>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 Sep 2017 18:42:55 +0100
-Message-ID: <CAFEAcA9FhXKVKe1E_pVDWX3u0W7WuKQmO54Z1Jgj-iL980yPew@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
+In-Reply-To: <20170918064613.GG15551@lemon.lan>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wWMLUEKf2aFSjjf26TuTIJvGb24A3g4sv"
+Subject: Re: [Qemu-devel] [PATCH 17/18] qemu-io: Add background write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,63 +25,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
-On 18 September 2017 at 18:09, Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> wr=
-ote:
-> Peter Maydell writes:
->> It's also exposing internal QEMU implementation detail.
->> What if in future we decide to switch from our current
->> setup to always interpreting guest instructions as a
->> first pass with JITting done only in the background for
->> hot code?
->
-> TCI still has a separation of translation-time (translate.c) and executio=
-n-time
-> (interpreting the TCG opcodes), and I don't think that's gonna go away an=
-ytime
-> soon.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wWMLUEKf2aFSjjf26TuTIJvGb24A3g4sv
+From: Max Reitz <mreitz@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ John Snow <jsnow@redhat.com>
+Message-ID: <87b2b2f4-ecc0-3436-a5af-6d2c9d858b8f@redhat.com>
+Subject: Re: [PATCH 17/18] qemu-io: Add background write
+References: <20170913181910.29688-1-mreitz@redhat.com>
+ <20170913181910.29688-18-mreitz@redhat.com>
+ <20170918064613.GG15551@lemon.lan>
+In-Reply-To: <20170918064613.GG15551@lemon.lan>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I didn't mean TCI, which is nothing like what you'd use for
-this if you did it (TCI is slower than just JITting.)
+On 2017-09-18 08:46, Fam Zheng wrote:
+> On Wed, 09/13 20:19, Max Reitz wrote:
+>> Add a new parameter -B to qemu-io's write command.  When used, qemu-io=
 
-> Even if it did, I think there still will be a translation/execution separ=
-ation
-> easy enough to hook into (even if it's a "fake" one for the cold-path
-> interpreted instructions).
+>> will not wait for the result of the operation and instead execute it i=
+n
+>> the background.
+>=20
+> Cannot aio_write be used for this purpose?
 
-But what would it mean? You don't have basic blocks any more.
+Depends.  I have been trained to dislike *_aio_*, so that's probably the
+initial reason why I didn't use it.
 
->> Sticking to instrumentation events that correspond exactly to guest
->> execution events means they won't break or expose internals.
->
-> It also means we won't be able to "conditionally" instrument instructions=
- (e.g.,
-> based on their opcode, address range, etc.).
+Second, I'd have to fix aio_write before it can be used.  Currently,
+this aborts:
 
-You can still do that, it's just less efficient (your
-condition-check happens in the callout to the instrumentation
-plugin). We can add "filter" options later if we need them
-(which I would rather do than have translate-time callbacks).
+echo 'qemu-io drv0 "aio_write -P 0x11 0 64M"' \
+    | x86_64-softmmu/qemu-system-x86_64 -monitor stdio \
+          -blockdev node-name=3Ddrv0,driver=3Dnull-co
 
-> Of course we can add the translation/execution differentiation later if w=
-e find
-> it necessary for performance, but I would rather avoid leaving "historica=
-l"
-> instrumentation points behind on the API.
->
-> What are the use-cases you're aiming for?
+because aio_write_done thinks it's a good idea to use qemu-io's
+BlockBackend -- but when qemu-io is executed through the HMP, the
+BlockBackend is only created for the duration of the qemu-io command
+(unless there already is a BB).  So what I'd have to do is add a
+blk_ref()/blk_unref() there, but for some reason I really don't like that=
+=2E
 
-* I want to be able to point the small stream of people who come
-into qemu-devel asking "how do I trace all my guest's memory
-accesses" at a clean API for it.
+So I'd probably have to give up on using -blockdev in the new iotest and
+would have to use -drive again.
+(Note: With if=3Dnone, it still aborts while doing the block accounting,
+and I have looked long enough into it to just decide I'd go with
+if=3Dvirtio instead.)
 
-* I want to be able to have less ugly and confusing tracing
-than our current -d output (and perhaps emit tracing in formats
-that other analysis tools want as input)
+So, yes, it appears I can use aio_write, together with -drive if=3Dvirtio=
 
-* I want to keep this initial tracing API simple enough that
-we can agree on it and get a first working useful version.
+instead of -blockdev.
 
-thanks
--- PMM
+The remaining difference is the following: With aio_write, all writes
+come from the same BlockBackend, and they are really asynchronous.
+That's nice because it's like a guest behaves.
+
+With write -B, they come from different BBs and the BB is usually
+already gone when the write is completed -- or maybe destroying the BB
+means that everything is flushed and thus the writes are not necessarily
+asynchronous.  That doesn't seem so nice, but this behavior made me
+write patch 13, so maybe it actually is a good idea to test this.
+
+So I'm a bit torn.  On one hand it seems to be a good idea to use
+aio_write because that's already there and it's good enough to simulate
+a guest.  But on the other hand, write -B gives a bit more funny
+behavior which in my opinion is always good for a test...
+
+Max
+
+
+--wWMLUEKf2aFSjjf26TuTIJvGb24A3g4sv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnACAISHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9ApBMH/jpLFJMkCkm9UZRQBd0ntoMjO645TCmz
+7EJUKrKiCmblmrmYSOVVAlyA2PKKwARaPQvXiplLX3Q0MoP1u9hEyb1nwjK/dRed
+ukE5tdoYDe67kDTpaXUoCGvExauNgmKnH6MfrdfHW/t9xrU9WAsjlzsAf3HFc6Hc
+NUaa1Ijnw6VMQKp9uEK5xN+P3x0fkX5QRsdv+rgLrBwS17UiR/C3f6C40jjUGzhB
+kKu7zAPlrxP8J9aKJGivIMJNXwl5aHOvFdKMSYnjMQnxjVsQVG05rg5zEZbOEIXa
+aGH6NELl2q5AH1G1X8rtzOBtb4f2ka7LCiBmDllWHk60hak1W6HfR2o=
+=4Bu5
+-----END PGP SIGNATURE-----
+
+--wWMLUEKf2aFSjjf26TuTIJvGb24A3g4sv--
