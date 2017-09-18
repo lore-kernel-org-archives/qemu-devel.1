@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46064)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47048)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dtxqc-0003VW-Fx
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:20:35 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dtxtN-0004bc-Fm
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:23:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dtxqY-00039o-Cb
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:20:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:29244)
+	(envelope-from <a.perevalov@samsung.com>) id 1dtxtJ-0004ML-A7
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:23:25 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:51061)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dtxqY-00039e-3a
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:20:30 -0400
-References: <20170918024402.3265-1-famz@redhat.com>
-	<20170918024402.3265-13-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e3266d0b-afdd-385e-e407-5fe05aa49f1d@redhat.com>
-Date: Mon, 18 Sep 2017 10:20:22 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170918024402.3265-13-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="p0Qt2M1wh0Hhe0Kj02aMLIR2JFLrvq7oi"
-Subject: Re: [Qemu-devel] [PATCH v8 12/13] tests: Add README for vm tests
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dtxtI-0004K1-W0
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:23:21 -0400
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <007210a5-de47-e873-7f23-63e052cbcbcd@samsung.com>
+Date: Mon, 18 Sep 2017 18:23:12 +0300
+MIME-version: 1.0
+In-reply-to: <20170918111527.GE2581@work-vm>
+Content-type: text/plain; charset="utf-8"; format="flowed"
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <CGME20170616191218eucas1p2bcc5ece2b03593f16ab599c4f12eaa5e@eucas1p2.samsung.com>
+	<1497640325-10960-1-git-send-email-a.perevalov@samsung.com>
+	<20170918111527.GE2581@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v9 0/8] calculate blocktime for postcopy
+ live migration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,63 +31,134 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Kamil Rytarowski <kamil@netbsd.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, peterx@redhat.com, i.maximets@samsung.com, quintela@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---p0Qt2M1wh0Hhe0Kj02aMLIR2JFLrvq7oi
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com,
- Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Kamil Rytarowski <kamil@netbsd.org>
-Message-ID: <e3266d0b-afdd-385e-e407-5fe05aa49f1d@redhat.com>
-Subject: Re: [PATCH v8 12/13] tests: Add README for vm tests
-References: <20170918024402.3265-1-famz@redhat.com>
- <20170918024402.3265-13-famz@redhat.com>
-In-Reply-To: <20170918024402.3265-13-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 09/18/2017 02:15 PM, Dr. David Alan Gilbert wrote:
+> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+>> This is 9th version.
+>>
+>> The rationale for that idea is following:
+>> vCPU could suspend during postcopy live migration until faulted
+>> page is not copied into kernel. Downtime on source side it's a value -
+>> time interval since source turn vCPU off, till destination start runnig
+>> vCPU. But that value was proper value for precopy migration it really shows
+>> amount of time when vCPU is down. But not for postcopy migration, because
+>> several vCPU threads could susppend after vCPU was started. That is important
+>> to estimate packet drop for SDN software.
+> Hi Alexey,
+>    I see that the UFFD_FEATURE_THREAD_ID has landed in kernel v4.14-rc1
+> over the weekend, so it's probably time to reheat this patchset.
+>
+>    I think you should be able to generate a first patch by running
+>    scripts/update-linux-headers.sh
+Hi David,
+ok, I'll resend it tomorrow,
+I also added set capability postcopy-blocktime into tests/postcopy-test.c,
+but I don't check the result of the qmp there,
+I added it just to enable and test code path, is it ok for you?
+>
+> Dave
+>
+>> (V8 -> V9)
+>>      - rebase
+>>      - traces
+>>
+>> (V7 -> V8)
+>>      - just one comma in
+>> "migration: fix hardcoded function name in error report"
+>> It was really missed, but fixed in futher patch.
+>>
+>> (V6 -> V7)
+>>      - copied bitmap was placed into RAMBlock as another migration
+>> related bitmaps.
+>>      - Ordering of mark_postcopy_blocktime_end call and ordering
+>> of checking copied bitmap were changed.
+>>      - linewrap style defects
+>>      - new patch "postcopy_place_page factoring out"
+>>      - postcopy_ram_supported_by_host accepts
+>> MigrationIncomingState in qmp_migrate_set_capabilities
+>>      - minor fixes of documentation.
+>>      and huge description of get_postcopy_total_blocktime was
+>> moved. Davids comment.
+>>
+>> (V5 -> V6)
+>>      - blocktime was added into hmp command. Comment from David.
+>>      - bitmap for copied pages was added as well as check in *_begin/_end
+>> functions. Patch uses just introduced RAMBLOCK_FOREACH. Comment from David.
+>>      - description of receive_ufd_features/request_ufd_features. Comment from David.
+>>      - commit message headers/@since references were modified. Comment from Eric.
+>>      - also typos in documentation. Comment from Eric.
+>>      - style and description of field in MigrationInfo. Comment from Eric.
+>>      - ufd_check_and_apply (former ufd_version_check) is calling twice,
+>> so my previous patch contained double allocation of blocktime context and
+>> as a result memory leak. In this patch series it was fixed.
+>>
+>> (V4 -> V5)
+>>      - fill_destination_postcopy_migration_info empty stub was missed for none linux
+>> build
+>>
+>> (V3 -> V4)
+>>      - get rid of Downtime as a name for vCPU waiting time during postcopy migration
+>>      - PostcopyBlocktimeContext renamed (it was just BlocktimeContext)
+>>      - atomic operations are used for dealing with fields of PostcopyBlocktimeContext
+>> affected in both threads.
+>>      - hardcoded function names in error_report were replaced to %s and __line__
+>>      - this patch set includes postcopy-downtime capability, but it used on
+>> destination, coupled with not possibility to return calculated downtime back
+>> to source to show it in query-migrate, it looks like a big trade off
+>>      - UFFD_API have to be sent notwithstanding need or not to ask kernel
+>> for a feature, due to kernel expects it in any case (see patch comment)
+>>      - postcopy_downtime included into query-migrate output
+>>      - also this patch set includes trivial fix
+>> migration: fix hardcoded function name in error report
+>> maybe that is a candidate for qemu-trivial mailing list, but I already
+>> sent "migration: Fixed code style" and it was unclaimed.
+>>
+>> (V2 -> V3)
+>>      - Downtime calculation approach was changed, thanks to Peter Xu
+>>      - Due to previous point no more need to keep GTree as well as bitmap of cpus.
+>> So glib changes aren't included in this patch set, it could be resent in
+>> another patch set, if it will be a good reason for it.
+>>      - No procfs traces in this patchset, if somebody wants it, you could get it
+>> from patchwork site to track down page fault initiators.
+>>      - UFFD_FEATURE_THREAD_ID is requesting only when kernel supports it
+>>      - It doesn't send back the downtime, just trace it
+>>
+>> This patch set is based on commit
+>> [PATCH v3 0/3] Add bitmap for received pages in postcopy migration
+>>
+>>
+>> Alexey Perevalov (8):
+>>    userfault: add pid into uffd_msg & update UFFD_FEATURE_*
+>>    migration: pass MigrationIncomingState* into migration check functions
+>>    migration: fix hardcoded function name in error report
+>>    migration: split ufd_version_check onto receive/request features part
+>>    migration: introduce postcopy-blocktime capability
+>>    migration: add postcopy blocktime ctx into MigrationIncomingState
+>>    migration: calculate vCPU blocktime on dst side
+>>    migration: postcopy_blocktime documentation
+>>
+>>   docs/devel/migration.txt          |  10 ++
+>>   linux-headers/linux/userfaultfd.h |   4 +
+>>   migration/migration.c             |  12 +-
+>>   migration/migration.h             |   9 ++
+>>   migration/postcopy-ram.c          | 300 ++++++++++++++++++++++++++++++++++++--
+>>   migration/postcopy-ram.h          |   2 +-
+>>   migration/savevm.c                |   2 +-
+>>   migration/trace-events            |   5 +-
+>>   qapi-schema.json                  |   5 +-
+>>   9 files changed, 334 insertions(+), 15 deletions(-)
+>>
+>> -- 
+>> 1.8.3.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
+>
 
-On 09/17/2017 09:44 PM, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  tests/vm/README | 85 +++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++++
->  1 file changed, 85 insertions(+)
->  create mode 100644 tests/vm/README
-
-The README should ALSO mention that (some) of the guests created in this
-manner are using a well-known public/private-key pair, and MUST NOT be
-exposed to external interfaces if you are at all concerned about an
-attacker being able to take over the guest VM and exploit any other qemu
-bug that can then take over your host machine.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---p0Qt2M1wh0Hhe0Kj02aMLIR2JFLrvq7oi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm/5DYACgkQp6FrSiUn
-Q2rv9gf/dk9vRcOuhAWOKOUPl7Yut6lDtwCFBBQBCOzlOEZvixWtfBCOQFVDR1MX
-pjl917RUkP8kXUQUO2QcLGqZD6Sqz51EEun8lOFjh8pEIY4Hs5NpMvUxv/EGQ0wP
-qJeLMnfsU0kghXWG7CxgEDPNY6SvD5fohVlFL6A5RiwTA+BVyr5sWkyMXwKXkpp5
-v8rwYL1ByfABb6mKBe8lRxhHXsAPuisMKLV5Kw2ONOTMLxfl5AnwhrNodgbiwu6u
-05xPMtvR3wsIWQ26d99TGp7+2VtPHbTv9F4xyAdaly5ZyQu6yXIonAm6FwD3silE
-CvIRTlBAomkF3Zuez83+n3tDAQULgg==
-=GVfn
------END PGP SIGNATURE-----
-
---p0Qt2M1wh0Hhe0Kj02aMLIR2JFLrvq7oi--
+-- 
+Best regards,
+Alexey Perevalov
