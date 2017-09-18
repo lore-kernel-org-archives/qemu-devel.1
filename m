@@ -1,28 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56517)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dtqcE-0005jj-8O
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 03:37:15 -0400
+	(envelope-from <famz@redhat.com>) id 1dtqct-0006DW-CG
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 03:37:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dtqcB-0006Kp-6i
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 03:37:14 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51428)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dtqcB-0006Jx-07
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 03:37:11 -0400
-Date: Mon, 18 Sep 2017 15:36:57 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170918073657.GA3617@pxdev.xzpeter.org>
-References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
-	<1505375436-28439-15-git-send-email-peterx@redhat.com>
-	<20170914153334.GC7370@stefanha-x1.localdomain>
-	<20170915025947.GL3617@pxdev.xzpeter.org>
-	<a43ad04c-77f8-928c-949e-48129711154c@redhat.com>
+	(envelope-from <famz@redhat.com>) id 1dtqcn-0006dM-BB
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 03:37:55 -0400
+Date: Mon, 18 Sep 2017 15:37:41 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170918073741.GJ15551@lemon.lan>
+References: <20170915101008.16646-1-kwolf@redhat.com>
+	<20170915101008.16646-7-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a43ad04c-77f8-928c-949e-48129711154c@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 14/15] qmp: support out-of-band (oob)
- execution
+In-Reply-To: <20170915101008.16646-7-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 6/6] block: Fix permissions after
+ bdrv_reopen()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,30 +24,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org
 
-On Fri, Sep 15, 2017 at 01:34:24PM -0500, Eric Blake wrote:
-> On 09/14/2017 09:59 PM, Peter Xu wrote:
-> > On Thu, Sep 14, 2017 at 04:33:34PM +0100, Stefan Hajnoczi wrote:
-> >> On Thu, Sep 14, 2017 at 03:50:35PM +0800, Peter Xu wrote:
-> >>> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-> >>> index 61fa167..47d16bb 100644
-> >>> --- a/docs/devel/qapi-code-gen.txt
-> >>> +++ b/docs/devel/qapi-code-gen.txt
+On Fri, 09/15 12:10, Kevin Wolf wrote:
+> If we switch between read-only and read-write, the permissions that
+> image format drivers need on bs->file change, too. Make sure to update
+> the permissions during bdrv_reopen().
 > 
-> >>
-> >> Is there a more relevant place to document QMP run-oob behavior than the
-> >> "How to use the QAPI code generator document"?
-> > 
-> > I agree, but I don't really know it. :(
-> > 
-> > Markus, could you provide a hint?
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  include/block/block.h |  1 +
+>  block.c               | 64 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 65 insertions(+)
 > 
-> I'm not Markus, but I suggest docs/interop/qmp-spec.txt
+> diff --git a/include/block/block.h b/include/block/block.h
+> index 082eb2cd9c..3c3af462e4 100644
+> --- a/include/block/block.h
+> +++ b/include/block/block.h
+> @@ -166,6 +166,7 @@ typedef QSIMPLEQ_HEAD(BlockReopenQueue, BlockReopenQueueEntry) BlockReopenQueue;
+>  typedef struct BDRVReopenState {
+>      BlockDriverState *bs;
+>      int flags;
+> +    uint64_t perm, shared_perm;
+>      QDict *options;
+>      QDict *explicit_options;
+>      void *opaque;
+> diff --git a/block.c b/block.c
+> index 204cbb46c7..5c65fac672 100644
+> --- a/block.c
+> +++ b/block.c
+> @@ -2781,6 +2781,10 @@ static BlockReopenQueue *bdrv_reopen_queue_child(BlockReopenQueue *bs_queue,
+>      bs_entry->state.explicit_options = explicit_options;
+>      bs_entry->state.flags = flags;
+>  
+> +    /* This needs to be overwritten in bdrv_reopen_prepare() */
+> +    bs_entry->state.perm = UINT64_MAX;
 
-Sorry I should have noticed it before (I am always not sensitive on
-the word "interop").  Thanks Eric!
+Probably doesn't matter because as the comment says it will be overwritten soon,
+but is BLK_PERM_ALL more appropriate?
 
--- 
-Peter Xu
+> +    bs_entry->state.shared_perm = 0;
+> +
+>      QLIST_FOREACH(child, &bs->children, next) {
+>          QDict *new_child_options;
+>          char *child_key_dot;
+> @@ -2887,6 +2891,52 @@ int bdrv_reopen(BlockDriverState *bs, int bdrv_flags, Error **errp)
+>      return ret;
+>  }
+>  
+> +static BlockReopenQueueEntry *find_parent_in_reopen_queue(BlockReopenQueue *q,
+> +                                                          BdrvChild *c)
+> +{
+> +    BlockReopenQueueEntry *entry;
+> +
+> +    QSIMPLEQ_FOREACH(entry, q, entry) {
+> +        BlockDriverState *bs = entry->state.bs;
+> +        BdrvChild *child;
+> +
+> +        QLIST_FOREACH(child, &bs->children, next) {
+> +            if (child == c) {
+> +                return entry;
+> +            }
+> +        }
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+> +static void bdrv_reopen_perm(BlockReopenQueue *q, BlockDriverState *bs,
+> +                             uint64_t *perm, uint64_t *shared)
+> +{
+> +    BdrvChild *c;
+> +    BlockReopenQueueEntry *parent;
+> +    uint64_t cumulative_perms = 0;
+> +    uint64_t cumulative_shared_perms = BLK_PERM_ALL;
+> +
+> +    QLIST_FOREACH(c, &bs->parents, next_parent) {
+> +        parent = find_parent_in_reopen_queue(q, c);
+> +        if (!parent) {
+> +            cumulative_perms |= c->perm;
+> +            cumulative_shared_perms &= c->shared_perm;
+> +        } else {
+> +            uint64_t nperm, nshared;
+> +
+> +            bdrv_child_perm(parent->state.bs, bs, c, c->role, q,
+> +                            parent->state.perm, parent->state.shared_perm,
+> +                            &nperm, &nshared);
+> +
+> +            cumulative_perms |= nperm;
+> +            cumulative_shared_perms &= nshared;
+> +        }
+> +    }
+> +    *perm = cumulative_perms;
+> +    *shared = cumulative_shared_perms;
+> +}
+>  
+>  /*
+>   * Prepares a BlockDriverState for reopen. All changes are staged in the
+> @@ -2952,6 +3002,9 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+>          goto error;
+>      }
+>  
+> +    /* Calculate required permissions after reopening */
+> +    bdrv_reopen_perm(queue, reopen_state->bs,
+> +                     &reopen_state->perm, &reopen_state->shared_perm);
+>  
+>      ret = bdrv_flush(reopen_state->bs);
+>      if (ret) {
+> @@ -3007,6 +3060,12 @@ int bdrv_reopen_prepare(BDRVReopenState *reopen_state, BlockReopenQueue *queue,
+>          } while ((entry = qdict_next(reopen_state->options, entry)));
+>      }
+>  
+> +    ret = bdrv_check_perm(reopen_state->bs, queue, reopen_state->perm,
+> +                          reopen_state->shared_perm, NULL, errp);
+> +    if (ret < 0) {
+> +        goto error;
+> +    }
+> +
+>      ret = 0;
+>  
+>  error:
+> @@ -3047,6 +3106,9 @@ void bdrv_reopen_commit(BDRVReopenState *reopen_state)
+>  
+>      bdrv_refresh_limits(bs, NULL);
+>  
+> +    bdrv_set_perm(reopen_state->bs, reopen_state->perm,
+> +                  reopen_state->shared_perm);
+> +
+>      new_can_write =
+>          !bdrv_is_read_only(bs) && !(bdrv_get_flags(bs) & BDRV_O_INACTIVE);
+>      if (!old_can_write && new_can_write && drv->bdrv_reopen_bitmaps_rw) {
+> @@ -3080,6 +3142,8 @@ void bdrv_reopen_abort(BDRVReopenState *reopen_state)
+>      }
+>  
+>      QDECREF(reopen_state->explicit_options);
+> +
+> +    bdrv_abort_perm_update(reopen_state->bs);
+>  }
+>  
+>  
+> -- 
+> 2.13.5
+> 
