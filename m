@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37311)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37280)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1du24r-0006lr-Hy
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:51:34 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1du24q-0006lF-UO
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:51:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1du24q-0006Gn-GX
+	(envelope-from <andrew.smirnov@gmail.com>) id 1du24q-0006GU-63
 	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:51:33 -0400
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 18 Sep 2017 12:50:47 -0700
-Message-Id: <20170918195100.17593-5-andrew.smirnov@gmail.com>
+Date: Mon, 18 Sep 2017 12:50:45 -0700
+Message-Id: <20170918195100.17593-3-andrew.smirnov@gmail.com>
 In-Reply-To: <20170918195100.17593-1-andrew.smirnov@gmail.com>
 References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
-Subject: [Qemu-devel] [PATCH 04/17] imx_fec: Change queue flushing heuristics
+Subject: [Qemu-devel] [PATCH 02/17] imx_fec: Do not calculate FEC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,51 +22,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-In current implementation, packet queue flushing logic seem to suffer
-from a deadlock like scenario if a packet is received by the interface
-before before Rx ring is initialized by Guest's driver. Consider the
-following sequence of events:
-
-	1. A QEMU instance is started against a TAP device on Linux
-	   host, running Linux guest, e. g., something to the effect
-	   of:
-
-	   qemu-system-arm \
-	      -net nic,model=imx.fec,netdev=lan0 \
-	      netdev tap,id=lan0,ifname=tap0,script=no,downscript=no \
-	      ... rest of the arguments ...
-
-	2. Once QEMU starts, but before guest reaches the point where
-	   FEC deriver is done initializing the HW, Guest, via TAP
-	   interface, receives a number of multicast MDNS packets from
-	   Host (not necessarily true for every OS, but it happens at
-	   least on Fedora 25)
-
-	3. Recieving a packet in such a state results in
-	   imx_eth_can_receive() returning '0', which in turn causes
-	   tap_send() to disable corresponding event (tap.c:203)
-
-	4. Once Guest's driver reaches the point where it is ready to
-	   recieve packets it prepares Rx ring descriptors and writes
-	   ENET_RDAR_RDAR to ENET_RDAR register to indicate to HW that
-	   more descriptors are ready. And at this points emulation
-	   layer does this:
-
-	   	 s->regs[index] = ENET_RDAR_RDAR;
-                 imx_eth_enable_rx(s);
-
-	   which, combined with:
-
-	   	  if (!s->regs[ENET_RDAR]) {
-		     qemu_flush_queued_packets(qemu_get_queue(s->nic));
-		  }
-
-	   results in Rx queue never being flushed and corresponding
-	   I/O event beign disabled.
-
-Change the code to remember the fact that can_receive callback was
-called before Rx ring was ready and use it to make a decision if
-receive queue needs to be flushed.
+Save some computation time and avoid calculating CRC's frame
 
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: Jason Wang <jasowang@redhat.com>
@@ -75,46 +31,44 @@ Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- hw/net/imx_fec.c         | 6 ++++--
- include/hw/net/imx_fec.h | 1 +
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ hw/net/imx_fec.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
-index 84085afe09..767402909d 100644
+index 88b4b049d7..75822344fc 100644
 --- a/hw/net/imx_fec.c
 +++ b/hw/net/imx_fec.c
-@@ -544,8 +544,9 @@ static void imx_eth_enable_rx(IMXFECState *s)
+@@ -1032,9 +1032,7 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+     IMXENETBufDesc bd;
+     uint32_t flags = 0;
+     uint32_t addr;
+-    uint32_t crc;
+     uint32_t buf_addr;
+-    uint8_t *crc_ptr;
+     unsigned int buf_len;
+     size_t size = len;
  
-     if (rx_ring_full) {
-         FEC_PRINTF("RX buffer full\n");
--    } else if (!s->regs[ENET_RDAR]) {
-+    } else if (s->needs_flush) {
-         qemu_flush_queued_packets(qemu_get_queue(s->nic));
-+        s->needs_flush = false;
-     }
+@@ -1048,8 +1046,6 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
  
-     s->regs[ENET_RDAR] = rx_ring_full ? 0 : ENET_RDAR_RDAR;
-@@ -930,7 +931,8 @@ static int imx_eth_can_receive(NetClientState *nc)
+     /* 4 bytes for the CRC.  */
+     size += 4;
+-    crc = cpu_to_be32(crc32(~0, buf, size));
+-    crc_ptr = (uint8_t *) &crc;
  
-     FEC_PRINTF("\n");
- 
--    return s->regs[ENET_RDAR] ? 1 : 0;
-+    s->needs_flush = !s->regs[ENET_RDAR];
-+    return !!s->regs[ENET_RDAR];
- }
- 
- static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf,
-diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
-index 62ad473b05..4bc8f03ec2 100644
---- a/include/hw/net/imx_fec.h
-+++ b/include/hw/net/imx_fec.h
-@@ -252,6 +252,7 @@ typedef struct IMXFECState {
-     uint32_t phy_int_mask;
- 
-     bool is_fec;
-+    bool needs_flush;
- } IMXFECState;
- 
- #endif
+     /* Huge frames are truncted.  */
+     if (size > ENET_MAX_FRAME_SIZE) {
+@@ -1090,9 +1086,10 @@ static ssize_t imx_enet_receive(NetClientState *nc, const uint8_t *buf,
+         dma_memory_write(&address_space_memory, buf_addr, buf, buf_len);
+         buf += buf_len;
+         if (size < 4) {
++            const uint8_t zeros[4] = { 0 };
++
+             dma_memory_write(&address_space_memory, buf_addr + buf_len,
+-                             crc_ptr, 4 - size);
+-            crc_ptr += 4 - size;
++                             zeros, 4 - size);
+         }
+         bd.flags &= ~ENET_BD_E;
+         if (size == 0) {
 -- 
 2.13.5
