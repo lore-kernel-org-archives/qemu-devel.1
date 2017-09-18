@@ -1,25 +1,45 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50969)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dtyt7-0005Fo-PE
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:27:15 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dtyyx-0001iM-Cm
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:33:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dtyt6-0003HW-Iw
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:27:13 -0400
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170913181910.29688-16-mreitz@redhat.com>
-	<20170914155738.GE7370@stefanha-x1.localdomain>
-	<2f1c5239-0cde-d164-b803-ebf807e684f2@redhat.com>
-	<20170918100626.GE31063@stefanha-x1.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <d6dbcebf-6dce-4803-0be0-a9f48a73a32f@redhat.com>
-Date: Mon, 18 Sep 2017 18:26:51 +0200
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dtyyt-0008KF-Dn
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:33:15 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38912)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dtyyt-0008JI-3u
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:33:11 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8IGQpnI062163
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 12:33:08 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d2d23ub73-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 12:33:08 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 18 Sep 2017 17:33:05 +0100
+References: <1505092362-10544-1-git-send-email-longpeng2@huawei.com>
+	<1505092362-10544-2-git-send-email-longpeng2@huawei.com>
+	<67d5549e-84de-ee85-00a7-37edc52234c4@linux.vnet.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA3D9A7B@DGGEMA505-MBX.china.huawei.com>
+	<73b9f2a8-6746-593b-4277-3ea757476130@linux.vnet.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA3D9B61@DGGEMA505-MBX.china.huawei.com>
+	<82063967A54EF84C8AFCD6BD7F6AD93310E1111B@SHSMSX103.ccr.corp.intel.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 18 Sep 2017 18:32:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170918100626.GE31063@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="baU0SGru35xgHo0t7o6fjImp82anbGQHP"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 15/18] block/mirror: Add
- active mirroring
+In-Reply-To: <82063967A54EF84C8AFCD6BD7F6AD93310E1111B@SHSMSX103.ccr.corp.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <e7e10450-806a-00f6-f9d3-65460b692f34@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH REPOST v19 1/2] virtio-crypto: Add virtio
+ crypto device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,159 +48,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---baU0SGru35xgHo0t7o6fjImp82anbGQHP
-From: Max Reitz <mreitz@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Message-ID: <d6dbcebf-6dce-4803-0be0-a9f48a73a32f@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 15/18] block/mirror: Add active mirroring
-References: <20170913181910.29688-1-mreitz@redhat.com>
- <20170913181910.29688-16-mreitz@redhat.com>
- <20170914155738.GE7370@stefanha-x1.localdomain>
- <2f1c5239-0cde-d164-b803-ebf807e684f2@redhat.com>
- <20170918100626.GE31063@stefanha-x1.localdomain>
-In-Reply-To: <20170918100626.GE31063@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 2017-09-18 12:06, Stefan Hajnoczi wrote:
-> On Sat, Sep 16, 2017 at 03:58:01PM +0200, Max Reitz wrote:
->> On 2017-09-14 17:57, Stefan Hajnoczi wrote:
->>> On Wed, Sep 13, 2017 at 08:19:07PM +0200, Max Reitz wrote:
->>>> This patch implements active synchronous mirroring.  In active mode,=
- the
->>>> passive mechanism will still be in place and is used to copy all
->>>> initially dirty clusters off the source disk; but every write reques=
-t
->>>> will write data both to the source and the target disk, so the sourc=
-e
->>>> cannot be dirtied faster than data is mirrored to the target.  Also,=
-
->>>> once the block job has converged (BLOCK_JOB_READY sent), source and
->>>> target are guaranteed to stay in sync (unless an error occurs).
->>>>
->>>> Optionally, dirty data can be copied to the target disk on read
->>>> operations, too.
->>>>
->>>> Active mode is completely optional and currently disabled at runtime=
-=2E  A
->>>> later patch will add a way for users to enable it.
->>>>
->>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
->>>> ---
->>>>  qapi/block-core.json |  23 +++++++
->>>>  block/mirror.c       | 187 ++++++++++++++++++++++++++++++++++++++++=
-+++++++++--
->>>>  2 files changed, 205 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
->>>> index bb11815608..e072cfa67c 100644
->>>> --- a/qapi/block-core.json
->>>> +++ b/qapi/block-core.json
->>>> @@ -938,6 +938,29 @@
->>>>    'data': ['top', 'full', 'none', 'incremental'] }
->>>> =20
->>>>  ##
->>>> +# @MirrorCopyMode:
->>>> +#
->>>> +# An enumeration whose values tell the mirror block job when to
->>>> +# trigger writes to the target.
->>>> +#
->>>> +# @passive: copy data in background only.
->>>> +#
->>>> +# @active-write: when data is written to the source, write it
->>>> +#                (synchronously) to the target as well.  In additio=
-n,
->>>> +#                data is copied in background just like in @passive=
-
->>>> +#                mode.
->>>> +#
->>>> +# @active-read-write: write data to the target (synchronously) both=
-
->>>> +#                     when it is read from and written to the sourc=
-e.
->>>> +#                     In addition, data is copied in background jus=
-t
->>>> +#                     like in @passive mode.
->>>
->>> I'm not sure the terms "active"/"passive" are helpful.  "Active commi=
-t"
->>> means committing the top-most BDS while the guest is accessing it.  T=
-he
->>> "passive" mirror block still works on the top-most BDS while the gues=
-t
->>> is accessing it.
->>>
->>> Calling it "asynchronous" and "synchronous" is clearer to me.  It's a=
-lso
->>> the terminology used in disk replication (e.g. DRBD).
->>
->> I'd be OK with that, too, but I think I remember that in the past at
->> least Kevin made a clear distinction between active/passive and
->> sync/async when it comes to mirroring.
->>
->>> Ideally the user wouldn't have to worry about async vs sync because Q=
-EMU
->>> would switch modes as appropriate in order to converge.  That way
->>> libvirt also doesn't have to worry about this.
->>
->> So here you mean async/sync in the way I meant it, i.e., whether the
->> mirror operations themselves are async/sync?
->=20
-> The meaning I had in mind is:
->=20
-> Sync mirroring means a guest write waits until the target write
-> completes.
-
-I.e. active-sync, ...
-
-> Async mirroring means guest writes completes independently of target
-> writes.
-
-=2E.. i.e. passive or active-async in the future.
-
-So you really want qemu to decide whether to use active or passive mode
-depending on what's enough to let the block job converge and not
-introduce any switch for the user?
-
-I'm not sure whether I like this too much, mostly because "libvirt
-doesn't have to worry" doesn't feel quite right to me.  If we don't make
-libvirt worry about this, then qemu has to worry.  I'm not sure whether
-that's any better.
-
-I think this really does get into policy territory.  Just switching to
-active mode the instant target writes are slower than source writes may
-not be what the user wants: Maybe it's OK for a short duration because
-they don't care about hard convergence too much.  Maybe they want to
-switch to active mode already when "only" twice as much is written to
-the target as to the source.
-
-I think this is a decision the management layer (or the user) has to make=
-=2E
-
-Max
+To: "Zeng, Xin" <xin.zeng@intel.com>, "Gonglei (Arei)" <arei.gonglei@huawei.com>, longpeng <longpeng2@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "Griffin, John" <john.griffin@intel.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "agraf@suse.de" <agraf@suse.de>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, Luonengjun <luonengjun@huawei.com>, "Ma, Liang J" <liang.j.ma@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "Keating, Brian A" <brian.a.keating@intel.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>
 
 
---baU0SGru35xgHo0t7o6fjImp82anbGQHP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
+On 09/18/2017 04:51 PM, Zeng, Xin wrote:
+> On Monday, September 18, 2017 9:24 PM, Gonglei (Arei) wrote:
+> 
+> < > On 09/18/2017 02:13 PM, Gonglei (Arei) wrote:
+> < > >> Destroy does not need to specify queue_id. That means session_id's aren't
+> < > >> queue scoped from namespace perspective. The question remains what is
+> < > >> queue_id good for, and whether a session type op request should be
+> < > >> rejected if the the session id originates from a session creation
+> < > >> request specifying a different dataqueue (not the dataqueue containing
+> < > >> the given request)?
+> < > >>
+> < > > My original idea about the queue_id is using the queue_id to specify which
+> < > > datequeue of the following data requests will be used. But after deep
+> < > thinking,
+> < > > I find that the queue_id is superfluous, and the current code in QEMU also
+> < > > don't use the queue_id value as well. That's because the we can use
+> < > session_id
+> < > > to find the pervious session information and get the current dataqueue id
+> < > > from the used virtqueue .
+> < > >
+> < > > So maybe we should drop the queue_id this time.
+> < > >
+> < > >
+> < >
+> < > Sounds reasonable to me. We can make it reserved and ignored in
+> < > the specification. Linux uses it, but it's always set to 0 as we only
+> < > support one data-queue (if I'm not wrong). So reserved and must be zero
+> < > is an option too.
+> < >
+> < Makes sense to keeping compatibility.
+> < 
+> 
+> If we always set it to 0, and backend device doesn't specify the queue
+> id when creating session, this works only when one data queue is
+> supported. But if we want to support multi data queues,
+> how does frontend driver know which queue it should use when 
+> sending requests to the virt queue? And furthermore, if the data queue 
+> id which can be used is determined by backend device, how does 
+> guest frontend driver know which queue can be used when operating
+> in stateless mode in case multi data queue is supported?
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlm/88sSHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9AIr0H/2Kagva2wDMY9PpqmTI9Ec/Oby/gFsTz
-C1VF1kxfjGWXS48Crd5rCiRojQHKOykRSE+CsCVma6NKOr4r0gIWxI8fP+RU0lch
-9rNojDhTq6EJJT8rF9F7t/5sKr9OUjJjNnepCQSvbDWt82NAeoMfvCtbhzHAJXCJ
-vPAzVBIei1foONS3sdyL5ljukzrYXS8fNUzyBdQjGVweN4eNoC/A+KFq5b7+a9L9
-uoyZAGCeQo5A9t0+4c/RT5oUzXH4ka6zTkVlxAXBipeZGwbTmRBNPIlWGet+gQWQ
-ebPYt/jONOmK0AIVkzJJxvm90TQd0R9evxtrevfGVDEfRXqmbUCERTM=
-=lk59
------END PGP SIGNATURE-----
+AFAIU you answered your own questions (questions above, answers below). Gonglei
+has just stated that he intends to abandon the queue_id.
 
---baU0SGru35xgHo0t7o6fjImp82anbGQHP--
+> So from my point of view, session should only be associated with service
+> related information, but not associated with the transport layer information,
+> i.e. data queue id in this case. The data queue to be used should be chosen by
+> frontend driver. Frontend driver can use any valid data queue to send requests
+> to backend device, backend device need to extract the session information
+> from the request packet and retrieve the request's session info then handle it 
+> correspondingly.
+
+AFAIU that's what we have agreed, basically. I'm not sure about your wording
+(for instance I would have said session identifier instead of session information),
+but I think we think the same. In short conceptually all configured data queues
+are equivalent in the sense that it does not matter on which queue a request is
+placed -- modulo capacity.
+
+Halil
+
+> 
+> < Thanks,
+> < -Gonglei
+> 
