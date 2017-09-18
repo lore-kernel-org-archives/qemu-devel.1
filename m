@@ -1,24 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56361)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56557)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dtyCG-0006vD-QC
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:43:01 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dtyCg-0007AA-W7
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:43:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1dtyCF-0005fL-Nl
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:42:56 -0400
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170914154221.GD7370@stefanha-x1.localdomain>
-	<ff9cac4f-5dba-666c-fc0d-8c1e3f23e6c9@redhat.com>
-	<20170918100226.GD31063@stefanha-x1.localdomain>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <38bf2d1a-ac37-84b0-7d36-689ba4697476@redhat.com>
-Date: Mon, 18 Sep 2017 17:42:40 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1dtyCf-0005tr-R9
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:43:23 -0400
+References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
+	<20170918135935.255591-4-vsementsov@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
+Date: Mon, 18 Sep 2017 17:43:12 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170918100226.GD31063@stefanha-x1.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="nOeiSfdPTVsNilGBEwiSsH8lk9oAwWKSk"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 00/18] block/mirror: Add
- active-sync mirroring
+In-Reply-To: <20170918135935.255591-4-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] block/nbd-client: refactor reading
+ reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,106 +25,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, den@openvz.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---nOeiSfdPTVsNilGBEwiSsH8lk9oAwWKSk
-From: Max Reitz <mreitz@redhat.com>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
-Message-ID: <38bf2d1a-ac37-84b0-7d36-689ba4697476@redhat.com>
-Subject: Re: [Qemu-block] [PATCH 00/18] block/mirror: Add active-sync
- mirroring
-References: <20170913181910.29688-1-mreitz@redhat.com>
- <20170914154221.GD7370@stefanha-x1.localdomain>
- <ff9cac4f-5dba-666c-fc0d-8c1e3f23e6c9@redhat.com>
- <20170918100226.GD31063@stefanha-x1.localdomain>
-In-Reply-To: <20170918100226.GD31063@stefanha-x1.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 18/09/2017 15:59, Vladimir Sementsov-Ogievskiy wrote:
+> Read the whole reply in one place - in nbd_read_reply_entry.
+> 
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/nbd-client.h |  1 +
+>  block/nbd-client.c | 42 ++++++++++++++++++++++++------------------
+>  2 files changed, 25 insertions(+), 18 deletions(-)
+> 
+> diff --git a/block/nbd-client.h b/block/nbd-client.h
+> index b1900e6a6d..3f97d31013 100644
+> --- a/block/nbd-client.h
+> +++ b/block/nbd-client.h
+> @@ -21,6 +21,7 @@ typedef struct {
+>      Coroutine *coroutine;
+>      bool receiving;         /* waiting for read_reply_co? */
+>      NBDRequest *request;
+> +    QEMUIOVector *qiov;
+>  } NBDClientRequest;
+>  
+>  typedef struct NBDClientSession {
+> diff --git a/block/nbd-client.c b/block/nbd-client.c
+> index 5f241ecc22..f7b642f079 100644
+> --- a/block/nbd-client.c
+> +++ b/block/nbd-client.c
+> @@ -98,6 +98,21 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+>              break;
+>          }
+>  
+> +        if (s->reply.error == 0 &&
+> +            s->requests[i].request->type == NBD_CMD_READ)
+> +        {
+> +            QEMUIOVector *qiov = s->requests[i].qiov;
+> +            assert(qiov != NULL);
+> +            assert(s->requests[i].request->len ==
+> +                   iov_size(qiov->iov, qiov->niov));
+> +            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
+> +                                      NULL) < 0)
+> +            {
+> +                s->reply.error = EIO;
+> +                break;
+> +            }
+> +        }
 
-On 2017-09-18 12:02, Stefan Hajnoczi wrote:
-> On Sat, Sep 16, 2017 at 04:02:45PM +0200, Max Reitz wrote:
->> On 2017-09-14 17:42, Stefan Hajnoczi wrote:
->>> On Wed, Sep 13, 2017 at 08:18:52PM +0200, Max Reitz wrote:
->>>> There may be a couple of things to do on top of this series:
->>>> - Allow switching between active and passive mode at runtime: This
->>>>   should not be too difficult to implement, the main question is how=
- to
->>>>   expose it to the user.
->>>>   (I seem to recall we wanted some form of block-job-set-option
->>>>   command...?)
->>>>
->>>> - Implement an asynchronous active mode: May be detrimental when it
->>>>   comes to convergence, but it might be nice to have anyway.  May or=
- may
->>>>   not be complicated to implement.
->>>
->>> Ideally the user doesn't have to know about async vs sync.  It's an
->>> implementation detail.
->>>
->>> Async makes sense during the bulk copy phase (e.g. sync=3Dfull) becau=
-se
->>> guest read/write latencies are mostly unaffected.  Once the entire
->>> device has been copied there are probably still dirty blocks left
->>> because the guest touched them while the mirror job was running.  At
->>> that point it definitely makes sense to switch to synchronous mirrori=
-ng
->>> in order to converge.
->>
->> Makes sense, but I'm not sure whether it really is just an
->> implementation detail.  If you're in the bulk copy phase in active/asy=
-nc
->> mode and you have enough write requests with the target being slow
->> enough, I suspect you might still not get convergence then (because th=
-e
->> writes to the target yield for a long time while ever more write
->> requests pile up) -- so then you'd just shift the dirty tracking from
->> the bitmap to a list of requests in progress.
->>
->> And I think we do want the bulk copy phase to guarantee convergence,
->> too, usually (when active/foreground/synchronous mode is selected).  I=
-f
->> we don't, then that's a policy decision and would be up to libvirt, as=
- I
->> see it.
->=20
-> This is a good point.  Bulk copy should converge too.
->=20
-> Can we measure the target write rate and guest write rate?  A heuristic=
+I am not sure this is an improvement.  In principle you could have
+commands that read replies a bit at a time without using a QEMUIOVector.
 
-> can choose between async vs sync based on the write rates.
->=20
-> For example, if the guest write rate has been larger than the target
-> write rate for the past 10 seconds during the bulk phase, switch to
-> synchronous mirroring.
+Paolo
 
-I guess we can just count how many unfinished target write requests are
-piling up.
-
-=2E..or libvirt can simply see that the block job is not progressing and
-switch the mode. :-)
-
-Max
-
-
---nOeiSfdPTVsNilGBEwiSsH8lk9oAwWKSk
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlm/6XASHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Aj2EH/jWrg373ohhxDeYOePjLSH4aIdXm5Ppm
-DZiJu6mQRnaMnlfUTvM95ToAQZPMcTkfijzC/4QOlwqINoliUbT3QkADj8LioUJR
-2d3geM4D5fpqeTaEz47eQew4VrsPn3Kej9xxDeVTZGvItCTnHgXbr40VobxuRO+C
-GnBbukgNTdHBgyg+1aYbC+QNsh5NYONSRxQX+RK5bt+UBq2PWyTO5r/oLVW3T1ch
-PcSwtVEL3Nz3xX+ETNVlDmvssmSkplcNKsYmzBN/u2VAYHgqMLE3nDVvhhS0GiXx
-YmtgEK3P1EdspyeVHumLNCOoq1fJxP+0nthNsrUvkYL5E1lSSYUdySA=
-=NIuT
------END PGP SIGNATURE-----
-
---nOeiSfdPTVsNilGBEwiSsH8lk9oAwWKSk--
+>          /* We're woken up again by the request itself.  Note that there
+>           * is no race between yielding and reentering read_reply_co.  This
+>           * is because:
+> @@ -118,6 +133,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+>      s->read_reply_co = NULL;
+>  }
+>  
+> +/* qiov should be provided for READ and WRITE */
+>  static int nbd_co_send_request(BlockDriverState *bs,
+>                                 NBDRequest *request,
+>                                 QEMUIOVector *qiov)
+> @@ -145,6 +161,7 @@ static int nbd_co_send_request(BlockDriverState *bs,
+>  
+>      request->handle = INDEX_TO_HANDLE(s, i);
+>      s->requests[i].request = request;
+> +    s->requests[i].qiov = qiov;
+>  
+>      if (s->quit) {
+>          rc = -EIO;
+> @@ -155,7 +172,8 @@ static int nbd_co_send_request(BlockDriverState *bs,
+>          goto err;
+>      }
+>  
+> -    if (qiov) {
+> +    if (s->requests[i].request->type == NBD_CMD_WRITE) {
+> +        assert(qiov);
+>          qio_channel_set_cork(s->ioc, true);
+>          rc = nbd_send_request(s->ioc, request);
+>          if (rc >= 0 && !s->quit) {
+> @@ -181,9 +199,7 @@ err:
+>      return rc;
+>  }
+>  
+> -static int nbd_co_receive_reply(NBDClientSession *s,
+> -                                NBDRequest *request,
+> -                                QEMUIOVector *qiov)
+> +static int nbd_co_receive_reply(NBDClientSession *s, NBDRequest *request)
+>  {
+>      int ret;
+>      int i = HANDLE_TO_INDEX(s, request->handle);
+> @@ -197,14 +213,6 @@ static int nbd_co_receive_reply(NBDClientSession *s,
+>      } else {
+>          assert(s->reply.handle == request->handle);
+>          ret = -s->reply.error;
+> -        if (qiov && s->reply.error == 0) {
+> -            assert(request->len == iov_size(qiov->iov, qiov->niov));
+> -            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
+> -                                      NULL) < 0) {
+> -                ret = -EIO;
+> -                s->quit = true;
+> -            }
+> -        }
+>  
+>          /* Tell the read handler to read another header.  */
+>          s->reply.handle = 0;
+> @@ -232,16 +240,14 @@ static int nbd_co_request(BlockDriverState *bs,
+>      NBDClientSession *client = nbd_get_client_session(bs);
+>      int ret;
+>  
+> -    assert(!qiov || request->type == NBD_CMD_WRITE ||
+> -           request->type == NBD_CMD_READ);
+> -    ret = nbd_co_send_request(bs, request,
+> -                              request->type == NBD_CMD_WRITE ? qiov : NULL);
+> +    assert((qiov == NULL) !=
+> +           (request->type == NBD_CMD_WRITE || request->type == NBD_CMD_READ));
+> +    ret = nbd_co_send_request(bs, request, qiov);
+>      if (ret < 0) {
+>          return ret;
+>      }
+>  
+> -    return nbd_co_receive_reply(client, request,
+> -                                request->type == NBD_CMD_READ ? qiov : NULL);
+> +    return nbd_co_receive_reply(client, request);
+>  }
+>  
+>  int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+> 
