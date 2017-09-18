@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40307)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40396)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dtxeo-0005YZ-0a
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:08:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1dtxes-0005bZ-Sc
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:08:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dtxel-0005ls-Al
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:08:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59594)
+	(envelope-from <eblake@redhat.com>) id 1dtxer-0005uE-Ea
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:08:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51194)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dtxel-0005iw-1k
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:08:19 -0400
-References: <20170911211320.25385-1-eblake@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e4a8ad66-0f41-2e67-444a-a677106e3561@redhat.com>
-Date: Mon, 18 Sep 2017 17:08:13 +0200
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dtxer-0005t6-5j
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:08:25 -0400
+References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
+	<CAJ+F1CL1CekcYq2xnrkhsjyx17FDSgppP1C+YqL0iNgv8HbwYQ@mail.gmail.com>
+	<20170914185314.GA3280@work-vm>
+	<20170915044622.GO3617@pxdev.xzpeter.org>
+	<CAJ+F1CKGsYbK5M6WKGSCioFCFY79WjFCtEQGqudiuA-QZTfOCA@mail.gmail.com>
+	<20170918083737.GD3617@pxdev.xzpeter.org>
+	<CAJ+F1C+ZE2xDVK8Ni7CaVbH6NHEz0-xXh_1gqwF-jf6T0iA16Q@mail.gmail.com>
+	<20170918105516.GD2581@work-vm>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <5e0abb57-0c5b-50b1-38ea-6b699bc21205@redhat.com>
+Date: Mon, 18 Sep 2017 10:08:18 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170911211320.25385-1-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2] osdep.h: Prohibit disabling assert() in
- supported builds
+In-Reply-To: <20170918105516.GD2581@work-vm>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mRo2qTqWhXD2PdLMnhQuPQDTbpOFLSHxh"
+Subject: Re: [Qemu-devel] [RFC 00/15] QMP: out-of-band (OOB) execution
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,134 +35,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, armbru@redhat.com, thuth@redhat.com, f4bug@amsat.org, peter.maydell@linaro.org
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: Peter Xu <peterx@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-On 11/09/2017 23:13, Eric Blake wrote:
-> We already have several files that knowingly require assert()
-> to work, sometimes because refactoring the code for proper
-> error handling has not been tackled yet; there are probably
-> other files that have a similar situation but with no comments
-> documenting the same.  In fact, we have places in migration
-> that handle untrusted input with assertions, where disabling
-> the assertions risks a worse security hole than the current
-> behavior of losing the guest to SIGABRT when migration fails
-> because of the assertion.  Promote our current per-file
-> safety-valve to instead be project-wide, and expand it to also
-> cover glib's g_assert().
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mRo2qTqWhXD2PdLMnhQuPQDTbpOFLSHxh
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: Peter Xu <peterx@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Michael Roth
+ <mdroth@linux.vnet.ibm.com>, Laurent Vivier <lvivier@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
+Message-ID: <5e0abb57-0c5b-50b1-38ea-6b699bc21205@redhat.com>
+Subject: Re: [RFC 00/15] QMP: out-of-band (OOB) execution support
+References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
+ <CAJ+F1CL1CekcYq2xnrkhsjyx17FDSgppP1C+YqL0iNgv8HbwYQ@mail.gmail.com>
+ <20170914185314.GA3280@work-vm> <20170915044622.GO3617@pxdev.xzpeter.org>
+ <CAJ+F1CKGsYbK5M6WKGSCioFCFY79WjFCtEQGqudiuA-QZTfOCA@mail.gmail.com>
+ <20170918083737.GD3617@pxdev.xzpeter.org>
+ <CAJ+F1C+ZE2xDVK8Ni7CaVbH6NHEz0-xXh_1gqwF-jf6T0iA16Q@mail.gmail.com>
+ <20170918105516.GD2581@work-vm>
+In-Reply-To: <20170918105516.GD2581@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 09/18/2017 05:55 AM, Dr. David Alan Gilbert wrote:
+
+>>> I think we have other quite simple ways to solve the "unexpected
+>>> reply" and "per-client-id duplication" issues you have mentioned.
+>>>
+>>> Firstly, when client gets unexpected replies ("id" field not in its
+>>> own request queue), the client should just ignore that reply, which
+>>> seems natural to me.
+
+That's probably reasonable, if we document it.
+
+>>
+>> The trouble is that it may legitimately use the same "id" value for
+>> new requests. And I don't see a simple way to handle that without
+>> races.
 >=20
-> Note that we do NOT want to encourage 'assert(side-effects);'
-> (that is a bad practice that prevents copy-and-paste of code to
-> other projects that CAN disable assertions; plus it costs
-> unnecessary reviewer mental cycles to remember whether a project
-> special-cases the crippling of asserts); and we would LIKE to
-> fix migration to not rely on asserts (but that takes a big code
-> audit).  But in the meantime, we DO want to send a message
-> that anyone that disables assertions has to tweak code in order
-> to compile, making it obvious that they are taking on additional
-> risk that we are not going to support.  At the same time, leave
-> comments mentioning NDEBUG in files that we know still need to
-> be scrubbed, so there is at least something to grep for.
->=20
-> It would be possible to come up with some other mechanism for
-> doing runtime checking by default, but which does not abort
-> the program on failure, while leaving side effects in place
-> (unlike how crippling assert() avoids even the side effects),
-> perhaps under the name q_verify(); but it was not deemed worth
-> the effort (developers should not have to learn a replacement
-> when the standard C macro works just fine, and it would be a lot
-> of churn for little gain).  The patch specifically uses #error
-> rather than #warn so that a user is forced to tweak the header
-> to acknowledge the issue, even when not using a -Werror
-> compilation.
->=20
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
->=20
-> ---
-> v2: promote from RFC, leave NDEBUG mentioned in comments, beef up
-> commit message
->=20
-> I'm not sure if this would fit best as a top-level patch applied
-> directly by Peter, or if it would fit through qemu-trivial, or if
-> it belongs to Paolo's misc queue.  But consensus seemed to be that
-> we are okay with having it.
->=20
-> ---
->  include/qemu/osdep.h | 16 ++++++++++++++++
->  hw/scsi/mptsas.c     |  6 ++----
->  hw/virtio/virtio.c   |  6 ++----
->  3 files changed, 20 insertions(+), 8 deletions(-)
->=20
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 6855b94bbf..99666383b2 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -107,6 +107,22 @@ extern int daemon(int, int);
->  #include "glib-compat.h"
->  #include "qemu/typedefs.h"
->=20
-> +/*
-> + * We have a lot of unaudited code that may fail in strange ways, or
-> + * even be a security risk during migration, if you disable assertions
-> + * at compile-time.  You may comment out these safety checks if you
-> + * absolutely want to disable assertion overhead, but it is not
-> + * supported upstream so the risk is all yours.  Meanwhile, please
-> + * submit patches to remove any side-effects inside an assertion, or
-> + * fixing error handling that should use Error instead of assert.
-> + */
-> +#ifdef NDEBUG
-> +#error building with NDEBUG is not supported
-> +#endif
-> +#ifdef G_DISABLE_ASSERT
-> +#error building with G_DISABLE_ASSERT is not supported
-> +#endif
-> +
->  #ifndef O_LARGEFILE
->  #define O_LARGEFILE 0
->  #endif
-> diff --git a/hw/scsi/mptsas.c b/hw/scsi/mptsas.c
-> index 765ab53c34..9962286bd6 100644
-> --- a/hw/scsi/mptsas.c
-> +++ b/hw/scsi/mptsas.c
-> @@ -1236,11 +1236,9 @@ static void *mptsas_load_request(QEMUFile *f, SC=
-SIRequest *sreq)
->      n =3D qemu_get_be32(f);
->      /* TODO: add a way for SCSIBusInfo's load_request to fail,
->       * and fail migration instead of asserting here.
-> -     * When we do, we might be able to re-enable NDEBUG below.
-> +     * This is just one thing (there are probably more) that must be
-> +     * fixed before we can allow NDEBUG compilation.
->       */
-> -#ifdef NDEBUG
-> -#error building with NDEBUG is not supported
-> -#endif
->      assert(n >=3D 0);
->=20
->      pci_dma_sglist_init(&req->qsg, pci, n);
-> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> index 464947f76d..3129d25c00 100644
-> --- a/hw/virtio/virtio.c
-> +++ b/hw/virtio/virtio.c
-> @@ -1025,11 +1025,9 @@ void *qemu_get_virtqueue_element(VirtIODevice *v=
-dev, QEMUFile *f, size_t sz)
->=20
->      /* TODO: teach all callers that this can fail, and return failure =
-instead
->       * of asserting here.
-> -     * When we do, we might be able to re-enable NDEBUG below.
-> +     * This is just one thing (there are probably more) that must be
-> +     * fixed before we can allow NDEBUG compilation.
->       */
-> -#ifdef NDEBUG
-> -#error building with NDEBUG is not supported
-> -#endif
->      assert(ARRAY_SIZE(data.in_addr) >=3D data.in_num);
->      assert(ARRAY_SIZE(data.out_addr) >=3D data.out_num);
->=20
+> Under what circumstances can it reuse the same ID for new requests?
+
+Libvirt uses distinct id's for every message on a single connection, but
+there is always the possibility that it will use id 'libvirt-0' on one
+connection, then restart libvirtd, then use id 'libvirt-0' on the second
+connection (there's nothing that I saw in libvirt code that saves the
+current 'mon->nextSerial' value in XML to survive libvirtd restarts).
+
+> Can't we simply tell it not to?
+
+Since use of OOB handling will require client opt-in, yes, we can make
+part of the opt-in process be a contract that the client has to do a
+better job of avoiding duplicate id's across reconnects, if we think
+that is easier to maintain.
+
+>>>
+>>> Then, if client disconnected and reconnected, it should not have the
+>>> problem to generate duplicated id for request, since it should know
+>>> what requests it has sent already.  A simplest case I can think of is=
+,
+>>> the ID should contains the following tuple:
+>>
+>> If you assume the "same" client will recover its state, yes.
+>>
+>>>
+>>>   (client name, client unique ID, request ID)
+>>>
+>>> Here "client name" can be something like "libvirt", which is the name=
+
+>>> of client application;
+>>>
+>>> "client unique ID" can be anything generated when client starts, it
+>>> identifies a single client session, maybe a UUID.
+>>>
+>>> "request ID" can be a unsigned integer starts from zero, and increase=
+s
+>>> each time the client sends one request.
+>>
+>> This is introducing  session handling, and can be done in server side
+>> only without changes in the protocol I believe.
+
+The 'id' field can be _any_ JSON object - libvirt currently sends a
+string, but could just as easily send a dict, and then libvirt could
+supply whatever it wanted in the dict, including uuids, to ensure that
+future reconnects don't reuse the id of a previous connection.  But
+right now, 'id' is opaque to qemu (and should stay that way) - if qemu
+is going to do any work to ensure that it doesn't send a stale reply to
+a new connection, then that has to be tracked externally from whatever
+'id' is passed in; or we just document that clients wanting to use OOB
+handling have to be careful of their choice of 'id' (and leave it up to
+the client to avoid confusion, because qemu doesn't care about it).
+
+I'm also fine with requiring that clients that opt-in to OOB handling be
+documented as having to ignore unknown 'id' responses, since we already
+document that clients must be able to ignore unknown 'event' messages.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
-Queued, thanks.
+--mRo2qTqWhXD2PdLMnhQuPQDTbpOFLSHxh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Paolo
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm/4WMACgkQp6FrSiUn
+Q2qbzwgArAWBDZMXIE3Off/l7N1kATrlOOqHvtGeeUw1XQ9kSI8YVJD4AnZFFmO+
+Ie8vcy8mMSIpD/wQhosk+OnetmhH6xcjGoe9t8Gffi70fWwhDs+jhVPJZSVmLbtX
+bl6EA42S0xnK53vhhqZ3OP5HZylFcgRQTBhLMxfVNj31Y/EVou1VLSY7GBMB+SEk
+ItHdLDj6s7IWXEXJjXG6q9NG8ywbzEliuEq4WAsRkL1kt2+ZJOJRYZipm85MvpN1
+szXalBOnot9QfeUlDY/Eic8DMN/tqbummQ0Amdnl84k4xovgTNLDBAZuzMxpRvnw
+yWCBwFlaHcsFr8HB98+6Jn7h35TVRw==
+=mdDF
+-----END PGP SIGNATURE-----
+
+--mRo2qTqWhXD2PdLMnhQuPQDTbpOFLSHxh--
