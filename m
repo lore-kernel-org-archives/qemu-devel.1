@@ -1,26 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43752)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dtuVW-0003pe-Is
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:46:35 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dtuWo-0004nO-B1
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:47:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dtuVT-0000tU-GV
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:46:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47726)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dtuVT-0000sn-8B
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:46:31 -0400
-Date: Mon, 18 Sep 2017 08:46:23 -0300
-From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170918114623.GG10621@localhost.localdomain>
-References: <20170915233739.26860-1-ehabkost@redhat.com>
-	<20170915233739.26860-15-ehabkost@redhat.com>
-	<20170918094400.GC2951@redhat.com>
+	(envelope-from <alex.bennee@linaro.org>) id 1dtuWj-0001Uf-Du
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:47:54 -0400
+Received: from mail-wr0-x229.google.com ([2a00:1450:400c:c0c::229]:48129)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dtuWj-0001UD-2j
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:47:49 -0400
+Received: by mail-wr0-x229.google.com with SMTP id 108so236729wra.5
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 04:47:48 -0700 (PDT)
+References: <20170914183516.19537-1-richard.henderson@linaro.org>
+	<20170914183516.19537-2-richard.henderson@linaro.org>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170914183516.19537-2-richard.henderson@linaro.org>
+Date: Mon, 18 Sep 2017 12:47:46 +0100
+Message-ID: <8760cgjkil.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170918094400.GC2951@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 14/15] qemu.py: improve message on negative
- exit code
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 01/10] target/i386: Convert to
+ disas_set_info hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,69 +31,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Amador Pahim <apahim@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-On Mon, Sep 18, 2017 at 10:44:00AM +0100, Daniel P. Berrange wrote:
-> On Fri, Sep 15, 2017 at 08:37:38PM -0300, Eduardo Habkost wrote:
-> > From: Amador Pahim <apahim@redhat.com>
-> > 
-> > The current message shows 'self._args', which contains only part of the
-> > options used in the Qemu command line.
-> > 
-> > This patch makes the qemu full args list an instance variable and then
-> > uses it in the negative exit code message.
-> > 
-> > Message was moved outside the 'if is_running' block to make sure it will
-> > be logged if the VM finishes before the call to shutdown().
-> > 
-> > Signed-off-by: Amador Pahim <apahim@redhat.com>
-> > Message-Id: <20170901112829.2571-5-apahim@redhat.com>
-> > [ehabkost: removed superfluous parenthesis]
-> > Reviewed-by: Fam Zheng <famz@redhat.com>
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >  scripts/qemu.py | 24 +++++++++++++++++-------
-> >  1 file changed, 17 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/scripts/qemu.py b/scripts/qemu.py
-> > index c9bcaafe41..9440261ac3 100644
-> > --- a/scripts/qemu.py
-> > +++ b/scripts/qemu.py
-> > @@ -87,6 +87,7 @@ class QEMUMachine(object):
-> >          self._socket_scm_helper = socket_scm_helper
-> >          self._debug = debug
-> >          self._qmp = None
-> > +        self._qemu_full_args = None
-> >  
-> >      def __enter__(self):
-> >          return self
-> > @@ -186,13 +187,16 @@ class QEMUMachine(object):
-> >  
-> >      def launch(self):
-> >          '''Launch the VM and establish a QMP connection'''
-> > +        self._qemu_full_args = None
-> >          devnull = open(os.path.devnull, 'rb')
-> >          qemulog = open(self._qemu_log_path, 'wb')
-> >          try:
-> >              self._pre_launch()
-> > -            args = (self._wrapper + [self._binary] + self._base_args() +
-> > -                    self._args)
-> > -            self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
-> > +            self._qemu_full_args = self._wrapper + [self._binary] +
-> > +                                    self._base_args() + self._args
-> 
-> FYI, this change causes a syntax error because you need either the ()
-> brackets, or an explicit \ continuation. Unfortunately this wasn't
-> caught by Peter's merge tests, since this code is only execised by
-> the qemu iotests which aren't run from a 'make check'.
-> 
-> If someone has cycles, it would be great to write some unit tests
-> directly targetting the qemu.py and qmp.py code, so that we get test
-> coverage of it independantly of the iotest execution.
 
-Oops, sorry!  I thought "make check" was exercising that code
-path.
+Richard Henderson <richard.henderson@linaro.org> writes:
 
--- 
-Eduardo
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+
+> ---
+>  disas.c                 | 22 ++--------------------
+>  monitor.c               | 21 ---------------------
+>  target/i386/cpu.c       | 12 ++++++++++++
+>  target/i386/translate.c |  8 +-------
+>  4 files changed, 15 insertions(+), 48 deletions(-)
+>
+> diff --git a/disas.c b/disas.c
+> index d6a1eb9c8e..2be716fdb2 100644
+> --- a/disas.c
+> +++ b/disas.c
+> @@ -205,16 +205,7 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
+>          cc->disas_set_info(cpu, &s.info);
+>      }
+>
+> -#if defined(TARGET_I386)
+> -    if (flags == 2) {
+> -        s.info.mach = bfd_mach_x86_64;
+> -    } else if (flags == 1) {
+> -        s.info.mach = bfd_mach_i386_i8086;
+> -    } else {
+> -        s.info.mach = bfd_mach_i386_i386;
+> -    }
+> -    s.info.print_insn = print_insn_i386;
+> -#elif defined(TARGET_PPC)
+> +#if defined(TARGET_PPC)
+>      if ((flags >> 16) & 1) {
+>          s.info.endian = BFD_ENDIAN_LITTLE;
+>      }
+> @@ -390,16 +381,7 @@ void monitor_disas(Monitor *mon, CPUState *cpu,
+>          cc->disas_set_info(cpu, &s.info);
+>      }
+>
+> -#if defined(TARGET_I386)
+> -    if (flags == 2) {
+> -        s.info.mach = bfd_mach_x86_64;
+> -    } else if (flags == 1) {
+> -        s.info.mach = bfd_mach_i386_i8086;
+> -    } else {
+> -        s.info.mach = bfd_mach_i386_i386;
+> -    }
+> -    s.info.print_insn = print_insn_i386;
+> -#elif defined(TARGET_PPC)
+> +#if defined(TARGET_PPC)
+>      if (flags & 0xFFFF) {
+>          /* If we have a precise definition of the instruction set, use it. */
+>          s.info.mach = flags & 0xFFFF;
+> diff --git a/monitor.c b/monitor.c
+> index 9239f7adde..3f3ebc31ef 100644
+> --- a/monitor.c
+> +++ b/monitor.c
+> @@ -1310,27 +1310,6 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+>
+>      if (format == 'i') {
+>          int flags = 0;
+> -#ifdef TARGET_I386
+> -        CPUArchState *env = mon_get_cpu_env();
+> -        if (wsize == 2) {
+> -            flags = 1;
+> -        } else if (wsize == 4) {
+> -            flags = 0;
+> -        } else {
+> -            /* as default we use the current CS size */
+> -            flags = 0;
+> -            if (env) {
+> -#ifdef TARGET_X86_64
+> -                if ((env->efer & MSR_EFER_LMA) &&
+> -                    (env->segs[R_CS].flags & DESC_L_MASK))
+> -                    flags = 2;
+> -                else
+> -#endif
+> -                if (!(env->segs[R_CS].flags & DESC_B_MASK))
+> -                    flags = 1;
+> -            }
+> -        }
+> -#endif
+>  #ifdef TARGET_PPC
+>          CPUArchState *env = mon_get_cpu_env();
+>          flags = msr_le << 16;
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index 69676e13e1..b869a69c53 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -4099,6 +4099,17 @@ static bool x86_cpu_has_work(CPUState *cs)
+>              !(env->hflags & HF_SMM_MASK));
+>  }
+>
+> +static void x86_disas_set_info(CPUState *cs, disassemble_info *info)
+> +{
+> +    X86CPU *cpu = X86_CPU(cs);
+> +    CPUX86State *env = &cpu->env;
+> +
+> +    info->mach = (env->hflags & HF_CS64_MASK ? bfd_mach_x86_64
+> +                  : env->hflags & HF_CS32_MASK ? bfd_mach_i386_i386
+> +                  : bfd_mach_i386_i8086);
+> +    info->print_insn = print_insn_i386;
+> +}
+> +
+>  static Property x86_cpu_properties[] = {
+>  #ifdef CONFIG_USER_ONLY
+>      /* apic_id = 0 by default for *-user, see commit 9886e834 */
+> @@ -4204,6 +4215,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+>  #endif
+>      cc->cpu_exec_enter = x86_cpu_exec_enter;
+>      cc->cpu_exec_exit = x86_cpu_exec_exit;
+> +    cc->disas_set_info = x86_disas_set_info;
+>
+>      dc->user_creatable = true;
+>  }
+> diff --git a/target/i386/translate.c b/target/i386/translate.c
+> index de0c989763..06c2cb9e64 100644
+> --- a/target/i386/translate.c
+> +++ b/target/i386/translate.c
+> @@ -8526,15 +8526,9 @@ static void i386_tr_disas_log(const DisasContextBase *dcbase,
+>                                CPUState *cpu)
+>  {
+>      DisasContext *dc = container_of(dcbase, DisasContext, base);
+> -    int disas_flags = !dc->code32;
+>
+>      qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
+> -#ifdef TARGET_X86_64
+> -    if (dc->code64) {
+> -        disas_flags = 2;
+> -    }
+> -#endif
+> -    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size, disas_flags);
+> +    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size, 0);
+>  }
+>
+>  static const TranslatorOps i386_tr_ops = {
+
+
+--
+Alex Bennée
