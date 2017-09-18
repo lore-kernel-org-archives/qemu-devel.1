@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50968)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51001)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duFtP-00016B-7T
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:40 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1duFtR-000170-0S
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duFtN-0002hp-Qm
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:39 -0400
-Date: Tue, 19 Sep 2017 06:27:49 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1duFtN-0002ho-Qo
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:41 -0400
+Date: Tue, 19 Sep 2017 06:37:49 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170918202749.GF15823@umbus>
+Message-ID: <20170918203749.GI15823@umbus>
 References: <1505668548-16616-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1505668548-16616-4-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1505668548-16616-7-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="jKBxcB1XkHIR0Eqt"
+	protocol="application/pgp-signature"; boundary="JI+G0+mN8WmwPnOn"
 Content-Disposition: inline
-In-Reply-To: <1505668548-16616-4-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 3/8] ppc/ide/macio: Add missing registers
+In-Reply-To: <1505668548-16616-7-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 6/8] ppc: Fix OpenPIC model
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,148 +28,120 @@ To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, benh@kernel.crashing.org
 
 
---jKBxcB1XkHIR0Eqt
+--JI+G0+mN8WmwPnOn
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Sep 17, 2017 at 06:15:43PM +0100, Mark Cave-Ayland wrote:
+On Sun, Sep 17, 2017 at 06:15:46PM +0100, Mark Cave-Ayland wrote:
 > From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 >=20
-> The timing register exists on all variants of MacIO IDE, we just
-> store and return its value.
->=20
-> The interrupts register only exists on KeyLargo but it doesn't
-> hurt to have it. The lack of this register causes MacOS X to
-> hangs under some circumstances.
->=20
-> Both are 32-bit only. The HW might support smaller access sizes
-> but no known OS uses them.
->=20
-> Because the core IDE subsystem doesn't provide us with a way
-> to query the main (level) interrupt state, nor do we have a way
-> to know that DBDMA issued a (edge) interrupt, we reflect both
-> through a private pair of qirq's in order to maintain the
-> register state.
+> Apple uses an IBM MPIC2A without timers, it has 64 sources.
 >=20
 > Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 Applied to ppc-for-2.11.
 
 > ---
->  hw/ide/macio.c |   44 +++++++++++++++++++++++++++++++++++++++++---
->  hw/ppc/mac.h   |    6 +++++-
->  2 files changed, 46 insertions(+), 4 deletions(-)
+>  hw/intc/openpic.c        |   35 +++++++++++++++++++++++++++++++++++
+>  hw/ppc/mac_newworld.c    |    2 +-
+>  include/hw/ppc/openpic.h |    1 +
+>  3 files changed, 37 insertions(+), 1 deletion(-)
 >=20
-> diff --git a/hw/ide/macio.c b/hw/ide/macio.c
-> index 9742c00..db5db39 100644
-> --- a/hw/ide/macio.c
-> +++ b/hw/ide/macio.c
-> @@ -331,6 +331,12 @@ static void pmac_ide_writel (void *opaque,
->      val =3D bswap32(val);
->      if (addr =3D=3D 0) {
->          ide_data_writel(&d->bus, 0, val);
-> +    } else if (addr =3D=3D 0x20) {
-> +        d->timing_reg =3D val;
-> +    } else if (addr =3D=3D 0x30) {
-> +        if (val & 0x80000000u) {
-> +            d->irq_reg &=3D 0x7fffffff;
+> diff --git a/hw/intc/openpic.c b/hw/intc/openpic.c
+> index 9dd285b..10d6e87 100644
+> --- a/hw/intc/openpic.c
+> +++ b/hw/intc/openpic.c
+> @@ -92,6 +92,16 @@ static int get_current_cpu(void);
+>  #define RAVEN_MAX_TMR      OPENPIC_MAX_TMR
+>  #define RAVEN_MAX_IPI      OPENPIC_MAX_IPI
+> =20
+> +/* KeyLargo */
+> +#define KEYLARGO_MAX_CPU  4
+> +#define KEYLARGO_MAX_EXT  64
+> +#define KEYLARGO_MAX_IPI  4
+> +#define KEYLARGO_MAX_IRQ  (64 + KEYLARGO_MAX_IPI)
+> +#define KEYLARGO_MAX_TMR  0
+> +#define KEYLARGO_IPI_IRQ  (KEYLARGO_MAX_EXT) /* First IPI IRQ */
+> +/* Timers don't exist but this makes the code happy... */
+> +#define KEYLARGO_TMR_IRQ  (KEYLARGO_IPI_IRQ + KEYLARGO_MAX_IPI)
+> +
+>  /* Interrupt definitions */
+>  #define RAVEN_FE_IRQ     (RAVEN_MAX_EXT)     /* Internal functional IRQ =
+*/
+>  #define RAVEN_ERR_IRQ    (RAVEN_MAX_EXT + 1) /* Error IRQ */
+> @@ -120,6 +130,7 @@ static FslMpicInfo fsl_mpic_42 =3D {
+>  #define VID_REVISION_1_3   3
+> =20
+>  #define VIR_GENERIC      0x00000000 /* Generic Vendor ID */
+> +#define VIR_MPIC2A       0x00004614 /* IBM MPIC-2A */
+> =20
+>  #define GCR_RESET        0x80000000
+>  #define GCR_MODE_PASS    0x00000000
+> @@ -329,6 +340,8 @@ typedef struct OpenPICState {
+>      uint32_t nb_cpus;
+>      /* Timer registers */
+>      OpenPICTimer timers[OPENPIC_MAX_TMR];
+> +    uint32_t max_tmr;
+> +
+>      /* Shared MSI registers */
+>      OpenPICMSI msi[MAX_MSI];
+>      uint32_t max_irq;
+> @@ -1717,6 +1730,28 @@ static void openpic_realize(DeviceState *dev, Erro=
+r **errp)
+> =20
+>          map_list(opp, list_le, &list_count);
+>          break;
+> +
+> +    case OPENPIC_MODEL_KEYLARGO:
+> +        opp->nb_irqs =3D KEYLARGO_MAX_EXT;
+> +        opp->vid =3D VID_REVISION_1_2;
+> +        opp->vir =3D VIR_GENERIC;
+> +        opp->vector_mask =3D 0xFF;
+> +        opp->tfrr_reset =3D 4160000;
+> +        opp->ivpr_reset =3D IVPR_MASK_MASK | IVPR_MODE_MASK;
+> +        opp->idr_reset =3D 0;
+> +        opp->max_irq =3D KEYLARGO_MAX_IRQ;
+> +        opp->irq_ipi0 =3D KEYLARGO_IPI_IRQ;
+> +        opp->irq_tim0 =3D KEYLARGO_TMR_IRQ;
+> +        opp->brr1 =3D -1;
+> +        opp->mpic_mode_mask =3D GCR_MODE_MIXED;
+> +
+> +        if (opp->nb_cpus !=3D 1) {
+> +            error_setg(errp, "Only UP supported today");
+> +            return;
 > +        }
+> +
+> +        map_list(opp, list_le, &list_count);
+> +        break;
 >      }
->  }
 > =20
-> @@ -342,6 +348,17 @@ static uint32_t pmac_ide_readl (void *opaque,hwaddr =
-addr)
->      addr =3D (addr & 0xFFF) >> 4;
->      if (addr =3D=3D 0) {
->          retval =3D ide_data_readl(&d->bus, 0);
-> +    } else if (addr =3D=3D 0x20) {
-> +        retval =3D d->timing_reg;
-> +    } else if (addr =3D=3D 0x30) {
-> +        /* This is an interrupt state register that only exists
-> +         * in the KeyLargo and later variants. Bit 0x8000_0000
-> +         * latches the DMA interrupt and has to be written to
-> +         * clear. Bit 0x4000_0000 is an image of the disk
-> +         * interrupt. MacOS X relies on this and will hang if
-> +         * we don't provide at least the disk interrupt
-> +         */
-> +        retval =3D d->irq_reg;
->      } else {
->          retval =3D 0xFFFFFFFF;
->      }
-> @@ -426,13 +443,32 @@ static void macio_ide_realizefn(DeviceState *dev, E=
-rror **errp)
->  {
->      MACIOIDEState *s =3D MACIO_IDE(dev);
+>      for (i =3D 0; i < opp->nb_cpus; i++) {
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index c581d96..62bd8d3 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -351,7 +351,7 @@ static void ppc_core99_init(MachineState *machine)
+>      pic =3D g_new0(qemu_irq, 64);
 > =20
-> -    ide_init2(&s->bus, s->irq);
-> +    ide_init2(&s->bus, s->ide_irq);
+>      dev =3D qdev_create(NULL, TYPE_OPENPIC);
+> -    qdev_prop_set_uint32(dev, "model", OPENPIC_MODEL_RAVEN);
+> +    qdev_prop_set_uint32(dev, "model", OPENPIC_MODEL_KEYLARGO);
+>      qdev_init_nofail(dev);
+>      s =3D SYS_BUS_DEVICE(dev);
+>      pic_mem =3D s->mmio[0].memory;
+> diff --git a/include/hw/ppc/openpic.h b/include/hw/ppc/openpic.h
+> index 6137e2d..e55ce54 100644
+> --- a/include/hw/ppc/openpic.h
+> +++ b/include/hw/ppc/openpic.h
+> @@ -20,6 +20,7 @@ enum {
+>  #define OPENPIC_MODEL_RAVEN       0
+>  #define OPENPIC_MODEL_FSL_MPIC_20 1
+>  #define OPENPIC_MODEL_FSL_MPIC_42 2
+> +#define OPENPIC_MODEL_KEYLARGO    3
 > =20
->      /* Register DMA callbacks */
->      s->dma.ops =3D &dbdma_ops;
->      s->bus.dma =3D &s->dma;
->  }
-> =20
-> +static void pmac_ide_irq(void *opaque, int n, int level)
-> +{
-> +    MACIOIDEState *s =3D opaque;
-> +    uint32_t mask =3D 0x80000000u >> n;
-> +
-> +    /* We need to reflect the IRQ state in the irq register */
-> +    if (level) {
-> +        s->irq_reg |=3D mask;
-> +    } else {
-> +        s->irq_reg &=3D ~mask;
-> +    }
-> +
-> +    if (n) {
-> +        qemu_set_irq(s->real_ide_irq, level);
-> +    } else {
-> +        qemu_set_irq(s->real_dma_irq, level);
-> +    }
-> +}
-> +
->  static void macio_ide_initfn(Object *obj)
->  {
->      SysBusDevice *d =3D SYS_BUS_DEVICE(obj);
-> @@ -441,8 +477,10 @@ static void macio_ide_initfn(Object *obj)
->      ide_bus_new(&s->bus, sizeof(s->bus), DEVICE(obj), 0, 2);
->      memory_region_init_io(&s->mem, obj, &pmac_ide_ops, s, "pmac-ide", 0x=
-1000);
->      sysbus_init_mmio(d, &s->mem);
-> -    sysbus_init_irq(d, &s->irq);
-> -    sysbus_init_irq(d, &s->dma_irq);
-> +    sysbus_init_irq(d, &s->real_ide_irq);
-> +    sysbus_init_irq(d, &s->real_dma_irq);
-> +    s->dma_irq =3D qemu_allocate_irq(pmac_ide_irq, s, 0);
-> +    s->ide_irq =3D qemu_allocate_irq(pmac_ide_irq, s, 1);
->  }
-> =20
->  static void macio_ide_class_init(ObjectClass *oc, void *data)
-> diff --git a/hw/ppc/mac.h b/hw/ppc/mac.h
-> index 20cbddb..300fc8a 100644
-> --- a/hw/ppc/mac.h
-> +++ b/hw/ppc/mac.h
-> @@ -132,7 +132,9 @@ typedef struct MACIOIDEState {
->      SysBusDevice parent_obj;
->      /*< public >*/
-> =20
-> -    qemu_irq irq;
-> +    qemu_irq real_ide_irq;
-> +    qemu_irq real_dma_irq;
-> +    qemu_irq ide_irq;
->      qemu_irq dma_irq;
-> =20
->      MemoryRegion mem;
-> @@ -140,6 +142,8 @@ typedef struct MACIOIDEState {
->      IDEDMA dma;
->      void *dbdma;
->      bool dma_active;
-> +    uint32_t timing_reg;
-> +    uint32_t irq_reg;
->  } MACIOIDEState;
-> =20
->  void macio_ide_init_drives(MACIOIDEState *ide, DriveInfo **hd_table);
+>  #define OPENPIC_MAX_SRC     256
+>  #define OPENPIC_MAX_TMR     4
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -177,24 +149,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---jKBxcB1XkHIR0Eqt
+--JI+G0+mN8WmwPnOn
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnALEUACgkQbDjKyiDZ
-s5JZdRAAwoF1u3xIiGQhIjM7bPgjHQVrGLQ3O6Wwys/Y7n6WSoqTB7RsB5wm3dEw
-jIbAmIUU3F2CuJ2WC42tnMUJgS5PIsQre34DFrtAF4paZ2K21CgTWHU/JbIogpZ4
-Ck6Tn4qPpEvJCSFxhwCVVKIG/6lSkmr5LiGk5BukA3FZSYz2OxIZOZVszD+EBEta
-eemBljsFUqqF/C9231MnDpq23hCoQR5KrbqjCI/ZJcSpot7LzCOMFshre4DvHY1i
-MQt0abmF8b0uwtp2hwLXFjO9nPMaLWHbo6e9LmDBIQgDySqwaWyxDdfCRIixoGlt
-Kd68NWUM82csA4IlAD6bC2ZKniakb1fZT3atfBqeT6oiWGgRvOoxO9wDJMNxA80q
-O3JN4iiO/C5wwxzj7e6dzMmqc+Nq9bCJohrlNRQz0ArQIcbjcUA/nKxbICUVarpP
-ubEpirp9FnXyIh//t2E66jepekbkehFvYF3QVLn/QpqRCKMVdn1YXVJS7+cq6MAf
-v4X0hWkrCjNbO83v4UQSgEUOuPKjqpoLocuV4PRccKddmzUUOrEtnMGtQXXz63eG
-wxzICRAaOiS+vtDhLQlkz/xduj5zqXatgddwcFR8Gt142kvrRV3Fjia5OAX0nKWD
-kleFhI6IgklfcXdhNJqvQAOfSBM+gxI9QhQfPIRdBPXKCPs8AJg=
-=289p
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnALp0ACgkQbDjKyiDZ
+s5KXlw/7BOMKYLDuSbP2IHOLiC3Pc/5Doe4oAD7zrdonWEF7F5sQWJ2bXSED27Gv
+is7Iar57ELP3KXRQ2NhhFvawcbcO4jgwrUlPqhLlMtVtwm4hbvTS8IeOUVVyOSaz
+/3UbZT4kgdF5V2Lz0zuk/ZjvGTBzFemjaTpg3BTODfOvvpt8uRX7qsCU8vKGsh14
+JB/dkyE/OAn8VjzUVYbAom0GuYMR2Ncp3CR3mN2BMikOWuv1jpxQNw/G4w4ImOdi
+/dnIVCcknVDBTvBgFr8FmjLKk9Mpkx2UgvYwbEGhgEhAL5koXtWDWh7hfiLvCnVh
+RRdB26kSnnEi56rJ5e3DP+SNCzMalQCCJR9HGUP7Yu7LcxnBpLuHdtQibBlluQ2u
+YoZ+bozyQ2U1n1sFpMlEmRaqd+vba/uAP4UEEKB64W7aa15zdEv2YZEtbFKaeImk
+6FfLEtdH0PVDlRBba7pCnvIjPgRdbmLg19Pmlhv0iwW3n7jgBExQbOenuIG1gvtr
+cVftWLCs+lqRoPVs66vVaqh+5qY6D+MxF+Mzmb7tJOnAv+lYkHt59OAorPgK9+aK
+y6sLqZXtpwhJsau0T8DHDLGYuUY4atfVWTgb9ARVrkUAi9TeQ/AG1pLlVDJtB8Ah
+oW9H6T04gcqB5OtLMBc+K0CHOn7bvBW50pNAhSKG9jbrOrHkWTs=
+=Dy/s
 -----END PGP SIGNATURE-----
 
---jKBxcB1XkHIR0Eqt--
+--JI+G0+mN8WmwPnOn--
