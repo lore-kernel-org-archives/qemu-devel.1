@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38417)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38603)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dtsw0-00082u-8F
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:05:49 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dtswj-0008Q9-0U
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:06:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dtsvw-00076U-IJ
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:05:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dtsvw-00075m-2h
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:05:44 -0400
-Date: Mon, 18 Sep 2017 12:05:36 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170918120536.6186c7fe.cohuck@redhat.com>
-In-Reply-To: <6c53f939cf2d64b66d2a6878b29c9bf3820f3d5b.1505485574.git.alifm@linux.vnet.ibm.com>
-References: <cover.1505485574.git.alifm@linux.vnet.ibm.com>
-	<6c53f939cf2d64b66d2a6878b29c9bf3820f3d5b.1505485574.git.alifm@linux.vnet.ibm.com>
+	(envelope-from <stefanha@gmail.com>) id 1dtswf-0007YN-PW
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:06:32 -0400
+Date: Mon, 18 Sep 2017 11:06:26 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170918100626.GE31063@stefanha-x1.localdomain>
+References: <20170913181910.29688-1-mreitz@redhat.com>
+	<20170913181910.29688-16-mreitz@redhat.com>
+	<20170914155738.GE7370@stefanha-x1.localdomain>
+	<2f1c5239-0cde-d164-b803-ebf807e684f2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 2/2] virtio-gpu-ccw: Create a virtio gpu
- device for the ccw bus
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2f1c5239-0cde-d164-b803-ebf807e684f2@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 15/18] block/mirror: Add
+ active mirroring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +26,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Farhan Ali <alifm@linux.vnet.ibm.com>, kraxel@redhat.com
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, thuth@redhat.com, pasic@linux.vnet.ibm.com
+To: Max Reitz <mreitz@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Fri, 15 Sep 2017 10:40:32 -0400
-Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
-
-> Wire up the virtio-gpu device for the CCW bus. The virtio-gpu
-> is a virtio-1 device, so disable revision 0.
+On Sat, Sep 16, 2017 at 03:58:01PM +0200, Max Reitz wrote:
+> On 2017-09-14 17:57, Stefan Hajnoczi wrote:
+> > On Wed, Sep 13, 2017 at 08:19:07PM +0200, Max Reitz wrote:
+> >> This patch implements active synchronous mirroring.  In active mode, the
+> >> passive mechanism will still be in place and is used to copy all
+> >> initially dirty clusters off the source disk; but every write request
+> >> will write data both to the source and the target disk, so the source
+> >> cannot be dirtied faster than data is mirrored to the target.  Also,
+> >> once the block job has converged (BLOCK_JOB_READY sent), source and
+> >> target are guaranteed to stay in sync (unless an error occurs).
+> >>
+> >> Optionally, dirty data can be copied to the target disk on read
+> >> operations, too.
+> >>
+> >> Active mode is completely optional and currently disabled at runtime.  A
+> >> later patch will add a way for users to enable it.
+> >>
+> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> >> ---
+> >>  qapi/block-core.json |  23 +++++++
+> >>  block/mirror.c       | 187 +++++++++++++++++++++++++++++++++++++++++++++++++--
+> >>  2 files changed, 205 insertions(+), 5 deletions(-)
+> >>
+> >> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> >> index bb11815608..e072cfa67c 100644
+> >> --- a/qapi/block-core.json
+> >> +++ b/qapi/block-core.json
+> >> @@ -938,6 +938,29 @@
+> >>    'data': ['top', 'full', 'none', 'incremental'] }
+> >>  
+> >>  ##
+> >> +# @MirrorCopyMode:
+> >> +#
+> >> +# An enumeration whose values tell the mirror block job when to
+> >> +# trigger writes to the target.
+> >> +#
+> >> +# @passive: copy data in background only.
+> >> +#
+> >> +# @active-write: when data is written to the source, write it
+> >> +#                (synchronously) to the target as well.  In addition,
+> >> +#                data is copied in background just like in @passive
+> >> +#                mode.
+> >> +#
+> >> +# @active-read-write: write data to the target (synchronously) both
+> >> +#                     when it is read from and written to the source.
+> >> +#                     In addition, data is copied in background just
+> >> +#                     like in @passive mode.
+> > 
+> > I'm not sure the terms "active"/"passive" are helpful.  "Active commit"
+> > means committing the top-most BDS while the guest is accessing it.  The
+> > "passive" mirror block still works on the top-most BDS while the guest
+> > is accessing it.
+> > 
+> > Calling it "asynchronous" and "synchronous" is clearer to me.  It's also
+> > the terminology used in disk replication (e.g. DRBD).
 > 
-> Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
-> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/s390x/virtio-ccw.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/s390x/virtio-ccw.h | 10 ++++++++++
->  2 files changed, 59 insertions(+)
+> I'd be OK with that, too, but I think I remember that in the past at
+> least Kevin made a clear distinction between active/passive and
+> sync/async when it comes to mirroring.
 > 
-> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> index b1976fd..12cacf6 100644
-> --- a/hw/s390x/virtio-ccw.c
-> +++ b/hw/s390x/virtio-ccw.c
+> > Ideally the user wouldn't have to worry about async vs sync because QEMU
+> > would switch modes as appropriate in order to converge.  That way
+> > libvirt also doesn't have to worry about this.
+> 
+> So here you mean async/sync in the way I meant it, i.e., whether the
+> mirror operations themselves are async/sync?
 
-> @@ -1815,6 +1863,7 @@ static void virtio_ccw_register(void)
->      type_register_static(&vhost_vsock_ccw_info);
->  #endif
->      type_register_static(&virtio_ccw_crypto);
-> +    type_register_static(&virtio_ccw_gpu);
+The meaning I had in mind is:
 
-Not a critique of this patch, just an observation: For virtio-ccw, we
-tend to collect the various virtio devices all in the same file. For
-virtio-pci, they sometimes get separate files. Not sure which is
-better, but it means that sometimes only the virtio-pci version is
-added...
+Sync mirroring means a guest write waits until the target write
+completes.
 
->  }
->  
->  type_init(virtio_ccw_register)
-
-The patch looks good to me.
-
-Gerd, if the first patch looks good to you, I can take both patches
-through the s390 tree. If you prefer to merge the patches yourself,
-that's fine with me as well.
-
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Async mirroring means guest writes completes independently of target
+writes.
