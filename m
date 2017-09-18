@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57832)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57875)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dtsUs-0003oU-Ei
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:37:48 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dtsUz-0003rR-4L
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:37:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dtsUp-0002mr-9b
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:37:46 -0400
-Received: from mail-db5eur01on0100.outbound.protection.outlook.com
-	([104.47.2.100]:59198
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
-	id 1dtsUo-0002mK-JF
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:37:43 -0400
-References: <20170707142138.411-1-pbutsykin@virtuozzo.com>
-	<55a8a300-2247-dadb-40b3-0c1d4e651e08@redhat.com>
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Message-ID: <61dd88c7-3f8c-471b-b33c-61aa2b09f981@virtuozzo.com>
-Date: Mon, 18 Sep 2017 12:37:21 +0300
+	(envelope-from <alex.bennee@linaro.org>) id 1dtsUw-0002pP-0Z
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:37:53 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:54133)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1dtsUv-0002ol-Pn
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:37:49 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id l22so5773495wrc.10
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 02:37:49 -0700 (PDT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Date: Mon, 18 Sep 2017 10:37:40 +0100
+Message-Id: <20170918093740.25198-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <55a8a300-2247-dadb-40b3-0c1d4e651e08@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] virtio-serial: add enable_backend callback
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] scripts/qemu.py: fix continuation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,110 +27,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com, dgilbert@redhat.com, amit@kernel.org, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: peter.maydell@linaro.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Amador Pahim <apahim@redhat.com>, Fam Zheng <famz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On 15.09.2017 20:09, Paolo Bonzini wrote:
-> On 07/07/2017 16:21, Pavel Butsykin wrote:
->> We should guarantee that RAM will not be modified while VM has a stopped
->> state, otherwise it can lead to negative consequences during post-copy
->> migration. In RUN_STATE_FINISH_MIGRATE step, it's expected that RAM on
->> source side will not be modified as this could lead to non-consistent vm state
->> on the destination side. Also RAM access during postcopy-ram migration with
->> enabled release-ram capability can lead to sad consequences.
->>
->> Let's add enable_backend() callback to avoid undesirable virtioqueue changes
->> in the guest memory.
->>
->> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-> 
-> To understand the patch better this doesn't fix _all_ stopped states,
-> only migration, right?  That said it's a valid bugfix even independent
-> of the effects for stopped runstate.
-Yes, the bug only appears on the migration. Actually, to protect memory 
-during the migration, this approach is already used for other virtio
-devices, for example net_vhost, see virtio_net_vhost_status().
+Commit dab91d9aa00e41ee680524e4f6e99a1e7fe12eb2 broke the invocation by
+dropping the surrounding braces. I'm not sure how this could have
+worked, maybe some pythons are more forgiving?
 
-> Thanks,
-> 
-> Paolo
-> 
->> ---
->>   hw/char/virtio-console.c          | 21 +++++++++++++++++++++
->>   hw/char/virtio-serial-bus.c       |  7 +++++++
->>   include/hw/virtio/virtio-serial.h |  3 +++
->>   3 files changed, 31 insertions(+)
->>
->> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
->> index 0cb1668c8a..b55905892e 100644
->> --- a/hw/char/virtio-console.c
->> +++ b/hw/char/virtio-console.c
->> @@ -163,6 +163,26 @@ static void chr_event(void *opaque, int event)
->>       }
->>   }
->>   
->> +static void virtconsole_enable_backend(VirtIOSerialPort *port, bool enable)
->> +{
->> +    VirtConsole *vcon = VIRTIO_CONSOLE(port);
->> +
->> +    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
->> +        return;
->> +    }
->> +
->> +    if (enable) {
->> +        VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
->> +
->> +        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
->> +                                 k->is_console ? NULL : chr_event,
->> +                                 vcon, NULL, false);
->> +    } else {
->> +        qemu_chr_fe_set_handlers(&vcon->chr, NULL, NULL,
->> +                                 NULL, NULL, NULL, false);
->> +    }
->> +}
->> +
->>   static void virtconsole_realize(DeviceState *dev, Error **errp)
->>   {
->>       VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
->> @@ -233,6 +253,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
->>       k->unrealize = virtconsole_unrealize;
->>       k->have_data = flush_buf;
->>       k->set_guest_connected = set_guest_connected;
->> +    k->enable_backend = virtconsole_enable_backend;
->>       k->guest_writable = guest_writable;
->>       dc->props = virtserialport_properties;
->>   }
->> diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
->> index f5bc173844..f0f18c8e7c 100644
->> --- a/hw/char/virtio-serial-bus.c
->> +++ b/hw/char/virtio-serial-bus.c
->> @@ -637,6 +637,13 @@ static void set_status(VirtIODevice *vdev, uint8_t status)
->>       if (!(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
->>           guest_reset(vser);
->>       }
->> +
->> +    QTAILQ_FOREACH(port, &vser->ports, next) {
->> +        VirtIOSerialPortClass *vsc = VIRTIO_SERIAL_PORT_GET_CLASS(port);
->> +        if (vsc->enable_backend) {
->> +            vsc->enable_backend(port, vdev->vm_running);
->> +        }
->> +    }
->>   }
->>   
->>   static void vser_reset(VirtIODevice *vdev)
->> diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio-serial.h
->> index b19c44727f..12657a9f39 100644
->> --- a/include/hw/virtio/virtio-serial.h
->> +++ b/include/hw/virtio/virtio-serial.h
->> @@ -58,6 +58,9 @@ typedef struct VirtIOSerialPortClass {
->>           /* Guest opened/closed device. */
->>       void (*set_guest_connected)(VirtIOSerialPort *port, int guest_connected);
->>   
->> +    /* Enable/disable backend for virtio serial port */
->> +    void (*enable_backend)(VirtIOSerialPort *port, bool enable);
->> +
->>           /* Guest is now ready to accept data (virtqueues set up). */
->>       void (*guest_ready)(VirtIOSerialPort *port);
->>   
->>
-> 
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+CC: Amador Pahim <apahim@redhat.com>
+CC: Fam Zheng <famz@redhat.com>
+CC: Eduardo Habkost <ehabkost@redhat.com>
+---
+ scripts/qemu.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/qemu.py b/scripts/qemu.py
+index 774e201e8b..2b5c2accb5 100644
+--- a/scripts/qemu.py
++++ b/scripts/qemu.py
+@@ -193,8 +193,8 @@ class QEMUMachine(object):
+         qemulog = open(self._qemu_log_path, 'wb')
+         try:
+             self._pre_launch()
+-            self._qemu_full_args = self._wrapper + [self._binary] +
+-                                    self._base_args() + self._args
++            self._qemu_full_args = (self._wrapper + [self._binary] +
++                                    self._base_args() + self._args)
+             self._popen = subprocess.Popen(self._qemu_full_args,
+                                            stdin=devnull,
+                                            stdout=qemulog,
+-- 
+2.14.1
