@@ -1,20 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57000)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36879)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1du1gi-0007GM-Ge
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:26:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1du23j-0006GP-9G
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:50:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mreitz@redhat.com>) id 1du1gh-00043E-HY
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:26:36 -0400
-References: <CAJoBWHyqyFiFi_feH=316fJRUbb9T8b4bbYzp-5eUF6dHtpNCg@mail.gmail.com>
-From: Max Reitz <mreitz@redhat.com>
-Message-ID: <1ff0af0b-cbcf-7184-3542-ccce908b130e@redhat.com>
-Date: Mon, 18 Sep 2017 21:26:25 +0200
+	(envelope-from <eblake@redhat.com>) id 1du23i-0005vT-Bn
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:50:23 -0400
+References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
+	<20170918135935.255591-3-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <31b5ba0a-9041-7cbc-625c-e12905e56169@redhat.com>
+Date: Mon, 18 Sep 2017 14:50:13 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAJoBWHyqyFiFi_feH=316fJRUbb9T8b4bbYzp-5eUF6dHtpNCg@mail.gmail.com>
+In-Reply-To: <20170918135935.255591-3-vsementsov@virtuozzo.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="6cIcQrMH5ra0LtcFPeNEiuTubAXrOPuJM"
-Subject: Re: [Qemu-devel] Disk Image Read Location
+	boundary="nc3Ata7phFTOMtCQ5O7Qu2ivBs48hwIWd"
+Subject: Re: [Qemu-devel] [PATCH v2 2/7] block/nbd-client: exit
+ reply-reading coroutine on incorrect handle
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,80 +25,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Derrick McKee <derrick.mckee@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---6cIcQrMH5ra0LtcFPeNEiuTubAXrOPuJM
-From: Max Reitz <mreitz@redhat.com>
-To: Derrick McKee <derrick.mckee@gmail.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Qemu-block <qemu-block@nongnu.org>
-Message-ID: <1ff0af0b-cbcf-7184-3542-ccce908b130e@redhat.com>
-Subject: Re: [Qemu-devel] Disk Image Read Location
-References: <CAJoBWHyqyFiFi_feH=316fJRUbb9T8b4bbYzp-5eUF6dHtpNCg@mail.gmail.com>
-In-Reply-To: <CAJoBWHyqyFiFi_feH=316fJRUbb9T8b4bbYzp-5eUF6dHtpNCg@mail.gmail.com>
+--nc3Ata7phFTOMtCQ5O7Qu2ivBs48hwIWd
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <31b5ba0a-9041-7cbc-625c-e12905e56169@redhat.com>
+Subject: Re: [PATCH v2 2/7] block/nbd-client: exit reply-reading coroutine on
+ incorrect handle
+References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
+ <20170918135935.255591-3-vsementsov@virtuozzo.com>
+In-Reply-To: <20170918135935.255591-3-vsementsov@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On 2017-09-18 20:47, Derrick McKee wrote:
-> Hi,
+On 09/18/2017 08:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+> Check reply-handle =3D=3D request-handle in the same place, where
+> recv coroutine number is calculated from reply->handle and it's
+> correctness checked - in nbd_read_reply_entry.
 >=20
-> I am trying to figure out if a particular disk operation is reading fro=
-m
-> the same location in an image file.  I am simulating a USB disk, and du=
-ring
-> an operation the guest OS performs, I would like to know how many times=
- the
-> backing image file is read.  I have identified the function
-> address_space_write as the function that writes the data to the guest O=
-S
-> from the image, but I am not sure what to compare with past writes.  Th=
-ere
-> are AddressSpace*, MemoryRegion*, and hwaddr types in that function.  C=
-an
-> any of those be used to compare image read locations?  I am hoping that=
- if,
-> for example, the AddressSpace* passed into address_space_write during o=
-ne
-> invocation equals the AddressSpace* of another invocation means that th=
-e
-> same location within the image file was read twice.  Any help would be
-> appreciated.
+> Also finish nbd_read_reply_entry in case of reply-handle !=3D
+> request-handle in the same way as in case of incorrect reply-handle.
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/nbd-client.h | 1 +
+>  block/nbd-client.c | 8 ++++++--
+>  2 files changed, 7 insertions(+), 2 deletions(-)
 
-If you're referring to images as in images of block devices, then the
-block layer contains the functionality you're looking for.
+On second thought:
 
-bdrv_driver_preadv() from block/io.c is a function that every read
-request should go through.  However, at this point it's already aligned
-to (host) sectors, so maybe bdrv_co_preadv() is better suited.
+> +++ b/block/nbd-client.c
+> @@ -92,7 +92,9 @@ static coroutine_fn void nbd_read_reply_entry(void *o=
+paque)
+>          i =3D HANDLE_TO_INDEX(s, s->reply.handle);
+>          if (i >=3D MAX_NBD_REQUESTS ||
+>              !s->requests[i].coroutine ||
+> -            !s->requests[i].receiving) {
+> +            !s->requests[i].receiving ||
+> +            s->reply.handle !=3D s->requests[i].request->handle)
 
-But then again, because of how the block layer works you'll likely see
-every read request twice there (once for the disk image's format (e.g.
-qcow2 or raw) and once for the storage backend used for the image (e.g.
-file for normal files or http)).  So you either correct for that or you
-instead go one layer above into block/block-backend.c.
+How can this condition ever be false?  s->reply.handle only ever
+contains two values: 0 when it is being reused for the next iteration of
+the loop, or the (munged) address of the request pointer.  But we are
+careful that we never write s->reply.handle =3D 0 until after
+s->requests[i].receiving is false.  So we will never see s->reply.handle
+equal to 0 here.  (It may have been possible prior to the introduction
+of reply.receiving, in commit 40f4a218, but I'm not seeing it now)
 
-All read requests from the guest go through either blk_co_preadv() or
-blk_aio_preadv(), and they should go through there only once.
+If I'm right, then this patch can be simplified - we don't need to track
+s.requests[i].request, and can merely:
 
-Max
+> @@ -189,9 +192,10 @@ static int nbd_co_receive_reply(NBDClientSession *=
+s,
+>      s->requests[i].receiving =3D true;
+>      qemu_coroutine_yield();
+>      s->requests[i].receiving =3D false;
+> -    if (s->reply.handle !=3D request->handle || !s->ioc || s->quit) {
+
+shorten this conditional to remove the now-dead condition.
+
+> +    if (!s->ioc || s->quit) {
+>          ret =3D -EIO;
+>      } else {
+> +        assert(s->reply.handle =3D=3D request->handle);
+>          ret =3D -s->reply.error;
+>          if (qiov && s->reply.error =3D=3D 0) {
+>              assert(request->len =3D=3D iov_size(qiov->iov, qiov->niov)=
+);
+>=20
+
+[Oh, and I just noticed HANDLE_TO_INDEX() and INDEX_TO_HANDLE() are
+improperly parenthesized, although to no ill effect with current clients]=
 
 
---6cIcQrMH5ra0LtcFPeNEiuTubAXrOPuJM
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--nc3Ata7phFTOMtCQ5O7Qu2ivBs48hwIWd
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnAHeESHG1yZWl0ekBy
-ZWRoYXQuY29tAAoJEPQH2wBh1c9Ate0H/3bTxSPFySkp1OlfAvMZn/1E6UHvXsRv
-+WPCATlv/44E7Vh2/hIr26WogifKpO8oLJX9ohkQbrG8mfiGc+VYRAHlBvH2QuCB
-RIg1aVV4v5ilvadOYojrxR1QSKGEAoNQ8fbrrqeLm7MP1kx8DJkZ8kTCAbBHSy8v
-FN4Vq8O4Xdcet82GzxvtHMK1tsLoAcbN72trLNdnCTXNj3v89GVf4cv8LkBzZ8Hj
-kCO/67iWm9b6ekZtOvcnhO8E8x0zHP4nor/Cf4J76aOgG0bMlFtyOgfJ71W5HqvJ
-xq3cz9smqwyLcOxdKXNrJsf3kQbf2IuEzMe57OvT3wIP/d6oIx+HGQw=
-=l24Y
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnAI3UACgkQp6FrSiUn
+Q2q7FAgAsLg0XWpSqnoozP9rGjsBDFAWo/09lGdjioA+KkBz3fVA7iz0mirLElZv
+KBcCyncscdlUy7+fYMpmtfLcghUlEFK/cUKbYWU/rgwpLlPtqRXoDuUH+J9wkchz
+QGisaQw/y2GXgcyLoQ8GiG0cS4PqDOd5SNc4CHgITqD5dBcMmOnBZmMRF0YMEtjQ
+meAxHRfYNFIDM2SkmGSmqmVZz3FF8xGS3uAiZz7meNzJnjSDPyHEKzEgkHe5CWgC
+yH7DHrMHrrWWJv22SWQDwe/5PWW+Sp15BFE643pwJspIjH44ICdglrbqOd7kiU1d
+pfSx+lkS5Yfgadkt3WTbkJvF3dPJiw==
+=97fr
 -----END PGP SIGNATURE-----
 
---6cIcQrMH5ra0LtcFPeNEiuTubAXrOPuJM--
+--nc3Ata7phFTOMtCQ5O7Qu2ivBs48hwIWd--
