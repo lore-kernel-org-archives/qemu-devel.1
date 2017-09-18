@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42023)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42102)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dtt7K-0005l2-36
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:17:38 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dtt7Q-0005qA-Br
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:17:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dtt7G-0004FE-Aq
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:17:30 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dtt7L-0004HT-Ni
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:17:36 -0400
 Received: from ozlabs.ru ([107.173.13.209]:35254)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dtt7F-0004Dh-Uh
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:17:26 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dtt7L-0004Dh-GB
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:17:31 -0400
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Mon, 18 Sep 2017 20:17:03 +1000
-Message-Id: <20170918101709.30421-8-aik@ozlabs.ru>
+Date: Mon, 18 Sep 2017 20:17:08 +1000
+Message-Id: <20170918101709.30421-13-aik@ozlabs.ru>
 In-Reply-To: <20170918101709.30421-1-aik@ozlabs.ru>
 References: <20170918101709.30421-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v3 07/13] memory: Switch memory from using
- AddressSpace to FlatView
+Subject: [Qemu-devel] [PATCH qemu v3 12/13] memory: Get rid of
+ address_space_init_shareable
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,755 +27,245 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
-FlatView's will be shared between AddressSpace's and subpage_t
-and MemoryRegionSection cannot store AS anymore, hence this change.
-
-In particular, for:
-
- typedef struct subpage_t {
-     MemoryRegion iomem;
--    AddressSpace *as;
-+    FlatView *fv;
-     hwaddr base;
-     uint16_t sub_section[];
- } subpage_t;
-
-  struct MemoryRegionSection {
-     MemoryRegion *mr;
--    AddressSpace *address_space;
-+    FlatView *fv;
-     hwaddr offset_within_region;
-     Int128 size;
-     hwaddr offset_within_address_space;
-     bool readonly;
- };
+Since FlatViews are shared now and ASes not, this gets rid of
+address_space_init_shareable().
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- include/exec/memory-internal.h |   2 +-
- include/exec/memory.h          |  51 ++++++++----
- exec.c                         | 180 ++++++++++++++++++++++++-----------------
- hw/intc/openpic_kvm.c          |   2 +-
- memory.c                       |  28 ++++---
- 5 files changed, 157 insertions(+), 106 deletions(-)
+Changes:
+v3:
+* now removes @malloced and @ref_count, used to be in the previos patch
+---
+ include/exec/memory.h   | 19 -------------------
+ include/hw/arm/armv7m.h |  2 +-
+ cpus.c                  |  5 +++--
+ hw/arm/armv7m.c         |  9 ++++-----
+ memory.c                | 22 +---------------------
+ target/arm/cpu.c        | 16 ++++++++--------
+ target/i386/cpu.c       |  5 +++--
+ 7 files changed, 20 insertions(+), 58 deletions(-)
 
-diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
-index 6e08eda256..1cf8ad9869 100644
---- a/include/exec/memory-internal.h
-+++ b/include/exec/memory-internal.h
-@@ -27,7 +27,7 @@ extern const MemoryRegionOps unassigned_mem_ops;
- bool memory_region_access_valid(MemoryRegion *mr, hwaddr addr,
-                                 unsigned size, bool is_write);
- 
--void mem_add(AddressSpace *as, FlatView *fv, MemoryRegionSection *section);
-+void mem_add(FlatView *fv, MemoryRegionSection *section);
- AddressSpaceDispatch *mem_begin(AddressSpace *as);
- void mem_commit(AddressSpaceDispatch *d);
- 
 diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 2346f8b863..7816e5d655 100644
+index 7816e5d655..d73430b543 100644
 --- a/include/exec/memory.h
 +++ b/include/exec/memory.h
-@@ -48,6 +48,7 @@
+@@ -309,8 +309,6 @@ struct AddressSpace {
+     struct rcu_head rcu;
+     char *name;
+     MemoryRegion *root;
+-    int ref_count;
+-    bool malloced;
  
- typedef struct MemoryRegionOps MemoryRegionOps;
- typedef struct MemoryRegionMmio MemoryRegionMmio;
-+typedef struct FlatView FlatView;
+     /* Accessed via RCU.  */
+     struct FlatView *current_map;
+@@ -1585,23 +1583,6 @@ MemTxResult memory_region_dispatch_write(MemoryRegion *mr,
+ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name);
  
- struct MemoryRegionMmio {
-     CPUReadMemoryFunc *read[3];
-@@ -320,6 +321,8 @@ struct AddressSpace {
-     QTAILQ_ENTRY(AddressSpace) address_spaces_link;
- };
- 
-+FlatView *address_space_to_flatview(AddressSpace *as);
-+
  /**
-  * MemoryRegionSection: describes a fragment of a #MemoryRegion
+- * address_space_init_shareable: return an address space for a memory region,
+- *                               creating it if it does not already exist
+- *
+- * @root: a #MemoryRegion that routes addresses for the address space
+- * @name: an address space name.  The name is only used for debugging
+- *        output.
+- *
+- * This function will return a pointer to an existing AddressSpace
+- * which was initialized with the specified MemoryRegion, or it will
+- * create and initialize one if it does not already exist. The ASes
+- * are reference-counted, so the memory will be freed automatically
+- * when the AddressSpace is destroyed via address_space_destroy.
+- */
+-AddressSpace *address_space_init_shareable(MemoryRegion *root,
+-                                           const char *name);
+-
+-/**
+  * address_space_destroy: destroy an address space
   *
-@@ -333,7 +336,7 @@ struct AddressSpace {
-  */
- struct MemoryRegionSection {
-     MemoryRegion *mr;
--    AddressSpace *address_space;
-+    FlatView *fv;
-     hwaddr offset_within_region;
-     Int128 size;
-     hwaddr offset_within_address_space;
-@@ -1842,9 +1845,17 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-  * @len: pointer to length
-  * @is_write: indicates the transfer direction
-  */
--MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
--                                      hwaddr *xlat, hwaddr *len,
--                                      bool is_write);
-+MemoryRegion *flatview_translate(FlatView *fv,
-+                                 hwaddr addr, hwaddr *xlat,
-+                                 hwaddr *len, bool is_write);
-+
-+static inline MemoryRegion *address_space_translate(AddressSpace *as,
-+                                                    hwaddr addr, hwaddr *xlat,
-+                                                    hwaddr *len, bool is_write)
-+{
-+    return flatview_translate(address_space_to_flatview(as),
-+                              addr, xlat, len, is_write);
-+}
+  * Releases all resources associated with an address space.  After an address space
+diff --git a/include/hw/arm/armv7m.h b/include/hw/arm/armv7m.h
+index 10eb058027..008000fe11 100644
+--- a/include/hw/arm/armv7m.h
++++ b/include/hw/arm/armv7m.h
+@@ -21,7 +21,7 @@ typedef struct {
+     SysBusDevice parent_obj;
+     /*< public >*/
  
- /* address_space_access_valid: check for validity of accessing an address
-  * space range
-@@ -1895,12 +1906,13 @@ void address_space_unmap(AddressSpace *as, void *buffer, hwaddr len,
- 
- 
- /* Internal functions, part of the implementation of address_space_read.  */
--MemTxResult address_space_read_continue(AddressSpace *as, hwaddr addr,
--                                        MemTxAttrs attrs, uint8_t *buf,
--                                        int len, hwaddr addr1, hwaddr l,
--					MemoryRegion *mr);
--MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
--                                    MemTxAttrs attrs, uint8_t *buf, int len);
-+MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
-+                                   MemTxAttrs attrs, uint8_t *buf,
-+                                   int len, hwaddr addr1, hwaddr l,
-+                                   MemoryRegion *mr);
-+
-+MemTxResult flatview_read_full(FlatView *fv, hwaddr addr,
-+                               MemTxAttrs attrs, uint8_t *buf, int len);
- void *qemu_map_ram_ptr(RAMBlock *ram_block, ram_addr_t addr);
- 
- static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
-@@ -1927,8 +1939,8 @@ static inline bool memory_access_is_direct(MemoryRegion *mr, bool is_write)
-  * @buf: buffer with the data transferred
-  */
- static inline __attribute__((__always_inline__))
--MemTxResult address_space_read(AddressSpace *as, hwaddr addr, MemTxAttrs attrs,
--                               uint8_t *buf, int len)
-+MemTxResult flatview_read(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
-+                          uint8_t *buf, int len)
- {
-     MemTxResult result = MEMTX_OK;
-     hwaddr l, addr1;
-@@ -1939,22 +1951,29 @@ MemTxResult address_space_read(AddressSpace *as, hwaddr addr, MemTxAttrs attrs,
-         if (len) {
-             rcu_read_lock();
-             l = len;
--            mr = address_space_translate(as, addr, &addr1, &l, false);
-+            mr = flatview_translate(fv, addr, &addr1, &l, false);
-             if (len == l && memory_access_is_direct(mr, false)) {
-                 ptr = qemu_map_ram_ptr(mr->ram_block, addr1);
-                 memcpy(buf, ptr, len);
-             } else {
--                result = address_space_read_continue(as, addr, attrs, buf, len,
--                                                     addr1, l, mr);
-+                result = flatview_read_continue(fv, addr, attrs, buf, len,
-+                                                addr1, l, mr);
-             }
-             rcu_read_unlock();
-         }
-     } else {
--        result = address_space_read_full(as, addr, attrs, buf, len);
-+        result = flatview_read_full(fv, addr, attrs, buf, len);
-     }
-     return result;
- }
- 
-+static inline MemTxResult address_space_read(AddressSpace *as, hwaddr addr,
-+                                             MemTxAttrs attrs, uint8_t *buf,
-+                                             int len)
-+{
-+    return flatview_read(address_space_to_flatview(as), addr, attrs, buf, len);
-+}
-+
- /**
-  * address_space_read_cached: read from a cached RAM region
-  *
-diff --git a/exec.c b/exec.c
-index 3212c5e70d..b561098df3 100644
---- a/exec.c
-+++ b/exec.c
-@@ -199,7 +199,7 @@ struct AddressSpaceDispatch {
- #define SUBPAGE_IDX(addr) ((addr) & ~TARGET_PAGE_MASK)
- typedef struct subpage_t {
+-    AddressSpace *source_as;
++    AddressSpace source_as;
      MemoryRegion iomem;
--    AddressSpace *as;
-+    FlatView *fv;
-     hwaddr base;
-     uint16_t sub_section[];
- } subpage_t;
-@@ -469,13 +469,13 @@ address_space_translate_internal(AddressSpaceDispatch *d, hwaddr addr, hwaddr *x
- }
- 
- /* Called from RCU critical section */
--static MemoryRegionSection address_space_do_translate(AddressSpace *as,
--                                                      hwaddr addr,
--                                                      hwaddr *xlat,
--                                                      hwaddr *plen,
--                                                      bool is_write,
--                                                      bool is_mmio,
--                                                      AddressSpace **target_as)
-+static MemoryRegionSection flatview_do_translate(FlatView *fv,
-+                                                 hwaddr addr,
-+                                                 hwaddr *xlat,
-+                                                 hwaddr *plen,
-+                                                 bool is_write,
-+                                                 bool is_mmio,
-+                                                 AddressSpace **target_as)
- {
-     IOMMUTLBEntry iotlb;
-     MemoryRegionSection *section;
-@@ -483,8 +483,9 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
-     IOMMUMemoryRegionClass *imrc;
- 
-     for (;;) {
--        AddressSpaceDispatch *d = address_space_to_dispatch(as);
--        section = address_space_translate_internal(d, addr, &addr, plen, is_mmio);
-+        section = address_space_translate_internal(
-+                flatview_to_dispatch(fv), addr, &addr,
-+                plen, is_mmio);
- 
-         iommu_mr = memory_region_get_iommu(section->mr);
-         if (!iommu_mr) {
-@@ -501,7 +502,7 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
-             goto translate_fail;
-         }
- 
--        as = iotlb.target_as;
-+        fv = address_space_to_flatview(iotlb.target_as);
-         *target_as = iotlb.target_as;
-     }
- 
-@@ -524,8 +525,8 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
-     plen = (hwaddr)-1;
- 
-     /* This can never be MMIO. */
--    section = address_space_do_translate(as, addr, &xlat, &plen,
--                                         is_write, false, &as);
-+    section = flatview_do_translate(address_space_to_flatview(as), addr,
-+                                    &xlat, &plen, is_write, false, &as);
- 
-     /* Illegal translation */
-     if (section.mr == &io_mem_unassigned) {
-@@ -561,16 +562,15 @@ iotlb_fail:
- }
- 
- /* Called from RCU critical section */
--MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
--                                      hwaddr *xlat, hwaddr *plen,
--                                      bool is_write)
-+MemoryRegion *flatview_translate(FlatView *fv, hwaddr addr, hwaddr *xlat,
-+                                 hwaddr *plen, bool is_write)
- {
-     MemoryRegion *mr;
-     MemoryRegionSection section;
-+    AddressSpace *as = NULL;
- 
-     /* This can be MMIO, so setup MMIO bit. */
--    section = address_space_do_translate(as, addr, xlat, plen, is_write, true,
--                                         &as);
-+    section = flatview_do_translate(fv, addr, xlat, plen, is_write, true, &as);
-     mr = section.mr;
- 
-     if (xen_enabled() && memory_access_is_direct(mr, is_write)) {
-@@ -1220,7 +1220,7 @@ hwaddr memory_region_section_get_iotlb(CPUState *cpu,
-     } else {
-         AddressSpaceDispatch *d;
- 
--        d = address_space_to_dispatch(section->address_space);
-+        d = flatview_to_dispatch(section->fv);
-         iotlb = section - d->map.sections;
-         iotlb += xlat;
-     }
-@@ -1246,7 +1246,7 @@ hwaddr memory_region_section_get_iotlb(CPUState *cpu,
- 
- static int subpage_register (subpage_t *mmio, uint32_t start, uint32_t end,
-                              uint16_t section);
--static subpage_t *subpage_init(AddressSpace *as, hwaddr base);
-+static subpage_t *subpage_init(FlatView *fv, hwaddr base);
- 
- static void *(*phys_mem_alloc)(size_t size, uint64_t *align) =
-                                qemu_anon_ram_alloc;
-@@ -1303,7 +1303,7 @@ static void phys_sections_free(PhysPageMap *map)
-     g_free(map->nodes);
- }
- 
--static void register_subpage(AddressSpace *as, AddressSpaceDispatch *d,
-+static void register_subpage(FlatView *fv, AddressSpaceDispatch *d,
-                              MemoryRegionSection *section)
- {
-     subpage_t *subpage;
-@@ -1319,8 +1319,8 @@ static void register_subpage(AddressSpace *as, AddressSpaceDispatch *d,
-     assert(existing->mr->subpage || existing->mr == &io_mem_unassigned);
- 
-     if (!(existing->mr->subpage)) {
--        subpage = subpage_init(as, base);
--        subsection.address_space = as;
-+        subpage = subpage_init(fv, base);
-+        subsection.fv = fv;
-         subsection.mr = &subpage->iomem;
-         phys_page_set(d, base >> TARGET_PAGE_BITS, 1,
-                       phys_section_add(&d->map, &subsection));
-@@ -1346,7 +1346,7 @@ static void register_multipage(AddressSpaceDispatch *d,
-     phys_page_set(d, start_addr >> TARGET_PAGE_BITS, num_pages, section_index);
- }
- 
--void mem_add(AddressSpace *as, FlatView *fv, MemoryRegionSection *section)
-+void mem_add(FlatView *fv, MemoryRegionSection *section)
- {
-     AddressSpaceDispatch *d = flatview_to_dispatch(fv);
-     MemoryRegionSection now = *section, remain = *section;
-@@ -1357,7 +1357,7 @@ void mem_add(AddressSpace *as, FlatView *fv, MemoryRegionSection *section)
-                        - now.offset_within_address_space;
- 
-         now.size = int128_min(int128_make64(left), now.size);
--        register_subpage(as, d, &now);
-+        register_subpage(fv, d, &now);
-     } else {
-         now.size = int128_zero();
-     }
-@@ -1367,10 +1367,10 @@ void mem_add(AddressSpace *as, FlatView *fv, MemoryRegionSection *section)
-         remain.offset_within_region += int128_get64(now.size);
-         now = remain;
-         if (int128_lt(remain.size, page_size)) {
--            register_subpage(as, d, &now);
-+            register_subpage(fv, d, &now);
-         } else if (remain.offset_within_address_space & ~TARGET_PAGE_MASK) {
-             now.size = page_size;
--            register_subpage(as, d, &now);
-+            register_subpage(fv, d, &now);
-         } else {
-             now.size = int128_and(now.size, int128_neg(page_size));
-             register_multipage(d, &now);
-@@ -2501,6 +2501,11 @@ static const MemoryRegionOps watch_mem_ops = {
-     .endianness = DEVICE_NATIVE_ENDIAN,
- };
- 
-+static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
-+                                  const uint8_t *buf, int len);
-+static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
-+                                  bool is_write);
+     uint32_t base;
+     MemoryRegion *source_memory;
+diff --git a/cpus.c b/cpus.c
+index 9bed61eefc..c9a624003a 100644
+--- a/cpus.c
++++ b/cpus.c
+@@ -1764,8 +1764,9 @@ void qemu_init_vcpu(CPUState *cpu)
+         /* If the target cpu hasn't set up any address spaces itself,
+          * give it the default one.
+          */
+-        AddressSpace *as = address_space_init_shareable(cpu->memory,
+-                                                        "cpu-memory");
++        AddressSpace *as = g_new0(AddressSpace, 1);
 +
- static MemTxResult subpage_read(void *opaque, hwaddr addr, uint64_t *data,
-                                 unsigned len, MemTxAttrs attrs)
- {
-@@ -2512,8 +2517,7 @@ static MemTxResult subpage_read(void *opaque, hwaddr addr, uint64_t *data,
-     printf("%s: subpage %p len %u addr " TARGET_FMT_plx "\n", __func__,
-            subpage, len, addr);
- #endif
--    res = address_space_read(subpage->as, addr + subpage->base,
--                             attrs, buf, len);
-+    res = flatview_read(subpage->fv, addr + subpage->base, attrs, buf, len);
++        address_space_init(as, cpu->memory, "cpu-memory");
+         cpu->num_ases = 1;
+         cpu_address_space_init(cpu, as, 0);
+     }
+diff --git a/hw/arm/armv7m.c b/hw/arm/armv7m.c
+index b64a409b40..4900339646 100644
+--- a/hw/arm/armv7m.c
++++ b/hw/arm/armv7m.c
+@@ -41,7 +41,7 @@ static MemTxResult bitband_read(void *opaque, hwaddr offset,
+ 
+     /* Find address in underlying memory and round down to multiple of size */
+     addr = bitband_addr(s, offset) & (-size);
+-    res = address_space_read(s->source_as, addr, attrs, buf, size);
++    res = address_space_read(&s->source_as, addr, attrs, buf, size);
      if (res) {
          return res;
      }
-@@ -2562,8 +2566,7 @@ static MemTxResult subpage_write(void *opaque, hwaddr addr,
-     default:
-         abort();
+@@ -66,7 +66,7 @@ static MemTxResult bitband_write(void *opaque, hwaddr offset, uint64_t value,
+ 
+     /* Find address in underlying memory and round down to multiple of size */
+     addr = bitband_addr(s, offset) & (-size);
+-    res = address_space_read(s->source_as, addr, attrs, buf, size);
++    res = address_space_read(&s->source_as, addr, attrs, buf, size);
+     if (res) {
+         return res;
      }
--    return address_space_write(subpage->as, addr + subpage->base,
--                               attrs, buf, len);
-+    return flatview_write(subpage->fv, addr + subpage->base, attrs, buf, len);
- }
- 
- static bool subpage_accepts(void *opaque, hwaddr addr,
-@@ -2575,8 +2578,8 @@ static bool subpage_accepts(void *opaque, hwaddr addr,
-            __func__, subpage, is_write ? 'w' : 'r', len, addr);
- #endif
- 
--    return address_space_access_valid(subpage->as, addr + subpage->base,
--                                      len, is_write);
-+    return flatview_access_valid(subpage->fv, addr + subpage->base,
-+                                 len, is_write);
- }
- 
- static const MemoryRegionOps subpage_ops = {
-@@ -2610,12 +2613,12 @@ static int subpage_register (subpage_t *mmio, uint32_t start, uint32_t end,
-     return 0;
- }
- 
--static subpage_t *subpage_init(AddressSpace *as, hwaddr base)
-+static subpage_t *subpage_init(FlatView *fv, hwaddr base)
- {
-     subpage_t *mmio;
- 
-     mmio = g_malloc0(sizeof(subpage_t) + TARGET_PAGE_SIZE * sizeof(uint16_t));
--    mmio->as = as;
-+    mmio->fv = fv;
-     mmio->base = base;
-     memory_region_init_io(&mmio->iomem, NULL, &subpage_ops, mmio,
-                           NULL, TARGET_PAGE_SIZE);
-@@ -2629,12 +2632,11 @@ static subpage_t *subpage_init(AddressSpace *as, hwaddr base)
-     return mmio;
- }
- 
--static uint16_t dummy_section(PhysPageMap *map, AddressSpace *as,
--                              MemoryRegion *mr)
-+static uint16_t dummy_section(PhysPageMap *map, FlatView *fv, MemoryRegion *mr)
- {
--    assert(as);
-+    assert(fv);
-     MemoryRegionSection section = {
--        .address_space = as,
-+        .fv = fv,
-         .mr = mr,
-         .offset_within_address_space = 0,
-         .offset_within_region = 0,
-@@ -2673,16 +2675,17 @@ static void io_mem_init(void)
- 
- AddressSpaceDispatch *mem_begin(AddressSpace *as)
- {
-+    FlatView *fv = address_space_to_flatview(as);
-     AddressSpaceDispatch *d = g_new0(AddressSpaceDispatch, 1);
-     uint16_t n;
- 
--    n = dummy_section(&d->map, as, &io_mem_unassigned);
-+    n = dummy_section(&d->map, fv, &io_mem_unassigned);
-     assert(n == PHYS_SECTION_UNASSIGNED);
--    n = dummy_section(&d->map, as, &io_mem_notdirty);
-+    n = dummy_section(&d->map, fv, &io_mem_notdirty);
-     assert(n == PHYS_SECTION_NOTDIRTY);
--    n = dummy_section(&d->map, as, &io_mem_rom);
-+    n = dummy_section(&d->map, fv, &io_mem_rom);
-     assert(n == PHYS_SECTION_ROM);
--    n = dummy_section(&d->map, as, &io_mem_watch);
-+    n = dummy_section(&d->map, fv, &io_mem_watch);
-     assert(n == PHYS_SECTION_WATCH);
- 
-     d->phys_map  = (PhysPageEntry) { .ptr = PHYS_MAP_NODE_NIL, .skip = 1 };
-@@ -2862,11 +2865,11 @@ static bool prepare_mmio_access(MemoryRegion *mr)
- }
- 
- /* Called within RCU critical section.  */
--static MemTxResult address_space_write_continue(AddressSpace *as, hwaddr addr,
--                                                MemTxAttrs attrs,
--                                                const uint8_t *buf,
--                                                int len, hwaddr addr1,
--                                                hwaddr l, MemoryRegion *mr)
-+static MemTxResult flatview_write_continue(FlatView *fv, hwaddr addr,
-+                                           MemTxAttrs attrs,
-+                                           const uint8_t *buf,
-+                                           int len, hwaddr addr1,
-+                                           hwaddr l, MemoryRegion *mr)
- {
-     uint8_t *ptr;
-     uint64_t val;
-@@ -2928,14 +2931,14 @@ static MemTxResult address_space_write_continue(AddressSpace *as, hwaddr addr,
-         }
- 
-         l = len;
--        mr = address_space_translate(as, addr, &addr1, &l, true);
-+        mr = flatview_translate(fv, addr, &addr1, &l, true);
-     }
- 
-     return result;
- }
- 
--MemTxResult address_space_write(AddressSpace *as, hwaddr addr, MemTxAttrs attrs,
--                                const uint8_t *buf, int len)
-+static MemTxResult flatview_write(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
-+                                  const uint8_t *buf, int len)
- {
-     hwaddr l;
-     hwaddr addr1;
-@@ -2945,20 +2948,27 @@ MemTxResult address_space_write(AddressSpace *as, hwaddr addr, MemTxAttrs attrs,
-     if (len > 0) {
-         rcu_read_lock();
-         l = len;
--        mr = address_space_translate(as, addr, &addr1, &l, true);
--        result = address_space_write_continue(as, addr, attrs, buf, len,
--                                              addr1, l, mr);
-+        mr = flatview_translate(fv, addr, &addr1, &l, true);
-+        result = flatview_write_continue(fv, addr, attrs, buf, len,
-+                                         addr1, l, mr);
-         rcu_read_unlock();
-     }
- 
-     return result;
- }
- 
-+MemTxResult address_space_write(AddressSpace *as, hwaddr addr,
-+                                              MemTxAttrs attrs,
-+                                              const uint8_t *buf, int len)
-+{
-+    return flatview_write(address_space_to_flatview(as), addr, attrs, buf, len);
-+}
-+
- /* Called within RCU critical section.  */
--MemTxResult address_space_read_continue(AddressSpace *as, hwaddr addr,
--                                        MemTxAttrs attrs, uint8_t *buf,
--                                        int len, hwaddr addr1, hwaddr l,
--                                        MemoryRegion *mr)
-+MemTxResult flatview_read_continue(FlatView *fv, hwaddr addr,
-+                                   MemTxAttrs attrs, uint8_t *buf,
-+                                   int len, hwaddr addr1, hwaddr l,
-+                                   MemoryRegion *mr)
- {
-     uint8_t *ptr;
-     uint64_t val;
-@@ -3018,14 +3028,14 @@ MemTxResult address_space_read_continue(AddressSpace *as, hwaddr addr,
-         }
- 
-         l = len;
--        mr = address_space_translate(as, addr, &addr1, &l, false);
-+        mr = flatview_translate(fv, addr, &addr1, &l, false);
-     }
- 
-     return result;
- }
- 
--MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
--                                    MemTxAttrs attrs, uint8_t *buf, int len)
-+MemTxResult flatview_read_full(FlatView *fv, hwaddr addr,
-+                               MemTxAttrs attrs, uint8_t *buf, int len)
- {
-     hwaddr l;
-     hwaddr addr1;
-@@ -3035,25 +3045,33 @@ MemTxResult address_space_read_full(AddressSpace *as, hwaddr addr,
-     if (len > 0) {
-         rcu_read_lock();
-         l = len;
--        mr = address_space_translate(as, addr, &addr1, &l, false);
--        result = address_space_read_continue(as, addr, attrs, buf, len,
--                                             addr1, l, mr);
-+        mr = flatview_translate(fv, addr, &addr1, &l, false);
-+        result = flatview_read_continue(fv, addr, attrs, buf, len,
-+                                        addr1, l, mr);
-         rcu_read_unlock();
-     }
- 
-     return result;
- }
- 
--MemTxResult address_space_rw(AddressSpace *as, hwaddr addr, MemTxAttrs attrs,
--                             uint8_t *buf, int len, bool is_write)
-+static MemTxResult flatview_rw(FlatView *fv, hwaddr addr, MemTxAttrs attrs,
-+                               uint8_t *buf, int len, bool is_write)
- {
-     if (is_write) {
--        return address_space_write(as, addr, attrs, (uint8_t *)buf, len);
-+        return flatview_write(fv, addr, attrs, (uint8_t *)buf, len);
+@@ -79,7 +79,7 @@ static MemTxResult bitband_write(void *opaque, hwaddr offset, uint64_t value,
      } else {
--        return address_space_read(as, addr, attrs, (uint8_t *)buf, len);
-+        return flatview_read(fv, addr, attrs, (uint8_t *)buf, len);
+         buf[bitpos >> 3] &= ~bit;
      }
+-    return address_space_write(s->source_as, addr, attrs, buf, size);
++    return address_space_write(&s->source_as, addr, attrs, buf, size);
  }
  
-+MemTxResult address_space_rw(AddressSpace *as, hwaddr addr,
-+                             MemTxAttrs attrs, uint8_t *buf,
-+                             int len, bool is_write)
-+{
-+    return flatview_rw(address_space_to_flatview(as),
-+                       addr, attrs, buf, len, is_write);
-+}
-+
- void cpu_physical_memory_rw(hwaddr addr, uint8_t *buf,
-                             int len, int is_write)
- {
-@@ -3211,7 +3229,8 @@ static void cpu_notify_map_clients(void)
-     qemu_mutex_unlock(&map_client_list_lock);
- }
- 
--bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len, bool is_write)
-+static bool flatview_access_valid(FlatView *fv, hwaddr addr, int len,
-+                                  bool is_write)
- {
-     MemoryRegion *mr;
-     hwaddr l, xlat;
-@@ -3219,7 +3238,7 @@ bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len, bool is_
-     rcu_read_lock();
-     while (len > 0) {
-         l = len;
--        mr = address_space_translate(as, addr, &xlat, &l, is_write);
-+        mr = flatview_translate(fv, addr, &xlat, &l, is_write);
-         if (!memory_access_is_direct(mr, is_write)) {
-             l = memory_access_size(mr, l, addr);
-             if (!memory_region_access_valid(mr, xlat, l, is_write)) {
-@@ -3235,8 +3254,16 @@ bool address_space_access_valid(AddressSpace *as, hwaddr addr, int len, bool is_
-     return true;
- }
- 
-+bool address_space_access_valid(AddressSpace *as, hwaddr addr,
-+                                int len, bool is_write)
-+{
-+    return flatview_access_valid(address_space_to_flatview(as),
-+                                 addr, len, is_write);
-+}
-+
- static hwaddr
--address_space_extend_translation(AddressSpace *as, hwaddr addr, hwaddr target_len,
-+flatview_extend_translation(FlatView *fv, hwaddr addr,
-+                                 hwaddr target_len,
-                                  MemoryRegion *mr, hwaddr base, hwaddr len,
-                                  bool is_write)
- {
-@@ -3253,7 +3280,8 @@ address_space_extend_translation(AddressSpace *as, hwaddr addr, hwaddr target_le
-         }
- 
-         len = target_len;
--        this_mr = address_space_translate(as, addr, &xlat, &len, is_write);
-+        this_mr = flatview_translate(fv, addr, &xlat,
-+                                                   &len, is_write);
-         if (this_mr != mr || xlat != base + done) {
-             return done;
-         }
-@@ -3276,6 +3304,7 @@ void *address_space_map(AddressSpace *as,
-     hwaddr l, xlat;
-     MemoryRegion *mr;
-     void *ptr;
-+    FlatView *fv = address_space_to_flatview(as);
- 
-     if (len == 0) {
-         return NULL;
-@@ -3283,7 +3312,7 @@ void *address_space_map(AddressSpace *as,
- 
-     l = len;
-     rcu_read_lock();
--    mr = address_space_translate(as, addr, &xlat, &l, is_write);
-+    mr = flatview_translate(fv, addr, &xlat, &l, is_write);
- 
-     if (!memory_access_is_direct(mr, is_write)) {
-         if (atomic_xchg(&bounce.in_use, true)) {
-@@ -3299,7 +3328,7 @@ void *address_space_map(AddressSpace *as,
-         memory_region_ref(mr);
-         bounce.mr = mr;
-         if (!is_write) {
--            address_space_read(as, addr, MEMTXATTRS_UNSPECIFIED,
-+            flatview_read(fv, addr, MEMTXATTRS_UNSPECIFIED,
-                                bounce.buffer, l);
-         }
- 
-@@ -3310,7 +3339,8 @@ void *address_space_map(AddressSpace *as,
- 
- 
-     memory_region_ref(mr);
--    *plen = address_space_extend_translation(as, addr, len, mr, xlat, l, is_write);
-+    *plen = flatview_extend_translation(fv, addr, len, mr, xlat,
-+                                             l, is_write);
-     ptr = qemu_ram_ptr_length(mr->ram_block, xlat, plen, true);
-     rcu_read_unlock();
- 
-diff --git a/hw/intc/openpic_kvm.c b/hw/intc/openpic_kvm.c
-index 0518e017c4..fa83420254 100644
---- a/hw/intc/openpic_kvm.c
-+++ b/hw/intc/openpic_kvm.c
-@@ -124,7 +124,7 @@ static void kvm_openpic_region_add(MemoryListener *listener,
-     uint64_t reg_base;
-     int ret;
- 
--    if (section->address_space != &address_space_memory) {
-+    if (section->fv != address_space_to_flatview(&address_space_memory)) {
-         abort();
+ static const MemoryRegionOps bitband_ops = {
+@@ -111,8 +111,7 @@ static void bitband_realize(DeviceState *dev, Error **errp)
+         return;
      }
  
+-    s->source_as = address_space_init_shareable(s->source_memory,
+-                                                "bitband-source");
++    address_space_init(&s->source_as, s->source_memory, "bitband-source");
+ }
+ 
+ /* Board init.  */
 diff --git a/memory.c b/memory.c
-index 7d28aec5e3..d208106032 100644
+index 6fca8bf932..c12507d26d 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -154,7 +154,8 @@ enum ListenerDirection { Forward, Reverse };
- /* No need to ref/unref .mr, the FlatRange keeps it alive.  */
- #define MEMORY_LISTENER_UPDATE_REGION(fr, as, dir, callback, _args...)  \
-     do {                                                                \
--        MemoryRegionSection mrs = section_from_flat_range(fr, as);      \
-+        MemoryRegionSection mrs = section_from_flat_range(fr,           \
-+                address_space_to_flatview(as));                         \
-         MEMORY_LISTENER_CALL(as, callback, dir, &mrs, ##_args);         \
-     } while(0)
- 
-@@ -238,11 +239,11 @@ typedef struct AddressSpaceOps AddressSpaceOps;
-     for (var = (view)->ranges; var < (view)->ranges + (view)->nr; ++var)
- 
- static inline MemoryRegionSection
--section_from_flat_range(FlatRange *fr, AddressSpace *as)
-+section_from_flat_range(FlatRange *fr, FlatView *fv)
+@@ -2689,9 +2689,7 @@ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
  {
-     return (MemoryRegionSection) {
-         .mr = fr->mr,
--        .address_space = as,
-+        .fv = fv,
-         .offset_within_region = fr->offset_in_region,
-         .size = fr->addr.size,
-         .offset_within_address_space = int128_get64(fr->addr.start),
-@@ -312,7 +313,7 @@ static void flatview_unref(FlatView *view)
-     }
+     memory_region_ref(root);
+     memory_region_transaction_begin();
+-    as->ref_count = 1;
+     as->root = root;
+-    as->malloced = false;
+     as->current_map = flatview_new(root);
+     as->ioeventfd_nb = 0;
+     as->ioeventfds = NULL;
+@@ -2704,37 +2702,19 @@ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
+ 
+ static void do_address_space_destroy(AddressSpace *as)
+ {
+-    bool do_free = as->malloced;
+-
+     assert(QTAILQ_EMPTY(&as->listeners));
+ 
+     flatview_unref(as->current_map);
+     g_free(as->name);
+     g_free(as->ioeventfds);
+     memory_region_unref(as->root);
+-    if (do_free) {
+-        g_free(as);
+-    }
+-}
+-
+-AddressSpace *address_space_init_shareable(MemoryRegion *root, const char *name)
+-{
+-    AddressSpace *as;
+-
+-    as = g_malloc0(sizeof *as);
+-    address_space_init(as, root, name);
+-    as->malloced = true;
+-    return as;
++    g_free(as);
  }
  
--static FlatView *address_space_to_flatview(AddressSpace *as)
-+FlatView *address_space_to_flatview(AddressSpace *as)
+ void address_space_destroy(AddressSpace *as)
  {
-     return atomic_rcu_read(&as->current_map);
- }
-@@ -760,7 +761,7 @@ static void address_space_add_del_ioeventfds(AddressSpace *as,
-                                                   fds_new[inew]))) {
-             fd = &fds_old[iold];
-             section = (MemoryRegionSection) {
--                .address_space = as,
-+                .fv = address_space_to_flatview(as),
-                 .offset_within_address_space = int128_get64(fd->addr.start),
-                 .size = fd->addr.size,
-             };
-@@ -773,7 +774,7 @@ static void address_space_add_del_ioeventfds(AddressSpace *as,
-                                                          fds_old[iold]))) {
-             fd = &fds_new[inew];
-             section = (MemoryRegionSection) {
--                .address_space = as,
-+                .fv = address_space_to_flatview(as),
-                 .offset_within_address_space = int128_get64(fd->addr.start),
-                 .size = fd->addr.size,
-             };
-@@ -908,8 +909,8 @@ static void address_space_update_topology(AddressSpace *as)
-     new_view->dispatch = mem_begin(as);
-     for (i = 0; i < new_view->nr; i++) {
-         MemoryRegionSection mrs =
--            section_from_flat_range(&new_view->ranges[i], as);
--        mem_add(as, new_view, &mrs);
-+            section_from_flat_range(&new_view->ranges[i], new_view);
-+        mem_add(new_view, &mrs);
-     }
-     mem_commit(new_view->dispatch);
+     MemoryRegion *root = as->root;
  
-@@ -1863,7 +1864,7 @@ void memory_region_sync_dirty_bitmap(MemoryRegion *mr)
-         view = address_space_get_flatview(as);
-         FOR_EACH_FLAT_RANGE(fr, view) {
-             if (fr->mr == mr) {
--                MemoryRegionSection mrs = section_from_flat_range(fr, as);
-+                MemoryRegionSection mrs = section_from_flat_range(fr, view);
-                 listener->log_sync(listener, &mrs);
-             }
+-    as->ref_count--;
+-    if (as->ref_count) {
+-        return;
+-    }
+     /* Flush out anything from MemoryListeners listening in on this */
+     memory_region_transaction_begin();
+     as->root = NULL;
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 412e94c7ad..bba24f4590 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -684,6 +684,9 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+     CPUARMState *env = &cpu->env;
+     int pagebits;
+     Error *local_err = NULL;
++#ifndef CONFIG_USER_ONLY
++    AddressSpace *as;
++#endif
+ 
+     cpu_exec_realizefn(cs, &local_err);
+     if (local_err != NULL) {
+@@ -874,24 +877,21 @@ static void arm_cpu_realizefn(DeviceState *dev, Error **errp)
+ 
+ #ifndef CONFIG_USER_ONLY
+     if (cpu->has_el3 || arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+-        AddressSpace *as;
++        as = g_new0(AddressSpace, 1);
+ 
+         cs->num_ases = 2;
+ 
+         if (!cpu->secure_memory) {
+             cpu->secure_memory = cs->memory;
          }
-@@ -1966,7 +1967,7 @@ static void memory_region_update_coalesced_range_as(MemoryRegion *mr, AddressSpa
-     FOR_EACH_FLAT_RANGE(fr, view) {
-         if (fr->mr == mr) {
-             section = (MemoryRegionSection) {
--                .address_space = as,
-+                .fv = view,
-                 .offset_within_address_space = int128_get64(fr->addr.start),
-                 .size = fr->addr.size,
-             };
-@@ -2328,7 +2329,7 @@ static MemoryRegionSection memory_region_find_rcu(MemoryRegion *mr,
+-        as = address_space_init_shareable(cpu->secure_memory,
+-                                          "cpu-secure-memory");
++        address_space_init(as, cpu->secure_memory, "cpu-secure-memory");
+         cpu_address_space_init(cs, as, ARMASIdx_S);
+     } else {
+         cs->num_ases = 1;
      }
+-
+-    cpu_address_space_init(cs,
+-                           address_space_init_shareable(cs->memory,
+-                                                        "cpu-memory"),
+-                           ARMASIdx_NS);
++    as = g_new0(AddressSpace, 1);
++    address_space_init(as, cs->memory, "cpu-memory");
++    cpu_address_space_init(cs, as, ARMASIdx_NS);
+ #endif
  
-     ret.mr = fr->mr;
--    ret.address_space = as;
-+    ret.fv = view;
-     range = addrrange_intersection(range, fr->addr);
-     ret.offset_within_region = fr->offset_in_region;
-     ret.offset_within_region += int128_get64(int128_sub(range.start,
-@@ -2377,7 +2378,8 @@ void memory_global_dirty_log_sync(void)
-         view = address_space_get_flatview(as);
-         FOR_EACH_FLAT_RANGE(fr, view) {
-             if (fr->dirty_log_mask) {
--                MemoryRegionSection mrs = section_from_flat_range(fr, as);
-+                MemoryRegionSection mrs = section_from_flat_range(fr, view);
+     qemu_init_vcpu(cs);
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 69676e13e1..11178300ee 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -3741,10 +3741,11 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+ 
+ #ifndef CONFIG_USER_ONLY
+     if (tcg_enabled()) {
+-        AddressSpace *as_normal = address_space_init_shareable(cs->memory,
+-                                                               "cpu-memory");
++        AddressSpace *as_normal = g_new0(AddressSpace, 1);
+         AddressSpace *as_smm = g_new(AddressSpace, 1);
+ 
++        address_space_init(as_normal, cs->memory, "cpu-memory");
 +
-                 listener->log_sync(listener, &mrs);
-             }
-         }
-@@ -2462,7 +2464,7 @@ static void listener_add_address_space(MemoryListener *listener,
-     FOR_EACH_FLAT_RANGE(fr, view) {
-         MemoryRegionSection section = {
-             .mr = fr->mr,
--            .address_space = as,
-+            .fv = view,
-             .offset_within_region = fr->offset_in_region,
-             .size = fr->addr.size,
-             .offset_within_address_space = int128_get64(fr->addr.start),
+         cpu->cpu_as_mem = g_new(MemoryRegion, 1);
+         cpu->cpu_as_root = g_new(MemoryRegion, 1);
+ 
 -- 
 2.11.0
