@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34148)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dtm2p-0006Ij-DE
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:44:27 -0400
+	(envelope-from <famz@redhat.com>) id 1dtm2x-0006MF-CZ
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:44:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dtm2o-00059Y-JT
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:44:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48244)
+	(envelope-from <famz@redhat.com>) id 1dtm2w-0005By-Kg
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:44:31 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48468)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dtm2o-00059M-DG
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:44:22 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dtm2w-0005Bh-EZ
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:44:30 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Mon, 18 Sep 2017 10:43:51 +0800
-Message-Id: <20170918024402.3265-3-famz@redhat.com>
+Date: Mon, 18 Sep 2017 10:43:52 +0800
+Message-Id: <20170918024402.3265-4-famz@redhat.com>
 In-Reply-To: <20170918024402.3265-1-famz@redhat.com>
 References: <20170918024402.3265-1-famz@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v8 02/13] qemu.py: Add "wait()" method
+Subject: [Qemu-devel] [PATCH v8 03/13] scripts: Add archive-source.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +27,49 @@ To: qemu-devel@nongnu.org
 Cc: berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 ---
- scripts/qemu.py | 7 +++++++
- 1 file changed, 7 insertions(+)
+ scripts/archive-source.sh | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
+ create mode 100755 scripts/archive-source.sh
 
-diff --git a/scripts/qemu.py b/scripts/qemu.py
-index 8c67595ec8..774e201e8b 100644
---- a/scripts/qemu.py
-+++ b/scripts/qemu.py
-@@ -215,6 +215,13 @@ class QEMUMachine(object):
-                 LOG.debug('Output: %r', self._iolog)
-             raise
-=20
-+    def wait(self):
-+        '''Wait for the VM to power off'''
-+        self._popen.wait()
-+        self._qmp.close()
-+        self._load_io_log()
-+        self._post_shutdown()
+diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+new file mode 100755
+index 0000000000..8b373e3090
+--- /dev/null
++++ b/scripts/archive-source.sh
+@@ -0,0 +1,33 @@
++#!/bin/sh
++#
++# Author: Fam Zheng <famz@redhat.com>
++#
++# Archive source tree, including submodules. This is created for test code to
++# export the source files, in order to be built in a different enviornment,
++# such as in a docker instance or VM.
++#
++# This code is licensed under the GPL version 2 or later.  See
++# the COPYING file in the top-level directory.
 +
-     def shutdown(self):
-         '''Terminate the VM and clean up'''
-         if self.is_running():
---=20
++set -e
++
++if test $# -lt 1; then
++    echo "Usage: $0 <output tarball>"
++    exit 1
++fi
++
++submodules=$(git submodule foreach --recursive --quiet 'echo $name')
++
++if test -n "$submodules"; then
++    {
++        git ls-files
++        for sm in $submodules; do
++            (cd $sm; git ls-files) | sed "s:^:$sm/:"
++        done
++    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > "$1".list
++else
++    git ls-files > "$1".list
++fi
++
++tar -cf "$1" -T "$1".list
++rm "$1".list
+-- 
 2.13.5
