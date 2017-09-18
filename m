@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52560)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dtuvL-0007HD-4v
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:13:16 -0400
+	(envelope-from <arei.gonglei@huawei.com>) id 1dtuvn-0007c0-FC
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:13:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dtuvH-0007ZS-KE
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:13:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54260)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dtuvH-0007Yo-Da
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:13:11 -0400
-References: <20170918085542.13265-1-cohuck@redhat.com>
-	<33493193-b9fc-e76f-f30e-c23d68e34289@redhat.com>
-	<20170918141127.17b669a7.cohuck@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <2e19455c-2af8-dad4-febb-c65e1e7d7a3c@redhat.com>
-Date: Mon, 18 Sep 2017 14:13:07 +0200
+	(envelope-from <arei.gonglei@huawei.com>) id 1dtuvj-0007mR-Ds
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:13:43 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:4493)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <arei.gonglei@huawei.com>) id 1dtuvi-0007iR-Cg
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:13:39 -0400
+From: "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Date: Mon, 18 Sep 2017 12:13:10 +0000
+Message-ID: <33183CC9F5247A488A2544077AF19020DA3D9A7B@DGGEMA505-MBX.china.huawei.com>
+References: <1505092362-10544-1-git-send-email-longpeng2@huawei.com>
+	<1505092362-10544-2-git-send-email-longpeng2@huawei.com>
+	<67d5549e-84de-ee85-00a7-37edc52234c4@linux.vnet.ibm.com>
+In-Reply-To: <67d5549e-84de-ee85-00a7-37edc52234c4@linux.vnet.ibm.com>
+Content-Language: zh-CN
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20170918141127.17b669a7.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] s390x/ccw: create s390 phb for compat
- reasons as well
+Subject: Re: [Qemu-devel] [PATCH REPOST v19 1/2] virtio-crypto: Add virtio
+ crypto device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,72 +30,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, longpeng <longpeng2@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "agraf@suse.de" <agraf@suse.de>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, Luonengjun <luonengjun@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>
 
-On 18.09.2017 14:11, Cornelia Huck wrote:
-> On Mon, 18 Sep 2017 14:03:20 +0200
-> David Hildenbrand <david@redhat.com> wrote:
-> 
->> On 18.09.2017 10:55, Cornelia Huck wrote:
->>> d32bd032d8 ("s390x/ccw: create s390 phb conditionally") made
->>> registering the s390 pci host bridge conditional on presense
->>> of the zpci facility bit. Sadly, that breaks migration from
->>> machines that did not use the cpu model (2.7 and previous).
->>>
->>> Create the s390 phb for pre-cpu model machines as well: We can
->>> tweak s390_has_feat() to always indicate the zpci facility bit
->>> when no cpu model is available (on 2.7 and previous compat machines).
->>>
->>> Fixes: d32bd032d8 ("s390x/ccw: create s390 phb conditionally")
->>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
->>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>> ---
->>>
->>> v2->v3:
->>> - no longer RFC (I tested a bit more)
->>> - removed unrelated hunk
->>> - more verbose patch description
->>>
->>> I'll wait a bit for more acks/reviews and will probably send a pull
->>> request for s390x tomorrow or so before the amount of queued patches
->>> gets out of hand...
->>>
->>> ---
->>>  target/s390x/cpu_models.c | 3 +++
->>>  1 file changed, 3 insertions(+)
->>>
->>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
->>> index c295e641e6..5169379db5 100644
->>> --- a/target/s390x/cpu_models.c
->>> +++ b/target/s390x/cpu_models.c
->>> @@ -196,6 +196,9 @@ bool s390_has_feat(S390Feat feat)
->>>              }
->>>          }
->>>  #endif
->>> +        if (feat == S390_FEAT_ZPCI) {
->>> +            return true;
->>> +        }
->>>          return 0;
->>>      }
->>>      return test_bit(feat, cpu->model->features);
->>>   
->>
->> 1. cpu->model will always be set for QEMU, so you can move that into the
->> ifdef, next do the other checks. You can even send a cleanup to remove
->> the if (kvm_enabled()) check.
-> 
-> I prefer it the way it is now. There's nothing kvm specific about that
-> bit, and cpu->model always being set is not really obvious.
-> 
-
-I's already kvm specific as this can never happen with TCG :)
-
-But whatever you prefer. This is good enough to fix the problem.
-
-
--- 
-
-Thanks,
-
-David
+Pg0KPiA+ICsNCj4gPiArVGhlIGluZm9ybWF0aW9uIHJlcXVpcmVkIGJ5IEFFQUQgc2Vzc2lvbiBj
+cmVhdGlvbiBpcyBzdG9yZWQgaW4gdGhlDQo+IHZpcnRpb19jcnlwdG9fYWVhZF9jcmVhdGVfc2Vz
+c2lvbl9yZXENCj4gPiArc3RydWN0dXJlLCBpbmNsdWRpbmcgdGhlIGFlYWQgcGFyYW1ldGVycyBz
+dG9yZWQgaW4gXGZpZWxke3BhcmF9IGFuZCB0aGUNCj4gY2lwaGVyIGtleSBpbiBcZmllbGR7a2V5
+fS4NCj4gPiArXGZpZWxke2lucHV0fSBzdG9yZXMgdGhlIHJlc3VsdCBvZiB0aGlzIG9wZXJhdGlv
+bi4NCj4gPiArDQo+ID4gK1xkcml2ZXJub3JtYXRpdmV7XHN1YnBhcmFncmFwaH17U2Vzc2lvbiBv
+cGVyYXRpb246IGNyZWF0ZSBzZXNzaW9ufXtEZXZpY2UNCj4gVHlwZXMgLyBDcnlwdG8gRGV2aWNl
+IC8gRGV2aWNlIE9wZXJhdGlvbiAvIENvbnRyb2wgVmlydHF1ZXVlIC8gU2Vzc2lvbg0KPiBvcGVy
+YXRpb24gLyBTZXNzaW9uIG9wZXJhdGlvbjogY3JlYXRlIHNlc3Npb259DQo+ID4gKw0KPiA+ICtc
+YmVnaW57aXRlbWl6ZSp9DQo+ID4gK1xpdGVtIFRoZSBkcml2ZXIgTVVTVCBzZXQgdGhlIGNvbnRy
+b2wgZ2VuZXJhbCBoZWFkZXIgYW5kIHRoZQ0KPiBjb3JyZXNwb25kaW5nIGFsZ29yaXRobS1zcGVj
+aWZpYyBzdHJ1Y3R1cmUuDQo+ID4gKyAgICBTZWUgXHJlZntzZWM6RGV2aWNlIFR5cGVzIC8gQ3J5
+cHRvIERldmljZSAvIERldmljZSBPcGVyYXRpb24gLyBDb250cm9sDQo+IFZpcnRxdWV1ZX0uDQo+
+ID4gK1xpdGVtIFRoZSBkcml2ZXIgTVVTVCBzZXQgdGhlIFxmaWVsZHtvcGNvZGV9IGZpZWxkIGJh
+c2VkIG9uIHNlcnZpY2UgdHlwZToNCj4gQ0lQSEVSLCBIQVNILCBNQUMsIG9yIEFFQUQuDQo+ID4g
+K1xpdGVtIFRoZSBkcml2ZXIgTVVTVCBzZXQgdGhlIFxmaWVsZHtxdWV1ZV9pZH0gZmllbGQgdG8g
+c2hvdyB1c2VkIGRhdGFxLg0KPiANCj4gSSd2ZSBmYWlsZWQgdG8gZmlndXJlIG91dCB0aGUgc2Vt
+YW50aWMgYmVoaW5kIHF1ZXVlX2lkLiBUaGlzIGNvdWxkIG1lYW4sDQo+IHRoYXQgc2Vzc2lvbnMg
+YW5kIHNlc3Npb25faWQncyBhcmUgcXVldWUgc2NvcGVkLiBCdXQgdGhlbiB3ZSBzaG91bGQgYmUN
+Cj4gKElNSE8pIG1vcmUgZXhwbGljaXQgb24gdGhpcyAtLSBteSBndWVzcyBpcyB0aGF0IHNlc3Np
+b25faWQncyBhcmVuJ3QNCj4gZGF0YXF1ZXVlIHNjb3BlZC4NCj4gDQo+ID4gK1xlbmR7aXRlbWl6
+ZSp9DQo+ID4gKw0KPiA+ICtcZGV2aWNlbm9ybWF0aXZle1xzdWJwYXJhZ3JhcGh9e1Nlc3Npb24g
+b3BlcmF0aW9uOiBjcmVhdGUgc2Vzc2lvbn17RGV2aWNlDQo+IFR5cGVzIC8gQ3J5cHRvIERldmlj
+ZSAvIERldmljZQ0KPiA+ICtPcGVyYXRpb24gLyBDb250cm9sIFZpcnRxdWV1ZSAvIFNlc3Npb24g
+b3BlcmF0aW9uIC8gU2Vzc2lvbiBvcGVyYXRpb246DQo+IGNyZWF0ZSBzZXNzaW9ufQ0KPiA+ICsN
+Cj4gPiArXGJlZ2lue2l0ZW1pemUqfQ0KPiA+ICtcaXRlbSBUaGUgZGV2aWNlIE1VU1QgdXNlIHRo
+ZSBjb3JyZXNwb25kaW5nIGFsZ29yaXRobS1zcGVjaWZpYyBzdHJ1Y3R1cmUNCj4gYWNjb3JkaW5n
+IHRvIHRoZQ0KPiA+ICsgICAgXGZpZWxke29wY29kZX0gaW4gdGhlIGNvbnRyb2wgZ2VuZXJhbCBo
+ZWFkZXIuDQo+ID4gK1xpdGVtIFRoZSBkZXZpY2UgTVVTVCBzZXQgdGhlIFxmaWVsZHtzdGF0dXN9
+IGZpZWxkIHRvIG9uZSBvZiB0aGUgZm9sbG93aW5nDQo+IHZhbHVlcyBvZiBlbnVtDQo+ID4gKyAg
+ICBWSVJUSU9fQ1JZUFRPX1NUQVRVUyBhZnRlciBmaW5pc2ggYSBzZXNzaW9uIGNyZWF0aW9uOg0K
+PiA+ICtcYmVnaW57aXRlbWl6ZSp9DQo+ID4gK1xpdGVtIFZJUlRJT19DUllQVE9fT0sgaWYgYSBz
+ZXNzaW9uIGlzIGNyZWF0ZWQgc3VjY2Vzc2Z1bGx5Lg0KPiA+ICtcaXRlbSBWSVJUSU9fQ1JZUFRP
+X05PVFNVUFAgaWYgdGhlIHJlcXVlc3RlZCBhbGdvcml0aG0gb3Igb3BlcmF0aW9uIGlzDQo+IHVu
+c3VwcG9ydGVkLg0KPiA+ICtcaXRlbSBWSVJUSU9fQ1JZUFRPX05PU1BDIGlmIG5vIGZyZWUgc2Vz
+c2lvbiBJRCAob25seSB3aGVuIHRoZQ0KPiBWSVJUSU9fQ1JZUFRPX0ZfTVVYX01PREUNCj4gPiAr
+ICAgIGZlYXR1cmUgYml0IGlzIG5lZ290aWF0ZWQpLg0KPiA+ICtcaXRlbSBWSVJUSU9fQ1JZUFRP
+X0VSUiBpZiBmYWlsdXJlIG5vdCBtZW50aW9uZWQgYWJvdmUgb2NjdXJzLg0KPiANCj4gSSBndWVz
+cyBhbiBpbnZhbGlkIHF1ZXVlX2lkIHdvdWxkIGJlIGFtb25nIHRoZXNlLg0KPiANCj4gPiArXGVu
+ZHtpdGVtaXplKn0NCj4gPiArXGl0ZW0gVGhlIGRldmljZSBNVVNUIHNldCB0aGUgXGZpZWxke3Nl
+c3Npb25faWR9IGZpZWxkIHRvIGEgdW5pcXVlIHNlc3Npb24NCj4gaWRlbnRpZmllcm9ubHkNCj4g
+cy9pZGVudGlmaWVyb25seS9pZGVudGlmaWVyIG9ubHkNCj4gPiArICAgIGlmIHRoZSBzdGF0dXMg
+aXMgc2V0IHRvIFZJUlRJT19DUllQVE9fT0suDQo+ID4gK1xlbmR7aXRlbWl6ZSp9DQo+ID4gKw0K
+PiA+ICtcZHJpdmVybm9ybWF0aXZle1xzdWJwYXJhZ3JhcGh9e1Nlc3Npb24gb3BlcmF0aW9uOiBk
+ZXN0cm95DQo+IHNlc3Npb259e0RldmljZSBUeXBlcyAvIENyeXB0byBEZXZpY2UgLyBEZXZpY2UN
+Cj4gPiArT3BlcmF0aW9uIC8gQ29udHJvbCBWaXJ0cXVldWUgLyBTZXNzaW9uIG9wZXJhdGlvbiAv
+IFNlc3Npb24gb3BlcmF0aW9uOg0KPiBkZXN0cm95IHNlc3Npb259DQo+ID4gKw0KPiA+ICtcYmVn
+aW57aXRlbWl6ZSp9DQo+ID4gK1xpdGVtIFRoZSBkcml2ZXIgTVVTVCBzZXQgdGhlIFxmaWVsZHtv
+cGNvZGV9IGZpZWxkIGJhc2VkIG9uIHNlcnZpY2UgdHlwZToNCj4gQ0lQSEVSLCBIQVNILCBNQUMs
+IG9yIEFFQUQuDQo+ID4gK1xpdGVtIFRoZSBkcml2ZXIgTVVTVCBzZXQgdGhlIFxmaWVsZHtzZXNz
+aW9uX2lkfSB0byBhIHZhbGlkIHZhbHVlIGFzc2lnbmVkIGJ5DQo+IHRoZSBkZXZpY2UNCj4gPiAr
+ICAgIHdoZW4gdGhlIHNlc3Npb24gd2FzIGNyZWF0ZWQuDQo+IA0KPiBEZXN0cm95IGRvZXMgbm90
+IG5lZWQgdG8gc3BlY2lmeSBxdWV1ZV9pZC4gVGhhdCBtZWFucyBzZXNzaW9uX2lkJ3MgYXJlbid0
+DQo+IHF1ZXVlIHNjb3BlZCBmcm9tIG5hbWVzcGFjZSBwZXJzcGVjdGl2ZS4gVGhlIHF1ZXN0aW9u
+IHJlbWFpbnMgd2hhdCBpcw0KPiBxdWV1ZV9pZCBnb29kIGZvciwgYW5kIHdoZXRoZXIgYSBzZXNz
+aW9uIHR5cGUgb3AgcmVxdWVzdCBzaG91bGQgYmUNCj4gcmVqZWN0ZWQgaWYgdGhlIHRoZSBzZXNz
+aW9uIGlkIG9yaWdpbmF0ZXMgZnJvbSBhIHNlc3Npb24gY3JlYXRpb24NCj4gcmVxdWVzdCBzcGVj
+aWZ5aW5nIGEgZGlmZmVyZW50IGRhdGFxdWV1ZSAobm90IHRoZSBkYXRhcXVldWUgY29udGFpbmlu
+Zw0KPiB0aGUgZ2l2ZW4gcmVxdWVzdCk/DQo+IA0KDQpNeSBvcmlnaW5hbCBpZGVhIGFib3V0IHRo
+ZSBxdWV1ZV9pZCBpcyB1c2luZyB0aGUgcXVldWVfaWQgdG8gc3BlY2lmeSB3aGljaA0KZGF0ZXF1
+ZXVlIG9mIHRoZSBmb2xsb3dpbmcgZGF0YSByZXF1ZXN0cyB3aWxsIGJlIHVzZWQuIEJ1dCBhZnRl
+ciBkZWVwIHRoaW5raW5nLA0KSSBmaW5kIHRoYXQgdGhlIHF1ZXVlX2lkIGlzIHN1cGVyZmx1b3Vz
+LCBhbmQgdGhlIGN1cnJlbnQgY29kZSBpbiBRRU1VIGFsc28NCmRvbid0IHVzZSB0aGUgcXVldWVf
+aWQgdmFsdWUgYXMgd2VsbC4gVGhhdCdzIGJlY2F1c2UgdGhlIHdlIGNhbiB1c2Ugc2Vzc2lvbl9p
+ZA0KdG8gZmluZCB0aGUgcGVydmlvdXMgc2Vzc2lvbiBpbmZvcm1hdGlvbiBhbmQgZ2V0IHRoZSBj
+dXJyZW50IGRhdGFxdWV1ZSBpZA0KZnJvbSB0aGUgdXNlZCB2aXJ0cXVldWUgLg0KDQpTbyBtYXli
+ZSB3ZSBzaG91bGQgZHJvcCB0aGUgcXVldWVfaWQgdGhpcyB0aW1lLg0KDQoNCj4gPiArXGVuZHtp
+dGVtaXplKn0NCj4gPiArDQo+ID4gK1xkZXZpY2Vub3JtYXRpdmV7XHN1YnBhcmFncmFwaH17U2Vz
+c2lvbiBvcGVyYXRpb246IGRlc3Ryb3kNCj4gc2Vzc2lvbn17RGV2aWNlIFR5cGVzIC8gQ3J5cHRv
+IERldmljZSAvIERldmljZQ0KPiA+ICtPcGVyYXRpb24gLyBDb250cm9sIFZpcnRxdWV1ZSAvIFNl
+c3Npb24gb3BlcmF0aW9uIC8gU2Vzc2lvbiBvcGVyYXRpb246DQo+IGRlc3Ryb3kgc2Vzc2lvbn0N
+Cj4gPiArDQo+ID4gK1xiZWdpbntpdGVtaXplKn0NCj4gPiArXGl0ZW0gVGhlIGRldmljZSBNVVNU
+IHNldCB0aGUgXGZpZWxke3N0YXR1c30gZmllbGQgdG8gb25lIG9mIHRoZSBmb2xsb3dpbmcNCj4g
+dmFsdWVzIG9mIGVudW0gVklSVElPX0NSWVBUT19TVEFUVVMuDQo+ID4gK1xiZWdpbntpdGVtaXpl
+Kn0NCj4gPiArXGl0ZW0gVklSVElPX0NSWVBUT19PSyBpZiBhIHNlc3Npb24gaXMgY3JlYXRlZCBz
+dWNjZXNzZnVsbHkuDQo+ID4gK1xpdGVtIFZJUlRJT19DUllQVE9fRVJSIGlmIGFueSBmYWlsdXJl
+IG9jY3Vycy4NCj4gPiArXGVuZHtpdGVtaXplKn0NCj4gPiArXGVuZHtpdGVtaXplKn0NCj4gPiAr
+DQo+ID4gK1xzdWJzdWJzZWN0aW9ue0RhdGEgVmlydHF1ZXVlfVxsYWJlbHtzZWM6RGV2aWNlIFR5
+cGVzIC8gQ3J5cHRvIERldmljZSAvDQo+IERldmljZSBPcGVyYXRpb24gLyBEYXRhIFZpcnRxdWV1
+ZX0NCj4gPg0KPiANCj4gWy4uXQ0KPiANCj4gSSd2ZSBydW4gdGhyb3VnaCB0aGUgcmVzdC4gSXQg
+c29tZSBzdHVmZiBzZWVtcyB2ZXJ5IHJlcGV0aXRpdmUuIEkgd29uZGVyIGlmDQo+IHdlIGNhbiBk
+byBiZXR0ZXIuDQo+IA0KPiBJIGFsc28gZGlzbGlrZSB0aGlzIDUuNy43LjUuMyBTdGVwcyBvZiBP
+cGVyYXRpb24gcGFydC4gSSBhbHNvIGRvbid0DQo+IHVuZGVyc3RhbmQgd2h5IGlzIHN5bW1ldHJp
+YyBzcGVjaWFsIGluIHRoaXMgcmVzcGVjdCAoSEFTSCwgTUFDIGFuZA0KPiBBRUFEIGRvbid0IGhh
+dmUgYSAnU3RlcHMgb2YgT3BlcmF0aW9uJyBzZWN0aW9uLg0KPiANCkhtbS4uIEkganVzdCB0b29r
+IGEgZXhhbXBsZSBhcyB0aGUgc3ltbWV0cmljIGlzIHRoZSBtb3N0IGNvbXBsaWNhdGVkIG9wZXJh
+dGlvbi4gOykNCg0KPiBJIHdvdWxkIGxpa2UgdG8gdHJ5IHNvbWUgdGhpbmdzIG91dCB3aXRoIHRo
+ZSByZWZlcmVuY2UgaW1wbGVtZW50YXRpb24uDQo+IERlcGVuZGluZyBvbiBob3cgdGhhdCBnb2Vz
+IEkgbWF5IG9yIG1heSBub3QgZW5kIHVwIHByb3ZpZGluZyBhIGRldGFpbGVkDQo+IHJldmlldyBm
+b3IgdGhlIHJlc3QgYmVmb3JlIGRpc2N1c3Npbmcgd2hhdCBJJ3ZlIGFscmVhZHkgYWRkcmVzc2Vk
+Lg0KPiANCkhhbGlsLCBUaGFuayB5b3UgZm9yIHlvdXIgd29yaywgcGxzIGdvIGFoZWFkIDopDQoN
+Cj4gUmVnYXJkcywNCj4gSGFsaWwNCg0KVGhhbmtzLA0KLUdvbmdsZWkNCg==
