@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41941)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dtt7E-0005i5-TM
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:17:29 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dtt7F-0005ia-O7
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:17:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dtt7A-0004DP-IP
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:17:24 -0400
-Received: from ozlabs.ru ([107.173.13.209]:35230)
+	(envelope-from <aik@ozlabs.ru>) id 1dtt79-0004Cv-QO
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:17:25 -0400
+Received: from ozlabs.ru ([107.173.13.209]:35222)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dtt7A-0004Bn-CE
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:17:20 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dtt79-0004BV-Kn
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:17:19 -0400
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Mon, 18 Sep 2017 20:16:57 +1000
-Message-Id: <20170918101709.30421-2-aik@ozlabs.ru>
-In-Reply-To: <20170918101709.30421-1-aik@ozlabs.ru>
-References: <20170918101709.30421-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v3 01/13] memory: Postpone flatview and
- dispatch tree building till all devices are added
+Date: Mon, 18 Sep 2017 20:16:56 +1000
+Message-Id: <20170918101709.30421-1-aik@ozlabs.ru>
+Subject: [Qemu-devel] [PATCH qemu v3 00/13] memory: Reduce memory use
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,61 +24,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
-Most devices use at least one address space and every time a new address
-space is added, flat views and dispatch trees are rebuild for all address
-spaces. This is not a problem for a relatively small amount of devices but
-even 50 virtio-pci devices use more than 8GB of RAM.
 
-What happens that on every flatview/dispatch rebuild, new arrays are
-allocated and old ones release but the release is done via RCU so until
-an entire machine is build, they are not released.
+This was inspired by https://bugzilla.redhat.com/show_bug.cgi?id=1481593
+Previous versions:
+v1: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01559.html
+v2: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04069.html
 
-This wraps devices creation into memory_region_transaction_begin/commit
-to massively reduce amount of flat view/dispatch tree (re)allocations.
+This patchset tries to reduce amount of memory used by FlatViews
+and tries share as many FVs between address spaces as possible.
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
-Changes:
+Changelog:
+v3:
+* addressed comments from v2, mainly simplified the code
+
 v2:
-* wrapped qemu_run_machine_init_done_notifiers() as well
----
- vl.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+* total rework
 
-diff --git a/vl.c b/vl.c
-index 9e62e92aea..e4f2ece590 100644
---- a/vl.c
-+++ b/vl.c
-@@ -4741,12 +4741,16 @@ int main(int argc, char **argv, char **envp)
-     igd_gfx_passthru();
- 
-     /* init generic devices */
-+    memory_region_transaction_begin();
-+
-     rom_set_order_override(FW_CFG_ORDER_OVERRIDE_DEVICE);
-     if (qemu_opts_foreach(qemu_find_opts("device"),
-                           device_init_func, NULL, NULL)) {
-         exit(1);
-     }
- 
-+    memory_region_transaction_commit();
-+
-     cpu_synchronize_all_post_init();
- 
-     rom_reset_order_override();
-@@ -4829,8 +4833,13 @@ int main(int argc, char **argv, char **envp)
-     /* TODO: once all bus devices are qdevified, this should be done
-      * when bus is created by qdev.c */
-     qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
-+
-+    memory_region_transaction_begin();
-+
-     qemu_run_machine_init_done_notifiers();
- 
-+    memory_region_transaction_commit();
-+
-     if (rom_check_and_register_reset() != 0) {
-         error_report("rom check and register reset failed");
-         exit(1);
+
+
+
+This is based on sha1
+4f2058ded4 Peter Maydell "Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20170917' into staging".
+
+Please comment. Thanks.
+
+
+
+Alexey Kardashevskiy (13):
+  memory: Postpone flatview and dispatch tree building till all devices
+    are added
+  exec: Explicitely export target AS from
+    address_space_translate_internal
+  memory: Open code FlatView rendering
+  memory: Move FlatView allocation to a helper
+  memory: Move AddressSpaceDispatch from AddressSpace to FlatView
+  memory: Remove AddressSpace pointer from AddressSpaceDispatch
+  memory: Switch memory from using AddressSpace to FlatView
+  memory: Cleanup after switching to FlatView
+  memory: Rename mem_begin/mem_commit/mem_add helpers
+  memory: Store physical root MR in FlatView
+  memory: Share FlatView's and dispatch trees between address spaces
+  memory: Get rid of address_space_init_shareable
+  memory: Add flat views to HMP "info mtree"
+
+ include/exec/memory-internal.h |  16 +-
+ include/exec/memory.h          |  76 +++++-----
+ include/hw/arm/armv7m.h        |   2 +-
+ cpus.c                         |   5 +-
+ exec.c                         | 330 +++++++++++++++++++++++++----------------
+ hw/arm/armv7m.c                |   9 +-
+ hw/intc/openpic_kvm.c          |   2 +-
+ memory.c                       | 271 +++++++++++++++++++++++----------
+ monitor.c                      |   3 +-
+ target/arm/cpu.c               |  16 +-
+ target/i386/cpu.c              |   5 +-
+ vl.c                           |   9 ++
+ hmp-commands-info.hx           |   7 +-
+ 13 files changed, 478 insertions(+), 273 deletions(-)
+
 -- 
 2.11.0
