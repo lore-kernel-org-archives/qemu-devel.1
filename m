@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57092)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57436)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1du0ZA-0004mt-1g
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:14:44 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1du0Zl-0005HK-0K
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:15:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1du0Z3-000117-Ea
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:14:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:59306)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1du0Z3-00010t-7r
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:14:37 -0400
-References: <20170918160012.4317-1-david@redhat.com>
-	<20170918160012.4317-17-david@redhat.com>
-	<21b0f4da-f89b-32c6-b0ef-efb668c11a98@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <9f04b0eb-6422-a207-35d7-d92706195d2a@redhat.com>
-Date: Mon, 18 Sep 2017 20:14:33 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1du0Zj-0001M3-R1
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:15:20 -0400
+Received: from mail-wm0-x234.google.com ([2a00:1450:400c:c09::234]:48190)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1du0Zj-0001KP-JW
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:15:19 -0400
+Received: by mail-wm0-x234.google.com with SMTP id r68so5051761wmg.3
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 11:15:19 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <21b0f4da-f89b-32c6-b0ef-efb668c11a98@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v1 16/27] s390x/kvm: factor out SIGP code
- into sigp.c
+In-Reply-To: <CAFEAcA9=syrPXD5cAq_EHWre_NniO1kZiWVAQXMDEnRuk=20ew@mail.gmail.com>
+References: <20170916010330.10435-1-jsnow@redhat.com>
+	<CAFEAcA8un6eescSDzd+P+jqEGuGkuQXgfjm+1=CPOydg6WQSnQ@mail.gmail.com>
+	<fb54f008-2913-3cd2-df95-41b1fcf3f2ee@redhat.com>
+	<CAFEAcA9=syrPXD5cAq_EHWre_NniO1kZiWVAQXMDEnRuk=20ew@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 18 Sep 2017 19:14:57 +0100
+Message-ID: <CAFEAcA9XgboiDD3SYsaJLRVMr=onckWU3VN-3ogd4DwH5fV3zw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/11] Ide patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,41 +31,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+To: John Snow <jsnow@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 18.09.2017 19:25, Christian Borntraeger wrote:
-> 
-> 
-> On 09/18/2017 06:00 PM, David Hildenbrand wrote:
->> We want to use the same code base for TCG, so let's cleanly factor it
->> out.
->>
->> The sigp mutex is currently not really needed, as everything is
->> protected by the iothread mutex. But this could change later, so leave
->> it in place and initialize it properly from common code.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>  hw/s390x/s390-virtio-ccw.c |   3 +
->>  target/s390x/Makefile.objs |   1 +
->>  target/s390x/cpu.c         |   8 -
->>  target/s390x/cpu.h         |   6 +-
->>  target/s390x/internal.h    |   4 +
->>  target/s390x/kvm-stub.c    |   5 -
->>  target/s390x/kvm.c         | 349 +-----------------------------------------
->>  target/s390x/kvm_s390x.h   |   1 -
->>  target/s390x/sigp.c        | 366 +++++++++++++++++++++++++++++++++++++++++++++
-> 
-> You should probably do something in MAINTAINERS for sigp.c,
-> otherwise Conny and myself no longer maintain the sigp code.
-> 
+On 18 September 2017 at 19:00, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 18 September 2017 at 18:55, John Snow <jsnow@redhat.com> wrote:
+>> On 09/16/2017 10:34 AM, Peter Maydell wrote:
+>>> Hi; I'm afraid this doesn't build with clang:
+>>>
+>>> /home/petmay01/linaro/qemu-for-merges/hw/ide/core.c:70:15: error:
+>>> comparison of unsigned enum expression >= 0 is always true
+>>> [-Werror,-Wtautological-compare]
+>>>     if (enval >= 0 && enval < IDE_DMA__COUNT) {
+>>>         ~~~~~ ^  ~
+>>> 1 error generated
 
-Good point, I'll add a patch. (copying the maintainers from kvm.c -  you
-and Conny  :) )
 
--- 
+> I think you could argue that it would at least be helpful
+> if clang didn't warn about comparisons that only happen
+> to be useless for this particular platform/impdef choice
+> but are useful for the same code compiled with a different
+> compiler.
 
-Thanks,
+A bit of googling and some experimentation reveals that
+clang deliberately suppresses this warning in the special
+case of comparing against an enum value which happens to
+be zero (but not for literal constant zero!). So this will
+be fine:
+   if (enval >= IDE_DMA_READ && enval < IDE_DMA__COUNT)
 
-David
+(or more sensibly you'd want to define an enum constant
+for IDE_DMA__FIRST or something rather than relying on
+READ being 0.)
+
+(found here:
+http://clang-developers.42468.n3.nabble.com/Possibly-invalid-enum-tautology-warning-td3233140.html
+)
+
+thanks
+-- PMM
