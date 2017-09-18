@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38619)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39558)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dtrKA-0005A7-Bk
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:22:40 -0400
+	(envelope-from <patrick@advancedtelematic.com>) id 1dtrPO-0006c7-4s
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:28:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dtrK6-0005bJ-CU
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:22:38 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:42127
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dtrK5-00051h-Fp
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:22:34 -0400
-References: <1505464398-28897-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<20170915084044.GE13610@redhat.com>
-	<dc424e80-bd13-576a-314b-716b906538b8@cn.fujitsu.com>
-	<7103711f-5ab5-0a8f-48d1-bb088df2fb13@cn.fujitsu.com>
-	<20170918094049.737ff454@nial.brq.redhat.com>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <813cf8da-23ae-9787-19c5-7572128bb60a@cn.fujitsu.com>
-Date: Mon, 18 Sep 2017 16:22:24 +0800
+	(envelope-from <patrick@advancedtelematic.com>) id 1dtrPK-000067-0T
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:28:02 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:49965)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <patrick@advancedtelematic.com>)
+	id 1dtrPJ-00089s-KV
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:27:57 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id e71so367731wmg.4
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 01:27:56 -0700 (PDT)
+From: Patrick Vacek <patrick@advancedtelematic.com>
+References: <2385fc24-dbc3-ba7c-948f-b986edb27c7a@advancedtelematic.com>
+	<CAJ+F1C+TZy=DY1d4qTf75iqkJ=-0nuOADa-h1SD1ZR3uj-BVTg@mail.gmail.com>
+Message-ID: <5d65e10d-de1c-b67e-326c-3964f3676d92@advancedtelematic.com>
+Date: Mon, 18 Sep 2017 10:27:53 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170918094049.737ff454@nial.brq.redhat.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] NUMA: Enable adding NUMA node
- implicitly
+In-Reply-To: <CAJ+F1C+TZy=DY1d4qTf75iqkJ=-0nuOADa-h1SD1ZR3uj-BVTg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AdPJjXNf9dpgXK0V9a84Pk8wMsDJgNa7K"
+Subject: Re: [Qemu-devel] Trying to use ccid-card-emulated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,219 +31,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Takao Indoh <indou.takao@jp.fujitsu.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, f4bug@amsat.org, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair23@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>, Izumi Taku <izumi.taku@jp.fujitsu.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, qemu-devel@nongnu.org
 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AdPJjXNf9dpgXK0V9a84Pk8wMsDJgNa7K
+From: Patrick Vacek <patrick@advancedtelematic.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
+ qemu-devel@nongnu.org
+Message-ID: <5d65e10d-de1c-b67e-326c-3964f3676d92@advancedtelematic.com>
+Subject: Re: [Qemu-devel] Trying to use ccid-card-emulated
+References: <2385fc24-dbc3-ba7c-948f-b986edb27c7a@advancedtelematic.com>
+ <CAJ+F1C+TZy=DY1d4qTf75iqkJ=-0nuOADa-h1SD1ZR3uj-BVTg@mail.gmail.com>
+In-Reply-To: <CAJ+F1C+TZy=DY1d4qTf75iqkJ=-0nuOADa-h1SD1ZR3uj-BVTg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+Hello Marc-Andr=C3=A9,
 
-At 09/18/2017 03:40 PM, Igor Mammedov wrote:
-> On Mon, 18 Sep 2017 11:54:50 +0800
-> Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
+Thanks for your message!
+
+On 14.09.2017 00:13, Marc-Andr=C3=A9 Lureau wrote:
+> Hi Patrick
 >
->> At 09/15/2017 06:05 PM, Dou Liyang wrote:
->>> Hi Daniel,
->>>
->>> At 09/15/2017 04:40 PM, Daniel P. Berrange wrote:
->>>> On Fri, Sep 15, 2017 at 04:33:18PM +0800, Dou Liyang wrote:
->>>>> In QEMU, if we enable NUMA and have nodes, QEMU will build ACPI SRAT
->>>>> table
->>>>> for transfering NUMA configuration to the guest. So, the maximum
->>>>> memory in
->>>>> SRAT can be used to determine whether to use the swiotlb for IOMMU or
->>>>> not.
->>>>>
->>>>> However, if QEmu doesn't enable NUMA explicitly on CLI, The SRAT will
->>>>> never be built. When memory hotplug is enabled, some guest's devices may
->>>>> start failing due to SWIOTLB is disabled.
->>>>>
->>>>> Add numa_implicit_add_node0 in struct MachineClass, Invoke it before
->>>>> QEMU
->>>>> parse NUMA options to enable adding NUMA node implicitly.
->>>>>
->>>>> Reported-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
->>>>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
->>>>> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
->>>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>>>> Cc: Richard Henderson <rth@twiddle.net>
->>>>> Cc: Eduardo Habkost <ehabkost@redhat.com>
->>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->>>>> Cc: Marcel Apfelbaum <marcel@redhat.com>
->>>>> Cc: Igor Mammedov <imammedo@redhat.com>
->>>>> Cc: David Hildenbrand <david@redhat.com>
->>>>> Cc: Thomas Huth <thuth@redhat.com>
->>>>> Cc: Alistair Francis <alistair23@gmail.com>
->>>>> Cc: f4bug@amsat.org
->>>>> Cc: Takao Indoh <indou.takao@jp.fujitsu.com>
->>>>> Cc: Izumi Taku <izumi.taku@jp.fujitsu.com>
->>>>>
->>>>> ---
->>>>>  hw/i386/pc.c        |  6 ++++++
->>>>>  include/hw/boards.h |  4 ++++
->>>>>  vl.c                | 14 ++++++++++++++
->>>>>  3 files changed, 24 insertions(+)
->>>>>
->>>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->>>>> index 2108104..3c40117 100644
->>>>> --- a/hw/i386/pc.c
->>>>> +++ b/hw/i386/pc.c
->>>>> @@ -2308,6 +2308,11 @@ static const CPUArchIdList
->>>>> *pc_possible_cpu_arch_ids(MachineState *ms)
->>>>>      return ms->possible_cpus;
->>>>>  }
->>>>>
->>>>> +static void numa_implicit_add_node0(void)
->>>>> +{
->>>>> +    qemu_opts_parse_noisily(qemu_find_opts("numa"), "node", true);
->>>>> +}
->>>>> +
->>>>>  static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
->>>>>  {
->>>>>      /* cpu index isn't used */
->>>>> @@ -2349,6 +2354,7 @@ static void pc_machine_class_init(ObjectClass
->>>>> *oc, void *data)
->>>>>      mc->get_hotplug_handler = pc_get_hotpug_handler;
->>>>>      mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
->>>>>      mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
->>>>> +    mc->numa_implicit_add_node0 = numa_implicit_add_node0;
->>>>>      mc->has_hotpluggable_cpus = true;
->>>>>      mc->default_boot_order = "cad";
->>>>>      mc->hot_add_cpu = pc_hot_add_cpu;
->>>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
->>>>> index 7f044d1..898d841 100644
->>>>> --- a/include/hw/boards.h
->>>>> +++ b/include/hw/boards.h
->>>>> @@ -141,6 +141,8 @@ typedef struct {
->>>>>   *    should instead use "unimplemented-device" for all memory
->>>>> ranges where
->>>>>   *    the guest will attempt to probe for a device that QEMU doesn't
->>>>>   *    implement and a stub device is required.
->>>>> + * @numa_implicit_add_node0:
->>>>> + *    Enable NUMA implicitly by add a NUMA node.
->>>>>   */
->>>>>  struct MachineClass {
->>>>>      /*< private >*/
->>>>> @@ -191,6 +193,8 @@ struct MachineClass {
->>>>>      CpuInstanceProperties
->>>>> (*cpu_index_to_instance_props)(MachineState *machine,
->>>>>                                                           unsigned
->>>>> cpu_index);
->>>>>      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState
->>>>> *machine);
->>>>> +
->>>>> +    void (*numa_implicit_add_node0)(void);
->>>>>  };
->>>>>
->>>>>  /**
->>>>> diff --git a/vl.c b/vl.c
->>>>> index fb1f05b..814a5fa 100644
->>>>> --- a/vl.c
->>>>> +++ b/vl.c
->>>>> @@ -3030,6 +3030,7 @@ int main(int argc, char **argv, char **envp)
->>>>>      Error *main_loop_err = NULL;
->>>>>      Error *err = NULL;
->>>>>      bool list_data_dirs = false;
->>>>> +    bool has_numa_config_in_CLI = false;
->>>>>      typedef struct BlockdevOptions_queue {
->>>>>          BlockdevOptions *bdo;
->>>>>          Location loc;
->>>>> @@ -3293,6 +3294,7 @@ int main(int argc, char **argv, char **envp)
->>>>>                  if (!opts) {
->>>>>                      exit(1);
->>>>>                  }
->>>>> +                has_numa_config_in_CLI = true;
->>>>>                  break;
->>>>>              case QEMU_OPTION_display:
->>>>>                  display_type = select_display(optarg);
->>>>> @@ -4585,6 +4587,18 @@ int main(int argc, char **argv, char **envp)
->>>>>      default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
->>>>>      default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
->>>>>
->>>>> +    /*
->>>>> +     * If memory hotplug is enabled i.e. slots > 0 and user hasn't add
->>>>> +     * NUMA nodes explicitly on CLI
->>>>> +     *
->>>>> +     * Enable NUMA implicitly for guest to know the maximum memory
->>>>> +     * from ACPI SRAT table, which is used for SWIOTLB.
->>>>> +     */
->>>>> +    if (ram_slots > 0 && !has_numa_config_in_CLI) {
->>>>> +        if (machine_class->numa_implicit_add_node0) {
->>>>> +            machine_class->numa_implicit_add_node0();
->>>>> +        }
->>>>> +    }
->>>>
->>>> Won't this change guest ABI
->>
->> Hi Daniel,
->>
->> No, this will change the ACPI table in following case without NUMA
->> configuration:
-> it also will affect FW_CFG_NUMA file length (read as break ABI),
-> you didn't see any breakage because currnet SeaBIOS don't use
-> this legacy file anymore and even if it would used it's still
-> a race one has to at boot.
+> On Wed, Sep 6, 2017 at 5:04 PM Patrick Vacek
+> <patrick@advancedtelematic.com <mailto:patrick@advancedtelematic.com>>
+> wrote:
 >
-> So you need to disable feature on old machine types as you've suggested
+>     Hello,
 >
+>     I'm trying to emulate a smartcard. I found section 4 of docs/ccid.t=
+xt,
+>     which appears to do exactly what I'm interested in. However, that
+>     document is a few years old and references CoolKey, which at this
+>     point
+>     seems obsolete, with OpenSC being the preferred succcessor. I've
+>     followed the rest of steps with success, and tried registering Open=
+SC
+>     with NSS (i.e. modutil -dbdir /etc/pki/nssdb -add "CAC Module"
+>     -libfile
+>     /usr/lib/opensc-pkcs11.so), but I'm still not seeing my three
+>     certificates listed on the device as I'd expect.
+>
+>     I'm using QEMU emulator version 2.8.0(Debian 1:2.8+dfsg-3ubuntu2.3)=
+=2E
+>     I've also tried using QEMU emulator version 2.10.0 (built from
+>     source),
+>     but the interface has changed and the commands from the documentati=
+on
+>     don't work anymore.
+>
+>     1. Am I correct to assume that OpenSC is the logical successor to
+>     CoolKey, and should I expect a simple substitution such as that to
+>     work?
+>
+>
+>  That's my understanding too, and it seems Fedora 26 deprecated
+> coolkey. However, when I tried opensc a few years with qemu/libcacard,
+> it didn't work. I haven't looked further since.
+>
+>     2. Are there other steps I might be overlooking with OpenSC or with=
 
-Hi Igor,
+>     getting the certificates recognized on the device?
+>
+>
+> I would first try to get coolkey module to work, before debuging
+> opensc. Ideally get some help from opensc developper since qemu should
+> still work with coolkey.
 
-Thank you very much. yes, I will.
+I haven't had great success with OpenSC yet, so I finally took the time
+to write a coolkey recipe for Yocto. The recipe seems to work and
+coolkey appears to be installed on my device, but it does not work
+entirely as desired. Specifically, when I run `modutil -dbdir
+sql:/etc/pki/nssdb -add "CAC Module" -libfile
+/usr/lib/pkcs11/libcoolkeypk11.so`, I get this: "ERROR: Failed to add
+module "CAC Module". Probable cause : "A PKCS #11 module returned
+CKR_GENERAL_ERROR, indicating that an unrecoverable error has
+occurred."." That's a pretty vague message and I haven't been able to
+find anything further to help guide me to a resolution. Do you have any
+ideas?
 
->>
->> ...
->> -m 128M,slots=4,maxmem=1G
->> ...
->>
->> How about fixing it by adding
->>
->> m->numa_implicit_add_node0 = NULL;
->>
->> in pc_i440fx/q35_2_10_machine_options() ?
-> yep, pls do so.
-> Also take a look spapr which also supports numa, to make sure
-> it won't regress.
+The one thing that has occurred to me is that nss seems to require a
+password for a database before being able to do anything meaningful with
+it. When I tried to reproduce the steps of docs/ccid.txt item 4 entirely
+locally (but with two separate databases), I had no problem with the
+modutil command, but when I tried to import the certificates with
+`certutil -A -d sql:./temp/ -i fake-smartcard-ca.cer -t TC,TC,TC -n
+fake-smartcard-ca`, I got this: "certutil: could not authenticate to
+token NSS Certificate DB.: SEC_ERROR_IO: An I/O error occurred during
+security authorization." When I recreated the second database manually
+and provided a password, that step worked fine and the output of listing
+the certificates worked as expected.
 
-Currently, just setup the pointer of pc_machine_class_init in
-pc_machine_class_init() for X86 and it's NULL in other arches. So there
-is no influence on SPAPR.
+Of course, on the device, I can recreate the database at /etc/pki/nssdb
+with a password, but that erases the existing contents, which means the
+certificates that were supposed to be initialized on the device wouldn't
+be there, so that defeats the whole purpose, right? Is there a way to
+specify a password for the nss database when launching qemu? In any
+case, that probably won't fix the modutil error, but it's the only
+thought I've had so far.
 
-And this bug only affects x86, seems no need to add NUMA node implicity
-for SPAPR as well.
+>
+>     3. If, as I suspect, that document is no longer up to date, what
+>     do the
+>     steps currently look like to get smartcard emulation working?
+>
+>
+> They look still pretty ok to me. certutil usage may have changes, but
+> qemu & coolkey didn't change I think.
+>
+> What problems did you have when trying to setup following
+> docs/ccid.txt ? we may want to update the doc.
+
+In item 2, the necessary nss package on Ubuntu 17.04 is libnss3-tools.
+In item 4, I think it might be best to prefix all database paths on the
+device with "sql:" as is done with the host commands.
+In item 8, docs/libcacard.txt no longer exists, as it is now in a
+separate package.
+And of course there's the fact that the modutil command doesn't work for
+me, but I can't say why or what should change yet.
+
+>
+> Thanks
+> --=20
+> Marc-Andr=C3=A9 Lureau
 
 Thanks,
-	dou.
+Patrick
 
-> CCing David.
->
->>
->>
->>   and so break migration/save/restore ?
->>
->> I did some tests(save/restore), this don't break migration.
->>
->> Are some situations I didn't consider ?
->>
->>
->> Thanks,
->> 	dou.
->>>>
->>> Thank you for your reply, I can't answer this immediately, I will
->>> look into it and reply you soon.
->>>
->>> This patch works for X86, has no influence on other arch, and we
->>> can regard it's functionality as "-numa node" in CLI.
->>>
->>> Thanks,
->>>     dou.
->>>
->>>
->>>> Regards,
->>>> Daniel
->>>>
->>
->>
->>
->
->
->
->
+--=20
+Patrick Vacek
+ATS Advanced Telematic Systems GmbH
+Kantstra=C3=9Fe 162, 10623 Berlin
+HRB 151501 B, Amtsgericht Charlottenburg
+Vertreten durch die Gesch=C3=A4ftsf=C3=BChrer
+Dirk P=C3=B6schl, Armin G. Schmidt
+
+
+--AdPJjXNf9dpgXK0V9a84Pk8wMsDJgNa7K
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCAAGBQJZv4OJAAoJEJPafbf+QhyowvkP/3HAICabTh6XANZC4Xlwy+MY
+jemjd3RRUaIWW+7dbWFIKBg+bguBU8e56E1voovaN2jxNFETPnW2U0Dt/6TyJWhr
+quPVX/5JEWOUoAecfXUNpeF64aYTK4TUy5skU9Rbt/W7frEfqGWxPI6sNwtz/aI8
+bEaFBC6GSaoxZg3d1dMe8ioTbTewUb3gH+VPwm/laJGuKjOJOb6Y0ZrgeMwZs1uJ
+KZ4f19yF8DKshrG8+U5rPqeGsyN+bsySQob6ML728uylwUFjpDttJQvmXO9blSuQ
+FWDAS0kcl77LvsL/zapWcZRcvUIFLOtq++M6vhsmSRieduHpek1ERTUANmUiXEds
+Sh8jhrmDjrVmLH8zkaqoAuuFkKwmkrDEExoad2Qo+JjCCSwKSesG6P2c0Y6kOATP
+EsZzlODN+Onll5JtKlesd5DA0oyiRnojGy/qKHieBq/OqXg781hjQDkfZSkk+gL1
+3/BGwhnDT/PAYIpWaO/4uPI2wYwt4jl9//CmL/zqTlOoPjHYBJ4P7KV/h7F5oRM+
+rSjKfT7ofmFx0lXqaBDVt8cESZ1phIQBbcXF767YMm8xXZKRHxi5JNcNgpe5Tzv3
+K5iqz7DSMRe35vp0/6/mu2tt8XSs/ougde+JUBxcz8polatXd4FY0EHhWsEvTem1
+1VTP+6eCZ+1KjmHuByjU
+=C5/S
+-----END PGP SIGNATURE-----
+
+--AdPJjXNf9dpgXK0V9a84Pk8wMsDJgNa7K--
