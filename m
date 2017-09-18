@@ -1,30 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34503)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52428)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eskultet@redhat.com>) id 1dtwSF-00058j-1c
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:51:20 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dty6P-00021K-SD
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:36:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eskultet@redhat.com>) id 1dtwSB-0004xR-4P
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:51:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55498)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eskultet@redhat.com>) id 1dtwSA-0004xA-SY
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:51:15 -0400
-Date: Mon, 18 Sep 2017 15:51:07 +0200
-From: Erik Skultety <eskultet@redhat.com>
-Message-ID: <20170918135107.GD24642@erzo-ntb>
-References: <69fd8746-b2bd-31d0-4d70-792f40ef2d79@amd.com>
-	<20170908131555.GD32645@redhat.com>
-	<9BF693FD-B1CD-4813-86B4-4A909D8847A1@amd.com>
-	<20170908145201.GJ32645@redhat.com>
-	<20170918094357.GB24642@erzo-ntb>
-	<20170918094748.GD2951@redhat.com>
-	<9b7231b0-b17e-5627-7a0b-20c42aec9480@amd.com>
+	(envelope-from <stefanha@gmail.com>) id 1dty6M-00024J-Ei
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:36:53 -0400
+Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:48742)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dty6M-000249-1j
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:36:50 -0400
+Received: by mail-wr0-x22c.google.com with SMTP id 108so848648wra.5
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 08:36:49 -0700 (PDT)
+Date: Mon, 18 Sep 2017 16:36:44 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170918153644.GA12759@stefanha-x1.localdomain>
+References: <87r2w6eq5n.fsf@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9b7231b0-b17e-5627-7a0b-20c42aec9480@amd.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [libvirt]  libvirt/QEMU/SEV interaction
+In-Reply-To: <87r2w6eq5n.fsf@gmail.com>
+Subject: Re: [Qemu-devel] [PATCH] scripts: Support building with Python 3
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,177 +28,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Relph <richard.relph@amd.com>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>, "libvir-list@redhat.com" <libvir-list@redhat.com>, "Lendacky, Thomas" <Thomas.Lendacky@amd.com>, "Singh, Brijesh" <brijesh.singh@amd.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Cleber Rosa <crosa@redhat.com>, David Michael <fedora.dm0@gmail.com>
 
-On Mon, Sep 18, 2017 at 07:41:09AM -0500, Richard Relph wrote:
->
->
-> On 9/18/17 4:47 AM, Daniel P. Berrange wrote:
-> > On Mon, Sep 18, 2017 at 11:43:57AM +0200, Erik Skultety wrote:
-> > > [...]
-> > >
-> > > > >      > c) what existing communicate interface can be used betwe=
-en libvirt and qemu
-> > > > >      > to get the measurement ? can we add a new qemu monitor c=
-ommand
-> > > > >      > 'get_sev_measurement' to get the measurement ? (step 10)
-> > > > >
-> > > > >      Yes, QMP commands seeem most likely.
-> > > > >
-> > > > >      > d) how to pass the secret blob from libvirt to qemu ? sh=
-ould we consider
-> > > > >      > adding a new object (sev-guest-secret) -- libvirt can ad=
-d the object through
-> > > > >      > qemu monitor.
-> > > > >
-> > > > >      Yeah, that looks like a viable option too.
-> > > > So I could see a flow like the following:
-> > > >
-> > > >
-> > > >    1. mgmt tool calls  virConnectGetCapabilities. This returns an=
- XML
-> > > >       document that includes the following
-> > > >
-> > > >        <host>
-> > > >           ...other bits...
-> > > >          <sev>
-> > > > 	  <platform-key>...hex encoded PDH key...</platform-key>
-> > > > 	</sev>
-> > > >        </host>
-> > > >
-> > > >    2. mgmt tool requests to start a guest calling virCreateXML(),
-> > > >       passing VIR_DOMAIN_START_PAUSED. The XML would include
-> > > >
-> > > >        <sev>
-> > > >          <owner-key>...hex encode DH key...</owner-key>
-> > > > 	<session-info>..hex encode info...</session-info>
-> > > > 	<policy>...int32 value..</policy>
-> > > >        </sev>
-> > > >
-> > > >
-> > > >       if <sev> is provided and VIR_DOMAIN_START_PAUSED is missing=
-,
-> > > >       libvirt would report an error and refuse to start the guest
-> For ease of use, I would not add this conditional to libvirt. If <sev> =
-is
-> provided and VIR_DOMAIN_START_PAUSED is missing, I=E2=80=99d just send =
-the "GO"
+On Sat, Aug 19, 2017 at 10:58:44PM -0700, David Michael wrote:
+> This allows building with "./configure --python=python3", where
+> the python3 program is at least version 3.6.  It preserves
+> compatibility with Python 2.  The changes include:
+> 
+>   - Avoiding "print" usage
+>   - Using bytes with files opened in binary mode
+>   - Switching .iteritems() to .items()
+>   - Adding fallback imports for functions moved to other modules
+> 
+> Signed-off-by: David Michael <fedora.dm0@gmail.com>
+> ---
+> 
+> Hi,
+> 
+> I've been applying these changes when building on Fedora 26, which does
+> not include any Python 2 packages by default.  It was tested with Python
+> 2.7 and 3.6.
+> 
+> I just saw the list of scripts that need updating on the mailing list,
+> and this doesn't cover all of them, but it is enough to build a binary
+> for running virtual machines with KVM.  Maybe it is still useful as a
+> starting point.
+> 
+> Thanks.
 
-I also feel that the presence of the <sev> element might determine the us=
-age of
-the VIR_DOMAIN_START_PAUSED flag implicitly.
 
-> command as it would naturally occur.
-> Unless that would confuse things inside libvirt or QEMU in relation to =
-the
-> measurement and secret=E2=80=A6
-> Many of our existing tests focus on other aspects of SEV functionality =
-and
-> so they skip the MEASURE/SECRET phase of launch and just go immediately=
- from
-> LAUNCH_UPDATE_DATA (or VMSA) to LAUNCH_FINISH.
-> I guess the key question will be how will QEMU know when to get the
-> MEASUREMENT and wait for a LAUNCH_SECRET before doing a LAUNCH_FINISH w=
-hen
-> connected to libvirt.
-> Brijesh, this is your area. It feels to me like QEMU will have to wait =
-to do
-> the LAUNCH_FINISH until it gets the first =E2=80=9Cgo=E2=80=9D from lib=
-virt. If that=E2=80=99s
-> right, and assuming the same =E2=80=9Cgo=E2=80=9D comes from libvirt wi=
-th or without
-> VIR_DOMAIN_START_PAUSED, then I=E2=80=99d simply exclude the conditiona=
-l check. QEMU
-> would get the measurement when it is done sending the data.
-> Though in =E2=80=9Creal world=E2=80=9D uses, I think the conditional is=
- perfectly OK.
-> > > >
-> > > >    3. Libvirt generates the QEMU cli arg to enable SEV using
-> > > >       the XML data and starts QEMU, leaving CPUs paused
-> > > >
-> > > >    4. QEMU emits a SEV_MEASURE event containing the measurement
-> > > >       blob
-> > > Speaking of which, I expect QEMU to have a QMP command to retrieve =
-the
-> > > measurement, in which case I think libvirt has to provide an API fo=
-r the user
-> > > to retrieve the measurement in case libvirtd crashes somewhere betw=
-een setting
-> > > up QEMU and waiting for the measurement event from QEMU, or simply =
-because the
-> > > GO missed the event for some unspecified reason.
-> > Yeah, that's a good point - we also ought to have a pause-reason that
-> > reflects that it is paused due to waiting for SEV secrets.
-> >
-> > > >    5. Libvirt catches the QEMU event and emits its own
-> > > >       VIR_CONNECT_DOMAIN_EVENT_SEV_MEASURE event containing
-> > > >       the measurement blob
-> > > >
-> > > >    6. GO does its validation of the measurement
-> > > >
-> > > >    7a  If validation failed, then virDomainDestroy() to stop QEMU
-> > > >
-> > > >    7b  If validation succeeed
-> > > >
-> > > >       Optionally call
-> > > >
-> > > >           virDomainSetSEVSecret()
-> > > Given the fact that we're likely introducing a new <sev> element to=
- the XML
-> > > config, I'm more inclined to utilizing the existing virSecret inter=
-faces (as
-> > > was originally suggested) instead of creating a vendor-specific API=
-. You could
-> > > have an optional secret sub-element within the <sev> element and li=
-bvirt would
-> > > simply check if that secret has a value set, once the GO issues
-> > > virDomainResume(). Any particular reason for having a specific API =
-for this that
-> > > I'm missing?
-> > Initially I was intending to suggest extensive use of virSecret, but =
-it
-> > turns out that despite being called a "secret", none of the SEV data =
-we are
-> > passing around needs protection. Either it is safe to be public, or i=
-t is
-> > already encrypted.  So essentially we just have some data blobs we ne=
-ed to
-> > pass into QEMU. I didn't feel we ought to be abusing virSecret as a
-> > general purpose mechanism for passing in opaque data blobs which do n=
-ot
-> > need any kind of protection.
-> All of the above looks really good to me.
-> While I agree with Daniel=E2=80=99s analysis of the need for =E2=80=9Cs=
-ecret=E2=80=9D, I do like
-> using virSecret to convey the notion of secrecy. But it isn=E2=80=99t n=
-ecessary. The
-> end points are the SEV FW and the guest owner and all secrets they shar=
-e are
-> already encrypted. Embedding it in the =E2=80=9CGO=E2=80=9D command fee=
-ls equally OK to me.
-> Note that sending a secret with a =E2=80=9CGO=E2=80=9D other than the f=
-irst one is an error=E2=80=A6
-> I don=E2=80=99t think libvirt needs to catch that, though. The SEV FW w=
-ill.
+Markus,
+You wanted to discuss the general direction of Python version support
+before applying this.
 
-Setting a secret and resuming a domain are two separate actions, as resum=
-ing a
-domain doesn't take any arbitrary data (ambiguity of the opaque data).
-This would especially be an issue if we allowed multiple secrets to be pa=
-ssed to
-the guest. Therefore such a check is transparent to libvirt, as libvirt c=
-an't
-reliably tell how many secrets are there necessary to be passed to the gu=
-est
-(only guest owner knows that) - libvirt would only fail setting the same =
-secret
-multiple times with QEMU error which in turn would get it from SEV FW).
+Has consensus been reached?
 
-Additionally, virDomainResume() can be called multiple times on the same =
-domain
-safely, since the domain to be resumed is going to be in the 'running' in=
- all
-but the first time you call the function.
+Stefan
 
-Erik
+> 
+> David
+> 
+>  configure            |  6 ++++--
+>  scripts/qapi.py      | 31 ++++++++++++++++++++-----------
+>  scripts/qapi2texi.py | 10 +++++-----
+>  scripts/signrom.py   |  4 ++--
+>  4 files changed, 31 insertions(+), 20 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index dd73cce..09f4d68 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1548,9 +1548,11 @@ fi
+>  
+>  # Note that if the Python conditional here evaluates True we will exit
+>  # with status 1 which is a shell 'false' value.
+> -if ! $python -c 'import sys; sys.exit(sys.version_info < (2,6) or sys.version_info >= (3,))'; then
+> +if ! $python -c 'import sys; sys.exit(sys.version_info >= (3,) and sys.version_info < (3,6))'; then
+> +  error_exit "Cannot use '$python', Python 3.6 or later is required." \
+> +      "Use --python=/path/to/python3 to specify a supported Python 3."
+> +elif ! $python -c 'import sys; sys.exit(sys.version_info < (2,6))'; then
+>    error_exit "Cannot use '$python', Python 2.6 or later is required." \
+> -      "Note that Python 3 or later is not yet supported." \
+>        "Use --python=/path/to/python to specify a supported Python."
+>  fi
+>  
+> diff --git a/scripts/qapi.py b/scripts/qapi.py
+> index 8aa2775..6450998 100644
+> --- a/scripts/qapi.py
+> +++ b/scripts/qapi.py
+> @@ -15,9 +15,11 @@ import errno
+>  import getopt
+>  import os
+>  import re
+> -import string
+>  import sys
+> -from ordereddict import OrderedDict
+> +try:
+> +    from collections import OrderedDict
+> +except ImportError:
+> +    from ordereddict import OrderedDict
+>  
+>  builtin_types = {
+>      'null':     'QTYPE_QNULL',
+> @@ -252,7 +254,7 @@ class QAPIDoc(object):
+>                                 "'Returns:' is only valid for commands")
+>  
+>      def check(self):
+> -        bogus = [name for name, section in self.args.iteritems()
+> +        bogus = [name for name, section in self.args.items()
+>                   if not section.member]
+>          if bogus:
+>              raise QAPISemError(
+> @@ -308,7 +310,7 @@ class QAPISchemaParser(object):
+>                  if not isinstance(pragma, dict):
+>                      raise QAPISemError(
+>                          info, "Value of 'pragma' must be a dictionary")
+> -                for name, value in pragma.iteritems():
+> +                for name, value in pragma.items():
+>                      self._pragma(name, value, info)
+>              else:
+>                  expr_elem = {'expr': expr,
+> @@ -1574,7 +1576,7 @@ class QAPISchema(object):
+>  
+>      def _make_members(self, data, info):
+>          return [self._make_member(key, value, info)
+> -                for (key, value) in data.iteritems()]
+> +                for (key, value) in data.items()]
+>  
+>      def _def_struct_type(self, expr, info, doc):
+>          name = expr['struct']
+> @@ -1606,11 +1608,11 @@ class QAPISchema(object):
+>                  name, info, doc, 'base', self._make_members(base, info)))
+>          if tag_name:
+>              variants = [self._make_variant(key, value)
+> -                        for (key, value) in data.iteritems()]
+> +                        for (key, value) in data.items()]
+>              members = []
+>          else:
+>              variants = [self._make_simple_variant(key, value, info)
+> -                        for (key, value) in data.iteritems()]
+> +                        for (key, value) in data.items()]
+>              typ = self._make_implicit_enum_type(name, info,
+>                                                  [v.name for v in variants])
+>              tag_member = QAPISchemaObjectTypeMember('type', typ, False)
+> @@ -1625,7 +1627,7 @@ class QAPISchema(object):
+>          name = expr['alternate']
+>          data = expr['data']
+>          variants = [self._make_variant(key, value)
+> -                    for (key, value) in data.iteritems()]
+> +                    for (key, value) in data.items()]
+>          tag_member = QAPISchemaObjectTypeMember('type', 'QType', False)
+>          self._def_entity(
+>              QAPISchemaAlternateType(name, info, doc,
+> @@ -1735,7 +1737,11 @@ def c_enum_const(type_name, const_name, prefix=None):
+>          type_name = prefix
+>      return camel_to_upper(type_name) + '_' + c_name(const_name, False).upper()
+>  
+> -c_name_trans = string.maketrans('.-', '__')
+> +try:
+> +    c_name_trans = str.maketrans('.-', '__')
+> +except AttributeError:
+> +    import string
+> +    c_name_trans = string.maketrans('.-', '__')
+>  
+>  
+>  # Map @name to a valid C identifier.
+> @@ -1997,8 +2003,11 @@ def open_output(output_dir, do_c, do_h, prefix, c_file, h_file,
+>          if really:
+>              return open(name, opt)
+>          else:
+> -            import StringIO
+> -            return StringIO.StringIO()
+> +            try:
+> +                from StringIO import StringIO
+> +            except ImportError:
+> +                from io import StringIO
+> +            return StringIO()
+>  
+>      fdef = maybe_open(do_c, c_file, 'w')
+>      fdecl = maybe_open(do_h, h_file, 'w')
+> diff --git a/scripts/qapi2texi.py b/scripts/qapi2texi.py
+> index a317526..9a6fed9 100755
+> --- a/scripts/qapi2texi.py
+> +++ b/scripts/qapi2texi.py
+> @@ -147,7 +147,7 @@ def texi_member(member, suffix=''):
+>  def texi_members(doc, what, base, variants, member_func):
+>      """Format the table of members"""
+>      items = ''
+> -    for section in doc.args.itervalues():
+> +    for section in doc.args.values():
+>          # TODO Drop fallbacks when undocumented members are outlawed
+>          if section.content:
+>              desc = texi_format(str(section))
+> @@ -285,15 +285,15 @@ def texi_schema(schema):
+>  def main(argv):
+>      """Takes schema argument, prints result to stdout"""
+>      if len(argv) != 2:
+> -        print >>sys.stderr, "%s: need exactly 1 argument: SCHEMA" % argv[0]
+> +        sys.stderr.write("%s: need exactly 1 argument: SCHEMA\n" % argv[0])
+>          sys.exit(1)
+>  
+>      schema = qapi.QAPISchema(argv[1])
+>      if not qapi.doc_required:
+> -        print >>sys.stderr, ("%s: need pragma 'doc-required' "
+> -                             "to generate documentation" % argv[0])
+> +        sys.stderr.write("%s: need pragma 'doc-required' "
+> +                         "to generate documentation\n" % argv[0])
+>          sys.exit(1)
+> -    print texi_schema(schema)
+> +    sys.stdout.write(texi_schema(schema) + "\n")
+>  
+>  
+>  if __name__ == '__main__':
+> diff --git a/scripts/signrom.py b/scripts/signrom.py
+> index d1dabe0..0497a1c 100644
+> --- a/scripts/signrom.py
+> +++ b/scripts/signrom.py
+> @@ -18,7 +18,7 @@ fin = open(sys.argv[1], 'rb')
+>  fout = open(sys.argv[2], 'wb')
+>  
+>  magic = fin.read(2)
+> -if magic != '\x55\xaa':
+> +if magic != b'\x55\xaa':
+>      sys.exit("%s: option ROM does not begin with magic 55 aa" % sys.argv[1])
+>  
+>  size_byte = ord(fin.read(1))
+> @@ -33,7 +33,7 @@ elif len(data) < size:
+>      # Add padding if necessary, rounding the whole input to a multiple of
+>      # 512 bytes according to the third byte of the input.
+>      # size-1 because a final byte is added below to store the checksum.
+> -    data = data.ljust(size-1, '\0')
+> +    data = data.ljust(size-1, b'\0')
+>  else:
+>      if ord(data[-1:]) != 0:
+>          sys.stderr.write('WARNING: ROM includes nonzero checksum\n')
+> -- 
+> 2.13.5
+> 
+> 
