@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37950)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37982)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dtyUk-0007j6-9k
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:02:09 -0400
+	(envelope-from <eblake@redhat.com>) id 1dtyUq-0007oq-98
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:02:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dtyUh-0008I5-TR
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:02:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47880)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dtyUh-0008Hm-Kg
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:01:59 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Mon, 18 Sep 2017 18:00:07 +0200
-Message-Id: <20170918160012.4317-23-david@redhat.com>
-In-Reply-To: <20170918160012.4317-1-david@redhat.com>
-References: <20170918160012.4317-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v1 22/27] s390x/tcg: implement SIGP CONDITIONAL
- EMERGENCY SIGNAL
+	(envelope-from <eblake@redhat.com>) id 1dtyUi-0008IG-DJ
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:02:08 -0400
+References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
+	<20170918135935.255591-6-vsementsov@virtuozzo.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <cd7f10e4-2e78-5108-f744-eab2babb5965@redhat.com>
+Date: Mon, 18 Sep 2017 11:01:45 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170918135935.255591-6-vsementsov@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wbh552j6MMcVJt4HMKsVC1rCtSj9IovGW"
+Subject: Re: [Qemu-devel] [PATCH v2 5/7] block/nbd-client:
+ nbd_co_send_request: return -EIO if s->quit was set in parallel
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,84 +25,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-Mostly analogous to the kernel/KVM version (so I assume the checks are
-correct :) ). As a preparation for TCG.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wbh552j6MMcVJt4HMKsVC1rCtSj9IovGW
+From: Eric Blake <eblake@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+Message-ID: <cd7f10e4-2e78-5108-f744-eab2babb5965@redhat.com>
+Subject: Re: [PATCH v2 5/7] block/nbd-client: nbd_co_send_request: return -EIO
+ if s->quit was set in parallel
+References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
+ <20170918135935.255591-6-vsementsov@virtuozzo.com>
+In-Reply-To: <20170918135935.255591-6-vsementsov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cpu.h  |  1 +
- target/s390x/sigp.c | 37 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
+On 09/18/2017 08:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+> It's incorrect to return success rc >=3D 0 if we skip qio_channel_write=
+v_all()
+> call due to s->quit.
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 5aa755d7b5..97d4abb6c0 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -594,6 +594,7 @@ struct sysib_322 {
- #define SIGP_SET_PREFIX        0x0d
- #define SIGP_STORE_STATUS_ADDR 0x0e
- #define SIGP_SET_ARCH          0x12
-+#define SIGP_COND_EMERGENCY    0x13
- #define SIGP_SENSE_RUNNING     0x15
- #define SIGP_STORE_ADTL_STATUS 0x17
- 
-diff --git a/target/s390x/sigp.c b/target/s390x/sigp.c
-index d492885787..ce8fda9d01 100644
---- a/target/s390x/sigp.c
-+++ b/target/s390x/sigp.c
-@@ -290,6 +290,40 @@ static void sigp_set_prefix(CPUState *cs, run_on_cpu_data arg)
-     si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
- }
- 
-+static void sigp_cond_emergency(S390CPU *src_cpu, S390CPU *dst_cpu,
-+                                SigpInfo *si)
-+{
-+    const uint64_t psw_int_mask = PSW_MASK_IO | PSW_MASK_EXT;
-+    uint16_t p_asn, s_asn, asn;
-+    uint64_t psw_addr, psw_mask;
-+    bool idle;
-+
-+    if (!tcg_enabled()) {
-+        /* handled in KVM */
-+        set_sigp_status(si, SIGP_STAT_INVALID_ORDER);
-+        return;
-+    }
-+
-+    /* this looks racy, but these values are only used when STOPPED */
-+    idle = CPU(dst_cpu)->halted;
-+    psw_addr = dst_cpu->env.psw.addr;
-+    psw_mask = dst_cpu->env.psw.mask;
-+    asn = si->param;
-+    p_asn = dst_cpu->env.cregs[4] & 0xffff;  /* Primary ASN */
-+    s_asn = dst_cpu->env.cregs[3] & 0xffff;  /* Secondary ASN */
-+
-+    if (s390_cpu_get_state(dst_cpu) != CPU_STATE_STOPPED ||
-+        (psw_mask & psw_int_mask) != psw_int_mask ||
-+        (idle && psw_addr != 0) ||
-+        (!idle && (asn == p_asn || asn == s_asn))) {
-+        cpu_inject_emergency_signal(dst_cpu, src_cpu->env.core_id);
-+    } else {
-+        set_sigp_status(si, SIGP_STAT_INCORRECT_STATE);
-+    }
-+
-+    si->cc = SIGP_CC_ORDER_CODE_ACCEPTED;
-+}
-+
- static void sigp_sense_running(S390CPU *dst_cpu, SigpInfo *si)
- {
-     if (!tcg_enabled()) {
-@@ -369,6 +403,9 @@ static int handle_sigp_single_dst(S390CPU *cpu, S390CPU *dst_cpu, uint8_t order,
-     case SIGP_CPU_RESET:
-         run_on_cpu(CPU(dst_cpu), sigp_cpu_reset, RUN_ON_CPU_HOST_PTR(&si));
-         break;
-+    case SIGP_COND_EMERGENCY:
-+        sigp_cond_emergency(cpu, dst_cpu, &si);
-+        break;
-     case SIGP_SENSE_RUNNING:
-         sigp_sense_running(dst_cpu, &si);
-         break;
--- 
-2.13.5
+Does this need to cc: qemu-stable for 2.10.1 (or put another way, can we
+come up with some scenario of EAGAIN or other handling that would
+actually set s->quit in a parallel coroutine when a client sends out
+multiple requests at once)?
+
+>=20
+> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> ---
+>  block/nbd-client.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/block/nbd-client.c b/block/nbd-client.c
+> index f331f08a9a..280147e6a7 100644
+> --- a/block/nbd-client.c
+> +++ b/block/nbd-client.c
+> @@ -189,6 +189,9 @@ static int nbd_co_send_request(BlockDriverState *bs=
+,
+>      }
+> =20
+>  err:
+> +    if (rc >=3D 0 && s->quit) {
+> +        rc =3D -EIO;
+> +    }
+
+I'm still not convinced this is in the right place.  This fails the
+send_request regardless of whether we skipped qio_channel_writev_all();
+shouldn't the rc be set only in the case that we actually skipped
+writing the full command because s->quit was detected at that point in ti=
+me?
+
+>      if (rc < 0) {
+>          s->quit =3D true;
+>          s->requests[i].coroutine =3D NULL;
+>=20
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--wbh552j6MMcVJt4HMKsVC1rCtSj9IovGW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm/7ekACgkQp6FrSiUn
+Q2oU/QgAgJ6nn8rD3nzOXhPX6kMmFYJd4zh/rXbLi1IPmRvL8HJSKcqcflL5kw+c
+tfGaO5P3GS0uTKEAE6Hn+XscvObpANfjFyzWgqsodGcJxUH63dt2YdLX8/22mAuD
+uAguSY475wf6FIPIXjwxNeAwvpbPnVa9SnhyY/SEQ2aFhfzQvsfcT0k0BVXV9+sJ
+JAFhLYfTA1On7QFHe7C7k3hJ2UG7TbjMXSnjdA/XoRLLG+shN5uwpdyymPDReXPx
+o3STF+HRA8ldYnKX8ILt2ZPFq9aTWkW3Y7UVeHg4tu4TBx893MjCIMmmjs5ZHRzE
+02FixOYegE/1kHJPZQ6HK10PDWmr4Q==
+=JYrv
+-----END PGP SIGNATURE-----
+
+--wbh552j6MMcVJt4HMKsVC1rCtSj9IovGW--
