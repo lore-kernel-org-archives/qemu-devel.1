@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44046)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1du1Fd-0001xH-Ft
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:58:38 -0400
+	(envelope-from <eblake@redhat.com>) id 1du1Fe-0001yT-JJ
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:58:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1du1Fc-0006J0-Az
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:58:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1du1Fd-0006K5-La
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:58:38 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 18 Sep 2017 13:58:01 -0500
-Message-Id: <20170918185819.5984-3-eblake@redhat.com>
+Date: Mon, 18 Sep 2017 13:58:02 -0500
+Message-Id: <20170918185819.5984-4-eblake@redhat.com>
 In-Reply-To: <20170918185819.5984-1-eblake@redhat.com>
 References: <20170918185819.5984-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 02/20] hbitmap: Rename
- serialization_granularity to serialization_align
+Subject: [Qemu-devel] [PATCH v8 03/20] qcow2: Ensure bitmap serialization is
+ aligned
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,14 +21,25 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Fam Zheng <famz@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-The only client of hbitmap_serialization_granularity() is dirty-bitmap's
-bdrv_dirty_bitmap_serialization_align().  Keeping the two names consistent
-is worthwhile, and the shorter name is more representative of what the
-function returns (the required alignment to be used for start/count of
-other serialization functions, where violating the alignment causes
-assertion failures).
+When subdividing a bitmap serialization, the code in hbitmap.c
+enforces that start/count parameters are aligned (except that
+count can end early at end-of-bitmap).  We exposed this required
+alignment through bdrv_dirty_bitmap_serialization_align(), but
+forgot to actually check that we comply with it.
+
+Fortunately, qcow2 is never dividing bitmap serialization smaller
+than one cluster (which is a minimum of 512 bytes); so we are
+always compliant with the serialization alignment (which insists
+that we partition at least 64 bits per chunk) because we are doing
+at least 4k bits per chunk.
+
+Still, it's safer to add an assertion (for the unlikely case that
+we'd ever support a cluster smaller than 512 bytes, or if the
+hbitmap implementation changes what it considers to be aligned),
+rather than leaving bdrv_dirty_bitmap_serialization_align()
+without a caller.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
@@ -37,122 +48,28 @@ Reviewed-by: John Snow <jsnow@redhat.com>
 v5: no change
 v4: new patch
 ---
- include/qemu/hbitmap.h |  8 ++++----
- block/dirty-bitmap.c   |  2 +-
- tests/test-hbitmap.c   | 10 +++++-----
- util/hbitmap.c         |  8 ++++----
- 4 files changed, 14 insertions(+), 14 deletions(-)
+ block/qcow2-bitmap.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index d3a74a21fc..81e78043d1 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -159,16 +159,16 @@ bool hbitmap_get(const HBitmap *hb, uint64_t item);
- bool hbitmap_is_serializable(const HBitmap *hb);
-
- /**
-- * hbitmap_serialization_granularity:
-+ * hbitmap_serialization_align:
-  * @hb: HBitmap to operate on.
-  *
-- * Granularity of serialization chunks, used by other serialization functions.
-- * For every chunk:
-+ * Required alignment of serialization chunks, used by other serialization
-+ * functions. For every chunk:
-  * 1. Chunk start should be aligned to this granularity.
-  * 2. Chunk size should be aligned too, except for last chunk (for which
-  *      start + count == hb->size)
-  */
--uint64_t hbitmap_serialization_granularity(const HBitmap *hb);
-+uint64_t hbitmap_serialization_align(const HBitmap *hb);
-
- /**
-  * hbitmap_serialization_size:
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 30462d4f9a..0490ca3aff 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -617,7 +617,7 @@ uint64_t bdrv_dirty_bitmap_serialization_size(const BdrvDirtyBitmap *bitmap,
-
- uint64_t bdrv_dirty_bitmap_serialization_align(const BdrvDirtyBitmap *bitmap)
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index e8d3bdbd6e..b3ee4c794a 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -274,10 +274,13 @@ static int free_bitmap_clusters(BlockDriverState *bs, Qcow2BitmapTable *tb)
+ static uint64_t sectors_covered_by_bitmap_cluster(const BDRVQcow2State *s,
+                                                   const BdrvDirtyBitmap *bitmap)
  {
--    return hbitmap_serialization_granularity(bitmap->bitmap);
-+    return hbitmap_serialization_align(bitmap->bitmap);
+-    uint32_t sector_granularity =
++    uint64_t sector_granularity =
+             bdrv_dirty_bitmap_granularity(bitmap) >> BDRV_SECTOR_BITS;
++    uint64_t sbc = sector_granularity * (s->cluster_size << 3);
+
+-    return (uint64_t)sector_granularity * (s->cluster_size << 3);
++    assert(QEMU_IS_ALIGNED(sbc,
++                           bdrv_dirty_bitmap_serialization_align(bitmap)));
++    return sbc;
  }
 
- void bdrv_dirty_bitmap_serialize_part(const BdrvDirtyBitmap *bitmap,
-diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-index 1acb353889..af41642346 100644
---- a/tests/test-hbitmap.c
-+++ b/tests/test-hbitmap.c
-@@ -738,15 +738,15 @@ static void test_hbitmap_meta_one(TestHBitmapData *data, const void *unused)
-     }
- }
-
--static void test_hbitmap_serialize_granularity(TestHBitmapData *data,
--                                               const void *unused)
-+static void test_hbitmap_serialize_align(TestHBitmapData *data,
-+                                         const void *unused)
- {
-     int r;
-
-     hbitmap_test_init(data, L3 * 2, 3);
-     g_assert(hbitmap_is_serializable(data->hb));
-
--    r = hbitmap_serialization_granularity(data->hb);
-+    r = hbitmap_serialization_align(data->hb);
-     g_assert_cmpint(r, ==, 64 << 3);
- }
-
-@@ -974,8 +974,8 @@ int main(int argc, char **argv)
-     hbitmap_test_add("/hbitmap/meta/word", test_hbitmap_meta_word);
-     hbitmap_test_add("/hbitmap/meta/sector", test_hbitmap_meta_sector);
-
--    hbitmap_test_add("/hbitmap/serialize/granularity",
--                     test_hbitmap_serialize_granularity);
-+    hbitmap_test_add("/hbitmap/serialize/align",
-+                     test_hbitmap_serialize_align);
-     hbitmap_test_add("/hbitmap/serialize/basic",
-                      test_hbitmap_serialize_basic);
-     hbitmap_test_add("/hbitmap/serialize/part",
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 21535cc90b..2f9d0fdbd0 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -413,14 +413,14 @@ bool hbitmap_is_serializable(const HBitmap *hb)
- {
-     /* Every serialized chunk must be aligned to 64 bits so that endianness
-      * requirements can be fulfilled on both 64 bit and 32 bit hosts.
--     * We have hbitmap_serialization_granularity() which converts this
-+     * We have hbitmap_serialization_align() which converts this
-      * alignment requirement from bitmap bits to items covered (e.g. sectors).
-      * That value is:
-      *    64 << hb->granularity
-      * Since this value must not exceed UINT64_MAX, hb->granularity must be
-      * less than 58 (== 64 - 6, where 6 is ld(64), i.e. 1 << 6 == 64).
-      *
--     * In order for hbitmap_serialization_granularity() to always return a
-+     * In order for hbitmap_serialization_align() to always return a
-      * meaningful value, bitmaps that are to be serialized must have a
-      * granularity of less than 58. */
-
-@@ -437,7 +437,7 @@ bool hbitmap_get(const HBitmap *hb, uint64_t item)
-     return (hb->levels[HBITMAP_LEVELS - 1][pos >> BITS_PER_LEVEL] & bit) != 0;
- }
-
--uint64_t hbitmap_serialization_granularity(const HBitmap *hb)
-+uint64_t hbitmap_serialization_align(const HBitmap *hb)
- {
-     assert(hbitmap_is_serializable(hb));
-
-@@ -454,7 +454,7 @@ static void serialization_chunk(const HBitmap *hb,
-                                 unsigned long **first_el, uint64_t *el_count)
- {
-     uint64_t last = start + count - 1;
--    uint64_t gran = hbitmap_serialization_granularity(hb);
-+    uint64_t gran = hbitmap_serialization_align(hb);
-
-     assert((start & (gran - 1)) == 0);
-     assert((last >> hb->granularity) < hb->size);
+ /* load_bitmap_data
 -- 
 2.13.5
