@@ -1,32 +1,43 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43734)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dtvjg-0005Fy-0v
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:05:21 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dtvmq-0006az-01
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:08:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dtvjY-0006Qu-Da
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:05:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45976)
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dtvmm-0008L8-MS
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:08:31 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36518
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dtvjY-0006Ps-44
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:05:08 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dtvmm-0008Ku-GS
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 09:08:28 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8ID4YkB062909
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 09:05:06 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d2afwfxdq-1
+	v8ID4cW3060517
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 09:08:27 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d2e9yhkpd-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 09:05:05 -0400
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 09:08:27 -0400
 Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 18 Sep 2017 14:04:59 +0100
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 18 Sep 2017 15:04:55 +0200
-Message-Id: <20170918130455.144262-1-borntraeger@de.ibm.com>
-Subject: [Qemu-devel] [PATCH] MAINTAINERS/s390x: add terminal3270.c
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Mon, 18 Sep 2017 14:08:24 +0100
+References: <1505092362-10544-1-git-send-email-longpeng2@huawei.com>
+	<1505092362-10544-2-git-send-email-longpeng2@huawei.com>
+	<67d5549e-84de-ee85-00a7-37edc52234c4@linux.vnet.ibm.com>
+	<33183CC9F5247A488A2544077AF19020DA3D9A7B@DGGEMA505-MBX.china.huawei.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Mon, 18 Sep 2017 15:08:16 +0200
+MIME-Version: 1.0
+In-Reply-To: <33183CC9F5247A488A2544077AF19020DA3D9A7B@DGGEMA505-MBX.china.huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <73b9f2a8-6746-593b-4277-3ea757476130@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH REPOST v19 1/2] virtio-crypto: Add virtio
+ crypto device specification
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,26 +46,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>
+To: "Gonglei (Arei)" <arei.gonglei@huawei.com>, longpeng <longpeng2@huawei.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "virtio-dev@lists.oasis-open.org" <virtio-dev@lists.oasis-open.org>
+Cc: "Huangweidong (C)" <weidong.huang@huawei.com>, "mst@redhat.com" <mst@redhat.com>, "jasowang@redhat.com" <jasowang@redhat.com>, "john.griffin@intel.com" <john.griffin@intel.com>, "Varun.Sethi@freescale.com" <Varun.Sethi@freescale.com>, "denglingli@chinamobile.com" <denglingli@chinamobile.com>, "arei.gonglei@hotmail.com" <arei.gonglei@hotmail.com>, "agraf@suse.de" <agraf@suse.de>, "vincent.jardin@6wind.com" <vincent.jardin@6wind.com>, "Ola.Liljedahl@arm.com" <Ola.Liljedahl@arm.com>, Luonengjun <luonengjun@huawei.com>, "xin.zeng@intel.com" <xin.zeng@intel.com>, "liang.j.ma@intel.com" <liang.j.ma@intel.com>, "stefanha@redhat.com" <stefanha@redhat.com>, Jani Kokkonen <Jani.Kokkonen@huawei.com>, "brian.a.keating@intel.com" <brian.a.keating@intel.com>, "wangxin (U)" <wangxinxin.wang@huawei.com>, "cohuck@redhat.com" <cohuck@redhat.com>, "mike.caraman@nxp.com" <mike.caraman@nxp.com>
 
-Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-Acked-by: Halil Pasic <pasic@linux.vnet.ibm.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4bd1797..3cdaa52 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -789,6 +789,7 @@ M: Christian Borntraeger <borntraeger@de.ibm.com>
- M: Alexander Graf <agraf@suse.de>
- S: Supported
- F: hw/char/sclp*.[hc]
-+F: hw/char/terminal3270.c
- F: hw/s390x/
- F: include/hw/s390x/
- F: pc-bios/s390-ccw/
--- 
-2.9.4
+
+On 09/18/2017 02:13 PM, Gonglei (Arei) wrote:
+>> Destroy does not need to specify queue_id. That means session_id's aren't
+>> queue scoped from namespace perspective. The question remains what is
+>> queue_id good for, and whether a session type op request should be
+>> rejected if the the session id originates from a session creation
+>> request specifying a different dataqueue (not the dataqueue containing
+>> the given request)?
+>>
+> My original idea about the queue_id is using the queue_id to specify which
+> datequeue of the following data requests will be used. But after deep thinking,
+> I find that the queue_id is superfluous, and the current code in QEMU also
+> don't use the queue_id value as well. That's because the we can use session_id
+> to find the pervious session information and get the current dataqueue id
+> from the used virtqueue .
+> 
+> So maybe we should drop the queue_id this time.
+> 
+> 
+
+Sounds reasonable to me. We can make it reserved and ignored in
+the specification. Linux uses it, but it's always set to 0 as we only
+support one data-queue (if I'm not wrong). So reserved and must be zero
+is an option too.
+
+Halil
