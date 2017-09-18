@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duFtT-0001DF-Uo
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:47 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1duFtQ-00016I-10
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duFtR-0002nv-0Q
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:43 -0400
-Date: Tue, 19 Sep 2017 09:03:58 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1duFtN-0002i8-Sb
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:40 -0400
+Date: Tue, 19 Sep 2017 06:37:02 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170918230358.GG27153@umbus>
-References: <150539846159.21523.16161730500010192093.stgit@bahia>
-	<150539848430.21523.2732328570419779115.stgit@bahia>
+Message-ID: <20170918203702.GH15823@umbus>
+References: <1505668548-16616-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1505668548-16616-6-git-send-email-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="w2JjAQZceEVGylhD"
+	protocol="application/pgp-signature"; boundary="nqkreNcslJAfgyzk"
 Content-Disposition: inline
-In-Reply-To: <150539848430.21523.2732328570419779115.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] spapr_pci: make index property
- mandatory
+In-Reply-To: <1505668548-16616-6-git-send-email-mark.cave-ayland@ilande.co.uk>
+Subject: Re: [Qemu-devel] [PATCH 5/8] ppc/mac: More rework of the DBDMA
+ emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,197 +25,392 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, benh@kernel.crashing.org
 
 
---w2JjAQZceEVGylhD
+--nqkreNcslJAfgyzk
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 14, 2017 at 04:14:44PM +0200, Greg Kurz wrote:
-> Creating several PHBs without index property confuses the DRC code
-> and causes issues:
-> - only the first index-less PHB is functional, the other ones will
->   silently ignore hotplugging of PCI devices
-> - QEMU will even terminate if these PHBs have cold-plugged devices
+On Sun, Sep 17, 2017 at 06:15:45PM +0100, Mark Cave-Ayland wrote:
+> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+>=20
+> This completely reworks the handling of the control register
+> according to my understanding of the HW and the spec.
+>=20
+> It should (hopefully ... still testing) fix a number of issues
+> most notably cases of MacOS hanging.
+>=20
+> Also update dbdma_unassigned_rw() and dbdma_unassigned_flush() to
+> have the expected behaviour now that flush is handled slightly
+> differently.
+>=20
+> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 
-So, this is true, but it's kind of missing the point; we could fix
-those things if we wanted.  The real point here is that the non-index
-option is more trouble than it's worth: it's difficult to use, keeps
-requiring (potentially incompatible) changes when some new parameter
-needs adding, and is awkward to check for collisions.
+Applied to ppc-for-2.11.
 
-> qemu-system-ppc64: -device virtio-net,bus=3Dpci2.0: an attached device
->  is still awaiting release
->=20
-> This happens because DR connectors for child PCI devices are created
-> with a DRC index that is derived from the PHB's index property. If the
-> PHBs are created without index, then the same value of -1 is used to
-> compute the DRC indexes for both PHBs, hence causing the collision.
->=20
-> Also, the index property is used to compute the placement of the PHB's
-> memory regions. It is limited to 31 or 255, depending on the machine
-> type version. This fits well with the requirements of DRC indexes, which
-> need the PHB index to be a 16-bit value.
->=20
-> This patch hence makes the index property mandatory. As a consequence,
-> the PHB's memory regions and BUID are now always configured according
-> to the index, and it is no longer possible to set them from the command
-> line. We have to introduce a PHB instance init function to initialize
-> the 64-bit window address to -1 because pseries-2.7 and older machines
-> don't set it.
->=20
-> This DOES BREAK backwards compat, but we don't think the non-index
-> PHB feature was used in practice (at least libvirt doesn't) and the
-> simplification is worth it.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
-> v1->v2: - error out if mem64_win_pciaddr is set but mem64_win_size
->           isn't
->         - set mem64_win_addr to -1 for old configuration with 32-bit
->           window below 2G in spapr_phb_realize()
->         - drop instance init function
->=20
-> RFC->v1: - as suggested dy David, updated the changelog to explicitely
->            mention that we intentionally break backwards compat.
-> ---
->  hw/ppc/spapr_pci.c |   53 +++++++++++-----------------------------------=
+>  hw/misc/macio/mac_dbdma.c |  191 +++++++++++++++++++++++++++++++++------=
 ------
->  1 file changed, 11 insertions(+), 42 deletions(-)
+>  1 file changed, 139 insertions(+), 52 deletions(-)
 >=20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index cf54160526fa..024638e18b53 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1523,16 +1523,6 @@ static void spapr_phb_realize(DeviceState *dev, Er=
-ror **errp)
->          sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
->          Error *local_err =3D NULL;
+> diff --git a/hw/misc/macio/mac_dbdma.c b/hw/misc/macio/mac_dbdma.c
+> index 15452b9..3fe5073 100644
+> --- a/hw/misc/macio/mac_dbdma.c
+> +++ b/hw/misc/macio/mac_dbdma.c
+> @@ -96,9 +96,8 @@ static void dbdma_cmdptr_load(DBDMA_channel *ch)
 > =20
-> -        if ((sphb->buid !=3D (uint64_t)-1) || (sphb->dma_liobn[0] !=3D (=
-uint32_t)-1)
-> -            || (sphb->dma_liobn[1] !=3D (uint32_t)-1 && windows_supporte=
-d =3D=3D 2)
-> -            || (sphb->mem_win_addr !=3D (hwaddr)-1)
-> -            || (sphb->mem64_win_addr !=3D (hwaddr)-1)
-> -            || (sphb->io_win_addr !=3D (hwaddr)-1)) {
-> -            error_setg(errp, "Either \"index\" or other parameters must"
-> -                       " be specified for PAPR PHB, not both");
-> -            return;
-> -        }
+>  static void dbdma_cmdptr_save(DBDMA_channel *ch)
+>  {
+> -    DBDMA_DPRINTFCH(ch, "dbdma_cmdptr_save 0x%08x\n",
+> -                    ch->regs[DBDMA_CMDPTR_LO]);
+> -    DBDMA_DPRINTFCH(ch, "xfer_status 0x%08x res_count 0x%04x\n",
+> +    DBDMA_DPRINTFCH(ch, "-> update 0x%08x stat=3D0x%08x, res=3D0x%04x\n",
+> +                    ch->regs[DBDMA_CMDPTR_LO],
+>                      le16_to_cpu(ch->current.xfer_status),
+>                      le16_to_cpu(ch->current.res_count));
+>      dma_memory_write(&address_space_memory, ch->regs[DBDMA_CMDPTR_LO],
+> @@ -166,15 +165,14 @@ static int conditional_wait(DBDMA_channel *ch)
+>      uint16_t sel_mask, sel_value;
+>      uint32_t status;
+>      int cond;
 > -
->          smc->phb_placement(spapr, sphb->index,
->                             &sphb->buid, &sphb->io_win_addr,
->                             &sphb->mem_win_addr, &sphb->mem64_win_addr,
-> @@ -1541,36 +1531,12 @@ static void spapr_phb_realize(DeviceState *dev, E=
-rror **errp)
->              error_propagate(errp, local_err);
->              return;
->          }
-> -    }
+> -    DBDMA_DPRINTFCH(ch, "conditional_wait\n");
+> +    int res =3D 0;
+> =20
+>      wait =3D le16_to_cpu(current->command) & WAIT_MASK;
 > -
-> -    if (sphb->buid =3D=3D (uint64_t)-1) {
-> -        error_setg(errp, "BUID not specified for PHB");
-> -        return;
-> -    }
+>      switch(wait) {
+>      case WAIT_NEVER:  /* don't wait */
+>          return 0;
+>      case WAIT_ALWAYS: /* always wait */
+> +        DBDMA_DPRINTFCH(ch, "  [WAIT_ALWAYS]\n");
+>          return 1;
+>      }
+> =20
+> @@ -187,15 +185,19 @@ static int conditional_wait(DBDMA_channel *ch)
+> =20
+>      switch(wait) {
+>      case WAIT_IFSET:  /* wait if condition bit is 1 */
+> -        if (cond)
+> -            return 1;
+> -        return 0;
+> +        if (cond) {
+> +            res =3D 1;
+> +        }
+> +        DBDMA_DPRINTFCH(ch, "  [WAIT_IFSET=3D%d]\n", res);
+> +        break;
+>      case WAIT_IFCLR:  /* wait if condition bit is 0 */
+> -        if (!cond)
+> -            return 1;
+> -        return 0;
+> +        if (!cond) {
+> +            res =3D 1;
+> +        }
+> +        DBDMA_DPRINTFCH(ch, "  [WAIT_IFCLR=3D%d]\n", res);
+> +        break;
+>      }
+> -    return 0;
+> +    return res;
+>  }
+> =20
+>  static void next(DBDMA_channel *ch)
+> @@ -226,8 +228,6 @@ static void conditional_branch(DBDMA_channel *ch)
+>      uint32_t status;
+>      int cond;
+> =20
+> -    DBDMA_DPRINTFCH(ch, "conditional_branch\n");
 > -
-> -    if ((sphb->dma_liobn[0] =3D=3D (uint32_t)-1) ||
-> -        ((sphb->dma_liobn[1] =3D=3D (uint32_t)-1) && (windows_supported =
-> 1))) {
-> -        error_setg(errp, "LIOBN(s) not specified for PHB");
-> -        return;
-> -    }
-> -
-> -    if (sphb->mem_win_addr =3D=3D (hwaddr)-1) {
-> -        error_setg(errp, "Memory window address not specified for PHB");
-> -        return;
-> -    }
-> -
-> -    if (sphb->io_win_addr =3D=3D (hwaddr)-1) {
-> -        error_setg(errp, "IO window address not specified for PHB");
-> +    } else {
-> +        error_setg(errp, "\"index\" for PAPR PHB is mandatory");
+>      /* check if we must branch */
+> =20
+>      br =3D le16_to_cpu(current->command) & BR_MASK;
+> @@ -237,6 +237,7 @@ static void conditional_branch(DBDMA_channel *ch)
+>          next(ch);
+>          return;
+>      case BR_ALWAYS: /* always branch */
+> +        DBDMA_DPRINTFCH(ch, "  [BR_ALWAYS]\n");
+>          branch(ch);
 >          return;
 >      }
+> @@ -250,16 +251,22 @@ static void conditional_branch(DBDMA_channel *ch)
 > =20
->      if (sphb->mem64_win_size !=3D 0) {
-> -        if (sphb->mem64_win_addr =3D=3D (hwaddr)-1) {
-> -            error_setg(errp,
-> -                       "64-bit memory window address not specified for P=
-HB");
-> -            return;
-> -        }
+>      switch(br) {
+>      case BR_IFSET:  /* branch if condition bit is 1 */
+> -        if (cond)
+> +        if (cond) {
+> +            DBDMA_DPRINTFCH(ch, "  [BR_IFSET =3D 1]\n");
+>              branch(ch);
+> -        else
+> +        } else {
+> +            DBDMA_DPRINTFCH(ch, "  [BR_IFSET =3D 0]\n");
+>              next(ch);
+> +        }
+>          return;
+>      case BR_IFCLR:  /* branch if condition bit is 0 */
+> -        if (!cond)
+> +        if (!cond) {
+> +            DBDMA_DPRINTFCH(ch, "  [BR_IFCLR =3D 1]\n");
+>              branch(ch);
+> -        else
+> +        } else {
+> +            DBDMA_DPRINTFCH(ch, "  [BR_IFCLR =3D 0]\n");
+>              next(ch);
+> +        }
+>          return;
+>      }
+>  }
+> @@ -428,7 +435,7 @@ wait:
+> =20
+>  static void stop(DBDMA_channel *ch)
+>  {
+> -    ch->regs[DBDMA_STATUS] &=3D ~(ACTIVE|DEAD|FLUSH);
+> +    ch->regs[DBDMA_STATUS] &=3D ~(ACTIVE);
+> =20
+>      /* the stop command does not increment command pointer */
+>  }
+> @@ -471,18 +478,22 @@ static void channel_run(DBDMA_channel *ch)
+> =20
+>      switch (cmd) {
+>      case OUTPUT_MORE:
+> +        DBDMA_DPRINTFCH(ch, "* OUTPUT_MORE *\n");
+>          start_output(ch, key, phy_addr, req_count, 0);
+>          return;
+> =20
+>      case OUTPUT_LAST:
+> +        DBDMA_DPRINTFCH(ch, "* OUTPUT_LAST *\n");
+>          start_output(ch, key, phy_addr, req_count, 1);
+>          return;
+> =20
+>      case INPUT_MORE:
+> +        DBDMA_DPRINTFCH(ch, "* INPUT_MORE *\n");
+>          start_input(ch, key, phy_addr, req_count, 0);
+>          return;
+> =20
+>      case INPUT_LAST:
+> +        DBDMA_DPRINTFCH(ch, "* INPUT_LAST *\n");
+>          start_input(ch, key, phy_addr, req_count, 1);
+>          return;
+>      }
+> @@ -508,10 +519,12 @@ static void channel_run(DBDMA_channel *ch)
+> =20
+>      switch (cmd) {
+>      case LOAD_WORD:
+> +        DBDMA_DPRINTFCH(ch, "* LOAD_WORD *\n");
+>          load_word(ch, key, phy_addr, req_count);
+>          return;
+> =20
+>      case STORE_WORD:
+> +        DBDMA_DPRINTFCH(ch, "* STORE_WORD *\n");
+>          store_word(ch, key, phy_addr, req_count);
+>          return;
+>      }
+> @@ -562,43 +575,117 @@ void DBDMA_register_channel(void *dbdma, int nchan=
+, qemu_irq irq,
+>      ch->io.opaque =3D opaque;
+>  }
+> =20
+> -static void
+> -dbdma_control_write(DBDMA_channel *ch)
+> +static void dbdma_control_write(DBDMA_channel *ch)
+>  {
+>      uint16_t mask, value;
+>      uint32_t status;
+> +    bool do_flush =3D false;
+> =20
+>      mask =3D (ch->regs[DBDMA_CONTROL] >> 16) & 0xffff;
+>      value =3D ch->regs[DBDMA_CONTROL] & 0xffff;
+> =20
+> -    value &=3D (RUN | PAUSE | FLUSH | WAKE | DEVSTAT);
 > -
->          if (sphb->mem_win_size > SPAPR_PCI_MEM32_WIN_SIZE) {
->              error_setg(errp, "32-bit memory window of size 0x%"HWADDR_PR=
-Ix
->                         " (max 2 GiB)", sphb->mem_win_size);
-
-Some of these checks could probably just become assert()s now, where
-they're things determined by the placement code and no longer have
-parameters, a problem indicates a bug in the machine rather than a
-user error.
-
-> @@ -1581,6 +1547,9 @@ static void spapr_phb_realize(DeviceState *dev, Err=
-or **errp)
->              /* 64-bit window defaults to identity mapping */
->              sphb->mem64_win_pciaddr =3D sphb->mem64_win_addr;
->          }
-> +    } else if (sphb->mem64_win_pciaddr !=3D (hwaddr) -1) {
-> +        error_setg(errp, "64-bit memory window requires \"mem64_win_size=
-\"");
-> +        return;
-
-Likewise this new one.
-
->      } else if (sphb->mem_win_size > SPAPR_PCI_MEM32_WIN_SIZE) {
->          /*
->           * For compatibility with old configuration, if no 64-bit MMIO
-> @@ -1594,6 +1563,12 @@ static void spapr_phb_realize(DeviceState *dev, Er=
-ror **errp)
->          sphb->mem64_win_pciaddr =3D
->              SPAPR_PCI_MEM_WIN_BUS_OFFSET + SPAPR_PCI_MEM32_WIN_SIZE;
->          sphb->mem_win_size =3D SPAPR_PCI_MEM32_WIN_SIZE;
-> +    } else {
-> +        /* Old configuration with the 32-bit MMIO window <=3D 2GiB don't=
- need a
-> +         * 64-bit MMIO window.
+> +    /* This is the status register which we'll update
+> +     * appropriately and store back
+> +     */
+>      status =3D ch->regs[DBDMA_STATUS];
+> =20
+> -    status =3D (value & mask) | (status & ~mask);
+> +    /* RUN and PAUSE are bits under SW control only
+> +     * FLUSH and WAKE are set by SW and cleared by HW
+> +     * DEAD, ACTIVE and BT are only under HW control
+> +     *
+> +     * We handle ACTIVE separately at the end of the
+> +     * logic to ensure all cases are covered.
+> +     */
+> =20
+> -    if (status & WAKE)
+> -        status |=3D ACTIVE;
+> -    if (status & RUN) {
+> -        status |=3D ACTIVE;
+> -        status &=3D ~DEAD;
+> +    /* Setting RUN will tentatively activate the channel
+> +     */
+> +    if ((mask & RUN) && (value & RUN)) {
+> +        status |=3D RUN;
+> +        DBDMA_DPRINTFCH(ch, " Setting RUN !\n");
+> +    }
+> +
+> +    /* Clearing RUN 1->0 will stop the channel */
+> +    if ((mask & RUN) && !(value & RUN)) {
+> +        /* This has the side effect of clearing the DEAD bit */
+> +        status &=3D ~(DEAD | RUN);
+> +        DBDMA_DPRINTFCH(ch, " Clearing RUN !\n");
+> +    }
+> +
+> +    /* Setting WAKE wakes up an idle channel if it's running
+> +     *
+> +     * Note: The doc doesn't say so but assume that only works
+> +     * on a channel whose RUN bit is set.
+> +     *
+> +     * We set WAKE in status, it's not terribly useful as it will
+> +     * be cleared on the next command fetch but it seems to mimmic
+> +     * the HW behaviour and is useful for the way we handle
+> +     * ACTIVE further down.
+> +     */
+> +    if ((mask & WAKE) && (value & WAKE) && (status & RUN)) {
+> +        status |=3D WAKE;
+> +        DBDMA_DPRINTFCH(ch, " Setting WAKE !\n");
+> +    }
+> +
+> +    /* PAUSE being set will deactivate (or prevent activation)
+> +     * of the channel. We just copy it over for now, ACTIVE will
+> +     * be re-evaluated later.
+> +     */
+> +    if (mask & PAUSE) {
+> +        status =3D (status & ~PAUSE) | (value & PAUSE);
+> +        DBDMA_DPRINTFCH(ch, " %sing PAUSE !\n",
+> +                        (value & PAUSE) ? "sett" : "clear");
+> +    }
+> +
+> +    /* FLUSH is its own thing */
+> +    if ((mask & FLUSH) && (value & FLUSH))  {
+> +        DBDMA_DPRINTFCH(ch, " Setting FLUSH !\n");
+> +        /* We set flush directly in the status register, we do *NOT*
+> +         * set it in "status" so that it gets naturally cleared when
+> +         * we update the status register further down. That way it
+> +         * will be set only during the HW flush operation so it is
+> +         * visible to any completions happening during that time.
 > +         */
-
-Wouldn't it be easier to just change the test below to check for size
-!=3D 0 instead of checking for addr !=3D -1 as it does now.
-
-> +        sphb->mem64_win_addr =3D (hwaddr) -1;
-> +        sphb->mem64_win_pciaddr =3D (hwaddr) -1;
+> +        ch->regs[DBDMA_STATUS] |=3D FLUSH;
+> +        do_flush =3D true;
+>      }
+> -    if (status & PAUSE)
+> +
+> +    /* If either RUN or PAUSE is clear, so should ACTIVE be,
+> +     * otherwise, ACTIVE will be set if we modified RUN, PAUSE or
+> +     * set WAKE. That means that PAUSE was just cleared, RUN was
+> +     * just set or WAKE was just set.
+> +     */
+> +    if ((status & PAUSE) || !(status & RUN)) {
+>          status &=3D ~ACTIVE;
+> -    if ((ch->regs[DBDMA_STATUS] & RUN) && !(status & RUN)) {
+> -        /* RUN is cleared */
+> -        status &=3D ~(ACTIVE|DEAD);
+> +        DBDMA_DPRINTFCH(ch, "  -> ACTIVE down !\n");
+> +
+> +        /* We stopped processing, we want the underlying HW command
+> +         * to complete *before* we clear the ACTIVE bit. Otherwise
+> +         * we can get into a situation where the command status will
+> +         * have RUN or ACTIVE not set which is going to confuse the
+> +         * MacOS driver.
+> +         */
+> +        do_flush =3D true;
+> +    } else if (mask & (RUN | PAUSE)) {
+> +        status |=3D ACTIVE;
+> +        DBDMA_DPRINTFCH(ch, " -> ACTIVE up !\n");
+> +    } else if ((mask & WAKE) && (value & WAKE)) {
+> +        status |=3D ACTIVE;
+> +        DBDMA_DPRINTFCH(ch, " -> ACTIVE up !\n");
 >      }
 > =20
->      if (spapr_pci_find_phb(spapr, sphb->buid)) {
-> @@ -1789,18 +1764,12 @@ static void spapr_phb_reset(DeviceState *qdev)
+> -    if ((status & FLUSH) && ch->flush) {
+> +    DBDMA_DPRINTFCH(ch, " new status=3D0x%08x\n", status);
+> +
+> +    /* If we need to flush the underlying HW, do it now, this happens
+> +     * both on FLUSH commands and when stopping the channel for safety.
+> +     */
+> +    if (do_flush && ch->flush) {
+>          ch->flush(&ch->io);
+> -        status &=3D ~FLUSH;
+>      }
 > =20
->  static Property spapr_phb_properties[] =3D {
->      DEFINE_PROP_UINT32("index", sPAPRPHBState, index, -1),
-> -    DEFINE_PROP_UINT64("buid", sPAPRPHBState, buid, -1),
-> -    DEFINE_PROP_UINT32("liobn", sPAPRPHBState, dma_liobn[0], -1),
-> -    DEFINE_PROP_UINT32("liobn64", sPAPRPHBState, dma_liobn[1], -1),
-> -    DEFINE_PROP_UINT64("mem_win_addr", sPAPRPHBState, mem_win_addr, -1),
->      DEFINE_PROP_UINT64("mem_win_size", sPAPRPHBState, mem_win_size,
->                         SPAPR_PCI_MEM32_WIN_SIZE),
-> -    DEFINE_PROP_UINT64("mem64_win_addr", sPAPRPHBState, mem64_win_addr, =
--1),
->      DEFINE_PROP_UINT64("mem64_win_size", sPAPRPHBState, mem64_win_size,
->                         SPAPR_PCI_MEM64_WIN_SIZE),
->      DEFINE_PROP_UINT64("mem64_win_pciaddr", sPAPRPHBState, mem64_win_pci=
-addr,
->                         -1),
-> -    DEFINE_PROP_UINT64("io_win_addr", sPAPRPHBState, io_win_addr, -1),
->      DEFINE_PROP_UINT64("io_win_size", sPAPRPHBState, io_win_size,
->                         SPAPR_PCI_IO_WIN_SIZE),
->      DEFINE_PROP_BOOL("dynamic-reconfiguration", sPAPRPHBState, dr_enable=
-d,
->=20
+> -    DBDMA_DPRINTFCH(ch, "    status 0x%08x\n", status);
+> -
+> +    /* Finally update the status register image */
+>      ch->regs[DBDMA_STATUS] =3D status;
+> =20
+> +    /* If active, make sure the BH gets to run */
+>      if (status & ACTIVE) {
+>          DBDMA_kick(dbdma_from_ch(ch));
+>      }
+> @@ -666,13 +753,9 @@ static uint64_t dbdma_read(void *opaque, hwaddr addr,
+> =20
+>      value =3D ch->regs[reg];
+> =20
+> -    DBDMA_DPRINTFCH(ch, "readl 0x" TARGET_FMT_plx " =3D> 0x%08x\n", addr=
+, value);
+> -    DBDMA_DPRINTFCH(ch, "channel 0x%x reg 0x%x\n",
+> -                    (uint32_t)addr >> DBDMA_CHANNEL_SHIFT, reg);
+> -
+>      switch(reg) {
+>      case DBDMA_CONTROL:
+> -        value =3D 0;
+> +        value =3D ch->regs[DBDMA_STATUS];
+>          break;
+>      case DBDMA_STATUS:
+>      case DBDMA_CMDPTR_LO:
+> @@ -698,6 +781,10 @@ static uint64_t dbdma_read(void *opaque, hwaddr addr,
+>          break;
+>      }
+> =20
+> +    DBDMA_DPRINTFCH(ch, "readl 0x" TARGET_FMT_plx " =3D> 0x%08x\n", addr=
+, value);
+> +    DBDMA_DPRINTFCH(ch, "channel 0x%x reg 0x%x\n",
+> +                    (uint32_t)addr >> DBDMA_CHANNEL_SHIFT, reg);
+> +
+>      return value;
+>  }
+> =20
+> @@ -776,28 +863,28 @@ static void dbdma_reset(void *opaque)
+>  static void dbdma_unassigned_rw(DBDMA_io *io)
+>  {
+>      DBDMA_channel *ch =3D io->channel;
+> -    qemu_log_mask(LOG_GUEST_ERROR, "%s: use of unassigned channel %d\n",
+> -                  __func__, ch->channel);
+> -    ch->io.processing =3D false;
+> -}
+> -
+> -static void dbdma_unassigned_flush(DBDMA_io *io)
+> -{
+> -    DBDMA_channel *ch =3D io->channel;
+>      dbdma_cmd *current =3D &ch->current;
+>      uint16_t cmd;
+>      qemu_log_mask(LOG_GUEST_ERROR, "%s: use of unassigned channel %d\n",
+>                    __func__, ch->channel);
+> +    ch->io.processing =3D false;
+> =20
+>      cmd =3D le16_to_cpu(current->command) & COMMAND_MASK;
+>      if (cmd =3D=3D OUTPUT_MORE || cmd =3D=3D OUTPUT_LAST ||
+>          cmd =3D=3D INPUT_MORE || cmd =3D=3D INPUT_LAST) {
+> -        current->xfer_status =3D cpu_to_le16(ch->regs[DBDMA_STATUS] | FL=
+USH);
+> +        current->xfer_status =3D cpu_to_le16(ch->regs[DBDMA_STATUS]);
+>          current->res_count =3D cpu_to_le16(io->len);
+>          dbdma_cmdptr_save(ch);
+>      }
+>  }
+> =20
+> +static void dbdma_unassigned_flush(DBDMA_io *io)
+> +{
+> +    DBDMA_channel *ch =3D io->channel;
+> +    qemu_log_mask(LOG_GUEST_ERROR, "%s: use of unassigned channel %d\n",
+> +                  __func__, ch->channel);
+> +}
+> +
+>  void* DBDMA_init (MemoryRegion **dbdma_mem)
+>  {
+>      DBDMAState *s;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -223,24 +418,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---w2JjAQZceEVGylhD
+--nqkreNcslJAfgyzk
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnAUNwACgkQbDjKyiDZ
-s5JDsBAApu7BC+53CBO+vJ/iI0fTOgsWdJvIAj4LMAbWgwQhs0+AlQ1k9HMdSJRa
-pcYdtDZ2UkvXUNo8iKfBlTRmdvzML02lKzkZmrpp4h3dZfv/iWMuZSLZP+/oW4W4
-zdyVNh1zPNV+umBEilM+aTYRNpfW3gjwpeclvnBeuluWaVV8NsdeLhLWf+jQuKYJ
-hV96ZSCysVgFy3CfDxkGXGP1pevVwA3rTeFQmU0j6I/HT0C9EJBpWtRtfHXI3vQm
-qytwWrFKUzfwtz/4+y84HPoeA5ED7QyfPgW3DWpQK/rhiTk3vsm5bF2iuBgHhQKf
-WMiluSDAos1qBnbVCPRToF5TeH2D/DbT4RklPryfP0lWrJhqW/jIJMId96l94IHw
-l1KrW17W8LJJUjWf7KdgxD1YwSIBEwrDo6uYBZli10p/scqpU7h6wCJEGJc2NRuR
-QlsdTanO8nLwuEBOIC5vDKINP9D1KEj6P2x35zixvBl3UaIoe8O9wg3Z8vKfWfLz
-LaRk0KrUDM2geilaLiBP7QA1NMZf3nJu027F6MyIvFGplRlHC3qnc1sFROCBuSSw
-TuueFFYhrzB3bGet8OFbTgt7wmWv9IG/+L4sZbK8GhvY+RJV1kAtZLQUafcDEaAD
-izkv1qQjhWCtmHykGkuCN3qQIaXofWzU+8vpJ78LUTJ283reYs4=
-=2aO2
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnALm4ACgkQbDjKyiDZ
+s5L25A/+KSq+NHmcqlPaz1WPJYaTewQnFEvly3kLEpQ09rBSbDGRe5Tw0tHerK1H
+F0v4mIZa/aRqMAtC8e6ZV676e6PEmtRfn+fHxKAGG9pL63cBqIHohNa7ErLDoofU
+6LnAbnnUvPMUDw0feLsOTJmGC7vetDKUzU3B2LhjV+IW9JOwETl1obGnOxcKHSnr
+bNe6NEMQzBP0HVE9p0+1LOkOg76MwTwuYexMRIrHy7D6MUJZPFKYmBI6apP1Qzx0
+OFkSvhT7+nFlgG4lRWWXDUBKViUcZIRMuNtjdP+wmN7nPir4Zd3zTMftzhq+tPb8
+jMd0+IZFwu9CDOgMKWuaxhsccgZIOESAZf1W80ra6YD7DjACoYXxQJcshQBeTbGH
+vjepc+bcQ6i4S4I5mFGgpOZ6lTPVr9xOlQOSM/iolO2J0YX6JZ+KYKc5BXT4Q+uQ
+PwoeWlxXaaEIYMRQ0LleJhthzHx8yc9Ipr5lvo0T80GSL1cWOc1spnHfnNcITVtH
+ORZtE8W/nckD7SPBbUpUq8tGTBG4bhhWnorACxHEVTY1nV1o0OxvOq38EMSI6B1d
+JlyiJv7X1U+Rg+wXKhcH8avJnw41eFloMFKQ6ctbY5ho31R8ytGtvRSDcw+wwlTT
+J+k2s3Xlm5L1vwafuKZm48k+FUnC+Lyf4o86DPZp95sBu9h70Ic=
+=c3tS
 -----END PGP SIGNATURE-----
 
---w2JjAQZceEVGylhD--
+--nqkreNcslJAfgyzk--
