@@ -1,23 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37054)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dtyNQ-0004Mi-4e
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:54:29 -0400
+	(envelope-from <david@redhat.com>) id 1dtyTK-0006Si-Em
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:00:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dtyNP-0004uv-9X
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:54:28 -0400
-References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
-	<20170918135935.255591-4-vsementsov@virtuozzo.com>
-	<d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <7df363e9-4f05-6b90-5ee9-dd848c52857d@redhat.com>
-Date: Mon, 18 Sep 2017 10:54:19 -0500
-MIME-Version: 1.0
-In-Reply-To: <d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="CFCtkQFhvADkNpIhaDlUgT9sxSkdacHVv"
-Subject: Re: [Qemu-devel] [PATCH v2 3/7] block/nbd-client: refactor reading
- reply
+	(envelope-from <david@redhat.com>) id 1dtyTH-0007aT-SG
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:00:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45290)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dtyTH-0007a4-J6
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:00:31 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Mon, 18 Sep 2017 17:59:45 +0200
+Message-Id: <20170918160012.4317-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1 00/27] s390x: SMP for TCG (+ cleanups)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,79 +21,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---CFCtkQFhvADkNpIhaDlUgT9sxSkdacHVv
-From: Eric Blake <eblake@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
-Message-ID: <7df363e9-4f05-6b90-5ee9-dd848c52857d@redhat.com>
-Subject: Re: [PATCH v2 3/7] block/nbd-client: refactor reading reply
-References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
- <20170918135935.255591-4-vsementsov@virtuozzo.com>
- <d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
-In-Reply-To: <d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This series contains:
+- properly implement local external interrupts for TCG
+- factor out KVM SIGP handling code into common code
+- implement missing SIGP orders for TCG handled by the kernel for KVM
+  (including STOP and RESTART interrupts)
+- make TCG use the new SIGP code - experimental SMP support for s390x TCG
+- refactor STFL(E) implementation for TCG
+- bunch of cleanups
 
-On 09/18/2017 10:43 AM, Paolo Bonzini wrote:
-> On 18/09/2017 15:59, Vladimir Sementsov-Ogievskiy wrote:
->> Read the whole reply in one place - in nbd_read_reply_entry.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>=
+Basically all SIGP instructions are fully supported.
 
->> ---
->>  block/nbd-client.h |  1 +
->>  block/nbd-client.c | 42 ++++++++++++++++++++++++------------------
->>  2 files changed, 25 insertions(+), 18 deletions(-)
->>
+Thanks to Aurelien Jarno for the initital prototype and showcasing that
+supporting experimental SMP code can be implemented quite easily.
 
->=20
-> I am not sure this is an improvement.  In principle you could have
-> commands that read replies a bit at a time without using a QEMUIOVector=
-=2E
+TCG SMP on s390x - what works?
+- "-smp X,maxcpus=X" with both, single and multi threaded TCG
+- "-smp ... -device qemu-s390-cpu,id=cpuX,core-id=X"
+- system_powerdown, system_reset, shutdown, reboot, NMI
+- online/offline of CPUs from inside the guest
 
-Right now we don't, but the most likely point where this would be an
-issue is the fact that we want to implement structured replies (the
-server can send more than one response to a single request from the
-client) in order to then implement block status queries (where the
-server can send piecemeal information in response to a query, and the
-client could very easily want to handle information as it comes in
-rather than waiting for the entire server response, especially if the
-amount of information returned by the server is not known a priori by
-the client, the way the length is known in advance for NBD_CMD_READ, but
-instead learned partway through the reply).  I guess the question
-becomes a matter of whether we are over-constraining future additions by
-making this refactoring, or whether we can still implement block status
-queries using a single QEMUIOVector.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+TCG SMP on s390x - what does not work?
+- Floating interrupts all target CPU 0. Don't offline it.
+- CPU hotplug after the machine/main loop has been fully setup
+-- the new CPU comes up, answers and sends emergency signals, but suddenly
+   the VM gets stuck. This is strange, as ordinary online/offline works
+   just fine.
+-- can be triggered by "cpu-add 1" + "system_reset". The system will hang
+   when trying to online CPUs. (note: in Linux code they are fully up and
+   running and already executed code)
+-- also if hotplugging with "-S", before anything has run. This is strange,
+   as "-device qemu-s390-cpu" works just fine.
+-- does not seem to be related to CPU setup/reset code, I checked that
+-- seems to be related to some TCG internals (as broken for single and
+   multi threaded TCG).
+-- common code seems to be somehow broken, not sure if this is even
+   expected to work (e.g. for single threaded TCG, hotplugged CPUs will
+   never get set "cpu->created = true". But doesn't seem to be related to
+   this)
 
 
---CFCtkQFhvADkNpIhaDlUgT9sxSkdacHVv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Based on: https://github.com/cohuck/qemu.git s390-next
+Available on: git@github.com:davidhildenbrand/qemu.git s390x-queue
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm/7CsACgkQp6FrSiUn
-Q2o0AwgAqzTlWXM/kflvpUySktRwnVwcGTRrfI/WHDTATbWy/il4i3IuJRGmJW08
-OjQ2KqBiwHd+xSmqPwHf0Gs3iGJBCg+8dGhO/ahqQEu+pf4q5vfW/7b3o99NmLRV
-RMBxgD84Xom6jlBBluWs7GgQobOshnkjcEqw8njPLxUHhjMglxZHCKjVJPjzS/iX
-oE5d+OjCK5ZKVjPdKsusKkmVdRBzll5CA27zngsca23RILaHEZLwdByPWsAsRj6u
-kOST8Tdh3Vc506SWNlpNehJFJraAMxr+rAVpC3QPp9E0TQgFJe0KK9Hl2nNNSjDX
-BSs11U/dxXd4eKsXtFs0O1DB7E0uRw==
-=Z/i0
------END PGP SIGNATURE-----
+David Hildenbrand (27):
+  s390x: raise CPU hotplug irq after really hotplugged
+  s390x/cpumodel: fix max STFL(E) bit number
+  target/s390x: get rid of next_core_id
+  s390x: introduce and use S390_MAX_CPUS
+  s390/tcg: turn INTERRUPT_EXT into a mask
+  s390x/tcg: injection of emergency signals and extarnal calls
+  s390x/tcg: STOPPED cpus can never wake up
+  s390x/tcg: a CPU cannot switch state due to an interrupt
+  target/s390x: factor out handling of WAIT PSW into handle_wait()
+  s390x/kvm: pass ipb directly into handle_sigp()
+  s390x/kvm: generalize SIGP stop and restart interrupt injection
+  s390x/kvm: factor out storing of CPU status
+  target/s390x: proper cpu->be convertion in s390_store_status()
+  s390x/kvm: factor out storing of adtl CPU status
+  s390x/kvm: drop two debug prints
+  s390x/kvm: factor out SIGP code into sigp.c
+  s390x/kvm: factor out actual handling of STOP interrupts
+  s390x/tcg: implement SIGP SENSE RUNNING STATUS
+  s390x/tcg: implement SIGP SENSE
+  s390x/tcg: implement SIGP EXTERNAL CALL
+  s390x/tcg: implement SIGP EMERGENCY SIGNAL
+  s390x/tcg: implement SIGP CONDITIONAL EMERGENCY SIGNAL
+  s390x/tcg: implement STOP and RESET interrupts for TCG
+  s390x/tcg: flush the tlb on SIGP SET PREFIX
+  s390x/tcg: switch to new SIGP handling code
+  s390x/tcg: unlock NMI
+  s390x/tcg: refactor stfl(e) to use s390_get_feat_block()
 
---CFCtkQFhvADkNpIhaDlUgT9sxSkdacHVv--
+ hw/s390x/s390-virtio-ccw.c  |  17 +-
+ target/s390x/Makefile.objs  |   1 +
+ target/s390x/cpu-qom.h      |   2 -
+ target/s390x/cpu.c          |  40 ++--
+ target/s390x/cpu.h          |  36 +++-
+ target/s390x/cpu_features.c |   2 +-
+ target/s390x/cpu_models.c   |   2 +
+ target/s390x/excp_helper.c  |  98 ++++++---
+ target/s390x/helper.c       | 115 ++++++++--
+ target/s390x/helper.h       |   4 +-
+ target/s390x/internal.h     |  15 ++
+ target/s390x/interrupt.c    |  70 +++++-
+ target/s390x/kvm-stub.c     |  13 +-
+ target/s390x/kvm.c          | 470 +++--------------------------------------
+ target/s390x/kvm_s390x.h    |   3 +-
+ target/s390x/misc_helper.c  | 114 ++++------
+ target/s390x/sigp.c         | 504 ++++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/trace-events   |   4 +-
+ target/s390x/translate.c    |   6 +-
+ 19 files changed, 896 insertions(+), 620 deletions(-)
+ create mode 100644 target/s390x/sigp.c
+
+-- 
+2.13.5
