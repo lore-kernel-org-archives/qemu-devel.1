@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47048)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50525)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dtxtN-0004bc-Fm
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:23:26 -0400
+	(envelope-from <digetx@gmail.com>) id 1dty2a-0007P4-D1
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:32:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1dtxtJ-0004ML-A7
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:23:25 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:51061)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1dtxtI-0004K1-W0
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:23:21 -0400
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <007210a5-de47-e873-7f23-63e052cbcbcd@samsung.com>
-Date: Mon, 18 Sep 2017 18:23:12 +0300
-MIME-version: 1.0
-In-reply-to: <20170918111527.GE2581@work-vm>
-Content-type: text/plain; charset="utf-8"; format="flowed"
-Content-transfer-encoding: 7bit
-Content-language: en-GB
-References: <CGME20170616191218eucas1p2bcc5ece2b03593f16ab599c4f12eaa5e@eucas1p2.samsung.com>
-	<1497640325-10960-1-git-send-email-a.perevalov@samsung.com>
-	<20170918111527.GE2581@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v9 0/8] calculate blocktime for postcopy
- live migration
+	(envelope-from <digetx@gmail.com>) id 1dty2X-0008UJ-1g
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 11:32:56 -0400
+References: <20170224112109.3147-1-alex.bennee@linaro.org>
+	<20170224112109.3147-23-alex.bennee@linaro.org>
+	<7468f944-914c-de89-66fb-f8ad49eb59c1@gmail.com>
+	<87poapbgt0.fsf@linaro.org>
+	<e511a895-b1e3-150f-6555-12ba1fa16273@gmail.com>
+	<87a81sjp15.fsf@linaro.org>
+	<70057789-ab76-1150-ab2e-b5a3239a0209@gmail.com>
+	<87d16ods3s.fsf@linaro.org>
+From: Dmitry Osipenko <digetx@gmail.com>
+Message-ID: <17f6550a-cb60-e15b-1723-b3a5ce7a43a1@gmail.com>
+Date: Mon, 18 Sep 2017 18:32:46 +0300
+MIME-Version: 1.0
+In-Reply-To: <87d16ods3s.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PULL 22/24] target-arm: ensure all cross vCPUs
+ TLB flushes complete
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,134 +31,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, peterx@redhat.com, i.maximets@samsung.com, quintela@redhat.com
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, "open list:ARM" <qemu-arm@nongnu.org>, qemu-devel@nongnu.org
 
-On 09/18/2017 02:15 PM, Dr. David Alan Gilbert wrote:
-> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
->> This is 9th version.
+On 18.09.2017 17:00, Alex Bennée wrote:
+> 
+> Dmitry Osipenko <digetx@gmail.com> writes:
+> 
+>> On 18.09.2017 13:10, Alex Bennée wrote:
+>>>
+>>> Dmitry Osipenko <digetx@gmail.com> writes:
+>>>
+>>>> On 17.09.2017 16:22, Alex Bennée wrote:
+>>>>>
+>>>>> Dmitry Osipenko <digetx@gmail.com> writes:
+>>>>>
+>>>>>> On 24.02.2017 14:21, Alex Bennée wrote:
+>>>>>>> Previously flushes on other vCPUs would only get serviced when they
+>>>>>>> exited their TranslationBlocks. While this isn't overly problematic it
+>>>>>>> violates the semantics of TLB flush from the point of view of source
+>>>>>>> vCPU.
+>>>>>>>
+>>>>>>> To solve this we call the cputlb *_all_cpus_synced() functions to do
+>>>>>>> the flushes which ensures all flushes are completed by the time the
+>>>>>>> vCPU next schedules its own work. As the TLB instructions are modelled
+>>>>>>> as CP writes the TB ends at this point meaning cpu->exit_request will
+>>>>>>> be checked before the next instruction is executed.
+>>>>>>>
+>>>>>>> Deferring the work until the architectural sync point is a possible
+>>>>>>> future optimisation.
+>>>>>>>
+>>>>>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>>>>>> Reviewed-by: Richard Henderson <rth@twiddle.net>
+>>>>>>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+>>>>>>> ---
+>>>>>>>  target/arm/helper.c | 165 ++++++++++++++++++++++------------------------------
+>>>>>>>  1 file changed, 69 insertions(+), 96 deletions(-)
+>>>>>>>
+>>>>>>
+>>>>>> Hello,
+>>>>>>
+>>>>>> I have an issue with Linux kernel stopping to boot on a SMP 32bit ARM (haven't
+>>>>>> checked 64bit) in a single-threaded TCG mode. Kernel reaches point where it
+>>>>>> should mount rootfs over NFS and vCPUs stop. This issue is reproducible with any
+>>>>>> 32bit ARM machine type. Kernel boots fine with a MTTCG accel, only
+>>>>>> single-threaded TCG is affected. Git bisection lead to this patch, any
+>>>>>> ideas?
+>>>>>
+>>>>> It shouldn't cause a problem but can you obtain a backtrace of the
+>>>>> system when hung?
+>>>>>
+>>>>
+>>>> Actually, it looks like TCG enters infinite loop. Do you mean backtrace of QEMU
+>>>> by 'backtrace of the system'? If so, here it is:
+>>>>
+>>>> Thread 4 (Thread 0x7ffa37f10700 (LWP 20716)):
+>>>>
+>>>> #0  0x00007ffa601888bd in poll () at ../sysdeps/unix/syscall-template.S:84
+>>>>
+>>>> #1  0x00007ffa5e3aa561 in poll (__timeout=-1, __nfds=2, __fds=0x7ffa30006dc0) at
+>>>> /usr/include/bits/poll2.h:46
+>>>> #2  poll_func (ufds=0x7ffa30006dc0, nfds=2, timeout=-1, userdata=0x557bd603eae0)
+>>>> at
+>>>> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/thread-mainloop.c:69
+>>>> #3  0x00007ffa5e39bbb1 in pa_mainloop_poll (m=m@entry=0x557bd60401f0) at
+>>>> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/mainloop.c:844
+>>>> #4  0x00007ffa5e39c24e in pa_mainloop_iterate (m=0x557bd60401f0,
+>>>> block=<optimized out>, retval=0x0) at
+>>>> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/mainloop.c:926
+>>>> #5  0x00007ffa5e39c300 in pa_mainloop_run (m=0x557bd60401f0,
+>>>> retval=retval@entry=0x0) at
+>>>> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/mainloop.c:944
+>>>>
+>>>> #6  0x00007ffa5e3aa4a9 in thread (userdata=0x557bd60400f0) at
+>>>> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/thread-mainloop.c:100
+>>>>
+>>>> #7  0x00007ffa599eea38 in internal_thread_func (userdata=0x557bd603e090) at
+>>>> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulsecore/thread-posix.c:81
+>>>>
+>>>> #8  0x00007ffa60453657 in start_thread (arg=0x7ffa37f10700) at
+>>>> pthread_create.c:456
+>>>>
+>>>> #9  0x00007ffa60193c5f in clone () at
+>>>> ../sysdeps/unix/sysv/linux/x86_64/clone.S:97
+>>>>
+>>>>
+>>>>
+>>>>
+>>>>
+>>>> Thread 3 (Thread 0x7ffa4adff700 (LWP 20715)):
+>>>>
+>>>>
+>>>> #0  0x00007ffa53e51caf in code_gen_buffer ()
+>>>>
+>>>
+>>> Well it's not locked up in servicing any flush tasks as it's executing
+>>> code. Maybe the guest code is spinning on something?
+>>>
 >>
->> The rationale for that idea is following:
->> vCPU could suspend during postcopy live migration until faulted
->> page is not copied into kernel. Downtime on source side it's a value -
->> time interval since source turn vCPU off, till destination start runnig
->> vCPU. But that value was proper value for precopy migration it really shows
->> amount of time when vCPU is down. But not for postcopy migration, because
->> several vCPU threads could susppend after vCPU was started. That is important
->> to estimate packet drop for SDN software.
-> Hi Alexey,
->    I see that the UFFD_FEATURE_THREAD_ID has landed in kernel v4.14-rc1
-> over the weekend, so it's probably time to reheat this patchset.
->
->    I think you should be able to generate a first patch by running
->    scripts/update-linux-headers.sh
-Hi David,
-ok, I'll resend it tomorrow,
-I also added set capability postcopy-blocktime into tests/postcopy-test.c,
-but I don't check the result of the qmp there,
-I added it just to enable and test code path, is it ok for you?
->
-> Dave
->
->> (V8 -> V9)
->>      - rebase
->>      - traces
+>> Indeed, I should have used 'exec' instead of 'in_asm'.
 >>
->> (V7 -> V8)
->>      - just one comma in
->> "migration: fix hardcoded function name in error report"
->> It was really missed, but fixed in futher patch.
+>>> In the monitor:
+>>>
+>>>   info registers
+>>>
+>>> Will show you where things are, see if the ip is moving each time. Also
+>>> you can do a disassemble dump from there to see what code it is stuck
+>>> on.
+>>>
 >>
->> (V6 -> V7)
->>      - copied bitmap was placed into RAMBlock as another migration
->> related bitmaps.
->>      - Ordering of mark_postcopy_blocktime_end call and ordering
->> of checking copied bitmap were changed.
->>      - linewrap style defects
->>      - new patch "postcopy_place_page factoring out"
->>      - postcopy_ram_supported_by_host accepts
->> MigrationIncomingState in qmp_migrate_set_capabilities
->>      - minor fixes of documentation.
->>      and huge description of get_postcopy_total_blocktime was
->> moved. Davids comment.
+>> I've attached with GDB to QEMU to see where it got stuck. Turned out it is
+>> caused by CONFIG_STRICT_KERNEL_RWX=y of the Linux kernel. Upon boot completion
+>> kernel changes memory permissions and that changing is executed on a dedicated
+>> CPU, while other CPUs are 'stopped' in a busy loop.
 >>
->> (V5 -> V6)
->>      - blocktime was added into hmp command. Comment from David.
->>      - bitmap for copied pages was added as well as check in *_begin/_end
->> functions. Patch uses just introduced RAMBLOCK_FOREACH. Comment from David.
->>      - description of receive_ufd_features/request_ufd_features. Comment from David.
->>      - commit message headers/@since references were modified. Comment from Eric.
->>      - also typos in documentation. Comment from Eric.
->>      - style and description of field in MigrationInfo. Comment from Eric.
->>      - ufd_check_and_apply (former ufd_version_check) is calling twice,
->> so my previous patch contained double allocation of blocktime context and
->> as a result memory leak. In this patch series it was fixed.
->>
->> (V4 -> V5)
->>      - fill_destination_postcopy_migration_info empty stub was missed for none linux
->> build
->>
->> (V3 -> V4)
->>      - get rid of Downtime as a name for vCPU waiting time during postcopy migration
->>      - PostcopyBlocktimeContext renamed (it was just BlocktimeContext)
->>      - atomic operations are used for dealing with fields of PostcopyBlocktimeContext
->> affected in both threads.
->>      - hardcoded function names in error_report were replaced to %s and __line__
->>      - this patch set includes postcopy-downtime capability, but it used on
->> destination, coupled with not possibility to return calculated downtime back
->> to source to show it in query-migrate, it looks like a big trade off
->>      - UFFD_API have to be sent notwithstanding need or not to ask kernel
->> for a feature, due to kernel expects it in any case (see patch comment)
->>      - postcopy_downtime included into query-migrate output
->>      - also this patch set includes trivial fix
->> migration: fix hardcoded function name in error report
->> maybe that is a candidate for qemu-trivial mailing list, but I already
->> sent "migration: Fixed code style" and it was unclaimed.
->>
->> (V2 -> V3)
->>      - Downtime calculation approach was changed, thanks to Peter Xu
->>      - Due to previous point no more need to keep GTree as well as bitmap of cpus.
->> So glib changes aren't included in this patch set, it could be resent in
->> another patch set, if it will be a good reason for it.
->>      - No procfs traces in this patchset, if somebody wants it, you could get it
->> from patchwork site to track down page fault initiators.
->>      - UFFD_FEATURE_THREAD_ID is requesting only when kernel supports it
->>      - It doesn't send back the downtime, just trace it
->>
->> This patch set is based on commit
->> [PATCH v3 0/3] Add bitmap for received pages in postcopy migration
->>
->>
->> Alexey Perevalov (8):
->>    userfault: add pid into uffd_msg & update UFFD_FEATURE_*
->>    migration: pass MigrationIncomingState* into migration check functions
->>    migration: fix hardcoded function name in error report
->>    migration: split ufd_version_check onto receive/request features part
->>    migration: introduce postcopy-blocktime capability
->>    migration: add postcopy blocktime ctx into MigrationIncomingState
->>    migration: calculate vCPU blocktime on dst side
->>    migration: postcopy_blocktime documentation
->>
->>   docs/devel/migration.txt          |  10 ++
->>   linux-headers/linux/userfaultfd.h |   4 +
->>   migration/migration.c             |  12 +-
->>   migration/migration.h             |   9 ++
->>   migration/postcopy-ram.c          | 300 ++++++++++++++++++++++++++++++++++++--
->>   migration/postcopy-ram.h          |   2 +-
->>   migration/savevm.c                |   2 +-
->>   migration/trace-events            |   5 +-
->>   qapi-schema.json                  |   5 +-
->>   9 files changed, 334 insertions(+), 15 deletions(-)
->>
->> -- 
->> 1.8.3.1
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
->
->
+>> This patch just introduced a noticeable performance regression for a
+>> single-threaded TCG, which is probably fine since MTTCG is the default now.
+>> Thank you very much for the suggestions and all your work on MTTCG!
+> 
+> Hmm well it would be nice to know the exact mechanism for that failure.
+> If we just end up with a very long list of tasks in
+> cpu->queued_work_first then I guess that explains it but it would be
+> nice to quantify the problem.
+> 
+> I had trouble seeing where this loop is in the kernel code, got a pointer?
+> 
+The memory permissions changing starts here:
+
+http://elixir.free-electrons.com/linux/v4.14-rc1/source/arch/arm/mm/init.c#L739
+
+The busy loop is here:
+
+http://elixir.free-electrons.com/linux/v4.14-rc1/source/kernel/stop_machine.c#L195
+
+Interestingly, I tried to attach to a 'hanged' QEMU another time and got into
+other code. That code has the same pattern, one CPU flushes cache a lot in
+shmem_rename2()->need_update()->memchr_inv() and the other is executing something.
+
+So seems busy loop isn't the problem, it's just the TLB flushing is very-very
+expensive in TCG. On the other hand I don't see such a problem with MTTCG, so
+not sure what's going on with a single-threaded TCG.
 
 -- 
-Best regards,
-Alexey Perevalov
+Dmitry
