@@ -1,28 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42228)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dtuRX-0002r5-6q
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:42:28 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1dtuVW-0003pe-Is
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:46:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dtuRU-0007q7-4v
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:42:27 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:44638)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dtuRT-0007pq-TP
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:42:24 -0400
-Received: by mail-wm0-x231.google.com with SMTP id 189so12835966wmh.1
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 04:42:23 -0700 (PDT)
-References: <20170918024402.3265-1-famz@redhat.com>
-	<20170918024402.3265-11-famz@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170918024402.3265-11-famz@redhat.com>
-Date: Mon, 18 Sep 2017 12:42:21 +0100
-Message-ID: <877ewwjkrm.fsf@linaro.org>
+	(envelope-from <ehabkost@redhat.com>) id 1dtuVT-0000tU-GV
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:46:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47726)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dtuVT-0000sn-8B
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 07:46:31 -0400
+Date: Mon, 18 Sep 2017 08:46:23 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170918114623.GG10621@localhost.localdomain>
+References: <20170915233739.26860-1-ehabkost@redhat.com>
+	<20170915233739.26860-15-ehabkost@redhat.com>
+	<20170918094400.GC2951@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v8 10/13] Makefile: Add rules to run vm
- tests
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170918094400.GC2951@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 14/15] qemu.py: improve message on negative
+ exit code
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,106 +29,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, Philippe =?utf-8?Q?Mathieu?= =?utf-8?Q?-Daud=C3=A9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, =?utf-8?B?THVrw6HFoQ==?= Doktor <ldoktor@redhat.com>, Amador Pahim <apahim@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
+On Mon, Sep 18, 2017 at 10:44:00AM +0100, Daniel P. Berrange wrote:
+> On Fri, Sep 15, 2017 at 08:37:38PM -0300, Eduardo Habkost wrote:
+> > From: Amador Pahim <apahim@redhat.com>
+> > 
+> > The current message shows 'self._args', which contains only part of the
+> > options used in the Qemu command line.
+> > 
+> > This patch makes the qemu full args list an instance variable and then
+> > uses it in the negative exit code message.
+> > 
+> > Message was moved outside the 'if is_running' block to make sure it will
+> > be logged if the VM finishes before the call to shutdown().
+> > 
+> > Signed-off-by: Amador Pahim <apahim@redhat.com>
+> > Message-Id: <20170901112829.2571-5-apahim@redhat.com>
+> > [ehabkost: removed superfluous parenthesis]
+> > Reviewed-by: Fam Zheng <famz@redhat.com>
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  scripts/qemu.py | 24 +++++++++++++++++-------
+> >  1 file changed, 17 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/scripts/qemu.py b/scripts/qemu.py
+> > index c9bcaafe41..9440261ac3 100644
+> > --- a/scripts/qemu.py
+> > +++ b/scripts/qemu.py
+> > @@ -87,6 +87,7 @@ class QEMUMachine(object):
+> >          self._socket_scm_helper = socket_scm_helper
+> >          self._debug = debug
+> >          self._qmp = None
+> > +        self._qemu_full_args = None
+> >  
+> >      def __enter__(self):
+> >          return self
+> > @@ -186,13 +187,16 @@ class QEMUMachine(object):
+> >  
+> >      def launch(self):
+> >          '''Launch the VM and establish a QMP connection'''
+> > +        self._qemu_full_args = None
+> >          devnull = open(os.path.devnull, 'rb')
+> >          qemulog = open(self._qemu_log_path, 'wb')
+> >          try:
+> >              self._pre_launch()
+> > -            args = (self._wrapper + [self._binary] + self._base_args() +
+> > -                    self._args)
+> > -            self._popen = subprocess.Popen(args, stdin=devnull, stdout=qemulog,
+> > +            self._qemu_full_args = self._wrapper + [self._binary] +
+> > +                                    self._base_args() + self._args
+> 
+> FYI, this change causes a syntax error because you need either the ()
+> brackets, or an explicit \ continuation. Unfortunately this wasn't
+> caught by Peter's merge tests, since this code is only execised by
+> the qemu iotests which aren't run from a 'make check'.
+> 
+> If someone has cycles, it would be great to write some unit tests
+> directly targetting the qemu.py and qmp.py code, so that we get test
+> coverage of it independantly of the iotest execution.
 
-Fam Zheng <famz@redhat.com> writes:
+Oops, sorry!  I thought "make check" was exercising that code
+path.
 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Tested-by: Alex Bennée <alex.bennee@linaro.org>
-
-> ---
->  Makefile                  |  2 ++
->  configure                 |  2 +-
->  tests/vm/Makefile.include | 42 ++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 45 insertions(+), 1 deletion(-)
->  create mode 100644 tests/vm/Makefile.include
->
-> diff --git a/Makefile b/Makefile
-> index b53fc69a60..79684ab138 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -812,6 +812,7 @@ endif
->  -include $(wildcard *.d tests/*.d)
->
->  include $(SRC_PATH)/tests/docker/Makefile.include
-> +include $(SRC_PATH)/tests/vm/Makefile.include
->
->  .PHONY: help
->  help:
-> @@ -835,6 +836,7 @@ help:
->  	@echo  'Test targets:'
->  	@echo  '  check           - Run all tests (check-help for details)'
->  	@echo  '  docker          - Help about targets running tests inside Docker containers'
-> +	@echo  '  vm-test         - Help about targets running tests inside VM'
->  	@echo  ''
->  	@echo  'Documentation targets:'
->  	@echo  '  html info pdf txt'
-> diff --git a/configure b/configure
-> index 94db2d103e..bbf053e3e0 100755
-> --- a/configure
-> +++ b/configure
-> @@ -6505,7 +6505,7 @@ if test "$ccache_cpp2" = "yes"; then
->  fi
->
->  # build tree in object directory in case the source is not in the current directory
-> -DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests"
-> +DIRS="tests tests/tcg tests/tcg/cris tests/tcg/lm32 tests/libqos tests/qapi-schema tests/tcg/xtensa tests/qemu-iotests tests/vm"
->  DIRS="$DIRS docs docs/interop fsdev"
->  DIRS="$DIRS pc-bios/optionrom pc-bios/spapr-rtas pc-bios/s390-ccw"
->  DIRS="$DIRS roms/seabios roms/vgabios"
-> diff --git a/tests/vm/Makefile.include b/tests/vm/Makefile.include
-> new file mode 100644
-> index 0000000000..5daa2a3b73
-> --- /dev/null
-> +++ b/tests/vm/Makefile.include
-> @@ -0,0 +1,42 @@
-> +# Makefile for VM tests
-> +
-> +.PHONY: vm-build-all
-> +
-> +IMAGES := ubuntu.i386 freebsd netbsd openbsd
-> +IMAGE_FILES := $(patsubst %, tests/vm/%.img, $(IMAGES))
-> +
-> +.PRECIOUS: $(IMAGE_FILES)
-> +
-> +vm-test:
-> +	@echo "vm-test: Test QEMU in preconfigured virtual machines"
-> +	@echo
-> +	@echo "  vm-build-ubuntu.i386            - Build QEMU in ubuntu i386 VM"
-> +	@echo "  vm-build-freebsd                - Build QEMU in FreeBSD VM"
-> +	@echo "  vm-build-netbsd                 - Build QEMU in NetBSD VM"
-> +	@echo "  vm-build-openbsd                - Build QEMU in OpenBSD VM"
-> +
-> +vm-build-all: $(addprefix vm-build-, $(IMAGES))
-> +
-> +tests/vm/%.img: $(SRC_PATH)/tests/vm/% \
-> +		$(SRC_PATH)/tests/vm/basevm.py \
-> +		$(SRC_PATH)/tests/vm/Makefile.include
-> +	$(call quiet-command, \
-> +		$< \
-> +		$(if $(V)$(DEBUG), --debug) \
-> +		--image "$@" \
-> +		--force \
-> +		--build-image $@, \
-> +		"  VM-IMAGE $*")
-> +
-> +
-> +# Build in VM $(IMAGE)
-> +vm-build-%: tests/vm/%.img
-> +	$(call quiet-command, \
-> +		$(SRC_PATH)/tests/vm/$* \
-> +		$(if $(V)$(DEBUG), --debug) \
-> +		$(if $(DEBUG), --interactive) \
-> +		$(if $(J),--jobs $(J)) \
-> +		--image "$<" \
-> +		--build-qemu $(SRC_PATH), \
-> +		"  VM-BUILD $*")
-> +
-
-
---
-Alex Bennée
+-- 
+Eduardo
