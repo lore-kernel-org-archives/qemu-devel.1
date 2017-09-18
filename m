@@ -1,20 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34549)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dtm3y-0007A2-Sk
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:45:36 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dtmR4-0001BL-Fj
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:09:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dtm3x-0005jW-OS
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:45:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46094)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dtm3x-0005j6-FW
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:45:33 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Mon, 18 Sep 2017 10:44:01 +0800
-Message-Id: <20170918024402.3265-13-famz@redhat.com>
+	(envelope-from <no-reply@patchew.org>) id 1dtmR0-0002eV-D2
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:09:26 -0400
+Resent-Message-Id: <E1dtmR0-0002eV-D2@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21356)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dtmR0-0002da-5h
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:09:22 -0400
 In-Reply-To: <20170918024402.3265-1-famz@redhat.com>
-References: <20170918024402.3265-1-famz@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 12/13] tests: Add README for vm tests
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150570414426.36.7011523692059086347@69b6ddf88678>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Sun, 17 Sep 2017 20:09:04 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH v8 00/13] tests: Add VM based build tests
+ (for non-x86_64 and/or non-Linux)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,105 +29,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: famz@redhat.com
+Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, crosa@redhat.com, f4bug@amsat.org, kamil@netbsd.org, stefanha@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
----
- tests/vm/README | 85 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 85 insertions(+)
- create mode 100644 tests/vm/README
-
-diff --git a/tests/vm/README b/tests/vm/README
-new file mode 100644
-index 0000000000..fa30a79ea7
---- /dev/null
-+++ b/tests/vm/README
-@@ -0,0 +1,85 @@
-+=== VM test suite to run build in guests ===
-+
-+== Intro ==
-+
-+This test suite contains scripts that bootstrap various guest images that have
-+necessary packages to build QEMU. The basic usage is documented in Makefile
-+help which is displayed with "make vm-test".
-+
-+== Quick start ==
-+
-+Run "make vm-test" to list available make targets. Invoke a specific make
-+command to run build test in an image. For example, "make vm-build-freebsd"
-+will build the source tree in the FreeBSD image. The command can be executed
-+from either the source tree or the build dir; if the former, ./configure is not
-+needed. The command will then generate the test image in ./tests/vm/ under the
-+working directory.
-+
-+== QEMU binary ==
-+
-+By default, qemu-system-x86_64 is searched in $PATH to run the guest. If there
-+isn't one, or if it is older than 2.10, the test won't work. In this case,
-+provide the QEMU binary in env var: QEMU=/path/to/qemu-2.10+.
-+
-+== Make jobs ==
-+
-+The "-j$X" option in the make command line is not propagated into the VM,
-+specify "J=$X" to control the make jobs in the guest.
-+
-+== Debugging ==
-+
-+Add "DEBUG=1" and/or "V=1" to the make command to allow interactive debugging
-+and verbose output. If this is not enough, see the next section.
-+
-+== Manual invocation ==
-+
-+Each guest script is an executable script with the same command line options.
-+For example to work with the netbsd guest, use $QEMU_SRC/tests/vm/netbsd:
-+
-+    $ cd $QEMU_SRC/tests/vm
-+
-+    # To bootstrap the image
-+    $ ./netbsd --build-image --image /var/tmp/netbsd.img
-+    <...>
-+
-+    # To run an arbitrary command in guest (the output will not be echoed unless
-+    # --debug is added)
-+    $ ./netbsd --debug --image /var/tmp/netbsd.img uname -a
-+
-+    # To build QEMU in guest
-+    $ ./netbsd --debug --image /var/tmp/netbsd.img --build-qemu $QEMU_SRC
-+
-+    # To get to an interactive shell
-+    $ ./netbsd --interactive --image /var/tmp/netbsd.img sh
-+
-+== Adding new guests ==
-+
-+Please look at existing guest scripts for how to add new guests.
-+
-+Most importantly, create a subclass of BaseVM and implement build_image()
-+method and define BUILD_SCRIPT, then finally call basevm.main() from the
-+script's main().
-+
-+  - Usually in build_image(), a template image is downloaded from a predefined
-+    URL. BaseVM._download_with_cache() takes care of the cache and the
-+    checksum, so consider using it.
-+
-+  - Once the image is downloaded, users, SSH server and QEMU build deps should
-+    be set up:
-+
-+    * Root password set to BaseVM.ROOT_PASS
-+    * User BaseVM.GUEST_USER is created, and password set to BaseVM.GUEST_PASS
-+    * SSH service is enabled and started on boot,
-+      $QEMU_SRC/tests/keys/id_rsa.pub is added to ssh's "authorized_keys" file
-+      of both root and the normal user
-+    * DHCP client service is enabled and started on boot, so that it can
-+      automatically configure the virtio-net-pci NIC and communicate with QEMU
-+      user net (10.0.2.2)
-+    * Necessary packages are installed to untar the source tarball and build
-+      QEMU
-+
-+  - Write a proper BUILD_SCRIPT template, which should be a shell script that
-+    untars a raw virtio-blk block device, which is the tarball data blob of the
-+    QEMU source tree, then configure/build it. Running "make check" is also
-+    recommended.
-+
--- 
-2.13.5
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSCB2OCAwMC8xM10gdGVzdHM6IEFkZCBWTSBiYXNlZCBidWlsZCB0ZXN0cyAo
+Zm9yIG5vbi14ODZfNjQgYW5kL29yIG5vbi1MaW51eCkKTWVzc2FnZS1pZDogMjAxNzA5MTgwMjQ0
+MDIuMzI2NS0xLWZhbXpAcmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBC
+RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
+bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0
+cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
+bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
+biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
+aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
+YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
+aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
+NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmVh
+ZGE4OWNiNDkgZG9ja2VyOiBVc2UgYXJjaGl2ZS1zb3VyY2UucHkKZWRiNTE2MTAxYiB0ZXN0czog
+QWRkIFJFQURNRSBmb3Igdm0gdGVzdHMKMjlhYjU2ZWVkNiBNQUlOVEFJTkVSUzogQWRkIHRlc3Rz
+L3ZtIGVudHJ5CjkxYmJlNTJhOTEgTWFrZWZpbGU6IEFkZCBydWxlcyB0byBydW4gdm0gdGVzdHMK
+ODUwYmUwNTBjZSB0ZXN0czogQWRkIE9wZW5CU0QgaW1hZ2UKNzkzZDBjZGU2YiB0ZXN0czogQWRk
+IE5ldEJTRCBpbWFnZQo0ZmNmZGIyODc5IHRlc3RzOiBBZGQgRnJlZUJTRCBpbWFnZQowMTg2Y2Jh
+OWIzIHRlc3RzOiBBZGQgdWJ1bnR1LmkzODYgaW1hZ2UKMmNjMmM0MTI5MSB0ZXN0czogQWRkIHZt
+IHRlc3QgbGliCmM2YTg1OWQ1ZGUgdGVzdHM6IEFkZCBhIHRlc3Qga2V5IHBhaXIKZmZjOGNhMmRl
+NCBzY3JpcHRzOiBBZGQgYXJjaGl2ZS1zb3VyY2Uuc2gKMGRmMzQ1MzRiOSBxZW11LnB5OiBBZGQg
+IndhaXQoKSIgbWV0aG9kCjdlZDliOTY2NjggZ2l0aWdub3JlOiBJZ25vcmUgdm0gdGVzdCBpbWFn
+ZXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTM6IGdpdGlnbm9yZTog
+SWdub3JlIHZtIHRlc3QgaW1hZ2VzLi4uCkNoZWNraW5nIFBBVENIIDIvMTM6IHFlbXUucHk6IEFk
+ZCAid2FpdCgpIiBtZXRob2QuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMzogc2NyaXB0czogQWRkIGFy
+Y2hpdmUtc291cmNlLnNoLi4uCkNoZWNraW5nIFBBVENIIDQvMTM6IHRlc3RzOiBBZGQgYSB0ZXN0
+IGtleSBwYWlyLi4uCkNoZWNraW5nIFBBVENIIDUvMTM6IHRlc3RzOiBBZGQgdm0gdGVzdCBsaWIu
+Li4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzcxOiBGSUxFOiB0ZXN0cy92bS9i
+YXNldm0ucHk6NDY6CisgICAgICAgIHNlbGYuX3RtcGRpciA9IHRlbXBmaWxlLm1rZHRlbXAocHJl
+Zml4PSJ2bS10ZXN0LSIsIHN1ZmZpeD0iLnRtcCIsIGRpcj0iLiIpCgpXQVJOSU5HOiBsaW5lIG92
+ZXIgODAgY2hhcmFjdGVycwojMTYyOiBGSUxFOiB0ZXN0cy92bS9iYXNldm0ucHk6MTM3OgorICAg
+ICAgICBsb2dnaW5nLmRlYnVnKCJDcmVhdGluZyBhcmNoaXZlICVzIGZvciBzcmNfZGlyIGRpcjog
+JXMiLCB0YXJmaWxlLCBzcmNfZGlyKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
+IzE2NzogRklMRTogdGVzdHMvdm0vYmFzZXZtLnB5OjE0MjoKKyAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAiZmlsZT0lcyxpZj1ub25lLGlkPSVzLGNhY2hlPXdyaXRlYmFjayxmb3JtYXQ9cmF3
+IiAlIFwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNzA6IEZJTEU6IHRlc3Rz
+L3ZtL2Jhc2V2bS5weToxNDU6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgInZpcnRpby1i
+bGssZHJpdmU9JXMsc2VyaWFsPSVzLGJvb3RpbmRleD0xIiAlIChuYW1lLCBuYW1lKV0KCkVSUk9S
+OiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjI1OiBGSUxFOiB0ZXN0cy92bS9iYXNldm0ucHk6
+MjAwOgorICAgIFZNIHRlc3QgdXRpbGl0eS4gIEV4aXQgY29kZXM6IDAgPSBzdWNjZXNzLCAxID0g
+Y29tbWFuZCBsaW5lIGVycm9yLCAyID0gZW52aXJvbm1lbnQgaW5pdGlhbGl6YXRpb24gZmFpbGVk
+LCAzID0gdGVzdCBjb21tYW5kIGZhaWxlZCIiIikKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
+YWN0ZXJzCiMyMzI6IEZJTEU6IHRlc3RzL3ZtL2Jhc2V2bS5weToyMDc6CisgICAgcGFyc2VyLmFk
+ZF9vcHRpb24oIi0tam9icyIsIHR5cGU9aW50LCBkZWZhdWx0PW11bHRpcHJvY2Vzc2luZy5jcHVf
+Y291bnQoKSAvIDIsCgp0b3RhbDogMSBlcnJvcnMsIDUgd2FybmluZ3MsIDI1NiBsaW5lcyBjaGVj
+a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
+eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
+bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
+SCA2LzEzOiB0ZXN0czogQWRkIHVidW50dS5pMzg2IGltYWdlLi4uCkNoZWNraW5nIFBBVENIIDcv
+MTM6IHRlc3RzOiBBZGQgRnJlZUJTRCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA4LzEzOiB0ZXN0
+czogQWRkIE5ldEJTRCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA5LzEzOiB0ZXN0czogQWRkIE9w
+ZW5CU0QgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTM6IE1ha2VmaWxlOiBBZGQgcnVsZXMg
+dG8gcnVuIHZtIHRlc3RzLi4uCkNoZWNraW5nIFBBVENIIDExLzEzOiBNQUlOVEFJTkVSUzogQWRk
+IHRlc3RzL3ZtIGVudHJ5Li4uCkNoZWNraW5nIFBBVENIIDEyLzEzOiB0ZXN0czogQWRkIFJFQURN
+RSBmb3Igdm0gdGVzdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTM6IGRvY2tlcjogVXNlIGFyY2hp
+dmUtc291cmNlLnB5Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
+aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
+dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
+Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
