@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55182)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55204)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dtlaV-0000o3-PP
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:15:08 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dtlaY-0000qR-Ph
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:15:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dtlaU-0005GA-Is
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:15:07 -0400
-Date: Mon, 18 Sep 2017 10:11:26 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1dtlaU-0005G7-JF
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 22:15:10 -0400
+Date: Mon, 18 Sep 2017 10:26:07 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170918001126.GA15823@umbus>
-References: <150548133297.5945.7401220081077343726.stgit@bahia.lan>
-	<150548135159.5945.17545667206379508322.stgit@bahia.lan>
+Message-ID: <20170918002607.GB15823@umbus>
+References: <cover.1505570561.git.balaton@eik.bme.hu>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="HcAYCG3uE/tztfnV"
+	protocol="application/pgp-signature"; boundary="98e8jtXdkpgskNou"
 Content-Disposition: inline
-In-Reply-To: <150548135159.5945.17545667206379508322.stgit@bahia.lan>
-Subject: Re: [Qemu-devel] [PATCH 1/4] ppc/kvm: drop kvmppc_has_cap_htab_fd()
+In-Reply-To: <cover.1505570561.git.balaton@eik.bme.hu>
+Subject: Re: [Qemu-devel] [PATCH v2 0/4] Sam460ex emulation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,71 +23,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Thomas Huth <thuth@redhat.com>, Alexey Kardashevskiy <aik@ozlabs.ru>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexander Graf <agraf@suse.de>, Francois Revol <revol@free.fr>
 
 
---HcAYCG3uE/tztfnV
+--98e8jtXdkpgskNou
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 15, 2017 at 03:15:51PM +0200, Greg Kurz wrote:
-> It never got used since its introduction (commit 7c43bca004af).
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+On Sat, Sep 16, 2017 at 04:02:41PM +0200, BALATON Zoltan wrote:
+> Resending those patches that were reviewed and did not need any
+> changes or only rebasing to latest master so these could go in now.
+> I'll get back to the other patches that need more changes later.
 
 Applied to ppc-for-2.11, thanks.
 
-> ---
->  target/ppc/kvm.c     |    5 -----
->  target/ppc/kvm_ppc.h |    6 ------
->  2 files changed, 11 deletions(-)
+> BALATON Zoltan (4):
+>   ohci: Allow sysbus version to be used as a companion
+>   ehci: Add ppc4xx-ehci for the USB 2.0 controller in embedded PPC SoCs
+>   ppc4xx: Add more PLB registers
+>   ppc: Add 460EX embedded CPU
 >=20
-> diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
-> index 1deaf106d2b9..00d7029b8d7a 100644
-> --- a/target/ppc/kvm.c
-> +++ b/target/ppc/kvm.c
-> @@ -2448,11 +2448,6 @@ bool kvmppc_has_cap_epr(void)
->      return cap_epr;
->  }
-> =20
-> -bool kvmppc_has_cap_htab_fd(void)
-> -{
-> -    return cap_htab_fd;
-> -}
-> -
->  bool kvmppc_has_cap_fixup_hcalls(void)
->  {
->      return cap_fixup_hcalls;
-> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-> index f780e6ec7b72..08aab46c5a56 100644
-> --- a/target/ppc/kvm_ppc.h
-> +++ b/target/ppc/kvm_ppc.h
-> @@ -51,7 +51,6 @@ uint64_t kvmppc_rma_size(uint64_t current_size, unsigne=
-d int hash_shift);
->  #endif /* !CONFIG_USER_ONLY */
->  bool kvmppc_has_cap_epr(void);
->  int kvmppc_define_rtas_kernel_token(uint32_t token, const char *function=
-);
-> -bool kvmppc_has_cap_htab_fd(void);
->  int kvmppc_get_htab_fd(bool write);
->  int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns=
-);
->  int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
-> @@ -246,11 +245,6 @@ static inline int kvmppc_define_rtas_kernel_token(ui=
-nt32_t token,
->      return -1;
->  }
-> =20
-> -static inline bool kvmppc_has_cap_htab_fd(void)
-> -{
-> -    return false;
-> -}
-> -
->  static inline int kvmppc_get_htab_fd(bool write)
->  {
->      return -1;
+>  hw/ppc/ppc405_uc.c          | 12 +++++++++---
+>  hw/usb/hcd-ehci-sysbus.c    | 25 +++++++++++++++++++++++++
+>  hw/usb/hcd-ehci.h           |  1 +
+>  hw/usb/hcd-ohci.c           | 15 ++++++++++++---
+>  target/ppc/cpu-models.c     |  3 +++
+>  target/ppc/cpu-models.h     |  1 +
+>  target/ppc/translate_init.c | 38 ++++++++++++++++++++++++++++++++++++++
+>  7 files changed, 89 insertions(+), 6 deletions(-)
 >=20
 
 --=20
@@ -97,24 +61,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---HcAYCG3uE/tztfnV
+--98e8jtXdkpgskNou
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm/DysACgkQbDjKyiDZ
-s5KyPBAAsMhoqzTVEz3o25icBGpEAeYMnhs73SeKTMUsFppQi0cyqo0rOPcnyYJZ
-/ekXi1fW24Z+mwx9GpRPuRXNzEkHRpQsDSkez9Nxt2/rb15JzMo28cKLd2UwFNRE
-9fbwZcBEJGMr9lavsNlmVQPrV8ecwl2SMjuZ9kA+UwtoM3ZWHvWCcCEwPtQ26Doo
-lwhbTkNQ8cfne5tXR1PoorA4cmRFRNc9MUIccvbeFzEyO0Cpzj5Tu+AvcgWLVfiS
-ibfVgTRR0Xy7IpIhLLS56QM8xbrd7+Bm2sXAFXOMHTqYkaoPAvAGk6CUkSpPUEvu
-f3V+vhPhWG1Pebaha2KHoPulyceEjd5BSOl1v9VYCQeo9PkFQDUZcKvuoLd5ugQ2
-KG0qrzTJFqJgEA/Ie6f0xlUf27q/JU09RbsLLN6Q5XlWtVmuPiOr7N1DItEpGfaG
-PXJ/YRzJcW+a7W0/vL1lv+Y5mWeRTYCniwI/G9XFCePoF8WMVCYrshfdO2L5T0/z
-XpyO0/WJR8ZmoPIIS8PZQd23MnZ29MlpYFVz/ik3KQxuF9DqYQcZHijrflukfpSc
-FViNfCjao9uKiFU9E3eZWTrKCkzNcUZ8JhLep5kE/HwYvAV/NEfYLpvh3+m3zIa4
-WIa09DlJRft5wLD8A8goNPBltgWjHfDJb1towEPo7rt1jGaPHtg=
-=8uUm
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlm/Ep0ACgkQbDjKyiDZ
+s5JATw//dWwaKHtumAgzbD1Aq4mmttIwn8mHsuHqM8e7YGB5gHYn9A5/MIqNpRF3
+dciyAZNIjIJDg+rTvYgatCYBwgvohTec21ejPNcGv2yNRPVsofQBQSNJd/n4CnJZ
+RD2QNoFMAlXhsuggnZM19vhNHVsOf6/iUDcvEIkh7Sb33kym/79dM4zKffRjfD3Z
+LG/Vhjs+Ec5n/AdxxzNdde0D0FY/cPemXd0Xfdv1F5yqC3GAHl0z2ixJJmnJRWgr
+W4+viW7Kb16uNJjfvRhMeinGuKfndtV0QZdPU54JFp4xwBMF+EiDhkyFtxkpiViI
+3WtmNdcI5F+nvj5jAFdxqPUXjJ+wXSSoiakv+2V7R9hzc3S9CToCJ+kF+V172uUW
+mwmeGag5u0eeBkFCGZ1yNDeMA1GrZG1ui+Fgwc2cuR8BNzZ+hMsdPvCcfhE+/p7h
+rqR3op5seAZvx584UAVhlQ2RgW+PN0CMtbyzI8quO2iW/dkCPsDnH2eX5w7q2yvw
+Lvvl+26rdf4/fyGbgNWdJ4rjlrMMn2PkTWhMB9Rus8DnMBqM9vFrFEJxVAzShoUn
+wYouv7mKRVYdAIyEzti6G7UDT1iJwmk1C4cOAWmi/qimBo5Dlr+2HlXDSdTFEOVn
+W5hApVzF2OK+1bcd9hmO1CZc8W3q5NwTrG0f9gsFplqmqs1JZmk=
+=E1qT
 -----END PGP SIGNATURE-----
 
---HcAYCG3uE/tztfnV--
+--98e8jtXdkpgskNou--
