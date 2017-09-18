@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36125)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38619)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dtr9A-0001ze-OV
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:11:17 -0400
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dtrKA-0005A7-Bk
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:22:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1dtr99-00044g-Ob
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:11:16 -0400
-Date: Mon, 18 Sep 2017 10:11:03 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170918081103.GD31915@localhost.localdomain>
-References: <20170915101008.16646-1-kwolf@redhat.com>
-	<20170918075107.GK15551@lemon.lan>
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dtrK6-0005bJ-CU
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:22:38 -0400
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:42127
+	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dtrK5-00051h-Fp
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:22:34 -0400
+References: <1505464398-28897-1-git-send-email-douly.fnst@cn.fujitsu.com>
+	<20170915084044.GE13610@redhat.com>
+	<dc424e80-bd13-576a-314b-716b906538b8@cn.fujitsu.com>
+	<7103711f-5ab5-0a8f-48d1-bb088df2fb13@cn.fujitsu.com>
+	<20170918094049.737ff454@nial.brq.redhat.com>
+From: Dou Liyang <douly.fnst@cn.fujitsu.com>
+Message-ID: <813cf8da-23ae-9787-19c5-7572128bb60a@cn.fujitsu.com>
+Date: Mon, 18 Sep 2017 16:22:24 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170918075107.GK15551@lemon.lan>
-Subject: Re: [Qemu-devel] [PATCH 0/6] block: Fix permissions after ro/rw
- reopen
+In-Reply-To: <20170918094049.737ff454@nial.brq.redhat.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] NUMA: Enable adding NUMA node
+ implicitly
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,64 +31,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, Thomas Huth <thuth@redhat.com>, Takao Indoh <indou.takao@jp.fujitsu.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org, f4bug@amsat.org, Paolo Bonzini <pbonzini@redhat.com>, Alistair Francis <alistair23@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>, Izumi Taku <izumi.taku@jp.fujitsu.com>, Richard Henderson <rth@twiddle.net>, David Gibson <david@gibson.dropbear.id.au>
 
-Am 18.09.2017 um 09:51 hat Fam Zheng geschrieben:
-> On Fri, 09/15 12:10, Kevin Wolf wrote:
-> > bdrv_reopen() can switch nodes between read-only and read-write modes.
-> > This has implications for the required permissions on their child nodes.
-> > For example, a qcow2 node requests write permissions on bs->file only if
-> > it is writable itself.
-> > 
-> > This means that during bdrv_reopen(), the permissions need to be
-> > recalculated in order to prevent failures where the bs->file
-> > permissions don't match its actual read-only state (e.g. bs->file is a
-> > read-write node, but the permission still enforces read-only access).
-> 
-> Passing reopen_queue around makes the interface and implementations
-> complicated.
 
-Yes. I don't like it, but I couldn't find any easier way.
 
-> I wonder if any of the alternatives make sense:
-> 
-> 1) Don't pass reopen_queue as a parameter, just pass the one
-> interesting BDRVReopenState pointer. So that callees don't need to
-> call bdrv_reopen_get_flags().
+At 09/18/2017 03:40 PM, Igor Mammedov wrote:
+> On Mon, 18 Sep 2017 11:54:50 +0800
+> Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
+>
+>> At 09/15/2017 06:05 PM, Dou Liyang wrote:
+>>> Hi Daniel,
+>>>
+>>> At 09/15/2017 04:40 PM, Daniel P. Berrange wrote:
+>>>> On Fri, Sep 15, 2017 at 04:33:18PM +0800, Dou Liyang wrote:
+>>>>> In QEMU, if we enable NUMA and have nodes, QEMU will build ACPI SRAT
+>>>>> table
+>>>>> for transfering NUMA configuration to the guest. So, the maximum
+>>>>> memory in
+>>>>> SRAT can be used to determine whether to use the swiotlb for IOMMU or
+>>>>> not.
+>>>>>
+>>>>> However, if QEmu doesn't enable NUMA explicitly on CLI, The SRAT will
+>>>>> never be built. When memory hotplug is enabled, some guest's devices may
+>>>>> start failing due to SWIOTLB is disabled.
+>>>>>
+>>>>> Add numa_implicit_add_node0 in struct MachineClass, Invoke it before
+>>>>> QEMU
+>>>>> parse NUMA options to enable adding NUMA node implicitly.
+>>>>>
+>>>>> Reported-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+>>>>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
+>>>>> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
+>>>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
+>>>>> Cc: Richard Henderson <rth@twiddle.net>
+>>>>> Cc: Eduardo Habkost <ehabkost@redhat.com>
+>>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+>>>>> Cc: Marcel Apfelbaum <marcel@redhat.com>
+>>>>> Cc: Igor Mammedov <imammedo@redhat.com>
+>>>>> Cc: David Hildenbrand <david@redhat.com>
+>>>>> Cc: Thomas Huth <thuth@redhat.com>
+>>>>> Cc: Alistair Francis <alistair23@gmail.com>
+>>>>> Cc: f4bug@amsat.org
+>>>>> Cc: Takao Indoh <indou.takao@jp.fujitsu.com>
+>>>>> Cc: Izumi Taku <izumi.taku@jp.fujitsu.com>
+>>>>>
+>>>>> ---
+>>>>>  hw/i386/pc.c        |  6 ++++++
+>>>>>  include/hw/boards.h |  4 ++++
+>>>>>  vl.c                | 14 ++++++++++++++
+>>>>>  3 files changed, 24 insertions(+)
+>>>>>
+>>>>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+>>>>> index 2108104..3c40117 100644
+>>>>> --- a/hw/i386/pc.c
+>>>>> +++ b/hw/i386/pc.c
+>>>>> @@ -2308,6 +2308,11 @@ static const CPUArchIdList
+>>>>> *pc_possible_cpu_arch_ids(MachineState *ms)
+>>>>>      return ms->possible_cpus;
+>>>>>  }
+>>>>>
+>>>>> +static void numa_implicit_add_node0(void)
+>>>>> +{
+>>>>> +    qemu_opts_parse_noisily(qemu_find_opts("numa"), "node", true);
+>>>>> +}
+>>>>> +
+>>>>>  static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
+>>>>>  {
+>>>>>      /* cpu index isn't used */
+>>>>> @@ -2349,6 +2354,7 @@ static void pc_machine_class_init(ObjectClass
+>>>>> *oc, void *data)
+>>>>>      mc->get_hotplug_handler = pc_get_hotpug_handler;
+>>>>>      mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
+>>>>>      mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
+>>>>> +    mc->numa_implicit_add_node0 = numa_implicit_add_node0;
+>>>>>      mc->has_hotpluggable_cpus = true;
+>>>>>      mc->default_boot_order = "cad";
+>>>>>      mc->hot_add_cpu = pc_hot_add_cpu;
+>>>>> diff --git a/include/hw/boards.h b/include/hw/boards.h
+>>>>> index 7f044d1..898d841 100644
+>>>>> --- a/include/hw/boards.h
+>>>>> +++ b/include/hw/boards.h
+>>>>> @@ -141,6 +141,8 @@ typedef struct {
+>>>>>   *    should instead use "unimplemented-device" for all memory
+>>>>> ranges where
+>>>>>   *    the guest will attempt to probe for a device that QEMU doesn't
+>>>>>   *    implement and a stub device is required.
+>>>>> + * @numa_implicit_add_node0:
+>>>>> + *    Enable NUMA implicitly by add a NUMA node.
+>>>>>   */
+>>>>>  struct MachineClass {
+>>>>>      /*< private >*/
+>>>>> @@ -191,6 +193,8 @@ struct MachineClass {
+>>>>>      CpuInstanceProperties
+>>>>> (*cpu_index_to_instance_props)(MachineState *machine,
+>>>>>                                                           unsigned
+>>>>> cpu_index);
+>>>>>      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState
+>>>>> *machine);
+>>>>> +
+>>>>> +    void (*numa_implicit_add_node0)(void);
+>>>>>  };
+>>>>>
+>>>>>  /**
+>>>>> diff --git a/vl.c b/vl.c
+>>>>> index fb1f05b..814a5fa 100644
+>>>>> --- a/vl.c
+>>>>> +++ b/vl.c
+>>>>> @@ -3030,6 +3030,7 @@ int main(int argc, char **argv, char **envp)
+>>>>>      Error *main_loop_err = NULL;
+>>>>>      Error *err = NULL;
+>>>>>      bool list_data_dirs = false;
+>>>>> +    bool has_numa_config_in_CLI = false;
+>>>>>      typedef struct BlockdevOptions_queue {
+>>>>>          BlockdevOptions *bdo;
+>>>>>          Location loc;
+>>>>> @@ -3293,6 +3294,7 @@ int main(int argc, char **argv, char **envp)
+>>>>>                  if (!opts) {
+>>>>>                      exit(1);
+>>>>>                  }
+>>>>> +                has_numa_config_in_CLI = true;
+>>>>>                  break;
+>>>>>              case QEMU_OPTION_display:
+>>>>>                  display_type = select_display(optarg);
+>>>>> @@ -4585,6 +4587,18 @@ int main(int argc, char **argv, char **envp)
+>>>>>      default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
+>>>>>      default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
+>>>>>
+>>>>> +    /*
+>>>>> +     * If memory hotplug is enabled i.e. slots > 0 and user hasn't add
+>>>>> +     * NUMA nodes explicitly on CLI
+>>>>> +     *
+>>>>> +     * Enable NUMA implicitly for guest to know the maximum memory
+>>>>> +     * from ACPI SRAT table, which is used for SWIOTLB.
+>>>>> +     */
+>>>>> +    if (ram_slots > 0 && !has_numa_config_in_CLI) {
+>>>>> +        if (machine_class->numa_implicit_add_node0) {
+>>>>> +            machine_class->numa_implicit_add_node0();
+>>>>> +        }
+>>>>> +    }
+>>>>
+>>>> Won't this change guest ABI
+>>
+>> Hi Daniel,
+>>
+>> No, this will change the ACPI table in following case without NUMA
+>> configuration:
+> it also will affect FW_CFG_NUMA file length (read as break ABI),
+> you didn't see any breakage because currnet SeaBIOS don't use
+> this legacy file anymore and even if it would used it's still
+> a race one has to at boot.
+>
+> So you need to disable feature on old machine types as you've suggested
+>
 
-There isn't a single interesting BDRVReopenState. The subset that a
-single BDS needs to determine its new state is the the BDRVReopenState
-of all of its parents. This can be an arbitrary number.
+Hi Igor,
 
-> 2) Don't change the prototypes at all, just change .bdrv_reopen_prepare contract
-> so that after it returns, .bdrv_child_perm/.bdrv_check_perm should comply to the
-> new state that would be commited once .bdrv_reopen_commit() is called, or
-> reverted if .bdrv_reopen_abort().
+Thank you very much. yes, I will.
 
-Hm, .bdrv_reopen_prepare already gets the whole queue passed, so I guess
-this could technically work. I'm not sure if it is a good idea, though.
+>>
+>> ...
+>> -m 128M,slots=4,maxmem=1G
+>> ...
+>>
+>> How about fixing it by adding
+>>
+>> m->numa_implicit_add_node0 = NULL;
+>>
+>> in pc_i440fx/q35_2_10_machine_options() ?
+> yep, pls do so.
+> Also take a look spapr which also supports numa, to make sure
+> it won't regress.
 
-Such a change would still make .bdrv_child_perm depend on the reopen
-queue, just without actually passing it as a parameter. I like such
-hidden data flows even less than adding an explicit one.
+Currently, just setup the pointer of pc_machine_class_init in
+pc_machine_class_init() for X86 and it's NULL in other arches. So there
+is no influence on SPAPR.
 
-It would also mean that each block driver would have to save the queue
-in its local bs->opaque structure so that .bdrv_child_perm can access it
-later. Alternatively, bdrv_reopen_prepare could already store the new
-cumulative parent permissions, but it would still involve two new fields
-in bs->opaque for storing something of a rather temporary nature.
+And this bug only affects x86, seems no need to add NUMA node implicity
+for SPAPR as well.
 
-Though maybe I'm just missing another way to implement this that you had
-in mind?
+Thanks,
+	dou.
 
-> 3) Don't change the prototypes at all, track the reopen progress in block.c
-> generically, (e.g. ignore conflicts and voilations) and update the permissions
-> only after bdrv_reopen_commit().
-
-Both permission updates and reopen are transactional. You need to do
-both prepare stages first before you can do commits. If you only start
-doing the prepare stage of permissions during the commit stage of
-reopen, you break the error cases.
-
-Kevin
+> CCing David.
+>
+>>
+>>
+>>   and so break migration/save/restore ?
+>>
+>> I did some tests(save/restore), this don't break migration.
+>>
+>> Are some situations I didn't consider ?
+>>
+>>
+>> Thanks,
+>> 	dou.
+>>>>
+>>> Thank you for your reply, I can't answer this immediately, I will
+>>> look into it and reply you soon.
+>>>
+>>> This patch works for X86, has no influence on other arch, and we
+>>> can regard it's functionality as "-numa node" in CLI.
+>>>
+>>> Thanks,
+>>>     dou.
+>>>
+>>>
+>>>> Regards,
+>>>> Daniel
+>>>>
+>>
+>>
+>>
+>
+>
+>
+>
