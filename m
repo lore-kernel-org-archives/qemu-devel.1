@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46652)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47727)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dtwpq-0007MI-QR
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:15:46 -0400
+	(envelope-from <eblake@redhat.com>) id 1dtwsF-0000zi-Sd
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:18:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dtwpp-0001tk-KV
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:15:42 -0400
+	(envelope-from <eblake@redhat.com>) id 1dtwsB-0003q7-SX
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:18:11 -0400
 References: <20170916185123.29255-1-mreitz@redhat.com>
-	<20170916185123.29255-4-mreitz@redhat.com>
+	<20170916185123.29255-6-mreitz@redhat.com>
 From: Eric Blake <eblake@redhat.com>
-Message-ID: <ce840ef8-6489-e0de-cc3c-2a5949205e36@redhat.com>
-Date: Mon, 18 Sep 2017 09:15:32 -0500
+Message-ID: <4848aab9-ce77-48cb-1531-54d45b361bef@redhat.com>
+Date: Mon, 18 Sep 2017 09:17:58 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170916185123.29255-4-mreitz@redhat.com>
+In-Reply-To: <20170916185123.29255-6-mreitz@redhat.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
 	protocol="application/pgp-signature";
-	boundary="itVBQDPQ4PnpD1XOmvqKNiWONtcjEpGXH"
-Subject: Re: [Qemu-devel] [PATCH v5 3/6] qapi: Add qobject_is_equal()
+	boundary="Gji95KvOTE8fsNQtNRwIabwq6r3fmQsLK"
+Subject: Re: [Qemu-devel] [PATCH v5 5/6] iotests: Add test for non-string
+ option reopening
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,38 +29,26 @@ To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---itVBQDPQ4PnpD1XOmvqKNiWONtcjEpGXH
+--Gji95KvOTE8fsNQtNRwIabwq6r3fmQsLK
 From: Eric Blake <eblake@redhat.com>
 To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
  Kevin Wolf <kwolf@redhat.com>
-Message-ID: <ce840ef8-6489-e0de-cc3c-2a5949205e36@redhat.com>
-Subject: Re: [PATCH v5 3/6] qapi: Add qobject_is_equal()
+Message-ID: <4848aab9-ce77-48cb-1531-54d45b361bef@redhat.com>
+Subject: Re: [PATCH v5 5/6] iotests: Add test for non-string option reopening
 References: <20170916185123.29255-1-mreitz@redhat.com>
- <20170916185123.29255-4-mreitz@redhat.com>
-In-Reply-To: <20170916185123.29255-4-mreitz@redhat.com>
+ <20170916185123.29255-6-mreitz@redhat.com>
+In-Reply-To: <20170916185123.29255-6-mreitz@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 On 09/16/2017 01:51 PM, Max Reitz wrote:
-> This generic function (along with its implementations for different
-> types) determines whether two QObjects are equal.
->=20
+> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 > Signed-off-by: Max Reitz <mreitz@redhat.com>
 > ---
-
-> +    case QNUM_DOUBLE:
-> +        switch (num_y->kind) {
-> +        case QNUM_I64:
-> +        case QNUM_U64:
-> +            return false;
-> +        case QNUM_DOUBLE:
-> +            /* Comparison in native double type */
-> +            return num_x->u.dbl =3D=3D num_y->u.dbl;
-
-I saw comments mentioning the odd behavior of NaN; one other odd
-behavior is that this treats -0.0 as equal to 0.0.  But that's fine by
-me (it matches C semantics of double =3D=3D double).
+>  tests/qemu-iotests/133     | 9 +++++++++
+>  tests/qemu-iotests/133.out | 5 +++++
+>  2 files changed, 14 insertions(+)
 
 Reviewed-by: Eric Blake <eblake@redhat.com>
 
@@ -69,7 +58,7 @@ Red Hat, Inc.           +1-919-301-3266
 Virtualization:  qemu.org | libvirt.org
 
 
---itVBQDPQ4PnpD1XOmvqKNiWONtcjEpGXH
+--Gji95KvOTE8fsNQtNRwIabwq6r3fmQsLK
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -78,14 +67,14 @@ Content-Disposition: attachment; filename="signature.asc"
 Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm/1QQACgkQp6FrSiUn
-Q2rVtQgAk1JxuXuH+h6cg3EV+VT+qJnnYt0wgJqqsA8dChXt8J/quZgyxgCGUBgI
-wOBIsj3C/qE02w14vEl39SZNN0/ubBZ31FEzxmartmoVOBX171IcjiyecxUGENED
-opmHs4TcHL3No/ECP6NHUyBRh5rvO8d6ZtsLm+nZfuBlsk10tQYHkXKlFBKYCo7n
-ycYK2fLEAEu86aHmMFlXue2ctcUTogW4PG4BF8Zq4l/a/8oz1pBbrQG2HasZIUya
-250Sf0vaEJUMkRY0GKuAt46CVNzncvVbN2yvdSoqS6nX0uwB5tTactBCPLQdFmtz
-zfnp2tt33hSaBn6KuoSbh6+vft/aAA==
-=a1zm
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm/1ZYACgkQp6FrSiUn
+Q2on+wf+JxeuX0FXPl891io0gw+5Qjh/brBpCscLFF3FhG2wfHqrcw2rQLdXrwW2
+VlxhgfvlSD9cRAJ9ZYCbp0vnzvrdcfiGsPV7fa8QA5QFlnL/1uBxEI1qvW33Wa+d
+kD2KDkxsSAz4QepWe8qebFDxgAvvtlGqKilrPPlfu76KzhxuEJC19euLoSQe419A
+y+90XL+yCjctL1z6/h6XhNQs8LdfSf0PyfwO+ekVoQJoQLFxdHN2hoGgADQK7icU
+eaJ26TyERbgfdGyQgSjU0x4my79TQfnjp2zPPXfOdXPzUjtqqWAYoYHf/qPzxbt8
+7XRlgMpbIxMd7WYrNIywu7aiCNX2ug==
+=B70L
 -----END PGP SIGNATURE-----
 
---itVBQDPQ4PnpD1XOmvqKNiWONtcjEpGXH--
+--Gji95KvOTE8fsNQtNRwIabwq6r3fmQsLK--
