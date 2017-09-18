@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51340)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dturc-0005Ix-5P
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:09:29 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dtutm-00063L-QE
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:11:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dturW-0005V7-2F
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:09:24 -0400
-Received: from mail-pg0-x230.google.com ([2607:f8b0:400e:c05::230]:53026)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dturV-0005Um-Rc
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:09:17 -0400
-Received: by mail-pg0-x230.google.com with SMTP id i195so131398pgd.9
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 05:09:17 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1dtuti-0006RH-QA
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:11:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60660)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dtuti-0006Qp-Ip
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:11:34 -0400
+Date: Mon, 18 Sep 2017 14:11:27 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170918141127.17b669a7.cohuck@redhat.com>
+In-Reply-To: <33493193-b9fc-e76f-f30e-c23d68e34289@redhat.com>
+References: <20170918085542.13265-1-cohuck@redhat.com>
+	<33493193-b9fc-e76f-f30e-c23d68e34289@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAKSfGUC_k6K=2Xy8pGcwuQ66DMPYCDvA47Ojgm7ntQfALGwDsQ@mail.gmail.com>
-References: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
-	<CAJhHMCCZh7hvQT8x9Bks9k6=ka4G1Oybv1MrkKJ9_VZ_eRZBfQ@mail.gmail.com>
-	<CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
-	<87bmrj8eks.fsf@linaro.org>
-	<CAPnv1PKyak1G-uL=H=-Vh_9TH2dZKffYjDf_2Z+LWuqovMKCBQ@mail.gmail.com>
-	<CAKSfGUC_k6K=2Xy8pGcwuQ66DMPYCDvA47Ojgm7ntQfALGwDsQ@mail.gmail.com>
-From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Mon, 18 Sep 2017 15:09:16 +0300
-Message-ID: <CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] What is the best commit for record-replay?
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3] s390x/ccw: create s390 phb for compat
+ reasons as well
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,72 +28,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor R <boost.lists@gmail.com>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, Pranith Kumar <bobby.prani+qemu@gmail.com>, pavel.dovgaluk@ispras.ru, Aleksandr Bezzubikov <abezzubikov@ispras.ru>
+To: David Hildenbrand <david@redhat.com>
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
 
-[+CC Pavel Dovgaluk, me]
+On Mon, 18 Sep 2017 14:03:20 +0200
+David Hildenbrand <david@redhat.com> wrote:
 
-2017-09-18 15:02 GMT+03:00 Aleksandr Bezzubikov <zuban32s@gmail.com>:
-> 2017-05-02 15:42 GMT+03:00 Igor R <boost.lists@gmail.com>:
->>>>>> I'm trying to use the deterministic record/replay feature, and I would
->>>>>> like to know which commit I should take to get it work.
->>>>>> In RC0 it seems to be broken. I tried pre-MTTCG commit 2421f381dc, as
->>>>
->>>>> Can you retry with the latest rc? There were some fixes regarding rr since rc0.
->>>>
->>>>
->>>> I've taken 2.9 release, and RR does not seem to work there.
->>>> I recorded the boot process of x86 Fedora-21 linux and the replay got
->>>> stuck almost immediately.
->>>
->>> What's your command line?
->>>
->>> Does it get stuck at the same place each time?
->>>
->>> Can you boot fine with icount but without record/replay?
->>
->> Here is the exact scenario:
->> - Get 2.9 from git, configure it as follows: "./configure
->> --target-list=i386-softmmu --enable-sdl" and  make.
->> - Download https://people.debian.org/~aurel32/qemu/i386/debian_squeeze_i386_standard.qcow2
->> - Run qemu with the following command line, until login prompt:
->> -icount shift=7,rr=record,rrfile=replay.bin -drive
->> file=debian_squeeze_i386_standard.qcow2,if=none,id=img-direct -drive
->> driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
->> ide-hd,drive=img-blkreplay -monitor stdio
->> - Replay: -icount shift=7,rr=replay,rrfile=replay.bin -drive
->> file=debian_squeeze_i386_standard.qcow2,if=none,id=img-direct -drive
->> driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
->> ide-hd,drive=img-blkreplay -monitor stdio
->>
->> Every time I attempt to replay, QEMU gets stuck at the same EIP, at a
->> very early stage.
->>
->>
->>> Can you boot fine with icount but without record/replay?
->>
->> Yes. I can also enable icount and recording - it also boots fine. The
->> problem with the replay.
->
-> Hi guys,
-> Maybe the thread is a bit outdated, but the problem is still relevant.
-> I've just tried to record and replay WinXP boot process, and I've encountered
-> exactly the same problem as described above - record is fine, replay
-> gets stuck early. I use current master.
-> And I've discovered the second problem - recording makes initial snapshot,
-> but it doesn't seem to be saved to the disk - replay can't see it.
->
-> Hope you've already found the solution (as the last post was on 2 May)
-> and it's just got missed the mailing list.
->
->>
->
->
->
-> --
-> Aleksandr Bezzubikov
+> On 18.09.2017 10:55, Cornelia Huck wrote:
+> > d32bd032d8 ("s390x/ccw: create s390 phb conditionally") made
+> > registering the s390 pci host bridge conditional on presense
+> > of the zpci facility bit. Sadly, that breaks migration from
+> > machines that did not use the cpu model (2.7 and previous).
+> > 
+> > Create the s390 phb for pre-cpu model machines as well: We can
+> > tweak s390_has_feat() to always indicate the zpci facility bit
+> > when no cpu model is available (on 2.7 and previous compat machines).
+> > 
+> > Fixes: d32bd032d8 ("s390x/ccw: create s390 phb conditionally")
+> > Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> > 
+> > v2->v3:
+> > - no longer RFC (I tested a bit more)
+> > - removed unrelated hunk
+> > - more verbose patch description
+> > 
+> > I'll wait a bit for more acks/reviews and will probably send a pull
+> > request for s390x tomorrow or so before the amount of queued patches
+> > gets out of hand...
+> > 
+> > ---
+> >  target/s390x/cpu_models.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> > index c295e641e6..5169379db5 100644
+> > --- a/target/s390x/cpu_models.c
+> > +++ b/target/s390x/cpu_models.c
+> > @@ -196,6 +196,9 @@ bool s390_has_feat(S390Feat feat)
+> >              }
+> >          }
+> >  #endif
+> > +        if (feat == S390_FEAT_ZPCI) {
+> > +            return true;
+> > +        }
+> >          return 0;
+> >      }
+> >      return test_bit(feat, cpu->model->features);
+> >   
+> 
+> 1. cpu->model will always be set for QEMU, so you can move that into the
+> ifdef, next do the other checks. You can even send a cleanup to remove
+> the if (kvm_enabled()) check.
 
+I prefer it the way it is now. There's nothing kvm specific about that
+bit, and cpu->model always being set is not really obvious.
 
+> 
+> 2. "return pci_available" ?
 
--- 
-Aleksandr Bezzubikov
+I thought about that as well. I think, however, that a better way is
+just to disable compat machines that rely on pci being available.
+
+As you can turn off pci only manually, I'd like to defer this and first
+get this out of the door, as it fixes an existing problem.
