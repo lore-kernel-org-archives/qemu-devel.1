@@ -1,26 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51851)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dtx2Q-00088W-8z
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:28:46 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dtx6t-0001pY-H1
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:33:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dtx2M-0000cd-Az
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:28:42 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47462)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dtx2M-0000cD-59
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:28:38 -0400
-References: <20170918101709.30421-1-aik@ozlabs.ru>
-	<20170918101709.30421-4-aik@ozlabs.ru>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f4fc948a-63d4-b150-2a6f-2cf73f167d6a@redhat.com>
-Date: Mon, 18 Sep 2017 09:28:36 -0500
+	(envelope-from <stefanha@gmail.com>) id 1dtx6n-0002d0-Qc
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:33:19 -0400
+Received: from mail-wr0-x22e.google.com ([2a00:1450:400c:c0c::22e]:50638)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dtx6n-0002cc-KD
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:33:13 -0400
+Received: by mail-wr0-x22e.google.com with SMTP id w12so662293wrc.7
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 07:33:13 -0700 (PDT)
+Date: Mon, 18 Sep 2017 15:33:08 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170918143308.GA4141@stefanha-x1.localdomain>
+References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
+	<150529666493.10902.14830445134051381968.stgit@frigg.lan>
 MIME-Version: 1.0
-In-Reply-To: <20170918101709.30421-4-aik@ozlabs.ru>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wdaW3TrEQBbwHuPRk0D9bHGX1rl7d3iUd"
-Subject: Re: [Qemu-devel] [PATCH qemu v3 03/13] memory: Open code FlatView
- rendering
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <150529666493.10902.14830445134051381968.stgit@frigg.lan>
+Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,57 +30,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+To: =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>
+Cc: qemu-devel@nongnu.org, "Emilio G. Cota" <cota@braap.org>, Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wdaW3TrEQBbwHuPRk0D9bHGX1rl7d3iUd
-From: Eric Blake <eblake@redhat.com>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <f4fc948a-63d4-b150-2a6f-2cf73f167d6a@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH qemu v3 03/13] memory: Open code FlatView
- rendering
-References: <20170918101709.30421-1-aik@ozlabs.ru>
- <20170918101709.30421-4-aik@ozlabs.ru>
-In-Reply-To: <20170918101709.30421-4-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Sep 13, 2017 at 12:57:45PM +0300, Lluís Vilanova wrote:
+> +    /* mandatory initialization function */
+> +    int main(int argc, const char **argv)
 
-On 09/18/2017 05:16 AM, Alexey Kardashevskiy wrote:
-> We are going to share FlatView's between AddressSpace's and per-AS
-> memory listeners won't suite the purpose anymore so open code
+Most shared library plugin interfaces I have seen do not use "main()" as
+the entry point.  Instead they use a unique name that allows the host
+application to differentiate between share library files that are valid
+plugins (e.g. "qemu_instr_init") and non-plugin shared libraries.
 
-s/suite/suit/
+Stable plugin APIs usually have a versioning or feature detection
+scheme.  Versioning is simple: the host application passes a major/minor
+version number to the init function.
 
-> the dispatch tree rendering.
->=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
+Of course the dynamic linker already enforces compatibility somewhat: if
+a plugin uses a newer API than available in the host application then
+there will be a missing symbol/linker error.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+So what versioning strategy should we follow?  The simplest would be to
+depend 100% on the dynamic linker with no explicit checks inside the
+plugin or QEMU.  In that case the API/ABI need to follow some rules like
+this (not sure how oudated this information is):
+http://plan99.net/~mike/writing-shared-libraries.html
 
+> +    {
+> +        int i;
+> +        printf("init!\n");
+> +        printf("    argc :: %d\n", argc);
+> +        for (i = 0; i < argc; i++) {
+> +            printf("            -> %s\n", argv[i]);
+> +        }
+> +    
+> +        qi_set_fini(fini, NULL);
+> +    
+> +        /* instrument and trace events */
+> +        QITraceEvent *ev;
+> +    
+> +        qi_event_set_guest_cpu_enter(guest_cpu_enter);
+> +        ev = qi_trace_event_name("guest_cpu_enter");
+> +        assert(ev);
+> +        qi_trace_event_set_state_dynamic(ev, true);
+> +    
+> +        qi_event_set_guest_mem_before_trans(guest_mem_before_trans);
+> +        ev = qi_trace_event_name("guest_mem_before_trans");
+> +        assert(ev);
+> +        qi_trace_event_set_state_dynamic(ev, true);
+> +    
+> +        qi_event_set_guest_mem_before_exec(guest_mem_before_exec);
+> +        ev = qi_trace_event_name("guest_mem_before_exec");
+> +        assert(ev);
+> +        qi_trace_event_set_state_dynamic(ev, true);
 
---wdaW3TrEQBbwHuPRk0D9bHGX1rl7d3iUd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Why are trace events being enabled in this example?
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+I would expect qi_event_set_guest_cpu_enter(guest_cpu_enter) to
+immediately enable the callback.  The user shouldn't need to use tracing
+to receive callbacks.
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm/2BQACgkQp6FrSiUn
-Q2ry8Af+Oe56ir4urixJPCwotsatcNGW3zEm73Zz8RkDEzDJwyscTIFxFJuonfhi
-JB1M6DhNWbTq+fEpV2psQNErY0VVUPASJ+KvWE+nLgdqceYrrZ9QQUx0eyfCghv2
-9CDRJh7UVxf1QFZWzjNlOnjAgoeoRLmRWxI6jw6/QCwDIYSKd3Nic/EVz0OfmoT6
-6cV2NP74Xl4qdno8D8GpKWoAp+W/rbrDsVGIVDWp6MxJFmqCEL5QDmpuPzcxMrlV
-u8dCbIltERnvwHRdu449jq9P7VbitQpumQydLGZhAe6EubLhqdw/eJwoDQhoZNbs
-uy3xTrdkv+AIqrCbzYbdCHPMq3mI6w==
-=hSKH
------END PGP SIGNATURE-----
+qi_event_set_guest_cpu_enter(NULL) should disable the callback.
 
---wdaW3TrEQBbwHuPRk0D9bHGX1rl7d3iUd--
+Stefan
