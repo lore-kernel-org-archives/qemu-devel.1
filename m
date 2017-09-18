@@ -1,22 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47727)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49536)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dtwsF-0000zi-Sd
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:18:17 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dtwwi-0004fx-AC
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:22:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dtwsB-0003q7-SX
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:18:11 -0400
-References: <20170916185123.29255-1-mreitz@redhat.com>
-	<20170916185123.29255-6-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4848aab9-ce77-48cb-1531-54d45b361bef@redhat.com>
-Date: Mon, 18 Sep 2017 09:17:58 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dtwwd-0006Rw-AR
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:22:48 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1505494753-10837-1-git-send-email-sundeep.lkml@gmail.com>
+	<1505494753-10837-3-git-send-email-sundeep.lkml@gmail.com>
+	<2c6a4136-fb80-2000-940c-1df5e718cbf1@amsat.org>
+	<CALHRZurRLysJCRwvm+SbJUn8YBAst_Q38RCzJkmT4z=mfnYuiQ@mail.gmail.com>
+	<CALHRZurNLqH_6Xbh9SKtCA0fuk-CFEZeqBMwYXV=+UaZB4k1Bg@mail.gmail.com>
+	<CAFEAcA-BQ=ognSsb3Kxx5ThJ5Q_GA_sFFFofpKY1=XnRS4-WTA@mail.gmail.com>
+	<6947945c-6b04-dce0-9010-b3350df0f151@amsat.org>
+	<CAFEAcA8yHmZBgudTbW7S6eoObYE_O=CP3YjfL7g7GGip=wsjaA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1abcfaca-3af0-efcf-d577-c3c5cb39e8fe@amsat.org>
+Date: Mon, 18 Sep 2017 11:22:28 -0300
 MIME-Version: 1.0
-In-Reply-To: <20170916185123.29255-6-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Gji95KvOTE8fsNQtNRwIabwq6r3fmQsLK"
-Subject: Re: [Qemu-devel] [PATCH v5 5/6] iotests: Add test for non-string
- option reopening
+In-Reply-To: <CAFEAcA8yHmZBgudTbW7S6eoObYE_O=CP3YjfL7g7GGip=wsjaA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [Qemu devel v9 PATCH 2/5] msf2: Microsemi
+ Smartfusion2 System Register block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,56 +35,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: sundeep subbaraya <sundeep.lkml@gmail.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Alistair Francis <alistair23@gmail.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Gji95KvOTE8fsNQtNRwIabwq6r3fmQsLK
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <4848aab9-ce77-48cb-1531-54d45b361bef@redhat.com>
-Subject: Re: [PATCH v5 5/6] iotests: Add test for non-string option reopening
-References: <20170916185123.29255-1-mreitz@redhat.com>
- <20170916185123.29255-6-mreitz@redhat.com>
-In-Reply-To: <20170916185123.29255-6-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 09/18/2017 11:00 AM, Peter Maydell wrote:
+> On 18 September 2017 at 14:58, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>> Hi Peter,
+>>
+>> On 09/18/2017 10:36 AM, Peter Maydell wrote:
+>>>
+>>> On 18 September 2017 at 14:27, sundeep subbaraya <sundeep.lkml@gmail.com>
+>>> wrote:
+>>>>>>
+>>>>>> Hi Sundeep, Peter,
+>>>>>>
+>>>>>>
+>>>>>> On 09/15/2017 01:59 PM, Subbaraya Sundeep wrote:
+>>>>>>>
+>>>>>>>
+>>>>>>> +static void msf2_sysreg_write(void *opaque, hwaddr offset,
+>>>>>>> +                          uint64_t val, unsigned size)
+>>>>>>> +{
+>>>>>>> +    MSF2SysregState *s = opaque;
+>>>>>>> +    uint32_t newval = val;
+>>>>>>> +
+>>>>>>> +    offset >>= 2;
+>>>>>>> +
+>>>>>>> +    switch (offset) {
+>>>>>>> +    case MSSDDR_PLL_STATUS:
+>>>>>>> +        trace_msf2_sysreg_write_pll_status();
+>>>>>>> +        break;
+>>>>>>> +
+>>>>>>> +    case ESRAM_CR:
+>>>>>>> +    case DDR_CR:
+>>>>>>> +    case ENVM_REMAP_BASE_CR:
+>>>>>>> +        if (newval != s->regs[offset]) {
+>>>>>>> +            qemu_log_mask(LOG_UNIMP,
+>>>>>>> +                       TYPE_MSF2_SYSREG": remapping not
+>>>>>>> supported\n");
+>>>>>>
+>>>>>>
+>>>>>>
+>>>>>> I'd rather exit here than continue with inconsistent cpu, Peter what do
+>>>>>> you recommend?
+>>>>
+>>>>
+>>>>
+>>>> Could you please suggest.
+>>>
+>>>
+>>> We shouldn't exit QEMU for something the guest can provoke. If
+>>> the functionality isn't implemented then just LOG_UNIMP it.
+>>
+>>
+>> This was commented here:
+>> http://lists.nongnu.org/archive/html/qemu-devel/2017-05/msg02971.html
+>>
+>> Guest remapping code is like non-return function. Hardware error here can
+>> not happen, so there is no more guest code after a remap request.
+>> Continuing running QEMU will lead to chaos, that's why I recommend aborting
+>> instead of just LOG_UNIMP it.
+> 
+> There's lots of stuff that can cause the guest to go badly
+> and confusingly wrong if unimplemented. If we print a
+> useful message with LOG_UNIMP then there's an easy clue
+> for what's gone wrong. The guest shouldn't be able to
+> provoke QEMU to exit.
 
-On 09/16/2017 01:51 PM, Max Reitz wrote:
-> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  tests/qemu-iotests/133     | 9 +++++++++
->  tests/qemu-iotests/133.out | 5 +++++
->  2 files changed, 14 insertions(+)
+I understand. I'm worried about being PITA for an user to figure out 
+what's happening here, that's why I'm wondering how this should be 
+handled. Another idea I thought about was raising a PREFETCH or BKPT 
+exception, but this would also be an incorrect model behavior.
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Anyway I'd be happy enough if instead of using LOG_UNIMP/LOG_GUEST_ERROR 
+we use an unconditional qemu_log("bus remap unimplemented, unpredictable 
+behaviour!") warning. Fair enough?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Regards,
 
-
---Gji95KvOTE8fsNQtNRwIabwq6r3fmQsLK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm/1ZYACgkQp6FrSiUn
-Q2on+wf+JxeuX0FXPl891io0gw+5Qjh/brBpCscLFF3FhG2wfHqrcw2rQLdXrwW2
-VlxhgfvlSD9cRAJ9ZYCbp0vnzvrdcfiGsPV7fa8QA5QFlnL/1uBxEI1qvW33Wa+d
-kD2KDkxsSAz4QepWe8qebFDxgAvvtlGqKilrPPlfu76KzhxuEJC19euLoSQe419A
-y+90XL+yCjctL1z6/h6XhNQs8LdfSf0PyfwO+ekVoQJoQLFxdHN2hoGgADQK7icU
-eaJ26TyERbgfdGyQgSjU0x4my79TQfnjp2zPPXfOdXPzUjtqqWAYoYHf/qPzxbt8
-7XRlgMpbIxMd7WYrNIywu7aiCNX2ug==
-=B70L
------END PGP SIGNATURE-----
-
---Gji95KvOTE8fsNQtNRwIabwq6r3fmQsLK--
+Phil.
