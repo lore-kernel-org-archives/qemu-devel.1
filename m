@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52083)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52085)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dtutm-00063L-QE
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:11:39 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dtutm-00063N-Uz
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:11:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dtuti-0006RH-QA
+	(envelope-from <kwolf@redhat.com>) id 1dtutl-0006TL-RU
 	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:11:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60660)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dtuti-0006Qp-Ip
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:11:34 -0400
-Date: Mon, 18 Sep 2017 14:11:27 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170918141127.17b669a7.cohuck@redhat.com>
-In-Reply-To: <33493193-b9fc-e76f-f30e-c23d68e34289@redhat.com>
-References: <20170918085542.13265-1-cohuck@redhat.com>
-	<33493193-b9fc-e76f-f30e-c23d68e34289@redhat.com>
+Date: Mon, 18 Sep 2017 14:11:23 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170918121123.GH31915@localhost.localdomain>
+References: <20170915101008.16646-1-kwolf@redhat.com>
+	<20170918075107.GK15551@lemon.lan>
+	<20170918081103.GD31915@localhost.localdomain>
+	<20170918115303.GL15551@lemon.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] s390x/ccw: create s390 phb for compat
- reasons as well
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170918115303.GL15551@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH 0/6] block: Fix permissions after ro/rw
+ reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,68 +26,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Mon, 18 Sep 2017 14:03:20 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> On 18.09.2017 10:55, Cornelia Huck wrote:
-> > d32bd032d8 ("s390x/ccw: create s390 phb conditionally") made
-> > registering the s390 pci host bridge conditional on presense
-> > of the zpci facility bit. Sadly, that breaks migration from
-> > machines that did not use the cpu model (2.7 and previous).
+Am 18.09.2017 um 13:53 hat Fam Zheng geschrieben:
+> On Mon, 09/18 10:11, Kevin Wolf wrote:
+> > > 2) Don't change the prototypes at all, just change .bdrv_reopen_prepare contract
+> > > so that after it returns, .bdrv_child_perm/.bdrv_check_perm should comply to the
+> > > new state that would be commited once .bdrv_reopen_commit() is called, or
+> > > reverted if .bdrv_reopen_abort().
 > > 
-> > Create the s390 phb for pre-cpu model machines as well: We can
-> > tweak s390_has_feat() to always indicate the zpci facility bit
-> > when no cpu model is available (on 2.7 and previous compat machines).
+> > Hm, .bdrv_reopen_prepare already gets the whole queue passed, so I guess
+> > this could technically work. I'm not sure if it is a good idea, though.
 > > 
-> > Fixes: d32bd032d8 ("s390x/ccw: create s390 phb conditionally")
-> > Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> > ---
+> > Such a change would still make .bdrv_child_perm depend on the reopen
+> > queue, just without actually passing it as a parameter. I like such
+> > hidden data flows even less than adding an explicit one.
 > > 
-> > v2->v3:
-> > - no longer RFC (I tested a bit more)
-> > - removed unrelated hunk
-> > - more verbose patch description
-> > 
-> > I'll wait a bit for more acks/reviews and will probably send a pull
-> > request for s390x tomorrow or so before the amount of queued patches
-> > gets out of hand...
-> > 
-> > ---
-> >  target/s390x/cpu_models.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> > index c295e641e6..5169379db5 100644
-> > --- a/target/s390x/cpu_models.c
-> > +++ b/target/s390x/cpu_models.c
-> > @@ -196,6 +196,9 @@ bool s390_has_feat(S390Feat feat)
-> >              }
-> >          }
-> >  #endif
-> > +        if (feat == S390_FEAT_ZPCI) {
-> > +            return true;
-> > +        }
-> >          return 0;
-> >      }
-> >      return test_bit(feat, cpu->model->features);
-> >   
+> > It would also mean that each block driver would have to save the queue
+> > in its local bs->opaque structure so that .bdrv_child_perm can access it
+> > later. Alternatively, bdrv_reopen_prepare could already store the new
+> > cumulative parent permissions, but it would still involve two new fields
+> > in bs->opaque for storing something of a rather temporary nature.
 > 
-> 1. cpu->model will always be set for QEMU, so you can move that into the
-> ifdef, next do the other checks. You can even send a cleanup to remove
-> the if (kvm_enabled()) check.
-
-I prefer it the way it is now. There's nothing kvm specific about that
-bit, and cpu->model always being set is not really obvious.
-
+> What about this?
 > 
-> 2. "return pci_available" ?
+> 1) drv->bdrv_reopen_prepare() saves the desired new perms in
+>    BDRVReopenState.
 
-I thought about that as well. I think, however, that a better way is
-just to disable compat machines that rely on pci being available.
+But how does it determine the desired new perms? Either you duplicate
+the logic of the .bdrv_child_perm implementation into a new set of
+functions that does the same thing, but based on the new state; or you
+extend the existing function with a BlockReopenQueue parameter. The
+latter is basically this series, except with an additional unnecessary
+detour through the driver code instead of doing it in common code.
 
-As you can turn off pci only manually, I'd like to defer this and first
-get this out of the door, as it fixes an existing problem.
+Also note that storing it in BDRVReopenState would have to involve a new
+list of an additional data structure because permissions are per
+BdrvChild, not per BlockDriverState.
+
+> 2) bdrv_reopen_prepare() checks the new perms after drv->bdrv_reopen_prepare()
+>    returns.
+> 3) bdrv_reopen_commit() updates the bs to new perms.
+
+2) and 3) are already implemented in this series like you suggest.
+
+Kevin
