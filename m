@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54799)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1du1e2-0004ep-1s
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:23:51 -0400
+	(envelope-from <mreitz@redhat.com>) id 1du1gi-0007GM-Ge
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:26:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1du1dz-0002Ba-7N
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:23:50 -0400
-From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Date: Tue, 19 Sep 2017 00:53:21 +0530
-Message-Id: <1505762601-27143-6-git-send-email-sundeep.lkml@gmail.com>
-In-Reply-To: <1505762601-27143-1-git-send-email-sundeep.lkml@gmail.com>
-References: <1505762601-27143-1-git-send-email-sundeep.lkml@gmail.com>
+	(envelope-from <mreitz@redhat.com>) id 1du1gh-00043E-HY
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:26:36 -0400
+References: <CAJoBWHyqyFiFi_feH=316fJRUbb9T8b4bbYzp-5eUF6dHtpNCg@mail.gmail.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <1ff0af0b-cbcf-7184-3542-ccce908b130e@redhat.com>
+Date: Mon, 18 Sep 2017 21:26:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [Qemu devel v10 PATCH 5/5] msf2: Add Emcraft's
- Smartfusion2 SOM kit
+In-Reply-To: <CAJoBWHyqyFiFi_feH=316fJRUbb9T8b4bbYzp-5eUF6dHtpNCg@mail.gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="6cIcQrMH5ra0LtcFPeNEiuTubAXrOPuJM"
+Subject: Re: [Qemu-devel] Disk Image Read Location
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,130 +23,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: peter.maydell@linaro.org, crosthwaite.peter@gmail.com, alistair23@gmail.com, f4bug@amsat.org, Subbaraya Sundeep <sundeep.lkml@gmail.com>
+To: Derrick McKee <derrick.mckee@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
 
-Emulated Emcraft's Smartfusion2 System On Module starter
-kit.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--6cIcQrMH5ra0LtcFPeNEiuTubAXrOPuJM
+From: Max Reitz <mreitz@redhat.com>
+To: Derrick McKee <derrick.mckee@gmail.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>
+Message-ID: <1ff0af0b-cbcf-7184-3542-ccce908b130e@redhat.com>
+Subject: Re: [Qemu-devel] Disk Image Read Location
+References: <CAJoBWHyqyFiFi_feH=316fJRUbb9T8b4bbYzp-5eUF6dHtpNCg@mail.gmail.com>
+In-Reply-To: <CAJoBWHyqyFiFi_feH=316fJRUbb9T8b4bbYzp-5eUF6dHtpNCg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/arm/Makefile.objs |  2 +-
- hw/arm/msf2-som.c    | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 95 insertions(+), 1 deletion(-)
- create mode 100644 hw/arm/msf2-som.c
+On 2017-09-18 20:47, Derrick McKee wrote:
+> Hi,
+>=20
+> I am trying to figure out if a particular disk operation is reading fro=
+m
+> the same location in an image file.  I am simulating a USB disk, and du=
+ring
+> an operation the guest OS performs, I would like to know how many times=
+ the
+> backing image file is read.  I have identified the function
+> address_space_write as the function that writes the data to the guest O=
+S
+> from the image, but I am not sure what to compare with past writes.  Th=
+ere
+> are AddressSpace*, MemoryRegion*, and hwaddr types in that function.  C=
+an
+> any of those be used to compare image read locations?  I am hoping that=
+ if,
+> for example, the AddressSpace* passed into address_space_write during o=
+ne
+> invocation equals the AddressSpace* of another invocation means that th=
+e
+> same location within the image file was read twice.  Any help would be
+> appreciated.
 
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index a6cf24f..2794e08 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -19,4 +19,4 @@ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
- obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
- obj-$(CONFIG_MPS2) += mps2.o
--obj-$(CONFIG_MSF2) += msf2-soc.o
-+obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
-diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
-new file mode 100644
-index 0000000..d395696
---- /dev/null
-+++ b/hw/arm/msf2-som.c
-@@ -0,0 +1,94 @@
-+/*
-+ * SmartFusion2 SOM starter kit(from Emcraft) emulation.
-+ *
-+ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "hw/boards.h"
-+#include "hw/arm/arm.h"
-+#include "exec/address-spaces.h"
-+#include "qemu/cutils.h"
-+#include "hw/arm/msf2-soc.h"
-+
-+#define DDR_BASE_ADDRESS      0xA0000000
-+#define DDR_SIZE              (64 * M_BYTE)
-+
-+#define M2S010_ENVM_SIZE      (256 * K_BYTE)
-+#define M2S010_ESRAM_SIZE     (64 * K_BYTE)
-+
-+static void emcraft_sf2_s2s010_init(MachineState *machine)
-+{
-+    DeviceState *dev;
-+    DeviceState *spi_flash;
-+    MSF2State *soc;
-+    DriveInfo *dinfo = drive_get_next(IF_MTD);
-+    qemu_irq cs_line;
-+    SSIBus *spi_bus;
-+    MemoryRegion *sysmem = get_system_memory();
-+    MemoryRegion *ddr = g_new(MemoryRegion, 1);
-+
-+    memory_region_init_ram(ddr, NULL, "ddr-ram", DDR_SIZE,
-+                           &error_fatal);
-+    memory_region_add_subregion(sysmem, DDR_BASE_ADDRESS, ddr);
-+
-+    dev = qdev_create(NULL, TYPE_MSF2_SOC);
-+    qdev_prop_set_string(dev, "part-name", "M2S010");
-+    qdev_prop_set_uint64(dev, "eNVM-size", M2S010_ENVM_SIZE);
-+    qdev_prop_set_uint64(dev, "eSRAM-size", M2S010_ESRAM_SIZE);
-+
-+    /*
-+     * CPU clock and peripheral clocks(APB0, APB1)are configurable
-+     * in Libero. CPU clock is divided by APB0 and APB1 divisors for
-+     * peripherals. Emcraft's SoM kit comes with these settings by default.
-+     */
-+    qdev_prop_set_uint32(dev, "m3clk", 142 * 1000000);
-+    qdev_prop_set_uint32(dev, "apb0div", 2);
-+    qdev_prop_set_uint32(dev, "apb1div", 2);
-+
-+    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-+
-+    soc = MSF2_SOC(dev);
-+
-+    /* Attach SPI flash to SPI0 controller */
-+    spi_bus = (SSIBus *)qdev_get_child_bus(dev, "spi0");
-+    spi_flash = ssi_create_slave_no_init(spi_bus, "s25sl12801");
-+    qdev_prop_set_uint8(spi_flash, "spansion-cr2nv", 1);
-+    if (dinfo) {
-+        qdev_prop_set_drive(spi_flash, "drive", blk_by_legacy_dinfo(dinfo),
-+                                    &error_fatal);
-+    }
-+    qdev_init_nofail(spi_flash);
-+    cs_line = qdev_get_gpio_in_named(spi_flash, SSI_GPIO_CS, 0);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
-+
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-+                       soc->envm_size);
-+}
-+
-+static void emcraft_sf2_machine_init(MachineClass *mc)
-+{
-+    mc->desc = "SmartFusion2 SOM kit from Emcraft (M2S010)";
-+    mc->init = emcraft_sf2_s2s010_init;
-+}
-+
-+DEFINE_MACHINE("emcraft-sf2", emcraft_sf2_machine_init)
--- 
-2.5.0
+If you're referring to images as in images of block devices, then the
+block layer contains the functionality you're looking for.
+
+bdrv_driver_preadv() from block/io.c is a function that every read
+request should go through.  However, at this point it's already aligned
+to (host) sectors, so maybe bdrv_co_preadv() is better suited.
+
+But then again, because of how the block layer works you'll likely see
+every read request twice there (once for the disk image's format (e.g.
+qcow2 or raw) and once for the storage backend used for the image (e.g.
+file for normal files or http)).  So you either correct for that or you
+instead go one layer above into block/block-backend.c.
+
+All read requests from the guest go through either blk_co_preadv() or
+blk_aio_preadv(), and they should go through there only once.
+
+Max
+
+
+--6cIcQrMH5ra0LtcFPeNEiuTubAXrOPuJM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnAHeESHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Ate0H/3bTxSPFySkp1OlfAvMZn/1E6UHvXsRv
++WPCATlv/44E7Vh2/hIr26WogifKpO8oLJX9ohkQbrG8mfiGc+VYRAHlBvH2QuCB
+RIg1aVV4v5ilvadOYojrxR1QSKGEAoNQ8fbrrqeLm7MP1kx8DJkZ8kTCAbBHSy8v
+FN4Vq8O4Xdcet82GzxvtHMK1tsLoAcbN72trLNdnCTXNj3v89GVf4cv8LkBzZ8Hj
+kCO/67iWm9b6ekZtOvcnhO8E8x0zHP4nor/Cf4J76aOgG0bMlFtyOgfJ71W5HqvJ
+xq3cz9smqwyLcOxdKXNrJsf3kQbf2IuEzMe57OvT3wIP/d6oIx+HGQw=
+=l24Y
+-----END PGP SIGNATURE-----
+
+--6cIcQrMH5ra0LtcFPeNEiuTubAXrOPuJM--
