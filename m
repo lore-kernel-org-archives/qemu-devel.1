@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41911)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dtkvI-0001MU-V6
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 21:32:36 -0400
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dtl0x-0002fL-8k
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 21:38:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dtkvF-0007Nj-7T
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 21:32:32 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1505494753-10837-1-git-send-email-sundeep.lkml@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4c141996-c4ed-7156-d960-58ae2d9c4d1e@amsat.org>
-Date: Sun, 17 Sep 2017 22:32:15 -0300
+	(envelope-from <maozy.fnst@cn.fujitsu.com>) id 1dtl0v-0001yv-FQ
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 21:38:23 -0400
+References: <cover.1501827395.git.maozy.fnst@cn.fujitsu.com>
+	<3702d1b07f96d8b6f51c14fc62a48f68a1646004.1501827395.git.maozy.fnst@cn.fujitsu.com>
+	<3d9adc5b-0cc4-ed0a-521c-265d9e3e5cb4@redhat.com>
+From: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+Message-ID: <b8e1acc6-e62d-9763-1fab-de6cf2c6dec0@cn.fujitsu.com>
+Date: Mon, 18 Sep 2017 09:35:36 +0800
 MIME-Version: 1.0
-In-Reply-To: <1505494753-10837-1-git-send-email-sundeep.lkml@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [Qemu devel v9 PATCH 0/5] Add support for
- Smartfusion2 SoC
+In-Reply-To: <3d9adc5b-0cc4-ed0a-521c-265d9e3e5cb4@redhat.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/6] hw/ide: Convert DeviceClass init to
+ realize
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,283 +25,340 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Subbaraya Sundeep <sundeep.lkml@gmail.com>, peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, qemu-arm@nongnu.org, crosthwaite.peter@gmail.com, alistair23@gmail.com
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Markus Armbruster <armbru@redhat.com>
 
-Hi Sundeep,
 
-On 09/15/2017 01:59 PM, Subbaraya Sundeep wrote:
-> Hi Qemu-devel,
-> 
-> I am trying to add Smartfusion2 SoC.
-> SoC is from Microsemi and System on Module(SOM)
-> board is from Emcraft systems. Smartfusion2 has hardened
-> Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
-> At the moment only system timer, sysreg and SPI
-> controller are modelled.
-> 
-> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-When a review tag is sent to the series cover, this means it can be 
-added to all the patches from the series.
+On 09/16/2017 05:35 AM, John Snow wrote:
+>
+>
+> On 08/04/2017 06:26 AM, Mao Zhongyi wrote:
+>> Replace init with realize in IDEDeviceClass, which has errp
+>> as a parameter. So all the implementations now use error_setg
+>> instead of error_report for reporting error.
+>>
+>> Cc: John Snow <jsnow@redhat.com>
+>> Cc: Markus Armbruster <armbru@redhat.com>
+>>
+>> Signed-off-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+>> ---
+>>  hw/ide/core.c             |  7 ++--
+>>  hw/ide/qdev.c             | 86 +++++++++++++++++++++++------------------------
+>>  include/hw/ide/internal.h |  5 +--
+>>  3 files changed, 49 insertions(+), 49 deletions(-)
+>>
+>> diff --git a/hw/ide/core.c b/hw/ide/core.c
+>> index 0b48b64..7c86fc7 100644
+>> --- a/hw/ide/core.c
+>> +++ b/hw/ide/core.c
+>> @@ -34,6 +34,7 @@
+>>  #include "hw/block/block.h"
+>>  #include "sysemu/block-backend.h"
+>>  #include "qemu/cutils.h"
+>> +#include "qemu/error-report.h"
+>>
+>>  #include "hw/ide/internal.h"
+>>
+>> @@ -2398,7 +2399,7 @@ int ide_init_drive(IDEState *s, BlockBackend *blk, IDEDriveKind kind,
+>>                     const char *version, const char *serial, const char *model,
+>>                     uint64_t wwn,
+>>                     uint32_t cylinders, uint32_t heads, uint32_t secs,
+>> -                   int chs_trans)
+>> +                   int chs_trans, Error **errp)
+>
+> this function now requires an additional invariant, which is that we
+> must return -1 AND set errp. Probably wisest to just get rid of the
+> return code so that we don't accidentally goof this up in the future.
+>
+> I think Markus has had some guidance on this in the past, but admittedly
+> I can't remember his preference.
+>
+>>  {
+>>      uint64_t nb_sectors;
+>>
+>> @@ -2423,11 +2424,11 @@ int ide_init_drive(IDEState *s, BlockBackend *blk, IDEDriveKind kind,
+>>          blk_set_guest_block_size(blk, 2048);
+>>      } else {
+>>          if (!blk_is_inserted(s->blk)) {
+>> -            error_report("Device needs media, but drive is empty");
+>> +            error_setg(errp, "Device needs media, but drive is empty");
+>>              return -1;
+>>          }
+>>          if (blk_is_read_only(blk)) {
+>> -            error_report("Can't use a read-only drive");
+>> +            error_setg(errp, "Can't use a read-only drive");
+>>              return -1;
+>>          }
+>>          blk_set_dev_ops(blk, &ide_hd_block_ops, s);
+>> diff --git a/hw/ide/qdev.c b/hw/ide/qdev.c
+>> index cc2f5bd..d60ac25 100644
+>> --- a/hw/ide/qdev.c
+>> +++ b/hw/ide/qdev.c
+>> @@ -80,7 +80,7 @@ static char *idebus_get_fw_dev_path(DeviceState *dev)
+>>      return g_strdup(path);
+>>  }
+>>
+>> -static int ide_qdev_init(DeviceState *qdev)
+>> +static void ide_qdev_realize(DeviceState *qdev, Error **errp)
+>>  {
+>>      IDEDevice *dev = IDE_DEVICE(qdev);
+>>      IDEDeviceClass *dc = IDE_DEVICE_GET_CLASS(dev);
+>> @@ -91,34 +91,31 @@ static int ide_qdev_init(DeviceState *qdev)
+>>      }
+>>
+>>      if (dev->unit >= bus->max_units) {
+>> -        error_report("Can't create IDE unit %d, bus supports only %d units",
+>> +        error_setg(errp, "Can't create IDE unit %d, bus supports only %d units",
+>>                       dev->unit, bus->max_units);
+>> -        goto err;
+>> +        return;
+>>      }
+>>
+>>      switch (dev->unit) {
+>>      case 0:
+>>          if (bus->master) {
+>> -            error_report("IDE unit %d is in use", dev->unit);
+>> -            goto err;
+>> +            error_setg(errp, "IDE unit %d is in use", dev->unit);
+>> +            return;
+>>          }
+>>          bus->master = dev;
+>>          break;
+>>      case 1:
+>>          if (bus->slave) {
+>> -            error_report("IDE unit %d is in use", dev->unit);
+>> -            goto err;
+>> +            error_setg(errp, "IDE unit %d is in use", dev->unit);
+>> +            return;
+>>          }
+>>          bus->slave = dev;
+>>          break;
+>>      default:
+>> -        error_report("Invalid IDE unit %d", dev->unit);
+>> -        goto err;
+>> +        error_setg(errp, "Invalid IDE unit %d", dev->unit);
+>> +        return;
+>>      }
+>> -    return dc->init(dev);
+>> -
+>> -err:
+>> -    return -1;
+>> +    dc->realize(dev, errp);
+>>  }
+>>
+>>  IDEDevice *ide_create_drive(IDEBus *bus, int unit, DriveInfo *drive)
+>> @@ -159,7 +156,7 @@ typedef struct IDEDrive {
+>>      IDEDevice dev;
+>>  } IDEDrive;
+>>
+>> -static int ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind)
+>> +static void ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind, Error **errp)
+>>  {
+>>      IDEBus *bus = DO_UPCAST(IDEBus, qbus, dev->qdev.parent_bus);
+>>      IDEState *s = bus->ifs + dev->unit;
+>> @@ -168,8 +165,8 @@ static int ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind)
+>>
+>>      if (!dev->conf.blk) {
+>>          if (kind != IDE_CD) {
+>> -            error_report("No drive specified");
+>> -            return -1;
+>> +            error_setg(errp, "No drive specified");
+>> +            return;
+>>          } else {
+>>              /* Anonymous BlockBackend for an empty drive */
+>>              dev->conf.blk = blk_new(0, BLK_PERM_ALL);
+>> @@ -182,36 +179,36 @@ static int ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind)
+>>          dev->conf.discard_granularity = 512;
+>>      } else if (dev->conf.discard_granularity &&
+>>                 dev->conf.discard_granularity != 512) {
+>> -        error_report("discard_granularity must be 512 for ide");
+>> -        return -1;
+>> +        error_setg(errp, "discard_granularity must be 512 for ide");
+>> +        return;
+>>      }
+>>
+>>      blkconf_blocksizes(&dev->conf);
+>>      if (dev->conf.logical_block_size != 512) {
+>> -        error_report("logical_block_size must be 512 for IDE");
+>> -        return -1;
+>> +        error_setg(errp, "logical_block_size must be 512 for IDE");
+>> +        return;
+>>      }
+>>
+>>      blkconf_serial(&dev->conf, &dev->serial);
+>>      if (kind != IDE_CD) {
+>>          blkconf_geometry(&dev->conf, &dev->chs_trans, 65535, 16, 255, &err);
+>>          if (err) {
+>> -            error_report_err(err);
+>> -            return -1;
+>> +            error_propagate(errp, err);
+>> +            return;
+>>          }
+>>      }
+>>      blkconf_apply_backend_options(&dev->conf, kind == IDE_CD, kind != IDE_CD,
+>>                                    &err);
+>>      if (err) {
+>> -        error_report_err(err);
+>> -        return -1;
+>> +        error_propagate(errp, err);
+>> +        return;
+>>      }
+>>
+>>      if (ide_init_drive(s, dev->conf.blk, kind,
+>>                         dev->version, dev->serial, dev->model, dev->wwn,
+>>                         dev->conf.cyls, dev->conf.heads, dev->conf.secs,
+>> -                       dev->chs_trans) < 0) {
+>> -        return -1;
+>> +                       dev->chs_trans, errp) < 0) {
+>> +        return;
+>>      }
+>>
+>>      if (!dev->version) {
+>> @@ -223,8 +220,6 @@ static int ide_dev_initfn(IDEDevice *dev, IDEDriveKind kind)
+>>
+>>      add_boot_device_path(dev->conf.bootindex, &dev->qdev,
+>>                           dev->unit ? "/disk@1" : "/disk@0");
+>> -
+>> -    return 0;
+>>  }
+>>
+>>  static void ide_dev_get_bootindex(Object *obj, Visitor *v, const char *name,
+>> @@ -270,17 +265,17 @@ static void ide_dev_instance_init(Object *obj)
+>>      object_property_set_int(obj, -1, "bootindex", NULL);
+>>  }
+>>
+>> -static int ide_hd_initfn(IDEDevice *dev)
+>> +static void ide_hd_realize(IDEDevice *dev, Error **errp)
+>
+> why rename these but not ide_dev_initfn ? I guess because it's not
+> directly referenced as being a realize function.
 
-> 
-> Testing:
-> ./arm-softmmu/qemu-system-arm -M emcraft-sf2 -serial mon:stdio \
-> -kernel u-boot.bin -display none -drive file=spi.bin,if=mtd,format=raw
-> 
-> Binaries u-boot.bin and spi.bin are at:
-> https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git
-> 
-> U-boot is from Emcraft with modified
->      - SPI driver not to use PDMA.
->      - ugly hack to pass dtb to kernel in r1.
-> @
-> https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git
-> 
-> Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource
-> driver added by myself @
-> https://github.com/Subbaraya-Sundeep/linux.git
-> 
-> v9:
+Hi, John
 
-However if you made significant changes to v9, please drop the R-b that 
-were left on v8 to make sure people re-review those changes. Functional 
-changes directly reset Tested-by tags.
+Yes, but not exactly. Because the realize function used to initialize the device
+can only accept two arguments, but ide_dev_initfn has three. If it is renamed to
+realize, although it is not wrong, but it looks puzzled.
 
-$ git backport-diff -r master..msf2_v9 -u msf2_v8
-Key:
-[----] : patches are identical
-[####] : number of functional differences between upstream/downstream patch
-[down] : patch is downstream-only
-The flags [FC] indicate (F)unctional and (C)ontextual differences, 
-respectively
+Thanks,
+Mao
 
-001/5:[----] [--] 'msf2: Add Smartfusion2 System timer'
-002/5:[0047] [FC] 'msf2: Microsemi Smartfusion2 System Register block'
-003/5:[----] [--] 'msf2: Add Smartfusion2 SPI controller'
-004/5:[0018] [FC] 'msf2: Add Smartfusion2 SoC'
-005/5:[0001] [FC] 'msf2: Add Emcraft's Smartfusion2 SOM kit'
-
-> 	used trace instead of DB_PRINT in msf2-sysreg.c
-> 	used LOG_UNIMP for non guest errors in msf2-sysreg.c
-> 	added unimplemented devices in msf2-soc.c
-> 	removed .alias suffix in alias memory region name for eNVM
-
-you also removed "mc->ignore_memory_transaction_failures" use.
-
-> 
-> v8:
-> 	memory_region_init_ram to memory_region_init_rom in soc
-> 	%s/emcraft_sf2_init/emcraft_sf2_s2s010_init/g in som
-> 	Added mc->ignore_memory_transaction_failures = true in som
-> 		as per latest commit.
-> 	Code simplifications as suggested by Alistair in sysreg and ssi.
-
-FYI, testing outputs:
-
-- U-Boot
-
-CPU  : SmartFusion2 SoC (Cortex-M3 Hard IP)
-Freqs: CORTEX-M3=142MHz,PCLK0=71MHz,PCLK1=71MHz
-Board: M2S-FG484-SOM Rev 1A, www.emcraft.com
-apb_config: unimplemented device write (size 4, value 0x0, offset 0x10)
-apb_config: unimplemented device write (size 4, value 0x118, offset 0x84)
-apb_config: unimplemented device write (size 4, value 0xc1, offset 0x18)
-apb_config: unimplemented device write (size 4, value 0x99f, offset 0x1c)
-apb_config: unimplemented device write (size 4, value 0x3333, offset 0x24)
-apb_config: unimplemented device write (size 4, value 0xffff, offset 0x28)
-apb_config: unimplemented device write (size 4, value 0x3300, offset 0x78)
-apb_config: unimplemented device write (size 4, value 0x7777, offset 0x2c)
-apb_config: unimplemented device write (size 4, value 0xfff, offset 0x30)
-apb_config: unimplemented device write (size 4, value 0x580, offset 0x8)
-apb_config: unimplemented device write (size 4, value 0x110, offset 0xc)
-apb_config: unimplemented device write (size 4, value 0x1c00, offset 0x38)
-apb_config: unimplemented device write (size 4, value 0x8, offset 0x3c)
-apb_config: unimplemented device write (size 4, value 0xd23, offset 0x6c)
-apb_config: unimplemented device write (size 4, value 0x240, offset 0x50)
-apb_config: unimplemented device write (size 4, value 0x2, offset 0x5c)
-apb_config: unimplemented device write (size 4, value 0x126, offset 0x60)
-apb_config: unimplemented device write (size 4, value 0x3, offset 0xbc)
-apb_config: unimplemented device write (size 4, value 0x23, offset 0x54)
-apb_config: unimplemented device write (size 4, value 0x33, offset 0x40)
-apb_config: unimplemented device write (size 4, value 0x20, offset 0x44)
-apb_config: unimplemented device write (size 4, value 0x33, offset 0x80)
-apb_config: unimplemented device write (size 4, value 0x8, offset 0x7c)
-apb_config: unimplemented device write (size 4, value 0x4000, offset 0x9c)
-apb_config: unimplemented device write (size 4, value 0x0, offset 0xb4)
-apb_config: unimplemented device write (size 4, value 0x107, offset 0x64)
-apb_config: unimplemented device write (size 4, value 0x104, offset 0x58)
-apb_config: unimplemented device write (size 4, value 0x11, offset 0x68)
-apb_config: unimplemented device write (size 4, value 0x80f8, offset 0xa0)
-apb_config: unimplemented device write (size 4, value 0x7, offset 0xa4)
-apb_config: unimplemented device write (size 4, value 0x80f8, offset 0xa8)
-apb_config: unimplemented device write (size 4, value 0x7, offset 0xac)
-apb_config: unimplemented device write (size 4, value 0x200, offset 0xb0)
-apb_config: unimplemented device write (size 4, value 0x0, offset 0x21c)
-apb_config: unimplemented device write (size 4, value 0x80, offset 0x224)
-apb_config: unimplemented device write (size 4, value 0xf, offset 0x230)
-apb_config: unimplemented device write (size 4, value 0xb, offset 0x248)
-apb_config: unimplemented device write (size 4, value 0x0, offset 0x25c)
-apb_config: unimplemented device write (size 4, value 0x0, offset 0x260)
-apb_config: unimplemented device write (size 4, value 0x0, offset 0x264)
-apb_config: unimplemented device write (size 4, value 0x0, offset 0x268)
-apb_config: unimplemented device write (size 4, value 0x1, offset 0x280)
-apb_config: unimplemented device write (size 4, value 0x40, offset 0x298)
-apb_config: unimplemented device write (size 4, value 0x401, offset 0x29c)
-apb_config: unimplemented device write (size 4, value 0x4010, offset 0x2a0)
-apb_config: unimplemented device write (size 4, value 0x40, offset 0x2d8)
-apb_config: unimplemented device write (size 4, value 0x401, offset 0x2dc)
-apb_config: unimplemented device write (size 4, value 0x4010, offset 0x2e0)
-apb_config: unimplemented device write (size 4, value 0x0, offset 0x2fc)
-apb_config: unimplemented device write (size 4, value 0x3, offset 0x304)
-apb_config: unimplemented device write (size 4, value 0x1, offset 0x308)
-apb_config: unimplemented device write (size 4, value 0x1, offset 0x30c)
-apb_config: unimplemented device write (size 4, value 0x9, offset 0x314)
-apb_config: unimplemented device write (size 4, value 0x0, offset 0x238)
-apb_config: unimplemented device write (size 4, value 0x0, offset 0x23c)
-apb_config: unimplemented device write (size 4, value 0x1, offset 0x31c)
-apb_config: unimplemented device write (size 4, value 0x1, offset 0x0)
-DRAM:  64 MB
-pdma: unimplemented device write (size 4, value 0x1a0, offset 0x20)
-pdma: unimplemented device read (size 4, offset 0x20)
-pdma: unimplemented device write (size 4, value 0x3c000, offset 0x20)
-pdma: unimplemented device read (size 4, offset 0x20)
-pdma: unimplemented device write (size 4, value 0x2000001, offset 0x20)
-pdma: unimplemented device write (size 4, value 0x1a0, offset 0x40)
-pdma: unimplemented device read (size 4, offset 0x40)
-pdma: unimplemented device write (size 4, value 0x3c000, offset 0x40)
-pdma: unimplemented device read (size 4, offset 0x40)
-pdma: unimplemented device write (size 4, value 0x2800003, offset 0x40)
-pdma: unimplemented device write (size 4, value 0x20, offset 0x20)
-pdma: unimplemented device write (size 4, value 0x20, offset 0x40)
-*** Warning - bad CRC, using default environment
-
-In:    serial
-Out:   serial
-Err:   serial
-Net:   M2S_MAC
-Hit any key to stop autoboot:  0
-pdma: unimplemented device write (size 4, value 0x1a0, offset 0x20)
-pdma: unimplemented device read (size 4, offset 0x20)
-pdma: unimplemented device write (size 4, value 0x3c000, offset 0x20)
-pdma: unimplemented device read (size 4, offset 0x20)
-pdma: unimplemented device write (size 4, value 0x2000001, offset 0x20)
-pdma: unimplemented device write (size 4, value 0x1a0, offset 0x40)
-pdma: unimplemented device read (size 4, offset 0x40)
-pdma: unimplemented device write (size 4, value 0x3c000, offset 0x40)
-pdma: unimplemented device read (size 4, offset 0x40)
-pdma: unimplemented device write (size 4, value 0x2800003, offset 0x40)
-pdma: unimplemented device write (size 4, value 0x20, offset 0x20)
-pdma: unimplemented device write (size 4, value 0x20, offset 0x40)
-16384 KiB S25FL128P_64K at 0:0 is now current device
-pdma: unimplemented device write (size 4, value 0x1a0, offset 0x20)
-pdma: unimplemented device read (size 4, offset 0x20)
-pdma: unimplemented device write (size 4, value 0x3c000, offset 0x20)
-pdma: unimplemented device read (size 4, offset 0x20)
-pdma: unimplemented device write (size 4, value 0x2000001, offset 0x20)
-pdma: unimplemented device write (size 4, value 0x1a0, offset 0x40)
-pdma: unimplemented device read (size 4, offset 0x40)
-pdma: unimplemented device write (size 4, value 0x3c000, offset 0x40)
-pdma: unimplemented device read (size 4, offset 0x40)
-pdma: unimplemented device write (size 4, value 0x2800003, offset 0x40)
-pdma: unimplemented device write (size 4, value 0x20, offset 0x20)
-pdma: unimplemented device write (size 4, value 0x20, offset 0x40)
-
-- tftpboot
-
-M2S-FG484-SOM> tftpboot
-emac: unimplemented device write (size 4, value 0x7, offset 0x20)
-emac: unimplemented device read (size 4, offset 0x0)
-emac: unimplemented device write (size 4, value 0x80000000, offset 0x0)
-emac: unimplemented device read (size 4, offset 0x0)
-emac: unimplemented device write (size 4, value 0x0, offset 0x0)
-emac: unimplemented device read (size 4, offset 0x0)
-emac: unimplemented device write (size 4, value 0x0, offset 0x0)
-emac: unimplemented device read (size 4, offset 0x0)
-emac: unimplemented device write (size 4, value 0x0, offset 0x0)
-emac: unimplemented device read (size 4, offset 0x0)
-emac: unimplemented device write (size 4, value 0x0, offset 0x0)
-emac: unimplemented device read (size 4, offset 0x0)
-emac: unimplemented device write (size 4, value 0x0, offset 0x0)
-emac: unimplemented device read (size 4, offset 0x38)
-emac: unimplemented device write (size 4, value 0x0, offset 0x38)
-emac: unimplemented device read (size 4, offset 0x48)
-emac: unimplemented device write (size 4, value 0x0, offset 0x48)
-emac: unimplemented device write (size 4, value 0x0, offset 0x0)
-emac: unimplemented device read (size 4, offset 0x4)
-emac: unimplemented device write (size 4, value 0x0, offset 0x4)
-emac: unimplemented device read (size 4, offset 0x4)
-emac: unimplemented device write (size 4, value 0x105, offset 0x4)
-emac: unimplemented device write (size 4, value 0x600, offset 0x10)
-emac: unimplemented device write (size 4, value 0xc0b13c83, offset 0x40)
-emac: unimplemented device write (size 4, value 0x83830000, offset 0x44)
-emac: unimplemented device write (size 4, value 0x200032e4, offset 0x190)
-emac: unimplemented device write (size 4, value 0x1, offset 0x18c)
-emac: unimplemented device read (size 4, offset 0x48)
-emac: unimplemented device write (size 4, value 0x1f, offset 0x48)
-emac: unimplemented device read (size 4, offset 0x48)
-emac: unimplemented device write (size 4, value 0x0, offset 0x48)
-emac: unimplemented device write (size 4, value 0xff00, offset 0x48)
-emac: unimplemented device read (size 4, offset 0x48)
-[...]
-emac: unimplemented device read (size 4, offset 0x48)
-m2s_eth_init: FIFO initialization timeout
-*** m2s_mac_dump_regs FIFO init:
-emac: unimplemented device read (size 4, offset 0x180)
-emac: unimplemented device read (size 4, offset 0x184)
-emac: unimplemented device read (size 4, offset 0x188)
-  DMA TX CTRL=00000000;DESC=00000000;STAT=00000000
-emac: unimplemented device read (size 4, offset 0x18c)
-emac: unimplemented device read (size 4, offset 0x190)
-emac: unimplemented device read (size 4, offset 0x194)
-  DMA RX CTRL=00000000;DESC=00000000;STAT=00000000
-emac: unimplemented device read (size 4, offset 0x19c)
-emac: unimplemented device read (size 4, offset 0x198)
-  DMA IRQ 00000000/00000000
-emac: unimplemented device read (size 4, offset 0x0)
-emac: unimplemented device read (size 4, offset 0x4)
-emac: unimplemented device read (size 4, offset 0x8)
-emac: unimplemented device read (size 4, offset 0xc)
-emac: unimplemented device read (size 4, offset 0x10)
-  CFG1=00000000;CFG2=00000000;IFG=00000000;HD=00000000;MFL=00000000
-emac: unimplemented device read (size 4, offset 0x38)
-emac: unimplemented device read (size 4, offset 0x3c)
-emac: unimplemented device read (size 4, offset 0x40)
-emac: unimplemented device read (size 4, offset 0x44)
-  IFCTRL=00000000;IFSTAT=00000000;ADR1=00000000;ADR2=00000000
-  FIFO CFG emac: unimplemented device read (size 4, offset 0x48)
-00000000/emac: unimplemented device read (size 4, offset 0x4c)
-00000000/emac: unimplemented device read (size 4, offset 0x50)
-00000000/emac: unimplemented device read (size 4, offset 0x54)
-00000000/emac: unimplemented device read (size 4, offset 0x58)
-00000000/emac: unimplemented device read (size 4, offset 0x5c)
-00000000/
-  FIFO ACC emac: unimplemented device read (size 4, offset 0x60)
-00000000/emac: unimplemented device read (size 4, offset 0x64)
-00000000/emac: unimplemented device read (size 4, offset 0x68)
-00000000/emac: unimplemented device read (size 4, offset 0x6c)
-00000000/emac: unimplemented device read (size 4, offset 0x70)
-00000000/emac: unimplemented device read (size 4, offset 0x74)
-00000000/emac: unimplemented device read (size 4, offset 0x78)
-00000000/emac: unimplemented device read (size 4, offset 0x7c)
-00000000/
-M2S-FG484-SOM>
-
-- erase
-
-M2S-FG484-SOM> sf erase 0 0x1000
-Taking exception 4 [Data Abort]
-...with CFSR.PRECISERR and BFAR 0x10
-... as 3
-UNHANDLED EXCEPTION: HARD FAULT
-   R0	= 00848cea  R1	= 00000000
-   R2	= 00022ab0  R3	= 00000000
-   R12	= 00000004  LR	= 00000a27
-   PC	= 0000d418  PSR	= 01000000
-
-Good work :)
-
-Regards,
-
-Phil.
+>
+>>  {
+>> -    return ide_dev_initfn(dev, IDE_HD);
+>> +    ide_dev_initfn(dev, IDE_HD, errp);
+>>  }
+>>
+>> -static int ide_cd_initfn(IDEDevice *dev)
+>> +static void ide_cd_realize(IDEDevice *dev, Error **errp)
+>>  {
+>> -    return ide_dev_initfn(dev, IDE_CD);
+>> +    ide_dev_initfn(dev, IDE_CD, errp);
+>>  }
+>>
+>> -static int ide_drive_initfn(IDEDevice *dev)
+>> +static void ide_drive_realize(IDEDevice *dev, Error **errp)
+>>  {
+>>      DriveInfo *dinfo = NULL;
+>>
+>> @@ -288,7 +283,7 @@ static int ide_drive_initfn(IDEDevice *dev)
+>>          dinfo = blk_legacy_dinfo(dev->conf.blk);
+>>      }
+>>
+>> -    return ide_dev_initfn(dev, dinfo && dinfo->media_cd ? IDE_CD : IDE_HD);
+>> +    ide_dev_initfn(dev, dinfo && dinfo->media_cd ? IDE_CD : IDE_HD, errp);
+>>  }
+>>
+>>  #define DEFINE_IDE_DEV_PROPERTIES()                     \
+>> @@ -311,10 +306,11 @@ static void ide_hd_class_init(ObjectClass *klass, void *data)
+>>  {
+>>      DeviceClass *dc = DEVICE_CLASS(klass);
+>>      IDEDeviceClass *k = IDE_DEVICE_CLASS(klass);
+>> -    k->init = ide_hd_initfn;
+>> +
+>> +    k->realize  = ide_hd_realize;
+>>      dc->fw_name = "drive";
+>> -    dc->desc = "virtual IDE disk";
+>> -    dc->props = ide_hd_properties;
+>> +    dc->desc    = "virtual IDE disk";
+>> +    dc->props   = ide_hd_properties;
+>>  }
+>>
+>>  static const TypeInfo ide_hd_info = {
+>> @@ -333,10 +329,11 @@ static void ide_cd_class_init(ObjectClass *klass, void *data)
+>>  {
+>>      DeviceClass *dc = DEVICE_CLASS(klass);
+>>      IDEDeviceClass *k = IDE_DEVICE_CLASS(klass);
+>> -    k->init = ide_cd_initfn;
+>> +
+>> +    k->realize  = ide_cd_realize;
+>>      dc->fw_name = "drive";
+>> -    dc->desc = "virtual IDE CD-ROM";
+>> -    dc->props = ide_cd_properties;
+>> +    dc->desc    = "virtual IDE CD-ROM";
+>> +    dc->props   = ide_cd_properties;
+>>  }
+>>
+>>  static const TypeInfo ide_cd_info = {
+>> @@ -355,10 +352,11 @@ static void ide_drive_class_init(ObjectClass *klass, void *data)
+>>  {
+>>      DeviceClass *dc = DEVICE_CLASS(klass);
+>>      IDEDeviceClass *k = IDE_DEVICE_CLASS(klass);
+>> -    k->init = ide_drive_initfn;
+>> +
+>> +    k->realize  = ide_drive_realize;
+>>      dc->fw_name = "drive";
+>> -    dc->desc = "virtual IDE disk or CD-ROM (legacy)";
+>> -    dc->props = ide_drive_properties;
+>> +    dc->desc    = "virtual IDE disk or CD-ROM (legacy)";
+>> +    dc->props   = ide_drive_properties;
+>>  }
+>>
+>>  static const TypeInfo ide_drive_info = {
+>> @@ -371,7 +369,7 @@ static const TypeInfo ide_drive_info = {
+>>  static void ide_device_class_init(ObjectClass *klass, void *data)
+>>  {
+>>      DeviceClass *k = DEVICE_CLASS(klass);
+>> -    k->init = ide_qdev_init;
+>> +    k->realize = ide_qdev_realize;
+>>      set_bit(DEVICE_CATEGORY_STORAGE, k->categories);
+>>      k->bus_type = TYPE_IDE_BUS;
+>>      k->props = ide_props;
+>> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
+>> index 482a951..5ebb4c9 100644
+>> --- a/include/hw/ide/internal.h
+>> +++ b/include/hw/ide/internal.h
+>> @@ -12,6 +12,7 @@
+>>  #include "sysemu/sysemu.h"
+>>  #include "hw/block/block.h"
+>>  #include "block/scsi.h"
+>> +#include "qapi/error.h"
+>>
+>>  /* debug IDE devices */
+>>  //#define DEBUG_IDE
+>> @@ -495,7 +496,7 @@ struct IDEBus {
+>>
+>>  typedef struct IDEDeviceClass {
+>>      DeviceClass parent_class;
+>> -    int (*init)(IDEDevice *dev);
+>> +    void (*realize)(IDEDevice *dev, Error **errp);
+>>  } IDEDeviceClass;
+>>
+>>  struct IDEDevice {
+>> @@ -605,7 +606,7 @@ int ide_init_drive(IDEState *s, BlockBackend *blk, IDEDriveKind kind,
+>>                     const char *version, const char *serial, const char *model,
+>>                     uint64_t wwn,
+>>                     uint32_t cylinders, uint32_t heads, uint32_t secs,
+>> -                   int chs_trans);
+>> +                   int chs_trans, Error **errp);
+>>  void ide_init2(IDEBus *bus, qemu_irq irq);
+>>  void ide_exit(IDEState *s);
+>>  void ide_init_ioport(IDEBus *bus, ISADevice *isa, int iobase, int iobase2);
+>>
+>
+> Only matters of style; seems mechanically OK.
+>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+>
+>
+>
