@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dtmR4-0001BL-Fj
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:09:27 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dtmxe-0007sj-Ka
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:43:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1dtmR0-0002eV-D2
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:09:26 -0400
-Resent-Message-Id: <E1dtmR0-0002eV-D2@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21356)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1dtmR0-0002da-5h
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:09:22 -0400
-In-Reply-To: <20170918024402.3265-1-famz@redhat.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150570414426.36.7011523692059086347@69b6ddf88678>
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dtmxd-0001Ye-TB
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:43:06 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+References: <1505668548-16616-1-git-send-email-mark.cave-ayland@ilande.co.uk>
+	<1505668548-16616-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <88f86547-b2f6-8214-d457-ec8237d4fb5e@amsat.org>
+Date: Mon, 18 Sep 2017 00:42:56 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Sun, 17 Sep 2017 20:09:04 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v8 00/13] tests: Add VM based build tests
- (for non-x86_64 and/or non-Linux)
+In-Reply-To: <1505668548-16616-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 1/8] ppc: QOMify g3beige machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,67 +28,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: famz@redhat.com
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, crosa@redhat.com, f4bug@amsat.org, kamil@netbsd.org, stefanha@redhat.com, pbonzini@redhat.com, alex.bennee@linaro.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au, benh@kernel.crashing.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2OCAwMC8xM10gdGVzdHM6IEFkZCBWTSBiYXNlZCBidWlsZCB0ZXN0cyAo
-Zm9yIG5vbi14ODZfNjQgYW5kL29yIG5vbi1MaW51eCkKTWVzc2FnZS1pZDogMjAxNzA5MTgwMjQ0
-MDIuMzI2NS0xLWZhbXpAcmVkaGF0LmNvbQpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBC
-RUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25l
-bGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0
-cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNv
-bW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAt
-biAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1h
-aWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBm
-YWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZh
-aWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIx
-NjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmVh
-ZGE4OWNiNDkgZG9ja2VyOiBVc2UgYXJjaGl2ZS1zb3VyY2UucHkKZWRiNTE2MTAxYiB0ZXN0czog
-QWRkIFJFQURNRSBmb3Igdm0gdGVzdHMKMjlhYjU2ZWVkNiBNQUlOVEFJTkVSUzogQWRkIHRlc3Rz
-L3ZtIGVudHJ5CjkxYmJlNTJhOTEgTWFrZWZpbGU6IEFkZCBydWxlcyB0byBydW4gdm0gdGVzdHMK
-ODUwYmUwNTBjZSB0ZXN0czogQWRkIE9wZW5CU0QgaW1hZ2UKNzkzZDBjZGU2YiB0ZXN0czogQWRk
-IE5ldEJTRCBpbWFnZQo0ZmNmZGIyODc5IHRlc3RzOiBBZGQgRnJlZUJTRCBpbWFnZQowMTg2Y2Jh
-OWIzIHRlc3RzOiBBZGQgdWJ1bnR1LmkzODYgaW1hZ2UKMmNjMmM0MTI5MSB0ZXN0czogQWRkIHZt
-IHRlc3QgbGliCmM2YTg1OWQ1ZGUgdGVzdHM6IEFkZCBhIHRlc3Qga2V5IHBhaXIKZmZjOGNhMmRl
-NCBzY3JpcHRzOiBBZGQgYXJjaGl2ZS1zb3VyY2Uuc2gKMGRmMzQ1MzRiOSBxZW11LnB5OiBBZGQg
-IndhaXQoKSIgbWV0aG9kCjdlZDliOTY2NjggZ2l0aWdub3JlOiBJZ25vcmUgdm0gdGVzdCBpbWFn
-ZXMKCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvMTM6IGdpdGlnbm9yZTog
-SWdub3JlIHZtIHRlc3QgaW1hZ2VzLi4uCkNoZWNraW5nIFBBVENIIDIvMTM6IHFlbXUucHk6IEFk
-ZCAid2FpdCgpIiBtZXRob2QuLi4KQ2hlY2tpbmcgUEFUQ0ggMy8xMzogc2NyaXB0czogQWRkIGFy
-Y2hpdmUtc291cmNlLnNoLi4uCkNoZWNraW5nIFBBVENIIDQvMTM6IHRlc3RzOiBBZGQgYSB0ZXN0
-IGtleSBwYWlyLi4uCkNoZWNraW5nIFBBVENIIDUvMTM6IHRlc3RzOiBBZGQgdm0gdGVzdCBsaWIu
-Li4KV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzcxOiBGSUxFOiB0ZXN0cy92bS9i
-YXNldm0ucHk6NDY6CisgICAgICAgIHNlbGYuX3RtcGRpciA9IHRlbXBmaWxlLm1rZHRlbXAocHJl
-Zml4PSJ2bS10ZXN0LSIsIHN1ZmZpeD0iLnRtcCIsIGRpcj0iLiIpCgpXQVJOSU5HOiBsaW5lIG92
-ZXIgODAgY2hhcmFjdGVycwojMTYyOiBGSUxFOiB0ZXN0cy92bS9iYXNldm0ucHk6MTM3OgorICAg
-ICAgICBsb2dnaW5nLmRlYnVnKCJDcmVhdGluZyBhcmNoaXZlICVzIGZvciBzcmNfZGlyIGRpcjog
-JXMiLCB0YXJmaWxlLCBzcmNfZGlyKQoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMK
-IzE2NzogRklMRTogdGVzdHMvdm0vYmFzZXZtLnB5OjE0MjoKKyAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAiZmlsZT0lcyxpZj1ub25lLGlkPSVzLGNhY2hlPXdyaXRlYmFjayxmb3JtYXQ9cmF3
-IiAlIFwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxNzA6IEZJTEU6IHRlc3Rz
-L3ZtL2Jhc2V2bS5weToxNDU6CisgICAgICAgICAgICAgICAgICAgICAgICAgICAgInZpcnRpby1i
-bGssZHJpdmU9JXMsc2VyaWFsPSVzLGJvb3RpbmRleD0xIiAlIChuYW1lLCBuYW1lKV0KCkVSUk9S
-OiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMjI1OiBGSUxFOiB0ZXN0cy92bS9iYXNldm0ucHk6
-MjAwOgorICAgIFZNIHRlc3QgdXRpbGl0eS4gIEV4aXQgY29kZXM6IDAgPSBzdWNjZXNzLCAxID0g
-Y29tbWFuZCBsaW5lIGVycm9yLCAyID0gZW52aXJvbm1lbnQgaW5pdGlhbGl6YXRpb24gZmFpbGVk
-LCAzID0gdGVzdCBjb21tYW5kIGZhaWxlZCIiIikKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFy
-YWN0ZXJzCiMyMzI6IEZJTEU6IHRlc3RzL3ZtL2Jhc2V2bS5weToyMDc6CisgICAgcGFyc2VyLmFk
-ZF9vcHRpb24oIi0tam9icyIsIHR5cGU9aW50LCBkZWZhdWx0PW11bHRpcHJvY2Vzc2luZy5jcHVf
-Y291bnQoKSAvIDIsCgp0b3RhbDogMSBlcnJvcnMsIDUgd2FybmluZ3MsIDI1NiBsaW5lcyBjaGVj
-a2VkCgpZb3VyIHBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFu
-eSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUg
-bWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgpDaGVja2luZyBQQVRD
-SCA2LzEzOiB0ZXN0czogQWRkIHVidW50dS5pMzg2IGltYWdlLi4uCkNoZWNraW5nIFBBVENIIDcv
-MTM6IHRlc3RzOiBBZGQgRnJlZUJTRCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA4LzEzOiB0ZXN0
-czogQWRkIE5ldEJTRCBpbWFnZS4uLgpDaGVja2luZyBQQVRDSCA5LzEzOiB0ZXN0czogQWRkIE9w
-ZW5CU0QgaW1hZ2UuLi4KQ2hlY2tpbmcgUEFUQ0ggMTAvMTM6IE1ha2VmaWxlOiBBZGQgcnVsZXMg
-dG8gcnVuIHZtIHRlc3RzLi4uCkNoZWNraW5nIFBBVENIIDExLzEzOiBNQUlOVEFJTkVSUzogQWRk
-IHRlc3RzL3ZtIGVudHJ5Li4uCkNoZWNraW5nIFBBVENIIDEyLzEzOiB0ZXN0czogQWRkIFJFQURN
-RSBmb3Igdm0gdGVzdHMuLi4KQ2hlY2tpbmcgUEFUQ0ggMTMvMTM6IGRvY2tlcjogVXNlIGFyY2hp
-dmUtc291cmNlLnB5Li4uCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
-aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hl
-dyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
+On 09/17/2017 02:15 PM, Mark Cave-Ayland wrote:
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+> ---
+>   hw/ppc/mac_oldworld.c |   17 +++++++++++++++--
+>   1 file changed, 15 insertions(+), 2 deletions(-)
+> 
+> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+> index fcac399..5d1171d 100644
+> --- a/hw/ppc/mac_oldworld.c
+> +++ b/hw/ppc/mac_oldworld.c
+> @@ -380,8 +380,10 @@ static int heathrow_kvm_type(const char *arg)
+>       return 2;
+>   }
+>   
+> -static void heathrow_machine_init(MachineClass *mc)
+> +static void heathrow_class_init(ObjectClass *oc, void *data)
+>   {
+> +    MachineClass *mc = MACHINE_CLASS(oc);
+> +
+>       mc->desc = "Heathrow based PowerMAC";
+>       mc->init = ppc_heathrow_init;
+>       mc->block_default_type = IF_IDE;
+> @@ -394,4 +396,15 @@ static void heathrow_machine_init(MachineClass *mc)
+>       mc->kvm_type = heathrow_kvm_type;
+>   }
+>   
+> -DEFINE_MACHINE("g3beige", heathrow_machine_init)
+> +static const TypeInfo ppc_heathrow_machine_info = {
+> +    .name          = MACHINE_TYPE_NAME("g3beige"),
+> +    .parent        = TYPE_MACHINE,
+> +    .class_init    = heathrow_class_init
+> +};
+> +
+> +static void ppc_heathrow_register_types(void)
+> +{
+> +    type_register_static(&ppc_heathrow_machine_info);
+> +}
+> +
+> +type_init(ppc_heathrow_register_types);
+> 
