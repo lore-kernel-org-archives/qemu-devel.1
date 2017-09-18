@@ -1,19 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53959)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55787)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dttZt-00060W-Ga
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:47:03 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dttdm-0007Im-EO
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:51:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <laurent@vivier.eu>) id 1dttZp-0008Tj-K8
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:47:01 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:60474)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dttZp-0008T8-Ad
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:46:57 -0400
-From: Laurent Vivier <laurent@vivier.eu>
-Date: Mon, 18 Sep 2017 12:46:24 +0200
-Message-Id: <20170918104624.14743-1-laurent@vivier.eu>
-Subject: [Qemu-devel] [PATCH] softfloat: rename make_float[x80|128]_init to
- const_float[x80|128]
+	(envelope-from <kwolf@redhat.com>) id 1dttdk-0001lA-UT
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:51:02 -0400
+Date: Mon, 18 Sep 2017 12:50:50 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170918105050.GG31915@localhost.localdomain>
+References: <1500993699-19299-1-git-send-email-pl@kamp.de>
+	<1500993699-19299-2-git-send-email-pl@kamp.de>
+	<20170911142249.GB6951@localhost.localdomain>
+	<80cd5cd6-e997-d4c5-d94a-2287ba85e578@kamp.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <80cd5cd6-e997-d4c5-d94a-2287ba85e578@kamp.de>
+Subject: Re: [Qemu-devel] [PATCH V5 01/10] specs/qcow2: add compress format
+ extension
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,105 +26,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>
+To: Peter Lieven <pl@kamp.de>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, lersek@redhat.com, den@openvz.org, mreitz@redhat.com, eblake@redhat.com, berrange@redhat.com
 
-We already have const_float16(), const_float32() and const_float64(),
-so rename make_floatx80_init() and make_float128_init() as
-const_floatx80() and const_float128().
+Am 18.09.2017 um 12:09 hat Peter Lieven geschrieben:
+> Am 11.09.2017 um 16:22 schrieb Kevin Wolf:
+> > Am 25.07.2017 um 16:41 hat Peter Lieven geschrieben:
+> > > Signed-off-by: Peter Lieven <pl@kamp.de>
+> > > ---
+> > >   docs/interop/qcow2.txt | 51 +++++++++++++++++++++++++++++++++++++++++++++++++-
+> > >   roms/ipxe              |  2 +-
+> > >   2 files changed, 51 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
+> > > index d7fdb1f..d0d2a8f 100644
+> > > --- a/docs/interop/qcow2.txt
+> > > +++ b/docs/interop/qcow2.txt
+> > > @@ -86,7 +86,12 @@ in the description of a field.
+> > >                                   be written to (unless for regaining
+> > >                                   consistency).
+> > > -                    Bits 2-63:  Reserved (set to 0)
+> > > +                    Bit 2:      Compress format bit.  If and only if this bit
+> > > +                                is set then the compress format extension
+> > > +                                MUST be present and MUST be parsed and checked
+> > > +                                for compatibility.
+> > > +
+> > > +                    Bits 3-63:  Reserved (set to 0)
+> > >            80 -  87:  compatible_features
+> > >                       Bitmask of compatible features. An implementation can
+> > > @@ -137,6 +142,7 @@ be stored. Each extension has a structure like the following:
+> > >                           0x6803f857 - Feature name table
+> > >                           0x23852875 - Bitmaps extension
+> > >                           0x0537be77 - Full disk encryption header pointer
+> > > +                        0xC03183A3 - Compress format extension
+> > >                           other      - Unknown header extension, can be safely
+> > >                                        ignored
+> > > @@ -311,6 +317,49 @@ The algorithms used for encryption vary depending on the method
+> > >      in the LUKS header, with the physical disk sector as the
+> > >      input tweak.
+> > > +
+> > > +== Compress format extension ==
+> > > +
+> > > +The compress format extension is an optional header extension. It provides
+> > > +the ability to specify the compress algorithm and compress parameters
+> > > +that are used for compressed clusters. This new header MUST be present if
+> > > +the incompatible-feature bit "compress format bit" is set and MUST be absent
+> > > +otherwise.
+> > > +
+> > > +The fields of the compress format extension are:
+> > > +
+> > > +    Byte  0 - 13:  compress_format_name (padded with zeros, but not
+> > > +                   necessarily null terminated if it has full length).
+> > > +                   Valid compression format names currently are:
+> > > +
+> > > +                   deflate: Standard zlib deflate compression without
+> > > +                            compression header
+> > > +
+> > > +              14:  compress_level (uint8_t)
+> > > +
+> > > +                   0 = default compress level (valid for all formats, default)
+> > > +
+> > > +                   Additional valid compression levels for deflate compression:
+> > > +
+> > > +                   All values between 1 and 9. 1 gives best speed, 9 gives best
+> > > +                   compression. The default compression level is defined by zlib
+> > > +                   and currently defaults to 6.
+> > > +
+> > > +              15:  compress_window_size (uint8_t)
+> > > +
+> > > +                   Window or dictionary size used by the compression format.
+> > > +                   Currently only used by the deflate compression algorithm.
+> > > +
+> > > +                   Valid window sizes for deflate compression range from 8 to
+> > > +                   15 inclusively.
+> > So what is the plan with respect to adding new compression algorithms?
+> > 
+> > If I understand correctly, we'll use the same extension type
+> > (0xC03183A3) and a different compress_format_name. However, the other
+> > algorithm will likely have different options and also a different number
+> > of options. Will the meaning of bytes 14-end then depend on the specific
+> > algorithm?
+> 
+> The idea of the current options is that almost every algorithm will have
+> a compression level setting and most have a dictionary or window
+> size. This is why I added them to the common header.
 
-Redefine make_floatx80() and make_float128() as make_float16(),
-make_float32() and make_float64() using a variable and not only
-a cast.
+It's this kind of assumptions that lead to awkward interfaces in the
+long run, because if you say "almost every" case looks like this, you
+can be sure that one day you'll get one of the remaining cases where the
+field becomes useless.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- include/fpu/softfloat.h  | 10 ++++++----
- target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
- 2 files changed, 28 insertions(+), 26 deletions(-)
+Also, while most formats may support a compress_level, it is also likely
+that each of them uses a different range of values and a different
+default. So they look very similar, but are in fact different.
 
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 0f96a0edd1..2e1a79ebf7 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -146,8 +146,9 @@ typedef struct {
-     uint64_t low;
-     uint16_t high;
- } floatx80;
--#define make_floatx80(exp, mant) ((floatx80) { mant, exp })
--#define make_floatx80_init(exp, mant) { .low = mant, .high = exp }
-+#define make_floatx80(exp, mant) __extension__ \
-+    ({ floatx80 f80_val = { .low = mant, .high = exp }; f80_val; })
-+#define const_floatx80(exp, mant) { .low = mant, .high = exp }
- typedef struct {
- #ifdef HOST_WORDS_BIGENDIAN
-     uint64_t high, low;
-@@ -155,8 +156,9 @@ typedef struct {
-     uint64_t low, high;
- #endif
- } float128;
--#define make_float128(high_, low_) ((float128) { .high = high_, .low = low_ })
--#define make_float128_init(high_, low_) { .high = high_, .low = low_ }
-+#define make_float128(high_, low_) __extension__ \
-+    ({float128 f128_val = { .high = high_, .low = low_ }; f128_val; })
-+#define const_float128(high_, low_) { .high = high_, .low = low_ }
- 
- /*----------------------------------------------------------------------------
- | Software IEC/IEEE floating-point underflow tininess-detection mode.
-diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
-index 665e7609af..bf62cf8003 100644
---- a/target/m68k/fpu_helper.c
-+++ b/target/m68k/fpu_helper.c
-@@ -29,28 +29,28 @@
-  */
- 
- static const floatx80 fpu_rom[128] = {
--    [0x00] = make_floatx80_init(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
--    [0x0b] = make_floatx80_init(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
--    [0x0c] = make_floatx80_init(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
--    [0x0d] = make_floatx80_init(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
--    [0x0e] = make_floatx80_init(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
--    [0x0f] = make_floatx80_init(0x0000, 0x0000000000000000ULL),  /* Zero     */
--    [0x30] = make_floatx80_init(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
--    [0x31] = make_floatx80_init(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
--    [0x32] = make_floatx80_init(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
--    [0x33] = make_floatx80_init(0x4002, 0xa000000000000000ULL),  /* 10^1     */
--    [0x34] = make_floatx80_init(0x4005, 0xc800000000000000ULL),  /* 10^2     */
--    [0x35] = make_floatx80_init(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
--    [0x36] = make_floatx80_init(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
--    [0x37] = make_floatx80_init(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
--    [0x38] = make_floatx80_init(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
--    [0x39] = make_floatx80_init(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
--    [0x3a] = make_floatx80_init(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
--    [0x3b] = make_floatx80_init(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
--    [0x3c] = make_floatx80_init(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
--    [0x3d] = make_floatx80_init(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
--    [0x3e] = make_floatx80_init(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
--    [0x3f] = make_floatx80_init(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
-+    [0x00] = const_floatx80(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
-+    [0x0b] = const_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
-+    [0x0c] = const_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
-+    [0x0d] = const_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
-+    [0x0e] = const_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
-+    [0x0f] = const_floatx80(0x0000, 0x0000000000000000ULL),  /* Zero     */
-+    [0x30] = const_floatx80(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
-+    [0x31] = const_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
-+    [0x32] = const_floatx80(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
-+    [0x33] = const_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
-+    [0x34] = const_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
-+    [0x35] = const_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
-+    [0x36] = const_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
-+    [0x37] = const_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
-+    [0x38] = const_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
-+    [0x39] = const_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
-+    [0x3a] = const_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
-+    [0x3b] = const_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
-+    [0x3c] = const_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
-+    [0x3d] = const_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
-+    [0x3e] = const_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
-+    [0x3f] = const_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
- };
- 
- int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
--- 
-2.13.5
+I think this is best dealt with by treating these options as specific to
+the format, and if many formats coincide to have a field with the same
+name at the same place, so be it.
+
+If one day we finally get to a state where 'qemu-img create' options are
+expressed in the QAPI schema, I would include the fields in the
+individual branches of the union type (with a documentation what the
+exact semantics are for the specific format) rather than in the base
+type where you have to explain the semantics without actually referring
+to the branches.
+
+> > Part of why I'm asking this is because I wonder why compress_format_name
+> > is 14 characters. It looks to me as if that is intended to make the
+> > header a round 16 bytes for the deflate algorithm. But unless we say
+> > "16 bits ought to be enough for every algorithm", this is just
+> > optimising a special case. (Or actually not optimising, but just moving
+> > the padding from the end of the header extension to padding inside the
+> > compress_format_name field.)
+> > 
+> > Wouldn't 8 bytes still be plenty of space for a format name, and look
+> > more natural? Then any format that requires options would have a little
+> > more space without immediately going to a 24 byte header extension.
+> 
+> Sure 8 characters will still be enough. I can respin the series with
+> an updated header if you like.
+
+Yes, I would prefer this.
+
+Kevin
