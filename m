@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40903)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dtt0O-0001RZ-H8
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:10:22 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1dtt4U-0003K0-Dh
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:14:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dtt0L-00019T-9h
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:10:20 -0400
-Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:56775)
+	(envelope-from <alex.bennee@linaro.org>) id 1dtt4R-0002pb-6G
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:14:34 -0400
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:46156)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dtt0K-00019B-VT
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:10:17 -0400
-Received: by mail-wr0-x234.google.com with SMTP id r74so5763542wrb.13
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 03:10:16 -0700 (PDT)
-References: <20170224112109.3147-1-alex.bennee@linaro.org>
-	<20170224112109.3147-23-alex.bennee@linaro.org>
-	<7468f944-914c-de89-66fb-f8ad49eb59c1@gmail.com>
-	<87poapbgt0.fsf@linaro.org>
-	<e511a895-b1e3-150f-6555-12ba1fa16273@gmail.com>
+	id 1dtt4Q-0002pF-TQ
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:14:31 -0400
+Received: by mail-wm0-x229.google.com with SMTP id i189so1201254wmf.1
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 03:14:30 -0700 (PDT)
+References: <20170918024402.3265-1-famz@redhat.com>
+	<20170918024402.3265-6-famz@redhat.com>
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <e511a895-b1e3-150f-6555-12ba1fa16273@gmail.com>
-Date: Mon, 18 Sep 2017 11:10:14 +0100
-Message-ID: <87a81sjp15.fsf@linaro.org>
+In-reply-to: <20170918024402.3265-6-famz@redhat.com>
+Date: Mon, 18 Sep 2017 11:14:28 +0100
+Message-ID: <878thcjou3.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PULL 22/24] target-arm: ensure all cross vCPUs
- TLB flushes complete
+Subject: Re: [Qemu-devel] [PATCH v8 05/13] tests: Add vm test lib
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,221 +30,294 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dmitry Osipenko <digetx@gmail.com>
-Cc: peter.maydell@linaro.org, "open list:ARM" <qemu-arm@nongnu.org>, qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, Philippe =?utf-8?Q?Mathieu?= =?utf-8?Q?-Daud=C3=A9?= <f4bug@amsat.org>, pbonzini@redhat.com, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
 
-Dmitry Osipenko <digetx@gmail.com> writes:
+Fam Zheng <famz@redhat.com> writes:
 
-> On 17.09.2017 16:22, Alex Bennée wrote:
->>
->> Dmitry Osipenko <digetx@gmail.com> writes:
->>
->>> On 24.02.2017 14:21, Alex Bennée wrote:
->>>> Previously flushes on other vCPUs would only get serviced when they
->>>> exited their TranslationBlocks. While this isn't overly problematic it
->>>> violates the semantics of TLB flush from the point of view of source
->>>> vCPU.
->>>>
->>>> To solve this we call the cputlb *_all_cpus_synced() functions to do
->>>> the flushes which ensures all flushes are completed by the time the
->>>> vCPU next schedules its own work. As the TLB instructions are modelled
->>>> as CP writes the TB ends at this point meaning cpu->exit_request will
->>>> be checked before the next instruction is executed.
->>>>
->>>> Deferring the work until the architectural sync point is a possible
->>>> future optimisation.
->>>>
->>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
->>>> Reviewed-by: Richard Henderson <rth@twiddle.net>
->>>> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
->>>> ---
->>>>  target/arm/helper.c | 165 ++++++++++++++++++++++------------------------------
->>>>  1 file changed, 69 insertions(+), 96 deletions(-)
->>>>
->>>
->>> Hello,
->>>
->>> I have an issue with Linux kernel stopping to boot on a SMP 32bit ARM (haven't
->>> checked 64bit) in a single-threaded TCG mode. Kernel reaches point where it
->>> should mount rootfs over NFS and vCPUs stop. This issue is reproducible with any
->>> 32bit ARM machine type. Kernel boots fine with a MTTCG accel, only
->>> single-threaded TCG is affected. Git bisection lead to this patch, any
->>> ideas?
->>
->> It shouldn't cause a problem but can you obtain a backtrace of the
->> system when hung?
->>
+> This is the common code to implement a "VM test" to
 >
-> Actually, it looks like TCG enters infinite loop. Do you mean backtrace of QEMU
-> by 'backtrace of the system'? If so, here it is:
+>   1) Download and initialize a pre-defined VM that has necessary
+>   dependencies to build QEMU and SSH access.
 >
-> Thread 4 (Thread 0x7ffa37f10700 (LWP 20716)):
+>   2) Archive $SRC_PATH to a .tar file.
 >
-> #0  0x00007ffa601888bd in poll () at ../sysdeps/unix/syscall-template.S:84
+>   3) Boot the VM, and pass the source tar file to the guest.
 >
-> #1  0x00007ffa5e3aa561 in poll (__timeout=-1, __nfds=2, __fds=0x7ffa30006dc0) at
-> /usr/include/bits/poll2.h:46
-> #2  poll_func (ufds=0x7ffa30006dc0, nfds=2, timeout=-1, userdata=0x557bd603eae0)
-> at
-> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/thread-mainloop.c:69
-> #3  0x00007ffa5e39bbb1 in pa_mainloop_poll (m=m@entry=0x557bd60401f0) at
-> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/mainloop.c:844
-> #4  0x00007ffa5e39c24e in pa_mainloop_iterate (m=0x557bd60401f0,
-> block=<optimized out>, retval=0x0) at
-> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/mainloop.c:926
-> #5  0x00007ffa5e39c300 in pa_mainloop_run (m=0x557bd60401f0,
-> retval=retval@entry=0x0) at
-> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/mainloop.c:944
+>   4) SSH into the VM, untar the source tarball, build from the source.
 >
-> #6  0x00007ffa5e3aa4a9 in thread (userdata=0x557bd60400f0) at
-> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulse/thread-mainloop.c:100
->
-> #7  0x00007ffa599eea38 in internal_thread_func (userdata=0x557bd603e090) at
-> /var/tmp/portage/media-sound/pulseaudio-10.0/work/pulseaudio-10.0/src/pulsecore/thread-posix.c:81
->
-> #8  0x00007ffa60453657 in start_thread (arg=0x7ffa37f10700) at
-> pthread_create.c:456
->
-> #9  0x00007ffa60193c5f in clone () at
-> ../sysdeps/unix/sysv/linux/x86_64/clone.S:97
->
->
->
->
->
-> Thread 3 (Thread 0x7ffa4adff700 (LWP 20715)):
->
->
-> #0  0x00007ffa53e51caf in code_gen_buffer ()
->
+> Signed-off-by: Fam Zheng <famz@redhat.com>
 
-Well it's not locked up in servicing any flush tasks as it's executing
-code. Maybe the guest code is spinning on something?
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 
-In the monitor:
-
-  info registers
-
-Will show you where things are, see if the ip is moving each time. Also
-you can do a disassemble dump from there to see what code it is stuck
-on.
-
+> ---
+>  tests/vm/basevm.py | 256 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 256 insertions(+)
+>  create mode 100755 tests/vm/basevm.py
 >
-> #1  0x0000557bd2fa7f17 in cpu_tb_exec (cpu=0x557bd56160a0, itb=0x7ffa53e51b80
-> <code_gen_buffer+15481686>) at /home/dima/vl/qemu-tests/accel/tcg/cpu-exec.c:166
->
-> #2  0x0000557bd2fa8e0f in cpu_loop_exec_tb (cpu=0x557bd56160a0,
-> tb=0x7ffa53e51b80 <code_gen_buffer+15481686>, last_tb=0x7ffa4adfea68,
-> tb_exit=0x7ffa4adfea64) at /home/dima/vl/qemu-tests/accel/tcg/cpu-exec.c:613
-> #3  0x0000557bd2fa90ff in cpu_exec (cpu=0x557bd56160a0) at
-> /home/dima/vl/qemu-tests/accel/tcg/cpu-exec.c:711
->
-> #4  0x0000557bd2f6dcba in tcg_cpu_exec (cpu=0x557bd56160a0) at
-> /home/dima/vl/qemu-tests/cpus.c:1270
->
-> #5  0x0000557bd2f6dee1 in qemu_tcg_rr_cpu_thread_fn (arg=0x557bd5598e20) at
-> /home/dima/vl/qemu-tests/cpus.c:1365
->
-> #6  0x00007ffa60453657 in start_thread (arg=0x7ffa4adff700) at
-> pthread_create.c:456
->
-> #7  0x00007ffa60193c5f in clone () at
-> ../sysdeps/unix/sysv/linux/x86_64/clone.S:97
->
->
->
->
->
->
->
-> Thread 2 (Thread 0x7ffa561bf700 (LWP 20714)):
->
->
->
-> #0  syscall () at ../sysdeps/unix/sysv/linux/x86_64/syscall.S:38
->
->
->
-> #1  0x0000557bd34e1eaa in qemu_futex_wait (f=0x557bd4031798
-> <rcu_call_ready_event>, val=4294967295) at
-> /home/dima/vl/qemu-tests/include/qemu/futex.h:26
->
->
-> #2  0x0000557bd34e2071 in qemu_event_wait (ev=0x557bd4031798
-> <rcu_call_ready_event>) at util/qemu-thread-posix.c:442
->
->
-> #3  0x0000557bd34f9b1f in call_rcu_thread (opaque=0x0) at util/rcu.c:249
->
->
->
-> #4  0x00007ffa60453657 in start_thread (arg=0x7ffa561bf700) at
-> pthread_create.c:456
->
->
-> #5  0x00007ffa60193c5f in clone () at
-> ../sysdeps/unix/sysv/linux/x86_64/clone.S:97
->
->
->
->
->
->
->
-> Thread 1 (Thread 0x7ffa67502600 (LWP 20713)):
->
->
->
-> #0  0x00007ffa601889ab in __GI_ppoll (fds=0x557bd5bbf160, nfds=11,
-> timeout=<optimized out>, sigmask=0x0) at ../sysdeps/unix/sysv/linux/ppoll.c:39
->
->
-> #1  0x0000557bd34dc460 in qemu_poll_ns (fds=0x557bd5bbf160, nfds=11,
-> timeout=29841115) at util/qemu-timer.c:334
->
->
-> #2  0x0000557bd34dd488 in os_host_main_loop_wait (timeout=29841115) at
-> util/main-loop.c:255
->
->
-> #3  0x0000557bd34dd557 in main_loop_wait (nonblocking=0) at util/main-loop.c:515
->
->
->
-> #4  0x0000557bd3120f0e in main_loop () at vl.c:1999
->
->
->
-> #5  0x0000557bd3128d4a in main (argc=17, argv=0x7ffe7de2a248,
-> envp=0x7ffe7de2a2d8) at vl.c:4877
->
->>>
->>> Example:
->>>
->>> qemu-system-arm -M vexpress-a9 -smp cpus=2 -accel accel=tcg,thread=single
->>> -kernel arch/arm/boot/zImage -dtb arch/arm/boot/dts/vexpress-v2p-ca9.dtb -serial
->>> stdio -net nic,model=lan9118 -net user -d in_asm,out_asm -D /tmp/qemulog
->>>
->>> Last TB from the log:
->>> ----------------
->>> IN:
->>> 0xc011a450:  ee080f73      mcr	15, 0, r0, cr8, cr3, {3}
->>>
->>> OUT: [size=68]
->>> 0x7f32d8b93f80:  mov    -0x18(%r14),%ebp
->>> 0x7f32d8b93f84:  test   %ebp,%ebp
->>> 0x7f32d8b93f86:  jne    0x7f32d8b93fb8
->>> 0x7f32d8b93f8c:  mov    %r14,%rdi
->>> 0x7f32d8b93f8f:  mov    $0x5620f2aea5d0,%rsi
->>> 0x7f32d8b93f99:  mov    (%r14),%edx
->>> 0x7f32d8b93f9c:  mov    $0x5620f18107ca,%r10
->>> 0x7f32d8b93fa6:  callq  *%r10
->>> 0x7f32d8b93fa9:  movl   $0xc011a454,0x3c(%r14)
->>> 0x7f32d8b93fb1:  xor    %eax,%eax
->>> 0x7f32d8b93fb3:  jmpq   0x7f32d7a4e016
->>> 0x7f32d8b93fb8:  lea    -0x14aa07c(%rip),%rax        # 0x7f32d76e9f43
->>> 0x7f32d8b93fbf:  jmpq   0x7f32d7a4e016
+> diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
+> new file mode 100755
+> index 0000000000..77d07b161d
+> --- /dev/null
+> +++ b/tests/vm/basevm.py
+> @@ -0,0 +1,256 @@
+> +#!/usr/bin/env python
+> +#
+> +# VM testing base class
+> +#
+> +# Copyright 2017 Red Hat Inc.
+> +#
+> +# Authors:
+> +#  Fam Zheng <famz@redhat.com>
+> +#
+> +# This code is licensed under the GPL version 2 or later.  See
+> +# the COPYING file in the top-level directory.
+> +#
+> +
+> +import os
+> +import sys
+> +import logging
+> +import time
+> +import datetime
+> +sys.path.append(os.path.join(os.path.dirname(__file__), "..", "..", "scripts"))
+> +from qemu import QEMUMachine
+> +import subprocess
+> +import hashlib
+> +import optparse
+> +import atexit
+> +import tempfile
+> +import shutil
+> +import multiprocessing
+> +import traceback
+> +
+> +SSH_KEY = open(os.path.join(os.path.dirname(__file__),
+> +               "..", "keys", "id_rsa")).read()
+> +SSH_PUB_KEY = open(os.path.join(os.path.dirname(__file__),
+> +                   "..", "keys", "id_rsa.pub")).read()
+> +
+> +class BaseVM(object):
+> +    GUEST_USER = "qemu"
+> +    GUEST_PASS = "qemupass"
+> +    ROOT_PASS = "qemupass"
+> +
+> +    # The script to run in the guest that builds QEMU
+> +    BUILD_SCRIPT = ""
+> +    # The guest name, to be overridden by subclasses
+> +    name = "#base"
+> +    def __init__(self, debug=False, vcpus=None):
+> +        self._guest = None
+> +        self._tmpdir = tempfile.mkdtemp(prefix="vm-test-", suffix=".tmp", dir=".")
+> +        atexit.register(shutil.rmtree, self._tmpdir)
+> +
+> +        self._ssh_key_file = os.path.join(self._tmpdir, "id_rsa")
+> +        open(self._ssh_key_file, "w").write(SSH_KEY)
+> +        subprocess.check_call(["chmod", "600", self._ssh_key_file])
+> +
+> +        self._ssh_pub_key_file = os.path.join(self._tmpdir, "id_rsa.pub")
+> +        open(self._ssh_pub_key_file, "w").write(SSH_PUB_KEY)
+> +
+> +        self.debug = debug
+> +        self._stderr = sys.stderr
+> +        self._devnull = open(os.devnull, "w")
+> +        if self.debug:
+> +            self._stdout = sys.stdout
+> +        else:
+> +            self._stdout = self._devnull
+> +        self._args = [ \
+> +            "-nodefaults", "-m", "2G",
+> +            "-cpu", "host",
+> +            "-netdev", "user,id=vnet,hostfwd=:127.0.0.1:0-:22",
+> +            "-device", "virtio-net-pci,netdev=vnet",
+> +            "-vnc", "127.0.0.1:0,to=20",
+> +            "-serial", "file:%s" % os.path.join(self._tmpdir, "serial.out")]
+> +        if vcpus:
+> +            self._args += ["-smp", str(vcpus)]
+> +        if os.access("/dev/kvm", os.R_OK | os.W_OK):
+> +            self._args += ["-enable-kvm"]
+> +        else:
+> +            logging.info("KVM not available, not using -enable-kvm")
+> +        self._data_args = []
+> +
+> +    def _download_with_cache(self, url, sha256sum=None):
+> +        def check_sha256sum(fname):
+> +            if not sha256sum:
+> +                return True
+> +            checksum = subprocess.check_output(["sha256sum", fname]).split()[0]
+> +            return sha256sum == checksum
+> +
+> +        cache_dir = os.path.expanduser("~/.cache/qemu-vm/download")
+> +        if not os.path.exists(cache_dir):
+> +            os.makedirs(cache_dir)
+> +        fname = os.path.join(cache_dir, hashlib.sha1(url).hexdigest())
+> +        if os.path.exists(fname) and check_sha256sum(fname):
+> +            return fname
+> +        logging.debug("Downloading %s to %s...", url, fname)
+> +        subprocess.check_call(["wget", "-c", url, "-O", fname + ".download"],
+> +                              stdout=self._stdout, stderr=self._stderr)
+> +        os.rename(fname + ".download", fname)
+> +        return fname
+> +
+> +    def _ssh_do(self, user, cmd, check, interactive=False):
+> +        ssh_cmd = ["ssh", "-q",
+> +                   "-o", "StrictHostKeyChecking=no",
+> +                   "-o", "UserKnownHostsFile=" + os.devnull,
+> +                   "-o", "ConnectTimeout=1",
+> +                   "-p", self.ssh_port, "-i", self._ssh_key_file]
+> +        if interactive:
+> +            ssh_cmd += ['-t']
+> +        assert not isinstance(cmd, str)
+> +        ssh_cmd += ["%s@127.0.0.1" % user] + list(cmd)
+> +        logging.debug("ssh_cmd: %s", " ".join(ssh_cmd))
+> +        r = subprocess.call(ssh_cmd,
+> +                            stdin=sys.stdin if interactive else self._devnull,
+> +                            stdout=sys.stdout if interactive else self._stdout,
+> +                            stderr=sys.stderr if interactive else self._stderr)
+> +        if check and r != 0:
+> +            raise Exception("SSH command failed: %s" % cmd)
+> +        return r
+> +
+> +    def ssh(self, *cmd):
+> +        return self._ssh_do(self.GUEST_USER, cmd, False)
+> +
+> +    def ssh_interactive(self, *cmd):
+> +        return self._ssh_do(self.GUEST_USER, cmd, False, True)
+> +
+> +    def ssh_root(self, *cmd):
+> +        return self._ssh_do("root", cmd, False)
+> +
+> +    def ssh_check(self, *cmd):
+> +        self._ssh_do(self.GUEST_USER, cmd, True)
+> +
+> +    def ssh_root_check(self, *cmd):
+> +        self._ssh_do("root", cmd, True)
+> +
+> +    def build_image(self, img):
+> +        raise NotImplementedError
+> +
+> +    def add_source_dir(self, src_dir):
+> +        name = "data-" + hashlib.sha1(src_dir).hexdigest()[:5]
+> +        tarfile = os.path.join(self._tmpdir, name + ".tar")
+> +        logging.debug("Creating archive %s for src_dir dir: %s", tarfile, src_dir)
+> +        subprocess.check_call(["./scripts/archive-source.sh", tarfile],
+> +                              cwd=src_dir, stdin=self._devnull,
+> +                              stdout=self._stdout, stderr=self._stderr)
+> +        self._data_args += ["-drive",
+> +                            "file=%s,if=none,id=%s,cache=writeback,format=raw" % \
+> +                                    (tarfile, name),
+> +                            "-device",
+> +                            "virtio-blk,drive=%s,serial=%s,bootindex=1" % (name, name)]
+> +
+> +    def boot(self, img, extra_args=[]):
+> +        args = self._args + [
+> +            "-device", "VGA",
+> +            "-drive", "file=%s,if=none,id=drive0,cache=writeback" % img,
+> +            "-device", "virtio-blk,drive=drive0,bootindex=0"]
+> +        args += self._data_args + extra_args
+> +        logging.debug("QEMU args: %s", " ".join(args))
+> +        qemu_bin = os.environ.get("QEMU", "qemu-system-x86_64")
+> +        guest = QEMUMachine(binary=qemu_bin, args=args)
+> +        try:
+> +            guest.launch()
+> +        except:
+> +            logging.error("Failed to launch QEMU, command line:")
+> +            logging.error(" ".join([qemu_bin] + args))
+> +            logging.error("Log:")
+> +            logging.error(guest.get_log())
+> +            logging.error("QEMU version >= 2.10 is required")
+> +            raise
+> +        atexit.register(self.shutdown)
+> +        self._guest = guest
+> +        usernet_info = guest.qmp("human-monitor-command",
+> +                                 command_line="info usernet")
+> +        self.ssh_port = None
+> +        for l in usernet_info["return"].splitlines():
+> +            fields = l.split()
+> +            if "TCP[HOST_FORWARD]" in fields and "22" in fields:
+> +                self.ssh_port = l.split()[3]
+> +        if not self.ssh_port:
+> +            raise Exception("Cannot find ssh port from 'info usernet':\n%s" % \
+> +                            usernet_info)
+> +
+> +    def wait_ssh(self, seconds=120):
+> +        starttime = datetime.datetime.now()
+> +        guest_up = False
+> +        while (datetime.datetime.now() - starttime).total_seconds() < seconds:
+> +            if self.ssh("exit 0") == 0:
+> +                guest_up = True
+> +                break
+> +            time.sleep(1)
+> +        if not guest_up:
+> +            raise Exception("Timeout while waiting for guest ssh")
+> +
+> +    def shutdown(self):
+> +        self._guest.shutdown()
+> +
+> +    def wait(self):
+> +        self._guest.wait()
+> +
+> +    def qmp(self, *args, **kwargs):
+> +        return self._guest.qmp(*args, **kwargs)
+> +
+> +def parse_args(vm_name):
+> +    parser = optparse.OptionParser(description="""
+> +    VM test utility.  Exit codes: 0 = success, 1 = command line error, 2 = environment initialization failed, 3 = test command failed""")
+> +    parser.add_option("--debug", "-D", action="store_true",
+> +                      help="enable debug output")
+> +    parser.add_option("--image", "-i", default="%s.img" % vm_name,
+> +                      help="image file name")
+> +    parser.add_option("--force", "-f", action="store_true",
+> +                      help="force build image even if image exists")
+> +    parser.add_option("--jobs", type=int, default=multiprocessing.cpu_count() / 2,
+> +                      help="number of virtual CPUs")
+> +    parser.add_option("--build-image", "-b", action="store_true",
+> +                      help="build image")
+> +    parser.add_option("--build-qemu",
+> +                      help="build QEMU from source in guest")
+> +    parser.add_option("--interactive", "-I", action="store_true",
+> +                      help="Interactively run command")
+> +    parser.disable_interspersed_args()
+> +    return parser.parse_args()
+> +
+> +def main(vmcls):
+> +    try:
+> +        args, argv = parse_args(vmcls.name)
+> +        if not argv and not args.build_qemu and not args.build_image:
+> +            print "Nothing to do?"
+> +            return 1
+> +        if args.debug:
+> +            logging.getLogger().setLevel(logging.DEBUG)
+> +        vm = vmcls(debug=args.debug, vcpus=args.jobs)
+> +        if args.build_image:
+> +            if os.path.exists(args.image) and not args.force:
+> +                sys.stderr.writelines(["Image file exists: %s\n" % args.image,
+> +                                      "Use --force option to overwrite\n"])
+> +                return 1
+> +            return vm.build_image(args.image)
+> +        if args.build_qemu:
+> +            vm.add_source_dir(args.build_qemu)
+> +            cmd = [vm.BUILD_SCRIPT.format(
+> +                   configure_opts = " ".join(argv),
+> +                   jobs=args.jobs)]
+> +        else:
+> +            cmd = argv
+> +        vm.boot(args.image + ",snapshot=on")
+> +        vm.wait_ssh()
+> +    except Exception as e:
+> +        if isinstance(e, SystemExit) and e.code == 0:
+> +            return 0
+> +        sys.stderr.write("Failed to prepare guest environment\n")
+> +        traceback.print_exc()
+> +        return 2
+> +
+> +    if args.interactive:
+> +        if vm.ssh_interactive(*cmd) == 0:
+> +            return 0
+> +        vm.ssh_interactive()
+> +        return 3
+> +    else:
+> +        if vm.ssh(*cmd) != 0:
+> +            return 3
 
 
 --
