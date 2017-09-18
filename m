@@ -1,21 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41593)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dtwgC-00075b-0a
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:05:49 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dtwh1-0007nE-4b
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dtwg2-0004yu-KQ
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:05:43 -0400
-References: <20170916185123.29255-1-mreitz@redhat.com>
-	<20170916185123.29255-2-mreitz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <ebce1124-8cbc-8fe4-76f0-52cd76bafc15@redhat.com>
-Date: Mon, 18 Sep 2017 09:05:18 -0500
+	(envelope-from <aik@ozlabs.ru>) id 1dtwgx-0005bU-Tl
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:06:35 -0400
+Received: from mail-pf0-x241.google.com ([2607:f8b0:400e:c00::241]:34282)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dtwgx-0005ar-Jd
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:06:31 -0400
+Received: by mail-pf0-x241.google.com with SMTP id g65so234497pfe.1
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 07:06:31 -0700 (PDT)
+References: <20170918101709.30421-1-aik@ozlabs.ru>
+	<20170918101709.30421-8-aik@ozlabs.ru>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <cdc396c4-f09e-baf3-6da8-8a30122bac4e@ozlabs.ru>
+Date: Tue, 19 Sep 2017 00:06:21 +1000
 MIME-Version: 1.0
-In-Reply-To: <20170916185123.29255-2-mreitz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="xaOngAFTVxB2U16o3IjLJ79QP7ekn04Gq"
-Subject: Re: [Qemu-devel] [PATCH v5 1/6] qapi/qnull: Add own header
+In-Reply-To: <20170918101709.30421-8-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v3 07/13] memory: Switch memory from
+ using AddressSpace to FlatView
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,72 +31,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Kevin Wolf <kwolf@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---xaOngAFTVxB2U16o3IjLJ79QP7ekn04Gq
-From: Eric Blake <eblake@redhat.com>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Kevin Wolf <kwolf@redhat.com>
-Message-ID: <ebce1124-8cbc-8fe4-76f0-52cd76bafc15@redhat.com>
-Subject: Re: [PATCH v5 1/6] qapi/qnull: Add own header
-References: <20170916185123.29255-1-mreitz@redhat.com>
- <20170916185123.29255-2-mreitz@redhat.com>
-In-Reply-To: <20170916185123.29255-2-mreitz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/16/2017 01:51 PM, Max Reitz wrote:
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
+On 18/09/17 20:17, Alexey Kardashevskiy wrote:
+> FlatView's will be shared between AddressSpace's and subpage_t
+> and MemoryRegionSection cannot store AS anymore, hence this change.
+> 
+> In particular, for:
+> 
+>  typedef struct subpage_t {
+>      MemoryRegion iomem;
+> -    AddressSpace *as;
+> +    FlatView *fv;
+>      hwaddr base;
+>      uint16_t sub_section[];
+>  } subpage_t;
+> 
+>   struct MemoryRegionSection {
+>      MemoryRegion *mr;
+> -    AddressSpace *address_space;
+> +    FlatView *fv;
+>      hwaddr offset_within_region;
+>      Int128 size;
+>      hwaddr offset_within_address_space;
+>      bool readonly;
+>  };
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 > ---
->  include/qapi/qmp/qdict.h    |  1 +
->  include/qapi/qmp/qnull.h    | 30 ++++++++++++++++++++++++++++++
->  include/qapi/qmp/qobject.h  | 12 ------------
->  include/qapi/qmp/types.h    |  1 +
->  qapi/qapi-clone-visitor.c   |  1 +
->  qapi/string-input-visitor.c |  1 +
->  qobject/qnull.c             |  2 +-
->  tests/check-qnull.c         |  2 +-
->  8 files changed, 36 insertions(+), 14 deletions(-)
->  create mode 100644 include/qapi/qmp/qnull.h
->=20
+>  include/exec/memory-internal.h |   2 +-
+>  include/exec/memory.h          |  51 ++++++++----
+>  exec.c                         | 180 ++++++++++++++++++++++++-----------------
+>  hw/intc/openpic_kvm.c          |   2 +-
+>  memory.c                       |  28 ++++---
+>  5 files changed, 157 insertions(+), 106 deletions(-)
+> 
+> diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
+> index 6e08eda256..1cf8ad9869 100644
+> --- a/include/exec/memory-internal.h
+> +++ b/include/exec/memory-internal.h
+> @@ -27,7 +27,7 @@ extern const MemoryRegionOps unassigned_mem_ops;
+>  bool memory_region_access_valid(MemoryRegion *mr, hwaddr addr,
+>                                  unsigned size, bool is_write);
+>  
+> -void mem_add(AddressSpace *as, FlatView *fv, MemoryRegionSection *section);
+> +void mem_add(FlatView *fv, MemoryRegionSection *section);
+>  AddressSpaceDispatch *mem_begin(AddressSpace *as);
+>  void mem_commit(AddressSpaceDispatch *d);
+>  
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 2346f8b863..7816e5d655 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -48,6 +48,7 @@
+>  
+>  typedef struct MemoryRegionOps MemoryRegionOps;
+>  typedef struct MemoryRegionMmio MemoryRegionMmio;
+> +typedef struct FlatView FlatView;
+>  
 
-> +++ b/include/qapi/qmp/qnull.h
-> @@ -0,0 +1,30 @@
-> +/*
-> + * QNull
-> + *
-> + * Copyright (C) 2015 Red Hat, Inc.
-
-Worth also claiming 2017?
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+This is missing, apparently. My gcc did not catch it :-/
 
 
---xaOngAFTVxB2U16o3IjLJ79QP7ekn04Gq
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+diff --git a/memory.c b/memory.c
+index 69f3334c9b..21e1a6f38f 100644
+--- a/memory.c
++++ b/memory.c
+@@ -209,7 +209,6 @@ static bool
+memory_region_ioeventfd_equal(MemoryRegionIoeventfd a,
+ }
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+ typedef struct FlatRange FlatRange;
+-typedef struct FlatView FlatView;
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlm/0p4ACgkQp6FrSiUn
-Q2rI8wf+PvkmqP24b4pI7VSHM+/gAZ0A86vQPh9iKGtsjJV3oPIwfWlzUqdJ5ooa
-tE04YRXKv/t4LcDAU2VpFps+ChE4PpSDeOdxYiCrn6PpvQDL0r//rDWhnzMhr9cg
-D8/JqaYl1txkjsPOw85EEYcUWOVwsxw8VP0WB+0Jff9tAre25454vG8rBZvytWtB
-0c45URQYFsYy82Ve3sR4BLZEeH98Kd2O6qWyYENKMtOQsHhKP/n81jp4omYIocn2
-HUpk3+Ju+GvZxFcT4kFKC4EwQSjYQZJzhgn0oiwh2ZuEpI3klYxQHzRzJ6OtmuoA
-uM0tVFNrvRKvLeANKo9ppiWf2hLSXQ==
-=ax6N
------END PGP SIGNATURE-----
 
---xaOngAFTVxB2U16o3IjLJ79QP7ekn04Gq--
+
+-- 
+Alexey
