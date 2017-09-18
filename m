@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50229)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52601)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dtq5P-0006x4-9L
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 03:03:20 -0400
+	(envelope-from <famz@redhat.com>) id 1dtqIJ-0000Rb-Kr
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 03:16:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dtq5J-0002pl-GE
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 03:03:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46262)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dtq5J-0002p4-9L
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 03:03:13 -0400
-Date: Mon, 18 Sep 2017 15:03:07 +0800
+	(envelope-from <famz@redhat.com>) id 1dtqII-0007y8-Ki
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 03:16:39 -0400
+Date: Mon, 18 Sep 2017 15:16:30 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170918070307.GH15551@lemon.lan>
-References: <20170901112829.2571-1-apahim@redhat.com>
-	<20170901112829.2571-5-apahim@redhat.com>
-	<20170905030255.GH22515@lemon.lan>
-	<20170918051858.GA31915@localhost.localdomain>
-	<20170918053913.GD15551@lemon.lan>
-	<20170918064439.GB31915@localhost.localdomain>
+Message-ID: <20170918071630.GI15551@lemon.lan>
+References: <20170915101008.16646-1-kwolf@redhat.com>
+	<20170915101008.16646-2-kwolf@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170918064439.GB31915@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v8 04/13] qemu.py: improve message on
- negative exit code
+In-Reply-To: <20170915101008.16646-2-kwolf@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 1/6] qemu-io: Reset qemuio_blk permissions
+ before each command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +25,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: Kevin Wolf <kwolf@redhat.com>
-Cc: ldoktor@redhat.com, ehabkost@redhat.com, stefanha@gmail.com, Amador Pahim <apahim@redhat.com>, armbru@redhat.com, qemu-devel@nongnu.org, crosa@redhat.com, mreitz@redhat.com
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org
 
-On Mon, 09/18 08:44, Kevin Wolf wrote:
-> > > > > +            self._qemu_full_args = (self._wrapper + [self._binary] +
-> > > > > +                                    self._base_args() + self._args)
-> > > > 
-> > > > The parentheses seem superfluous. With those removed:
-> > > > 
-> > > > Reviewed-by: Fam Zheng <famz@redhat.com>
-> > > 
-> > > Congratulations, with this advice you just killed all Python-based
-> > > qemu-iotests and filled up my inbox with CI failure messages. :-)
-> > 
-> > Oops. Why doesn't python understand such multi line expressions
-> > impllied by "+" just like in "[,]"?
+On Fri, 09/15 12:10, Kevin Wolf wrote:
+> qemu-io provides a 'reopen' command that allows switching from writable
+> to read-only access. We need to make sure that we don't try to keep
+> write permissions to a BlockBackend that becomes read-only, otherwise
+> things are going to fail.
 > 
-> To be honest, I didn't know that either until now. But apparently the
-> different kinds of brackets (including those around function arguments)
-> are the only things that allow multiline expressions in Python.
+> command() already makes sure to request any additional permissions that
+> a qemu-io command requires, so just resetting the permissions to values
+> that are safe for read-only images is enough to fix this.
+> 
+> As a side effect, this makes the output of qemu-iotests case 187 more
+> consistent.
+> 
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qemu-io.c                  | 13 +++++++++++++
+>  tests/qemu-iotests/187.out |  2 +-
+>  2 files changed, 14 insertions(+), 1 deletion(-)
+> 
+> diff --git a/qemu-io.c b/qemu-io.c
+> index 265445ad89..9e031f0f8e 100644
+> --- a/qemu-io.c
+> +++ b/qemu-io.c
+> @@ -366,6 +366,12 @@ static void command_loop(void)
+>      char *input;
+>  
+>      for (i = 0; !done && i < ncmdline; i++) {
+> +        /* Make sure that we start each command with clean permissions and only
+> +         * add whatever the specific cmdinfo_t describes */
+> +        if (qemuio_blk) {
+> +            blk_set_perm(qemuio_blk, BLK_PERM_CONSISTENT_READ, BLK_PERM_ALL,
+> +                         &error_abort);
+> +        }
+>          done = qemuio_command(qemuio_blk, cmdline[i]);
+>      }
+>      if (cmdline) {
+> @@ -391,6 +397,13 @@ static void command_loop(void)
+>          if (input == NULL) {
+>              break;
+>          }
+> +
+> +        /* Make sure that we start each command with clean permissions and only
+> +         * add whatever the specific cmdinfo_t describes */
+> +        if (qemuio_blk) {
+> +            blk_set_perm(qemuio_blk, BLK_PERM_CONSISTENT_READ, BLK_PERM_ALL,
+> +                         &error_abort);
+> +        }
+>          done = qemuio_command(qemuio_blk, input);
+>          g_free(input);
+>  
+> diff --git a/tests/qemu-iotests/187.out b/tests/qemu-iotests/187.out
+> index 68fb944cd5..30b987f71f 100644
+> --- a/tests/qemu-iotests/187.out
+> +++ b/tests/qemu-iotests/187.out
+> @@ -12,7 +12,7 @@ Start from read-write
+>  
+>  wrote 65536/65536 bytes at offset 0
+>  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+> -write failed: Operation not permitted
+> +Block node is read-only
+>  wrote 65536/65536 bytes at offset 0
+>  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+>  *** done
+> -- 
+> 2.13.5
+> 
 
-Yes, and now I read that PEP recommends using brackets for multilines compared
-to backslashes. I was totally wrong with this advice.
-
-Fam
+Reviewed-by: Fam Zheng <famz@redhat.com>
