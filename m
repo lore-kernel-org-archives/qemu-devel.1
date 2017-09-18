@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51295)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51426)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dtyzs-0002Qo-Iu
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:34:13 -0400
+	(envelope-from <jan.dakinevich@gmail.com>) id 1dtz09-0002fm-OO
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:34:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dtyzo-0000lP-Ju
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:34:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34506)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dtyzo-0000kq-AU
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:34:08 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 59877C07DEAB
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 16:34:07 +0000 (UTC)
-Date: Mon, 18 Sep 2017 17:34:01 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170918163400.GL2581@work-vm>
-References: <20170913105953.13760-1-quintela@redhat.com>
-	<20170913105953.13760-6-quintela@redhat.com>
+	(envelope-from <jan.dakinevich@gmail.com>) id 1dtz05-00010e-QM
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:34:29 -0400
+Received: from mail-lf0-x244.google.com ([2a00:1450:4010:c07::244]:33151)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jan.dakinevich@gmail.com>)
+	id 1dtz05-0000yf-IP
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 12:34:25 -0400
+Received: by mail-lf0-x244.google.com with SMTP id y15so600264lfd.0
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 09:34:24 -0700 (PDT)
+References: <150574930075.27635.3945832472060840946.stgit@bahia>
+From: Jan Dakinevich <jan.dakinevich@gmail.com>
+Message-ID: <34ed6b38-3531-80ba-d281-6c7634244bfb@gmail.com>
+Date: Mon, 18 Sep 2017 19:34:21 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170913105953.13760-6-quintela@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 05/20] migration: Improve migration
- thread error handling
+In-Reply-To: <150574930075.27635.3945832472060840946.stgit@bahia>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] 9pfs: fix readdir() for 9p2000.u
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,135 +30,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>
-Cc: qemu-devel@nongnu.org, lvivier@redhat.com, peterx@redhat.com
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
 
-* Juan Quintela (quintela@redhat.com) wrote:
-> We now report errors also when we finish migration, not only on info
-> migrate.  We plan to use this error from several places, and we want
-> the first error to happen to win, so we add an mutex to order it.
+Hi Greg,
+
+I am also thinking about this... :-(
+
+As I see, stat_to_v9stat() is also used for symbolic links resolving and
+requires full path, not only d_name.
+
+With your patch I have the following:
+
+$ ln -s /usr usr
+$ ls -l
+ls: reading directory .: Invalid argument
+total 0
+
+On 09/18/2017 06:46 PM, Greg Kurz wrote:
+> If the client is using 9p2000.u, the following occurs:
 > 
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> $ cd ${virtfs_shared_dir}
+> $ mkdir -p a/b/c
+> $ ls a/b
+> ls: cannot access 'a/b/a': No such file or directory
+> ls: cannot access 'a/b/b': No such file or directory
+> a  b  c
+> 
+> instead of the expected:
+> 
+> $ ls a/b
+> c
+> 
+> This is a regression introduced by commit f57f5878578a;
+> local_name_to_path() now resolves ".." and "." in paths,
+> and v9fs_do_readdir_with_stat()->stat_to_v9stat() then
+> copies the basename of the resulting path to the response.
+> With the example above, this means that "." and ".." are
+> turned into "b" and "a" respectively...
+> 
+> Actually, the name we need to pass is the d_name field of
+> the dirent.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  migration/migration.c | 19 ++++++++++++++++---
->  migration/migration.h |  7 ++++++-
->  migration/ram.c       |  2 +-
->  migration/tls.c       |  1 -
->  4 files changed, 23 insertions(+), 6 deletions(-)
 > 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index bac4a99277..adc07e442a 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -1013,19 +1013,30 @@ static void migrate_fd_cleanup(void *opaque)
->                            MIGRATION_STATUS_CANCELLED);
->      }
->  
-> +    if (s->error) {
-> +        /* It is used on info migrate.  We can't free it */
-> +        error_report_err(error_copy(s->error));
-> +    }
->      notifier_list_notify(&migration_state_notifiers, s);
->      block_cleanup_parameters(s);
->  }
->  
-> +void migrate_set_error(MigrationState *s, const Error *error)
-> +{
-> +    qemu_mutex_lock(&s->error_mutex);
-> +    if (!s->error) {
-> +        s->error = error_copy(error);
-> +    }
-> +    qemu_mutex_unlock(&s->error_mutex);
-> +}
-> +
->  void migrate_fd_error(MigrationState *s, const Error *error)
->  {
->      trace_migrate_fd_error(error_get_pretty(error));
->      assert(s->to_dst_file == NULL);
->      migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
->                        MIGRATION_STATUS_FAILED);
-> -    if (!s->error) {
-> -        s->error = error_copy(error);
-> -    }
-> +    migrate_set_error(s, error);
->      notifier_list_notify(&migration_state_notifiers, s);
->      block_cleanup_parameters(s);
->  }
-> @@ -2244,6 +2255,7 @@ static void migration_instance_finalize(Object *obj)
->      MigrationState *ms = MIGRATION_OBJ(obj);
->      MigrationParameters *params = &ms->parameters;
->  
-> +    qemu_mutex_destroy(&ms->error_mutex);
->      g_free(params->tls_hostname);
->      g_free(params->tls_creds);
->  }
-> @@ -2256,6 +2268,7 @@ static void migration_instance_init(Object *obj)
->      ms->state = MIGRATION_STATUS_NONE;
->      ms->xbzrle_cache_size = DEFAULT_MIGRATE_CACHE_SIZE;
->      ms->mbps = -1;
-> +    qemu_mutex_init(&ms->error_mutex);
->  
->      params->tls_hostname = g_strdup("");
->      params->tls_creds = g_strdup("");
-> diff --git a/migration/migration.h b/migration/migration.h
-> index 1881e4a754..9a81b8a70a 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -129,8 +129,12 @@ struct MigrationState
->      int64_t colo_checkpoint_time;
->      QEMUTimer *colo_delay_timer;
->  
-> -    /* The last error that occurred */
-> +    /* The first error that has occurred.
-> +       We used the mutex to be able to return the 1st error message */
->      Error *error;
-> +    /* mutex to protect errp */
-> +    QemuMutex error_mutex;
-> +
->      /* Do we have to clean up -b/-i from old migrate parameters */
->      /* This feature is deprecated and will be removed */
->      bool must_remove_block_options;
-> @@ -159,6 +163,7 @@ bool  migration_has_all_channels(void);
->  
->  uint64_t migrate_max_downtime(void);
->  
-> +void migrate_set_error(MigrationState *s, const Error *error);
->  void migrate_fd_error(MigrationState *s, const Error *error);
->  
->  void migrate_fd_connect(MigrationState *s);
-> diff --git a/migration/ram.c b/migration/ram.c
-> index e18b3e2d4f..e0179fc838 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -1789,7 +1789,7 @@ int ram_discard_range(const char *rbname, uint64_t start, size_t length)
->      RAMBlock *rb = qemu_ram_block_by_name(rbname);
->  
->      if (!rb) {
-> -        error_report("ram_discard_range: Failed to find block '%s'", rbname);
-> +        error_report("ram_discard_rang0e: Failed to find block '%s'", rbname);
-
-Except for that typo;
-
-
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-
->          goto err;
->      }
->  
-> diff --git a/migration/tls.c b/migration/tls.c
-> index 596e8790bd..026a008667 100644
-> --- a/migration/tls.c
-> +++ b/migration/tls.c
-> @@ -119,7 +119,6 @@ static void migration_tls_outgoing_handshake(QIOTask *task,
->      if (qio_task_propagate_error(task, &err)) {
->          trace_migration_tls_outgoing_handshake_error(error_get_pretty(err));
->          migrate_fd_error(s, err);
-> -        error_free(err);
->      } else {
->          trace_migration_tls_outgoing_handshake_complete();
->          migration_channel_connect(s, ioc, NULL);
-> -- 
-> 2.13.5
+> Hi Jan,
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> I found this will testing your patches. I'd appreciate if you could
+> review this. Then I'll push all these patches to 9p-next and send
+> a pull request.
+> 
+> Thanks,
+> 
+> --
+> Greg
+> 
+>  hw/9pfs/9p.c |    3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+> index 0a37c8bd1361..0474e9e787c0 100644
+> --- a/hw/9pfs/9p.c
+> +++ b/hw/9pfs/9p.c
+> @@ -1748,6 +1748,9 @@ static int coroutine_fn v9fs_do_readdir_with_stat(V9fsPDU *pdu,
+>          if (err < 0) {
+>              break;
+>          }
+> +        v9fs_path_free(&path);
+> +
+> +        v9fs_path_sprintf(&path, "%s", dent->d_name);
+>          err = stat_to_v9stat(pdu, &path, &stbuf, &v9stat);
+>          if (err < 0) {
+>              break;
+> 
+
+-- 
+Best regards
+Jan Dakinevich
