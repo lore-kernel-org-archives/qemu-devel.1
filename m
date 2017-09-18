@@ -1,20 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57832)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dtsUK-0003RO-Oe
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:37:15 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dtsUs-0003oU-Ei
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:37:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dtsUJ-0002W4-AL
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:37:12 -0400
-Date: Mon, 18 Sep 2017 11:36:39 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170918113639.7deae179@nial.brq.redhat.com>
-In-Reply-To: <20170917232842.14544-1-f4bug@amsat.org>
-References: <20170917232842.14544-1-f4bug@amsat.org>
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dtsUp-0002mr-9b
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:37:46 -0400
+Received: from mail-db5eur01on0100.outbound.protection.outlook.com
+	([104.47.2.100]:59198
+	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
+	id 1dtsUo-0002mK-JF
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 05:37:43 -0400
+References: <20170707142138.411-1-pbutsykin@virtuozzo.com>
+	<55a8a300-2247-dadb-40b3-0c1d4e651e08@redhat.com>
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Message-ID: <61dd88c7-3f8c-471b-b33c-61aa2b09f981@virtuozzo.com>
+Date: Mon, 18 Sep 2017 12:37:21 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] qom/cpu: move cpu_model null check to
- cpu_class_by_name()
+In-Reply-To: <55a8a300-2247-dadb-40b3-0c1d4e651e08@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] virtio-serial: add enable_backend callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,269 +31,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?B?TGx1w61z?= Vilanova <vilanova@ac.upc.edu>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Anthony Green <green@moxielogic.com>, Artyom Tarasenko <atar4qemu@gmail.com>, Aurelien Jarno <aurelien@aurel32.net>, Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, Chris Wulff <crwulff@gmail.com>, David Gibson <david@gibson.dropbear.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Laurent Vivier <laurent@vivier.eu>, Marek Vasut <marex@denx.de>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Max Filippov <jcmvbkbc@gmail.com>, Michael Walle <michael@walle.cc>, Peter Maydell <peter.maydell@linaro.org>, Stafford Horne <shorne@gmail.com>, Yongbok Kim <yongbok.kim@imgtec.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Marcel Apfelbaum <marcel@redhat.com>, =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: mst@redhat.com, dgilbert@redhat.com, amit@kernel.org, den@openvz.org
 
-On Sun, 17 Sep 2017 20:28:42 -0300
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+On 15.09.2017 20:09, Paolo Bonzini wrote:
+> On 07/07/2017 16:21, Pavel Butsykin wrote:
+>> We should guarantee that RAM will not be modified while VM has a stopped
+>> state, otherwise it can lead to negative consequences during post-copy
+>> migration. In RUN_STATE_FINISH_MIGRATE step, it's expected that RAM on
+>> source side will not be modified as this could lead to non-consistent vm state
+>> on the destination side. Also RAM access during postcopy-ram migration with
+>> enabled release-ram capability can lead to sad consequences.
+>>
+>> Let's add enable_backend() callback to avoid undesirable virtioqueue changes
+>> in the guest memory.
+>>
+>> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+> 
+> To understand the patch better this doesn't fix _all_ stopped states,
+> only migration, right?  That said it's a valid bugfix even independent
+> of the effects for stopped runstate.
+Yes, the bug only appears on the migration. Actually, to protect memory 
+during the migration, this approach is already used for other virtio
+devices, for example net_vhost, see virtio_net_vhost_status().
 
-> and clean every implementation.
->=20
-> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
-> ---
-> Based-on: 20170917232010.14183-7-f4bug@amsat.org
->=20
->  qom/cpu.c              | 7 ++++++-
->  target/alpha/cpu.c     | 6 +-----
->  target/arm/cpu.c       | 4 ----
->  target/cris/cpu.c      | 4 ----
->  target/lm32/cpu.c      | 4 ----
->  target/m68k/cpu.c      | 4 ----
->  target/mips/cpu.c      | 4 ----
->  target/moxie/cpu.c     | 8 +-------
->  target/openrisc/cpu.c  | 4 ----
->  target/sh4/cpu.c       | 3 ---
->  target/sparc/cpu.c     | 4 ----
->  target/tricore/cpu.c   | 4 ----
->  target/unicore32/cpu.c | 4 ----
->  target/xtensa/cpu.c    | 4 ----
->  14 files changed, 8 insertions(+), 56 deletions(-)
->=20
-> diff --git a/qom/cpu.c b/qom/cpu.c
-> index dc5392dbeb..411d8cdd2b 100644
-> --- a/qom/cpu.c
-> +++ b/qom/cpu.c
-> @@ -311,7 +311,12 @@ static bool cpu_common_has_work(CPUState *cs)
-> =20
->  ObjectClass *cpu_class_by_name(const char *typename, const char *cpu_mod=
-el)
->  {
-> -    CPUClass *cc =3D CPU_CLASS(object_class_by_name(typename));
-> +    CPUClass *cc;
-> +
-> +    if (!cpu_model) {
-> +        return NULL;
-> +    }
-> +    cc =3D CPU_CLASS(object_class_by_name(typename));
-> =20
->      return cc->class_by_name(cpu_model);
->  }
-> diff --git a/target/alpha/cpu.c b/target/alpha/cpu.c
-> index e6c6aabdf0..b8a21f4e01 100644
-> --- a/target/alpha/cpu.c
-> +++ b/target/alpha/cpu.c
-> @@ -127,14 +127,10 @@ static const AlphaCPUAlias alpha_cpu_aliases[] =3D {
-> =20
->  static ObjectClass *alpha_cpu_class_by_name(const char *cpu_model)
->  {
-> -    ObjectClass *oc =3D NULL;
-> +    ObjectClass *oc;
->      char *typename;
->      int i;
-> =20
-> -    if (cpu_model =3D=3D NULL) {
-> -        return NULL;
-> -    }
-> -
->      oc =3D object_class_by_name(cpu_model);
->      if (oc !=3D NULL && object_class_dynamic_cast(oc, TYPE_ALPHA_CPU) !=
-=3D NULL &&
->          !object_class_is_abstract(oc)) {
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index 412e94c7ad..ea219c2dde 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -906,10 +906,6 @@ static ObjectClass *arm_cpu_class_by_name(const char=
- *cpu_model)
->      char *typename;
->      char **cpuname;
-> =20
-> -    if (!cpu_model) {
-> -        return NULL;
-> -    }
-> -
->      cpuname =3D g_strsplit(cpu_model, ",", 1);
->      typename =3D g_strdup_printf("%s-" TYPE_ARM_CPU, cpuname[0]);
->      oc =3D object_class_by_name(typename);
-> diff --git a/target/cris/cpu.c b/target/cris/cpu.c
-> index ceebfed79b..88d93f2d11 100644
-> --- a/target/cris/cpu.c
-> +++ b/target/cris/cpu.c
-> @@ -69,10 +69,6 @@ static ObjectClass *cris_cpu_class_by_name(const char =
-*cpu_model)
->      ObjectClass *oc;
->      char *typename;
-> =20
-> -    if (cpu_model =3D=3D NULL) {
-> -        return NULL;
-> -    }
-> -
->  #if defined(CONFIG_USER_ONLY)
->      if (strcasecmp(cpu_model, "any") =3D=3D 0) {
->          return object_class_by_name("crisv32-" TYPE_CRIS_CPU);
-> diff --git a/target/lm32/cpu.c b/target/lm32/cpu.c
-> index 2b8c36b6d0..bf081f56d2 100644
-> --- a/target/lm32/cpu.c
-> +++ b/target/lm32/cpu.c
-> @@ -246,10 +246,6 @@ static ObjectClass *lm32_cpu_class_by_name(const cha=
-r *cpu_model)
->      ObjectClass *oc;
->      char *typename;
-> =20
-> -    if (cpu_model =3D=3D NULL) {
-> -        return NULL;
-> -    }
-> -
->      typename =3D g_strdup_printf("%s-" TYPE_LM32_CPU, cpu_model);
->      oc =3D object_class_by_name(typename);
->      g_free(typename);
-> diff --git a/target/m68k/cpu.c b/target/m68k/cpu.c
-> index 55bf24bae6..8c70e0805c 100644
-> --- a/target/m68k/cpu.c
-> +++ b/target/m68k/cpu.c
-> @@ -87,10 +87,6 @@ static ObjectClass *m68k_cpu_class_by_name(const char =
-*cpu_model)
->      ObjectClass *oc;
->      char *typename;
-> =20
-> -    if (cpu_model =3D=3D NULL) {
-> -        return NULL;
-> -    }
-> -
->      typename =3D g_strdup_printf("%s-" TYPE_M68K_CPU, cpu_model);
->      oc =3D object_class_by_name(typename);
->      g_free(typename);
-> diff --git a/target/mips/cpu.c b/target/mips/cpu.c
-> index 1a9a3ed94d..c15b894362 100644
-> --- a/target/mips/cpu.c
-> +++ b/target/mips/cpu.c
-> @@ -166,10 +166,6 @@ static ObjectClass *mips_cpu_class_by_name(const cha=
-r *cpu_model)
->      ObjectClass *oc;
->      char *typename;
-> =20
-> -    if (cpu_model =3D=3D NULL) {
-> -        return NULL;
-> -    }
-> -
->      typename =3D mips_cpu_type_name(cpu_model);
->      oc =3D object_class_by_name(typename);
->      g_free(typename);
-> diff --git a/target/moxie/cpu.c b/target/moxie/cpu.c
-> index 748d02f29e..30bd44fcad 100644
-> --- a/target/moxie/cpu.c
-> +++ b/target/moxie/cpu.c
-> @@ -89,13 +89,7 @@ static void moxie_cpu_initfn(Object *obj)
-> =20
->  static ObjectClass *moxie_cpu_class_by_name(const char *cpu_model)
->  {
-> -    ObjectClass *oc;
-> -
-> -    if (cpu_model =3D=3D NULL) {
-> -        return NULL;
-> -    }
-> -
-> -    oc =3D object_class_by_name(cpu_model);
-> +    ObjectClass *oc =3D object_class_by_name(cpu_model);
->      if (oc !=3D NULL && (!object_class_dynamic_cast(oc, TYPE_MOXIE_CPU) =
-||
->                         object_class_is_abstract(oc))) {
->          return NULL;
-> diff --git a/target/openrisc/cpu.c b/target/openrisc/cpu.c
-> index a979f0bf8b..af9cdcc102 100644
-> --- a/target/openrisc/cpu.c
-> +++ b/target/openrisc/cpu.c
-> @@ -108,10 +108,6 @@ static ObjectClass *openrisc_cpu_class_by_name(const=
- char *cpu_model)
->      ObjectClass *oc;
->      char *typename;
-> =20
-> -    if (cpu_model =3D=3D NULL) {
-> -        return NULL;
-> -    }
-> -
->      typename =3D g_strdup_printf("%s-" TYPE_OPENRISC_CPU, cpu_model);
->      oc =3D object_class_by_name(typename);
->      g_free(typename);
-> diff --git a/target/sh4/cpu.c b/target/sh4/cpu.c
-> index 6ce7cba5a9..252440e019 100644
-> --- a/target/sh4/cpu.c
-> +++ b/target/sh4/cpu.c
-> @@ -133,9 +133,6 @@ static ObjectClass *superh_cpu_class_by_name(const ch=
-ar *cpu_model)
->      ObjectClass *oc;
->      GSList *list, *item;
-> =20
-> -    if (cpu_model =3D=3D NULL) {
-> -        return NULL;
-> -    }
->      if (strcasecmp(cpu_model, "any") =3D=3D 0) {
->          return object_class_by_name(TYPE_SH7750R_CPU);
->      }
-> diff --git a/target/sparc/cpu.c b/target/sparc/cpu.c
-> index 0806d699e6..beab90f3e6 100644
-> --- a/target/sparc/cpu.c
-> +++ b/target/sparc/cpu.c
-> @@ -730,10 +730,6 @@ static ObjectClass *sparc_cpu_class_by_name(const ch=
-ar *cpu_model)
->      ObjectClass *oc;
->      char *typename;
-> =20
-> -    if (cpu_model =3D=3D NULL) {
-> -        return NULL;
-> -    }
-> -
->      typename =3D sparc_cpu_type_name(cpu_model);
->      oc =3D object_class_by_name(typename);
->      g_free(typename);
-> diff --git a/target/tricore/cpu.c b/target/tricore/cpu.c
-> index 5ab5b56454..871eb35453 100644
-> --- a/target/tricore/cpu.c
-> +++ b/target/tricore/cpu.c
-> @@ -120,10 +120,6 @@ static ObjectClass *tricore_cpu_class_by_name(const =
-char *cpu_model)
->      ObjectClass *oc;
->      char *typename;
-> =20
-> -    if (!cpu_model) {
-> -        return NULL;
-> -    }
-> -
->      typename =3D g_strdup_printf("%s-" TYPE_TRICORE_CPU, cpu_model);
->      oc =3D object_class_by_name(typename);
->      g_free(typename);
-> diff --git a/target/unicore32/cpu.c b/target/unicore32/cpu.c
-> index c9b78ce68e..138acc9dd8 100644
-> --- a/target/unicore32/cpu.c
-> +++ b/target/unicore32/cpu.c
-> @@ -44,10 +44,6 @@ static ObjectClass *uc32_cpu_class_by_name(const char =
-*cpu_model)
->      ObjectClass *oc;
->      char *typename;
-> =20
-> -    if (cpu_model =3D=3D NULL) {
-> -        return NULL;
-> -    }
-> -
->      typename =3D g_strdup_printf("%s-" TYPE_UNICORE32_CPU, cpu_model);
->      oc =3D object_class_by_name(typename);
->      g_free(typename);
-> diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
-> index 85897df0a8..dcdc765a86 100644
-> --- a/target/xtensa/cpu.c
-> +++ b/target/xtensa/cpu.c
-> @@ -83,10 +83,6 @@ static ObjectClass *xtensa_cpu_class_by_name(const cha=
-r *cpu_model)
->      ObjectClass *oc;
->      char *typename;
-> =20
-> -    if (cpu_model =3D=3D NULL) {
-> -        return NULL;
-> -    }
-> -
->      typename =3D g_strdup_printf("%s-" TYPE_XTENSA_CPU, cpu_model);
->      oc =3D object_class_by_name(typename);
->      g_free(typename);
+> Thanks,
+> 
+> Paolo
+> 
+>> ---
+>>   hw/char/virtio-console.c          | 21 +++++++++++++++++++++
+>>   hw/char/virtio-serial-bus.c       |  7 +++++++
+>>   include/hw/virtio/virtio-serial.h |  3 +++
+>>   3 files changed, 31 insertions(+)
+>>
+>> diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
+>> index 0cb1668c8a..b55905892e 100644
+>> --- a/hw/char/virtio-console.c
+>> +++ b/hw/char/virtio-console.c
+>> @@ -163,6 +163,26 @@ static void chr_event(void *opaque, int event)
+>>       }
+>>   }
+>>   
+>> +static void virtconsole_enable_backend(VirtIOSerialPort *port, bool enable)
+>> +{
+>> +    VirtConsole *vcon = VIRTIO_CONSOLE(port);
+>> +
+>> +    if (!qemu_chr_fe_get_driver(&vcon->chr)) {
+>> +        return;
+>> +    }
+>> +
+>> +    if (enable) {
+>> +        VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
+>> +
+>> +        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
+>> +                                 k->is_console ? NULL : chr_event,
+>> +                                 vcon, NULL, false);
+>> +    } else {
+>> +        qemu_chr_fe_set_handlers(&vcon->chr, NULL, NULL,
+>> +                                 NULL, NULL, NULL, false);
+>> +    }
+>> +}
+>> +
+>>   static void virtconsole_realize(DeviceState *dev, Error **errp)
+>>   {
+>>       VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
+>> @@ -233,6 +253,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
+>>       k->unrealize = virtconsole_unrealize;
+>>       k->have_data = flush_buf;
+>>       k->set_guest_connected = set_guest_connected;
+>> +    k->enable_backend = virtconsole_enable_backend;
+>>       k->guest_writable = guest_writable;
+>>       dc->props = virtserialport_properties;
+>>   }
+>> diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+>> index f5bc173844..f0f18c8e7c 100644
+>> --- a/hw/char/virtio-serial-bus.c
+>> +++ b/hw/char/virtio-serial-bus.c
+>> @@ -637,6 +637,13 @@ static void set_status(VirtIODevice *vdev, uint8_t status)
+>>       if (!(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
+>>           guest_reset(vser);
+>>       }
+>> +
+>> +    QTAILQ_FOREACH(port, &vser->ports, next) {
+>> +        VirtIOSerialPortClass *vsc = VIRTIO_SERIAL_PORT_GET_CLASS(port);
+>> +        if (vsc->enable_backend) {
+>> +            vsc->enable_backend(port, vdev->vm_running);
+>> +        }
+>> +    }
+>>   }
+>>   
+>>   static void vser_reset(VirtIODevice *vdev)
+>> diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio-serial.h
+>> index b19c44727f..12657a9f39 100644
+>> --- a/include/hw/virtio/virtio-serial.h
+>> +++ b/include/hw/virtio/virtio-serial.h
+>> @@ -58,6 +58,9 @@ typedef struct VirtIOSerialPortClass {
+>>           /* Guest opened/closed device. */
+>>       void (*set_guest_connected)(VirtIOSerialPort *port, int guest_connected);
+>>   
+>> +    /* Enable/disable backend for virtio serial port */
+>> +    void (*enable_backend)(VirtIOSerialPort *port, bool enable);
+>> +
+>>           /* Guest is now ready to accept data (virtqueues set up). */
+>>       void (*guest_ready)(VirtIOSerialPort *port);
+>>   
+>>
+> 
