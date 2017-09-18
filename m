@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35185)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dtr68-00019g-LV
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:08:13 -0400
+	(envelope-from <kwolf@redhat.com>) id 1dtr9A-0001ze-OV
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:11:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dtr63-0001cq-Nk
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:08:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50916)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dtr63-0001cR-F3
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:08:03 -0400
-Date: Mon, 18 Sep 2017 10:07:56 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170918100756.75eec02d.cohuck@redhat.com>
-In-Reply-To: <396c3d9d-644a-c946-3099-aba94f0571e8@de.ibm.com>
-References: <20170915163952.32147-1-cohuck@redhat.com>
-	<20170915163952.32147-2-cohuck@redhat.com>
-	<987d04c6-dc24-e11b-3904-303058058c3b@de.ibm.com>
-	<396c3d9d-644a-c946-3099-aba94f0571e8@de.ibm.com>
+	(envelope-from <kwolf@redhat.com>) id 1dtr99-00044g-Ob
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 04:11:16 -0400
+Date: Mon, 18 Sep 2017 10:11:03 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170918081103.GD31915@localhost.localdomain>
+References: <20170915101008.16646-1-kwolf@redhat.com>
+	<20170918075107.GK15551@lemon.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH RFC v2 1/1] s390x/ccw: create s390 phb for
- compat reasons as well
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170918075107.GK15551@lemon.lan>
+Subject: Re: [Qemu-devel] [PATCH 0/6] block: Fix permissions after ro/rw
+ reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,64 +24,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel@nongnu.org, agraf@suse.de, thuth@redhat.com, david@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-block@nongnu.org, mreitz@redhat.com, qemu-devel@nongnu.org
 
-On Mon, 18 Sep 2017 09:47:00 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> On 09/18/2017 09:33 AM, Christian Borntraeger wrote:
+Am 18.09.2017 um 09:51 hat Fam Zheng geschrieben:
+> On Fri, 09/15 12:10, Kevin Wolf wrote:
+> > bdrv_reopen() can switch nodes between read-only and read-write modes.
+> > This has implications for the required permissions on their child nodes.
+> > For example, a qcow2 node requests write permissions on bs->file only if
+> > it is writable itself.
 > > 
-> > 
-> > On 09/15/2017 06:39 PM, Cornelia Huck wrote:  
-> >> d32bd032d8 ("s390x/ccw: create s390 phb conditionally") made
-> >> registering the s390 pci host bridge conditional on presense
-> >> of the zpci facility bit. Sadly, that breaks migration from
-> >> machines that did not use the cpu model (2.7 and previous).
-> >>
-> >> Create the s390 phb for pre-cpu model machines as well.
-> >>
-> >> Fixes: d32bd032d8 ("s390x/ccw: create s390 phb conditionally")
-> >> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> >> ---
-> >>  hw/s390x/s390-virtio-ccw.c | 2 ++
-> >>  target/s390x/cpu_models.c  | 3 +++
-> >>  2 files changed, 5 insertions(+)
-> >>
-> >> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> >> index 0471407187..907abc7a32 100644
-> >> --- a/hw/s390x/s390-virtio-ccw.c
-> >> +++ b/hw/s390x/s390-virtio-ccw.c
-> >> @@ -269,6 +269,8 @@ static void s390_create_virtio_net(BusState *bus, const char *name)
-> >>      }
-> >>  }
-> >>
-> >> +static S390CcwMachineClass *get_machine_class(void);
-> >> +
-> >>  static void ccw_init(MachineState *machine)
-> >>  {
-> >>      int ret;
-
-This hunk is from the previous version and should not be in there...
-
-> >> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> >> index c295e641e6..5169379db5 100644
-> >> --- a/target/s390x/cpu_models.c
-> >> +++ b/target/s390x/cpu_models.c
-> >> @@ -196,6 +196,9 @@ bool s390_has_feat(S390Feat feat)
-> >>              }
-> >>          }
-> >>  #endif
-> >> +        if (feat == S390_FEAT_ZPCI) {
-> >> +            return true;
-> >> +        }  
-> > 
-> > Shouldnt that be depend on the machine being 2.7? I mean unless I misread 
-> > the context of this patch, you hard enable the PCI facility bit for all 
-> > machines and make all s390_has_feat(S390_FEAT_ZPCI) useless?
-> >   
+> > This means that during bdrv_reopen(), the permissions need to be
+> > recalculated in order to prevent failures where the bs->file
+> > permissions don't match its actual read-only state (e.g. bs->file is a
+> > read-write node, but the permission still enforces read-only access).
 > 
-> Sorry, I had to lookup again the original code. So this is inside !cpu->model. 
-> Yes makes sense then.
+> Passing reopen_queue around makes the interface and implementations
+> complicated.
 
-Yes, this is hard to figure out from the context alone.
+Yes. I don't like it, but I couldn't find any easier way.
+
+> I wonder if any of the alternatives make sense:
+> 
+> 1) Don't pass reopen_queue as a parameter, just pass the one
+> interesting BDRVReopenState pointer. So that callees don't need to
+> call bdrv_reopen_get_flags().
+
+There isn't a single interesting BDRVReopenState. The subset that a
+single BDS needs to determine its new state is the the BDRVReopenState
+of all of its parents. This can be an arbitrary number.
+
+> 2) Don't change the prototypes at all, just change .bdrv_reopen_prepare contract
+> so that after it returns, .bdrv_child_perm/.bdrv_check_perm should comply to the
+> new state that would be commited once .bdrv_reopen_commit() is called, or
+> reverted if .bdrv_reopen_abort().
+
+Hm, .bdrv_reopen_prepare already gets the whole queue passed, so I guess
+this could technically work. I'm not sure if it is a good idea, though.
+
+Such a change would still make .bdrv_child_perm depend on the reopen
+queue, just without actually passing it as a parameter. I like such
+hidden data flows even less than adding an explicit one.
+
+It would also mean that each block driver would have to save the queue
+in its local bs->opaque structure so that .bdrv_child_perm can access it
+later. Alternatively, bdrv_reopen_prepare could already store the new
+cumulative parent permissions, but it would still involve two new fields
+in bs->opaque for storing something of a rather temporary nature.
+
+Though maybe I'm just missing another way to implement this that you had
+in mind?
+
+> 3) Don't change the prototypes at all, track the reopen progress in block.c
+> generically, (e.g. ignore conflicts and voilations) and update the permissions
+> only after bdrv_reopen_commit().
+
+Both permission updates and reopen are transactional. You need to do
+both prepare stages first before you can do commits. If you only start
+doing the prepare stage of permissions during the commit stage of
+reopen, you break the error cases.
+
+Kevin
