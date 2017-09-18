@@ -1,26 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51567)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58786)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dtnBW-0004LT-IC
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:57:27 -0400
+	(envelope-from <bounces@canonical.com>) id 1dtnrx-0004eW-5s
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 00:41:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1dtnBT-0006vG-FM
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:57:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46738)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dtnBT-0006sz-77
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:57:23 -0400
-Date: Mon, 18 Sep 2017 11:57:09 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170918035709.GY3617@pxdev.xzpeter.org>
-References: <20170824192730.8440-1-dgilbert@redhat.com>
-	<20170824192730.8440-23-dgilbert@redhat.com>
-	<20170830055540.GD5920@pxdev.xzpeter.org>
-	<20170913130901.GC2096@work-vm>
+	(envelope-from <bounces@canonical.com>) id 1dtnrs-0002U2-9h
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 00:41:17 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50329)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dtnrs-0002Ti-3U
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 00:41:12 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.76 #1 (Debian))
+	id 1dtnrq-0004BL-OU
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 04:41:10 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id B7F1C2E848A
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 04:41:10 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170913130901.GC2096@work-vm>
-Subject: Re: [Qemu-devel] [RFC v2 22/32] vhost+postcopy: Add vhost waker
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 18 Sep 2017 04:30:41 -0000
+From: oscarbg <rtfss1@gmail.com>
+Reply-To: Bug 1717708 <1717708@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150558614762.29770.16367876405044972592.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150570904151.16999.2198596676076335741.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1717708] Re: QEMU aarch64 can't run Windows ARM64
+ iso's
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +37,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
+To: qemu-devel@nongnu.org
 
-On Wed, Sep 13, 2017 at 02:09:02PM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > On Thu, Aug 24, 2017 at 08:27:20PM +0100, Dr. David Alan Gilbert (git) wrote:
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > 
-> > > Register a waker function in vhost-user code to be notified when
-> > > pages arrive or requests to previously mapped pages get requested.
-> > > 
-> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > ---
-> > >  hw/virtio/trace-events |  3 +++
-> > >  hw/virtio/vhost-user.c | 26 ++++++++++++++++++++++++++
-> > >  2 files changed, 29 insertions(+)
-> > > 
-> > > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
-> > > index f7d4b831fe..adebf6dc6b 100644
-> > > --- a/hw/virtio/trace-events
-> > > +++ b/hw/virtio/trace-events
-> > > @@ -7,6 +7,9 @@ vhost_user_postcopy_fault_handler_found(int i, uint64_t region_offset, uint64_t
-> > >  vhost_user_postcopy_listen(void) ""
-> > >  vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply %d region %d"
-> > >  vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t memory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t offset) "%d:%s: size:0x%"PRIx64" GPA:0x%"PRIx64" QVA/userspace:0x%"PRIx64" RB offset:0x%"PRIx64
-> > > +vhost_user_postcopy_waker(const char *rb, uint64_t rb_offset) "%s + 0x%"PRIx64
-> > > +vhost_user_postcopy_waker_found(uint64_t client_addr) "0x%"PRIx64
-> > > +vhost_user_postcopy_waker_nomatch(const char *rb, uint64_t rb_offset) "%s + 0x%"PRIx64
-> > >  
-> > >  # hw/virtio/virtio.c
-> > >  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
-> > > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-> > > index 2897ff70b3..3bff33a1a6 100644
-> > > --- a/hw/virtio/vhost-user.c
-> > > +++ b/hw/virtio/vhost-user.c
-> > > @@ -847,6 +847,31 @@ static int vhost_user_postcopy_fault_handler(struct PostCopyFD *pcfd,
-> > >      return -1;
-> > >  }
-> > >  
-> > > +static int vhost_user_postcopy_waker(struct PostCopyFD *pcfd, RAMBlock *rb,
-> > > +                                     uint64_t offset)
-> > > +{
-> > > +    struct vhost_dev *dev = pcfd->data;
-> > > +    struct vhost_user *u = dev->opaque;
-> > > +    int i;
-> > > +
-> > > +    trace_vhost_user_postcopy_waker(qemu_ram_get_idstr(rb), offset);
-> > > +    /* Translate the offset into an address in the clients address space */
-> > > +    for (i = 0; i < MIN(dev->mem->nregions, u->region_rb_len); i++) {
-> > > +        if (u->region_rb[i] == rb &&
-> > > +            offset >= u->region_rb_offset[i] &&
-> > > +            offset < (u->region_rb_offset[i] +
-> > > +                      dev->mem->regions[i].memory_size)) {
-> > 
-> > Just curious: checks against offset should only be for safety, right?
-> > Is there valid case that even rb is correct but the offset gets out of
-> > the range of that RAMBlock?
-> 
-> Yes, I think that case does exist.
-> 
-> 'regions' are mapping regions as visible from the guest, but there may
-> be two regions that are mapped to the same RAMBlock.  In our world
-> the cleanest example of that is an x86 guest with 8GB of RAM; it
-> has a single pc.ram RAMBlock of 8GB in size, but that's mapped
-> in two chunks, a 3GB chunk at the bottom of physical address space
-> and a 5GB chunk that starts on the 4GB boundary - i.e. leaving
-> a 1GB hole.
-> In this structure that appears as two regions each with the same rb and
-> different offsets.
+thanks Peter..
+Shannon,
+using your launch arguments seems to go as you write..
+nice progress..
 
-Yeah I missed that.  Thanks!
+any info on if running QEMU on Linux will be better right now than
+Windows?
 
--- 
-Peter Xu
+as I thought virtio-gpu was for Linux but I'm very new to QEMU so
+probably bad knowledge..
+
+also don't know how mature ARM64 platform emulation is right now and how
+fast is progressing.. could be, that say next QEMU 2.11 could handle
+Windows ARM64 installation and booting correctly via some patches?
+
+thanks..
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1717708
+
+Title:
+  QEMU aarch64 can't run Windows ARM64 iso's
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hi,
+  recently Windows ARM64 ISOs have been posted on the internet..
+  just checked with latest QEMU 2.10 release from =
+
+  https://qemu.weilnetz.de/w64/qemu-w64-setup-20170830.exe =
+
+  "h:\qemu\qemu-system-aarch64.exe" -boot d -cdrom h:\iso\16353.1000.170825=
+-1423.RS_PRERELEASE_CLIENTPRO_OEMRET_ARM64FRE_ES-ES.ISO -m 2048 -cpu cortex=
+-a57 -smp 1 -machine virt
+  seems no video output..
+  checked various machine options for example versatilepb (says guest has n=
+ot initialized the guest)..
+
+  so don't know if it's a QEMU bug or lacking feature but can support
+  running Windows ARM64 builds (would be nice if you can add a
+  Snapdragon835 machine type which is which first machines will be
+  running..)
+
+  =
+
+  note running a Windows x64 ISO with similar parameters works (removing -c=
+pu and -machine as not needed)
+
+  thanks..
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1717708/+subscriptions
