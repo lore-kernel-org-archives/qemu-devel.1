@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51024)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51567)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dtn9M-0003QZ-Kp
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:55:14 -0400
+	(envelope-from <peterx@redhat.com>) id 1dtnBW-0004LT-IC
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:57:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dtn9J-00060q-Iu
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:55:12 -0400
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:53564
-	helo=heian.cn.fujitsu.com) by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <douly.fnst@cn.fujitsu.com>) id 1dtn9I-0005xL-Ma
-	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:55:09 -0400
-References: <1505464398-28897-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<20170915084044.GE13610@redhat.com>
-	<dc424e80-bd13-576a-314b-716b906538b8@cn.fujitsu.com>
-From: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Message-ID: <7103711f-5ab5-0a8f-48d1-bb088df2fb13@cn.fujitsu.com>
-Date: Mon, 18 Sep 2017 11:54:50 +0800
+	(envelope-from <peterx@redhat.com>) id 1dtnBT-0006vG-FM
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:57:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46738)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dtnBT-0006sz-77
+	for qemu-devel@nongnu.org; Sun, 17 Sep 2017 23:57:23 -0400
+Date: Mon, 18 Sep 2017 11:57:09 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170918035709.GY3617@pxdev.xzpeter.org>
+References: <20170824192730.8440-1-dgilbert@redhat.com>
+	<20170824192730.8440-23-dgilbert@redhat.com>
+	<20170830055540.GD5920@pxdev.xzpeter.org>
+	<20170913130901.GC2096@work-vm>
 MIME-Version: 1.0
-In-Reply-To: <dc424e80-bd13-576a-314b-716b906538b8@cn.fujitsu.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] NUMA: Enable adding NUMA node
- implicitly
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170913130901.GC2096@work-vm>
+Subject: Re: [Qemu-devel] [RFC v2 22/32] vhost+postcopy: Add vhost waker
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,178 +29,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Takao Indoh <indou.takao@jp.fujitsu.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Izumi Taku <izumi.taku@jp.fujitsu.com>, David Hildenbrand <david@redhat.com>, f4bug@amsat.org, Alistair Francis <alistair23@gmail.com>, Igor Mammedov <imammedo@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
 
-At 09/15/2017 06:05 PM, Dou Liyang wrote:
-> Hi Daniel,
->
-> At 09/15/2017 04:40 PM, Daniel P. Berrange wrote:
->> On Fri, Sep 15, 2017 at 04:33:18PM +0800, Dou Liyang wrote:
->>> In QEMU, if we enable NUMA and have nodes, QEMU will build ACPI SRAT
->>> table
->>> for transfering NUMA configuration to the guest. So, the maximum
->>> memory in
->>> SRAT can be used to determine whether to use the swiotlb for IOMMU or
->>> not.
->>>
->>> However, if QEmu doesn't enable NUMA explicitly on CLI, The SRAT will
->>> never be built. When memory hotplug is enabled, some guest's devices may
->>> start failing due to SWIOTLB is disabled.
->>>
->>> Add numa_implicit_add_node0 in struct MachineClass, Invoke it before
->>> QEMU
->>> parse NUMA options to enable adding NUMA node implicitly.
->>>
->>> Reported-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
->>> Suggested-by: Igor Mammedov <imammedo@redhat.com>
->>> Signed-off-by: Dou Liyang <douly.fnst@cn.fujitsu.com>
->>> Cc: Paolo Bonzini <pbonzini@redhat.com>
->>> Cc: Richard Henderson <rth@twiddle.net>
->>> Cc: Eduardo Habkost <ehabkost@redhat.com>
->>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
->>> Cc: Marcel Apfelbaum <marcel@redhat.com>
->>> Cc: Igor Mammedov <imammedo@redhat.com>
->>> Cc: David Hildenbrand <david@redhat.com>
->>> Cc: Thomas Huth <thuth@redhat.com>
->>> Cc: Alistair Francis <alistair23@gmail.com>
->>> Cc: f4bug@amsat.org
->>> Cc: Takao Indoh <indou.takao@jp.fujitsu.com>
->>> Cc: Izumi Taku <izumi.taku@jp.fujitsu.com>
->>>
->>> ---
->>>  hw/i386/pc.c        |  6 ++++++
->>>  include/hw/boards.h |  4 ++++
->>>  vl.c                | 14 ++++++++++++++
->>>  3 files changed, 24 insertions(+)
->>>
->>> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
->>> index 2108104..3c40117 100644
->>> --- a/hw/i386/pc.c
->>> +++ b/hw/i386/pc.c
->>> @@ -2308,6 +2308,11 @@ static const CPUArchIdList
->>> *pc_possible_cpu_arch_ids(MachineState *ms)
->>>      return ms->possible_cpus;
->>>  }
->>>
->>> +static void numa_implicit_add_node0(void)
->>> +{
->>> +    qemu_opts_parse_noisily(qemu_find_opts("numa"), "node", true);
->>> +}
->>> +
->>>  static void x86_nmi(NMIState *n, int cpu_index, Error **errp)
->>>  {
->>>      /* cpu index isn't used */
->>> @@ -2349,6 +2354,7 @@ static void pc_machine_class_init(ObjectClass
->>> *oc, void *data)
->>>      mc->get_hotplug_handler = pc_get_hotpug_handler;
->>>      mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
->>>      mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
->>> +    mc->numa_implicit_add_node0 = numa_implicit_add_node0;
->>>      mc->has_hotpluggable_cpus = true;
->>>      mc->default_boot_order = "cad";
->>>      mc->hot_add_cpu = pc_hot_add_cpu;
->>> diff --git a/include/hw/boards.h b/include/hw/boards.h
->>> index 7f044d1..898d841 100644
->>> --- a/include/hw/boards.h
->>> +++ b/include/hw/boards.h
->>> @@ -141,6 +141,8 @@ typedef struct {
->>>   *    should instead use "unimplemented-device" for all memory
->>> ranges where
->>>   *    the guest will attempt to probe for a device that QEMU doesn't
->>>   *    implement and a stub device is required.
->>> + * @numa_implicit_add_node0:
->>> + *    Enable NUMA implicitly by add a NUMA node.
->>>   */
->>>  struct MachineClass {
->>>      /*< private >*/
->>> @@ -191,6 +193,8 @@ struct MachineClass {
->>>      CpuInstanceProperties
->>> (*cpu_index_to_instance_props)(MachineState *machine,
->>>                                                           unsigned
->>> cpu_index);
->>>      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState
->>> *machine);
->>> +
->>> +    void (*numa_implicit_add_node0)(void);
->>>  };
->>>
->>>  /**
->>> diff --git a/vl.c b/vl.c
->>> index fb1f05b..814a5fa 100644
->>> --- a/vl.c
->>> +++ b/vl.c
->>> @@ -3030,6 +3030,7 @@ int main(int argc, char **argv, char **envp)
->>>      Error *main_loop_err = NULL;
->>>      Error *err = NULL;
->>>      bool list_data_dirs = false;
->>> +    bool has_numa_config_in_CLI = false;
->>>      typedef struct BlockdevOptions_queue {
->>>          BlockdevOptions *bdo;
->>>          Location loc;
->>> @@ -3293,6 +3294,7 @@ int main(int argc, char **argv, char **envp)
->>>                  if (!opts) {
->>>                      exit(1);
->>>                  }
->>> +                has_numa_config_in_CLI = true;
->>>                  break;
->>>              case QEMU_OPTION_display:
->>>                  display_type = select_display(optarg);
->>> @@ -4585,6 +4587,18 @@ int main(int argc, char **argv, char **envp)
->>>      default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
->>>      default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
->>>
->>> +    /*
->>> +     * If memory hotplug is enabled i.e. slots > 0 and user hasn't add
->>> +     * NUMA nodes explicitly on CLI
->>> +     *
->>> +     * Enable NUMA implicitly for guest to know the maximum memory
->>> +     * from ACPI SRAT table, which is used for SWIOTLB.
->>> +     */
->>> +    if (ram_slots > 0 && !has_numa_config_in_CLI) {
->>> +        if (machine_class->numa_implicit_add_node0) {
->>> +            machine_class->numa_implicit_add_node0();
->>> +        }
->>> +    }
->>
->> Won't this change guest ABI
+On Wed, Sep 13, 2017 at 02:09:02PM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > On Thu, Aug 24, 2017 at 08:27:20PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > 
+> > > Register a waker function in vhost-user code to be notified when
+> > > pages arrive or requests to previously mapped pages get requested.
+> > > 
+> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > ---
+> > >  hw/virtio/trace-events |  3 +++
+> > >  hw/virtio/vhost-user.c | 26 ++++++++++++++++++++++++++
+> > >  2 files changed, 29 insertions(+)
+> > > 
+> > > diff --git a/hw/virtio/trace-events b/hw/virtio/trace-events
+> > > index f7d4b831fe..adebf6dc6b 100644
+> > > --- a/hw/virtio/trace-events
+> > > +++ b/hw/virtio/trace-events
+> > > @@ -7,6 +7,9 @@ vhost_user_postcopy_fault_handler_found(int i, uint64_t region_offset, uint64_t
+> > >  vhost_user_postcopy_listen(void) ""
+> > >  vhost_user_set_mem_table_postcopy(uint64_t client_addr, uint64_t qhva, int reply_i, int region_i) "client:0x%"PRIx64" for hva: 0x%"PRIx64" reply %d region %d"
+> > >  vhost_user_set_mem_table_withfd(int index, const char *name, uint64_t memory_size, uint64_t guest_phys_addr, uint64_t userspace_addr, uint64_t offset) "%d:%s: size:0x%"PRIx64" GPA:0x%"PRIx64" QVA/userspace:0x%"PRIx64" RB offset:0x%"PRIx64
+> > > +vhost_user_postcopy_waker(const char *rb, uint64_t rb_offset) "%s + 0x%"PRIx64
+> > > +vhost_user_postcopy_waker_found(uint64_t client_addr) "0x%"PRIx64
+> > > +vhost_user_postcopy_waker_nomatch(const char *rb, uint64_t rb_offset) "%s + 0x%"PRIx64
+> > >  
+> > >  # hw/virtio/virtio.c
+> > >  virtqueue_alloc_element(void *elem, size_t sz, unsigned in_num, unsigned out_num) "elem %p size %zd in_num %u out_num %u"
+> > > diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
+> > > index 2897ff70b3..3bff33a1a6 100644
+> > > --- a/hw/virtio/vhost-user.c
+> > > +++ b/hw/virtio/vhost-user.c
+> > > @@ -847,6 +847,31 @@ static int vhost_user_postcopy_fault_handler(struct PostCopyFD *pcfd,
+> > >      return -1;
+> > >  }
+> > >  
+> > > +static int vhost_user_postcopy_waker(struct PostCopyFD *pcfd, RAMBlock *rb,
+> > > +                                     uint64_t offset)
+> > > +{
+> > > +    struct vhost_dev *dev = pcfd->data;
+> > > +    struct vhost_user *u = dev->opaque;
+> > > +    int i;
+> > > +
+> > > +    trace_vhost_user_postcopy_waker(qemu_ram_get_idstr(rb), offset);
+> > > +    /* Translate the offset into an address in the clients address space */
+> > > +    for (i = 0; i < MIN(dev->mem->nregions, u->region_rb_len); i++) {
+> > > +        if (u->region_rb[i] == rb &&
+> > > +            offset >= u->region_rb_offset[i] &&
+> > > +            offset < (u->region_rb_offset[i] +
+> > > +                      dev->mem->regions[i].memory_size)) {
+> > 
+> > Just curious: checks against offset should only be for safety, right?
+> > Is there valid case that even rb is correct but the offset gets out of
+> > the range of that RAMBlock?
+> 
+> Yes, I think that case does exist.
+> 
+> 'regions' are mapping regions as visible from the guest, but there may
+> be two regions that are mapped to the same RAMBlock.  In our world
+> the cleanest example of that is an x86 guest with 8GB of RAM; it
+> has a single pc.ram RAMBlock of 8GB in size, but that's mapped
+> in two chunks, a 3GB chunk at the bottom of physical address space
+> and a 5GB chunk that starts on the 4GB boundary - i.e. leaving
+> a 1GB hole.
+> In this structure that appears as two regions each with the same rb and
+> different offsets.
 
-Hi Daniel,
+Yeah I missed that.  Thanks!
 
-No, this will change the ACPI table in following case without NUMA
-configuration:
-
-...
--m 128M,slots=4,maxmem=1G
-...
-
-How about fixing it by adding
-
-m->numa_implicit_add_node0 = NULL;
-
-in pc_i440fx/q35_2_10_machine_options() ?
-
-
-  and so break migration/save/restore ?
-
-I did some tests(save/restore), this don't break migration.
-
-Are some situations I didn't consider ?
-
-
-Thanks,
-	dou.
->>
-> Thank you for your reply, I can't answer this immediately, I will
-> look into it and reply you soon.
->
-> This patch works for X86, has no influence on other arch, and we
-> can regard it's functionality as "-numa node" in CLI.
->
-> Thanks,
->     dou.
->
->
->> Regards,
->> Daniel
->>
+-- 
+Peter Xu
