@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1du251-00072x-To
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:51:44 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1du256-0007Bk-DK
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:51:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <andrew.smirnov@gmail.com>) id 1du251-0006QN-2k
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:51:43 -0400
+	(envelope-from <andrew.smirnov@gmail.com>) id 1du253-0006RW-6f
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 15:51:48 -0400
 From: Andrey Smirnov <andrew.smirnov@gmail.com>
-Date: Mon, 18 Sep 2017 12:50:58 -0700
-Message-Id: <20170918195100.17593-16-andrew.smirnov@gmail.com>
+Date: Mon, 18 Sep 2017 12:51:00 -0700
+Message-Id: <20170918195100.17593-18-andrew.smirnov@gmail.com>
 In-Reply-To: <20170918195100.17593-1-andrew.smirnov@gmail.com>
 References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
-Subject: [Qemu-devel] [PATCH 15/17] include/qemu: Add sizes.h from Linux
+Subject: [Qemu-devel] [PATCH 17/17] Implement support for i.MX7 Sabre board
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,71 +22,133 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org
 Cc: Andrey Smirnov <andrew.smirnov@gmail.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-Add sizes.h from Linux to have a more readable way of specifying
-MemoryRegion sizes.
-
 Cc: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-devel@nongnu.org
 Cc: qemu-arm@nongnu.org
 Cc: yurovsky@gmail.com
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 ---
- include/qemu/sizes.h | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
- create mode 100644 include/qemu/sizes.h
+ hw/arm/Makefile.objs   |   2 +-
+ hw/arm/mcimx7d-sabre.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 101 insertions(+), 1 deletion(-)
+ create mode 100644 hw/arm/mcimx7d-sabre.c
 
-diff --git a/include/qemu/sizes.h b/include/qemu/sizes.h
+diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
+index 33f6051ae3..fc4a963de8 100644
+--- a/hw/arm/Makefile.objs
++++ b/hw/arm/Makefile.objs
+@@ -19,5 +19,5 @@ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
+ obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
+ obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
+ obj-$(CONFIG_MPS2) += mps2.o
+-obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o
++obj-$(CONFIG_FSL_IMX7) += fsl-imx7.o mcimx7d-sabre.o
+ 
+diff --git a/hw/arm/mcimx7d-sabre.c b/hw/arm/mcimx7d-sabre.c
 new file mode 100644
-index 0000000000..9aedb9f8f6
+index 0000000000..34e3933db8
 --- /dev/null
-+++ b/include/qemu/sizes.h
-@@ -0,0 +1,47 @@
++++ b/hw/arm/mcimx7d-sabre.c
+@@ -0,0 +1,100 @@
 +/*
-+ * Copy of include/linux/sizes.h
++ * Copyright (c) 2017, Impinj, Inc.
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
++ * MCIMX7D_SABRE Board System emulation.
++ *
++ * Author: Andrey Smirnov <andrew.smirnov@gmail.com>
++ *
++ * This code is licensed under the GPL, version 2 or later.
++ * See the file `COPYING' in the top level directory.
++ *
++ * It (partially) emulates a mcimx7d_sabre board, with a Freescale
++ * i.MX7 SoC
 + */
-+#ifndef SIZES_H
-+#define SIZES_H
 +
-+#define SZ_1				0x00000001
-+#define SZ_2				0x00000002
-+#define SZ_4				0x00000004
-+#define SZ_8				0x00000008
-+#define SZ_16				0x00000010
-+#define SZ_32				0x00000020
-+#define SZ_64				0x00000040
-+#define SZ_128				0x00000080
-+#define SZ_256				0x00000100
-+#define SZ_512				0x00000200
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "qemu-common.h"
++#include "hw/arm/fsl-imx7.h"
++#include "hw/boards.h"
++#include "sysemu/sysemu.h"
++#include "sysemu/device_tree.h"
++#include "qemu/error-report.h"
++#include "sysemu/qtest.h"
++#include "net/net.h"
 +
-+#define SZ_1K				0x00000400
-+#define SZ_2K				0x00000800
-+#define SZ_4K				0x00001000
-+#define SZ_8K				0x00002000
-+#define SZ_16K				0x00004000
-+#define SZ_32K				0x00008000
-+#define SZ_64K				0x00010000
-+#define SZ_128K				0x00020000
-+#define SZ_256K				0x00040000
-+#define SZ_512K				0x00080000
++typedef struct {
++    FslIMX7State soc;
++    MemoryRegion ram;
++} MCIMX7Sabre;
 +
-+#define SZ_1M				0x00100000
-+#define SZ_2M				0x00200000
-+#define SZ_4M				0x00400000
-+#define SZ_8M				0x00800000
-+#define SZ_16M				0x01000000
-+#define SZ_32M				0x02000000
-+#define SZ_64M				0x04000000
-+#define SZ_128M				0x08000000
-+#define SZ_256M				0x10000000
-+#define SZ_512M				0x20000000
++static void mcimx7d_add_psci_node(const struct arm_boot_info *boot_info, void *fdt)
++{
++    const char comp[] = "arm,psci-0.2\0arm,psci";
 +
-+#define SZ_1G				0x40000000
-+#define SZ_2G				0x80000000
++    qemu_fdt_add_subnode(fdt, "/psci");
++    qemu_fdt_setprop(fdt, "/psci", "compatible", comp, sizeof(comp));
++    qemu_fdt_setprop_string(fdt, "/psci", "method", "smc");
++}
 +
-+#endif /* SIZES_H */
++static void mcimx7d_sabre_init(MachineState *machine)
++{
++    static struct arm_boot_info boot_info;
++    MCIMX7Sabre *s = g_new0(MCIMX7Sabre, 1);
++    Object *soc;
++    int i;
++
++    if (machine->ram_size > FSL_IMX7_MMDC_SIZE) {
++        error_report("RAM size " RAM_ADDR_FMT " above max supported (%08x)",
++                     machine->ram_size, FSL_IMX7_MMDC_SIZE);
++        exit(1);
++    }
++
++    boot_info = (struct arm_boot_info) {
++        .loader_start = FSL_IMX7_MMDC_ADDR,
++        .board_id = -1,
++        .ram_size = machine->ram_size,
++        .kernel_filename = machine->kernel_filename,
++        .kernel_cmdline = machine->kernel_cmdline,
++        .initrd_filename = machine->initrd_filename,
++        .nb_cpus = smp_cpus,
++        .modify_dtb = mcimx7d_add_psci_node,
++    };
++
++    object_initialize(&s->soc, sizeof(s->soc), TYPE_FSL_IMX7);
++    soc = OBJECT(&s->soc);
++    object_property_add_child(OBJECT(machine), "soc", soc, &error_fatal);
++    object_property_set_bool(soc, true, "realized", &error_fatal);
++
++    memory_region_allocate_system_memory(&s->ram, NULL, "mcimx7d-sabre.ram",
++                                         machine->ram_size);
++    memory_region_add_subregion(get_system_memory(),
++                                FSL_IMX7_MMDC_ADDR, &s->ram);
++
++    for (i = 0; i < FSL_IMX7_NUM_USDHCS; i++) {
++        BusState *bus;
++        DeviceState *carddev;
++        DriveInfo *di;
++        BlockBackend *blk;
++
++        di = drive_get_next(IF_SD);
++        blk = di ? blk_by_legacy_dinfo(di) : NULL;
++        bus = qdev_get_child_bus(DEVICE(&s->soc.usdhc[i]), "sd-bus");
++        carddev = qdev_create(bus, TYPE_SD_CARD);
++        qdev_prop_set_drive(carddev, "drive", blk, &error_fatal);
++        object_property_set_bool(OBJECT(carddev), true, "realized", &error_fatal);
++    }
++
++    if (!qtest_enabled()) {
++        arm_load_kernel(&s->soc.cpu[0], &boot_info);
++    }
++}
++
++static void mcimx7d_sabre_machine_init(MachineClass *mc)
++{
++    mc->desc = "Freescale i.MX7 DUAL SABRE (Cortex A7)";
++    mc->init = mcimx7d_sabre_init;
++    mc->max_cpus = FSL_IMX7_NUM_CPUS;
++    mc->ignore_memory_transaction_failures = true;
++}
++DEFINE_MACHINE("mcimx7d-sabre", mcimx7d_sabre_machine_init)
 -- 
 2.13.5
