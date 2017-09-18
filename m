@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54794)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55074)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dtxB6-0004GD-EJ
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:37:41 -0400
+	(envelope-from <mgamal@redhat.com>) id 1dtxBe-0004bh-4w
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:38:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dtxB2-0004ly-61
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:37:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41900)
+	(envelope-from <mgamal@redhat.com>) id 1dtxBa-00056Z-55
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:38:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47664)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dtxB1-0004lN-Vw
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:37:36 -0400
-References: <20170918101709.30421-1-aik@ozlabs.ru>
-	<20170918101709.30421-12-aik@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <a0ca1e5e-75f9-3d5c-d291-1dc0da8bf5aa@redhat.com>
-Date: Mon, 18 Sep 2017 16:37:31 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170918101709.30421-12-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu v3 11/13] memory: Share FlatView's and
- dispatch trees between address spaces
+	(Exim 4.71) (envelope-from <mgamal@redhat.com>) id 1dtxBZ-000563-Vq
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:38:10 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id DF37863E12
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 14:38:08 +0000 (UTC)
+From: Mohammed Gamal <mgamal@redhat.com>
+Date: Mon, 18 Sep 2017 16:37:47 +0200
+Message-Id: <1505745470-12208-1-git-send-email-mgamal@redhat.com>
+Subject: [Qemu-devel] [PATCH v4 0/3] x86_iommu: Fix segfault when starting
+ on non-PCI machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,75 +28,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com, thuth@redhat.com, peterx@redhat.com, pbonzini@redhat.com, Mohammed Gamal <mgamal@redhat.com>
 
-On 18/09/2017 12:17, Alexey Kardashevskiy wrote:
-> +        physmr =3D memory_region_unalias_entire(old_view->root);
-> +
-> +        key =3D !physmr->enabled ? 0 : physmr;
-> +        new_view =3D (FlatView *) g_hash_table_lookup(views, key);
-> +        if (new_view) {
-> +            continue;
-> +        }
-> +
-> +        new_view =3D generate_memory_topology(physmr);
-> +
-> +        new_view->dispatch =3D address_space_dispatch_new(new_view);
-> +        for (i =3D 0; i < new_view->nr; i++) {
-> +            MemoryRegionSection mrs =3D
-> +                section_from_flat_range(&new_view->ranges[i], new_view=
-);
-> +            flatview_add_to_dispatch(new_view, &mrs);
-> +        }
-> +        address_space_dispatch_compact(new_view->dispatch);
-> +
-> +        g_hash_table_insert(views, key, new_view);
-> +    }
-> +
-> +    /* Replace FVs in ASes */
-> +    QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
-> +        old_view =3D as->current_map;
-> +        physmr =3D memory_region_unalias_entire(old_view->root);
-> +
-> +        key =3D !physmr->enabled ? 0 : physmr;
+Starting qemu with
+qemu-system-x86_64 -S -M isapc -device {amd|intel}-iommu
+leads to a segfault. The code assume PCI bus is present and
+tries to access the bus structure without checking.
 
-This is duplicate, perhaps memory_region_unalias_entire should do it
-instead?  Does it make sense for flatview->root to be NULL, or does it
-break something else?  If something breaks, disregard the remaining
-comments.
+The patch series moves the error checks from vtd_realize()
+and amdvi_realize() to the generic x86_iommu_realize() and
+adds a check for PCI bus presence.
 
-(BTW, maybe you can rename the function to memory_region_get_flatview_roo=
-t).
+v3 --> v4:
+  * Restore correct object_dynamic_cast() in x86_iommu_realize()
+  * Remove redundant casting in callee functions. Implemented in
+    a new patch
 
->=20
-> +
-> +    /* Unref FVs from temporary table */
-> +    g_hash_table_foreach_remove(views, flatview_unref_g_hash, 0);
-> +    g_hash_table_unref(views);
->  }
+Mohammed Gamal (3):
+  x86_iommu: Move machine check to x86_iommu_realize()
+  intel_iommu, amd_iommu: Remove redundant object_dynamic_cast calls
+  x86_iommu: check if machine has PCI bus
 
-You can avoid g_hash_table_foreach_remove and also flatview_unref_g_hash
-instead use g_hash_table_new_full (casting flatview_unref to
-GDestroyNotify should work fine).
+ hw/i386/amd_iommu.c   | 13 ++-----------
+ hw/i386/intel_iommu.c | 13 ++-----------
+ hw/i386/x86-iommu.c   | 13 +++++++++++++
+ 3 files changed, 17 insertions(+), 22 deletions(-)
 
->=20
-> @@ -2690,13 +2721,6 @@ AddressSpace *address_space_init_shareable(Memor=
-yRegion *root, const char *name)
->  {
->      AddressSpace *as;
-> =20
-> -    QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
-> -        if (root =3D=3D as->root && as->malloced) {
-> -            as->ref_count++;
-> -            return as;
-> -        }
-> -    }
-> -
->      as =3D g_malloc0(sizeof *as);
->      address_space_init(as, root, name);
->      as->malloced =3D true;
-
-Is this on purpose because it's now pointless?  Maybe it should be
-pointed out in the commit message.
-
-Paolo
+-- 
+1.8.3.1
