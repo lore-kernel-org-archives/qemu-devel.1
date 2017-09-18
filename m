@@ -1,32 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53959)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dttU0-0004Tl-SE
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:40:58 -0400
+	(envelope-from <laurent@vivier.eu>) id 1dttZt-00060W-Ga
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:47:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dttTw-0005zg-T6
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:40:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45206)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dttTw-0005zT-Hw
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:40:52 -0400
-Date: Mon, 18 Sep 2017 11:40:40 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170918104039.GC2581@work-vm>
-References: <20170915035057.GM3617@pxdev.xzpeter.org>
-	<20170915104926.GA14994@stefanha-x1.localdomain>
-	<20170915113428.GF13610@redhat.com> <20170915120643.GN2170@work-vm>
-	<20170915121433.GI13610@redhat.com> <20170915121956.GO2170@work-vm>
-	<20170915122913.GJ13610@redhat.com>
-	<20170915145632.GD18767@stefanha-x1.localdomain>
-	<20170915151706.GQ2170@work-vm>
-	<20170918092625.GE3617@pxdev.xzpeter.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20170918092625.GE3617@pxdev.xzpeter.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 00/15] QMP: out-of-band (OOB) execution
- support
+	(envelope-from <laurent@vivier.eu>) id 1dttZp-0008Tj-K8
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:47:01 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:60474)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1dttZp-0008T8-Ad
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:46:57 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Mon, 18 Sep 2017 12:46:24 +0200
+Message-Id: <20170918104624.14743-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH] softfloat: rename make_float[x80|128]_init to
+ const_float[x80|128]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,204 +22,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Laurent Vivier <laurent@vivier.eu>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Fri, Sep 15, 2017 at 04:17:07PM +0100, Dr. David Alan Gilbert wrote:
-> > * Stefan Hajnoczi (stefanha@redhat.com) wrote:
-> > > On Fri, Sep 15, 2017 at 01:29:13PM +0100, Daniel P. Berrange wrote:
-> > > > On Fri, Sep 15, 2017 at 01:19:56PM +0100, Dr. David Alan Gilbert =
-wrote:
-> > > > > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > > > > > On Fri, Sep 15, 2017 at 01:06:44PM +0100, Dr. David Alan Gilb=
-ert wrote:
-> > > > > > > * Daniel P. Berrange (berrange@redhat.com) wrote:
-> > > > > > > > On Fri, Sep 15, 2017 at 11:49:26AM +0100, Stefan Hajnoczi=
- wrote:
-> > > > > > > > > On Fri, Sep 15, 2017 at 11:50:57AM +0800, Peter Xu wrot=
-e:
-> > > > > > > > > > On Thu, Sep 14, 2017 at 04:19:11PM +0100, Stefan Hajn=
-oczi wrote:
-> > > > > > > > > > > On Thu, Sep 14, 2017 at 01:15:09PM +0200, Marc-Andr=
-=E9 Lureau wrote:
-> > > > > > > > > > > > There should be a limit in the number of requests=
- the thread can
-> > > > > > > > > > > > queue. Before the patch, the limit was enforced b=
-y system socket
-> > > > > > > > > > > > buffering I think. Now, should oob commands still=
- be processed even if
-> > > > > > > > > > > > the queue is full? If so, the thread can't be sus=
-pended.
-> > > > > > > > > > >=20
-> > > > > > > > > > > I agree.
-> > > > > > > > > > >=20
-> > > > > > > > > > > Memory usage must be bounded.  The number of reques=
-ts is less important
-> > > > > > > > > > > than the amount of memory consumed by them.
-> > > > > > > > > > >=20
-> > > > > > > > > > > Existing QMP clients that send multiple QMP command=
-s without waiting for
-> > > > > > > > > > > replies need to rethink their strategy because OOB =
-commands cannot be
-> > > > > > > > > > > processed if queued non-OOB commands consume too mu=
-ch memory.
-> > > > > > > > > >=20
-> > > > > > > > > > Thanks for pointing out this.  Yes the memory usage p=
-roblem is valid,
-> > > > > > > > > > as Markus pointed out as well in previous discussions=
- (in "Flow
-> > > > > > > > > > Control" section of that long reply).  Hopefully this=
- series basically
-> > > > > > > > > > can work from design prospective, then I'll add this =
-flow control in
-> > > > > > > > > > next version.
-> > > > > > > > > >=20
-> > > > > > > > > > Regarding to what we should do if the limit is reache=
-d: Markus
-> > > > > > > > > > provided a few options, but the one I prefer most is =
-that we don't
-> > > > > > > > > > respond, but send an event showing that a command is =
-dropped.
-> > > > > > > > > > However, I would like it not queued, but a direct rep=
-ly (after all,
-> > > > > > > > > > it's an event, and we should not need to care much on=
- ordering of it).
-> > > > > > > > > > Then we can get rid of the babysitting of those "to b=
-e failed"
-> > > > > > > > > > requests asap, meanwhile we don't lose anything IMHO.
-> > > > > > > > > >=20
-> > > > > > > > > > I think I also missed at least a unit test for this n=
-ew interface.
-> > > > > > > > > > Again, I'll add it after the whole idea is proved sol=
-id.  Thanks,
-> > > > > > > > >=20
-> > > > > > > > > Another solution: the server reports available receive =
-buffer space to
-> > > > > > > > > the client.  The server only guarantees immediate OOB p=
-rocessing when
-> > > > > > > > > the client stays within the receive buffer size.
-> > > > > > > > >=20
-> > > > > > > > > Clients wishing to take advantage of OOB must query the=
- receive buffer
-> > > > > > > > > size and make sure to leave enough room.
-> > > > > > > >=20
-> > > > > > > > I don't think having to query it ahead of time is particu=
-larly nice,
-> > > > > > > > and of course it is inherantly racy.
-> > > > > > > >=20
-> > > > > > > > I would just have QEMU emit an event when it pausing proc=
-essing of the
-> > > > > > > > incoming commands due to a full queue.  If the event incl=
-udes the ID
-> > > > > > > > of the last queued command, the client will know which (i=
-f any) of
-> > > > > > > > its outstanding commands are delayed. Another even can be=
- sent when
-> > > > > > > > it restarts reading.
-> > > > > > >=20
-> > > > > > > Hmm and now we're implementing flow control!
-> > > > > > >=20
-> > > > > > > a) What exactly is the current semantics/buffer sizes?
-> > > > > > > b) When do clients send multiple QMP commands on one channe=
-l without
-> > > > > > > waiting for the response to the previous command?
-> > > > > > > c) Would one queue entry for each class of commands/channel=
- work
-> > > > > > >   (Where a class of commands is currently 'normal' and 'oob=
-')
-> > > > > >=20
-> > > > > > I do wonder if we need to worry about request limiting at all=
- from the
-> > > > > > client side.  For non-OOB commands clients will wait for a re=
-ply before
-> > > > > > sending a 2nd non-OOB command, so you'll never get a deep que=
-ue for.
-> > > > > >=20
-> > > > > > OOB commands are supposed to be things which can be handled q=
-uickly
-> > > > > > without blocking, so even if a client sent several commands a=
-t once
-> > > > > > without waiting for replies, they're going to be processed qu=
-ickly,
-> > > > > > so whether we temporarily block reading off the wire is a min=
-or
-> > > > > > detail.
-> > > > >=20
-> > > > > Lets just define it so that it can't - you send an OOB command =
-and wait
-> > > > > for it's response before sending another on that channel.
-> > > > >=20
-> > > > > > IOW, I think we could just have a fixed 10 command queue and =
-apps just
-> > > > > > pretend that there's an infinite queue and nothing bad would =
-happen from
-> > > > > > the app's POV.
-> > > > >=20
-> > > > > Can you justify 10 as opposed to 1?
-> > > >=20
-> > > > Semantically I don't think it makes a difference if the OOB comma=
-nds are
-> > > > being processed sequentially by their thread. A >1 length queue w=
-ould only
-> > > > matter for non-OOB commands if an app was filling the pipeline wi=
-th non-OOB
-> > > > requests, as then that could block reading of OOB commands.=20
-> > >=20
-> > > To summarize:
-> > >=20
-> > > The QMP server has a lookahead of 1 command so it can dispatch
-> > > out-of-band commands.  If 2 or more non-OOB commands are queued at =
-the
-> > > same time then OOB processing will not occur.
-> > >=20
-> > > Is that right?
-> >=20
-> > I think my view is slightly more complex;
-> >   a) There's a pair of queues for each channel
-> >   b) There's a central pair of queues on the QMP server
-> >     one for OOB commands and one for normal commands.
-> >   c) Each queue is only really guaranteed to be one deep.
-> >=20
-> >   That means that each one of the channels can send a non-OOB
-> > command without getting in the way of a channel that wants
-> > to send one.
->=20
-> But current version should not be that complex:
->=20
-> Firstly, parser thread will only be enabled for QMP+NO_MIXED monitors.
->=20
-> Then, we only have a single global queue for QMP non-oob commands, and
-> we don't have response queue yet.  We do respond just like before in a
-> synchronous way (I explained why - for OOB we don't need that
-> complexity IMHO).
+We already have const_float16(), const_float32() and const_float64(),
+so rename make_floatx80_init() and make_float128_init() as
+const_floatx80() and const_float128().
 
-I think  the discussion started because of two related comments:
-  Marc-Andr=E9 said :
-     'There should be a limit in the number of requests the thread can
-queue'
-and Stefan said :
-     'Memory usage must be bounded.'
+Redefine make_floatx80() and make_float128() as make_float16(),
+make_float32() and make_float64() using a variable and not only
+a cast.
 
-actually neither of those cases really worried me (because they only
-happen if the client keeps pumping commands, and that seems it's fault).
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ include/fpu/softfloat.h  | 10 ++++++----
+ target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
+ 2 files changed, 28 insertions(+), 26 deletions(-)
 
-However, once you start adding a limit, you've got to be careful - if
-you just added a limit to the central queue, then what happens if that
-queue is filled by non-OOB commands?
-
-Dave
-
-> When we parse commands, we execute it directly if OOB, otherwise we
-> put it onto request queue.  Request queue handling is done by a main
-> thread QEMUBH.  That's all.
->=20
-> Would this "simple version" suffice to implement this whole OOB idea?
->=20
-> (Again, I really don't think we need to specify queue length to 1,
->  though we can make it small)
->=20
-> --=20
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 0f96a0edd1..2e1a79ebf7 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -146,8 +146,9 @@ typedef struct {
+     uint64_t low;
+     uint16_t high;
+ } floatx80;
+-#define make_floatx80(exp, mant) ((floatx80) { mant, exp })
+-#define make_floatx80_init(exp, mant) { .low = mant, .high = exp }
++#define make_floatx80(exp, mant) __extension__ \
++    ({ floatx80 f80_val = { .low = mant, .high = exp }; f80_val; })
++#define const_floatx80(exp, mant) { .low = mant, .high = exp }
+ typedef struct {
+ #ifdef HOST_WORDS_BIGENDIAN
+     uint64_t high, low;
+@@ -155,8 +156,9 @@ typedef struct {
+     uint64_t low, high;
+ #endif
+ } float128;
+-#define make_float128(high_, low_) ((float128) { .high = high_, .low = low_ })
+-#define make_float128_init(high_, low_) { .high = high_, .low = low_ }
++#define make_float128(high_, low_) __extension__ \
++    ({float128 f128_val = { .high = high_, .low = low_ }; f128_val; })
++#define const_float128(high_, low_) { .high = high_, .low = low_ }
+ 
+ /*----------------------------------------------------------------------------
+ | Software IEC/IEEE floating-point underflow tininess-detection mode.
+diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+index 665e7609af..bf62cf8003 100644
+--- a/target/m68k/fpu_helper.c
++++ b/target/m68k/fpu_helper.c
+@@ -29,28 +29,28 @@
+  */
+ 
+ static const floatx80 fpu_rom[128] = {
+-    [0x00] = make_floatx80_init(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
+-    [0x0b] = make_floatx80_init(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
+-    [0x0c] = make_floatx80_init(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
+-    [0x0d] = make_floatx80_init(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
+-    [0x0e] = make_floatx80_init(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
+-    [0x0f] = make_floatx80_init(0x0000, 0x0000000000000000ULL),  /* Zero     */
+-    [0x30] = make_floatx80_init(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
+-    [0x31] = make_floatx80_init(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
+-    [0x32] = make_floatx80_init(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
+-    [0x33] = make_floatx80_init(0x4002, 0xa000000000000000ULL),  /* 10^1     */
+-    [0x34] = make_floatx80_init(0x4005, 0xc800000000000000ULL),  /* 10^2     */
+-    [0x35] = make_floatx80_init(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
+-    [0x36] = make_floatx80_init(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
+-    [0x37] = make_floatx80_init(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
+-    [0x38] = make_floatx80_init(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
+-    [0x39] = make_floatx80_init(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
+-    [0x3a] = make_floatx80_init(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
+-    [0x3b] = make_floatx80_init(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
+-    [0x3c] = make_floatx80_init(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
+-    [0x3d] = make_floatx80_init(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
+-    [0x3e] = make_floatx80_init(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
+-    [0x3f] = make_floatx80_init(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
++    [0x00] = const_floatx80(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
++    [0x0b] = const_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
++    [0x0c] = const_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
++    [0x0d] = const_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
++    [0x0e] = const_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
++    [0x0f] = const_floatx80(0x0000, 0x0000000000000000ULL),  /* Zero     */
++    [0x30] = const_floatx80(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
++    [0x31] = const_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
++    [0x32] = const_floatx80(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
++    [0x33] = const_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
++    [0x34] = const_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
++    [0x35] = const_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
++    [0x36] = const_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
++    [0x37] = const_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
++    [0x38] = const_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
++    [0x39] = const_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
++    [0x3a] = const_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
++    [0x3b] = const_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
++    [0x3c] = const_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
++    [0x3d] = const_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
++    [0x3e] = const_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
++    [0x3f] = const_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
+ };
+ 
+ int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
+-- 
+2.13.5
