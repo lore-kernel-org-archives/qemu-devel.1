@@ -1,17 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44008)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1du1Fb-0001vV-2s
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:58:35 -0400
+	(envelope-from <eblake@redhat.com>) id 1du1Fb-0001w5-R5
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:58:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1du1Fa-0006H8-6D
+	(envelope-from <eblake@redhat.com>) id 1du1Fa-0006HQ-Np
 	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:58:35 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 18 Sep 2017 13:58:00 -0500
-Message-Id: <20170918185819.5984-2-eblake@redhat.com>
-In-Reply-To: <20170918185819.5984-1-eblake@redhat.com>
-References: <20170918185819.5984-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 01/20] block: Make bdrv_img_create() size
- selection easier to read
+Date: Mon, 18 Sep 2017 13:57:59 -0500
+Message-Id: <20170918185819.5984-1-eblake@redhat.com>
+Subject: [Qemu-devel] [PATCH v8 00/20] make dirty-bitmap byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,41 +18,92 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-All callers of bdrv_img_create() pass in a size, or -1 to read the
-size from the backing file.  We then set that size as the QemuOpt
-default, which means we will reuse that default rather than the
-final parameter to qemu_opt_get_size() several lines later.  But
-it is rather confusing to read subsequent checks of 'size == -1'
-when it looks (without seeing the full context) like size defaults
-to 0; it also doesn't help that a size of 0 is valid (for some
-formats).
+There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+but NBD wants to report status on byte granularity (even if the
+reporting will probably be naturally aligned to sectors or even
+much higher levels).  I've therefore started the task of
+converting our block status code to report at a byte granularity
+rather than sectors.
 
-Rework the logic to make things more legible.
+Now that 2.11 is open, I'm rebasing/reposting the remaining patches.
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
+The overall conversion currently looks like:
+part 1: bdrv_is_allocated (merged in 2.10, commit 51b0a488)
+part 2: dirty-bitmap (this series, v7 was here [1])
+part 3: bdrv_get_block_status (v4 is posted [2] and is mostly reviewed)
+part 4: .bdrv_co_block_status (v3 is posted [3], but needs review)
 
----
-v6: Combine into a series rather than being a standalone patch (more for
-ease of tracking than for being on topic)
----
- block.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Available as a tag at:
+git fetch git://repo.or.cz/qemu/ericb.git nbd-byte-dirty-v8
 
-diff --git a/block.c b/block.c
-index 6dd47e414e..ee6a48976e 100644
---- a/block.c
-+++ b/block.c
-@@ -4393,7 +4393,7 @@ void bdrv_img_create(const char *filename, const char *fmt,
+[1] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03160.html
+[2] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03543.html
+[3] https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg03812.html
 
-     /* The size for the image must always be specified, unless we have a backing
-      * file and we have not been forbidden from opening it. */
--    size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, 0);
-+    size = qemu_opt_get_size(opts, BLOCK_OPT_SIZE, img_size);
-     if (backing_file && !(flags & BDRV_O_NO_BACKING)) {
-         BlockDriverState *bs;
-         char *full_backing = g_new0(char, PATH_MAX);
+Since v7:
+- add R-b where appropriate
+- patch 5 rewritten to be simpler [John]
+- patch 7 and 20 have fallout from patch 5, but I kept R-b
+
+001/20:[----] [--] 'block: Make bdrv_img_create() size selection easier to read'
+002/20:[----] [--] 'hbitmap: Rename serialization_granularity to serialization_align'
+003/20:[----] [--] 'qcow2: Ensure bitmap serialization is aligned'
+004/20:[----] [--] 'dirty-bitmap: Drop unused functions'
+005/20:[down] 'dirty-bitmap: Avoid size query failure during truncate'
+006/20:[----] [--] 'dirty-bitmap: Change bdrv_dirty_bitmap_size() to report bytes'
+007/20:[0007] [FC] 'dirty-bitmap: Track bitmap size by bytes'
+008/20:[----] [--] 'dirty-bitmap: Change bdrv_dirty_bitmap_*serialize*() to take bytes'
+009/20:[----] [--] 'qcow2: Switch sectors_covered_by_bitmap_cluster() to byte-based'
+010/20:[----] [-C] 'dirty-bitmap: Set iterator start by offset, not sector'
+011/20:[----] [--] 'dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset'
+012/20:[----] [--] 'dirty-bitmap: Change bdrv_get_dirty_count() to report bytes'
+013/20:[----] [--] 'dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes'
+014/20:[----] [--] 'dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes'
+015/20:[----] [--] 'mirror: Switch mirror_dirty_init() to byte-based iteration'
+016/20:[----] [--] 'qcow2: Switch qcow2_measure() to byte-based iteration'
+017/20:[----] [--] 'qcow2: Switch load_bitmap_data() to byte-based iteration'
+018/20:[----] [--] 'qcow2: Switch store_bitmap_data() to byte-based iteration'
+019/20:[----] [--] 'dirty-bitmap: Switch bdrv_set_dirty() to bytes'
+020/20:[0004] [FC] 'dirty-bitmap: Convert internal hbitmap size/granularity'
+
+Eric Blake (20):
+  block: Make bdrv_img_create() size selection easier to read
+  hbitmap: Rename serialization_granularity to serialization_align
+  qcow2: Ensure bitmap serialization is aligned
+  dirty-bitmap: Drop unused functions
+  dirty-bitmap: Avoid size query failure during truncate
+  dirty-bitmap: Change bdrv_dirty_bitmap_size() to report bytes
+  dirty-bitmap: Track bitmap size by bytes
+  dirty-bitmap: Change bdrv_dirty_bitmap_*serialize*() to take bytes
+  qcow2: Switch sectors_covered_by_bitmap_cluster() to byte-based
+  dirty-bitmap: Set iterator start by offset, not sector
+  dirty-bitmap: Change bdrv_dirty_iter_next() to report byte offset
+  dirty-bitmap: Change bdrv_get_dirty_count() to report bytes
+  dirty-bitmap: Change bdrv_get_dirty_locked() to take bytes
+  dirty-bitmap: Change bdrv_[re]set_dirty_bitmap() to use bytes
+  mirror: Switch mirror_dirty_init() to byte-based iteration
+  qcow2: Switch qcow2_measure() to byte-based iteration
+  qcow2: Switch load_bitmap_data() to byte-based iteration
+  qcow2: Switch store_bitmap_data() to byte-based iteration
+  dirty-bitmap: Switch bdrv_set_dirty() to bytes
+  dirty-bitmap: Convert internal hbitmap size/granularity
+
+ include/block/block_int.h    |   2 +-
+ include/block/dirty-bitmap.h |  43 ++++++--------
+ include/qemu/hbitmap.h       |   8 +--
+ block/io.c                   |   6 +-
+ block.c                      |  17 ++++--
+ block/backup.c               |   7 +--
+ block/dirty-bitmap.c         | 134 ++++++++++++++-----------------------------
+ block/mirror.c               |  79 +++++++++++--------------
+ block/qcow2-bitmap.c         |  57 +++++++++---------
+ block/qcow2.c                |  22 ++++---
+ migration/block.c            |  12 ++--
+ tests/test-hbitmap.c         |  10 ++--
+ util/hbitmap.c               |   8 +--
+ 13 files changed, 167 insertions(+), 238 deletions(-)
+
 -- 
 2.13.5
