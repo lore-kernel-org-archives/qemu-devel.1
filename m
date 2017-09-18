@@ -1,16 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44596)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44547)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1du1GH-0002cp-1G
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:59:18 -0400
+	(envelope-from <eblake@redhat.com>) id 1du1GF-0002aM-2o
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:59:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1du1GG-0006kZ-2y
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:59:17 -0400
+	(envelope-from <eblake@redhat.com>) id 1du1GE-0006hn-32
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 14:59:15 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Mon, 18 Sep 2017 13:58:16 -0500
-Message-Id: <20170918185819.5984-18-eblake@redhat.com>
+Date: Mon, 18 Sep 2017 13:58:15 -0500
+Message-Id: <20170918185819.5984-17-eblake@redhat.com>
 In-Reply-To: <20170918185819.5984-1-eblake@redhat.com>
 References: <20170918185819.5984-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v8 17/20] qcow2: Switch load_bitmap_data() to
+Subject: [Qemu-devel] [PATCH v8 16/20] qcow2: Switch qcow2_measure() to
  byte-based iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -23,75 +23,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-Now that we have adjusted the majority of the calls this function
-makes to be byte-based, it is easier to read the code if it makes
-passes over the image using bytes rather than sectors.
+This is new code, but it is easier to read if it makes passes over
+the image using bytes rather than sectors (and will get easier in
+the future when bdrv_get_block_status is converted to byte-based).
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 ---
-v5: no change
-v4: new patch
+v7: tweak constant given to MIN (no semantic change, R-b kept) [Kevin]
+v6: separate bug fix to earlier patch
+v5: new patch
 ---
- block/qcow2-bitmap.c | 22 ++++++++--------------
- 1 file changed, 8 insertions(+), 14 deletions(-)
+ block/qcow2.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index b09010b1d3..692ce0de88 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -291,9 +291,8 @@ static int load_bitmap_data(BlockDriverState *bs,
- {
-     int ret = 0;
-     BDRVQcow2State *s = bs->opaque;
--    uint64_t sector, limit, sbc;
-+    uint64_t offset, limit;
-     uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
--    uint64_t bm_sectors = DIV_ROUND_UP(bm_size, BDRV_SECTOR_SIZE);
-     uint8_t *buf = NULL;
-     uint64_t i, tab_size =
-             size_to_clusters(s,
-@@ -305,32 +304,27 @@ static int load_bitmap_data(BlockDriverState *bs,
-
-     buf = g_malloc(s->cluster_size);
-     limit = bytes_covered_by_bitmap_cluster(s, bitmap);
--    sbc = limit >> BDRV_SECTOR_BITS;
--    for (i = 0, sector = 0; i < tab_size; ++i, sector += sbc) {
--        uint64_t count = MIN(bm_sectors - sector, sbc);
-+    for (i = 0, offset = 0; i < tab_size; ++i, offset += limit) {
-+        uint64_t count = MIN(bm_size - offset, limit);
-         uint64_t entry = bitmap_table[i];
--        uint64_t offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
-+        uint64_t data_offset = entry & BME_TABLE_ENTRY_OFFSET_MASK;
-
-         assert(check_table_entry(entry, s->cluster_size) == 0);
-
--        if (offset == 0) {
-+        if (data_offset == 0) {
-             if (entry & BME_TABLE_ENTRY_FLAG_ALL_ONES) {
--                bdrv_dirty_bitmap_deserialize_ones(bitmap,
--                                                   sector * BDRV_SECTOR_SIZE,
--                                                   count * BDRV_SECTOR_SIZE,
-+                bdrv_dirty_bitmap_deserialize_ones(bitmap, offset, count,
-                                                    false);
-             } else {
-                 /* No need to deserialize zeros because the dirty bitmap is
-                  * already cleared */
-             }
+diff --git a/block/qcow2.c b/block/qcow2.c
+index bae5893327..64dcd98a91 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3647,20 +3647,19 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+              */
+             required = virtual_size;
          } else {
--            ret = bdrv_pread(bs->file, offset, buf, s->cluster_size);
-+            ret = bdrv_pread(bs->file, data_offset, buf, s->cluster_size);
-             if (ret < 0) {
-                 goto finish;
+-            int cluster_sectors = cluster_size / BDRV_SECTOR_SIZE;
+-            int64_t sector_num;
++            int64_t offset;
+             int pnum = 0;
+
+-            for (sector_num = 0;
+-                 sector_num < ssize / BDRV_SECTOR_SIZE;
+-                 sector_num += pnum) {
+-                int nb_sectors = MIN(ssize / BDRV_SECTOR_SIZE - sector_num,
+-                                     BDRV_REQUEST_MAX_SECTORS);
++            for (offset = 0; offset < ssize;
++                 offset += pnum * BDRV_SECTOR_SIZE) {
++                int nb_sectors = MIN(ssize - offset,
++                                     BDRV_REQUEST_MAX_BYTES) / BDRV_SECTOR_SIZE;
+                 BlockDriverState *file;
+                 int64_t ret;
+
+                 ret = bdrv_get_block_status_above(in_bs, NULL,
+-                                                  sector_num, nb_sectors,
++                                                  offset >> BDRV_SECTOR_BITS,
++                                                  nb_sectors,
+                                                   &pnum, &file);
+                 if (ret < 0) {
+                     error_setg_errno(&local_err, -ret,
+@@ -3673,12 +3672,11 @@ static BlockMeasureInfo *qcow2_measure(QemuOpts *opts, BlockDriverState *in_bs,
+                 } else if ((ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED)) ==
+                            (BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED)) {
+                     /* Extend pnum to end of cluster for next iteration */
+-                    pnum = ROUND_UP(sector_num + pnum, cluster_sectors) -
+-                           sector_num;
++                    pnum = (ROUND_UP(offset + pnum * BDRV_SECTOR_SIZE,
++                                 cluster_size) - offset) >> BDRV_SECTOR_BITS;
+
+                     /* Count clusters we've seen */
+-                    required += (sector_num % cluster_sectors + pnum) *
+-                                BDRV_SECTOR_SIZE;
++                    required += offset % cluster_size + pnum * BDRV_SECTOR_SIZE;
+                 }
              }
--            bdrv_dirty_bitmap_deserialize_part(bitmap, buf,
--                                               sector * BDRV_SECTOR_SIZE,
--                                               count * BDRV_SECTOR_SIZE,
-+            bdrv_dirty_bitmap_deserialize_part(bitmap, buf, offset, count,
-                                                false);
          }
-     }
 -- 
 2.13.5
