@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dtxRW-0006mO-J2
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:54:39 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dtxWS-00011C-7Z
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:59:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dtxRT-0006Sm-B1
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:54:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46542)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dtxRT-0006Qv-34
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:54:35 -0400
-References: <20170918101709.30421-1-aik@ozlabs.ru>
-	<20170918101709.30421-2-aik@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c01622e7-3e6d-cf90-a28c-aa31b4857887@redhat.com>
-Date: Mon, 18 Sep 2017 16:54:31 +0200
+	(envelope-from <stefanha@gmail.com>) id 1dtxWO-00010F-V8
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:59:44 -0400
+Received: from mail-wm0-x22a.google.com ([2a00:1450:400c:c09::22a]:50825)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dtxWO-0000zr-Ln
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:59:40 -0400
+Received: by mail-wm0-x22a.google.com with SMTP id v142so3494548wmv.5
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 07:59:40 -0700 (PDT)
+Date: Mon, 18 Sep 2017 15:59:36 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170918145936.GE4141@stefanha-x1.localdomain>
+References: <1504729728-23279-1-git-send-email-cota@braap.org>
 MIME-Version: 1.0
-In-Reply-To: <20170918101709.30421-2-aik@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH qemu v3 01/13] memory: Postpone flatview
- and dispatch tree building till all devices are added
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1504729728-23279-1-git-send-email-cota@braap.org>
+Subject: Re: [Qemu-devel] [RFC 0/6] initial plugin support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,95 +29,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+To: "Emilio G. Cota" <cota@braap.org>
+Cc: qemu-devel@nongnu.org, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
 
-On 18/09/2017 12:16, Alexey Kardashevskiy wrote:
-> Most devices use at least one address space and every time a new addres=
-s
-> space is added, flat views and dispatch trees are rebuild for all addre=
-ss
-> spaces. This is not a problem for a relatively small amount of devices =
-but
-> even 50 virtio-pci devices use more than 8GB of RAM.
->=20
-> What happens that on every flatview/dispatch rebuild, new arrays are
-> allocated and old ones release but the release is done via RCU so until
-> an entire machine is build, they are not released.
->=20
-> This wraps devices creation into memory_region_transaction_begin/commit
-> to massively reduce amount of flat view/dispatch tree (re)allocations.
->=20
-> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-> ---
-> Changes:
-> v2:
-> * wrapped qemu_run_machine_init_done_notifiers() as well
-> ---
->  vl.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
->=20
-> diff --git a/vl.c b/vl.c
-> index 9e62e92aea..e4f2ece590 100644
-> --- a/vl.c
-> +++ b/vl.c
-> @@ -4741,12 +4741,16 @@ int main(int argc, char **argv, char **envp)
->      igd_gfx_passthru();
-> =20
->      /* init generic devices */
-> +    memory_region_transaction_begin();
-> +
->      rom_set_order_override(FW_CFG_ORDER_OVERRIDE_DEVICE);
->      if (qemu_opts_foreach(qemu_find_opts("device"),
->                            device_init_func, NULL, NULL)) {
->          exit(1);
->      }
-> =20
-> +    memory_region_transaction_commit();
-> +
->      cpu_synchronize_all_post_init();
-> =20
->      rom_reset_order_override();
-> @@ -4829,8 +4833,13 @@ int main(int argc, char **argv, char **envp)
->      /* TODO: once all bus devices are qdevified, this should be done
->       * when bus is created by qdev.c */
->      qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
-> +
-> +    memory_region_transaction_begin();
-> +
->      qemu_run_machine_init_done_notifiers();
-> =20
-> +    memory_region_transaction_commit();
-> +
->      if (rom_check_and_register_reset() !=3D 0) {
->          error_report("rom check and register reset failed");
->          exit(1);
->=20
+On Wed, Sep 06, 2017 at 04:28:42PM -0400, Emilio G. Cota wrote:
+> Related threads:
+>   [PATCH 00/13] instrument: Add basic event instrumentation
+>   Date: Mon, 24 Jul 2017 20:02:24 +0300
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07419.html
+> and
+>   [PATCH v4 00/20] instrument: Add basic event instrumentation
+>   Date:	Wed, 6 Sep 2017 20:22:41 +0300
+>   https://lists.gnu.org/archive/html/qemu-devel/2017-07/msg07419.html
+> 
+> This set does something similar to the instrumentation patches by Lluis,
+> but with a different implementation (and for now less events).
+> 
+> My focus has been on working on the skeleton of a (pseudo) stable API,
+> as Stefan requested. Of course more events would have to be added, but
+> before spending more time on this I'd like to get some feedback on the
+> core of the design. Patch 2 has all the details.
+> 
+> Note: yes, patch 1 is not used in the series, but this is an RFC. It's there
+> because it will be needed to get the tb->plugin_mask when deciding whether
+> to generate a mem_cb helper when generating loads/stores from TCG.
+> 
+> This set applies on top of:
+>   https://github.com/cota/qemu/tree/tcg-generic-15%2Bmulti-tcg-v4-parallel
+> 
+> The tree can be fetched from:
+>   https://github.com/cota/qemu/tree/plugins
 
-This should not be necessary given the other patches; the PCI devices
-have an empty address space at the beginning, so there are other less
-intrusive optimizations to do instead with the same effect:
+Hi Emilio,
+Thanks for sending this!  Could you and Lluís collaborate on a single
+instrumentation plugin API?
 
-1) as a start, the "|=3D root->enabled" can resolve aliases.  This should
-be enough for the PCI device case.
+Let's have a discussion with Lluís, Peter, myself, and potentially
+others then we can use the QEMU Developer Conference Call that is
+scheduled every 2 weeks.
 
-2) also, after patch 2 you know that the address space has no listeners
-here, so the begin/commit isn't really needed.  Instead you can use the
-open-coded loop to directly generate the FlatView.  This avoids touching
-_all_ address spaces, which is already an improvement from O(n^2) to
-O(n) rebuilds on device startup.
+The next call time slot is Tue 26 Sept at 13:00 UTC:
+https://www.timeanddate.com/worldclock/fixedtime.html?iso=20170926T140000&p1=136
 
-3) you can consult the list (or hash table :)) of live FlatViews (which
-means you keep it live after memory_region_transaction_commit ends, and
-only clear it on the next call), and reuse an existing FlatView.  Note
-that the number of distinct FlatViews should be very few, so feel free
-to revert from hash table to list in v4 if you prefer.
-
-4) you can skip address_space_update_topology_pass if
-QTAILQ_EMPTY(&as->listeners).  This can provide some startup speed
-improvements.
-
-Optimizations 2/3/4 should be moved to the end of the series, or even in
-a separate post.  The first can be done in the beginning too, as you pref=
-er.
-
-Paolo
+Stefan
