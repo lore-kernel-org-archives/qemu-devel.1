@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58105)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dtvBs-00077l-HN
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:30:22 -0400
+	(envelope-from <famz@redhat.com>) id 1dtvDs-000839-8s
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:32:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dtvBr-000715-BO
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:30:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34100)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dtvBr-00070Q-2D
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:30:19 -0400
-Date: Mon, 18 Sep 2017 20:30:12 +0800
+	(envelope-from <famz@redhat.com>) id 1dtvDp-0007if-43
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:32:24 -0400
+Date: Mon, 18 Sep 2017 20:32:12 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170918123012.GN15551@lemon.lan>
-References: <77c55c6c-3397-5a32-6276-6b88f13fa531@siemens.com>
-	<CAFEAcA_bpija3nfB2URJbsqyGZfkziszFf16Q2U9TkC9HbnAJQ@mail.gmail.com>
+Message-ID: <20170918123212.GO15551@lemon.lan>
+References: <20170915101008.16646-1-kwolf@redhat.com>
+	<20170918075107.GK15551@lemon.lan>
+	<20170918081103.GD31915@localhost.localdomain>
+	<20170918115303.GL15551@lemon.lan>
+	<20170918121123.GH31915@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFEAcA_bpija3nfB2URJbsqyGZfkziszFf16Q2U9TkC9HbnAJQ@mail.gmail.com>
-Subject: Re: [Qemu-devel] [PATCH] seccomp: Fix build
+In-Reply-To: <20170918121123.GH31915@localhost.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 0/6] block: Fix permissions after ro/rw
+ reopen
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,98 +27,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>, Eduardo Otubo <otubo@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, mreitz@redhat.com
 
-On Mon, 09/18 09:31, Peter Maydell wrote:
-> On 18 September 2017 at 08:46, Jan Kiszka <jan.kiszka@siemens.com> wrote:
-> > From: Jan Kiszka <jan.kiszka@siemens.com>
-> >
-> > vl.c includes seccomp.h, thus requires the related CFLAGS as well.
-> >
-> > Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> > ---
-> >  Makefile.objs | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/Makefile.objs b/Makefile.objs
-> > index d9cf7ad791..4f1488d65d 100644
-> > --- a/Makefile.objs
-> > +++ b/Makefile.objs
-> > @@ -61,7 +61,7 @@ bt-host.o-cflags := $(BLUEZ_CFLAGS)
-> >
-> >  common-obj-y += dma-helpers.o
-> >  common-obj-y += vl.o
-> > -vl.o-cflags := $(GPROF_CFLAGS) $(SDL_CFLAGS)
-> > +vl.o-cflags := $(GPROF_CFLAGS) $(SDL_CFLAGS) $(SECCOMP_CFLAGS)
-> >  common-obj-y += tpm.o
-> >
-> >  common-obj-$(CONFIG_SLIRP) += slirp/
+On Mon, 09/18 14:11, Kevin Wolf wrote:
+> But how does it determine the desired new perms? Either you duplicate
+> the logic of the .bdrv_child_perm implementation into a new set of
+> functions that does the same thing, but based on the new state; or you
+> extend the existing function with a BlockReopenQueue parameter. The
+> latter is basically this series, except with an additional unnecessary
+> detour through the driver code instead of doing it in common code.
 > 
-> ...I get the feeling we're going to get a whole bunch of these
-> compile errors and fixups as we switch over to trying to specify
-> package-dependent cflags only on certain source files. Is
-> there anything we can do to make this changeover more reliable?
+> Also note that storing it in BDRVReopenState would have to involve a new
+> list of an additional data structure because permissions are per
+> BdrvChild, not per BlockDriverState.
 
-I think we should spot those risky headers and clean them up. See below.
+Indeed, this is not going to remove any complexity. :(
 
-> 
-> In particular I think that just adding a new #include line
-> to a source file shouldn't suddenly require us to change
-> the makefile to add a FOO_CFLAGS if we can avoid it. If
-> it is necessary, then we need to make sure that's a compile
-> error on all platforms and configurations (including those
-> where pkg-config happens to set FOO_CFLAGS to the empty string.)
-
-My apologies in advance that I'm not directly answering your question, because I
-don't know. Anyway..  IMHO being prudent on which library headers to pull in
-from a source file is a good thing, so I feel the conversion a worthwhile
-effort.  It also forces developers to fully hide the implementation details
-behind an internal API:
-
-> qemu-foo.h:
-  void qemu_foo_do_a(void);
-  void qemu_foo_do_b(void);
-> qemu-foo-internal.h:
-  /* A header that includes the library header, if necessary */
-  #include <libfoo.h>
-  #include "qemu-foo.h"
-> qemu-foo-a.c:
-  #include "qemu-foo.h"
-  #include "qemu-foo-internal.h"
-  void qemu_foo_do_a(void)
-  {
-      ...
-  }
-> qemu-foo-b.c:
-  #include "qemu-foo.h"
-  #include "qemu-foo-internal.h"
-  void qemu_foo_do_b(void)
-  {
-      ...
-  }
-
-So in general we could clean up non-internal headers (as in the above example
-the qemu-foo.h versus qemu-foo-internal.h) so that the library headers are not
-included there, whenever possible.
-
-If a library header is indeed wanted by different .c files, it probably should
-goto QEMU_CFLAGS, like the glib headers.
-
-But if a .c file does need to include a library header, it probably also wants
-the libs flag as well. So, commonly -cflags and -libs still go together.
-
-In the case of this patch, I think we should do this:
-
-diff --git a/include/sysemu/seccomp.h b/include/sysemu/seccomp.h
-index e67c2dc840..9b092aa23f 100644
---- a/include/sysemu/seccomp.h
-+++ b/include/sysemu/seccomp.h
-@@ -21,7 +21,5 @@
- #define QEMU_SECCOMP_SET_SPAWN       (1 << 3)
- #define QEMU_SECCOMP_SET_RESOURCECTL (1 << 4)
-
--#include <seccomp.h>
--
- int seccomp_start(uint32_t seccomp_opts);
- #endif
+Fam
