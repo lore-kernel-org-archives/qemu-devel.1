@@ -1,18 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33399)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dtvO8-0003LI-1f
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:43:01 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dtvO6-0003Qq-Tt
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dtvO7-0003Kx-Iu
 	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:43:00 -0400
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dtvO6-0003Oj-4Q
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:42:59 -0400
 From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Mon, 18 Sep 2017 15:42:28 +0300
-Message-Id: <20170918124230.8152-3-pbutsykin@virtuozzo.com>
-In-Reply-To: <20170918124230.8152-1-pbutsykin@virtuozzo.com>
-References: <20170918124230.8152-1-pbutsykin@virtuozzo.com>
+Date: Mon, 18 Sep 2017 15:42:26 +0300
+Message-Id: <20170918124230.8152-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v8 2/4] qcow2: add qcow2_cache_discard
+Subject: [Qemu-devel] [PATCH v8 0/4] Add shrink image for qcow2
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,98 +22,104 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: pbutsykin@virtuozzo.com, jsnow@redhat.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, armbru@redhat.com, den@openvz.org
 
-Whenever l2/refcount table clusters are discarded from the file we can
-automatically drop unnecessary content of the cache tables. This reduces
-the chance of eviction useful cache data and eliminates inconsistent data
-in the cache with the data in the file.
+This patch add shrinking of the image file for qcow2. As a result, this allows
+us to reduce the virtual image size and free up space on the disk without
+copying the image. Image can be fragmented and shrink is done by punching holes
+in the image file.
 
-Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
----
- block/qcow2-cache.c    | 26 ++++++++++++++++++++++++++
- block/qcow2-refcount.c | 20 ++++++++++++++++++--
- block/qcow2.h          |  3 +++
- 3 files changed, 47 insertions(+), 2 deletions(-)
+# ./qemu-img create -f qcow2 image.qcow2 4G
+Formatting 'image.qcow2', fmt=qcow2 size=4294967296 encryption=off cluster_size=65536 lazy_refcounts=off refcount_bits=16
 
-diff --git a/block/qcow2-cache.c b/block/qcow2-cache.c
-index 1d25147392..75746a7f43 100644
---- a/block/qcow2-cache.c
-+++ b/block/qcow2-cache.c
-@@ -411,3 +411,29 @@ void qcow2_cache_entry_mark_dirty(BlockDriverState *bs, Qcow2Cache *c,
-     assert(c->entries[i].offset != 0);
-     c->entries[i].dirty = true;
- }
-+
-+void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
-+                                  uint64_t offset)
-+{
-+    int i;
-+
-+    for (i = 0; i < c->size; i++) {
-+        if (c->entries[i].offset == offset) {
-+            return qcow2_cache_get_table_addr(bs, c, i);
-+        }
-+    }
-+    return NULL;
-+}
-+
-+void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table)
-+{
-+    int i = qcow2_cache_get_table_idx(bs, c, table);
-+
-+    assert(c->entries[i].ref == 0);
-+
-+    c->entries[i].offset = 0;
-+    c->entries[i].lru_counter = 0;
-+    c->entries[i].dirty = false;
-+
-+    qcow2_cache_table_release(bs, c, i, 1);
-+}
-diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
-index 168fc32e7b..8c17c0e3aa 100644
---- a/block/qcow2-refcount.c
-+++ b/block/qcow2-refcount.c
-@@ -861,8 +861,24 @@ static int QEMU_WARN_UNUSED_RESULT update_refcount(BlockDriverState *bs,
-         }
-         s->set_refcount(refcount_block, block_index, refcount);
- 
--        if (refcount == 0 && s->discard_passthrough[type]) {
--            update_refcount_discard(bs, cluster_offset, s->cluster_size);
-+        if (refcount == 0) {
-+            void *table;
-+
-+            table = qcow2_cache_is_table_offset(bs, s->refcount_block_cache,
-+                                                offset);
-+            if (table != NULL) {
-+                qcow2_cache_put(bs, s->refcount_block_cache, &refcount_block);
-+                qcow2_cache_discard(bs, s->refcount_block_cache, table);
-+            }
-+
-+            table = qcow2_cache_is_table_offset(bs, s->l2_table_cache, offset);
-+            if (table != NULL) {
-+                qcow2_cache_discard(bs, s->l2_table_cache, table);
-+            }
-+
-+            if (s->discard_passthrough[type]) {
-+                update_refcount_discard(bs, cluster_offset, s->cluster_size);
-+            }
-         }
-     }
- 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 96a8d43c17..52c374e9ed 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -649,6 +649,9 @@ int qcow2_cache_get(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
- int qcow2_cache_get_empty(BlockDriverState *bs, Qcow2Cache *c, uint64_t offset,
-     void **table);
- void qcow2_cache_put(BlockDriverState *bs, Qcow2Cache *c, void **table);
-+void *qcow2_cache_is_table_offset(BlockDriverState *bs, Qcow2Cache *c,
-+                                  uint64_t offset);
-+void qcow2_cache_discard(BlockDriverState *bs, Qcow2Cache *c, void *table);
- 
- /* qcow2-bitmap.c functions */
- int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+# ./qemu-io -c "write -P 0x22 0 1G" image.qcow2
+wrote 1073741824/1073741824 bytes at offset 0
+1 GiB, 1 ops; 0:00:04.59 (222.886 MiB/sec and 0.2177 ops/sec)
+
+# ./qemu-img resize image.qcow2 512M
+warning: qemu-img: Shrinking an image will delete all data beyond the shrunken image's end. Before performing such an operation, make sure there is no important data there.
+error: qemu-img: Use the --shrink option to perform a shrink operation.
+
+# ./qemu-img resize --shrink image.qcow2 128M
+Image resized.
+
+# ./qemu-img info image.qcow2
+image: image.qcow2
+file format: qcow2
+virtual size: 128M (134217728 bytes)
+disk size: 128M
+cluster_size: 65536
+Format specific information:
+    compat: 1.1
+    lazy refcounts: false
+    refcount bits: 16
+    corrupt: false
+
+# du -h image.qcow2
+129M    image.qcow2
+
+Changes from v1:
+- add --shrink flag for qemu-img resize
+- add qcow2_cache_discard
+- simplify qcow2_shrink_l1_table() to reduce the likelihood of image corruption
+- add new qemu-iotests for shrinking images
+
+Changes from v2:
+- replace qprintf() on error_report() (1)
+- rewrite warning messages (1)
+- enforce --shrink flag for all formats except raw (1)
+- split qcow2_cache_discard() (2)
+- minor fixes according to comments (3)
+- rewrite the last part of qcow2_shrink_reftable() to avoid
+  qcow2_free_clusters() calls inside (3)
+- improve test for shrinking image (4)
+
+Changes from v3:
+- rebase on "Implement a warning_report function" Alistair's patch-set (1)
+- spelling fixes (1)
+- the man page fix according to the discussion (1)
+- add call qcow2_signal_corruption() in case of image corruption (3)
+
+Changes from v4:
+- rebase on https://github.com/XanClic/qemu/commits/block Max's block branch
+
+Changes from v5:
+- the condition refcount == 0 should be enough to evict the l2/refcount cluster
+  from the cache (2)
+- overwrite the l1/refcount table in memory with zeros, even if overwriting the
+  l1/refcount table on disk has failed (3)
+- replace g_try_malloc() on g_malloc() for allocation reftable_tmp (3)
+
+Changes from v6:
+- rebase on master 1f29673387
+
+Changes from v7:
+- fix 106 iotest (1)
+- minor fixes according to comments (2, 3)
+- add documentation of the new enum members (3)
+- add r-b's by Max and John
+
+Pavel Butsykin (4):
+  qemu-img: add --shrink flag for resize
+  qcow2: add qcow2_cache_discard
+  qcow2: add shrink image support
+  qemu-iotests: add shrinking image test
+
+ block/qcow2-cache.c        |  26 +++++++
+ block/qcow2-cluster.c      |  50 +++++++++++++
+ block/qcow2-refcount.c     | 140 ++++++++++++++++++++++++++++++++++++-
+ block/qcow2.c              |  43 +++++++++---
+ block/qcow2.h              |  17 +++++
+ qapi/block-core.json       |   8 ++-
+ qemu-img-cmds.hx           |   4 +-
+ qemu-img.c                 |  23 ++++++
+ qemu-img.texi              |   6 +-
+ tests/qemu-iotests/102     |   4 +-
+ tests/qemu-iotests/106     |   2 +-
+ tests/qemu-iotests/163     | 170 +++++++++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/163.out |   5 ++
+ tests/qemu-iotests/group   |   1 +
+ 14 files changed, 481 insertions(+), 18 deletions(-)
+ create mode 100644 tests/qemu-iotests/163
+ create mode 100644 tests/qemu-iotests/163.out
+
 -- 
 2.14.1
