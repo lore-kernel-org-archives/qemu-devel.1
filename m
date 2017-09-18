@@ -1,40 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41325)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42031)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dtzlU-0004SD-9r
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 13:23:25 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dtznG-0005N9-6s
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 13:25:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dtzlR-0001hA-6n
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 13:23:24 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:36524)
+	(envelope-from <borntraeger@de.ibm.com>) id 1dtznD-0002gf-3a
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 13:25:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47814
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dtzlQ-0001go-U4
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 13:23:21 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	id 1dtznC-0002fs-Ug
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 13:25:11 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8IHJHxj016941
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 13:23:19 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d2gdt0bd9-1
+	v8IHJJqI058577
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 13:25:10 -0400
+Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d2ea01ffe-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 13:23:19 -0400
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 13:25:10 -0400
 Received: from localhost
-	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Mon, 18 Sep 2017 18:23:17 +0100
-References: <20170918163322.206581-1-borntraeger@de.ibm.com>
-	<c83c066e-093a-fca5-6c47-9eff6cffc03d@redhat.com>
+	Mon, 18 Sep 2017 18:25:05 +0100
+References: <20170918160012.4317-1-david@redhat.com>
+	<20170918160012.4317-17-david@redhat.com>
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Mon, 18 Sep 2017 19:23:13 +0200
+Date: Mon, 18 Sep 2017 19:25:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <c83c066e-093a-fca5-6c47-9eff6cffc03d@redhat.com>
+In-Reply-To: <20170918160012.4317-17-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Message-Id: <2e7d1283-86f7-7650-073a-2f10b07d8ad3@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH] s390x/cpu: expose the guest crash
- information
+Message-Id: <21b0f4da-f89b-32c6-b0ef-efb668c11a98@de.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v1 16/27] s390x/kvm: factor out SIGP code
+ into sigp.c
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,35 +44,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
 
 
-On 09/18/2017 07:12 PM, Eric Blake wrote:
-> On 09/18/2017 11:33 AM, Christian Borntraeger wrote:
->> From: Jing Liu <liujbjl@linux.vnet.ibm.com>
->>
->> This patch is the s390 implementation of guest crash information, similar
->> to commit d187e08dc4 ("i386/cpu: add crash-information QOM property") and
->> the related commits. We will detect several crash reasons, with the
->> "disabled wait" being the most important one, since this is used by all
->> s390 guests as a "panic like" notification.
->>
+On 09/18/2017 06:00 PM, David Hildenbrand wrote:
+> We want to use the same code base for TCG, so let's cleanly factor it
+> out.
 > 
->> +
->> +##
->> +# @GuestPanicInformationKVMS390:
->> +#
->> +# KVM-S390 specific guest panic information (PSW)
->> +#
->> +# Since: 2.11
->> +##
->> +{'struct': 'GuestPanicInformationKVMS390',
->> + 'data': { 'psw_mask': 'uint64',
->> +           'psw_addr': 'uint64',
+> The sigp mutex is currently not really needed, as everything is
+> protected by the iothread mutex. But this could change later, so leave
+> it in place and initialize it properly from common code.
 > 
-> New interfaces should favor '-' over '_'; is there any reason we can't
-> name these 'psw-mask' and 'pws-addr'?
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  hw/s390x/s390-virtio-ccw.c |   3 +
+>  target/s390x/Makefile.objs |   1 +
+>  target/s390x/cpu.c         |   8 -
+>  target/s390x/cpu.h         |   6 +-
+>  target/s390x/internal.h    |   4 +
+>  target/s390x/kvm-stub.c    |   5 -
+>  target/s390x/kvm.c         | 349 +-----------------------------------------
+>  target/s390x/kvm_s390x.h   |   1 -
+>  target/s390x/sigp.c        | 366 +++++++++++++++++++++++++++++++++++++++++++++
 
-Can change.
+You should probably do something in MAINTAINERS for sigp.c,
+otherwise Conny and myself no longer maintain the sigp code.
