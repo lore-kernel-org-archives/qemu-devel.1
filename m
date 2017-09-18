@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53632)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54287)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dtuyh-0000pq-P2
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:16:44 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dtv0O-00027g-Gx
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:18:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dtuyb-0000jf-M9
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:16:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55502)
+	(envelope-from <dgilbert@redhat.com>) id 1dtv0N-0001wK-7J
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:18:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48210)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dtuyb-0000iV-DV
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:16:37 -0400
-Date: Mon, 18 Sep 2017 14:16:29 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170918141629.31de16de.cohuck@redhat.com>
-In-Reply-To: <2e19455c-2af8-dad4-febb-c65e1e7d7a3c@redhat.com>
-References: <20170918085542.13265-1-cohuck@redhat.com>
-	<33493193-b9fc-e76f-f30e-c23d68e34289@redhat.com>
-	<20170918141127.17b669a7.cohuck@redhat.com>
-	<2e19455c-2af8-dad4-febb-c65e1e7d7a3c@redhat.com>
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dtv0M-0001w4-Ua
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 08:18:27 -0400
+Date: Mon, 18 Sep 2017 13:18:10 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170918121809.GH2581@work-vm>
+References: <20170824192730.8440-1-dgilbert@redhat.com>
+	<20170824192730.8440-4-dgilbert@redhat.com>
+	<20170829053011.GS14174@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3] s390x/ccw: create s390 phb for compat
- reasons as well
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170829053011.GS14174@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC v2 03/32] migrate: Update
+ ram_block_discard_range for shared
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,71 +29,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de, thuth@redhat.com, pmorel@linux.vnet.ibm.com, zyimin@linux.vnet.ibm.com, pasic@linux.vnet.ibm.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, maxime.coquelin@redhat.com, a.perevalov@samsung.com, mst@redhat.com, marcandre.lureau@redhat.com, quintela@redhat.com, lvivier@redhat.com, aarcange@redhat.com, felipe@nutanix.com
 
-On Mon, 18 Sep 2017 14:13:07 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> On 18.09.2017 14:11, Cornelia Huck wrote:
-> > On Mon, 18 Sep 2017 14:03:20 +0200
-> > David Hildenbrand <david@redhat.com> wrote:
-> >   
-> >> On 18.09.2017 10:55, Cornelia Huck wrote:  
-> >>> d32bd032d8 ("s390x/ccw: create s390 phb conditionally") made
-> >>> registering the s390 pci host bridge conditional on presense
-> >>> of the zpci facility bit. Sadly, that breaks migration from
-> >>> machines that did not use the cpu model (2.7 and previous).
-> >>>
-> >>> Create the s390 phb for pre-cpu model machines as well: We can
-> >>> tweak s390_has_feat() to always indicate the zpci facility bit
-> >>> when no cpu model is available (on 2.7 and previous compat machines).
-> >>>
-> >>> Fixes: d32bd032d8 ("s390x/ccw: create s390 phb conditionally")
-> >>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> >>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> >>> ---
-> >>>
-> >>> v2->v3:
-> >>> - no longer RFC (I tested a bit more)
-> >>> - removed unrelated hunk
-> >>> - more verbose patch description
-> >>>
-> >>> I'll wait a bit for more acks/reviews and will probably send a pull
-> >>> request for s390x tomorrow or so before the amount of queued patches
-> >>> gets out of hand...
-> >>>
-> >>> ---
-> >>>  target/s390x/cpu_models.c | 3 +++
-> >>>  1 file changed, 3 insertions(+)
-> >>>
-> >>> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> >>> index c295e641e6..5169379db5 100644
-> >>> --- a/target/s390x/cpu_models.c
-> >>> +++ b/target/s390x/cpu_models.c
-> >>> @@ -196,6 +196,9 @@ bool s390_has_feat(S390Feat feat)
-> >>>              }
-> >>>          }
-> >>>  #endif
-> >>> +        if (feat == S390_FEAT_ZPCI) {
-> >>> +            return true;
-> >>> +        }
-> >>>          return 0;
-> >>>      }
-> >>>      return test_bit(feat, cpu->model->features);
-> >>>     
-> >>
-> >> 1. cpu->model will always be set for QEMU, so you can move that into the
-> >> ifdef, next do the other checks. You can even send a cleanup to remove
-> >> the if (kvm_enabled()) check.  
+* Peter Xu (peterx@redhat.com) wrote:
+> On Thu, Aug 24, 2017 at 08:27:01PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 > > 
-> > I prefer it the way it is now. There's nothing kvm specific about that
-> > bit, and cpu->model always being set is not really obvious.
-> >   
+> > The choice of call to discard a block is getting more complicated
+> > for other cases.   We use fallocate PUNCH_HOLE in any file cases;
+> > it works for both hugepage and for tmpfs.
+> > We use the DONTNEED for non-hugepage cases either where they're
+> > anonymous or where they're private.
+> > 
+> > Care should be taken when trying other backing files.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  exec.c       | 35 ++++++++++++++++++++++++-----------
+> >  trace-events |  3 +++
+> >  2 files changed, 27 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/exec.c b/exec.c
+> > index d20c34ca83..67df2909ce 100644
+> > --- a/exec.c
+> > +++ b/exec.c
+> > @@ -3573,6 +3573,7 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+> >      }
+> >  
+> >      if ((start + length) <= rb->used_length) {
+> > +        bool need_madvise, need_fallocate;
+> >          uint8_t *host_endaddr = host_startaddr + length;
+> >          if ((uintptr_t)host_endaddr & (rb->page_size - 1)) {
+> >              error_report("ram_block_discard_range: Unaligned end address: %p",
+> > @@ -3582,23 +3583,35 @@ int ram_block_discard_range(RAMBlock *rb, uint64_t start, size_t length)
+> >  
+> >          errno = ENOTSUP; /* If we are missing MADVISE etc */
+> >  
+> > -        if (rb->page_size == qemu_host_page_size) {
+> > -#if defined(CONFIG_MADVISE)
+> > -            /* Note: We need the madvise MADV_DONTNEED behaviour of definitely
+> > -             * freeing the page.
+> > -             */
+> > -            ret = madvise(host_startaddr, length, MADV_DONTNEED);
+> > -#endif
+> > -        } else {
+> > -            /* Huge page case  - unfortunately it can't do DONTNEED, but
+> > -             * it can do the equivalent by FALLOC_FL_PUNCH_HOLE in the
+> > -             * huge page file.
+> > +        /* The logic here is messy;
+> > +         *    madvise DONTNEED fails for hugepages
+> > +         *    fallocate works on hugepages and shmem
+> > +         */
+> > +        need_madvise = (rb->page_size == qemu_host_page_size);
+> > +        need_fallocate = rb->fd != -1;
+> > +        if (need_fallocate) {
+> > +            /* For a file, this causes the area of the file to be zero'd
+> > +             * if read, and for hugetlbfs also causes it to be unmapped
+> > +             * so a userfault will trigger.
+> >               */
+> >  #ifdef CONFIG_FALLOCATE_PUNCH_HOLE
+> >              ret = fallocate(rb->fd, FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE,
+> >                              start, length);
+> >  #endif
+> >          }
+> > +        /* i.e. need madvise but skip it if the fallocate failed */
+> > +        if (need_madvise && (!need_fallocate || (ret == 0))) {
 > 
-> I's already kvm specific as this can never happen with TCG :)
+> I'll slightly prefer:
 > 
-> But whatever you prefer. This is good enough to fix the problem.
+>   trace_ram_block_discard_range();
+> 
+>   if (need_fallocate) {
+>     ret = fallocate();
+>     if (ret) {
+>       error_report();
+>       goto err;
+>     }
+>   }
+> 
+>   if (need_madvise) {
+>     ret = madvise();
+>     if (ret) {
+>       error_report();
+>       goto err;
+>     }
+>   }
 
-Sure, we can revisit that one later. I plan to send a pull request
-tomorrow.
+OK, I've reworked it more like that.
+(It's a little more complex because of the ifdef's)
+
+Dave
+
+> But it is personal preference.  For either way:
+> 
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> 
+> > +            /* For normal RAM this causes it to be unmapped,
+> > +             * for shared memory it causes the local mapping to disappear
+> > +             * and to fall back on the file contents (which we just
+> > +             * fallocate'd away).
+> > +             */
+> > +#if defined(CONFIG_MADVISE)
+> > +            ret =  madvise(host_startaddr, length, MADV_DONTNEED);
+> > +#endif
+> > +        }
+> > +        trace_ram_block_discard_range(rb->idstr, host_startaddr,
+> > +                                      need_madvise, need_fallocate, ret);
+> >          if (ret) {
+> >              ret = -errno;
+> >              error_report("ram_block_discard_range: Failed to discard range "
+> > diff --git a/trace-events b/trace-events
+> > index 1f50f56d9d..213ee34f89 100644
+> > --- a/trace-events
+> > +++ b/trace-events
+> > @@ -55,6 +55,9 @@ dma_complete(void *dbs, int ret, void *cb) "dbs=%p ret=%d cb=%p"
+> >  dma_blk_cb(void *dbs, int ret) "dbs=%p ret=%d"
+> >  dma_map_wait(void *dbs) "dbs=%p"
+> >  
+> > +# exec.c
+> > +ram_block_discard_range(const char *rbname, void *hva, bool need_madvise, bool need_fallocate, int ret) "%s@%p: madvise: %d fallocate: %d ret: %d"
+> > +
+> >  # memory.c
+> >  memory_region_ops_read(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+> >  memory_region_ops_write(int cpu_index, void *mr, uint64_t addr, uint64_t value, unsigned size) "cpu %d mr %p addr 0x%"PRIx64" value 0x%"PRIx64" size %u"
+> > -- 
+> > 2.13.5
+> > 
+> 
+> -- 
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
