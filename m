@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37573)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dtssu-0007Cy-9D
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:02:42 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dtsw0-00082u-8F
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:05:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dtsso-00050o-Cb
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:02:36 -0400
-Date: Mon, 18 Sep 2017 11:02:26 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170918100226.GD31063@stefanha-x1.localdomain>
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170914154221.GD7370@stefanha-x1.localdomain>
-	<ff9cac4f-5dba-666c-fc0d-8c1e3f23e6c9@redhat.com>
+	(envelope-from <cohuck@redhat.com>) id 1dtsvw-00076U-IJ
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:05:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41558)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dtsvw-00075m-2h
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 06:05:44 -0400
+Date: Mon, 18 Sep 2017 12:05:36 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170918120536.6186c7fe.cohuck@redhat.com>
+In-Reply-To: <6c53f939cf2d64b66d2a6878b29c9bf3820f3d5b.1505485574.git.alifm@linux.vnet.ibm.com>
+References: <cover.1505485574.git.alifm@linux.vnet.ibm.com>
+	<6c53f939cf2d64b66d2a6878b29c9bf3820f3d5b.1505485574.git.alifm@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ff9cac4f-5dba-666c-fc0d-8c1e3f23e6c9@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 00/18] block/mirror: Add
- active-sync mirroring
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 2/2] virtio-gpu-ccw: Create a virtio gpu
+ device for the ccw bus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,53 +28,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Farhan Ali <alifm@linux.vnet.ibm.com>, kraxel@redhat.com
+Cc: qemu-devel@nongnu.org, borntraeger@de.ibm.com, thuth@redhat.com, pasic@linux.vnet.ibm.com
 
-On Sat, Sep 16, 2017 at 04:02:45PM +0200, Max Reitz wrote:
-> On 2017-09-14 17:42, Stefan Hajnoczi wrote:
-> > On Wed, Sep 13, 2017 at 08:18:52PM +0200, Max Reitz wrote:
-> >> There may be a couple of things to do on top of this series:
-> >> - Allow switching between active and passive mode at runtime: This
-> >>   should not be too difficult to implement, the main question is how to
-> >>   expose it to the user.
-> >>   (I seem to recall we wanted some form of block-job-set-option
-> >>   command...?)
-> >>
-> >> - Implement an asynchronous active mode: May be detrimental when it
-> >>   comes to convergence, but it might be nice to have anyway.  May or may
-> >>   not be complicated to implement.
-> > 
-> > Ideally the user doesn't have to know about async vs sync.  It's an
-> > implementation detail.
-> > 
-> > Async makes sense during the bulk copy phase (e.g. sync=full) because
-> > guest read/write latencies are mostly unaffected.  Once the entire
-> > device has been copied there are probably still dirty blocks left
-> > because the guest touched them while the mirror job was running.  At
-> > that point it definitely makes sense to switch to synchronous mirroring
-> > in order to converge.
+On Fri, 15 Sep 2017 10:40:32 -0400
+Farhan Ali <alifm@linux.vnet.ibm.com> wrote:
+
+> Wire up the virtio-gpu device for the CCW bus. The virtio-gpu
+> is a virtio-1 device, so disable revision 0.
 > 
-> Makes sense, but I'm not sure whether it really is just an
-> implementation detail.  If you're in the bulk copy phase in active/async
-> mode and you have enough write requests with the target being slow
-> enough, I suspect you might still not get convergence then (because the
-> writes to the target yield for a long time while ever more write
-> requests pile up) -- so then you'd just shift the dirty tracking from
-> the bitmap to a list of requests in progress.
+> Signed-off-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  hw/s390x/virtio-ccw.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/s390x/virtio-ccw.h | 10 ++++++++++
+>  2 files changed, 59 insertions(+)
 > 
-> And I think we do want the bulk copy phase to guarantee convergence,
-> too, usually (when active/foreground/synchronous mode is selected).  If
-> we don't, then that's a policy decision and would be up to libvirt, as I
-> see it.
+> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> index b1976fd..12cacf6 100644
+> --- a/hw/s390x/virtio-ccw.c
+> +++ b/hw/s390x/virtio-ccw.c
 
-This is a good point.  Bulk copy should converge too.
+> @@ -1815,6 +1863,7 @@ static void virtio_ccw_register(void)
+>      type_register_static(&vhost_vsock_ccw_info);
+>  #endif
+>      type_register_static(&virtio_ccw_crypto);
+> +    type_register_static(&virtio_ccw_gpu);
 
-Can we measure the target write rate and guest write rate?  A heuristic
-can choose between async vs sync based on the write rates.
+Not a critique of this patch, just an observation: For virtio-ccw, we
+tend to collect the various virtio devices all in the same file. For
+virtio-pci, they sometimes get separate files. Not sure which is
+better, but it means that sometimes only the virtio-pci version is
+added...
 
-For example, if the guest write rate has been larger than the target
-write rate for the past 10 seconds during the bulk phase, switch to
-synchronous mirroring.
+>  }
+>  
+>  type_init(virtio_ccw_register)
 
-Stefan
+The patch looks good to me.
+
+Gerd, if the first patch looks good to you, I can take both patches
+through the s390 tree. If you prefer to merge the patches yourself,
+that's fine with me as well.
+
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
