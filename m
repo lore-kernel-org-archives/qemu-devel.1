@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56985)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59372)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dtxFJ-0007sy-8m
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:42:07 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dtxLQ-0003dD-Lp
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:48:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dtxFI-0006oK-Ay
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:42:01 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:52262)
+	(envelope-from <stefanha@gmail.com>) id 1dtxLN-0001KA-Ea
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:48:20 -0400
+Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:38787)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dtxFI-0006mz-55
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:42:00 -0400
-Received: by mail-wr0-x231.google.com with SMTP id c23so679005wrg.9
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 07:42:00 -0700 (PDT)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dtxLN-0001Jt-76
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 10:48:17 -0400
+Received: by mail-wr0-x243.google.com with SMTP id p37so489183wrb.5
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 07:48:17 -0700 (PDT)
+Date: Mon, 18 Sep 2017 15:48:13 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170918144813.GD4141@stefanha-x1.localdomain>
+References: <20170912152153.7729-1-brandon.carpenter@cypherpath.com>
 MIME-Version: 1.0
-In-Reply-To: <87poasgjyh.fsf@frigg.lan>
-References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
-	<150529666493.10902.14830445134051381968.stgit@frigg.lan>
-	<CAFEAcA9p9B8AFaaSaSOOSsFsEhHW=XPLBFs5MrozWq=7p4_9Zg@mail.gmail.com>
-	<87poasgjyh.fsf@frigg.lan>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 18 Sep 2017 15:41:38 +0100
-Message-ID: <CAFEAcA8XP+8Jz9Dn-mEQ3CCrVj00t3HA0praQ-OSggtQGAmQ5Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170912152153.7729-1-brandon.carpenter@cypherpath.com>
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] Update websocket code to more fully
+ support the RFC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,28 +29,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Brandon Carpenter <brandon.carpenter@cypherpath.com>
+Cc: qemu-devel@nongnu.org, "Daniel P. Berrange" <berrange@redhat.com>
 
-On 15 September 2017 at 14:39, Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> wr=
-ote:
-> Peter Maydell writes:
->> This looks like it's exposing too much implementation detail.
->> We should just provide an API for "hook to be called for
->> memory writes" which gets all the information when it
->> is called. I don't think we should expose any kind of
->> "this hook is called at translation time" at all.
->
-> The differentiation between translation-time and execution-time is key to
-> perform certain analysis efficiently.
+On Tue, Sep 12, 2017 at 08:21:46AM -0700, Brandon Carpenter wrote:
+> We've been experiencing issues where the qemu websocket server closes
+> connections from noVNC clients for no apparent reason. Debugging shows
+> that certain web browsers are injecting ping and pong frames when the
+> connection becomes idle. Some browsers send those frames without a
+> payload, which also is causing closure. This patch series addresses
+> these issues by making the websocket server more conformant to RFC
+> 6455 - The WebSocket Protocol.
+> 
+> Remembering the opcode is sufficient for handling fragmented frames from
+> the client, which may be introduced by an intermediary server/proxy.
+> Respond to pings and ignore pongs rather than close the connection as
+> many browsers use ping/pong to test an idle connection. Close
+> connections according to the RFC, including providing a reason code and
+> message to aid debugging of unexpected disconnects. Empty payloads
+> should not cause a disconnect.
+> 
+> While updating the websocket code, several other bugs were discovered
+> for which patches are also included early in the set.
+> 
+> Brandon Carpenter (7):
+>   io: Always remove an old channel watch before adding a new one
+>   io: Small updates in preparation for websocket changes
+>   io: Add support for fragmented websocket binary frames
+>   io: Allow empty websocket payload
+>   io: Ignore websocket PING and PONG frames
+>   io: Reply to ping frames
+>   io: Attempt to send websocket close messages to client
+> 
+>  include/io/channel-websock.h |   2 +
+>  io/channel-websock.c         | 282 +++++++++++++++++++++++++++----------------
+>  ui/vnc-auth-vencrypt.c       |   3 +
+>  ui/vnc-ws.c                  |   6 +
+>  ui/vnc.c                     |   4 +
+>  5 files changed, 194 insertions(+), 103 deletions(-)
+> 
+> -- 
+> 2.14.1
 
-It's also exposing internal QEMU implementation detail.
-What if in future we decide to switch from our current
-setup to always interpreting guest instructions as a
-first pass with JITting done only in the background for
-hot code?
+Hi Brandon,
+Thanks for the patch series!  Please CC the relevant maintainer on
+future patches.  I've CCed Daniel Berrange on this email to bring your
+work to his attention.
 
-Sticking to instrumentation events that correspond exactly to guest
-execution events means they won't break or expose internals.
+  $ scripts/get_maintainer.pl -f io/channel-websock.c
+  "Daniel P. Berrange" <berrange@redhat.com> (maintainer:I/O Channels)
+  qemu-devel@nongnu.org (open list:All patches CC here)
 
-thanks
--- PMM
+Stefan
+
+> 
+> 
+> -- 
+> 
+> 
+> CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is 
+> for the sole use of the intended recipient(s) and may contain proprietary, 
+> confidential or privileged information or otherwise be protected by law. 
+> Any unauthorized review, use, disclosure or distribution is prohibited. If 
+> you are not the intended recipient, please notify the sender and destroy 
+> all copies and the original message.
+> 
