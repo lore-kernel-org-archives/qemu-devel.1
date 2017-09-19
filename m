@@ -1,35 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45769)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1duGaU-0007kI-IP
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:21:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1duGaU-0007kJ-Ik
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:21:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1duGaR-0001Hq-EN
+	(envelope-from <bounces@canonical.com>) id 1duGaR-0001I3-Nu
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:21:10 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40278)
+Received: from indium.canonical.com ([91.189.90.7]:40294)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1duGaR-0001Gx-7N
+	id 1duGaR-0001H9-HF
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:21:07 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
 	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1duGaP-0001TF-0O
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 11:21:05 +0000
+	id 1duGaO-0001UJ-If
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 11:21:04 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 00D442E84A0
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 11:21:04 +0000 (UTC)
+	by loganberry.canonical.com (Postfix) with ESMTP id B28DF2E8498
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 11:21:02 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Sep 2017 11:10:30 -0000
-From: Igor <imammedo@redhat.com>
+Date: Tue, 19 Sep 2017 11:10:18 -0000
+From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
 Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
 Sender: bounces@canonical.com
 References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
-	<150581754021.5372.7659460549123078484.malone@wampee.canonical.com>
-Message-Id: <20170919131030.23f00c8c@nial.brq.redhat.com>
+Message-Id: <150581941823.23029.6553588011723978696.malone@gac.canonical.com>
 Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on
- qemu 2.10 (works on 2.9)
+Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
+ 2.10 (works on 2.9)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,17 +39,28 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-On Tue, 19 Sep 2017 10:39:00 -0000
-Gerd Hoffmann <1715700@bugs.launchpad.net> wrote:
+I'd also like to mention that, when we originally worked on the VBE
+Shim, I tried to put it elsewhere. Obviously it has to be pointed-to by
+a real mode interrupt vector, which limits quite a bit where it can go
+at all; the point is that I tried to put it into low *RAM* (under
+640KB).
 
-> could be this commit breaks vbeshim ...
-> =
+It didn't work. Windows 7 would only accept the VBE Shim when it existed
+in the C segment, i.e. where a VGA option ROM would normally be located.
 
+This is just to say that moving the VBE Shim out of the C segment (into
+real-mode addressible RAM) will not work.
 
-Did a bit of testing: w7 iso boots to install screen with seabios but
-stuck at win boot logo with ovmf.
+The symptom described in the original report is likely due to
 
-I've heard (maybe wrongly) that seabios would also break in that case.
+- Windows following the 0x10 interrupt vector (from page 0) to the C
+segment,
+
+- copying a bunch of zeros into its real mode emulator from the C
+segment (where now no actual VBE code can be found),
+
+- and then seeing no results when the real mode emulator executes the
+zeros.
 
 -- =
 
