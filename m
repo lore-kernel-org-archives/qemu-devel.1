@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49029)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1duK3Z-0007zx-8M
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:03:31 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1duK3c-00082S-5w
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:03:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1duK3V-0003bi-80
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:03:25 -0400
-Received: from mail-io0-x236.google.com ([2607:f8b0:4001:c06::236]:57289)
+	(envelope-from <richard.henderson@linaro.org>) id 1duK3W-0003cW-61
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:03:28 -0400
+Received: from mail-io0-x230.google.com ([2607:f8b0:4001:c06::230]:47577)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1duK3V-0003Yf-4J
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:03:21 -0400
-Received: by mail-io0-x236.google.com with SMTP id m103so681256iod.13
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 08:03:19 -0700 (PDT)
+	id 1duK3W-0003c4-1V
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:03:22 -0400
+Received: by mail-io0-x230.google.com with SMTP id e189so734672ioa.4
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 08:03:21 -0700 (PDT)
+Received: from bigtime.twiddle.net (162.189-204-159.bestel.com.mx.
+	[189.204.159.162])
+	by smtp.gmail.com with ESMTPSA id h63sm360621otb.59.2017.09.19.08.03.18
+	for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+	Tue, 19 Sep 2017 08:03:19 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 19 Sep 2017 10:03:05 -0500
-Message-Id: <20170919150313.10833-1-richard.henderson@linaro.org>
+Date: Tue, 19 Sep 2017 10:03:06 -0500
+Message-Id: <20170919150313.10833-2-richard.henderson@linaro.org>
+In-Reply-To: <20170919150313.10833-1-richard.henderson@linaro.org>
+References: <20170919150313.10833-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v2 0/8] Support the Capstone disassembler
+Subject: [Qemu-devel] [PATCH v2 1/8] target/i386: Convert to disas_set_info
+ hook
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,75 +37,138 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
 
-Changes since v1:
-  * Don't silently ignore unknown insns.
-  * Don't copy memory when dumping host insns.
-  * More properly handle dumping from the monitor.
-  * Drop enabling for s390x, sparc, mips.
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ disas.c                 | 22 ++--------------------
+ monitor.c               | 21 ---------------------
+ target/i386/cpu.c       | 12 ++++++++++++
+ target/i386/translate.c |  8 +-------
+ 4 files changed, 15 insertions(+), 48 deletions(-)
 
-    The s390x and sparc support in capstone is pretty poor.  It seems
-    to only handle userland instructions -- at least that's the impression
-    I get from the hordes of insns rendered as ".byte" within the first
-    few TB of booting each machine.  I dropped the mips patch simply
-    because there are too many capstone options and it probably needs
-    more testing than I've given it.
-
-    If there are any IBM folk paying attention, it would be awesome if
-    some time could be found somewhere to improve capstone for zSeries.
-    You're in the same boat that i386 is in -- namely that our ancient
-    binutils gplv2 code is neigh useless for modern systems.  It would
-    be really really nice to have a better disassembler for qemu.
-
-
-r~
-
-
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Alexander Graf <agraf@suse.de>
-
-Richard Henderson (8):
-  target/i386: Convert to disas_set_info hook
-  target/ppc: Convert to disas_set_info hook
-  disas: Remove unused flags arguments
-  disas: Support the Capstone disassembler library
-  i386: Support Capstone in disas_set_info
-  arm: Support Capstone in disas_set_info
-  ppc: Support Capstone in disas_set_info
-  disas: Remove monitor_disas_is_physical
-
- include/disas/bfd.h           |   4 +
- include/disas/capstone.h      |  38 ++++++
- include/disas/disas.h         |   4 +-
- include/exec/log.h            |   4 +-
- disas.c                       | 310 ++++++++++++++++++++++++++++++------------
- monitor.c                     |  29 +---
- target/alpha/translate.c      |   2 +-
- target/arm/cpu.c              |  21 ++-
- target/arm/translate-a64.c    |   3 +-
- target/arm/translate.c        |   3 +-
- target/cris/translate.c       |   3 +-
- target/hppa/translate.c       |   2 +-
- target/i386/cpu.c             |  19 +++
- target/i386/translate.c       |   8 +-
- target/lm32/translate.c       |   2 +-
- target/m68k/translate.c       |   2 +-
- target/microblaze/translate.c |   2 +-
- target/mips/translate.c       |   2 +-
- target/nios2/translate.c      |   2 +-
- target/openrisc/translate.c   |   2 +-
- target/ppc/translate.c        |   5 +-
- target/ppc/translate_init.c   |  27 ++++
- target/s390x/translate.c      |   2 +-
- target/sh4/translate.c        |   2 +-
- target/sparc/translate.c      |   2 +-
- target/tricore/translate.c    |   2 +-
- target/unicore32/translate.c  |   2 +-
- target/xtensa/translate.c     |   2 +-
- configure                     |  26 ++++
- 29 files changed, 380 insertions(+), 152 deletions(-)
- create mode 100644 include/disas/capstone.h
-
+diff --git a/disas.c b/disas.c
+index d6a1eb9c8e..2be716fdb2 100644
+--- a/disas.c
++++ b/disas.c
+@@ -205,16 +205,7 @@ void target_disas(FILE *out, CPUState *cpu, target_ulong code,
+         cc->disas_set_info(cpu, &s.info);
+     }
+ 
+-#if defined(TARGET_I386)
+-    if (flags == 2) {
+-        s.info.mach = bfd_mach_x86_64;
+-    } else if (flags == 1) {
+-        s.info.mach = bfd_mach_i386_i8086;
+-    } else {
+-        s.info.mach = bfd_mach_i386_i386;
+-    }
+-    s.info.print_insn = print_insn_i386;
+-#elif defined(TARGET_PPC)
++#if defined(TARGET_PPC)
+     if ((flags >> 16) & 1) {
+         s.info.endian = BFD_ENDIAN_LITTLE;
+     }
+@@ -390,16 +381,7 @@ void monitor_disas(Monitor *mon, CPUState *cpu,
+         cc->disas_set_info(cpu, &s.info);
+     }
+ 
+-#if defined(TARGET_I386)
+-    if (flags == 2) {
+-        s.info.mach = bfd_mach_x86_64;
+-    } else if (flags == 1) {
+-        s.info.mach = bfd_mach_i386_i8086;
+-    } else {
+-        s.info.mach = bfd_mach_i386_i386;
+-    }
+-    s.info.print_insn = print_insn_i386;
+-#elif defined(TARGET_PPC)
++#if defined(TARGET_PPC)
+     if (flags & 0xFFFF) {
+         /* If we have a precise definition of the instruction set, use it. */
+         s.info.mach = flags & 0xFFFF;
+diff --git a/monitor.c b/monitor.c
+index 058045b3cb..d9d364bb9e 100644
+--- a/monitor.c
++++ b/monitor.c
+@@ -1310,27 +1310,6 @@ static void memory_dump(Monitor *mon, int count, int format, int wsize,
+ 
+     if (format == 'i') {
+         int flags = 0;
+-#ifdef TARGET_I386
+-        CPUArchState *env = mon_get_cpu_env();
+-        if (wsize == 2) {
+-            flags = 1;
+-        } else if (wsize == 4) {
+-            flags = 0;
+-        } else {
+-            /* as default we use the current CS size */
+-            flags = 0;
+-            if (env) {
+-#ifdef TARGET_X86_64
+-                if ((env->efer & MSR_EFER_LMA) &&
+-                    (env->segs[R_CS].flags & DESC_L_MASK))
+-                    flags = 2;
+-                else
+-#endif
+-                if (!(env->segs[R_CS].flags & DESC_B_MASK))
+-                    flags = 1;
+-            }
+-        }
+-#endif
+ #ifdef TARGET_PPC
+         CPUArchState *env = mon_get_cpu_env();
+         flags = msr_le << 16;
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 69676e13e1..b869a69c53 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4099,6 +4099,17 @@ static bool x86_cpu_has_work(CPUState *cs)
+             !(env->hflags & HF_SMM_MASK));
+ }
+ 
++static void x86_disas_set_info(CPUState *cs, disassemble_info *info)
++{
++    X86CPU *cpu = X86_CPU(cs);
++    CPUX86State *env = &cpu->env;
++
++    info->mach = (env->hflags & HF_CS64_MASK ? bfd_mach_x86_64
++                  : env->hflags & HF_CS32_MASK ? bfd_mach_i386_i386
++                  : bfd_mach_i386_i8086);
++    info->print_insn = print_insn_i386;
++}
++
+ static Property x86_cpu_properties[] = {
+ #ifdef CONFIG_USER_ONLY
+     /* apic_id = 0 by default for *-user, see commit 9886e834 */
+@@ -4204,6 +4215,7 @@ static void x86_cpu_common_class_init(ObjectClass *oc, void *data)
+ #endif
+     cc->cpu_exec_enter = x86_cpu_exec_enter;
+     cc->cpu_exec_exit = x86_cpu_exec_exit;
++    cc->disas_set_info = x86_disas_set_info;
+ 
+     dc->user_creatable = true;
+ }
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index de0c989763..06c2cb9e64 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -8526,15 +8526,9 @@ static void i386_tr_disas_log(const DisasContextBase *dcbase,
+                               CPUState *cpu)
+ {
+     DisasContext *dc = container_of(dcbase, DisasContext, base);
+-    int disas_flags = !dc->code32;
+ 
+     qemu_log("IN: %s\n", lookup_symbol(dc->base.pc_first));
+-#ifdef TARGET_X86_64
+-    if (dc->code64) {
+-        disas_flags = 2;
+-    }
+-#endif
+-    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size, disas_flags);
++    log_target_disas(cpu, dc->base.pc_first, dc->base.tb->size, 0);
+ }
+ 
+ static const TranslatorOps i386_tr_ops = {
 -- 
 2.13.5
