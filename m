@@ -1,30 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49029)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50095)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1duNrT-0006th-6d
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:07:12 -0400
+	(envelope-from <thuth@redhat.com>) id 1duNsm-0007bW-Tt
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:08:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1duNrQ-0001GQ-2d
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:07:11 -0400
-Received: from mail-io0-x229.google.com ([2607:f8b0:4001:c06::229]:53833)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1duNrP-0001Fq-Tt
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:07:08 -0400
-Received: by mail-io0-x229.google.com with SMTP id q11so1420383ioe.10
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 12:07:07 -0700 (PDT)
-References: <20170918104624.14743-1-laurent@vivier.eu>
-	<a79537e9-1053-128e-e63b-8ce969beb12d@linaro.org>
-	<e67746f6-6855-c761-f4ff-dd6b19391eda@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <10c85d62-6cd3-c555-529b-59b8de2c6ac7@linaro.org>
-Date: Tue, 19 Sep 2017 14:06:58 -0500
+	(envelope-from <thuth@redhat.com>) id 1duNsj-0002aK-Nr
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:08:32 -0400
+References: <1505298088-10878-1-git-send-email-thuth@redhat.com>
+	<ab1516cb-9590-0833-b872-0e691e8ace49@redhat.com>
+	<23cfaae7-7744-9865-6f43-9b74b2d60ec9@redhat.com>
+	<a59a9f94-a8e1-29e0-8456-dbcd07b359b0@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e431646d-808c-3eac-7cc6-b192fd1f0dc3@redhat.com>
+Date: Tue, 19 Sep 2017 21:08:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <e67746f6-6855-c761-f4ff-dd6b19391eda@redhat.com>
+In-Reply-To: <a59a9f94-a8e1-29e0-8456-dbcd07b359b0@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH] softfloat: rename make_float[x80|128]_init
- to const_float[x80|128]
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Clean up some bad code
+ in the vvfat driver
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,33 +27,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Laszlo Ersek <lersek@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: John Snow <jsnow@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 09/19/2017 12:39 PM, Eric Blake wrote:
-> On 09/19/2017 11:30 AM, Richard Henderson wrote:
->> On 09/18/2017 05:46 AM, Laurent Vivier wrote:
->>> Redefine make_floatx80() and make_float128() as make_float16(),
->>> make_float32() and make_float64() using a variable and not only
->>> a cast.
+On 19.09.2017 21:01, John Snow wrote:
 > 
->>> -#define make_floatx80(exp, mant) ((floatx80) { mant, exp })
->>> -#define make_floatx80_init(exp, mant) { .low = mant, .high = exp }
->>> +#define make_floatx80(exp, mant) __extension__ \
->>> +    ({ floatx80 f80_val = { .low = mant, .high = exp }; f80_val; })
->>> +#define const_floatx80(exp, mant) { .low = mant, .high = exp }
 > 
+> On 09/19/2017 04:06 AM, Paolo Bonzini wrote:
+>> On 13/09/2017 21:08, John Snow wrote:
+>>>
+>>>
+>>> On 09/13/2017 06:21 AM, Thomas Huth wrote:
+>>>> Remove the unnecessary home-grown redefinition of the assert() macro here,
+>>>> and remove the unusable debug code at the end of the checkpoint() function.
+>>>> The code there uses assert() with side-effects (assignment to the "mapping"
+>>>> variable), which should be avoided. Looking more closely, it seems as it is
+>>>> apparently also only usable for one certain directory layout (with a file
+>>>> named USB.H in it) and thus is of no use for the rest of the world.
+>>>>
+>>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>>
+>>> Farewell, bitrot code.
+>>>
+>>> Reviewed-by: John Snow <jsnow@redhat.com>
+>>>
+>>> Out of curiosity, I wonder ...
+>>>
+>>> jhuston@probe (foobar) ~/s/qemu> git grep '#if 0' | wc -l
+>>> 320
 >>
->> I don't like this part -- (type){ init } is a standard C99 compound literal.
->> There's no point using a gcc extension instead.
+>>
+>> $ git grep -c '#if 0' | sort -k2 --field-separator=: -n
+>> ...
+>> hw/net/eepro100.c:21
+>> target/ppc/cpu-models.h:76
+>>
+>> whoa :)
+>>
 > 
-> The C99 compound literal is not a const initializer in all situations,
-> though :( 
+> Wonder if '#if 0' should be against the style guide / in checkpatch.
 
-A compound literal not officially a const initializer in any situation.  That
-it is accepted by gcc as a const initializer is an extension.
+checkpatch already complains if you have a "#if 0" in your patch, so I
+think we should be pretty fine here already - but of course you can
+still add a paragraph to the CODING_STYLE if you like.
 
-I don't dispute const_floatx80, but the change to make_floatx80.
-
-
-r~
+ Thomas
