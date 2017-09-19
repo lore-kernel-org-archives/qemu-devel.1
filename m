@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60931)
-	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1duJgq-0006dT-Id
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:39:57 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32802)
+	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
+	id 1duJh9-0006uE-QZ
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:40:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1duJgp-00049g-Iw
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:39:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42330)
+	(envelope-from <pl@kamp.de>) id 1duJh5-0004I9-L6
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:40:15 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:46112 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1duJgp-00049T-8z
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:39:55 -0400
-References: <20170919074314.10350-1-borntraeger@de.ibm.com>
-	<70c1733f-6ff7-ddd0-2799-308bf6ad2dd2@redhat.com>
-	<0f1c2678-bf5d-d931-eb7d-0baaf1b4b675@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <e75bfdc7-2a78-41dd-c267-bb76de859899@redhat.com>
-Date: Tue, 19 Sep 2017 16:39:51 +0200
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1duJh5-0004GU-CW
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:40:11 -0400
+References: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
+	<20170919143829.GH2107@work-vm>
+From: Peter Lieven <pl@kamp.de>
+Message-ID: <48cdd8ff-4940-9aa1-9aba-1acf8ce74ebe@kamp.de>
+Date: Tue, 19 Sep 2017 16:40:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <0f1c2678-bf5d-d931-eb7d-0baaf1b4b675@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20170919143829.GH2107@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/cpu: expose the guest crash
- information
+Content-Language: en-US
+Subject: Re: [Qemu-devel] Block Migration and CPU throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +28,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Jing Liu <liujbjl@linux.vnet.ibm.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
 
-On 19.09.2017 15:56, Christian Borntraeger wrote:
-> 
-> 
-> On 09/19/2017 03:14 PM, David Hildenbrand wrote:
+Am 19.09.2017 um 16:38 schrieb Dr. David Alan Gilbert:
+> * Peter Lieven (pl@kamp.de) wrote:
+>> Hi,
 >>
->>>      CPUState *cs = CPU(obj);
->>> @@ -291,6 +345,8 @@ static void s390_cpu_initfn(Object *obj)
->>>      cs->exception_index = EXCP_HLT;
->>>      object_property_add(OBJECT(cpu), "id", "int64_t", s390x_cpu_get_id,
->>>                          s390x_cpu_set_id, NULL, NULL, NULL);
->>> +    object_property_add(obj, "crash-information", "GuestPanicInformation",
->>> +                        s390x_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL);
->>>      s390_cpu_model_register_props(obj);
->>>  #if !defined(CONFIG_USER_ONLY)
->>>      qemu_get_timedate(&tm, 0);
->>> @@ -517,6 +573,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
->>>      cc->do_interrupt = s390_cpu_do_interrupt;
->>>  #endif
->>>      cc->dump_state = s390_cpu_dump_state;
->>> +    cc->get_crash_info = s390x_cpu_get_crash_info;
->>>      cc->set_pc = s390_cpu_set_pc;
->>>      cc->gdb_read_register = s390_cpu_gdb_read_register;
->>>      cc->gdb_write_register = s390_cpu_gdb_write_register;
->>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->>> index 0bd97a5..dba32db 100644
->>> --- a/target/s390x/cpu.h
->>> +++ b/target/s390x/cpu.h
->>> @@ -396,6 +396,12 @@ static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
->>>  #define EXCP_IO  7 /* I/O interrupt */
->>>  #define EXCP_MCHK 8 /* machine check */
->>>  
->>> +/* Crash cases. */
->>> +#define EXCP_CRASH_PGM 9
->>> +#define EXCP_CRASH_EXT 10
->>> +#define EXCP_CRASH_WAITPSW 11
->>> +#define EXCP_CRASH_OPEREXC 12
->>> +
+>> I just noticed that CPU throttling and Block Migration don't work together very well.
+>> During block migration the throttling heuristic detects that we obviously make no progress
+>> in ram transfer. But the reason is the running block migration and not a too high dirty pages rate.
 >>
->> Okay, looking at cpu_handle_exception() I am pretty sure this won't work
->> with TCG unless cpu->exception_index >= EXCP_INTERRUPT. Maybe define new
->> EXCP_CRASH or store this information somewhere else inside s390 CPU?
-> 
-> Just asking: 
-> Would it be ok to define EXCP_CRASH as 0x20000 or so?
-> 
+>> The result is that any VM is throttled by 99% during block migration.
+> Hmm that's unfortunate; do you have a bandwidth set lower than your
+> actual network connection? I'm just wondering if it's actually going
+> between the block and RAM iterative sections or getting stuck in ne.
 
-I guess the main problem with EXCP_CRASH is that it will get lost during
-migration (if I am not wrong). So cpu->exception_index should most
-probably really only be used for "temporary" things, e.g. to exit the
-main loop.
+It happens also if source and dest are on the same machine and speed is set to 100G.
 
-Apart from that, I guess introducing it next to the other common code
-EXCP_ defines sould be fine!
-
--- 
-
-Thanks,
-
-David
+Peter
