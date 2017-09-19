@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41705)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41673)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duHtO-00080J-Aq
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:44:47 -0400
-Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duHtN-0007Bi-Dv
+	(envelope-from <kwolf@redhat.com>) id 1duHtN-0007z5-1u
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:44:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55756)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1duHtN-0007B4-7u
+Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
+	(envelope-from <kwolf@redhat.com>) id 1duHtG-00077K-Td
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:44:45 -0400
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 19 Sep 2017 14:44:40 +0200
-Message-Id: <20170919124440.30017-3-pbonzini@redhat.com>
-In-Reply-To: <20170919124440.30017-1-pbonzini@redhat.com>
-References: <20170919124440.30017-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 43/50] update-linux-headers: prepare for
- hyperv.h removal
+Date: Tue, 19 Sep 2017 14:44:24 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170919124424.GD3789@localhost.localdomain>
+References: <20170918185819.5984-1-eblake@redhat.com>
+	<20170918185819.5984-19-eblake@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170918185819.5984-19-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 18/20] qcow2: Switch store_bitmap_data()
+ to byte-based iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,40 +24,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Roman Kagan <rkagan@virtuozzo.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-From: Roman Kagan <rkagan@virtuozzo.com>
+Am 18.09.2017 um 20:58 hat Eric Blake geschrieben:
+> Now that we have adjusted the majority of the calls this function
+> makes to be byte-based, it is easier to read the code if it makes
+> passes over the image using bytes rather than sectors.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Reviewed-by: John Snow <jsnow@redhat.com>
+> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> 
+> ---
+> v7: rebase to earlier change, make rounding of offset obvious (no semantic
+> change, so R-b kept) [Kevin]
+> v5-v6: no change
+> v4: new patch
+> ---
+>  block/qcow2-bitmap.c | 26 +++++++++++---------------
+>  1 file changed, 11 insertions(+), 15 deletions(-)
+> 
+> diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+> index 692ce0de88..302fffd6e1 100644
+> --- a/block/qcow2-bitmap.c
+> +++ b/block/qcow2-bitmap.c
+> @@ -1072,10 +1072,9 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
+>  {
+>      int ret;
+>      BDRVQcow2State *s = bs->opaque;
+> -    int64_t sector;
+> -    uint64_t limit, sbc;
+> +    int64_t offset;
+> +    uint64_t limit;
+>      uint64_t bm_size = bdrv_dirty_bitmap_size(bitmap);
+> -    uint64_t bm_sectors = DIV_ROUND_UP(bm_size, BDRV_SECTOR_SIZE);
+>      const char *bm_name = bdrv_dirty_bitmap_name(bitmap);
+>      uint8_t *buf = NULL;
+>      BdrvDirtyBitmapIter *dbi;
+> @@ -1100,18 +1099,17 @@ static uint64_t *store_bitmap_data(BlockDriverState *bs,
+>      dbi = bdrv_dirty_iter_new(bitmap);
+>      buf = g_malloc(s->cluster_size);
+>      limit = bytes_covered_by_bitmap_cluster(s, bitmap);
+> -    sbc = limit >> BDRV_SECTOR_BITS;
+>      assert(DIV_ROUND_UP(bm_size, limit) == tb_size);
+> 
+> -    while ((sector = bdrv_dirty_iter_next(dbi) >> BDRV_SECTOR_BITS) >= 0) {
+> -        uint64_t cluster = sector / sbc;
+> +    while ((offset = bdrv_dirty_iter_next(dbi)) >= 0) {
+> +        uint64_t cluster = offset / limit;
+>          uint64_t end, write_size;
+>          int64_t off;
+> 
+> -        sector = cluster * sbc;
+> -        end = MIN(bm_sectors, sector + sbc);
+> -        write_size = bdrv_dirty_bitmap_serialization_size(bitmap,
+> -            sector * BDRV_SECTOR_SIZE, (end - sector) * BDRV_SECTOR_SIZE);
+> +        offset = QEMU_ALIGN_DOWN(offset, limit);
 
-All definitions related to Hyper-V emulation are now taken from the QEMU
-own header, so the one imported from the kernel is no longer needed.
+With the question that I asked in v6, apart from changing the spelling
+to be more explicit, I actually hoped that you would explain why
+aligning down is the right thing to do.
 
-Unfortunately it's included by kvm_para.h.
+It looks plausible to me that we can do this in correct code because we
+don't support granularities < 512 bytes (a qemu restriction that is
+written down as a note in the qcow2 spec).
 
-So, until this is fixed in the kernel, teach the header harvesting
-script to substitute kernel's hyperv.h with a dummy.
+The part that I'm missing yet is why we need to do it. The bitmap
+granularity is also the granularity of bdrv_dirty_iter_next(), so isn't
+offset already aligned and we could even assert that instead of aligning
+down? (As long we enforce our restriction, which we seem to do in
+bitmap_list_load().)
 
-Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-Message-Id: <20170713201522.13765-3-rkagan@virtuozzo.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- scripts/update-linux-headers.sh | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> +        end = MIN(bm_size, offset + limit);
+> +        write_size = bdrv_dirty_bitmap_serialization_size(bitmap, offset,
+> +                                                          end - offset);
+>          assert(write_size <= s->cluster_size);
+> 
+>          off = qcow2_alloc_clusters(bs, s->cluster_size);
 
-diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
-index 2f906c4d16..ad80fe3fca 100755
---- a/scripts/update-linux-headers.sh
-+++ b/scripts/update-linux-headers.sh
-@@ -104,7 +104,9 @@ for arch in $ARCHLIST; do
-         cp "$tmpdir/include/asm/unistd-common.h" "$output/linux-headers/asm-arm/"
-     fi
-     if [ $arch = x86 ]; then
--        cp_portable "$tmpdir/include/asm/hyperv.h" "$output/include/standard-headers/asm-x86/"
-+        cat <<-EOF >"$output/include/standard-headers/asm-x86/hyperv.h"
-+        /* this is a temporary placeholder until kvm_para.h stops including it */
-+        EOF
-         cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-x86/"
-         cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
-         cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
--- 
-2.13.5
+Kevin
