@@ -1,28 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51894)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53368)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1duEmX-0007qV-OP
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:25:35 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1duEra-0001Tp-5f
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:30:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1duEmT-0004ty-1o
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:25:29 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:23699 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1duEmS-0004p6-L3
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:25:24 -0400
-References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
-	<20170918135935.255591-4-vsementsov@virtuozzo.com>
-	<d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <577e29c4-5187-8c6f-aacc-c77282959fdd@virtuozzo.com>
-Date: Tue, 19 Sep 2017 12:25:09 +0300
+	(envelope-from <alex.bennee@linaro.org>) id 1duErV-0000Ps-JE
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:30:42 -0400
+Received: from mail-wm0-x22c.google.com ([2a00:1450:400c:c09::22c]:49423)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1duErV-0000PK-Cc
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:30:37 -0400
+Received: by mail-wm0-x22c.google.com with SMTP id e71so3396557wmg.4
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 02:30:37 -0700 (PDT)
+References: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
+	<CAJhHMCCZh7hvQT8x9Bks9k6=ka4G1Oybv1MrkKJ9_VZ_eRZBfQ@mail.gmail.com>
+	<CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
+	<87bmrj8eks.fsf@linaro.org>
+	<CAPnv1PKyak1G-uL=H=-Vh_9TH2dZKffYjDf_2Z+LWuqovMKCBQ@mail.gmail.com>
+	<CAKSfGUC_k6K=2Xy8pGcwuQ66DMPYCDvA47Ojgm7ntQfALGwDsQ@mail.gmail.com>
+	<CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
+	<000601d33128$2dd9d5e0$898d81a0$@ru>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <000601d33128$2dd9d5e0$898d81a0$@ru>
+Date: Tue, 19 Sep 2017 10:30:35 +0100
+Message-ID: <87bmm7dohw.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 3/7] block/nbd-client: refactor reading
- reply
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] What is the best commit for record-replay?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,145 +36,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, den@openvz.org
+To: Pavel Dovgalyuk <dovgaluk@ispras.ru>
+Cc: 'Aleksandr Bezzubikov' <zuban32s@gmail.com>, 'QEMU Developers' <qemu-devel@nongnu.org>, 'Pranith Kumar' <bobby.prani+qemu@gmail.com>, pavel.dovgaluk@ispras.ru, 'Aleksandr Bezzubikov' <abezzubikov@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Igor R' <boost.lists@gmail.com>
 
-18.09.2017 18:43, Paolo Bonzini wrote:
-> On 18/09/2017 15:59, Vladimir Sementsov-Ogievskiy wrote:
->> Read the whole reply in one place - in nbd_read_reply_entry.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block/nbd-client.h |  1 +
->>   block/nbd-client.c | 42 ++++++++++++++++++++++++------------------
->>   2 files changed, 25 insertions(+), 18 deletions(-)
->>
->> diff --git a/block/nbd-client.h b/block/nbd-client.h
->> index b1900e6a6d..3f97d31013 100644
->> --- a/block/nbd-client.h
->> +++ b/block/nbd-client.h
->> @@ -21,6 +21,7 @@ typedef struct {
->>       Coroutine *coroutine;
->>       bool receiving;         /* waiting for read_reply_co? */
->>       NBDRequest *request;
->> +    QEMUIOVector *qiov;
->>   } NBDClientRequest;
->>   
->>   typedef struct NBDClientSession {
->> diff --git a/block/nbd-client.c b/block/nbd-client.c
->> index 5f241ecc22..f7b642f079 100644
->> --- a/block/nbd-client.c
->> +++ b/block/nbd-client.c
->> @@ -98,6 +98,21 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
->>               break;
->>           }
->>   
->> +        if (s->reply.error == 0 &&
->> +            s->requests[i].request->type == NBD_CMD_READ)
->> +        {
->> +            QEMUIOVector *qiov = s->requests[i].qiov;
->> +            assert(qiov != NULL);
->> +            assert(s->requests[i].request->len ==
->> +                   iov_size(qiov->iov, qiov->niov));
->> +            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
->> +                                      NULL) < 0)
->> +            {
->> +                s->reply.error = EIO;
->> +                break;
->> +            }
->> +        }
-> I am not sure this is an improvement.  In principle you could have
-> commands that read replies a bit at a time without using a QEMUIOVector.
+
+Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+
+>> From: Aleksandr Bezzubikov [mailto:zuban32s@gmail.com]
+>> 2017-09-18 15:02 GMT+03:00 Aleksandr Bezzubikov <zuban32s@gmail.com>:
+>> > 2017-05-02 15:42 GMT+03:00 Igor R <boost.lists@gmail.com>:
+>> >>>>>> I'm trying to use the deterministic record/replay feature, and I would
+>> >>>>>> like to know which commit I should take to get it work.
+>> >>>>>> In RC0 it seems to be broken. I tried pre-MTTCG commit 2421f381dc, as
+>> >>>>
+>> >>>>> Can you retry with the latest rc? There were some fixes regarding rr since rc0.
+>> >>>>
+>> >>>>
+>> >>>> I've taken 2.9 release, and RR does not seem to work there.
+>> >>>> I recorded the boot process of x86 Fedora-21 linux and the replay got
+>> >>>> stuck almost immediately.
+>> >>>
+>> >>> What's your command line?
+>> >>>
+>> >>> Does it get stuck at the same place each time?
+>> >>>
+>> >>> Can you boot fine with icount but without record/replay?
+>> >>
+>> >> Here is the exact scenario:
+>> >> - Get 2.9 from git, configure it as follows: "./configure
+>> >> --target-list=i386-softmmu --enable-sdl" and  make.
+>> >> - Download https://people.debian.org/~aurel32/qemu/i386/debian_squeeze_i386_standard.qcow2
+>> >> - Run qemu with the following command line, until login prompt:
+>> >> -icount shift=7,rr=record,rrfile=replay.bin -drive
+>> >> file=debian_squeeze_i386_standard.qcow2,if=none,id=img-direct -drive
+>> >> driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
+>> >> ide-hd,drive=img-blkreplay -monitor stdio
+>> >> - Replay: -icount shift=7,rr=replay,rrfile=replay.bin -drive
+>> >> file=debian_squeeze_i386_standard.qcow2,if=none,id=img-direct -drive
+>> >> driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
+>> >> ide-hd,drive=img-blkreplay -monitor stdio
+>> >>
+>> >> Every time I attempt to replay, QEMU gets stuck at the same EIP, at a
+>> >> very early stage.
+>> >>
+>> >>
+>> >>> Can you boot fine with icount but without record/replay?
+>> >>
+>> >> Yes. I can also enable icount and recording - it also boots fine. The
+>> >> problem with the replay.
+>> >
+>> > Hi guys,
+>> > Maybe the thread is a bit outdated, but the problem is still relevant.
+>> > I've just tried to record and replay WinXP boot process, and I've encountered
+>> > exactly the same problem as described above - record is fine, replay
+>> > gets stuck early. I use current master.
 >
-> Paolo
-
-Hm, what do you mean? In this patch I don't change "how do we read it", 
-I only move the reading code to one coroutine, to make it simple to 
-extend it in future (block status, etc). nbd_read_reply_enty has all 
-information it need (s->requests[i].request) to handle the whole reply.. 
-It's an improvement, because it leads to separating reply_entry 
-coroutine - it don't need any synchronization (yield/wake) more with 
-request coroutines.
-
+> Maybe this commit will work: cfb2d02be9413d45b30ed6d8e38800250b6b4b48
 >
->>           /* We're woken up again by the request itself.  Note that there
->>            * is no race between yielding and reentering read_reply_co.  This
->>            * is because:
->> @@ -118,6 +133,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
->>       s->read_reply_co = NULL;
->>   }
->>   
->> +/* qiov should be provided for READ and WRITE */
->>   static int nbd_co_send_request(BlockDriverState *bs,
->>                                  NBDRequest *request,
->>                                  QEMUIOVector *qiov)
->> @@ -145,6 +161,7 @@ static int nbd_co_send_request(BlockDriverState *bs,
->>   
->>       request->handle = INDEX_TO_HANDLE(s, i);
->>       s->requests[i].request = request;
->> +    s->requests[i].qiov = qiov;
->>   
->>       if (s->quit) {
->>           rc = -EIO;
->> @@ -155,7 +172,8 @@ static int nbd_co_send_request(BlockDriverState *bs,
->>           goto err;
->>       }
->>   
->> -    if (qiov) {
->> +    if (s->requests[i].request->type == NBD_CMD_WRITE) {
->> +        assert(qiov);
->>           qio_channel_set_cork(s->ioc, true);
->>           rc = nbd_send_request(s->ioc, request);
->>           if (rc >= 0 && !s->quit) {
->> @@ -181,9 +199,7 @@ err:
->>       return rc;
->>   }
->>   
->> -static int nbd_co_receive_reply(NBDClientSession *s,
->> -                                NBDRequest *request,
->> -                                QEMUIOVector *qiov)
->> +static int nbd_co_receive_reply(NBDClientSession *s, NBDRequest *request)
->>   {
->>       int ret;
->>       int i = HANDLE_TO_INDEX(s, request->handle);
->> @@ -197,14 +213,6 @@ static int nbd_co_receive_reply(NBDClientSession *s,
->>       } else {
->>           assert(s->reply.handle == request->handle);
->>           ret = -s->reply.error;
->> -        if (qiov && s->reply.error == 0) {
->> -            assert(request->len == iov_size(qiov->iov, qiov->niov));
->> -            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
->> -                                      NULL) < 0) {
->> -                ret = -EIO;
->> -                s->quit = true;
->> -            }
->> -        }
->>   
->>           /* Tell the read handler to read another header.  */
->>           s->reply.handle = 0;
->> @@ -232,16 +240,14 @@ static int nbd_co_request(BlockDriverState *bs,
->>       NBDClientSession *client = nbd_get_client_session(bs);
->>       int ret;
->>   
->> -    assert(!qiov || request->type == NBD_CMD_WRITE ||
->> -           request->type == NBD_CMD_READ);
->> -    ret = nbd_co_send_request(bs, request,
->> -                              request->type == NBD_CMD_WRITE ? qiov : NULL);
->> +    assert((qiov == NULL) !=
->> +           (request->type == NBD_CMD_WRITE || request->type == NBD_CMD_READ));
->> +    ret = nbd_co_send_request(bs, request, qiov);
->>       if (ret < 0) {
->>           return ret;
->>       }
->>   
->> -    return nbd_co_receive_reply(client, request,
->> -                                request->type == NBD_CMD_READ ? qiov : NULL);
->> +    return nbd_co_receive_reply(client, request);
->>   }
->>   
->>   int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
->>
+>> > And I've discovered the second problem - recording makes initial snapshot,
+>> > but it doesn't seem to be saved to the disk - replay can't see it.
+>
+> It is ok, because there is a mode where snapshot is created and loaded.
+>
+>> >
+>> > Hope you've already found the solution (as the last post was on 2 May)
+>> > and it's just got missed the mailing list.
+>
+> As I know, RR is still broken in the current version.
+> It was caused by the MTTCG implementation.
+> Alex Bennee tried to fix RR back. Alex, have you found any solution?
+>
+> We also trying to find a way to fix RR. It seems, that we will reinvent BQL for RR.
 
--- 
-Best regards,
-Vladimir
+I think the method outlined in my RFC is the way to go, essentially the
+RR mutex taking over for the what the BQL did. The RFC patch hadn't
+hoisted the mutex for the additional devices so I'm just re-basing now
+and I'll see if I can make the changes for Igor's test case.
+
+--
+Alex Bennée
