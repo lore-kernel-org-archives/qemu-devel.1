@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44600)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44655)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duJxo-0002d8-6e
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:57:32 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duJxt-0002i0-5t
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:57:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duJxk-0007sZ-SP
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:57:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45370)
+	(envelope-from <cohuck@redhat.com>) id 1duJxn-0007tu-Iy
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:57:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45528)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duJxk-0007s9-N7
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:57:24 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duJxn-0007tP-DL
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:57:27 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 19 Sep 2017 16:56:05 +0200
-Message-Id: <20170919145636.9389-8-cohuck@redhat.com>
+Date: Tue, 19 Sep 2017 16:56:06 +0200
+Message-Id: <20170919145636.9389-9-cohuck@redhat.com>
 In-Reply-To: <20170919145636.9389-1-cohuck@redhat.com>
 References: <20170919145636.9389-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 07/38] s390x/css: drop data-check in
- interpretation
+Subject: [Qemu-devel] [PULL 08/38] s390x/css: fix NULL handling for CCW
+ addresses
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,53 +29,35 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
 
-The architecture says that channel-data check is indicating that
-an uncorrected storage (memory) error has been detected in regard
-to the data residing in main storage (memory) that is currently
-used for an I/O operation. The described detection is done using
-the CBC technology.
+Back then in the time of df1fe5bb49 ("s390: Virtual channel subsystem
+support.", 2013-01-24) -EIO used to map to a channel-program check (via
+the default label of the switch statement).  Then 2dc95b4cac
+("s390x/3270: 3270 data stream handling", 2016-04-01) came along
+and that changed dramatically.
 
-The ccw interpretation code is however generating a channel-data check
-effectively when the (device specific) ccw_cb returns -EFAULT.  In case
-of virtio-ccw devices this happens when mapping memory fails, or when a
-NULL pointer is encountered. So this behavior is not architecture
-conform.
-
-Furthermore the best fit for these situations (null pointer, mapping a
-piece of guest memory fails) from architectural perspective the condition
-described as the channel subsystem refers to a location that is not
-available, which when encountered shall result in a channel-program
-check.
-
-To fix this, all we have to do is to get rid of the switch case matching
--EFAULT: the default is generating a channel-program check.
+Let us roll back this undesired side effect, and go back to
+channel-program check.
 
 Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Message-Id: <20170908152446.14606-2-pasic@linux.vnet.ibm.com>
+Fixes: 2dc95b4cac "s390x/3270: 3270 data stream handling"
+Message-Id: <20170908152446.14606-3-pasic@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/css.c | 9 ---------
- 1 file changed, 9 deletions(-)
+ hw/s390x/css.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-index 5d3de71c4c..bab78fc79a 100644
+index bab78fc79a..6d599477b2 100644
 --- a/hw/s390x/css.c
 +++ b/hw/s390x/css.c
-@@ -980,15 +980,6 @@ static void sch_handle_start_func_virtual(SubchDev *sch)
-                     SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
-             s->cpa = sch->channel_prog + 8;
-             break;
--        case -EFAULT:
--            /* memory problem, generate channel data check */
--            s->ctrl &= ~SCSW_ACTL_START_PEND;
--            s->cstat = SCSW_CSTAT_DATA_CHECK;
--            s->ctrl &= ~SCSW_CTRL_MASK_STCTL;
--            s->ctrl |= SCSW_STCTL_PRIMARY | SCSW_STCTL_SECONDARY |
--                    SCSW_STCTL_ALERT | SCSW_STCTL_STATUS_PEND;
--            s->cpa = sch->channel_prog + 8;
--            break;
-         case -EBUSY:
-             /* subchannel busy, generate deferred cc 1 */
-             s->flags &= ~SCSW_FLAGS_MASK_CC;
+@@ -793,7 +793,7 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
+     CCW1 ccw;
+ 
+     if (!ccw_addr) {
+-        return -EIO;
++        return -EINVAL; /* channel-program check */
+     }
+     /* Check doubleword aligned and 31 or 24 (fmt 0) bit addressable. */
+     if (ccw_addr & (sch->ccw_fmt_1 ? 0x80000007 : 0xff000007)) {
 -- 
 2.13.5
