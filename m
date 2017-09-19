@@ -1,16 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42331)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duOzV-0005Ff-35
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:19:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1duOzZ-0005KY-3T
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:19:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duOzT-0004fe-Ns
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:19:33 -0400
+	(envelope-from <eblake@redhat.com>) id 1duOzT-0004fr-Q0
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:19:37 -0400
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 19 Sep 2017 15:18:54 -0500
-Message-Id: <20170919201910.25656-5-eblake@redhat.com>
+Date: Tue, 19 Sep 2017 15:18:55 -0500
+Message-Id: <20170919201910.25656-6-eblake@redhat.com>
 In-Reply-To: <20170919201910.25656-1-eblake@redhat.com>
 References: <20170919201910.25656-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 04/20] dirty-bitmap: Drop unused functions
+Subject: [Qemu-devel] [PATCH v9 05/20] dirty-bitmap: Avoid size query
+ failure during truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,121 +23,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-We had several functions that no one is currently using, and which
-use sector-based interfaces.  I'm trying to convert towards byte-based
-interfaces, so it's easier to just drop the unused functions:
-
-bdrv_dirty_bitmap_get_meta
-bdrv_dirty_bitmap_get_meta_locked
-bdrv_dirty_bitmap_reset_meta
-bdrv_dirty_bitmap_meta_granularity
+We've previously fixed several places where we failed to account
+for possible errors from bdrv_nb_sectors().  Fix another one by
+making bdrv_dirty_bitmap_truncate() take the new size from the
+caller instead of querying itself; then adjust the sole caller
+bdrv_truncate() to pass the size just determined by a successful
+resize, or to skip the bitmap resize on failure, thus avoiding
+sizing the bitmaps to -1.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
 
 ---
-v5: no change
-v4: rebase to Vladimir's persistent bitmaps (bdrv_dirty_bitmap_size now
-in use), dropped R-b
-v3: rebase to upstream changes (bdrv_dirty_bitmap_get_meta_locked was
-added in b64bd51e with no clients), kept R-b
-v2: tweak commit message based on review, no code change
+v9: skip only bdrv_dirty_bitmap_truncate on error [Fam]
+v8: retitle and rework to avoid possibility of secondary failure [John]
+v7: new patch [Kevin]
 ---
- include/block/dirty-bitmap.h | 10 ----------
- block/dirty-bitmap.c         | 44 --------------------------------------------
- 2 files changed, 54 deletions(-)
+ include/block/dirty-bitmap.h |  2 +-
+ block.c                      | 15 ++++++++++-----
+ block/dirty-bitmap.c         |  6 +++---
+ 3 files changed, 14 insertions(+), 9 deletions(-)
 
 diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-index a79a58d2c3..8fd842eac9 100644
+index 8fd842eac9..7a27590047 100644
 --- a/include/block/dirty-bitmap.h
 +++ b/include/block/dirty-bitmap.h
-@@ -34,7 +34,6 @@ void bdrv_enable_dirty_bitmap(BdrvDirtyBitmap *bitmap);
- BlockDirtyInfoList *bdrv_query_dirty_bitmaps(BlockDriverState *bs);
- uint32_t bdrv_get_default_bitmap_granularity(BlockDriverState *bs);
- uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap);
--uint32_t bdrv_dirty_bitmap_meta_granularity(BdrvDirtyBitmap *bitmap);
- bool bdrv_dirty_bitmap_enabled(BdrvDirtyBitmap *bitmap);
- bool bdrv_dirty_bitmap_frozen(BdrvDirtyBitmap *bitmap);
- const char *bdrv_dirty_bitmap_name(const BdrvDirtyBitmap *bitmap);
-@@ -44,15 +43,6 @@ void bdrv_set_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                            int64_t cur_sector, int64_t nr_sectors);
- void bdrv_reset_dirty_bitmap(BdrvDirtyBitmap *bitmap,
-                              int64_t cur_sector, int64_t nr_sectors);
--int bdrv_dirty_bitmap_get_meta(BlockDriverState *bs,
--                               BdrvDirtyBitmap *bitmap, int64_t sector,
--                               int nb_sectors);
--int bdrv_dirty_bitmap_get_meta_locked(BlockDriverState *bs,
--                                      BdrvDirtyBitmap *bitmap, int64_t sector,
--                                      int nb_sectors);
--void bdrv_dirty_bitmap_reset_meta(BlockDriverState *bs,
--                                  BdrvDirtyBitmap *bitmap, int64_t sector,
--                                  int nb_sectors);
- BdrvDirtyBitmapIter *bdrv_dirty_meta_iter_new(BdrvDirtyBitmap *bitmap);
- BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap,
-                                          uint64_t first_sector);
+@@ -83,7 +83,7 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
+ void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t sector_num);
+ int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
+ int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
+-void bdrv_dirty_bitmap_truncate(BlockDriverState *bs);
++void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
+ bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
+ bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
+ bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
+diff --git a/block.c b/block.c
+index ee6a48976e..89261a7a53 100644
+--- a/block.c
++++ b/block.c
+@@ -3450,12 +3450,17 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
+     assert(!(bs->open_flags & BDRV_O_INACTIVE));
+
+     ret = drv->bdrv_truncate(bs, offset, prealloc, errp);
+-    if (ret == 0) {
+-        ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
+-        bdrv_dirty_bitmap_truncate(bs);
+-        bdrv_parent_cb_resize(bs);
+-        atomic_inc(&bs->write_gen);
++    if (ret < 0) {
++        return ret;
+     }
++    ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
++    if (ret < 0) {
++        error_setg_errno(errp, -ret, "Could not refresh total sector count");
++    } else {
++        bdrv_dirty_bitmap_truncate(bs, bs->total_sectors * BDRV_SECTOR_SIZE);
++    }
++    bdrv_parent_cb_resize(bs);
++    atomic_inc(&bs->write_gen);
+     return ret;
+ }
+
 diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 0490ca3aff..42a55e4a4b 100644
+index 42a55e4a4b..ee164fb518 100644
 --- a/block/dirty-bitmap.c
 +++ b/block/dirty-bitmap.c
-@@ -173,45 +173,6 @@ void bdrv_release_meta_dirty_bitmap(BdrvDirtyBitmap *bitmap)
-     qemu_mutex_unlock(bitmap->mutex);
- }
-
--int bdrv_dirty_bitmap_get_meta_locked(BlockDriverState *bs,
--                                      BdrvDirtyBitmap *bitmap, int64_t sector,
--                                      int nb_sectors)
--{
--    uint64_t i;
--    int sectors_per_bit = 1 << hbitmap_granularity(bitmap->meta);
--
--    /* To optimize: we can make hbitmap to internally check the range in a
--     * coarse level, or at least do it word by word. */
--    for (i = sector; i < sector + nb_sectors; i += sectors_per_bit) {
--        if (hbitmap_get(bitmap->meta, i)) {
--            return true;
--        }
--    }
--    return false;
--}
--
--int bdrv_dirty_bitmap_get_meta(BlockDriverState *bs,
--                               BdrvDirtyBitmap *bitmap, int64_t sector,
--                               int nb_sectors)
--{
--    bool dirty;
--
--    qemu_mutex_lock(bitmap->mutex);
--    dirty = bdrv_dirty_bitmap_get_meta_locked(bs, bitmap, sector, nb_sectors);
--    qemu_mutex_unlock(bitmap->mutex);
--
--    return dirty;
--}
--
--void bdrv_dirty_bitmap_reset_meta(BlockDriverState *bs,
--                                  BdrvDirtyBitmap *bitmap, int64_t sector,
--                                  int nb_sectors)
--{
--    qemu_mutex_lock(bitmap->mutex);
--    hbitmap_reset(bitmap->meta, sector, nb_sectors);
--    qemu_mutex_unlock(bitmap->mutex);
--}
--
- int64_t bdrv_dirty_bitmap_size(const BdrvDirtyBitmap *bitmap)
+@@ -1,7 +1,7 @@
+ /*
+  * Block Dirty Bitmap
+  *
+- * Copyright (c) 2016 Red Hat. Inc
++ * Copyright (c) 2016-2017 Red Hat. Inc
+  *
+  * Permission is hereby granted, free of charge, to any person obtaining a copy
+  * of this software and associated documentation files (the "Software"), to deal
+@@ -302,10 +302,10 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
+  * Truncates _all_ bitmaps attached to a BDS.
+  * Called with BQL taken.
+  */
+-void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
++void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes)
  {
-     return bitmap->size;
-@@ -511,11 +472,6 @@ uint32_t bdrv_dirty_bitmap_granularity(const BdrvDirtyBitmap *bitmap)
-     return BDRV_SECTOR_SIZE << hbitmap_granularity(bitmap->bitmap);
- }
+     BdrvDirtyBitmap *bitmap;
+-    uint64_t size = bdrv_nb_sectors(bs);
++    int64_t size = DIV_ROUND_UP(bytes, BDRV_SECTOR_SIZE);
 
--uint32_t bdrv_dirty_bitmap_meta_granularity(BdrvDirtyBitmap *bitmap)
--{
--    return BDRV_SECTOR_SIZE << hbitmap_granularity(bitmap->meta);
--}
--
- BdrvDirtyBitmapIter *bdrv_dirty_iter_new(BdrvDirtyBitmap *bitmap,
-                                          uint64_t first_sector)
- {
+     bdrv_dirty_bitmaps_lock(bs);
+     QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
 -- 
 2.13.5
