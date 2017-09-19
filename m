@@ -1,20 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1duJd4-0004iw-0m
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:36:09 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1duJg1-0006EV-Uj
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:39:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <Yongbok.Kim@imgtec.com>) id 1duJcz-0001VN-RT
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:36:02 -0400
-References: <20170919141307.23113-1-eblake@redhat.com>
-From: Yongbok Kim <yongbok.kim@imgtec.com>
-Message-ID: <1d765929-c654-80d6-b949-87429f4c0aa8@imgtec.com>
-Date: Tue, 19 Sep 2017 15:35:49 +0100
+	(envelope-from <dgilbert@redhat.com>) id 1duJfw-0003iV-3Y
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:39:05 -0400
+Date: Tue, 19 Sep 2017 15:38:30 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170919143829.GH2107@work-vm>
+References: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
 MIME-Version: 1.0
-In-Reply-To: <20170919141307.23113-1-eblake@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] mips: Improve macro parenthesization
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
+Subject: Re: [Qemu-devel] Block Migration and CPU throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,115 +22,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
+To: Peter Lieven <pl@kamp.de>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
 
+* Peter Lieven (pl@kamp.de) wrote:
+> Hi,
+> 
+> I just noticed that CPU throttling and Block Migration don't work together very well.
+> During block migration the throttling heuristic detects that we obviously make no progress
+> in ram transfer. But the reason is the running block migration and not a too high dirty pages rate.
+> 
+> The result is that any VM is throttled by 99% during block migration.
 
+Hmm that's unfortunate; do you have a bandwidth set lower than your
+actual network connection? I'm just wondering if it's actually going
+between the block and RAM iterative sections or getting stuck in ne.
 
-On 19/09/2017 15:13, Eric Blake wrote:
-> Although none of the existing macro call-sites were broken,
-> it's always better to write macros that properly parenthesize
-> arguments that can be complex expressions, so that the intended
-> order of operations is not broken.
+> I wonder what the best way would be fix this. I came up with the following ideas so far:
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> ---
->  target/mips/dsp_helper.c | 56 ++++++++++++++++++++++++------------------------
->  1 file changed, 28 insertions(+), 28 deletions(-)
-> 
-> diff --git a/target/mips/dsp_helper.c b/target/mips/dsp_helper.c
-> index dc707934ea..f152fea34a 100644
-> --- a/target/mips/dsp_helper.c
-> +++ b/target/mips/dsp_helper.c
-> @@ -45,9 +45,9 @@ typedef union {
->  } DSP64Value;
-> 
->  /*** MIPS DSP internal functions begin ***/
-> -#define MIPSDSP_ABS(x) (((x) >= 0) ? x : -x)
-> -#define MIPSDSP_OVERFLOW_ADD(a, b, c, d) (~(a ^ b) & (a ^ c) & d)
-> -#define MIPSDSP_OVERFLOW_SUB(a, b, c, d) ((a ^ b) & (a ^ c) & d)
-> +#define MIPSDSP_ABS(x) (((x) >= 0) ? (x) : -(x))
-> +#define MIPSDSP_OVERFLOW_ADD(a, b, c, d) (~((a) ^ (b)) & ((a) ^ (c)) & (d))
-> +#define MIPSDSP_OVERFLOW_SUB(a, b, c, d) (((a) ^ (b)) & ((a) ^ (c)) & (d))
-> 
->  static inline void set_DSPControl_overflow_flag(uint32_t flag, int position,
->                                                  CPUMIPSState *env)
-> @@ -1047,47 +1047,47 @@ static inline int32_t mipsdsp_cmpu_lt(uint32_t a, uint32_t b)
-> 
->  #define MIPSDSP_SPLIT32_8(num, a, b, c, d)  \
->      do {                                    \
-> -        a = (num >> 24) & MIPSDSP_Q0;       \
-> -        b = (num >> 16) & MIPSDSP_Q0;       \
-> -        c = (num >> 8) & MIPSDSP_Q0;        \
-> -        d = num & MIPSDSP_Q0;               \
-> +        a = ((num) >> 24) & MIPSDSP_Q0;     \
-> +        b = ((num) >> 16) & MIPSDSP_Q0;     \
-> +        c = ((num) >> 8) & MIPSDSP_Q0;      \
-> +        d = (num) & MIPSDSP_Q0;             \
->      } while (0)
-> 
->  #define MIPSDSP_SPLIT32_16(num, a, b)       \
->      do {                                    \
-> -        a = (num >> 16) & MIPSDSP_LO;       \
-> -        b = num & MIPSDSP_LO;               \
-> +        a = ((num) >> 16) & MIPSDSP_LO;     \
-> +        b = (num) & MIPSDSP_LO;             \
->      } while (0)
-> 
-> -#define MIPSDSP_RETURN32_8(a, b, c, d)  ((target_long)(int32_t) \
-> -                                         (((uint32_t)a << 24) | \
-> -                                         (((uint32_t)b << 16) | \
-> -                                         (((uint32_t)c << 8) |  \
-> -                                          ((uint32_t)d & 0xFF)))))
-> -#define MIPSDSP_RETURN32_16(a, b)       ((target_long)(int32_t) \
-> -                                         (((uint32_t)a << 16) | \
-> -                                          ((uint32_t)b & 0xFFFF)))
-> +#define MIPSDSP_RETURN32_8(a, b, c, d)  ((target_long)(int32_t)         \
-> +                                         (((uint32_t)(a) << 24) |       \
-> +                                          ((uint32_t)(b) << 16) |       \
-> +                                          ((uint32_t)(c) << 8) |        \
-> +                                          ((uint32_t)(d) & 0xFF)))
-> +#define MIPSDSP_RETURN32_16(a, b)       ((target_long)(int32_t)         \
-> +                                         (((uint32_t)(a) << 16) |       \
-> +                                          ((uint32_t)(b) & 0xFFFF)))
-> 
->  #ifdef TARGET_MIPS64
->  #define MIPSDSP_SPLIT64_16(num, a, b, c, d)  \
->      do {                                     \
-> -        a = (num >> 48) & MIPSDSP_LO;        \
-> -        b = (num >> 32) & MIPSDSP_LO;        \
-> -        c = (num >> 16) & MIPSDSP_LO;        \
-> -        d = num & MIPSDSP_LO;                \
-> +        a = ((num) >> 48) & MIPSDSP_LO;      \
-> +        b = ((num) >> 32) & MIPSDSP_LO;      \
-> +        c = ((num) >> 16) & MIPSDSP_LO;      \
-> +        d = (num) & MIPSDSP_LO;              \
->      } while (0)
-> 
->  #define MIPSDSP_SPLIT64_32(num, a, b)       \
->      do {                                    \
-> -        a = (num >> 32) & MIPSDSP_LLO;      \
-> -        b = num & MIPSDSP_LLO;              \
-> +        a = ((num) >> 32) & MIPSDSP_LLO;    \
-> +        b = (num) & MIPSDSP_LLO;            \
->      } while (0)
-> 
-> -#define MIPSDSP_RETURN64_16(a, b, c, d) (((uint64_t)a << 48) | \
-> -                                         ((uint64_t)b << 32) | \
-> -                                         ((uint64_t)c << 16) | \
-> -                                         (uint64_t)d)
-> -#define MIPSDSP_RETURN64_32(a, b)       (((uint64_t)a << 32) | (uint64_t)b)
-> +#define MIPSDSP_RETURN64_16(a, b, c, d) (((uint64_t)(a) << 48) |        \
-> +                                         ((uint64_t)(b) << 32) |        \
-> +                                         ((uint64_t)(c) << 16) |        \
-> +                                         (uint64_t)(d))
-> +#define MIPSDSP_RETURN64_32(a, b)       (((uint64_t)(a) << 32) | (uint64_t)(b))
->  #endif
-> 
->  /** DSP Arithmetic Sub-class insns **/
-> 
+> - disable throttling while block migration is in bulk stage
 
-Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
+mig_throttle_guest_down is currently in migration/ram.c
+so however we do it, we've got to add an 'inhibit' that
+block.c could set (I suggest a counter so that it could
+be set by a few things).
 
-Regards,
-Yongbok
+> - check if absolute number of num_dirty_pages_period crosses a threshold and not if its just
+>   greater than 50% of transferred bytes
+> - check if migration_dirty_pages > 0. This slows down throttling, but does not avoid it completely.
+
+An interesting question is whether you want to inhibit in the non-bulk
+stage if IO writes are happening too quickly to keep up.
+
+Dave
+
+> 
+> Peter
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
