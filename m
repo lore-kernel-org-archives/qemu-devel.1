@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40392)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40501)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duLfC-0007gx-7t
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:46:23 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duLfH-0007kd-0k
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:46:28 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duLfA-0004Jj-Kx
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:46:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54356)
+	(envelope-from <cohuck@redhat.com>) id 1duLfG-0004Oc-2n
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:46:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49956)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLfA-0004IJ-GD
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:46:20 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLfF-0004No-Ts
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:46:26 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 19 Sep 2017 18:43:32 +0200
-Message-Id: <20170919164337.18555-34-cohuck@redhat.com>
+Date: Tue, 19 Sep 2017 18:43:34 +0200
+Message-Id: <20170919164337.18555-36-cohuck@redhat.com>
 In-Reply-To: <20170919164337.18555-1-cohuck@redhat.com>
 References: <20170919164337.18555-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL v2 33/38] virtio-ccw: remove stale comments on
- endianness
+Subject: [Qemu-devel] [PULL v2 35/38] s390x/ccw: create s390 phb for compat
+ reasons as well
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,47 +25,37 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
+d32bd032d8 ("s390x/ccw: create s390 phb conditionally") made
+registering the s390 pci host bridge conditional on presense
+of the zpci facility bit. Sadly, that breaks migration from
+machines that did not use the cpu model (2.7 and previous).
 
-We have two stale comments suggesting one should think about virtio
-config space endianness a bit longer. We have just done that, and came to
-the conclusion we are fine as is: it's the responsibility of the virtio
-device and not of the transport (and that is how it works now). Putting
-the responsibility into the transport isn't even possible, because the
-transport would have to know about the config space layout of each
-device.
+Create the s390 phb for pre-cpu model machines as well: We can
+tweak s390_has_feat() to always indicate the zpci facility bit
+when no cpu model is available (on 2.7 and previous compat machines).
 
-Let us remove the stale comments.
-
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Suggested-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20170914105535.47941-1-pasic@linux.vnet.ibm.com>
+Fixes: d32bd032d8 ("s390x/ccw: create s390 phb conditionally")
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/virtio-ccw.c | 2 --
- 1 file changed, 2 deletions(-)
+ target/s390x/cpu_models.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index b1976fdd19..2262b0cc9a 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -487,7 +487,6 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-             ret = -EFAULT;
-         } else {
-             virtio_bus_get_vdev_config(&dev->bus, vdev->config);
--            /* XXX config space endianness */
-             cpu_physical_memory_write(ccw.cda, vdev->config, len);
-             sch->curr_status.scsw.count = ccw.count - len;
-             ret = 0;
-@@ -510,7 +509,6 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-                 ret = -EFAULT;
-             } else {
-                 len = hw_len;
--                /* XXX config space endianness */
-                 memcpy(vdev->config, config, len);
-                 cpu_physical_memory_unmap(config, hw_len, 0, hw_len);
-                 virtio_bus_set_vdev_config(&dev->bus, vdev->config);
+diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+index c295e641e6..5169379db5 100644
+--- a/target/s390x/cpu_models.c
++++ b/target/s390x/cpu_models.c
+@@ -196,6 +196,9 @@ bool s390_has_feat(S390Feat feat)
+             }
+         }
+ #endif
++        if (feat == S390_FEAT_ZPCI) {
++            return true;
++        }
+         return 0;
+     }
+     return test_bit(feat, cpu->model->features);
 -- 
 2.13.5
