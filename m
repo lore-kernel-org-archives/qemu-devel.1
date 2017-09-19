@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43248)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49925)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1duOKg-000464-FA
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:37:23 -0400
+	(envelope-from <eblake@redhat.com>) id 1duOQQ-0000Ef-PF
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:43:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1duOKc-0007Sm-Hh
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:37:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41008)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1duOKc-0007Rt-9o
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:37:18 -0400
-References: <20170919142654.16369-1-david@redhat.com>
-	<20170919142654.16369-4-david@redhat.com>
-	<452a304a-70e4-c3ab-2e76-a67823922e90@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <8bc7cb17-522a-48ea-5818-12bdbfb37d70@redhat.com>
-Date: Tue, 19 Sep 2017 21:36:55 +0200
+	(envelope-from <eblake@redhat.com>) id 1duOQP-0004lP-Cq
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:43:18 -0400
+References: <20170918185819.5984-1-eblake@redhat.com>
+	<20170918185819.5984-19-eblake@redhat.com>
+	<20170919124424.GD3789@localhost.localdomain>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <ef350240-dbe3-e91a-ac1c-734a0c5d24f1@redhat.com>
+Date: Tue, 19 Sep 2017 14:42:59 -0500
 MIME-Version: 1.0
-In-Reply-To: <452a304a-70e4-c3ab-2e76-a67823922e90@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/3] s390x/tcg: add basic MSA features
+In-Reply-To: <20170919124424.GD3789@localhost.localdomain>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="BmclKvP40ErUksRlPB6upBwRVdPCrfQU1"
+Subject: Re: [Qemu-devel] [PATCH v8 18/20] qcow2: Switch store_bitmap_data()
+ to byte-based iteration
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,124 +26,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: thuth@redhat.com, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On 19.09.2017 19:47, Richard Henderson wrote:
-> On 09/19/2017 09:26 AM, David Hildenbrand wrote:
->> +    const uint8_t fc = env->regs[0] & 0x7fULL;
-> 
-> Don't mask here...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--BmclKvP40ErUksRlPB6upBwRVdPCrfQU1
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Message-ID: <ef350240-dbe3-e91a-ac1c-734a0c5d24f1@redhat.com>
+Subject: Re: [PATCH v8 18/20] qcow2: Switch store_bitmap_data() to byte-based
+ iteration
+References: <20170918185819.5984-1-eblake@redhat.com>
+ <20170918185819.5984-19-eblake@redhat.com>
+ <20170919124424.GD3789@localhost.localdomain>
+In-Reply-To: <20170919124424.GD3789@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Bit 56 is the mod bit (see variable "mod") and is checked inside the
-switch(). The function code really is just composed of bit 57 - 63, so
-this is correct.
+On 09/19/2017 07:44 AM, Kevin Wolf wrote:
+> Am 18.09.2017 um 20:58 hat Eric Blake geschrieben:
+>> Now that we have adjusted the majority of the calls this function
+>> makes to be byte-based, it is easier to read the code if it makes
+>> passes over the image using bytes rather than sectors.
+>>
+>> Signed-off-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: John Snow <jsnow@redhat.com>
+>> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-> 
->> +    if (fc >= 128 || !test_be_bit(fc, subfunc)) {
+>> @@ -1100,18 +1099,17 @@ static uint64_t *store_bitmap_data(BlockDriver=
+State *bs,
+>>      dbi =3D bdrv_dirty_iter_new(bitmap);
+>>      buf =3D g_malloc(s->cluster_size);
+>>      limit =3D bytes_covered_by_bitmap_cluster(s, bitmap);
 
-... however the fc >= 128 case can be dropped, as this can in fact never
-happen (due to the masking).
+Limit is huge.  For ease of math, let's consider an image with 512-byte
+clusters, and an explicit bitmap granularity of 512 bytes.  One cluster
+(512 bytes, or 4k bits) of the bitmap covers 4k multiples of the
+granularity, or 2M of image; and the minimum serialization alignment of
+64 bits covers 32k bytes of image.  bytes_covered_by_bitmap_cluster()
+computes granularity (512 bytes per bit), limit (2M bytes per cluster of
+bits), and checks that 2M is indeed aligned to
+bdrv_dirty_bitmap_serialization_align() (which is 32k).
 
->> +        cpu_restore_state(cs, ra);
->> +        program_interrupt(env, PGM_SPECIFICATION, 4);
->> +        return 0;
->> +    }
-> 
-> ... because you are indeed supposed to test bit 56.  But you've already ensured
-> that won't be set above.
-> 
-> Do you in fact need to set bit 63 in subfunc, since that itself is query?
-> Certainly you won't get past this test, regardless...
+Next, an image with default 64k clusters and a default bitmap
+granularity of 64k bytes; one cluster (64k bytes, or 512k bits) now
+covers 512k multiples of the granularity, or 32G of image size.
 
-Yes, it always has to be set and is guaranteed by s390_get_feat_block().
-So test_be_bit(fc, subfunc) will always allow bit 0 (query).
+However...
 
-Especially due to the statement:
+>> -    sbc =3D limit >> BDRV_SECTOR_BITS;
+>>      assert(DIV_ROUND_UP(bm_size, limit) =3D=3D tb_size);
+>>
+>> -    while ((sector =3D bdrv_dirty_iter_next(dbi) >> BDRV_SECTOR_BITS)=
+ >=3D 0) {
+>> -        uint64_t cluster =3D sector / sbc;
+>> +    while ((offset =3D bdrv_dirty_iter_next(dbi)) >=3D 0) {
+>> +        uint64_t cluster =3D offset / limit;
 
-"When a bit is one, the corresponding function is installed; otherwise,
-the function is not installed."
+bdrv_dirty_iter_next() returns the next dirty bit (which is not
+necessarily the first bit in the cluster).  For the purposes of
+serialization, we want to serialize the entire cluster in one go, even
+though we will be serializing 0 bits up until the first dirty bit.  So
+offset at this point may be unaligned,
 
-Query is always installed.
+>>          uint64_t end, write_size;
+>>          int64_t off;
+>>
+>> -        sector =3D cluster * sbc;
+>> -        end =3D MIN(bm_sectors, sector + sbc);
+>> -        write_size =3D bdrv_dirty_bitmap_serialization_size(bitmap,
+>> -            sector * BDRV_SECTOR_SIZE, (end - sector) * BDRV_SECTOR_S=
+IZE);
+>> +        offset =3D QEMU_ALIGN_DOWN(offset, limit);
 
+and we round it down to the start of the cluster that we will actually
+be serializing.
 
-> 
-> 
->> +static ExitStatus op_msa(DisasContext *s, DisasOps *o)
->> +{
->> +    int r1 = have_field(s->fields, r1) ? get_field(s->fields, r1) : 0;
->> +    int r2 = have_field(s->fields, r2) ? get_field(s->fields, r2) : 0;
->> +    int r3 = have_field(s->fields, r3) ? get_field(s->fields, r3) : 0;
->> +    TCGv_i32 t_r1, t_r2, t_r3, type;
->> +
->> +    switch (s->insn->data) {
->> +    case S390_FEAT_TYPE_KMCTR:
->> +        if (r3 & 1 || !r3) {
->> +            gen_program_exception(s, PGM_SPECIFICATION);
->> +            return EXIT_NORETURN;
->> +        }
->> +        /* FALL THROUGH */
->> +    case S390_FEAT_TYPE_PPNO:
->> +    case S390_FEAT_TYPE_KMF:
->> +    case S390_FEAT_TYPE_KMC:
->> +    case S390_FEAT_TYPE_KMO:
->> +    case S390_FEAT_TYPE_KM:
->> +        if (r1 & 1 || !r1) {
->> +            gen_program_exception(s, PGM_SPECIFICATION);
->> +            return EXIT_NORETURN;
->> +        }
->> +        /* FALL THROUGH */
->> +    case S390_FEAT_TYPE_KMAC:
->> +    case S390_FEAT_TYPE_KIMD:
->> +    case S390_FEAT_TYPE_KLMD:
->> +        if (r2 & 1 || !r2) {
->> +            gen_program_exception(s, PGM_SPECIFICATION);
->> +            return EXIT_NORETURN;
->> +        }
-> 
-> Even though it would be silly to do so, considering that r0+r1 are implicit
-> arguments to these insns, I see nothing that insists that r[123] are not 0,
-> only that they are even.
-> 
+>=20
+> With the question that I asked in v6, apart from changing the spelling
+> to be more explicit, I actually hoped that you would explain why
+> aligning down is the right thing to do.
+>=20
+> It looks plausible to me that we can do this in correct code because we=
 
-E.g. for KMAC (7-187):
+> don't support granularities < 512 bytes (a qemu restriction that is
+> written down as a note in the qcow2 spec).
 
-"A specification exception is recognized and no other
-action is taken if any of the following occurs:
-[...]
- The R2 field designates an odd-numbered regis-
-ter or general register 0."
+It's not granularities < 512 that we have to worry about, but dirty bits
+with an offset < 4M (because we are serializing an entire cluster of
+bitmap data, where the first dirty offset is not necessarily aligned to
+that large).
 
-Or KMCTR (7-103):
+>=20
+> The part that I'm missing yet is why we need to do it. The bitmap
+> granularity is also the granularity of bdrv_dirty_iter_next(), so isn't=
 
-"A specification exception is recognized and no other
-action is taken if any of the following occurs:
-[...]
- The R1 R2, or R3 field designates an odd-num-
-bered register or general register 0."
+> offset already aligned and we could even assert that instead of alignin=
+g
+> down? (As long we enforce our restriction, which we seem to do in
+> bitmap_list_load().)
 
+Sadly, a quick:
 
-I implemented kvm-unit-tests that test all of these conditions.
-Especially they also pass on KVM, so I assume they are correct (as these
-instructions are fully interpreted by HW).
+diff --git i/block/qcow2-bitmap.c w/block/qcow2-bitmap.c
+index 302fffd6e1..160f3b99f9 100644
+--- i/block/qcow2-bitmap.c
++++ w/block/qcow2-bitmap.c
+@@ -1106,6 +1106,7 @@ static uint64_t
+*store_bitmap_data(BlockDriverState *bs,
+         uint64_t end, write_size;
+         int64_t off;
 
-https://www.spinics.net/lists/kvm/msg155690.html
++        assert(QEMU_IS_ALIGNED(offset, limit));
+         offset =3D QEMU_ALIGN_DOWN(offset, limit);
+         end =3D MIN(bm_size, offset + limit);
+         write_size =3D bdrv_dirty_bitmap_serialization_size(bitmap, offs=
+et,
 
-In the test included is
-a) checking that the mod bit must not be set for certain instructions
-b) r1-3 either odd or 0 for certain instructions
-c) that query is always indicated
+does NOT fail iotests 165, which appears to be the only test that
+actually hammers on qcow2 bitmaps (changing it to an 'assert(false)'
+only shows an effect on 165) - which means our test is NOT exercising
+all possible alignments.  And it's python-based, with lame output, which
+makes debugging it painful.  But never fear, for v9 I will improve the
+test to actually affect the bitmap at a point that would fail with my
+temporary assertion in place, and thus proving that we DO need to align
+down.  Note that test 165 is testing only a 1G image, but I just showed
+that 64k clusters with 64k granularity covers up to 32G of image space
+in one cluster of the bitmap, so the test is only covering one cluster
+of serialization in the first place, and as written, the test is
+dirtying byte 0, which explains why it happens to get an offset aligned
+to limit, even though that is not a valid assertion.
 
-
-Thanks for the review!
-
-> 
-> r~
-> 
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
--- 
+--BmclKvP40ErUksRlPB6upBwRVdPCrfQU1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-Thanks,
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-David
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnBc0MACgkQp6FrSiUn
+Q2ryNgf7Bis+HU4qrYSOmjf+fbNmTUCqubeuIKMmut/REZ8vDvhRXuToZe33gBUA
+kqGvDt3k//gcS/koKenEfp1Q5smbqnmtDN+iYecU8QO1mC6tALlYaiRAclhc5Eq8
+ptus0hexKOEbsRmccmFtf/64jGtzI8FnMIv1Tbreujdx7FDGH0WUOoE+q6HWkvZe
+g6y6MQNyGYv+xLzlHy87QY1XrsQe9jwQCytYEx4e3F2DcqwisJS8pX9/Ab72rtDM
+nBCBotqVmAw2skcd8IfAQKdAzR4z5kIjKMFstklHCmfP7WkeBIw/odWO0k44/8W9
+58RTj+i35d+5YW03eZhNDtnlvr7tfg==
+=OD11
+-----END PGP SIGNATURE-----
+
+--BmclKvP40ErUksRlPB6upBwRVdPCrfQU1--
