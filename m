@@ -1,30 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38388)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1duGJz-0007Dx-B5
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:04:08 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1duGMF-0000cp-Sn
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:06:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1duGJx-00017x-Gq
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:04:07 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:48498 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1duGJx-00015c-13
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:04:05 -0400
-References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
-	<20170918135935.255591-4-vsementsov@virtuozzo.com>
-	<d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
-	<577e29c4-5187-8c6f-aacc-c77282959fdd@virtuozzo.com>
-	<26582eb0-1db3-3aac-3652-44e3fbb1e49c@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <5fff43cf-717d-2d64-f51d-57f116888921@virtuozzo.com>
-Date: Tue, 19 Sep 2017 14:03:47 +0300
+	(envelope-from <peter.maydell@linaro.org>) id 1duGMA-00022O-1P
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:06:27 -0400
+Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:48992)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1duGM9-00022F-QU
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:06:21 -0400
+Received: by mail-wm0-x231.google.com with SMTP id r68so4126455wmg.3
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 04:06:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <26582eb0-1db3-3aac-3652-44e3fbb1e49c@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] [PATCH v2 3/7] block/nbd-client: refactor reading
- reply
+In-Reply-To: <1505818700.12708.3.camel@redhat.com>
+References: <20170912123744.14730-1-berrange@redhat.com>
+	<1505223994.31639.20.camel@redhat.com>
+	<20170912141910.GJ17633@redhat.com>
+	<CAFEAcA-tdbzXBkyxXW_e15hVcbcfqSfKqke0PX6y-Cg6A62DzQ@mail.gmail.com>
+	<20170912143007.GK17633@redhat.com>
+	<1505390103.31557.11.camel@redhat.com>
+	<CAFEAcA9JEGbiwKeSMyvnLrdE+2WrkRbYLcVJ+UpFnU1RymC1vQ@mail.gmail.com>
+	<20170914124059.GD15518@redhat.com>
+	<1505747575.4959.1.camel@redhat.com>
+	<20170919100839.GH9536@redhat.com>
+	<1505818700.12708.3.camel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 19 Sep 2017 12:05:59 +0100
+Message-ID: <CAFEAcA_ao-Zz=4bNZB3RG2DH04hcMzTRruDc6dO1KEj3obTB4w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH v5 00/12] Convert over to use keycodemapdb
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,181 +38,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, den@openvz.org
+To: Gerd Hoffmann <kraxel@redhat.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 
-19.09.2017 13:01, Paolo Bonzini wrote:
-> On 19/09/2017 11:25, Vladimir Sementsov-Ogievskiy wrote:
->> 18.09.2017 18:43, Paolo Bonzini wrote:
->>> On 18/09/2017 15:59, Vladimir Sementsov-Ogievskiy wrote:
->>>> Read the whole reply in one place - in nbd_read_reply_entry.
->>>>
->>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->>>> ---
->>>>    block/nbd-client.h |  1 +
->>>>    block/nbd-client.c | 42 ++++++++++++++++++++++++------------------
->>>>    2 files changed, 25 insertions(+), 18 deletions(-)
->>>>
->>>> diff --git a/block/nbd-client.h b/block/nbd-client.h
->>>> index b1900e6a6d..3f97d31013 100644
->>>> --- a/block/nbd-client.h
->>>> +++ b/block/nbd-client.h
->>>> @@ -21,6 +21,7 @@ typedef struct {
->>>>        Coroutine *coroutine;
->>>>        bool receiving;         /* waiting for read_reply_co? */
->>>>        NBDRequest *request;
->>>> +    QEMUIOVector *qiov;
->>>>    } NBDClientRequest;
->>>>      typedef struct NBDClientSession {
->>>> diff --git a/block/nbd-client.c b/block/nbd-client.c
->>>> index 5f241ecc22..f7b642f079 100644
->>>> --- a/block/nbd-client.c
->>>> +++ b/block/nbd-client.c
->>>> @@ -98,6 +98,21 @@ static coroutine_fn void nbd_read_reply_entry(void
->>>> *opaque)
->>>>                break;
->>>>            }
->>>>    +        if (s->reply.error == 0 &&
->>>> +            s->requests[i].request->type == NBD_CMD_READ)
->>>> +        {
->>>> +            QEMUIOVector *qiov = s->requests[i].qiov;
->>>> +            assert(qiov != NULL);
->>>> +            assert(s->requests[i].request->len ==
->>>> +                   iov_size(qiov->iov, qiov->niov));
->>>> +            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
->>>> +                                      NULL) < 0)
->>>> +            {
->>>> +                s->reply.error = EIO;
->>>> +                break;
->>>> +            }
->>>> +        }
->>> I am not sure this is an improvement.  In principle you could have
->>> commands that read replies a bit at a time without using a QEMUIOVector.
->>>
->>> Paolo
->> Hm, what do you mean? In this patch I don't change "how do we read it",
->> I only move the reading code to one coroutine, to make it simple to
->> extend it in future (block status, etc).
-> I disagree that it is easier to extend it in the future.  If some
-> commands in the future need a different "how do we read it" (e.g. for
-> structured reply), nbd_read_reply_entry may not have all the information
-> it needs anymore.
+On 19 September 2017 at 11:58, Gerd Hoffmann <kraxel@redhat.com> wrote:
 
-how is it possible? all information is in requests[i].
-
+>> It feels like this is a similar scenario to 'config-host.mak' being
+>> outdated. I don't entirely understand the logic yet, but we manage to
+>> automatically re-run configure and rebuild config-host.make, when
+>> configure changes, and that in turn affects which dependancies need
+>> rebuild.
 >
-> In fact, you're pushing knowledge of the commands from nbd_co_request to
-> nbd_read_reply_entry:
->
-> +        if (s->reply.error == 0 &&
-> +            s->requests[i].request->type == NBD_CMD_READ)
->
-> and knowledge of NBD_CMD_READ simply doesn't belong there.  So there is
-> an example of that right now, it is not some arbitrary bad thing that
-> could happen in the future.
->
-> Paolo
+> Can't spot anything special in the Makefile.  Maybe make is clever
+> enough to figure that a rule updates a include file and starts over
+> then.
 
-I can't agree that my point of view is wrong, it's just different.
-You want commands, reading from socket, each knows what it should read.
-I want the receiver - one sequential reader, that can read all kinds of 
-replies and just
-wake requesting coroutines when all reading is done. For me it looks simpler
-than switching.
+Yes, Make will notice if it has a dependency rule for a file
+included via 'include foo' (or for the makefile itself). In
+this case we 'include config-host.mak', and config-host.mak
+has a rule which says it depends on configure (and on pc-bios ???)
+which triggers a rerun of configure.
 
-We can add reading callbacks for commands which have some payload, like
-s->requests[i].read_payload(ioc, request) or may be 
-s->requests[i].request->read_payload(...),
-and call them from reply_entry instead of if (s->... == NBD_CMD_READ).
+I also notice that we have a "TODO: this code can be removed
+after QEMU 1.7" in the run-configure rune :-)
 
-How do you see the refactoring for introducing structured reply?
-
-
->
->
->> nbd_read_reply_enty has all
->> information it need (s->requests[i].request) to handle the whole reply..
->> It's an improvement, because it leads to separating reply_entry
->> coroutine - it don't need any synchronization (yield/wake) more with
->> request coroutines.
->>
->>>>            /* We're woken up again by the request itself.  Note that
->>>> there
->>>>             * is no race between yielding and reentering
->>>> read_reply_co.  This
->>>>             * is because:
->>>> @@ -118,6 +133,7 @@ static coroutine_fn void
->>>> nbd_read_reply_entry(void *opaque)
->>>>        s->read_reply_co = NULL;
->>>>    }
->>>>    +/* qiov should be provided for READ and WRITE */
->>>>    static int nbd_co_send_request(BlockDriverState *bs,
->>>>                                   NBDRequest *request,
->>>>                                   QEMUIOVector *qiov)
->>>> @@ -145,6 +161,7 @@ static int nbd_co_send_request(BlockDriverState *bs,
->>>>          request->handle = INDEX_TO_HANDLE(s, i);
->>>>        s->requests[i].request = request;
->>>> +    s->requests[i].qiov = qiov;
->>>>          if (s->quit) {
->>>>            rc = -EIO;
->>>> @@ -155,7 +172,8 @@ static int nbd_co_send_request(BlockDriverState *bs,
->>>>            goto err;
->>>>        }
->>>>    -    if (qiov) {
->>>> +    if (s->requests[i].request->type == NBD_CMD_WRITE) {
->>>> +        assert(qiov);
->>>>            qio_channel_set_cork(s->ioc, true);
->>>>            rc = nbd_send_request(s->ioc, request);
->>>>            if (rc >= 0 && !s->quit) {
->>>> @@ -181,9 +199,7 @@ err:
->>>>        return rc;
->>>>    }
->>>>    -static int nbd_co_receive_reply(NBDClientSession *s,
->>>> -                                NBDRequest *request,
->>>> -                                QEMUIOVector *qiov)
->>>> +static int nbd_co_receive_reply(NBDClientSession *s, NBDRequest
->>>> *request)
->>>>    {
->>>>        int ret;
->>>>        int i = HANDLE_TO_INDEX(s, request->handle);
->>>> @@ -197,14 +213,6 @@ static int nbd_co_receive_reply(NBDClientSession
->>>> *s,
->>>>        } else {
->>>>            assert(s->reply.handle == request->handle);
->>>>            ret = -s->reply.error;
->>>> -        if (qiov && s->reply.error == 0) {
->>>> -            assert(request->len == iov_size(qiov->iov, qiov->niov));
->>>> -            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
->>>> -                                      NULL) < 0) {
->>>> -                ret = -EIO;
->>>> -                s->quit = true;
->>>> -            }
->>>> -        }
->>>>              /* Tell the read handler to read another header.  */
->>>>            s->reply.handle = 0;
->>>> @@ -232,16 +240,14 @@ static int nbd_co_request(BlockDriverState *bs,
->>>>        NBDClientSession *client = nbd_get_client_session(bs);
->>>>        int ret;
->>>>    -    assert(!qiov || request->type == NBD_CMD_WRITE ||
->>>> -           request->type == NBD_CMD_READ);
->>>> -    ret = nbd_co_send_request(bs, request,
->>>> -                              request->type == NBD_CMD_WRITE ? qiov
->>>> : NULL);
->>>> +    assert((qiov == NULL) !=
->>>> +           (request->type == NBD_CMD_WRITE || request->type ==
->>>> NBD_CMD_READ));
->>>> +    ret = nbd_co_send_request(bs, request, qiov);
->>>>        if (ret < 0) {
->>>>            return ret;
->>>>        }
->>>>    -    return nbd_co_receive_reply(client, request,
->>>> -                                request->type == NBD_CMD_READ ? qiov
->>>> : NULL);
->>>> +    return nbd_co_receive_reply(client, request);
->>>>    }
->>>>      int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
->>>>
-
--- 
-Best regards,
-Vladimir
+thanks
+-- PMM
