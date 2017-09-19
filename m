@@ -1,31 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50395)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51057)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1duEgp-0005fl-Pg
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:19:37 -0400
+	(envelope-from <peterx@redhat.com>) id 1duEk1-0006Yz-5t
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:22:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1duEgm-0001bg-HR
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:19:35 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56000)
+	(envelope-from <peterx@redhat.com>) id 1duEjw-000338-5s
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:22:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43212)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1duEgm-0001ag-7Q
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:19:32 -0400
-Date: Tue, 19 Sep 2017 10:19:21 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170919091921.GD2107@work-vm>
-References: <20170914185314.GA3280@work-vm>
-	<20170915044622.GO3617@pxdev.xzpeter.org>
-	<CAJ+F1CKGsYbK5M6WKGSCioFCFY79WjFCtEQGqudiuA-QZTfOCA@mail.gmail.com>
-	<20170918083737.GD3617@pxdev.xzpeter.org>
-	<CAJ+F1C+ZE2xDVK8Ni7CaVbH6NHEz0-xXh_1gqwF-jf6T0iA16Q@mail.gmail.com>
-	<20170918105516.GD2581@work-vm>
-	<CAJ+F1CL3UwzTO7APLnR1MUFg+XWF1B8VJkmNQGBa3bqB_bXNfg@mail.gmail.com>
-	<20170918112618.GF2581@work-vm>
-	<CAJ+F1CLkTZMgUtpPUu_3SkscYDRuM0+zjWsiJ6-a-CtZYOLhBA@mail.gmail.com>
-	<20170919062903.GH3617@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1duEjv-00032l-Ss
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:22:48 -0400
+Date: Tue, 19 Sep 2017 17:22:32 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170919092232.GM3617@pxdev.xzpeter.org>
+References: <20170915120643.GN2170@work-vm> <20170915121433.GI13610@redhat.com>
+	<20170915121956.GO2170@work-vm> <20170915122913.GJ13610@redhat.com>
+	<20170915145632.GD18767@stefanha-x1.localdomain>
+	<20170915151706.GQ2170@work-vm>
+	<20170918092625.GE3617@pxdev.xzpeter.org>
+	<20170918104039.GC2581@work-vm>
+	<20170919022312.GG3617@pxdev.xzpeter.org>
+	<20170919091352.GC2107@work-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20170919062903.GH3617@pxdev.xzpeter.org>
+In-Reply-To: <20170919091352.GC2107@work-vm>
 Content-Transfer-Encoding: quoted-printable
 Subject: Re: [Qemu-devel] [RFC 00/15] QMP: out-of-band (OOB) execution
  support
@@ -37,280 +35,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Daniel P. Berrange" <berrange@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> On Mon, Sep 18, 2017 at 06:09:29PM +0200, Marc-Andr=E9 Lureau wrote:
-> > On Mon, Sep 18, 2017 at 1:26 PM, Dr. David Alan Gilbert
-> > <dgilbert@redhat.com> wrote:
-> > > * Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
-> > >> Hi
-> > >>
-> > >> On Mon, Sep 18, 2017 at 12:55 PM, Dr. David Alan Gilbert
-> > >> <dgilbert@redhat.com> wrote:
-> > >> > * Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
-> > >> >> Hi
-> > >> >>
-> > >> >> On Mon, Sep 18, 2017 at 10:37 AM, Peter Xu <peterx@redhat.com> =
+On Tue, Sep 19, 2017 at 10:13:52AM +0100, Dr. David Alan Gilbert wrote:
+> * Peter Xu (peterx@redhat.com) wrote:
+> > On Mon, Sep 18, 2017 at 11:40:40AM +0100, Dr. David Alan Gilbert wrot=
+e:
+> > > * Peter Xu (peterx@redhat.com) wrote:
+> > > > On Fri, Sep 15, 2017 at 04:17:07PM +0100, Dr. David Alan Gilbert =
 wrote:
-> > >> >> > On Fri, Sep 15, 2017 at 01:14:47PM +0200, Marc-Andr=E9 Lureau=
- wrote:
-> > >> >> >> Hi
-> > >> >> >>
-> > >> >> >> On Thu, Sep 14, 2017 at 9:46 PM, Peter Xu <peterx@redhat.com=
-> wrote:
-> > >> >> >> > On Thu, Sep 14, 2017 at 07:53:15PM +0100, Dr. David Alan G=
-ilbert wrote:
-> > >> >> >> >> * Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
-> > >> >> >> >> > Hi
-> > >> >> >> >> >
-> > >> >> >> >> > On Thu, Sep 14, 2017 at 9:50 AM, Peter Xu <peterx@redha=
-t.com> wrote:
-> > >> >> >> >> > > This series was born from this one:
-> > >> >> >> >> > >
-> > >> >> >> >> > >   https://lists.gnu.org/archive/html/qemu-devel/2017-=
-08/msg04310.html
-> > >> >> >> >> > >
-> > >> >> >> >> > > The design comes from Markus, and also the whole-bunc=
-h-of discussions
-> > >> >> >> >> > > in previous thread.  My heartful thanks to Markus, Da=
-niel, Dave,
-> > >> >> >> >> > > Stefan, etc. on discussing the topic (...again!), pro=
-viding shiny
-> > >> >> >> >> > > ideas and suggestions.  Finally we got such a solutio=
-n that seems to
-> > >> >> >> >> > > satisfy everyone.
-> > >> >> >> >> > >
-> > >> >> >> >> > > I re-started the versioning since this series is tota=
-lly different
-> > >> >> >> >> > > from previous one.  Now it's version 1.
-> > >> >> >> >> > >
-> > >> >> >> >> > > In case new reviewers come along the way without read=
-ing previous
-> > >> >> >> >> > > discussions, I will try to do a summary on what this =
-is all about.
-> > >> >> >> >> > >
-> > >> >> >> >> > > What is OOB execution?
-> > >> >> >> >> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-> > >> >> >> >> > >
-> > >> >> >> >> > > It's the shortcut of Out-Of-Band execution, its name =
-is given by
-> > >> >> >> >> > > Markus.  It's a way to quickly execute a QMP request.=
-  Say, originally
-> > >> >> >> >> > > QMP is going throw these steps:
-> > >> >> >> >> > >
-> > >> >> >> >> > >       JSON Parser --> QMP Dispatcher --> Respond
-> > >> >> >> >> > >           /|\    (2)                (3)     |
-> > >> >> >> >> > >        (1) |                               \|/ (4)
-> > >> >> >> >> > >            +---------  main thread  --------+
-> > >> >> >> >> > >
-> > >> >> >> >> > > The requests are executed by the so-called QMP-dispat=
-cher after the
-> > >> >> >> >> > > JSON is parsed.  If OOB is on, we run the command dir=
-ectly in the
-> > >> >> >> >> > > parser and quickly returns.
-> > >> >> >> >> >
-> > >> >> >> >> > All commands should have the "id" field mandatory in th=
-is case, else
-> > >> >> >> >> > the client will not distinguish the replies coming from=
- the last/oob
-> > >> >> >> >> > and the previous commands.
-> > >> >> >> >> >
-> > >> >> >> >> > This should probably be enforced upfront by client capa=
-bility checks,
-> > >> >> >> >> > more below.
-> > >> >> >> >
-> > >> >> >> > Hmm yes since the oob commands are actually running in asy=
-nc way,
-> > >> >> >> > request ID should be needed here.  However I'm not sure wh=
-ether
-> > >> >> >> > enabling the whole "request ID" thing is too big for this =
-"try to be
-> > >> >> >> > small" oob change... And IMHO it suites better to be part =
-of the whole
-> > >> >> >> > async work (no matter which implementation we'll use).
-> > >> >> >> >
-> > >> >> >> > How about this: we make "id" mandatory for "run-oob" reque=
-sts only.
-> > >> >> >> > For oob commands, they will always have ID then no orderin=
-g issue, and
-> > >> >> >> > we can do it async; for the rest of non-oob commands, we s=
-till allow
-> > >> >> >> > them to go without ID, and since they are not oob, they'll=
- always be
-> > >> >> >> > done in order as well.  Would this work?
-> > >> >> >>
-> > >> >> >> This mixed-mode is imho more complicated to deal with than h=
-aving the
-> > >> >> >> protocol enforced one way or the other, but that should work=
-.
-> > >> >> >>
-> > >> >> >> >
-> > >> >> >> >> >
-> > >> >> >> >> > > Yeah I know in current code the parser calls dispatch=
-er directly
-> > >> >> >> >> > > (please see handle_qmp_command()).  However it's not =
-true again after
-> > >> >> >> >> > > this series (parser will has its own IO thread, and d=
-ispatcher will
-> > >> >> >> >> > > still be run in main thread).  So this OOB does bring=
-s something
-> > >> >> >> >> > > different.
-> > >> >> >> >> > >
-> > >> >> >> >> > > There are more details on why OOB and the difference/=
-relationship
-> > >> >> >> >> > > between OOB, async QMP, block/general jobs, etc.. but=
- IMHO that's
-> > >> >> >> >> > > slightly out of topic (and believe me, it's not easy =
-for me to
-> > >> >> >> >> > > summarize that).  For more information, please refers=
- to [1].
-> > >> >> >> >> > >
-> > >> >> >> >> > > Summary ends here.
-> > >> >> >> >> > >
-> > >> >> >> >> > > Some Implementation Details
-> > >> >> >> >> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > >> >> >> >> > >
-> > >> >> >> >> > > Again, I mentioned that the old QMP workflow is this:
-> > >> >> >> >> > >
-> > >> >> >> >> > >       JSON Parser --> QMP Dispatcher --> Respond
-> > >> >> >> >> > >           /|\    (2)                (3)     |
-> > >> >> >> >> > >        (1) |                               \|/ (4)
-> > >> >> >> >> > >            +---------  main thread  --------+
-> > >> >> >> >> > >
-> > >> >> >> >> > > What this series does is, firstly:
-> > >> >> >> >> > >
-> > >> >> >> >> > >       JSON Parser     QMP Dispatcher --> Respond
-> > >> >> >> >> > >           /|\ |           /|\       (4)     |
-> > >> >> >> >> > >            |  | (2)        | (3)            |  (5)
-> > >> >> >> >> > >        (1) |  +----->      |               \|/
-> > >> >> >> >> > >            +---------  main thread  <-------+
-> > >> >> >> >> > >
-> > >> >> >> >> > > And further:
-> > >> >> >> >> > >
-> > >> >> >> >> > >                queue/kick
-> > >> >> >> >> > >      JSON Parser =3D=3D=3D=3D=3D=3D> QMP Dispatcher -=
--> Respond
-> > >> >> >> >> > >          /|\ |     (3)       /|\        (4)    |
-> > >> >> >> >> > >       (1) |  | (2)            |                |  (5)
-> > >> >> >> >> > >           | \|/               |               \|/
-> > >> >> >> >> > >         IO thread         main thread  <-------+
-> > >> >> >> >> >
-> > >> >> >> >> > Is the queue per monitor or per client?
-> > >> >> >> >
-> > >> >> >> > The queue is currently global. I think yes maybe at least =
-we can do it
-> > >> >> >> > per monitor, but I am not sure whether that is urgent or c=
-an be
-> > >> >> >> > postponed.  After all now QMPRequest (please refer to patc=
-h 11) is
-> > >> >> >> > defined as (mon, id, req) tuple, so at least "id" namespac=
-e is
-> > >> >> >> > per-monitor.
-> > >> >> >> >
-> > >> >> >> >> > And is the dispatching going
-> > >> >> >> >> > to be processed even if the client is disconnected, and=
- are new
-> > >> >> >> >> > clients going to receive the replies from previous clie=
-nts
-> > >> >> >> >> > commands?
-> > >> >> >> >
-> > >> >> >> > [1]
-> > >> >> >> >
-> > >> >> >> > (will discuss together below)
-> > >> >> >> >
-> > >> >> >> >> > I
-> > >> >> >> >> > believe there should be a per-client context, so there =
-won't be "id"
-> > >> >> >> >> > request conflicts.
-> > >> >> >> >
-> > >> >> >> > I'd say I am not familiar with this "client" idea, since a=
-fter all
-> > >> >> >> > IMHO one monitor is currently designed to mostly work with=
- a single
-> > >> >> >> > client. Say, unix sockets, telnet, all these backends are =
-only single
-> > >> >> >> > channeled, and one monitor instance can only work with one=
- client at a
-> > >> >> >> > time.  Then do we really need to add this client layer upo=
-n it?  IMHO
-> > >> >> >> > the user can just provide more monitors if they wants more=
- clients
-> > >> >> >> > (and at least these clients should know the existance of t=
-he others or
-> > >> >> >> > there might be problem, otherwise user2 will fail a migrat=
-ion, finally
-> > >> >> >> > noticed that user1 has already triggered one), and the use=
-r should
-> > >> >> >> > manage them well.
-> > >> >> >>
-> > >> >> >> qemu should support a management layer / libvirt restart/rec=
-onnect.
-> > >> >> >> Afaik, it mostly work today. There might be a cases where li=
-bvirt can
-> > >> >> >> be confused if it receives a reply from a previous connectio=
-n command,
-> > >> >> >> but due to the sync processing of the chardev, I am not sure=
- you can
-> > >> >> >> get in this situation.  By adding "oob" commands and queuing=
-, the
-> > >> >> >> client will have to remember which was the last "id" used, o=
-r it will
-> > >> >> >> create more conflict after a reconnect.
-> > >> >> >>
-> > >> >> >> Imho we should introduce the client/connection concept to av=
-oid this
-> > >> >> >> confusion (unexpected reply & per client id space).
-> > >> >> >
-> > >> >> > Hmm I agree that the reconnect feature would be nice, but if =
-so IMHO
-> > >> >> > instead of throwing responses away when client disconnect, we=
- should
-> > >> >> > really keep them, and when the client reconnects, we queue th=
-e
-> > >> >> > responses again.
-> > >> >> >
-> > >> >> > I think we have other quite simple ways to solve the "unexpec=
-ted
-> > >> >> > reply" and "per-client-id duplication" issues you have mentio=
-ned.
-> > >> >> >
-> > >> >> > Firstly, when client gets unexpected replies ("id" field not =
-in its
-> > >> >> > own request queue), the client should just ignore that reply,=
- which
-> > >> >> > seems natural to me.
-> > >> >>
-> > >> >> The trouble is that it may legitimately use the same "id" value=
- for
-> > >> >> new requests. And I don't see a simple way to handle that witho=
-ut
-> > >> >> races.
-> > >> >
-> > >> > Under what circumstances can it reuse the same ID for new reques=
-ts?
-> > >> > Can't we simply tell it not to?
-> > >>
-> > >> I don't see any restriction today in the protocol in connecting wi=
-th a
-> > >> new client that may not know anything from a previous client.
-> > >
-> > > Well, it knows it's doing a reconnection.
+> > > > > * Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> > > > > > On Fri, Sep 15, 2017 at 01:29:13PM +0100, Daniel P. Berrange =
+wrote:
+> > > > > > > On Fri, Sep 15, 2017 at 01:19:56PM +0100, Dr. David Alan Gi=
+lbert wrote:
+> > > > > > > > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > > > > > > > On Fri, Sep 15, 2017 at 01:06:44PM +0100, Dr. David Ala=
+n Gilbert wrote:
+> > > > > > > > > > * Daniel P. Berrange (berrange@redhat.com) wrote:
+> > > > > > > > > > > On Fri, Sep 15, 2017 at 11:49:26AM +0100, Stefan Ha=
+jnoczi wrote:
+> > > > > > > > > > > > On Fri, Sep 15, 2017 at 11:50:57AM +0800, Peter X=
+u wrote:
+> > > > > > > > > > > > > On Thu, Sep 14, 2017 at 04:19:11PM +0100, Stefa=
+n Hajnoczi wrote:
+> > > > > > > > > > > > > > On Thu, Sep 14, 2017 at 01:15:09PM +0200, Mar=
+c-Andr=C3=A9 Lureau wrote:
+> > > > > > > > > > > > > > > There should be a limit in the number of re=
+quests the thread can
+> > > > > > > > > > > > > > > queue. Before the patch, the limit was enfo=
+rced by system socket
+> > > > > > > > > > > > > > > buffering I think. Now, should oob commands=
+ still be processed even if
+> > > > > > > > > > > > > > > the queue is full? If so, the thread can't =
+be suspended.
+> > > > > > > > > > > > > >=20
+> > > > > > > > > > > > > > I agree.
+> > > > > > > > > > > > > >=20
+> > > > > > > > > > > > > > Memory usage must be bounded.  The number of =
+requests is less important
+> > > > > > > > > > > > > > than the amount of memory consumed by them.
+> > > > > > > > > > > > > >=20
+> > > > > > > > > > > > > > Existing QMP clients that send multiple QMP c=
+ommands without waiting for
+> > > > > > > > > > > > > > replies need to rethink their strategy becaus=
+e OOB commands cannot be
+> > > > > > > > > > > > > > processed if queued non-OOB commands consume =
+too much memory.
+> > > > > > > > > > > > >=20
+> > > > > > > > > > > > > Thanks for pointing out this.  Yes the memory u=
+sage problem is valid,
+> > > > > > > > > > > > > as Markus pointed out as well in previous discu=
+ssions (in "Flow
+> > > > > > > > > > > > > Control" section of that long reply).  Hopefull=
+y this series basically
+> > > > > > > > > > > > > can work from design prospective, then I'll add=
+ this flow control in
+> > > > > > > > > > > > > next version.
+> > > > > > > > > > > > >=20
+> > > > > > > > > > > > > Regarding to what we should do if the limit is =
+reached: Markus
+> > > > > > > > > > > > > provided a few options, but the one I prefer mo=
+st is that we don't
+> > > > > > > > > > > > > respond, but send an event showing that a comma=
+nd is dropped.
+> > > > > > > > > > > > > However, I would like it not queued, but a dire=
+ct reply (after all,
+> > > > > > > > > > > > > it's an event, and we should not need to care m=
+uch on ordering of it).
+> > > > > > > > > > > > > Then we can get rid of the babysitting of those=
+ "to be failed"
+> > > > > > > > > > > > > requests asap, meanwhile we don't lose anything=
+ IMHO.
+> > > > > > > > > > > > >=20
+> > > > > > > > > > > > > I think I also missed at least a unit test for =
+this new interface.
+> > > > > > > > > > > > > Again, I'll add it after the whole idea is prov=
+ed solid.  Thanks,
+> > > > > > > > > > > >=20
+> > > > > > > > > > > > Another solution: the server reports available re=
+ceive buffer space to
+> > > > > > > > > > > > the client.  The server only guarantees immediate=
+ OOB processing when
+> > > > > > > > > > > > the client stays within the receive buffer size.
+> > > > > > > > > > > >=20
+> > > > > > > > > > > > Clients wishing to take advantage of OOB must que=
+ry the receive buffer
+> > > > > > > > > > > > size and make sure to leave enough room.
+> > > > > > > > > > >=20
+> > > > > > > > > > > I don't think having to query it ahead of time is p=
+articularly nice,
+> > > > > > > > > > > and of course it is inherantly racy.
+> > > > > > > > > > >=20
+> > > > > > > > > > > I would just have QEMU emit an event when it pausin=
+g processing of the
+> > > > > > > > > > > incoming commands due to a full queue.  If the even=
+t includes the ID
+> > > > > > > > > > > of the last queued command, the client will know wh=
+ich (if any) of
+> > > > > > > > > > > its outstanding commands are delayed. Another even =
+can be sent when
+> > > > > > > > > > > it restarts reading.
+> > > > > > > > > >=20
+> > > > > > > > > > Hmm and now we're implementing flow control!
+> > > > > > > > > >=20
+> > > > > > > > > > a) What exactly is the current semantics/buffer sizes=
+?
+> > > > > > > > > > b) When do clients send multiple QMP commands on one =
+channel without
+> > > > > > > > > > waiting for the response to the previous command?
+> > > > > > > > > > c) Would one queue entry for each class of commands/c=
+hannel work
+> > > > > > > > > >   (Where a class of commands is currently 'normal' an=
+d 'oob')
+> > > > > > > > >=20
+> > > > > > > > > I do wonder if we need to worry about request limiting =
+at all from the
+> > > > > > > > > client side.  For non-OOB commands clients will wait fo=
+r a reply before
+> > > > > > > > > sending a 2nd non-OOB command, so you'll never get a de=
+ep queue for.
+> > > > > > > > >=20
+> > > > > > > > > OOB commands are supposed to be things which can be han=
+dled quickly
+> > > > > > > > > without blocking, so even if a client sent several comm=
+ands at once
+> > > > > > > > > without waiting for replies, they're going to be proces=
+sed quickly,
+> > > > > > > > > so whether we temporarily block reading off the wire is=
+ a minor
+> > > > > > > > > detail.
+> > > > > > > >=20
+> > > > > > > > Lets just define it so that it can't - you send an OOB co=
+mmand and wait
+> > > > > > > > for it's response before sending another on that channel.
+> > > > > > > >=20
+> > > > > > > > > IOW, I think we could just have a fixed 10 command queu=
+e and apps just
+> > > > > > > > > pretend that there's an infinite queue and nothing bad =
+would happen from
+> > > > > > > > > the app's POV.
+> > > > > > > >=20
+> > > > > > > > Can you justify 10 as opposed to 1?
+> > > > > > >=20
+> > > > > > > Semantically I don't think it makes a difference if the OOB=
+ commands are
+> > > > > > > being processed sequentially by their thread. A >1 length q=
+ueue would only
+> > > > > > > matter for non-OOB commands if an app was filling the pipel=
+ine with non-OOB
+> > > > > > > requests, as then that could block reading of OOB commands.=
+=20
+> > > > > >=20
+> > > > > > To summarize:
+> > > > > >=20
+> > > > > > The QMP server has a lookahead of 1 command so it can dispatc=
+h
+> > > > > > out-of-band commands.  If 2 or more non-OOB commands are queu=
+ed at the
+> > > > > > same time then OOB processing will not occur.
+> > > > > >=20
+> > > > > > Is that right?
+> > > > >=20
+> > > > > I think my view is slightly more complex;
+> > > > >   a) There's a pair of queues for each channel
+> > > > >   b) There's a central pair of queues on the QMP server
+> > > > >     one for OOB commands and one for normal commands.
+> > > > >   c) Each queue is only really guaranteed to be one deep.
+> > > > >=20
+> > > > >   That means that each one of the channels can send a non-OOB
+> > > > > command without getting in the way of a channel that wants
+> > > > > to send one.
+> > > >=20
+> > > > But current version should not be that complex:
+> > > >=20
+> > > > Firstly, parser thread will only be enabled for QMP+NO_MIXED moni=
+tors.
+> > > >=20
+> > > > Then, we only have a single global queue for QMP non-oob commands=
+, and
+> > > > we don't have response queue yet.  We do respond just like before=
+ in a
+> > > > synchronous way (I explained why - for OOB we don't need that
+> > > > complexity IMHO).
+> > >=20
+> > > I think  the discussion started because of two related comments:
+> > >   Marc-Andr=C3=A9 said :
+> > >      'There should be a limit in the number of requests the thread =
+can
+> > > queue'
+> > > and Stefan said :
+> > >      'Memory usage must be bounded.'
+> > >=20
+> > > actually neither of those cases really worried me (because they onl=
+y
+> > > happen if the client keeps pumping commands, and that seems it's fa=
+ult).
+> > >=20
+> > > However, once you start adding a limit, you've got to be careful - =
+if
+> > > you just added a limit to the central queue, then what happens if t=
+hat
+> > > queue is filled by non-OOB commands?
 > >=20
-> > If you assume the "same client" reconnects to the monitor, I agree.
-> > But this is a restriction of monitor usage.
+> > Ah!  So I misunderstood "a pair of queues for each channel".  I
+> > thought it means the input and output of a single monitor, while I
+> > think it actually means "OOB channel" and "non-OOB channel".
+> >=20
+> > My plan (or say, this version) starts from only one global queue for
+> > non-OOB commands.  There is no queue for OOB commands at all.  As
+> > discussed below [1], if we receive one OOB command, we execute it
+> > directly and reply to client.  And here the "request queue" will only
+> > queue non-OOB commands.  Maybe the name "request queue" sounds
+> > confusing here.
+> >=20
+> > If so, we should not have above problem, right?  Since even if the
+> > queue is full (of course there will only be non-OOB commands in the
+> > queue), the parsing is still working, and we will still be able to
+> > handle OOB ones:
+> >=20
+> >   req =3D parse(stream);
+> >=20
+> >   if (is_oob(req)) {
+> >     execute(req);
+> >     return;
+> >   }
+> >=20
+> >   if (queue_full(req_queue)) {
+> >     emit_full_event(req);
+> >     return;
+> >   }
+> >=20
+> >   enqueue(req_queue, req);
+> >=20
+> > So again, this version is a simplified version from previous
+> > discussion (no oob-queue but only non-oob-queue, no respond queue but
+> > only request queue, etc...), but hope it can work.
 >=20
-> In monitor_qmp_event(), we can empty the request queue when got
-> CHR_EVENT_CLOSED.  Would that be a solution?
+> That might work.  You have to be really careful about allowing
+> OOB commands to be parsed, even if the non-OOB queue is full.
+>=20
+> One problem is that one client could fill up that shared queue,
+> then another client would be surprised to find the queue is full
+> when it tries to send just one command - hence why I thought a separate
+> queue per client would solve that.
 
-What happens to commands that are in flight?
+Ah yes.  Let me switch to one queue per monitor in my next post.  Thanks,
 
-Dave
-
-> --=20
-> Peter Xu
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+--=20
+Peter Xu
