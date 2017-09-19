@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57418)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57532)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1duDaj-0006t9-23
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 04:09:19 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1duDbF-0007A1-2o
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 04:09:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1duDai-0004Tj-4T
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 04:09:13 -0400
-Date: Tue, 19 Sep 2017 16:08:58 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170919080858.GD11534@lemon.lan>
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170913181910.29688-19-mreitz@redhat.com>
-	<20170918064515.GF15551@lemon.lan>
-	<ea1f7b60-4b95-f40a-2dc9-e368a74b3de5@redhat.com>
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1duDbC-0004c4-9d
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 04:09:45 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:24114)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1duDbB-0004Zq-Tq
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 04:09:42 -0400
+References: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1505385610-35529-3-git-send-email-pradeep.jagadeesh@huawei.com>
+	<20170918162503.gudmrjtvpytqf64m@postretch>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <aa362374-22ab-9aaf-b5f9-b719d1fa64ef@huawei.com>
+Date: Tue, 19 Sep 2017 10:07:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ea1f7b60-4b95-f40a-2dc9-e368a74b3de5@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 18/18] iotests: Add test for active
- mirroring
+In-Reply-To: <20170918162503.gudmrjtvpytqf64m@postretch>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 2/6] qmp: Use ThrottleLimits structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,37 +28,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, jani kokkonen <jani.kokkonen@huawei.com>, alberto garcia <berto@igalia.com>, qemu-devel@nongnu.org
 
-On Mon, 09/18 18:53, Max Reitz wrote:
-> >> +
-> >> +        if sync_source_and_target:
-> >> +            # If source and target should be in sync after the mirror,
-> >> +            # we have to flush before completion
-> > 
-> > Not sure I understand this requirements, does it apply to libvirt and user too?
-> > I.e. it's a part of the interface ? Why cannot mirror_complete do it
-> > automatically?
-> 
-> Well, it seems to pass without this flush, but the original intention
-> was this: When mirror is completed, the source node is replaced by the
-> target.  All further writes are then only executed on the (former)
-> target node.  So what might happen (or at least I think it could) is
-> that qemu-io submits some writes, but before they are actually
-> performed, the mirror block job is completed and the source is replaced
-> by the target.  Then, the write operations are performed on the target
-> but no longer on the source, so source and target are then out of sync.
-> For the mirror block job, that is fine -- at the point of completion,
-> source and target were in sync.  The job doesn't care that they get out
-> of sync after completion.  But here, we have to care or we can't compare
-> source and target.
-> 
-> The reason for why it always seems to pass without a flush is that every
-> submitted write is actually sent to the mirror node before it yields for
-> the first time.  But I wouldn't bet on that, so I think it's better to
-> keep the flush before completing the block job.
+On 9/18/2017 6:25 PM, Manos Pitsidianakis wrote:
+> On Thu, Sep 14, 2017 at 06:40:06AM -0400, Pradeep Jagadeesh wrote:
+>> This patch factors out code to use the ThrottleLimits
+>> strurcture.
+>>
+>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+>> Reviewed-by: Greg Kurz <groug@kaod.org>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>> qapi/block-core.json | 78
+>> +++-------------------------------------------------
+>> 1 file changed, 4 insertions(+), 74 deletions(-)
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index bb11815..d0ccfda 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -1826,84 +1826,13 @@
+>> #
+>> # @device: Block device name (deprecated, use @id instead)
+>> #
+>> -# @id: The name or QOM path of the guest device (since: 2.8)
+>> -#
+>> -# @bps: total throughput limit in bytes per second
+>> -#
+>> -# @bps_rd: read throughput limit in bytes per second
+>> -#
+>> -# @bps_wr: write throughput limit in bytes per second
+>> -#
+>> -# @iops: total I/O operations per second
+>> -#
+>> -# @iops_rd: read I/O operations per second
+>> -#
+>> -# @iops_wr: write I/O operations per second
+>> -#
+>> -# @bps_max: total throughput limit during bursts,
+>> -#                     in bytes (Since 1.7)
+>> -#
+>> -# @bps_rd_max: read throughput limit during bursts,
+>> -#                        in bytes (Since 1.7)
+>> -#
+>> -# @bps_wr_max: write throughput limit during bursts,
+>> -#                        in bytes (Since 1.7)
+>> -#
+>> -# @iops_max: total I/O operations per second during bursts,
+>> -#                      in bytes (Since 1.7)
+>> -#
+>> -# @iops_rd_max: read I/O operations per second during bursts,
+>> -#                         in bytes (Since 1.7)
+>> -#
+>> -# @iops_wr_max: write I/O operations per second during bursts,
+>> -#                         in bytes (Since 1.7)
+>> -#
+>> -# @bps_max_length: maximum length of the @bps_max burst
+>> -#                            period, in seconds. It must only
+>> -#                            be set if @bps_max is set as well.
+>> -#                            Defaults to 1. (Since 2.6)
+>> -#
+>> -# @bps_rd_max_length: maximum length of the @bps_rd_max
+>> -#                               burst period, in seconds. It must only
+>> -#                               be set if @bps_rd_max is set as well.
+>> -#                               Defaults to 1. (Since 2.6)
+>> -#
+>> -# @bps_wr_max_length: maximum length of the @bps_wr_max
+>> -#                               burst period, in seconds. It must only
+>> -#                               be set if @bps_wr_max is set as well.
+>> -#                               Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_max_length: maximum length of the @iops burst
+>> -#                             period, in seconds. It must only
+>> -#                             be set if @iops_max is set as well.
+>> -#                             Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_rd_max_length: maximum length of the @iops_rd_max
+>> -#                                burst period, in seconds. It must only
+>> -#                                be set if @iops_rd_max is set as well.
+>> -#                                Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_wr_max_length: maximum length of the @iops_wr_max
+>> -#                                burst period, in seconds. It must only
+>> -#                                be set if @iops_wr_max is set as well.
+>> -#                                Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_size: an I/O size in bytes (Since 1.7)
+>> -#
+>> # @group: throttle group name (Since 2.4)
+>> #
+>> # Since: 1.1
+>> ##
+>> { 'struct': 'BlockIOThrottle',
+>> -  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd':
+>> 'int',
+>> -            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int',
+>> 'iops_wr': 'int',
+>> -            '*bps_max': 'int', '*bps_rd_max': 'int',
+>> -            '*bps_wr_max': 'int', '*iops_max': 'int',
+>> -            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+>> -            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+>> -            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>> -            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+>> -            '*iops_size': 'int', '*group': 'str' } }
+>> +  'base': 'ThrottleLimits',
+>> +  'data': { '*device': 'str', '*group': 'str' } }
+>>
+>> ##
+>> # @ThrottleLimits:
+>> @@ -1913,6 +1842,7 @@
+>> # transaction. All fields are optional. When setting limits, if a
+>> field is
+>> # missing the current value is not changed.
+>> #
+>> +# @id:                     device id
+>> # @iops-total:             limit total I/O operations per second
+>> # @iops-total-max:         I/O operations burst
+>> # @iops-total-max-length:  length of the iops-total-max burst period,
+>> in seconds
+>> @@ -1942,7 +1872,7 @@
+>> # Since: 2.11
+>> ##
+>> { 'struct': 'ThrottleLimits',
+>> -  'data': { '*iops-total' : 'int', '*iops-total-max' : 'int',
+>> +  'data': { '*id' : 'str', '*iops-total' : 'int', '*iops-total-max' :
+>> 'int',
+>>             '*iops-total-max-length' : 'int', '*iops-read' : 'int',
+>>             '*iops-read-max' : 'int', '*iops-read-max-length' : 'int',
+>>             '*iops-write' : 'int', '*iops-write-max' : 'int',
+>> --
+>> 1.8.3.1
+>>
+>
+> Why is id needed? ThrottleLimits is not per group, not per device. And
+> as I mentioned in another reply, this changes the block_set_io_throttle
+> command which is not simple refactoring.
+When you use qmp/hmp interface the id is used to set/get throttle 
+configuration. So, I thought if id is part of the throttle config, it 
+will be useful. Now I will try to move it to just for fsdeviothrottle.
 
-OK, that makes sense. Thanks.
-
-Fam
+-Pradeep
