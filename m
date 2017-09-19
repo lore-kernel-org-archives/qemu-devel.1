@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60234)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfd-0004SR-T5
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:40 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfr-0004fc-Qz
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfc-0005fz-LH
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:33 -0400
-Received: from mail-wr0-x22f.google.com ([2a00:1450:400c:c0c::22f]:53331)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfk-0005mv-HT
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:47 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33584)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1duHfc-0005et-Fa
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:32 -0400
-Received: by mail-wr0-x22f.google.com with SMTP id l22so2975168wrc.10
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:30:31 -0700 (PDT)
+	id 1duHfk-0005mD-BN
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:40 -0400
+Received: by mail-wm0-x243.google.com with SMTP id m127so3758122wmm.0
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:30:40 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 19 Sep 2017 14:29:30 +0200
-Message-Id: <1505824179-21541-42-git-send-email-pbonzini@redhat.com>
+Date: Tue, 19 Sep 2017 14:29:38 +0200
+Message-Id: <1505824179-21541-50-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
 References: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 41/50] i386/cpu/hyperv: support over 64 vcpus
- for windows guests
+Subject: [Qemu-devel] [PULL 49/50] default-configs: Replace $(and ...) with
+ $(call land, ...)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,103 +29,81 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Gonglei <arei.gonglei@huawei.com>
+Cc: Thomas Huth <thuth@redhat.com>
 
-From: Gonglei <arei.gonglei@huawei.com>
+From: Thomas Huth <thuth@redhat.com>
 
-Starting with Windows Server 2012 and Windows 8, if
-CPUID.40000005.EAX contains a value of -1, Windows assumes specific
-limit to the number of VPs. In this case, Windows Server 2012
-guest VMs may use more than 64 VPs, up to the maximum supported
-number of processors applicable to the specific Windows
-version being used.
+Using $(and ...) is dangerous here: It only works as long as the first
+argument is set to 'y' or completely unset. It does not work if the
+first argument is set to 'n' for example. Let's use the "land" make
+function instead which has been written explicitely for this purpose.
 
-https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
-
-For compatibility, Let's introduce a new property for X86CPU,
-named "x-hv-max-vps" as Eduardo's suggestion, and set it
-to 0x40 before machine 2.10.
-
-(The "x-" prefix indicates that the property is not supposed to
-be a stable user interface.)
-
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
-Message-Id: <1505143227-14324-1-git-send-email-arei.gonglei@huawei.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1505759538-15365-1-git-send-email-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/hw/i386/pc.h |  5 +++++
- target/i386/cpu.c    | 14 ++++++++++++++
- target/i386/cpu.h    |  2 ++
- target/i386/kvm.c    |  3 ++-
- 4 files changed, 23 insertions(+), 1 deletion(-)
+ default-configs/pci.mak           | 2 +-
+ default-configs/ppc-softmmu.mak   | 2 +-
+ default-configs/ppc64-softmmu.mak | 4 ++--
+ default-configs/s390x-softmmu.mak | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 8226904..087d184 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -371,6 +371,11 @@ bool e820_get_entry(int, uint32_t, uint64_t *, uint64_t *);
- 
- #define PC_COMPAT_2_10 \
-     HW_COMPAT_2_10 \
-+    {\
-+        .driver   = TYPE_X86_CPU,\
-+        .property = "x-hv-max-vps",\
-+        .value    = "0x40",\
-+    },
- 
- #define PC_COMPAT_2_9 \
-     HW_COMPAT_2_9 \
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 7644f6d..40c3091 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4145,6 +4145,20 @@ static Property x86_cpu_properties[] = {
-                      false),
-     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
-     DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
-+
-+    /*
-+     * From "Requirements for Implementing the Microsoft
-+     * Hypervisor Interface":
-+     * https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
-+     *
-+     * "Starting with Windows Server 2012 and Windows 8, if
-+     * CPUID.40000005.EAX contains a value of -1, Windows assumes that
-+     * the hypervisor imposes no specific limit to the number of VPs.
-+     * In this case, Windows Server 2012 guest VMs may use more than
-+     * 64 VPs, up to the maximum supported number of processors applicable
-+     * to the specific Windows version being used."
-+     */
-+    DEFINE_PROP_INT32("x-hv-max-vps", X86CPU, hv_max_vps, -1),
-     DEFINE_PROP_END_OF_LIST()
- };
- 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 525d35d..5c726f3 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1282,6 +1282,8 @@ struct X86CPU {
-     int32_t socket_id;
-     int32_t core_id;
-     int32_t thread_id;
-+
-+    int32_t hv_max_vps;
- };
- 
- static inline X86CPU *x86_env_get_cpu(CPUX86State *env)
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 739334a..ee4e91f 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -786,7 +786,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
- 
-         c = &cpuid_data.entries[cpuid_i++];
-         c->function = HYPERV_CPUID_IMPLEMENT_LIMITS;
--        c->eax = 0x40;
-+
-+        c->eax = cpu->hv_max_vps;
-         c->ebx = 0x40;
- 
-         kvm_base = KVM_CPUID_SIGNATURE_NEXT;
+diff --git a/default-configs/pci.mak b/default-configs/pci.mak
+index a758630..187e438 100644
+--- a/default-configs/pci.mak
++++ b/default-configs/pci.mak
+@@ -43,4 +43,4 @@ CONFIG_VGA=y
+ CONFIG_VGA_PCI=y
+ CONFIG_IVSHMEM_DEVICE=$(CONFIG_IVSHMEM)
+ CONFIG_ROCKER=y
+-CONFIG_VHOST_USER_SCSI=$(and $(CONFIG_VHOST_USER),$(CONFIG_LINUX))
++CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+diff --git a/default-configs/ppc-softmmu.mak b/default-configs/ppc-softmmu.mak
+index a3972c5..d7a3755 100644
+--- a/default-configs/ppc-softmmu.mak
++++ b/default-configs/ppc-softmmu.mak
+@@ -43,7 +43,7 @@ CONFIG_XILINX_ETHLITE=y
+ CONFIG_PREP=y
+ CONFIG_MAC=y
+ CONFIG_E500=y
+-CONFIG_OPENPIC_KVM=$(and $(CONFIG_E500),$(CONFIG_KVM))
++CONFIG_OPENPIC_KVM=$(call land,$(CONFIG_E500),$(CONFIG_KVM))
+ CONFIG_PLATFORM_BUS=y
+ CONFIG_ETSEC=y
+ CONFIG_LIBDECNUMBER=y
+diff --git a/default-configs/ppc64-softmmu.mak b/default-configs/ppc64-softmmu.mak
+index af32589..9086475 100644
+--- a/default-configs/ppc64-softmmu.mak
++++ b/default-configs/ppc64-softmmu.mak
+@@ -48,7 +48,7 @@ CONFIG_POWERNV=y
+ CONFIG_PREP=y
+ CONFIG_MAC=y
+ CONFIG_E500=y
+-CONFIG_OPENPIC_KVM=$(and $(CONFIG_E500),$(CONFIG_KVM))
++CONFIG_OPENPIC_KVM=$(call land,$(CONFIG_E500),$(CONFIG_KVM))
+ CONFIG_PLATFORM_BUS=y
+ CONFIG_ETSEC=y
+ CONFIG_LIBDECNUMBER=y
+@@ -56,7 +56,7 @@ CONFIG_SM501=y
+ # For pSeries
+ CONFIG_XICS=$(CONFIG_PSERIES)
+ CONFIG_XICS_SPAPR=$(CONFIG_PSERIES)
+-CONFIG_XICS_KVM=$(and $(CONFIG_PSERIES),$(CONFIG_KVM))
++CONFIG_XICS_KVM=$(call land,$(CONFIG_PSERIES),$(CONFIG_KVM))
+ # For PReP
+ CONFIG_SERIAL_ISA=y
+ CONFIG_MC146818RTC=y
+diff --git a/default-configs/s390x-softmmu.mak b/default-configs/s390x-softmmu.mak
+index 6ab2bc6..444bf16 100644
+--- a/default-configs/s390x-softmmu.mak
++++ b/default-configs/s390x-softmmu.mak
+@@ -1,6 +1,6 @@
+ CONFIG_PCI=y
+ CONFIG_VIRTIO_PCI=$(CONFIG_PCI)
+-CONFIG_VHOST_USER_SCSI=$(and $(CONFIG_VHOST_USER),$(CONFIG_LINUX))
++CONFIG_VHOST_USER_SCSI=$(call land,$(CONFIG_VHOST_USER),$(CONFIG_LINUX))
+ CONFIG_VIRTIO=y
+ CONFIG_SCLPCONSOLE=y
+ CONFIG_TERMINAL3270=y
 -- 
 1.8.3.1
