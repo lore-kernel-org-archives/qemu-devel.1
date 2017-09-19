@@ -1,23 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49206)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1duK3h-00088G-S3
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:03:34 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1duK3j-0008A9-LW
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:03:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1duK3g-0003lY-Ig
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:03:33 -0400
-Received: from mail-io0-x233.google.com ([2607:f8b0:4001:c06::233]:49511)
+	(envelope-from <richard.henderson@linaro.org>) id 1duK3e-0003jt-SV
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:03:35 -0400
+Received: from mail-io0-x231.google.com ([2607:f8b0:4001:c06::231]:52410)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1duK3g-0003lA-CC
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:03:32 -0400
-Received: by mail-io0-x233.google.com with SMTP id 21so725884iof.6
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 08:03:32 -0700 (PDT)
+	id 1duK3e-0003j8-Oa
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:03:30 -0400
+Received: by mail-io0-x231.google.com with SMTP id i197so715549ioe.9
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 08:03:30 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Date: Tue, 19 Sep 2017 10:03:12 -0500
-Message-Id: <20170919150313.10833-8-richard.henderson@linaro.org>
+Date: Tue, 19 Sep 2017 10:03:11 -0500
+Message-Id: <20170919150313.10833-7-richard.henderson@linaro.org>
 In-Reply-To: <20170919150313.10833-1-richard.henderson@linaro.org>
 References: <20170919150313.10833-1-richard.henderson@linaro.org>
-Subject: [Qemu-devel] [PATCH v2 7/8] ppc: Support Capstone in disas_set_info
+Subject: [Qemu-devel] [PATCH v2 6/8] arm: Support Capstone in disas_set_info
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,53 +27,75 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-arm@nongnu.org
 
-Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-arm@nongnu.org
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- disas.c                     | 4 ++++
- target/ppc/translate_init.c | 6 ++++++
- 2 files changed, 10 insertions(+)
+ disas.c          |  3 +++
+ target/arm/cpu.c | 21 ++++++++++++++++++---
+ 2 files changed, 21 insertions(+), 3 deletions(-)
 
 diff --git a/disas.c b/disas.c
-index ea295f9cfc..b4e4fc409e 100644
+index 42fae735ee..ea295f9cfc 100644
 --- a/disas.c
 +++ b/disas.c
-@@ -449,6 +449,10 @@ void disas(FILE *out, void *code, unsigned long size)
- #elif defined(_ARCH_PPC)
-     s.info.disassembler_options = (char *)"any";
+@@ -451,6 +451,7 @@ void disas(FILE *out, void *code, unsigned long size)
      print_insn = print_insn_ppc;
-+    s.info.cap_arch = CS_ARCH_PPC;
-+# ifdef _ARCH_PPC64
-+    s.info.cap_mode = CS_MODE_64;
-+# endif
  #elif defined(__aarch64__) && defined(CONFIG_ARM_A64_DIS)
      print_insn = print_insn_arm_a64;
-     s.info.cap_arch = CS_ARCH_ARM64;
-diff --git a/target/ppc/translate_init.c b/target/ppc/translate_init.c
-index c7b4a7c02a..b976784d21 100644
---- a/target/ppc/translate_init.c
-+++ b/target/ppc/translate_init.c
-@@ -35,6 +35,7 @@
- #include "mmu-book3s-v3.h"
- #include "sysemu/qtest.h"
- #include "qemu/cutils.h"
++    s.info.cap_arch = CS_ARCH_ARM64;
+ #elif defined(__alpha__)
+     print_insn = print_insn_alpha;
+ #elif defined(__sparc__)
+@@ -458,6 +459,8 @@ void disas(FILE *out, void *code, unsigned long size)
+     s.info.mach = bfd_mach_sparc_v9b;
+ #elif defined(__arm__)
+     print_insn = print_insn_arm;
++    s.info.cap_arch = CS_ARCH_ARM;
++    /* TCG only generates code for arm mode.  */
+ #elif defined(__MIPSEB__)
+     print_insn = print_insn_big_mips;
+ #elif defined(__MIPSEL__)
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 412e94c7ad..53320709ac 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -33,6 +33,7 @@
+ #include "sysemu/sysemu.h"
+ #include "sysemu/hw_accel.h"
+ #include "kvm_arm.h"
 +#include "disas/capstone.h"
  
- //#define PPC_DUMP_CPU
- //#define PPC_DEBUG_SPR
-@@ -10662,6 +10663,11 @@ static void ppc_disas_set_info(CPUState *cs, disassemble_info *info)
+ static void arm_cpu_set_pc(CPUState *cs, vaddr value)
+ {
+@@ -482,10 +483,24 @@ static void arm_disas_set_info(CPUState *cpu, disassemble_info *info)
+ #if defined(CONFIG_ARM_A64_DIS)
+         info->print_insn = print_insn_arm_a64;
+ #endif
+-    } else if (env->thumb) {
+-        info->print_insn = print_insn_thumb1;
++        info->cap_arch = CS_ARCH_ARM64;
+     } else {
+-        info->print_insn = print_insn_arm;
++        int cap_mode;
++        if (env->thumb) {
++            info->print_insn = print_insn_thumb1;
++            cap_mode = CS_MODE_THUMB;
++        } else {
++            info->print_insn = print_insn_arm;
++            cap_mode = CS_MODE_ARM;
++        }
++        if (arm_feature(env, ARM_FEATURE_V8)) {
++            cap_mode |= CS_MODE_V8;
++        }
++        if (arm_feature(env, ARM_FEATURE_M)) {
++            cap_mode |= CS_MODE_MCLASS;
++        }
++        info->cap_arch = CS_ARCH_ARM;
++        info->cap_mode = cap_mode;
      }
-     info->disassembler_options = (char *)"any";
-     info->print_insn = print_insn_ppc;
-+
-+    info->cap_arch = CS_ARCH_PPC;
-+#ifdef TARGET_PPC64
-+    info->cap_mode = CS_MODE_64;
-+#endif
- }
- 
- static Property ppc_cpu_properties[] = {
+     if (bswap_code(arm_sctlr_b(env))) {
+ #ifdef TARGET_WORDS_BIGENDIAN
 -- 
 2.13.5
