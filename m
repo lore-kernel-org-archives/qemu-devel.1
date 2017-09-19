@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41760)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1duOoy-0001zV-Kt
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:08:41 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1duOyz-0004ps-CU
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:19:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1duOot-0005Ok-IF
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:08:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42204)
+	(envelope-from <ehabkost@redhat.com>) id 1duOyu-000465-VB
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:19:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38060)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1duOot-0005O8-CW
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:08:35 -0400
-Date: Tue, 19 Sep 2017 17:08:26 -0300
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1duOyu-00044Y-NU
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:18:56 -0400
 From: Eduardo Habkost <ehabkost@redhat.com>
-Message-ID: <20170919200826.GF21016@localhost.localdomain>
-References: <20170825195406.19624-1-ehabkost@redhat.com>
-	<7dbaeffc-44f2-06a3-0d0c-0470958dd60c@redhat.com>
+Date: Tue, 19 Sep 2017 17:18:38 -0300
+Message-Id: <20170919201850.14772-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7dbaeffc-44f2-06a3-0d0c-0470958dd60c@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] xio3130_downstream: Report error if
- pcie_chassis_add_slot() failed
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 00/12] Machine/CPU/NUMA queue, 2017-09-19
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +24,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, Mao Zhongyi <maozy.fnst@cn.fujitsu.com>, "Michael S . Tsirkin" <mst@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-On Sun, Aug 27, 2017 at 10:44:26AM +0300, Marcel Apfelbaum wrote:
-> Hi Eduardo,
-> 
-> On 25/08/2017 22:54, Eduardo Habkost wrote:
-> > On commit f8cd1b02 ("pci: Convert to realize"), no error_set*()
-> > call was added for the pcie_chassis_add_slot() error case.
-> > pcie_chassis_add_slot() errors get ignored, making QEMU crash
-> > later.  e.g.:
-> > 
-> >    $ qemu-system-x86_64 -device ioh3420 -device xio3130-downstream
-> >    qemu-system-x86_64: memory.c:2166: memory_region_del_subregion: Assertion `subregion->container == mr' failed.
-> >    Aborted (core dumped)
-> > 
-> > Fix it by reporting the error using error_setg().
-> > 
-> > Fixes: f8cd1b0201c41d88bb97dcafb80348a0e88d8805
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> >   hw/pci-bridge/xio3130_downstream.c | 1 +
-> >   1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/hw/pci-bridge/xio3130_downstream.c b/hw/pci-bridge/xio3130_downstream.c
-> > index e706f36..5a882b0 100644
-> > --- a/hw/pci-bridge/xio3130_downstream.c
-> > +++ b/hw/pci-bridge/xio3130_downstream.c
-> > @@ -94,6 +94,7 @@ static void xio3130_downstream_realize(PCIDevice *d, Error **errp)
-> >       pcie_chassis_create(s->chassis);
-> >       rc = pcie_chassis_add_slot(s);
-> >       if (rc < 0) {
-> > +        error_setg(errp, "Can't add chassis slot, error %d", rc);
-> >           goto err_pcie_cap;
-> >       }
-> > 
-> 
-> 
-> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
+The following changes since commit a9158a5cba955b79d580a252cc58ff44d154e3=
+70:
 
-Thanks!
+  Merge remote-tracking branch 'remotes/kraxel/tags/audio-20170918-pull-r=
+equest' into staging (2017-09-18 12:40:54 +0100)
 
-Michael, do you want to merge this, or should I queue it?
+are available in the git repository at:
 
--- 
-Eduardo
+  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+
+for you to fetch changes up to e3d038b89f1bf3f09da4d59aa16b16e8305e1a05:
+
+  MAINTAINERS: Update git URLs for my trees (2017-09-19 16:53:13 -0300)
+
+----------------------------------------------------------------
+Machine/CPU/NUMA queue, 2017-09-19
+
+----------------------------------------------------------------
+
+Dou Liyang (1):
+  NUMA: Replace MAX_NODES with nb_numa_nodes in for loop
+
+Eduardo Habkost (5):
+  vl: Clean up user-creatable objects when exiting
+  osdep: Define QEMU_MADV_REMOVE
+  hostmem-file: Add "discard-data" option
+  hw/acpi-build: Fix SRAT memory building in case of node 0 without RAM
+  MAINTAINERS: Update git URLs for my trees
+
+Igor Mammedov (6):
+  qom: cpus: split cpu_generic_init() on feature parsing and cpu
+    creation parts
+  cpu: make cpu_generic_init() abort QEMU on error
+  vl.c: convert cpu_model to cpu type and set of global properties
+    before machine_init()
+  pc: use generic cpu_model parsing
+  arm: drop intermediate cpu_model -> cpu type parsing and use cpu type
+    directly
+  numa: cpu: calculate/set default node-ids after all -numa CLI options
+    are parsed
+
+ include/hw/arm/armv7m.h         |  4 +--
+ include/hw/arm/aspeed_soc.h     |  2 +-
+ include/hw/arm/stm32f205_soc.h  |  2 +-
+ include/hw/boards.h             | 10 +++++++
+ include/qemu/osdep.h            |  7 +++++
+ include/qom/cpu.h               | 22 +++++++++++++++
+ include/qom/object_interfaces.h |  8 ++++++
+ target/arm/cpu.h                |  3 ++
+ target/i386/cpu.h               |  9 ++++++
+ backends/hostmem-file.c         | 29 ++++++++++++++++++++
+ bsd-user/main.c                 |  4 ---
+ hw/alpha/dp264.c                |  4 ---
+ hw/arm/armv7m.c                 | 40 ++++-----------------------
+ hw/arm/aspeed_soc.c             | 13 ++++-----
+ hw/arm/collie.c                 | 10 ++-----
+ hw/arm/exynos4210.c             |  6 +---
+ hw/arm/gumstix.c                |  5 ++--
+ hw/arm/highbank.c               | 10 +++----
+ hw/arm/integratorcp.c           | 30 ++------------------
+ hw/arm/mainstone.c              |  9 +++---
+ hw/arm/mps2.c                   | 17 +++++-------
+ hw/arm/musicpal.c               | 11 ++------
+ hw/arm/netduino2.c              |  2 +-
+ hw/arm/nseries.c                |  4 ++-
+ hw/arm/omap1.c                  | 11 ++------
+ hw/arm/omap2.c                  |  8 ++----
+ hw/arm/omap_sx1.c               |  5 +++-
+ hw/arm/palm.c                   |  5 ++--
+ hw/arm/pxa2xx.c                 | 18 +++---------
+ hw/arm/realview.c               | 25 ++++-------------
+ hw/arm/spitz.c                  | 12 ++++----
+ hw/arm/stellaris.c              | 16 +++++------
+ hw/arm/stm32f205_soc.c          |  4 +--
+ hw/arm/strongarm.c              | 15 ++--------
+ hw/arm/tosa.c                   |  4 ---
+ hw/arm/versatilepb.c            | 15 ++--------
+ hw/arm/vexpress.c               | 32 +++++++--------------
+ hw/arm/virt.c                   | 60 ++++++++++-------------------------=
+-----
+ hw/arm/xilinx_zynq.c            | 10 ++-----
+ hw/arm/z2.c                     |  9 ++----
+ hw/core/machine.c               |  1 +
+ hw/i386/acpi-build.c            | 28 +++++++++++++++----
+ hw/i386/pc.c                    | 61 +++++++++++------------------------=
+------
+ hw/i386/pc_piix.c               |  4 +--
+ hw/lm32/lm32_boards.c           |  8 ------
+ hw/lm32/milkymist.c             |  4 ---
+ hw/m68k/an5206.c                |  4 ---
+ hw/m68k/mcf5208.c               |  4 ---
+ hw/mips/cps.c                   |  4 ---
+ hw/mips/mips_fulong2e.c         |  4 ---
+ hw/mips/mips_jazz.c             |  4 ---
+ hw/mips/mips_malta.c            |  4 ---
+ hw/mips/mips_mipssim.c          |  4 ---
+ hw/mips/mips_r4k.c              |  4 ---
+ hw/moxie/moxiesim.c             |  4 ---
+ hw/openrisc/openrisc_sim.c      |  4 ---
+ hw/ppc/e500.c                   |  4 ---
+ hw/ppc/mac_newworld.c           |  4 ---
+ hw/ppc/mac_oldworld.c           |  4 ---
+ hw/ppc/ppc440_bamboo.c          |  4 ---
+ hw/ppc/ppc4xx_devs.c            |  5 ----
+ hw/ppc/prep.c                   |  9 ------
+ hw/ppc/spapr.c                  | 15 ++++------
+ hw/ppc/virtex_ml507.c           |  4 ---
+ hw/sh4/r2d.c                    |  4 ---
+ hw/sh4/shix.c                   |  4 ---
+ hw/sparc/leon3.c                |  4 ---
+ hw/sparc/sun4m.c                |  4 ---
+ hw/sparc64/sparc64.c            |  4 ---
+ hw/tricore/tricore_testboard.c  |  4 ---
+ hw/unicore32/puv3.c             |  4 ---
+ hw/xtensa/sim.c                 |  5 ----
+ hw/xtensa/xtfpga.c              |  5 ----
+ linux-user/main.c               |  4 ---
+ numa.c                          |  2 +-
+ qom/cpu.c                       | 49 ++++++++++++++++++---------------
+ qom/object_interfaces.c         |  5 ++++
+ target/arm/cpu.c                |  2 +-
+ target/i386/cpu.c               |  3 --
+ vl.c                            | 11 ++++++++
+ MAINTAINERS                     |  5 +++-
+ qemu-options.hx                 |  8 +++++-
+ 82 files changed, 307 insertions(+), 525 deletions(-)
+
+--=20
+2.13.5
