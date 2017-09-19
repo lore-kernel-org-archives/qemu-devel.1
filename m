@@ -1,29 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56033)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57498)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duHZK-0000xr-Da
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:24:08 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1duHbc-0002GD-Jc
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:26:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duHZG-0001JN-ED
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:24:02 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57652)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duHZG-0001Is-4z
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:23:58 -0400
-Date: Tue, 19 Sep 2017 14:23:51 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170919142351.1e3b66d8.cohuck@redhat.com>
-In-Reply-To: <9872cee8-3503-8d52-c68f-d9c61143201c@linux.vnet.ibm.com>
-References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
-	<20170913115029.47626-5-pasic@linux.vnet.ibm.com>
-	<20170919055005.GE5274@bjsdjshi@linux.vnet.ibm.com>
-	<20170919114859.3e2d895b.cohuck@redhat.com>
-	<fbb3522e-4086-359a-fca7-05371b76dac7@linux.vnet.ibm.com>
-	<20170919125717.1ae0cd38.cohuck@redhat.com>
-	<9872cee8-3503-8d52-c68f-d9c61143201c@linux.vnet.ibm.com>
+	(envelope-from <zuban32s@gmail.com>) id 1duHbW-0002u5-Ad
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:26:24 -0400
+Received: from mail-pg0-x22e.google.com ([2607:f8b0:400e:c05::22e]:44454)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1duHbW-0002sz-2l
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:26:18 -0400
+Received: by mail-pg0-x22e.google.com with SMTP id j16so1911625pga.1
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:26:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] s390x/css: support ccw IDA
+In-Reply-To: <87bmm7dohw.fsf@linaro.org>
+References: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
+	<CAJhHMCCZh7hvQT8x9Bks9k6=ka4G1Oybv1MrkKJ9_VZ_eRZBfQ@mail.gmail.com>
+	<CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
+	<87bmrj8eks.fsf@linaro.org>
+	<CAPnv1PKyak1G-uL=H=-Vh_9TH2dZKffYjDf_2Z+LWuqovMKCBQ@mail.gmail.com>
+	<CAKSfGUC_k6K=2Xy8pGcwuQ66DMPYCDvA47Ojgm7ntQfALGwDsQ@mail.gmail.com>
+	<CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
+	<000601d33128$2dd9d5e0$898d81a0$@ru> <87bmm7dohw.fsf@linaro.org>
+From: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Date: Tue, 19 Sep 2017 15:26:14 +0300
+Message-ID: <CAKSfGUCt7p95nDeW12Q_-BSTXVhRLPtL+=u_WLx5_BZEgAgeLw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] What is the best commit for record-replay?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,84 +35,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>, Pranith Kumar <bobby.prani+qemu@gmail.com>, pavel.dovgaluk@ispras.ru, Aleksandr Bezzubikov <abezzubikov@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>, Igor R <boost.lists@gmail.com>
 
-On Tue, 19 Sep 2017 14:04:03 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+2017-09-19 12:30 GMT+03:00 Alex Benn=C3=A9e <alex.bennee@linaro.org>:
+>
+> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+>
+>>> From: Aleksandr Bezzubikov [mailto:zuban32s@gmail.com]
+>>> 2017-09-18 15:02 GMT+03:00 Aleksandr Bezzubikov <zuban32s@gmail.com>:
+>>> > 2017-05-02 15:42 GMT+03:00 Igor R <boost.lists@gmail.com>:
+>>> >>>>>> I'm trying to use the deterministic record/replay feature, and I=
+ would
+>>> >>>>>> like to know which commit I should take to get it work.
+>>> >>>>>> In RC0 it seems to be broken. I tried pre-MTTCG commit 2421f381d=
+c, as
+>>> >>>>
+>>> >>>>> Can you retry with the latest rc? There were some fixes regarding=
+ rr since rc0.
+>>> >>>>
+>>> >>>>
+>>> >>>> I've taken 2.9 release, and RR does not seem to work there.
+>>> >>>> I recorded the boot process of x86 Fedora-21 linux and the replay =
+got
+>>> >>>> stuck almost immediately.
+>>> >>>
+>>> >>> What's your command line?
+>>> >>>
+>>> >>> Does it get stuck at the same place each time?
+>>> >>>
+>>> >>> Can you boot fine with icount but without record/replay?
+>>> >>
+>>> >> Here is the exact scenario:
+>>> >> - Get 2.9 from git, configure it as follows: "./configure
+>>> >> --target-list=3Di386-softmmu --enable-sdl" and  make.
+>>> >> - Download https://people.debian.org/~aurel32/qemu/i386/debian_squee=
+ze_i386_standard.qcow2
+>>> >> - Run qemu with the following command line, until login prompt:
+>>> >> -icount shift=3D7,rr=3Drecord,rrfile=3Dreplay.bin -drive
+>>> >> file=3Ddebian_squeeze_i386_standard.qcow2,if=3Dnone,id=3Dimg-direct =
+-drive
+>>> >> driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay -=
+device
+>>> >> ide-hd,drive=3Dimg-blkreplay -monitor stdio
+>>> >> - Replay: -icount shift=3D7,rr=3Dreplay,rrfile=3Dreplay.bin -drive
+>>> >> file=3Ddebian_squeeze_i386_standard.qcow2,if=3Dnone,id=3Dimg-direct =
+-drive
+>>> >> driver=3Dblkreplay,if=3Dnone,image=3Dimg-direct,id=3Dimg-blkreplay -=
+device
+>>> >> ide-hd,drive=3Dimg-blkreplay -monitor stdio
+>>> >>
+>>> >> Every time I attempt to replay, QEMU gets stuck at the same EIP, at =
+a
+>>> >> very early stage.
+>>> >>
+>>> >>
+>>> >>> Can you boot fine with icount but without record/replay?
+>>> >>
+>>> >> Yes. I can also enable icount and recording - it also boots fine. Th=
+e
+>>> >> problem with the replay.
+>>> >
+>>> > Hi guys,
+>>> > Maybe the thread is a bit outdated, but the problem is still relevant=
+.
+>>> > I've just tried to record and replay WinXP boot process, and I've enc=
+ountered
+>>> > exactly the same problem as described above - record is fine, replay
+>>> > gets stuck early. I use current master.
+>>
+>> Maybe this commit will work: cfb2d02be9413d45b30ed6d8e38800250b6b4b48
 
-> On 09/19/2017 12:57 PM, Cornelia Huck wrote:
-> >>>>> +static inline int ida_read_next_idaw(CcwDataStream *cds)
-> >>>>> +{
-> >>>>> +    union {uint64_t fmt2; uint32_t fmt1; } idaw;      
-> >>>>                                            ^
-> >>>> Nit.
-> >>>>    
-> >> Maybe checkpatch wanted it this way. My memories are blurry.  
-> > 
-> > I'd just leave it like that, tbh.
-> >   
-> >>>>> +    bool is_fmt2 = cds->flags & CDS_F_C64;
-> >>>>> +    int ret;
-> >>>>> +    hwaddr idaw_addr;
-> >>>>> +
-> >>>>> +    if (is_fmt2) {
-> >>>>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt2) * cds->at_idaw;
-> >>>>> +        if (idaw_addr & 0x07) {
-> >>>>> +            return -EINVAL; /* channel program check */
-> >>>>> +        }
-> >>>>> +        ret = address_space_rw(&address_space_memory, idaw_addr,
-> >>>>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt2,
-> >>>>> +                               sizeof(idaw.fmt2), false);
-> >>>>> +        cds->cda = be64_to_cpu(idaw.fmt2);  
-> 
-> 
-> >>>>> +    } else {
-> >>>>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
-> >>>>> +        if (idaw_addr & 0x03) {      
-> >>>> ?:
-> >>>> (idaw_addr & 0x80000003)    
-> >>> Yes.
-> >>>     
-> >> I will double check this. Does not seem unreasonable but
-> >> double-checking is better.  
-> > Please let me know. I think the architecture says that the bit must be
-> > zero, and that we may (...) generate a channel program check.
-> >   
-> 
-> Not exactly. The more significant bits part of the check
-> depend on the ccw format. This needs to be done for both
-> idaw formats. I would need to introduce a new flag, or
-> access the SubchDev to do this properly.
-> 
-> Architecturally we also need to check the data addresses
-> from which we read so we have nothing bigger than 
-> (1 << 31) - 1 if we are working with format-1 idaws.
-> 
-> I also think we did not take proper care of proper
-> maximum data address checks prior CwwDataStream which also
-> depend on the ccw format (in absence of IDAW or MIDAW).
-> 
-> The ccw format dependent maximum address checks are (1 << 24) - 1
-> and (1 << 31) - 1 respectively for format-0 and format-1 (on
-> the first indirection level that is for non-IDA for the data,
-> and for (M)IDA for the (M)IDAWs).
-> 
-> Reference:
-> PoP pages 16-25 and 16-26 "Invalid IDAW or MIDAW Addre" and
-> "Invalid Data Address".
+Unfortunately this one doesn't work either. It seems we need just an
+all-in-one fix
+for the current implementation to make it work.
 
-Sigh, when are things ever easy :(
+>>
+>>> > And I've discovered the second problem - recording makes initial snap=
+shot,
+>>> > but it doesn't seem to be saved to the disk - replay can't see it.
+>>
+>> It is ok, because there is a mode where snapshot is created and loaded.
 
-I'll need some time to review this. But more urgently, I need a break.
+So it shouldn't work properly when I use 'rrsnapshot=3D<name>' for both
+record and replay?
+Then how can I enable this mode?
 
-> 
-> How shall we proceed?
+>>
+>>> >
+>>> > Hope you've already found the solution (as the last post was on 2 May=
+)
+>>> > and it's just got missed the mailing list.
+>>
+>> As I know, RR is still broken in the current version.
+>> It was caused by the MTTCG implementation.
+>> Alex Bennee tried to fix RR back. Alex, have you found any solution?
+>>
+>> We also trying to find a way to fix RR. It seems, that we will reinvent =
+BQL for RR.
+>
+> I think the method outlined in my RFC is the way to go, essentially the
+> RR mutex taking over for the what the BQL did. The RFC patch hadn't
+> hoisted the mutex for the additional devices so I'm just re-basing now
+> and I'll see if I can make the changes for Igor's test case.
+>
+> --
+> Alex Benn=C3=A9e
 
-Given the discussion about this patch in particular, I'll probably
-dequeue it and send it with the next batch of patches. We can also
-include the other improvements, then. Not sure whether I should just
-dequeue this one or the whole series (I really want to get the rest of
-the patches out...)
 
-More after the break :)
+
+--=20
+Aleksandr Bezzubikov
