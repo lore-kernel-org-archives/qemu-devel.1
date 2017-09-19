@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54420)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duIj2-0001Rf-PZ
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:38:09 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1duIoO-0005nW-Vp
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:43:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duIj0-00064n-5M
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:38:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33590)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1duIiz-00063Y-SG
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:38:06 -0400
-References: <1505328054-23805-1-git-send-email-thuth@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f09b7bd0-2055-9f1c-4bb8-ab5f2bbf6837@redhat.com>
-Date: Tue, 19 Sep 2017 08:38:00 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1duIoM-0002EU-ES
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:43:41 -0400
+Received: from mail-wm0-f44.google.com ([74.125.82.44]:48712)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1duIoM-0002EB-7h
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:43:38 -0400
+Received: by mail-wm0-f44.google.com with SMTP id r68so11067wmg.3
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 06:43:38 -0700 (PDT)
+References: <20170823162004.27337-1-marcandre.lureau@redhat.com>
+	<20170823162004.27337-4-marcandre.lureau@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <09b52e82-484e-a840-7300-0fcd0f40d1d7@redhat.com>
+Date: Tue, 19 Sep 2017 15:43:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <1505328054-23805-1-git-send-email-thuth@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="wsPmd1JGBUxUqqrheXgjVdvWURWNPHJxT"
-Subject: Re: [Qemu-devel] [PATCH v2] tests: Introduce generic device
- hot-plug/hot-unplug functions
+In-Reply-To: <20170823162004.27337-4-marcandre.lureau@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 03/27] libvhost-user: improve
+ vu_queue_pop() doc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,87 +31,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
-Cc: Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel@nongnu.org
+Cc: changpeng.liu@intel.com, felipe@nutanix.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wsPmd1JGBUxUqqrheXgjVdvWURWNPHJxT
-From: Eric Blake <eblake@redhat.com>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Peter Xu <peterx@redhat.com>
-Cc: Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
-Message-ID: <f09b7bd0-2055-9f1c-4bb8-ab5f2bbf6837@redhat.com>
-Subject: Re: [PATCH v2] tests: Introduce generic device hot-plug/hot-unplug
- functions
-References: <1505328054-23805-1-git-send-email-thuth@redhat.com>
-In-Reply-To: <1505328054-23805-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/13/2017 01:40 PM, Thomas Huth wrote:
-> A lot of tests provide code for adding and removing a device via the
-> device_add and device_del QMP commands. Maintaining this code in so man=
-y
-> places is cumbersome and error-prone (some of the code parts check the
-> responses for device deletion in an incorrect way, for example, we've g=
-ot
-> to deal with both, error code and DEVICE_DEL event here). So let's prov=
-ide
-> some proper generic functions for adding and removing a device instead.=
-
->=20
-> The code for correctly unplugging a device has been taken from a patch
-> from Peter Xu.
->=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 23/08/2017 18:19, Marc-André Lureau wrote:
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 > ---
+>  contrib/libvhost-user/libvhost-user.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-user/libvhost-user.h
+> index 53ef222c0b..9b9b00e191 100644
+> --- a/contrib/libvhost-user/libvhost-user.h
+> +++ b/contrib/libvhost-user/libvhost-user.h
+> @@ -351,7 +351,8 @@ void vu_queue_notify(VuDev *dev, VuVirtq *vq);
+>   * @vq: a VuVirtq queue
+>   * @sz: the size of struct to return (must be >= VuVirtqElement)
+>   *
+> - * Returns: a VuVirtqElement filled from the queue or NULL.
+> + * Returns: a VuVirtqElement filled from the queue or NULL. The
+> + * returned element must be free() by the caller.
 
-> + */
-> +void qtest_qmp_device_del(const char *id)
-> +{
-> +    QDict *response1, *response2, *event =3D NULL;
-> +    char *cmd;
-> +
-> +    cmd =3D g_strdup_printf("{'execute': 'device_del',"
-> +                          " 'arguments': { 'id': '%s' }}", id);
-> +    response1 =3D qmp(cmd);
-> +    g_free(cmd);
-> +    g_assert(response1);
-> +    g_assert(!qdict_haskey(response1, "error"));
-> +
-> +    response2 =3D qmp("");
+Maybe free()-d or freed.
 
-Hmm, this new use of qmp("") means I get to rebase the efforts to remove
-the empty qmp command usage from the testsuite efforts.  We really want
-to have two low-level functions (one to send, one to receive), and then
-have qmp() be the combination of both in a row; we have qmp_async() for
-the send, and only qtest_receive() for the receive, so I'll have to
-revive my work on unifying things...
+Otherwise
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-
---wsPmd1JGBUxUqqrheXgjVdvWURWNPHJxT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnBHbgACgkQp6FrSiUn
-Q2pjQggAnKdlZPIP401y2Hu/7kjm5jE1A9iFfGTANnkHsYpKm/s2E8NDn3IqmrXA
-c5O9KQ3DiQNsO0YumRWKYIF9unJB1yBewje1HWbySIT2heEVHKxdvKeN7IUwHiC+
-s8Rx4Y2ufxgGZIS0QoCymftAIqXRzteKwkgBAnQrhfIKdUc4gU6iTEr8M1ZtfxZ8
-rj10MqOYR2livSL0sTaTWf7fMgQXmIqtnv3xa0f0sqFtvT2mk3gq3uNYyQLiA3CV
-4xtyArdf8LBARf1qyToVM2FsICgmRVa1bMxWFZsWYPW+EXsFxXG3g7y3zPzeVldT
-FBNMHYhz+8woZVopCjLmfiOEakf8Uw==
-=oV7G
------END PGP SIGNATURE-----
-
---wsPmd1JGBUxUqqrheXgjVdvWURWNPHJxT--
+>   */
+>  void *vu_queue_pop(VuDev *dev, VuVirtq *vq, size_t sz);
+>  
+> 
