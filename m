@@ -1,21 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51103)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51166)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duFtU-0001DL-2i
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:46 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1duFtW-0001Fe-3C
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duFtN-0002i2-RO
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:43 -0400
-Date: Tue, 19 Sep 2017 06:25:03 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1duFtQ-0002nI-LC
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:46 -0400
+Date: Tue, 19 Sep 2017 12:27:19 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170918202503.GD15823@umbus>
-References: <1505668548-16616-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1505668548-16616-2-git-send-email-mark.cave-ayland@ilande.co.uk>
+Message-ID: <20170919022719.GH27153@umbus>
+References: <20170911171235.29331-1-clg@kaod.org>
+	<20170911171235.29331-2-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="V88s5gaDVPzZ0KCq"
+	protocol="application/pgp-signature"; boundary="y0Ed1hDcWxc3B7cn"
 Content-Disposition: inline
-In-Reply-To: <1505668548-16616-2-git-send-email-mark.cave-ayland@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCH 1/8] ppc: QOMify g3beige machine
+In-Reply-To: <20170911171235.29331-2-clg@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 01/21] ppc/xive: introduce a
+ skeleton for the sPAPR XIVE interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,57 +25,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, benh@kernel.crashing.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
 
---V88s5gaDVPzZ0KCq
-Content-Type: text/plain; charset=us-ascii
+--y0Ed1hDcWxc3B7cn
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Sep 17, 2017 at 06:15:41PM +0100, Mark Cave-Ayland wrote:
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-Applied to ppc-for-2.11.
-
-> ---
->  hw/ppc/mac_oldworld.c |   17 +++++++++++++++--
->  1 file changed, 15 insertions(+), 2 deletions(-)
+On Mon, Sep 11, 2017 at 07:12:15PM +0200, C=E9dric Le Goater wrote:
+> Start with a couple of attributes for the XIVE sPAPR controller
+> model. The number of provisionned IRQ is necessary to size the
+> different internal XIVE tables, the number of CPUs is also.
 >=20
-> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-> index fcac399..5d1171d 100644
-> --- a/hw/ppc/mac_oldworld.c
-> +++ b/hw/ppc/mac_oldworld.c
-> @@ -380,8 +380,10 @@ static int heathrow_kvm_type(const char *arg)
->      return 2;
->  }
-> =20
-> -static void heathrow_machine_init(MachineClass *mc)
-> +static void heathrow_class_init(ObjectClass *oc, void *data)
->  {
-> +    MachineClass *mc =3D MACHINE_CLASS(oc);
-> +
->      mc->desc =3D "Heathrow based PowerMAC";
->      mc->init =3D ppc_heathrow_init;
->      mc->block_default_type =3D IF_IDE;
-> @@ -394,4 +396,15 @@ static void heathrow_machine_init(MachineClass *mc)
->      mc->kvm_type =3D heathrow_kvm_type;
->  }
-> =20
-> -DEFINE_MACHINE("g3beige", heathrow_machine_init)
-> +static const TypeInfo ppc_heathrow_machine_info =3D {
-> +    .name          =3D MACHINE_TYPE_NAME("g3beige"),
-> +    .parent        =3D TYPE_MACHINE,
-> +    .class_init    =3D heathrow_class_init
-> +};
-> +
-> +static void ppc_heathrow_register_types(void)
+> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+
+[snip]
+
+> +static void spapr_xive_realize(DeviceState *dev, Error **errp)
 > +{
-> +    type_register_static(&ppc_heathrow_machine_info);
+> +    sPAPRXive *xive =3D SPAPR_XIVE(dev);
+> +
+> +    if (!xive->nr_targets) {
+> +        error_setg(errp, "Number of interrupt targets needs to be greate=
+r 0");
+> +        return;
+> +    }
+> +    /* We need to be able to allocate at least the IPIs */
+> +    if (!xive->nr_irqs || xive->nr_irqs < xive->nr_targets) {
+> +        error_setg(errp, "Number of interrupts too small");
+> +        return;
+> +    }
 > +}
 > +
-> +type_init(ppc_heathrow_register_types);
+> +static Property spapr_xive_properties[] =3D {
+> +    DEFINE_PROP_UINT32("nr-irqs", sPAPRXive, nr_irqs, 0),
+> +    DEFINE_PROP_UINT32("nr-targets", sPAPRXive, nr_targets, 0),
+
+I'm a bit uneasy about the number of targets having to be set in
+advance: this can make life awkward when CPUs are hotplugged.  I know
+there's something similar in xics, but it has caused some hassles, and
+we're starting to move away from it.
+
+Do you really need this?
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -82,24 +76,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---V88s5gaDVPzZ0KCq
+--y0Ed1hDcWxc3B7cn
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnAK58ACgkQbDjKyiDZ
-s5K3Mg//YWUfpBVHVgYcHvoa/cMzvSc9Q8/W71hLUQ9xtxVtnNfL4MG501CsWm0j
-9bWSDmQsTPmnlPkiXmZgC4z4vvB7+9SQbXcd7i56WC8JqP4nvOBsVJvAuknDzxHt
-0AIe1PiEb9bZFdlYqDqo7FJsyxWpnaRoIY+6ygy1O/lB8Bczx+f7aImX9clBYfOf
-Y2m+GOKB4WNdOXChF6sRvhoAiwY/XRNhiSVB8AjFFTz9IVNPtPWJJuZcNGrxpJrd
-+NOLdEb+H7/fmgEdtrE6zHUhiDaqIzs2K9wx+eWOjMp16pJiXgcr3p3EPrbYK3nd
-yzA97pXEjmfEKskaFX5yBNrrrCivI1IAYIZyg98C45Wzmt0TXVrWmGdlCGQwTvkx
-tbPZlOURKpMc1fsINkp4h6NYNgeRP8xA8SKE4QXeGRQqMdQGPmFHnyZnFOXNOv4/
-OUE+V79aaJMNAXWdVhcqoVPUixU5hDLXJ+c7jo7Rz4/pjSv2fONPJEoMq7HiwdRN
-6DuxoaOiiWnISNab42XvupOvx3PeC438wGk3L3n+m2xTnekA7rRGczv94rWDlvUZ
-E2jXcKB50fSdW8hFMSSXYEGnoh9u6+wec39YpElJu4pFkj4AZLZRboUlxFZf9AL0
-bG4F0GFIJm8a1v3YjczFzKfZeKA7gYfzCM58HLeDxDYMs4s+N3o=
-=kmfE
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnAgIUACgkQbDjKyiDZ
+s5L+rBAAmAVmfwpg/Mu3PyF0r9QdN/UXse+wzlGBuDwPo1tj1TTvvz+Dobm+ICG0
+7rliFC04bgUo78jhExRTQtOv0tQOBhDGqnOQz6PoTbeJkdjDSiQMeBHfD0lk6O3d
+wV38MDZ6emoKN2U7azTkr3LEi24jq4m+hmYlaKgpWNd4j+8+FtvYKFRJmsHfk8a5
+k+GKkrAn89fRNSiXHpTw206jgmuhF2+EgYFV7BU2vpQ/5qQgaXsEqUxWBv4DSgAQ
+J9585swlUYZsxf1uHhbaQsP4qt/9fckWVzuOwDYGlLApGN0CpPGjntuYHNIVpioE
+5xcxVnhlgd9HAvMvLHXC01smSX5e5591KTXnVEAbmHWH7bclfveZ6RdVlr+bGbqM
+2L2vge98QtEJE4uVZiE0O764aSY4bf6PoO15oRBzqrNntNPjxyIwDuyjLK2bCvly
+z0dtNeiCTMpr01rotWQCLQUH43JLnyXrKPB1VHph8xTz3DnKzQJHwbGvwEvMWxuC
+Qi8rj1mxQ6E3nrDd/gbZZhBUbDvR7kjMyDiRVsQjmvlljZZR2LuXrRuyD/nwjWB2
+Bv3TSNXo76Pir9RiJmX70BzyXcsUsb46GsgZYIIZwsDHM3wWGYeFyA3SlyfltYQC
+gI4RpN6+glOtmtnFu2ZfhnSfzPL7OCU3Y+dDgltnw2gfanF/J7Y=
+=iei+
 -----END PGP SIGNATURE-----
 
---V88s5gaDVPzZ0KCq--
+--y0Ed1hDcWxc3B7cn--
