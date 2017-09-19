@@ -1,18 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53060)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57561)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1duKjE-0003i5-8z
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:46:29 -0400
+	(envelope-from <stefanha@redhat.com>) id 1duKnF-0006lz-Uq
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:50:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1duKjA-0001HA-T2
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:46:28 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <a6ad8398-fcef-2d7f-548a-024c54ad2379@virtuozzo.com>
-Date: Tue, 19 Sep 2017 18:46:19 +0300
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: [Qemu-devel] image locking
+	(envelope-from <stefanha@redhat.com>) id 1duKnF-00053n-3w
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:50:38 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Date: Tue, 19 Sep 2017 16:50:25 +0100
+Message-Id: <20170919155025.4098-1-stefanha@redhat.com>
+Subject: [Qemu-devel] [PATCH] throttle-groups: update tg->any_timer_armed[]
+ on detach
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,16 +18,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu block <qemu-block@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>, Alberto Garcia <berto@igalia.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Hi Fam!
+Clear tg->any_timer_armed[] when throttling timers are destroy during
+AioContext attach/detach.  Failure to do so causes throttling to hang
+because we believe the timer is already scheduled!
 
-I have a question about your image locking series:
+The following was broken at least since QEMU 2.10.0 with -drive
+iops=100:
 
-Can you please explain, why OFD locking is enabled by default and posix 
-locking is not? What is wrong with posix locking, what are the problems?
+  $ dd if=/dev/zero of=/dev/vdb oflag=direct count=1000
+  (qemu) stop
+  (qemu) cont
+  ...I/O is stuck...
 
+Reported-by: Yongxue Hong <yhong@redhat.com>
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+---
+ block/throttle-groups.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+index 6ba992c8d7..2bfd03faa0 100644
+--- a/block/throttle-groups.c
++++ b/block/throttle-groups.c
+@@ -592,7 +592,20 @@ void throttle_group_attach_aio_context(ThrottleGroupMember *tgm,
+ void throttle_group_detach_aio_context(ThrottleGroupMember *tgm)
+ {
+     ThrottleTimers *tt = &tgm->throttle_timers;
++    ThrottleGroup *tg = container_of(tgm->throttle_state, ThrottleGroup, ts);
++
+     throttle_timers_detach_aio_context(tt);
++
++    /* Forget about these timers, they have been destroyed */
++    qemu_mutex_lock(&tg->lock);
++    if (tg->tokens[0] == tgm) {
++        tg->any_timer_armed[0] = false;
++    }
++    if (tg->tokens[1] == tgm) {
++        tg->any_timer_armed[1] = false;
++    }
++    qemu_mutex_unlock(&tg->lock);
++
+     tgm->aio_context = NULL;
+ }
+ 
 -- 
-Best regards,
-Vladimir
+2.13.5
