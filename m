@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39588)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duLeA-0006ld-De
+	(envelope-from <cohuck@redhat.com>) id 1duLeA-0006lh-Jx
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duLe7-0003RD-Dm
+	(envelope-from <cohuck@redhat.com>) id 1duLe9-0003T1-PB
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36890)
+Received: from mx1.redhat.com ([209.132.183.28]:46012)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLe7-0003QR-82
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:15 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLe9-0003Sf-KV
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:17 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 19 Sep 2017 18:43:18 +0200
-Message-Id: <20170919164337.18555-20-cohuck@redhat.com>
+Date: Tue, 19 Sep 2017 18:43:19 +0200
+Message-Id: <20170919164337.18555-21-cohuck@redhat.com>
 In-Reply-To: <20170919164337.18555-1-cohuck@redhat.com>
 References: <20170919164337.18555-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL v2 19/38] target/s390x: use
- trigger_pgm_exception() in s390_cpu_handle_mmu_fault()
+Subject: [Qemu-devel] [PULL v2 20/38] target/s390x: use program_interrupt()
+ in per_check_exception()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,30 +29,43 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: David Hildenbrand <david@redhat.com>
 
-This looks cleaner. linux-user will not use the ilen field, so setting
-it doesn't do any harm.
+Clean it up by reusing program_interrupt(). Add a concern regarding
+ilen.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170913132417.24384-10-david@redhat.com>
+Message-Id: <20170913132417.24384-11-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/excp_helper.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ target/s390x/misc_helper.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/target/s390x/excp_helper.c b/target/s390x/excp_helper.c
-index 361f970db3..14d3160e92 100644
---- a/target/s390x/excp_helper.c
-+++ b/target/s390x/excp_helper.c
-@@ -59,8 +59,7 @@ int s390_cpu_handle_mmu_fault(CPUState *cs, vaddr address,
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 8b07535b02..f3624d75eb 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -447,14 +447,17 @@ void HELPER(chsc)(CPUS390XState *env, uint64_t inst)
+ #ifndef CONFIG_USER_ONLY
+ void HELPER(per_check_exception)(CPUS390XState *env)
  {
-     S390CPU *cpu = S390_CPU(cs);
+-    CPUState *cs = CPU(s390_env_get_cpu(env));
++    uint32_t ilen;
  
--    cs->exception_index = EXCP_PGM;
--    cpu->env.int_pgm_code = PGM_ADDRESSING;
-+    trigger_pgm_exception(&cpu->env, PGM_ADDRESSING, ILEN_AUTO);
-     /* On real machines this value is dropped into LowMem.  Since this
-        is userland, simply put this someplace that cpu_loop can find it.  */
-     cpu->env.__excp_addr = address;
+     if (env->per_perc_atmid) {
+-        env->int_pgm_code = PGM_PER;
+-        env->int_pgm_ilen = get_ilen(cpu_ldub_code(env, env->per_address));
+-
+-        cs->exception_index = EXCP_PGM;
+-        cpu_loop_exit(cs);
++        /*
++         * FIXME: ILEN_AUTO is most probably the right thing to use. ilen
++         * always has to match the instruction referenced in the PSW. E.g.
++         * if a PER interrupt is triggered via EXECUTE, we have to use ilen
++         * of EXECUTE, while per_address contains the target of EXECUTE.
++         */
++        ilen = get_ilen(cpu_ldub_code(env, env->per_address));
++        program_interrupt(env, PGM_PER, ilen);
+     }
+ }
+ 
 -- 
 2.13.5
