@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45762)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1duLlF-00051v-D4
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:52:38 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1duLlH-000549-QZ
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:52:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@redhat.com>) id 1duLlA-0001Cx-US
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:52:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37050)
+	(envelope-from <marcandre.lureau@redhat.com>) id 1duLlH-0001IR-0d
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:52:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46314)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
-	id 1duLlA-0001CN-Ls
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:52:32 -0400
+	id 1duLlG-0001Hm-Qu
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:52:38 -0400
 From: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
-Date: Tue, 19 Sep 2017 18:51:59 +0200
-Message-Id: <20170919165226.23022-1-marcandre.lureau@redhat.com>
+Date: Tue, 19 Sep 2017 18:52:00 +0200
+Message-Id: <20170919165226.23022-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20170919165226.23022-1-marcandre.lureau@redhat.com>
+References: <20170919165226.23022-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v2 00/27] vhost-user-scsi: code clean-up
+Subject: [Qemu-devel] [PATCH v2 01/27] glib-compat: move
+ G_SOURCE_CONTINUE/REMOVE there
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +31,49 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: pbonzini@redhat.com, changpeng.liu@intel.com, f4bug@amsat.org, felipe@nutanix.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-Hi,
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Acked-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+---
+ include/glib-compat.h                     | 7 +++++++
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 8 --------
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
-While reviewing vhost-user-blk, I realized a lot of code was based on
-vhost-user-scsi, and I found a number of improvements could be
-made. As a result in this series, I tried to move common glib code in
-libvhost-user-glib. (I originally made libvhost-user glib-free, so if
-external projects want to play with it, they don't have to depend on
-glib, for ex vhost-user-bridge doesn't use glib).
-
-I haven't done extensive testing, I tried to setup a LUN with help
-from https://fedoraproject.org/wiki/Scsi-target-utils_Quickstart_Guide, b=
-ut
-the guest says "Unexpected response from lun 1 while scanning, scan
-aborted" (before or after the series). Help welcome!
-
-Thanks
-
-v2:
-- patch 3, 25, 26 missing review
-- drop giochannel patch, use libvhost-user-glib helper instead
-- misc style changes
-- comments improvements
-- fix vus dependency on libvhost-user.a
-
-Marc-Andr=C3=A9 Lureau (27):
-  glib-compat: move G_SOURCE_CONTINUE/REMOVE there
-  build-sys: fix libvhost-user.a build
-  build-sys: make vhost-user-scsi depend on libvhost-user.a
-  libvhost-user: drop dependency on glib
-  libvhost-user: improve vu_queue_pop() doc
-  vhost-user-scsi: use g_strdup()
-  vhost-user-scsi: connect unix socket before allocating
-  vhost-user-scsi: code style fixes
-  vhost-user-scsi: use glib allocation
-  vhost-user-scsi: glib calls that allocate don't return NULL
-  vhost-user-scsi: also free the gtree
-  vhost-user-scsi: remove vdev_scsi_find_by_vu()
-  vhost-user-scsi: simplify unix path cleanup
-  vhost-user-scsi: use NULL pointer
-  vhost-user-scsi: assert() in iscsi_add_lun()
-  vhost-user-scsi: remove vdev_scsi_add_iscsi_lun()
-  vhost-user-scsi: remove VUS_MAX_LUNS
-  vhost-user-scsi: remove unimplemented functions
-  vhost-user-scsi: rename VUS types
-  vhost-user-scsi: avoid use of iscsi_ namespace
-  vhost-user-scsi: don't copy iscsi/scsi-lowlevel.h
-  vhost-user-scsi: drop extra callback pointer
-  vhost-user-scsi: simplify source handling
-  vhost-user-scsi: use glib logging
-  libvhost-user: add glib source helper
-  vhost-user-scsi: use libvhost-user glib helper
-  vhost-user-scsi: remove server_sock from VusDev
-
- contrib/libvhost-user/libvhost-user-glib.h |  32 ++
- contrib/libvhost-user/libvhost-user.h      |   3 +-
- include/glib-compat.h                      |   7 +
- contrib/libvhost-user/libvhost-user-glib.c | 154 +++++++
- contrib/libvhost-user/libvhost-user.c      |  29 +-
- contrib/vhost-user-scsi/vhost-user-scsi.c  | 629 +++++------------------=
-------
- Makefile                                   |   5 +-
- Makefile.objs                              |   1 -
- contrib/libvhost-user/Makefile.objs        |   2 +-
- tests/Makefile.include                     |   2 +-
- 10 files changed, 316 insertions(+), 548 deletions(-)
- create mode 100644 contrib/libvhost-user/libvhost-user-glib.h
- create mode 100644 contrib/libvhost-user/libvhost-user-glib.c
-
+diff --git a/include/glib-compat.h b/include/glib-compat.h
+index fcffcd3f07..d35d641b7f 100644
+--- a/include/glib-compat.h
++++ b/include/glib-compat.h
+@@ -354,5 +354,12 @@ g_test_add_data_func_full(const char *path,
+ }
+ #endif
+=20
++/* Small compat shim from glib 2.32 */
++#ifndef G_SOURCE_CONTINUE
++#define G_SOURCE_CONTINUE TRUE
++#endif
++#ifndef G_SOURCE_REMOVE
++#define G_SOURCE_REMOVE FALSE
++#endif
+=20
+ #endif
+diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-us=
+er-scsi/vhost-user-scsi.c
+index b5ae02c96f..78bcc65f5a 100644
+--- a/contrib/vhost-user-scsi/vhost-user-scsi.c
++++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
+@@ -17,14 +17,6 @@
+=20
+ #include <glib.h>
+=20
+-/* Small compat shim from glib 2.32 */
+-#ifndef G_SOURCE_CONTINUE
+-#define G_SOURCE_CONTINUE TRUE
+-#endif
+-#ifndef G_SOURCE_REMOVE
+-#define G_SOURCE_REMOVE FALSE
+-#endif
+-
+ /* #define VUS_DEBUG 1 */
+=20
+ /** Log helpers **/
 --=20
 2.14.1.146.gd35faa819
