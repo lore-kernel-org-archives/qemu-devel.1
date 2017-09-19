@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55852)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duKAT-00061p-EW
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:10:37 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1duKCO-0007pU-8D
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:12:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duKAP-0000l8-1K
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:10:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53303)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1duKAO-0000kG-Oc
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:10:28 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1duKCI-0002f1-9c
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:12:32 -0400
+Received: from mail-wr0-x234.google.com ([2a00:1450:400c:c0c::234]:49087)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1duKCH-0002e2-Vy
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:12:26 -0400
+Received: by mail-wr0-x234.google.com with SMTP id 108so282903wra.5
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 08:12:25 -0700 (PDT)
 References: <20170919072719.11815-1-famz@redhat.com>
-	<20170919072719.11815-4-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4ffe9274-996f-8e16-4b79-583e54b17f54@redhat.com>
-Date: Tue, 19 Sep 2017 10:10:19 -0500
+	<20170919072719.11815-7-famz@redhat.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <20170919072719.11815-7-famz@redhat.com>
+Date: Tue, 19 Sep 2017 16:12:24 +0100
+Message-ID: <874lryen8n.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170919072719.11815-4-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="BRaraGGsFrKUV3uHfItp1A11kDV4wA0IO"
-Subject: Re: [Qemu-devel] [PATCH v9 03/13] scripts: Add archive-source.sh
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v9 06/13] tests: Add ubuntu.i386 image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,94 +30,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, Philippe =?utf-8?Q?Mathieu?= =?utf-8?Q?-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---BRaraGGsFrKUV3uHfItp1A11kDV4wA0IO
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>,
- stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com,
- Kamil Rytarowski <kamil@netbsd.org>
-Message-ID: <4ffe9274-996f-8e16-4b79-583e54b17f54@redhat.com>
-Subject: Re: [PATCH v9 03/13] scripts: Add archive-source.sh
-References: <20170919072719.11815-1-famz@redhat.com>
- <20170919072719.11815-4-famz@redhat.com>
-In-Reply-To: <20170919072719.11815-4-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 09/19/2017 02:27 AM, Fam Zheng wrote:
+Fam Zheng <famz@redhat.com> writes:
+
+> This adds a 32bit guest.
+>
+> The official LTS cloud image is downloaded and initialized with
+> cloud-init.
+>
 > Signed-off-by: Fam Zheng <famz@redhat.com>
 > ---
->  scripts/archive-source.sh | 46 +++++++++++++++++++++++++++++++++++++++=
-+++++++
->  1 file changed, 46 insertions(+)
->  create mode 100755 scripts/archive-source.sh
->=20
-> diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+>  tests/vm/ubuntu.i386 | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 88 insertions(+)
+>  create mode 100755 tests/vm/ubuntu.i386
+>
+> diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
 > new file mode 100755
-> index 0000000000..e155d980ee
+> index 0000000000..e70dcb89ce
 > --- /dev/null
-> +++ b/scripts/archive-source.sh
-> @@ -0,0 +1,46 @@
-> +#!/bin/sh
-
-Needs to be /bin/bash...
-
-> +        git ls-files || error "git ls-files failed"
-> +        for sm in $submodules; do
-> +            (cd $sm; git ls-files) | sed "s:^:$sm/:"
-> +            if test ${PIPESTATUS[0]} -ne 0 -o $? -ne 0; then
-> +                error "git ls-files in submodule $sm failed"
-
-=2E..because $PIPESTATUS is a useful bashism not present in dash, where
-the alternative is MUCH more verbose and painful to write in portable she=
-ll.
-
-With just that fixed,
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-If desired, one other change (not mandatory, but if you want to do it,
-I'll want to re-review):
-
+> +++ b/tests/vm/ubuntu.i386
+> @@ -0,0 +1,88 @@
+> +#!/usr/bin/env python
+> +#
+> +# Ubuntu i386 image
+> +#
+> +# Copyright 2017 Red Hat Inc.
+> +#
+> +# Authors:
+> +#  Fam Zheng <famz@redhat.com>
+> +#
+> +# This code is licensed under the GPL version 2 or later.  See
+> +# the COPYING file in the top-level directory.
+> +#
 > +
-> +tar -cf "$1" -T "$1".list || error "failed to create tar file"
+> +import os
+> +import sys
+> +import subprocess
+> +import basevm
+> +import time
+> +
+> +class UbuntuX86VM(basevm.BaseVM):
+> +    name = "ubuntu.i386"
+> +    BUILD_SCRIPT = """
+> +        set -e;
+> +        cd $(mktemp -d);
+> +        sudo chmod a+r /dev/vdb;
+> +        tar -xf /dev/vdb;
+> +        ./configure {configure_opts};
+> +        make -j{jobs};
+> +        make check;
+> +    """
+> +
+> +    def _gen_cloud_init_iso(self):
+> +        cidir = self._tmpdir
+> +        mdata = open(os.path.join(cidir, "meta-data"), "w")
+> +        mdata.writelines(["instance-id: ubuntu-vm-0\n",
+> +                         "local-hostname: ubuntu-guest\n"])
+> +        mdata.close()
+> +        udata = open(os.path.join(cidir, "user-data"), "w")
+> +        udata.writelines(["#cloud-config\n",
+> +                          "chpasswd:\n",
+> +                          "  list: |\n",
+> +                          "    root:%s\n" % self.ROOT_PASS,
+> +                          "    %s:%s\n" % (self.GUEST_USER, self.GUEST_PASS),
+> +                          "  expire: False\n",
+> +                          "users:\n",
+> +                          "  - name: %s\n" % self.GUEST_USER,
+> +                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
+> +                          "    ssh-authorized-keys:\n",
+> +                          "    - %s\n" % basevm.SSH_PUB_KEY,
+> +                          "  - name: root\n",
+> +                          "    ssh-authorized-keys:\n",
+> +                          "    - %s\n" % basevm.SSH_PUB_KEY])
+> +        udata.close()
+> +        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
+> +                               "-volid", "cidata", "-joliet", "-rock",
+> +                               "user-data", "meta-data"],
+> +                               cwd=cidir,
+> +                               stdin=self._devnull, stdout=self._stdout,
+> +                               stderr=self._stdout)
+> +        return os.path.join(cidir, "cloud-init.iso")
+> +
+> +    def build_image(self, img):
+> +        cimg = self._download_with_cache("https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-i386-disk1.img")
+> +        img_tmp = img + ".tmp"
+> +        subprocess.check_call(["cp", "-f", cimg, img_tmp])
+> +        subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
+> +        self.boot(img_tmp, extra_args = ["-cdrom", self._gen_cloud_init_iso()])
+> +        self.wait_ssh()
+> +        self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
+> +        self.ssh_root_check("apt-get update")
+> +        self.ssh_root_check("apt-get install -y cloud-initramfs-growroot")
+> +        # Don't check the status in case the guest hang up too quickly
+> +        self.ssh_root("sync && reboot")
+> +        time.sleep(5)
+> +        self.wait_ssh()
+> +        # The previous update sometimes doesn't survive a reboot, so do it again
+> +        self.ssh_root_check("apt-get update")
+> +        self.ssh_root_check("apt-get build-dep -y qemu")
+> +        self.ssh_root_check("apt-get install -y libfdt-dev")
 
-If we exit here, $1.list is not removed...
+Could we also do something about locales in this setup. The build gives
+a lot of noise like:
 
-> +rm "$1".list
+    perl: warning: Falling back to a fallback locale ("en_US.UTF-8").
+    perl: warning: Setting locale failed.
+    perl: warning: Please check that your locale settings:
+            LANGUAGE = (unset),
+            LC_ALL = "en_GB.UTF-8",
+            LC_TIME = "en_US.UTF-8",
+            LC_CTYPE = "en_GB.UTF-8",
+            LC_MONETARY = "en_US.UTF-8",
+            LC_COLLATE = "C",
+            LC_ADDRESS = "en_US.UTF-8",
+            LC_TELEPHONE = "en_US.UTF-8",
+            LC_NAME = "en_US.UTF-8",
+            LC_MEASUREMENT = "en_US.UTF-8",
+            LC_IDENTIFICATION = "en_US.UTF-8",
+            LC_NUMERIC = "en_US.UTF-8",
+            LC_PAPER = "en_US.UTF-8",
+            LANG = "en_US.UTF-8"
+        are supported and installed on your system.
 
-Should we make removal of the list be controlled by a cleanup trap, to
-always happen even if something else fails in the interim?  Or is
-leaving it around on failure useful for debugging?
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+> +        self.ssh_root("poweroff")
+> +        self.wait()
+> +        if os.path.exists(img):
+> +            os.remove(img)
+> +        os.rename(img_tmp, img)
+> +        return 0
+> +
+> +if __name__ == "__main__":
+> +    sys.exit(basevm.main(UbuntuX86VM))
 
 
---BRaraGGsFrKUV3uHfItp1A11kDV4wA0IO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEyBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnBM1sACgkQp6FrSiUn
-Q2ryZgf43mgYaNGiIM1bA4ICtMprbB52VRGehxowjdhNL6JeRo/ea3D2mULWQOUh
-7Pe9IiJT0HaywkeCWRw2K23NIFnMKuoBlyhkx+MqZkPQ4rgJd1ow0q5ieRHkLtdY
-wPf9PSNfyGsjWIzrBLdUWmBXQaRKDhLTwINzbsura6HD+nqMpDrxlH2KFOXJUvL9
-nlWXKCCiVJGskfOJOKOmZNR4x1a7ygyuhK0l04phuauo8TofTEX/oPiB4xSnP96r
-6a0U6RHqJcR3xPf48pSV68UzdM168gsNq8PXh/Y+tHZtIl88Jc+PtX8dsyPHBq4a
-JuLc9YSyyZW4VTmgb4wmFIX2rbqq
-=pPJB
------END PGP SIGNATURE-----
-
---BRaraGGsFrKUV3uHfItp1A11kDV4wA0IO--
+--
+Alex Bennée
