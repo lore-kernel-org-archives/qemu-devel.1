@@ -1,17 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45335)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45337)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duFhz-00049r-IK
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:24:53 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1duFhz-00049s-J5
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:24:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duFhx-0004dV-3q
+	(envelope-from <pbonzini@redhat.com>) id 1duFhv-0004cN-Cl
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:24:51 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 19 Sep 2017 12:24:31 +0200
-Message-Id: <20170919102434.21147-2-pbonzini@redhat.com>
+Date: Tue, 19 Sep 2017 12:24:33 +0200
+Message-Id: <20170919102434.21147-4-pbonzini@redhat.com>
 In-Reply-To: <20170919102434.21147-1-pbonzini@redhat.com>
 References: <20170919102434.21147-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 1/4] scsi,
- file-posix: add support for persistent reservation management
+Subject: [Qemu-devel] [PATCH 3/4] scsi: add multipath support to
+ qemu-pr-helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,425 +23,675 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: qemu-block@nongnu.org
 
-It is a common requirement for virtual machine to send persistent
-reservations, but this currently requires either running QEMU with
-CAP_SYS_RAWIO, or using out-of-tree patches that let an unprivileged
-QEMU bypass Linux's filter on SG_IO commands.
-
-As an alternative mechanism, the next patches will introduce a
-privileged helper to run persistent reservation commands without
-expanding QEMU's attack surface unnecessarily.
-
-The helper is invoked through a "pr-manager" QOM object, to which
-file-posix.c passes SG_IO requests for PERSISTENT RESERVE OUT and
-PERSISTENT RESERVE IN commands.  For example:
-
-  $ qemu-system-x86_64
-      -device virtio-scsi \
-      -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock
-      -drive if=none,id=hd,driver=raw,file.filename=/dev/sdb,file.pr-manager=helper0
-      -device scsi-block,drive=hd
-
-or:
-
-  $ qemu-system-x86_64
-      -device virtio-scsi \
-      -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock
-      -blockdev node-name=hd,driver=raw,file.driver=host_device,file.filename=/dev/sdb,file.pr-manager=helper0
-      -device scsi-block,drive=hd
-
-Multiple pr-manager implementations are conceivable and possible, though
-only one is implemented right now.  For example, a pr-manager could:
-
-- talk directly to the multipath daemon from a privileged QEMU
-  (i.e. QEMU links to libmpathpersist); this makes reservation work
-  properly with multipath, but still requires CAP_SYS_RAWIO
-
-- use the Linux IOC_PR_* ioctls (they require CAP_SYS_ADMIN though)
-
-- more interestingly, implement reservations directly in QEMU
-  through file system locks or a shared database (e.g. sqlite)
+Proper support of persistent reservation for multipath devices requires
+communication with the multipath daemon, so that the reservation is
+registered and applied when a path comes up.  The device mapper
+utilities provide a library to do so; this patch makes qemu-pr-helper.c
+detect multipath devices and, when one is found, delegate the operation
+to libmpathpersist.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile.objs             |   1 +
- block/file-posix.c        |  30 +++++++++++++
- docs/pr-manager.rst       |  51 ++++++++++++++++++++++
- include/scsi/pr-manager.h |  56 ++++++++++++++++++++++++
- qapi/block-core.json      |   4 ++
- scsi/Makefile.objs        |   2 +
- scsi/pr-manager.c         | 109 ++++++++++++++++++++++++++++++++++++++++++++++
- vl.c                      |   3 +-
- 8 files changed, 255 insertions(+), 1 deletion(-)
- create mode 100644 docs/pr-manager.rst
- create mode 100644 include/scsi/pr-manager.h
- create mode 100644 scsi/pr-manager.c
+v1->v2: moved dm_init/multipath_pr_init to this patch
+        drop CAP_SYS_ADMIN if multipath not compiled in
+        simplify buffer size handling in multipath PERSISTENT RESERVE IN
+        block REGISTER AND MOVE operation for multipath PERSISTENT RESERVE OUT
+        fixed transport id handling in multipath PERSISTENT RESERVE OUT
 
-diff --git a/Makefile.objs b/Makefile.objs
-index 0caa8a5cf8..12abaa6191 100644
---- a/Makefile.objs
-+++ b/Makefile.objs
-@@ -170,6 +170,7 @@ trace-events-subdirs += qapi
- trace-events-subdirs += accel/tcg
- trace-events-subdirs += accel/kvm
- trace-events-subdirs += nbd
-+trace-events-subdirs += scsi
+ Makefile              |   3 +
+ configure             |  57 ++++++++-
+ docs/pr-manager.rst   |  27 ++++
+ include/scsi/utils.h  |   4 +
+ scsi/qemu-pr-helper.c | 346 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ scsi/utils.c          |  10 ++
+ 6 files changed, 441 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 51503ee8ad..39ec5112b6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -377,6 +377,9 @@ fsdev/virtfs-proxy-helper$(EXESUF): fsdev/virtfs-proxy-helper.o fsdev/9p-marshal
+ fsdev/virtfs-proxy-helper$(EXESUF): LIBS += -lcap
  
- trace-events-files = $(SRC_PATH)/trace-events $(trace-events-subdirs:%=$(SRC_PATH)/%/trace-events)
+ scsi/qemu-pr-helper$(EXESUF): scsi/qemu-pr-helper.o scsi/utils.o $(crypto-obj-y) $(io-obj-y) $(qom-obj-y) $(COMMON_LDADDS)
++ifdef CONFIG_MPATH
++scsi/qemu-pr-helper$(EXESUF): LIBS += -ludev -lmultipath -lmpathpersist
++endif
  
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 6acbd56238..ab12a2b591 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -33,6 +33,9 @@
- #include "block/raw-aio.h"
- #include "qapi/qmp/qstring.h"
+ qemu-img-cmds.h: $(SRC_PATH)/qemu-img-cmds.hx $(SRC_PATH)/scripts/hxtool
+ 	$(call quiet-command,sh $(SRC_PATH)/scripts/hxtool -h < $< > $@,"GEN","$@")
+diff --git a/configure b/configure
+index fba27cf0fc..bea343c701 100755
+--- a/configure
++++ b/configure
+@@ -290,6 +290,7 @@ netmap="no"
+ sdl=""
+ sdlabi=""
+ virtfs=""
++mpath=""
+ vnc="yes"
+ sparse="no"
+ vde=""
+@@ -936,6 +937,10 @@ for opt do
+   ;;
+   --enable-virtfs) virtfs="yes"
+   ;;
++  --disable-mpath) mpath="no"
++  ;;
++  --enable-mpath) mpath="yes"
++  ;;
+   --disable-vnc) vnc="no"
+   ;;
+   --enable-vnc) vnc="yes"
+@@ -1479,6 +1484,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+   vnc-png         PNG compression for VNC server
+   cocoa           Cocoa UI (Mac OS X only)
+   virtfs          VirtFS
++  mpath           Multipath persistent reservation passthrough
+   xen             xen backend driver support
+   xen-pci-passthrough
+   brlapi          BrlAPI (Braile)
+@@ -3300,6 +3306,29 @@ else
+ fi
  
-+#include "scsi/pr-manager.h"
-+#include "scsi/constants.h"
+ ##########################################
++# libmpathpersist probe
 +
- #if defined(__APPLE__) && (__MACH__)
- #include <paths.h>
- #include <sys/param.h>
-@@ -155,6 +158,8 @@ typedef struct BDRVRawState {
-     bool page_cache_inconsistent:1;
-     bool has_fallocate;
-     bool needs_alignment;
-+
-+    PRManager *pr_mgr;
- } BDRVRawState;
- 
- typedef struct BDRVRawReopenState {
-@@ -402,6 +407,11 @@ static QemuOptsList raw_runtime_opts = {
-             .type = QEMU_OPT_STRING,
-             .help = "file locking mode (on/off/auto, default: auto)",
-         },
-+        {
-+            .name = "pr-manager",
-+            .type = QEMU_OPT_STRING,
-+            .help = "id of persistent reservation manager object (default: none)",
-+        },
-         { /* end of list */ }
-     },
- };
-@@ -413,6 +423,7 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-     QemuOpts *opts;
-     Error *local_err = NULL;
-     const char *filename = NULL;
-+    const char *str;
-     BlockdevAioOptions aio, aio_default;
-     int fd, ret;
-     struct stat st;
-@@ -476,6 +487,16 @@ static int raw_open_common(BlockDriverState *bs, QDict *options,
-         abort();
-     }
- 
-+    str = qemu_opt_get(opts, "pr-manager");
-+    if (str) {
-+        s->pr_mgr = pr_manager_lookup(str, &local_err);
-+        if (local_err) {
-+            error_propagate(errp, local_err);
-+            ret = -EINVAL;
-+            goto fail;
-+        }
-+    }
-+
-     s->open_flags = open_flags;
-     raw_parse_flags(bdrv_flags, &s->open_flags);
- 
-@@ -2597,6 +2618,15 @@ static BlockAIOCB *hdev_aio_ioctl(BlockDriverState *bs,
-     if (fd_open(bs) < 0)
-         return NULL;
- 
-+    if (req == SG_IO && s->pr_mgr) {
-+        struct sg_io_hdr *io_hdr = buf;
-+        if (io_hdr->cmdp[0] == PERSISTENT_RESERVE_OUT ||
-+            io_hdr->cmdp[0] == PERSISTENT_RESERVE_IN) {
-+            return pr_manager_execute(s->pr_mgr, bdrv_get_aio_context(bs),
-+                                      s->fd, io_hdr, cb, opaque);
-+        }
-+    }
-+
-     acb = g_new(RawPosixAIOData, 1);
-     acb->bs = bs;
-     acb->aio_type = QEMU_AIO_IOCTL;
-diff --git a/docs/pr-manager.rst b/docs/pr-manager.rst
-new file mode 100644
-index 0000000000..b6089fb57c
---- /dev/null
-+++ b/docs/pr-manager.rst
-@@ -0,0 +1,51 @@
-+======================================
-+Persistent reservation managers
-+======================================
-+
-+SCSI persistent Reservations allow restricting access to block devices
-+to specific initiators in a shared storage setup.  When implementing
-+clustering of virtual machines, it is a common requirement for virtual
-+machines to send persistent reservation SCSI commands.  However,
-+the operating system restricts sending these commands to unprivileged
-+programs because incorrect usage can disrupt regular operation of the
-+storage fabric.
-+
-+For this reason, QEMU's SCSI passthrough devices, ``scsi-block``
-+and ``scsi-generic`` (both are only available on Linux) can delegate
-+implementation of persistent reservations to a separate object,
-+the "persistent reservation manager".  Only PERSISTENT RESERVE OUT and
-+PERSISTENT RESERVE IN commands are passed to the persistent reservation
-+manager object; other commands are processed by QEMU as usual.
-+
-+-----------------------------------------
-+Defining a persistent reservation manager
-+-----------------------------------------
-+
-+A persistent reservation manager is an instance of a subclass of the
-+"pr-manager" QOM class.
-+
-+Right now only one subclass is defined, ``pr-manager-helper``, which
-+forwards the commands to an external privileged helper program
-+over Unix sockets.  The helper program only allows sending persistent
-+reservation commands to devices for which QEMU has a file descriptor,
-+so that QEMU will not be able to effect persistent reservations
-+unless it has access to both the socket and the device.
-+
-+``pr-manager-helper`` has a single string property, ``path``, which
-+accepts the path to the helper program's Unix socket.  For example,
-+the following command line defines a ``pr-manager-helper`` object and
-+attaches it to a SCSI passthrough device::
-+
-+      $ qemu-system-x86_64
-+          -device virtio-scsi \
-+          -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock
-+          -drive if=none,id=hd,driver=raw,file.filename=/dev/sdb,file.pr-manager=helper0
-+          -device scsi-block,drive=hd
-+
-+Alternatively, using ``-blockdev``::
-+
-+      $ qemu-system-x86_64
-+          -device virtio-scsi \
-+          -object pr-manager-helper,id=helper0,path=/var/run/qemu-pr-helper.sock
-+          -blockdev node-name=hd,driver=raw,file.driver=host_device,file.filename=/dev/sdb,file.pr-manager=helper0
-+          -device scsi-block,drive=hd
-diff --git a/include/scsi/pr-manager.h b/include/scsi/pr-manager.h
-new file mode 100644
-index 0000000000..b2b37d63bc
---- /dev/null
-+++ b/include/scsi/pr-manager.h
-@@ -0,0 +1,56 @@
-+#ifndef PR_MANAGER_H
-+#define PR_MANAGER_H
-+
-+#include "qom/object.h"
-+#include "qapi/qmp/qdict.h"
-+#include "qapi/visitor.h"
-+#include "qom/object_interfaces.h"
-+#include "block/aio.h"
-+
-+#define TYPE_PR_MANAGER "pr-manager"
-+
-+#define PR_MANAGER_CLASS(klass) \
-+     OBJECT_CLASS_CHECK(PRManagerClass, (klass), TYPE_PR_MANAGER)
-+#define PR_MANAGER_GET_CLASS(obj) \
-+     OBJECT_GET_CLASS(PRManagerClass, (obj), TYPE_PR_MANAGER)
-+#define PR_MANAGER(obj) \
-+     OBJECT_CHECK(PRManager, (obj), TYPE_PR_MANAGER)
-+
-+struct sg_io_hdr;
-+
-+typedef struct PRManager {
-+    /* <private> */
-+    Object parent;
-+} PRManager;
-+
-+/**
-+ * PRManagerClass:
-+ * @parent_class: the base class
-+ * @run: callback invoked in thread pool context
-+ */
-+typedef struct PRManagerClass {
-+    /* <private> */
-+    ObjectClass parent_class;
-+
-+    /* <public> */
-+    int (*run)(PRManager *pr_mgr, int fd, struct sg_io_hdr *hdr);
-+} PRManagerClass;
-+
-+BlockAIOCB *pr_manager_execute(PRManager *pr_mgr,
-+                               AioContext *ctx, int fd,
-+                               struct sg_io_hdr *hdr,
-+                               BlockCompletionFunc *complete,
-+                               void *opaque);
-+
-+#ifdef CONFIG_LINUX
-+PRManager *pr_manager_lookup(const char *id, Error **errp);
-+#else
-+static inline PRManager *pr_manager_lookup(const char *id, Error **errp)
-+{
-+    /* The classes do not exist at all!  */
-+    error_setg(errp, "No persistent reservation manager with id '%s'", id);
-+    return NULL;
++if test "$mpath" != "no" ; then
++  cat > $TMPC <<EOF
++#include <libudev.h>
++#include <mpath_persist.h>
++unsigned mpath_mx_alloc_len = 1024;
++int logsink;
++int main(void) {
++    struct udev *udev = udev_new();
++    mpath_lib_init(udev);
 +}
-+#endif
++EOF
++  if compile_prog "" "-ludev -lmultipath -lmpathpersist" ; then
++    mpathpersist=yes
++  else
++    mpathpersist=no
++  fi
++else
++  mpathpersist=no
++fi
 +
-+#endif
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index bb11815608..c69a395804 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2241,6 +2241,9 @@
- # Driver specific block device options for the file backend.
- #
- # @filename:    path to the image file
-+# @pr-manager:  the id for the object that will handle persistent reservations
-+#               for this device (default: none, forward the commands via SG_IO;
-+#               since 2.11)
- # @aio:         AIO backend (default: threads) (since: 2.8)
- # @locking:     whether to enable file locking. If set to 'auto', only enable
- #               when Open File Descriptor (OFD) locking API is available
-@@ -2250,6 +2253,7 @@
- ##
- { 'struct': 'BlockdevOptionsFile',
-   'data': { 'filename': 'str',
-+            '*pr-manager': 'str',
-             '*locking': 'OnOffAuto',
-             '*aio': 'BlockdevAioOptions' } }
++##########################################
+ # libcap probe
  
-diff --git a/scsi/Makefile.objs b/scsi/Makefile.objs
-index 31b82a5a36..5496d2ae6a 100644
---- a/scsi/Makefile.objs
-+++ b/scsi/Makefile.objs
-@@ -1 +1,3 @@
- block-obj-y += utils.o
+ if test "$cap" != "no" ; then
+@@ -5034,16 +5063,34 @@ if test "$want_tools" = "yes" ; then
+   fi
+ fi
+ if test "$softmmu" = yes ; then
+-  if test "$virtfs" != no ; then
+-    if test "$cap" = yes && test "$linux" = yes && test "$attr" = yes ; then
++  if test "$linux" = yes; then
++    if test "$virtfs" != no && test "$cap" = yes && test "$attr" = yes ; then
+       virtfs=yes
+       tools="$tools fsdev/virtfs-proxy-helper\$(EXESUF)"
+     else
+       if test "$virtfs" = yes; then
+-        error_exit "VirtFS is supported only on Linux and requires libcap devel and libattr devel"
++        error_exit "VirtFS requires libcap devel and libattr devel"
+       fi
+       virtfs=no
+     fi
++    if test "$mpath" != no && test "$mpathpersist" = yes ; then
++      mpath=yes
++      tools="$tools mpath/qemu-mpath-helper\$(EXESUF)"
++    else
++      if test "$mpath" = yes; then
++        error_exit "Multipath requires libmpathpersist devel"
++      fi
++      mpath=no
++    fi
++  else
++    if test "$virtfs" = yes; then
++      error_exit "VirtFS is supported only on Linux"
++    fi
++    virtfs=no
++    if test "$mpath" = yes; then
++      error_exit "Multipath is supported only on Linux"
++    fi
++    mpath=no
+   fi
+ fi
+ 
+@@ -5289,6 +5336,7 @@ echo "Audio drivers     $audio_drv_list"
+ echo "Block whitelist (rw) $block_drv_rw_whitelist"
+ echo "Block whitelist (ro) $block_drv_ro_whitelist"
+ echo "VirtFS support    $virtfs"
++echo "Multipath support $mpath"
+ echo "VNC support       $vnc"
+ if test "$vnc" = "yes" ; then
+     echo "VNC SASL support  $vnc_sasl"
+@@ -5732,6 +5780,9 @@ fi
+ if test "$virtfs" = "yes" ; then
+   echo "CONFIG_VIRTFS=y" >> $config_host_mak
+ fi
++if test "$mpath" = "yes" ; then
++  echo "CONFIG_MPATH=y" >> $config_host_mak
++fi
+ if test "$vhost_scsi" = "yes" ; then
+   echo "CONFIG_VHOST_SCSI=y" >> $config_host_mak
+ fi
+diff --git a/docs/pr-manager.rst b/docs/pr-manager.rst
+index 7107e59fb8..9b1de198b1 100644
+--- a/docs/pr-manager.rst
++++ b/docs/pr-manager.rst
+@@ -60,6 +60,7 @@ system service and supports the following option:
+ 
+ -d, --daemon              run in the background
+ -q, --quiet               decrease verbosity
++-v, --verbose             increase verbosity
+ -f, --pidfile=path        PID file when running as a daemon
+ -k, --socket=path         path to the socket
+ -T, --trace=trace-opts    tracing options
+@@ -82,3 +83,29 @@ its operation.  To do this, add the following options:
+ 
+ -u, --user=user           user to drop privileges to
+ -g, --group=group         group to drop privileges to
 +
-+block-obj-$(CONFIG_LINUX) += pr-manager.o
-diff --git a/scsi/pr-manager.c b/scsi/pr-manager.c
-new file mode 100644
-index 0000000000..cde19b87c3
---- /dev/null
-+++ b/scsi/pr-manager.c
-@@ -0,0 +1,109 @@
-+/*
-+ * Persistent reservation manager abstract class
-+ *
-+ * Copyright (c) 2017 Red Hat, Inc.
-+ *
-+ * Author: Paolo Bonzini <pbonzini@redhat.com>
-+ *
-+ * This code is licensed under the LGPL.
-+ *
-+ */
++---------------------------------------------
++Multipath devices and persistent reservations
++---------------------------------------------
 +
-+#include "qemu/osdep.h"
-+#include <scsi/sg.h>
++Proper support of persistent reservation for multipath devices requires
++communication with the multipath daemon, so that the reservation is
++registered and applied when a path is newly discovered or becomes online
++again.  :command:`qemu-pr-helper` can do this if the ``libmpathpersist``
++library was available on the system at build time.
 +
-+#include "qapi/error.h"
-+#include "block/aio.h"
-+#include "block/thread-pool.h"
-+#include "scsi/pr-manager.h"
-+#include "trace.h"
++As of August 2017, a reservation key must be specified in ``multipath.conf``
++for ``multipathd`` to check for persistent reservation for newly
++discovered paths or reinstated paths.  The attribute can be added
++to the ``defaults`` section or the ``multipaths`` section; for example::
 +
-+typedef struct PRManagerData {
-+    PRManager *pr_mgr;
-+    struct sg_io_hdr *hdr;
-+    int fd;
-+} PRManagerData;
++    multipaths {
++        multipath {
++            wwid   XXXXXXXXXXXXXXXX
++            alias      yellow
++            reservation_key  0x123abc
++        }
++    }
 +
-+static int pr_manager_worker(void *opaque)
++Linking :program:`qemu-pr-helper` to ``libmpathpersist`` does not impede
++its usage on regular SCSI devices.
+diff --git a/include/scsi/utils.h b/include/scsi/utils.h
+index d301b31768..00a4bdb080 100644
+--- a/include/scsi/utils.h
++++ b/include/scsi/utils.h
+@@ -72,10 +72,14 @@ extern const struct SCSISense sense_code_IO_ERROR;
+ extern const struct SCSISense sense_code_I_T_NEXUS_LOSS;
+ /* Command aborted, Logical Unit failure */
+ extern const struct SCSISense sense_code_LUN_FAILURE;
++/* Command aborted, LUN Communication failure */
++extern const struct SCSISense sense_code_LUN_COMM_FAILURE;
+ /* Command aborted, Overlapped Commands Attempted */
+ extern const struct SCSISense sense_code_OVERLAPPED_COMMANDS;
+ /* LUN not ready, Capacity data has changed */
+ extern const struct SCSISense sense_code_CAPACITY_CHANGED;
++/* Unit attention, SCSI bus reset */
++extern const struct SCSISense sense_code_SCSI_BUS_RESET;
+ /* LUN not ready, Medium not present */
+ extern const struct SCSISense sense_code_UNIT_ATTENTION_NO_MEDIUM;
+ /* Unit attention, Power on, reset or bus device reset occurred */
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index 9662ede753..3f08ab12b4 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -30,6 +30,12 @@
+ #include <pwd.h>
+ #include <grp.h>
+ 
++#ifdef CONFIG_MPATH
++#include <libudev.h>
++#include <mpath_cmd.h>
++#include <mpath_persist.h>
++#endif
++
+ #include "qapi/error.h"
+ #include "qemu-common.h"
+ #include "qemu/cutils.h"
+@@ -60,6 +66,7 @@ static enum { RUNNING, TERMINATE, TERMINATING } state;
+ static QIOChannelSocket *server_ioc;
+ static int server_watch;
+ static int num_active_sockets = 1;
++static int noisy;
+ static int verbose;
+ 
+ #ifdef CONFIG_LIBCAP
+@@ -171,9 +178,316 @@ static int do_sgio(int fd, const uint8_t *cdb, uint8_t *sense,
+     return r;
+ }
+ 
++/* Device mapper interface */
++
++#ifdef CONFIG_MPATH
++#define CONTROL_PATH "/dev/mapper/control"
++
++typedef struct DMData {
++    struct dm_ioctl dm;
++    uint8_t data[1024];
++} DMData;
++
++static int control_fd;
++
++static void *dm_ioctl(int ioc, struct dm_ioctl *dm)
 +{
-+    PRManagerData *data = opaque;
-+    PRManager *pr_mgr = data->pr_mgr;
-+    PRManagerClass *pr_mgr_class =
-+        PR_MANAGER_GET_CLASS(pr_mgr);
-+    struct sg_io_hdr *hdr = data->hdr;
-+    int fd = data->fd;
++    static DMData d;
++    memcpy(&d.dm, dm, sizeof(d.dm));
++    QEMU_BUILD_BUG_ON(sizeof(d.data) < sizeof(struct dm_target_spec));
++
++    d.dm.version[0] = DM_VERSION_MAJOR;
++    d.dm.version[1] = 0;
++    d.dm.version[2] = 0;
++    d.dm.data_size = 1024;
++    d.dm.data_start = offsetof(DMData, data);
++    if (ioctl(control_fd, ioc, &d) < 0) {
++        return NULL;
++    }
++    memcpy(dm, &d.dm, sizeof(d.dm));
++    return &d.data;
++}
++
++static void *dm_dev_ioctl(int fd, int ioc, struct dm_ioctl *dm)
++{
++    struct stat st;
 +    int r;
 +
-+    g_free(data);
-+    trace_pr_manager_run(fd, hdr->cmdp[0], hdr->cmdp[1]);
-+
-+    /* The is was taken in pr_manager_execute.  */
-+    r = pr_mgr_class->run(pr_mgr, fd, hdr);
-+    object_unref(OBJECT(pr_mgr));
-+    return r;
-+}
-+
-+
-+BlockAIOCB *pr_manager_execute(PRManager *pr_mgr,
-+                               AioContext *ctx, int fd,
-+                               struct sg_io_hdr *hdr,
-+                               BlockCompletionFunc *complete,
-+                               void *opaque)
-+{
-+    PRManagerData *data = g_new(PRManagerData, 1);
-+    ThreadPool *pool = aio_get_thread_pool(ctx);
-+
-+    trace_pr_manager_execute(fd, hdr->cmdp[0], hdr->cmdp[1], opaque);
-+    data->pr_mgr = pr_mgr;
-+    data->fd = fd;
-+    data->hdr = hdr;
-+
-+    /* The matching object_unref is in pr_manager_worker.  */
-+    object_ref(OBJECT(pr_mgr));
-+    return thread_pool_submit_aio(pool, pr_manager_worker,
-+                                  data, complete, opaque);
-+}
-+
-+static const TypeInfo pr_manager_info = {
-+    .parent = TYPE_OBJECT,
-+    .name = TYPE_PR_MANAGER,
-+    .class_size = sizeof(PRManagerClass),
-+    .abstract = true,
-+    .interfaces = (InterfaceInfo[]) {
-+        { TYPE_USER_CREATABLE },
-+        { }
-+    }
-+};
-+
-+PRManager *pr_manager_lookup(const char *id, Error **errp)
-+{
-+    Object *obj;
-+    PRManager *pr_mgr;
-+
-+    obj = object_resolve_path_component(object_get_objects_root(), id);
-+    if (!obj) {
-+        error_setg(errp, "No persistent reservation manager with id '%s'", id);
-+        return NULL;
++    r = fstat(fd, &st);
++    if (r < 0) {
++        perror("fstat");
++        exit(1);
 +    }
 +
-+    pr_mgr = (PRManager *)
-+        object_dynamic_cast(obj,
-+                            TYPE_PR_MANAGER);
-+    if (!pr_mgr) {
-+        error_setg(errp,
-+                   "Object with id '%s' is not a persistent reservation manager",
-+                   id);
-+        return NULL;
++    dm->dev = st.st_rdev;
++    return dm_ioctl(ioc, dm);
++}
++
++static void dm_init(void)
++{
++    control_fd = open(CONTROL_PATH, O_RDWR);
++    if (control_fd < 0) {
++        perror("Cannot open " CONTROL_PATH);
++        exit(1);
++    }
++    struct dm_ioctl dm = { 0 };
++    if (!dm_ioctl(DM_VERSION, &dm)) {
++        perror("ioctl");
++        exit(1);
++    }
++    if (dm.version[0] != DM_VERSION_MAJOR) {
++        fprintf(stderr, "Unsupported device mapper interface");
++        exit(1);
++    }
++}
++
++/* Variables required by libmultipath and libmpathpersist.  */
++QEMU_BUILD_BUG_ON(PR_HELPER_DATA_SIZE > MPATH_MAX_PARAM_LEN);
++unsigned mpath_mx_alloc_len = PR_HELPER_DATA_SIZE;
++int logsink;
++
++static void multipath_pr_init(void)
++{
++    static struct udev *udev;
++
++    udev = udev_new();
++    mpath_lib_init(udev);
++}
++
++static int is_mpath(int fd)
++{
++    struct dm_ioctl dm = { .flags = DM_NOFLUSH_FLAG };
++    struct dm_target_spec *tgt;
++
++    tgt = dm_dev_ioctl(fd, DM_TABLE_STATUS, &dm);
++    if (!tgt) {
++        if (errno == ENXIO) {
++            return 0;
++        }
++        perror("ioctl");
++        exit(EXIT_FAILURE);
++    }
++    return !strncmp(tgt->target_type, "multipath", DM_MAX_TYPE_NAME);
++}
++
++static int mpath_reconstruct_sense(int fd, int r, uint8_t *sense)
++{
++    switch (r) {
++    case MPATH_PR_SUCCESS:
++        return GOOD;
++    case MPATH_PR_SENSE_NOT_READY:
++    case MPATH_PR_SENSE_MEDIUM_ERROR:
++    case MPATH_PR_SENSE_HARDWARE_ERROR:
++    case MPATH_PR_SENSE_ABORTED_COMMAND:
++        {
++            /* libmpathpersist ate the exact sense.  Try to find it by
++             * issuing TEST UNIT READY.
++             */
++            uint8_t cdb[6] = { TEST_UNIT_READY };
++            int sz = 0;
++            return do_sgio(fd, cdb, sense, NULL, &sz, SG_DXFER_NONE);
++        }
++
++    case MPATH_PR_SENSE_UNIT_ATTENTION:
++        /* Congratulations libmpathpersist, you ruined the Unit Attention...
++         * Return a heavyweight one.
++         */
++        scsi_build_sense(sense, SENSE_CODE(SCSI_BUS_RESET));
++        return CHECK_CONDITION;
++    case MPATH_PR_SENSE_INVALID_OP:
++        /* Only one valid sense.  */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_OPCODE));
++        return CHECK_CONDITION;
++    case MPATH_PR_ILLEGAL_REQ:
++        /* Guess.  */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM));
++        return CHECK_CONDITION;
++    case MPATH_PR_NO_SENSE:
++        scsi_build_sense(sense, SENSE_CODE(NO_SENSE));
++        return CHECK_CONDITION;
++
++    case MPATH_PR_RESERV_CONFLICT:
++        return RESERVATION_CONFLICT;
++
++    case MPATH_PR_OTHER:
++    default:
++        scsi_build_sense(sense, SENSE_CODE(LUN_COMM_FAILURE));
++        return CHECK_CONDITION;
++    }
++}
++
++static int multipath_pr_in(int fd, const uint8_t *cdb, uint8_t *sense,
++                           uint8_t *data, int sz)
++{
++    int rq_servact = cdb[1];
++    struct prin_resp resp;
++    size_t written;
++    int r;
++
++    switch (rq_servact) {
++    case MPATH_PRIN_RKEY_SA:
++    case MPATH_PRIN_RRES_SA:
++    case MPATH_PRIN_RCAP_SA:
++        break;
++    case MPATH_PRIN_RFSTAT_SA:
++        /* Nobody implements it anyway, so bail out. */
++    default:
++        /* Cannot parse any other output.  */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_FIELD));
++        return CHECK_CONDITION;
 +    }
 +
-+    return pr_mgr;
++    r = mpath_persistent_reserve_in(fd, rq_servact, &resp, noisy, verbose);
++    if (r == MPATH_PR_SUCCESS) {
++        switch (rq_servact) {
++        case MPATH_PRIN_RKEY_SA:
++        case MPATH_PRIN_RRES_SA: {
++            struct prin_readdescr *out = &resp.prin_descriptor.prin_readkeys;
++            assert(sz >= 8);
++            written = MIN(out->additional_length + 8, sz);
++            stl_be_p(&data[0], out->prgeneration);
++            stl_be_p(&data[4], out->additional_length);
++            memcpy(&data[8], out->key_list, written - 8);
++            break;
++        }
++        case MPATH_PRIN_RCAP_SA: {
++            struct prin_capdescr *out = &resp.prin_descriptor.prin_readcap;
++            assert(sz >= 6);
++            written = 6;
++            stw_be_p(&data[0], out->length);
++            data[2] = out->flags[0];
++            data[3] = out->flags[1];
++            stw_be_p(&data[4], out->pr_type_mask);
++            break;
++        }
++        default:
++            scsi_build_sense(sense, SENSE_CODE(INVALID_OPCODE));
++            return CHECK_CONDITION;
++        }
++        assert(written <= sz);
++        memset(data + written, 0, sz - written);
++    }
++
++    return mpath_reconstruct_sense(fd, r, sense);
 +}
 +
-+static void
-+pr_manager_register_types(void)
++static int multipath_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
++                            const uint8_t *param, int sz)
 +{
-+    type_register_static(&pr_manager_info);
++    int rq_servact = cdb[1];
++    int rq_scope = cdb[2] >> 4;
++    int rq_type = cdb[2] & 0xf;
++    struct prout_param_descriptor paramp;
++    char transportids[PR_HELPER_DATA_SIZE];
++    int r;
++
++    switch (rq_servact) {
++    case MPATH_PROUT_REG_SA:
++    case MPATH_PROUT_RES_SA:
++    case MPATH_PROUT_REL_SA:
++    case MPATH_PROUT_CLEAR_SA:
++    case MPATH_PROUT_PREE_SA:
++    case MPATH_PROUT_PREE_AB_SA:
++    case MPATH_PROUT_REG_IGN_SA:
++        break;
++    case MPATH_PROUT_REG_MOV_SA:
++        /* Not supported by struct prout_param_descriptor.  */
++    default:
++        /* Cannot parse any other input.  */
++        scsi_build_sense(sense, SENSE_CODE(INVALID_FIELD));
++        return CHECK_CONDITION;
++    }
++
++    /* Convert input data, especially transport IDs, to the structs
++     * used by libmpathpersist (which, of course, will immediately
++     * do the opposite).
++     */
++    memset(&paramp, 0, sizeof(paramp));
++    memcpy(&paramp.key, &param[0], 8);
++    memcpy(&paramp.sa_key, &param[8], 8);
++    paramp.sa_flags = param[10];
++    if (sz > PR_OUT_FIXED_PARAM_SIZE) {
++        size_t transportid_len;
++        int i, j;
++        if (sz < PR_OUT_FIXED_PARAM_SIZE + 4) {
++            scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM_LEN));
++            return CHECK_CONDITION;
++        }
++        transportid_len = ldl_be_p(&param[24]) + PR_OUT_FIXED_PARAM_SIZE + 4;
++        if (transportid_len > sz) {
++            scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM));
++            return CHECK_CONDITION;
++        }
++        for (i = PR_OUT_FIXED_PARAM_SIZE + 4, j = 0; i < transportid_len; ) {
++            struct transportid *id = (struct transportid *) &transportids[j];
++            int len;
++
++            id->format_code = param[i] & 0xc0;
++            id->protocol_id = param[i] & 0x0f;
++            switch (param[i] & 0xcf) {
++            case 0:
++                /* FC transport.  */
++                if (i + 24 > transportid_len) {
++                    goto illegal_req;
++                }
++                memcpy(id->n_port_name, &param[i + 8], 8);
++                j += offsetof(struct transportid, n_port_name[8]);
++                i += 24;
++                break;
++            case 3:
++            case 0x43:
++                /* iSCSI transport.  */
++                len = lduw_be_p(&param[i + 2]);
++                if (len > 252 || (len & 3) || i + len + 4 > transportid_len) {
++                    /* For format code 00, the standard says the maximum is 223
++                     * plus the NUL terminator.  For format code 01 there is no
++                     * maximum length, but libmpathpersist ignores the first
++                     * byte of id->iscsi_name so our maximum is 252.
++                     */
++                    goto illegal_req;
++                }
++                if (memchr(&param[i + 4], 0, len) == NULL) {
++                    goto illegal_req;
++                }
++                memcpy(id->iscsi_name, &param[i + 2], len + 2);
++                j += offsetof(struct transportid, iscsi_name[len + 2]);
++                i += len + 4;
++                break;
++            case 6:
++                /* SAS transport.  */
++                if (i + 24 > transportid_len) {
++                    goto illegal_req;
++                }
++                memcpy(id->sas_address, &param[i + 4], 8);
++                j += offsetof(struct transportid, sas_address[8]);
++                i += 24;
++                break;
++            default:
++            illegal_req:
++                scsi_build_sense(sense, SENSE_CODE(INVALID_PARAM));
++                return CHECK_CONDITION;
++            }
++
++            paramp.trnptid_list[paramp.num_transportid++] = id;
++        }
++    }
++
++    r = mpath_persistent_reserve_out(fd, rq_servact, rq_scope, rq_type,
++                                     &paramp, noisy, verbose);
++    return mpath_reconstruct_sense(fd, r, sense);
 +}
++#endif
 +
-+
-+type_init(pr_manager_register_types);
-diff --git a/vl.c b/vl.c
-index 9e62e92aea..bfee61053b 100644
---- a/vl.c
-+++ b/vl.c
-@@ -2893,7 +2893,8 @@ static int machine_set_property(void *opaque,
-  */
- static bool object_create_initial(const char *type)
+ static int do_pr_in(int fd, const uint8_t *cdb, uint8_t *sense,
+                     uint8_t *data, int *resp_sz)
  {
--    if (g_str_equal(type, "rng-egd")) {
-+    if (g_str_equal(type, "rng-egd") ||
-+        g_str_has_prefix(type, "pr-manager-")) {
-         return false;
++#ifdef CONFIG_MPATH
++    if (is_mpath(fd)) {
++        /* multipath_pr_in fills the whole input buffer.  */
++        return multipath_pr_in(fd, cdb, sense, data, *resp_sz);
++    }
++#endif
++
+     return do_sgio(fd, cdb, sense, data, resp_sz,
+                    SG_DXFER_FROM_DEV);
+ }
+@@ -181,7 +495,14 @@ static int do_pr_in(int fd, const uint8_t *cdb, uint8_t *sense,
+ static int do_pr_out(int fd, const uint8_t *cdb, uint8_t *sense,
+                      const uint8_t *param, int sz)
+ {
+-    int resp_sz = sz;
++    int resp_sz;
++#ifdef CONFIG_MPATH
++    if (is_mpath(fd)) {
++        return multipath_pr_out(fd, cdb, sense, param, sz);
++    }
++#endif
++
++    resp_sz = sz;
+     return do_sgio(fd, cdb, sense, (uint8_t *)param, &resp_sz,
+                    SG_DXFER_TO_DEV);
+ }
+@@ -491,6 +812,14 @@ static int drop_privileges(void)
+         return -1;
      }
  
++#ifdef CONFIG_MPATH
++    /* For /dev/mapper/control ioctls */
++    if (capng_update(CAPNG_ADD, CAPNG_EFFECTIVE | CAPNG_PERMITTED,
++                     CAP_SYS_ADMIN) < 0) {
++        return -1;
++    }
++#endif
++
+     /* Change user/group id, retaining the capabilities.  Because file descriptors
+      * are passed via SCM_RIGHTS, we don't need supplementary groups (and in
+      * fact the helper can run as "nobody").
+@@ -507,7 +836,7 @@ static int drop_privileges(void)
+ 
+ int main(int argc, char **argv)
+ {
+-    const char *sopt = "hVk:fdT:u:g:q";
++    const char *sopt = "hVk:fdT:u:g:vq";
+     struct option lopt[] = {
+         { "help", no_argument, NULL, 'h' },
+         { "version", no_argument, NULL, 'V' },
+@@ -517,10 +846,12 @@ int main(int argc, char **argv)
+         { "trace", required_argument, NULL, 'T' },
+         { "user", required_argument, NULL, 'u' },
+         { "group", required_argument, NULL, 'g' },
++        { "verbose", no_argument, NULL, 'v' },
+         { "quiet", no_argument, NULL, 'q' },
+         { NULL, 0, NULL, 0 }
+     };
+     int opt_ind = 0;
++    int loglevel = 1;
+     int quiet = 0;
+     char ch;
+     Error *local_err = NULL;
+@@ -597,6 +928,9 @@ int main(int argc, char **argv)
+         case 'q':
+             quiet = 1;
+             break;
++        case 'v':
++            ++loglevel;
++            break;
+         case 'T':
+             g_free(trace_file);
+             trace_file = trace_opt_parse(optarg);
+@@ -616,7 +950,8 @@ int main(int argc, char **argv)
+     }
+ 
+     /* set verbosity */
+-    verbose = !quiet;
++    noisy = !quiet && (loglevel >= 3);
++    verbose = quiet ? 0 : MIN(loglevel, 3);
+ 
+     if (!trace_init_backends()) {
+         exit(EXIT_FAILURE);
+@@ -624,6 +959,11 @@ int main(int argc, char **argv)
+     trace_init_file(trace_file);
+     qemu_set_log(LOG_TRACE);
+ 
++#ifdef CONFIG_MPATH
++    dm_init();
++    multipath_pr_init();
++#endif
++
+     socket_activation = check_socket_activation();
+     if (socket_activation == 0) {
+         SocketAddress saddr = {
+diff --git a/scsi/utils.c b/scsi/utils.c
+index fab60bdf20..5684951b12 100644
+--- a/scsi/utils.c
++++ b/scsi/utils.c
+@@ -206,6 +206,11 @@ const struct SCSISense sense_code_OVERLAPPED_COMMANDS = {
+     .key = ABORTED_COMMAND, .asc = 0x4e, .ascq = 0x00
+ };
+ 
++/* Command aborted, LUN Communication Failure */
++const struct SCSISense sense_code_LUN_COMM_FAILURE = {
++    .key = ABORTED_COMMAND, .asc = 0x08, .ascq = 0x00
++};
++
+ /* Unit attention, Capacity data has changed */
+ const struct SCSISense sense_code_CAPACITY_CHANGED = {
+     .key = UNIT_ATTENTION, .asc = 0x2a, .ascq = 0x09
+@@ -216,6 +221,11 @@ const struct SCSISense sense_code_RESET = {
+     .key = UNIT_ATTENTION, .asc = 0x29, .ascq = 0x00
+ };
+ 
++/* Unit attention, SCSI bus reset */
++const struct SCSISense sense_code_SCSI_BUS_RESET = {
++    .key = UNIT_ATTENTION, .asc = 0x29, .ascq = 0x02
++};
++
+ /* Unit attention, No medium */
+ const struct SCSISense sense_code_UNIT_ATTENTION_NO_MEDIUM = {
+     .key = UNIT_ATTENTION, .asc = 0x3a, .ascq = 0x00
 -- 
 2.13.5
