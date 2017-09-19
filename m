@@ -1,33 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44492)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44490)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1duD9X-0002sD-4F
+	(envelope-from <pbonzini@redhat.com>) id 1duD9X-0002sC-3N
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 03:41:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1duD9S-0005K6-SA
+	(envelope-from <pbonzini@redhat.com>) id 1duD9R-0005JC-Fq
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 03:41:07 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60208)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1duD9S-0005JK-JX
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 03:41:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1duD9Q-0002Gb-RF
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 07:41:00 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id CAB6B2E8487
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 07:41:00 +0000 (UTC)
+Received: from mx1.redhat.com ([209.132.183.28]:55070)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1duD9R-0005Ic-9S
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 03:41:01 -0400
+References: <20170918101709.30421-1-aik@ozlabs.ru>
+	<20170918101709.30421-2-aik@ozlabs.ru>
+	<c01622e7-3e6d-cf90-a28c-aa31b4857887@redhat.com>
+	<2debed31-4c28-6dc3-b159-1fdc3fbf87f5@ozlabs.ru>
+	<a85cbaf9-d7c7-403b-2dfc-886f9ddc0920@ozlabs.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <11f3ee38-7c70-41d8-0df1-774fbe95cfcb@redhat.com>
+Date: Tue, 19 Sep 2017 09:40:57 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <a85cbaf9-d7c7-403b-2dfc-886f9ddc0920@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Sep 2017 07:30:55 -0000
-From: "R.Nageswara Sastry" <nasastry@in.ibm.com>
-Reply-To: Bug 1718118 <1718118@bugs.launchpad.net>
-Sender: bounces@canonical.com
-Message-Id: <150580625533.32282.1265641231641467649.malonedeb@soybean.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1718118] [NEW] qemu crashes with
- hw/ppc/spapr_drc.c:417:spapr_drc_detach: assertion failed: (drc->dev)
+Subject: Re: [Qemu-devel] [PATCH qemu v3 01/13] memory: Postpone flatview
+ and dispatch tree building till all devices are added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,129 +32,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
 
-Public bug reported:
+On 19/09/2017 08:57, Alexey Kardashevskiy wrote:
+>>> 3) you can consult the list (or hash table :)) of live FlatViews (whi=
+ch
+>>> means you keep it live after memory_region_transaction_commit ends, a=
+nd
+>>> only clear it on the next call), and reuse an existing FlatView.  Not=
+e
+>>> that the number of distinct FlatViews should be very few,=20
+>>
+>> I keep missing this bit - why few? Each virtio-pci device creates 2 AS=
+,
+>> with proxy->modern_bar and pci_dev->bus_master_container_region which =
+are
+>> unique and not aliases. Remember, 500 virtio devices is my test case ;=
+)
 
-Qemu crashes with error "hw/ppc/spapr_drc.c:417:spapr_drc_detach:
-assertion failed: (drc->dev)" when memory hotplug and hotunplug was done
-continuously.
+Argh, no, it's me who keeps missing the bit.
 
-Steps to re-produce:
-1. git clone (today's i.e 19th Sept)
-2. Bring up ppc64le guest with memory hotplug capabilities ( I used libvirt=
- xml to do this).
-3. And do continuous memory hotplug and unplug using the following memory x=
-ml (mem_hp_8g.xml)
-<memory model=3D'dimm'>
-<target>
-<size unit=3D'KiB'>8388608</size>
-<node>1</node>
-</target>
-</memory>
-4. Run the following =
+> More details: pci_dev->bus_master_container_region is a root and it is
+> enabled but its only child pci_dev->bus_master_enable_region is not. Ok=
+, in
+> flatview_topology_update() I can render a FV, see that it is empty
+> (view->nr=3D=3D0) and share an empty FV in this case too, this halves t=
+he
+> number of FVs (from ~1000 to ~500 for 500 virtio devices).
 
-for i in `seq 1 100`; do virsh attach-device nrs mem_hp_8g.xml --live; virs=
-h detach-device nrs mem_hp_8g.xml --live; done
-5. Guest will crash
-6. Following is from qemu log
+We can also resolve "fake" aliases, obtained through a region with only
+one subregion.
 
-LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin QEMU_AU=
-DIO_DRV=3Dnone /usr/local/bin/qemu-system-ppc64 -name guest=3Dnrs,debug-thr=
-eads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/li=
-bvirt/qemu/domain-19-nrs/master-key.aes -machine pseries-2.10,accel=3Dkvm,u=
-sb=3Doff,dump-guest-core=3Doff -m size=3D8388608k,slots=3D256,maxmem=3D4194=
-30400k -realtime mlock=3Doff -smp 4,sockets=3D4,cores=3D1,threads=3D1 -numa=
- node,nodeid=3D0,cpus=3D0-1,mem=3D4096 -numa node,nodeid=3D1,cpus=3D2-3,mem=
-=3D4096 -uuid d7987973-2467-43ff-b8d2-acefc6ac59e5 -display none -no-user-c=
-onfig -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib/libvirt/=
-qemu/domain-19-nrs/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,id=
-=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don -d=
-evice qemu-xhci,id=3Dusb,bus=3Dpci.0,addr=3D0x3 -device virtio-scsi-pci,id=
-=3Dscsi0,bus=3Dpci.0,addr=3D0x2 -drive file=3D/home/nasastry/pegas-1.0-ppc6=
-4le.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 -device scsi-hd,b=
-us=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-scsi0-0-0-0,id=
-=3Dscsi0-0-0-0,bootindex=3D1 -netdev tap,fd=3D28,id=3Dhostnet0,vhost=3Don,v=
-hostfd=3D30 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:=
-00:89:8a:8b,bus=3Dpci.0,addr=3D0x1 -chardev pty,id=3Dcharserial0 -device sp=
-apr-vty,chardev=3Dcharserial0,reg=3D0x30000000 -device virtio-balloon-pci,i=
-d=3Dballoon0,bus=3Dpci.0,addr=3D0x4 -s -msg timestamp=3Don
-2017-09-19 06:59:07.878+0000: Domain id=3D19 is tainted: custom-argv
-2017-09-19T06:59:07.918273Z qemu-system-ppc64: -chardev pty,id=3Dcharserial=
-0: char device redirected to /dev/pts/5 (label charserial0)
-**
-ERROR:/home/nasastry/qemu/hw/ppc/spapr_drc.c:417:spapr_drc_detach: assertio=
-n failed: (drc->dev)
-2017-09-19 06:59:51.428+0000: shutting down, reason=3Dcrashed
+> But proxy->modern_bar (which has an modern_cfg alias which is a root of=
+ an
+> AS) is enabled since it is created and I could disable it and enable
+> afterwards but since a PCI device enablement is done by writing to the
+> config space, I kind of stuck here.
+>=20
+> I can do something like this and it helps a lot (now with -S I end up
+> having 4 FVs and much better start time) but it is kinda hacky and "mem=
+ory:
+> Postpone flatview and dispatch tree building till all devices are added=
+"
+> solves this better imho, no?
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+I think modern_bar (actually modern_cfg) shouldn't have its own address
+space, it's a pretty wasteful way to compute the dispatch tree where a
+simple linked list or array would be enough:
 
--- =
+memory-region: virtio-pci
+  00000000fe000000-00000000fe003fff (prio 1, i/o): virtio-pci
+    00000000fe000000-00000000fe000fff (prio 0, i/o): virtio-pci-common
+    00000000fe001000-00000000fe001fff (prio 0, i/o): virtio-pci-isr
+    00000000fe002000-00000000fe002fff (prio 0, i/o): virtio-pci-device
+    00000000fe003000-00000000fe003fff (prio 0, i/o): virtio-pci-notify
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1718118
-
-Title:
-  qemu crashes with hw/ppc/spapr_drc.c:417:spapr_drc_detach: assertion
-  failed: (drc->dev)
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu crashes with error "hw/ppc/spapr_drc.c:417:spapr_drc_detach:
-  assertion failed: (drc->dev)" when memory hotplug and hotunplug was
-  done continuously.
-
-  Steps to re-produce:
-  1. git clone (today's i.e 19th Sept)
-  2. Bring up ppc64le guest with memory hotplug capabilities ( I used libvi=
-rt xml to do this).
-  3. And do continuous memory hotplug and unplug using the following memory=
- xml (mem_hp_8g.xml)
-  <memory model=3D'dimm'>
-  <target>
-  <size unit=3D'KiB'>8388608</size>
-  <node>1</node>
-  </target>
-  </memory>
-  4. Run the following =
-
-  for i in `seq 1 100`; do virsh attach-device nrs mem_hp_8g.xml --live; vi=
-rsh detach-device nrs mem_hp_8g.xml --live; done
-  5. Guest will crash
-  6. Following is from qemu log
-
-  LC_ALL=3DC PATH=3D/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin QEMU_=
-AUDIO_DRV=3Dnone /usr/local/bin/qemu-system-ppc64 -name guest=3Dnrs,debug-t=
-hreads=3Don -S -object secret,id=3DmasterKey0,format=3Draw,file=3D/var/lib/=
-libvirt/qemu/domain-19-nrs/master-key.aes -machine pseries-2.10,accel=3Dkvm=
-,usb=3Doff,dump-guest-core=3Doff -m size=3D8388608k,slots=3D256,maxmem=3D41=
-9430400k -realtime mlock=3Doff -smp 4,sockets=3D4,cores=3D1,threads=3D1 -nu=
-ma node,nodeid=3D0,cpus=3D0-1,mem=3D4096 -numa node,nodeid=3D1,cpus=3D2-3,m=
-em=3D4096 -uuid d7987973-2467-43ff-b8d2-acefc6ac59e5 -display none -no-user=
--config -nodefaults -chardev socket,id=3Dcharmonitor,path=3D/var/lib/libvir=
-t/qemu/domain-19-nrs/monitor.sock,server,nowait -mon chardev=3Dcharmonitor,=
-id=3Dmonitor,mode=3Dcontrol -rtc base=3Dutc -no-shutdown -boot strict=3Don =
--device qemu-xhci,id=3Dusb,bus=3Dpci.0,addr=3D0x3 -device virtio-scsi-pci,i=
-d=3Dscsi0,bus=3Dpci.0,addr=3D0x2 -drive file=3D/home/nasastry/pegas-1.0-ppc=
-64le.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-scsi0-0-0-0 -device scsi-hd,=
-bus=3Dscsi0.0,channel=3D0,scsi-id=3D0,lun=3D0,drive=3Ddrive-scsi0-0-0-0,id=
-=3Dscsi0-0-0-0,bootindex=3D1 -netdev tap,fd=3D28,id=3Dhostnet0,vhost=3Don,v=
-hostfd=3D30 -device virtio-net-pci,netdev=3Dhostnet0,id=3Dnet0,mac=3D52:54:=
-00:89:8a:8b,bus=3Dpci.0,addr=3D0x1 -chardev pty,id=3Dcharserial0 -device sp=
-apr-vty,chardev=3Dcharserial0,reg=3D0x30000000 -device virtio-balloon-pci,i=
-d=3Dballoon0,bus=3Dpci.0,addr=3D0x4 -s -msg timestamp=3Don
-  2017-09-19 06:59:07.878+0000: Domain id=3D19 is tainted: custom-argv
-  2017-09-19T06:59:07.918273Z qemu-system-ppc64: -chardev pty,id=3Dcharseri=
-al0: char device redirected to /dev/pts/5 (label charserial0)
-  **
-  ERROR:/home/nasastry/qemu/hw/ppc/spapr_drc.c:417:spapr_drc_detach: assert=
-ion failed: (drc->dev)
-  2017-09-19 06:59:51.428+0000: shutting down, reason=3Dcrashed
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1718118/+subscriptions
+Paolo
