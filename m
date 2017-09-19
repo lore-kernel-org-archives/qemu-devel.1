@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52456)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52605)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1duK8N-00046Z-1S
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:08:24 -0400
+	(envelope-from <clg@kaod.org>) id 1duK8W-0004FV-Ja
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:08:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1duK8K-0007Qh-8R
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:08:23 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:45925)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1duK8K-0007OU-2n
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:08:20 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id m18so276774wrm.2
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 08:08:20 -0700 (PDT)
-References: <20170919072719.11815-1-famz@redhat.com>
-	<20170919072719.11815-5-famz@redhat.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170919072719.11815-5-famz@redhat.com>
-Date: Tue, 19 Sep 2017 16:08:17 +0100
-Message-ID: <8760ceenfi.fsf@linaro.org>
+	(envelope-from <clg@kaod.org>) id 1duK8T-0007dW-Qe
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:08:32 -0400
+Received: from 20.mo3.mail-out.ovh.net ([178.33.47.94]:59009)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duK8T-0007cc-L7
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 11:08:29 -0400
+Received: from player797.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 5482A158D25
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 17:08:28 +0200 (CEST)
+References: <20170911171235.29331-1-clg@kaod.org>
+	<20170911171235.29331-7-clg@kaod.org> <20170919024849.GL27153@umbus>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <7e43adba-0e65-df5f-b87a-e16115fb3c95@kaod.org>
+Date: Tue, 19 Sep 2017 17:08:21 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v9 04/13] tests: Add a test key pair
+In-Reply-To: <20170919024849.GL27153@umbus>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 06/21] ppc/xive: introduce handlers
+ for interrupt sources
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,80 +32,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, Philippe =?utf-8?Q?Mathieu?= =?utf-8?Q?-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
+On 09/19/2017 04:48 AM, David Gibson wrote:
+> On Mon, Sep 11, 2017 at 07:12:20PM +0200, C=E9dric Le Goater wrote:
+>> These are very similar to the XICS handlers in a simpler form. They
+>> make use of the ICSIRQState array of the XICS interrupt source to
+>> differentiate the MSI from the LSI interrupts. The spapr_xive_irq()
+>> routine in charge of triggering the CPU interrupt line will be filled
+>> later on.
+>>
+>> The next patch will introduce the MMIO handlers to interact with XIVE
+>> interrupt sources.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  hw/intc/spapr_xive.c        | 46 ++++++++++++++++++++++++++++++++++++=
++++++++++
+>>  include/hw/ppc/spapr_xive.h |  1 +
+>>  2 files changed, 47 insertions(+)
+>>
+>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>> index 52c32f588d6d..1ed7b6a286e9 100644
+>> --- a/hw/intc/spapr_xive.c
+>> +++ b/hw/intc/spapr_xive.c
+>> @@ -27,6 +27,50 @@
+>> =20
+>>  #include "xive-internal.h"
+>> =20
+>> +static void spapr_xive_irq(sPAPRXive *xive, int srcno)
+>> +{
+>> +
+>> +}
+>> +
+>> +/*
+>> + * XIVE Interrupt Source
+>> + */
+>> +static void spapr_xive_source_set_irq_msi(sPAPRXive *xive, int srcno,=
+ int val)
+>> +{
+>> +    if (val) {
+>> +        spapr_xive_irq(xive, srcno);
+>> +    }
+>> +}
+>=20
+> So in XICS "srcno" (vs "irq") indicates an offset within a single ICS
+> object, as opposed to a global irq number.  Does that concept even
+> exist in XIVE?
 
-Fam Zheng <famz@redhat.com> writes:
+We don't really care in the internals. 'srcno' is just an index in the=20
+tables, may be I should change the name. It could be the same in XICS=20
+but the xirr is manipulated at low level and so we need to propagate=20
+the source offset in a couple of places.=20
 
-> This will be used by setup test user ssh.
->
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+This to say that the 'irq' number is a guest level information which
+in the patchset should only be used at the hcall level to identify=20
+a source.
+=20
+>> +
+>> +static void spapr_xive_source_set_irq_lsi(sPAPRXive *xive, int srcno,=
+ int val)
+>> +{
+>> +    ICSIRQState *irq =3D &xive->ics->irqs[srcno];
+>> +
+>> +    if (val) {
+>> +        irq->status |=3D XICS_STATUS_ASSERTED;
+>> +    } else {
+>> +        irq->status &=3D ~XICS_STATUS_ASSERTED;
+>=20
+> More mangling a XICS specific object for XIVE operations.  Please
+> stop.
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-> ---
->  tests/keys/README     |  6 ++++++
->  tests/keys/id_rsa     | 27 +++++++++++++++++++++++++++
->  tests/keys/id_rsa.pub |  1 +
->  3 files changed, 34 insertions(+)
->  create mode 100644 tests/keys/README
->  create mode 100644 tests/keys/id_rsa
->  create mode 100644 tests/keys/id_rsa.pub
->
-> diff --git a/tests/keys/README b/tests/keys/README
-> new file mode 100644
-> index 0000000000..f381ac0698
-> --- /dev/null
-> +++ b/tests/keys/README
-> @@ -0,0 +1,6 @@
-> +This folder contains a well-known key pair used in QEMU tests.
-> +
-> +Some guests require the key to exist prior to provisioning the guest; also,
-> +reusing a pre-built key avoids consuming entropy every time the testsuite is
-> +run.  Because the private key is well-known, care must be taken to use the key
-> +ONLY in situations that cannot be compromised by external network clients.
-> diff --git a/tests/keys/id_rsa b/tests/keys/id_rsa
-> new file mode 100644
-> index 0000000000..2933eac3db
-> --- /dev/null
-> +++ b/tests/keys/id_rsa
-> @@ -0,0 +1,27 @@
-> +-----BEGIN RSA PRIVATE KEY-----
-> +MIIEowIBAAKCAQEAopAuOlmLV6LVHdFBj8/eeOwI9CqguIJPp7eAQSZvOiB4Ag/R
-> +coEhl/RBbrV5Yc/SmSD4PTpJO/iM10RwliNjDb4a3I8q3sykRJu9c9PI/YsH8WN9
-> ++NH2NjKPtJIcKTu287IM5JYxyB6nDoOzILbTyJ1TDR/xH6qYEfBAyiblggdjcvhA
-> +RTf93QIn39F/xLypXvT1K2O9BJEsnJ8lEUvB2UXhKo/JTfSeZF8wPBeowaP9EONk
-> +7b+nuJOWHGg68Ji6wVi62tjwl2Szch6lxIhZBpnV7QNRKMfYHP6eIyF4pusazzZq
-> +Telsq6xI2ghecWLzb/MF5A+rklsGx2FNuJSAJwIDAQABAoIBAHHi4o/8VZNivz0x
-> +cWXn8erzKV6tUoWQvW85Lj/2RiwJvSlsnYZDkx5af1CpEE2HA/pFT8PNRqsd+MWC
-> +7AEy710cVsM4BYerBFYQaYxwzblaoojo88LSjVPw3h5Z0iLM8+IMVd36nwuc9dpE
-> +R8TecMZ1+U4Tl6BgqkK+9xToZRdPKdjS8L5MoFhGN+xY0vRbbJbGaV9Q0IHxLBkB
-> +rEBV7T1mUynneCHRUQlJQEwJmKpT8MH3IjsUXlG5YvnuuvcQJSNTaW2iDLxuOKp8
-> +cxW8+qL88zpb1D5dppoIu6rlrugN0azSq70ruFJQPc/A8GQrDKoGgRQiagxNY3u+
-> +vHZzXlECgYEA0dKO3gfkSxsDBb94sQwskMScqLhcKhztEa8kPxTx6Yqh+x8/scx3
-> +XhJyOt669P8U1v8a/2Al+s81oZzzfQSzO1Q7gEwSrgBcRMSIoRBUw9uYcy02ngb/
-> +j/ng3DGivfJztjjiSJwb46FHkJ2JR8mF2UisC6UMXk3NgFY/3vWQx78CgYEAxlcG
-> +T3hfSWSmTgKRczMJuHQOX9ULfTBIqwP5VqkkkiavzigGRirzb5lgnmuTSPTpF0LB
-> +XVPjR2M4q+7gzP0Dca3pocrvLEoxjwIKnCbYKnyyvnUoE9qHv4Kr+vDbgWpa2LXG
-> +JbLmE7tgTCIp20jOPPT4xuDvlbzQZBJ5qCQSoZkCgYEAgrotSSihlCnAOFSTXbu4
-> +CHp3IKe8xIBBNENq0eK61kcJpOxTQvOha3sSsJsU4JAM6+cFaxb8kseHIqonCj1j
-> +bhOM/uJmwQJ4el/4wGDsbxriYOBKpyq1D38gGhDS1IW6kk3erl6VAb36WJ/OaGum
-> +eTpN9vNeQWM4Jj2WjdNx4QECgYAwTdd6mU1TmZCrJRL5ZG+0nYc2rbMrnQvFoqUi
-> +BvWiJovggHzur90zy73tNzPaq9Ls2FQxf5G1vCN8NCRJqEEjeYCR59OSDMu/EXc2
-> +CnvQ9SevHOdS1oEDEjcCWZCMFzPi3XpRih1gptzQDe31uuiHjf3cqcGPzTlPdfRt
-> +D8P92QKBgC4UaBvIRwREVJsdZzpIzm224Bpe8LOmA7DeTnjlT0b3lkGiBJ36/Q0p
-> +VhYh/6cjX4/iuIs7gJbGon7B+YPB8scmOi3fj0+nkJAONue1mMfBNkba6qQTc6Y2
-> +5mEKw2/O7/JpND7ucU3OK9plcw/qnrWDgHxl0Iz95+OzUIIagxne
-> +-----END RSA PRIVATE KEY-----
-> diff --git a/tests/keys/id_rsa.pub b/tests/keys/id_rsa.pub
-> new file mode 100644
-> index 0000000000..d9888e312f
-> --- /dev/null
-> +++ b/tests/keys/id_rsa.pub
-> @@ -0,0 +1 @@
-> +ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCikC46WYtXotUd0UGPz9547Aj0KqC4gk+nt4BBJm86IHgCD9FygSGX9EFutXlhz9KZIPg9Okk7+IzXRHCWI2MNvhrcjyrezKREm71z08j9iwfxY3340fY2Mo+0khwpO7bzsgzkljHIHqcOg7MgttPInVMNH/EfqpgR8EDKJuWCB2Ny+EBFN/3dAiff0X/EvKle9PUrY70EkSycnyURS8HZReEqj8lN9J5kXzA8F6jBo/0Q42Ttv6e4k5YcaDrwmLrBWLra2PCXZLNyHqXEiFkGmdXtA1Eox9gc/p4jIXim6xrPNmpN6WyrrEjaCF5xYvNv8wXkD6uSWwbHYU24lIAn qemu-test
-
-
---
-Alex Bennée
+ah ! we will still need the same information and that means introducing=20
+a common source object. The patchset today just uses the XICS ICSIRQState=
+=20
+array as a common object.
+=20
+>> +    }
+>> +
+>> +    if (irq->status & XICS_STATUS_ASSERTED
+>> +        && !(irq->status & XICS_STATUS_SENT)) {
+>> +        irq->status |=3D XICS_STATUS_SENT;
+>> +        spapr_xive_irq(xive, srcno);
+>> +    }
+>> +}
+>> +
+>> +static void spapr_xive_source_set_irq(void *opaque, int srcno, int va=
+l)
+>> +{
+>> +    sPAPRXive *xive =3D SPAPR_XIVE(opaque);
+>> +    ICSIRQState *irq =3D &xive->ics->irqs[srcno];
+>> +
+>> +    if (irq->flags & XICS_FLAGS_IRQ_LSI) {
+>> +        spapr_xive_source_set_irq_lsi(xive, srcno, val);
+>> +    } else {
+>> +        spapr_xive_source_set_irq_msi(xive, srcno, val);
+>> +    }
+>> +}
+>> +
+>>  /*
+>>   * Main XIVE object
+>>   */
+>> @@ -80,6 +124,8 @@ static void spapr_xive_realize(DeviceState *dev, Er=
+ror **errp)
+>>      }
+>> =20
+>>      xive->ics =3D ICS_BASE(obj);
+>> +    xive->qirqs =3D qemu_allocate_irqs(spapr_xive_source_set_irq, xiv=
+e,
+>> +                                     xive->nr_irqs);
+>> =20
+>>      /* Allocate the last IRQ numbers for the IPIs */
+>>      for (i =3D xive->nr_irqs - xive->nr_targets; i < xive->nr_irqs; i=
+++) {
+>> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+>> index 29112589b37f..eab92c4c1bb8 100644
+>> --- a/include/hw/ppc/spapr_xive.h
+>> +++ b/include/hw/ppc/spapr_xive.h
+>> @@ -38,6 +38,7 @@ struct sPAPRXive {
+>> =20
+>>      /* IRQ */
+>>      ICSState     *ics;  /* XICS source inherited from the SPAPR machi=
+ne */
+>> +    qemu_irq     *qirqs;
+>> =20
+>>      /* XIVE internal tables */
+>>      uint8_t      *sbe;
+>=20
