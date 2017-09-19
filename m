@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59874)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59954)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfI-00042R-B0
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfM-00048Y-MG
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfC-0005L3-G4
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:12 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:38516)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfG-0005R1-Tl
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:16 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33573)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1duHfC-0005Kw-98
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:06 -0400
-Received: by mail-wm0-x241.google.com with SMTP id x17so3721997wmd.5
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:30:06 -0700 (PDT)
+	id 1duHfG-0005Q9-Nd
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:10 -0400
+Received: by mail-wm0-x243.google.com with SMTP id m127so3756869wmm.0
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:30:10 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 19 Sep 2017 14:29:08 +0200
-Message-Id: <1505824179-21541-20-git-send-email-pbonzini@redhat.com>
+Date: Tue, 19 Sep 2017 14:29:12 +0200
+Message-Id: <1505824179-21541-24-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
 References: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 19/50] i386/kvm: set tsc_khz before configuring
- Hyper-V CPUID
+Subject: [Qemu-devel] [PULL 23/50] memory: Rename queue to mrqueue (memory
+ region queue)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,76 +29,105 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Ladi Prosek <lprosek@redhat.com>
+Cc: Kamil Rytarowski <n54@gmx.com>
 
-From: Ladi Prosek <lprosek@redhat.com>
+From: Kamil Rytarowski <n54@gmx.com>
 
-Timing-related Hyper-V enlightenments will benefit from knowing the final
-tsc_khz value. This commit just moves the code in preparation for further
-changes.
+SunOS declares struct queue in <netinet/in.h>.
 
-Signed-off-by: Ladi Prosek <lprosek@redhat.com>
-Message-Id: <20170807085703.32267-3-lprosek@redhat.com>
+This fixes build on SmartOS (Joyent).
+
+Patch cherry-picked from pkgsrc by jperkin (Joyent).
+
+Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+Message-Id: <20170903163304.17919-1-n54@gmx.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/kvm.c | 38 +++++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+ memory.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index b14a0db..15d56ae 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -695,6 +695,25 @@ int kvm_arch_init_vcpu(CPUState *cs)
+diff --git a/memory.c b/memory.c
+index c0adc35..b9920a6 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2701,10 +2701,10 @@ typedef struct MemoryRegionList MemoryRegionList;
  
-     cpuid_i = 0;
+ struct MemoryRegionList {
+     const MemoryRegion *mr;
+-    QTAILQ_ENTRY(MemoryRegionList) queue;
++    QTAILQ_ENTRY(MemoryRegionList) mrqueue;
+ };
  
-+    r = kvm_arch_set_tsc_khz(cs);
-+    if (r < 0) {
-+        goto fail;
-+    }
-+
-+    /* vcpu's TSC frequency is either specified by user, or following
-+     * the value used by KVM if the former is not present. In the
-+     * latter case, we query it from KVM and record in env->tsc_khz,
-+     * so that vcpu's TSC frequency can be migrated later via this field.
-+     */
-+    if (!env->tsc_khz) {
-+        r = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
-+            kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
-+            -ENOTSUP;
-+        if (r > 0) {
-+            env->tsc_khz = r;
-+        }
-+    }
-+
-     /* Paravirtualization CPUIDs */
-     if (hyperv_enabled(cpu)) {
-         c = &cpuid_data.entries[cpuid_i++];
-@@ -961,25 +980,6 @@ int kvm_arch_init_vcpu(CPUState *cs)
+-typedef QTAILQ_HEAD(queue, MemoryRegionList) MemoryRegionListHead;
++typedef QTAILQ_HEAD(mrqueue, MemoryRegionList) MemoryRegionListHead;
+ 
+ #define MR_SIZE(size) (int128_nz(size) ? (hwaddr)int128_get64( \
+                            int128_sub((size), int128_one())) : 0)
+@@ -2746,7 +2746,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
+         bool found = false;
+ 
+         /* check if the alias is already in the queue */
+-        QTAILQ_FOREACH(ml, alias_print_queue, queue) {
++        QTAILQ_FOREACH(ml, alias_print_queue, mrqueue) {
+             if (ml->mr == mr->alias) {
+                 found = true;
+             }
+@@ -2755,7 +2755,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
+         if (!found) {
+             ml = g_new(MemoryRegionList, 1);
+             ml->mr = mr->alias;
+-            QTAILQ_INSERT_TAIL(alias_print_queue, ml, queue);
++            QTAILQ_INSERT_TAIL(alias_print_queue, ml, mrqueue);
+         }
+         mon_printf(f, TARGET_FMT_plx "-" TARGET_FMT_plx
+                    " (prio %d, %s): alias %s @%s " TARGET_FMT_plx
+@@ -2783,26 +2783,26 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
+     QTAILQ_FOREACH(submr, &mr->subregions, subregions_link) {
+         new_ml = g_new(MemoryRegionList, 1);
+         new_ml->mr = submr;
+-        QTAILQ_FOREACH(ml, &submr_print_queue, queue) {
++        QTAILQ_FOREACH(ml, &submr_print_queue, mrqueue) {
+             if (new_ml->mr->addr < ml->mr->addr ||
+                 (new_ml->mr->addr == ml->mr->addr &&
+                  new_ml->mr->priority > ml->mr->priority)) {
+-                QTAILQ_INSERT_BEFORE(ml, new_ml, queue);
++                QTAILQ_INSERT_BEFORE(ml, new_ml, mrqueue);
+                 new_ml = NULL;
+                 break;
+             }
+         }
+         if (new_ml) {
+-            QTAILQ_INSERT_TAIL(&submr_print_queue, new_ml, queue);
++            QTAILQ_INSERT_TAIL(&submr_print_queue, new_ml, mrqueue);
          }
      }
  
--    r = kvm_arch_set_tsc_khz(cs);
--    if (r < 0) {
--        goto fail;
--    }
--
--    /* vcpu's TSC frequency is either specified by user, or following
--     * the value used by KVM if the former is not present. In the
--     * latter case, we query it from KVM and record in env->tsc_khz,
--     * so that vcpu's TSC frequency can be migrated later via this field.
--     */
--    if (!env->tsc_khz) {
--        r = kvm_check_extension(cs->kvm_state, KVM_CAP_GET_TSC_KHZ) ?
--            kvm_vcpu_ioctl(cs, KVM_GET_TSC_KHZ) :
--            -ENOTSUP;
--        if (r > 0) {
--            env->tsc_khz = r;
--        }
--    }
--
-     if (cpu->vmware_cpuid_freq
-         /* Guests depend on 0x40000000 to detect this feature, so only expose
-          * it if KVM exposes leaf 0x40000000. (Conflicts with Hyper-V) */
+-    QTAILQ_FOREACH(ml, &submr_print_queue, queue) {
++    QTAILQ_FOREACH(ml, &submr_print_queue, mrqueue) {
+         mtree_print_mr(mon_printf, f, ml->mr, level + 1, cur_start,
+                        alias_print_queue);
+     }
+ 
+-    QTAILQ_FOREACH_SAFE(ml, &submr_print_queue, queue, next_ml) {
++    QTAILQ_FOREACH_SAFE(ml, &submr_print_queue, mrqueue, next_ml) {
+         g_free(ml);
+     }
+ }
+@@ -2872,13 +2872,13 @@ void mtree_info(fprintf_function mon_printf, void *f, bool flatview)
+     }
+ 
+     /* print aliased regions */
+-    QTAILQ_FOREACH(ml, &ml_head, queue) {
++    QTAILQ_FOREACH(ml, &ml_head, mrqueue) {
+         mon_printf(f, "memory-region: %s\n", memory_region_name(ml->mr));
+         mtree_print_mr(mon_printf, f, ml->mr, 1, 0, &ml_head);
+         mon_printf(f, "\n");
+     }
+ 
+-    QTAILQ_FOREACH_SAFE(ml, &ml_head, queue, ml2) {
++    QTAILQ_FOREACH_SAFE(ml, &ml_head, mrqueue, ml2) {
+         g_free(ml);
+     }
+ }
 -- 
 1.8.3.1
