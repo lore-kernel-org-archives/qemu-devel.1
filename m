@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54701)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1duOZ2-0002ty-VV
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:52:14 -0400
+	(envelope-from <eblake@redhat.com>) id 1duOgU-0006TD-9m
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:59:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1duOYz-0001tM-P8
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:52:13 -0400
-References: <1505668548-16616-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1505668548-16616-9-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170918203948.GA27153@umbus>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <a18b32f4-aa4b-752a-7c93-630566aa3935@ilande.co.uk>
-Date: Tue, 19 Sep 2017 20:52:00 +0100
+	(envelope-from <eblake@redhat.com>) id 1duOgR-0006sW-6N
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:59:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58074)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1duOgQ-0006r1-TE
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:59:51 -0400
+References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
+	<1505375436-28439-2-git-send-email-peterx@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <810ee791-fecd-c0b7-fefd-66a78c2de925@redhat.com>
+Date: Tue, 19 Sep 2017 14:59:37 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170918203948.GA27153@umbus>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 8/8] openpic: Fix problem when IRQ
- transitions from edge to level
+In-Reply-To: <1505375436-28439-2-git-send-email-peterx@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="jfmbqRSkXpscpgX0pmvqWoWQfs9BeQrRG"
+Subject: Re: [Qemu-devel] [RFC 01/15] char-io: fix possible race on
+ IOWatchPoll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,119 +29,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-On 18/09/17 21:39, David Gibson wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--jfmbqRSkXpscpgX0pmvqWoWQfs9BeQrRG
+From: Eric Blake <eblake@redhat.com>
+To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com,
+ Laurent Vivier <lvivier@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <810ee791-fecd-c0b7-fefd-66a78c2de925@redhat.com>
+Subject: Re: [RFC 01/15] char-io: fix possible race on IOWatchPoll
+References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
+ <1505375436-28439-2-git-send-email-peterx@redhat.com>
+In-Reply-To: <1505375436-28439-2-git-send-email-peterx@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-> On Sun, Sep 17, 2017 at 06:15:48PM +0100, Mark Cave-Ayland wrote:
->> From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->>
->> Some interrupts get triggered before the OS has setup the
->> right interrupt type. If an edge interrupt is latched that
->> way, not delivered (still masked), then the interrupt is
->> changed to level and isn't asserted anymore, it will be
->> stuck "pending", causing an interrupt flood. This can happen
->> with the PMU GPIO interrupt for example.
->>
->> There are a few other corner cases like this, so let's keep
->> track of the input "level" so we can properly re-evaluate
->> when the trigger type changes.
->>
->> Signed-off-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
->> ---
->>  hw/intc/openpic.c |   32 +++++++++++++++++++++++++++-----
->>  1 file changed, 27 insertions(+), 5 deletions(-)
->>
->> diff --git a/hw/intc/openpic.c b/hw/intc/openpic.c
->> index debfcbf..34749f8 100644
->> --- a/hw/intc/openpic.c
->> +++ b/hw/intc/openpic.c
->> @@ -236,6 +236,7 @@ typedef struct IRQSource {
->>      int last_cpu;
->>      int output;     /* IRQ level, e.g. OPENPIC_OUTPUT_INT */
->>      int pending;    /* TRUE if IRQ is pending */
->> +    int cur_level;  /* Cache current level */
->>      IRQType type;
->>      bool level:1;   /* level-triggered */
->>      bool nomask:1;  /* critical interrupts ignore mask on some FSL MPICs */
->> @@ -552,14 +553,26 @@ static void openpic_set_irq(void *opaque, int n_IRQ, int level)
->>      }
->>  
->>      src = &opp->src[n_IRQ];
->> -    DPRINTF("openpic: set irq %d = %d ivpr=0x%08x\n",
->> -            n_IRQ, level, src->ivpr);
->> +    DPRINTF("openpic: set irq %d = %d ivpr=0x%08x (l=%d,cl=%d)\n",
->> +            n_IRQ, level, src->ivpr, src->level, src->cur_level);
->> +
->> +    /* Keep track of the current input level in order to properly deal
->> +     * with the configuration of the source changing from edge to level
->> +     * after it's been latched. Otherwise the interrupt can get stuck.
->> +     */
->> +    src->cur_level = level;
->> +
->>      if (src->level) {
->> -        /* level-sensitive irq */
->>          src->pending = level;
->>          openpic_update_irq(opp, n_IRQ);
->>      } else {
->> -        /* edge-sensitive irq */
->> +        /* edge-sensitive irq
->> +         *
->> +         * In an ideal world we would only set pending on an "edge", ie
->> +         * if level is set and src->cur_level as clear. However that would
->> +         * require all the devices to properly send "pulses" rather than
->> +         * just "raise" which isn't the case today.
->> +         */
->>          if (level) {
->>              src->pending = 1;
->>              openpic_update_irq(opp, n_IRQ);
->> @@ -676,6 +689,13 @@ static inline void write_IRQreg_ivpr(OpenPICState *opp, int n_IRQ, uint32_t val)
->>      switch (opp->src[n_IRQ].type) {
->>      case IRQ_TYPE_NORMAL:
->>          opp->src[n_IRQ].level = !!(opp->src[n_IRQ].ivpr & IVPR_SENSE_MASK);
->> +
->> +        /* If we switched to level we need to re-evaluate "pending" based
->> +         * on the actual input state.
->> +         */
->> +        if (opp->src[n_IRQ].level) {
->> +            opp->src[n_IRQ].pending = opp->src[n_IRQ].cur_level;
->> +        }
->>          break;
->>  
->>      case IRQ_TYPE_FSLINT:
->> @@ -687,6 +707,7 @@ static inline void write_IRQreg_ivpr(OpenPICState *opp, int n_IRQ, uint32_t val)
->>          break;
->>      }
->>  
->> +    /* Re-evaluate a level irq */
->>      openpic_update_irq(opp, n_IRQ);
->>      DPRINTF("Set IVPR %d to 0x%08x -> 0x%08x\n", n_IRQ, val,
->>              opp->src[n_IRQ].ivpr);
->> @@ -1232,7 +1253,7 @@ static uint32_t openpic_iack(OpenPICState *opp, IRQDest *dst, int cpu)
->>      }
->>  
->>      if (!src->level) {
->> -        /* edge-sensitive IRQ */
->> +        /* edge-sensitive IRQ or level dropped */
->>          src->ivpr &= ~IVPR_ACTIVITY_MASK;
->>          src->pending = 0;
->>          IRQ_resetbit(&dst->raised, irq);
->> @@ -1564,6 +1585,7 @@ static const VMStateDescription vmstate_openpic_irqsource = {
->>          VMSTATE_UINT32(destmask, IRQSource),
->>          VMSTATE_INT32(last_cpu, IRQSource),
->>          VMSTATE_INT32(pending, IRQSource),
->> +        VMSTATE_INT32(cur_level, IRQSource),
->>          VMSTATE_END_OF_LIST()
-> 
-> This alters the migration stream without bumping the version number.
-> I suspect it will be best to move this hunk into your other patch
-> updating the migration of the openpic.
+On 09/14/2017 02:50 AM, Peter Xu wrote:
+> This is not a problem if we are only having one single loop thread like=
 
-Yes, that's fine. I'll wait for your reply to the previous openpic patch
-before resubmitting though.
+> before.  However, after per-monitor thread is introduced, this is not
+> true any more, and the race can happen.
+>=20
+> The race can be triggered with "make check -j8" sometimes:
+>=20
+>   qemu-system-x86_64: /root/git/qemu/chardev/char-io.c:91:
+>   io_watch_poll_finalize: Assertion `iwp->src =3D=3D NULL' failed.
+>=20
+> This patch keeps the reference for the watch object when creating in
+> io_add_watch_poll(), so that the object will never be released in the
+> context main loop, especially when the context loop is running in
+> another standalone thread.  Meanwhile, when we want to remove the watch=
+
+> object, we always first detach the watch object from its owner context,=
+
+> then we continue with the cleanup.
+>=20
+> Without this patch, calling io_remove_watch_poll() in main loop thread
+> is not thread-safe, since the other per-monitor thread may be modifying=
+
+> the watch object at the same time.
+>=20
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+
+> +     * Let's blame the glib bug mentioned in commit 2b3167 (again) for=
 
 
-ATB,
+That 6-char commit id may become ambiguous soon (it's still rare to see
+ambiguity with an 8-char id, although I've seen it more in recent times
+than in the past; and git itself has moved from a 7-char default
+abbreviation length in the 2.0 days to what is now a 10-char default
+abbreviation in 2.13.5).
 
-Mark.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--jfmbqRSkXpscpgX0pmvqWoWQfs9BeQrRG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnBdyoACgkQp6FrSiUn
+Q2rpSwf+K/lV0xk1C//lDwQ2L4Lp5Z8+ptl1VTmlaUfc1KrJtHVhHtQm4/xc1k0T
+5u7zmhcK2dyvuvfIVkryfwKCXU8qibiO8c53KYJ4LA5Fhm39qYeboH0hGQGA+Qyi
+Gtak18B5I8sS/3Ys7Wxub2SSody+3X/MzOZqpuaSGJte+6cys+c/AiiaeTBHtqVh
+3OwGqvbizkuw0ELa7azodl8ry0yXTwgIXaU1MZPM+QaFErO0Akua0LWaGhZRqf+u
+QCuud2wXn01em8UqKixuNU9+kzoP0M1q4IvZz/T/k9lDOlUnrqqNCHjpIJaxOvcN
+/mFfEzi7QZeLhJLRwLK1boPkiX0qDw==
+=11b2
+-----END PGP SIGNATURE-----
+
+--jfmbqRSkXpscpgX0pmvqWoWQfs9BeQrRG--
