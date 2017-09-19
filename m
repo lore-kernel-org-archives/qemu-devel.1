@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50395)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1duEfH-0004h2-I9
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:18:00 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1duEgp-0005fl-Pg
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:19:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1duEfE-000132-Ch
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:17:59 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:42754)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1duEfE-00012X-0V
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:17:56 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
-	<CAJhHMCCZh7hvQT8x9Bks9k6=ka4G1Oybv1MrkKJ9_VZ_eRZBfQ@mail.gmail.com>
-	<CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
-	<87bmrj8eks.fsf@linaro.org>
-	<CAPnv1PKyak1G-uL=H=-Vh_9TH2dZKffYjDf_2Z+LWuqovMKCBQ@mail.gmail.com>
-	<CAKSfGUC_k6K=2Xy8pGcwuQ66DMPYCDvA47Ojgm7ntQfALGwDsQ@mail.gmail.com>
-	<CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
-In-Reply-To: <CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
-Date: Tue, 19 Sep 2017 12:17:55 +0300
-Message-ID: <000601d33128$2dd9d5e0$898d81a0$@ru>
+	(envelope-from <dgilbert@redhat.com>) id 1duEgm-0001bg-HR
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:19:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56000)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1duEgm-0001ag-7Q
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:19:32 -0400
+Date: Tue, 19 Sep 2017 10:19:21 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170919091921.GD2107@work-vm>
+References: <20170914185314.GA3280@work-vm>
+	<20170915044622.GO3617@pxdev.xzpeter.org>
+	<CAJ+F1CKGsYbK5M6WKGSCioFCFY79WjFCtEQGqudiuA-QZTfOCA@mail.gmail.com>
+	<20170918083737.GD3617@pxdev.xzpeter.org>
+	<CAJ+F1C+ZE2xDVK8Ni7CaVbH6NHEz0-xXh_1gqwF-jf6T0iA16Q@mail.gmail.com>
+	<20170918105516.GD2581@work-vm>
+	<CAJ+F1CL3UwzTO7APLnR1MUFg+XWF1B8VJkmNQGBa3bqB_bXNfg@mail.gmail.com>
+	<20170918112618.GF2581@work-vm>
+	<CAJ+F1CLkTZMgUtpPUu_3SkscYDRuM0+zjWsiJ6-a-CtZYOLhBA@mail.gmail.com>
+	<20170919062903.GH3617@pxdev.xzpeter.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: ru
-Subject: Re: [Qemu-devel] What is the best commit for record-replay?
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <20170919062903.GH3617@pxdev.xzpeter.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 00/15] QMP: out-of-band (OOB) execution
+ support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,73 +37,280 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: 'Aleksandr Bezzubikov' <zuban32s@gmail.com>, =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
-Cc: 'QEMU Developers' <qemu-devel@nongnu.org>, 'Pranith Kumar' <bobby.prani+qemu@gmail.com>, pavel.dovgaluk@ispras.ru, 'Aleksandr Bezzubikov' <abezzubikov@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Igor R' <boost.lists@gmail.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@gmail.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-> From: Aleksandr Bezzubikov [mailto:zuban32s@gmail.com]
-> 2017-09-18 15:02 GMT+03:00 Aleksandr Bezzubikov <zuban32s@gmail.com>:
-> > 2017-05-02 15:42 GMT+03:00 Igor R <boost.lists@gmail.com>:
-> >>>>>> I'm trying to use the deterministic record/replay feature, and I would
-> >>>>>> like to know which commit I should take to get it work.
-> >>>>>> In RC0 it seems to be broken. I tried pre-MTTCG commit 2421f381dc, as
-> >>>>
-> >>>>> Can you retry with the latest rc? There were some fixes regarding rr since rc0.
-> >>>>
-> >>>>
-> >>>> I've taken 2.9 release, and RR does not seem to work there.
-> >>>> I recorded the boot process of x86 Fedora-21 linux and the replay got
-> >>>> stuck almost immediately.
-> >>>
-> >>> What's your command line?
-> >>>
-> >>> Does it get stuck at the same place each time?
-> >>>
-> >>> Can you boot fine with icount but without record/replay?
-> >>
-> >> Here is the exact scenario:
-> >> - Get 2.9 from git, configure it as follows: "./configure
-> >> --target-list=i386-softmmu --enable-sdl" and  make.
-> >> - Download https://people.debian.org/~aurel32/qemu/i386/debian_squeeze_i386_standard.qcow2
-> >> - Run qemu with the following command line, until login prompt:
-> >> -icount shift=7,rr=record,rrfile=replay.bin -drive
-> >> file=debian_squeeze_i386_standard.qcow2,if=none,id=img-direct -drive
-> >> driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
-> >> ide-hd,drive=img-blkreplay -monitor stdio
-> >> - Replay: -icount shift=7,rr=replay,rrfile=replay.bin -drive
-> >> file=debian_squeeze_i386_standard.qcow2,if=none,id=img-direct -drive
-> >> driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
-> >> ide-hd,drive=img-blkreplay -monitor stdio
-> >>
-> >> Every time I attempt to replay, QEMU gets stuck at the same EIP, at a
-> >> very early stage.
-> >>
-> >>
-> >>> Can you boot fine with icount but without record/replay?
-> >>
-> >> Yes. I can also enable icount and recording - it also boots fine. The
-> >> problem with the replay.
-> >
-> > Hi guys,
-> > Maybe the thread is a bit outdated, but the problem is still relevant.
-> > I've just tried to record and replay WinXP boot process, and I've encountered
-> > exactly the same problem as described above - record is fine, replay
-> > gets stuck early. I use current master.
+* Peter Xu (peterx@redhat.com) wrote:
+> On Mon, Sep 18, 2017 at 06:09:29PM +0200, Marc-Andr=E9 Lureau wrote:
+> > On Mon, Sep 18, 2017 at 1:26 PM, Dr. David Alan Gilbert
+> > <dgilbert@redhat.com> wrote:
+> > > * Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
+> > >> Hi
+> > >>
+> > >> On Mon, Sep 18, 2017 at 12:55 PM, Dr. David Alan Gilbert
+> > >> <dgilbert@redhat.com> wrote:
+> > >> > * Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
+> > >> >> Hi
+> > >> >>
+> > >> >> On Mon, Sep 18, 2017 at 10:37 AM, Peter Xu <peterx@redhat.com> =
+wrote:
+> > >> >> > On Fri, Sep 15, 2017 at 01:14:47PM +0200, Marc-Andr=E9 Lureau=
+ wrote:
+> > >> >> >> Hi
+> > >> >> >>
+> > >> >> >> On Thu, Sep 14, 2017 at 9:46 PM, Peter Xu <peterx@redhat.com=
+> wrote:
+> > >> >> >> > On Thu, Sep 14, 2017 at 07:53:15PM +0100, Dr. David Alan G=
+ilbert wrote:
+> > >> >> >> >> * Marc-Andr=E9 Lureau (marcandre.lureau@gmail.com) wrote:
+> > >> >> >> >> > Hi
+> > >> >> >> >> >
+> > >> >> >> >> > On Thu, Sep 14, 2017 at 9:50 AM, Peter Xu <peterx@redha=
+t.com> wrote:
+> > >> >> >> >> > > This series was born from this one:
+> > >> >> >> >> > >
+> > >> >> >> >> > >   https://lists.gnu.org/archive/html/qemu-devel/2017-=
+08/msg04310.html
+> > >> >> >> >> > >
+> > >> >> >> >> > > The design comes from Markus, and also the whole-bunc=
+h-of discussions
+> > >> >> >> >> > > in previous thread.  My heartful thanks to Markus, Da=
+niel, Dave,
+> > >> >> >> >> > > Stefan, etc. on discussing the topic (...again!), pro=
+viding shiny
+> > >> >> >> >> > > ideas and suggestions.  Finally we got such a solutio=
+n that seems to
+> > >> >> >> >> > > satisfy everyone.
+> > >> >> >> >> > >
+> > >> >> >> >> > > I re-started the versioning since this series is tota=
+lly different
+> > >> >> >> >> > > from previous one.  Now it's version 1.
+> > >> >> >> >> > >
+> > >> >> >> >> > > In case new reviewers come along the way without read=
+ing previous
+> > >> >> >> >> > > discussions, I will try to do a summary on what this =
+is all about.
+> > >> >> >> >> > >
+> > >> >> >> >> > > What is OOB execution?
+> > >> >> >> >> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> > >> >> >> >> > >
+> > >> >> >> >> > > It's the shortcut of Out-Of-Band execution, its name =
+is given by
+> > >> >> >> >> > > Markus.  It's a way to quickly execute a QMP request.=
+  Say, originally
+> > >> >> >> >> > > QMP is going throw these steps:
+> > >> >> >> >> > >
+> > >> >> >> >> > >       JSON Parser --> QMP Dispatcher --> Respond
+> > >> >> >> >> > >           /|\    (2)                (3)     |
+> > >> >> >> >> > >        (1) |                               \|/ (4)
+> > >> >> >> >> > >            +---------  main thread  --------+
+> > >> >> >> >> > >
+> > >> >> >> >> > > The requests are executed by the so-called QMP-dispat=
+cher after the
+> > >> >> >> >> > > JSON is parsed.  If OOB is on, we run the command dir=
+ectly in the
+> > >> >> >> >> > > parser and quickly returns.
+> > >> >> >> >> >
+> > >> >> >> >> > All commands should have the "id" field mandatory in th=
+is case, else
+> > >> >> >> >> > the client will not distinguish the replies coming from=
+ the last/oob
+> > >> >> >> >> > and the previous commands.
+> > >> >> >> >> >
+> > >> >> >> >> > This should probably be enforced upfront by client capa=
+bility checks,
+> > >> >> >> >> > more below.
+> > >> >> >> >
+> > >> >> >> > Hmm yes since the oob commands are actually running in asy=
+nc way,
+> > >> >> >> > request ID should be needed here.  However I'm not sure wh=
+ether
+> > >> >> >> > enabling the whole "request ID" thing is too big for this =
+"try to be
+> > >> >> >> > small" oob change... And IMHO it suites better to be part =
+of the whole
+> > >> >> >> > async work (no matter which implementation we'll use).
+> > >> >> >> >
+> > >> >> >> > How about this: we make "id" mandatory for "run-oob" reque=
+sts only.
+> > >> >> >> > For oob commands, they will always have ID then no orderin=
+g issue, and
+> > >> >> >> > we can do it async; for the rest of non-oob commands, we s=
+till allow
+> > >> >> >> > them to go without ID, and since they are not oob, they'll=
+ always be
+> > >> >> >> > done in order as well.  Would this work?
+> > >> >> >>
+> > >> >> >> This mixed-mode is imho more complicated to deal with than h=
+aving the
+> > >> >> >> protocol enforced one way or the other, but that should work=
+.
+> > >> >> >>
+> > >> >> >> >
+> > >> >> >> >> >
+> > >> >> >> >> > > Yeah I know in current code the parser calls dispatch=
+er directly
+> > >> >> >> >> > > (please see handle_qmp_command()).  However it's not =
+true again after
+> > >> >> >> >> > > this series (parser will has its own IO thread, and d=
+ispatcher will
+> > >> >> >> >> > > still be run in main thread).  So this OOB does bring=
+s something
+> > >> >> >> >> > > different.
+> > >> >> >> >> > >
+> > >> >> >> >> > > There are more details on why OOB and the difference/=
+relationship
+> > >> >> >> >> > > between OOB, async QMP, block/general jobs, etc.. but=
+ IMHO that's
+> > >> >> >> >> > > slightly out of topic (and believe me, it's not easy =
+for me to
+> > >> >> >> >> > > summarize that).  For more information, please refers=
+ to [1].
+> > >> >> >> >> > >
+> > >> >> >> >> > > Summary ends here.
+> > >> >> >> >> > >
+> > >> >> >> >> > > Some Implementation Details
+> > >> >> >> >> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > >> >> >> >> > >
+> > >> >> >> >> > > Again, I mentioned that the old QMP workflow is this:
+> > >> >> >> >> > >
+> > >> >> >> >> > >       JSON Parser --> QMP Dispatcher --> Respond
+> > >> >> >> >> > >           /|\    (2)                (3)     |
+> > >> >> >> >> > >        (1) |                               \|/ (4)
+> > >> >> >> >> > >            +---------  main thread  --------+
+> > >> >> >> >> > >
+> > >> >> >> >> > > What this series does is, firstly:
+> > >> >> >> >> > >
+> > >> >> >> >> > >       JSON Parser     QMP Dispatcher --> Respond
+> > >> >> >> >> > >           /|\ |           /|\       (4)     |
+> > >> >> >> >> > >            |  | (2)        | (3)            |  (5)
+> > >> >> >> >> > >        (1) |  +----->      |               \|/
+> > >> >> >> >> > >            +---------  main thread  <-------+
+> > >> >> >> >> > >
+> > >> >> >> >> > > And further:
+> > >> >> >> >> > >
+> > >> >> >> >> > >                queue/kick
+> > >> >> >> >> > >      JSON Parser =3D=3D=3D=3D=3D=3D> QMP Dispatcher -=
+-> Respond
+> > >> >> >> >> > >          /|\ |     (3)       /|\        (4)    |
+> > >> >> >> >> > >       (1) |  | (2)            |                |  (5)
+> > >> >> >> >> > >           | \|/               |               \|/
+> > >> >> >> >> > >         IO thread         main thread  <-------+
+> > >> >> >> >> >
+> > >> >> >> >> > Is the queue per monitor or per client?
+> > >> >> >> >
+> > >> >> >> > The queue is currently global. I think yes maybe at least =
+we can do it
+> > >> >> >> > per monitor, but I am not sure whether that is urgent or c=
+an be
+> > >> >> >> > postponed.  After all now QMPRequest (please refer to patc=
+h 11) is
+> > >> >> >> > defined as (mon, id, req) tuple, so at least "id" namespac=
+e is
+> > >> >> >> > per-monitor.
+> > >> >> >> >
+> > >> >> >> >> > And is the dispatching going
+> > >> >> >> >> > to be processed even if the client is disconnected, and=
+ are new
+> > >> >> >> >> > clients going to receive the replies from previous clie=
+nts
+> > >> >> >> >> > commands?
+> > >> >> >> >
+> > >> >> >> > [1]
+> > >> >> >> >
+> > >> >> >> > (will discuss together below)
+> > >> >> >> >
+> > >> >> >> >> > I
+> > >> >> >> >> > believe there should be a per-client context, so there =
+won't be "id"
+> > >> >> >> >> > request conflicts.
+> > >> >> >> >
+> > >> >> >> > I'd say I am not familiar with this "client" idea, since a=
+fter all
+> > >> >> >> > IMHO one monitor is currently designed to mostly work with=
+ a single
+> > >> >> >> > client. Say, unix sockets, telnet, all these backends are =
+only single
+> > >> >> >> > channeled, and one monitor instance can only work with one=
+ client at a
+> > >> >> >> > time.  Then do we really need to add this client layer upo=
+n it?  IMHO
+> > >> >> >> > the user can just provide more monitors if they wants more=
+ clients
+> > >> >> >> > (and at least these clients should know the existance of t=
+he others or
+> > >> >> >> > there might be problem, otherwise user2 will fail a migrat=
+ion, finally
+> > >> >> >> > noticed that user1 has already triggered one), and the use=
+r should
+> > >> >> >> > manage them well.
+> > >> >> >>
+> > >> >> >> qemu should support a management layer / libvirt restart/rec=
+onnect.
+> > >> >> >> Afaik, it mostly work today. There might be a cases where li=
+bvirt can
+> > >> >> >> be confused if it receives a reply from a previous connectio=
+n command,
+> > >> >> >> but due to the sync processing of the chardev, I am not sure=
+ you can
+> > >> >> >> get in this situation.  By adding "oob" commands and queuing=
+, the
+> > >> >> >> client will have to remember which was the last "id" used, o=
+r it will
+> > >> >> >> create more conflict after a reconnect.
+> > >> >> >>
+> > >> >> >> Imho we should introduce the client/connection concept to av=
+oid this
+> > >> >> >> confusion (unexpected reply & per client id space).
+> > >> >> >
+> > >> >> > Hmm I agree that the reconnect feature would be nice, but if =
+so IMHO
+> > >> >> > instead of throwing responses away when client disconnect, we=
+ should
+> > >> >> > really keep them, and when the client reconnects, we queue th=
+e
+> > >> >> > responses again.
+> > >> >> >
+> > >> >> > I think we have other quite simple ways to solve the "unexpec=
+ted
+> > >> >> > reply" and "per-client-id duplication" issues you have mentio=
+ned.
+> > >> >> >
+> > >> >> > Firstly, when client gets unexpected replies ("id" field not =
+in its
+> > >> >> > own request queue), the client should just ignore that reply,=
+ which
+> > >> >> > seems natural to me.
+> > >> >>
+> > >> >> The trouble is that it may legitimately use the same "id" value=
+ for
+> > >> >> new requests. And I don't see a simple way to handle that witho=
+ut
+> > >> >> races.
+> > >> >
+> > >> > Under what circumstances can it reuse the same ID for new reques=
+ts?
+> > >> > Can't we simply tell it not to?
+> > >>
+> > >> I don't see any restriction today in the protocol in connecting wi=
+th a
+> > >> new client that may not know anything from a previous client.
+> > >
+> > > Well, it knows it's doing a reconnection.
+> >=20
+> > If you assume the "same client" reconnects to the monitor, I agree.
+> > But this is a restriction of monitor usage.
+>=20
+> In monitor_qmp_event(), we can empty the request queue when got
+> CHR_EVENT_CLOSED.  Would that be a solution?
 
-Maybe this commit will work: cfb2d02be9413d45b30ed6d8e38800250b6b4b48
+What happens to commands that are in flight?
 
-> > And I've discovered the second problem - recording makes initial snapshot,
-> > but it doesn't seem to be saved to the disk - replay can't see it.
+Dave
 
-It is ok, because there is a mode where snapshot is created and loaded.
-
-> >
-> > Hope you've already found the solution (as the last post was on 2 May)
-> > and it's just got missed the mailing list.
-
-As I know, RR is still broken in the current version.
-It was caused by the MTTCG implementation.
-Alex Bennee tried to fix RR back. Alex, have you found any solution?
-
-We also trying to find a way to fix RR. It seems, that we will reinvent BQL for RR.
-
-Pavel Dovgalyuk
+> --=20
+> Peter Xu
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
