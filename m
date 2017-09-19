@@ -1,25 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49964)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53125)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1duHOB-00067q-AC
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:12:33 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1duHSJ-00089A-Tu
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:16:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1duHO4-0002zC-Tl
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:12:31 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170919112645.8574-1-clg@kaod.org>
-	<20170919112645.8574-4-clg@kaod.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <472ff629-39bd-9fe2-c1f8-a08ba6997b53@amsat.org>
-Date: Tue, 19 Sep 2017 09:12:20 -0300
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1duHSE-0005nd-Tb
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:16:47 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:48704)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1duHSE-0005mX-L5
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:16:42 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8JCE4oL047218
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 08:16:41 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d2yyqb22y-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 08:16:41 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Tue, 19 Sep 2017 13:16:38 +0100
+References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
+	<20170913115029.47626-2-pasic@linux.vnet.ibm.com>
+	<63eabac3-0646-92ff-dede-d16391124061@linux.vnet.ibm.com>
+	<20170919115321.0f3b5c57.cohuck@redhat.com>
+	<b75ec315-27c4-aa65-9360-85ed21796f0d@linux.vnet.ibm.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Tue, 19 Sep 2017 14:16:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170919112645.8574-4-clg@kaod.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <b75ec315-27c4-aa65-9360-85ed21796f0d@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 3/5] aspeed: Add EEPROM I2C devices
+Message-Id: <3fb74715-e807-7316-99e8-c111702b8d44@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] s390x/css: introduce css data stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,76 +45,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-Hi Cédric,
 
-On 09/19/2017 08:26 AM, Cédric Le Goater wrote:
-> The Aspeed boards have at least one EEPROM to hold the Vital Product
-> Data (VPD).
-> 
-> Signed-off-by: Cédric Le Goater <clg@kaod.org>
-> ---
->   hw/arm/aspeed.c | 20 ++++++++++++++++++++
->   1 file changed, 20 insertions(+)
-> 
-> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-> index 362b683e9021..3e74970d7ad2 100644
-> --- a/hw/arm/aspeed.c
-> +++ b/hw/arm/aspeed.c
-> @@ -251,6 +251,17 @@ static void aspeed_board_init(MachineState *machine,
->       arm_load_kernel(ARM_CPU(first_cpu), &aspeed_board_binfo);
->   }
->   
-> +static void aspeed_i2c_add_eeprom(I2CBus *bus, uint8_t address, size_t size)
-> +{
-> +    uint8_t *eeprom_buf = g_malloc0(size);
-> +    DeviceState *dev;
-> +
-> +    dev = qdev_create((BusState *) bus, "smbus-eeprom");
-> +    qdev_prop_set_uint8(dev, "address", address);
-> +    qdev_prop_set_ptr(dev, "data", eeprom_buf);
-> +    qdev_init_nofail(dev);
 
-Can you merge this with smbus_eeprom_init() ?
-I think the cleaner way would be add "include/hw/i2c/eeprom.h" defining 
-SMB_EEPROM_TYPE "smbus-eeprom" and declare smbus_eeprom_init() there or 
-as inlined.
+On 09/19/2017 01:41 PM, Pierre Morel wrote:
+> On 19/09/2017 11:53, Cornelia Huck wrote:
+>> On Tue, 19 Sep 2017 11:11:27 +0200
+>> Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+>>
+>>> On 13/09/2017 13:50, Halil Pasic wrote:
+>>>> This is a preparation for introducing handling for indirect data
+>>>> addressing and modified indirect data addressing (CCW). Here we intr=
+oduce
+>>>> an interface which should make the addressing scheme transparent for=
+ the
+>>>> client code. Here we implement only the basic scheme (no IDA or MIDA=
+).
+>>>>
+>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>>> ---
+>>>> =C2=A0=C2=A0 hw/s390x/css.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 | 55 +++++++++++++++++++++++++++++++++++++++++
+>>>> =C2=A0=C2=A0 include/hw/s390x/css.h | 67 +++++++++++++++++++++++++++=
++++++++++++++++++++++++
+>>>> =C2=A0=C2=A0 2 files changed, 122 insertions(+)
+>>
+>>>> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+>>>> index 0653d3c9be..79acaf99b7 100644
+>>>> --- a/include/hw/s390x/css.h
+>>>> +++ b/include/hw/s390x/css.h
+>>>> @@ -75,6 +75,29 @@ typedef struct CMBE {
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint32_t reserved[7];
+>>>> =C2=A0=C2=A0 } QEMU_PACKED CMBE;
+>>>>
+>>>> +typedef enum CcwDataStreamOp {
+>>>> +=C2=A0=C2=A0=C2=A0 CDS_OP_R =3D 0,
+>>>> +=C2=A0=C2=A0=C2=A0 CDS_OP_W =3D 1,
+>>>> +=C2=A0=C2=A0=C2=A0 CDS_OP_A =3D 2
+>>>> +} CcwDataStreamOp;
+>>>> +
+>>>> +/** normal usage is via SuchchDev.cds instead of instantiating */
+>>>> +typedef struct CcwDataStream {
+>>>> +#define CDS_F_IDA=C2=A0=C2=A0 0x01
+>>>> +#define CDS_F_MIDA=C2=A0 0x02
+>>>> +#define CDS_F_I2K=C2=A0=C2=A0 0x04
+>>>> +#define CDS_F_C64=C2=A0=C2=A0 0x08
+>>>> +#define CDS_F_STREAM_BROKEN=C2=A0 0x80
+>>>> +=C2=A0=C2=A0=C2=A0 uint8_t flags;
+>>>> +=C2=A0=C2=A0=C2=A0 uint8_t at_idaw;
+>>>> +=C2=A0=C2=A0=C2=A0 uint16_t at_byte;
+>>>> +=C2=A0=C2=A0=C2=A0 uint16_t count;
+>>>> +=C2=A0=C2=A0=C2=A0 uint32_t cda_orig;
+>>>> +=C2=A0=C2=A0=C2=A0 int (*op_handler)(struct CcwDataStream *cds, voi=
+d *buff, int len,
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 CcwDataStreamOp=
+ op);
+>>>
+>>> I would have prefer one handler per operation instead of a operation
+>>> parameter.
+>>>
+>>> Is it possible to change the name of the "buf" argument to "arg".
+>>> I just think of the foollowing:
+>>> If one day we do not want to gather all IDAs into a single buffer but
+>>> keep them split, we can have something like an array of buffers as ar=
+gument.
+>>
 
-> +}
-> +
->   static void palmetto_bmc_i2c_init(AspeedBoardState *bmc)
->   {
->       AspeedSoCState *soc = &bmc->soc;
-> @@ -260,6 +271,9 @@ static void palmetto_bmc_i2c_init(AspeedBoardState *bmc)
->        * enough to provide basic RTC features. Alarms will be missing */
->       i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 0), "ds1338", 0x68);
->   
-> +    aspeed_i2c_add_eeprom(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 0), 0x50,
-> +                          256 * 1024);
-> +
->       /* add a TMP423 temperature sensor */
->       dev = i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 2),
->                              "tmp423", 0x4c);
-> @@ -298,6 +312,9 @@ static void ast2500_evb_i2c_init(AspeedBoardState *bmc)
->   {
->       AspeedSoCState *soc = &bmc->soc;
->   
-> +    aspeed_i2c_add_eeprom(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 3), 0x50,
-> +                          8 * 1024);
-> +
->       /* The AST2500 EVB expects a LM75 but a TMP105 is compatible */
->       i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 7), "tmp105", 0x4d);
->   
-> @@ -377,6 +394,9 @@ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
->       /* The witherspoon board expects Epson RX8900 I2C RTC but a ds1338 is
->        * good enough */
->       i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), "ds1338", 0x32);
-> +
-> +    aspeed_i2c_add_eeprom(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), 0x51,
-> +                          8 * 1024);
->   }
->   
->   static void witherspoon_bmc_init(MachineState *machine)
-> 
+I had a similar idea: basically indirect data access is kind of a scatter=
+-
+gather mechanism. If one just has to mediate the data (e.g. between some
+backed taking sg or some facility provided by the kernel) creating a copy
+of the data (what CcwDataStream currently does) is not necessarily optima=
+l.
+
+I've realized that while looking at the 3270 code.
+
+So some kind of a turn a CcwDataStream into a scatter-gather list may
+come along the road. But I would like to have an use-case for that first.
+
+>> It should be possible to change the internal format should we decide t=
+o
+>> want to do something different, so I'll leave that as-is for now.
+>>
+
+Fully agree! This is internal stuff we have under full control. We can
+decide any time to do something completely different looking (if we are
+willing to change all the client code). So I think taking out the crystal=
+ orb
+(pun intended) ain't necessary (or very productive).
+
+>>>
+>>>
+>>>
+>>>> +=C2=A0=C2=A0=C2=A0 hwaddr cda;
+>>>> +} CcwDataStream;
+>>>> +
+>>
+>>> otherwise, LGTM
+>>
+>> Is that an ack? :)
+>>
+>=20
+> Sorry, yes it is.
+> I play a little with the code before giving a RB
+> Should be end of the day.
+>=20
+>=20
