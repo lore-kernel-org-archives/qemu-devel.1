@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46356)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duJzv-0004Zc-St
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:59:42 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duK00-0004dN-1o
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:59:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duJzs-0000ws-Fm
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:59:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37858)
+	(envelope-from <cohuck@redhat.com>) id 1duJzz-00011T-3q
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:59:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53120)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duJzs-0000wY-AY
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:59:36 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duJzy-00010o-VA
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:59:43 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 19 Sep 2017 16:56:24 +0200
-Message-Id: <20170919145636.9389-27-cohuck@redhat.com>
+Date: Tue, 19 Sep 2017 16:56:25 +0200
+Message-Id: <20170919145636.9389-28-cohuck@redhat.com>
 In-Reply-To: <20170919145636.9389-1-cohuck@redhat.com>
 References: <20170919145636.9389-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 26/38] s390x: allow cpu hotplug via device_add
+Subject: [Qemu-devel] [PULL 27/38] s390x: CPU hot unplug via device_del
+ cannot work for now
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,37 +29,49 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: David Hildenbrand <david@redhat.com>
 
-E.g. the following now works:
-    device_add host-s390-cpu,id=cpu1,core-id=1
+device_del on a CPU will currently do nothing. Let's emit an error
+telling that this is will currently not work (there is no architecture
+support on s390x). Error message copied from ppc.
 
-The system will perform the same checks as when using cpu_add:
-- If the core_id is already in use
-- If the next sequential core_id isn't used
-- If core-id >= max_cpu is specified
-
-In addition, mixed CPU models are checked. E.g. if starting with
--cpu host and trying to hotplug "qemu-s390-cpu":
-    "Mixed CPU models are not supported on s390x."
+(qemu) device_del cpu1
+device_del cpu1
+CPU hot unplug not supported on this machine
 
 Reviewed-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170913132417.24384-17-david@redhat.com>
+Message-Id: <20170913132417.24384-18-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/cpu.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/s390x/s390-virtio-ccw.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 8c1c644057..5724dffb88 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -467,6 +467,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
-     scc->parent_realize = dc->realize;
-     dc->realize = s390_cpu_realizefn;
-     dc->props = s390x_cpu_properties;
-+    dc->user_creatable = true;
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 9da9fd3994..3be81d96af 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -337,6 +337,15 @@ static void s390_machine_device_plug(HotplugHandler *hotplug_dev,
+     }
+ }
  
-     scc->parent_reset = cc->reset;
- #if !defined(CONFIG_USER_ONLY)
++static void s390_machine_device_unplug_request(HotplugHandler *hotplug_dev,
++                                               DeviceState *dev, Error **errp)
++{
++    if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
++        error_setg(errp, "CPU hot unplug not supported on this machine");
++        return;
++    }
++}
++
+ static HotplugHandler *s390_get_hotplug_handler(MachineState *machine,
+                                                 DeviceState *dev)
+ {
+@@ -386,6 +395,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+     mc->max_cpus = 248;
+     mc->get_hotplug_handler = s390_get_hotplug_handler;
+     hc->plug = s390_machine_device_plug;
++    hc->unplug_request = s390_machine_device_unplug_request;
+     nc->nmi_monitor_handler = s390_nmi;
+ }
+ 
 -- 
 2.13.5
