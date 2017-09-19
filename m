@@ -1,26 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43640)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46454)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duPiT-000246-Mq
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 17:06:03 -0400
+	(envelope-from <laurent@vivier.eu>) id 1duPn3-0003RI-GK
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 17:10:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duPiP-0006oD-1v
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 17:06:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45318)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1duPiO-0006nk-PQ
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 17:05:56 -0400
-References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
-	<1505375436-28439-7-git-send-email-peterx@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <0888aa23-a2a9-6080-d6c0-7522c86b5eb4@redhat.com>
-Date: Tue, 19 Sep 2017 16:05:48 -0500
-MIME-Version: 1.0
-In-Reply-To: <1505375436-28439-7-git-send-email-peterx@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="JT29wFHwrSO0T8mDcjdn8eSkF4St9ts7l"
-Subject: Re: [Qemu-devel] [RFC 06/15] monitor: move the cur_mon hack deeper
- for QMP
+	(envelope-from <laurent@vivier.eu>) id 1duPmu-0002MX-7d
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 17:10:39 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:56372)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1duPmt-0002Ky-UV
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 17:10:36 -0400
+From: Laurent Vivier <laurent@vivier.eu>
+Date: Tue, 19 Sep 2017 23:10:12 +0200
+Message-Id: <20170919211012.13507-1-laurent@vivier.eu>
+Subject: [Qemu-devel] [PATCH v2] softfloat: rename make_float[x80|128]_init
+ to const_float[x80|128]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,77 +22,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Eric Blake <eblake@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---JT29wFHwrSO0T8mDcjdn8eSkF4St9ts7l
-From: Eric Blake <eblake@redhat.com>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Daniel P . Berrange" <berrange@redhat.com>,
- Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>,
- Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com,
- Laurent Vivier <lvivier@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <0888aa23-a2a9-6080-d6c0-7522c86b5eb4@redhat.com>
-Subject: Re: [RFC 06/15] monitor: move the cur_mon hack deeper for QMP
-References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
- <1505375436-28439-7-git-send-email-peterx@redhat.com>
-In-Reply-To: <1505375436-28439-7-git-send-email-peterx@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+We already have const_float16(), const_float32() and const_float64(),
+so rename make_floatx80_init() and make_float128_init() as
+const_floatx80() and const_float128().
 
-On 09/14/2017 02:50 AM, Peter Xu wrote:
-> In monitor_qmp_read(), we have the hack to temporarily replace the
-> cur_mon pointer.  Now we move this hack deeper inside the QMP dispatche=
-r
-> routine since the Monitor pointer can be passed in to that using the ne=
-w
-> JSON Parser opaque field now.
->=20
-> This does not make much sense as a single patch.  However, this will be=
+Redefine make_float16(), make_float32() and make_float64() as
+make_floatx80() and make_float128() using a cast.
 
-> a big step for the next patch, when the QMP dispatcher routine will be
-> splitted from the QMP parser.
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+v2: change float16(), make_float32() and make_float64()
+    instead of make_floatx80() and make_float128()
 
-English is weird: 'split' is the word for present, past, and past
-participle tenses; there is no word 'splitted'.
+ include/fpu/softfloat.h  | 10 +++++-----
+ target/m68k/fpu_helper.c | 44 ++++++++++++++++++++++----------------------
+ 2 files changed, 27 insertions(+), 27 deletions(-)
 
->=20
-> Signed-off-by: Peter Xu <peterx@redhat.com>
-> ---
->  monitor.c | 19 ++++++++++---------
->  1 file changed, 10 insertions(+), 9 deletions(-)
->=20
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---JT29wFHwrSO0T8mDcjdn8eSkF4St9ts7l
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnBhqwACgkQp6FrSiUn
-Q2qZFwf9Hlww9GNtMMw7PL9ScuHiibfWcul3XYvPOh7/DjO8CKgeBYxOIJzHKS7G
-73NpJmmuSoQKU/uuI3hsRvICyVzUPsFKM9Omq+wY2HoclbPc6wi5n/l58TsTTDdt
-Jq3+0/90PiIoLEbRgx5CHXgwZ1dj2SvqPVyLcWuzzTGiaAepeLUsDNv4gK5P5WjF
-IkxDGWxY+GZU6lREZHaO8UvbQmi64LUvrD8BV0lrHALgK0bfDdAA5lPIdw5QTNsJ
-JGTDxNHTIe7bwSBgVZ8aX0sG6G9dnE1rOAtnehjE5lCxvUGgFKohXiwEstwEK32i
-mkuPTPTzfNVsThwj7nS6ThAHXHTOfA==
-=Jugu
------END PGP SIGNATURE-----
-
---JT29wFHwrSO0T8mDcjdn8eSkF4St9ts7l--
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 0f96a0edd1..cda6421b23 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -113,20 +113,20 @@ typedef struct {
+     uint16_t v;
+ } float16;
+ #define float16_val(x) (((float16)(x)).v)
+-#define make_float16(x) __extension__ ({ float16 f16_val = {x}; f16_val; })
++#define make_float16(x) ((float16) { x })
+ #define const_float16(x) { x }
+ typedef struct {
+     uint32_t v;
+ } float32;
+ /* The cast ensures an error if the wrong type is passed.  */
+ #define float32_val(x) (((float32)(x)).v)
+-#define make_float32(x) __extension__ ({ float32 f32_val = {x}; f32_val; })
++#define make_float32(x) ((float32) { x })
+ #define const_float32(x) { x }
+ typedef struct {
+     uint64_t v;
+ } float64;
+ #define float64_val(x) (((float64)(x)).v)
+-#define make_float64(x) __extension__ ({ float64 f64_val = {x}; f64_val; })
++#define make_float64(x) ((float64) { x })
+ #define const_float64(x) { x }
+ #else
+ typedef uint16_t float16;
+@@ -147,7 +147,7 @@ typedef struct {
+     uint16_t high;
+ } floatx80;
+ #define make_floatx80(exp, mant) ((floatx80) { mant, exp })
+-#define make_floatx80_init(exp, mant) { .low = mant, .high = exp }
++#define const_floatx80(exp, mant) { .low = mant, .high = exp }
+ typedef struct {
+ #ifdef HOST_WORDS_BIGENDIAN
+     uint64_t high, low;
+@@ -156,7 +156,7 @@ typedef struct {
+ #endif
+ } float128;
+ #define make_float128(high_, low_) ((float128) { .high = high_, .low = low_ })
+-#define make_float128_init(high_, low_) { .high = high_, .low = low_ }
++#define const_float128(high_, low_) { .high = high_, .low = low_ }
+ 
+ /*----------------------------------------------------------------------------
+ | Software IEC/IEEE floating-point underflow tininess-detection mode.
+diff --git a/target/m68k/fpu_helper.c b/target/m68k/fpu_helper.c
+index 665e7609af..bf62cf8003 100644
+--- a/target/m68k/fpu_helper.c
++++ b/target/m68k/fpu_helper.c
+@@ -29,28 +29,28 @@
+  */
+ 
+ static const floatx80 fpu_rom[128] = {
+-    [0x00] = make_floatx80_init(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
+-    [0x0b] = make_floatx80_init(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
+-    [0x0c] = make_floatx80_init(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
+-    [0x0d] = make_floatx80_init(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
+-    [0x0e] = make_floatx80_init(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
+-    [0x0f] = make_floatx80_init(0x0000, 0x0000000000000000ULL),  /* Zero     */
+-    [0x30] = make_floatx80_init(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
+-    [0x31] = make_floatx80_init(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
+-    [0x32] = make_floatx80_init(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
+-    [0x33] = make_floatx80_init(0x4002, 0xa000000000000000ULL),  /* 10^1     */
+-    [0x34] = make_floatx80_init(0x4005, 0xc800000000000000ULL),  /* 10^2     */
+-    [0x35] = make_floatx80_init(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
+-    [0x36] = make_floatx80_init(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
+-    [0x37] = make_floatx80_init(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
+-    [0x38] = make_floatx80_init(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
+-    [0x39] = make_floatx80_init(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
+-    [0x3a] = make_floatx80_init(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
+-    [0x3b] = make_floatx80_init(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
+-    [0x3c] = make_floatx80_init(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
+-    [0x3d] = make_floatx80_init(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
+-    [0x3e] = make_floatx80_init(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
+-    [0x3f] = make_floatx80_init(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
++    [0x00] = const_floatx80(0x4000, 0xc90fdaa22168c235ULL),  /* Pi       */
++    [0x0b] = const_floatx80(0x3ffd, 0x9a209a84fbcff798ULL),  /* Log10(2) */
++    [0x0c] = const_floatx80(0x4000, 0xadf85458a2bb4a9aULL),  /* e        */
++    [0x0d] = const_floatx80(0x3fff, 0xb8aa3b295c17f0bcULL),  /* Log2(e)  */
++    [0x0e] = const_floatx80(0x3ffd, 0xde5bd8a937287195ULL),  /* Log10(e) */
++    [0x0f] = const_floatx80(0x0000, 0x0000000000000000ULL),  /* Zero     */
++    [0x30] = const_floatx80(0x3ffe, 0xb17217f7d1cf79acULL),  /* ln(2)    */
++    [0x31] = const_floatx80(0x4000, 0x935d8dddaaa8ac17ULL),  /* ln(10)   */
++    [0x32] = const_floatx80(0x3fff, 0x8000000000000000ULL),  /* 10^0     */
++    [0x33] = const_floatx80(0x4002, 0xa000000000000000ULL),  /* 10^1     */
++    [0x34] = const_floatx80(0x4005, 0xc800000000000000ULL),  /* 10^2     */
++    [0x35] = const_floatx80(0x400c, 0x9c40000000000000ULL),  /* 10^4     */
++    [0x36] = const_floatx80(0x4019, 0xbebc200000000000ULL),  /* 10^8     */
++    [0x37] = const_floatx80(0x4034, 0x8e1bc9bf04000000ULL),  /* 10^16    */
++    [0x38] = const_floatx80(0x4069, 0x9dc5ada82b70b59eULL),  /* 10^32    */
++    [0x39] = const_floatx80(0x40d3, 0xc2781f49ffcfa6d5ULL),  /* 10^64    */
++    [0x3a] = const_floatx80(0x41a8, 0x93ba47c980e98ce0ULL),  /* 10^128   */
++    [0x3b] = const_floatx80(0x4351, 0xaa7eebfb9df9de8eULL),  /* 10^256   */
++    [0x3c] = const_floatx80(0x46a3, 0xe319a0aea60e91c7ULL),  /* 10^512   */
++    [0x3d] = const_floatx80(0x4d48, 0xc976758681750c17ULL),  /* 10^1024  */
++    [0x3e] = const_floatx80(0x5a92, 0x9e8b3b5dc53d5de5ULL),  /* 10^2048  */
++    [0x3f] = const_floatx80(0x7525, 0xc46052028a20979bULL),  /* 10^4096  */
+ };
+ 
+ int32_t HELPER(reds32)(CPUM68KState *env, FPReg *val)
+-- 
+2.13.5
