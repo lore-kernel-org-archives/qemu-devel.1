@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38005)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1duHlf-0001E6-Fj
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:36:53 -0400
+	(envelope-from <david@redhat.com>) id 1duHny-0003AA-2u
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:39:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <rkagan@virtuozzo.com>) id 1duHlc-0001Xj-9t
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:36:47 -0400
-Received: from mail-db5eur01hn0231.outbound.protection.outlook.com
-	([104.47.2.231]:14245
-	helo=EUR01-DB5-obe.outbound.protection.outlook.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <rkagan@virtuozzo.com>)
-	id 1duHlb-0001RV-I3
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:36:44 -0400
-Date: Tue, 19 Sep 2017 15:36:26 +0300
-From: Roman Kagan <rkagan@virtuozzo.com>
-Message-ID: <20170919123626.GC2612@rkaganb.sw.ru>
-References: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
-	<1505824179-21541-44-git-send-email-pbonzini@redhat.com>
+	(envelope-from <david@redhat.com>) id 1duHnu-0003Ge-Tq
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:39:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53864)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1duHnu-0003Ev-LY
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:39:06 -0400
+References: <1490347615-19222-1-git-send-email-thuth@redhat.com>
+	<f3b0b14e-4ea1-6c4e-f9c6-cb86e78c6104@de.ibm.com>
+	<c2195ec9-a3d7-eb14-c204-d5c0e6239811@redhat.com>
+	<129fdced-8f83-e408-b37a-26c6ba8bb48f@de.ibm.com>
+	<169bbaaf-3212-ce1d-a0db-6edede5b481d@redhat.com>
+	<004effcd-142f-d667-3f14-c77c211cd219@de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <6f711dfd-84bc-8683-3655-b836bb5d0a51@redhat.com>
+Date: Tue, 19 Sep 2017 14:38:59 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1505824179-21541-44-git-send-email-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 43/50] update-linux-headers: prepare for
- hyperv.h removal
+In-Reply-To: <004effcd-142f-d667-3f14-c77c211cd219@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] target/s390x/kvm: Fix problem when running
+ with SELinux under z/VM
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,100 +33,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: Cornelia Huck <cohuck@redhat.com>
 
-On Tue, Sep 19, 2017 at 02:29:32PM +0200, Paolo Bonzini wrote:
-> From: Roman Kagan <rkagan@virtuozzo.com>
+On 18.09.2017 09:43, Christian Borntraeger wrote:
 > 
-> All definitions related to Hyper-V emulation are now taken from the QEMU
-> own header, so the one imported from the kernel is no longer needed.
 > 
-> Unfortunately it's included by kvm_para.h.
+> On 09/15/2017 04:36 PM, Thomas Huth wrote:
+>> On 29.03.2017 16:25, Christian Borntraeger wrote:
+>>> On 03/29/2017 04:21 PM, Thomas Huth wrote:
+>>>> On 24.03.2017 10:39, Christian Borntraeger wrote:
+>>>>> On 03/24/2017 10:26 AM, Thomas Huth wrote:
+>>>>>> When running QEMU with KVM under z/VM, the memory for the guest
+>>>>>> is allocated via legacy_s390_alloc() since the KVM_CAP_S390_COW
+>>>>>> extension is not supported on z/VM. legacy_s390_alloc() then uses
+>>>>>> mmap(... PROT_EXEC ...) for the guest memory - but this does not
+>>>>>> work when running with SELinux enabled, mmap() fails and QEMU aborts
+>>>>>> with the following error message:
+>>>>>>
+>>>>>>  cannot set up guest memory 's390.ram': Permission denied
+>>>>>>
+>>>>>> Looking at the other allocator function qemu_anon_ram_alloc(), it
+>>>>>> seems like PROT_EXEC is normally not needed for allocating the
+>>>>>> guest RAM, and indeed, the guest also starts successfully under
+>>>>>> z/VM when we remove the PROT_EXEC from the legacy_s390_alloc()
+>>>>>> function. So let's get rid of that flag here to be able to run
+>>>>>> with SELinux under z/VM, too.
+>>>>>
+>>>>> Older z/VM versions do not provide the enhanced suppression on protection
+>>>>> facility, which would result in guest failures as soon as the kernel
+>>>>> starts dirty pages tracking by write protecting the pages via the page
+>>>>> table. Some kernel release back (last time I checked) the PROT_EXEC was 
+>>>>> necessary to prevent the dirty pages tracking from taking place. So this
+>>>>> patch would break KVM in that case.
+>>>>>
+>>>>> Newer z/VMs (e.g. 6.3) do provide ESOP. SO the question is,
+>>>>> why is KVM_CAP_S390_COW not set?
+>>>>
+>>>> I now had another look at this, and seems like the ESOP bit is indeed
+>>>> not set in S390_lowcore.machine_flags here. According to /proc/sysinfo,
+>>>> z/VM is version 6.1.0 here, so I guess that's just too old for ESOP?
+>>>
+>>> Yes, this was introduced with z/VM 6.3
+>>
+>> FWIW, the last version without ESOP, z/VM 6.2, is now end of life,
+>> according to: http://www.vm.ibm.com/techinfo/lpmigr/vmleos.html
+>> ... so I guess we could remove the legacy_s390_alloc() function now?
 > 
-> So, until this is fixed in the kernel, teach the header harvesting
-> script to substitute kernel's hyperv.h with a dummy.
 > 
-> Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-> Message-Id: <20170713201522.13765-3-rkagan@virtuozzo.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  scripts/update-linux-headers.sh |  4 +++-
->  target/i386/hyperv-proto.h      |  3 +++
->  target/i386/kvm.c               | 17 +++++------------
->  3 files changed, 11 insertions(+), 13 deletions(-)
-> 
-> diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
-> index 2f906c4..ad80fe3 100755
-> --- a/scripts/update-linux-headers.sh
-> +++ b/scripts/update-linux-headers.sh
-> @@ -104,7 +104,9 @@ for arch in $ARCHLIST; do
->          cp "$tmpdir/include/asm/unistd-common.h" "$output/linux-headers/asm-arm/"
->      fi
->      if [ $arch = x86 ]; then
-> -        cp_portable "$tmpdir/include/asm/hyperv.h" "$output/include/standard-headers/asm-x86/"
-> +        cat <<-EOF >"$output/include/standard-headers/asm-x86/hyperv.h"
-> +        /* this is a temporary placeholder until kvm_para.h stops including it */
-> +        EOF
->          cp "$tmpdir/include/asm/unistd_32.h" "$output/linux-headers/asm-x86/"
->          cp "$tmpdir/include/asm/unistd_x32.h" "$output/linux-headers/asm-x86/"
->          cp "$tmpdir/include/asm/unistd_64.h" "$output/linux-headers/asm-x86/"
-> diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
-> index 1b3fa6e..cb4d7f2 100644
-> --- a/target/i386/hyperv-proto.h
-> +++ b/target/i386/hyperv-proto.h
-> @@ -34,6 +34,8 @@
->  #define HV_VP_INDEX_AVAILABLE        (1u << 6)
->  #define HV_RESET_AVAILABLE           (1u << 7)
->  #define HV_REFERENCE_TSC_AVAILABLE   (1u << 9)
-> +#define HV_ACCESS_FREQUENCY_MSRS     (1u << 11)
-> +
->  
->  /*
->   * HV_CPUID_FEATURES.EDX bits
-> @@ -44,6 +46,7 @@
->  #define HV_CPU_DYNAMIC_PARTITIONING_AVAILABLE   (1u << 3)
->  #define HV_HYPERCALL_PARAMS_XMM_AVAILABLE       (1u << 4)
->  #define HV_GUEST_IDLE_STATE_AVAILABLE           (1u << 5)
-> +#define HV_FREQUENCY_MSRS_AVAILABLE             (1u << 8)
->  #define HV_GUEST_CRASH_MSR_AVAILABLE            (1u << 10)
->  
->  /*
-> diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-> index 0498ab7..b1e32e9 100644
-> --- a/target/i386/kvm.c
-> +++ b/target/i386/kvm.c
-> @@ -639,21 +639,14 @@ static int hyperv_handle_properties(CPUState *cs)
->          env->features[FEAT_HYPERV_EAX] |= HV_APIC_ACCESS_AVAILABLE;
->      }
->      if (cpu->hyperv_time) {
-> -<<<<<<< HEAD
-> -        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_HYPERCALL_AVAILABLE;
-> -        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_TIME_REF_COUNT_AVAILABLE;
-> -        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_REFERENCE_TSC_AVAILABLE;
-> -
-> -        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
-> -            env->features[FEAT_HYPERV_EAX] |= HV_X64_ACCESS_FREQUENCY_MSRS;
-> -            env->features[FEAT_HYPERV_EDX] |=
-> -                HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
-> -        }
-> -=======
->          env->features[FEAT_HYPERV_EAX] |= HV_HYPERCALL_AVAILABLE;
->          env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
->          env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
-> ->>>>>>> hyperv: add header with protocol definitions
-> +
-> +        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
-> +            env->features[FEAT_HYPERV_EAX] |= HV_ACCESS_FREQUENCY_MSRS;
-> +            env->features[FEAT_HYPERV_EDX] |= HV_FREQUENCY_MSRS_AVAILABLE;
-> +        }
->      }
->      if (cpu->hyperv_crash && has_msr_hv_crash) {
->          env->features[FEAT_HYPERV_EDX] |= HV_GUEST_CRASH_MSR_AVAILABLE;
+> I recently learned that you can buy some extended z/VM support not sure how
+> long this will be available. In addition, ESOP was added with z10, so
+> if we still care about z9 and older then this would break things on
+> very very old boxes.
 
-I guess the conflicts were not supposed to be here.
+I wonder if that is really relevant anymore.
 
-Nor the FREQUENCY_MSRS stuff which would better be merged in the
-previous patch.
+Existing user on such machines (I doubt there are many) can simply stick
+to QEMU <= 2.10. Or do we actually expect people with such old
+environments to use latest and grates QEMU versions?
 
-Roman.
+We could add an error message an error out.
+
+> 
+> The pain/risk-to-break ratio seems to suggest to keep this "hack"
+> for a while.
+
+
+-- 
+
+Thanks,
+
+David
