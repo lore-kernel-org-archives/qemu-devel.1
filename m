@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35635)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36569)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1duIMl-0000Gn-Cr
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:15:14 -0400
+	(envelope-from <clg@kaod.org>) id 1duINc-000169-9G
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:16:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1duIMf-0003yX-Gk
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:15:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:27423)
+	(envelope-from <clg@kaod.org>) id 1duINY-0004pI-1d
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:16:00 -0400
+Received: from 8.mo3.mail-out.ovh.net ([87.98.172.249]:60015)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1duIMf-0003wn-8z
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:15:01 -0400
-References: <1490347615-19222-1-git-send-email-thuth@redhat.com>
-	<f3b0b14e-4ea1-6c4e-f9c6-cb86e78c6104@de.ibm.com>
-	<c2195ec9-a3d7-eb14-c204-d5c0e6239811@redhat.com>
-	<129fdced-8f83-e408-b37a-26c6ba8bb48f@de.ibm.com>
-	<169bbaaf-3212-ce1d-a0db-6edede5b481d@redhat.com>
-	<004effcd-142f-d667-3f14-c77c211cd219@de.ibm.com>
-	<6f711dfd-84bc-8683-3655-b836bb5d0a51@redhat.com>
-	<09c14d39-8867-0a19-aeeb-f8edcd0df66e@redhat.com>
-	<3ce8f3c2-1ef5-6e1d-504d-9ca9a68cb818@redhat.com>
-	<872bdedf-b0d2-1301-684e-678060ef68a0@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <9d6a7693-12b6-b23f-8e52-c808d31ce891@redhat.com>
-Date: Tue, 19 Sep 2017 15:14:58 +0200
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duINX-0004oA-S0
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:15:55 -0400
+Received: from player797.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 6A1D0159601
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 15:15:54 +0200 (CEST)
+References: <20170911171235.29331-1-clg@kaod.org>
+	<20170911171235.29331-2-clg@kaod.org> <20170919022719.GH27153@umbus>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <d3ee87a7-208e-a172-094b-6aeedf8c5840@kaod.org>
+Date: Tue, 19 Sep 2017 15:15:44 +0200
 MIME-Version: 1.0
-In-Reply-To: <872bdedf-b0d2-1301-684e-678060ef68a0@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170919022719.GH27153@umbus>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/s390x/kvm: Fix problem when running
- with SELinux under z/VM
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 01/21] ppc/xive: introduce a
+ skeleton for the sPAPR XIVE interrupt controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,22 +32,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
->> It's the last remaining alloc hack we have in QEMU :) That's why I am
->> asking the question.
-> 
-> Hmm, maybe we could remove it for QEMU v3.0 ? ;-)
-> 
->  Thomas
-> 
-> 
+On 09/19/2017 04:27 AM, David Gibson wrote:
+> On Mon, Sep 11, 2017 at 07:12:15PM +0200, C=E9dric Le Goater wrote:
+>> Start with a couple of attributes for the XIVE sPAPR controller
+>> model. The number of provisionned IRQ is necessary to size the
+>> different internal XIVE tables, the number of CPUs is also.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>=20
+> [snip]
+>=20
+>> +static void spapr_xive_realize(DeviceState *dev, Error **errp)
+>> +{
+>> +    sPAPRXive *xive =3D SPAPR_XIVE(dev);
+>> +
+>> +    if (!xive->nr_targets) {
+>> +        error_setg(errp, "Number of interrupt targets needs to be gre=
+ater 0");
+>> +        return;
+>> +    }
+>> +    /* We need to be able to allocate at least the IPIs */
+>> +    if (!xive->nr_irqs || xive->nr_irqs < xive->nr_targets) {
+>> +        error_setg(errp, "Number of interrupts too small");
+>> +        return;
+>> +    }
+>> +}
+>> +
+>> +static Property spapr_xive_properties[] =3D {
+>> +    DEFINE_PROP_UINT32("nr-irqs", sPAPRXive, nr_irqs, 0),
+>> +    DEFINE_PROP_UINT32("nr-targets", sPAPRXive, nr_targets, 0),
+>=20
+> I'm a bit uneasy about the number of targets having to be set in
+> advance: this can make life awkward when CPUs are hotplugged.  I know
+> there's something similar in xics, but it has caused some hassles, and
+> we're starting to move away from it.
+>=20
+> Do you really need this?
+>=20
 
-Chasing unicorns on rainbows? ;)
+Some of the internal table size depend on the number of cpus=20
+defined for the machine. When the sPAPRXive object is instantiated,=20
+we use xics_max_server_number() to get the max number of cpus
+provisioned.
 
--- 
-
-Thanks,
-
-David
+C.
