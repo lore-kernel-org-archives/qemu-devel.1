@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49127)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49191)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1duGgD-0001zT-Lo
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:27:06 -0400
+	(envelope-from <clg@kaod.org>) id 1duGgM-00025g-8D
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:27:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1duGgC-0006E2-K6
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:27:05 -0400
-Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:54120)
+	(envelope-from <clg@kaod.org>) id 1duGgJ-0006I5-4m
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:27:14 -0400
+Received: from 3.mo179.mail-out.ovh.net ([178.33.251.175]:34368)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duGgC-0006DU-Dj
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:27:04 -0400
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duGgI-0006Hc-UK
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:27:11 -0400
 Received: from player716.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 739A662592
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 13:27:03 +0200 (CEST)
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id ED69D5B1BC
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 13:27:09 +0200 (CEST)
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
-Date: Tue, 19 Sep 2017 13:26:41 +0200
-Message-Id: <20170919112645.8574-2-clg@kaod.org>
+Date: Tue, 19 Sep 2017 13:26:42 +0200
+Message-Id: <20170919112645.8574-3-clg@kaod.org>
 In-Reply-To: <20170919112645.8574-1-clg@kaod.org>
 References: <20170919112645.8574-1-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 1/5] aspeed: add support for the
- witherspoon-bmc board
+Subject: [Qemu-devel] [PATCH 2/5] aspeed: add an I2C RTC device to all
+ machines
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,107 +33,83 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Peter Maydell <peter.maydell@linaro.org>
 Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-The Witherspoon boards are OpenPOWER system hosting POWER9 Processors.
-Let's add support for their BMC including a couple of I2C devices as
-found on real HW.
+The AST2500 EVB does not have an RTC but we can pretend that one is
+plugged on the I2C bus header.
+
+The romulus and witherspoon boards expects an Epson RX8900 I2C RTC but
+a ds1338 is good enough for the basic features we need.
 
 Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
 ---
- hw/arm/aspeed.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+ hw/arm/aspeed.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
-index ab895ad490af..81f522f711ae 100644
+index 81f522f711ae..362b683e9021 100644
 --- a/hw/arm/aspeed.c
 +++ b/hw/arm/aspeed.c
-@@ -46,6 +46,7 @@ enum {
-     PALMETTO_BMC,
-     AST2500_EVB,
-     ROMULUS_BMC,
-+    WITHERSPOON_BMC,
- };
+@@ -89,6 +89,7 @@ enum {
 =20
- /* Palmetto hardware value: 0x120CE416 */
-@@ -83,8 +84,12 @@ enum {
-         SCU_AST2500_HW_STRAP_ACPI_ENABLE |                              =
-\
-         SCU_HW_STRAP_SPI_MODE(SCU_HW_STRAP_SPI_MASTER))
-=20
-+/* Witherspoon hardware value: 0xF10AD216 (but use romulus definition) *=
-/
-+#define WITHERSPOON_BMC_HW_STRAP1 ROMULUS_BMC_HW_STRAP1
-+
  static void palmetto_bmc_i2c_init(AspeedBoardState *bmc);
  static void ast2500_evb_i2c_init(AspeedBoardState *bmc);
-+static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc);
++static void romulus_bmc_i2c_init(AspeedBoardState *bmc);
+ static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc);
 =20
  static const AspeedBoardConfig aspeed_boards[] =3D {
-     [PALMETTO_BMC] =3D {
-@@ -110,6 +115,14 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
+@@ -114,6 +115,7 @@ static const AspeedBoardConfig aspeed_boards[] =3D {
+         .fmc_model =3D "n25q256a",
          .spi_model =3D "mx66l1g45g",
          .num_cs    =3D 2,
++        .i2c_init  =3D romulus_bmc_i2c_init,
      },
-+    [WITHERSPOON_BMC]  =3D {
-+        .soc_name  =3D "ast2500-a1",
-+        .hw_strap1 =3D WITHERSPOON_BMC_HW_STRAP1,
-+        .fmc_model =3D "mx25l25635e",
-+        .spi_model =3D "mx66l1g45g",
-+        .num_cs    =3D 2,
-+        .i2c_init  =3D witherspoon_bmc_i2c_init,
-+    },
+     [WITHERSPOON_BMC]  =3D {
+         .soc_name  =3D "ast2500-a1",
+@@ -298,6 +300,10 @@ static void ast2500_evb_i2c_init(AspeedBoardState *b=
+mc)
+=20
+     /* The AST2500 EVB expects a LM75 but a TMP105 is compatible */
+     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 7), "tmp105",=
+ 0x4d);
++
++    /* The AST2500 EVB does not have an RTC. Let's pretend that one is
++     * plugged on the I2C bus header */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), "ds1338"=
+, 0x32);
+ }
+=20
+ static void ast2500_evb_init(MachineState *machine)
+@@ -325,6 +331,15 @@ static const TypeInfo ast2500_evb_type =3D {
+     .class_init =3D ast2500_evb_class_init,
  };
 =20
- #define FIRMWARE_ADDR 0x0
-@@ -337,11 +350,47 @@ static const TypeInfo romulus_bmc_type =3D {
-     .class_init =3D romulus_bmc_class_init,
- };
-=20
-+static void witherspoon_bmc_i2c_init(AspeedBoardState *bmc)
++static void romulus_bmc_i2c_init(AspeedBoardState *bmc)
 +{
 +    AspeedSoCState *soc =3D &bmc->soc;
 +
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 4), "tmp423",=
- 0x4c);
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 5), "tmp423",=
- 0x4c);
-+
-+    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), "tmp105",=
- 0x4a);
++    /* The romulus board expects Epson RX8900 I2C RTC but a ds1338 is
++     * good enough */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), "ds1338"=
+, 0x32);
 +}
 +
-+static void witherspoon_bmc_init(MachineState *machine)
-+{
-+    aspeed_board_init(machine, &aspeed_boards[WITHERSPOON_BMC]);
-+}
-+
-+static void witherspoon_bmc_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc =3D MACHINE_CLASS(oc);
-+
-+    mc->desc =3D "OpenPOWER Witherspoon BMC (ARM1176)";
-+    mc->init =3D witherspoon_bmc_init;
-+    mc->max_cpus =3D 1;
-+    mc->no_sdcard =3D 1;
-+    mc->no_floppy =3D 1;
-+    mc->no_cdrom =3D 1;
-+    mc->no_parallel =3D 1;
-+    mc->ignore_memory_transaction_failures =3D true;
-+}
-+
-+static const TypeInfo witherspoon_bmc_type =3D {
-+    .name =3D MACHINE_TYPE_NAME("witherspoon-bmc"),
-+    .parent =3D TYPE_MACHINE,
-+    .class_init =3D witherspoon_bmc_class_init,
-+};
-+
- static void aspeed_machine_init(void)
+ static void romulus_bmc_init(MachineState *machine)
  {
-     type_register_static(&palmetto_bmc_type);
-     type_register_static(&ast2500_evb_type);
-     type_register_static(&romulus_bmc_type);
-+    type_register_static(&witherspoon_bmc_type);
+     aspeed_board_init(machine, &aspeed_boards[ROMULUS_BMC]);
+@@ -358,6 +373,10 @@ static void witherspoon_bmc_i2c_init(AspeedBoardStat=
+e *bmc)
+     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 5), "tmp423",=
+ 0x4c);
+=20
+     i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 9), "tmp105",=
+ 0x4a);
++
++    /* The witherspoon board expects Epson RX8900 I2C RTC but a ds1338 i=
+s
++     * good enough */
++    i2c_create_slave(aspeed_i2c_get_bus(DEVICE(&soc->i2c), 11), "ds1338"=
+, 0x32);
  }
 =20
- type_init(aspeed_machine_init)
+ static void witherspoon_bmc_init(MachineState *machine)
 --=20
 2.13.5
