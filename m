@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46162)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1duHzL-0004gc-LH
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:50:57 -0400
+	(envelope-from <bounces@canonical.com>) id 1duHzQ-0004l6-32
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:51:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1duHzH-0003XD-6D
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:50:55 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 19 Sep 2017 09:50:41 -0300
-Message-Id: <20170919125041.2153-1-f4bug@amsat.org>
+	(envelope-from <bounces@canonical.com>) id 1duHzL-0003a7-3y
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:51:00 -0400
+Received: from indium.canonical.com ([91.189.90.7]:56210)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1duHzK-0003ZF-Kq
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:50:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1duHzI-0002JW-88
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 12:50:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id DDA742E84B8
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 12:50:50 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] hw/input/lm832x: move LM8323 declarations to
- input/keypad.h
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 19 Sep 2017 12:38:15 -0000
+From: Gerd Hoffmann <1715700@bugs.launchpad.net>
+Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
+	<150582231000.13645.13271569408662777261.malone@gac.canonical.com>
+Message-Id: <1505824695.12708.7.camel@redhat.com>
+Errors-To: bounces@canonical.com
+Subject: Re: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on
+ qemu 2.10 (works on 2.9)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,104 +38,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
+To: qemu-devel@nongnu.org
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-Based-on: 20170919123053.32675-1-f4bug@amsat.org
+> (2) Build the SeaBIOS CSM (CONFIG_CSM=3Dy), and embed it into OVMF,
+> like described above. Then, boot Windows 7 in *UEFI Mode*.
 
-$ ./scripts/get_maintainer.pl -f hw/input/lm832x.c
-get_maintainer.pl: No maintainers found, printing recent contributors.
+> Option #1 and option #2 no longer work because the CSM infrastructure
+> in edk2 needs to be able to write 0xc0000.
 
- include/hw/i2c/i2c.h      |  3 ---
- include/hw/input/keypad.h | 23 +++++++++++++++++++++++
- hw/arm/nseries.c          |  3 ++-
- hw/input/lm832x.c         |  3 +--
- 4 files changed, 26 insertions(+), 6 deletions(-)
- create mode 100644 include/hw/input/keypad.h
+Well, option #2 works for me.
 
-diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
-index 24e95d0155..8fdf3e47d6 100644
---- a/include/hw/i2c/i2c.h
-+++ b/include/hw/i2c/i2c.h
-@@ -70,9 +70,6 @@ int i2c_recv(I2CBus *bus);
- 
- DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr);
- 
--/* lm832x.c */
--void lm832x_key_event(DeviceState *dev, int key, int state);
--
- extern const VMStateDescription vmstate_i2c_slave;
- 
- #define VMSTATE_I2C_SLAVE(_field, _state) {                          \
-diff --git a/include/hw/input/keypad.h b/include/hw/input/keypad.h
-new file mode 100644
-index 0000000000..efacef6458
---- /dev/null
-+++ b/include/hw/input/keypad.h
-@@ -0,0 +1,23 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+#ifndef HW_KEYPAD_H
-+#define HW_KEYPAD_H
-+
-+#include "hw/hw.h"
-+
-+#define TYPE_LM8323 "lm8323"
-+
-+void lm832x_key_event(DeviceState *dev, int key, int state);
-+
-+#endif
-diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
-index a32ac82702..594b7e878c 100644
---- a/hw/arm/nseries.c
-+++ b/hw/arm/nseries.c
-@@ -30,6 +30,7 @@
- #include "ui/console.h"
- #include "hw/boards.h"
- #include "hw/i2c/i2c.h"
-+#include "hw/input/keypad.h"
- #include "hw/devices.h"
- #include "hw/block/flash.h"
- #include "hw/hw.h"
-@@ -412,7 +413,7 @@ static void n810_kbd_setup(struct n800_s *s)
-     /* Attach the LM8322 keyboard to the I2C bus,
-      * should happen in n8x0_i2c_setup and s->kbd be initialised here.  */
-     s->kbd = i2c_create_slave(omap_i2c_bus(s->mpu->i2c[0]),
--                           "lm8323", N810_LM8323_ADDR);
-+                              TYPE_LM8323, N810_LM8323_ADDR);
-     qdev_connect_gpio_out(s->kbd, 0, kbd_irq);
- }
- 
-diff --git a/hw/input/lm832x.c b/hw/input/lm832x.c
-index 2340523da0..868ddfe5ea 100644
---- a/hw/input/lm832x.c
-+++ b/hw/input/lm832x.c
-@@ -19,12 +19,11 @@
-  */
- 
- #include "qemu/osdep.h"
--#include "hw/hw.h"
- #include "hw/i2c/i2c.h"
-+#include "hw/input/keypad.h"
- #include "qemu/timer.h"
- #include "ui/console.h"
- 
--#define TYPE_LM8323 "lm8323"
- #define LM8323(obj) OBJECT_CHECK(LM823KbdState, (obj), TYPE_LM8323)
- 
- typedef struct {
--- 
-2.14.1
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1715700
+
+Title:
+  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
+
+Status in QEMU:
+  New
+
+Bug description:
+  Qemu version: 2.10 stable.
+  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
+st.
+  Command line:
+  qemu-system-x86_64 \
+      -nodefaults \
+      -nodefconfig \
+      -machine type=3Dq35,accel=3Dkvm \
+      -enable-kvm \
+      -cpu host \
+      -m 2048 \
+      -vga virtio \
+      -boot menu=3Don \
+      -smbios file=3D/path/dmidecode_BIOS.bin \
+      -acpitable file=3D/path/acpi_slic.bin \
+      -bios /path/OVMF_CODE.fd \
+      -net none \
+      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
+      -device pcie-root-port \
+      -device ich9-usb-ehci1 \
+      -device ich9-usb-uhci1 \
+      -device ich9-usb-uhci2 \
+      -device ich9-usb-uhci3
+
+  Windows hangs at boot with waving flag screen (flag doesn't freeze,
+  keeps waving indefinitely). Same command line boots fine with Qemu
+  2.9. I tried changing machine type to pc-q35-2.9 - same result.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
