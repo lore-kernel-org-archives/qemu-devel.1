@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43414)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45908)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duL4C-0003fK-KR
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:08:12 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1duL7D-0004tk-RL
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:11:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duL46-0002g8-Vv
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:08:08 -0400
-References: <20170919155025.4098-1-stefanha@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <9d3ff80c-5ae8-0fc3-6912-75c0f16f56d2@redhat.com>
-Date: Tue, 19 Sep 2017 11:07:53 -0500
+	(envelope-from <peter.maydell@linaro.org>) id 1duL7C-0004iB-Qw
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:11:15 -0400
+Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:45716)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1duL7C-0004gi-Ib
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:11:14 -0400
+Received: by mail-wm0-x233.google.com with SMTP id g206so299985wme.0
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 09:11:14 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170919155025.4098-1-stefanha@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="mDa74bLpTDTXFxlqq9elipH3QFfTgmxvi"
-Subject: Re: [Qemu-devel] [PATCH] throttle-groups: update
- tg->any_timer_armed[] on detach
+In-Reply-To: <20170919142758.13577-1-pbonzini@redhat.com>
+References: <20170919142758.13577-1-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 19 Sep 2017 17:10:52 +0100
+Message-ID: <CAFEAcA_G_XJ-FcD8VVVHj=QQAmmyM9OsaQORxLuZN0U80pwu9w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL v3 00/51] Misc patches for 2017-09-19
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,73 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>, Max Reitz <mreitz@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---mDa74bLpTDTXFxlqq9elipH3QFfTgmxvi
-From: Eric Blake <eblake@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>,
- Max Reitz <mreitz@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
-Message-ID: <9d3ff80c-5ae8-0fc3-6912-75c0f16f56d2@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] throttle-groups: update
- tg->any_timer_armed[] on detach
-References: <20170919155025.4098-1-stefanha@redhat.com>
-In-Reply-To: <20170919155025.4098-1-stefanha@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 19 September 2017 at 15:27, Paolo Bonzini <pbonzini@redhat.com> wrote:
+> The following changes since commit 11e06ce1ed28fd0ffcbc1e2436b72f3412b4ecc8:
+>
+>   Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' into staging (2017-09-19 10:13:51 +0100)
+>
+> are available in the git repository at:
+>
+>   git://github.com/bonzini/qemu.git tags/for-upstream
+>
+> for you to fetch changes up to 7437866bfc3b25663f415a8c660fd78360e84598:
+>
+>   docker: fix creation of archives (2017-09-19 16:20:49 +0200)
+>
+> ----------------------------------------------------------------
+> * warning improvements (Alistair)
+> * KVM code cleanup (David)
+> * scsi-block support for rerror/werror (Fam)
+> * support for >64 vCPUs in Windows (Gonglei)
+> * SCSI fix (Hannes)
+> * SSE bugfixes (Joseph)
+> * SmartOS compilation fixes (Kamil)
+> * Hyper-V frequency MSR support (Ladi)
+> * move more files to accel/tcg (Philippe, Thomas)
+> * multiboot validation (PJP)
+> * virtqueue size configuration for virtio-scsi (Richard)
+> * Hyper-V header cleanup (Roman)
+> * Maintainer email update (Guangrong)
+> * checkpatch.pl --branch (Daniel), fixes (Greg)
+> * introducing scsi/ (me)
 
-On 09/19/2017 10:50 AM, Stefan Hajnoczi wrote:
-> Clear tg->any_timer_armed[] when throttling timers are destroy during
+Applied, thanks.
 
-s/destroy/destroyed/
-
-> AioContext attach/detach.  Failure to do so causes throttling to hang
-> because we believe the timer is already scheduled!
->=20
-> The following was broken at least since QEMU 2.10.0 with -drive
-> iops=3D100:
->=20
->   $ dd if=3D/dev/zero of=3D/dev/vdb oflag=3Ddirect count=3D1000
->   (qemu) stop
->   (qemu) cont
->   ...I/O is stuck...
->=20
-> Reported-by: Yongxue Hong <yhong@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
-> ---
->  block/throttle-groups.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->=20
-Reviewed-by: Eric Blake <eblake@redhat.com>
-
-CC: qemu-stable@nongnu.org
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---mDa74bLpTDTXFxlqq9elipH3QFfTgmxvi
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnBQNkACgkQp6FrSiUn
-Q2rZ1wf+JVexPJ4od827HtWNVPXJr7gtXTv6mS9Fnxj51cTqV2Mnw/v9lZHl9iVb
-W4UFUg1HkxwUQ1uDIOphxqkbQqaRi1/ryk4HndhWyBnO+ErDUGhfcxiQc5nImreJ
-2nelfPYC3SBMSmcV3N2Z+1Q1MWd31TMa1oWF5EZvnhMm7xWKRYUYEn8caZwtt4uA
-GPCH1bpB0jHD4nDMdJccQuB5B8xxY+QxYEBsWKo8beeqKjb70bbTxCYWdlMf6Oz9
-/aYTGKemqBnBA1t7IkVs0+fEiV88Iem1PAnrV6DxR6gaARBMvO0Sl5YiTJ2sNsEE
-10XN+Mz2aORWzNKpCWQTde5ZT/JNPA==
-=suHX
------END PGP SIGNATURE-----
-
---mDa74bLpTDTXFxlqq9elipH3QFfTgmxvi--
+-- PMM
