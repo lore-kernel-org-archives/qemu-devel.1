@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39633)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40022)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duLeG-0006sX-BC
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:27 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duLeh-0007Fd-6T
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duLeF-0003Wl-HI
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40714)
+	(envelope-from <cohuck@redhat.com>) id 1duLeg-0003wW-AC
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50580)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLeF-0003WT-A7
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:23 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLeg-0003vW-5A
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:50 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 19 Sep 2017 18:43:20 +0200
-Message-Id: <20170919164337.18555-22-cohuck@redhat.com>
+Date: Tue, 19 Sep 2017 18:43:25 +0200
+Message-Id: <20170919164337.18555-27-cohuck@redhat.com>
 In-Reply-To: <20170919164337.18555-1-cohuck@redhat.com>
 References: <20170919164337.18555-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL v2 21/38] s390x: allow only 1 CPU with TCG
+Subject: [Qemu-devel] [PULL v2 26/38] s390x: allow cpu hotplug via device_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,45 +28,37 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: David Hildenbrand <david@redhat.com>
 
-Specifying more than 1 CPU (e.g. -smp 5) leads to SIGP errors (the
-guest tries to bring these CPUs up but fails), because we don't support
-multiple CPUs on s390x under TCG.
+E.g. the following now works:
+    device_add host-s390-cpu,id=cpu1,core-id=1
 
-Let's bail out if more than 1 is specified, so we don't raise people's
-hope.
+The system will perform the same checks as when using cpu_add:
+- If the core_id is already in use
+- If the next sequential core_id isn't used
+- If core-id >= max_cpu is specified
 
-Tested-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
+In addition, mixed CPU models are checked. E.g. if starting with
+-cpu host and trying to hotplug "qemu-s390-cpu":
+    "Mixed CPU models are not supported on s390x."
+
+Reviewed-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170913132417.24384-12-david@redhat.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <20170913132417.24384-17-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ target/s390x/cpu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index c908f63543..56f8200851 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -23,6 +23,7 @@
- #include "hw/s390x/css.h"
- #include "virtio-ccw.h"
- #include "qemu/config-file.h"
-+#include "qemu/error-report.h"
- #include "s390-pci-bus.h"
- #include "hw/s390x/storage-keys.h"
- #include "hw/s390x/storage-attributes.h"
-@@ -55,6 +56,11 @@ static void s390_init_cpus(MachineState *machine)
-     if (machine->cpu_model == NULL) {
-         machine->cpu_model = s390_default_cpu_model_name();
-     }
-+    if (tcg_enabled() && max_cpus > 1) {
-+        error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
-+                     "supported by TCG (1) on s390x", max_cpus);
-+        exit(1);
-+    }
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 8c1c644057..5724dffb88 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -467,6 +467,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
+     scc->parent_realize = dc->realize;
+     dc->realize = s390_cpu_realizefn;
+     dc->props = s390x_cpu_properties;
++    dc->user_creatable = true;
  
-     cpu_states = g_new0(S390CPU *, max_cpus);
- 
+     scc->parent_reset = cc->reset;
+ #if !defined(CONFIG_USER_ONLY)
 -- 
 2.13.5
