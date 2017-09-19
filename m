@@ -1,26 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45890)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46068)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duHzB-0004a1-0i
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:50:45 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1duHzL-0004gc-LH
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:50:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duHz9-0003RR-Oc
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:50:44 -0400
-References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
-	<20170918135935.255591-4-vsementsov@virtuozzo.com>
-	<d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
-	<577e29c4-5187-8c6f-aacc-c77282959fdd@virtuozzo.com>
-	<26582eb0-1db3-3aac-3652-44e3fbb1e49c@redhat.com>
-	<5fff43cf-717d-2d64-f51d-57f116888921@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <11ccb9c4-aecb-e82f-a520-50710dae8ea1@redhat.com>
-Date: Tue, 19 Sep 2017 14:50:30 +0200
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1duHzH-0003XD-6D
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:50:55 -0400
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 19 Sep 2017 09:50:41 -0300
+Message-Id: <20170919125041.2153-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <5fff43cf-717d-2d64-f51d-57f116888921@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/7] block/nbd-client: refactor reading
- reply
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH] hw/input/lm832x: move LM8323 declarations to
+ input/keypad.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,44 +25,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, den@openvz.org
+To: Peter Maydell <peter.maydell@linaro.org>, Andrzej Zaborowski <balrogg@gmail.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
 
-On 19/09/2017 13:03, Vladimir Sementsov-Ogievskiy wrote:
->>>
->> I disagree that it is easier to extend it in the future.  If some
->> commands in the future need a different "how do we read it" (e.g. for
->> structured reply), nbd_read_reply_entry may not have all the information
->> it needs anymore.
-> 
-> how is it possible? all information is in requests[i].
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+Based-on: 20170919123053.32675-1-f4bug@amsat.org
 
-If you are okay with violating information hiding, then it is.
+$ ./scripts/get_maintainer.pl -f hw/input/lm832x.c
+get_maintainer.pl: No maintainers found, printing recent contributors.
 
->>
->> In fact, you're pushing knowledge of the commands from nbd_co_request to
->> nbd_read_reply_entry:
->>
->> +        if (s->reply.error == 0 &&
->> +            s->requests[i].request->type == NBD_CMD_READ)
->>
->> and knowledge of NBD_CMD_READ simply doesn't belong there.  So there is
->> an example of that right now, it is not some arbitrary bad thing that
->> could happen in the future.
-> 
-> I can't agree that my point of view is wrong, it's just different.
-> You want commands, reading from socket, each knows what it should read.
-> I want the receiver - one sequential reader, that can read all kinds of
-> replies and just wake requesting coroutines when all reading is done.
-> For me it looks simpler than switching.
+ include/hw/i2c/i2c.h      |  3 ---
+ include/hw/input/keypad.h | 23 +++++++++++++++++++++++
+ hw/arm/nseries.c          |  3 ++-
+ hw/input/lm832x.c         |  3 +--
+ 4 files changed, 26 insertions(+), 6 deletions(-)
+ create mode 100644 include/hw/input/keypad.h
 
-It may look simpler, but I think it goes against the principle of
-coroutines which is to have related code in the same function.  Here you
-have the command function that takes care of sending the request payload
-but not receiving the reply payload (except that for commands that
-aren't as simple as read or write, it will have to _process_ the reply
-payload).  What to do with the reply payload is in another function that
-has to peek at the command in order to find out what to do.  It doesn't
-seem like a better design, honestly.
-
-Paolo
+diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+index 24e95d0155..8fdf3e47d6 100644
+--- a/include/hw/i2c/i2c.h
++++ b/include/hw/i2c/i2c.h
+@@ -70,9 +70,6 @@ int i2c_recv(I2CBus *bus);
+ 
+ DeviceState *i2c_create_slave(I2CBus *bus, const char *name, uint8_t addr);
+ 
+-/* lm832x.c */
+-void lm832x_key_event(DeviceState *dev, int key, int state);
+-
+ extern const VMStateDescription vmstate_i2c_slave;
+ 
+ #define VMSTATE_I2C_SLAVE(_field, _state) {                          \
+diff --git a/include/hw/input/keypad.h b/include/hw/input/keypad.h
+new file mode 100644
+index 0000000000..efacef6458
+--- /dev/null
++++ b/include/hw/input/keypad.h
+@@ -0,0 +1,23 @@
++/*
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms and conditions of the GNU General Public License,
++ * version 2 or later, as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
++ * more details.
++ *
++ * You should have received a copy of the GNU General Public License along with
++ * this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++#ifndef HW_KEYPAD_H
++#define HW_KEYPAD_H
++
++#include "hw/hw.h"
++
++#define TYPE_LM8323 "lm8323"
++
++void lm832x_key_event(DeviceState *dev, int key, int state);
++
++#endif
+diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
+index a32ac82702..594b7e878c 100644
+--- a/hw/arm/nseries.c
++++ b/hw/arm/nseries.c
+@@ -30,6 +30,7 @@
+ #include "ui/console.h"
+ #include "hw/boards.h"
+ #include "hw/i2c/i2c.h"
++#include "hw/input/keypad.h"
+ #include "hw/devices.h"
+ #include "hw/block/flash.h"
+ #include "hw/hw.h"
+@@ -412,7 +413,7 @@ static void n810_kbd_setup(struct n800_s *s)
+     /* Attach the LM8322 keyboard to the I2C bus,
+      * should happen in n8x0_i2c_setup and s->kbd be initialised here.  */
+     s->kbd = i2c_create_slave(omap_i2c_bus(s->mpu->i2c[0]),
+-                           "lm8323", N810_LM8323_ADDR);
++                              TYPE_LM8323, N810_LM8323_ADDR);
+     qdev_connect_gpio_out(s->kbd, 0, kbd_irq);
+ }
+ 
+diff --git a/hw/input/lm832x.c b/hw/input/lm832x.c
+index 2340523da0..868ddfe5ea 100644
+--- a/hw/input/lm832x.c
++++ b/hw/input/lm832x.c
+@@ -19,12 +19,11 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "hw/hw.h"
+ #include "hw/i2c/i2c.h"
++#include "hw/input/keypad.h"
+ #include "qemu/timer.h"
+ #include "ui/console.h"
+ 
+-#define TYPE_LM8323 "lm8323"
+ #define LM8323(obj) OBJECT_CHECK(LM823KbdState, (obj), TYPE_LM8323)
+ 
+ typedef struct {
+-- 
+2.14.1
