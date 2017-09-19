@@ -1,29 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47448)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1duIe6-0006HD-79
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:33:03 -0400
+	(envelope-from <berrange@redhat.com>) id 1duIfD-0006z4-1B
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:34:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1duIe2-0002Ym-Qm
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:33:02 -0400
-Received: from 15.mo1.mail-out.ovh.net ([188.165.38.232]:35701)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1duIe2-0002XQ-LR
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:32:58 -0400
-Received: from player691.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id EE63193E4E
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 15:32:56 +0200 (CEST)
-Date: Tue, 19 Sep 2017 15:32:31 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170919131405.301817a8@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <7d5e2b72-808b-2a71-b285-35c16a273f94@huawei.com>
-References: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1505385610-35529-3-git-send-email-pradeep.jagadeesh@huawei.com>
-	<23a3b68e-efa5-5daa-363e-f697e3d8ae2f@redhat.com>
-	<7d5e2b72-808b-2a71-b285-35c16a273f94@huawei.com>
+	(envelope-from <berrange@redhat.com>) id 1duIf7-0003PC-4T
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:34:11 -0400
+Date: Tue, 19 Sep 2017 14:33:51 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170919133351.GO9536@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170919102434.21147-1-pbonzini@redhat.com>
+	<20170919102434.21147-3-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 2/6] qmp: Use ThrottleLimits structure
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170919102434.21147-3-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 2/4] scsi: build qemu-pr-helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,43 +24,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Cc: Eric Blake <eblake@redhat.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Tue, 19 Sep 2017 12:06:26 +0200
-Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com> wrote:
-
-> On 9/18/2017 7:10 PM, Eric Blake wrote:
-> > On 09/14/2017 05:40 AM, Pradeep Jagadeesh wrote:  
-> >> This patch factors out code to use the ThrottleLimits
-> >> strurcture.  
-> >
-> > s/strurcture/structure/
-> >  
-> >>
-> >> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-> >> Reviewed-by: Greg Kurz <groug@kaod.org>
-> >> Reviewed-by: Eric Blake <eblake@redhat.com>  
-> >
-> > Echoing the sentiments made elsewhere - this is a significant rewrite
-> > from the earlier version, so you WANT reviewers to look at it fresh
-> > rather than assuming that previous reviews still apply.
-> >  
-> OK, but shall I send them as V12 or V01 again?
+On Tue, Sep 19, 2017 at 12:24:32PM +0200, Paolo Bonzini wrote:
+> Introduce a privileged helper to run persistent reservation commands.
+> This lets virtual machines send persistent reservations without using
+> CAP_SYS_RAWIO or out-of-tree patches.  The helper uses Unix permissions
+> and SCM_RIGHTS to restrict access to processes that can access its socket
+> and prove that they have an open file descriptor for a raw SCSI device.
 > 
-
-The version is rather tied to the whole patchset than to each
-individual patch. The next round will be the 12th, so all
-patches should have v12 in the Subject.
-
-> -Pradeep
+> The next patch will also correct the usage of persistent reservations
+> with multipath devices.
 > 
+> It would also be possible to support for Linux's IOC_PR_* ioctls in
+> the future, to support NVMe devices.  For now, however, only SCSI is
+> supported.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
+
+> +
+> +#define PR_HELPER_CDB_SIZE     16
+> +#define PR_HELPER_SENSE_SIZE   96
+> +#define PR_HELPER_DATA_SIZE    8192
+> +
+> +typedef struct PRHelperResponse {
+> +    int32_t result;
+> +    int32_t sz;
+> +    uint8_t sense[PR_HELPER_SENSE_SIZE];
+> +} PRHelperResponse;
+
+Should we annotate this with 'packed' to ensure its immune to compiler
+padding ?
+
+
+> +typedef struct PRHelperRequest {
+> +    int fd;
+> +    size_t sz;
+> +    uint8_t cdb[PR_HELPER_CDB_SIZE];
+> +} PRHelperRequest;
+
+Same q here ?
+
+
+> +static int coroutine_fn prh_write_response(PRHelperClient *client,
+> +                                           PRHelperRequest *req,
+> +                                           PRHelperResponse *resp, Error **errp)
+> +{
+> +    ssize_t r;
+
+Can just be int
+
+> +    size_t sz;
+> +
+> +    if (req->cdb[0] == PERSISTENT_RESERVE_IN && resp->result == GOOD) {
+> +        assert(resp->sz <= req->sz && resp->sz <= sizeof(client->data));
+> +    } else {
+> +        assert(resp->sz == 0);
+> +    }
+> +
+> +    sz = resp->sz;
+> +
+> +    resp->result = cpu_to_be32(resp->result);
+> +    resp->sz = cpu_to_be32(resp->sz);
+> +    r = qio_channel_write_all(QIO_CHANNEL(client->ioc),
+> +                              (char *) resp, sizeof(*resp), errp);
+> +    if (r < 0) {
+> +        return r;
+> +    }
+> +
+> +    r = qio_channel_write_all(QIO_CHANNEL(client->ioc),
+> +                              (char *) client->data,
+> +                              sz, errp);
+> +    return r < 0 ? r : 0;
+
+Just return 'r' directly, its only ever -1 or 0
+
+
+
+Regards,
+Daniel
 -- 
-Gregory Kurz                                     kurzgreg@fr.ibm.com
-                                                 gkurz@linux.vnet.ibm.com
-Software Engineer @ IBM/LTC                      http://www.ibm.com
-Tel 33-5-6218-1607
-
-"Anarchy is about taking complete responsibility for yourself."
-        Alan Moore.
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
