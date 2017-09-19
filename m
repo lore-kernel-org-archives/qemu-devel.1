@@ -1,44 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56654)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56785)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1duIr9-0008Dy-05
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:46:32 -0400
+	(envelope-from <clg@kaod.org>) id 1duIrH-0008LF-4j
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:46:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1duIr6-00042T-BY
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:46:31 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:50034
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
-	id 1duIr6-00041r-3w
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:46:28 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8JDiQ4D130298
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 09:46:27 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2d313wd07g-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 09:46:26 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
-	Tue, 19 Sep 2017 14:46:23 +0100
-References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
-	<20170913115029.47626-5-pasic@linux.vnet.ibm.com>
-	<20170919055005.GE5274@bjsdjshi@linux.vnet.ibm.com>
-	<20170919114859.3e2d895b.cohuck@redhat.com>
-	<fbb3522e-4086-359a-fca7-05371b76dac7@linux.vnet.ibm.com>
-	<20170919125717.1ae0cd38.cohuck@redhat.com>
-From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+	(envelope-from <clg@kaod.org>) id 1duIrA-00044m-Kv
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:46:39 -0400
+Received: from 19.mo3.mail-out.ovh.net ([178.32.98.231]:57005)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duIrA-00043v-Br
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:46:32 -0400
+Received: from player797.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id 885D8154A88
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 15:46:30 +0200 (CEST)
+References: <20170911171235.29331-1-clg@kaod.org>
+	<20170911171235.29331-4-clg@kaod.org> <20170919023943.GI27153@umbus>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <09082408-6f2f-4bd8-d6c6-69734fe7de44@kaod.org>
 Date: Tue, 19 Sep 2017 15:46:20 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170919125717.1ae0cd38.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170919023943.GI27153@umbus>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Message-Id: <0c6660b7-9d81-7ada-7388-cfdaf89e25f3@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] s390x/css: support ccw IDA
+Subject: Re: [Qemu-devel] [RFC PATCH v2 03/21] ppc/xive: define the XIVE
+ internal tables
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,313 +32,383 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
-On 19/09/2017 12:57, Cornelia Huck wrote:
-> On Tue, 19 Sep 2017 12:36:33 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+On 09/19/2017 04:39 AM, David Gibson wrote:
+> On Mon, Sep 11, 2017 at 07:12:17PM +0200, C=E9dric Le Goater wrote:
+>> The XIVE interrupt controller of the POWER9 uses a set of tables to
+>> redirect exception from event sources to CPU threads. Among which we
+>> choose to model :
+>>
+>>  - the State Bit Entries (SBE), also known as Event State Buffer
+>>    (ESB). This is a two bit state machine for each event source which
+>>    is used to trigger events. The bits are named "P" (pending) and "Q"
+>>    (queued) and can be controlled by MMIO.
+>>
+>>  - the Interrupt Virtualization Entry (IVE) table, also known as Event
+>>    Assignment Structure (EAS). This table is indexed by the IRQ number
+>>    and is looked up to find the Event Queue associated with a
+>>    triggered event.
 >=20
->> On 09/19/2017 11:48 AM, Cornelia Huck wrote:
->>> On Tue, 19 Sep 2017 13:50:05 +0800
->>> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
->>>   =20
->>>> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-13 13:50:29 +0200]=
-:
->>>>  =20
->>>>> Let's add indirect data addressing support for our virtual channel
->>>>> subsystem. This implementation does no bother with any kind of
->>>>> prefetching. We simply step trough the IDAL on demand.
->>>>>
->>>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>>>> ---
->>>>>   hw/s390x/css.c | 109 ++++++++++++++++++++++++++++++++++++++++++++=
-++++++++++++-
->>>>>   1 file changed, 108 insertions(+), 1 deletion(-)
->>>>>
->>>>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
->>>>> index 6b0cd8861b..e34b2af4eb 100644
->>>>> --- a/hw/s390x/css.c
->>>>> +++ b/hw/s390x/css.c
->>>>> @@ -819,6 +819,113 @@ incr:
->>>>>       return 0;
->>>>>   }
->>>>>
->>>>> +/* returns values between 1 and bsz, where bs is a power of 2 */
->>>>> +static inline uint16_t ida_continuous_left(hwaddr cda, uint64_t bs=
-z)
->>>>> +{
->>>>> +    return bsz - (cda & (bsz - 1));
->>>>> +}
->>>>> +
->>>>> +static inline uint64_t ccw_ida_block_size(uint8_t flags)
->>>>> +{
->>>>> +    return 1ULL << (((flags ^ CDS_F_C64) & (CDS_F_C64 | CDS_F_I2K)=
-) ? 11 : 12);
->>>> If CDS_F_C64 is set, (flags ^ CDS_F_C64) will be 0, so (1ULL << 11) =
-will
->>>> be the result regardless the I2K flag? The logic seems wrong.
+> Both the above are one entry per irq source, yes?  What's the
+> rationale for having them as parallel tables, rather than bits in a
+> single per-source structure?
+
+For the sPAPR machines, yes, we could use a struct to hold both=20
+information. But these tables are defined in the HW specs and=20
+are used as such by the PowerNV platform in skiboot. They are=20
+registered by the firmware for the use of the XIVE interrupt=20
+controller.  =20
+
+When we model XIVE for PowerNV, it would be preferable to have=20
+common definitions for these tables I think.=20
+=20
+>>  - the Event Queue Descriptor (EQD) table, also known as Event
+>>    Notification Descriptor (END). The EQD contains fields that specify
+>>    the Event Queue on which event data is posted (and later pulled by
+>>    the OS) and also a target (or VPD) to notify.
 >>
->> No. If CDS_F_C64 is set then the outcome depends on the fact if
->> CDS_F_I2K is set or not.
->> (flags & CDS_F_IK) =3D> ((flags ^ CDS_F_C64) & CDS_F_IK)
->> "(flags ^ CDS_F_C64) will be 0" is wrong. flags ^ CDS_F_C64
->> just flips the CDS_F_C64.
+>> An additional table was not modeled but we might need to support the
+>> H_INT_SET_OS_REPORTING_LINE hcall:
 >>
->> OTOH if the CDS_F_C64 was not set we have the corresponding
->> bit set in flags ^ CDS_F_C64 so then the  CDS_F_I2K bit does
->> not matter: we have 1ULL << 11.
+>>  - the Virtual Processor Descriptor (VPD) table, also known as
+>>    Notification Virtual Target (NVT).
 >>
->> In my reading the logic is good.
->=20
-> So I'll just leave it...
->=20
+>> The XIVE object is expanded with the tables described above. The size
+>> of each table depends on the number of provisioned IRQ and the maximum
+>> number of CPUs in the system. The indexing is very basic and might
+>> need to be improved for the EQs.
 >>
->>>
->>> I've stared at that condition now for a bit, but all it managed was t=
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  hw/intc/spapr_xive.c        | 108 +++++++++++++++++++++++++++++++++++=
++++++++++
+>>  hw/intc/xive-internal.h     | 105 +++++++++++++++++++++++++++++++++++=
++++++++
+>>  include/hw/ppc/spapr_xive.h |   9 ++++
+>>  3 files changed, 222 insertions(+)
+>>  create mode 100644 hw/intc/xive-internal.h
+>>
+>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>> index c83796519586..6d98528fae68 100644
+>> --- a/hw/intc/spapr_xive.c
+>> +++ b/hw/intc/spapr_xive.c
+>> @@ -25,11 +25,34 @@
+>>  #include "hw/ppc/xics.h"
+>>  #include "hw/ppc/spapr_xive.h"
+>> =20
+>> +#include "xive-internal.h"
+>> =20
+>>  /*
+>>   * Main XIVE object
+>>   */
+>> =20
+>> +void spapr_xive_reset(void *dev)
+>> +{
+>> +    sPAPRXive *xive =3D SPAPR_XIVE(dev);
+>> +    int i;
+>> +
+>> +    /* SBEs are initialized to 0b01 which corresponds to "ints off" *=
+/
+>> +    memset(xive->sbe, 0x55, xive->sbe_size);
+>> +
+>> +    /* Validate all available IVEs in the IRQ number space. It would
+>> +     * be more correct to validate only the allocated IRQs but this
+>> +     * would require some callback routine from the spapr machine int=
 o
->>> get me more confused... probably just need a break.
->>>   =20
->>>>
->>>> I2K is meaningful only when C64 is 1, otherwise it is ignored. The l=
-ogic
->>>> here should be:
->>>> if ((flags & CDS_F_C64) && !(flags & CDS_F_I2K)) {
->>>>      return 1ULL << 12;
->>>> }
->>>>      return 1ULL << 11;
->>>
->>> But I do think your version is more readable... >>>
->>
->> I won't argue with this.
+>> +     * XIVE. To be done later.
+>> +     */
+>> +    for (i =3D 0; i < xive->nr_irqs; i++) {
+>> +        XiveIVE *ive =3D &xive->ivt[i];
+>> +        ive->w =3D IVE_VALID | IVE_MASKED;
+>> +    }
+>> +
+>> +    /* clear all EQs */
+>> +    memset(xive->eqt, 0, xive->nr_eqs * sizeof(XiveEQ));
+>> +}
+>> +
+>>  static void spapr_xive_realize(DeviceState *dev, Error **errp)
+>>  {
+>>      sPAPRXive *xive =3D SPAPR_XIVE(dev);
+>> @@ -44,8 +67,64 @@ static void spapr_xive_realize(DeviceState *dev, Er=
+ror **errp)
+>>          error_setg(errp, "Number of interrupts too small");
+>>          return;
+>>      }
+>> +
+>> +    /* Allocate SBEs (State Bit Entry). 2 bits, so 4 entries per byte=
+ */
+>> +    xive->sbe_size =3D DIV_ROUND_UP(xive->nr_irqs, 4);
+>> +    xive->sbe =3D g_malloc0(xive->sbe_size);
+>> +
+>> +    /* Allocate the IVT (Interrupt Virtualization Table) */
+>> +    xive->ivt =3D g_malloc0(xive->nr_irqs * sizeof(XiveIVE));
+>> +
+>> +    /* Allocate the EQDT (Event Queue Descriptor Table), 8 priorities
+>> +     * for each thread in the system */
+>> +    xive->nr_eqs =3D xive->nr_targets * XIVE_EQ_PRIORITY_COUNT;
+>> +    xive->eqt =3D g_malloc0(xive->nr_eqs * sizeof(XiveEQ));
+>> +
+>> +    qemu_register_reset(spapr_xive_reset, dev);
+>>  }
+>> =20
+>> +static const VMStateDescription vmstate_spapr_xive_ive =3D {
+>> +    .name =3D "xive/ive",
+>> +    .version_id =3D 1,
+>> +    .minimum_version_id =3D 1,
+>> +    .fields =3D (VMStateField []) {
+>> +        VMSTATE_UINT64(w, XiveIVE),
+>> +        VMSTATE_END_OF_LIST()
+>> +    },
+>> +};
+>> +
+>> +static const VMStateDescription vmstate_spapr_xive_eq =3D {
+>> +    .name =3D "xive/eq",
+>> +    .version_id =3D 1,
+>> +    .minimum_version_id =3D 1,
+>> +    .fields =3D (VMStateField []) {
+>> +        VMSTATE_UINT32(w0, XiveEQ),
+>> +        VMSTATE_UINT32(w1, XiveEQ),
+>> +        VMSTATE_UINT32(w2, XiveEQ),
+>> +        VMSTATE_UINT32(w3, XiveEQ),
+>> +        VMSTATE_UINT32(w4, XiveEQ),
+>> +        VMSTATE_UINT32(w5, XiveEQ),
+>> +        VMSTATE_UINT32(w6, XiveEQ),
+>> +        VMSTATE_UINT32(w7, XiveEQ),
+>> +        VMSTATE_END_OF_LIST()
+>> +    },
+>> +};
+>> +
+>> +static const VMStateDescription vmstate_xive =3D {
+>> +    .name =3D "xive",
+>> +    .version_id =3D 1,
+>> +    .minimum_version_id =3D 1,
+>> +    .fields =3D (VMStateField[]) {
+>> +        VMSTATE_VARRAY_UINT32_ALLOC(sbe, sPAPRXive, sbe_size, 0,
+>> +                                    vmstate_info_uint8, uint8_t),
+>=20
+> Since you're treating the SBE as a packed buffer of u8s anyway, it's
+> probably simpler to use VMSTATE_BUFFER().  I don't see that you need
+> the ALLOC - it should have already been allocated on the destination.
+>=20
+> Might be worth having a VMSTATE_UINT32_EQUAL to sanity check that
+> sbe_size is equal at either end.
 
-:)
-
->=20
-> ...and we could change that in a patch on top to avoid future confusion.
->=20
->>
->>>>  =20
->>>>> +}
->>>>> +
->>>>> +static inline int ida_read_next_idaw(CcwDataStream *cds)
->>>>> +{
->>>>> +    union {uint64_t fmt2; uint32_t fmt1; } idaw;
->>>>                                             ^
->>>> Nit.
->>>>  =20
->>
->> Maybe checkpatch wanted it this way. My memories are blurry.
->=20
->=20
-> I'd just leave it like that, tbh.
->=20
->>
->>>>> +    bool is_fmt2 =3D cds->flags & CDS_F_C64;
->>>>> +    int ret;
->>>>> +    hwaddr idaw_addr;
->>>>> +
->>>>> +    if (is_fmt2) {
->>>>> +        idaw_addr =3D cds->cda_orig + sizeof(idaw.fmt2) * cds->at_=
-idaw;
->>>>> +        if (idaw_addr & 0x07) {
->>>>> +            return -EINVAL; /* channel program check */
->>>>> +        }
->>>>> +        ret =3D address_space_rw(&address_space_memory, idaw_addr,
->>>>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &i=
-daw.fmt2,
->>>>> +                               sizeof(idaw.fmt2), false);
->>>>> +        cds->cda =3D be64_to_cpu(idaw.fmt2);
->>>>> +    } else {
->>>>> +        idaw_addr =3D cds->cda_orig + sizeof(idaw.fmt1) * cds->at_=
-idaw;
->>>>> +        if (idaw_addr & 0x03) {
->>>> ?:
->>>> (idaw_addr & 0x80000003)
->>>
->>> Yes.
->>>   =20
->>
->> I will double check this. Does not seem unreasonable but
->> double-checking is better.
->=20
-> Please let me know. I think the architecture says that the bit must be
-> zero, and that we may (...) generate a channel program check.
->=20
-
-Right (0x80000003) !=3D0 implies program check .
-It is what is done , except for the bit 0 that was forgotten.
-
->>
->>>>  =20
->>>>> +            return -EINVAL; /* channel program check */
->>>>> +
->>>>> +        }
->>>>> +        ret =3D address_space_rw(&address_space_memory, idaw_addr,
->>>>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &i=
-daw.fmt1,
->>>>> +                               sizeof(idaw.fmt1), false);
->>>>> +        cds->cda =3D be64_to_cpu(idaw.fmt1);
->>>>> +    }
->>>>> +    ++(cds->at_idaw);
->>>>> +    if (ret !=3D MEMTX_OK) {
->>>>> +        /* assume inaccessible address */
->>>>> +        return -EINVAL; /* channel program check */
->>>>> +
->>>>> +    }
->>>>> +    return 0;
->>>>> +}
->>>>> +
->>>>> +static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int =
-len,
->>>>> +                              CcwDataStreamOp op)
->>>>> +{
->>>>> +    uint64_t bsz =3D ccw_ida_block_size(cds->flags);
->>>>> +    int ret =3D 0;
->>>>> +    uint16_t cont_left, iter_len;
->>>>> +
->>>>> +    ret =3D cds_check_len(cds, len);
->>>>> +    if (ret <=3D 0) {
->>>>> +        return ret;
->>>>> +    }
->>>>> +    if (!cds->at_idaw) {
->>>>> +        /* read first idaw */
->>>>> +        ret =3D ida_read_next_idaw(cds);
->>>>> +        if (ret) {
->>>>> +            goto err;
->>>>> +        }
->>>>> +        cont_left =3D ida_continuous_left(cds->cda, bsz);
->>>>> +    } else {
->>>>> +        cont_left =3D ida_continuous_left(cds->cda, bsz);
->>>>> +        if (cont_left =3D=3D bsz) {
->>>>> +            ret =3D ida_read_next_idaw(cds);
->>>>> +            if (ret) {
->>>>> +                goto err;
->>>>> +            }
->>>>> +            if (cds->cda & (bsz - 1)) {
->>>> Could move this check into ida_read_next_idaw?
->>>
->>> I'd like to avoid further code movement...
->>>   =20
->>
->> The first idaw is special. I don't think moving is possible.
->=20
-> So, the code is correct and I'll just leave it like that.
-
-hum.
-It seems to me that the handling of the first IDAW is indeed a little=20
-bit different.
-It is accessed directly from the CCW->CDA and generated dedicated status=20
-but I do not see the handling.
-
-The channel status must be made pending with primary, secondary and=20
-alert status.
-
-I do not find this code, may be it is somewhere before, I searched but=20
-did not find it.
-Also, I do not find in the documentation that we have a program check=20
-for this case.
+OK. I will fix that.
 
 >=20
->>
->>>>  =20
->>>>> +                ret =3D -EINVAL; /* channel program check */
->>>>> +                goto err;
->>>>> +            }
->>>>> +        }
->>>>> +    }
->>>>> +    do {
->>>>> +        iter_len =3D MIN(len, cont_left);
->>>>> +        if (op !=3D CDS_OP_A) {
->>>>> +            ret =3D address_space_rw(&address_space_memory, cds->c=
-da,
->>>>> +                                   MEMTXATTRS_UNSPECIFIED, buff, i=
-ter_len, op);
->>>> Ahh, now I recall that explictly defining CDS_OP_R to 0 and CDS_OP_W=
- to
->>>> 1 in 'struct CcwDataStreamOp' do have a meaning. Does it make sense =
-to
->>>> make it more obvious by adding some comment there?
->>>
->>> Would you have a good text for that?
->>>   =20
->>
->> I'm fine with clarifications.
+>> +        VMSTATE_STRUCT_VARRAY_UINT32_ALLOC(ivt, sPAPRXive, nr_irqs, 0=
+,
+>> +                                    vmstate_spapr_xive_ive, XiveIVE),
+>> +        VMSTATE_STRUCT_VARRAY_UINT32_ALLOC(eqt, sPAPRXive, nr_eqs, 0,
+>> +                                    vmstate_spapr_xive_eq, XiveEQ),
+>> +        VMSTATE_END_OF_LIST()
+>> +    },
+>> +};
+>> +
+>>  static Property spapr_xive_properties[] =3D {
+>>      DEFINE_PROP_UINT32("nr-irqs", sPAPRXive, nr_irqs, 0),
+>>      DEFINE_PROP_UINT32("nr-targets", sPAPRXive, nr_targets, 0),
+>> @@ -59,6 +138,7 @@ static void spapr_xive_class_init(ObjectClass *klas=
+s, void *data)
+>>      dc->realize =3D spapr_xive_realize;
+>>      dc->props =3D spapr_xive_properties;
+>>      dc->desc =3D "sPAPR XIVE interrupt controller";
+>> +    dc->vmsd =3D &vmstate_xive;
+>>  }
+>> =20
+>>  static const TypeInfo spapr_xive_info =3D {
+>> @@ -74,3 +154,31 @@ static void spapr_xive_register_types(void)
+>>  }
+>> =20
+>>  type_init(spapr_xive_register_types)
+>> +
+>> +XiveIVE *spapr_xive_get_ive(sPAPRXive *xive, uint32_t idx)
+>> +{
+>> +    return idx < xive->nr_irqs ? &xive->ivt[idx] : NULL;
+>> +}
+>> +
+>> +XiveEQ *spapr_xive_get_eq(sPAPRXive *xive, uint32_t idx)
+>> +{
+>> +    return idx < xive->nr_eqs ? &xive->eqt[idx] : NULL;
+>> +}
+>> +
+>> +/* TODO: improve EQ indexing. This is very simple and relies on the
+>> + * fact that target (CPU) numbers start at 0 and are contiguous. It
+>> + * should be OK for sPAPR.
+>> + */
+>> +bool spapr_xive_eq_for_target(sPAPRXive *xive, uint32_t target,
+>> +                              uint8_t priority, uint32_t *out_eq_idx)
+>> +{
+>> +    if (priority > XIVE_PRIORITY_MAX || target >=3D xive->nr_targets)=
+ {
+>> +        return false;
+>> +    }
+>> +
+>> +    if (out_eq_idx) {
+>> +        *out_eq_idx =3D target + priority;
 >=20
-> Let's do it as a patch on top.
->=20
->>
->>>>  =20
->>>>> +            if (ret !=3D MEMTX_OK) {
->>>>> +                /* assume inaccessible address */
->>>>> +                ret =3D -EINVAL; /* channel program check */
->>>>> +                goto err;
->>>>> +            }
->>>>> +        }
->>>>> +        cds->at_byte +=3D iter_len;
->>>>> +        cds->cda +=3D iter_len;
->>>>> +        len -=3D iter_len;
->>>>> +        if (!len) {
->>>>> +            break;
->>>>> +        }
->>>>> +        ret =3D ida_read_next_idaw(cds);
->>>>> +        if (ret) {
->>>>> +            goto err;
->>>>> +        }
->>>>> +        cont_left =3D bsz;
->>>>> +    } while (true);
->>>>> +    return ret;
->>>>> +err:
->>>>> +    cds->flags |=3D CDS_F_STREAM_BROKEN;
->>>>> +    return ret;
->>>>> +}
->>>>> +
->>>>>   void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB co=
-nst *orb)
->>>>>   {
->>>>>       /*
->>>>> @@ -835,7 +942,7 @@ void ccw_dstream_init(CcwDataStream *cds, CCW1 =
-const *ccw, ORB const *orb)
->>>>>       if (!(cds->flags & CDS_F_IDA)) {
->>>>>           cds->op_handler =3D ccw_dstream_rw_noflags;
->>>>>       } else {
->>>>> -        assert(false);
->>>>> +        cds->op_handler =3D ccw_dstream_rw_ida;
->>>>>       }
->>>>>   }
->>>>>
->>>>> --=20
->>>>> 2.13.5
->>>>>     =20
->>>>
->>>> Generally, the logic looks fine to me.
->>>>  =20
->>>
->>> It did pass Halil's test; but that can only test fmt-2 + 4k blocks, a=
-s
->>> this is what the kernel infrastructure provides.
->>
->> Nod.
->>
->>>
->>> Halil, do you have some more comments?
->>>   =20
->>
->> Just a question. Do I have to respin?
->=20
-> I don't think so. If you could confirm the check for format-1, I'll
-> just fixup that one and get the queued patches out of the door.
+> Don't you need to multiply target by XIVE_EQ_PRIORITY_COUNT?
 
-generally LGTM but in my opinion the check for format-1 and the handling=20
-of the error status for the first IDA for format 1 and 2 must be cleared.
+Because this is a bug ... I was lucky to only use a high priority (7)
 
+Thanks,
+
+C.=20
 
 >=20
-> We can do more changes on top; it's not like I don't have more patches
-> waiting...
+>> +    }
+>> +
+>> +    return true;
+>> +}
+>> diff --git a/hw/intc/xive-internal.h b/hw/intc/xive-internal.h
+>> new file mode 100644
+>> index 000000000000..95184bad5c1d
+>> --- /dev/null
+>> +++ b/hw/intc/xive-internal.h
+>> @@ -0,0 +1,105 @@
+>> +/*
+>> + * QEMU PowerPC XIVE model
+>> + *
+>> + * Copyright 2016,2017 IBM Corporation.
+>> + *
+>> + * This program is free software; you can redistribute it and/or
+>> + * modify it under the terms of the GNU General Public License
+>> + * as published by the Free Software Foundation; either version
+>> + * 2 of the License, or (at your option) any later version.
+>> + */
+>> +#ifndef _INTC_XIVE_INTERNAL_H
+>> +#define _INTC_XIVE_INTERNAL_H
+>> +
+>> +/* Utilities to manipulate these (originaly from OPAL) */
+>> +#define MASK_TO_LSH(m)          (__builtin_ffsl(m) - 1)
+>> +#define GETFIELD(m, v)          (((v) & (m)) >> MASK_TO_LSH(m))
+>> +#define SETFIELD(m, v, val)                             \
+>> +        (((v) & ~(m)) | ((((typeof(v))(val)) << MASK_TO_LSH(m)) & (m)=
+))
+>> +
+>> +#define PPC_BIT(bit)            (0x8000000000000000UL >> (bit))
+>> +#define PPC_BIT32(bit)          (0x80000000UL >> (bit))
+>> +#define PPC_BIT8(bit)           (0x80UL >> (bit))
+>> +#define PPC_BITMASK(bs, be)     ((PPC_BIT(bs) - PPC_BIT(be)) | PPC_BI=
+T(bs))
+>> +#define PPC_BITMASK32(bs, be)   ((PPC_BIT32(bs) - PPC_BIT32(be)) | \
+>> +                                 PPC_BIT32(bs))
+>> +
+>> +/* IVE/EAS
+>> + *
+>> + * One per interrupt source. Targets that interrupt to a given EQ
+>> + * and provides the corresponding logical interrupt number (EQ data)
+>> + *
+>> + * We also map this structure to the escalation descriptor inside
+>> + * an EQ, though in that case the valid and masked bits are not used.
+>> + */
+>> +typedef struct XiveIVE {
+>> +        /* Use a single 64-bit definition to make it easier to
+>> +         * perform atomic updates
+>> +         */
+>> +        uint64_t        w;
+>> +#define IVE_VALID       PPC_BIT(0)
+>> +#define IVE_EQ_BLOCK    PPC_BITMASK(4, 7)        /* Destination EQ bl=
+ock# */
+>> +#define IVE_EQ_INDEX    PPC_BITMASK(8, 31)       /* Destination EQ in=
+dex */
+>> +#define IVE_MASKED      PPC_BIT(32)              /* Masked */
+>> +#define IVE_EQ_DATA     PPC_BITMASK(33, 63)      /* Data written to t=
+he EQ */
+>> +} XiveIVE;
+>> +
+>> +/* EQ */
+>> +typedef struct XiveEQ {
+>> +        uint32_t        w0;
 >=20
-
-
---=20
-Pierre Morel
-Linux/KVM/QEMU in B=C3=B6blingen - Germany
+> It'd be nice if IBM came up with better names for its fields thatn w0,
+> w1, etc.   Oh well.
+>=20
+>> +#define EQ_W0_VALID             PPC_BIT32(0)
+>> +#define EQ_W0_ENQUEUE           PPC_BIT32(1)
+>> +#define EQ_W0_UCOND_NOTIFY      PPC_BIT32(2)
+>> +#define EQ_W0_BACKLOG           PPC_BIT32(3)
+>> +#define EQ_W0_PRECL_ESC_CTL     PPC_BIT32(4)
+>> +#define EQ_W0_ESCALATE_CTL      PPC_BIT32(5)
+>> +#define EQ_W0_END_OF_INTR       PPC_BIT32(6)
+>> +#define EQ_W0_QSIZE             PPC_BITMASK32(12, 15)
+>> +#define EQ_W0_SW0               PPC_BIT32(16)
+>> +#define EQ_W0_FIRMWARE          EQ_W0_SW0 /* Owned by FW */
+>> +#define EQ_QSIZE_4K             0
+>> +#define EQ_QSIZE_64K            4
+>> +#define EQ_W0_HWDEP             PPC_BITMASK32(24, 31)
+>> +        uint32_t        w1;
+>> +#define EQ_W1_ESn               PPC_BITMASK32(0, 1)
+>> +#define EQ_W1_ESn_P             PPC_BIT32(0)
+>> +#define EQ_W1_ESn_Q             PPC_BIT32(1)
+>> +#define EQ_W1_ESe               PPC_BITMASK32(2, 3)
+>> +#define EQ_W1_ESe_P             PPC_BIT32(2)
+>> +#define EQ_W1_ESe_Q             PPC_BIT32(3)
+>> +#define EQ_W1_GENERATION        PPC_BIT32(9)
+>> +#define EQ_W1_PAGE_OFF          PPC_BITMASK32(10, 31)
+>> +        uint32_t        w2;
+>> +#define EQ_W2_MIGRATION_REG     PPC_BITMASK32(0, 3)
+>> +#define EQ_W2_OP_DESC_HI        PPC_BITMASK32(4, 31)
+>> +        uint32_t        w3;
+>> +#define EQ_W3_OP_DESC_LO        PPC_BITMASK32(0, 31)
+>> +        uint32_t        w4;
+>> +#define EQ_W4_ESC_EQ_BLOCK      PPC_BITMASK32(4, 7)
+>> +#define EQ_W4_ESC_EQ_INDEX      PPC_BITMASK32(8, 31)
+>> +        uint32_t        w5;
+>> +#define EQ_W5_ESC_EQ_DATA       PPC_BITMASK32(1, 31)
+>> +        uint32_t        w6;
+>> +#define EQ_W6_FORMAT_BIT        PPC_BIT32(8)
+>> +#define EQ_W6_NVT_BLOCK         PPC_BITMASK32(9, 12)
+>> +#define EQ_W6_NVT_INDEX         PPC_BITMASK32(13, 31)
+>> +        uint32_t        w7;
+>> +#define EQ_W7_F0_IGNORE         PPC_BIT32(0)
+>> +#define EQ_W7_F0_BLK_GROUPING   PPC_BIT32(1)
+>> +#define EQ_W7_F0_PRIORITY       PPC_BITMASK32(8, 15)
+>> +#define EQ_W7_F1_WAKEZ          PPC_BIT32(0)
+>> +#define EQ_W7_F1_LOG_SERVER_ID  PPC_BITMASK32(1, 31)
+>> +} XiveEQ;
+>> +
+>> +#define XIVE_EQ_PRIORITY_COUNT 8
+>> +#define XIVE_PRIORITY_MAX  (XIVE_EQ_PRIORITY_COUNT - 1)
+>> +
+>> +void spapr_xive_reset(void *dev);
+>> +XiveIVE *spapr_xive_get_ive(sPAPRXive *xive, uint32_t isn);
+>> +XiveEQ *spapr_xive_get_eq(sPAPRXive *xive, uint32_t idx);
+>> +
+>> +bool spapr_xive_eq_for_target(sPAPRXive *xive, uint32_t target, uint8=
+_t prio,
+>> +                        uint32_t *out_eq_idx);
+>> +
+>> +
+>> +#endif /* _INTC_XIVE_INTERNAL_H */
+>> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
+>> index 5b99f7fc2b81..b17dd4f17b0b 100644
+>> --- a/include/hw/ppc/spapr_xive.h
+>> +++ b/include/hw/ppc/spapr_xive.h
+>> @@ -22,6 +22,8 @@
+>>  #include <hw/sysbus.h>
+>> =20
+>>  typedef struct sPAPRXive sPAPRXive;
+>> +typedef struct XiveIVE XiveIVE;
+>> +typedef struct XiveEQ XiveEQ;
+>> =20
+>>  #define TYPE_SPAPR_XIVE "spapr-xive"
+>>  #define SPAPR_XIVE(obj) OBJECT_CHECK(sPAPRXive, (obj), TYPE_SPAPR_XIV=
+E)
+>> @@ -32,6 +34,13 @@ struct sPAPRXive {
+>>      /* Properties */
+>>      uint32_t     nr_targets;
+>>      uint32_t     nr_irqs;
+>> +
+>> +    /* XIVE internal tables */
+>> +    uint8_t      *sbe;
+>> +    uint32_t     sbe_size;
+>> +    XiveIVE      *ivt;
+>> +    XiveEQ       *eqt;
+>> +    uint32_t     nr_eqs;
+>>  };
+>> =20
+>>  #endif /* PPC_SPAPR_XIVE_H */
+>=20
