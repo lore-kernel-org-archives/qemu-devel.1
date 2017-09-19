@@ -1,34 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52277)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52391)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1duJTP-0004sZ-Lo
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:26:05 -0400
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1duJTd-00054Z-MW
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:26:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1duJTM-0003cI-Vf
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:26:03 -0400
-Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:47475)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1duJTM-0003az-KD
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:26:00 -0400
-Received: by mail-wm0-x235.google.com with SMTP id 13so431660wmq.2
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 07:25:59 -0700 (PDT)
-References: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
-	<CAJhHMCCZh7hvQT8x9Bks9k6=ka4G1Oybv1MrkKJ9_VZ_eRZBfQ@mail.gmail.com>
-	<CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
-	<87bmrj8eks.fsf@linaro.org>
-	<CAPnv1PKyak1G-uL=H=-Vh_9TH2dZKffYjDf_2Z+LWuqovMKCBQ@mail.gmail.com>
-	<CAKSfGUC_k6K=2Xy8pGcwuQ66DMPYCDvA47Ojgm7ntQfALGwDsQ@mail.gmail.com>
-	<CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
-	<000601d33128$2dd9d5e0$898d81a0$@ru> <87bmm7dohw.fsf@linaro.org>
-	<CAKSfGUCt7p95nDeW12Q_-BSTXVhRLPtL+=u_WLx5_BZEgAgeLw@mail.gmail.com>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <CAKSfGUCt7p95nDeW12Q_-BSTXVhRLPtL+=u_WLx5_BZEgAgeLw@mail.gmail.com>
-Date: Tue, 19 Sep 2017 15:25:57 +0100
-Message-ID: <878thaepe2.fsf@linaro.org>
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1duJTb-0003lY-0J
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:26:17 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42830
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1duJTa-0003lB-Re
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:26:14 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8JEP1IT141503
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 10:26:14 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2d33dret08-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 10:26:13 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Tue, 19 Sep 2017 15:26:12 +0100
+References: <20170913132752.8484-1-pasic@linux.vnet.ibm.com>
+	<20170913132752.8484-2-pasic@linux.vnet.ibm.com>
+	<20170914162603.1cdabd09.cohuck@redhat.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Tue, 19 Sep 2017 16:26:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] What is the best commit for record-replay?
+In-Reply-To: <20170914162603.1cdabd09.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <7f8340e7-068d-3740-81ac-c9d22fd6b6c7@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/ccs: add ccw-tester emulated
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,105 +45,148 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>, Pranith Kumar <bobby.prani+qemu@gmail.com>, pavel.dovgaluk@ispras.ru, Aleksandr Bezzubikov <abezzubikov@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>, Igor R <boost.lists@gmail.com>
+To: Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-
-Aleksandr Bezzubikov <zuban32s@gmail.com> writes:
-
-> 2017-09-19 12:30 GMT+03:00 Alex Bennée <alex.bennee@linaro.org>:
+On 14/09/2017 16:26, Cornelia Huck wrote:
+> On Wed, 13 Sep 2017 15:27:51 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+>=20
+>> Add a fake device meant for testing the correctness of our css emulati=
+on.
 >>
->> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
+>> What we currently have is writing a Fibonacci sequence of uint32_t to =
+the
+>> device via ccw write. The write is going to fail if it ain't a Fibonac=
+ci
+>> and indicate a device exception in scsw together with the proper resid=
+ual
+>> count.
 >>
->>>> From: Aleksandr Bezzubikov [mailto:zuban32s@gmail.com]
->>>> 2017-09-18 15:02 GMT+03:00 Aleksandr Bezzubikov <zuban32s@gmail.com>:
->>>> > 2017-05-02 15:42 GMT+03:00 Igor R <boost.lists@gmail.com>:
->>>> >>>>>> I'm trying to use the deterministic record/replay feature, and I would
->>>> >>>>>> like to know which commit I should take to get it work.
->>>> >>>>>> In RC0 it seems to be broken. I tried pre-MTTCG commit 2421f381dc, as
->>>> >>>>
->>>> >>>>> Can you retry with the latest rc? There were some fixes regarding rr since rc0.
->>>> >>>>
->>>> >>>>
->>>> >>>> I've taken 2.9 release, and RR does not seem to work there.
->>>> >>>> I recorded the boot process of x86 Fedora-21 linux and the replay got
->>>> >>>> stuck almost immediately.
->>>> >>>
->>>> >>> What's your command line?
->>>> >>>
->>>> >>> Does it get stuck at the same place each time?
->>>> >>>
->>>> >>> Can you boot fine with icount but without record/replay?
->>>> >>
->>>> >> Here is the exact scenario:
->>>> >> - Get 2.9 from git, configure it as follows: "./configure
->>>> >> --target-list=i386-softmmu --enable-sdl" and  make.
->>>> >> - Download https://people.debian.org/~aurel32/qemu/i386/debian_squeeze_i386_standard.qcow2
->>>> >> - Run qemu with the following command line, until login prompt:
->>>> >> -icount shift=7,rr=record,rrfile=replay.bin -drive
->>>> >> file=debian_squeeze_i386_standard.qcow2,if=none,id=img-direct -drive
->>>> >> driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
->>>> >> ide-hd,drive=img-blkreplay -monitor stdio
->>>> >> - Replay: -icount shift=7,rr=replay,rrfile=replay.bin -drive
->>>> >> file=debian_squeeze_i386_standard.qcow2,if=none,id=img-direct -drive
->>>> >> driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
->>>> >> ide-hd,drive=img-blkreplay -monitor stdio
->>>> >>
->>>> >> Every time I attempt to replay, QEMU gets stuck at the same EIP, at a
->>>> >> very early stage.
->>>> >>
->>>> >>
->>>> >>> Can you boot fine with icount but without record/replay?
->>>> >>
->>>> >> Yes. I can also enable icount and recording - it also boots fine. The
->>>> >> problem with the replay.
->>>> >
->>>> > Hi guys,
->>>> > Maybe the thread is a bit outdated, but the problem is still relevant.
->>>> > I've just tried to record and replay WinXP boot process, and I've encountered
->>>> > exactly the same problem as described above - record is fine, replay
->>>> > gets stuck early. I use current master.
->>>
->>> Maybe this commit will work: cfb2d02be9413d45b30ed6d8e38800250b6b4b48
->
-> Unfortunately this one doesn't work either. It seems we need just an
-> all-in-one fix
-> for the current implementation to make it work.
->
->>>
->>>> > And I've discovered the second problem - recording makes initial snapshot,
->>>> > but it doesn't seem to be saved to the disk - replay can't see it.
->>>
->>> It is ok, because there is a mode where snapshot is created and loaded.
->
-> So it shouldn't work properly when I use 'rrsnapshot=<name>' for both
-> record and replay?
-> Then how can I enable this mode?
->
->>>
->>>> >
->>>> > Hope you've already found the solution (as the last post was on 2 May)
->>>> > and it's just got missed the mailing list.
->>>
->>> As I know, RR is still broken in the current version.
->>> It was caused by the MTTCG implementation.
->>> Alex Bennee tried to fix RR back. Alex, have you found any solution?
->>>
->>> We also trying to find a way to fix RR. It seems, that we will reinvent BQL for RR.
+>> Of course lot's of invalid inputs (besides basic data processing) can =
+be
+>> tested with that as well.
 >>
->> I think the method outlined in my RFC is the way to go, essentially the
->> RR mutex taking over for the what the BQL did. The RFC patch hadn't
->> hoisted the mutex for the additional devices so I'm just re-basing now
->> and I'll see if I can make the changes for Igor's test case.
+>> Usage:
+>> 1) fire up a qemu with something like -device ccw-tester,devno=3Dfe.0.=
+0001
+>>     on the command line
+>> 2) exercise the device from the guest
 >>
->> --
->> Alex Bennée
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> ---
+>>
+>> Depends on the series 'add CCW indirect data access support'
+>>
+>> ---
+>>   hw/s390x/Makefile.objs |   1 +
+>>   hw/s390x/ccw-tester.c  | 179 +++++++++++++++++++++++++++++++++++++++=
+++++++++++
+>>   2 files changed, 180 insertions(+)
+>>   create mode 100644 hw/s390x/ccw-tester.c
+>>
+>=20
+>> +static int  ccw_tester_write_fib(SubchDev *sch, CCW1 ccw)
+>> +{
+>> +    CcwTesterDevice *d =3D sch->driver_data;
+>> +    bool is_fib =3D true;
+>> +    uint32_t sum;
+>> +    int ret =3D 0;
+>> +
+>> +    ccw_dstream_init(&sch->cds, &ccw, &sch->orb);
+>> +    d->fib.next =3D 0;
+>> +    while (ccw_dstream_avail(&sch->cds) > 0) {
+>> +        ret =3D ccw_dstream_read(&sch->cds,
+>> +                               d->fib.ring[abs_to_ring(d->fib.next)])=
+;
+>> +        if (ret) {
+>> +            error(0, -ret, "fib");
+>> +            break;
+>> +        }
+>> +        if (d->fib.next > 2) {
+>> +            sum =3D (d->fib.ring[abs_to_ring(d->fib.next - 1)]
+>> +                  + d->fib.ring[abs_to_ring(d->fib.next - 2)]);
+>> +            is_fib =3D sum =3D=3D  d->fib.ring[abs_to_ring(d->fib.nex=
+t)];
+>=20
+> This is not endian-safe (noticed while testing on my laptop). Trivial
+> to fix:
+>=20
+> diff --git a/hw/s390x/ccw-tester.c b/hw/s390x/ccw-tester.c
+> index c8017818c4..a425daaa34 100644
+> --- a/hw/s390x/ccw-tester.c
+> +++ b/hw/s390x/ccw-tester.c
+> @@ -58,9 +58,9 @@ static int  ccw_tester_write_fib(SubchDev *sch, CCW1 =
+ccw)
+>               break;
+>           }
+>           if (d->fib.next > 2) {
+> -            sum =3D (d->fib.ring[abs_to_ring(d->fib.next - 1)]
+> -                  + d->fib.ring[abs_to_ring(d->fib.next - 2)]);
+> -            is_fib =3D sum =3D=3D  d->fib.ring[abs_to_ring(d->fib.next=
+)];
+> +            sum =3D be32_to_cpu(d->fib.ring[abs_to_ring(d->fib.next - =
+1)])
+> +                + be32_to_cpu(d->fib.ring[abs_to_ring(d->fib.next - 2)=
+]);
+> +            is_fib =3D sum =3D=3D be32_to_cpu(d->fib.ring[abs_to_ring(=
+d->fib.next)]);
+>               if (!is_fib) {
+>                   break;
+>               }
+>=20
+>> +            if (!is_fib) {
+>> +                break;
+>> +            }
+>> +        }
+>> +        ++(d->fib.next);
+>> +    }
+>> +    if (!is_fib) {
+>> +        sch->curr_status.scsw.ctrl &=3D ~SCSW_ACTL_START_PEND;
+>> +        sch->curr_status.scsw.ctrl |=3D SCSW_STCTL_PRIMARY |
+>> +                                      SCSW_STCTL_SECONDARY |
+>> +                                      SCSW_STCTL_ALERT |
+>> +                                      SCSW_STCTL_STATUS_PEND;
+>> +        sch->curr_status.scsw.count =3D ccw_dstream_residual_count(&s=
+ch->cds);
+>> +        sch->curr_status.scsw.cpa =3D sch->channel_prog + 8;
+>> +        sch->curr_status.scsw.dstat =3D  SCSW_DSTAT_UNIT_EXCEP;
+>> +        return -EIO;
+>> +    }
+>> +    return ret;
+>> +}
+>> +
+> (...)
+>> +static Property ccw_tester_properties[] =3D {
+>> +    DEFINE_PROP_UINT16("cu_type", CcwTesterDevice, cu_type,
+>> +                        0x3831),
+>=20
+> 0x4711 would be nice :)
 
-Could you try:
+The C0C0 channel would be nice too.
+Sorry.
 
-  https://github.com/stsquad/qemu/tree/bql-and-replay-locks-v2
+>=20
+> If we want to follow up on that testdev idea (and I think we should),
+> it might make sense to have a proper type reserve to prevent accidental
+> clashes.
+>=20
+> (Or is there already something reserved for "hypervisor use" or
+> whatever?)
+>=20
+>> +    DEFINE_PROP_UINT8("chpid_type", CcwTesterDevice, chpid_type,
+>> +                       0x98),
+>> +    DEFINE_PROP_END_OF_LIST(),
+>> +};
+>=20
+> IIUC, pci-testdev provides some unit tests to testers (like kvm-tests)
+> itself. This might be an idea to follow up on for ccw as well.
+>=20
+> There's quite some potential in this. We may want to make this a
+> permanent addition.
+>=20
 
-And report back?
 
---
-Alex Bennée
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
