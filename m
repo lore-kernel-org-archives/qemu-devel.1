@@ -1,27 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56695)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57690)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duJZb-0002IZ-9O
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:32:33 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duJbT-0003g0-Kd
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:34:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duJZV-0007wV-MD
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:32:27 -0400
-References: <20170919102434.21147-1-pbonzini@redhat.com>
-	<20170919102434.21147-5-pbonzini@redhat.com>
-	<20170919125300.GL9536@redhat.com>
-	<d80b9409-9524-4a05-d0a3-d3e8f23c416b@redhat.com>
-	<20170919131208.GM9536@redhat.com>
-	<ddc23258-0e68-f2e3-72a3-c16e443a7143@redhat.com>
-	<20170919132627.GN9536@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c01b9beb-7f85-32ed-2958-f1a688ba3478@redhat.com>
-Date: Tue, 19 Sep 2017 16:32:05 +0200
+	(envelope-from <cohuck@redhat.com>) id 1duJbN-0000Xq-Dp
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:34:23 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35382)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duJbN-0000XR-5A
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:34:17 -0400
+Date: Tue, 19 Sep 2017 16:34:11 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170919163411.649d3b66.cohuck@redhat.com>
+In-Reply-To: <8e6eaeef-0ed3-4660-b445-fd0440afbe1d@linux.vnet.ibm.com>
+References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
+	<20170913115029.47626-5-pasic@linux.vnet.ibm.com>
+	<20170919055005.GE5274@bjsdjshi@linux.vnet.ibm.com>
+	<20170919114859.3e2d895b.cohuck@redhat.com>
+	<fbb3522e-4086-359a-fca7-05371b76dac7@linux.vnet.ibm.com>
+	<20170919125717.1ae0cd38.cohuck@redhat.com>
+	<9872cee8-3503-8d52-c68f-d9c61143201c@linux.vnet.ibm.com>
+	<20170919142351.1e3b66d8.cohuck@redhat.com>
+	<8e6eaeef-0ed3-4660-b445-fd0440afbe1d@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20170919132627.GN9536@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 4/4] scsi: add persistent reservation
- manager using qemu-pr-helper
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] s390x/css: support ccw IDA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +34,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 19/09/2017 15:26, Daniel P. Berrange wrote:
-> On Tue, Sep 19, 2017 at 03:23:09PM +0200, Paolo Bonzini wrote:
->> On 19/09/2017 15:12, Daniel P. Berrange wrote:
->>> On Tue, Sep 19, 2017 at 02:57:00PM +0200, Paolo Bonzini wrote:
->>>> On 19/09/2017 14:53, Daniel P. Berrange wrote:
->>>>>> +    /* Try to reconnect while sending the CDB.  */
->>>>>> +    for (attempts = 0; attempts < PR_MAX_RECONNECT_ATTEMPTS; attempts++) {
->>>>>
->>>>> I'm curious why you need to loop here. The helper daemon should be running
->>>>> already, as you're not spawning it on demand IIUC. So it shoudl either
->>>>> succeed first time, or fail every time.
->>>>
->>>> You're focusing on the usecase where the helper daemon is spawned per-VM
->>>> by the system libvirtd, which I agree is the most important one.
->>>> However, the other usecase is the one with a global daemon, access to
->>>> which is controlled via Unix permissions.  This is not SELinux-friendly,
->>>> but it is nicer for testing and it is also the only possibility for user
->>>> libvirtd.
->>>>
->>>> In that case, upgrading QEMU on the host could result in a "systemctl
->>>> restart qemu-pr-helper.service" (or, hopefully unlikely, a crash could
->>>> result in systemd respawning the daemon).  Reconnect is useful in that case.
->>>
->>> If using systemd socket activation and you restart the daemon, the listening
->>> socket should be preserved, so you shouldn't need to reconnect - the client
->>> should get queued until it has started again (likewise on crash).
->>
->> Oh, that's cool.  I didn't know that.  However, systemd socket
->> activation is optional, and it's only a handful of lines so I think it's
->> a bit nicer behavior (chardevs for example have options to reconnect).
+On Tue, 19 Sep 2017 14:32:33 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+
+> On 09/19/2017 02:23 PM, Cornelia Huck wrote:
+> > On Tue, 19 Sep 2017 14:04:03 +0200
+> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> >   
+> >> On 09/19/2017 12:57 PM, Cornelia Huck wrote:  
+> >>>>>>> +static inline int ida_read_next_idaw(CcwDataStream *cds)
+> >>>>>>> +{
+> >>>>>>> +    union {uint64_t fmt2; uint32_t fmt1; } idaw;        
+> >>>>>>                                            ^
+> >>>>>> Nit.
+> >>>>>>      
+> >>>> Maybe checkpatch wanted it this way. My memories are blurry.    
+> >>>
+> >>> I'd just leave it like that, tbh.
+> >>>     
+> >>>>>>> +    bool is_fmt2 = cds->flags & CDS_F_C64;
+> >>>>>>> +    int ret;
+> >>>>>>> +    hwaddr idaw_addr;
+> >>>>>>> +
+> >>>>>>> +    if (is_fmt2) {
+> >>>>>>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt2) * cds->at_idaw;
+> >>>>>>> +        if (idaw_addr & 0x07) {
+> >>>>>>> +            return -EINVAL; /* channel program check */
+> >>>>>>> +        }
+> >>>>>>> +        ret = address_space_rw(&address_space_memory, idaw_addr,
+> >>>>>>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt2,
+> >>>>>>> +                               sizeof(idaw.fmt2), false);
+> >>>>>>> +        cds->cda = be64_to_cpu(idaw.fmt2);    
+> >>
+> >>  
+> >>>>>>> +    } else {
+> >>>>>>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
+> >>>>>>> +        if (idaw_addr & 0x03) {        
+> >>>>>> ?:
+> >>>>>> (idaw_addr & 0x80000003)      
+> >>>>> Yes.
+> >>>>>       
+> >>>> I will double check this. Does not seem unreasonable but
+> >>>> double-checking is better.    
+> >>> Please let me know. I think the architecture says that the bit must be
+> >>> zero, and that we may (...) generate a channel program check.
+> >>>     
+> >>
+> >> Not exactly. The more significant bits part of the check
+> >> depend on the ccw format. This needs to be done for both
+> >> idaw formats. I would need to introduce a new flag, or
+> >> access the SubchDev to do this properly.
+> >>
+> >> Architecturally we also need to check the data addresses
+> >> from which we read so we have nothing bigger than 
+> >> (1 << 31) - 1 if we are working with format-1 idaws.
+> >>
+> >> I also think we did not take proper care of proper
+> >> maximum data address checks prior CwwDataStream which also
+> >> depend on the ccw format (in absence of IDAW or MIDAW).
+> >>
+> >> The ccw format dependent maximum address checks are (1 << 24) - 1
+> >> and (1 << 31) - 1 respectively for format-0 and format-1 (on
+> >> the first indirection level that is for non-IDA for the data,
+> >> and for (M)IDA for the (M)IDAWs).
+> >>
+> >> Reference:
+> >> PoP pages 16-25 and 16-26 "Invalid IDAW or MIDAW Addre" and
+> >> "Invalid Data Address".  
+> > 
+> > Sigh, when are things ever easy :(
+> > 
+> > I'll need some time to review this. But more urgently, I need a break.
+> >   
+> >>
+> >> How shall we proceed?  
+> > 
+> > Given the discussion about this patch in particular, I'll probably
+> > dequeue it and send it with the next batch of patches. We can also
+> > include the other improvements, then. Not sure whether I should just
+> > dequeue this one or the whole series (I really want to get the rest of
+> > the patches out...)
+> > 
+> > More after the break :)
+> >   
 > 
-> The downside is that if someone forget to start the daemon, or enable
-> the socket,  QEMU will spin for 5 seconds trying to reconnect, instead
-> of reporting an error immediately. 
+> I think I can fix this pretty fast, and fixing this later is
+> an option too in my opinion as the patch is consistent with our
+> prior art (we ignored this maximum address checking requirement,
+> and we keep ignoring it). 
+> 
+> I would prefer not dequeue-ing the whole series because a
+> 3270 fix of mine (which just made the internal review) depends
+> on this. IMHO, it's not like the series is fundamentally broken,
+> not ain't an improvement at all. It is not perfect, but it's
+> IMHO certainly an improvement over what we have.
 
-Not exactly:
+The issue is not that the series is problematic, but that I need to put
+a stop on changes at some point in time and just flush my queue -
+otherwise this is not workable.
 
-- the daemon must be present at startup.  Reconnect is only tried when
-sending a command.
+Therefore, I dequeued the series for now. I'll probably do another pull
+request in the next weeks anyway - so there's unlikely to be a long
+delay, and we can hash out everything without pressure.
 
-- it's not a busy wait, pr_manager_helper_run runs in an
-util/thread-pool.c worker thread (see pr_manager_execute in patch 1).
-
-Paolo
+It would be best to just think this through; then you can send a v3
+with the feedback addressed and your 3270 patch on top.
