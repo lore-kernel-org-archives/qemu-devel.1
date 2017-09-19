@@ -1,40 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35388)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1duJ1H-0007HW-34
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:57:00 -0400
+	(envelope-from <no-reply@patchew.org>) id 1duJ1M-0007LQ-Ar
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:57:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1duJ1D-0002hK-1N
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:56:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54494)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1duJ1C-0002gU-OC
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:56:54 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8JDsr5g011522
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 09:56:52 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d30021nrm-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 09:56:52 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Tue, 19 Sep 2017 14:56:49 +0100
-References: <20170919074314.10350-1-borntraeger@de.ibm.com>
-	<70c1733f-6ff7-ddd0-2799-308bf6ad2dd2@redhat.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Tue, 19 Sep 2017 15:56:46 +0200
+	(envelope-from <no-reply@patchew.org>) id 1duJ1I-0002kN-B9
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:57:04 -0400
+Resent-Message-Id: <E1duJ1I-0002kN-B9@eggs.gnu.org>
+In-Reply-To: <20170919125041.2153-1-f4bug@amsat.org>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150582940762.57.11503092763565098162@69b6ddf88678>
 MIME-Version: 1.0
-In-Reply-To: <70c1733f-6ff7-ddd0-2799-308bf6ad2dd2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <0f1c2678-bf5d-d931-eb7d-0baaf1b4b675@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/cpu: expose the guest crash
- information
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Tue, 19 Sep 2017 06:56:48 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PATCH] hw/input/lm832x: move LM8323 declarations
+ to input/keypad.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,49 +24,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Jing Liu <liujbjl@linux.vnet.ibm.com>
+To: f4bug@amsat.org
+Cc: famz@redhat.com, peter.maydell@linaro.org, balrogg@gmail.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 
-
-
-On 09/19/2017 03:14 PM, David Hildenbrand wrote:
-> 
->>      CPUState *cs = CPU(obj);
->> @@ -291,6 +345,8 @@ static void s390_cpu_initfn(Object *obj)
->>      cs->exception_index = EXCP_HLT;
->>      object_property_add(OBJECT(cpu), "id", "int64_t", s390x_cpu_get_id,
->>                          s390x_cpu_set_id, NULL, NULL, NULL);
->> +    object_property_add(obj, "crash-information", "GuestPanicInformation",
->> +                        s390x_cpu_get_crash_info_qom, NULL, NULL, NULL, NULL);
->>      s390_cpu_model_register_props(obj);
->>  #if !defined(CONFIG_USER_ONLY)
->>      qemu_get_timedate(&tm, 0);
->> @@ -517,6 +573,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
->>      cc->do_interrupt = s390_cpu_do_interrupt;
->>  #endif
->>      cc->dump_state = s390_cpu_dump_state;
->> +    cc->get_crash_info = s390x_cpu_get_crash_info;
->>      cc->set_pc = s390_cpu_set_pc;
->>      cc->gdb_read_register = s390_cpu_gdb_read_register;
->>      cc->gdb_write_register = s390_cpu_gdb_write_register;
->> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->> index 0bd97a5..dba32db 100644
->> --- a/target/s390x/cpu.h
->> +++ b/target/s390x/cpu.h
->> @@ -396,6 +396,12 @@ static inline void cpu_get_tb_cpu_state(CPUS390XState* env, target_ulong *pc,
->>  #define EXCP_IO  7 /* I/O interrupt */
->>  #define EXCP_MCHK 8 /* machine check */
->>  
->> +/* Crash cases. */
->> +#define EXCP_CRASH_PGM 9
->> +#define EXCP_CRASH_EXT 10
->> +#define EXCP_CRASH_WAITPSW 11
->> +#define EXCP_CRASH_OPEREXC 12
->> +
-> 
-> Okay, looking at cpu_handle_exception() I am pretty sure this won't work
-> with TCG unless cpu->exception_index >= EXCP_INTERRUPT. Maybe define new
-> EXCP_CRASH or store this information somewhere else inside s390 CPU?
-
-Just asking: 
-Would it be ok to define EXCP_CRASH as 0x20000 or so?
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQQVRDSF0gaHcvaW5wdXQvbG04MzJ4OiBtb3ZlIExNODMyMyBkZWNsYXJhdGlvbnMg
+dG8gaW5wdXQva2V5cGFkLmgKTWVzc2FnZS1pZDogMjAxNzA5MTkxMjUwNDEuMjE1My0xLWY0YnVn
+QGFtc2F0Lm9yZwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
+L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
+d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
+dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
+Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
+Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
+ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
+IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
+Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
+ODcxMzM4NAplcnJvcjogUlBDIGZhaWxlZDsgY3VybCAxOCB0cmFuc2ZlciBjbG9zZWQgd2l0aCBv
+dXRzdGFuZGluZyByZWFkIGRhdGEgcmVtYWluaW5nCmZhdGFsOiBUaGUgcmVtb3RlIGVuZCBodW5n
+IHVwIHVuZXhwZWN0ZWRseQplcnJvcjogQ291bGQgbm90IGZldGNoIDNjOGNmNWE5YzIxZmY4Nzgy
+MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3Qp
+OgogIEZpbGUgIi91c3IvYmluL3BhdGNoZXciLCBsaW5lIDQ0MiwgaW4gdGVzdF9vbmUKICAgIGdp
+dF9jbG9uZV9yZXBvKGNsb25lLCByWyJyZXBvIl0sIHJbImhlYWQiXSwgbG9nZikKICBGaWxlICIv
+dXNyL2Jpbi9wYXRjaGV3IiwgbGluZSA0OCwgaW4gZ2l0X2Nsb25lX3JlcG8KICAgIHN0ZG91dD1s
+b2dmLCBzdGRlcnI9bG9nZikKICBGaWxlICIvdXNyL2xpYjY0L3B5dGhvbjMuNi9zdWJwcm9jZXNz
+LnB5IiwgbGluZSAyOTEsIGluIGNoZWNrX2NhbGwKICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJv
+cihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdb
+J2dpdCcsICdyZW1vdGUnLCAnYWRkJywgJy1mJywgJy0tbWlycm9yPWZldGNoJywgJzNjOGNmNWE5
+YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQnLCAnaHR0cHM6Ly9naXRodWIuY29tL3Bh
+dGNoZXctcHJvamVjdC9xZW11J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDEuCgoK
+Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
+Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZy
+ZWVsaXN0cy5vcmc=
