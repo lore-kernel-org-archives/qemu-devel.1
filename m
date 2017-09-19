@@ -1,24 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59683)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59723)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHf4-0003ly-UC
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:00 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHf7-0003oC-44
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHf2-0005F8-Ke
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:29:58 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:37388)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHf6-0005Gz-9c
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:01 -0400
+Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:37665)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1duHf2-0005Ev-Ee
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:29:56 -0400
-Received: by mail-wm0-x244.google.com with SMTP id f4so3731700wmh.4
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:29:56 -0700 (PDT)
+	id 1duHf6-0005Ga-3m
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:00 -0400
+Received: by mail-wr0-x244.google.com with SMTP id u48so2145775wrf.4
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:29:59 -0700 (PDT)
+Received: from 640k.lan (dynamic-adsl-78-12-246-117.clienti.tiscali.it.
+	[78.12.246.117]) by smtp.gmail.com with ESMTPSA id
+	k18sm1292878wmd.22.2017.09.19.05.29.58 for <qemu-devel@nongnu.org>
+	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+	Tue, 19 Sep 2017 05:29:58 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 19 Sep 2017 14:29:00 +0200
-Message-Id: <1505824179-21541-12-git-send-email-pbonzini@redhat.com>
+Date: Tue, 19 Sep 2017 14:29:03 +0200
+Message-Id: <1505824179-21541-15-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
 References: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 11/50] scsi-block: Support rerror/werror
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 14/50] scsi: introduce scsi_build_sense
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,117 +36,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Fam Zheng <famz@redhat.com>
 
-From: Fam Zheng <famz@redhat.com>
+Move more knowledge of sense data format out of hw/scsi/scsi-bus.c
+for reusability.
 
-This makes the werror/rerror options available on the scsi-block device,
-to allow user specify error handling policy similar to scsi-hd.
-
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Message-Id: <20170821141008.19383-5-famz@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/scsi/scsi-disk.c | 38 ++++++++++++++++++++++++--------------
- 1 file changed, 24 insertions(+), 14 deletions(-)
+ hw/scsi/scsi-bus.c   |  8 +-------
+ include/scsi/utils.h |  2 ++
+ scsi/utils.c         | 11 +++++++++++
+ 3 files changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/hw/scsi/scsi-disk.c b/hw/scsi/scsi-disk.c
-index 5f1e5e8..cf38f93 100644
---- a/hw/scsi/scsi-disk.c
-+++ b/hw/scsi/scsi-disk.c
-@@ -39,6 +39,7 @@ do { printf("scsi-disk: " fmt , ## __VA_ARGS__); } while (0)
- #include "hw/block/block.h"
- #include "sysemu/dma.h"
- #include "qemu/cutils.h"
-+#include "scsi/scsi.h"
- 
- #ifdef __linux
- #include <scsi/sg.h>
-@@ -106,7 +107,7 @@ typedef struct SCSIDiskState
-     bool tray_locked;
- } SCSIDiskState;
- 
--static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed);
-+static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed);
- 
- static void scsi_free_request(SCSIRequest *req)
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index 42920d5..652ab04 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -818,13 +818,7 @@ void scsi_req_build_sense(SCSIRequest *req, SCSISense sense)
  {
-@@ -184,19 +185,10 @@ static bool scsi_disk_req_check_error(SCSIDiskReq *r, int ret, bool acct_failed)
-         return true;
-     }
- 
--    if (ret < 0) {
-+    if (ret < 0 || (r->status && *r->status)) {
-         return scsi_handle_rw_error(r, -ret, acct_failed);
-     }
- 
--    if (r->status && *r->status) {
--        if (acct_failed) {
--            SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
--            block_acct_failed(blk_get_stats(s->qdev.conf.blk), &r->acct);
--        }
--        scsi_req_complete(&r->req, *r->status);
--        return true;
--    }
--
-     return false;
+     trace_scsi_req_build_sense(req->dev->id, req->lun, req->tag,
+                                sense.key, sense.asc, sense.ascq);
+-    memset(req->sense, 0, 18);
+-    req->sense[0] = 0x70;
+-    req->sense[2] = sense.key;
+-    req->sense[7] = 10;
+-    req->sense[12] = sense.asc;
+-    req->sense[13] = sense.ascq;
+-    req->sense_len = 18;
++    req->sense_len = scsi_build_sense(req->sense, sense);
  }
  
-@@ -422,13 +414,13 @@ static void scsi_read_data(SCSIRequest *req)
- }
+ static void scsi_req_enqueue_internal(SCSIRequest *req)
+diff --git a/include/scsi/utils.h b/include/scsi/utils.h
+index 90bf4dc..b49392d 100644
+--- a/include/scsi/utils.h
++++ b/include/scsi/utils.h
+@@ -30,6 +30,8 @@ typedef struct SCSISense {
+     uint8_t ascq;
+ } SCSISense;
  
++int scsi_build_sense(uint8_t *buf, SCSISense sense);
++
  /*
-- * scsi_handle_rw_error has two return values.  0 means that the error
-- * must be ignored, 1 means that the error has been processed and the
-+ * scsi_handle_rw_error has two return values.  False means that the error
-+ * must be ignored, true means that the error has been processed and the
-  * caller should not do anything else for this request.  Note that
-  * scsi_handle_rw_error always manages its reference counts, independent
-  * of the return value.
+  * Predefined sense codes
   */
--static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
-+static bool scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
- {
-     bool is_read = (r->req.cmd.mode == SCSI_XFER_FROM_DEV);
-     SCSIDiskState *s = DO_UPCAST(SCSIDiskState, qdev, r->req.dev);
-@@ -440,6 +432,11 @@ static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
-             block_acct_failed(blk_get_stats(s->qdev.conf.blk), &r->acct);
-         }
-         switch (error) {
-+        case 0:
-+            /* The command has run, no need to fake sense.  */
-+            assert(r->status && *r->status);
-+            scsi_req_complete(&r->req, *r->status);
-+            break;
-         case ENOMEDIUM:
-             scsi_check_condition(r, SENSE_CODE(NO_MEDIUM));
-             break;
-@@ -457,6 +454,18 @@ static int scsi_handle_rw_error(SCSIDiskReq *r, int error, bool acct_failed)
-             break;
-         }
-     }
-+    if (!error) {
-+        assert(r->status && *r->status);
-+        error = scsi_sense_buf_to_errno(r->req.sense, sizeof(r->req.sense));
-+
-+        if (error == ECANCELED || error == EAGAIN || error == ENOTCONN ||
-+            error == 0)  {
-+            /* These errors are handled by guest. */
-+            scsi_req_complete(&r->req, *r->status);
-+            return true;
-+        }
-+    }
-+
-     blk_error_action(s->qdev.conf.blk, action, is_read, error);
-     if (action == BLOCK_ERROR_ACTION_STOP) {
-         scsi_req_retry(&r->req);
-@@ -2972,6 +2981,7 @@ static const TypeInfo scsi_cd_info = {
+diff --git a/scsi/utils.c b/scsi/utils.c
+index 2327e06..89d9167 100644
+--- a/scsi/utils.c
++++ b/scsi/utils.c
+@@ -96,6 +96,17 @@ int scsi_cdb_length(uint8_t *buf)
+     return cdb_len;
+ }
  
- #ifdef __linux__
- static Property scsi_block_properties[] = {
-+    DEFINE_BLOCK_ERROR_PROPERTIES(SCSIDiskState, qdev.conf),         \
-     DEFINE_PROP_DRIVE("drive", SCSIDiskState, qdev.conf.blk),
-     DEFINE_PROP_END_OF_LIST(),
- };
++int scsi_build_sense(uint8_t *buf, SCSISense sense)
++{
++    memset(buf, 0, 18);
++    buf[0] = 0x70;
++    buf[2] = sense.key;
++    buf[7] = 10;
++    buf[12] = sense.asc;
++    buf[13] = sense.ascq;
++    return 18;
++}
++
+ /*
+  * Predefined sense codes
+  */
 -- 
 1.8.3.1
