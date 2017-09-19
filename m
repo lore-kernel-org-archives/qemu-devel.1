@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59551)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59612)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHev-0003ey-PC
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:29:50 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHey-0003fq-Kt
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:29:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHer-00059E-Va
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:29:49 -0400
-Received: from mail-wr0-x243.google.com ([2a00:1450:400c:c0c::243]:33609)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHex-0005Cq-AO
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:29:52 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:34338)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1duHer-00058k-QV
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:29:45 -0400
-Received: by mail-wr0-x243.google.com with SMTP id b9so2160707wra.0
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:29:45 -0700 (PDT)
+	id 1duHex-0005CH-3O
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:29:51 -0400
+Received: by mail-wr0-x241.google.com with SMTP id k20so2149239wre.1
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:29:50 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 19 Sep 2017 14:28:50 +0200
-Message-Id: <1505824179-21541-2-git-send-email-pbonzini@redhat.com>
+Date: Tue, 19 Sep 2017 14:28:55 +0200
+Message-Id: <1505824179-21541-7-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
 References: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 01/50] target/i386: fix pmovsx/pmovzx in-place
- operations
+Subject: [Qemu-devel] [PULL 06/50] virtio-scsi: Add virtqueue_size parameter
+ allowing virtqueue size to be set.
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +29,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Joseph Myers <joseph@codesourcery.com>
+Cc: "Richard W.M. Jones" <rjones@redhat.com>
 
-From: Joseph Myers <joseph@codesourcery.com>
+From: "Richard W.M. Jones" <rjones@redhat.com>
 
-The SSE4.1 pmovsx* and pmovzx* instructions take packed 1-byte, 2-byte
-or 4-byte inputs and sign-extend or zero-extend them to a wider vector
-output.  The associated helpers for these instructions do the
-extension on each element in turn, starting with the lowest.  If the
-input and output are the same register, this means that all the input
-elements after the first have been overwritten before they are read.
-This patch makes the helpers extend starting with the highest element,
-not the lowest, to avoid such overwriting.  This fixes many GCC test
-failures (161 in the gcc testsuite in my GCC 6-based testing) when
-testing with a default CPU setting enabling those instructions.
+Since Linux switched to blk-mq as the default in Linux commit
+5c279bd9e406 ("scsi: default to scsi-mq"), virtio-scsi LUNs consume
+about 10x as much guest kernel memory.
 
-Signed-off-by: Joseph Myers <joseph@codesourcery.com>
+This commit allows you to choose the virtqueue size for each
+virtio-scsi-pci controller like this:
 
-Message-Id: <alpine.DEB.2.20.1708082018390.23380@digraph.polyomino.org.uk>
+  -device virtio-scsi-pci,id=scsi,virtqueue_size=16
+
+The default is still 128 as before.  Using smaller virtqueue_size
+allows many more disks to be added to small memory virtual machines.
+For a 1 vCPU, 500 MB, no swap VM I observed:
+
+  With scsi-mq enabled (upstream kernel):              175 disks
+    -"- ditto -"-   virtqueue_size=64:                 318 disks
+    -"- ditto -"-   virtqueue_size=16:                 775 disks
+  With scsi-mq disabled (kernel before 5c279bd9e406): 1755 disks
+
+Note that to have any effect, this requires a kernel patch:
+
+  https://lkml.org/lkml/2017/8/10/689
+
+Signed-off-by: Richard W.M. Jones <rjones@redhat.com>
+Message-Id: <20170810165255.20865-1-rjones@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/ops_sse.h | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ hw/scsi/virtio-scsi.c           | 8 +++++---
+ include/hw/virtio/virtio-scsi.h | 2 +-
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/target/i386/ops_sse.h b/target/i386/ops_sse.h
-index 16509d0..d578216 100644
---- a/target/i386/ops_sse.h
-+++ b/target/i386/ops_sse.h
-@@ -1617,18 +1617,18 @@ void glue(helper_ptest, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)
- #define SSE_HELPER_F(name, elem, num, F)        \
-     void glue(name, SUFFIX)(CPUX86State *env, Reg *d, Reg *s)     \
-     {                                           \
--        d->elem(0) = F(0);                      \
--        d->elem(1) = F(1);                      \
-         if (num > 2) {                          \
--            d->elem(2) = F(2);                  \
--            d->elem(3) = F(3);                  \
-             if (num > 4) {                      \
--                d->elem(4) = F(4);              \
--                d->elem(5) = F(5);              \
--                d->elem(6) = F(6);              \
-                 d->elem(7) = F(7);              \
-+                d->elem(6) = F(6);              \
-+                d->elem(5) = F(5);              \
-+                d->elem(4) = F(4);              \
-             }                                   \
-+            d->elem(3) = F(3);                  \
-+            d->elem(2) = F(2);                  \
-         }                                       \
-+        d->elem(1) = F(1);                      \
-+        d->elem(0) = F(0);                      \
-     }
+diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
+index eb63944..aca1909 100644
+--- a/hw/scsi/virtio-scsi.c
++++ b/hw/scsi/virtio-scsi.c
+@@ -867,10 +867,10 @@ void virtio_scsi_common_realize(DeviceState *dev,
+     s->sense_size = VIRTIO_SCSI_SENSE_DEFAULT_SIZE;
+     s->cdb_size = VIRTIO_SCSI_CDB_DEFAULT_SIZE;
  
- SSE_HELPER_F(helper_pmovsxbw, W, 8, (int8_t) s->B)
+-    s->ctrl_vq = virtio_add_queue(vdev, VIRTIO_SCSI_VQ_SIZE, ctrl);
+-    s->event_vq = virtio_add_queue(vdev, VIRTIO_SCSI_VQ_SIZE, evt);
++    s->ctrl_vq = virtio_add_queue(vdev, s->conf.virtqueue_size, ctrl);
++    s->event_vq = virtio_add_queue(vdev, s->conf.virtqueue_size, evt);
+     for (i = 0; i < s->conf.num_queues; i++) {
+-        s->cmd_vqs[i] = virtio_add_queue(vdev, VIRTIO_SCSI_VQ_SIZE, cmd);
++        s->cmd_vqs[i] = virtio_add_queue(vdev, s->conf.virtqueue_size, cmd);
+     }
+ }
+ 
+@@ -917,6 +917,8 @@ static void virtio_scsi_device_unrealize(DeviceState *dev, Error **errp)
+ 
+ static Property virtio_scsi_properties[] = {
+     DEFINE_PROP_UINT32("num_queues", VirtIOSCSI, parent_obj.conf.num_queues, 1),
++    DEFINE_PROP_UINT32("virtqueue_size", VirtIOSCSI,
++                                         parent_obj.conf.virtqueue_size, 128),
+     DEFINE_PROP_UINT32("max_sectors", VirtIOSCSI, parent_obj.conf.max_sectors,
+                                                   0xFFFF),
+     DEFINE_PROP_UINT32("cmd_per_lun", VirtIOSCSI, parent_obj.conf.cmd_per_lun,
+diff --git a/include/hw/virtio/virtio-scsi.h b/include/hw/virtio/virtio-scsi.h
+index de6ae5a..4c0bcdb 100644
+--- a/include/hw/virtio/virtio-scsi.h
++++ b/include/hw/virtio/virtio-scsi.h
+@@ -32,7 +32,6 @@
+ #define VIRTIO_SCSI(obj) \
+         OBJECT_CHECK(VirtIOSCSI, (obj), TYPE_VIRTIO_SCSI)
+ 
+-#define VIRTIO_SCSI_VQ_SIZE     128
+ #define VIRTIO_SCSI_MAX_CHANNEL 0
+ #define VIRTIO_SCSI_MAX_TARGET  255
+ #define VIRTIO_SCSI_MAX_LUN     16383
+@@ -48,6 +47,7 @@ typedef struct virtio_scsi_config VirtIOSCSIConfig;
+ 
+ struct VirtIOSCSIConf {
+     uint32_t num_queues;
++    uint32_t virtqueue_size;
+     uint32_t max_sectors;
+     uint32_t cmd_per_lun;
+ #ifdef CONFIG_VHOST_SCSI
 -- 
 1.8.3.1
