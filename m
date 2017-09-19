@@ -1,34 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52518)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58735)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1duC22-00058M-VL
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 02:29:20 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1duCTI-0003gR-CD
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 02:57:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1duC1z-00071L-KR
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 02:29:18 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36366)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1duC1z-00070e-BI
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 02:29:15 -0400
-Date: Tue, 19 Sep 2017 14:29:03 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170919062903.GH3617@pxdev.xzpeter.org>
-References: <CAJ+F1CL1CekcYq2xnrkhsjyx17FDSgppP1C+YqL0iNgv8HbwYQ@mail.gmail.com>
-	<20170914185314.GA3280@work-vm>
-	<20170915044622.GO3617@pxdev.xzpeter.org>
-	<CAJ+F1CKGsYbK5M6WKGSCioFCFY79WjFCtEQGqudiuA-QZTfOCA@mail.gmail.com>
-	<20170918083737.GD3617@pxdev.xzpeter.org>
-	<CAJ+F1C+ZE2xDVK8Ni7CaVbH6NHEz0-xXh_1gqwF-jf6T0iA16Q@mail.gmail.com>
-	<20170918105516.GD2581@work-vm>
-	<CAJ+F1CL3UwzTO7APLnR1MUFg+XWF1B8VJkmNQGBa3bqB_bXNfg@mail.gmail.com>
-	<20170918112618.GF2581@work-vm>
-	<CAJ+F1CLkTZMgUtpPUu_3SkscYDRuM0+zjWsiJ6-a-CtZYOLhBA@mail.gmail.com>
+	(envelope-from <aik@ozlabs.ru>) id 1duCTE-0003vx-82
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 02:57:28 -0400
+Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:33729)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1duCTD-0003uq-W1
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 02:57:24 -0400
+Received: by mail-it0-x244.google.com with SMTP id g18so1878477itg.0
+	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 23:57:23 -0700 (PDT)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+References: <20170918101709.30421-1-aik@ozlabs.ru>
+	<20170918101709.30421-2-aik@ozlabs.ru>
+	<c01622e7-3e6d-cf90-a28c-aa31b4857887@redhat.com>
+	<2debed31-4c28-6dc3-b159-1fdc3fbf87f5@ozlabs.ru>
+Message-ID: <a85cbaf9-d7c7-403b-2dfc-886f9ddc0920@ozlabs.ru>
+Date: Tue, 19 Sep 2017 16:57:17 +1000
 MIME-Version: 1.0
+In-Reply-To: <2debed31-4c28-6dc3-b159-1fdc3fbf87f5@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJ+F1CLkTZMgUtpPUu_3SkscYDRuM0+zjWsiJ6-a-CtZYOLhBA@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 00/15] QMP: out-of-band (OOB) execution
- support
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v3 01/13] memory: Postpone flatview
+ and dispatch tree building till all devices are added
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,271 +33,168 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, QEMU <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On Mon, Sep 18, 2017 at 06:09:29PM +0200, Marc-Andr=C3=A9 Lureau wrote:
-> On Mon, Sep 18, 2017 at 1:26 PM, Dr. David Alan Gilbert
-> <dgilbert@redhat.com> wrote:
-> > * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
-> >> Hi
-> >>
-> >> On Mon, Sep 18, 2017 at 12:55 PM, Dr. David Alan Gilbert
-> >> <dgilbert@redhat.com> wrote:
-> >> > * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote:
-> >> >> Hi
-> >> >>
-> >> >> On Mon, Sep 18, 2017 at 10:37 AM, Peter Xu <peterx@redhat.com> wr=
-ote:
-> >> >> > On Fri, Sep 15, 2017 at 01:14:47PM +0200, Marc-Andr=C3=A9 Lurea=
-u wrote:
-> >> >> >> Hi
-> >> >> >>
-> >> >> >> On Thu, Sep 14, 2017 at 9:46 PM, Peter Xu <peterx@redhat.com> =
-wrote:
-> >> >> >> > On Thu, Sep 14, 2017 at 07:53:15PM +0100, Dr. David Alan Gil=
-bert wrote:
-> >> >> >> >> * Marc-Andr=C3=A9 Lureau (marcandre.lureau@gmail.com) wrote=
-:
-> >> >> >> >> > Hi
-> >> >> >> >> >
-> >> >> >> >> > On Thu, Sep 14, 2017 at 9:50 AM, Peter Xu <peterx@redhat.=
-com> wrote:
-> >> >> >> >> > > This series was born from this one:
-> >> >> >> >> > >
-> >> >> >> >> > >   https://lists.gnu.org/archive/html/qemu-devel/2017-08=
-/msg04310.html
-> >> >> >> >> > >
-> >> >> >> >> > > The design comes from Markus, and also the whole-bunch-=
-of discussions
-> >> >> >> >> > > in previous thread.  My heartful thanks to Markus, Dani=
-el, Dave,
-> >> >> >> >> > > Stefan, etc. on discussing the topic (...again!), provi=
-ding shiny
-> >> >> >> >> > > ideas and suggestions.  Finally we got such a solution =
-that seems to
-> >> >> >> >> > > satisfy everyone.
-> >> >> >> >> > >
-> >> >> >> >> > > I re-started the versioning since this series is totall=
-y different
-> >> >> >> >> > > from previous one.  Now it's version 1.
-> >> >> >> >> > >
-> >> >> >> >> > > In case new reviewers come along the way without readin=
-g previous
-> >> >> >> >> > > discussions, I will try to do a summary on what this is=
- all about.
-> >> >> >> >> > >
-> >> >> >> >> > > What is OOB execution?
-> >> >> >> >> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> >> >> >> >> > >
-> >> >> >> >> > > It's the shortcut of Out-Of-Band execution, its name is=
- given by
-> >> >> >> >> > > Markus.  It's a way to quickly execute a QMP request.  =
-Say, originally
-> >> >> >> >> > > QMP is going throw these steps:
-> >> >> >> >> > >
-> >> >> >> >> > >       JSON Parser --> QMP Dispatcher --> Respond
-> >> >> >> >> > >           /|\    (2)                (3)     |
-> >> >> >> >> > >        (1) |                               \|/ (4)
-> >> >> >> >> > >            +---------  main thread  --------+
-> >> >> >> >> > >
-> >> >> >> >> > > The requests are executed by the so-called QMP-dispatch=
-er after the
-> >> >> >> >> > > JSON is parsed.  If OOB is on, we run the command direc=
-tly in the
-> >> >> >> >> > > parser and quickly returns.
-> >> >> >> >> >
-> >> >> >> >> > All commands should have the "id" field mandatory in this=
- case, else
-> >> >> >> >> > the client will not distinguish the replies coming from t=
-he last/oob
-> >> >> >> >> > and the previous commands.
-> >> >> >> >> >
-> >> >> >> >> > This should probably be enforced upfront by client capabi=
-lity checks,
-> >> >> >> >> > more below.
-> >> >> >> >
-> >> >> >> > Hmm yes since the oob commands are actually running in async=
- way,
-> >> >> >> > request ID should be needed here.  However I'm not sure whet=
-her
-> >> >> >> > enabling the whole "request ID" thing is too big for this "t=
-ry to be
-> >> >> >> > small" oob change... And IMHO it suites better to be part of=
- the whole
-> >> >> >> > async work (no matter which implementation we'll use).
-> >> >> >> >
-> >> >> >> > How about this: we make "id" mandatory for "run-oob" request=
-s only.
-> >> >> >> > For oob commands, they will always have ID then no ordering =
-issue, and
-> >> >> >> > we can do it async; for the rest of non-oob commands, we sti=
-ll allow
-> >> >> >> > them to go without ID, and since they are not oob, they'll a=
-lways be
-> >> >> >> > done in order as well.  Would this work?
-> >> >> >>
-> >> >> >> This mixed-mode is imho more complicated to deal with than hav=
-ing the
-> >> >> >> protocol enforced one way or the other, but that should work.
-> >> >> >>
-> >> >> >> >
-> >> >> >> >> >
-> >> >> >> >> > > Yeah I know in current code the parser calls dispatcher=
- directly
-> >> >> >> >> > > (please see handle_qmp_command()).  However it's not tr=
-ue again after
-> >> >> >> >> > > this series (parser will has its own IO thread, and dis=
-patcher will
-> >> >> >> >> > > still be run in main thread).  So this OOB does brings =
-something
-> >> >> >> >> > > different.
-> >> >> >> >> > >
-> >> >> >> >> > > There are more details on why OOB and the difference/re=
-lationship
-> >> >> >> >> > > between OOB, async QMP, block/general jobs, etc.. but I=
-MHO that's
-> >> >> >> >> > > slightly out of topic (and believe me, it's not easy fo=
-r me to
-> >> >> >> >> > > summarize that).  For more information, please refers t=
-o [1].
-> >> >> >> >> > >
-> >> >> >> >> > > Summary ends here.
-> >> >> >> >> > >
-> >> >> >> >> > > Some Implementation Details
-> >> >> >> >> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-> >> >> >> >> > >
-> >> >> >> >> > > Again, I mentioned that the old QMP workflow is this:
-> >> >> >> >> > >
-> >> >> >> >> > >       JSON Parser --> QMP Dispatcher --> Respond
-> >> >> >> >> > >           /|\    (2)                (3)     |
-> >> >> >> >> > >        (1) |                               \|/ (4)
-> >> >> >> >> > >            +---------  main thread  --------+
-> >> >> >> >> > >
-> >> >> >> >> > > What this series does is, firstly:
-> >> >> >> >> > >
-> >> >> >> >> > >       JSON Parser     QMP Dispatcher --> Respond
-> >> >> >> >> > >           /|\ |           /|\       (4)     |
-> >> >> >> >> > >            |  | (2)        | (3)            |  (5)
-> >> >> >> >> > >        (1) |  +----->      |               \|/
-> >> >> >> >> > >            +---------  main thread  <-------+
-> >> >> >> >> > >
-> >> >> >> >> > > And further:
-> >> >> >> >> > >
-> >> >> >> >> > >                queue/kick
-> >> >> >> >> > >      JSON Parser =3D=3D=3D=3D=3D=3D> QMP Dispatcher -->=
- Respond
-> >> >> >> >> > >          /|\ |     (3)       /|\        (4)    |
-> >> >> >> >> > >       (1) |  | (2)            |                |  (5)
-> >> >> >> >> > >           | \|/               |               \|/
-> >> >> >> >> > >         IO thread         main thread  <-------+
-> >> >> >> >> >
-> >> >> >> >> > Is the queue per monitor or per client?
-> >> >> >> >
-> >> >> >> > The queue is currently global. I think yes maybe at least we=
- can do it
-> >> >> >> > per monitor, but I am not sure whether that is urgent or can=
- be
-> >> >> >> > postponed.  After all now QMPRequest (please refer to patch =
-11) is
-> >> >> >> > defined as (mon, id, req) tuple, so at least "id" namespace =
-is
-> >> >> >> > per-monitor.
-> >> >> >> >
-> >> >> >> >> > And is the dispatching going
-> >> >> >> >> > to be processed even if the client is disconnected, and a=
-re new
-> >> >> >> >> > clients going to receive the replies from previous client=
-s
-> >> >> >> >> > commands?
-> >> >> >> >
-> >> >> >> > [1]
-> >> >> >> >
-> >> >> >> > (will discuss together below)
-> >> >> >> >
-> >> >> >> >> > I
-> >> >> >> >> > believe there should be a per-client context, so there wo=
-n't be "id"
-> >> >> >> >> > request conflicts.
-> >> >> >> >
-> >> >> >> > I'd say I am not familiar with this "client" idea, since aft=
-er all
-> >> >> >> > IMHO one monitor is currently designed to mostly work with a=
- single
-> >> >> >> > client. Say, unix sockets, telnet, all these backends are on=
-ly single
-> >> >> >> > channeled, and one monitor instance can only work with one c=
-lient at a
-> >> >> >> > time.  Then do we really need to add this client layer upon =
-it?  IMHO
-> >> >> >> > the user can just provide more monitors if they wants more c=
-lients
-> >> >> >> > (and at least these clients should know the existance of the=
- others or
-> >> >> >> > there might be problem, otherwise user2 will fail a migratio=
-n, finally
-> >> >> >> > noticed that user1 has already triggered one), and the user =
-should
-> >> >> >> > manage them well.
-> >> >> >>
-> >> >> >> qemu should support a management layer / libvirt restart/recon=
-nect.
-> >> >> >> Afaik, it mostly work today. There might be a cases where libv=
-irt can
-> >> >> >> be confused if it receives a reply from a previous connection =
-command,
-> >> >> >> but due to the sync processing of the chardev, I am not sure y=
-ou can
-> >> >> >> get in this situation.  By adding "oob" commands and queuing, =
-the
-> >> >> >> client will have to remember which was the last "id" used, or =
-it will
-> >> >> >> create more conflict after a reconnect.
-> >> >> >>
-> >> >> >> Imho we should introduce the client/connection concept to avoi=
-d this
-> >> >> >> confusion (unexpected reply & per client id space).
-> >> >> >
-> >> >> > Hmm I agree that the reconnect feature would be nice, but if so=
- IMHO
-> >> >> > instead of throwing responses away when client disconnect, we s=
-hould
-> >> >> > really keep them, and when the client reconnects, we queue the
-> >> >> > responses again.
-> >> >> >
-> >> >> > I think we have other quite simple ways to solve the "unexpecte=
-d
-> >> >> > reply" and "per-client-id duplication" issues you have mentione=
-d.
-> >> >> >
-> >> >> > Firstly, when client gets unexpected replies ("id" field not in=
- its
-> >> >> > own request queue), the client should just ignore that reply, w=
-hich
-> >> >> > seems natural to me.
-> >> >>
-> >> >> The trouble is that it may legitimately use the same "id" value f=
-or
-> >> >> new requests. And I don't see a simple way to handle that without
-> >> >> races.
-> >> >
-> >> > Under what circumstances can it reuse the same ID for new requests=
-?
-> >> > Can't we simply tell it not to?
-> >>
-> >> I don't see any restriction today in the protocol in connecting with=
- a
-> >> new client that may not know anything from a previous client.
-> >
-> > Well, it knows it's doing a reconnection.
->=20
-> If you assume the "same client" reconnects to the monitor, I agree.
-> But this is a restriction of monitor usage.
+On 19/09/17 12:09, Alexey Kardashevskiy wrote:
+> On 19/09/17 00:54, Paolo Bonzini wrote:
+>> On 18/09/2017 12:16, Alexey Kardashevskiy wrote:
+>>> Most devices use at least one address space and every time a new address
+>>> space is added, flat views and dispatch trees are rebuild for all address
+>>> spaces. This is not a problem for a relatively small amount of devices but
+>>> even 50 virtio-pci devices use more than 8GB of RAM.
+>>>
+>>> What happens that on every flatview/dispatch rebuild, new arrays are
+>>> allocated and old ones release but the release is done via RCU so until
+>>> an entire machine is build, they are not released.
+>>>
+>>> This wraps devices creation into memory_region_transaction_begin/commit
+>>> to massively reduce amount of flat view/dispatch tree (re)allocations.
+>>>
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>> ---
+>>> Changes:
+>>> v2:
+>>> * wrapped qemu_run_machine_init_done_notifiers() as well
+>>> ---
+>>>  vl.c | 9 +++++++++
+>>>  1 file changed, 9 insertions(+)
+>>>
+>>> diff --git a/vl.c b/vl.c
+>>> index 9e62e92aea..e4f2ece590 100644
+>>> --- a/vl.c
+>>> +++ b/vl.c
+>>> @@ -4741,12 +4741,16 @@ int main(int argc, char **argv, char **envp)
+>>>      igd_gfx_passthru();
+>>>  
+>>>      /* init generic devices */
+>>> +    memory_region_transaction_begin();
+>>> +
+>>>      rom_set_order_override(FW_CFG_ORDER_OVERRIDE_DEVICE);
+>>>      if (qemu_opts_foreach(qemu_find_opts("device"),
+>>>                            device_init_func, NULL, NULL)) {
+>>>          exit(1);
+>>>      }
+>>>  
+>>> +    memory_region_transaction_commit();
+>>> +
+>>>      cpu_synchronize_all_post_init();
+>>>  
+>>>      rom_reset_order_override();
+>>> @@ -4829,8 +4833,13 @@ int main(int argc, char **argv, char **envp)
+>>>      /* TODO: once all bus devices are qdevified, this should be done
+>>>       * when bus is created by qdev.c */
+>>>      qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
+>>> +
+>>> +    memory_region_transaction_begin();
+>>> +
+>>>      qemu_run_machine_init_done_notifiers();
+>>>  
+>>> +    memory_region_transaction_commit();
+>>> +
+>>>      if (rom_check_and_register_reset() != 0) {
+>>>          error_report("rom check and register reset failed");
+>>>          exit(1);
+>>>
+>>
+>> This should not be necessary given the other patches; the PCI devices
+>> have an empty address space at the beginning, so there are other less
+>> intrusive optimizations to do instead with the same effect:
+>>
+>> 1) as a start, the "|= root->enabled" can resolve aliases.  This should
+>> be enough for the PCI device case.
+>>
+>> 2) also, after patch 2 you know that the address space has no listeners
+>> here, so the begin/commit isn't really needed.  Instead you can use the
+>> open-coded loop to directly generate the FlatView.  This avoids touching
+>> _all_ address spaces, which is already an improvement from O(n^2) to
+>> O(n) rebuilds on device startup.
 
-In monitor_qmp_event(), we can empty the request queue when got
-CHR_EVENT_CLOSED.  Would that be a solution?
+03/13 does this already, no?
 
---=20
-Peter Xu
+>>
+>> 3) you can consult the list (or hash table :)) of live FlatViews (which
+>> means you keep it live after memory_region_transaction_commit ends, and
+>> only clear it on the next call), and reuse an existing FlatView.  Note
+>> that the number of distinct FlatViews should be very few, 
+> 
+> 
+> I keep missing this bit - why few? Each virtio-pci device creates 2 AS,
+> with proxy->modern_bar and pci_dev->bus_master_container_region which are
+> unique and not aliases. Remember, 500 virtio devices is my test case ;)
+
+
+More details: pci_dev->bus_master_container_region is a root and it is
+enabled but its only child pci_dev->bus_master_enable_region is not. Ok, in
+flatview_topology_update() I can render a FV, see that it is empty
+(view->nr==0) and share an empty FV in this case too, this halves the
+number of FVs (from ~1000 to ~500 for 500 virtio devices).
+
+But proxy->modern_bar (which has an modern_cfg alias which is a root of an
+AS) is enabled since it is created and I could disable it and enable
+afterwards but since a PCI device enablement is done by writing to the
+config space, I kind of stuck here.
+
+
+I can do something like this and it helps a lot (now with -S I end up
+having 4 FVs and much better start time) but it is kinda hacky and "memory:
+Postpone flatview and dispatch tree building till all devices are added"
+solves this better imho, no?
+
+
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index 3268c16966..fa2cd7cf2c 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -629,6 +629,8 @@ static void virtio_write_config(PCIDevice *pci_dev,
+uint32_t address,
+     VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
+     struct virtio_pci_cfg_cap *cfg;
+
++    memory_region_set_enabled(&proxy->modern_bar, true);
++
+     pci_default_write_config(pci_dev, address, val, len);
+
+     if (range_covers_byte(address, len, PCI_COMMAND) &&
+@@ -662,6 +664,8 @@ static uint32_t virtio_read_config(PCIDevice *pci_dev,
+     VirtIOPCIProxy *proxy = DO_UPCAST(VirtIOPCIProxy, pci_dev, pci_dev);
+     struct virtio_pci_cfg_cap *cfg;
+
++    memory_region_set_enabled(&proxy->modern_bar, true);
++
+     if (proxy->config_cap &&
+         ranges_overlap(address, len, proxy->config_cap + offsetof(struct
+virtio_pci_cfg_cap,
+
+pci_cfg_data),
+@@ -1790,6 +1794,8 @@ static void virtio_pci_realize(PCIDevice *pci_dev,
+Error **errp)
+                              0,
+                              memory_region_size(&proxy->modern_bar));
+
++    memory_region_set_enabled(&proxy->modern_bar, false);
++
+     address_space_init(&proxy->modern_as, &proxy->modern_cfg,
+"virtio-pci-cfg-as");
+
+
+
+
+
+> 
+> 
+>> so feel free
+>> to revert from hash table to list in v4 if you prefer.
+>>> 4) you can skip address_space_update_topology_pass if
+>> QTAILQ_EMPTY(&as->listeners).  This can provide some startup speed
+>> improvements.
+>>
+>> Optimizations 2/3/4 should be moved to the end of the series, or even in
+>> a separate post.  The first can be done in the beginning too, as you prefer.
+> 
+> 
+> 
+> 
+
+
+-- 
+Alexey
