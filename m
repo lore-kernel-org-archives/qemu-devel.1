@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60344)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60345)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfh-0004WV-Ul
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:40 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfh-0004WW-VO
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfd-0005hJ-JW
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHff-0005iS-84
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:37 -0400
-Received: from mail-wr0-x244.google.com ([2a00:1450:400c:c0c::244]:37678)
+Received: from mail-wm0-x229.google.com ([2a00:1450:400c:c09::229]:45677)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1duHfd-0005fy-7D
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:33 -0400
-Received: by mail-wr0-x244.google.com with SMTP id u48so2146641wrf.4
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:30:33 -0700 (PDT)
+	id 1duHfe-0005hv-Ur
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:35 -0400
+Received: by mail-wm0-x229.google.com with SMTP id g206so4794747wme.0
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:30:34 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 19 Sep 2017 14:29:31 +0200
-Message-Id: <1505824179-21541-43-git-send-email-pbonzini@redhat.com>
+Date: Tue, 19 Sep 2017 14:29:33 +0200
+Message-Id: <1505824179-21541-45-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
 References: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 42/50] hyperv: add header with protocol
- definitions
+Subject: [Qemu-devel] [PULL 44/50] scripts: let checkpatch.pl process an
+ entire GIT branch
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,605 +29,248 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Roman Kagan <rkagan@virtuozzo.com>
 
-From: Roman Kagan <rkagan@virtuozzo.com>
+From: "Daniel P. Berrange" <berrange@redhat.com>
 
-The definitions for Hyper-V emulation are currently taken from a header
-imported from the Linux kernel.
+Currently before submitting a series, devs should run checkpatch.pl
+across each patch to be submitted. This can be automated using a
+command such as:
 
-However, as these describe a third-party protocol rather than a kernel
-API, it probably wasn't a good idea to publish it in the kernel uapi.
+  git rebase -i master -x 'git show | ./scripts/checkpatch.pl -'
 
-This patch introduces a header that provides all the necessary
-definitions, superseding the one coming from the kernel.
+This is rather long winded to type, so this patch introduces a way
+to tell checkpatch.pl to validate a series of GIT revisions.
 
-The new header supports (temporary) coexistence with the kernel one.
-The constants explicitly named in the Hyper-V specification (e.g. msr
-numbers) are defined in a non-conflicting way.  Other constants and
-types have got new names.
+There are now three modes it can operate in 1) check a patch 2) check a source
+file, or 3) check a git branch.
 
-While at this, the protocol data structures are defined in a more
-conventional way, without bitfields, enums, and excessive unions.
+If no flags are given, the mode is determined by checking the args passed to
+the command. If the args contain a literal ".." it is treated as a GIT revision
+list. If the args end in ".patch" or equal "-" it is treated as a patch file.
+Otherwise it is treated as a source file.
 
-The code using this stuff is adjusted, too; it can now be built both
-with and without the kernel header in the tree.
+This automatic guessing can be overridden using --[no-]patch --[no-]file or
+--[no-]branch
 
-Signed-off-by: Roman Kagan <rkagan@virtuozzo.com>
-Message-Id: <20170713201522.13765-2-rkagan@virtuozzo.com>
+For example to check a GIT revision list:
+
+    $ ./scripts/checkpatch.pl master..
+    total: 0 errors, 0 warnings, 297 lines checked
+
+    b886d352a2bf58f0996471fb3991a138373a2957 has no obvious style problems and is ready for submission.
+    total: 0 errors, 0 warnings, 182 lines checked
+
+    2a731f9a9ce145e0e0df6d42dd2a3ce4dfc543fa has no obvious style problems and is ready for submission.
+    total: 0 errors, 0 warnings, 102 lines checked
+
+    11844169bcc0c8ed4449eb3744a69877ed329dd7 has no obvious style problems and is ready for submission.
+
+If a genuine patch filename contains the characters '..' it is
+possible to force interpretation of the arg as a patch
+
+  $ ./scripts/checkpatch.pl --patch master..
+
+will force it to load a patch file called "master..", or equivalently
+
+  $ ./scripts/checkpatch.pl --no-branch master..
+
+will simply turn off guessing of GIT revision lists.
+
+Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+Message-Id: <20170913091000.9005-1-berrange@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- target/i386/cpu.c          |   4 +-
- target/i386/cpu.h          |  10 +-
- target/i386/hyperv-proto.h | 257 +++++++++++++++++++++++++++++++++++++++++++++
- target/i386/hyperv.c       |   6 +-
- target/i386/kvm.c          |  57 +++++-----
- target/i386/machine.c      |  15 ++-
- 6 files changed, 304 insertions(+), 45 deletions(-)
- create mode 100644 target/i386/hyperv-proto.h
+ scripts/checkpatch.pl | 138 ++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 111 insertions(+), 27 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 40c3091..4b0fa06 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -3934,12 +3934,12 @@ static GuestPanicInformation *x86_cpu_get_crash_info(CPUState *cs)
-     CPUX86State *env = &cpu->env;
-     GuestPanicInformation *panic_info = NULL;
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index fa47807..28d71b3 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -18,11 +18,12 @@ use Getopt::Long qw(:config no_auto_abbrev);
+ my $quiet = 0;
+ my $tree = 1;
+ my $chk_signoff = 1;
+-my $chk_patch = 1;
++my $chk_patch = undef;
++my $chk_branch = undef;
+ my $tst_only;
+ my $emacs = 0;
+ my $terse = 0;
+-my $file = 0;
++my $file = undef;
+ my $no_warnings = 0;
+ my $summary = 1;
+ my $mailback = 0;
+@@ -35,14 +36,19 @@ sub help {
+ 	my ($exitcode) = @_;
  
--    if (env->features[FEAT_HYPERV_EDX] & HV_X64_GUEST_CRASH_MSR_AVAILABLE) {
-+    if (env->features[FEAT_HYPERV_EDX] & HV_GUEST_CRASH_MSR_AVAILABLE) {
-         panic_info = g_malloc0(sizeof(GuestPanicInformation));
+ 	print << "EOM";
+-Usage: $P [OPTION]... [FILE]...
++Usage:
++
++    $P [OPTION]... [FILE]...
++    $P [OPTION]... [GIT-REV-LIST]
++
+ Version: $V
  
-         panic_info->type = GUEST_PANIC_INFORMATION_TYPE_HYPER_V;
- 
--        assert(HV_X64_MSR_CRASH_PARAMS >= 5);
-+        assert(HV_CRASH_PARAMS >= 5);
-         panic_info->u.hyper_v.arg1 = env->msr_hv_crash_params[0];
-         panic_info->u.hyper_v.arg2 = env->msr_hv_crash_params[1];
-         panic_info->u.hyper_v.arg3 = env->msr_hv_crash_params[2];
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 5c726f3..0f80de1 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -22,7 +22,7 @@
- 
- #include "qemu-common.h"
- #include "cpu-qom.h"
--#include "standard-headers/asm-x86/hyperv.h"
-+#include "hyperv-proto.h"
- 
- #ifdef TARGET_X86_64
- #define TARGET_LONG_BITS 64
-@@ -1095,15 +1095,15 @@ typedef struct CPUX86State {
-     uint64_t msr_hv_guest_os_id;
-     uint64_t msr_hv_vapic;
-     uint64_t msr_hv_tsc;
--    uint64_t msr_hv_crash_params[HV_X64_MSR_CRASH_PARAMS];
-+    uint64_t msr_hv_crash_params[HV_CRASH_PARAMS];
-     uint64_t msr_hv_runtime;
-     uint64_t msr_hv_synic_control;
-     uint64_t msr_hv_synic_version;
-     uint64_t msr_hv_synic_evt_page;
-     uint64_t msr_hv_synic_msg_page;
--    uint64_t msr_hv_synic_sint[HV_SYNIC_SINT_COUNT];
--    uint64_t msr_hv_stimer_config[HV_SYNIC_STIMER_COUNT];
--    uint64_t msr_hv_stimer_count[HV_SYNIC_STIMER_COUNT];
-+    uint64_t msr_hv_synic_sint[HV_SINT_COUNT];
-+    uint64_t msr_hv_stimer_config[HV_STIMER_COUNT];
-+    uint64_t msr_hv_stimer_count[HV_STIMER_COUNT];
- 
-     /* exception/interrupt handling */
-     int error_code;
-diff --git a/target/i386/hyperv-proto.h b/target/i386/hyperv-proto.h
-new file mode 100644
-index 0000000..1b3fa6e
---- /dev/null
-+++ b/target/i386/hyperv-proto.h
-@@ -0,0 +1,257 @@
-+/*
-+ * Definitions for Hyper-V guest/hypervisor interaction
-+ *
-+ * Copyright (C) 2017 Parallels International GmbH
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef TARGET_I386_HYPERV_PROTO_H
-+#define TARGET_I386_HYPERV_PROTO_H
-+
-+#include "qemu/bitmap.h"
-+
-+#define HV_CPUID_VENDOR_AND_MAX_FUNCTIONS     0x40000000
-+#define HV_CPUID_INTERFACE                    0x40000001
-+#define HV_CPUID_VERSION                      0x40000002
-+#define HV_CPUID_FEATURES                     0x40000003
-+#define HV_CPUID_ENLIGHTMENT_INFO             0x40000004
-+#define HV_CPUID_IMPLEMENT_LIMITS             0x40000005
-+#define HV_CPUID_MIN                          0x40000005
-+#define HV_CPUID_MAX                          0x4000ffff
-+#define HV_HYPERVISOR_PRESENT_BIT             0x80000000
-+
-+/*
-+ * HV_CPUID_FEATURES.EAX bits
-+ */
-+#define HV_VP_RUNTIME_AVAILABLE      (1u << 0)
-+#define HV_TIME_REF_COUNT_AVAILABLE  (1u << 1)
-+#define HV_SYNIC_AVAILABLE           (1u << 2)
-+#define HV_SYNTIMERS_AVAILABLE       (1u << 3)
-+#define HV_APIC_ACCESS_AVAILABLE     (1u << 4)
-+#define HV_HYPERCALL_AVAILABLE       (1u << 5)
-+#define HV_VP_INDEX_AVAILABLE        (1u << 6)
-+#define HV_RESET_AVAILABLE           (1u << 7)
-+#define HV_REFERENCE_TSC_AVAILABLE   (1u << 9)
-+
-+/*
-+ * HV_CPUID_FEATURES.EDX bits
-+ */
-+#define HV_MWAIT_AVAILABLE                      (1u << 0)
-+#define HV_GUEST_DEBUGGING_AVAILABLE            (1u << 1)
-+#define HV_PERF_MONITOR_AVAILABLE               (1u << 2)
-+#define HV_CPU_DYNAMIC_PARTITIONING_AVAILABLE   (1u << 3)
-+#define HV_HYPERCALL_PARAMS_XMM_AVAILABLE       (1u << 4)
-+#define HV_GUEST_IDLE_STATE_AVAILABLE           (1u << 5)
-+#define HV_GUEST_CRASH_MSR_AVAILABLE            (1u << 10)
-+
-+/*
-+ * HV_CPUID_ENLIGHTMENT_INFO.EAX bits
-+ */
-+#define HV_AS_SWITCH_RECOMMENDED            (1u << 0)
-+#define HV_LOCAL_TLB_FLUSH_RECOMMENDED      (1u << 1)
-+#define HV_REMOTE_TLB_FLUSH_RECOMMENDED     (1u << 2)
-+#define HV_APIC_ACCESS_RECOMMENDED          (1u << 3)
-+#define HV_SYSTEM_RESET_RECOMMENDED         (1u << 4)
-+#define HV_RELAXED_TIMING_RECOMMENDED       (1u << 5)
-+
-+/*
-+ * Basic virtualized MSRs
-+ */
-+#define HV_X64_MSR_GUEST_OS_ID                0x40000000
-+#define HV_X64_MSR_HYPERCALL                  0x40000001
-+#define HV_X64_MSR_VP_INDEX                   0x40000002
-+#define HV_X64_MSR_RESET                      0x40000003
-+#define HV_X64_MSR_VP_RUNTIME                 0x40000010
-+#define HV_X64_MSR_TIME_REF_COUNT             0x40000020
-+#define HV_X64_MSR_REFERENCE_TSC              0x40000021
-+#define HV_X64_MSR_TSC_FREQUENCY              0x40000022
-+#define HV_X64_MSR_APIC_FREQUENCY             0x40000023
-+
-+/*
-+ * Virtual APIC MSRs
-+ */
-+#define HV_X64_MSR_EOI                        0x40000070
-+#define HV_X64_MSR_ICR                        0x40000071
-+#define HV_X64_MSR_TPR                        0x40000072
-+#define HV_X64_MSR_APIC_ASSIST_PAGE           0x40000073
-+
-+/*
-+ * Synthetic interrupt controller MSRs
-+ */
-+#define HV_X64_MSR_SCONTROL                   0x40000080
-+#define HV_X64_MSR_SVERSION                   0x40000081
-+#define HV_X64_MSR_SIEFP                      0x40000082
-+#define HV_X64_MSR_SIMP                       0x40000083
-+#define HV_X64_MSR_EOM                        0x40000084
-+#define HV_X64_MSR_SINT0                      0x40000090
-+#define HV_X64_MSR_SINT1                      0x40000091
-+#define HV_X64_MSR_SINT2                      0x40000092
-+#define HV_X64_MSR_SINT3                      0x40000093
-+#define HV_X64_MSR_SINT4                      0x40000094
-+#define HV_X64_MSR_SINT5                      0x40000095
-+#define HV_X64_MSR_SINT6                      0x40000096
-+#define HV_X64_MSR_SINT7                      0x40000097
-+#define HV_X64_MSR_SINT8                      0x40000098
-+#define HV_X64_MSR_SINT9                      0x40000099
-+#define HV_X64_MSR_SINT10                     0x4000009A
-+#define HV_X64_MSR_SINT11                     0x4000009B
-+#define HV_X64_MSR_SINT12                     0x4000009C
-+#define HV_X64_MSR_SINT13                     0x4000009D
-+#define HV_X64_MSR_SINT14                     0x4000009E
-+#define HV_X64_MSR_SINT15                     0x4000009F
-+
-+/*
-+ * Synthetic timer MSRs
-+ */
-+#define HV_X64_MSR_STIMER0_CONFIG               0x400000B0
-+#define HV_X64_MSR_STIMER0_COUNT                0x400000B1
-+#define HV_X64_MSR_STIMER1_CONFIG               0x400000B2
-+#define HV_X64_MSR_STIMER1_COUNT                0x400000B3
-+#define HV_X64_MSR_STIMER2_CONFIG               0x400000B4
-+#define HV_X64_MSR_STIMER2_COUNT                0x400000B5
-+#define HV_X64_MSR_STIMER3_CONFIG               0x400000B6
-+#define HV_X64_MSR_STIMER3_COUNT                0x400000B7
-+
-+/*
-+ * Guest crash notification MSRs
-+ */
-+#define HV_X64_MSR_CRASH_P0                     0x40000100
-+#define HV_X64_MSR_CRASH_P1                     0x40000101
-+#define HV_X64_MSR_CRASH_P2                     0x40000102
-+#define HV_X64_MSR_CRASH_P3                     0x40000103
-+#define HV_X64_MSR_CRASH_P4                     0x40000104
-+#define HV_CRASH_PARAMS    (HV_X64_MSR_CRASH_P4 - HV_X64_MSR_CRASH_P0 + 1)
-+#define HV_X64_MSR_CRASH_CTL                    0x40000105
-+#define HV_CRASH_CTL_NOTIFY                     (1ull << 63)
-+
-+/*
-+ * Hypercall status code
-+ */
-+#define HV_STATUS_SUCCESS                     0
-+#define HV_STATUS_INVALID_HYPERCALL_CODE      2
-+#define HV_STATUS_INVALID_HYPERCALL_INPUT     3
-+#define HV_STATUS_INVALID_ALIGNMENT           4
-+#define HV_STATUS_INVALID_PARAMETER           5
-+#define HV_STATUS_INSUFFICIENT_MEMORY         11
-+#define HV_STATUS_INVALID_CONNECTION_ID       18
-+#define HV_STATUS_INSUFFICIENT_BUFFERS        19
-+
-+/*
-+ * Hypercall numbers
-+ */
-+#define HV_POST_MESSAGE                       0x005c
-+#define HV_SIGNAL_EVENT                       0x005d
-+#define HV_HYPERCALL_FAST                     (1u << 16)
-+
-+/*
-+ * Hypercall MSR bits
-+ */
-+#define HV_HYPERCALL_ENABLE                   (1u << 0)
-+
-+/*
-+ * Synthetic interrupt controller definitions
-+ */
-+#define HV_SYNIC_VERSION                      1
-+#define HV_SINT_COUNT                         16
-+#define HV_SYNIC_ENABLE                       (1u << 0)
-+#define HV_SIMP_ENABLE                        (1u << 0)
-+#define HV_SIEFP_ENABLE                       (1u << 0)
-+#define HV_SINT_MASKED                        (1u << 16)
-+#define HV_SINT_AUTO_EOI                      (1u << 17)
-+#define HV_SINT_VECTOR_MASK                   0xff
-+
-+#define HV_STIMER_COUNT                       4
-+
-+/*
-+ * Message size
-+ */
-+#define HV_MESSAGE_PAYLOAD_SIZE               240
-+
-+/*
-+ * Message types
-+ */
-+#define HV_MESSAGE_NONE                       0x00000000
-+#define HV_MESSAGE_VMBUS                      0x00000001
-+#define HV_MESSAGE_UNMAPPED_GPA               0x80000000
-+#define HV_MESSAGE_GPA_INTERCEPT              0x80000001
-+#define HV_MESSAGE_TIMER_EXPIRED              0x80000010
-+#define HV_MESSAGE_INVALID_VP_REGISTER_VALUE  0x80000020
-+#define HV_MESSAGE_UNRECOVERABLE_EXCEPTION    0x80000021
-+#define HV_MESSAGE_UNSUPPORTED_FEATURE        0x80000022
-+#define HV_MESSAGE_EVENTLOG_BUFFERCOMPLETE    0x80000040
-+#define HV_MESSAGE_X64_IOPORT_INTERCEPT       0x80010000
-+#define HV_MESSAGE_X64_MSR_INTERCEPT          0x80010001
-+#define HV_MESSAGE_X64_CPUID_INTERCEPT        0x80010002
-+#define HV_MESSAGE_X64_EXCEPTION_INTERCEPT    0x80010003
-+#define HV_MESSAGE_X64_APIC_EOI               0x80010004
-+#define HV_MESSAGE_X64_LEGACY_FP_ERROR        0x80010005
-+
-+/*
-+ * Message flags
-+ */
-+#define HV_MESSAGE_FLAG_PENDING               0x1
-+
-+/*
-+ * Event flags number per SINT
-+ */
-+#define HV_EVENT_FLAGS_COUNT                  (256 * 8)
-+
-+/*
-+ * Connection id valid bits
-+ */
-+#define HV_CONNECTION_ID_MASK                 0x00ffffff
-+
-+/*
-+ * Input structure for POST_MESSAGE hypercall
-+ */
-+struct hyperv_post_message_input {
-+    uint32_t connection_id;
-+    uint32_t _reserved;
-+    uint32_t message_type;
-+    uint32_t payload_size;
-+    uint8_t  payload[HV_MESSAGE_PAYLOAD_SIZE];
-+};
-+
-+/*
-+ * Input structure for SIGNAL_EVENT hypercall
-+ */
-+struct hyperv_signal_event_input {
-+    uint32_t connection_id;
-+    uint16_t flag_number;
-+    uint16_t _reserved_zero;
-+};
-+
-+/*
-+ * SynIC message structures
-+ */
-+struct hyperv_message_header {
-+    uint32_t message_type;
-+    uint8_t  payload_size;
-+    uint8_t  message_flags; /* HV_MESSAGE_FLAG_XX */
-+    uint8_t  _reserved[2];
-+    uint64_t sender;
-+};
-+
-+struct hyperv_message {
-+    struct hyperv_message_header header;
-+    uint8_t payload[HV_MESSAGE_PAYLOAD_SIZE];
-+};
-+
-+struct hyperv_message_page {
-+    struct hyperv_message slot[HV_SINT_COUNT];
-+};
-+
-+/*
-+ * SynIC event flags structures
-+ */
-+struct hyperv_event_flags {
-+    DECLARE_BITMAP(flags, HV_EVENT_FLAGS_COUNT);
-+};
-+
-+struct hyperv_event_flags_page {
-+    struct hyperv_event_flags slot[HV_SINT_COUNT];
-+};
-+
-+#endif
-diff --git a/target/i386/hyperv.c b/target/i386/hyperv.c
-index 8545574..a050c9d 100644
---- a/target/i386/hyperv.c
-+++ b/target/i386/hyperv.c
-@@ -14,7 +14,7 @@
- #include "qemu/osdep.h"
- #include "qemu/main-loop.h"
- #include "hyperv.h"
--#include "standard-headers/asm-x86/hyperv.h"
-+#include "hyperv-proto.h"
- 
- int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
- {
-@@ -50,8 +50,8 @@ int kvm_hv_handle_exit(X86CPU *cpu, struct kvm_hyperv_exit *exit)
- 
-         code  = exit->u.hcall.input & 0xffff;
-         switch (code) {
--        case HVCALL_POST_MESSAGE:
--        case HVCALL_SIGNAL_EVENT:
-+        case HV_POST_MESSAGE:
-+        case HV_SIGNAL_EVENT:
-         default:
-             exit->u.hcall.result = HV_STATUS_INVALID_HYPERCALL_CODE;
-             return 0;
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index ee4e91f..0498ab7 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -27,6 +27,7 @@
- #include "sysemu/kvm_int.h"
- #include "kvm_i386.h"
- #include "hyperv.h"
-+#include "hyperv-proto.h"
- 
- #include "exec/gdbstub.h"
- #include "qemu/host-utils.h"
-@@ -40,7 +41,6 @@
- #include "hw/i386/x86-iommu.h"
- 
- #include "exec/ioport.h"
--#include "standard-headers/asm-x86/hyperv.h"
- #include "hw/pci/pci.h"
- #include "hw/pci/msi.h"
- #include "hw/pci/msix.h"
-@@ -632,13 +632,14 @@ static int hyperv_handle_properties(CPUState *cs)
-     }
- 
-     if (cpu->hyperv_relaxed_timing) {
--        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_HYPERCALL_AVAILABLE;
-+        env->features[FEAT_HYPERV_EAX] |= HV_HYPERCALL_AVAILABLE;
-     }
-     if (cpu->hyperv_vapic) {
--        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_HYPERCALL_AVAILABLE;
--        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_APIC_ACCESS_AVAILABLE;
-+        env->features[FEAT_HYPERV_EAX] |= HV_HYPERCALL_AVAILABLE;
-+        env->features[FEAT_HYPERV_EAX] |= HV_APIC_ACCESS_AVAILABLE;
-     }
-     if (cpu->hyperv_time) {
-+<<<<<<< HEAD
-         env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_HYPERCALL_AVAILABLE;
-         env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_TIME_REF_COUNT_AVAILABLE;
-         env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_REFERENCE_TSC_AVAILABLE;
-@@ -648,19 +649,24 @@ static int hyperv_handle_properties(CPUState *cs)
-             env->features[FEAT_HYPERV_EDX] |=
-                 HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
-         }
-+=======
-+        env->features[FEAT_HYPERV_EAX] |= HV_HYPERCALL_AVAILABLE;
-+        env->features[FEAT_HYPERV_EAX] |= HV_TIME_REF_COUNT_AVAILABLE;
-+        env->features[FEAT_HYPERV_EAX] |= HV_REFERENCE_TSC_AVAILABLE;
-+>>>>>>> hyperv: add header with protocol definitions
-     }
-     if (cpu->hyperv_crash && has_msr_hv_crash) {
--        env->features[FEAT_HYPERV_EDX] |= HV_X64_GUEST_CRASH_MSR_AVAILABLE;
-+        env->features[FEAT_HYPERV_EDX] |= HV_GUEST_CRASH_MSR_AVAILABLE;
-     }
--    env->features[FEAT_HYPERV_EDX] |= HV_X64_CPU_DYNAMIC_PARTITIONING_AVAILABLE;
-+    env->features[FEAT_HYPERV_EDX] |= HV_CPU_DYNAMIC_PARTITIONING_AVAILABLE;
-     if (cpu->hyperv_reset && has_msr_hv_reset) {
--        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_RESET_AVAILABLE;
-+        env->features[FEAT_HYPERV_EAX] |= HV_RESET_AVAILABLE;
-     }
-     if (cpu->hyperv_vpindex && has_msr_hv_vpindex) {
--        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_VP_INDEX_AVAILABLE;
-+        env->features[FEAT_HYPERV_EAX] |= HV_VP_INDEX_AVAILABLE;
-     }
-     if (cpu->hyperv_runtime && has_msr_hv_runtime) {
--        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_VP_RUNTIME_AVAILABLE;
-+        env->features[FEAT_HYPERV_EAX] |= HV_VP_RUNTIME_AVAILABLE;
-     }
-     if (cpu->hyperv_synic) {
-         int sint;
-@@ -671,10 +677,10 @@ static int hyperv_handle_properties(CPUState *cs)
-             return -ENOSYS;
-         }
- 
--        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_SYNIC_AVAILABLE;
--        env->msr_hv_synic_version = HV_SYNIC_VERSION_1;
-+        env->features[FEAT_HYPERV_EAX] |= HV_SYNIC_AVAILABLE;
-+        env->msr_hv_synic_version = HV_SYNIC_VERSION;
-         for (sint = 0; sint < ARRAY_SIZE(env->msr_hv_synic_sint); sint++) {
--            env->msr_hv_synic_sint[sint] = HV_SYNIC_SINT_MASKED;
-+            env->msr_hv_synic_sint[sint] = HV_SINT_MASKED;
-         }
-     }
-     if (cpu->hyperv_stimer) {
-@@ -682,7 +688,7 @@ static int hyperv_handle_properties(CPUState *cs)
-             fprintf(stderr, "Hyper-V timers aren't supported by kernel\n");
-             return -ENOSYS;
-         }
--        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_SYNTIMER_AVAILABLE;
-+        env->features[FEAT_HYPERV_EAX] |= HV_SYNTIMERS_AVAILABLE;
-     }
-     return 0;
+ Options:
+   -q, --quiet                quiet
+   --no-tree                  run without a kernel tree
+   --no-signoff               do not check for 'Signed-off-by' line
+-  --patch                    treat FILE as patchfile (default)
++  --patch                    treat FILE as patchfile
++  --branch                   treat args as GIT revision list
+   --emacs                    emacs compile window format
+   --terse                    one line per report
+   -f, --file                 treat FILE as regular source file
+@@ -69,6 +75,7 @@ GetOptions(
+ 	'tree!'		=> \$tree,
+ 	'signoff!'	=> \$chk_signoff,
+ 	'patch!'	=> \$chk_patch,
++	'branch!'	=> \$chk_branch,
+ 	'emacs!'	=> \$emacs,
+ 	'terse!'	=> \$terse,
+ 	'f|file!'	=> \$file,
+@@ -93,6 +100,49 @@ if ($#ARGV < 0) {
+ 	exit(1);
  }
-@@ -733,7 +739,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
-     /* Paravirtualization CPUIDs */
-     if (hyperv_enabled(cpu)) {
-         c = &cpuid_data.entries[cpuid_i++];
--        c->function = HYPERV_CPUID_VENDOR_AND_MAX_FUNCTIONS;
-+        c->function = HV_CPUID_VENDOR_AND_MAX_FUNCTIONS;
-         if (!cpu->hyperv_vendor_id) {
-             memcpy(signature, "Microsoft Hv", 12);
-         } else {
-@@ -746,13 +752,13 @@ int kvm_arch_init_vcpu(CPUState *cs)
-             memset(signature, 0, 12);
-             memcpy(signature, cpu->hyperv_vendor_id, len);
-         }
--        c->eax = HYPERV_CPUID_MIN;
-+        c->eax = HV_CPUID_MIN;
-         c->ebx = signature[0];
-         c->ecx = signature[1];
-         c->edx = signature[2];
  
-         c = &cpuid_data.entries[cpuid_i++];
--        c->function = HYPERV_CPUID_INTERFACE;
-+        c->function = HV_CPUID_INTERFACE;
-         memcpy(signature, "Hv#1\0\0\0\0\0\0\0\0", 12);
-         c->eax = signature[0];
-         c->ebx = 0;
-@@ -760,12 +766,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         c->edx = 0;
++if (!defined $chk_branch && !defined $chk_patch && !defined $file) {
++	$chk_branch = $ARGV[0] =~ /\.\./ ? 1 : 0;
++	$chk_patch = $chk_branch ? 0 :
++		$ARGV[0] =~ /\.patch$/ || $ARGV[0] eq "-" ? 1 : 0;
++	$file = $chk_branch || $chk_patch ? 0 : 1;
++} elsif (!defined $chk_branch && !defined $chk_patch) {
++	if ($file) {
++		$chk_branch = $chk_patch = 0;
++	} else {
++		$chk_branch = $ARGV[0] =~ /\.\./ ? 1 : 0;
++		$chk_patch = $chk_branch ? 0 : 1;
++	}
++} elsif (!defined $chk_branch && !defined $file) {
++	if ($chk_patch) {
++		$chk_branch = $file = 0;
++	} else {
++		$chk_branch = $ARGV[0] =~ /\.\./ ? 1 : 0;
++		$file = $chk_branch ? 0 : 1;
++	}
++} elsif (!defined $chk_patch && !defined $file) {
++	if ($chk_branch) {
++		$chk_patch = $file = 0;
++	} else {
++		$chk_patch = $ARGV[0] =~ /\.patch$/ || $ARGV[0] eq "-" ? 1 : 0;
++		$file = $chk_patch ? 0 : 1;
++	}
++} elsif (!defined $chk_branch) {
++	$chk_branch = $chk_patch || $file ? 0 : 1;
++} elsif (!defined $chk_patch) {
++	$chk_patch = $chk_branch || $file ? 0 : 1;
++} elsif (!defined $file) {
++	$file = $chk_patch || $chk_branch ? 0 : 1;
++}
++
++if (($chk_patch && $chk_branch) ||
++    ($chk_patch && $file) ||
++    ($chk_branch && $file)) {
++	die "Only one of --file, --branch, --patch is permitted\n";
++}
++if (!$chk_patch && !$chk_branch && !$file) {
++	die "One of --file, --branch, --patch is required\n";
++}
++
+ my $dbg_values = 0;
+ my $dbg_possible = 0;
+ my $dbg_type = 0;
+@@ -251,32 +301,66 @@ $chk_signoff = 0 if ($file);
+ my @rawlines = ();
+ my @lines = ();
+ my $vname;
+-for my $filename (@ARGV) {
+-	my $FILE;
+-	if ($file) {
+-		open($FILE, '-|', "diff -u /dev/null $filename") ||
+-			die "$P: $filename: diff failed - $!\n";
+-	} elsif ($filename eq '-') {
+-		open($FILE, '<&STDIN');
+-	} else {
+-		open($FILE, '<', "$filename") ||
+-			die "$P: $filename: open failed - $!\n";
+-	}
+-	if ($filename eq '-') {
+-		$vname = 'Your patch';
+-	} else {
+-		$vname = $filename;
+-	}
+-	while (<$FILE>) {
++if ($chk_branch) {
++	my @patches;
++	my $HASH;
++	open($HASH, "-|", "git", "log", "--format=%H", $ARGV[0]) ||
++		die "$P: git log --format=%H $ARGV[0] failed - $!\n";
++
++	while (<$HASH>) {
+ 		chomp;
+-		push(@rawlines, $_);
++		push @patches, $_;
++	}
++
++	close $HASH;
++
++	die "$P: no revisions returned for revlist '$chk_branch'\n"
++	    unless @patches;
++
++	for my $hash (@patches) {
++		my $FILE;
++		open($FILE, '-|', "git", "show", $hash) ||
++			die "$P: git show $hash - $!\n";
++		$vname = $hash;
++		while (<$FILE>) {
++			chomp;
++			push(@rawlines, $_);
++		}
++		close($FILE);
++		if (!process($hash)) {
++			$exit = 1;
++		}
++		@rawlines = ();
++		@lines = ();
+ 	}
+-	close($FILE);
+-	if (!process($filename)) {
+-		$exit = 1;
++} else {
++	for my $filename (@ARGV) {
++		my $FILE;
++		if ($file) {
++			open($FILE, '-|', "diff -u /dev/null $filename") ||
++				die "$P: $filename: diff failed - $!\n";
++		} elsif ($filename eq '-') {
++			open($FILE, '<&STDIN');
++		} else {
++			open($FILE, '<', "$filename") ||
++				die "$P: $filename: open failed - $!\n";
++		}
++		if ($filename eq '-') {
++			$vname = 'Your patch';
++		} else {
++			$vname = $filename;
++		}
++		while (<$FILE>) {
++			chomp;
++			push(@rawlines, $_);
++		}
++		close($FILE);
++		if (!process($filename)) {
++			$exit = 1;
++		}
++		@rawlines = ();
++		@lines = ();
+ 	}
+-	@rawlines = ();
+-	@lines = ();
+ }
  
-         c = &cpuid_data.entries[cpuid_i++];
--        c->function = HYPERV_CPUID_VERSION;
-+        c->function = HV_CPUID_VERSION;
-         c->eax = 0x00001bbc;
-         c->ebx = 0x00060001;
- 
-         c = &cpuid_data.entries[cpuid_i++];
--        c->function = HYPERV_CPUID_FEATURES;
-+        c->function = HV_CPUID_FEATURES;
-         r = hyperv_handle_properties(cs);
-         if (r) {
-             return r;
-@@ -775,17 +781,17 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         c->edx = env->features[FEAT_HYPERV_EDX];
- 
-         c = &cpuid_data.entries[cpuid_i++];
--        c->function = HYPERV_CPUID_ENLIGHTMENT_INFO;
-+        c->function = HV_CPUID_ENLIGHTMENT_INFO;
-         if (cpu->hyperv_relaxed_timing) {
--            c->eax |= HV_X64_RELAXED_TIMING_RECOMMENDED;
-+            c->eax |= HV_RELAXED_TIMING_RECOMMENDED;
-         }
-         if (cpu->hyperv_vapic) {
--            c->eax |= HV_X64_APIC_ACCESS_RECOMMENDED;
-+            c->eax |= HV_APIC_ACCESS_RECOMMENDED;
-         }
-         c->ebx = cpu->hyperv_spinlock_attempts;
- 
-         c = &cpuid_data.entries[cpuid_i++];
--        c->function = HYPERV_CPUID_IMPLEMENT_LIMITS;
-+        c->function = HV_CPUID_IMPLEMENT_LIMITS;
- 
-         c->eax = cpu->hv_max_vps;
-         c->ebx = 0x40;
-@@ -1695,12 +1701,11 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-         if (has_msr_hv_crash) {
-             int j;
- 
--            for (j = 0; j < HV_X64_MSR_CRASH_PARAMS; j++)
-+            for (j = 0; j < HV_CRASH_PARAMS; j++)
-                 kvm_msr_entry_add(cpu, HV_X64_MSR_CRASH_P0 + j,
-                                   env->msr_hv_crash_params[j]);
- 
--            kvm_msr_entry_add(cpu, HV_X64_MSR_CRASH_CTL,
--                              HV_X64_MSR_CRASH_CTL_NOTIFY);
-+            kvm_msr_entry_add(cpu, HV_X64_MSR_CRASH_CTL, HV_CRASH_CTL_NOTIFY);
-         }
-         if (has_msr_hv_runtime) {
-             kvm_msr_entry_add(cpu, HV_X64_MSR_VP_RUNTIME, env->msr_hv_runtime);
-@@ -2064,7 +2069,7 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (has_msr_hv_crash) {
-         int j;
- 
--        for (j = 0; j < HV_X64_MSR_CRASH_PARAMS; j++) {
-+        for (j = 0; j < HV_CRASH_PARAMS; j++) {
-             kvm_msr_entry_add(cpu, HV_X64_MSR_CRASH_P0 + j, 0);
-         }
-     }
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index eab3372..29cc58e 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -587,7 +587,7 @@ static bool hyperv_crash_enable_needed(void *opaque)
-     CPUX86State *env = &cpu->env;
-     int i;
- 
--    for (i = 0; i < HV_X64_MSR_CRASH_PARAMS; i++) {
-+    for (i = 0; i < HV_CRASH_PARAMS; i++) {
-         if (env->msr_hv_crash_params[i]) {
-             return true;
-         }
-@@ -601,8 +601,7 @@ static const VMStateDescription vmstate_msr_hyperv_crash = {
-     .minimum_version_id = 1,
-     .needed = hyperv_crash_enable_needed,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT64_ARRAY(env.msr_hv_crash_params,
--                             X86CPU, HV_X64_MSR_CRASH_PARAMS),
-+        VMSTATE_UINT64_ARRAY(env.msr_hv_crash_params, X86CPU, HV_CRASH_PARAMS),
-         VMSTATE_END_OF_LIST()
-     }
- };
-@@ -660,8 +659,7 @@ static const VMStateDescription vmstate_msr_hyperv_synic = {
-         VMSTATE_UINT64(env.msr_hv_synic_control, X86CPU),
-         VMSTATE_UINT64(env.msr_hv_synic_evt_page, X86CPU),
-         VMSTATE_UINT64(env.msr_hv_synic_msg_page, X86CPU),
--        VMSTATE_UINT64_ARRAY(env.msr_hv_synic_sint, X86CPU,
--                             HV_SYNIC_SINT_COUNT),
-+        VMSTATE_UINT64_ARRAY(env.msr_hv_synic_sint, X86CPU, HV_SINT_COUNT),
-         VMSTATE_END_OF_LIST()
-     }
- };
-@@ -686,10 +684,9 @@ static const VMStateDescription vmstate_msr_hyperv_stimer = {
-     .minimum_version_id = 1,
-     .needed = hyperv_stimer_enable_needed,
-     .fields = (VMStateField[]) {
--        VMSTATE_UINT64_ARRAY(env.msr_hv_stimer_config,
--                             X86CPU, HV_SYNIC_STIMER_COUNT),
--        VMSTATE_UINT64_ARRAY(env.msr_hv_stimer_count,
--                             X86CPU, HV_SYNIC_STIMER_COUNT),
-+        VMSTATE_UINT64_ARRAY(env.msr_hv_stimer_config, X86CPU,
-+                             HV_STIMER_COUNT),
-+        VMSTATE_UINT64_ARRAY(env.msr_hv_stimer_count, X86CPU, HV_STIMER_COUNT),
-         VMSTATE_END_OF_LIST()
-     }
- };
+ exit($exit);
 -- 
 1.8.3.1
