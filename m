@@ -1,29 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41977)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43248)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1duOJh-0003Ns-Jq
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:36:24 -0400
+	(envelope-from <david@redhat.com>) id 1duOKg-000464-FA
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:37:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1duOJd-00065a-Fx
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:36:21 -0400
-Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:49257)
+	(envelope-from <david@redhat.com>) id 1duOKc-0007Sm-Hh
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:37:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41008)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duOJd-00062d-3v
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:36:17 -0400
-Received: from player157.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 907ECA9EC6
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 21:36:14 +0200 (CEST)
-References: <20170911171235.29331-1-clg@kaod.org>
-	<20170911171235.29331-12-clg@kaod.org> <20170919074556.GO27153@umbus>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <2d91c586-ff31-ceb8-bee6-6d4531d1b5c0@kaod.org>
-Date: Tue, 19 Sep 2017 21:36:08 +0200
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1duOKc-0007Rt-9o
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:37:18 -0400
+References: <20170919142654.16369-1-david@redhat.com>
+	<20170919142654.16369-4-david@redhat.com>
+	<452a304a-70e4-c3ab-2e76-a67823922e90@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <8bc7cb17-522a-48ea-5818-12bdbfb37d70@redhat.com>
+Date: Tue, 19 Sep 2017 21:36:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170919074556.GO27153@umbus>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <452a304a-70e4-c3ab-2e76-a67823922e90@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 11/21] ppc/xive: push the EQ data in
- OS event queue
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] s390x/tcg: add basic MSA features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,130 +29,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-On 09/19/2017 09:45 AM, David Gibson wrote:
-> On Mon, Sep 11, 2017 at 07:12:25PM +0200, C=E9dric Le Goater wrote:
->> If a triggered event is let through, the Event Queue data defined in
->> the associated IVE is pushed in the in-memory event queue. The latter
->> is a circular buffer provided by the OS using the H_INT_SET_QUEUE_CONF=
-IG
->> hcall, one per target and priority couple. It is composed of Event
->> Queue entries which are 4 bytes long, the first bit being a
->> 'generation' bit and the 31 following bits the EQ Data field.
->>
->> The EQ Data field provides a way to set an invariant logical event
->> source number for an IRQ. It is set with the H_INT_SET_SOURCE_CONFIG
->> hcall.
->>
->> Notification of the CPU will be done in the following patch.
->>
->> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
->> ---
->>  hw/intc/spapr_xive.c | 67 +++++++++++++++++++++++++++++++++++++++++++=
-+++++++++
->>  1 file changed, 67 insertions(+)
->>
->> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
->> index 557a7e2535b5..4bc61cfda67a 100644
->> --- a/hw/intc/spapr_xive.c
->> +++ b/hw/intc/spapr_xive.c
->> @@ -175,9 +175,76 @@ static const MemoryRegionOps spapr_xive_tm_ops =3D=
- {
->>      },
->>  };
->> =20
->> +static void spapr_xive_eq_push(XiveEQ *eq, uint32_t data)
+On 19.09.2017 19:47, Richard Henderson wrote:
+> On 09/19/2017 09:26 AM, David Hildenbrand wrote:
+>> +    const uint8_t fc = env->regs[0] & 0x7fULL;
+> 
+> Don't mask here...
+
+Bit 56 is the mod bit (see variable "mod") and is checked inside the
+switch(). The function code really is just composed of bit 57 - 63, so
+this is correct.
+
+> 
+>> +    if (fc >= 128 || !test_be_bit(fc, subfunc)) {
+
+... however the fc >= 128 case can be dropped, as this can in fact never
+happen (due to the masking).
+
+>> +        cpu_restore_state(cs, ra);
+>> +        program_interrupt(env, PGM_SPECIFICATION, 4);
+>> +        return 0;
+>> +    }
+> 
+> ... because you are indeed supposed to test bit 56.  But you've already ensured
+> that won't be set above.
+> 
+> Do you in fact need to set bit 63 in subfunc, since that itself is query?
+> Certainly you won't get past this test, regardless...
+
+Yes, it always has to be set and is guaranteed by s390_get_feat_block().
+So test_be_bit(fc, subfunc) will always allow bit 0 (query).
+
+Especially due to the statement:
+
+"When a bit is one, the corresponding function is installed; otherwise,
+the function is not installed."
+
+Query is always installed.
+
+
+> 
+> 
+>> +static ExitStatus op_msa(DisasContext *s, DisasOps *o)
 >> +{
->> +    uint64_t qaddr_base =3D (((uint64_t)(eq->w2 & 0x0fffffff)) << 32)=
- | eq->w3;
->> +    uint32_t qsize =3D GETFIELD(EQ_W0_QSIZE, eq->w0);
->> +    uint32_t qindex =3D GETFIELD(EQ_W1_PAGE_OFF, eq->w1);
->> +    uint32_t qgen =3D GETFIELD(EQ_W1_GENERATION, eq->w1);
+>> +    int r1 = have_field(s->fields, r1) ? get_field(s->fields, r1) : 0;
+>> +    int r2 = have_field(s->fields, r2) ? get_field(s->fields, r2) : 0;
+>> +    int r3 = have_field(s->fields, r3) ? get_field(s->fields, r3) : 0;
+>> +    TCGv_i32 t_r1, t_r2, t_r3, type;
 >> +
->> +    uint64_t qaddr =3D qaddr_base + (qindex << 2);
->> +    uint32_t qdata =3D cpu_to_be32((qgen << 31) | (data & 0x7fffffff)=
-);
->> +    uint32_t qentries =3D 1 << (qsize + 10);
->> +
->> +    if (dma_memory_write(&address_space_memory, qaddr, &qdata, sizeof=
-(qdata))) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to write EQ data @=
-0x%"
->> +                      HWADDR_PRIx "\n", __func__, qaddr);
->> +        return;
->> +    }
->> +
->> +    qindex =3D (qindex + 1) % qentries;
->> +    if (qindex =3D=3D 0) {
->> +        qgen ^=3D 1;
->> +        eq->w1 =3D SETFIELD(EQ_W1_GENERATION, eq->w1, qgen);
->> +    }
->> +    eq->w1 =3D SETFIELD(EQ_W1_PAGE_OFF, eq->w1, qindex);
->> +}
->> +
->>  static void spapr_xive_irq(sPAPRXive *xive, int srcno)
->>  {
->> +    XiveIVE *ive;
->> +    XiveEQ *eq;
->> +    uint32_t eq_idx;
->> +    uint32_t priority;
->> +
->> +    ive =3D spapr_xive_get_ive(xive, srcno);
->> +    if (!ive || !(ive->w & IVE_VALID)) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %d\n", src=
-no);
->> +        return;
->> +    }
->> +
->> +    if (ive->w & IVE_MASKED) {
->> +        return;
->> +    }
->> +
->> +    /* Find our XiveEQ */
->> +    eq_idx =3D GETFIELD(IVE_EQ_INDEX, ive->w);
->> +    eq =3D spapr_xive_get_eq(xive, eq_idx);
->> +    if (!eq) {
->> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No EQ for LISN %d\n", s=
-rcno);
->> +        return;
->> +    }
->> +
->> +    if (eq->w0 & EQ_W0_ENQUEUE) {
->> +        spapr_xive_eq_push(eq, GETFIELD(IVE_EQ_DATA, ive->w));
->> +    } else {
->> +        qemu_log_mask(LOG_UNIMP, "XIVE: !ENQUEUE not implemented\n");
->> +    }
->> +
->> +    if (!(eq->w0 & EQ_W0_UCOND_NOTIFY)) {
->> +        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented=
-\n");
->> +    }
->> +
->> +    if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) =3D=3D 0) {
->> +        priority =3D GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
->> =20
->> +        /* The EQ is masked. Can this happen ?  */
->> +        if (priority =3D=3D 0xff) {
->> +            return;
->=20
-> How does the 8-bit priority field here interact with the 3-bit
-> priority which selects which EQ to use?
-
-priority OxFF is a special case kept for masking, see the hcall=20
-h_int_set_source_config. It should never reach the EQ lookup=20
-routines. So may be an assert would be better here.
-
-C.=20
-
->=20
+>> +    switch (s->insn->data) {
+>> +    case S390_FEAT_TYPE_KMCTR:
+>> +        if (r3 & 1 || !r3) {
+>> +            gen_program_exception(s, PGM_SPECIFICATION);
+>> +            return EXIT_NORETURN;
 >> +        }
->> +    } else {
->> +        qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n"=
-);
->> +    }
->>  }
->> =20
->>  /*
->=20
+>> +        /* FALL THROUGH */
+>> +    case S390_FEAT_TYPE_PPNO:
+>> +    case S390_FEAT_TYPE_KMF:
+>> +    case S390_FEAT_TYPE_KMC:
+>> +    case S390_FEAT_TYPE_KMO:
+>> +    case S390_FEAT_TYPE_KM:
+>> +        if (r1 & 1 || !r1) {
+>> +            gen_program_exception(s, PGM_SPECIFICATION);
+>> +            return EXIT_NORETURN;
+>> +        }
+>> +        /* FALL THROUGH */
+>> +    case S390_FEAT_TYPE_KMAC:
+>> +    case S390_FEAT_TYPE_KIMD:
+>> +    case S390_FEAT_TYPE_KLMD:
+>> +        if (r2 & 1 || !r2) {
+>> +            gen_program_exception(s, PGM_SPECIFICATION);
+>> +            return EXIT_NORETURN;
+>> +        }
+> 
+> Even though it would be silly to do so, considering that r0+r1 are implicit
+> arguments to these insns, I see nothing that insists that r[123] are not 0,
+> only that they are even.
+> 
+
+E.g. for KMAC (7-187):
+
+"A specification exception is recognized and no other
+action is taken if any of the following occurs:
+[...]
+ The R2 field designates an odd-numbered regis-
+ter or general register 0."
+
+Or KMCTR (7-103):
+
+"A specification exception is recognized and no other
+action is taken if any of the following occurs:
+[...]
+ The R1 R2, or R3 field designates an odd-num-
+bered register or general register 0."
+
+
+I implemented kvm-unit-tests that test all of these conditions.
+Especially they also pass on KVM, so I assume they are correct (as these
+instructions are fully interpreted by HW).
+
+https://www.spinics.net/lists/kvm/msg155690.html
+
+In the test included is
+a) checking that the mod bit must not be set for certain instructions
+b) r1-3 either odd or 0 for certain instructions
+c) that query is always indicated
+
+
+Thanks for the review!
+
+> 
+> r~
+> 
+
+
+-- 
+
+Thanks,
+
+David
