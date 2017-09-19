@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60147)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59909)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfa-0004Mr-TI
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:36 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfK-000466-Ck
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfS-0005aw-HY
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:26 -0400
-Received: from mail-wm0-x242.google.com ([2a00:1450:400c:c09::242]:33580)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfE-0005My-J7
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:14 -0400
+Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:35002)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1duHfS-0005aW-Ai
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:22 -0400
-Received: by mail-wm0-x242.google.com with SMTP id m127so3757436wmm.0
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:30:22 -0700 (PDT)
+	id 1duHfE-0005M7-D2
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:08 -0400
+Received: by mail-wm0-x241.google.com with SMTP id e64so3756809wmi.2
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:30:08 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 19 Sep 2017 14:29:23 +0200
-Message-Id: <1505824179-21541-35-git-send-email-pbonzini@redhat.com>
+Date: Tue, 19 Sep 2017 14:29:10 +0200
+Message-Id: <1505824179-21541-22-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
 References: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 34/50] Convert remaining error_report() to
- warn_report()
+Subject: [Qemu-devel] [PULL 21/50] i386/kvm: advertise Hyper-V frequency MSRs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +28,63 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Ladi Prosek <lprosek@redhat.com>
 
-From: Alistair Francis <alistair.francis@xilinx.com>
+From: Ladi Prosek <lprosek@redhat.com>
 
-In a previous patch (3dc6f8693694a649a9c83f1e2746565b47683923) we
-converted uses of error_report("warning:"... to use warn_report()
-instead. This was to help standardise on a single method of printing
-warnings to the user.
+As of kernel commit eb82feea59d6 ("KVM: hyperv: support HV_X64_MSR_TSC_FREQUENCY
+and HV_X64_MSR_APIC_FREQUENCY"), KVM supports two new MSRs which are required
+for nested Hyper-V to read timestamps with RDTSC + TSC page.
 
-There appears to have been some cases that slipped through in patch sets
-applied around the same time, this patch catches the few remaining
-cases.
+This commit makes QEMU advertise the MSRs with CPUID.40000003H:EAX[11] and
+CPUID.40000003H:EDX[8] as specified in the Hyper-V TLFS and experimentally
+verified on a Hyper-V host. The feature is enabled with the existing hv-time CPU
+flag, and only if the TSC frequency is stable across migrations and known.
 
-All of the warnings were changed using this command:
-  find ./* -type f -exec sed -i \
-    's|error_report(".*warning[,:] |warn_report("|Ig' {} +
-
-Indentation fixed up manually afterwards.
-
-Two messages were manually fixed up as well.
-
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Cc: Kevin Wolf <kwolf@redhat.com>
-Cc: Max Reitz <mreitz@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Alexander Graf <agraf@suse.de>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <eec8cba0d5434bd828639e5e45f12182490ff47d.1505158760.git.alistair.francis@xilinx.com>
+Signed-off-by: Ladi Prosek <lprosek@redhat.com>
+Reviewed-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20170807085703.32267-5-lprosek@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- block/qcow2.c      | 9 +++++----
- target/s390x/kvm.c | 4 ++--
- trace/control.c    | 4 ++--
- 3 files changed, 9 insertions(+), 8 deletions(-)
+ target/i386/kvm.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index bae5893..d33fb3e 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -301,10 +301,11 @@ static int qcow2_read_extensions(BlockDriverState *bs, uint64_t start_offset,
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 2dc01c9..739334a 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -89,6 +89,7 @@ static bool has_msr_hv_vpindex;
+ static bool has_msr_hv_runtime;
+ static bool has_msr_hv_synic;
+ static bool has_msr_hv_stimer;
++static bool has_msr_hv_frequencies;
+ static bool has_msr_xss;
+ 
+ static bool has_msr_architectural_pmu;
+@@ -640,7 +641,13 @@ static int hyperv_handle_properties(CPUState *cs)
+     if (cpu->hyperv_time) {
+         env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_HYPERCALL_AVAILABLE;
+         env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_TIME_REF_COUNT_AVAILABLE;
+-        env->features[FEAT_HYPERV_EAX] |= 0x200;
++        env->features[FEAT_HYPERV_EAX] |= HV_X64_MSR_REFERENCE_TSC_AVAILABLE;
++
++        if (has_msr_hv_frequencies && tsc_is_stable_and_known(env)) {
++            env->features[FEAT_HYPERV_EAX] |= HV_X64_ACCESS_FREQUENCY_MSRS;
++            env->features[FEAT_HYPERV_EDX] |=
++                HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
++        }
+     }
+     if (cpu->hyperv_crash && has_msr_hv_crash) {
+         env->features[FEAT_HYPERV_EDX] |= HV_X64_GUEST_CRASH_MSR_AVAILABLE;
+@@ -1134,6 +1141,9 @@ static int kvm_get_supported_msrs(KVMState *s)
+                 case HV_X64_MSR_STIMER0_CONFIG:
+                     has_msr_hv_stimer = true;
+                     break;
++                case HV_X64_MSR_TSC_FREQUENCY:
++                    has_msr_hv_frequencies = true;
++                    break;
+                 }
              }
- 
-             if (!(s->autoclear_features & QCOW2_AUTOCLEAR_BITMAPS)) {
--                error_report("WARNING: a program lacking bitmap support "
--                             "modified this file, so all bitmaps are now "
--                             "considered inconsistent. Some clusters may be "
--                             "leaked, run 'qemu-img check -r' on the image "
-+                warn_report("a program lacking bitmap support "
-+                            "modified this file, so all bitmaps are now "
-+                            "considered inconsistent");
-+                error_printf("Some clusters may be leaked, "
-+                             "run 'qemu-img check -r' on the image "
-                              "file to fix.");
-                 if (need_update_header != NULL) {
-                     /* Updating is needed to drop invalid bitmap extension. */
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index d07763f..ad7ce9f 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -224,8 +224,8 @@ static void kvm_s390_enable_cmma(void)
-     };
- 
-     if (mem_path) {
--        error_report("Warning: CMM will not be enabled because it is not "
--                     "compatible to hugetlbfs.");
-+        warn_report("CMM will not be enabled because it is not "
-+                    "compatible with hugetlbfs.");
-         return;
-     }
-     rc = kvm_vm_ioctl(kvm_state, KVM_SET_DEVICE_ATTR, &attr);
-diff --git a/trace/control.c b/trace/control.c
-index 82d8989..2769934 100644
---- a/trace/control.c
-+++ b/trace/control.c
-@@ -72,8 +72,8 @@ void trace_event_register_group(TraceEvent **events)
-         if (likely(next_vcpu_id < CPU_TRACE_DSTATE_MAX_EVENTS)) {
-             events[i]->vcpu_id = next_vcpu_id++;
-         } else {
--            error_report("WARNING: too many vcpu trace events; dropping '%s'",
--                         events[i]->name);
-+            warn_report("too many vcpu trace events; dropping '%s'",
-+                        events[i]->name);
          }
-     }
-     event_groups = g_renew(TraceEventGroup, event_groups, nevent_groups + 1);
 -- 
 1.8.3.1
