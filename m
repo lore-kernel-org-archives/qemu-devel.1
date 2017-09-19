@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42274)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duOzU-0005FT-SU
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:19:37 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1duOzZ-0005KX-3V
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:19:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duOzT-0004fO-Ih
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:19:32 -0400
-From: Eric Blake <eblake@redhat.com>
-Date: Tue, 19 Sep 2017 15:18:52 -0500
-Message-Id: <20170919201910.25656-3-eblake@redhat.com>
-In-Reply-To: <20170919201910.25656-1-eblake@redhat.com>
-References: <20170919201910.25656-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH v9 02/20] hbitmap: Rename
- serialization_granularity to serialization_align
+	(envelope-from <ehabkost@redhat.com>) id 1duOzT-0004g0-Ue
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:19:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34014)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1duOzT-0004f9-LE
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 16:19:31 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+Date: Tue, 19 Sep 2017 17:18:47 -0300
+Message-Id: <20170919201850.14772-10-ehabkost@redhat.com>
+In-Reply-To: <20170919201850.14772-1-ehabkost@redhat.com>
+References: <20170919201850.14772-1-ehabkost@redhat.com>
+Subject: [Qemu-devel] [PULL 09/12] numa: cpu: calculate/set default node-ids
+ after all -numa CLI options are parsed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,141 +24,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, famz@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Igor Mammedov <imammedo@redhat.com>
 
-The only client of hbitmap_serialization_granularity() is dirty-bitmap's
-bdrv_dirty_bitmap_serialization_align().  Keeping the two names consistent
-is worthwhile, and the shorter name is more representative of what the
-function returns (the required alignment to be used for start/count of
-other serialization functions, where violating the alignment causes
-assertion failures).
+From: Igor Mammedov <imammedo@redhat.com>
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Calculating default node-ids for CPUs in possible_cpu_arch_ids()
+is rather fragile since defaults calculation uses nb_numa_nodes but
+callback might be potentially called early before all -numa CLI
+options are parsed, which would lead to cpus assigned only upto
+nb_numa_nodes at the time possible_cpu_arch_ids() is called.
 
+Issue was introduced by
+(7c88e65 numa: mirror cpu to node mapping in MachineState::possible_cpus)
+and for example CLI:
+  -smp 4 -numa node,cpus=0 -numa node
+would set props.node-id in possible_cpus array for every non
+explicitly mapped CPU to the first node.
+
+Issue is not visible to guest nor to mgmt interface due to
+  1) implictly mapped cpus are forced to the first node in
+     case of partial mapping
+  2) in case of default mapping possible_cpu_arch_ids() is
+     called after all -numa options are parsed (resulting
+     in correct mapping).
+
+However it's fragile to rely on late execution of
+possible_cpu_arch_ids(), therefore add machine specific
+callback that returns node-id for CPU and use it to calculate/
+set defaults at machine_numa_finish_init() time when all -numa
+options are parsed.
+
+Reported-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <1496314408-163972-1-git-send-email-imammedo@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-v5: no change
-v4: new patch
----
- include/qemu/hbitmap.h |  8 ++++----
- block/dirty-bitmap.c   |  2 +-
- tests/test-hbitmap.c   | 10 +++++-----
- util/hbitmap.c         |  8 ++++----
- 4 files changed, 14 insertions(+), 14 deletions(-)
+ include/hw/boards.h |  4 ++++
+ hw/arm/virt.c       | 14 ++++++--------
+ hw/core/machine.c   |  1 +
+ hw/i386/pc.c        | 20 +++++++++++---------
+ hw/ppc/spapr.c      | 15 ++++++---------
+ 5 files changed, 28 insertions(+), 26 deletions(-)
 
-diff --git a/include/qemu/hbitmap.h b/include/qemu/hbitmap.h
-index d3a74a21fc..81e78043d1 100644
---- a/include/qemu/hbitmap.h
-+++ b/include/qemu/hbitmap.h
-@@ -159,16 +159,16 @@ bool hbitmap_get(const HBitmap *hb, uint64_t item);
- bool hbitmap_is_serializable(const HBitmap *hb);
-
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index 6b67adaef6..156e0a5701 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -123,6 +123,9 @@ typedef struct {
+  *    Returns an array of @CPUArchId architecture-dependent CPU IDs
+  *    which includes CPU IDs for present and possible to hotplug CPUs.
+  *    Caller is responsible for freeing returned list.
++ * @get_default_cpu_node_id:
++ *    returns default board specific node_id value for CPU slot specified by
++ *    index @idx in @ms->possible_cpus[]
+  * @has_hotpluggable_cpus:
+  *    If true, board supports CPUs creation with -device/device_add.
+  * @default_cpu_type:
+@@ -196,6 +199,7 @@ struct MachineClass {
+     CpuInstanceProperties (*cpu_index_to_instance_props)(MachineState *machine,
+                                                          unsigned cpu_index);
+     const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState *machine);
++    int64_t (*get_default_cpu_node_id)(const MachineState *ms, int idx);
+ };
+ 
  /**
-- * hbitmap_serialization_granularity:
-+ * hbitmap_serialization_align:
-  * @hb: HBitmap to operate on.
-  *
-- * Granularity of serialization chunks, used by other serialization functions.
-- * For every chunk:
-+ * Required alignment of serialization chunks, used by other serialization
-+ * functions. For every chunk:
-  * 1. Chunk start should be aligned to this granularity.
-  * 2. Chunk size should be aligned too, except for last chunk (for which
-  *      start + count == hb->size)
-  */
--uint64_t hbitmap_serialization_granularity(const HBitmap *hb);
-+uint64_t hbitmap_serialization_align(const HBitmap *hb);
-
- /**
-  * hbitmap_serialization_size:
-diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-index 30462d4f9a..0490ca3aff 100644
---- a/block/dirty-bitmap.c
-+++ b/block/dirty-bitmap.c
-@@ -617,7 +617,7 @@ uint64_t bdrv_dirty_bitmap_serialization_size(const BdrvDirtyBitmap *bitmap,
-
- uint64_t bdrv_dirty_bitmap_serialization_align(const BdrvDirtyBitmap *bitmap)
- {
--    return hbitmap_serialization_granularity(bitmap->bitmap);
-+    return hbitmap_serialization_align(bitmap->bitmap);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 65d68bc50d..9e18b410d7 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -1554,6 +1554,11 @@ virt_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+     return possible_cpus->cpus[cpu_index].props;
  }
-
- void bdrv_dirty_bitmap_serialize_part(const BdrvDirtyBitmap *bitmap,
-diff --git a/tests/test-hbitmap.c b/tests/test-hbitmap.c
-index 1acb353889..af41642346 100644
---- a/tests/test-hbitmap.c
-+++ b/tests/test-hbitmap.c
-@@ -738,15 +738,15 @@ static void test_hbitmap_meta_one(TestHBitmapData *data, const void *unused)
+ 
++static int64_t virt_get_default_cpu_node_id(const MachineState *ms, int idx)
++{
++    return idx % nb_numa_nodes;
++}
++
+ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+ {
+     int n;
+@@ -1572,14 +1577,6 @@ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+             virt_cpu_mp_affinity(vms, n);
+         ms->possible_cpus->cpus[n].props.has_thread_id = true;
+         ms->possible_cpus->cpus[n].props.thread_id = n;
+-
+-        /* default distribution of CPUs over NUMA nodes */
+-        if (nb_numa_nodes) {
+-            /* preset values but do not enable them i.e. 'has_node_id = false',
+-             * numa init code will enable them later if manual mapping wasn't
+-             * present on CLI */
+-            ms->possible_cpus->cpus[n].props.node_id = n % nb_numa_nodes;
+-        }
      }
+     return ms->possible_cpus;
  }
-
--static void test_hbitmap_serialize_granularity(TestHBitmapData *data,
--                                               const void *unused)
-+static void test_hbitmap_serialize_align(TestHBitmapData *data,
-+                                         const void *unused)
- {
-     int r;
-
-     hbitmap_test_init(data, L3 * 2, 3);
-     g_assert(hbitmap_is_serializable(data->hb));
-
--    r = hbitmap_serialization_granularity(data->hb);
-+    r = hbitmap_serialization_align(data->hb);
-     g_assert_cmpint(r, ==, 64 << 3);
+@@ -1603,6 +1600,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     mc->possible_cpu_arch_ids = virt_possible_cpu_arch_ids;
+     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
+     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
++    mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
  }
-
-@@ -974,8 +974,8 @@ int main(int argc, char **argv)
-     hbitmap_test_add("/hbitmap/meta/word", test_hbitmap_meta_word);
-     hbitmap_test_add("/hbitmap/meta/sector", test_hbitmap_meta_sector);
-
--    hbitmap_test_add("/hbitmap/serialize/granularity",
--                     test_hbitmap_serialize_granularity);
-+    hbitmap_test_add("/hbitmap/serialize/align",
-+                     test_hbitmap_serialize_align);
-     hbitmap_test_add("/hbitmap/serialize/basic",
-                      test_hbitmap_serialize_basic);
-     hbitmap_test_add("/hbitmap/serialize/part",
-diff --git a/util/hbitmap.c b/util/hbitmap.c
-index 21535cc90b..2f9d0fdbd0 100644
---- a/util/hbitmap.c
-+++ b/util/hbitmap.c
-@@ -413,14 +413,14 @@ bool hbitmap_is_serializable(const HBitmap *hb)
- {
-     /* Every serialized chunk must be aligned to 64 bits so that endianness
-      * requirements can be fulfilled on both 64 bit and 32 bit hosts.
--     * We have hbitmap_serialization_granularity() which converts this
-+     * We have hbitmap_serialization_align() which converts this
-      * alignment requirement from bitmap bits to items covered (e.g. sectors).
-      * That value is:
-      *    64 << hb->granularity
-      * Since this value must not exceed UINT64_MAX, hb->granularity must be
-      * less than 58 (== 64 - 6, where 6 is ld(64), i.e. 1 << 6 == 64).
-      *
--     * In order for hbitmap_serialization_granularity() to always return a
-+     * In order for hbitmap_serialization_align() to always return a
-      * meaningful value, bitmaps that are to be serialized must have a
-      * granularity of less than 58. */
-
-@@ -437,7 +437,7 @@ bool hbitmap_get(const HBitmap *hb, uint64_t item)
-     return (hb->levels[HBITMAP_LEVELS - 1][pos >> BITS_PER_LEVEL] & bit) != 0;
+ 
+ static const TypeInfo virt_machine_info = {
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 41b53a17ad..80647edc2a 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -724,6 +724,7 @@ static void machine_numa_finish_init(MachineState *machine)
+             /* fetch default mapping from board and enable it */
+             CpuInstanceProperties props = cpu_slot->props;
+ 
++            props.node_id = mc->get_default_cpu_node_id(machine, i);
+             if (!default_mapping) {
+                 /* record slots with not set mapping,
+                  * TODO: make it hard error in future */
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 2247ac0a01..610c65aeab 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -2234,6 +2234,16 @@ pc_cpu_index_to_props(MachineState *ms, unsigned cpu_index)
+     return possible_cpus->cpus[cpu_index].props;
  }
-
--uint64_t hbitmap_serialization_granularity(const HBitmap *hb)
-+uint64_t hbitmap_serialization_align(const HBitmap *hb)
+ 
++static int64_t pc_get_default_cpu_node_id(const MachineState *ms, int idx)
++{
++   X86CPUTopoInfo topo;
++
++   assert(idx < ms->possible_cpus->len);
++   x86_topo_ids_from_apicid(ms->possible_cpus->cpus[idx].arch_id,
++                            smp_cores, smp_threads, &topo);
++   return topo.pkg_id % nb_numa_nodes;
++}
++
+ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
  {
-     assert(hbitmap_is_serializable(hb));
-
-@@ -454,7 +454,7 @@ static void serialization_chunk(const HBitmap *hb,
-                                 unsigned long **first_el, uint64_t *el_count)
+     int i;
+@@ -2263,15 +2273,6 @@ static const CPUArchIdList *pc_possible_cpu_arch_ids(MachineState *ms)
+         ms->possible_cpus->cpus[i].props.core_id = topo.core_id;
+         ms->possible_cpus->cpus[i].props.has_thread_id = true;
+         ms->possible_cpus->cpus[i].props.thread_id = topo.smt_id;
+-
+-        /* default distribution of CPUs over NUMA nodes */
+-        if (nb_numa_nodes) {
+-            /* preset values but do not enable them i.e. 'has_node_id = false',
+-             * numa init code will enable them later if manual mapping wasn't
+-             * present on CLI */
+-            ms->possible_cpus->cpus[i].props.node_id =
+-                topo.pkg_id % nb_numa_nodes;
+-        }
+     }
+     return ms->possible_cpus;
+ }
+@@ -2316,6 +2317,7 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+     pcmc->linuxboot_dma_enabled = true;
+     mc->get_hotplug_handler = pc_get_hotpug_handler;
+     mc->cpu_index_to_instance_props = pc_cpu_index_to_props;
++    mc->get_default_cpu_node_id = pc_get_default_cpu_node_id;
+     mc->possible_cpu_arch_ids = pc_possible_cpu_arch_ids;
+     mc->has_hotpluggable_cpus = true;
+     mc->default_boot_order = "cad";
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index f680f28a15..17ea77618c 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3404,6 +3404,11 @@ spapr_cpu_index_to_props(MachineState *machine, unsigned cpu_index)
+     return core_slot->props;
+ }
+ 
++static int64_t spapr_get_default_cpu_node_id(const MachineState *ms, int idx)
++{
++    return idx / smp_cores % nb_numa_nodes;
++}
++
+ static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
  {
-     uint64_t last = start + count - 1;
--    uint64_t gran = hbitmap_serialization_granularity(hb);
-+    uint64_t gran = hbitmap_serialization_align(hb);
-
-     assert((start & (gran - 1)) == 0);
-     assert((last >> hb->granularity) < hb->size);
+     int i;
+@@ -3428,15 +3433,6 @@ static const CPUArchIdList *spapr_possible_cpu_arch_ids(MachineState *machine)
+         machine->possible_cpus->cpus[i].arch_id = core_id;
+         machine->possible_cpus->cpus[i].props.has_core_id = true;
+         machine->possible_cpus->cpus[i].props.core_id = core_id;
+-
+-        /* default distribution of CPUs over NUMA nodes */
+-        if (nb_numa_nodes) {
+-            /* preset values but do not enable them i.e. 'has_node_id = false',
+-             * numa init code will enable them later if manual mapping wasn't
+-             * present on CLI */
+-            machine->possible_cpus->cpus[i].props.node_id =
+-                core_id / smp_threads / smp_cores % nb_numa_nodes;
+-        }
+     }
+     return machine->possible_cpus;
+ }
+@@ -3587,6 +3583,7 @@ static void spapr_machine_class_init(ObjectClass *oc, void *data)
+     hc->pre_plug = spapr_machine_device_pre_plug;
+     hc->plug = spapr_machine_device_plug;
+     mc->cpu_index_to_instance_props = spapr_cpu_index_to_props;
++    mc->get_default_cpu_node_id = spapr_get_default_cpu_node_id;
+     mc->possible_cpu_arch_ids = spapr_possible_cpu_arch_ids;
+     hc->unplug_request = spapr_machine_device_unplug_request;
+ 
 -- 
 2.13.5
