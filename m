@@ -1,33 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45813)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1duGaW-0007lM-3S
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:21:14 -0400
+	(envelope-from <clg@kaod.org>) id 1duGgA-0001yB-Iq
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:27:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1duGaQ-0001HE-AR
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:21:12 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48950)
+	(envelope-from <clg@kaod.org>) id 1duGg7-0006BT-H2
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:27:02 -0400
+Received: from 9.mo179.mail-out.ovh.net ([46.105.76.148]:37878)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1duGaQ-0001GY-22
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:21:06 -0400
-Date: Tue, 19 Sep 2017 12:20:55 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170919112055.GI9536@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1505223994.31639.20.camel@redhat.com>
-	<20170912141910.GJ17633@redhat.com>
-	<CAFEAcA-tdbzXBkyxXW_e15hVcbcfqSfKqke0PX6y-Cg6A62DzQ@mail.gmail.com>
-	<20170912143007.GK17633@redhat.com>
-	<1505390103.31557.11.camel@redhat.com>
-	<CAFEAcA9JEGbiwKeSMyvnLrdE+2WrkRbYLcVJ+UpFnU1RymC1vQ@mail.gmail.com>
-	<20170914124059.GD15518@redhat.com>
-	<1505747575.4959.1.camel@redhat.com>
-	<20170919100839.GH9536@redhat.com>
-	<1505818700.12708.3.camel@redhat.com>
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duGg7-0006Ac-Ai
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:26:59 -0400
+Received: from player716.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id E206D62291
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 13:26:57 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Tue, 19 Sep 2017 13:26:40 +0200
+Message-Id: <20170919112645.8574-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1505818700.12708.3.camel@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v5 00/12] Convert over to use keycodemapdb
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 0/5] aspeed: add a witherspoon-bmc machine
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,57 +27,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, Joel Stanley <joel@jms.id.au>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On Tue, Sep 19, 2017 at 12:58:20PM +0200, Gerd Hoffmann wrote:
->   Hi,
-> 
-> > > So I did the keymaps build with a recursive make call too, which
-> > > doesn't look that pretty ...
-> > 
-> > I don't think that's too ugly, but I wonder if there's some way to
-> > avoid
-> > the recursive make call.
-> > 
-> > It feels like this is a similar scenario to 'config-host.mak' being
-> > outdated. I don't entirely understand the logic yet, but we manage to
-> > automatically re-run configure and rebuild config-host.make, when
-> > configure changes, and that in turn affects which dependancies need
-> > rebuild.
-> 
-> Can't spot anything special in the Makefile.  Maybe make is clever
-> enough to figure that a rule updates a include file and starts over
-> then.
-> 
-> > I wonder if we can somehow integrate into that process, so
-> > that configure is responsible for checking out the git submodules,
-> > then make the re-running of configure trigger when .gitmodules
-> > changes content.
-> 
-> .gitmodules only has the repo links, not the checkout hashes.  So it
-> wouldn't be touched on updates.
-> 
-> I can't see an easy way for make to figure a submodule has changed,
-> other than running "git submodule update".
+Hello,
 
-So I think I figured out the trick libvirt/gnulib uses for this. It
-runs an external script to check the submodule status. This runs
-'git submodule' to get a list of expected hashes, and compares this
-to a file .git-submodule-status that it previously created (might be
-missing on fresh checkout). If the expected & stores hashes don't
-match this script runs an error.
+This series adds a new Aspeed machine to emulate the BMC of a
+Witherspoon system. It also extends the other Aspeed machines with I2C
+devices and adds a simple model for the pca9552 LED blinker present on
+the witherspoon board.
 
-The Makefile checks the output of this script, and if it indicates
-that an submodule update is required, it uses an ifeq() to add a
-dependancy between "Makefile" and a phony target that re-runs
-configure (which in turns updates the submodules). If no update was
-required, then no dependancy from Makefile gets added, so build runs
-normally.
+Thanks,
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+C.
+
+C=C3=A9dric Le Goater (5):
+  aspeed: add support for the witherspoon-bmc board
+  aspeed: add an I2C RTC device to all machines
+  aspeed: Add EEPROM I2C devices
+  misc: add pca9552 LED blinker model
+  aspeed: add the pc9552 chips to the witherspoon machine
+
+ default-configs/arm-softmmu.mak |   1 +
+ hw/arm/aspeed.c                 |  92 +++++++++++++++++
+ hw/misc/Makefile.objs           |   1 +
+ hw/misc/pca9552.c               | 212 ++++++++++++++++++++++++++++++++++=
+++++++
+ include/hw/misc/pca9552.h       |  32 ++++++
+ 5 files changed, 338 insertions(+)
+ create mode 100644 hw/misc/pca9552.c
+ create mode 100644 include/hw/misc/pca9552.h
+
+--=20
+2.13.5
