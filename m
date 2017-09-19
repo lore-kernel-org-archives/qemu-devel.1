@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51332)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51330)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duFta-0001J4-QY
+	(envelope-from <dgibson@ozlabs.org>) id 1duFta-0001J0-Pj
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duFtX-0002yR-3F
+	(envelope-from <dgibson@ozlabs.org>) id 1duFtW-0002xh-NC
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:50 -0400
-Date: Tue, 19 Sep 2017 12:48:49 +1000
+Date: Tue, 19 Sep 2017 18:20:20 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170919024849.GL27153@umbus>
+Message-ID: <20170919082020.GT27153@umbus>
 References: <20170911171235.29331-1-clg@kaod.org>
-	<20170911171235.29331-7-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="z9sQuz+HmDh2hVO4"
+	protocol="application/pgp-signature"; boundary="bxF9Dep5HzwGj9mC"
 Content-Disposition: inline
-In-Reply-To: <20170911171235.29331-7-clg@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 06/21] ppc/xive: introduce handlers
- for interrupt sources
+In-Reply-To: <20170911171235.29331-1-clg@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 00/21] Guest exploitation of the
+ XIVE interrupt controller (POWER9)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,118 +28,132 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
 
---z9sQuz+HmDh2hVO4
+--bxF9Dep5HzwGj9mC
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 11, 2017 at 07:12:20PM +0200, C=E9dric Le Goater wrote:
-> These are very similar to the XICS handlers in a simpler form. They
-> make use of the ICSIRQState array of the XICS interrupt source to
-> differentiate the MSI from the LSI interrupts. The spapr_xive_irq()
-> routine in charge of triggering the CPU interrupt line will be filled
-> later on.
+On Mon, Sep 11, 2017 at 07:12:14PM +0200, C=E9dric Le Goater wrote:
+> On a POWER9 sPAPR machine, the Client Architecture Support (CAS)
+> negotiation process determines whether the guest operates with an
+> interrupt controller using the XICS legacy model, as found on POWER8,
+> or in XIVE exploitation mode, the newer POWER9 interrupt model. This
+> patchset is a proposal to add XIVE support in POWER9 sPAPR machine.
 >=20
-> The next patch will introduce the MMIO handlers to interact with XIVE
-> interrupt sources.
+> Follows a model for the XIVE interrupt controller and support for the
+> Hypervisor's calls which are used to configure the interrupt sources
+> and the event/notification queues of the guest. The last patch
+> integrates XIVE in the sPAPR machine.
 >=20
-> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> ---
->  hw/intc/spapr_xive.c        | 46 +++++++++++++++++++++++++++++++++++++++=
+> Code is here:
+
+
+An overall comment:
+
+I note in several replies here that I think the way XICS objects are
+re-used for XIVE is really ugly, and I think it will make future
+maintenance pretty painful.
+
+I'm thinking maybe trying to support the CAS negotiation of interrupt
+controller from day 1 is warping the design.  A better approach might
+be first to implement XIVE only when given a specific machine option -
+guest gets one or the other and can't negotiate.
+
+That should allow a more natural XIVE design to emerge, *then* we can
+look at what's necessary to make boot-time negotiation possible.
+>=20
+>   https://github.com/legoater/qemu/commits/xive
+>=20
+> Caveats :
+>=20
+>  - IRQ allocator : making progress
+>=20
+>    The sPAPR machine make uses of the interrupt controller very early
+>    in the initialization sequence to allocate IRQ numbers and populate
+>    the device tree. CAS requires XIVE to be able to switch interrupt
+>    model and consequently have the models share a common IRQ allocator.  =
+=20
+>=20
+>    I have chosen to link the sPAPR XICS interrupt source into XIVE to
+>    share the ICSIRQState array which acts as an IRQ allocator. This
+>    can be improved.
+>=20
+>  - Interrupt presenter :
+>=20
+>    The register data is directly stored under the ICPState structure
+>    which is shared with all other sPAPR interrupt controller models.
+>=20
+>  - KVM support : not addressed yet
+>=20
+>    The guest needs to be run with kernel_irqchip=3Doff on a POWER9 system.
+>=20
+>  - LSI : lightly tested.
+>   =20
+> Thanks,
+>=20
+> C.
+>=20
+> Changes since RFC v1:
+>=20
+>  - removed initial complexity due to a tentative try to support
+>    PowerNV. This will come later.
+>  - removed specific XIVE interrupt source and presenter models
+>  - renamed files and typedefs
+>  - removed print_info() handler
+>  - introduced a CAS reset to rebuild the device tree
+>  - linked the XIVE model with the sPAPR XICS interrupt source to share
+>    the IRQ allocator  =20
+>  - improved hcall support (still some missing but they are not used
+>    under Linux)
+>  - improved device tree
+>  - should have addressed comments in first RFC
+>  - and much more ... Next version should have a better changelog.
+> =20
+>=20
+> C=E9dric Le Goater (21):
+>   ppc/xive: introduce a skeleton for the sPAPR XIVE interrupt controller
+>   migration: add VMSTATE_STRUCT_VARRAY_UINT32_ALLOC
+>   ppc/xive: define the XIVE internal tables
+>   ppc/xive: provide a link to the sPAPR ICS object under XIVE
+>   ppc/xive: allocate IRQ numbers for the IPIs
+>   ppc/xive: introduce handlers for interrupt sources
+>   ppc/xive: add MMIO handlers for the XIVE interrupt sources
+>   ppc/xive: describe the XIVE interrupt source flags
+>   ppc/xive: extend the interrupt presenter model for XIVE
+>   ppc/xive: add MMIO handlers for the XIVE TIMA
+>   ppc/xive: push the EQ data in OS event queue
+>   ppc/xive: notify the CPU when interrupt priority is more privileged
+>   ppc/xive: handle interrupt acknowledgment by the O/S
+>   ppc/xive: add support for the SET_OS_PENDING command
+>   spapr: modify spapr_populate_pci_dt() to use a 'nr_irqs' argument
+>   spapr: add a XIVE object to the sPAPR machine
+>   ppc/xive: add hcalls support
+>   ppc/xive: add device tree support
+>   ppc/xive: introduce a helper to map the XIVE memory regions
+>   ppc/xics: introduce a qirq_get() helper in the XICSFabric
+>   spapr: activate XIVE exploitation mode
+>=20
+>  default-configs/ppc64-softmmu.mak |   1 +
+>  hw/intc/Makefile.objs             |   1 +
+>  hw/intc/spapr_xive.c              | 821 +++++++++++++++++++++++++++++++++
+>  hw/intc/spapr_xive_hcall.c        | 930 ++++++++++++++++++++++++++++++++=
 ++++++
->  include/hw/ppc/spapr_xive.h |  1 +
->  2 files changed, 47 insertions(+)
+>  hw/intc/xics.c                    |  11 +-
+>  hw/intc/xive-internal.h           | 189 ++++++++
+>  hw/ppc/spapr.c                    | 110 ++++-
+>  hw/ppc/spapr_hcall.c              |   6 +
+>  hw/ppc/spapr_pci.c                |   4 +-
+>  include/hw/pci-host/spapr.h       |   2 +-
+>  include/hw/ppc/spapr.h            |  17 +-
+>  include/hw/ppc/spapr_xive.h       |  75 +++
+>  include/hw/ppc/xics.h             |   7 +
+>  include/migration/vmstate.h       |  10 +
+>  14 files changed, 2169 insertions(+), 15 deletions(-)
+>  create mode 100644 hw/intc/spapr_xive.c
+>  create mode 100644 hw/intc/spapr_xive_hcall.c
+>  create mode 100644 hw/intc/xive-internal.h
+>  create mode 100644 include/hw/ppc/spapr_xive.h
 >=20
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 52c32f588d6d..1ed7b6a286e9 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -27,6 +27,50 @@
-> =20
->  #include "xive-internal.h"
-> =20
-> +static void spapr_xive_irq(sPAPRXive *xive, int srcno)
-> +{
-> +
-> +}
-> +
-> +/*
-> + * XIVE Interrupt Source
-> + */
-> +static void spapr_xive_source_set_irq_msi(sPAPRXive *xive, int srcno, in=
-t val)
-> +{
-> +    if (val) {
-> +        spapr_xive_irq(xive, srcno);
-> +    }
-> +}
-
-So in XICS "srcno" (vs "irq") indicates an offset within a single ICS
-object, as opposed to a global irq number.  Does that concept even
-exist in XIVE?
-
-> +
-> +static void spapr_xive_source_set_irq_lsi(sPAPRXive *xive, int srcno, in=
-t val)
-> +{
-> +    ICSIRQState *irq =3D &xive->ics->irqs[srcno];
-> +
-> +    if (val) {
-> +        irq->status |=3D XICS_STATUS_ASSERTED;
-> +    } else {
-> +        irq->status &=3D ~XICS_STATUS_ASSERTED;
-
-More mangling a XICS specific object for XIVE operations.  Please
-stop.
-
-> +    }
-> +
-> +    if (irq->status & XICS_STATUS_ASSERTED
-> +        && !(irq->status & XICS_STATUS_SENT)) {
-> +        irq->status |=3D XICS_STATUS_SENT;
-> +        spapr_xive_irq(xive, srcno);
-> +    }
-> +}
-> +
-> +static void spapr_xive_source_set_irq(void *opaque, int srcno, int val)
-> +{
-> +    sPAPRXive *xive =3D SPAPR_XIVE(opaque);
-> +    ICSIRQState *irq =3D &xive->ics->irqs[srcno];
-> +
-> +    if (irq->flags & XICS_FLAGS_IRQ_LSI) {
-> +        spapr_xive_source_set_irq_lsi(xive, srcno, val);
-> +    } else {
-> +        spapr_xive_source_set_irq_msi(xive, srcno, val);
-> +    }
-> +}
-> +
->  /*
->   * Main XIVE object
->   */
-> @@ -80,6 +124,8 @@ static void spapr_xive_realize(DeviceState *dev, Error=
- **errp)
->      }
-> =20
->      xive->ics =3D ICS_BASE(obj);
-> +    xive->qirqs =3D qemu_allocate_irqs(spapr_xive_source_set_irq, xive,
-> +                                     xive->nr_irqs);
-> =20
->      /* Allocate the last IRQ numbers for the IPIs */
->      for (i =3D xive->nr_irqs - xive->nr_targets; i < xive->nr_irqs; i++)=
- {
-> diff --git a/include/hw/ppc/spapr_xive.h b/include/hw/ppc/spapr_xive.h
-> index 29112589b37f..eab92c4c1bb8 100644
-> --- a/include/hw/ppc/spapr_xive.h
-> +++ b/include/hw/ppc/spapr_xive.h
-> @@ -38,6 +38,7 @@ struct sPAPRXive {
-> =20
->      /* IRQ */
->      ICSState     *ics;  /* XICS source inherited from the SPAPR machine =
-*/
-> +    qemu_irq     *qirqs;
-> =20
->      /* XIVE internal tables */
->      uint8_t      *sbe;
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -148,24 +161,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---z9sQuz+HmDh2hVO4
+--bxF9Dep5HzwGj9mC
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnAhZEACgkQbDjKyiDZ
-s5IBZw//WnZjC4sPzHjckdWo8xHJNP/P5gcoJ16TCOW/T2ugmMhJY+WDCb3SpsTv
-uDZyFgxaFaQnIUBYVxy2fLqf0z0KuT+vb2M/58PISfVZESX9o6RBtBRkVTdUSBEB
-k3MKG/2407SHqjEQqFIfArxf9JIwZmdSMD61IHNIyRJoLG+pNi8vQNHwXrM+NfAz
-O9pwLPOacI05hajdQKJtqLaa/l83EdY/ImTYI8+Q5wVfPlM4FS6bh6nq8t0fIrD5
-UFPGgRoe1SE8kA58lOyiDc1tUBYCPBAuU2uy6ptCSjxO9hUCXhF0N9BN4zcREHTj
-pMd8CwcocLDISe38jPVq7qCag/kBq89AQJhgceYLRTnRxTrYhuT2vcjPPRAOtamZ
-mE8T4BVy0aJJGas5bB2G0N/HyDP4XdiIgNb5M3EriGBDFFFAsvOyZT73bv/HcLqp
-iJmZHDp3/q0tnJJ7SkSlXbiS81kEGD30ty+lwVJtwHzXt+1nwMuVkWhY28FPCklI
-ouVqwxmamxNuLuhwuoRB0F01GqYjollXP9A/C8IV6QF5GU3dA+97m2n1GnIiQmcG
-5fHCJXsNDJpYfOkzfFJpuHqTWSrbNExMK3uk3rFMsV0QWbuq76Yc8RSVpdt1c4Qv
-o6jo2teaasgkD2c+wYUhefsVnyqEsx9XtKDJ0FxtaMg8v+QXbH0=
-=hiuZ
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnA00IACgkQbDjKyiDZ
+s5LgPg//eX7Ja7L5TG+V8DJsemjJirg9owjCN2XzZ8UwDz8EM4qKomiyqTV7Meh3
+hnwix1l4AL/7Ym3BCG/3h9Y1DfAZqS5ZDKcLFs41G8xWk+fKCVbVVGn5yGzthoEc
+Cbgsc6nKWWgsoYDEvU6tXr5eotOs4HBbs7IUtQvosW7oxnDY78wVqqfQz7UXTmFI
+L6p0WEaNK9U9/QDQ3FGn6qZecNkwvt+vM1b2raGIGrx+ofwG6XP4MkucZvR1iR17
+/a0t3+/ehEDFnY6dmhGBllFvA0c7+9t/lKNoZwt/WORxTcNdmeVXe4V3d4RPtDhZ
+Fr1DrMCEIzh7VOuNIaL9GE+NFX078Z2uk7rgRnCnMa71vXQBBbhmDfgyNPPwfYC6
+PO9y/32TvDNrvzALZeruy+OvpWZhrQulQ3XcH119nBc5v/Qq9OmlJFVqUdOw9S3G
+iCF0dQFmeP6q8SxHkoQRpCDCCGVwGU0dgXmOb6tEcVkRKku3EEaW9ERfX75go3Hk
+8CBp59j2RHo3qY8FkA2qphGr9BRUug4BrLD03qaXG75Saj5nOWqftE4GV11Cq7hV
+I4TifuQCXQpeuxpwttZoKQXM1JEDda9Dny1t74NN8iidGFS4N0ekmHYngTCXgaWO
+ggIP+s/4h7F5GkAOW0+zLqVdZxl8bTO/vVtNfkcDuTrqamuU5mo=
+=rBWt
 -----END PGP SIGNATURE-----
 
---z9sQuz+HmDh2hVO4--
+--bxF9Dep5HzwGj9mC--
