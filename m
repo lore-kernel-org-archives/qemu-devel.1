@@ -1,28 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47090)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47238)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duJKQ-0007Hi-FX
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:16:47 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1duJKb-0007Sg-4G
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:17:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duJKM-0006yb-BO
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:16:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37100)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1duJKM-0006xu-1g
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:16:42 -0400
-References: <20170918214649.17550-1-eblake@redhat.com>
-	<dfe4dc28-4011-e7a7-aa1f-54e340f091d2@amsat.org>
-	<53ea39b4-7926-d29b-fb28-3f2295dc394d@redhat.com>
-	<8f30a125-040e-0c75-92c9-2c6fd8db08db@amsat.org>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <f7e88217-271b-c24f-c466-e3e42d596158@redhat.com>
-Date: Tue, 19 Sep 2017 09:16:39 -0500
+	(envelope-from <pbonzini@redhat.com>) id 1duJKR-00076L-LA
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:16:57 -0400
+Received: from mail-wr0-f178.google.com ([209.85.128.178]:57190)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1duJKR-000752-EZ
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:16:47 -0400
+Received: by mail-wr0-f178.google.com with SMTP id r74so110585wrb.13
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 07:16:47 -0700 (PDT)
+References: <20170919124440.30017-1-pbonzini@redhat.com>
+	<CAFEAcA-PffxsdgohV3nO=bPW+ACVEAAExZoCha5eDiaR2w5O1Q@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <32e9b1dc-7f3e-93c9-ec17-6d744ffc8401@redhat.com>
+Date: Tue, 19 Sep 2017 16:16:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <8f30a125-040e-0c75-92c9-2c6fd8db08db@amsat.org>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="4P7bAoOsF83vGxkaTkGTn6nsruF43es1M"
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] nbd-client: Use correct
- macro parenthesization
+In-Reply-To: <CAFEAcA-PffxsdgohV3nO=bPW+ACVEAAExZoCha5eDiaR2w5O1Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PULL v2 00/50] Misc patches for 2017-09-19
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,76 +30,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---4P7bAoOsF83vGxkaTkGTn6nsruF43es1M
-From: Eric Blake <eblake@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Cc: qemu-devel@nongnu.org
-Message-ID: <f7e88217-271b-c24f-c466-e3e42d596158@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] nbd-client: Use correct macro
- parenthesization
-References: <20170918214649.17550-1-eblake@redhat.com>
- <dfe4dc28-4011-e7a7-aa1f-54e340f091d2@amsat.org>
- <53ea39b4-7926-d29b-fb28-3f2295dc394d@redhat.com>
- <8f30a125-040e-0c75-92c9-2c6fd8db08db@amsat.org>
-In-Reply-To: <8f30a125-040e-0c75-92c9-2c6fd8db08db@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 19/09/2017 15:47, Peter Maydell wrote:
+>   LINK    tests/ptimer-test
+> duplicate symbol _qemu_bh_delete in:
+>     tests/ptimer-test-stubs.o
+>     libqemuutil.a(async.o)
+> duplicate symbol _qemu_clock_get_ns in:
+>     tests/ptimer-test-stubs.o
+>     libqemuutil.a(qemu-timer.o)
+> duplicate symbol _timer_init_tl in:
+>     tests/ptimer-test-stubs.o
+>     libqemuutil.a(qemu-timer.o)
+> duplicate symbol _qemu_clock_deadline_ns_all in:
+>     tests/ptimer-test-stubs.o
+>     libqemuutil.a(qemu-timer.o)
+> duplicate symbol _timer_del in:
+>     tests/ptimer-test-stubs.o
+>     libqemuutil.a(qemu-timer.o)
+> duplicate symbol _main_loop_tlg in:
+>     tests/ptimer-test-stubs.o
+>     libqemuutil.a(qemu-timer.o)
+> duplicate symbol _timer_mod in:
+>     tests/ptimer-test-stubs.o
+>     libqemuutil.a(qemu-timer.o)
+> duplicate symbol _qemu_bh_new in:
+>     tests/ptimer-test-stubs.o
+>     libqemuutil.a(main-loop.o)
+> ld: 8 duplicate symbols for architecture x86_64
+> clang: error: linker command failed with exit code 1 (use -v to see invocation)
 
-On 09/19/2017 05:32 AM, Philippe Mathieu-Daud=C3=A9 wrote:
-> On 09/18/2017 07:42 PM, Eric Blake wrote:
->> On 09/18/2017 05:13 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->>> Any magic cocci script to verify there aren't no more?
->>
->> I don't know if cocci can do it; checkpatch tries to check whether mac=
-ro
->> arguments are parenthesized, but even that's prone to missing things.=C2=
-=A0 I
->> just spotted this particular one while reviewing a related patch.
->=20
-> couldn't figure out.
->=20
-> grep -E '^\s*#define\s+\w+\([^\)]+\)\s+.*\(\w+\)\w+' (no multiline)
-> found those unharmful:
->=20
-> target/mips/dsp_helper.c:#define MIPSDSP_RETURN64_16(a, b, c, d)
-> (((uint64_t)a << 48) | \
-> target/mips/dsp_helper.c:#define MIPSDSP_RETURN64_32(a, b) (((uint64_t)=
-a
-> << 32) | (uint64_t)b)
-> include/hw/ppc/pnv_xscom.h:#define PNV_XSCOM_EX_CORE_BASE(base, i) (bas=
-e
-> | (((uint64_t)i) << 24))
+What the patches changes is essentially
 
-There's probably more, but I submitted patches for these two files as
-separate threads for qemu-trivial.
+-tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o hw/core/ptimer.o libqemustub.a
++	libqemuutil.a
++tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o hw/core/ptimer.o libqemuutil.a
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+so I think what happens is that OS X was previously favoring a file from
+libqemustub.a, while now it favors a file from libqemuutil.a, which brings
+in async.o and main-loop.o.
 
+Luckily it is pretty easy to drop libqemuutil.a from this test, which makes
+sense since it provides its own mock timer subsystem:
 
---4P7bAoOsF83vGxkaTkGTn6nsruF43es1M
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 0c644626e8..baa10e362d 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -618,7 +618,7 @@ tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
+ tests/test-timed-average$(EXESUF): tests/test-timed-average.o $(test-util-obj-y)
+ tests/test-base64$(EXESUF): tests/test-base64.o \
+ 	libqemuutil.a
+-tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o hw/core/ptimer.o $(test-util-obj-y)
++tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o hw/core/ptimer.o
+ 
+ tests/test-logging$(EXESUF): tests/test-logging.o $(test-util-obj-y)
+ 
+diff --git a/tests/ptimer-test-stubs.c b/tests/ptimer-test-stubs.c
+index 8a1b0a336c..ca5cc3b13b 100644
+--- a/tests/ptimer-test-stubs.c
++++ b/tests/ptimer-test-stubs.c
+@@ -30,6 +30,10 @@ QEMUTimerListGroup main_loop_tlg;
+ 
+ int64_t ptimer_test_time_ns;
+ 
++/* Do not artificially limit period - see hw/core/ptimer.c.  */
++int use_icount = 1;
++bool qtest_allowed;
++
+ void timer_init_tl(QEMUTimer *ts,
+                    QEMUTimerList *timer_list, int scale,
+                    QEMUTimerCB *cb, void *opaque)
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Paolo
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnBJscACgkQp6FrSiUn
-Q2rI1wf+PCZy1UrDd95NuUmvdZgpWLgbnq51F3HSBYazX7yz9CrWN+zCDNNNpTLO
-jlZYwp4nhUdnydDl0qhFxxZ7G+iFCo9e0lM/NjkVjtjsdJYkcqYYJNkynHhGXsrp
-daso08RXI3ae2z0DIbxs4Qph80k35gCJNA/To1W9nVJQERdr7jT1h3kIKApVRP2+
-Zs18LXJWdym0JQ2efib/D9IT28FLI44YVqRvVdhgsAfTcRU2UyJ4eSAJaK6UnD4I
-QACoFEdfpNww/xQ5UfLodrJ6W8+b3N+JGNVPNImxU81ZBIbXrRF4ul0r9LrSFECb
-5z+k7fP0RYgnXHHe9wcXqmNVoT7sMw==
-=XxWK
------END PGP SIGNATURE-----
-
---4P7bAoOsF83vGxkaTkGTn6nsruF43es1M--
+> (I'll leave the rest of the merge tests running to see if they
+> find anything else.)
