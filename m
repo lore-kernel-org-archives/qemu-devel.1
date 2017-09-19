@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46257)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46356)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duJzp-0004Ta-02
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:59:37 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duJzv-0004Zc-St
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:59:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duJzj-0000qT-79
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:59:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47746)
+	(envelope-from <cohuck@redhat.com>) id 1duJzs-0000ws-Fm
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:59:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37858)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duJzj-0000q2-24
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:59:27 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duJzs-0000wY-AY
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:59:36 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 19 Sep 2017 16:56:22 +0200
-Message-Id: <20170919145636.9389-25-cohuck@redhat.com>
+Date: Tue, 19 Sep 2017 16:56:24 +0200
+Message-Id: <20170919145636.9389-27-cohuck@redhat.com>
 In-Reply-To: <20170919145636.9389-1-cohuck@redhat.com>
 References: <20170919145636.9389-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 24/38] target/s390x: rename next_cpu_id to
- next_core_id
+Subject: [Qemu-devel] [PULL 26/38] s390x: allow cpu hotplug via device_add
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,74 +28,37 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: David Hildenbrand <david@redhat.com>
 
-Adapt to the new term "core_id". While at it, fix the type and drop the
-initialization to 0 (which is superfluous).
+E.g. the following now works:
+    device_add host-s390-cpu,id=cpu1,core-id=1
+
+The system will perform the same checks as when using cpu_add:
+- If the core_id is already in use
+- If the next sequential core_id isn't used
+- If core-id >= max_cpu is specified
+
+In addition, mixed CPU models are checked. E.g. if starting with
+-cpu host and trying to hotplug "qemu-s390-cpu":
+    "Mixed CPU models are not supported on s390x."
 
 Reviewed-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170913132417.24384-15-david@redhat.com>
+Message-Id: <20170913132417.24384-17-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/cpu-qom.h |  2 +-
- target/s390x/cpu.c     | 11 +++++------
- 2 files changed, 6 insertions(+), 7 deletions(-)
+ target/s390x/cpu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/target/s390x/cpu-qom.h b/target/s390x/cpu-qom.h
-index 2435cd8390..2e446fab51 100644
---- a/target/s390x/cpu-qom.h
-+++ b/target/s390x/cpu-qom.h
-@@ -54,7 +54,7 @@ typedef struct S390CPUClass {
-     bool is_migration_safe;
-     const char *desc;
- 
--    int64_t next_cpu_id;
-+    uint32_t next_core_id;
- 
-     DeviceRealize parent_realize;
-     void (*parent_reset)(CPUState *cpu);
 diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 87ebbe5b28..8c1c644057 100644
+index 8c1c644057..5724dffb88 100644
 --- a/target/s390x/cpu.c
 +++ b/target/s390x/cpu.c
-@@ -198,7 +198,7 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-     }
- #else
-     /* implicitly set for linux-user only */
--    cpu->env.core_id = scc->next_cpu_id;
-+    cpu->env.core_id = scc->next_core_id;
- #endif
- 
-     if (cpu_exists(cpu->env.core_id)) {
-@@ -206,10 +206,10 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-                    ", it already exists", cpu->env.core_id);
-         goto out;
-     }
--    if (cpu->env.core_id != scc->next_cpu_id) {
-+    if (cpu->env.core_id != scc->next_core_id) {
-         error_setg(&err, "Unable to add CPU with core-id: %" PRIu32
--                   ", the next available core-id is %" PRIi64, cpu->env.core_id,
--                   scc->next_cpu_id);
-+                   ", the next available core-id is %" PRIu32, cpu->env.core_id,
-+                   scc->next_core_id);
-         goto out;
-     }
- 
-@@ -219,7 +219,7 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-     if (err != NULL) {
-         goto out;
-     }
--    scc->next_cpu_id++;
-+    scc->next_core_id++;
- 
- #if !defined(CONFIG_USER_ONLY)
-     qemu_register_reset(s390_cpu_machine_reset_cb, cpu);
-@@ -464,7 +464,6 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
-     CPUClass *cc = CPU_CLASS(scc);
-     DeviceClass *dc = DEVICE_CLASS(oc);
- 
--    scc->next_cpu_id = 0;
+@@ -467,6 +467,7 @@ static void s390_cpu_class_init(ObjectClass *oc, void *data)
      scc->parent_realize = dc->realize;
      dc->realize = s390_cpu_realizefn;
      dc->props = s390x_cpu_properties;
++    dc->user_creatable = true;
+ 
+     scc->parent_reset = cc->reset;
+ #if !defined(CONFIG_USER_ONLY)
 -- 
 2.13.5
