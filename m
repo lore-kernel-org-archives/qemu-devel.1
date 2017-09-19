@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32826)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1duRVH-00037h-UE
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 19:00:33 -0400
+	(envelope-from <carenas@gmail.com>) id 1duRbc-0004zS-C5
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 19:07:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1duRVG-0004xr-Qu
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 19:00:32 -0400
-References: <20170919201910.25656-1-eblake@redhat.com>
-	<20170919201910.25656-6-eblake@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <26069637-9535-cb59-8920-9d9a7eef78b7@redhat.com>
-Date: Tue, 19 Sep 2017 19:00:19 -0400
+	(envelope-from <carenas@gmail.com>) id 1duRbX-0000tI-Ag
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 19:07:04 -0400
+Received: from mail-it0-x243.google.com ([2607:f8b0:4001:c0b::243]:35921)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <carenas@gmail.com>) id 1duRbX-0000sC-5A
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 19:06:59 -0400
+Received: by mail-it0-x243.google.com with SMTP id e134so576348ite.3
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 16:06:59 -0700 (PDT)
+From: =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>
+Date: Tue, 19 Sep 2017 16:06:41 -0700
+Message-Id: <20170919230643.87425-1-carenas@gmail.com>
+In-Reply-To: <d137f607-aa48-e388-02b2-1f1b104439e2@vivier.eu>
+References: <d137f607-aa48-e388-02b2-1f1b104439e2@vivier.eu>
 MIME-Version: 1.0
-In-Reply-To: <20170919201910.25656-6-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v9 05/20] dirty-bitmap: Avoid size query
- failure during truncate
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH 1/3] linux-user: fix TARGET_SO_LINGER for sparc
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,133 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, famz@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: riku.voipio@iki.fi, laurent@vivier.eu, peter.maydell@linaro.org, gang.chen.5i5j@gmail.com, rth@twiddle.net, =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>
 
+Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
+---
+ linux-user/socket.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-
-On 09/19/2017 04:18 PM, Eric Blake wrote:
-> We've previously fixed several places where we failed to account
-> for possible errors from bdrv_nb_sectors().  Fix another one by
-> making bdrv_dirty_bitmap_truncate() take the new size from the
-> caller instead of querying itself; then adjust the sole caller
-> bdrv_truncate() to pass the size just determined by a successful
-> resize, or to skip the bitmap resize on failure, thus avoiding
-> sizing the bitmaps to -1.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v9: skip only bdrv_dirty_bitmap_truncate on error [Fam]
-> v8: retitle and rework to avoid possibility of secondary failure [John]
-> v7: new patch [Kevin]
-> ---
->  include/block/dirty-bitmap.h |  2 +-
->  block.c                      | 15 ++++++++++-----
->  block/dirty-bitmap.c         |  6 +++---
->  3 files changed, 14 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index 8fd842eac9..7a27590047 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -83,7 +83,7 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
->  void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t sector_num);
->  int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
->  int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
-> -void bdrv_dirty_bitmap_truncate(BlockDriverState *bs);
-> +void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
->  bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
->  bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
->  bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
-> diff --git a/block.c b/block.c
-> index ee6a48976e..89261a7a53 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -3450,12 +3450,17 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
->      assert(!(bs->open_flags & BDRV_O_INACTIVE));
-> 
->      ret = drv->bdrv_truncate(bs, offset, prealloc, errp);
-> -    if (ret == 0) {
-> -        ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-> -        bdrv_dirty_bitmap_truncate(bs);
-> -        bdrv_parent_cb_resize(bs);
-> -        atomic_inc(&bs->write_gen);
-> +    if (ret < 0) {
-> +        return ret;
->      }
-> +    ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, -ret, "Could not refresh total sector count");
-> +    } else {
-
-Sorry for dragging my feet on this point; if anyone else wants to R-B
-this I will cede without much of a fuss, but perhaps you can help me
-understand.
-
-(Copying some questions I asked Eric on IRC, airing to list for wider
-discussion, and also because I had to drive home before the stores
-closed for the evening)
-
-Do you suspect that almost certainly if bdrv_truncate() fails overall
-that the image format driver will either unmount the image or become
-read-only?
-
-There are calls from parallels, qcow, qcow2-refcount, qcow2, raw-format,
-vhdx-log, vhdx plus whichever calls from blk_truncate (jobs, all of the
-same formats, blockdev, qemu-img)
-
-I'm just trying to picture exactly what's going to happen if we manage
-to resize the drive but then don't resize the bitmap -- say we expand
-the drive larger but fail to refresh (and fail to resize the bitmap.)
-
-if the block format module does not immediately and dutifully stop all
-further writes -- is there anything that stops us from writing to new
-sectors that were beyond EOF previously?
-
-I suppose if *not* that's a bug for callers of bdrv_truncate to allow
-that kind of monkey business, but if it CAN happen, hbitmap only guards
-against such things with an assert (which, IIRC, is not guaranteed to be
-on for all builds)
-
-
-So the question is: "bdrv_truncate failure is NOT considered recoverable
-in ANY case, is it?"
-
-It may possibly be safer to, if the initial truncate request succeeds,
-apply a best-effort to the bitmap before returning the error.
-
-> +        bdrv_dirty_bitmap_truncate(bs, bs->total_sectors * BDRV_SECTOR_SIZE);
-> +    }
-> +    bdrv_parent_cb_resize(bs);
-> +    atomic_inc(&bs->write_gen);
->      return ret;
->  }
-> 
-> diff --git a/block/dirty-bitmap.c b/block/dirty-bitmap.c
-> index 42a55e4a4b..ee164fb518 100644
-> --- a/block/dirty-bitmap.c
-> +++ b/block/dirty-bitmap.c
-> @@ -1,7 +1,7 @@
->  /*
->   * Block Dirty Bitmap
->   *
-> - * Copyright (c) 2016 Red Hat. Inc
-> + * Copyright (c) 2016-2017 Red Hat. Inc
->   *
->   * Permission is hereby granted, free of charge, to any person obtaining a copy
->   * of this software and associated documentation files (the "Software"), to deal
-> @@ -302,10 +302,10 @@ BdrvDirtyBitmap *bdrv_reclaim_dirty_bitmap(BlockDriverState *bs,
->   * Truncates _all_ bitmaps attached to a BDS.
->   * Called with BQL taken.
->   */
-> -void bdrv_dirty_bitmap_truncate(BlockDriverState *bs)
-> +void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes)
->  {
->      BdrvDirtyBitmap *bitmap;
-> -    uint64_t size = bdrv_nb_sectors(bs);
-> +    int64_t size = DIV_ROUND_UP(bytes, BDRV_SECTOR_SIZE);
-> 
->      bdrv_dirty_bitmaps_lock(bs);
->      QLIST_FOREACH(bitmap, &bs->dirty_bitmaps, list) {
-> 
+diff --git a/linux-user/socket.h b/linux-user/socket.h
+index 7051cd2cf4..129f9b4713 100644
+--- a/linux-user/socket.h
++++ b/linux-user/socket.h
+@@ -246,8 +246,12 @@
+     #define TARGET_SOCK_MAX (TARGET_SOCK_PACKET + 1)
+     #define TARGET_SOCK_TYPE_MASK    0xf  /* Covers up to TARGET_SOCK_MAX-1. */
+ 
++    #define TARGET_SO_LINGER         0x0080
++
+     #define TARGET_SO_PASSSEC        31
+ #else
++    #define TARGET_SO_LINGER         13
++
+     #define TARGET_SO_PASSSEC        34
+ #endif
+ 
+@@ -268,7 +272,7 @@
+     #define TARGET_SO_OOBINLINE    10
+     #define TARGET_SO_NO_CHECK     11
+     #define TARGET_SO_PRIORITY     12
+-    #define TARGET_SO_LINGER       13
++
+     #define TARGET_SO_BSDCOMPAT    14
+     /* To add :#define TARGET_SO_REUSEPORT 15 */
+ #if defined(TARGET_PPC)
+-- 
+2.14.1
