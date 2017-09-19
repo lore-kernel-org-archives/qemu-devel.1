@@ -1,25 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42625)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1duL38-0002vA-4L
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:07:03 -0400
+	(envelope-from <eblake@redhat.com>) id 1duL4C-0003fK-KR
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:08:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1duL33-0001uv-O4
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:07:02 -0400
-Resent-Message-Id: <E1duL33-0001uv-O4@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21397)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1duL33-0001uQ-Hf
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:06:57 -0400
-In-Reply-To: <20170919150313.10833-1-richard.henderson@linaro.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150583721011.66.1736720280117378391@69b6ddf88678>
+	(envelope-from <eblake@redhat.com>) id 1duL46-0002g8-Vv
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:08:08 -0400
+References: <20170919155025.4098-1-stefanha@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <9d3ff80c-5ae8-0fc3-6912-75c0f16f56d2@redhat.com>
+Date: Tue, 19 Sep 2017 11:07:53 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 19 Sep 2017 09:06:50 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH v2 0/8] Support the Capstone disassembler
+In-Reply-To: <20170919155025.4098-1-stefanha@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="mDa74bLpTDTXFxlqq9elipH3QFfTgmxvi"
+Subject: Re: [Qemu-devel] [PATCH] throttle-groups: update
+ tg->any_timer_armed[] on detach
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,48 +24,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: richard.henderson@linaro.org
-Cc: famz@redhat.com, qemu-devel@nongnu.org, borntraeger@de.ibm.com, agraf@suse.de
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>, Max Reitz <mreitz@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSCB2MiAwLzhdIFN1cHBvcnQgdGhlIENhcHN0b25lIGRpc2Fzc2VtYmxlcgpN
-ZXNzYWdlLWlkOiAyMDE3MDkxOTE1MDMxMy4xMDgzMy0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFy
-by5vcmcKVHlwZTogc2VyaWVzCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
-CgpCQVNFPWJhc2UKbj0xCnRvdGFsPSQoZ2l0IGxvZyAtLW9uZWxpbmUgJEJBU0UuLiB8IHdjIC1s
-KQpmYWlsZWQ9MAoKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29u
-ZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKCmNvbW1pdHM9IiQoZ2l0IGxvZyAtLWZvcm1h
-dD0lSCAtLXJldmVyc2UgJEJBU0UuLikiCmZvciBjIGluICRjb21taXRzOyBkbwogICAgZWNobyAi
-Q2hlY2tpbmcgUEFUQ0ggJG4vJHRvdGFsOiAkKGdpdCBsb2cgLW4gMSAtLWZvcm1hdD0lcyAkYyku
-Li4iCiAgICBpZiAhIGdpdCBzaG93ICRjIC0tZm9ybWF0PWVtYWlsIHwgLi9zY3JpcHRzL2NoZWNr
-cGF0Y2gucGwgLS1tYWlsYmFjayAtOyB0aGVuCiAgICAgICAgZmFpbGVkPTEKICAgICAgICBlY2hv
-CiAgICBmaQogICAgbj0kKChuKzEpKQpkb25lCgpleGl0ICRmYWlsZWQKPT09IFRFU1QgU0NSSVBU
-IEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMz
-ODQKU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpkMGY1M2JkMmUxIGRpc2FzOiBSZW1v
-dmUgbW9uaXRvcl9kaXNhc19pc19waHlzaWNhbAo1ODBhZDlmMDVkIHBwYzogU3VwcG9ydCBDYXBz
-dG9uZSBpbiBkaXNhc19zZXRfaW5mbwo1MDk1YzcwOTQ1IGFybTogU3VwcG9ydCBDYXBzdG9uZSBp
-biBkaXNhc19zZXRfaW5mbwpjMzU5YTY1MWQ0IGkzODY6IFN1cHBvcnQgQ2Fwc3RvbmUgaW4gZGlz
-YXNfc2V0X2luZm8KZDQ0MzI1NDc0MyBkaXNhczogU3VwcG9ydCB0aGUgQ2Fwc3RvbmUgZGlzYXNz
-ZW1ibGVyIGxpYnJhcnkKNjVkOWMzYmZmNiBkaXNhczogUmVtb3ZlIHVudXNlZCBmbGFncyBhcmd1
-bWVudHMKMTIwY2VmZjY1NSB0YXJnZXQvcHBjOiBDb252ZXJ0IHRvIGRpc2FzX3NldF9pbmZvIGhv
-b2sKMTgwYzRmNDNjMiB0YXJnZXQvaTM4NjogQ29udmVydCB0byBkaXNhc19zZXRfaW5mbyBob29r
-Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzg6IHRhcmdldC9pMzg2OiBD
-b252ZXJ0IHRvIGRpc2FzX3NldF9pbmZvIGhvb2suLi4KQ2hlY2tpbmcgUEFUQ0ggMi84OiB0YXJn
-ZXQvcHBjOiBDb252ZXJ0IHRvIGRpc2FzX3NldF9pbmZvIGhvb2suLi4KQ2hlY2tpbmcgUEFUQ0gg
-My84OiBkaXNhczogUmVtb3ZlIHVudXNlZCBmbGFncyBhcmd1bWVudHMuLi4KQ2hlY2tpbmcgUEFU
-Q0ggNC84OiBkaXNhczogU3VwcG9ydCB0aGUgQ2Fwc3RvbmUgZGlzYXNzZW1ibGVyIGxpYnJhcnku
-Li4KQ2hlY2tpbmcgUEFUQ0ggNS84OiBpMzg2OiBTdXBwb3J0IENhcHN0b25lIGluIGRpc2FzX3Nl
-dF9pbmZvLi4uCkNoZWNraW5nIFBBVENIIDYvODogYXJtOiBTdXBwb3J0IENhcHN0b25lIGluIGRp
-c2FzX3NldF9pbmZvLi4uCkNoZWNraW5nIFBBVENIIDcvODogcHBjOiBTdXBwb3J0IENhcHN0b25l
-IGluIGRpc2FzX3NldF9pbmZvLi4uCkNoZWNraW5nIFBBVENIIDgvODogZGlzYXM6IFJlbW92ZSBt
-b25pdG9yX2Rpc2FzX2lzX3BoeXNpY2FsLi4uCkVSUk9SOiBzcGFjZSBwcm9oaWJpdGVkIGJldHdl
-ZW4gZnVuY3Rpb24gbmFtZSBhbmQgb3BlbiBwYXJlbnRoZXNpcyAnKCcKIzI3OiBGSUxFOiBkaXNh
-cy5jOjUxNzoKK3BoeXNpY2FsX3JlYWRfbWVtb3J5IChiZmRfdm1hIG1lbWFkZHIsIGJmZF9ieXRl
-ICpteWFkZHIsIGludCBsZW5ndGgsCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDMyIGxp
-bmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCj09PSBP
-VVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1h
-aWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3Jn
-L10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMu
-b3Jn
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--mDa74bLpTDTXFxlqq9elipH3QFfTgmxvi
+From: Eric Blake <eblake@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>,
+ Max Reitz <mreitz@redhat.com>, qemu-stable <qemu-stable@nongnu.org>
+Message-ID: <9d3ff80c-5ae8-0fc3-6912-75c0f16f56d2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] throttle-groups: update
+ tg->any_timer_armed[] on detach
+References: <20170919155025.4098-1-stefanha@redhat.com>
+In-Reply-To: <20170919155025.4098-1-stefanha@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 09/19/2017 10:50 AM, Stefan Hajnoczi wrote:
+> Clear tg->any_timer_armed[] when throttling timers are destroy during
+
+s/destroy/destroyed/
+
+> AioContext attach/detach.  Failure to do so causes throttling to hang
+> because we believe the timer is already scheduled!
+>=20
+> The following was broken at least since QEMU 2.10.0 with -drive
+> iops=3D100:
+>=20
+>   $ dd if=3D/dev/zero of=3D/dev/vdb oflag=3Ddirect count=3D1000
+>   (qemu) stop
+>   (qemu) cont
+>   ...I/O is stuck...
+>=20
+> Reported-by: Yongxue Hong <yhong@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  block/throttle-groups.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+>=20
+Reviewed-by: Eric Blake <eblake@redhat.com>
+
+CC: qemu-stable@nongnu.org
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--mDa74bLpTDTXFxlqq9elipH3QFfTgmxvi
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnBQNkACgkQp6FrSiUn
+Q2rZ1wf+JVexPJ4od827HtWNVPXJr7gtXTv6mS9Fnxj51cTqV2Mnw/v9lZHl9iVb
+W4UFUg1HkxwUQ1uDIOphxqkbQqaRi1/ryk4HndhWyBnO+ErDUGhfcxiQc5nImreJ
+2nelfPYC3SBMSmcV3N2Z+1Q1MWd31TMa1oWF5EZvnhMm7xWKRYUYEn8caZwtt4uA
+GPCH1bpB0jHD4nDMdJccQuB5B8xxY+QxYEBsWKo8beeqKjb70bbTxCYWdlMf6Oz9
+/aYTGKemqBnBA1t7IkVs0+fEiV88Iem1PAnrV6DxR6gaARBMvO0Sl5YiTJ2sNsEE
+10XN+Mz2aORWzNKpCWQTde5ZT/JNPA==
+=suHX
+-----END PGP SIGNATURE-----
+
+--mDa74bLpTDTXFxlqq9elipH3QFfTgmxvi--
