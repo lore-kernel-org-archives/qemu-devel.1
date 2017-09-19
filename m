@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59954)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59980)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfM-00048Y-MG
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:17 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfO-0004BR-9G
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfG-0005R1-Tl
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:16 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:33573)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1duHfN-0005Ve-5W
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:18 -0400
+Received: from mail-wr0-x242.google.com ([2a00:1450:400c:c0c::242]:38226)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1duHfG-0005Q9-Nd
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:10 -0400
-Received: by mail-wm0-x243.google.com with SMTP id m127so3756869wmm.0
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:30:10 -0700 (PDT)
+	id 1duHfM-0005VC-Rz
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:30:17 -0400
+Received: by mail-wr0-x242.google.com with SMTP id p37so2134567wrb.5
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:30:16 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 19 Sep 2017 14:29:12 +0200
-Message-Id: <1505824179-21541-24-git-send-email-pbonzini@redhat.com>
+Date: Tue, 19 Sep 2017 14:29:18 +0200
+Message-Id: <1505824179-21541-30-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
 References: <1505824179-21541-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 23/50] memory: Rename queue to mrqueue (memory
- region queue)
+Subject: [Qemu-devel] [PULL 29/50] kvm: we never have overlapping slots in
+ kvm_set_phys_mem()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +29,137 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Kamil Rytarowski <n54@gmx.com>
+Cc: David Hildenbrand <david@redhat.com>
 
-From: Kamil Rytarowski <n54@gmx.com>
+From: David Hildenbrand <david@redhat.com>
 
-SunOS declares struct queue in <netinet/in.h>.
+The way flatview handles memory sections, we will never have overlapping
+memory sections in kvm.
 
-This fixes build on SmartOS (Joyent).
+address_space_update_topology_pass() will make sure that we will only
+get called for
 
-Patch cherry-picked from pkgsrc by jperkin (Joyent).
+a) an existing memory section for which we only update parameters
+(log_start, log_stop).
+b) an existing memory section we want to delete (region_del)
+c) a brand new memory section we want to add (region_add)
 
-Signed-off-by: Kamil Rytarowski <n54@gmx.com>
-Message-Id: <20170903163304.17919-1-n54@gmx.com>
+We cannot have overlapping memory sections in kvm as we will first remove
+the overlapping sections and then add the ones without conflicts.
+
+Therefore we can remove the complexity for handling prefix and suffix
+slots.
+
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20170911174933.20789-5-david@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- memory.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ accel/kvm/kvm-all.c | 68 +++++++++--------------------------------------------
+ 1 file changed, 11 insertions(+), 57 deletions(-)
 
-diff --git a/memory.c b/memory.c
-index c0adc35..b9920a6 100644
---- a/memory.c
-+++ b/memory.c
-@@ -2701,10 +2701,10 @@ typedef struct MemoryRegionList MemoryRegionList;
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 88b0e63..b677d1b 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -725,7 +725,7 @@ kvm_check_extension_list(KVMState *s, const KVMCapabilityInfo *list)
+ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+                              MemoryRegionSection *section, bool add)
+ {
+-    KVMSlot *mem, old;
++    KVMSlot *mem;
+     int err;
+     MemoryRegion *mr = section->mr;
+     bool writeable = !mr->readonly && !mr->rom_device;
+@@ -750,28 +750,17 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+     ram = memory_region_get_ram_ptr(mr) + section->offset_within_region +
+           (section->offset_within_address_space - start_addr);
  
- struct MemoryRegionList {
-     const MemoryRegion *mr;
--    QTAILQ_ENTRY(MemoryRegionList) queue;
-+    QTAILQ_ENTRY(MemoryRegionList) mrqueue;
- };
- 
--typedef QTAILQ_HEAD(queue, MemoryRegionList) MemoryRegionListHead;
-+typedef QTAILQ_HEAD(mrqueue, MemoryRegionList) MemoryRegionListHead;
- 
- #define MR_SIZE(size) (int128_nz(size) ? (hwaddr)int128_get64( \
-                            int128_sub((size), int128_one())) : 0)
-@@ -2746,7 +2746,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
-         bool found = false;
- 
-         /* check if the alias is already in the queue */
--        QTAILQ_FOREACH(ml, alias_print_queue, queue) {
-+        QTAILQ_FOREACH(ml, alias_print_queue, mrqueue) {
-             if (ml->mr == mr->alias) {
-                 found = true;
-             }
-@@ -2755,7 +2755,7 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
-         if (!found) {
-             ml = g_new(MemoryRegionList, 1);
-             ml->mr = mr->alias;
--            QTAILQ_INSERT_TAIL(alias_print_queue, ml, queue);
-+            QTAILQ_INSERT_TAIL(alias_print_queue, ml, mrqueue);
+-    while (1) {
+-        mem = kvm_lookup_overlapping_slot(kml, start_addr, start_addr + size);
++    mem = kvm_lookup_matching_slot(kml, start_addr, size);
++    if (!add) {
+         if (!mem) {
+-            break;
+-        }
+-
+-        if (add && start_addr >= mem->start_addr &&
+-            (start_addr + size <= mem->start_addr + mem->memory_size) &&
+-            (ram - start_addr == mem->ram - mem->start_addr)) {
+-            /* The new slot fits into the existing one and comes with
+-             * identical parameters - update flags and done. */
+-            kvm_slot_update_flags(kml, mem, mr);
++            g_assert(!memory_region_is_ram(mr) && !writeable && !mr->romd_mode);
+             return;
          }
-         mon_printf(f, TARGET_FMT_plx "-" TARGET_FMT_plx
-                    " (prio %d, %s): alias %s @%s " TARGET_FMT_plx
-@@ -2783,26 +2783,26 @@ static void mtree_print_mr(fprintf_function mon_printf, void *f,
-     QTAILQ_FOREACH(submr, &mr->subregions, subregions_link) {
-         new_ml = g_new(MemoryRegionList, 1);
-         new_ml->mr = submr;
--        QTAILQ_FOREACH(ml, &submr_print_queue, queue) {
-+        QTAILQ_FOREACH(ml, &submr_print_queue, mrqueue) {
-             if (new_ml->mr->addr < ml->mr->addr ||
-                 (new_ml->mr->addr == ml->mr->addr &&
-                  new_ml->mr->priority > ml->mr->priority)) {
--                QTAILQ_INSERT_BEFORE(ml, new_ml, queue);
-+                QTAILQ_INSERT_BEFORE(ml, new_ml, mrqueue);
-                 new_ml = NULL;
-                 break;
-             }
+-
+-        old = *mem;
+-
+         if (mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
+             kvm_physical_sync_dirty_bitmap(kml, section);
          }
-         if (new_ml) {
--            QTAILQ_INSERT_TAIL(&submr_print_queue, new_ml, queue);
-+            QTAILQ_INSERT_TAIL(&submr_print_queue, new_ml, mrqueue);
+ 
+-        /* unregister the overlapping slot */
++        /* unregister the slot */
+         mem->memory_size = 0;
+         err = kvm_set_user_memory_region(kml, mem);
+         if (err) {
+@@ -779,51 +768,16 @@ static void kvm_set_phys_mem(KVMMemoryListener *kml,
+                     __func__, strerror(-err));
+             abort();
          }
+-
+-        /* register prefix slot */
+-        if (old.start_addr < start_addr) {
+-            mem = kvm_alloc_slot(kml);
+-            mem->memory_size = start_addr - old.start_addr;
+-            mem->start_addr = old.start_addr;
+-            mem->ram = old.ram;
+-            mem->flags =  kvm_mem_flags(mr);
+-
+-            err = kvm_set_user_memory_region(kml, mem);
+-            if (err) {
+-                fprintf(stderr, "%s: error registering prefix slot: %s\n",
+-                        __func__, strerror(-err));
+-#ifdef TARGET_PPC
+-                fprintf(stderr, "%s: This is probably because your kernel's " \
+-                                "PAGE_SIZE is too big. Please try to use 4k " \
+-                                "PAGE_SIZE!\n", __func__);
+-#endif
+-                abort();
+-            }
+-        }
+-
+-        /* register suffix slot */
+-        if (old.start_addr + old.memory_size > start_addr + size) {
+-            ram_addr_t size_delta;
+-
+-            mem = kvm_alloc_slot(kml);
+-            mem->start_addr = start_addr + size;
+-            size_delta = mem->start_addr - old.start_addr;
+-            mem->memory_size = old.memory_size - size_delta;
+-            mem->ram = old.ram + size_delta;
+-            mem->flags = kvm_mem_flags(mr);
+-
+-            err = kvm_set_user_memory_region(kml, mem);
+-            if (err) {
+-                fprintf(stderr, "%s: error registering suffix slot: %s\n",
+-                        __func__, strerror(-err));
+-                abort();
+-            }
+-        }
++        return;
      }
  
--    QTAILQ_FOREACH(ml, &submr_print_queue, queue) {
-+    QTAILQ_FOREACH(ml, &submr_print_queue, mrqueue) {
-         mtree_print_mr(mon_printf, f, ml->mr, level + 1, cur_start,
-                        alias_print_queue);
+-    if (!add) {
++    if (mem) {
++        /* update the slot */
++        kvm_slot_update_flags(kml, mem, mr);
+         return;
      }
- 
--    QTAILQ_FOREACH_SAFE(ml, &submr_print_queue, queue, next_ml) {
-+    QTAILQ_FOREACH_SAFE(ml, &submr_print_queue, mrqueue, next_ml) {
-         g_free(ml);
-     }
- }
-@@ -2872,13 +2872,13 @@ void mtree_info(fprintf_function mon_printf, void *f, bool flatview)
-     }
- 
-     /* print aliased regions */
--    QTAILQ_FOREACH(ml, &ml_head, queue) {
-+    QTAILQ_FOREACH(ml, &ml_head, mrqueue) {
-         mon_printf(f, "memory-region: %s\n", memory_region_name(ml->mr));
-         mtree_print_mr(mon_printf, f, ml->mr, 1, 0, &ml_head);
-         mon_printf(f, "\n");
-     }
- 
--    QTAILQ_FOREACH_SAFE(ml, &ml_head, queue, ml2) {
-+    QTAILQ_FOREACH_SAFE(ml, &ml_head, mrqueue, ml2) {
-         g_free(ml);
-     }
- }
++
++    /* register the new slot */
+     mem = kvm_alloc_slot(kml);
+     mem->memory_size = size;
+     mem->start_addr = start_addr;
 -- 
 1.8.3.1
