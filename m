@@ -1,22 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49713)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1duIhj-0000P2-T8
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:36:57 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50664)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <eblake@redhat.com>) id 1duIj2-0001Rf-PZ
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:38:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1duIhf-00057G-CH
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:36:47 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:51428 helo=mx01.kamp.de)
+	(envelope-from <eblake@redhat.com>) id 1duIj0-00064n-5M
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:38:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33590)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1duIhf-00052i-2n
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:36:43 -0400
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
-Date: Tue, 19 Sep 2017 15:36:38 +0200
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1duIiz-00063Y-SG
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:38:06 -0400
+References: <1505328054-23805-1-git-send-email-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <f09b7bd0-2055-9f1c-4bb8-ab5f2bbf6837@redhat.com>
+Date: Tue, 19 Sep 2017 08:38:00 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: [Qemu-devel] Block Migration and CPU throttling
+In-Reply-To: <1505328054-23805-1-git-send-email-thuth@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="wsPmd1JGBUxUqqrheXgjVdvWURWNPHJxT"
+Subject: Re: [Qemu-devel] [PATCH v2] tests: Introduce generic device
+ hot-plug/hot-unplug functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,22 +28,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>
+Cc: Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
 
-Hi,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wsPmd1JGBUxUqqrheXgjVdvWURWNPHJxT
+From: Eric Blake <eblake@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Peter Xu <peterx@redhat.com>
+Cc: Amit Shah <amit@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Markus Armbruster <armbru@redhat.com>
+Message-ID: <f09b7bd0-2055-9f1c-4bb8-ab5f2bbf6837@redhat.com>
+Subject: Re: [PATCH v2] tests: Introduce generic device hot-plug/hot-unplug
+ functions
+References: <1505328054-23805-1-git-send-email-thuth@redhat.com>
+In-Reply-To: <1505328054-23805-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-I just noticed that CPU throttling and Block Migration don't work together very well.
-During block migration the throttling heuristic detects that we obviously make no progress
-in ram transfer. But the reason is the running block migration and not a too high dirty pages rate.
+On 09/13/2017 01:40 PM, Thomas Huth wrote:
+> A lot of tests provide code for adding and removing a device via the
+> device_add and device_del QMP commands. Maintaining this code in so man=
+y
+> places is cumbersome and error-prone (some of the code parts check the
+> responses for device deletion in an incorrect way, for example, we've g=
+ot
+> to deal with both, error code and DEVICE_DEL event here). So let's prov=
+ide
+> some proper generic functions for adding and removing a device instead.=
 
-The result is that any VM is throttled by 99% during block migration.
+>=20
+> The code for correctly unplugging a device has been taken from a patch
+> from Peter Xu.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
 
-I wonder what the best way would be fix this. I came up with the following ideas so far:
+> + */
+> +void qtest_qmp_device_del(const char *id)
+> +{
+> +    QDict *response1, *response2, *event =3D NULL;
+> +    char *cmd;
+> +
+> +    cmd =3D g_strdup_printf("{'execute': 'device_del',"
+> +                          " 'arguments': { 'id': '%s' }}", id);
+> +    response1 =3D qmp(cmd);
+> +    g_free(cmd);
+> +    g_assert(response1);
+> +    g_assert(!qdict_haskey(response1, "error"));
+> +
+> +    response2 =3D qmp("");
 
-- disable throttling while block migration is in bulk stage
-- check if absolute number of num_dirty_pages_period crosses a threshold and not if its just
-   greater than 50% of transferred bytes
-- check if migration_dirty_pages > 0. This slows down throttling, but does not avoid it completely.
+Hmm, this new use of qmp("") means I get to rebase the efforts to remove
+the empty qmp command usage from the testsuite efforts.  We really want
+to have two low-level functions (one to send, one to receive), and then
+have qmp() be the combination of both in a row; we have qmp_async() for
+the send, and only qtest_receive() for the receive, so I'll have to
+revive my work on unifying things...
 
-Peter
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--wsPmd1JGBUxUqqrheXgjVdvWURWNPHJxT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnBHbgACgkQp6FrSiUn
+Q2pjQggAnKdlZPIP401y2Hu/7kjm5jE1A9iFfGTANnkHsYpKm/s2E8NDn3IqmrXA
+c5O9KQ3DiQNsO0YumRWKYIF9unJB1yBewje1HWbySIT2heEVHKxdvKeN7IUwHiC+
+s8Rx4Y2ufxgGZIS0QoCymftAIqXRzteKwkgBAnQrhfIKdUc4gU6iTEr8M1ZtfxZ8
+rj10MqOYR2livSL0sTaTWf7fMgQXmIqtnv3xa0f0sqFtvT2mk3gq3uNYyQLiA3CV
+4xtyArdf8LBARf1qyToVM2FsICgmRVa1bMxWFZsWYPW+EXsFxXG3g7y3zPzeVldT
+FBNMHYhz+8woZVopCjLmfiOEakf8Uw==
+=oV7G
+-----END PGP SIGNATURE-----
+
+--wsPmd1JGBUxUqqrheXgjVdvWURWNPHJxT--
