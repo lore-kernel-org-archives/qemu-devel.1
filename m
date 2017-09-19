@@ -1,34 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40436)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45230)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1duFUx-0000vT-Qm
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:11:29 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1duFhr-00043M-VC
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:24:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1duFUr-0006UT-QH
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:11:23 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51204)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1duFUr-0006U9-KH
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:11:17 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1duFUp-00069O-2L
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 10:11:15 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 0872F2E8508
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 10:11:00 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Sep 2017 10:01:45 -0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150581530557.24868.9046834785917125651.malone@chaenomeles.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
- 2.10 (works on 2.9)
+	(envelope-from <pbonzini@redhat.com>) id 1duFhq-0004Ye-W6
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:24:43 -0400
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 19 Sep 2017 12:24:30 +0200
+Message-Id: <20170919102434.21147-1-pbonzini@redhat.com>
+Subject: [Qemu-devel] [PATCH v2 0/4] scsi,
+ block: introduce persistent reservation managers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,49 +19,68 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org
 
-Igor asked to add Gerd.
+SCSI persistent Reservations allow restricting access to block devices
+to specific initiators in a shared storage setup.  When implementing
+clustering of virtual machines, it is a common requirement for virtual
+machines to send persistent reservation SCSI commands.  However,
+the operating system restricts sending these commands to unprivileged
+programs because incorrect usage can disrupt regular operation of the
+storage fabric.
 
--- =
+With these patches, the scsi-block and scsi-generic SCSI passthrough
+devices learn to delegate the implementation of persistent reservations to
+a separate object, the "persistent reservation manager".  The persistent
+reservation manager talks to a separate privileged program, with a very
+simple protocol based on SCM_RIGHTS.  In addition to invoking PERSISTENT
+RESERVATION OUT and PERSISTENT RESERVATION IN commands, the privileged
+component can also use libmpathpersist so that persistent reservations
+are applied to all paths in a multipath setting.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715700
+Patch 1 defines the abstract QOM class and plugs it into block/file-posix.c.
 
-Title:
-  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
+Patch 2 and 3 introduce the privileged helper program, while patch 4
+defines the concrete QOM class that talks to it.
 
-Status in QEMU:
-  New
+Paolo
 
-Bug description:
-  Qemu version: 2.10 stable.
-  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
-st.
-  Command line:
-  qemu-system-x86_64 \
-      -nodefaults \
-      -nodefconfig \
-      -machine type=3Dq35,accel=3Dkvm \
-      -enable-kvm \
-      -cpu host \
-      -m 2048 \
-      -vga virtio \
-      -boot menu=3Don \
-      -smbios file=3D/path/dmidecode_BIOS.bin \
-      -acpitable file=3D/path/acpi_slic.bin \
-      -bios /path/OVMF_CODE.fd \
-      -net none \
-      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
-      -device pcie-root-port \
-      -device ich9-usb-ehci1 \
-      -device ich9-usb-uhci1 \
-      -device ich9-usb-uhci2 \
-      -device ich9-usb-uhci3
+v1->v2: removed scsi/ patches which were all reviewed
+        removed man page (requires .texi while I used .rst for docs)
+        qio_channel_read/write_all also went in independently
+        fix installation of qemu-pr-helper man page
+        fixes to documentation
+        added BSD license to protocol header
+        added handling of residual (buffer underrun)
+        fixed closing of file descriptors on error
+        block PERSISTENT RESERVE OUT for read-only file descriptors
+        do not use g_assert
+        use EXIT_SUCCESS/EXIT_FAILURE consistently
+        moved all CONFIG_MPATH usage to the right patch
+        drop CAP_SYS_ADMIN if multipath not compiled in
+        simplify buffer size handling in multipath PERSISTENT RESERVE IN
+        block REGISTER AND MOVE operation for multipath PERSISTENT RESERVE OUT
+        fixed transport id handling in multipath PERSISTENT RESERVE OUT
+        fixed string property double-free in pr-manager-helper
+        fixed/cleaned up error handling in pr-manager-helper
+        
+Paolo Bonzini (9):
+  scsi, file-posix: add support for persistent reservation management
+  scsi: build qemu-pr-helper
+  scsi: add multipath support to qemu-pr-helper
+  scsi: add persistent reservation manager using qemu-pr-helper
 
-  Windows hangs at boot with waving flag screen (flag doesn't freeze,
-  keeps waving indefinitely). Same command line boots fine with Qemu
-  2.9. I tried changing machine type to pc-q35-2.9 - same result.
+ Makefile                   |   14 +-
+ configure                  |   59 ++-
+ docs/interop/pr-helper.rst |   83 ++++
+ docs/pr-manager.rst        |   60 +++
+ include/scsi/utils.h       |    4 +
+ scsi/Makefile.objs         |    2 +-
+ scsi/pr-helper.h           |   41 ++
+ scsi/pr-manager-helper.c   |  302 +++++++++++++
+ scsi/qemu-pr-helper.c      | 1038 ++++++++++++++++++++++++++++++++++++++++++++
+ scsi/utils.c               |   10 +
+ 10 files changed, 1607 insertions(+), 6 deletions(-)
 
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
+-- 
+2.13.5
