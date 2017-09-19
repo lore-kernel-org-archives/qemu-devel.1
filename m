@@ -1,35 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41238)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44375)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1duGRC-000425-BW
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:11:42 -0400
+	(envelope-from <clg@kaod.org>) id 1duGXH-0006xh-Sc
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:17:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1duGR4-0004XD-Ej
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:11:34 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59698)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1duGR4-0004Uf-7d
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:11:26 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1duGR2-0007iR-ES
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 11:11:24 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 4A8F52E848E
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 11:11:24 +0000 (UTC)
+	(envelope-from <clg@kaod.org>) id 1duGXD-0007mE-TP
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:17:51 -0400
+Received: from 6.mo179.mail-out.ovh.net ([46.105.56.76]:52705)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duGXD-0007lh-N8
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 07:17:47 -0400
+Received: from player716.ha.ovh.net (b6.ovh.net [213.186.33.56])
+	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 8A44263A60
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 13:17:45 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Tue, 19 Sep 2017 13:17:21 +0200
+Message-Id: <20170919111721.7931-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Sep 2017 11:01:06 -0000
-From: Igor <imammedo@redhat.com>
-Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
-	<150581754021.5372.7659460549123078484.malone@wampee.canonical.com>
-Message-Id: <20170919130106.5bd31fde@nial.brq.redhat.com>
-Errors-To: bounces@canonical.com
-Subject: Re: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on
- qemu 2.10 (works on 2.9)
+Subject: [Qemu-devel] [PATCH] watchdog/aspeed: fix variable type to store
+ reload value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -38,58 +28,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Andrew Jeffery <andrew@aj.id.au>, "Anton D . Kachalov" <mouse@yandex-team.ru>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-On Tue, 19 Sep 2017 10:39:00 -0000
-Gerd Hoffmann <1715700@bugs.launchpad.net> wrote:
+Initially from Anton D. Kachalov" <mouse@yandex-team.ru> but the SoB was
+missing.
 
-> could be this commit breaks vbeshim ...
-> =
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+[clg: change commit log and subject]
+---
+ hw/watchdog/wdt_aspeed.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-is there a way to fix vbeshim instead of reverting RO limitation that
-commit introduced?
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715700
-
-Title:
-  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu version: 2.10 stable.
-  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
-st.
-  Command line:
-  qemu-system-x86_64 \
-      -nodefaults \
-      -nodefconfig \
-      -machine type=3Dq35,accel=3Dkvm \
-      -enable-kvm \
-      -cpu host \
-      -m 2048 \
-      -vga virtio \
-      -boot menu=3Don \
-      -smbios file=3D/path/dmidecode_BIOS.bin \
-      -acpitable file=3D/path/acpi_slic.bin \
-      -bios /path/OVMF_CODE.fd \
-      -net none \
-      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
-      -device pcie-root-port \
-      -device ich9-usb-ehci1 \
-      -device ich9-usb-uhci1 \
-      -device ich9-usb-uhci2 \
-      -device ich9-usb-uhci3
-
-  Windows hangs at boot with waving flag screen (flag doesn't freeze,
-  keeps waving indefinitely). Same command line boots fine with Qemu
-  2.9. I tried changing machine type to pc-q35-2.9 - same result.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
+diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+index 22bce364d7b5..b8e0e9a75999 100644
+--- a/hw/watchdog/wdt_aspeed.c
++++ b/hw/watchdog/wdt_aspeed.c
+@@ -100,13 +100,13 @@ static uint64_t aspeed_wdt_read(void *opaque, hwadd=
+r offset, unsigned size)
+=20
+ static void aspeed_wdt_reload(AspeedWDTState *s, bool pclk)
+ {
+-    uint32_t reload;
++    uint64_t reload;
+=20
+     if (pclk) {
+         reload =3D muldiv64(s->regs[WDT_RELOAD_VALUE], NANOSECONDS_PER_S=
+ECOND,
+                           s->pclk_freq);
+     } else {
+-        reload =3D s->regs[WDT_RELOAD_VALUE] * 1000;
++        reload =3D s->regs[WDT_RELOAD_VALUE] * 1000UL;
+     }
+=20
+     if (aspeed_wdt_is_enabled(s)) {
+--=20
+2.13.5
