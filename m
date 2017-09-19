@@ -1,24 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50095)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34234)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1duNsm-0007bW-Tt
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:08:33 -0400
+	(envelope-from <clg@kaod.org>) id 1duOCg-0006uW-C1
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:29:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1duNsj-0002aK-Nr
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:08:32 -0400
-References: <1505298088-10878-1-git-send-email-thuth@redhat.com>
-	<ab1516cb-9590-0833-b872-0e691e8ace49@redhat.com>
-	<23cfaae7-7744-9865-6f43-9b74b2d60ec9@redhat.com>
-	<a59a9f94-a8e1-29e0-8456-dbcd07b359b0@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e431646d-808c-3eac-7cc6-b192fd1f0dc3@redhat.com>
-Date: Tue, 19 Sep 2017 21:08:20 +0200
+	(envelope-from <clg@kaod.org>) id 1duOCb-00007I-Se
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:29:06 -0400
+Received: from 2.mo2.mail-out.ovh.net ([188.165.53.149]:52696)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duOCb-00006P-ME
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:29:01 -0400
+Received: from player157.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 7A82CAC0E2
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 21:29:00 +0200 (CEST)
+References: <20170911171235.29331-1-clg@kaod.org>
+	<20170911171235.29331-10-clg@kaod.org> <20170919073615.GN27153@umbus>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <52f31e9e-f7de-ae27-a8a6-bd2f37666659@kaod.org>
+Date: Tue, 19 Sep 2017 21:28:45 +0200
 MIME-Version: 1.0
-In-Reply-To: <a59a9f94-a8e1-29e0-8456-dbcd07b359b0@redhat.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170919073615.GN27153@umbus>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH] block: Clean up some bad code
- in the vvfat driver
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 09/21] ppc/xive: extend the
+ interrupt presenter model for XIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,48 +32,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
-On 19.09.2017 21:01, John Snow wrote:
-> 
-> 
-> On 09/19/2017 04:06 AM, Paolo Bonzini wrote:
->> On 13/09/2017 21:08, John Snow wrote:
->>>
->>>
->>> On 09/13/2017 06:21 AM, Thomas Huth wrote:
->>>> Remove the unnecessary home-grown redefinition of the assert() macro here,
->>>> and remove the unusable debug code at the end of the checkpoint() function.
->>>> The code there uses assert() with side-effects (assignment to the "mapping"
->>>> variable), which should be avoided. Looking more closely, it seems as it is
->>>> apparently also only usable for one certain directory layout (with a file
->>>> named USB.H in it) and thus is of no use for the rest of the world.
->>>>
->>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>>
->>> Farewell, bitrot code.
->>>
->>> Reviewed-by: John Snow <jsnow@redhat.com>
->>>
->>> Out of curiosity, I wonder ...
->>>
->>> jhuston@probe (foobar) ~/s/qemu> git grep '#if 0' | wc -l
->>> 320
+On 09/19/2017 09:36 AM, David Gibson wrote:
+> On Mon, Sep 11, 2017 at 07:12:23PM +0200, C=E9dric Le Goater wrote:
+>> The XIVE interrupt presenter exposes a set of Thread Interrupt
+>> Management Areas, also called rings, one per different level of
+>> privilege (four in all). This area is used to handle priority
+>> management and interrupt acknowledgment among other things.
 >>
->>
->> $ git grep -c '#if 0' | sort -k2 --field-separator=: -n
->> ...
->> hw/net/eepro100.c:21
->> target/ppc/cpu-models.h:76
->>
->> whoa :)
->>
-> 
-> Wonder if '#if 0' should be against the style guide / in checkpatch.
+>> We extend the ICPState object with a cache of the register data for
+>> XIVE. The integration with the sPAPR machine is much easier and we
+>> need a common framework to switch from one controller model to
+>> another: XICS <-> XIVE.
+>=20
+> This sounds like an even worse idea than referencing the ICS state.
 
-checkpatch already complains if you have a "#if 0" in your patch, so I
-think we should be pretty fine here already - but of course you can
-still add a paragraph to the CODING_STYLE if you like.
+ok ok.
 
- Thomas
+> The TIMA really needs to be managed by a different object than the ICP.
+
+like an array under the machine indexed by the cpu index ?=20
+
+at some point, we will need to :
+
+    PowerPCCPU *cpu =3D POWERPC_CPU(current_cpu);
+    ICPState *icp =3D ICP(cpu->intc);
+
+and=20
+
+    icp =3D xics_icp_get(xive->ics->xics, target);
+
+
+isn't the cpu->intc pointer  the best option to hold that information ?=20
+and it is migrated.
+
+C.=20
+
+
+>> The next patch will introduce the MMIO handlers to interact with the
+>> TIMA, OS only, which is required for the sPAPR support.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  hw/intc/xics.c        | 4 ++++
+>>  include/hw/ppc/xics.h | 6 ++++++
+>>  2 files changed, 10 insertions(+)
+>>
+>> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+>> index a84ba51ad8ff..927d4fec966a 100644
+>> --- a/hw/intc/xics.c
+>> +++ b/hw/intc/xics.c
+>> @@ -274,6 +274,7 @@ static const VMStateDescription vmstate_icp_server=
+ =3D {
+>>          VMSTATE_UINT32(xirr, ICPState),
+>>          VMSTATE_UINT8(pending_priority, ICPState),
+>>          VMSTATE_UINT8(mfrr, ICPState),
+>> +        VMSTATE_UINT8_ARRAY(tima, ICPState, 0x40),
+>>          VMSTATE_END_OF_LIST()
+>>      },
+>>  };
+>> @@ -293,6 +294,7 @@ static void icp_reset(void *dev)
+>>      if (icpc->reset) {
+>>          icpc->reset(icp);
+>>      }
+>> +    memset(icp->tima, 0, sizeof(icp->tima));
+>>  }
+>> =20
+>>  static void icp_realize(DeviceState *dev, Error **errp)
+>> @@ -343,6 +345,8 @@ static void icp_realize(DeviceState *dev, Error **=
+errp)
+>>          icpc->realize(icp, errp);
+>>      }
+>> =20
+>> +    icp->tima_os =3D &icp->tima[0x10];
+>> +
+>>      qemu_register_reset(icp_reset, dev);
+>>      vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, i=
+cp);
+>>  }
+>> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+>> index 28d248abad61..c835997303c4 100644
+>> --- a/include/hw/ppc/xics.h
+>> +++ b/include/hw/ppc/xics.h
+>> @@ -83,6 +83,12 @@ struct ICPState {
+>>      qemu_irq output;
+>> =20
+>>      XICSFabric *xics;
+>> +
+>> +    /* XIVE section */
+>> +#define XIVE_TM_RING_COUNT 4
+>> +
+>> +    uint8_t tima[XIVE_TM_RING_COUNT * 0x10];
+>> +    uint8_t *tima_os;
+>>  };
+>> =20
+>>  #define ICP_PROP_XICS "xics"
+>=20
