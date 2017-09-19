@@ -1,21 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35749)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1duJ1M-0007LQ-Ar
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:57:10 -0400
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1duJ1i-0007cJ-LQ
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:57:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1duJ1I-0002kN-B9
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:57:04 -0400
-Resent-Message-Id: <E1duJ1I-0002kN-B9@eggs.gnu.org>
-In-Reply-To: <20170919125041.2153-1-f4bug@amsat.org>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150582940762.57.11503092763565098162@69b6ddf88678>
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1duJ1e-0002wF-LI
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:57:26 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57392)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1duJ1e-0002vp-Cz
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:57:22 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8JDtuHP141012
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 09:57:21 -0400
+Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d30001eck-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 09:57:20 -0400
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Tue, 19 Sep 2017 14:57:18 +0100
+References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
+	<20170913115029.47626-3-pasic@linux.vnet.ibm.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Tue, 19 Sep 2017 15:57:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Tue, 19 Sep 2017 06:56:48 -0700 (PDT)
-Subject: Re: [Qemu-devel] [PATCH] hw/input/lm832x: move LM8323 declarations
- to input/keypad.h
+In-Reply-To: <20170913115029.47626-3-pasic@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <0a029ec8-ff4c-e56d-4ef1-750fc8c49e19@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 2/4] s390x/css: use ccw data stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,36 +42,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: f4bug@amsat.org
-Cc: famz@redhat.com, peter.maydell@linaro.org, balrogg@gmail.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIFtQQVRDSF0gaHcvaW5wdXQvbG04MzJ4OiBtb3ZlIExNODMyMyBkZWNsYXJhdGlvbnMg
-dG8gaW5wdXQva2V5cGFkLmgKTWVzc2FnZS1pZDogMjAxNzA5MTkxMjUwNDEuMjE1My0xLWY0YnVn
-QGFtc2F0Lm9yZwpUeXBlOiBzZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmlu
-L2Jhc2gKCkJBU0U9YmFzZQpuPTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwg
-d2MgLWwpCmZhaWxlZD0wCgpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdp
-dCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0t
-Zm9ybWF0PSVIIC0tcmV2ZXJzZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBl
-Y2hvICJDaGVja2luZyBQQVRDSCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVz
-ICRjKS4uLiIKICAgIGlmICEgZ2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAg
-IGVjaG8KICAgIGZpCiAgICBuPSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBT
-Q1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4
-ODcxMzM4NAplcnJvcjogUlBDIGZhaWxlZDsgY3VybCAxOCB0cmFuc2ZlciBjbG9zZWQgd2l0aCBv
-dXRzdGFuZGluZyByZWFkIGRhdGEgcmVtYWluaW5nCmZhdGFsOiBUaGUgcmVtb3RlIGVuZCBodW5n
-IHVwIHVuZXhwZWN0ZWRseQplcnJvcjogQ291bGQgbm90IGZldGNoIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKVHJhY2ViYWNrIChtb3N0IHJlY2VudCBjYWxsIGxhc3Qp
-OgogIEZpbGUgIi91c3IvYmluL3BhdGNoZXciLCBsaW5lIDQ0MiwgaW4gdGVzdF9vbmUKICAgIGdp
-dF9jbG9uZV9yZXBvKGNsb25lLCByWyJyZXBvIl0sIHJbImhlYWQiXSwgbG9nZikKICBGaWxlICIv
-dXNyL2Jpbi9wYXRjaGV3IiwgbGluZSA0OCwgaW4gZ2l0X2Nsb25lX3JlcG8KICAgIHN0ZG91dD1s
-b2dmLCBzdGRlcnI9bG9nZikKICBGaWxlICIvdXNyL2xpYjY0L3B5dGhvbjMuNi9zdWJwcm9jZXNz
-LnB5IiwgbGluZSAyOTEsIGluIGNoZWNrX2NhbGwKICAgIHJhaXNlIENhbGxlZFByb2Nlc3NFcnJv
-cihyZXRjb2RlLCBjbWQpCnN1YnByb2Nlc3MuQ2FsbGVkUHJvY2Vzc0Vycm9yOiBDb21tYW5kICdb
-J2dpdCcsICdyZW1vdGUnLCAnYWRkJywgJy1mJywgJy0tbWlycm9yPWZldGNoJywgJzNjOGNmNWE5
-YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQnLCAnaHR0cHM6Ly9naXRodWIuY29tL3Bh
-dGNoZXctcHJvamVjdC9xZW11J10nIHJldHVybmVkIG5vbi16ZXJvIGV4aXQgc3RhdHVzIDEuCgoK
-Ci0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3IFtodHRwOi8vcGF0
-Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQGZy
-ZWVsaXN0cy5vcmc=
+On 13/09/2017 13:50, Halil Pasic wrote:
+> Replace direct access which implicitly assumes no IDA
+> or MIDA with the new ccw data stream interface which should
+> cope with these transparently in the future.
+>=20
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> ---
+>   hw/s390x/css.c | 9 +++++----
+>   1 file changed, 5 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index e8d2016563..6b0cd8861b 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -890,6 +890,7 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr =
+ccw_addr,
+>       }
+>=20
+>       /* Look at the command. */
+> +    ccw_dstream_init(&sch->cds, &ccw, &(sch->orb));
+>       switch (ccw.cmd_code) {
+>       case CCW_CMD_NOOP:
+>           /* Nothing to do. */
+> @@ -903,8 +904,8 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr =
+ccw_addr,
+>               }
+>           }
+>           len =3D MIN(ccw.count, sizeof(sch->sense_data));
+> -        cpu_physical_memory_write(ccw.cda, sch->sense_data, len);
+> -        sch->curr_status.scsw.count =3D ccw.count - len;
+> +        ccw_dstream_write_buf(&sch->cds, sch->sense_data, len);
+> +        sch->curr_status.scsw.count =3D ccw_dstream_residual_count(&sc=
+h->cds);
+>           memset(sch->sense_data, 0, sizeof(sch->sense_data));
+>           ret =3D 0;
+>           break;
+> @@ -930,8 +931,8 @@ static int css_interpret_ccw(SubchDev *sch, hwaddr =
+ccw_addr,
+>           } else {
+>               sense_id.reserved =3D 0;
+>           }
+> -        cpu_physical_memory_write(ccw.cda, &sense_id, len);
+> -        sch->curr_status.scsw.count =3D ccw.count - len;
+> +        ccw_dstream_write_buf(&sch->cds, &sense_id, len);
+> +        sch->curr_status.scsw.count =3D ccw_dstream_residual_count(&sc=
+h->cds);
+>           ret =3D 0;
+>           break;
+>       }
+>=20
+
+Reviewed-by: Pierre Morel<pmorel@linux.vnet.ibm.com>
+
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
