@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36743)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1duFKW-0004cQ-Q1
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:00:42 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1duFMA-0005ac-RS
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:02:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1duFKQ-00012q-Vq
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:00:36 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:5811 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1duFKQ-0000zm-Jf
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:00:30 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1duFM4-0001vs-TF
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:02:18 -0400
 References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
-	<20170918135935.255591-8-vsementsov@virtuozzo.com>
-	<0f9ffc3d-02e1-fde8-67ac-0f62101f1204@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <17fdbc1d-05db-ee91-6b13-cac9d3719c21@virtuozzo.com>
-Date: Tue, 19 Sep 2017 13:00:19 +0300
+	<20170918135935.255591-4-vsementsov@virtuozzo.com>
+	<d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
+	<577e29c4-5187-8c6f-aacc-c77282959fdd@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <26582eb0-1db3-3aac-3652-44e3fbb1e49c@redhat.com>
+Date: Tue, 19 Sep 2017 12:01:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <0f9ffc3d-02e1-fde8-67ac-0f62101f1204@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <577e29c4-5187-8c6f-aacc-c77282959fdd@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v2 7/7] block/nbd-client: do not yield from
- nbd_read_reply_entry
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] block/nbd-client: refactor reading
+ reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,93 +27,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, den@openvz.org
 
-19.09.2017 01:36, Eric Blake wrote:
-> On 09/18/2017 08:59 AM, Vladimir Sementsov-Ogievskiy wrote:
->> Refactor nbd client to not yield from nbd_read_reply_entry. It's
->> possible now as all reading is done in nbd_read_reply_entry and
->> all request-related data is stored in per-request s->requests[i].
+On 19/09/2017 11:25, Vladimir Sementsov-Ogievskiy wrote:
+> 18.09.2017 18:43, Paolo Bonzini wrote:
+>> On 18/09/2017 15:59, Vladimir Sementsov-Ogievskiy wrote:
+>>> Read the whole reply in one place - in nbd_read_reply_entry.
+>>>
+>>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>>> ---
+>>>   block/nbd-client.h |  1 +
+>>>   block/nbd-client.c | 42 ++++++++++++++++++++++++------------------
+>>>   2 files changed, 25 insertions(+), 18 deletions(-)
+>>>
+>>> diff --git a/block/nbd-client.h b/block/nbd-client.h
+>>> index b1900e6a6d..3f97d31013 100644
+>>> --- a/block/nbd-client.h
+>>> +++ b/block/nbd-client.h
+>>> @@ -21,6 +21,7 @@ typedef struct {
+>>>       Coroutine *coroutine;
+>>>       bool receiving;         /* waiting for read_reply_co? */
+>>>       NBDRequest *request;
+>>> +    QEMUIOVector *qiov;
+>>>   } NBDClientRequest;
+>>>     typedef struct NBDClientSession {
+>>> diff --git a/block/nbd-client.c b/block/nbd-client.c
+>>> index 5f241ecc22..f7b642f079 100644
+>>> --- a/block/nbd-client.c
+>>> +++ b/block/nbd-client.c
+>>> @@ -98,6 +98,21 @@ static coroutine_fn void nbd_read_reply_entry(void
+>>> *opaque)
+>>>               break;
+>>>           }
+>>>   +        if (s->reply.error == 0 &&
+>>> +            s->requests[i].request->type == NBD_CMD_READ)
+>>> +        {
+>>> +            QEMUIOVector *qiov = s->requests[i].qiov;
+>>> +            assert(qiov != NULL);
+>>> +            assert(s->requests[i].request->len ==
+>>> +                   iov_size(qiov->iov, qiov->niov));
+>>> +            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
+>>> +                                      NULL) < 0)
+>>> +            {
+>>> +                s->reply.error = EIO;
+>>> +                break;
+>>> +            }
+>>> +        }
+>> I am not sure this is an improvement.  In principle you could have
+>> commands that read replies a bit at a time without using a QEMUIOVector.
 >>
->> We need here some additional work with s->requests[i].ret and
->> s->quit to not fail requests on normal disconnet and to not report
->> reading errors on normal disconnect.
+>> Paolo
+> 
+> Hm, what do you mean? In this patch I don't change "how do we read it",
+> I only move the reading code to one coroutine, to make it simple to
+> extend it in future (block status, etc).
+
+I disagree that it is easier to extend it in the future.  If some
+commands in the future need a different "how do we read it" (e.g. for
+structured reply), nbd_read_reply_entry may not have all the information
+it needs anymore.
+
+In fact, you're pushing knowledge of the commands from nbd_co_request to
+nbd_read_reply_entry:
+
++        if (s->reply.error == 0 &&
++            s->requests[i].request->type == NBD_CMD_READ)
+
+and knowledge of NBD_CMD_READ simply doesn't belong there.  So there is
+an example of that right now, it is not some arbitrary bad thing that
+could happen in the future.
+
+Paolo
+
+
+> nbd_read_reply_enty has all
+> information it need (s->requests[i].request) to handle the whole reply..
+> It's an improvement, because it leads to separating reply_entry
+> coroutine - it don't need any synchronization (yield/wake) more with
+> request coroutines.
+> 
 >>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block/nbd-client.c | 29 ++++++++++-------------------
->>   1 file changed, 10 insertions(+), 19 deletions(-)
-> The diffstat may have merit, but I'm wondering:
->
->> diff --git a/block/nbd-client.c b/block/nbd-client.c
->> index f80a4c5564..bf20d5d5e6 100644
->> --- a/block/nbd-client.c
->> +++ b/block/nbd-client.c
->> @@ -79,7 +79,11 @@ static coroutine_fn void nbd_read_reply_entry(void =
-*opaque)
->>       while (!s->quit) {
->>           ret =3D nbd_receive_reply(s->ioc, &reply, &local_err);
->>           if (ret < 0) {
->> -            error_report_err(local_err);
->> +            if (s->quit) {
->> +                error_free(local_err);
-> This discards errors on all remaining coroutines after we detect an
-> early exit. Are we sure the coroutine that set s->quit will have
-> reported an appropriate error, and thus explaining why we can discard
-> all secondary errors?  A comment in the code would be helpful.
-
-I'll think about it.
-
->
->> +            } else {
->> +                error_report_err(local_err);
->> +            }
->>           }
->> @@ -210,7 +204,7 @@ static int nbd_co_receive_reply(NBDClientSession *=
-s, NBDRequest *request)
->>       s->requests[i].receiving =3D true;
->>       qemu_coroutine_yield();
->>       s->requests[i].receiving =3D false;
->> -    if (!s->ioc || s->quit) {
->> +    if (!s->ioc) {
->>           ret =3D -EIO;
-> Why don't we need to check s->quit any more?  That was just added
-> earlier in the series; why the churn?
-
-it is "to not fail requests on normal disconnet". Because reply_entry=20
-may be already finished.
-Initializing "+=C2=A0=C2=A0=C2=A0 s->requests[i].ret =3D -EIO;" is enough.
-
->
->>       } else {
->>           ret =3D s->requests[i].ret;
->> @@ -218,11 +212,6 @@ static int nbd_co_receive_reply(NBDClientSession =
-*s, NBDRequest *request)
->>  =20
->>       s->requests[i].coroutine =3D NULL;
->>  =20
->> -    /* Kick the read_reply_co to get the next reply.  */
->> -    if (s->read_reply_co) {
->> -        aio_co_wake(s->read_reply_co);
->> -    }
->> -
->>       qemu_co_mutex_lock(&s->send_mutex);
->>       s->in_flight--;
->>       qemu_co_queue_next(&s->free_sema);
->> @@ -364,6 +353,8 @@ void nbd_client_close(BlockDriverState *bs)
->>  =20
->>       nbd_send_request(client->ioc, &request);
->>  =20
->> +    client->quit =3D true;
-> Previously, client->quit was only set when detecting a broken server,
-> now it is also set for a clean exit.  Do we need to change any
-> documentation of the field?
-
-It has documentation?
-
->
-
---=20
-Best regards,
-Vladimir
+>>>           /* We're woken up again by the request itself.  Note that
+>>> there
+>>>            * is no race between yielding and reentering
+>>> read_reply_co.  This
+>>>            * is because:
+>>> @@ -118,6 +133,7 @@ static coroutine_fn void
+>>> nbd_read_reply_entry(void *opaque)
+>>>       s->read_reply_co = NULL;
+>>>   }
+>>>   +/* qiov should be provided for READ and WRITE */
+>>>   static int nbd_co_send_request(BlockDriverState *bs,
+>>>                                  NBDRequest *request,
+>>>                                  QEMUIOVector *qiov)
+>>> @@ -145,6 +161,7 @@ static int nbd_co_send_request(BlockDriverState *bs,
+>>>         request->handle = INDEX_TO_HANDLE(s, i);
+>>>       s->requests[i].request = request;
+>>> +    s->requests[i].qiov = qiov;
+>>>         if (s->quit) {
+>>>           rc = -EIO;
+>>> @@ -155,7 +172,8 @@ static int nbd_co_send_request(BlockDriverState *bs,
+>>>           goto err;
+>>>       }
+>>>   -    if (qiov) {
+>>> +    if (s->requests[i].request->type == NBD_CMD_WRITE) {
+>>> +        assert(qiov);
+>>>           qio_channel_set_cork(s->ioc, true);
+>>>           rc = nbd_send_request(s->ioc, request);
+>>>           if (rc >= 0 && !s->quit) {
+>>> @@ -181,9 +199,7 @@ err:
+>>>       return rc;
+>>>   }
+>>>   -static int nbd_co_receive_reply(NBDClientSession *s,
+>>> -                                NBDRequest *request,
+>>> -                                QEMUIOVector *qiov)
+>>> +static int nbd_co_receive_reply(NBDClientSession *s, NBDRequest
+>>> *request)
+>>>   {
+>>>       int ret;
+>>>       int i = HANDLE_TO_INDEX(s, request->handle);
+>>> @@ -197,14 +213,6 @@ static int nbd_co_receive_reply(NBDClientSession
+>>> *s,
+>>>       } else {
+>>>           assert(s->reply.handle == request->handle);
+>>>           ret = -s->reply.error;
+>>> -        if (qiov && s->reply.error == 0) {
+>>> -            assert(request->len == iov_size(qiov->iov, qiov->niov));
+>>> -            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
+>>> -                                      NULL) < 0) {
+>>> -                ret = -EIO;
+>>> -                s->quit = true;
+>>> -            }
+>>> -        }
+>>>             /* Tell the read handler to read another header.  */
+>>>           s->reply.handle = 0;
+>>> @@ -232,16 +240,14 @@ static int nbd_co_request(BlockDriverState *bs,
+>>>       NBDClientSession *client = nbd_get_client_session(bs);
+>>>       int ret;
+>>>   -    assert(!qiov || request->type == NBD_CMD_WRITE ||
+>>> -           request->type == NBD_CMD_READ);
+>>> -    ret = nbd_co_send_request(bs, request,
+>>> -                              request->type == NBD_CMD_WRITE ? qiov
+>>> : NULL);
+>>> +    assert((qiov == NULL) !=
+>>> +           (request->type == NBD_CMD_WRITE || request->type ==
+>>> NBD_CMD_READ));
+>>> +    ret = nbd_co_send_request(bs, request, qiov);
+>>>       if (ret < 0) {
+>>>           return ret;
+>>>       }
+>>>   -    return nbd_co_receive_reply(client, request,
+>>> -                                request->type == NBD_CMD_READ ? qiov
+>>> : NULL);
+>>> +    return nbd_co_receive_reply(client, request);
+>>>   }
+>>>     int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+>>>
+> 
