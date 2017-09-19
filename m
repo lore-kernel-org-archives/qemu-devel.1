@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39528)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45107)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1du6Fz-0002xc-KY
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 20:19:22 -0400
+	(envelope-from <jsnow@redhat.com>) id 1du6dX-0002Xu-QW
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 20:43:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1du6Fw-0000bP-Ci
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 20:19:19 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:38876)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1du6Fw-0000b7-5e
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 20:19:16 -0400
-Received: by mail-pf0-x242.google.com with SMTP id q76so803984pfq.5
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 17:19:16 -0700 (PDT)
-References: <20170918101709.30421-1-aik@ozlabs.ru>
-	<c7702271-0af0-d33d-5ebe-364ce75a68df@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <ea2a1b2f-4b44-0eb2-2fef-bb8eec118693@ozlabs.ru>
-Date: Tue, 19 Sep 2017 10:19:11 +1000
+	(envelope-from <jsnow@redhat.com>) id 1du6dR-000805-LB
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 20:43:36 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49198)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1du6dR-0007yA-Bt
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 20:43:33 -0400
+References: <CAJoBWHyqyFiFi_feH=316fJRUbb9T8b4bbYzp-5eUF6dHtpNCg@mail.gmail.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <a7e7471a-7c55-59cb-b6ae-a6c11d4d93c2@redhat.com>
+Date: Mon, 18 Sep 2017 20:43:28 -0400
 MIME-Version: 1.0
-In-Reply-To: <c7702271-0af0-d33d-5ebe-364ce75a68df@redhat.com>
+In-Reply-To: <CAJoBWHyqyFiFi_feH=316fJRUbb9T8b4bbYzp-5eUF6dHtpNCg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v3 00/13] memory: Reduce memory use
+Subject: Re: [Qemu-devel] Disk Image Read Location
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,27 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Derrick McKee <derrick.mckee@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 
-On 19/09/17 00:59, Paolo Bonzini wrote:
-> On 18/09/2017 12:16, Alexey Kardashevskiy wrote:
->> This was inspired by https://bugzilla.redhat.com/show_bug.cgi?id=1481593
->> Previous versions:
->> v1: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01559.html
->> v2: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04069.html
->>
->> This patchset tries to reduce amount of memory used by FlatViews
->> and tries share as many FVs between address spaces as possible.
->>
->> Changelog:
->> v3:
->> * addressed comments from v2, mainly simplified the code
+
+
+On 09/18/2017 02:47 PM, Derrick McKee wrote:
+> Hi,
 > 
-> Looks almost ready.  I had a couple comments on patch 11.  However, if
-> they are wrong, I can just queue patches 2-13 immediately. 
 
-Nah, I'll repost, too many commit logs need an update. Thanks for the review!
+Hi Derrick;
 
+> I am trying to figure out if a particular disk operation is reading from
+> the same location in an image file.  I am simulating a USB disk, and during
 
--- 
-Alexey
+Which device handles the USB disk emulation? hw/usb/dev-storage.c?
+("usb-storage")?
+
+> an operation the guest OS performs, I would like to know how many times the
+> backing image file is read.  I have identified the function
+> address_space_write as the function that writes the data to the guest OS
+> from the image, but I am not sure what to compare with past writes.  There
+> are AddressSpace*, MemoryRegion*, and hwaddr types in that function.  Can
+> any of those be used to compare image read locations?  I am hoping that if,
+> for example, the AddressSpace* passed into address_space_write during one
+> invocation equals the AddressSpace* of another invocation means that the
+> same location within the image file was read twice.  Any help would be
+> appreciated.
+> 
+> - Derrick McKee
+>
+
+address_space_write is merely the function that is handling guest writes
+to memory, not guest writes to disk.
+
+Likely, your guest is writing some kind of disk IO command to whatever
+sort of disk controller you have, and this process is dispatched by a
+write to a register somewhere. If you wanted to snoop the disk activity
+at this high of a level, you'd have to understand the protocol the
+hardware uses to perform IO, look at the value being written to the
+HWAddr, and re-interpret the state of the device and so on to see what
+data is being read/written. The addresses you see here are likely just
+registers that belong to the disk controller, so they don't reflect disk
+offsets.
+
+What I'd suggest instead is that you take a look at the dispatch for
+address_space_write and follow it to the handler for the device emulator
+that is actually handling the write and trace through the device
+emulator code to find where the actual reading/writing is taking place.
+The disk emulation code being employed is likely a good and logical
+place to enable tracing of particular offsets at the logical level.
+
+If you want to know about reads/writes at a more concrete level after
+translation for offsets for file formats and so on and so forth -- if
+you were curious to know how many literal, actual read calls get issued
+-- keep looking down the stack.
+
+>From the device emulator, calls to QEMU's generic block layer are made.
+Usually blk_aio_preadv or dma_blk_read, something along these lines.
+Ultimately, if you're reading from qcow2 or raw files on a locally
+mounted hard disk, you'll probably trace the modular block layer read
+calls all the way down to raw_co_preadv, then to raw_co_prw, then to
+either laio_co_submit (if linux_aio is enabled) or paio_submit_co if it
+isn't.
+
+Then maybe you'll trace, say, paio_submit_co down (eventually) to the
+constituent pwrite/pread calls.
+
+Hard to know exactly what you want. Tracking guest IO activity and
+tracking QEMU IO activity become slightly different things due to cache,
+alignment and other protocol/format translations QEMU might be
+performing. Hopefully this sets you on the right path. Other folks will
+correct me if I've taken too many liberties at distilling all the stuff
+going on inside of QEMU. ;)
+
+Hope this helps,
+John.
