@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51201)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51894)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1duEkN-0006jt-GT
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:23:16 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1duEmX-0007qV-OP
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:25:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1duEkI-0003Ch-BO
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:23:15 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35532)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1duEkI-0003CA-4h
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:23:10 -0400
-Received: by mail-wm0-x243.google.com with SMTP id e64so3271761wmi.2
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 02:23:10 -0700 (PDT)
-Date: Tue, 19 Sep 2017 10:23:07 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170919092307.GB22797@stefanha-x1.localdomain>
-References: <CAJoBWHyqyFiFi_feH=316fJRUbb9T8b4bbYzp-5eUF6dHtpNCg@mail.gmail.com>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1duEmT-0004ty-1o
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:25:29 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:23699 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1duEmS-0004p6-L3
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:25:24 -0400
+References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
+	<20170918135935.255591-4-vsementsov@virtuozzo.com>
+	<d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <577e29c4-5187-8c6f-aacc-c77282959fdd@virtuozzo.com>
+Date: Tue, 19 Sep 2017 12:25:09 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJoBWHyqyFiFi_feH=316fJRUbb9T8b4bbYzp-5eUF6dHtpNCg@mail.gmail.com>
-Subject: Re: [Qemu-devel] Disk Image Read Location
+In-Reply-To: <d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] block/nbd-client: refactor reading
+ reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,35 +31,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Derrick McKee <derrick.mckee@gmail.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, den@openvz.org
 
-On Mon, Sep 18, 2017 at 06:47:38PM +0000, Derrick McKee wrote:
-> I am trying to figure out if a particular disk operation is reading from
-> the same location in an image file.
+18.09.2017 18:43, Paolo Bonzini wrote:
+> On 18/09/2017 15:59, Vladimir Sementsov-Ogievskiy wrote:
+>> Read the whole reply in one place - in nbd_read_reply_entry.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/nbd-client.h |  1 +
+>>   block/nbd-client.c | 42 ++++++++++++++++++++++++------------------
+>>   2 files changed, 25 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/block/nbd-client.h b/block/nbd-client.h
+>> index b1900e6a6d..3f97d31013 100644
+>> --- a/block/nbd-client.h
+>> +++ b/block/nbd-client.h
+>> @@ -21,6 +21,7 @@ typedef struct {
+>>       Coroutine *coroutine;
+>>       bool receiving;         /* waiting for read_reply_co? */
+>>       NBDRequest *request;
+>> +    QEMUIOVector *qiov;
+>>   } NBDClientRequest;
+>>   
+>>   typedef struct NBDClientSession {
+>> diff --git a/block/nbd-client.c b/block/nbd-client.c
+>> index 5f241ecc22..f7b642f079 100644
+>> --- a/block/nbd-client.c
+>> +++ b/block/nbd-client.c
+>> @@ -98,6 +98,21 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+>>               break;
+>>           }
+>>   
+>> +        if (s->reply.error == 0 &&
+>> +            s->requests[i].request->type == NBD_CMD_READ)
+>> +        {
+>> +            QEMUIOVector *qiov = s->requests[i].qiov;
+>> +            assert(qiov != NULL);
+>> +            assert(s->requests[i].request->len ==
+>> +                   iov_size(qiov->iov, qiov->niov));
+>> +            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
+>> +                                      NULL) < 0)
+>> +            {
+>> +                s->reply.error = EIO;
+>> +                break;
+>> +            }
+>> +        }
+> I am not sure this is an improvement.  In principle you could have
+> commands that read replies a bit at a time without using a QEMUIOVector.
+>
+> Paolo
 
-The following trace event is fired when a BlockBackend (a drive) is
-read:
+Hm, what do you mean? In this patch I don't change "how do we read it", 
+I only move the reading code to one coroutine, to make it simple to 
+extend it in future (block status, etc). nbd_read_reply_enty has all 
+information it need (s->requests[i].request) to handle the whole reply.. 
+It's an improvement, because it leads to separating reply_entry 
+coroutine - it don't need any synchronization (yield/wake) more with 
+request coroutines.
 
-  # block/block-backend.c
-  blk_co_preadv(void *blk, void *bs, int64_t offset, unsigned int bytes, int flags) "blk %p bs %p offset %"PRId64" bytes %u flags 0x%x"
+>
+>>           /* We're woken up again by the request itself.  Note that there
+>>            * is no race between yielding and reentering read_reply_co.  This
+>>            * is because:
+>> @@ -118,6 +133,7 @@ static coroutine_fn void nbd_read_reply_entry(void *opaque)
+>>       s->read_reply_co = NULL;
+>>   }
+>>   
+>> +/* qiov should be provided for READ and WRITE */
+>>   static int nbd_co_send_request(BlockDriverState *bs,
+>>                                  NBDRequest *request,
+>>                                  QEMUIOVector *qiov)
+>> @@ -145,6 +161,7 @@ static int nbd_co_send_request(BlockDriverState *bs,
+>>   
+>>       request->handle = INDEX_TO_HANDLE(s, i);
+>>       s->requests[i].request = request;
+>> +    s->requests[i].qiov = qiov;
+>>   
+>>       if (s->quit) {
+>>           rc = -EIO;
+>> @@ -155,7 +172,8 @@ static int nbd_co_send_request(BlockDriverState *bs,
+>>           goto err;
+>>       }
+>>   
+>> -    if (qiov) {
+>> +    if (s->requests[i].request->type == NBD_CMD_WRITE) {
+>> +        assert(qiov);
+>>           qio_channel_set_cork(s->ioc, true);
+>>           rc = nbd_send_request(s->ioc, request);
+>>           if (rc >= 0 && !s->quit) {
+>> @@ -181,9 +199,7 @@ err:
+>>       return rc;
+>>   }
+>>   
+>> -static int nbd_co_receive_reply(NBDClientSession *s,
+>> -                                NBDRequest *request,
+>> -                                QEMUIOVector *qiov)
+>> +static int nbd_co_receive_reply(NBDClientSession *s, NBDRequest *request)
+>>   {
+>>       int ret;
+>>       int i = HANDLE_TO_INDEX(s, request->handle);
+>> @@ -197,14 +213,6 @@ static int nbd_co_receive_reply(NBDClientSession *s,
+>>       } else {
+>>           assert(s->reply.handle == request->handle);
+>>           ret = -s->reply.error;
+>> -        if (qiov && s->reply.error == 0) {
+>> -            assert(request->len == iov_size(qiov->iov, qiov->niov));
+>> -            if (qio_channel_readv_all(s->ioc, qiov->iov, qiov->niov,
+>> -                                      NULL) < 0) {
+>> -                ret = -EIO;
+>> -                s->quit = true;
+>> -            }
+>> -        }
+>>   
+>>           /* Tell the read handler to read another header.  */
+>>           s->reply.handle = 0;
+>> @@ -232,16 +240,14 @@ static int nbd_co_request(BlockDriverState *bs,
+>>       NBDClientSession *client = nbd_get_client_session(bs);
+>>       int ret;
+>>   
+>> -    assert(!qiov || request->type == NBD_CMD_WRITE ||
+>> -           request->type == NBD_CMD_READ);
+>> -    ret = nbd_co_send_request(bs, request,
+>> -                              request->type == NBD_CMD_WRITE ? qiov : NULL);
+>> +    assert((qiov == NULL) !=
+>> +           (request->type == NBD_CMD_WRITE || request->type == NBD_CMD_READ));
+>> +    ret = nbd_co_send_request(bs, request, qiov);
+>>       if (ret < 0) {
+>>           return ret;
+>>       }
+>>   
+>> -    return nbd_co_receive_reply(client, request,
+>> -                                request->type == NBD_CMD_READ ? qiov : NULL);
+>> +    return nbd_co_receive_reply(client, request);
+>>   }
+>>   
+>>   int nbd_client_co_preadv(BlockDriverState *bs, uint64_t offset,
+>>
 
-Here is an example:
-
-  $ qemu-system-x86_64 -M accel=kvm -m 1G -cpu host \
-                       -trace enable=blk_co_preadv \
-		       -drive if=virtio,file=test.img,format=raw
-23087@1505812623.056729:blk_co_preadv blk 0x55f703389390 bs 0x55f7033895f0 offset 0 bytes 512 flags 0x0
-23087@1505812623.176042:blk_co_preadv blk 0x55f703389390 bs 0x55f7033895f0 offset 0 bytes 512 flags 0x0
-
-"offset" is the byte address that the guest is reading from.
-
-See docs/devel/tracing.txt for more information on tracing.  One or more
-tracing backends are compiled into QEMU.  By default the "log" backend
-prints to stderr.
-
-If you are using the QEMU binary from a Linux distribution package, they
-may have compiled in only the SystemTap backend so try compiling your
-own QEMU if you don't see any output from the example above.
-
-Stefan
+-- 
+Best regards,
+Vladimir
