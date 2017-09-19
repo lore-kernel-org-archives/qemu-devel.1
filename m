@@ -1,34 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35399)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1duOEX-0007js-9f
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:31:02 -0400
+	(envelope-from <laurent@vivier.eu>) id 1duOF1-00081K-6K
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:31:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1duOES-00017x-DU
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:31:01 -0400
-Received: from indium.canonical.com ([91.189.90.7]:49890)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1duOES-00017h-78
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:30:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1duOEQ-0006pd-IJ
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 19:30:54 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 7138F2E8493
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 19:30:54 +0000 (UTC)
+	(envelope-from <laurent@vivier.eu>) id 1duOEw-0001OG-9J
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:31:31 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:59647)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <laurent@vivier.eu>) id 1duOEv-0001Mx-U9
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:31:26 -0400
+References: <20170918104624.14743-1-laurent@vivier.eu>
+	<a79537e9-1053-128e-e63b-8ce969beb12d@linaro.org>
+	<e67746f6-6855-c761-f4ff-dd6b19391eda@redhat.com>
+	<9234d486-d4cb-c10e-da8c-48ca800e31a3@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <ab998bd2-ba92-0a9e-ce0f-25d19cdb860a@vivier.eu>
+Date: Tue, 19 Sep 2017 21:31:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Sep 2017 19:20:19 -0000
-From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
-Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150584881928.23529.5021086252748990054.malone@wampee.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
- 2.10 (works on 2.9)
+In-Reply-To: <9234d486-d4cb-c10e-da8c-48ca800e31a3@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH] softfloat: rename make_float[x80|128]_init
+ to const_float[x80|128]
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,58 +31,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Laszlo Ersek <lersek@redhat.com>, Eric Blake <eblake@redhat.com>, Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Aurelien Jarno <aurelien@aurel32.net>, Markus Armbruster <armbru@redhat.com>
 
-Posted:
+Le 19/09/2017 à 20:45, Laszlo Ersek a écrit :
+> On 09/19/17 19:39, Eric Blake wrote:
+>> On 09/19/2017 11:30 AM, Richard Henderson wrote:
+>>> On 09/18/2017 05:46 AM, Laurent Vivier wrote:
+>>>> Redefine make_floatx80() and make_float128() as make_float16(),
+>>>> make_float32() and make_float64() using a variable and not only
+>>>> a cast.
+>>
+>>>> -#define make_floatx80(exp, mant) ((floatx80) { mant, exp })
+>>>> -#define make_floatx80_init(exp, mant) { .low = mant, .high = exp }
+>>>> +#define make_floatx80(exp, mant) __extension__ \
+>>>> +    ({ floatx80 f80_val = { .low = mant, .high = exp }; f80_val; })
+>>>> +#define const_floatx80(exp, mant) { .low = mant, .high = exp }
+>>
+>>>
+>>> I don't like this part -- (type){ init } is a standard C99 compound literal.
+>>> There's no point using a gcc extension instead.
+>>
+>> The C99 compound literal is not a const initializer in all situations,
+>> though :(  Here's another thread where we had a similar discussion, but
+>> there, the solution was to just make the macro behave as an initializer
+>> (which is C99 compliant, but loses some type safety) instead of relying
+>> on a gcc extension:
+>>
+>> https://lists.gnu.org/archive/html/qemu-devel/2017-08/msg06566.html
+>>
+>> I suspect you're running into the same issues that Laszlo already helped
+>> us understand regarding QLit.
+>>
+> 
+> Thanks for the CC! I don't have much context, but the patch looks quite
+> isolated.
+> 
+> I think I agree with Richard here -- I don't think there's any reason to
+> change the replacement text of make_floatx80.
+> 
+> The patch names make_float64() as an earlier example (already using
+> __extension__), but I don't understand why make_float64() was written
+> that way. ... It seems to go back to ancient commit f090c9d4ad58 ("Add
+> strict checking mode for softfp code.", 2007-11-18). Was C99 support
+> (esp. compound literals) spotty in gcc back then?
+> 
+> Not having much background, I'd suggest the opposite change -- replace
+> the statement-expression in make_float64() with a compound literal.
 
-[edk2] [PATCH 0/3] OvmfPkg/QemuVideoDxe/VbeShim: handle PAM1 register on
-Q35 correctly
 
-https://lists.01.org/pipermail/edk2-devel/2017-September/014898.html
+Okay, I'll do this way.
 
-I CC'd Aleksei on the series, but testing is welcome from anyone. (The
-cover letter at the link contains a git fetch URL.)
+Thank you all for your comments.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715700
-
-Title:
-  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu version: 2.10 stable.
-  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
-st.
-  Command line:
-  qemu-system-x86_64 \
-      -nodefaults \
-      -nodefconfig \
-      -machine type=3Dq35,accel=3Dkvm \
-      -enable-kvm \
-      -cpu host \
-      -m 2048 \
-      -vga virtio \
-      -boot menu=3Don \
-      -smbios file=3D/path/dmidecode_BIOS.bin \
-      -acpitable file=3D/path/acpi_slic.bin \
-      -bios /path/OVMF_CODE.fd \
-      -net none \
-      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
-      -device pcie-root-port \
-      -device ich9-usb-ehci1 \
-      -device ich9-usb-uhci1 \
-      -device ich9-usb-uhci2 \
-      -device ich9-usb-uhci3
-
-  Windows hangs at boot with waving flag screen (flag doesn't freeze,
-  keeps waving indefinitely). Same command line boots fine with Qemu
-  2.9. I tried changing machine type to pc-q35-2.9 - same result.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
+Laurent
