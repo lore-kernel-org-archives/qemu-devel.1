@@ -1,28 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42287)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42590)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1duHuP-0000XA-Ps
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:45:50 -0400
+	(envelope-from <kwolf@redhat.com>) id 1duHut-0000xK-Ar
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:46:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcandre.lureau@gmail.com>) id 1duHuO-0007pR-NF
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:45:49 -0400
-Received: from mail-io0-x233.google.com ([2607:f8b0:4001:c06::233]:55300)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <marcandre.lureau@gmail.com>)
-	id 1duHuO-0007oi-G1
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:45:48 -0400
-Received: by mail-io0-x233.google.com with SMTP id z187so9579361ioz.12
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:45:47 -0700 (PDT)
+	(envelope-from <kwolf@redhat.com>) id 1duHus-00087f-JB
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:46:19 -0400
+Date: Tue, 19 Sep 2017 14:46:08 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170919124608.GE3789@localhost.localdomain>
+References: <20170918185819.5984-1-eblake@redhat.com>
 MIME-Version: 1.0
-References: <20170823162004.27337-1-marcandre.lureau@redhat.com>
-	<FF7FC980937D6342B9D289F5F3C7C2625B5AEDAE@SHSMSX152.ccr.corp.intel.com>
-	<CAJ+F1CJ2q7-YX0Sww+sV9Sx0s0sViN++G-Q81P2hupwaZfztRw@mail.gmail.com>
-In-Reply-To: <CAJ+F1CJ2q7-YX0Sww+sV9Sx0s0sViN++G-Q81P2hupwaZfztRw@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 19 Sep 2017 12:45:35 +0000
-Message-ID: <CAJ+F1CJBR=vAvAt7vNA=GRc+7J1vUm4k7=CLGAG=MJ1rEEor_g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/27] vhost-user-scsi: code clean-up
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170918185819.5984-1-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 00/20] make dirty-bitmap byte-based
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,37 +22,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Liu, Changpeng" <changpeng.liu@intel.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: "felipe@nutanix.com" <felipe@nutanix.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org
 
-Hi
+Am 18.09.2017 um 20:57 hat Eric Blake geschrieben:
+> There are patches floating around to add NBD_CMD_BLOCK_STATUS,
+> but NBD wants to report status on byte granularity (even if the
+> reporting will probably be naturally aligned to sectors or even
+> much higher levels).  I've therefore started the task of
+> converting our block status code to report at a byte granularity
+> rather than sectors.
+> 
+> Now that 2.11 is open, I'm rebasing/reposting the remaining patches.
+> 
+> The overall conversion currently looks like:
+> part 1: bdrv_is_allocated (merged in 2.10, commit 51b0a488)
+> part 2: dirty-bitmap (this series, v7 was here [1])
+> part 3: bdrv_get_block_status (v4 is posted [2] and is mostly reviewed)
+> part 4: .bdrv_co_block_status (v3 is posted [3], but needs review)
 
-On Mon, Sep 11, 2017 at 3:18 PM Marc-Andr=C3=A9 Lureau <
-marcandre.lureau@gmail.com> wrote:
+I agree with Fam's comment on patch 5 and had a question on patch 18.
 
-> Hi
->
-> On Thu, Aug 24, 2017 at 2:41 AM Liu, Changpeng <changpeng.liu@intel.com>
-> wrote:
->
->> Thanks for helping the example code clean-up. I can rebase the
->> vhost-user-blk patch
->> set after your commits. For the issue you mentioned below, I think the
->> vhost-user-scsi example
->> can only support 1 LUN, so LUN0 is exist, LUN1 reported error should be
->> okay.
->>
->
-> I think this series should go first before your vhost-user-blk, to avoid
-> code churn. Please help review.
->
-> Patches missing review: 1, 2, 3, 5, 8, 9, 10, 11, 13, 17, 20, 22, 24, 25,
-> 26
->
-
-Now missing 3, 8, 10, 11, 13, 17, 22, 24.
-
-Many thanks Philippe so far!
-
---=20
-Marc-Andr=C3=A9 Lureau
+Everything else is
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
