@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duFNo-0006Ir-Ti
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:04:01 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1duFOe-0006ko-KS
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:04:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duFNn-0003KJ-Ve
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:04:00 -0400
-References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
-	<20170918135935.255591-7-vsementsov@virtuozzo.com>
-	<b016f0b6-c7bd-eef3-caee-47f7da7d8deb@redhat.com>
-	<48c3e73c-d142-7a46-a6be-b4c05349aa81@virtuozzo.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <268eb4fb-b61e-403c-0c5a-80bab84ef4e2@redhat.com>
-Date: Tue, 19 Sep 2017 12:03:48 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1duFOa-0003aX-OS
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:04:52 -0400
+Received: from mail-wm0-x236.google.com ([2a00:1450:400c:c09::236]:45566)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1duFOa-0003a9-H3
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:04:48 -0400
+Received: by mail-wm0-x236.google.com with SMTP id g206so3709576wme.0
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 03:04:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <48c3e73c-d142-7a46-a6be-b4c05349aa81@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 6/7] block/nbd-client: early fail
- nbd_read_reply_entry if s->quit is set
+In-Reply-To: <20170919001147.23182-2-jsnow@redhat.com>
+References: <20170919001147.23182-1-jsnow@redhat.com>
+	<20170919001147.23182-2-jsnow@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 19 Sep 2017 11:04:26 +0100
+Message-ID: <CAFEAcA-7f++EFXqxm6DnHfYX-kz6w9J90DHzqiGcVOWvOQffQg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL 00/13] Ide patches
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,31 +29,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+To: John Snow <jsnow@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 19/09/2017 11:43, Vladimir Sementsov-Ogievskiy wrote:
->>
->> I'm trying to look forward to structured reads, where we will have to
->> deal with more than one server message in reply to a single client
->> request.  For read, we just piece together portions of the qiov until
->> the server has sent us all the pieces.  But for block query, I really do
->> think we'll want to defer to specialized handlers for doing further
->> reads (the amount of data to be read from the server is not known by the
->> client a priori, so it is a two-part read, one to get the length, and
->> another to read that remaining length); if we need some sort of callback
->> function rather than cramming all the logic here in the main read loop,
-> 
-> by patch 3 I do not mean in any way that I want to have all reading
-> staff in one function, ofcourse it should be refactored
-> for block-status addition. I just want to have all reading staff in one
-> coroutine. Reading from ioc is sequential, so it's
-> native to do it sequentially in one coroutine, without switches.
+On 19 September 2017 at 01:11, John Snow <jsnow@redhat.com> wrote:
+> The following changes since commit a9158a5cba955b79d580a252cc58ff44d154e370:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/audio-20170918-pull-request' into staging (2017-09-18 12:40:54 +0100)
+>
+> are available in the git repository at:
+>
+>   https://github.com/jnsnow/qemu.git tags/ide-pull-request
+>
+> for you to fetch changes up to ae34fce5f94e93a68c879fe6179d4bcd9ee915d7:
+>
+>   hw/block/fdc: Convert to realize (2017-09-18 19:43:38 -0400)
+>
+> ----------------------------------------------------------------
+>
+> ----------------------------------------------------------------
+>
 
-But why is that a goal?  See it as a state machine that goes between the
-"waiting for header" and "waiting for payload" states.  Reading header
-corresponds to read_reply_co waiting on the socket (and reading when
-it's ready); reading payload corresponds to the request coroutine
-waiting on the socket and reading when it's ready.
+Applied, thanks.
 
-Paolo
+-- PMM
