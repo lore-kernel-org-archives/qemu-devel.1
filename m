@@ -1,30 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40119)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41394)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1duJ90-0002KL-Fn
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:05:00 -0400
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1duJBc-0003Pf-Qm
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:07:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <groug@kaod.org>) id 1duJ8v-0007cm-Tz
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:04:58 -0400
-Received: from 16.mo1.mail-out.ovh.net ([178.33.104.224]:41815)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <groug@kaod.org>) id 1duJ8v-0007bj-Jq
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:04:53 -0400
-Received: from player691.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo1.mail-out.ovh.net (Postfix) with ESMTP id 9225295A50
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 16:04:51 +0200 (CEST)
-Date: Tue, 19 Sep 2017 16:03:57 +0200
-From: Greg Kurz <groug@kaod.org>
-Message-ID: <20170919160357.082b991f@bahia.lab.toulouse-stg.fr.ibm.com>
-In-Reply-To: <20170918230358.GG27153@umbus>
-References: <150539846159.21523.16161730500010192093.stgit@bahia>
-	<150539848430.21523.2732328570419779115.stgit@bahia>
-	<20170918230358.GG27153@umbus>
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1duJBV-00011i-Mt
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:07:40 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35862
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1duJBV-00011c-Gd
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:07:33 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8JE6oYq057400
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 10:07:32 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d33uhkx4f-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 10:07:32 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Tue, 19 Sep 2017 15:07:30 +0100
+References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
+	<20170913115029.47626-4-pasic@linux.vnet.ibm.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Tue, 19 Sep 2017 16:07:25 +0200
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	boundary="Sig_/7EXtrxp/VpmTwXqaD8rMlwt";
-	protocol="application/pgp-signature"
-Subject: Re: [Qemu-devel] [PATCH v2 2/2] spapr_pci: make index property
- mandatory
+In-Reply-To: <20170913115029.47626-4-pasic@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <883c16a8-6289-18e7-bbdb-cf684b20a9eb@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] virtio-ccw: use ccw data stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,236 +43,378 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Michael Roth <mdroth@linux.vnet.ibm.com>, Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
---Sig_/7EXtrxp/VpmTwXqaD8rMlwt
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, 19 Sep 2017 09:03:58 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
-
-> On Thu, Sep 14, 2017 at 04:14:44PM +0200, Greg Kurz wrote:
-> > Creating several PHBs without index property confuses the DRC code
-> > and causes issues:
-> > - only the first index-less PHB is functional, the other ones will
-> >   silently ignore hotplugging of PCI devices
-> > - QEMU will even terminate if these PHBs have cold-plugged devices =20
+On 13/09/2017 13:50, Halil Pasic wrote:
+> Replace direct access which implicitly assumes no IDA
+> or MIDA with the new ccw data stream interface which should
+> cope with these transparently in the future.
 >=20
-> So, this is true, but it's kind of missing the point; we could fix
-> those things if we wanted.  The real point here is that the non-index
-> option is more trouble than it's worth: it's difficult to use, keeps
-> requiring (potentially incompatible) changes when some new parameter
-> needs adding, and is awkward to check for collisions.
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 >=20
+> ---
+>=20
+> v1 --> v2:
+> Removed todo comments on possible errno change as with
+> https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg02441.html
+> applied it does not matter any more.
+>=20
+> Error handling: At the moment we ignore errors reported
+> by stream ops to keep the change minimal. An add-on
+> patch improving on this is to be expected later.
+> ---
+>   hw/s390x/virtio-ccw.c | 156 +++++++++++++++--------------------------=
+---------
+>   1 file changed, 46 insertions(+), 110 deletions(-)
 
-Ok, I'll rewrite the changelog accordingly in the next spin.
+:)
 
-> > qemu-system-ppc64: -device virtio-net,bus=3Dpci2.0: an attached device
-> >  is still awaiting release
-> >=20
-> > This happens because DR connectors for child PCI devices are created
-> > with a DRC index that is derived from the PHB's index property. If the
-> > PHBs are created without index, then the same value of -1 is used to
-> > compute the DRC indexes for both PHBs, hence causing the collision.
-> >=20
-> > Also, the index property is used to compute the placement of the PHB's
-> > memory regions. It is limited to 31 or 255, depending on the machine
-> > type version. This fits well with the requirements of DRC indexes, which
-> > need the PHB index to be a 16-bit value.
-> >=20
-> > This patch hence makes the index property mandatory. As a consequence,
-> > the PHB's memory regions and BUID are now always configured according
-> > to the index, and it is no longer possible to set them from the command
-> > line. We have to introduce a PHB instance init function to initialize
-> > the 64-bit window address to -1 because pseries-2.7 and older machines
-> > don't set it.
-> >=20
-> > This DOES BREAK backwards compat, but we don't think the non-index
-> > PHB feature was used in practice (at least libvirt doesn't) and the
-> > simplification is worth it.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> > v1->v2: - error out if mem64_win_pciaddr is set but mem64_win_size
-> >           isn't
-> >         - set mem64_win_addr to -1 for old configuration with 32-bit
-> >           window below 2G in spapr_phb_realize()
-> >         - drop instance init function
-> >=20
-> > RFC->v1: - as suggested dy David, updated the changelog to explicitely
-> >            mention that we intentionally break backwards compat.
-> > ---
-> >  hw/ppc/spapr_pci.c |   53 +++++++++++---------------------------------=
---------
-> >  1 file changed, 11 insertions(+), 42 deletions(-)
-> >=20
-> > diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> > index cf54160526fa..024638e18b53 100644
-> > --- a/hw/ppc/spapr_pci.c
-> > +++ b/hw/ppc/spapr_pci.c
-> > @@ -1523,16 +1523,6 @@ static void spapr_phb_realize(DeviceState *dev, =
-Error **errp)
-> >          sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
-> >          Error *local_err =3D NULL;
-> > =20
-> > -        if ((sphb->buid !=3D (uint64_t)-1) || (sphb->dma_liobn[0] !=3D=
- (uint32_t)-1)
-> > -            || (sphb->dma_liobn[1] !=3D (uint32_t)-1 && windows_suppor=
-ted =3D=3D 2)
-> > -            || (sphb->mem_win_addr !=3D (hwaddr)-1)
-> > -            || (sphb->mem64_win_addr !=3D (hwaddr)-1)
-> > -            || (sphb->io_win_addr !=3D (hwaddr)-1)) {
-> > -            error_setg(errp, "Either \"index\" or other parameters mus=
-t"
-> > -                       " be specified for PAPR PHB, not both");
-> > -            return;
-> > -        }
-> > -
-> >          smc->phb_placement(spapr, sphb->index,
-> >                             &sphb->buid, &sphb->io_win_addr,
-> >                             &sphb->mem_win_addr, &sphb->mem64_win_addr,
-> > @@ -1541,36 +1531,12 @@ static void spapr_phb_realize(DeviceState *dev,=
- Error **errp)
-> >              error_propagate(errp, local_err);
-> >              return;
-> >          }
-> > -    }
-> > -
-> > -    if (sphb->buid =3D=3D (uint64_t)-1) {
-> > -        error_setg(errp, "BUID not specified for PHB");
-> > -        return;
-> > -    }
-> > -
-> > -    if ((sphb->dma_liobn[0] =3D=3D (uint32_t)-1) ||
-> > -        ((sphb->dma_liobn[1] =3D=3D (uint32_t)-1) && (windows_supporte=
-d > 1))) {
-> > -        error_setg(errp, "LIOBN(s) not specified for PHB");
-> > -        return;
-> > -    }
-> > -
-> > -    if (sphb->mem_win_addr =3D=3D (hwaddr)-1) {
-> > -        error_setg(errp, "Memory window address not specified for PHB"=
+>=20
+> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> index b1976fdd19..a9baf6f7ab 100644
+> --- a/hw/s390x/virtio-ccw.c
+> +++ b/hw/s390x/virtio-ccw.c
+> @@ -287,49 +287,19 @@ static int virtio_ccw_handle_set_vq(SubchDev *sch=
+, CCW1 ccw, bool check_len,
+>           return -EFAULT;
+>       }
+>       if (is_legacy) {
+> -        linfo.queue =3D address_space_ldq_be(&address_space_memory, cc=
+w.cda,
+> -                                           MEMTXATTRS_UNSPECIFIED, NUL=
+L);
+> -        linfo.align =3D address_space_ldl_be(&address_space_memory,
+> -                                           ccw.cda + sizeof(linfo.queu=
+e),
+> -                                           MEMTXATTRS_UNSPECIFIED,
+> -                                           NULL);
+> -        linfo.index =3D address_space_lduw_be(&address_space_memory,
+> -                                            ccw.cda + sizeof(linfo.que=
+ue)
+> -                                            + sizeof(linfo.align),
+> -                                            MEMTXATTRS_UNSPECIFIED,
+> -                                            NULL);
+> -        linfo.num =3D address_space_lduw_be(&address_space_memory,
+> -                                          ccw.cda + sizeof(linfo.queue=
+)
+> -                                          + sizeof(linfo.align)
+> -                                          + sizeof(linfo.index),
+> -                                          MEMTXATTRS_UNSPECIFIED,
+> -                                          NULL);
+> +        ccw_dstream_read(&sch->cds, linfo);
+> +        be64_to_cpus(&linfo.queue);
+> +        be32_to_cpus(&linfo.align);
+> +        be16_to_cpus(&linfo.index);
+> +        be16_to_cpus(&linfo.num);
+>           ret =3D virtio_ccw_set_vqs(sch, NULL, &linfo);
+>       } else {
+> -        info.desc =3D address_space_ldq_be(&address_space_memory, ccw.=
+cda,
+> -                                           MEMTXATTRS_UNSPECIFIED, NUL=
+L);
+> -        info.index =3D address_space_lduw_be(&address_space_memory,
+> -                                           ccw.cda + sizeof(info.desc)
+> -                                           + sizeof(info.res0),
+> -                                           MEMTXATTRS_UNSPECIFIED, NUL=
+L);
+> -        info.num =3D address_space_lduw_be(&address_space_memory,
+> -                                         ccw.cda + sizeof(info.desc)
+> -                                         + sizeof(info.res0)
+> -                                         + sizeof(info.index),
+> -                                         MEMTXATTRS_UNSPECIFIED, NULL)=
+;
+> -        info.avail =3D address_space_ldq_be(&address_space_memory,
+> -                                          ccw.cda + sizeof(info.desc)
+> -                                          + sizeof(info.res0)
+> -                                          + sizeof(info.index)
+> -                                          + sizeof(info.num),
+> -                                          MEMTXATTRS_UNSPECIFIED, NULL=
 );
-> > -        return;
-> > -    }
-> > -
-> > -    if (sphb->io_win_addr =3D=3D (hwaddr)-1) {
-> > -        error_setg(errp, "IO window address not specified for PHB");
-> > +    } else {
-> > +        error_setg(errp, "\"index\" for PAPR PHB is mandatory");
-> >          return;
-> >      }
-> > =20
-> >      if (sphb->mem64_win_size !=3D 0) {
-> > -        if (sphb->mem64_win_addr =3D=3D (hwaddr)-1) {
-> > -            error_setg(errp,
-> > -                       "64-bit memory window address not specified for=
- PHB");
-> > -            return;
-> > -        }
-> > -
-> >          if (sphb->mem_win_size > SPAPR_PCI_MEM32_WIN_SIZE) {
-> >              error_setg(errp, "32-bit memory window of size 0x%"HWADDR_=
-PRIx
-> >                         " (max 2 GiB)", sphb->mem_win_size); =20
+> -        info.used =3D address_space_ldq_be(&address_space_memory,
+> -                                         ccw.cda + sizeof(info.desc)
+> -                                         + sizeof(info.res0)
+> -                                         + sizeof(info.index)
+> -                                         + sizeof(info.num)
+> -                                         + sizeof(info.avail),
+> -                                         MEMTXATTRS_UNSPECIFIED, NULL)=
+;
+> +        ccw_dstream_read(&sch->cds, info);
+> +        be64_to_cpus(&info.desc);
+> +        be16_to_cpus(&info.index);
+> +        be16_to_cpus(&info.num);
+> +        be64_to_cpus(&info.avail);
+> +        be64_to_cpus(&info.used);
+>           ret =3D virtio_ccw_set_vqs(sch, &info, NULL);
+>       }
+>       sch->curr_status.scsw.count =3D 0;
+> @@ -342,15 +312,13 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>       VirtioRevInfo revinfo;
+>       uint8_t status;
+>       VirtioFeatDesc features;
+> -    void *config;
+>       hwaddr indicators;
+>       VqConfigBlock vq_config;
+>       VirtioCcwDevice *dev =3D sch->driver_data;
+>       VirtIODevice *vdev =3D virtio_ccw_get_vdev(sch);
+>       bool check_len;
+>       int len;
+> -    hwaddr hw_len;
+> -    VirtioThinintInfo *thinint;
+> +    VirtioThinintInfo thinint;
 >=20
-> Some of these checks could probably just become assert()s now, where
-> they're things determined by the placement code and no longer have
-> parameters, a problem indicates a bug in the machine rather than a
-> user error.
+>       if (!dev) {
+>           return -EINVAL;
+> @@ -394,11 +362,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>           } else {
+>               VirtioDeviceClass *vdc =3D VIRTIO_DEVICE_GET_CLASS(vdev);
 >=20
-
-All the *_size properties are still user settable, as before... should we
-make them internal and have the placement hook initialize them instead ?
-
-> > @@ -1581,6 +1547,9 @@ static void spapr_phb_realize(DeviceState *dev, E=
-rror **errp)
-> >              /* 64-bit window defaults to identity mapping */
-> >              sphb->mem64_win_pciaddr =3D sphb->mem64_win_addr;
-> >          }
-> > +    } else if (sphb->mem64_win_pciaddr !=3D (hwaddr) -1) {
-> > +        error_setg(errp, "64-bit memory window requires \"mem64_win_si=
-ze\"");
-> > +        return; =20
+> -            features.index =3D address_space_ldub(&address_space_memor=
+y,
+> -                                                ccw.cda
+> -                                                + sizeof(features.feat=
+ures),
+> -                                                MEMTXATTRS_UNSPECIFIED=
+,
+> -                                                NULL);
+> +            ccw_dstream_advance(&sch->cds, sizeof(features.features));
+> +            ccw_dstream_read(&sch->cds, features.index);
+>               if (features.index =3D=3D 0) {
+>                   if (dev->revision >=3D 1) {
+>                       /* Don't offer legacy features for modern devices=
+. */
+> @@ -417,9 +382,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>                   /* Return zeroes if the guest supports more feature b=
+its. */
+>                   features.features =3D 0;
+>               }
+> -            address_space_stl_le(&address_space_memory, ccw.cda,
+> -                                 features.features, MEMTXATTRS_UNSPECI=
+FIED,
+> -                                 NULL);
+> +            ccw_dstream_rewind(&sch->cds);
+> +            cpu_to_le32s(&features.features);
+> +            ccw_dstream_write(&sch->cds, features.features);
+>               sch->curr_status.scsw.count =3D ccw.count - sizeof(featur=
+es);
+>               ret =3D 0;
+>           }
+> @@ -438,15 +403,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>           if (!ccw.cda) {
+>               ret =3D -EFAULT;
+>           } else {
+> -            features.index =3D address_space_ldub(&address_space_memor=
+y,
+> -                                                ccw.cda
+> -                                                + sizeof(features.feat=
+ures),
+> -                                                MEMTXATTRS_UNSPECIFIED=
+,
+> -                                                NULL);
+> -            features.features =3D address_space_ldl_le(&address_space_=
+memory,
+> -                                                     ccw.cda,
+> -                                                     MEMTXATTRS_UNSPEC=
+IFIED,
+> -                                                     NULL);
+> +            ccw_dstream_read(&sch->cds, features);
+> +            le32_to_cpus(&features.features);
+>               if (features.index =3D=3D 0) {
+>                   virtio_set_features(vdev,
+>                                       (vdev->guest_features & 0xfffffff=
+f00000000ULL) |
+> @@ -488,7 +446,7 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>           } else {
+>               virtio_bus_get_vdev_config(&dev->bus, vdev->config);
+>               /* XXX config space endianness */
+> -            cpu_physical_memory_write(ccw.cda, vdev->config, len);
+> +            ccw_dstream_write_buf(&sch->cds, vdev->config, len);
+>               sch->curr_status.scsw.count =3D ccw.count - len;
+>               ret =3D 0;
+>           }
+> @@ -501,21 +459,13 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>               }
+>           }
+>           len =3D MIN(ccw.count, vdev->config_len);
+> -        hw_len =3D len;
+>           if (!ccw.cda) {
+>               ret =3D -EFAULT;
+>           } else {
+> -            config =3D cpu_physical_memory_map(ccw.cda, &hw_len, 0);
+> -            if (!config) {
+> -                ret =3D -EFAULT;
+> -            } else {
+> -                len =3D hw_len;
+> -                /* XXX config space endianness */
+> -                memcpy(vdev->config, config, len);
+> -                cpu_physical_memory_unmap(config, hw_len, 0, hw_len);
+> +            ret =3D ccw_dstream_read_buf(&sch->cds, vdev->config, len)=
+;
+> +            if (!ret) {
+>                   virtio_bus_set_vdev_config(&dev->bus, vdev->config);
+>                   sch->curr_status.scsw.count =3D ccw.count - len;
+> -                ret =3D 0;
+>               }
+>           }
+>           break;
+> @@ -553,8 +503,7 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>           if (!ccw.cda) {
+>               ret =3D -EFAULT;
+>           } else {
+> -            status =3D address_space_ldub(&address_space_memory, ccw.c=
+da,
+> -                                        MEMTXATTRS_UNSPECIFIED, NULL);
+> +            ccw_dstream_read(&sch->cds, status);
+>               if (!(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
+>                   virtio_ccw_stop_ioeventfd(dev);
+>               }
+> @@ -597,8 +546,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>           if (!ccw.cda) {
+>               ret =3D -EFAULT;
+>           } else {
+> -            indicators =3D address_space_ldq_be(&address_space_memory,=
+ ccw.cda,
+> -                                              MEMTXATTRS_UNSPECIFIED, =
+NULL);
+> +            ccw_dstream_read(&sch->cds, indicators);
+> +            be64_to_cpus(&indicators);
+>               dev->indicators =3D get_indicator(indicators, sizeof(uint=
+64_t));
+>               sch->curr_status.scsw.count =3D ccw.count - sizeof(indica=
+tors);
+>               ret =3D 0;
+> @@ -618,8 +567,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>           if (!ccw.cda) {
+>               ret =3D -EFAULT;
+>           } else {
+> -            indicators =3D address_space_ldq_be(&address_space_memory,=
+ ccw.cda,
+> -                                              MEMTXATTRS_UNSPECIFIED, =
+NULL);
+> +            ccw_dstream_read(&sch->cds, indicators);
+> +            be64_to_cpus(&indicators);
+>               dev->indicators2 =3D get_indicator(indicators, sizeof(uin=
+t64_t));
+>               sch->curr_status.scsw.count =3D ccw.count - sizeof(indica=
+tors);
+>               ret =3D 0;
+> @@ -639,67 +588,58 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>           if (!ccw.cda) {
+>               ret =3D -EFAULT;
+>           } else {
+> -            vq_config.index =3D address_space_lduw_be(&address_space_m=
+emory,
+> -                                                    ccw.cda,
+> -                                                    MEMTXATTRS_UNSPECI=
+FIED,
+> -                                                    NULL);
+> +            ccw_dstream_read(&sch->cds, vq_config.index);
+> +            be16_to_cpus(&vq_config.index);
+>               if (vq_config.index >=3D VIRTIO_QUEUE_MAX) {
+>                   ret =3D -EINVAL;
+>                   break;
+>               }
+>               vq_config.num_max =3D virtio_queue_get_num(vdev,
+>                                                        vq_config.index)=
+;
+> -            address_space_stw_be(&address_space_memory,
+> -                                 ccw.cda + sizeof(vq_config.index),
+> -                                 vq_config.num_max,
+> -                                 MEMTXATTRS_UNSPECIFIED,
+> -                                 NULL);
+> +            cpu_to_be16s(&vq_config.num_max);
+> +            ccw_dstream_write(&sch->cds, vq_config.num_max);
+>               sch->curr_status.scsw.count =3D ccw.count - sizeof(vq_con=
+fig);
+>               ret =3D 0;
+>           }
+>           break;
+>       case CCW_CMD_SET_IND_ADAPTER:
+>           if (check_len) {
+> -            if (ccw.count !=3D sizeof(*thinint)) {
+> +            if (ccw.count !=3D sizeof(thinint)) {
+>                   ret =3D -EINVAL;
+>                   break;
+>               }
+> -        } else if (ccw.count < sizeof(*thinint)) {
+> +        } else if (ccw.count < sizeof(thinint)) {
+>               /* Can't execute command. */
+>               ret =3D -EINVAL;
+>               break;
+>           }
+> -        len =3D sizeof(*thinint);
+> -        hw_len =3D len;
+>           if (!ccw.cda) {
+>               ret =3D -EFAULT;
+>           } else if (dev->indicators && !sch->thinint_active) {
+>               /* Trigger a command reject. */
+>               ret =3D -ENOSYS;
+>           } else {
+> -            thinint =3D cpu_physical_memory_map(ccw.cda, &hw_len, 0);
+> -            if (!thinint) {
+> +            if (ccw_dstream_read(&sch->cds, thinint)) {
+>                   ret =3D -EFAULT;
+>               } else {
+> -                uint64_t ind_bit =3D ldq_be_p(&thinint->ind_bit);
+> +                be64_to_cpus(&thinint.ind_bit);
+> +                be64_to_cpus(&thinint.summary_indicator);
+> +                be64_to_cpus(&thinint.device_indicator);
 >=20
-> Likewise this new one.
->=20
-
-mem64_win_pciaddr is still user settable as well...
-
-> >      } else if (sphb->mem_win_size > SPAPR_PCI_MEM32_WIN_SIZE) {
-> >          /*
-> >           * For compatibility with old configuration, if no 64-bit MMIO
-> > @@ -1594,6 +1563,12 @@ static void spapr_phb_realize(DeviceState *dev, =
-Error **errp)
-> >          sphb->mem64_win_pciaddr =3D
-> >              SPAPR_PCI_MEM_WIN_BUS_OFFSET + SPAPR_PCI_MEM32_WIN_SIZE;
-> >          sphb->mem_win_size =3D SPAPR_PCI_MEM32_WIN_SIZE;
-> > +    } else {
-> > +        /* Old configuration with the 32-bit MMIO window <=3D 2GiB don=
-'t need a
-> > +         * 64-bit MMIO window.
-> > +         */ =20
->=20
-> Wouldn't it be easier to just change the test below to check for size
-> !=3D 0 instead of checking for addr !=3D -1 as it does now.
->=20
-
-Yeah indeed.
-
-> > +        sphb->mem64_win_addr =3D (hwaddr) -1;
-> > +        sphb->mem64_win_pciaddr =3D (hwaddr) -1;
-> >      }
-> > =20
-> >      if (spapr_pci_find_phb(spapr, sphb->buid)) {
-> > @@ -1789,18 +1764,12 @@ static void spapr_phb_reset(DeviceState *qdev)
-> > =20
-> >  static Property spapr_phb_properties[] =3D {
-> >      DEFINE_PROP_UINT32("index", sPAPRPHBState, index, -1),
-> > -    DEFINE_PROP_UINT64("buid", sPAPRPHBState, buid, -1),
-> > -    DEFINE_PROP_UINT32("liobn", sPAPRPHBState, dma_liobn[0], -1),
-> > -    DEFINE_PROP_UINT32("liobn64", sPAPRPHBState, dma_liobn[1], -1),
-> > -    DEFINE_PROP_UINT64("mem_win_addr", sPAPRPHBState, mem_win_addr, -1=
+> -                len =3D hw_len;
+>                   dev->summary_indicator =3D
+> -                    get_indicator(ldq_be_p(&thinint->summary_indicator=
 ),
-> >      DEFINE_PROP_UINT64("mem_win_size", sPAPRPHBState, mem_win_size,
-> >                         SPAPR_PCI_MEM32_WIN_SIZE),
-> > -    DEFINE_PROP_UINT64("mem64_win_addr", sPAPRPHBState, mem64_win_addr=
-, -1),
-> >      DEFINE_PROP_UINT64("mem64_win_size", sPAPRPHBState, mem64_win_size,
-> >                         SPAPR_PCI_MEM64_WIN_SIZE),
-> >      DEFINE_PROP_UINT64("mem64_win_pciaddr", sPAPRPHBState, mem64_win_p=
-ciaddr,
-> >                         -1),
-> > -    DEFINE_PROP_UINT64("io_win_addr", sPAPRPHBState, io_win_addr, -1),
-> >      DEFINE_PROP_UINT64("io_win_size", sPAPRPHBState, io_win_size,
-> >                         SPAPR_PCI_IO_WIN_SIZE),
-> >      DEFINE_PROP_BOOL("dynamic-reconfiguration", sPAPRPHBState, dr_enab=
-led,
-> >  =20
+> -                                  sizeof(uint8_t));
+> +                    get_indicator(thinint.summary_indicator, sizeof(ui=
+nt8_t));
+>                   dev->indicators =3D
+> -                    get_indicator(ldq_be_p(&thinint->device_indicator)=
+,
+> -                                  ind_bit / 8 + 1);
+> -                dev->thinint_isc =3D thinint->isc;
+> -                dev->routes.adapter.ind_offset =3D ind_bit;
+> +                    get_indicator(thinint.device_indicator,
+> +                                  thinint.ind_bit / 8 + 1);
+> +                dev->thinint_isc =3D thinint.isc;
+> +                dev->routes.adapter.ind_offset =3D thinint.ind_bit;
+>                   dev->routes.adapter.summary_offset =3D 7;
+> -                cpu_physical_memory_unmap(thinint, hw_len, 0, hw_len);
+>                   dev->routes.adapter.adapter_id =3D css_get_adapter_id=
+(
+>                                                    CSS_IO_ADAPTER_VIRTI=
+O,
+>                                                    dev->thinint_isc);
+>                   sch->thinint_active =3D ((dev->indicators !=3D NULL) =
+&&
+>                                          (dev->summary_indicator !=3D N=
+ULL));
+> -                sch->curr_status.scsw.count =3D ccw.count - len;
+> +                sch->curr_status.scsw.count =3D ccw.count - sizeof(thi=
+nint);
+>                   ret =3D 0;
+>               }
+>           }
+> @@ -714,13 +654,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+>               ret =3D -EFAULT;
+>               break;
+>           }
+> -        revinfo.revision =3D
+> -            address_space_lduw_be(&address_space_memory, ccw.cda,
+> -                                  MEMTXATTRS_UNSPECIFIED, NULL);
+> -        revinfo.length =3D
+> -            address_space_lduw_be(&address_space_memory,
+> -                                  ccw.cda + sizeof(revinfo.revision),
+> -                                  MEMTXATTRS_UNSPECIFIED, NULL);
+> +        ccw_dstream_read_buf(&sch->cds, &revinfo, 4);
+> +        be16_to_cpus(&revinfo.revision);
+> +        be16_to_cpus(&revinfo.length);
+>           if (ccw.count < len + revinfo.length ||
+>               (check_len && ccw.count > len + revinfo.length)) {
+>               ret =3D -EINVAL;
 >=20
 
-
+Reviewed-by: Pierre Morel<pmorel@linux.vnet.ibm.com>
 
 --=20
-Gregory Kurz                                     kurzgreg@fr.ibm.com
-                                                 gkurz@linux.vnet.ibm.com
-Software Engineer @ IBM/LTC                      http://www.ibm.com
-Tel 33-5-6218-1607
-
-"Anarchy is about taking complete responsibility for yourself."
-        Alan Moore.
-
---Sig_/7EXtrxp/VpmTwXqaD8rMlwt
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iF0EARECAB0WIQQr1DtEU17Ap5iU26IC/DrrAQHbwgUCWcEjzQAKCRAC/DrrAQHb
-wiTgAKCKdztbsOV2NFoCfvC0R3YX6MudKQCgkhgmbuATfRV1Wjr7GisilIS5h/Q=
-=jBOv
------END PGP SIGNATURE-----
-
---Sig_/7EXtrxp/VpmTwXqaD8rMlwt--
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
