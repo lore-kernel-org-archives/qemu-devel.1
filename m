@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45494)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47741)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duEUK-0007VT-FY
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:06:42 -0400
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1duEZ6-00022l-Lg
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:11:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duEUH-0003x0-Aw
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:06:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44984)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duEUH-0003wf-2S
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:06:37 -0400
-Date: Tue, 19 Sep 2017 11:06:31 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170919110631.59039743.cohuck@redhat.com>
-In-Reply-To: <20170919033730.GD5274@bjsdjshi@linux.vnet.ibm.com>
+	(envelope-from <pmorel@linux.vnet.ibm.com>) id 1duEZ3-0006YV-F6
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:11:36 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58745
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pmorel@linux.vnet.ibm.com>)
+	id 1duEZ3-0006Xs-9f
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:11:33 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8J99aC5089690
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:11:32 -0400
+Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2d2xcjymuf-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 05:11:32 -0400
+Received: from localhost
+	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pmorel@linux.vnet.ibm.com>;
+	Tue, 19 Sep 2017 10:11:30 +0100
 References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
-	<20170913115029.47626-4-pasic@linux.vnet.ibm.com>
-	<20170919033730.GD5274@bjsdjshi@linux.vnet.ibm.com>
+	<20170913115029.47626-2-pasic@linux.vnet.ibm.com>
+From: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Date: Tue, 19 Sep 2017 11:11:27 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 3/4] virtio-ccw: use ccw data stream
+In-Reply-To: <20170913115029.47626-2-pasic@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Message-Id: <63eabac3-0646-92ff-dede-d16391124061@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] s390x/css: introduce css data stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,166 +43,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Tue, 19 Sep 2017 11:37:30 +0800
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+On 13/09/2017 13:50, Halil Pasic wrote:
+> This is a preparation for introducing handling for indirect data
+> addressing and modified indirect data addressing (CCW). Here we introdu=
+ce
+> an interface which should make the addressing scheme transparent for th=
+e
+> client code. Here we implement only the basic scheme (no IDA or MIDA).
+>=20
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> ---
+>   hw/s390x/css.c         | 55 +++++++++++++++++++++++++++++++++++++++++
+>   include/hw/s390x/css.h | 67 +++++++++++++++++++++++++++++++++++++++++=
++++++++++
+>   2 files changed, 122 insertions(+)
+>=20
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 901dc6a0f3..e8d2016563 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -783,6 +783,61 @@ static CCW1 copy_ccw_from_guest(hwaddr addr, bool =
+fmt1)
+>       }
+>       return ret;
+>   }
+> +/**
+> + * If out of bounds marks the stream broken. If broken returns -EINVAL=
+,
+> + * otherwise the requested length (may be zero)
+> + */
+> +static inline int cds_check_len(CcwDataStream *cds, int len)
+> +{
+> +    if (cds->at_byte + len > cds->count) {
+> +        cds->flags |=3D CDS_F_STREAM_BROKEN;
+> +    }
+> +    return cds->flags & CDS_F_STREAM_BROKEN ? -EINVAL : len;
+> +}
+> +
+> +static int ccw_dstream_rw_noflags(CcwDataStream *cds, void *buff, int =
+len,
+> +                                  CcwDataStreamOp op)
+> +{
+> +    int ret;
+> +
+> +    ret =3D cds_check_len(cds, len);
+> +    if (ret <=3D 0) {
+> +        return ret;
+> +    }
+> +    if (op =3D=3D CDS_OP_A) {
+> +        goto incr;
+> +    }
+> +    ret =3D address_space_rw(&address_space_memory, cds->cda,
+> +                           MEMTXATTRS_UNSPECIFIED, buff, len, op);
+> +    if (ret !=3D MEMTX_OK) {
+> +        cds->flags |=3D CDS_F_STREAM_BROKEN;
+> +        return -EINVAL;
+> +    }
+> +incr:
+> +    cds->at_byte +=3D len;
+> +    cds->cda +=3D len;
+> +    return 0;
+> +}
+> +
+> +void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *=
+orb)
+> +{
+> +    /*
+> +     * We don't support MIDA (an optional facility) yet and we
+> +     * catch this earlier. Just for expressing the precondition.
+> +     */
+> +    g_assert(!(orb->ctrl1 & ORB_CTRL1_MASK_MIDAW));
+> +    cds->flags =3D (orb->ctrl0 & ORB_CTRL0_MASK_I2K ? CDS_F_I2K : 0) |
+> +                 (orb->ctrl0 & ORB_CTRL0_MASK_C64 ? CDS_F_C64 : 0) |
+> +                 (ccw->flags & CCW_FLAG_IDA ? CDS_F_IDA : 0);
+> +    cds->count =3D ccw->count;
+> +    cds->cda_orig =3D ccw->cda;
+> +    ccw_dstream_rewind(cds);
+> +    if (!(cds->flags & CDS_F_IDA)) {
+> +        cds->op_handler =3D ccw_dstream_rw_noflags;
+> +    } else {
+> +        assert(false);
+> +    }
+> +}
+>=20
+>   static int css_interpret_ccw(SubchDev *sch, hwaddr ccw_addr,
+>                                bool suspend_allowed)
+> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+> index 0653d3c9be..79acaf99b7 100644
+> --- a/include/hw/s390x/css.h
+> +++ b/include/hw/s390x/css.h
+> @@ -75,6 +75,29 @@ typedef struct CMBE {
+>       uint32_t reserved[7];
+>   } QEMU_PACKED CMBE;
+>=20
+> +typedef enum CcwDataStreamOp {
+> +    CDS_OP_R =3D 0,
+> +    CDS_OP_W =3D 1,
+> +    CDS_OP_A =3D 2
+> +} CcwDataStreamOp;
+> +
+> +/** normal usage is via SuchchDev.cds instead of instantiating */
+> +typedef struct CcwDataStream {
+> +#define CDS_F_IDA   0x01
+> +#define CDS_F_MIDA  0x02
+> +#define CDS_F_I2K   0x04
+> +#define CDS_F_C64   0x08
+> +#define CDS_F_STREAM_BROKEN  0x80
+> +    uint8_t flags;
+> +    uint8_t at_idaw;
+> +    uint16_t at_byte;
+> +    uint16_t count;
+> +    uint32_t cda_orig;
+> +    int (*op_handler)(struct CcwDataStream *cds, void *buff, int len,
+> +                      CcwDataStreamOp op);
 
-> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-13 13:50:28 +0200]:
-> 
-> > Replace direct access which implicitly assumes no IDA
-> > or MIDA with the new ccw data stream interface which should
-> > cope with these transparently in the future.
-> > 
-> > Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> > 
-> > ---
-> > 
-> > v1 --> v2:
-> > Removed todo comments on possible errno change as with
-> > https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg02441.html
-> > applied it does not matter any more.
-> > 
-> > Error handling: At the moment we ignore errors reported
-> > by stream ops to keep the change minimal. An add-on
-> > patch improving on this is to be expected later.  
-> Add a TODO somewhere around the code as a reminder?
+I would have prefer one handler per operation instead of a operation=20
+parameter.
 
-I expect Halil to have it on his TODO list and send a patch later ;)
+Is it possible to change the name of the "buf" argument to "arg".
+I just think of the foollowing:
+If one day we do not want to gather all IDAs into a single buffer but=20
+keep them split, we can have something like an array of buffers as argume=
+nt.
 
-> 
-> > ---
-> >  hw/s390x/virtio-ccw.c | 156 +++++++++++++++-----------------------------------
-> >  1 file changed, 46 insertions(+), 110 deletions(-)
-> > 
-> > diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-> > index b1976fdd19..a9baf6f7ab 100644
-> > --- a/hw/s390x/virtio-ccw.c
-> > +++ b/hw/s390x/virtio-ccw.c  
-> [...]
-> 
-> > @@ -394,11 +362,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-> >          } else {
-> >              VirtioDeviceClass *vdc = VIRTIO_DEVICE_GET_CLASS(vdev);
-> > 
-> > -            features.index = address_space_ldub(&address_space_memory,
-> > -                                                ccw.cda
-> > -                                                + sizeof(features.features),
-> > -                                                MEMTXATTRS_UNSPECIFIED,
-> > -                                                NULL);
-> > +            ccw_dstream_advance(&sch->cds, sizeof(features.features));  
-> How about:
-> ccw_dstream_advance(&sch->cds, offsetof(VirtioFeatDesc, index));
 
-I think keeping sizeof(features.features) is better: It matches the old
-code, and we really do jump over the features flag and revisit it
-later...
 
-> 
-> > +            ccw_dstream_read(&sch->cds, features.index);
-> >              if (features.index == 0) {
-> >                  if (dev->revision >= 1) {
-> >                      /* Don't offer legacy features for modern devices. */
-> > @@ -417,9 +382,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-> >                  /* Return zeroes if the guest supports more feature bits. */
-> >                  features.features = 0;
-> >              }
-> > -            address_space_stl_le(&address_space_memory, ccw.cda,
-> > -                                 features.features, MEMTXATTRS_UNSPECIFIED,
-> > -                                 NULL);
-> > +            ccw_dstream_rewind(&sch->cds);
-> > +            cpu_to_le32s(&features.features);
-> > +            ccw_dstream_write(&sch->cds, features.features);
-> >              sch->curr_status.scsw.count = ccw.count - sizeof(features);  
-> How about:
-> sch->curr_status.scsw.count = ccw_dstream_residual_count(&sch->cds);
+> +    hwaddr cda;
+> +} CcwDataStream;
+> +
+>   typedef struct SubchDev SubchDev;
+>   struct SubchDev {
+>       /* channel-subsystem related things: */
+> @@ -92,6 +115,7 @@ struct SubchDev {
+>       uint8_t ccw_no_data_cnt;
+>       uint16_t migrated_schid; /* used for missmatch detection */
+>       ORB orb;
+> +    CcwDataStream cds;
+>       /* transport-provided data: */
+>       int (*ccw_cb) (SubchDev *, CCW1);
+>       void (*disable_cb)(SubchDev *);
+> @@ -240,4 +264,47 @@ SubchDev *css_create_sch(CssDevId bus_id, bool is_=
+virtual, bool squash_mcss,
+>   /** Turn on css migration */
+>   void css_register_vmstate(void);
+>=20
+> +
+> +void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *=
+orb);
+> +
+> +static inline void ccw_dstream_rewind(CcwDataStream *cds)
+> +{
+> +    cds->at_byte =3D 0;
+> +    cds->at_idaw =3D 0;
+> +    cds->cda =3D cds->cda_orig;
+> +}
+> +
+> +static inline bool ccw_dstream_good(CcwDataStream *cds)
+> +{
+> +    return !(cds->flags & CDS_F_STREAM_BROKEN);
+> +}
+> +
+> +static inline uint16_t ccw_dstream_residual_count(CcwDataStream *cds)
+> +{
+> +    return cds->count - cds->at_byte;
+> +}
+> +
+> +static inline uint16_t ccw_dstream_avail(CcwDataStream *cds)
+> +{
+> +    return ccw_dstream_good(cds) ?  ccw_dstream_residual_count(cds) : =
+0;
+> +}
+> +
+> +static inline int ccw_dstream_advance(CcwDataStream *cds, int len)
+> +{
+> +    return cds->op_handler(cds, NULL, len, CDS_OP_A);
+> +}
+> +
+> +static inline int ccw_dstream_write_buf(CcwDataStream *cds, void *buff=
+, int len)
+> +{
+> +    return cds->op_handler(cds, buff, len, CDS_OP_W);
+> +}
+> +
+> +static inline int ccw_dstream_read_buf(CcwDataStream *cds, void *buff,=
+ int len)
+> +{
+> +    return cds->op_handler(cds, buff, len, CDS_OP_R);
+> +}
+> +
+> +#define ccw_dstream_read(cds, v) ccw_dstream_read_buf((cds), &(v), siz=
+eof(v))
+> +#define ccw_dstream_write(cds, v) ccw_dstream_write_buf((cds), &(v), s=
+izeof(v))
+> +
+>   #endif
+>=20
 
-Hm, I thought I had commented on this, but I seem to have missed
-these...
+otherwise, LGTM
 
-I'd prefer to do it as a follow-up patch.
-
-> 
-> This also applies to other places.
-> 
-> >              ret = 0;
-> >          }  
-> [...]
-> 
-> > @@ -501,21 +459,13 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-> >              }
-> >          }
-> >          len = MIN(ccw.count, vdev->config_len);
-> > -        hw_len = len;
-> >          if (!ccw.cda) {
-> >              ret = -EFAULT;
-> >          } else {
-> > -            config = cpu_physical_memory_map(ccw.cda, &hw_len, 0);
-> > -            if (!config) {
-> > -                ret = -EFAULT;
-> > -            } else {
-> > -                len = hw_len;
-> > -                /* XXX config space endianness */
-> > -                memcpy(vdev->config, config, len);
-> > -                cpu_physical_memory_unmap(config, hw_len, 0, hw_len);
-> > +            ret = ccw_dstream_read_buf(&sch->cds, vdev->config, len);
-> > +            if (!ret) {  
-> Add a TODO here, and:
-> 
-> if (ccw_dstream_read_buf(&sch->cds, vdev->config, len)) {
->     ret = -EFAULT;
-> } else {
->     ....
-> }
-
-I don't think that would be correct: The function will (at least
-currently) return 0 or -EINVAL, and you are now mapping any error to
--EFAULT? (Not that it has an effect in the end: We map both to a
-channel program check as of "s390x/css: drop data-check in
-interpretation".)
-
-> 
-> >                  virtio_bus_set_vdev_config(&dev->bus, vdev->config);
-> >                  sch->curr_status.scsw.count = ccw.count - len;
-> > -                ret = 0;
-> >              }
-> >          }
-> >          break;  
-> [...]
-> 
-> > @@ -714,13 +654,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-> >              ret = -EFAULT;
-> >              break;
-> >          }
-> > -        revinfo.revision =
-> > -            address_space_lduw_be(&address_space_memory, ccw.cda,
-> > -                                  MEMTXATTRS_UNSPECIFIED, NULL);
-> > -        revinfo.length =
-> > -            address_space_lduw_be(&address_space_memory,
-> > -                                  ccw.cda + sizeof(revinfo.revision),
-> > -                                  MEMTXATTRS_UNSPECIFIED, NULL);
-> > +        ccw_dstream_read_buf(&sch->cds, &revinfo, 4);  
->                                                      ^
-> A magic number? O:)
-
-Hah :)
-
-We can't use sizeof(revinfo), and sizeof(revinfo.revision) +
-sizeof(revinfo.length) is a bit unwieldy. Let's keep some magic in our
-code :)
-
-> 
-> > +        be16_to_cpus(&revinfo.revision);
-> > +        be16_to_cpus(&revinfo.length);
-> >          if (ccw.count < len + revinfo.length ||
-> >              (check_len && ccw.count > len + revinfo.length)) {
-> >              ret = -EINVAL;
-> > -- 
-> > 2.13.5
-> >   
-> 
-> Otherwise, looks good.
-> 
-
-Can I get an ack?
+--=20
+Pierre Morel
+Linux/KVM/QEMU in B=C3=B6blingen - Germany
