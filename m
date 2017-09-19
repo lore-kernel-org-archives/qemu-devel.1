@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33045)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33462)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1duFC0-00005B-Qs
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:51:49 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duFDc-0001O9-Tv
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:53:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1duFBx-0005gs-Mn
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:51:48 -0400
-Received: from mail-wm0-x244.google.com ([2a00:1450:400c:c09::244]:35426)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1duFBx-0005gm-FU
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:51:45 -0400
-Received: by mail-wm0-x244.google.com with SMTP id e64so3345921wmi.2
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 02:51:45 -0700 (PDT)
-Date: Tue, 19 Sep 2017 10:51:42 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170919095142.GD22797@stefanha-x1.localdomain>
-References: <1504729728-23279-1-git-send-email-cota@braap.org>
-	<20170918145936.GE4141@stefanha-x1.localdomain>
-	<CAFEAcA9i5UhGP+J=DynPkvz3=t+uAEXTbwEXYoB4nOLXrjhzhA@mail.gmail.com>
+	(envelope-from <cohuck@redhat.com>) id 1duFDc-0006ed-2x
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:53:29 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58386)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duFDb-0006eI-TN
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:53:28 -0400
+Date: Tue, 19 Sep 2017 11:53:21 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170919115321.0f3b5c57.cohuck@redhat.com>
+In-Reply-To: <63eabac3-0646-92ff-dede-d16391124061@linux.vnet.ibm.com>
+References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
+	<20170913115029.47626-2-pasic@linux.vnet.ibm.com>
+	<63eabac3-0646-92ff-dede-d16391124061@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFEAcA9i5UhGP+J=DynPkvz3=t+uAEXTbwEXYoB4nOLXrjhzhA@mail.gmail.com>
-Subject: Re: [Qemu-devel] [RFC 0/6] initial plugin support
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 1/4] s390x/css: introduce css data stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,31 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>, =?iso-8859-1?Q?Llu=EDs?= Vilanova <vilanova@ac.upc.edu>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Mon, Sep 18, 2017 at 04:05:31PM +0100, Peter Maydell wrote:
-> On 18 September 2017 at 15:59, Stefan Hajnoczi <stefanha@gmail.com> wrote:
-> > Thanks for sending this!  Could you and Lluís collaborate on a single
-> > instrumentation plugin API?
-> >
-> > Let's have a discussion with Lluís, Peter, myself, and potentially
-> > others then we can use the QEMU Developer Conference Call that is
-> > scheduled every 2 weeks.
-> >
-> > The next call time slot is Tue 26 Sept at 13:00 UTC:
-> > https://www.timeanddate.com/worldclock/fixedtime.html?iso=20170926T140000&p1=136
+On Tue, 19 Sep 2017 11:11:27 +0200
+Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
+
+> On 13/09/2017 13:50, Halil Pasic wrote:
+> > This is a preparation for introducing handling for indirect data
+> > addressing and modified indirect data addressing (CCW). Here we introduce
+> > an interface which should make the addressing scheme transparent for the
+> > client code. Here we implement only the basic scheme (no IDA or MIDA).
+> > 
+> > Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> > ---
+> >   hw/s390x/css.c         | 55 +++++++++++++++++++++++++++++++++++++++++
+> >   include/hw/s390x/css.h | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> >   2 files changed, 122 insertions(+)
+
+> > diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
+> > index 0653d3c9be..79acaf99b7 100644
+> > --- a/include/hw/s390x/css.h
+> > +++ b/include/hw/s390x/css.h
+> > @@ -75,6 +75,29 @@ typedef struct CMBE {
+> >       uint32_t reserved[7];
+> >   } QEMU_PACKED CMBE;
+> > 
+> > +typedef enum CcwDataStreamOp {
+> > +    CDS_OP_R = 0,
+> > +    CDS_OP_W = 1,
+> > +    CDS_OP_A = 2
+> > +} CcwDataStreamOp;
+> > +
+> > +/** normal usage is via SuchchDev.cds instead of instantiating */
+> > +typedef struct CcwDataStream {
+> > +#define CDS_F_IDA   0x01
+> > +#define CDS_F_MIDA  0x02
+> > +#define CDS_F_I2K   0x04
+> > +#define CDS_F_C64   0x08
+> > +#define CDS_F_STREAM_BROKEN  0x80
+> > +    uint8_t flags;
+> > +    uint8_t at_idaw;
+> > +    uint16_t at_byte;
+> > +    uint16_t count;
+> > +    uint32_t cda_orig;
+> > +    int (*op_handler)(struct CcwDataStream *cds, void *buff, int len,
+> > +                      CcwDataStreamOp op);  
 > 
-> I can't make that, I'm afraid, it's Linaro Connect that week.
+> I would have prefer one handler per operation instead of a operation 
+> parameter.
 > 
-> From my point of view, it would be helpful to start with
-> just designing the API that we're trying to implement.
-> I care a lot that we get that API correct, I don't care much
-> at all about the implementation...
+> Is it possible to change the name of the "buf" argument to "arg".
+> I just think of the foollowing:
+> If one day we do not want to gather all IDAs into a single buffer but 
+> keep them split, we can have something like an array of buffers as argument.
 
-That sounds good to me.
+It should be possible to change the internal format should we decide to
+want to do something different, so I'll leave that as-is for now.
 
-An RFC patch with just the header files would be enough for mailing list
-discussion.  No implementation is needed yet.
+> 
+> 
+> 
+> > +    hwaddr cda;
+> > +} CcwDataStream;
+> > +
 
-Stefan
+> otherwise, LGTM
+
+Is that an ack? :)
