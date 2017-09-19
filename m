@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33462)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35018)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duFDc-0001O9-Tv
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:53:29 -0400
+	(envelope-from <berrange@redhat.com>) id 1duFID-0003jT-SH
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:58:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duFDc-0006ed-2x
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:53:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58386)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duFDb-0006eI-TN
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:53:28 -0400
-Date: Tue, 19 Sep 2017 11:53:21 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170919115321.0f3b5c57.cohuck@redhat.com>
-In-Reply-To: <63eabac3-0646-92ff-dede-d16391124061@linux.vnet.ibm.com>
-References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
-	<20170913115029.47626-2-pasic@linux.vnet.ibm.com>
-	<63eabac3-0646-92ff-dede-d16391124061@linux.vnet.ibm.com>
+	(envelope-from <berrange@redhat.com>) id 1duFIC-0008Qy-Dk
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:58:13 -0400
+Date: Tue, 19 Sep 2017 10:57:50 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170919095750.GG9536@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170913181910.29688-1-mreitz@redhat.com>
+	<20170913181910.29688-16-mreitz@redhat.com>
+	<20170914155738.GE7370@stefanha-x1.localdomain>
+	<2f1c5239-0cde-d164-b803-ebf807e684f2@redhat.com>
+	<20170918100626.GE31063@stefanha-x1.localdomain>
+	<d6dbcebf-6dce-4803-0be0-a9f48a73a32f@redhat.com>
+	<20170919094416.GC22797@stefanha-x1.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 1/4] s390x/css: introduce css data stream
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170919094416.GC22797@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 15/18] block/mirror: Add
+ active mirroring
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,71 +30,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pierre Morel <pmorel@linux.vnet.ibm.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-On Tue, 19 Sep 2017 11:11:27 +0200
-Pierre Morel <pmorel@linux.vnet.ibm.com> wrote:
-
-> On 13/09/2017 13:50, Halil Pasic wrote:
-> > This is a preparation for introducing handling for indirect data
-> > addressing and modified indirect data addressing (CCW). Here we introduce
-> > an interface which should make the addressing scheme transparent for the
-> > client code. Here we implement only the basic scheme (no IDA or MIDA).
+On Tue, Sep 19, 2017 at 10:44:16AM +0100, Stefan Hajnoczi wrote:
+> On Mon, Sep 18, 2017 at 06:26:51PM +0200, Max Reitz wrote:
+> > On 2017-09-18 12:06, Stefan Hajnoczi wrote:
+> > > On Sat, Sep 16, 2017 at 03:58:01PM +0200, Max Reitz wrote:
+> > >> On 2017-09-14 17:57, Stefan Hajnoczi wrote:
+> > >>> On Wed, Sep 13, 2017 at 08:19:07PM +0200, Max Reitz wrote:
+> > >>>> This patch implements active synchronous mirroring.  In active mode, the
+> > >>>> passive mechanism will still be in place and is used to copy all
+> > >>>> initially dirty clusters off the source disk; but every write request
+> > >>>> will write data both to the source and the target disk, so the source
+> > >>>> cannot be dirtied faster than data is mirrored to the target.  Also,
+> > >>>> once the block job has converged (BLOCK_JOB_READY sent), source and
+> > >>>> target are guaranteed to stay in sync (unless an error occurs).
+> > >>>>
+> > >>>> Optionally, dirty data can be copied to the target disk on read
+> > >>>> operations, too.
+> > >>>>
+> > >>>> Active mode is completely optional and currently disabled at runtime.  A
+> > >>>> later patch will add a way for users to enable it.
+> > >>>>
+> > >>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
+> > >>>> ---
+> > >>>>  qapi/block-core.json |  23 +++++++
+> > >>>>  block/mirror.c       | 187 +++++++++++++++++++++++++++++++++++++++++++++++++--
+> > >>>>  2 files changed, 205 insertions(+), 5 deletions(-)
+> > >>>>
+> > >>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+> > >>>> index bb11815608..e072cfa67c 100644
+> > >>>> --- a/qapi/block-core.json
+> > >>>> +++ b/qapi/block-core.json
+> > >>>> @@ -938,6 +938,29 @@
+> > >>>>    'data': ['top', 'full', 'none', 'incremental'] }
+> > >>>>  
+> > >>>>  ##
+> > >>>> +# @MirrorCopyMode:
+> > >>>> +#
+> > >>>> +# An enumeration whose values tell the mirror block job when to
+> > >>>> +# trigger writes to the target.
+> > >>>> +#
+> > >>>> +# @passive: copy data in background only.
+> > >>>> +#
+> > >>>> +# @active-write: when data is written to the source, write it
+> > >>>> +#                (synchronously) to the target as well.  In addition,
+> > >>>> +#                data is copied in background just like in @passive
+> > >>>> +#                mode.
+> > >>>> +#
+> > >>>> +# @active-read-write: write data to the target (synchronously) both
+> > >>>> +#                     when it is read from and written to the source.
+> > >>>> +#                     In addition, data is copied in background just
+> > >>>> +#                     like in @passive mode.
+> > >>>
+> > >>> I'm not sure the terms "active"/"passive" are helpful.  "Active commit"
+> > >>> means committing the top-most BDS while the guest is accessing it.  The
+> > >>> "passive" mirror block still works on the top-most BDS while the guest
+> > >>> is accessing it.
+> > >>>
+> > >>> Calling it "asynchronous" and "synchronous" is clearer to me.  It's also
+> > >>> the terminology used in disk replication (e.g. DRBD).
+> > >>
+> > >> I'd be OK with that, too, but I think I remember that in the past at
+> > >> least Kevin made a clear distinction between active/passive and
+> > >> sync/async when it comes to mirroring.
+> > >>
+> > >>> Ideally the user wouldn't have to worry about async vs sync because QEMU
+> > >>> would switch modes as appropriate in order to converge.  That way
+> > >>> libvirt also doesn't have to worry about this.
+> > >>
+> > >> So here you mean async/sync in the way I meant it, i.e., whether the
+> > >> mirror operations themselves are async/sync?
+> > > 
+> > > The meaning I had in mind is:
+> > > 
+> > > Sync mirroring means a guest write waits until the target write
+> > > completes.
 > > 
-> > Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> > ---
-> >   hw/s390x/css.c         | 55 +++++++++++++++++++++++++++++++++++++++++
-> >   include/hw/s390x/css.h | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> >   2 files changed, 122 insertions(+)
-
-> > diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-> > index 0653d3c9be..79acaf99b7 100644
-> > --- a/include/hw/s390x/css.h
-> > +++ b/include/hw/s390x/css.h
-> > @@ -75,6 +75,29 @@ typedef struct CMBE {
-> >       uint32_t reserved[7];
-> >   } QEMU_PACKED CMBE;
+> > I.e. active-sync, ...
 > > 
-> > +typedef enum CcwDataStreamOp {
-> > +    CDS_OP_R = 0,
-> > +    CDS_OP_W = 1,
-> > +    CDS_OP_A = 2
-> > +} CcwDataStreamOp;
-> > +
-> > +/** normal usage is via SuchchDev.cds instead of instantiating */
-> > +typedef struct CcwDataStream {
-> > +#define CDS_F_IDA   0x01
-> > +#define CDS_F_MIDA  0x02
-> > +#define CDS_F_I2K   0x04
-> > +#define CDS_F_C64   0x08
-> > +#define CDS_F_STREAM_BROKEN  0x80
-> > +    uint8_t flags;
-> > +    uint8_t at_idaw;
-> > +    uint16_t at_byte;
-> > +    uint16_t count;
-> > +    uint32_t cda_orig;
-> > +    int (*op_handler)(struct CcwDataStream *cds, void *buff, int len,
-> > +                      CcwDataStreamOp op);  
+> > > Async mirroring means guest writes completes independently of target
+> > > writes.
+> > 
+> > ... i.e. passive or active-async in the future.
+> > 
+> > So you really want qemu to decide whether to use active or passive mode
+> > depending on what's enough to let the block job converge and not
+> > introduce any switch for the user?
+> > 
+> > I'm not sure whether I like this too much, mostly because "libvirt
+> > doesn't have to worry" doesn't feel quite right to me.  If we don't make
+> > libvirt worry about this, then qemu has to worry.  I'm not sure whether
+> > that's any better.
+> > 
+> > I think this really does get into policy territory.  Just switching to
+> > active mode the instant target writes are slower than source writes may
+> > not be what the user wants: Maybe it's OK for a short duration because
+> > they don't care about hard convergence too much.  Maybe they want to
+> > switch to active mode already when "only" twice as much is written to
+> > the target as to the source.
+> > 
+> > I think this is a decision the management layer (or the user) has to make.
 > 
-> I would have prefer one handler per operation instead of a operation 
-> parameter.
-> 
-> Is it possible to change the name of the "buf" argument to "arg".
-> I just think of the foollowing:
-> If one day we do not want to gather all IDAs into a single buffer but 
-> keep them split, we can have something like an array of buffers as argument.
+> Eric: Does libvirt want to be involved with converging the mirror job
+> (i.e. if the guest is writing to disk faster than QEMU can copy data to
+> the target)?
 
-It should be possible to change the internal format should we decide to
-want to do something different, so I'll leave that as-is for now.
+Libvirt doesn't really want to set the policy - it will just need to expose
+the mechansim & information to make such decisions upto the application.
 
-> 
-> 
-> 
-> > +    hwaddr cda;
-> > +} CcwDataStream;
-> > +
+I agree with Max that we don't want QEMU making this policy decision on
+its own. Simply switching from passive to active mode is not an approach
+that will be satisfactory to all scenarios. It might be preferrable to
+apply CPU throttling of the guest, or I/O rate throttling, or temporarily
+pause the guest to allow catch or any number of other policies. Neither
+libvirt or QEMU knows which is best for the scenario at hand.
 
-> otherwise, LGTM
 
-Is that an ack? :)
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
