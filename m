@@ -1,23 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39120)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39658)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1duCy4-0002sX-4Q
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 03:29:17 -0400
+	(envelope-from <kwolf@redhat.com>) id 1duCz2-0003n3-Ct
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 03:30:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1duCy3-0000AX-0E
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 03:29:16 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39674)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1duCy2-0000A8-Qt
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 03:29:14 -0400
-From: Fam Zheng <famz@redhat.com>
-Date: Tue, 19 Sep 2017 15:27:19 +0800
-Message-Id: <20170919072719.11815-14-famz@redhat.com>
-In-Reply-To: <20170919072719.11815-1-famz@redhat.com>
-References: <20170919072719.11815-1-famz@redhat.com>
+	(envelope-from <kwolf@redhat.com>) id 1duCyy-00015S-Jn
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 03:30:16 -0400
+Date: Tue, 19 Sep 2017 09:29:56 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170919072956.GB3789@localhost.localdomain>
+References: <20170918202529.28379-1-el13635@mail.ntua.gr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v9 13/13] docker: Use archive-source.py
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170918202529.28379-1-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [PATCH] block/throttle-groups.c: allocate
+ RestartData on the heap
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,67 +23,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-block <qemu-block@nongnu.org>, qemu-devel <qemu-devel@nongnu.org>, qemu-stable <qemu-stable@nongnu.org>, Alberto Garcia <berto@igalia.com>, Max Reitz <mreitz@redhat.com>
 
-Signed-off-by: Fam Zheng <famz@redhat.com>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
----
- tests/docker/Makefile.include | 15 ++-------------
- tests/docker/run              |  8 +-------
- 2 files changed, 3 insertions(+), 20 deletions(-)
+Am 18.09.2017 um 22:25 hat Manos Pitsidianakis geschrieben:
+> RestartData is the opaque data of the throttle_group_restart_queue_entry
+> coroutine. By being stack allocated, it isn't available anymore if
+> aio_co_enter schedules the coroutine with a bottom halve and runs after
+> throttle_group_restart_queue returns.
 
-diff --git a/tests/docker/Makefile.include b/tests/docker/Makefile.includ=
-e
-index aaab1a4208..7a027d5bd6 100644
---- a/tests/docker/Makefile.include
-+++ b/tests/docker/Makefile.include
-@@ -17,24 +17,13 @@ DOCKER_TOOLS :=3D travis
- TESTS ?=3D %
- IMAGES ?=3D %
-=20
--# Make archive from git repo $1 to tar.gz $2
--make-archive-maybe =3D $(if $(wildcard $1/*), \
--	$(call quiet-command, \
--		(cd $1; if git diff-index --quiet HEAD -- &>/dev/null; then \
--			git archive -1 HEAD --format=3Dtar.gz; \
--		else \
--			git archive -1 $$(git stash create) --format=3Dtar.gz; \
--		fi) > $2, \
--		"ARCHIVE","$(notdir $2)"))
--
- CUR_TIME :=3D $(shell date +%Y-%m-%d-%H.%M.%S.$$$$)
- DOCKER_SRC_COPY :=3D docker-src.$(CUR_TIME)
-=20
- $(DOCKER_SRC_COPY):
- 	@mkdir $@
--	$(call make-archive-maybe, $(SRC_PATH), $@/qemu.tgz)
--	$(call make-archive-maybe, $(SRC_PATH)/dtc, $@/dtc.tgz)
--	$(call make-archive-maybe, $(SRC_PATH)/pixman, $@/pixman.tgz)
-+	$(call quiet-command, $(SRC_PATH)/scripts/archive-source.sh $@/qemu.tar=
-, \
-+		"GEN", "$@/qemu.tar")
- 	$(call quiet-command, cp $(SRC_PATH)/tests/docker/run $@/run, \
- 		"COPY","RUNNER")
-=20
-diff --git a/tests/docker/run b/tests/docker/run
-index c1e4513bce..9eb9165f76 100755
---- a/tests/docker/run
-+++ b/tests/docker/run
-@@ -32,13 +32,7 @@ export TEST_DIR=3D/tmp/qemu-test
- mkdir -p $TEST_DIR/{src,build,install}
-=20
- # Extract the source tarballs
--tar -C $TEST_DIR/src -xzf $BASE/qemu.tgz
--for p in dtc pixman; do
--    if test -f $BASE/$p.tgz; then
--        tar -C $TEST_DIR/src/$p -xzf $BASE/$p.tgz
--        export FEATURES=3D"$FEATURES $p"
--    fi
--done
-+tar -C $TEST_DIR/src -xf $BASE/qemu.tar
-=20
- if test -n "$SHOW_ENV"; then
-     if test -f /packages.txt; then
---=20
-2.13.5
+Cc: qemu-stable@nongnu.org
+
+(It should be mentioned explicitly in the commit message so you can
+filter for it in the commit history. I routinely add this while applying
+patches if I'm aware of the qemu-stable CC, but it makes my life easier
+if it's already there.)
+
+> Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+
+Thanks, applied to the block branch.
+
+Kevin
