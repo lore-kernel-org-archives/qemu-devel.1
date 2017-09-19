@@ -1,14 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46315)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duJJs-0006wt-86
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:16:20 -0400
+	(envelope-from <eblake@redhat.com>) id 1duJKQ-0007Hi-FX
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:16:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duJJn-0006Lx-4i
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:16:12 -0400
+	(envelope-from <eblake@redhat.com>) id 1duJKM-0006yb-BO
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:16:46 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37100)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1duJKM-0006xu-1g
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:16:42 -0400
+References: <20170918214649.17550-1-eblake@redhat.com>
+	<dfe4dc28-4011-e7a7-aa1f-54e340f091d2@amsat.org>
+	<53ea39b4-7926-d29b-fb28-3f2295dc394d@redhat.com>
+	<8f30a125-040e-0c75-92c9-2c6fd8db08db@amsat.org>
 From: Eric Blake <eblake@redhat.com>
-Date: Tue, 19 Sep 2017 09:16:03 -0500
-Message-Id: <20170919141603.27713-1-eblake@redhat.com>
-Subject: [Qemu-devel] [PATCH] ppc/pnv: Improve macro parenthesization
+Message-ID: <f7e88217-271b-c24f-c466-e3e42d596158@redhat.com>
+Date: Tue, 19 Sep 2017 09:16:39 -0500
+MIME-Version: 1.0
+In-Reply-To: <8f30a125-040e-0c75-92c9-2c6fd8db08db@amsat.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="4P7bAoOsF83vGxkaTkGTn6nsruF43es1M"
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] nbd-client: Use correct
+ macro parenthesization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -17,31 +31,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-trivial@nongnu.org, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, "open list:PowerPC" <qemu-ppc@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org
 
-Although none of the existing macro call-sites were broken,
-it's always better to write macros that properly parenthesize
-arguments that can be complex expressions, so that the intended
-order of operations is not broken.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--4P7bAoOsF83vGxkaTkGTn6nsruF43es1M
+From: Eric Blake <eblake@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org
+Message-ID: <f7e88217-271b-c24f-c466-e3e42d596158@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-trivial] [PATCH] nbd-client: Use correct macro
+ parenthesization
+References: <20170918214649.17550-1-eblake@redhat.com>
+ <dfe4dc28-4011-e7a7-aa1f-54e340f091d2@amsat.org>
+ <53ea39b4-7926-d29b-fb28-3f2295dc394d@redhat.com>
+ <8f30a125-040e-0c75-92c9-2c6fd8db08db@amsat.org>
+In-Reply-To: <8f30a125-040e-0c75-92c9-2c6fd8db08db@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
----
- include/hw/ppc/pnv_xscom.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 09/19/2017 05:32 AM, Philippe Mathieu-Daud=C3=A9 wrote:
+> On 09/18/2017 07:42 PM, Eric Blake wrote:
+>> On 09/18/2017 05:13 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+>>> Any magic cocci script to verify there aren't no more?
+>>
+>> I don't know if cocci can do it; checkpatch tries to check whether mac=
+ro
+>> arguments are parenthesized, but even that's prone to missing things.=C2=
+=A0 I
+>> just spotted this particular one while reviewing a related patch.
+>=20
+> couldn't figure out.
+>=20
+> grep -E '^\s*#define\s+\w+\([^\)]+\)\s+.*\(\w+\)\w+' (no multiline)
+> found those unharmful:
+>=20
+> target/mips/dsp_helper.c:#define MIPSDSP_RETURN64_16(a, b, c, d)
+> (((uint64_t)a << 48) | \
+> target/mips/dsp_helper.c:#define MIPSDSP_RETURN64_32(a, b) (((uint64_t)=
+a
+> << 32) | (uint64_t)b)
+> include/hw/ppc/pnv_xscom.h:#define PNV_XSCOM_EX_CORE_BASE(base, i) (bas=
+e
+> | (((uint64_t)i) << 24))
 
-diff --git a/include/hw/ppc/pnv_xscom.h b/include/hw/ppc/pnv_xscom.h
-index 3757b2cab9..38077b4796 100644
---- a/include/hw/ppc/pnv_xscom.h
-+++ b/include/hw/ppc/pnv_xscom.h
-@@ -54,7 +54,7 @@ typedef struct PnvXScomInterfaceClass {
-  *   PCB SLAVE   0x110Fxxxx
-  */
+There's probably more, but I submitted patches for these two files as
+separate threads for qemu-trivial.
 
--#define PNV_XSCOM_EX_CORE_BASE(base, i) (base | (((uint64_t)i) << 24))
-+#define PNV_XSCOM_EX_CORE_BASE(base, i) ((base) | ((uint64_t)(i) << 24))
- #define PNV_XSCOM_EX_CORE_SIZE    0x100000
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
- #define PNV_XSCOM_LPC_BASE        0xb0020
--- 
-2.13.5
+
+--4P7bAoOsF83vGxkaTkGTn6nsruF43es1M
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnBJscACgkQp6FrSiUn
+Q2rI1wf+PCZy1UrDd95NuUmvdZgpWLgbnq51F3HSBYazX7yz9CrWN+zCDNNNpTLO
+jlZYwp4nhUdnydDl0qhFxxZ7G+iFCo9e0lM/NjkVjtjsdJYkcqYYJNkynHhGXsrp
+daso08RXI3ae2z0DIbxs4Qph80k35gCJNA/To1W9nVJQERdr7jT1h3kIKApVRP2+
+Zs18LXJWdym0JQ2efib/D9IT28FLI44YVqRvVdhgsAfTcRU2UyJ4eSAJaK6UnD4I
+QACoFEdfpNww/xQ5UfLodrJ6W8+b3N+JGNVPNImxU81ZBIbXrRF4ul0r9LrSFECb
+5z+k7fP0RYgnXHHe9wcXqmNVoT7sMw==
+=XxWK
+-----END PGP SIGNATURE-----
+
+--4P7bAoOsF83vGxkaTkGTn6nsruF43es1M--
