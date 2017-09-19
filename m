@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38969)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39017)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duLdX-00068E-3D
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:44:40 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duLdZ-00069x-4t
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:44:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duLdW-0002uu-2Y
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:44:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47300)
+	(envelope-from <cohuck@redhat.com>) id 1duLdY-0002wo-BH
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:44:41 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44324)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLdV-0002u6-QH
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:44:37 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLdY-0002w5-6J
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:44:40 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 19 Sep 2017 18:43:10 +0200
-Message-Id: <20170919164337.18555-12-cohuck@redhat.com>
+Date: Tue, 19 Sep 2017 18:43:11 +0200
+Message-Id: <20170919164337.18555-13-cohuck@redhat.com>
 In-Reply-To: <20170919164337.18555-1-cohuck@redhat.com>
 References: <20170919164337.18555-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL v2 11/38] exec, dump, i386, ppc,
- s390x: don't include exec/cpu-all.h explicitly
+Subject: [Qemu-devel] [PULL v2 12/38] cpu: drop old comments describing
+ members
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,107 +29,33 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: David Hildenbrand <david@redhat.com>
 
-All but a handful of files include exec/cpu-all.h via cpu.h only.
-As these files already include cpu.h, let's just drop the additional
-include.
+These comments are obviously stale.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Acked-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170913132417.24384-2-david@redhat.com>
+Message-Id: <20170913132417.24384-3-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- dump.c                            | 1 -
- exec.c                            | 1 -
- target/i386/arch_dump.c           | 1 -
- target/i386/arch_memory_mapping.c | 1 -
- target/i386/svm_helper.c          | 1 -
- target/ppc/arch_dump.c            | 1 -
- target/s390x/arch_dump.c          | 1 -
- 7 files changed, 7 deletions(-)
+ include/qom/cpu.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/dump.c b/dump.c
-index d2093e141b..7ebcf553b2 100644
---- a/dump.c
-+++ b/dump.c
-@@ -15,7 +15,6 @@
- #include "qemu/cutils.h"
- #include "elf.h"
- #include "cpu.h"
--#include "exec/cpu-all.h"
- #include "exec/hwaddr.h"
- #include "monitor/monitor.h"
- #include "sysemu/kvm.h"
-diff --git a/exec.c b/exec.c
-index d20c34ca83..a25a4c6018 100644
---- a/exec.c
-+++ b/exec.c
-@@ -56,7 +56,6 @@
- #endif
+diff --git a/include/qom/cpu.h b/include/qom/cpu.h
+index 995a7beeb5..0dc767a753 100644
+--- a/include/qom/cpu.h
++++ b/include/qom/cpu.h
+@@ -388,10 +388,10 @@ struct CPUState {
+     DECLARE_BITMAP(trace_dstate, CPU_TRACE_DSTATE_MAX_EVENTS);
  
- #endif
--#include "exec/cpu-all.h"
- #include "qemu/rcu_queue.h"
- #include "qemu/main-loop.h"
- #include "translate-all.h"
-diff --git a/target/i386/arch_dump.c b/target/i386/arch_dump.c
-index e682904052..35b55fc200 100644
---- a/target/i386/arch_dump.c
-+++ b/target/i386/arch_dump.c
-@@ -13,7 +13,6 @@
+     /* TODO Move common fields from CPUArchState here. */
+-    int cpu_index; /* used by alpha TCG */
+-    uint32_t halted; /* used by alpha, cris, ppc TCG */
++    int cpu_index;
++    uint32_t halted;
+     uint32_t can_do_io;
+-    int32_t exception_index; /* used by m68k TCG */
++    int32_t exception_index;
  
- #include "qemu/osdep.h"
- #include "cpu.h"
--#include "exec/cpu-all.h"
- #include "sysemu/dump.h"
- #include "elf.h"
- #include "sysemu/memory_mapping.h"
-diff --git a/target/i386/arch_memory_mapping.c b/target/i386/arch_memory_mapping.c
-index 647cff2829..271cb5e41b 100644
---- a/target/i386/arch_memory_mapping.c
-+++ b/target/i386/arch_memory_mapping.c
-@@ -13,7 +13,6 @@
- 
- #include "qemu/osdep.h"
- #include "cpu.h"
--#include "exec/cpu-all.h"
- #include "sysemu/memory_mapping.h"
- 
- /* PAE Paging or IA-32e Paging */
-diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
-index 59e8b5091c..f479239875 100644
---- a/target/i386/svm_helper.c
-+++ b/target/i386/svm_helper.c
-@@ -19,7 +19,6 @@
- 
- #include "qemu/osdep.h"
- #include "cpu.h"
--#include "exec/cpu-all.h"
- #include "exec/helper-proto.h"
- #include "exec/exec-all.h"
- #include "exec/cpu_ldst.h"
-diff --git a/target/ppc/arch_dump.c b/target/ppc/arch_dump.c
-index 95b9ab6f29..351a65b22f 100644
---- a/target/ppc/arch_dump.c
-+++ b/target/ppc/arch_dump.c
-@@ -15,7 +15,6 @@
- #include "qemu/osdep.h"
- #include "cpu.h"
- #include "elf.h"
--#include "exec/cpu-all.h"
- #include "sysemu/dump.h"
- #include "sysemu/kvm.h"
- 
-diff --git a/target/s390x/arch_dump.c b/target/s390x/arch_dump.c
-index 9b0bf92698..6f61ff95af 100644
---- a/target/s390x/arch_dump.c
-+++ b/target/s390x/arch_dump.c
-@@ -15,7 +15,6 @@
- #include "cpu.h"
- #include "internal.h"
- #include "elf.h"
--#include "exec/cpu-all.h"
- #include "sysemu/dump.h"
- 
- 
+     /* shared by kvm, hax and hvf */
+     bool vcpu_dirty;
 -- 
 2.13.5
