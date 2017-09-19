@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39239)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39260)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duLdn-0006N7-Og
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:44:56 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duLdo-0006OD-Tv
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:44:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duLdk-00036k-VD
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:44:55 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:8722)
+	(envelope-from <cohuck@redhat.com>) id 1duLdo-00038l-0j
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:44:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:51728)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLdk-00035g-PU
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:44:52 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLdn-000388-RB
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:44:55 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 19 Sep 2017 18:43:13 +0200
-Message-Id: <20170919164337.18555-15-cohuck@redhat.com>
+Date: Tue, 19 Sep 2017 18:43:14 +0200
+Message-Id: <20170919164337.18555-16-cohuck@redhat.com>
 In-Reply-To: <20170919164337.18555-1-cohuck@redhat.com>
 References: <20170919164337.18555-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL v2 14/38] s390x: rename s390-virtio.h to
+Subject: [Qemu-devel] [PULL v2 15/38] s390x: move s390_virtio_hypercall() to
  s390-virtio-hcall.h
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -29,75 +29,64 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: David Hildenbrand <david@redhat.com>
 
-The only interface left, so let's properly rename it.
+Implemented in hw/s390x/s390-virtio-hcall.c, so let's move it to the
+right header file.
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170913132417.24384-5-david@redhat.com>
+Message-Id: <20170913132417.24384-6-david@redhat.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/s390x/s390-virtio-ccw.c                      | 2 +-
- hw/s390x/s390-virtio-hcall.c                    | 2 +-
- hw/s390x/{s390-virtio.h => s390-virtio-hcall.h} | 8 ++++----
- 3 files changed, 6 insertions(+), 6 deletions(-)
- rename hw/s390x/{s390-virtio.h => s390-virtio-hcall.h} (77%)
+ hw/s390x/s390-virtio-hcall.h | 1 +
+ target/s390x/cpu.h           | 1 -
+ target/s390x/kvm.c           | 1 +
+ target/s390x/misc_helper.c   | 1 +
+ 4 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 57a5139a65..c908f63543 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -16,7 +16,7 @@
- #include "cpu.h"
- #include "hw/boards.h"
- #include "exec/address-spaces.h"
--#include "s390-virtio.h"
-+#include "hw/s390x/s390-virtio-hcall.h"
- #include "hw/s390x/sclp.h"
- #include "hw/s390x/s390_flic.h"
- #include "hw/s390x/ioinst.h"
-diff --git a/hw/s390x/s390-virtio-hcall.c b/hw/s390x/s390-virtio-hcall.c
-index 23d67d6170..ec7cf8beb3 100644
---- a/hw/s390x/s390-virtio-hcall.c
-+++ b/hw/s390x/s390-virtio-hcall.c
-@@ -11,7 +11,7 @@
- 
- #include "qemu/osdep.h"
- #include "cpu.h"
--#include "hw/s390x/s390-virtio.h"
-+#include "hw/s390x/s390-virtio-hcall.h"
- 
- #define MAX_DIAG_SUBCODES 255
- 
-diff --git a/hw/s390x/s390-virtio.h b/hw/s390x/s390-virtio-hcall.h
-similarity index 77%
-rename from hw/s390x/s390-virtio.h
-rename to hw/s390x/s390-virtio-hcall.h
-index d984cd4115..59fcba3a06 100644
---- a/hw/s390x/s390-virtio.h
+diff --git a/hw/s390x/s390-virtio-hcall.h b/hw/s390x/s390-virtio-hcall.h
+index 59fcba3a06..cbc270eef3 100644
+--- a/hw/s390x/s390-virtio-hcall.h
 +++ b/hw/s390x/s390-virtio-hcall.h
-@@ -1,5 +1,5 @@
- /*
-- * Virtio interfaces for s390
-+ * Support for virtio hypercalls on s390x
-  *
-  * Copyright 2012 IBM Corp.
-  * Author(s): Cornelia Huck <cornelia.huck@de.ibm.com>
-@@ -9,12 +9,12 @@
-  * directory.
-  */
- 
--#ifndef HW_S390_VIRTIO_H
--#define HW_S390_VIRTIO_H
-+#ifndef HW_S390_VIRTIO_HCALL_H
-+#define HW_S390_VIRTIO_HCALL_H
- 
- #include "standard-headers/asm-s390/kvm_virtio.h"
- #include "standard-headers/asm-s390/virtio-ccw.h"
+@@ -17,4 +17,5 @@
  
  typedef int (*s390_virtio_fn)(const uint64_t *args);
  void s390_register_virtio_hypercall(uint64_t code, s390_virtio_fn fn);
--#endif
-+#endif /* HW_S390_VIRTIO_HCALL_H */
++int s390_virtio_hypercall(CPUS390XState *env);
+ #endif /* HW_S390_VIRTIO_HCALL_H */
+diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+index 0bd97a5670..7073fa59e9 100644
+--- a/target/s390x/cpu.h
++++ b/target/s390x/cpu.h
+@@ -723,6 +723,5 @@ int s390_cpu_virt_mem_rw(S390CPU *cpu, vaddr laddr, uint8_t ar, void *hostbuf,
+ S390CPU *s390_cpu_addr2state(uint16_t cpu_addr);
+ extern void subsystem_reset(void);
+ int sclp_service_call(CPUS390XState *env, uint64_t sccb, uint32_t code);
+-int s390_virtio_hypercall(CPUS390XState *env);
+ 
+ #endif
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 375369fd1c..720cb1d833 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -48,6 +48,7 @@
+ #include "hw/s390x/ebcdic.h"
+ #include "exec/memattrs.h"
+ #include "hw/s390x/s390-virtio-ccw.h"
++#include "hw/s390x/s390-virtio-hcall.h"
+ 
+ #ifndef DEBUG_KVM
+ #define DEBUG_KVM  0
+diff --git a/target/s390x/misc_helper.c b/target/s390x/misc_helper.c
+index 50cc046ca2..b142db71c6 100644
+--- a/target/s390x/misc_helper.c
++++ b/target/s390x/misc_helper.c
+@@ -34,6 +34,7 @@
+ #include "sysemu/cpus.h"
+ #include "sysemu/sysemu.h"
+ #include "hw/s390x/ebcdic.h"
++#include "hw/s390x/s390-virtio-hcall.h"
+ #endif
+ 
+ /* #define DEBUG_HELPER */
 -- 
 2.13.5
