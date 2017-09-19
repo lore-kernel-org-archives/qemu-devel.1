@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42159)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56984)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duQNt-0002eZ-89
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 17:48:50 -0400
+	(envelope-from <lersek@redhat.com>) id 1duQo0-00024L-Au
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 18:15:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duQNp-00036A-Bg
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 17:48:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46816)
+	(envelope-from <lersek@redhat.com>) id 1duQnw-0006cd-VT
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 18:15:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55870)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1duQNp-00035g-2X
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 17:48:45 -0400
-References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
-	<1505375436-28439-8-git-send-email-peterx@redhat.com>
-	<5c8217a4-c169-c580-f461-e7173a772e31@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <dd2bfb4d-2899-fad1-00a0-ffb833588618@redhat.com>
-Date: Tue, 19 Sep 2017 16:48:35 -0500
+	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1duQnw-0006af-LZ
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 18:15:44 -0400
+References: <20170906142658.58298-1-marcel@redhat.com>
+	<20170906142658.58298-3-marcel@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <4ca77991-ad6a-a138-622b-b42f410fa1eb@redhat.com>
+Date: Wed, 20 Sep 2017 00:15:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <5c8217a4-c169-c580-f461-e7173a772e31@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="goeLLfjMWXDnDLQ2uB5feWBwaHb9D0jNA"
-Subject: Re: [Qemu-devel] [RFC 07/15] monitor: unify global init
+In-Reply-To: <20170906142658.58298-3-marcel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] hw/pcie: disable IO port fwd by
+ default for pcie-root-port
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,139 +29,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>, mdroth@linux.vnet.ibm.com, Stefan Hajnoczi <shajnocz@redhat.com>, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---goeLLfjMWXDnDLQ2uB5feWBwaHb9D0jNA
-From: Eric Blake <eblake@redhat.com>
-To: Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <lvivier@redhat.com>, Fam Zheng <famz@redhat.com>,
- Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- mdroth@linux.vnet.ibm.com, Stefan Hajnoczi <shajnocz@redhat.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <dd2bfb4d-2899-fad1-00a0-ffb833588618@redhat.com>
-Subject: Re: [Qemu-devel] [RFC 07/15] monitor: unify global init
-References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
- <1505375436-28439-8-git-send-email-peterx@redhat.com>
- <5c8217a4-c169-c580-f461-e7173a772e31@redhat.com>
-In-Reply-To: <5c8217a4-c169-c580-f461-e7173a772e31@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi Marcel,
 
-On 09/19/2017 04:35 PM, Eric Blake wrote:
-> On 09/14/2017 02:50 AM, Peter Xu wrote:
->> There are many places for monitor init its globals, at least:
->>
+On 09/06/17 16:26, Marcel Apfelbaum wrote:
+> For most cases the devices attached to PCIe Root Ports
+> do not need IO ports range, add an 'enable-io-fwd' property
+> making it false by default, but keeping it true for older machines.
+> 
+> Signed-off-by: Marcel Apfelbaum <marcel@redhat.com>
+> ---
+>  hw/pci-bridge/gen_pcie_root_port.c | 38 ++++++++++++++++++++++++++++++++++++++
+>  include/hw/compat.h                |  6 +++++-
+>  2 files changed, 43 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/pci-bridge/gen_pcie_root_port.c b/hw/pci-bridge/gen_pcie_root_port.c
+> index cb694d6da5..cbdeb73e2c 100644
+> --- a/hw/pci-bridge/gen_pcie_root_port.c
+> +++ b/hw/pci-bridge/gen_pcie_root_port.c
+> @@ -20,12 +20,26 @@
+>  #define GEN_PCIE_ROOT_PORT_AER_OFFSET           0x100
+>  #define GEN_PCIE_ROOT_PORT_MSIX_NR_VECTOR       1
+>  
+> +#define GEN_PCIE_ROOT_PORT(obj) \
+> +     OBJECT_CHECK(GenPCIERootPort, (obj), TYPE_GEN_PCIE_ROOT_PORT)
+> +#define GEN_PCIE_ROOT_PORT_CLASS(klass) \
+> +     OBJECT_CLASS_CHECK(GenPCIERootPortClass, (klass), TYPE_GEN_PCIE_ROOT_PORT)
+> +#define GEN_PCIE_ROOT_PORT_GET_CLASS(obj) \
+> +     OBJECT_GET_CLASS(GenPCIERootPortClass, (obj), TYPE_GEN_PCIE_ROOT_PORT)
+> +
+> +typedef struct GenPCIERootPortClass {
+> +    PCIERootPortClass parent_class;
+> +
+> +    DeviceRealize parent_realize;
+> +} GenPCIERootPortClass;
+> +
+>  typedef struct GenPCIERootPort {
+>      /*< private >*/
+>      PCIESlot parent_obj;
+>      /*< public >*/
+>  
+>      bool migrate_msix;
+> +    bool enable_io_fwd;
+>  } GenPCIERootPort;
+>  
+>  static uint8_t gen_rp_aer_vector(const PCIDevice *d)
+> @@ -60,6 +74,25 @@ static bool gen_rp_test_migrate_msix(void *opaque, int version_id)
+>      return rp->migrate_msix;
+>  }
+>  
+> +static void gen_rp_realize(DeviceState *d, Error **errp)
+> +{
+> +    GenPCIERootPortClass *grpc = GEN_PCIE_ROOT_PORT_GET_CLASS(d);
+> +    GenPCIERootPort *grp = GEN_PCIE_ROOT_PORT(d);
+> +    PCIDevice *pci_dev = PCI_DEVICE(d);
+> +
+> +    grpc->parent_realize(DEVICE(d), errp);
+> +    if (*errp) {
+> +        return;
+> +    }
+> +
+> +    if (!grp->enable_io_fwd) {
+> +        pci_word_test_and_clear_mask(pci_dev->wmask + PCI_COMMAND,
+> +                                     PCI_COMMAND_IO);
+> +        pci_dev->wmask[PCI_IO_BASE] = 0;
+> +        pci_dev->wmask[PCI_IO_LIMIT] = 0;
+> +    }
+> +}
+> +
 
-> Are we sure that this new function is called sooner than any access to
-> monitor_lock,
->=20
->> -static void __attribute__((constructor)) monitor_lock_init(void)
->> -{
->> -    qemu_mutex_init(&monitor_lock);
->> -}
->=20
-> especially since the old code initialized the lock REALLY early?
+This function exists now, but with different implementation, from
+Aleksandr's commit 226263fb5cda ("hw/pci: add QEMU-specific PCI
+capability to the Generic PCI Express Root Port", 2017-08-18).
 
-(Partially) answering myself:
+It seems that we now have "grp->io_reserve" (a numeric quantity, not a
+boolean), from property "io-reserve". The default value is -1.
 
->=20
-> Pre-patch, a breakpoint on main() and on monitor_lock_init() fires on
-> monitor_lock_init() first, prior to main.
->=20
-> Breakpoint 2, monitor_lock_init () at /home/eblake/qemu/monitor.c:4089
-> 4089	    qemu_mutex_init(&monitor_lock);
-> (gdb) c
-> Continuing.
-> [New Thread 0x7fffce225700 (LWP 26380)]
->=20
-> Thread 1 "qemu-system-x86" hit Breakpoint 1, main (argc=3D5,
->     argv=3D0x7fffffffdc88, envp=3D0x7fffffffdcb8) at vl.c:3077
-> 3077	{
+According to the documentation added in c1800a162765 ("docs: update
+documentation considering PCIE-PCI bridge", 2017-08-18), the value -1
+seems to imply, "If any reservation field is -1 then this kind of
+reservation is not needed and must be ignored by firmware".
 
-Also, pre-patch, 'watch monitor_lock.initialized' and 'watch
-monitor_lock.lock.__data.__lock' show that the lock is first utilized at:=
+I think we'll need to refine the definition. Once OVMF starts processing
+this capability, the behavior should be compatible with earlier
+behavior. Assume that a user sets only "mem-reserve" to something
+different from -1, and thus the capability appears. When OVMF sees the
+capability, it should be able to tell apart:
 
+- no particular hint about IO space, so continue doing whatever has been
+done all this time (default IO space reservation),
+- do not request IO space reservation at all,
+- a given (positive) size of IO space should be reserved.
 
-(gdb) bt
-#0  0x00007fffdac59e12 in __GI___pthread_mutex_lock
-(mutex=3D0x555556399340 <monitor_lock>) at ../nptl/pthread_mutex_lock.c:8=
-0
-#1  0x0000555555ce01ed in qemu_mutex_lock (mutex=3D0x555556399340
-<monitor_lock>)
-    at util/qemu-thread-posix.c:65
-#2  0x00005555557bc8b8 in monitor_init (chr=3D0x55555690bf70, flags=3D4)
-    at /home/eblake/qemu/monitor.c:4126
-#3  0x000055555591ae80 in mon_init_func (opaque=3D0x0,
-opts=3D0x55555688e3d0, errp=3D0x0) at vl.c:2482
-#4  0x0000555555cf3e63 in qemu_opts_foreach (list=3D0x555556225200
-<qemu_mon_opts>, func=3D0x55555591ad33 <mon_init_func>, opaque=3D0x0, err=
-p=3D0x0)
-    at util/qemu-option.c:1104
-#5  0x0000555555920128 in main (argc=3D5, argv=3D0x7fffffffdc88,
-envp=3D0x7fffffffdcb8) at vl.c:4670
+So I think:
 
-and double-checking qemu_mutex_lock, our .initialized member provides
-NICE runtime checking that we don't use an uninitialized lock.  So the
-fact that your patch doesn't assert means your later initialization is
-still fine.
+(a) the above read-only mask setting should be done based on
 
-[TIL: the gdb 'watch' command is cool, but it's better if you watch only
-4 or 8 bytes at a time; I first tried 'watch monitor_lock', but that's
-hundreds of times slower as hardware can't watch that much data at once,
-at which point gdb emulates it by single-stepping the entire program]
+  (grp->io_reserve == 0)
 
->=20
-> Post-patch, the mutex is not initialized until well after main().  So
-> the real question is what (if anything) is using the lock in between
-> those two points?
+and the "enable-io-fwd" property should be unnecessary,
 
-According to gdb watchpoints, no.
+(b) the "io-reserve" property should be set to 0 for 2.11 machine types
+and onward, and to -1 for 2.10 and earlier (for compatibility),
 
->=20
-> Hmm - it may be that we needed it back before commit 05875687, when we
-> really did depend on MODULE_INIT_QAPI, but it is something we forgot to=
+(c) the documentation in "docs/pcie_pci_bridge.txt" should be updated to
+say:
+* (-1) --> default firmware behavior (unspecified)
+*   0  --> do not reserve
+*  >0  --> specific reservation requested
 
-> cleanup in the meantime?
-
-So what I didn't debug was whether the constructor attribute was
-mandatory in the past, and if so, which commit made it no longer
-mandatory (my mention of commit 05875687 is only a guess).
-
->=20
-> If nothing else, the commit message should call out that dropping
-> __attribute__((constructor)) nonsense is intentional (if it was indeed
-> nonsense).
->=20
-
-This part is still true.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+(d) pci_bridge_qemu_reserve_cap_init() should be updated accordingly
+(i.e., a conflict exists if both mem_pref_32_reserve and
+mem_pref_64_reserve are *positive*),
 
 
---goeLLfjMWXDnDLQ2uB5feWBwaHb9D0jNA
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Second, when determining the reservations in OVMF, I would like to look
+only at the capability fields, and not do a read-write-read-write
+quadruplet to the IO base/limit registers. Do you agree?
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+Thanks!
+Laszlo
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnBkLMACgkQp6FrSiUn
-Q2ps7AgAm6uOdTqsyAHJ0MYbHubisKKLGeHaXZ3vjydmO1hhp4oVNfso2ygNQDmu
-hRIW9NEeEVDLXSw3V16cFOBSTMLTDQ8TenSgPukclc2q41XcLN7wxtngcdMpe0m+
-LahHeqD2/in2FPT7QWiwLOhub9ALMt3d8XYIdfPZpRPNsP2IlvqBMZanCTkPBO71
-AsX9PKCwNoCU6ZfwcNqZ/eYxfhHZqPl6M3h4hvZ8XAplhYvd4VsHjjJ+La1qLejD
-02j66t5t7z/9aN/6pCsNS/VgTB4QAp45rhhSH/HdD8gVz095zcGbXV0eJLGb7EvB
-ihgh6yq/Z5P0BEj7W1Xx6MHpgzGq9w==
-=kbpc
------END PGP SIGNATURE-----
 
---goeLLfjMWXDnDLQ2uB5feWBwaHb9D0jNA--
+>  static const VMStateDescription vmstate_rp_dev = {
+>      .name = "pcie-root-port",
+>      .version_id = 1,
+> @@ -78,6 +111,7 @@ static const VMStateDescription vmstate_rp_dev = {
+>  
+>  static Property gen_rp_props[] = {
+>      DEFINE_PROP_BOOL("x-migrate-msix", GenPCIERootPort, migrate_msix, true),
+> +    DEFINE_PROP_BOOL("enable-io-fwd", GenPCIERootPort, enable_io_fwd, false),
+>      DEFINE_PROP_END_OF_LIST()
+>  };
+>  
+> @@ -86,6 +120,7 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
+>      DeviceClass *dc = DEVICE_CLASS(klass);
+>      PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
+>      PCIERootPortClass *rpc = PCIE_ROOT_PORT_CLASS(klass);
+> +    GenPCIERootPortClass *grpc = GEN_PCIE_ROOT_PORT_CLASS(klass);
+>  
+>      k->vendor_id = PCI_VENDOR_ID_REDHAT;
+>      k->device_id = PCI_DEVICE_ID_REDHAT_PCIE_RP;
+> @@ -96,6 +131,8 @@ static void gen_rp_dev_class_init(ObjectClass *klass, void *data)
+>      rpc->interrupts_init = gen_rp_interrupts_init;
+>      rpc->interrupts_uninit = gen_rp_interrupts_uninit;
+>      rpc->aer_offset = GEN_PCIE_ROOT_PORT_AER_OFFSET;
+> +    grpc->parent_realize = dc->realize;
+> +    dc->realize = gen_rp_realize;
+>  }
+>  
+>  static const TypeInfo gen_rp_dev_info = {
+> @@ -103,6 +140,7 @@ static const TypeInfo gen_rp_dev_info = {
+>      .parent        = TYPE_PCIE_ROOT_PORT,
+>      .instance_size = sizeof(GenPCIERootPort),
+>      .class_init    = gen_rp_dev_class_init,
+> +    .class_size    = sizeof(GenPCIERootPortClass),
+>  };
+>  
+>   static void gen_rp_register_types(void)
+> diff --git a/include/hw/compat.h b/include/hw/compat.h
+> index 3e101f8f67..843bf4a3a5 100644
+> --- a/include/hw/compat.h
+> +++ b/include/hw/compat.h
+> @@ -2,7 +2,11 @@
+>  #define HW_COMPAT_H
+>  
+>  #define HW_COMPAT_2_10 \
+> -    /* empty */
+> +    {\
+> +        .driver   = "pcie-root-port",\
+> +        .property = "enable-io-fwd",\
+> +        .value    = "true",\
+> +    },
+>  
+>  #define HW_COMPAT_2_9 \
+>      {\
+> 
