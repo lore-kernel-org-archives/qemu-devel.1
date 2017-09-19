@@ -1,22 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51881)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52277)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duJSo-0004MZ-Bd
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:25:32 -0400
+	(envelope-from <alex.bennee@linaro.org>) id 1duJTP-0004sZ-Lo
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:26:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duJSk-0003Af-A5
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:25:26 -0400
-References: <20170919102434.21147-1-pbonzini@redhat.com>
-	<20170919102434.21147-3-pbonzini@redhat.com>
-	<20170919133351.GO9536@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <0e5ceed7-ca5c-f771-fa58-72766f07373b@redhat.com>
-Date: Tue, 19 Sep 2017 16:25:09 +0200
+	(envelope-from <alex.bennee@linaro.org>) id 1duJTM-0003cI-Vf
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:26:03 -0400
+Received: from mail-wm0-x235.google.com ([2a00:1450:400c:c09::235]:47475)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
+	id 1duJTM-0003az-KD
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:26:00 -0400
+Received: by mail-wm0-x235.google.com with SMTP id 13so431660wmq.2
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 07:25:59 -0700 (PDT)
+References: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
+	<CAJhHMCCZh7hvQT8x9Bks9k6=ka4G1Oybv1MrkKJ9_VZ_eRZBfQ@mail.gmail.com>
+	<CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
+	<87bmrj8eks.fsf@linaro.org>
+	<CAPnv1PKyak1G-uL=H=-Vh_9TH2dZKffYjDf_2Z+LWuqovMKCBQ@mail.gmail.com>
+	<CAKSfGUC_k6K=2Xy8pGcwuQ66DMPYCDvA47Ojgm7ntQfALGwDsQ@mail.gmail.com>
+	<CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
+	<000601d33128$2dd9d5e0$898d81a0$@ru> <87bmm7dohw.fsf@linaro.org>
+	<CAKSfGUCt7p95nDeW12Q_-BSTXVhRLPtL+=u_WLx5_BZEgAgeLw@mail.gmail.com>
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+In-reply-to: <CAKSfGUCt7p95nDeW12Q_-BSTXVhRLPtL+=u_WLx5_BZEgAgeLw@mail.gmail.com>
+Date: Tue, 19 Sep 2017 15:25:57 +0100
+Message-ID: <878thaepe2.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20170919133351.GO9536@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/4] scsi: build qemu-pr-helper
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] What is the best commit for record-replay?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,90 +37,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Cc: Pavel Dovgalyuk <dovgaluk@ispras.ru>, QEMU Developers <qemu-devel@nongnu.org>, Pranith Kumar <bobby.prani+qemu@gmail.com>, pavel.dovgaluk@ispras.ru, Aleksandr Bezzubikov <abezzubikov@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>, Igor R <boost.lists@gmail.com>
 
-On 19/09/2017 15:33, Daniel P. Berrange wrote:
-> On Tue, Sep 19, 2017 at 12:24:32PM +0200, Paolo Bonzini wrote:
->> Introduce a privileged helper to run persistent reservation commands.
->> This lets virtual machines send persistent reservations without using
->> CAP_SYS_RAWIO or out-of-tree patches.  The helper uses Unix permissions
->> and SCM_RIGHTS to restrict access to processes that can access its socket
->> and prove that they have an open file descriptor for a raw SCSI device.
+
+Aleksandr Bezzubikov <zuban32s@gmail.com> writes:
+
+> 2017-09-19 12:30 GMT+03:00 Alex Bennée <alex.bennee@linaro.org>:
 >>
->> The next patch will also correct the usage of persistent reservations
->> with multipath devices.
+>> Pavel Dovgalyuk <dovgaluk@ispras.ru> writes:
 >>
->> It would also be possible to support for Linux's IOC_PR_* ioctls in
->> the future, to support NVMe devices.  For now, however, only SCSI is
->> supported.
+>>>> From: Aleksandr Bezzubikov [mailto:zuban32s@gmail.com]
+>>>> 2017-09-18 15:02 GMT+03:00 Aleksandr Bezzubikov <zuban32s@gmail.com>:
+>>>> > 2017-05-02 15:42 GMT+03:00 Igor R <boost.lists@gmail.com>:
+>>>> >>>>>> I'm trying to use the deterministic record/replay feature, and I would
+>>>> >>>>>> like to know which commit I should take to get it work.
+>>>> >>>>>> In RC0 it seems to be broken. I tried pre-MTTCG commit 2421f381dc, as
+>>>> >>>>
+>>>> >>>>> Can you retry with the latest rc? There were some fixes regarding rr since rc0.
+>>>> >>>>
+>>>> >>>>
+>>>> >>>> I've taken 2.9 release, and RR does not seem to work there.
+>>>> >>>> I recorded the boot process of x86 Fedora-21 linux and the replay got
+>>>> >>>> stuck almost immediately.
+>>>> >>>
+>>>> >>> What's your command line?
+>>>> >>>
+>>>> >>> Does it get stuck at the same place each time?
+>>>> >>>
+>>>> >>> Can you boot fine with icount but without record/replay?
+>>>> >>
+>>>> >> Here is the exact scenario:
+>>>> >> - Get 2.9 from git, configure it as follows: "./configure
+>>>> >> --target-list=i386-softmmu --enable-sdl" and  make.
+>>>> >> - Download https://people.debian.org/~aurel32/qemu/i386/debian_squeeze_i386_standard.qcow2
+>>>> >> - Run qemu with the following command line, until login prompt:
+>>>> >> -icount shift=7,rr=record,rrfile=replay.bin -drive
+>>>> >> file=debian_squeeze_i386_standard.qcow2,if=none,id=img-direct -drive
+>>>> >> driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
+>>>> >> ide-hd,drive=img-blkreplay -monitor stdio
+>>>> >> - Replay: -icount shift=7,rr=replay,rrfile=replay.bin -drive
+>>>> >> file=debian_squeeze_i386_standard.qcow2,if=none,id=img-direct -drive
+>>>> >> driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
+>>>> >> ide-hd,drive=img-blkreplay -monitor stdio
+>>>> >>
+>>>> >> Every time I attempt to replay, QEMU gets stuck at the same EIP, at a
+>>>> >> very early stage.
+>>>> >>
+>>>> >>
+>>>> >>> Can you boot fine with icount but without record/replay?
+>>>> >>
+>>>> >> Yes. I can also enable icount and recording - it also boots fine. The
+>>>> >> problem with the replay.
+>>>> >
+>>>> > Hi guys,
+>>>> > Maybe the thread is a bit outdated, but the problem is still relevant.
+>>>> > I've just tried to record and replay WinXP boot process, and I've encountered
+>>>> > exactly the same problem as described above - record is fine, replay
+>>>> > gets stuck early. I use current master.
+>>>
+>>> Maybe this commit will work: cfb2d02be9413d45b30ed6d8e38800250b6b4b48
+>
+> Unfortunately this one doesn't work either. It seems we need just an
+> all-in-one fix
+> for the current implementation to make it work.
+>
+>>>
+>>>> > And I've discovered the second problem - recording makes initial snapshot,
+>>>> > but it doesn't seem to be saved to the disk - replay can't see it.
+>>>
+>>> It is ok, because there is a mode where snapshot is created and loaded.
+>
+> So it shouldn't work properly when I use 'rrsnapshot=<name>' for both
+> record and replay?
+> Then how can I enable this mode?
+>
+>>>
+>>>> >
+>>>> > Hope you've already found the solution (as the last post was on 2 May)
+>>>> > and it's just got missed the mailing list.
+>>>
+>>> As I know, RR is still broken in the current version.
+>>> It was caused by the MTTCG implementation.
+>>> Alex Bennee tried to fix RR back. Alex, have you found any solution?
+>>>
+>>> We also trying to find a way to fix RR. It seems, that we will reinvent BQL for RR.
 >>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
-> 
-> 
->> +
->> +#define PR_HELPER_CDB_SIZE     16
->> +#define PR_HELPER_SENSE_SIZE   96
->> +#define PR_HELPER_DATA_SIZE    8192
->> +
->> +typedef struct PRHelperResponse {
->> +    int32_t result;
->> +    int32_t sz;
->> +    uint8_t sense[PR_HELPER_SENSE_SIZE];
->> +} PRHelperResponse;
-> 
-> Should we annotate this with 'packed' to ensure its immune to compiler
-> padding ?
+>> I think the method outlined in my RFC is the way to go, essentially the
+>> RR mutex taking over for the what the BQL did. The RFC patch hadn't
+>> hoisted the mutex for the additional devices so I'm just re-basing now
+>> and I'll see if I can make the changes for Igor's test case.
+>>
+>> --
+>> Alex Bennée
 
-Yes...
+Could you try:
 
-> 
->> +typedef struct PRHelperRequest {
->> +    int fd;
->> +    size_t sz;
->> +    uint8_t cdb[PR_HELPER_CDB_SIZE];
->> +} PRHelperRequest;
-> 
-> Same q here ?
+  https://github.com/stsquad/qemu/tree/bql-and-replay-locks-v2
 
-... and no since this one is not the wire format (which is just a
-16-byte cdb, plus fd in ancillary data).
+And report back?
 
-> 
->> +static int coroutine_fn prh_write_response(PRHelperClient *client,
->> +                                           PRHelperRequest *req,
->> +                                           PRHelperResponse *resp, Error **errp)
->> +{
->> +    ssize_t r;
-> 
-> Can just be int
-> 
->> +    size_t sz;
->> +
->> +    if (req->cdb[0] == PERSISTENT_RESERVE_IN && resp->result == GOOD) {
->> +        assert(resp->sz <= req->sz && resp->sz <= sizeof(client->data));
->> +    } else {
->> +        assert(resp->sz == 0);
->> +    }
->> +
->> +    sz = resp->sz;
->> +
->> +    resp->result = cpu_to_be32(resp->result);
->> +    resp->sz = cpu_to_be32(resp->sz);
->> +    r = qio_channel_write_all(QIO_CHANNEL(client->ioc),
->> +                              (char *) resp, sizeof(*resp), errp);
->> +    if (r < 0) {
->> +        return r;
->> +    }
->> +
->> +    r = qio_channel_write_all(QIO_CHANNEL(client->ioc),
->> +                              (char *) client->data,
->> +                              sz, errp);
->> +    return r < 0 ? r : 0;
-> 
-> Just return 'r' directly, its only ever -1 or 0
-
-Ok, thanks, will adjust all of these.
-
-Paolo
+--
+Alex Bennée
