@@ -1,20 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39247)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1duMpS-0005vw-TG
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 14:01:09 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1duMtC-0000oq-E8
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 14:04:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1duMpR-0000C4-LX
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 14:01:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54736)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1duMpR-00009Y-Cl
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 14:01:01 -0400
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Date: Tue, 19 Sep 2017 19:00:38 +0100
-Message-Id: <20170919180038.26056-6-dgilbert@redhat.com>
-In-Reply-To: <20170919180038.26056-1-dgilbert@redhat.com>
-References: <20170919180038.26056-1-dgilbert@redhat.com>
-Subject: [Qemu-devel] [PATCH 5/5] migration: Route more error paths
+	(envelope-from <richard.henderson@linaro.org>) id 1duMt8-0002eh-OF
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 14:04:54 -0400
+Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:53015)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1duMt8-0002ct-K6
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 14:04:50 -0400
+Received: by mail-io0-x22f.google.com with SMTP id i197so1026989ioe.9
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 11:04:50 -0700 (PDT)
+References: <1505240046-11454-1-git-send-email-peter.maydell@linaro.org>
+	<1505240046-11454-7-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <32166eca-14d9-63b3-cfc7-d7b63066cdc7@linaro.org>
+Date: Tue, 19 Sep 2017 13:04:46 -0500
+MIME-Version: 1.0
+In-Reply-To: <1505240046-11454-7-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 06/19] nvic: Make ICSR.RETTOBASE handle
+ banked exceptions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,163 +32,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com
-Cc: peter.maydell@linaro.org, cohuck@redhat.com, rth@twiddle.net
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 09/12/2017 01:13 PM, Peter Maydell wrote:
+> Update the code in nvic_rettobase() so that it checks the
+> sec_vectors[] array as well as the vectors[] array if needed.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  hw/intc/armv7m_nvic.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 
-vmstate_save is called in a few places, and vmstate_save_state is
-called in lots of places.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Route error returns from the easier cases back up;  there are lots
-of more complex cases where there own error paths need fixing.
-
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- hw/display/virtio-gpu.c    |  4 +---
- hw/virtio/virtio.c         | 13 +++++++------
- include/hw/virtio/virtio.h |  2 +-
- migration/vmstate-types.c  | 11 ++++++++---
- tests/test-vmstate.c       |  6 +++---
- 5 files changed, 20 insertions(+), 16 deletions(-)
-
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 622ee300f9..c9494e8a79 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -996,9 +996,7 @@ static int virtio_gpu_save(QEMUFile *f, void *opaque, size_t size,
-     }
-     qemu_put_be32(f, 0); /* end of list */
- 
--    vmstate_save_state(f, &vmstate_virtio_gpu_scanouts, g, NULL);
--
--    return 0;
-+    return vmstate_save_state(f, &vmstate_virtio_gpu_scanouts, g, NULL);
- }
- 
- static int virtio_gpu_load(QEMUFile *f, void *opaque, size_t size,
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index 464947f76d..860333788b 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -1899,7 +1899,7 @@ static const VMStateDescription vmstate_virtio = {
-     }
- };
- 
--void virtio_save(VirtIODevice *vdev, QEMUFile *f)
-+int virtio_save(VirtIODevice *vdev, QEMUFile *f)
- {
-     BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
-     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
-@@ -1949,20 +1949,21 @@ void virtio_save(VirtIODevice *vdev, QEMUFile *f)
-     }
- 
-     if (vdc->vmsd) {
--        vmstate_save_state(f, vdc->vmsd, vdev, NULL);
-+        int ret = vmstate_save_state(f, vdc->vmsd, vdev, NULL);
-+        if (ret) {
-+            return ret;
-+        }
-     }
- 
-     /* Subsections */
--    vmstate_save_state(f, &vmstate_virtio, vdev, NULL);
-+    return vmstate_save_state(f, &vmstate_virtio, vdev, NULL);
- }
- 
- /* A wrapper for use as a VMState .put function */
- static int virtio_device_put(QEMUFile *f, void *opaque, size_t size,
-                               VMStateField *field, QJSON *vmdesc)
- {
--    virtio_save(VIRTIO_DEVICE(opaque), f);
--
--    return 0;
-+    return virtio_save(VIRTIO_DEVICE(opaque), f);
- }
- 
- /* A wrapper for use as a VMState .get function */
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index 80c45c321e..5abada6966 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -188,7 +188,7 @@ void virtqueue_get_avail_bytes(VirtQueue *vq, unsigned int *in_bytes,
- void virtio_notify_irqfd(VirtIODevice *vdev, VirtQueue *vq);
- void virtio_notify(VirtIODevice *vdev, VirtQueue *vq);
- 
--void virtio_save(VirtIODevice *vdev, QEMUFile *f);
-+int virtio_save(VirtIODevice *vdev, QEMUFile *f);
- 
- extern const VMStateInfo virtio_vmstate_info;
- 
-diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
-index c056c98bdb..48184c380d 100644
---- a/migration/vmstate-types.c
-+++ b/migration/vmstate-types.c
-@@ -550,13 +550,14 @@ static int put_tmp(QEMUFile *f, void *pv, size_t size, VMStateField *field,
- {
-     const VMStateDescription *vmsd = field->vmsd;
-     void *tmp = g_malloc(size);
-+    int ret;
- 
-     /* Writes the parent field which is at the start of the tmp */
-     *(void **)tmp = pv;
--    vmstate_save_state(f, vmsd, tmp, vmdesc);
-+    ret = vmstate_save_state(f, vmsd, tmp, vmdesc);
-     g_free(tmp);
- 
--    return 0;
-+    return ret;
- }
- 
- const VMStateInfo vmstate_info_tmp = {
-@@ -657,12 +658,16 @@ static int put_qtailq(QEMUFile *f, void *pv, size_t unused_size,
-     /* offset of the QTAILQ entry in a QTAILQ element*/
-     size_t entry_offset = field->start;
-     void *elm;
-+    int ret;
- 
-     trace_put_qtailq(vmsd->name, vmsd->version_id);
- 
-     QTAILQ_RAW_FOREACH(elm, pv, entry_offset) {
-         qemu_put_byte(f, true);
--        vmstate_save_state(f, vmsd, elm, vmdesc);
-+        ret = vmstate_save_state(f, vmsd, elm, vmdesc);
-+        if (ret) {
-+            return ret;
-+        }
-     }
-     qemu_put_byte(f, false);
- 
-diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-index e643ac662b..ab3e430c2c 100644
---- a/tests/test-vmstate.c
-+++ b/tests/test-vmstate.c
-@@ -70,7 +70,7 @@ static void save_vmstate(const VMStateDescription *desc, void *obj)
-     QEMUFile *f = open_test_file(true);
- 
-     /* Save file with vmstate */
--    vmstate_save_state(f, desc, obj, NULL);
-+    g_assert(!vmstate_save_state(f, desc, obj, NULL));
-     qemu_put_byte(f, QEMU_VM_EOF);
-     g_assert(!qemu_file_get_error(f));
-     qemu_fclose(f);
-@@ -381,7 +381,7 @@ static void test_save_noskip(void)
-     QEMUFile *fsave = open_test_file(true);
-     TestStruct obj = { .a = 1, .b = 2, .c = 3, .d = 4, .e = 5, .f = 6,
-                        .skip_c_e = false };
--    vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
-+    g_assert(!vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL));
-     g_assert(!qemu_file_get_error(fsave));
- 
-     uint8_t expected[] = {
-@@ -402,7 +402,7 @@ static void test_save_skip(void)
-     QEMUFile *fsave = open_test_file(true);
-     TestStruct obj = { .a = 1, .b = 2, .c = 3, .d = 4, .e = 5, .f = 6,
-                        .skip_c_e = true };
--    vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
-+    g_assert(!vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL));
-     g_assert(!qemu_file_get_error(fsave));
- 
-     uint8_t expected[] = {
--- 
-2.13.5
+r~
