@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51132)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duFtV-0001EM-2n
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1duFtU-0001Du-Hl
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duFtS-0002rG-Vw
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:45 -0400
-Date: Tue, 19 Sep 2017 12:45:44 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1duFtS-0002qX-PH
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:44 -0400
+Date: Tue, 19 Sep 2017 17:55:06 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170919024544.GK27153@umbus>
+Message-ID: <20170919075506.GR27153@umbus>
 References: <20170911171235.29331-1-clg@kaod.org>
-	<20170911171235.29331-6-clg@kaod.org>
+	<20170911171235.29331-15-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="n83H03bbH672hrlY"
+	protocol="application/pgp-signature"; boundary="6eUvXotnMb6+obQB"
 Content-Disposition: inline
-In-Reply-To: <20170911171235.29331-6-clg@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 05/21] ppc/xive: allocate IRQ
- numbers for the IPIs
+In-Reply-To: <20170911171235.29331-15-clg@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 14/21] ppc/xive: add support for the
+ SET_OS_PENDING command
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,56 +29,47 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
 
---n83H03bbH672hrlY
+--6eUvXotnMb6+obQB
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 11, 2017 at 07:12:19PM +0200, C=E9dric Le Goater wrote:
-> The number of IPIs is deduced from the max number of CPUs the guest
-> supports and the IRQ numbers for the IPIs are allocated from the top
-> of the IRQ number space to reduce conflict with other IRQ numbers
-> allocated by the devices.
+On Mon, Sep 11, 2017 at 07:12:28PM +0200, C=E9dric Le Goater wrote:
+> Adjusting the Interrupt Pending Buffer for the O/S would allow a CPU
+> to process event queues of other priorities during one physical
+> interrupt cycle. This is not currently used by the XIVE support for
+> sPAPR in Linux but it is by the hypervisor.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-
-This is more ick associated with implementing XIVE in terms of XICS.
-We shouldn't need to "allocate" IRQs for the IPIs - they should just
-be a fixed set.  And we certainly shouldn't need to set the XICS irq
-type for XIVE irqs.
-
 > ---
->  hw/intc/spapr_xive.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  hw/intc/spapr_xive.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
 >=20
 > diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 1681affb0848..52c32f588d6d 100644
+> index ad3ff91b13ea..ad3f03e37401 100644
 > --- a/hw/intc/spapr_xive.c
 > +++ b/hw/intc/spapr_xive.c
-> @@ -58,6 +58,7 @@ static void spapr_xive_realize(DeviceState *dev, Error =
-**errp)
->      sPAPRXive *xive =3D SPAPR_XIVE(dev);
->      Object *obj;
->      Error *err =3D NULL;
-> +    int i;
-> =20
->      if (!xive->nr_targets) {
->          error_setg(errp, "Number of interrupt targets needs to be greate=
-r 0");
-> @@ -80,6 +81,11 @@ static void spapr_xive_realize(DeviceState *dev, Error=
- **errp)
-> =20
->      xive->ics =3D ICS_BASE(obj);
-> =20
-> +    /* Allocate the last IRQ numbers for the IPIs */
-> +    for (i =3D xive->nr_irqs - xive->nr_targets; i < xive->nr_irqs; i++)=
- {
-> +        ics_set_irq_type(xive->ics, i, false);
+> @@ -162,7 +162,14 @@ static bool spapr_xive_tm_is_readonly(uint8_t index)
+>  static void spapr_xive_tm_write_special(ICPState *icp, hwaddr offset,
+>                                    uint64_t value, unsigned size)
+>  {
+> -    /* TODO: support TM_SPC_SET_OS_PENDING */
+> +    if (offset =3D=3D TM_SPC_SET_OS_PENDING && size =3D=3D 1) {
+> +        icp->tima_os[TM_IPB] |=3D priority_to_ipb(value & 0xff);
+> +        icp->tima_os[TM_PIPR] =3D ipb_to_pipr(icp->tima_os[TM_IPB]);
+
+This only lets the cpu raise bits in the IPB, never clear them.  Is
+that right?  I don't see how you'd implement the handling of multiple
+priorities without being able to clear bits here.
+
+> +        spapr_xive_icp_notify(icp);
+> +    } else {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid TIMA write @%"
+> +                      HWADDR_PRIx" size %d\n", offset, size);
 > +    }
-> +
->      /* Allocate SBEs (State Bit Entry). 2 bits, so 4 entries per byte */
->      xive->sbe_size =3D DIV_ROUND_UP(xive->nr_irqs, 4);
->      xive->sbe =3D g_malloc0(xive->sbe_size);
+> =20
+>      /* TODO: support TM_SPC_ACK_OS_EL */
+>  }
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -86,24 +77,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---n83H03bbH672hrlY
+--6eUvXotnMb6+obQB
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnAhNgACgkQbDjKyiDZ
-s5Iv8RAA0AKAChb1zGFSqbo8f/hoEwBv3T7TtewumbA1MTuBUQy3g7J0As6bGNtJ
-g0adWUacmicb63V1sPiHd9ado/mixZb0sZsb6oLFyhuSTFhKqaDNK+JVl+QKFmyA
-/iyJAnBj3V9lyLy0h2PE049rdKHYv2wUwxti0dVsUUGSGXfTyLpfuTKD+16bEUNo
-TYWHDNYoZK/QUhk3tyryH2bdW8X9FE/dRpb3fUo1iMoUf+jWzsRWLI3nriEjl2Cu
-SUJSdfV4U5n+fB8zUdfQVk11TsQ+hofJ78JhWV7hMqoMOOuYpswsd8+ukCfrHnUk
-UgfgpSyhmLh2PEL8X7Y57CecKnaa5Ilts0A8Nn0hNSdOqcftdqygH1OFQ76ZIbmE
-imWJN2WaCkeTgaFh9ZjqOvk/3F8kmgmb+ylm59srcHLlJ8BD5hY8mkgfu79wgUQp
-fT0b8XMcWsMBRPt4yToi62CgV5MvTJRmVgskq+R5vZFRExtH/S8H7Is49BzPg8xg
-9u8nblayaCwi0+Y05ZAlR4r+vOh/0LaycfPvSzjdIfg7U1sBaNFHaETHtE0EGohj
-mSE9Q78cpVjPCnFcZzYKapPLUZGBg3Uo3BVglrXnV9b0Q0cU1eY3OlFhtMsRTCFr
-Sq8RF7BKMD/gWAGXhrWNHN8omuMUIq54kUxIgMjnbWofFogf/OA=
-=Yxls
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnAzVoACgkQbDjKyiDZ
+s5JyMQ//ZgPXghj7QqndY8xv/axtRwJHv7aXoAIae+zYqYgjaj+0MKmLSngOxTCG
+h6JiIF8hQzSBa9IYSUmuqP+C6wilPxRgi3Vw2yySHZLjRkppZ+jI6qXrzXHYZPvC
+YV2keqoiylrZdbJeTUn9yD40sjTuAnT/R/boVOSF0XsQXXWc1vcg5wHglFWPbQM/
+/yR7bdS5IBQYGAOPDQIX+v677iO5iDG/cMnQFYsroBjYzVgFuMVc0FIEhnJQjF6E
+xpD23DURcE/3wMoTfNUSb1Ihqnv3iTx+wNQSQ71WIICYX2bMj2gMR6jOKkJpqw7F
+jl85baUpm7GrDomfrQcmjyEMtgS0OqdK7gzKpC2wsS9nfMQTAt52Nbl+CGyPdpoa
+k+Lrl2VD5lgwDI+BGSa6IEYOSnxUgnPMvllrzhsDedTaKOoq1u3cvLxRSLHymT0d
+ETqlC172d0nVwNNL24H7wyj8hmZmOn2liNivGflpRwltaI6WK1AVrZQd2q0JGaN3
+QJLHJUPIQ39JhJohB2IN0bu6/EyuNlC7aUKJ/hfnvs8tZqvTf4Rtq155d1q6AKAa
+7/PRy+t/8+f4b0Cv87qvymuMTnnlB5SvZoBV0suZ9Q2e4H36fFG7NfpCBfCjnBnZ
+4u6e239BXBtTX224K1/mYYKqPBanQRHcSTqndOWqc2h/3dfugGI=
+=dDOI
 -----END PGP SIGNATURE-----
 
---n83H03bbH672hrlY--
+--6eUvXotnMb6+obQB--
