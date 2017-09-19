@@ -1,31 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44616)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1duHxU-00038v-I5
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:49:07 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1duHzB-0004a1-0i
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:50:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1duHxR-00023P-Bb
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:49:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53428)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1duHxR-00022V-3Y
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:48:57 -0400
-References: <1490347615-19222-1-git-send-email-thuth@redhat.com>
-	<f3b0b14e-4ea1-6c4e-f9c6-cb86e78c6104@de.ibm.com>
-	<c2195ec9-a3d7-eb14-c204-d5c0e6239811@redhat.com>
-	<129fdced-8f83-e408-b37a-26c6ba8bb48f@de.ibm.com>
-	<169bbaaf-3212-ce1d-a0db-6edede5b481d@redhat.com>
-	<004effcd-142f-d667-3f14-c77c211cd219@de.ibm.com>
-	<6f711dfd-84bc-8683-3655-b836bb5d0a51@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <09c14d39-8867-0a19-aeeb-f8edcd0df66e@redhat.com>
-Date: Tue, 19 Sep 2017 14:48:50 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1duHz9-0003RR-Oc
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:50:44 -0400
+References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
+	<20170918135935.255591-4-vsementsov@virtuozzo.com>
+	<d554b537-54da-2a70-66c7-722f2c27f4da@redhat.com>
+	<577e29c4-5187-8c6f-aacc-c77282959fdd@virtuozzo.com>
+	<26582eb0-1db3-3aac-3652-44e3fbb1e49c@redhat.com>
+	<5fff43cf-717d-2d64-f51d-57f116888921@virtuozzo.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <11ccb9c4-aecb-e82f-a520-50710dae8ea1@redhat.com>
+Date: Tue, 19 Sep 2017 14:50:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <6f711dfd-84bc-8683-3655-b836bb5d0a51@redhat.com>
+In-Reply-To: <5fff43cf-717d-2d64-f51d-57f116888921@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] target/s390x/kvm: Fix problem when running
- with SELinux under z/VM
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/7] block/nbd-client: refactor reading
+ reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,86 +29,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, eblake@redhat.com, den@openvz.org
 
-On 19.09.2017 14:38, David Hildenbrand wrote:
-> On 18.09.2017 09:43, Christian Borntraeger wrote:
->>
->>
->> On 09/15/2017 04:36 PM, Thomas Huth wrote:
->>> On 29.03.2017 16:25, Christian Borntraeger wrote:
->>>> On 03/29/2017 04:21 PM, Thomas Huth wrote:
->>>>> On 24.03.2017 10:39, Christian Borntraeger wrote:
->>>>>> On 03/24/2017 10:26 AM, Thomas Huth wrote:
->>>>>>> When running QEMU with KVM under z/VM, the memory for the guest
->>>>>>> is allocated via legacy_s390_alloc() since the KVM_CAP_S390_COW
->>>>>>> extension is not supported on z/VM. legacy_s390_alloc() then uses
->>>>>>> mmap(... PROT_EXEC ...) for the guest memory - but this does not
->>>>>>> work when running with SELinux enabled, mmap() fails and QEMU abo=
-rts
->>>>>>> with the following error message:
->>>>>>>
->>>>>>>  cannot set up guest memory 's390.ram': Permission denied
->>>>>>>
->>>>>>> Looking at the other allocator function qemu_anon_ram_alloc(), it
->>>>>>> seems like PROT_EXEC is normally not needed for allocating the
->>>>>>> guest RAM, and indeed, the guest also starts successfully under
->>>>>>> z/VM when we remove the PROT_EXEC from the legacy_s390_alloc()
->>>>>>> function. So let's get rid of that flag here to be able to run
->>>>>>> with SELinux under z/VM, too.
->>>>>>
->>>>>> Older z/VM versions do not provide the enhanced suppression on pro=
-tection
->>>>>> facility, which would result in guest failures as soon as the kern=
-el
->>>>>> starts dirty pages tracking by write protecting the pages via the =
-page
->>>>>> table. Some kernel release back (last time I checked) the PROT_EXE=
-C was=20
->>>>>> necessary to prevent the dirty pages tracking from taking place. S=
-o this
->>>>>> patch would break KVM in that case.
->>>>>>
->>>>>> Newer z/VMs (e.g. 6.3) do provide ESOP. SO the question is,
->>>>>> why is KVM_CAP_S390_COW not set?
->>>>>
->>>>> I now had another look at this, and seems like the ESOP bit is inde=
-ed
->>>>> not set in S390_lowcore.machine_flags here. According to /proc/sysi=
-nfo,
->>>>> z/VM is version 6.1.0 here, so I guess that's just too old for ESOP=
-?
->>>>
->>>> Yes, this was introduced with z/VM 6.3
+On 19/09/2017 13:03, Vladimir Sementsov-Ogievskiy wrote:
 >>>
->>> FWIW, the last version without ESOP, z/VM 6.2, is now end of life,
->>> according to: http://www.vm.ibm.com/techinfo/lpmigr/vmleos.html
->>> ... so I guess we could remove the legacy_s390_alloc() function now?
->>
->>
->> I recently learned that you can buy some extended z/VM support not sur=
-e how
->> long this will be available. In addition, ESOP was added with z10, so
->> if we still care about z9 and older then this would break things on
->> very very old boxes.
->=20
-> I wonder if that is really relevant anymore.
->=20
-> Existing user on such machines (I doubt there are many) can simply stic=
-k
-> to QEMU <=3D 2.10. Or do we actually expect people with such old
-> environments to use latest and grates QEMU versions?
->=20
-> We could add an error message an error out.
+>> I disagree that it is easier to extend it in the future.  If some
+>> commands in the future need a different "how do we read it" (e.g. for
+>> structured reply), nbd_read_reply_entry may not have all the information
+>> it needs anymore.
+> 
+> how is it possible? all information is in requests[i].
 
-Well, as long as the code does not cause any trouble for us, and as long
-as there still might be possible users, there is also no real urge to
-remove it, is there? I originally thought that all affected systems
-would now be EOL, but as Christian pointed out, the z9 BC is not EOL
-yet, so I'd say we should at least wait for that point in time before
-removing it (I haven't found any public information about extended z/VM
-support though, so no clue whether we should really take that into accoun=
-t).
+If you are okay with violating information hiding, then it is.
 
- Thomas
+>>
+>> In fact, you're pushing knowledge of the commands from nbd_co_request to
+>> nbd_read_reply_entry:
+>>
+>> +        if (s->reply.error == 0 &&
+>> +            s->requests[i].request->type == NBD_CMD_READ)
+>>
+>> and knowledge of NBD_CMD_READ simply doesn't belong there.  So there is
+>> an example of that right now, it is not some arbitrary bad thing that
+>> could happen in the future.
+> 
+> I can't agree that my point of view is wrong, it's just different.
+> You want commands, reading from socket, each knows what it should read.
+> I want the receiver - one sequential reader, that can read all kinds of
+> replies and just wake requesting coroutines when all reading is done.
+> For me it looks simpler than switching.
+
+It may look simpler, but I think it goes against the principle of
+coroutines which is to have related code in the same function.  Here you
+have the command function that takes care of sending the request payload
+but not receiving the reply payload (except that for commands that
+aren't as simple as read or write, it will have to _process_ the reply
+payload).  What to do with the reply payload is in another function that
+has to peek at the command in order to find out what to do.  It doesn't
+seem like a better design, honestly.
+
+Paolo
