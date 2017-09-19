@@ -1,13 +1,13 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46281)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1duHzX-0004tV-HX
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:51:14 -0400
+	(envelope-from <berrange@redhat.com>) id 1duI1a-0006gt-Qe
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:53:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1duHzR-0003f1-MW
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:51:07 -0400
-Date: Tue, 19 Sep 2017 13:50:51 +0100
+	(envelope-from <berrange@redhat.com>) id 1duI1Z-0004xj-Ng
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:53:14 -0400
+Date: Tue, 19 Sep 2017 13:53:00 +0100
 From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170919125051.GK9536@redhat.com>
+Message-ID: <20170919125300.GL9536@redhat.com>
 Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
 References: <20170919102434.21147-1-pbonzini@redhat.com>
 	<20170919102434.21147-5-pbonzini@redhat.com>
@@ -41,42 +41,64 @@ On Tue, Sep 19, 2017 at 12:24:34PM +0200, Paolo Bonzini wrote:
 >  scsi/pr-manager-helper.c | 302 +++++++++++++++++++++++++++++++++++++++++++++++
 >  2 files changed, 303 insertions(+), 1 deletion(-)
 >  create mode 100644 scsi/pr-manager-helper.c
-> 
-> diff --git a/scsi/Makefile.objs b/scsi/Makefile.objs
-> index 5496d2ae6a..4d25e476cf 100644
-> --- a/scsi/Makefile.objs
-> +++ b/scsi/Makefile.objs
-> @@ -1,3 +1,3 @@
->  block-obj-y += utils.o
->  
-> -block-obj-$(CONFIG_LINUX) += pr-manager.o
-> +block-obj-$(CONFIG_LINUX) += pr-manager.o pr-manager-helper.o
-> diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
-> new file mode 100644
-> index 0000000000..063fd35dee
-> --- /dev/null
-> +++ b/scsi/pr-manager-helper.c
 
-> +/* Called with lock held.  */
-> +static int pr_manager_helper_read(PRManagerHelper *pr_mgr,
-> +                                  void *buf, int sz, Error **errp)
+
+> +static int pr_manager_helper_run(PRManager *p,
+> +                                 int fd, struct sg_io_hdr *io_hdr)
 > +{
-> +    ssize_t r = qio_channel_read_all(pr_mgr->ioc, buf, sz, errp);
-
-The return value isn't ssize_t - it just returns 0 on success, -1 on
-error, never a bytes count since it always reads all requested bytes
-and treats EOF as an error condition.
-
+> +    PRManagerHelper *pr_mgr = PR_MANAGER_HELPER(p);
 > +
-> +    if (r < 0) {
-> +        object_unref(OBJECT(pr_mgr->ioc));
-> +        pr_mgr->ioc = NULL;
+> +    uint32_t len;
+> +    PRHelperResponse resp;
+> +    int ret;
+> +    int expected_dir;
+> +    int attempts;
+> +    uint8_t cdb[PR_HELPER_CDB_SIZE] = { 0 };
+> +
+> +    if (!io_hdr->cmd_len || io_hdr->cmd_len > PR_HELPER_CDB_SIZE) {
 > +        return -EINVAL;
 > +    }
 > +
-> +    return 0;
-> +}
+> +    memcpy(cdb, io_hdr->cmdp, io_hdr->cmd_len);
+> +    assert(cdb[0] == PERSISTENT_RESERVE_OUT || cdb[0] == PERSISTENT_RESERVE_IN);
+> +    expected_dir =
+> +        (cdb[0] == PERSISTENT_RESERVE_OUT ? SG_DXFER_TO_DEV : SG_DXFER_FROM_DEV);
+> +    if (io_hdr->dxfer_direction != expected_dir) {
+> +        return -EINVAL;
+> +    }
 > +
+> +    len = scsi_cdb_xfer(cdb);
+> +    if (io_hdr->dxfer_len < len || len > PR_HELPER_DATA_SIZE) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    qemu_mutex_lock(&pr_mgr->lock);
+> +
+> +    /* Try to reconnect while sending the CDB.  */
+> +    for (attempts = 0; attempts < PR_MAX_RECONNECT_ATTEMPTS; attempts++) {
+
+I'm curious why you need to loop here. The helper daemon should be running
+already, as you're not spawning it on demand IIUC. So it shoudl either
+succeed first time, or fail every time.
+
+> +        if (!pr_mgr->ioc) {
+> +            ret = pr_manager_helper_initialize(pr_mgr, NULL);
+> +            if (ret < 0) {
+> +                qemu_mutex_unlock(&pr_mgr->lock);
+> +                g_usleep(G_USEC_PER_SEC);
+> +                qemu_mutex_lock(&pr_mgr->lock);
+> +                continue;
+> +            }
+> +        }
+> +
+> +        ret = pr_manager_helper_write(pr_mgr, fd, cdb, ARRAY_SIZE(cdb), NULL);
+> +        if (ret >= 0) {
+> +            break;
+> +        }
+> +    }
+> +    if (ret < 0) {
+> +        goto out;
+> +    }
 
 Regards,
 Daniel
