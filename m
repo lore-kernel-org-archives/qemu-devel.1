@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45908)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47376)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1duL7D-0004tk-RL
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:11:16 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1duL94-0005fe-Oy
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:13:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1duL7C-0004iB-Qw
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:11:15 -0400
-Received: from mail-wm0-x233.google.com ([2a00:1450:400c:c09::233]:45716)
+	(envelope-from <richard.henderson@linaro.org>) id 1duL90-0006Gq-UM
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:13:10 -0400
+Received: from mail-io0-x230.google.com ([2607:f8b0:4001:c06::230]:53524)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1duL7C-0004gi-Ib
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:11:14 -0400
-Received: by mail-wm0-x233.google.com with SMTP id g206so299985wme.0
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 09:11:14 -0700 (PDT)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1duL90-0006GJ-R0
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:13:06 -0400
+Received: by mail-io0-x230.google.com with SMTP id q11so221345ioe.10
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 09:13:06 -0700 (PDT)
+References: <20170914183516.19537-1-richard.henderson@linaro.org>
+	<53de205c-7c24-426c-129a-7cce7ca67210@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <0a265b7a-c84f-fefc-41e6-0276dfc131b8@linaro.org>
+Date: Tue, 19 Sep 2017 11:13:01 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170919142758.13577-1-pbonzini@redhat.com>
-References: <20170919142758.13577-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Sep 2017 17:10:52 +0100
-Message-ID: <CAFEAcA_G_XJ-FcD8VVVHj=QQAmmyM9OsaQORxLuZN0U80pwu9w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v3 00/51] Misc patches for 2017-09-19
+In-Reply-To: <53de205c-7c24-426c-129a-7cce7ca67210@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH 00/10] Support the Capstone disassembler
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,39 +31,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, qemu-arm@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On 19 September 2017 at 15:27, Paolo Bonzini <pbonzini@redhat.com> wrote:
-> The following changes since commit 11e06ce1ed28fd0ffcbc1e2436b72f3412b4ecc8:
->
->   Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' into staging (2017-09-19 10:13:51 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 7437866bfc3b25663f415a8c660fd78360e84598:
->
->   docker: fix creation of archives (2017-09-19 16:20:49 +0200)
->
-> ----------------------------------------------------------------
-> * warning improvements (Alistair)
-> * KVM code cleanup (David)
-> * scsi-block support for rerror/werror (Fam)
-> * support for >64 vCPUs in Windows (Gonglei)
-> * SCSI fix (Hannes)
-> * SSE bugfixes (Joseph)
-> * SmartOS compilation fixes (Kamil)
-> * Hyper-V frequency MSR support (Ladi)
-> * move more files to accel/tcg (Philippe, Thomas)
-> * multiboot validation (PJP)
-> * virtqueue size configuration for virtio-scsi (Richard)
-> * Hyper-V header cleanup (Roman)
-> * Maintainer email update (Guangrong)
-> * checkpatch.pl --branch (Daniel), fixes (Greg)
-> * introducing scsi/ (me)
+[ Just saw this, so missed adding tags to the v2 patch set. ]
 
-Applied, thanks.
+On 09/14/2017 11:53 PM, Philippe Mathieu-Daudé wrote:
+> At least this msg disappeared:
+> 
+> "Disassembler disagrees with translator over instruction decoding"
 
--- PMM
+It's back in v2.
+
+> For i386, arm, mips32/64:
+> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+Which patches?  Which mips versions?
+
+Can you, by any chance, test micro-mips?  I'm certain I've got that wrong in
+the v1 patch, and thus I dropped the mips patch from v2.  But in theory
+capstone supports umips too and should be trivially fixable.
+
+
+r~
