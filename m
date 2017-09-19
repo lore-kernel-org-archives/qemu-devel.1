@@ -1,21 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44408)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44448)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duJxT-0002Ca-S2
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:57:11 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duJxW-0002FK-OZ
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:57:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duJxO-0007Vj-1p
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:57:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:3715)
+	(envelope-from <cohuck@redhat.com>) id 1duJxR-0007ZN-7V
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:57:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36973)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duJxN-0007Uh-T6
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:57:02 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duJxR-0007Yn-1W
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:57:05 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 19 Sep 2017 16:56:02 +0200
-Message-Id: <20170919145636.9389-5-cohuck@redhat.com>
+Date: Tue, 19 Sep 2017 16:56:03 +0200
+Message-Id: <20170919145636.9389-6-cohuck@redhat.com>
 In-Reply-To: <20170919145636.9389-1-cohuck@redhat.com>
 References: <20170919145636.9389-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL 04/38] s390x/pci: fixup ind_offset of msix
- routing entry
+Subject: [Qemu-devel] [PULL 05/38] s390x/pci: add iommu replay callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,39 +28,49 @@ Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, bor
 
 From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
 
-The guest uses the mpcifc instruction to register the aibvo of a zpci
-device, which is the starting offset of indicators in the indicator
-area and thus remains constant. Each msix vector is an offset from the
-aibvo. When we map a msix route to an adapter route, we should not
-modify the starting offset, but instead add the vector to the starting
-offset to get the absolute offset in the specific route.
+Let's introduce iommu replay callback for s390 pci iommu memory region.
+Currently we don't need any dma mapping replay. So let it return
+directly. This implementation will avoid meaningless loops calling
+translation callback.
 
+Reviewed-by: Pierre Morel <pmorel@linux.vnet.ibm.com>
+Reviewed-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 Signed-off-by: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Message-Id: <1504606380-49341-3-git-send-email-zyimin@linux.vnet.ibm.com>
+Message-Id: <1504606380-49341-4-git-send-email-zyimin@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/kvm.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ hw/s390x/s390-pci-bus.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index 7478edeb70..cd2204baef 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -2436,14 +2436,12 @@ int kvm_arch_fixup_msi_route(struct kvm_irq_routing_entry *route,
-         return -ENODEV;
-     }
- 
--    pbdev->routes.adapter.ind_offset = vec;
--
-     route->type = KVM_IRQ_ROUTING_S390_ADAPTER;
-     route->flags = 0;
-     route->u.adapter.summary_addr = pbdev->routes.adapter.summary_addr;
-     route->u.adapter.ind_addr = pbdev->routes.adapter.ind_addr;
-     route->u.adapter.summary_offset = pbdev->routes.adapter.summary_offset;
--    route->u.adapter.ind_offset = pbdev->routes.adapter.ind_offset;
-+    route->u.adapter.ind_offset = pbdev->routes.adapter.ind_offset + vec;
-     route->u.adapter.adapter_id = pbdev->routes.adapter.adapter_id;
-     return 0;
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index bd8a3e1e1c..3b9965fde0 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -397,6 +397,17 @@ static IOMMUTLBEntry s390_translate_iommu(IOMMUMemoryRegion *mr, hwaddr addr,
+     return ret;
  }
+ 
++static void s390_pci_iommu_replay(IOMMUMemoryRegion *iommu,
++                                  IOMMUNotifier *notifier)
++{
++    /* It's impossible to plug a pci device on s390x that already has iommu
++     * mappings which need to be replayed, that is due to the "one iommu per
++     * zpci device" construct. But when we support migration of vfio-pci
++     * devices in future, we need to revisit this.
++     */
++    return;
++}
++
+ static S390PCIIOMMU *s390_pci_get_iommu(S390pciState *s, PCIBus *bus,
+                                         int devfn)
+ {
+@@ -1045,6 +1056,7 @@ static void s390_iommu_memory_region_class_init(ObjectClass *klass, void *data)
+     IOMMUMemoryRegionClass *imrc = IOMMU_MEMORY_REGION_CLASS(klass);
+ 
+     imrc->translate = s390_translate_iommu;
++    imrc->replay = s390_pci_iommu_replay;
+ }
+ 
+ static const TypeInfo s390_iommu_memory_region_info = {
 -- 
 2.13.5
