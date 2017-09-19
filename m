@@ -1,34 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46281)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1duHzP-0004kn-RX
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:51:01 -0400
+	(envelope-from <berrange@redhat.com>) id 1duHzX-0004tV-HX
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:51:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bounces@canonical.com>) id 1duHzL-0003a5-2s
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:50:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56174)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <bounces@canonical.com>)
-	id 1duHzK-0003Z2-GP
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:50:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
-	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
-	id 1duHzH-0002JW-Md
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 12:50:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
-	by loganberry.canonical.com (Postfix) with ESMTP id 64E0F2E84B3
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 12:50:50 +0000 (UTC)
+	(envelope-from <berrange@redhat.com>) id 1duHzR-0003f1-MW
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:51:07 -0400
+Date: Tue, 19 Sep 2017 13:50:51 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170919125051.GK9536@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <20170919102434.21147-1-pbonzini@redhat.com>
+	<20170919102434.21147-5-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 19 Sep 2017 12:38:42 -0000
-From: "Laszlo Ersek \(Red Hat\)" <lersek@redhat.com>
-Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
-Sender: bounces@canonical.com
-References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
-Message-Id: <150582472271.13480.11438661349776005282.malone@gac.canonical.com>
-Errors-To: bounces@canonical.com
-Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
- 2.10 (works on 2.9)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170919102434.21147-5-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 4/4] scsi: add persistent reservation
+ manager using qemu-pr-helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,55 +25,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-Indeed the CSM platform support had the same error one and half years
-ago, see:
+On Tue, Sep 19, 2017 at 12:24:34PM +0200, Paolo Bonzini wrote:
+> This adds a concrete subclass of pr-manager that talks to qemu-pr-helper.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+> v1->v2: fixed string property double-free
+>         fixed/cleaned up error handling
+>         handle buffer underrun
+> 
+>  scsi/Makefile.objs       |   2 +-
+>  scsi/pr-manager-helper.c | 302 +++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 303 insertions(+), 1 deletion(-)
+>  create mode 100644 scsi/pr-manager-helper.c
+> 
+> diff --git a/scsi/Makefile.objs b/scsi/Makefile.objs
+> index 5496d2ae6a..4d25e476cf 100644
+> --- a/scsi/Makefile.objs
+> +++ b/scsi/Makefile.objs
+> @@ -1,3 +1,3 @@
+>  block-obj-y += utils.o
+>  
+> -block-obj-$(CONFIG_LINUX) += pr-manager.o
+> +block-obj-$(CONFIG_LINUX) += pr-manager.o pr-manager-helper.o
+> diff --git a/scsi/pr-manager-helper.c b/scsi/pr-manager-helper.c
+> new file mode 100644
+> index 0000000000..063fd35dee
+> --- /dev/null
+> +++ b/scsi/pr-manager-helper.c
 
-https://github.com/tianocore/edk2/commit/db27e9f3d8f0
+> +/* Called with lock held.  */
+> +static int pr_manager_helper_read(PRManagerHelper *pr_mgr,
+> +                                  void *buf, int sz, Error **errp)
+> +{
+> +    ssize_t r = qio_channel_read_all(pr_mgr->ioc, buf, sz, errp);
 
-Thank you, Gerd, for the hint!
+The return value isn't ssize_t - it just returns 0 on success, -1 on
+error, never a bytes count since it always reads all requested bytes
+and treats EOF as an error condition.
 
--- =
+> +
+> +    if (r < 0) {
+> +        object_unref(OBJECT(pr_mgr->ioc));
+> +        pr_mgr->ioc = NULL;
+> +        return -EINVAL;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715700
-
-Title:
-  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
-
-Status in QEMU:
-  New
-
-Bug description:
-  Qemu version: 2.10 stable.
-  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
-st.
-  Command line:
-  qemu-system-x86_64 \
-      -nodefaults \
-      -nodefconfig \
-      -machine type=3Dq35,accel=3Dkvm \
-      -enable-kvm \
-      -cpu host \
-      -m 2048 \
-      -vga virtio \
-      -boot menu=3Don \
-      -smbios file=3D/path/dmidecode_BIOS.bin \
-      -acpitable file=3D/path/acpi_slic.bin \
-      -bios /path/OVMF_CODE.fd \
-      -net none \
-      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
-      -device pcie-root-port \
-      -device ich9-usb-ehci1 \
-      -device ich9-usb-uhci1 \
-      -device ich9-usb-uhci2 \
-      -device ich9-usb-uhci3
-
-  Windows hangs at boot with waving flag screen (flag doesn't freeze,
-  keeps waving indefinitely). Same command line boots fine with Qemu
-  2.9. I tried changing machine type to pc-q35-2.9 - same result.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
