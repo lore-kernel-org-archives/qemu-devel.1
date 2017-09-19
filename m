@@ -1,30 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38005)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40172)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1duHny-0003AA-2u
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:39:11 -0400
+	(envelope-from <clg@kaod.org>) id 1duHr6-0005vT-DM
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:42:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1duHnu-0003Ge-Tq
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:39:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53864)
+	(envelope-from <clg@kaod.org>) id 1duHr0-0005Wp-M1
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:42:24 -0400
+Received: from 19.mo3.mail-out.ovh.net ([178.32.98.231]:35687)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1duHnu-0003Ev-LY
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:39:06 -0400
-References: <1490347615-19222-1-git-send-email-thuth@redhat.com>
-	<f3b0b14e-4ea1-6c4e-f9c6-cb86e78c6104@de.ibm.com>
-	<c2195ec9-a3d7-eb14-c204-d5c0e6239811@redhat.com>
-	<129fdced-8f83-e408-b37a-26c6ba8bb48f@de.ibm.com>
-	<169bbaaf-3212-ce1d-a0db-6edede5b481d@redhat.com>
-	<004effcd-142f-d667-3f14-c77c211cd219@de.ibm.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <6f711dfd-84bc-8683-3655-b836bb5d0a51@redhat.com>
-Date: Tue, 19 Sep 2017 14:38:59 +0200
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duHr0-0005Vu-FU
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:42:18 -0400
+Received: from player797.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo3.mail-out.ovh.net (Postfix) with ESMTP id E844A1595E1
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 14:42:16 +0200 (CEST)
+References: <20170919112645.8574-1-clg@kaod.org>
+	<20170919112645.8574-4-clg@kaod.org>
+	<472ff629-39bd-9fe2-c1f8-a08ba6997b53@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <f510d607-b328-90e6-3727-c6f554864e2f@kaod.org>
+Date: Tue, 19 Sep 2017 14:42:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <004effcd-142f-d667-3f14-c77c211cd219@de.ibm.com>
+In-Reply-To: <472ff629-39bd-9fe2-c1f8-a08ba6997b53@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] target/s390x/kvm: Fix problem when running
- with SELinux under z/VM
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 3/5] aspeed: Add EEPROM I2C devices
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,74 +32,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-Cc: Cornelia Huck <cohuck@redhat.com>
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, Joel Stanley <joel@jms.id.au>
 
-On 18.09.2017 09:43, Christian Borntraeger wrote:
-> 
-> 
-> On 09/15/2017 04:36 PM, Thomas Huth wrote:
->> On 29.03.2017 16:25, Christian Borntraeger wrote:
->>> On 03/29/2017 04:21 PM, Thomas Huth wrote:
->>>> On 24.03.2017 10:39, Christian Borntraeger wrote:
->>>>> On 03/24/2017 10:26 AM, Thomas Huth wrote:
->>>>>> When running QEMU with KVM under z/VM, the memory for the guest
->>>>>> is allocated via legacy_s390_alloc() since the KVM_CAP_S390_COW
->>>>>> extension is not supported on z/VM. legacy_s390_alloc() then uses
->>>>>> mmap(... PROT_EXEC ...) for the guest memory - but this does not
->>>>>> work when running with SELinux enabled, mmap() fails and QEMU aborts
->>>>>> with the following error message:
->>>>>>
->>>>>>  cannot set up guest memory 's390.ram': Permission denied
->>>>>>
->>>>>> Looking at the other allocator function qemu_anon_ram_alloc(), it
->>>>>> seems like PROT_EXEC is normally not needed for allocating the
->>>>>> guest RAM, and indeed, the guest also starts successfully under
->>>>>> z/VM when we remove the PROT_EXEC from the legacy_s390_alloc()
->>>>>> function. So let's get rid of that flag here to be able to run
->>>>>> with SELinux under z/VM, too.
->>>>>
->>>>> Older z/VM versions do not provide the enhanced suppression on protection
->>>>> facility, which would result in guest failures as soon as the kernel
->>>>> starts dirty pages tracking by write protecting the pages via the page
->>>>> table. Some kernel release back (last time I checked) the PROT_EXEC was 
->>>>> necessary to prevent the dirty pages tracking from taking place. So this
->>>>> patch would break KVM in that case.
->>>>>
->>>>> Newer z/VMs (e.g. 6.3) do provide ESOP. SO the question is,
->>>>> why is KVM_CAP_S390_COW not set?
->>>>
->>>> I now had another look at this, and seems like the ESOP bit is indeed
->>>> not set in S390_lowcore.machine_flags here. According to /proc/sysinfo,
->>>> z/VM is version 6.1.0 here, so I guess that's just too old for ESOP?
->>>
->>> Yes, this was introduced with z/VM 6.3
+On 09/19/2017 02:12 PM, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi C=C3=A9dric,
+>=20
+> On 09/19/2017 08:26 AM, C=C3=A9dric Le Goater wrote:
+>> The Aspeed boards have at least one EEPROM to hold the Vital Product
+>> Data (VPD).
 >>
->> FWIW, the last version without ESOP, z/VM 6.2, is now end of life,
->> according to: http://www.vm.ibm.com/techinfo/lpmigr/vmleos.html
->> ... so I guess we could remove the legacy_s390_alloc() function now?
-> 
-> 
-> I recently learned that you can buy some extended z/VM support not sure how
-> long this will be available. In addition, ESOP was added with z10, so
-> if we still care about z9 and older then this would break things on
-> very very old boxes.
+>> Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+>> ---
+>> =C2=A0 hw/arm/aspeed.c | 20 ++++++++++++++++++++
+>> =C2=A0 1 file changed, 20 insertions(+)
+>>
+>> diff --git a/hw/arm/aspeed.c b/hw/arm/aspeed.c
+>> index 362b683e9021..3e74970d7ad2 100644
+>> --- a/hw/arm/aspeed.c
+>> +++ b/hw/arm/aspeed.c
+>> @@ -251,6 +251,17 @@ static void aspeed_board_init(MachineState *machi=
+ne,
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 arm_load_kernel(ARM_CPU(first_cpu), &as=
+peed_board_binfo);
+>> =C2=A0 }
+>> =C2=A0 +static void aspeed_i2c_add_eeprom(I2CBus *bus, uint8_t address=
+, size_t size)
+>> +{
+>> +=C2=A0=C2=A0=C2=A0 uint8_t *eeprom_buf =3D g_malloc0(size);
+>> +=C2=A0=C2=A0=C2=A0 DeviceState *dev;
+>> +
+>> +=C2=A0=C2=A0=C2=A0 dev =3D qdev_create((BusState *) bus, "smbus-eepro=
+m");
+>> +=C2=A0=C2=A0=C2=A0 qdev_prop_set_uint8(dev, "address", address);
+>> +=C2=A0=C2=A0=C2=A0 qdev_prop_set_ptr(dev, "data", eeprom_buf);
+>> +=C2=A0=C2=A0=C2=A0 qdev_init_nofail(dev);
+>=20
+> Can you merge this with smbus_eeprom_init() ?
+> I think the cleaner way would be add "include/hw/i2c/eeprom.h" defining=
+ SMB_EEPROM_TYPE "smbus-eeprom" and declare smbus_eeprom_init() there or =
+as inlined.
 
-I wonder if that is really relevant anymore.
+yes. That would remove some duplicated code.
 
-Existing user on such machines (I doubt there are many) can simply stick
-to QEMU <= 2.10. Or do we actually expect people with such old
-environments to use latest and grates QEMU versions?
-
-We could add an error message an error out.
-
-> 
-> The pain/risk-to-break ratio seems to suggest to keep this "hack"
-> for a while.
-
-
--- 
+I will wait for some feedback before doing a resend or a followup.
 
 Thanks,
 
-David
+C.
+
+
+>=20
+>> +}
+>> +
+>> =C2=A0 static void palmetto_bmc_i2c_init(AspeedBoardState *bmc)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 AspeedSoCState *soc =3D &bmc->soc;
+>> @@ -260,6 +271,9 @@ static void palmetto_bmc_i2c_init(AspeedBoardState=
+ *bmc)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * enough to provide basic RTC fea=
+tures. Alarms will be missing */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i2c_create_slave(aspeed_i2c_get_bus(DEV=
+ICE(&soc->i2c), 0), "ds1338", 0x68);
+>> =C2=A0 +=C2=A0=C2=A0=C2=A0 aspeed_i2c_add_eeprom(aspeed_i2c_get_bus(DE=
+VICE(&soc->i2c), 0), 0x50,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 256 * 1024);
+>> +
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* add a TMP423 temperature sensor */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 dev =3D i2c_create_slave(aspeed_i2c_get=
+_bus(DEVICE(&soc->i2c), 2),
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 "tmp423", 0x4c);
+>> @@ -298,6 +312,9 @@ static void ast2500_evb_i2c_init(AspeedBoardState =
+*bmc)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 AspeedSoCState *soc =3D &bmc->soc;
+>> =C2=A0 +=C2=A0=C2=A0=C2=A0 aspeed_i2c_add_eeprom(aspeed_i2c_get_bus(DE=
+VICE(&soc->i2c), 3), 0x50,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 8 * 1024);
+>> +
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* The AST2500 EVB expects a LM75 but a=
+ TMP105 is compatible */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i2c_create_slave(aspeed_i2c_get_bus(DEV=
+ICE(&soc->i2c), 7), "tmp105", 0x4d);
+>> =C2=A0 @@ -377,6 +394,9 @@ static void witherspoon_bmc_i2c_init(Aspeed=
+BoardState *bmc)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* The witherspoon board expects Epson =
+RX8900 I2C RTC but a ds1338 is
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * good enough */
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i2c_create_slave(aspeed_i2c_get_bus(DEV=
+ICE(&soc->i2c), 11), "ds1338", 0x32);
+>> +
+>> +=C2=A0=C2=A0=C2=A0 aspeed_i2c_add_eeprom(aspeed_i2c_get_bus(DEVICE(&s=
+oc->i2c), 11), 0x51,
+>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 8 * 1024);
+>> =C2=A0 }
+>> =C2=A0 =C2=A0 static void witherspoon_bmc_init(MachineState *machine)
+>>
