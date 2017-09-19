@@ -1,28 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54900)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55456)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duIp7-0006JP-8c
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:44:26 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1duIpi-0006q0-1S
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:45:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duIp4-0002e6-GF
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:44:25 -0400
-Received: from mail-wr0-f180.google.com ([209.85.128.180]:47525)
+	(envelope-from <pbonzini@redhat.com>) id 1duIpf-00032r-A9
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:45:02 -0400
+Received: from mail-wr0-f179.google.com ([209.85.128.179]:56215)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1duIp4-0002dX-6y
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:44:22 -0400
-Received: by mail-wr0-f180.google.com with SMTP id k20so41736wre.4
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 06:44:22 -0700 (PDT)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1duIpf-00031P-1k
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:44:59 -0400
+Received: by mail-wr0-f179.google.com with SMTP id l39so24634wrl.12
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 06:44:58 -0700 (PDT)
 References: <20170823162004.27337-1-marcandre.lureau@redhat.com>
-	<20170823162004.27337-9-marcandre.lureau@redhat.com>
+	<20170823162004.27337-11-marcandre.lureau@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e01cf9f0-4d16-9a5c-04db-b85a166e55b4@redhat.com>
-Date: Tue, 19 Sep 2017 15:44:19 +0200
+Message-ID: <98eb7b7d-08a4-9cc8-d9fc-2849d4718932@redhat.com>
+Date: Tue, 19 Sep 2017 15:44:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170823162004.27337-9-marcandre.lureau@redhat.com>
+In-Reply-To: <20170823162004.27337-11-marcandre.lureau@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 08/27] vhost-user-scsi: glib calls that
- allocate don't return NULL
+Subject: Re: [Qemu-devel] [PATCH 10/27] vhost-user-scsi: remove
+ vdev_scsi_find_by_vu()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,141 +35,126 @@ To: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>, qemu-devel
 Cc: changpeng.liu@intel.com, felipe@nutanix.com
 
 On 23/08/2017 18:19, Marc-André Lureau wrote:
-> They abort instead, so get rid of failure conditions.
+> The *dev pointer belongs to the vhost_scsi_dev_t parent.
 > 
 > Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 > ---
->  contrib/vhost-user-scsi/vhost-user-scsi.c | 52 +++++--------------------------
->  1 file changed, 7 insertions(+), 45 deletions(-)
+>  contrib/vhost-user-scsi/vhost-user-scsi.c | 47 +++----------------------------
+>  1 file changed, 4 insertions(+), 43 deletions(-)
 > 
 > diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-user-scsi/vhost-user-scsi.c
-> index f3fc8c23c6..5f8ff9d9e5 100644
+> index d0456a5e7c..bb10848cd2 100644
 > --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
 > +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-> @@ -139,8 +139,8 @@ static GSourceFuncs vus_gsrc_funcs = {
->      NULL
->  };
+> @@ -55,8 +55,6 @@
 >  
-> -static int vus_gsrc_new(vhost_scsi_dev_t *vdev_scsi, int fd, GIOCondition cond,
-> -                        vu_watch_cb vu_cb, GSourceFunc gsrc_cb, gpointer data)
-> +static void vus_gsrc_new(vhost_scsi_dev_t *vdev_scsi, int fd, GIOCondition cond,
-> +                         vu_watch_cb vu_cb, GSourceFunc gsrc_cb, gpointer data)
->  {
->      GSource *vus_gsrc;
->      vus_gsrc_t *vus_src;
-> @@ -152,10 +152,6 @@ static int vus_gsrc_new(vhost_scsi_dev_t *vdev_scsi, int fd, GIOCondition cond,
->      assert(!(vu_cb && gsrc_cb));
->  
->      vus_gsrc = g_source_new(&vus_gsrc_funcs, sizeof(vus_gsrc_t));
-> -    if (!vus_gsrc) {
-> -        PERR("Error creating GSource for new watch");
-> -        return -1;
-> -    }
->      vus_src = (vus_gsrc_t *)vus_gsrc;
->  
->      vus_src->vdev_scsi = vdev_scsi;
-> @@ -171,8 +167,6 @@ static int vus_gsrc_new(vhost_scsi_dev_t *vdev_scsi, int fd, GIOCondition cond,
->  
->      g_tree_insert(vdev_scsi->fdmap, (gpointer)(uintptr_t)fd,
->                                      (gpointer)(uintptr_t)id);
+>   /* Only 1 LUN and device supported today */
+>  #define VUS_MAX_LUNS 1
+> -#define VUS_MAX_DEVS 1
 > -
-> -    return 0;
->  }
+>  #define VUS_ISCSI_INITIATOR "iqn.2016-11.com.nutanix:vhost-user-scsi"
 >  
->  /* from libiscsi's scsi-lowlevel.h **
-> @@ -440,10 +434,7 @@ static void vus_panic_cb(VuDev *vu_dev, const char *buf)
+>  typedef struct iscsi_lun {
+> @@ -72,8 +70,6 @@ typedef struct vhost_scsi_dev {
+>      iscsi_lun_t luns[VUS_MAX_LUNS];
+>  } vhost_scsi_dev_t;
+>  
+> -static vhost_scsi_dev_t *vhost_scsi_devs[VUS_MAX_DEVS];
+> -
+>  /** glib event loop integration for libvhost-user and misc callbacks **/
+>  
+>  QEMU_BUILD_BUG_ON((int)G_IO_IN != (int)VU_WATCH_IN);
+> @@ -420,16 +416,13 @@ static int handle_cmd_sync(struct iscsi_context *ctx,
+>  
+>  /** libvhost-user callbacks **/
+>  
+> -static vhost_scsi_dev_t *vdev_scsi_find_by_vu(VuDev *vu_dev);
+> -
+>  static void vus_panic_cb(VuDev *vu_dev, const char *buf)
+>  {
+>      vhost_scsi_dev_t *vdev_scsi;
+>  
+>      assert(vu_dev);
+>  
+> -    vdev_scsi = vdev_scsi_find_by_vu(vu_dev);
+> -
+> +    vdev_scsi = container_of(vu_dev, vhost_scsi_dev_t, vu_dev);
+>      if (buf) {
 >          PERR("vu_panic: %s", buf);
 >      }
+> @@ -447,12 +440,7 @@ static void vus_add_watch_cb(VuDev *vu_dev, int fd, int vu_evt, vu_watch_cb cb,
+>      assert(fd >= 0);
+>      assert(cb);
 >  
-> -    if (vdev_scsi) {
-> -        assert(vdev_scsi->loop);
-> -        g_main_loop_quit(vdev_scsi->loop);
-> -    }
-> +    g_main_loop_quit(vdev_scsi->loop);
->  }
->  
->  static void vus_add_watch_cb(VuDev *vu_dev, int fd, int vu_evt, vu_watch_cb cb,
-> @@ -471,9 +462,7 @@ static void vus_add_watch_cb(VuDev *vu_dev, int fd, int vu_evt, vu_watch_cb cb,
->          (void)g_tree_remove(vdev_scsi->fdmap, (gpointer)(uintptr_t)fd);
->      }
->  
-> -    if (vus_gsrc_new(vdev_scsi, fd, vu_evt, cb, NULL, pvt)) {
+> -    vdev_scsi = vdev_scsi_find_by_vu(vu_dev);
+> -    if (!vdev_scsi) {
 > -        vus_panic_cb(vu_dev, NULL);
-> -    }
-> +    vus_gsrc_new(vdev_scsi, fd, vu_evt, cb, NULL, pvt);
->  }
->  
->  static void vus_del_watch_cb(VuDev *vu_dev, int fd)
-> @@ -703,10 +692,7 @@ static void vdev_scsi_free(vhost_scsi_dev_t *vdev_scsi)
->          vdev_scsi->server_sock = -1;
->      }
->  
-> -    if (vdev_scsi->loop) {
-> -        g_main_loop_unref(vdev_scsi->loop);
-> -        vdev_scsi->loop = NULL;
-> -    }
-> +    g_main_loop_unref(vdev_scsi->loop);
->      g_free(vdev_scsi);
->  }
->  
-> @@ -719,23 +705,9 @@ static vhost_scsi_dev_t *vdev_scsi_new(int server_sock)
->      vdev_scsi = g_new0(vhost_scsi_dev_t, 1);
->      vdev_scsi->server_sock = server_sock;
->      vdev_scsi->loop = g_main_loop_new(NULL, FALSE);
-> -    if (!vdev_scsi->loop) {
-> -        PERR("Error creating glib event loop");
-> -        goto err;
+> -        return;
 > -    }
 > -
->      vdev_scsi->fdmap = g_tree_new(vus_fdmap_compare);
-> -    if (!vdev_scsi->fdmap) {
-> -        PERR("Error creating glib tree for fdmap");
-> -        goto err;
-> -    }
+> +    vdev_scsi = container_of(vu_dev, vhost_scsi_dev_t, vu_dev);
+>      id = (guint)(uintptr_t)g_tree_lookup(vdev_scsi->fdmap,
+>                                           (gpointer)(uintptr_t)fd);
+>      if (id) {
+> @@ -473,12 +461,7 @@ static void vus_del_watch_cb(VuDev *vu_dev, int fd)
+>      assert(vu_dev);
+>      assert(fd >= 0);
 >  
->      return vdev_scsi;
+> -    vdev_scsi = vdev_scsi_find_by_vu(vu_dev);
+> -    if (!vdev_scsi) {
+> -        vus_panic_cb(vu_dev, NULL);
+> -        return;
+> -    }
 > -
-> -err:
-> -    vdev_scsi_free(vdev_scsi);
+> +    vdev_scsi = container_of(vu_dev, vhost_scsi_dev_t, vu_dev);
+>      id = (guint)(uintptr_t)g_tree_lookup(vdev_scsi->fdmap,
+>                                           (gpointer)(uintptr_t)fd);
+>      if (id) {
+> @@ -506,12 +489,7 @@ static void vus_proc_req(VuDev *vu_dev, int idx)
+>  
+>      assert(vu_dev);
+>  
+> -    vdev_scsi = vdev_scsi_find_by_vu(vu_dev);
+> -    if (!vdev_scsi) {
+> -        vus_panic_cb(vu_dev, NULL);
+> -        return;
+> -    }
 > -
+> +    vdev_scsi = container_of(vu_dev, vhost_scsi_dev_t, vu_dev);
+>      if (idx < 0 || idx >= VHOST_MAX_NR_VIRTQUEUE) {
+>          PERR("VQ Index out of range: %d", idx);
+>          vus_panic_cb(vu_dev, NULL);
+> @@ -656,22 +634,6 @@ fail:
+>  
+>  /** vhost-user-scsi **/
+>  
+> -static vhost_scsi_dev_t *vdev_scsi_find_by_vu(VuDev *vu_dev)
+> -{
+> -    int i;
+> -
+> -    assert(vu_dev);
+> -
+> -    for (i = 0; i < VUS_MAX_DEVS; i++) {
+> -        if (&vhost_scsi_devs[i]->vu_dev == vu_dev) {
+> -            return vhost_scsi_devs[i];
+> -        }
+> -    }
+> -
+> -    PERR("Unknown VuDev %p", vu_dev);
 > -    return NULL;
->  }
->  
->  static int vdev_scsi_add_iscsi_lun(vhost_scsi_dev_t *vdev_scsi,
-> @@ -779,21 +751,14 @@ static int vdev_scsi_run(vhost_scsi_dev_t *vdev_scsi)
->              vus_del_watch_cb,
->              &vus_iface);
->  
-> -    if (vus_gsrc_new(vdev_scsi, cli_sock, G_IO_IN, NULL, vus_vhost_cb,
-> -                     &vdev_scsi->vu_dev)) {
-> -        goto fail;
-> -    }
-> +    vus_gsrc_new(vdev_scsi, cli_sock, G_IO_IN, NULL, vus_vhost_cb,
-> +                 &vdev_scsi->vu_dev);
->  
->      g_main_loop_run(vdev_scsi->loop);
->  
-> -out:
->      vu_deinit(&vdev_scsi->vu_dev);
->  
->      return ret;
+> -}
 > -
-> -fail:
-> -    ret = -1;
-> -    goto out;
->  }
->  
->  int main(int argc, char **argv)
-> @@ -826,9 +791,6 @@ int main(int argc, char **argv)
+>  static void vdev_scsi_free(vhost_scsi_dev_t *vdev_scsi)
+>  {
+>      if (!vdev_scsi) {
+> @@ -792,7 +754,6 @@ int main(int argc, char **argv)
 >          goto err;
 >      }
 >      vdev_scsi = vdev_scsi_new(sock);
-> -    if (!vdev_scsi) {
-> -        goto err;
-> -    }
->      vhost_scsi_devs[0] = vdev_scsi;
+> -    vhost_scsi_devs[0] = vdev_scsi;
 >  
 >      if (vdev_scsi_add_iscsi_lun(vdev_scsi, iscsi_uri, 0) != 0) {
+>          goto err;
 > 
 
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
