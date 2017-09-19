@@ -1,31 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58715)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duG3s-00027W-R9
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:47:29 -0400
+	(envelope-from <bounces@canonical.com>) id 1duG7Y-000575-90
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:51:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duG3p-0008St-Ok
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:47:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50888)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1duG3p-0008SS-He
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:47:25 -0400
-References: <20170918101709.30421-1-aik@ozlabs.ru>
-	<20170918101709.30421-2-aik@ozlabs.ru>
-	<c01622e7-3e6d-cf90-a28c-aa31b4857887@redhat.com>
-	<2debed31-4c28-6dc3-b159-1fdc3fbf87f5@ozlabs.ru>
-	<a85cbaf9-d7c7-403b-2dfc-886f9ddc0920@ozlabs.ru>
-	<bdd220a9-7773-74c5-f924-112a6134d13b@redhat.com>
-	<9c707630-570a-d7a1-76a4-3ddd5ae0f9b6@ozlabs.ru>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <bb0004db-6e35-0181-552a-62e133eb7f76@redhat.com>
-Date: Tue, 19 Sep 2017 12:47:22 +0200
+	(envelope-from <bounces@canonical.com>) id 1duG7T-0001oP-F4
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:51:16 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39778)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1duG7T-0001ny-9D
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:51:11 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1duG7P-0002Nk-6Z
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 10:51:07 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 4E10C2E84F4
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 10:50:59 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <9c707630-570a-d7a1-76a4-3ddd5ae0f9b6@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v3 01/13] memory: Postpone flatview
- and dispatch tree building till all devices are added
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 19 Sep 2017 10:39:00 -0000
+From: Gerd Hoffmann <1715700@bugs.launchpad.net>
+Reply-To: Bug 1715700 <1715700@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150480187483.29281.9921794433489304819.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150581754021.5372.7659460549123078484.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1715700] Re: Windows 7 guest won't boot on qemu
+ 2.10 (works on 2.9)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,36 +37,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
 
-On 19/09/2017 12:39, Alexey Kardashevskiy wrote:
->> No, there's still
->>
->>     as->dispatch = NULL;
->>     memory_region_update_pending |= root->enabled;
->>     memory_region_transaction_commit();
->>
->> when creating the address space, which touches all address spaces.
-> 
-> This does not seem helping a lot - my test without such an optimization
-> allocates 2966044 FVs and 2388768 with it, which is just 25%, i.e. worth
-> making a patch but yet getting rid of those nasty virtio-modern address
-> spaces will do a lot better job.
+could be this commit breaks vbeshim ...
 
-Have you tried resolving aliases that are implemented with containers
-and one subregion?
+-- =
 
-> What is the exact concern about the "[PATCH qemu v3 01/13] memory: Postpone
-> flatview and dispatch tree building till all devices are added"? Is it that
-> you missed that modern AS thing in virtio and thought we can do well even
-> without it?
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1715700
 
-I am afraid that some of the special sysbus devices (not PCI, those go
-through the bus master DMA region and it's empty on startup) might write
-to memory during initialization.
+Title:
+  Windows 7 guest won't boot on qemu 2.10 (works on 2.9)
 
-Thanks,
+Status in QEMU:
+  New
 
-Paolo
+Bug description:
+  Qemu version: 2.10 stable.
+  Guest: Windows 7 SP1 x64, virtio drivers are already installed in the gue=
+st.
+  Command line:
+  qemu-system-x86_64 \
+      -nodefaults \
+      -nodefconfig \
+      -machine type=3Dq35,accel=3Dkvm \
+      -enable-kvm \
+      -cpu host \
+      -m 2048 \
+      -vga virtio \
+      -boot menu=3Don \
+      -smbios file=3D/path/dmidecode_BIOS.bin \
+      -acpitable file=3D/path/acpi_slic.bin \
+      -bios /path/OVMF_CODE.fd \
+      -net none \
+      -drive if=3Dvirtio,media=3Ddisk,file=3D/media/win7.qcow2 \
+      -device pcie-root-port \
+      -device ich9-usb-ehci1 \
+      -device ich9-usb-uhci1 \
+      -device ich9-usb-uhci2 \
+      -device ich9-usb-uhci3
 
-> Or there is something wrong with the approach?
+  Windows hangs at boot with waving flag screen (flag doesn't freeze,
+  keeps waving indefinitely). Same command line boots fine with Qemu
+  2.9. I tried changing machine type to pc-q35-2.9 - same result.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1715700/+subscriptions
