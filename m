@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52712)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54519)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1duFw3-0003X8-C6
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:39:24 -0400
+	(envelope-from <ehabkost@redhat.com>) id 1duFzh-0006m4-TV
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:43:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1duFw0-0004RO-8p
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:39:23 -0400
-Received: from mail-pg0-x22f.google.com ([2607:f8b0:400e:c05::22f]:47145)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1duFw0-0004QO-1t
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:39:20 -0400
-Received: by mail-pg0-x22f.google.com with SMTP id d8so1789426pgt.4
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 03:39:18 -0700 (PDT)
-References: <20170918101709.30421-1-aik@ozlabs.ru>
-	<20170918101709.30421-2-aik@ozlabs.ru>
-	<c01622e7-3e6d-cf90-a28c-aa31b4857887@redhat.com>
-	<2debed31-4c28-6dc3-b159-1fdc3fbf87f5@ozlabs.ru>
-	<a85cbaf9-d7c7-403b-2dfc-886f9ddc0920@ozlabs.ru>
-	<bdd220a9-7773-74c5-f924-112a6134d13b@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <9c707630-570a-d7a1-76a4-3ddd5ae0f9b6@ozlabs.ru>
-Date: Tue, 19 Sep 2017 20:39:13 +1000
+	(envelope-from <ehabkost@redhat.com>) id 1duFze-0006d4-QU
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:43:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41988)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1duFze-0006cl-L4
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:43:06 -0400
+Date: Tue, 19 Sep 2017 07:42:59 -0300
+From: Eduardo Habkost <ehabkost@redhat.com>
+Message-ID: <20170919104259.GB3030@localhost.localdomain>
+References: <20170918215719.16415-1-f4bug@amsat.org>
+	<20170918225552.GM10621@localhost.localdomain>
+	<36b5e019-4f30-666b-7479-df8de0a6f936@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <bdd220a9-7773-74c5-f924-112a6134d13b@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v3 01/13] memory: Postpone flatview
- and dispatch tree building till all devices are added
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <36b5e019-4f30-666b-7479-df8de0a6f936@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC v1 0/2] Add a valid_cpu_types property
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,38 +29,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, Alistair Francis <alistair.francis@xilinx.com>, marcel@redhat.com
 
-On 19/09/17 17:42, Paolo Bonzini wrote:
-> On 19/09/2017 08:57, Alexey Kardashevskiy wrote:
->>>> 2) also, after patch 2 you know that the address space has no listeners
->>>> here, so the begin/commit isn't really needed.  Instead you can use the
->>>> open-coded loop to directly generate the FlatView.  This avoids touching
->>>> _all_ address spaces, which is already an improvement from O(n^2) to
->>>> O(n) rebuilds on device startup.
->> 03/13 does this already, no?
->>
-> 
-> No, there's still
-> 
->     as->dispatch = NULL;
->     memory_region_update_pending |= root->enabled;
->     memory_region_transaction_commit();
-> 
-> when creating the address space, which touches all address spaces.
+On Tue, Sep 19, 2017 at 06:51:23AM -0300, Philippe Mathieu-Daud=E9 wrote:
+> On 09/18/2017 07:55 PM, Eduardo Habkost wrote:
+> > On Mon, Sep 18, 2017 at 06:57:19PM -0300, Philippe Mathieu-Daud=E9 wr=
+ote:
+> > > add a property to restrict the CPU for SoCs once on machine creatio=
+n and avoid
+> > > duplicate code in each board.
+> > >=20
+> > > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
+> >=20
+> > The valid_cpu_types approach implemented by Alistair is more
+> > generic:
+> >    Subject: [Qemu-devel] [RFC v1 0/2]  Add a valid_cpu_types property
+> >    Message-ID: <cover.1504656490.git.alistair.francis@xilinx.com>
+> >=20
+> > With it, boards that don't support other CPUs just need to set
+> > valid_cpu_types =3D { default_cpu_type }.
+>=20
+> Oh thank for pointing this out, I missed his series.
+>=20
+> Many people waiting for Igor series to land ;)
 
+I plan to queue it today, and get a pull request out today or
+tomorrow.
 
-This does not seem helping a lot - my test without such an optimization
-allocates 2966044 FVs and 2388768 with it, which is just 25%, i.e. worth
-making a patch but yet getting rid of those nasty virtio-modern address
-spaces will do a lot better job.
-
-What is the exact concern about the "[PATCH qemu v3 01/13] memory: Postpone
-flatview and dispatch tree building till all devices are added"? Is it that
-you missed that modern AS thing in virtio and thought we can do well even
-without it? Or there is something wrong with the approach?
-
-
-
--- 
-Alexey
+--=20
+Eduardo
