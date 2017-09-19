@@ -1,44 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45776)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47543)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1duHGE-0002rX-AI
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:04:22 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1duHJp-0003x6-Uj
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:08:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1duHG8-0006DR-73
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:04:18 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44756
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1duHJk-0000OH-U8
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:08:01 -0400
+Received: from mail-eopbgr00128.outbound.protection.outlook.com
+	([40.107.0.128]:19886
+	helo=EUR02-AM5-obe.outbound.protection.outlook.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1duHG8-0006D1-1z
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:04:12 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8JBwZ56032597
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 08:04:11 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2d319pe67f-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 08:04:10 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Tue, 19 Sep 2017 13:04:07 +0100
-References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
-	<20170913115029.47626-5-pasic@linux.vnet.ibm.com>
-	<20170919055005.GE5274@bjsdjshi@linux.vnet.ibm.com>
-	<20170919114859.3e2d895b.cohuck@redhat.com>
-	<fbb3522e-4086-359a-fca7-05371b76dac7@linux.vnet.ibm.com>
-	<20170919125717.1ae0cd38.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Tue, 19 Sep 2017 14:04:03 +0200
+	(Exim 4.71) (envelope-from <pbutsykin@virtuozzo.com>)
+	id 1duHJk-0000NF-3O
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 08:07:56 -0400
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Date: Tue, 19 Sep 2017 15:07:33 +0300
+Message-Id: <20170919120733.22020-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20170919125717.1ae0cd38.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <9872cee8-3503-8d52-c68f-d9c61143201c@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] s390x/css: support ccw IDA
+Content-Type: text/plain
+Subject: [Qemu-devel] [PATCH v2] virtio-serial: add enable_backend callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,89 +26,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: pbutsykin@virtuozzo.com, amit@kernel.org, mst@redhat.com, pbonzini@redhat.com, den@openvz.org
 
+We should guarantee that RAM will not be modified while VM has a stopped
+state, otherwise it can lead to negative consequences during post-copy
+migration. In RUN_STATE_FINISH_MIGRATE step, it's expected that RAM on
+source side will not be modified as this could lead to non-consistent vm state
+on the destination side. Also RAM access during postcopy-ram migration with
+enabled release-ram capability can lead to sad consequences.
 
+Let's add enable_backend() callback to avoid undesirable virtioqueue changes
+in the guest memory.
 
-On 09/19/2017 12:57 PM, Cornelia Huck wrote:
->>>>> +static inline int ida_read_next_idaw(CcwDataStream *cds)
->>>>> +{
->>>>> +    union {uint64_t fmt2; uint32_t fmt1; } idaw;    
->>>>                                            ^
->>>> Nit.
->>>>  
->> Maybe checkpatch wanted it this way. My memories are blurry.
-> 
-> I'd just leave it like that, tbh.
-> 
->>>>> +    bool is_fmt2 = cds->flags & CDS_F_C64;
->>>>> +    int ret;
->>>>> +    hwaddr idaw_addr;
->>>>> +
->>>>> +    if (is_fmt2) {
->>>>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt2) * cds->at_idaw;
->>>>> +        if (idaw_addr & 0x07) {
->>>>> +            return -EINVAL; /* channel program check */
->>>>> +        }
->>>>> +        ret = address_space_rw(&address_space_memory, idaw_addr,
->>>>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt2,
->>>>> +                               sizeof(idaw.fmt2), false);
->>>>> +        cds->cda = be64_to_cpu(idaw.fmt2);
+Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+---
+Changes from v1:
+- rebase on master a9158a5cba
 
+ hw/char/virtio-console.c          | 21 +++++++++++++++++++++
+ hw/char/virtio-serial-bus.c       |  7 +++++++
+ include/hw/virtio/virtio-serial.h |  3 +++
+ 3 files changed, 31 insertions(+)
 
->>>>> +    } else {
->>>>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
->>>>> +        if (idaw_addr & 0x03) {    
->>>> ?:
->>>> (idaw_addr & 0x80000003)  
->>> Yes.
->>>   
->> I will double check this. Does not seem unreasonable but
->> double-checking is better.
-> Please let me know. I think the architecture says that the bit must be
-> zero, and that we may (...) generate a channel program check.
-> 
-
-Not exactly. The more significant bits part of the check
-depend on the ccw format. This needs to be done for both
-idaw formats. I would need to introduce a new flag, or
-access the SubchDev to do this properly.
-
-Architecturally we also need to check the data addresses
-from which we read so we have nothing bigger than 
-(1 << 31) - 1 if we are working with format-1 idaws.
-
-I also think we did not take proper care of proper
-maximum data address checks prior CwwDataStream which also
-depend on the ccw format (in absence of IDAW or MIDAW).
-
-The ccw format dependent maximum address checks are (1 << 24) - 1
-and (1 << 31) - 1 respectively for format-0 and format-1 (on
-the first indirection level that is for non-IDA for the data,
-and for (M)IDA for the (M)IDAWs).
-
-Reference:
-PoP pages 16-25 and 16-26 "Invalid IDAW or MIDAW Addre" and
-"Invalid Data Address".
-
-How shall we proceed?
-
-Halil
-
->>>>  
->>>>> +            return -EINVAL; /* channel program check */
->>>>> +
->>>>> +        }
->>>>> +        ret = address_space_rw(&address_space_memory, idaw_addr,
->>>>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt1,
->>>>> +                               sizeof(idaw.fmt1), false);
->>>>> +        cds->cda = be64_to_cpu(idaw.fmt1);>>>>> +    }
->>>>> +    ++(cds->at_idaw);
->>>>> +    if (ret != MEMTX_OK) {
->>>>> +        /* assume inaccessible address */
->>>>> +        return -EINVAL; /* channel program check */
->>>>> +
->>>>> +    }
->>>>> +    return 0;
->>>>> +}
+diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
+index 198b2a89c0..172c72d06c 100644
+--- a/hw/char/virtio-console.c
++++ b/hw/char/virtio-console.c
+@@ -187,6 +187,26 @@ static int chr_be_change(void *opaque)
+     return 0;
+ }
+ 
++static void virtconsole_enable_backend(VirtIOSerialPort *port, bool enable)
++{
++    VirtConsole *vcon = VIRTIO_CONSOLE(port);
++
++    if (!qemu_chr_fe_backend_connected(&vcon->chr)) {
++        return;
++    }
++
++    if (enable) {
++        VirtIOSerialPortClass *k = VIRTIO_SERIAL_PORT_GET_CLASS(port);
++
++        qemu_chr_fe_set_handlers(&vcon->chr, chr_can_read, chr_read,
++                                 k->is_console ? NULL : chr_event,
++                                 chr_be_change, vcon, NULL, false);
++    } else {
++        qemu_chr_fe_set_handlers(&vcon->chr, NULL, NULL, NULL,
++                                 NULL, NULL, NULL, false);
++    }
++}
++
+ static void virtconsole_realize(DeviceState *dev, Error **errp)
+ {
+     VirtIOSerialPort *port = VIRTIO_SERIAL_PORT(dev);
+@@ -258,6 +278,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
+     k->unrealize = virtconsole_unrealize;
+     k->have_data = flush_buf;
+     k->set_guest_connected = set_guest_connected;
++    k->enable_backend = virtconsole_enable_backend;
+     k->guest_writable = guest_writable;
+     dc->props = virtserialport_properties;
+ }
+diff --git a/hw/char/virtio-serial-bus.c b/hw/char/virtio-serial-bus.c
+index 17a1bb008a..9470bd7be7 100644
+--- a/hw/char/virtio-serial-bus.c
++++ b/hw/char/virtio-serial-bus.c
+@@ -637,6 +637,13 @@ static void set_status(VirtIODevice *vdev, uint8_t status)
+     if (!(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
+         guest_reset(vser);
+     }
++
++    QTAILQ_FOREACH(port, &vser->ports, next) {
++        VirtIOSerialPortClass *vsc = VIRTIO_SERIAL_PORT_GET_CLASS(port);
++        if (vsc->enable_backend) {
++            vsc->enable_backend(port, vdev->vm_running);
++        }
++    }
+ }
+ 
+ static void vser_reset(VirtIODevice *vdev)
+diff --git a/include/hw/virtio/virtio-serial.h b/include/hw/virtio/virtio-serial.h
+index b19c44727f..12657a9f39 100644
+--- a/include/hw/virtio/virtio-serial.h
++++ b/include/hw/virtio/virtio-serial.h
+@@ -58,6 +58,9 @@ typedef struct VirtIOSerialPortClass {
+         /* Guest opened/closed device. */
+     void (*set_guest_connected)(VirtIOSerialPort *port, int guest_connected);
+ 
++    /* Enable/disable backend for virtio serial port */
++    void (*enable_backend)(VirtIOSerialPort *port, bool enable);
++
+         /* Guest is now ready to accept data (virtqueues set up). */
+     void (*guest_ready)(VirtIOSerialPort *port);
+ 
+-- 
+2.14.1
