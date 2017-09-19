@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35639)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38217)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1duLZQ-000405-Od
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:40:25 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duLch-0005Ti-UG
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:43:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1duLZN-0008Td-Vq
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:40:24 -0400
-Received: from mail-io0-x232.google.com ([2607:f8b0:4001:c06::232]:52855)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1duLZN-0008T0-Pk
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:40:21 -0400
-Received: by mail-io0-x232.google.com with SMTP id i197so431855ioe.9
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 09:40:21 -0700 (PDT)
-References: <20170918163322.206581-1-borntraeger@de.ibm.com>
-	<a82be132-6363-6875-9cb2-837eb9787ac4@redhat.com>
-	<91de41ca-ca4f-8c80-6bbf-e03eefb6ae0a@de.ibm.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <1685829b-db95-8cc3-19bc-4764cc4fbc7c@linaro.org>
-Date: Tue, 19 Sep 2017 11:40:01 -0500
+	(envelope-from <cohuck@redhat.com>) id 1duLcf-0002EQ-3L
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:43:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47010)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLce-0002Dx-QQ
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:43:45 -0400
+From: Cornelia Huck <cohuck@redhat.com>
+Date: Tue, 19 Sep 2017 18:42:59 +0200
+Message-Id: <20170919164337.18555-1-cohuck@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <91de41ca-ca4f-8c80-6bbf-e03eefb6ae0a@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x/cpu: expose the guest crash
- information
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v2 00/38] various s390x patches (+some fixes)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,27 +24,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, Richard Henderson <rth@twiddle.net>, Jing Liu <liujbjl@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>
+To: peter.maydell@linaro.org
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
 
-On 09/18/2017 12:22 PM, Christian Borntraeger wrote:
-> On 09/18/2017 06:51 PM, David Hildenbrand wrote:
->> kvm-s390 is wrong. This is general s390x and should be named s390/s390x
->> and GuestPanicInformationS390(x). One can argue about s390 v s390x. See
->> last comment in this mail.
-> 
-> 
-> Yes, will remove the kvm part and only use s390. Not sure about s390 vs. s390x.
-> I slightly prefer the s390 name as in the kernel but I really do not care if
-> we follow the s390x as in QEMU. Conny, any opinion?
+The following changes since commit 7ec6a364916c0d1eba01128481e503a550a2b4=
+66:
 
-Note that qemu is inconsistent here:
+  Merge remote-tracking branch 'remotes/bonzini/tags/for-upstream' into s=
+taging (2017-09-19 15:44:07 +0100)
 
-  target/s390x
-  tcg/s390
+are available in the git repository at:
 
-which is arguably exactly wrong because target/s390x handles 32-bit mode,
-whereas tcg/s390 requires 64-bit mode.  ;-)
+  git://github.com/cohuck/qemu tags/s390x-20170919-v2
 
+for you to fetch changes up to 9d1c4449218d8a2e98a6a11688b09b9137f25c1c:
 
-r~
+  MAINTAINERS/s390x: add terminal3270.c (2017-09-19 18:31:32 +0200)
+
+----------------------------------------------------------------
+Assorted s390x patches:
+- introduce virtio-gpu-ccw, with virtio-gpu endian fixes
+- lots of cleanup in the s390x code
+- make device_add work for s390x cpus
+- enable seccomp on s390x
+- an ivshmem endian fix
+- set the reserved DHCP client architecture id for netboot
+- fixes in the css and pci support
+
+----------------------------------------------------------------
+
+Christian Borntraeger (1):
+  MAINTAINERS/s390x: add terminal3270.c
+
+Cornelia Huck (1):
+  s390x/ccw: create s390 phb for compat reasons as well
+
+David Hildenbrand (22):
+  exec,dump,i386,ppc,s390x: don't include exec/cpu-all.h explicitly
+  cpu: drop old comments describing members
+  s390x: get rid of s390-virtio.c
+  s390x: rename s390-virtio.h to s390-virtio-hcall.h
+  s390x: move s390_virtio_hypercall() to s390-virtio-hcall.h
+  s390x: move subsystem_reset() to s390-virtio-ccw.h
+  target/s390x: move some s390x typedefs to cpu-qom.h
+  s390x: move sclp_service_call() to sclp.h
+  target/s390x: use trigger_pgm_exception() in
+    s390_cpu_handle_mmu_fault()
+  target/s390x: use program_interrupt() in per_check_exception()
+  s390x: allow only 1 CPU with TCG
+  target/s390x: set cpu->id for linux user when realizing
+  target/s390x: use "core-id" for cpu number/address/id handling
+  target/s390x: rename next_cpu_id to next_core_id
+  s390x: print CPU definitions in sorted order
+  s390x: allow cpu hotplug via device_add
+  s390x: CPU hot unplug via device_del cannot work for now
+  s390x: implement query-hotpluggable-cpus
+  s390x: get rid of cpu_states and use possible_cpus instead
+  s390x: get rid of cpu_s390x_create()
+  s390x: generate sclp cpu information from possible_cpus
+  s390x: allow CPU hotplug in random core-id order
+
+Farhan Ali (2):
+  virtio-gpu: Handle endian conversion
+  virtio-ccw: Create a virtio gpu device for the ccw bus
+
+Halil Pasic (5):
+  s390x/css: fix cc handling for XSCH
+  s390x/css: drop data-check in interpretation
+  s390x/css: fix NULL handling for CCW addresses
+  s390x/css: remove unused error handling branch
+  virtio-ccw: remove stale comments on endianness
+
+Thomas Huth (3):
+  tests: Enable the drive_del test also on s390x
+  hw/misc/ivshmem: Fix ivshmem_recv_msg() to also work on big endian
+    systems
+  configure: Allow --enable-seccomp on s390x, too
+
+Viktor Mihajlovski (1):
+  s390: set DHCP client architecure id for netboot
+
+Yi Min Zhao (3):
+  s390x/pci: remove idx from msix msg data
+  s390x/pci: fixup ind_offset of msix routing entry
+  s390x/pci: add iommu replay callback
+
+ MAINTAINERS                        |   1 +
+ configure                          |   2 +-
+ dump.c                             |   1 -
+ exec.c                             |   1 -
+ hw/display/virtio-gpu.c            |  70 +++++++++--
+ hw/misc/ivshmem.c                  |   2 +-
+ hw/s390x/Makefile.objs             |   1 -
+ hw/s390x/css.c                     |  28 +----
+ hw/s390x/s390-pci-bus.c            |  28 +++--
+ hw/s390x/s390-pci-bus.h            |   2 +
+ hw/s390x/s390-pci-inst.c           |  24 ----
+ hw/s390x/s390-pci-stub.c           |   3 +-
+ hw/s390x/s390-virtio-ccw.c         | 241 +++++++++++++++++++++++++++++++=
+++++--
+ hw/s390x/s390-virtio-hcall.c       |   2 +-
+ hw/s390x/s390-virtio-hcall.h       |  21 ++++
+ hw/s390x/s390-virtio.c             | 203 -------------------------------
+ hw/s390x/s390-virtio.h             |  35 ------
+ hw/s390x/sclp.c                    |  34 +++---
+ hw/s390x/virtio-ccw.c              |  51 +++++++-
+ hw/s390x/virtio-ccw.h              |  10 ++
+ include/hw/s390x/s390-virtio-ccw.h |   2 +
+ include/hw/s390x/sclp.h            |   2 +
+ include/qom/cpu.h                  |   6 +-
+ pc-bios/s390-ccw/netboot.mak       |   2 +-
+ qapi-schema.json                   |  16 +++
+ target/i386/arch_dump.c            |   1 -
+ target/i386/arch_memory_mapping.c  |   1 -
+ target/i386/svm_helper.c           |   1 -
+ target/ppc/arch_dump.c             |   1 -
+ target/s390x/arch_dump.c           |   1 -
+ target/s390x/cpu-qom.h             |   7 +-
+ target/s390x/cpu.c                 |  85 ++++---------
+ target/s390x/cpu.h                 |  13 +-
+ target/s390x/cpu_models.c          |  61 +++++++---
+ target/s390x/cpu_models.h          |   8 +-
+ target/s390x/diag.c                |   1 +
+ target/s390x/excp_helper.c         |   5 +-
+ target/s390x/helper.c              |  47 +-------
+ target/s390x/internal.h            |   1 -
+ target/s390x/kvm.c                 |  15 ++-
+ target/s390x/misc_helper.c         |  21 ++--
+ target/s390x/translate.c           |   5 +-
+ tests/Makefile.include             |   3 +-
+ tests/drive_del-test.c             |  25 ++--
+ tests/libqos/virtio.c              |  17 +++
+ tests/libqos/virtio.h              |   3 +
+ 46 files changed, 591 insertions(+), 519 deletions(-)
+ create mode 100644 hw/s390x/s390-virtio-hcall.h
+ delete mode 100644 hw/s390x/s390-virtio.c
+ delete mode 100644 hw/s390x/s390-virtio.h
+
+--=20
+2.13.5
