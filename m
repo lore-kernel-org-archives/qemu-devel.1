@@ -1,30 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58735)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38223)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1duCTI-0003gR-CD
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 02:57:29 -0400
+	(envelope-from <famz@redhat.com>) id 1duCwV-0001eL-PD
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 03:27:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1duCTE-0003vx-82
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 02:57:28 -0400
-Received: from mail-it0-x244.google.com ([2607:f8b0:4001:c0b::244]:33729)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1duCTD-0003uq-W1
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 02:57:24 -0400
-Received: by mail-it0-x244.google.com with SMTP id g18so1878477itg.0
-	for <qemu-devel@nongnu.org>; Mon, 18 Sep 2017 23:57:23 -0700 (PDT)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-References: <20170918101709.30421-1-aik@ozlabs.ru>
-	<20170918101709.30421-2-aik@ozlabs.ru>
-	<c01622e7-3e6d-cf90-a28c-aa31b4857887@redhat.com>
-	<2debed31-4c28-6dc3-b159-1fdc3fbf87f5@ozlabs.ru>
-Message-ID: <a85cbaf9-d7c7-403b-2dfc-886f9ddc0920@ozlabs.ru>
-Date: Tue, 19 Sep 2017 16:57:17 +1000
+	(envelope-from <famz@redhat.com>) id 1duCwT-0007jJ-14
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 03:27:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43350)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1duCwS-0007iO-Na
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 03:27:36 -0400
+From: Fam Zheng <famz@redhat.com>
+Date: Tue, 19 Sep 2017 15:27:06 +0800
+Message-Id: <20170919072719.11815-1-famz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2debed31-4c28-6dc3-b159-1fdc3fbf87f5@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH qemu v3 01/13] memory: Postpone flatview
- and dispatch tree building till all devices are added
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v9 00/13] tests: Add VM based build tests (for
+ non-x86_64 and/or non-Linux)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,168 +25,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-On 19/09/17 12:09, Alexey Kardashevskiy wrote:
-> On 19/09/17 00:54, Paolo Bonzini wrote:
->> On 18/09/2017 12:16, Alexey Kardashevskiy wrote:
->>> Most devices use at least one address space and every time a new address
->>> space is added, flat views and dispatch trees are rebuild for all address
->>> spaces. This is not a problem for a relatively small amount of devices but
->>> even 50 virtio-pci devices use more than 8GB of RAM.
->>>
->>> What happens that on every flatview/dispatch rebuild, new arrays are
->>> allocated and old ones release but the release is done via RCU so until
->>> an entire machine is build, they are not released.
->>>
->>> This wraps devices creation into memory_region_transaction_begin/commit
->>> to massively reduce amount of flat view/dispatch tree (re)allocations.
->>>
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
->>> ---
->>> Changes:
->>> v2:
->>> * wrapped qemu_run_machine_init_done_notifiers() as well
->>> ---
->>>  vl.c | 9 +++++++++
->>>  1 file changed, 9 insertions(+)
->>>
->>> diff --git a/vl.c b/vl.c
->>> index 9e62e92aea..e4f2ece590 100644
->>> --- a/vl.c
->>> +++ b/vl.c
->>> @@ -4741,12 +4741,16 @@ int main(int argc, char **argv, char **envp)
->>>      igd_gfx_passthru();
->>>  
->>>      /* init generic devices */
->>> +    memory_region_transaction_begin();
->>> +
->>>      rom_set_order_override(FW_CFG_ORDER_OVERRIDE_DEVICE);
->>>      if (qemu_opts_foreach(qemu_find_opts("device"),
->>>                            device_init_func, NULL, NULL)) {
->>>          exit(1);
->>>      }
->>>  
->>> +    memory_region_transaction_commit();
->>> +
->>>      cpu_synchronize_all_post_init();
->>>  
->>>      rom_reset_order_override();
->>> @@ -4829,8 +4833,13 @@ int main(int argc, char **argv, char **envp)
->>>      /* TODO: once all bus devices are qdevified, this should be done
->>>       * when bus is created by qdev.c */
->>>      qemu_register_reset(qbus_reset_all_fn, sysbus_get_default());
->>> +
->>> +    memory_region_transaction_begin();
->>> +
->>>      qemu_run_machine_init_done_notifiers();
->>>  
->>> +    memory_region_transaction_commit();
->>> +
->>>      if (rom_check_and_register_reset() != 0) {
->>>          error_report("rom check and register reset failed");
->>>          exit(1);
->>>
->>
->> This should not be necessary given the other patches; the PCI devices
->> have an empty address space at the beginning, so there are other less
->> intrusive optimizations to do instead with the same effect:
->>
->> 1) as a start, the "|= root->enabled" can resolve aliases.  This should
->> be enough for the PCI device case.
->>
->> 2) also, after patch 2 you know that the address space has no listeners
->> here, so the begin/commit isn't really needed.  Instead you can use the
->> open-coded loop to directly generate the FlatView.  This avoids touching
->> _all_ address spaces, which is already an improvement from O(n^2) to
->> O(n) rebuilds on device startup.
+v9: Don't use 'set -e' in archive-source.sh. [Eric]
+    Add tests/keys/README. [Eric]
+    Fix direct invocation of ./netbsd etc. [Alex]
+    Add a note about test image well-known ssh key. [Eric]
 
-03/13 does this already, no?
+v8: Fix typo in code "od" =3D> "os".
+    QEMU to listen on 127.0.0.1 to be more secure.
+    Update README.
 
->>
->> 3) you can consult the list (or hash table :)) of live FlatViews (which
->> means you keep it live after memory_region_transaction_commit ends, and
->> only clear it on the next call), and reuse an existing FlatView.  Note
->> that the number of distinct FlatViews should be very few, 
-> 
-> 
-> I keep missing this bit - why few? Each virtio-pci device creates 2 AS,
-> with proxy->modern_bar and pci_dev->bus_master_container_region which are
-> unique and not aliases. Remember, 500 virtio devices is my test case ;)
+v7: Add Alex's rev-by to patch 2.
+    GPLv2 =3D> GPLv2+ for all new files. [Peter]
+    Add more description in file header to archive-source.sh for the inte=
+nded
+    usage.  [Peter]
+    "output tarball" in usage. [Alex]
+    Add quotes to "$1". [Peter]
+    Put generated keys in separate files. [Alex]
+    Use os.devnull. [Alex]
+    More error info when launching QEMU fails. [Alex]
 
+v6: Add license to new file. [Philippe]
+    Change tests/.gitignore. [Philippe]
 
-More details: pci_dev->bus_master_container_region is a root and it is
-enabled but its only child pci_dev->bus_master_enable_region is not. Ok, in
-flatview_topology_update() I can render a FV, see that it is empty
-(view->nr==0) and share an empty FV in this case too, this halves the
-number of FVs (from ~1000 to ~500 for 500 virtio devices).
+v5: Generate source tar file with a script.
+    Fix tmpdir, use pwd.
+    Reduce default -j to half cores.
 
-But proxy->modern_bar (which has an modern_cfg alias which is a root of an
-AS) is enabled since it is created and I could disable it and enable
-afterwards but since a PCI device enablement is done by writing to the
-config space, I kind of stuck here.
+v4: Drop unused imports and parameters. [Cleber]
+    Use --exclude-vcs (still no --exclude-vcs-ignores because it's too ne=
+w). [Philippe]
+    Use gtar if available. [Philippe, Kamil]
+    /dev/ld1a -> /dev/rld1a for netbsd. [Kamil]
+    Only use '-enable-kvm' if /dev/kvm is there. [Kamil]
+    Grammar fixes of README. [Stefan]
+    Rename image on the server to include version and arch. [Kamil]
+    Just ignore *.tmp. [Philippe]
 
+v3: Drop RFC.
+    Add Stefan's and Kamil's reviewed-bys.
+    Use optparse. [Stefan]
+    Drop the VGA patch. [Paolo, Stefan]
+    Improve exit/exit code/doc. [Stefan]
+    Drop unused line from basevm.py. [Stefan]
+    Drop "--target-list" form Makefile.
+    More intelligent '-j'.
+    Add README. [Stefan]
 
-I can do something like this and it helps a lot (now with -S I end up
-having 4 FVs and much better start time) but it is kinda hacky and "memory:
-Postpone flatview and dispatch tree building till all devices are added"
-solves this better imho, no?
+v2: - Add docstring. [Stefan]
+    - Call self._load_io_lod. [Stefan]
+    - Use "info usernet" and dynamic ssh_port forwarding. [Stefan]
+    - Add image checksum.
+    - Use os.rename() and os.makedirs(). [Stefan]
+    - Fix NetBSD URL. [Kamil]
 
+Build tests in one 32 bit Linux guest and three BSD images are defined in=
+ this
+series. This is a more managable way than the manually maintained virtual
+machines in patchew. Also, one big advantage of ephemeral VMs over long r=
+unning
+guests is the reduced RAM usage of host, which makes it possible to have =
+one
+host test all these BSD variants and probably more.
 
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 3268c16966..fa2cd7cf2c 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -629,6 +629,8 @@ static void virtio_write_config(PCIDevice *pci_dev,
-uint32_t address,
-     VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
-     struct virtio_pci_cfg_cap *cfg;
+The BSD guest templates are manually prepared following
 
-+    memory_region_set_enabled(&proxy->modern_bar, true);
-+
-     pci_default_write_config(pci_dev, address, val, len);
+https://wiki.qemu.org/Hosts/BSD
 
-     if (range_covers_byte(address, len, PCI_COMMAND) &&
-@@ -662,6 +664,8 @@ static uint32_t virtio_read_config(PCIDevice *pci_dev,
-     VirtIOPCIProxy *proxy = DO_UPCAST(VirtIOPCIProxy, pci_dev, pci_dev);
-     struct virtio_pci_cfg_cap *cfg;
+as it is not easy to automate. (The ideal approach is like the ubuntu.i38=
+6
+script, which configures the guest on top of an official released image, =
+fully
+automatically.)
 
-+    memory_region_set_enabled(&proxy->modern_bar, true);
-+
-     if (proxy->config_cap &&
-         ranges_overlap(address, len, proxy->config_cap + offsetof(struct
-virtio_pci_cfg_cap,
+Need for help: "gmake check" in the added OpenBSD image fails with -ENOME=
+M
+errors, even if I change "-m 2G" to "-m 8G" when starting VM. Ideas? And =
+there
+is a warning from ./configure about OpenBSD going to be unsupported in co=
+ming
+releases, is it still the case?
 
-pci_cfg_data),
-@@ -1790,6 +1794,8 @@ static void virtio_pci_realize(PCIDevice *pci_dev,
-Error **errp)
-                              0,
-                              memory_region_size(&proxy->modern_bar));
+Fam
 
-+    memory_region_set_enabled(&proxy->modern_bar, false);
-+
-     address_space_init(&proxy->modern_as, &proxy->modern_cfg,
-"virtio-pci-cfg-as");
+Fam Zheng (13):
+  gitignore: Ignore vm test images
+  qemu.py: Add "wait()" method
+  scripts: Add archive-source.sh
+  tests: Add a test key pair
+  tests: Add vm test lib
+  tests: Add ubuntu.i386 image
+  tests: Add FreeBSD image
+  tests: Add NetBSD image
+  tests: Add OpenBSD image
+  Makefile: Add rules to run vm tests
+  MAINTAINERS: Add tests/vm entry
+  tests: Add README for vm tests
+  docker: Use archive-source.py
 
+ .gitignore                    |   1 +
+ MAINTAINERS                   |   1 +
+ Makefile                      |   2 +
+ configure                     |   2 +-
+ scripts/archive-source.sh     |  46 ++++++++
+ scripts/qemu.py               |   7 ++
+ tests/.gitignore              |   1 +
+ tests/docker/Makefile.include |  15 +--
+ tests/docker/run              |   8 +-
+ tests/keys/README             |   6 +
+ tests/keys/id_rsa             |  27 +++++
+ tests/keys/id_rsa.pub         |   1 +
+ tests/vm/Makefile.include     |  42 +++++++
+ tests/vm/README               |  89 ++++++++++++++
+ tests/vm/basevm.py            | 262 ++++++++++++++++++++++++++++++++++++=
+++++++
+ tests/vm/freebsd              |  42 +++++++
+ tests/vm/netbsd               |  42 +++++++
+ tests/vm/openbsd              |  43 +++++++
+ tests/vm/ubuntu.i386          |  88 ++++++++++++++
+ 19 files changed, 704 insertions(+), 21 deletions(-)
+ create mode 100755 scripts/archive-source.sh
+ create mode 100644 tests/keys/README
+ create mode 100644 tests/keys/id_rsa
+ create mode 100644 tests/keys/id_rsa.pub
+ create mode 100644 tests/vm/Makefile.include
+ create mode 100644 tests/vm/README
+ create mode 100755 tests/vm/basevm.py
+ create mode 100755 tests/vm/freebsd
+ create mode 100755 tests/vm/netbsd
+ create mode 100755 tests/vm/openbsd
+ create mode 100755 tests/vm/ubuntu.i386
 
-
-
-
-> 
-> 
->> so feel free
->> to revert from hash table to list in v4 if you prefer.
->>> 4) you can skip address_space_update_topology_pass if
->> QTAILQ_EMPTY(&as->listeners).  This can provide some startup speed
->> improvements.
->>
->> Optimizations 2/3/4 should be moved to the end of the series, or even in
->> a separate post.  The first can be done in the beginning too, as you prefer.
-> 
-> 
-> 
-> 
-
-
--- 
-Alexey
+--=20
+2.13.5
