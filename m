@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36449)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41977)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1duOFu-0000Jq-Hs
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:32:28 -0400
+	(envelope-from <clg@kaod.org>) id 1duOJh-0003Ns-Jq
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:36:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mark.cave-ayland@ilande.co.uk>) id 1duOFt-00020W-Aw
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:32:26 -0400
-References: <1505668548-16616-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<1505668548-16616-5-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170918203620.GG15823@umbus>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <6cc177bf-1e95-056f-35cc-6184065ce3ec@ilande.co.uk>
-Date: Tue, 19 Sep 2017 20:31:50 +0100
+	(envelope-from <clg@kaod.org>) id 1duOJd-00065a-Fx
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:36:21 -0400
+Received: from 1.mo2.mail-out.ovh.net ([46.105.63.121]:49257)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duOJd-00062d-3v
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:36:17 -0400
+Received: from player157.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 907ECA9EC6
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 21:36:14 +0200 (CEST)
+References: <20170911171235.29331-1-clg@kaod.org>
+	<20170911171235.29331-12-clg@kaod.org> <20170919074556.GO27153@umbus>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <2d91c586-ff31-ceb8-bee6-6d4531d1b5c0@kaod.org>
+Date: Tue, 19 Sep 2017 21:36:08 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170918203620.GG15823@umbus>
+In-Reply-To: <20170919074556.GO27153@umbus>
 Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH 4/8] macio: convert pmac_ide_ops from
- old_mmio
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH v2 11/21] ppc/xive: push the EQ data in
+ OS event queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,244 +33,129 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, benh@kernel.crashing.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
-On 18/09/17 21:36, David Gibson wrote:
-
-> On Sun, Sep 17, 2017 at 06:15:44PM +0100, Mark Cave-Ayland wrote:
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> 
-> Nice, but there are some details I'm not sure about.
-> 
->> ---
->>  hw/ide/macio.c |  154 +++++++++++++++++++++-----------------------------------
->>  1 file changed, 56 insertions(+), 98 deletions(-)
+On 09/19/2017 09:45 AM, David Gibson wrote:
+> On Mon, Sep 11, 2017 at 07:12:25PM +0200, C=E9dric Le Goater wrote:
+>> If a triggered event is let through, the Event Queue data defined in
+>> the associated IVE is pushed in the in-memory event queue. The latter
+>> is a circular buffer provided by the OS using the H_INT_SET_QUEUE_CONF=
+IG
+>> hcall, one per target and priority couple. It is composed of Event
+>> Queue entries which are 4 bytes long, the first bit being a
+>> 'generation' bit and the 31 following bits the EQ Data field.
 >>
->> diff --git a/hw/ide/macio.c b/hw/ide/macio.c
->> index db5db39..428fbfc 100644
->> --- a/hw/ide/macio.c
->> +++ b/hw/ide/macio.c
->> @@ -255,131 +255,89 @@ static void pmac_ide_flush(DBDMA_io *io)
->>  }
->>  
->>  /* PowerMac IDE memory IO */
->> -static void pmac_ide_writeb (void *opaque,
->> -                             hwaddr addr, uint32_t val)
->> +static uint64_t pmac_ide_read(void *opaque, hwaddr addr, unsigned size)
->>  {
->>      MACIOIDEState *d = opaque;
->> +    uint64_t retval;
->> +    addr = (addr & 0xfff) >> 4;
-> 
-> Do you need the mask?  Using the new mmio interfaces, the given
-> address should already be just an offset within the region.  I also
-> dislike re-using the 'addr' name when it's now essentially a register
-> index.
-
-Good point, I don't think it is needed anymore since the MemoryRegion
-size is 0x1000.
-
->>  
->> -    addr = (addr & 0xFFF) >> 4;
->>      switch (addr) {
->> -    case 1 ... 7:
->> -        ide_ioport_write(&d->bus, addr, val);
->> -        break;
->> -    case 8:
->> -    case 22:
->> -        ide_cmd_write(&d->bus, 0, val);
->> -        break;
->> -    default:
->> +    case 0x0:
->> +        if (size == 2) {
->> +            retval = ide_data_readw(&d->bus, 0);
->> +        } else if (size == 4) {
->> +            retval = ide_data_readl(&d->bus, 0);
->> +        } else {
->> +            retval = 0xffffffff;
-> 
-> Are single byte reads not permitted, or will they just return parts of
-> the data?
-
->From what I can tell looking at the IDE core code, the accesses are
-effectively the same except for the access size, but ide_portio_list[]
-specifies the access sizes as being 2 and 4 respectively.
-
->> +        }
->>          break;
->> -    }
->> -}
->> -
->> -static uint32_t pmac_ide_readb (void *opaque,hwaddr addr)
->> -{
->> -    uint8_t retval;
->> -    MACIOIDEState *d = opaque;
->> -
->> -    addr = (addr & 0xFFF) >> 4;
->> -    switch (addr) {
->> -    case 1 ... 7:
->> +    case 0x1 ... 0x7:
->>          retval = ide_ioport_read(&d->bus, addr);
->>          break;
->> -    case 8:
->> -    case 22:
->> +    case 0x8:
->> +    case 0x16:
-> 
-> I think you need some sort of size check for these other registers -
-> you've declared yourself as both supporting and implementing 1..4 byte
-> accesses, but I don't think these make sense for size != 4.
-
-Yes, agreed.
-
->>          retval = ide_status_read(&d->bus, 0);
->>          break;
->> +    case 0x20:
->> +        retval = d->timing_reg;
->> +        break;
->> +    case 0x30:
->> +        /* This is an interrupt state register that only exists
->> +         * in the KeyLargo and later variants. Bit 0x8000_0000
->> +         * latches the DMA interrupt and has to be written to
->> +         * clear. Bit 0x4000_0000 is an image of the disk
->> +         * interrupt. MacOS X relies on this and will hang if
->> +         * we don't provide at least the disk interrupt
->> +         */
->> +        retval = d->irq_reg;
->> +        break;
->>      default:
->> -        retval = 0xFF;
->> +        retval = 0xffffffff;
->>          break;
->>      }
->> -    return retval;
->> -}
->> -
->> -static void pmac_ide_writew (void *opaque,
->> -                             hwaddr addr, uint32_t val)
->> -{
->> -    MACIOIDEState *d = opaque;
->> -
->> -    addr = (addr & 0xFFF) >> 4;
->> -    val = bswap16(val);
->> -    if (addr == 0) {
->> -        ide_data_writew(&d->bus, 0, val);
->> -    }
->> -}
->>  
->> -static uint32_t pmac_ide_readw (void *opaque,hwaddr addr)
->> -{
->> -    uint16_t retval;
->> -    MACIOIDEState *d = opaque;
->> -
->> -    addr = (addr & 0xFFF) >> 4;
->> -    if (addr == 0) {
->> -        retval = ide_data_readw(&d->bus, 0);
->> -    } else {
->> -        retval = 0xFFFF;
->> -    }
->> -    retval = bswap16(retval);
->>      return retval;
->>  }
->>  
->> -static void pmac_ide_writel (void *opaque,
->> -                             hwaddr addr, uint32_t val)
+>> The EQ Data field provides a way to set an invariant logical event
+>> source number for an IRQ. It is set with the H_INT_SET_SOURCE_CONFIG
+>> hcall.
+>>
+>> Notification of the CPU will be done in the following patch.
+>>
+>> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+>> ---
+>>  hw/intc/spapr_xive.c | 67 +++++++++++++++++++++++++++++++++++++++++++=
++++++++++
+>>  1 file changed, 67 insertions(+)
+>>
+>> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+>> index 557a7e2535b5..4bc61cfda67a 100644
+>> --- a/hw/intc/spapr_xive.c
+>> +++ b/hw/intc/spapr_xive.c
+>> @@ -175,9 +175,76 @@ static const MemoryRegionOps spapr_xive_tm_ops =3D=
+ {
+>>      },
+>>  };
+>> =20
+>> +static void spapr_xive_eq_push(XiveEQ *eq, uint32_t data)
+>> +{
+>> +    uint64_t qaddr_base =3D (((uint64_t)(eq->w2 & 0x0fffffff)) << 32)=
+ | eq->w3;
+>> +    uint32_t qsize =3D GETFIELD(EQ_W0_QSIZE, eq->w0);
+>> +    uint32_t qindex =3D GETFIELD(EQ_W1_PAGE_OFF, eq->w1);
+>> +    uint32_t qgen =3D GETFIELD(EQ_W1_GENERATION, eq->w1);
 >> +
->> +static void pmac_ide_write(void *opaque, hwaddr addr, uint64_t val,
->> +                           unsigned size)
-> 
-> Similar comments on the write path.
-> 
+>> +    uint64_t qaddr =3D qaddr_base + (qindex << 2);
+>> +    uint32_t qdata =3D cpu_to_be32((qgen << 31) | (data & 0x7fffffff)=
+);
+>> +    uint32_t qentries =3D 1 << (qsize + 10);
+>> +
+>> +    if (dma_memory_write(&address_space_memory, qaddr, &qdata, sizeof=
+(qdata))) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to write EQ data @=
+0x%"
+>> +                      HWADDR_PRIx "\n", __func__, qaddr);
+>> +        return;
+>> +    }
+>> +
+>> +    qindex =3D (qindex + 1) % qentries;
+>> +    if (qindex =3D=3D 0) {
+>> +        qgen ^=3D 1;
+>> +        eq->w1 =3D SETFIELD(EQ_W1_GENERATION, eq->w1, qgen);
+>> +    }
+>> +    eq->w1 =3D SETFIELD(EQ_W1_PAGE_OFF, eq->w1, qindex);
+>> +}
+>> +
+>>  static void spapr_xive_irq(sPAPRXive *xive, int srcno)
 >>  {
->>      MACIOIDEState *d = opaque;
->> +    addr = (addr & 0xfff) >> 4;
->>  
->> -    addr = (addr & 0xFFF) >> 4;
->> -    val = bswap32(val);
->> -    if (addr == 0) {
->> -        ide_data_writel(&d->bus, 0, val);
->> -    } else if (addr == 0x20) {
->> +    switch (addr) {
->> +    case 0x0:
->> +        if (size == 2) {
->> +            ide_data_writew(&d->bus, 0, val);
->> +        } else if (size == 4) {
->> +            ide_data_writel(&d->bus, 0, val);
+>> +    XiveIVE *ive;
+>> +    XiveEQ *eq;
+>> +    uint32_t eq_idx;
+>> +    uint32_t priority;
+>> +
+>> +    ive =3D spapr_xive_get_ive(xive, srcno);
+>> +    if (!ive || !(ive->w & IVE_VALID)) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %d\n", src=
+no);
+>> +        return;
+>> +    }
+>> +
+>> +    if (ive->w & IVE_MASKED) {
+>> +        return;
+>> +    }
+>> +
+>> +    /* Find our XiveEQ */
+>> +    eq_idx =3D GETFIELD(IVE_EQ_INDEX, ive->w);
+>> +    eq =3D spapr_xive_get_eq(xive, eq_idx);
+>> +    if (!eq) {
+>> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No EQ for LISN %d\n", s=
+rcno);
+>> +        return;
+>> +    }
+>> +
+>> +    if (eq->w0 & EQ_W0_ENQUEUE) {
+>> +        spapr_xive_eq_push(eq, GETFIELD(IVE_EQ_DATA, ive->w));
+>> +    } else {
+>> +        qemu_log_mask(LOG_UNIMP, "XIVE: !ENQUEUE not implemented\n");
+>> +    }
+>> +
+>> +    if (!(eq->w0 & EQ_W0_UCOND_NOTIFY)) {
+>> +        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented=
+\n");
+>> +    }
+>> +
+>> +    if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) =3D=3D 0) {
+>> +        priority =3D GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
+>> =20
+>> +        /* The EQ is masked. Can this happen ?  */
+>> +        if (priority =3D=3D 0xff) {
+>> +            return;
+>=20
+> How does the 8-bit priority field here interact with the 3-bit
+> priority which selects which EQ to use?
+
+priority OxFF is a special case kept for masking, see the hcall=20
+h_int_set_source_config. It should never reach the EQ lookup=20
+routines. So may be an assert would be better here.
+
+C.=20
+
+>=20
 >> +        }
->> +        break;
->> +    case 0x1 ... 0x7:
->> +        ide_ioport_write(&d->bus, addr, val);
->> +        break;
->> +    case 0x8:
->> +    case 0x16:
->> +        ide_cmd_write(&d->bus, 0, val);
->> +        break;
->> +    case 0x20:
->>          d->timing_reg = val;
->> -    } else if (addr == 0x30) {
->> +        break;
->> +    case 0x30:
->>          if (val & 0x80000000u) {
->>              d->irq_reg &= 0x7fffffff;
->>          }
->> +        break;
->>      }
+>> +    } else {
+>> +        qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n"=
+);
+>> +    }
 >>  }
->>  
->> -static uint32_t pmac_ide_readl (void *opaque,hwaddr addr)
->> -{
->> -    uint32_t retval;
->> -    MACIOIDEState *d = opaque;
->> -
->> -    addr = (addr & 0xFFF) >> 4;
->> -    if (addr == 0) {
->> -        retval = ide_data_readl(&d->bus, 0);
->> -    } else if (addr == 0x20) {
->> -        retval = d->timing_reg;
->> -    } else if (addr == 0x30) {
->> -        /* This is an interrupt state register that only exists
->> -         * in the KeyLargo and later variants. Bit 0x8000_0000
->> -         * latches the DMA interrupt and has to be written to
->> -         * clear. Bit 0x4000_0000 is an image of the disk
->> -         * interrupt. MacOS X relies on this and will hang if
->> -         * we don't provide at least the disk interrupt
->> -         */
->> -        retval = d->irq_reg;
->> -    } else {
->> -        retval = 0xFFFFFFFF;
->> -    }
->> -    retval = bswap32(retval);
->> -    return retval;
->> -}
->> -
->>  static const MemoryRegionOps pmac_ide_ops = {
->> -    .old_mmio = {
->> -        .write = {
->> -            pmac_ide_writeb,
->> -            pmac_ide_writew,
->> -            pmac_ide_writel,
->> -        },
->> -        .read = {
->> -            pmac_ide_readb,
->> -            pmac_ide_readw,
->> -            pmac_ide_readl,
->> -        },
->> -    },
->> -    .endianness = DEVICE_NATIVE_ENDIAN,
->> +    .read = pmac_ide_read,
->> +    .write = pmac_ide_write,
->> +    .valid.min_access_size = 1,
->> +    .valid.max_access_size = 4,
-> 
-> Remember you can set .impl. different from .valid if you want the mmio
-> core to do the work of splitting accesses up.
-
-I'm not sure exactly sure what the behaviour for unaligned accesses is
-(or indeed if they are valid), however I've just run an updated version
-through my OpenBIOS boot tests and I don't see any regression so I'll
-resubmit it shortly.
-
-
-ATB,
-
-Mark.
+>> =20
+>>  /*
+>=20
