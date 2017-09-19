@@ -1,31 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57690)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58693)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duJbT-0003g0-Kd
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:34:25 -0400
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1duJd4-0004iw-0m
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:36:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duJbN-0000Xq-Dp
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:34:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35382)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duJbN-0000XR-5A
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:34:17 -0400
-Date: Tue, 19 Sep 2017 16:34:11 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170919163411.649d3b66.cohuck@redhat.com>
-In-Reply-To: <8e6eaeef-0ed3-4660-b445-fd0440afbe1d@linux.vnet.ibm.com>
-References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
-	<20170913115029.47626-5-pasic@linux.vnet.ibm.com>
-	<20170919055005.GE5274@bjsdjshi@linux.vnet.ibm.com>
-	<20170919114859.3e2d895b.cohuck@redhat.com>
-	<fbb3522e-4086-359a-fca7-05371b76dac7@linux.vnet.ibm.com>
-	<20170919125717.1ae0cd38.cohuck@redhat.com>
-	<9872cee8-3503-8d52-c68f-d9c61143201c@linux.vnet.ibm.com>
-	<20170919142351.1e3b66d8.cohuck@redhat.com>
-	<8e6eaeef-0ed3-4660-b445-fd0440afbe1d@linux.vnet.ibm.com>
+	(envelope-from <Yongbok.Kim@imgtec.com>) id 1duJcz-0001VN-RT
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:36:02 -0400
+References: <20170919141307.23113-1-eblake@redhat.com>
+From: Yongbok Kim <yongbok.kim@imgtec.com>
+Message-ID: <1d765929-c654-80d6-b949-87429f4c0aa8@imgtec.com>
+Date: Tue, 19 Sep 2017 15:35:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170919141307.23113-1-eblake@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/4] s390x/css: support ccw IDA
+Subject: Re: [Qemu-devel] [PATCH] mips: Improve macro parenthesization
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,111 +23,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, Aurelien Jarno <aurelien@aurel32.net>
 
-On Tue, 19 Sep 2017 14:32:33 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-> On 09/19/2017 02:23 PM, Cornelia Huck wrote:
-> > On Tue, 19 Sep 2017 14:04:03 +0200
-> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> >   
-> >> On 09/19/2017 12:57 PM, Cornelia Huck wrote:  
-> >>>>>>> +static inline int ida_read_next_idaw(CcwDataStream *cds)
-> >>>>>>> +{
-> >>>>>>> +    union {uint64_t fmt2; uint32_t fmt1; } idaw;        
-> >>>>>>                                            ^
-> >>>>>> Nit.
-> >>>>>>      
-> >>>> Maybe checkpatch wanted it this way. My memories are blurry.    
-> >>>
-> >>> I'd just leave it like that, tbh.
-> >>>     
-> >>>>>>> +    bool is_fmt2 = cds->flags & CDS_F_C64;
-> >>>>>>> +    int ret;
-> >>>>>>> +    hwaddr idaw_addr;
-> >>>>>>> +
-> >>>>>>> +    if (is_fmt2) {
-> >>>>>>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt2) * cds->at_idaw;
-> >>>>>>> +        if (idaw_addr & 0x07) {
-> >>>>>>> +            return -EINVAL; /* channel program check */
-> >>>>>>> +        }
-> >>>>>>> +        ret = address_space_rw(&address_space_memory, idaw_addr,
-> >>>>>>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt2,
-> >>>>>>> +                               sizeof(idaw.fmt2), false);
-> >>>>>>> +        cds->cda = be64_to_cpu(idaw.fmt2);    
-> >>
-> >>  
-> >>>>>>> +    } else {
-> >>>>>>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
-> >>>>>>> +        if (idaw_addr & 0x03) {        
-> >>>>>> ?:
-> >>>>>> (idaw_addr & 0x80000003)      
-> >>>>> Yes.
-> >>>>>       
-> >>>> I will double check this. Does not seem unreasonable but
-> >>>> double-checking is better.    
-> >>> Please let me know. I think the architecture says that the bit must be
-> >>> zero, and that we may (...) generate a channel program check.
-> >>>     
-> >>
-> >> Not exactly. The more significant bits part of the check
-> >> depend on the ccw format. This needs to be done for both
-> >> idaw formats. I would need to introduce a new flag, or
-> >> access the SubchDev to do this properly.
-> >>
-> >> Architecturally we also need to check the data addresses
-> >> from which we read so we have nothing bigger than 
-> >> (1 << 31) - 1 if we are working with format-1 idaws.
-> >>
-> >> I also think we did not take proper care of proper
-> >> maximum data address checks prior CwwDataStream which also
-> >> depend on the ccw format (in absence of IDAW or MIDAW).
-> >>
-> >> The ccw format dependent maximum address checks are (1 << 24) - 1
-> >> and (1 << 31) - 1 respectively for format-0 and format-1 (on
-> >> the first indirection level that is for non-IDA for the data,
-> >> and for (M)IDA for the (M)IDAWs).
-> >>
-> >> Reference:
-> >> PoP pages 16-25 and 16-26 "Invalid IDAW or MIDAW Addre" and
-> >> "Invalid Data Address".  
-> > 
-> > Sigh, when are things ever easy :(
-> > 
-> > I'll need some time to review this. But more urgently, I need a break.
-> >   
-> >>
-> >> How shall we proceed?  
-> > 
-> > Given the discussion about this patch in particular, I'll probably
-> > dequeue it and send it with the next batch of patches. We can also
-> > include the other improvements, then. Not sure whether I should just
-> > dequeue this one or the whole series (I really want to get the rest of
-> > the patches out...)
-> > 
-> > More after the break :)
-> >   
+
+On 19/09/2017 15:13, Eric Blake wrote:
+> Although none of the existing macro call-sites were broken,
+> it's always better to write macros that properly parenthesize
+> arguments that can be complex expressions, so that the intended
+> order of operations is not broken.
 > 
-> I think I can fix this pretty fast, and fixing this later is
-> an option too in my opinion as the patch is consistent with our
-> prior art (we ignored this maximum address checking requirement,
-> and we keep ignoring it). 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  target/mips/dsp_helper.c | 56 ++++++++++++++++++++++++------------------------
+>  1 file changed, 28 insertions(+), 28 deletions(-)
 > 
-> I would prefer not dequeue-ing the whole series because a
-> 3270 fix of mine (which just made the internal review) depends
-> on this. IMHO, it's not like the series is fundamentally broken,
-> not ain't an improvement at all. It is not perfect, but it's
-> IMHO certainly an improvement over what we have.
+> diff --git a/target/mips/dsp_helper.c b/target/mips/dsp_helper.c
+> index dc707934ea..f152fea34a 100644
+> --- a/target/mips/dsp_helper.c
+> +++ b/target/mips/dsp_helper.c
+> @@ -45,9 +45,9 @@ typedef union {
+>  } DSP64Value;
+> 
+>  /*** MIPS DSP internal functions begin ***/
+> -#define MIPSDSP_ABS(x) (((x) >= 0) ? x : -x)
+> -#define MIPSDSP_OVERFLOW_ADD(a, b, c, d) (~(a ^ b) & (a ^ c) & d)
+> -#define MIPSDSP_OVERFLOW_SUB(a, b, c, d) ((a ^ b) & (a ^ c) & d)
+> +#define MIPSDSP_ABS(x) (((x) >= 0) ? (x) : -(x))
+> +#define MIPSDSP_OVERFLOW_ADD(a, b, c, d) (~((a) ^ (b)) & ((a) ^ (c)) & (d))
+> +#define MIPSDSP_OVERFLOW_SUB(a, b, c, d) (((a) ^ (b)) & ((a) ^ (c)) & (d))
+> 
+>  static inline void set_DSPControl_overflow_flag(uint32_t flag, int position,
+>                                                  CPUMIPSState *env)
+> @@ -1047,47 +1047,47 @@ static inline int32_t mipsdsp_cmpu_lt(uint32_t a, uint32_t b)
+> 
+>  #define MIPSDSP_SPLIT32_8(num, a, b, c, d)  \
+>      do {                                    \
+> -        a = (num >> 24) & MIPSDSP_Q0;       \
+> -        b = (num >> 16) & MIPSDSP_Q0;       \
+> -        c = (num >> 8) & MIPSDSP_Q0;        \
+> -        d = num & MIPSDSP_Q0;               \
+> +        a = ((num) >> 24) & MIPSDSP_Q0;     \
+> +        b = ((num) >> 16) & MIPSDSP_Q0;     \
+> +        c = ((num) >> 8) & MIPSDSP_Q0;      \
+> +        d = (num) & MIPSDSP_Q0;             \
+>      } while (0)
+> 
+>  #define MIPSDSP_SPLIT32_16(num, a, b)       \
+>      do {                                    \
+> -        a = (num >> 16) & MIPSDSP_LO;       \
+> -        b = num & MIPSDSP_LO;               \
+> +        a = ((num) >> 16) & MIPSDSP_LO;     \
+> +        b = (num) & MIPSDSP_LO;             \
+>      } while (0)
+> 
+> -#define MIPSDSP_RETURN32_8(a, b, c, d)  ((target_long)(int32_t) \
+> -                                         (((uint32_t)a << 24) | \
+> -                                         (((uint32_t)b << 16) | \
+> -                                         (((uint32_t)c << 8) |  \
+> -                                          ((uint32_t)d & 0xFF)))))
+> -#define MIPSDSP_RETURN32_16(a, b)       ((target_long)(int32_t) \
+> -                                         (((uint32_t)a << 16) | \
+> -                                          ((uint32_t)b & 0xFFFF)))
+> +#define MIPSDSP_RETURN32_8(a, b, c, d)  ((target_long)(int32_t)         \
+> +                                         (((uint32_t)(a) << 24) |       \
+> +                                          ((uint32_t)(b) << 16) |       \
+> +                                          ((uint32_t)(c) << 8) |        \
+> +                                          ((uint32_t)(d) & 0xFF)))
+> +#define MIPSDSP_RETURN32_16(a, b)       ((target_long)(int32_t)         \
+> +                                         (((uint32_t)(a) << 16) |       \
+> +                                          ((uint32_t)(b) & 0xFFFF)))
+> 
+>  #ifdef TARGET_MIPS64
+>  #define MIPSDSP_SPLIT64_16(num, a, b, c, d)  \
+>      do {                                     \
+> -        a = (num >> 48) & MIPSDSP_LO;        \
+> -        b = (num >> 32) & MIPSDSP_LO;        \
+> -        c = (num >> 16) & MIPSDSP_LO;        \
+> -        d = num & MIPSDSP_LO;                \
+> +        a = ((num) >> 48) & MIPSDSP_LO;      \
+> +        b = ((num) >> 32) & MIPSDSP_LO;      \
+> +        c = ((num) >> 16) & MIPSDSP_LO;      \
+> +        d = (num) & MIPSDSP_LO;              \
+>      } while (0)
+> 
+>  #define MIPSDSP_SPLIT64_32(num, a, b)       \
+>      do {                                    \
+> -        a = (num >> 32) & MIPSDSP_LLO;      \
+> -        b = num & MIPSDSP_LLO;              \
+> +        a = ((num) >> 32) & MIPSDSP_LLO;    \
+> +        b = (num) & MIPSDSP_LLO;            \
+>      } while (0)
+> 
+> -#define MIPSDSP_RETURN64_16(a, b, c, d) (((uint64_t)a << 48) | \
+> -                                         ((uint64_t)b << 32) | \
+> -                                         ((uint64_t)c << 16) | \
+> -                                         (uint64_t)d)
+> -#define MIPSDSP_RETURN64_32(a, b)       (((uint64_t)a << 32) | (uint64_t)b)
+> +#define MIPSDSP_RETURN64_16(a, b, c, d) (((uint64_t)(a) << 48) |        \
+> +                                         ((uint64_t)(b) << 32) |        \
+> +                                         ((uint64_t)(c) << 16) |        \
+> +                                         (uint64_t)(d))
+> +#define MIPSDSP_RETURN64_32(a, b)       (((uint64_t)(a) << 32) | (uint64_t)(b))
+>  #endif
+> 
+>  /** DSP Arithmetic Sub-class insns **/
+> 
 
-The issue is not that the series is problematic, but that I need to put
-a stop on changes at some point in time and just flush my queue -
-otherwise this is not workable.
+Reviewed-by: Yongbok Kim <yongbok.kim@imgtec.com>
 
-Therefore, I dequeued the series for now. I'll probably do another pull
-request in the next weeks anyway - so there's unlikely to be a long
-delay, and we can hash out everything without pressure.
-
-It would be best to just think this through; then you can send a v3
-with the feedback addressed and your 3270 patch on top.
+Regards,
+Yongbok
