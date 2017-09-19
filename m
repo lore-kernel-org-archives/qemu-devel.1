@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44077)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1duNfd-00020M-9q
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 14:54:58 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1duNkf-0003wK-VG
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:00:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1duNfa-0001Aq-5r
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 14:54:57 -0400
-Received: from mail-io0-x22c.google.com ([2607:f8b0:4001:c06::22c]:55274)
+	(envelope-from <richard.henderson@linaro.org>) id 1duNkc-0004Ld-Mh
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:00:10 -0400
+Received: from mail-io0-x22c.google.com ([2607:f8b0:4001:c06::22c]:51087)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1duNfa-0001AU-14
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 14:54:54 -0400
-Received: by mail-io0-x22c.google.com with SMTP id h66so1337968ioh.11
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 11:54:53 -0700 (PDT)
+	id 1duNkc-0004LH-Gu
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 15:00:06 -0400
+Received: by mail-io0-x22c.google.com with SMTP id w94so1408119ioi.7
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 12:00:06 -0700 (PDT)
 References: <1505240046-11454-1-git-send-email-peter.maydell@linaro.org>
-	<1505240046-11454-14-git-send-email-peter.maydell@linaro.org>
+	<1505240046-11454-15-git-send-email-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b80ed6a1-dc49-c5b8-1e76-7afcf1b3d4f2@linaro.org>
-Date: Tue, 19 Sep 2017 13:54:49 -0500
+Message-ID: <0414513a-a050-f16c-94b4-24da7dd49972@linaro.org>
+Date: Tue, 19 Sep 2017 13:59:58 -0500
 MIME-Version: 1.0
-In-Reply-To: <1505240046-11454-14-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1505240046-11454-15-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 13/19] nvic: Implement v8M changes to fixed
- priority exceptions
+Subject: Re: [Qemu-devel] [PATCH 14/19] nvic: Disable the non-secure
+ HardFault if AIRCR.BFHFNMINS is clear
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,26 +36,15 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 09/12/2017 01:14 PM, Peter Maydell wrote:
-> In v7M, the fixed-priority exceptions are:
->  Reset: -3
->  NMI: -2
->  HardFault: -1
-> 
-> In v8M, this changes because Secure HardFault may need
-> to be prioritised above NMI:
->  Reset: -4
->  Secure HardFault if AIRCR.BFHFNMINS == 1: -3
->  NMI: -2
->  Secure HardFault if AIRCR.BFHFNMINS == 0: -1
->  NonSecure HardFault: -1
-> 
-> Make these changes, including support for changing the
-> priority of Secure HardFault as AIRCR.BFHFNMINS changes.
+> If AIRCR.BFHFNMINS is clear, then although NonSecure HardFault
+> can still be pended via SHCSR.HARDFAULTPENDED it mustn't actually
+> preempt execution. The simple way to achieve this is to clear the
+> enable bit for it, since the enable bit isn't guest visible.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/intc/armv7m_nvic.c | 22 +++++++++++++++++++---
->  1 file changed, 19 insertions(+), 3 deletions(-)
+>  hw/intc/armv7m_nvic.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
