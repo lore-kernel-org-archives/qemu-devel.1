@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39677)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40392)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duLeL-0006xa-LQ
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:30 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duLfC-0007gx-7t
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:46:23 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duLeK-0003c0-Or
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41240)
+	(envelope-from <cohuck@redhat.com>) id 1duLfA-0004Jj-Kx
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:46:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54356)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLeK-0003a1-Jp
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:45:28 -0400
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duLfA-0004IJ-GD
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 12:46:20 -0400
 From: Cornelia Huck <cohuck@redhat.com>
-Date: Tue, 19 Sep 2017 18:43:21 +0200
-Message-Id: <20170919164337.18555-23-cohuck@redhat.com>
+Date: Tue, 19 Sep 2017 18:43:32 +0200
+Message-Id: <20170919164337.18555-34-cohuck@redhat.com>
 In-Reply-To: <20170919164337.18555-1-cohuck@redhat.com>
 References: <20170919164337.18555-1-cohuck@redhat.com>
-Subject: [Qemu-devel] [PULL v2 22/38] target/s390x: set cpu->id for linux
- user when realizing
+Subject: [Qemu-devel] [PULL v2 33/38] virtio-ccw: remove stale comments on
+ endianness
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,51 +25,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org
-Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, rth@twiddle.net, agraf@suse.de, thuth@redhat.com, borntraeger@de.ibm.com, david@redhat.com, Halil Pasic <pasic@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
 
-From: David Hildenbrand <david@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
 
-scc->next_cpu_id is updated when realizing. Setting it just before that
-point looks cleaner.
+We have two stale comments suggesting one should think about virtio
+config space endianness a bit longer. We have just done that, and came to
+the conclusion we are fine as is: it's the responsibility of the virtio
+device and not of the transport (and that is how it works now). Putting
+the responsibility into the transport isn't even possible, because the
+transport would have to know about the config space layout of each
+device.
 
-Reviewed-by: Matthew Rosato <mjrosato@linux.vnet.ibm.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20170913132417.24384-13-david@redhat.com>
+Let us remove the stale comments.
+
+Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+Suggested-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20170914105535.47941-1-pasic@linux.vnet.ibm.com>
 Signed-off-by: Cornelia Huck <cohuck@redhat.com>
 ---
- target/s390x/cpu.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+ hw/s390x/virtio-ccw.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 74b3e4fd0d..5f9315fb16 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -194,7 +194,11 @@ static void s390_cpu_realizefn(DeviceState *dev, Error **errp)
-                    ", max allowed: %d", cpu->id, max_cpus - 1);
-         goto out;
-     }
-+#else
-+    /* implicitly set for linux-user only */
-+    cpu->id = scc->next_cpu_id;
- #endif
-+
-     if (cpu_exists(cpu->id)) {
-         error_setg(&err, "Unable to add CPU: %" PRIi64
-                    ", it already exists", cpu->id);
-@@ -306,13 +310,6 @@ static void s390_cpu_initfn(Object *obj)
-         inited = true;
-         s390x_translate_init();
-     }
--
--#if defined(CONFIG_USER_ONLY)
--    {
--        S390CPUClass *scc = S390_CPU_GET_CLASS(obj);
--        cpu->id = scc->next_cpu_id;
--    }
--#endif
- }
- 
- static void s390_cpu_finalize(Object *obj)
+diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+index b1976fdd19..2262b0cc9a 100644
+--- a/hw/s390x/virtio-ccw.c
++++ b/hw/s390x/virtio-ccw.c
+@@ -487,7 +487,6 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+             ret = -EFAULT;
+         } else {
+             virtio_bus_get_vdev_config(&dev->bus, vdev->config);
+-            /* XXX config space endianness */
+             cpu_physical_memory_write(ccw.cda, vdev->config, len);
+             sch->curr_status.scsw.count = ccw.count - len;
+             ret = 0;
+@@ -510,7 +509,6 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+                 ret = -EFAULT;
+             } else {
+                 len = hw_len;
+-                /* XXX config space endianness */
+                 memcpy(vdev->config, config, len);
+                 cpu_physical_memory_unmap(config, hw_len, 0, hw_len);
+                 virtio_bus_set_vdev_config(&dev->bus, vdev->config);
 -- 
 2.13.5
