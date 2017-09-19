@@ -1,20 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53533)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duJVN-0006jL-Jj
+	(envelope-from <pbonzini@redhat.com>) id 1duJVQ-0006m6-F5
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:28:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duJVM-0005HY-5v
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:28:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57772)
+	(envelope-from <pbonzini@redhat.com>) id 1duJVJ-0005FY-S7
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:28:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35140)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1duJVL-0005Ga-V2
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:28:04 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1duJVJ-0005El-Je
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:28:01 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+	[10.5.11.16])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B5DEB4FD
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 14:28:00 +0000 (UTC)
+Received: from donizetti.redhat.com (ovpn-117-61.ams2.redhat.com
+	[10.36.117.61])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DA6F35C541
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 14:27:59 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 19 Sep 2017 16:27:58 +0200
-Message-Id: <20170919142758.13577-3-pbonzini@redhat.com>
-In-Reply-To: <20170919142758.13577-1-pbonzini@redhat.com>
-References: <20170919142758.13577-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 40/51] Makefile: Remove libqemustub.a
+Date: Tue, 19 Sep 2017 16:27:56 +0200
+Message-Id: <20170919142758.13577-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL v3 00/51] Misc patches for 2017-09-19
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,114 +35,249 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: Alistair Francis <alistair.francis@xilinx.com>
 
-Using two libraries (libqemuutil.a and libqemustub.a) would sometimes
-result in circular dependencies. To avoid these issues let's just
-combine both into a single library that functions as both.
+The following changes since commit 11e06ce1ed28fd0ffcbc1e2436b72f3412b4ec=
+c8:
 
-Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Message-Id: <54e6458745493d10901964624479a7d9a872f481.1503077821.git.alistair.francis@xilinx.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile                    |  7 +++----
- Makefile.target             |  2 +-
- docs/devel/build-system.txt | 18 +++++++++---------
- tests/Makefile.include      |  5 ++---
- 4 files changed, 15 insertions(+), 17 deletions(-)
+  Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' int=
+o staging (2017-09-19 10:13:51 +0100)
 
-diff --git a/Makefile b/Makefile
-index b53fc69a60..eb831b98d1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -335,7 +335,7 @@ subdir-dtc:dtc/libfdt dtc/tests
- dtc/%:
- 	mkdir -p $@
- 
--$(SUBDIR_RULES): libqemuutil.a libqemustub.a $(common-obj-y) $(chardev-obj-y) \
-+$(SUBDIR_RULES): libqemuutil.a $(common-obj-y) $(chardev-obj-y) \
- 	$(qom-obj-y) $(crypto-aes-obj-$(CONFIG_USER_ONLY))
- 
- ROMSUBDIR_RULES=$(patsubst %,romsubdir-%, $(ROMS))
-@@ -355,12 +355,11 @@ Makefile: $(version-obj-y)
- ######################################################################
- # Build libraries
- 
--libqemustub.a: $(stub-obj-y)
--libqemuutil.a: $(util-obj-y) $(trace-obj-y)
-+libqemuutil.a: $(util-obj-y) $(trace-obj-y) $(stub-obj-y)
- 
- ######################################################################
- 
--COMMON_LDADDS = libqemuutil.a libqemustub.a
-+COMMON_LDADDS = libqemuutil.a
- 
- qemu-img.o: qemu-img-cmds.h
- 
-diff --git a/Makefile.target b/Makefile.target
-index 6361f957fb..32b0100344 100644
---- a/Makefile.target
-+++ b/Makefile.target
-@@ -193,7 +193,7 @@ all-obj-$(CONFIG_SOFTMMU) += $(io-obj-y)
- 
- $(QEMU_PROG_BUILD): config-devices.mak
- 
--COMMON_LDADDS = ../libqemuutil.a ../libqemustub.a
-+COMMON_LDADDS = ../libqemuutil.a
- 
- # build either PROG or PROGW
- $(QEMU_PROG_BUILD): $(all-obj-y) $(COMMON_LDADDS)
-diff --git a/docs/devel/build-system.txt b/docs/devel/build-system.txt
-index 2af1e668c5..386ef36ee3 100644
---- a/docs/devel/build-system.txt
-+++ b/docs/devel/build-system.txt
-@@ -232,15 +232,15 @@ The utility code that is used by all binaries is built into a
- static archive called libqemuutil.a, which is then linked to all the
- binaries. In order to provide hooks that are only needed by some of the
- binaries, code in libqemuutil.a may depend on other functions that are
--not fully implemented by all QEMU binaries. To deal with this there is a
--second library called libqemustub.a which provides dummy stubs for all
--these functions. These will get lazy linked into the binary if the real
--implementation is not present. In this way, the libqemustub.a static
--library can be thought of as a portable implementation of the weak
--symbols concept. All binaries should link to both libqemuutil.a and
--libqemustub.a. e.g.
--
-- qemu-img$(EXESUF): qemu-img.o ..snip.. libqemuutil.a libqemustub.a
-+not fully implemented by all QEMU binaries.  Dummy stubs for all these
-+functions are also provided by this library, and will only be linked
-+into the binary if the real implementation is not present.  In a way,
-+the stubs can be thought of as a portable implementation of the weak
-+symbols concept.
-+
-+All binaries should link to libqemuutil.a, e.g.:
-+
-+ qemu-img$(EXESUF): qemu-img.o ..snip.. libqemuutil.a
- 
- 
- Windows platform portability
+are available in the git repository at:
+
+  git://github.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to 7437866bfc3b25663f415a8c660fd78360e84598:
+
+  docker: fix creation of archives (2017-09-19 16:20:49 +0200)
+
+----------------------------------------------------------------
+* warning improvements (Alistair)
+* KVM code cleanup (David)
+* scsi-block support for rerror/werror (Fam)
+* support for >64 vCPUs in Windows (Gonglei)
+* SCSI fix (Hannes)
+* SSE bugfixes (Joseph)
+* SmartOS compilation fixes (Kamil)
+* Hyper-V frequency MSR support (Ladi)
+* move more files to accel/tcg (Philippe, Thomas)
+* multiboot validation (PJP)
+* virtqueue size configuration for virtio-scsi (Richard)
+* Hyper-V header cleanup (Roman)
+* Maintainer email update (Guangrong)
+* checkpatch.pl --branch (Daniel), fixes (Greg)
+* introducing scsi/ (me)
+
+----------------------------------------------------------------
+Alistair Francis (7):
+      hw/i386: Improve some of the warning messages
+      Convert remaining error_report() to warn_report()
+      Convert single line fprintf(.../n) to warn_report()
+      Convert multi-line fprintf() to warn_report()
+      General warn report fixups
+      target/mips: Convert VM clock update prints to warn_report
+      Convert remaining single line fprintf() to warn_report()
+
+Daniel P. Berrange (1):
+      scripts: let checkpatch.pl process an entire GIT branch
+
+David Hildenbrand (6):
+      kvm: require JOIN_MEMORY_REGIONS_WORKS
+      kvm: factor out alignment of memory section
+      kvm: use start + size for memory ranges
+      kvm: we never have overlapping slots in kvm_set_phys_mem()
+      kvm: kvm_log_start/stop are only called with known sections
+      kvm: kvm_log_sync() is only called with known memory sections
+
+Eric Blake (1):
+      osdep.h: Prohibit disabling assert() in supported builds
+
+Fam Zheng (4):
+      scsi: Refactor scsi sense interpreting code
+      scsi: Improve scsi_sense_to_errno
+      scsi: Introduce scsi_sense_buf_to_errno
+      scsi-block: Support rerror/werror
+
+Gonglei (1):
+      i386/cpu/hyperv: support over 64 vcpus for windows guests
+
+Greg Kurz (1):
+      checkpatch: add hwaddr to @typeList
+
+Hannes Reinecke (1):
+      scsi-bus: correct responses for INQUIRY and REQUEST SENSE
+
+Joseph Myers (5):
+      target/i386: fix pmovsx/pmovzx in-place operations
+      target/i386: set rip_offset for further SSE instructions
+      target/i386: fix packusdw in-place operation
+      target/i386: fix pcmpxstrx substring search
+      target/i386: fix phminposuw in-place operation
+
+Kamil Rytarowski (2):
+      memory: Rename queue to mrqueue (memory region queue)
+      scsi/esp: Rename the ESP macro to ESP_STATE
+
+Ladi Prosek (4):
+      i386/kvm: use a switch statement for MSR detection
+      i386/kvm: set tsc_khz before configuring Hyper-V CPUID
+      i386/kvm: introduce tsc_is_stable_and_known()
+      i386/kvm: advertise Hyper-V frequency MSRs
+
+Paolo Bonzini (9):
+      scsi: rename scsi_build_sense to scsi_convert_sense
+      scsi: move non-emulation specific code to scsi/
+      scsi: introduce scsi_build_sense
+      scsi: introduce sg_io_sense_from_errno
+      scsi: move block/scsi.h to include/scsi/constants.h
+      ptimer-test: do not link to libqemustub.a/libqemuutil.a
+      Makefile: Remove libqemustub.a
+      target/i386: fix "info mem" for LA57 mode
+      docker: fix creation of archives
+
+Philippe Mathieu-Daud=C3=A9 (3):
+      MAINTAINERS: update email, add missing test entry for megasas
+      test-qga: add missing qemu-ga tool dependency
+      accel/hax: move hax-stub.c to accel/stubs/
+
+Prasad J Pandit (1):
+      multiboot: validate multiboot header address values
+
+Richard W.M. Jones (1):
+      virtio-scsi: Add virtqueue_size parameter allowing virtqueue size t=
+o be set.
+
+Roman Kagan (2):
+      hyperv: add header with protocol definitions
+      update-linux-headers: prepare for hyperv.h removal
+
+Thomas Huth (1):
+      default-configs: Replace $(and ...) with $(call land, ...)
+
+Xiao Guangrong (1):
+      MAINTAINERS: update mail address for NVDIMM
+
+ MAINTAINERS                                |  14 +-
+ Makefile                                   |   7 +-
+ Makefile.objs                              |   2 +-
+ Makefile.target                            |   3 +-
+ accel/kvm/kvm-all.c                        | 242 ++++---------
+ accel/stubs/Makefile.objs                  |   1 +
+ hax-stub.c =3D> accel/stubs/hax-stub.c       |   0
+ block/iscsi.c                              |  51 +--
+ block/qcow2.c                              |   9 +-
+ block/vvfat.c                              |   7 +-
+ default-configs/pci.mak                    |   2 +-
+ default-configs/ppc-softmmu.mak            |   2 +-
+ default-configs/ppc64-softmmu.mak          |   4 +-
+ default-configs/s390x-softmmu.mak          |   2 +-
+ docs/devel/build-system.txt                |  18 +-
+ hw/acpi/core.c                             |  10 +-
+ hw/arm/vexpress.c                          |   4 +-
+ hw/block/virtio-blk.c                      |   2 +-
+ hw/i386/acpi-build.c                       |  15 +-
+ hw/i386/multiboot.c                        |  19 +
+ hw/i386/pc.c                               |   9 +-
+ hw/i386/pc_q35.c                           |   8 +-
+ hw/i386/xen/xen-mapcache.c                 |   5 +-
+ hw/mips/mips_malta.c                       |   4 +-
+ hw/mips/mips_r4k.c                         |   5 +-
+ hw/misc/applesmc.c                         |   2 +-
+ hw/s390x/s390-virtio.c                     |  18 +-
+ hw/scsi/esp.c                              |  10 +-
+ hw/scsi/megasas.c                          |   2 +-
+ hw/scsi/mptendian.c                        |   2 +-
+ hw/scsi/mptsas.c                           |   8 +-
+ hw/scsi/scsi-bus.c                         | 440 ++---------------------
+ hw/scsi/scsi-disk.c                        |  43 ++-
+ hw/scsi/scsi-generic.c                     |  50 +--
+ hw/scsi/spapr_vscsi.c                      |   2 +-
+ hw/scsi/virtio-scsi-dataplane.c            |   2 +-
+ hw/scsi/virtio-scsi.c                      |  10 +-
+ hw/scsi/vmw_pvscsi.c                       |   2 +-
+ hw/usb/dev-uas.c                           |   2 +-
+ hw/usb/hcd-ehci.c                          |   5 +-
+ hw/virtio/virtio-balloon.c                 |   3 +-
+ hw/virtio/virtio.c                         |   6 +-
+ include/hw/i386/pc.h                       |   5 +
+ include/hw/ide/internal.h                  |   2 +-
+ include/hw/scsi/scsi.h                     |  94 +----
+ include/hw/virtio/virtio-scsi.h            |   2 +-
+ include/qemu/osdep.h                       |  16 +
+ include/{block/scsi.h =3D> scsi/constants.h} |   2 -
+ include/scsi/utils.h                       | 124 +++++++
+ memory.c                                   |  22 +-
+ net/hub.c                                  |  10 +-
+ net/net.c                                  |  15 +-
+ qga/vss-win32.c                            |   3 +-
+ scripts/checkpatch.pl                      | 139 ++++++--
+ scripts/update-linux-headers.sh            |   4 +-
+ scsi/Makefile.objs                         |   1 +
+ scsi/utils.c                               | 538 +++++++++++++++++++++++=
+++++++
+ target/i386/cpu.c                          |  30 +-
+ target/i386/cpu.h                          |  12 +-
+ target/i386/hax-mem.c                      |   6 +-
+ target/i386/hyperv-proto.h                 | 260 ++++++++++++++
+ target/i386/hyperv.c                       |   6 +-
+ target/i386/kvm.c                          | 195 ++++++-----
+ target/i386/machine.c                      |  15 +-
+ target/i386/monitor.c                      |   8 +-
+ target/i386/ops_sse.h                      |  47 +--
+ target/i386/translate.c                    |   3 +-
+ target/mips/kvm.c                          |  10 +-
+ target/ppc/translate_init.c                |  17 +-
+ target/s390x/kvm.c                         |   4 +-
+ tests/Makefile.include                     |  12 +-
+ tests/docker/Makefile.include              |   1 -
+ tests/ptimer-test-stubs.c                  |   4 +
+ tests/virtio-scsi-test.c                   |   2 +-
+ trace/control.c                            |   4 +-
+ trace/simple.c                             |   3 +-
+ ui/keymaps.c                               |  10 +-
+ ui/spice-display.c                         |   2 +-
+ util/cutils.c                              |   3 +-
+ util/main-loop.c                           |   6 +-
+ 80 files changed, 1576 insertions(+), 1113 deletions(-)
+ rename hax-stub.c =3D> accel/stubs/hax-stub.c (100%)
+ rename include/{block/scsi.h =3D> scsi/constants.h} (99%)
+ create mode 100644 include/scsi/utils.h
+ create mode 100644 scsi/Makefile.objs
+ create mode 100644 scsi/utils.c
+ create mode 100644 target/i386/hyperv-proto.h
+--=20
+2.13.5
+
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 194315475b..36ef322cc3 100644
+index 0c644626e8..d680cda833 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -561,7 +561,7 @@ QEMU_CFLAGS += -I$(SRC_PATH)/tests
- 
- 
- # Deps that are common to various different sets of tests below
--test-util-obj-y = libqemuutil.a libqemustub.a
-+test-util-obj-y = libqemuutil.a
- test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
- test-qapi-obj-y = tests/test-qapi-visit.o tests/test-qapi-types.o \
- 	tests/test-qapi-event.o tests/test-qmp-introspect.o \
-@@ -616,8 +616,7 @@ tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
+@@ -616,9 +616,8 @@ tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
          migration/qemu-file-channel.o migration/qjson.o \
  	$(test-io-obj-y)
- tests/test-timed-average$(EXESUF): tests/test-timed-average.o $(test-util-obj-y)
+ tests/test-timed-average$(EXESUF): tests/test-timed-average.o $(test-uti=
+l-obj-y)
 -tests/test-base64$(EXESUF): tests/test-base64.o \
--	libqemuutil.a libqemustub.a
+-	libqemuutil.a
+-tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.=
+o hw/core/ptimer.o $(test-util-obj-y)
 +tests/test-base64$(EXESUF): tests/test-base64.o $(test-util-obj-y)
- tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o hw/core/ptimer.o
- 
++tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.=
+o hw/core/ptimer.o
+=20
  tests/test-logging$(EXESUF): tests/test-logging.o $(test-util-obj-y)
--- 
-2.13.5
+=20
+diff --git a/tests/ptimer-test-stubs.c b/tests/ptimer-test-stubs.c
+index 8a1b0a336c..ca5cc3b13b 100644
+--- a/tests/ptimer-test-stubs.c
++++ b/tests/ptimer-test-stubs.c
+@@ -30,6 +30,10 @@ QEMUTimerListGroup main_loop_tlg;
+=20
+ int64_t ptimer_test_time_ns;
+=20
++/* Do not artificially limit period - see hw/core/ptimer.c.  */
++int use_icount =3D 1;
++bool qtest_allowed;
++
+ void timer_init_tl(QEMUTimer *ts,
+                    QEMUTimerList *timer_list, int scale,
+                    QEMUTimerCB *cb, void *opaque)
