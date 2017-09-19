@@ -1,31 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59285)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60307)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1duIHN-0003vF-TE
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:09:37 -0400
+	(envelope-from <eblake@redhat.com>) id 1duIII-0004lO-6v
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:10:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1duIHJ-0008QY-QY
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:09:33 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:47736)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1duIHJ-0008Pn-JE
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:09:29 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id 13so5108805wmq.2
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 06:09:29 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1duIIA-0000p6-4b
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:10:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35330)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1duII9-0000oj-Rt
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 09:10:22 -0400
+References: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1505385610-35529-3-git-send-email-pradeep.jagadeesh@huawei.com>
+	<23a3b68e-efa5-5daa-363e-f697e3d8ae2f@redhat.com>
+	<7d5e2b72-808b-2a71-b285-35c16a273f94@huawei.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <906dd6d0-5012-22d2-c0fa-b21eaf7b24bf@redhat.com>
+Date: Tue, 19 Sep 2017 08:10:18 -0500
 MIME-Version: 1.0
-In-Reply-To: <87d16o53xr.fsf@frigg.lan>
-References: <150529642278.10902.18234057937634437857.stgit@frigg.lan>
-	<150529666493.10902.14830445134051381968.stgit@frigg.lan>
-	<CAFEAcA9p9B8AFaaSaSOOSsFsEhHW=XPLBFs5MrozWq=7p4_9Zg@mail.gmail.com>
-	<87poasgjyh.fsf@frigg.lan>
-	<CAFEAcA8XP+8Jz9Dn-mEQ3CCrVj00t3HA0praQ-OSggtQGAmQ5Q@mail.gmail.com>
-	<87d16o53xr.fsf@frigg.lan>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 19 Sep 2017 14:09:07 +0100
-Message-ID: <CAFEAcA9pc8Q4THRK8P3y_5OFPsJt9qYg9zNG5Wh6m_LYhTAyag@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v6 01/22] instrument: Add documentation
+In-Reply-To: <7d5e2b72-808b-2a71-b285-35c16a273f94@huawei.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="JUHWSErOiGEscIHhe5mGK7r0JctKSCUdG"
+Subject: Re: [Qemu-devel] [PATCH v11 2/6] qmp: Use ThrottleLimits structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,33 +30,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, "Emilio G. Cota" <cota@braap.org>, QEMU Developers <qemu-devel@nongnu.org>, Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
+To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
+Cc: alberto garcia <berto@igalia.com>, jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
 
-On 18 September 2017 at 18:09, Llu=C3=ADs Vilanova <vilanova@ac.upc.edu> wr=
-ote:
-> TCI still has a separation of translation-time (translate.c) and executio=
-n-time
-> (interpreting the TCG opcodes), and I don't think that's gonna go away an=
-ytime
-> soon.
->
-> Even if it did, I think there still will be a translation/execution separ=
-ation
-> easy enough to hook into (even if it's a "fake" one for the cold-path
-> interpreted instructions).
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--JUHWSErOiGEscIHhe5mGK7r0JctKSCUdG
+From: Eric Blake <eblake@redhat.com>
+To: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>,
+ Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, greg kurz <groug@kaod.org>
+Cc: alberto garcia <berto@igalia.com>,
+ jani kokkonen <jani.kokkonen@huawei.com>, qemu-devel@nongnu.org
+Message-ID: <906dd6d0-5012-22d2-c0fa-b21eaf7b24bf@redhat.com>
+Subject: Re: [PATCH v11 2/6] qmp: Use ThrottleLimits structure
+References: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
+ <1505385610-35529-3-git-send-email-pradeep.jagadeesh@huawei.com>
+ <23a3b68e-efa5-5daa-363e-f697e3d8ae2f@redhat.com>
+ <7d5e2b72-808b-2a71-b285-35c16a273f94@huawei.com>
+In-Reply-To: <7d5e2b72-808b-2a71-b285-35c16a273f94@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-As a slightly more immediate and practical example, I'm currently
-implementing the v8M "SG" instruction. This is a somewhat weird
-corner-case of an instruction (it's the only instruction you can
-execute in non-secure state from a code region that's secure).
-I'm implementing it in the exception-handling code path: if we
-detect "NS execute from S memory" we throw a QEMU internal exception,
-and in the cpu_do_interrupt code we either (a) identify that this
-is the SG instruction and execute it or (b) generate the right guest
-CPU exception.
+On 09/19/2017 05:06 AM, Pradeep Jagadeesh wrote:
+> On 9/18/2017 7:10 PM, Eric Blake wrote:
+>> On 09/14/2017 05:40 AM, Pradeep Jagadeesh wrote:
+>>> This patch factors out code to use the ThrottleLimits
+>>> strurcture.
+>>
+>> s/strurcture/structure/
+>>
+>>>
+>>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+>>> Reviewed-by: Greg Kurz <groug@kaod.org>
+>>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>>
+>> Echoing the sentiments made elsewhere - this is a significant rewrite
+>> from the earlier version, so you WANT reviewers to look at it fresh
+>> rather than assuming that previous reviews still apply.
+>>
+> OK, but shall I send them as V12 or V01 again?
 
-That's definitely executing an instruction, and there's no translation
-time for it...
+v12 is fine - you really are revising the patches a twelfth time.
 
-thanks
--- PMM
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--JUHWSErOiGEscIHhe5mGK7r0JctKSCUdG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnBFzoACgkQp6FrSiUn
+Q2rmegf9FHrJTgfl+GAFe4HmPf796xI5w0X4cV//M1OtzYleYTI2lS75e/86O24c
+54P1BCjMuteUif6/iQGQJkql7snQIJ50U+MWkC/GcoTDMR7RNWH8dJ5xvL4helK6
+egli0Jw81TvwnUMv/wSlfRFXOBcSyBVBV5iRi4WOmHHh1HpoBmK01Nkh9kfHCJD3
+lOiuAHoEHXyyvPH6anjed04i+ph+XMPVOe046ozlrE6L+6V2iU2Okp9CLCF74ObO
+Svru7negJGC8hznpnlEa5WXQNVtZvhMUYcdauSJS4S6TyPStWoSuvl7jX3Dh2s+B
+LeZO/9RStaweHDBmP7rwNYNSNHObVg==
+=B+Gs
+-----END PGP SIGNATURE-----
+
+--JUHWSErOiGEscIHhe5mGK7r0JctKSCUdG--
