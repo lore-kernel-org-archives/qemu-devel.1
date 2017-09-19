@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37091)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37083)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1du68v-0005dR-6r
+	(envelope-from <jsnow@redhat.com>) id 1du68u-0005d0-QO
 	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 20:12:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1du68u-0004Vs-0U
-	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 20:12:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:38482)
+	(envelope-from <jsnow@redhat.com>) id 1du68t-0004VL-9J
+	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 20:12:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39500)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1du68t-0004VA-ND
+	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1du68t-0004Up-13
 	for qemu-devel@nongnu.org; Mon, 18 Sep 2017 20:11:59 -0400
 From: John Snow <jsnow@redhat.com>
-Date: Mon, 18 Sep 2017 20:11:44 -0400
-Message-Id: <20170919001147.23182-12-jsnow@redhat.com>
+Date: Mon, 18 Sep 2017 20:11:43 -0400
+Message-Id: <20170919001147.23182-11-jsnow@redhat.com>
 In-Reply-To: <20170919001147.23182-1-jsnow@redhat.com>
 References: <20170919001147.23182-1-jsnow@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL 10/13] AHCI: pretty-print FIS to buffer instead
- of stderr
+Subject: [Qemu-devel] [PULL 09/13] AHCI: Rework IRQ constants
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,104 +29,237 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, jsnow@redhat.com
 
-The current FIS printing routines dump the FIS to screen. adjust this
-such that it dumps to buffer instead, then use this ability to have
-FIS dump mechanisms via trace-events instead of compiled defines.
+Create a new enum so that we can name the IRQ bits, which will make debug=
+ging
+them a little nicer if we can print them out. Not handled in this patch, =
+but
+this will make it possible to get a nice debug printf detailing exactly w=
+hich
+status bits are set, as it can be multiple at any given time.
+
+As a consequence of this patch, it is no longer possible to set multiple =
+IRQ
+codes at once, but nothing was utilizing this ability anyway.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-id: 20170901001502.29915-9-jsnow@redhat.com
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-id: 20170901001502.29915-8-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- hw/ide/ahci.c       | 28 ++++++++++++++++++----------
- hw/ide/trace-events |  4 ++++
- 2 files changed, 22 insertions(+), 10 deletions(-)
+ hw/ide/ahci.c          | 49 ++++++++++++++++++++++++++++++++++++++------=
+-----
+ hw/ide/ahci_internal.h | 44 +++++++++++++++++++++++++++++++++++---------
+ hw/ide/trace-events    |  2 +-
+ 3 files changed, 74 insertions(+), 21 deletions(-)
 
 diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index 2dfcab9..dfc05be 100644
+index 9d2c8ded..2dfcab9 100644
 --- a/hw/ide/ahci.c
 +++ b/hw/ide/ahci.c
-@@ -644,20 +644,21 @@ static void ahci_reset_port(AHCIState *s, int port)
-     ahci_init_d2h(d);
- }
+@@ -56,6 +56,27 @@ static bool ahci_map_fis_address(AHCIDevice *ad);
+ static void ahci_unmap_clb_address(AHCIDevice *ad);
+ static void ahci_unmap_fis_address(AHCIDevice *ad);
 =20
--static void debug_print_fis(uint8_t *fis, int cmd_len)
-+/* Buffer pretty output based on a raw FIS structure. */
-+static char *ahci_pretty_buffer_fis(uint8_t *fis, int cmd_len)
++static const char *AHCIPortIRQ_lookup[AHCI_PORT_IRQ__COUNT] =3D {
++    [AHCI_PORT_IRQ_BIT_DHRS] =3D "DHRS",
++    [AHCI_PORT_IRQ_BIT_PSS]  =3D "PSS",
++    [AHCI_PORT_IRQ_BIT_DSS]  =3D "DSS",
++    [AHCI_PORT_IRQ_BIT_SDBS] =3D "SDBS",
++    [AHCI_PORT_IRQ_BIT_UFS]  =3D "UFS",
++    [AHCI_PORT_IRQ_BIT_DPS]  =3D "DPS",
++    [AHCI_PORT_IRQ_BIT_PCS]  =3D "PCS",
++    [AHCI_PORT_IRQ_BIT_DMPS] =3D "DMPS",
++    [8 ... 21]               =3D "RESERVED",
++    [AHCI_PORT_IRQ_BIT_PRCS] =3D "PRCS",
++    [AHCI_PORT_IRQ_BIT_IPMS] =3D "IPMS",
++    [AHCI_PORT_IRQ_BIT_OFS]  =3D "OFS",
++    [25]                     =3D "RESERVED",
++    [AHCI_PORT_IRQ_BIT_INFS] =3D "INFS",
++    [AHCI_PORT_IRQ_BIT_IFS]  =3D "IFS",
++    [AHCI_PORT_IRQ_BIT_HBDS] =3D "HBDS",
++    [AHCI_PORT_IRQ_BIT_HBFS] =3D "HBFS",
++    [AHCI_PORT_IRQ_BIT_TFES] =3D "TFES",
++    [AHCI_PORT_IRQ_BIT_CPDS] =3D "CPDS"
++};
+=20
+ static uint32_t  ahci_port_read(AHCIState *s, int port, int offset)
  {
--#if DEBUG_AHCI
-     int i;
-+    GString *s =3D g_string_new("FIS:");
-=20
--    fprintf(stderr, "fis:");
-     for (i =3D 0; i < cmd_len; i++) {
-         if ((i & 0xf) =3D=3D 0) {
--            fprintf(stderr, "\n%02x:",i);
-+            g_string_append_printf(s, "\n0x%02x: ", i);
-         }
--        fprintf(stderr, "%02x ",fis[i]);
-+        g_string_append_printf(s, "%02x ", fis[i]);
-     }
--    fprintf(stderr, "\n");
--#endif
-+    g_string_append_c(s, '\n');
-+
-+    return g_string_free(s, FALSE);
+@@ -170,12 +191,18 @@ static void ahci_check_irq(AHCIState *s)
  }
 =20
- static bool ahci_map_fis_address(AHCIDevice *ad)
-@@ -1201,7 +1202,11 @@ static void handle_reg_h2d_fis(AHCIState *s, int p=
-ort,
-      * table to ide_state->io_buffer */
-     if (opts & AHCI_CMD_ATAPI) {
-         memcpy(ide_state->io_buffer, &cmd_fis[AHCI_COMMAND_TABLE_ACMD], =
-0x10);
--        debug_print_fis(ide_state->io_buffer, 0x10);
-+        if (trace_event_get_state_backends(TRACE_HANDLE_REG_H2D_FIS_DUMP=
-)) {
-+            char *pretty_fis =3D ahci_pretty_buffer_fis(ide_state->io_bu=
-ffer, 0x10);
-+            trace_handle_reg_h2d_fis_dump(s, port, pretty_fis);
-+            g_free(pretty_fis);
-+        }
-         s->dev[port].done_atapi_packet =3D false;
-         /* XXX send PIO setup FIS */
+ static void ahci_trigger_irq(AHCIState *s, AHCIDevice *d,
+-                             int irq_type)
++                             enum AHCIPortIRQ irqbit)
+ {
+-    DPRINTF(d->port_no, "trigger irq %#x -> %x\n",
+-            irq_type, d->port_regs.irq_mask & irq_type);
++    g_assert(irqbit >=3D 0 && irqbit < 32);
++    uint32_t irq =3D 1U << irqbit;
++    uint32_t irqstat =3D d->port_regs.irq_stat | irq;
+=20
+-    d->port_regs.irq_stat |=3D irq_type;
++    trace_ahci_trigger_irq(s, d->port_no,
++                           AHCIPortIRQ_lookup[irqbit], irq,
++                           d->port_regs.irq_stat, irqstat,
++                           irqstat & d->port_regs.irq_mask);
++
++    d->port_regs.irq_stat =3D irqstat;
+     ahci_check_irq(s);
+ }
+=20
+@@ -718,7 +745,7 @@ static void ahci_write_fis_sdb(AHCIState *s, NCQTrans=
+ferState *ncq_tfs)
+=20
+     /* Trigger IRQ if interrupt bit is set (which currently, it always i=
+s) */
+     if (sdb_fis->flags & 0x40) {
+-        ahci_trigger_irq(s, ad, PORT_IRQ_SDB_FIS);
++        ahci_trigger_irq(s, ad, AHCI_PORT_IRQ_BIT_SDBS);
      }
-@@ -1256,8 +1261,11 @@ static int handle_cmd(AHCIState *s, int port, uint=
-8_t slot)
+ }
+=20
+@@ -761,10 +788,10 @@ static void ahci_write_fis_pio(AHCIDevice *ad, uint=
+16_t len)
+         ad->port.ifs[0].status;
+=20
+     if (pio_fis[2] & ERR_STAT) {
+-        ahci_trigger_irq(ad->hba, ad, PORT_IRQ_TF_ERR);
++        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_TFES);
+     }
+=20
+-    ahci_trigger_irq(ad->hba, ad, PORT_IRQ_PIOS_FIS);
++    ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_PSS);
+ }
+=20
+ static bool ahci_write_fis_d2h(AHCIDevice *ad)
+@@ -804,10 +831,10 @@ static bool ahci_write_fis_d2h(AHCIDevice *ad)
+         ad->port.ifs[0].status;
+=20
+     if (d2h_fis[2] & ERR_STAT) {
+-        ahci_trigger_irq(ad->hba, ad, PORT_IRQ_TF_ERR);
++        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_TFES);
+     }
+=20
+-    ahci_trigger_irq(ad->hba, ad, PORT_IRQ_D2H_REG_FIS);
++    ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_DHRS);
+     return true;
+ }
+=20
+@@ -1082,7 +1109,7 @@ static void process_ncq_command(AHCIState *s, int p=
+ort, uint8_t *cmd_fis,
+                      "is smaller than the requested size (0x%zx)",
+                      ncq_tfs->sglist.size, size);
+         ncq_err(ncq_tfs);
+-        ahci_trigger_irq(ad->hba, ad, PORT_IRQ_OVERFLOW);
++        ahci_trigger_irq(ad->hba, ad, AHCI_PORT_IRQ_BIT_OFS);
+         return;
+     } else if (ncq_tfs->sglist.size !=3D size) {
+         trace_process_ncq_command_large(s, port, tag,
+@@ -1225,7 +1252,7 @@ static int handle_cmd(AHCIState *s, int port, uint8=
+_t slot)
+         trace_handle_cmd_badfis(s, port);
+         return -1;
+     } else if (cmd_len !=3D 0x80) {
+-        ahci_trigger_irq(s, &s->dev[port], PORT_IRQ_HBUS_ERR);
++        ahci_trigger_irq(s, &s->dev[port], AHCI_PORT_IRQ_BIT_HBFS);
          trace_handle_cmd_badmap(s, port, cmd_len);
          goto out;
      }
--    debug_print_fis(cmd_fis, 0x80);
+diff --git a/hw/ide/ahci_internal.h b/hw/ide/ahci_internal.h
+index 1e21169..ce2e818 100644
+--- a/hw/ide/ahci_internal.h
++++ b/hw/ide/ahci_internal.h
+@@ -91,6 +91,31 @@
+ #define PORT_CMD_ISSUE            0x38 /* command issue */
+ #define PORT_RESERVED             0x3c /* reserved */
+=20
++/* Port interrupt bit descriptors */
++enum AHCIPortIRQ {
++    AHCI_PORT_IRQ_BIT_DHRS =3D 0,
++    AHCI_PORT_IRQ_BIT_PSS  =3D 1,
++    AHCI_PORT_IRQ_BIT_DSS  =3D 2,
++    AHCI_PORT_IRQ_BIT_SDBS =3D 3,
++    AHCI_PORT_IRQ_BIT_UFS  =3D 4,
++    AHCI_PORT_IRQ_BIT_DPS  =3D 5,
++    AHCI_PORT_IRQ_BIT_PCS  =3D 6,
++    AHCI_PORT_IRQ_BIT_DMPS =3D 7,
++    /* RESERVED */
++    AHCI_PORT_IRQ_BIT_PRCS =3D 22,
++    AHCI_PORT_IRQ_BIT_IPMS =3D 23,
++    AHCI_PORT_IRQ_BIT_OFS  =3D 24,
++    /* RESERVED */
++    AHCI_PORT_IRQ_BIT_INFS =3D 26,
++    AHCI_PORT_IRQ_BIT_IFS  =3D 27,
++    AHCI_PORT_IRQ_BIT_HBDS =3D 28,
++    AHCI_PORT_IRQ_BIT_HBFS =3D 29,
++    AHCI_PORT_IRQ_BIT_TFES =3D 30,
++    AHCI_PORT_IRQ_BIT_CPDS =3D 31,
++    AHCI_PORT_IRQ__COUNT   =3D 32
++};
++
++
+ /* PORT_IRQ_{STAT,MASK} bits */
+ #define PORT_IRQ_COLD_PRES        (1U << 31) /* cold presence detect */
+ #define PORT_IRQ_TF_ERR           (1 << 30) /* task file error */
+@@ -98,18 +123,19 @@
+ #define PORT_IRQ_HBUS_DATA_ERR    (1 << 28) /* host bus data error */
+ #define PORT_IRQ_IF_ERR           (1 << 27) /* interface fatal error */
+ #define PORT_IRQ_IF_NONFATAL      (1 << 26) /* interface non-fatal error=
+ */
++                                            /* reserved */
+ #define PORT_IRQ_OVERFLOW         (1 << 24) /* xfer exhausted available =
+S/G */
+ #define PORT_IRQ_BAD_PMP          (1 << 23) /* incorrect port multiplier=
+ */
 -
-+    if (trace_event_get_state_backends(TRACE_HANDLE_CMD_FIS_DUMP)) {
-+        char *pretty_fis =3D ahci_pretty_buffer_fis(cmd_fis, 0x80);
-+        trace_handle_cmd_fis_dump(s, port, pretty_fis);
-+        g_free(pretty_fis);
-+    }
-     switch (cmd_fis[0]) {
-         case SATA_FIS_TYPE_REGISTER_H2D:
-             handle_reg_h2d_fis(s, port, slot, cmd_fis);
+ #define PORT_IRQ_PHYRDY           (1 << 22) /* PhyRdy changed */
+-#define PORT_IRQ_DEV_ILCK         (1 << 7) /* device interlock */
+-#define PORT_IRQ_CONNECT          (1 << 6) /* port connect change status=
+ */
+-#define PORT_IRQ_SG_DONE          (1 << 5) /* descriptor processed */
+-#define PORT_IRQ_UNK_FIS          (1 << 4) /* unknown FIS rx'd */
+-#define PORT_IRQ_SDB_FIS          (1 << 3) /* Set Device Bits FIS rx'd *=
+/
+-#define PORT_IRQ_DMAS_FIS         (1 << 2) /* DMA Setup FIS rx'd */
+-#define PORT_IRQ_PIOS_FIS         (1 << 1) /* PIO Setup FIS rx'd */
+-#define PORT_IRQ_D2H_REG_FIS      (1 << 0) /* D2H Register FIS rx'd */
++                                            /* reserved */
++#define PORT_IRQ_DEV_ILCK         (1 << 7)  /* device interlock */
++#define PORT_IRQ_CONNECT          (1 << 6)  /* port connect change statu=
+s */
++#define PORT_IRQ_SG_DONE          (1 << 5)  /* descriptor processed */
++#define PORT_IRQ_UNK_FIS          (1 << 4)  /* unknown FIS rx'd */
++#define PORT_IRQ_SDB_FIS          (1 << 3)  /* Set Device Bits FIS rx'd =
+*/
++#define PORT_IRQ_DMAS_FIS         (1 << 2)  /* DMA Setup FIS rx'd */
++#define PORT_IRQ_PIOS_FIS         (1 << 1)  /* PIO Setup FIS rx'd */
++#define PORT_IRQ_D2H_REG_FIS      (1 << 0)  /* D2H Register FIS rx'd */
+=20
+ #define PORT_IRQ_FREEZE           (PORT_IRQ_HBUS_ERR | PORT_IRQ_IF_ERR |=
+   \
+                                    PORT_IRQ_CONNECT | PORT_IRQ_PHYRDY | =
+   \
 diff --git a/hw/ide/trace-events b/hw/ide/trace-events
-index e15fd77..601bd97 100644
+index 0b61c5d..e15fd77 100644
 --- a/hw/ide/trace-events
 +++ b/hw/ide/trace-events
-@@ -105,3 +105,7 @@ ahci_cmd_done(void *s, int port) "ahci(%p)[%d]: cmd d=
-one"
- ahci_reset(void *s) "ahci(%p): HBA reset"
- allwinner_ahci_mem_read(void *s, void *a, uint64_t addr, uint64_t val, u=
-nsigned size) "ahci(%p): read a=3D%p addr=3D0x%"HWADDR_PRIx" val=3D0x%"PR=
-Ix64", size=3D%d"
- allwinner_ahci_mem_write(void *s, void *a, uint64_t addr, uint64_t val, =
-unsigned size) "ahci(%p): write a=3D%p addr=3D0x%"HWADDR_PRIx" val=3D0x%"=
-PRIx64", size=3D%d"
-+
-+# Warning: Verbose
-+handle_reg_h2d_fis_dump(void *s, int port, const char *fis) "ahci(%p)[%d=
-]: %s"
-+handle_cmd_fis_dump(void *s, int port, const char *fis) "ahci(%p)[%d]: %=
-s"
+@@ -62,7 +62,7 @@ ahci_port_read(void *s, int port, int offset, uint32_t =
+ret) "ahci(%p)[%d]: port
+ ahci_irq_raise(void *s) "ahci(%p): raise irq"
+ ahci_irq_lower(void *s) "ahci(%p): lower irq"
+ ahci_check_irq(void *s, uint32_t old, uint32_t new) "ahci(%p): check irq=
+ 0x%08x --> 0x%08x"
+-
++ahci_trigger_irq(void *s, int port, const char *name, uint32_t val, uint=
+32_t old, uint32_t new, uint32_t effective) "ahci(%p)[%d]: trigger irq +%=
+s (0x%08x); irqstat: 0x%08x --> 0x%08x; effective: 0x%08x"
+ ahci_port_write(void *s, int port, int offset, uint32_t val) "ahci(%p)[%=
+d]: port write @ 0x%x: 0x%08x"
+ ahci_mem_read_32(void *s, uint64_t addr, uint32_t val) "ahci(%p): mem re=
+ad @ 0x%"PRIx64": 0x%08x"
+ ahci_mem_read(void *s, unsigned size, uint64_t addr, uint64_t val) "ahci=
+(%p): read%u @ 0x%"PRIx64": 0x%016"PRIx64
 --=20
 2.9.5
