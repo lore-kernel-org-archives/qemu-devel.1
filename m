@@ -1,31 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54339)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duJVQ-0006m6-F5
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:28:10 -0400
+	(envelope-from <jan.dakinevich@gmail.com>) id 1duJWv-00087g-53
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:29:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duJVJ-0005FY-S7
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:28:08 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35140)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1duJVJ-0005El-Je
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:28:01 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
-	[10.5.11.16])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B5DEB4FD
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 14:28:00 +0000 (UTC)
-Received: from donizetti.redhat.com (ovpn-117-61.ams2.redhat.com
-	[10.36.117.61])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id DA6F35C541
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 14:27:59 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Tue, 19 Sep 2017 16:27:56 +0200
-Message-Id: <20170919142758.13577-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PULL v3 00/51] Misc patches for 2017-09-19
+	(envelope-from <jan.dakinevich@gmail.com>) id 1duJWs-00061U-Db
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:29:41 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:33303)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <jan.dakinevich@gmail.com>)
+	id 1duJWr-000611-TF
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 10:29:38 -0400
+Received: by mail-wr0-x241.google.com with SMTP id b9so2362483wra.0
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 07:29:37 -0700 (PDT)
+From: Jan Dakinevich <jan.dakinevich@gmail.com>
+Date: Tue, 19 Sep 2017 16:28:58 +0200
+Message-Id: <20170919142858.73056-1-jan.dakinevich@gmail.com>
+In-Reply-To: <20170919002659.3cd0004a@bahia.lan>
+References: <20170919002659.3cd0004a@bahia.lan>
+Subject: [Qemu-devel] [PATCH] 9pfs: fix readdir() for 9p2000.u
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,250 +26,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
+Cc: Jan Dakinevich <jan.dakinevich@gmail.com>
 
-The following changes since commit 11e06ce1ed28fd0ffcbc1e2436b72f3412b4ec=
-c8:
+-- >8 --
+Greg,
 
-  Merge remote-tracking branch 'remotes/jnsnow/tags/ide-pull-request' int=
-o staging (2017-09-19 10:13:51 +0100)
+Usually, I use 9p as rootfs and run qemu in one of these way. First,
+using initrd with built-in 9p modules:
 
-are available in the git repository at:
+$ sudo /path/to/qemu-system-x86_64 \
+    -machine accel=kvm -m 1G -nographic -vga none -serial mon:stdio \
+    -kernel $PWD/rootfs/boot/vmlinuz-3.16.0-4-amd64 \
+    -initrd $PWD/rootfs/boot/initrd.img-3.16.0-4-amd64 \
+    -append "root=rootfs rw rootfstype=9p rootflags=trans=virtio,version=9p2000.u console=ttyS0" \
+    -fsdev local,id=fsdev0,path=$PWD/rootfs,security_model=passthrough \
+    -device virtio-9p-pci,fsdev=fsdev0,mount_tag=rootfs
 
-  git://github.com/bonzini/qemu.git tags/for-upstream
+Second, with compiled into the kernel 9p support and without initrd (but
+this way quite tricky):
 
-for you to fetch changes up to 7437866bfc3b25663f415a8c660fd78360e84598:
+$ sudo /path/to/qemu-system-x86_64 \
+    -machine accel=kvm -m 1G -nographic -vga none -serial mon:stdio \
+    -kernel /path/to/bzImage \
+    -append "root=/dev/root rw rootfstype=9p rootflags=trans=virtio,version=9p2000.u console=ttyS0" \
+    -fsdev local,id=fsdev0,path=$PWD/rootfs,security_model=passthrough \
+    -device virtio-9p-pci,fsdev=fsdev0,mount_tag=/dev/root
 
-  docker: fix creation of archives (2017-09-19 16:20:49 +0200)
+This patch mostly uses your commit message, because it is much more
+informative than I could ever suggest.
 
-----------------------------------------------------------------
-* warning improvements (Alistair)
-* KVM code cleanup (David)
-* scsi-block support for rerror/werror (Fam)
-* support for >64 vCPUs in Windows (Gonglei)
-* SCSI fix (Hannes)
-* SSE bugfixes (Joseph)
-* SmartOS compilation fixes (Kamil)
-* Hyper-V frequency MSR support (Ladi)
-* move more files to accel/tcg (Philippe, Thomas)
-* multiboot validation (PJP)
-* virtqueue size configuration for virtio-scsi (Richard)
-* Hyper-V header cleanup (Roman)
-* Maintainer email update (Guangrong)
-* checkpatch.pl --branch (Daniel), fixes (Greg)
-* introducing scsi/ (me)
+--
+Best regards
+Jan Dakinevich
+-- >8 --
+If the client is using 9p2000.u, the following occurs:
 
-----------------------------------------------------------------
-Alistair Francis (7):
-      hw/i386: Improve some of the warning messages
-      Convert remaining error_report() to warn_report()
-      Convert single line fprintf(.../n) to warn_report()
-      Convert multi-line fprintf() to warn_report()
-      General warn report fixups
-      target/mips: Convert VM clock update prints to warn_report
-      Convert remaining single line fprintf() to warn_report()
+$ cd ${virtfs_shared_dir}
+$ mkdir -p a/b/c
+$ ls a/b
+ls: cannot access 'a/b/a': No such file or directory
+ls: cannot access 'a/b/b': No such file or directory
+a  b  c
 
-Daniel P. Berrange (1):
-      scripts: let checkpatch.pl process an entire GIT branch
+instead of the expected:
 
-David Hildenbrand (6):
-      kvm: require JOIN_MEMORY_REGIONS_WORKS
-      kvm: factor out alignment of memory section
-      kvm: use start + size for memory ranges
-      kvm: we never have overlapping slots in kvm_set_phys_mem()
-      kvm: kvm_log_start/stop are only called with known sections
-      kvm: kvm_log_sync() is only called with known memory sections
+$ ls a/b
+c
 
-Eric Blake (1):
-      osdep.h: Prohibit disabling assert() in supported builds
+This is a regression introduced by commit f57f5878578a;
+local_name_to_path() now resolves ".." and "." in paths,
+and v9fs_do_readdir_with_stat()->stat_to_v9stat() then
+copies the basename of the resulting path to the response.
+With the example above, this means that "." and ".." are
+turned into "b" and "a" respectively...
 
-Fam Zheng (4):
-      scsi: Refactor scsi sense interpreting code
-      scsi: Improve scsi_sense_to_errno
-      scsi: Introduce scsi_sense_buf_to_errno
-      scsi-block: Support rerror/werror
+Actually, the name we need to pass is the d_name field of
+the dirent. Meanwhile, name argument of stat_to_v9stat is
+preserved, since it used to symbolic links resolving.
 
-Gonglei (1):
-      i386/cpu/hyperv: support over 64 vcpus for windows guests
+To satisfy stat_to_v9stat(), v9fs_stat() takes a care of the
+logic from old stat_to_v9stat() for determining basename of
+the given path.
 
-Greg Kurz (1):
-      checkpatch: add hwaddr to @typeList
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Jan Dakinevich <jan.dakinevich@gmail.com>
+---
+ hw/9pfs/9p.c | 18 +++++++-----------
+ 1 file changed, 7 insertions(+), 11 deletions(-)
 
-Hannes Reinecke (1):
-      scsi-bus: correct responses for INQUIRY and REQUEST SENSE
-
-Joseph Myers (5):
-      target/i386: fix pmovsx/pmovzx in-place operations
-      target/i386: set rip_offset for further SSE instructions
-      target/i386: fix packusdw in-place operation
-      target/i386: fix pcmpxstrx substring search
-      target/i386: fix phminposuw in-place operation
-
-Kamil Rytarowski (2):
-      memory: Rename queue to mrqueue (memory region queue)
-      scsi/esp: Rename the ESP macro to ESP_STATE
-
-Ladi Prosek (4):
-      i386/kvm: use a switch statement for MSR detection
-      i386/kvm: set tsc_khz before configuring Hyper-V CPUID
-      i386/kvm: introduce tsc_is_stable_and_known()
-      i386/kvm: advertise Hyper-V frequency MSRs
-
-Paolo Bonzini (9):
-      scsi: rename scsi_build_sense to scsi_convert_sense
-      scsi: move non-emulation specific code to scsi/
-      scsi: introduce scsi_build_sense
-      scsi: introduce sg_io_sense_from_errno
-      scsi: move block/scsi.h to include/scsi/constants.h
-      ptimer-test: do not link to libqemustub.a/libqemuutil.a
-      Makefile: Remove libqemustub.a
-      target/i386: fix "info mem" for LA57 mode
-      docker: fix creation of archives
-
-Philippe Mathieu-Daud=C3=A9 (3):
-      MAINTAINERS: update email, add missing test entry for megasas
-      test-qga: add missing qemu-ga tool dependency
-      accel/hax: move hax-stub.c to accel/stubs/
-
-Prasad J Pandit (1):
-      multiboot: validate multiboot header address values
-
-Richard W.M. Jones (1):
-      virtio-scsi: Add virtqueue_size parameter allowing virtqueue size t=
-o be set.
-
-Roman Kagan (2):
-      hyperv: add header with protocol definitions
-      update-linux-headers: prepare for hyperv.h removal
-
-Thomas Huth (1):
-      default-configs: Replace $(and ...) with $(call land, ...)
-
-Xiao Guangrong (1):
-      MAINTAINERS: update mail address for NVDIMM
-
- MAINTAINERS                                |  14 +-
- Makefile                                   |   7 +-
- Makefile.objs                              |   2 +-
- Makefile.target                            |   3 +-
- accel/kvm/kvm-all.c                        | 242 ++++---------
- accel/stubs/Makefile.objs                  |   1 +
- hax-stub.c =3D> accel/stubs/hax-stub.c       |   0
- block/iscsi.c                              |  51 +--
- block/qcow2.c                              |   9 +-
- block/vvfat.c                              |   7 +-
- default-configs/pci.mak                    |   2 +-
- default-configs/ppc-softmmu.mak            |   2 +-
- default-configs/ppc64-softmmu.mak          |   4 +-
- default-configs/s390x-softmmu.mak          |   2 +-
- docs/devel/build-system.txt                |  18 +-
- hw/acpi/core.c                             |  10 +-
- hw/arm/vexpress.c                          |   4 +-
- hw/block/virtio-blk.c                      |   2 +-
- hw/i386/acpi-build.c                       |  15 +-
- hw/i386/multiboot.c                        |  19 +
- hw/i386/pc.c                               |   9 +-
- hw/i386/pc_q35.c                           |   8 +-
- hw/i386/xen/xen-mapcache.c                 |   5 +-
- hw/mips/mips_malta.c                       |   4 +-
- hw/mips/mips_r4k.c                         |   5 +-
- hw/misc/applesmc.c                         |   2 +-
- hw/s390x/s390-virtio.c                     |  18 +-
- hw/scsi/esp.c                              |  10 +-
- hw/scsi/megasas.c                          |   2 +-
- hw/scsi/mptendian.c                        |   2 +-
- hw/scsi/mptsas.c                           |   8 +-
- hw/scsi/scsi-bus.c                         | 440 ++---------------------
- hw/scsi/scsi-disk.c                        |  43 ++-
- hw/scsi/scsi-generic.c                     |  50 +--
- hw/scsi/spapr_vscsi.c                      |   2 +-
- hw/scsi/virtio-scsi-dataplane.c            |   2 +-
- hw/scsi/virtio-scsi.c                      |  10 +-
- hw/scsi/vmw_pvscsi.c                       |   2 +-
- hw/usb/dev-uas.c                           |   2 +-
- hw/usb/hcd-ehci.c                          |   5 +-
- hw/virtio/virtio-balloon.c                 |   3 +-
- hw/virtio/virtio.c                         |   6 +-
- include/hw/i386/pc.h                       |   5 +
- include/hw/ide/internal.h                  |   2 +-
- include/hw/scsi/scsi.h                     |  94 +----
- include/hw/virtio/virtio-scsi.h            |   2 +-
- include/qemu/osdep.h                       |  16 +
- include/{block/scsi.h =3D> scsi/constants.h} |   2 -
- include/scsi/utils.h                       | 124 +++++++
- memory.c                                   |  22 +-
- net/hub.c                                  |  10 +-
- net/net.c                                  |  15 +-
- qga/vss-win32.c                            |   3 +-
- scripts/checkpatch.pl                      | 139 ++++++--
- scripts/update-linux-headers.sh            |   4 +-
- scsi/Makefile.objs                         |   1 +
- scsi/utils.c                               | 538 +++++++++++++++++++++++=
-++++++
- target/i386/cpu.c                          |  30 +-
- target/i386/cpu.h                          |  12 +-
- target/i386/hax-mem.c                      |   6 +-
- target/i386/hyperv-proto.h                 | 260 ++++++++++++++
- target/i386/hyperv.c                       |   6 +-
- target/i386/kvm.c                          | 195 ++++++-----
- target/i386/machine.c                      |  15 +-
- target/i386/monitor.c                      |   8 +-
- target/i386/ops_sse.h                      |  47 +--
- target/i386/translate.c                    |   3 +-
- target/mips/kvm.c                          |  10 +-
- target/ppc/translate_init.c                |  17 +-
- target/s390x/kvm.c                         |   4 +-
- tests/Makefile.include                     |  12 +-
- tests/docker/Makefile.include              |   1 -
- tests/ptimer-test-stubs.c                  |   4 +
- tests/virtio-scsi-test.c                   |   2 +-
- trace/control.c                            |   4 +-
- trace/simple.c                             |   3 +-
- ui/keymaps.c                               |  10 +-
- ui/spice-display.c                         |   2 +-
- util/cutils.c                              |   3 +-
- util/main-loop.c                           |   6 +-
- 80 files changed, 1576 insertions(+), 1113 deletions(-)
- rename hax-stub.c =3D> accel/stubs/hax-stub.c (100%)
- rename include/{block/scsi.h =3D> scsi/constants.h} (99%)
- create mode 100644 include/scsi/utils.h
- create mode 100644 scsi/Makefile.objs
- create mode 100644 scsi/utils.c
- create mode 100644 target/i386/hyperv-proto.h
---=20
-2.13.5
-
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 0c644626e8..d680cda833 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -616,9 +616,8 @@ tests/test-vmstate$(EXESUF): tests/test-vmstate.o \
-         migration/qemu-file-channel.o migration/qjson.o \
- 	$(test-io-obj-y)
- tests/test-timed-average$(EXESUF): tests/test-timed-average.o $(test-uti=
-l-obj-y)
--tests/test-base64$(EXESUF): tests/test-base64.o \
--	libqemuutil.a
--tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.=
-o hw/core/ptimer.o $(test-util-obj-y)
-+tests/test-base64$(EXESUF): tests/test-base64.o $(test-util-obj-y)
-+tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.=
-o hw/core/ptimer.o
-=20
- tests/test-logging$(EXESUF): tests/test-logging.o $(test-util-obj-y)
-=20
-diff --git a/tests/ptimer-test-stubs.c b/tests/ptimer-test-stubs.c
-index 8a1b0a336c..ca5cc3b13b 100644
---- a/tests/ptimer-test-stubs.c
-+++ b/tests/ptimer-test-stubs.c
-@@ -30,6 +30,10 @@ QEMUTimerListGroup main_loop_tlg;
-=20
- int64_t ptimer_test_time_ns;
-=20
-+/* Do not artificially limit period - see hw/core/ptimer.c.  */
-+int use_icount =3D 1;
-+bool qtest_allowed;
-+
- void timer_init_tl(QEMUTimer *ts,
-                    QEMUTimerList *timer_list, int scale,
-                    QEMUTimerCB *cb, void *opaque)
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index 4d4ed85..6cb9dfc 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -804,11 +804,11 @@ static uint32_t stat_to_v9mode(const struct stat *stbuf)
+ }
+ 
+ static int coroutine_fn stat_to_v9stat(V9fsPDU *pdu, V9fsPath *name,
++                                       const char *basename,
+                                        const struct stat *stbuf,
+                                        V9fsStat *v9stat)
+ {
+     int err;
+-    const char *str;
+ 
+     memset(v9stat, 0, sizeof(*v9stat));
+ 
+@@ -842,14 +842,7 @@ static int coroutine_fn stat_to_v9stat(V9fsPDU *pdu, V9fsPath *name,
+                 "HARDLINKCOUNT", (unsigned long)stbuf->st_nlink);
+     }
+ 
+-    str = strrchr(name->data, '/');
+-    if (str) {
+-        str += 1;
+-    } else {
+-        str = name->data;
+-    }
+-
+-    v9fs_string_sprintf(&v9stat->name, "%s", str);
++    v9fs_string_sprintf(&v9stat->name, "%s", basename);
+ 
+     v9stat->size = 61 +
+         v9fs_string_size(&v9stat->name) +
+@@ -1058,6 +1051,7 @@ static void coroutine_fn v9fs_stat(void *opaque)
+     struct stat stbuf;
+     V9fsFidState *fidp;
+     V9fsPDU *pdu = opaque;
++    char *basename;
+ 
+     err = pdu_unmarshal(pdu, offset, "d", &fid);
+     if (err < 0) {
+@@ -1074,7 +1068,9 @@ static void coroutine_fn v9fs_stat(void *opaque)
+     if (err < 0) {
+         goto out;
+     }
+-    err = stat_to_v9stat(pdu, &fidp->path, &stbuf, &v9stat);
++    basename = g_path_get_basename(fidp->path.data);
++    err = stat_to_v9stat(pdu, &fidp->path, basename, &stbuf, &v9stat);
++    g_free(basename);
+     if (err < 0) {
+         goto out;
+     }
+@@ -1750,7 +1746,7 @@ static int coroutine_fn v9fs_do_readdir_with_stat(V9fsPDU *pdu,
+         if (err < 0) {
+             break;
+         }
+-        err = stat_to_v9stat(pdu, &path, &stbuf, &v9stat);
++        err = stat_to_v9stat(pdu, &path, dent->d_name, &stbuf, &v9stat);
+         if (err < 0) {
+             break;
+         }
+-- 
+2.10.1
