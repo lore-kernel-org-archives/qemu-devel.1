@@ -1,22 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51158)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51212)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duFtV-0001FM-Uh
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:49 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1duFtX-0001Gk-8L
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duFtT-0002sR-IH
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:45 -0400
-Date: Tue, 19 Sep 2017 17:50:08 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1duFtU-0002u4-Cv
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:36:47 -0400
+Date: Tue, 19 Sep 2017 17:36:15 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170919075008.GP27153@umbus>
+Message-ID: <20170919073615.GN27153@umbus>
 References: <20170911171235.29331-1-clg@kaod.org>
-	<20170911171235.29331-13-clg@kaod.org>
+	<20170911171235.29331-10-clg@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="hHiQ9nAwW5IGN2dL"
+	protocol="application/pgp-signature"; boundary="aIbcA3MSwnGacr4f"
 Content-Disposition: inline
-In-Reply-To: <20170911171235.29331-13-clg@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 12/21] ppc/xive: notify the CPU when
- interrupt priority is more privileged
+In-Reply-To: <20170911171235.29331-10-clg@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 09/21] ppc/xive: extend the
+ interrupt presenter model for XIVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,137 +29,82 @@ To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
 Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
 
---hHiQ9nAwW5IGN2dL
+--aIbcA3MSwnGacr4f
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 11, 2017 at 07:12:26PM +0200, C=E9dric Le Goater wrote:
-> The Pending Interrupt Priority Register (PIPR) contains the priority
-> of the most favored pending notification. It is calculated from the
-> Interrupt Pending Buffer (IPB) which indicates a pending interrupt at
-> the priority corresponding to the bit number.
+On Mon, Sep 11, 2017 at 07:12:23PM +0200, C=E9dric Le Goater wrote:
+> The XIVE interrupt presenter exposes a set of Thread Interrupt
+> Management Areas, also called rings, one per different level of
+> privilege (four in all). This area is used to handle priority
+> management and interrupt acknowledgment among other things.
 >=20
-> If the PIPR is more favored (1) than the Current Processor Priority
-> Register (CPPR), the CPU interrupt line can be raised and the EO bit
-> of the Notification Source Register is updated to notify the presence
-> of an exception for the O/S. The check needs to be done whenever the
-> PIPR or the CPPR is changed.
->=20
-> (1) numerically less than
+> We extend the ICPState object with a cache of the register data for
+> XIVE. The integration with the sPAPR machine is much easier and we
+> need a common framework to switch from one controller model to
+> another: XICS <-> XIVE.
+
+This sounds like an even worse idea than referencing the ICS state.
+The TIMA really needs to be managed by a different object than the ICP.
+
+> The next patch will introduce the MMIO handlers to interact with the
+> TIMA, OS only, which is required for the sPAPR support.
 >=20
 > Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
 > ---
->  hw/intc/spapr_xive.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++=
-++++
->  1 file changed, 50 insertions(+)
+>  hw/intc/xics.c        | 4 ++++
+>  include/hw/ppc/xics.h | 6 ++++++
+>  2 files changed, 10 insertions(+)
 >=20
-> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> index 4bc61cfda67a..e5d4b723b7e0 100644
-> --- a/hw/intc/spapr_xive.c
-> +++ b/hw/intc/spapr_xive.c
-> @@ -28,11 +28,39 @@
->  #include "xive-internal.h"
-> =20
-> =20
-> +/* Convert a priority number to an Interrupt Pending Buffer (IPB)
-> + * register, which indicates a pending interrupt at the priority
-> + * corresponding to the bit number
-> + */
-> +static uint8_t priority_to_ipb(uint8_t priority)
-> +{
-> +    return priority > XIVE_PRIORITY_MAX ? 0 :  1 << (7 - priority);
-> +}
-> +
-> +/* Convert an Interrupt Pending Buffer (IPB) register to a Pending
-> + * Interrupt Priority Register (PIPR), which contains the priority of
-> + * the most favored pending notification.
-> + *
-> + * TODO: PIPR can never be OxFF. Needs a fix.
-> + */
-> +static uint8_t ipb_to_pipr(uint8_t ibp)
-> +{
-> +    return ibp ? clz32((uint32_t)ibp << 24) : 0xff;
-> +}
-> +
->  static uint64_t spapr_xive_icp_accept(ICPState *icp)
->  {
->      return 0;
+> diff --git a/hw/intc/xics.c b/hw/intc/xics.c
+> index a84ba51ad8ff..927d4fec966a 100644
+> --- a/hw/intc/xics.c
+> +++ b/hw/intc/xics.c
+> @@ -274,6 +274,7 @@ static const VMStateDescription vmstate_icp_server =
+=3D {
+>          VMSTATE_UINT32(xirr, ICPState),
+>          VMSTATE_UINT8(pending_priority, ICPState),
+>          VMSTATE_UINT8(mfrr, ICPState),
+> +        VMSTATE_UINT8_ARRAY(tima, ICPState, 0x40),
+>          VMSTATE_END_OF_LIST()
+>      },
+>  };
+> @@ -293,6 +294,7 @@ static void icp_reset(void *dev)
+>      if (icpc->reset) {
+>          icpc->reset(icp);
+>      }
+> +    memset(icp->tima, 0, sizeof(icp->tima));
 >  }
 > =20
-> +static void spapr_xive_icp_notify(ICPState *icp)
-> +{
-> +    if (icp->tima_os[TM_PIPR] < icp->tima_os[TM_CPPR]) {
-> +        icp->tima_os[TM_NSR] |=3D TM_QW1_NSR_EO;
-> +        qemu_irq_raise(ICP(icp)->output);
-
-The CPU interrupt lines are effectively level sensitive, but you never
-lower this, AFAICT.
-
-> +    }
-> +}
-> +
->  static void spapr_xive_icp_set_cppr(ICPState *icp, uint8_t cppr)
->  {
->      if (cppr > XIVE_PRIORITY_MAX) {
-> @@ -40,6 +68,10 @@ static void spapr_xive_icp_set_cppr(ICPState *icp, uin=
-t8_t cppr)
+>  static void icp_realize(DeviceState *dev, Error **errp)
+> @@ -343,6 +345,8 @@ static void icp_realize(DeviceState *dev, Error **err=
+p)
+>          icpc->realize(icp, errp);
 >      }
 > =20
->      icp->tima_os[TM_CPPR] =3D cppr;
+> +    icp->tima_os =3D &icp->tima[0x10];
 > +
-> +    /* CPPR has changed, inform the ICP which might raise an
-> +     * exception */
-> +    spapr_xive_icp_notify(icp);
+>      qemu_register_reset(icp_reset, dev);
+>      vmstate_register(NULL, icp->cs->cpu_index, &vmstate_icp_server, icp);
 >  }
+> diff --git a/include/hw/ppc/xics.h b/include/hw/ppc/xics.h
+> index 28d248abad61..c835997303c4 100644
+> --- a/include/hw/ppc/xics.h
+> +++ b/include/hw/ppc/xics.h
+> @@ -83,6 +83,12 @@ struct ICPState {
+>      qemu_irq output;
 > =20
->  /*
-> @@ -206,6 +238,8 @@ static void spapr_xive_irq(sPAPRXive *xive, int srcno)
->      XiveEQ *eq;
->      uint32_t eq_idx;
->      uint32_t priority;
-> +    uint32_t target;
-> +    ICPState *icp;
-> =20
->      ive =3D spapr_xive_get_ive(xive, srcno);
->      if (!ive || !(ive->w & IVE_VALID)) {
-> @@ -235,6 +269,13 @@ static void spapr_xive_irq(sPAPRXive *xive, int srcn=
-o)
->          qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented\n"=
-);
->      }
-> =20
-> +    target =3D GETFIELD(EQ_W6_NVT_INDEX, eq->w6);
-> +    icp =3D xics_icp_get(xive->ics->xics, target);
-> +    if (!icp) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No ICP for target %d\n", t=
-arget);
-> +        return;
-> +    }
+>      XICSFabric *xics;
 > +
->      if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) =3D=3D 0) {
->          priority =3D GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
-> =20
-> @@ -242,9 +283,18 @@ static void spapr_xive_irq(sPAPRXive *xive, int srcn=
-o)
->          if (priority =3D=3D 0xff) {
->              return;
->          }
+> +    /* XIVE section */
+> +#define XIVE_TM_RING_COUNT 4
 > +
-> +        /* Update the IPB (Interrupt Pending Buffer) with the priority
-> +         * of the new notification and inform the ICP, which will
-> +         * decide to raise the exception, or not, depending the CPPR.
-> +         */
-> +        icp->tima_os[TM_IPB] |=3D priority_to_ipb(priority);
-> +        icp->tima_os[TM_PIPR] =3D ipb_to_pipr(icp->tima_os[TM_IPB]);
->      } else {
->          qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n");
->      }
-> +
-> +    spapr_xive_icp_notify(icp);
->  }
+> +    uint8_t tima[XIVE_TM_RING_COUNT * 0x10];
+> +    uint8_t *tima_os;
+>  };
 > =20
->  /*
+>  #define ICP_PROP_XICS "xics"
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -167,24 +112,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hHiQ9nAwW5IGN2dL
+--aIbcA3MSwnGacr4f
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnAzDAACgkQbDjKyiDZ
-s5KVYBAAv+OddViVXYwyr1H23yzYZ2FiE7XaL/nyHFUdARInzrpWxooiCxD7pudf
-nnrsx+ooxKZwghxPtyR3OpwQKLT8rCEILai9prr/7NWWRmSwuQ12oqm+qfGK4NoO
-ST5o1+gMCcuyNH3x1bNlLCOtD1oKzAuxXzodlZW9A7Bzt9n8idRpajzRQNjZ8EbF
-WBquYpbO3ZZ26caH8q/v7JhJvKDPoJU9jK8GJ1rj/QX7u2xNAiH+I9IQgkqVqKoX
-jwdHogFWs3Tf0EL4bGa5yyWFdpmZEN3ZiLxvJ9VEi/9yopbrAczCrckSXdNd05GK
-AKSFCkSj4tGlSBUOGcqxlsZiZ+hK8A0yszcHKEfqZKTHRcq8M3I2T9d475bvwIdw
-XTE+b994nTPO0omfKYQUXVGSEjILe9GwpG3+vf8zLfrujpep4GA58z/Ea0L6P0mT
-8lM2+svDhvNYbK/ZNYuEuDwJBriUO5YnsTCa+K4VUTZ2zr5P+kk31tjGzubOb4hc
-RRM3KgEY69NRx0Wttj8aqvMyEV7h7wx4C4MHwPSar8i5/kxHHoM33PukiuHKes6f
-HVg54mE5EHzQR5uForFBN5plHS/2pX/Vumlq4fhFEZZ1KewyxAqoEISGRivXNOey
-ktBlUlPFGEJ12xNnQsPEUkxQljIxwYU80rUsGuj1jTFVg4FlI6Y=
-=8cP+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnAyOwACgkQbDjKyiDZ
+s5I5jA/7BhvPEZBvke1v1u7vAOc/i22QM9kH6RCdzQ2dob+NMUY5oZB5kjPX4ro8
+AnscHhnNee1W8esVgRB698UUZBqlpV4/j67hkQ6CL5g9j5y+xmT2UqPF7Z3PFDse
+Dmb60x9ue7K1769XARZXGTSYn6bGNUZOEz59XaI14AlMX40dci7NUiRHr0QbvccG
+lOcqcyQcIEFvELzWtskwMLDvePx2AXClTI4XXbe7yVhs1cK7tXhzioex1eAVSpsK
++WHSW2OMflJdeAEee0jf8Qjqwr7Jahq0e4vAFICenK+ooWfswpJ+fHUHgi+qzMZW
+Vv33R7zZLnVzS+O36HxSjeoXZxDT56FlGmlhZ//uGcQdoqVBFFqFATspDbz6tmBw
+BOAp5jq1H0ZgUaf/AKoTCyLqhjdE4q46ZV1wXUaxZUYG9Gl9H3DTPVXL1xzSDdU+
+LPjC2z6G2P8xL9XQU6U03uVCYC8u27PF6fZv7EEgx5Ylgn7Nn9i82fh4wsHa9Qmy
+0kR3UrACmpLTAMFPYa9TspdqBmzGut78sJibiTxonyhf3A7RB5ZnBYiX1Y0/dlSW
+L61FvsLHrfrRDtzyNfc2LFRILkCUFUSSfoyZ6N21sM4e7ztO/PSl2/dThhoO4Z6h
+cFQDl6oTbC00OSR1P3HpyLejMvwjsrrVvZJMaW5naUmrGLemXCU=
+=VZyc
 -----END PGP SIGNATURE-----
 
---hHiQ9nAwW5IGN2dL--
+--aIbcA3MSwnGacr4f--
