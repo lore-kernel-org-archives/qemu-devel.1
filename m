@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59761)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33877)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1duDhx-0000yp-KP
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 04:16:42 -0400
+	(envelope-from <mol@pengutronix.de>) id 1duDpB-0003BE-K5
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 04:24:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1duDhu-00080S-T1
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 04:16:41 -0400
-Received: from mail-pf0-x242.google.com ([2607:f8b0:400e:c00::242]:34878)
+	(envelope-from <mol@pengutronix.de>) id 1duDpA-0003Gn-7o
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 04:24:09 -0400
+Received: from metis.ext.pengutronix.de
+	([2001:67c:670:201:290:27ff:fe1d:cc33]:43333)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <carenas@gmail.com>) id 1duDhu-0007zn-N7
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 04:16:38 -0400
-Received: by mail-pf0-x242.google.com with SMTP id i23so1221514pfi.2
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 01:16:37 -0700 (PDT)
-From: =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>
-Date: Tue, 19 Sep 2017 01:15:49 -0700
-Message-Id: <20170919081549.82541-1-carenas@gmail.com>
+	(Exim 4.71) (envelope-from <mol@pengutronix.de>) id 1duDp9-0003Du-WF
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 04:24:08 -0400
+Date: Tue, 19 Sep 2017 10:23:58 +0200
+From: Michael Olbrich <m.olbrich@pengutronix.de>
+Message-ID: <20170919082358.43upqf3lawg2aqtg@pengutronix.de>
+References: <150555367996.36.15771330325496067998@69b6ddf88678>
+	<20170916103523.1482-1-m.olbrich@pengutronix.de>
+	<CAKmqyKP_5dC1td8DMCEM_4v74XBZy5-rWH2z4XA8VCw4165SAg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v3] linux-user: syscall: Add SO_LINGER for
- setsockopt
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKmqyKP_5dC1td8DMCEM_4v74XBZy5-rWH2z4XA8VCw4165SAg@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2] hw/sd: fix out-of-bounds check for
+ multi block reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,67 +30,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: riku.voipio@iki.fi, laurent@vivier.eu, peter.maydell@linaro.org, gang.chen.5i5j@gmail.com, rth@twiddle.net, =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>
+To: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Alistair Francis <alistair23@gmail.com>
 
-Original implementation from Chen Gang; code moved around as per v2
+On Mon, Sep 18, 2017 at 02:28:26PM -0700, Alistair Francis wrote:
+> On Sat, Sep 16, 2017 at 3:35 AM, Michael Olbrich
+> <m.olbrich@pengutronix.de> wrote:
+> > The current code checks if the next block exceeds the size of the card.
+> > This generates an error while reading the last block of the card.
+> > Do the out-of-bounds check when starting to read a new block to fix this.
+> >
+> > This issue became visible with increased error checking in Linux 4.13.
+> >
+> > Signed-off-by: Michael Olbrich <m.olbrich@pengutronix.de>
+> 
+> Thanks for the patch!
+> 
+> > ---
+> >
+> > Changes in v2:
+> >  - fixed warning
+> >
+> > I'm not quite sure if 0x00 is the correct return value, but it's used
+> > elsewhere in the same function when an error occurs, so it seems
+> > reasonable.
+> 
+> Returning 0 looks fine to me.
+> 
+> >
+> >  hw/sd/sd.c | 12 ++++++------
+> >  1 file changed, 6 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> > index ba47bff4db80..35347a5bbcde 100644
+> > --- a/hw/sd/sd.c
+> > +++ b/hw/sd/sd.c
+> > @@ -1797,8 +1797,13 @@ uint8_t sd_read_data(SDState *sd)
+> >          break;
+> >
+> >      case 18:   /* CMD18:  READ_MULTIPLE_BLOCK */
+> > -        if (sd->data_offset == 0)
+> > +        if (sd->data_offset == 0) {
+> > +            if (sd->data_start + io_len > sd->size) {
+> > +                sd->card_status |= ADDRESS_ERROR;
+> > +                return 0x00;
+> > +            }
+> 
+> Why move it inside the if (sd->data_offset == 0) and not just below
+> the ret = sd->data[sd->data_offset ++] ?
+> 
+> >              BLK_READ_BLOCK(sd->data_start, io_len);
 
-Signed-off-by: Chen Gang <gang.chen.5i5j@gmail.com>
-Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
----
- linux-user/syscall.c      | 16 ++++++++++++++++
- linux-user/syscall_defs.h |  5 +++++
- 2 files changed, 21 insertions(+)
+Mostly because of the line above. This copies the full block from the
+backend storage to sd->data, so we need to make sure that the data is
+actually available to fill sd->data, not if it's ok to access a certain
+byte within sd->data.
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 9b6364a266..d3c500ca78 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -2829,6 +2829,8 @@ static abi_long do_setsockopt(int sockfd, int level, int optname,
-     int val;
-     struct ip_mreqn *ip_mreq;
-     struct ip_mreq_source *ip_mreq_source;
-+    struct linger lg;
-+    struct target_linger *tlg;
- 
-     switch(level) {
-     case SOL_TCP:
-@@ -3071,6 +3073,20 @@ set_timeout:
- 		unlock_user (dev_ifname, optval_addr, 0);
- 		return ret;
- 	}
-+        case TARGET_SO_LINGER:
-+                optname = SO_LINGER;
-+                if (optlen != sizeof(struct target_linger)) {
-+                    return -TARGET_EINVAL;
-+                }
-+                if (!lock_user_struct(VERIFY_READ, tlg, optval_addr, 1)) {
-+                    return -TARGET_EFAULT;
-+                }
-+                __get_user(lg.l_onoff, &tlg->l_onoff);
-+                __get_user(lg.l_linger, &tlg->l_linger);
-+                ret = get_errno(setsockopt(sockfd, SOL_SOCKET, optname,
-+                                &lg, sizeof(lg)));
-+                unlock_user_struct(tlg, optval_addr, 0);
-+                return ret;
-             /* Options with 'int' argument.  */
-         case TARGET_SO_DEBUG:
- 		optname = SO_DEBUG;
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 40c5027e93..a60d6bb163 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -202,6 +202,11 @@ struct target_ip_mreq_source {
-     uint32_t imr_sourceaddr;
- };
- 
-+struct target_linger {
-+    abi_int l_onoff;        /* Linger active                */
-+    abi_int l_linger;       /* How long to linger for       */
-+};
-+
- struct target_timeval {
-     abi_long tv_sec;
-     abi_long tv_usec;
+Michael
+
+> > +        }
+> >          ret = sd->data[sd->data_offset ++];
+> >
+> >          if (sd->data_offset >= io_len) {
+> > @@ -1812,11 +1817,6 @@ uint8_t sd_read_data(SDState *sd)
+> >                      break;
+> >                  }
+> >              }
+> > -
+> > -            if (sd->data_start + io_len > sd->size) {
+> > -                sd->card_status |= ADDRESS_ERROR;
+> > -                break;
+> > -            }
+> >          }
+> >          break;
+> >
+> > --
+> > 2.14.1
+> >
+> >
+> 
+
 -- 
-2.11.0 (Apple Git-81)
+Pengutronix e.K.                           |                             |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
