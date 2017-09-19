@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35018)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1duFID-0003jT-SH
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:58:16 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1duFKW-0004cQ-Q1
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:00:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1duFIC-0008Qy-Dk
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:58:13 -0400
-Date: Tue, 19 Sep 2017 10:57:50 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170919095750.GG9536@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170913181910.29688-16-mreitz@redhat.com>
-	<20170914155738.GE7370@stefanha-x1.localdomain>
-	<2f1c5239-0cde-d164-b803-ebf807e684f2@redhat.com>
-	<20170918100626.GE31063@stefanha-x1.localdomain>
-	<d6dbcebf-6dce-4803-0be0-a9f48a73a32f@redhat.com>
-	<20170919094416.GC22797@stefanha-x1.localdomain>
+	(envelope-from <vsementsov@virtuozzo.com>) id 1duFKQ-00012q-Vq
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:00:36 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:5811 helo=relay.sw.ru)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1duFKQ-0000zm-Jf
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 06:00:30 -0400
+References: <20170918135935.255591-1-vsementsov@virtuozzo.com>
+	<20170918135935.255591-8-vsementsov@virtuozzo.com>
+	<0f9ffc3d-02e1-fde8-67ac-0f62101f1204@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <17fdbc1d-05db-ee91-6b13-cac9d3719c21@virtuozzo.com>
+Date: Tue, 19 Sep 2017 13:00:19 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170919094416.GC22797@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 15/18] block/mirror: Add
- active mirroring
+In-Reply-To: <0f9ffc3d-02e1-fde8-67ac-0f62101f1204@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v2 7/7] block/nbd-client: do not yield from
+ nbd_read_reply_entry
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,127 +31,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Eric Blake <eblake@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: mreitz@redhat.com, kwolf@redhat.com, pbonzini@redhat.com, den@openvz.org
 
-On Tue, Sep 19, 2017 at 10:44:16AM +0100, Stefan Hajnoczi wrote:
-> On Mon, Sep 18, 2017 at 06:26:51PM +0200, Max Reitz wrote:
-> > On 2017-09-18 12:06, Stefan Hajnoczi wrote:
-> > > On Sat, Sep 16, 2017 at 03:58:01PM +0200, Max Reitz wrote:
-> > >> On 2017-09-14 17:57, Stefan Hajnoczi wrote:
-> > >>> On Wed, Sep 13, 2017 at 08:19:07PM +0200, Max Reitz wrote:
-> > >>>> This patch implements active synchronous mirroring.  In active mode, the
-> > >>>> passive mechanism will still be in place and is used to copy all
-> > >>>> initially dirty clusters off the source disk; but every write request
-> > >>>> will write data both to the source and the target disk, so the source
-> > >>>> cannot be dirtied faster than data is mirrored to the target.  Also,
-> > >>>> once the block job has converged (BLOCK_JOB_READY sent), source and
-> > >>>> target are guaranteed to stay in sync (unless an error occurs).
-> > >>>>
-> > >>>> Optionally, dirty data can be copied to the target disk on read
-> > >>>> operations, too.
-> > >>>>
-> > >>>> Active mode is completely optional and currently disabled at runtime.  A
-> > >>>> later patch will add a way for users to enable it.
-> > >>>>
-> > >>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> > >>>> ---
-> > >>>>  qapi/block-core.json |  23 +++++++
-> > >>>>  block/mirror.c       | 187 +++++++++++++++++++++++++++++++++++++++++++++++++--
-> > >>>>  2 files changed, 205 insertions(+), 5 deletions(-)
-> > >>>>
-> > >>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > >>>> index bb11815608..e072cfa67c 100644
-> > >>>> --- a/qapi/block-core.json
-> > >>>> +++ b/qapi/block-core.json
-> > >>>> @@ -938,6 +938,29 @@
-> > >>>>    'data': ['top', 'full', 'none', 'incremental'] }
-> > >>>>  
-> > >>>>  ##
-> > >>>> +# @MirrorCopyMode:
-> > >>>> +#
-> > >>>> +# An enumeration whose values tell the mirror block job when to
-> > >>>> +# trigger writes to the target.
-> > >>>> +#
-> > >>>> +# @passive: copy data in background only.
-> > >>>> +#
-> > >>>> +# @active-write: when data is written to the source, write it
-> > >>>> +#                (synchronously) to the target as well.  In addition,
-> > >>>> +#                data is copied in background just like in @passive
-> > >>>> +#                mode.
-> > >>>> +#
-> > >>>> +# @active-read-write: write data to the target (synchronously) both
-> > >>>> +#                     when it is read from and written to the source.
-> > >>>> +#                     In addition, data is copied in background just
-> > >>>> +#                     like in @passive mode.
-> > >>>
-> > >>> I'm not sure the terms "active"/"passive" are helpful.  "Active commit"
-> > >>> means committing the top-most BDS while the guest is accessing it.  The
-> > >>> "passive" mirror block still works on the top-most BDS while the guest
-> > >>> is accessing it.
-> > >>>
-> > >>> Calling it "asynchronous" and "synchronous" is clearer to me.  It's also
-> > >>> the terminology used in disk replication (e.g. DRBD).
-> > >>
-> > >> I'd be OK with that, too, but I think I remember that in the past at
-> > >> least Kevin made a clear distinction between active/passive and
-> > >> sync/async when it comes to mirroring.
-> > >>
-> > >>> Ideally the user wouldn't have to worry about async vs sync because QEMU
-> > >>> would switch modes as appropriate in order to converge.  That way
-> > >>> libvirt also doesn't have to worry about this.
-> > >>
-> > >> So here you mean async/sync in the way I meant it, i.e., whether the
-> > >> mirror operations themselves are async/sync?
-> > > 
-> > > The meaning I had in mind is:
-> > > 
-> > > Sync mirroring means a guest write waits until the target write
-> > > completes.
-> > 
-> > I.e. active-sync, ...
-> > 
-> > > Async mirroring means guest writes completes independently of target
-> > > writes.
-> > 
-> > ... i.e. passive or active-async in the future.
-> > 
-> > So you really want qemu to decide whether to use active or passive mode
-> > depending on what's enough to let the block job converge and not
-> > introduce any switch for the user?
-> > 
-> > I'm not sure whether I like this too much, mostly because "libvirt
-> > doesn't have to worry" doesn't feel quite right to me.  If we don't make
-> > libvirt worry about this, then qemu has to worry.  I'm not sure whether
-> > that's any better.
-> > 
-> > I think this really does get into policy territory.  Just switching to
-> > active mode the instant target writes are slower than source writes may
-> > not be what the user wants: Maybe it's OK for a short duration because
-> > they don't care about hard convergence too much.  Maybe they want to
-> > switch to active mode already when "only" twice as much is written to
-> > the target as to the source.
-> > 
-> > I think this is a decision the management layer (or the user) has to make.
-> 
-> Eric: Does libvirt want to be involved with converging the mirror job
-> (i.e. if the guest is writing to disk faster than QEMU can copy data to
-> the target)?
+19.09.2017 01:36, Eric Blake wrote:
+> On 09/18/2017 08:59 AM, Vladimir Sementsov-Ogievskiy wrote:
+>> Refactor nbd client to not yield from nbd_read_reply_entry. It's
+>> possible now as all reading is done in nbd_read_reply_entry and
+>> all request-related data is stored in per-request s->requests[i].
+>>
+>> We need here some additional work with s->requests[i].ret and
+>> s->quit to not fail requests on normal disconnet and to not report
+>> reading errors on normal disconnect.
+>>
+>> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+>> ---
+>>   block/nbd-client.c | 29 ++++++++++-------------------
+>>   1 file changed, 10 insertions(+), 19 deletions(-)
+> The diffstat may have merit, but I'm wondering:
+>
+>> diff --git a/block/nbd-client.c b/block/nbd-client.c
+>> index f80a4c5564..bf20d5d5e6 100644
+>> --- a/block/nbd-client.c
+>> +++ b/block/nbd-client.c
+>> @@ -79,7 +79,11 @@ static coroutine_fn void nbd_read_reply_entry(void =
+*opaque)
+>>       while (!s->quit) {
+>>           ret =3D nbd_receive_reply(s->ioc, &reply, &local_err);
+>>           if (ret < 0) {
+>> -            error_report_err(local_err);
+>> +            if (s->quit) {
+>> +                error_free(local_err);
+> This discards errors on all remaining coroutines after we detect an
+> early exit. Are we sure the coroutine that set s->quit will have
+> reported an appropriate error, and thus explaining why we can discard
+> all secondary errors?  A comment in the code would be helpful.
 
-Libvirt doesn't really want to set the policy - it will just need to expose
-the mechansim & information to make such decisions upto the application.
+I'll think about it.
 
-I agree with Max that we don't want QEMU making this policy decision on
-its own. Simply switching from passive to active mode is not an approach
-that will be satisfactory to all scenarios. It might be preferrable to
-apply CPU throttling of the guest, or I/O rate throttling, or temporarily
-pause the guest to allow catch or any number of other policies. Neither
-libvirt or QEMU knows which is best for the scenario at hand.
+>
+>> +            } else {
+>> +                error_report_err(local_err);
+>> +            }
+>>           }
+>> @@ -210,7 +204,7 @@ static int nbd_co_receive_reply(NBDClientSession *=
+s, NBDRequest *request)
+>>       s->requests[i].receiving =3D true;
+>>       qemu_coroutine_yield();
+>>       s->requests[i].receiving =3D false;
+>> -    if (!s->ioc || s->quit) {
+>> +    if (!s->ioc) {
+>>           ret =3D -EIO;
+> Why don't we need to check s->quit any more?  That was just added
+> earlier in the series; why the churn?
 
+it is "to not fail requests on normal disconnet". Because reply_entry=20
+may be already finished.
+Initializing "+=C2=A0=C2=A0=C2=A0 s->requests[i].ret =3D -EIO;" is enough.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>
+>>       } else {
+>>           ret =3D s->requests[i].ret;
+>> @@ -218,11 +212,6 @@ static int nbd_co_receive_reply(NBDClientSession =
+*s, NBDRequest *request)
+>>  =20
+>>       s->requests[i].coroutine =3D NULL;
+>>  =20
+>> -    /* Kick the read_reply_co to get the next reply.  */
+>> -    if (s->read_reply_co) {
+>> -        aio_co_wake(s->read_reply_co);
+>> -    }
+>> -
+>>       qemu_co_mutex_lock(&s->send_mutex);
+>>       s->in_flight--;
+>>       qemu_co_queue_next(&s->free_sema);
+>> @@ -364,6 +353,8 @@ void nbd_client_close(BlockDriverState *bs)
+>>  =20
+>>       nbd_send_request(client->ioc, &request);
+>>  =20
+>> +    client->quit =3D true;
+> Previously, client->quit was only set when detecting a broken server,
+> now it is also set for a clean exit.  Do we need to change any
+> documentation of the field?
+
+It has documentation?
+
+>
+
+--=20
+Best regards,
+Vladimir
