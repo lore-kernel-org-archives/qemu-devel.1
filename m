@@ -1,21 +1,31 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49784)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49890)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1duEer-0004VL-4u
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:17:36 -0400
+	(envelope-from <dovgaluk@ispras.ru>) id 1duEfH-0004h2-I9
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:18:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1duEen-0000wp-1G
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:17:33 -0400
-Date: Tue, 19 Sep 2017 17:17:19 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170919091719.GE11534@lemon.lan>
-References: <20170918185819.5984-1-eblake@redhat.com>
-	<20170918185819.5984-6-eblake@redhat.com>
+	(envelope-from <dovgaluk@ispras.ru>) id 1duEfE-000132-Ch
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:17:59 -0400
+Received: from mail.ispras.ru ([83.149.199.45]:42754)
+	by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <dovgaluk@ispras.ru>) id 1duEfE-00012X-0V
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 05:17:56 -0400
+From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
+References: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
+	<CAJhHMCCZh7hvQT8x9Bks9k6=ka4G1Oybv1MrkKJ9_VZ_eRZBfQ@mail.gmail.com>
+	<CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
+	<87bmrj8eks.fsf@linaro.org>
+	<CAPnv1PKyak1G-uL=H=-Vh_9TH2dZKffYjDf_2Z+LWuqovMKCBQ@mail.gmail.com>
+	<CAKSfGUC_k6K=2Xy8pGcwuQ66DMPYCDvA47Ojgm7ntQfALGwDsQ@mail.gmail.com>
+	<CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
+In-Reply-To: <CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
+Date: Tue, 19 Sep 2017 12:17:55 +0300
+Message-ID: <000601d33128$2dd9d5e0$898d81a0$@ru>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170918185819.5984-6-eblake@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v8 05/20] dirty-bitmap: Avoid size query
- failure during truncate
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Content-Language: ru
+Subject: Re: [Qemu-devel] What is the best commit for record-replay?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,76 +34,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: 'Aleksandr Bezzubikov' <zuban32s@gmail.com>, =?UTF-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>
+Cc: 'QEMU Developers' <qemu-devel@nongnu.org>, 'Pranith Kumar' <bobby.prani+qemu@gmail.com>, pavel.dovgaluk@ispras.ru, 'Aleksandr Bezzubikov' <abezzubikov@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Igor R' <boost.lists@gmail.com>
 
-On Mon, 09/18 13:58, Eric Blake wrote:
-> We've previously fixed several places where we failed to account
-> for possible errors from bdrv_nb_sectors().  Fix another one by
-> making bdrv_dirty_bitmap_truncate() take the new size from the
-> caller instead of querying itself; then adjust the sole caller
-> bdrv_truncate() to pass the size just determined by a successful
-> resize, or to skip the bitmap resize on failure, thus avoiding
-> sizing the bitmaps to -1.
-> 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
-> 
-> ---
-> v8: retitle and rework to avoid possibility of secondary failure [John]
-> v7: new patch [Kevin]
-> ---
->  include/block/dirty-bitmap.h |  2 +-
->  block.c                      | 15 ++++++++++-----
->  block/dirty-bitmap.c         |  6 +++---
->  3 files changed, 14 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/block/dirty-bitmap.h b/include/block/dirty-bitmap.h
-> index 8fd842eac9..7a27590047 100644
-> --- a/include/block/dirty-bitmap.h
-> +++ b/include/block/dirty-bitmap.h
-> @@ -83,7 +83,7 @@ int64_t bdrv_dirty_iter_next(BdrvDirtyBitmapIter *iter);
->  void bdrv_set_dirty_iter(BdrvDirtyBitmapIter *hbi, int64_t sector_num);
->  int64_t bdrv_get_dirty_count(BdrvDirtyBitmap *bitmap);
->  int64_t bdrv_get_meta_dirty_count(BdrvDirtyBitmap *bitmap);
-> -void bdrv_dirty_bitmap_truncate(BlockDriverState *bs);
-> +void bdrv_dirty_bitmap_truncate(BlockDriverState *bs, int64_t bytes);
->  bool bdrv_dirty_bitmap_readonly(const BdrvDirtyBitmap *bitmap);
->  bool bdrv_has_readonly_bitmaps(BlockDriverState *bs);
->  bool bdrv_dirty_bitmap_get_autoload(const BdrvDirtyBitmap *bitmap);
-> diff --git a/block.c b/block.c
-> index ee6a48976e..61ee9d4b83 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -3450,12 +3450,17 @@ int bdrv_truncate(BdrvChild *child, int64_t offset, PreallocMode prealloc,
->      assert(!(bs->open_flags & BDRV_O_INACTIVE));
-> 
->      ret = drv->bdrv_truncate(bs, offset, prealloc, errp);
-> -    if (ret == 0) {
-> -        ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-> -        bdrv_dirty_bitmap_truncate(bs);
-> -        bdrv_parent_cb_resize(bs);
-> -        atomic_inc(&bs->write_gen);
-> +    if (ret < 0) {
-> +        return ret;
->      }
-> +    ret = refresh_total_sectors(bs, offset >> BDRV_SECTOR_BITS);
-> +    if (ret < 0) {
+> From: Aleksandr Bezzubikov [mailto:zuban32s@gmail.com]
+> 2017-09-18 15:02 GMT+03:00 Aleksandr Bezzubikov <zuban32s@gmail.com>:
+> > 2017-05-02 15:42 GMT+03:00 Igor R <boost.lists@gmail.com>:
+> >>>>>> I'm trying to use the deterministic record/replay feature, and I would
+> >>>>>> like to know which commit I should take to get it work.
+> >>>>>> In RC0 it seems to be broken. I tried pre-MTTCG commit 2421f381dc, as
+> >>>>
+> >>>>> Can you retry with the latest rc? There were some fixes regarding rr since rc0.
+> >>>>
+> >>>>
+> >>>> I've taken 2.9 release, and RR does not seem to work there.
+> >>>> I recorded the boot process of x86 Fedora-21 linux and the replay got
+> >>>> stuck almost immediately.
+> >>>
+> >>> What's your command line?
+> >>>
+> >>> Does it get stuck at the same place each time?
+> >>>
+> >>> Can you boot fine with icount but without record/replay?
+> >>
+> >> Here is the exact scenario:
+> >> - Get 2.9 from git, configure it as follows: "./configure
+> >> --target-list=i386-softmmu --enable-sdl" and  make.
+> >> - Download https://people.debian.org/~aurel32/qemu/i386/debian_squeeze_i386_standard.qcow2
+> >> - Run qemu with the following command line, until login prompt:
+> >> -icount shift=7,rr=record,rrfile=replay.bin -drive
+> >> file=debian_squeeze_i386_standard.qcow2,if=none,id=img-direct -drive
+> >> driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
+> >> ide-hd,drive=img-blkreplay -monitor stdio
+> >> - Replay: -icount shift=7,rr=replay,rrfile=replay.bin -drive
+> >> file=debian_squeeze_i386_standard.qcow2,if=none,id=img-direct -drive
+> >> driver=blkreplay,if=none,image=img-direct,id=img-blkreplay -device
+> >> ide-hd,drive=img-blkreplay -monitor stdio
+> >>
+> >> Every time I attempt to replay, QEMU gets stuck at the same EIP, at a
+> >> very early stage.
+> >>
+> >>
+> >>> Can you boot fine with icount but without record/replay?
+> >>
+> >> Yes. I can also enable icount and recording - it also boots fine. The
+> >> problem with the replay.
+> >
+> > Hi guys,
+> > Maybe the thread is a bit outdated, but the problem is still relevant.
+> > I've just tried to record and replay WinXP boot process, and I've encountered
+> > exactly the same problem as described above - record is fine, replay
+> > gets stuck early. I use current master.
 
-Ugh, if we get here the situation is a bit embarrassing, because...
+Maybe this commit will work: cfb2d02be9413d45b30ed6d8e38800250b6b4b48
 
-> +        error_setg_errno(errp, -ret, "Could not refresh total sector count");
-> +        return ret;
-> +    }
-> +    bdrv_dirty_bitmap_truncate(bs, bs->total_sectors * BDRV_SECTOR_SIZE);
-> +    bdrv_parent_cb_resize(bs);
-> +    atomic_inc(&bs->write_gen);
+> > And I've discovered the second problem - recording makes initial snapshot,
+> > but it doesn't seem to be saved to the disk - replay can't see it.
 
-I think we still want to inc write_gen even if refresh_total_sectors failed, if
-drv->bdrv_truncate has succeeded? That way the next bdrv_co_flush will actually
-flush the metadata change to disk.
+It is ok, because there is a mode where snapshot is created and loaded.
 
-Maybe similarly call bdrv_parent_cb_resize() as long as drv->bdrv_truncate()
-succeeded? The effect is the virtual devices notify guest about this "resized"
-event, which I think is correct.
+> >
+> > Hope you've already found the solution (as the last post was on 2 May)
+> > and it's just got missed the mailing list.
 
-Fam
+As I know, RR is still broken in the current version.
+It was caused by the MTTCG implementation.
+Alex Bennee tried to fix RR back. Alex, have you found any solution?
+
+We also trying to find a way to fix RR. It seems, that we will reinvent BQL for RR.
+
+Pavel Dovgalyuk
