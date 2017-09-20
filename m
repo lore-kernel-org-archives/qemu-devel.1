@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48330)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48932)
 	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dukTC-0003Pn-Et
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:15:39 -0400
+	id 1dukUN-0003xt-8s
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:16:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dukT8-0003Kb-G6
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:15:38 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:36240 helo=mx01.kamp.de)
+	(envelope-from <pl@kamp.de>) id 1dukUM-0004PG-CI
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:16:51 -0400
+Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:47515 helo=mx01.kamp.de)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dukT8-0003Il-7r
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:15:34 -0400
+	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dukUM-0004OS-3j
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:16:50 -0400
 References: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
-	<20170919143829.GH2107@work-vm>
-	<48cdd8ff-4940-9aa1-9aba-1acf8ce74ebe@kamp.de>
-	<20170919144130.GI2107@work-vm>
+	<eb8d6f5c-ad08-500f-7d89-70d109deaa21@redhat.com>
 From: Peter Lieven <pl@kamp.de>
-Message-ID: <a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
-Date: Wed, 20 Sep 2017 21:15:28 +0200
+Message-ID: <a97d1247-75ea-2fd6-3d74-0b10434d751e@kamp.de>
+Date: Wed, 20 Sep 2017 21:16:47 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170919144130.GI2107@work-vm>
+In-Reply-To: <eb8d6f5c-ad08-500f-7d89-70d109deaa21@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -30,34 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
+To: Paolo Bonzini <pbonzini@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: qemu block <qemu-block@nongnu.org>, Fam Zheng <famz@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-Am 19.09.2017 um 16:41 schrieb Dr. David Alan Gilbert:
-> * Peter Lieven (pl@kamp.de) wrote:
->> Am 19.09.2017 um 16:38 schrieb Dr. David Alan Gilbert:
->>> * Peter Lieven (pl@kamp.de) wrote:
->>>> Hi,
->>>>
->>>> I just noticed that CPU throttling and Block Migration don't work together very well.
->>>> During block migration the throttling heuristic detects that we obviously make no progress
->>>> in ram transfer. But the reason is the running block migration and not a too high dirty pages rate.
->>>>
->>>> The result is that any VM is throttled by 99% during block migration.
->>> Hmm that's unfortunate; do you have a bandwidth set lower than your
->>> actual network connection? I'm just wondering if it's actually going
->>> between the block and RAM iterative sections or getting stuck in ne.
->> It happens also if source and dest are on the same machine and speed is set to 100G.
-> But does it happen if they're not and the speed is set low?
+Am 19.09.2017 um 16:41 schrieb Paolo Bonzini:
+> On 19/09/2017 15:36, Peter Lieven wrote:
+>> Hi,
+>>
+>> I just noticed that CPU throttling and Block Migration don't work
+>> together very well.
+>> During block migration the throttling heuristic detects that we
+>> obviously make no progress
+>> in ram transfer. But the reason is the running block migration and not a
+>> too high dirty pages rate.
+>>
+>> The result is that any VM is throttled by 99% during block migration.
+>>
+>> I wonder what the best way would be fix this. I came up with the
+>> following ideas so far:
+>>
+>> - disable throttling while block migration is in bulk stage
+>> - check if absolute number of num_dirty_pages_period crosses a threshold
+>> and not if its just
+>>   greater than 50% of transferred bytes
+>> - check if migration_dirty_pages > 0. This slows down throttling, but
+>> does not avoid it completely.
+> If you can use nbd-server and drive-mirror for block migration (libvirt
+> would do it), then you will use multiple sockets and be able to migrate
+> block and RAM at the same time.
+>
+> Otherwise, disabling throttling during the bulk stage is the one that
+> seems nicest and most promising.
 
-Yes, it does. I noticed it in our test environment between different nodes with a 10G
-link in between. But its totally clear why it happens. During block migration we transfer
-all dirty memory pages in each round (if there is moderate memory load), but all dirty
-pages are obviously more than 50% of the transferred ram in that round.
-It is more exactly 100%. But the current logic triggers on this condition.
+Okay, but this can be done independently of the nbd approach.
+If someone uses classic block migration and auto converge his
+vserver will freeze.
 
-I think I will go forward and send a patch which disables auto converge during
-block migration bulk stage.
+I will send a patch to fix that.
 
-Thanks for your feedback,
+Thanks,
 Peter
