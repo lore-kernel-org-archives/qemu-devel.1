@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34195)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36326)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dumcd-0002g9-Hp
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:33:32 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dumhf-0003me-6I
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:38:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dumca-0002Va-E0
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:33:31 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52690)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1dumca-0002VH-5f
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:33:28 -0400
-References: <20170920194144.20101-1-jsnow@redhat.com>
-	<f6ec49d1-2e23-ebcb-7ace-8fe52348138e@ilande.co.uk>
+	(envelope-from <jsnow@redhat.com>) id 1dumhe-00007G-38
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:38:43 -0400
+References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
+	<20170920135833.20472-3-pbutsykin@virtuozzo.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <dedbcfd6-52b6-333c-0b14-8ae12cd9eb7c@redhat.com>
-Date: Wed, 20 Sep 2017 17:33:26 -0400
+Message-ID: <ac533c95-a0f5-c6ce-cc6a-7fab63eb0517@redhat.com>
+Date: Wed, 20 Sep 2017 17:38:34 -0400
 MIME-Version: 1.0
-In-Reply-To: <f6ec49d1-2e23-ebcb-7ace-8fe52348138e@ilande.co.uk>
+In-Reply-To: <20170920135833.20472-3-pbutsykin@virtuozzo.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] ide: fix enum comparison for gcc 4.7
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] qcow2: truncate the tail
+ of the image file after shrinking the image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,105 +25,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
 
 
-On 09/20/2017 05:28 PM, Mark Cave-Ayland wrote:
-> On 20/09/17 20:41, John Snow wrote:
->=20
->> Apparently GCC gets bent over comparing enum values against zero.
->> Replace the conditional with something less readable.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>  hw/ide/core.c             | 2 +-
->>  include/hw/ide/internal.h | 3 +--
->>  2 files changed, 2 insertions(+), 3 deletions(-)
->>
->> diff --git a/hw/ide/core.c b/hw/ide/core.c
->> index a19bd90..d63eb4a 100644
->> --- a/hw/ide/core.c
->> +++ b/hw/ide/core.c
->> @@ -68,7 +68,7 @@ const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT] =3D {
->> =20
->>  static const char *IDE_DMA_CMD_str(enum ide_dma_cmd enval)
->>  {
->> -    if (enval >=3D IDE_DMA__BEGIN && enval < IDE_DMA__COUNT) {
->> +    if ((unsigned)enval < IDE_DMA__COUNT) {
->>          return IDE_DMA_CMD_lookup[enval];
->>      }
->>      return "DMA UNKNOWN CMD";
->> diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
->> index 180e00e..e641012 100644
->> --- a/include/hw/ide/internal.h
->> +++ b/include/hw/ide/internal.h
->> @@ -333,8 +333,7 @@ struct unreported_events {
->>  };
->> =20
->>  enum ide_dma_cmd {
->> -    IDE_DMA__BEGIN =3D 0,
->> -    IDE_DMA_READ =3D IDE_DMA__BEGIN,
->> +    IDE_DMA_READ =3D 0,
->>      IDE_DMA_WRITE,
->>      IDE_DMA_TRIM,
->>      IDE_DMA_ATAPI,
->>
->=20
-> Really close - it fixes the error in hw/ide/core.c but then I see a
-> similar error a bit later in hw/ide/ahci.c:
->=20
-> cc -I/home/build/src/qemu/git/qemu/hw/ide -Ihw/ide
-> -I/home/build/src/qemu/git/qemu/tcg
-> -I/home/build/src/qemu/git/qemu/tcg/i386
-> -I/home/build/src/qemu/git/qemu/linux-headers
-> -I/home/build/src/qemu/git/qemu/linux-headers -I.
-> -I/home/build/src/qemu/git/qemu
-> -I/home/build/src/qemu/git/qemu/accel/tcg
-> -I/home/build/src/qemu/git/qemu/include -I/usr/include/pixman-1
-> -I/home/build/src/qemu/git/qemu/dtc/libfdt -Werror -pthread
-> -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
-> -m64 -mcx16 -D_GNU_SOURCE -D_FILE_OFFSET_BITS=3D64 -D_LARGEFILE_SOURCE
-> -Wstrict-prototypes -Wredundant-decls -Wall -Wundef -Wwrite-strings
-> -Wmissing-prototypes -fno-strict-aliasing -fno-common -fwrapv
-> -Wendif-labels -Wno-missing-include-dirs -Wempty-body -Wnested-externs
-> -Wformat-security -Wformat-y2k -Winit-self -Wignored-qualifiers
-> -Wold-style-declaration -Wold-style-definition -Wtype-limits
-> -fstack-protector-all -I/usr/include/p11-kit-1
-> -I/usr/include/libpng12   -I/home/build/src/qemu/git/qemu/tests -MMD -M=
-P
-> -MT hw/ide/ahci.o -MF hw/ide/ahci.d -O2 -U_FORTIFY_SOURCE
-> -D_FORTIFY_SOURCE=3D2 -g   -c -o hw/ide/ahci.o hw/ide/ahci.c
-> hw/ide/ahci.c: In function =E2=80=98ahci_trigger_irq=E2=80=99:
-> hw/ide/ahci.c:187:5: error: comparison of unsigned expression >=3D 0 is
-> always true [-Werror=3Dtype-limits]
-> cc1: all warnings being treated as errors
-> make: *** [hw/ide/ahci.o] Error 1
->=20
->=20
-> ATB,
->=20
-> Mark.
->=20
+On 09/20/2017 09:58 AM, Pavel Butsykin wrote:
+> Now after shrinking the image, at the end of the image file, there might be a
+> tail that probably will never be used. So we can find the last used cluster and
+> cut the tail.
+> 
+> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+> ---
+>  block/qcow2-refcount.c | 21 +++++++++++++++++++++
+>  block/qcow2.c          | 19 +++++++++++++++++++
+>  block/qcow2.h          |  1 +
+>  3 files changed, 41 insertions(+)
+> 
+> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+> index 88d5a3f1ad..5e221a166c 100644
+> --- a/block/qcow2-refcount.c
+> +++ b/block/qcow2-refcount.c
+> @@ -3181,3 +3181,24 @@ out:
+>      g_free(reftable_tmp);
+>      return ret;
+>  }
+> +
+> +int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size)
+> +{
+> +    BDRVQcow2State *s = bs->opaque;
+> +    int64_t i, last_cluster, nb_clusters = size_to_clusters(s, size);
+> +    uint64_t refcount;
+> +
+> +    for (i = 0, last_cluster = 0; i < nb_clusters; i++) {
+> +        int ret = qcow2_get_refcount(bs, i, &refcount);
+> +        if (ret < 0) {
+> +            fprintf(stderr, "Can't get refcount for cluster %" PRId64 ": %s\n",
+> +                    i, strerror(-ret));
+> +            continue;
+> +        }
+> +
+> +        if (refcount > 0) {
+> +            last_cluster = i;
+> +        }
+> +    }
+> +    return last_cluster;
+> +}> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 8a4311d338..c3b6dd44c4 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -3106,6 +3106,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
+>      new_l1_size = size_to_l1(s, offset);
+>  
+>      if (offset < old_length) {
+> +        int64_t image_end_offset, old_file_size;
+>          if (prealloc != PREALLOC_MODE_OFF) {
+>              error_setg(errp,
+>                         "Preallocation can't be used for shrinking an image");
+> @@ -3134,6 +3135,24 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
+>                               "Failed to discard unused refblocks");
+>              return ret;
+>          }
+> +
+> +        old_file_size = bdrv_getlength(bs->file->bs);
+> +        if (old_file_size < 0) {
+> +            error_setg_errno(errp, -old_file_size,
+> +                             "Failed to inquire current file length");
+> +            return old_file_size;
+> +        }
+> +        image_end_offset = (qcow2_get_last_cluster(bs, old_file_size) + 1) *
+> +                           s->cluster_size;
+> +        if (image_end_offset < old_file_size) {
+> +            ret = bdrv_truncate(bs->file, image_end_offset,
+> +                                PREALLOC_MODE_OFF, NULL);
+> +            if (ret < 0) {
+> +                error_setg_errno(errp, -ret,
+> +                                 "Failed to truncate the tail of the image");
 
-Man, what's with your compiler? ...
+I've recently become skeptical of what partial resize successes look
+like, but that's an issue for another day entirely.
 
-OK, let's try:
+> +                return ret;
+> +            }
+> +        }
+>      } else {
+>          ret = qcow2_grow_l1_table(bs, new_l1_size, true);
+>          if (ret < 0) {
+> diff --git a/block/qcow2.h b/block/qcow2.h
+> index 5a289a81e2..782a206ecb 100644
+> --- a/block/qcow2.h
+> +++ b/block/qcow2.h
+> @@ -597,6 +597,7 @@ int qcow2_change_refcount_order(BlockDriverState *bs, int refcount_order,
+>                                  BlockDriverAmendStatusCB *status_cb,
+>                                  void *cb_opaque, Error **errp);
+>  int qcow2_shrink_reftable(BlockDriverState *bs);
+> +int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size);
+>  
+>  /* qcow2-cluster.c functions */
+>  int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_size,
+> 
 
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index 24c65df..32d1296 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -184,7 +184,7 @@ static void ahci_check_irq(AHCIState *s)
- static void ahci_trigger_irq(AHCIState *s, AHCIDevice *d,
-                              enum AHCIPortIRQ irqbit)
- {
--    g_assert(irqbit >=3D 0 && irqbit < 32);
-+    g_assert((unsigned)irqbit < 32);
-     uint32_t irq =3D 1U << irqbit;
-     uint32_t irqstat =3D d->port_regs.irq_stat | irq;
+Reviewed-by: John Snow <jsnow@redhat.com>
 
+Looks sane to me, but under which circumstances might we grow such a
+tail? I assume the actual truncate call aligns to cluster boundaries as
+appropriate, so is this a bit of a "quick fix" to cull unused clusters
+that happened to be near the truncate boundary?
 
-I can't remember immediately if I have more spots that might cause a
-ruckus for you.
+It might be worth documenting the circumstances that produces this
+unused space that will never get used. My hunch is that such unused
+space should likely be getting reclaimed elsewhere and not here, but
+perhaps I'm misunderstanding the causal factors.
+
+--js
