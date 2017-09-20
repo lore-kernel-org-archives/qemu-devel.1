@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54983)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56160)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1duip1-0007pp-TC
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 13:30:05 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1duirD-0000IK-Tt
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 13:32:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1duip0-0002HS-QR
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 13:30:03 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38102)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <carenas@gmail.com>) id 1duip0-0002Ea-KP
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 13:30:02 -0400
-Received: by mail-wm0-x243.google.com with SMTP id x17so3038393wmd.5
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 10:30:01 -0700 (PDT)
+	(envelope-from <el13635@mail.ntua.gr>) id 1duirD-00049c-7S
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 13:32:19 -0400
+Date: Wed, 20 Sep 2017 20:32:10 +0300
+From: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Message-ID: <20170920173210.ftursp2syk2vm3j5@postretch>
+References: <20170920102311.25736-1-el13635@mail.ntua.gr>
+	<20170920102311.25736-2-el13635@mail.ntua.gr>
+	<20170920142632.GC9409@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <d8115e2d-7409-c6ea-3c8d-3aead5b5fa87@vivier.eu>
-References: <d137f607-aa48-e388-02b2-1f1b104439e2@vivier.eu>
-	<20170919230643.87425-1-carenas@gmail.com>
-	<20170919230643.87425-2-carenas@gmail.com>
-	<d8115e2d-7409-c6ea-3c8d-3aead5b5fa87@vivier.eu>
-From: Carlo Arenas <carenas@gmail.com>
-Date: Wed, 20 Sep 2017 10:29:59 -0700
-Message-ID: <CAPUEspjdyJ8_cwGPZFOAKs3NE83kdwXV-Ji6TTFYJf7MFQxvBg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH 2/3] linux-user: add SO_LINGER to setsockopt
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="tavq6tdkbs2vzndn"
+Content-Disposition: inline
+In-Reply-To: <20170920142632.GC9409@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] [PATCH 1/3] block: add bdrv_co_drain_end callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +25,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Laurent Vivier <laurent@vivier.eu>
-Cc: qemu-devel@nongnu.org, peter.maydell@linaro.org, gang.chen.5i5j@gmail.com, riku.voipio@iki.fi, rth@twiddle.net
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
 
-On Wed, Sep 20, 2017 at 1:39 AM, Laurent Vivier <laurent@vivier.eu> wrote:
+
+--tavq6tdkbs2vzndn
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Sep 20, 2017 at 03:26:32PM +0100, Stefan Hajnoczi wrote:
+>On Wed, Sep 20, 2017 at 01:23:09PM +0300, Manos Pitsidianakis wrote:
+>> @@ -188,7 +194,7 @@ static bool bdrv_drain_recurse(BlockDriverState *bs)
+>>      waited =3D BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
+>>
+>>      /* Ensure any pending metadata writes are submitted to bs->file.  */
+>> -    bdrv_drain_invoke(bs);
+>> +    bdrv_drain_invoke(bs, begin);
 >
-> Why did you remove "optname = SO_LINGER" and "if (optlen !=
-> sizeof(struct target_linger))"?
+>Do you need to move bdrv_drain_invoke(bs, begin) before
+>BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0)?
+>
+>This will ensure that throttling is disabled and the TGM restarted
+>before we wait for requests to complete.
 >
 
-the optname assignment is not really needed, since it is only used for the
-setsockopt call and that call is clearer using SO_LINGER directly, so to
-avoid hard to see bugs like :
+Hm yes. Before, the order was irrelevant because BlockBackend issued the=20
+drain first by restarting the tgm in blk_root_drained_begin.
 
-  http://lists.nongnu.org/archive/html/qemu-devel/2016-01/msg00980.html
+--tavq6tdkbs2vzndn
+Content-Type: application/pgp-signature; name="signature.asc"
 
-the test for optlen is replaced by passing optlen to the underlying
-setsockopt call directly, who would do the test and return the right error.
+-----BEGIN PGP SIGNATURE-----
 
-as an interesting note, I noticed when testing (in ubuntu artful x86_64)
-that regardless of how you interpret the documentation, setsockopt won't
-fail just because the len is smaller than the size of the struct, and
-therefore that code was not equivalent to the setsockopt it was trying to
-emulate, and therefore this change doesn't only make the code simpler but
-also more correct IMHO
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlnCphoACgkQc2J8L2kN
+9xDuaQ/8Cg5+57c0yP6SKfeocYyMEABxze5UR4pKpcIu1a1ASBRQdmv14iJPgwoZ
+q453xgz843d8p0dbEZMB5XPzfyOLG13DkwQqasqpzEHIiWZKF1YUSBJWfSNtu4eQ
+8U42GXw/VqCIDlk0uiq7as6PVqBE/NzN65U9cit2niFVR2eBl7XbXul17QCLCifj
+t3Eo0XIaRBJaLtaLpiMKSZMKs6/MoGOtpA0bbdnNb5muYs6kBdUsayddvg/F4ric
+kxGpKXap4uQ8Z9PYCOCRH6FC6ZeTc5UQcXBnqD+CooH1zGCD0PW1k6uZ4IBcrs0I
+H6vJSB69iE7XrCRvWYJHWeSfd9YbsIUPbpA2d5GpWtLk6xqOnbL4da2WD1aiYczR
+FWquMMf8h5grjQiIbXLJq6A/yFck49pw8JpCFRUzkYVRVZ5kOijnQmKekRkcpwKJ
+8lAmgsAgNB5EBVmwvOfvzI2qrFxQAY8NWVmMMpr0Vw3ZWZjI3r3TXyvKQ5N9JrEY
+ZCgBguPKsJDjYYOmGAY2bkK1ot34GYWvNmv81eHmRIoERhMtGot2eahb+lOeLngx
+lvYL4Hrvf+ZSFdJ9YXKK6VlUZsEntAyWQBnjGLB8+/MlS+Ir/GMRhPbjVgJOX8Es
+7h2urW4+6DRdfWIh/w4C3TinCrinweETFFyTkN+lCl67Xjpsyns=
+=L5lX
+-----END PGP SIGNATURE-----
 
-Carlo
+--tavq6tdkbs2vzndn--
