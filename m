@@ -1,17 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41820)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41791)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dufAZ-00028V-U1
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:36:04 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dufAX-000260-PC
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:36:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dufAY-00015I-Vw
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:36:03 -0400
+	(envelope-from <el13635@mail.ntua.gr>) id 1dufAW-00013r-Vl
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:36:01 -0400
+Date: Wed, 20 Sep 2017 13:34:17 +0300
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Wed, 20 Sep 2017 13:23:10 +0300
-Message-Id: <20170920102311.25736-3-el13635@mail.ntua.gr>
-In-Reply-To: <20170920102311.25736-1-el13635@mail.ntua.gr>
-References: <20170920102311.25736-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH 2/3] block: rename bdrv_co_drain to
- bdrv_co_drain_begin
+Message-ID: <20170920103417.kch7vp6dcn2bueqb@postretch>
+References: <20170920101740.12490-1-stefanha@redhat.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ceqgzs4mlbxnzqij"
+Content-Disposition: inline
+In-Reply-To: <20170920101740.12490-1-stefanha@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v2] throttle-groups: update
+ tg->any_timer_armed[] on detach
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -20,81 +24,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Alberto Garcia <berto@igalia.com>
 
-Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
----
- include/block/block_int.h | 2 +-
- block/io.c                | 4 ++--
- block/qed.c               | 6 +++---
- 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index ea1326e3c7..fd10f53b43 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -357,7 +357,7 @@ struct BlockDriver {
-      * Drain and stop any internal sources of requests in the driver, and
-      * remain so until next I/O callback (e.g. bdrv_co_writev) is called.
-      */
--    void coroutine_fn (*bdrv_co_drain)(BlockDriverState *bs);
-+    void coroutine_fn (*bdrv_co_drain_begin)(BlockDriverState *bs);
- 
-     void coroutine_fn (*bdrv_co_drain_end)(BlockDriverState *bs);
- 
-diff --git a/block/io.c b/block/io.c
-index 465345289d..6b4b13b777 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -162,7 +162,7 @@ static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
-     BlockDriverState *bs = data->bs;
- 
-     if (data->begin) {
--        bs->drv->bdrv_co_drain(bs);
-+        bs->drv->bdrv_co_drain_begin(bs);
-     } else {
-         bs->drv->bdrv_co_drain_end(bs);
-     }
-@@ -176,7 +176,7 @@ static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
- {
-     BdrvCoDrainData data = { .bs = bs, .done = false, .begin = begin};
- 
--    if (!bs->drv || (begin && !bs->drv->bdrv_co_drain) ||
-+    if (!bs->drv || (begin && !bs->drv->bdrv_co_drain_begin) ||
-             (!begin && !bs->drv->bdrv_co_drain_end)) {
-         return;
-     }
-diff --git a/block/qed.c b/block/qed.c
-index 28e2ec89e8..821dcaa055 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -265,7 +265,7 @@ static bool qed_plug_allocating_write_reqs(BDRVQEDState *s)
-     assert(!s->allocating_write_reqs_plugged);
-     if (s->allocating_acb != NULL) {
-         /* Another allocating write came concurrently.  This cannot happen
--         * from bdrv_qed_co_drain, but it can happen when the timer runs.
-+         * from bdrv_qed_co_drain_begin, but it can happen when the timer runs.
-          */
-         qemu_co_mutex_unlock(&s->table_lock);
-         return false;
-@@ -358,7 +358,7 @@ static void bdrv_qed_attach_aio_context(BlockDriverState *bs,
-     }
- }
- 
--static void coroutine_fn bdrv_qed_co_drain(BlockDriverState *bs)
-+static void coroutine_fn bdrv_qed_co_drain_begin(BlockDriverState *bs)
- {
-     BDRVQEDState *s = bs->opaque;
- 
-@@ -1608,7 +1608,7 @@ static BlockDriver bdrv_qed = {
-     .bdrv_check               = bdrv_qed_check,
-     .bdrv_detach_aio_context  = bdrv_qed_detach_aio_context,
-     .bdrv_attach_aio_context  = bdrv_qed_attach_aio_context,
--    .bdrv_co_drain            = bdrv_qed_co_drain,
-+    .bdrv_co_drain_begin      = bdrv_qed_co_drain_begin,
- };
- 
- static void bdrv_qed_init(void)
--- 
-2.11.0
+--ceqgzs4mlbxnzqij
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Sep 20, 2017 at 11:17:40AM +0100, Stefan Hajnoczi wrote:
+>Clear tg->any_timer_armed[] when throttling timers are destroyed during
+>AioContext attach/detach.  Failure to do so causes throttling to hang
+>because we believe the timer is already scheduled!
+>
+>The following was broken at least since QEMU 2.10.0 with -drive
+>iops=3D100:
+>
+>  $ dd if=3D/dev/zero of=3D/dev/vdb oflag=3Ddirect count=3D1000
+>  (qemu) stop
+>  (qemu) cont
+>  ...I/O is stuck...
+>
+>Reported-by: Yongxue Hong <yhong@redhat.com>
+>Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+Reviewed-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
+
+
+>v2:
+> * Use timer_pending(tt->timers[i]) instead of token [Berto]
+> * Fix s/destroy/destroyed/ typo [Eric]
+>
+> block/throttle-groups.c | 11 +++++++++++
+> 1 file changed, 11 insertions(+)
+>
+>diff --git a/block/throttle-groups.c b/block/throttle-groups.c
+>index 6ba992c8d7..0a49f3c409 100644
+>--- a/block/throttle-groups.c
+>+++ b/block/throttle-groups.c
+>@@ -592,6 +592,17 @@ void throttle_group_attach_aio_context(ThrottleGroupM=
+ember *tgm,
+> void throttle_group_detach_aio_context(ThrottleGroupMember *tgm)
+> {
+>     ThrottleTimers *tt =3D &tgm->throttle_timers;
+>+    ThrottleGroup *tg =3D container_of(tgm->throttle_state, ThrottleGroup=
+, ts);
+>+
+>+    qemu_mutex_lock(&tg->lock);
+>+    if (timer_pending(tt->timers[0])) {
+>+        tg->any_timer_armed[0] =3D false;
+>+    }
+>+    if (timer_pending(tt->timers[1])) {
+>+        tg->any_timer_armed[1] =3D false;
+>+    }
+>+    qemu_mutex_unlock(&tg->lock);
+>+
+>     throttle_timers_detach_aio_context(tt);
+>     tgm->aio_context =3D NULL;
+> }
+>--=20
+>2.13.5
+>
+>
+
+--ceqgzs4mlbxnzqij
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlnCRCkACgkQc2J8L2kN
+9xDXHRAAlLDtKSVH9vf4nVJ1KsSHN0B18oB4PyDYZeTFZfURDz3E9IKv8nI0qFXN
+D64eQgPLIZpuFXv90pplXy/gDGjfxOq8f1UVNRoPYYJQaPJKpiZsv6q2j57BbLtS
+v9mYwbCXkNybIVsXrZ3+8gmLk01E/cGV5lJGbJp31rBIGakm6HygtxAg9+nnI2M+
+V5IUdI4cs/dFsVXUub1rwHp9N5cAe4Di0vWtPvcpkyjC1Pl4kR1SAKqNdhEeZVGZ
+NAuQFkgPeAsGeQpBPytb1QoPkbLW5iMWy7Xxl9p4FfFd+8H2UvINzA/lwg2WXWPQ
+wtR2hKt1A63871lWBf3E3K/5zBcrAGsAEBqP/O4Qnc+YpEj7dWei8BWCbmsg6+9u
+C9eaNiEVNXaGRK7XlsrcUIyhzP9eJfdFr4pG4d9d7O9eTNVjxZYBQ+YIpp1LtVh2
+df+DxiTfU7WrR7VL7st5Qrdq088lW1QV3XXbDgVFTtjeM6+QCsyGuA+cITeyD5Vo
+dM8i9nCt2mkkhWWUPiqhWNRAmh3laed1Q5XHzczA1CTjovSEzwbR/S/giJY0vJyu
+lmyoxEDXRXTuAcVK2eUbcybmw/69OLO25oiQxWEcD9JSK5Tm86MvYMrcyxIc0uU5
+3PRw2U4slfqHD2ehIvQ8pAQyTnMb4xj0S9Qaxu6zNckUPj+Em9k=
+=fSh5
+-----END PGP SIGNATURE-----
+
+--ceqgzs4mlbxnzqij--
