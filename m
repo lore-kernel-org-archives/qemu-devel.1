@@ -1,36 +1,38 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40674)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40618)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9Y-0004R8-2T
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:14 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9W-0004P4-3z
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9O-0005dm-FL
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55284
-	helo=mx0a-001b2d01.pphosted.com)
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9L-0005aO-Ai
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:04 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60128)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1duT9O-0005d4-1Y
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:02 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8K0hblp139549
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:46:01 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2d39xyvars-1
+	id 1duT9L-0005ZX-2n
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:45:59 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8K0havp144807
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:58 -0400
+Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3cbn4ybg-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:46:01 -0400
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:57 -0400
 Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 19 Sep 2017 18:46:00 -0600
+	Tue, 19 Sep 2017 18:45:57 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 19 Sep 2017 19:45:12 -0500
+Date: Tue, 19 Sep 2017 19:45:20 -0500
 In-Reply-To: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
 References: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20170920004521.9417-4-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 03/12] target/arm: Fix aa64 ldp register
- writeback
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20170920004521.9417-12-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 11/12] libvhost-user: support resuming
+ vq->last_avail_idx based on used_idx
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,81 +42,78 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, qemu-arm@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-For "ldp x0, x1, [x0]", if the second load is on a second page and
-the second page is unmapped, the exception would be raised with x0
-already modified.  This means the instruction couldn't be restarted.
+This is the same workaround as commit 523b018dde3b765, which was lost
+with libvhost-user transition in commit e10e798c85c2331.
 
-Cc: qemu-arm@nongnu.org
-Cc: qemu-stable@nongnu.org
-Reported-by: Andrew <andrew@fubar.geek.nz>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20170825224833.4463-1-richard.henderson@linaro.org
-Fixes: https://bugs.launchpad.net/qemu/+bug/1713066
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-[PMM: tweaked comment format]
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-
-(cherry picked from commit 3e4d91b94ce400326fae0850578d9e9f30a71adb)
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+(cherry picked from commit 35480cbfcb73143af66c8de4b444d686a46c2e88)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- target/arm/translate-a64.c | 29 +++++++++++++++++------------
- 1 file changed, 17 insertions(+), 12 deletions(-)
+ contrib/libvhost-user/libvhost-user.c | 13 +++++++++++++
+ contrib/libvhost-user/libvhost-user.h |  7 +++++++
+ 2 files changed, 20 insertions(+)
 
-diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
-index 2200e25be0..cb44632d16 100644
---- a/target/arm/translate-a64.c
-+++ b/target/arm/translate-a64.c
-@@ -2217,29 +2217,34 @@ static void disas_ldst_pair(DisasContext *s, uint32_t insn)
-         } else {
-             do_fp_st(s, rt, tcg_addr, size);
-         }
--    } else {
--        TCGv_i64 tcg_rt = cpu_reg(s, rt);
--        if (is_load) {
--            do_gpr_ld(s, tcg_rt, tcg_addr, size, is_signed, false,
--                      false, 0, false, false);
--        } else {
--            do_gpr_st(s, tcg_rt, tcg_addr, size,
--                      false, 0, false, false);
--        }
--    }
--    tcg_gen_addi_i64(tcg_addr, tcg_addr, 1 << size);
--    if (is_vector) {
-+        tcg_gen_addi_i64(tcg_addr, tcg_addr, 1 << size);
-         if (is_load) {
-             do_fp_ld(s, rt2, tcg_addr, size);
-         } else {
-             do_fp_st(s, rt2, tcg_addr, size);
-         }
-     } else {
-+        TCGv_i64 tcg_rt = cpu_reg(s, rt);
-         TCGv_i64 tcg_rt2 = cpu_reg(s, rt2);
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-use=
+r/libvhost-user.c
+index 35fa0c5e56..d27d6303db 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -521,6 +521,19 @@ vu_set_vring_addr_exec(VuDev *dev, VhostUserMsg *vms=
+g)
+=20
+     vq->used_idx =3D vq->vring.used->idx;
+=20
++    if (vq->last_avail_idx !=3D vq->used_idx) {
++        bool resume =3D dev->iface->queue_is_processed_in_order &&
++            dev->iface->queue_is_processed_in_order(dev, index);
 +
-         if (is_load) {
-+            TCGv_i64 tmp = tcg_temp_new_i64();
++        DPRINT("Last avail index !=3D used index: %u !=3D %u%s\n",
++               vq->last_avail_idx, vq->used_idx,
++               resume ? ", resuming" : "");
 +
-+            /* Do not modify tcg_rt before recognizing any exception
-+             * from the second load.
-+             */
-+            do_gpr_ld(s, tmp, tcg_addr, size, is_signed, false,
-+                      false, 0, false, false);
-+            tcg_gen_addi_i64(tcg_addr, tcg_addr, 1 << size);
-             do_gpr_ld(s, tcg_rt2, tcg_addr, size, is_signed, false,
-                       false, 0, false, false);
++        if (resume) {
++            vq->shadow_avail_idx =3D vq->last_avail_idx =3D vq->used_idx=
+;
++        }
++    }
 +
-+            tcg_gen_mov_i64(tcg_rt, tmp);
-+            tcg_temp_free_i64(tmp);
-         } else {
-+            do_gpr_st(s, tcg_rt, tcg_addr, size,
-+                      false, 0, false, false);
-+            tcg_gen_addi_i64(tcg_addr, tcg_addr, 1 << size);
-             do_gpr_st(s, tcg_rt2, tcg_addr, size,
-                       false, 0, false, false);
-         }
--- 
+     return false;
+ }
+=20
+diff --git a/contrib/libvhost-user/libvhost-user.h b/contrib/libvhost-use=
+r/libvhost-user.h
+index 53ef222c0b..4021f1124e 100644
+--- a/contrib/libvhost-user/libvhost-user.h
++++ b/contrib/libvhost-user/libvhost-user.h
+@@ -132,6 +132,7 @@ typedef void (*vu_set_features_cb) (VuDev *dev, uint6=
+4_t features);
+ typedef int (*vu_process_msg_cb) (VuDev *dev, VhostUserMsg *vmsg,
+                                   int *do_reply);
+ typedef void (*vu_queue_set_started_cb) (VuDev *dev, int qidx, bool star=
+ted);
++typedef bool (*vu_queue_is_processed_in_order_cb) (VuDev *dev, int qidx)=
+;
+=20
+ typedef struct VuDevIface {
+     /* called by VHOST_USER_GET_FEATURES to get the features bitmask */
+@@ -148,6 +149,12 @@ typedef struct VuDevIface {
+     vu_process_msg_cb process_msg;
+     /* tells when queues can be processed */
+     vu_queue_set_started_cb queue_set_started;
++    /*
++     * If the queue is processed in order, in which case it will be
++     * resumed to vring.used->idx. This can help to support resuming
++     * on unmanaged exit/crash.
++     */
++    vu_queue_is_processed_in_order_cb queue_is_processed_in_order;
+ } VuDevIface;
+=20
+ typedef void (*vu_queue_handler_cb) (VuDev *dev, int qidx);
+--=20
 2.11.0
