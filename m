@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58982)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32797)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ljy@baibantech.com.cn>) id 1duW36-00036s-W4
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 23:51:48 -0400
+	(envelope-from <famz@redhat.com>) id 1duW6e-0004e9-SG
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 23:55:25 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ljy@baibantech.com.cn>) id 1duW33-0003Bo-UR
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 23:51:45 -0400
-Received: from mail139-154.mail.alibaba.com ([198.11.139.154]:56807)
+	(envelope-from <famz@redhat.com>) id 1duW6b-0000ey-Ql
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 23:55:24 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39824)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ljy@baibantech.com.cn>)
-	id 1duW33-0002xz-HW
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 23:51:41 -0400
-Date: Wed, 20 Sep 2017 11:51:32 +0800
-From: "XaviLi" <ljy@baibantech.com.cn>
-Reply-To: "XaviLi" <ljy@baibantech.com.cn>
-Message-ID: <0b48ed49-198f-4304-9d03-c0fce71ed5be.ljy@baibantech.com.cn>
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1duW6b-0000aw-Lf
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 23:55:21 -0400
+Date: Wed, 20 Sep 2017 11:55:12 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170920035512.GF18491@lemon>
+References: <20170919180038.26056-1-dgilbert@redhat.com>
+	<20170919180038.26056-6-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-Subject: [Qemu-devel] =?utf-8?q?=5BRFC=5D_Another_Para-Virtualization_page?=
- =?utf-8?q?_recycler=2E_Empty_Guest_OS_free_pages_every_few_seconds?=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170919180038.26056-6-dgilbert@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/5] migration: Route more error paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +27,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: =?UTF-8?B?5p2O54+F?= <lishen@baibantech.com.cn>, =?UTF-8?B?5p2o5rO95piV?= <yzx@baibantech.com.cn>, =?UTF-8?B?546L5paM?= <wb@baibantech.com.cn>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, peter.maydell@linaro.org, cohuck@redhat.com, rth@twiddle.net
 
-UFBSIChQZXIgUGFnZSBSZWN5Y2xlcikgaXMgYSBwYXJhIHZpcnR1YWxpemF0aW9uIGRyaXZlciBj
-dXJyZW50bHkgYXZhaWxhYmxlIGZvciBLVk0gaG9zdHMgYW5kIExpbnV4L1dpbmRvd3MgZ3Vlc3Rz
-LiBXaXRoIFBQUiwgZXZlcnkgcGFnZSBmcmVlZCB0byBHdWVzdCBPUyBjYW4gYmUgcmVjeWNsZWQg
-aW4gc2Vjb25kcyBieSBoeXBlcnZpc29yLiBUaGVyZWZvcmUsIFZNcyBjYW4gZHluYW1pY2FsIGFs
-bG9jYXRlL2ZyZWUgcGFnZXMgZnJvbSBoeXBlcnZpc29yIGFjY29yZGluZyB0byBhcHBsaWNhdGlv
-buKAmXMgcmVxdWVzdC4gVGhpcyBpc3N1ZSBjYW4gcmVzdWx0IGluIGEgbWVtb3J5IGRlbnNpdHkg
-Ym9vc3QgaW4gbWFueSBjYXNlcyB3aXRoIGxpdHRsZSBDUFUgY29zdC4gUFBSIGlzIGEgY29tcG9u
-ZW50IG9mIGFuIG9wZW4gc291cmNlIHNvbHV0aW9uIG5hbWVkIER5bmFtaWMgVk06Cmh0dHBzOi8v
-Z2l0aHViLmNvbS9iYWliYW50ZWNoL2R5bmFtaWNfdm0uZ2l0CgpwYXRjaCBjYW4gYmUgZm91bmQg
-aGVyZTogaHR0cHM6Ly9naXRodWIuY29tL2JhaWJhbnRlY2gvZHluYW1pY192bS90cmVlL21hc3Rl
-ci9keW5hbWljX3ZtXzAuNQoKVGhlIGd1ZXN0IHNpZGUgaXMgdmVyeSBzaW1wbGUuIFBQUiBoYXZl
-IGEgaG9vayBhdCB0aGUgZW50cnkgb2YgcGFnZS1mcmVlIGludGVyZmFjZSBvZiBHdWVzdCBPUyB0
-byBtYXJrIGV2ZXJ5IGZyZWVkIHBhZ2VzLiBNYXJrZWQgcGFnZXMgY2FuIGJlIHJlY3ljbGVkIGFu
-ZCByZXBsYWNlZCBieSByZWFkLW9ubHkgemVybyBwYWdlIGluIG9uZSBzY2FuIHBlcmlvZC4gSWYg
-dGhlIHBhZ2Ugd2FzIGFsbG9jYXRlZCBhZ2FpbiBiZWZvcmUgdGhlIHJlY3ljbGluZyBoYXBwZW5z
-LCB0aGUgbWFyayB3YXMgc2ltcGx5IGNhbmNlbGVkIGJ5IFBQUuKAmXMgcGFnZS1hbGxvY2F0aW9u
-IGludGVyZmFjZSBob29rLgoKVGhlIGd1ZXN0IGRyaXZlciB3b3JrcyBpbiBhIHBlci1wYWdlIHdh
-eSBvdGhlciB0aGFuIFZpcnRJTyBiYWxsb29u4oCZcyBiYXRjaCBtb2RlLiBUaGUgcmVjeWNsaW5n
-IGlzc3VlIGlzIGJhc2VkIG9uIGEgbG9ja2xlc3Mgb3BlcmF0aW9uLiBUaGUgZ3Vlc3QgYW5kIGhv
-c3QgZG9lcyBub3Qgc2VuZCBhbnkgaW50ZXJydXB0IHRvIGVhY2ggb3RoZXIgZm9yIHRoaXMuCgpX
-ZSByYW4gYSB0ZXN0IG9uIG91ciBtYWNoaW5lLiBIb3N0IHVzZSBhYm91dCA2NTAwKyBDUFUgY3lj
-bGVzIGF2ZXJhZ2VseSBmb3IgcmVjeWNsaW5nIGVhY2ggcGFnZS4gSW4gd2hpY2ggMzkwMCBjeWNs
-ZXMgaXMgY29zdCBieSB0aGUgTGludXgga2VybmVsIHBhZ2UtdGFibGUgb3BlcmF0aW9uLiBUaGUg
-Z3Vlc3QgaG9vayBjb3N0IGFib3V0IDMwMCBjeWNsZXMgZm9yIG1hcmsgb3IgdW5tYXJrIGVhY2gg
-cGFnZS4gSXQgaXMgY2hlYXAgZW5vdWdoIGluIG1hbnkgY2FzZXMuIFRoZSBkYWVtb24gY29zdCA1
-JSBvZiBvbmUgQ1BVIHdoZW4gdGhlIHNjYW5uaW5nIGZvdW5kIG5vdGhpbmcgdG8gcmVjeWNsZS4g
-T3RoZXIgdGhyZWFkcyBvbmx5IG1vdmUgd2hlbiB0aGVyZSBpcyB3b3JrIHRvIGRvLgoKU2F2aW5n
-IG1lbW9yeSBvZnRlbiBsZWFkcyB0byBhIENQVS1tZW1vcnkgdHJhZGVvZmYgdG9waWMuIEhlcmUg
-dGhpbmcgaXMgZGlmZmVyZW50LiBJbiBtZW1vcnkgaW50ZW5zaXZlIHVzYWdlIHdlIG9mdGVuIHNl
-ZSBwYWdlLWRlZHVwbGljYXRpb24gYXBwbGllZC4gSXQgaXMgdmVyeSBtdWNoIGNoZWFwZXIgdG8g
-cmVjeWNsZSBhIHBhZ2UgdGhhbiBkZWR1cCBpdC4gSW4gdGhhdCBjYXNlIHdlIGNhbiB1c2UgUFBS
-IHRvIHdpbiBDUFUgYW5kIG1lbW9yeSBib3RoLgoKV2UgaGF2ZSBhIHRlc3QgdG8gZGVtb25zdHJh
-dGUgaG93IGRlbnNpdHkgd2FzIGJvb3N0ZWQuIEluIHdoaWNoIFBQUiB3b3JrcyB3aXRoIGEgbXVs
-dGl0aHJlYWQgcGFnZSBkZWR1cGxpY2F0aW9uIGVuZ2luZSBuYW1lZCBQYWdlT05FIHJhdGhlciB0
-aGFuIEtTTS4gUGFnZU9ORSBpcyBnb2luZyB0byBiZSBkaXNjdXNzZWQgaW4gYW5vdGhlciB0b3Bp
-Yy4KClRlc3QgZW52aXJvbm1lbnQKREVMTCBSNzMwCkludGVswq4gWGVvbsKuIEU1LTI2NTAgdjQg
-KDIuMjAgR0h6LCBvZiBDb3JlcyAxMiwgdGhyZWFkcyAyNCk7IAoyNTZHQiBSQU0KSG9zdCBPUzog
-VWJ1bnR1IHNlcnZlciAxNC4wNCBIb3N0IGtlcm5lbDogNC40LjEKUWVtdTogMi45LjAKR3Vlc3Qg
-T1M6IFVidW50dSBzZXJ2ZXIgMTYuMDQgR3Vlc3Qga2VybmVsOiA0LjQuNzYKClRlc3QgVk1z4oCZ
-IG1lbW9yeSBzaXplIHdhcyBjb25maWd1cmVkIHRvIGJlIDRHQi4gRWFjaCBWTSByYW4gYW4gYXBw
-bGljYXRpb24gYWxsb2NhdGUvZnJlZSBtZW1vcnkgZXZlcnkgMzAgbWludXRlcy4gVGhlIHRvcCBt
-ZW1vcnkgYWxsb2NhdGlvbiBzaXplIG9mIGVhY2ggcGVyaW9kIGlzIDNHQiBhbmQgYXZlcmFnZSBz
-aXplIGlzIDE1ME1CLiBXZSByYW4gbWFueSBzdWNoIFZNcyBpbiB0aGUgc2FtZSB0aW1lIHNhbWUg
-bWFjaGluZSB0byBzZWUgdGhlIHRvdGFsIGhvc3Qtc2lkZSBtZW1vcnkgY29zdC4KCgpSYXcgS1ZN
-ClJlc3VsdDogNjcgVk1zIHVzZWQgMjMwR0IgbWVtb3J5LiAKCktWTSArIEtTTSAKQ29uZmlndXJh
-dGlvbjogc2xlZXBfbWlsbGlzZWNzID0gMCwgcGFnZXNfdG9fc2NhbiA9IDEwMDAwMDAKUmVzdWx0
-OiA3MyBWTXMgdXNlZCAyMzBHQiBtZW1vcnkuIEtTTSBkYWVtb24gY29zdCAxMDAlIG9mIG9uZSBD
-UFUKCktWTSArIFBQUiArIFBhZ2VPTkU6CkNvbmZpZ3VyYXRpb246IAp3b3JrIHRocmVhZHMgPTEy
-IHJlY2xhaW1fcGVyaW9kID0gMTAgc2VjcyBtZXJnZV9wZXJpb2QgPSA2MDAgc2VjcyAKKFdoaWNo
-IG1lYW5zIGZyZWVkIHBhZ2VzIHdhcyByZWN5Y2xlZCBlYWNoIDEwIHNlY3MsIHBhZ2VzIHdlcmUg
-bWVyZ2VkIGlmIG5vdCBtb2RpZmllZCBpbiAyIG1lcmdlX3BlcmlvZHMpClJlc3VsdDogNTE2IFZN
-cyBydW4gdG9nZXRoZXIuIFRoZSB0b3RhbCB1c2VkIG1lbW9yeSBnb2VzIHVwIGFuZCBkb3duIGJl
-dHdlZW4gMjE4R0IgYW5kIDEzOUdCLCBhdmVyYWdlbHkgMTgyR0IuIAoKUFBSIGFuZCBQYWdlT05F
-IHNoYXJlZCBhIGRhZW1vbiB0aHJlYWQgYW5kIDEyIHdvcmsgdGhyZWFkcy4gV2UgdGVzdCB0aGVp
-ciBDUFUgY29zdCB0b2dldGhlciBiZWNhdXNlIHRoZSB0d28gZmVhdHVyZXMgYXJlIHNoYXJpbmcg
-dGhyZWFkcyB3aGlsZSBvZmZsb2FkaW5nIGZvciBlYWNoIG90aGVyLiAKClRoZSBhdmVyYWdlIENQ
-VSBjb3N0IG9mIHdvcmsgdGhyZWFkcyBpcyA2LjElLiBEYWVtb24gdGhyZWFk4oCZcyBjb3N0IGlz
-IDIyLjElCgpIZXJlIHdlIHRyaWVkIG90aGVyIGNvbWJpbmF0aW9ucyBpbiB0aGUgc2FtZSB0ZXN0
-IGNhc2U6CnJlY2xhaW1fcGVyaW9kKHNlYykgbWVyZ2VfcGVyaW9kKHNlYykgYXZlcmFnZSBtZW1v
-cnkoR0IpIHdvcmsgdGhyZWFkcycgYXZlcmFnZSBDUFUgZGFlbW9uJ3MgQ1BVCjUgMjAwIDE2NCA2
-LjglIDM0JQo1IDYwMCAxNzYgNi4zJSAzNSUKMTAgMjAwIDE3MSA2LjYlIDIyJQoxMCA2MDAgMTgy
-IDYuMSUgMjIlCk5PVEU6IEl0IGlzIGEgaGlnaCBwcmVzc3VyZSB0ZXN0LiBQUFIgd2FzIHJlY3lj
-bGluZyAzLjJUQiBtZW1vcnkgcGVyIGhvdXIuIEluIG5vcm1hbCBjYXNlIFBQUiBjb3N0cyBmYXIg
-bGVzcyBDUFUgdGhhbiB0aGF0Lg==
+On Tue, 09/19 19:00, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> vmstate_save is called in a few places, and vmstate_save_state is
+> called in lots of places.
+> 
+> Route error returns from the easier cases back up;  there are lots
+> of more complex cases where there own error paths need fixing.
+
+Did you mean s/there/their/ ?
+
+<snip>
+
+> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+> index e643ac662b..ab3e430c2c 100644
+> --- a/tests/test-vmstate.c
+> +++ b/tests/test-vmstate.c
+> @@ -70,7 +70,7 @@ static void save_vmstate(const VMStateDescription *desc, void *obj)
+>      QEMUFile *f = open_test_file(true);
+>  
+>      /* Save file with vmstate */
+> -    vmstate_save_state(f, desc, obj, NULL);
+> +    g_assert(!vmstate_save_state(f, desc, obj, NULL));
+
+Though this is test code, isn't putting anything with a side effect into an
+assert expression a very bad pattern in general?
+
+>      qemu_put_byte(f, QEMU_VM_EOF);
+>      g_assert(!qemu_file_get_error(f));
+>      qemu_fclose(f);
+> @@ -381,7 +381,7 @@ static void test_save_noskip(void)
+>      QEMUFile *fsave = open_test_file(true);
+>      TestStruct obj = { .a = 1, .b = 2, .c = 3, .d = 4, .e = 5, .f = 6,
+>                         .skip_c_e = false };
+> -    vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
+> +    g_assert(!vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL));
+>      g_assert(!qemu_file_get_error(fsave));
+>  
+>      uint8_t expected[] = {
+> @@ -402,7 +402,7 @@ static void test_save_skip(void)
+>      QEMUFile *fsave = open_test_file(true);
+>      TestStruct obj = { .a = 1, .b = 2, .c = 3, .d = 4, .e = 5, .f = 6,
+>                         .skip_c_e = true };
+> -    vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
+> +    g_assert(!vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL));
+>      g_assert(!qemu_file_get_error(fsave));
+>  
+>      uint8_t expected[] = {
+> -- 
+> 2.13.5
+> 
+> 
+
+Fam
