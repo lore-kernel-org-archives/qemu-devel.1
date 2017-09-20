@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32957)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dug3M-0003h5-2D
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:32:41 -0400
+	(envelope-from <david@redhat.com>) id 1dug58-0005Bp-C1
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:34:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dug3I-00042b-Ro
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:32:40 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37148)
+	(envelope-from <david@redhat.com>) id 1dug54-0004Vm-HS
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:34:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37154)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dug3I-00042R-LI
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:32:36 -0400
-Date: Wed, 20 Sep 2017 15:32:27 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170920143226.GF2449@work-vm>
-References: <20170919180038.26056-1-dgilbert@redhat.com>
-	<20170919180038.26056-2-dgilbert@redhat.com>
-	<20170920155746.1192d2fa.cohuck@redhat.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dug54-0004VY-BI
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:34:26 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 6E7BE81E01
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 14:34:25 +0000 (UTC)
+References: <1505913885.24609.8.camel@redhat.com>
+	<2b739056-081b-593a-6344-50b60d04872b@redhat.com>
+	<1505917879.24609.11.camel@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <394d5515-c9a0-578d-1daf-8af1328f0b4b@redhat.com>
+Date: Wed, 20 Sep 2017 16:34:20 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170920155746.1192d2fa.cohuck@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 1/5] migration: pre_save return int
+In-Reply-To: <1505917879.24609.11.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] kvm_set_phys_mem: assertion failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +35,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, peter.maydell@linaro.org, rth@twiddle.net
+To: Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: pbonzini@redhat.com
 
-* Cornelia Huck (cohuck@redhat.com) wrote:
-> On Tue, 19 Sep 2017 19:00:34 +0100
-> "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
+On 20.09.2017 16:31, Gerd Hoffmann wrote:
+>   Hi,
 > 
-> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > 
-> > Modify the pre_save method on VMStateDescription to return an int
-> > rather than void so that it potentially can fail.
-> > 
-> > Changed zillions of devices to make them return 0; the only
-> > case I've made it return non-0 is hw/intc/s390_flic_kvm.c that already
-> > had an error_report/return case.
+>> Dropping from os section:
+>>
+>> <loader readonly="yes"
+>> type="pflash">/usr/share/edk2.git/ovmf-x64/OVMF_CODE-pure-
+>> efi.fd</loader>
+>> <nvram
+>> template="/usr/share/edk2.git/ovmf-x64/OVMF_VARS-pure-
+>> efi.fd">/var/lib/libvirt/qemu/nvram/fedora-org-drm-qxl-
+>> base_VARS.fd</nvram>
 > 
-> Never thought that this device would be at the bleeding edge ;)
+> Bad idea I guess.
+> 
+>> 1) Does the assert trigger right at startup? Or how is it triggered?
+> 
+> Yes, right at startup, before OVMF is done initializing.
+> So probably something in OVMF triggers it.
 
-It's the one case that had bothered to do a proper error.
-
-> > 
-> > Note: If you add an error exit in your pre_save you must emit
-> > an error_report to say why.
-> 
-> Would it make sense to relay an error object? For example,
-> cpu_pre_save() in target/s390x/machine.c calls
-> kvm_s390_vcpu_interrupt_pre_save() which already does an error report.
-> If we relay that error instead, we would avoid saying "oops, this
-> didn't work" several times with decreasing amount of information.
-> 
-> On the other hand, that change would be more invasive.
-
-Right, and it's very very verbose.
+I'll try to include ovmf to reproduce it.
 
 > 
-> > 
-> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > ---
+>> 2) Does your setup work when dopping the assertion?
 > 
-> >  hw/intc/s390_flic_kvm.c        |  6 ++++--
-> 
-> >  hw/s390x/css.c                 | 10 +++++++---
-> >  hw/s390x/virtio-ccw.c          |  4 +++-
-> 
-> >  target/s390x/machine.c         |  4 +++-
-> 
-> That said, the changes in s390-related code look fine.
+> Can try tomorrow.
 
-Thanks.
+I think that assertion might not be stable, because properties (romd
+mode) might not be stable and can change. So if it works without the
+assert, dropping it is the right thing to do.
 
-Dave
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> 
+> cheers,
+>   Gerd
+> 
+
+
+-- 
+
+Thanks,
+
+David
