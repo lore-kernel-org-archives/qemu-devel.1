@@ -1,37 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40584)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40617)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9V-0004MZ-0p
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9W-0004P3-4B
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9K-0005ZF-33
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40454
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9M-0005bH-3m
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:04 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40638
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1duT9J-0005Yo-PU
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:45:57 -0400
+	id 1duT9L-0005ac-Un
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:00 -0400
 Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8K0hasx108317
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:57 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3brr6mn4-1
+	v8K0haxN108285
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:59 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3brr6mqd-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:56 -0400
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:59 -0400
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 19 Sep 2017 20:45:55 -0400
+	Tue, 19 Sep 2017 18:45:58 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 19 Sep 2017 19:45:09 -0500
+Date: Tue, 19 Sep 2017 19:45:10 -0500
+In-Reply-To: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
+References: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Message-Id: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
+Message-Id: <20170920004521.9417-2-mdroth@linux.vnet.ibm.com>
 Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 00/12] Patch Round-up for stable 2.10.1,
- freeze on 2017-09-27
+Subject: [Qemu-devel] [PATCH 01/12] slirp: fix clearing ifq_so from pending
+ packets
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,76 +43,83 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Peter Maydell <peter.maydell@linaro.org>
+
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+
+The if_fastq and if_batchq contain not only packets, but queues of packet=
+s
+for the same socket. When sofree frees a socket, it thus has to clear ifq=
+_so
+from all the packets from the queues, not only the first.
+
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 Cc: qemu-stable@nongnu.org
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+(cherry picked from commit 1201d308519f1e915866d7583d5136d03cc1d384)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+---
+ slirp/socket.c | 39 +++++++++++++++++++++++----------------
+ 1 file changed, 23 insertions(+), 16 deletions(-)
 
-Hi everyone,
-
-The following new patches are queued for QEMU stable v2.10.1:
-
-  https://github.com/mdroth/qemu/commits/stable-2.10-staging
-
-The release is planned for 2017-10-02:
-
-  https://wiki.qemu.org/Planning/2.10
-
-Please respond here or CC qemu-stable@nongnu.org on any patches you
-think should be included in the release.
-
-Testing/feedback is greatly appreciated.
-
-Thanks!
-
-----------------------------------------------------------------
-Alex Williamson (1):
-      vhost: Release memory references on cleanup
-
-Farhan Ali (1):
-      s390-ccw: Fix alignment for CCW1
-
-Greg Kurz (1):
-      virtfs: error out gracefully when mandatory suboptions are missing
-
-Hannes Reinecke (1):
-      scsi-bus: correct responses for INQUIRY and REQUEST SENSE
-
-Marc-Andr=C3=A9 Lureau (2):
-      libvhost-user: support resuming vq->last_avail_idx based on used_id=
-x
-      vhost-user-bridge: fix resume regression (since 2.9)
-
-Pavel Butsykin (1):
-      qcow2: move qcow2_store_persistent_dirty_bitmaps() before cache flu=
-shing
-
-Peter Maydell (1):
-      mps2-an511: Fix wiring of UART overflow interrupt lines
-
-Pranith Kumar (1):
-      arm_gicv3_kvm: Fix compile warning
-
-Richard Henderson (1):
-      target/arm: Fix aa64 ldp register writeback
-
-Samuel Thibault (1):
-      slirp: fix clearing ifq_so from pending packets
-
-Thomas Huth (1):
-      hw/arm/allwinner-a10: Mark the allwinner-a10 device with user_creat=
-able =3D false
-
- block/qcow2.c                         | 16 +++++++-------
- contrib/libvhost-user/libvhost-user.c | 13 ++++++++++++
- contrib/libvhost-user/libvhost-user.h |  7 +++++++
- hw/arm/allwinner-a10.c                |  2 ++
- hw/arm/mps2.c                         |  4 ++--
- hw/intc/arm_gicv3_kvm.c               |  2 +-
- hw/scsi/scsi-bus.c                    | 29 ++++++++++++++++++++++----
- hw/virtio/vhost.c                     |  4 ++++
- pc-bios/s390-ccw/cio.h                |  2 +-
- scripts/device-crash-test             |  1 -
- slirp/socket.c                        | 39 +++++++++++++++++++++--------=
-------
- target/arm/translate-a64.c            | 29 +++++++++++++++-----------
- tests/vhost-user-bridge.c             |  7 +++++++
- vl.c                                  | 16 ++++++++------
- 14 files changed, 120 insertions(+), 51 deletions(-)
+diff --git a/slirp/socket.c b/slirp/socket.c
+index ecec0295a9..cb7b5b608d 100644
+--- a/slirp/socket.c
++++ b/slirp/socket.c
+@@ -60,29 +60,36 @@ socreate(Slirp *slirp)
+ }
+=20
+ /*
++ * Remove references to so from the given message queue.
++ */
++static void
++soqfree(struct socket *so, struct quehead *qh)
++{
++    struct mbuf *ifq;
++
++    for (ifq =3D (struct mbuf *) qh->qh_link;
++             (struct quehead *) ifq !=3D qh;
++             ifq =3D ifq->ifq_next) {
++        if (ifq->ifq_so =3D=3D so) {
++            struct mbuf *ifm;
++            ifq->ifq_so =3D NULL;
++            for (ifm =3D ifq->ifs_next; ifm !=3D ifq; ifm =3D ifm->ifs_n=
+ext) {
++                ifm->ifq_so =3D NULL;
++            }
++        }
++    }
++}
++
++/*
+  * remque and free a socket, clobber cache
+  */
+ void
+ sofree(struct socket *so)
+ {
+   Slirp *slirp =3D so->slirp;
+-  struct mbuf *ifm;
+=20
+-  for (ifm =3D (struct mbuf *) slirp->if_fastq.qh_link;
+-       (struct quehead *) ifm !=3D &slirp->if_fastq;
+-       ifm =3D ifm->ifq_next) {
+-    if (ifm->ifq_so =3D=3D so) {
+-      ifm->ifq_so =3D NULL;
+-    }
+-  }
+-
+-  for (ifm =3D (struct mbuf *) slirp->if_batchq.qh_link;
+-       (struct quehead *) ifm !=3D &slirp->if_batchq;
+-       ifm =3D ifm->ifq_next) {
+-    if (ifm->ifq_so =3D=3D so) {
+-      ifm->ifq_so =3D NULL;
+-    }
+-  }
++  soqfree(so, &slirp->if_fastq);
++  soqfree(so, &slirp->if_batchq);
+=20
+   if (so->so_emu=3D=3DEMU_RSH && so->extra) {
+ 	sofree(so->extra);
+--=20
+2.11.0
