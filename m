@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44157)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47898)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1duhRD-0000dx-3G
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:01:24 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1duhUC-0003EK-Py
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1duhR9-0008NH-2l
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:01:23 -0400
-Received: from mail-wr0-f181.google.com ([209.85.128.181]:55002)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1duhR8-0008LL-St
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:01:19 -0400
-Received: by mail-wr0-f181.google.com with SMTP id g29so2557178wrg.11
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 09:01:18 -0700 (PDT)
-Date: Wed, 20 Sep 2017 18:01:13 +0200
-From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
-Message-ID: <20170920180113.73b76041@fiorina>
-In-Reply-To: <0bc0c49663fafdf3b03844fe048cac3216d88c5b.1505922364.git.tgolembi@redhat.com>
-References: <0bc0c49663fafdf3b03844fe048cac3216d88c5b.1505922364.git.tgolembi@redhat.com>
+	(envelope-from <dgilbert@redhat.com>) id 1duhU8-0005Tz-BQ
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:04:28 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42932)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1duhU7-0005SM-T3
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:04:24 -0400
+Date: Wed, 20 Sep 2017 17:04:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170920160417.GB3132@work-vm>
+References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
+	<1500028867-134709-34-git-send-email-borntraeger@de.ibm.com>
+	<5eb9a7bd-2761-bea1-738a-da7a6d3fbfcf@de.ibm.com>
+	<f6da1ec7-4845-fe78-b6b8-29a71d481458@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio_balloon: include buffers and
- chached memory statistics
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f6da1ec7-4845-fe78-b6b8-29a71d481458@de.ibm.com>
+Subject: Re: [Qemu-devel] block ais migration for machines <= 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,100 +29,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: linux-mm@kvack.org, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-Cc: Wei Wang <wei.w.wang@intel.com>, Shaohua Li <shli@fb.com>, Huang Ying <ying.huang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Michael Roth <mdroth@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Halil Pasic <pasic@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On Wed, 20 Sep 2017 17:48:36 +0200
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> wrote:
+* Christian Borntraeger (borntraeger@de.ibm.com) wrote:
+> Something like the following seems to do the tricks.
+> Needs proper patch description, review, full test with different kernel versions.....
 
-> Add a new fields, VIRTIO_BALLOON_S_BUFFERS and VIRTIO_BALLOON_S_CACHED,
-> to virtio_balloon memory statistics protocol. The values correspond to
-> 'Buffers' and 'Cached' in /proc/meminfo.
->=20
-> To be able to compute the value of 'Cached' memory it is necessary to
-> export total_swapcache_pages() to modules.
->=20
-> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
-> ---
->  drivers/virtio/virtio_balloon.c     | 11 +++++++++++
->  include/uapi/linux/virtio_balloon.h |  4 +++-
->  mm/swap_state.c                     |  1 +
->  3 files changed, 15 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_ball=
-oon.c
-> index f0b3a0b9d42f..c2558ec47a62 100644
-> --- a/drivers/virtio/virtio_balloon.c
-> +++ b/drivers/virtio/virtio_balloon.c
-> @@ -244,12 +244,19 @@ static unsigned int update_balloon_stats(struct vir=
-tio_balloon *vb)
->  	struct sysinfo i;
->  	unsigned int idx =3D 0;
->  	long available;
-> +	long cached;
-> =20
->  	all_vm_events(events);
->  	si_meminfo(&i);
-> =20
->  	available =3D si_mem_available();
-> =20
-> +	cached =3D global_node_page_state(NR_FILE_PAGES) -
-> +			total_swapcache_pages() - i.bufferram;
-> +	if (cached < 0)
-> +		cached =3D 0;
-> +
-> +
->  #ifdef CONFIG_VM_EVENT_COUNTERS
->  	update_stat(vb, idx++, VIRTIO_BALLOON_S_SWAP_IN,
->  				pages_to_bytes(events[PSWPIN]));
-> @@ -264,6 +271,10 @@ static unsigned int update_balloon_stats(struct virt=
-io_balloon *vb)
->  				pages_to_bytes(i.totalram));
->  	update_stat(vb, idx++, VIRTIO_BALLOON_S_AVAIL,
->  				pages_to_bytes(available));
-> +	update_stat(vb, idx++, VIRTIO_BALLOON_S_BUFFERS,
-> +				pages_to_bytes(i.bufferram));
-> +	update_stat(vb, idx++, VIRTIO_BALLOON_S_CACHED,
-> +				pages_to_bytes(cached));
-> =20
->  	return idx;
+Without knowing anything about 'ais' - will this break migration from
+2.10 -> 2.10+this fix?
+
+Dave
+
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 1c7af39..2ff32ba 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -212,6 +212,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+>      s390mc->cpu_model_allowed = true;
+>      s390mc->css_migration_enabled = true;
+>      s390mc->gs_allowed = true;
+> +    s390mc->ais_allowed = true;
+>      mc->init = ccw_init;
+>      mc->reset = s390_machine_reset;
+>      mc->hot_add_cpu = s390_hot_add_cpu;
+> @@ -305,6 +306,11 @@ bool gs_allowed(void)
+>      return false;
 >  }
-> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/vir=
-tio_balloon.h
-> index 343d7ddefe04..119224c34389 100644
-> --- a/include/uapi/linux/virtio_balloon.h
-> +++ b/include/uapi/linux/virtio_balloon.h
-> @@ -52,7 +52,9 @@ struct virtio_balloon_config {
->  #define VIRTIO_BALLOON_S_MEMFREE  4   /* Total amount of free memory */
->  #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory */
->  #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in /proc */
-> -#define VIRTIO_BALLOON_S_NR       7
-> +#define VIRTIO_BALLOON_S_BUFFERS  7   /* Bufferes memory as in /proc */
-
-I've just noticed I have a typo in the comment: 'Bufferes' should be
-'Buffers'.
-
-> +#define VIRTIO_BALLOON_S_CACHED   8   /* Cached memory as in /proc */
-> +#define VIRTIO_BALLOON_S_NR       9
-> =20
->  /*
->   * Memory statistics structure.
-> diff --git a/mm/swap_state.c b/mm/swap_state.c
-> index 71ce2d1ccbf7..f3a4ff7d6c52 100644
-> --- a/mm/swap_state.c
-> +++ b/mm/swap_state.c
-> @@ -95,6 +95,7 @@ unsigned long total_swapcache_pages(void)
->  	rcu_read_unlock();
->  	return ret;
->  }
-> +EXPORT_SYMBOL_GPL(total_swapcache_pages);
-> =20
->  static atomic_t swapin_readahead_hits =3D ATOMIC_INIT(4);
-> =20
-> --=20
-> 2.14.1
->=20
-
-
---=20
-Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+>  
+> +bool ais_allowed(void)
+> +{
+> +    return get_machine_class()->ais_allowed;
+> +}
+> +
+>  static char *machine_get_loadparm(Object *obj, Error **errp)
+>  {
+>      S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
+> @@ -533,6 +539,7 @@ static void ccw_machine_2_9_class_options(MachineClass *mc)
+>      S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
+>  
+>      s390mc->gs_allowed = false;
+> +    s390mc->ais_allowed = false;
+>      ccw_machine_2_10_class_options(mc);
+>      SET_MACHINE_COMPAT(mc, CCW_COMPAT_2_9);
+>      s390mc->css_migration_enabled = false;
+> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+> index 41a9d28..bba8660 100644
+> --- a/include/hw/s390x/s390-virtio-ccw.h
+> +++ b/include/hw/s390x/s390-virtio-ccw.h
+> @@ -41,6 +41,7 @@ typedef struct S390CcwMachineClass {
+>      bool cpu_model_allowed;
+>      bool css_migration_enabled;
+>      bool gs_allowed;
+> +    bool ais_allowed;
+>  } S390CcwMachineClass;
+>  
+>  /* runtime-instrumentation allowed by the machine */
+> @@ -49,6 +50,8 @@ bool ri_allowed(void);
+>  bool cpu_model_allowed(void);
+>  /* guarded-storage allowed by the machine */
+>  bool gs_allowed(void);
+> +/* ais allowed by the machine */
+> +bool ais_allowed(void);
+>  
+>  /**
+>   * Returns true if (vmstate based) migration of the channel subsystem
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index c4c5791..531d474 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -309,7 +309,9 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>      }
+>  
+>      /* Try to enable AIS facility */
+> -    kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
+> +    if (ais_allowed()) {
+> +       kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
+> +    }
+>  
+>      qemu_mutex_init(&qemu_sigp_mutex);
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
