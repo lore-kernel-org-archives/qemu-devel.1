@@ -1,19 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52232)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52321)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dua1s-0000co-G4
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 04:06:48 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dua20-0000hQ-5a
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 04:06:53 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berto@igalia.com>) id 1dua1p-000225-5W
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 04:06:44 -0400
-From: Alberto Garcia <berto@igalia.com>
-In-Reply-To: <20170919155025.4098-1-stefanha@redhat.com>
-References: <20170919155025.4098-1-stefanha@redhat.com>
-Date: Wed, 20 Sep 2017 10:06:35 +0200
-Message-ID: <w51mv5p23qs.fsf@maestria.local.igalia.com>
+	(envelope-from <cohuck@redhat.com>) id 1dua1u-0002DH-FC
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 04:06:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55860)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dua1u-0002BR-9Q
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 04:06:46 -0400
+Date: Wed, 20 Sep 2017 10:06:40 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170920100640.79900c9f.cohuck@redhat.com>
+In-Reply-To: <20170919182745.90280-5-pasic@linux.vnet.ibm.com>
+References: <20170919182745.90280-1-pasic@linux.vnet.ibm.com>
+	<20170919182745.90280-5-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [PATCH] throttle-groups: update
- tg->any_timer_armed[] on detach
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 4/5] 390x/css: introduce maximum data
+ address checking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,52 +28,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-Cc: Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, Manos Pitsidianakis <el13635@mail.ntua.gr>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Tue 19 Sep 2017 05:50:25 PM CEST, Stefan Hajnoczi wrote:
-> Clear tg->any_timer_armed[] when throttling timers are destroy during
-> AioContext attach/detach.  Failure to do so causes throttling to hang
-> because we believe the timer is already scheduled!
->
-> The following was broken at least since QEMU 2.10.0 with -drive
-> iops=100:
->
->   $ dd if=/dev/zero of=/dev/vdb oflag=direct count=1000
->   (qemu) stop
->   (qemu) cont
->   ...I/O is stuck...
->
-> Reported-by: Yongxue Hong <yhong@redhat.com>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+On Tue, 19 Sep 2017 20:27:44 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+
+> The architecture mandates the addresses to be  accessed on the first
+> indirection level (that is, the data addresses without IDA, and the
+> (M)IDAW addresses with (M)IDA) to be checked against an CCW format
+> dependent limit maximum address.  If a violation is detected, the storage
+> access is not to be performed and a channel program check needs to be
+> generated. As of today, we fail to do this check.
+> 
+> Let us stick even closer to the architecture specification.
+> 
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
 > ---
->  block/throttle-groups.c | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
->
-> diff --git a/block/throttle-groups.c b/block/throttle-groups.c
-> index 6ba992c8d7..2bfd03faa0 100644
-> --- a/block/throttle-groups.c
-> +++ b/block/throttle-groups.c
-> @@ -592,7 +592,20 @@ void throttle_group_attach_aio_context(ThrottleGroupMember *tgm,
->  void throttle_group_detach_aio_context(ThrottleGroupMember *tgm)
+>  hw/s390x/css.c         | 10 ++++++++++
+>  include/hw/s390x/css.h |  1 +
+>  2 files changed, 11 insertions(+)
+> 
+> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> index 6b0cd8861b..2d37a9ddde 100644
+> --- a/hw/s390x/css.c
+> +++ b/hw/s390x/css.c
+> @@ -795,6 +795,11 @@ static inline int cds_check_len(CcwDataStream *cds, int len)
+>      return cds->flags & CDS_F_STREAM_BROKEN ? -EINVAL : len;
+>  }
+>  
+> +static inline bool cds_ccw_addrs_ok(hwaddr addr, int len, bool ccw_fmt1)
+
+cds_cda_limit_ok?
+
+> +{
+> +    return (addr + len) < (ccw_fmt1 ? (1UL << 31) : (1UL << 24));
+> +}
+> +
+>  static int ccw_dstream_rw_noflags(CcwDataStream *cds, void *buff, int len,
+>                                    CcwDataStreamOp op)
 >  {
->      ThrottleTimers *tt = &tgm->throttle_timers;
-> +    ThrottleGroup *tg = container_of(tgm->throttle_state, ThrottleGroup, ts);
-> +
->      throttle_timers_detach_aio_context(tt);
-> +
-> +    /* Forget about these timers, they have been destroyed */
-> +    qemu_mutex_lock(&tg->lock);
-> +    if (tg->tokens[0] == tgm) {
-> +        tg->any_timer_armed[0] = false;
-> +    }
-> +    if (tg->tokens[1] == tgm) {
-> +        tg->any_timer_armed[1] = false;
-> +    }
-> +    qemu_mutex_unlock(&tg->lock);
 
-I think I'd rather check the timers directly using timer_pending().
-
-See https://github.com/qemu/qemu/blob/dbe824cc5/block/throttle-groups.c#L426
-
-Berto
+Looks good.
