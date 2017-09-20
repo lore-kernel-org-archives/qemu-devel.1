@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42706)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51437)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1duhkJ-00008k-1z
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:21:09 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1duhut-0008Os-UB
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:32:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <no-reply@patchew.org>) id 1duhkF-00031i-PG
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:21:07 -0400
-Resent-Message-Id: <E1duhkF-00031i-PG@eggs.gnu.org>
-Received: from sender-of-o52.zoho.com ([135.84.80.217]:21485)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
-	id 1duhkF-00030w-Hs
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:21:03 -0400
-In-Reply-To: <f6da1ec7-4845-fe78-b6b8-29a71d481458@de.ibm.com>
-Reply-To: <qemu-devel@nongnu.org>
-Message-ID: <150592444730.27.1338735295153306404@d650bbe78fe3>
+	(envelope-from <richard.henderson@linaro.org>) id 1duhur-00025E-Bc
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:32:03 -0400
+Received: from mail-io0-x22c.google.com ([2607:f8b0:4001:c06::22c]:54260)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1duhur-00023z-6i
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:32:01 -0400
+Received: by mail-io0-x22c.google.com with SMTP id q11so4761962ioe.10
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 09:31:59 -0700 (PDT)
+References: <20170920153016.3858-1-david@redhat.com>
+	<20170920153016.3858-4-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <626da179-e410-e793-8c25-661c940d37d5@linaro.org>
+Date: Wed, 20 Sep 2017 11:31:54 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-From: no-reply@patchew.org
-Date: Wed, 20 Sep 2017 09:20:47 -0700 (PDT)
-Subject: Re: [Qemu-devel] block ais migration for machines <= 2.9
+In-Reply-To: <20170920153016.3858-4-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 3/3] s390x/tcg: add basic MSA features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,34 +31,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: borntraeger@de.ibm.com
-Cc: famz@redhat.com, peter.maydell@linaro.org, thuth@redhat.com, zyimin@linux.vnet.ibm.com, mdroth@linux.vnet.ibm.com, cohuck@redhat.com, qemu-devel@nongnu.org, agraf@suse.de, pasic@linux.vnet.ibm.com, rth@twiddle.net
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
-LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
-ZGV2ZWxdIGJsb2NrIGFpcyBtaWdyYXRpb24gZm9yIG1hY2hpbmVzIDw9IDIuOQpNZXNzYWdlLWlk
-OiBmNmRhMWVjNy00ODQ1LWZlNzgtYjZiOC0yOWE3MWQ0ODE0NThAZGUuaWJtLmNvbQpUeXBlOiBz
-ZXJpZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpu
-PTEKdG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJz
-ZSAkQkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRD
-SCAkbi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEg
-Z2l0IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1h
-aWxiYWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBu
-PSQoKG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApTd2l0Y2hlZCB0
-byBhIG5ldyBicmFuY2ggJ3Rlc3QnCmMwYjMwODNjNzEgYmxvY2sgYWlzIG1pZ3JhdGlvbiBmb3Ig
-bWFjaGluZXMgPD0gMi45Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpDaGVja2luZyBQQVRDSCAxLzE6
-IGJsb2NrIGFpcyBtaWdyYXRpb24gZm9yIG1hY2hpbmVzIDw9IDIuOS4uLgpFUlJPUjogc3VzcGVj
-dCBjb2RlIGluZGVudCBmb3IgY29uZGl0aW9uYWwgc3RhdGVtZW50cyAoNCwgNykKIzczOiBGSUxF
-OiB0YXJnZXQvczM5MHgva3ZtLmM6MzE1OgorICAgIGlmIChhaXNfYWxsb3dlZCgpKSB7CisgICAg
-ICAga3ZtX3ZtX2VuYWJsZV9jYXAocywgS1ZNX0NBUF9TMzkwX0FJUywgMCk7CgpFUlJPUjogTWlz
-c2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMiBlcnJvcnMsIDAgd2FybmluZ3Ms
-IDUwIGxpbmVzIGNoZWNrZWQKCllvdXIgcGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgot
-LS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNo
-ZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVl
-bGlzdHMub3Jn
+On 09/20/2017 10:30 AM, David Hildenbrand wrote:
+> The STFLE bits for the MSA (extension) facilities simply indicate that
+> the respective instructions can be executed. The QUERY subfunction can then
+> be used to identify which features exactly are available.
+> 
+> Availability of subfunctions can also vary on real hardware. For now, we
+> simply implement a CPU model without any available subfunctions except
+> QUERY (which is always around).
+> 
+> As all MSA functions behave quite similarly, we can use one translation
+> handler for now. Prepare the code for implementation of actual subfunctions.
+> 
+> At least MSA is helpful for now, as older Linux kernels require this
+> facility when compiled for a z9 model. Allow to enable the facilities
+> for the qemu cpu model.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>  target/s390x/Makefile.objs   |  2 +-
+>  target/s390x/cpu_models.c    |  4 +++
+>  target/s390x/crypto_helper.c | 65 ++++++++++++++++++++++++++++++++++++++++++++
+>  target/s390x/helper.h        |  1 +
+>  target/s390x/insn-data.def   | 13 +++++++++
+>  target/s390x/translate.c     | 56 ++++++++++++++++++++++++++++++++++++++
+>  6 files changed, 140 insertions(+), 1 deletion(-)
+>  create mode 100644 target/s390x/crypto_helper.c
+
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+
+
+r~
