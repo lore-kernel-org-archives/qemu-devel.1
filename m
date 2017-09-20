@@ -1,39 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40636)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40740)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9X-0004QF-Co
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:16 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9Z-0004RZ-NX
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9M-0005bD-3d
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:05 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55126
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9T-0005hS-Pt
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34888
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1duT9L-0005ag-UZ
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:00 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+	id 1duT9T-0005f3-Kk
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:07 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8K0hbt5139612
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:59 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2d39xyvaq8-1
+	v8K0hcrN015507
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:46:04 -0400
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2d3akjtph2-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:59 -0400
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:46:03 -0400
 Received: from localhost
-	by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 19 Sep 2017 18:45:58 -0600
+	Tue, 19 Sep 2017 20:46:03 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 19 Sep 2017 19:45:21 -0500
+Date: Tue, 19 Sep 2017 19:45:14 -0500
 In-Reply-To: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
 References: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20170920004521.9417-13-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 12/12] vhost-user-bridge: fix resume regression
- (since 2.9)
+Message-Id: <20170920004521.9417-6-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 05/12] arm_gicv3_kvm: Fix compile warning
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -43,47 +39,50 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>
+Cc: qemu-stable@nongnu.org, Pranith Kumar <bobby.prani@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+From: Pranith Kumar <bobby.prani@gmail.com>
 
-Commit e10e798c85c2331 switched to libvhost-user which lacked support
-for resuming the avail_idx based on used_idx.
+Fix the following warning:
 
-Fixes:
-https://bugzilla.redhat.com/show_bug.cgi?id=3D1485867
+/home/pranith/qemu/hw/intc/arm_gicv3_kvm.c:296:17: warning: logical not is only applied to the left hand side of this bitwise operator [-Wlogical-not-parentheses]
+            if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
+                ^             ~
+/home/pranith/qemu/hw/intc/arm_gicv3_kvm.c:296:17: note: add parentheses after the '!' to evaluate the bitwise operator first
+            if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
+                ^
+/home/pranith/qemu/hw/intc/arm_gicv3_kvm.c:296:17: note: add parentheses around left hand side expression to silence this warning
+            if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
+                ^
 
-Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit 672339f7eff5e9226f302037290e84e783d2b5cd)
+This logic error meant we were not setting the PTZ
+bit when we should -- luckily as the comment suggests
+this wouldn't have had any effects beyond making GIC
+initialization take a little longer.
+
+Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
+Message-id: 20170829173226.7625-1-bobby.prani@gmail.com
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+(cherry picked from commit 7229ec5825df6b933f150b54a8a2bedd2de1864c)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/vhost-user-bridge.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ hw/intc/arm_gicv3_kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/vhost-user-bridge.c b/tests/vhost-user-bridge.c
-index 1e5b5ca3da..f922cc75ae 100644
---- a/tests/vhost-user-bridge.c
-+++ b/tests/vhost-user-bridge.c
-@@ -466,11 +466,18 @@ vubr_panic(VuDev *dev, const char *msg)
-     vubr->quit =3D 1;
- }
-=20
-+static bool
-+vubr_queue_is_processed_in_order(VuDev *dev, int qidx)
-+{
-+    return true;
-+}
-+
- static const VuDevIface vuiface =3D {
-     .get_features =3D vubr_get_features,
-     .set_features =3D vubr_set_features,
-     .process_msg =3D vubr_process_msg,
-     .queue_set_started =3D vubr_queue_set_started,
-+    .queue_is_processed_in_order =3D vubr_queue_is_processed_in_order,
- };
-=20
- static void
---=20
+diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
+index 6051c77705..481fe5405a 100644
+--- a/hw/intc/arm_gicv3_kvm.c
++++ b/hw/intc/arm_gicv3_kvm.c
+@@ -293,7 +293,7 @@ static void kvm_arm_gicv3_put(GICv3State *s)
+             kvm_gicr_access(s, GICR_PROPBASER + 4, ncpu, &regh, true);
+ 
+             reg64 = c->gicr_pendbaser;
+-            if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
++            if (!(c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS)) {
+                 /* Setting PTZ is advised if LPIs are disabled, to reduce
+                  * GIC initialization time.
+                  */
+-- 
 2.11.0
