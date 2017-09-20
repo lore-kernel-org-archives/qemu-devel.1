@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33101)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34738)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1duk2L-00047P-Pi
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:47:55 -0400
+	(envelope-from <peter.tribble@gmail.com>) id 1duk5J-00054F-DU
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:50:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1duk2I-0002Sn-Mt
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:47:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43302)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1duk2I-0002Ow-Ep
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:47:50 -0400
-References: <20170919213611.8988-1-jsnow@redhat.com>
-	<20170919213611.8988-2-jsnow@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <68ca6f8d-5673-4177-fadf-ca512258257b@redhat.com>
-Date: Wed, 20 Sep 2017 20:47:43 +0200
+	(envelope-from <peter.tribble@gmail.com>) id 1duk5H-0006d7-Te
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:50:57 -0400
+Received: from mail-it0-x22d.google.com ([2607:f8b0:4001:c0b::22d]:44799)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.tribble@gmail.com>)
+	id 1duk5H-0006Uw-Lv
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:50:55 -0400
+Received: by mail-it0-x22d.google.com with SMTP id r131so3016341itc.1
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 11:50:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170919213611.8988-2-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/2] ppc: remove unused CPU definitions
+From: Peter Tribble <peter.tribble@gmail.com>
+Date: Wed, 20 Sep 2017 19:50:52 +0100
+Message-ID: <CAEgYsbFZGT3GARy7LEkU7uvb4__Xg6AdA2oU9wHtctmKhewkmw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: [Qemu-devel] SunOS support
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,73 +26,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au
+To: qemu-devel@nongnu.org
 
-On 19.09.2017 23:36, John Snow wrote:
-> Following commit aef77960, remove now-unused definitions from
-> cpu-models.h.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  target/ppc/cpu-models.h | 32 --------------------------------
->  1 file changed, 32 deletions(-)
-> 
-> diff --git a/target/ppc/cpu-models.h b/target/ppc/cpu-models.h
-> index df31d7f..b34b512 100644
-> --- a/target/ppc/cpu-models.h
-> +++ b/target/ppc/cpu-models.h
-> @@ -291,34 +291,6 @@ enum {
->  #endif
->      CPU_POWERPC_e200z5             = 0x81000000,
->      CPU_POWERPC_e200z6             = 0x81120000,
-> -    /* MPC55xx microcontrollers */
-> -#define CPU_POWERPC_MPC55xx          CPU_POWERPC_MPC5567
-> -#if 0
-> -#define CPU_POWERPC_MPC5514E         CPU_POWERPC_MPC5514E_v1
-> -#define CPU_POWERPC_MPC5514E_v0      CPU_POWERPC_e200z0
-> -#define CPU_POWERPC_MPC5514E_v1      CPU_POWERPC_e200z1
-> -#define CPU_POWERPC_MPC5514G         CPU_POWERPC_MPC5514G_v1
-> -#define CPU_POWERPC_MPC5514G_v0      CPU_POWERPC_e200z0
-> -#define CPU_POWERPC_MPC5514G_v1      CPU_POWERPC_e200z1
-> -#define CPU_POWERPC_MPC5515S         CPU_POWERPC_e200z1
-> -#define CPU_POWERPC_MPC5516E         CPU_POWERPC_MPC5516E_v1
-> -#define CPU_POWERPC_MPC5516E_v0      CPU_POWERPC_e200z0
-> -#define CPU_POWERPC_MPC5516E_v1      CPU_POWERPC_e200z1
-> -#define CPU_POWERPC_MPC5516G         CPU_POWERPC_MPC5516G_v1
-> -#define CPU_POWERPC_MPC5516G_v0      CPU_POWERPC_e200z0
-> -#define CPU_POWERPC_MPC5516G_v1      CPU_POWERPC_e200z1
-> -#define CPU_POWERPC_MPC5516S         CPU_POWERPC_e200z1
-> -#endif
-> -#if 0
-> -#define CPU_POWERPC_MPC5533          CPU_POWERPC_e200z3
-> -#define CPU_POWERPC_MPC5534          CPU_POWERPC_e200z3
-> -#endif
-> -#define CPU_POWERPC_MPC5553          CPU_POWERPC_e200z6
-> -#define CPU_POWERPC_MPC5554          CPU_POWERPC_e200z6
-> -#define CPU_POWERPC_MPC5561          CPU_POWERPC_e200z6
-> -#define CPU_POWERPC_MPC5565          CPU_POWERPC_e200z6
-> -#define CPU_POWERPC_MPC5566          CPU_POWERPC_e200z6
-> -#define CPU_POWERPC_MPC5567          CPU_POWERPC_e200z6
->      /* e300 family */
->      /* e300 cores */
->      CPU_POWERPC_e300c1             = 0x00830010,
-> @@ -326,11 +298,7 @@ enum {
->      CPU_POWERPC_e300c3             = 0x00850010,
->      CPU_POWERPC_e300c4             = 0x00860010,
->      /* MPC83xx microcontrollers */
+Hi,
 
-I think you should also remove the above comment now?
+To introduce myself: I'm a member of the illumos community (the successor
+to OpenSolaris, to those unfamiliar with us), and I maintain my own illumos
+distribution.
 
-> -#define CPU_POWERPC_MPC831x          CPU_POWERPC_e300c3
-> -#define CPU_POWERPC_MPC832x          CPU_POWERPC_e300c2
->  #define CPU_POWERPC_MPC834x          CPU_POWERPC_e300c1
-> -#define CPU_POWERPC_MPC835x          CPU_POWERPC_e300c1
-> -#define CPU_POWERPC_MPC836x          CPU_POWERPC_e300c1
->  #define CPU_POWERPC_MPC837x          CPU_POWERPC_e300c4
->      /* e500 family */
->      /* e500 cores  */
+Having seen the scary 'SUPPORT FOR THIS HOST OS WILL GO AWAY'
+message, I'm reaching out to see what needs to be done so that support for
+SunOS (not just illumos, I include Oracle's Solaris in the same family)
+needs
+to be kept and, where possible, enhanced.
 
-With the above comment removed:
+I'm willing to act as a contact in this effort, and can work with others in
+the illumos
+community to see if there are other resources we can bring to bear.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+One of my interests here is the sparc support; it would be helpful for us
+to have
+a working sparc emulator, as only a few of us have actual sparc hardware,
+and
+the qemu sparc emulation has dramatically improved in the last couple of
+releases - it would be unfortunate if we were then unable to make use of it.
+
+Thanks,
+
+-- 
+-Peter Tribble
+http://www.petertribble.co.uk/ - http://ptribble.blogspot.com/
