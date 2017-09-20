@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51835)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51844)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dufYl-0006xs-2K
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:04 -0400
+	(envelope-from <marcel@redhat.com>) id 1dufYm-0006yq-1D
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dufYh-0007lf-6I
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44302)
+	(envelope-from <marcel@redhat.com>) id 1dufYk-0007np-TU
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42700)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dufYg-0007lR-Tj
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:00:59 -0400
-Date: Wed, 20 Sep 2017 10:14:38 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170920091438.GB4053@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
-	<1505375436-28439-2-git-send-email-peterx@redhat.com>
-	<20170920075703.GA4053@redhat.com>
-	<20170920090926.GA31306@pxdev.xzpeter.org>
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dufYk-0007nT-O8
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:02 -0400
+References: <1503013010-11500-1-git-send-email-zuban32s@gmail.com>
+	<1503013010-11500-2-git-send-email-zuban32s@gmail.com>
+	<20170919203449.GG21016@localhost.localdomain>
+	<436365c9-43fc-95be-9bb2-7974f12e84df@redhat.com>
+	<CAKSfGUAS8EfYF179pjQ=svmAL2x-VR_iMTh=cZZjQmz77mO8fQ@mail.gmail.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <9c2e8b73-5dc0-ae78-05ff-3b9e307fe895@redhat.com>
+Date: Wed, 20 Sep 2017 17:00:58 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170920090926.GA31306@pxdev.xzpeter.org>
-Subject: Re: [Qemu-devel] [RFC 01/15] char-io: fix possible race on
- IOWatchPoll
+In-Reply-To: <CAKSfGUAS8EfYF179pjQ=svmAL2x-VR_iMTh=cZZjQmz77mO8fQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v7 1/4] hw/pci: introduce pcie-pci-bridge
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,70 +32,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Aleksandr Bezzubikov <zuban32s@gmail.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: lersek@redhat.com, mst@redhat.com, qemu-devel@nongnu.org, seabios@seabios.org
 
-On Wed, Sep 20, 2017 at 05:09:26PM +0800, Peter Xu wrote:
-> On Wed, Sep 20, 2017 at 08:57:03AM +0100, Daniel P. Berrange wrote:
-> > On Thu, Sep 14, 2017 at 03:50:22PM +0800, Peter Xu wrote:
-> > > This is not a problem if we are only having one single loop thread like
-> > > before.  However, after per-monitor thread is introduced, this is not
-> > > true any more, and the race can happen.
-> > > 
-> > > The race can be triggered with "make check -j8" sometimes:
-> > > 
-> > >   qemu-system-x86_64: /root/git/qemu/chardev/char-io.c:91:
-> > >   io_watch_poll_finalize: Assertion `iwp->src == NULL' failed.
-> > > 
-> > > This patch keeps the reference for the watch object when creating in
-> > > io_add_watch_poll(), so that the object will never be released in the
-> > > context main loop, especially when the context loop is running in
-> > > another standalone thread.  Meanwhile, when we want to remove the watch
-> > > object, we always first detach the watch object from its owner context,
-> > > then we continue with the cleanup.
-> > > 
-> > > Without this patch, calling io_remove_watch_poll() in main loop thread
-> > > is not thread-safe, since the other per-monitor thread may be modifying
-> > > the watch object at the same time.
-> > 
-> > This doesn't feel right to me. Why is the main loop thread doing anything
-> > at all with the Chardev, if there is a per-monitor thread ? The Chardev
-> > code isn't thread safe so it isn't safe to have two separate threads
-> > accessing the same Chardev. IOW, if we want a per-monitor thread, then
-> > we must make sure the main thread never touches that monitor's chardev
-> > at all.  While your patch here might have avoided the assertion you
-> > mention above, I fear this is just papering over a fundamental problem
-> > that still exists, that can only be solved by not letting the mainloop
-> > touch the chardev at all.
-> 
-> The stack I encountered:
-> 
-> #0  0x00007f658234c765 in __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:54
-> #1  0x00007f658234e36a in __GI_abort () at abort.c:89
-> #2  0x00007f6582344f97 in __assert_fail_base (fmt=<optimized out>, assertion=assertion@entry=0x55c76345fce1 "iwp->src == NULL", file=file@entry=0x55c76345fcc0 "/root/git/qemu/chardev/char-io.c", line=line@entry=91, function=function@entry=0x55c76345fd10 <__PRETTY_FUNCTION__.21863> "io_watch_poll_finalize") at assert.c:92
-> #3  0x00007f6582345042 in __GI___assert_fail (assertion=0x55c76345fce1 "iwp->src == NULL", file=0x55c76345fcc0 "/root/git/qemu/chardev/char-io.c", line=91, function=0x55c76345fd10 <__PRETTY_FUNCTION__.21863> "io_watch_poll_finalize") at assert.c:101
-> #4  0x000055c7632c2be5 in io_watch_poll_finalize (source=0x55c7651cd450) at /root/git/qemu/chardev/char-io.c:91
-> #5  0x00007f65847bb859 in g_source_unref_internal () at /lib64/libglib-2.0.so.0
-> #6  0x00007f65847bca29 in g_source_destroy_internal () at /lib64/libglib-2.0.so.0
-> #7  0x000055c7632c2d30 in io_remove_watch_poll (source=0x55c7651cd450) at /root/git/qemu/chardev/char-io.c:139
-> #8  0x000055c7632c2d5c in remove_fd_in_watch (chr=0x55c7651ccdf0) at /root/git/qemu/chardev/char-io.c:145
-> #9  0x000055c7632c2368 in qemu_chr_fe_set_handlers (b=0x55c7651f6410, fd_can_read=0x0, fd_read=0x0, fd_event=0x0, be_change=0x0, opaque=0x0, context=0x0, set_open=true)
->     at /root/git/qemu/chardev/char-fe.c:267
-> #10 0x000055c7632c2221 in qemu_chr_fe_deinit (b=0x55c7651f6410, del=false) at /root/git/qemu/chardev/char-fe.c:231
-> #11 0x000055c762e2b15c in monitor_data_destroy (mon=0x55c7651f6410) at /root/git/qemu/monitor.c:600
-> #12 0x000055c762e340ec in monitor_cleanup () at /root/git/qemu/monitor.c:4346
-> #13 0x000055c762f9445d in main (argc=19, argv=0x7ffc6846d0e8, envp=0x7ffc6846d188) at /root/git/qemu/vl.c:4889
-> 
-> So it's destroying the CharBackend, but it'll then call
-> qemu_chr_fe_set_handlers() which finally tries to remove the watch poll.
+On 20/09/2017 12:52, Aleksandr Bezzubikov wrote:
+>=20
+> =D1=81=D1=80, 20 =D1=81=D0=B5=D0=BD=D1=82. 2017 =D0=B3. =D0=B2 10:13, M=
+arcel Apfelbaum <marcel@redhat.com=20
+> <mailto:marcel@redhat.com>>:
+>=20
+>     On 19/09/2017 23:34, Eduardo Habkost wrote:
+>      > On Fri, Aug 18, 2017 at 02:36:47AM +0300, Aleksandr Bezzubikov w=
+rote:
+>      >> Introduce a new PCIExpress-to-PCI Bridge device,
+>      >> which is a hot-pluggable PCI Express device and
+>      >> supports devices hot-plug with SHPC.
+>      >>
+>      >> This device is intended to replace the DMI-to-PCI Bridge.
+>      >>
+>      >> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com
+>     <mailto:zuban32s@gmail.com>>
+>      >> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com
+>     <mailto:marcel@redhat.com>>
+>      >
+>      > It's possible to crash QEMU by instantiating this device, with;
+>      >
+>      >=C2=A0 =C2=A0 $ qemu-system-ppc64 -machine prep -device pcie-pci-=
+bridge
+>      >=C2=A0 =C2=A0 qemu-system-ppc64: qemu/memory.c:1533: memory_regio=
+n_finalize:
+>     Assertion `!mr->container' failed.
+>      >=C2=A0 =C2=A0 Aborted
+>=20
+>     Hi Edurado,
+>=20
+>      >
+>      > I didn't investigate the root cause.
+>      >
+>=20
+>     Thanks for reporting it!
+>     Aleksandr, can you have a look? Maybe we should not compile
+>     the device for ppc arch. (x86 and arm is enough)
+>=20
+>=20
+> I will see what can we do. Is x86 and arm really enough?
+>=20
 
-Ok that code is broken - it must not call monitor_cleanup from the main
-thread - it needs to be called from the monitor thread, unless it can
-guarantee that the monitor thread has already exited, which seems unlikely
+Well, I am being selfish, and it works for me lately :).
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Seriously speaking, the new generic PCI Express
+Port was restricted to x86 and arm for reasons I don't remember.
+Since your work has the same scope, the restriction makes sense.
+
+Please grep for CONFIG_PCIE_PORT to convince yourself
+and to help coding it.
+
+Thanks,
+Marcel
+
+>=20
+>=20
+>     Appreciated,
+>     Marcel
+>=20
+> --=20
+> Aleksandr Bezzubikov
