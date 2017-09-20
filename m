@@ -1,35 +1,39 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40775)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9Z-0004RZ-NX
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9a-0004Rh-3q
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9T-0005hS-Pt
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34888
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9V-0005iJ-AH
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57906
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1duT9T-0005f3-Kk
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:07 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8K0hcrN015507
+	id 1duT9V-0005fQ-4w
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:09 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8K0hbSP041250
 	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:46:04 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2d3akjtph2-1
+Received: from e18.ny.us.ibm.com (e18.ny.us.ibm.com [129.33.205.208])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d39bk780v-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:46:03 -0400
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:46:04 -0400
 Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e18.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
 	Tue, 19 Sep 2017 20:46:03 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 19 Sep 2017 19:45:14 -0500
+Date: Tue, 19 Sep 2017 19:45:16 -0500
 In-Reply-To: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
 References: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20170920004521.9417-6-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 05/12] arm_gicv3_kvm: Fix compile warning
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20170920004521.9417-8-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 07/12] qcow2: move
+ qcow2_store_persistent_dirty_bitmaps() before cache flushing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -39,50 +43,62 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Pranith Kumar <bobby.prani@gmail.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, Pavel Butsykin <pbutsykin@virtuozzo.com>, Kevin Wolf <kwolf@redhat.com>
 
-From: Pranith Kumar <bobby.prani@gmail.com>
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
 
-Fix the following warning:
+After calling qcow2_inactivate(), all qcow2 caches must be flushed, but t=
+his
+may not happen, because the last call qcow2_store_persistent_dirty_bitmap=
+s()
+can lead to marking l2/refcont cache as dirty.
 
-/home/pranith/qemu/hw/intc/arm_gicv3_kvm.c:296:17: warning: logical not is only applied to the left hand side of this bitwise operator [-Wlogical-not-parentheses]
-            if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
-                ^             ~
-/home/pranith/qemu/hw/intc/arm_gicv3_kvm.c:296:17: note: add parentheses after the '!' to evaluate the bitwise operator first
-            if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
-                ^
-/home/pranith/qemu/hw/intc/arm_gicv3_kvm.c:296:17: note: add parentheses around left hand side expression to silence this warning
-            if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
-                ^
+Let's move qcow2_store_persistent_dirty_bitmaps() before the ca=D1=81he f=
+lushing
+to fix it.
 
-This logic error meant we were not setting the PTZ
-bit when we should -- luckily as the comment suggests
-this wouldn't have had any effects beyond making GIC
-initialization take a little longer.
-
-Signed-off-by: Pranith Kumar <bobby.prani@gmail.com>
-Message-id: 20170829173226.7625-1-bobby.prani@gmail.com
 Cc: qemu-stable@nongnu.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit 7229ec5825df6b933f150b54a8a2bedd2de1864c)
+Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 83a8c775a8bf134eb18a719322939b74a818d750)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/intc/arm_gicv3_kvm.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/qcow2.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/hw/intc/arm_gicv3_kvm.c b/hw/intc/arm_gicv3_kvm.c
-index 6051c77705..481fe5405a 100644
---- a/hw/intc/arm_gicv3_kvm.c
-+++ b/hw/intc/arm_gicv3_kvm.c
-@@ -293,7 +293,7 @@ static void kvm_arm_gicv3_put(GICv3State *s)
-             kvm_gicr_access(s, GICR_PROPBASER + 4, ncpu, &regh, true);
- 
-             reg64 = c->gicr_pendbaser;
--            if (!c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS) {
-+            if (!(c->gicr_ctlr & GICR_CTLR_ENABLE_LPIS)) {
-                 /* Setting PTZ is advised if LPIs are disabled, to reduce
-                  * GIC initialization time.
-                  */
--- 
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 40ba26c111..a756bf9541 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2053,6 +2053,14 @@ static int qcow2_inactivate(BlockDriverState *bs)
+     int ret, result =3D 0;
+     Error *local_err =3D NULL;
+=20
++    qcow2_store_persistent_dirty_bitmaps(bs, &local_err);
++    if (local_err !=3D NULL) {
++        result =3D -EINVAL;
++        error_report_err(local_err);
++        error_report("Persistent bitmaps are lost for node '%s'",
++                     bdrv_get_device_or_node_name(bs));
++    }
++
+     ret =3D qcow2_cache_flush(bs, s->l2_table_cache);
+     if (ret) {
+         result =3D ret;
+@@ -2067,14 +2075,6 @@ static int qcow2_inactivate(BlockDriverState *bs)
+                      strerror(-ret));
+     }
+=20
+-    qcow2_store_persistent_dirty_bitmaps(bs, &local_err);
+-    if (local_err !=3D NULL) {
+-        result =3D -EINVAL;
+-        error_report_err(local_err);
+-        error_report("Persistent bitmaps are lost for node '%s'",
+-                     bdrv_get_device_or_node_name(bs));
+-    }
+-
+     if (result =3D=3D 0) {
+         qcow2_mark_clean(bs);
+     }
+--=20
 2.11.0
