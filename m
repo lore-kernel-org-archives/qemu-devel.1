@@ -1,22 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60134)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60271)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dufyu-00084z-0x
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:28:08 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dufzL-0008TS-2m
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:28:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dufyp-0002CQ-US
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:28:04 -0400
-References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
-	<20170920135833.20472-2-pbutsykin@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <d897c151-f2a4-fa44-11dd-e12503b41b61@redhat.com>
-Date: Wed, 20 Sep 2017 09:27:45 -0500
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dufzF-0002QB-7Y
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:28:31 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60488)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dufys-0001pd-Jm
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:28:25 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8KBBZbD078806
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 07:13:08 -0400
+Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3mf8tcw3-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 07:13:07 -0400
+Received: from localhost
+	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Wed, 20 Sep 2017 12:13:05 +0100
+References: <20170919182745.90280-1-pasic@linux.vnet.ibm.com>
+	<20170919182745.90280-6-pasic@linux.vnet.ibm.com>
+	<20170920074238.GH11080@bjsdjshi@linux.vnet.ibm.com>
+	<20170920103312.50b8b69b.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Wed, 20 Sep 2017 13:13:01 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170920135833.20472-2-pbutsykin@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="WoHFxAR3fPmIc7ep5niifqQPVhOsJLI62"
-Subject: Re: [Qemu-devel] [PATCH 1/2] qcow2: fix return error code in
- qcow2_truncate()
+In-Reply-To: <20170920103312.50b8b69b.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Message-Id: <009428a2-fb31-ecc9-d477-4cdea226f2d8@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] s390x/css: support ccw IDA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,88 +44,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, qemu-stable <qemu-stable@nongnu.org>
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---WoHFxAR3fPmIc7ep5niifqQPVhOsJLI62
-From: Eric Blake <eblake@redhat.com>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
- qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, mreitz@redhat.com, den@openvz.org,
- qemu-stable <qemu-stable@nongnu.org>
-Message-ID: <d897c151-f2a4-fa44-11dd-e12503b41b61@redhat.com>
-Subject: Re: [PATCH 1/2] qcow2: fix return error code in qcow2_truncate()
-References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
- <20170920135833.20472-2-pbutsykin@virtuozzo.com>
-In-Reply-To: <20170920135833.20472-2-pbutsykin@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/20/2017 08:58 AM, Pavel Butsykin wrote:
-> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-> ---
->  block/qcow2.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-
-Wow, bdrv_truncate() has had problems!  You found fixes unrelated to my
-current struggles to fix the dirty-bitmap failure.
-
-Reviewed-by: Eric Blake <eblake@redhat.com>
-CC: qemu-stable@nongnu.org
-
->=20
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index 2174a84d1f..8a4311d338 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -3166,7 +3166,7 @@ static int qcow2_truncate(BlockDriverState *bs, i=
-nt64_t offset,
->          if (old_file_size < 0) {
->              error_setg_errno(errp, -old_file_size,
->                               "Failed to inquire current file length");=
-
-> -            return ret;
-> +            return old_file_size;
->          }
-> =20
->          nb_new_data_clusters =3D DIV_ROUND_UP(offset - old_length,
-> @@ -3195,7 +3195,7 @@ static int qcow2_truncate(BlockDriverState *bs, i=
-nt64_t offset,
->          if (allocation_start < 0) {
->              error_setg_errno(errp, -allocation_start,
->                               "Failed to resize refcount structures");
-> -            return -allocation_start;
-> +            return allocation_start;
->          }
-> =20
->          clusters_allocated =3D qcow2_alloc_clusters_at(bs, allocation_=
-start,
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
 
---WoHFxAR3fPmIc7ep5niifqQPVhOsJLI62
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+On 09/20/2017 10:33 AM, Cornelia Huck wrote:
+> On Wed, 20 Sep 2017 15:42:38 +0800
+> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> 
+>> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-19 20:27:45 +0200]:
+>>
+>>> Let's add indirect data addressing support for our virtual channel
+>>> subsystem. This implementation does not bother with any kind of
+>>> prefetching. We simply step through the IDAL on demand.
+>>>
+>>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+>>> ---
+>>>  hw/s390x/css.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>>  1 file changed, 116 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+>>> index 2d37a9ddde..a3ce6d89b6 100644
+>>> --- a/hw/s390x/css.c
+>>> +++ b/hw/s390x/css.c
+>>> @@ -827,6 +827,121 @@ incr:
+>>>      return 0;
+>>>  }
+>>>
+>>> +/* returns values between 1 and bsz, where bsz is a power of 2 */
+>>> +static inline uint16_t ida_continuous_left(hwaddr cda, uint64_t bsz)
+>>> +{
+>>> +    return bsz - (cda & (bsz - 1));
+>>> +}
+>>> +
+>>> +static inline uint64_t ccw_ida_block_size(uint8_t flags)
+>>> +{
+>>> +    if ((flags & CDS_F_C64) && !(flags & CDS_F_I2K)) {
+>>> +        return 1ULL << 12;
+>>> +    }
+>>> +    return 1ULL << 11;
+>>> +}
+>>> +
+>>> +static inline int ida_read_next_idaw(CcwDataStream *cds, bool ccw_fmt1,
+>>> +                                     bool idaw_fmt_2)
+>>> +{
+>>> +    union {uint64_t fmt2; uint32_t fmt1; } idaw;
+>>> +    int ret;
+>>> +    hwaddr idaw_addr;
+>>> +
+>>> +    if (idaw_fmt_2) {
+>>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt2) * cds->at_idaw;
+>>> +        if (idaw_addr & 0x07 && cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1)) {
+>>> +            return -EINVAL; /* channel program check */
+>>> +        }
+>>> +        ret = address_space_rw(&address_space_memory, idaw_addr,  
+>> Ahh, just got one question here:
+>> Do we need to considerate endianess for idaw_addr?
+> 
+> That is taken care of below.
+> 
+> And the previous version worked on my laptop via tcg ;)
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnCeuEACgkQp6FrSiUn
-Q2peWgf/Xfm2j1/0utZcGkMt0myQpZNz+s8S/38ejrA9UUZthLLTWH9NXVboVRx8
-3eSt4fa9rBEmFYW19duFMLH66crH/+RP2/hsA+mKMnWKv2g/BuOeF4/bCPR1rikZ
-qERYgt7tWIk5xS+2gOngmFsR1qE/kKpP1efjw9Tw5lM0VHOgBXMyOKQkpMP1Qs0a
-rw9CuEVMNE9wG4iAQnfJ7XS3jTbGJwyb2BxVfFvBSrcoekevCMxANtaSoOrReULK
-HpkjLQxYWDxMRKqW4GYWotuyTa8z/xV2CtCgipm/GKvcm/2xquYx151UgG+bJtPi
-xR5eyuRXyQtDppvLV/alVeyxQfsKOw==
-=NNBW
------END PGP SIGNATURE-----
+Nod.
 
---WoHFxAR3fPmIc7ep5niifqQPVhOsJLI62--
+> 
+>>
+>>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt2,
+>>> +                               sizeof(idaw.fmt2), false);
+>>> +        cds->cda = be64_to_cpu(idaw.fmt2);
+>>> +    } else {
+>>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
+>>> +        if (idaw_addr & 0x03 && cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1)) {
+>>> +            return -EINVAL; /* channel program check */
+>>> +        }
+>>> +        ret = address_space_rw(&address_space_memory, idaw_addr,
+>>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt1,
+>>> +                               sizeof(idaw.fmt1), false);
+>>> +        cds->cda = be64_to_cpu(idaw.fmt1);  
+>> Still need to check bit 0x80000000 here I think.
+> 
+> Yes, I think this is 'must be zero' for format-1 idaws, and not covered
+> by the ccw-format specific checks above. (Although the PoP can be a bit
+> confusing with many similar terms...)
+>
+
+It's taken care of in ccw_dstream_rw_ida before the actual
+access happens. Code looks like this:
++        if (!idaw_fmt2 && (cds->cda + iter_len) >= (1ULL << 31)) {
++                ret = -EINVAL; /* channel program check */
++                goto err;
++        }
+
+The idea was to have it similar to the non-indirect case.
+ 
+>>
+>>> +    }
+>>> +    ++(cds->at_idaw);
+>>> +    if (ret != MEMTX_OK) {
+>>> +        /* assume inaccessible address */
+>>> +        return -EINVAL; /* channel program check */
+>>> +  
+>> Extra line.
+>>
+>>> +    }
+>>> +    return 0;
+>>> +}
+>>> +
+>>> +static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int len,
+>>> +                              CcwDataStreamOp op)
+>>> +{
+>>> +    uint64_t bsz = ccw_ida_block_size(cds->flags);
+>>> +    int ret = 0;
+>>> +    uint16_t cont_left, iter_len;
+>>> +    const bool idaw_fmt2 = cds->flags & CDS_F_C64;
+>>> +    bool ccw_fmt1 = cds->flags & CDS_F_FMT;  
+>> Use 'const bool' either? Although I doubt the value of using const here.
+>> ;)
+> 
+> Both being the same is still a good idea.
+> 
+
+Yeah. For which one should I go (with const or without)?
+
+>>
+>>> +
+>>> +    ret = cds_check_len(cds, len);
+>>> +    if (ret <= 0) {
+>>> +        return ret;
+>>> +    }  
+>>
+>> [...]
+>>
+> 
