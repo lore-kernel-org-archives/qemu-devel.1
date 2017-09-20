@@ -1,24 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39184)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39645)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duf6T-0006xJ-5Z
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:31:54 -0400
+	(envelope-from <famz@redhat.com>) id 1duf7Z-00088I-86
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:33:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duf6P-0007IP-36
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:31:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50342)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duf6O-0007I1-OF
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:31:44 -0400
-Date: Wed, 20 Sep 2017 11:14:31 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170920111431.1435dacd.cohuck@redhat.com>
-In-Reply-To: <20170919074314.10350-1-borntraeger@de.ibm.com>
-References: <20170919074314.10350-1-borntraeger@de.ibm.com>
+	(envelope-from <famz@redhat.com>) id 1duf7X-0007xl-RI
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:32:57 -0400
+Date: Wed, 20 Sep 2017 17:57:11 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170920095711.GA4058@lemon.lan>
+References: <20170914144032.14945-1-eblake@redhat.com>
+	<20170914144032.14945-4-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v2] s390x/cpu: expose the guest crash
- information
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170914144032.14945-4-eblake@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v3 03/20] file-posix: Switch to
+ .bdrv_co_block_status()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,92 +24,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>, Richard Henderson <rth@twiddle.net>, Jing Liu <liujbjl@linux.vnet.ibm.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, jsnow@redhat.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-On Tue, 19 Sep 2017 09:43:14 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-
-> From: Jing Liu <liujbjl@linux.vnet.ibm.com>
+On Thu, 09/14 09:40, Eric Blake wrote:
+> We are gradually moving away from sector-based interfaces, towards
+> byte-based.  Update the file protocol driver accordingly.  In mapping
+> mode, note that the entire file is reported as allocated, so we can
+> take a shortcut and skip lseek().
 > 
-> This patch is the s390 implementation of guest crash information, similar
-> to commit d187e08dc4 ("i386/cpu: add crash-information QOM property") and
-> the related commits. We will detect several crash reasons, with the
-> "disabled wait" being the most important one, since this is used by all
-> s390 guests as a "panic like" notification.
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 > 
-> Demonstrate the these ways with examples as follows.
-
-s/the these/these/
-
-> 
->   1. crash-information QOM property;
-> 
->   Run qemu with -qmp unix:qmp-sock,server, then use utility "qmp-shell"
->   to execute "qom-get" command, and might get the result like,
-> 
->   (QEMU) qom-get path=/machine/cpu[0]/ property=crash-information
->   {"return": {"psw-addr": 1105350, "psw-mask": 562956395872256, "reason":
->    "disabled wait", "type": "s390"}}
-> 
->   2. GUEST_PANICKED event reporting;
-> 
->   Run qemu with a socket option, and telnet or nc to that,
->   -chardev socket,id=qmp,port=4444,host=localhost,server \
->   -mon chardev=qmp,mode=control,pretty=on \
->   Negotiating the mode by { "execute": "qmp_capabilities" }, and the crash
->   information will be reported on a guest crash event like,
-> 
->   {
->       "timestamp": {
->           "seconds": 1499931739,
->           "microseconds": 961296
->       },
->       "event": "GUEST_PANICKED",
->       "data": {
->           "action": "pause",
->           "info": {
->               "psw-addr": 1105350,
->               "reason": "disabled wait",
->               "psw-mask": 562956395872256,
->               "type": "s390"
->           }
->       }
->   }
-
-Out of scope for this patch, but is there a way to print the values as
-hex in the monitor?
-
-> 
->   3. log;
-> 
->   Run qemu with the parameters: -D <logfile> -d guest_errors, to
->   specify the logfile and log item. The results might be,
-> 
->   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  
->   Guest crashed
->   S390 crash parameters: (0x2000180000000 0x10ddc6)
-
-Would it make sense to pad with zeroes, for readability?
-
->   S390 crash reason: disabled wait
->   >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  
-> 
-> Signed-off-by: Jing Liu <liujbjl@linux.vnet.ibm.com>
-> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
-> [minor fixes due to upstream feedback]
 > ---
-> V1->V2:
-> 	- rename kvm-s390 to s390 in all places
-> 	- add "loop" to the crash reasons where appropriate
-> 	- use "-" instead of "_" for qapi
+> v2: tweak comment, add mapping support
+> ---
+>  block/file-posix.c | 57 ++++++++++++++++++++++++++++++------------------------
+>  1 file changed, 32 insertions(+), 25 deletions(-)
 > 
->  qapi/run-state.json | 19 ++++++++++++++++--
->  target/s390x/cpu.c  | 57 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  target/s390x/cpu.h  |  6 ++++++
->  target/s390x/kvm.c  | 29 +++++++++++++++++++++------
->  vl.c                |  6 ++++++
->  5 files changed, 109 insertions(+), 8 deletions(-)
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 72ecfbb0e0..6813059867 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -2107,24 +2107,25 @@ static int find_allocation(BlockDriverState *bs, off_t start,
+>  }
+> 
+>  /*
+> - * Returns the allocation status of the specified sectors.
+> + * Returns the allocation status of the specified offset.
+>   *
+> - * If 'sector_num' is beyond the end of the disk image the return value is 0
+> + * If 'offset' is beyond the end of the disk image the return value is 0
+>   * and 'pnum' is set to 0.
+>   *
+> - * 'pnum' is set to the number of sectors (including and immediately following
+> - * the specified sector) that are known to be in the same
+> + * 'pnum' is set to the number of bytes (including and immediately following
+> + * the specified offset) that are known to be in the same
+>   * allocated/unallocated state.
+>   *
+> - * 'nb_sectors' is the max value 'pnum' should be set to.  If nb_sectors goes
+> + * 'bytes' is the max value 'pnum' should be set to.  If bytes goes
+>   * beyond the end of the disk image it will be clamped.
+>   */
+> -static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+> -                                                    int64_t sector_num,
+> -                                                    int nb_sectors, int *pnum,
+> -                                                    BlockDriverState **file)
+> +static int64_t coroutine_fn raw_co_block_status(BlockDriverState *bs,
+> +                                                bool mapping,
+> +                                                int64_t offset,
+> +                                                int64_t bytes, int64_t *pnum,
+> +                                                BlockDriverState **file)
+>  {
+> -    off_t start, data = 0, hole = 0;
+> +    off_t data = 0, hole = 0;
+>      int64_t total_size;
+>      int ret;
+> 
+> @@ -2133,39 +2134,45 @@ static int64_t coroutine_fn raw_co_get_block_status(BlockDriverState *bs,
+>          return ret;
+>      }
+> 
+> -    start = sector_num * BDRV_SECTOR_SIZE;
+>      total_size = bdrv_getlength(bs);
+>      if (total_size < 0) {
+>          return total_size;
+> -    } else if (start >= total_size) {
+> +    } else if (offset >= total_size) {
+>          *pnum = 0;
+>          return 0;
+> -    } else if (start + nb_sectors * BDRV_SECTOR_SIZE > total_size) {
+> -        nb_sectors = DIV_ROUND_UP(total_size - start, BDRV_SECTOR_SIZE);
+> +    } else if (offset + bytes > total_size) {
+> +        bytes = total_size - offset;
+>      }
+> 
+> -    ret = find_allocation(bs, start, &data, &hole);
+> +    if (!mapping) {
+> +        *pnum = bytes;
+> +        *file = bs;
+> +        return BDRV_BLOCK_DATA | BDRV_BLOCK_OFFSET_VALID |
+> +            (offset & BDRV_BLOCK_OFFSET_MASK);
+> +    }
 
-No further comments over what others have already said.
+I may be missing something, because the last time I tried to understand the
+rationale behind "mapping" was already some time ago: shouldn't we still
+distinguish hole and data? What will omitting BDRV_BLOCK_ZERO help?
+
+Fam
+
+> +
+> +    ret = find_allocation(bs, offset, &data, &hole);
+>      if (ret == -ENXIO) {
+>          /* Trailing hole */
+> -        *pnum = nb_sectors;
+> +        *pnum = bytes;
+>          ret = BDRV_BLOCK_ZERO;
+>      } else if (ret < 0) {
+>          /* No info available, so pretend there are no holes */
+> -        *pnum = nb_sectors;
+> +        *pnum = bytes;
+>          ret = BDRV_BLOCK_DATA;
+> -    } else if (data == start) {
+> -        /* On a data extent, compute sectors to the end of the extent,
+> +    } else if (data == offset) {
+> +        /* On a data extent, compute bytes to the end of the extent,
+>           * possibly including a partial sector at EOF. */
+> -        *pnum = MIN(nb_sectors, DIV_ROUND_UP(hole - start, BDRV_SECTOR_SIZE));
+> +        *pnum = MIN(bytes, hole - offset);
+>          ret = BDRV_BLOCK_DATA;
+>      } else {
+> -        /* On a hole, compute sectors to the beginning of the next extent.  */
+> -        assert(hole == start);
+> -        *pnum = MIN(nb_sectors, (data - start) / BDRV_SECTOR_SIZE);
+> +        /* On a hole, compute bytes to the beginning of the next extent.  */
+> +        assert(hole == offset);
+> +        *pnum = MIN(bytes, data - offset);
+>          ret = BDRV_BLOCK_ZERO;
+>      }
+>      *file = bs;
+> -    return ret | BDRV_BLOCK_OFFSET_VALID | start;
+> +    return ret | BDRV_BLOCK_OFFSET_VALID | (offset & BDRV_BLOCK_OFFSET_MASK);
+>  }
+> 
+>  static coroutine_fn BlockAIOCB *raw_aio_pdiscard(BlockDriverState *bs,
+> @@ -2259,7 +2266,7 @@ BlockDriver bdrv_file = {
+>      .bdrv_close = raw_close,
+>      .bdrv_create = raw_create,
+>      .bdrv_has_zero_init = bdrv_has_zero_init_1,
+> -    .bdrv_co_get_block_status = raw_co_get_block_status,
+> +    .bdrv_co_block_status = raw_co_block_status,
+>      .bdrv_co_pwrite_zeroes = raw_co_pwrite_zeroes,
+> 
+>      .bdrv_co_preadv         = raw_co_preadv,
+> -- 
+> 2.13.5
+> 
