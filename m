@@ -1,27 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55359)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dufjB-0000Oo-2N
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:11:53 -0400
+	(envelope-from <borntraeger@de.ibm.com>) id 1dufj9-0000NR-JX
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:11:51 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dufj7-000475-22
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:11:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35508)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dufj6-00046h-Rf
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:11:44 -0400
-Date: Wed, 20 Sep 2017 13:43:58 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170920134358.568404ac.cohuck@redhat.com>
-In-Reply-To: <1f526c43-6967-e30c-25c7-3b079e0598d3@linux.vnet.ibm.com>
-References: <20170919182745.90280-1-pasic@linux.vnet.ibm.com>
-	<20170919182745.90280-5-pasic@linux.vnet.ibm.com>
-	<20170920100640.79900c9f.cohuck@redhat.com>
-	<1f526c43-6967-e30c-25c7-3b079e0598d3@linux.vnet.ibm.com>
+	(envelope-from <borntraeger@de.ibm.com>) id 1dufj5-00045o-JV
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:11:47 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:53626)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
+	id 1dufj5-000452-AI
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:11:43 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8KCqJF5069335
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 08:53:14 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3pksrdfv-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 08:53:14 -0400
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
+	Wed, 20 Sep 2017 13:53:11 +0100
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
+	<1500028867-134709-34-git-send-email-borntraeger@de.ibm.com>
+	<5eb9a7bd-2761-bea1-738a-da7a6d3fbfcf@de.ibm.com>
+Date: Wed, 20 Sep 2017 14:53:07 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <5eb9a7bd-2761-bea1-738a-da7a6d3fbfcf@de.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/5] 390x/css: introduce maximum data
- address checking
+Message-Id: <f6da1ec7-4845-fe78-b6b8-29a71d481458@de.ibm.com>
+Subject: [Qemu-devel] block ais migration for machines <= 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,56 +43,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>, Thomas Huth <thuth@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On Wed, 20 Sep 2017 13:34:21 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+Something like the following seems to do the tricks.
+Needs proper patch description, review, full test with different kernel versions.....
 
-> On 09/20/2017 10:06 AM, Cornelia Huck wrote:
-> > On Tue, 19 Sep 2017 20:27:44 +0200
-> > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> >   
-> >> The architecture mandates the addresses to be  accessed on the first
-> >> indirection level (that is, the data addresses without IDA, and the
-> >> (M)IDAW addresses with (M)IDA) to be checked against an CCW format
-> >> dependent limit maximum address.  If a violation is detected, the storage
-> >> access is not to be performed and a channel program check needs to be
-> >> generated. As of today, we fail to do this check.
-> >>
-> >> Let us stick even closer to the architecture specification.
-> >>
-> >> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> >> ---
-> >>  hw/s390x/css.c         | 10 ++++++++++
-> >>  include/hw/s390x/css.h |  1 +
-> >>  2 files changed, 11 insertions(+)
-> >>
-> >> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> >> index 6b0cd8861b..2d37a9ddde 100644
-> >> --- a/hw/s390x/css.c
-> >> +++ b/hw/s390x/css.c
-> >> @@ -795,6 +795,11 @@ static inline int cds_check_len(CcwDataStream *cds, int len)
-> >>      return cds->flags & CDS_F_STREAM_BROKEN ? -EINVAL : len;
-> >>  }
-> >>  
-> >> +static inline bool cds_ccw_addrs_ok(hwaddr addr, int len, bool ccw_fmt1)  
-> > 
-> > cds_cda_limit_ok?
-> >   
-> 
-> I use cda to point to the 2 level in case of IDA. This is about
-> level 1 (addressed by the ccw directly). That's why I used ccw_addrs
-> but if you think cds_cda_limit_ok is better I can live with that.
-
-I don't care that much, tbh.
-
-> 
-> We could also think about renaming cds->cda. Btw what does cda stand
-> for (channel data address is my guess)?
-
-Yes, cda should stand for 'channel data address'. Its usage in cds->cda
-is probably the source of this minor confusion.
-
-But, as said, I don't really care that much; so unless one of the other
-folks has a strong opinion, feel free to leave as-is.
+diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+index 1c7af39..2ff32ba 100644
+--- a/hw/s390x/s390-virtio-ccw.c
++++ b/hw/s390x/s390-virtio-ccw.c
+@@ -212,6 +212,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+     s390mc->cpu_model_allowed = true;
+     s390mc->css_migration_enabled = true;
+     s390mc->gs_allowed = true;
++    s390mc->ais_allowed = true;
+     mc->init = ccw_init;
+     mc->reset = s390_machine_reset;
+     mc->hot_add_cpu = s390_hot_add_cpu;
+@@ -305,6 +306,11 @@ bool gs_allowed(void)
+     return false;
+ }
+ 
++bool ais_allowed(void)
++{
++    return get_machine_class()->ais_allowed;
++}
++
+ static char *machine_get_loadparm(Object *obj, Error **errp)
+ {
+     S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
+@@ -533,6 +539,7 @@ static void ccw_machine_2_9_class_options(MachineClass *mc)
+     S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
+ 
+     s390mc->gs_allowed = false;
++    s390mc->ais_allowed = false;
+     ccw_machine_2_10_class_options(mc);
+     SET_MACHINE_COMPAT(mc, CCW_COMPAT_2_9);
+     s390mc->css_migration_enabled = false;
+diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+index 41a9d28..bba8660 100644
+--- a/include/hw/s390x/s390-virtio-ccw.h
++++ b/include/hw/s390x/s390-virtio-ccw.h
+@@ -41,6 +41,7 @@ typedef struct S390CcwMachineClass {
+     bool cpu_model_allowed;
+     bool css_migration_enabled;
+     bool gs_allowed;
++    bool ais_allowed;
+ } S390CcwMachineClass;
+ 
+ /* runtime-instrumentation allowed by the machine */
+@@ -49,6 +50,8 @@ bool ri_allowed(void);
+ bool cpu_model_allowed(void);
+ /* guarded-storage allowed by the machine */
+ bool gs_allowed(void);
++/* ais allowed by the machine */
++bool ais_allowed(void);
+ 
+ /**
+  * Returns true if (vmstate based) migration of the channel subsystem
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index c4c5791..531d474 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -309,7 +309,9 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     }
+ 
+     /* Try to enable AIS facility */
+-    kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
++    if (ais_allowed()) {
++       kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
++    }
+ 
+     qemu_mutex_init(&qemu_sigp_mutex);
