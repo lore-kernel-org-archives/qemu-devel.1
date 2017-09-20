@@ -1,32 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51514)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51835)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dufXj-00061M-Gm
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:00:00 -0400
+	(envelope-from <berrange@redhat.com>) id 1dufYl-0006xs-2K
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dufXe-0007Iy-Vf
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:59:59 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41730)
+	(envelope-from <berrange@redhat.com>) id 1dufYh-0007lf-6I
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44302)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dufXe-0007Ip-NJ
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:59:54 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id B16997EAA4
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 13:59:53 +0000 (UTC)
-References: <20170920104639.2335-1-quintela@redhat.com>
-	<20170920104639.2335-8-quintela@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <52df88ba-6844-3569-2913-fa692a2ca6d6@redhat.com>
-Date: Wed, 20 Sep 2017 08:59:49 -0500
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dufYg-0007lR-Tj
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:00:59 -0400
+Date: Wed, 20 Sep 2017 10:14:38 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170920091438.GB4053@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
+	<1505375436-28439-2-git-send-email-peterx@redhat.com>
+	<20170920075703.GA4053@redhat.com>
+	<20170920090926.GA31306@pxdev.xzpeter.org>
 MIME-Version: 1.0
-In-Reply-To: <20170920104639.2335-8-quintela@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="C0Bu3ttJOg0TL2HbRQfmt1VePGtRbGnFW"
-Subject: Re: [Qemu-devel] [PULL 07/16] migration: Create
- x-multifd-page-count parameter
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170920090926.GA31306@pxdev.xzpeter.org>
+Subject: Re: [Qemu-devel] [RFC 01/15] char-io: fix possible race on
+ IOWatchPoll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,80 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---C0Bu3ttJOg0TL2HbRQfmt1VePGtRbGnFW
-From: Eric Blake <eblake@redhat.com>
-To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
-Message-ID: <52df88ba-6844-3569-2913-fa692a2ca6d6@redhat.com>
-Subject: Re: [Qemu-devel] [PULL 07/16] migration: Create x-multifd-page-count
- parameter
-References: <20170920104639.2335-1-quintela@redhat.com>
- <20170920104639.2335-8-quintela@redhat.com>
-In-Reply-To: <20170920104639.2335-8-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Sep 20, 2017 at 05:09:26PM +0800, Peter Xu wrote:
+> On Wed, Sep 20, 2017 at 08:57:03AM +0100, Daniel P. Berrange wrote:
+> > On Thu, Sep 14, 2017 at 03:50:22PM +0800, Peter Xu wrote:
+> > > This is not a problem if we are only having one single loop thread like
+> > > before.  However, after per-monitor thread is introduced, this is not
+> > > true any more, and the race can happen.
+> > > 
+> > > The race can be triggered with "make check -j8" sometimes:
+> > > 
+> > >   qemu-system-x86_64: /root/git/qemu/chardev/char-io.c:91:
+> > >   io_watch_poll_finalize: Assertion `iwp->src == NULL' failed.
+> > > 
+> > > This patch keeps the reference for the watch object when creating in
+> > > io_add_watch_poll(), so that the object will never be released in the
+> > > context main loop, especially when the context loop is running in
+> > > another standalone thread.  Meanwhile, when we want to remove the watch
+> > > object, we always first detach the watch object from its owner context,
+> > > then we continue with the cleanup.
+> > > 
+> > > Without this patch, calling io_remove_watch_poll() in main loop thread
+> > > is not thread-safe, since the other per-monitor thread may be modifying
+> > > the watch object at the same time.
+> > 
+> > This doesn't feel right to me. Why is the main loop thread doing anything
+> > at all with the Chardev, if there is a per-monitor thread ? The Chardev
+> > code isn't thread safe so it isn't safe to have two separate threads
+> > accessing the same Chardev. IOW, if we want a per-monitor thread, then
+> > we must make sure the main thread never touches that monitor's chardev
+> > at all.  While your patch here might have avoided the assertion you
+> > mention above, I fear this is just papering over a fundamental problem
+> > that still exists, that can only be solved by not letting the mainloop
+> > touch the chardev at all.
+> 
+> The stack I encountered:
+> 
+> #0  0x00007f658234c765 in __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:54
+> #1  0x00007f658234e36a in __GI_abort () at abort.c:89
+> #2  0x00007f6582344f97 in __assert_fail_base (fmt=<optimized out>, assertion=assertion@entry=0x55c76345fce1 "iwp->src == NULL", file=file@entry=0x55c76345fcc0 "/root/git/qemu/chardev/char-io.c", line=line@entry=91, function=function@entry=0x55c76345fd10 <__PRETTY_FUNCTION__.21863> "io_watch_poll_finalize") at assert.c:92
+> #3  0x00007f6582345042 in __GI___assert_fail (assertion=0x55c76345fce1 "iwp->src == NULL", file=0x55c76345fcc0 "/root/git/qemu/chardev/char-io.c", line=91, function=0x55c76345fd10 <__PRETTY_FUNCTION__.21863> "io_watch_poll_finalize") at assert.c:101
+> #4  0x000055c7632c2be5 in io_watch_poll_finalize (source=0x55c7651cd450) at /root/git/qemu/chardev/char-io.c:91
+> #5  0x00007f65847bb859 in g_source_unref_internal () at /lib64/libglib-2.0.so.0
+> #6  0x00007f65847bca29 in g_source_destroy_internal () at /lib64/libglib-2.0.so.0
+> #7  0x000055c7632c2d30 in io_remove_watch_poll (source=0x55c7651cd450) at /root/git/qemu/chardev/char-io.c:139
+> #8  0x000055c7632c2d5c in remove_fd_in_watch (chr=0x55c7651ccdf0) at /root/git/qemu/chardev/char-io.c:145
+> #9  0x000055c7632c2368 in qemu_chr_fe_set_handlers (b=0x55c7651f6410, fd_can_read=0x0, fd_read=0x0, fd_event=0x0, be_change=0x0, opaque=0x0, context=0x0, set_open=true)
+>     at /root/git/qemu/chardev/char-fe.c:267
+> #10 0x000055c7632c2221 in qemu_chr_fe_deinit (b=0x55c7651f6410, del=false) at /root/git/qemu/chardev/char-fe.c:231
+> #11 0x000055c762e2b15c in monitor_data_destroy (mon=0x55c7651f6410) at /root/git/qemu/monitor.c:600
+> #12 0x000055c762e340ec in monitor_cleanup () at /root/git/qemu/monitor.c:4346
+> #13 0x000055c762f9445d in main (argc=19, argv=0x7ffc6846d0e8, envp=0x7ffc6846d188) at /root/git/qemu/vl.c:4889
+> 
+> So it's destroying the CharBackend, but it'll then call
+> qemu_chr_fe_set_handlers() which finally tries to remove the watch poll.
 
-On 09/20/2017 05:46 AM, Juan Quintela wrote:
-> Indicates how many pages we are going to send in each batch to a multif=
-d
-> thread.
->=20
-> Signed-off-by: Juan Quintela <quintela@redhat.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
->=20
+Ok that code is broken - it must not call monitor_cleanup from the main
+thread - it needs to be called from the monitor thread, unless it can
+guarantee that the monitor thread has already exited, which seems unlikely
 
-> +++ b/qapi/migration.json
-> @@ -471,6 +471,9 @@
->  #                     number of sockets used for migration.  The
->  #                     default value is 2 (since 2.11)
->  #
-> +# @x-multifd-page-count: Number of pages sent together to a thread
-> +#                        The default value is 16 (since 2.11)
-
-You're missing a '.' between sentences; it's more obvious when you no
-longer have a newline between them when things are rendered to other
-documentation formats.
-
-Can be fixed as a followup.
-
-> @@ -539,6 +542,9 @@
->  #                     number of sockets used for migration.  The
->  #                     default value is 2 (since 2.11)
->  #
-> +# @x-multifd-page-count: Number of pages sent together to a thread
-> +#                        The default value is 16 (since 2.11)
-> +#
-
-Multiple instances of it.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---C0Bu3ttJOg0TL2HbRQfmt1VePGtRbGnFW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnCdFUACgkQp6FrSiUn
-Q2qZEAf/dn+/EcHpV38FxBmy1yasbw7aXsOFr5BsPNbTbjp1ZiLF8jdEGDYRu3I5
-W8a0Z+X62MjpkRs0AwlWIlU7gHh3smZK6Tipy7r0x5L/64GLtpwBv5hny5I+sTPe
-yscQLUS6Bc4FU44K9ZACujeR7lEQU4Ll2Y5E1H85fuzBozx41M4FWsLsQSD2oKKe
-O3vKElu9Lv/zTu4E6PyxTfv5HZOdeoeLDzZJmI1SykYsvnkXbN9f/HnQ/n2wDc37
-y4kn/yUvEdeifKtvN6UQM8362vcQ0X5uLrXSoQIqyoND1FG7ROiXuEeZWMWOfUnV
-/rzkZlp4uIQ3pcPAIT7iwRAqfO9erQ==
-=0ome
------END PGP SIGNATURE-----
-
---C0Bu3ttJOg0TL2HbRQfmt1VePGtRbGnFW--
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
