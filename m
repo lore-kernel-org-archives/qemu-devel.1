@@ -1,24 +1,46 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:32797)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46442)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1duW6e-0004e9-SG
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 23:55:25 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1duWV7-0001Zb-Q0
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 00:20:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1duW6b-0000ey-Ql
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 23:55:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:39824)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1duW6b-0000aw-Lf
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 23:55:21 -0400
-Date: Wed, 20 Sep 2017 11:55:12 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170920035512.GF18491@lemon>
-References: <20170919180038.26056-1-dgilbert@redhat.com>
-	<20170919180038.26056-6-dgilbert@redhat.com>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1duWV4-0002Ox-Kq
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 00:20:41 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56926)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1duWV4-0002Hh-C6
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 00:20:38 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8K4JHY3113957
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 00:20:36 -0400
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3cmr6uxk-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 00:20:36 -0400
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Wed, 20 Sep 2017 14:20:33 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20170919082421.GU27153@umbus>
+References: <20170906082748.28520-1-nikunj@linux.vnet.ibm.com>
+	<20170909070212.GT2735@umbus.fritz.box>
+	<87k2153jnx.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170913073519.GK7550@umbus.fritz.box>
+	<8760clsw17.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170915064830.GI5250@umbus.fritz.box>
+	<87377omkuk.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170915085115.GN5250@umbus.fritz.box>
+	<87y3pgl45f.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170919082421.GU27153@umbus>
+Date: Wed, 20 Sep 2017 09:50:24 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170919180038.26056-6-dgilbert@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH 5/5] migration: Route more error paths
+Content-Type: text/plain
+Message-Id: <871sn2hugn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +49,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, peter.maydell@linaro.org, cohuck@redhat.com, rth@twiddle.net
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
-On Tue, 09/19 19:00, Dr. David Alan Gilbert (git) wrote:
-> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> 
-> vmstate_save is called in a few places, and vmstate_save_state is
-> called in lots of places.
-> 
-> Route error returns from the easier cases back up;  there are lots
-> of more complex cases where there own error paths need fixing.
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-Did you mean s/there/their/ ?
+> On Fri, Sep 15, 2017 at 02:39:16PM +0530, Nikunj A Dadhania wrote:
+>> David Gibson <david@gibson.dropbear.id.au> writes:
+>> 
+>> > On Fri, Sep 15, 2017 at 01:53:15PM +0530, Nikunj A Dadhania wrote:
+>> >> David Gibson <david@gibson.dropbear.id.au> writes:
+>> >> 
+>> >> >> 
+>> >> >> I thought, I am doing the same here for PowerNV, number of online cores
+>> >> >> is equal to initial online vcpus / threads per core
+>> >> >> 
+>> >> >>    int boot_cores_nr = smp_cpus / smp_threads;
+>> >> >> 
+>> >> >> Only difference that I see in PowerNV is that we have multiple chips
+>> >> >> (max 2, at the moment)
+>> >> >> 
+>> >> >>         cores_per_chip = smp_cpus / (smp_threads * pnv->num_chips);
+>> >> >
+>> >> > This doesn't make sense to me.  Cores per chip should *always* equal
+>> >> > smp_cores, you shouldn't need another calculation for it.
+>> >> >
+>> >> >> And in case user has provided sane smp_cores, we use it.
+>> >> >
+>> >> > If smp_cores isn't sane, you should simply reject it, not try to fix
+>> >> > it.  That's just asking for confusion.
+>> >> 
+>> >> This is the case where the user does not provide a topology(which is a
+>> >> valid scenario), not sure we should reject it. So qemu defaults
+>> >> smp_cores/smt_threads to 1. I think it makes sense to over-ride.
+>> >
+>> > If you can find a way to override it by altering smp_cores when it's
+>> > not explicitly specified, then ok.
+>> 
+>> Should I change the global smp_cores here as well ?
+>
+> I'm pretty uneasy with that option.
 
-<snip>
+Me too.
 
-> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-> index e643ac662b..ab3e430c2c 100644
-> --- a/tests/test-vmstate.c
-> +++ b/tests/test-vmstate.c
-> @@ -70,7 +70,7 @@ static void save_vmstate(const VMStateDescription *desc, void *obj)
->      QEMUFile *f = open_test_file(true);
->  
->      /* Save file with vmstate */
-> -    vmstate_save_state(f, desc, obj, NULL);
-> +    g_assert(!vmstate_save_state(f, desc, obj, NULL));
+> It would take a fair bit of checking to ensure that changing smp_cores
+> is safe here. An easier to verify option would be to make the generic
+> logic which splits up an unspecified -smp N into cores and sockets
+> more flexible, possibly based on machine options for max values.
+>
+> That might still be more trouble than its worth.
 
-Though this is test code, isn't putting anything with a side effect into an
-assert expression a very bad pattern in general?
+I think the current approach is the simplest and less intrusive, as we
+are handling a case where user has not bothered to provide a detailed
+topology, the best we can do is create single threaded cores equal to
+number of cores.
 
->      qemu_put_byte(f, QEMU_VM_EOF);
->      g_assert(!qemu_file_get_error(f));
->      qemu_fclose(f);
-> @@ -381,7 +381,7 @@ static void test_save_noskip(void)
->      QEMUFile *fsave = open_test_file(true);
->      TestStruct obj = { .a = 1, .b = 2, .c = 3, .d = 4, .e = 5, .f = 6,
->                         .skip_c_e = false };
-> -    vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
-> +    g_assert(!vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL));
->      g_assert(!qemu_file_get_error(fsave));
->  
->      uint8_t expected[] = {
-> @@ -402,7 +402,7 @@ static void test_save_skip(void)
->      QEMUFile *fsave = open_test_file(true);
->      TestStruct obj = { .a = 1, .b = 2, .c = 3, .d = 4, .e = 5, .f = 6,
->                         .skip_c_e = true };
-> -    vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
-> +    g_assert(!vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL));
->      g_assert(!qemu_file_get_error(fsave));
->  
->      uint8_t expected[] = {
-> -- 
-> 2.13.5
-> 
-> 
-
-Fam
+Regards
+Nikunj
