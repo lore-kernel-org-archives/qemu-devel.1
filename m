@@ -1,48 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54510)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54504)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1duYh4-000362-CG
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1duYh4-000360-6P
 	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:41:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1duYh0-000414-U3
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1duYgz-0003zA-58
 	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:41:10 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39214
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38920
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
-	id 1duYh0-00040d-Ow
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:41:06 -0400
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1duYgy-0003y3-Vm
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:41:05 -0400
 Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
 	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8K6dW7A019815
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 02:41:06 -0400
-Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3brrqpuh-1
+	v8K6dYux019938
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 02:41:04 -0400
+Received: from e17.ny.us.ibm.com (e17.ny.us.ibm.com [129.33.205.207])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3brrqpvs-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 02:41:06 -0400
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 02:41:03 -0400
 Received: from localhost
-	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
-	Wed, 20 Sep 2017 16:41:01 +1000
-From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-In-Reply-To: <20170920061756.GJ5520@umbus.fritz.box>
-References: <20170913073519.GK7550@umbus.fritz.box>
-	<8760clsw17.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170915064830.GI5250@umbus.fritz.box>
-	<87377omkuk.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170915085115.GN5250@umbus.fritz.box>
-	<87y3pgl45f.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170919082421.GU27153@umbus>
-	<871sn2hugn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170920045524.GH5520@umbus.fritz.box>
-	<87y3pagdg0.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170920061756.GJ5520@umbus.fritz.box>
-Date: Wed, 20 Sep 2017 12:10:48 +0530
+	by e17.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Wed, 20 Sep 2017 02:41:03 -0400
+Date: Wed, 20 Sep 2017 14:40:58 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
+	<20170913115029.47626-5-pasic@linux.vnet.ibm.com>
+	<20170919055005.GE5274@bjsdjshi@linux.vnet.ibm.com>
+	<20170919114859.3e2d895b.cohuck@redhat.com>
+	<fbb3522e-4086-359a-fca7-05371b76dac7@linux.vnet.ibm.com>
+	<20170919125717.1ae0cd38.cohuck@redhat.com>
+	<9872cee8-3503-8d52-c68f-d9c61143201c@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Message-Id: <87vakdhnyn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
- cpus
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9872cee8-3503-8d52-c68f-d9c61143201c@linux.vnet.ibm.com>
+Message-Id: <20170920064058.GE11080@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 4/4] s390x/css: support ccw IDA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -51,84 +47,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-David Gibson <david@gibson.dropbear.id.au> writes:
+* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-19 14:04:03 +0200]:
 
-> On Wed, Sep 20, 2017 at 10:43:19AM +0530, Nikunj A Dadhania wrote:
->> David Gibson <david@gibson.dropbear.id.au> writes:
->> 
->> > On Wed, Sep 20, 2017 at 09:50:24AM +0530, Nikunj A Dadhania wrote:
->> >> David Gibson <david@gibson.dropbear.id.au> writes:
->> >> 
->> >> > On Fri, Sep 15, 2017 at 02:39:16PM +0530, Nikunj A Dadhania wrote:
->> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
->> >> >> 
->> >> >> > On Fri, Sep 15, 2017 at 01:53:15PM +0530, Nikunj A Dadhania wrote:
->> >> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
->> >> >> >> 
->> >> >> >> >> 
->> >> >> >> >> I thought, I am doing the same here for PowerNV, number of online cores
->> >> >> >> >> is equal to initial online vcpus / threads per core
->> >> >> >> >> 
->> >> >> >> >>    int boot_cores_nr = smp_cpus / smp_threads;
->> >> >> >> >> 
->> >> >> >> >> Only difference that I see in PowerNV is that we have multiple chips
->> >> >> >> >> (max 2, at the moment)
->> >> >> >> >> 
->> >> >> >> >>         cores_per_chip = smp_cpus / (smp_threads * pnv->num_chips);
->> >> >> >> >
->> >> >> >> > This doesn't make sense to me.  Cores per chip should *always* equal
->> >> >> >> > smp_cores, you shouldn't need another calculation for it.
->> >> >> >> >
->> >> >> >> >> And in case user has provided sane smp_cores, we use it.
->> >> >> >> >
->> >> >> >> > If smp_cores isn't sane, you should simply reject it, not try to fix
->> >> >> >> > it.  That's just asking for confusion.
->> >> >> >> 
->> >> >> >> This is the case where the user does not provide a topology(which is a
->> >> >> >> valid scenario), not sure we should reject it. So qemu defaults
->> >> >> >> smp_cores/smt_threads to 1. I think it makes sense to over-ride.
->> >> >> >
->> >> >> > If you can find a way to override it by altering smp_cores when it's
->> >> >> > not explicitly specified, then ok.
->> >> >> 
->> >> >> Should I change the global smp_cores here as well ?
->> >> >
->> >> > I'm pretty uneasy with that option.
->> >> 
->> >> Me too.
->> >> 
->> >> > It would take a fair bit of checking to ensure that changing smp_cores
->> >> > is safe here. An easier to verify option would be to make the generic
->> >> > logic which splits up an unspecified -smp N into cores and sockets
->> >> > more flexible, possibly based on machine options for max values.
->> >> >
->> >> > That might still be more trouble than its worth.
->> >> 
->> >> I think the current approach is the simplest and less intrusive, as we
->> >> are handling a case where user has not bothered to provide a detailed
->> >> topology, the best we can do is create single threaded cores equal to
->> >> number of cores.
->> >
->> > No, sorry.  Having smp_cores not correspond to the number of cores per
->> > chip in all cases is just not ok.  Add an error message if the
->> > topology isn't workable for powernv by all means.  But users having to
->> > use a longer command line is better than breaking basic assumptions
->> > about what numbers reflect what topology.
->> 
->> Sorry to ask again, as I am still not convinced, we do similar
->> adjustment in spapr where the user did not provide the number of cores,
->> but qemu assumes them as single threaded cores and created
->> cores(boot_cores_nr) that were not same as smp_cores ?
->
-> What?  boot_cores_nr has absolutely nothing to do with adjusting the
-> topology, and it certainly doesn't assume they're single threaded.
+I have no problem with the rest parts of the discussion in this thread.
 
-When we start a TCG guest and user provides following commandline, e.g.
-"-smp 4", smt_threads is set to 1 by default in vl.c. So the guest boots
-with 4 cores, each having 1 thread.
+> 
+> 
+> On 09/19/2017 12:57 PM, Cornelia Huck wrote:
+> >>>>> +static inline int ida_read_next_idaw(CcwDataStream *cds)
+> >>>>> +{
+> >>>>> +    union {uint64_t fmt2; uint32_t fmt1; } idaw;    
+> >>>>                                            ^
+> >>>> Nit.
+> >>>>  
+> >> Maybe checkpatch wanted it this way. My memories are blurry.
+> > 
+> > I'd just leave it like that, tbh.
+> > 
+> >>>>> +    bool is_fmt2 = cds->flags & CDS_F_C64;
+> >>>>> +    int ret;
+> >>>>> +    hwaddr idaw_addr;
+> >>>>> +
+> >>>>> +    if (is_fmt2) {
+> >>>>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt2) * cds->at_idaw;
+> >>>>> +        if (idaw_addr & 0x07) {
+> >>>>> +            return -EINVAL; /* channel program check */
+> >>>>> +        }
+> >>>>> +        ret = address_space_rw(&address_space_memory, idaw_addr,
+> >>>>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt2,
+> >>>>> +                               sizeof(idaw.fmt2), false);
+> >>>>> +        cds->cda = be64_to_cpu(idaw.fmt2);
+> 
+> 
+> >>>>> +    } else {
+> >>>>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
+> >>>>> +        if (idaw_addr & 0x03) {    
+> >>>> ?:
+> >>>> (idaw_addr & 0x80000003)  
+> >>> Yes.
+> >>>   
+> >> I will double check this. Does not seem unreasonable but
+> >> double-checking is better.
+> > Please let me know. I think the architecture says that the bit must be
+> > zero, and that we may (...) generate a channel program check.
+> > 
+My fault... This is the address of an IDAW, not the content (data
+address) in an IDAW. So what Halil pointed out is the right direction to
+go I think.
 
-Regards
-Nikunj
+I will review in the thread of the new version (v3).
+
+> 
+> Not exactly. The more significant bits part of the check
+> depend on the ccw format. This needs to be done for both
+> idaw formats. I would need to introduce a new flag, or
+> access the SubchDev to do this properly.
+> 
+> Architecturally we also need to check the data addresses
+> from which we read so we have nothing bigger than 
+> (1 << 31) - 1 if we are working with format-1 idaws.
+Right. This is what I actually wanted to say.
+
+> 
+> I also think we did not take proper care of proper
+> maximum data address checks prior CwwDataStream which also
+> depend on the ccw format (in absence of IDAW or MIDAW).
+> 
+> The ccw format dependent maximum address checks are (1 << 24) - 1
+> and (1 << 31) - 1 respectively for format-0 and format-1 (on
+> the first indirection level that is for non-IDA for the data,
+> and for (M)IDA for the (M)IDAWs).
+> 
+> Reference:
+> PoP pages 16-25 and 16-26 "Invalid IDAW or MIDAW Addre" and
+> "Invalid Data Address".
+> 
+> How shall we proceed?
+> 
+> Halil
+> 
+> >>>>  
+> >>>>> +            return -EINVAL; /* channel program check */
+> >>>>> +
+> >>>>> +        }
+> >>>>> +        ret = address_space_rw(&address_space_memory, idaw_addr,
+> >>>>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt1,
+> >>>>> +                               sizeof(idaw.fmt1), false);
+> >>>>> +        cds->cda = be64_to_cpu(idaw.fmt1);>>>>> +    }
+> >>>>> +    ++(cds->at_idaw);
+> >>>>> +    if (ret != MEMTX_OK) {
+> >>>>> +        /* assume inaccessible address */
+> >>>>> +        return -EINVAL; /* channel program check */
+> >>>>> +
+> >>>>> +    }
+> >>>>> +    return 0;
+> >>>>> +}
+
+-- 
+Dong Jia Shi
