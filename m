@@ -1,27 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51376)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dufXB-0005Yd-TZ
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:59:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1dufXj-00061M-Gm
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:00:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dufXA-000790-RR
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:59:25 -0400
-Received: from mail-wr0-x231.google.com ([2a00:1450:400c:c0c::231]:51917)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dufXA-00078g-KE
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:59:24 -0400
-Received: by mail-wr0-x231.google.com with SMTP id z39so2241233wrb.8
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 06:59:24 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dufXe-0007Iy-Vf
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:59:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41730)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dufXe-0007Ip-NJ
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:59:54 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id B16997EAA4
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 13:59:53 +0000 (UTC)
+References: <20170920104639.2335-1-quintela@redhat.com>
+	<20170920104639.2335-8-quintela@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <52df88ba-6844-3569-2913-fa692a2ca6d6@redhat.com>
+Date: Wed, 20 Sep 2017 08:59:49 -0500
 MIME-Version: 1.0
-In-Reply-To: <84d1e5a0-141f-cd91-f62c-14fe58e73b4b@redhat.com>
-References: <1505811353-29151-1-git-send-email-thuth@redhat.com>
-	<84d1e5a0-141f-cd91-f62c-14fe58e73b4b@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Sep 2017 11:07:25 +0100
-Message-ID: <CAFEAcA_morPirUBzbpX1tHKfSCX+vAEcWX+KmUZKdnNm3O3vhA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC PATCH] qdev: Mark devices as non-hotpluggable
- by default
+In-Reply-To: <20170920104639.2335-8-quintela@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="C0Bu3ttJOg0TL2HbRQfmt1VePGtRbGnFW"
+Subject: Re: [Qemu-devel] [PULL 07/16] migration: Create
+ x-multifd-page-count parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,76 +35,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
 
-On 20 September 2017 at 08:50, Marcel Apfelbaum <marcel@redhat.com> wrote:
-> Hi Thomas,
->
->
-> On 19/09/2017 11:55, Thomas Huth wrote:
->>
->> Historically we've marked all devices as hotpluggable by default. However,
->> most devices are not hotpluggable, and you also need a HotplugHandler to
->> support these devices. So if the user tries to "device_add" or
->> "device_del"
->> such a non-hotpluggable device during runtime, either nothing really
->> usable
->> happens, or QEMU even crashes/aborts unexpectedly (see for example commit
->> 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
->> So let's change this dangerous default behaviour and mark the devices as
->> non-hotpluggable by default. Certain parent devices classes which are
->> known
->> as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable =
->> true",
->> so that devices that are derived from these classes continue to work as
->> expected.
->>
->> Signed-off-by: Thomas Huth <thuth@redhat.com>
->> ---
->>   Note: I've marked the patch as RFC since I'm not 100% sure whether I've
->>   correctly identified all devices that should still be marked as hot-
->>   pluggable. Feedback is welcome!
->>
->>   hw/core/qdev.c        | 10 ++++------
->>   hw/cpu/core.c         |  1 +
->>   hw/mem/nvdimm.c       |  3 +++
->>   hw/mem/pc-dimm.c      |  1 +
->>   hw/pci/pci.c          |  1 +
->>   hw/s390x/ccw-device.c |  1 +
->>   hw/scsi/scsi-bus.c    |  1 +
->>   hw/usb/bus.c          |  1 +
->>   8 files changed, 13 insertions(+), 6 deletions(-)
->>
->> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
->> index 606ab53..c4f1902 100644
->> --- a/hw/core/qdev.c
->> +++ b/hw/core/qdev.c
->> @@ -1120,13 +1120,11 @@ static void device_class_init(ObjectClass *class,
->> void *data)
->>       dc->realize = device_realize;
->>       dc->unrealize = device_unrealize;
->>   -    /* by default all devices were considered as hotpluggable,
->> -     * so with intent to check it in generic qdev_unplug() /
->> -     * device_set_realized() functions make every device
->> -     * hotpluggable. Devices that shouldn't be hotpluggable,
->> -     * should override it in their class_init()
->> +    /*
->> +     * All devices are considered as cold-pluggable by default. The
->> devices
->> +     * that are hotpluggable should override it in their class_init().
->>        */
->> -    dc->hotpluggable = true;
->> +    dc->hotpluggable = false;
->
->
-> I agree with the defensive mode as long as we don't
-> introduce any regression...
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--C0Bu3ttJOg0TL2HbRQfmt1VePGtRbGnFW
+From: Eric Blake <eblake@redhat.com>
+To: Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, dgilbert@redhat.com, peterx@redhat.com
+Message-ID: <52df88ba-6844-3569-2913-fa692a2ca6d6@redhat.com>
+Subject: Re: [Qemu-devel] [PULL 07/16] migration: Create x-multifd-page-count
+ parameter
+References: <20170920104639.2335-1-quintela@redhat.com>
+ <20170920104639.2335-8-quintela@redhat.com>
+In-Reply-To: <20170920104639.2335-8-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Is it possible to hack together some kind of test code that
-can give us a list of the devices compiled in that have
-hotpluggable enabled? Then we could compare before and
-after to see which devices we've changed.
+On 09/20/2017 05:46 AM, Juan Quintela wrote:
+> Indicates how many pages we are going to send in each batch to a multif=
+d
+> thread.
+>=20
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+>=20
 
-thanks
--- PMM
+> +++ b/qapi/migration.json
+> @@ -471,6 +471,9 @@
+>  #                     number of sockets used for migration.  The
+>  #                     default value is 2 (since 2.11)
+>  #
+> +# @x-multifd-page-count: Number of pages sent together to a thread
+> +#                        The default value is 16 (since 2.11)
+
+You're missing a '.' between sentences; it's more obvious when you no
+longer have a newline between them when things are rendered to other
+documentation formats.
+
+Can be fixed as a followup.
+
+> @@ -539,6 +542,9 @@
+>  #                     number of sockets used for migration.  The
+>  #                     default value is 2 (since 2.11)
+>  #
+> +# @x-multifd-page-count: Number of pages sent together to a thread
+> +#                        The default value is 16 (since 2.11)
+> +#
+
+Multiple instances of it.
+
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--C0Bu3ttJOg0TL2HbRQfmt1VePGtRbGnFW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnCdFUACgkQp6FrSiUn
+Q2qZEAf/dn+/EcHpV38FxBmy1yasbw7aXsOFr5BsPNbTbjp1ZiLF8jdEGDYRu3I5
+W8a0Z+X62MjpkRs0AwlWIlU7gHh3smZK6Tipy7r0x5L/64GLtpwBv5hny5I+sTPe
+yscQLUS6Bc4FU44K9ZACujeR7lEQU4Ll2Y5E1H85fuzBozx41M4FWsLsQSD2oKKe
+O3vKElu9Lv/zTu4E6PyxTfv5HZOdeoeLDzZJmI1SykYsvnkXbN9f/HnQ/n2wDc37
+y4kn/yUvEdeifKtvN6UQM8362vcQ0X5uLrXSoQIqyoND1FG7ROiXuEeZWMWOfUnV
+/rzkZlp4uIQ3pcPAIT7iwRAqfO9erQ==
+=0ome
+-----END PGP SIGNATURE-----
+
+--C0Bu3ttJOg0TL2HbRQfmt1VePGtRbGnFW--
