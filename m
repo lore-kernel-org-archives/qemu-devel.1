@@ -1,25 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45243)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45387)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dueru-0003Gd-Dl
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:55 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dues4-0003Q8-CM
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:17:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1duerm-0001FB-7h
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:46 -0400
-Received: from mail-wr0-x22c.google.com ([2a00:1450:400c:c0c::22c]:46681)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1duerl-0001Ev-Pl
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:37 -0400
-Received: by mail-wr0-x22c.google.com with SMTP id o42so2141035wrb.3
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 06:16:37 -0700 (PDT)
+	(envelope-from <cohuck@redhat.com>) id 1duert-0001Jd-Vx
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:56 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47736)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duert-0001II-8z
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:45 -0400
+Date: Wed, 20 Sep 2017 14:59:35 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170920145935.7d177fcf.cohuck@redhat.com>
+In-Reply-To: <f6da1ec7-4845-fe78-b6b8-29a71d481458@de.ibm.com>
+References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
+	<1500028867-134709-34-git-send-email-borntraeger@de.ibm.com>
+	<5eb9a7bd-2761-bea1-738a-da7a6d3fbfcf@de.ibm.com>
+	<f6da1ec7-4845-fe78-b6b8-29a71d481458@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <4d10cdd2-233c-46ac-926b-d4254b017c78@bitwagon.com>
-References: <4d10cdd2-233c-46ac-926b-d4254b017c78@bitwagon.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 20 Sep 2017 11:21:44 +0100
-Message-ID: <CAFEAcA82LzXcT6BoAoAuD3XtmO6+hehwWd=Jno1DXZd5qEuYcw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] qmeu-arm SIGSEGV for self-modifying code
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] block ais migration for machines <= 2.9
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,54 +29,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Reiser <jreiser@bitwagon.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 
-On 20 September 2017 at 00:13, John Reiser <jreiser@bitwagon.com> wrote:
-> [Moving here from  https://bugzilla.redhat.com/show_bug.cgi?id=1493304 ]
->
-> qemu-arm from qemu-user-2.10.0-1.fc27.x86_64 (thus emulating 32-bit ARM on
-> x86_64)
-> generates SIGSEGV when code modifies a never-previously executed instruction
-> that is on a writable page and is 848 bytes ahead of pc.
-> A real armv7l processor allows this and executes as desired.
-> Why the difference?  How can it be changed?  Where is the documentation?
-> The memory region in question is allocated via
+On Wed, 20 Sep 2017 14:53:07 +0200
+Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> mmap2(0xf7000000,228092,PROT_EXEC|PROT_READ|PROT_WRITE,MAP_PRIVATE|MAP_ANONYMOUS|MAP_FIXED,-1,0)
-> = 0xf7000000
-> [and not changed via mprotect()] and written once to contain:
-> =====
-> 0xf703704c:
->         ldr r2,mflg_here  // pc+856
->         orr r2,r2,r3  @ modify the instruction
-> =>      str r2,mflg_here  // pc+848    the faulting instruction
->
->      [[snip about 848 bytes containing instructions only]]
->
-> 0xf70373ac:
->   mflg_here:  // The next instruction is re-written once.
->         orr r3,r3,#0  @ flags |= MAP_{PRIVATE|ANON}  [QNX vs Linux]
+> Something like the following seems to do the tricks.
+> Needs proper patch description, review, full test with different kernel versions.....
 
-Is your guest program correctly performing the necessary cache
-maintenance operations between writing to the instruction and
-executing the modified version? The ARM architecture provides
-very wide latitude to an implementation to prefetch and precache
-instructions, so it's quite easy to write code that happens
-to run by accident in one implementation but not in another.
-QEMU's implementation means that for straightline code with
-no branches it will tend to prefetch more aggressively than a
-hardware implementation, but it's still architecturally valid
-to do so.
+Looks sane.
 
-For 32-bit ARM Linux guest code, this usually means you need to
-call the cacheflush syscall -- the lack of any cacheflush
-lines in your strace output suggests maybe you've forgotten
-to do this.
+Will you handle it?
 
-The gcc __builtin___clear_cache() is usually the simplest
-way to achieve the required cache maintenance (portably,
-for any CPU architecture).
-
-thanks
--- PMM
+> 
+> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
+> index 1c7af39..2ff32ba 100644
+> --- a/hw/s390x/s390-virtio-ccw.c
+> +++ b/hw/s390x/s390-virtio-ccw.c
+> @@ -212,6 +212,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+>      s390mc->cpu_model_allowed = true;
+>      s390mc->css_migration_enabled = true;
+>      s390mc->gs_allowed = true;
+> +    s390mc->ais_allowed = true;
+>      mc->init = ccw_init;
+>      mc->reset = s390_machine_reset;
+>      mc->hot_add_cpu = s390_hot_add_cpu;
+> @@ -305,6 +306,11 @@ bool gs_allowed(void)
+>      return false;
+>  }
+>  
+> +bool ais_allowed(void)
+> +{
+> +    return get_machine_class()->ais_allowed;
+> +}
+> +
+>  static char *machine_get_loadparm(Object *obj, Error **errp)
+>  {
+>      S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
+> @@ -533,6 +539,7 @@ static void ccw_machine_2_9_class_options(MachineClass *mc)
+>      S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
+>  
+>      s390mc->gs_allowed = false;
+> +    s390mc->ais_allowed = false;
+>      ccw_machine_2_10_class_options(mc);
+>      SET_MACHINE_COMPAT(mc, CCW_COMPAT_2_9);
+>      s390mc->css_migration_enabled = false;
+> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+> index 41a9d28..bba8660 100644
+> --- a/include/hw/s390x/s390-virtio-ccw.h
+> +++ b/include/hw/s390x/s390-virtio-ccw.h
+> @@ -41,6 +41,7 @@ typedef struct S390CcwMachineClass {
+>      bool cpu_model_allowed;
+>      bool css_migration_enabled;
+>      bool gs_allowed;
+> +    bool ais_allowed;
+>  } S390CcwMachineClass;
+>  
+>  /* runtime-instrumentation allowed by the machine */
+> @@ -49,6 +50,8 @@ bool ri_allowed(void);
+>  bool cpu_model_allowed(void);
+>  /* guarded-storage allowed by the machine */
+>  bool gs_allowed(void);
+> +/* ais allowed by the machine */
+> +bool ais_allowed(void);
+>  
+>  /**
+>   * Returns true if (vmstate based) migration of the channel subsystem
+> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> index c4c5791..531d474 100644
+> --- a/target/s390x/kvm.c
+> +++ b/target/s390x/kvm.c
+> @@ -309,7 +309,9 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+>      }
+>  
+>      /* Try to enable AIS facility */
+> -    kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
+> +    if (ais_allowed()) {
+> +       kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
+> +    }
+>  
+>      qemu_mutex_init(&qemu_sigp_mutex);
+> 
