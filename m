@@ -1,22 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56160)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58190)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1duirD-0000IK-Tt
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 13:32:20 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1duiuX-00018U-0G
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 13:35:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1duirD-00049c-7S
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 13:32:19 -0400
-Date: Wed, 20 Sep 2017 20:32:10 +0300
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Message-ID: <20170920173210.ftursp2syk2vm3j5@postretch>
-References: <20170920102311.25736-1-el13635@mail.ntua.gr>
-	<20170920102311.25736-2-el13635@mail.ntua.gr>
-	<20170920142632.GC9409@stefanha-x1.localdomain>
+	(envelope-from <richard.henderson@linaro.org>) id 1duiuT-0006O3-Lp
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 13:35:44 -0400
+Received: from mail-io0-x230.google.com ([2607:f8b0:4001:c06::230]:53134)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1duiuT-0006NY-8a
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 13:35:41 -0400
+Received: by mail-io0-x230.google.com with SMTP id i197so5236492ioe.9
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 10:35:41 -0700 (PDT)
+References: <1505240046-11454-1-git-send-email-peter.maydell@linaro.org>
+	<1505240046-11454-17-git-send-email-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <25250048-7930-e084-9ab7-c899e4f9bdb8@linaro.org>
+Date: Wed, 20 Sep 2017 12:35:36 -0500
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="tavq6tdkbs2vzndn"
-Content-Disposition: inline
-In-Reply-To: <20170920142632.GC9409@stefanha-x1.localdomain>
-Subject: Re: [Qemu-devel] [PATCH 1/3] block: add bdrv_co_drain_end callback
+In-Reply-To: <1505240046-11454-17-git-send-email-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 16/19] target/arm: Handle banking in
+ negative-execution-priority check in cpu_mmu_index()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,52 +32,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
+Cc: patches@linaro.org
 
+On 09/12/2017 01:14 PM, Peter Maydell wrote:
+> Now that we have a banked FAULTMASK register and banked exceptions,
+> we can implement the correct check in cpu_mmu_index() for whether
+> the MPU_CTRL.HFNMIENA bit's effect should apply. This bit causes
+> handlers which have requested a negative execution priority to run
+> with the MPU disabled. In v8M the test has to check this for the
+> current security state and so takes account of banking.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/cpu.h      | 21 ++++++++++++++++-----
+>  hw/intc/armv7m_nvic.c | 29 +++++++++++++++++++++++++++++
+>  2 files changed, 45 insertions(+), 5 deletions(-)
 
---tavq6tdkbs2vzndn
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-On Wed, Sep 20, 2017 at 03:26:32PM +0100, Stefan Hajnoczi wrote:
->On Wed, Sep 20, 2017 at 01:23:09PM +0300, Manos Pitsidianakis wrote:
->> @@ -188,7 +194,7 @@ static bool bdrv_drain_recurse(BlockDriverState *bs)
->>      waited =3D BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
->>
->>      /* Ensure any pending metadata writes are submitted to bs->file.  */
->> -    bdrv_drain_invoke(bs);
->> +    bdrv_drain_invoke(bs, begin);
->
->Do you need to move bdrv_drain_invoke(bs, begin) before
->BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0)?
->
->This will ensure that throttling is disabled and the TGM restarted
->before we wait for requests to complete.
->
-
-Hm yes. Before, the order was irrelevant because BlockBackend issued the=20
-drain first by restarting the tgm in blk_root_drained_begin.
-
---tavq6tdkbs2vzndn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEvy2VxhCrsoeMN1aIc2J8L2kN9xAFAlnCphoACgkQc2J8L2kN
-9xDuaQ/8Cg5+57c0yP6SKfeocYyMEABxze5UR4pKpcIu1a1ASBRQdmv14iJPgwoZ
-q453xgz843d8p0dbEZMB5XPzfyOLG13DkwQqasqpzEHIiWZKF1YUSBJWfSNtu4eQ
-8U42GXw/VqCIDlk0uiq7as6PVqBE/NzN65U9cit2niFVR2eBl7XbXul17QCLCifj
-t3Eo0XIaRBJaLtaLpiMKSZMKs6/MoGOtpA0bbdnNb5muYs6kBdUsayddvg/F4ric
-kxGpKXap4uQ8Z9PYCOCRH6FC6ZeTc5UQcXBnqD+CooH1zGCD0PW1k6uZ4IBcrs0I
-H6vJSB69iE7XrCRvWYJHWeSfd9YbsIUPbpA2d5GpWtLk6xqOnbL4da2WD1aiYczR
-FWquMMf8h5grjQiIbXLJq6A/yFck49pw8JpCFRUzkYVRVZ5kOijnQmKekRkcpwKJ
-8lAmgsAgNB5EBVmwvOfvzI2qrFxQAY8NWVmMMpr0Vw3ZWZjI3r3TXyvKQ5N9JrEY
-ZCgBguPKsJDjYYOmGAY2bkK1ot34GYWvNmv81eHmRIoERhMtGot2eahb+lOeLngx
-lvYL4Hrvf+ZSFdJ9YXKK6VlUZsEntAyWQBnjGLB8+/MlS+Ir/GMRhPbjVgJOX8Es
-7h2urW4+6DRdfWIh/w4C3TinCrinweETFFyTkN+lCl67Xjpsyns=
-=L5lX
------END PGP SIGNATURE-----
-
---tavq6tdkbs2vzndn--
+r~
