@@ -1,23 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50524)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54510)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1duYdj-0002HY-MR
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:37:45 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1duYh4-000362-CG
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:41:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <carenas@gmail.com>) id 1duYde-0004k5-MM
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:37:43 -0400
-Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:34553)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <carenas@gmail.com>) id 1duYde-0004fU-HO
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:37:38 -0400
-Received: by mail-pg0-x244.google.com with SMTP id u18so1151253pgo.1
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 23:37:38 -0700 (PDT)
-From: =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>
-Date: Tue, 19 Sep 2017 23:35:58 -0700
-Message-Id: <20170920063558.89376-1-carenas@gmail.com>
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1duYh0-000414-U3
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:41:10 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:39214
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1duYh0-00040d-Ow
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:41:06 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8K6dW7A019815
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 02:41:06 -0400
+Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3brrqpuh-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 02:41:06 -0400
+Received: from localhost
+	by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Wed, 20 Sep 2017 16:41:01 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20170920061756.GJ5520@umbus.fritz.box>
+References: <20170913073519.GK7550@umbus.fritz.box>
+	<8760clsw17.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170915064830.GI5250@umbus.fritz.box>
+	<87377omkuk.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170915085115.GN5250@umbus.fritz.box>
+	<87y3pgl45f.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170919082421.GU27153@umbus>
+	<871sn2hugn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920045524.GH5520@umbus.fritz.box>
+	<87y3pagdg0.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920061756.GJ5520@umbus.fritz.box>
+Date: Wed, 20 Sep 2017 12:10:48 +0530
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH] linux_user: fix TARGET_SOL_SOCKET for sparc
+Content-Type: text/plain
+Message-Id: <87vakdhnyn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +51,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
-Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
----
- linux-user/socket.h | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-diff --git a/linux-user/socket.h b/linux-user/socket.h
-index 129f9b4713..1db1a184b9 100644
---- a/linux-user/socket.h
-+++ b/linux-user/socket.h
-@@ -229,7 +229,9 @@
-      * @SOCK_NONBLOCK - sets the O_NONBLOCK file status flag.
-      */
- 
--    #define ARCH_HAS_SOCKET_TYPES          1
-+    #define ARCH_HAS_SOCKET_TYPES    1
-+
-+    #define TARGET_SOL_SOCKET        0xffff
- 
-     enum sock_type {
-            TARGET_SOCK_STREAM      = 1,
-@@ -250,14 +252,13 @@
- 
-     #define TARGET_SO_PASSSEC        31
- #else
-+    #define TARGET_SOL_SOCKET        1
-+
-     #define TARGET_SO_LINGER         13
- 
-     #define TARGET_SO_PASSSEC        34
- #endif
- 
--    /* For setsockopt(2) */
--    #define TARGET_SOL_SOCKET      1
--
-     #define TARGET_SO_DEBUG        1
-     #define TARGET_SO_REUSEADDR    2
-     #define TARGET_SO_TYPE         3
--- 
-2.14.1
+> On Wed, Sep 20, 2017 at 10:43:19AM +0530, Nikunj A Dadhania wrote:
+>> David Gibson <david@gibson.dropbear.id.au> writes:
+>> 
+>> > On Wed, Sep 20, 2017 at 09:50:24AM +0530, Nikunj A Dadhania wrote:
+>> >> David Gibson <david@gibson.dropbear.id.au> writes:
+>> >> 
+>> >> > On Fri, Sep 15, 2017 at 02:39:16PM +0530, Nikunj A Dadhania wrote:
+>> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
+>> >> >> 
+>> >> >> > On Fri, Sep 15, 2017 at 01:53:15PM +0530, Nikunj A Dadhania wrote:
+>> >> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
+>> >> >> >> 
+>> >> >> >> >> 
+>> >> >> >> >> I thought, I am doing the same here for PowerNV, number of online cores
+>> >> >> >> >> is equal to initial online vcpus / threads per core
+>> >> >> >> >> 
+>> >> >> >> >>    int boot_cores_nr = smp_cpus / smp_threads;
+>> >> >> >> >> 
+>> >> >> >> >> Only difference that I see in PowerNV is that we have multiple chips
+>> >> >> >> >> (max 2, at the moment)
+>> >> >> >> >> 
+>> >> >> >> >>         cores_per_chip = smp_cpus / (smp_threads * pnv->num_chips);
+>> >> >> >> >
+>> >> >> >> > This doesn't make sense to me.  Cores per chip should *always* equal
+>> >> >> >> > smp_cores, you shouldn't need another calculation for it.
+>> >> >> >> >
+>> >> >> >> >> And in case user has provided sane smp_cores, we use it.
+>> >> >> >> >
+>> >> >> >> > If smp_cores isn't sane, you should simply reject it, not try to fix
+>> >> >> >> > it.  That's just asking for confusion.
+>> >> >> >> 
+>> >> >> >> This is the case where the user does not provide a topology(which is a
+>> >> >> >> valid scenario), not sure we should reject it. So qemu defaults
+>> >> >> >> smp_cores/smt_threads to 1. I think it makes sense to over-ride.
+>> >> >> >
+>> >> >> > If you can find a way to override it by altering smp_cores when it's
+>> >> >> > not explicitly specified, then ok.
+>> >> >> 
+>> >> >> Should I change the global smp_cores here as well ?
+>> >> >
+>> >> > I'm pretty uneasy with that option.
+>> >> 
+>> >> Me too.
+>> >> 
+>> >> > It would take a fair bit of checking to ensure that changing smp_cores
+>> >> > is safe here. An easier to verify option would be to make the generic
+>> >> > logic which splits up an unspecified -smp N into cores and sockets
+>> >> > more flexible, possibly based on machine options for max values.
+>> >> >
+>> >> > That might still be more trouble than its worth.
+>> >> 
+>> >> I think the current approach is the simplest and less intrusive, as we
+>> >> are handling a case where user has not bothered to provide a detailed
+>> >> topology, the best we can do is create single threaded cores equal to
+>> >> number of cores.
+>> >
+>> > No, sorry.  Having smp_cores not correspond to the number of cores per
+>> > chip in all cases is just not ok.  Add an error message if the
+>> > topology isn't workable for powernv by all means.  But users having to
+>> > use a longer command line is better than breaking basic assumptions
+>> > about what numbers reflect what topology.
+>> 
+>> Sorry to ask again, as I am still not convinced, we do similar
+>> adjustment in spapr where the user did not provide the number of cores,
+>> but qemu assumes them as single threaded cores and created
+>> cores(boot_cores_nr) that were not same as smp_cores ?
+>
+> What?  boot_cores_nr has absolutely nothing to do with adjusting the
+> topology, and it certainly doesn't assume they're single threaded.
+
+When we start a TCG guest and user provides following commandline, e.g.
+"-smp 4", smt_threads is set to 1 by default in vl.c. So the guest boots
+with 4 cores, each having 1 thread.
+
+Regards
+Nikunj
