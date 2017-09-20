@@ -1,23 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51224)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51267)
 	by lists.gnu.org with esmtp (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dulRT-0007lq-1e
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:17:56 -0400
+	id 1dulRX-0007nq-6l
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:18:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
 	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dulRR-0002XJ-6M
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:17:55 -0400
+	id 1dulRV-0002aq-BL
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:17:59 -0400
 Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
 	<philippe.mathieu.daude@gmail.com>
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 20 Sep 2017 17:17:33 -0300
-Message-Id: <20170920201737.25723-2-f4bug@amsat.org>
+Date: Wed, 20 Sep 2017 17:17:34 -0300
+Message-Id: <20170920201737.25723-3-f4bug@amsat.org>
 In-Reply-To: <20170920201737.25723-1-f4bug@amsat.org>
 References: <20170920201737.25723-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v11 1/5] msf2: Add Smartfusion2 System timer
+Subject: [Qemu-devel] [PATCH v11 2/5] msf2: Microsemi Smartfusion2 System
+ Register block
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +31,30 @@ To: Peter Maydell <peter.maydell@linaro.org>, Subbaraya Sundeep <sundeep.lkml@gm
 
 From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-Modelled System Timer in Microsemi's Smartfusion2 Soc.
-Timer has two 32bit down counters and two interrupts.
+Added Sytem register block of Smartfusion2.
+This block has PLL registers which are accessed by guest.
 
 Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Acked-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/timer/mss-timer.h |  64 ++++++++++
- hw/timer/mss-timer.c         | 289 +++++++++++++++++++++++++++++++++++++++++++
- hw/timer/Makefile.objs       |   1 +
- 3 files changed, 354 insertions(+)
- create mode 100644 include/hw/timer/mss-timer.h
- create mode 100644 hw/timer/mss-timer.c
+ include/hw/misc/msf2-sysreg.h |  77 ++++++++++++++++++++
+ hw/misc/msf2-sysreg.c         | 160 ++++++++++++++++++++++++++++++++++++++++++
+ hw/misc/Makefile.objs         |   1 +
+ hw/misc/trace-events          |   5 ++
+ 4 files changed, 243 insertions(+)
+ create mode 100644 include/hw/misc/msf2-sysreg.h
+ create mode 100644 hw/misc/msf2-sysreg.c
 
-diff --git a/include/hw/timer/mss-timer.h b/include/hw/timer/mss-timer.h
+diff --git a/include/hw/misc/msf2-sysreg.h b/include/hw/misc/msf2-sysreg.h
 new file mode 100644
-index 0000000000..d15d1732f8
+index 0000000000..5993f67b4e
 --- /dev/null
-+++ b/include/hw/timer/mss-timer.h
-@@ -0,0 +1,64 @@
++++ b/include/hw/misc/msf2-sysreg.h
+@@ -0,0 +1,77 @@
 +/*
-+ * Microsemi SmartFusion2 Timer.
++ * Microsemi SmartFusion2 SYSREG
 + *
 + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
 + *
@@ -75,349 +77,246 @@ index 0000000000..d15d1732f8
 + * THE SOFTWARE.
 + */
 +
-+#ifndef HW_MSS_TIMER_H
-+#define HW_MSS_TIMER_H
++#ifndef HW_MSF2_SYSREG_H
++#define HW_MSF2_SYSREG_H
 +
 +#include "hw/sysbus.h"
-+#include "hw/ptimer.h"
 +
-+#define TYPE_MSS_TIMER     "mss-timer"
-+#define MSS_TIMER(obj)     OBJECT_CHECK(MSSTimerState, \
-+                              (obj), TYPE_MSS_TIMER)
++enum {
++    ESRAM_CR        = 0x00 / 4,
++    ESRAM_MAX_LAT,
++    DDR_CR,
++    ENVM_CR,
++    ENVM_REMAP_BASE_CR,
++    ENVM_REMAP_FAB_CR,
++    CC_CR,
++    CC_REGION_CR,
++    CC_LOCK_BASE_ADDR_CR,
++    CC_FLUSH_INDX_CR,
++    DDRB_BUF_TIMER_CR,
++    DDRB_NB_ADDR_CR,
++    DDRB_NB_SIZE_CR,
++    DDRB_CR,
 +
-+/*
-+ * There are two 32-bit down counting timers.
-+ * Timers 1 and 2 can be concatenated into a single 64-bit Timer
-+ * that operates either in Periodic mode or in One-shot mode.
-+ * Writing 1 to the TIM64_MODE register bit 0 sets the Timers in 64-bit mode.
-+ * In 64-bit mode, writing to the 32-bit registers has no effect.
-+ * Similarly, in 32-bit mode, writing to the 64-bit mode registers
-+ * has no effect. Only two 32-bit timers are supported currently.
-+ */
-+#define NUM_TIMERS        2
++    SOFT_RESET_CR  = 0x48 / 4,
++    M3_CR,
 +
-+#define R_TIM1_MAX        6
++    GPIO_SYSRESET_SEL_CR = 0x58 / 4,
 +
-+struct Msf2Timer {
-+    QEMUBH *bh;
-+    ptimer_state *ptimer;
++    MDDR_CR = 0x60 / 4,
 +
-+    uint32_t regs[R_TIM1_MAX];
-+    qemu_irq irq;
++    MSSDDR_PLL_STATUS_LOW_CR = 0x90 / 4,
++    MSSDDR_PLL_STATUS_HIGH_CR,
++    MSSDDR_FACC1_CR,
++    MSSDDR_FACC2_CR,
++
++    MSSDDR_PLL_STATUS = 0x150 / 4,
 +};
 +
-+typedef struct MSSTimerState {
++#define MSF2_SYSREG_MMIO_SIZE     0x300
++
++#define TYPE_MSF2_SYSREG          "msf2-sysreg"
++#define MSF2_SYSREG(obj)  OBJECT_CHECK(MSF2SysregState, (obj), TYPE_MSF2_SYSREG)
++
++typedef struct MSF2SysregState {
 +    SysBusDevice parent_obj;
 +
-+    MemoryRegion mmio;
-+    uint32_t freq_hz;
-+    struct Msf2Timer timers[NUM_TIMERS];
-+} MSSTimerState;
++    MemoryRegion iomem;
 +
-+#endif /* HW_MSS_TIMER_H */
-diff --git a/hw/timer/mss-timer.c b/hw/timer/mss-timer.c
++    uint8_t apb0div;
++    uint8_t apb1div;
++
++    uint32_t regs[MSF2_SYSREG_MMIO_SIZE / 4];
++} MSF2SysregState;
++
++#endif /* HW_MSF2_SYSREG_H */
+diff --git a/hw/misc/msf2-sysreg.c b/hw/misc/msf2-sysreg.c
 new file mode 100644
-index 0000000000..60f1213a3b
+index 0000000000..6eb501104b
 --- /dev/null
-+++ b/hw/timer/mss-timer.c
-@@ -0,0 +1,289 @@
++++ b/hw/misc/msf2-sysreg.c
+@@ -0,0 +1,160 @@
 +/*
-+ * Block model of System timer present in
-+ * Microsemi's SmartFusion2 and SmartFusion SoCs.
++ * System Register block model of Microsemi SmartFusion2.
 + *
-+ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>.
++ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
 + *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * as published by the Free Software Foundation; either version
++ * 2 of the License, or (at your option) any later version.
 + *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
++ * You should have received a copy of the GNU General Public License along
++ * with this program; if not, see <http://www.gnu.org/licenses/>.
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/main-loop.h"
++#include "qapi/error.h"
 +#include "qemu/log.h"
-+#include "hw/timer/mss-timer.h"
++#include "hw/misc/msf2-sysreg.h"
++#include "qemu/error-report.h"
++#include "trace.h"
 +
-+#ifndef MSS_TIMER_ERR_DEBUG
-+#define MSS_TIMER_ERR_DEBUG  0
-+#endif
-+
-+#define DB_PRINT_L(lvl, fmt, args...) do { \
-+    if (MSS_TIMER_ERR_DEBUG >= lvl) { \
-+        qemu_log("%s: " fmt "\n", __func__, ## args); \
-+    } \
-+} while (0);
-+
-+#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
-+
-+#define R_TIM_VAL         0
-+#define R_TIM_LOADVAL     1
-+#define R_TIM_BGLOADVAL   2
-+#define R_TIM_CTRL        3
-+#define R_TIM_RIS         4
-+#define R_TIM_MIS         5
-+
-+#define TIMER_CTRL_ENBL     (1 << 0)
-+#define TIMER_CTRL_ONESHOT  (1 << 1)
-+#define TIMER_CTRL_INTR     (1 << 2)
-+#define TIMER_RIS_ACK       (1 << 0)
-+#define TIMER_RST_CLR       (1 << 6)
-+#define TIMER_MODE          (1 << 0)
-+
-+static void timer_update_irq(struct Msf2Timer *st)
++static inline int msf2_divbits(uint32_t div)
 +{
-+    bool isr, ier;
++    int r = ctz32(div);
 +
-+    isr = !!(st->regs[R_TIM_RIS] & TIMER_RIS_ACK);
-+    ier = !!(st->regs[R_TIM_CTRL] & TIMER_CTRL_INTR);
-+    qemu_set_irq(st->irq, (ier && isr));
++    return (div < 8) ? r : r + 1;
 +}
 +
-+static void timer_update(struct Msf2Timer *st)
++static void msf2_sysreg_reset(DeviceState *d)
 +{
-+    uint64_t count;
++    MSF2SysregState *s = MSF2_SYSREG(d);
 +
-+    if (!(st->regs[R_TIM_CTRL] & TIMER_CTRL_ENBL)) {
-+        ptimer_stop(st->ptimer);
-+        return;
-+    }
-+
-+    count = st->regs[R_TIM_LOADVAL];
-+    ptimer_set_limit(st->ptimer, count, 1);
-+    ptimer_run(st->ptimer, 1);
++    s->regs[MSSDDR_PLL_STATUS_LOW_CR] = 0x021A2358;
++    s->regs[MSSDDR_PLL_STATUS] = 0x3;
++    s->regs[MSSDDR_FACC1_CR] = msf2_divbits(s->apb0div) << 5 |
++                               msf2_divbits(s->apb1div) << 2;
 +}
 +
-+static uint64_t
-+timer_read(void *opaque, hwaddr offset, unsigned int size)
++static uint64_t msf2_sysreg_read(void *opaque, hwaddr offset,
++    unsigned size)
 +{
-+    MSSTimerState *t = opaque;
-+    hwaddr addr;
-+    struct Msf2Timer *st;
++    MSF2SysregState *s = opaque;
 +    uint32_t ret = 0;
-+    int timer = 0;
-+    int isr;
-+    int ier;
 +
-+    addr = offset >> 2;
-+    /*
-+     * Two independent timers has same base address.
-+     * Based on address passed figure out which timer is being used.
-+     */
-+    if ((addr >= R_TIM1_MAX) && (addr < NUM_TIMERS * R_TIM1_MAX)) {
-+        timer = 1;
-+        addr -= R_TIM1_MAX;
++    offset >>= 2;
++    if (offset < ARRAY_SIZE(s->regs)) {
++        ret = s->regs[offset];
++        trace_msf2_sysreg_read(offset << 2, ret);
++    } else {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                    "%s: Bad offset 0x%08" HWADDR_PRIx "\n", __func__,
++                    offset << 2);
 +    }
 +
-+    st = &t->timers[timer];
-+
-+    switch (addr) {
-+    case R_TIM_VAL:
-+        ret = ptimer_get_count(st->ptimer);
-+        break;
-+
-+    case R_TIM_MIS:
-+        isr = !!(st->regs[R_TIM_RIS] & TIMER_RIS_ACK);
-+        ier = !!(st->regs[R_TIM_CTRL] & TIMER_CTRL_INTR);
-+        ret = ier & isr;
-+        break;
-+
-+    default:
-+        if (addr < R_TIM1_MAX) {
-+            ret = st->regs[addr];
-+        } else {
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                        TYPE_MSS_TIMER": 64-bit mode not supported\n");
-+            return ret;
-+        }
-+        break;
-+    }
-+
-+    DB_PRINT("timer=%d 0x%" HWADDR_PRIx "=0x%" PRIx32, timer, offset,
-+            ret);
 +    return ret;
 +}
 +
-+static void
-+timer_write(void *opaque, hwaddr offset,
-+            uint64_t val64, unsigned int size)
++static void msf2_sysreg_write(void *opaque, hwaddr offset,
++                          uint64_t val, unsigned size)
 +{
-+    MSSTimerState *t = opaque;
-+    hwaddr addr;
-+    struct Msf2Timer *st;
-+    int timer = 0;
-+    uint32_t value = val64;
++    MSF2SysregState *s = opaque;
++    uint32_t newval = val;
 +
-+    addr = offset >> 2;
-+    /*
-+     * Two independent timers has same base address.
-+     * Based on addr passed figure out which timer is being used.
-+     */
-+    if ((addr >= R_TIM1_MAX) && (addr < NUM_TIMERS * R_TIM1_MAX)) {
-+        timer = 1;
-+        addr -= R_TIM1_MAX;
-+    }
++    offset >>= 2;
 +
-+    st = &t->timers[timer];
-+
-+    DB_PRINT("addr=0x%" HWADDR_PRIx " val=0x%" PRIx32 " (timer=%d)", offset,
-+            value, timer);
-+
-+    switch (addr) {
-+    case R_TIM_CTRL:
-+        st->regs[R_TIM_CTRL] = value;
-+        timer_update(st);
++    switch (offset) {
++    case MSSDDR_PLL_STATUS:
++        trace_msf2_sysreg_write_pll_status();
 +        break;
 +
-+    case R_TIM_RIS:
-+        if (value & TIMER_RIS_ACK) {
-+            st->regs[R_TIM_RIS] &= ~TIMER_RIS_ACK;
++    case ESRAM_CR:
++    case DDR_CR:
++    case ENVM_REMAP_BASE_CR:
++        if (newval != s->regs[offset]) {
++            qemu_log_mask(LOG_UNIMP,
++                       TYPE_MSF2_SYSREG": remapping not supported\n");
 +        }
-+        break;
-+
-+    case R_TIM_LOADVAL:
-+        st->regs[R_TIM_LOADVAL] = value;
-+        if (st->regs[R_TIM_CTRL] & TIMER_CTRL_ENBL) {
-+            timer_update(st);
-+        }
-+        break;
-+
-+    case R_TIM_BGLOADVAL:
-+        st->regs[R_TIM_BGLOADVAL] = value;
-+        st->regs[R_TIM_LOADVAL] = value;
-+        break;
-+
-+    case R_TIM_VAL:
-+    case R_TIM_MIS:
 +        break;
 +
 +    default:
-+        if (addr < R_TIM1_MAX) {
-+            st->regs[addr] = value;
++        if (offset < ARRAY_SIZE(s->regs)) {
++            trace_msf2_sysreg_write(offset << 2, newval, s->regs[offset]);
++            s->regs[offset] = newval;
 +        } else {
 +            qemu_log_mask(LOG_GUEST_ERROR,
-+                        TYPE_MSS_TIMER": 64-bit mode not supported\n");
-+            return;
++                        "%s: Bad offset 0x%08" HWADDR_PRIx "\n", __func__,
++                        offset << 2);
 +        }
 +        break;
 +    }
-+    timer_update_irq(st);
 +}
 +
-+static const MemoryRegionOps timer_ops = {
-+    .read = timer_read,
-+    .write = timer_write,
++static const MemoryRegionOps sysreg_ops = {
++    .read = msf2_sysreg_read,
++    .write = msf2_sysreg_write,
 +    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 4
-+    }
 +};
 +
-+static void timer_hit(void *opaque)
++static void msf2_sysreg_init(Object *obj)
 +{
-+    struct Msf2Timer *st = opaque;
++    MSF2SysregState *s = MSF2_SYSREG(obj);
 +
-+    st->regs[R_TIM_RIS] |= TIMER_RIS_ACK;
-+
-+    if (!(st->regs[R_TIM_CTRL] & TIMER_CTRL_ONESHOT)) {
-+        timer_update(st);
-+    }
-+    timer_update_irq(st);
++    memory_region_init_io(&s->iomem, obj, &sysreg_ops, s, TYPE_MSF2_SYSREG,
++                          MSF2_SYSREG_MMIO_SIZE);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->iomem);
 +}
 +
-+static void mss_timer_init(Object *obj)
-+{
-+    MSSTimerState *t = MSS_TIMER(obj);
-+    int i;
-+
-+    /* Init all the ptimers.  */
-+    for (i = 0; i < NUM_TIMERS; i++) {
-+        struct Msf2Timer *st = &t->timers[i];
-+
-+        st->bh = qemu_bh_new(timer_hit, st);
-+        st->ptimer = ptimer_init(st->bh, PTIMER_POLICY_DEFAULT);
-+        ptimer_set_freq(st->ptimer, t->freq_hz);
-+        sysbus_init_irq(SYS_BUS_DEVICE(obj), &st->irq);
-+    }
-+
-+    memory_region_init_io(&t->mmio, OBJECT(t), &timer_ops, t, TYPE_MSS_TIMER,
-+                          NUM_TIMERS * R_TIM1_MAX * 4);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &t->mmio);
-+}
-+
-+static const VMStateDescription vmstate_timers = {
-+    .name = "mss-timer-block",
++static const VMStateDescription vmstate_msf2_sysreg = {
++    .name = TYPE_MSF2_SYSREG,
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_PTIMER(ptimer, struct Msf2Timer),
-+        VMSTATE_UINT32_ARRAY(regs, struct Msf2Timer, R_TIM1_MAX),
++        VMSTATE_UINT32_ARRAY(regs, MSF2SysregState, MSF2_SYSREG_MMIO_SIZE / 4),
 +        VMSTATE_END_OF_LIST()
 +    }
 +};
 +
-+static const VMStateDescription vmstate_mss_timer = {
-+    .name = TYPE_MSS_TIMER,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32(freq_hz, MSSTimerState),
-+        VMSTATE_STRUCT_ARRAY(timers, MSSTimerState, NUM_TIMERS, 0,
-+                vmstate_timers, struct Msf2Timer),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property mss_timer_properties[] = {
-+    /* Libero GUI shows 100Mhz as default for clocks */
-+    DEFINE_PROP_UINT32("clock-frequency", MSSTimerState, freq_hz,
-+                      100 * 1000000),
++static Property msf2_sysreg_properties[] = {
++    /* default divisors in Libero GUI */
++    DEFINE_PROP_UINT8("apb0divisor", MSF2SysregState, apb0div, 2),
++    DEFINE_PROP_UINT8("apb1divisor", MSF2SysregState, apb1div, 2),
 +    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void mss_timer_class_init(ObjectClass *klass, void *data)
++static void msf2_sysreg_realize(DeviceState *dev, Error **errp)
++{
++    MSF2SysregState *s = MSF2_SYSREG(dev);
++
++    if ((s->apb0div > 32 || !is_power_of_2(s->apb0div))
++        || (s->apb1div > 32 || !is_power_of_2(s->apb1div))) {
++        error_setg(errp, "Invalid apb divisor value");
++        error_append_hint(errp, "apb divisor must be a power of 2"
++                           " and maximum value is 32\n");
++    }
++}
++
++static void msf2_sysreg_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->props = mss_timer_properties;
-+    dc->vmsd = &vmstate_mss_timer;
++    dc->vmsd = &vmstate_msf2_sysreg;
++    dc->reset = msf2_sysreg_reset;
++    dc->props = msf2_sysreg_properties;
++    dc->realize = msf2_sysreg_realize;
 +}
 +
-+static const TypeInfo mss_timer_info = {
-+    .name          = TYPE_MSS_TIMER,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(MSSTimerState),
-+    .instance_init = mss_timer_init,
-+    .class_init    = mss_timer_class_init,
++static const TypeInfo msf2_sysreg_info = {
++    .name  = TYPE_MSF2_SYSREG,
++    .parent = TYPE_SYS_BUS_DEVICE,
++    .class_init = msf2_sysreg_class_init,
++    .instance_size  = sizeof(MSF2SysregState),
++    .instance_init = msf2_sysreg_init,
 +};
 +
-+static void mss_timer_register_types(void)
++static void msf2_sysreg_register_types(void)
 +{
-+    type_register_static(&mss_timer_info);
++    type_register_static(&msf2_sysreg_info);
 +}
 +
-+type_init(mss_timer_register_types)
-diff --git a/hw/timer/Makefile.objs b/hw/timer/Makefile.objs
-index 15cce1c531..8c19eac3b6 100644
---- a/hw/timer/Makefile.objs
-+++ b/hw/timer/Makefile.objs
-@@ -42,3 +42,4 @@ common-obj-$(CONFIG_ASPEED_SOC) += aspeed_timer.o
- 
- common-obj-$(CONFIG_SUN4V_RTC) += sun4v-rtc.o
- common-obj-$(CONFIG_CMSDK_APB_TIMER) += cmsdk-apb-timer.o
-+common-obj-$(CONFIG_MSF2) += mss-timer.o
++type_init(msf2_sysreg_register_types)
+diff --git a/hw/misc/Makefile.objs b/hw/misc/Makefile.objs
+index 29fb922cef..e8f0a02f35 100644
+--- a/hw/misc/Makefile.objs
++++ b/hw/misc/Makefile.objs
+@@ -59,3 +59,4 @@ obj-$(CONFIG_HYPERV_TESTDEV) += hyperv_testdev.o
+ obj-$(CONFIG_AUX) += auxbus.o
+ obj-$(CONFIG_ASPEED_SOC) += aspeed_scu.o aspeed_sdmc.o
+ obj-y += mmio_interface.o
++obj-$(CONFIG_MSF2) += msf2-sysreg.o
+diff --git a/hw/misc/trace-events b/hw/misc/trace-events
+index 3313585b12..616579a403 100644
+--- a/hw/misc/trace-events
++++ b/hw/misc/trace-events
+@@ -61,3 +61,8 @@ mps2_scc_reset(void) "MPS2 SCC: reset"
+ mps2_scc_leds(char led7, char led6, char led5, char led4, char led3, char led2, char led1, char led0) "MPS2 SCC LEDs: %c%c%c%c%c%c%c%c"
+ mps2_scc_cfg_write(unsigned function, unsigned device, uint32_t value) "MPS2 SCC config write: function %d device %d data 0x%" PRIx32
+ mps2_scc_cfg_read(unsigned function, unsigned device, uint32_t value) "MPS2 SCC config read: function %d device %d data 0x%" PRIx32
++
++# hw/misc/msf2-sysreg.c
++msf2_sysreg_write(uint64_t offset, uint32_t val, uint32_t prev) "msf2-sysreg write: addr 0x%08" HWADDR_PRIx " data 0x%" PRIx32 " prev 0x%" PRIx32
++msf2_sysreg_read(uint64_t offset, uint32_t val) "msf2-sysreg read: addr 0x%08" HWADDR_PRIx " data 0x%08" PRIx32
++msf2_sysreg_write_pll_status(void) "Invalid write to read only PLL status register"
 -- 
 2.14.1
