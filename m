@@ -1,18 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41920)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:59493)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1duTAw-0005d9-UE
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:47:40 -0400
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1duTdO-0001XN-7c
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 21:17:03 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <flukshun@gmail.com>) id 1duTAs-0006n9-1u
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:47:38 -0400
-Sender: fluxion <flukshun@gmail.com>
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 19 Sep 2017 19:45:17 -0500
-Message-Id: <20170920004521.9417-9-mdroth@linux.vnet.ibm.com>
-In-Reply-To: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
-References: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 08/12] vhost: Release memory references on
- cleanup
+	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1duTdK-0004S1-Ug
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 21:17:02 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45548)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
+	id 1duTdK-0004Pz-Kq
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 21:16:58 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8K1EjqX062385
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 21:16:57 -0400
+Received: from e37.co.us.ibm.com (e37.co.us.ibm.com [32.97.110.158])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3cnnnjyv-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 21:16:56 -0400
+Received: from localhost
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
+	Tue, 19 Sep 2017 19:16:55 -0600
+Date: Wed, 20 Sep 2017 09:16:52 +0800
+From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+References: <20170913115029.47626-1-pasic@linux.vnet.ibm.com>
+	<20170913115029.47626-4-pasic@linux.vnet.ibm.com>
+	<20170919033730.GD5274@bjsdjshi@linux.vnet.ibm.com>
+	<20170919110631.59039743.cohuck@redhat.com>
+	<6a51f84b-9185-ec5c-b0ec-1fc21fbfb201@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6a51f84b-9185-ec5c-b0ec-1fc21fbfb201@linux.vnet.ibm.com>
+Message-Id: <20170920011652.GC11080@bjsdjshi@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH v2 3/4] virtio-ccw: use ccw data stream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,53 +44,206 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Alex Williamson <alex.williamson@redhat.com>, "Michael S . Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-From: Alex Williamson <alex.williamson@redhat.com>
+* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-19 15:30:29 +0200]:
 
-vhost registers a MemoryListener where it adds and removes references
-to MemoryRegions as the MemoryRegionSections pass through.  The
-region_add callback is invoked for each existing section when the
-MemoryListener is registered, but unregistering the MemoryListener
-performs no reciprocal region_del callback.  It's therefore the
-owner of the MemoryListener's responsibility to cleanup any persistent
-changes, such as these memory references, after unregistering.
+> 
+> 
+> On 09/19/2017 11:06 AM, Cornelia Huck wrote:
+> > On Tue, 19 Sep 2017 11:37:30 +0800
+> > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+> > 
+> >> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-13 13:50:28 +0200]:
+> >>
+> >>> Replace direct access which implicitly assumes no IDA
+> >>> or MIDA with the new ccw data stream interface which should
+> >>> cope with these transparently in the future.
+> >>>
+> >>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> >>>
+> >>> ---
+> >>>
+> >>> v1 --> v2:
+> >>> Removed todo comments on possible errno change as with
+> >>> https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg02441.html
+> >>> applied it does not matter any more.
+> >>>
+> >>> Error handling: At the moment we ignore errors reported
+> >>> by stream ops to keep the change minimal. An add-on
+> >>> patch improving on this is to be expected later.  
+> >> Add a TODO somewhere around the code as a reminder?
+> > 
+> > I expect Halil to have it on his TODO list and send a patch later ;)
+No problem with me.
 
-The consequence of this bug is that if we have both a vhost device
-and a vfio device, the vhost device will reference any mmap'd MMIO of
-the vfio device via this MemoryListener.  If the vhost device is then
-removed, those references remain outstanding.  If we then attempt to
-remove the vfio device, it never gets finalized and the only way to
-release the kernel file descriptors is to terminate the QEMU process.
+> > 
+> >>
+> >>> ---
+> >>>  hw/s390x/virtio-ccw.c | 156 +++++++++++++++-----------------------------------
+> >>>  1 file changed, 46 insertions(+), 110 deletions(-)
+> >>>
+> >>> diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
+> >>> index b1976fdd19..a9baf6f7ab 100644
+> >>> --- a/hw/s390x/virtio-ccw.c
+> >>> +++ b/hw/s390x/virtio-ccw.c  
+> >> [...]
+> >>
+> >>> @@ -394,11 +362,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+> >>>          } else {
+> >>>              VirtioDeviceClass *vdc = VIRTIO_DEVICE_GET_CLASS(vdev);
+> >>>
+> >>> -            features.index = address_space_ldub(&address_space_memory,
+> >>> -                                                ccw.cda
+> >>> -                                                + sizeof(features.features),
+> >>> -                                                MEMTXATTRS_UNSPECIFIED,
+> >>> -                                                NULL);
+> >>> +            ccw_dstream_advance(&sch->cds, sizeof(features.features));  
+> >> How about:
+> >> ccw_dstream_advance(&sch->cds, offsetof(VirtioFeatDesc, index));
+> > 
+> > I think keeping sizeof(features.features) is better: It matches the old
+> > code, and we really do jump over the features flag and revisit it
+> > later...
+I was thinking 'advance' to the offset of features.index, then 'read'
+the value for features.index seems more natural, and you do not need to
+care too much for what exaclty the elements are that you need to
+'advance'.
 
-Fixes: dfde4e6e1a86 ("memory: add ref/unref calls")
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-stable@nongnu.org # v1.6.0+
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit ee4c112846a0f2ac4fe5601918b0a2642ac8e2ed)
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- hw/virtio/vhost.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Not big deal for me. I could also accept the original version.
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 6eddb099b0..b737ca915b 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -1356,6 +1356,10 @@ void vhost_dev_cleanup(struct vhost_dev *hdev)
-     if (hdev->mem) {
-         /* those are only safe after successful init */
-         memory_listener_unregister(&hdev->memory_listener);
-+        for (i = 0; i < hdev->n_mem_sections; ++i) {
-+            MemoryRegionSection *section = &hdev->mem_sections[i];
-+            memory_region_unref(section->mr);
-+        }
-         QLIST_REMOVE(hdev, entry);
-     }
-     if (hdev->migration_blocker) {
+> > 
+> >>
+> >>> +            ccw_dstream_read(&sch->cds, features.index);
+> >>>              if (features.index == 0) {
+> >>>                  if (dev->revision >= 1) {
+> >>>                      /* Don't offer legacy features for modern devices. */
+> >>> @@ -417,9 +382,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+> >>>                  /* Return zeroes if the guest supports more feature bits. */
+> >>>                  features.features = 0;
+> >>>              }
+> >>> -            address_space_stl_le(&address_space_memory, ccw.cda,
+> >>> -                                 features.features, MEMTXATTRS_UNSPECIFIED,
+> >>> -                                 NULL);
+> >>> +            ccw_dstream_rewind(&sch->cds);
+> >>> +            cpu_to_le32s(&features.features);
+> >>> +            ccw_dstream_write(&sch->cds, features.features);
+> >>>              sch->curr_status.scsw.count = ccw.count - sizeof(features);  
+> >> How about:
+> >> sch->curr_status.scsw.count = ccw_dstream_residual_count(&sch->cds);
+> > 
+> > Hm, I thought I had commented on this, but I seem to have missed
+> > these...
+> > 
+> > I'd prefer to do it as a follow-up patch.
+No problem.
+
+> > 
+> >>
+> >> This also applies to other places.
+> >>
+> >>>              ret = 0;
+> >>>          }  
+> >> [...]
+> >>
+> >>> @@ -501,21 +459,13 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+> >>>              }
+> >>>          }
+> >>>          len = MIN(ccw.count, vdev->config_len);
+> >>> -        hw_len = len;
+> >>>          if (!ccw.cda) {
+> >>>              ret = -EFAULT;
+> >>>          } else {
+> >>> -            config = cpu_physical_memory_map(ccw.cda, &hw_len, 0);
+> >>> -            if (!config) {
+> >>> -                ret = -EFAULT;
+> >>> -            } else {
+> >>> -                len = hw_len;
+> >>> -                /* XXX config space endianness */
+> >>> -                memcpy(vdev->config, config, len);
+> >>> -                cpu_physical_memory_unmap(config, hw_len, 0, hw_len);
+> >>> +            ret = ccw_dstream_read_buf(&sch->cds, vdev->config, len);
+> >>> +            if (!ret) {  
+> >> Add a TODO here, and:
+> >>
+> >> if (ccw_dstream_read_buf(&sch->cds, vdev->config, len)) {
+> >>     ret = -EFAULT;
+> >> } else {
+> >>     ....
+> >> }
+> > 
+> > I don't think that would be correct: The function will (at least
+> > currently) return 0 or -EINVAL, and you are now mapping any error to
+> > -EFAULT? (Not that it has an effect in the end: We map both to a
+> > channel program check as of "s390x/css: drop data-check in
+> > interpretation".)
+Ah, I missed this. Now no problem from me.
+
+> > 
+> >>
+> >>>                  virtio_bus_set_vdev_config(&dev->bus, vdev->config);
+> >>>                  sch->curr_status.scsw.count = ccw.count - len;
+> >>> -                ret = 0;
+> >>>              }
+> >>>          }
+> >>>          break;  
+> >> [...]
+> >>
+> >>> @@ -714,13 +654,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
+> >>>              ret = -EFAULT;
+> >>>              break;
+> >>>          }
+> >>> -        revinfo.revision =
+> >>> -            address_space_lduw_be(&address_space_memory, ccw.cda,
+> >>> -                                  MEMTXATTRS_UNSPECIFIED, NULL);
+> >>> -        revinfo.length =
+> >>> -            address_space_lduw_be(&address_space_memory,
+> >>> -                                  ccw.cda + sizeof(revinfo.revision),
+> >>> -                                  MEMTXATTRS_UNSPECIFIED, NULL);
+> >>> +        ccw_dstream_read_buf(&sch->cds, &revinfo, 4);  
+
+> >>                                                      ^
+> >> A magic number? O:)
+> > 
+> > Hah :)
+> > 
+> > We can't use sizeof(revinfo), and sizeof(revinfo.revision) +
+> > sizeof(revinfo.length) is a bit unwieldy. Let's keep some magic in our
+> > code :)
+No problem. This seems the best option.
+
+> > 
+> >>
+> >>> +        be16_to_cpus(&revinfo.revision);
+> >>> +        be16_to_cpus(&revinfo.length);
+> >>>          if (ccw.count < len + revinfo.length ||
+> >>>              (check_len && ccw.count > len + revinfo.length)) {
+> >>>              ret = -EINVAL;
+> >>> -- 
+> >>> 2.13.5
+> >>>   
+> >>
+> >> Otherwise, looks good.
+> >>
+> > 
+> > Can I get an ack?
+Sure:
+Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+
+> > 
+> 
+> I agree that further cleanups are possible (e.g. using
+> ccw_dstream_residual_count() and tightening error handling) but
+> I also prefer to see these as on-top, and prefer sticking to
+> change as little as possible in the transformation patch and stay
+> as close as possible to what we had before in terms of behavior).
+Understand and agree.
+
+> 
+> Regards,
+> Halil 
+> 
+
 -- 
-2.11.0
+Dong Jia Shi
