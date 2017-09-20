@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42740)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43002)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dufC7-0003Mw-MH
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:37:43 -0400
+	(envelope-from <david@redhat.com>) id 1dufCa-0003jT-KX
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:38:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1duevI-0005Ef-Rs
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:21:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49194)
+	(envelope-from <david@redhat.com>) id 1dufCU-0002MR-OB
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:38:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42300)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1duevH-00058V-33
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:20:15 -0400
-References: <20170920032555.18911-1-famz@redhat.com>
-	<20170920032555.18911-4-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <91d27127-b1ba-0922-7d08-44782d277501@redhat.com>
-Date: Wed, 20 Sep 2017 08:20:02 -0500
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dufCU-0002Lg-Gx
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:38:02 -0400
+References: <20170919142654.16369-1-david@redhat.com>
+	<20170919142654.16369-4-david@redhat.com>
+	<452a304a-70e4-c3ab-2e76-a67823922e90@linaro.org>
+	<8bc7cb17-522a-48ea-5818-12bdbfb37d70@redhat.com>
+	<3e21fee6-4560-a3c9-926a-165a6212b1ef@linaro.org>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <aee44e68-84e7-fa88-5be1-70e078e00b1d@redhat.com>
+Date: Wed, 20 Sep 2017 15:37:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170920032555.18911-4-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="VuEX8d3qJhkND9EAFbfX5q344u3FL0Slv"
-Subject: Re: [Qemu-devel] [PATCH v10 03/13] scripts: Add archive-source.sh
+In-Reply-To: <3e21fee6-4560-a3c9-926a-165a6212b1ef@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2 3/3] s390x/tcg: add basic MSA features
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,115 +31,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com, Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---VuEX8d3qJhkND9EAFbfX5q344u3FL0Slv
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>,
- stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com,
- Kamil Rytarowski <kamil@netbsd.org>
-Message-ID: <91d27127-b1ba-0922-7d08-44782d277501@redhat.com>
-Subject: Re: [PATCH v10 03/13] scripts: Add archive-source.sh
-References: <20170920032555.18911-1-famz@redhat.com>
- <20170920032555.18911-4-famz@redhat.com>
-In-Reply-To: <20170920032555.18911-4-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 20.09.2017 15:23, Richard Henderson wrote:
+> On 09/19/2017 02:36 PM, David Hildenbrand wrote:
+>> On 19.09.2017 19:47, Richard Henderson wrote:
+>>> On 09/19/2017 09:26 AM, David Hildenbrand wrote:
+>>>> +    const uint8_t fc = env->regs[0] & 0x7fULL;
+>>>
+>>> Don't mask here...
+>>
+>> Bit 56 is the mod bit (see variable "mod") and is checked inside the
+>> switch(). The function code really is just composed of bit 57 - 63, so
+>> this is correct.
+> 
+> "mod bit"?
+> 
+>   # Bit 56 of general register 0 must be zero; oth-
+>   # erwise, a specification exception is recognized.
+> 
+> I don't suppose this is a change in PoO v11?  I'm still looking at v10.
+> 
 
-On 09/19/2017 10:25 PM, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  scripts/archive-source.sh | 51 +++++++++++++++++++++++++++++++++++++++=
-++++++++
->  1 file changed, 51 insertions(+)
->  create mode 100755 scripts/archive-source.sh
->=20
+I'm also looking at v10.
 
-> +
-> +if test -n "$submodules"; then
-> +    {
-> +        git ls-files || error "git ls-files failed"
-> +        for sm in $submodules; do
-> +            (cd $sm; git ls-files) | sed "s:^:$sm/:"
-> +            if test ${PIPESTATUS[0]} -ne 0 -o $? -ne 0; then
+This bit is called "M" bit for all cpacf instructions that allow
+en/decryption. M == modifier bit == mod bit == bit 56
 
-This relies on 'test ... -o ...' which is non-portable.  It "works"
-because there is no possible ambiguity in the contents of $PIPESTATUS
-that could cause a different parse of the test arguments, but I tend to
-discourage any use of -a/-o inside test on principle.  Sadly, writing:
+e.g. for KM (7-56)
 
-if test ${PIPESTATUS[0]} -ne 0 || test $? -ne 0
+"When the modifier bit in general register 0 is one, a
+decipher operation is performed. ...".
 
-has a flaw that $? is no longer what you want, at which point you would
-have to introduce a temporary variable.  But we're using bash, so you
-can instead write this as:
+For instructions that don't allow switching between de/encryption (e.g.
+KLMD), the modifier bit a.k.a. bit 56 must not be set.
 
-if test "${PIPESTATUS[@]}" !=3D "0 0"; then
+I don't really see the need here to rename mod -> bit_56 here.
 
-> +                error "git ls-files in submodule $sm failed"
-> +            fi
-> +        done
-> +    } | grep -x -v $(for sm in $submodules; do echo "-e $sm"; done) > =
-"$1".list
-> +else
-> +    git ls-files > "$1".list
-> +fi
+Thank!
 
-At this point, $1.list has been created, even if commands failed...
+-- 
 
-> +
-> +if test $? -ne 0; then
-> +    error "failed to generate list file"
-> +fi
+Thanks,
 
-=2E..but this exits without cleanup.  If we really want it cleaned no
-matter what, it's probably better to do:
-
-trap "status=3D$?; rm -f "$1".list; exit \$status" 0 1 2 3 15
-
-earlier than anything that can create the file.
-
-> +
-> +tar -cf "$1" -T "$1".list
-> +status=3D$?
-> +rm "$1".list
-> +if test $statue -ne 0; then
-
-Umm, $statue is not the same as $status.
-
-> +    error "failed to create tar file"
-> +fi
-> +exit 0
->=20
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---VuEX8d3qJhkND9EAFbfX5q344u3FL0Slv
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnCawMACgkQp6FrSiUn
-Q2qcSAf+OPf41cl66dGLIMxjtWiXKST2p2CcfNhj6dsnCEjjmKw7pLLhkHX5jta2
-OuKH02+b4sh9ZSRlUkVrRPqVjaoAWotZla35vo92xoQ4XSkgVxfEPHXEpbaW6ZEy
-OALseScG0hH5yKMYQSk/IVqxrlMnpQLcVm5WE6gFw0e6NlS99or57N8Qox6iwjJy
-PG3r6XRdqDg4XQRM7YZBvjpQEUO3GYNH66Ed7T8Ov0EiChiJ7ZKCfbfNrUgpcdOq
-TbSqmxMAxcHMgV40k8fp9tI99vRpUzBjiUN96NlHHKgQoVtJaWKv8vHLsopeuYqH
-039Hs48tTErUngbJvQSp2Lq+6EUu7Q==
-=8umn
------END PGP SIGNATURE-----
-
---VuEX8d3qJhkND9EAFbfX5q344u3FL0Slv--
+David
