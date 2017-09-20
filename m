@@ -1,23 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57050)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57471)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dufoC-0005hp-V0
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:17:04 -0400
+	(envelope-from <eblake@redhat.com>) id 1dufp4-0006fU-Ma
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:17:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dufo6-00063j-Qo
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:17:00 -0400
-Date: Wed, 20 Sep 2017 15:16:43 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170920141643.GB9409@stefanha-x1.localdomain>
-References: <20170920101740.12490-1-stefanha@redhat.com>
-	<w51fubh1vaz.fsf@maestria.local.igalia.com>
-	<20170920113902.ljcsl3y5c6kvo4eq@postretch>
-	<w51d16l1s40.fsf@maestria.local.igalia.com>
+	(envelope-from <eblake@redhat.com>) id 1dufp3-0006MR-H9
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:17:54 -0400
+References: <20170920121515.1311-1-kwolf@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <e0b5fdb3-1cd8-c398-ad00-474ed783c7a2@redhat.com>
+Date: Wed, 20 Sep 2017 09:17:41 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <w51d16l1s40.fsf@maestria.local.igalia.com>
-Subject: Re: [Qemu-devel] [PATCH v2] throttle-groups: update
- tg->any_timer_armed[] on detach
+In-Reply-To: <20170920121515.1311-1-kwolf@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="TQaXvXU939611iaUrE8QEF0No8wBNXuSd"
+Subject: Re: [Qemu-devel] [PATCH] qemu-iotests/195: Change multiple nodes in
+ one run
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,91 +24,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
 
-On Wed, Sep 20, 2017 at 02:17:51PM +0200, Alberto Garcia wrote:
-> On Wed 20 Sep 2017 01:39:02 PM CEST, Manos Pitsidianakis wrote:
-> >>>  void throttle_group_detach_aio_context(ThrottleGroupMember *tgm)
-> >>>  {
-> >>>      ThrottleTimers *tt = &tgm->throttle_timers;
-> >>> +    ThrottleGroup *tg = container_of(tgm->throttle_state, ThrottleGroup, ts);
-> >>> +
-> >>> +    qemu_mutex_lock(&tg->lock);
-> >>> +    if (timer_pending(tt->timers[0])) {
-> >>> +        tg->any_timer_armed[0] = false;
-> >>> +    }
-> >>> +    if (timer_pending(tt->timers[1])) {
-> >>> +        tg->any_timer_armed[1] = false;
-> >>> +    }
-> >>> +    qemu_mutex_unlock(&tg->lock);
-> >>> +
-> >>>      throttle_timers_detach_aio_context(tt);
-> >>>      tgm->aio_context = NULL;
-> >>>  }
-> >>
-> >>I'm sorry that I didn't noticed this in my previous e-mail, but after
-> >>this call you might have destroyed the timer that was set for that
-> >>throttling group, so if there are pending requests waiting it can
-> >>happen that no one wakes them up.
-> >>
-> >>I think that the queue needs to be restarted after this, probably
-> >>after having reattached the context (or actually after detaching it
-> >>already, but then what happens if you try to restart the queue while
-> >>aio_context is NULL?).
-> >
-> > aio_co_enter in the restart queue function requires that aio_context
-> > is non-NULL. Perhaps calling throttle_group_restart_tgm in
-> > throttle_group_attach_aio_context will suffice.
-> 
-> But can we guarantee that everything is safe between the _detach() and
-> _attach() calls?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--TQaXvXU939611iaUrE8QEF0No8wBNXuSd
+From: Eric Blake <eblake@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org
+Message-ID: <e0b5fdb3-1cd8-c398-ad00-474ed783c7a2@redhat.com>
+Subject: Re: [PATCH] qemu-iotests/195: Change multiple nodes in one run
+References: <20170920121515.1311-1-kwolf@redhat.com>
+In-Reply-To: <20170920121515.1311-1-kwolf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Here is a second patch that I didn't send because I was unsure whether it's
-needed.
+On 09/20/2017 07:15 AM, Kevin Wolf wrote:
+> This additional check for change-backing-file makes sure that actions o=
+n
+> one part of the graph don't interfere with later actions elsewhere.
+>=20
+> Suggested-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  tests/qemu-iotests/195     | 17 ++++++++++++++++
+>  tests/qemu-iotests/195.out | 51 ++++++++++++++++++++++++++++++++++++++=
+++++++++
+>  2 files changed, 68 insertions(+)
+>=20
 
-The idea is to move the throttle_group_detach/attach_aio_context() into
-bdrv_set_aio_context() so it becomes part of the bdrv_drained_begin/end()
-region.
+> +run_qemu -drive if=3Dnone,file=3D"$TEST_IMG",node-name=3Dtop,backing.n=
+ode-name=3Dmid <<EOF
+> +{"execute":"qmp_capabilities"}
+> +{"execute":"change-backing-file", "arguments":{"device":"none0","image=
+-node-name":"mid","backing-file":"/dev/null"}}
+> +{"execute":"change-backing-file", "arguments":{"device":"none0","image=
+-node-name":"top","backing-file":"/dev/null"}}
 
-The guarantees we have inside the drained region:
+I guess 'mid' is still accessible even though 'top' now no longer points
+to mid in the header, because we rely on our cache of the relationships
+rather than what is written into the header (of course, as soon as qemu
+quits, we've broken the chain, but that doesn't matter for this test).
 
-1. Throttling has been temporarily disabled.
-2. throttle_group_restart_tgm() has been called to kick throttled reqs.
-3. All requests are completed.
+> +{"execute":"change-backing-file", "arguments":{"device":"none0","image=
+-node-name":"mid","backing-file":"/dev/null"}}
 
-This is a nice, controlled environment to do the detach/attach.  That said,
-Berto's point still stands: what about other ThrottleGroupMembers who have
-throttled requests queued?
+Should the second modification to 'mid' be distinct from the first (as
+in, back to $TEST_IMG.mid), to make sure we are actually making another
+change, rather than triggering some short-cut that might treat a no-op
+change as something that can be skipped?  Even bouncing between
+"$TEST_IMG.mid", "./$TEST_IMG.mid", and "././$TEST_IMG.mid" will access
+the same file (and thus not break the chain), while still making it
+obvious which changes took effect, when compared to your change to
+/dev/null.
 
-The main reason I didn't publish this patch is because Manos' "block: remove
-legacy I/O throttling" series ought to remove this code anyway soon.
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index 45d9101be3..624eb3dc15 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -1747,10 +1747,6 @@ void blk_set_aio_context(BlockBackend *blk, AioContext *new_context)
-     ThrottleGroupMember *tgm = &blk->public.throttle_group_member;
- 
-     if (bs) {
--        if (tgm->throttle_state) {
--            throttle_group_detach_aio_context(tgm);
--            throttle_group_attach_aio_context(tgm, new_context);
--        }
-         bdrv_set_aio_context(bs, new_context);
-     }
- }
-@@ -2029,6 +2025,13 @@ static void blk_root_drained_end(BdrvChild *child)
-     BlockBackend *blk = child->opaque;
-     assert(blk->quiesce_counter);
- 
-+    if (tgm->throttle_state) {
-+        AioContext *new_context = bdrv_aio_context(blk_bs(blk));
-+
-+        throttle_group_detach_aio_context(tgm);
-+        throttle_group_attach_aio_context(tgm, new_context);
-+    }
-+
-     assert(blk->public.throttle_group_member.io_limits_disabled);
-     atomic_dec(&blk->public.throttle_group_member.io_limits_disabled);
+
+--TQaXvXU939611iaUrE8QEF0No8wBNXuSd
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnCeIUACgkQp6FrSiUn
+Q2pMRQf+McgfTYeHDRywtJ2vEcdUcnxvVzUwKxPmrxZK042larVsy0KEp0ravzAr
+M3TAbYZFCPWhPN+zBYDeRCnx/7W3FlOvHr8tLm1Z+rWy5hx3cLuU7IaK3pBcXb42
+x2RXvneyPMyynGFcqcLPdb3d18tJn0UkralYazG8yZPbEEOaxyWnp8pCNPSFsUdG
+9CWwN5Btl2qbqHV9eGhBN4/chaf0rcofBp/gYwfBIANg04xAxL/fcyb2/WRXtb63
+DWlm/whOpgr87NiLikYKSoWga+oMtufvC6hxbXaqhjmWoqZopWerlCgFQfMKb1Eo
+4SPfTtQytE86V8ioQAoPAjzuL8hbpQ==
+=jy6w
+-----END PGP SIGNATURE-----
+
+--TQaXvXU939611iaUrE8QEF0No8wBNXuSd--
