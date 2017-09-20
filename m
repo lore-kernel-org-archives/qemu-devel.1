@@ -1,30 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51854)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52020)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dufYp-000723-5F
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:13 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dufZQ-0007fD-EY
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <lersek@redhat.com>) id 1dufYj-0007mr-6U
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43030)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <lersek@redhat.com>) id 1dufYi-0007mM-VH
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:01 -0400
-References: <20170906142658.58298-1-marcel@redhat.com>
-	<20170906142658.58298-3-marcel@redhat.com>
-	<4ca77991-ad6a-a138-622b-b42f410fa1eb@redhat.com>
-	<a8d8ec43-bc27-b28a-dd7d-163a715acb5e@redhat.com>
-	<24ca79b9-9350-4339-960b-0dbdf9cd4c5b@redhat.com>
-	<77945ee2-ccfa-becc-eee1-c4b1066303c7@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <3920012f-1af2-acc4-4c41-77327482c008@redhat.com>
-Date: Wed, 20 Sep 2017 13:35:43 +0200
+	(envelope-from <pbonzini@redhat.com>) id 1dufZK-00082u-J8
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:44 -0400
+Received: from mail-wr0-f178.google.com ([209.85.128.178]:51915)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dufZK-00082B-Ci
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:01:38 -0400
+Received: by mail-wr0-f178.google.com with SMTP id z39so2247153wrb.8
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 07:01:38 -0700 (PDT)
+References: <1495613046-6430-1-git-send-email-thuth@redhat.com>
+	<5e647277-d688-071d-7def-bd8d57dd7e66@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <deb2e9b4-686d-1a5a-0aba-0c404183ae9a@redhat.com>
+Date: Wed, 20 Sep 2017 13:07:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <77945ee2-ccfa-becc-eee1-c4b1066303c7@redhat.com>
+In-Reply-To: <5e647277-d688-071d-7def-bd8d57dd7e66@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 2/2] hw/pcie: disable IO port fwd by
- default for pcie-root-port
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] net: Mark the 'hubport' netdev as
+ deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,147 +31,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>, qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com, mst@redhat.com, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Jason Wang <jasowang@redhat.com>
 
-On 09/20/17 13:16, Marcel Apfelbaum wrote:
-> On 20/09/2017 14:01, Laszlo Ersek wrote:
->> On 09/20/17 09:42, Marcel Apfelbaum wrote:
+On 20/09/2017 09:45, Thomas Huth wrote:
+> On 24.05.2017 10:04, Thomas Huth wrote:
+>> The 'hubport' netdev is closely tied to the 'vlan' concept which
+>> has been marked as deprecated in commit a2dbe1356faff3cb6 already.
+>> Thus we should also mark the hubport netdevs as deprecated to make
+>> the remaining users aware that they should not use this anymore.
+>>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
 
->>> The implementation issue might be that Guest Firmware would
->>> take the alignment as default value for an empty root port.
->>> (maybe take it as a bug and "solve" it?)
->>
->> Hm, I don't get this. What do you mean?
->>
->=20
-> Empty PCI Express Root Port with io_reserve =3D 0 should end with
-> no IO ports range, right?
+What is the replacement for VLANs?
 
-Yes.
+The point of hub/hubport was to implement this without needing
+special-casing of VLANs everywhere in the net/ directory.  VLANs remain
+messy in terms of command-line expression for -net, but that's where the
+problems end.
 
-> But there is some code in SeaBIOS that "aligns" the IO range to 4K,
-> so we may end up with a 4K range even if io_reserve=3D0.
+In fact, while there are some uses of VLANs that have been replaced by
+filters, VLANs are still needed to place 2 NICs to be on the same guest
+network without using a host bridge.  This should be a supported use
+case for e.g. L2TP backends, and it can be important for users that
+don't have the ability to configure a host bridge.
 
-Ah.
+In addition, depending on how you read the warning in commit a2dbe1356,
+this patch could be deprecating the exact replacement that you're
+suggesting in the warning.
 
-OK, if this makes a difference, please report your findings :)
+Rather than deprecating hubport, we need a mechanism to define a hubport
+for the back-end side.  For example:
 
->>>> (d) pci_bridge_qemu_reserve_cap_init() should be updated accordingly
->>>> (i.e., a conflict exists if both mem_pref_32_reserve and
->>>> mem_pref_64_reserve are *positive*),
->>>>
->>>
->>> I thought we have this check already.
->>
->> We have a check like this, but it doesn't use the exact condition that
->> I'm suggesting above (emphasis on *positive*). We now have
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0 if (mem_pref_32_reserve !=3D (uint32_t)-1 &&
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mem_pref_64_reserve !=
-=3D (uint64_t)-1) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp,
->>
->> but after introducing the zero value, this is going to be too strict.
->> Consider all the possible combinations:
->>
->> * (-1; -1): default fw behavior, check is OK
->>
->> * (-1;=C2=A0 0): fw sticks with the default for the first component, p=
-icks
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- "no reservation" for the second component, check is OK
->>
->> * (-1; >0): fw can treat this identically to ( 0; >0) -- see below. Th=
-is
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- is justified because, while the first component says "use
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- the default", the entire situation of having such a
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- capability is new, so the firmware can introduce new ways
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- for handling it. The check passes, which is good.
->>
->> * ( 0;=C2=A0 0): check reports error, but the firmware can handle this=
- case
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- fine (no reservation for either component)
->>
->> * ( 0; >0): check reports error, but the fw can handle this (no
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- reservation for the first component, specific reservation
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- for the second)
->>
->> * (>0; >0): conflict, check is OK
->>
->> (I'm skipping the description of the inverted orderings, such as (0;-1=
-),
->> they behave similarly.)
->>
->> So we need to accept 0 as "valid" for either component:
->>
->> =C2=A0=C2=A0=C2=A0=C2=A0 if (mem_pref_32_reserve > 0 &&
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mem_pref_32_reserve <=
- (uint32_t)-1 &&
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mem_pref_64_reserve >=
- 0 &&
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mem_pref_64_reserve <=
- (uint64_t)-1) {
->> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_setg(errp,
->>
->=20
-> Got it, you are right. How did we end up with something
-> complicated again :( ?
-> (complicated =3D needs documentation and not straight forward)
+   -netdev l2tp,...,id=l2tp-backend
+   -netdev hubport,hubid=0,netdev=l2tp-backend,id=l2tp-hub
+   -netdev hubport,hubid=0,id=nic0 -device virtio-net-pci,netdev=nic0
+   -netdev hubport,hubid=0,id=nic1 -device virtio-net-pci,netdev=nic1
 
-Haha, are you serious? :)
+This would normalize the topology
 
-*Nothing* is simple in QEMU; nothing at all. :) In general, software is
-complex because of feature requests, and QEMU caters to a million
-different (and conflicting) use cases, so you get complexity.
+   NIC      NIC      L2TP
+    |        |        |
+   hubport  hubport   |
+    |        |        |
+    '--------'--------'-------- hub
 
-(I know this is trivial, but it sure felt good to write down! :) )
-
->>>> Second, when determining the reservations in OVMF, I would like to l=
-ook
->>>> only at the capability fields, and not do a read-write-read-write
->>>> quadruplet to the IO base/limit registers. Do you agree?
->>>>
->>>
->>> Well, as stated before, the semantics for the hint is
->>> max(hint, <sum of all IO/MEM ranges for devices behind the bridge>).
->>> If you can follow it, that would be OK.
->>
->> In OVMF there are two separate questions:
->> - how to report the requested reservations,
->> - how to act upon the reported values.
->>
->> The first question pertains to "platform code", i.e., what I'm going t=
-o
->> implement under OvmfPkg. The second question pertains to "universal
->> code" (under "MdeModulePkg/Bus/Pci/PciBusDxe"), which is a lot harder =
 to
->> modify, because it is shipped on a wide range of physical platforms to=
-o.
->>
->> Again, my understanding is that PciBusDxe implements the "max" semanti=
-cs
->> that you describe (pertaining to the 2nd question).
->>
->> My interest is in figuring out the 1st question now, that is, where I
->> should take the information from that goes into the "reservation
->> description" that PciBusDxe understands. My preference would be to loo=
-k
->> only at the PCIE port in question (i.e. no other PCI devices at all),
->> and only at said capability in the config space of the PCIE port.
->>
->=20
-> Sounds OK.
 
-Thank you! Looks like I can start writing code for OVMF when I find the
-time.
+   NIC      NIC      L2TP
+    |        |        |
+   hubport  hubport  hubport
+    |        |        |
+    '--------'--------'-------- hub
 
-Thanks!
-Laszlo
+and would let us drop vlan from the command-line options.  Even
+immediately in 2.11.
+
+(Also, the reasoning in commit a2dbe1356 seems backwards, what's wrong
+with connecting two NICs with a cross cable?  If you can do it with
+physical hardware, you ought to be able to do it in QEMU).
+
+And in any case, this is certainly not a trivial patch!
+
+Paolo
+
+>> ---
+>>  net/hub.c       | 4 ++++
+>>  qemu-options.hx | 6 ++++--
+>>  2 files changed, 8 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/hub.c b/net/hub.c
+>> index 32d8cf5..85bd5bc 100644
+>> --- a/net/hub.c
+>> +++ b/net/hub.c
+>> @@ -13,6 +13,7 @@
+>>   */
+>>  
+>>  #include "qemu/osdep.h"
+>> +#include "qemu/error-report.h"
+>>  #include "monitor/monitor.h"
+>>  #include "net/net.h"
+>>  #include "clients.h"
+>> @@ -286,6 +287,9 @@ int net_init_hubport(const Netdev *netdev, const char *name,
+>>  {
+>>      const NetdevHubPortOptions *hubport;
+>>  
+>> +    error_report("hubports are deprecated and will be removed in a "
+>> +                 "future release");
+>> +
+>>      assert(netdev->type == NET_CLIENT_DRIVER_HUBPORT);
+>>      assert(!peer);
+>>      hubport = &netdev->u.hubport;
+>> diff --git a/qemu-options.hx b/qemu-options.hx
+>> index dc1a48a..efb555c 100644
+>> --- a/qemu-options.hx
+>> +++ b/qemu-options.hx
+>> @@ -1810,7 +1810,7 @@ DEF("netdev", HAS_ARG, QEMU_OPTION_netdev,
+>>      "-netdev vhost-user,id=str,chardev=dev[,vhostforce=on|off]\n"
+>>      "                configure a vhost-user network, backed by a chardev 'dev'\n"
+>>      "-netdev hubport,id=str,hubid=n\n"
+>> -    "                configure a hub port on QEMU VLAN 'n'\n", QEMU_ARCH_ALL)
+>> +    "                configure a hub port on QEMU VLAN 'n' (deprecated)\n", QEMU_ARCH_ALL)
+>>  DEF("net", HAS_ARG, QEMU_OPTION_net,
+>>      "-net nic[,vlan=n][,macaddr=mac][,model=type][,name=str][,addr=str][,vectors=v]\n"
+>>      "                old way to create a new NIC and connect it to VLAN 'n'\n"
+>> @@ -2239,7 +2239,9 @@ Create a hub port on QEMU "vlan" @var{hubid}.
+>>  
+>>  The hubport netdev lets you connect a NIC to a QEMU "vlan" instead of a single
+>>  netdev.  @code{-net} and @code{-device} with parameter @option{vlan} create the
+>> -required hub automatically.
+>> +required hub automatically. Note that the "vlan" concept and thus the hubport
+>> +option, too, are considered as deprecated and might be removed in a future
+>> +release of QEMU.
+>>  
+>>  @item -netdev vhost-user,chardev=@var{id}[,vhostforce=on|off][,queues=n]
+>>  
+>>
+> 
+> ping?
+> 
+>  Thomas
+> 
