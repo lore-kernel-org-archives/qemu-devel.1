@@ -1,20 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58608)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1duZ5b-0008RY-V4
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:06:33 -0400
+	(envelope-from <marcel@redhat.com>) id 1duZCe-0002T3-Sp
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:13:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <kwolf@redhat.com>) id 1duZ5a-0003z6-P4
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:06:31 -0400
-Date: Wed, 20 Sep 2017 09:06:20 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-Message-ID: <20170920070620.GB4730@localhost.localdomain>
-References: <87tvzyu3p4.fsf@igalia.com>
+	(envelope-from <marcel@redhat.com>) id 1duZCb-0002Aj-LK
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:13:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53628)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1duZCb-0002AP-FC
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:13:45 -0400
+References: <1503013010-11500-1-git-send-email-zuban32s@gmail.com>
+	<1503013010-11500-2-git-send-email-zuban32s@gmail.com>
+	<20170919203449.GG21016@localhost.localdomain>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <436365c9-43fc-95be-9bb2-7974f12e84df@redhat.com>
+Date: Wed, 20 Sep 2017 10:13:35 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87tvzyu3p4.fsf@igalia.com>
-Subject: Re: [Qemu-devel] RFC: Reducing the size of entries in the qcow2 L2
- cache
+In-Reply-To: <20170919203449.GG21016@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v7 1/4] hw/pci: introduce pcie-pci-bridge
+ device
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,77 +30,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alberto Garcia <berto@igalia.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>, "Denis V. Lunev" <den@openvz.org>
+To: Eduardo Habkost <ehabkost@redhat.com>, Aleksandr Bezzubikov <zuban32s@gmail.com>
+Cc: qemu-devel@nongnu.org, seabios@seabios.org, lersek@redhat.com, mst@redhat.com
 
-Am 19.09.2017 um 17:07 hat Alberto Garcia geschrieben:
-> Hi everyone,
+On 19/09/2017 23:34, Eduardo Habkost wrote:
+> On Fri, Aug 18, 2017 at 02:36:47AM +0300, Aleksandr Bezzubikov wrote:
+>> Introduce a new PCIExpress-to-PCI Bridge device,
+>> which is a hot-pluggable PCI Express device and
+>> supports devices hot-plug with SHPC.
+>>
+>> This device is intended to replace the DMI-to-PCI Bridge.
+>>
+>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+>> Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
 > 
-> over the past few weeks I have been testing the effects of reducing
-> the size of the entries in the qcow2 L2 cache. This was briefly
-> mentioned by Denis in the same thread where we discussed subcluster
-> allocation back in April, but I'll describe here the problem and the
-> proposal in detail.
-> [...]
-
-Thanks for working on this, Berto! I think this is essential for large
-cluster sizes and have been meaning to make a change like this for a
-long time, but I never found the time for it.
-
-> Some results from my tests (using an SSD drive and random 4K reads):
+> It's possible to crash QEMU by instantiating this device, with;
 > 
-> |-----------+--------------+-------------+---------------+--------------|
-> | Disk size | Cluster size | L2 cache    | Standard QEMU | Patched QEMU |
-> |-----------+--------------+-------------+---------------+--------------|
-> | 16 GB     | 64 KB        | 1 MB [8 GB] | 5000 IOPS     | 12700 IOPS   |
-> |  2 TB     |  2 MB        | 4 MB [1 TB] |  576 IOPS     | 11000 IOPS   |
-> |-----------+--------------+-------------+---------------+--------------|
+>    $ qemu-system-ppc64 -machine prep -device pcie-pci-bridge
+>    qemu-system-ppc64: qemu/memory.c:1533: memory_region_finalize: Assertion `!mr->container' failed.
+>    Aborted
+
+Hi Edurado,
+
 > 
-> The improvements are clearly visible, but it's important to point out
-> a couple of things:
+> I didn't investigate the root cause.
 > 
->    - L2 cache size is always < total L2 metadata on disk (otherwise
->      this wouldn't make sense). Increasing the L2 cache size improves
->      performance a lot (and makes the effect of these patches
->      disappear), but it requires more RAM.
 
-Do you have the numbers for the two cases abve if the L2 tables covered
-the whole image?
+Thanks for reporting it!
+Aleksandr, can you have a look? Maybe we should not compile
+the device for ppc arch. (x86 and arm is enough)
 
->    - Doing random reads over the whole disk is probably not a very
->      realistic scenario. During normal usage only certain areas of the
->      disk need to be accessed, so performance should be much better
->      with the same amount of cache.
->    - I wrote a best-case scenario test (several I/O jobs each accesing
->      a part of the disk that requires loading its own L2 table) and my
->      patched version is 20x faster even with 64KB clusters.
-
-I suppose you choose the scenario so that the number of jobs is larger
-than the number of cached L2 tables without the patch, but smaller than
-than the number of cache entries with the patch?
-
-We will probably need to do some more benchmarking to find a good
-default value for the cached chunks. 4k is nice and small, so we can
-cover many parallel jobs without using too much memory. But if we have a
-single sequential job, we may end up doing the metadata updates in
-small 4k chunks instead of doing a single larger write.
-
-Of course, if this starts becoming a problem (maybe unlikely?), we can
-always change the cache code to gather any adjacent dirty chunks in the
-cache when writing out something. Same thing for readahead, if we can
-find a policy when to evict old entries for readahead.
-
->    - We need a proper name for these sub-tables that we are loading
->      now. I'm actually still struggling with this :-) I can't think of
->      any name that is clear enough and not too cumbersome to use (L2
->      subtables? => Confusing. L3 tables? => they're not really that).
-
-L2 table chunk? Or just L2 cache entry?
-
-> I think I haven't forgotten anything. As I said I have a working
-> prototype of this and if you like the idea I'd like to publish it
-> soon. Any questions or comments will be appreciated.
-
-Please do post it!
-
-Kevin
+Appreciated,
+Marcel
