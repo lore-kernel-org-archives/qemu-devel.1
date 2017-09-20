@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49283)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57873)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1duhVE-0004BL-SV
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:05:35 -0400
+	(envelope-from <thuth@redhat.com>) id 1duhaf-0000OL-Ux
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:11:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <tgolembi@redhat.com>) id 1duhV9-0007Lk-1A
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:05:32 -0400
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:44610)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1duhV8-0007KP-Qg
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:05:26 -0400
-Received: by mail-wm0-f50.google.com with SMTP id 189so5554328wmh.1
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 09:05:26 -0700 (PDT)
-From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
-Date: Wed, 20 Sep 2017 18:05:22 +0200
-Message-Id: <13ca7e373615efac74661590527067ee8966f027.1505923516.git.tgolembi@redhat.com>
-In-Reply-To: <cover.1505923516.git.tgolembi@redhat.com>
-References: <cover.1505923516.git.tgolembi@redhat.com>
+	(envelope-from <thuth@redhat.com>) id 1duhab-0006kW-Pi
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:11:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:57232)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1duhaZ-0006gH-KU
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:11:04 -0400
+From: Thomas Huth <thuth@redhat.com>
+References: <1505811353-29151-1-git-send-email-thuth@redhat.com>
+	<84d1e5a0-141f-cd91-f62c-14fe58e73b4b@redhat.com>
+	<CAFEAcA_morPirUBzbpX1tHKfSCX+vAEcWX+KmUZKdnNm3O3vhA@mail.gmail.com>
+	<54a1ab1c-4da0-ded1-c225-f50d4756b773@redhat.com>
+	<99dd133d-239e-b53e-d258-7b1bde8639df@redhat.com>
+Message-ID: <05454839-2216-ee27-1cce-7d9899563806@redhat.com>
+Date: Wed, 20 Sep 2017 18:10:48 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 1/1] virtio-balloon: include buffers and
- chached memory statistics
+In-Reply-To: <99dd133d-239e-b53e-d258-7b1bde8639df@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH] qdev: Mark devices as non-hotpluggable
+ by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,42 +32,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org
-Cc: Wei Wang <wei.w.wang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+To: Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Stefano Stabellini <sstabellini@kernel.org>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, Igor Mammedov <imammedo@redhat.com>, David Hildenbrand <david@redhat.com>
 
-Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
----
- hw/virtio/virtio-balloon.c                      | 2 ++
- include/standard-headers/linux/virtio_balloon.h | 4 +++-
- 2 files changed, 5 insertions(+), 1 deletion(-)
+On 20.09.2017 13:17, Thomas Huth wrote:
+> On 20.09.2017 12:57, Marcel Apfelbaum wrote:
+>> On 20/09/2017 13:07, Peter Maydell wrote:
+[...]
+>>> Is it possible to hack together some kind of test code that
+>>> can give us a list of the devices compiled in that have
+>>> hotpluggable enabled? Then we could compare before and
+>>> after to see which devices we've changed.
+>>>
+>>
+>> Eduardo came up with some cool automated tests not long ago.
+>> Eduardo, can your tests help?
+>=20
+> You mean the scripts/device-crash-test script? That's only for
+> cold-plugging ... but I could maybe use the device_add HMP test (see
+> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg00817.html ) t=
+o
+> exercise the hotplugging of all devices and add some debug code to
+> qdev_device_add() to see which devices are dc->hotpluggable and have a
+> hotplug handler at the same time... I'll give it a try.
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index a705e0ec55..0434784c14 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -49,6 +49,8 @@ static const char *balloon_stat_names[] = {
-    [VIRTIO_BALLOON_S_MEMFREE] = "stat-free-memory",
-    [VIRTIO_BALLOON_S_MEMTOT] = "stat-total-memory",
-    [VIRTIO_BALLOON_S_AVAIL] = "stat-available-memory",
-+   [VIRTIO_BALLOON_S_BUFFERS] = "stat-linux-buffers",
-+   [VIRTIO_BALLOON_S_CACHED] = "stat-linux-cached",
-    [VIRTIO_BALLOON_S_NR] = NULL
- };
- 
-diff --git a/include/standard-headers/linux/virtio_balloon.h b/include/standard-headers/linux/virtio_balloon.h
-index 9d06ccd066..d61efbfcee 100644
---- a/include/standard-headers/linux/virtio_balloon.h
-+++ b/include/standard-headers/linux/virtio_balloon.h
-@@ -52,7 +52,9 @@ struct virtio_balloon_config {
- #define VIRTIO_BALLOON_S_MEMFREE  4   /* Total amount of free memory */
- #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory */
- #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in /proc */
--#define VIRTIO_BALLOON_S_NR       7
-+#define VIRTIO_BALLOON_S_BUFFERS  7   /* Buffers memory as in /proc */
-+#define VIRTIO_BALLOON_S_CACHED   8   /* Cached memory as in /proc */
-+#define VIRTIO_BALLOON_S_NR       9
- 
- /*
-  * Memory statistics structure.
--- 
-2.14.1
+Ok, done that now, and it looks like I missed devices of type
+TYPE_X86_CPU and TYPE_S390_CPU at least... Unlike the ppc64 CPUs, they
+are not derived from TYPE_CPU_CORE, but from TYPE_CPU ... is that on
+purpose? I thought hot-pluggable CPUs would need to be derived from
+TYPE_CPU_CORE... well, maybe I just understood that wrong.
+I'll send a new version of my patch.
+
+ Thomas
