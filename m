@@ -1,36 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40738)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9Z-0004RY-NV
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:15 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9Z-0004RX-NV
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:16 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9T-0005h9-J6
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:12 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51764
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9R-0005fu-FT
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:10 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57736
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1duT9T-0005et-D8
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:07 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8K0hbF7041338
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:46:03 -0400
-Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2d3c3e5k7j-1
+	id 1duT9R-0005eA-Ac
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:05 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8K0hbKD041251
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:46:02 -0400
+Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d39bk77y3-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:46:03 -0400
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:46:02 -0400
 Received: from localhost
-	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 19 Sep 2017 20:46:03 -0400
+	Tue, 19 Sep 2017 18:46:01 -0600
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 19 Sep 2017 19:45:15 -0500
+Date: Tue, 19 Sep 2017 19:45:13 -0500
 In-Reply-To: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
 References: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20170920004521.9417-7-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 06/12] hw/arm/allwinner-a10: Mark the
- allwinner-a10 device with user_creatable = false
+Message-Id: <20170920004521.9417-5-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 04/12] virtfs: error out gracefully when
+ mandatory suboptions are missing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,60 +40,65 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Thomas Huth <thuth@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, Greg Kurz <groug@kaod.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Greg Kurz <groug@kaod.org>
 
-QEMU currently exits unexpectedly when the user accidentially
-tries to do something like this:
+We internally convert -virtfs to -fsdev/-device. If the user doesn't
+provide the path or security_model suboptions, and the fsdev backend
+requires them, we hit an assertion when populating the internal -fsdev
+option:
 
-$ aarch64-softmmu/qemu-system-aarch64 -S -M integratorcp -nographic
-QEMU 2.9.93 monitor - type 'help' for more information
-(qemu) device_add allwinner-a10
-Unsupported NIC model: smc91c111
+util/qemu-option.c:547: opt_set: Assertion `opt->str' failed.
+Aborted (core dumped)
 
-Exiting just due to a "device_add" should not happen. Looking closer
-at the the realize and instance_init function of this device also
-reveals that it is using serial_hds and nd_table directly there, so
-this device is clearly not creatable by the user and should be marked
-accordingly.
+Let's test the suboption presence on the command line before trying
+to set it in the internal -fsdev option, and let the backend code
+error out gracefully (ie, like it already does when the user passes
+-fsdev on the command line).
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-id: 1503416789-32080-1-git-send-email-thuth@redhat.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-(cherry picked from commit dc89a180caf143a5d596d3f2f776d13be83a687d)
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+(cherry picked from commit 32b6943699948f7adc35ada233fbd25daffad5e9)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/arm/allwinner-a10.c    | 2 ++
- scripts/device-crash-test | 1 -
- 2 files changed, 2 insertions(+), 1 deletion(-)
+ vl.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/hw/arm/allwinner-a10.c b/hw/arm/allwinner-a10.c
-index f62a9a3541..43a3f01f45 100644
---- a/hw/arm/allwinner-a10.c
-+++ b/hw/arm/allwinner-a10.c
-@@ -118,6 +118,8 @@ static void aw_a10_class_init(ObjectClass *oc, void *data)
-     DeviceClass *dc = DEVICE_CLASS(oc);
+diff --git a/vl.c b/vl.c
+index 8e247cc2a2..d63269332f 100644
+--- a/vl.c
++++ b/vl.c
+@@ -3557,7 +3557,7 @@ int main(int argc, char **argv, char **envp)
+             case QEMU_OPTION_virtfs: {
+                 QemuOpts *fsdev;
+                 QemuOpts *device;
+-                const char *writeout, *sock_fd, *socket;
++                const char *writeout, *sock_fd, *socket, *path, *security_model;
  
-     dc->realize = aw_a10_realize;
-+    /* Reason: Uses serial_hds in realize and nd_table in instance_init */
-+    dc->user_creatable = false;
- }
- 
- static const TypeInfo aw_a10_type_info = {
-diff --git a/scripts/device-crash-test b/scripts/device-crash-test
-index e77b693eb2..81d65b9617 100755
---- a/scripts/device-crash-test
-+++ b/scripts/device-crash-test
-@@ -187,7 +187,6 @@ ERROR_WHITELIST = [
-     {'log':r"Device [\w.,-]+ can not be dynamically instantiated"},
-     {'log':r"Platform Bus: Can not fit MMIO region of size "},
-     # other more specific errors we will ignore:
--    {'device':'allwinner-a10', 'log':"Unsupported NIC model:"},
-     {'device':'.*-spapr-cpu-core', 'log':r"CPU core type should be"},
-     {'log':r"MSI(-X)? is not supported by interrupt controller"},
-     {'log':r"pxb-pcie? devices cannot reside on a PCIe? bus"},
+                 olist = qemu_find_opts("virtfs");
+                 if (!olist) {
+@@ -3596,11 +3596,15 @@ int main(int argc, char **argv, char **envp)
+                 }
+                 qemu_opt_set(fsdev, "fsdriver",
+                              qemu_opt_get(opts, "fsdriver"), &error_abort);
+-                qemu_opt_set(fsdev, "path", qemu_opt_get(opts, "path"),
+-                             &error_abort);
+-                qemu_opt_set(fsdev, "security_model",
+-                             qemu_opt_get(opts, "security_model"),
+-                             &error_abort);
++                path = qemu_opt_get(opts, "path");
++                if (path) {
++                    qemu_opt_set(fsdev, "path", path, &error_abort);
++                }
++                security_model = qemu_opt_get(opts, "security_model");
++                if (security_model) {
++                    qemu_opt_set(fsdev, "security_model", security_model,
++                                 &error_abort);
++                }
+                 socket = qemu_opt_get(opts, "socket");
+                 if (socket) {
+                     qemu_opt_set(fsdev, "socket", socket, &error_abort);
 -- 
 2.11.0
