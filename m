@@ -1,34 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60264)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33155)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1duYKO-0001aF-B0
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:17:45 -0400
+	(envelope-from <mol@pengutronix.de>) id 1duYLl-0002UX-KU
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:19:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1duYKK-00054q-AK
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:17:44 -0400
-Received: from mail.ispras.ru ([83.149.199.45]:34610)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dovgaluk@ispras.ru>) id 1duYKK-0004xS-1s
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:17:40 -0400
-From: "Pavel Dovgalyuk" <dovgaluk@ispras.ru>
-References: <CAPnv1PJeMRPKv9UUSmSWxyn=GFOPaWY8eUgH8ZeL=ZBMDJpbdg@mail.gmail.com>
-	<CAJhHMCCZh7hvQT8x9Bks9k6=ka4G1Oybv1MrkKJ9_VZ_eRZBfQ@mail.gmail.com>
-	<CAPnv1PL7-BAt36BvTxP7G8J8990Ur9MJJbr-QPccWziD4sy28g@mail.gmail.com>
-	<87bmrj8eks.fsf@linaro.org>
-	<CAPnv1PKyak1G-uL=H=-Vh_9TH2dZKffYjDf_2Z+LWuqovMKCBQ@mail.gmail.com>
-	<CAKSfGUC_k6K=2Xy8pGcwuQ66DMPYCDvA47Ojgm7ntQfALGwDsQ@mail.gmail.com>
-	<CAKSfGUD-FEb+DGwtrVHm2_NR_WOes9_+WkPm3Z76OPNhc3vbGA@mail.gmail.com>
-	<000601d33128$2dd9d5e0$898d81a0$@ru> <87bmm7dohw.fsf@linaro.org>
-	<CAKSfGUCt7p95nDeW12Q_-BSTXVhRLPtL+=u_WLx5_BZEgAgeLw@mail.gmail.com>
-	<878thaepe2.fsf@linaro.org>
-In-Reply-To: <878thaepe2.fsf@linaro.org>
-Date: Wed, 20 Sep 2017 09:17:41 +0300
-Message-ID: <000401d331d8$2a94d410$7fbe7c30$@ru>
+	(envelope-from <mol@pengutronix.de>) id 1duYLk-0006rZ-C4
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:19:09 -0400
+Received: from metis.ext.pengutronix.de
+	([2001:67c:670:201:290:27ff:fe1d:cc33]:39257)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <mol@pengutronix.de>) id 1duYLk-0006d4-5N
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:19:08 -0400
+Date: Wed, 20 Sep 2017 08:19:05 +0200
+From: Michael Olbrich <m.olbrich@pengutronix.de>
+Message-ID: <20170920061905.rbv3g2ubd4c5zvn4@pengutronix.de>
+References: <150555367996.36.15771330325496067998@69b6ddf88678>
+	<20170916103523.1482-1-m.olbrich@pengutronix.de>
+	<CAKmqyKP_5dC1td8DMCEM_4v74XBZy5-rWH2z4XA8VCw4165SAg@mail.gmail.com>
+	<20170919082358.43upqf3lawg2aqtg@pengutronix.de>
+	<CAKmqyKOeYQHRytnhzmC0Tr3rp4KU8NomgnFhhcrKE5KP75WMow@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Language: ru
-Subject: Re: [Qemu-devel] What is the best commit for record-replay?
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKmqyKOeYQHRytnhzmC0Tr3rp4KU8NomgnFhhcrKE5KP75WMow@mail.gmail.com>
+Subject: Re: [Qemu-devel] [PATCH v2] hw/sd: fix out-of-bounds check for
+ multi block reads
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,68 +32,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?utf-8?Q?'Alex_Benn=C3=A9e'?= <alex.bennee@linaro.org>, 'Aleksandr Bezzubikov' <zuban32s@gmail.com>
-Cc: 'QEMU Developers' <qemu-devel@nongnu.org>, 'Pranith Kumar' <bobby.prani+qemu@gmail.com>, pavel.dovgaluk@ispras.ru, 'Aleksandr Bezzubikov' <abezzubikov@ispras.ru>, 'Paolo Bonzini' <pbonzini@redhat.com>, 'Igor R' <boost.lists@gmail.com>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-> From: Alex Benn=C3=A9e [mailto:alex.bennee@linaro.org]
+On Tue, Sep 19, 2017 at 05:09:51PM -0700, Alistair Francis wrote:
+> On Tue, Sep 19, 2017 at 1:23 AM, Michael Olbrich
+> <m.olbrich@pengutronix.de> wrote:
+> > On Mon, Sep 18, 2017 at 02:28:26PM -0700, Alistair Francis wrote:
+> >> On Sat, Sep 16, 2017 at 3:35 AM, Michael Olbrich
+> >> <m.olbrich@pengutronix.de> wrote:
+> >> >  hw/sd/sd.c | 12 ++++++------
+> >> >  1 file changed, 6 insertions(+), 6 deletions(-)
+> >> >
+> >> > diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> >> > index ba47bff4db80..35347a5bbcde 100644
+> >> > --- a/hw/sd/sd.c
+> >> > +++ b/hw/sd/sd.c
+> >> > @@ -1797,8 +1797,13 @@ uint8_t sd_read_data(SDState *sd)
+> >> >          break;
+> >> >
+> >> >      case 18:   /* CMD18:  READ_MULTIPLE_BLOCK */
+> >> > -        if (sd->data_offset == 0)
+> >> > +        if (sd->data_offset == 0) {
+> >> > +            if (sd->data_start + io_len > sd->size) {
+> >> > +                sd->card_status |= ADDRESS_ERROR;
+> >> > +                return 0x00;
+> >> > +            }
+> >>
+> >> Why move it inside the if (sd->data_offset == 0) and not just below
+> >> the ret = sd->data[sd->data_offset ++] ?
+> >>
+> >> >              BLK_READ_BLOCK(sd->data_start, io_len);
 > >
-> >>>
-> >>>> >
-> >>>> > Hope you've already found the solution (as the last post was on =
-2 May)
-> >>>> > and it's just got missed the mailing list.
-> >>>
-> >>> As I know, RR is still broken in the current version.
-> >>> It was caused by the MTTCG implementation.
-> >>> Alex Bennee tried to fix RR back. Alex, have you found any =
-solution?
-> >>>
-> >>> We also trying to find a way to fix RR. It seems, that we will =
-reinvent BQL for RR.
-> >>
-> >> I think the method outlined in my RFC is the way to go, essentially =
-the
-> >> RR mutex taking over for the what the BQL did. The RFC patch hadn't
-> >> hoisted the mutex for the additional devices so I'm just re-basing =
-now
-> >> and I'll see if I can make the changes for Igor's test case.
-> >>
-> >> --
-> >> Alex Benn=C3=A9e
->=20
-> Could you try:
->=20
->   https://github.com/stsquad/qemu/tree/bql-and-replay-locks-v2
->=20
-> And report back?
+> > Mostly because of the line above. This copies the full block from the
+> > backend storage to sd->data, so we need to make sure that the data is
+> > actually available to fill sd->data, not if it's ok to access a certain
+> > byte within sd->data.
+> 
+> Doesn't this mean that the check is only done for the first block
+> then? When data_offset is 0.
 
-Most of the code look reasonable.
-Isn't better to lock before acting with icount in the following =
-function?
-=20
-static void prepare_icount_for_run(CPUState *cpu)
-{
-    if (use_icount) {
-        int insns_left;
+No, data_offset is reset at the end of the block. That's not visible in the
+patch. Here ist the relevant hunks with a bit more context:
 
-        /* These should always be cleared by process_icount_data after
-         * each vCPU execution. However u16.high can be raised
-         * asynchronously by cpu_exit/cpu_interrupt/tcg_handle_interrupt
-         */
-        g_assert(cpu->icount_decr.u16.low =3D=3D 0);
-        g_assert(cpu->icount_extra =3D=3D 0);
+     case 18:	/* CMD18:  READ_MULTIPLE_BLOCK */
+-        if (sd->data_offset == 0)
++        if (sd->data_offset == 0) {
++            if (sd->data_start + io_len > sd->size) {
++                sd->card_status |= ADDRESS_ERROR;
++                return 0x00;
++            }
+             BLK_READ_BLOCK(sd->data_start, io_len);
++        }
+         ret = sd->data[sd->data_offset ++];
+ 
+         if (sd->data_offset >= io_len) {
+             sd->data_start += io_len;
+             sd->data_offset = 0;
+[...]
+-
+-            if (sd->data_start + io_len > sd->size) {
+-                sd->card_status |= ADDRESS_ERROR;
+-                break;
+-            }
+         }
+         break;
 
-        cpu->icount_budget =3D tcg_get_icount_limit();
-        insns_left =3D MIN(0xffff, cpu->icount_budget);
-        cpu->icount_decr.u16.low =3D insns_left;
-        cpu->icount_extra =3D cpu->icount_budget - insns_left;
+As you can see, the old check was inside the block that resets data_offset
+to zero. This patch just delays exactly that check to the beginning of the
+next access.
 
-        if (replay_mode !=3D REPLAY_MODE_NONE) {
-            replay_mutex_lock();
-        }
-    }
-}
+Regards,
+Michael
 
-
-
-Pavel Dovgalyuk
+-- 
+Pengutronix e.K.                           |                             |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
