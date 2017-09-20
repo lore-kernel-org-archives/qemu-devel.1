@@ -1,21 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57471)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dufp4-0006fU-Ma
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:17:58 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dufrx-0000Yp-3m
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:20:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dufp3-0006MR-H9
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:17:54 -0400
-References: <20170920121515.1311-1-kwolf@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <e0b5fdb3-1cd8-c398-ad00-474ed783c7a2@redhat.com>
-Date: Wed, 20 Sep 2017 09:17:41 -0500
+	(envelope-from <dgilbert@redhat.com>) id 1dufrt-0007KY-2l
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:20:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59414)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dufrs-0007Jr-Oq
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:20:48 -0400
+Date: Wed, 20 Sep 2017 15:20:41 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170920142040.GE2449@work-vm>
+References: <20170919180038.26056-1-dgilbert@redhat.com>
+	<20170919180038.26056-6-dgilbert@redhat.com>
+	<20170920035512.GF18491@lemon>
 MIME-Version: 1.0
-In-Reply-To: <20170920121515.1311-1-kwolf@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="TQaXvXU939611iaUrE8QEF0No8wBNXuSd"
-Subject: Re: [Qemu-devel] [PATCH] qemu-iotests/195: Change multiple nodes in
- one run
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170920035512.GF18491@lemon>
+Subject: Re: [Qemu-devel] [PATCH 5/5] migration: Route more error paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,83 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
+To: Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, peter.maydell@linaro.org, cohuck@redhat.com, rth@twiddle.net
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TQaXvXU939611iaUrE8QEF0No8wBNXuSd
-From: Eric Blake <eblake@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org
-Message-ID: <e0b5fdb3-1cd8-c398-ad00-474ed783c7a2@redhat.com>
-Subject: Re: [PATCH] qemu-iotests/195: Change multiple nodes in one run
-References: <20170920121515.1311-1-kwolf@redhat.com>
-In-Reply-To: <20170920121515.1311-1-kwolf@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Fam Zheng (famz@redhat.com) wrote:
+> On Tue, 09/19 19:00, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > vmstate_save is called in a few places, and vmstate_save_state is
+> > called in lots of places.
+> > 
+> > Route error returns from the easier cases back up;  there are lots
+> > of more complex cases where there own error paths need fixing.
+> 
+> Did you mean s/there/their/ ?
 
-On 09/20/2017 07:15 AM, Kevin Wolf wrote:
-> This additional check for change-backing-file makes sure that actions o=
-n
-> one part of the graph don't interfere with later actions elsewhere.
->=20
-> Suggested-by: Eric Blake <eblake@redhat.com>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  tests/qemu-iotests/195     | 17 ++++++++++++++++
->  tests/qemu-iotests/195.out | 51 ++++++++++++++++++++++++++++++++++++++=
-++++++++
->  2 files changed, 68 insertions(+)
->=20
+I do; thanks.
 
-> +run_qemu -drive if=3Dnone,file=3D"$TEST_IMG",node-name=3Dtop,backing.n=
-ode-name=3Dmid <<EOF
-> +{"execute":"qmp_capabilities"}
-> +{"execute":"change-backing-file", "arguments":{"device":"none0","image=
--node-name":"mid","backing-file":"/dev/null"}}
-> +{"execute":"change-backing-file", "arguments":{"device":"none0","image=
--node-name":"top","backing-file":"/dev/null"}}
+> <snip>
+> 
+> > diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+> > index e643ac662b..ab3e430c2c 100644
+> > --- a/tests/test-vmstate.c
+> > +++ b/tests/test-vmstate.c
+> > @@ -70,7 +70,7 @@ static void save_vmstate(const VMStateDescription *desc, void *obj)
+> >      QEMUFile *f = open_test_file(true);
+> >  
+> >      /* Save file with vmstate */
+> > -    vmstate_save_state(f, desc, obj, NULL);
+> > +    g_assert(!vmstate_save_state(f, desc, obj, NULL));
+> 
+> Though this is test code, isn't putting anything with a side effect into an
+> assert expression a very bad pattern in general?
 
-I guess 'mid' is still accessible even though 'top' now no longer points
-to mid in the header, because we rely on our cache of the relationships
-rather than what is written into the header (of course, as soon as qemu
-quits, we've broken the chain, but that doesn't matter for this test).
+Hmm; ok I've changed this but I'm not really convinced; the whole point
+of an asser in a test is to actually run it, and I think the g_assert
+prints the text that failed, so it gives you a much better error inline.
 
-> +{"execute":"change-backing-file", "arguments":{"device":"none0","image=
--node-name":"mid","backing-file":"/dev/null"}}
+Dave
 
-Should the second modification to 'mid' be distinct from the first (as
-in, back to $TEST_IMG.mid), to make sure we are actually making another
-change, rather than triggering some short-cut that might treat a no-op
-change as something that can be skipped?  Even bouncing between
-"$TEST_IMG.mid", "./$TEST_IMG.mid", and "././$TEST_IMG.mid" will access
-the same file (and thus not break the chain), while still making it
-obvious which changes took effect, when compared to your change to
-/dev/null.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---TQaXvXU939611iaUrE8QEF0No8wBNXuSd
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnCeIUACgkQp6FrSiUn
-Q2pMRQf+McgfTYeHDRywtJ2vEcdUcnxvVzUwKxPmrxZK042larVsy0KEp0ravzAr
-M3TAbYZFCPWhPN+zBYDeRCnx/7W3FlOvHr8tLm1Z+rWy5hx3cLuU7IaK3pBcXb42
-x2RXvneyPMyynGFcqcLPdb3d18tJn0UkralYazG8yZPbEEOaxyWnp8pCNPSFsUdG
-9CWwN5Btl2qbqHV9eGhBN4/chaf0rcofBp/gYwfBIANg04xAxL/fcyb2/WRXtb63
-DWlm/whOpgr87NiLikYKSoWga+oMtufvC6hxbXaqhjmWoqZopWerlCgFQfMKb1Eo
-4SPfTtQytE86V8ioQAoPAjzuL8hbpQ==
-=jy6w
------END PGP SIGNATURE-----
-
---TQaXvXU939611iaUrE8QEF0No8wBNXuSd--
+> >      qemu_put_byte(f, QEMU_VM_EOF);
+> >      g_assert(!qemu_file_get_error(f));
+> >      qemu_fclose(f);
+> > @@ -381,7 +381,7 @@ static void test_save_noskip(void)
+> >      QEMUFile *fsave = open_test_file(true);
+> >      TestStruct obj = { .a = 1, .b = 2, .c = 3, .d = 4, .e = 5, .f = 6,
+> >                         .skip_c_e = false };
+> > -    vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
+> > +    g_assert(!vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL));
+> >      g_assert(!qemu_file_get_error(fsave));
+> >  
+> >      uint8_t expected[] = {
+> > @@ -402,7 +402,7 @@ static void test_save_skip(void)
+> >      QEMUFile *fsave = open_test_file(true);
+> >      TestStruct obj = { .a = 1, .b = 2, .c = 3, .d = 4, .e = 5, .f = 6,
+> >                         .skip_c_e = true };
+> > -    vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL);
+> > +    g_assert(!vmstate_save_state(fsave, &vmstate_skipping, &obj, NULL));
+> >      g_assert(!qemu_file_get_error(fsave));
+> >  
+> >      uint8_t expected[] = {
+> > -- 
+> > 2.13.5
+> > 
+> > 
+> 
+> Fam
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
