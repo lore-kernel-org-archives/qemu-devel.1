@@ -1,27 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59079)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36187)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1duWs6-0005wp-Ox
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 00:44:28 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1duX1E-0007wJ-Hg
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 00:53:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1duWs2-0003TJ-RT
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 00:44:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43556)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1duWs2-0003PU-J6
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 00:44:22 -0400
-Date: Wed, 20 Sep 2017 12:44:12 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170920044412.GS3617@pxdev.xzpeter.org>
-References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
-	<1505375436-28439-2-git-send-email-peterx@redhat.com>
-	<810ee791-fecd-c0b7-fefd-66a78c2de925@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1duX1B-0001J7-7n
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 00:53:52 -0400
+Date: Wed, 20 Sep 2017 14:35:33 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170920043533.GF5520@umbus.fritz.box>
+References: <20170911171235.29331-1-clg@kaod.org>
+	<20170911171235.29331-6-clg@kaod.org>
+	<20170919024544.GK27153@umbus>
+	<f4c2ca7a-0757-f847-7a3e-4907d9b6582d@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="Wb5NtZlyOqqy58h0"
 Content-Disposition: inline
-In-Reply-To: <810ee791-fecd-c0b7-fefd-66a78c2de925@redhat.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC 01/15] char-io: fix possible race on
- IOWatchPoll
+In-Reply-To: <f4c2ca7a-0757-f847-7a3e-4907d9b6582d@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 05/21] ppc/xive: allocate IRQ
+ numbers for the IPIs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,50 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
-On Tue, Sep 19, 2017 at 02:59:37PM -0500, Eric Blake wrote:
-> On 09/14/2017 02:50 AM, Peter Xu wrote:
-> > This is not a problem if we are only having one single loop thread li=
-ke
-> > before.  However, after per-monitor thread is introduced, this is not
-> > true any more, and the race can happen.
-> >=20
-> > The race can be triggered with "make check -j8" sometimes:
-> >=20
-> >   qemu-system-x86_64: /root/git/qemu/chardev/char-io.c:91:
-> >   io_watch_poll_finalize: Assertion `iwp->src =3D=3D NULL' failed.
-> >=20
-> > This patch keeps the reference for the watch object when creating in
-> > io_add_watch_poll(), so that the object will never be released in the
-> > context main loop, especially when the context loop is running in
-> > another standalone thread.  Meanwhile, when we want to remove the wat=
-ch
-> > object, we always first detach the watch object from its owner contex=
-t,
-> > then we continue with the cleanup.
-> >=20
-> > Without this patch, calling io_remove_watch_poll() in main loop threa=
-d
-> > is not thread-safe, since the other per-monitor thread may be modifyi=
-ng
-> > the watch object at the same time.
-> >=20
-> > Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
->=20
-> > +     * Let's blame the glib bug mentioned in commit 2b3167 (again) f=
-or
->=20
-> That 6-char commit id may become ambiguous soon (it's still rare to see
-> ambiguity with an 8-char id, although I've seen it more in recent times
-> than in the past; and git itself has moved from a 7-char default
-> abbreviation length in the 2.0 days to what is now a 10-char default
-> abbreviation in 2.13.5).
 
-Thanks for noticing this.  I'll use 10 chars in next post.
+--Wb5NtZlyOqqy58h0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Sep 19, 2017 at 04:52:10PM +0200, C=E9dric Le Goater wrote:
+> On 09/19/2017 04:45 AM, David Gibson wrote:
+> > On Mon, Sep 11, 2017 at 07:12:19PM +0200, C=E9dric Le Goater wrote:
+> >> The number of IPIs is deduced from the max number of CPUs the guest
+> >> supports and the IRQ numbers for the IPIs are allocated from the top
+> >> of the IRQ number space to reduce conflict with other IRQ numbers
+> >> allocated by the devices.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >=20
+> > This is more ick associated with implementing XIVE in terms of XICS.
+> > We shouldn't need to "allocate" IRQs for the IPIs - they should just
+> > be a fixed set. =20
+>=20
+> They are allocated at the right beginning so we can consider them
+> fixed I suppose.=20
+>=20
+> > And we certainly shouldn't need to set the XICS irq type for XIVE irqs.
+>=20
+> This is because, in this patchset, XIVE and XICS use the same IRQ=20
+> allocator which happens to be the ICSIRQState array of XICS. yes,=20
+> this is ugly but we are identifying the different constraints.=20
+
+Yeah, as I said in the other mail, I think trying to support both
+immediately is making a mess of the XIVE design.  Let's get it working
+as a machine option first, then worry about CAS and migration.
 
 --=20
-Peter Xu
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Wb5NtZlyOqqy58h0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnB8BUACgkQbDjKyiDZ
+s5IocxAAhojNUOxxas0HPUQYPCJtMW2TNrG7yov1twZk7VBE9ZR7t9ErAKe1ZH9u
+YU74gtAvC9d1LMZ1Y5NSHbPC1nYGcqYhnXieUO2ZC7gj8euvTQyqIFCR+ne4Jonk
+HBnCzYaWKqe8coPJiQskmmXwXo/SvwEAWuqzecJ6sXuoDKdPnqV4AWrjGxmUuhm7
+KnFv8acwbTqptbEUls0WjaSvgNILjM/2PHRik7hWbWiYmiPEsAt6e9wFS/u9FGRG
+ib3SPDKpp0T62g1sD+SQqt1vTjbHp4xrqnwNR/fKyBjfSHTxduQpzndC21jq8MVZ
+swzHQzaWSiBgq9nyLEQw12NE7XzexZX13VipTzp0uyNi6/iWjY+Ek85M+gWV7lr7
+QGM3TG8t9pk4L0CNYZLKgUCEbU0HKv+zCVuBYkLCTdjEzNP0n+vFI82/GykpaJ+s
+9BIjVqVC8ZC9Imb5SZIn+h10ftdhQSKQfxrWKat+c+EiBS3cAmy1l+pY/9sYhS2/
+jkpCZjvRCThzC14p4mV+wGNNuG9nAB3W6o+1Cu44AajAZ6vRVLr86n8nDSaKKgNw
+vWQdDzCNbvOBdhAgCrLnRgOVxbQG3+qYbcRckCXX6P2UiSWs6A9bOFNTTLzUo+tq
+IBtXxj9MnMuXpTuBe61lDqzMwjEn7y/PyooD/qPYw8QUKVlXPxM=
+=Nx3u
+-----END PGP SIGNATURE-----
+
+--Wb5NtZlyOqqy58h0--
