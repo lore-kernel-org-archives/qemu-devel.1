@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41115)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41194)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duYvM-00010o-Ox
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:55:57 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1duYvP-00013A-Of
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:56:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duYvL-0002V6-OP
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:55:56 -0400
-Date: Wed, 20 Sep 2017 16:32:34 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1duYvL-0002VH-PL
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:55:59 -0400
+Date: Wed, 20 Sep 2017 16:34:16 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170920063234.GL5520@umbus.fritz.box>
-References: <1505851374-6408-1-git-send-email-mark.cave-ayland@ilande.co.uk>
-	<20170920042907.GC5520@umbus.fritz.box>
-	<88f39fd3-0ecf-8c37-e159-684c845672fd@ilande.co.uk>
-	<20170920060014.GI5520@umbus.fritz.box>
-	<b8b0190f-0dd0-dc60-d5cb-fcf356a954d8@ilande.co.uk>
+Message-ID: <20170920063416.GM5520@umbus.fritz.box>
+References: <20170911171235.29331-1-clg@kaod.org>
+	<20170911171235.29331-12-clg@kaod.org>
+	<20170919074556.GO27153@umbus>
+	<2d91c586-ff31-ceb8-bee6-6d4531d1b5c0@kaod.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ZrCu0B0FMx3UnjE2"
+	protocol="application/pgp-signature"; boundary="oYAXToTM8kn9Ra/9"
 Content-Disposition: inline
-In-Reply-To: <b8b0190f-0dd0-dc60-d5cb-fcf356a954d8@ilande.co.uk>
-Subject: Re: [Qemu-devel] [PATCHv2] macio: convert pmac_ide_ops from old_mmio
+In-Reply-To: <2d91c586-ff31-ceb8-bee6-6d4531d1b5c0@kaod.org>
+Subject: Re: [Qemu-devel] [RFC PATCH v2 11/21] ppc/xive: push the EQ data in
+ OS event queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,60 +27,144 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
 
 
---ZrCu0B0FMx3UnjE2
-Content-Type: text/plain; charset=us-ascii
+--oYAXToTM8kn9Ra/9
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 20, 2017 at 07:28:27AM +0100, Mark Cave-Ayland wrote:
-> On 20/09/17 07:00, David Gibson wrote:
+On Tue, Sep 19, 2017 at 09:36:08PM +0200, C=E9dric Le Goater wrote:
+> On 09/19/2017 09:45 AM, David Gibson wrote:
+> > On Mon, Sep 11, 2017 at 07:12:25PM +0200, C=E9dric Le Goater wrote:
+> >> If a triggered event is let through, the Event Queue data defined in
+> >> the associated IVE is pushed in the in-memory event queue. The latter
+> >> is a circular buffer provided by the OS using the H_INT_SET_QUEUE_CONF=
+IG
+> >> hcall, one per target and priority couple. It is composed of Event
+> >> Queue entries which are 4 bytes long, the first bit being a
+> >> 'generation' bit and the 31 following bits the EQ Data field.
+> >>
+> >> The EQ Data field provides a way to set an invariant logical event
+> >> source number for an IRQ. It is set with the H_INT_SET_SOURCE_CONFIG
+> >> hcall.
+> >>
+> >> Notification of the CPU will be done in the following patch.
+> >>
+> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
+> >> ---
+> >>  hw/intc/spapr_xive.c | 67 +++++++++++++++++++++++++++++++++++++++++++=
++++++++++
+> >>  1 file changed, 67 insertions(+)
+> >>
+> >> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
+> >> index 557a7e2535b5..4bc61cfda67a 100644
+> >> --- a/hw/intc/spapr_xive.c
+> >> +++ b/hw/intc/spapr_xive.c
+> >> @@ -175,9 +175,76 @@ static const MemoryRegionOps spapr_xive_tm_ops =
+=3D {
+> >>      },
+> >>  };
+> >> =20
+> >> +static void spapr_xive_eq_push(XiveEQ *eq, uint32_t data)
+> >> +{
+> >> +    uint64_t qaddr_base =3D (((uint64_t)(eq->w2 & 0x0fffffff)) << 32)=
+ | eq->w3;
+> >> +    uint32_t qsize =3D GETFIELD(EQ_W0_QSIZE, eq->w0);
+> >> +    uint32_t qindex =3D GETFIELD(EQ_W1_PAGE_OFF, eq->w1);
+> >> +    uint32_t qgen =3D GETFIELD(EQ_W1_GENERATION, eq->w1);
+> >> +
+> >> +    uint64_t qaddr =3D qaddr_base + (qindex << 2);
+> >> +    uint32_t qdata =3D cpu_to_be32((qgen << 31) | (data & 0x7fffffff)=
+);
+> >> +    uint32_t qentries =3D 1 << (qsize + 10);
+> >> +
+> >> +    if (dma_memory_write(&address_space_memory, qaddr, &qdata, sizeof=
+(qdata))) {
+> >> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to write EQ data @=
+0x%"
+> >> +                      HWADDR_PRIx "\n", __func__, qaddr);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    qindex =3D (qindex + 1) % qentries;
+> >> +    if (qindex =3D=3D 0) {
+> >> +        qgen ^=3D 1;
+> >> +        eq->w1 =3D SETFIELD(EQ_W1_GENERATION, eq->w1, qgen);
+> >> +    }
+> >> +    eq->w1 =3D SETFIELD(EQ_W1_PAGE_OFF, eq->w1, qindex);
+> >> +}
+> >> +
+> >>  static void spapr_xive_irq(sPAPRXive *xive, int srcno)
+> >>  {
+> >> +    XiveIVE *ive;
+> >> +    XiveEQ *eq;
+> >> +    uint32_t eq_idx;
+> >> +    uint32_t priority;
+> >> +
+> >> +    ive =3D spapr_xive_get_ive(xive, srcno);
+> >> +    if (!ive || !(ive->w & IVE_VALID)) {
+> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %d\n", src=
+no);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    if (ive->w & IVE_MASKED) {
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    /* Find our XiveEQ */
+> >> +    eq_idx =3D GETFIELD(IVE_EQ_INDEX, ive->w);
+> >> +    eq =3D spapr_xive_get_eq(xive, eq_idx);
+> >> +    if (!eq) {
+> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No EQ for LISN %d\n", s=
+rcno);
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    if (eq->w0 & EQ_W0_ENQUEUE) {
+> >> +        spapr_xive_eq_push(eq, GETFIELD(IVE_EQ_DATA, ive->w));
+> >> +    } else {
+> >> +        qemu_log_mask(LOG_UNIMP, "XIVE: !ENQUEUE not implemented\n");
+> >> +    }
+> >> +
+> >> +    if (!(eq->w0 & EQ_W0_UCOND_NOTIFY)) {
+> >> +        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented=
+\n");
+> >> +    }
+> >> +
+> >> +    if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) =3D=3D 0) {
+> >> +        priority =3D GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
+> >> =20
+> >> +        /* The EQ is masked. Can this happen ?  */
+> >> +        if (priority =3D=3D 0xff) {
+> >> +            return;
+> >=20
+> > How does the 8-bit priority field here interact with the 3-bit
+> > priority which selects which EQ to use?
 >=20
-> > On Wed, Sep 20, 2017 at 06:56:37AM +0100, Mark Cave-Ayland wrote:
-> >> On 20/09/17 05:29, David Gibson wrote:
-> >>
-> >>> On Tue, Sep 19, 2017 at 09:02:54PM +0100, Mark Cave-Ayland wrote:
-> >>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> >>>
-> >>> This didn't apply for me.  Can you rebase on top of ppc-for-2.11, ple=
-ase.
-> >>
-> >> (goes and looks)
-> >>
-> >> Okay looks like the issue is that you're missing "[PATCH 3/8]
-> >> ppc/ide/macio: Add missing registers" from your queue - I see you
-> >> replied with an applied to ppc-2.11 email so I bet this got dropped on
-> >> rebase somewhere.
-> >=20
-> > Oh, sorry.  Not sure how that happened.
-> >=20
-> >> Can you try again with that patch added and then let me know if it sti=
-ll
-> >> doesn't work?
-> >=20
-> > Uh.. I've lost track of it, I'm afraid.  Can you resend it and the
-> > ide_ops one as a series.
->=20
-> Done. BTW if possible can you keep them in a similar order, i.e. ensure
-> that "ppc/ide/macio: Add missing registers" comes before "ppc: Fix
-> OpenPIC model"? (See
-> https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04397.html for
-> the full set).
+> priority OxFF is a special case kept for masking, see the hcall=20
+> h_int_set_source_config. It should never reach the EQ lookup=20
+> routines. So may be an assert would be better here.
 
-Done.
+Ok, if this situation can't be guest triggered, only by a bug in the
+rest of the XIVE code, then an assert() is better.
 
-> This is because in my testing Linux will see the change in OpenPIC model
-> and try to access the new macio registers, and so if that patch isn't
-> there first then you end up with a hang on boot. Keeping the order will
-> help make things much easier for bisection.
 >=20
+> C.=20
 >=20
-> ATB,
->=20
-> Mark.
+> >=20
+> >> +        }
+> >> +    } else {
+> >> +        qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n"=
+);
+> >> +    }
+> >>  }
+> >> =20
+> >>  /*
+> >=20
 >=20
 
 --=20
@@ -89,24 +173,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---ZrCu0B0FMx3UnjE2
+--oYAXToTM8kn9Ra/9
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnCC4IACgkQbDjKyiDZ
-s5Kdsw//TAQAqKQUWPLv5NBuSchtdCmp9+SXlxGcUxSQoThxv7aUuxBi4qTA3uk/
-elvGlGYtiNhxLpHEjKUzBG/fxZ8e/nfkrgMneyHzOeJn92s3Xewb0LWrk7Sa+sRP
-tQakB8IRLf1g4xL/mx3jyTqVSF+25OiQ0szyyAQ3UmL9kZ3JVre1q0TwyiTLdsnh
-D6pR28rkqtAVb87G//K8vpd7QWBHgeoxclaJ6qdHxurPEy6Q8qoPx8TTD0zjEXWI
-NUpMfDIAR9FkradcEZnHkaL1uz6VwtSTwXE2M7xRg0a4EaiNFRBbPHiOTR+k+LSx
-ffzYOiDJHJGGWTq1sNeLoP/8DtqgxX55JYMA4F5GF7Xr4MlKn9o9WjTGk4GlbgV8
-Kf3couQQjCBW+9+2A5gUhhOMIv18WGtF4AIsA9meFwLcJi/tgadDMZqyZDjZ5QPT
-8Ne0sFiBlL2iuAKI8D9O6Wibgo+1NcaOeYmGVIqJRn+tCpffZXO8dcn/LFwDSwkl
-AorSV+/G9AC3hOQrIMzpPQlKEVIfS4Fxlz5pWperjsP7OLw+8xC974sZis0hn9Mv
-i6v0ITcF/QKgKt7Hz3gdCBL/cF9XkOw27cYWeN4ooMJz2w6RKUxMh8HebUEwKuCj
-4yyISuHrZiTV/AU8P0Avc8mZ6iWDl+Byh5s3zVxE4dCTQVFUbXM=
-=3KQy
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnCC+gACgkQbDjKyiDZ
+s5LasA//V5JVP4ynG8ZGvaUESWIzQDn/OH1buKfePHCvQXGH7tNZFKRRVoVuQQ+5
+vUDuxLmX1uP6F5/SpGXa6avDPvsJD0SvJNsxvSbiFdqC+XPoE8aI1TQ5For16e/Z
+mj/IFXGY6IC23tVLZoDkdrUvI6AUdwGQXH/Hj/O1d2D3zfS2rpctIGH/RXlXW8nw
+bCKPUghYMzRUfk3ehNOmqGOXh8d2sZRmRSovA+PsQt3CiLLI0PXSTchgN55gNG6d
+bxjOl1SsVMaJFhdh0ox26U8x1a1kQWfVvprWAN5GLZ6dSRgZsk3zPe9TEVlNtJhJ
+NS57sqiJOA2oETOJhvLm/pVOt2ZBsgD36cLihiLipb35xZLIyo9nJRxGXlWqEvc/
+yrMuEfxCBwc/05ZupexzYPe1skIfdmYOU2AzC4yPzZJvrMgewhdZZ4cxbMmtHB8C
+1oiefCk+27atPCZdfChGyswOvyAH+AE9W5EF4wqmGt0knLXqOX0GBr7i25/HR/jv
++LPkshyIgqNj6VmfSkvUA7Vgi2i5le/XbdHQFqH93vgk9en5f9/W4GJx/jskjanl
+fVRUiHWUuRsodyyW4qlBq7iGyfPU11rf6kXVmbTe/sDGPb5G2Cnbh4SFY5R2O+6y
+3dBQLDZqo/QRLKv6MMnhwR5fQSAxoKzPpGwejE17cIQkNbGfotA=
+=eAVI
 -----END PGP SIGNATURE-----
 
---ZrCu0B0FMx3UnjE2--
+--oYAXToTM8kn9Ra/9--
