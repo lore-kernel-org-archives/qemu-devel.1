@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45387)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dues4-0003Q8-CM
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:17:00 -0400
+	(envelope-from <quintela@redhat.com>) id 1dues1-0003MY-SL
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duert-0001Jd-Vx
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:56 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47736)
+	(envelope-from <quintela@redhat.com>) id 1duert-0001JJ-LW
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47742)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duert-0001II-8z
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1duert-0001IJ-68
 	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:45 -0400
-Date: Wed, 20 Sep 2017 14:59:35 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170920145935.7d177fcf.cohuck@redhat.com>
-In-Reply-To: <f6da1ec7-4845-fe78-b6b8-29a71d481458@de.ibm.com>
-References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
-	<1500028867-134709-34-git-send-email-borntraeger@de.ibm.com>
-	<5eb9a7bd-2761-bea1-738a-da7a6d3fbfcf@de.ibm.com>
-	<f6da1ec7-4845-fe78-b6b8-29a71d481458@de.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] block ais migration for machines <= 2.9
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+	[10.5.11.12])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id A0C5A25C29
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 10:50:27 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 20 Sep 2017 12:50:26 +0200
+Message-Id: <20170920105026.1458-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PATCH] tests: Move postcopy migration test to
+ migrate-set-parameters
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,85 +28,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On Wed, 20 Sep 2017 14:53:07 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+migrate_set_speed and migrate_set_dowtime are deprecated since long ago.
 
-> Something like the following seems to do the tricks.
-> Needs proper patch description, review, full test with different kernel versions.....
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+---
+ tests/postcopy-test.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Looks sane.
-
-Will you handle it?
-
-> 
-> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-> index 1c7af39..2ff32ba 100644
-> --- a/hw/s390x/s390-virtio-ccw.c
-> +++ b/hw/s390x/s390-virtio-ccw.c
-> @@ -212,6 +212,7 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->      s390mc->cpu_model_allowed = true;
->      s390mc->css_migration_enabled = true;
->      s390mc->gs_allowed = true;
-> +    s390mc->ais_allowed = true;
->      mc->init = ccw_init;
->      mc->reset = s390_machine_reset;
->      mc->hot_add_cpu = s390_hot_add_cpu;
-> @@ -305,6 +306,11 @@ bool gs_allowed(void)
->      return false;
->  }
->  
-> +bool ais_allowed(void)
-> +{
-> +    return get_machine_class()->ais_allowed;
-> +}
-> +
->  static char *machine_get_loadparm(Object *obj, Error **errp)
->  {
->      S390CcwMachineState *ms = S390_CCW_MACHINE(obj);
-> @@ -533,6 +539,7 @@ static void ccw_machine_2_9_class_options(MachineClass *mc)
->      S390CcwMachineClass *s390mc = S390_MACHINE_CLASS(mc);
->  
->      s390mc->gs_allowed = false;
-> +    s390mc->ais_allowed = false;
->      ccw_machine_2_10_class_options(mc);
->      SET_MACHINE_COMPAT(mc, CCW_COMPAT_2_9);
->      s390mc->css_migration_enabled = false;
-> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
-> index 41a9d28..bba8660 100644
-> --- a/include/hw/s390x/s390-virtio-ccw.h
-> +++ b/include/hw/s390x/s390-virtio-ccw.h
-> @@ -41,6 +41,7 @@ typedef struct S390CcwMachineClass {
->      bool cpu_model_allowed;
->      bool css_migration_enabled;
->      bool gs_allowed;
-> +    bool ais_allowed;
->  } S390CcwMachineClass;
->  
->  /* runtime-instrumentation allowed by the machine */
-> @@ -49,6 +50,8 @@ bool ri_allowed(void);
->  bool cpu_model_allowed(void);
->  /* guarded-storage allowed by the machine */
->  bool gs_allowed(void);
-> +/* ais allowed by the machine */
-> +bool ais_allowed(void);
->  
->  /**
->   * Returns true if (vmstate based) migration of the channel subsystem
-> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-> index c4c5791..531d474 100644
-> --- a/target/s390x/kvm.c
-> +++ b/target/s390x/kvm.c
-> @@ -309,7 +309,9 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->      }
->  
->      /* Try to enable AIS facility */
-> -    kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
-> +    if (ais_allowed()) {
-> +       kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
-> +    }
->  
->      qemu_mutex_init(&qemu_sigp_mutex);
-> 
+diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
+index 8142f2ab90..991b954a83 100644
+--- a/tests/postcopy-test.c
++++ b/tests/postcopy-test.c
+@@ -430,14 +430,14 @@ static void test_migrate(void)
+      * machine, so also set the downtime.
+      */
+     global_qtest = from;
+-    rsp = qmp("{ 'execute': 'migrate_set_speed',"
+-              "'arguments': { 'value': 100000000 } }");
++    rsp = qmp("{ 'execute': 'migrate-set-parameters',"
++              "'arguments': { 'max-bandwidth': 100000000 } }");
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+ 
+     /* 1ms downtime - it should never finish precopy */
+-    rsp = qmp("{ 'execute': 'migrate_set_downtime',"
+-              "'arguments': { 'value': 0.001 } }");
++    rsp = qmp("{ 'execute': 'migrate-set-parameters',"
++              "'arguments': { 'downtime-limit': 1 } }");
+     g_assert(qdict_haskey(rsp, "return"));
+     QDECREF(rsp);
+ 
+-- 
+2.13.5
