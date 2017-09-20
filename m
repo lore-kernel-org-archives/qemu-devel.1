@@ -1,25 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35914)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1duk6o-000682-By
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:52:31 -0400
+	(envelope-from <felipe@nutanix.com>) id 1duk7W-0006Zx-JH
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:53:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1duk6l-0004Pu-A7
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:52:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50634)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1duk6l-0004MS-3x
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:52:27 -0400
-References: <20170919213611.8988-1-jsnow@redhat.com>
-	<20170919213611.8988-3-jsnow@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <61dd1fd1-c3e7-2884-22bf-5856803c2a1b@redhat.com>
-Date: Wed, 20 Sep 2017 20:52:21 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170919213611.8988-3-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] ppc: remove all unused CPU definitions
+	(envelope-from <felipe@nutanix.com>) id 1duk7T-0007Wl-Ie
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:53:14 -0400
+Received: from 206-15-90-246.static.twtelecom.net ([206.15.90.246]:56921
+	helo=mailrelay.nutanix.com) by eggs.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <felipe@nutanix.com>) id 1duk7T-0007SR-Cf
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:53:11 -0400
+From: Felipe Franciosi <felipe@nutanix.com>
+Date: Wed, 20 Sep 2017 11:53:06 -0700
+Message-Id: <1505933586-11296-1-git-send-email-felipe@nutanix.com>
+Subject: [Qemu-devel] [PATCH] virtio/vhost: reset dev->log after syncing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,49 +21,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: imammedo@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au
+To: Jason Wang <jasowang@redhat.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, Felipe Franciosi <felipe@nutanix.com>
 
-On 19.09.2017 23:36, John Snow wrote:
-> Remove *all* unused CPU definitions as indicated by compile-time
-> `#if 0` constructs.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  target/ppc/cpu-models.h | 223 ------------------------------------------------
->  1 file changed, 223 deletions(-)
-> 
-> diff --git a/target/ppc/cpu-models.h b/target/ppc/cpu-models.h
-> index b34b512..248f833 100644
-> --- a/target/ppc/cpu-models.h
-> +++ b/target/ppc/cpu-models.h
-[...]
-> @@ -234,24 +105,11 @@ enum {
->      CPU_POWERPC_440GXb             = 0x51B21851,
->      CPU_POWERPC_440GXc             = 0x51B21892,
->      CPU_POWERPC_440GXf             = 0x51B21894,
-> -#if 0
-> -    CPU_POWERPC_440S               = xxx,
-> -#endif
->      CPU_POWERPC_440SP              = 0x53221850,
->      CPU_POWERPC_440SP2             = 0x53221891,
->      CPU_POWERPC_440SPE             = 0x53421890,
->      /* PowerPC 460 family */
-> -#if 0
-> -    /* Generic PowerPC 464 */
-> -#define CPU_POWERPC_464              CPU_POWERPC_464H90
-> -#endif
->      /* PowerPC 464 microcontrolers */
-> -#if 0
-> -    CPU_POWERPC_464H90             = xxx,
-> -#endif
-> -#if 0
-> -    CPU_POWERPC_464H90FP           = xxx,
-> -#endif
+vhost_log_put() is called to decomission the dirty log between qemu and
+a vhost device when stopping the device. Such a call can happen from
+migration_completion().
 
-I think you could also remove the "/* PowerPC 460 family */" and "/*
-PowerPC 464 microcontrolers */" lines now.
+Present code sets dev->log_size to zero too early in vhost_log_put(),
+causing the sync check to always return false. As a consequence, the
+last pass on the dirty bitmap never happens at the end of migration.
 
-Anyway:
+If a vhost device was busy (writing to guest memory) until the last
+moments before vhost_virtqueue_stop(), this error will result in guest
+memory corruption (at least) following migrations.
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+---
+ hw/virtio/vhost.c |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index 5fd69f0..ddc42f0 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -375,8 +375,6 @@ static void vhost_log_put(struct vhost_dev *dev, bool sync)
+     if (!log) {
+         return;
+     }
+-    dev->log = NULL;
+-    dev->log_size = 0;
+ 
+     --log->refcnt;
+     if (log->refcnt == 0) {
+@@ -396,6 +394,9 @@ static void vhost_log_put(struct vhost_dev *dev, bool sync)
+ 
+         g_free(log);
+     }
++
++    dev->log = NULL;
++    dev->log_size = 0;
+ }
+ 
+ static bool vhost_dev_log_is_shared(struct vhost_dev *dev)
+-- 
+1.7.1
