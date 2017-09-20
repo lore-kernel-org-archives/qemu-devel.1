@@ -1,21 +1,48 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60902)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35685)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1duZFH-0003ID-Ov
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:16:33 -0400
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1duZHu-0004yf-24
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:19:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <thuth@redhat.com>) id 1duZFE-0004ZO-Ex
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:16:31 -0400
-References: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <333d3515-9533-bf2a-29a5-7ff3faffa94f@redhat.com>
-Date: Wed, 20 Sep 2017 09:16:18 +0200
+	(envelope-from <nikunj@linux.vnet.ibm.com>) id 1duZHq-0007yj-Nt
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:19:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58638
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <nikunj@linux.vnet.ibm.com>)
+	id 1duZHq-0007xS-Id
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:19:10 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8K7IvmB123541
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 03:19:09 -0400
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3brrs9w9-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 03:19:09 -0400
+Received: from localhost
+	by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <nikunj@linux.vnet.ibm.com>;
+	Wed, 20 Sep 2017 17:19:06 +1000
+From: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+In-Reply-To: <20170920065700.GO5520@umbus.fritz.box>
+References: <20170915064830.GI5250@umbus.fritz.box>
+	<87377omkuk.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170915085115.GN5250@umbus.fritz.box>
+	<87y3pgl45f.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170919082421.GU27153@umbus>
+	<871sn2hugn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920045524.GH5520@umbus.fritz.box>
+	<87y3pagdg0.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920061756.GJ5520@umbus.fritz.box>
+	<87vakdhnyn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920065700.GO5520@umbus.fritz.box>
+Date: Wed, 20 Sep 2017 12:48:55 +0530
 MIME-Version: 1.0
-In-Reply-To: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH 00/12] Patch Round-up for stable 2.10.1,
- freeze on 2017-09-27
+Content-Type: text/plain
+Message-Id: <87poalhm74.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,130 +51,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>, P J P <ppandit@redhat.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
-On 20.09.2017 02:45, Michael Roth wrote:
-> Hi everyone,
->=20
-> The following new patches are queued for QEMU stable v2.10.1:
->=20
->   https://github.com/mdroth/qemu/commits/stable-2.10-staging
->=20
-> The release is planned for 2017-10-02:
->=20
->   https://wiki.qemu.org/Planning/2.10
->=20
-> Please respond here or CC qemu-stable@nongnu.org on any patches you
-> think should be included in the release.
+David Gibson <david@gibson.dropbear.id.au> writes:
 
-Looks like there have been some patches that fix CVEs, I think they
-should be included, too:
+> On Wed, Sep 20, 2017 at 12:10:48PM +0530, Nikunj A Dadhania wrote:
+>> David Gibson <david@gibson.dropbear.id.au> writes:
+>> 
+>> > On Wed, Sep 20, 2017 at 10:43:19AM +0530, Nikunj A Dadhania wrote:
+>> >> David Gibson <david@gibson.dropbear.id.au> writes:
+>> >> 
+>> >> > On Wed, Sep 20, 2017 at 09:50:24AM +0530, Nikunj A Dadhania wrote:
+>> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
+>> >> >> 
+>> >> >> > On Fri, Sep 15, 2017 at 02:39:16PM +0530, Nikunj A Dadhania wrote:
+>> >> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
+>> >> >> >> 
+>> >> >> >> > On Fri, Sep 15, 2017 at 01:53:15PM +0530, Nikunj A Dadhania wrote:
+>> >> >> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
+>> >> >> >> >> 
+>> >> >> >> >> >> 
+>> >> >> >> >> >> I thought, I am doing the same here for PowerNV, number of online cores
+>> >> >> >> >> >> is equal to initial online vcpus / threads per core
+>> >> >> >> >> >> 
+>> >> >> >> >> >>    int boot_cores_nr = smp_cpus / smp_threads;
+>> >> >> >> >> >> 
+>> >> >> >> >> >> Only difference that I see in PowerNV is that we have multiple chips
+>> >> >> >> >> >> (max 2, at the moment)
+>> >> >> >> >> >> 
+>> >> >> >> >> >>         cores_per_chip = smp_cpus / (smp_threads * pnv->num_chips);
+>> >> >> >> >> >
+>> >> >> >> >> > This doesn't make sense to me.  Cores per chip should *always* equal
+>> >> >> >> >> > smp_cores, you shouldn't need another calculation for it.
+>> >> >> >> >> >
+>> >> >> >> >> >> And in case user has provided sane smp_cores, we use it.
+>> >> >> >> >> >
+>> >> >> >> >> > If smp_cores isn't sane, you should simply reject it, not try to fix
+>> >> >> >> >> > it.  That's just asking for confusion.
+>> >> >> >> >> 
+>> >> >> >> >> This is the case where the user does not provide a topology(which is a
+>> >> >> >> >> valid scenario), not sure we should reject it. So qemu defaults
+>> >> >> >> >> smp_cores/smt_threads to 1. I think it makes sense to over-ride.
+>> >> >> >> >
+>> >> >> >> > If you can find a way to override it by altering smp_cores when it's
+>> >> >> >> > not explicitly specified, then ok.
+>> >> >> >> 
+>> >> >> >> Should I change the global smp_cores here as well ?
+>> >> >> >
+>> >> >> > I'm pretty uneasy with that option.
+>> >> >> 
+>> >> >> Me too.
+>> >> >> 
+>> >> >> > It would take a fair bit of checking to ensure that changing smp_cores
+>> >> >> > is safe here. An easier to verify option would be to make the generic
+>> >> >> > logic which splits up an unspecified -smp N into cores and sockets
+>> >> >> > more flexible, possibly based on machine options for max values.
+>> >> >> >
+>> >> >> > That might still be more trouble than its worth.
+>> >> >> 
+>> >> >> I think the current approach is the simplest and less intrusive, as we
+>> >> >> are handling a case where user has not bothered to provide a detailed
+>> >> >> topology, the best we can do is create single threaded cores equal to
+>> >> >> number of cores.
+>> >> >
+>> >> > No, sorry.  Having smp_cores not correspond to the number of cores per
+>> >> > chip in all cases is just not ok.  Add an error message if the
+>> >> > topology isn't workable for powernv by all means.  But users having to
+>> >> > use a longer command line is better than breaking basic assumptions
+>> >> > about what numbers reflect what topology.
+>> >> 
+>> >> Sorry to ask again, as I am still not convinced, we do similar
+>> >> adjustment in spapr where the user did not provide the number of cores,
+>> >> but qemu assumes them as single threaded cores and created
+>> >> cores(boot_cores_nr) that were not same as smp_cores ?
+>> >
+>> > What?  boot_cores_nr has absolutely nothing to do with adjusting the
+>> > topology, and it certainly doesn't assume they're single threaded.
+>> 
+>> When we start a TCG guest and user provides following commandline, e.g.
+>> "-smp 4", smt_threads is set to 1 by default in vl.c. So the guest boots
+>> with 4 cores, each having 1 thread.
+>
+> Ok.. and what's the problem with that behaviour on powernv?
 
-e65294157d4b69393b3f819c99f4f647452b48e3
-"vga: fix display update region calculation (split screen)"
+As smp_thread defaults to 1 in vl.c, similarly smp_cores also has the
+default value of 1 in vl.c. In powernv, we were setting nr-cores like
+this:
 
-3d90c6254863693a6b13d918d2b8682e08bbc681
-"vga: stop passing pointers to vga_draw_line* functions"
+        object_property_set_int(chip, smp_cores, "nr-cores", &error_fatal);
 
-ed4f86e8b6eff8e600c69adee68c7cd34dd2cccb
-"multiboot: validate multiboot header address values"
+Even when there were multiple cpus (-smp 4), when the guest boots up, we
+just get one core (i.e. smp_cores was 1) with single thread(smp_threads
+was 1), which is wrong as per the command-line that was provided.
 
-?
-
-
-Apart from that, I'd like to suggest the following commits, since
-without these patches, QEMU can crash during runtime when the user
-accidentally issues the wrong device_add/del commands:
-
-84ebd3e8c7d4fe955b359b9aac84395907b0412e
-"watchdog/wdt_diag288: Mark diag288 watchdog as non-hotpluggable"
-
-0d4fa4996fc5ee56ea7d072e272b8e69948460a5
-"s390x/ipl: The s390-ipl device is not hot-pluggable"
-
-f58f25599b72c7479e6a1ff67c7f671823aa14da
-"hw/arm/digic: Mark device with user_creatable =3D false"
-
-469f3da42ef4af347fa7831e1cc0bd35d17f5b83
-"hw/arm/aspeed_soc: Mark devices as user_creatable =3D false"
-
-4c93950659487c7ad4f85571ee78524c1e3a94b3
-"hw/ide/microdrive: Mark the dscm1xxxx device with user_creatable =3D fal=
-se"
-
-955f5c7ba127746345a3d43b4d7c885ca159ae6b
-"ide: ahci: unparent children buses before freeing their memory"
-
-
-And searching the history for "assert", I think these are also good
-candidates:
-
-32b6943699948f7adc35ada233fbd25daffad5e9
-"virtfs: error out gracefully when mandatory suboptions are missing"
-
-1540008629bbb6a9c0826582d94ecf7a559f784c
-"console: fix dpy_gfx_replace_surface assert"
-
- Thomas
-
-
->=20
-> ----------------------------------------------------------------
-> Alex Williamson (1):
->       vhost: Release memory references on cleanup
->=20
-> Farhan Ali (1):
->       s390-ccw: Fix alignment for CCW1
->=20
-> Greg Kurz (1):
->       virtfs: error out gracefully when mandatory suboptions are missin=
-g
->=20
-> Hannes Reinecke (1):
->       scsi-bus: correct responses for INQUIRY and REQUEST SENSE
->=20
-> Marc-Andr=C3=A9 Lureau (2):
->       libvhost-user: support resuming vq->last_avail_idx based on used_=
-idx
->       vhost-user-bridge: fix resume regression (since 2.9)
->=20
-> Pavel Butsykin (1):
->       qcow2: move qcow2_store_persistent_dirty_bitmaps() before cache f=
-lushing
->=20
-> Peter Maydell (1):
->       mps2-an511: Fix wiring of UART overflow interrupt lines
->=20
-> Pranith Kumar (1):
->       arm_gicv3_kvm: Fix compile warning
->=20
-> Richard Henderson (1):
->       target/arm: Fix aa64 ldp register writeback
->=20
-> Samuel Thibault (1):
->       slirp: fix clearing ifq_so from pending packets
->=20
-> Thomas Huth (1):
->       hw/arm/allwinner-a10: Mark the allwinner-a10 device with user_cre=
-atable =3D false
->=20
->  block/qcow2.c                         | 16 +++++++-------
->  contrib/libvhost-user/libvhost-user.c | 13 ++++++++++++
->  contrib/libvhost-user/libvhost-user.h |  7 +++++++
->  hw/arm/allwinner-a10.c                |  2 ++
->  hw/arm/mps2.c                         |  4 ++--
->  hw/intc/arm_gicv3_kvm.c               |  2 +-
->  hw/scsi/scsi-bus.c                    | 29 ++++++++++++++++++++++----
->  hw/virtio/vhost.c                     |  4 ++++
->  pc-bios/s390-ccw/cio.h                |  2 +-
->  scripts/device-crash-test             |  1 -
->  slirp/socket.c                        | 39 +++++++++++++++++++++------=
---------
->  target/arm/translate-a64.c            | 29 +++++++++++++++-----------
->  tests/vhost-user-bridge.c             |  7 +++++++
->  vl.c                                  | 16 ++++++++------
->  14 files changed, 120 insertions(+), 51 deletions(-)
->=20
->=20
->=20
+Regards
+Nikunj
