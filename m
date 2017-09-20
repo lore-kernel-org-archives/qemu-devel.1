@@ -1,24 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41194)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43407)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duYvP-00013A-Of
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:56:01 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1duYxX-0002ci-V8
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:58:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duYvL-0002VH-PL
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:55:59 -0400
-Date: Wed, 20 Sep 2017 16:34:16 +1000
+	(envelope-from <dgibson@ozlabs.org>) id 1duYxW-0004jV-Ii
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:58:12 -0400
+Date: Wed, 20 Sep 2017 16:57:00 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170920063416.GM5520@umbus.fritz.box>
-References: <20170911171235.29331-1-clg@kaod.org>
-	<20170911171235.29331-12-clg@kaod.org>
-	<20170919074556.GO27153@umbus>
-	<2d91c586-ff31-ceb8-bee6-6d4531d1b5c0@kaod.org>
+Message-ID: <20170920065700.GO5520@umbus.fritz.box>
+References: <20170915064830.GI5250@umbus.fritz.box>
+	<87377omkuk.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170915085115.GN5250@umbus.fritz.box>
+	<87y3pgl45f.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170919082421.GU27153@umbus>
+	<871sn2hugn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920045524.GH5520@umbus.fritz.box>
+	<87y3pagdg0.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920061756.GJ5520@umbus.fritz.box>
+	<87vakdhnyn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="oYAXToTM8kn9Ra/9"
+	protocol="application/pgp-signature"; boundary="IpgPcFyQO6wM49Um"
 Content-Disposition: inline
-In-Reply-To: <2d91c586-ff31-ceb8-bee6-6d4531d1b5c0@kaod.org>
-Subject: Re: [Qemu-devel] [RFC PATCH v2 11/21] ppc/xive: push the EQ data in
- OS event queue
+In-Reply-To: <87vakdhnyn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,145 +33,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
+To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
 
---oYAXToTM8kn9Ra/9
-Content-Type: text/plain; charset=iso-8859-1
+--IpgPcFyQO6wM49Um
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 19, 2017 at 09:36:08PM +0200, C=E9dric Le Goater wrote:
-> On 09/19/2017 09:45 AM, David Gibson wrote:
-> > On Mon, Sep 11, 2017 at 07:12:25PM +0200, C=E9dric Le Goater wrote:
-> >> If a triggered event is let through, the Event Queue data defined in
-> >> the associated IVE is pushed in the in-memory event queue. The latter
-> >> is a circular buffer provided by the OS using the H_INT_SET_QUEUE_CONF=
-IG
-> >> hcall, one per target and priority couple. It is composed of Event
-> >> Queue entries which are 4 bytes long, the first bit being a
-> >> 'generation' bit and the 31 following bits the EQ Data field.
-> >>
-> >> The EQ Data field provides a way to set an invariant logical event
-> >> source number for an IRQ. It is set with the H_INT_SET_SOURCE_CONFIG
-> >> hcall.
-> >>
-> >> Notification of the CPU will be done in the following patch.
-> >>
-> >> Signed-off-by: C=E9dric Le Goater <clg@kaod.org>
-> >> ---
-> >>  hw/intc/spapr_xive.c | 67 +++++++++++++++++++++++++++++++++++++++++++=
-+++++++++
-> >>  1 file changed, 67 insertions(+)
-> >>
-> >> diff --git a/hw/intc/spapr_xive.c b/hw/intc/spapr_xive.c
-> >> index 557a7e2535b5..4bc61cfda67a 100644
-> >> --- a/hw/intc/spapr_xive.c
-> >> +++ b/hw/intc/spapr_xive.c
-> >> @@ -175,9 +175,76 @@ static const MemoryRegionOps spapr_xive_tm_ops =
-=3D {
-> >>      },
-> >>  };
-> >> =20
-> >> +static void spapr_xive_eq_push(XiveEQ *eq, uint32_t data)
-> >> +{
-> >> +    uint64_t qaddr_base =3D (((uint64_t)(eq->w2 & 0x0fffffff)) << 32)=
- | eq->w3;
-> >> +    uint32_t qsize =3D GETFIELD(EQ_W0_QSIZE, eq->w0);
-> >> +    uint32_t qindex =3D GETFIELD(EQ_W1_PAGE_OFF, eq->w1);
-> >> +    uint32_t qgen =3D GETFIELD(EQ_W1_GENERATION, eq->w1);
-> >> +
-> >> +    uint64_t qaddr =3D qaddr_base + (qindex << 2);
-> >> +    uint32_t qdata =3D cpu_to_be32((qgen << 31) | (data & 0x7fffffff)=
-);
-> >> +    uint32_t qentries =3D 1 << (qsize + 10);
-> >> +
-> >> +    if (dma_memory_write(&address_space_memory, qaddr, &qdata, sizeof=
-(qdata))) {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to write EQ data @=
-0x%"
-> >> +                      HWADDR_PRIx "\n", __func__, qaddr);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    qindex =3D (qindex + 1) % qentries;
-> >> +    if (qindex =3D=3D 0) {
-> >> +        qgen ^=3D 1;
-> >> +        eq->w1 =3D SETFIELD(EQ_W1_GENERATION, eq->w1, qgen);
-> >> +    }
-> >> +    eq->w1 =3D SETFIELD(EQ_W1_PAGE_OFF, eq->w1, qindex);
-> >> +}
-> >> +
-> >>  static void spapr_xive_irq(sPAPRXive *xive, int srcno)
-> >>  {
-> >> +    XiveIVE *ive;
-> >> +    XiveEQ *eq;
-> >> +    uint32_t eq_idx;
-> >> +    uint32_t priority;
-> >> +
-> >> +    ive =3D spapr_xive_get_ive(xive, srcno);
-> >> +    if (!ive || !(ive->w & IVE_VALID)) {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: invalid LISN %d\n", src=
-no);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    if (ive->w & IVE_MASKED) {
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    /* Find our XiveEQ */
-> >> +    eq_idx =3D GETFIELD(IVE_EQ_INDEX, ive->w);
-> >> +    eq =3D spapr_xive_get_eq(xive, eq_idx);
-> >> +    if (!eq) {
-> >> +        qemu_log_mask(LOG_GUEST_ERROR, "XIVE: No EQ for LISN %d\n", s=
-rcno);
-> >> +        return;
-> >> +    }
-> >> +
-> >> +    if (eq->w0 & EQ_W0_ENQUEUE) {
-> >> +        spapr_xive_eq_push(eq, GETFIELD(IVE_EQ_DATA, ive->w));
-> >> +    } else {
-> >> +        qemu_log_mask(LOG_UNIMP, "XIVE: !ENQUEUE not implemented\n");
-> >> +    }
-> >> +
-> >> +    if (!(eq->w0 & EQ_W0_UCOND_NOTIFY)) {
-> >> +        qemu_log_mask(LOG_UNIMP, "XIVE: !UCOND_NOTIFY not implemented=
-\n");
-> >> +    }
-> >> +
-> >> +    if (GETFIELD(EQ_W6_FORMAT_BIT, eq->w6) =3D=3D 0) {
-> >> +        priority =3D GETFIELD(EQ_W7_F0_PRIORITY, eq->w7);
-> >> =20
-> >> +        /* The EQ is masked. Can this happen ?  */
-> >> +        if (priority =3D=3D 0xff) {
-> >> +            return;
-> >=20
-> > How does the 8-bit priority field here interact with the 3-bit
-> > priority which selects which EQ to use?
+On Wed, Sep 20, 2017 at 12:10:48PM +0530, Nikunj A Dadhania wrote:
+> David Gibson <david@gibson.dropbear.id.au> writes:
 >=20
-> priority OxFF is a special case kept for masking, see the hcall=20
-> h_int_set_source_config. It should never reach the EQ lookup=20
-> routines. So may be an assert would be better here.
+> > On Wed, Sep 20, 2017 at 10:43:19AM +0530, Nikunj A Dadhania wrote:
+> >> David Gibson <david@gibson.dropbear.id.au> writes:
+> >>=20
+> >> > On Wed, Sep 20, 2017 at 09:50:24AM +0530, Nikunj A Dadhania wrote:
+> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
+> >> >>=20
+> >> >> > On Fri, Sep 15, 2017 at 02:39:16PM +0530, Nikunj A Dadhania wrote:
+> >> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
+> >> >> >>=20
+> >> >> >> > On Fri, Sep 15, 2017 at 01:53:15PM +0530, Nikunj A Dadhania wr=
+ote:
+> >> >> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
+> >> >> >> >>=20
+> >> >> >> >> >>=20
+> >> >> >> >> >> I thought, I am doing the same here for PowerNV, number of=
+ online cores
+> >> >> >> >> >> is equal to initial online vcpus / threads per core
+> >> >> >> >> >>=20
+> >> >> >> >> >>    int boot_cores_nr =3D smp_cpus / smp_threads;
+> >> >> >> >> >>=20
+> >> >> >> >> >> Only difference that I see in PowerNV is that we have mult=
+iple chips
+> >> >> >> >> >> (max 2, at the moment)
+> >> >> >> >> >>=20
+> >> >> >> >> >>         cores_per_chip =3D smp_cpus / (smp_threads * pnv->=
+num_chips);
+> >> >> >> >> >
+> >> >> >> >> > This doesn't make sense to me.  Cores per chip should *alwa=
+ys* equal
+> >> >> >> >> > smp_cores, you shouldn't need another calculation for it.
+> >> >> >> >> >
+> >> >> >> >> >> And in case user has provided sane smp_cores, we use it.
+> >> >> >> >> >
+> >> >> >> >> > If smp_cores isn't sane, you should simply reject it, not t=
+ry to fix
+> >> >> >> >> > it.  That's just asking for confusion.
+> >> >> >> >>=20
+> >> >> >> >> This is the case where the user does not provide a topology(w=
+hich is a
+> >> >> >> >> valid scenario), not sure we should reject it. So qemu defaul=
+ts
+> >> >> >> >> smp_cores/smt_threads to 1. I think it makes sense to over-ri=
+de.
+> >> >> >> >
+> >> >> >> > If you can find a way to override it by altering smp_cores whe=
+n it's
+> >> >> >> > not explicitly specified, then ok.
+> >> >> >>=20
+> >> >> >> Should I change the global smp_cores here as well ?
+> >> >> >
+> >> >> > I'm pretty uneasy with that option.
+> >> >>=20
+> >> >> Me too.
+> >> >>=20
+> >> >> > It would take a fair bit of checking to ensure that changing smp_=
+cores
+> >> >> > is safe here. An easier to verify option would be to make the gen=
+eric
+> >> >> > logic which splits up an unspecified -smp N into cores and sockets
+> >> >> > more flexible, possibly based on machine options for max values.
+> >> >> >
+> >> >> > That might still be more trouble than its worth.
+> >> >>=20
+> >> >> I think the current approach is the simplest and less intrusive, as=
+ we
+> >> >> are handling a case where user has not bothered to provide a detail=
+ed
+> >> >> topology, the best we can do is create single threaded cores equal =
+to
+> >> >> number of cores.
+> >> >
+> >> > No, sorry.  Having smp_cores not correspond to the number of cores p=
+er
+> >> > chip in all cases is just not ok.  Add an error message if the
+> >> > topology isn't workable for powernv by all means.  But users having =
+to
+> >> > use a longer command line is better than breaking basic assumptions
+> >> > about what numbers reflect what topology.
+> >>=20
+> >> Sorry to ask again, as I am still not convinced, we do similar
+> >> adjustment in spapr where the user did not provide the number of cores,
+> >> but qemu assumes them as single threaded cores and created
+> >> cores(boot_cores_nr) that were not same as smp_cores ?
+> >
+> > What?  boot_cores_nr has absolutely nothing to do with adjusting the
+> > topology, and it certainly doesn't assume they're single threaded.
+>=20
+> When we start a TCG guest and user provides following commandline, e.g.
+> "-smp 4", smt_threads is set to 1 by default in vl.c. So the guest boots
+> with 4 cores, each having 1 thread.
 
-Ok, if this situation can't be guest triggered, only by a bug in the
-rest of the XIVE code, then an assert() is better.
-
->=20
-> C.=20
->=20
-> >=20
-> >> +        }
-> >> +    } else {
-> >> +        qemu_log_mask(LOG_UNIMP, "XIVE: w7 format1 not implemented\n"=
-);
-> >> +    }
-> >>  }
-> >> =20
-> >>  /*
-> >=20
->=20
+Ok.. and what's the problem with that behaviour on powernv?
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -173,24 +144,24 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---oYAXToTM8kn9Ra/9
+--IpgPcFyQO6wM49Um
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnCC+gACgkQbDjKyiDZ
-s5LasA//V5JVP4ynG8ZGvaUESWIzQDn/OH1buKfePHCvQXGH7tNZFKRRVoVuQQ+5
-vUDuxLmX1uP6F5/SpGXa6avDPvsJD0SvJNsxvSbiFdqC+XPoE8aI1TQ5For16e/Z
-mj/IFXGY6IC23tVLZoDkdrUvI6AUdwGQXH/Hj/O1d2D3zfS2rpctIGH/RXlXW8nw
-bCKPUghYMzRUfk3ehNOmqGOXh8d2sZRmRSovA+PsQt3CiLLI0PXSTchgN55gNG6d
-bxjOl1SsVMaJFhdh0ox26U8x1a1kQWfVvprWAN5GLZ6dSRgZsk3zPe9TEVlNtJhJ
-NS57sqiJOA2oETOJhvLm/pVOt2ZBsgD36cLihiLipb35xZLIyo9nJRxGXlWqEvc/
-yrMuEfxCBwc/05ZupexzYPe1skIfdmYOU2AzC4yPzZJvrMgewhdZZ4cxbMmtHB8C
-1oiefCk+27atPCZdfChGyswOvyAH+AE9W5EF4wqmGt0knLXqOX0GBr7i25/HR/jv
-+LPkshyIgqNj6VmfSkvUA7Vgi2i5le/XbdHQFqH93vgk9en5f9/W4GJx/jskjanl
-fVRUiHWUuRsodyyW4qlBq7iGyfPU11rf6kXVmbTe/sDGPb5G2Cnbh4SFY5R2O+6y
-3dBQLDZqo/QRLKv6MMnhwR5fQSAxoKzPpGwejE17cIQkNbGfotA=
-=eAVI
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnCEToACgkQbDjKyiDZ
+s5KpgxAA2TneHZbt6Gc/XTHesCJk2qkh+ZvfhotLOKKz4MTJjeJVer2IQdo32sO3
+/YvgxXt7gDlBeEIIsOENO81KjvNHaLroTxsuPySY9ZHFm5LjpfAHIKm6AA8k+7h5
+jAtcxft1r1sFjkrqT/sQke19CUYRKlKDes0aMExv74SImTdZNemm6FzLCLnox/rx
+wxvZqWoYTQV09nYWG67rDpgdrWAu+4G4suMly5dfDYGCMU/32XKGjFxp05wLwimT
+RQgqdxZdLwahsZyAkwzlxLbVs7OqOCUuNZtOTEI0u0WMtvl6FjJZo29geHXFv0al
+s1wcUAHaJTYIqf5ohQjjfpxuuH2k4Ewolsyk0z6D4Av9ItDcOQp3xsIeqkzdOJVw
+fL4lgaQQ2NrerwAMXQgnV9hzpQOAS3Gq8E2+hFB9pOjeKjInZG4CKiOtot7GXR3v
+hNK3dMRw78HvRUTzYzyWcYZ2IrpYzNOLQLux2tH1BQRCadUctlIonwUsKX4ZFZYq
+ySK3iYTFA6aZlUiQI16BvGaXZ2VgfQXjceNWTSUldVlecMSHJCZzj/H1jq+0za1W
+DjWDeAYN1XtYer/wp5kbDUA7CjYMgiZ/AptYtrEa3SEeg5xkzefGkaHmvMKA23fW
+zHnRy4UiBAWWslSU0BVyc0lkiYg1pSEKD4lNoI5WEu6s2Jd6gsg=
+=rfRV
 -----END PGP SIGNATURE-----
 
---oYAXToTM8kn9Ra/9--
+--IpgPcFyQO6wM49Um--
