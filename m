@@ -1,27 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38470)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39360)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dugRB-0002mX-8Z
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:57:18 -0400
+	(envelope-from <prvs=4297b1e9d=anthony.perard@citrix.com>)
+	id 1dugUO-0006Jw-Fl
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:00:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@redhat.com>) id 1dugR6-0004zl-Cx
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:57:17 -0400
-Date: Wed, 20 Sep 2017 15:56:48 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-Message-ID: <20170920145648.GH9409@stefanha-x1.localdomain>
-References: <20170913181910.29688-1-mreitz@redhat.com>
-	<20170913181910.29688-16-mreitz@redhat.com>
-	<20170914155738.GE7370@stefanha-x1.localdomain>
-	<2f1c5239-0cde-d164-b803-ebf807e684f2@redhat.com>
-	<20170918100626.GE31063@stefanha-x1.localdomain>
-	<d6dbcebf-6dce-4803-0be0-a9f48a73a32f@redhat.com>
-	<20170919094416.GC22797@stefanha-x1.localdomain>
-	<20170919095750.GG9536@redhat.com>
+	(envelope-from <prvs=4297b1e9d=anthony.perard@citrix.com>)
+	id 1dugUI-0006dr-Hw
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:00:36 -0400
+Received: from smtp02.citrix.com ([66.165.176.63]:36508)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <prvs=4297b1e9d=anthony.perard@citrix.com>)
+	id 1dugUI-0006cX-AX
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:00:30 -0400
+Date: Wed, 20 Sep 2017 16:00:06 +0100
+From: Anthony PERARD <anthony.perard@citrix.com>
+Message-ID: <20170920150006.GB1859@perard.uk.xensource.com>
+References: <20170919115055.19278-1-jgross@suse.com>
+	<20170919115055.19278-3-jgross@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20170919095750.GG9536@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 15/18] block/mirror: Add
- active mirroring
+In-Reply-To: <20170919115055.19278-3-jgross@suse.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] xen: dont try setting max grants
+ multiple times
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,124 +31,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, Eric Blake <eblake@redhat.com>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
+To: Juergen Gross <jgross@suse.com>
+Cc: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org, kraxel@redhat.com, sstabellini@kernel.org
 
-On Tue, Sep 19, 2017 at 10:57:50AM +0100, Daniel P. Berrange wrote:
-> On Tue, Sep 19, 2017 at 10:44:16AM +0100, Stefan Hajnoczi wrote:
-> > On Mon, Sep 18, 2017 at 06:26:51PM +0200, Max Reitz wrote:
-> > > On 2017-09-18 12:06, Stefan Hajnoczi wrote:
-> > > > On Sat, Sep 16, 2017 at 03:58:01PM +0200, Max Reitz wrote:
-> > > >> On 2017-09-14 17:57, Stefan Hajnoczi wrote:
-> > > >>> On Wed, Sep 13, 2017 at 08:19:07PM +0200, Max Reitz wrote:
-> > > >>>> This patch implements active synchronous mirroring.  In active mode, the
-> > > >>>> passive mechanism will still be in place and is used to copy all
-> > > >>>> initially dirty clusters off the source disk; but every write request
-> > > >>>> will write data both to the source and the target disk, so the source
-> > > >>>> cannot be dirtied faster than data is mirrored to the target.  Also,
-> > > >>>> once the block job has converged (BLOCK_JOB_READY sent), source and
-> > > >>>> target are guaranteed to stay in sync (unless an error occurs).
-> > > >>>>
-> > > >>>> Optionally, dirty data can be copied to the target disk on read
-> > > >>>> operations, too.
-> > > >>>>
-> > > >>>> Active mode is completely optional and currently disabled at runtime.  A
-> > > >>>> later patch will add a way for users to enable it.
-> > > >>>>
-> > > >>>> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> > > >>>> ---
-> > > >>>>  qapi/block-core.json |  23 +++++++
-> > > >>>>  block/mirror.c       | 187 +++++++++++++++++++++++++++++++++++++++++++++++++--
-> > > >>>>  2 files changed, 205 insertions(+), 5 deletions(-)
-> > > >>>>
-> > > >>>> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> > > >>>> index bb11815608..e072cfa67c 100644
-> > > >>>> --- a/qapi/block-core.json
-> > > >>>> +++ b/qapi/block-core.json
-> > > >>>> @@ -938,6 +938,29 @@
-> > > >>>>    'data': ['top', 'full', 'none', 'incremental'] }
-> > > >>>>  
-> > > >>>>  ##
-> > > >>>> +# @MirrorCopyMode:
-> > > >>>> +#
-> > > >>>> +# An enumeration whose values tell the mirror block job when to
-> > > >>>> +# trigger writes to the target.
-> > > >>>> +#
-> > > >>>> +# @passive: copy data in background only.
-> > > >>>> +#
-> > > >>>> +# @active-write: when data is written to the source, write it
-> > > >>>> +#                (synchronously) to the target as well.  In addition,
-> > > >>>> +#                data is copied in background just like in @passive
-> > > >>>> +#                mode.
-> > > >>>> +#
-> > > >>>> +# @active-read-write: write data to the target (synchronously) both
-> > > >>>> +#                     when it is read from and written to the source.
-> > > >>>> +#                     In addition, data is copied in background just
-> > > >>>> +#                     like in @passive mode.
-> > > >>>
-> > > >>> I'm not sure the terms "active"/"passive" are helpful.  "Active commit"
-> > > >>> means committing the top-most BDS while the guest is accessing it.  The
-> > > >>> "passive" mirror block still works on the top-most BDS while the guest
-> > > >>> is accessing it.
-> > > >>>
-> > > >>> Calling it "asynchronous" and "synchronous" is clearer to me.  It's also
-> > > >>> the terminology used in disk replication (e.g. DRBD).
-> > > >>
-> > > >> I'd be OK with that, too, but I think I remember that in the past at
-> > > >> least Kevin made a clear distinction between active/passive and
-> > > >> sync/async when it comes to mirroring.
-> > > >>
-> > > >>> Ideally the user wouldn't have to worry about async vs sync because QEMU
-> > > >>> would switch modes as appropriate in order to converge.  That way
-> > > >>> libvirt also doesn't have to worry about this.
-> > > >>
-> > > >> So here you mean async/sync in the way I meant it, i.e., whether the
-> > > >> mirror operations themselves are async/sync?
-> > > > 
-> > > > The meaning I had in mind is:
-> > > > 
-> > > > Sync mirroring means a guest write waits until the target write
-> > > > completes.
-> > > 
-> > > I.e. active-sync, ...
-> > > 
-> > > > Async mirroring means guest writes completes independently of target
-> > > > writes.
-> > > 
-> > > ... i.e. passive or active-async in the future.
-> > > 
-> > > So you really want qemu to decide whether to use active or passive mode
-> > > depending on what's enough to let the block job converge and not
-> > > introduce any switch for the user?
-> > > 
-> > > I'm not sure whether I like this too much, mostly because "libvirt
-> > > doesn't have to worry" doesn't feel quite right to me.  If we don't make
-> > > libvirt worry about this, then qemu has to worry.  I'm not sure whether
-> > > that's any better.
-> > > 
-> > > I think this really does get into policy territory.  Just switching to
-> > > active mode the instant target writes are slower than source writes may
-> > > not be what the user wants: Maybe it's OK for a short duration because
-> > > they don't care about hard convergence too much.  Maybe they want to
-> > > switch to active mode already when "only" twice as much is written to
-> > > the target as to the source.
-> > > 
-> > > I think this is a decision the management layer (or the user) has to make.
-> > 
-> > Eric: Does libvirt want to be involved with converging the mirror job
-> > (i.e. if the guest is writing to disk faster than QEMU can copy data to
-> > the target)?
+On Tue, Sep 19, 2017 at 01:50:55PM +0200, Juergen Gross wrote:
+> Trying to call xengnttab_set_max_grants() with the same file handle
+> might fail on some kernels, as this operation is allowed only once.
 > 
-> Libvirt doesn't really want to set the policy - it will just need to expose
-> the mechansim & information to make such decisions upto the application.
+> This is a problem for the qdisk backend as blk_connect() can be
+> called multiple times for a domain, e.g. in case grub-xen is being
+> used to boot it.
 > 
-> I agree with Max that we don't want QEMU making this policy decision on
-> its own. Simply switching from passive to active mode is not an approach
-> that will be satisfactory to all scenarios. It might be preferrable to
-> apply CPU throttling of the guest, or I/O rate throttling, or temporarily
-> pause the guest to allow catch or any number of other policies. Neither
-> libvirt or QEMU knows which is best for the scenario at hand.
+> So instead of letting the generic backend code open the gnttab device
+> do it in blk_connect() and close it again in blk_disconnect.
+> 
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> ---
+>  hw/block/xen_disk.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
+> index 6632746250..7cff8863cb 100644
+> --- a/hw/block/xen_disk.c
+> +++ b/hw/block/xen_disk.c
+> @@ -1220,6 +1220,12 @@ static int blk_connect(struct XenDevice *xendev)
+>      /* Add on the number needed for the ring pages */
+>      max_grants += blkdev->nr_ring_ref;
+>  
+> +    blkdev->xendev.gnttabdev = xengnttab_open(NULL, 0);
+> +    if (blkdev->xendev.gnttabdev == NULL) {
+> +        xen_pv_printf(xendev, 0, "xengnttab_open failed: %s\n",
+> +                      strerror(errno));
+> +        return -1;
+> +    }
+>      if (xengnttab_set_max_grants(blkdev->xendev.gnttabdev, max_grants)) {
+>          xen_pv_printf(xendev, 0, "xengnttab_set_max_grants failed: %s\n",
+>                        strerror(errno));
+> @@ -1327,6 +1333,11 @@ static void blk_disconnect(struct XenDevice *xendev)
+>          }
+>          blkdev->feature_persistent = false;
+>      }
+> +
+> +    if (blkdev->xendev.gnttabdev) {
+> +        xengnttab_close(blkdev->xendev.gnttabdev);
+> +        blkdev->xendev.gnttabdev = NULL;
+> +    }
 
-Okay.
+I think blk_disconnect needs to be called from blk_free in case where
+the gnttabdev is not closed (like it is done when blk or the sring are
+not cleared, in blk_free).
 
-Stefan
+>  }
+
+>  static int blk_free(struct XenDevice *xendev)
+> @@ -1363,7 +1374,6 @@ static void blk_event(struct XenDevice *xendev)
+>  
+>  struct XenDevOps xen_blkdev_ops = {
+>      .size       = sizeof(struct XenBlkDev),
+> -    .flags      = DEVOPS_FLAG_NEED_GNTDEV,
+>      .alloc      = blk_alloc,
+>      .init       = blk_init,
+>      .initialise    = blk_connect,
+> -- 
+> 2.12.3
+> 
+
+-- 
+Anthony PERARD
