@@ -1,28 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48369)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49642)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dumAJ-0001v9-Qk
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:04:16 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dumCa-0003fl-0D
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:06:36 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dumAG-0002Zm-KF
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:04:15 -0400
-Received: from mail-io0-x234.google.com ([2607:f8b0:4001:c06::234]:43017)
+	(envelope-from <richard.henderson@linaro.org>) id 1dumCW-0004Yt-Rb
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:06:35 -0400
+Received: from mail-io0-x22b.google.com ([2607:f8b0:4001:c06::22b]:55848)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dumAG-0002ZF-Eg
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:04:12 -0400
-Received: by mail-io0-x234.google.com with SMTP id k101so6624720iod.0
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 14:04:12 -0700 (PDT)
-References: <1505580378-9044-1-git-send-email-peter.maydell@linaro.org>
-	<1505580378-9044-7-git-send-email-peter.maydell@linaro.org>
+	id 1dumCW-0004YZ-MM
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:06:32 -0400
+Received: by mail-io0-x22b.google.com with SMTP id z187so6546246ioz.12
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 14:06:32 -0700 (PDT)
+References: <20170919150313.10833-1-richard.henderson@linaro.org>
+	<20170919150313.10833-5-richard.henderson@linaro.org>
+	<87y3p9d3fq.fsf@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <5b4f7b5c-7d54-eba7-cb31-5ff2389042f2@linaro.org>
-Date: Wed, 20 Sep 2017 16:04:08 -0500
+Message-ID: <929c47da-b3e6-b8e8-36aa-e02bfc6a31fd@linaro.org>
+Date: Wed, 20 Sep 2017 16:06:28 -0500
 MIME-Version: 1.0
-In-Reply-To: <1505580378-9044-7-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <87y3p9d3fq.fsf@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 6/6] hw/arm/omap2.c: Don't use old_mmio
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Qemu-devel] [PATCH v2 4/8] disas: Support the Capstone
+ disassembler library
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,17 +33,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@nongnu.org
-Cc: patches@linaro.org
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org
 
-On 09/16/2017 11:46 AM, Peter Maydell wrote:
-> Don't use old_mmio in the memory region ops struct.
+On 09/20/2017 06:17 AM, Alex Bennée wrote:
+> Hmm I get a link failure:
 > 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  hw/arm/omap2.c | 49 +++++++++++++++++++++++++++++++++++++------------
->  1 file changed, 37 insertions(+), 12 deletions(-)
+>   LINK    tilegx-linux-user/qemu-tilegx
+> disas.o: In function `cap_disas_start':
+> /home/alex/lsrc/qemu/qemu.git/disas.c:196: undefined reference to `cs_open'
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+As discussed on IRC, this turned out to be wrong link ordering due to me
+placing -lcapstone in LDFLAGS instead of LIBS.  Fixed locally.
+
+Any other comments on the patch set?
+
 
 r~
