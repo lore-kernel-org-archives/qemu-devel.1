@@ -1,30 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49642)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56208)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dumCa-0003fl-0D
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:06:36 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dumQq-0007hd-9x
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:21:21 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dumCW-0004Yt-Rb
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:06:35 -0400
-Received: from mail-io0-x22b.google.com ([2607:f8b0:4001:c06::22b]:55848)
+	(envelope-from <zuban32s@gmail.com>) id 1dumQm-0006c5-VQ
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:21:20 -0400
+Received: from mail-lf0-x241.google.com ([2a00:1450:4010:c07::241]:33241)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dumCW-0004YZ-MM
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:06:32 -0400
-Received: by mail-io0-x22b.google.com with SMTP id z187so6546246ioz.12
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 14:06:32 -0700 (PDT)
-References: <20170919150313.10833-1-richard.henderson@linaro.org>
-	<20170919150313.10833-5-richard.henderson@linaro.org>
-	<87y3p9d3fq.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <929c47da-b3e6-b8e8-36aa-e02bfc6a31fd@linaro.org>
-Date: Wed, 20 Sep 2017 16:06:28 -0500
-MIME-Version: 1.0
-In-Reply-To: <87y3p9d3fq.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/8] disas: Support the Capstone
- disassembler library
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dumQm-0006bT-Mj
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:21:16 -0400
+Received: by mail-lf0-x241.google.com with SMTP id y15so2015421lfd.0
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 14:21:16 -0700 (PDT)
+From: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Date: Thu, 21 Sep 2017 00:21:11 +0300
+Message-Id: <1505942471-11260-1-git-send-email-zuban32s@gmail.com>
+Subject: [Qemu-devel] [PATCH] hw/pci-bridge/pcie_pci_bridge: properly handle
+ MSI unavailability case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,20 +24,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: mst@redhat.com, marcel@redhat.com, Aleksandr Bezzubikov <zuban32s@gmail.com>
 
-On 09/20/2017 06:17 AM, Alex Bennée wrote:
-> Hmm I get a link failure:
-> 
->   LINK    tilegx-linux-user/qemu-tilegx
-> disas.o: In function `cap_disas_start':
-> /home/alex/lsrc/qemu/qemu.git/disas.c:196: undefined reference to `cs_open'
+Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+---
+ hw/pci-bridge/pcie_pci_bridge.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
 
-As discussed on IRC, this turned out to be wrong link ordering due to me
-placing -lcapstone in LDFLAGS instead of LIBS.  Fixed locally.
-
-Any other comments on the patch set?
-
-
-r~
+diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
+index 9aa5cc3..da562fe 100644
+--- a/hw/pci-bridge/pcie_pci_bridge.c
++++ b/hw/pci-bridge/pcie_pci_bridge.c
+@@ -65,10 +65,18 @@ static void pcie_pci_bridge_realize(PCIDevice *d, Error **errp)
+         goto aer_error;
+     }
+ 
++    Error *local_err = NULL;
+     if (pcie_br->msi != ON_OFF_AUTO_OFF) {
+-        rc = msi_init(d, 0, 1, true, true, errp);
++        rc = msi_init(d, 0, 1, true, true, &local_err);
+         if (rc < 0) {
+-            goto msi_error;
++            assert(rc == -ENOTSUP);
++            if (pcie_br->msi != ON_OFF_AUTO_ON) {
++                error_free(local_err);
++            } else {
++                /* failed to satisfy user's explicit request for MSI */
++                error_propagate(errp, local_err);
++                goto msi_error;
++            }
+         }
+     }
+     pci_register_bar(d, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+@@ -81,7 +89,7 @@ aer_error:
+ pm_error:
+     pcie_cap_exit(d);
+ cap_error:
+-    shpc_free(d);
++    shpc_cleanup(d, &pcie_br->shpc_bar);
+ error:
+     pci_bridge_exitfn(d);
+ }
+@@ -98,7 +106,9 @@ static void pcie_pci_bridge_reset(DeviceState *qdev)
+ {
+     PCIDevice *d = PCI_DEVICE(qdev);
+     pci_bridge_reset(qdev);
+-    msi_reset(d);
++    if (msi_present(d)) {
++        msi_reset(d);
++    }
+     shpc_reset(d);
+ }
+ 
+@@ -106,12 +116,14 @@ static void pcie_pci_bridge_write_config(PCIDevice *d,
+         uint32_t address, uint32_t val, int len)
+ {
+     pci_bridge_write_config(d, address, val, len);
+-    msi_write_config(d, address, val, len);
++    if (msi_present(d)) {
++        msi_write_config(d, address, val, len);
++    }
+     shpc_cap_write_config(d, address, val, len);
+ }
+ 
+ static Property pcie_pci_bridge_dev_properties[] = {
+-        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi, ON_OFF_AUTO_ON),
++        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi, ON_OFF_AUTO_AUTO),
+         DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+-- 
+2.7.4
