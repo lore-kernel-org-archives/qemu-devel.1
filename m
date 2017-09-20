@@ -1,27 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44744)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1duerJ-0002g6-9n
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:13 -0400
+	(envelope-from <quintela@redhat.com>) id 1duerD-0002Zi-3G
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1duer9-0000r4-45
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:09 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35778)
+	(envelope-from <quintela@redhat.com>) id 1duer9-0000qv-3c
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:03 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35772)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1duer8-0000qU-RN
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1duer8-0000qV-RQ
 	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:15:59 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AB7BC80468
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 10:46:56 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 20 Sep 2017 12:46:29 +0200
-Message-Id: <20170920104639.2335-7-quintela@redhat.com>
+Date: Wed, 20 Sep 2017 12:46:36 +0200
+Message-Id: <20170920104639.2335-14-quintela@redhat.com>
 In-Reply-To: <20170920104639.2335-1-quintela@redhat.com>
 References: <20170920104639.2335-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 06/16] migration: Create x-multifd-channels
- parameter
+Subject: [Qemu-devel] [PULL 13/16] migration: pass MigrationIncomingState*
+ into migration check functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,213 +25,119 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com, Alexey Perevalov <a.perevalov@samsung.com>
 
-Indicates the number of channels that we will create.  By default we
-create 2 channels.
+From: Alexey Perevalov <a.perevalov@samsung.com>
 
+That tiny refactoring is necessary to be able to set
+UFFD_FEATURE_THREAD_ID while requesting features, and then
+to create downtime context in case when kernel supports it.
+
+Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
 Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-
---
-
-Catch inconsistent defaults (eric).
-Improve comment stating that number of threads is the same than number
-of sockets
-Use new DEFIN_PROP_*
-Rename x-multifd-threads to x-multifd-threads
 ---
- hmp.c                 |  7 +++++++
- migration/migration.c | 26 ++++++++++++++++++++++++++
- migration/migration.h |  1 +
- qapi/migration.json   | 24 +++++++++++++++++++++---
- 4 files changed, 55 insertions(+), 3 deletions(-)
+ migration/migration.c    |  3 ++-
+ migration/postcopy-ram.c | 10 +++++-----
+ migration/postcopy-ram.h |  2 +-
+ migration/savevm.c       |  2 +-
+ 4 files changed, 9 insertions(+), 8 deletions(-)
 
-diff --git a/hmp.c b/hmp.c
-index 0fb2bc7043..bebe19ebe4 100644
---- a/hmp.c
-+++ b/hmp.c
-@@ -336,6 +336,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
-         monitor_printf(mon, "%s: %s\n",
-             MigrationParameter_str(MIGRATION_PARAMETER_BLOCK_INCREMENTAL),
-             params->block_incremental ? "on" : "off");
-+        monitor_printf(mon, "%s: %" PRId64 "\n",
-+            MigrationParameter_str(MIGRATION_PARAMETER_X_MULTIFD_CHANNELS),
-+            params->x_multifd_channels);
-     }
- 
-     qapi_free_MigrationParameters(params);
-@@ -1621,6 +1624,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
-         p->has_block_incremental = true;
-         visit_type_bool(v, param, &p->block_incremental, &err);
-         break;
-+    case MIGRATION_PARAMETER_X_MULTIFD_CHANNELS:
-+        p->has_x_multifd_channels = true;
-+        visit_type_int(v, param, &p->x_multifd_channels, &err);
-+        break;
-     default:
-         assert(0);
-     }
 diff --git a/migration/migration.c b/migration/migration.c
-index 958b783bcf..7e79310d03 100644
+index 067dd929c4..b9056ccbac 100644
 --- a/migration/migration.c
 +++ b/migration/migration.c
-@@ -77,6 +77,7 @@
-  * Note: Please change this default value to 10000 when we support hybrid mode.
-  */
- #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
-+#define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
- 
- static NotifierList migration_state_notifiers =
-     NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
-@@ -481,6 +482,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
-     params->x_checkpoint_delay = s->parameters.x_checkpoint_delay;
-     params->has_block_incremental = true;
-     params->block_incremental = s->parameters.block_incremental;
-+    params->has_x_multifd_channels = true;
-+    params->x_multifd_channels = s->parameters.x_multifd_channels;
- 
-     return params;
- }
-@@ -762,6 +765,13 @@ static bool migrate_params_check(MigrationParameters *params, Error **errp)
-                     "is invalid, it should be positive");
-         return false;
-     }
-+    if (params->has_x_multifd_channels &&
-+        (params->x_multifd_channels < 1 || params->x_multifd_channels > 255)) {
-+        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
-+                   "multifd_channels",
-+                   "is invalid, it should be in the range of 1 to 255");
-+        return false;
-+    }
- 
-     return true;
- }
-@@ -880,6 +890,9 @@ static void migrate_params_apply(MigrateSetParameters *params)
-     if (params->has_block_incremental) {
-         s->parameters.block_incremental = params->block_incremental;
-     }
-+    if (params->has_x_multifd_channels) {
-+        s->parameters.x_multifd_channels = params->x_multifd_channels;
-+    }
- }
- 
- void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
-@@ -1458,6 +1471,15 @@ bool migrate_use_multifd(void)
-     return s->enabled_capabilities[MIGRATION_CAPABILITY_X_MULTIFD];
- }
- 
-+int migrate_multifd_channels(void)
-+{
-+    MigrationState *s;
-+
-+    s = migrate_get_current();
-+
-+    return s->parameters.x_multifd_channels;
-+}
-+
- int migrate_use_xbzrle(void)
+@@ -659,6 +659,7 @@ static bool migrate_caps_check(bool *cap_list,
  {
-     MigrationState *s;
-@@ -2223,6 +2245,9 @@ static Property migration_properties[] = {
-     DEFINE_PROP_INT64("x-checkpoint-delay", MigrationState,
-                       parameters.x_checkpoint_delay,
-                       DEFAULT_MIGRATE_X_CHECKPOINT_DELAY),
-+    DEFINE_PROP_INT64("x-multifd-channels", MigrationState,
-+                      parameters.x_multifd_channels,
-+                      DEFAULT_MIGRATE_MULTIFD_CHANNELS),
+     MigrationCapabilityStatusList *cap;
+     bool old_postcopy_cap;
++    MigrationIncomingState *mis = migration_incoming_get_current();
  
-     /* Migration capabilities */
-     DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
-@@ -2280,6 +2305,7 @@ static void migration_instance_init(Object *obj)
-     params->has_downtime_limit = true;
-     params->has_x_checkpoint_delay = true;
-     params->has_block_incremental = true;
-+    params->has_x_multifd_channels = true;
- }
+     old_postcopy_cap = cap_list[MIGRATION_CAPABILITY_POSTCOPY_RAM];
+ 
+@@ -692,7 +693,7 @@ static bool migrate_caps_check(bool *cap_list,
+          * special support.
+          */
+         if (!old_postcopy_cap && runstate_check(RUN_STATE_INMIGRATE) &&
+-            !postcopy_ram_supported_by_host()) {
++            !postcopy_ram_supported_by_host(mis)) {
+             /* postcopy_ram_supported_by_host will have emitted a more
+              * detailed message
+              */
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 7e21e6fd36..c70305ccc7 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -61,7 +61,7 @@ struct PostcopyDiscardState {
+ #include <sys/eventfd.h>
+ #include <linux/userfaultfd.h>
+ 
+-static bool ufd_version_check(int ufd)
++static bool ufd_version_check(int ufd, MigrationIncomingState *mis)
+ {
+     struct uffdio_api api_struct;
+     uint64_t ioctl_mask;
+@@ -124,7 +124,7 @@ static int test_ramblock_postcopiable(const char *block_name, void *host_addr,
+  * normally fine since if the postcopy succeeds it gets turned back on at the
+  * end.
+  */
+-bool postcopy_ram_supported_by_host(void)
++bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+ {
+     long pagesize = getpagesize();
+     int ufd = -1;
+@@ -147,7 +147,7 @@ bool postcopy_ram_supported_by_host(void)
+     }
+ 
+     /* Version and features check */
+-    if (!ufd_version_check(ufd)) {
++    if (!ufd_version_check(ufd, mis)) {
+         goto out;
+     }
+ 
+@@ -523,7 +523,7 @@ int postcopy_ram_enable_notify(MigrationIncomingState *mis)
+      * Although the host check already tested the API, we need to
+      * do the check again as an ABI handshake on the new fd.
+      */
+-    if (!ufd_version_check(mis->userfault_fd)) {
++    if (!ufd_version_check(mis->userfault_fd, mis)) {
+         return -1;
+     }
+ 
+@@ -661,7 +661,7 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
+ 
+ #else
+ /* No target OS support, stubs just fail */
+-bool postcopy_ram_supported_by_host(void)
++bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+ {
+     error_report("%s: No OS support", __func__);
+     return false;
+diff --git a/migration/postcopy-ram.h b/migration/postcopy-ram.h
+index 52d51e8007..587a8b86a7 100644
+--- a/migration/postcopy-ram.h
++++ b/migration/postcopy-ram.h
+@@ -14,7 +14,7 @@
+ #define QEMU_POSTCOPY_RAM_H
+ 
+ /* Return true if the host supports everything we need to do postcopy-ram */
+-bool postcopy_ram_supported_by_host(void);
++bool postcopy_ram_supported_by_host(MigrationIncomingState *mis);
  
  /*
-diff --git a/migration/migration.h b/migration/migration.h
-index b7437f16ce..3060cbc374 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -175,6 +175,7 @@ bool migrate_zero_blocks(void);
+  * Make all of RAM sensitive to accesses to areas that haven't yet been written
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 7a55023d1a..6ed6d5765a 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -1352,7 +1352,7 @@ static int loadvm_postcopy_handle_advise(MigrationIncomingState *mis)
+         return -1;
+     }
  
- bool migrate_auto_converge(void);
- bool migrate_use_multifd(void);
-+int migrate_multifd_channels(void);
- 
- int migrate_use_xbzrle(void);
- int64_t migrate_xbzrle_cache_size(void);
-diff --git a/qapi/migration.json b/qapi/migration.json
-index ec4a88a43a..c766fb1e52 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -466,13 +466,19 @@
- # 	migrated and the destination must already have access to the
- # 	same backing chain as was used on the source.  (since 2.10)
- #
-+# @x-multifd-channels: Number of channels used to migrate data in
-+#                     parallel. This is the same number that the
-+#                     number of sockets used for migration.  The
-+#                     default value is 2 (since 2.11)
-+#
- # Since: 2.4
- ##
- { 'enum': 'MigrationParameter',
-   'data': ['compress-level', 'compress-threads', 'decompress-threads',
-            'cpu-throttle-initial', 'cpu-throttle-increment',
-            'tls-creds', 'tls-hostname', 'max-bandwidth',
--           'downtime-limit', 'x-checkpoint-delay', 'block-incremental' ] }
-+           'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
-+           'x-multifd-channels'] }
- 
- ##
- # @MigrateSetParameters:
-@@ -528,6 +534,11 @@
- # 	migrated and the destination must already have access to the
- # 	same backing chain as was used on the source.  (since 2.10)
- #
-+# @x-multifd-channels: Number of channels used to migrate data in
-+#                     parallel. This is the same number that the
-+#                     number of sockets used for migration.  The
-+#                     default value is 2 (since 2.11)
-+#
- # Since: 2.4
- ##
- # TODO either fuse back into MigrationParameters, or make
-@@ -543,7 +554,8 @@
-             '*max-bandwidth': 'int',
-             '*downtime-limit': 'int',
-             '*x-checkpoint-delay': 'int',
--            '*block-incremental': 'bool' } }
-+            '*block-incremental': 'bool',
-+            '*x-multifd-channels': 'int' } }
- 
- ##
- # @migrate-set-parameters:
-@@ -614,6 +626,11 @@
- # 	migrated and the destination must already have access to the
- # 	same backing chain as was used on the source.  (since 2.10)
- #
-+# @x-multifd-channels: Number of channels used to migrate data in
-+#                     parallel. This is the same number that the
-+#                     number of sockets used for migration.
-+#                     The default value is 2 (since 2.11)
-+#
- # Since: 2.4
- ##
- { 'struct': 'MigrationParameters',
-@@ -627,7 +644,8 @@
-             '*max-bandwidth': 'int',
-             '*downtime-limit': 'int',
-             '*x-checkpoint-delay': 'int',
--            '*block-incremental': 'bool' } }
-+            '*block-incremental': 'bool' ,
-+            '*x-multifd-channels': 'int' } }
- 
- ##
- # @query-migrate-parameters:
+-    if (!postcopy_ram_supported_by_host()) {
++    if (!postcopy_ram_supported_by_host(mis)) {
+         postcopy_state_set(POSTCOPY_INCOMING_NONE);
+         return -1;
+     }
 -- 
 2.13.5
