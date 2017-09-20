@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43403)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44157)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duhQd-00005c-Oa
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:00:50 -0400
+	(envelope-from <tgolembi@redhat.com>) id 1duhRD-0000dx-3G
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:01:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duhQX-0007BA-C6
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:00:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:28270)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duhQX-00078y-5x
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:00:41 -0400
-Date: Wed, 20 Sep 2017 18:00:32 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170920180032.567c49a7.cohuck@redhat.com>
-In-Reply-To: <20170920155739.GI2449@work-vm>
-References: <20170919180038.26056-1-dgilbert@redhat.com>
-	<20170919180038.26056-6-dgilbert@redhat.com>
-	<20170920163059.2ddd456c.cohuck@redhat.com>
-	<20170920155739.GI2449@work-vm>
+	(envelope-from <tgolembi@redhat.com>) id 1duhR9-0008NH-2l
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:01:23 -0400
+Received: from mail-wr0-f181.google.com ([209.85.128.181]:55002)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1duhR8-0008LL-St
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 12:01:19 -0400
+Received: by mail-wr0-f181.google.com with SMTP id g29so2557178wrg.11
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 09:01:18 -0700 (PDT)
+Date: Wed, 20 Sep 2017 18:01:13 +0200
+From: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>
+Message-ID: <20170920180113.73b76041@fiorina>
+In-Reply-To: <0bc0c49663fafdf3b03844fe048cac3216d88c5b.1505922364.git.tgolembi@redhat.com>
+References: <0bc0c49663fafdf3b03844fe048cac3216d88c5b.1505922364.git.tgolembi@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/5] migration: Route more error paths
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio_balloon: include buffers and
+ chached memory statistics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,58 +29,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, quintela@redhat.com, peterx@redhat.com, peter.maydell@linaro.org, rth@twiddle.net
+To: linux-mm@kvack.org, virtio-dev@lists.oasis-open.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Cc: Wei Wang <wei.w.wang@intel.com>, Shaohua Li <shli@fb.com>, Huang Ying <ying.huang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
 
-On Wed, 20 Sep 2017 16:57:39 +0100
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+On Wed, 20 Sep 2017 17:48:36 +0200
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com> wrote:
 
-> * Cornelia Huck (cohuck@redhat.com) wrote:
-> > On Tue, 19 Sep 2017 19:00:38 +0100
-> > "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com> wrote:
-> >   
-> > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-> > > 
-> > > vmstate_save is called in a few places, and vmstate_save_state is
-> > > called in lots of places.
-> > > 
-> > > Route error returns from the easier cases back up;  there are lots
-> > > of more complex cases where there own error paths need fixing.
-> > > 
-> > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> > > ---
-> > >  hw/display/virtio-gpu.c    |  4 +---
-> > >  hw/virtio/virtio.c         | 13 +++++++------
-> > >  include/hw/virtio/virtio.h |  2 +-
-> > >  migration/vmstate-types.c  | 11 ++++++++---
-> > >  tests/test-vmstate.c       |  6 +++---
-> > >  5 files changed, 20 insertions(+), 16 deletions(-)
-> > >   
-> >   
-> > > diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-> > > index 464947f76d..860333788b 100644
-> > > --- a/hw/virtio/virtio.c
-> > > +++ b/hw/virtio/virtio.c
-> > > @@ -1899,7 +1899,7 @@ static const VMStateDescription vmstate_virtio = {
-> > >      }
-> > >  };
-> > >  
-> > > -void virtio_save(VirtIODevice *vdev, QEMUFile *f)
-> > > +int virtio_save(VirtIODevice *vdev, QEMUFile *f)
-> > >  {
-> > >      BusState *qbus = qdev_get_parent_bus(DEVICE(vdev));
-> > >      VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);  
-> > 
-> > Would it make sense to touch up the save_config callback as well? Else
-> > virtio_save() looks a bit lopsided.
-> > 
-> > [For virtio-ccw, the callback can simply pass on any return code from
-> > vmstate_save_state(). For virtio-pci, we can probably make
-> > pci_device_save() restore the interrupt state in any case.]  
-> 
-> What I'd really love to do with save_config is turn it into a
-> VMStateDescription* - I think I've figured out how to
-> do that for ccw and mmio - but the pci version is a much harder
-> mess of casts and stuff.
+> Add a new fields, VIRTIO_BALLOON_S_BUFFERS and VIRTIO_BALLOON_S_CACHED,
+> to virtio_balloon memory statistics protocol. The values correspond to
+> 'Buffers' and 'Cached' in /proc/meminfo.
+>=20
+> To be able to compute the value of 'Cached' memory it is necessary to
+> export total_swapcache_pages() to modules.
+>=20
+> Signed-off-by: Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
+> ---
+>  drivers/virtio/virtio_balloon.c     | 11 +++++++++++
+>  include/uapi/linux/virtio_balloon.h |  4 +++-
+>  mm/swap_state.c                     |  1 +
+>  3 files changed, 15 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/virtio/virtio_balloon.c b/drivers/virtio/virtio_ball=
+oon.c
+> index f0b3a0b9d42f..c2558ec47a62 100644
+> --- a/drivers/virtio/virtio_balloon.c
+> +++ b/drivers/virtio/virtio_balloon.c
+> @@ -244,12 +244,19 @@ static unsigned int update_balloon_stats(struct vir=
+tio_balloon *vb)
+>  	struct sysinfo i;
+>  	unsigned int idx =3D 0;
+>  	long available;
+> +	long cached;
+> =20
+>  	all_vm_events(events);
+>  	si_meminfo(&i);
+> =20
+>  	available =3D si_mem_available();
+> =20
+> +	cached =3D global_node_page_state(NR_FILE_PAGES) -
+> +			total_swapcache_pages() - i.bufferram;
+> +	if (cached < 0)
+> +		cached =3D 0;
+> +
+> +
+>  #ifdef CONFIG_VM_EVENT_COUNTERS
+>  	update_stat(vb, idx++, VIRTIO_BALLOON_S_SWAP_IN,
+>  				pages_to_bytes(events[PSWPIN]));
+> @@ -264,6 +271,10 @@ static unsigned int update_balloon_stats(struct virt=
+io_balloon *vb)
+>  				pages_to_bytes(i.totalram));
+>  	update_stat(vb, idx++, VIRTIO_BALLOON_S_AVAIL,
+>  				pages_to_bytes(available));
+> +	update_stat(vb, idx++, VIRTIO_BALLOON_S_BUFFERS,
+> +				pages_to_bytes(i.bufferram));
+> +	update_stat(vb, idx++, VIRTIO_BALLOON_S_CACHED,
+> +				pages_to_bytes(cached));
+> =20
+>  	return idx;
+>  }
+> diff --git a/include/uapi/linux/virtio_balloon.h b/include/uapi/linux/vir=
+tio_balloon.h
+> index 343d7ddefe04..119224c34389 100644
+> --- a/include/uapi/linux/virtio_balloon.h
+> +++ b/include/uapi/linux/virtio_balloon.h
+> @@ -52,7 +52,9 @@ struct virtio_balloon_config {
+>  #define VIRTIO_BALLOON_S_MEMFREE  4   /* Total amount of free memory */
+>  #define VIRTIO_BALLOON_S_MEMTOT   5   /* Total amount of memory */
+>  #define VIRTIO_BALLOON_S_AVAIL    6   /* Available memory as in /proc */
+> -#define VIRTIO_BALLOON_S_NR       7
+> +#define VIRTIO_BALLOON_S_BUFFERS  7   /* Bufferes memory as in /proc */
 
-Sounds even better, but even more complicated as well...
+I've just noticed I have a typo in the comment: 'Bufferes' should be
+'Buffers'.
+
+> +#define VIRTIO_BALLOON_S_CACHED   8   /* Cached memory as in /proc */
+> +#define VIRTIO_BALLOON_S_NR       9
+> =20
+>  /*
+>   * Memory statistics structure.
+> diff --git a/mm/swap_state.c b/mm/swap_state.c
+> index 71ce2d1ccbf7..f3a4ff7d6c52 100644
+> --- a/mm/swap_state.c
+> +++ b/mm/swap_state.c
+> @@ -95,6 +95,7 @@ unsigned long total_swapcache_pages(void)
+>  	rcu_read_unlock();
+>  	return ret;
+>  }
+> +EXPORT_SYMBOL_GPL(total_swapcache_pages);
+> =20
+>  static atomic_t swapin_readahead_hits =3D ATOMIC_INIT(4);
+> =20
+> --=20
+> 2.14.1
+>=20
+
+
+--=20
+Tom=C3=A1=C5=A1 Golembiovsk=C3=BD <tgolembi@redhat.com>
