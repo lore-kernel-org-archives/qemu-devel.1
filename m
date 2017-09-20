@@ -1,27 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44664)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44702)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1duerD-0002Zg-2k
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:07 -0400
+	(envelope-from <thuth@redhat.com>) id 1duerF-0002c8-80
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:11 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1duerA-0000s7-VM
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:5976)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1duerA-0000rY-Oc
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:00 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 99CF77E442
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 10:46:50 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 20 Sep 2017 12:46:26 +0200
-Message-Id: <20170920104639.2335-4-quintela@redhat.com>
-In-Reply-To: <20170920104639.2335-1-quintela@redhat.com>
-References: <20170920104639.2335-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PULL 03/16] migration: Add comments to channel
- functions
+	(envelope-from <thuth@redhat.com>) id 1duer9-0000r3-3w
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:05 -0400
+References: <1495613046-6430-1-git-send-email-thuth@redhat.com>
+	<5e647277-d688-071d-7def-bd8d57dd7e66@redhat.com>
+	<deb2e9b4-686d-1a5a-0aba-0c404183ae9a@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <6518e022-d9ef-5cf6-625b-9cbd7c106d2e@redhat.com>
+Date: Wed, 20 Sep 2017 13:57:21 +0200
+MIME-Version: 1.0
+In-Reply-To: <deb2e9b4-686d-1a5a-0aba-0c404183ae9a@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] net: Mark the 'hubport' netdev as
+ deprecated
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,47 +26,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
 
-Signed-off-by: Juan Quintela <quintela@redhat.com>
-Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
----
- migration/channel.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+On 20.09.2017 13:07, Paolo Bonzini wrote:
+> On 20/09/2017 09:45, Thomas Huth wrote:
+>> On 24.05.2017 10:04, Thomas Huth wrote:
+>>> The 'hubport' netdev is closely tied to the 'vlan' concept which
+>>> has been marked as deprecated in commit a2dbe1356faff3cb6 already.
+>>> Thus we should also mark the hubport netdevs as deprecated to make
+>>> the remaining users aware that they should not use this anymore.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>=20
+> What is the replacement for VLANs?
+>=20
+> The point of hub/hubport was to implement this without needing
+> special-casing of VLANs everywhere in the net/ directory.  VLANs remain
+> messy in terms of command-line expression for -net, but that's where th=
+e
+> problems end.
 
-diff --git a/migration/channel.c b/migration/channel.c
-index edceebdb7b..70ec7ea3b7 100644
---- a/migration/channel.c
-+++ b/migration/channel.c
-@@ -19,6 +19,14 @@
- #include "qapi/error.h"
- #include "io/channel-tls.h"
- 
-+/**
-+ * @migration_channel_process_incoming - Create new incoming migration channel
-+ *
-+ * Notice that TLS is special.  For it we listen in a listener socket,
-+ * and then create a new client socket from the TLS library.
-+ *
-+ * @ioc: Channel to which we are connecting
-+ */
- void migration_channel_process_incoming(QIOChannel *ioc)
- {
-     MigrationState *s = migrate_get_current();
-@@ -41,6 +49,13 @@ void migration_channel_process_incoming(QIOChannel *ioc)
- }
- 
- 
-+/**
-+ * @migration_channel_connect - Create new outgoing migration channel
-+ *
-+ * @s: Current migration state
-+ * @ioc: Channel to which we are connecting
-+ * @hostname: Where we want to connect
-+ */
- void migration_channel_connect(MigrationState *s,
-                                QIOChannel *ioc,
-                                const char *hostname)
--- 
-2.13.5
+The QEMU "VLAN"s are a complete PITA for the users, they are causing
+confusion (e.g. https://bugs.launchpad.net/qemu/+bug/658904) and
+mis-configurations (see e.g.
+http://lists.gnu.org/archive/html/qemu-discuss/2017-08/msg00031.html).
+So I hope you agree that we should get rid of this "vlan" stuff in QEMU
+(no matter whether we continue to provide some kind of "hub" or "switch"
+instead or completely remove it).
+
+> In fact, while there are some uses of VLANs that have been replaced by
+> filters, VLANs are still needed to place 2 NICs to be on the same guest
+> network without using a host bridge.  This should be a supported use
+> case for e.g. L2TP backends, and it can be important for users that
+> don't have the ability to configure a host bridge.
+
+I don't think that anybody really wants to connect two NICs of one
+machine to a *hub* - all the network traffic of one NIC will go to the
+other, too! That might only make sense if you want to do some basic
+network driver tests in your guest, but for every normal OS, this is
+nonsense. You normally are also not doing this with real hardware (note
+that we're talking about hubs, not switches!).
+
+> Rather than deprecating hubport, we need a mechanism to define a hubpor=
+t
+> for the back-end side.  For example:
+>=20
+>    -netdev l2tp,...,id=3Dl2tp-backend
+>    -netdev hubport,hubid=3D0,netdev=3Dl2tp-backend,id=3Dl2tp-hub
+>    -netdev hubport,hubid=3D0,id=3Dnic0 -device virtio-net-pci,netdev=3D=
+nic0
+>    -netdev hubport,hubid=3D0,id=3Dnic1 -device virtio-net-pci,netdev=3D=
+nic1
+>=20
+> This would normalize the topology
+>=20
+>    NIC      NIC      L2TP
+>     |        |        |
+>    hubport  hubport   |
+>     |        |        |
+>     '--------'--------'-------- hub
+>=20
+> to
+>=20
+>    NIC      NIC      L2TP
+>     |        |        |
+>    hubport  hubport  hubport
+>     |        |        |
+>     '--------'--------'-------- hub
+>=20
+> and would let us drop vlan from the command-line options.  Even
+> immediately in 2.11.
+
+While that looks at least way more logical than the "vlan" parameter, I
+really doubt that we need a *hub* within QEMU. Emulating a switch might
+make at least a little bit more sense ... but still, do we really need
+this? Do you have any real world example where somebody is using QEMU
+for a configuration like this?
+
+ Thomas
+
+
+PS: Or are you just afraid that we might finally get rid of the short
+"-net nic -net tap" syntax, which is way easier to type than its -netdev
+equivalent? Well, I'd say that's a different topic, and we should come
+up with a new convenience option instead before we remove the old one.
