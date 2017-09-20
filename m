@@ -1,39 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34362)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37535)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1duZjn-00048K-6Y
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:48:04 -0400
+	(envelope-from <marcel@redhat.com>) id 1duZmo-00052P-8C
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:51:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1duZjj-0007qc-2p
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:48:03 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42160)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1duZji-0007mM-Pc
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:47:59 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8K7i89m039729
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 03:47:57 -0400
-Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3cmrgvyr-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 03:47:57 -0400
-Received: from localhost
-	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Wed, 20 Sep 2017 01:47:56 -0600
-Date: Wed, 20 Sep 2017 15:47:51 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170919182745.90280-1-pasic@linux.vnet.ibm.com>
-	<20170919182745.90280-5-pasic@linux.vnet.ibm.com>
+	(envelope-from <marcel@redhat.com>) id 1duZmj-0003r4-Qe
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:51:10 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33832)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1duZmj-0003nk-F7
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:51:05 -0400
+References: <1505811353-29151-1-git-send-email-thuth@redhat.com>
+From: Marcel Apfelbaum <marcel@redhat.com>
+Message-ID: <84d1e5a0-141f-cd91-f62c-14fe58e73b4b@redhat.com>
+Date: Wed, 20 Sep 2017 10:50:55 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170919182745.90280-5-pasic@linux.vnet.ibm.com>
-Message-Id: <20170920074751.GI11080@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 4/5] 390x/css: introduce maximum data
- address checking
+In-Reply-To: <1505811353-29151-1-git-send-email-thuth@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [RFC PATCH] qdev: Mark devices as non-hotpluggable
+ by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,81 +28,163 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-19 20:27:44 +0200]:
+Hi Thomas,
 
-> The architecture mandates the addresses to be  accessed on the first
-> indirection level (that is, the data addresses without IDA, and the
-> (M)IDAW addresses with (M)IDA) to be checked against an CCW format
-> dependent limit maximum address.  If a violation is detected, the storage
-> access is not to be performed and a channel program check needs to be
-> generated. As of today, we fail to do this check.
+On 19/09/2017 11:55, Thomas Huth wrote:
+> Historically we've marked all devices as hotpluggable by default. However,
+> most devices are not hotpluggable, and you also need a HotplugHandler to
+> support these devices. So if the user tries to "device_add" or "device_del"
+> such a non-hotpluggable device during runtime, either nothing really usable
+> happens, or QEMU even crashes/aborts unexpectedly (see for example commit
+> 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
+> So let's change this dangerous default behaviour and mark the devices as
+> non-hotpluggable by default. Certain parent devices classes which are known
+> as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
+> so that devices that are derived from these classes continue to work as
+> expected.
 > 
-> Let us stick even closer to the architecture specification.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/s390x/css.c         | 10 ++++++++++
->  include/hw/s390x/css.h |  1 +
->  2 files changed, 11 insertions(+)
+>   Note: I've marked the patch as RFC since I'm not 100% sure whether I've
+>   correctly identified all devices that should still be marked as hot-
+>   pluggable. Feedback is welcome!
 > 
-> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 6b0cd8861b..2d37a9ddde 100644
-> --- a/hw/s390x/css.c
-> +++ b/hw/s390x/css.c
-> @@ -795,6 +795,11 @@ static inline int cds_check_len(CcwDataStream *cds, int len)
->      return cds->flags & CDS_F_STREAM_BROKEN ? -EINVAL : len;
->  }
+>   hw/core/qdev.c        | 10 ++++------
+>   hw/cpu/core.c         |  1 +
+>   hw/mem/nvdimm.c       |  3 +++
+>   hw/mem/pc-dimm.c      |  1 +
+>   hw/pci/pci.c          |  1 +
+>   hw/s390x/ccw-device.c |  1 +
+>   hw/scsi/scsi-bus.c    |  1 +
+>   hw/usb/bus.c          |  1 +
+>   8 files changed, 13 insertions(+), 6 deletions(-)
 > 
-> +static inline bool cds_ccw_addrs_ok(hwaddr addr, int len, bool ccw_fmt1)
-> +{
-> +    return (addr + len) < (ccw_fmt1 ? (1UL << 31) : (1UL << 24));
-> +}
-> +
->  static int ccw_dstream_rw_noflags(CcwDataStream *cds, void *buff, int len,
->                                    CcwDataStreamOp op)
->  {
-> @@ -804,6 +809,9 @@ static int ccw_dstream_rw_noflags(CcwDataStream *cds, void *buff, int len,
->      if (ret <= 0) {
->          return ret;
->      }
-> +    if (!cds_ccw_addrs_ok(cds->cda, len, cds->flags & CDS_F_FMT)) {
-> +        return -EINVAL; /* channel program check */
-> +    }
->      if (op == CDS_OP_A) {
->          goto incr;
->      }
-> @@ -828,7 +836,9 @@ void ccw_dstream_init(CcwDataStream *cds, CCW1 const *ccw, ORB const *orb)
->      g_assert(!(orb->ctrl1 & ORB_CTRL1_MASK_MIDAW));
->      cds->flags = (orb->ctrl0 & ORB_CTRL0_MASK_I2K ? CDS_F_I2K : 0) |
->                   (orb->ctrl0 & ORB_CTRL0_MASK_C64 ? CDS_F_C64 : 0) |
-> +                 (orb->ctrl0 & ORB_CTRL0_MASK_FMT ? CDS_F_FMT : 0) |
-This reminds me one more question:
-Calling ccw_dsteram_init() after copy_ccw_from_guest() may lead to a
-fmt-1 @ccw with an @orb that designates fmt-0 ccw. This sounds insane.
+> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
+> index 606ab53..c4f1902 100644
+> --- a/hw/core/qdev.c
+> +++ b/hw/core/qdev.c
+> @@ -1120,13 +1120,11 @@ static void device_class_init(ObjectClass *class, void *data)
+>       dc->realize = device_realize;
+>       dc->unrealize = device_unrealize;
+>   
+> -    /* by default all devices were considered as hotpluggable,
+> -     * so with intent to check it in generic qdev_unplug() /
+> -     * device_set_realized() functions make every device
+> -     * hotpluggable. Devices that shouldn't be hotpluggable,
+> -     * should override it in their class_init()
+> +    /*
+> +     * All devices are considered as cold-pluggable by default. The devices
+> +     * that are hotpluggable should override it in their class_init().
+>        */
+> -    dc->hotpluggable = true;
+> +    dc->hotpluggable = false;
 
->                   (ccw->flags & CCW_FLAG_IDA ? CDS_F_IDA : 0);
-> +
->      cds->count = ccw->count;
->      cds->cda_orig = ccw->cda;
->      ccw_dstream_rewind(cds);
-> diff --git a/include/hw/s390x/css.h b/include/hw/s390x/css.h
-> index 078356e94c..69b374730e 100644
-> --- a/include/hw/s390x/css.h
-> +++ b/include/hw/s390x/css.h
-> @@ -87,6 +87,7 @@ typedef struct CcwDataStream {
->  #define CDS_F_MIDA  0x02
->  #define CDS_F_I2K   0x04
->  #define CDS_F_C64   0x08
-> +#define CDS_F_FMT   0x10 /* CCW format-1 */
->  #define CDS_F_STREAM_BROKEN  0x80
->      uint8_t flags;
->      uint8_t at_idaw;
-> -- 
-> 2.13.5
-> 
+I agree with the defensive mode as long as we don't
+introduce any regression...
 
--- 
-Dong Jia Shi
+By the way, in case a base class of a "family" of devices
+would set the "hotpluggable" field to true (e.g. PCI devices),
+we would still have the same problem on the specific sub-tree.
+If the sub-tree is wide enough, this patch might not have the
+intended impact. (we will still have the same bugs as the one
+you mentioned in the commit message)
+
+Thanks,
+Marcel
+
+>       dc->user_creatable = true;
+>   }
+>   
+> diff --git a/hw/cpu/core.c b/hw/cpu/core.c
+> index bd578ab..01660aa 100644
+> --- a/hw/cpu/core.c
+> +++ b/hw/cpu/core.c
+> @@ -82,6 +82,7 @@ static void cpu_core_class_init(ObjectClass *oc, void *data)
+>       DeviceClass *dc = DEVICE_CLASS(oc);
+>   
+>       set_bit(DEVICE_CATEGORY_CPU, dc->categories);
+> +    dc->hotpluggable = true;
+>   }
+>   
+>   static const TypeInfo cpu_core_type_info = {
+> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
+> index 952fce5..02be9f3 100644
+> --- a/hw/mem/nvdimm.c
+> +++ b/hw/mem/nvdimm.c
+> @@ -148,9 +148,12 @@ static MemoryRegion *nvdimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
+>   
+>   static void nvdimm_class_init(ObjectClass *oc, void *data)
+>   {
+> +    DeviceClass *dc = DEVICE_CLASS(oc);
+>       PCDIMMDeviceClass *ddc = PC_DIMM_CLASS(oc);
+>       NVDIMMClass *nvc = NVDIMM_CLASS(oc);
+>   
+> +    dc->hotpluggable = true;
+> +
+>       ddc->realize = nvdimm_realize;
+>       ddc->get_memory_region = nvdimm_get_memory_region;
+>       ddc->get_vmstate_memory_region = nvdimm_get_vmstate_memory_region;
+> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> index 66eace5..1f78567 100644
+> --- a/hw/mem/pc-dimm.c
+> +++ b/hw/mem/pc-dimm.c
+> @@ -443,6 +443,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
+>       dc->unrealize = pc_dimm_unrealize;
+>       dc->props = pc_dimm_properties;
+>       dc->desc = "DIMM memory module";
+> +    dc->hotpluggable = true;
+>   
+>       ddc->get_memory_region = pc_dimm_get_memory_region;
+>       ddc->get_vmstate_memory_region = pc_dimm_get_vmstate_memory_region;
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 1e6fb88..8db380d 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -2534,6 +2534,7 @@ static void pci_device_class_init(ObjectClass *klass, void *data)
+>       k->unrealize = pci_qdev_unrealize;
+>       k->bus_type = TYPE_PCI_BUS;
+>       k->props = pci_props;
+> +    k->hotpluggable = true;
+>       pc->realize = pci_default_realize;
+>   }
+>   
+> diff --git a/hw/s390x/ccw-device.c b/hw/s390x/ccw-device.c
+> index f9bfa15..d1b6e6f 100644
+> --- a/hw/s390x/ccw-device.c
+> +++ b/hw/s390x/ccw-device.c
+> @@ -48,6 +48,7 @@ static void ccw_device_class_init(ObjectClass *klass, void *data)
+>       k->realize = ccw_device_realize;
+>       k->refill_ids = ccw_device_refill_ids;
+>       dc->props = ccw_device_properties;
+> +    dc->hotpluggable = true;
+>   }
+>   
+>   const VMStateDescription vmstate_ccw_dev = {
+> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+> index e364410..338180d 100644
+> --- a/hw/scsi/scsi-bus.c
+> +++ b/hw/scsi/scsi-bus.c
+> @@ -2123,6 +2123,7 @@ static void scsi_device_class_init(ObjectClass *klass, void *data)
+>       k->realize   = scsi_qdev_realize;
+>       k->unrealize = scsi_qdev_unrealize;
+>       k->props     = scsi_props;
+> +    k->hotpluggable = true;
+>   }
+>   
+>   static void scsi_dev_instance_init(Object *obj)
+> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
+> index d910f84..16701aa 100644
+> --- a/hw/usb/bus.c
+> +++ b/hw/usb/bus.c
+> @@ -793,6 +793,7 @@ static void usb_device_class_init(ObjectClass *klass, void *data)
+>       k->realize  = usb_qdev_realize;
+>       k->unrealize = usb_qdev_unrealize;
+>       k->props    = usb_props;
+> +    k->hotpluggable = true;
+>   }
+>   
+>   static const TypeInfo usb_device_type_info = {
+> 
