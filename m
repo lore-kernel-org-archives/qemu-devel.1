@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35167)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1duezg-00011z-Rw
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:26:05 -0400
+	(envelope-from <kraxel@redhat.com>) id 1duf0l-0001vq-5u
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:26:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dueyc-0001Is-6G
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:24:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43696)
+	(envelope-from <kraxel@redhat.com>) id 1duezk-0002mc-9v
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:25:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60198)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dueyU-00017V-8r
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:23:40 -0400
-References: <1505811353-29151-1-git-send-email-thuth@redhat.com>
-	<84d1e5a0-141f-cd91-f62c-14fe58e73b4b@redhat.com>
-	<CAFEAcA_morPirUBzbpX1tHKfSCX+vAEcWX+KmUZKdnNm3O3vhA@mail.gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <54a1ab1c-4da0-ded1-c225-f50d4756b773@redhat.com>
-Date: Wed, 20 Sep 2017 13:57:16 +0300
-MIME-Version: 1.0
-In-Reply-To: <CAFEAcA_morPirUBzbpX1tHKfSCX+vAEcWX+KmUZKdnNm3O3vhA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] qdev: Mark devices as non-hotpluggable
- by default
+	(Exim 4.71) (envelope-from <kraxel@redhat.com>) id 1duezj-0002ky-FN
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:24:51 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D9B1B20276
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 13:24:49 +0000 (UTC)
+Message-ID: <1505913885.24609.8.camel@redhat.com>
+From: Gerd Hoffmann <kraxel@redhat.com>
+Date: Wed, 20 Sep 2017 15:24:45 +0200
+Content-Type: multipart/mixed; boundary="=-6NKt/tPpHnhKoOIYRKUR"
+Mime-Version: 1.0
+Subject: [Qemu-devel] kvm_set_phys_mem: assertion failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,85 +29,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: david@redhat.com, pbonzini@redhat.com
 
-On 20/09/2017 13:07, Peter Maydell wrote:
-> On 20 September 2017 at 08:50, Marcel Apfelbaum <marcel@redhat.com> wrote:
->> Hi Thomas,
->>
->>
->> On 19/09/2017 11:55, Thomas Huth wrote:
->>>
->>> Historically we've marked all devices as hotpluggable by default. However,
->>> most devices are not hotpluggable, and you also need a HotplugHandler to
->>> support these devices. So if the user tries to "device_add" or
->>> "device_del"
->>> such a non-hotpluggable device during runtime, either nothing really
->>> usable
->>> happens, or QEMU even crashes/aborts unexpectedly (see for example commit
->>> 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
->>> So let's change this dangerous default behaviour and mark the devices as
->>> non-hotpluggable by default. Certain parent devices classes which are
->>> known
->>> as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable =
->>> true",
->>> so that devices that are derived from these classes continue to work as
->>> expected.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>    Note: I've marked the patch as RFC since I'm not 100% sure whether I've
->>>    correctly identified all devices that should still be marked as hot-
->>>    pluggable. Feedback is welcome!
->>>
->>>    hw/core/qdev.c        | 10 ++++------
->>>    hw/cpu/core.c         |  1 +
->>>    hw/mem/nvdimm.c       |  3 +++
->>>    hw/mem/pc-dimm.c      |  1 +
->>>    hw/pci/pci.c          |  1 +
->>>    hw/s390x/ccw-device.c |  1 +
->>>    hw/scsi/scsi-bus.c    |  1 +
->>>    hw/usb/bus.c          |  1 +
->>>    8 files changed, 13 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
->>> index 606ab53..c4f1902 100644
->>> --- a/hw/core/qdev.c
->>> +++ b/hw/core/qdev.c
->>> @@ -1120,13 +1120,11 @@ static void device_class_init(ObjectClass *class,
->>> void *data)
->>>        dc->realize = device_realize;
->>>        dc->unrealize = device_unrealize;
->>>    -    /* by default all devices were considered as hotpluggable,
->>> -     * so with intent to check it in generic qdev_unplug() /
->>> -     * device_set_realized() functions make every device
->>> -     * hotpluggable. Devices that shouldn't be hotpluggable,
->>> -     * should override it in their class_init()
->>> +    /*
->>> +     * All devices are considered as cold-pluggable by default. The
->>> devices
->>> +     * that are hotpluggable should override it in their class_init().
->>>         */
->>> -    dc->hotpluggable = true;
->>> +    dc->hotpluggable = false;
->>
->>
->> I agree with the defensive mode as long as we don't
->> introduce any regression...
-> 
-> Is it possible to hack together some kind of test code that
-> can give us a list of the devices compiled in that have
-> hotpluggable enabled? Then we could compare before and
-> after to see which devices we've changed.
-> 
 
-Eduardo came up with some cool automated tests not long ago.
-Eduardo, can your tests help?
+--=-6NKt/tPpHnhKoOIYRKUR
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Marcel
+  Hi,
 
-> thanks
-> -- PMM
-> 
+git master crashes:
+
+ERROR:/home/kraxel/projects/qemu/accel/kvm/kvm-
+all.c:756:kvm_set_phys_mem: assertion failed:
+(!memory_region_is_ram(mr) && !writeable && !mr->romd_mode)
+
+bisect blames:
+
+commit f357f564be0bd45245b3ccfbbe20ace08fe83ca8
+Author: David Hildenbrand <david@redhat.com>
+Date:=C2=A0=C2=A0=C2=A0Mon Sep 11 19:49:31 2017 +0200
+
+=C2=A0=C2=A0=C2=A0=C2=A0kvm: we never have overlapping slots in kvm_set_p=
+hys_mem()
+
+libvirt config attached.
+
+cheers,
+  Gerd
+
+--=-6NKt/tPpHnhKoOIYRKUR
+Content-Type: application/xml; name="fedora-org-drm-qxl-base.xml"
+Content-Disposition: attachment; filename="fedora-org-drm-qxl-base.xml"
+Content-Transfer-Encoding: base64
+
+PGRvbWFpbiB0eXBlPSdrdm0nIHhtbG5zOnFlbXU9J2h0dHA6Ly9saWJ2aXJ0Lm9yZy9zY2hlbWFz
+L2RvbWFpbi9xZW11LzEuMCc+CiAgPG5hbWU+ZmVkb3JhLW9yZy1kcm0tcXhsLWJhc2U8L25hbWU+
+CiAgPHV1aWQ+Nzk1NTk1ZTYtY2M5Yi00NmI4LThhMTQtZmQ3OTZjMTk0M2UyPC91dWlkPgogIDxt
+ZW1vcnkgdW5pdD0nS2lCJz40MTk0MzA0PC9tZW1vcnk+CiAgPGN1cnJlbnRNZW1vcnkgdW5pdD0n
+S2lCJz40MTk0MzA0PC9jdXJyZW50TWVtb3J5PgogIDx2Y3B1IHBsYWNlbWVudD0nc3RhdGljJz4y
+PC92Y3B1PgogIDxvcz4KICAgIDx0eXBlIGFyY2g9J3g4Nl82NCcgbWFjaGluZT0ncGMtcTM1LTIu
+OSc+aHZtPC90eXBlPgogICAgPGxvYWRlciByZWFkb25seT0neWVzJyB0eXBlPSdwZmxhc2gnPi91
+c3Ivc2hhcmUvZWRrMi5naXQvb3ZtZi14NjQvT1ZNRl9DT0RFLXB1cmUtZWZpLmZkPC9sb2FkZXI+
+CiAgICA8bnZyYW0gdGVtcGxhdGU9Jy91c3Ivc2hhcmUvZWRrMi5naXQvb3ZtZi14NjQvT1ZNRl9W
+QVJTLXB1cmUtZWZpLmZkJz4vdmFyL2xpYi9saWJ2aXJ0L3FlbXUvbnZyYW0vZmVkb3JhLW9yZy1k
+cm0tcXhsLWJhc2VfVkFSUy5mZDwvbnZyYW0+CiAgICA8Ym9vdG1lbnUgZW5hYmxlPSd5ZXMnLz4K
+ICA8L29zPgogIDxmZWF0dXJlcz4KICAgIDxhY3BpLz4KICAgIDxhcGljLz4KICAgIDx2bXBvcnQg
+c3RhdGU9J29mZicvPgogIDwvZmVhdHVyZXM+CiAgPGNwdSBtb2RlPSdjdXN0b20nIG1hdGNoPSdl
+eGFjdCcgY2hlY2s9J3BhcnRpYWwnPgogICAgPG1vZGVsIGZhbGxiYWNrPSdhbGxvdyc+U2t5bGFr
+ZS1DbGllbnQ8L21vZGVsPgogIDwvY3B1PgogIDxjbG9jayBvZmZzZXQ9J3V0Yyc+CiAgICA8dGlt
+ZXIgbmFtZT0ncnRjJyB0aWNrcG9saWN5PSdjYXRjaHVwJy8+CiAgICA8dGltZXIgbmFtZT0ncGl0
+JyB0aWNrcG9saWN5PSdkZWxheScvPgogICAgPHRpbWVyIG5hbWU9J2hwZXQnIHByZXNlbnQ9J25v
+Jy8+CiAgPC9jbG9jaz4KICA8b25fcG93ZXJvZmY+ZGVzdHJveTwvb25fcG93ZXJvZmY+CiAgPG9u
+X3JlYm9vdD5yZXN0YXJ0PC9vbl9yZWJvb3Q+CiAgPG9uX2NyYXNoPmRlc3Ryb3k8L29uX2NyYXNo
+PgogIDxwbT4KICAgIDxzdXNwZW5kLXRvLW1lbSBlbmFibGVkPSdubycvPgogICAgPHN1c3BlbmQt
+dG8tZGlzayBlbmFibGVkPSdubycvPgogIDwvcG0+CiAgPGRldmljZXM+CiAgICA8ZW11bGF0b3I+
+L2hvbWUva3JheGVsL2Jpbi9xZW11LWRlZmF1bHQ8L2VtdWxhdG9yPgogICAgPGRpc2sgdHlwZT0n
+YmxvY2snIGRldmljZT0nZGlzayc+CiAgICAgIDxkcml2ZXIgbmFtZT0ncWVtdScgdHlwZT0ncmF3
+JyBjYWNoZT0nbm9uZScgaW89J25hdGl2ZScgZGlzY2FyZD0ndW5tYXAnLz4KICAgICAgPHNvdXJj
+ZSBkZXY9Jy9kZXYvaGRkL2d1ZXN0LWZlZG9yYScvPgogICAgICA8dGFyZ2V0IGRldj0nc2RhJyBi
+dXM9J3Njc2knLz4KICAgICAgPGJvb3Qgb3JkZXI9JzEnLz4KICAgICAgPGFkZHJlc3MgdHlwZT0n
+ZHJpdmUnIGNvbnRyb2xsZXI9JzAnIGJ1cz0nMCcgdGFyZ2V0PScwJyB1bml0PScwJy8+CiAgICA8
+L2Rpc2s+CiAgICA8Y29udHJvbGxlciB0eXBlPSd1c2InIGluZGV4PScwJyBtb2RlbD0ncWVtdS14
+aGNpJz4KICAgICAgPGFkZHJlc3MgdHlwZT0ncGNpJyBkb21haW49JzB4MDAwMCcgYnVzPScweDAy
+JyBzbG90PScweDAwJyBmdW5jdGlvbj0nMHgwJy8+CiAgICA8L2NvbnRyb2xsZXI+CiAgICA8Y29u
+dHJvbGxlciB0eXBlPSdzYXRhJyBpbmRleD0nMCc+CiAgICAgIDxhZGRyZXNzIHR5cGU9J3BjaScg
+ZG9tYWluPScweDAwMDAnIGJ1cz0nMHgwMCcgc2xvdD0nMHgxZicgZnVuY3Rpb249JzB4MicvPgog
+ICAgPC9jb250cm9sbGVyPgogICAgPGNvbnRyb2xsZXIgdHlwZT0ncGNpJyBpbmRleD0nMCcgbW9k
+ZWw9J3BjaWUtcm9vdCcvPgogICAgPGNvbnRyb2xsZXIgdHlwZT0ncGNpJyBpbmRleD0nMScgbW9k
+ZWw9J3BjaWUtcm9vdC1wb3J0Jz4KICAgICAgPG1vZGVsIG5hbWU9J3BjaWUtcm9vdC1wb3J0Jy8+
+CiAgICAgIDx0YXJnZXQgY2hhc3Npcz0nMScgcG9ydD0nMHgxMCcvPgogICAgICA8YWRkcmVzcyB0
+eXBlPSdwY2knIGRvbWFpbj0nMHgwMDAwJyBidXM9JzB4MDAnIHNsb3Q9JzB4MDInIGZ1bmN0aW9u
+PScweDAnIG11bHRpZnVuY3Rpb249J29uJy8+CiAgICA8L2NvbnRyb2xsZXI+CiAgICA8Y29udHJv
+bGxlciB0eXBlPSdwY2knIGluZGV4PScyJyBtb2RlbD0ncGNpZS1yb290LXBvcnQnPgogICAgICA8
+bW9kZWwgbmFtZT0ncGNpZS1yb290LXBvcnQnLz4KICAgICAgPHRhcmdldCBjaGFzc2lzPScyJyBw
+b3J0PScweDExJy8+CiAgICAgIDxhZGRyZXNzIHR5cGU9J3BjaScgZG9tYWluPScweDAwMDAnIGJ1
+cz0nMHgwMCcgc2xvdD0nMHgwMicgZnVuY3Rpb249JzB4MScvPgogICAgPC9jb250cm9sbGVyPgog
+ICAgPGNvbnRyb2xsZXIgdHlwZT0ncGNpJyBpbmRleD0nMycgbW9kZWw9J3BjaWUtcm9vdC1wb3J0
+Jz4KICAgICAgPG1vZGVsIG5hbWU9J3BjaWUtcm9vdC1wb3J0Jy8+CiAgICAgIDx0YXJnZXQgY2hh
+c3Npcz0nMycgcG9ydD0nMHgxMicvPgogICAgICA8YWRkcmVzcyB0eXBlPSdwY2knIGRvbWFpbj0n
+MHgwMDAwJyBidXM9JzB4MDAnIHNsb3Q9JzB4MDInIGZ1bmN0aW9uPScweDInLz4KICAgIDwvY29u
+dHJvbGxlcj4KICAgIDxjb250cm9sbGVyIHR5cGU9J3BjaScgaW5kZXg9JzQnIG1vZGVsPSdwY2ll
+LXJvb3QtcG9ydCc+CiAgICAgIDxtb2RlbCBuYW1lPSdwY2llLXJvb3QtcG9ydCcvPgogICAgICA8
+dGFyZ2V0IGNoYXNzaXM9JzQnIHBvcnQ9JzB4MTMnLz4KICAgICAgPGFkZHJlc3MgdHlwZT0ncGNp
+JyBkb21haW49JzB4MDAwMCcgYnVzPScweDAwJyBzbG90PScweDAyJyBmdW5jdGlvbj0nMHgzJy8+
+CiAgICA8L2NvbnRyb2xsZXI+CiAgICA8Y29udHJvbGxlciB0eXBlPSdwY2knIGluZGV4PSc1JyBt
+b2RlbD0ncGNpZS1yb290LXBvcnQnPgogICAgICA8bW9kZWwgbmFtZT0ncGNpZS1yb290LXBvcnQn
+Lz4KICAgICAgPHRhcmdldCBjaGFzc2lzPSc1JyBwb3J0PScweDE0Jy8+CiAgICAgIDxhZGRyZXNz
+IHR5cGU9J3BjaScgZG9tYWluPScweDAwMDAnIGJ1cz0nMHgwMCcgc2xvdD0nMHgwMicgZnVuY3Rp
+b249JzB4NCcvPgogICAgPC9jb250cm9sbGVyPgogICAgPGNvbnRyb2xsZXIgdHlwZT0ncGNpJyBp
+bmRleD0nNicgbW9kZWw9J3BjaWUtcm9vdC1wb3J0Jz4KICAgICAgPG1vZGVsIG5hbWU9J3BjaWUt
+cm9vdC1wb3J0Jy8+CiAgICAgIDx0YXJnZXQgY2hhc3Npcz0nNicgcG9ydD0nMHgxNScvPgogICAg
+ICA8YWRkcmVzcyB0eXBlPSdwY2knIGRvbWFpbj0nMHgwMDAwJyBidXM9JzB4MDAnIHNsb3Q9JzB4
+MDInIGZ1bmN0aW9uPScweDUnLz4KICAgIDwvY29udHJvbGxlcj4KICAgIDxjb250cm9sbGVyIHR5
+cGU9J3BjaScgaW5kZXg9JzcnIG1vZGVsPSdwY2llLXJvb3QtcG9ydCc+CiAgICAgIDxtb2RlbCBu
+YW1lPSdwY2llLXJvb3QtcG9ydCcvPgogICAgICA8dGFyZ2V0IGNoYXNzaXM9JzcnIHBvcnQ9JzB4
+MTYnLz4KICAgICAgPGFkZHJlc3MgdHlwZT0ncGNpJyBkb21haW49JzB4MDAwMCcgYnVzPScweDAw
+JyBzbG90PScweDAyJyBmdW5jdGlvbj0nMHg2Jy8+CiAgICA8L2NvbnRyb2xsZXI+CiAgICA8Y29u
+dHJvbGxlciB0eXBlPSdzY3NpJyBpbmRleD0nMCcgbW9kZWw9J3ZpcnRpby1zY3NpJz4KICAgICAg
+PGFkZHJlc3MgdHlwZT0ncGNpJyBkb21haW49JzB4MDAwMCcgYnVzPScweDAzJyBzbG90PScweDAw
+JyBmdW5jdGlvbj0nMHgwJy8+CiAgICA8L2NvbnRyb2xsZXI+CiAgICA8Y29udHJvbGxlciB0eXBl
+PSd2aXJ0aW8tc2VyaWFsJyBpbmRleD0nMCc+CiAgICAgIDxhZGRyZXNzIHR5cGU9J3BjaScgZG9t
+YWluPScweDAwMDAnIGJ1cz0nMHgwNCcgc2xvdD0nMHgwMCcgZnVuY3Rpb249JzB4MCcvPgogICAg
+PC9jb250cm9sbGVyPgogICAgPGludGVyZmFjZSB0eXBlPSduZXR3b3JrJz4KICAgICAgPG1hYyBh
+ZGRyZXNzPSc1Mjo1NDowMDoxMDo4NzpjZScvPgogICAgICA8c291cmNlIG5ldHdvcms9J2RlZmF1
+bHQnLz4KICAgICAgPG1vZGVsIHR5cGU9J3ZpcnRpbycvPgogICAgICA8Ym9vdCBvcmRlcj0nMicv
+PgogICAgICA8YWRkcmVzcyB0eXBlPSdwY2knIGRvbWFpbj0nMHgwMDAwJyBidXM9JzB4MDEnIHNs
+b3Q9JzB4MDAnIGZ1bmN0aW9uPScweDAnLz4KICAgIDwvaW50ZXJmYWNlPgogICAgPHNlcmlhbCB0
+eXBlPSdwdHknPgogICAgICA8dGFyZ2V0IHBvcnQ9JzAnLz4KICAgIDwvc2VyaWFsPgogICAgPGNv
+bnNvbGUgdHlwZT0ncHR5Jz4KICAgICAgPHRhcmdldCB0eXBlPSdzZXJpYWwnIHBvcnQ9JzAnLz4K
+ICAgIDwvY29uc29sZT4KICAgIDxjaGFubmVsIHR5cGU9J3VuaXgnPgogICAgICA8dGFyZ2V0IHR5
+cGU9J3ZpcnRpbycgbmFtZT0nb3JnLnFlbXUuZ3Vlc3RfYWdlbnQuMCcvPgogICAgICA8YWRkcmVz
+cyB0eXBlPSd2aXJ0aW8tc2VyaWFsJyBjb250cm9sbGVyPScwJyBidXM9JzAnIHBvcnQ9JzEnLz4K
+ICAgIDwvY2hhbm5lbD4KICAgIDxpbnB1dCB0eXBlPSd0YWJsZXQnIGJ1cz0ndXNiJz4KICAgICAg
+PGFkZHJlc3MgdHlwZT0ndXNiJyBidXM9JzAnIHBvcnQ9JzEnLz4KICAgIDwvaW5wdXQ+CiAgICA8
+aW5wdXQgdHlwZT0nbW91c2UnIGJ1cz0ncHMyJy8+CiAgICA8aW5wdXQgdHlwZT0na2V5Ym9hcmQn
+IGJ1cz0ncHMyJy8+CiAgICA8Z3JhcGhpY3MgdHlwZT0nc3BpY2UnIGF1dG9wb3J0PSd5ZXMnPgog
+ICAgICA8bGlzdGVuIHR5cGU9J2FkZHJlc3MnLz4KICAgICAgPGltYWdlIGNvbXByZXNzaW9uPSdv
+ZmYnLz4KICAgIDwvZ3JhcGhpY3M+CiAgICA8c291bmQgbW9kZWw9J2ljaDknPgogICAgICA8YWRk
+cmVzcyB0eXBlPSdwY2knIGRvbWFpbj0nMHgwMDAwJyBidXM9JzB4MDAnIHNsb3Q9JzB4MWInIGZ1
+bmN0aW9uPScweDAnLz4KICAgIDwvc291bmQ+CiAgICA8dmlkZW8+CiAgICAgIDxtb2RlbCB0eXBl
+PSdxeGwnIHJhbT0nNjU1MzYnIHZyYW09JzY1NTM2JyB2Z2FtZW09JzE2Mzg0JyBoZWFkcz0nMScg
+cHJpbWFyeT0neWVzJy8+CiAgICAgIDxhZGRyZXNzIHR5cGU9J3BjaScgZG9tYWluPScweDAwMDAn
+IGJ1cz0nMHgwMCcgc2xvdD0nMHgwMScgZnVuY3Rpb249JzB4MCcvPgogICAgPC92aWRlbz4KICAg
+IDxtZW1iYWxsb29uIG1vZGVsPSd2aXJ0aW8nPgogICAgICA8YWRkcmVzcyB0eXBlPSdwY2knIGRv
+bWFpbj0nMHgwMDAwJyBidXM9JzB4MDUnIHNsb3Q9JzB4MDAnIGZ1bmN0aW9uPScweDAnLz4KICAg
+IDwvbWVtYmFsbG9vbj4KICAgIDxybmcgbW9kZWw9J3ZpcnRpbyc+CiAgICAgIDxiYWNrZW5kIG1v
+ZGVsPSdyYW5kb20nPi9kZXYvdXJhbmRvbTwvYmFja2VuZD4KICAgICAgPGFkZHJlc3MgdHlwZT0n
+cGNpJyBkb21haW49JzB4MDAwMCcgYnVzPScweDA2JyBzbG90PScweDAwJyBmdW5jdGlvbj0nMHgw
+Jy8+CiAgICA8L3JuZz4KICA8L2RldmljZXM+CiAgPHFlbXU6Y29tbWFuZGxpbmU+CiAgICA8cWVt
+dTphcmcgdmFsdWU9Jy10cmFjZScvPgogICAgPHFlbXU6YXJnIHZhbHVlPSdldmVudHM9L2hvbWUv
+a3JheGVsL2xpYnZpcnQvdHJhY2UvcXhsLmV2ZW50cycvPgogICAgPHFlbXU6YXJnIHZhbHVlPSct
+c2V0Jy8+CiAgICA8cWVtdTphcmcgdmFsdWU9J2RldmljZS52aWRlbzAuZ3Vlc3RkZWJ1Zz0xJy8+
+CiAgPC9xZW11OmNvbW1hbmRsaW5lPgo8L2RvbWFpbj4KCg==
+
+
+--=-6NKt/tPpHnhKoOIYRKUR--
