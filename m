@@ -1,19 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47814)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47810)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dun7j-0000xZ-BJ
+	(envelope-from <alistai@xilinx.com>) id 1dun7j-0000xL-3B
 	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 18:05:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistai@xilinx.com>) id 1dun7i-00006t-6g
+	(envelope-from <alistai@xilinx.com>) id 1dun7h-00005l-SJ
 	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 18:05:39 -0400
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Wed, 20 Sep 2017 15:01:41 -0700
-Message-ID: <e91f214abb3ae132f66f1052b45d44105fecc5f1.1505929556.git.alistair.francis@xilinx.com>
+Date: Wed, 20 Sep 2017 15:01:37 -0700
+Message-ID: <ab4b24b35e4b73354fbe79788217d5dc947d7002.1505929556.git.alistair.francis@xilinx.com>
 In-Reply-To: <cover.1505929556.git.alistair.francis@xilinx.com>
 References: <cover.1505929556.git.alistair.francis@xilinx.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v3 3/8] aarch64-softmmu.mak: Use an ARM
- specific config
+Subject: [Qemu-devel] [PATCH v3 2/8] xlnx-zynqmp-pmu: Add the CPU and memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,63 +24,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org, edgar.iglesias@xilinx.com, edgar.iglesias@gmail.com
 Cc: alistair.francis@xilinx.com, alistair23@gmail.com, qemu-arm@nongnu.org
 
-In preperation for having an ARM and MicroBlaze ZynqMP machine let's
-split out the current ARM specific config options.
+Connect the MicroBlaze CPU and the ROM and RAM memory regions.
 
 Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
-Acked-by: Peter Maydell <peter.maydell@linaro.org>
 ---
+V2:
+ - Fix the pmu-cpu name
+ - Use err and errp for CPU realise instead of error_fatal
 
- default-configs/aarch64-softmmu.mak | 1 +
- hw/arm/Makefile.objs                | 2 +-
- hw/display/Makefile.objs            | 2 +-
- hw/dma/Makefile.objs                | 2 +-
- 4 files changed, 4 insertions(+), 3 deletions(-)
+ hw/microblaze/xlnx-zynqmp-pmu.c | 70 +++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 68 insertions(+), 2 deletions(-)
 
-diff --git a/default-configs/aarch64-softmmu.mak b/default-configs/aarch64-softmmu.mak
-index 24494832cf..9ddccf855e 100644
---- a/default-configs/aarch64-softmmu.mak
-+++ b/default-configs/aarch64-softmmu.mak
-@@ -7,3 +7,4 @@ CONFIG_AUX=y
- CONFIG_DDC=y
- CONFIG_DPCD=y
- CONFIG_XLNX_ZYNQMP=y
-+CONFIG_XLNX_ZYNQMP_ARM=y
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index 5ee6f7da5b..01138b05f5 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -13,7 +13,7 @@ obj-y += omap1.o omap2.o strongarm.o
- obj-$(CONFIG_ALLWINNER_A10) += allwinner-a10.o cubieboard.o
- obj-$(CONFIG_RASPI) += bcm2835_peripherals.o bcm2836.o raspi.o
- obj-$(CONFIG_STM32F205_SOC) += stm32f205_soc.o
--obj-$(CONFIG_XLNX_ZYNQMP) += xlnx-zynqmp.o xlnx-zcu102.o
-+obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx-zynqmp.o xlnx-zcu102.o
- obj-$(CONFIG_FSL_IMX25) += fsl-imx25.o imx25_pdk.o
- obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
- obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
-diff --git a/hw/display/Makefile.objs b/hw/display/Makefile.objs
-index 551c050a6a..d3a4cb396e 100644
---- a/hw/display/Makefile.objs
-+++ b/hw/display/Makefile.objs
-@@ -40,4 +40,4 @@ virtio-gpu.o-libs += $(VIRGL_LIBS)
- virtio-gpu-3d.o-cflags := $(VIRGL_CFLAGS)
- virtio-gpu-3d.o-libs += $(VIRGL_LIBS)
- obj-$(CONFIG_DPCD) += dpcd.o
--obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dp.o
-+obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dp.o
-diff --git a/hw/dma/Makefile.objs b/hw/dma/Makefile.objs
-index 087c8e6855..be98d5d3d8 100644
---- a/hw/dma/Makefile.objs
-+++ b/hw/dma/Makefile.objs
-@@ -9,7 +9,7 @@ common-obj-$(CONFIG_ZYNQ_DEVCFG) += xlnx-zynq-devcfg.o
- common-obj-$(CONFIG_ETRAXFS) += etraxfs_dma.o
- common-obj-$(CONFIG_STP2000) += sparc32_dma.o
- common-obj-$(CONFIG_SUN4M) += sun4m_iommu.o
--obj-$(CONFIG_XLNX_ZYNQMP) += xlnx_dpdma.o
-+obj-$(CONFIG_XLNX_ZYNQMP_ARM) += xlnx_dpdma.o
+diff --git a/hw/microblaze/xlnx-zynqmp-pmu.c b/hw/microblaze/xlnx-zynqmp-pmu.c
+index fc3c8b236f..b643125704 100644
+--- a/hw/microblaze/xlnx-zynqmp-pmu.c
++++ b/hw/microblaze/xlnx-zynqmp-pmu.c
+@@ -18,8 +18,11 @@
+ #include "qemu/osdep.h"
+ #include "qapi/error.h"
+ #include "qemu-common.h"
++#include "exec/address-spaces.h"
+ #include "hw/boards.h"
++#include "hw/qdev-properties.h"
+ #include "cpu.h"
++#include "boot.h"
  
- obj-$(CONFIG_OMAP) += omap_dma.o soc_dma.o
- obj-$(CONFIG_PXA2XX) += pxa2xx_dma.o
+ /* Define the PMU device */
+ 
+@@ -27,21 +30,56 @@
+ #define XLNX_ZYNQMP_PMU(obj) OBJECT_CHECK(XlnxZynqMPPMUState, (obj), \
+                                           TYPE_XLNX_ZYNQMP_PMU)
+ 
++#define XLNX_ZYNQMP_PMU_ROM_SIZE    0x8000
++#define XLNX_ZYNQMP_PMU_ROM_ADDR    0xFFD00000
++#define XLNX_ZYNQMP_PMU_RAM_ADDR    0xFFDC0000
++
+ typedef struct XlnxZynqMPPMUState {
+     /*< private >*/
+     DeviceState parent_obj;
+ 
+     /*< public >*/
++    MicroBlazeCPU cpu;
+ }  XlnxZynqMPPMUState;
+ 
+ static void xlnx_zynqmp_pmu_init(Object *obj)
+ {
++    XlnxZynqMPPMUState *s = XLNX_ZYNQMP_PMU(obj);
+ 
++    object_initialize(&s->cpu, sizeof(s->cpu),
++                      TYPE_MICROBLAZE_CPU);
++    object_property_add_child(obj, "pmu-cpu", OBJECT(&s->cpu),
++                              &error_abort);
+ }
+ 
+ static void xlnx_zynqmp_pmu_realize(DeviceState *dev, Error **errp)
+ {
+-
++    XlnxZynqMPPMUState *s = XLNX_ZYNQMP_PMU(dev);
++    Error *err = NULL;
++
++    object_property_set_uint(OBJECT(&s->cpu), XLNX_ZYNQMP_PMU_ROM_ADDR,
++                             "base-vectors", &error_abort);
++    object_property_set_bool(OBJECT(&s->cpu), true, "use-stack-protection",
++                             &error_abort);
++    object_property_set_uint(OBJECT(&s->cpu), 0, "use-fpu", &error_abort);
++    object_property_set_uint(OBJECT(&s->cpu), 0, "use-hw-mul", &error_abort);
++    object_property_set_bool(OBJECT(&s->cpu), true, "use-barrel",
++                             &error_abort);
++    object_property_set_bool(OBJECT(&s->cpu), true, "use-msr-instr",
++                             &error_abort);
++    object_property_set_bool(OBJECT(&s->cpu), true, "use-pcmp-instr",
++                             &error_abort);
++    object_property_set_bool(OBJECT(&s->cpu), false, "use-mmu", &error_abort);
++    object_property_set_bool(OBJECT(&s->cpu), true, "endianness",
++                             &error_abort);
++    object_property_set_str(OBJECT(&s->cpu), "8.40.b", "version",
++                            &error_abort);
++    object_property_set_uint(OBJECT(&s->cpu), 0, "pvr", &error_abort);
++    object_property_set_bool(OBJECT(&s->cpu), true, "realized", &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
+ }
+ 
+ static void xlnx_zynqmp_pmu_class_init(ObjectClass *oc, void *data)
+@@ -70,7 +108,35 @@ type_init(xlnx_zynqmp_pmu_register_types)
+ 
+ static void xlnx_zcu102_pmu_init(MachineState *machine)
+ {
+-
++    XlnxZynqMPPMUState *pmu = g_new0(XlnxZynqMPPMUState, 1);
++    MemoryRegion *address_space_mem = get_system_memory();
++    MemoryRegion *pmu_rom = g_new(MemoryRegion, 1);
++    MemoryRegion *pmu_ram = g_new(MemoryRegion, 1);
++
++    /* Create the ROM */
++    memory_region_init_rom(pmu_rom, NULL, "xlnx-zcu102-pmu.rom",
++                           XLNX_ZYNQMP_PMU_ROM_SIZE, &error_fatal);
++    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_ROM_ADDR,
++                                pmu_rom);
++
++    /* Create the RAM */
++    memory_region_init_ram(pmu_ram, NULL, "xlnx-zcu102-pmu.ram",
++                           machine->ram_size, &error_fatal);
++    memory_region_add_subregion(address_space_mem, XLNX_ZYNQMP_PMU_RAM_ADDR,
++                                pmu_ram);
++
++    /* Create the PMU device */
++    object_initialize(pmu, sizeof(XlnxZynqMPPMUState), TYPE_XLNX_ZYNQMP_PMU);
++    object_property_add_child(OBJECT(machine), "pmu", OBJECT(pmu),
++                              &error_abort);
++    object_property_set_bool(OBJECT(pmu), true, "realized", &error_fatal);
++
++    /* Load the kernel */
++    microblaze_load_kernel(&pmu->cpu, XLNX_ZYNQMP_PMU_RAM_ADDR,
++                           machine->ram_size,
++                           machine->kernel_filename,
++                           machine->dtb,
++                           NULL);
+ }
+ 
+ static void xlnx_zcu102_pmu_machine_init(MachineClass *mc)
 -- 
 2.11.0
