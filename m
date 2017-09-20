@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48138)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48308)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dufMi-0004Xu-Pr
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:48:37 -0400
+	(envelope-from <famz@redhat.com>) id 1dufN4-0004s0-9Y
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:48:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dufMf-0002QE-NW
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:48:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54276)
+	(envelope-from <famz@redhat.com>) id 1dufN1-0002Zk-7J
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:48:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:25699)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dufMf-0002PM-CB
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:48:33 -0400
-Date: Wed, 20 Sep 2017 13:18:44 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170920131844.066e53d7.cohuck@redhat.com>
-In-Reply-To: <009428a2-fb31-ecc9-d477-4cdea226f2d8@linux.vnet.ibm.com>
-References: <20170919182745.90280-1-pasic@linux.vnet.ibm.com>
-	<20170919182745.90280-6-pasic@linux.vnet.ibm.com>
-	<20170920074238.GH11080@bjsdjshi@linux.vnet.ibm.com>
-	<20170920103312.50b8b69b.cohuck@redhat.com>
-	<009428a2-fb31-ecc9-d477-4cdea226f2d8@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] s390x/css: support ccw IDA
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dufN1-0002ZV-23
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:48:55 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id D56EE7CB8C
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 08:59:59 +0000 (UTC)
+From: Fam Zheng <famz@redhat.com>
+Date: Wed, 20 Sep 2017 16:59:52 +0800
+Message-Id: <20170920085952.3872-1-famz@redhat.com>
+Subject: [Qemu-devel] [PATCH] usb: Use angle brackets for cacard include
+ directive
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,65 +28,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 
-On Wed, 20 Sep 2017 13:13:01 +0200
-Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+This is a library header, so angle brackets are more appropriate; also
+move the line to before QEMU headers, as is recommended in HACKING.
 
-> On 09/20/2017 10:33 AM, Cornelia Huck wrote:
-> > On Wed, 20 Sep 2017 15:42:38 +0800
-> > Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> >   
-> >> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-19 20:27:45 +0200]:
+Signed-off-by: Fam Zheng <famz@redhat.com>
+---
+ hw/usb/ccid-card-passthru.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> >>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt2,
-> >>> +                               sizeof(idaw.fmt2), false);
-> >>> +        cds->cda = be64_to_cpu(idaw.fmt2);
-> >>> +    } else {
-> >>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
-> >>> +        if (idaw_addr & 0x03 && cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1)) {
-> >>> +            return -EINVAL; /* channel program check */
-> >>> +        }
-> >>> +        ret = address_space_rw(&address_space_memory, idaw_addr,
-> >>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt1,
-> >>> +                               sizeof(idaw.fmt1), false);
-> >>> +        cds->cda = be64_to_cpu(idaw.fmt1);    
-> >> Still need to check bit 0x80000000 here I think.  
-> > 
-> > Yes, I think this is 'must be zero' for format-1 idaws, and not covered
-> > by the ccw-format specific checks above. (Although the PoP can be a bit
-> > confusing with many similar terms...)
-> >  
-> 
-> It's taken care of in ccw_dstream_rw_ida before the actual
-> access happens. Code looks like this:
-> +        if (!idaw_fmt2 && (cds->cda + iter_len) >= (1ULL << 31)) {
-> +                ret = -EINVAL; /* channel program check */
-> +                goto err;
-> +        }
-> 
-> The idea was to have it similar to the non-indirect case.
-
-<looks at patch again>
-
-Ah, I was simply looking for the wrong pattern. Looks correct.
-
-
-> >>> +static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int len,
-> >>> +                              CcwDataStreamOp op)
-> >>> +{
-> >>> +    uint64_t bsz = ccw_ida_block_size(cds->flags);
-> >>> +    int ret = 0;
-> >>> +    uint16_t cont_left, iter_len;
-> >>> +    const bool idaw_fmt2 = cds->flags & CDS_F_C64;
-> >>> +    bool ccw_fmt1 = cds->flags & CDS_F_FMT;    
-> >> Use 'const bool' either? Although I doubt the value of using const here.
-> >> ;)  
-> > 
-> > Both being the same is still a good idea.
-> >   
-> 
-> Yeah. For which one should I go (with const or without)?
-
-For the one you prefer :) (I'm not sure if the const adds value here.)
+diff --git a/hw/usb/ccid-card-passthru.c b/hw/usb/ccid-card-passthru.c
+index 45d96b03c6..117711862e 100644
+--- a/hw/usb/ccid-card-passthru.c
++++ b/hw/usb/ccid-card-passthru.c
+@@ -9,11 +9,11 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include <cacard/vscard_common.h>
+ #include "chardev/char-fe.h"
+ #include "qemu/error-report.h"
+ #include "qemu/sockets.h"
+ #include "ccid.h"
+-#include "cacard/vscard_common.h"
+ 
+ #define DPRINTF(card, lvl, fmt, ...)                    \
+ do {                                                    \
+-- 
+2.13.5
