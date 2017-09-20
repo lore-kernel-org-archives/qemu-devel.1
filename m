@@ -1,21 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56352)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57050)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dufmG-0003O0-Lh
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:15:05 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dufoC-0005hp-V0
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:17:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dufmD-00057B-5f
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:15:00 -0400
-Received: from ozlabs.ru ([107.173.13.209]:59744)
-	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dufmD-00056z-16
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:14:57 -0400
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Wed, 20 Sep 2017 21:46:28 +1000
-Message-Id: <20170920114637.42004-10-aik@ozlabs.ru>
-In-Reply-To: <20170920114637.42004-1-aik@ozlabs.ru>
-References: <20170920114637.42004-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v4 09/18] memory: Store physical root MR
- in FlatView
+	(envelope-from <stefanha@redhat.com>) id 1dufo6-00063j-Qo
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:17:00 -0400
+Date: Wed, 20 Sep 2017 15:16:43 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170920141643.GB9409@stefanha-x1.localdomain>
+References: <20170920101740.12490-1-stefanha@redhat.com>
+	<w51fubh1vaz.fsf@maestria.local.igalia.com>
+	<20170920113902.ljcsl3y5c6kvo4eq@postretch>
+	<w51d16l1s40.fsf@maestria.local.igalia.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <w51d16l1s40.fsf@maestria.local.igalia.com>
+Subject: Re: [Qemu-devel] [PATCH v2] throttle-groups: update
+ tg->any_timer_armed[] on detach
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,103 +26,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
+To: Alberto Garcia <berto@igalia.com>
+Cc: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 
-Address spaces get to keep a root MR (alias or not) but FlatView stores
-the actual MR as this is going to be used later on to decide whether to
-share a particular FlatView or not.
+On Wed, Sep 20, 2017 at 02:17:51PM +0200, Alberto Garcia wrote:
+> On Wed 20 Sep 2017 01:39:02 PM CEST, Manos Pitsidianakis wrote:
+> >>>  void throttle_group_detach_aio_context(ThrottleGroupMember *tgm)
+> >>>  {
+> >>>      ThrottleTimers *tt = &tgm->throttle_timers;
+> >>> +    ThrottleGroup *tg = container_of(tgm->throttle_state, ThrottleGroup, ts);
+> >>> +
+> >>> +    qemu_mutex_lock(&tg->lock);
+> >>> +    if (timer_pending(tt->timers[0])) {
+> >>> +        tg->any_timer_armed[0] = false;
+> >>> +    }
+> >>> +    if (timer_pending(tt->timers[1])) {
+> >>> +        tg->any_timer_armed[1] = false;
+> >>> +    }
+> >>> +    qemu_mutex_unlock(&tg->lock);
+> >>> +
+> >>>      throttle_timers_detach_aio_context(tt);
+> >>>      tgm->aio_context = NULL;
+> >>>  }
+> >>
+> >>I'm sorry that I didn't noticed this in my previous e-mail, but after
+> >>this call you might have destroyed the timer that was set for that
+> >>throttling group, so if there are pending requests waiting it can
+> >>happen that no one wakes them up.
+> >>
+> >>I think that the queue needs to be restarted after this, probably
+> >>after having reattached the context (or actually after detaching it
+> >>already, but then what happens if you try to restart the queue while
+> >>aio_context is NULL?).
+> >
+> > aio_co_enter in the restart queue function requires that aio_context
+> > is non-NULL. Perhaps calling throttle_group_restart_tgm in
+> > throttle_group_attach_aio_context will suffice.
+> 
+> But can we guarantee that everything is safe between the _detach() and
+> _attach() calls?
 
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
----
-Changes:
-v4:
-* s/memory_region_unalias_entire/memory_region_get_flatview_root/
----
- memory.c | 26 ++++++++++++++++++++++----
- 1 file changed, 22 insertions(+), 4 deletions(-)
+Here is a second patch that I didn't send because I was unsure whether it's
+needed.
 
-diff --git a/memory.c b/memory.c
-index 990e9b8478..98b0b95e6e 100644
---- a/memory.c
-+++ b/memory.c
-@@ -230,6 +230,7 @@ struct FlatView {
-     unsigned nr;
-     unsigned nr_allocated;
-     struct AddressSpaceDispatch *dispatch;
-+    MemoryRegion *root;
- };
+The idea is to move the throttle_group_detach/attach_aio_context() into
+bdrv_set_aio_context() so it becomes part of the bdrv_drained_begin/end()
+region.
+
+The guarantees we have inside the drained region:
+
+1. Throttling has been temporarily disabled.
+2. throttle_group_restart_tgm() has been called to kick throttled reqs.
+3. All requests are completed.
+
+This is a nice, controlled environment to do the detach/attach.  That said,
+Berto's point still stands: what about other ThrottleGroupMembers who have
+throttled requests queued?
+
+The main reason I didn't publish this patch is because Manos' "block: remove
+legacy I/O throttling" series ought to remove this code anyway soon.
+
+diff --git a/block/block-backend.c b/block/block-backend.c
+index 45d9101be3..624eb3dc15 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -1747,10 +1747,6 @@ void blk_set_aio_context(BlockBackend *blk, AioContext *new_context)
+     ThrottleGroupMember *tgm = &blk->public.throttle_group_member;
  
- typedef struct AddressSpaceOps AddressSpaceOps;
-@@ -259,12 +260,14 @@ static bool flatrange_equal(FlatRange *a, FlatRange *b)
-         && a->readonly == b->readonly;
- }
- 
--static FlatView *flatview_new(void)
-+static FlatView *flatview_new(MemoryRegion *mr_root)
- {
-     FlatView *view;
- 
-     view = g_new0(FlatView, 1);
-     view->ref = 1;
-+    view->root = mr_root;
-+    memory_region_ref(mr_root);
- 
-     return view;
- }
-@@ -297,6 +300,7 @@ static void flatview_destroy(FlatView *view)
-         memory_region_unref(view->ranges[i].mr);
+     if (bs) {
+-        if (tgm->throttle_state) {
+-            throttle_group_detach_aio_context(tgm);
+-            throttle_group_attach_aio_context(tgm, new_context);
+-        }
+         bdrv_set_aio_context(bs, new_context);
      }
-     g_free(view->ranges);
-+    memory_region_unref(view->root);
-     g_free(view);
  }
+@@ -2029,6 +2025,13 @@ static void blk_root_drained_end(BdrvChild *child)
+     BlockBackend *blk = child->opaque;
+     assert(blk->quiesce_counter);
  
-@@ -722,12 +726,25 @@ static void render_memory_region(FlatView *view,
-     }
- }
- 
-+static MemoryRegion *memory_region_get_flatview_root(MemoryRegion *mr)
-+{
-+    while (mr->alias && !mr->alias_offset &&
-+           int128_ge(mr->size, mr->alias->size)) {
-+        /* The alias is included in its entirety.  Use it as
-+         * the "real" root, so that we can share more FlatViews.
-+         */
-+        mr = mr->alias;
++    if (tgm->throttle_state) {
++        AioContext *new_context = bdrv_aio_context(blk_bs(blk));
++
++        throttle_group_detach_aio_context(tgm);
++        throttle_group_attach_aio_context(tgm, new_context);
 +    }
 +
-+    return mr;
-+}
-+
- /* Render a memory topology into a list of disjoint absolute ranges. */
- static FlatView *generate_memory_topology(MemoryRegion *mr)
- {
-     FlatView *view;
- 
--    view = flatview_new();
-+    view = flatview_new(mr);
- 
-     if (mr) {
-         render_memory_region(view, mr, int128_zero(),
-@@ -902,7 +919,8 @@ static void address_space_update_topology_pass(AddressSpace *as,
- static void address_space_update_topology(AddressSpace *as)
- {
-     FlatView *old_view = address_space_get_flatview(as);
--    FlatView *new_view = generate_memory_topology(as->root);
-+    MemoryRegion *physmr = memory_region_get_flatview_root(old_view->root);
-+    FlatView *new_view = generate_memory_topology(physmr);
-     int i;
- 
-     new_view->dispatch = address_space_dispatch_new(new_view);
-@@ -2645,7 +2663,7 @@ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
-     as->ref_count = 1;
-     as->root = root;
-     as->malloced = false;
--    as->current_map = flatview_new();
-+    as->current_map = flatview_new(root);
-     as->ioeventfd_nb = 0;
-     as->ioeventfds = NULL;
-     QTAILQ_INIT(&as->listeners);
--- 
-2.11.0
+     assert(blk->public.throttle_group_member.io_limits_disabled);
+     atomic_dec(&blk->public.throttle_group_member.io_limits_disabled);
