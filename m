@@ -1,25 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49768)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51144)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dulOx-00067q-GH
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:15:20 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dulRB-0007d4-6c
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:17:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dulOu-0000cy-Au
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:15:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51496)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dulOu-0000c0-14
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:15:16 -0400
-References: <20170920032555.18911-1-famz@redhat.com>
-	<20170920032555.18911-8-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <642c8291-6be7-88a4-de74-31da51dcc1ef@redhat.com>
-Date: Wed, 20 Sep 2017 15:15:01 -0500
+	(envelope-from <jsnow@redhat.com>) id 1dulRA-0002PL-7d
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:17:37 -0400
+References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
+	<20170920135833.20472-2-pbutsykin@virtuozzo.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <eaef3a7c-e634-50bb-a98c-9d5db7446c00@redhat.com>
+Date: Wed, 20 Sep 2017 16:17:29 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170920032555.18911-8-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="PSInQbfe7jMQHOMLweLwN1hE13fAfmdf0"
-Subject: Re: [Qemu-devel] [PATCH v10 07/13] tests: Add FreeBSD image
+In-Reply-To: <20170920135833.20472-2-pbutsykin@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 1/2] qcow2: fix return error
+ code in qcow2_truncate()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,74 +25,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PSInQbfe7jMQHOMLweLwN1hE13fAfmdf0
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>,
- stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com,
- Kamil Rytarowski <kamil@netbsd.org>
-Message-ID: <642c8291-6be7-88a4-de74-31da51dcc1ef@redhat.com>
-Subject: Re: [PATCH v10 07/13] tests: Add FreeBSD image
-References: <20170920032555.18911-1-famz@redhat.com>
- <20170920032555.18911-8-famz@redhat.com>
-In-Reply-To: <20170920032555.18911-8-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-On 09/19/2017 10:25 PM, Fam Zheng wrote:
-> The image is prepared following instructions as in:
->=20
-> https://wiki.qemu.org/Hosts/BSD
->=20
-> Signed-off-by: Fam Zheng <famz@redhat.com>
+
+On 09/20/2017 09:58 AM, Pavel Butsykin wrote:
+> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
 > ---
->  tests/vm/freebsd | 42 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 42 insertions(+)
->  create mode 100755 tests/vm/freebsd
->=20
+>  block/qcow2.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index 2174a84d1f..8a4311d338 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -3166,7 +3166,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
+>          if (old_file_size < 0) {
+>              error_setg_errno(errp, -old_file_size,
+>                               "Failed to inquire current file length");
+> -            return ret;
+> +            return old_file_size;
+>          }
+>  
+>          nb_new_data_clusters = DIV_ROUND_UP(offset - old_length,
+> @@ -3195,7 +3195,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
+>          if (allocation_start < 0) {
+>              error_setg_errno(errp, -allocation_start,
+>                               "Failed to resize refcount structures");
+> -            return -allocation_start;
+> +            return allocation_start;
+>          }
+>  
+>          clusters_allocated = qcow2_alloc_clusters_at(bs, allocation_start,
+> 
 
-While testing v10, I got:
+Yikes...
 
-$ make vm-build-freebsd
-=2E..
-    VM-BUILD freebsd
-=2E/scripts/archive-source.sh: line 48: test: -ne: unary operator expecte=
-d
-ar: warning: creating libfdt/libfdt.a
-
-At least the archive-source.sh warning is part of your series, and worth
-fixing.
-
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---PSInQbfe7jMQHOMLweLwN1hE13fAfmdf0
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnCzEYACgkQp6FrSiUn
-Q2pWNgf+K6aOoYdVfkXWaSa18pLN/YPG+45ptdiFyP556iA6LHqtaEUN575CsRAU
-nLvZPL9X4bLJoFwxT6wbCyTMVLcsDAnZ0TSX5kPbZorCpZ9yox6YlWszjY5tkqU1
-oTeYeuNlAq2Q5cFn78p6rQzOa+iQsM5kTkVug1jKGoc4AQTxiPJduOOP2U6632AI
-SEp79VDTx1aoTNQgfzZjjJthLDVtFETIt1XPmCCVu77OKK/tM01Xx6F92cY7R/hz
-6A0oWO6cOTwor1kPl0kK3/19H0LC/5xHEZC7RMEYeIuqUPnFIX0tE8uzT1tc/JgS
-O7UMn82CO5Ob+9iPS64pRvM0bgGNsA==
-=Yh5h
------END PGP SIGNATURE-----
-
---PSInQbfe7jMQHOMLweLwN1hE13fAfmdf0--
+Reviewed-by: John Snow <jsnow@redhat.com>
