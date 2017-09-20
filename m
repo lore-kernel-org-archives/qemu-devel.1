@@ -1,21 +1,18 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56714)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56704)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dugxf-0000F3-IP
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:30:52 -0400
+	(envelope-from <david@redhat.com>) id 1dugxe-0000ES-MS
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:30:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dugxd-00083w-W6
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:30:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58046)
+	(envelope-from <david@redhat.com>) id 1dugxb-000815-3P
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:30:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60868)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dugxd-00082q-Pr
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:30:49 -0400
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dugxa-00080M-Td
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:30:47 -0400
 From: David Hildenbrand <david@redhat.com>
-Date: Wed, 20 Sep 2017 17:30:14 +0200
-Message-Id: <20170920153016.3858-2-david@redhat.com>
-In-Reply-To: <20170920153016.3858-1-david@redhat.com>
-References: <20170920153016.3858-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v3 1/3] s390x/tcg: implement spm (SET PROGRAM
- MASK)
+Date: Wed, 20 Sep 2017 17:30:13 +0200
+Message-Id: <20170920153016.3858-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v3 0/3] Implement basic MSA functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +24,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-Missing and is used inside Linux in the context of CPACF.
+Some leftover from "target/s390x: tcg improvments + MSA functions".
 
-Reviewed-by: Richard Henderson <rth@twiddle.net>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/cpu.h         |  2 ++
- target/s390x/insn-data.def |  2 ++
- target/s390x/translate.c   | 11 +++++++++++
- 3 files changed, 15 insertions(+)
+Implement all basic MSA (cpacf/crypto) instructions <= z13. Only provide
+the query subfunction (to query available subfunctions), no actual
+de/encryption yet. Good enough to unlock the STFL bits.
 
-diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-index 9b549dc491..4414485089 100644
---- a/target/s390x/cpu.h
-+++ b/target/s390x/cpu.h
-@@ -292,6 +292,7 @@ extern const struct VMStateDescription vmstate_s390_cpu;
- #undef PSW_SHIFT_ASC
- #undef PSW_MASK_CC
- #undef PSW_MASK_PM
-+#undef PSW_SHIFT_MASK_PM
- #undef PSW_MASK_64
- #undef PSW_MASK_32
- #undef PSW_MASK_ESA_ADDR
-@@ -309,6 +310,7 @@ extern const struct VMStateDescription vmstate_s390_cpu;
- #define PSW_SHIFT_ASC           46
- #define PSW_MASK_CC             0x0000300000000000ULL
- #define PSW_MASK_PM             0x00000F0000000000ULL
-+#define PSW_SHIFT_MASK_PM       40
- #define PSW_MASK_64             0x0000000100000000ULL
- #define PSW_MASK_32             0x0000000080000000ULL
- #define PSW_MASK_ESA_ADDR       0x000000007fffffffULL
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index ad84c748e3..84233a456d 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -755,6 +755,8 @@
-     C(0xb2b8, SRNMB,   S,     FPE, 0, 0, 0, 0, srnm, 0)
- /* SET DFP ROUNDING MODE */
-     C(0xb2b9, SRNMT,   S,     DFPR, 0, 0, 0, 0, srnm, 0)
-+/* SET PROGRAM MASK */
-+    C(0x0400, SPM,     RR_a,  Z,   r1, 0, 0, 0, spm, 0)
- 
- /* SHIFT LEFT SINGLE */
-     D(0x8b00, SLA,     RS_a,  Z,   r1, sh32, new, r1_32, sla, 0, 31)
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index 5abd34fb34..59fde44d55 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -3796,6 +3796,17 @@ static ExitStatus op_srnm(DisasContext *s, DisasOps *o)
-     return NO_EXIT;
- }
- 
-+static ExitStatus op_spm(DisasContext *s, DisasOps *o)
-+{
-+    tcg_gen_extrl_i64_i32(cc_op, o->in1);
-+    tcg_gen_extract_i32(cc_op, cc_op, 28, 2);
-+    set_cc_static(s);
-+
-+    tcg_gen_shri_i64(o->in1, o->in1, 24);
-+    tcg_gen_deposit_i64(psw_mask, psw_mask, o->in1, PSW_SHIFT_MASK_PM, 4);
-+    return NO_EXIT;
-+}
-+
- #ifndef CONFIG_USER_ONLY
- static ExitStatus op_spka(DisasContext *s, DisasOps *o)
- {
+I have written kvm-unit-tests for MSA functions and for SPM/IPM. Will
+send them out soon. I use the following cpu model to test with an upstream
+kernel compiled for z10:
+
+... -cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
+              eimm=on,stckf=on,csst=on,csst2=on,ginste=on,\
+              exrl=on,msa-base=on,msa3-base=on,msa4-base=on,msa5-base=on ...
+
+Available on: https://github.com/davidhildenbrand/qemu.git s390x-msa
+
+v2 -> v3:
+ - "s390x/tcg: add basic MSA features"
+ -- drop one check (fc >= 128) that can due to masking never happen
+
+v1 -> v2:
+ - "s390x/tcg: implement spm (SET PROGRAM MASK)"
+ -- use tcg_gen_extrl_i64_i32 + tcg_gen_extract_i32
+ - "s390x/tcg: move wrap_address() to internal.h"
+ -- internal.h instead of cpu.h
+ - "s390x/tcg: add basic MSA features"
+ -- minor style fixes
+
+
+David Hildenbrand (3):
+  s390x/tcg: implement spm (SET PROGRAM MASK)
+  s390x/tcg: move wrap_address() to internal.h
+  s390x/tcg: add basic MSA features
+
+ target/s390x/Makefile.objs   |  2 +-
+ target/s390x/cpu.h           |  2 ++
+ target/s390x/cpu_models.c    |  4 +++
+ target/s390x/crypto_helper.c | 65 ++++++++++++++++++++++++++++++++++++++++++
+ target/s390x/helper.h        |  1 +
+ target/s390x/insn-data.def   | 15 ++++++++++
+ target/s390x/internal.h      | 14 +++++++++
+ target/s390x/mem_helper.c    | 14 ---------
+ target/s390x/translate.c     | 67 ++++++++++++++++++++++++++++++++++++++++++++
+ 9 files changed, 169 insertions(+), 15 deletions(-)
+ create mode 100644 target/s390x/crypto_helper.c
+
 -- 
 2.13.5
