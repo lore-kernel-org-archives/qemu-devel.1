@@ -1,24 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51401)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53165)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dulRg-0007vr-5f
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:18:11 -0400
+	(envelope-from <bounces@canonical.com>) id 1dulV6-0002Kl-GZ
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:21:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dulRe-0002hB-RO
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:18:08 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 20 Sep 2017 17:17:37 -0300
-Message-Id: <20170920201737.25723-6-f4bug@amsat.org>
-In-Reply-To: <20170920201737.25723-1-f4bug@amsat.org>
-References: <20170920201737.25723-1-f4bug@amsat.org>
+	(envelope-from <bounces@canonical.com>) id 1dulV3-0004w7-3g
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:21:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:34346)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dulV2-0004vE-Ta
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 16:21:37 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dulV0-0002M2-Uw
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 20:21:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0E4152E84CC
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 20:21:33 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v11 5/5] msf2: Add Emcraft's Smartfusion2 SOM
- kit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 20 Sep 2017 20:10:51 -0000
+From: Matheus Izvekov <1673976@bugs.launchpad.net>
+Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150593825149.6235.5292831257661210346.malone@soybean.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1673976] Re: core dump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,143 +36,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Subbaraya Sundeep <sundeep.lkml@gmail.com>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org, qemu-arm@nongnu.org
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
 
-From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+I can confirm this. The ninja build system is also affected.
 
-Emulated Emcraft's Smartfusion2 System On Module starter
-kit.
+-- =
 
-Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[PMD: drop cpu_model to directly use cpu type]
----
- hw/arm/msf2-som.c    | 105 +++++++++++++++++++++++++++++++++++++++++++++++++++
- hw/arm/Makefile.objs |   2 +-
- 2 files changed, 106 insertions(+), 1 deletion(-)
- create mode 100644 hw/arm/msf2-som.c
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1673976
 
-diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
-new file mode 100644
-index 0000000000..0795a3a3a1
---- /dev/null
-+++ b/hw/arm/msf2-som.c
-@@ -0,0 +1,105 @@
-+/*
-+ * SmartFusion2 SOM starter kit(from Emcraft) emulation.
-+ *
-+ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "hw/boards.h"
-+#include "hw/arm/arm.h"
-+#include "exec/address-spaces.h"
-+#include "qemu/cutils.h"
-+#include "hw/arm/msf2-soc.h"
-+#include "cpu.h"
-+
-+#define DDR_BASE_ADDRESS      0xA0000000
-+#define DDR_SIZE              (64 * M_BYTE)
-+
-+#define M2S010_ENVM_SIZE      (256 * K_BYTE)
-+#define M2S010_ESRAM_SIZE     (64 * K_BYTE)
-+
-+static void emcraft_sf2_s2s010_init(MachineState *machine)
-+{
-+    DeviceState *dev;
-+    DeviceState *spi_flash;
-+    MSF2State *soc;
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
-+    DriveInfo *dinfo = drive_get_next(IF_MTD);
-+    qemu_irq cs_line;
-+    SSIBus *spi_bus;
-+    MemoryRegion *sysmem = get_system_memory();
-+    MemoryRegion *ddr = g_new(MemoryRegion, 1);
-+
-+    if (strcmp(machine->cpu_type, mc->default_cpu_type) != 0) {
-+        error_report("This board can only be used with CPU %s",
-+                     mc->default_cpu_type);
-+    }
-+
-+    memory_region_init_ram(ddr, NULL, "ddr-ram", DDR_SIZE,
-+                           &error_fatal);
-+    memory_region_add_subregion(sysmem, DDR_BASE_ADDRESS, ddr);
-+
-+    dev = qdev_create(NULL, TYPE_MSF2_SOC);
-+    qdev_prop_set_string(dev, "part-name", "M2S010");
-+    qdev_prop_set_string(dev, "cpu-type", mc->default_cpu_type);
-+
-+    qdev_prop_set_uint64(dev, "eNVM-size", M2S010_ENVM_SIZE);
-+    qdev_prop_set_uint64(dev, "eSRAM-size", M2S010_ESRAM_SIZE);
-+
-+    /*
-+     * CPU clock and peripheral clocks(APB0, APB1)are configurable
-+     * in Libero. CPU clock is divided by APB0 and APB1 divisors for
-+     * peripherals. Emcraft's SoM kit comes with these settings by default.
-+     */
-+    qdev_prop_set_uint32(dev, "m3clk", 142 * 1000000);
-+    qdev_prop_set_uint32(dev, "apb0div", 2);
-+    qdev_prop_set_uint32(dev, "apb1div", 2);
-+
-+    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
-+
-+    soc = MSF2_SOC(dev);
-+
-+    /* Attach SPI flash to SPI0 controller */
-+    spi_bus = (SSIBus *)qdev_get_child_bus(dev, "spi0");
-+    spi_flash = ssi_create_slave_no_init(spi_bus, "s25sl12801");
-+    qdev_prop_set_uint8(spi_flash, "spansion-cr2nv", 1);
-+    if (dinfo) {
-+        qdev_prop_set_drive(spi_flash, "drive", blk_by_legacy_dinfo(dinfo),
-+                                    &error_fatal);
-+    }
-+    qdev_init_nofail(spi_flash);
-+    cs_line = qdev_get_gpio_in_named(spi_flash, SSI_GPIO_CS, 0);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
-+
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-+                       soc->envm_size);
-+}
-+
-+static void emcraft_sf2_machine_init(MachineClass *mc)
-+{
-+    mc->desc = "SmartFusion2 SOM kit from Emcraft (M2S010)";
-+    mc->init = emcraft_sf2_s2s010_init;
-+    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
-+}
-+
-+DEFINE_MACHINE("emcraft-sf2", emcraft_sf2_machine_init)
-diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index a6cf24f6ac..2794e086d6 100644
---- a/hw/arm/Makefile.objs
-+++ b/hw/arm/Makefile.objs
-@@ -19,4 +19,4 @@ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
- obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
- obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
- obj-$(CONFIG_MPS2) += mps2.o
--obj-$(CONFIG_MSF2) += msf2-soc.o
-+obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
--- 
-2.14.1
+Title:
+  core dump
+
+Status in QEMU:
+  New
+
+Bug description:
+  I'm running a command (locale-gen) inside of an armv7h chroot mounted
+  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
+  chroot file system and I get a core dump.
+
+  locale-gen
+  Generating locales...
+  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
+360: __spawnix: Assertion `ec >=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
+ localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
+le
+
+  I've done this same thing successfully for years, but this breakage
+  has appeared some time in the last 3 or so months. Possibly with the
+  update to qemu version 2.8.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
