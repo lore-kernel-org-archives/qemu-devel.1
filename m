@@ -1,25 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49842)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50209)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dufRe-0000Pf-1I
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:53:43 -0400
+	(envelope-from <david@redhat.com>) id 1dufSf-0001GF-Ts
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:54:46 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dufRZ-000507-Lr
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:53:42 -0400
-Received: from lhrrgout.huawei.com ([194.213.3.17]:24224)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dufRZ-0004zF-1N
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:53:37 -0400
-References: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
-	<1505385610-35529-3-git-send-email-pradeep.jagadeesh@huawei.com>
-	<20170918160434.cfkm7jlg3oig25qj@postretch>
-From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
-Message-ID: <23bb8481-7854-70aa-de7c-8f3d18270ebb@huawei.com>
-Date: Wed, 20 Sep 2017 10:46:09 +0200
+	(envelope-from <david@redhat.com>) id 1dufSc-0005KC-TA
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:54:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46844)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dufSc-0005K1-Mc
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:54:42 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+	[10.5.11.13])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 9587A86647
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 13:54:41 +0000 (UTC)
+References: <1505913885.24609.8.camel@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <4102bc02-0439-862b-67b8-b297c29dc121@redhat.com>
+Date: Wed, 20 Sep 2017 15:54:36 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170918160434.cfkm7jlg3oig25qj@postretch>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 2/6] qmp: Use ThrottleLimits structure
+In-Reply-To: <1505913885.24609.8.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] kvm_set_phys_mem: assertion failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,146 +33,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, jani kokkonen <jani.kokkonen@huawei.com>, alberto garcia <berto@igalia.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: pbonzini@redhat.com
 
-On 9/18/2017 6:04 PM, Manos Pitsidianakis wrote:
-> On Thu, Sep 14, 2017 at 06:40:06AM -0400, Pradeep Jagadeesh wrote:
->> This patch factors out code to use the ThrottleLimits
->> strurcture.
->>
->> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
->> Reviewed-by: Greg Kurz <groug@kaod.org>
->> Reviewed-by: Eric Blake <eblake@redhat.com>
->> Reviewed-by: Alberto Garcia <berto@igalia.com>
->> Reviewed-by: Markus Armbruster <armbru@redhat.com>
->> ---
->> qapi/block-core.json | 78
->> +++-------------------------------------------------
->> 1 file changed, 4 insertions(+), 74 deletions(-)
->>
->> diff --git a/qapi/block-core.json b/qapi/block-core.json
->> index bb11815..d0ccfda 100644
->> --- a/qapi/block-core.json
->> +++ b/qapi/block-core.json
->> @@ -1826,84 +1826,13 @@
->> #
->> # @device: Block device name (deprecated, use @id instead)
->> #
->> -# @id: The name or QOM path of the guest device (since: 2.8)
->> -#
->> -# @bps: total throughput limit in bytes per second
->> -#
->> -# @bps_rd: read throughput limit in bytes per second
->> -#
->> -# @bps_wr: write throughput limit in bytes per second
->> -#
->> -# @iops: total I/O operations per second
->> -#
->> -# @iops_rd: read I/O operations per second
->> -#
->> -# @iops_wr: write I/O operations per second
->> -#
->> -# @bps_max: total throughput limit during bursts,
->> -#                     in bytes (Since 1.7)
->> -#
->> -# @bps_rd_max: read throughput limit during bursts,
->> -#                        in bytes (Since 1.7)
->> -#
->> -# @bps_wr_max: write throughput limit during bursts,
->> -#                        in bytes (Since 1.7)
->> -#
->> -# @iops_max: total I/O operations per second during bursts,
->> -#                      in bytes (Since 1.7)
->> -#
->> -# @iops_rd_max: read I/O operations per second during bursts,
->> -#                         in bytes (Since 1.7)
->> -#
->> -# @iops_wr_max: write I/O operations per second during bursts,
->> -#                         in bytes (Since 1.7)
->> -#
->> -# @bps_max_length: maximum length of the @bps_max burst
->> -#                            period, in seconds. It must only
->> -#                            be set if @bps_max is set as well.
->> -#                            Defaults to 1. (Since 2.6)
->> -#
->> -# @bps_rd_max_length: maximum length of the @bps_rd_max
->> -#                               burst period, in seconds. It must only
->> -#                               be set if @bps_rd_max is set as well.
->> -#                               Defaults to 1. (Since 2.6)
->> -#
->> -# @bps_wr_max_length: maximum length of the @bps_wr_max
->> -#                               burst period, in seconds. It must only
->> -#                               be set if @bps_wr_max is set as well.
->> -#                               Defaults to 1. (Since 2.6)
->> -#
->> -# @iops_max_length: maximum length of the @iops burst
->> -#                             period, in seconds. It must only
->> -#                             be set if @iops_max is set as well.
->> -#                             Defaults to 1. (Since 2.6)
->> -#
->> -# @iops_rd_max_length: maximum length of the @iops_rd_max
->> -#                                burst period, in seconds. It must only
->> -#                                be set if @iops_rd_max is set as well.
->> -#                                Defaults to 1. (Since 2.6)
->> -#
->> -# @iops_wr_max_length: maximum length of the @iops_wr_max
->> -#                                burst period, in seconds. It must only
->> -#                                be set if @iops_wr_max is set as well.
->> -#                                Defaults to 1. (Since 2.6)
->> -#
->> -# @iops_size: an I/O size in bytes (Since 1.7)
->> -#
->> # @group: throttle group name (Since 2.4)
->
-> BlockIOThrottle and ThrottleLimits are not directly compatible, for
-> example here we have iops_rd_max_length as a name,
->
->> #
->> # Since: 1.1
->> ##
->> { 'struct': 'BlockIOThrottle',
->> -  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd':
->> 'int',
->> -            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int',
->> 'iops_wr': 'int',
->> -            '*bps_max': 'int', '*bps_rd_max': 'int',
->> -            '*bps_wr_max': 'int', '*iops_max': 'int',
->> -            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
->> -            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
->> -            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
->> -            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
->> -            '*iops_size': 'int', '*group': 'str' } }
->> +  'base': 'ThrottleLimits',
->> +  'data': { '*device': 'str', '*group': 'str' } }
->>
->> ##
->> # @ThrottleLimits:
->> @@ -1913,6 +1842,7 @@
->> # transaction. All fields are optional. When setting limits, if a
->> field is
->> # missing the current value is not changed.
->> #
->> +# @id:                     device id
->> # @iops-total:             limit total I/O operations per second
->> # @iops-total-max:         I/O operations burst
->> # @iops-total-max-length:  length of the iops-total-max burst period,
->> in seconds
->> @@ -1942,7 +1872,7 @@
->> # Since: 2.11
->> ##
->> { 'struct': 'ThrottleLimits',
->> -  'data': { '*iops-total' : 'int', '*iops-total-max' : 'int',
->> +  'data': { '*id' : 'str', '*iops-total' : 'int', '*iops-total-max' :
->> 'int',
->>             '*iops-total-max-length' : 'int', '*iops-read' : 'int',
->>             '*iops-read-max' : 'int', '*iops-read-max-length' : 'int',
->>             '*iops-write' : 'int', '*iops-write-max' : 'int',
->
-> And here it's iops-read-max-length. This breaks the block layer's old
-> throttling API. Do we want the old API replaced for 2.11? I don't know
-> which maintainer is responsible for this, so I CC'd armbru.
+On 20.09.2017 15:24, Gerd Hoffmann wrote:
+>   Hi,
+>=20
+> git master crashes:
+>=20
+> ERROR:/home/kraxel/projects/qemu/accel/kvm/kvm-
+> all.c:756:kvm_set_phys_mem: assertion failed:
+> (!memory_region_is_ram(mr) && !writeable && !mr->romd_mode)
+>=20
+> bisect blames:
+>=20
+> commit f357f564be0bd45245b3ccfbbe20ace08fe83ca8
+> Author: David Hildenbrand <david@redhat.com>
+> Date:=C2=A0=C2=A0=C2=A0Mon Sep 11 19:49:31 2017 +0200
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0kvm: we never have overlapping slots in kvm_set=
+_phys_mem()
+>=20
+> libvirt config attached.
+>=20
+> cheers,
+>   Gerd
+>=20
 
-I do not think its going to break. It just exist we neither try to set 
-that or to query.
+Thanks. That g_assert() was just a security precaution. I'll double
+check if it can be removed or if there is an actual problem.
 
--Pradeep
+--=20
+
+Thanks,
+
+David
