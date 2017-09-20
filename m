@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:55824)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1duex2-0007Bt-Dv
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:23:42 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duexn-0007u3-Rg
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:24:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jan.kiszka@siemens.com>) id 1duevm-0005qk-NG
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:22:04 -0400
-Received: from david.siemens.de ([192.35.17.14]:34127)
+	(envelope-from <cohuck@redhat.com>) id 1duewj-0007Lu-NX
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:22:51 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34682)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
-	id 1dueva-0004ab-PH
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:20:45 -0400
-From: Jan Kiszka <jan.kiszka@siemens.com>
-References: <1d61ec4d-da94-e96a-e1f6-509a4e80daec@siemens.com>
-Message-ID: <7ed88631-9983-db74-245c-8d3fd12a037e@siemens.com>
-Date: Wed, 20 Sep 2017 10:59:59 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duewi-0007K5-SN
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:21:45 -0400
+Date: Wed, 20 Sep 2017 10:33:12 +0200
+From: Cornelia Huck <cohuck@redhat.com>
+Message-ID: <20170920103312.50b8b69b.cohuck@redhat.com>
+In-Reply-To: <20170920074238.GH11080@bjsdjshi@linux.vnet.ibm.com>
+References: <20170919182745.90280-1-pasic@linux.vnet.ibm.com>
+	<20170919182745.90280-6-pasic@linux.vnet.ibm.com>
+	<20170920074238.GH11080@bjsdjshi@linux.vnet.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <1d61ec4d-da94-e96a-e1f6-509a4e80daec@siemens.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] arm: Fix SMC reporting to EL2 when QEMU
- provides PSCI
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] s390x/css: support ccw IDA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,94 +28,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel <qemu-devel@nongnu.org>
+To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On 2017-09-18 09:51, Jan Kiszka wrote:
-> From: Jan Kiszka <jan.kiszka@siemens.com>
+On Wed, 20 Sep 2017 15:42:38 +0800
+Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+
+> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-19 20:27:45 +0200]:
 > 
-> This properly forwards SMC events to EL2 when PSCI is provided by QEMU
-> itself and, thus, ARM_FEATURE_EL3 is off.
+> > Let's add indirect data addressing support for our virtual channel
+> > subsystem. This implementation does not bother with any kind of
+> > prefetching. We simply step through the IDAL on demand.
+> > 
+> > Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> > Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >  hw/s390x/css.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+> >  1 file changed, 116 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+> > index 2d37a9ddde..a3ce6d89b6 100644
+> > --- a/hw/s390x/css.c
+> > +++ b/hw/s390x/css.c
+> > @@ -827,6 +827,121 @@ incr:
+> >      return 0;
+> >  }
+> > 
+> > +/* returns values between 1 and bsz, where bsz is a power of 2 */
+> > +static inline uint16_t ida_continuous_left(hwaddr cda, uint64_t bsz)
+> > +{
+> > +    return bsz - (cda & (bsz - 1));
+> > +}
+> > +
+> > +static inline uint64_t ccw_ida_block_size(uint8_t flags)
+> > +{
+> > +    if ((flags & CDS_F_C64) && !(flags & CDS_F_I2K)) {
+> > +        return 1ULL << 12;
+> > +    }
+> > +    return 1ULL << 11;
+> > +}
+> > +
+> > +static inline int ida_read_next_idaw(CcwDataStream *cds, bool ccw_fmt1,
+> > +                                     bool idaw_fmt_2)
+> > +{
+> > +    union {uint64_t fmt2; uint32_t fmt1; } idaw;
+> > +    int ret;
+> > +    hwaddr idaw_addr;
+> > +
+> > +    if (idaw_fmt_2) {
+> > +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt2) * cds->at_idaw;
+> > +        if (idaw_addr & 0x07 && cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1)) {
+> > +            return -EINVAL; /* channel program check */
+> > +        }
+> > +        ret = address_space_rw(&address_space_memory, idaw_addr,  
+> Ahh, just got one question here:
+> Do we need to considerate endianess for idaw_addr?
+
+That is taken care of below.
+
+And the previous version worked on my laptop via tcg ;)
+
 > 
-> Found and tested with the Jailhouse hypervisor.
+> > +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt2,
+> > +                               sizeof(idaw.fmt2), false);
+> > +        cds->cda = be64_to_cpu(idaw.fmt2);
+> > +    } else {
+> > +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
+> > +        if (idaw_addr & 0x03 && cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1)) {
+> > +            return -EINVAL; /* channel program check */
+> > +        }
+> > +        ret = address_space_rw(&address_space_memory, idaw_addr,
+> > +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt1,
+> > +                               sizeof(idaw.fmt1), false);
+> > +        cds->cda = be64_to_cpu(idaw.fmt1);  
+> Still need to check bit 0x80000000 here I think.
+
+Yes, I think this is 'must be zero' for format-1 idaws, and not covered
+by the ccw-format specific checks above. (Although the PoP can be a bit
+confusing with many similar terms...)
+
 > 
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> ---
->  target/arm/helper.c    | 2 +-
->  target/arm/op_helper.c | 8 ++++----
->  target/arm/psci.c      | 6 ++++++
->  3 files changed, 11 insertions(+), 5 deletions(-)
+> > +    }
+> > +    ++(cds->at_idaw);
+> > +    if (ret != MEMTX_OK) {
+> > +        /* assume inaccessible address */
+> > +        return -EINVAL; /* channel program check */
+> > +  
+> Extra line.
 > 
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 4f41841ef6..8c3929762c 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -3717,7 +3717,7 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
->  
->      if (arm_feature(env, ARM_FEATURE_EL3)) {
->          valid_mask &= ~HCR_HCD;
-> -    } else {
-> +    } else if (cpu->psci_conduit != QEMU_PSCI_CONDUIT_SMC) {
->          valid_mask &= ~HCR_TSC;
->      }
->  
-> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index 6a60464ab9..4b0ef6a234 100644
-> --- a/target/arm/op_helper.c
-> +++ b/target/arm/op_helper.c
-> @@ -960,12 +960,12 @@ void HELPER(pre_smc)(CPUARMState *env, uint32_t syndrome)
->          return;
->      }
->  
-> -    if (!arm_feature(env, ARM_FEATURE_EL3)) {
-> -        /* If we have no EL3 then SMC always UNDEFs */
-> -        undef = true;
-> -    } else if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
-> +    if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
->          /* In NS EL1, HCR controlled routing to EL2 has priority over SMD. */
->          raise_exception(env, EXCP_HYP_TRAP, syndrome, 2);
-> +    } else if (!arm_feature(env, ARM_FEATURE_EL3)) {
-> +        /* If we have no EL3 then SMC always UNDEFs */
-> +        undef = true;
->      }
->  
->      if (undef) {
-> diff --git a/target/arm/psci.c b/target/arm/psci.c
-> index fc34b263d3..637987ff46 100644
-> --- a/target/arm/psci.c
-> +++ b/target/arm/psci.c
-> @@ -35,6 +35,8 @@ bool arm_is_psci_call(ARMCPU *cpu, int excp_type)
->       */
->      CPUARMState *env = &cpu->env;
->      uint64_t param = is_a64(env) ? env->xregs[0] : env->regs[0];
-> +    int cur_el = arm_current_el(env);
-> +    bool secure = arm_is_secure(env);
->  
->      switch (excp_type) {
->      case EXCP_HVC:
-> @@ -46,6 +48,10 @@ bool arm_is_psci_call(ARMCPU *cpu, int excp_type)
->          if (cpu->psci_conduit != QEMU_PSCI_CONDUIT_SMC) {
->              return false;
->          }
-> +        if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
-> +            /* The EL2 will handle this. */
-> +            return false;
-> +        }
->          break;
->      default:
->          return false;
+> > +    }
+> > +    return 0;
+> > +}
+> > +
+> > +static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int len,
+> > +                              CcwDataStreamOp op)
+> > +{
+> > +    uint64_t bsz = ccw_ida_block_size(cds->flags);
+> > +    int ret = 0;
+> > +    uint16_t cont_left, iter_len;
+> > +    const bool idaw_fmt2 = cds->flags & CDS_F_C64;
+> > +    bool ccw_fmt1 = cds->flags & CDS_F_FMT;  
+> Use 'const bool' either? Although I doubt the value of using const here.
+> ;)
+
+Both being the same is still a good idea.
+
 > 
-
-FWIW, we've now a stable (and fast!) QEMU setup running Jailhouse for
-aarch64. We just got bitten by a deficit that this setup revealed in our
-device tree overlay. See also
-
-https://groups.google.com/forum/#!topic/jailhouse-dev/ZqWpFyMXtZE
-
-Looking forward to eventually expand this to ARMv7, GICv2, or ITS.
-Anyone working on those edges already or plan to do so?
-
-Jan
-
--- 
-Siemens AG, Corporate Technology, CT RDA ITP SES-DE
-Corporate Competence Center Embedded Linux
+> > +
+> > +    ret = cds_check_len(cds, len);
+> > +    if (ret <= 0) {
+> > +        return ret;
+> > +    }  
+> 
+> [...]
+> 
