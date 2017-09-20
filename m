@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37210)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37664)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dukzS-0003mi-2M
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:48:59 -0400
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dul0G-0004Ad-TC
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:49:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dukzN-00074q-HU
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:48:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:37610)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dukzN-00073J-AR
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:48:53 -0400
-References: <20170920194144.20101-1-jsnow@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <557731f6-58f6-3fe5-884b-42896c8f1be7@redhat.com>
-Date: Wed, 20 Sep 2017 14:48:46 -0500
+	(envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dul0B-0007oe-Uu
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:49:48 -0400
+Received: from mail-qt0-x243.google.com ([2607:f8b0:400d:c0d::243]:33012)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
+	id 1dul0B-0007oK-Q9
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:49:43 -0400
+Received: by mail-qt0-x243.google.com with SMTP id b1so2428434qtc.0
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 12:49:43 -0700 (PDT)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
+	<philippe.mathieu.daude@gmail.com>
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Date: Wed, 20 Sep 2017 16:49:28 -0300
+Message-Id: <20170920194934.23071-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20170920194144.20101-1-jsnow@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="vvC1EI6mD9ixihxnRd4FRIK7lFHbRioXM"
-Subject: Re: [Qemu-devel] [PATCH] ide: fix enum comparison for gcc 4.7
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v4 0/6] QOMify MIPS cpu
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,59 +31,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk
+To: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Marcel Apfelbaum <marcel@redhat.com>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, James Hogan <james.hogan@imgtec.com>, Thomas Huth <thuth@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---vvC1EI6mD9ixihxnRd4FRIK7lFHbRioXM
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk
-Message-ID: <557731f6-58f6-3fe5-884b-42896c8f1be7@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH] ide: fix enum comparison for gcc 4.7
-References: <20170920194144.20101-1-jsnow@redhat.com>
-In-Reply-To: <20170920194144.20101-1-jsnow@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-On 09/20/2017 02:41 PM, John Snow wrote:
-> Apparently GCC gets bent over comparing enum values against zero.
-> Replace the conditional with something less readable.
->=20
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  hw/ide/core.c             | 2 +-
->  include/hw/ide/internal.h | 3 +--
->  2 files changed, 2 insertions(+), 3 deletions(-)
+This series is based on Igor's "complete cpu QOMification" [1] but only modify
+the MIPS part. Igor posted an updated series [2].
 
-Unfortunate that the compiler conspires against aesthetics, but such is
-life.
+Yongbok: this series is now ready to apply to your MIPS tree :)
 
-Reviewed-by: Eric Blake <eblake@redhat.com>
+Regards,
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
+Phil.
 
+[1]: http://lists.nongnu.org/archive/html/qemu-devel/2017-07/msg04414.html
+[2]: http://lists.nongnu.org/archive/html/qemu-devel/2017-08/msg03364.html
 
---vvC1EI6mD9ixihxnRd4FRIK7lFHbRioXM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+v4:
+- rebased after "generalize parsing of cpu_model  (x86/arm)" merge
 
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+v3:
+- added Eduardo Habkost Acked-by and Reviewed-by
+- put Eduardo patch 4 review comment in commit message
+- address Eduardo's patch 5 review (use correct type, unnecessary null check)
+- drop patch 7 in favor of a "generic mechanism to list CPU models using the
+  QOM hierarchy"
 
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnCxh4ACgkQp6FrSiUn
-Q2qn2gf+OcfOgogB2VyZAP/ylpLSxEc552IX/5VD/5cFqhLrwAVE7Laftblp/pzd
-LHD6md570EMsgDvfK3nPo0QG1xStHanHyaAZrSlf2dUoC67/QL5y/QJaGiJdbgSr
-dkxLeMc7BHeTIMLZFWDNNqHZzgWtBuF33/LG7pGGSR0QhPWWLAnpLnepBuDJ73fx
-v/KQWlD7UtXZGSrEsv/ldnLoa2aePFRMwZbP4vkcWR5YMQgcF3l+4nE1JQ6J83YB
-H8O6Tgjgq7oqUAhiuHhWQbM6GW5dg7GQ+Vj8gsMJO1sqL6kyenG70wQHLvB76sUr
-Lm2LOH72Bzcjc9yeYS0Z+lwY1ht4Xg==
-=5nx7
------END PGP SIGNATURE-----
+v2: 
+- added Igor and James Tested-by
+- squashed "!fixup mips: now than MIPSCPU is QOMified, mark it abstract"
 
---vvC1EI6mD9ixihxnRd4FRIK7lFHbRioXM--
+PS: code movement somehow triggers a "binary vs unary operators" confusion
+    in checkpatch: "ERROR: space prohibited after that '&' (ctx:WxW)"
+
+Igor Mammedov (2):
+  mips: MIPSCPU model subclasses
+  mips: replace cpu_mips_init() with cpu_generic_init()
+
+Philippe Mathieu-Daudé (4):
+  mips: move hw/mips/cputimer.c to target/mips/
+  mips: introduce internal.h and cleanup cpu.h
+  mips: split cpu_mips_realize_env() out of cpu_mips_init()
+  mips: call cpu_mips_realize_env() from mips_cpu_realizefn()
+
+ target/mips/cpu-qom.h                         |   1 +
+ target/mips/cpu.h                             | 357 +---------------------
+ target/mips/internal.h                        | 422 ++++++++++++++++++++++++++
+ hw/mips/cps.c                                 |   2 +-
+ hw/mips/mips_fulong2e.c                       |   2 +-
+ hw/mips/mips_jazz.c                           |   2 +-
+ hw/mips/mips_malta.c                          |   2 +-
+ hw/mips/mips_mipssim.c                        |   2 +-
+ hw/mips/mips_r4k.c                            |   2 +-
+ hw/mips/cputimer.c => target/mips/cp0_timer.c |   2 +-
+ target/mips/cpu.c                             |  54 +++-
+ target/mips/gdbstub.c                         |   1 +
+ target/mips/helper.c                          |   1 +
+ target/mips/kvm.c                             |   1 +
+ target/mips/machine.c                         |   1 +
+ target/mips/msa_helper.c                      |   1 +
+ target/mips/op_helper.c                       |   1 +
+ target/mips/translate.c                       |  23 +-
+ target/mips/translate_init.c                  |  58 +---
+ hw/mips/Makefile.objs                         |   2 +-
+ target/mips/Makefile.objs                     |   2 +-
+ 21 files changed, 500 insertions(+), 439 deletions(-)
+ create mode 100644 target/mips/internal.h
+ rename hw/mips/cputimer.c => target/mips/cp0_timer.c (99%)
+
+-- 
+2.14.1
