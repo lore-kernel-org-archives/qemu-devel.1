@@ -1,31 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37932)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38494)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dul0c-0004SO-HT
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:50:11 -0400
+	(envelope-from <jsnow@redhat.com>) id 1dul1d-0005Is-7B
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:51:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dul0X-0008Hk-Rv
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:50:10 -0400
-Received: from mail-qt0-x241.google.com ([2607:f8b0:400d:c0d::241]:35746)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dul0X-0008Gi-M5
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:50:05 -0400
-Received: by mail-qt0-x241.google.com with SMTP id l25so2418089qtf.2
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 12:50:05 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Wed, 20 Sep 2017 16:49:34 -0300
-Message-Id: <20170920194934.23071-7-f4bug@amsat.org>
-In-Reply-To: <20170920194934.23071-1-f4bug@amsat.org>
-References: <20170920194934.23071-1-f4bug@amsat.org>
+	(envelope-from <jsnow@redhat.com>) id 1dul1c-000145-1y
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 15:51:13 -0400
+References: <20170919201910.25656-1-eblake@redhat.com>
+	<20170919201910.25656-6-eblake@redhat.com>
+	<26069637-9535-cb59-8920-9d9a7eef78b7@redhat.com>
+	<20170920021014.GB18491@lemon>
+	<de133330-5cc3-d877-516c-38fc1928bebf@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <adf09781-51c7-adda-bd0b-f2630fedceff@redhat.com>
+Date: Wed, 20 Sep 2017 15:50:57 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH v4 6/6] mips: replace cpu_mips_init() with
- cpu_generic_init()
+In-Reply-To: <de133330-5cc3-d877-516c-38fc1928bebf@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v9 05/20] dirty-bitmap: Avoid size query
+ failure during truncate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,152 +28,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Marcel Apfelbaum <marcel@redhat.com>
-Cc: qemu-devel@nongnu.org, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, James Hogan <james.hogan@imgtec.com>, Thomas Huth <thuth@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: Eric Blake <eblake@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 
-From: Igor Mammedov <imammedo@redhat.com>
 
-now cpu_mips_init() reimplements subset of cpu_generic_init()
-tasks, so just drop it and use cpu_generic_init() directly.
 
-Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-[PMD: use internal.h instead of cpu.h]
-Tested-by: James Hogan <james.hogan@imgtec.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/mips/cpu.h       |  3 +--
- hw/mips/cps.c           |  2 +-
- hw/mips/mips_fulong2e.c |  2 +-
- hw/mips/mips_jazz.c     |  2 +-
- hw/mips/mips_malta.c    |  2 +-
- hw/mips/mips_mipssim.c  |  2 +-
- hw/mips/mips_r4k.c      |  2 +-
- target/mips/translate.c | 17 -----------------
- 8 files changed, 7 insertions(+), 25 deletions(-)
+On 09/20/2017 09:11 AM, Eric Blake wrote:
+> On 09/19/2017 09:10 PM, Fam Zheng wrote:
+> 
+>>>
+>>> Do you suspect that almost certainly if bdrv_truncate() fails overall
+>>> that the image format driver will either unmount the image or become
+>>> read-only?
+> 
+> Uggh - it feels like I've bitten off more than I can chew with this
+> patch - I'm getting bogged down by trying to fix bad behavior in code
+> that is mostly unrelated to the patch at hand, so I don't have a good
+> opinion on WHAT is supposed to happen if bdrv_truncate() fails, only
+> that I'm trying to avoid compounding that failure even worse.
+> 
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 2f81e0f950..66265e4eb6 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -737,10 +737,9 @@ enum {
-  */
- #define CPU_INTERRUPT_WAKE CPU_INTERRUPT_TGT_INT_0
- 
--MIPSCPU *cpu_mips_init(const char *cpu_model);
- int cpu_mips_signal_handler(int host_signum, void *pinfo, void *puc);
- 
--#define cpu_init(cpu_model) CPU(cpu_mips_init(cpu_model))
-+#define cpu_init(cpu_model) cpu_generic_init(TYPE_MIPS_CPU, cpu_model)
- bool cpu_supports_cps_smp(const char *cpu_model);
- bool cpu_supports_isa(const char *cpu_model, unsigned int isa);
- void cpu_set_exception_base(int vp_index, target_ulong address);
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index 79d4c5e30a..fe5c630af6 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -71,7 +71,7 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-     bool itu_present = false;
- 
-     for (i = 0; i < s->num_vp; i++) {
--        cpu = cpu_mips_init(s->cpu_model);
-+        cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, s->cpu_model));
- 
-         /* Init internal devices */
-         cpu_mips_irq_init_cpu(cpu);
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 439a3d7a66..75318680e1 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -280,7 +280,7 @@ static void mips_fulong2e_init(MachineState *machine)
-     if (cpu_model == NULL) {
-         cpu_model = "Loongson-2E";
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     env = &cpu->env;
- 
-     qemu_register_reset(main_cpu_reset, cpu);
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index ae10670efd..7e6626dc88 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -151,7 +151,7 @@ static void mips_jazz_init(MachineState *machine,
-     if (cpu_model == NULL) {
-         cpu_model = "R4000";
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     env = &cpu->env;
-     qemu_register_reset(main_cpu_reset, cpu);
- 
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index e87cd3230b..2adb9bcf89 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -931,7 +931,7 @@ static void create_cpu_without_cps(const char *cpu_model,
-     int i;
- 
-     for (i = 0; i < smp_cpus; i++) {
--        cpu = cpu_mips_init(cpu_model);
-+        cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
- 
-         /* Init internal devices */
-         cpu_mips_irq_init_cpu(cpu);
-diff --git a/hw/mips/mips_mipssim.c b/hw/mips/mips_mipssim.c
-index 49cd38d680..a092072e2a 100644
---- a/hw/mips/mips_mipssim.c
-+++ b/hw/mips/mips_mipssim.c
-@@ -163,7 +163,7 @@ mips_mipssim_init(MachineState *machine)
-         cpu_model = "24Kf";
- #endif
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     env = &cpu->env;
- 
-     reset_info = g_malloc0(sizeof(ResetData));
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index 7efee94431..1272d4ef9d 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -193,7 +193,7 @@ void mips_r4k_init(MachineState *machine)
-         cpu_model = "24Kf";
- #endif
-     }
--    cpu = cpu_mips_init(cpu_model);
-+    cpu = MIPS_CPU(cpu_generic_init(TYPE_MIPS_CPU, cpu_model));
-     env = &cpu->env;
- 
-     reset_info = g_malloc0(sizeof(ResetData));
-diff --git a/target/mips/translate.c b/target/mips/translate.c
-index f7128bc91d..d16d879df7 100644
---- a/target/mips/translate.c
-+++ b/target/mips/translate.c
-@@ -20523,23 +20523,6 @@ void cpu_mips_realize_env(CPUMIPSState *env)
-     mvp_init(env, env->cpu_model);
- }
- 
--MIPSCPU *cpu_mips_init(const char *cpu_model)
--{
--    ObjectClass *oc;
--    MIPSCPU *cpu;
--
--    oc = cpu_class_by_name(TYPE_MIPS_CPU, cpu_model);
--    if (oc == NULL) {
--        return NULL;
--    }
--
--    cpu = MIPS_CPU(object_new(object_class_get_name(oc)));
--
--    object_property_set_bool(OBJECT(cpu), true, "realized", NULL);
--
--    return cpu;
--}
--
- bool cpu_supports_cps_smp(const char *cpu_model)
- {
-     const mips_def_t *def = cpu_mips_find_by_name(cpu_model);
--- 
-2.14.1
+Yes, I apologize -- I realize I'm holding this series hostage. For now I
+am just trying to legitimately understand the behavior. I am willing to
+accept "It's sorta busted right now, but -EOUTOFSCOPE"
+
+>>> I suppose if *not* that's a bug for callers of bdrv_truncate to allow
+>>> that kind of monkey business, but if it CAN happen, hbitmap only guards
+>>> against such things with an assert (which, IIRC, is not guaranteed to be
+>>> on for all builds)
+>>
+>> It's guaranteed since a few hours ago:
+>>
+>> commit 262a69f4282e44426c7a132138581d400053e0a1
+> 
+> Indeed - but even without my patch, we would have hit the assertion
+> failures when trying to resize the dirty bitmap to -1 when
+> bdrv_nb_sectors() fails (which was likely if refresh_total_sectors()
+> failed).
+> 
+>>> So the question is: "bdrv_truncate failure is NOT considered recoverable
+>>> in ANY case, is it?"
+>>>
+>>> It may possibly be safer to, if the initial truncate request succeeds,
+>>> apply a best-effort to the bitmap before returning the error.
+>>
+>> Like fallback "offset" (or it aligned up to bs cluster size) if
+>> refresh_total_sectors() returns error? I think that is okay.
+> 
+> Here's my proposal for squashing in a best-effort dirty-bitmap resize no
+> matter what happens in refresh_total_sectors() (but really, if you
+> successfully truncate the disk but then get a failure while trying to
+> read back the actual new size, which may differ from the requested size,
+> you're probably doomed down the road anyways).
+> 
+> diff --git i/block.c w/block.c
+> index 3caf6bb093..ef5af81f66 100644
+> --- i/block.c
+> +++ w/block.c
+> @@ -3552,8 +3552,9 @@ int bdrv_truncate(BdrvChild *child, int64_t
+> offset, PreallocMode prealloc,
+>      if (ret < 0) {
+>          error_setg_errno(errp, -ret, "Could not refresh total sector
+> count");
+>      } else {
+> -        bdrv_dirty_bitmap_truncate(bs, bs->total_sectors *
+> BDRV_SECTOR_SIZE);
+> +        offset = bs->total_sectors * BDRV_SECTOR_SIZE;
+>      }
+> +    bdrv_dirty_bitmap_truncate(bs, offset);
+>      bdrv_parent_cb_resize(bs);
+>      atomic_inc(&bs->write_gen);
+>      return ret;
+> 
+> 
+
+Don't respin on my accord, I'm trying to find out if there is a problem;
+I'm not convinced of one yet. Just thinking out loud.
+
+Two cases:
+
+(1) Attempt to resize larger. Resize succeeds, but refresh fails.
+Possibly a temporary protocol failure, but we'll assume the resize
+actually worked. Bitmap does not get resized, however any caller of
+truncate *must* assume that the resize did not succeed. Any calls to
+write beyond previous EOF are a bug by the calling module.
+
+(2) Attempt to resize smaller, an actual truncate. Call succeeds but
+refresh doesn't. Bitmap is now larger than the drive. The bitmap itself
+is perfectly capable of describing reads/writes even to the now-OOB
+area, but it's unlikely the BB would submit any. Problems may arise if
+the BB does not treat this as a hard failure and a user later attempts
+to use this bitmap for a backup operation, as the trailing bits now
+reference disk segments that may or may not physically exist. Likely to
+hit EIO problems during block jobs.
+
+
+If we do decide to resize the bitmap even on refresh failure, We
+probably do still run the risk of the bitmap being slightly bigger or
+slightly smaller than the actual size due to alignment.
+
+It sounds like the resize operation itself needs to be able to return to
+the caller the actual size of the operation instead of forcing the
+caller to query separately in a follow-up call to really "fix" this.
+
+Considering that either resizing or not resizing the bitmap after a
+partial failure probably still leaves us with a possibly dangerous
+bitmap, I don't think I'll hold you to the flames over this one.
+
+--js
