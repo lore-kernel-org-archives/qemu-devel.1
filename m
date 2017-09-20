@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45333)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45371)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dues1-0003MY-SL
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:58 -0400
+	(envelope-from <quintela@redhat.com>) id 1dues2-0003NI-Op
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:17:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1duert-0001JJ-LW
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47742)
+	(envelope-from <quintela@redhat.com>) id 1duert-0001JO-Po
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47738)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1duert-0001IJ-68
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1duert-0001IF-4v
 	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:16:45 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
-	[10.5.11.12])
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A0C5A25C29
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 10:50:27 +0000 (UTC)
+	by mx1.redhat.com (Postfix) with ESMTPS id B694E267F5
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 10:46:58 +0000 (UTC)
 From: Juan Quintela <quintela@redhat.com>
-Date: Wed, 20 Sep 2017 12:50:26 +0200
-Message-Id: <20170920105026.1458-1-quintela@redhat.com>
-Subject: [Qemu-devel] [PATCH] tests: Move postcopy migration test to
- migrate-set-parameters
+Date: Wed, 20 Sep 2017 12:46:30 +0200
+Message-Id: <20170920104639.2335-8-quintela@redhat.com>
+In-Reply-To: <20170920104639.2335-1-quintela@redhat.com>
+References: <20170920104639.2335-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 07/16] migration: Create x-multifd-page-count
+ parameter
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,35 +33,204 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-migrate_set_speed and migrate_set_dowtime are deprecated since long ago.
+Indicates how many pages we are going to send in each batch to a multifd
+thread.
 
 Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- tests/postcopy-test.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 
-diff --git a/tests/postcopy-test.c b/tests/postcopy-test.c
-index 8142f2ab90..991b954a83 100644
---- a/tests/postcopy-test.c
-+++ b/tests/postcopy-test.c
-@@ -430,14 +430,14 @@ static void test_migrate(void)
-      * machine, so also set the downtime.
-      */
-     global_qtest = from;
--    rsp = qmp("{ 'execute': 'migrate_set_speed',"
--              "'arguments': { 'value': 100000000 } }");
-+    rsp = qmp("{ 'execute': 'migrate-set-parameters',"
-+              "'arguments': { 'max-bandwidth': 100000000 } }");
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
+--
+
+Be consistent with defaults and documentation
+Use new DEFINE_PROP_*
+Rename x-multifd-group to x-multifd-page-count
+---
+ hmp.c                 |  7 +++++++
+ migration/migration.c | 27 +++++++++++++++++++++++++++
+ migration/migration.h |  1 +
+ qapi/migration.json   | 17 ++++++++++++++---
+ 4 files changed, 49 insertions(+), 3 deletions(-)
+
+diff --git a/hmp.c b/hmp.c
+index bebe19ebe4..ace729d03f 100644
+--- a/hmp.c
++++ b/hmp.c
+@@ -339,6 +339,9 @@ void hmp_info_migrate_parameters(Monitor *mon, const QDict *qdict)
+         monitor_printf(mon, "%s: %" PRId64 "\n",
+             MigrationParameter_str(MIGRATION_PARAMETER_X_MULTIFD_CHANNELS),
+             params->x_multifd_channels);
++        monitor_printf(mon, "%s: %" PRId64 "\n",
++            MigrationParameter_str(MIGRATION_PARAMETER_X_MULTIFD_PAGE_COUNT),
++            params->x_multifd_page_count);
+     }
  
-     /* 1ms downtime - it should never finish precopy */
--    rsp = qmp("{ 'execute': 'migrate_set_downtime',"
--              "'arguments': { 'value': 0.001 } }");
-+    rsp = qmp("{ 'execute': 'migrate-set-parameters',"
-+              "'arguments': { 'downtime-limit': 1 } }");
-     g_assert(qdict_haskey(rsp, "return"));
-     QDECREF(rsp);
+     qapi_free_MigrationParameters(params);
+@@ -1628,6 +1631,10 @@ void hmp_migrate_set_parameter(Monitor *mon, const QDict *qdict)
+         p->has_x_multifd_channels = true;
+         visit_type_int(v, param, &p->x_multifd_channels, &err);
+         break;
++    case MIGRATION_PARAMETER_X_MULTIFD_PAGE_COUNT:
++        p->has_x_multifd_page_count = true;
++        visit_type_int(v, param, &p->x_multifd_page_count, &err);
++        break;
+     default:
+         assert(0);
+     }
+diff --git a/migration/migration.c b/migration/migration.c
+index 7e79310d03..494c6eb435 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -78,6 +78,7 @@
+  */
+ #define DEFAULT_MIGRATE_X_CHECKPOINT_DELAY 200
+ #define DEFAULT_MIGRATE_MULTIFD_CHANNELS 2
++#define DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT 16
  
+ static NotifierList migration_state_notifiers =
+     NOTIFIER_LIST_INITIALIZER(migration_state_notifiers);
+@@ -484,6 +485,8 @@ MigrationParameters *qmp_query_migrate_parameters(Error **errp)
+     params->block_incremental = s->parameters.block_incremental;
+     params->has_x_multifd_channels = true;
+     params->x_multifd_channels = s->parameters.x_multifd_channels;
++    params->has_x_multifd_page_count = true;
++    params->x_multifd_page_count = s->parameters.x_multifd_page_count;
+ 
+     return params;
+ }
+@@ -772,6 +775,14 @@ static bool migrate_params_check(MigrationParameters *params, Error **errp)
+                    "is invalid, it should be in the range of 1 to 255");
+         return false;
+     }
++    if (params->has_x_multifd_page_count &&
++            (params->x_multifd_page_count < 1 ||
++             params->x_multifd_page_count > 10000)) {
++        error_setg(errp, QERR_INVALID_PARAMETER_VALUE,
++                   "multifd_page_count",
++                   "is invalid, it should be in the range of 1 to 10000");
++        return false;
++    }
+ 
+     return true;
+ }
+@@ -893,6 +904,9 @@ static void migrate_params_apply(MigrateSetParameters *params)
+     if (params->has_x_multifd_channels) {
+         s->parameters.x_multifd_channels = params->x_multifd_channels;
+     }
++    if (params->has_x_multifd_page_count) {
++        s->parameters.x_multifd_page_count = params->x_multifd_page_count;
++    }
+ }
+ 
+ void qmp_migrate_set_parameters(MigrateSetParameters *params, Error **errp)
+@@ -1480,6 +1494,15 @@ int migrate_multifd_channels(void)
+     return s->parameters.x_multifd_channels;
+ }
+ 
++int migrate_multifd_page_count(void)
++{
++    MigrationState *s;
++
++    s = migrate_get_current();
++
++    return s->parameters.x_multifd_page_count;
++}
++
+ int migrate_use_xbzrle(void)
+ {
+     MigrationState *s;
+@@ -2248,6 +2271,9 @@ static Property migration_properties[] = {
+     DEFINE_PROP_INT64("x-multifd-channels", MigrationState,
+                       parameters.x_multifd_channels,
+                       DEFAULT_MIGRATE_MULTIFD_CHANNELS),
++    DEFINE_PROP_INT64("x-multifd-page-count", MigrationState,
++                      parameters.x_multifd_page_count,
++                      DEFAULT_MIGRATE_MULTIFD_PAGE_COUNT),
+ 
+     /* Migration capabilities */
+     DEFINE_PROP_MIG_CAP("x-xbzrle", MIGRATION_CAPABILITY_XBZRLE),
+@@ -2306,6 +2332,7 @@ static void migration_instance_init(Object *obj)
+     params->has_x_checkpoint_delay = true;
+     params->has_block_incremental = true;
+     params->has_x_multifd_channels = true;
++    params->has_x_multifd_page_count = true;
+ }
+ 
+ /*
+diff --git a/migration/migration.h b/migration/migration.h
+index 3060cbc374..641290f51b 100644
+--- a/migration/migration.h
++++ b/migration/migration.h
+@@ -176,6 +176,7 @@ bool migrate_zero_blocks(void);
+ bool migrate_auto_converge(void);
+ bool migrate_use_multifd(void);
+ int migrate_multifd_channels(void);
++int migrate_multifd_page_count(void);
+ 
+ int migrate_use_xbzrle(void);
+ int64_t migrate_xbzrle_cache_size(void);
+diff --git a/qapi/migration.json b/qapi/migration.json
+index c766fb1e52..f8b365e3f5 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -471,6 +471,9 @@
+ #                     number of sockets used for migration.  The
+ #                     default value is 2 (since 2.11)
+ #
++# @x-multifd-page-count: Number of pages sent together to a thread
++#                        The default value is 16 (since 2.11)
++#
+ # Since: 2.4
+ ##
+ { 'enum': 'MigrationParameter',
+@@ -478,7 +481,7 @@
+            'cpu-throttle-initial', 'cpu-throttle-increment',
+            'tls-creds', 'tls-hostname', 'max-bandwidth',
+            'downtime-limit', 'x-checkpoint-delay', 'block-incremental',
+-           'x-multifd-channels'] }
++           'x-multifd-channels', 'x-multifd-page-count' ] }
+ 
+ ##
+ # @MigrateSetParameters:
+@@ -539,6 +542,9 @@
+ #                     number of sockets used for migration.  The
+ #                     default value is 2 (since 2.11)
+ #
++# @x-multifd-page-count: Number of pages sent together to a thread
++#                        The default value is 16 (since 2.11)
++#
+ # Since: 2.4
+ ##
+ # TODO either fuse back into MigrationParameters, or make
+@@ -555,7 +561,8 @@
+             '*downtime-limit': 'int',
+             '*x-checkpoint-delay': 'int',
+             '*block-incremental': 'bool',
+-            '*x-multifd-channels': 'int' } }
++            '*x-multifd-channels': 'int',
++            '*x-multifd-page-count': 'int' } }
+ 
+ ##
+ # @migrate-set-parameters:
+@@ -631,6 +638,9 @@
+ #                     number of sockets used for migration.
+ #                     The default value is 2 (since 2.11)
+ #
++# @x-multifd-page-count: Number of pages sent together to a thread
++#                        The default value is 16 (since 2.11)
++#
+ # Since: 2.4
+ ##
+ { 'struct': 'MigrationParameters',
+@@ -645,7 +655,8 @@
+             '*downtime-limit': 'int',
+             '*x-checkpoint-delay': 'int',
+             '*block-incremental': 'bool' ,
+-            '*x-multifd-channels': 'int' } }
++            '*x-multifd-channels': 'int',
++            '*x-multifd-page-count': 'int' } }
+ 
+ ##
+ # @query-migrate-parameters:
 -- 
 2.13.5
