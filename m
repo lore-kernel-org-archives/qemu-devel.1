@@ -1,41 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60271)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60278)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dufzL-0008TS-2m
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:28:36 -0400
+	(envelope-from <stefanha@redhat.com>) id 1dufzL-0008Ti-Ah
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:28:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dufzF-0002QB-7Y
+	(envelope-from <stefanha@redhat.com>) id 1dufzK-0002Rp-GA
 	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:28:31 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60488)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dufys-0001pd-Jm
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:28:25 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8KBBZbD078806
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 07:13:08 -0400
-Received: from e06smtp15.uk.ibm.com (e06smtp15.uk.ibm.com [195.75.94.111])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3mf8tcw3-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 07:13:07 -0400
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Wed, 20 Sep 2017 12:13:05 +0100
-References: <20170919182745.90280-1-pasic@linux.vnet.ibm.com>
-	<20170919182745.90280-6-pasic@linux.vnet.ibm.com>
-	<20170920074238.GH11080@bjsdjshi@linux.vnet.ibm.com>
-	<20170920103312.50b8b69b.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Wed, 20 Sep 2017 13:13:01 +0200
+Date: Wed, 20 Sep 2017 15:28:16 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+Message-ID: <20170920142816.GE9409@stefanha-x1.localdomain>
+References: <20170920102311.25736-1-el13635@mail.ntua.gr>
+	<20170920102311.25736-2-el13635@mail.ntua.gr>
 MIME-Version: 1.0
-In-Reply-To: <20170920103312.50b8b69b.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <009428a2-fb31-ecc9-d477-4cdea226f2d8@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 5/5] s390x/css: support ccw IDA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170920102311.25736-2-el13635@mail.ntua.gr>
+Subject: Re: [Qemu-devel] [PATCH 1/3] block: add bdrv_co_drain_end callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,137 +23,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>
+Cc: qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Max Reitz <mreitz@redhat.com>, Fam Zheng <famz@redhat.com>
 
+On Wed, Sep 20, 2017 at 01:23:09PM +0300, Manos Pitsidianakis wrote:
+> diff --git a/include/block/block_int.h b/include/block/block_int.h
+> index ba4c383393..ea1326e3c7 100644
+> --- a/include/block/block_int.h
+> +++ b/include/block/block_int.h
+> @@ -359,6 +359,8 @@ struct BlockDriver {
+>       */
+>      void coroutine_fn (*bdrv_co_drain)(BlockDriverState *bs);
+>  
+> +    void coroutine_fn (*bdrv_co_drain_end)(BlockDriverState *bs);
 
-
-On 09/20/2017 10:33 AM, Cornelia Huck wrote:
-> On Wed, 20 Sep 2017 15:42:38 +0800
-> Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
-> 
->> * Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-19 20:27:45 +0200]:
->>
->>> Let's add indirect data addressing support for our virtual channel
->>> subsystem. This implementation does not bother with any kind of
->>> prefetching. We simply step through the IDAL on demand.
->>>
->>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
->>> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->>> ---
->>>  hw/s390x/css.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->>>  1 file changed, 116 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/hw/s390x/css.c b/hw/s390x/css.c
->>> index 2d37a9ddde..a3ce6d89b6 100644
->>> --- a/hw/s390x/css.c
->>> +++ b/hw/s390x/css.c
->>> @@ -827,6 +827,121 @@ incr:
->>>      return 0;
->>>  }
->>>
->>> +/* returns values between 1 and bsz, where bsz is a power of 2 */
->>> +static inline uint16_t ida_continuous_left(hwaddr cda, uint64_t bsz)
->>> +{
->>> +    return bsz - (cda & (bsz - 1));
->>> +}
->>> +
->>> +static inline uint64_t ccw_ida_block_size(uint8_t flags)
->>> +{
->>> +    if ((flags & CDS_F_C64) && !(flags & CDS_F_I2K)) {
->>> +        return 1ULL << 12;
->>> +    }
->>> +    return 1ULL << 11;
->>> +}
->>> +
->>> +static inline int ida_read_next_idaw(CcwDataStream *cds, bool ccw_fmt1,
->>> +                                     bool idaw_fmt_2)
->>> +{
->>> +    union {uint64_t fmt2; uint32_t fmt1; } idaw;
->>> +    int ret;
->>> +    hwaddr idaw_addr;
->>> +
->>> +    if (idaw_fmt_2) {
->>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt2) * cds->at_idaw;
->>> +        if (idaw_addr & 0x07 && cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1)) {
->>> +            return -EINVAL; /* channel program check */
->>> +        }
->>> +        ret = address_space_rw(&address_space_memory, idaw_addr,  
->> Ahh, just got one question here:
->> Do we need to considerate endianess for idaw_addr?
-> 
-> That is taken care of below.
-> 
-> And the previous version worked on my laptop via tcg ;)
-
-Nod.
-
-> 
->>
->>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt2,
->>> +                               sizeof(idaw.fmt2), false);
->>> +        cds->cda = be64_to_cpu(idaw.fmt2);
->>> +    } else {
->>> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
->>> +        if (idaw_addr & 0x03 && cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1)) {
->>> +            return -EINVAL; /* channel program check */
->>> +        }
->>> +        ret = address_space_rw(&address_space_memory, idaw_addr,
->>> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt1,
->>> +                               sizeof(idaw.fmt1), false);
->>> +        cds->cda = be64_to_cpu(idaw.fmt1);  
->> Still need to check bit 0x80000000 here I think.
-> 
-> Yes, I think this is 'must be zero' for format-1 idaws, and not covered
-> by the ccw-format specific checks above. (Although the PoP can be a bit
-> confusing with many similar terms...)
->
-
-It's taken care of in ccw_dstream_rw_ida before the actual
-access happens. Code looks like this:
-+        if (!idaw_fmt2 && (cds->cda + iter_len) >= (1ULL << 31)) {
-+                ret = -EINVAL; /* channel program check */
-+                goto err;
-+        }
-
-The idea was to have it similar to the non-indirect case.
- 
->>
->>> +    }
->>> +    ++(cds->at_idaw);
->>> +    if (ret != MEMTX_OK) {
->>> +        /* assume inaccessible address */
->>> +        return -EINVAL; /* channel program check */
->>> +  
->> Extra line.
->>
->>> +    }
->>> +    return 0;
->>> +}
->>> +
->>> +static int ccw_dstream_rw_ida(CcwDataStream *cds, void *buff, int len,
->>> +                              CcwDataStreamOp op)
->>> +{
->>> +    uint64_t bsz = ccw_ida_block_size(cds->flags);
->>> +    int ret = 0;
->>> +    uint16_t cont_left, iter_len;
->>> +    const bool idaw_fmt2 = cds->flags & CDS_F_C64;
->>> +    bool ccw_fmt1 = cds->flags & CDS_F_FMT;  
->> Use 'const bool' either? Although I doubt the value of using const here.
->> ;)
-> 
-> Both being the same is still a good idea.
-> 
-
-Yeah. For which one should I go (with const or without)?
-
->>
->>> +
->>> +    ret = cds_check_len(cds, len);
->>> +    if (ret <= 0) {
->>> +        return ret;
->>> +    }  
->>
->> [...]
->>
-> 
+Please update the doc comment to describe the environment under which
+begin() and end() are invoked.  It should be clear when to implement
+begin() and/or end().
