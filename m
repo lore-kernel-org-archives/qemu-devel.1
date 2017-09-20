@@ -1,38 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60545)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34483)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1duYnA-0006T1-4T
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:47:29 -0400
+	(envelope-from <clg@kaod.org>) id 1duYpJ-0007E5-S7
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:49:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <bjsdjshi@linux.vnet.ibm.com>) id 1duYn5-0002cQ-4m
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:47:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:52202)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <bjsdjshi@linux.vnet.ibm.com>)
-	id 1duYn4-0002bT-M6
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:47:23 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8K6kPDA123538
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 02:47:21 -0400
-Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3bt1yx4h-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 02:47:20 -0400
-Received: from localhost
-	by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <bjsdjshi@linux.vnet.ibm.com>;
-	Wed, 20 Sep 2017 00:47:20 -0600
-Date: Wed, 20 Sep 2017 14:47:15 +0800
-From: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-References: <20170919182745.90280-1-pasic@linux.vnet.ibm.com>
-	<20170919182745.90280-4-pasic@linux.vnet.ibm.com>
+	(envelope-from <clg@kaod.org>) id 1duYpC-0004oK-NX
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:49:39 -0400
+Received: from 8.mo2.mail-out.ovh.net ([188.165.52.147]:55240)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duYpC-0004nJ-Hm
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 02:49:34 -0400
+Received: from player157.ha.ovh.net (b9.ovh.net [213.186.33.59])
+	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 11F09AC96C
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 08:49:33 +0200 (CEST)
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Date: Wed, 20 Sep 2017 08:49:15 +0200
+Message-Id: <20170920064915.30027-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170919182745.90280-4-pasic@linux.vnet.ibm.com>
-Message-Id: <20170920064715.GG11080@bjsdjshi@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH v3 3/5] virtio-ccw: use ccw data stream
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v2] watchdog/aspeed: fix variable type to store
+ reload value
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,25 +28,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Halil Pasic <pasic@linux.vnet.ibm.com>
-Cc: Cornelia Huck <cohuck@redhat.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, Andrew Jeffery <andrew@aj.id.au>, "Anton D . Kachalov" <mouse@yandex-team.ru>, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 
-* Halil Pasic <pasic@linux.vnet.ibm.com> [2017-09-19 20:27:43 +0200]:
+Initially from Anton D. Kachalov" <mouse@yandex-team.ru> but the SoB was
+missing.
 
-> Replace direct access which implicitly assumes no IDA
-> or MIDA with the new ccw data stream interface which should
-> cope with these transparently in the future.
-> 
-> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-> Reviewed-by: Pierre Morel<pmorel@linux.vnet.ibm.com>
-> ---
->  hw/s390x/virtio-ccw.c | 157 +++++++++++++++-----------------------------------
->  1 file changed, 46 insertions(+), 111 deletions(-)
-> 
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+[clg: change commit log and subject
+      replace UL suffix by ULL ]
+Signed-off-by: C=C3=A9dric Le Goater <clg@kaod.org>
+---
+ hw/watchdog/wdt_aspeed.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-
-[...]
-
--- 
-Dong Jia Shi
+diff --git a/hw/watchdog/wdt_aspeed.c b/hw/watchdog/wdt_aspeed.c
+index 22bce364d7b5..95f6ad186d72 100644
+--- a/hw/watchdog/wdt_aspeed.c
++++ b/hw/watchdog/wdt_aspeed.c
+@@ -100,13 +100,13 @@ static uint64_t aspeed_wdt_read(void *opaque, hwadd=
+r offset, unsigned size)
+=20
+ static void aspeed_wdt_reload(AspeedWDTState *s, bool pclk)
+ {
+-    uint32_t reload;
++    uint64_t reload;
+=20
+     if (pclk) {
+         reload =3D muldiv64(s->regs[WDT_RELOAD_VALUE], NANOSECONDS_PER_S=
+ECOND,
+                           s->pclk_freq);
+     } else {
+-        reload =3D s->regs[WDT_RELOAD_VALUE] * 1000;
++        reload =3D s->regs[WDT_RELOAD_VALUE] * 1000ULL;
+     }
+=20
+     if (aspeed_wdt_is_enabled(s)) {
+--=20
+2.13.5
