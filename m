@@ -1,26 +1,15 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40068)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40090)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1duf8Y-0000Qb-4K
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:34:01 -0400
+	(envelope-from <kwolf@redhat.com>) id 1duf8a-0000Sj-DQ
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:34:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1duf8U-0008ND-Vk
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:33:58 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53824)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1duf8U-0008Mw-PQ
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:33:54 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1504081950-2528-7-git-send-email-peterx@redhat.com> (Peter Xu's
-	message of "Wed, 30 Aug 2017 16:32:03 +0800")
-References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-	<1504081950-2528-7-git-send-email-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 20 Sep 2017 10:47:06 +0200
-Message-ID: <874lrxlpth.fsf@secure.laptop>
-MIME-Version: 1.0
-Content-Type: text/plain
-Subject: Re: [Qemu-devel] [RFC v2 06/33] migration: reuse
- mis->userfault_quit_fd
+	(envelope-from <kwolf@redhat.com>) id 1duf8Z-0008Oo-Dn
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:34:00 -0400
+From: Kevin Wolf <kwolf@redhat.com>
+Date: Wed, 20 Sep 2017 14:15:15 +0200
+Message-Id: <20170920121515.1311-1-kwolf@redhat.com>
+Subject: [Qemu-devel] [PATCH] qemu-iotests/195: Change multiple nodes in one
+ run
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,18 +18,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
 
-Peter Xu <peterx@redhat.com> wrote:
-> It was only used for quitting the page fault thread before. Let it be
-> something more useful - now we can use it to notify a "wake" for the
-> page fault thread (for any reason), and it only means "quit" if the
-> fault_thread_quit is set.
->
-> Since we changed what it does, renaming it to userfault_event_fd.
->
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+This additional check for change-backing-file makes sure that actions on
+one part of the graph don't interfere with later actions elsewhere.
 
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+Suggested-by: Eric Blake <eblake@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+---
+ tests/qemu-iotests/195     | 17 ++++++++++++++++
+ tests/qemu-iotests/195.out | 51 ++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 68 insertions(+)
+
+diff --git a/tests/qemu-iotests/195 b/tests/qemu-iotests/195
+index 05a239cbf5..eb2861380d 100755
+--- a/tests/qemu-iotests/195
++++ b/tests/qemu-iotests/195
+@@ -86,6 +86,23 @@ EOF
+ 
+ _img_info
+ 
++echo
++echo "Change backing file of multiple nodes in a single run"
++echo
++
++_make_test_img -b "$TEST_IMG.mid"
++
++run_qemu -drive if=none,file="$TEST_IMG",node-name=top,backing.node-name=mid <<EOF
++{"execute":"qmp_capabilities"}
++{"execute":"change-backing-file", "arguments":{"device":"none0","image-node-name":"mid","backing-file":"/dev/null"}}
++{"execute":"change-backing-file", "arguments":{"device":"none0","image-node-name":"top","backing-file":"/dev/null"}}
++{"execute":"change-backing-file", "arguments":{"device":"none0","image-node-name":"mid","backing-file":"/dev/null"}}
++{"execute":"quit"}
++EOF
++
++TEST_IMG="$TEST_IMG.mid" _img_info
++_img_info
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/195.out b/tests/qemu-iotests/195.out
+index 7613575c64..d210c04895 100644
+--- a/tests/qemu-iotests/195.out
++++ b/tests/qemu-iotests/195.out
+@@ -75,4 +75,55 @@ virtual size: 64M (67108864 bytes)
+ cluster_size: 65536
+ backing file: /dev/null
+ backing file format: IMGFMT
++
++Change backing file of multiple nodes in a single run
++
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 backing_file=TEST_DIR/t.IMGFMT.mid
++Testing: -drive if=none,file=TEST_DIR/t.IMGFMT,node-name=top,backing.node-name=mid
++{
++    QMP_VERSION
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "return": {
++    }
++}
++{
++    "timestamp": {
++        "seconds":  TIMESTAMP,
++        "microseconds":  TIMESTAMP
++    },
++    "event": "SHUTDOWN",
++    "data": {
++        "guest": false
++    }
++}
++
++image: TEST_DIR/t.IMGFMT.mid
++file format: IMGFMT
++virtual size: 64M (67108864 bytes)
++cluster_size: 65536
++backing file: /dev/null
++backing file format: IMGFMT
++image: TEST_DIR/t.IMGFMT
++file format: IMGFMT
++virtual size: 64M (67108864 bytes)
++cluster_size: 65536
++backing file: /dev/null
++backing file format: IMGFMT
+ *** done
+-- 
+2.13.5
