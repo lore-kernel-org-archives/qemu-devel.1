@@ -1,36 +1,37 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40522)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40584)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9N-0004KK-Nz
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:02 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9V-0004MZ-0p
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9I-0005YL-SY
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:01 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34158
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9K-0005ZF-33
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:03 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40454
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1duT9I-0005Xl-Ms
-	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:45:56 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8K0hcvT015487
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:56 -0400
-Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2d3akjtpaq-1
+	id 1duT9J-0005Yo-PU
+	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:45:57 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8K0hasx108317
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:57 -0400
+Received: from e16.ny.us.ibm.com (e16.ny.us.ibm.com [129.33.205.206])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3brr6mn4-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:55 -0400
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:56 -0400
 Received: from localhost
-	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e16.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
 	Tue, 19 Sep 2017 20:45:55 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 19 Sep 2017 19:45:19 -0500
-In-Reply-To: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
-References: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
-Message-Id: <20170920004521.9417-11-mdroth@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH 10/12] scsi-bus: correct responses for INQUIRY
- and REQUEST SENSE
+Date: Tue, 19 Sep 2017 19:45:09 -0500
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Message-Id: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH 00/12] Patch Round-up for stable 2.10.1,
+ freeze on 2017-09-27
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -40,73 +41,76 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>, Paolo Bonzini <pbonzini@redhat.com>
-
-From: Hannes Reinecke <hare@suse.de>
-
-According to SPC-3 INQUIRY and REQUEST SENSE should return GOOD
-even on unsupported LUNS.
-
-Signed-off-by: Hannes Reinecke <hare@suse.com>
-Message-Id: <1503049022-14749-1-git-send-email-hare@suse.de>
-Reported-by: Laszlo Ersek <lersek@redhat.com>
-Fixes: ded6ddc5a7b95217557fa360913d1213e12d4a6d
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Hannes Reinecke <hare@suse.de>
-(cherry picked from commit b07fbce6349c7b84642e7ed56c7a1ac3c1caca61)
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
----
- hw/scsi/scsi-bus.c | 29 +++++++++++++++++++++++++----
- 1 file changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index e364410a23..ade31c11f5 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -516,8 +516,10 @@ static size_t scsi_sense_len(SCSIRequest *req)
- static int32_t scsi_target_send_command(SCSIRequest *req, uint8_t *buf)
- {
-     SCSITargetReq *r = DO_UPCAST(SCSITargetReq, req, req);
-+    int fixed_sense = (req->cmd.buf[1] & 1) == 0;
- 
--    if (req->lun != 0) {
-+    if (req->lun != 0 &&
-+        buf[0] != INQUIRY && buf[0] != REQUEST_SENSE) {
-         scsi_req_build_sense(req, SENSE_CODE(LUN_NOT_SUPPORTED));
-         scsi_req_complete(req, CHECK_CONDITION);
-         return 0;
-@@ -535,9 +537,28 @@ static int32_t scsi_target_send_command(SCSIRequest *req, uint8_t *buf)
-         break;
-     case REQUEST_SENSE:
-         scsi_target_alloc_buf(&r->req, scsi_sense_len(req));
--        r->len = scsi_device_get_sense(r->req.dev, r->buf,
--                                       MIN(req->cmd.xfer, r->buf_len),
--                                       (req->cmd.buf[1] & 1) == 0);
-+        if (req->lun != 0) {
-+            const struct SCSISense sense = SENSE_CODE(LUN_NOT_SUPPORTED);
-+
-+            if (fixed_sense) {
-+                r->buf[0] = 0x70;
-+                r->buf[2] = sense.key;
-+                r->buf[10] = 10;
-+                r->buf[12] = sense.asc;
-+                r->buf[13] = sense.ascq;
-+                r->len = MIN(req->cmd.xfer, SCSI_SENSE_LEN);
-+            } else {
-+                r->buf[0] = 0x72;
-+                r->buf[1] = sense.key;
-+                r->buf[2] = sense.asc;
-+                r->buf[3] = sense.ascq;
-+                r->len = 8;
-+            }
-+        } else {
-+            r->len = scsi_device_get_sense(r->req.dev, r->buf,
-+                                           MIN(req->cmd.xfer, r->buf_len),
-+                                           fixed_sense);
-+        }
-         if (r->req.dev->sense_is_ua) {
-             scsi_device_unit_attention_reported(req->dev);
-             r->req.dev->sense_len = 0;
--- 
-2.11.0
+Hi everyone,
+
+The following new patches are queued for QEMU stable v2.10.1:
+
+  https://github.com/mdroth/qemu/commits/stable-2.10-staging
+
+The release is planned for 2017-10-02:
+
+  https://wiki.qemu.org/Planning/2.10
+
+Please respond here or CC qemu-stable@nongnu.org on any patches you
+think should be included in the release.
+
+Testing/feedback is greatly appreciated.
+
+Thanks!
+
+----------------------------------------------------------------
+Alex Williamson (1):
+      vhost: Release memory references on cleanup
+
+Farhan Ali (1):
+      s390-ccw: Fix alignment for CCW1
+
+Greg Kurz (1):
+      virtfs: error out gracefully when mandatory suboptions are missing
+
+Hannes Reinecke (1):
+      scsi-bus: correct responses for INQUIRY and REQUEST SENSE
+
+Marc-Andr=C3=A9 Lureau (2):
+      libvhost-user: support resuming vq->last_avail_idx based on used_id=
+x
+      vhost-user-bridge: fix resume regression (since 2.9)
+
+Pavel Butsykin (1):
+      qcow2: move qcow2_store_persistent_dirty_bitmaps() before cache flu=
+shing
+
+Peter Maydell (1):
+      mps2-an511: Fix wiring of UART overflow interrupt lines
+
+Pranith Kumar (1):
+      arm_gicv3_kvm: Fix compile warning
+
+Richard Henderson (1):
+      target/arm: Fix aa64 ldp register writeback
+
+Samuel Thibault (1):
+      slirp: fix clearing ifq_so from pending packets
+
+Thomas Huth (1):
+      hw/arm/allwinner-a10: Mark the allwinner-a10 device with user_creat=
+able =3D false
+
+ block/qcow2.c                         | 16 +++++++-------
+ contrib/libvhost-user/libvhost-user.c | 13 ++++++++++++
+ contrib/libvhost-user/libvhost-user.h |  7 +++++++
+ hw/arm/allwinner-a10.c                |  2 ++
+ hw/arm/mps2.c                         |  4 ++--
+ hw/intc/arm_gicv3_kvm.c               |  2 +-
+ hw/scsi/scsi-bus.c                    | 29 ++++++++++++++++++++++----
+ hw/virtio/vhost.c                     |  4 ++++
+ pc-bios/s390-ccw/cio.h                |  2 +-
+ scripts/device-crash-test             |  1 -
+ slirp/socket.c                        | 39 +++++++++++++++++++++--------=
+------
+ target/arm/translate-a64.c            | 29 +++++++++++++++-----------
+ tests/vhost-user-bridge.c             |  7 +++++++
+ vl.c                                  | 16 ++++++++------
+ 14 files changed, 120 insertions(+), 51 deletions(-)
