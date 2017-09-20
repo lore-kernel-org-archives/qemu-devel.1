@@ -1,24 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58754)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dugxp-0000N6-Aj
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:31:02 -0400
+	(envelope-from <eblake@redhat.com>) id 1dugzN-0001cJ-IU
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:32:38 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dugxj-00088s-4D
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:31:00 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:56688)
+	(envelope-from <eblake@redhat.com>) id 1dugzK-0001NE-8f
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:32:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38418)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dugxi-00086y-BR
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:30:54 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Wed, 20 Sep 2017 17:30:15 +0200
-Message-Id: <20170920153016.3858-3-david@redhat.com>
-In-Reply-To: <20170920153016.3858-1-david@redhat.com>
-References: <20170920153016.3858-1-david@redhat.com>
+	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dugzJ-0001MA-NP
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 11:32:34 -0400
+References: <20170919180038.26056-1-dgilbert@redhat.com>
+	<20170919180038.26056-6-dgilbert@redhat.com>
+	<20170920035512.GF18491@lemon> <20170920142040.GE2449@work-vm>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <80ea7936-97b1-7d82-1373-149d33a811f7@redhat.com>
+Date: Wed, 20 Sep 2017 10:32:26 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH v3 2/3] s390x/tcg: move wrap_address() to
- internal.h
+In-Reply-To: <20170920142040.GE2449@work-vm>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="AxhdUuIgcAmLbbf8daeRbni1khqlCDxSr"
+Subject: Re: [Qemu-devel] [PATCH 5/5] migration: Route more error paths
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,70 +29,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, david@redhat.com, Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Fam Zheng <famz@redhat.com>
+Cc: peter.maydell@linaro.org, quintela@redhat.com, cohuck@redhat.com, qemu-devel@nongnu.org, peterx@redhat.com, rth@twiddle.net
 
-We want to use it in another file.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--AxhdUuIgcAmLbbf8daeRbni1khqlCDxSr
+From: Eric Blake <eblake@redhat.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Fam Zheng <famz@redhat.com>
+Cc: peter.maydell@linaro.org, quintela@redhat.com, cohuck@redhat.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, rth@twiddle.net
+Message-ID: <80ea7936-97b1-7d82-1373-149d33a811f7@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 5/5] migration: Route more error paths
+References: <20170919180038.26056-1-dgilbert@redhat.com>
+ <20170919180038.26056-6-dgilbert@redhat.com> <20170920035512.GF18491@lemon>
+ <20170920142040.GE2449@work-vm>
+In-Reply-To: <20170920142040.GE2449@work-vm>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- target/s390x/internal.h   | 14 ++++++++++++++
- target/s390x/mem_helper.c | 14 --------------
- 2 files changed, 14 insertions(+), 14 deletions(-)
+On 09/20/2017 09:20 AM, Dr. David Alan Gilbert wrote:
 
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index bc8f83129a..70d2b87e55 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -162,6 +162,20 @@ static inline uint8_t get_per_atmid(CPUS390XState *e=
-nv)
-            ((env->psw.mask & PSW_ASC_ACCREG) ?    (1 << 2) : 0);
- }
-=20
-+static inline uint64_t wrap_address(CPUS390XState *env, uint64_t a)
-+{
-+    if (!(env->psw.mask & PSW_MASK_64)) {
-+        if (!(env->psw.mask & PSW_MASK_32)) {
-+            /* 24-Bit mode */
-+            a &=3D 0x00ffffff;
-+        } else {
-+            /* 31-Bit mode */
-+            a &=3D 0x7fffffff;
-+        }
-+    }
-+    return a;
-+}
-+
- /* CC optimization */
-=20
- /* Instead of computing the condition codes after each x86 instruction,
-diff --git a/target/s390x/mem_helper.c b/target/s390x/mem_helper.c
-index ec4760e390..a254613dc2 100644
---- a/target/s390x/mem_helper.c
-+++ b/target/s390x/mem_helper.c
-@@ -122,20 +122,6 @@ static inline void cpu_stsize_data_ra(CPUS390XState =
-*env, uint64_t addr,
-     }
- }
-=20
--static inline uint64_t wrap_address(CPUS390XState *env, uint64_t a)
--{
--    if (!(env->psw.mask & PSW_MASK_64)) {
--        if (!(env->psw.mask & PSW_MASK_32)) {
--            /* 24-Bit mode */
--            a &=3D 0x00ffffff;
--        } else {
--            /* 31-Bit mode */
--            a &=3D 0x7fffffff;
--        }
--    }
--    return a;
--}
--
- static void fast_memset(CPUS390XState *env, uint64_t dest, uint8_t byte,
-                         uint32_t l, uintptr_t ra)
- {
+>>>      /* Save file with vmstate */
+>>> -    vmstate_save_state(f, desc, obj, NULL);
+>>> +    g_assert(!vmstate_save_state(f, desc, obj, NULL));
+>>
+>> Though this is test code, isn't putting anything with a side effect in=
+to an
+>> assert expression a very bad pattern in general?
+>=20
+> Hmm; ok I've changed this but I'm not really convinced; the whole point=
+
+> of an asser in a test is to actually run it, and I think the g_assert
+> prints the text that failed, so it gives you a much better error inline=
+=2E
+
+glib doesn't make life any easier by having two different flavors of
+assertions.
+
+g_assert() can be disabled at compile-time (side effects are lost).  It
+is roughly akin to assert(); and the output when an assertion fails
+isn't that much more useful than what you get with plain assert().
+
+g_assert_cmpint() cannot be disabled at compile-time, but can have a
+runtime switch on whether it abort()s or continues on.  Here, the output
+when something fails is MUCH more pleasant to read.
+
+But the fact that there are two separate families of g_assert* behaviors
+just makes it easier to live by the mantra that side-effects don't
+belong inside assertions.
+
 --=20
-2.13.5
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
+
+--AxhdUuIgcAmLbbf8daeRbni1khqlCDxSr
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnCigoACgkQp6FrSiUn
+Q2oUjAf/d0hvlq1aDlucSSMqXDzmCsg7hvAq9410AdKhY4Gq0rRRs23ouL9TfD10
+NpRkM+oumz2bT1VZR19LKgy7ZbukHCDaLhhkDHN+mrYmYYyb73g9yyaYsTO5ivfJ
+uTHINSPoC77nlXPOqpOjW408LjGeXTETceD7/RhI4krV0WVN0ls9dCfQKw2kjo6o
+zE/AUNUAgYWao9uOsqRV7CXv/Vz8G4+mZLh44TJTynD987YvBmeeJh4Vpx2bYEZL
++x3VEUcNj1jov0/9JdTKap4CBdkm2cvgrGCM+oHNHJ0Z0g+yFKh7uAJcKnbsODy0
+GcLCS0uuyADQcyHpcJ5qo3bUZLeBDQ==
+=jX7h
+-----END PGP SIGNATURE-----
+
+--AxhdUuIgcAmLbbf8daeRbni1khqlCDxSr--
