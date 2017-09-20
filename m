@@ -1,38 +1,36 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40495)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40522)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9M-0004KH-Vd
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9N-0004KK-Nz
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9I-0005YU-Ub
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1duT9I-0005YL-SY
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:46:01 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:59970)
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:34158
+	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
-	id 1duT9I-0005XW-N6
+	id 1duT9I-0005Xl-Ms
 	for qemu-devel@nongnu.org; Tue, 19 Sep 2017 20:45:56 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8K0haV2144782
-	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:55 -0400
-Received: from e12.ny.us.ibm.com (e12.ny.us.ibm.com [129.33.205.202])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d3cbn4y8w-1
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8K0hcvT015487
+	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:56 -0400
+Received: from e19.ny.us.ibm.com (e19.ny.us.ibm.com [129.33.205.209])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2d3akjtpaq-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
 	for <qemu-devel@nongnu.org>; Tue, 19 Sep 2017 20:45:55 -0400
 Received: from localhost
-	by e12.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	by e19.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
 	Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
-	Tue, 19 Sep 2017 20:45:54 -0400
+	Tue, 19 Sep 2017 20:45:55 -0400
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
-Date: Tue, 19 Sep 2017 19:45:18 -0500
+Date: Tue, 19 Sep 2017 19:45:19 -0500
 In-Reply-To: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
 References: <20170920004521.9417-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Message-Id: <20170920004521.9417-10-mdroth@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH 09/12] mps2-an511: Fix wiring of UART overflow
- interrupt lines
+Message-Id: <20170920004521.9417-11-mdroth@linux.vnet.ibm.com>
+Subject: [Qemu-devel] [PATCH 10/12] scsi-bus: correct responses for INQUIRY
+ and REQUEST SENSE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,40 +40,73 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: qemu-stable@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-stable@nongnu.org, Hannes Reinecke <hare@suse.de>, Hannes Reinecke <hare@suse.com>, Paolo Bonzini <pbonzini@redhat.com>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Hannes Reinecke <hare@suse.de>
 
-Fix an error that meant we were wiring every UART's overflow
-interrupts into the same inputs 0 and 1 of the OR gate,
-rather than giving each its own input.
+According to SPC-3 INQUIRY and REQUEST SENSE should return GOOD
+even on unsupported LUNS.
 
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+Message-Id: <1503049022-14749-1-git-send-email-hare@suse.de>
+Reported-by: Laszlo Ersek <lersek@redhat.com>
+Fixes: ded6ddc5a7b95217557fa360913d1213e12d4a6d
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
-Message-id: 1505232834-20890-1-git-send-email-peter.maydell@linaro.org
-(cherry picked from commit ce3bc112cdb1d462e2d52eaa17a7314e7f3af504)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+(cherry picked from commit b07fbce6349c7b84642e7ed56c7a1ac3c1caca61)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/arm/mps2.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/scsi/scsi-bus.c | 29 +++++++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
-index abb0ab6d71..769cff872c 100644
---- a/hw/arm/mps2.c
-+++ b/hw/arm/mps2.c
-@@ -287,8 +287,8 @@ static void mps2_common_init(MachineState *machine)
-             cmsdk_apb_uart_create(uartbase[i],
-                                   qdev_get_gpio_in(txrx_orgate_dev, 0),
-                                   qdev_get_gpio_in(txrx_orgate_dev, 1),
--                                  qdev_get_gpio_in(orgate_dev, 0),
--                                  qdev_get_gpio_in(orgate_dev, 1),
-+                                  qdev_get_gpio_in(orgate_dev, i * 2),
-+                                  qdev_get_gpio_in(orgate_dev, i * 2 + 1=
-),
-                                   NULL,
-                                   uartchr, SYSCLK_FRQ);
-         }
---=20
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index e364410a23..ade31c11f5 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -516,8 +516,10 @@ static size_t scsi_sense_len(SCSIRequest *req)
+ static int32_t scsi_target_send_command(SCSIRequest *req, uint8_t *buf)
+ {
+     SCSITargetReq *r = DO_UPCAST(SCSITargetReq, req, req);
++    int fixed_sense = (req->cmd.buf[1] & 1) == 0;
+ 
+-    if (req->lun != 0) {
++    if (req->lun != 0 &&
++        buf[0] != INQUIRY && buf[0] != REQUEST_SENSE) {
+         scsi_req_build_sense(req, SENSE_CODE(LUN_NOT_SUPPORTED));
+         scsi_req_complete(req, CHECK_CONDITION);
+         return 0;
+@@ -535,9 +537,28 @@ static int32_t scsi_target_send_command(SCSIRequest *req, uint8_t *buf)
+         break;
+     case REQUEST_SENSE:
+         scsi_target_alloc_buf(&r->req, scsi_sense_len(req));
+-        r->len = scsi_device_get_sense(r->req.dev, r->buf,
+-                                       MIN(req->cmd.xfer, r->buf_len),
+-                                       (req->cmd.buf[1] & 1) == 0);
++        if (req->lun != 0) {
++            const struct SCSISense sense = SENSE_CODE(LUN_NOT_SUPPORTED);
++
++            if (fixed_sense) {
++                r->buf[0] = 0x70;
++                r->buf[2] = sense.key;
++                r->buf[10] = 10;
++                r->buf[12] = sense.asc;
++                r->buf[13] = sense.ascq;
++                r->len = MIN(req->cmd.xfer, SCSI_SENSE_LEN);
++            } else {
++                r->buf[0] = 0x72;
++                r->buf[1] = sense.key;
++                r->buf[2] = sense.asc;
++                r->buf[3] = sense.ascq;
++                r->len = 8;
++            }
++        } else {
++            r->len = scsi_device_get_sense(r->req.dev, r->buf,
++                                           MIN(req->cmd.xfer, r->buf_len),
++                                           fixed_sense);
++        }
+         if (r->req.dev->sense_is_ua) {
+             scsi_device_unit_attention_reported(req->dev);
+             r->req.dev->sense_len = 0;
+-- 
 2.11.0
