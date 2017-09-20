@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:59096)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33101)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dujy4-000249-Mm
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:43:29 -0400
+	(envelope-from <thuth@redhat.com>) id 1duk2L-00047P-Pi
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:47:55 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dujy1-0001vZ-JW
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:43:28 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33202)
+	(envelope-from <thuth@redhat.com>) id 1duk2I-0002Sn-Mt
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:47:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43302)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dujy1-0001rC-A9
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:43:25 -0400
-Date: Wed, 20 Sep 2017 19:43:17 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170920184317.GK2449@work-vm>
-References: <1505839684-10046-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170919164820eucas1p25f16f91aa65933fa18cdff7cb7b7444c@eucas1p2.samsung.com>
-	<1505839684-10046-2-git-send-email-a.perevalov@samsung.com>
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1duk2I-0002Ow-Ep
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 14:47:50 -0400
+References: <20170919213611.8988-1-jsnow@redhat.com>
+	<20170919213611.8988-2-jsnow@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <68ca6f8d-5673-4177-fadf-ca512258257b@redhat.com>
+Date: Wed, 20 Sep 2017 20:47:43 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1505839684-10046-2-git-send-email-a.perevalov@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH v10 01/10] userfault: update kernel header
- for UFFD_FEATURE_*
+In-Reply-To: <20170919213611.8988-2-jsnow@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 1/2] ppc: remove unused CPU definitions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,78 +28,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com, quintela@redhat.com, heetae82.ahn@samsung.com
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+Cc: imammedo@redhat.com, agraf@suse.de, david@gibson.dropbear.id.au
 
-* Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> This commit adds modification for UFFD_FEATURE_SIGBUS and
-> UFFD_FEATURE_THREAD_ID.
+On 19.09.2017 23:36, John Snow wrote:
+> Following commit aef77960, remove now-unused definitions from
+> cpu-models.h.
 > 
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-
-This should be replaced with just running the 
-   scripts/update-linux-headers.sh
-against a 4.14-rc1 checkout.
-
-That can be done as a separate patch or the first patch
-of this series.
-
-Dave
-
+> Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->  linux-headers/linux/userfaultfd.h | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
+>  target/ppc/cpu-models.h | 32 --------------------------------
+>  1 file changed, 32 deletions(-)
 > 
-> diff --git a/linux-headers/linux/userfaultfd.h b/linux-headers/linux/userfaultfd.h
-> index 9701772..b43cf0d 100644
-> --- a/linux-headers/linux/userfaultfd.h
-> +++ b/linux-headers/linux/userfaultfd.h
-> @@ -23,7 +23,9 @@
->  			   UFFD_FEATURE_EVENT_REMOVE |	\
->  			   UFFD_FEATURE_EVENT_UNMAP |		\
->  			   UFFD_FEATURE_MISSING_HUGETLBFS |	\
-> -			   UFFD_FEATURE_MISSING_SHMEM)
-> +			   UFFD_FEATURE_MISSING_SHMEM |		\
-> +			   UFFD_FEATURE_SIGBUS |		\
-> +			   UFFD_FEATURE_THREAD_ID)
->  #define UFFD_API_IOCTLS				\
->  	((__u64)1 << _UFFDIO_REGISTER |		\
->  	 (__u64)1 << _UFFDIO_UNREGISTER |	\
-> @@ -78,6 +80,9 @@ struct uffd_msg {
->  		struct {
->  			__u64	flags;
->  			__u64	address;
-> +			union {
-> +				__u32 ptid;
-> +			} feat;
->  		} pagefault;
->  
->  		struct {
-> @@ -153,6 +158,13 @@ struct uffdio_api {
->  	 * UFFD_FEATURE_MISSING_SHMEM works the same as
->  	 * UFFD_FEATURE_MISSING_HUGETLBFS, but it applies to shmem
->  	 * (i.e. tmpfs and other shmem based APIs).
-> +	 *
-> +	 * UFFD_FEATURE_SIGBUS feature means no page-fault
-> +	 * (UFFD_EVENT_PAGEFAULT) event will be delivered, instead
-> +	 * a SIGBUS signal will be sent to the faulting process.
-> +	 *
-> +	 * UFFD_FEATURE_THREAD_ID pid of the page faulted task_struct will
-> +	 * be returned, if feature is not requested 0 will be returned.
->  	 */
->  #define UFFD_FEATURE_PAGEFAULT_FLAG_WP		(1<<0)
->  #define UFFD_FEATURE_EVENT_FORK			(1<<1)
-> @@ -161,6 +173,8 @@ struct uffdio_api {
->  #define UFFD_FEATURE_MISSING_HUGETLBFS		(1<<4)
->  #define UFFD_FEATURE_MISSING_SHMEM		(1<<5)
->  #define UFFD_FEATURE_EVENT_UNMAP		(1<<6)
-> +#define UFFD_FEATURE_SIGBUS			(1<<7)
-> +#define UFFD_FEATURE_THREAD_ID			(1<<8)
->  	__u64 features;
->  
->  	__u64 ioctls;
-> -- 
-> 1.9.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> diff --git a/target/ppc/cpu-models.h b/target/ppc/cpu-models.h
+> index df31d7f..b34b512 100644
+> --- a/target/ppc/cpu-models.h
+> +++ b/target/ppc/cpu-models.h
+> @@ -291,34 +291,6 @@ enum {
+>  #endif
+>      CPU_POWERPC_e200z5             = 0x81000000,
+>      CPU_POWERPC_e200z6             = 0x81120000,
+> -    /* MPC55xx microcontrollers */
+> -#define CPU_POWERPC_MPC55xx          CPU_POWERPC_MPC5567
+> -#if 0
+> -#define CPU_POWERPC_MPC5514E         CPU_POWERPC_MPC5514E_v1
+> -#define CPU_POWERPC_MPC5514E_v0      CPU_POWERPC_e200z0
+> -#define CPU_POWERPC_MPC5514E_v1      CPU_POWERPC_e200z1
+> -#define CPU_POWERPC_MPC5514G         CPU_POWERPC_MPC5514G_v1
+> -#define CPU_POWERPC_MPC5514G_v0      CPU_POWERPC_e200z0
+> -#define CPU_POWERPC_MPC5514G_v1      CPU_POWERPC_e200z1
+> -#define CPU_POWERPC_MPC5515S         CPU_POWERPC_e200z1
+> -#define CPU_POWERPC_MPC5516E         CPU_POWERPC_MPC5516E_v1
+> -#define CPU_POWERPC_MPC5516E_v0      CPU_POWERPC_e200z0
+> -#define CPU_POWERPC_MPC5516E_v1      CPU_POWERPC_e200z1
+> -#define CPU_POWERPC_MPC5516G         CPU_POWERPC_MPC5516G_v1
+> -#define CPU_POWERPC_MPC5516G_v0      CPU_POWERPC_e200z0
+> -#define CPU_POWERPC_MPC5516G_v1      CPU_POWERPC_e200z1
+> -#define CPU_POWERPC_MPC5516S         CPU_POWERPC_e200z1
+> -#endif
+> -#if 0
+> -#define CPU_POWERPC_MPC5533          CPU_POWERPC_e200z3
+> -#define CPU_POWERPC_MPC5534          CPU_POWERPC_e200z3
+> -#endif
+> -#define CPU_POWERPC_MPC5553          CPU_POWERPC_e200z6
+> -#define CPU_POWERPC_MPC5554          CPU_POWERPC_e200z6
+> -#define CPU_POWERPC_MPC5561          CPU_POWERPC_e200z6
+> -#define CPU_POWERPC_MPC5565          CPU_POWERPC_e200z6
+> -#define CPU_POWERPC_MPC5566          CPU_POWERPC_e200z6
+> -#define CPU_POWERPC_MPC5567          CPU_POWERPC_e200z6
+>      /* e300 family */
+>      /* e300 cores */
+>      CPU_POWERPC_e300c1             = 0x00830010,
+> @@ -326,11 +298,7 @@ enum {
+>      CPU_POWERPC_e300c3             = 0x00850010,
+>      CPU_POWERPC_e300c4             = 0x00860010,
+>      /* MPC83xx microcontrollers */
+
+I think you should also remove the above comment now?
+
+> -#define CPU_POWERPC_MPC831x          CPU_POWERPC_e300c3
+> -#define CPU_POWERPC_MPC832x          CPU_POWERPC_e300c2
+>  #define CPU_POWERPC_MPC834x          CPU_POWERPC_e300c1
+> -#define CPU_POWERPC_MPC835x          CPU_POWERPC_e300c1
+> -#define CPU_POWERPC_MPC836x          CPU_POWERPC_e300c1
+>  #define CPU_POWERPC_MPC837x          CPU_POWERPC_e300c4
+>      /* e500 family */
+>      /* e500 cores  */
+
+With the above comment removed:
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
