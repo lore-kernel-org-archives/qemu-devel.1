@@ -1,28 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47282)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dum7F-0008QW-3u
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:01:05 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dum8e-0000hF-60
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:02:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dum7B-0008L6-Bn
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:01:05 -0400
-Received: from mail-io0-x22d.google.com ([2607:f8b0:4001:c06::22d]:55782)
+	(envelope-from <richard.henderson@linaro.org>) id 1dum8b-00017F-2p
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:02:32 -0400
+Received: from mail-io0-x22a.google.com ([2607:f8b0:4001:c06::22a]:55801)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1dum7B-0008Kc-5m
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:01:01 -0400
-Received: by mail-io0-x22d.google.com with SMTP id z187so6513565ioz.12
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 14:01:00 -0700 (PDT)
+	id 1dum8a-00016x-Ub
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 17:02:29 -0400
+Received: by mail-io0-x22a.google.com with SMTP id z187so6522256ioz.12
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 14:02:28 -0700 (PDT)
 References: <1505580378-9044-1-git-send-email-peter.maydell@linaro.org>
-	<1505580378-9044-3-git-send-email-peter.maydell@linaro.org>
+	<1505580378-9044-4-git-send-email-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0d5885ea-8152-4779-3eda-e18aca00cf3f@linaro.org>
-Date: Wed, 20 Sep 2017 16:00:56 -0500
+Message-ID: <9481c523-ff48-2c78-9e02-9feb9f2a5e90@linaro.org>
+Date: Wed, 20 Sep 2017 16:02:24 -0500
 MIME-Version: 1.0
-In-Reply-To: <1505580378-9044-3-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1505580378-9044-4-git-send-email-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/6] hw/gpio/omap_gpio.c: Don't use old_mmio
+Subject: Re: [Qemu-devel] [PATCH 3/6] hw/timer/omap_synctimer.c: Don't use
+ old_mmio
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,12 +36,12 @@ To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org, qemu-devel@no
 Cc: patches@linaro.org
 
 On 09/16/2017 11:46 AM, Peter Maydell wrote:
-> Drop the use of old_mmio in the omap2_gpio memory ops.
+> Don't use the old_mmio in the memory region ops struct.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  hw/gpio/omap_gpio.c | 26 ++++++++++++--------------
->  1 file changed, 12 insertions(+), 14 deletions(-)
+>  hw/timer/omap_synctimer.c | 35 +++++++++++++++++++++--------------
+>  1 file changed, 21 insertions(+), 14 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
