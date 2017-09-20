@@ -1,30 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42702)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42758)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1dueoB-00008D-OO
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:13:01 -0400
+	(envelope-from <quintela@redhat.com>) id 1dueoE-0000Ag-4b
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:13:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <richard.henderson@linaro.org>) id 1duenk-0007Xf-LP
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:12:55 -0400
-Received: from mail-oi0-x233.google.com ([2607:f8b0:4003:c06::233]:46876)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
-	id 1duenk-0007XO-FQ
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:12:28 -0400
-Received: by mail-oi0-x233.google.com with SMTP id a74so2506512oib.3
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 06:12:28 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-References: <20170919150313.10833-1-richard.henderson@linaro.org>
-	<20170919150313.10833-5-richard.henderson@linaro.org>
-	<87y3p9d3fq.fsf@linaro.org>
-Message-ID: <8deb13bd-af38-9851-085f-6428255297d3@linaro.org>
-Date: Wed, 20 Sep 2017 08:04:26 -0500
-MIME-Version: 1.0
-In-Reply-To: <87y3p9d3fq.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 4/8] disas: Support the Capstone
- disassembler library
+	(envelope-from <quintela@redhat.com>) id 1dueo7-0007ir-47
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:12:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45434)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dueo6-0007i7-Ru
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:12:51 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 7C948C0587F1
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 10:46:48 +0000 (UTC)
+From: Juan Quintela <quintela@redhat.com>
+Date: Wed, 20 Sep 2017 12:46:25 +0200
+Message-Id: <20170920104639.2335-3-quintela@redhat.com>
+In-Reply-To: <20170920104639.2335-1-quintela@redhat.com>
+References: <20170920104639.2335-1-quintela@redhat.com>
+Subject: [Qemu-devel] [PULL 02/16] migration: Teach it about G_SOURCE_REMOVE
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,45 +29,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: dgilbert@redhat.com, lvivier@redhat.com, peterx@redhat.com
 
-On 09/20/2017 06:17 AM, Alex Bennée wrote:
-> 
-> Richard Henderson <richard.henderson@linaro.org> writes:
-> 
->> If configured, prefer this over our rather dated copy of the
->> GPLv2-only binutils.  This will be especially apparent with
->> the proposed vector extensions to TCG, as disas/i386.c does
->> not handle AVX.
->>
->> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> 
-> Hmm I get a link failure:
-> 
->   LINK    tilegx-linux-user/qemu-tilegx
-> disas.o: In function `cap_disas_start':
-> /home/alex/lsrc/qemu/qemu.git/disas.c:196: undefined reference to `cs_open'
+As this is defined on glib 2.32, add compatibility macros for older glibs.
 
-I'm going to assume that this isn't the first executable to be linked, and
-therefore it's weirder than what I imagine.
+Signed-off-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Daniel P. Berrange <berrange@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+---
+ include/glib-compat.h | 2 ++
+ migration/exec.c      | 2 +-
+ migration/fd.c        | 2 +-
+ migration/socket.c    | 2 +-
+ 4 files changed, 5 insertions(+), 3 deletions(-)
 
-> I wonder if this is a version thing?
-> 
->     Package: libcapstone-dev
->     Status: install ok installed
->     Priority: optional
->     Section: libdevel
->     Installed-Size: 4079
->     Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
->     Architecture: amd64
->     Source: capstone
->     Version: 3.0.4-0.2
-
-No, I've got capstone-devel-3.0.4-8.fc26.x86_64.
-
-The only thing I can imagine is that you didn't start from a fresh build tree
-and something went wrong during re-configure.
-
-
-r~
+diff --git a/include/glib-compat.h b/include/glib-compat.h
+index fcffcd3f07..e15aca2d40 100644
+--- a/include/glib-compat.h
++++ b/include/glib-compat.h
+@@ -223,6 +223,8 @@ static inline gboolean g_hash_table_contains(GHashTable *hash_table,
+ {
+     return g_hash_table_lookup_extended(hash_table, key, NULL, NULL);
+ }
++#define G_SOURCE_CONTINUE TRUE
++#define G_SOURCE_REMOVE FALSE
+ #endif
+ 
+ #ifndef g_assert_true
+diff --git a/migration/exec.c b/migration/exec.c
+index 08b599e0e2..f3be1baf2e 100644
+--- a/migration/exec.c
++++ b/migration/exec.c
+@@ -49,7 +49,7 @@ static gboolean exec_accept_incoming_migration(QIOChannel *ioc,
+ {
+     migration_channel_process_incoming(ioc);
+     object_unref(OBJECT(ioc));
+-    return FALSE; /* unregister */
++    return G_SOURCE_REMOVE;
+ }
+ 
+ void exec_start_incoming_migration(const char *command, Error **errp)
+diff --git a/migration/fd.c b/migration/fd.c
+index 30f5258a6a..30de4b9847 100644
+--- a/migration/fd.c
++++ b/migration/fd.c
+@@ -49,7 +49,7 @@ static gboolean fd_accept_incoming_migration(QIOChannel *ioc,
+ {
+     migration_channel_process_incoming(ioc);
+     object_unref(OBJECT(ioc));
+-    return FALSE; /* unregister */
++    return G_SOURCE_REMOVE;
+ }
+ 
+ void fd_start_incoming_migration(const char *infd, Error **errp)
+diff --git a/migration/socket.c b/migration/socket.c
+index 757d3821a1..b02d37d7a3 100644
+--- a/migration/socket.c
++++ b/migration/socket.c
+@@ -154,7 +154,7 @@ static gboolean socket_accept_incoming_migration(QIOChannel *ioc,
+ out:
+     /* Close listening socket as its no longer needed */
+     qio_channel_close(ioc, NULL);
+-    return FALSE; /* unregister */
++    return G_SOURCE_REMOVE;
+ }
+ 
+ 
+-- 
+2.13.5
