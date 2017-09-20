@@ -1,27 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49817)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49842)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dufRY-0000Kv-4a
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:53:37 -0400
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dufRe-0000Pf-1I
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:53:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dufRV-0004z0-3X
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:53:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41582)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dufRU-0004yn-Tv
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:53:33 -0400
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <1504081950-2528-7-git-send-email-peterx@redhat.com> (Peter Xu's
-	message of "Wed, 30 Aug 2017 16:32:03 +0800")
-References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-	<1504081950-2528-7-git-send-email-peterx@redhat.com>
-Reply-To: quintela@redhat.com
-Date: Wed, 20 Sep 2017 11:06:50 +0200
-Message-ID: <87shfhkac5.fsf@secure.laptop>
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dufRZ-000507-Lr
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:53:42 -0400
+Received: from lhrrgout.huawei.com ([194.213.3.17]:24224)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
+	(envelope-from <pradeep.jagadeesh@huawei.com>) id 1dufRZ-0004zF-1N
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 09:53:37 -0400
+References: <1505385610-35529-1-git-send-email-pradeep.jagadeesh@huawei.com>
+	<1505385610-35529-3-git-send-email-pradeep.jagadeesh@huawei.com>
+	<20170918160434.cfkm7jlg3oig25qj@postretch>
+From: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+Message-ID: <23bb8481-7854-70aa-de7c-8f3d18270ebb@huawei.com>
+Date: Wed, 20 Sep 2017 10:46:09 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC v2 06/33] migration: reuse
- mis->userfault_quit_fd
+In-Reply-To: <20170918160434.cfkm7jlg3oig25qj@postretch>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v11 2/6] qmp: Use ThrottleLimits structure
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,29 +28,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Andrea Arcangeli <aarcange@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+To: Manos Pitsidianakis <el13635@mail.ntua.gr>, Pradeep Jagadeesh <pradeepkiruvale@gmail.com>, eric blake <eblake@redhat.com>, greg kurz <groug@kaod.org>, jani kokkonen <jani.kokkonen@huawei.com>, alberto garcia <berto@igalia.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 
-Peter Xu <peterx@redhat.com> wrote:
+On 9/18/2017 6:04 PM, Manos Pitsidianakis wrote:
+> On Thu, Sep 14, 2017 at 06:40:06AM -0400, Pradeep Jagadeesh wrote:
+>> This patch factors out code to use the ThrottleLimits
+>> strurcture.
+>>
+>> Signed-off-by: Pradeep Jagadeesh <pradeep.jagadeesh@huawei.com>
+>> Reviewed-by: Greg Kurz <groug@kaod.org>
+>> Reviewed-by: Eric Blake <eblake@redhat.com>
+>> Reviewed-by: Alberto Garcia <berto@igalia.com>
+>> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>> qapi/block-core.json | 78
+>> +++-------------------------------------------------
+>> 1 file changed, 4 insertions(+), 74 deletions(-)
+>>
+>> diff --git a/qapi/block-core.json b/qapi/block-core.json
+>> index bb11815..d0ccfda 100644
+>> --- a/qapi/block-core.json
+>> +++ b/qapi/block-core.json
+>> @@ -1826,84 +1826,13 @@
+>> #
+>> # @device: Block device name (deprecated, use @id instead)
+>> #
+>> -# @id: The name or QOM path of the guest device (since: 2.8)
+>> -#
+>> -# @bps: total throughput limit in bytes per second
+>> -#
+>> -# @bps_rd: read throughput limit in bytes per second
+>> -#
+>> -# @bps_wr: write throughput limit in bytes per second
+>> -#
+>> -# @iops: total I/O operations per second
+>> -#
+>> -# @iops_rd: read I/O operations per second
+>> -#
+>> -# @iops_wr: write I/O operations per second
+>> -#
+>> -# @bps_max: total throughput limit during bursts,
+>> -#                     in bytes (Since 1.7)
+>> -#
+>> -# @bps_rd_max: read throughput limit during bursts,
+>> -#                        in bytes (Since 1.7)
+>> -#
+>> -# @bps_wr_max: write throughput limit during bursts,
+>> -#                        in bytes (Since 1.7)
+>> -#
+>> -# @iops_max: total I/O operations per second during bursts,
+>> -#                      in bytes (Since 1.7)
+>> -#
+>> -# @iops_rd_max: read I/O operations per second during bursts,
+>> -#                         in bytes (Since 1.7)
+>> -#
+>> -# @iops_wr_max: write I/O operations per second during bursts,
+>> -#                         in bytes (Since 1.7)
+>> -#
+>> -# @bps_max_length: maximum length of the @bps_max burst
+>> -#                            period, in seconds. It must only
+>> -#                            be set if @bps_max is set as well.
+>> -#                            Defaults to 1. (Since 2.6)
+>> -#
+>> -# @bps_rd_max_length: maximum length of the @bps_rd_max
+>> -#                               burst period, in seconds. It must only
+>> -#                               be set if @bps_rd_max is set as well.
+>> -#                               Defaults to 1. (Since 2.6)
+>> -#
+>> -# @bps_wr_max_length: maximum length of the @bps_wr_max
+>> -#                               burst period, in seconds. It must only
+>> -#                               be set if @bps_wr_max is set as well.
+>> -#                               Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_max_length: maximum length of the @iops burst
+>> -#                             period, in seconds. It must only
+>> -#                             be set if @iops_max is set as well.
+>> -#                             Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_rd_max_length: maximum length of the @iops_rd_max
+>> -#                                burst period, in seconds. It must only
+>> -#                                be set if @iops_rd_max is set as well.
+>> -#                                Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_wr_max_length: maximum length of the @iops_wr_max
+>> -#                                burst period, in seconds. It must only
+>> -#                                be set if @iops_wr_max is set as well.
+>> -#                                Defaults to 1. (Since 2.6)
+>> -#
+>> -# @iops_size: an I/O size in bytes (Since 1.7)
+>> -#
+>> # @group: throttle group name (Since 2.4)
+>
+> BlockIOThrottle and ThrottleLimits are not directly compatible, for
+> example here we have iops_rd_max_length as a name,
+>
+>> #
+>> # Since: 1.1
+>> ##
+>> { 'struct': 'BlockIOThrottle',
+>> -  'data': { '*device': 'str', '*id': 'str', 'bps': 'int', 'bps_rd':
+>> 'int',
+>> -            'bps_wr': 'int', 'iops': 'int', 'iops_rd': 'int',
+>> 'iops_wr': 'int',
+>> -            '*bps_max': 'int', '*bps_rd_max': 'int',
+>> -            '*bps_wr_max': 'int', '*iops_max': 'int',
+>> -            '*iops_rd_max': 'int', '*iops_wr_max': 'int',
+>> -            '*bps_max_length': 'int', '*bps_rd_max_length': 'int',
+>> -            '*bps_wr_max_length': 'int', '*iops_max_length': 'int',
+>> -            '*iops_rd_max_length': 'int', '*iops_wr_max_length': 'int',
+>> -            '*iops_size': 'int', '*group': 'str' } }
+>> +  'base': 'ThrottleLimits',
+>> +  'data': { '*device': 'str', '*group': 'str' } }
+>>
+>> ##
+>> # @ThrottleLimits:
+>> @@ -1913,6 +1842,7 @@
+>> # transaction. All fields are optional. When setting limits, if a
+>> field is
+>> # missing the current value is not changed.
+>> #
+>> +# @id:                     device id
+>> # @iops-total:             limit total I/O operations per second
+>> # @iops-total-max:         I/O operations burst
+>> # @iops-total-max-length:  length of the iops-total-max burst period,
+>> in seconds
+>> @@ -1942,7 +1872,7 @@
+>> # Since: 2.11
+>> ##
+>> { 'struct': 'ThrottleLimits',
+>> -  'data': { '*iops-total' : 'int', '*iops-total-max' : 'int',
+>> +  'data': { '*id' : 'str', '*iops-total' : 'int', '*iops-total-max' :
+>> 'int',
+>>             '*iops-total-max-length' : 'int', '*iops-read' : 'int',
+>>             '*iops-read-max' : 'int', '*iops-read-max-length' : 'int',
+>>             '*iops-write' : 'int', '*iops-write-max' : 'int',
+>
+> And here it's iops-read-max-length. This breaks the block layer's old
+> throttling API. Do we want the old API replaced for 2.11? I don't know
+> which maintainer is responsible for this, so I CC'd armbru.
 
-> @@ -448,8 +449,15 @@ static void *postcopy_ram_fault_thread(void *opaque)
->          }
->=20=20
->          if (pfd[1].revents) {
-> -            trace_postcopy_ram_fault_thread_quit();
-> -            break;
-> +            uint64_t tmp64 =3D 0;
-> +
-> +            /* Consume the signal */
-> +            read(mis->userfault_event_fd, &tmp64, 8);
+I do not think its going to break. It just exist we neither try to set 
+that or to query.
 
-make: Entering directory '/scratch/qemu/next/all'
-  CC      migration/postcopy-ram.o
-/mnt/kvm/qemu/next/migration/postcopy-ram.c: In function =E2=80=98postcopy_=
-ram_fault_thread=E2=80=99:
-/mnt/kvm/qemu/next/migration/postcopy-ram.c:460:13: error: ignoring return =
-value of =E2=80=98read=E2=80=99, declared with attribute warn_unused_result=
- [-Werror=3Dunused-result]
-             read(mis->userfault_event_fd, &tmp64, 8);
-             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
+-Pradeep
