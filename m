@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56693)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56643)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dufmm-00045J-0z
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:15:38 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dufmj-00041x-CF
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:15:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dufmh-0005P0-Ct
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:15:32 -0400
-Received: from ozlabs.ru ([107.173.13.209]:59854)
+	(envelope-from <aik@ozlabs.ru>) id 1dufmi-0005PI-26
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:15:29 -0400
+Received: from ozlabs.ru ([107.173.13.209]:59860)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dufmh-0005Op-1u
+	(envelope-from <aik@ozlabs.ru>) id 1dufmh-0005P6-Sf
 	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 10:15:27 -0400
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Wed, 20 Sep 2017 21:46:23 +1000
-Message-Id: <20170920114637.42004-5-aik@ozlabs.ru>
+Date: Wed, 20 Sep 2017 21:46:22 +1000
+Message-Id: <20170920114637.42004-4-aik@ozlabs.ru>
 In-Reply-To: <20170920114637.42004-1-aik@ozlabs.ru>
 References: <20170920114637.42004-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v4 04/18] memory: Move
- AddressSpaceDispatch from AddressSpace to FlatView
+Subject: [Qemu-devel] [PATCH qemu v4 03/18] memory: Move FlatView allocation
+ to a helper
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,274 +27,63 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
-As we are going to share FlatView's between AddressSpace's,
-and AddressSpaceDispatch is a structure to perform quick lookup
-in FlatView, this moves ASD to FlatView.
-
-After previosly open coded ASD rendering, we can also remove
-as->next_dispatch as the new FlatView pointer is stored
-on a stack and set to an AS atomically.
-
-flatview_destroy() is executed under RCU instead of
-address_space_dispatch_free() now.
-
-This makes mem_begin/mem_commit to work with ASD and mem_add with FV
-as later on mem_add will be taking FV as an argument anyway.
+This moves a FlatView allocation and initialization to a helper.
+While we are nere, replace g_new with g_new0 to not to bother if we add
+new fields in the future.
 
 This should cause no behavioural change.
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
 Changes:
-v4:
-* since FlatView::rcu is used now to dispose FV, call_rcu() in
-address_space_update_topology() is replaced with direct call to
-flatview_unref()
+v3:
+* s/flatview_alloc/flatview_new/
 ---
- include/exec/memory-internal.h | 12 +++++++-----
- include/exec/memory.h          |  2 --
- exec.c                         | 41 +++++++++++------------------------------
- memory.c                       | 31 ++++++++++++++++++++++++-------
- 4 files changed, 42 insertions(+), 44 deletions(-)
+ memory.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
-index 9abde2f11c..6e08eda256 100644
---- a/include/exec/memory-internal.h
-+++ b/include/exec/memory-internal.h
-@@ -22,16 +22,18 @@
- #ifndef CONFIG_USER_ONLY
- typedef struct AddressSpaceDispatch AddressSpaceDispatch;
- 
--void address_space_destroy_dispatch(AddressSpace *as);
--
- extern const MemoryRegionOps unassigned_mem_ops;
- 
- bool memory_region_access_valid(MemoryRegion *mr, hwaddr addr,
-                                 unsigned size, bool is_write);
- 
--void mem_add(AddressSpace *as, MemoryRegionSection *section);
--void mem_begin(AddressSpace *as);
--void mem_commit(AddressSpace *as);
-+void mem_add(AddressSpace *as, FlatView *fv, MemoryRegionSection *section);
-+AddressSpaceDispatch *mem_begin(AddressSpace *as);
-+void mem_commit(AddressSpaceDispatch *d);
-+
-+AddressSpaceDispatch *address_space_to_dispatch(AddressSpace *as);
-+AddressSpaceDispatch *flatview_to_dispatch(FlatView *fv);
-+void address_space_dispatch_free(AddressSpaceDispatch *d);
- 
- #endif
- #endif
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 9581f7a7db..2346f8b863 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -316,8 +316,6 @@ struct AddressSpace {
- 
-     int ioeventfd_nb;
-     struct MemoryRegionIoeventfd *ioeventfds;
--    struct AddressSpaceDispatch *dispatch;
--    struct AddressSpaceDispatch *next_dispatch;
-     QTAILQ_HEAD(memory_listeners_as, MemoryListener) listeners;
-     QTAILQ_ENTRY(AddressSpace) address_spaces_link;
- };
-diff --git a/exec.c b/exec.c
-index 1626d254bb..afd64127e6 100644
---- a/exec.c
-+++ b/exec.c
-@@ -187,8 +187,6 @@ typedef struct PhysPageMap {
- } PhysPageMap;
- 
- struct AddressSpaceDispatch {
--    struct rcu_head rcu;
--
-     MemoryRegionSection *mru_section;
-     /* This is a multi-level map on the physical address space.
-      * The bottom level has pointers to MemoryRegionSections.
-@@ -485,7 +483,7 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
-     IOMMUMemoryRegionClass *imrc;
- 
-     for (;;) {
--        AddressSpaceDispatch *d = atomic_rcu_read(&as->dispatch);
-+        AddressSpaceDispatch *d = address_space_to_dispatch(as);
-         section = address_space_translate_internal(d, addr, &addr, plen, is_mmio);
- 
-         iommu_mr = memory_region_get_iommu(section->mr);
-@@ -1222,7 +1220,7 @@ hwaddr memory_region_section_get_iotlb(CPUState *cpu,
-     } else {
-         AddressSpaceDispatch *d;
- 
--        d = atomic_rcu_read(&section->address_space->dispatch);
-+        d = address_space_to_dispatch(section->address_space);
-         iotlb = section - d->map.sections;
-         iotlb += xlat;
-     }
-@@ -1347,9 +1345,9 @@ static void register_multipage(AddressSpaceDispatch *d,
-     phys_page_set(d, start_addr >> TARGET_PAGE_BITS, num_pages, section_index);
- }
- 
--void mem_add(AddressSpace *as, MemoryRegionSection *section)
-+void mem_add(AddressSpace *as, FlatView *fv, MemoryRegionSection *section)
- {
--    AddressSpaceDispatch *d = as->next_dispatch;
-+    AddressSpaceDispatch *d = flatview_to_dispatch(fv);
-     MemoryRegionSection now = *section, remain = *section;
-     Int128 page_size = int128_make64(TARGET_PAGE_SIZE);
- 
-@@ -2672,7 +2670,7 @@ static void io_mem_init(void)
-                           NULL, UINT64_MAX);
- }
- 
--void mem_begin(AddressSpace *as)
-+AddressSpaceDispatch *mem_begin(AddressSpace *as)
- {
-     AddressSpaceDispatch *d = g_new0(AddressSpaceDispatch, 1);
-     uint16_t n;
-@@ -2688,26 +2686,19 @@ void mem_begin(AddressSpace *as)
- 
-     d->phys_map  = (PhysPageEntry) { .ptr = PHYS_MAP_NODE_NIL, .skip = 1 };
-     d->as = as;
--    as->next_dispatch = d;
-+
-+    return d;
- }
- 
--static void address_space_dispatch_free(AddressSpaceDispatch *d)
-+void address_space_dispatch_free(AddressSpaceDispatch *d)
- {
-     phys_sections_free(&d->map);
-     g_free(d);
- }
- 
--void mem_commit(AddressSpace *as)
-+void mem_commit(AddressSpaceDispatch *d)
- {
--    AddressSpaceDispatch *cur = as->dispatch;
--    AddressSpaceDispatch *next = as->next_dispatch;
--
--    phys_page_compact_all(next, next->map.nodes_nb);
--
--    atomic_rcu_set(&as->dispatch, next);
--    if (cur) {
--        call_rcu(cur, address_space_dispatch_free, rcu);
--    }
-+    phys_page_compact_all(d, d->map.nodes_nb);
- }
- 
- static void tcg_commit(MemoryListener *listener)
-@@ -2723,21 +2714,11 @@ static void tcg_commit(MemoryListener *listener)
-      * We reload the dispatch pointer now because cpu_reloading_memory_map()
-      * may have split the RCU critical section.
-      */
--    d = atomic_rcu_read(&cpuas->as->dispatch);
-+    d = address_space_to_dispatch(cpuas->as);
-     atomic_rcu_set(&cpuas->memory_dispatch, d);
-     tlb_flush(cpuas->cpu);
- }
- 
--void address_space_destroy_dispatch(AddressSpace *as)
--{
--    AddressSpaceDispatch *d = as->dispatch;
--
--    atomic_rcu_set(&as->dispatch, NULL);
--    if (d) {
--        call_rcu(d, address_space_dispatch_free, rcu);
--    }
--}
--
- static void memory_map_init(void)
- {
-     system_memory = g_malloc(sizeof(*system_memory));
 diff --git a/memory.c b/memory.c
-index 9babd7d423..27d7aeffc2 100644
+index 101d5f4d60..9babd7d423 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -229,6 +229,7 @@ struct FlatView {
-     FlatRange *ranges;
-     unsigned nr;
-     unsigned nr_allocated;
-+    struct AddressSpaceDispatch *dispatch;
- };
- 
- typedef struct AddressSpaceOps AddressSpaceOps;
-@@ -289,6 +290,9 @@ static void flatview_destroy(FlatView *view)
- {
-     int i;
- 
-+    if (view->dispatch) {
-+        address_space_dispatch_free(view->dispatch);
-+    }
-     for (i = 0; i < view->nr; i++) {
-         memory_region_unref(view->ranges[i].mr);
-     }
-@@ -304,10 +308,25 @@ static void flatview_ref(FlatView *view)
- static void flatview_unref(FlatView *view)
- {
-     if (atomic_fetch_dec(&view->ref) == 1) {
--        flatview_destroy(view);
-+        call_rcu(view, flatview_destroy, rcu);
-     }
+@@ -258,12 +258,14 @@ static bool flatrange_equal(FlatRange *a, FlatRange *b)
+         && a->readonly == b->readonly;
  }
  
-+static FlatView *address_space_to_flatview(AddressSpace *as)
-+{
-+    return atomic_rcu_read(&as->current_map);
-+}
-+
-+AddressSpaceDispatch *flatview_to_dispatch(FlatView *fv)
-+{
-+    return fv->dispatch;
-+}
-+
-+AddressSpaceDispatch *address_space_to_dispatch(AddressSpace *as)
-+{
-+    return flatview_to_dispatch(address_space_to_flatview(as));
-+}
-+
- static bool can_merge(FlatRange *r1, FlatRange *r2)
+-static void flatview_init(FlatView *view)
++static FlatView *flatview_new(void)
  {
-     return int128_eq(addrrange_end(r1->addr), r2->addr.start)
-@@ -886,13 +905,13 @@ static void address_space_update_topology(AddressSpace *as)
-     FlatView *new_view = generate_memory_topology(as->root);
-     int i;
++    FlatView *view;
++
++    view = g_new0(FlatView, 1);
+     view->ref = 1;
+-    view->ranges = NULL;
+-    view->nr = 0;
+-    view->nr_allocated = 0;
++
++    return view;
+ }
  
--    mem_begin(as);
-+    new_view->dispatch = mem_begin(as);
-     for (i = 0; i < new_view->nr; i++) {
-         MemoryRegionSection mrs =
-             section_from_flat_range(&new_view->ranges[i], as);
--        mem_add(as, &mrs);
-+        mem_add(as, new_view, &mrs);
-     }
--    mem_commit(as);
-+    mem_commit(new_view->dispatch);
+ /* Insert a range into a given position.  Caller is responsible for maintaining
+@@ -706,8 +708,7 @@ static FlatView *generate_memory_topology(MemoryRegion *mr)
+ {
+     FlatView *view;
  
-     if (!QTAILQ_EMPTY(&as->listeners)) {
-         address_space_update_topology_pass(as, old_view, new_view, false);
-@@ -901,7 +920,7 @@ static void address_space_update_topology(AddressSpace *as)
+-    view = g_new(FlatView, 1);
+-    flatview_init(view);
++    view = flatview_new();
  
-     /* Writes are protected by the BQL.  */
-     atomic_rcu_set(&as->current_map, new_view);
--    call_rcu(old_view, flatview_unref, rcu);
-+    flatview_unref(old_view);
- 
-     /* Note that all the old MemoryRegions are still alive up to this
-      * point.  This relieves most MemoryListeners from the need to
-@@ -2631,7 +2650,6 @@ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
+     if (mr) {
+         render_memory_region(view, mr, int128_zero(),
+@@ -2624,8 +2625,7 @@ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
+     as->ref_count = 1;
+     as->root = root;
+     as->malloced = false;
+-    as->current_map = g_new(FlatView, 1);
+-    flatview_init(as->current_map);
++    as->current_map = flatview_new();
+     as->ioeventfd_nb = 0;
+     as->ioeventfds = NULL;
      QTAILQ_INIT(&as->listeners);
-     QTAILQ_INSERT_TAIL(&address_spaces, as, address_spaces_link);
-     as->name = g_strdup(name ? name : "anonymous");
--    as->dispatch = NULL;
-     memory_region_update_pending |= root->enabled;
-     memory_region_transaction_commit();
- }
-@@ -2640,7 +2658,6 @@ static void do_address_space_destroy(AddressSpace *as)
- {
-     bool do_free = as->malloced;
- 
--    address_space_destroy_dispatch(as);
-     assert(QTAILQ_EMPTY(&as->listeners));
- 
-     flatview_unref(as->current_map);
 -- 
 2.11.0
