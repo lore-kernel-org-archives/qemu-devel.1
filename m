@@ -1,25 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37535)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43421)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1duZmo-00052P-8C
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:51:14 -0400
+	(envelope-from <berrange@redhat.com>) id 1duZso-0006jU-Q3
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:57:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1duZmj-0003r4-Qe
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:51:10 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33832)
+	(envelope-from <berrange@redhat.com>) id 1duZsl-0003Ry-Ht
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:57:22 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39392)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1duZmj-0003nk-F7
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:51:05 -0400
-References: <1505811353-29151-1-git-send-email-thuth@redhat.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <84d1e5a0-141f-cd91-f62c-14fe58e73b4b@redhat.com>
-Date: Wed, 20 Sep 2017 10:50:55 +0300
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1duZsl-0003NS-9E
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 03:57:19 -0400
+Date: Wed, 20 Sep 2017 08:57:03 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170920075703.GA4053@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
+	<1505375436-28439-2-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1505811353-29151-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] qdev: Mark devices as non-hotpluggable
- by default
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1505375436-28439-2-git-send-email-peterx@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC 01/15] char-io: fix possible race on
+ IOWatchPoll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,163 +30,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Anthony Perard <anthony.perard@citrix.com>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Hi Thomas,
+On Thu, Sep 14, 2017 at 03:50:22PM +0800, Peter Xu wrote:
+> This is not a problem if we are only having one single loop thread like
+> before.  However, after per-monitor thread is introduced, this is not
+> true any more, and the race can happen.
+>=20
+> The race can be triggered with "make check -j8" sometimes:
+>=20
+>   qemu-system-x86_64: /root/git/qemu/chardev/char-io.c:91:
+>   io_watch_poll_finalize: Assertion `iwp->src =3D=3D NULL' failed.
+>=20
+> This patch keeps the reference for the watch object when creating in
+> io_add_watch_poll(), so that the object will never be released in the
+> context main loop, especially when the context loop is running in
+> another standalone thread.  Meanwhile, when we want to remove the watch
+> object, we always first detach the watch object from its owner context,
+> then we continue with the cleanup.
+>=20
+> Without this patch, calling io_remove_watch_poll() in main loop thread
+> is not thread-safe, since the other per-monitor thread may be modifying
+> the watch object at the same time.
 
-On 19/09/2017 11:55, Thomas Huth wrote:
-> Historically we've marked all devices as hotpluggable by default. However,
-> most devices are not hotpluggable, and you also need a HotplugHandler to
-> support these devices. So if the user tries to "device_add" or "device_del"
-> such a non-hotpluggable device during runtime, either nothing really usable
-> happens, or QEMU even crashes/aborts unexpectedly (see for example commit
-> 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
-> So let's change this dangerous default behaviour and mark the devices as
-> non-hotpluggable by default. Certain parent devices classes which are known
-> as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
-> so that devices that are derived from these classes continue to work as
-> expected.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+This doesn't feel right to me. Why is the main loop thread doing anything
+at all with the Chardev, if there is a per-monitor thread ? The Chardev
+code isn't thread safe so it isn't safe to have two separate threads
+accessing the same Chardev. IOW, if we want a per-monitor thread, then
+we must make sure the main thread never touches that monitor's chardev
+at all.  While your patch here might have avoided the assertion you
+mention above, I fear this is just papering over a fundamental problem
+that still exists, that can only be solved by not letting the mainloop
+touch the chardev at all.
+
+>=20
+> Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 > ---
->   Note: I've marked the patch as RFC since I'm not 100% sure whether I've
->   correctly identified all devices that should still be marked as hot-
->   pluggable. Feedback is welcome!
-> 
->   hw/core/qdev.c        | 10 ++++------
->   hw/cpu/core.c         |  1 +
->   hw/mem/nvdimm.c       |  3 +++
->   hw/mem/pc-dimm.c      |  1 +
->   hw/pci/pci.c          |  1 +
->   hw/s390x/ccw-device.c |  1 +
->   hw/scsi/scsi-bus.c    |  1 +
->   hw/usb/bus.c          |  1 +
->   8 files changed, 13 insertions(+), 6 deletions(-)
-> 
-> diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-> index 606ab53..c4f1902 100644
-> --- a/hw/core/qdev.c
-> +++ b/hw/core/qdev.c
-> @@ -1120,13 +1120,11 @@ static void device_class_init(ObjectClass *class, void *data)
->       dc->realize = device_realize;
->       dc->unrealize = device_unrealize;
->   
-> -    /* by default all devices were considered as hotpluggable,
-> -     * so with intent to check it in generic qdev_unplug() /
-> -     * device_set_realized() functions make every device
-> -     * hotpluggable. Devices that shouldn't be hotpluggable,
-> -     * should override it in their class_init()
-> +    /*
-> +     * All devices are considered as cold-pluggable by default. The devices
-> +     * that are hotpluggable should override it in their class_init().
->        */
-> -    dc->hotpluggable = true;
-> +    dc->hotpluggable = false;
-
-I agree with the defensive mode as long as we don't
-introduce any regression...
-
-By the way, in case a base class of a "family" of devices
-would set the "hotpluggable" field to true (e.g. PCI devices),
-we would still have the same problem on the specific sub-tree.
-If the sub-tree is wide enough, this patch might not have the
-intended impact. (we will still have the same bugs as the one
-you mentioned in the commit message)
-
-Thanks,
-Marcel
-
->       dc->user_creatable = true;
->   }
->   
-> diff --git a/hw/cpu/core.c b/hw/cpu/core.c
-> index bd578ab..01660aa 100644
-> --- a/hw/cpu/core.c
-> +++ b/hw/cpu/core.c
-> @@ -82,6 +82,7 @@ static void cpu_core_class_init(ObjectClass *oc, void *data)
->       DeviceClass *dc = DEVICE_CLASS(oc);
->   
->       set_bit(DEVICE_CATEGORY_CPU, dc->categories);
-> +    dc->hotpluggable = true;
->   }
->   
->   static const TypeInfo cpu_core_type_info = {
-> diff --git a/hw/mem/nvdimm.c b/hw/mem/nvdimm.c
-> index 952fce5..02be9f3 100644
-> --- a/hw/mem/nvdimm.c
-> +++ b/hw/mem/nvdimm.c
-> @@ -148,9 +148,12 @@ static MemoryRegion *nvdimm_get_vmstate_memory_region(PCDIMMDevice *dimm)
->   
->   static void nvdimm_class_init(ObjectClass *oc, void *data)
->   {
-> +    DeviceClass *dc = DEVICE_CLASS(oc);
->       PCDIMMDeviceClass *ddc = PC_DIMM_CLASS(oc);
->       NVDIMMClass *nvc = NVDIMM_CLASS(oc);
->   
-> +    dc->hotpluggable = true;
+>  chardev/char-io.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/chardev/char-io.c b/chardev/char-io.c
+> index f810524..3828c20 100644
+> --- a/chardev/char-io.c
+> +++ b/chardev/char-io.c
+> @@ -122,7 +122,6 @@ GSource *io_add_watch_poll(Chardev *chr,
+>      g_free(name);
+> =20
+>      g_source_attach(&iwp->parent, context);
+> -    g_source_unref(&iwp->parent);
+>      return (GSource *)iwp;
+>  }
+> =20
+> @@ -131,12 +130,24 @@ static void io_remove_watch_poll(GSource *source)
+>      IOWatchPoll *iwp;
+> =20
+>      iwp =3D io_watch_poll_from_source(source);
 > +
->       ddc->realize = nvdimm_realize;
->       ddc->get_memory_region = nvdimm_get_memory_region;
->       ddc->get_vmstate_memory_region = nvdimm_get_vmstate_memory_region;
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index 66eace5..1f78567 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -443,6 +443,7 @@ static void pc_dimm_class_init(ObjectClass *oc, void *data)
->       dc->unrealize = pc_dimm_unrealize;
->       dc->props = pc_dimm_properties;
->       dc->desc = "DIMM memory module";
-> +    dc->hotpluggable = true;
->   
->       ddc->get_memory_region = pc_dimm_get_memory_region;
->       ddc->get_vmstate_memory_region = pc_dimm_get_vmstate_memory_region;
-> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-> index 1e6fb88..8db380d 100644
-> --- a/hw/pci/pci.c
-> +++ b/hw/pci/pci.c
-> @@ -2534,6 +2534,7 @@ static void pci_device_class_init(ObjectClass *klass, void *data)
->       k->unrealize = pci_qdev_unrealize;
->       k->bus_type = TYPE_PCI_BUS;
->       k->props = pci_props;
-> +    k->hotpluggable = true;
->       pc->realize = pci_default_realize;
->   }
->   
-> diff --git a/hw/s390x/ccw-device.c b/hw/s390x/ccw-device.c
-> index f9bfa15..d1b6e6f 100644
-> --- a/hw/s390x/ccw-device.c
-> +++ b/hw/s390x/ccw-device.c
-> @@ -48,6 +48,7 @@ static void ccw_device_class_init(ObjectClass *klass, void *data)
->       k->realize = ccw_device_realize;
->       k->refill_ids = ccw_device_refill_ids;
->       dc->props = ccw_device_properties;
-> +    dc->hotpluggable = true;
->   }
->   
->   const VMStateDescription vmstate_ccw_dev = {
-> diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-> index e364410..338180d 100644
-> --- a/hw/scsi/scsi-bus.c
-> +++ b/hw/scsi/scsi-bus.c
-> @@ -2123,6 +2123,7 @@ static void scsi_device_class_init(ObjectClass *klass, void *data)
->       k->realize   = scsi_qdev_realize;
->       k->unrealize = scsi_qdev_unrealize;
->       k->props     = scsi_props;
-> +    k->hotpluggable = true;
->   }
->   
->   static void scsi_dev_instance_init(Object *obj)
-> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-> index d910f84..16701aa 100644
-> --- a/hw/usb/bus.c
-> +++ b/hw/usb/bus.c
-> @@ -793,6 +793,7 @@ static void usb_device_class_init(ObjectClass *klass, void *data)
->       k->realize  = usb_qdev_realize;
->       k->unrealize = usb_qdev_unrealize;
->       k->props    = usb_props;
-> +    k->hotpluggable = true;
->   }
->   
->   static const TypeInfo usb_device_type_info = {
-> 
+> +    /*
+> +     * Here the order of destruction really matters.  We need to first
+> +     * detach the IOWatchPoll object from the context (which may still
+> +     * be running in another loop thread), only after that could we
+> +     * continue to operate on iwp->src, or there may be race condition
+> +     * between current thread and the context loop thread.
+> +     *
+> +     * Let's blame the glib bug mentioned in commit 2b3167 (again) for
+> +     * this extra complexity.
+> +     */
+> +    g_source_destroy(&iwp->parent);
+>      if (iwp->src) {
+>          g_source_destroy(iwp->src);
+>          g_source_unref(iwp->src);
+>          iwp->src =3D NULL;
+>      }
+> -    g_source_destroy(&iwp->parent);
+> +    g_source_unref(&iwp->parent);
+>  }
+> =20
+>  void remove_fd_in_watch(Chardev *chr)
+> --=20
+> 2.7.4
+>=20
+
+Regards,
+Daniel
+--=20
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
