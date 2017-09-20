@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52321)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57748)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dua20-0000hQ-5a
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 04:06:53 -0400
+	(envelope-from <cohuck@redhat.com>) id 1dua77-0002OL-2Y
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 04:12:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dua1u-0002DH-FC
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 04:06:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55860)
+	(envelope-from <cohuck@redhat.com>) id 1dua74-0001b7-BI
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 04:12:09 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43428)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dua1u-0002BR-9Q
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 04:06:46 -0400
-Date: Wed, 20 Sep 2017 10:06:40 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dua74-0001Xo-27
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 04:12:06 -0400
+Date: Wed, 20 Sep 2017 10:11:59 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170920100640.79900c9f.cohuck@redhat.com>
-In-Reply-To: <20170919182745.90280-5-pasic@linux.vnet.ibm.com>
+Message-ID: <20170920101159.0aaff3d6.cohuck@redhat.com>
+In-Reply-To: <20170919182745.90280-6-pasic@linux.vnet.ibm.com>
 References: <20170919182745.90280-1-pasic@linux.vnet.ibm.com>
-	<20170919182745.90280-5-pasic@linux.vnet.ibm.com>
+	<20170919182745.90280-6-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 4/5] 390x/css: introduce maximum data
- address checking
+Subject: Re: [Qemu-devel] [PATCH v3 5/5] s390x/css: support ccw IDA
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,42 +30,79 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: Halil Pasic <pasic@linux.vnet.ibm.com>
 Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Tue, 19 Sep 2017 20:27:44 +0200
+On Tue, 19 Sep 2017 20:27:45 +0200
 Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-> The architecture mandates the addresses to be  accessed on the first
-> indirection level (that is, the data addresses without IDA, and the
-> (M)IDAW addresses with (M)IDA) to be checked against an CCW format
-> dependent limit maximum address.  If a violation is detected, the storage
-> access is not to be performed and a channel program check needs to be
-> generated. As of today, we fail to do this check.
-> 
-> Let us stick even closer to the architecture specification.
+> Let's add indirect data addressing support for our virtual channel
+> subsystem. This implementation does not bother with any kind of
+> prefetching. We simply step through the IDAL on demand.
 > 
 > Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+
+My s-o-b is a bit preliminary ;)
+
 > ---
->  hw/s390x/css.c         | 10 ++++++++++
->  include/hw/s390x/css.h |  1 +
->  2 files changed, 11 insertions(+)
+>  hw/s390x/css.c | 117 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 116 insertions(+), 1 deletion(-)
 > 
 > diff --git a/hw/s390x/css.c b/hw/s390x/css.c
-> index 6b0cd8861b..2d37a9ddde 100644
+> index 2d37a9ddde..a3ce6d89b6 100644
 > --- a/hw/s390x/css.c
 > +++ b/hw/s390x/css.c
-> @@ -795,6 +795,11 @@ static inline int cds_check_len(CcwDataStream *cds, int len)
->      return cds->flags & CDS_F_STREAM_BROKEN ? -EINVAL : len;
+> @@ -827,6 +827,121 @@ incr:
+>      return 0;
 >  }
 >  
-> +static inline bool cds_ccw_addrs_ok(hwaddr addr, int len, bool ccw_fmt1)
-
-cds_cda_limit_ok?
-
+> +/* returns values between 1 and bsz, where bsz is a power of 2 */
+> +static inline uint16_t ida_continuous_left(hwaddr cda, uint64_t bsz)
 > +{
-> +    return (addr + len) < (ccw_fmt1 ? (1UL << 31) : (1UL << 24));
+> +    return bsz - (cda & (bsz - 1));
 > +}
 > +
->  static int ccw_dstream_rw_noflags(CcwDataStream *cds, void *buff, int len,
->                                    CcwDataStreamOp op)
->  {
+> +static inline uint64_t ccw_ida_block_size(uint8_t flags)
+> +{
+> +    if ((flags & CDS_F_C64) && !(flags & CDS_F_I2K)) {
+> +        return 1ULL << 12;
+> +    }
+> +    return 1ULL << 11;
+> +}
+> +
+> +static inline int ida_read_next_idaw(CcwDataStream *cds, bool ccw_fmt1,
+> +                                     bool idaw_fmt_2)
+> +{
+> +    union {uint64_t fmt2; uint32_t fmt1; } idaw;
+> +    int ret;
+> +    hwaddr idaw_addr;
+> +
+> +    if (idaw_fmt_2) {
+> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt2) * cds->at_idaw;
+> +        if (idaw_addr & 0x07 && cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1)) {
 
-Looks good.
+So, what is supposed to happen if the idaw_addr is not aligned
+correctly _and_ is violating the limits?
+
+> +            return -EINVAL; /* channel program check */
+> +        }
+> +        ret = address_space_rw(&address_space_memory, idaw_addr,
+> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt2,
+> +                               sizeof(idaw.fmt2), false);
+> +        cds->cda = be64_to_cpu(idaw.fmt2);
+> +    } else {
+> +        idaw_addr = cds->cda_orig + sizeof(idaw.fmt1) * cds->at_idaw;
+> +        if (idaw_addr & 0x03 && cds_ccw_addrs_ok(idaw_addr, 0, ccw_fmt1)) {
+> +            return -EINVAL; /* channel program check */
+> +        }
+> +        ret = address_space_rw(&address_space_memory, idaw_addr,
+> +                               MEMTXATTRS_UNSPECIFIED, (void *) &idaw.fmt1,
+> +                               sizeof(idaw.fmt1), false);
+> +        cds->cda = be64_to_cpu(idaw.fmt1);
+> +    }
+> +    ++(cds->at_idaw);
+> +    if (ret != MEMTX_OK) {
+> +        /* assume inaccessible address */
+> +        return -EINVAL; /* channel program check */
+> +
+> +    }
+> +    return 0;
+> +}
