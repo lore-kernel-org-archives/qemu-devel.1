@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48505)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48474)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1duxCq-00056N-0U
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:51:38 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1duxCn-00054J-Hz
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:51:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1duxCo-0001J9-T9
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:51:36 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1duxCk-0001GU-HP
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:51:33 -0400
 Received: from ozlabs.ru ([107.173.13.209]:54112)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1duxCo-0001CA-KH
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:51:34 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1duxCk-0001CA-8S
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:51:30 -0400
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Thu, 21 Sep 2017 18:51:04 +1000
-Message-Id: <20170921085110.25598-13-aik@ozlabs.ru>
+Date: Thu, 21 Sep 2017 18:51:00 +1000
+Message-Id: <20170921085110.25598-9-aik@ozlabs.ru>
 In-Reply-To: <20170921085110.25598-1-aik@ozlabs.ru>
 References: <20170921085110.25598-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v5 12/18] memory: Share FlatView's and
- dispatch trees between address spaces
+Subject: [Qemu-devel] [PATCH qemu v5 08/18] memory: Rename
+ mem_begin/mem_commit/mem_add helpers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,134 +27,105 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
-This allows sharing flat views between address spaces (AS) when
-the same root memory region is used when creating a new address space.
-This is done by walking through all ASes and caching one FlatView per
-a physical root MR (i.e. not aliased).
+This renames some helpers to reflect better what they do.
 
-This removes search for duplicates from address_space_init_shareable() as
-FlatViews are shared elsewhere and keeping as::ref_count correct seems
-an unnecessary and useless complication.
-
-This should cause no change and memory use or boot time yet.
+This should cause no behavioural change.
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
 Changes:
-v5:
-* s/flatview_set_to_address_space/address_space_set_flatview/g
-* generate_memory_topology() does g_hash_table_replace() as well
-
-v4:
-* used g_hash_table_new_full() instead of g_hash_table_new() +
-g_hash_table_foreach_remove()
-* cached last hash table of FV globally
-
 v3:
-* got rid of global and per-AS lists of FlatView objects
+* s/flatview_mem_add/flatview_add_to_dispatch/
+* s/phys_page_compact_all/address_space_dispatch_compact/
+* s/address_space_dispatch_alloc/address_space_dispatch_new/
 ---
- memory.c | 56 +++++++++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 45 insertions(+), 11 deletions(-)
+ include/exec/memory-internal.h |  6 +++---
+ exec.c                         | 12 +++---------
+ memory.c                       |  6 +++---
+ 3 files changed, 9 insertions(+), 15 deletions(-)
 
+diff --git a/include/exec/memory-internal.h b/include/exec/memory-internal.h
+index 1cf8ad9869..d4a35c6e96 100644
+--- a/include/exec/memory-internal.h
++++ b/include/exec/memory-internal.h
+@@ -27,9 +27,9 @@ extern const MemoryRegionOps unassigned_mem_ops;
+ bool memory_region_access_valid(MemoryRegion *mr, hwaddr addr,
+                                 unsigned size, bool is_write);
+ 
+-void mem_add(FlatView *fv, MemoryRegionSection *section);
+-AddressSpaceDispatch *mem_begin(AddressSpace *as);
+-void mem_commit(AddressSpaceDispatch *d);
++void flatview_add_to_dispatch(FlatView *fv, MemoryRegionSection *section);
++AddressSpaceDispatch *address_space_dispatch_new(FlatView *fv);
++void address_space_dispatch_compact(AddressSpaceDispatch *d);
+ 
+ AddressSpaceDispatch *address_space_to_dispatch(AddressSpace *as);
+ AddressSpaceDispatch *flatview_to_dispatch(FlatView *fv);
+diff --git a/exec.c b/exec.c
+index 548ec71b4c..b085f82503 100644
+--- a/exec.c
++++ b/exec.c
+@@ -358,7 +358,7 @@ static void phys_page_compact(PhysPageEntry *lp, Node *nodes)
+     }
+ }
+ 
+-static void phys_page_compact_all(AddressSpaceDispatch *d, int nodes_nb)
++void address_space_dispatch_compact(AddressSpaceDispatch *d)
+ {
+     if (d->phys_map.skip) {
+         phys_page_compact(&d->phys_map, d->map.nodes);
+@@ -1346,7 +1346,7 @@ static void register_multipage(FlatView *fv,
+     phys_page_set(d, start_addr >> TARGET_PAGE_BITS, num_pages, section_index);
+ }
+ 
+-void mem_add(FlatView *fv, MemoryRegionSection *section)
++void flatview_add_to_dispatch(FlatView *fv, MemoryRegionSection *section)
+ {
+     MemoryRegionSection now = *section, remain = *section;
+     Int128 page_size = int128_make64(TARGET_PAGE_SIZE);
+@@ -2672,9 +2672,8 @@ static void io_mem_init(void)
+                           NULL, UINT64_MAX);
+ }
+ 
+-AddressSpaceDispatch *mem_begin(AddressSpace *as)
++AddressSpaceDispatch *address_space_dispatch_new(FlatView *fv)
+ {
+-    FlatView *fv = address_space_to_flatview(as);
+     AddressSpaceDispatch *d = g_new0(AddressSpaceDispatch, 1);
+     uint16_t n;
+ 
+@@ -2698,11 +2697,6 @@ void address_space_dispatch_free(AddressSpaceDispatch *d)
+     g_free(d);
+ }
+ 
+-void mem_commit(AddressSpaceDispatch *d)
+-{
+-    phys_page_compact_all(d, d->map.nodes_nb);
+-}
+-
+ static void tcg_commit(MemoryListener *listener)
+ {
+     CPUAddressSpace *cpuas;
 diff --git a/memory.c b/memory.c
-index 9868d0f57c..56b3dd47ab 100644
+index 1364500eb6..990e9b8478 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -47,6 +47,8 @@ static QTAILQ_HEAD(memory_listeners, MemoryListener) memory_listeners
- static QTAILQ_HEAD(, AddressSpace) address_spaces
-     = QTAILQ_HEAD_INITIALIZER(address_spaces);
+@@ -905,13 +905,13 @@ static void address_space_update_topology(AddressSpace *as)
+     FlatView *new_view = generate_memory_topology(as->root);
+     int i;
  
-+static GHashTable *flat_views;
-+
- typedef struct AddrRange AddrRange;
- 
- /*
-@@ -760,6 +762,7 @@ static FlatView *generate_memory_topology(MemoryRegion *mr)
-         flatview_add_to_dispatch(view, &mrs);
+-    new_view->dispatch = mem_begin(as);
++    new_view->dispatch = address_space_dispatch_new(new_view);
+     for (i = 0; i < new_view->nr; i++) {
+         MemoryRegionSection mrs =
+             section_from_flat_range(&new_view->ranges[i], new_view);
+-        mem_add(new_view, &mrs);
++        flatview_add_to_dispatch(new_view, &mrs);
      }
-     address_space_dispatch_compact(view->dispatch);
-+    g_hash_table_replace(flat_views, mr, view);
- 
-     return view;
- }
-@@ -925,11 +928,47 @@ static void address_space_update_topology_pass(AddressSpace *as,
-     }
- }
- 
--static void address_space_update_topology(AddressSpace *as)
-+static void flatviews_init(void)
-+{
-+    if (flat_views) {
-+        return;
-+    }
-+
-+    flat_views = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
-+                                       (GDestroyNotify) flatview_unref);
-+}
-+
-+static void flatviews_reset(void)
-+{
-+    AddressSpace *as;
-+
-+    if (flat_views) {
-+        g_hash_table_unref(flat_views);
-+        flat_views = NULL;
-+    }
-+    flatviews_init();
-+
-+    /* Render unique FVs */
-+    QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
-+        MemoryRegion *physmr = memory_region_get_flatview_root(as->root);
-+
-+        if (g_hash_table_lookup(flat_views, physmr)) {
-+            continue;
-+        }
-+
-+        generate_memory_topology(physmr);
-+    }
-+}
-+
-+static void address_space_set_flatview(AddressSpace *as)
- {
-     FlatView *old_view = address_space_get_flatview(as);
--    MemoryRegion *physmr = memory_region_get_flatview_root(old_view->root);
--    FlatView *new_view = generate_memory_topology(physmr);
-+    MemoryRegion *physmr = memory_region_get_flatview_root(as->root);
-+    FlatView *new_view = g_hash_table_lookup(flat_views, physmr);
-+
-+    assert(new_view);
-+
-+    flatview_ref(new_view);
+-    mem_commit(new_view->dispatch);
++    address_space_dispatch_compact(new_view->dispatch);
  
      if (!QTAILQ_EMPTY(&as->listeners)) {
          address_space_update_topology_pass(as, old_view, new_view, false);
-@@ -965,10 +1004,12 @@ void memory_region_transaction_commit(void)
-     --memory_region_transaction_depth;
-     if (!memory_region_transaction_depth) {
-         if (memory_region_update_pending) {
-+            flatviews_reset();
-+
-             MEMORY_LISTENER_CALL_GLOBAL(begin, Forward);
- 
-             QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
--                address_space_update_topology(as);
-+                address_space_set_flatview(as);
-                 address_space_update_ioeventfds(as);
-             }
-             memory_region_update_pending = false;
-@@ -2691,13 +2732,6 @@ AddressSpace *address_space_init_shareable(MemoryRegion *root, const char *name)
- {
-     AddressSpace *as;
- 
--    QTAILQ_FOREACH(as, &address_spaces, address_spaces_link) {
--        if (root == as->root && as->malloced) {
--            as->ref_count++;
--            return as;
--        }
--    }
--
-     as = g_malloc0(sizeof *as);
-     address_space_init(as, root, name);
-     as->malloced = true;
 -- 
 2.11.0
