@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34621)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dur8G-0002Sa-TY
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 22:22:29 -0400
+	(envelope-from <sstabellini@kernel.org>) id 1dur8H-0002Sq-M9
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 22:22:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sstabellini@kernel.org>) id 1dur8F-0008CF-T6
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 22:22:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48632)
+	(envelope-from <sstabellini@kernel.org>) id 1dur8G-0008Ce-AM
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 22:22:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48656)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <sstabellini@kernel.org>)
-	id 1dur8F-0008Bk-N7
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 22:22:27 -0400
+	id 1dur8G-0008C5-22
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 22:22:28 -0400
 From: Stefano Stabellini <sstabellini@kernel.org>
-Date: Wed, 20 Sep 2017 19:22:23 -0700
-Message-Id: <1505960544-12202-1-git-send-email-sstabellini@kernel.org>
-In-Reply-To: <alpine.DEB.2.10.1709201906040.2968@sstabellini-ThinkPad-X260>
+Date: Wed, 20 Sep 2017 19:22:24 -0700
+Message-Id: <1505960544-12202-2-git-send-email-sstabellini@kernel.org>
+In-Reply-To: <1505960544-12202-1-git-send-email-sstabellini@kernel.org>
 References: <alpine.DEB.2.10.1709201906040.2968@sstabellini-ThinkPad-X260>
-Subject: [Qemu-devel] [PULL 1/2] xen-disk: use g_new0 to fix build
+	<1505960544-12202-1-git-send-email-sstabellini@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 2/2] xen/pt: allow QEMU to request MSI unmasking
+ at bind time
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +30,152 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: peter.maydell@linaro.org, stefanha@gmail.com
-Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Olaf Hering <olaf@aepfle.de>
+Cc: sstabellini@kernel.org, stefanha@redhat.com, anthony.perard@citrix.com, xen-devel@lists.xenproject.org, qemu-devel@nongnu.org, Roger Pau Monne <roger.pau@citrix.com>
 
-From: Olaf Hering <olaf@aepfle.de>
+From: Roger Pau Monne <roger.pau@citrix.com>
 
-g_malloc0_n is available since glib-2.24. To allow build with older glib
-versions use the generic g_new0, which is already used in many other
-places in the code.
+When a MSI interrupt is bound to a guest using
+xc_domain_update_msi_irq (XEN_DOMCTL_bind_pt_irq) the interrupt is
+left masked by default.
 
-Fixes commit 3284fad728 ("xen-disk: add support for multi-page shared rings")
+This causes problems with guests that first configure interrupts and
+clean the per-entry MSIX table mask bit and afterwards enable MSIX
+globally. In such scenario the Xen internal msixtbl handlers would not
+detect the unmasking of MSIX entries because vectors are not yet
+registered since MSIX is not enabled, and vectors would be left
+masked.
 
-Signed-off-by: Olaf Hering <olaf@aepfle.de>
+Introduce a new flag in the gflags field to signal Xen whether a MSI
+interrupt should be unmasked after being bound.
+
+This also requires to track the mask register for MSI interrupts, so
+QEMU can also notify to Xen whether the MSI interrupt should be bound
+masked or unmasked
+
+Signed-off-by: Roger Pau Monn=C3=A9 <roger.pau@citrix.com>
+Reviewed-by: Jan Beulich <jbeulich@suse.com>
+Reported-by: Andreas Kinzler <hfp@posteo.de>
 Reviewed-by: Stefano Stabellini <sstabellini@kernel.org>
 Signed-off-by: Stefano Stabellini <sstabellini@kernel.org>
 ---
- hw/block/xen_disk.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/xen/xen_pt.h             |  1 +
+ hw/xen/xen_pt_config_init.c | 20 ++++++++++++++++++--
+ hw/xen/xen_pt_msi.c         | 13 ++++++++++---
+ 3 files changed, 29 insertions(+), 5 deletions(-)
 
-diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-index d42ed70..536e2ee 100644
---- a/hw/block/xen_disk.c
-+++ b/hw/block/xen_disk.c
-@@ -1232,7 +1232,7 @@ static int blk_connect(struct XenDevice *xendev)
-         return -1;
+diff --git a/hw/xen/xen_pt.h b/hw/xen/xen_pt.h
+index 191d9ca..aa39a9a 100644
+--- a/hw/xen/xen_pt.h
++++ b/hw/xen/xen_pt.h
+@@ -180,6 +180,7 @@ typedef struct XenPTMSI {
+     uint32_t addr_hi;  /* guest message upper address */
+     uint16_t data;     /* guest message data */
+     uint32_t ctrl_offset; /* saved control offset */
++    uint32_t mask;     /* guest mask bits */
+     int pirq;          /* guest pirq corresponding */
+     bool initialized;  /* when guest MSI is initialized */
+     bool mapped;       /* when pirq is mapped */
+diff --git a/hw/xen/xen_pt_config_init.c b/hw/xen/xen_pt_config_init.c
+index 1f04ec5..a3ce33e 100644
+--- a/hw/xen/xen_pt_config_init.c
++++ b/hw/xen/xen_pt_config_init.c
+@@ -1315,6 +1315,22 @@ static int xen_pt_msgdata_reg_write(XenPCIPassthro=
+ughState *s,
+     return 0;
+ }
+=20
++static int xen_pt_mask_reg_write(XenPCIPassthroughState *s, XenPTReg *cf=
+g_entry,
++                                 uint32_t *val, uint32_t dev_value,
++                                 uint32_t valid_mask)
++{
++    int rc;
++
++    rc =3D xen_pt_long_reg_write(s, cfg_entry, val, dev_value, valid_mas=
+k);
++    if (rc) {
++        return rc;
++    }
++
++    s->msi->mask =3D *val;
++
++    return 0;
++}
++
+ /* MSI Capability Structure reg static information table */
+ static XenPTRegInfo xen_pt_emu_reg_msi[] =3D {
+     /* Next Pointer reg */
+@@ -1393,7 +1409,7 @@ static XenPTRegInfo xen_pt_emu_reg_msi[] =3D {
+         .emu_mask   =3D 0xFFFFFFFF,
+         .init       =3D xen_pt_mask_reg_init,
+         .u.dw.read  =3D xen_pt_long_reg_read,
+-        .u.dw.write =3D xen_pt_long_reg_write,
++        .u.dw.write =3D xen_pt_mask_reg_write,
+     },
+     /* Mask reg (if PCI_MSI_FLAGS_MASKBIT set, for 64-bit devices) */
+     {
+@@ -1404,7 +1420,7 @@ static XenPTRegInfo xen_pt_emu_reg_msi[] =3D {
+         .emu_mask   =3D 0xFFFFFFFF,
+         .init       =3D xen_pt_mask_reg_init,
+         .u.dw.read  =3D xen_pt_long_reg_read,
+-        .u.dw.write =3D xen_pt_long_reg_write,
++        .u.dw.write =3D xen_pt_mask_reg_write,
+     },
+     /* Pending reg (if PCI_MSI_FLAGS_MASKBIT set, for 32-bit devices) */
+     {
+diff --git a/hw/xen/xen_pt_msi.c b/hw/xen/xen_pt_msi.c
+index ff9a79f..6d1e3bd 100644
+--- a/hw/xen/xen_pt_msi.c
++++ b/hw/xen/xen_pt_msi.c
+@@ -24,6 +24,7 @@
+ #define XEN_PT_GFLAGS_SHIFT_DM             9
+ #define XEN_PT_GFLAGSSHIFT_DELIV_MODE     12
+ #define XEN_PT_GFLAGSSHIFT_TRG_MODE       15
++#define XEN_PT_GFLAGSSHIFT_UNMASKED       16
+=20
+ #define latch(fld) latch[PCI_MSIX_ENTRY_##fld / sizeof(uint32_t)]
+=20
+@@ -155,7 +156,8 @@ static int msi_msix_update(XenPCIPassthroughState *s,
+                            int pirq,
+                            bool is_msix,
+                            int msix_entry,
+-                           int *old_pirq)
++                           int *old_pirq,
++                           bool masked)
+ {
+     PCIDevice *d =3D &s->dev;
+     uint8_t gvec =3D msi_vector(data);
+@@ -171,6 +173,8 @@ static int msi_msix_update(XenPCIPassthroughState *s,
+         table_addr =3D s->msix->mmio_base_addr;
      }
- 
--    domids = g_malloc0_n(blkdev->nr_ring_ref, sizeof(uint32_t));
-+    domids = g_new0(uint32_t, blkdev->nr_ring_ref);
-     for (i = 0; i < blkdev->nr_ring_ref; i++) {
-         domids[i] = blkdev->xendev.dom;
+=20
++    gflags |=3D masked ? 0 : (1u << XEN_PT_GFLAGSSHIFT_UNMASKED);
++
+     rc =3D xc_domain_update_msi_irq(xen_xc, xen_domid, gvec,
+                                   pirq, gflags, table_addr);
+=20
+@@ -273,8 +277,10 @@ int xen_pt_msi_setup(XenPCIPassthroughState *s)
+ int xen_pt_msi_update(XenPCIPassthroughState *s)
+ {
+     XenPTMSI *msi =3D s->msi;
++
++    /* Current MSI emulation in QEMU only supports 1 vector */
+     return msi_msix_update(s, msi_addr64(msi), msi->data, msi->pirq,
+-                           false, 0, &msi->pirq);
++                           false, 0, &msi->pirq, msi->mask & 1);
+ }
+=20
+ void xen_pt_msi_disable(XenPCIPassthroughState *s)
+@@ -355,7 +361,8 @@ static int xen_pt_msix_update_one(XenPCIPassthroughSt=
+ate *s, int entry_nr,
      }
--- 
+=20
+     rc =3D msi_msix_update(s, entry->addr, entry->data, pirq, true,
+-                         entry_nr, &entry->pirq);
++                         entry_nr, &entry->pirq,
++                         vec_ctrl & PCI_MSIX_ENTRY_CTRL_MASKBIT);
+=20
+     if (!rc) {
+         entry->updated =3D false;
+--=20
 1.9.1
