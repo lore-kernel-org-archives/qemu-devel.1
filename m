@@ -1,30 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56917)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:57362)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1duxfp-0003kL-Nw
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 05:21:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1duxho-0004Zq-5X
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 05:23:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1duxfm-00029X-Gp
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 05:21:33 -0400
-Received: from mail-it0-x242.google.com ([2607:f8b0:4001:c0b::242]:38464)
+	(envelope-from <peter.maydell@linaro.org>) id 1duxhn-0003FO-3s
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 05:23:36 -0400
+Received: from mail-wr0-x233.google.com ([2a00:1450:400c:c0c::233]:53147)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1duxfm-000290-7V
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 05:21:30 -0400
-Received: by mail-it0-x242.google.com with SMTP id 85so2733245ith.5
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 02:21:29 -0700 (PDT)
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-References: <20170720072231.35054-1-aik@ozlabs.ru>
-	<20170720072231.35054-3-aik@ozlabs.ru>
-	<20170825062153.GF2772@umbus.fritz.box>
-	<477eff2f-42bf-585d-84a4-1b2e5554bf38@ozlabs.ru>
-Message-ID: <d01e56b6-4077-e7fb-937c-9c43a02a3c1d@ozlabs.ru>
-Date: Thu, 21 Sep 2017 19:21:22 +1000
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1duxhm-0003FF-RS
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 05:23:35 -0400
+Received: by mail-wr0-x233.google.com with SMTP id c23so4043328wrg.9
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 02:23:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <477eff2f-42bf-585d-84a4-1b2e5554bf38@ozlabs.ru>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="d5xjFIgOLrbvov3CAmC5TJsEGA2lmCoSR"
-Subject: Re: [Qemu-devel] [PATCH qemu v4 2/3] vfio/spapr: Add a notifier for
- PPC64 HV/PR KVM about new group attached to LIOBN
+In-Reply-To: <CAFEAcA-WZbG=vCxyVJava1T8yUT1PGiRhNTX092cD1C869StQg@mail.gmail.com>
+References: <150097502966.6397.351311629210845503.malonedeb@gac.canonical.com>
+	<150240857521.18943.1371547756430353016.malone@chaenomeles.canonical.com>
+	<87shgpi800.fsf@linaro.org>
+	<CAFEAcA8S6S_T9d=QhncSb4or09HqRoZQNtxWDo3vj8OA9+pb-w@mail.gmail.com>
+	<87r2w9i38i.fsf@linaro.org>
+	<CAFEAcA-WZbG=vCxyVJava1T8yUT1PGiRhNTX092cD1C869StQg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 Sep 2017 10:23:12 +0100
+Message-ID: <CAFEAcA--V6PhntAt4=_fHkwn0dw=k+g+Om5b6RbKCnKODgUiDg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [Bug 1706296] Re: Booting NT 4 disk causes
+ /home/rjones/d/qemu/cpus.c:1580:qemu_mutex_lock_iothread: assertion failed:
+ (!qemu_mutex_iothread_locked())
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,323 +36,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alex Williamson <alex.williamson@redhat.com>
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---d5xjFIgOLrbvov3CAmC5TJsEGA2lmCoSR
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- Alex Williamson <alex.williamson@redhat.com>
-Message-ID: <d01e56b6-4077-e7fb-937c-9c43a02a3c1d@ozlabs.ru>
-Subject: Re: [PATCH qemu v4 2/3] vfio/spapr: Add a notifier for PPC64 HV/PR
- KVM about new group attached to LIOBN
-References: <20170720072231.35054-1-aik@ozlabs.ru>
- <20170720072231.35054-3-aik@ozlabs.ru>
- <20170825062153.GF2772@umbus.fritz.box>
- <477eff2f-42bf-585d-84a4-1b2e5554bf38@ozlabs.ru>
-In-Reply-To: <477eff2f-42bf-585d-84a4-1b2e5554bf38@ozlabs.ru>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 28/08/17 14:20, Alexey Kardashevskiy wrote:
-> On 25/08/17 16:21, David Gibson wrote:
->> On Thu, Jul 20, 2017 at 05:22:30PM +1000, Alexey Kardashevskiy wrote:
->>> This implements a notification for a new IOMMU group attached to
->>> sPAPR's logical IO bus (LIOBN) to enable in-kernel TCE acceleration.
+On 18 August 2017 at 11:33, Peter Maydell <peter.maydell@linaro.org> wrote:
+> On 18 August 2017 at 11:23, Alex Benn=C3=A9e <alex.bennee@linaro.org> wro=
+te:
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>> On 18 August 2017 at 09:40, Alex Benn=C3=A9e <alex.bennee@linaro.org> w=
+rote:
+>>>> It might be related. The assertion error is caused by the fact an
+>>>> exception has occurred and processor is trying to dump a stack frame t=
+hat
+>>>> overlaps from RAM into device memory. As the IRQ/exception handling is
+>>>> already under the BQL (as it changes machine state) we get the asserti=
+on
+>>>> when it tries to take the BQL a second time when accessing device
+>>>> memory.
 >>>
->>> This extends the TYPE_SPAPR_IOMMU_MEMORY_REGION class with a get_fd()=
-
->>> callback which returns KVM fd associated with LIOBN, the notifier use=
-s it
->>> to establish link between LIOBN and IOMMU group in the KVM.
->>>
->>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-
-Ping?
-
-
->>> ---
->>>
->>> The practical reason for adding get_fd() as a callback is avoiding st=
-atic
->>> linking to spapt_tce_get_fd(): hw/vfio/spapr.c compiles when
->>> CONFIG_SOFTMMU=3Dy to avoid multiple "ifdef PSERIES"'s in the rest
->>> of VFIO code but hw/ppc/spapr_iommu.c (where spapt_tce_get_fd() besid=
-es)
->>> compiles only when CONFIG_PSERIES=3Dy.
+>>> This sounds worrying -- lots and lots of target backend code
+>>> does writes to memory. Is it all going to cause assertions if
+>>> it happens to be pointing at a device?
 >>
->> Ok.  Nonetheless I don't think the get_fd() method is a good idea.
->> First, it's basically an abstraction violation, exposing the region's
->> internal fd.  Second, it's a method which only plausibly has one
->> implementation which is rarely sensible.
+>> Currently yes.
 >>
->> What this comes down to is that the guest IOMMU mechanism needs
->> information about host vfio groups mapped - for an optimization in
->> this case.
+>> That said from John's update it sounds very much like a symptom of not
+>> emulating the right processor type rather than behaviour we are
+>> incorrectly modelling. If we invert the lock before writing the stack
+>> page is it just going to crash in a more esoteric way?
 >>
->> So what would make sense to me is to put an "add_vfio_group" method
->> into IOMMUMemoryRegionClass (or even MemoryRegionClass).  In most
->> cases that will be NULL (=3D=3D no-op).  For the spapr IOMMU region, i=
-t
->> will (attempt to) connect the host group to the guest liobn.
->=20
->=20
-> Like this?
->=20
-> IOMMUMemoryRegionClass::add_vfio_group_kvm(int kvm_device_fd, int group=
-fd);
->=20
-> It is just cleaner to keep kvm_device_fd and its ioclts() in the same p=
-lace
-> but ok.
->=20
->=20
->>
->>> ---
->>>  include/hw/ppc/spapr.h        | 15 +++++++++++++++
->>>  include/hw/vfio/vfio-common.h |  2 ++
->>>  hw/ppc/spapr_iommu.c          | 10 ++++++++++
->>>  hw/vfio/common.c              | 10 ++++++++++
->>>  hw/vfio/spapr.c               | 39 +++++++++++++++++++++++++++++++++=
-++++++
->>>  hw/vfio/trace-events          |  1 +
->>>  6 files changed, 77 insertions(+)
->>>
->>> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
->>> index 2a303a705c..c1d37e6356 100644
->>> --- a/include/hw/ppc/spapr.h
->>> +++ b/include/hw/ppc/spapr.h
->>> @@ -591,6 +591,7 @@ void spapr_load_rtas(sPAPRMachineState *spapr, vo=
-id *fdt, hwaddr addr);
->>>  #define RTAS_EVENT_SCAN_RATE    1
->>> =20
->>>  typedef struct sPAPRTCETable sPAPRTCETable;
->>> +typedef struct sPAPRIOMMUMemoryRegionClass sPAPRIOMMUMemoryRegionCla=
-ss;
->>> =20
->>>  #define TYPE_SPAPR_TCE_TABLE "spapr-tce-table"
->>>  #define SPAPR_TCE_TABLE(obj) \
->>> @@ -599,6 +600,12 @@ typedef struct sPAPRTCETable sPAPRTCETable;
->>>  #define TYPE_SPAPR_IOMMU_MEMORY_REGION "spapr-iommu-memory-region"
->>>  #define SPAPR_IOMMU_MEMORY_REGION(obj) \
->>>          OBJECT_CHECK(IOMMUMemoryRegion, (obj), TYPE_SPAPR_IOMMU_MEMO=
-RY_REGION)
->>> +#define SPAPR_IOMMU_MEMORY_REGION_GET_CLASS(obj) \
->>> +        OBJECT_GET_CLASS(sPAPRIOMMUMemoryRegionClass, obj, \
->>> +                         TYPE_SPAPR_IOMMU_MEMORY_REGION)
->>> +#define SPAPR_IOMMU_MEMORY_REGION_CLASS(klass) \
->>> +        OBJECT_CLASS_CHECK(sPAPRIOMMUMemoryRegionClass, klass, \
->>> +                           TYPE_SPAPR_IOMMU_MEMORY_REGION)
->>> =20
->>>  struct sPAPRTCETable {
->>>      DeviceState parent;
->>> @@ -618,6 +625,14 @@ struct sPAPRTCETable {
->>>      QLIST_ENTRY(sPAPRTCETable) list;
->>>  };
->>> =20
->>> +struct sPAPRIOMMUMemoryRegionClass {
->>> +    /* private */
->>> +    IOMMUMemoryRegionClass parent_class;
->>> +
->>> +    /* public */
->>> +    int (*get_fd)(IOMMUMemoryRegion *iommu_mr);
->>> +};
->>> +
->>>  sPAPRTCETable *spapr_tce_find_by_liobn(target_ulong liobn);
->>
->> To make sure I'm understanding correctly: the MR subclass here is
->> representing a guest-side property, yes?  It means that on the guest
->> side the IOMMU mappings are managed by the PAPR {GET,PUT}_TCE
->> interface.
->=20
-> I do not understand the question, sorry. MR is a QEMU thing, only QEMU
-> devices use these MRs as MRs.
->=20
->=20
->>>  struct sPAPREventLogEntry {
->>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-com=
-mon.h
->>> index f3a2ac9fee..d245d3cecc 100644
->>> --- a/include/hw/vfio/vfio-common.h
->>> +++ b/include/hw/vfio/vfio-common.h
->>> @@ -177,6 +177,8 @@ extern const MemoryListener vfio_prereg_listener;=
+>> I'm not sure how you correctly emulate writing random stack pages to a
+>> random device. Unless there is some sort of weird [un]documented behavio=
+ur
+>> we should be doing?
+>
+> The desired behaviour is straightforward -- if the code calls
+> a function for "do a 4 byte write" then we do a 4 byte write
+> to the device. The only place where writing to a device has
+> to be special cased is when we're trying to execute code
+> from it (which is itself arguably a defect of our emulation).
+>
+> It looks like we only get this double locking when the
+> target/ code does a write-by-virtual-address (which ends
+> up going via io_writex() which takes the lock again) --
+> write-by-physical-address, eg stl_phys and friends presumably
+> don't take the lock. That's a rather confusing mismatch of
+> semantics.
 
->>>  int vfio_spapr_create_window(VFIOContainer *container,
->>>                               MemoryRegionSection *section,
->>>                               hwaddr *pgsize);
->>> +int vfio_spapr_notify_kvm(int vfio_kvm_device_fd, int groupfd,
->>> +                          IOMMUMemoryRegion *iommumr);
->>>  int vfio_spapr_remove_window(VFIOContainer *container,
->>>                               hwaddr offset_within_address_space);
->>> =20
->>> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
->>> index 307dc3021e..82fca61a75 100644
->>> --- a/hw/ppc/spapr_iommu.c
->>> +++ b/hw/ppc/spapr_iommu.c
->>> @@ -171,6 +171,13 @@ static void spapr_tce_notify_flag_changed(IOMMUM=
-emoryRegion *iommu,
->>>      }
->>>  }
->>> =20
->>> +static int spapr_tce_get_fd(IOMMUMemoryRegion *iommu_mr)
->>> +{
->>> +    sPAPRTCETable *tcet =3D container_of(iommu_mr, sPAPRTCETable, io=
-mmu);
->>> +
->>> +    return tcet->fd;
->>
->> Does this have a well defined value if there's no KVM?
->=20
->=20
-> It is -1 in TCG, any other value is undefined.
->=20
->=20
->>
->>> +}
->>> +
->>>  static int spapr_tce_table_post_load(void *opaque, int version_id)
->>>  {
->>>      sPAPRTCETable *tcet =3D SPAPR_TCE_TABLE(opaque);
->>> @@ -631,16 +638,19 @@ static TypeInfo spapr_tce_table_info =3D {
->>>  static void spapr_iommu_memory_region_class_init(ObjectClass *klass,=
- void *data)
->>>  {
->>>      IOMMUMemoryRegionClass *imrc =3D IOMMU_MEMORY_REGION_CLASS(klass=
-);
->>> +    sPAPRIOMMUMemoryRegionClass *simrc =3D SPAPR_IOMMU_MEMORY_REGION=
-_CLASS(klass);
->>> =20
->>>      imrc->translate =3D spapr_tce_translate_iommu;
->>>      imrc->get_min_page_size =3D spapr_tce_get_min_page_size;
->>>      imrc->notify_flag_changed =3D spapr_tce_notify_flag_changed;
->>> +    simrc->get_fd =3D spapr_tce_get_fd;
->>>  }
->>> =20
->>>  static const TypeInfo spapr_iommu_memory_region_info =3D {
->>>      .parent =3D TYPE_IOMMU_MEMORY_REGION,
->>>      .name =3D TYPE_SPAPR_IOMMU_MEMORY_REGION,
->>>      .class_init =3D spapr_iommu_memory_region_class_init,
->>> +    .class_size =3D sizeof(sPAPRIOMMUMemoryRegionClass),
->>>  };
->>> =20
->>>  static void register_types(void)
->>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->>> index 7b2924c0ef..92f1f88ae8 100644
->>> --- a/hw/vfio/common.c
->>> +++ b/hw/vfio/common.c
->>> @@ -454,6 +454,16 @@ static void vfio_listener_region_add(MemoryListe=
-ner *listener,
->>>              goto fail;
->>>          }
->>> =20
->>> +#ifdef CONFIG_KVM
->>> +        if (kvm_enabled()) {
->>> +            VFIOGroup *group;
->>> +
->>> +            QLIST_FOREACH(group, &container->group_list, container_n=
-ext) {
->>> +                vfio_spapr_notify_kvm(vfio_kvm_device_fd, group->fd,=
+Hi Alex -- do we have a fix for this assertion now, or is it still
+on your todo list?
 
->>> +                                      IOMMU_MEMORY_REGION(section->m=
-r));
->>> +            }
->>> +        }
->>
->> So, here you're informing the region of the groups when the region is
->> mapped in.  But don't you similarly need to notify if a group is added=
-
->> to an existing address space?=20
->=20
-> It is either in VFIO for ages (forever? in vfio_connect_container()), o=
-r I
-> did not understand the question...
->=20
->=20
->> And won't you also need notifications
->> of groups/regions being removed?
->=20
-> Same comment. vfio_disconnect_container()?
->=20
->=20
->>
->>> +#endif
->>>          vfio_host_win_add(container, section->offset_within_address_=
-space,
->>>                            section->offset_within_address_space +
->>>                            int128_get64(section->size) - 1, pgsize);
->>> diff --git a/hw/vfio/spapr.c b/hw/vfio/spapr.c
->>> index 32fd6a9b54..2b9af75c03 100644
->>> --- a/hw/vfio/spapr.c
->>> +++ b/hw/vfio/spapr.c
->>> @@ -15,8 +15,12 @@
->>> =20
->>>  #include "hw/vfio/vfio-common.h"
->>>  #include "hw/hw.h"
->>> +#include "hw/ppc/spapr.h"
->>>  #include "qemu/error-report.h"
->>>  #include "trace.h"
->>> +#ifdef CONFIG_KVM
->>> +#include "linux/kvm.h"
->>> +#endif
->>> =20
->>>  static bool vfio_prereg_listener_skipped_section(MemoryRegionSection=
- *section)
->>>  {
->>> @@ -188,6 +192,41 @@ int vfio_spapr_create_window(VFIOContainer *cont=
-ainer,
->>>      return 0;
->>>  }
->>> =20
->>> +int vfio_spapr_notify_kvm(int vfio_kvm_device_fd, int groupfd,
->>> +                          IOMMUMemoryRegion *iommu_mr)
->>> +{
->>> +#ifdef CONFIG_KVM
->>> +    struct kvm_vfio_spapr_tce param =3D {
->>> +        .groupfd =3D groupfd,
->>> +    };
->>> +    struct kvm_device_attr attr =3D {
->>> +        .group =3D KVM_DEV_VFIO_GROUP,
->>> +        .attr =3D KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE,
->>> +        .addr =3D (uint64_t)(unsigned long)&param,
->>> +    };
->>> +    IOMMUMemoryRegion *spapr_iommu_mr =3D SPAPR_IOMMU_MEMORY_REGION(=
-iommu_mr);
->>
->> This will assert if you have a non-spapr guest IOMMU on a ppc host
->> (e.g. emulating an x86 with VT-d under TCG).
->=20
->=20
-> Sure but this should not execute when TCG, hence "_kvm" in
-> "vfio_spapr_notify_kvm".
->=20
-
---=20
-Alexey
-
-
---d5xjFIgOLrbvov3CAmC5TJsEGA2lmCoSR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIrBAEBCAAVBQJZw4STDhxhaWtAb3psYWJzLnJ1AAoJEIYTPdgrwSC5bqQP/ika
-USAgmkZjrJgNW5JPA4gOlbXTRRg0nk3o7r9BGl8z8NJUce0DH2uAzxQTa21Ylc7e
-vK3W6uZQ8v5ZV6cyUqjP/eeQRdg5d3DoTmZOeqqk7hgiFWOWN9GlmmbaoRJ6MptM
-a5j06udyYByabSIoPqeg6FPADYFJmeQzqGOm4mDqmLIOJ7JtWx2zIl2RyuJ42oDO
-1yw/4unYYEO77H+4lI2mQo8zP4x67E0Tx4BClR7Ovg1D6iXIOi8rZgeChoWNpx0A
-UFlSYidDmayXs0fzDp2CiYmbABioWekgsw5Yl7N5prorltkShg7N0pwCs1cTmk8E
-b5PeqaIMsbFSeFL38f3iN4q+4xxHqmotzv8ZYeZsxD+bTjsuiJ12BNs6mSkfJKI+
-KpfluRf/AhiDw6vRPBl+zJmZkAl9zRT/NyFPINGM93qLrD1r5atFz/pv8L6IrHAB
-n/3Vi7jL+OrwsqfNDWwO+/7uBLS2dcKp7SIbobhNltwptajP5fTtWnnrjIxP+vyl
-K6srXnj/EKRRM0fTlWHnsAr9jvBPaFSxPFl5woCHhVmalKgKKjdkHDBGi4uIBaSE
-CYo6Sq3ES1c/3jNva/kENoAfzYR8YbZlC5AtAxuuq0dCNHQr0WJnTtZQMy6g1KkK
-LR2REC4J9sx2m/8jvUBILKOoE6yl238q95sa/qD/
-=xwuO
------END PGP SIGNATURE-----
-
---d5xjFIgOLrbvov3CAmC5TJsEGA2lmCoSR--
+thanks
+-- PMM
