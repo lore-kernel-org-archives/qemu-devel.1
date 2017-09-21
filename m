@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58007)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60802)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dv5xZ-0008DV-EA
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:12:26 -0400
+	(envelope-from <eblake@redhat.com>) id 1dv68Z-0002mh-I3
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:23:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zuban32s@gmail.com>) id 1dv5xY-0001LP-Fj
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:12:25 -0400
-Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dv5xY-0001KB-76
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:12:24 -0400
-Received: by mail-pf0-x244.google.com with SMTP id g65so2780067pfe.1
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 11:12:22 -0700 (PDT)
+	(envelope-from <eblake@redhat.com>) id 1dv68Y-0003c1-AN
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:23:47 -0400
+References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
+	<20170920135833.20472-3-pbutsykin@virtuozzo.com>
+	<ac533c95-a0f5-c6ce-cc6a-7fab63eb0517@redhat.com>
+	<79eb6628-130e-af9d-cd39-56bf71194ae3@virtuozzo.com>
+	<ccbd7d7e-512a-76ea-5b03-8853fd88fda2@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Message-ID: <4393a82e-de82-ed8d-15ae-8defe59413ac@redhat.com>
+Date: Thu, 21 Sep 2017 13:23:32 -0500
 MIME-Version: 1.0
-In-Reply-To: <f5dbe1a3-bb18-28ff-515b-e8a9ef924835@redhat.com>
-References: <1505942471-11260-1-git-send-email-zuban32s@gmail.com>
-	<f5dbe1a3-bb18-28ff-515b-e8a9ef924835@redhat.com>
-From: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Date: Thu, 21 Sep 2017 21:12:21 +0300
-Message-ID: <CAKSfGUAjsBb-zmwZPMcApL0p5mz8Futdpis0W6v_ry-3nhBypA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] hw/pci-bridge/pcie_pci_bridge: properly
- handle MSI unavailability case
+In-Reply-To: <ccbd7d7e-512a-76ea-5b03-8853fd88fda2@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="HMupOISu5dlbE4vKPVNvg4dbMEIfXquAP"
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] qcow2: truncate the tail
+ of the image file after shrinking the image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,108 +28,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marcel Apfelbaum <marcel@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: John Snow <jsnow@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
 
-2017-09-21 13:16 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
-> Hi Aleksandr,
->
-> On 21/09/2017 0:21, Aleksandr Bezzubikov wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--HMupOISu5dlbE4vKPVNvg4dbMEIfXquAP
+From: Eric Blake <eblake@redhat.com>
+To: John Snow <jsnow@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+Message-ID: <4393a82e-de82-ed8d-15ae-8defe59413ac@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] qcow2: truncate the tail of
+ the image file after shrinking the image
+References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
+ <20170920135833.20472-3-pbutsykin@virtuozzo.com>
+ <ac533c95-a0f5-c6ce-cc6a-7fab63eb0517@redhat.com>
+ <79eb6628-130e-af9d-cd39-56bf71194ae3@virtuozzo.com>
+ <ccbd7d7e-512a-76ea-5b03-8853fd88fda2@redhat.com>
+In-Reply-To: <ccbd7d7e-512a-76ea-5b03-8853fd88fda2@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 09/21/2017 11:48 AM, John Snow wrote:
+>>> Looks sane to me, but under which circumstances might we grow such a
+>>> tail? I assume the actual truncate call aligns to cluster boundaries =
+as
+>>> appropriate, so is this a bit of a "quick fix" to cull unused cluster=
+s
+>>> that happened to be near the truncate boundary?
+>>>
+>>> It might be worth documenting the circumstances that produces this
+>>> unused space that will never get used. My hunch is that such unused
+>>> space should likely be getting reclaimed elsewhere and not here, but
+>>> perhaps I'm misunderstanding the causal factors.
+>>>
 >>
->> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->> ---
->>   hw/pci-bridge/pcie_pci_bridge.c | 24 ++++++++++++++++++------
->>   1 file changed, 18 insertions(+), 6 deletions(-)
+>> This is a consequence of how we implemented shrinking the qcow2 image.=
+
+>> (https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04580.html)
+>> But on the other hand, if we need to shrink the qcow2 image without
+>> copying the data, this is the only way. The same guest offset can be
+>> converted to almost any host offset in the file i.e. the first guest
+>> cluster may be located somewhere at the end or the middle of the image=
+
+>> file. So we can't just take and truncate the image file on the border =
+of
+>> the truncation, therefore to shrink the image we just discard the
+>> clusters that corresponds to the truncated area. The result is a
+>> sparse image file where the apparent file size differs from actual siz=
+e.
+>> And the tail in this case is the difference between the actual size an=
+d
+>> last used cluster in the image, so in fact the cutting of the tail doe=
+s
+>> not change the apparent file size.
 >>
->
-> Please add Eduardo's Reported-by tag and the
-> actual failure in the commit message.
-> You might even explain in the commit message that you
-> moved msi prop to ON_OFF_AUTO_AUTO.
+>=20
+> Oh, duh, I get it. The truncation itself creates a lot of sparseness.
 
-Should I send a new one, or resend, or just reply to this post?
+It is also interesting to think about whether we should someday
+implement a qcow2 defragmenting operation (either a simple one: pull all
+later clusters into earlier holes, but the end result is not necessarily
+contiguous; or a complex one: shuffle things so that all clusters are in
+order, even though it may require moving some clusters around twice), so
+that you can remove all holes from the file (perhaps useful if the file
+is stored on a system that does not support holes).  But not for this
+series :)
 
->
->
->> diff --git a/hw/pci-bridge/pcie_pci_bridge.c
->> b/hw/pci-bridge/pcie_pci_bridge.c
->> index 9aa5cc3..da562fe 100644
->> --- a/hw/pci-bridge/pcie_pci_bridge.c
->> +++ b/hw/pci-bridge/pcie_pci_bridge.c
->> @@ -65,10 +65,18 @@ static void pcie_pci_bridge_realize(PCIDevice *d,
->> Error **errp)
->>           goto aer_error;
->>       }
->>   +    Error *local_err = NULL;
->>       if (pcie_br->msi != ON_OFF_AUTO_OFF) {
->> -        rc = msi_init(d, 0, 1, true, true, errp);
->> +        rc = msi_init(d, 0, 1, true, true, &local_err);
->>           if (rc < 0) {
->> -            goto msi_error;
->> +            assert(rc == -ENOTSUP);
->> +            if (pcie_br->msi != ON_OFF_AUTO_ON) {
->> +                error_free(local_err);
->
->
-> In that case it will fallback to legacy INTx, right?
-
-Exactly. Maybe I should add this to the commit message.
-
->
-> Thanks,
-> Marcel
->
->
->> +            } else {
->> +                /* failed to satisfy user's explicit request for MSI */
->> +                error_propagate(errp, local_err);
->> +                goto msi_error;
->> +            }
->>           }
->>       }
->>       pci_register_bar(d, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
->> @@ -81,7 +89,7 @@ aer_error:
->>   pm_error:
->>       pcie_cap_exit(d);
->>   cap_error:
->> -    shpc_free(d);
->> +    shpc_cleanup(d, &pcie_br->shpc_bar);
->>   error:
->>       pci_bridge_exitfn(d);
->>   }
->> @@ -98,7 +106,9 @@ static void pcie_pci_bridge_reset(DeviceState *qdev)
->>   {
->>       PCIDevice *d = PCI_DEVICE(qdev);
->>       pci_bridge_reset(qdev);
->> -    msi_reset(d);
->> +    if (msi_present(d)) {
->> +        msi_reset(d);
->> +    }
->>       shpc_reset(d);
->>   }
->>   @@ -106,12 +116,14 @@ static void pcie_pci_bridge_write_config(PCIDevice
->> *d,
->>           uint32_t address, uint32_t val, int len)
->>   {
->>       pci_bridge_write_config(d, address, val, len);
->> -    msi_write_config(d, address, val, len);
->> +    if (msi_present(d)) {
->> +        msi_write_config(d, address, val, len);
->> +    }
->>       shpc_cap_write_config(d, address, val, len);
->>   }
->>     static Property pcie_pci_bridge_dev_properties[] = {
->> -        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi,
->> ON_OFF_AUTO_ON),
->> +        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi,
->> ON_OFF_AUTO_AUTO),
->>           DEFINE_PROP_END_OF_LIST(),
->>   };
->>
->
->
+--=20
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
 
 
+--HMupOISu5dlbE4vKPVNvg4dbMEIfXquAP
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
--- 
-Aleksandr Bezzubikov
+-----BEGIN PGP SIGNATURE-----
+Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnEA6QACgkQp6FrSiUn
+Q2qTQAf/dALnPjA3HdQ6tTAaOzGhK2i07S93WH6FhMAQEdpesvx679q3qV0OKwly
+aYoEGMaR6S8f6vVeyLxF4tynE655E47mMakoehYMCNXjISMpVykMlo6qUd/mYtcN
+Y6ozX2tWcNqlvPDrz9+OCyCkmUC+IiVPb1BIarTxiK7ymRwsiNq+cC5INSB05HzS
+GChYVJfL5TlmVdEGU21ImXtzQiX+Q3XqUc9WKollU53+/TxP0neAEecbeYy5vePP
+8Hics84kKYrs3qltuNBySt3ARsRSNJJCVz6iV4O6I4/kaG0f0BwgKnhCKpihoQSJ
+XY1DVUJsk4bF8SNYUkW5PXoVFNBoBw==
+=Ic+o
+-----END PGP SIGNATURE-----
+
+--HMupOISu5dlbE4vKPVNvg4dbMEIfXquAP--
