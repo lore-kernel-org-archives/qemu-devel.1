@@ -1,33 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47648)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51370)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dv2T0-0004Hl-8F
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:28:39 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dv2ee-0007dh-09
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:40:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eric.auger@redhat.com>) id 1dv2Sx-0000LM-2w
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:28:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54706)
+	(envelope-from <dgilbert@redhat.com>) id 1dv2eb-00083M-0J
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:40:40 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33078)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
-	id 1dv2Sw-0000Ko-TC
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:28:35 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
-	[10.5.11.14])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id 2395B806D4
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 14:28:33 +0000 (UTC)
-References: <1505913885.24609.8.camel@redhat.com>
-	<2b739056-081b-593a-6344-50b60d04872b@redhat.com>
-	<1505917879.24609.11.camel@redhat.com>
-	<394d5515-c9a0-578d-1daf-8af1328f0b4b@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <3f8964dc-3fd4-1f0d-c6c6-46afe78a085d@redhat.com>
-Date: Thu, 21 Sep 2017 16:28:21 +0200
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dv2ea-00082Z-NK
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:40:36 -0400
+Date: Thu, 21 Sep 2017 15:40:27 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170921144026.GJ2717@work-vm>
+References: <1505839684-10046-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170919164825eucas1p21fd133a55091e4a09fdeee05d130260d@eucas1p2.samsung.com>
+	<1505839684-10046-9-git-send-email-a.perevalov@samsung.com>
+	<20170921123326.GD2717@work-vm>
+	<0c0baef1-fbad-e6d2-8d8b-07f54d084ee9@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <394d5515-c9a0-578d-1daf-8af1328f0b4b@redhat.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] kvm_set_phys_mem: assertion failed
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0c0baef1-fbad-e6d2-8d8b-07f54d084ee9@samsung.com>
+Subject: Re: [Qemu-devel] [PATCH v10 08/10] migration: postcopy_blocktime
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,51 +31,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Cc: pbonzini@redhat.com
+To: Alexey Perevalov <a.perevalov@samsung.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com, quintela@redhat.com, heetae82.ahn@samsung.com
 
-Hi David,
-On 20/09/2017 16:34, David Hildenbrand wrote:
-> On 20.09.2017 16:31, Gerd Hoffmann wrote:
->>   Hi,
->>
->>> Dropping from os section:
->>>
->>> <loader readonly="yes"
->>> type="pflash">/usr/share/edk2.git/ovmf-x64/OVMF_CODE-pure-
->>> efi.fd</loader>
->>> <nvram
->>> template="/usr/share/edk2.git/ovmf-x64/OVMF_VARS-pure-
->>> efi.fd">/var/lib/libvirt/qemu/nvram/fedora-org-drm-qxl-
->>> base_VARS.fd</nvram>
->>
->> Bad idea I guess.
->>
->>> 1) Does the assert trigger right at startup? Or how is it triggered?
->>
->> Yes, right at startup, before OVMF is done initializing.
->> So probably something in OVMF triggers it.
+* Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> On 09/21/2017 03:33 PM, Dr. David Alan Gilbert wrote:
+> > * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+> > > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> > Although it does have my R-b it might be worth adding some clarification
+> > that it's a measure of when *all* cpus are blocked and so isn't a
+> > total measure of impact of postcopy (when blocking some of them).
+> yes, maybe additional clarification is necessary.
+> now we have both values:
+> {"return": {"postcopy-blocktime": 5691, "status": "completed",
+> "postcopy-vcpu-blocktime": [7671, 6388]}}
+> where postcopy-blocktime is for *all* and postcopy-vcpu-blocktime is per
+> vCPU,
+> it's really worth to describe it, like:
 > 
-> I'll try to include ovmf to reproduce it.
+> Blocktime is a postcopy live migration metric, intended to show
+> how long the vCPU was in state of interruptible sleep due to pagefault.
+> That metric is calculated both for all vCPUs as overlapped value, and
+> separately for each vCPU. These values are calculated on destination side.
+> To enable postcopy blocktime calculation, enter following command on destination
+> monitor:
 > 
->>
->>> 2) Does your setup work when dopping the assertion?
->>
->> Can try tomorrow.
-I encounter the problem on ARM too. My setup works when dropping the
-assertion.
+> migrate_set_capability postcopy-blocktime on
+> 
+> Postcopy blocktime can be retrieved by query-migrate qmp command.
+> postcopy-blocktime value of qmp command will show overlapped blocking time for all vCPU,
+> postcopy-vcpu-blocktime will show list of blocking time per vCPU.
 
-Thanks
 
-Eric
+Yep that seems OK.
+
+Dave
+
+> -- 
+> Best regards,
+> Alexey Perevalov
 > 
-> I think that assertion might not be stable, because properties (romd
-> mode) might not be stable and can change. So if it works without the
-> assert, dropping it is the right thing to do.
+> > 
+> > Dave
+> > 
+> > > ---
+> > >   docs/devel/migration.txt | 10 ++++++++++
+> > >   1 file changed, 10 insertions(+)
+> > > 
+> > > diff --git a/docs/devel/migration.txt b/docs/devel/migration.txt
+> > > index 1b940a8..4b625ca 100644
+> > > --- a/docs/devel/migration.txt
+> > > +++ b/docs/devel/migration.txt
+> > > @@ -402,6 +402,16 @@ will now cause the transition from precopy to postcopy.
+> > >   It can be issued immediately after migration is started or any
+> > >   time later on.  Issuing it after the end of a migration is harmless.
+> > > +Blocktime is a postcopy live migration metric, intended to show
+> > > +how long the vCPU was in state of interruptable sleep due to pagefault.
+> > > +This value is calculated on destination side.
+> > > +To enable postcopy blocktime calculation, enter following command on destination
+> > > +monitor:
+> > > +
+> > > +migrate_set_capability postcopy-blocktime on
+> > > +
+> > > +Postcopy blocktime can be retrieved by query-migrate qmp command.
+> > > +
+> > >   Note: During the postcopy phase, the bandwidth limits set using
+> > >   migrate_set_speed is ignored (to avoid delaying requested pages that
+> > >   the destination is waiting for).
+> > > -- 
+> > > 1.9.1
+> > > 
+> > --
+> > Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> > 
+> > 
+> > 
 > 
->>
->> cheers,
->>   Gerd
->>
 > 
-> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
