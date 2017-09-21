@@ -1,18 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41782)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41961)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1dv0R3-0008MF-PM
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:18:33 -0400
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dv0Rn-0000IQ-7S
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:19:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1dv0Qy-0000u6-AM
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:18:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53944)
+	(envelope-from <vsementsov@virtuozzo.com>) id 1dv0Rk-0001FM-0Z
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:19:15 -0400
+Received: from mailhub.sw.ru ([195.214.232.25]:35884 helo=relay.sw.ru)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1dv0Qy-0000tU-4T
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:18:24 -0400
-Message-Id: <20170921120341.590850215@redhat.com>
-Date: Thu, 21 Sep 2017 09:03:41 -0300
-From: Marcelo Tosatti <mtosatti@redhat.com>
-Subject: [Qemu-devel] [patch 0/2] support RT_PRIO_HC hypercall
+	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
+	id 1dv0Rj-0001En-LH
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:19:11 -0400
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
+Date: Thu, 21 Sep 2017 15:18:47 +0300
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Subject: [Qemu-devel] nbd structured reply
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,13 +26,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: kvm@vger.kernel.org, qemu-devel@nongnu.org
+To: Eric Blake <eblake@redhat.com>, Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
+Cc: qemu-devel <qemu-devel@nongnu.org>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>
 
-Add the following CPU options:
+Hi all!
 
-allow-rt-prio-hc: allow guest to execute hypercall to change vcpu
-thread priority.
+I'm about this:
 
-rt-prio: SCHED_FIFO priority to be used when that hypercall is invoked.
+"A server SHOULD try to minimize the number of chunks sent in a reply, 
+but MUST NOT mark a chunk as final if there is still a possibility of 
+detecting an error before transmission of that chunk completes"
 
-Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
+What do we mean by "possibility"? Formally, such possibility exists 
+always, so, we'll never mark a chunk as final.
+
+-- 
+Best regards,
+Vladimir
