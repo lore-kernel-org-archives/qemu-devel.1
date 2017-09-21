@@ -1,29 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33576)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33765)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dvAZ7-0004uT-Py
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 19:07:31 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dvAZg-0005Kq-4l
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 19:08:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alistair23@gmail.com>) id 1dvAZ6-0000Ba-DG
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 19:07:29 -0400
-Received: from mail-wm0-x241.google.com ([2a00:1450:400c:c09::241]:37056)
+	(envelope-from <alistair23@gmail.com>) id 1dvAZe-0000rZ-VO
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 19:08:04 -0400
+Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:38153)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <alistair23@gmail.com>)
-	id 1dvAZ6-000093-4F
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 19:07:28 -0400
-Received: by mail-wm0-x241.google.com with SMTP id f4so6409388wmh.4
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 16:07:26 -0700 (PDT)
+	id 1dvAZe-0000pm-PI
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 19:08:02 -0400
+Received: by mail-wm0-x243.google.com with SMTP id x17so6405476wmd.5
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 16:08:02 -0700 (PDT)
 MIME-Version: 1.0
 Sender: alistair23@gmail.com
-In-Reply-To: <20170909201657.GF7570@localhost.localdomain>
+In-Reply-To: <c270c470-fad7-b8ea-b445-c975d3c3c432@adacore.com>
 References: <cover.1504656490.git.alistair.francis@xilinx.com>
-	<b2bfe1ee20bd9764572015df0d167d3015036ef0.1504656490.git.alistair.francis@xilinx.com>
-	<20170909201657.GF7570@localhost.localdomain>
+	<16cf589bc0c0431fbba6bbed8d1a50b49d24e867.1504656490.git.alistair.francis@xilinx.com>
+	<c270c470-fad7-b8ea-b445-c975d3c3c432@adacore.com>
 From: Alistair Francis <alistair.francis@xilinx.com>
-Date: Thu, 21 Sep 2017 16:06:54 -0700
-Message-ID: <CAKmqyKPJVLROtA7uT7YC9P8DVwNcTWURophsZ5id+bJ_oexwGg@mail.gmail.com>
+Date: Thu, 21 Sep 2017 16:07:31 -0700
+Message-ID: <CAKmqyKNp8KVBfr6HJLQ24ew3eFFtTQuiwqeAEv1EycDh-yBUpw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [RFC v1 1/2] machine: Add a valid_cpu_types
- property
+Subject: Re: [Qemu-devel] [RFC v1 2/2] netduino2: Specify the valid CPUs
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,117 +31,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>
+To: KONRAD Frederic <frederic.konrad@adacore.com>
+Cc: Alistair Francis <alistair.francis@xilinx.com>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Marcel Apfelbaum <marcel@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 
-On Sat, Sep 9, 2017 at 1:16 PM, Eduardo Habkost <ehabkost@redhat.com> wrote:
-> On Tue, Sep 05, 2017 at 05:12:01PM -0700, Alistair Francis wrote:
+On Mon, Sep 11, 2017 at 4:56 AM, KONRAD Frederic
+<frederic.konrad@adacore.com> wrote:
+>
+>
+> On 09/06/2017 02:12 AM, Alistair Francis wrote:
+>>
 >> Signed-off-by: Alistair Francis <alistair.francis@xilinx.com>
 >> ---
 >>
->>  hw/core/machine.c   | 27 +++++++++++++++++++++++++++
->>  include/hw/boards.h |  1 +
->>  2 files changed, 28 insertions(+)
+>>   hw/arm/netduino2.c | 5 +++++
+>>   1 file changed, 5 insertions(+)
 >>
->> diff --git a/hw/core/machine.c b/hw/core/machine.c
->> index 41b53a17ad..de0f127d27 100644
->> --- a/hw/core/machine.c
->> +++ b/hw/core/machine.c
->> @@ -758,6 +758,33 @@ void machine_run_board_init(MachineState *machine)
->>          machine_numa_finish_init(machine);
->>      }
->>      machine_class->init(machine);
+>> diff --git a/hw/arm/netduino2.c b/hw/arm/netduino2.c
+>> index 3cfe332dd1..accca344fd 100644
+>> --- a/hw/arm/netduino2.c
+>> +++ b/hw/arm/netduino2.c
+>> @@ -43,8 +43,13 @@ static void netduino2_init(MachineState *machine)
+>>     static void netduino2_machine_init(MachineClass *mc)
+>>   {
+>> +    const char *val = "cortex-m3";
 >> +
->> +    if (machine_class->valid_cpu_types && machine->cpu_model) {
->> +        const char *temp;
->> +        int i, len = machine_class->valid_cpu_types->len;
->
-> I suggest doing this after Igor's series that replaces the
-> cpu_model field (full -cpu string) with cpu_type (only the CPU
-> type name).
->
+>>       mc->desc = "Netduino 2 Machine";
+>>       mc->init = netduino2_init;
 >> +
->> +        for (i = 0; i < len; i++) {
->> +            temp = g_array_index(machine_class->valid_cpu_types, char *, i);
->> +            if (!strcmp(machine->cpu_model, temp)) {
->> +                /* The user specificed CPU is in the valid field, we are
->> +                 * good to go.
->> +                 */
->> +                g_array_free(machine_class->valid_cpu_types, true);
->> +                return;
+>> +    mc->valid_cpu_types = g_array_new(false, false, sizeof(char *));
+>> +    g_array_append_val(mc->valid_cpu_types, val);
+>>   }
 >
-> I suggest checking for:
->   object_class_dynamic_cast(object_class_get_name(machine->cpu_type), type)
-> instead.  This way machines could just enumerate a common parent
-> type to all supported CPU models.
 >
->> +            }
->> +        }
->> +        /* The user specified CPU must not be a valid CPU, print a sane error */
->> +        temp = g_array_index(machine_class->valid_cpu_types, char *, 0);
->> +        error_report("Invalid CPU: %s", machine->cpu_model);
->> +        error_printf("The valid options are: %s", temp);
->> +        for (i = 1; i < len; i++) {
->> +            temp = g_array_index(machine_class->valid_cpu_types, char *, i);
->> +            error_printf(", %s", temp);
->> +        }
->> +        error_printf("\n");
+> Hi Alistair,
 >
-> Now we have a completely new method to list the valid CPU types
-> in addition to arch_query_cpu_definitions() and list_cpus()
-> (which are already a bit messy and need to share more code).
->
-> I think this should share code with "-cpu
-> help"/query-cpu-definitions instead.  This means
-> arch_query_cpu_definitions() will need a MachineClass* argument,
-> if the user wants only the CPU types supported by a specific
-> machine type, but I think it would be an interesting improvement
-> to query-cpu-definitions.
+> Nice idea! Why not adding an helper function which take a const
+> char** in argument?
 
-I don't see the improvement here. arch_query_cpu_definitions() is just
-a pretty simple list of that arch's CPUs. I don't really see how it
-helps in this case. We don't re-use much code at all.
+Thanks Fred.
 
-Ideally I would like to see less arch dependent code in QEMU, and
-relying on arch_query_cpu_definitions() is moving in the opposite
-direction. It looks like arch_query_cpu_definitions() isn't supported
-by every architecture as well. I only see ARM, x86, PPC and S390x
-support.
-
-I have addressed all the other comments so I'm going to send an RFCv2
-out later today. The code looks a lot nicer now. I'm happy to keep
-discussing this though, just want to keep the ball rolling.
+I'm going to send a v2 with just that :)
 
 Thanks,
 Alistair
 
 >
->> +        g_array_free(machine_class->valid_cpu_types, true);
->> +        exit(1);
->> +    }
->>  }
->>
->>  static void machine_class_finalize(ObjectClass *klass, void *data)
->> diff --git a/include/hw/boards.h b/include/hw/boards.h
->> index 3363dd19fd..78678f84a9 100644
->> --- a/include/hw/boards.h
->> +++ b/include/hw/boards.h
->> @@ -172,6 +172,7 @@ struct MachineClass {
->>      int minimum_page_bits;
->>      bool has_hotpluggable_cpus;
->>      int numa_mem_align_shift;
->> +    GArray *valid_cpu_types;
+> Fred
 >
-> The list of CPU types for a machine are very likely to be
-> statically defined at build time.  Any specific reason to not
-> make it a simple char** pointer?
->
->>      void (*numa_auto_assign_ram)(MachineClass *mc, NodeInfo *nodes,
->>                                   int nb_nodes, ram_addr_t size);
->>
->> --
->> 2.11.0
+>>     DEFINE_MACHINE("netduino2", netduino2_machine_init)
 >>
 >
-> --
-> Eduardo
