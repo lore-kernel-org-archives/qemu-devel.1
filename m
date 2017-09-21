@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51428)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53440)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dv154-00080S-3o
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:59:51 -0400
+	(envelope-from <david@redhat.com>) id 1dv1D0-0002hv-3U
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:08:08 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1dv14z-0000Ry-9u
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:59:50 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33210)
+	(envelope-from <david@redhat.com>) id 1dv1Cu-0005uS-6s
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:08:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54960)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1dv14z-0000RB-1j
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:59:45 -0400
-Date: Thu, 21 Sep 2017 14:59:39 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170921145939.653d4d5f@nial.brq.redhat.com>
-In-Reply-To: <bf0ffdb7-d164-5947-cbaf-5a8aef58c1ef@redhat.com>
-References: <1505991234-246759-1-git-send-email-imammedo@redhat.com>
-	<bf0ffdb7-d164-5947-cbaf-5a8aef58c1ef@redhat.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dv1Ct-0005tH-UP
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:07:56 -0400
+References: <20170918160012.4317-1-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <2ee2a862-d52a-486d-bb99-f7dfc5579e4e@redhat.com>
+Date: Thu, 21 Sep 2017 15:07:51 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20170918160012.4317-1-david@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x: use generic cpu_model parsing
+Subject: Re: [Qemu-devel] [PATCH v1 00/27] s390x: SMP for TCG (+ cleanups)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +27,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: qemu-devel@nongnu.org
+Cc: Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, cohuck@redhat.com, borntraeger@de.ibm.com, Alexander Graf <agraf@suse.de>, Igor Mammedov <imammedo@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Matthew Rosato <mjrosato@linux.vnet.ibm.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 
-On Thu, 21 Sep 2017 14:34:40 +0200
-David Hildenbrand <david@redhat.com> wrote:
 
-> On 21.09.2017 12:53, Igor Mammedov wrote:
-> > define default CPU type in generic way in machine class_init
-> > and let common machine code to handle cpu_model parsing.
-> > 
-> > Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> > ---
-> > tested under TCG booting debian kernel,
-> > and compile tested on s390 host  
-> 
-> Hotplugging checks (mixed CPU models) still seem to work fine.
-> 
-> Also parameters get applied and the model name is properly parsed.
-> 
-> >                       "supported by TCG (1) on s390x", max_cpus);
-> > @@ -73,25 +66,8 @@ static void s390_init_cpus(MachineState *machine)
-> >      /* initialize possible_cpus */
-> >      mc->possible_cpu_arch_ids(machine);
-> >  
-> > -    model_pieces = g_strsplit(machine->cpu_model, ",", 2);
-> > -    if (!model_pieces[0]) {
-> > -        error_report("Invalid/empty CPU model name");
-> > -        exit(1);
-> > -    }
-> > -
-> > -    oc = cpu_class_by_name(TYPE_S390_CPU, model_pieces[0]);
-> > -    if (!oc) {
-> > -        error_report("Unable to find CPU definition: %s", model_pieces[0]);
-> > -        exit(1);
-> > -    }
-> > -    typename = object_class_get_name(oc);
-> > -    cc = CPU_CLASS(oc);
-> > -    /* after parsing, properties will be applied to all *typename* instances */
-> > -    cc->parse_features(typename, model_pieces[1], &error_fatal);
-> > -    g_strfreev(model_pieces);
-> > -
-> >      for (i = 0; i < smp_cpus; i++) {
-> > -        s390x_new_cpu(typename, i, &error_fatal);
-> > +        s390x_new_cpu(machine->cpu_type, i, &error_fatal);
-> >      }
-> >  }
-> >  
-> > @@ -446,6 +422,9 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
-> >      mc->get_hotplug_handler = s390_get_hotplug_handler;
-> >      mc->cpu_index_to_instance_props = s390_cpu_index_to_props;
-> >      mc->possible_cpu_arch_ids = s390_possible_cpu_arch_ids;
-> > +    /* it is overrriden with 'host' cpu type when accel=kvm  
-> 
-> s/overrriden/overridden/
-> 
-> ... with 'host' cpu *in kvm_arch_init*. ?
-thanks, fixed in v2
+> David Hildenbrand (27):
+>   s390x: raise CPU hotplug irq after really hotplugged
+>   s390x/cpumodel: fix max STFL(E) bit number
+>   target/s390x: get rid of next_core_id
+>   s390x: introduce and use S390_MAX_CPUS
 
-> 
-> > +     * i.e. when kvm_arch_init() is executed */
-> > +    mc->default_cpu_type = S390_CPU_TYPE_NAME("qemu");
-> >      hc->plug = s390_machine_device_plug;
-> >      hc->unplug_request = s390_machine_device_unplug_request;
-> >      nc->nmi_monitor_handler = s390_nmi;
-> > diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> > index 5169379..0bf7e14 100644
-> > --- a/target/s390x/cpu_models.c
-> > +++ b/target/s390x/cpu_models.c
-> > @@ -1207,9 +1207,6 @@ static void s390_qemu_cpu_model_class_init(ObjectClass *oc, void *data)
-> >                                  qemu_hw_version());
-> >  }  
-> 
-> 
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> 
+It probably makes sense to apply 1-3/4 before the SMP support.
+
+Igor, can you take a look at Patch nr. 3?
+
+>   s390/tcg: turn INTERRUPT_EXT into a mask
+>   s390x/tcg: injection of emergency signals and extarnal calls
+>   s390x/tcg: STOPPED cpus can never wake up
+>   s390x/tcg: a CPU cannot switch state due to an interrupt
+>   target/s390x: factor out handling of WAIT PSW into handle_wait()
+>   s390x/kvm: pass ipb directly into handle_sigp()
+>   s390x/kvm: generalize SIGP stop and restart interrupt injection
+>   s390x/kvm: factor out storing of CPU status
+>   target/s390x: proper cpu->be convertion in s390_store_status()
+>   s390x/kvm: factor out storing of adtl CPU status
+>   s390x/kvm: drop two debug prints
+>   s390x/kvm: factor out SIGP code into sigp.c
+>   s390x/kvm: factor out actual handling of STOP interrupts
+>   s390x/tcg: implement SIGP SENSE RUNNING STATUS
+>   s390x/tcg: implement SIGP SENSE
+>   s390x/tcg: implement SIGP EXTERNAL CALL
+>   s390x/tcg: implement SIGP EMERGENCY SIGNAL
+>   s390x/tcg: implement SIGP CONDITIONAL EMERGENCY SIGNAL
+>   s390x/tcg: implement STOP and RESET interrupts for TCG
+>   s390x/tcg: flush the tlb on SIGP SET PREFIX
+>   s390x/tcg: switch to new SIGP handling code
+>   s390x/tcg: unlock NMI
+>   s390x/tcg: refactor stfl(e) to use s390_get_feat_block()
+
+
+-- 
+
+Thanks,
+
+David
