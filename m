@@ -1,24 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45419)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45935)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dv0gq-0006T6-Cu
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:34:49 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dv0ie-0007aV-D1
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:36:41 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dv0gn-0002ag-3n
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:34:48 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49172)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dv0gm-0002aP-Rt
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:34:45 -0400
-References: <1505991234-246759-1-git-send-email-imammedo@redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Message-ID: <bf0ffdb7-d164-5947-cbaf-5a8aef58c1ef@redhat.com>
-Date: Thu, 21 Sep 2017 14:34:40 +0200
+	(envelope-from <dgilbert@redhat.com>) id 1dv0id-0003oj-DH
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:36:40 -0400
+Date: Thu, 21 Sep 2017 13:36:26 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170921123625.GE2717@work-vm>
+References: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
+	<20170919143829.GH2107@work-vm>
+	<48cdd8ff-4940-9aa1-9aba-1acf8ce74ebe@kamp.de>
+	<20170919144130.GI2107@work-vm>
+	<a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
 MIME-Version: 1.0
-In-Reply-To: <1505991234-246759-1-git-send-email-imammedo@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] s390x: use generic cpu_model parsing
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
+Subject: Re: [Qemu-devel] Block Migration and CPU throttling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,78 +26,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Peter Lieven <pl@kamp.de>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
 
-On 21.09.2017 12:53, Igor Mammedov wrote:
-> define default CPU type in generic way in machine class_init
-> and let common machine code to handle cpu_model parsing.
+* Peter Lieven (pl@kamp.de) wrote:
+> Am 19.09.2017 um 16:41 schrieb Dr. David Alan Gilbert:
+> > * Peter Lieven (pl@kamp.de) wrote:
+> >> Am 19.09.2017 um 16:38 schrieb Dr. David Alan Gilbert:
+> >>> * Peter Lieven (pl@kamp.de) wrote:
+> >>>> Hi,
+> >>>>
+> >>>> I just noticed that CPU throttling and Block Migration don't work together very well.
+> >>>> During block migration the throttling heuristic detects that we obviously make no progress
+> >>>> in ram transfer. But the reason is the running block migration and not a too high dirty pages rate.
+> >>>>
+> >>>> The result is that any VM is throttled by 99% during block migration.
+> >>> Hmm that's unfortunate; do you have a bandwidth set lower than your
+> >>> actual network connection? I'm just wondering if it's actually going
+> >>> between the block and RAM iterative sections or getting stuck in ne.
+> >> It happens also if source and dest are on the same machine and speed is set to 100G.
+> > But does it happen if they're not and the speed is set low?
 > 
-> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
-> ---
-> tested under TCG booting debian kernel,
-> and compile tested on s390 host
+> Yes, it does. I noticed it in our test environment between different nodes with a 10G
+> link in between. But its totally clear why it happens. During block migration we transfer
+> all dirty memory pages in each round (if there is moderate memory load), but all dirty
+> pages are obviously more than 50% of the transferred ram in that round.
+> It is more exactly 100%. But the current logic triggers on this condition.
+> 
+> I think I will go forward and send a patch which disables auto converge during
+> block migration bulk stage.
 
-Hotplugging checks (mixed CPU models) still seem to work fine.
+Yes, that's fair;  it probably would also make sense to throttle the RAM
+migration during the block migration bulk stage, since the chances are
+it's not going to get far.  (I think in the nbd setup, the main
+migration process isn't started until the end of bulk).
 
-Also parameters get applied and the model name is properly parsed.
+Dave
 
->                       "supported by TCG (1) on s390x", max_cpus);
-> @@ -73,25 +66,8 @@ static void s390_init_cpus(MachineState *machine)
->      /* initialize possible_cpus */
->      mc->possible_cpu_arch_ids(machine);
->  
-> -    model_pieces = g_strsplit(machine->cpu_model, ",", 2);
-> -    if (!model_pieces[0]) {
-> -        error_report("Invalid/empty CPU model name");
-> -        exit(1);
-> -    }
-> -
-> -    oc = cpu_class_by_name(TYPE_S390_CPU, model_pieces[0]);
-> -    if (!oc) {
-> -        error_report("Unable to find CPU definition: %s", model_pieces[0]);
-> -        exit(1);
-> -    }
-> -    typename = object_class_get_name(oc);
-> -    cc = CPU_CLASS(oc);
-> -    /* after parsing, properties will be applied to all *typename* instances */
-> -    cc->parse_features(typename, model_pieces[1], &error_fatal);
-> -    g_strfreev(model_pieces);
-> -
->      for (i = 0; i < smp_cpus; i++) {
-> -        s390x_new_cpu(typename, i, &error_fatal);
-> +        s390x_new_cpu(machine->cpu_type, i, &error_fatal);
->      }
->  }
->  
-> @@ -446,6 +422,9 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
->      mc->get_hotplug_handler = s390_get_hotplug_handler;
->      mc->cpu_index_to_instance_props = s390_cpu_index_to_props;
->      mc->possible_cpu_arch_ids = s390_possible_cpu_arch_ids;
-> +    /* it is overrriden with 'host' cpu type when accel=kvm
-
-s/overrriden/overridden/
-
-... with 'host' cpu *in kvm_arch_init*. ?
-
-> +     * i.e. when kvm_arch_init() is executed */
-> +    mc->default_cpu_type = S390_CPU_TYPE_NAME("qemu");
->      hc->plug = s390_machine_device_plug;
->      hc->unplug_request = s390_machine_device_unplug_request;
->      nc->nmi_monitor_handler = s390_nmi;
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index 5169379..0bf7e14 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -1207,9 +1207,6 @@ static void s390_qemu_cpu_model_class_init(ObjectClass *oc, void *data)
->                                  qemu_hw_version());
->  }
-
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
--- 
-
-Thanks,
-
-David
+> Thanks for your feedback,
+> Peter
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
