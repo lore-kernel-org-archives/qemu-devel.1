@@ -1,41 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56703)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58304)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1duzZI-0006P7-4s
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 07:23:00 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1duzeA-0008BA-6T
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 07:27:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1duzZE-0007VC-4c
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 07:22:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37510)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1duzZD-0007RU-ST
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 07:22:52 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8LBKECj100171
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 07:22:50 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d4a5q0pne-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 07:22:50 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 21 Sep 2017 12:22:48 +0100
-References: <20170920172314.102710-1-pasic@linux.vnet.ibm.com>
-	<20170920172314.102710-2-pasic@linux.vnet.ibm.com>
-	<20170921111552.41167e80.cohuck@redhat.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 21 Sep 2017 13:22:44 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170921111552.41167e80.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <efa7f105-78c4-1ec0-dcf5-9b97678cd7e5@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/3270: IDA support for 3270 via
- CcwDataStream
+	(envelope-from <a.perevalov@samsung.com>) id 1duze4-0007Aq-3O
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 07:27:58 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:53978)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1duze3-00076y-Px
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 07:27:52 -0400
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <6b5a0775-d17b-946f-fb28-9e4c8839b789@samsung.com>
+Date: Thu, 21 Sep 2017 14:27:45 +0300
+MIME-version: 1.0
+In-reply-to: <20170921101608.GA2717@work-vm>
+Content-type: text/plain; charset="utf-8"; format="flowed"
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1505839684-10046-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170919164824eucas1p23607e53e3ea38f8be4e885bb960e803f@eucas1p2.samsung.com>
+	<1505839684-10046-7-git-send-email-a.perevalov@samsung.com>
+	<20170921101608.GA2717@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v10 06/10] migration: add postcopy
+ blocktime ctx into MigrationIncomingState
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -44,51 +32,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com, quintela@redhat.com, heetae82.ahn@samsung.com
 
-
-
-On 09/21/2017 11:15 AM, Cornelia Huck wrote:
->> +static inline CcwDataStream *get_cds(Terminal3270 *t)
+On 09/21/2017 01:16 PM, Dr. David Alan Gilbert wrote:
+> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+>> This patch adds request to kernel space for UFFD_FEATURE_THREAD_ID,
+>> in case when this feature is provided by kernel.
+>>
+>> PostcopyBlocktimeContext is incapsulated inside postcopy-ram.c,
+>> due to it's postcopy only feature.
+>> Also it defines PostcopyBlocktimeContext's instance live time.
+>> Information from PostcopyBlocktimeContext instance will be provided
+>> much after postcopy migration end, instance of PostcopyBlocktimeContext
+>> will live till QEMU exit, but part of it (vcpu_addr,
+>> page_fault_vcpu_time) used only during calculation, will be released
+>> when postcopy ended or failed.
+>>
+>> To enable postcopy blocktime calculation on destination, need to request
+>> proper capabiltiy (Patch for documentation will be at the tail of the patch
+>> set).
+>>
+>> As an example following command enable that capability, assume QEMU was
+>> started with
+>> -chardev socket,id=charmonitor,path=/var/lib/migrate-vm-monitor.sock
+>> option to control it
+>>
+>> [root@host]#printf "{\"execute\" : \"qmp_capabilities\"}\r\n \
+>> {\"execute\": \"migrate-set-capabilities\" , \"arguments\":   {
+>> \"capabilities\": [ { \"capability\": \"postcopy-blocktime\", \"state\":
+>> true } ] } }" | nc -U /var/lib/migrate-vm-monitor.sock
+>>
+>> Or just with HMP
+>> (qemu) migrate_set_capability postcopy-blocktime on
+>>
+>> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+>> ---
+>>   migration/migration.h    |  8 ++++++
+>>   migration/postcopy-ram.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>   2 files changed, 73 insertions(+)
+>>
+>> diff --git a/migration/migration.h b/migration/migration.h
+>> index 56bf33c..770466b 100644
+>> --- a/migration/migration.h
+>> +++ b/migration/migration.h
+>> @@ -21,6 +21,8 @@
+>>   #include "qemu/coroutine_int.h"
+>>   #include "hw/qdev.h"
+>>   
+>> +struct PostcopyBlocktimeContext;
+>> +
+>>   /* State for the incoming migration */
+>>   struct MigrationIncomingState {
+>>       QEMUFile *from_src_file;
+>> @@ -58,6 +60,12 @@ struct MigrationIncomingState {
+>>       /* The coroutine we should enter (back) after failover */
+>>       Coroutine *migration_incoming_co;
+>>       QemuSemaphore colo_incoming_sem;
+>> +
+>> +    /*
+>> +     * PostcopyBlocktimeContext to keep information for postcopy
+>> +     * live migration, to calculate vCPU block time
+>> +     * */
+>> +    struct PostcopyBlocktimeContext *blocktime_ctx;
+>>   };
+>>   
+>>   MigrationIncomingState *migration_incoming_get_current(void);
+>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>> index bec6c2c..cc78981 100644
+>> --- a/migration/postcopy-ram.c
+>> +++ b/migration/postcopy-ram.c
+>> @@ -61,6 +61,58 @@ struct PostcopyDiscardState {
+>>   #include <sys/eventfd.h>
+>>   #include <linux/userfaultfd.h>
+>>   
+>> +typedef struct PostcopyBlocktimeContext {
+>> +    /* time when page fault initiated per vCPU */
+>> +    int64_t *page_fault_vcpu_time;
+>> +    /* page address per vCPU */
+>> +    uint64_t *vcpu_addr;
+>> +    int64_t total_blocktime;
+>> +    /* blocktime per vCPU */
+>> +    int64_t *vcpu_blocktime;
+>> +    /* point in time when last page fault was initiated */
+>> +    int64_t last_begin;
+>> +    /* number of vCPU are suspended */
+>> +    int smp_cpus_down;
+>> +
+>> +    /*
+>> +     * Handler for exit event, necessary for
+>> +     * releasing whole blocktime_ctx
+>> +     */
+>> +    Notifier exit_notifier;
+>> +    /*
+>> +     * Handler for postcopy event, necessary for
+>> +     * releasing unnecessary part of blocktime_ctx
+>> +     */
+>> +    Notifier postcopy_notifier;
+> Is this actually used? It's just that...
+>
+>> +} PostcopyBlocktimeContext;
+>> +
+>> +static void destroy_blocktime_context(struct PostcopyBlocktimeContext *ctx)
 >> +{
->> +    return &(CCW_DEVICE(&t->cdev)->sch->cds);
+>> +    g_free(ctx->page_fault_vcpu_time);
+>> +    g_free(ctx->vcpu_addr);
+>> +    g_free(ctx->vcpu_blocktime);
+>> +    g_free(ctx);
 >> +}
 >> +
->> +static int read_payload_3270(EmulatedCcw3270Device *dev)
->>  {
->>      Terminal3270 *t = TERMINAL_3270(dev);
->>      int len;
->>  
->> -    len = MIN(count, t->in_len);
->> -    cpu_physical_memory_write(cda, t->inv, len);
->> +    len = MIN(ccw_dstream_avail(get_cds(t)), t->in_len);
->> +    ccw_dstream_write_buf(get_cds(t), t->inv, len);
-> CCW_DEVICE() as called by get_cds() goes through qom, which implies a
-> bit of overhead. Not sure if it makes sense to cache it in this
-> function so you don't go through it multiple times. (Dito for the other
-> callback.)
-> 
+>> +static void migration_exit_cb(Notifier *n, void *data)
+>> +{
+>> +    PostcopyBlocktimeContext *ctx = container_of(n, PostcopyBlocktimeContext,
+>> +                                                 exit_notifier);
+>> +    destroy_blocktime_context(ctx);
+>> +}
+>> +
+>> +static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+>> +{
+>> +    PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
+>> +    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
+>> +    ctx->vcpu_addr = g_new0(uint64_t, smp_cpus);
+>> +    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
+>> +
+>> +    ctx->exit_notifier.notify = migration_exit_cb;
+>> +    qemu_add_exit_notifier(&ctx->exit_notifier);
+>> +    add_migration_state_change_notifier(&ctx->postcopy_notifier);
+> Patch 7 removes that line, and I don't see what puts it back;
+> and this line doesn't actually set up ctx->postcopy_notifier.
+>
+> Other than that, it looks OK.
+Thank you, I really changed my mind, and decided to keep
+blocktime context (and all calculated values) till the
+stop of VM, but not till the end of migration.
 
-I've cargo-culted this way of getting CCW_DEVICE(&t->cdev) to the CcwDevice
-form terminal_read (the pattern used at multiple places in the file). As
-far as I can tell, the overhead basically depends on CONFIG_QOM_CAST_DEBUG.
-
-I have no idea what do we have in production, but my guess is, that
-ONFIG_QOM_CAST_DEBUG makes only sense for development and testing
-(especially if proper test coverage is assumed).
-Can you enlighten me?
-
-CCW_DEVICE() may contain a run-time check (depending on CONFIG_QOM_CAST_DEBUG),
-we however can make sure things are OK at compile time. This brings
-me to the next question. Does it even make sense to use OBJECT_CHECK based
-constructs when going from specific to general (we don't actually need a
-cast here)? Obviously, for the other direction we really need a cast, so doing
-a run-time check there does indeed provide added value.
-
-Halil
-
-
->>      t->in_len -= len;
->>  
->>      return len;
+-- 
+Best regards,
+Alexey Perevalov
+>
+> Dave
+>
+>> +    return ctx;
+>> +}
+>>   
+>>   /**
+>>    * receive_ufd_features: check userfault fd features, to request only supported
+>> @@ -153,6 +205,19 @@ static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
+>>           }
+>>       }
+>>   
+>> +#ifdef UFFD_FEATURE_THREAD_ID
+>> +    if (migrate_postcopy_blocktime() && mis &&
+>> +        UFFD_FEATURE_THREAD_ID & supported_features) {
+>> +        /* kernel supports that feature */
+>> +        /* don't create blocktime_context if it exists */
+>> +        if (!mis->blocktime_ctx) {
+>> +            mis->blocktime_ctx = blocktime_context_new();
+>> +        }
+>> +
+>> +        asked_features |= UFFD_FEATURE_THREAD_ID;
+>> +    }
+>> +#endif
+>> +
+>>       /*
+>>        * request features, even if asked_features is 0, due to
+>>        * kernel expects UFFD_API before UFFDIO_REGISTER, per
+>> -- 
+>> 1.9.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
+>
