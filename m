@@ -1,21 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48435)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:48477)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1duxCk-00051U-BV
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:51:33 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1duxCn-00054M-Iq
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:51:34 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1duxCj-0001Fd-DA
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:51:30 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1duxCl-0001HP-HU
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:51:33 -0400
 Received: from ozlabs.ru ([107.173.13.209]:54112)
 	by eggs.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1duxCj-0001CA-7n
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:51:29 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1duxCl-0001CA-BY
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:51:31 -0400
 From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Date: Thu, 21 Sep 2017 18:50:59 +1000
-Message-Id: <20170921085110.25598-8-aik@ozlabs.ru>
+Date: Thu, 21 Sep 2017 18:51:01 +1000
+Message-Id: <20170921085110.25598-10-aik@ozlabs.ru>
 In-Reply-To: <20170921085110.25598-1-aik@ozlabs.ru>
 References: <20170921085110.25598-1-aik@ozlabs.ru>
-Subject: [Qemu-devel] [PATCH qemu v5 07/18] memory: Cleanup after switching
- to FlatView
+Subject: [Qemu-devel] [PATCH qemu v5 09/18] memory: Store physical root MR
+ in FlatView
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,77 +27,100 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Alexey Kardashevskiy <aik@ozlabs.ru>, Paolo Bonzini <pbonzini@redhat.com>
 
-We store AddressSpaceDispatch* in FlatView anyway so there is no need
-to carry it from mem_add() to register_subpage/register_multipage.
-
-This should cause no behavioural change.
+Address spaces get to keep a root MR (alias or not) but FlatView stores
+the actual MR as this is going to be used later on to decide whether to
+share a particular FlatView or not.
 
 Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- exec.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Changes:
+v4:
+* s/memory_region_unalias_entire/memory_region_get_flatview_root/
+---
+ memory.c | 26 ++++++++++++++++++++++----
+ 1 file changed, 22 insertions(+), 4 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index d2b9f60494..548ec71b4c 100644
---- a/exec.c
-+++ b/exec.c
-@@ -1302,9 +1302,9 @@ static void phys_sections_free(PhysPageMap *map)
-     g_free(map->nodes);
+diff --git a/memory.c b/memory.c
+index 990e9b8478..98b0b95e6e 100644
+--- a/memory.c
++++ b/memory.c
+@@ -230,6 +230,7 @@ struct FlatView {
+     unsigned nr;
+     unsigned nr_allocated;
+     struct AddressSpaceDispatch *dispatch;
++    MemoryRegion *root;
+ };
+ 
+ typedef struct AddressSpaceOps AddressSpaceOps;
+@@ -259,12 +260,14 @@ static bool flatrange_equal(FlatRange *a, FlatRange *b)
+         && a->readonly == b->readonly;
  }
  
--static void register_subpage(FlatView *fv, AddressSpaceDispatch *d,
--                             MemoryRegionSection *section)
-+static void register_subpage(FlatView *fv, MemoryRegionSection *section)
+-static FlatView *flatview_new(void)
++static FlatView *flatview_new(MemoryRegion *mr_root)
  {
-+    AddressSpaceDispatch *d = flatview_to_dispatch(fv);
-     subpage_t *subpage;
-     hwaddr base = section->offset_within_address_space
-         & TARGET_PAGE_MASK;
-@@ -1333,9 +1333,10 @@ static void register_subpage(FlatView *fv, AddressSpaceDispatch *d,
+     FlatView *view;
+ 
+     view = g_new0(FlatView, 1);
+     view->ref = 1;
++    view->root = mr_root;
++    memory_region_ref(mr_root);
+ 
+     return view;
  }
- 
- 
--static void register_multipage(AddressSpaceDispatch *d,
-+static void register_multipage(FlatView *fv,
-                                MemoryRegionSection *section)
- {
-+    AddressSpaceDispatch *d = flatview_to_dispatch(fv);
-     hwaddr start_addr = section->offset_within_address_space;
-     uint16_t section_index = phys_section_add(&d->map, section);
-     uint64_t num_pages = int128_get64(int128_rshift(section->size,
-@@ -1347,7 +1348,6 @@ static void register_multipage(AddressSpaceDispatch *d,
- 
- void mem_add(FlatView *fv, MemoryRegionSection *section)
- {
--    AddressSpaceDispatch *d = flatview_to_dispatch(fv);
-     MemoryRegionSection now = *section, remain = *section;
-     Int128 page_size = int128_make64(TARGET_PAGE_SIZE);
- 
-@@ -1356,7 +1356,7 @@ void mem_add(FlatView *fv, MemoryRegionSection *section)
-                        - now.offset_within_address_space;
- 
-         now.size = int128_min(int128_make64(left), now.size);
--        register_subpage(fv, d, &now);
-+        register_subpage(fv, &now);
-     } else {
-         now.size = int128_zero();
+@@ -297,6 +300,7 @@ static void flatview_destroy(FlatView *view)
+         memory_region_unref(view->ranges[i].mr);
      }
-@@ -1366,13 +1366,13 @@ void mem_add(FlatView *fv, MemoryRegionSection *section)
-         remain.offset_within_region += int128_get64(now.size);
-         now = remain;
-         if (int128_lt(remain.size, page_size)) {
--            register_subpage(fv, d, &now);
-+            register_subpage(fv, &now);
-         } else if (remain.offset_within_address_space & ~TARGET_PAGE_MASK) {
-             now.size = page_size;
--            register_subpage(fv, d, &now);
-+            register_subpage(fv, &now);
-         } else {
-             now.size = int128_and(now.size, int128_neg(page_size));
--            register_multipage(d, &now);
-+            register_multipage(fv, &now);
-         }
+     g_free(view->ranges);
++    memory_region_unref(view->root);
+     g_free(view);
+ }
+ 
+@@ -722,12 +726,25 @@ static void render_memory_region(FlatView *view,
      }
  }
+ 
++static MemoryRegion *memory_region_get_flatview_root(MemoryRegion *mr)
++{
++    while (mr->alias && !mr->alias_offset &&
++           int128_ge(mr->size, mr->alias->size)) {
++        /* The alias is included in its entirety.  Use it as
++         * the "real" root, so that we can share more FlatViews.
++         */
++        mr = mr->alias;
++    }
++
++    return mr;
++}
++
+ /* Render a memory topology into a list of disjoint absolute ranges. */
+ static FlatView *generate_memory_topology(MemoryRegion *mr)
+ {
+     FlatView *view;
+ 
+-    view = flatview_new();
++    view = flatview_new(mr);
+ 
+     if (mr) {
+         render_memory_region(view, mr, int128_zero(),
+@@ -902,7 +919,8 @@ static void address_space_update_topology_pass(AddressSpace *as,
+ static void address_space_update_topology(AddressSpace *as)
+ {
+     FlatView *old_view = address_space_get_flatview(as);
+-    FlatView *new_view = generate_memory_topology(as->root);
++    MemoryRegion *physmr = memory_region_get_flatview_root(old_view->root);
++    FlatView *new_view = generate_memory_topology(physmr);
+     int i;
+ 
+     new_view->dispatch = address_space_dispatch_new(new_view);
+@@ -2645,7 +2663,7 @@ void address_space_init(AddressSpace *as, MemoryRegion *root, const char *name)
+     as->ref_count = 1;
+     as->root = root;
+     as->malloced = false;
+-    as->current_map = flatview_new();
++    as->current_map = flatview_new(root);
+     as->ioeventfd_nb = 0;
+     as->ioeventfds = NULL;
+     QTAILQ_INIT(&as->listeners);
 -- 
 2.11.0
