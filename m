@@ -1,31 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44725)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47648)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dv2JQ-0000gX-NY
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:18:50 -0400
+	(envelope-from <eric.auger@redhat.com>) id 1dv2T0-0004Hl-8F
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:28:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dv2JN-0008Qe-HP
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:18:44 -0400
-Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:39065)
+	(envelope-from <eric.auger@redhat.com>) id 1dv2Sx-0000LM-2w
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:28:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54706)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dv2JN-0008PX-BI
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:18:41 -0400
-Received: from player157.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id D6453ACAC8
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 16:18:39 +0200 (CEST)
-References: <20170911171235.29331-1-clg@kaod.org>
-	<20170919082020.GT27153@umbus> <20170919084618.GY27153@umbus>
-	<98b6f737-a554-1c83-79f9-2c8021e1cf69@kaod.org>
-	<20170921012508.GA4998@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <53b4c971-920f-816b-59fb-f77a03663d81@kaod.org>
-Date: Thu, 21 Sep 2017 16:18:33 +0200
+	(Exim 4.71) (envelope-from <eric.auger@redhat.com>)
+	id 1dv2Sw-0000Ko-TC
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:28:35 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+	[10.5.11.14])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 2395B806D4
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 14:28:33 +0000 (UTC)
+References: <1505913885.24609.8.camel@redhat.com>
+	<2b739056-081b-593a-6344-50b60d04872b@redhat.com>
+	<1505917879.24609.11.camel@redhat.com>
+	<394d5515-c9a0-578d-1daf-8af1328f0b4b@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <3f8964dc-3fd4-1f0d-c6c6-46afe78a085d@redhat.com>
+Date: Thu, 21 Sep 2017 16:28:21 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170921012508.GA4998@umbus.fritz.box>
+In-Reply-To: <394d5515-c9a0-578d-1daf-8af1328f0b4b@redhat.com>
 Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 00/21] Guest exploitation of the
- XIVE interrupt controller (POWER9)
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] kvm_set_phys_mem: assertion failed
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,107 +36,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
+To: David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: pbonzini@redhat.com
 
-On 09/21/2017 03:25 AM, David Gibson wrote:
-> On Wed, Sep 20, 2017 at 02:33:37PM +0200, C=E9dric Le Goater wrote:
->> On 09/19/2017 10:46 AM, David Gibson wrote:
->>> On Tue, Sep 19, 2017 at 06:20:20PM +1000, David Gibson wrote:
->>>> On Mon, Sep 11, 2017 at 07:12:14PM +0200, C=E9dric Le Goater wrote:
->>>>> On a POWER9 sPAPR machine, the Client Architecture Support (CAS)
->>>>> negotiation process determines whether the guest operates with an
->>>>> interrupt controller using the XICS legacy model, as found on POWER=
-8,
->>>>> or in XIVE exploitation mode, the newer POWER9 interrupt model. Thi=
-s
->>>>> patchset is a proposal to add XIVE support in POWER9 sPAPR machine.
->>>>>
->>>>> Follows a model for the XIVE interrupt controller and support for t=
-he
->>>>> Hypervisor's calls which are used to configure the interrupt source=
-s
->>>>> and the event/notification queues of the guest. The last patch
->>>>> integrates XIVE in the sPAPR machine.
->>>>>
->>>>> Code is here:
->>>>
->>>>
->>>> An overall comment:
->>>>
->>>> I note in several replies here that I think the way XICS objects are
->>>> re-used for XIVE is really ugly, and I think it will make future
->>>> maintenance pretty painful.
+Hi David,
+On 20/09/2017 16:34, David Hildenbrand wrote:
+> On 20.09.2017 16:31, Gerd Hoffmann wrote:
+>>   Hi,
 >>
->> I agree. That was one way to identify what we need for migration=20
->> compatibility and CAS reset.  =20
->>
->>>> I'm thinking maybe trying to support the CAS negotiation of interrup=
-t
->>>> controller from day 1 is warping the design.  A better approach migh=
-t
->>>> be first to implement XIVE only when given a specific machine option=
- -
->>>> guest gets one or the other and can't negotiate.
->>
->> ok.=20
->>
->> CAS is not the most complex problem, we mostly need to share=20
->> the ICSIRQState array and the source offset. migration from older
->> machine is a problem.
->=20
-> Uh.. what?  Migration from an older machine isn't a thing.  We can
-> migrate from an older qemu, but the machine type (and version) has to
-> be identical at each end.  That's *why* we keep around the older
-> machine types on newer qemus.
-
-yes. I am just wondering how I am going to handle a xics-only=20
-machine migrating to a xics/xive machine.=20
-
-The xive machine option we are talking about will activate=20
-the xive interrupt mode and instantiate the objects behind it.=20
-So when we migrate from an older machine we will need to start=20
-the target machine with xive=3Doff. I guess that is OK.  =20
-
-Thanks for the insights and the time to review the code,
-
-C.=20
-
->> We are doomed to keep the existing XICS
->> framework available.
->>
->>>> That should allow a more natural XIVE design to emerge, *then* we ca=
-n
->>>> look at what's necessary to make boot-time negotiation possible.
+>>> Dropping from os section:
 >>>
->>> Actually, it just occurred to me that we might be making life hard fo=
-r
->>> ourselves by trying to actually switch between full XICS and XIVE
->>> models.  Coudln't we have new machine types always construct the XIVE
->>> infrastructure,=20
+>>> <loader readonly="yes"
+>>> type="pflash">/usr/share/edk2.git/ovmf-x64/OVMF_CODE-pure-
+>>> efi.fd</loader>
+>>> <nvram
+>>> template="/usr/share/edk2.git/ovmf-x64/OVMF_VARS-pure-
+>>> efi.fd">/var/lib/libvirt/qemu/nvram/fedora-org-drm-qxl-
+>>> base_VARS.fd</nvram>
 >>
->> yes.
+>> Bad idea I guess.
 >>
->>> but then implement the XICS RTAS and hcalls in terms of the XIVE virt=
-ual=20
->>> hardware.
+>>> 1) Does the assert trigger right at startup? Or how is it triggered?
 >>
->> ok but migration will not be supported.
->=20
-> Right, this would only be for newer machine types, and you can never
-> migrate between different machine types.
->=20
->>> Since something more or less equivalent
->>> has already been done in both OPAL and the host kernel, I'm guessing
->>> this shouldn't be too hard at this point.
+>> Yes, right at startup, before OVMF is done initializing.
+>> So probably something in OVMF triggers it.
+> 
+> I'll try to include ovmf to reproduce it.
+> 
 >>
->> Indeed that is how it is working currently on P9 kvm guests. hcalls ar=
-e
->> implemented on top of XIVE native.
+>>> 2) Does your setup work when dopping the assertion?
 >>
->> Thanks,
+>> Can try tomorrow.
+I encounter the problem on ARM too. My setup works when dropping the
+assertion.
+
+Thanks
+
+Eric
+> 
+> I think that assertion might not be stable, because properties (romd
+> mode) might not be stable and can change. So if it works without the
+> assert, dropping it is the right thing to do.
+> 
 >>
+>> cheers,
+>>   Gerd
 >>
->> C.
->>
->=20
+> 
+> 
