@@ -1,27 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35659)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35934)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <prvs=430e4adce=anthony.perard@citrix.com>)
-	id 1dv3Nf-0004jB-Po
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:27:12 -0400
+	(envelope-from <mreitz@redhat.com>) id 1dv3Ow-0005OQ-8t
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:28:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <prvs=430e4adce=anthony.perard@citrix.com>)
-	id 1dv3Nd-0003ru-5a
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:27:11 -0400
-Received: from smtp02.citrix.com ([66.165.176.63]:6765)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <prvs=430e4adce=anthony.perard@citrix.com>)
-	id 1dv3Nc-0003lw-Ui
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:27:09 -0400
-Date: Thu, 21 Sep 2017 16:27:03 +0100
-From: Anthony PERARD <anthony.perard@citrix.com>
-Message-ID: <20170921152703.GD1859@perard.uk.xensource.com>
-References: <1505811353-29151-1-git-send-email-thuth@redhat.com>
+	(envelope-from <mreitz@redhat.com>) id 1dv3Ov-0004ah-9P
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:28:30 -0400
+References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
+	<20170920135833.20472-3-pbutsykin@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Message-ID: <d64c9cdd-098b-bb41-cf80-de51c569288b@redhat.com>
+Date: Thu, 21 Sep 2017 17:28:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1505811353-29151-1-git-send-email-thuth@redhat.com>
-Subject: Re: [Qemu-devel] [RFC PATCH] qdev: Mark devices as non-hotpluggable
- by default
+In-Reply-To: <20170920135833.20472-3-pbutsykin@virtuozzo.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="gfrM87qRwCsCj946QDBplaDW8TbQfn0NC"
+Subject: Re: [Qemu-devel] [PATCH 2/2] qcow2: truncate the tail of the image
+ file after shrinking the image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,39 +25,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Marcel Apfelbaum <marcel@redhat.com>, Cornelia Huck <cohuck@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, den@openvz.org
 
-On Tue, Sep 19, 2017 at 10:55:53AM +0200, Thomas Huth wrote:
-> Historically we've marked all devices as hotpluggable by default. However,
-> most devices are not hotpluggable, and you also need a HotplugHandler to
-> support these devices. So if the user tries to "device_add" or "device_del"
-> such a non-hotpluggable device during runtime, either nothing really usable
-> happens, or QEMU even crashes/aborts unexpectedly (see for example commit
-> 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
-> So let's change this dangerous default behaviour and mark the devices as
-> non-hotpluggable by default. Certain parent devices classes which are known
-> as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
-> so that devices that are derived from these classes continue to work as
-> expected.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--gfrM87qRwCsCj946QDBplaDW8TbQfn0NC
+From: Max Reitz <mreitz@redhat.com>
+To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, den@openvz.org
+Message-ID: <d64c9cdd-098b-bb41-cf80-de51c569288b@redhat.com>
+Subject: Re: [PATCH 2/2] qcow2: truncate the tail of the image file after
+ shrinking the image
+References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
+ <20170920135833.20472-3-pbutsykin@virtuozzo.com>
+In-Reply-To: <20170920135833.20472-3-pbutsykin@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+On 2017-09-20 15:58, Pavel Butsykin wrote:
+> Now after shrinking the image, at the end of the image file, there migh=
+t be a
+> tail that probably will never be used. So we can find the last used clu=
+ster and
+> cut the tail.
+>=20
+> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+> ---
+>  block/qcow2-refcount.c | 21 +++++++++++++++++++++
+>  block/qcow2.c          | 19 +++++++++++++++++++
+>  block/qcow2.h          |  1 +
+>  3 files changed, 41 insertions(+)
+>=20
+> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+> index 88d5a3f1ad..5e221a166c 100644
+> --- a/block/qcow2-refcount.c
+> +++ b/block/qcow2-refcount.c
+> @@ -3181,3 +3181,24 @@ out:
+>      g_free(reftable_tmp);
+>      return ret;
+>  }
+> +
+> +int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size)
+> +{
+> +    BDRVQcow2State *s =3D bs->opaque;
+> +    int64_t i, last_cluster, nb_clusters =3D size_to_clusters(s, size)=
+;
+> +    uint64_t refcount;
+> +
+> +    for (i =3D 0, last_cluster =3D 0; i < nb_clusters; i++) {
+> +        int ret =3D qcow2_get_refcount(bs, i, &refcount);
+> +        if (ret < 0) {
+> +            fprintf(stderr, "Can't get refcount for cluster %" PRId64 =
+": %s\n",
+> +                    i, strerror(-ret));
+> +            continue;
+> +        }
+> +
+> +        if (refcount > 0) {
+> +            last_cluster =3D i;
+> +        }
+> +    }
+> +    return last_cluster;
+> +}
+
+Wouldn't it make more sense to start from the end of the image?
+
+Max
 
 
-Hi,
+--gfrM87qRwCsCj946QDBplaDW8TbQfn0NC
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-xen-backend is needed to be hotpluggable, otherwise I have this error
-message:
-qemu-system-i386: Initialization of device xen-backend failed: Device 'xen-backend' does not support hotplugging
+-----BEGIN PGP SIGNATURE-----
 
-Also, when I try to add more cpus:
-QMP command: { "execute": "cpu-add", "id": 2, "arguments": { "id": 2 } }
-error message: Device 'qemu32-i386-cpu' does not support hotplugging
+iQFGBAEBCAAwFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAlnD2pMSHG1yZWl0ekBy
+ZWRoYXQuY29tAAoJEPQH2wBh1c9Ap3wIAJk8YenqPz1rQcbqa7ojwU0MDg7yR40/
+KAunWTdDAhFcDEgmuTCZnR9h8PQeCflzEiH6/g16FJC3/7D8VDLN3Dnn18e/swIV
+U9TLh9hDZwmPc/5YRXs5JL/WgNFijH4IxHk4N32pZRUGmwu4+KoPdmLHbkwVo9xr
+DrvYjUOkWzKgwuamPZr1w7qty+Muq6LdEt/sUFB5owtZcHhBwy5ZehvJjjnIQOnQ
+cw6AGRzanlVgeHsP8mP+Z31q8+J5TtPfU78ltC0c0BZY3hAw5zn7hvvlH1DlpAkm
+JmNoo4cvEnRrYQEAu486JQ5ZCtJPSdHZmb6dH75pffQJh7paP25avkI=
+=dcRP
+-----END PGP SIGNATURE-----
 
-
-I've tested all I could think of that would involve hotplug.
-
-Thanks,
-
--- 
-Anthony PERARD
+--gfrM87qRwCsCj946QDBplaDW8TbQfn0NC--
