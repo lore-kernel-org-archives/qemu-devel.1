@@ -1,24 +1,41 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34783)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35450)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dv4eW-0001G0-FR
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:48:42 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dv4gY-00032W-9e
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:50:48 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1dv4eU-000174-Nk
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:48:40 -0400
-References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
-	<20170920135833.20472-3-pbutsykin@virtuozzo.com>
-	<ac533c95-a0f5-c6ce-cc6a-7fab63eb0517@redhat.com>
-	<79eb6628-130e-af9d-cd39-56bf71194ae3@virtuozzo.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <ccbd7d7e-512a-76ea-5b03-8853fd88fda2@redhat.com>
-Date: Thu, 21 Sep 2017 12:48:30 -0400
+	(envelope-from <mdroth@linux.vnet.ibm.com>) id 1dv4gV-0002OL-Az
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:50:46 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55250
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <mdroth@linux.vnet.ibm.com>)
+	id 1dv4gU-0002LQ-6O
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:50:42 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8LGnG5E058324
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 12:50:36 -0400
+Received: from e11.ny.us.ibm.com (e11.ny.us.ibm.com [129.33.205.201])
+	by mx0a-001b2d01.pphosted.com with ESMTP id 2d4fg562sa-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 12:50:36 -0400
+Received: from localhost
+	by e11.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
+	Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <mdroth@linux.vnet.ibm.com>;
+	Thu, 21 Sep 2017 12:50:36 -0400
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <79eb6628-130e-af9d-cd39-56bf71194ae3@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] qcow2: truncate the tail
- of the image file after shrinking the image
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+In-Reply-To: <20170921172142.1052a887.cohuck@redhat.com>
+References: <20170921151446.40015-1-borntraeger@de.ibm.com>
+	<20170921151446.40015-2-borntraeger@de.ibm.com>
+	<20170921172142.1052a887.cohuck@redhat.com>
+Date: Thu, 21 Sep 2017 11:50:28 -0500
+Message-Id: <150601262807.14100.4805165453968988313@sif>
+Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/ais: for 2.10 stable: disable
+ ais facility
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,192 +44,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+To: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>
 
+Quoting Cornelia Huck (2017-09-21 10:21:42)
+> On Thu, 21 Sep 2017 17:14:46 +0200
+> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+> =
 
+> > The migration interface for ais was introduced with kernel 4.13
+> > but the capability itself had been active since 4.12. As migration
+> > support is considered necessary lets disable ais in the 2.10
+> > stable version. A proper fix and re-enablement will be done
+> > for qemu 2.11.
+> =
 
-On 09/21/2017 05:49 AM, Pavel Butsykin wrote:
-> On 21.09.2017 00:38, John Snow wrote:
->>
->>
->> On 09/20/2017 09:58 AM, Pavel Butsykin wrote:
->>> Now after shrinking the image, at the end of the image file, there
->>> might be a
->>> tail that probably will never be used. So we can find the last used
->>> cluster and
->>> cut the tail.
->>>
->>> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
->>> ---
->>> =C2=A0 block/qcow2-refcount.c | 21 +++++++++++++++++++++
->>> =C2=A0 block/qcow2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 | 19 +++++++++++++++++++
->>> =C2=A0 block/qcow2.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0 1 +
->>> =C2=A0 3 files changed, 41 insertions(+)
->>>
->>> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
->>> index 88d5a3f1ad..5e221a166c 100644
->>> --- a/block/qcow2-refcount.c
->>> +++ b/block/qcow2-refcount.c
->>> @@ -3181,3 +3181,24 @@ out:
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 g_free(reftable_tmp);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
->>> =C2=A0 }
->>> +
->>> +int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size)
->>> +{
->>> +=C2=A0=C2=A0=C2=A0 BDRVQcow2State *s =3D bs->opaque;
->>> +=C2=A0=C2=A0=C2=A0 int64_t i, last_cluster, nb_clusters =3D size_to_=
-clusters(s, size);
->>> +=C2=A0=C2=A0=C2=A0 uint64_t refcount;
->>> +
->>> +=C2=A0=C2=A0=C2=A0 for (i =3D 0, last_cluster =3D 0; i < nb_clusters=
-; i++) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret =3D qcow2_get_ref=
-count(bs, i, &refcount);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 f=
-printf(stderr, "Can't get refcount for cluster %"
->>> PRId64 ": %s\n",
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i, strerror(-ret));
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 c=
-ontinue;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (refcount > 0) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 l=
-ast_cluster =3D i;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0 return last_cluster;
->>> +}> diff --git a/block/qcow2.c b/block/qcow2.c
->>> index 8a4311d338..c3b6dd44c4 100644
->>> --- a/block/qcow2.c
->>> +++ b/block/qcow2.c
->>> @@ -3106,6 +3106,7 @@ static int qcow2_truncate(BlockDriverState *bs,
->>> int64_t offset,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 new_l1_size =3D size_to_l1(s, offset);
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (offset < old_length) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int64_t image_end_offset,=
- old_file_size;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (prealloc !=
-=3D PREALLOC_MODE_OFF) {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 error_setg(errp,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- "Preallocation can't be used for shrinking
->>> an image");
->>> @@ -3134,6 +3135,24 @@ static int qcow2_truncate(BlockDriverState
->>> *bs, int64_t offset,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Failed to discard unused refblocks"=
-);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 return ret;
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 old_file_size =3D bdrv_ge=
-tlength(bs->file->bs);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (old_file_size < 0) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 e=
-rror_setg_errno(errp, -old_file_size,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 "Failed to inquire current file length");
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
-eturn old_file_size;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 image_end_offset =3D (qco=
-w2_get_last_cluster(bs,
->>> old_file_size) + 1) *
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 s->cluster_size;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (image_end_offset < ol=
-d_file_size) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
-et =3D bdrv_truncate(bs->file, image_end_offset,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 PREALLOC_MODE_OFF, NULL);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
-f (ret < 0) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 error_setg_errno(errp, -ret,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 "Failed to truncate the =
-tail of the
->>> image");
->>
->> I've recently become skeptical of what partial resize successes look
->> like, but that's an issue for another day entirely.
->>
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 return ret;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D qcow2_=
-grow_l1_table(bs, new_l1_size, true);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>> diff --git a/block/qcow2.h b/block/qcow2.h
->>> index 5a289a81e2..782a206ecb 100644
->>> --- a/block/qcow2.h
->>> +++ b/block/qcow2.h
->>> @@ -597,6 +597,7 @@ int qcow2_change_refcount_order(BlockDriverState
->>> *bs, int refcount_order,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BlockDriverAmendSt=
-atusCB *status_cb,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 void *cb_opaque, E=
-rror **errp);
->>> =C2=A0 int qcow2_shrink_reftable(BlockDriverState *bs);
->>> +int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size);
->>> =C2=A0 =C2=A0 /* qcow2-cluster.c functions */
->>> =C2=A0 int qcow2_grow_l1_table(BlockDriverState *bs, uint64_t min_siz=
-e,
->>>
->>
->> Reviewed-by: John Snow <jsnow@redhat.com>
->>
->> Looks sane to me, but under which circumstances might we grow such a
->> tail? I assume the actual truncate call aligns to cluster boundaries a=
-s
->> appropriate, so is this a bit of a "quick fix" to cull unused clusters
->> that happened to be near the truncate boundary?
->>
->> It might be worth documenting the circumstances that produces this
->> unused space that will never get used. My hunch is that such unused
->> space should likely be getting reclaimed elsewhere and not here, but
->> perhaps I'm misunderstanding the causal factors.
->>
+> Also now with qemu-devel on cc:
+> =
+
+> So, should I apply to s390-next? Or can this be applied just to stable?
+
+Ideally we would get it in master or at least a branch that'll
+eventually get pulled so we can reference the upstream commit ID.
+It's not set in stone, but usually only patches specifically ported
+to stable are applied directly.
+
+> =
+
+> > =
+
+> > Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> > Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> > ---
+> >  target/s390x/kvm.c | 9 +++++++--
+> >  1 file changed, 7 insertions(+), 2 deletions(-)
+> > =
+
+> > diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+> > index c4c5791..eb0dbb3 100644
+> > --- a/target/s390x/kvm.c
+> > +++ b/target/s390x/kvm.c
+> > @@ -308,8 +308,13 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+> >          }
+> >      }
+> >  =
+
+> > -    /* Try to enable AIS facility */
+> > -    kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
+> > +    /*
+> > +     * The migration interface for ais was introduced with kernel 4.13
+> > +     * but the capability itself had been active since 4.12. As migrat=
+ion
+> > +     * support is considered necessary let's disable ais in the 2.10
+> > +     * machine.
+> > +     */
+> > +    /* kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0); */
+> >  =
+
+> >      qemu_mutex_init(&qemu_sigp_mutex);
+> >  =
+
 >=20
-> This is a consequence of how we implemented shrinking the qcow2 image.
-> (https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04580.html)
-> But on the other hand, if we need to shrink the qcow2 image without
-> copying the data, this is the only way. The same guest offset can be
-> converted to almost any host offset in the file i.e. the first guest
-> cluster may be located somewhere at the end or the middle of the image
-> file. So we can't just take and truncate the image file on the border o=
-f
-> the truncation, therefore to shrink the image we just discard the
-> clusters that corresponds to the truncated area. The result is a
-> sparse image file where the apparent file size differs from actual size=
-.
-> And the tail in this case is the difference between the actual size and
-> last used cluster in the image, so in fact the cutting of the tail does
-> not change the apparent file size.
->=20
-
-Oh, duh, I get it. The truncation itself creates a lot of sparseness.
-
-Thanks for the explanation.
