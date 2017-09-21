@@ -1,25 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34443)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34856)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dv3KP-0002Tm-VW
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:23:57 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dv3Lg-0003Sr-Qx
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:25:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dv3KN-0001OK-9z
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:23:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53364)
+	(envelope-from <a.perevalov@samsung.com>) id 1dv3La-00029m-I5
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:25:08 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:39177)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dv3KN-0001O0-0U
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:23:47 -0400
-References: <20170921150755.19914-1-famz@redhat.com>
-	<20170921150755.19914-2-famz@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <99df6023-be07-dac0-1434-105774c383ac@redhat.com>
-Date: Thu, 21 Sep 2017 10:23:38 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170921150755.19914-2-famz@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="8sR1Cai78lm49aphMllXI8GwUfgsC8Ujb"
-Subject: Re: [Qemu-devel] [PATCH v11 01/13] gitignore: Ignore vm test images
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dv3La-00027h-91
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:25:02 -0400
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <288ce5a4-ece0-1754-c7df-0a6be5af1f2a@samsung.com>
+Date: Thu, 21 Sep 2017 18:24:54 +0300
+MIME-version: 1.0
+In-reply-to: <20170921124228.GG2717@work-vm>
+Content-type: text/plain; charset="utf-8"; format="flowed"
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1505839684-10046-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170919164827eucas1p231a5b9afd8e81427db114e57a0b6fbbe@eucas1p2.samsung.com>
+	<1505839684-10046-11-git-send-email-a.perevalov@samsung.com>
+	<20170921124228.GG2717@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v10 10/10] migration: add postcopy total
+ blocktime into query-migrate
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,58 +32,300 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com, quintela@redhat.com, heetae82.ahn@samsung.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---8sR1Cai78lm49aphMllXI8GwUfgsC8Ujb
-From: Eric Blake <eblake@redhat.com>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>,
- stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com,
- Kamil Rytarowski <kamil@netbsd.org>
-Message-ID: <99df6023-be07-dac0-1434-105774c383ac@redhat.com>
-Subject: Re: [PATCH v11 01/13] gitignore: Ignore vm test images
-References: <20170921150755.19914-1-famz@redhat.com>
- <20170921150755.19914-2-famz@redhat.com>
-In-Reply-To: <20170921150755.19914-2-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On 09/21/2017 03:42 PM, Dr. David Alan Gilbert wrote:
+> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+>> Postcopy total blocktime is available on destination side only.
+>> But query-migrate was possible only for source. This patch
+>> adds ability to call query-migrate on destination.
+>> To be able to see postcopy blocktime, need to request postcopy-blocktime
+>> capability.
+>>
+>> The query-migrate command will show following sample result:
+>> {"return":
+>>      "postcopy-vcpu-blocktime": [115, 100],
+>>      "status": "completed",
+>>      "postcopy-blocktime": 100
+>> }}
+>>
+>> postcopy_vcpu_blocktime contains list, where the first item is the first
+>> vCPU in QEMU.
+>>
+>> This patch has a drawback, it combines states of incoming and
+>> outgoing migration. Ongoing migration state will overwrite incoming
+>> state. Looks like better to separate query-migrate for incoming and
+>> outgoing migration or add parameter to indicate type of migration.
+>>
+>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+>> ---
+>>   hmp.c                    | 15 +++++++++++++
+>>   migration/migration.c    | 42 +++++++++++++++++++++++++++++++----
+>>   migration/migration.h    |  4 ++++
+>>   migration/postcopy-ram.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++
+>>   migration/trace-events   |  1 +
+>>   qapi/migration.json      | 11 +++++++++-
+>>   6 files changed, 125 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/hmp.c b/hmp.c
+>> index 0fb2bc7..142f76e 100644
+>> --- a/hmp.c
+>> +++ b/hmp.c
+>> @@ -264,6 +264,21 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>>                          info->cpu_throttle_percentage);
+>>       }
+>>   
+>> +    if (info->has_postcopy_blocktime) {
+>> +        monitor_printf(mon, "postcopy blocktime: %" PRId64 "\n",
+>> +                       info->postcopy_blocktime);
+>> +    }
+>> +
+>> +    if (info->has_postcopy_vcpu_blocktime) {
+>> +        Visitor *v;
+>> +        char *str;
+>> +        v = string_output_visitor_new(false, &str);
+>> +        visit_type_int64List(v, NULL, &info->postcopy_vcpu_blocktime, NULL);
+>> +        visit_complete(v, &str);
+>> +        monitor_printf(mon, "postcopy vcpu blocktime: %s\n", str);
+>> +        g_free(str);
+>> +        visit_free(v);
+>> +    }
+>>       qapi_free_MigrationInfo(info);
+>>       qapi_free_MigrationCapabilityStatusList(caps);
+>>   }
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 4f029e8..e1d3248 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -528,14 +528,15 @@ static void populate_disk_info(MigrationInfo *info)
+>>       }
+>>   }
+>>   
+>> -MigrationInfo *qmp_query_migrate(Error **errp)
+>> +static void fill_source_migration_info(MigrationInfo *info)
+>>   {
+>> -    MigrationInfo *info = g_malloc0(sizeof(*info));
+>>       MigrationState *s = migrate_get_current();
+>>   
+>>       switch (s->state) {
+>>       case MIGRATION_STATUS_NONE:
+>>           /* no migration has happened ever */
+>> +        /* do not overwrite destination migration status */
+>> +        return;
+>>           break;
+>>       case MIGRATION_STATUS_SETUP:
+>>           info->has_status = true;
+>> @@ -584,8 +585,6 @@ MigrationInfo *qmp_query_migrate(Error **errp)
+>>           break;
+>>       }
+>>       info->status = s->state;
+>> -
+>> -    return info;
+>>   }
+>>   
+>>   /**
+>> @@ -649,6 +648,41 @@ static bool migrate_caps_check(bool *cap_list,
+>>       return true;
+>>   }
+>>   
+>> +static void fill_destination_migration_info(MigrationInfo *info)
+>> +{
+>> +    MigrationIncomingState *mis = migration_incoming_get_current();
+>> +
+>> +    switch (mis->state) {
+>> +    case MIGRATION_STATUS_NONE:
+>> +        return;
+>> +        break;
+>> +    case MIGRATION_STATUS_SETUP:
+>> +    case MIGRATION_STATUS_CANCELLING:
+>> +    case MIGRATION_STATUS_CANCELLED:
+>> +    case MIGRATION_STATUS_ACTIVE:
+>> +    case MIGRATION_STATUS_POSTCOPY_ACTIVE:
+>> +    case MIGRATION_STATUS_FAILED:
+>> +    case MIGRATION_STATUS_COLO:
+>> +        info->has_status = true;
+>> +        break;
+>> +    case MIGRATION_STATUS_COMPLETED:
+>> +        info->has_status = true;
+>> +        fill_destination_postcopy_migration_info(info);
+>> +        break;
+>> +    }
+>> +    info->status = mis->state;
+>> +}
+>> +
+>> +MigrationInfo *qmp_query_migrate(Error **errp)
+>> +{
+>> +    MigrationInfo *info = g_malloc0(sizeof(*info));
+>> +
+>> +    fill_destination_migration_info(info);
+>> +    fill_source_migration_info(info);
+>> +
+>> +    return info;
+>> +}
+>> +
+>>   void qmp_migrate_set_capabilities(MigrationCapabilityStatusList *params,
+>>                                     Error **errp)
+>>   {
+>> diff --git a/migration/migration.h b/migration/migration.h
+>> index 770466b..882a59b 100644
+>> --- a/migration/migration.h
+>> +++ b/migration/migration.h
+>> @@ -70,6 +70,10 @@ struct MigrationIncomingState {
+>>   
+>>   MigrationIncomingState *migration_incoming_get_current(void);
+>>   void migration_incoming_state_destroy(void);
+>> +/*
+>> + * Functions to work with blocktime context
+>> + */
+>> +void fill_destination_postcopy_migration_info(MigrationInfo *info);
+>>   
+>>   #define TYPE_MIGRATION "migration"
+>>   
+>> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+>> index 9a5133f..5fdbf1e 100644
+>> --- a/migration/postcopy-ram.c
+>> +++ b/migration/postcopy-ram.c
+>> @@ -113,6 +113,55 @@ static struct PostcopyBlocktimeContext *blocktime_context_new(void)
+>>       return ctx;
+>>   }
+>>   
+>> +static int64List *get_vcpu_blocktime_list(PostcopyBlocktimeContext *ctx)
+>> +{
+>> +    int64List *list = NULL, *entry = NULL;
+>> +    int i;
+>> +
+>> +    for (i = smp_cpus - 1; i >= 0; i--) {
+>> +        entry = g_new0(int64List, 1);
+>> +        entry->value = ctx->vcpu_blocktime[i];
+>> +        entry->next = list;
+>> +        list = entry;
+>> +    }
+>> +
+>> +    return list;
+>> +}
+>> +
+>> +/*
+>> + * This function just populates MigrationInfo from postcopy's
+>> + * blocktime context. It will not populate MigrationInfo,
+>> + * unless postcopy-blocktime capability was set.
+>> + *
+>> + * @info: pointer to MigrationInfo to populate
+>> + */
+>> +void fill_destination_postcopy_migration_info(MigrationInfo *info)
+>> +{
+>> +    MigrationIncomingState *mis = migration_incoming_get_current();
+>> +    PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
+>> +
+>> +    if (!bc) {
+>> +        return;
+>> +    }
+>> +
+>> +    info->has_postcopy_blocktime = true;
+>> +    info->postcopy_blocktime = bc->total_blocktime;
+>> +    info->has_postcopy_vcpu_blocktime = true;
+>> +    info->postcopy_vcpu_blocktime = get_vcpu_blocktime_list(bc);
+>> +}
+>> +
+>> +static uint64_t get_postcopy_total_blocktime(void)
+>> +{
+>> +    MigrationIncomingState *mis = migration_incoming_get_current();
+>> +    PostcopyBlocktimeContext *bc = mis->blocktime_ctx;
+>> +
+>> +    if (!bc) {
+>> +        return 0;
+>> +    }
+>> +
+>> +    return bc->total_blocktime;
+>> +}
+>> +
+>>   /**
+>>    * receive_ufd_features: check userfault fd features, to request only supported
+>>    * features in the future.
+>> @@ -487,6 +536,9 @@ int postcopy_ram_incoming_cleanup(MigrationIncomingState *mis)
+>>           munmap(mis->postcopy_tmp_zero_page, mis->largest_page_size);
+>>           mis->postcopy_tmp_zero_page = NULL;
+>>       }
+>> +    trace_postcopy_ram_incoming_cleanup_blocktime(
+>> +            get_postcopy_total_blocktime());
+>> +
+>>       trace_postcopy_ram_incoming_cleanup_exit();
+>>       return 0;
+>>   }
+>> @@ -958,6 +1010,11 @@ void *postcopy_get_tmp_page(MigrationIncomingState *mis)
+>>   
+>>   #else
+>>   /* No target OS support, stubs just fail */
+>> +void fill_destination_postcopy_migration_info(MigrationInfo *info)
+>> +{
+>> +    error_report("%s: No OS support", __func__);
+>> +}
+>> +
+> Do we want that error_report? info migrate shouldn't give an error on a
+> non-postcopy host.
+>
+> Also, don't you fancy just checking for the presence of this new info in
+> the test?
+I'll add assert, like that
+g_assert(qdict_haskey(rsp_return, "postcopy-blocktime"));
+when host supports UFFD_FEATURE_THREAD_ID
 
-On 09/21/2017 10:07 AM, Fam Zheng wrote:
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->  .gitignore       | 1 +
->  tests/.gitignore | 1 +
->  2 files changed, 2 insertions(+)
-
-Missing my R-b from v10.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---8sR1Cai78lm49aphMllXI8GwUfgsC8Ujb
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnD2XoACgkQp6FrSiUn
-Q2or9Qf7BOi7Uwjbsef/OB7WhpMgBO6c6mp7w3dnq5e5HcEzjQEo5Wfu3IppurBW
-OzHTqS6IdBWsfKBtCtom1pc+ccKjj+S2bvkLgvCO7jIc5y6a6hLfpfBbNaPlMZX1
-m0vNy0J1e1dFYZ5NmO3KSK+h7FozbY7ORMQMopLMUCabkLAWsz3VGeyKbStIHPHP
-Bc0DnHa80llfNHjcdXTj5FRxoerxwinaZRyi7VvR10C6+owIsOO9I3FW22Q9BxXv
-8e+WQ1j3/XkXwklPKJ1bdShQRjs5AKAWTSGP32BUlMrRDj30czGFMtq7gMujLV1w
-nnPTgTpEn/bTmZ/YdC6qYVPD+ey8zg==
-=orw6
------END PGP SIGNATURE-----
-
---8sR1Cai78lm49aphMllXI8GwUfgsC8Ujb--
+-- 
+Best regards,
+Alexey Perevalov
+>
+> Dave
+>
+>>   bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+>>   {
+>>       error_report("%s: No OS support", __func__);
+>> diff --git a/migration/trace-events b/migration/trace-events
+>> index 01f30fe..741f2ae 100644
+>> --- a/migration/trace-events
+>> +++ b/migration/trace-events
+>> @@ -197,6 +197,7 @@ postcopy_ram_incoming_cleanup_closeuf(void) ""
+>>   postcopy_ram_incoming_cleanup_entry(void) ""
+>>   postcopy_ram_incoming_cleanup_exit(void) ""
+>>   postcopy_ram_incoming_cleanup_join(void) ""
+>> +postcopy_ram_incoming_cleanup_blocktime(uint64_t total) "total blocktime %" PRIu64
+>>   save_xbzrle_page_skipping(void) ""
+>>   save_xbzrle_page_overflow(void) ""
+>>   ram_save_iterate_big_wait(uint64_t milliconds, int iterations) "big wait: %" PRIu64 " milliseconds, %d iterations"
+>> diff --git a/qapi/migration.json b/qapi/migration.json
+>> index 2e4a15d..55b055e 100644
+>> --- a/qapi/migration.json
+>> +++ b/qapi/migration.json
+>> @@ -150,6 +150,13 @@
+>>   #              @status is 'failed'. Clients should not attempt to parse the
+>>   #              error strings. (Since 2.7)
+>>   #
+>> +# @postcopy-blocktime: total time when all vCPU were blocked during postcopy
+>> +#           live migration (Since 2.11)
+>> +#
+>> +# @postcopy-vcpu-blocktime: list of the postcopy blocktime per vCPU (Since 2.10)
+>> +#
+>> +
+>> +#
+>>   # Since: 0.14.0
+>>   ##
+>>   { 'struct': 'MigrationInfo',
+>> @@ -161,7 +168,9 @@
+>>              '*downtime': 'int',
+>>              '*setup-time': 'int',
+>>              '*cpu-throttle-percentage': 'int',
+>> -           '*error-desc': 'str'} }
+>> +           '*error-desc': 'str',
+>> +           '*postcopy-blocktime' : 'int64',
+>> +           '*postcopy-vcpu-blocktime': ['int64']} }
+>>   
+>>   ##
+>>   # @query-migrate:
+>> -- 
+>> 1.9.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
+>
