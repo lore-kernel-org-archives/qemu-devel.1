@@ -1,44 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52284)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52728)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dv44O-00079N-VU
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:11:22 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dv46A-0007xt-RZ
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:13:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dv44M-0004j0-8a
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:11:20 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48290
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dv44M-0004iE-3J
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:11:18 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8LG4UQM094056
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 12:11:13 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2d4e1h94c5-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 12:11:12 -0400
-Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 21 Sep 2017 17:11:11 +0100
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-References: <20170920172314.102710-1-pasic@linux.vnet.ibm.com>
-	<20170920172314.102710-2-pasic@linux.vnet.ibm.com>
-	<20170921111552.41167e80.cohuck@redhat.com>
-	<efa7f105-78c4-1ec0-dcf5-9b97678cd7e5@linux.vnet.ibm.com>
-	<20170921140506.42c5f7f6.cohuck@redhat.com>
-Date: Thu, 21 Sep 2017 18:11:06 +0200
+	(envelope-from <peter.maydell@linaro.org>) id 1dv466-0005us-Hr
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:13:10 -0400
+Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:44182)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dv466-0005uJ-6I
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:13:06 -0400
+Received: by mail-wr0-x22d.google.com with SMTP id v109so4990773wrc.1
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 09:13:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170921140506.42c5f7f6.cohuck@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <a426d7bc-c1c8-0eb5-0a31-464468010259@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/3270: IDA support for 3270 via
- CcwDataStream
+In-Reply-To: <1d61ec4d-da94-e96a-e1f6-509a4e80daec@siemens.com>
+References: <1d61ec4d-da94-e96a-e1f6-509a4e80daec@siemens.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 Sep 2017 17:12:44 +0100
+Message-ID: <CAFEAcA8H=wz2y+GEXUbxLpGRc8PoLKDUZf+emF=NeAs-zAPj1Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] arm: Fix SMC reporting to EL2 when QEMU
+ provides PSCI
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,78 +29,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 
-
-
-On 09/21/2017 02:05 PM, Cornelia Huck wrote:
-> On Thu, 21 Sep 2017 13:22:44 +0200
-> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
-> 
->> On 09/21/2017 11:15 AM, Cornelia Huck wrote:
->>>> +static inline CcwDataStream *get_cds(Terminal3270 *t)
->>>> +{
->>>> +    return &(CCW_DEVICE(&t->cdev)->sch->cds);
->>>> +}
->>>> +
->>>> +static int read_payload_3270(EmulatedCcw3270Device *dev)
->>>>  {
->>>>      Terminal3270 *t = TERMINAL_3270(dev);
->>>>      int len;
->>>>  
->>>> -    len = MIN(count, t->in_len);
->>>> -    cpu_physical_memory_write(cda, t->inv, len);
->>>> +    len = MIN(ccw_dstream_avail(get_cds(t)), t->in_len);
->>>> +    ccw_dstream_write_buf(get_cds(t), t->inv, len);  
->>> CCW_DEVICE() as called by get_cds() goes through qom, which implies a
->>> bit of overhead. Not sure if it makes sense to cache it in this
->>> function so you don't go through it multiple times. (Dito for the other
->>> callback.)
->>>   
->>
->> I've cargo-culted this way of getting CCW_DEVICE(&t->cdev) to the CcwDevice
->> form terminal_read (the pattern used at multiple places in the file). As
->> far as I can tell, the overhead basically depends on CONFIG_QOM_CAST_DEBUG.
->>
->> I have no idea what do we have in production, but my guess is, that
->> ONFIG_QOM_CAST_DEBUG makes only sense for development and testing
->> (especially if proper test coverage is assumed).
->> Can you enlighten me?
->>
->> CCW_DEVICE() may contain a run-time check (depending on CONFIG_QOM_CAST_DEBUG),
->> we however can make sure things are OK at compile time. This brings
->> me to the next question. Does it even make sense to use OBJECT_CHECK based
->> constructs when going from specific to general (we don't actually need a
->> cast here)? Obviously, for the other direction we really need a cast, so doing
->> a run-time check there does indeed provide added value.
-> 
-> The basic rule seems to be "use a qom cast, unless you are on a fast
-> path" - even though qom debug makes the most sense while developing.
-> 
-
-Does this imply "don't use qom cast on fast path"? I guess that would
-mean that we basically expect production builds being with CONFIG_QOM_CAST_DEBUG
-defined.
-
-> But let's not turn that into a big discussion: It's probably not really
-> worth optimizing here.
+On 18 September 2017 at 08:51, Jan Kiszka <jan.kiszka@siemens.com> wrote:
+> From: Jan Kiszka <jan.kiszka@siemens.com>
 >
+> This properly forwards SMC events to EL2 when PSCI is provided by QEMU
+> itself and, thus, ARM_FEATURE_EL3 is off.
+>
+> Found and tested with the Jailhouse hypervisor.
+>
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> ---
+>  target/arm/helper.c    | 2 +-
+>  target/arm/op_helper.c | 8 ++++----
+>  target/arm/psci.c      | 6 ++++++
+>  3 files changed, 11 insertions(+), 5 deletions(-)
+>
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 4f41841ef6..8c3929762c 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -3717,7 +3717,7 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
+>
+>      if (arm_feature(env, ARM_FEATURE_EL3)) {
+>          valid_mask &= ~HCR_HCD;
+> -    } else {
+> +    } else if (cpu->psci_conduit != QEMU_PSCI_CONDUIT_SMC) {
+>          valid_mask &= ~HCR_TSC;
 
-I agree about the optimization. OTOH I do believe establishing best
-practices is important. I'm afraid, I'm seeing much 'more monkey see
-monkey do' than healthy (in such an environment prior art is even
-more important). I believe, understanding a best practice (candidate)
-should always be a part of establishing a best practice. 
+This looks odd, so it needs a comment I think.
+  /* Architecturally HCR.TSC is RES0 if EL3 is not implemented.
+   * However, if we're using the SMC PSCI conduit then QEMU is
+   * effectively acting like EL3 firmware and so the guest at
+   * EL2 should retain the ability to prevent EL1 from being
+   * able to make SMC calls into the ersatz firmware, so in
+   * that case HCR.TSC should be read/write.
+   */
 
-Sorry, I may be inappropriate (you requested to not turn this into
-a big discussion, and I'm afraid this goes in that direction). If
-I'm please ignore the stuff above this line.
+>      }
+>
+> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
+> index 6a60464ab9..4b0ef6a234 100644
+> --- a/target/arm/op_helper.c
+> +++ b/target/arm/op_helper.c
+> @@ -960,12 +960,12 @@ void HELPER(pre_smc)(CPUARMState *env, uint32_t syndrome)
+>          return;
+>      }
+>
+> -    if (!arm_feature(env, ARM_FEATURE_EL3)) {
+> -        /* If we have no EL3 then SMC always UNDEFs */
+> -        undef = true;
+> -    } else if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
+> +    if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
+>          /* In NS EL1, HCR controlled routing to EL2 has priority over SMD. */
+>          raise_exception(env, EXCP_HYP_TRAP, syndrome, 2);
+> +    } else if (!arm_feature(env, ARM_FEATURE_EL3)) {
+> +        /* If we have no EL3 then SMC always UNDEFs */
+> +        undef = true;
+>      }
+>
+>      if (undef) {
 
-So, there is nothing to be addressed about about this series so far.
-Does this mean good for inclusion once prerequisites are met -- unless
-somebody finds something?
+I think the logic in this function should be something like:
 
-Regards,
-Halil
- 
+    if (!arm_feature(env, ARM_FEATURE_EL3) &&
+        cpu->psci_conduit != QEMU_PSCI_CONDUIT_SMC)) {
+        /* If we have no EL3 then SMC always UNDEFs and can't be
+         * trapped to EL2. PSCI-via-SMC is a sort of ersatz EL3
+         * firmware within QEMU, and we want an EL2 guest to be able
+         * to forbid its EL1 from making PSCI calls into QEMU's
+         * "firmware" via HCR.TSC, so for these purposes treat
+         *  PSCI-via-SMC as implying an EL3.
+         */
+        undef = true;
+    else if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
+        /* In NS EL1, HCR controlled routing to EL2 has priority over SMD.
+         * We also want an EL2 guest to be able to forbid its EL1 from
+         * making PSCI calls into QEMU's "firmware" via HCR.TSC.
+         */
+        raise_exception(env, EXCP_HYP_TRAP, syndrome, 2);
+    }
+
+    if (undef && !arm_is_psci_call(cpu, EXCP_SMC)) {
+        /* If PSCI is enabled and this looks like a valid PSCI call then
+         * suppress the UNDEF -- we'll catch the SMC exception and
+         * implement the PSCI call behaviour there.
+         */
+        raise_exception(env, EXCP_UDEF, syn_uncategorized(),
+                        exception_target_el(env));
+    }
+
+(Totally untested!)
+
+> diff --git a/target/arm/psci.c b/target/arm/psci.c
+> index fc34b263d3..637987ff46 100644
+> --- a/target/arm/psci.c
+> +++ b/target/arm/psci.c
+> @@ -35,6 +35,8 @@ bool arm_is_psci_call(ARMCPU *cpu, int excp_type)
+>       */
+>      CPUARMState *env = &cpu->env;
+>      uint64_t param = is_a64(env) ? env->xregs[0] : env->regs[0];
+> +    int cur_el = arm_current_el(env);
+> +    bool secure = arm_is_secure(env);
+>
+>      switch (excp_type) {
+>      case EXCP_HVC:
+> @@ -46,6 +48,10 @@ bool arm_is_psci_call(ARMCPU *cpu, int excp_type)
+>          if (cpu->psci_conduit != QEMU_PSCI_CONDUIT_SMC) {
+>              return false;
+>          }
+> +        if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
+> +            /* The EL2 will handle this. */
+> +            return false;
+> +        }
+
+I don't think we should need to change this function -- its
+purpose is "does this look like a PSCI call", and if it's
+an SMC exception with the right magic parameters, then it
+does look like a PSCI call. Instead we should make the
+pre_smc helper choose "raise a hyp trap" if that's the right
+thing to be doing (see comment above for what I think is the
+right logic there).
+
+thanks
+-- PMM
