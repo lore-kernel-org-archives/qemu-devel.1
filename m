@@ -1,25 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39610)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41075)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1duyMV-0002Lq-50
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:05:40 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1duySl-0004Si-OP
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:12:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1duyMR-0000oF-Uq
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:05:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:48996)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1duyMR-0000ix-MW
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:05:35 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
-	[10.5.11.15])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id A73DA804E3
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 10:05:34 +0000 (UTC)
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Date: Thu, 21 Sep 2017 11:05:29 +0100
-Message-Id: <20170921100529.2462-1-berrange@redhat.com>
-Subject: [Qemu-devel] [PATCH] io: add trace events for websockets frame
- handling
+	(envelope-from <aik@ozlabs.ru>) id 1duySf-0008F2-Rr
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:12:07 -0400
+Received: from mail-it0-x230.google.com ([2607:f8b0:4001:c0b::230]:53099)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1duySf-0008C3-M0
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:12:01 -0400
+Received: by mail-it0-x230.google.com with SMTP id c195so61777itb.1
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 03:12:01 -0700 (PDT)
+References: <20170921085110.25598-1-aik@ozlabs.ru>
+	<5e836306-27bd-a0fd-5bdd-8c8a510bf8eb@redhat.com>
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-ID: <44820288-1464-de78-8a23-59cf9b945aea@ozlabs.ru>
+Date: Thu, 21 Sep 2017 20:11:55 +1000
+MIME-Version: 1.0
+In-Reply-To: <5e836306-27bd-a0fd-5bdd-8c8a510bf8eb@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v5 00/18] memory: Store physical root
+ MR in FlatView
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,129 +31,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-It is useful to trace websockets frame encoding/decoding when debugging
-problems.
+On 21/09/17 20:03, Paolo Bonzini wrote:
+> On 21/09/2017 10:50, Alexey Kardashevskiy wrote:
+>> This was inspired by https://bugzilla.redhat.com/show_bug.cgi?id=1481593
+>> Previous versions:
+>> v1: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01559.html
+>> v2: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04069.html
+>> v3: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04523.html
+>> v4: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg05669.html
+>>
+>> This patchset tries to reduce amount of memory used by FlatViews
+>> and tries share as many FVs between address spaces as possible.
+> 
+> Thanks, this looks good!  (Patch 18 indeed is not what I had in mind :)).
 
-Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
----
- io/channel-websock.c | 23 ++++++++++++++++++-----
- io/trace-events      |  5 +++++
- 2 files changed, 23 insertions(+), 5 deletions(-)
 
-diff --git a/io/channel-websock.c b/io/channel-websock.c
-index 3195eb2eb8..d1d471f86e 100644
---- a/io/channel-websock.c
-+++ b/io/channel-websock.c
-@@ -582,7 +582,8 @@ static gboolean qio_channel_websock_handshake_io(QIOChannel *ioc,
- }
- 
- 
--static void qio_channel_websock_encode_buffer(Buffer *output,
-+static void qio_channel_websock_encode_buffer(QIOChannelWebsock *ioc,
-+                                              Buffer *output,
-                                               uint8_t opcode, Buffer *buffer)
- {
-     size_t header_size;
-@@ -608,6 +609,7 @@ static void qio_channel_websock_encode_buffer(Buffer *output,
-     }
-     header_size -= QIO_CHANNEL_WEBSOCK_HEADER_LEN_MASK;
- 
-+    trace_qio_channel_websock_encode(ioc, opcode, header_size, buffer->offset);
-     buffer_reserve(output, header_size + buffer->offset);
-     buffer_append(output, header.buf, header_size);
-     buffer_append(output, buffer->buffer, buffer->offset);
-@@ -620,7 +622,7 @@ static void qio_channel_websock_encode(QIOChannelWebsock *ioc)
-         return;
-     }
-     qio_channel_websock_encode_buffer(
--        &ioc->encoutput, QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME,
-+        ioc, &ioc->encoutput, QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME,
-         &ioc->rawoutput);
-     buffer_reset(&ioc->rawoutput);
- }
-@@ -640,7 +642,8 @@ static void qio_channel_websock_write_close(QIOChannelWebsock *ioc,
-         buffer_append(&ioc->rawoutput, reason, strlen(reason));
-     }
-     qio_channel_websock_encode_buffer(
--        &ioc->encoutput, QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE, &ioc->rawoutput);
-+        ioc, &ioc->encoutput, QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE,
-+        &ioc->rawoutput);
-     buffer_reset(&ioc->rawoutput);
-     qio_channel_websock_write_wire(ioc, NULL);
-     qio_channel_shutdown(ioc->master, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
-@@ -682,6 +685,9 @@ static int qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
-         opcode = ioc->opcode;
-     }
- 
-+    trace_qio_channel_websock_header_partial_decode(ioc, payload_len,
-+                                                    fin, opcode, (int)has_mask);
-+
-     if (opcode == QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE) {
-         /* disconnect */
-         return 0;
-@@ -746,6 +752,8 @@ static int qio_channel_websock_decode_header(QIOChannelWebsock *ioc,
-         return QIO_CHANNEL_ERR_BLOCK;
-     }
- 
-+    trace_qio_channel_websock_header_full_decode(
-+        ioc, header_size, ioc->payload_remain, ioc->mask.u);
-     buffer_advance(&ioc->encinput, header_size);
-     return 0;
- }
-@@ -791,6 +799,9 @@ static int qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
-         }
-     }
- 
-+    trace_qio_channel_websock_payload_decode(
-+        ioc, ioc->opcode, ioc->payload_remain);
-+
-     if (ioc->opcode == QIO_CHANNEL_WEBSOCK_OPCODE_BINARY_FRAME) {
-         if (payload_len) {
-             /* binary frames are passed on */
-@@ -803,7 +814,7 @@ static int qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
-         if (payload_len) {
-             /* echo client status */
-             qio_channel_websock_encode_buffer(
--                &ioc->encoutput, QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE,
-+                ioc, &ioc->encoutput, QIO_CHANNEL_WEBSOCK_OPCODE_CLOSE,
-                 &ioc->encinput);
-             qio_channel_websock_write_wire(ioc, NULL);
-             qio_channel_shutdown(ioc->master, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
-@@ -817,7 +828,8 @@ static int qio_channel_websock_decode_payload(QIOChannelWebsock *ioc,
-         /* ping frames produce an immediate reply */
-         buffer_reset(&ioc->ping_reply);
-         qio_channel_websock_encode_buffer(
--            &ioc->ping_reply, QIO_CHANNEL_WEBSOCK_OPCODE_PONG, &ioc->encinput);
-+            ioc, &ioc->ping_reply, QIO_CHANNEL_WEBSOCK_OPCODE_PONG,
-+            &ioc->encinput);
-     }   /* pong frames are ignored */
- 
-     if (payload_len) {
-@@ -1176,6 +1188,7 @@ static int qio_channel_websock_close(QIOChannel *ioc,
- {
-     QIOChannelWebsock *wioc = QIO_CHANNEL_WEBSOCK(ioc);
- 
-+    trace_qio_channel_websock_close(ioc);
-     return qio_channel_close(wioc->master, errp);
- }
- 
-diff --git a/io/trace-events b/io/trace-events
-index 6459f71f5b..801b5dcb61 100644
---- a/io/trace-events
-+++ b/io/trace-events
-@@ -48,6 +48,11 @@ qio_channel_websock_handshake_pending(void *ioc, int status) "Websock handshake
- qio_channel_websock_handshake_reply(void *ioc) "Websock handshake reply ioc=%p"
- qio_channel_websock_handshake_fail(void *ioc, const char *msg) "Websock handshake fail ioc=%p err=%s"
- qio_channel_websock_handshake_complete(void *ioc) "Websock handshake complete ioc=%p"
-+qio_channel_websock_header_partial_decode(void *ioc, size_t payloadlen, unsigned char fin, unsigned char opcode, unsigned char has_mask) "Websocket header decoded ioc=%p payload-len=%zu fin=0x%x opcode=0x%x has_mask=0x%x"
-+qio_channel_websock_header_full_decode(void *ioc, size_t headerlen, size_t payloadlen, uint32_t mask) "Websocket header decoded ioc=%p header-len=%zu payload-len=%zu mask=0x%x"
-+qio_channel_websock_payload_decode(void *ioc, uint8_t opcode, size_t payload_remain) "Websocket header decoded ioc=%p opcode=0x%x payload-remain=%zu"
-+qio_channel_websock_encode(void *ioc, uint8_t opcode, size_t payloadlen, size_t headerlen) "Websocket encoded ioc=%p opcode=0x%x header-len=%zu payload-len=%zu"
-+qio_channel_websock_close(void *ioc) "Websocket close ioc=%p"
- 
- # io/channel-command.c
- qio_channel_command_new_pid(void *ioc, int writefd, int readfd, int pid) "Command new pid ioc=%p writefd=%d readfd=%d pid=%d"
+Hmmm, then what did you have in mind then?
+
+When clear my backlog a bit, I'd give it a try.
+
+Thanks for the ideas and review.
+
+
+ps. this could make a semidecent kvm forum talk, could not it? :)
+
+> 
+> Paolo
+> 
+> 
+>> Changelog:
+>> v5:
+>> * removed "memory: Give memory_region_transaction_commit a hint" (broken)
+>> * added "memory: Avoid temporary FlatView allocation in a single child case"
+>> but I suggest ditching it, it is just there to demonsrate how I checked
+>> the suggested idea
+>> * updated example of "info mtree -f -d" in 14/18 to demonstrate the result
+>>
+>> v4:
+>> * total rework again to provide grounds for new 15/18, 17/18, 18/18
+>>
+>> v3:
+>> * addressed comments from v2, mainly simplified the code
+>>
+>> v2:
+>> * total rework
+>>
+>>
+>> This is based on sha1
+>> c51700273a Peter Maydell "Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20170919-v2' into staging".
+>>
+>> Please comment. Thanks.
+>>
+>>
+>>
+>> Alexey Kardashevskiy (18):
+>>   exec: Explicitly export target AS from
+>>     address_space_translate_internal
+>>   memory: Open code FlatView rendering
+>>   memory: Move FlatView allocation to a helper
+>>   memory: Move AddressSpaceDispatch from AddressSpace to FlatView
+>>   memory: Remove AddressSpace pointer from AddressSpaceDispatch
+>>   memory: Switch memory from using AddressSpace to FlatView
+>>   memory: Cleanup after switching to FlatView
+>>   memory: Rename mem_begin/mem_commit/mem_add helpers
+>>   memory: Store physical root MR in FlatView
+>>   memory: Alloc dispatch tree where topology is generared
+>>   memory: Move address_space_update_ioeventfds
+>>   memory: Share FlatView's and dispatch trees between address spaces
+>>   memory: Do not allocate FlatView in address_space_init
+>>   memory: Rework "info mtree" to print flat views and dispatch trees
+>>   memory: Share special empty FlatView
+>>   memory: Get rid of address_space_init_shareable
+>>   memory: Create FlatView directly
+>>   memory: Avoid temporary FlatView allocation in a single child case
+>>
+>>  include/exec/memory-internal.h |  16 +-
+>>  include/exec/memory.h          |  76 +++++-----
+>>  include/hw/arm/armv7m.h        |   2 +-
+>>  cpus.c                         |   5 +-
+>>  exec.c                         | 330 ++++++++++++++++++++++++----------------
+>>  hw/arm/armv7m.c                |   9 +-
+>>  hw/intc/openpic_kvm.c          |   2 +-
+>>  memory.c                       | 335 +++++++++++++++++++++++++++++++----------
+>>  monitor.c                      |   3 +-
+>>  target/arm/cpu.c               |  16 +-
+>>  target/i386/cpu.c              |   5 +-
+>>  hmp-commands-info.hx           |   7 +-
+>>  12 files changed, 533 insertions(+), 273 deletions(-)
+>>
+> 
+
+
 -- 
-2.13.5
+Alexey
