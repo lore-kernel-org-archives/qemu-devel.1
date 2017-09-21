@@ -1,20 +1,44 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:51290)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52284)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dv413-0005uJ-98
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:07:54 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dv44O-00079N-VU
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:11:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <stefanha@gmail.com>) id 1dv410-00014R-Hm
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:07:53 -0400
-Date: Thu, 21 Sep 2017 17:07:47 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-Message-ID: <20170921160747.GI32364@stefanha-x1.localdomain>
-References: <20170919102434.21147-1-pbonzini@redhat.com>
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dv44M-0004j0-8a
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:11:20 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:48290
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1dv44M-0004iE-3J
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:11:18 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8LG4UQM094056
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 12:11:13 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2d4e1h94c5-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 12:11:12 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 21 Sep 2017 17:11:11 +0100
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+References: <20170920172314.102710-1-pasic@linux.vnet.ibm.com>
+	<20170920172314.102710-2-pasic@linux.vnet.ibm.com>
+	<20170921111552.41167e80.cohuck@redhat.com>
+	<efa7f105-78c4-1ec0-dcf5-9b97678cd7e5@linux.vnet.ibm.com>
+	<20170921140506.42c5f7f6.cohuck@redhat.com>
+Date: Thu, 21 Sep 2017 18:11:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170919102434.21147-1-pbonzini@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/4] scsi,
- block: introduce persistent reservation managers
+In-Reply-To: <20170921140506.42c5f7f6.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Message-Id: <a426d7bc-c1c8-0eb5-0a31-464468010259@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/3270: IDA support for 3270 via
+ CcwDataStream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,74 +47,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-On Tue, Sep 19, 2017 at 12:24:30PM +0200, Paolo Bonzini wrote:
-> SCSI persistent Reservations allow restricting access to block devices
-> to specific initiators in a shared storage setup.  When implementing
-> clustering of virtual machines, it is a common requirement for virtual
-> machines to send persistent reservation SCSI commands.  However,
-> the operating system restricts sending these commands to unprivileged
-> programs because incorrect usage can disrupt regular operation of the
-> storage fabric.
+
+
+On 09/21/2017 02:05 PM, Cornelia Huck wrote:
+> On Thu, 21 Sep 2017 13:22:44 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 > 
-> With these patches, the scsi-block and scsi-generic SCSI passthrough
-> devices learn to delegate the implementation of persistent reservations to
-> a separate object, the "persistent reservation manager".  The persistent
-> reservation manager talks to a separate privileged program, with a very
-> simple protocol based on SCM_RIGHTS.  In addition to invoking PERSISTENT
-> RESERVATION OUT and PERSISTENT RESERVATION IN commands, the privileged
-> component can also use libmpathpersist so that persistent reservations
-> are applied to all paths in a multipath setting.
+>> On 09/21/2017 11:15 AM, Cornelia Huck wrote:
+>>>> +static inline CcwDataStream *get_cds(Terminal3270 *t)
+>>>> +{
+>>>> +    return &(CCW_DEVICE(&t->cdev)->sch->cds);
+>>>> +}
+>>>> +
+>>>> +static int read_payload_3270(EmulatedCcw3270Device *dev)
+>>>>  {
+>>>>      Terminal3270 *t = TERMINAL_3270(dev);
+>>>>      int len;
+>>>>  
+>>>> -    len = MIN(count, t->in_len);
+>>>> -    cpu_physical_memory_write(cda, t->inv, len);
+>>>> +    len = MIN(ccw_dstream_avail(get_cds(t)), t->in_len);
+>>>> +    ccw_dstream_write_buf(get_cds(t), t->inv, len);  
+>>> CCW_DEVICE() as called by get_cds() goes through qom, which implies a
+>>> bit of overhead. Not sure if it makes sense to cache it in this
+>>> function so you don't go through it multiple times. (Dito for the other
+>>> callback.)
+>>>   
+>>
+>> I've cargo-culted this way of getting CCW_DEVICE(&t->cdev) to the CcwDevice
+>> form terminal_read (the pattern used at multiple places in the file). As
+>> far as I can tell, the overhead basically depends on CONFIG_QOM_CAST_DEBUG.
+>>
+>> I have no idea what do we have in production, but my guess is, that
+>> ONFIG_QOM_CAST_DEBUG makes only sense for development and testing
+>> (especially if proper test coverage is assumed).
+>> Can you enlighten me?
+>>
+>> CCW_DEVICE() may contain a run-time check (depending on CONFIG_QOM_CAST_DEBUG),
+>> we however can make sure things are OK at compile time. This brings
+>> me to the next question. Does it even make sense to use OBJECT_CHECK based
+>> constructs when going from specific to general (we don't actually need a
+>> cast here)? Obviously, for the other direction we really need a cast, so doing
+>> a run-time check there does indeed provide added value.
 > 
-> Patch 1 defines the abstract QOM class and plugs it into block/file-posix.c.
-> 
-> Patch 2 and 3 introduce the privileged helper program, while patch 4
-> defines the concrete QOM class that talks to it.
-> 
-> Paolo
-> 
-> v1->v2: removed scsi/ patches which were all reviewed
->         removed man page (requires .texi while I used .rst for docs)
->         qio_channel_read/write_all also went in independently
->         fix installation of qemu-pr-helper man page
->         fixes to documentation
->         added BSD license to protocol header
->         added handling of residual (buffer underrun)
->         fixed closing of file descriptors on error
->         block PERSISTENT RESERVE OUT for read-only file descriptors
->         do not use g_assert
->         use EXIT_SUCCESS/EXIT_FAILURE consistently
->         moved all CONFIG_MPATH usage to the right patch
->         drop CAP_SYS_ADMIN if multipath not compiled in
->         simplify buffer size handling in multipath PERSISTENT RESERVE IN
->         block REGISTER AND MOVE operation for multipath PERSISTENT RESERVE OUT
->         fixed transport id handling in multipath PERSISTENT RESERVE OUT
->         fixed string property double-free in pr-manager-helper
->         fixed/cleaned up error handling in pr-manager-helper
->         
-> Paolo Bonzini (9):
->   scsi, file-posix: add support for persistent reservation management
->   scsi: build qemu-pr-helper
->   scsi: add multipath support to qemu-pr-helper
->   scsi: add persistent reservation manager using qemu-pr-helper
-> 
->  Makefile                   |   14 +-
->  configure                  |   59 ++-
->  docs/interop/pr-helper.rst |   83 ++++
->  docs/pr-manager.rst        |   60 +++
->  include/scsi/utils.h       |    4 +
->  scsi/Makefile.objs         |    2 +-
->  scsi/pr-helper.h           |   41 ++
->  scsi/pr-manager-helper.c   |  302 +++++++++++++
->  scsi/qemu-pr-helper.c      | 1038 ++++++++++++++++++++++++++++++++++++++++++++
->  scsi/utils.c               |   10 +
->  10 files changed, 1607 insertions(+), 6 deletions(-)
-> 
-> -- 
-> 2.13.5
-> 
+> The basic rule seems to be "use a qom cast, unless you are on a fast
+> path" - even though qom debug makes the most sense while developing.
 > 
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Does this imply "don't use qom cast on fast path"? I guess that would
+mean that we basically expect production builds being with CONFIG_QOM_CAST_DEBUG
+defined.
+
+> But let's not turn that into a big discussion: It's probably not really
+> worth optimizing here.
+>
+
+I agree about the optimization. OTOH I do believe establishing best
+practices is important. I'm afraid, I'm seeing much 'more monkey see
+monkey do' than healthy (in such an environment prior art is even
+more important). I believe, understanding a best practice (candidate)
+should always be a part of establishing a best practice. 
+
+Sorry, I may be inappropriate (you requested to not turn this into
+a big discussion, and I'm afraid this goes in that direction). If
+I'm please ignore the stuff above this line.
+
+So, there is nothing to be addressed about about this series so far.
+Does this mean good for inclusion once prerequisites are met -- unless
+somebody finds something?
+
+Regards,
+Halil
+ 
