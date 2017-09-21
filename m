@@ -1,28 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56439)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dv2mu-0003S1-0F
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:49:12 -0400
+	(envelope-from <famz@redhat.com>) id 1dv2xK-0005XH-2n
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:00:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <alex.bennee@linaro.org>) id 1dv2mq-0005op-1d
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:49:12 -0400
-Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:53174)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <alex.bennee@linaro.org>)
-	id 1dv2mp-0005oI-RQ
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:49:07 -0400
-Received: by mail-wr0-x22b.google.com with SMTP id c23so4762295wrg.9
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 07:49:07 -0700 (PDT)
-References: <20170919150313.10833-1-richard.henderson@linaro.org>
-	<20170919150313.10833-6-richard.henderson@linaro.org>
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-In-reply-to: <20170919150313.10833-6-richard.henderson@linaro.org>
-Date: Thu, 21 Sep 2017 15:49:09 +0100
-Message-ID: <87efr0cdju.fsf@linaro.org>
+	(envelope-from <famz@redhat.com>) id 1dv2xJ-0005n8-4I
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 10:59:58 -0400
+Date: Thu, 21 Sep 2017 22:59:43 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170921145943.GA28064@lemon.lan>
+References: <20170913181910.29688-1-mreitz@redhat.com>
+	<20170913181910.29688-18-mreitz@redhat.com>
+	<20170918064613.GG15551@lemon.lan>
+	<87b2b2f4-ecc0-3436-a5af-6d2c9d858b8f@redhat.com>
+	<20170919080311.GC11534@lemon.lan>
+	<7a0de5bd-5e1e-856b-e2f3-29b1baad7cf2@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Qemu-devel] [PATCH v2 5/8] i386: Support Capstone in
- disas_set_info
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7a0de5bd-5e1e-856b-e2f3-29b1baad7cf2@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH 17/18] qemu-io: Add background write
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,65 +27,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org
+To: Max Reitz <mreitz@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 
+On Thu, 09/21 16:40, Max Reitz wrote:
+> On 2017-09-19 10:03, Fam Zheng wrote:
+> > On Mon, 09/18 19:53, Max Reitz wrote:
+> >> On 2017-09-18 08:46, Fam Zheng wrote:
+> >>> On Wed, 09/13 20:19, Max Reitz wrote:
+> >>>> Add a new parameter -B to qemu-io's write command.  When used, qemu-io
+> >>>> will not wait for the result of the operation and instead execute it in
+> >>>> the background.
+> >>>
+> >>> Cannot aio_write be used for this purpose?
+> >>
+> >> Depends.  I have been trained to dislike *_aio_*, so that's probably the
+> >> initial reason why I didn't use it.
+> >>
+> >> Second, I'd have to fix aio_write before it can be used.  Currently,
+> >> this aborts:
+> >>
+> >> echo 'qemu-io drv0 "aio_write -P 0x11 0 64M"' \
+> >>     | x86_64-softmmu/qemu-system-x86_64 -monitor stdio \
+> >>           -blockdev node-name=drv0,driver=null-co
+> >>
+> >> because aio_write_done thinks it's a good idea to use qemu-io's
+> >> BlockBackend -- but when qemu-io is executed through the HMP, the
+> >> BlockBackend is only created for the duration of the qemu-io command
+> >> (unless there already is a BB).  So what I'd have to do is add a
+> >> blk_ref()/blk_unref() there, but for some reason I really don't like that.
+> > 
+> > What is the reason? If it crashes it should be fixed anyway, I assume?
+> 
+> Because the AIO CB (aio_write_done()) continues to use qemu-io's BB --
+> but in case of HMP's qemu-io, that is pretty much already gone once the
+> command is done.
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+I can see aio_{read,write}_done accesses BB for accounting, we can probably skip
+this part altogether if issued from HMP (because the BB is gone). This way you
+don't need the blk_ref/unref pair.
 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Fam
 
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-> ---
->  disas.c           | 4 ++++
->  target/i386/cpu.c | 7 +++++++
->  2 files changed, 11 insertions(+)
->
-> diff --git a/disas.c b/disas.c
-> index 4dbb492219..42fae735ee 100644
-> --- a/disas.c
-> +++ b/disas.c
-> @@ -439,9 +439,13 @@ void disas(FILE *out, void *code, unsigned long size)
->  #elif defined(__i386__)
->      s.info.mach = bfd_mach_i386_i386;
->      print_insn = print_insn_i386;
-> +    s.info.cap_arch = CS_ARCH_X86;
-> +    s.info.cap_mode = CS_MODE_32;
->  #elif defined(__x86_64__)
->      s.info.mach = bfd_mach_x86_64;
->      print_insn = print_insn_i386;
-> +    s.info.cap_arch = CS_ARCH_X86;
-> +    s.info.cap_mode = CS_MODE_64;
->  #elif defined(_ARCH_PPC)
->      s.info.disassembler_options = (char *)"any";
->      print_insn = print_insn_ppc;
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index b869a69c53..c3980b3864 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -51,6 +51,8 @@
->  #include "hw/i386/apic_internal.h"
->  #endif
->
-> +#include "disas/capstone.h"
-> +
->
->  /* Cache topology CPUID constants: */
->
-> @@ -4108,6 +4110,11 @@ static void x86_disas_set_info(CPUState *cs, disassemble_info *info)
->                    : env->hflags & HF_CS32_MASK ? bfd_mach_i386_i386
->                    : bfd_mach_i386_i8086);
->      info->print_insn = print_insn_i386;
-> +
-> +    info->cap_arch = CS_ARCH_X86;
-> +    info->cap_mode = (env->hflags & HF_CS64_MASK ? CS_MODE_64
-> +                      : env->hflags & HF_CS32_MASK ? CS_MODE_32
-> +                      : CS_MODE_16);
->  }
->
->  static Property x86_cpu_properties[] = {
-
-
---
-Alex Bennée
+> 
+> That could be fixed, as I said, by blk_ref()ing the BB before aio_write
+> returns (and then blk_unref()ing it in aio_write_done()).  However, I'm
+> not even sure whether aio_write_done() is always executed in the main
+> thread...
+> 
+> Other than that, I just have a bad feeling about adding the pair, not
+> sure why.  Probably because it means having to carry a temporary BB
+> around until the command is done, which is weird.  Well, it's not an
+> issue permission-wise, because the qemu-io BB simply doesn't take the
+> proper permissions (no, I'm not going to question the fact how it's then
+> possible to even write to it, considering we have assertions that check
+> whether the correct permissions have been taken...), and I can't think
+> of another way.
+> 
+> In any case, you're right, it probably needs to be fixed anyway -- even
+> if the fix is just not allowing aio_write with a temporary BB (i.e. from
+> HMP).
+> 
+> Max
+> 
