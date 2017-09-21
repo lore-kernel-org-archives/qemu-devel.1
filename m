@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49988)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50087)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dv10k-0005BE-2G
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:55:23 -0400
+	(envelope-from <tgolembi@redhat.com>) id 1dv11D-0005Ok-80
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:55:52 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dv10e-0006fr-4N
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:55:22 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58418)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dv10d-0006ey-VO
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:55:16 -0400
-Date: Thu, 21 Sep 2017 20:55:11 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170921125511.GD13703@lemon.lan>
-References: <CAATJJ0KLaR6VUrPZZSQxwb6niF5YY0UMB5sWDq9b=OeeC5=1Xw@mail.gmail.com>
-	<20170921123320.GG32364@stefanha-x1.localdomain>
-	<20170921124317.GB15693@redhat.com>
+	(envelope-from <tgolembi@redhat.com>) id 1dv117-00075M-NK
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:55:51 -0400
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:49316)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <tgolembi@redhat.com>) id 1dv117-00074x-El
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:55:45 -0400
+Received: by mail-wm0-f53.google.com with SMTP id r74so1542228wme.4
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 05:55:45 -0700 (PDT)
+From: =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
+Date: Thu, 21 Sep 2017 14:55:40 +0200
+Message-Id: <cover.1505998455.git.tgolembi@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170921124317.GB15693@redhat.com>
-Subject: Re: [Qemu-devel] need to resurrect no-lock option?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v2 0/1] linux: Buffers/caches in VirtIO Balloon
+ driver stats
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,46 +27,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Daniel P. Berrange" <berrange@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@gmail.com>, qemu-devel <qemu-devel@nongnu.org>, Christian Ehrhardt <christian.ehrhardt@canonical.com>
+To: linux-mm@kvack.org, virtualization@lists.linux-foundation.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, virtio-dev@lists.oasis-open.org
+Cc: Wei Wang <wei.w.wang@intel.com>, Shaohua Li <shli@fb.com>, Huang Ying <ying.huang@intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, =?UTF-8?q?Tom=C3=A1=C5=A1=20Golembiovsk=C3=BD?= <tgolembi@redhat.com>
 
-On Thu, 09/21 13:43, Daniel P. Berrange wrote:
-> On Thu, Sep 21, 2017 at 01:33:20PM +0100, Stefan Hajnoczi wrote:
-> > On Wed, Sep 20, 2017 at 11:26:11AM +0200, Christian Ehrhardt wrote:
-> > > Hi,
-> > > this might have been discussed in the wake of the lock changes that took
-> > > place in 2.10 but I can't find anything clear enough to follow in the
-> > > current case.
-> > > There was an old submission [1] by Fam to make it possible to no-lock
-> > > qemu-img and others if needed. But it seems nothing like it made it along
-> > > to the locking we have in 2.10.
-> > > 
-> > > One (maybe more) case where missing this causes pain is e.g. running an
-> > > info check on a running guest.
-> > > In general info shouldn't need a write lock anyway, but without --no-lock
-> > > that use case is broken.
-> > 
-> > It's still an invalid use case.  There is no guarantee that qemu-img
-> > will see a consistent version of the image file.  Metadata could change
-> > underneath qemu-img because QEMU may still write to it.  QEMU may also
-> > have some metadata cached so there's no guarantee that qemu-img sees an
-> > up-to-date image.
-> > 
-> > Why do you need to run qemu-img on a disk image that is in use?
-> 
-> You have a directory full of images and you want to understand current usage
-> vs potential future usage. For this you need to get the virtual size, which
-> rquires 'qemu-img info' for non-raw files. Actually it would be even better
-> served by the new 'measure' command recently added.
-> 
-> The job analyzing this directory of images may not have any context as to
-> whether each file is in use by a running QEMU, so would just blindly call
-> 'qemu-img info' on each file it finds.  There's of course potential that
-> opening the image in 'qemu-img info' could hit problems if the running QEMU
-> changed qcow2 metadata, but generally that would not have serious negative
-> impact and would be self-correcting next time the job analysed the directory.
+Linux driver part
 
-Probably it's helpful to add a hint about "--force-share" the in the error
-message of "qemu-img info" when hitting an image lock failure?
+v2:
+- fixed typos
 
-Fam
+Tomáš Golembiovský (1):
+  virtio_balloon: include buffers and cached memory statistics
+
+ drivers/virtio/virtio_balloon.c     | 11 +++++++++++
+ include/uapi/linux/virtio_balloon.h |  4 +++-
+ mm/swap_state.c                     |  1 +
+ 3 files changed, 15 insertions(+), 1 deletion(-)
+
+-- 
+2.14.1
