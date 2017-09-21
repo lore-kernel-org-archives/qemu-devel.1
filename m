@@ -1,24 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60251)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60241)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XN-00034x-ME
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XN-00034f-C1
 	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:20 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XL-00030A-Ne
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XL-0002yt-Ex
 	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:17 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37494)
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37496)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dv4XL-0002Bq-GC
+	id 1dv4XL-0002la-4N
 	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:15 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XK-000598-6q
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:41:14 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XF-00056G-Jd
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:41:09 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Sep 2017 17:41:25 +0100
-Message-Id: <1506012099-13605-18-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 21 Sep 2017 17:41:18 +0100
+Message-Id: <1506012099-13605-11-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1506012099-13605-1-git-send-email-peter.maydell@linaro.org>
 References: <1506012099-13605-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 17/31] nvic: Make ICSR banked for v8M
+Subject: [Qemu-devel] [PULL 10/31] nvic: Make SHPR registers banked
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,92 +29,172 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-The ICSR NVIC register is banked for v8M. This doesn't
-require any new state, but it does mean that some bits
-are controlled by BFHNFNMINS and some bits must work
-with the correct banked exception. There is also a new
-in v8M PENDNMICLR bit.
+Make the set_prio() function take a bool indicating
+whether to pend the secure or non-secure version of a banked
+interrupt, and use this to implement the correct banking
+semantics for the SHPR registers.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1505240046-11454-18-git-send-email-peter.maydell@linaro.org
+Message-id: 1505240046-11454-11-git-send-email-peter.maydell@linaro.org
 ---
- hw/intc/armv7m_nvic.c | 45 ++++++++++++++++++++++++++++++++-------------
- 1 file changed, 32 insertions(+), 13 deletions(-)
+ hw/intc/armv7m_nvic.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ hw/intc/trace-events  |  2 +-
+ 2 files changed, 88 insertions(+), 10 deletions(-)
 
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 1aa925b..284521f 100644
+index 1694c1e..6831ec5 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -703,7 +703,7 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
+@@ -349,15 +349,40 @@ int armv7m_nvic_raw_execution_priority(void *opaque)
+     return s->exception_prio;
+ }
+ 
+-/* caller must call nvic_irq_update() after this */
+-static void set_prio(NVICState *s, unsigned irq, uint8_t prio)
++/* caller must call nvic_irq_update() after this.
++ * secure indicates the bank to use for banked exceptions (we assert if
++ * we are passed secure=true for a non-banked exception).
++ */
++static void set_prio(NVICState *s, unsigned irq, bool secure, uint8_t prio)
+ {
+     assert(irq > ARMV7M_EXCP_NMI); /* only use for configurable prios */
+     assert(irq < s->num_irq);
+ 
+-    s->vectors[irq].prio = prio;
++    if (secure) {
++        assert(exc_is_banked(irq));
++        s->sec_vectors[irq].prio = prio;
++    } else {
++        s->vectors[irq].prio = prio;
++    }
++
++    trace_nvic_set_prio(irq, secure, prio);
++}
++
++/* Return the current raw priority register value.
++ * secure indicates the bank to use for banked exceptions (we assert if
++ * we are passed secure=true for a non-banked exception).
++ */
++static int get_prio(NVICState *s, unsigned irq, bool secure)
++{
++    assert(irq > ARMV7M_EXCP_NMI); /* only use for configurable prios */
++    assert(irq < s->num_irq);
+ 
+-    trace_nvic_set_prio(irq, prio);
++    if (secure) {
++        assert(exc_is_banked(irq));
++        return s->sec_vectors[irq].prio;
++    } else {
++        return s->vectors[irq].prio;
++    }
+ }
+ 
+ /* Recompute state and assert irq line accordingly.
+@@ -1149,6 +1174,47 @@ static bool nvic_user_access_ok(NVICState *s, hwaddr offset, MemTxAttrs attrs)
      }
-     case 0xd00: /* CPUID Base.  */
-         return cpu->midr;
--    case 0xd04: /* Interrupt Control State.  */
-+    case 0xd04: /* Interrupt Control State (ICSR) */
-         /* VECTACTIVE */
-         val = cpu->env.v7m.exception;
-         /* VECTPENDING */
-@@ -716,19 +716,32 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-         if (nvic_rettobase(s)) {
-             val |= (1 << 11);
+ }
+ 
++static int shpr_bank(NVICState *s, int exc, MemTxAttrs attrs)
++{
++    /* Behaviour for the SHPR register field for this exception:
++     * return M_REG_NS to use the nonsecure vector (including for
++     * non-banked exceptions), M_REG_S for the secure version of
++     * a banked exception, and -1 if this field should RAZ/WI.
++     */
++    switch (exc) {
++    case ARMV7M_EXCP_MEM:
++    case ARMV7M_EXCP_USAGE:
++    case ARMV7M_EXCP_SVC:
++    case ARMV7M_EXCP_PENDSV:
++    case ARMV7M_EXCP_SYSTICK:
++        /* Banked exceptions */
++        return attrs.secure;
++    case ARMV7M_EXCP_BUS:
++        /* Not banked, RAZ/WI from nonsecure if BFHFNMINS is zero */
++        if (!attrs.secure &&
++            !(s->cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK)) {
++            return -1;
++        }
++        return M_REG_NS;
++    case ARMV7M_EXCP_SECURE:
++        /* Not banked, RAZ/WI from nonsecure */
++        if (!attrs.secure) {
++            return -1;
++        }
++        return M_REG_NS;
++    case ARMV7M_EXCP_DEBUG:
++        /* Not banked. TODO should RAZ/WI if DEMCR.SDME is set */
++        return M_REG_NS;
++    case 8 ... 10:
++    case 13:
++        /* RES0 */
++        return -1;
++    default:
++        /* Not reachable due to decode of SHPR register addresses */
++        g_assert_not_reached();
++    }
++}
++
+ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
+                                     uint64_t *data, unsigned size,
+                                     MemTxAttrs attrs)
+@@ -1213,10 +1279,16 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
+             }
          }
--        /* PENDSTSET */
--        if (s->vectors[ARMV7M_EXCP_SYSTICK].pending) {
--            val |= (1 << 26);
--        }
--        /* PENDSVSET */
--        if (s->vectors[ARMV7M_EXCP_PENDSV].pending) {
--            val |= (1 << 28);
-+        if (attrs.secure) {
-+            /* PENDSTSET */
-+            if (s->sec_vectors[ARMV7M_EXCP_SYSTICK].pending) {
-+                val |= (1 << 26);
-+            }
-+            /* PENDSVSET */
-+            if (s->sec_vectors[ARMV7M_EXCP_PENDSV].pending) {
-+                val |= (1 << 28);
-+            }
-+        } else {
-+            /* PENDSTSET */
-+            if (s->vectors[ARMV7M_EXCP_SYSTICK].pending) {
-+                val |= (1 << 26);
-+            }
-+            /* PENDSVSET */
-+            if (s->vectors[ARMV7M_EXCP_PENDSV].pending) {
-+                val |= (1 << 28);
-+            }
-         }
-         /* NMIPENDSET */
--        if (s->vectors[ARMV7M_EXCP_NMI].pending) {
-+        if ((cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK) &&
-+            s->vectors[ARMV7M_EXCP_NMI].pending) {
-             val |= (1 << 31);
-         }
--        /* ISRPREEMPT not implemented */
-+        /* ISRPREEMPT: RES0 when halting debug not implemented */
-+        /* STTNS: RES0 for the Main Extension */
-         return val;
-     case 0xd08: /* Vector Table Offset.  */
-         return cpu->env.v7m.vecbase[attrs.secure];
-@@ -953,9 +966,15 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-         nvic_irq_update(s);
          break;
-     }
--    case 0xd04: /* Interrupt Control State.  */
--        if (value & (1 << 31)) {
--            armv7m_nvic_set_pending(s, ARMV7M_EXCP_NMI, false);
-+    case 0xd04: /* Interrupt Control State (ICSR) */
-+        if (cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK) {
-+            if (value & (1 << 31)) {
-+                armv7m_nvic_set_pending(s, ARMV7M_EXCP_NMI, false);
-+            } else if (value & (1 << 30) &&
-+                       arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-+                /* PENDNMICLR didn't exist in v7M */
-+                armv7m_nvic_clear_pending(s, ARMV7M_EXCP_NMI, false);
+-    case 0xd18 ... 0xd23: /* System Handler Priority.  */
++    case 0xd18 ... 0xd23: /* System Handler Priority (SHPR1, SHPR2, SHPR3) */
+         val = 0;
+         for (i = 0; i < size; i++) {
+-            val |= s->vectors[(offset - 0xd14) + i].prio << (i * 8);
++            unsigned hdlidx = (offset - 0xd14) + i;
++            int sbank = shpr_bank(s, hdlidx, attrs);
++
++            if (sbank < 0) {
++                continue;
 +            }
++            val = deposit32(val, i * 8, 8, get_prio(s, hdlidx, sbank));
          }
-         if (value & (1 << 28)) {
-             armv7m_nvic_set_pending(s, ARMV7M_EXCP_PENDSV, attrs.secure);
+         break;
+     case 0xfe0 ... 0xfff: /* ID.  */
+@@ -1299,15 +1371,21 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
+ 
+         for (i = 0; i < size && startvec + i < s->num_irq; i++) {
+             if (attrs.secure || s->itns[startvec + i]) {
+-                set_prio(s, startvec + i, (value >> (i * 8)) & 0xff);
++                set_prio(s, startvec + i, false, (value >> (i * 8)) & 0xff);
+             }
+         }
+         nvic_irq_update(s);
+         return MEMTX_OK;
+-    case 0xd18 ... 0xd23: /* System Handler Priority.  */
++    case 0xd18 ... 0xd23: /* System Handler Priority (SHPR1, SHPR2, SHPR3) */
+         for (i = 0; i < size; i++) {
+             unsigned hdlidx = (offset - 0xd14) + i;
+-            set_prio(s, hdlidx, (value >> (i * 8)) & 0xff);
++            int newprio = extract32(value, i * 8, 8);
++            int sbank = shpr_bank(s, hdlidx, attrs);
++
++            if (sbank < 0) {
++                continue;
++            }
++            set_prio(s, hdlidx, sbank, newprio);
+         }
+         nvic_irq_update(s);
+         return MEMTX_OK;
+diff --git a/hw/intc/trace-events b/hw/intc/trace-events
+index 94038b6..29bd308 100644
+--- a/hw/intc/trace-events
++++ b/hw/intc/trace-events
+@@ -169,7 +169,7 @@ gicv3_redist_send_sgi(uint32_t cpu, int irq) "GICv3 redistributor 0x%x pending S
+ # hw/intc/armv7m_nvic.c
+ nvic_recompute_state(int vectpending, int vectpending_prio, int exception_prio) "NVIC state recomputed: vectpending %d vectpending_prio %d exception_prio %d"
+ nvic_recompute_state_secure(int vectpending, bool vectpending_is_s_banked, int vectpending_prio, int exception_prio) "NVIC state recomputed: vectpending %d is_s_banked %d vectpending_prio %d exception_prio %d"
+-nvic_set_prio(int irq, uint8_t prio) "NVIC set irq %d priority %d"
++nvic_set_prio(int irq, bool secure, uint8_t prio) "NVIC set irq %d secure-bank %d priority %d"
+ nvic_irq_update(int vectpending, int pendprio, int exception_prio, int level) "NVIC vectpending %d pending prio %d exception_prio %d: setting irq line to %d"
+ nvic_escalate_prio(int irq, int irqprio, int runprio) "NVIC escalating irq %d to HardFault: insufficient priority %d >= %d"
+ nvic_escalate_disabled(int irq) "NVIC escalating irq %d to HardFault: disabled"
 -- 
 2.7.4
