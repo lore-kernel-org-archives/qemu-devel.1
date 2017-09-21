@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:37155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37203)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dvAiB-0004Yh-4l
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 19:16:52 -0400
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dvAiD-0004bN-Pp
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 19:16:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <paolo.bonzini@gmail.com>) id 1dvAiA-0003tX-7E
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 19:16:51 -0400
-Received: from mail-wm0-x243.google.com ([2a00:1450:400c:c09::243]:35971)
+	(envelope-from <paolo.bonzini@gmail.com>) id 1dvAiC-0003zE-MP
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 19:16:53 -0400
+Received: from mail-wr0-x241.google.com ([2a00:1450:400c:c0c::241]:35840)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
 	(Exim 4.71) (envelope-from <paolo.bonzini@gmail.com>)
-	id 1dvAiA-0003rX-0W
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 19:16:50 -0400
-Received: by mail-wm0-x243.google.com with SMTP id r136so6436924wmf.3
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 16:16:49 -0700 (PDT)
-Received: from 640k.lan (dynamic-adsl-78-12-246-117.clienti.tiscali.it.
-	[78.12.246.117]) by smtp.gmail.com with ESMTPSA id
-	u186sm2596278wmd.19.2017.09.21.16.16.47 for <qemu-devel@nongnu.org>
-	(version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-	Thu, 21 Sep 2017 16:16:47 -0700 (PDT)
+	id 1dvAiC-0003xV-GQ
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 19:16:52 -0400
+Received: by mail-wr0-x241.google.com with SMTP id g50so3841848wra.3
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 16:16:52 -0700 (PDT)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 22 Sep 2017 01:16:12 +0200
-Message-Id: <1506035800-30509-5-git-send-email-pbonzini@redhat.com>
+Date: Fri, 22 Sep 2017 01:16:14 +0200
+Message-Id: <1506035800-30509-7-git-send-email-pbonzini@redhat.com>
 In-Reply-To: <1506035800-30509-1-git-send-email-pbonzini@redhat.com>
 References: <1506035800-30509-1-git-send-email-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PULL 04/32] atomic: update documentation
+Subject: [Qemu-devel] [PULL 06/32] exec: Explicitly export target AS from
+ address_space_translate_internal
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,39 +29,71 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
+Cc: Alexey Kardashevskiy <aik@ozlabs.ru>
 
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+
+This adds an AS** parameter to address_space_do_translate()
+to make it easier for the next patch to share FlatViews.
+
+This should cause no behavioural change.
+
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+Message-Id: <20170921085110.25598-2-aik@ozlabs.ru>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- docs/devel/atomics.txt | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ exec.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/docs/devel/atomics.txt b/docs/devel/atomics.txt
-index 3ef5d85..048e5f2 100644
---- a/docs/devel/atomics.txt
-+++ b/docs/devel/atomics.txt
-@@ -63,11 +63,22 @@ operations:
-     typeof(*ptr) atomic_fetch_sub(ptr, val)
-     typeof(*ptr) atomic_fetch_and(ptr, val)
-     typeof(*ptr) atomic_fetch_or(ptr, val)
-+    typeof(*ptr) atomic_fetch_xor(ptr, val)
-     typeof(*ptr) atomic_xchg(ptr, val)
-     typeof(*ptr) atomic_cmpxchg(ptr, old, new)
+diff --git a/exec.c b/exec.c
+index a25a4c6..fd8994b 100644
+--- a/exec.c
++++ b/exec.c
+@@ -476,7 +476,8 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
+                                                       hwaddr *xlat,
+                                                       hwaddr *plen,
+                                                       bool is_write,
+-                                                      bool is_mmio)
++                                                      bool is_mmio,
++                                                      AddressSpace **target_as)
+ {
+     IOMMUTLBEntry iotlb;
+     MemoryRegionSection *section;
+@@ -503,6 +504,7 @@ static MemoryRegionSection address_space_do_translate(AddressSpace *as,
+         }
  
- all of which return the old value of *ptr.  These operations are
--polymorphic; they operate on any type that is as wide as an int.
-+polymorphic; they operate on any type that is as wide as a pointer.
-+
-+Similar operations return the new value of *ptr:
-+
-+    typeof(*ptr) atomic_inc_fetch(ptr)
-+    typeof(*ptr) atomic_dec_fetch(ptr)
-+    typeof(*ptr) atomic_add_fetch(ptr, val)
-+    typeof(*ptr) atomic_sub_fetch(ptr, val)
-+    typeof(*ptr) atomic_and_fetch(ptr, val)
-+    typeof(*ptr) atomic_or_fetch(ptr, val)
-+    typeof(*ptr) atomic_xor_fetch(ptr, val)
+         as = iotlb.target_as;
++        *target_as = iotlb.target_as;
+     }
  
- Sequentially consistent loads and stores can be done using:
+     *xlat = addr;
+@@ -525,7 +527,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
  
+     /* This can never be MMIO. */
+     section = address_space_do_translate(as, addr, &xlat, &plen,
+-                                         is_write, false);
++                                         is_write, false, &as);
+ 
+     /* Illegal translation */
+     if (section.mr == &io_mem_unassigned) {
+@@ -548,7 +550,7 @@ IOMMUTLBEntry address_space_get_iotlb_entry(AddressSpace *as, hwaddr addr,
+     plen -= 1;
+ 
+     return (IOMMUTLBEntry) {
+-        .target_as = section.address_space,
++        .target_as = as,
+         .iova = addr & ~plen,
+         .translated_addr = xlat & ~plen,
+         .addr_mask = plen,
+@@ -569,7 +571,8 @@ MemoryRegion *address_space_translate(AddressSpace *as, hwaddr addr,
+     MemoryRegionSection section;
+ 
+     /* This can be MMIO, so setup MMIO bit. */
+-    section = address_space_do_translate(as, addr, xlat, plen, is_write, true);
++    section = address_space_do_translate(as, addr, xlat, plen, is_write, true,
++                                         &as);
+     mr = section.mr;
+ 
+     if (xen_enabled() && memory_access_is_direct(mr, is_write)) {
 -- 
 1.8.3.1
