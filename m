@@ -1,27 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60502)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60533)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XX-0003F8-7E
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:28 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XY-0003Gy-KW
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XV-0003ZO-N4
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:27 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37512)
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XW-0003ba-64
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:28 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37510)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dv4XV-0003Vo-EV
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:25 -0400
+	id 1dv4XV-0003Oh-Qr
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:26 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XU-0005GG-2i
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:41:24 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XT-0005Fn-F8
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:41:23 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Sep 2017 17:41:39 +0100
-Message-Id: <1506012099-13605-32-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 21 Sep 2017 17:41:38 +0100
+Message-Id: <1506012099-13605-31-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1506012099-13605-1-git-send-email-peter.maydell@linaro.org>
 References: <1506012099-13605-1-git-send-email-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PULL 31/31] msf2: Add Emcraft's Smartfusion2 SOM kit
+Subject: [Qemu-devel] [PULL 30/31] msf2: Add Smartfusion2 SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -34,38 +34,115 @@ To: qemu-devel@nongnu.org
 
 From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
-Emulated Emcraft's Smartfusion2 System On Module starter
-kit.
+Smartfusion2 SoC has hardened Microcontroller subsystem
+and flash based FPGA fabric. This patch adds support for
+Microcontroller subsystem in the SoC.
 
 Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20170920201737.25723-6-f4bug@amsat.org
-[PMD: drop cpu_model to directly use cpu type]
+Message-id: 20170920201737.25723-5-f4bug@amsat.org
+[PMD: drop cpu_model to directly use cpu type, check m3clk non null]
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/arm/Makefile.objs |   2 +-
- hw/arm/msf2-som.c    | 105 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 106 insertions(+), 1 deletion(-)
- create mode 100644 hw/arm/msf2-som.c
+ hw/arm/Makefile.objs            |   1 +
+ include/hw/arm/msf2-soc.h       |  67 +++++++++++
+ hw/arm/msf2-soc.c               | 238 ++++++++++++++++++++++++++++++++++++++++
+ default-configs/arm-softmmu.mak |   1 +
+ 4 files changed, 307 insertions(+)
+ create mode 100644 include/hw/arm/msf2-soc.h
+ create mode 100644 hw/arm/msf2-soc.c
 
 diff --git a/hw/arm/Makefile.objs b/hw/arm/Makefile.objs
-index a6cf24f..2794e08 100644
+index 5ee6f7d..a6cf24f 100644
 --- a/hw/arm/Makefile.objs
 +++ b/hw/arm/Makefile.objs
-@@ -19,4 +19,4 @@ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
+@@ -19,3 +19,4 @@ obj-$(CONFIG_FSL_IMX31) += fsl-imx31.o kzm.o
  obj-$(CONFIG_FSL_IMX6) += fsl-imx6.o sabrelite.o
  obj-$(CONFIG_ASPEED_SOC) += aspeed_soc.o aspeed.o
  obj-$(CONFIG_MPS2) += mps2.o
--obj-$(CONFIG_MSF2) += msf2-soc.o
-+obj-$(CONFIG_MSF2) += msf2-soc.o msf2-som.o
-diff --git a/hw/arm/msf2-som.c b/hw/arm/msf2-som.c
++obj-$(CONFIG_MSF2) += msf2-soc.o
+diff --git a/include/hw/arm/msf2-soc.h b/include/hw/arm/msf2-soc.h
 new file mode 100644
-index 0000000..0795a3a
+index 0000000..3cfe5c7
 --- /dev/null
-+++ b/hw/arm/msf2-som.c
-@@ -0,0 +1,105 @@
++++ b/include/hw/arm/msf2-soc.h
+@@ -0,0 +1,67 @@
 +/*
-+ * SmartFusion2 SOM starter kit(from Emcraft) emulation.
++ * Microsemi Smartfusion2 SoC
++ *
++ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef HW_ARM_MSF2_SOC_H
++#define HW_ARM_MSF2_SOC_H
++
++#include "hw/arm/armv7m.h"
++#include "hw/timer/mss-timer.h"
++#include "hw/misc/msf2-sysreg.h"
++#include "hw/ssi/mss-spi.h"
++
++#define TYPE_MSF2_SOC     "msf2-soc"
++#define MSF2_SOC(obj)     OBJECT_CHECK(MSF2State, (obj), TYPE_MSF2_SOC)
++
++#define MSF2_NUM_SPIS         2
++#define MSF2_NUM_UARTS        2
++
++/*
++ * System timer consists of two programmable 32-bit
++ * decrementing counters that generate individual interrupts to
++ * the Cortex-M3 processor
++ */
++#define MSF2_NUM_TIMERS       2
++
++typedef struct MSF2State {
++    /*< private >*/
++    SysBusDevice parent_obj;
++    /*< public >*/
++
++    ARMv7MState armv7m;
++
++    char *cpu_type;
++    char *part_name;
++    uint64_t envm_size;
++    uint64_t esram_size;
++
++    uint32_t m3clk;
++    uint8_t apb0div;
++    uint8_t apb1div;
++
++    MSF2SysregState sysreg;
++    MSSTimerState timer;
++    MSSSpiState spi[MSF2_NUM_SPIS];
++} MSF2State;
++
++#endif
+diff --git a/hw/arm/msf2-soc.c b/hw/arm/msf2-soc.c
+new file mode 100644
+index 0000000..6f97fa9
+--- /dev/null
++++ b/hw/arm/msf2-soc.c
+@@ -0,0 +1,238 @@
++/*
++ * SmartFusion2 SoC emulation.
 + *
 + * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
 + *
@@ -90,84 +167,226 @@ index 0000000..0795a3a
 +
 +#include "qemu/osdep.h"
 +#include "qapi/error.h"
-+#include "qemu/error-report.h"
-+#include "hw/boards.h"
++#include "qemu-common.h"
 +#include "hw/arm/arm.h"
 +#include "exec/address-spaces.h"
++#include "hw/char/serial.h"
++#include "hw/boards.h"
++#include "sysemu/block-backend.h"
 +#include "qemu/cutils.h"
 +#include "hw/arm/msf2-soc.h"
-+#include "cpu.h"
++#include "hw/misc/unimp.h"
 +
-+#define DDR_BASE_ADDRESS      0xA0000000
-+#define DDR_SIZE              (64 * M_BYTE)
++#define MSF2_TIMER_BASE       0x40004000
++#define MSF2_SYSREG_BASE      0x40038000
 +
-+#define M2S010_ENVM_SIZE      (256 * K_BYTE)
-+#define M2S010_ESRAM_SIZE     (64 * K_BYTE)
++#define ENVM_BASE_ADDRESS     0x60000000
 +
-+static void emcraft_sf2_s2s010_init(MachineState *machine)
++#define SRAM_BASE_ADDRESS     0x20000000
++
++#define MSF2_ENVM_MAX_SIZE    (512 * K_BYTE)
++
++/*
++ * eSRAM max size is 80k without SECDED(Single error correction and
++ * dual error detection) feature and 64k with SECDED.
++ * We do not support SECDED now.
++ */
++#define MSF2_ESRAM_MAX_SIZE       (80 * K_BYTE)
++
++static const uint32_t spi_addr[MSF2_NUM_SPIS] = { 0x40001000 , 0x40011000 };
++static const uint32_t uart_addr[MSF2_NUM_UARTS] = { 0x40000000 , 0x40010000 };
++
++static const int spi_irq[MSF2_NUM_SPIS] = { 2, 3 };
++static const int uart_irq[MSF2_NUM_UARTS] = { 10, 11 };
++static const int timer_irq[MSF2_NUM_TIMERS] = { 14, 15 };
++
++static void m2sxxx_soc_initfn(Object *obj)
 +{
-+    DeviceState *dev;
-+    DeviceState *spi_flash;
-+    MSF2State *soc;
-+    MachineClass *mc = MACHINE_GET_CLASS(machine);
-+    DriveInfo *dinfo = drive_get_next(IF_MTD);
-+    qemu_irq cs_line;
-+    SSIBus *spi_bus;
-+    MemoryRegion *sysmem = get_system_memory();
-+    MemoryRegion *ddr = g_new(MemoryRegion, 1);
++    MSF2State *s = MSF2_SOC(obj);
++    int i;
 +
-+    if (strcmp(machine->cpu_type, mc->default_cpu_type) != 0) {
-+        error_report("This board can only be used with CPU %s",
-+                     mc->default_cpu_type);
++    object_initialize(&s->armv7m, sizeof(s->armv7m), TYPE_ARMV7M);
++    qdev_set_parent_bus(DEVICE(&s->armv7m), sysbus_get_default());
++
++    object_initialize(&s->sysreg, sizeof(s->sysreg), TYPE_MSF2_SYSREG);
++    qdev_set_parent_bus(DEVICE(&s->sysreg), sysbus_get_default());
++
++    object_initialize(&s->timer, sizeof(s->timer), TYPE_MSS_TIMER);
++    qdev_set_parent_bus(DEVICE(&s->timer), sysbus_get_default());
++
++    for (i = 0; i < MSF2_NUM_SPIS; i++) {
++        object_initialize(&s->spi[i], sizeof(s->spi[i]),
++                          TYPE_MSS_SPI);
++        qdev_set_parent_bus(DEVICE(&s->spi[i]), sysbus_get_default());
 +    }
++}
 +
-+    memory_region_init_ram(ddr, NULL, "ddr-ram", DDR_SIZE,
++static void m2sxxx_soc_realize(DeviceState *dev_soc, Error **errp)
++{
++    MSF2State *s = MSF2_SOC(dev_soc);
++    DeviceState *dev, *armv7m;
++    SysBusDevice *busdev;
++    Error *err = NULL;
++    int i;
++
++    MemoryRegion *system_memory = get_system_memory();
++    MemoryRegion *nvm = g_new(MemoryRegion, 1);
++    MemoryRegion *nvm_alias = g_new(MemoryRegion, 1);
++    MemoryRegion *sram = g_new(MemoryRegion, 1);
++
++    memory_region_init_rom(nvm, NULL, "MSF2.eNVM", s->envm_size,
 +                           &error_fatal);
-+    memory_region_add_subregion(sysmem, DDR_BASE_ADDRESS, ddr);
-+
-+    dev = qdev_create(NULL, TYPE_MSF2_SOC);
-+    qdev_prop_set_string(dev, "part-name", "M2S010");
-+    qdev_prop_set_string(dev, "cpu-type", mc->default_cpu_type);
-+
-+    qdev_prop_set_uint64(dev, "eNVM-size", M2S010_ENVM_SIZE);
-+    qdev_prop_set_uint64(dev, "eSRAM-size", M2S010_ESRAM_SIZE);
-+
 +    /*
-+     * CPU clock and peripheral clocks(APB0, APB1)are configurable
-+     * in Libero. CPU clock is divided by APB0 and APB1 divisors for
-+     * peripherals. Emcraft's SoM kit comes with these settings by default.
++     * On power-on, the eNVM region 0x60000000 is automatically
++     * remapped to the Cortex-M3 processor executable region
++     * start address (0x0). We do not support remapping other eNVM,
++     * eSRAM and DDR regions by guest(via Sysreg) currently.
 +     */
-+    qdev_prop_set_uint32(dev, "m3clk", 142 * 1000000);
-+    qdev_prop_set_uint32(dev, "apb0div", 2);
-+    qdev_prop_set_uint32(dev, "apb1div", 2);
++    memory_region_init_alias(nvm_alias, NULL, "MSF2.eNVM",
++                             nvm, 0, s->envm_size);
 +
-+    object_property_set_bool(OBJECT(dev), true, "realized", &error_fatal);
++    memory_region_add_subregion(system_memory, ENVM_BASE_ADDRESS, nvm);
++    memory_region_add_subregion(system_memory, 0, nvm_alias);
 +
-+    soc = MSF2_SOC(dev);
++    memory_region_init_ram(sram, NULL, "MSF2.eSRAM", s->esram_size,
++                           &error_fatal);
++    memory_region_add_subregion(system_memory, SRAM_BASE_ADDRESS, sram);
 +
-+    /* Attach SPI flash to SPI0 controller */
-+    spi_bus = (SSIBus *)qdev_get_child_bus(dev, "spi0");
-+    spi_flash = ssi_create_slave_no_init(spi_bus, "s25sl12801");
-+    qdev_prop_set_uint8(spi_flash, "spansion-cr2nv", 1);
-+    if (dinfo) {
-+        qdev_prop_set_drive(spi_flash, "drive", blk_by_legacy_dinfo(dinfo),
-+                                    &error_fatal);
++    armv7m = DEVICE(&s->armv7m);
++    qdev_prop_set_uint32(armv7m, "num-irq", 81);
++    qdev_prop_set_string(armv7m, "cpu-type", s->cpu_type);
++    object_property_set_link(OBJECT(&s->armv7m), OBJECT(get_system_memory()),
++                                     "memory", &error_abort);
++    object_property_set_bool(OBJECT(&s->armv7m), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
 +    }
-+    qdev_init_nofail(spi_flash);
-+    cs_line = qdev_get_gpio_in_named(spi_flash, SSI_GPIO_CS, 0);
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&soc->spi[0]), 1, cs_line);
 +
-+    armv7m_load_kernel(ARM_CPU(first_cpu), machine->kernel_filename,
-+                       soc->envm_size);
++    if (!s->m3clk) {
++        error_setg(errp, "Invalid m3clk value");
++        error_append_hint(errp, "m3clk can not be zero\n");
++        return;
++    }
++    system_clock_scale = NANOSECONDS_PER_SECOND / s->m3clk;
++
++    for (i = 0; i < MSF2_NUM_UARTS; i++) {
++        if (serial_hds[i]) {
++            serial_mm_init(get_system_memory(), uart_addr[i], 2,
++                           qdev_get_gpio_in(armv7m, uart_irq[i]),
++                           115200, serial_hds[i], DEVICE_NATIVE_ENDIAN);
++        }
++    }
++
++    dev = DEVICE(&s->timer);
++    /* APB0 clock is the timer input clock */
++    qdev_prop_set_uint32(dev, "clock-frequency", s->m3clk / s->apb0div);
++    object_property_set_bool(OBJECT(&s->timer), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    busdev = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(busdev, 0, MSF2_TIMER_BASE);
++    sysbus_connect_irq(busdev, 0,
++                           qdev_get_gpio_in(armv7m, timer_irq[0]));
++    sysbus_connect_irq(busdev, 1,
++                           qdev_get_gpio_in(armv7m, timer_irq[1]));
++
++    dev = DEVICE(&s->sysreg);
++    qdev_prop_set_uint32(dev, "apb0divisor", s->apb0div);
++    qdev_prop_set_uint32(dev, "apb1divisor", s->apb1div);
++    object_property_set_bool(OBJECT(&s->sysreg), true, "realized", &err);
++    if (err != NULL) {
++        error_propagate(errp, err);
++        return;
++    }
++    busdev = SYS_BUS_DEVICE(dev);
++    sysbus_mmio_map(busdev, 0, MSF2_SYSREG_BASE);
++
++    for (i = 0; i < MSF2_NUM_SPIS; i++) {
++        gchar *bus_name;
++
++        object_property_set_bool(OBJECT(&s->spi[i]), true, "realized", &err);
++        if (err != NULL) {
++            error_propagate(errp, err);
++            return;
++        }
++
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->spi[i]), 0, spi_addr[i]);
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->spi[i]), 0,
++                           qdev_get_gpio_in(armv7m, spi_irq[i]));
++
++        /* Alias controller SPI bus to the SoC itself */
++        bus_name = g_strdup_printf("spi%d", i);
++        object_property_add_alias(OBJECT(s), bus_name,
++                                  OBJECT(&s->spi[i]), "spi",
++                                  &error_abort);
++        g_free(bus_name);
++    }
++
++    /* Below devices are not modelled yet. */
++    create_unimplemented_device("i2c_0", 0x40002000, 0x1000);
++    create_unimplemented_device("dma", 0x40003000, 0x1000);
++    create_unimplemented_device("watchdog", 0x40005000, 0x1000);
++    create_unimplemented_device("i2c_1", 0x40012000, 0x1000);
++    create_unimplemented_device("gpio", 0x40013000, 0x1000);
++    create_unimplemented_device("hs-dma", 0x40014000, 0x1000);
++    create_unimplemented_device("can", 0x40015000, 0x1000);
++    create_unimplemented_device("rtc", 0x40017000, 0x1000);
++    create_unimplemented_device("apb_config", 0x40020000, 0x10000);
++    create_unimplemented_device("emac", 0x40041000, 0x1000);
++    create_unimplemented_device("usb", 0x40043000, 0x1000);
 +}
 +
-+static void emcraft_sf2_machine_init(MachineClass *mc)
++static Property m2sxxx_soc_properties[] = {
++    /*
++     * part name specifies the type of SmartFusion2 device variant(this
++     * property is for information purpose only.
++     */
++    DEFINE_PROP_STRING("cpu-type", MSF2State, cpu_type),
++    DEFINE_PROP_STRING("part-name", MSF2State, part_name),
++    DEFINE_PROP_UINT64("eNVM-size", MSF2State, envm_size, MSF2_ENVM_MAX_SIZE),
++    DEFINE_PROP_UINT64("eSRAM-size", MSF2State, esram_size,
++                        MSF2_ESRAM_MAX_SIZE),
++    /* Libero GUI shows 100Mhz as default for clocks */
++    DEFINE_PROP_UINT32("m3clk", MSF2State, m3clk, 100 * 1000000),
++    /* default divisors in Libero GUI */
++    DEFINE_PROP_UINT8("apb0div", MSF2State, apb0div, 2),
++    DEFINE_PROP_UINT8("apb1div", MSF2State, apb1div, 2),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void m2sxxx_soc_class_init(ObjectClass *klass, void *data)
 +{
-+    mc->desc = "SmartFusion2 SOM kit from Emcraft (M2S010)";
-+    mc->init = emcraft_sf2_s2s010_init;
-+    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = m2sxxx_soc_realize;
++    dc->props = m2sxxx_soc_properties;
 +}
 +
-+DEFINE_MACHINE("emcraft-sf2", emcraft_sf2_machine_init)
++static const TypeInfo m2sxxx_soc_info = {
++    .name          = TYPE_MSF2_SOC,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(MSF2State),
++    .instance_init = m2sxxx_soc_initfn,
++    .class_init    = m2sxxx_soc_class_init,
++};
++
++static void m2sxxx_soc_types(void)
++{
++    type_register_static(&m2sxxx_soc_info);
++}
++
++type_init(m2sxxx_soc_types)
+diff --git a/default-configs/arm-softmmu.mak b/default-configs/arm-softmmu.mak
+index bbdd3c1..5059d13 100644
+--- a/default-configs/arm-softmmu.mak
++++ b/default-configs/arm-softmmu.mak
+@@ -129,3 +129,4 @@ CONFIG_ACPI=y
+ CONFIG_SMBIOS=y
+ CONFIG_ASPEED_SOC=y
+ CONFIG_GPIO_KEY=y
++CONFIG_MSF2=y
 -- 
 2.7.4
