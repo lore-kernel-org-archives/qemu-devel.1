@@ -1,16 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56354)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56641)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dv1Mo-00057a-H2
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:18:14 -0400
+	(envelope-from <berrange@redhat.com>) id 1dv1NP-0005aS-V0
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:18:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dv1Mn-00049Q-6a
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:18:10 -0400
-From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Thu, 21 Sep 2017 16:17:05 +0300
-Message-Id: <20170921131707.17364-2-el13635@mail.ntua.gr>
-In-Reply-To: <20170921131707.17364-1-el13635@mail.ntua.gr>
-References: <20170921131707.17364-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v2 1/3] block: add bdrv_co_drain_end callback
+	(envelope-from <berrange@redhat.com>) id 1dv1NM-0004Vm-N0
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:18:47 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34524)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dv1NM-0004VF-Dp
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:18:44 -0400
+Date: Thu, 21 Sep 2017 14:18:39 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170921131839.GC15693@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CAATJJ0KLaR6VUrPZZSQxwb6niF5YY0UMB5sWDq9b=OeeC5=1Xw@mail.gmail.com>
+	<20170921123320.GG32364@stefanha-x1.localdomain>
+	<20170921124317.GB15693@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170921124317.GB15693@redhat.com>
+Subject: Re: [Qemu-devel] need to resurrect no-lock option?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -19,187 +29,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Christian Ehrhardt <christian.ehrhardt@canonical.com>
 
-BlockDriverState has a bdrv_do_drain() callback but no equivalent for the end
-of the drain. The throttle driver (block/throttle.c) needs a way to mark the
-end of the drain in order to toggle io_limits_disabled correctly, thus
-bdrv_co_drain_end is needed.
+On Thu, Sep 21, 2017 at 01:43:17PM +0100, Daniel P. Berrange wrote:
+> On Thu, Sep 21, 2017 at 01:33:20PM +0100, Stefan Hajnoczi wrote:
+> > On Wed, Sep 20, 2017 at 11:26:11AM +0200, Christian Ehrhardt wrote:
+> > > Hi,
+> > > this might have been discussed in the wake of the lock changes that took
+> > > place in 2.10 but I can't find anything clear enough to follow in the
+> > > current case.
+> > > There was an old submission [1] by Fam to make it possible to no-lock
+> > > qemu-img and others if needed. But it seems nothing like it made it along
+> > > to the locking we have in 2.10.
+> > > 
+> > > One (maybe more) case where missing this causes pain is e.g. running an
+> > > info check on a running guest.
+> > > In general info shouldn't need a write lock anyway, but without --no-lock
+> > > that use case is broken.
+> > 
+> > It's still an invalid use case.  There is no guarantee that qemu-img
+> > will see a consistent version of the image file.  Metadata could change
+> > underneath qemu-img because QEMU may still write to it.  QEMU may also
+> > have some metadata cached so there's no guarantee that qemu-img sees an
+> > up-to-date image.
+> > 
+> > Why do you need to run qemu-img on a disk image that is in use?
+> 
+> You have a directory full of images and you want to understand current usage
+> vs potential future usage. For this you need to get the virtual size, which
+> rquires 'qemu-img info' for non-raw files. Actually it would be even better
+> served by the new 'measure' command recently added.
+> 
+> The job analyzing this directory of images may not have any context as to
+> whether each file is in use by a running QEMU, so would just blindly call
+> 'qemu-img info' on each file it finds.  There's of course potential that
+> opening the image in 'qemu-img info' could hit problems if the running QEMU
+> changed qcow2 metadata, but generally that would not have serious negative
+> impact and would be self-correcting next time the job analysed the directory.
 
-Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
----
- include/block/block_int.h |  6 ++++++
- block/io.c                | 48 +++++++++++++++++++++++++++++++++--------------
- 2 files changed, 40 insertions(+), 14 deletions(-)
+FYI this scenario has already hit OpenStack with breakage on new QMEU
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index ba4c383393..21950cfda3 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -356,8 +356,14 @@ struct BlockDriver {
-     /**
-      * Drain and stop any internal sources of requests in the driver, and
-      * remain so until next I/O callback (e.g. bdrv_co_writev) is called.
-+     *
-+     * The callbacks are called at the beginning and ending of the drain
-+     * respectively. They should be implemented if the driver needs to e.g.
-+     * manage scheduled I/O requests, or toggle an internal state. After an
-+     * bdrv_co_drain_end() invocation new requests will continue normally.
-      */
-     void coroutine_fn (*bdrv_co_drain)(BlockDriverState *bs);
-+    void coroutine_fn (*bdrv_co_drain_end)(BlockDriverState *bs);
- 
-     void (*bdrv_add_child)(BlockDriverState *parent, BlockDriverState *child,
-                            Error **errp);
-diff --git a/block/io.c b/block/io.c
-index 4378ae4c7d..b0a10ad3ef 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -153,6 +153,7 @@ typedef struct {
-     Coroutine *co;
-     BlockDriverState *bs;
-     bool done;
-+    bool begin;
- } BdrvCoDrainData;
- 
- static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
-@@ -160,18 +161,23 @@ static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
-     BdrvCoDrainData *data = opaque;
-     BlockDriverState *bs = data->bs;
- 
--    bs->drv->bdrv_co_drain(bs);
-+    if (data->begin) {
-+        bs->drv->bdrv_co_drain(bs);
-+    } else {
-+        bs->drv->bdrv_co_drain_end(bs);
-+    }
- 
-     /* Set data->done before reading bs->wakeup.  */
-     atomic_mb_set(&data->done, true);
-     bdrv_wakeup(bs);
- }
- 
--static void bdrv_drain_invoke(BlockDriverState *bs)
-+static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
- {
--    BdrvCoDrainData data = { .bs = bs, .done = false };
-+    BdrvCoDrainData data = { .bs = bs, .done = false, .begin = begin};
- 
--    if (!bs->drv || !bs->drv->bdrv_co_drain) {
-+    if (!bs->drv || (begin && !bs->drv->bdrv_co_drain) ||
-+            (!begin && !bs->drv->bdrv_co_drain_end)) {
-         return;
-     }
- 
-@@ -180,15 +186,16 @@ static void bdrv_drain_invoke(BlockDriverState *bs)
-     BDRV_POLL_WHILE(bs, !data.done);
- }
- 
--static bool bdrv_drain_recurse(BlockDriverState *bs)
-+static bool bdrv_drain_recurse(BlockDriverState *bs, bool begin)
- {
-     BdrvChild *child, *tmp;
-     bool waited;
- 
--    waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
--
-     /* Ensure any pending metadata writes are submitted to bs->file.  */
--    bdrv_drain_invoke(bs);
-+    bdrv_drain_invoke(bs, begin);
-+
-+    /* Wait for drained requests to finish */
-+    waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
- 
-     QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
-         BlockDriverState *bs = child->bs;
-@@ -205,7 +212,7 @@ static bool bdrv_drain_recurse(BlockDriverState *bs)
-              */
-             bdrv_ref(bs);
-         }
--        waited |= bdrv_drain_recurse(bs);
-+        waited |= bdrv_drain_recurse(bs, begin);
-         if (in_main_loop) {
-             bdrv_unref(bs);
-         }
-@@ -221,12 +228,18 @@ static void bdrv_co_drain_bh_cb(void *opaque)
-     BlockDriverState *bs = data->bs;
- 
-     bdrv_dec_in_flight(bs);
--    bdrv_drained_begin(bs);
-+    if (data->begin) {
-+        bdrv_drained_begin(bs);
-+    } else {
-+        bdrv_drained_end(bs);
-+    }
-+
-     data->done = true;
-     aio_co_wake(co);
- }
- 
--static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs)
-+static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs,
-+                                                bool begin)
- {
-     BdrvCoDrainData data;
- 
-@@ -239,6 +252,7 @@ static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs)
-         .co = qemu_coroutine_self(),
-         .bs = bs,
-         .done = false,
-+        .begin = begin,
-     };
-     bdrv_inc_in_flight(bs);
-     aio_bh_schedule_oneshot(bdrv_get_aio_context(bs),
-@@ -253,7 +267,7 @@ static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs)
- void bdrv_drained_begin(BlockDriverState *bs)
- {
-     if (qemu_in_coroutine()) {
--        bdrv_co_yield_to_drain(bs);
-+        bdrv_co_yield_to_drain(bs, true);
-         return;
-     }
- 
-@@ -262,17 +276,22 @@ void bdrv_drained_begin(BlockDriverState *bs)
-         bdrv_parent_drained_begin(bs);
-     }
- 
--    bdrv_drain_recurse(bs);
-+    bdrv_drain_recurse(bs, true);
- }
- 
- void bdrv_drained_end(BlockDriverState *bs)
- {
-+    if (qemu_in_coroutine()) {
-+        bdrv_co_yield_to_drain(bs, false);
-+        return;
-+    }
-     assert(bs->quiesce_counter > 0);
-     if (atomic_fetch_dec(&bs->quiesce_counter) > 1) {
-         return;
-     }
- 
-     bdrv_parent_drained_end(bs);
-+    bdrv_drain_recurse(bs, false);
-     aio_enable_external(bdrv_get_aio_context(bs));
- }
- 
-@@ -350,7 +369,7 @@ void bdrv_drain_all_begin(void)
-             aio_context_acquire(aio_context);
-             for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
-                 if (aio_context == bdrv_get_aio_context(bs)) {
--                    waited |= bdrv_drain_recurse(bs);
-+                    waited |= bdrv_drain_recurse(bs, true);
-                 }
-             }
-             aio_context_release(aio_context);
-@@ -371,6 +390,7 @@ void bdrv_drain_all_end(void)
-         aio_context_acquire(aio_context);
-         aio_enable_external(aio_context);
-         bdrv_parent_drained_end(bs);
-+        bdrv_drain_recurse(bs, false);
-         aio_context_release(aio_context);
-     }
- 
+  https://bugs.launchpad.net/nova/+bug/1718295
+
+and thus they're just going to add '--force-shared' for all usage of
+qemu-img info.
+
+Regards,
+Daniel
 -- 
-2.11.0
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
