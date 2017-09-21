@@ -1,24 +1,27 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60320)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60514)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XQ-00038S-0f
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:24 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XX-0003Fe-Jr
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XM-00032r-FI
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:20 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37500)
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XV-0003Wk-1B
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:27 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37510)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dv4XM-0002yR-2A
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:16 -0400
+	id 1dv4XU-0003Oh-B1
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:24 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XK-00059b-SD
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:41:14 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XS-0005FB-PD
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:41:22 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Sep 2017 17:41:26 +0100
-Message-Id: <1506012099-13605-19-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 21 Sep 2017 17:41:37 +0100
+Message-Id: <1506012099-13605-30-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1506012099-13605-1-git-send-email-peter.maydell@linaro.org>
 References: <1506012099-13605-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 18/31] nvic: Make SHCSR banked for v8M
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PULL 29/31] msf2: Add Smartfusion2 SPI controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,261 +32,508 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Handle banking of SHCSR: some register bits are banked between
-Secure and Non-Secure, and some are only accessible to Secure.
+From: Subbaraya Sundeep <sundeep.lkml@gmail.com>
 
+Modelled Microsemi's Smartfusion2 SPI controller.
+
+Signed-off-by: Subbaraya Sundeep <sundeep.lkml@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@xilinx.com>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20170920201737.25723-4-f4bug@amsat.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1505240046-11454-19-git-send-email-peter.maydell@linaro.org
 ---
- hw/intc/armv7m_nvic.c | 221 ++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 169 insertions(+), 52 deletions(-)
+ hw/ssi/Makefile.objs     |   1 +
+ include/hw/ssi/mss-spi.h |  58 +++++++
+ hw/ssi/mss-spi.c         | 404 +++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 463 insertions(+)
+ create mode 100644 include/hw/ssi/mss-spi.h
+ create mode 100644 hw/ssi/mss-spi.c
 
-diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 284521f..19b0be1 100644
---- a/hw/intc/armv7m_nvic.c
-+++ b/hw/intc/armv7m_nvic.c
-@@ -770,50 +770,117 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
-         val = cpu->env.v7m.ccr[attrs.secure];
-         val |= cpu->env.v7m.ccr[M_REG_NS] & R_V7M_CCR_BFHFNMIGN_MASK;
-         return val;
--    case 0xd24: /* System Handler Status.  */
-+    case 0xd24: /* System Handler Control and State (SHCSR) */
-         val = 0;
--        if (s->vectors[ARMV7M_EXCP_MEM].active) {
--            val |= (1 << 0);
--        }
--        if (s->vectors[ARMV7M_EXCP_BUS].active) {
--            val |= (1 << 1);
--        }
--        if (s->vectors[ARMV7M_EXCP_USAGE].active) {
--            val |= (1 << 3);
-+        if (attrs.secure) {
-+            if (s->sec_vectors[ARMV7M_EXCP_MEM].active) {
-+                val |= (1 << 0);
-+            }
-+            if (s->sec_vectors[ARMV7M_EXCP_HARD].active) {
-+                val |= (1 << 2);
-+            }
-+            if (s->sec_vectors[ARMV7M_EXCP_USAGE].active) {
-+                val |= (1 << 3);
-+            }
-+            if (s->sec_vectors[ARMV7M_EXCP_SVC].active) {
-+                val |= (1 << 7);
-+            }
-+            if (s->sec_vectors[ARMV7M_EXCP_PENDSV].active) {
-+                val |= (1 << 10);
-+            }
-+            if (s->sec_vectors[ARMV7M_EXCP_SYSTICK].active) {
-+                val |= (1 << 11);
-+            }
-+            if (s->sec_vectors[ARMV7M_EXCP_USAGE].pending) {
-+                val |= (1 << 12);
-+            }
-+            if (s->sec_vectors[ARMV7M_EXCP_MEM].pending) {
-+                val |= (1 << 13);
-+            }
-+            if (s->sec_vectors[ARMV7M_EXCP_SVC].pending) {
-+                val |= (1 << 15);
-+            }
-+            if (s->sec_vectors[ARMV7M_EXCP_MEM].enabled) {
-+                val |= (1 << 16);
-+            }
-+            if (s->sec_vectors[ARMV7M_EXCP_USAGE].enabled) {
-+                val |= (1 << 18);
-+            }
-+            if (s->sec_vectors[ARMV7M_EXCP_HARD].pending) {
-+                val |= (1 << 21);
-+            }
-+            /* SecureFault is not banked but is always RAZ/WI to NS */
-+            if (s->vectors[ARMV7M_EXCP_SECURE].active) {
-+                val |= (1 << 4);
-+            }
-+            if (s->vectors[ARMV7M_EXCP_SECURE].enabled) {
-+                val |= (1 << 19);
-+            }
-+            if (s->vectors[ARMV7M_EXCP_SECURE].pending) {
-+                val |= (1 << 20);
-+            }
-+        } else {
-+            if (s->vectors[ARMV7M_EXCP_MEM].active) {
-+                val |= (1 << 0);
-+            }
-+            if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-+                /* HARDFAULTACT, HARDFAULTPENDED not present in v7M */
-+                if (s->vectors[ARMV7M_EXCP_HARD].active) {
-+                    val |= (1 << 2);
-+                }
-+                if (s->vectors[ARMV7M_EXCP_HARD].pending) {
-+                    val |= (1 << 21);
-+                }
-+            }
-+            if (s->vectors[ARMV7M_EXCP_USAGE].active) {
-+                val |= (1 << 3);
-+            }
-+            if (s->vectors[ARMV7M_EXCP_SVC].active) {
-+                val |= (1 << 7);
-+            }
-+            if (s->vectors[ARMV7M_EXCP_PENDSV].active) {
-+                val |= (1 << 10);
-+            }
-+            if (s->vectors[ARMV7M_EXCP_SYSTICK].active) {
-+                val |= (1 << 11);
-+            }
-+            if (s->vectors[ARMV7M_EXCP_USAGE].pending) {
-+                val |= (1 << 12);
-+            }
-+            if (s->vectors[ARMV7M_EXCP_MEM].pending) {
-+                val |= (1 << 13);
-+            }
-+            if (s->vectors[ARMV7M_EXCP_SVC].pending) {
-+                val |= (1 << 15);
-+            }
-+            if (s->vectors[ARMV7M_EXCP_MEM].enabled) {
-+                val |= (1 << 16);
-+            }
-+            if (s->vectors[ARMV7M_EXCP_USAGE].enabled) {
-+                val |= (1 << 18);
-+            }
-         }
--        if (s->vectors[ARMV7M_EXCP_SVC].active) {
--            val |= (1 << 7);
-+        if (attrs.secure || (cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK)) {
-+            if (s->vectors[ARMV7M_EXCP_BUS].active) {
-+                val |= (1 << 1);
-+            }
-+            if (s->vectors[ARMV7M_EXCP_BUS].pending) {
-+                val |= (1 << 14);
-+            }
-+            if (s->vectors[ARMV7M_EXCP_BUS].enabled) {
-+                val |= (1 << 17);
-+            }
-+            if (arm_feature(&cpu->env, ARM_FEATURE_V8) &&
-+                s->vectors[ARMV7M_EXCP_NMI].active) {
-+                /* NMIACT is not present in v7M */
-+                val |= (1 << 5);
-+            }
-         }
-+
-+        /* TODO: this is RAZ/WI from NS if DEMCR.SDME is set */
-         if (s->vectors[ARMV7M_EXCP_DEBUG].active) {
-             val |= (1 << 8);
-         }
--        if (s->vectors[ARMV7M_EXCP_PENDSV].active) {
--            val |= (1 << 10);
--        }
--        if (s->vectors[ARMV7M_EXCP_SYSTICK].active) {
--            val |= (1 << 11);
--        }
--        if (s->vectors[ARMV7M_EXCP_USAGE].pending) {
--            val |= (1 << 12);
--        }
--        if (s->vectors[ARMV7M_EXCP_MEM].pending) {
--            val |= (1 << 13);
--        }
--        if (s->vectors[ARMV7M_EXCP_BUS].pending) {
--            val |= (1 << 14);
--        }
--        if (s->vectors[ARMV7M_EXCP_SVC].pending) {
--            val |= (1 << 15);
--        }
--        if (s->vectors[ARMV7M_EXCP_MEM].enabled) {
--            val |= (1 << 16);
--        }
--        if (s->vectors[ARMV7M_EXCP_BUS].enabled) {
--            val |= (1 << 17);
--        }
--        if (s->vectors[ARMV7M_EXCP_USAGE].enabled) {
--            val |= (1 << 18);
--        }
-         return val;
-     case 0xd28: /* Configurable Fault Status.  */
-         /* The BFSR bits [15:8] are shared between security states
-@@ -1061,21 +1128,71 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
+diff --git a/hw/ssi/Makefile.objs b/hw/ssi/Makefile.objs
+index 487add2..f5bcc65 100644
+--- a/hw/ssi/Makefile.objs
++++ b/hw/ssi/Makefile.objs
+@@ -4,6 +4,7 @@ common-obj-$(CONFIG_XILINX_SPI) += xilinx_spi.o
+ common-obj-$(CONFIG_XILINX_SPIPS) += xilinx_spips.o
+ common-obj-$(CONFIG_ASPEED_SOC) += aspeed_smc.o
+ common-obj-$(CONFIG_STM32F2XX_SPI) += stm32f2xx_spi.o
++common-obj-$(CONFIG_MSF2) += mss-spi.o
  
-         cpu->env.v7m.ccr[attrs.secure] = value;
-         break;
--    case 0xd24: /* System Handler Control.  */
--        s->vectors[ARMV7M_EXCP_MEM].active = (value & (1 << 0)) != 0;
--        s->vectors[ARMV7M_EXCP_BUS].active = (value & (1 << 1)) != 0;
--        s->vectors[ARMV7M_EXCP_USAGE].active = (value & (1 << 3)) != 0;
--        s->vectors[ARMV7M_EXCP_SVC].active = (value & (1 << 7)) != 0;
-+    case 0xd24: /* System Handler Control and State (SHCSR) */
-+        if (attrs.secure) {
-+            s->sec_vectors[ARMV7M_EXCP_MEM].active = (value & (1 << 0)) != 0;
-+            /* Secure HardFault active bit cannot be written */
-+            s->sec_vectors[ARMV7M_EXCP_USAGE].active = (value & (1 << 3)) != 0;
-+            s->sec_vectors[ARMV7M_EXCP_SVC].active = (value & (1 << 7)) != 0;
-+            s->sec_vectors[ARMV7M_EXCP_PENDSV].active =
-+                (value & (1 << 10)) != 0;
-+            s->sec_vectors[ARMV7M_EXCP_SYSTICK].active =
-+                (value & (1 << 11)) != 0;
-+            s->sec_vectors[ARMV7M_EXCP_USAGE].pending =
-+                (value & (1 << 12)) != 0;
-+            s->sec_vectors[ARMV7M_EXCP_MEM].pending = (value & (1 << 13)) != 0;
-+            s->sec_vectors[ARMV7M_EXCP_SVC].pending = (value & (1 << 15)) != 0;
-+            s->sec_vectors[ARMV7M_EXCP_MEM].enabled = (value & (1 << 16)) != 0;
-+            s->sec_vectors[ARMV7M_EXCP_BUS].enabled = (value & (1 << 17)) != 0;
-+            s->sec_vectors[ARMV7M_EXCP_USAGE].enabled =
-+                (value & (1 << 18)) != 0;
-+            /* SecureFault not banked, but RAZ/WI to NS */
-+            s->vectors[ARMV7M_EXCP_SECURE].active = (value & (1 << 4)) != 0;
-+            s->vectors[ARMV7M_EXCP_SECURE].enabled = (value & (1 << 19)) != 0;
-+            s->vectors[ARMV7M_EXCP_SECURE].pending = (value & (1 << 20)) != 0;
-+        } else {
-+            s->vectors[ARMV7M_EXCP_MEM].active = (value & (1 << 0)) != 0;
-+            if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
-+                /* HARDFAULTPENDED is not present in v7M */
-+                s->vectors[ARMV7M_EXCP_HARD].pending = (value & (1 << 21)) != 0;
-+            }
-+            s->vectors[ARMV7M_EXCP_USAGE].active = (value & (1 << 3)) != 0;
-+            s->vectors[ARMV7M_EXCP_SVC].active = (value & (1 << 7)) != 0;
-+            s->vectors[ARMV7M_EXCP_PENDSV].active = (value & (1 << 10)) != 0;
-+            s->vectors[ARMV7M_EXCP_SYSTICK].active = (value & (1 << 11)) != 0;
-+            s->vectors[ARMV7M_EXCP_USAGE].pending = (value & (1 << 12)) != 0;
-+            s->vectors[ARMV7M_EXCP_MEM].pending = (value & (1 << 13)) != 0;
-+            s->vectors[ARMV7M_EXCP_SVC].pending = (value & (1 << 15)) != 0;
-+            s->vectors[ARMV7M_EXCP_MEM].enabled = (value & (1 << 16)) != 0;
-+            s->vectors[ARMV7M_EXCP_USAGE].enabled = (value & (1 << 18)) != 0;
-+        }
-+        if (attrs.secure || (cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK)) {
-+            s->vectors[ARMV7M_EXCP_BUS].active = (value & (1 << 1)) != 0;
-+            s->vectors[ARMV7M_EXCP_BUS].pending = (value & (1 << 14)) != 0;
-+            s->vectors[ARMV7M_EXCP_BUS].enabled = (value & (1 << 17)) != 0;
-+        }
-+        /* NMIACT can only be written if the write is of a zero, with
-+         * BFHFNMINS 1, and by the CPU in secure state via the NS alias.
-+         */
-+        if (!attrs.secure && cpu->env.v7m.secure &&
-+            (cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK) &&
-+            (value & (1 << 5)) == 0) {
-+            s->vectors[ARMV7M_EXCP_NMI].active = 0;
-+        }
-+        /* HARDFAULTACT can only be written if the write is of a zero
-+         * to the non-secure HardFault state by the CPU in secure state.
-+         * The only case where we can be targeting the non-secure HF state
-+         * when in secure state is if this is a write via the NS alias
-+         * and BFHFNMINS is 1.
-+         */
-+        if (!attrs.secure && cpu->env.v7m.secure &&
-+            (cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK) &&
-+            (value & (1 << 2)) == 0) {
-+            s->vectors[ARMV7M_EXCP_HARD].active = 0;
-+        }
+ obj-$(CONFIG_OMAP) += omap_spi.o
+ obj-$(CONFIG_IMX) += imx_spi.o
+diff --git a/include/hw/ssi/mss-spi.h b/include/hw/ssi/mss-spi.h
+new file mode 100644
+index 0000000..f0cf324
+--- /dev/null
++++ b/include/hw/ssi/mss-spi.h
+@@ -0,0 +1,58 @@
++/*
++ * Microsemi SmartFusion2 SPI
++ *
++ * Copyright (c) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-+        /* TODO: this is RAZ/WI from NS if DEMCR.SDME is set */
-         s->vectors[ARMV7M_EXCP_DEBUG].active = (value & (1 << 8)) != 0;
--        s->vectors[ARMV7M_EXCP_PENDSV].active = (value & (1 << 10)) != 0;
--        s->vectors[ARMV7M_EXCP_SYSTICK].active = (value & (1 << 11)) != 0;
--        s->vectors[ARMV7M_EXCP_USAGE].pending = (value & (1 << 12)) != 0;
--        s->vectors[ARMV7M_EXCP_MEM].pending = (value & (1 << 13)) != 0;
--        s->vectors[ARMV7M_EXCP_BUS].pending = (value & (1 << 14)) != 0;
--        s->vectors[ARMV7M_EXCP_SVC].pending = (value & (1 << 15)) != 0;
--        s->vectors[ARMV7M_EXCP_MEM].enabled = (value & (1 << 16)) != 0;
--        s->vectors[ARMV7M_EXCP_BUS].enabled = (value & (1 << 17)) != 0;
--        s->vectors[ARMV7M_EXCP_USAGE].enabled = (value & (1 << 18)) != 0;
-         nvic_irq_update(s);
-         break;
-     case 0xd28: /* Configurable Fault Status.  */
++#ifndef HW_MSS_SPI_H
++#define HW_MSS_SPI_H
++
++#include "hw/sysbus.h"
++#include "hw/ssi/ssi.h"
++#include "qemu/fifo32.h"
++
++#define TYPE_MSS_SPI   "mss-spi"
++#define MSS_SPI(obj)   OBJECT_CHECK(MSSSpiState, (obj), TYPE_MSS_SPI)
++
++#define R_SPI_MAX             16
++
++typedef struct MSSSpiState {
++    SysBusDevice parent_obj;
++
++    MemoryRegion mmio;
++
++    qemu_irq irq;
++
++    qemu_irq cs_line;
++
++    SSIBus *spi;
++
++    Fifo32 rx_fifo;
++    Fifo32 tx_fifo;
++
++    int fifo_depth;
++    uint32_t frame_count;
++    bool enabled;
++
++    uint32_t regs[R_SPI_MAX];
++} MSSSpiState;
++
++#endif /* HW_MSS_SPI_H */
+diff --git a/hw/ssi/mss-spi.c b/hw/ssi/mss-spi.c
+new file mode 100644
+index 0000000..5a8e308
+--- /dev/null
++++ b/hw/ssi/mss-spi.c
+@@ -0,0 +1,404 @@
++/*
++ * Block model of SPI controller present in
++ * Microsemi's SmartFusion2 and SmartFusion SoCs.
++ *
++ * Copyright (C) 2017 Subbaraya Sundeep <sundeep.lkml@gmail.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/ssi/mss-spi.h"
++#include "qemu/log.h"
++
++#ifndef MSS_SPI_ERR_DEBUG
++#define MSS_SPI_ERR_DEBUG   0
++#endif
++
++#define DB_PRINT_L(lvl, fmt, args...) do { \
++    if (MSS_SPI_ERR_DEBUG >= lvl) { \
++        qemu_log("%s: " fmt "\n", __func__, ## args); \
++    } \
++} while (0);
++
++#define DB_PRINT(fmt, args...) DB_PRINT_L(1, fmt, ## args)
++
++#define FIFO_CAPACITY         32
++
++#define R_SPI_CONTROL         0
++#define R_SPI_DFSIZE          1
++#define R_SPI_STATUS          2
++#define R_SPI_INTCLR          3
++#define R_SPI_RX              4
++#define R_SPI_TX              5
++#define R_SPI_CLKGEN          6
++#define R_SPI_SS              7
++#define R_SPI_MIS             8
++#define R_SPI_RIS             9
++
++#define S_TXDONE             (1 << 0)
++#define S_RXRDY              (1 << 1)
++#define S_RXCHOVRF           (1 << 2)
++#define S_RXFIFOFUL          (1 << 4)
++#define S_RXFIFOFULNXT       (1 << 5)
++#define S_RXFIFOEMP          (1 << 6)
++#define S_RXFIFOEMPNXT       (1 << 7)
++#define S_TXFIFOFUL          (1 << 8)
++#define S_TXFIFOFULNXT       (1 << 9)
++#define S_TXFIFOEMP          (1 << 10)
++#define S_TXFIFOEMPNXT       (1 << 11)
++#define S_FRAMESTART         (1 << 12)
++#define S_SSEL               (1 << 13)
++#define S_ACTIVE             (1 << 14)
++
++#define C_ENABLE             (1 << 0)
++#define C_MODE               (1 << 1)
++#define C_INTRXDATA          (1 << 4)
++#define C_INTTXDATA          (1 << 5)
++#define C_INTRXOVRFLO        (1 << 6)
++#define C_SPS                (1 << 26)
++#define C_BIGFIFO            (1 << 29)
++#define C_RESET              (1 << 31)
++
++#define FRAMESZ_MASK         0x1F
++#define FMCOUNT_MASK         0x00FFFF00
++#define FMCOUNT_SHIFT        8
++
++static void txfifo_reset(MSSSpiState *s)
++{
++    fifo32_reset(&s->tx_fifo);
++
++    s->regs[R_SPI_STATUS] &= ~S_TXFIFOFUL;
++    s->regs[R_SPI_STATUS] |= S_TXFIFOEMP;
++}
++
++static void rxfifo_reset(MSSSpiState *s)
++{
++    fifo32_reset(&s->rx_fifo);
++
++    s->regs[R_SPI_STATUS] &= ~S_RXFIFOFUL;
++    s->regs[R_SPI_STATUS] |= S_RXFIFOEMP;
++}
++
++static void set_fifodepth(MSSSpiState *s)
++{
++    unsigned int size = s->regs[R_SPI_DFSIZE] & FRAMESZ_MASK;
++
++    if (size <= 8) {
++        s->fifo_depth = 32;
++    } else if (size <= 16) {
++        s->fifo_depth = 16;
++    } else if (size <= 32) {
++        s->fifo_depth = 8;
++    } else {
++        s->fifo_depth = 4;
++    }
++}
++
++static void update_mis(MSSSpiState *s)
++{
++    uint32_t reg = s->regs[R_SPI_CONTROL];
++    uint32_t tmp;
++
++    /*
++     * form the Control register interrupt enable bits
++     * same as RIS, MIS and Interrupt clear registers for simplicity
++     */
++    tmp = ((reg & C_INTRXOVRFLO) >> 4) | ((reg & C_INTRXDATA) >> 3) |
++           ((reg & C_INTTXDATA) >> 5);
++    s->regs[R_SPI_MIS] |= tmp & s->regs[R_SPI_RIS];
++}
++
++static void spi_update_irq(MSSSpiState *s)
++{
++    int irq;
++
++    update_mis(s);
++    irq = !!(s->regs[R_SPI_MIS]);
++
++    qemu_set_irq(s->irq, irq);
++}
++
++static void mss_spi_reset(DeviceState *d)
++{
++    MSSSpiState *s = MSS_SPI(d);
++
++    memset(s->regs, 0, sizeof s->regs);
++    s->regs[R_SPI_CONTROL] = 0x80000102;
++    s->regs[R_SPI_DFSIZE] = 0x4;
++    s->regs[R_SPI_STATUS] = S_SSEL | S_TXFIFOEMP | S_RXFIFOEMP;
++    s->regs[R_SPI_CLKGEN] = 0x7;
++    s->regs[R_SPI_RIS] = 0x0;
++
++    s->fifo_depth = 4;
++    s->frame_count = 1;
++    s->enabled = false;
++
++    rxfifo_reset(s);
++    txfifo_reset(s);
++}
++
++static uint64_t
++spi_read(void *opaque, hwaddr addr, unsigned int size)
++{
++    MSSSpiState *s = opaque;
++    uint32_t ret = 0;
++
++    addr >>= 2;
++    switch (addr) {
++    case R_SPI_RX:
++        s->regs[R_SPI_STATUS] &= ~S_RXFIFOFUL;
++        s->regs[R_SPI_STATUS] &= ~S_RXCHOVRF;
++        ret = fifo32_pop(&s->rx_fifo);
++        if (fifo32_is_empty(&s->rx_fifo)) {
++            s->regs[R_SPI_STATUS] |= S_RXFIFOEMP;
++        }
++        break;
++
++    case R_SPI_MIS:
++        update_mis(s);
++        ret = s->regs[R_SPI_MIS];
++        break;
++
++    default:
++        if (addr < ARRAY_SIZE(s->regs)) {
++            ret = s->regs[addr];
++        } else {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                         "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func__,
++                         addr * 4);
++            return ret;
++        }
++        break;
++    }
++
++    DB_PRINT("addr=0x%" HWADDR_PRIx " = 0x%" PRIx32, addr * 4, ret);
++    spi_update_irq(s);
++    return ret;
++}
++
++static void assert_cs(MSSSpiState *s)
++{
++    qemu_set_irq(s->cs_line, 0);
++}
++
++static void deassert_cs(MSSSpiState *s)
++{
++    qemu_set_irq(s->cs_line, 1);
++}
++
++static void spi_flush_txfifo(MSSSpiState *s)
++{
++    uint32_t tx;
++    uint32_t rx;
++    bool sps = !!(s->regs[R_SPI_CONTROL] & C_SPS);
++
++    /*
++     * Chip Select(CS) is automatically controlled by this controller.
++     * If SPS bit is set in Control register then CS is asserted
++     * until all the frames set in frame count of Control register are
++     * transferred. If SPS is not set then CS pulses between frames.
++     * Note that Slave Select register specifies which of the CS line
++     * has to be controlled automatically by controller. Bits SS[7:1] are for
++     * masters in FPGA fabric since we model only Microcontroller subsystem
++     * of Smartfusion2 we control only one CS(SS[0]) line.
++     */
++    while (!fifo32_is_empty(&s->tx_fifo) && s->frame_count) {
++        assert_cs(s);
++
++        s->regs[R_SPI_STATUS] &= ~(S_TXDONE | S_RXRDY);
++
++        tx = fifo32_pop(&s->tx_fifo);
++        DB_PRINT("data tx:0x%" PRIx32, tx);
++        rx = ssi_transfer(s->spi, tx);
++        DB_PRINT("data rx:0x%" PRIx32, rx);
++
++        if (fifo32_num_used(&s->rx_fifo) == s->fifo_depth) {
++            s->regs[R_SPI_STATUS] |= S_RXCHOVRF;
++            s->regs[R_SPI_RIS] |= S_RXCHOVRF;
++        } else {
++            fifo32_push(&s->rx_fifo, rx);
++            s->regs[R_SPI_STATUS] &= ~S_RXFIFOEMP;
++            if (fifo32_num_used(&s->rx_fifo) == (s->fifo_depth - 1)) {
++                s->regs[R_SPI_STATUS] |= S_RXFIFOFULNXT;
++            } else if (fifo32_num_used(&s->rx_fifo) == s->fifo_depth) {
++                s->regs[R_SPI_STATUS] |= S_RXFIFOFUL;
++            }
++        }
++        s->frame_count--;
++        if (!sps) {
++            deassert_cs(s);
++        }
++    }
++
++    if (!s->frame_count) {
++        s->frame_count = (s->regs[R_SPI_CONTROL] & FMCOUNT_MASK) >>
++                            FMCOUNT_SHIFT;
++        deassert_cs(s);
++        s->regs[R_SPI_RIS] |= S_TXDONE | S_RXRDY;
++        s->regs[R_SPI_STATUS] |= S_TXDONE | S_RXRDY;
++   }
++}
++
++static void spi_write(void *opaque, hwaddr addr,
++            uint64_t val64, unsigned int size)
++{
++    MSSSpiState *s = opaque;
++    uint32_t value = val64;
++
++    DB_PRINT("addr=0x%" HWADDR_PRIx " =0x%" PRIx32, addr, value);
++    addr >>= 2;
++
++    switch (addr) {
++    case R_SPI_TX:
++        /* adding to already full FIFO */
++        if (fifo32_num_used(&s->tx_fifo) == s->fifo_depth) {
++            break;
++        }
++        s->regs[R_SPI_STATUS] &= ~S_TXFIFOEMP;
++        fifo32_push(&s->tx_fifo, value);
++        if (fifo32_num_used(&s->tx_fifo) == (s->fifo_depth - 1)) {
++            s->regs[R_SPI_STATUS] |= S_TXFIFOFULNXT;
++        } else if (fifo32_num_used(&s->tx_fifo) == s->fifo_depth) {
++            s->regs[R_SPI_STATUS] |= S_TXFIFOFUL;
++        }
++        if (s->enabled) {
++            spi_flush_txfifo(s);
++        }
++        break;
++
++    case R_SPI_CONTROL:
++        s->regs[R_SPI_CONTROL] = value;
++        if (value & C_BIGFIFO) {
++            set_fifodepth(s);
++        } else {
++            s->fifo_depth = 4;
++        }
++        s->enabled = value & C_ENABLE;
++        s->frame_count = (value & FMCOUNT_MASK) >> FMCOUNT_SHIFT;
++        if (value & C_RESET) {
++            mss_spi_reset(DEVICE(s));
++        }
++        break;
++
++    case R_SPI_DFSIZE:
++        if (s->enabled) {
++            break;
++        }
++        s->regs[R_SPI_DFSIZE] = value;
++        break;
++
++    case R_SPI_INTCLR:
++        s->regs[R_SPI_INTCLR] = value;
++        if (value & S_TXDONE) {
++            s->regs[R_SPI_RIS] &= ~S_TXDONE;
++        }
++        if (value & S_RXRDY) {
++            s->regs[R_SPI_RIS] &= ~S_RXRDY;
++        }
++        if (value & S_RXCHOVRF) {
++            s->regs[R_SPI_RIS] &= ~S_RXCHOVRF;
++        }
++        break;
++
++    case R_SPI_MIS:
++    case R_SPI_STATUS:
++    case R_SPI_RIS:
++            qemu_log_mask(LOG_GUEST_ERROR,
++                         "%s: Write to read only register 0x%" HWADDR_PRIx "\n",
++                         __func__, addr * 4);
++        break;
++
++    default:
++        if (addr < ARRAY_SIZE(s->regs)) {
++            s->regs[addr] = value;
++        } else {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                         "%s: Bad offset 0x%" HWADDR_PRIx "\n", __func__,
++                         addr * 4);
++        }
++        break;
++    }
++
++    spi_update_irq(s);
++}
++
++static const MemoryRegionOps spi_ops = {
++    .read = spi_read,
++    .write = spi_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 4
++    }
++};
++
++static void mss_spi_realize(DeviceState *dev, Error **errp)
++{
++    MSSSpiState *s = MSS_SPI(dev);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
++
++    s->spi = ssi_create_bus(dev, "spi");
++
++    sysbus_init_irq(sbd, &s->irq);
++    ssi_auto_connect_slaves(dev, &s->cs_line, s->spi);
++    sysbus_init_irq(sbd, &s->cs_line);
++
++    memory_region_init_io(&s->mmio, OBJECT(s), &spi_ops, s,
++                          TYPE_MSS_SPI, R_SPI_MAX * 4);
++    sysbus_init_mmio(sbd, &s->mmio);
++
++    fifo32_create(&s->tx_fifo, FIFO_CAPACITY);
++    fifo32_create(&s->rx_fifo, FIFO_CAPACITY);
++}
++
++static const VMStateDescription vmstate_mss_spi = {
++    .name = TYPE_MSS_SPI,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_FIFO32(tx_fifo, MSSSpiState),
++        VMSTATE_FIFO32(rx_fifo, MSSSpiState),
++        VMSTATE_UINT32_ARRAY(regs, MSSSpiState, R_SPI_MAX),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static void mss_spi_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    dc->realize = mss_spi_realize;
++    dc->reset = mss_spi_reset;
++    dc->vmsd = &vmstate_mss_spi;
++}
++
++static const TypeInfo mss_spi_info = {
++    .name           = TYPE_MSS_SPI,
++    .parent         = TYPE_SYS_BUS_DEVICE,
++    .instance_size  = sizeof(MSSSpiState),
++    .class_init     = mss_spi_class_init,
++};
++
++static void mss_spi_register_types(void)
++{
++    type_register_static(&mss_spi_info);
++}
++
++type_init(mss_spi_register_types)
 -- 
 2.7.4
