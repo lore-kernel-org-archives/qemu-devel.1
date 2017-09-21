@@ -1,53 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:36687)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39175)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dusMF-0005T4-M5
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 23:41:01 -0400
+	(envelope-from <peterx@redhat.com>) id 1dusR6-00070b-DA
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 23:46:01 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <zyimin@linux.vnet.ibm.com>) id 1dusMC-0001b7-J4
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 23:40:59 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:49652
-	helo=mx0a-001b2d01.pphosted.com)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <zyimin@linux.vnet.ibm.com>)
-	id 1dusMC-0001ZM-DY
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 23:40:56 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8L3dtPk121834
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 23:40:54 -0400
-Received: from e31.co.us.ibm.com (e31.co.us.ibm.com [32.97.110.149])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2d3w1n3cbs-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 23:40:54 -0400
-Received: from localhost
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only!
-	Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <zyimin@linux.vnet.ibm.com>;
-	Wed, 20 Sep 2017 21:40:53 -0600
-Received: from b03ledav001.gho.boulder.ibm.com
-	(b03ledav001.gho.boulder.ibm.com [9.17.130.232])
-	by b03cxnp07028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with
-	ESMTP id v8L3eoHo3932638
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 20:40:50 -0700
-Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1EFDF6E035
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 21:40:50 -0600 (MDT)
-Received: from zyimindembp.cn.ibm.com (unknown [9.115.193.63])
-	by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP id A47CA6E038
-	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 21:40:49 -0600 (MDT)
-References: <1500028867-134709-1-git-send-email-borntraeger@de.ibm.com>
-	<1500028867-134709-34-git-send-email-borntraeger@de.ibm.com>
-	<5eb9a7bd-2761-bea1-738a-da7a6d3fbfcf@de.ibm.com>
-	<f6da1ec7-4845-fe78-b6b8-29a71d481458@de.ibm.com>
-	<20170920160417.GB3132@work-vm>
-From: Yi Min Zhao <zyimin@linux.vnet.ibm.com>
-Date: Thu, 21 Sep 2017 11:40:47 +0800
+	(envelope-from <peterx@redhat.com>) id 1dusR1-0005DF-EJ
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 23:46:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54950)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1dusR1-0005Cm-56
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 23:45:55 -0400
+Date: Thu, 21 Sep 2017 11:45:45 +0800
+From: Peter Xu <peterx@redhat.com>
+Message-ID: <20170921034545.GC30661@pxdev.xzpeter.org>
+References: <1505375436-28439-1-git-send-email-peterx@redhat.com>
+	<1505375436-28439-2-git-send-email-peterx@redhat.com>
+	<20170920075703.GA4053@redhat.com>
+	<20170920090926.GA31306@pxdev.xzpeter.org>
+	<20170920091438.GB4053@redhat.com>
+	<20170920104958.GA30661@pxdev.xzpeter.org>
+	<20170920110309.GF4053@redhat.com>
+	<20170920111849.GB30661@pxdev.xzpeter.org>
+	<20170920112921.GG4053@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170920160417.GB3132@work-vm>
-Content-Type: text/plain; charset=gbk; format=flowed
-Message-Id: <f0fcf8d6-e341-c53d-1198-3457ec2a007a@linux.vnet.ibm.com>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] block ais migration for machines <= 2.9
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170920112921.GG4053@redhat.com>
+Subject: Re: [Qemu-devel] [RFC 01/15] char-io: fix possible race on
+ IOWatchPoll
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -56,95 +35,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <shajnocz@redhat.com>, Fam Zheng <famz@redhat.com>, Juan Quintela <quintela@redhat.com>, mdroth@linux.vnet.ibm.com, Eric Blake <eblake@redhat.com>, Laurent Vivier <lvivier@redhat.com>, =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>, Markus Armbruster <armbru@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
+On Wed, Sep 20, 2017 at 12:29:21PM +0100, Daniel P. Berrange wrote:
+> On Wed, Sep 20, 2017 at 07:18:49PM +0800, Peter Xu wrote:
+> > On Wed, Sep 20, 2017 at 12:03:09PM +0100, Daniel P. Berrange wrote:
+> > > On Wed, Sep 20, 2017 at 06:49:58PM +0800, Peter Xu wrote:
+> > > > On Wed, Sep 20, 2017 at 10:14:38AM +0100, Daniel P. Berrange wrote:
+> > > > > On Wed, Sep 20, 2017 at 05:09:26PM +0800, Peter Xu wrote:
+> > > > > > On Wed, Sep 20, 2017 at 08:57:03AM +0100, Daniel P. Berrange wrote:
+> > > > > > > On Thu, Sep 14, 2017 at 03:50:22PM +0800, Peter Xu wrote:
+> > > > > > > > This is not a problem if we are only having one single loop thread like
+> > > > > > > > before.  However, after per-monitor thread is introduced, this is not
+> > > > > > > > true any more, and the race can happen.
+> > > > > > > > 
+> > > > > > > > The race can be triggered with "make check -j8" sometimes:
+> > > > > > > > 
+> > > > > > > >   qemu-system-x86_64: /root/git/qemu/chardev/char-io.c:91:
+> > > > > > > >   io_watch_poll_finalize: Assertion `iwp->src == NULL' failed.
+> > > > > > > > 
+> > > > > > > > This patch keeps the reference for the watch object when creating in
+> > > > > > > > io_add_watch_poll(), so that the object will never be released in the
+> > > > > > > > context main loop, especially when the context loop is running in
+> > > > > > > > another standalone thread.  Meanwhile, when we want to remove the watch
+> > > > > > > > object, we always first detach the watch object from its owner context,
+> > > > > > > > then we continue with the cleanup.
+> > > > > > > > 
+> > > > > > > > Without this patch, calling io_remove_watch_poll() in main loop thread
+> > > > > > > > is not thread-safe, since the other per-monitor thread may be modifying
+> > > > > > > > the watch object at the same time.
+> > > > > > > 
+> > > > > > > This doesn't feel right to me. Why is the main loop thread doing anything
+> > > > > > > at all with the Chardev, if there is a per-monitor thread ? The Chardev
+> > > > > > > code isn't thread safe so it isn't safe to have two separate threads
+> > > > > > > accessing the same Chardev. IOW, if we want a per-monitor thread, then
+> > > > > > > we must make sure the main thread never touches that monitor's chardev
+> > > > > > > at all.  While your patch here might have avoided the assertion you
+> > > > > > > mention above, I fear this is just papering over a fundamental problem
+> > > > > > > that still exists, that can only be solved by not letting the mainloop
+> > > > > > > touch the chardev at all.
+> > > > > > 
+> > > > > > The stack I encountered:
+> > > > > > 
+> > > > > > #0  0x00007f658234c765 in __GI_raise (sig=sig@entry=6) at ../sysdeps/unix/sysv/linux/raise.c:54
+> > > > > > #1  0x00007f658234e36a in __GI_abort () at abort.c:89
+> > > > > > #2  0x00007f6582344f97 in __assert_fail_base (fmt=<optimized out>, assertion=assertion@entry=0x55c76345fce1 "iwp->src == NULL", file=file@entry=0x55c76345fcc0 "/root/git/qemu/chardev/char-io.c", line=line@entry=91, function=function@entry=0x55c76345fd10 <__PRETTY_FUNCTION__.21863> "io_watch_poll_finalize") at assert.c:92
+> > > > > > #3  0x00007f6582345042 in __GI___assert_fail (assertion=0x55c76345fce1 "iwp->src == NULL", file=0x55c76345fcc0 "/root/git/qemu/chardev/char-io.c", line=91, function=0x55c76345fd10 <__PRETTY_FUNCTION__.21863> "io_watch_poll_finalize") at assert.c:101
+> > > > > > #4  0x000055c7632c2be5 in io_watch_poll_finalize (source=0x55c7651cd450) at /root/git/qemu/chardev/char-io.c:91
+> > > > > > #5  0x00007f65847bb859 in g_source_unref_internal () at /lib64/libglib-2.0.so.0
+> > > > > > #6  0x00007f65847bca29 in g_source_destroy_internal () at /lib64/libglib-2.0.so.0
+> > > > > > #7  0x000055c7632c2d30 in io_remove_watch_poll (source=0x55c7651cd450) at /root/git/qemu/chardev/char-io.c:139
+> > > > > > #8  0x000055c7632c2d5c in remove_fd_in_watch (chr=0x55c7651ccdf0) at /root/git/qemu/chardev/char-io.c:145
+> > > > > > #9  0x000055c7632c2368 in qemu_chr_fe_set_handlers (b=0x55c7651f6410, fd_can_read=0x0, fd_read=0x0, fd_event=0x0, be_change=0x0, opaque=0x0, context=0x0, set_open=true)
+> > > > > >     at /root/git/qemu/chardev/char-fe.c:267
+> > > > > > #10 0x000055c7632c2221 in qemu_chr_fe_deinit (b=0x55c7651f6410, del=false) at /root/git/qemu/chardev/char-fe.c:231
+> > > > > > #11 0x000055c762e2b15c in monitor_data_destroy (mon=0x55c7651f6410) at /root/git/qemu/monitor.c:600
+> > > > > > #12 0x000055c762e340ec in monitor_cleanup () at /root/git/qemu/monitor.c:4346
+> > > > > > #13 0x000055c762f9445d in main (argc=19, argv=0x7ffc6846d0e8, envp=0x7ffc6846d188) at /root/git/qemu/vl.c:4889
+> > > > > > 
+> > > > > > So it's destroying the CharBackend, but it'll then call
+> > > > > > qemu_chr_fe_set_handlers() which finally tries to remove the watch poll.
+> > > > > 
+> > > > > Ok that code is broken - it must not call monitor_cleanup from the main
+> > > > > thread - it needs to be called from the monitor thread, unless it can
+> > > > > guarantee that the monitor thread has already exited, which seems unlikely
+> > > > 
+> > > > The problem is that not all monitors are parsed in the IO thread, but
+> > > > only those with use_io_thr=true set.
+> > > > 
+> > > > How about I move the calls of monitor_data_destroy() into that monitor
+> > > > IO thread when use_io_thr=true?  And for the rest, I think they still
+> > > > need to be destroyed in the main thread.
+> > > 
+> > > I think having the monitor sometimes run in the main thread and sometimes
+> > > run in a background thread is a recipe for ongoing trouble, of which this
+> > > problem is just the first example that will hurt us. People will test
+> > > behaviour of a feature with one setup and then users will later run it in
+> > > a different setup and potentially experiance obscure bugs as a result.
+> > > IOW, use_io_thr flag should not exist, and every monitor should be run
+> > > unconditionally in the background thread from the point at which your
+> > > patch series merges.
+> > 
+> > I agree with you that this may bring trouble in some aspect.  I just
+> > don't know whether it'll bring more trouble if we move all the
+> > monitor-related chardev IO into monitor thread.
+> > 
+> > The key is the muxed typed chardev.
+> > 
+> > If we don't have muxed typed chardev, I'll surely consider to use IO
+> > thread for all the monitors.
+> > 
+> > However, the muxed chardevs can support e.g. one monitor plus a serial
+> > port. Can we just run the IO stuff in monitor thread even part of its
+> > frontend is a serial port?  And also I'm not sure what would happen if
+> > it's a monitor plus something else I even don't aware of.
+> 
+> Urgh, I forgot about the horrible mux chardev concept, that does rather
+> complicate life - moving the guest device interaction to the monitor
+> thread would be dubious.
+> 
+> So yeah, given that, it probably is simplest to change monitor_cleanup
+> to skip destroy of monitors which have a background thread.
 
+Thanks.  I'll add one more patch to split the cleanups to make sure
+they are done in their own thread.
 
-=D4=DA 2017/9/21 =C9=CF=CE=E712:04, Dr. David Alan Gilbert =D0=B4=B5=C0:
-> * Christian Borntraeger (borntraeger@de.ibm.com) wrote:
->> Something like the following seems to do the tricks.
->> Needs proper patch description, review, full test with different kerne=
-l versions.....
-> Without knowing anything about 'ais' - will this break migration from
-> 2.10 -> 2.10+this fix?
-I think it doesn't break. I will have a try later.
->
-> Dave
->
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index 1c7af39..2ff32ba 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -212,6 +212,7 @@ static void ccw_machine_class_init(ObjectClass *oc=
-, void *data)
->>       s390mc->cpu_model_allowed =3D true;
->>       s390mc->css_migration_enabled =3D true;
->>       s390mc->gs_allowed =3D true;
->> +    s390mc->ais_allowed =3D true;
->>       mc->init =3D ccw_init;
->>       mc->reset =3D s390_machine_reset;
->>       mc->hot_add_cpu =3D s390_hot_add_cpu;
->> @@ -305,6 +306,11 @@ bool gs_allowed(void)
->>       return false;
->>   }
->>  =20
->> +bool ais_allowed(void)
->> +{
->> +    return get_machine_class()->ais_allowed;
->> +}
->> +
->>   static char *machine_get_loadparm(Object *obj, Error **errp)
->>   {
->>       S390CcwMachineState *ms =3D S390_CCW_MACHINE(obj);
->> @@ -533,6 +539,7 @@ static void ccw_machine_2_9_class_options(MachineC=
-lass *mc)
->>       S390CcwMachineClass *s390mc =3D S390_MACHINE_CLASS(mc);
->>  =20
->>       s390mc->gs_allowed =3D false;
->> +    s390mc->ais_allowed =3D false;
->>       ccw_machine_2_10_class_options(mc);
->>       SET_MACHINE_COMPAT(mc, CCW_COMPAT_2_9);
->>       s390mc->css_migration_enabled =3D false;
->> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s39=
-0-virtio-ccw.h
->> index 41a9d28..bba8660 100644
->> --- a/include/hw/s390x/s390-virtio-ccw.h
->> +++ b/include/hw/s390x/s390-virtio-ccw.h
->> @@ -41,6 +41,7 @@ typedef struct S390CcwMachineClass {
->>       bool cpu_model_allowed;
->>       bool css_migration_enabled;
->>       bool gs_allowed;
->> +    bool ais_allowed;
->>   } S390CcwMachineClass;
->>  =20
->>   /* runtime-instrumentation allowed by the machine */
->> @@ -49,6 +50,8 @@ bool ri_allowed(void);
->>   bool cpu_model_allowed(void);
->>   /* guarded-storage allowed by the machine */
->>   bool gs_allowed(void);
->> +/* ais allowed by the machine */
->> +bool ais_allowed(void);
->>  =20
->>   /**
->>    * Returns true if (vmstate based) migration of the channel subsyste=
-m
->> diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
->> index c4c5791..531d474 100644
->> --- a/target/s390x/kvm.c
->> +++ b/target/s390x/kvm.c
->> @@ -309,7 +309,9 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
->>       }
->>  =20
->>       /* Try to enable AIS facility */
->> -    kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
->> +    if (ais_allowed()) {
->> +       kvm_vm_enable_cap(s, KVM_CAP_S390_AIS, 0);
->> +    }
->>  =20
->>       qemu_mutex_init(&qemu_sigp_mutex);
->>
->>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
->
+If you won't disagree, I would still prefer to keep this patch -
+firstly, it never hurts; secondly, in case one day we would like to
+make the whole chardev thread-safe, then we won't need to dig that
+hole again.
+
+-- 
+Peter Xu
