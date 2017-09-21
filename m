@@ -1,20 +1,33 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40155)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41548)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dusTJ-0007gq-Vu
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 23:48:19 -0400
+	(envelope-from <bounces@canonical.com>) id 1dusWE-00007g-1N
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 23:51:18 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1dusTI-0006cf-Ds
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 23:48:18 -0400
-Date: Thu, 21 Sep 2017 12:22:10 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170921022210.GC4998@umbus.fritz.box>
-References: <150591878000.25597.7317602171707035692.stgit@bahia>
+	(envelope-from <bounces@canonical.com>) id 1dusW9-0008Vy-64
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 23:51:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54056)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dusW9-0008VR-06
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 23:51:13 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dusW6-0006BT-1p
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 03:51:10 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id 0B8E22E8493
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 03:51:10 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="+xNpyl7Qekk2NvDX"
-Content-Disposition: inline
-In-Reply-To: <150591878000.25597.7317602171707035692.stgit@bahia>
-Subject: Re: [Qemu-devel] [PATCH v3] spapr_pci: make index property mandatory
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 21 Sep 2017 03:38:52 -0000
+From: Thomas Huth <1673976@bugs.launchpad.net>
+Reply-To: Bug 1673976 <1673976@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <20170318142657.21676.52259.malonedeb@chaenomeles.canonical.com>
+Message-Id: <150596513220.22073.8026844278313569082.malone@chaenomeles.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1673976] Re: core dump
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,213 +36,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, Alexey Kardashevskiy <aik@ozlabs.ru>, Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
 
+Could you please check whether the problem also occurs with QEMU v2.10?
 
---+xNpyl7Qekk2NvDX
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
-On Wed, Sep 20, 2017 at 04:46:20PM +0200, Greg Kurz wrote:
-> PHBs can be created with an index property, in which case the machine
-> code automatically sets all the MMIO windows at addresses derived from
-> the index. Alternatively, they can be manually created without index,
-> but the user has to provide addresses for all MMIO windows.
->=20
-> The non-index way happens to be more trouble than it's worth: it's
-> difficult to use, keeps requiring (potentially incompatible) changes
-> when some new parameter needs adding, and is awkward to check for
-> collisions. It currently even has a bug that prevents to use two
-> non-index PHBs because their child DRCs are all derived from the
-> same index =3D=3D -1 value, and, thus, collide.
->=20
-> This patch hence makes the index property mandatory. As a consequence,
-> the PHB's memory regions and BUID are now always configured according
-> to the index, and it is no longer possible to set them from the command
-> line.
->=20
-> This DOES BREAK backwards compat, but we don't think the non-index
-> PHB feature was used in practice (at least libvirt doesn't) and the
-> simplification is worth it.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
-> v2->v3: - re-write commit message
->         - mem64_win_pciaddr no longer configurable
->         - simplified check to map 64-bit window
->=20
-> v1->v2: - error out if mem64_win_pciaddr is set but mem64_win_size
->           isn't
->         - set mem64_win_addr to -1 for old configuration with 32-bit
->           window below 2G in spapr_phb_realize()
->         - drop instance init function
->=20
-> RFC->v1: - as suggested dy David, updated the changelog to explicitely
->            mention that we intentionally break backwards compat.
+-- =
 
-Applied to ppc-for-2.11, thanks.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1673976
 
-> ---
+Title:
+  core dump
 
-> ---
->  hw/ppc/spapr_pci.c |   62 +++++++---------------------------------------=
-------
->  1 file changed, 8 insertions(+), 54 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-> index cf54160526fa..6126c800440f 100644
-> --- a/hw/ppc/spapr_pci.c
-> +++ b/hw/ppc/spapr_pci.c
-> @@ -1523,16 +1523,6 @@ static void spapr_phb_realize(DeviceState *dev, Er=
-ror **errp)
->          sPAPRMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
->          Error *local_err =3D NULL;
-> =20
-> -        if ((sphb->buid !=3D (uint64_t)-1) || (sphb->dma_liobn[0] !=3D (=
-uint32_t)-1)
-> -            || (sphb->dma_liobn[1] !=3D (uint32_t)-1 && windows_supporte=
-d =3D=3D 2)
-> -            || (sphb->mem_win_addr !=3D (hwaddr)-1)
-> -            || (sphb->mem64_win_addr !=3D (hwaddr)-1)
-> -            || (sphb->io_win_addr !=3D (hwaddr)-1)) {
-> -            error_setg(errp, "Either \"index\" or other parameters must"
-> -                       " be specified for PAPR PHB, not both");
-> -            return;
-> -        }
-> -
->          smc->phb_placement(spapr, sphb->index,
->                             &sphb->buid, &sphb->io_win_addr,
->                             &sphb->mem_win_addr, &sphb->mem64_win_addr,
-> @@ -1541,46 +1531,20 @@ static void spapr_phb_realize(DeviceState *dev, E=
-rror **errp)
->              error_propagate(errp, local_err);
->              return;
->          }
-> -    }
-> -
-> -    if (sphb->buid =3D=3D (uint64_t)-1) {
-> -        error_setg(errp, "BUID not specified for PHB");
-> -        return;
-> -    }
-> -
-> -    if ((sphb->dma_liobn[0] =3D=3D (uint32_t)-1) ||
-> -        ((sphb->dma_liobn[1] =3D=3D (uint32_t)-1) && (windows_supported =
-> 1))) {
-> -        error_setg(errp, "LIOBN(s) not specified for PHB");
-> -        return;
-> -    }
-> -
-> -    if (sphb->mem_win_addr =3D=3D (hwaddr)-1) {
-> -        error_setg(errp, "Memory window address not specified for PHB");
-> -        return;
-> -    }
-> -
-> -    if (sphb->io_win_addr =3D=3D (hwaddr)-1) {
-> -        error_setg(errp, "IO window address not specified for PHB");
-> +    } else {
-> +        error_setg(errp, "\"index\" for PAPR PHB is mandatory");
->          return;
->      }
-> =20
->      if (sphb->mem64_win_size !=3D 0) {
-> -        if (sphb->mem64_win_addr =3D=3D (hwaddr)-1) {
-> -            error_setg(errp,
-> -                       "64-bit memory window address not specified for P=
-HB");
-> -            return;
-> -        }
-> -
->          if (sphb->mem_win_size > SPAPR_PCI_MEM32_WIN_SIZE) {
->              error_setg(errp, "32-bit memory window of size 0x%"HWADDR_PR=
-Ix
->                         " (max 2 GiB)", sphb->mem_win_size);
->              return;
->          }
-> =20
-> -        if (sphb->mem64_win_pciaddr =3D=3D (hwaddr)-1) {
-> -            /* 64-bit window defaults to identity mapping */
-> -            sphb->mem64_win_pciaddr =3D sphb->mem64_win_addr;
-> -        }
-> +        /* 64-bit window defaults to identity mapping */
-> +        sphb->mem64_win_pciaddr =3D sphb->mem64_win_addr;
->      } else if (sphb->mem_win_size > SPAPR_PCI_MEM32_WIN_SIZE) {
->          /*
->           * For compatibility with old configuration, if no 64-bit MMIO
-> @@ -1622,18 +1586,16 @@ static void spapr_phb_realize(DeviceState *dev, E=
-rror **errp)
->      memory_region_add_subregion(get_system_memory(), sphb->mem_win_addr,
->                                  &sphb->mem32window);
-> =20
-> -    if (sphb->mem64_win_pciaddr !=3D (hwaddr)-1) {
-> +    if (sphb->mem64_win_size !=3D 0) {
->          namebuf =3D g_strdup_printf("%s.mmio64-alias", sphb->dtbusname);
->          memory_region_init_alias(&sphb->mem64window, OBJECT(sphb),
->                                   namebuf, &sphb->memspace,
->                                   sphb->mem64_win_pciaddr, sphb->mem64_wi=
-n_size);
->          g_free(namebuf);
-> =20
-> -        if (sphb->mem64_win_addr !=3D (hwaddr)-1) {
-> -            memory_region_add_subregion(get_system_memory(),
-> -                                        sphb->mem64_win_addr,
-> -                                        &sphb->mem64window);
-> -        }
-> +        memory_region_add_subregion(get_system_memory(),
-> +                                    sphb->mem64_win_addr,
-> +                                    &sphb->mem64window);
->      }
-> =20
->      /* Initialize IO regions */
-> @@ -1789,18 +1751,10 @@ static void spapr_phb_reset(DeviceState *qdev)
-> =20
->  static Property spapr_phb_properties[] =3D {
->      DEFINE_PROP_UINT32("index", sPAPRPHBState, index, -1),
-> -    DEFINE_PROP_UINT64("buid", sPAPRPHBState, buid, -1),
-> -    DEFINE_PROP_UINT32("liobn", sPAPRPHBState, dma_liobn[0], -1),
-> -    DEFINE_PROP_UINT32("liobn64", sPAPRPHBState, dma_liobn[1], -1),
-> -    DEFINE_PROP_UINT64("mem_win_addr", sPAPRPHBState, mem_win_addr, -1),
->      DEFINE_PROP_UINT64("mem_win_size", sPAPRPHBState, mem_win_size,
->                         SPAPR_PCI_MEM32_WIN_SIZE),
-> -    DEFINE_PROP_UINT64("mem64_win_addr", sPAPRPHBState, mem64_win_addr, =
--1),
->      DEFINE_PROP_UINT64("mem64_win_size", sPAPRPHBState, mem64_win_size,
->                         SPAPR_PCI_MEM64_WIN_SIZE),
-> -    DEFINE_PROP_UINT64("mem64_win_pciaddr", sPAPRPHBState, mem64_win_pci=
-addr,
-> -                       -1),
-> -    DEFINE_PROP_UINT64("io_win_addr", sPAPRPHBState, io_win_addr, -1),
->      DEFINE_PROP_UINT64("io_win_size", sPAPRPHBState, io_win_size,
->                         SPAPR_PCI_IO_WIN_SIZE),
->      DEFINE_PROP_BOOL("dynamic-reconfiguration", sPAPRPHBState, dr_enable=
-d,
->=20
+Status in QEMU:
+  Incomplete
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+Bug description:
+  I'm running a command (locale-gen) inside of an armv7h chroot mounted
+  on my x86_64 desktop by putting qemu-arm-static into /usr/bin/ of the
+  chroot file system and I get a core dump.
 
---+xNpyl7Qekk2NvDX
-Content-Type: application/pgp-signature; name="signature.asc"
+  locale-gen
+  Generating locales...
+  =C2=A0=C2=A0en_US.UTF-8...localedef: ../sysdeps/unix/sysv/linux/spawni.c:=
+360: __spawnix: Assertion `ec >=3D 0' failed.
+  qemu: uncaught target signal 6 (Aborted) - core dumped
+  /usr/bin/locale-gen: line 41:    34 Aborted                 (core dumped)=
+ localedef -i $input -c -f $charset -A /usr/share/locale/locale.alias $loca=
+le
 
------BEGIN PGP SIGNATURE-----
+  I've done this same thing successfully for years, but this breakage
+  has appeared some time in the last 3 or so months. Possibly with the
+  update to qemu version 2.8.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnDIk8ACgkQbDjKyiDZ
-s5KyMRAAvCehGML5OyEaos0gszRRWHvhHK9A2sEamgyFXEs5cPqftzRr30G+Slx0
-Yq9PGk/mQDNBTDETOLWlx0ewC0YfbN2W0AVMAD+9cUrhNrlDH0hW/gHYeMLw9DfH
-zJQEy3dudTOjHwEnZCEpeXohHiy0g06uFySKJJi/oQHV2+WVbHlKGsXQXwRs5oTI
-kya/+wdHEkM7ofrK8j4OnjjziNPy2RTeevnM4C9dwloSIyOPI2P9ufmimuPUd9ny
-Bd/JVGCgOV5n9srC4wJyEko17vIZJlfA/g1Yg+hXRqy0B0YhwaRul8s5BMIxc8Hw
-Sg1bc/ct3IG+b40FRq7BjKz9b1kdQGxQQaJYUWZ8ofIhNImxTYMpHejPwCpv0Vsg
-fyR18bVgf4LaQjr1cRjOaJBUHy5De/x2S+OJFlBEpYZyVAvN17YZiFbSXNzTqEcI
-d174xrfKGwyganWusglsPBjlg4dXhSU1Iesmq84jwARdcUQT6v5HEc45FM9TWNO5
-6qxMCOfkWS8mZWXF/4/87IMjEw77h8iNrgl9SbrQUodrQNF1FOlWjjQLroAoE0ZE
-WPXMrvCDGyklmDYznU9wLf1aitMFX4yFfpx9bfR1VCoqLvqmoOEk5xmG8ojiUAF0
-PfhVOstVS1AzdKBH8bUu3IfbMdFk/acnN+1BLkR+PJ4OLYbVlDk=
-=WVnN
------END PGP SIGNATURE-----
-
---+xNpyl7Qekk2NvDX--
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1673976/+subscriptions
