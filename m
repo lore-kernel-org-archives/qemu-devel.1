@@ -1,28 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33721)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33996)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dv1hW-0008S0-E1
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:39:40 -0400
+	(envelope-from <peter.maydell@linaro.org>) id 1dv1iN-0000jJ-Bh
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:40:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <aik@ozlabs.ru>) id 1dv1hT-00075w-9t
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:39:34 -0400
-Received: from mail-pg0-x242.google.com ([2607:f8b0:400e:c05::242]:33132)
+	(envelope-from <peter.maydell@linaro.org>) id 1dv1iH-0007e3-QL
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:40:27 -0400
+Received: from mail-wr0-x22b.google.com ([2a00:1450:400c:c0c::22b]:56456)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dv1hT-00075R-0l
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:39:31 -0400
-Received: by mail-pg0-x242.google.com with SMTP id i130so3459630pgc.0
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 06:39:30 -0700 (PDT)
-References: <20170921120751.3027-1-pbonzini@redhat.com>
-	<20170921120751.3027-3-pbonzini@redhat.com>
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-ID: <1d5f2bb4-c330-98b9-bf1a-6024a9f9093d@ozlabs.ru>
-Date: Thu, 21 Sep 2017 23:39:25 +1000
+	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
+	id 1dv1iH-0007dm-IQ
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:40:21 -0400
+Received: by mail-wr0-x22b.google.com with SMTP id r74so4599730wrb.13
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 06:40:21 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170921120751.3027-3-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-AU
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/3] memory: seek FlatView sharing
- candidates among children subregions
+In-Reply-To: <20170921075134.GB19099@kentang.lan>
+References: <20170921075134.GB19099@kentang.lan>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 Sep 2017 14:39:59 +0100
+Message-ID: <CAFEAcA-mKF_2E_ZjC8QYY5qpeCx+9tqwBNtc-DQY4gfqAc-Dcg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PULL] qemu-sparc updates
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -31,88 +28,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 
-On 21/09/17 22:07, Paolo Bonzini wrote:
-> A container can be used instead of an alias to allow switching between
-> multiple subregions.  In this case we cannot directly share the
-> subregions (since they only belong to a single parent), but if the
-> subregions are aliases we can in turn walk those.
-> 
-> While this does not reduce much the number of FlatViews that are created,
-> it makes it possible to share the PCI bus master FlatViews and their
-> AddressSpaceDispatch structures.  For 112 virtio-net-pci devices, boot time
-> is reduced from 25 to 10 seconds and memory consumption from 1.4 to 1 G.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  memory.c | 41 +++++++++++++++++++++++++++++++++++------
->  1 file changed, 35 insertions(+), 6 deletions(-)
-> 
-> diff --git a/memory.c b/memory.c
-> index 4952cc5d84..3207ae55e2 100644
-> --- a/memory.c
-> +++ b/memory.c
-> @@ -733,12 +733,41 @@ static void render_memory_region(FlatView *view,
->  
->  static MemoryRegion *memory_region_get_flatview_root(MemoryRegion *mr)
->  {
-> -    while (mr->alias && !mr->alias_offset &&
-> -           int128_ge(mr->size, mr->alias->size)) {
-> -        /* The alias is included in its entirety.  Use it as
-> -         * the "real" root, so that we can share more FlatViews.
-> -         */
-> -        mr = mr->alias;
-> +    while (mr->enabled) {
-> +        if (mr->alias && !mr->alias_offset &&
-> +            int128_ge(mr->size, mr->alias->size)) {
-> +            /* The alias is included in its entirety.  Use it as
-> +             * the "real" root, so that we can share more FlatViews.
-> +             */
-> +            mr = mr->alias;
-> +            continue;
-> +        }
-> +
-> +        if (!mr->terminates) {
+On 21 September 2017 at 08:51, Mark Cave-Ayland
+<mark.cave-ayland@ilande.co.uk> wrote:
+> Hi Peter,
+>
+> This contains the code for the new Sun HME (Happy Meal Ethernet) card and switches the sun4u machine
+> over to use it as the default. Please pull.
+>
+>
+> ATB,
+>
+> Mark.
+>
+>
+> The following changes since commit b62b7ed0fc9c58e373b8946c9bd2e193be98dae6:
+>
+>   Merge remote-tracking branch 'remotes/gkurz/tags/for-upstream' into staging (2017-09-20 20:33:48 +0100)
+>
+> are available in the git repository at:
+>
+>
+>   https://github.com/mcayland/qemu.git tags/qemu-sparc-signed
+>
+> for you to fetch changes up to 8d9329719cc0996e5837fb466ca4d7be8030f8c9:
+>
+>   sun4u: use sunhme as default on-board NIC (2017-09-21 08:38:42 +0100)
+>
+> ----------------------------------------------------------------
+> qemu-sparc update
+>
+> ----------------------------------------------------------------
+> Mark Cave-Ayland (2):
+>       net: add Sun HME (Happy Meal Ethernet) on-board NIC
+>       sun4u: use sunhme as default on-board NIC
 
-Can an MR have terminates==true and children by the same time? If so, what for?
+Applied, thanks.
 
-
-> +            unsigned int found = 0;
-> +            MemoryRegion *child, *next = NULL;
-> +            QTAILQ_FOREACH(child, &mr->subregions, subregions_link) {
-> +                if (child->enabled) {
-> +                    if (++found > 1) {
-> +                        next = NULL;
-> +                        break;
-> +                    }
-> +                    if (!child->addr && int128_ge(mr->size, child->size)) {
-
-
-Ah, I tried this one but in v4's 18/18 (that hinting thing), did not work
-out but for a different reason.
-
-
-> +                        /* A child is included in its entirety.  If it's the only
-> +                         * enabled one, use it in the hope of finding an alias down the
-> +                         * way. This will also let us share FlatViews.
-> +                         */
-> +                        next = child;
-> +                    }
-> +                }
-> +            }
-> +            if (next) {
-> +                mr = next;
-> +                continue;
-> +            }
-> +        }
-> +
-> +        break;
->      }
->  
->      return mr;
-> 
-
-
--- 
-Alexey
+-- PMM
