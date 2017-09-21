@@ -1,23 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41961)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43429)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dv0Rn-0000IQ-7S
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:19:20 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dv0WX-0002nE-KO
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:24:10 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <vsementsov@virtuozzo.com>) id 1dv0Rk-0001FM-0Z
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:19:15 -0400
-Received: from mailhub.sw.ru ([195.214.232.25]:35884 helo=relay.sw.ru)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <vsementsov@virtuozzo.com>)
-	id 1dv0Rj-0001En-LH
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:19:11 -0400
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
-Date: Thu, 21 Sep 2017 15:18:47 +0300
+	(envelope-from <stefanha@gmail.com>) id 1dv0WU-00042i-F7
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:24:09 -0400
+Received: from mail-wm0-x22b.google.com ([2a00:1450:400c:c09::22b]:48413)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <stefanha@gmail.com>) id 1dv0WU-00041v-8E
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:24:06 -0400
+Received: by mail-wm0-x22b.google.com with SMTP id m127so1304345wmm.3
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 05:24:04 -0700 (PDT)
+Date: Thu, 21 Sep 2017 13:24:01 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170921122401.GE32364@stefanha-x1.localdomain>
+References: <20170921100529.2462-1-berrange@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: [Qemu-devel] nbd structured reply
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170921100529.2462-1-berrange@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH] io: add trace events for websockets frame
+ handling
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,20 +29,17 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>, Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>, "nbd-general@lists.sourceforge.net" <nbd-general@lists.sourceforge.net>
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-Hi all!
+On Thu, Sep 21, 2017 at 11:05:29AM +0100, Daniel P. Berrange wrote:
+> It is useful to trace websockets frame encoding/decoding when debugging
+> problems.
+> 
+> Signed-off-by: Daniel P. Berrange <berrange@redhat.com>
+> ---
+>  io/channel-websock.c | 23 ++++++++++++++++++-----
+>  io/trace-events      |  5 +++++
+>  2 files changed, 23 insertions(+), 5 deletions(-)
 
-I'm about this:
-
-"A server SHOULD try to minimize the number of chunks sent in a reply, 
-but MUST NOT mark a chunk as final if there is still a possibility of 
-detecting an error before transmission of that chunk completes"
-
-What do we mean by "possibility"? Formally, such possibility exists 
-always, so, we'll never mark a chunk as final.
-
--- 
-Best regards,
-Vladimir
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
