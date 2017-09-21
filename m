@@ -1,34 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56936)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58007)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dv5uI-0005np-Gy
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:09:06 -0400
+	(envelope-from <zuban32s@gmail.com>) id 1dv5xZ-0008DV-EA
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:12:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dv5uE-0006K2-Qj
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:09:02 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:35912)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dv5uE-0006JJ-Hf
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:08:58 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8LI6u9l087363
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 14:08:53 -0400
-Received: from e06smtp14.uk.ibm.com (e06smtp14.uk.ibm.com [195.75.94.110])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d4f1mk9wv-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 14:08:52 -0400
-Received: from localhost
-	by e06smtp14.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 21 Sep 2017 19:08:50 +0100
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 21 Sep 2017 20:08:39 +0200
-In-Reply-To: <20170921180841.24490-1-pasic@linux.vnet.ibm.com>
-References: <20170921180841.24490-1-pasic@linux.vnet.ibm.com>
-Message-Id: <20170921180841.24490-4-pasic@linux.vnet.ibm.com>
-Subject: [Qemu-devel] [PATCH v4 3/5] virtio-ccw: use ccw data stream
+	(envelope-from <zuban32s@gmail.com>) id 1dv5xY-0001LP-Fj
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:12:25 -0400
+Received: from mail-pf0-x244.google.com ([2607:f8b0:400e:c00::244]:34182)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <zuban32s@gmail.com>) id 1dv5xY-0001KB-76
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:12:24 -0400
+Received: by mail-pf0-x244.google.com with SMTP id g65so2780067pfe.1
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 11:12:22 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <f5dbe1a3-bb18-28ff-515b-e8a9ef924835@redhat.com>
+References: <1505942471-11260-1-git-send-email-zuban32s@gmail.com>
+	<f5dbe1a3-bb18-28ff-515b-e8a9ef924835@redhat.com>
+From: Aleksandr Bezzubikov <zuban32s@gmail.com>
+Date: Thu, 21 Sep 2017 21:12:21 +0300
+Message-ID: <CAKSfGUAjsBb-zmwZPMcApL0p5mz8Futdpis0W6v_ry-3nhBypA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [Qemu-devel] [PATCH] hw/pci-bridge/pcie_pci_bridge: properly
+ handle MSI unavailability case
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -37,311 +29,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org, Halil Pasic <pasic@linux.vnet.ibm.com>
+To: Marcel Apfelbaum <marcel@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 
-Replace direct access which implicitly assumes no IDA
-or MIDA with the new ccw data stream interface which should
-cope with these transparently in the future.
+2017-09-21 13:16 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
+> Hi Aleksandr,
+>
+> On 21/09/2017 0:21, Aleksandr Bezzubikov wrote:
+>>
+>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
+>> ---
+>>   hw/pci-bridge/pcie_pci_bridge.c | 24 ++++++++++++++++++------
+>>   1 file changed, 18 insertions(+), 6 deletions(-)
+>>
+>
+> Please add Eduardo's Reported-by tag and the
+> actual failure in the commit message.
+> You might even explain in the commit message that you
+> moved msi prop to ON_OFF_AUTO_AUTO.
 
-Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
-Reviewed-by: Pierre Morel<pmorel@linux.vnet.ibm.com>
-Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
----
- hw/s390x/virtio-ccw.c | 155 +++++++++++++++-----------------------------------
- 1 file changed, 46 insertions(+), 109 deletions(-)
+Should I send a new one, or resend, or just reply to this post?
 
-diff --git a/hw/s390x/virtio-ccw.c b/hw/s390x/virtio-ccw.c
-index ff1bb1534c..e6fc25ebf4 100644
---- a/hw/s390x/virtio-ccw.c
-+++ b/hw/s390x/virtio-ccw.c
-@@ -287,49 +287,19 @@ static int virtio_ccw_handle_set_vq(SubchDev *sch, CCW1 ccw, bool check_len,
-         return -EFAULT;
-     }
-     if (is_legacy) {
--        linfo.queue = address_space_ldq_be(&address_space_memory, ccw.cda,
--                                           MEMTXATTRS_UNSPECIFIED, NULL);
--        linfo.align = address_space_ldl_be(&address_space_memory,
--                                           ccw.cda + sizeof(linfo.queue),
--                                           MEMTXATTRS_UNSPECIFIED,
--                                           NULL);
--        linfo.index = address_space_lduw_be(&address_space_memory,
--                                            ccw.cda + sizeof(linfo.queue)
--                                            + sizeof(linfo.align),
--                                            MEMTXATTRS_UNSPECIFIED,
--                                            NULL);
--        linfo.num = address_space_lduw_be(&address_space_memory,
--                                          ccw.cda + sizeof(linfo.queue)
--                                          + sizeof(linfo.align)
--                                          + sizeof(linfo.index),
--                                          MEMTXATTRS_UNSPECIFIED,
--                                          NULL);
-+        ccw_dstream_read(&sch->cds, linfo);
-+        be64_to_cpus(&linfo.queue);
-+        be32_to_cpus(&linfo.align);
-+        be16_to_cpus(&linfo.index);
-+        be16_to_cpus(&linfo.num);
-         ret = virtio_ccw_set_vqs(sch, NULL, &linfo);
-     } else {
--        info.desc = address_space_ldq_be(&address_space_memory, ccw.cda,
--                                           MEMTXATTRS_UNSPECIFIED, NULL);
--        info.index = address_space_lduw_be(&address_space_memory,
--                                           ccw.cda + sizeof(info.desc)
--                                           + sizeof(info.res0),
--                                           MEMTXATTRS_UNSPECIFIED, NULL);
--        info.num = address_space_lduw_be(&address_space_memory,
--                                         ccw.cda + sizeof(info.desc)
--                                         + sizeof(info.res0)
--                                         + sizeof(info.index),
--                                         MEMTXATTRS_UNSPECIFIED, NULL);
--        info.avail = address_space_ldq_be(&address_space_memory,
--                                          ccw.cda + sizeof(info.desc)
--                                          + sizeof(info.res0)
--                                          + sizeof(info.index)
--                                          + sizeof(info.num),
--                                          MEMTXATTRS_UNSPECIFIED, NULL);
--        info.used = address_space_ldq_be(&address_space_memory,
--                                         ccw.cda + sizeof(info.desc)
--                                         + sizeof(info.res0)
--                                         + sizeof(info.index)
--                                         + sizeof(info.num)
--                                         + sizeof(info.avail),
--                                         MEMTXATTRS_UNSPECIFIED, NULL);
-+        ccw_dstream_read(&sch->cds, info);
-+        be64_to_cpus(&info.desc);
-+        be16_to_cpus(&info.index);
-+        be16_to_cpus(&info.num);
-+        be64_to_cpus(&info.avail);
-+        be64_to_cpus(&info.used);
-         ret = virtio_ccw_set_vqs(sch, &info, NULL);
-     }
-     sch->curr_status.scsw.count = 0;
-@@ -342,15 +312,13 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-     VirtioRevInfo revinfo;
-     uint8_t status;
-     VirtioFeatDesc features;
--    void *config;
-     hwaddr indicators;
-     VqConfigBlock vq_config;
-     VirtioCcwDevice *dev = sch->driver_data;
-     VirtIODevice *vdev = virtio_ccw_get_vdev(sch);
-     bool check_len;
-     int len;
--    hwaddr hw_len;
--    VirtioThinintInfo *thinint;
-+    VirtioThinintInfo thinint;
- 
-     if (!dev) {
-         return -EINVAL;
-@@ -394,11 +362,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         } else {
-             VirtioDeviceClass *vdc = VIRTIO_DEVICE_GET_CLASS(vdev);
- 
--            features.index = address_space_ldub(&address_space_memory,
--                                                ccw.cda
--                                                + sizeof(features.features),
--                                                MEMTXATTRS_UNSPECIFIED,
--                                                NULL);
-+            ccw_dstream_advance(&sch->cds, sizeof(features.features));
-+            ccw_dstream_read(&sch->cds, features.index);
-             if (features.index == 0) {
-                 if (dev->revision >= 1) {
-                     /* Don't offer legacy features for modern devices. */
-@@ -417,9 +382,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-                 /* Return zeroes if the guest supports more feature bits. */
-                 features.features = 0;
-             }
--            address_space_stl_le(&address_space_memory, ccw.cda,
--                                 features.features, MEMTXATTRS_UNSPECIFIED,
--                                 NULL);
-+            ccw_dstream_rewind(&sch->cds);
-+            cpu_to_le32s(&features.features);
-+            ccw_dstream_write(&sch->cds, features.features);
-             sch->curr_status.scsw.count = ccw.count - sizeof(features);
-             ret = 0;
-         }
-@@ -438,15 +403,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else {
--            features.index = address_space_ldub(&address_space_memory,
--                                                ccw.cda
--                                                + sizeof(features.features),
--                                                MEMTXATTRS_UNSPECIFIED,
--                                                NULL);
--            features.features = address_space_ldl_le(&address_space_memory,
--                                                     ccw.cda,
--                                                     MEMTXATTRS_UNSPECIFIED,
--                                                     NULL);
-+            ccw_dstream_read(&sch->cds, features);
-+            le32_to_cpus(&features.features);
-             if (features.index == 0) {
-                 virtio_set_features(vdev,
-                                     (vdev->guest_features & 0xffffffff00000000ULL) |
-@@ -487,7 +445,7 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-             ret = -EFAULT;
-         } else {
-             virtio_bus_get_vdev_config(&dev->bus, vdev->config);
--            cpu_physical_memory_write(ccw.cda, vdev->config, len);
-+            ccw_dstream_write_buf(&sch->cds, vdev->config, len);
-             sch->curr_status.scsw.count = ccw.count - len;
-             ret = 0;
-         }
-@@ -500,20 +458,13 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-             }
-         }
-         len = MIN(ccw.count, vdev->config_len);
--        hw_len = len;
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else {
--            config = cpu_physical_memory_map(ccw.cda, &hw_len, 0);
--            if (!config) {
--                ret = -EFAULT;
--            } else {
--                len = hw_len;
--                memcpy(vdev->config, config, len);
--                cpu_physical_memory_unmap(config, hw_len, 0, hw_len);
-+            ret = ccw_dstream_read_buf(&sch->cds, vdev->config, len);
-+            if (!ret) {
-                 virtio_bus_set_vdev_config(&dev->bus, vdev->config);
-                 sch->curr_status.scsw.count = ccw.count - len;
--                ret = 0;
-             }
-         }
-         break;
-@@ -551,8 +502,7 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else {
--            status = address_space_ldub(&address_space_memory, ccw.cda,
--                                        MEMTXATTRS_UNSPECIFIED, NULL);
-+            ccw_dstream_read(&sch->cds, status);
-             if (!(status & VIRTIO_CONFIG_S_DRIVER_OK)) {
-                 virtio_ccw_stop_ioeventfd(dev);
-             }
-@@ -595,8 +545,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else {
--            indicators = address_space_ldq_be(&address_space_memory, ccw.cda,
--                                              MEMTXATTRS_UNSPECIFIED, NULL);
-+            ccw_dstream_read(&sch->cds, indicators);
-+            be64_to_cpus(&indicators);
-             dev->indicators = get_indicator(indicators, sizeof(uint64_t));
-             sch->curr_status.scsw.count = ccw.count - sizeof(indicators);
-             ret = 0;
-@@ -616,8 +566,8 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else {
--            indicators = address_space_ldq_be(&address_space_memory, ccw.cda,
--                                              MEMTXATTRS_UNSPECIFIED, NULL);
-+            ccw_dstream_read(&sch->cds, indicators);
-+            be64_to_cpus(&indicators);
-             dev->indicators2 = get_indicator(indicators, sizeof(uint64_t));
-             sch->curr_status.scsw.count = ccw.count - sizeof(indicators);
-             ret = 0;
-@@ -637,67 +587,58 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else {
--            vq_config.index = address_space_lduw_be(&address_space_memory,
--                                                    ccw.cda,
--                                                    MEMTXATTRS_UNSPECIFIED,
--                                                    NULL);
-+            ccw_dstream_read(&sch->cds, vq_config.index);
-+            be16_to_cpus(&vq_config.index);
-             if (vq_config.index >= VIRTIO_QUEUE_MAX) {
-                 ret = -EINVAL;
-                 break;
-             }
-             vq_config.num_max = virtio_queue_get_num(vdev,
-                                                      vq_config.index);
--            address_space_stw_be(&address_space_memory,
--                                 ccw.cda + sizeof(vq_config.index),
--                                 vq_config.num_max,
--                                 MEMTXATTRS_UNSPECIFIED,
--                                 NULL);
-+            cpu_to_be16s(&vq_config.num_max);
-+            ccw_dstream_write(&sch->cds, vq_config.num_max);
-             sch->curr_status.scsw.count = ccw.count - sizeof(vq_config);
-             ret = 0;
-         }
-         break;
-     case CCW_CMD_SET_IND_ADAPTER:
-         if (check_len) {
--            if (ccw.count != sizeof(*thinint)) {
-+            if (ccw.count != sizeof(thinint)) {
-                 ret = -EINVAL;
-                 break;
-             }
--        } else if (ccw.count < sizeof(*thinint)) {
-+        } else if (ccw.count < sizeof(thinint)) {
-             /* Can't execute command. */
-             ret = -EINVAL;
-             break;
-         }
--        len = sizeof(*thinint);
--        hw_len = len;
-         if (!ccw.cda) {
-             ret = -EFAULT;
-         } else if (dev->indicators && !sch->thinint_active) {
-             /* Trigger a command reject. */
-             ret = -ENOSYS;
-         } else {
--            thinint = cpu_physical_memory_map(ccw.cda, &hw_len, 0);
--            if (!thinint) {
-+            if (ccw_dstream_read(&sch->cds, thinint)) {
-                 ret = -EFAULT;
-             } else {
--                uint64_t ind_bit = ldq_be_p(&thinint->ind_bit);
-+                be64_to_cpus(&thinint.ind_bit);
-+                be64_to_cpus(&thinint.summary_indicator);
-+                be64_to_cpus(&thinint.device_indicator);
- 
--                len = hw_len;
-                 dev->summary_indicator =
--                    get_indicator(ldq_be_p(&thinint->summary_indicator),
--                                  sizeof(uint8_t));
-+                    get_indicator(thinint.summary_indicator, sizeof(uint8_t));
-                 dev->indicators =
--                    get_indicator(ldq_be_p(&thinint->device_indicator),
--                                  ind_bit / 8 + 1);
--                dev->thinint_isc = thinint->isc;
--                dev->routes.adapter.ind_offset = ind_bit;
-+                    get_indicator(thinint.device_indicator,
-+                                  thinint.ind_bit / 8 + 1);
-+                dev->thinint_isc = thinint.isc;
-+                dev->routes.adapter.ind_offset = thinint.ind_bit;
-                 dev->routes.adapter.summary_offset = 7;
--                cpu_physical_memory_unmap(thinint, hw_len, 0, hw_len);
-                 dev->routes.adapter.adapter_id = css_get_adapter_id(
-                                                  CSS_IO_ADAPTER_VIRTIO,
-                                                  dev->thinint_isc);
-                 sch->thinint_active = ((dev->indicators != NULL) &&
-                                        (dev->summary_indicator != NULL));
--                sch->curr_status.scsw.count = ccw.count - len;
-+                sch->curr_status.scsw.count = ccw.count - sizeof(thinint);
-                 ret = 0;
-             }
-         }
-@@ -712,13 +653,9 @@ static int virtio_ccw_cb(SubchDev *sch, CCW1 ccw)
-             ret = -EFAULT;
-             break;
-         }
--        revinfo.revision =
--            address_space_lduw_be(&address_space_memory, ccw.cda,
--                                  MEMTXATTRS_UNSPECIFIED, NULL);
--        revinfo.length =
--            address_space_lduw_be(&address_space_memory,
--                                  ccw.cda + sizeof(revinfo.revision),
--                                  MEMTXATTRS_UNSPECIFIED, NULL);
-+        ccw_dstream_read_buf(&sch->cds, &revinfo, 4);
-+        be16_to_cpus(&revinfo.revision);
-+        be16_to_cpus(&revinfo.length);
-         if (ccw.count < len + revinfo.length ||
-             (check_len && ccw.count > len + revinfo.length)) {
-             ret = -EINVAL;
+>
+>
+>> diff --git a/hw/pci-bridge/pcie_pci_bridge.c
+>> b/hw/pci-bridge/pcie_pci_bridge.c
+>> index 9aa5cc3..da562fe 100644
+>> --- a/hw/pci-bridge/pcie_pci_bridge.c
+>> +++ b/hw/pci-bridge/pcie_pci_bridge.c
+>> @@ -65,10 +65,18 @@ static void pcie_pci_bridge_realize(PCIDevice *d,
+>> Error **errp)
+>>           goto aer_error;
+>>       }
+>>   +    Error *local_err = NULL;
+>>       if (pcie_br->msi != ON_OFF_AUTO_OFF) {
+>> -        rc = msi_init(d, 0, 1, true, true, errp);
+>> +        rc = msi_init(d, 0, 1, true, true, &local_err);
+>>           if (rc < 0) {
+>> -            goto msi_error;
+>> +            assert(rc == -ENOTSUP);
+>> +            if (pcie_br->msi != ON_OFF_AUTO_ON) {
+>> +                error_free(local_err);
+>
+>
+> In that case it will fallback to legacy INTx, right?
+
+Exactly. Maybe I should add this to the commit message.
+
+>
+> Thanks,
+> Marcel
+>
+>
+>> +            } else {
+>> +                /* failed to satisfy user's explicit request for MSI */
+>> +                error_propagate(errp, local_err);
+>> +                goto msi_error;
+>> +            }
+>>           }
+>>       }
+>>       pci_register_bar(d, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
+>> @@ -81,7 +89,7 @@ aer_error:
+>>   pm_error:
+>>       pcie_cap_exit(d);
+>>   cap_error:
+>> -    shpc_free(d);
+>> +    shpc_cleanup(d, &pcie_br->shpc_bar);
+>>   error:
+>>       pci_bridge_exitfn(d);
+>>   }
+>> @@ -98,7 +106,9 @@ static void pcie_pci_bridge_reset(DeviceState *qdev)
+>>   {
+>>       PCIDevice *d = PCI_DEVICE(qdev);
+>>       pci_bridge_reset(qdev);
+>> -    msi_reset(d);
+>> +    if (msi_present(d)) {
+>> +        msi_reset(d);
+>> +    }
+>>       shpc_reset(d);
+>>   }
+>>   @@ -106,12 +116,14 @@ static void pcie_pci_bridge_write_config(PCIDevice
+>> *d,
+>>           uint32_t address, uint32_t val, int len)
+>>   {
+>>       pci_bridge_write_config(d, address, val, len);
+>> -    msi_write_config(d, address, val, len);
+>> +    if (msi_present(d)) {
+>> +        msi_write_config(d, address, val, len);
+>> +    }
+>>       shpc_cap_write_config(d, address, val, len);
+>>   }
+>>     static Property pcie_pci_bridge_dev_properties[] = {
+>> -        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi,
+>> ON_OFF_AUTO_ON),
+>> +        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi,
+>> ON_OFF_AUTO_AUTO),
+>>           DEFINE_PROP_END_OF_LIST(),
+>>   };
+>>
+>
+>
+
+
+
 -- 
-2.13.5
+Aleksandr Bezzubikov
