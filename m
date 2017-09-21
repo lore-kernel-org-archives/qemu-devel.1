@@ -1,30 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50538)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51290)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1dv3yt-0004Qy-P6
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:05:40 -0400
+	(envelope-from <stefanha@gmail.com>) id 1dv413-0005uJ-98
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:07:54 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jfreimann@redhat.com>) id 1dv3yq-0007NI-Ot
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:05:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60558)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jfreimann@redhat.com>)
-	id 1dv3yq-0007Mi-Jr
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:05:36 -0400
-Date: Thu, 21 Sep 2017 18:05:10 +0200
-From: Jens Freimann <jfreimann@redhat.com>
-Message-ID: <20170921160510.h2b6kbtsvf3rc73z@localhost.localdomain>
-References: <20170808203900.7661-1-jfreimann@redhat.com>
-	<20170808203900.7661-4-jfreimann@redhat.com>
-	<CAJ+F1C+1WzPe4Z6DDZyn308VV+D7AjVob2VseWK+0FFpiY2NsA@mail.gmail.com>
-	<20170920150903.arckboulxo7o72d4@dhcp-192-218.str.redhat.com>
-	<CAJ+F1CJVZxt3pWW1GEuy+0KNab4wxY4wc8A-raMPzTF5Qq_G4Q@mail.gmail.com>
-	<20170921133137.dbs6o6mwe6tm3joh@localhost.localdomain>
+	(envelope-from <stefanha@gmail.com>) id 1dv410-00014R-Hm
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:07:53 -0400
+Date: Thu, 21 Sep 2017 17:07:47 +0100
+From: Stefan Hajnoczi <stefanha@gmail.com>
+Message-ID: <20170921160747.GI32364@stefanha-x1.localdomain>
+References: <20170919102434.21147-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170921133137.dbs6o6mwe6tm3joh@localhost.localdomain>
-Subject: Re: [Qemu-devel] [PATCH v2 3/5] libvhost-user: quit when no more
- data received
+In-Reply-To: <20170919102434.21147-1-pbonzini@redhat.com>
+Subject: Re: [Qemu-devel] [Qemu-block] [PATCH v2 0/4] scsi,
+ block: introduce persistent reservation managers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,28 +23,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Marc-Andr?? Lureau <marcandre.lureau@gmail.com>
-Cc: QEMU <qemu-devel@nongnu.org>, Victor Kaplansky <victork@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Maxime Coquelin <maxime.coquelin@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
 
-On Thu, Sep 21, 2017 at 01:31:37PM +0000, Jens Freimann wrote:
->On Wed, Sep 20, 2017 at 04:14:33PM +0000, Marc-Andr?? Lureau wrote:
->>On Wed, Sep 20, 2017 at 5:09 PM, Jens Freimann <jfreimann@redhat.com> wrote:
->>>On Tue, Sep 19, 2017 at 04:46:24PM +0000, Marc-Andr?? Lureau wrote:
->>>>On Tue, Aug 8, 2017 at 10:52 PM Jens Freimann <jfreimann@redhat.com>
->>>>wrote:
->>We want to treat disconnect as a panic condition imho, that the
->>library user is free to implement in different way (abort() clean
->>exit, reconnect etc).
->
->Ok, that wasn't obvious to me. Thanks for clarifying! So I was 
->"fixing" the wrong part. On a disconnect vubr_panic() in
->vhost-user-bridge.c is called and is supposed to do the right thing.
->
->Currently it will print an error message "PANIC: Unhandled request:
+On Tue, Sep 19, 2017 at 12:24:30PM +0200, Paolo Bonzini wrote:
+> SCSI persistent Reservations allow restricting access to block devices
+> to specific initiators in a shared storage setup.  When implementing
+> clustering of virtual machines, it is a common requirement for virtual
+> machines to send persistent reservation SCSI commands.  However,
+> the operating system restricts sending these commands to unprivileged
+> programs because incorrect usage can disrupt regular operation of the
+> storage fabric.
+> 
+> With these patches, the scsi-block and scsi-generic SCSI passthrough
+> devices learn to delegate the implementation of persistent reservations to
+> a separate object, the "persistent reservation manager".  The persistent
+> reservation manager talks to a separate privileged program, with a very
+> simple protocol based on SCM_RIGHTS.  In addition to invoking PERSISTENT
+> RESERVATION OUT and PERSISTENT RESERVATION IN commands, the privileged
+> component can also use libmpathpersist so that persistent reservations
+> are applied to all paths in a multipath setting.
+> 
+> Patch 1 defines the abstract QOM class and plugs it into block/file-posix.c.
+> 
+> Patch 2 and 3 introduce the privileged helper program, while patch 4
+> defines the concrete QOM class that talks to it.
+> 
+> Paolo
+> 
+> v1->v2: removed scsi/ patches which were all reviewed
+>         removed man page (requires .texi while I used .rst for docs)
+>         qio_channel_read/write_all also went in independently
+>         fix installation of qemu-pr-helper man page
+>         fixes to documentation
+>         added BSD license to protocol header
+>         added handling of residual (buffer underrun)
+>         fixed closing of file descriptors on error
+>         block PERSISTENT RESERVE OUT for read-only file descriptors
+>         do not use g_assert
+>         use EXIT_SUCCESS/EXIT_FAILURE consistently
+>         moved all CONFIG_MPATH usage to the right patch
+>         drop CAP_SYS_ADMIN if multipath not compiled in
+>         simplify buffer size handling in multipath PERSISTENT RESERVE IN
+>         block REGISTER AND MOVE operation for multipath PERSISTENT RESERVE OUT
+>         fixed transport id handling in multipath PERSISTENT RESERVE OUT
+>         fixed string property double-free in pr-manager-helper
+>         fixed/cleaned up error handling in pr-manager-helper
+>         
+> Paolo Bonzini (9):
+>   scsi, file-posix: add support for persistent reservation management
+>   scsi: build qemu-pr-helper
+>   scsi: add multipath support to qemu-pr-helper
+>   scsi: add persistent reservation manager using qemu-pr-helper
+> 
+>  Makefile                   |   14 +-
+>  configure                  |   59 ++-
+>  docs/interop/pr-helper.rst |   83 ++++
+>  docs/pr-manager.rst        |   60 +++
+>  include/scsi/utils.h       |    4 +
+>  scsi/Makefile.objs         |    2 +-
+>  scsi/pr-helper.h           |   41 ++
+>  scsi/pr-manager-helper.c   |  302 +++++++++++++
+>  scsi/qemu-pr-helper.c      | 1038 ++++++++++++++++++++++++++++++++++++++++++++
+>  scsi/utils.c               |   10 +
+>  10 files changed, 1607 insertions(+), 6 deletions(-)
+> 
+> -- 
+> 2.13.5
+> 
+> 
 
-Actually it is "Error while recvmsg" because in vu_message_read()
-vu_panic is called if rc from recvmsg is <= 0. Followed by "Error
-while dispatching" printed by vhost-user-bridge. 
-
-regards,
-Jens 
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
