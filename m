@@ -1,39 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60540)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:33350)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1duubo-0003yE-2k
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:05:13 -0400
+	(envelope-from <sundeep.lkml@gmail.com>) id 1duuiC-0005AP-Uc
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:11:50 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1duubj-0002dT-3W
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:05:12 -0400
-Received: from 5.mo2.mail-out.ovh.net ([87.98.181.248]:47986)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1duubi-0002cW-QI
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:05:07 -0400
-Received: from player157.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo2.mail-out.ovh.net (Postfix) with ESMTP id 33790AC995
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 08:05:03 +0200 (CEST)
-References: <20170915085115.GN5250@umbus.fritz.box>
-	<87y3pgl45f.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170919082421.GU27153@umbus>
-	<871sn2hugn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170920045524.GH5520@umbus.fritz.box>
-	<87y3pagdg0.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170920061756.GJ5520@umbus.fritz.box>
-	<87vakdhnyn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170920065700.GO5520@umbus.fritz.box>
-	<87poalhm74.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170920115342.GQ5520@umbus.fritz.box>
-	<87377gpuyh.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <a59b2c71-fe1d-1ef6-e885-703c3f33893c@kaod.org>
-Date: Thu, 21 Sep 2017 08:04:55 +0200
+	(envelope-from <sundeep.lkml@gmail.com>) id 1duuiB-0006B2-6n
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:11:48 -0400
 MIME-Version: 1.0
-In-Reply-To: <87377gpuyh.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
- cpus
+In-Reply-To: <20170920201737.25723-1-f4bug@amsat.org>
+References: <20170920201737.25723-1-f4bug@amsat.org>
+From: sundeep subbaraya <sundeep.lkml@gmail.com>
+Date: Thu, 21 Sep 2017 11:41:44 +0530
+Message-ID: <CALHRZupkDOR0ztSZ8xiiq0jo8uCNsth26s==iJnG2Zff=_MT1Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v11 0/5] Add support for Smartfusion2 SoC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -42,122 +22,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
 
-On 09/21/2017 05:54 AM, Nikunj A Dadhania wrote:
-> David Gibson <david@gibson.dropbear.id.au> writes:
-> 
->> On Wed, Sep 20, 2017 at 12:48:55PM +0530, Nikunj A Dadhania wrote:
->>> David Gibson <david@gibson.dropbear.id.au> writes:
->>>
->>>> On Wed, Sep 20, 2017 at 12:10:48PM +0530, Nikunj A Dadhania wrote:
->>>>> David Gibson <david@gibson.dropbear.id.au> writes:
->>>>>
->>>>>> On Wed, Sep 20, 2017 at 10:43:19AM +0530, Nikunj A Dadhania wrote:
->>>>>>> David Gibson <david@gibson.dropbear.id.au> writes:
->>>>>>>
->>>>>>>> On Wed, Sep 20, 2017 at 09:50:24AM +0530, Nikunj A Dadhania wrote:
->>>>>>>>> David Gibson <david@gibson.dropbear.id.au> writes:
->>>>>>>>>
->>>>>>>>>> On Fri, Sep 15, 2017 at 02:39:16PM +0530, Nikunj A Dadhania wrote:
->>>>>>>>>>> David Gibson <david@gibson.dropbear.id.au> writes:
->>>>>>>>>>>
->>>>>>>>>>>> On Fri, Sep 15, 2017 at 01:53:15PM +0530, Nikunj A Dadhania wrote:
->>>>>>>>>>>>> David Gibson <david@gibson.dropbear.id.au> writes:
->>>>>>>>>>>>>
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> I thought, I am doing the same here for PowerNV, number of online cores
->>>>>>>>>>>>>>> is equal to initial online vcpus / threads per core
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>    int boot_cores_nr = smp_cpus / smp_threads;
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> Only difference that I see in PowerNV is that we have multiple chips
->>>>>>>>>>>>>>> (max 2, at the moment)
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>         cores_per_chip = smp_cpus / (smp_threads * pnv->num_chips);
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> This doesn't make sense to me.  Cores per chip should *always* equal
->>>>>>>>>>>>>> smp_cores, you shouldn't need another calculation for it.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>>> And in case user has provided sane smp_cores, we use it.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> If smp_cores isn't sane, you should simply reject it, not try to fix
->>>>>>>>>>>>>> it.  That's just asking for confusion.
->>>>>>>>>>>>>
->>>>>>>>>>>>> This is the case where the user does not provide a topology(which is a
->>>>>>>>>>>>> valid scenario), not sure we should reject it. So qemu defaults
->>>>>>>>>>>>> smp_cores/smt_threads to 1. I think it makes sense to over-ride.
->>>>>>>>>>>>
->>>>>>>>>>>> If you can find a way to override it by altering smp_cores when it's
->>>>>>>>>>>> not explicitly specified, then ok.
->>>>>>>>>>>
->>>>>>>>>>> Should I change the global smp_cores here as well ?
->>>>>>>>>>
->>>>>>>>>> I'm pretty uneasy with that option.
->>>>>>>>>
->>>>>>>>> Me too.
->>>>>>>>>
->>>>>>>>>> It would take a fair bit of checking to ensure that changing smp_cores
->>>>>>>>>> is safe here. An easier to verify option would be to make the generic
->>>>>>>>>> logic which splits up an unspecified -smp N into cores and sockets
->>>>>>>>>> more flexible, possibly based on machine options for max values.
->>>>>>>>>>
->>>>>>>>>> That might still be more trouble than its worth.
->>>>>>>>>
->>>>>>>>> I think the current approach is the simplest and less intrusive, as we
->>>>>>>>> are handling a case where user has not bothered to provide a detailed
->>>>>>>>> topology, the best we can do is create single threaded cores equal to
->>>>>>>>> number of cores.
->>>>>>>>
->>>>>>>> No, sorry.  Having smp_cores not correspond to the number of cores per
->>>>>>>> chip in all cases is just not ok.  Add an error message if the
->>>>>>>> topology isn't workable for powernv by all means.  But users having to
->>>>>>>> use a longer command line is better than breaking basic assumptions
->>>>>>>> about what numbers reflect what topology.
->>>>>>>
->>>>>>> Sorry to ask again, as I am still not convinced, we do similar
->>>>>>> adjustment in spapr where the user did not provide the number of cores,
->>>>>>> but qemu assumes them as single threaded cores and created
->>>>>>> cores(boot_cores_nr) that were not same as smp_cores ?
->>>>>>
->>>>>> What?  boot_cores_nr has absolutely nothing to do with adjusting the
->>>>>> topology, and it certainly doesn't assume they're single threaded.
->>>>>
->>>>> When we start a TCG guest and user provides following commandline, e.g.
->>>>> "-smp 4", smt_threads is set to 1 by default in vl.c. So the guest boots
->>>>> with 4 cores, each having 1 thread.
->>>>
->>>> Ok.. and what's the problem with that behaviour on powernv?
->>>
->>> As smp_thread defaults to 1 in vl.c, similarly smp_cores also has the
->>> default value of 1 in vl.c. In powernv, we were setting nr-cores like
->>> this:
->>>
->>>         object_property_set_int(chip, smp_cores, "nr-cores", &error_fatal);
->>>
->>> Even when there were multiple cpus (-smp 4), when the guest boots up, we
->>> just get one core (i.e. smp_cores was 1) with single thread(smp_threads
->>> was 1), which is wrong as per the command-line that was provided.
->>
->> Right, so, -smp 4 defaults to 4 sockets, each with 1 core of 1
->> thread.  If you can't supply 4 sockets you should error, but you
->> shouldn't go and change the number of cores per socket.
-> 
-> OK, that makes sense now. And I do see that smp_cpus is 4 in the above
-> case. Now looking more into it, i see that powernv has something called
-> "num_chips", isnt this same as sockets ? Do we need num_chips separately?
+Thanks Philippe :)
 
-yes that would do for cpus, but how do we retrieve the number of 
-sockets ? I don't see a smp_sockets. 
+Sundeep
 
-If we start looking at such issues, we should also take into account 
-memory distribution :
+On Thu, Sep 21, 2017 at 1:47 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg>
+wrote:
 
-      -numa node[,mem=size][,cpus=firstcpu[-lastcpu]][,nodeid=node]
-
-would allow us to define a set of cpus per node, cpus should be evenly 
-distributed on the nodes though, and also define memory per node, but 
-some nodes could be without memory.   
-
-C. 
+> Hi Peter,
+>
+> Now than Igor's patch landed, I respin Sundeep's series updating it to wo=
+rk
+> after the "arm: drop intermediate cpu_model -> cpu type parsing and use c=
+pu
+> type directly" patch.
+>
+> v11:
+> - msf2-soc.c: add a check for null m3clk
+> - msf2-soc.c, msf2-som.c: drop cpu_model to directly use cpu type
+>
+> --
+>
+> Sundeep original cover:
+>
+> I am trying to add Smartfusion2 SoC.
+> SoC is from Microsemi and System on Module(SOM)
+> board is from Emcraft systems. Smartfusion2 has hardened
+> Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
+> At the moment only system timer, sysreg and SPI
+> controller are modelled.
+>
+> Testing:
+> ./arm-softmmu/qemu-system-arm -M emcraft-sf2 -serial mon:stdio \
+> -kernel u-boot.bin -display none -drive file=3Dspi.bin,if=3Dmtd,format=3D=
+raw
+>
+> Binaries u-boot.bin and spi.bin are at:
+> https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git
+>
+> U-boot is from Emcraft with modified
+>     - SPI driver not to use PDMA.
+>     - ugly hack to pass dtb to kernel in r1.
+> @
+> https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git
+>
+> Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource
+> driver added by myself @
+> https://github.com/Subbaraya-Sundeep/linux.git
+>
+> v10:
+>     Added msf2_sysreg_realize in msf2-sysreg.c
+>     modified unimplemented devices names:
+>         pdma->dma and hpdma->hs-dma
+>     used uint8_t for apb divisors properties
+>     simplified msf2_divbits() using ctz32()
+>
+> v9:
+>     used trace instead of DB_PRINT in msf2-sysreg.c
+>     used LOG_UNIMP for non guest errors in msf2-sysreg.c
+>     added unimplemented devices in msf2-soc.c
+>     removed .alias suffix in alias memory region name for eNVM
+>     removed mc->ignore_memory_transaction_failures in msf2-som.c
+>
+> v8:
+>     memory_region_init_ram to memory_region_init_rom in soc
+>     %s/emcraft_sf2_init/emcraft_sf2_s2s010_init/g in som
+>     Added mc->ignore_memory_transaction_failures =3D true in som
+>         as per latest commit.
+>     Code simplifications as suggested by Alistair in sysreg and ssi.
+>
+> v7:
+>     Removed vmstate_register_ram_global as per latest commit
+>     Moved header files to C which are local to C source files
+>     Removed abort() from msf2-sysreg.c
+>     Added VMStateDescription in mss-timer.c
+>
+> v6:
+>     Moved some defines from header files to source files
+>     Added properties m3clk, apb0div, apb0div1 properties
+>     to soc.
+>     Added properties apb0divisor, apb1divisor to sysreg
+>     Update system_clock_source in msf2-soc.c
+>     Changed machine name smartfusion2-som->emcraft-sf2
+>
+> v5
+>     As per Philippe comments:
+>         Added abort in Sysreg if guest tries to remap memory
+>         other than default mapping.
+>         Use of CONFIG_MSF2 in Makefile for soc.c
+>         Fixed incorrect logic in timer model.
+>         Renamed msf2-timer.c -> mss-timer.c
+>                 msf2-spi.c -> mss-spi.c also type names
+>         Renamed function msf2_init->emcraft_sf2_init in msf2-som.c
+>         Added part-name,eNVM-size,eSRAM-size,pclk0 and pclk1
+>             properties to soc.
+>         Pass soc part-name,memory size and clock rate properties from som=
+.
+> v4:
+>     Fixed build failure by using PRIx macros.
+> v3:
+>     Added SoC file and board file as per Alistair comments.
+> v2:
+>     Added SPI controller so that u-boot loads kernel from spi flash.
+> v1:
+>     Initial patch set with timer and sysreg
+>
+> Thanks,
+> Sundeep
+>
+> Subbaraya Sundeep (5):
+>   msf2: Add Smartfusion2 System timer
+>   msf2: Microsemi Smartfusion2 System Register block
+>   msf2: Add Smartfusion2 SPI controller
+>   msf2: Add Smartfusion2 SoC
+>   msf2: Add Emcraft's Smartfusion2 SOM kit
+>
+>  default-configs/arm-softmmu.mak |   1 +
+>  include/hw/arm/msf2-soc.h       |  67 +++++++
+>  include/hw/misc/msf2-sysreg.h   |  77 ++++++++
+>  include/hw/ssi/mss-spi.h        |  58 ++++++
+>  include/hw/timer/mss-timer.h    |  64 +++++++
+>  hw/arm/msf2-soc.c               | 238 +++++++++++++++++++++++
+>  hw/arm/msf2-som.c               | 105 +++++++++++
+>  hw/misc/msf2-sysreg.c           | 160 ++++++++++++++++
+>  hw/ssi/mss-spi.c                | 404 ++++++++++++++++++++++++++++++
+> ++++++++++
+>  hw/timer/mss-timer.c            | 289 ++++++++++++++++++++++++++++
+>  hw/arm/Makefile.objs            |   1 +
+>  hw/misc/Makefile.objs           |   1 +
+>  hw/misc/trace-events            |   5 +
+>  hw/ssi/Makefile.objs            |   1 +
+>  hw/timer/Makefile.objs          |   1 +
+>  15 files changed, 1472 insertions(+)
+>  create mode 100644 include/hw/arm/msf2-soc.h
+>  create mode 100644 include/hw/misc/msf2-sysreg.h
+>  create mode 100644 include/hw/ssi/mss-spi.h
+>  create mode 100644 include/hw/timer/mss-timer.h
+>  create mode 100644 hw/arm/msf2-soc.c
+>  create mode 100644 hw/arm/msf2-som.c
+>  create mode 100644 hw/misc/msf2-sysreg.c
+>  create mode 100644 hw/ssi/mss-spi.c
+>  create mode 100644 hw/timer/mss-timer.c
+>
+> --
+> 2.14.1
+>
+>
