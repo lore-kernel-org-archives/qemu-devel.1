@@ -1,26 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56641)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:58417)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dv1NP-0005aS-V0
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:18:49 -0400
+	(envelope-from <a.perevalov@samsung.com>) id 1dv1V0-0000eo-EC
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:26:44 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dv1NM-0004Vm-N0
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:18:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34524)
+	(envelope-from <a.perevalov@samsung.com>) id 1dv1Uw-0008Dg-8C
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:26:38 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:40236)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dv1NM-0004VF-Dp
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:18:44 -0400
-Date: Thu, 21 Sep 2017 14:18:39 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170921131839.GC15693@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <CAATJJ0KLaR6VUrPZZSQxwb6niF5YY0UMB5sWDq9b=OeeC5=1Xw@mail.gmail.com>
-	<20170921123320.GG32364@stefanha-x1.localdomain>
-	<20170921124317.GB15693@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170921124317.GB15693@redhat.com>
-Subject: Re: [Qemu-devel] need to resurrect no-lock option?
+	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
+	id 1dv1Uv-0008D6-V5
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:26:34 -0400
+From: Alexey Perevalov <a.perevalov@samsung.com>
+Message-id: <0c0baef1-fbad-e6d2-8d8b-07f54d084ee9@samsung.com>
+Date: Thu, 21 Sep 2017 16:26:27 +0300
+MIME-version: 1.0
+In-reply-to: <20170921123326.GD2717@work-vm>
+Content-type: text/plain; charset="utf-8"; format="flowed"
+Content-transfer-encoding: 7bit
+Content-language: en-GB
+References: <1505839684-10046-1-git-send-email-a.perevalov@samsung.com>
+	<CGME20170919164825eucas1p21fd133a55091e4a09fdeee05d130260d@eucas1p2.samsung.com>
+	<1505839684-10046-9-git-send-email-a.perevalov@samsung.com>
+	<20170921123326.GD2717@work-vm>
+Subject: Re: [Qemu-devel] [PATCH v10 08/10] migration: postcopy_blocktime
+ documentation
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,55 +32,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Stefan Hajnoczi <stefanha@gmail.com>
-Cc: Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Christian Ehrhardt <christian.ehrhardt@canonical.com>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com, quintela@redhat.com, heetae82.ahn@samsung.com
 
-On Thu, Sep 21, 2017 at 01:43:17PM +0100, Daniel P. Berrange wrote:
-> On Thu, Sep 21, 2017 at 01:33:20PM +0100, Stefan Hajnoczi wrote:
-> > On Wed, Sep 20, 2017 at 11:26:11AM +0200, Christian Ehrhardt wrote:
-> > > Hi,
-> > > this might have been discussed in the wake of the lock changes that took
-> > > place in 2.10 but I can't find anything clear enough to follow in the
-> > > current case.
-> > > There was an old submission [1] by Fam to make it possible to no-lock
-> > > qemu-img and others if needed. But it seems nothing like it made it along
-> > > to the locking we have in 2.10.
-> > > 
-> > > One (maybe more) case where missing this causes pain is e.g. running an
-> > > info check on a running guest.
-> > > In general info shouldn't need a write lock anyway, but without --no-lock
-> > > that use case is broken.
-> > 
-> > It's still an invalid use case.  There is no guarantee that qemu-img
-> > will see a consistent version of the image file.  Metadata could change
-> > underneath qemu-img because QEMU may still write to it.  QEMU may also
-> > have some metadata cached so there's no guarantee that qemu-img sees an
-> > up-to-date image.
-> > 
-> > Why do you need to run qemu-img on a disk image that is in use?
-> 
-> You have a directory full of images and you want to understand current usage
-> vs potential future usage. For this you need to get the virtual size, which
-> rquires 'qemu-img info' for non-raw files. Actually it would be even better
-> served by the new 'measure' command recently added.
-> 
-> The job analyzing this directory of images may not have any context as to
-> whether each file is in use by a running QEMU, so would just blindly call
-> 'qemu-img info' on each file it finds.  There's of course potential that
-> opening the image in 'qemu-img info' could hit problems if the running QEMU
-> changed qcow2 metadata, but generally that would not have serious negative
-> impact and would be self-correcting next time the job analysed the directory.
+On 09/21/2017 03:33 PM, Dr. David Alan Gilbert wrote:
+> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
+>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
+> Although it does have my R-b it might be worth adding some clarification
+> that it's a measure of when *all* cpus are blocked and so isn't a
+> total measure of impact of postcopy (when blocking some of them).
+yes, maybe additional clarification is necessary.
+now we have both values:
+{"return": {"postcopy-blocktime": 5691, "status": "completed", 
+"postcopy-vcpu-blocktime": [7671, 6388]}}
+where postcopy-blocktime is for *all* and postcopy-vcpu-blocktime is per 
+vCPU,
+it's really worth to describe it, like:
 
-FYI this scenario has already hit OpenStack with breakage on new QMEU
+Blocktime is a postcopy live migration metric, intended to show
+how long the vCPU was in state of interruptible sleep due to pagefault.
+That metric is calculated both for all vCPUs as overlapped value, and
+separately for each vCPU. These values are calculated on destination side.
+To enable postcopy blocktime calculation, enter following command on destination
+monitor:
 
-  https://bugs.launchpad.net/nova/+bug/1718295
+migrate_set_capability postcopy-blocktime on
 
-and thus they're just going to add '--force-shared' for all usage of
-qemu-img info.
+Postcopy blocktime can be retrieved by query-migrate qmp command.
+postcopy-blocktime value of qmp command will show overlapped blocking time for all vCPU,
+postcopy-vcpu-blocktime will show list of blocking time per vCPU.
 
-Regards,
-Daniel
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Best regards,
+Alexey Perevalov
+
+>
+> Dave
+>
+>> ---
+>>   docs/devel/migration.txt | 10 ++++++++++
+>>   1 file changed, 10 insertions(+)
+>>
+>> diff --git a/docs/devel/migration.txt b/docs/devel/migration.txt
+>> index 1b940a8..4b625ca 100644
+>> --- a/docs/devel/migration.txt
+>> +++ b/docs/devel/migration.txt
+>> @@ -402,6 +402,16 @@ will now cause the transition from precopy to postcopy.
+>>   It can be issued immediately after migration is started or any
+>>   time later on.  Issuing it after the end of a migration is harmless.
+>>   
+>> +Blocktime is a postcopy live migration metric, intended to show
+>> +how long the vCPU was in state of interruptable sleep due to pagefault.
+>> +This value is calculated on destination side.
+>> +To enable postcopy blocktime calculation, enter following command on destination
+>> +monitor:
+>> +
+>> +migrate_set_capability postcopy-blocktime on
+>> +
+>> +Postcopy blocktime can be retrieved by query-migrate qmp command.
+>> +
+>>   Note: During the postcopy phase, the bandwidth limits set using
+>>   migrate_set_speed is ignored (to avoid delaying requested pages that
+>>   the destination is waiting for).
+>> -- 
+>> 1.9.1
+>>
+> --
+> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+>
+>
+>
