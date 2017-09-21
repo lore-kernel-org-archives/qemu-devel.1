@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45935)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46310)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dv0ie-0007aV-D1
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:36:41 -0400
+	(envelope-from <david@redhat.com>) id 1dv0kZ-0008W0-JQ
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:38:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dv0id-0003oj-DH
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:36:40 -0400
-Date: Thu, 21 Sep 2017 13:36:26 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170921123625.GE2717@work-vm>
-References: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
-	<20170919143829.GH2107@work-vm>
-	<48cdd8ff-4940-9aa1-9aba-1acf8ce74ebe@kamp.de>
-	<20170919144130.GI2107@work-vm>
-	<a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
+	(envelope-from <david@redhat.com>) id 1dv0kW-0004rL-8Q
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:38:39 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59206)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dv0kW-0004qU-2r
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:38:36 -0400
+References: <20170920153016.3858-1-david@redhat.com>
+	<20170921102318.1d7784f1.cohuck@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <a81059c3-4f26-5175-ce58-8312fb3f5115@redhat.com>
+Date: Thu, 21 Sep 2017 14:38:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
-Subject: Re: [Qemu-devel] Block Migration and CPU throttling
+In-Reply-To: <20170921102318.1d7784f1.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v3 0/3] Implement basic MSA functions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,45 +28,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Lieven <pl@kamp.de>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
 
-* Peter Lieven (pl@kamp.de) wrote:
-> Am 19.09.2017 um 16:41 schrieb Dr. David Alan Gilbert:
-> > * Peter Lieven (pl@kamp.de) wrote:
-> >> Am 19.09.2017 um 16:38 schrieb Dr. David Alan Gilbert:
-> >>> * Peter Lieven (pl@kamp.de) wrote:
-> >>>> Hi,
-> >>>>
-> >>>> I just noticed that CPU throttling and Block Migration don't work together very well.
-> >>>> During block migration the throttling heuristic detects that we obviously make no progress
-> >>>> in ram transfer. But the reason is the running block migration and not a too high dirty pages rate.
-> >>>>
-> >>>> The result is that any VM is throttled by 99% during block migration.
-> >>> Hmm that's unfortunate; do you have a bandwidth set lower than your
-> >>> actual network connection? I'm just wondering if it's actually going
-> >>> between the block and RAM iterative sections or getting stuck in ne.
-> >> It happens also if source and dest are on the same machine and speed is set to 100G.
-> > But does it happen if they're not and the speed is set low?
+On 21.09.2017 10:23, Cornelia Huck wrote:
+> On Wed, 20 Sep 2017 17:30:13 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> Yes, it does. I noticed it in our test environment between different nodes with a 10G
-> link in between. But its totally clear why it happens. During block migration we transfer
-> all dirty memory pages in each round (if there is moderate memory load), but all dirty
-> pages are obviously more than 50% of the transferred ram in that round.
-> It is more exactly 100%. But the current logic triggers on this condition.
+>> Some leftover from "target/s390x: tcg improvments + MSA functions".
+>>
+>> Implement all basic MSA (cpacf/crypto) instructions <= z13. Only provide
+>> the query subfunction (to query available subfunctions), no actual
+>> de/encryption yet. Good enough to unlock the STFL bits.
+>>
+>> I have written kvm-unit-tests for MSA functions and for SPM/IPM. Will
+>> send them out soon. I use the following cpu model to test with an upstream
+>> kernel compiled for z10:
+>>
+>> ... -cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
+>>               eimm=on,stckf=on,csst=on,csst2=on,ginste=on,\
+>>               exrl=on,msa-base=on,msa3-base=on,msa4-base=on,msa5-base=on ...
+>>
+>> Available on: https://github.com/davidhildenbrand/qemu.git s390x-msa
 > 
-> I think I will go forward and send a patch which disables auto converge during
-> block migration bulk stage.
-
-Yes, that's fair;  it probably would also make sense to throttle the RAM
-migration during the block migration bulk stage, since the chances are
-it's not going to get far.  (I think in the nbd setup, the main
-migration process isn't started until the end of bulk).
-
-Dave
-
-> Thanks for your feedback,
-> Peter
+> I used the following cpu model:
 > 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> -cpu qemu,eimm=on,ldisp=on,stckf=on,msa-base=on,msa3-base=on,msa4-base=on,msa5-base=on
+> 
+> and got
+> 
+> qemu-system-s390x: warning: 'msa5-base' requires 'kimd-sha-512'.
+> qemu-system-s390x: warning: 'msa5-base' requires 'klmd-sha-512'.
+> 
+
+Yes, I am aware of that and it is on my todo list. Shouldn't matter for
+now as it is completely optional and not enabled as default.
+
+> (It works anyway.)
+> 
+> However,
+> 
+> -cpu qemu,eimm=on,ldisp=on,stckf=on,msa-base=on,msa3-base=on,msa4-base=on,msa5-base=on,kimd-sha-512=on
+> 
+> gives
+> 
+> qemu-system-s390x: can't apply global qemu-s390-cpu.kimd-sha-512=on: Feature 'kimd-sha-512' is not available for CPU model 'z900', it was introduced with later models.
+> 
+> which is a bit confusing.
+
+Due to the way we hack up the qemu cpu model, allowing to set features
+that are theoretically not possible (just to have some way of enabling
+them before we can change the qemu model to something never).
+
+> 
+> So I'm wondering whether providing msa5-base without the providing the
+> algorithms above is sane - or whether it is just enough to satisfy some
+> kernels.
+> 
+> [Double-checking the various dependencies looks impossible without
+> access to IBM doc, anyway - I just hope you got it right back then :)]
+> 
+
+We can take care of that later (if at all relevant).
+
+-- 
+
+Thanks,
+
+David
