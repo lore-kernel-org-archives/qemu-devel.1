@@ -1,25 +1,32 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60802)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44751)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dv68Z-0002mh-I3
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:23:48 -0400
+	(envelope-from <thuth@redhat.com>) id 1dv6LZ-00023P-CO
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:37:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dv68Y-0003c1-AN
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:23:47 -0400
-References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
-	<20170920135833.20472-3-pbutsykin@virtuozzo.com>
-	<ac533c95-a0f5-c6ce-cc6a-7fab63eb0517@redhat.com>
-	<79eb6628-130e-af9d-cd39-56bf71194ae3@virtuozzo.com>
-	<ccbd7d7e-512a-76ea-5b03-8853fd88fda2@redhat.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <4393a82e-de82-ed8d-15ae-8defe59413ac@redhat.com>
-Date: Thu, 21 Sep 2017 13:23:32 -0500
+	(envelope-from <thuth@redhat.com>) id 1dv6LW-00080D-Al
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:37:13 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45944)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <thuth@redhat.com>) id 1dv6LW-0007yo-4s
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 14:37:10 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id 120D4883C2
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 18:37:09 +0000 (UTC)
+References: <1504776162-31400-1-git-send-email-thuth@redhat.com>
+	<20170921175650.GJ21016@localhost.localdomain>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <80fe06ef-4912-dc9a-cb8b-8431a96c358f@redhat.com>
+Date: Thu, 21 Sep 2017 20:37:03 +0200
 MIME-Version: 1.0
-In-Reply-To: <ccbd7d7e-512a-76ea-5b03-8853fd88fda2@redhat.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="HMupOISu5dlbE4vKPVNvg4dbMEIfXquAP"
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] qcow2: truncate the tail
- of the image file after shrinking the image
+In-Reply-To: <20170921175650.GJ21016@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] hw/core/qdev: Do not allow hot-plugging
+ without hotplug controller
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,96 +35,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: John Snow <jsnow@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
+To: Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Juan Quintela <quintela@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---HMupOISu5dlbE4vKPVNvg4dbMEIfXquAP
-From: Eric Blake <eblake@redhat.com>
-To: John Snow <jsnow@redhat.com>, Pavel Butsykin <pbutsykin@virtuozzo.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, den@openvz.org, mreitz@redhat.com
-Message-ID: <4393a82e-de82-ed8d-15ae-8defe59413ac@redhat.com>
-Subject: Re: [Qemu-devel] [Qemu-block] [PATCH 2/2] qcow2: truncate the tail of
- the image file after shrinking the image
-References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
- <20170920135833.20472-3-pbutsykin@virtuozzo.com>
- <ac533c95-a0f5-c6ce-cc6a-7fab63eb0517@redhat.com>
- <79eb6628-130e-af9d-cd39-56bf71194ae3@virtuozzo.com>
- <ccbd7d7e-512a-76ea-5b03-8853fd88fda2@redhat.com>
-In-Reply-To: <ccbd7d7e-512a-76ea-5b03-8853fd88fda2@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-On 09/21/2017 11:48 AM, John Snow wrote:
->>> Looks sane to me, but under which circumstances might we grow such a
->>> tail? I assume the actual truncate call aligns to cluster boundaries =
-as
->>> appropriate, so is this a bit of a "quick fix" to cull unused cluster=
-s
->>> that happened to be near the truncate boundary?
->>>
->>> It might be worth documenting the circumstances that produces this
->>> unused space that will never get used. My hunch is that such unused
->>> space should likely be getting reclaimed elsewhere and not here, but
->>> perhaps I'm misunderstanding the causal factors.
->>>
+On 21.09.2017 19:56, Eduardo Habkost wrote:
+> On Thu, Sep 07, 2017 at 11:22:42AM +0200, Thomas Huth wrote:
+>> qdev_unplug() bails out with an assertion if the user tries to device_del
+>> a hot-plugged device that does not have a hotplug controller. Unfortunately,
+>> our devices are all marked with hotpluggable = true by default (see the
+>> device_class_init() function in qdev.c), so it currently can happen that
+>> the user runs into this situation and QEMU gets terminated unexpectedly:
 >>
->> This is a consequence of how we implemented shrinking the qcow2 image.=
-
->> (https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04580.html)
->> But on the other hand, if we need to shrink the qcow2 image without
->> copying the data, this is the only way. The same guest offset can be
->> converted to almost any host offset in the file i.e. the first guest
->> cluster may be located somewhere at the end or the middle of the image=
-
->> file. So we can't just take and truncate the image file on the border =
-of
->> the truncation, therefore to shrink the image we just discard the
->> clusters that corresponds to the truncated area. The result is a
->> sparse image file where the apparent file size differs from actual siz=
-e.
->> And the tail in this case is the difference between the actual size an=
-d
->> last used cluster in the image, so in fact the cutting of the tail doe=
-s
->> not change the apparent file size.
+>> $ qemu-system-aarch64 -M virt -nographic -nodefaults -monitor stdio -S
+>> QEMU 2.10.50 monitor - type 'help' for more information
+>> (qemu) device_add aux-to-i2c-bridge,id=x
+>> (qemu) device_del x
+>> **
+>> ERROR:qdev-monitor.c:872:qdev_unplug: assertion failed: (hotplug_ctrl)
+>> Aborted (core dumped)
 >>
->=20
-> Oh, duh, I get it. The truncation itself creates a lot of sparseness.
+>> Hotplugging devices without a hotplug controller does not make much sense,
+>> so we should disallow this during the device_add process already!
+>>
+>> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> 
+> I'm queueing this on machine-next.  We still want it even if we
+> apply the patch that changes TYPE_DEVICE to hotpluggable=false by
+> default, right?
 
-It is also interesting to think about whether we should someday
-implement a qcow2 defragmenting operation (either a simple one: pull all
-later clusters into earlier holes, but the end result is not necessarily
-contiguous; or a complex one: shuffle things so that all clusters are in
-order, even though it may require moving some clusters around twice), so
-that you can remove all holes from the file (perhaps useful if the file
-is stored on a system that does not support holes).  But not for this
-series :)
+As far as I can see, yes. There might be machine types where e.g. the
+PCI bus comes without a hotplug controller, so in that case we'd need this.
 
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---HMupOISu5dlbE4vKPVNvg4dbMEIfXquAP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnEA6QACgkQp6FrSiUn
-Q2qTQAf/dALnPjA3HdQ6tTAaOzGhK2i07S93WH6FhMAQEdpesvx679q3qV0OKwly
-aYoEGMaR6S8f6vVeyLxF4tynE655E47mMakoehYMCNXjISMpVykMlo6qUd/mYtcN
-Y6ozX2tWcNqlvPDrz9+OCyCkmUC+IiVPb1BIarTxiK7ymRwsiNq+cC5INSB05HzS
-GChYVJfL5TlmVdEGU21ImXtzQiX+Q3XqUc9WKollU53+/TxP0neAEecbeYy5vePP
-8Hics84kKYrs3qltuNBySt3ARsRSNJJCVz6iV4O6I4/kaG0f0BwgKnhCKpihoQSJ
-XY1DVUJsk4bF8SNYUkW5PXoVFNBoBw==
-=Ic+o
------END PGP SIGNATURE-----
-
---HMupOISu5dlbE4vKPVNvg4dbMEIfXquAP--
+ Thomas
