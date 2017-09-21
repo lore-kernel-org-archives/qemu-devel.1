@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:49542)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:55435)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duxFL-0007KL-AL
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:54:12 -0400
+	(envelope-from <cohuck@redhat.com>) id 1duxaT-0001sI-5a
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 05:16:02 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1duxFH-0003I1-EL
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:54:11 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:45630)
+	(envelope-from <cohuck@redhat.com>) id 1duxaP-0007pm-Ve
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 05:16:01 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46312)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duxFH-0003Hh-5P
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:54:07 -0400
-Date: Thu, 21 Sep 2017 10:54:02 +0200
+	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1duxaP-0007pC-PS
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 05:15:57 -0400
+Date: Thu, 21 Sep 2017 11:15:52 +0200
 From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170921105402.617d905b.cohuck@redhat.com>
-In-Reply-To: <20170921084547.GN11080@bjsdjshi@linux.vnet.ibm.com>
-References: <20170905111645.18068-1-pasic@linux.vnet.ibm.com>
-	<20170905111645.18068-6-pasic@linux.vnet.ibm.com>
-	<20170906151821.1a77afe5.cohuck@redhat.com>
-	<20170907073108.GD31680@bjsdjshi@linux.vnet.ibm.com>
-	<20170907100817.08ddae29.cohuck@redhat.com>
-	<20170921084547.GN11080@bjsdjshi@linux.vnet.ibm.com>
+Message-ID: <20170921111552.41167e80.cohuck@redhat.com>
+In-Reply-To: <20170920172314.102710-2-pasic@linux.vnet.ibm.com>
+References: <20170920172314.102710-1-pasic@linux.vnet.ibm.com>
+	<20170920172314.102710-2-pasic@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 5/5] s390x/ccs: add ccw-tester emulated
- device
+Subject: Re: [Qemu-devel] [PATCH 1/2] s390x/3270: IDA support for 3270 via
+ CcwDataStream
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,64 +28,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
-Cc: Halil Pasic <pasic@linux.vnet.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+To: Halil Pasic <pasic@linux.vnet.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, qemu-devel@nongnu.org
 
-On Thu, 21 Sep 2017 16:45:47 +0800
-Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com> wrote:
+On Wed, 20 Sep 2017 19:23:13 +0200
+Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 
-> * Cornelia Huck <cohuck@redhat.com> [2017-09-07 10:08:17 +0200]:
+> Let us convert the 3270 code so it uses the recently introduced
+> CcwDataStream abstraction instead of blindly assuming direct data access.
 > 
-> [...]
+> This patch does not change behavior beyond introducing IDA support: for
+> direct data access CCWs everything stays as-is. (If there are bugs, they
+> are also preserved).
 > 
-> > > I'm thinking of a method these days:
-> > > Could passing through an fully emulated ccw device (e.g. 3270), or a
-> > > virtio ccw device, in the level 1 kvm guest to a level 2 guest be a test
-> > > method for this?
-> > > 
-> > > All of the CCWs will be translated to IDAL CCWs by vfio-ccw in the level
-> > > 1 guest (which is the level 2 kvm host) and issued to the level 1 kvm
-> > > host. So, those IDALs will eventually be handled by the emulated device,
-> > > or the virtio ccw device, on the level 1 kvm host...
-> > > 
-> > > Some days ago, one of my colleague tried the emulated 3270 passing
-> > > through. She stucked with the problem that the level 1 kvm host handling
-> > > a senseid IDAL ccw as a Direct ccw.
-> > > 
-> > > Maybe I could try to pass through a virtio ccw device. I don't think of
-> > > any obvious problem that would lead to fail. Any comment?
-> > >   
-> > 
-> > That actually looks like a good thing to try! Cool idea.
-> >   
+> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+> ---
+>  hw/char/terminal3270.c      | 18 +++++++++++-------
+>  hw/s390x/3270-ccw.c         |  4 ++--
+>  include/hw/s390x/3270-ccw.h |  5 ++---
+>  3 files changed, 15 insertions(+), 12 deletions(-)
 > 
-> Tried to test with the following method:
-> 1. Start g1 (first level guest on kvm a host) with a virtio blk device
->    defined:
-> -drive file=/dev/disk/by-path/ccw-0.0.3f3e,if=none,id=drive-virtio-disk1,format=raw \
-> -device virtio-blk-ccw,devno=fe.0.2222,scsi=off,drive=drive-virtio-disk1,id=virtio-disk1 \
-> 2. Login g1, and bind the subchannel of ccw device 0.0.2222 with
->    vfio-ccw drvier.
-> 3. Create a mdev on the above subchannel.
-> 4. Passthrough the mdev to g2, and try to start g2.
-> 
-> The 4th step failed with the following message and hang:
-> qemu-system-s390x: vfio-ccw: wirte I/O region: errno=4
-> (BTW, 4 is EINTR.)
-> 
-> I roughly guess this might be caused by:
-> On the kvm host, virtio callback injects the I/O interrupt in a
-> synchronzing manner. And this causes g1's I/O interrupt handler getting
-> the interrupt and then signaling the Qemu instance on g1 with the I/O
-> result, even before return of the pwrite().
-> 
-> But, using gdb on the kvm host, I do see several ssch successfully
-> executed. I will dig the root reason, and see if there is some way to
-> fix the issue.
+> diff --git a/hw/char/terminal3270.c b/hw/char/terminal3270.c
+> index 28f599111d..c976a63cc2 100644
+> --- a/hw/char/terminal3270.c
+> +++ b/hw/char/terminal3270.c
+> @@ -182,14 +182,18 @@ static void terminal_init(EmulatedCcw3270Device *dev, Error **errp)
+>                               terminal_read, chr_event, NULL, t, NULL, true);
+>  }
+>  
+> -static int read_payload_3270(EmulatedCcw3270Device *dev, uint32_t cda,
+> -                             uint16_t count)
+> +static inline CcwDataStream *get_cds(Terminal3270 *t)
+> +{
+> +    return &(CCW_DEVICE(&t->cdev)->sch->cds);
+> +}
+> +
+> +static int read_payload_3270(EmulatedCcw3270Device *dev)
+>  {
+>      Terminal3270 *t = TERMINAL_3270(dev);
+>      int len;
+>  
+> -    len = MIN(count, t->in_len);
+> -    cpu_physical_memory_write(cda, t->inv, len);
+> +    len = MIN(ccw_dstream_avail(get_cds(t)), t->in_len);
+> +    ccw_dstream_write_buf(get_cds(t), t->inv, len);
 
-Hm... would that be the ccws used for setting up a virtio device, and
-the problems start once adapter interrupts become active? Does it work
-if you modify the nested guest to use the old per-subchannel indicators
-mechanism?
+CCW_DEVICE() as called by get_cds() goes through qom, which implies a
+bit of overhead. Not sure if it makes sense to cache it in this
+function so you don't go through it multiple times. (Dito for the other
+callback.)
 
-(I'm also wondering how diag is handled?)
+>      t->in_len -= len;
+>  
+>      return len;
+
+Looks good.
