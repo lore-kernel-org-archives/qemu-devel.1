@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58819)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60113)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dv4Qd-0001Jv-74
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:34:20 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XI-00032J-UK
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <crosa@redhat.com>) id 1dv4QZ-0003ex-Rm
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:34:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55438)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <crosa@redhat.com>) id 1dv4QZ-0003dh-Lv
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:34:15 -0400
-References: <20170921162234.847-1-ehabkost@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Message-ID: <98c893ce-b9ad-2b95-7b91-d86df27353fc@redhat.com>
-Date: Thu, 21 Sep 2017 12:34:05 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170921162234.847-1-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] qemu.py: Call logging.basicConfig()
- automatically
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XH-0002iF-SH
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:12 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37494)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
+	id 1dv4XH-0002Bq-KS
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:11 -0400
+Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4X9-00052F-R9
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:41:03 +0100
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 21 Sep 2017 17:41:09 +0100
+Message-Id: <1506012099-13605-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1506012099-13605-1-git-send-email-peter.maydell@linaro.org>
+References: <1506012099-13605-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PULL 01/31] target/arm: Implement MSR/MRS access to
+ NS banked registers
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,50 +28,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-Cc: Kevin Wolf <kwolf@redhat.com>, Amador Pahim <apahim@redhat.com>, Fam Zheng <famz@redhat.com>, ldoktor@redhat.com, stefanha@gmail.com, armbru@redhat.com, mreitz@redhat.com
+To: qemu-devel@nongnu.org
 
+In v8M the MSR and MRS instructions have extra register value
+encodings to allow secure code to access the non-secure banked
+version of various special registers.
 
+(We don't implement the MSPLIM_NS or PSPLIM_NS aliases, because
+we don't currently implement the stack limit registers at all.)
 
-On 09/21/2017 12:22 PM, Eduardo Habkost wrote:
-> Not all scripts using qemu.py configure the Python logging
-> module, and end up generating a "No handlers could be found for
-> logger" message instead of actual log messages.
-> 
-> To avoid requiring every script using qemu.py to configure
-> logging manually, call basicConfig() when creating a QEMUMachine
-> object.  This won't affect scripts that already set up logging,
-> but will ensure that scripts that don't configure logging keep
-> working.
-> 
-> Reported-by: Kevin Wolf <kwolf@redhat.com>
-> Fixes: 4738b0a85a0c2031fddc71b51cccebce0c4ba6b1
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
->  scripts/qemu.py | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/scripts/qemu.py b/scripts/qemu.py
-> index 5e02dd8e78..73d6031e02 100644
-> --- a/scripts/qemu.py
-> +++ b/scripts/qemu.py
-> @@ -89,6 +89,9 @@ class QEMUMachine(object):
->          self._qmp = None
->          self._qemu_full_args = None
->  
-> +        # just in case logging wasn't configured by the main script:
-> +        logging.basicConfig(level=(logging.DEBUG if debug else logging.WARN))
-> +
->      def __enter__(self):
->          return self
->  
-> 
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 1505240046-11454-2-git-send-email-peter.maydell@linaro.org
+---
+ target/arm/helper.c | 110 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 110 insertions(+)
 
-Your description is accurate, and backed by:
-
-https://docs.python.org/3/library/logging.html#logging.basicConfig
-
-Quoting the relevant section: "This function does nothing if the root
-logger already has handlers configured for it."
-
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
+diff --git a/target/arm/helper.c b/target/arm/helper.c
+index 4f41841..f4f2a87 100644
+--- a/target/arm/helper.c
++++ b/target/arm/helper.c
+@@ -8892,12 +8892,68 @@ uint32_t HELPER(v7m_mrs)(CPUARMState *env, uint32_t reg)
+         break;
+     case 20: /* CONTROL */
+         return env->v7m.control[env->v7m.secure];
++    case 0x94: /* CONTROL_NS */
++        /* We have to handle this here because unprivileged Secure code
++         * can read the NS CONTROL register.
++         */
++        if (!env->v7m.secure) {
++            return 0;
++        }
++        return env->v7m.control[M_REG_NS];
+     }
+ 
+     if (el == 0) {
+         return 0; /* unprivileged reads others as zero */
+     }
+ 
++    if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
++        switch (reg) {
++        case 0x88: /* MSP_NS */
++            if (!env->v7m.secure) {
++                return 0;
++            }
++            return env->v7m.other_ss_msp;
++        case 0x89: /* PSP_NS */
++            if (!env->v7m.secure) {
++                return 0;
++            }
++            return env->v7m.other_ss_psp;
++        case 0x90: /* PRIMASK_NS */
++            if (!env->v7m.secure) {
++                return 0;
++            }
++            return env->v7m.primask[M_REG_NS];
++        case 0x91: /* BASEPRI_NS */
++            if (!env->v7m.secure) {
++                return 0;
++            }
++            return env->v7m.basepri[M_REG_NS];
++        case 0x93: /* FAULTMASK_NS */
++            if (!env->v7m.secure) {
++                return 0;
++            }
++            return env->v7m.faultmask[M_REG_NS];
++        case 0x98: /* SP_NS */
++        {
++            /* This gives the non-secure SP selected based on whether we're
++             * currently in handler mode or not, using the NS CONTROL.SPSEL.
++             */
++            bool spsel = env->v7m.control[M_REG_NS] & R_V7M_CONTROL_SPSEL_MASK;
++
++            if (!env->v7m.secure) {
++                return 0;
++            }
++            if (!arm_v7m_is_handler_mode(env) && spsel) {
++                return env->v7m.other_ss_psp;
++            } else {
++                return env->v7m.other_ss_msp;
++            }
++        }
++        default:
++            break;
++        }
++    }
++
+     switch (reg) {
+     case 8: /* MSP */
+         return (env->v7m.control[env->v7m.secure] & R_V7M_CONTROL_SPSEL_MASK) ?
+@@ -8936,6 +8992,60 @@ void HELPER(v7m_msr)(CPUARMState *env, uint32_t maskreg, uint32_t val)
+         return;
+     }
+ 
++    if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
++        switch (reg) {
++        case 0x88: /* MSP_NS */
++            if (!env->v7m.secure) {
++                return;
++            }
++            env->v7m.other_ss_msp = val;
++            return;
++        case 0x89: /* PSP_NS */
++            if (!env->v7m.secure) {
++                return;
++            }
++            env->v7m.other_ss_psp = val;
++            return;
++        case 0x90: /* PRIMASK_NS */
++            if (!env->v7m.secure) {
++                return;
++            }
++            env->v7m.primask[M_REG_NS] = val & 1;
++            return;
++        case 0x91: /* BASEPRI_NS */
++            if (!env->v7m.secure) {
++                return;
++            }
++            env->v7m.basepri[M_REG_NS] = val & 0xff;
++            return;
++        case 0x93: /* FAULTMASK_NS */
++            if (!env->v7m.secure) {
++                return;
++            }
++            env->v7m.faultmask[M_REG_NS] = val & 1;
++            return;
++        case 0x98: /* SP_NS */
++        {
++            /* This gives the non-secure SP selected based on whether we're
++             * currently in handler mode or not, using the NS CONTROL.SPSEL.
++             */
++            bool spsel = env->v7m.control[M_REG_NS] & R_V7M_CONTROL_SPSEL_MASK;
++
++            if (!env->v7m.secure) {
++                return;
++            }
++            if (!arm_v7m_is_handler_mode(env) && spsel) {
++                env->v7m.other_ss_psp = val;
++            } else {
++                env->v7m.other_ss_msp = val;
++            }
++            return;
++        }
++        default:
++            break;
++        }
++    }
++
+     switch (reg) {
+     case 0 ... 7: /* xPSR sub-fields */
+         /* only APSR is actually writable */
+-- 
+2.7.4
