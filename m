@@ -1,23 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46779)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47369)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dv3mL-0004YX-Io
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:52:42 -0400
+	(envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1dv3o7-0005fv-QT
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:54:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dv3mI-0006D8-9S
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:52:41 -0400
-References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
-	<20170920135833.20472-3-pbutsykin@virtuozzo.com>
-	<129077ca-af54-fe7c-40ee-850547f63cff@redhat.com>
-From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Message-ID: <45a6e398-ebbf-fb7c-8d42-535376ae4234@virtuozzo.com>
-Date: Thu, 21 Sep 2017 18:52:29 +0300
+	(envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1dv3o4-0006xL-GT
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:54:31 -0400
+Received: from mail-pf0-x230.google.com ([2607:f8b0:400e:c00::230]:50909)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <brandon.carpenter@cypherpath.com>)
+	id 1dv3o4-0006wr-5x
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 11:54:28 -0400
+Received: by mail-pf0-x230.google.com with SMTP id m63so3410566pfk.7
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 08:54:27 -0700 (PDT)
+Date: Thu, 21 Sep 2017 08:54:24 -0700
+From: Brandon Carpenter <brandon.carpenter@cypherpath.com>
+Message-Id: <1506009264.7363.0@smtp.gmail.com>
+In-Reply-To: <20170921095528.GE26740@redhat.com>
+References: <20170912152153.7729-1-brandon.carpenter@cypherpath.com>
+	<1505926567.32618.0@smtp.gmail.com> <20170921095528.GE26740@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <129077ca-af54-fe7c-40ee-850547f63cff@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 2/2] qcow2: truncate the tail of the image
- file after shrinking the image
+Content-Type: text/plain; charset="US-ASCII"; format=flowed
+Subject: Re: [Qemu-devel] [PATCH v3 0/7] Update websocket code to more fully
+ support the RFC
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,60 +32,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, eblake@redhat.com, den@openvz.org
+To: "Daniel P. Berrange" <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org
 
-On 21.09.2017 18:30, Max Reitz wrote:
-> On 2017-09-20 15:58, Pavel Butsykin wrote:
->> Now after shrinking the image, at the end of the image file, there might be a
->> tail that probably will never be used. So we can find the last used cluster and
->> cut the tail.
->>
->> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
->> ---
->>   block/qcow2-refcount.c | 21 +++++++++++++++++++++
->>   block/qcow2.c          | 19 +++++++++++++++++++
->>   block/qcow2.h          |  1 +
->>   3 files changed, 41 insertions(+)
->>
->> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
->> index 88d5a3f1ad..5e221a166c 100644
->> --- a/block/qcow2-refcount.c
->> +++ b/block/qcow2-refcount.c
->> @@ -3181,3 +3181,24 @@ out:
->>       g_free(reftable_tmp);
->>       return ret;
->>   }
->> +
->> +int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size)
->> +{
->> +    BDRVQcow2State *s = bs->opaque;
->> +    int64_t i, last_cluster, nb_clusters = size_to_clusters(s, size);
->> +    uint64_t refcount;
->> +
->> +    for (i = 0, last_cluster = 0; i < nb_clusters; i++) {
->> +        int ret = qcow2_get_refcount(bs, i, &refcount);
->> +        if (ret < 0) {
->> +            fprintf(stderr, "Can't get refcount for cluster %" PRId64 ": %s\n",
->> +                    i, strerror(-ret));
->> +            continue;
-> 
-> Oh, and another thing: If you decide to ignore errors here, I'd at least
-> consider the cluster allocated.
-> 
-> Of course it would also be possible not to ignore errors, and instead
-> return them to the caller which would then just not truncate the file.
+Cool. Thanks for helping me through the process and for the great 
+feedback.
 
-Yes, it seems so safer.
+--
+Brandon Carpenter | Software Engineer
+Cypherpath, Inc.
+400 Columbia Point Drive Ste 101 | Richland, Washington USA
+Office: (650) 713-3060
 
-> Max
+On Thu, Sep 21, 2017 at 2:55 AM, Daniel P. Berrange 
+<berrange@redhat.com> wrote:
+> On Wed, Sep 20, 2017 at 09:56:07AM -0700, Brandon Carpenter wrote:
+>>  How are things looking, Daniel. I believe every comment from the 
+>> previous
+>>  version of the series was addressed.
+>> 
+>>  I also wanted to mention that I put together a Python script, which 
+>> acts as
+>>  a proxy between noVNC and qemu, and can inject various frame types, 
+>> fragment
+>>  frames, and shutdown the socket in various ways to help exercise the
+>>  different code paths. I would be happy to post it here to help test 
+>> the
+>>  changes.
 > 
->> +        }
->> +
->> +        if (refcount > 0) {
->> +            last_cluster = i;
->> +        }
->> +    }
->> +    return last_cluster;
->> +}
+> Sorry for the delay - I've reviewed this now and it looks good. I've 
+> made a
+> few whitespace changes in places, but I've queued it for my next pull 
+> request
+> now.
 > 
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-    
+> https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-            
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-    
+> https://www.instagram.com/dberrange :|
+
+-- 
+
+
+CONFIDENTIALITY NOTICE: This e-mail message, including any attachments, is 
+for the sole use of the intended recipient(s) and may contain proprietary, 
+confidential or privileged information or otherwise be protected by law. 
+Any unauthorized review, use, disclosure or distribution is prohibited. If 
+you are not the intended recipient, please notify the sender and destroy 
+all copies and the original message.
