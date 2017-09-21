@@ -1,27 +1,19 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:57278)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36049)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dv8aF-0005Er-KM
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:00:32 -0400
+	(envelope-from <david@redhat.com>) id 1dv93o-0003lB-JX
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:31:05 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dv8aE-0007fF-Hu
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:00:31 -0400
-Received: from mail-wm0-x231.google.com ([2a00:1450:400c:c09::231]:46564)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dv8aE-0007d8-B2
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:00:30 -0400
-Received: by mail-wm0-x231.google.com with SMTP id m72so5178273wmc.1
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 14:00:28 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <f794478b-b73f-60d4-0c0f-0ad1c0e2f20b@redhat.com>
-References: <1506014941-31076-1-git-send-email-peter.maydell@linaro.org>
-	<f794478b-b73f-60d4-0c0f-0ad1c0e2f20b@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Sep 2017 22:00:06 +0100
-Message-ID: <CAFEAcA-Ow-e5PHe5HczV2NSLtKnBLsqhZpx5BSjTt-ZQVQyE7w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH v2] docs/devel/loads-stores.rst: Document
- our various load and store APIs
+	(envelope-from <david@redhat.com>) id 1dv93j-0005Cd-MB
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:31:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60460)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dv93j-0005CN-Dl
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:30:59 -0400
+From: David Hildenbrand <david@redhat.com>
+Date: Thu, 21 Sep 2017 23:30:52 +0200
+Message-Id: <20170921213052.1765-1-david@redhat.com>
+Subject: [Qemu-devel] [PATCH v1] s390x/kvm: fix and cleanup storing CPU
+ status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,86 +22,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eric Blake <eblake@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, "patches@linaro.org" <patches@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com, david@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-On 21 September 2017 at 20:17, Eric Blake <eblake@redhat.com> wrote:
-> On 09/21/2017 12:29 PM, Peter Maydell wrote:
->> QEMU has a wide selection of different functions for doing
->> loads and stores; provide some overview documentation of
->> what they do and how to pick which one to use.
->>
->> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
->> ---
->> Changes v1->v2: filled in most of the gaps thanks to the
->> comments on v1.
->>
->> I have left some TODO markers in where they represent
->> fixes we should ideally make to the API. Since this
->> is for-developers internals documentation I think it's
->> OK to leave those in.
->>
->> I found I was referring back to my v1 patch and the replies
->> to it quite a bit recently, so I think it would be nice to
->> get it into the tree.
->>
->> The major question I have left is about the license text
->> to apply to this...
->
->> +   Copyright (c) 2017 Linaro Limited
->> +   Written by Peter Maydell
->> +   TODO: do we have a standard doc license? bitmaps.rst
->> +   uses the FreeBSD documentation license, I notice.
->
-> The default GPLv2+ seems okay to me for something for internal use, but
-> of course, if you want something looser like FreeBSD docs, I'm also fine
-> with that (as it's not the first use in the tree).
+env->psa is a 64bit value, while we copy 4 bytes into the save area,
+resulting always in 0 getting stored.
 
-I was wondering how GPLv2+ would work with things like the
-"readthedocs" website -- if we used that for providing a
-nice rendering of the documentation does it get awkward
-license-wise?
+Let's try to reduce such errors by using a proper structure. While at
+it, use correct cpu->be conversion (and get_psw_mask()), as we will be
+reusing this code for TCG soon.
 
-But yes, just not saying anything and going with our
-default is probably simplest.
+Signed-off-by: David Hildenbrand <david@redhat.com>
+---
 
->> +
->> +===================
->> +Load and Store APIs
->> +===================
->> +
->> +QEMU internally has multiple families of functions for performing
->> +loads and stores. This document attempts to enumerate them all
->> +and indicate when to use them. It does not provide detailed
->> +documentation of each API -- for that you should look at the
->> +documentation comments in the relevant header files.
->> +
->> +
->> +``ld*_p and st_*p``
->
-> Difference in placement of * vs. _ - is it intentional?
+Found with my fancy SIGP kvm-unit-tests I am currently working on. And
+looks like there is even more ... stay tuned :)
 
-No, it should be st*_p. (If in doubt, trust the regexs;
-I tested them all.)
+ target/s390x/kvm.c | 63 +++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 43 insertions(+), 20 deletions(-)
 
->> +
->> +``cpu_{ld,st}_*``
->> +~~~~~~~~~~~~~~~~~
->> +
->> +These functions operate on a guest virtual address. Be aware
->> +that these functions may cause a guest CPU exception to be
->> +taken (eg for an alignment fault or MMU fault) which will
->
-> Do we care about the formal spelling "e.g." ?
-
-I don't personally, tending to the BBC and Guardian style
-guide recommended approach of using no punctuation:
-https://www.theguardian.com/guardian-observer-style-guide-e
-http://www.bbc.co.uk/academy/journalism/article/art20130716140724183
-
-but grep suggests that 'e.g.' is the much more common
-style in docs/ so I guess we should follow that
-for consistency.
-
-thanks
--- PMM
+diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
+index 720cb1d833..21c22f48b9 100644
+--- a/target/s390x/kvm.c
++++ b/target/s390x/kvm.c
+@@ -1548,22 +1548,38 @@ static int do_store_adtl_status(S390CPU *cpu, hwaddr addr, hwaddr len)
+     return 0;
+ }
+ 
++struct sigp_save_area {
++    uint64_t    fprs[16];                       /* 0x0000 */
++    uint64_t    grs[16];                        /* 0x0080 */
++    PSW         psw;                            /* 0x0100 */
++    uint8_t     pad_0x0110[0x0118 - 0x0110];    /* 0x0110 */
++    uint32_t    prefix;                         /* 0x0118 */
++    uint32_t    fpc;                            /* 0x011c */
++    uint8_t     pad_0x0120[0x0124 - 0x0120];    /* 0x0120 */
++    uint32_t    todpr;                          /* 0x0124 */
++    uint64_t    cputm;                          /* 0x0128 */
++    uint64_t    ckc;                            /* 0x0130 */
++    uint8_t     pad_0x0138[0x0140 - 0x0138];    /* 0x0138 */
++    uint32_t    ars[16];                        /* 0x0140 */
++    uint64_t    crs[16];                        /* 0x0384 */
++} QEMU_PACKED;
++
+ #define KVM_S390_STORE_STATUS_DEF_ADDR offsetof(LowCore, floating_pt_save_area)
+-#define SAVE_AREA_SIZE 512
+ static int kvm_s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
+ {
+     static const uint8_t ar_id = 1;
+-    uint64_t ckc = cpu->env.ckc >> 8;
+-    void *mem;
++    struct sigp_save_area *sa;
++    hwaddr len = sizeof(*sa);
+     int i;
+-    hwaddr len = SAVE_AREA_SIZE;
+ 
+-    mem = cpu_physical_memory_map(addr, &len, 1);
+-    if (!mem) {
++    QEMU_BUILD_BUG_ON(sizeof(*sa) != 512);
++
++    sa = cpu_physical_memory_map(addr, &len, 1);
++    if (!sa) {
+         return -EFAULT;
+     }
+-    if (len != SAVE_AREA_SIZE) {
+-        cpu_physical_memory_unmap(mem, len, 1, 0);
++    if (len != sizeof(*sa)) {
++        cpu_physical_memory_unmap(sa, len, 1, 0);
+         return -EFAULT;
+     }
+ 
+@@ -1571,19 +1587,26 @@ static int kvm_s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
+         cpu_physical_memory_write(offsetof(LowCore, ar_access_id), &ar_id, 1);
+     }
+     for (i = 0; i < 16; ++i) {
+-        *((uint64_t *)mem + i) = get_freg(&cpu->env, i)->ll;
+-    }
+-    memcpy(mem + 128, &cpu->env.regs, 128);
+-    memcpy(mem + 256, &cpu->env.psw, 16);
+-    memcpy(mem + 280, &cpu->env.psa, 4);
+-    memcpy(mem + 284, &cpu->env.fpc, 4);
+-    memcpy(mem + 292, &cpu->env.todpr, 4);
+-    memcpy(mem + 296, &cpu->env.cputm, 8);
+-    memcpy(mem + 304, &ckc, 8);
+-    memcpy(mem + 320, &cpu->env.aregs, 64);
+-    memcpy(mem + 384, &cpu->env.cregs, 128);
++        sa->fprs[i] = cpu_to_be64(get_freg(&cpu->env, i)->ll);
++    }
++    for (i = 0; i < 16; ++i) {
++        sa->grs[i] = cpu_to_be64(cpu->env.regs[i]);
++    }
++    sa->psw.addr = cpu_to_be64(cpu->env.psw.addr);
++    sa->psw.mask = cpu_to_be64(get_psw_mask(&cpu->env));
++    sa->prefix = cpu_to_be32(cpu->env.psa);
++    sa->fpc = cpu_to_be32(cpu->env.fpc);
++    sa->todpr = cpu_to_be32(cpu->env.todpr);
++    sa->cputm = cpu_to_be64(cpu->env.cputm);
++    sa->ckc = cpu_to_be64(cpu->env.ckc >> 8);
++    for (i = 0; i < 16; ++i) {
++        sa->ars[i] = cpu_to_be32(cpu->env.aregs[i]);
++    }
++    for (i = 0; i < 16; ++i) {
++        sa->ars[i] = cpu_to_be64(cpu->env.cregs[i]);
++    }
+ 
+-    cpu_physical_memory_unmap(mem, len, 1, len);
++    cpu_physical_memory_unmap(sa, len, 1, len);
+ 
+     return 0;
+ }
+-- 
+2.13.5
