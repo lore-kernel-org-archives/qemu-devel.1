@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38681)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38770)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dv1x9-0002IH-GR
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:55:44 -0400
+	(envelope-from <no-reply@patchew.org>) id 1dv1xb-0002Yr-G2
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:56:12 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dv1x4-0001ua-Pf
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:55:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47218)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dv1x4-0001u3-Bu
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:55:38 -0400
-References: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <cd46a9e9-4e9d-9ac8-53ed-34ba1b6f4dc0@redhat.com>
-Date: Thu, 21 Sep 2017 08:55:34 -0500
+	(envelope-from <no-reply@patchew.org>) id 1dv1xX-00029p-4r
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:56:11 -0400
+Resent-Message-Id: <E1dv1xX-00029p-4r@eggs.gnu.org>
+Received: from sender-of-o52.zoho.com ([135.84.80.217]:21460)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <no-reply@patchew.org>)
+	id 1dv1xW-00029T-TL
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:56:07 -0400
+In-Reply-To: <1506001091-8296-1-git-send-email-yongbok.kim@imgtec.com>
+Reply-To: <qemu-devel@nongnu.org>
+Message-ID: <150600214350.33.2109417940402198270@d650bbe78fe3>
 MIME-Version: 1.0
-In-Reply-To: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="2QK6ft9qFaODBWWTPvBB7vFKnKvOS9gj6"
-Subject: Re: [Qemu-devel] nbd structured reply
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+From: no-reply@patchew.org
+Date: Thu, 21 Sep 2017 06:55:44 -0700 (PDT)
+Subject: Re: [Qemu-devel] [PULL 0/7] target-mips queue
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,88 +28,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>, nbd@other.debian.org
+To: yongbok.kim@imgtec.com
+Cc: famz@redhat.com, qemu-devel@nongnu.org, peter.maydell@linaro.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---2QK6ft9qFaODBWWTPvBB7vFKnKvOS9gj6
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>, nbd@other.debian.org
-Message-ID: <cd46a9e9-4e9d-9ac8-53ed-34ba1b6f4dc0@redhat.com>
-Subject: Re: nbd structured reply
-References: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
-In-Reply-To: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-[updating CC to point to the correct new NBD list]
-
-On 09/21/2017 07:18 AM, Vladimir Sementsov-Ogievskiy wrote:
-> Hi all!
->=20
-> I'm about this:
->=20
-> "A server SHOULD try to minimize the number of chunks sent in a reply,
-> but MUST NOT mark a chunk as final if there is still a possibility of
-> detecting an error before transmission of that chunk completes"
->=20
-> What do we mean by "possibility"? Formally, such possibility exists
-> always, so, we'll never mark a chunk as final.
-
-Here's what is envisioned.  It is fairly easy to write a server that
-receives an NBD_CMD_READ, issues the header reply, and only then
-dispatches the I/O to collect the data from the file system to send
-after the header.  But if you encounter EIO (or other problem) while
-reading from the file system, you're stuck if you've already sent the
-header.  In this scenario, if you mark the header being as final, you
-are unable to report the EIO (it is one of the flaws with non-structured
-reads that makes the spec say that if you detect an error after sending
-the header, you have no choice but to terminate the connection).
-
-An alternative server implementation would buffer the header, perform
-the I/O to collect data from the file system, and only when it is all
-present in memory, it finally sends the reply to the client.  In this
-scenario, since you wait until all data is buffered, you know up front
-whether an error occurred while collecting the I/O, and can therefore
-send the data as the final packet right away (whether error or success).
- However, it potentially requires more memory to buffer requests like
-this, compared to the server that sends information piecemeal as soon as
-it obtains data.
-
-The intent is not to detect errors in sending the data over the wire,
-but in detecting errors in reading the data from the underlying storage
-(or however else the data to be read is being collected).  A chunk must
-not be marked final unless you can guarantee that there will be no
-further errors in collecting data for the reply.
-
-If you have suggestions for improving the NBD spec wording, feel free to
-propose a doc patch.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---2QK6ft9qFaODBWWTPvBB7vFKnKvOS9gj6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnDxNYACgkQp6FrSiUn
-Q2ppmwgAiEdVmporfWDePoXHN7eTIHGo0pjku30CQlegmBdGRv1JFXweREECKmb5
-yLSAxrnua8xlz2k0lLpBfCAKk7ew9f05xxZmyCTL6F2PJgq00oEhuTz/OobM3tRQ
-fAk1GQU1tpAFuw+ZoAHPVSCXPHPBS02pxfOVuWGfsbzf4BET454xAMEOMLC5YkTp
-BsI/reaWXIgvdbYNsIjR3UNEpCzNCAyiQ5EEahkXsISd0pq2t7mxj12fSJ8Lc5p0
-VxWtZGd7cuvJiWdJP7hfssw3k8JymLFUljqe++rWotElhYfvHvITgXmNl+4ZtReK
-dufhUKXPV3EvbN/OgAOr2HOu+KlLdQ==
-=VQzb
------END PGP SIGNATURE-----
-
---2QK6ft9qFaODBWWTPvBB7vFKnKvOS9gj6--
+SGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1z
+LiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKU3ViamVjdDogW1FlbXUt
+ZGV2ZWxdIFtQVUxMIDAvN10gdGFyZ2V0LW1pcHMgcXVldWUKTWVzc2FnZS1pZDogMTUwNjAwMTA5
+MS04Mjk2LTEtZ2l0LXNlbmQtZW1haWwteW9uZ2Jvay5raW1AaW1ndGVjLmNvbQpUeXBlOiBzZXJp
+ZXMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKCkJBU0U9YmFzZQpuPTEK
+dG90YWw9JChnaXQgbG9nIC0tb25lbGluZSAkQkFTRS4uIHwgd2MgLWwpCmZhaWxlZD0wCgpnaXQg
+Y29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
+LnJlbmFtZXMgVHJ1ZQoKY29tbWl0cz0iJChnaXQgbG9nIC0tZm9ybWF0PSVIIC0tcmV2ZXJzZSAk
+QkFTRS4uKSIKZm9yIGMgaW4gJGNvbW1pdHM7IGRvCiAgICBlY2hvICJDaGVja2luZyBQQVRDSCAk
+bi8kdG90YWw6ICQoZ2l0IGxvZyAtbiAxIC0tZm9ybWF0PSVzICRjKS4uLiIKICAgIGlmICEgZ2l0
+IHNob3cgJGMgLS1mb3JtYXQ9ZW1haWwgfCAuL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
+YWNrIC07IHRoZW4KICAgICAgICBmYWlsZWQ9MQogICAgICAgIGVjaG8KICAgIGZpCiAgICBuPSQo
+KG4rMSkpCmRvbmUKCmV4aXQgJGZhaWxlZAo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRp
+bmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8v
+Z2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICAgICAg
+ICBwYXRjaGV3LzE1MDYwMDEwOTEtODI5Ni0xLWdpdC1zZW5kLWVtYWlsLXlvbmdib2sua2ltQGlt
+Z3RlYy5jb20gLT4gcGF0Y2hldy8xNTA2MDAxMDkxLTgyOTYtMS1naXQtc2VuZC1lbWFpbC15b25n
+Ym9rLmtpbUBpbWd0ZWMuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKMTE2MDE5
+MDUxYyBtaXBzOiBJbXByb3ZlIG1hY3JvIHBhcmVudGhlc2l6YXRpb24KYWNkMDY4ODkzYSBtaXBz
+OiByZXBsYWNlIGNwdV9taXBzX2luaXQoKSB3aXRoIGNwdV9nZW5lcmljX2luaXQoKQozOTgwMGI4
+YmEyIG1pcHM6IE1JUFNDUFUgbW9kZWwgc3ViY2xhc3Nlcwo5YjM5NzUyOWU2IG1pcHM6IGNhbGwg
+Y3B1X21pcHNfcmVhbGl6ZV9lbnYoKSBmcm9tIG1pcHNfY3B1X3JlYWxpemVmbigpCjkxZDg0MThl
+ZGQgbWlwczogc3BsaXQgY3B1X21pcHNfcmVhbGl6ZV9lbnYoKSBvdXQgb2YgY3B1X21pcHNfaW5p
+dCgpCjkyNWM1OGUzYWMgbWlwczogaW50cm9kdWNlIGludGVybmFsLmggYW5kIGNsZWFudXAgY3B1
+LmgKM2I4OThhN2RjOCBtaXBzOiBtb3ZlIGh3L21pcHMvY3B1dGltZXIuYyB0byB0YXJnZXQvbWlw
+cy8KCj09PSBPVVRQVVQgQkVHSU4gPT09CkNoZWNraW5nIFBBVENIIDEvNzogbWlwczogbW92ZSBo
+dy9taXBzL2NwdXRpbWVyLmMgdG8gdGFyZ2V0L21pcHMvLi4uCkNoZWNraW5nIFBBVENIIDIvNzog
+bWlwczogaW50cm9kdWNlIGludGVybmFsLmggYW5kIGNsZWFudXAgY3B1LmguLi4KRVJST1I6IHNw
+YWNlIHByb2hpYml0ZWQgYWZ0ZXIgdGhhdCAnJicgKGN0eDpXeFcpCiM3Mjk6IEZJTEU6IHRhcmdl
+dC9taXBzL2ludGVybmFsLmg6MjMwOgorICAgIGlmICgoZW52LT5DUDBfVlBDb250cm9sID4+IENQ
+MFZQQ3RsX0RJUykgJiAxKSB7CiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICBeCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJyAoY3R4Old4
+VykKIzczNzogRklMRTogdGFyZ2V0L21pcHMvaW50ZXJuYWwuaDoyMzg6CisgICAgICAgICAgICAo
+KG90aGVyX2NwdS0+ZW52LkNQMF9WUENvbnRyb2wgPj4gQ1AwVlBDdGxfRElTKSAmIDEpKSB7CiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICBeCgpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBhZnRlciB0aGF0ICcmJyAoY3R4Old4VykKIzc1
+NzogRklMRTogdGFyZ2V0L21pcHMvaW50ZXJuYWwuaDoyNTg6CisgICAgICAgIGVudi0+aGZsYWdz
+IHw9IChlbnYtPkNQMF9TdGF0dXMgPj4gQ1AwU3RfS1NVKSAmIE1JUFNfSEZMQUdfS1NVOwogICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90
+YWw6IDMgZXJyb3JzLCAwIHdhcm5pbmdzLCA4NDIgbGluZXMgY2hlY2tlZAoKWW91ciBwYXRjaCBo
+YXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3Jz
+CmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpD
+SEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKQ2hlY2tpbmcgUEFUQ0ggMy83OiBtaXBzOiBzcGxp
+dCBjcHVfbWlwc19yZWFsaXplX2VudigpIG91dCBvZiBjcHVfbWlwc19pbml0KCkuLi4KQ2hlY2tp
+bmcgUEFUQ0ggNC83OiBtaXBzOiBjYWxsIGNwdV9taXBzX3JlYWxpemVfZW52KCkgZnJvbSBtaXBz
+X2NwdV9yZWFsaXplZm4oKS4uLgpDaGVja2luZyBQQVRDSCA1Lzc6IG1pcHM6IE1JUFNDUFUgbW9k
+ZWwgc3ViY2xhc3Nlcy4uLgpDaGVja2luZyBQQVRDSCA2Lzc6IG1pcHM6IHJlcGxhY2UgY3B1X21p
+cHNfaW5pdCgpIHdpdGggY3B1X2dlbmVyaWNfaW5pdCgpLi4uCkNoZWNraW5nIFBBVENIIDcvNzog
+bWlwczogSW1wcm92ZSBtYWNybyBwYXJlbnRoZXNpemF0aW9uLi4uCj09PSBPVVRQVVQgRU5EID09
+PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgotLS0KRW1haWwgZ2VuZXJhdGVk
+IGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cDovL3BhdGNoZXcub3JnL10uClBsZWFzZSBz
+ZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEBmcmVlbGlzdHMub3Jn
