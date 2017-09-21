@@ -1,20 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39266)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dv0Gv-0002IU-J7
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:08:02 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dv0Gs-0002GT-FK
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:08:04 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1dv0Gr-00029E-Ue
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:08:01 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:55632)
+	(envelope-from <pbonzini@redhat.com>) id 1dv0Gq-00026C-QQ
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:07:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53126)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dv0Gr-00026w-NW
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:07:57 -0400
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dv0Gq-00024j-Ke
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:07:56 -0400
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 21 Sep 2017 14:07:51 +0200
-Message-Id: <20170921120751.3027-4-pbonzini@redhat.com>
+Date: Thu, 21 Sep 2017 14:07:50 +0200
+Message-Id: <20170921120751.3027-3-pbonzini@redhat.com>
 In-Reply-To: <20170921120751.3027-1-pbonzini@redhat.com>
 References: <20170921120751.3027-1-pbonzini@redhat.com>
-Subject: [Qemu-devel] [PATCH 3/3] memory: Share special empty FlatView
+Subject: [Qemu-devel] [PATCH 2/3] memory: seek FlatView sharing candidates
+ among children subregions
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,83 +27,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: aik@ozlabs.ru
 
-From: Alexey Kardashevskiy <aik@ozlabs.ru>
+A container can be used instead of an alias to allow switching between
+multiple subregions.  In this case we cannot directly share the
+subregions (since they only belong to a single parent), but if the
+subregions are aliases we can in turn walk those.
 
-This shares an cached empty FlatView among address spaces. The empty
-FV is used every time when a root MR would render into a FV without
-memory sections, which happens when MR or its children are not enabled
-(or zero-sized, which isn't caught yet). The empty_view is not NULL to
-keep the rest of memory API intact; it also has a dispatch tree for the
-same reason.
+While this does not reduce much the number of FlatViews that are created,
+it makes it possible to share the PCI bus master FlatViews and their
+AddressSpaceDispatch structures.  For 112 virtio-net-pci devices, boot time
+is reduced from 25 to 10 seconds and memory consumption from 1.4 to 1 G.
 
-On POWER8 with 255 CPUs, 255 virtio-net, 40 PCI bridges guest this halves
-the amount of FlatView's in use (557 -> 260) and dispatch tables
-(~800000 -> ~370000).  In an unrelated experiment with 112 non-virtio
-devices on x86 ("-M pc"), only 4 FlatViews are alive while the guest runs.
-
-Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
-Message-Id: <20170921085110.25598-16-aik@ozlabs.ru>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- memory.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ memory.c | 41 +++++++++++++++++++++++++++++++++++------
+ 1 file changed, 35 insertions(+), 6 deletions(-)
 
 diff --git a/memory.c b/memory.c
-index 3207ae55e2..cb369223b1 100644
+index 4952cc5d84..3207ae55e2 100644
 --- a/memory.c
 +++ b/memory.c
-@@ -316,6 +316,7 @@ static void flatview_ref(FlatView *view)
- static void flatview_unref(FlatView *view)
+@@ -733,12 +733,41 @@ static void render_memory_region(FlatView *view,
+ 
+ static MemoryRegion *memory_region_get_flatview_root(MemoryRegion *mr)
  {
-     if (atomic_fetch_dec(&view->ref) == 1) {
-+        assert(view->root);
-         call_rcu(view, flatview_destroy, rcu);
-     }
- }
-@@ -761,16 +762,19 @@ static MemoryRegion *memory_region_get_flatview_root(MemoryRegion *mr)
-                     }
-                 }
-             }
-+            if (found == 0) {
-+                return NULL;
-+            }
-             if (next) {
-                 mr = next;
-                 continue;
-             }
-         }
- 
--        break;
-+        return mr;
-     }
- 
--    return mr;
-+    return NULL;
- }
- 
- /* Render a memory topology into a list of disjoint absolute ranges. */
-@@ -962,12 +966,22 @@ static void address_space_update_topology_pass(AddressSpace *as,
- 
- static void flatviews_init(void)
- {
-+    static FlatView *empty_view;
+-    while (mr->alias && !mr->alias_offset &&
+-           int128_ge(mr->size, mr->alias->size)) {
+-        /* The alias is included in its entirety.  Use it as
+-         * the "real" root, so that we can share more FlatViews.
+-         */
+-        mr = mr->alias;
++    while (mr->enabled) {
++        if (mr->alias && !mr->alias_offset &&
++            int128_ge(mr->size, mr->alias->size)) {
++            /* The alias is included in its entirety.  Use it as
++             * the "real" root, so that we can share more FlatViews.
++             */
++            mr = mr->alias;
++            continue;
++        }
 +
-     if (flat_views) {
-         return;
++        if (!mr->terminates) {
++            unsigned int found = 0;
++            MemoryRegion *child, *next = NULL;
++            QTAILQ_FOREACH(child, &mr->subregions, subregions_link) {
++                if (child->enabled) {
++                    if (++found > 1) {
++                        next = NULL;
++                        break;
++                    }
++                    if (!child->addr && int128_ge(mr->size, child->size)) {
++                        /* A child is included in its entirety.  If it's the only
++                         * enabled one, use it in the hope of finding an alias down the
++                         * way. This will also let us share FlatViews.
++                         */
++                        next = child;
++                    }
++                }
++            }
++            if (next) {
++                mr = next;
++                continue;
++            }
++        }
++
++        break;
      }
  
-     flat_views = g_hash_table_new_full(g_direct_hash, g_direct_equal, NULL,
-                                        (GDestroyNotify) flatview_unref);
-+    if (!empty_view) {
-+        empty_view = generate_memory_topology(NULL);
-+        /* We keep it alive forever in the global variable.  */
-+        flatview_ref(empty_view);
-+    } else {
-+        g_hash_table_replace(flat_views, NULL, empty_view);
-+        flatview_ref(empty_view);
-+    }
- }
- 
- static void flatviews_reset(void)
+     return mr;
 -- 
 2.13.5
