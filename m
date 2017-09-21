@@ -1,25 +1,40 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41826)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43099)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1duyXG-0005tk-HK
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:16:47 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1duycz-0007Q3-8U
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:22:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1duyXB-000063-Fy
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:16:46 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49174)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1duyXB-0008WU-7j
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:16:41 -0400
-References: <1505942471-11260-1-git-send-email-zuban32s@gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <f5dbe1a3-bb18-28ff-515b-e8a9ef924835@redhat.com>
-Date: Thu, 21 Sep 2017 13:16:39 +0300
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1duycu-0002dD-7l
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:22:41 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57576
+	helo=mx0a-001b2d01.pphosted.com)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
+	id 1duycu-0002c3-3D
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:22:36 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
+	v8LAJglG133725
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 06:22:35 -0400
+Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2d4aemvjew-1
+	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 06:22:35 -0400
+Received: from localhost
+	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	Only! Violators will be prosecuted
+	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
+	Thu, 21 Sep 2017 11:22:33 +0100
+References: <20170920172314.102710-1-pasic@linux.vnet.ibm.com>
+	<20170921112459.0153cc64.cohuck@redhat.com>
+From: Halil Pasic <pasic@linux.vnet.ibm.com>
+Date: Thu, 21 Sep 2017 12:22:30 +0200
 MIME-Version: 1.0
-In-Reply-To: <1505942471-11260-1-git-send-email-zuban32s@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20170921112459.0153cc64.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/pci-bridge/pcie_pci_bridge: properly
- handle MSI unavailability case
+Content-Transfer-Encoding: 8bit
+Message-Id: <8abd41f8-e3fd-682f-1669-a5c3870c32fd@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 0/2] 3270 improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,90 +43,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>, qemu-devel@nongnu.org
-Cc: mst@redhat.com
+To: Cornelia Huck <cohuck@redhat.com>
+Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger <borntraeger@de.ibm.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
 
-Hi Aleksandr,
 
-On 21/09/2017 0:21, Aleksandr Bezzubikov wrote:
-> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
-> ---
->   hw/pci-bridge/pcie_pci_bridge.c | 24 ++++++++++++++++++------
->   1 file changed, 18 insertions(+), 6 deletions(-)
+
+On 09/21/2017 11:24 AM, Cornelia Huck wrote:
+> On Wed, 20 Sep 2017 19:23:12 +0200
+> Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
+> 
+>> Jason found some problems with 3270 which he traced down to insufficient
+>> output buffer size. I've looked into the underlying issue (and the
+>> relevant code) and I saw strange things. Among others an unreasonable
+>> assert requiring the payload of a ccw being less than some more or
+>> less arbitrary limit (dictated by the size of the output buffer).
+>>
+>> Because we were already considering converting 3270 to CcwDataStream I've
+>> decided to try do get rid of this strange limitation on the length of the
+>> writes too. 
+>>
+>> This series depends on my IDA work, which can be found here:
+>> https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg03434.html.
+>>
+>> Halil Pasic (2):
+>>   s390x/3270: IDA support for 3270 via CcwDataStream
+>>   s390x/3270: handle writes of arbitrary length
+>>
+>>  hw/char/terminal3270.c      | 46 +++++++++++++++++++++++++++------------------
+>>  hw/s390x/3270-ccw.c         |  4 ++--
+>>  include/hw/s390x/3270-ccw.h |  5 ++---
+>>  3 files changed, 32 insertions(+), 23 deletions(-)
+>>
+> 
+> Are you planning to do some further work on 3270, btw?
 > 
 
-Please add Eduardo's Reported-by tag and the
-actual failure in the commit message.
-You might even explain in the commit message that you
-moved msi prop to ON_OFF_AUTO_AUTO.
+I did not. I jumped in because of IDA, and because I did
+not agree with increasing the buffer size to another arbitrary
+an value (and essentially keep the bug). I hope the original
+authors will do further polishing.
 
+I'm just curious, what's behind the question?
 
-> diff --git a/hw/pci-bridge/pcie_pci_bridge.c b/hw/pci-bridge/pcie_pci_bridge.c
-> index 9aa5cc3..da562fe 100644
-> --- a/hw/pci-bridge/pcie_pci_bridge.c
-> +++ b/hw/pci-bridge/pcie_pci_bridge.c
-> @@ -65,10 +65,18 @@ static void pcie_pci_bridge_realize(PCIDevice *d, Error **errp)
->           goto aer_error;
->       }
->   
-> +    Error *local_err = NULL;
->       if (pcie_br->msi != ON_OFF_AUTO_OFF) {
-> -        rc = msi_init(d, 0, 1, true, true, errp);
-> +        rc = msi_init(d, 0, 1, true, true, &local_err);
->           if (rc < 0) {
-> -            goto msi_error;
-> +            assert(rc == -ENOTSUP);
-> +            if (pcie_br->msi != ON_OFF_AUTO_ON) {
-> +                error_free(local_err);
-
-In that case it will fallback to legacy INTx, right?
-
-Thanks,
-Marcel
-
-> +            } else {
-> +                /* failed to satisfy user's explicit request for MSI */
-> +                error_propagate(errp, local_err);
-> +                goto msi_error;
-> +            }
->           }
->       }
->       pci_register_bar(d, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
-> @@ -81,7 +89,7 @@ aer_error:
->   pm_error:
->       pcie_cap_exit(d);
->   cap_error:
-> -    shpc_free(d);
-> +    shpc_cleanup(d, &pcie_br->shpc_bar);
->   error:
->       pci_bridge_exitfn(d);
->   }
-> @@ -98,7 +106,9 @@ static void pcie_pci_bridge_reset(DeviceState *qdev)
->   {
->       PCIDevice *d = PCI_DEVICE(qdev);
->       pci_bridge_reset(qdev);
-> -    msi_reset(d);
-> +    if (msi_present(d)) {
-> +        msi_reset(d);
-> +    }
->       shpc_reset(d);
->   }
->   
-> @@ -106,12 +116,14 @@ static void pcie_pci_bridge_write_config(PCIDevice *d,
->           uint32_t address, uint32_t val, int len)
->   {
->       pci_bridge_write_config(d, address, val, len);
-> -    msi_write_config(d, address, val, len);
-> +    if (msi_present(d)) {
-> +        msi_write_config(d, address, val, len);
-> +    }
->       shpc_cap_write_config(d, address, val, len);
->   }
->   
->   static Property pcie_pci_bridge_dev_properties[] = {
-> -        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi, ON_OFF_AUTO_ON),
-> +        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi, ON_OFF_AUTO_AUTO),
->           DEFINE_PROP_END_OF_LIST(),
->   };
->   
-> 
+Halil
