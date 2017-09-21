@@ -1,17 +1,16 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56354)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dv1Mo-00057G-AA
+	(envelope-from <el13635@mail.ntua.gr>) id 1dv1Mo-00057a-H2
 	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:18:14 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <el13635@mail.ntua.gr>) id 1dv1Mi-00046k-KX
+	(envelope-from <el13635@mail.ntua.gr>) id 1dv1Mn-00049Q-6a
 	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 09:18:10 -0400
 From: Manos Pitsidianakis <el13635@mail.ntua.gr>
-Date: Thu, 21 Sep 2017 16:17:07 +0300
-Message-Id: <20170921131707.17364-4-el13635@mail.ntua.gr>
+Date: Thu, 21 Sep 2017 16:17:05 +0300
+Message-Id: <20170921131707.17364-2-el13635@mail.ntua.gr>
 In-Reply-To: <20170921131707.17364-1-el13635@mail.ntua.gr>
 References: <20170921131707.17364-1-el13635@mail.ntua.gr>
-Subject: [Qemu-devel] [PATCH v2 3/3] block/throttle.c: add
- bdrv_co_drain_begin/end callbacks
+Subject: [Qemu-devel] [PATCH v2 1/3] block: add bdrv_co_drain_end callback
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -23,47 +22,184 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel <qemu-devel@nongnu.org>
 Cc: qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+BlockDriverState has a bdrv_do_drain() callback but no equivalent for the end
+of the drain. The throttle driver (block/throttle.c) needs a way to mark the
+end of the drain in order to toggle io_limits_disabled correctly, thus
+bdrv_co_drain_end is needed.
+
 Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
 ---
- block/throttle.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ include/block/block_int.h |  6 ++++++
+ block/io.c                | 48 +++++++++++++++++++++++++++++++++--------------
+ 2 files changed, 40 insertions(+), 14 deletions(-)
 
-diff --git a/block/throttle.c b/block/throttle.c
-index 5bca76300f..833175ac77 100644
---- a/block/throttle.c
-+++ b/block/throttle.c
-@@ -197,6 +197,21 @@ static bool throttle_recurse_is_first_non_filter(BlockDriverState *bs,
-     return bdrv_recurse_is_first_non_filter(bs->file->bs, candidate);
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index ba4c383393..21950cfda3 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -356,8 +356,14 @@ struct BlockDriver {
+     /**
+      * Drain and stop any internal sources of requests in the driver, and
+      * remain so until next I/O callback (e.g. bdrv_co_writev) is called.
++     *
++     * The callbacks are called at the beginning and ending of the drain
++     * respectively. They should be implemented if the driver needs to e.g.
++     * manage scheduled I/O requests, or toggle an internal state. After an
++     * bdrv_co_drain_end() invocation new requests will continue normally.
+      */
+     void coroutine_fn (*bdrv_co_drain)(BlockDriverState *bs);
++    void coroutine_fn (*bdrv_co_drain_end)(BlockDriverState *bs);
+ 
+     void (*bdrv_add_child)(BlockDriverState *parent, BlockDriverState *child,
+                            Error **errp);
+diff --git a/block/io.c b/block/io.c
+index 4378ae4c7d..b0a10ad3ef 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -153,6 +153,7 @@ typedef struct {
+     Coroutine *co;
+     BlockDriverState *bs;
+     bool done;
++    bool begin;
+ } BdrvCoDrainData;
+ 
+ static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
+@@ -160,18 +161,23 @@ static void coroutine_fn bdrv_drain_invoke_entry(void *opaque)
+     BdrvCoDrainData *data = opaque;
+     BlockDriverState *bs = data->bs;
+ 
+-    bs->drv->bdrv_co_drain(bs);
++    if (data->begin) {
++        bs->drv->bdrv_co_drain(bs);
++    } else {
++        bs->drv->bdrv_co_drain_end(bs);
++    }
+ 
+     /* Set data->done before reading bs->wakeup.  */
+     atomic_mb_set(&data->done, true);
+     bdrv_wakeup(bs);
  }
  
-+static void coroutine_fn throttle_co_drain_begin(BlockDriverState *bs)
-+{
-+    ThrottleGroupMember *tgm = bs->opaque;
-+    if (atomic_fetch_inc(&tgm->io_limits_disabled) == 0) {
-+        throttle_group_restart_tgm(tgm);
-+    }
-+}
-+
-+static void coroutine_fn throttle_co_drain_end(BlockDriverState *bs)
-+{
-+    ThrottleGroupMember *tgm = bs->opaque;
-+    assert(tgm->io_limits_disabled);
-+    atomic_dec(&tgm->io_limits_disabled);
-+}
-+
- static BlockDriver bdrv_throttle = {
-     .format_name                        =   "throttle",
-     .protocol_name                      =   "throttle",
-@@ -226,6 +241,9 @@ static BlockDriver bdrv_throttle = {
-     .bdrv_reopen_abort                  =   throttle_reopen_abort,
-     .bdrv_co_get_block_status           =   bdrv_co_get_block_status_from_file,
+-static void bdrv_drain_invoke(BlockDriverState *bs)
++static void bdrv_drain_invoke(BlockDriverState *bs, bool begin)
+ {
+-    BdrvCoDrainData data = { .bs = bs, .done = false };
++    BdrvCoDrainData data = { .bs = bs, .done = false, .begin = begin};
  
-+    .bdrv_co_drain_begin                =   throttle_co_drain_begin,
-+    .bdrv_co_drain_end                  =   throttle_co_drain_end,
+-    if (!bs->drv || !bs->drv->bdrv_co_drain) {
++    if (!bs->drv || (begin && !bs->drv->bdrv_co_drain) ||
++            (!begin && !bs->drv->bdrv_co_drain_end)) {
+         return;
+     }
+ 
+@@ -180,15 +186,16 @@ static void bdrv_drain_invoke(BlockDriverState *bs)
+     BDRV_POLL_WHILE(bs, !data.done);
+ }
+ 
+-static bool bdrv_drain_recurse(BlockDriverState *bs)
++static bool bdrv_drain_recurse(BlockDriverState *bs, bool begin)
+ {
+     BdrvChild *child, *tmp;
+     bool waited;
+ 
+-    waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
+-
+     /* Ensure any pending metadata writes are submitted to bs->file.  */
+-    bdrv_drain_invoke(bs);
++    bdrv_drain_invoke(bs, begin);
 +
-     .is_filter                          =   true,
- };
++    /* Wait for drained requests to finish */
++    waited = BDRV_POLL_WHILE(bs, atomic_read(&bs->in_flight) > 0);
+ 
+     QLIST_FOREACH_SAFE(child, &bs->children, next, tmp) {
+         BlockDriverState *bs = child->bs;
+@@ -205,7 +212,7 @@ static bool bdrv_drain_recurse(BlockDriverState *bs)
+              */
+             bdrv_ref(bs);
+         }
+-        waited |= bdrv_drain_recurse(bs);
++        waited |= bdrv_drain_recurse(bs, begin);
+         if (in_main_loop) {
+             bdrv_unref(bs);
+         }
+@@ -221,12 +228,18 @@ static void bdrv_co_drain_bh_cb(void *opaque)
+     BlockDriverState *bs = data->bs;
+ 
+     bdrv_dec_in_flight(bs);
+-    bdrv_drained_begin(bs);
++    if (data->begin) {
++        bdrv_drained_begin(bs);
++    } else {
++        bdrv_drained_end(bs);
++    }
++
+     data->done = true;
+     aio_co_wake(co);
+ }
+ 
+-static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs)
++static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs,
++                                                bool begin)
+ {
+     BdrvCoDrainData data;
+ 
+@@ -239,6 +252,7 @@ static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs)
+         .co = qemu_coroutine_self(),
+         .bs = bs,
+         .done = false,
++        .begin = begin,
+     };
+     bdrv_inc_in_flight(bs);
+     aio_bh_schedule_oneshot(bdrv_get_aio_context(bs),
+@@ -253,7 +267,7 @@ static void coroutine_fn bdrv_co_yield_to_drain(BlockDriverState *bs)
+ void bdrv_drained_begin(BlockDriverState *bs)
+ {
+     if (qemu_in_coroutine()) {
+-        bdrv_co_yield_to_drain(bs);
++        bdrv_co_yield_to_drain(bs, true);
+         return;
+     }
+ 
+@@ -262,17 +276,22 @@ void bdrv_drained_begin(BlockDriverState *bs)
+         bdrv_parent_drained_begin(bs);
+     }
+ 
+-    bdrv_drain_recurse(bs);
++    bdrv_drain_recurse(bs, true);
+ }
+ 
+ void bdrv_drained_end(BlockDriverState *bs)
+ {
++    if (qemu_in_coroutine()) {
++        bdrv_co_yield_to_drain(bs, false);
++        return;
++    }
+     assert(bs->quiesce_counter > 0);
+     if (atomic_fetch_dec(&bs->quiesce_counter) > 1) {
+         return;
+     }
+ 
+     bdrv_parent_drained_end(bs);
++    bdrv_drain_recurse(bs, false);
+     aio_enable_external(bdrv_get_aio_context(bs));
+ }
+ 
+@@ -350,7 +369,7 @@ void bdrv_drain_all_begin(void)
+             aio_context_acquire(aio_context);
+             for (bs = bdrv_first(&it); bs; bs = bdrv_next(&it)) {
+                 if (aio_context == bdrv_get_aio_context(bs)) {
+-                    waited |= bdrv_drain_recurse(bs);
++                    waited |= bdrv_drain_recurse(bs, true);
+                 }
+             }
+             aio_context_release(aio_context);
+@@ -371,6 +390,7 @@ void bdrv_drain_all_end(void)
+         aio_context_acquire(aio_context);
+         aio_enable_external(aio_context);
+         bdrv_parent_drained_end(bs);
++        bdrv_drain_recurse(bs, false);
+         aio_context_release(aio_context);
+     }
  
 -- 
 2.11.0
