@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60241)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60301)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XN-00034f-C1
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:20 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XP-00036p-IA
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XL-0002yt-Ex
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:17 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XM-00033G-HM
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:19 -0400
 Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37496)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dv4XL-0002la-4N
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:15 -0400
+	id 1dv4XM-0002la-7F
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:16 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XF-00056G-Jd
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:41:09 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XE-00055Q-Ch
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:41:08 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Sep 2017 17:41:18 +0100
-Message-Id: <1506012099-13605-11-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 21 Sep 2017 17:41:16 +0100
+Message-Id: <1506012099-13605-9-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1506012099-13605-1-git-send-email-peter.maydell@linaro.org>
 References: <1506012099-13605-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 10/31] nvic: Make SHPR registers banked
+Subject: [Qemu-devel] [PULL 08/31] nvic: Handle banked exceptions in
+ nvic_recompute_state()
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,172 +30,230 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Make the set_prio() function take a bool indicating
-whether to pend the secure or non-secure version of a banked
-interrupt, and use this to implement the correct banking
-semantics for the SHPR registers.
+Update the nvic_recompute_state() code to handle the security
+extension and its associated banked registers.
+
+Code that uses the resulting cached state (ie the irq
+acknowledge and complete code) will be updated in a later
+commit.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1505240046-11454-11-git-send-email-peter.maydell@linaro.org
+Message-id: 1505240046-11454-9-git-send-email-peter.maydell@linaro.org
 ---
- hw/intc/armv7m_nvic.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++-----
- hw/intc/trace-events  |  2 +-
- 2 files changed, 88 insertions(+), 10 deletions(-)
+ hw/intc/armv7m_nvic.c | 151 ++++++++++++++++++++++++++++++++++++++++++++++++--
+ hw/intc/trace-events  |   1 +
+ 2 files changed, 147 insertions(+), 5 deletions(-)
 
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 1694c1e..6831ec5 100644
+index 150c719..7081158 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -349,15 +349,40 @@ int armv7m_nvic_raw_execution_priority(void *opaque)
-     return s->exception_prio;
+@@ -54,6 +54,8 @@
+  * (higher than the highest possible priority value)
+  */
+ #define NVIC_NOEXC_PRIO 0x100
++/* Maximum priority of non-secure exceptions when AIRCR.PRIS is set */
++#define NVIC_NS_PRIO_LIMIT 0x80
+ 
+ static const uint8_t nvic_id[] = {
+     0x00, 0xb0, 0x1b, 0x00, 0x0d, 0xe0, 0x05, 0xb1
+@@ -126,13 +128,139 @@ static bool nvic_isrpending(NVICState *s)
+     return false;
  }
  
--/* caller must call nvic_irq_update() after this */
--static void set_prio(NVICState *s, unsigned irq, uint8_t prio)
-+/* caller must call nvic_irq_update() after this.
-+ * secure indicates the bank to use for banked exceptions (we assert if
-+ * we are passed secure=true for a non-banked exception).
-+ */
-+static void set_prio(NVICState *s, unsigned irq, bool secure, uint8_t prio)
- {
-     assert(irq > ARMV7M_EXCP_NMI); /* only use for configurable prios */
-     assert(irq < s->num_irq);
- 
--    s->vectors[irq].prio = prio;
-+    if (secure) {
-+        assert(exc_is_banked(irq));
-+        s->sec_vectors[irq].prio = prio;
-+    } else {
-+        s->vectors[irq].prio = prio;
-+    }
-+
-+    trace_nvic_set_prio(irq, secure, prio);
-+}
-+
-+/* Return the current raw priority register value.
-+ * secure indicates the bank to use for banked exceptions (we assert if
-+ * we are passed secure=true for a non-banked exception).
-+ */
-+static int get_prio(NVICState *s, unsigned irq, bool secure)
++static bool exc_is_banked(int exc)
 +{
-+    assert(irq > ARMV7M_EXCP_NMI); /* only use for configurable prios */
-+    assert(irq < s->num_irq);
- 
--    trace_nvic_set_prio(irq, prio);
-+    if (secure) {
-+        assert(exc_is_banked(irq));
-+        return s->sec_vectors[irq].prio;
-+    } else {
-+        return s->vectors[irq].prio;
-+    }
- }
- 
- /* Recompute state and assert irq line accordingly.
-@@ -1149,6 +1174,47 @@ static bool nvic_user_access_ok(NVICState *s, hwaddr offset, MemTxAttrs attrs)
-     }
- }
- 
-+static int shpr_bank(NVICState *s, int exc, MemTxAttrs attrs)
-+{
-+    /* Behaviour for the SHPR register field for this exception:
-+     * return M_REG_NS to use the nonsecure vector (including for
-+     * non-banked exceptions), M_REG_S for the secure version of
-+     * a banked exception, and -1 if this field should RAZ/WI.
++    /* Return true if this is one of the limited set of exceptions which
++     * are banked (and thus have state in sec_vectors[])
 +     */
++    return exc == ARMV7M_EXCP_HARD ||
++        exc == ARMV7M_EXCP_MEM ||
++        exc == ARMV7M_EXCP_USAGE ||
++        exc == ARMV7M_EXCP_SVC ||
++        exc == ARMV7M_EXCP_PENDSV ||
++        exc == ARMV7M_EXCP_SYSTICK;
++}
++
+ /* Return a mask word which clears the subpriority bits from
+  * a priority value for an M-profile exception, leaving only
+  * the group priority.
+  */
+-static inline uint32_t nvic_gprio_mask(NVICState *s)
++static inline uint32_t nvic_gprio_mask(NVICState *s, bool secure)
++{
++    return ~0U << (s->prigroup[secure] + 1);
++}
++
++static bool exc_targets_secure(NVICState *s, int exc)
++{
++    /* Return true if this non-banked exception targets Secure state. */
++    if (!arm_feature(&s->cpu->env, ARM_FEATURE_M_SECURITY)) {
++        return false;
++    }
++
++    if (exc >= NVIC_FIRST_IRQ) {
++        return !s->itns[exc];
++    }
++
++    /* Function shouldn't be called for banked exceptions. */
++    assert(!exc_is_banked(exc));
++
 +    switch (exc) {
-+    case ARMV7M_EXCP_MEM:
-+    case ARMV7M_EXCP_USAGE:
-+    case ARMV7M_EXCP_SVC:
-+    case ARMV7M_EXCP_PENDSV:
-+    case ARMV7M_EXCP_SYSTICK:
-+        /* Banked exceptions */
-+        return attrs.secure;
++    case ARMV7M_EXCP_NMI:
 +    case ARMV7M_EXCP_BUS:
-+        /* Not banked, RAZ/WI from nonsecure if BFHFNMINS is zero */
-+        if (!attrs.secure &&
-+            !(s->cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK)) {
-+            return -1;
-+        }
-+        return M_REG_NS;
++        return !(s->cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK);
 +    case ARMV7M_EXCP_SECURE:
-+        /* Not banked, RAZ/WI from nonsecure */
-+        if (!attrs.secure) {
-+            return -1;
-+        }
-+        return M_REG_NS;
++        return true;
 +    case ARMV7M_EXCP_DEBUG:
-+        /* Not banked. TODO should RAZ/WI if DEMCR.SDME is set */
-+        return M_REG_NS;
-+    case 8 ... 10:
-+    case 13:
-+        /* RES0 */
-+        return -1;
++        /* TODO: controlled by DEMCR.SDME, which we don't yet implement */
++        return false;
 +    default:
-+        /* Not reachable due to decode of SHPR register addresses */
-+        g_assert_not_reached();
++        /* reset, and reserved (unused) low exception numbers.
++         * We'll get called by code that loops through all the exception
++         * numbers, but it doesn't matter what we return here as these
++         * non-existent exceptions will never be pended or active.
++         */
++        return true;
 +    }
 +}
 +
- static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-                                     uint64_t *data, unsigned size,
-                                     MemTxAttrs attrs)
-@@ -1213,10 +1279,16 @@ static MemTxResult nvic_sysreg_read(void *opaque, hwaddr addr,
-             }
-         }
-         break;
--    case 0xd18 ... 0xd23: /* System Handler Priority.  */
-+    case 0xd18 ... 0xd23: /* System Handler Priority (SHPR1, SHPR2, SHPR3) */
-         val = 0;
-         for (i = 0; i < size; i++) {
--            val |= s->vectors[(offset - 0xd14) + i].prio << (i * 8);
-+            unsigned hdlidx = (offset - 0xd14) + i;
-+            int sbank = shpr_bank(s, hdlidx, attrs);
++static int exc_group_prio(NVICState *s, int rawprio, bool targets_secure)
++{
++    /* Return the group priority for this exception, given its raw
++     * (group-and-subgroup) priority value and whether it is targeting
++     * secure state or not.
++     */
++    if (rawprio < 0) {
++        return rawprio;
++    }
++    rawprio &= nvic_gprio_mask(s, targets_secure);
++    /* AIRCR.PRIS causes us to squash all NS priorities into the
++     * lower half of the total range
++     */
++    if (!targets_secure &&
++        (s->cpu->env.v7m.aircr & R_V7M_AIRCR_PRIS_MASK)) {
++        rawprio = (rawprio >> 1) + NVIC_NS_PRIO_LIMIT;
++    }
++    return rawprio;
++}
 +
-+            if (sbank < 0) {
-+                continue;
++/* Recompute vectpending and exception_prio for a CPU which implements
++ * the Security extension
++ */
++static void nvic_recompute_state_secure(NVICState *s)
+ {
+-    return ~0U << (s->prigroup[M_REG_NS] + 1);
++    int i, bank;
++    int pend_prio = NVIC_NOEXC_PRIO;
++    int active_prio = NVIC_NOEXC_PRIO;
++    int pend_irq = 0;
++    bool pending_is_s_banked = false;
++
++    /* R_CQRV: precedence is by:
++     *  - lowest group priority; if both the same then
++     *  - lowest subpriority; if both the same then
++     *  - lowest exception number; if both the same (ie banked) then
++     *  - secure exception takes precedence
++     * Compare pseudocode RawExecutionPriority.
++     * Annoyingly, now we have two prigroup values (for S and NS)
++     * we can't do the loop comparison on raw priority values.
++     */
++    for (i = 1; i < s->num_irq; i++) {
++        for (bank = M_REG_S; bank >= M_REG_NS; bank--) {
++            VecInfo *vec;
++            int prio;
++            bool targets_secure;
++
++            if (bank == M_REG_S) {
++                if (!exc_is_banked(i)) {
++                    continue;
++                }
++                vec = &s->sec_vectors[i];
++                targets_secure = true;
++            } else {
++                vec = &s->vectors[i];
++                targets_secure = !exc_is_banked(i) && exc_targets_secure(s, i);
 +            }
-+            val = deposit32(val, i * 8, 8, get_prio(s, hdlidx, sbank));
-         }
-         break;
-     case 0xfe0 ... 0xfff: /* ID.  */
-@@ -1299,15 +1371,21 @@ static MemTxResult nvic_sysreg_write(void *opaque, hwaddr addr,
++
++            prio = exc_group_prio(s, vec->prio, targets_secure);
++            if (vec->enabled && vec->pending && prio < pend_prio) {
++                pend_prio = prio;
++                pend_irq = i;
++                pending_is_s_banked = (bank == M_REG_S);
++            }
++            if (vec->active && prio < active_prio) {
++                active_prio = prio;
++            }
++        }
++    }
++
++    s->vectpending_is_s_banked = pending_is_s_banked;
++    s->vectpending = pend_irq;
++    s->vectpending_prio = pend_prio;
++    s->exception_prio = active_prio;
++
++    trace_nvic_recompute_state_secure(s->vectpending,
++                                      s->vectpending_is_s_banked,
++                                      s->vectpending_prio,
++                                      s->exception_prio);
+ }
  
-         for (i = 0; i < size && startvec + i < s->num_irq; i++) {
-             if (attrs.secure || s->itns[startvec + i]) {
--                set_prio(s, startvec + i, (value >> (i * 8)) & 0xff);
-+                set_prio(s, startvec + i, false, (value >> (i * 8)) & 0xff);
-             }
-         }
-         nvic_irq_update(s);
-         return MEMTX_OK;
--    case 0xd18 ... 0xd23: /* System Handler Priority.  */
-+    case 0xd18 ... 0xd23: /* System Handler Priority (SHPR1, SHPR2, SHPR3) */
-         for (i = 0; i < size; i++) {
-             unsigned hdlidx = (offset - 0xd14) + i;
--            set_prio(s, hdlidx, (value >> (i * 8)) & 0xff);
-+            int newprio = extract32(value, i * 8, 8);
-+            int sbank = shpr_bank(s, hdlidx, attrs);
+ /* Recompute vectpending and exception_prio */
+@@ -143,6 +271,18 @@ static void nvic_recompute_state(NVICState *s)
+     int active_prio = NVIC_NOEXC_PRIO;
+     int pend_irq = 0;
+ 
++    /* In theory we could write one function that handled both
++     * the "security extension present" and "not present"; however
++     * the security related changes significantly complicate the
++     * recomputation just by themselves and mixing both cases together
++     * would be even worse, so we retain a separate non-secure-only
++     * version for CPUs which don't implement the security extension.
++     */
++    if (arm_feature(&s->cpu->env, ARM_FEATURE_M_SECURITY)) {
++        nvic_recompute_state_secure(s);
++        return;
++    }
 +
-+            if (sbank < 0) {
-+                continue;
-+            }
-+            set_prio(s, hdlidx, sbank, newprio);
-         }
-         nvic_irq_update(s);
-         return MEMTX_OK;
+     for (i = 1; i < s->num_irq; i++) {
+         VecInfo *vec = &s->vectors[i];
+ 
+@@ -156,11 +296,11 @@ static void nvic_recompute_state(NVICState *s)
+     }
+ 
+     if (active_prio > 0) {
+-        active_prio &= nvic_gprio_mask(s);
++        active_prio &= nvic_gprio_mask(s, false);
+     }
+ 
+     if (pend_prio > 0) {
+-        pend_prio &= nvic_gprio_mask(s);
++        pend_prio &= nvic_gprio_mask(s, false);
+     }
+ 
+     s->vectpending = pend_irq;
+@@ -186,7 +326,8 @@ static inline int nvic_exec_prio(NVICState *s)
+     } else if (env->v7m.primask[env->v7m.secure]) {
+         running = 0;
+     } else if (env->v7m.basepri[env->v7m.secure] > 0) {
+-        running = env->v7m.basepri[env->v7m.secure] & nvic_gprio_mask(s);
++        running = env->v7m.basepri[env->v7m.secure] &
++            nvic_gprio_mask(s, env->v7m.secure);
+     } else {
+         running = NVIC_NOEXC_PRIO; /* lower than any possible priority */
+     }
 diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index 94038b6..29bd308 100644
+index 5635a5f..0b1fba3 100644
 --- a/hw/intc/trace-events
 +++ b/hw/intc/trace-events
-@@ -169,7 +169,7 @@ gicv3_redist_send_sgi(uint32_t cpu, int irq) "GICv3 redistributor 0x%x pending S
+@@ -168,6 +168,7 @@ gicv3_redist_send_sgi(uint32_t cpu, int irq) "GICv3 redistributor 0x%x pending S
+ 
  # hw/intc/armv7m_nvic.c
  nvic_recompute_state(int vectpending, int vectpending_prio, int exception_prio) "NVIC state recomputed: vectpending %d vectpending_prio %d exception_prio %d"
- nvic_recompute_state_secure(int vectpending, bool vectpending_is_s_banked, int vectpending_prio, int exception_prio) "NVIC state recomputed: vectpending %d is_s_banked %d vectpending_prio %d exception_prio %d"
--nvic_set_prio(int irq, uint8_t prio) "NVIC set irq %d priority %d"
-+nvic_set_prio(int irq, bool secure, uint8_t prio) "NVIC set irq %d secure-bank %d priority %d"
++nvic_recompute_state_secure(int vectpending, bool vectpending_is_s_banked, int vectpending_prio, int exception_prio) "NVIC state recomputed: vectpending %d is_s_banked %d vectpending_prio %d exception_prio %d"
+ nvic_set_prio(int irq, uint8_t prio) "NVIC set irq %d priority %d"
  nvic_irq_update(int vectpending, int pendprio, int exception_prio, int level) "NVIC vectpending %d pending prio %d exception_prio %d: setting irq line to %d"
  nvic_escalate_prio(int irq, int irqprio, int runprio) "NVIC escalating irq %d to HardFault: insufficient priority %d >= %d"
- nvic_escalate_disabled(int irq) "NVIC escalating irq %d to HardFault: disabled"
 -- 
 2.7.4
