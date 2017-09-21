@@ -1,26 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52728)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:53717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dv46A-0007xt-RZ
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:13:12 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dv4A0-0001Op-61
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:17:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dv466-0005us-Hr
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:13:10 -0400
-Received: from mail-wr0-x22d.google.com ([2a00:1450:400c:c0c::22d]:44182)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dv466-0005uJ-6I
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:13:06 -0400
-Received: by mail-wr0-x22d.google.com with SMTP id v109so4990773wrc.1
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 09:13:06 -0700 (PDT)
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dv49v-00009h-UQ
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:17:08 -0400
+References: <20170920135833.20472-1-pbutsykin@virtuozzo.com>
+	<20170920135833.20472-3-pbutsykin@virtuozzo.com>
+	<d64c9cdd-098b-bb41-cf80-de51c569288b@redhat.com>
+From: Pavel Butsykin <pbutsykin@virtuozzo.com>
+Message-ID: <175657ad-e6b4-0323-4f32-db9217be6bac@virtuozzo.com>
+Date: Thu, 21 Sep 2017 19:16:56 +0300
 MIME-Version: 1.0
-In-Reply-To: <1d61ec4d-da94-e96a-e1f6-509a4e80daec@siemens.com>
-References: <1d61ec4d-da94-e96a-e1f6-509a4e80daec@siemens.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Sep 2017 17:12:44 +0100
-Message-ID: <CAFEAcA8H=wz2y+GEXUbxLpGRc8PoLKDUZf+emF=NeAs-zAPj1Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PATCH] arm: Fix SMC reporting to EL2 when QEMU
- provides PSCI
+In-Reply-To: <d64c9cdd-098b-bb41-cf80-de51c569288b@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH 2/2] qcow2: truncate the tail of the image
+ file after shrinking the image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,129 +26,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, eblake@redhat.com, den@openvz.org
 
-On 18 September 2017 at 08:51, Jan Kiszka <jan.kiszka@siemens.com> wrote:
-> From: Jan Kiszka <jan.kiszka@siemens.com>
->
-> This properly forwards SMC events to EL2 when PSCI is provided by QEMU
-> itself and, thus, ARM_FEATURE_EL3 is off.
->
-> Found and tested with the Jailhouse hypervisor.
->
-> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
-> ---
->  target/arm/helper.c    | 2 +-
->  target/arm/op_helper.c | 8 ++++----
->  target/arm/psci.c      | 6 ++++++
->  3 files changed, 11 insertions(+), 5 deletions(-)
->
-> diff --git a/target/arm/helper.c b/target/arm/helper.c
-> index 4f41841ef6..8c3929762c 100644
-> --- a/target/arm/helper.c
-> +++ b/target/arm/helper.c
-> @@ -3717,7 +3717,7 @@ static void hcr_write(CPUARMState *env, const ARMCPRegInfo *ri, uint64_t value)
->
->      if (arm_feature(env, ARM_FEATURE_EL3)) {
->          valid_mask &= ~HCR_HCD;
-> -    } else {
-> +    } else if (cpu->psci_conduit != QEMU_PSCI_CONDUIT_SMC) {
->          valid_mask &= ~HCR_TSC;
+On 21.09.2017 18:28, Max Reitz wrote:
+> On 2017-09-20 15:58, Pavel Butsykin wrote:
+>> Now after shrinking the image, at the end of the image file, there might be a
+>> tail that probably will never be used. So we can find the last used cluster and
+>> cut the tail.
+>>
+>> Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
+>> ---
+>>   block/qcow2-refcount.c | 21 +++++++++++++++++++++
+>>   block/qcow2.c          | 19 +++++++++++++++++++
+>>   block/qcow2.h          |  1 +
+>>   3 files changed, 41 insertions(+)
+>>
+>> diff --git a/block/qcow2-refcount.c b/block/qcow2-refcount.c
+>> index 88d5a3f1ad..5e221a166c 100644
+>> --- a/block/qcow2-refcount.c
+>> +++ b/block/qcow2-refcount.c
+>> @@ -3181,3 +3181,24 @@ out:
+>>       g_free(reftable_tmp);
+>>       return ret;
+>>   }
+>> +
+>> +int64_t qcow2_get_last_cluster(BlockDriverState *bs, int64_t size)
+>> +{
+>> +    BDRVQcow2State *s = bs->opaque;
+>> +    int64_t i, last_cluster, nb_clusters = size_to_clusters(s, size);
+>> +    uint64_t refcount;
+>> +
+>> +    for (i = 0, last_cluster = 0; i < nb_clusters; i++) {
+>> +        int ret = qcow2_get_refcount(bs, i, &refcount);
+>> +        if (ret < 0) {
+>> +            fprintf(stderr, "Can't get refcount for cluster %" PRId64 ": %s\n",
+>> +                    i, strerror(-ret));
+>> +            continue;
+>> +        }
+>> +
+>> +        if (refcount > 0) {
+>> +            last_cluster = i;
+>> +        }
+>> +    }
+>> +    return last_cluster;
+>> +}
+> 
+> Wouldn't it make more sense to start from the end of the image?
 
-This looks odd, so it needs a comment I think.
-  /* Architecturally HCR.TSC is RES0 if EL3 is not implemented.
-   * However, if we're using the SMC PSCI conduit then QEMU is
-   * effectively acting like EL3 firmware and so the guest at
-   * EL2 should retain the ability to prevent EL1 from being
-   * able to make SMC calls into the ersatz firmware, so in
-   * that case HCR.TSC should be read/write.
-   */
-
->      }
->
-> diff --git a/target/arm/op_helper.c b/target/arm/op_helper.c
-> index 6a60464ab9..4b0ef6a234 100644
-> --- a/target/arm/op_helper.c
-> +++ b/target/arm/op_helper.c
-> @@ -960,12 +960,12 @@ void HELPER(pre_smc)(CPUARMState *env, uint32_t syndrome)
->          return;
->      }
->
-> -    if (!arm_feature(env, ARM_FEATURE_EL3)) {
-> -        /* If we have no EL3 then SMC always UNDEFs */
-> -        undef = true;
-> -    } else if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
-> +    if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
->          /* In NS EL1, HCR controlled routing to EL2 has priority over SMD. */
->          raise_exception(env, EXCP_HYP_TRAP, syndrome, 2);
-> +    } else if (!arm_feature(env, ARM_FEATURE_EL3)) {
-> +        /* If we have no EL3 then SMC always UNDEFs */
-> +        undef = true;
->      }
->
->      if (undef) {
-
-I think the logic in this function should be something like:
-
-    if (!arm_feature(env, ARM_FEATURE_EL3) &&
-        cpu->psci_conduit != QEMU_PSCI_CONDUIT_SMC)) {
-        /* If we have no EL3 then SMC always UNDEFs and can't be
-         * trapped to EL2. PSCI-via-SMC is a sort of ersatz EL3
-         * firmware within QEMU, and we want an EL2 guest to be able
-         * to forbid its EL1 from making PSCI calls into QEMU's
-         * "firmware" via HCR.TSC, so for these purposes treat
-         *  PSCI-via-SMC as implying an EL3.
-         */
-        undef = true;
-    else if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
-        /* In NS EL1, HCR controlled routing to EL2 has priority over SMD.
-         * We also want an EL2 guest to be able to forbid its EL1 from
-         * making PSCI calls into QEMU's "firmware" via HCR.TSC.
-         */
-        raise_exception(env, EXCP_HYP_TRAP, syndrome, 2);
-    }
-
-    if (undef && !arm_is_psci_call(cpu, EXCP_SMC)) {
-        /* If PSCI is enabled and this looks like a valid PSCI call then
-         * suppress the UNDEF -- we'll catch the SMC exception and
-         * implement the PSCI call behaviour there.
-         */
-        raise_exception(env, EXCP_UDEF, syn_uncategorized(),
-                        exception_target_el(env));
-    }
-
-(Totally untested!)
-
-> diff --git a/target/arm/psci.c b/target/arm/psci.c
-> index fc34b263d3..637987ff46 100644
-> --- a/target/arm/psci.c
-> +++ b/target/arm/psci.c
-> @@ -35,6 +35,8 @@ bool arm_is_psci_call(ARMCPU *cpu, int excp_type)
->       */
->      CPUARMState *env = &cpu->env;
->      uint64_t param = is_a64(env) ? env->xregs[0] : env->regs[0];
-> +    int cur_el = arm_current_el(env);
-> +    bool secure = arm_is_secure(env);
->
->      switch (excp_type) {
->      case EXCP_HVC:
-> @@ -46,6 +48,10 @@ bool arm_is_psci_call(ARMCPU *cpu, int excp_type)
->          if (cpu->psci_conduit != QEMU_PSCI_CONDUIT_SMC) {
->              return false;
->          }
-> +        if (!secure && cur_el == 1 && (env->cp15.hcr_el2 & HCR_TSC)) {
-> +            /* The EL2 will handle this. */
-> +            return false;
-> +        }
-
-I don't think we should need to change this function -- its
-purpose is "does this look like a PSCI call", and if it's
-an SMC exception with the right magic parameters, then it
-does look like a PSCI call. Instead we should make the
-pre_smc helper choose "raise a hyp trap" if that's the right
-thing to be doing (see comment above for what I think is the
-right logic there).
-
-thanks
--- PMM
+If this will reduce the iterations, then yes. But it will depend on the
+situation. If you truncate the image more than half, it can increase the
+number of iterations. But intuitively it seems that to start from the
+end would be better :)
+> Max
+> 
