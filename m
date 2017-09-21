@@ -1,25 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60303)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60333)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XP-00037H-Kv
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XQ-000396-GB
 	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:24 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XL-00030w-TP
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:19 -0400
-Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37498)
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XN-00037d-O7
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:20 -0400
+Received: from orth.archaic.org.uk ([2001:8b0:1d0::2]:37496)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pm215@archaic.org.uk>)
-	id 1dv4XL-0002sG-Hq
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:15 -0400
+	id 1dv4XN-0002la-BI
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 12:41:17 -0400
 Received: from pm215 by orth.archaic.org.uk with local (Exim 4.89)
-	(envelope-from <pm215@archaic.org.uk>) id 1dv4XF-00055q-0C
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:41:09 +0100
+	(envelope-from <pm215@archaic.org.uk>) id 1dv4XC-000547-D3
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 17:41:06 +0100
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 21 Sep 2017 17:41:17 +0100
-Message-Id: <1506012099-13605-10-git-send-email-peter.maydell@linaro.org>
+Date: Thu, 21 Sep 2017 17:41:13 +0100
+Message-Id: <1506012099-13605-6-git-send-email-peter.maydell@linaro.org>
 In-Reply-To: <1506012099-13605-1-git-send-email-peter.maydell@linaro.org>
 References: <1506012099-13605-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PULL 09/31] nvic: Make set_pending and clear_pending
- take a secure parameter
+Subject: [Qemu-devel] [PULL 05/31] nvic: Implement AIRCR changes for v8M
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,281 +29,187 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
 
-Make the armv7m_nvic_set_pending() and armv7m_nvic_clear_pending()
-functions take a bool indicating whether to pend the secure
-or non-secure version of a banked interrupt, and update the
-callsites accordingly.
+The Application Interrupt and Reset Control Register has some changes
+for v8M:
+ * new bits SYSRESETREQS, BFHFNMINS and PRIS: these all have
+   real state if the security extension is implemented and otherwise
+   are constant
+ * the PRIGROUP field is banked between security states
+ * non-secure code can be blocked from using the SYSRESET bit
+   to reset the system if SYSRESETREQS is set
 
-In most callsites we can simply pass the correct security
-state in; in a couple of cases we use TODO comments to indicate
-that we will return the code in a subsequent commit.
+Implement the new state and the changes to register read and write.
+For the moment we ignore the effects of the secure PRIGROUP.
+We will implement the effects of PRIS and BFHFNMIS later.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 1505240046-11454-10-git-send-email-peter.maydell@linaro.org
+Message-id: 1505240046-11454-6-git-send-email-peter.maydell@linaro.org
 ---
- target/arm/cpu.h      | 14 ++++++++++-
- hw/intc/armv7m_nvic.c | 64 ++++++++++++++++++++++++++++++++++++++-------------
- target/arm/helper.c   | 24 +++++++++++--------
- hw/intc/trace-events  |  4 ++--
- 4 files changed, 77 insertions(+), 29 deletions(-)
+ include/hw/intc/armv7m_nvic.h |  3 ++-
+ target/arm/cpu.h              | 12 +++++++++++
+ hw/intc/armv7m_nvic.c         | 49 +++++++++++++++++++++++++++++++++----------
+ target/arm/cpu.c              |  7 +++++++
+ 4 files changed, 59 insertions(+), 12 deletions(-)
 
+diff --git a/include/hw/intc/armv7m_nvic.h b/include/hw/intc/armv7m_nvic.h
+index 329774e..e96e488 100644
+--- a/include/hw/intc/armv7m_nvic.h
++++ b/include/hw/intc/armv7m_nvic.h
+@@ -55,7 +55,8 @@ typedef struct NVICState {
+      * Entries in sec_vectors[] for non-banked exception numbers are unused.
+      */
+     VecInfo sec_vectors[NVIC_INTERNAL_VECTORS];
+-    uint32_t prigroup;
++    /* The PRIGROUP field in AIRCR is banked */
++    uint32_t prigroup[M_REG_NUM_BANKS];
+ 
+     /* The following fields are all cached state that can be recalculated
+      * from the vectors[] and sec_vectors[] arrays and the prigroup field:
 diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index a52ec6b..b67c29b 100644
+index 6e50ae2..a52ec6b 100644
 --- a/target/arm/cpu.h
 +++ b/target/arm/cpu.h
-@@ -1463,7 +1463,19 @@ static inline bool armv7m_nvic_can_take_pending_exception(void *opaque)
-     return true;
- }
- #endif
--void armv7m_nvic_set_pending(void *opaque, int irq);
-+/**
-+ * armv7m_nvic_set_pending: mark the specified exception as pending
-+ * @opaque: the NVIC
-+ * @irq: the exception number to mark pending
-+ * @secure: false for non-banked exceptions or for the nonsecure
-+ * version of a banked exception, true for the secure version of a banked
-+ * exception.
-+ *
-+ * Marks the specified exception as pending. Note that we will assert()
-+ * if @secure is true and @irq does not specify one of the fixed set
-+ * of architecturally banked exceptions.
-+ */
-+void armv7m_nvic_set_pending(void *opaque, int irq, bool secure);
- void armv7m_nvic_acknowledge_irq(void *opaque);
- /**
-  * armv7m_nvic_complete_irq: complete specified interrupt or exception
+@@ -449,6 +449,7 @@ typedef struct CPUARMState {
+         int exception;
+         uint32_t primask[M_REG_NUM_BANKS];
+         uint32_t faultmask[M_REG_NUM_BANKS];
++        uint32_t aircr; /* only holds r/w state if security extn implemented */
+         uint32_t secure; /* Is CPU in Secure state? (not guest visible) */
+     } v7m;
+ 
+@@ -1200,6 +1201,17 @@ FIELD(V7M_CCR, STKALIGN, 9, 1)
+ FIELD(V7M_CCR, DC, 16, 1)
+ FIELD(V7M_CCR, IC, 17, 1)
+ 
++/* V7M AIRCR bits */
++FIELD(V7M_AIRCR, VECTRESET, 0, 1)
++FIELD(V7M_AIRCR, VECTCLRACTIVE, 1, 1)
++FIELD(V7M_AIRCR, SYSRESETREQ, 2, 1)
++FIELD(V7M_AIRCR, SYSRESETREQS, 3, 1)
++FIELD(V7M_AIRCR, PRIGROUP, 8, 3)
++FIELD(V7M_AIRCR, BFHFNMINS, 13, 1)
++FIELD(V7M_AIRCR, PRIS, 14, 1)
++FIELD(V7M_AIRCR, ENDIANNESS, 15, 1)
++FIELD(V7M_AIRCR, VECTKEY, 16, 16)
++
+ /* V7M CFSR bits for MMFSR */
+ FIELD(V7M_CFSR, IACCVIOL, 0, 1)
+ FIELD(V7M_CFSR, DACCVIOL, 1, 1)
 diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
-index 7081158..1694c1e 100644
+index fa5dd23..d745f38 100644
 --- a/hw/intc/armv7m_nvic.c
 +++ b/hw/intc/armv7m_nvic.c
-@@ -384,31 +384,50 @@ static void nvic_irq_update(NVICState *s)
-     qemu_set_irq(s->excpout, lvl);
- }
- 
--static void armv7m_nvic_clear_pending(void *opaque, int irq)
-+/**
-+ * armv7m_nvic_clear_pending: mark the specified exception as not pending
-+ * @opaque: the NVIC
-+ * @irq: the exception number to mark as not pending
-+ * @secure: false for non-banked exceptions or for the nonsecure
-+ * version of a banked exception, true for the secure version of a banked
-+ * exception.
-+ *
-+ * Marks the specified exception as not pending. Note that we will assert()
-+ * if @secure is true and @irq does not specify one of the fixed set
-+ * of architecturally banked exceptions.
-+ */
-+static void armv7m_nvic_clear_pending(void *opaque, int irq, bool secure)
+@@ -129,7 +129,7 @@ static bool nvic_isrpending(NVICState *s)
+  */
+ static inline uint32_t nvic_gprio_mask(NVICState *s)
  {
-     NVICState *s = (NVICState *)opaque;
-     VecInfo *vec;
- 
-     assert(irq > ARMV7M_EXCP_RESET && irq < s->num_irq);
- 
--    vec = &s->vectors[irq];
--    trace_nvic_clear_pending(irq, vec->enabled, vec->prio);
-+    if (secure) {
-+        assert(exc_is_banked(irq));
-+        vec = &s->sec_vectors[irq];
-+    } else {
-+        vec = &s->vectors[irq];
-+    }
-+    trace_nvic_clear_pending(irq, secure, vec->enabled, vec->prio);
-     if (vec->pending) {
-         vec->pending = 0;
-         nvic_irq_update(s);
-     }
+-    return ~0U << (s->prigroup + 1);
++    return ~0U << (s->prigroup[M_REG_NS] + 1);
  }
  
--void armv7m_nvic_set_pending(void *opaque, int irq)
-+void armv7m_nvic_set_pending(void *opaque, int irq, bool secure)
- {
-     NVICState *s = (NVICState *)opaque;
-+    bool banked = exc_is_banked(irq);
-     VecInfo *vec;
- 
-     assert(irq > ARMV7M_EXCP_RESET && irq < s->num_irq);
-+    assert(!secure || banked);
- 
--    vec = &s->vectors[irq];
--    trace_nvic_set_pending(irq, vec->enabled, vec->prio);
-+    vec = (banked && secure) ? &s->sec_vectors[irq] : &s->vectors[irq];
- 
-+    trace_nvic_set_pending(irq, secure, vec->enabled, vec->prio);
- 
-     if (irq >= ARMV7M_EXCP_HARD && irq < ARMV7M_EXCP_PENDSV) {
-         /* If a synchronous exception is pending then it may be
-@@ -454,9 +473,20 @@ void armv7m_nvic_set_pending(void *opaque, int irq)
-                           "(current priority %d)\n", irq, running);
-             }
- 
--            /* We can do the escalation, so we take HardFault instead */
-+            /* We can do the escalation, so we take HardFault instead.
-+             * If BFHFNMINS is set then we escalate to the banked HF for
-+             * the target security state of the original exception; otherwise
-+             * we take a Secure HardFault.
-+             */
-             irq = ARMV7M_EXCP_HARD;
--            vec = &s->vectors[irq];
-+            if (arm_feature(&s->cpu->env, ARM_FEATURE_M_SECURITY) &&
-+                (secure ||
-+                 !(s->cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK))) {
-+                vec = &s->sec_vectors[irq];
-+            } else {
-+                vec = &s->vectors[irq];
-+            }
-+            /* HF may be banked but there is only one shared HFSR */
-             s->cpu->env.v7m.hfsr |= R_V7M_HFSR_FORCED_MASK;
-         }
-     }
-@@ -551,7 +581,7 @@ static void set_irq_level(void *opaque, int n, int level)
-     if (level != vec->level) {
-         vec->level = level;
-         if (level) {
--            armv7m_nvic_set_pending(s, n);
-+            armv7m_nvic_set_pending(s, n, false);
-         }
-     }
- }
-@@ -837,17 +867,17 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-     }
-     case 0xd04: /* Interrupt Control State.  */
-         if (value & (1 << 31)) {
--            armv7m_nvic_set_pending(s, ARMV7M_EXCP_NMI);
-+            armv7m_nvic_set_pending(s, ARMV7M_EXCP_NMI, false);
-         }
-         if (value & (1 << 28)) {
--            armv7m_nvic_set_pending(s, ARMV7M_EXCP_PENDSV);
-+            armv7m_nvic_set_pending(s, ARMV7M_EXCP_PENDSV, attrs.secure);
-         } else if (value & (1 << 27)) {
--            armv7m_nvic_clear_pending(s, ARMV7M_EXCP_PENDSV);
-+            armv7m_nvic_clear_pending(s, ARMV7M_EXCP_PENDSV, attrs.secure);
-         }
-         if (value & (1 << 26)) {
--            armv7m_nvic_set_pending(s, ARMV7M_EXCP_SYSTICK);
-+            armv7m_nvic_set_pending(s, ARMV7M_EXCP_SYSTICK, attrs.secure);
-         } else if (value & (1 << 25)) {
--            armv7m_nvic_clear_pending(s, ARMV7M_EXCP_SYSTICK);
-+            armv7m_nvic_clear_pending(s, ARMV7M_EXCP_SYSTICK, attrs.secure);
-         }
-         break;
+ /* Recompute vectpending and exception_prio */
+@@ -451,8 +451,21 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
+         return val;
      case 0xd08: /* Vector Table Offset.  */
-@@ -1093,7 +1123,7 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
-     {
-         int excnum = (value & 0x1ff) + NVIC_FIRST_IRQ;
-         if (excnum < s->num_irq) {
--            armv7m_nvic_set_pending(s, excnum);
-+            armv7m_nvic_set_pending(s, excnum, false);
+         return cpu->env.v7m.vecbase[attrs.secure];
+-    case 0xd0c: /* Application Interrupt/Reset Control.  */
+-        return 0xfa050000 | (s->prigroup << 8);
++    case 0xd0c: /* Application Interrupt/Reset Control (AIRCR) */
++        val = 0xfa050000 | (s->prigroup[attrs.secure] << 8);
++        if (attrs.secure) {
++            /* s->aircr stores PRIS, BFHFNMINS, SYSRESETREQS */
++            val |= cpu->env.v7m.aircr;
++        } else {
++            if (arm_feature(&cpu->env, ARM_FEATURE_V8)) {
++                /* BFHFNMINS is R/O from NS; other bits are RAZ/WI. If
++                 * security isn't supported then BFHFNMINS is RAO (and
++                 * the bit in env.v7m.aircr is always set).
++                 */
++                val |= cpu->env.v7m.aircr & R_V7M_AIRCR_BFHFNMINS_MASK;
++            }
++        }
++        return val;
+     case 0xd10: /* System Control.  */
+         /* TODO: Implement SLEEPONEXIT.  */
+         return 0;
+@@ -660,22 +673,35 @@ static void nvic_writel(NVICState *s, uint32_t offset, uint32_t value,
+     case 0xd08: /* Vector Table Offset.  */
+         cpu->env.v7m.vecbase[attrs.secure] = value & 0xffffff80;
+         break;
+-    case 0xd0c: /* Application Interrupt/Reset Control.  */
+-        if ((value >> 16) == 0x05fa) {
+-            if (value & 4) {
+-                qemu_irq_pulse(s->sysresetreq);
++    case 0xd0c: /* Application Interrupt/Reset Control (AIRCR) */
++        if ((value >> R_V7M_AIRCR_VECTKEY_SHIFT) == 0x05fa) {
++            if (value & R_V7M_AIRCR_SYSRESETREQ_MASK) {
++                if (attrs.secure ||
++                    !(cpu->env.v7m.aircr & R_V7M_AIRCR_SYSRESETREQS_MASK)) {
++                    qemu_irq_pulse(s->sysresetreq);
++                }
+             }
+-            if (value & 2) {
++            if (value & R_V7M_AIRCR_VECTCLRACTIVE_MASK) {
+                 qemu_log_mask(LOG_GUEST_ERROR,
+                               "Setting VECTCLRACTIVE when not in DEBUG mode "
+                               "is UNPREDICTABLE\n");
+             }
+-            if (value & 1) {
++            if (value & R_V7M_AIRCR_VECTRESET_MASK) {
++                /* NB: this bit is RES0 in v8M */
+                 qemu_log_mask(LOG_GUEST_ERROR,
+                               "Setting VECTRESET when not in DEBUG mode "
+                               "is UNPREDICTABLE\n");
+             }
+-            s->prigroup = extract32(value, 8, 3);
++            s->prigroup[attrs.secure] = extract32(value,
++                                                  R_V7M_AIRCR_PRIGROUP_SHIFT,
++                                                  R_V7M_AIRCR_PRIGROUP_LENGTH);
++            if (attrs.secure) {
++                /* These bits are only writable by secure */
++                cpu->env.v7m.aircr = value &
++                    (R_V7M_AIRCR_SYSRESETREQS_MASK |
++                     R_V7M_AIRCR_BFHFNMINS_MASK |
++                     R_V7M_AIRCR_PRIS_MASK);
++            }
+             nvic_irq_update(s);
          }
          break;
+@@ -1193,6 +1219,7 @@ static const VMStateDescription vmstate_nvic_security = {
+     .fields = (VMStateField[]) {
+         VMSTATE_STRUCT_ARRAY(sec_vectors, NVICState, NVIC_INTERNAL_VECTORS, 1,
+                              vmstate_VecInfo, VecInfo),
++        VMSTATE_UINT32(prigroup[M_REG_S], NVICState),
+         VMSTATE_END_OF_LIST()
      }
-@@ -1499,8 +1529,10 @@ static void nvic_systick_trigger(void *opaque, int n, int level)
-         /* SysTick just asked us to pend its exception.
-          * (This is different from an external interrupt line's
-          * behaviour.)
-+         * TODO: when we implement the banked systicks we must make
-+         * this pend the correct banked exception.
-          */
--        armv7m_nvic_set_pending(s, ARMV7M_EXCP_SYSTICK);
-+        armv7m_nvic_set_pending(s, ARMV7M_EXCP_SYSTICK, false);
-     }
- }
+ };
+@@ -1205,7 +1232,7 @@ static const VMStateDescription vmstate_nvic = {
+     .fields = (VMStateField[]) {
+         VMSTATE_STRUCT_ARRAY(vectors, NVICState, NVIC_MAX_VECTORS, 1,
+                              vmstate_VecInfo, VecInfo),
+-        VMSTATE_UINT32(prigroup, NVICState),
++        VMSTATE_UINT32(prigroup[M_REG_NS], NVICState),
+         VMSTATE_END_OF_LIST()
+     },
+     .subsections = (const VMStateDescription*[]) {
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 20a3445..3344979 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -187,6 +187,13 @@ static void arm_cpu_reset(CPUState *s)
  
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index f4f2a87..b64acd8 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6306,7 +6306,7 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-          * stack, directly take a usage fault on the current stack.
-          */
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
--        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
-+        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
-         v7m_exception_taken(cpu, excret);
-         qemu_log_mask(CPU_LOG_INT, "...taking UsageFault on existing "
-                       "stackframe: failed exception return integrity check\n");
-@@ -6345,8 +6345,11 @@ static void do_v7m_exception_exit(ARMCPU *cpu)
-      * exception return excret specified then this is a UsageFault.
-      */
-     if (return_to_handler != arm_v7m_is_handler_mode(env)) {
--        /* Take an INVPC UsageFault by pushing the stack again. */
--        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
-+        /* Take an INVPC UsageFault by pushing the stack again.
-+         * TODO: the v8M version of this code should target the
-+         * background state for this exception.
-+         */
-+        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, false);
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVPC_MASK;
-         v7m_push_stack(cpu);
-         v7m_exception_taken(cpu, excret);
-@@ -6406,20 +6409,20 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-        handle it.  */
-     switch (cs->exception_index) {
-     case EXCP_UDEF:
--        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
-+        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_UNDEFINSTR_MASK;
-         break;
-     case EXCP_NOCP:
--        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
-+        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_NOCP_MASK;
-         break;
-     case EXCP_INVSTATE:
--        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE);
-+        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_USAGE, env->v7m.secure);
-         env->v7m.cfsr[env->v7m.secure] |= R_V7M_CFSR_INVSTATE_MASK;
-         break;
-     case EXCP_SWI:
-         /* The PC already points to the next instruction.  */
--        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SVC);
-+        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_SVC, env->v7m.secure);
-         break;
-     case EXCP_PREFETCH_ABORT:
-     case EXCP_DATA_ABORT:
-@@ -6443,7 +6446,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-                               env->v7m.bfar);
-                 break;
-             }
--            armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_BUS);
-+            armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_BUS, false);
-             break;
-         default:
-             /* All other FSR values are either MPU faults or "can't happen
-@@ -6463,7 +6466,8 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-                               env->v7m.mmfar[env->v7m.secure]);
-                 break;
-             }
--            armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_MEM);
-+            armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_MEM,
-+                                    env->v7m.secure);
-             break;
+         if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+             env->v7m.secure = true;
++        } else {
++            /* This bit resets to 0 if security is supported, but 1 if
++             * it is not. The bit is not present in v7M, but we set it
++             * here so we can avoid having to make checks on it conditional
++             * on ARM_FEATURE_V8 (we don't let the guest see the bit).
++             */
++            env->v7m.aircr = R_V7M_AIRCR_BFHFNMINS_MASK;
          }
-         break;
-@@ -6480,7 +6484,7 @@ void arm_v7m_cpu_do_interrupt(CPUState *cs)
-                 return;
-             }
-         }
--        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_DEBUG);
-+        armv7m_nvic_set_pending(env->nvic, ARMV7M_EXCP_DEBUG, false);
-         break;
-     case EXCP_IRQ:
-         break;
-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index 0b1fba3..94038b6 100644
---- a/hw/intc/trace-events
-+++ b/hw/intc/trace-events
-@@ -173,8 +173,8 @@ nvic_set_prio(int irq, uint8_t prio) "NVIC set irq %d priority %d"
- nvic_irq_update(int vectpending, int pendprio, int exception_prio, int level) "NVIC vectpending %d pending prio %d exception_prio %d: setting irq line to %d"
- nvic_escalate_prio(int irq, int irqprio, int runprio) "NVIC escalating irq %d to HardFault: insufficient priority %d >= %d"
- nvic_escalate_disabled(int irq) "NVIC escalating irq %d to HardFault: disabled"
--nvic_set_pending(int irq, int en, int prio) "NVIC set pending irq %d (enabled: %d priority %d)"
--nvic_clear_pending(int irq, int en, int prio) "NVIC clear pending irq %d (enabled: %d priority %d)"
-+nvic_set_pending(int irq, bool secure, int en, int prio) "NVIC set pending irq %d secure-bank %d (enabled: %d priority %d)"
-+nvic_clear_pending(int irq, bool secure, int en, int prio) "NVIC clear pending irq %d secure-bank %d (enabled: %d priority %d)"
- nvic_set_pending_level(int irq) "NVIC set pending: irq %d higher prio than vectpending: setting irq line to 1"
- nvic_acknowledge_irq(int irq, int prio) "NVIC acknowledge IRQ: %d now active (prio %d)"
- nvic_complete_irq(int irq) "NVIC complete IRQ %d"
+ 
+         /* In v7M the reset value of this bit is IMPDEF, but ARM recommends
 -- 
 2.7.4
