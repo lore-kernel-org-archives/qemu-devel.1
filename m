@@ -1,22 +1,21 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39139)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43905)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dv4rn-0004fg-Bm
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 13:02:29 -0400
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dv55t-0006Fb-IA
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 13:16:58 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <ehabkost@redhat.com>) id 1dv4rh-0001S5-H3
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 13:02:23 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:52330)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <ehabkost@redhat.com>) id 1dv4rh-0001Qt-BS
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 13:02:17 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-Date: Thu, 21 Sep 2017 14:02:09 -0300
-Message-Id: <20170921170209.9101-1-ehabkost@redhat.com>
+	(envelope-from <anton.nefedov@virtuozzo.com>) id 1dv55p-00031C-Je
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 13:16:57 -0400
+References: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
+From: Anton Nefedov <anton.nefedov@virtuozzo.com>
+Message-ID: <f27a04c3-f4ac-3220-4a6a-9aca0c36aebb@virtuozzo.com>
+Date: Thu, 21 Sep 2017 20:16:38 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Subject: [Qemu-devel] [PATCH] MAINTAINERS: Fix subsystem name for "Build and
- test automation"
+In-Reply-To: <1501597152-25342-1-git-send-email-anton.nefedov@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v4 00/15] qcow2: space preallocation and
+ COW improvements
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,39 +25,27 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 To: qemu-devel@nongnu.org
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, Fam Zheng <famz@redhat.com>, =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-block@nongnu.org, den@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com
 
-The subsystem name for the "Build test automation" section is
-"-------------------------", because an actual subsystem name
-line is missing:
 
-  $ ./scripts/get_maintainer.pl -f tests/docker/docker.py
-  "Alex Benn=C3=A9e" <alex.bennee@linaro.org> (maintainer:---------------=
---...)
-  Fam Zheng <famz@redhat.com> (maintainer:-----------------...)
-  "Philippe Mathieu-Daud=C3=A9" <f4bug@amsat.org> (reviewer:-------------=
-----...)
-  qemu-devel@nongnu.org (open list:-----------------...)
+On 1/8/2017 5:18 PM, Anton Nefedov wrote:
+> 
+> This pull request is to address a few performance problems of qcow2 format:
+> 
+>    1. non cluster-aligned write requests (to unallocated clusters) explicitly
+>      pad data with zeroes if there is no backing data. This can be avoided
+>      and the whole clusters are preallocated and zeroed in a single
+>      efficient write_zeroes() operation, also providing better host file
+>      continuity
+> 
+>    2. moreover, efficient write_zeroes() operation can be used to preallocate
+>      space megabytes ahead which gives noticeable improvement on some storage
+>      types (e.g. distributed storages where space allocation operation is
+>      expensive)
+> 
 
-Fix the issue by inserting a subsystem name line where
-get_maintainer.pl expects it.
+ping?
+I'd send the rebased series but there are no real conflicts so
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e511ba780f..13c1ac65b7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1896,6 +1896,7 @@ F: docs/block-replication.txt
-=20
- Build and test automation
- -------------------------
-+Build and test automation
- M: Alex Benn=C3=A9e <alex.bennee@linaro.org>
- M: Fam Zheng <famz@redhat.com>
- R: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
---=20
-2.13.5
+/thanks,
+Anton
