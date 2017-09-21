@@ -1,29 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47142)
-	by lists.gnu.org with esmtp (Exim 4.71) (envelope-from <pl@kamp.de>)
-	id 1dv0or-0001iZ-Q3
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:43:06 -0400
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:47238)
+	by lists.gnu.org with esmtp (Exim 4.71)
+	(envelope-from <berrange@redhat.com>) id 1dv0pC-0001yZ-LG
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:43:27 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pl@kamp.de>) id 1dv0ol-0000pm-Rm
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:43:05 -0400
-Received: from mx-v6.kamp.de ([2a02:248:0:51::16]:59292 helo=mx01.kamp.de)
+	(envelope-from <berrange@redhat.com>) id 1dv0pB-000128-7I
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:43:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:45028)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pl@kamp.de>) id 1dv0ol-0000oY-Ib
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:42:59 -0400
-References: <6cc4a99c-0212-6b7b-4a12-3e898215bea9@kamp.de>
-	<20170919143829.GH2107@work-vm>
-	<48cdd8ff-4940-9aa1-9aba-1acf8ce74ebe@kamp.de>
-	<20170919144130.GI2107@work-vm>
-	<a271a2f8-173e-45c8-bd64-16f4963b3518@kamp.de>
-	<20170921123625.GE2717@work-vm>
-From: Peter Lieven <pl@kamp.de>
-Message-ID: <3ce38800-9189-a5af-5de0-90ad9692b16b@kamp.de>
-Date: Thu, 21 Sep 2017 14:42:56 +0200
+	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dv0pB-00011j-0m
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:43:25 -0400
+Date: Thu, 21 Sep 2017 13:43:17 +0100
+From: "Daniel P. Berrange" <berrange@redhat.com>
+Message-ID: <20170921124317.GB15693@redhat.com>
+Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
+References: <CAATJJ0KLaR6VUrPZZSQxwb6niF5YY0UMB5sWDq9b=OeeC5=1Xw@mail.gmail.com>
+	<20170921123320.GG32364@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20170921123625.GE2717@work-vm>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Subject: Re: [Qemu-devel] Block Migration and CPU throttling
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20170921123320.GG32364@stefanha-x1.localdomain>
+Subject: Re: [Qemu-devel] need to resurrect no-lock option?
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,41 +28,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Juan Quintela <quintela@redhat.com>, Fam Zheng <famz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, qemu block <qemu-block@nongnu.org>, jjherne@linux.vnet.ibm.com
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Cc: Christian Ehrhardt <christian.ehrhardt@canonical.com>, Fam Zheng <famz@redhat.com>, qemu-devel <qemu-devel@nongnu.org>
 
-Am 21.09.2017 um 14:36 schrieb Dr. David Alan Gilbert:
-> * Peter Lieven (pl@kamp.de) wrote:
->> Am 19.09.2017 um 16:41 schrieb Dr. David Alan Gilbert:
->>> * Peter Lieven (pl@kamp.de) wrote:
->>>> Am 19.09.2017 um 16:38 schrieb Dr. David Alan Gilbert:
->>>>> * Peter Lieven (pl@kamp.de) wrote:
->>>>>> Hi,
->>>>>>
->>>>>> I just noticed that CPU throttling and Block Migration don't work together very well.
->>>>>> During block migration the throttling heuristic detects that we obviously make no progress
->>>>>> in ram transfer. But the reason is the running block migration and not a too high dirty pages rate.
->>>>>>
->>>>>> The result is that any VM is throttled by 99% during block migration.
->>>>> Hmm that's unfortunate; do you have a bandwidth set lower than your
->>>>> actual network connection? I'm just wondering if it's actually going
->>>>> between the block and RAM iterative sections or getting stuck in ne.
->>>> It happens also if source and dest are on the same machine and speed is set to 100G.
->>> But does it happen if they're not and the speed is set low?
->> Yes, it does. I noticed it in our test environment between different nodes with a 10G
->> link in between. But its totally clear why it happens. During block migration we transfer
->> all dirty memory pages in each round (if there is moderate memory load), but all dirty
->> pages are obviously more than 50% of the transferred ram in that round.
->> It is more exactly 100%. But the current logic triggers on this condition.
->>
->> I think I will go forward and send a patch which disables auto converge during
->> block migration bulk stage.
-> Yes, that's fair;  it probably would also make sense to throttle the RAM
-> migration during the block migration bulk stage, since the chances are
-> it's not going to get far.  (I think in the nbd setup, the main
-> migration process isn't started until the end of bulk).
+On Thu, Sep 21, 2017 at 01:33:20PM +0100, Stefan Hajnoczi wrote:
+> On Wed, Sep 20, 2017 at 11:26:11AM +0200, Christian Ehrhardt wrote:
+> > Hi,
+> > this might have been discussed in the wake of the lock changes that took
+> > place in 2.10 but I can't find anything clear enough to follow in the
+> > current case.
+> > There was an old submission [1] by Fam to make it possible to no-lock
+> > qemu-img and others if needed. But it seems nothing like it made it along
+> > to the locking we have in 2.10.
+> > 
+> > One (maybe more) case where missing this causes pain is e.g. running an
+> > info check on a running guest.
+> > In general info shouldn't need a write lock anyway, but without --no-lock
+> > that use case is broken.
+> 
+> It's still an invalid use case.  There is no guarantee that qemu-img
+> will see a consistent version of the image file.  Metadata could change
+> underneath qemu-img because QEMU may still write to it.  QEMU may also
+> have some metadata cached so there's no guarantee that qemu-img sees an
+> up-to-date image.
+> 
+> Why do you need to run qemu-img on a disk image that is in use?
 
-Exactly, but I would move this to a different patch. I would not start ram migration at all before
-the bulk phase has completed.
+You have a directory full of images and you want to understand current usage
+vs potential future usage. For this you need to get the virtual size, which
+rquires 'qemu-img info' for non-raw files. Actually it would be even better
+served by the new 'measure' command recently added.
 
-Peter
+The job analyzing this directory of images may not have any context as to
+whether each file is in use by a running QEMU, so would just blindly call
+'qemu-img info' on each file it finds.  There's of course potential that
+opening the image in 'qemu-img info' could hit problems if the running QEMU
+changed qcow2 metadata, but generally that would not have serious negative
+impact and would be self-correcting next time the job analysed the directory.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
