@@ -1,29 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:58304)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60516)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1duzeA-0008BA-6T
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 07:27:59 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1duzoV-0001Io-GZ
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 07:38:42 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <a.perevalov@samsung.com>) id 1duze4-0007Aq-3O
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 07:27:58 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:53978)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <a.perevalov@samsung.com>)
-	id 1duze3-00076y-Px
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 07:27:52 -0400
-From: Alexey Perevalov <a.perevalov@samsung.com>
-Message-id: <6b5a0775-d17b-946f-fb28-9e4c8839b789@samsung.com>
-Date: Thu, 21 Sep 2017 14:27:45 +0300
-MIME-version: 1.0
-In-reply-to: <20170921101608.GA2717@work-vm>
-Content-type: text/plain; charset="utf-8"; format="flowed"
-Content-transfer-encoding: 7bit
-Content-language: en-GB
-References: <1505839684-10046-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170919164824eucas1p23607e53e3ea38f8be4e885bb960e803f@eucas1p2.samsung.com>
-	<1505839684-10046-7-git-send-email-a.perevalov@samsung.com>
-	<20170921101608.GA2717@work-vm>
-Subject: Re: [Qemu-devel] [PATCH v10 06/10] migration: add postcopy
- blocktime ctx into MigrationIncomingState
+	(envelope-from <pbonzini@redhat.com>) id 1duzoS-000555-D4
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 07:38:39 -0400
+Received: from mail-wr0-f175.google.com ([209.85.128.175]:56598)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1duzoS-00054x-7J
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 07:38:36 -0400
+Received: by mail-wr0-f175.google.com with SMTP id r74so4325773wrb.13
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 04:38:36 -0700 (PDT)
+References: <20170921085110.25598-1-aik@ozlabs.ru>
+	<5e836306-27bd-a0fd-5bdd-8c8a510bf8eb@redhat.com>
+	<44820288-1464-de78-8a23-59cf9b945aea@ozlabs.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0fb7a236-668f-e147-b325-23d2355c46e3@redhat.com>
+Date: Thu, 21 Sep 2017 13:38:32 +0200
+MIME-Version: 1.0
+In-Reply-To: <44820288-1464-de78-8a23-59cf9b945aea@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v5 00/18] memory: Store physical root
+ MR in FlatView
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,176 +32,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com, quintela@redhat.com, heetae82.ahn@samsung.com
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
 
-On 09/21/2017 01:16 PM, Dr. David Alan Gilbert wrote:
-> * Alexey Perevalov (a.perevalov@samsung.com) wrote:
->> This patch adds request to kernel space for UFFD_FEATURE_THREAD_ID,
->> in case when this feature is provided by kernel.
+On 21/09/2017 12:11, Alexey Kardashevskiy wrote:
+> On 21/09/17 20:03, Paolo Bonzini wrote:
+>> On 21/09/2017 10:50, Alexey Kardashevskiy wrote:
+>>> This was inspired by https://bugzilla.redhat.com/show_bug.cgi?id=1481593
+>>> Previous versions:
+>>> v1: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg01559.html
+>>> v2: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04069.html
+>>> v3: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg04523.html
+>>> v4: https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg05669.html
+>>>
+>>> This patchset tries to reduce amount of memory used by FlatViews
+>>> and tries share as many FVs between address spaces as possible.
 >>
->> PostcopyBlocktimeContext is incapsulated inside postcopy-ram.c,
->> due to it's postcopy only feature.
->> Also it defines PostcopyBlocktimeContext's instance live time.
->> Information from PostcopyBlocktimeContext instance will be provided
->> much after postcopy migration end, instance of PostcopyBlocktimeContext
->> will live till QEMU exit, but part of it (vcpu_addr,
->> page_fault_vcpu_time) used only during calculation, will be released
->> when postcopy ended or failed.
->>
->> To enable postcopy blocktime calculation on destination, need to request
->> proper capabiltiy (Patch for documentation will be at the tail of the patch
->> set).
->>
->> As an example following command enable that capability, assume QEMU was
->> started with
->> -chardev socket,id=charmonitor,path=/var/lib/migrate-vm-monitor.sock
->> option to control it
->>
->> [root@host]#printf "{\"execute\" : \"qmp_capabilities\"}\r\n \
->> {\"execute\": \"migrate-set-capabilities\" , \"arguments\":   {
->> \"capabilities\": [ { \"capability\": \"postcopy-blocktime\", \"state\":
->> true } ] } }" | nc -U /var/lib/migrate-vm-monitor.sock
->>
->> Or just with HMP
->> (qemu) migrate_set_capability postcopy-blocktime on
->>
->> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
->> ---
->>   migration/migration.h    |  8 ++++++
->>   migration/postcopy-ram.c | 65 ++++++++++++++++++++++++++++++++++++++++++++++++
->>   2 files changed, 73 insertions(+)
->>
->> diff --git a/migration/migration.h b/migration/migration.h
->> index 56bf33c..770466b 100644
->> --- a/migration/migration.h
->> +++ b/migration/migration.h
->> @@ -21,6 +21,8 @@
->>   #include "qemu/coroutine_int.h"
->>   #include "hw/qdev.h"
->>   
->> +struct PostcopyBlocktimeContext;
->> +
->>   /* State for the incoming migration */
->>   struct MigrationIncomingState {
->>       QEMUFile *from_src_file;
->> @@ -58,6 +60,12 @@ struct MigrationIncomingState {
->>       /* The coroutine we should enter (back) after failover */
->>       Coroutine *migration_incoming_co;
->>       QemuSemaphore colo_incoming_sem;
->> +
->> +    /*
->> +     * PostcopyBlocktimeContext to keep information for postcopy
->> +     * live migration, to calculate vCPU block time
->> +     * */
->> +    struct PostcopyBlocktimeContext *blocktime_ctx;
->>   };
->>   
->>   MigrationIncomingState *migration_incoming_get_current(void);
->> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
->> index bec6c2c..cc78981 100644
->> --- a/migration/postcopy-ram.c
->> +++ b/migration/postcopy-ram.c
->> @@ -61,6 +61,58 @@ struct PostcopyDiscardState {
->>   #include <sys/eventfd.h>
->>   #include <linux/userfaultfd.h>
->>   
->> +typedef struct PostcopyBlocktimeContext {
->> +    /* time when page fault initiated per vCPU */
->> +    int64_t *page_fault_vcpu_time;
->> +    /* page address per vCPU */
->> +    uint64_t *vcpu_addr;
->> +    int64_t total_blocktime;
->> +    /* blocktime per vCPU */
->> +    int64_t *vcpu_blocktime;
->> +    /* point in time when last page fault was initiated */
->> +    int64_t last_begin;
->> +    /* number of vCPU are suspended */
->> +    int smp_cpus_down;
->> +
->> +    /*
->> +     * Handler for exit event, necessary for
->> +     * releasing whole blocktime_ctx
->> +     */
->> +    Notifier exit_notifier;
->> +    /*
->> +     * Handler for postcopy event, necessary for
->> +     * releasing unnecessary part of blocktime_ctx
->> +     */
->> +    Notifier postcopy_notifier;
-> Is this actually used? It's just that...
->
->> +} PostcopyBlocktimeContext;
->> +
->> +static void destroy_blocktime_context(struct PostcopyBlocktimeContext *ctx)
->> +{
->> +    g_free(ctx->page_fault_vcpu_time);
->> +    g_free(ctx->vcpu_addr);
->> +    g_free(ctx->vcpu_blocktime);
->> +    g_free(ctx);
->> +}
->> +
->> +static void migration_exit_cb(Notifier *n, void *data)
->> +{
->> +    PostcopyBlocktimeContext *ctx = container_of(n, PostcopyBlocktimeContext,
->> +                                                 exit_notifier);
->> +    destroy_blocktime_context(ctx);
->> +}
->> +
->> +static struct PostcopyBlocktimeContext *blocktime_context_new(void)
->> +{
->> +    PostcopyBlocktimeContext *ctx = g_new0(PostcopyBlocktimeContext, 1);
->> +    ctx->page_fault_vcpu_time = g_new0(int64_t, smp_cpus);
->> +    ctx->vcpu_addr = g_new0(uint64_t, smp_cpus);
->> +    ctx->vcpu_blocktime = g_new0(int64_t, smp_cpus);
->> +
->> +    ctx->exit_notifier.notify = migration_exit_cb;
->> +    qemu_add_exit_notifier(&ctx->exit_notifier);
->> +    add_migration_state_change_notifier(&ctx->postcopy_notifier);
-> Patch 7 removes that line, and I don't see what puts it back;
-> and this line doesn't actually set up ctx->postcopy_notifier.
->
-> Other than that, it looks OK.
-Thank you, I really changed my mind, and decided to keep
-blocktime context (and all calculated values) till the
-stop of VM, but not till the end of migration.
+>> Thanks, this looks good!  (Patch 18 indeed is not what I had in mind :)).
 
--- 
-Best regards,
-Alexey Perevalov
->
-> Dave
->
->> +    return ctx;
->> +}
->>   
->>   /**
->>    * receive_ufd_features: check userfault fd features, to request only supported
->> @@ -153,6 +205,19 @@ static bool ufd_check_and_apply(int ufd, MigrationIncomingState *mis)
->>           }
->>       }
->>   
->> +#ifdef UFFD_FEATURE_THREAD_ID
->> +    if (migrate_postcopy_blocktime() && mis &&
->> +        UFFD_FEATURE_THREAD_ID & supported_features) {
->> +        /* kernel supports that feature */
->> +        /* don't create blocktime_context if it exists */
->> +        if (!mis->blocktime_ctx) {
->> +            mis->blocktime_ctx = blocktime_context_new();
->> +        }
->> +
->> +        asked_features |= UFFD_FEATURE_THREAD_ID;
->> +    }
->> +#endif
->> +
->>       /*
->>        * request features, even if asked_features is 0, due to
->>        * kernel expects UFFD_API before UFFDIO_REGISTER, per
->> -- 
->> 1.9.1
+With further review:
+
+- this is missing from patch 17:
+
+diff --git a/memory.c b/memory.c
+index f3db61621c..7d266ec8a2 100644
+--- a/memory.c
++++ b/memory.c
+@@ -2770,6 +2770,7 @@ void address_space_init(AddressSpace *as,
+MemoryRegion *root, const char *name)
+     QTAILQ_INSERT_TAIL(&address_spaces, as, address_spaces_link);
+     as->name = g_strdup(name ? name : "anonymous");
+     address_space_update_topology(as);
++    address_space_update_ioeventfds(as);
+ }
+
+ static void do_address_space_destroy(AddressSpace *as)
+
+- with non-virtio devices 98% (!) of created FlatViews are the empty
+ones that are destroyed immediately, so we probably should detect those
+in advance
+
+I'll then drop patches 15 and 18, and send some more optimizations on top.
+
+Thanks again for doing the *real* optimization work!
+
+Paolo
+
+
+> Hmmm, then what did you have in mind then?
+> When clear my backlog a bit, I'd give it a try.
+> 
+> Thanks for the ideas and review.
+> 
+> 
+> ps. this could make a semidecent kvm forum talk, could not it? :)
+> 
 >>
-> --
-> Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
->
->
->
+>> Paolo
+>>
+>>
+>>> Changelog:
+>>> v5:
+>>> * removed "memory: Give memory_region_transaction_commit a hint" (broken)
+>>> * added "memory: Avoid temporary FlatView allocation in a single child case"
+>>> but I suggest ditching it, it is just there to demonsrate how I checked
+>>> the suggested idea
+>>> * updated example of "info mtree -f -d" in 14/18 to demonstrate the result
+>>>
+>>> v4:
+>>> * total rework again to provide grounds for new 15/18, 17/18, 18/18
+>>>
+>>> v3:
+>>> * addressed comments from v2, mainly simplified the code
+>>>
+>>> v2:
+>>> * total rework
+>>>
+>>>
+>>> This is based on sha1
+>>> c51700273a Peter Maydell "Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20170919-v2' into staging".
+>>>
+>>> Please comment. Thanks.
+>>>
+>>>
+>>>
+>>> Alexey Kardashevskiy (18):
+>>>   exec: Explicitly export target AS from
+>>>     address_space_translate_internal
+>>>   memory: Open code FlatView rendering
+>>>   memory: Move FlatView allocation to a helper
+>>>   memory: Move AddressSpaceDispatch from AddressSpace to FlatView
+>>>   memory: Remove AddressSpace pointer from AddressSpaceDispatch
+>>>   memory: Switch memory from using AddressSpace to FlatView
+>>>   memory: Cleanup after switching to FlatView
+>>>   memory: Rename mem_begin/mem_commit/mem_add helpers
+>>>   memory: Store physical root MR in FlatView
+>>>   memory: Alloc dispatch tree where topology is generared
+>>>   memory: Move address_space_update_ioeventfds
+>>>   memory: Share FlatView's and dispatch trees between address spaces
+>>>   memory: Do not allocate FlatView in address_space_init
+>>>   memory: Rework "info mtree" to print flat views and dispatch trees
+>>>   memory: Share special empty FlatView
+>>>   memory: Get rid of address_space_init_shareable
+>>>   memory: Create FlatView directly
+>>>   memory: Avoid temporary FlatView allocation in a single child case
+>>>
+>>>  include/exec/memory-internal.h |  16 +-
+>>>  include/exec/memory.h          |  76 +++++-----
+>>>  include/hw/arm/armv7m.h        |   2 +-
+>>>  cpus.c                         |   5 +-
+>>>  exec.c                         | 330 ++++++++++++++++++++++++----------------
+>>>  hw/arm/armv7m.c                |   9 +-
+>>>  hw/intc/openpic_kvm.c          |   2 +-
+>>>  memory.c                       | 335 +++++++++++++++++++++++++++++++----------
+>>>  monitor.c                      |   3 +-
+>>>  target/arm/cpu.c               |  16 +-
+>>>  target/i386/cpu.c              |   5 +-
+>>>  hmp-commands-info.hx           |   7 +-
+>>>  12 files changed, 533 insertions(+), 273 deletions(-)
+>>>
+>>
+> 
+> 
