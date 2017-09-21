@@ -1,30 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38606)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39716)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duuzJ-000473-Tg
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:29:31 -0400
+	(envelope-from <ahzhanghaoyu@gmail.com>) id 1duv3P-0005l5-BA
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:33:47 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgibson@ozlabs.org>) id 1duuzI-00063h-Cq
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:29:29 -0400
-Date: Thu, 21 Sep 2017 15:31:07 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Message-ID: <20170921053107.GD4998@umbus.fritz.box>
-References: <20170919082421.GU27153@umbus>
-	<871sn2hugn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170920045524.GH5520@umbus.fritz.box>
-	<87y3pagdg0.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170920061756.GJ5520@umbus.fritz.box>
-	<87vakdhnyn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170920065700.GO5520@umbus.fritz.box>
-	<87poalhm74.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-	<20170920115342.GQ5520@umbus.fritz.box>
-	<87377gpuyh.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	(envelope-from <ahzhanghaoyu@gmail.com>) id 1duv3M-0008VB-4m
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:33:43 -0400
+Received: from mail-pg0-x244.google.com ([2607:f8b0:400e:c05::244]:37303)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <ahzhanghaoyu@gmail.com>)
+	id 1duv3L-0008Ul-Te
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:33:40 -0400
+Received: by mail-pg0-x244.google.com with SMTP id v5so2928882pgn.4
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 23:33:39 -0700 (PDT)
+References: <1470744604-80857-1-git-send-email-jiangshanlai@gmail.com>
+	<87bn11ov1p.fsf@emacs.mitica>
+	<CAJhGHyA=n1exdiP03OWctrCpD0wKxz1jH5i=fLsaoEO44NBUEg@mail.gmail.com>
+From: Zhang Haoyu <ahzhanghaoyu@gmail.com>
+Message-ID: <dc76f11e-9c07-5afd-0376-8c69e244d4db@gmail.com>
+Date: Thu, 21 Sep 2017 14:33:37 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="9UV9rz0O2dU/yYYn"
-Content-Disposition: inline
-In-Reply-To: <87377gpuyh.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
-Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
- cpus
+In-Reply-To: <CAJhGHyA=n1exdiP03OWctrCpD0wKxz1jH5i=fLsaoEO44NBUEg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] add migration capability to bypass the
+ shared memory
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -33,178 +33,174 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, clg@kaod.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
+To: Lai Jiangshan <jiangshanlai@gmail.com>, Juan Quintela <quintela@redhat.com>
+Cc: Peter Crosthwaite <crosthwaite.peter@gmail.com>, qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>, Amit Shah <amit.shah@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 
+Hi,
 
---9UV9rz0O2dU/yYYn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Any update?
 
-On Thu, Sep 21, 2017 at 09:24:46AM +0530, Nikunj A Dadhania wrote:
-> David Gibson <david@gibson.dropbear.id.au> writes:
->=20
-> > On Wed, Sep 20, 2017 at 12:48:55PM +0530, Nikunj A Dadhania wrote:
-> >> David Gibson <david@gibson.dropbear.id.au> writes:
-> >>=20
-> >> > On Wed, Sep 20, 2017 at 12:10:48PM +0530, Nikunj A Dadhania wrote:
-> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
-> >> >>=20
-> >> >> > On Wed, Sep 20, 2017 at 10:43:19AM +0530, Nikunj A Dadhania wrote:
-> >> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
-> >> >> >>=20
-> >> >> >> > On Wed, Sep 20, 2017 at 09:50:24AM +0530, Nikunj A Dadhania wr=
-ote:
-> >> >> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
-> >> >> >> >>=20
-> >> >> >> >> > On Fri, Sep 15, 2017 at 02:39:16PM +0530, Nikunj A Dadhania=
- wrote:
-> >> >> >> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
-> >> >> >> >> >>=20
-> >> >> >> >> >> > On Fri, Sep 15, 2017 at 01:53:15PM +0530, Nikunj A Dadha=
-nia wrote:
-> >> >> >> >> >> >> David Gibson <david@gibson.dropbear.id.au> writes:
-> >> >> >> >> >> >>=20
-> >> >> >> >> >> >> >>=20
-> >> >> >> >> >> >> >> I thought, I am doing the same here for PowerNV, num=
-ber of online cores
-> >> >> >> >> >> >> >> is equal to initial online vcpus / threads per core
-> >> >> >> >> >> >> >>=20
-> >> >> >> >> >> >> >>    int boot_cores_nr =3D smp_cpus / smp_threads;
-> >> >> >> >> >> >> >>=20
-> >> >> >> >> >> >> >> Only difference that I see in PowerNV is that we hav=
-e multiple chips
-> >> >> >> >> >> >> >> (max 2, at the moment)
-> >> >> >> >> >> >> >>=20
-> >> >> >> >> >> >> >>         cores_per_chip =3D smp_cpus / (smp_threads *=
- pnv->num_chips);
-> >> >> >> >> >> >> >
-> >> >> >> >> >> >> > This doesn't make sense to me.  Cores per chip should=
- *always* equal
-> >> >> >> >> >> >> > smp_cores, you shouldn't need another calculation for=
- it.
-> >> >> >> >> >> >> >
-> >> >> >> >> >> >> >> And in case user has provided sane smp_cores, we use=
- it.
-> >> >> >> >> >> >> >
-> >> >> >> >> >> >> > If smp_cores isn't sane, you should simply reject it,=
- not try to fix
-> >> >> >> >> >> >> > it.  That's just asking for confusion.
-> >> >> >> >> >> >>=20
-> >> >> >> >> >> >> This is the case where the user does not provide a topo=
-logy(which is a
-> >> >> >> >> >> >> valid scenario), not sure we should reject it. So qemu =
-defaults
-> >> >> >> >> >> >> smp_cores/smt_threads to 1. I think it makes sense to o=
-ver-ride.
-> >> >> >> >> >> >
-> >> >> >> >> >> > If you can find a way to override it by altering smp_cor=
-es when it's
-> >> >> >> >> >> > not explicitly specified, then ok.
-> >> >> >> >> >>=20
-> >> >> >> >> >> Should I change the global smp_cores here as well ?
-> >> >> >> >> >
-> >> >> >> >> > I'm pretty uneasy with that option.
-> >> >> >> >>=20
-> >> >> >> >> Me too.
-> >> >> >> >>=20
-> >> >> >> >> > It would take a fair bit of checking to ensure that changin=
-g smp_cores
-> >> >> >> >> > is safe here. An easier to verify option would be to make t=
-he generic
-> >> >> >> >> > logic which splits up an unspecified -smp N into cores and =
-sockets
-> >> >> >> >> > more flexible, possibly based on machine options for max va=
-lues.
-> >> >> >> >> >
-> >> >> >> >> > That might still be more trouble than its worth.
-> >> >> >> >>=20
-> >> >> >> >> I think the current approach is the simplest and less intrusi=
-ve, as we
-> >> >> >> >> are handling a case where user has not bothered to provide a =
-detailed
-> >> >> >> >> topology, the best we can do is create single threaded cores =
-equal to
-> >> >> >> >> number of cores.
-> >> >> >> >
-> >> >> >> > No, sorry.  Having smp_cores not correspond to the number of c=
-ores per
-> >> >> >> > chip in all cases is just not ok.  Add an error message if the
-> >> >> >> > topology isn't workable for powernv by all means.  But users h=
-aving to
-> >> >> >> > use a longer command line is better than breaking basic assump=
-tions
-> >> >> >> > about what numbers reflect what topology.
-> >> >> >>=20
-> >> >> >> Sorry to ask again, as I am still not convinced, we do similar
-> >> >> >> adjustment in spapr where the user did not provide the number of=
- cores,
-> >> >> >> but qemu assumes them as single threaded cores and created
-> >> >> >> cores(boot_cores_nr) that were not same as smp_cores ?
-> >> >> >
-> >> >> > What?  boot_cores_nr has absolutely nothing to do with adjusting =
-the
-> >> >> > topology, and it certainly doesn't assume they're single threaded.
-> >> >>=20
-> >> >> When we start a TCG guest and user provides following commandline, =
-e.g.
-> >> >> "-smp 4", smt_threads is set to 1 by default in vl.c. So the guest =
-boots
-> >> >> with 4 cores, each having 1 thread.
-> >> >
-> >> > Ok.. and what's the problem with that behaviour on powernv?
-> >>=20
-> >> As smp_thread defaults to 1 in vl.c, similarly smp_cores also has the
-> >> default value of 1 in vl.c. In powernv, we were setting nr-cores like
-> >> this:
-> >>=20
-> >>         object_property_set_int(chip, smp_cores, "nr-cores", &error_fa=
-tal);
-> >>=20
-> >> Even when there were multiple cpus (-smp 4), when the guest boots up, =
-we
-> >> just get one core (i.e. smp_cores was 1) with single thread(smp_threads
-> >> was 1), which is wrong as per the command-line that was provided.
-> >
-> > Right, so, -smp 4 defaults to 4 sockets, each with 1 core of 1
-> > thread.  If you can't supply 4 sockets you should error, but you
-> > shouldn't go and change the number of cores per socket.
->=20
-> OK, that makes sense now. And I do see that smp_cpus is 4 in the above
-> case. Now looking more into it, i see that powernv has something called
-> "num_chips", isnt this same as sockets ? Do we need num_chips separately?
+Thanks,
+Zhang Haoyu
 
-Ah, yes, I see.  It's probably still reasonable to keep num_chips as
-an internal variable, rather than using (smp_cpus / smp_cores /
-smp_threads) everywhere.  But we shouldn't have it as a direct
-user-settable property, instead setting it from the -smp command line
-option.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---9UV9rz0O2dU/yYYn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnDTpkACgkQbDjKyiDZ
-s5K3ShAAsDce4TFB/VQepUl8ajx9Yvlgh2MwFppGoXGvotbWzR5t65OOAM2LFgWR
-U1u1v0wbh5f/oCn/NdC8VW23TlCPxDDvKTdiy7kKQIaRBOYhMCnqENY5TMns4Qmo
-INU3X4XFlG6Q6z4A+MkAtstiR8oSOYRrbNUx0seNB0G9EIMqmNHx/pylhy7dHX5v
-ncNjAeqGkRF16qSBmm3SUAPhMV5ImOQOLDV9s1sbuEKJyt2M6d9cbO0LK/9N4zXE
-YPsfvFIPMDyFGniu8RpJjGjPfhcXtm+0nmBhkAp9FyPPa4IjY9O82ShfL1GgHx7W
-P+dkBM38kxwMRBuoFTS2eIdPOAUyHfaQYhm/kaf2Wm2US/emspzqD6a8HODsEr9m
-VJsrXLbXC20boHg9f7RcXz0C8V/pFFohIzrKqb9ixs/MDYxSA/2rttvN2YppDKBk
-HOvr+OzMWxE8brexq72x4zb0lodPloAUCoGrUNSmG9begZ+wPjlEYnud5iDtz8BS
-C+LNoATnBPCMeu+ksNHC6w1BS19rb4BFS2EmdBP/EXYw7y/pc44ZwqjFjFLK5oeE
-K/RPTlGwaZPN0B46NsATs7xOMV9x2lhC0F1b0DSI2TwJGd+xkB4FOAFB44fyp8ds
-bm+jJF9JALrDu2lC3zxA2IUWZe07yoOUEYOkAG+t0rHjiGOHnsA=
-=+akz
------END PGP SIGNATURE-----
-
---9UV9rz0O2dU/yYYn--
+On 2016/8/30 12:11, Lai Jiangshan wrote:
+> On Wed, Aug 10, 2016 at 5:03 PM, Juan Quintela <quintela@redhat.com> wrote:
+>> Lai Jiangshan <jiangshanlai@gmail.com> wrote:
+>>
+>> Hi
+>>
+>> First of all, I like a lot the patchset, but I would preffer to split it
+>> to find "possible" bugs along the lines, especially in postcopy, but not only.
+> 
+> Hello, thanks for review and comments
+> 
+> I tried to make the patch be sane and tight.
+> I don't see any strong reason to split it without complicating the patch.
+> 
+>>
+>> [very nice description of the patch]
+>>
+>> Nothing to say about the QMP and shared memory detection, looks correct
+>> to me.
+>>
+>>> diff --git a/migration/ram.c b/migration/ram.c
+>>> index 815bc0e..880972d 100644
+>>> --- a/migration/ram.c
+>>> +++ b/migration/ram.c
+>>> @@ -605,6 +605,28 @@ static void migration_bitmap_sync_init(void)
+>>>      num_dirty_pages_period = 0;
+>>>      xbzrle_cache_miss_prev = 0;
+>>>      iterations_prev = 0;
+>>> +    migration_dirty_pages = 0;
+>>> +}
+>>> +
+>>> +static void migration_bitmap_init(unsigned long *bitmap)
+>>> +{
+>>> +    RAMBlock *block;
+>>> +
+>>> +    bitmap_clear(bitmap, 0, last_ram_offset() >> TARGET_PAGE_BITS);
+>>> +    rcu_read_lock();
+>>> +    QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>>> +        if (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(block)) {
+>>> +            bitmap_set(bitmap, block->offset >> TARGET_PAGE_BITS,
+>>> +                       block->used_length >> TARGET_PAGE_BITS);
+>>> +
+>>> +            /*
+>>> +             * Count the total number of pages used by ram blocks not including
+>>> +             * any gaps due to alignment or unplugs.
+>>> +             */
+>>> +         migration_dirty_pages += block->used_length >> TARGET_PAGE_BITS;
+>>> +     }
+>>> +    }
+>>> +    rcu_read_unlock();
+>>>  }
+>>
+>> We can split this function in a different patch.
+> 
+> it calls the new function migrate_bypass_shared_memory().
+> it is no a good idea to split it out.
+> 
+>> I haven't fully search
+>> if we care about taking the rcu lock here.  The thing that I am more
+>> interested is in knowing what happens when we don't set
+>> migration_dirty_pages as the full "possible" memory pages.
+> 
+> I hadn't tested it with postcopy, I don't know how to use postcopy.
+> From my review I can't find obvious bugs about it.
+> 
+> I don't think there is any good reason to use migrate_bypass
+> and postcopy together,  I can disable the migrate_bypass
+> when postcopy==true if you want.
+> 
+>>
+>> Once here, should we check for ROM regions?
+>>
+>> BTW, could'nt we use:
+>>
+>> int qemu_ram_foreach_block(RAMBlockIterFunc func, void *opaque)
+>> {
+>>     RAMBlock *block;
+>>     int ret = 0;
+>>
+>>     rcu_read_lock();
+>>     QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>>         ret = func(block->idstr, block->host, block->offset,
+>>                    block->used_length, opaque);
+>>         if (ret) {
+>>             break;
+>>         }
+>>     }
+>>     rcu_read_unlock();
+>>     return ret;
+>> }
+>>
+> 
+> the patch only introduces only one "QLIST_FOREACH_RCU(ram_list.blocks)"
+> but
+> # git grep 'QLIST_FOREACH_RCU.*ram_list'  | wc -l
+> #       16
+> 
+> I don't want to introduce qemu_ram_foreach_block()
+> and touch another 15 places.
+> I hope someone do it after merged.
+> 
+> 
+>>
+>>
+>>>
+>>>  static void migration_bitmap_sync(void)
+>>> @@ -631,7 +653,9 @@ static void migration_bitmap_sync(void)
+>>>      qemu_mutex_lock(&migration_bitmap_mutex);
+>>>      rcu_read_lock();
+>>>      QLIST_FOREACH_RCU(block, &ram_list.blocks, next) {
+>>> -        migration_bitmap_sync_range(block->offset, block->used_length);
+>>> +        if (!migrate_bypass_shared_memory() || !qemu_ram_is_shared(block)) {
+>>> +            migration_bitmap_sync_range(block->offset, block->used_length);
+>>> +        }
+>>>      }
+>>>      rcu_read_unlock();
+>>>      qemu_mutex_unlock(&migration_bitmap_mutex);
+>>
+>> Oops, another place where we were not using qemu_ram_foreach_block :p
+>>
+>>
+>>> @@ -1926,19 +1950,14 @@ static int ram_save_setup(QEMUFile *f, void *opaque)
+>>>      ram_bitmap_pages = last_ram_offset() >> TARGET_PAGE_BITS;
+>>>      migration_bitmap_rcu = g_new0(struct BitmapRcu, 1);
+>>>      migration_bitmap_rcu->bmap = bitmap_new(ram_bitmap_pages);
+>>> -    bitmap_set(migration_bitmap_rcu->bmap, 0, ram_bitmap_pages);
+>>> +    migration_bitmap_init(migration_bitmap_rcu->bmap);
+>>>
+>>>      if (migrate_postcopy_ram()) {
+>>>          migration_bitmap_rcu->unsentmap = bitmap_new(ram_bitmap_pages);
+>>> -        bitmap_set(migration_bitmap_rcu->unsentmap, 0, ram_bitmap_pages);
+>>> +        bitmap_copy(migration_bitmap_rcu->unsentmap,
+>>> +                 migration_bitmap_rcu->bmap, ram_bitmap_pages);
+>>>      }
+>>
+>> I think that if we go this route, we should move the whole if inside the
+>> migration_bitmap_init?
+> 
+> good! I will do it when I update the patch.
+> 
+> Thanks,
+> Lai
+> 
+>>
+>>>
+>>> -    /*
+>>> -     * Count the total number of pages used by ram blocks not including any
+>>> -     * gaps due to alignment or unplugs.
+>>> -     */
+>>> -    migration_dirty_pages = ram_bytes_total() >> TARGET_PAGE_BITS;
+>>> -
+>>>      memory_global_dirty_log_start();
+>>>      migration_bitmap_sync();
+>>>      qemu_mutex_unlock_ramlist();
+>>
+>>
+>> As said, very happy with the patch.  And it got much simpler that I
+>> would have expected.
+>>
+>> Thanks, Juan.
+> 
