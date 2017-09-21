@@ -1,40 +1,42 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43099)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45717)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1duycz-0007Q3-8U
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:22:42 -0400
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1duykR-0000dZ-JP
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:30:29 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1duycu-0002dD-7l
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:22:41 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57576
+	(envelope-from <pasic@linux.vnet.ibm.com>) id 1duykN-0008K9-CX
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:30:23 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53108
 	helo=mx0a-001b2d01.pphosted.com)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
 	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1duycu-0002c3-3D
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:22:36 -0400
+	id 1duykN-0008IB-7f
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:30:19 -0400
 Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
 	by mx0b-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8LAJglG133725
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 06:22:35 -0400
-Received: from e06smtp12.uk.ibm.com (e06smtp12.uk.ibm.com [195.75.94.108])
-	by mx0b-001b2d01.pphosted.com with ESMTP id 2d4aemvjew-1
+	v8LAT9TQ010437
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 06:30:18 -0400
+Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
+	by mx0b-001b2d01.pphosted.com with ESMTP id 2d4aemvw9d-1
 	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 06:22:35 -0400
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 06:30:18 -0400
 Received: from localhost
-	by e06smtp12.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
 	Only! Violators will be prosecuted
 	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Thu, 21 Sep 2017 11:22:33 +0100
+	Thu, 21 Sep 2017 11:30:16 +0100
 References: <20170920172314.102710-1-pasic@linux.vnet.ibm.com>
-	<20170921112459.0153cc64.cohuck@redhat.com>
+	<20170920172314.102710-3-pasic@linux.vnet.ibm.com>
+	<20170921112341.59175a29.cohuck@redhat.com>
 From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Thu, 21 Sep 2017 12:22:30 +0200
+Date: Thu, 21 Sep 2017 12:30:11 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170921112459.0153cc64.cohuck@redhat.com>
+In-Reply-To: <20170921112341.59175a29.cohuck@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Message-Id: <8abd41f8-e3fd-682f-1669-a5c3870c32fd@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH 0/2] 3270 improvements
+Message-Id: <d36a9f7f-bbf1-0815-a0c1-c9f36cdd1803@linux.vnet.ibm.com>
+Subject: Re: [Qemu-devel] [PATCH 2/2] s390x/3270: handle writes of arbitrary
+ length
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -48,41 +50,43 @@ Cc: qemu-devel@nongnu.org, Alexander Graf <agraf@suse.de>, Christian Borntraeger
 
 
 
-On 09/21/2017 11:24 AM, Cornelia Huck wrote:
-> On Wed, 20 Sep 2017 19:23:12 +0200
+On 09/21/2017 11:23 AM, Cornelia Huck wrote:
+> On Wed, 20 Sep 2017 19:23:14 +0200
 > Halil Pasic <pasic@linux.vnet.ibm.com> wrote:
 > 
->> Jason found some problems with 3270 which he traced down to insufficient
->> output buffer size. I've looked into the underlying issue (and the
->> relevant code) and I saw strange things. Among others an unreasonable
->> assert requiring the payload of a ccw being less than some more or
->> less arbitrary limit (dictated by the size of the output buffer).
+>> The problem is, that the current implementation places unrealistic and
+>> arbitrary constraints on the length of writes to the device (that is the
+>> outbound requests), by asserting ccw.count being such that that even the
+>> worst case escaped payload will fit an  more or less arbitrary sized
+>> buffer. Actually on protocol level there is nothing to justify such
+>> a limitation.
 >>
->> Because we were already considering converting 3270 to CcwDataStream I've
->> decided to try do get rid of this strange limitation on the length of the
->> writes too. 
->>
->> This series depends on my IDA work, which can be found here:
->> https://lists.nongnu.org/archive/html/qemu-devel/2017-09/msg03434.html.
->>
->> Halil Pasic (2):
->>   s390x/3270: IDA support for 3270 via CcwDataStream
->>   s390x/3270: handle writes of arbitrary length
->>
->>  hw/char/terminal3270.c      | 46 +++++++++++++++++++++++++++------------------
->>  hw/s390x/3270-ccw.c         |  4 ++--
->>  include/hw/s390x/3270-ccw.h |  5 ++---
->>  3 files changed, 32 insertions(+), 23 deletions(-)
->>
+>> Another strange thing is the return value which more or less reflects
+>> the size (written) after escaping instead of before escaping. This
+>> is strange, because this return value is used to calculate SCSW.count.
 > 
-> Are you planning to do some further work on 3270, btw?
+> Didn't the Linux driver care about the count?
 > 
 
-I did not. I jumped in because of IDA, and because I did
-not agree with increasing the buffer size to another arbitrary
-an value (and essentially keep the bug). I hope the original
-authors will do further polishing.
+Maybe Jason can answer that. I did only most basic testing with my patch
+applied (and basically no testing without my changes).
 
-I'm just curious, what's behind the question?
+>From code perspective I'm sure it does for the reads. For the writes
+I did not look into that.
 
 Halil
+
+>>
+>> Let us teach 3270 how to deal with arbitrary long writes.
+>>
+>> Signed-off-by: Halil Pasic <pasic@linux.vnet.ibm.com>
+>> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+>> Reviewed-by: Dong Jia Shi <bjsdjshi@linux.vnet.ibm.com>
+>> Reported-by: Jason J . Herne <jjherne@linux.vnet.ibm.com>
+>> Tested-by: Jason J . Herne <jjherne@linux.vnet.ibm.com>
+>> ---
+>>  hw/char/terminal3270.c | 30 ++++++++++++++++++------------
+>>  1 file changed, 18 insertions(+), 12 deletions(-)
+> 
+> Looks good.
+> 
