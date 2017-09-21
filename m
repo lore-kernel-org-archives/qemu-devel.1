@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46770)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46804)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duyox-0001cS-Pl
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:35:07 -0400
+	(envelope-from <kwolf@redhat.com>) id 1duypF-0001p3-P0
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:35:22 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbonzini@redhat.com>) id 1duyot-0001Du-QQ
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:35:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51962)
+	(envelope-from <kwolf@redhat.com>) id 1duypB-0001pB-PY
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:35:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39356)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1duyot-0001BS-KK
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:34:59 -0400
-References: <20170920145025.19403-1-david@redhat.com>
-	<1505976596.7353.0.camel@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <059a4497-affa-23b7-2875-42efa82c65de@redhat.com>
-Date: Thu, 21 Sep 2017 12:34:50 +0200
+	(Exim 4.71) (envelope-from <kwolf@redhat.com>) id 1duypB-0001o6-Ii
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:35:17 -0400
+Date: Thu, 21 Sep 2017 12:35:08 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+Message-ID: <20170921103508.GB4677@localhost.localdomain>
+References: <20170901112829.2571-1-apahim@redhat.com>
+	<20170901112829.2571-3-apahim@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1505976596.7353.0.camel@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v1] kvm: drop wrong assertion creating
- problems with pflash
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170901112829.2571-3-apahim@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v8 02/13] qemu.py: avoid writing to
+ stdout/stderr
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,25 +28,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Gerd Hoffmann <kraxel@redhat.com>, David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc: =?UTF-8?B?UmFkaW0gS3LEjW3DocWZ?= <rkrcmar@redhat.com>, kvm@vger.kernel.org
+To: Amador Pahim <apahim@redhat.com>
+Cc: qemu-devel@nongnu.org, stefanha@gmail.com, famz@redhat.com, berrange@redhat.com, ehabkost@redhat.com, mreitz@redhat.com, armbru@redhat.com, crosa@redhat.com, ldoktor@redhat.com
 
-On 21/09/2017 08:49, Gerd Hoffmann wrote:
-> On Wed, 2017-09-20 at 16:50 +0200, David Hildenbrand wrote:
->> pflash toggles mr->romd_mode. So this assert does not always hold.
->>
->> 1) a device was added with !mr->romd_mode, therefore effectively not
->> =C2=A0=C2=A0=C2=A0creating a kvm slot as we want to trap every access =
-(add =3D false).
->> 2) mr->romd_mode was toggled on before remove it. There is now
->> =C2=A0=C2=A0=C2=A0actually no slot to remove and the asser is wrong.
->>
->> So let's just drop the assert.
->=20
-> Works without any obvious bad side effects.
->=20
-> Tested-by: Gerd Hoffmann <kraxel@redhat.com>
+Am 01.09.2017 um 13:28 hat Amador Pahim geschrieben:
+> This module should not write directly to stdout/stderr. Instead, it
+> should either raise exceptions or just log the messages and let the
+> callers handle them and decide what to do. For example, scripts could
+> choose to send the log messages stderr or/and write them to a file if
+> verbose or debugging mode is enabled.
+> 
+> This patch replaces the writes to stderr by an exception in the
+> send_fd_scm() when _socket_scm_helper is not set or not present. In the
+> same method, the subprocess Popen will now redirect the stdout/stderr to
+> logging.debug instead of writing to system stderr. As consequence, since
+> the Popen.communicate() is now used (in order to get the stdout), the
+> further call to wait() became redundant and was replaced by
+> Popen.returncode.
+> 
+> The shutdown() message on negative exit code will now be logged
+> to logging.warn instead of written to system stderr.
+> 
+> Signed-off-by: Amador Pahim <apahim@redhat.com>
+> ---
+>  scripts/qemu.py | 30 ++++++++++++++++++++++--------
+>  1 file changed, 22 insertions(+), 8 deletions(-)
+> 
+> diff --git a/scripts/qemu.py b/scripts/qemu.py
+> index 0ae5d39414..aca6fa4d82 100644
+> --- a/scripts/qemu.py
+> +++ b/scripts/qemu.py
+> @@ -13,6 +13,7 @@
+>  #
+>  
+>  import errno
+> +import logging
+>  import string
+>  import os
+>  import sys
+> @@ -20,6 +21,15 @@ import subprocess
+>  import qmp.qmp
+>  
+>  
+> +LOG = logging.getLogger(__name__)
 
-Queued, thanks.
+This logger isn't properly initialised, so whenever it would actually be
+used, the only thing that ends up in the qemu-iotests output is:
 
-Paolo
++No handlers could be found for logger "qemu"
+
+The actual error message (that was previously logged to stderr) doesn't
+make it to the output any more.
+
+I find it sad how the recent test infrastructure "improvements" tend to
+break the tests instead of making them easier to work with. Please be a
+bit more careful when touching this code, and *test* your code before
+you submit it. I expect from anyone that they test their code, but if we
+don't even manage to do that for the tests themselves, I'm losing hope.
+
+Kevin
