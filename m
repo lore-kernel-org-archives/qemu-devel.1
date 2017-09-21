@@ -1,27 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:34729)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37946)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1duwK7-0000OO-Aj
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 03:55:04 -0400
+	(envelope-from <imammedo@redhat.com>) id 1duwTC-0003Se-5z
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:04:32 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <imammedo@redhat.com>) id 1duwK2-0000DL-QM
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 03:55:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57544)
+	(envelope-from <imammedo@redhat.com>) id 1duwT8-0007g3-7z
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:04:26 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38006)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1duwK2-0000Ch-H6
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 03:54:58 -0400
-Date: Thu, 21 Sep 2017 09:54:45 +0200
+	(Exim 4.71) (envelope-from <imammedo@redhat.com>) id 1duwT8-0007f5-0r
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 04:04:22 -0400
+Date: Thu, 21 Sep 2017 10:04:06 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-Message-ID: <20170921095445.78b41837@nial.brq.redhat.com>
-In-Reply-To: <81826b6c-0b4b-0b06-b354-e07bded5b7cf@cn.fujitsu.com>
-References: <1505464398-28897-1-git-send-email-douly.fnst@cn.fujitsu.com>
-	<20170918110846.74476f91@nial.brq.redhat.com>
-	<857a7c4c-7593-2365-cee1-7d217be15817@cn.fujitsu.com>
-	<81826b6c-0b4b-0b06-b354-e07bded5b7cf@cn.fujitsu.com>
+Message-ID: <20170921100406.11fbc2ed@nial.brq.redhat.com>
+In-Reply-To: <05454839-2216-ee27-1cce-7d9899563806@redhat.com>
+References: <1505811353-29151-1-git-send-email-thuth@redhat.com>
+	<84d1e5a0-141f-cd91-f62c-14fe58e73b4b@redhat.com>
+	<CAFEAcA_morPirUBzbpX1tHKfSCX+vAEcWX+KmUZKdnNm3O3vhA@mail.gmail.com>
+	<54a1ab1c-4da0-ded1-c225-f50d4756b773@redhat.com>
+	<99dd133d-239e-b53e-d258-7b1bde8639df@redhat.com>
+	<05454839-2216-ee27-1cce-7d9899563806@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] NUMA: Enable adding NUMA node
- implicitly
+Subject: Re: [Qemu-devel] [RFC PATCH] qdev: Mark devices as non-hotpluggable
+ by default
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,147 +32,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Dou Liyang <douly.fnst@cn.fujitsu.com>
-Cc: qemu-devel@nongnu.org, Thomas Huth <thuth@redhat.com>, Takao Indoh <indou.takao@jp.fujitsu.com>, Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Izumi Taku <izumi.taku@jp.fujitsu.com>, David Hildenbrand <david@redhat.com>, f4bug@amsat.org, Alistair Francis <alistair23@gmail.com>, Marcel Apfelbaum <marcel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Marcel Apfelbaum <marcel@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Eduardo Habkost <ehabkost@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, David Hildenbrand <david@redhat.com>
 
-On Thu, 21 Sep 2017 12:19:17 +0800
-Dou Liyang <douly.fnst@cn.fujitsu.com> wrote:
+On Wed, 20 Sep 2017 18:10:48 +0200
+Thomas Huth <thuth@redhat.com> wrote:
 
-> Hi Igor,
-> 
-> I am sorry I missed some comments you gave to me.
-> 
-> my reply is below.
-> At 09/18/2017 05:24 PM, Dou Liyang wrote:
+> On 20.09.2017 13:17, Thomas Huth wrote:
+> > On 20.09.2017 12:57, Marcel Apfelbaum wrote:  
+> >> On 20/09/2017 13:07, Peter Maydell wrote:  
 > [...]
-> >>> ranges where
-> >>>   *    the guest will attempt to probe for a device that QEMU doesn't
-> >>>   *    implement and a stub device is required.
-> >>> + * @numa_implicit_add_node0:
-> >>> + *    Enable NUMA implicitly by add a NUMA node.  
-> >> how about:
-> >> s/auto_enable_numa_with_memhp/  
-> 
-> Yes, really better than me, will do it.
-> 
-> >> boolean instead, see below how it could improve patch.
-> >>  
-> 
-> I am not really sure why do we want to make this function boolean.
-> 
-> >>>   */
-> >>>  struct MachineClass {
-> >>>      /*< private >*/
-> >>> @@ -191,6 +193,8 @@ struct MachineClass {
-> >>>      CpuInstanceProperties
-> >>> (*cpu_index_to_instance_props)(MachineState *machine,
-> >>>                                                           unsigned
-> >>> cpu_index);
-> >>>      const CPUArchIdList *(*possible_cpu_arch_ids)(MachineState
-> >>> *machine);
-> >>> +
-> >>> +    void (*numa_implicit_add_node0)(void);
-> >>>  };
-> >>>
-> >>>  /**
-> >>> diff --git a/vl.c b/vl.c
-> >>> index fb1f05b..814a5fa 100644
-> >>> --- a/vl.c
-> >>> +++ b/vl.c
-> >>> @@ -3030,6 +3030,7 @@ int main(int argc, char **argv, char **envp)
-> >>>      Error *main_loop_err = NULL;
-> >>>      Error *err = NULL;
-> >>>      bool list_data_dirs = false;
-> >>> +    bool has_numa_config_in_CLI = false;
-> >>>      typedef struct BlockdevOptions_queue {
-> >>>          BlockdevOptions *bdo;
-> >>>          Location loc;
-> >>> @@ -3293,6 +3294,7 @@ int main(int argc, char **argv, char **envp)
-> >>>                  if (!opts) {
-> >>>                      exit(1);
-> >>>                  }
-> >>> +                has_numa_config_in_CLI = true;
-> >>>                  break;
-> >>>              case QEMU_OPTION_display:
-> >>>                  display_type = select_display(optarg);
-> >>> @@ -4585,6 +4587,18 @@ int main(int argc, char **argv, char **envp)
-> >>>      default_drive(default_floppy, snapshot, IF_FLOPPY, 0, FD_OPTS);
-> >>>      default_drive(default_sdcard, snapshot, IF_SD, 0, SD_OPTS);
-> >>>
-> >>> +    /*
-> >>> +     * If memory hotplug is enabled i.e. slots > 0 and user hasn't add
-> >>> +     * NUMA nodes explicitly on CLI
-> >>> +     *
-> >>> +     * Enable NUMA implicitly for guest to know the maximum memory
-> >>> +     * from ACPI SRAT table, which is used for SWIOTLB.
-> >>> +     */
-> >>> +    if (ram_slots > 0 && !has_numa_config_in_CLI) {
-> >>> +        if (machine_class->numa_implicit_add_node0) {
-> >>> +            machine_class->numa_implicit_add_node0();
-> >>> +        }
-> >>> +    }
-> >>>      parse_numa_opts(current_machine);  
-> >> it would be better to put this logic inside of parse_numa_opts()
-> >> I'd suggest to move:
+> >>> Is it possible to hack together some kind of test code that
+> >>> can give us a list of the devices compiled in that have
+> >>> hotpluggable enabled? Then we could compare before and
+> >>> after to see which devices we've changed.
+> >>>  
 > >>
-> >>     current_machine->ram_size = ram_size;
-> >>     current_machine->maxram_size = maxram_size;
-> >>     current_machine->ram_slots = ram_slots;
-> >>
-> >> before parse_numa_opts() is called, and then
-> >> handle 'memhp present+no numa on CLI" logic inside of
-> >> parse_numa_opts(). With this you won't have to track
-> >> 'has_numa_config_in_CLI', drop callback numa_implicit_add_node0()
-> >> and numa nuances would be in place they are supposed to be: numa.c
-> >>  
+> >> Eduardo came up with some cool automated tests not long ago.
+> >> Eduardo, can your tests help?  
+> > 
+> > You mean the scripts/device-crash-test script? That's only for
+> > cold-plugging ... but I could maybe use the device_add HMP test (see
+> > https://lists.gnu.org/archive/html/qemu-devel/2017-09/msg00817.html ) to
+> > exercise the hotplugging of all devices and add some debug code to
+> > qdev_device_add() to see which devices are dc->hotpluggable and have a
+> > hotplug handler at the same time... I'll give it a try.  
 > 
-> Is "dropping the callback..." means :
-> 
->      static void auto_enable_numa_with_memhp(QemuOptsList *list)
->      {
->          ...
->      }
-> 
->      void parse_numa_opts(MachineState *ms, uint64_t ram_slots)
->      {
->          QemuOptsList *numa_opts = qemu_find_opts("numa");
->          ...
->          auto_enable_numa_with_memhp(numa_opts);
->          ...
->      }
-> 
-> So, No matter what arch it is, if it support NUMA, we will enable NUMA
-> implicitly when it has already enabled memory hotplug by 
-> "slot=xx,maxmem=xx" CLI explicitly.
-> 
-> I am not sure that, but this bug only affects x86 as I know, seems no
-> need to affect other arches which support NUMA as well.
+> Ok, done that now, and it looks like I missed devices of type
+> TYPE_X86_CPU and TYPE_S390_CPU at least... Unlike the ppc64 CPUs, they
+> are not derived from TYPE_CPU_CORE, but from TYPE_CPU ... is that on
+> purpose? I thought hot-pluggable CPUs would need to be derived from
+> TYPE_CPU_CORE... well, maybe I just understood that wrong.
+> I'll send a new version of my patch.
+cpu hotplug on x86 existed before ppc started to support it and
+hotplug is done at thread level there. core was introduced later
+for ppc as guest expects hotplugged cpu in core granularity.
 
-I've meant something like that:
+So as you noticed some leaf CPU types are indeed hotpluggble.
 
-parse_numa_opts() {
-    if (mc->auto_enable_numa_with_memhp == true) {
-        qemu_opts_parse_noisily(qemu_find_opts("numa"), "node", true);
-    }
-}
-
-where x86 sets mc->auto_enable_numa_with_memhp to true by default
-and sets it to false for 2.10 and older machine types.
-It will allow individual machines to enable feature if they need it
-but prevent guest ABI breakage for old machine types
-(i.e. won't break migration)
-
-grep source for 'pcmc->legacy_cpu_hotplug = true' to see how
-this compat stuff works.
 
 > 
-> Thanks,
-> 	dou.
-> >>>
-> >>>      if (qemu_opts_foreach(qemu_find_opts("mon"),  
-> >>
-> >>
-> >>
-> >>  
-> 
-> 
+>  Thomas
