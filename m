@@ -1,19 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:33350)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:34026)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1duuiC-0005AP-Uc
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:11:50 -0400
+	(envelope-from <peterx@redhat.com>) id 1duukF-0005qK-Du
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:13:56 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sundeep.lkml@gmail.com>) id 1duuiB-0006B2-6n
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:11:48 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170920201737.25723-1-f4bug@amsat.org>
-References: <20170920201737.25723-1-f4bug@amsat.org>
-From: sundeep subbaraya <sundeep.lkml@gmail.com>
-Date: Thu, 21 Sep 2017 11:41:44 +0530
-Message-ID: <CALHRZupkDOR0ztSZ8xiiq0jo8uCNsth26s==iJnG2Zff=_MT1Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH v11 0/5] Add support for Smartfusion2 SoC
+	(envelope-from <peterx@redhat.com>) id 1duukA-0007dY-1i
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:13:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:36842)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1duuk9-0007cl-SA
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 02:13:49 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+	[10.5.11.15])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx1.redhat.com (Postfix) with ESMTPS id BE4F2356D6
+	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 06:13:48 +0000 (UTC)
+From: Peter Xu <peterx@redhat.com>
+Date: Thu, 21 Sep 2017 14:13:30 +0800
+Message-Id: <1505974414-6033-1-git-send-email-peterx@redhat.com>
+Subject: [Qemu-devel] [PATCH 0/4] chardev: support non-default gcontext
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -22,153 +27,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Alistair Francis <alistair@alistair23.me>, Peter Crosthwaite <crosthwaite.peter@gmail.com>, Igor Mammedov <imammedo@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, qemu-arm <qemu-arm@nongnu.org>
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Juan Quintela <quintela@redhat.com>, peterx@redhat.com, Eric Blake <eblake@redhat.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>, "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 
-Thanks Philippe :)
+The old chardev may not fully support non-default GMainContext.  One
+direct clue is that when we call io_add_watch_poll() sometimes we are
+still passing in the NULL context pointer.
 
-Sundeep
+IIUC we are fine during setup since the context will be passed
+correctly during setup via chr_update_read_handler().  However it
+won't survive if chardev reconnected due to some reason.
 
-On Thu, Sep 21, 2017 at 1:47 AM, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg>
-wrote:
+This series tries to solve above problem by caching the gcontext
+pointer in Chardev itself.
 
-> Hi Peter,
->
-> Now than Igor's patch landed, I respin Sundeep's series updating it to wo=
-rk
-> after the "arm: drop intermediate cpu_model -> cpu type parsing and use c=
-pu
-> type directly" patch.
->
-> v11:
-> - msf2-soc.c: add a check for null m3clk
-> - msf2-soc.c, msf2-som.c: drop cpu_model to directly use cpu type
->
-> --
->
-> Sundeep original cover:
->
-> I am trying to add Smartfusion2 SoC.
-> SoC is from Microsemi and System on Module(SOM)
-> board is from Emcraft systems. Smartfusion2 has hardened
-> Microcontroller(Cortex-M3)based Sub System and FPGA fabric.
-> At the moment only system timer, sysreg and SPI
-> controller are modelled.
->
-> Testing:
-> ./arm-softmmu/qemu-system-arm -M emcraft-sf2 -serial mon:stdio \
-> -kernel u-boot.bin -display none -drive file=3Dspi.bin,if=3Dmtd,format=3D=
-raw
->
-> Binaries u-boot.bin and spi.bin are at:
-> https://github.com/Subbaraya-Sundeep/qemu-test-binaries.git
->
-> U-boot is from Emcraft with modified
->     - SPI driver not to use PDMA.
->     - ugly hack to pass dtb to kernel in r1.
-> @
-> https://github.com/Subbaraya-Sundeep/emcraft-uboot-sf2.git
->
-> Linux is 4.5 linux with Smartfusion2 SoC dts and clocksource
-> driver added by myself @
-> https://github.com/Subbaraya-Sundeep/linux.git
->
-> v10:
->     Added msf2_sysreg_realize in msf2-sysreg.c
->     modified unimplemented devices names:
->         pdma->dma and hpdma->hs-dma
->     used uint8_t for apb divisors properties
->     simplified msf2_divbits() using ctz32()
->
-> v9:
->     used trace instead of DB_PRINT in msf2-sysreg.c
->     used LOG_UNIMP for non guest errors in msf2-sysreg.c
->     added unimplemented devices in msf2-soc.c
->     removed .alias suffix in alias memory region name for eNVM
->     removed mc->ignore_memory_transaction_failures in msf2-som.c
->
-> v8:
->     memory_region_init_ram to memory_region_init_rom in soc
->     %s/emcraft_sf2_init/emcraft_sf2_s2s010_init/g in som
->     Added mc->ignore_memory_transaction_failures =3D true in som
->         as per latest commit.
->     Code simplifications as suggested by Alistair in sysreg and ssi.
->
-> v7:
->     Removed vmstate_register_ram_global as per latest commit
->     Moved header files to C which are local to C source files
->     Removed abort() from msf2-sysreg.c
->     Added VMStateDescription in mss-timer.c
->
-> v6:
->     Moved some defines from header files to source files
->     Added properties m3clk, apb0div, apb0div1 properties
->     to soc.
->     Added properties apb0divisor, apb1divisor to sysreg
->     Update system_clock_source in msf2-soc.c
->     Changed machine name smartfusion2-som->emcraft-sf2
->
-> v5
->     As per Philippe comments:
->         Added abort in Sysreg if guest tries to remap memory
->         other than default mapping.
->         Use of CONFIG_MSF2 in Makefile for soc.c
->         Fixed incorrect logic in timer model.
->         Renamed msf2-timer.c -> mss-timer.c
->                 msf2-spi.c -> mss-spi.c also type names
->         Renamed function msf2_init->emcraft_sf2_init in msf2-som.c
->         Added part-name,eNVM-size,eSRAM-size,pclk0 and pclk1
->             properties to soc.
->         Pass soc part-name,memory size and clock rate properties from som=
-.
-> v4:
->     Fixed build failure by using PRIx macros.
-> v3:
->     Added SoC file and board file as per Alistair comments.
-> v2:
->     Added SPI controller so that u-boot loads kernel from spi flash.
-> v1:
->     Initial patch set with timer and sysreg
->
-> Thanks,
-> Sundeep
->
-> Subbaraya Sundeep (5):
->   msf2: Add Smartfusion2 System timer
->   msf2: Microsemi Smartfusion2 System Register block
->   msf2: Add Smartfusion2 SPI controller
->   msf2: Add Smartfusion2 SoC
->   msf2: Add Emcraft's Smartfusion2 SOM kit
->
->  default-configs/arm-softmmu.mak |   1 +
->  include/hw/arm/msf2-soc.h       |  67 +++++++
->  include/hw/misc/msf2-sysreg.h   |  77 ++++++++
->  include/hw/ssi/mss-spi.h        |  58 ++++++
->  include/hw/timer/mss-timer.h    |  64 +++++++
->  hw/arm/msf2-soc.c               | 238 +++++++++++++++++++++++
->  hw/arm/msf2-som.c               | 105 +++++++++++
->  hw/misc/msf2-sysreg.c           | 160 ++++++++++++++++
->  hw/ssi/mss-spi.c                | 404 ++++++++++++++++++++++++++++++
-> ++++++++++
->  hw/timer/mss-timer.c            | 289 ++++++++++++++++++++++++++++
->  hw/arm/Makefile.objs            |   1 +
->  hw/misc/Makefile.objs           |   1 +
->  hw/misc/trace-events            |   5 +
->  hw/ssi/Makefile.objs            |   1 +
->  hw/timer/Makefile.objs          |   1 +
->  15 files changed, 1472 insertions(+)
->  create mode 100644 include/hw/arm/msf2-soc.h
->  create mode 100644 include/hw/misc/msf2-sysreg.h
->  create mode 100644 include/hw/ssi/mss-spi.h
->  create mode 100644 include/hw/timer/mss-timer.h
->  create mode 100644 hw/arm/msf2-soc.c
->  create mode 100644 hw/arm/msf2-som.c
->  create mode 100644 hw/misc/msf2-sysreg.c
->  create mode 100644 hw/ssi/mss-spi.c
->  create mode 100644 hw/timer/mss-timer.c
->
-> --
-> 2.14.1
->
->
+This will be required for the monitor OOB (out-of-band) support, since
+in that series monitor backends may be run in non-default contexts.
+
+Please review.  Thanks.
+
+Peter Xu (4):
+  chardev: new qemu_chr_be_update_read_handlers()
+  chardev: add Chardev.gcontext field
+  chardev: use per-dev context for io_add_watch_poll
+  chardev: remove context in chr_update_read_handler
+
+ chardev/char-fd.c      |  5 ++---
+ chardev/char-fe.c      |  7 ++-----
+ chardev/char-pty.c     |  5 ++---
+ chardev/char-socket.c  |  7 +++----
+ chardev/char-udp.c     |  5 ++---
+ chardev/char.c         | 11 +++++++++++
+ include/chardev/char.h | 13 ++++++++++++-
+ 7 files changed, 34 insertions(+), 19 deletions(-)
+
+-- 
+2.7.4
