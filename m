@@ -1,20 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38511)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38589)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1dv0EY-0000qv-Et
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:05:40 -0400
+	(envelope-from <mtosatti@redhat.com>) id 1dv0Ej-0000y5-MX
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:05:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mtosatti@redhat.com>) id 1dv0EU-0007cV-GT
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:05:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:46594)
+	(envelope-from <mtosatti@redhat.com>) id 1dv0Ed-0007ev-Hq
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:05:45 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50414)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1dv0EU-0007cD-9t
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:05:30 -0400
-Message-Id: <20170921120415.155548393@redhat.com>
-Date: Thu, 21 Sep 2017 09:03:42 -0300
+	(Exim 4.71) (envelope-from <mtosatti@redhat.com>) id 1dv0Ed-0007eY-3P
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:05:39 -0400
+Message-Id: <20170921120415.241151389@redhat.com>
+Date: Thu, 21 Sep 2017 09:03:43 -0300
 From: Marcelo Tosatti <mtosatti@redhat.com>
 References: <20170921120341.590850215@redhat.com>
-Content-Disposition: inline; filename=sync-linux-headers
-Subject: [Qemu-devel] [patch 1/2] qemu: sync linux-headers with KVM
+Content-Disposition: inline; filename=qemu-toggle-kvmrt-prio
+Subject: [Qemu-devel] [patch 2/2] qemu: kvm: support RT_PRIO_HC hypercall
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,62 +26,101 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: kvm@vger.kernel.org, qemu-devel@nongnu.org
 Cc: Marcelo Tosatti <mtosatti@redhat.com>
 
+Add the following CPU options:
+
+allow-rt-prio-hc: allow guest to execute hypercall to change vcpu 
+thread priority.
+
+rt-prio: SCHED_FIFO priority to be used when that hypercall is invoked.
+
+See kernel patchset for details about this hypercall.
+
 Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
 
-Index: qemu-fifoprio/linux-headers/linux/kvm.h
+---
+ target/i386/cpu.c |    2 ++
+ target/i386/cpu.h |    4 ++++
+ target/i386/kvm.c |   23 +++++++++++++++++++++++
+ 3 files changed, 29 insertions(+)
+
+Index: qemu-fifoprio/target/i386/cpu.c
 ===================================================================
---- qemu-fifoprio.orig/linux-headers/linux/kvm.h
-+++ qemu-fifoprio/linux-headers/linux/kvm.h
-@@ -929,6 +929,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_PPC_SMT_POSSIBLE 147
- #define KVM_CAP_HYPERV_SYNIC2 148
- #define KVM_CAP_HYPERV_VP_INDEX 149
-+#define KVM_CAP_VCPU_RT_PRIO_HC 150
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -1355,6 +1356,8 @@ struct kvm_s390_ucas_mapping {
- /* Available with KVM_CAP_S390_CMMA_MIGRATION */
- #define KVM_S390_GET_CMMA_BITS      _IOWR(KVMIO, 0xb8, struct kvm_s390_cmma_log)
- #define KVM_S390_SET_CMMA_BITS      _IOW(KVMIO, 0xb9, struct kvm_s390_cmma_log)
-+/* Available with KVM_CAP_VCPU_RT_PRIO_HC */
-+#define KVM_SET_VCPU_RT_PRIO_HC	_IOW(KVMIO, 0xba, struct kvm_vcpu_rt_prio)
- 
- #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
- #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
-Index: qemu-fifoprio/linux-headers/asm-x86/kvm.h
-===================================================================
---- qemu-fifoprio.orig/linux-headers/asm-x86/kvm.h
-+++ qemu-fifoprio/linux-headers/asm-x86/kvm.h
-@@ -353,6 +353,11 @@ struct kvm_xcrs {
- 	__u64 padding[16];
+--- qemu-fifoprio.orig/target/i386/cpu.c
++++ qemu-fifoprio/target/i386/cpu.c
+@@ -4106,6 +4106,8 @@ static Property x86_cpu_properties[] = {
+                      false),
+     DEFINE_PROP_BOOL("vmware-cpuid-freq", X86CPU, vmware_cpuid_freq, true),
+     DEFINE_PROP_BOOL("tcg-cpuid", X86CPU, expose_tcg, true),
++    DEFINE_PROP_BOOL("allow-rt-prio-hc", X86CPU, allow_rt_prio_hc, false),
++    DEFINE_PROP_UINT32("rt-prio", X86CPU, rt_prio_hc, 0),
+     DEFINE_PROP_END_OF_LIST()
  };
  
-+struct kvm_vcpu_rt_prio {
-+	__u32 enabled;
-+	__u32 sched_priority;
-+};
+Index: qemu-fifoprio/target/i386/cpu.h
+===================================================================
+--- qemu-fifoprio.orig/target/i386/cpu.h
++++ qemu-fifoprio/target/i386/cpu.h
+@@ -1215,6 +1215,7 @@ struct X86CPU {
+     bool hyperv_runtime;
+     bool hyperv_synic;
+     bool hyperv_stimer;
++    bool allow_rt_prio_hc;
+     bool check_cpuid;
+     bool enforce_cpuid;
+     bool expose_kvm;
+@@ -1270,6 +1271,9 @@ struct X86CPU {
+     /* Number of physical address bits supported */
+     uint32_t phys_bits;
+ 
++    /* RT priority of VCPU thread, when hypercall is invoked by guest */
++    uint32_t rt_prio_hc;
 +
- /* definition of registers in kvm_run */
- struct kvm_sync_regs {
- };
-Index: qemu-fifoprio/linux-headers/linux/kvm_para.h
+     /* in order to simplify APIC support, we leave this pointer to the
+        user */
+     struct DeviceState *apic_state;
+Index: qemu-fifoprio/target/i386/kvm.c
 ===================================================================
---- qemu-fifoprio.orig/linux-headers/linux/kvm_para.h
-+++ qemu-fifoprio/linux-headers/linux/kvm_para.h
-@@ -15,6 +15,7 @@
- #define KVM_E2BIG		E2BIG
- #define KVM_EPERM		EPERM
- #define KVM_EOPNOTSUPP		95
-+#define KVM_EINVAL		EINVAL
+--- qemu-fifoprio.orig/target/i386/kvm.c
++++ qemu-fifoprio/target/i386/kvm.c
+@@ -673,6 +673,28 @@ static int hyperv_handle_properties(CPUS
  
- #define KVM_HC_VAPIC_POLL_IRQ		1
- #define KVM_HC_MMU_OP			2
-@@ -25,6 +26,7 @@
- #define KVM_HC_MIPS_EXIT_VM		7
- #define KVM_HC_MIPS_CONSOLE_OUTPUT	8
- #define KVM_HC_CLOCK_PAIRING		9
-+#define KVM_HC_RT_PRIO			10
+ static Error *invtsc_mig_blocker;
  
- /*
-  * hypercalls use architecture specific
++static int enable_allow_rt_prio_hc(CPUState *cs)
++{
++    int ret;
++    struct kvm_vcpu_rt_prio rt_prio;
++    X86CPU *cpu = X86_CPU(cs);
++
++    if (!kvm_check_extension(kvm_state, KVM_CAP_VCPU_RT_PRIO_HC)) {
++        fprintf(stderr, "RT prio hypercall not supported by kernel\n");
++        return -ENOSYS;
++    }
++
++    rt_prio.sched_priority = cpu->rt_prio_hc;
++    rt_prio.enabled = 1;
++
++    ret = kvm_vcpu_ioctl(cs, KVM_ENABLE_VCPU_RT_PRIO_HC, &rt_prio);
++    if (ret) {
++        fprintf(stderr, "RT prio hypercall failed, ret=%d\n", ret);
++    }
++
++    return ret;
++}
++
+ #define KVM_MAX_CPUID_ENTRIES  100
+ 
+ int kvm_arch_init_vcpu(CPUState *cs)
+@@ -758,6 +780,12 @@ int kvm_arch_init_vcpu(CPUState *cs)
+         has_msr_hv_hypercall = true;
+     }
+ 
++    if (cpu->allow_rt_prio_hc) {
++        if (enable_allow_rt_prio_hc(cs)) {
++            abort();
++        }
++    }
++
+     if (cpu->expose_kvm) {
+         memcpy(signature, "KVMKVMKVM\0\0\0", 12);
+         c = &cpuid_data.entries[cpuid_i++];
