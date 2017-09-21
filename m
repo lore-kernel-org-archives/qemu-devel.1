@@ -1,23 +1,14 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39122)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39479)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1duyKr-0001C8-22
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:04:02 -0400
+	(envelope-from <frederic.konrad@adacore.com>) id 1duyM1-0001x9-IA
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:05:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <mlureau@redhat.com>) id 1duyKn-00058l-Qx
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:03:57 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34464)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <mlureau@redhat.com>) id 1duyKn-0004zx-Kt
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:03:53 -0400
-Date: Thu, 21 Sep 2017 06:03:47 -0400 (EDT)
-From: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
-Message-ID: <840800224.19387835.1505988227572.JavaMail.zimbra@redhat.com>
-In-Reply-To: <1505933586-11296-1-git-send-email-felipe@nutanix.com>
-References: <1505933586-11296-1-git-send-email-felipe@nutanix.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PATCH] virtio/vhost: reset dev->log after syncing
+	(envelope-from <frederic.konrad@adacore.com>) id 1duyLs-0006Rb-3b
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 06:05:09 -0400
+From: KONRAD Frederic <frederic.konrad@adacore.com>
+Date: Thu, 21 Sep 2017 12:04:20 +0200
+Message-Id: <1505988260-8483-1-git-send-email-frederic.konrad@adacore.com>
+Subject: [Qemu-devel] [PATCH] memory: avoid a name clash with access macro
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,58 +17,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Felipe Franciosi <felipe@nutanix.com>
-Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+To: qemu-devel@nongnu.org
+Cc: qemu-trivial@nongnu.org, pbonzini@redhat.com, frederic.konrad@adacore.com
 
+This avoids a name clash with the access macro on windows 64:
 
+make
+	CHK version_gen.h
+  CC      aarch64-softmmu/memory.o
+/home/konrad/qemu/memory.c: In function 'access_with_adjusted_size':
+/home/konrad/qemu/memory.c:591:73: error: macro "access" passed 7 arguments, \
+                         but takes just 2
+                         (size - access_size - i) * 8, access_mask, attrs);
+                                                                         ^
 
------ Original Message -----
-> vhost_log_put() is called to decomission the dirty log between qemu and
-> a vhost device when stopping the device. Such a call can happen from
-> migration_completion().
->=20
-> Present code sets dev->log_size to zero too early in vhost_log_put(),
-> causing the sync check to always return false. As a consequence, the
-> last pass on the dirty bitmap never happens at the end of migration.
->=20
-> If a vhost device was busy (writing to guest memory) until the last
-> moments before vhost_virtqueue_stop(), this error will result in guest
-> memory corruption (at least) following migrations.
->=20
-> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+Signed-off-by: KONRAD Frederic <frederic.konrad@adacore.com>
+---
+ memory.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-> ---
->  hw/virtio/vhost.c |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 5fd69f0..ddc42f0 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -375,8 +375,6 @@ static void vhost_log_put(struct vhost_dev *dev, bool
-> sync)
->      if (!log) {
->          return;
->      }
-> -    dev->log =3D NULL;
-> -    dev->log_size =3D 0;
-> =20
->      --log->refcnt;
->      if (log->refcnt =3D=3D 0) {
-> @@ -396,6 +394,9 @@ static void vhost_log_put(struct vhost_dev *dev, bool
-> sync)
-> =20
->          g_free(log);
->      }
-> +
-> +    dev->log =3D NULL;
-> +    dev->log_size =3D 0;
->  }
-> =20
->  static bool vhost_dev_log_is_shared(struct vhost_dev *dev)
-> --
-> 1.7.1
->=20
->=20
+diff --git a/memory.c b/memory.c
+index b9920a6..2b90117 100644
+--- a/memory.c
++++ b/memory.c
+@@ -560,13 +560,14 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
+                                       unsigned size,
+                                       unsigned access_size_min,
+                                       unsigned access_size_max,
+-                                      MemTxResult (*access)(MemoryRegion *mr,
+-                                                            hwaddr addr,
+-                                                            uint64_t *value,
+-                                                            unsigned size,
+-                                                            unsigned shift,
+-                                                            uint64_t mask,
+-                                                            MemTxAttrs attrs),
++                                      MemTxResult (*access_fn)
++                                                  (MemoryRegion *mr,
++                                                   hwaddr addr,
++                                                   uint64_t *value,
++                                                   unsigned size,
++                                                   unsigned shift,
++                                                   uint64_t mask,
++                                                   MemTxAttrs attrs),
+                                       MemoryRegion *mr,
+                                       MemTxAttrs attrs)
+ {
+@@ -587,12 +588,12 @@ static MemTxResult access_with_adjusted_size(hwaddr addr,
+     access_mask = -1ULL >> (64 - access_size * 8);
+     if (memory_region_big_endian(mr)) {
+         for (i = 0; i < size; i += access_size) {
+-            r |= access(mr, addr + i, value, access_size,
++            r |= access_fn(mr, addr + i, value, access_size,
+                         (size - access_size - i) * 8, access_mask, attrs);
+         }
+     } else {
+         for (i = 0; i < size; i += access_size) {
+-            r |= access(mr, addr + i, value, access_size, i * 8,
++            r |= access_fn(mr, addr + i, value, access_size, i * 8,
+                         access_mask, attrs);
+         }
+     }
+-- 
+1.8.3.1
