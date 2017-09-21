@@ -1,18 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47888)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:51487)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1duqRh-0003ca-EC
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 21:38:32 -0400
+	(envelope-from <jasowang@redhat.com>) id 1duqb5-00062S-67
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 21:48:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jsnow@redhat.com>) id 1duqRe-0006yD-Ag
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 21:38:29 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34634)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jsnow@redhat.com>) id 1duqRe-0006xP-5I
-	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 21:38:26 -0400
-From: John Snow <jsnow@redhat.com>
-Date: Wed, 20 Sep 2017 21:38:21 -0400
-Message-Id: <20170921013821.1673-1-jsnow@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] ide: fix enum comparison for gcc 4.7
+	(envelope-from <jasowang@redhat.com>) id 1duqb2-0005GG-3D
+	for qemu-devel@nongnu.org; Wed, 20 Sep 2017 21:48:11 -0400
+References: <1505933586-11296-1-git-send-email-felipe@nutanix.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <6f116856-b587-78fe-ca45-bf970441c422@redhat.com>
+Date: Thu, 21 Sep 2017 09:47:46 +0800
+MIME-Version: 1.0
+In-Reply-To: <1505933586-11296-1-git-send-email-felipe@nutanix.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] virtio/vhost: reset dev->log after syncing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,64 +23,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: peter.maydell@linaro.org, mark.cave-ayland@ilande.co.uk, John Snow <jsnow@redhat.com>
+To: Felipe Franciosi <felipe@nutanix.com>, Marc-Andre Lureau <marcandre.lureau@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org, qemu-stable@nongnu.org
 
-Apparently GCC gets bent over comparing enum values against zero.
-Replace the conditional with something less readable.
 
-Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: John Snow <jsnow@redhat.com>
 
----
+On 2017=E5=B9=B409=E6=9C=8821=E6=97=A5 02:53, Felipe Franciosi wrote:
+> vhost_log_put() is called to decomission the dirty log between qemu and
+> a vhost device when stopping the device. Such a call can happen from
+> migration_completion().
+>
+> Present code sets dev->log_size to zero too early in vhost_log_put(),
+> causing the sync check to always return false. As a consequence, the
+> last pass on the dirty bitmap never happens at the end of migration.
+>
+> If a vhost device was busy (writing to guest memory) until the last
+> moments before vhost_virtqueue_stop(), this error will result in guest
+> memory corruption (at least) following migrations.
+>
+> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+> ---
+>   hw/virtio/vhost.c |    5 +++--
+>   1 files changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> index 5fd69f0..ddc42f0 100644
+> --- a/hw/virtio/vhost.c
+> +++ b/hw/virtio/vhost.c
+> @@ -375,8 +375,6 @@ static void vhost_log_put(struct vhost_dev *dev, bo=
+ol sync)
+>       if (!log) {
+>           return;
+>       }
+> -    dev->log =3D NULL;
+> -    dev->log_size =3D 0;
+>  =20
+>       --log->refcnt;
+>       if (log->refcnt =3D=3D 0) {
+> @@ -396,6 +394,9 @@ static void vhost_log_put(struct vhost_dev *dev, bo=
+ol sync)
+>  =20
+>           g_free(log);
+>       }
+> +
+> +    dev->log =3D NULL;
+> +    dev->log_size =3D 0;
+>   }
+>  =20
+>   static bool vhost_dev_log_is_shared(struct vhost_dev *dev)
 
-v2: Second verse, same as the first.
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- hw/ide/ahci.c             | 2 +-
- hw/ide/core.c             | 2 +-
- include/hw/ide/internal.h | 3 +--
- 3 files changed, 3 insertions(+), 4 deletions(-)
+Cc: qemu-stable@nongnu.org
 
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index 24c65df..32d1296 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -184,7 +184,7 @@ static void ahci_check_irq(AHCIState *s)
- static void ahci_trigger_irq(AHCIState *s, AHCIDevice *d,
-                              enum AHCIPortIRQ irqbit)
- {
--    g_assert(irqbit >= 0 && irqbit < 32);
-+    g_assert((unsigned)irqbit < 32);
-     uint32_t irq = 1U << irqbit;
-     uint32_t irqstat = d->port_regs.irq_stat | irq;
- 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index a19bd90..d63eb4a 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -68,7 +68,7 @@ const char *IDE_DMA_CMD_lookup[IDE_DMA__COUNT] = {
- 
- static const char *IDE_DMA_CMD_str(enum ide_dma_cmd enval)
- {
--    if (enval >= IDE_DMA__BEGIN && enval < IDE_DMA__COUNT) {
-+    if ((unsigned)enval < IDE_DMA__COUNT) {
-         return IDE_DMA_CMD_lookup[enval];
-     }
-     return "DMA UNKNOWN CMD";
-diff --git a/include/hw/ide/internal.h b/include/hw/ide/internal.h
-index 180e00e..e641012 100644
---- a/include/hw/ide/internal.h
-+++ b/include/hw/ide/internal.h
-@@ -333,8 +333,7 @@ struct unreported_events {
- };
- 
- enum ide_dma_cmd {
--    IDE_DMA__BEGIN = 0,
--    IDE_DMA_READ = IDE_DMA__BEGIN,
-+    IDE_DMA_READ = 0,
-     IDE_DMA_WRITE,
-     IDE_DMA_TRIM,
-     IDE_DMA_ATAPI,
--- 
-2.9.5
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks
