@@ -1,26 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45130)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:45419)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dv0fi-0005aR-7z
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:33:39 -0400
+	(envelope-from <david@redhat.com>) id 1dv0gq-0006T6-Cu
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:34:49 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dv0ff-0001sC-2O
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:33:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51484)
+	(envelope-from <david@redhat.com>) id 1dv0gn-0002ag-3n
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:34:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:49172)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dv0fe-0001rY-Sh
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:33:35 -0400
-Date: Thu, 21 Sep 2017 13:33:27 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170921123326.GD2717@work-vm>
-References: <1505839684-10046-1-git-send-email-a.perevalov@samsung.com>
-	<CGME20170919164825eucas1p21fd133a55091e4a09fdeee05d130260d@eucas1p2.samsung.com>
-	<1505839684-10046-9-git-send-email-a.perevalov@samsung.com>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dv0gm-0002aP-Rt
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 08:34:45 -0400
+References: <1505991234-246759-1-git-send-email-imammedo@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <bf0ffdb7-d164-5947-cbaf-5a8aef58c1ef@redhat.com>
+Date: Thu, 21 Sep 2017 14:34:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1505839684-10046-9-git-send-email-a.perevalov@samsung.com>
-Subject: Re: [Qemu-devel] [PATCH v10 08/10] migration: postcopy_blocktime
- documentation
+In-Reply-To: <1505991234-246759-1-git-send-email-imammedo@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] s390x: use generic cpu_model parsing
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,46 +27,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Alexey Perevalov <a.perevalov@samsung.com>
-Cc: qemu-devel@nongnu.org, i.maximets@samsung.com, peterx@redhat.com, eblake@redhat.com, quintela@redhat.com, heetae82.ahn@samsung.com
+To: Igor Mammedov <imammedo@redhat.com>, qemu-devel@nongnu.org
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cohuck@redhat.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
 
-* Alexey Perevalov (a.perevalov@samsung.com) wrote:
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Signed-off-by: Alexey Perevalov <a.perevalov@samsung.com>
-
-Although it does have my R-b it might be worth adding some clarification
-that it's a measure of when *all* cpus are blocked and so isn't a 
-total measure of impact of postcopy (when blocking some of them).
-
-Dave
-
+On 21.09.2017 12:53, Igor Mammedov wrote:
+> define default CPU type in generic way in machine class_init
+> and let common machine code to handle cpu_model parsing.
+> 
+> Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 > ---
->  docs/devel/migration.txt | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/docs/devel/migration.txt b/docs/devel/migration.txt
-> index 1b940a8..4b625ca 100644
-> --- a/docs/devel/migration.txt
-> +++ b/docs/devel/migration.txt
-> @@ -402,6 +402,16 @@ will now cause the transition from precopy to postcopy.
->  It can be issued immediately after migration is started or any
->  time later on.  Issuing it after the end of a migration is harmless.
+> tested under TCG booting debian kernel,
+> and compile tested on s390 host
+
+Hotplugging checks (mixed CPU models) still seem to work fine.
+
+Also parameters get applied and the model name is properly parsed.
+
+>                       "supported by TCG (1) on s390x", max_cpus);
+> @@ -73,25 +66,8 @@ static void s390_init_cpus(MachineState *machine)
+>      /* initialize possible_cpus */
+>      mc->possible_cpu_arch_ids(machine);
 >  
-> +Blocktime is a postcopy live migration metric, intended to show
-> +how long the vCPU was in state of interruptable sleep due to pagefault.
-> +This value is calculated on destination side.
-> +To enable postcopy blocktime calculation, enter following command on destination
-> +monitor:
-> +
-> +migrate_set_capability postcopy-blocktime on
-> +
-> +Postcopy blocktime can be retrieved by query-migrate qmp command.
-> +
->  Note: During the postcopy phase, the bandwidth limits set using
->  migrate_set_speed is ignored (to avoid delaying requested pages that
->  the destination is waiting for).
-> -- 
-> 1.9.1
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+> -    model_pieces = g_strsplit(machine->cpu_model, ",", 2);
+> -    if (!model_pieces[0]) {
+> -        error_report("Invalid/empty CPU model name");
+> -        exit(1);
+> -    }
+> -
+> -    oc = cpu_class_by_name(TYPE_S390_CPU, model_pieces[0]);
+> -    if (!oc) {
+> -        error_report("Unable to find CPU definition: %s", model_pieces[0]);
+> -        exit(1);
+> -    }
+> -    typename = object_class_get_name(oc);
+> -    cc = CPU_CLASS(oc);
+> -    /* after parsing, properties will be applied to all *typename* instances */
+> -    cc->parse_features(typename, model_pieces[1], &error_fatal);
+> -    g_strfreev(model_pieces);
+> -
+>      for (i = 0; i < smp_cpus; i++) {
+> -        s390x_new_cpu(typename, i, &error_fatal);
+> +        s390x_new_cpu(machine->cpu_type, i, &error_fatal);
+>      }
+>  }
+>  
+> @@ -446,6 +422,9 @@ static void ccw_machine_class_init(ObjectClass *oc, void *data)
+>      mc->get_hotplug_handler = s390_get_hotplug_handler;
+>      mc->cpu_index_to_instance_props = s390_cpu_index_to_props;
+>      mc->possible_cpu_arch_ids = s390_possible_cpu_arch_ids;
+> +    /* it is overrriden with 'host' cpu type when accel=kvm
+
+s/overrriden/overridden/
+
+... with 'host' cpu *in kvm_arch_init*. ?
+
+> +     * i.e. when kvm_arch_init() is executed */
+> +    mc->default_cpu_type = S390_CPU_TYPE_NAME("qemu");
+>      hc->plug = s390_machine_device_plug;
+>      hc->unplug_request = s390_machine_device_unplug_request;
+>      nc->nmi_monitor_handler = s390_nmi;
+> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
+> index 5169379..0bf7e14 100644
+> --- a/target/s390x/cpu_models.c
+> +++ b/target/s390x/cpu_models.c
+> @@ -1207,9 +1207,6 @@ static void s390_qemu_cpu_model_class_init(ObjectClass *oc, void *data)
+>                                  qemu_hw_version());
+>  }
+
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+-- 
+
+Thanks,
+
+David
