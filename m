@@ -1,27 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56137)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49342)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1duszY-00067v-Ta
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 00:21:37 -0400
+	(envelope-from <aik@ozlabs.ru>) id 1dutwi-0005ru-J2
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 01:22:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peterx@redhat.com>) id 1duszV-0007m2-Ot
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 00:21:36 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58738)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <peterx@redhat.com>) id 1duszV-0007lO-JD
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 00:21:33 -0400
-Date: Thu, 21 Sep 2017 12:21:24 +0800
-From: Peter Xu <peterx@redhat.com>
-Message-ID: <20170921042124.GE30661@pxdev.xzpeter.org>
-References: <20170920104639.2335-1-quintela@redhat.com>
-	<87o9q5k348.fsf@secure.laptop>
-	<CAFEAcA_t3iBPr862YAv_Hp=_mESoqLJ07QFKp6QwKJ8P=tS+1Q@mail.gmail.com>
-	<20170921041039.GD30661@pxdev.xzpeter.org>
+	(envelope-from <aik@ozlabs.ru>) id 1dutwe-0007Ea-Kp
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 01:22:44 -0400
+Received: from mail-it0-x241.google.com ([2607:f8b0:4001:c0b::241]:36002)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <aik@ozlabs.ru>) id 1dutwe-0007E9-Bt
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 01:22:40 -0400
+Received: by mail-it0-x241.google.com with SMTP id e134so2474816ite.3
+	for <qemu-devel@nongnu.org>; Wed, 20 Sep 2017 22:22:39 -0700 (PDT)
+From: Alexey Kardashevskiy <aik@ozlabs.ru>
+References: <20170920114637.42004-1-aik@ozlabs.ru>
+	<20170920114637.42004-10-aik@ozlabs.ru>
+	<611f7d09-7c5d-20c4-9b9b-1c1f58525fb1@redhat.com>
+	<e9f654aa-ca37-b4fc-a4b9-e916d62a5847@ozlabs.ru>
+Message-ID: <97ce1385-01c9-1045-2791-494a14a86a78@ozlabs.ru>
+Date: Thu, 21 Sep 2017 15:22:33 +1000
 MIME-Version: 1.0
+In-Reply-To: <e9f654aa-ca37-b4fc-a4b9-e916d62a5847@ozlabs.ru>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170921041039.GD30661@pxdev.xzpeter.org>
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/16] Migration PULL request
+Content-Language: en-AU
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH qemu v4 09/18] memory: Store physical root
+ MR in FlatView
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,40 +33,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Juan Quintela <quintela@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <lvivier@redhat.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 
-On Thu, Sep 21, 2017 at 12:10:39PM +0800, Peter Xu wrote:
-> On Wed, Sep 20, 2017 at 08:32:46PM +0100, Peter Maydell wrote:
-> > On 20 September 2017 at 12:42, Juan Quintela <quintela@redhat.com> wr=
-ote:
-> > > Juan Quintela <quintela@redhat.com> wrote:
-> > >> Hi
-> > >>
-> > >> To make merges easier, this includes:
-> > >> - Peter Xu reviewed patches from Postocpy recovery (3)
-> > >> - Alexey reviewed pages from block postcopy (4)
-> > >
-> > > I meaned here to include Vladimir series.  This is incomplete.
-> > >
-> > > Nacked myself.
-> >=20
-> > It also fails to build on ppc64 and s390x (so probably
-> > all bigendian hosts):
-> >=20
-> > /home/pm215/qemu/util/bitmap.c: In function =E2=80=98bitmap_to_from_l=
-e=E2=80=99:
-> > /home/pm215/qemu/util/bitmap.c:383:6: error: "__WORD_SIZE" is not
-> > defined [-Werror=3Dundef]
-> >  # if __WORD_SIZE =3D=3D 64
-> >       ^
->=20
-> I'll look into this.  Thanks,
+On 21/09/17 10:02, Alexey Kardashevskiy wrote:
+> On 21/09/17 03:15, Paolo Bonzini wrote:
+>> On 20/09/2017 13:46, Alexey Kardashevskiy wrote:
+>>> Address spaces get to keep a root MR (alias or not) but FlatView stores
+>>> the actual MR as this is going to be used later on to decide whether to
+>>> share a particular FlatView or not.
+>>>
+>>> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>>> ---
+>>> Changes:
+>>> v4:
+>>> * s/memory_region_unalias_entire/memory_region_get_flatview_root/
+>>
+>> Did you try the idea of checking for single-child regions too?
+> 
+> No, I did not, I do not see how I can actually measure the difference - the
+> PCI and virtio root MRs or single child MRs are unique anyway, I can save
+> some time by just checking for 2 @enabled flags instead of rendering a
+> FlatView but rendering such cases itself is fast as well. I'll give a try
+> though.
 
-Oops... I think it should be __WORDSIZE (no "_" between "WORD" and
-"SIZE").  Sorry.
+I tried. memory_region_get_flatview_root() returns a last child which still
+covers the same space as the root; generate_memory_topology() checks for
+@enabled first and only if it is enabled - renders a new FV (this solves
+PCI busmater).
 
-Juan, do you want me to repost or you'd like to fix it directly?
+With 256 CPUs and 256 virtio devices this saves 0.1s (20.4s -> 20.3s) and
+100MB of RAM (14.38G -> 14.28G) :) I'll push it out anyway.
 
---=20
-Peter Xu
+
+-- 
+Alexey
