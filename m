@@ -1,26 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40763)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:41111)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dvUgN-0003VD-TO
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:36:21 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dvUhv-0004gd-33
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:37:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <eblake@redhat.com>) id 1dvUgK-0002vQ-P2
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:36:19 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49636)
+	(envelope-from <dgilbert@redhat.com>) id 1dvUhr-0003l0-V2
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:37:55 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47842)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <eblake@redhat.com>) id 1dvUgK-0002uy-Ex
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:36:16 -0400
-References: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
-	<cd46a9e9-4e9d-9ac8-53ed-34ba1b6f4dc0@redhat.com>
-	<9a3ce498-040d-5d8f-41d0-a2a649771528@virtuozzo.com>
-From: Eric Blake <eblake@redhat.com>
-Message-ID: <866e71c0-5d94-d9a2-d00b-3dd43319a1f8@redhat.com>
-Date: Fri, 22 Sep 2017 15:36:12 -0500
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dvUhr-0003kP-MH
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:37:51 -0400
+Date: Fri, 22 Sep 2017 21:37:44 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170922203744.GQ2620@work-vm>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-34-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9a3ce498-040d-5d8f-41d0-a2a649771528@virtuozzo.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="Ncid48hltjlXwuwpkgxM7FcxgdJnR9ABj"
-Subject: Re: [Qemu-devel] nbd structured reply
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1504081950-2528-34-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 33/33] migration: init dst in
+ migration_object_init too
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,105 +28,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>, nbd@other.debian.org
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---Ncid48hltjlXwuwpkgxM7FcxgdJnR9ABj
-From: Eric Blake <eblake@redhat.com>
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Wouter Verhelst <w@uter.be>, Alex Bligh <alex@alex.org.uk>
-Cc: qemu-devel <qemu-devel@nongnu.org>, nbd@other.debian.org
-Message-ID: <866e71c0-5d94-d9a2-d00b-3dd43319a1f8@redhat.com>
-Subject: Re: nbd structured reply
-References: <cecb7a50-6913-0d88-59b4-805463aba790@virtuozzo.com>
- <cd46a9e9-4e9d-9ac8-53ed-34ba1b6f4dc0@redhat.com>
- <9a3ce498-040d-5d8f-41d0-a2a649771528@virtuozzo.com>
-In-Reply-To: <9a3ce498-040d-5d8f-41d0-a2a649771528@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+* Peter Xu (peterx@redhat.com) wrote:
+> Though we may not need it, now we init both the src/dst migration
+> objects in migration_object_init() so that even incoming migration
+> object would be thread safe (it was not).
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-On 09/22/2017 09:57 AM, Vladimir Sementsov-Ogievskiy wrote:
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
->> If you have suggestions for improving the NBD spec wording, feel free =
-to
->> propose a doc patch.
->>
->=20
-> Thanks, now I understand.. However I don't have good idea of wording..
->=20
->=20
-> Another thing: server can send several error and success chunks on
-> CMD_READ..
-
-Yes, and that is intentional. A server that spawns sub-tasks to read
-portions of the request to various parallel workers, and then sends
-those responses back to the client as sub-tasks finish, can indeed send
-multiple errors before sending the final chunk complete message.
-
->=20
-> The obvious behavior of client is to fail the whole read if it received=
-
-> one error chunk.
-
-Yes, the read has failed if the client sees at least one error chunk.
-The read is not successful unless there are no error chunks, and the
-server has sent chunks describing every portion of the request (the
-server is not allowed to send chunks that overlap, nor to send a
-successful chunk after sending an error for the same offset, nor to send
-a success message if it has not covered the entire request - but IS
-allowed to send multiple error chunks).
-
-> And, actually, client is not interesting in all following chunks for
-> this request.
-
-Perhaps not, but the client is not in control of how much the server
-sends, so it must gracefully deal with the remaining traffic from the
-server while waiting for the server to finally send the last chunk.
-
-> I think
-> we need some additional negotiation flag for this, which says that erro=
-r
-> chunk
-> must be final.
-
-Why? It adds complexity, for no real reason.  (Read errors are not
-common, so it is okay if dealing with read errors requires more network
-traffic than normal).
-
->=20
-> May be we need also a method (command) to cancel one of inflight
-> requests, but it
-> is not so important.
-
-Again, that would add complexity that may be really hard to justify (we
-want to be able to implement stateless servers; a server that has to
-parse a second message from a client requesting to abort an in-flight
-command has to track state).  So I don't think it is worth it.
-
---=20
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
-
---Ncid48hltjlXwuwpkgxM7FcxgdJnR9ABj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Comment: Public key at http://people.redhat.com/eblake/eblake.gpg
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQEzBAEBCAAdFiEEccLMIrHEYCkn0vOqp6FrSiUnQ2oFAlnFdDwACgkQp6FrSiUn
-Q2onrwf6A0r3UFu/Iir3OWzyg8+DUWrxLXQt1C4arCEolJalNjU2p88V57YpYLeh
-aLNDt2xmsFQ0pCUQ9g+WXKm0xc90yvj3gTMGbISLnVPfW8OcexX4US9GXbKym9pg
-ENMWPeN/yafpOBswEGsTt6+yj2HbpbH2sHCGzQw+bHD2cNfDRc/atziOLZqJrx1v
-Cl0x3sQopMOSpMkpcsXNGGw+mYKTp9X8RrhFOGs/mfcQM3xiX6Pxt/VSJaYqvIkT
-9mU926IYtS8tc2yAbATceV7JYD7Py6HNQBRKvdbi8jH7QF8/41c/qV+LrZ2rNGky
-DUxgkcTzGhK5F/icDZTlNEYedioUaw==
-=Yq4G
------END PGP SIGNATURE-----
-
---Ncid48hltjlXwuwpkgxM7FcxgdJnR9ABj--
+> ---
+>  migration/migration.c | 27 ++++++++++++++-------------
+>  1 file changed, 14 insertions(+), 13 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 5812478..7e9ccf0 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -103,6 +103,7 @@ enum mig_rp_message_type {
+>     dynamic creation of migration */
+>  
+>  static MigrationState *current_migration;
+> +static MigrationIncomingState *current_incoming;
+>  
+>  static bool migration_object_check(MigrationState *ms, Error **errp);
+>  
+> @@ -128,6 +129,17 @@ void migration_object_init(void)
+>      if (ms->enforce_config_section) {
+>          current_migration->send_configuration = true;
+>      }
+> +
+> +    /*
+> +     * Init the migrate incoming object as well no matter whether
+> +     * we'll use it or not.
+> +     */
+> +    current_incoming = g_new0(MigrationIncomingState, 1);
+> +    current_incoming->state = MIGRATION_STATUS_NONE;
+> +    qemu_mutex_init(&current_incoming->rp_mutex);
+> +    qemu_event_init(&current_incoming->main_thread_load_event, false);
+> +    qemu_sem_init(&current_incoming->postcopy_pause_sem_dst, 0);
+> +    qemu_sem_init(&current_incoming->postcopy_pause_sem_fault, 0);
+>  }
+>  
+>  /* For outgoing */
+> @@ -140,19 +152,8 @@ MigrationState *migrate_get_current(void)
+>  
+>  MigrationIncomingState *migration_incoming_get_current(void)
+>  {
+> -    static bool once;
+> -    static MigrationIncomingState mis_current;
+> -
+> -    if (!once) {
+> -        mis_current.state = MIGRATION_STATUS_NONE;
+> -        memset(&mis_current, 0, sizeof(MigrationIncomingState));
+> -        qemu_mutex_init(&mis_current.rp_mutex);
+> -        qemu_event_init(&mis_current.main_thread_load_event, false);
+> -        qemu_sem_init(&mis_current.postcopy_pause_sem_dst, 0);
+> -        qemu_sem_init(&mis_current.postcopy_pause_sem_fault, 0);
+> -        once = true;
+> -    }
+> -    return &mis_current;
+> +    assert(current_incoming);
+> +    return current_incoming;
+>  }
+>  
+>  void migration_incoming_state_destroy(void)
+> -- 
+> 2.7.4
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
