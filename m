@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:48841)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:50174)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dvJHB-0002O6-Hy
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 04:25:34 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dvJOO-0003sC-0f
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 04:33:00 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <quintela@redhat.com>) id 1dvJH8-0004qs-Eo
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 04:25:33 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:44240)
+	(envelope-from <jasowang@redhat.com>) id 1dvJOK-0008SX-Tj
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 04:33:00 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34150)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <quintela@redhat.com>) id 1dvJH8-0004qW-8w
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 04:25:30 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
-	[10.5.11.11])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx1.redhat.com (Postfix) with ESMTPS id AF99D7C839
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 08:25:28 +0000 (UTC)
-From: Juan Quintela <quintela@redhat.com>
-In-Reply-To: <20170922055146.GI30661@pxdev.xzpeter.org> (Peter Xu's message of
-	"Fri, 22 Sep 2017 13:51:46 +0800")
-References: <20170921230812.7095-1-quintela@redhat.com>
-	<150603654377.39.6000423576102095707@d650bbe78fe3>
-	<20170922055146.GI30661@pxdev.xzpeter.org>
-Reply-To: quintela@redhat.com
-Date: Fri, 22 Sep 2017 10:25:28 +0200
-Message-ID: <87vakbi1hj.fsf@secure.laptop>
+	(Exim 4.71) (envelope-from <jasowang@redhat.com>) id 1dvJOK-0008SB-Nj
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 04:32:56 -0400
+References: <20170922080435.27342-1-jfreimann@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <bef3e3f3-e5a6-5e00-64d8-211b89d396b4@redhat.com>
+Date: Fri, 22 Sep 2017 16:32:47 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20170922080435.27342-1-jfreimann@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [PULL 00/18] Migration PULL request
+Subject: Re: [Qemu-devel] [PATCH] net: fix check for number of parameters to
+ -netdev socket
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,38 +28,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, famz@redhat.com, lvivier@redhat.com, dgilbert@redhat.com
+To: Jens Freimann <jfreimann@redhat.com>, qemu-devel@nongnu.org
+Cc: maozy.fnst@cn.fujitsu.com
 
-Peter Xu <peterx@redhat.com> wrote:
-> On Thu, Sep 21, 2017 at 04:29:04PM -0700, no-reply@patchew.org wrote:
->
-> [...]
->
->> /var/tmp/patchew-tester-tmp-b0y2ycie/src/util/bitmap.c: In function =E2=
-=80=98bitmap_to_from_le=E2=80=99:
->> /var/tmp/patchew-tester-tmp-b0y2ycie/src/util/bitmap.c:383:6: error: "__=
-WORD_SIZE" is not defined [-Werror=3Dundef]
->>  # if __WORD_SIZE =3D=3D 64
->>       ^~~~~~~~~~~
->>   CC      util/acl.o
->> cc1: all warnings being treated as errors
->> /var/tmp/patchew-tester-tmp-b0y2ycie/src/rules.mak:66: recipe for target=
- 'util/bitmap.o' failed
->> make: *** [util/bitmap.o] Error 1
->> make: *** Waiting for unfinished jobs....
->> =3D=3D=3D OUTPUT END =3D=3D=3D
->>=20
->> Test command exited with code: 2
->
-> This is the same error with previous one.  We need to replace the
-> single usage of __WORD_SIZE into either __WORDSIZE or HOST_LONG_BITS
-> (as suggested by Dave).
->
-> Again, please let me know if you want me to repost, and sorry for the
-> trouble!
 
-I think we can let that in in the PULL request and fix it later if
-needed, not?
 
-Thanks, Juan.
+On 2017=E5=B9=B409=E6=9C=8822=E6=97=A5 16:04, Jens Freimann wrote:
+> Since commit 0f8c289ad "net: fix -netdev socket,fd=3D for UDP sockets"
+> we allow more than one parameter for -netdev socket. But now
+> we run into an assert when no parameter at all is specified
+>
+>> qemu-system-x86_64 -netdev socket
+> socket.c:729: net_init_socket: Assertion `sock->has_udp' failed.
+>
+> Change the check and error message to reflect that at least
+> one of the options has to be specified. An example for when we need
+> more than on is when we hand in a UDP socket. Then we have fd=3D and ud=
+p=3D
+> as parameters.
+>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Fixes: 0f8c289ad539feb5135c545bea947b310a893f4b
+> Reported-by: Mao Zhongyi <maozy.fnst@cn.fujitsu.com>
+> Signed-off-by: Jens Freimann <jfreimann@redhat.com>
+> ---
+>   net/socket.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/socket.c b/net/socket.c
+> index e6b471c63d..0a987bcf4f 100644
+> --- a/net/socket.c
+> +++ b/net/socket.c
+> @@ -695,9 +695,9 @@ int net_init_socket(const Netdev *netdev, const cha=
+r *name,
+>       assert(netdev->type =3D=3D NET_CLIENT_DRIVER_SOCKET);
+>       sock =3D &netdev->u.socket;
+>  =20
+> -    if (sock->has_listen + sock->has_connect + sock->has_mcast +
+> -        sock->has_udp > 1) {
+> -        error_setg(errp, "exactly one of listen=3D, connect=3D, mcast=3D=
+ or udp=3D"
+> +    if (sock->has_fd + sock->has_listen + sock->has_connect + sock->ha=
+s_mcast +
+> +        sock->has_udp =3D=3D 0) {
+> +        error_setg(errp, "at least one of fd=3D, listen=3D, connect=3D=
+, mcast=3D or udp=3D"
+>                      " is required");
+>           return -1;
+>       }
+
+Looks like this allows "listen" and "connect" to be used in the same=20
+time which is wrong I think?
+
+Thanks
