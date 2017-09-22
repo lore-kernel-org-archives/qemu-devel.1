@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:43407)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43653)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dvNv9-0008CK-PS
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:23:10 -0400
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dvNwU-0000Lp-Ow
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:24:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dvNv3-0004RA-Ra
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:23:07 -0400
-Date: Fri, 22 Sep 2017 21:22:54 +0800
-From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170922132254.GG32000@lemon>
-References: <20170915101008.16646-2-kwolf@redhat.com>
-	<20170922125559.11768-1-kwolf@redhat.com>
+	(envelope-from <marcandre.lureau@redhat.com>) id 1dvNwT-0004xZ-Qu
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:24:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:41812)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <marcandre.lureau@redhat.com>)
+	id 1dvNwT-0004ww-LV
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:24:29 -0400
+From: marcandre.lureau@redhat.com
+Date: Fri, 22 Sep 2017 15:24:08 +0200
+Message-Id: <20170922132412.9408-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20170922132412.9408-1-marcandre.lureau@redhat.com>
+References: <20170922132412.9408-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170922125559.11768-1-kwolf@redhat.com>
-Subject: Re: [Qemu-devel] [PATCH v2 1/6] qemu-io: Drop write permissions
- before read-only reopen
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PATCH v3 1/5] fw_cfg: fix the command line module name
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,65 +27,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, mreitz@redhat.com, eblake@redhat.com, qemu-devel@nongnu.org
+To: linux-kernel@vger.kernel.org
+Cc: somlo@cmu.edu, qemu-devel@nongnu.org, mst@redhat.com, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 
-On Fri, 09/22 14:55, Kevin Wolf wrote:
-> qemu-io provides a 'reopen' command that allows switching from writable
-> to read-only access. We need to make sure that we don't try to keep
-> write permissions to a BlockBackend that becomes read-only, otherwise
-> things are going to fail.
-> 
-> This requires a bdrv_drain() call because otherwise in-flight AIO
-> write requests could issue new internal requests while the permission
-> has already gone away, which would cause assertion failures. Draining
-> the queue doesn't break AIO requests in any new way, bdrv_reopen() would
-> drain it anyway only a few lines later.
-> 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  qemu-io-cmds.c             | 12 ++++++++++++
->  tests/qemu-iotests/187.out |  2 +-
->  2 files changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
-> index 2811a89099..3727fb43f3 100644
-> --- a/qemu-io-cmds.c
-> +++ b/qemu-io-cmds.c
-> @@ -2010,6 +2010,18 @@ static int reopen_f(BlockBackend *blk, int argc, char **argv)
->          return 0;
->      }
->  
-> +    if (!(flags & BDRV_O_RDWR)) {
-> +        uint64_t orig_perm, orig_shared_perm;
-> +
-> +        bdrv_drain(bs);
-> +
-> +        blk_get_perm(blk, &orig_perm, &orig_shared_perm);
-> +        blk_set_perm(blk,
-> +                     orig_perm & ~(BLK_PERM_WRITE | BLK_PERM_WRITE_UNCHANGED),
-> +                     orig_shared_perm,
-> +                     &error_abort);
-> +    }
-> +
->      qopts = qemu_opts_find(&reopen_opts, NULL);
->      opts = qopts ? qemu_opts_to_qdict(qopts, NULL) : NULL;
->      qemu_opts_reset(&reopen_opts);
-> diff --git a/tests/qemu-iotests/187.out b/tests/qemu-iotests/187.out
-> index 68fb944cd5..30b987f71f 100644
-> --- a/tests/qemu-iotests/187.out
-> +++ b/tests/qemu-iotests/187.out
-> @@ -12,7 +12,7 @@ Start from read-write
->  
->  wrote 65536/65536 bytes at offset 0
->  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
-> -write failed: Operation not permitted
-> +Block node is read-only
->  wrote 65536/65536 bytes at offset 0
->  64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
->  *** done
-> -- 
-> 2.13.5
-> 
+From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Reviewed-by: Fam Zheng <famz@redhat.com>
+Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+---
+ drivers/firmware/qemu_fw_cfg.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/firmware/qemu_fw_cfg.c b/drivers/firmware/qemu_fw_cf=
+g.c
+index 0e2011636fbb..5cfe39f7a45f 100644
+--- a/drivers/firmware/qemu_fw_cfg.c
++++ b/drivers/firmware/qemu_fw_cfg.c
+@@ -10,9 +10,9 @@
+  * and select subsets of aarch64), a Device Tree node (on arm), or using
+  * a kernel module (or command line) parameter with the following syntax=
+:
+  *
+- *      [fw_cfg.]ioport=3D<size>@<base>[:<ctrl_off>:<data_off>]
++ *      [qemu_fw_cfg.]ioport=3D<size>@<base>[:<ctrl_off>:<data_off>]
+  * or
+- *      [fw_cfg.]mmio=3D<size>@<base>[:<ctrl_off>:<data_off>]
++ *      [qemu_fw_cfg.]mmio=3D<size>@<base>[:<ctrl_off>:<data_off>]
+  *
+  * where:
+  *      <size>     :=3D size of ioport or mmio range
+@@ -21,9 +21,9 @@
+  *      <data_off> :=3D (optional) offset of data register
+  *
+  * e.g.:
+- *      fw_cfg.ioport=3D2@0x510:0:1		(the default on x86)
++ *      qemu_fw_cfg.ioport=3D2@0x510:0:1		(the default on x86)
+  * or
+- *      fw_cfg.mmio=3D0xA@0x9020000:8:0		(the default on arm)
++ *      qemu_fw_cfg.mmio=3D0xA@0x9020000:8:0	(the default on arm)
+  */
+=20
+ #include <linux/module.h>
+--=20
+2.14.1.146.gd35faa819
