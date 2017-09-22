@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47928)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49078)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1dvMk3-0000mH-Qj
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:07:36 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dvMn4-0003Xm-Cx
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:10:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <jgross@suse.com>) id 1dvMjx-0007Ia-KJ
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:07:35 -0400
-Received: from mx2.suse.de ([195.135.220.15]:33104 helo=mx1.suse.de)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <jgross@suse.com>) id 1dvMjx-0007Hu-AK
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:07:29 -0400
-From: Juergen Gross <jgross@suse.com>
-Date: Fri, 22 Sep 2017 14:07:24 +0200
-Message-Id: <20170922120725.10910-2-jgross@suse.com>
-In-Reply-To: <20170922120725.10910-1-jgross@suse.com>
-References: <20170922120725.10910-1-jgross@suse.com>
-Subject: [Qemu-devel] [PATCH v2 1/2] xen: add a global indicator for grant
- copy being available
+	(envelope-from <programmingkidx@gmail.com>) id 1dvMmy-0001Lp-KP
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:10:42 -0400
+Received: from mail-io0-x22f.google.com ([2607:f8b0:4001:c06::22f]:43300)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dvMmy-0001Kb-FU
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:10:36 -0400
+Received: by mail-io0-x22f.google.com with SMTP id k101so2570702iod.0
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 05:10:35 -0700 (PDT)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <mailman.3351.1506066493.14747.qemu-devel@nongnu.org>
+Date: Fri, 22 Sep 2017 08:10:32 -0400
+Content-Transfer-Encoding: 7bit
+Message-Id: <726A2123-0371-407B-9270-6672DF66D511@gmail.com>
+References: <mailman.3351.1506066493.14747.qemu-devel@nongnu.org>
+Subject: [Qemu-devel]  [PULL 28/36] tests: Add ubuntu.i386 image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,148 +29,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org, xen-devel@lists.xenproject.org
-Cc: anthony.perard@citrix.com, kraxel@redhat.com, sstabellini@kernel.org, Juergen Gross <jgross@suse.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-The Xen qdisk backend needs to test whether grant copy operations is
-available in the kernel. Unfortunately this collides with using
-xengnttab_set_max_grants() on some kernels as this operation has to
-be the first one after opening the gnttab device.
-
-In order to solve this problem test for the availability of grant copy
-in xen_be_init() opening the gnttab device just for that purpose and
-closing it again afterwards. Advertise the availability via a global
-flag and use that flag in the qdisk backend.
-
-Signed-off-by: Juergen Gross <jgross@suse.com>
-Acked-by: Anthony PERARD <anthony.perard@citrix.com>
----
-V2:
-- gboolean -> bool (Anthony PERARD)
----
- hw/block/xen_disk.c          | 18 ++++++------------
- hw/xen/xen_backend.c         | 11 +++++++++++
- include/hw/xen/xen_backend.h |  1 +
- 3 files changed, 18 insertions(+), 12 deletions(-)
-
-diff --git a/hw/block/xen_disk.c b/hw/block/xen_disk.c
-index 536e2ee735..62506e3167 100644
---- a/hw/block/xen_disk.c
-+++ b/hw/block/xen_disk.c
-@@ -121,9 +121,6 @@ struct XenBlkDev {
-     unsigned int        persistent_gnt_count;
-     unsigned int        max_grants;
- 
--    /* Grant copy */
--    gboolean            feature_grant_copy;
--
-     /* qemu block driver */
-     DriveInfo           *dinfo;
-     BlockBackend        *blk;
-@@ -616,7 +613,7 @@ static void qemu_aio_complete(void *opaque, int ret)
-         return;
-     }
- 
--    if (ioreq->blkdev->feature_grant_copy) {
-+    if (xen_feature_grant_copy) {
-         switch (ioreq->req.operation) {
-         case BLKIF_OP_READ:
-             /* in case of failure ioreq->aio_errors is increased */
-@@ -638,7 +635,7 @@ static void qemu_aio_complete(void *opaque, int ret)
-     }
- 
-     ioreq->status = ioreq->aio_errors ? BLKIF_RSP_ERROR : BLKIF_RSP_OKAY;
--    if (!ioreq->blkdev->feature_grant_copy) {
-+    if (!xen_feature_grant_copy) {
-         ioreq_unmap(ioreq);
-     }
-     ioreq_finish(ioreq);
-@@ -698,7 +695,7 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
- {
-     struct XenBlkDev *blkdev = ioreq->blkdev;
- 
--    if (ioreq->blkdev->feature_grant_copy) {
-+    if (xen_feature_grant_copy) {
-         ioreq_init_copy_buffers(ioreq);
-         if (ioreq->req.nr_segments && (ioreq->req.operation == BLKIF_OP_WRITE ||
-             ioreq->req.operation == BLKIF_OP_FLUSH_DISKCACHE) &&
-@@ -750,7 +747,7 @@ static int ioreq_runio_qemu_aio(struct ioreq *ioreq)
-     }
-     default:
-         /* unknown operation (shouldn't happen -- parse catches this) */
--        if (!ioreq->blkdev->feature_grant_copy) {
-+        if (!xen_feature_grant_copy) {
-             ioreq_unmap(ioreq);
-         }
-         goto err;
-@@ -1010,18 +1007,15 @@ static int blk_init(struct XenDevice *xendev)
- 
-     blkdev->file_blk  = BLOCK_SIZE;
- 
--    blkdev->feature_grant_copy =
--                (xengnttab_grant_copy(blkdev->xendev.gnttabdev, 0, NULL) == 0);
--
-     xen_pv_printf(&blkdev->xendev, 3, "grant copy operation %s\n",
--                  blkdev->feature_grant_copy ? "enabled" : "disabled");
-+                  xen_feature_grant_copy ? "enabled" : "disabled");
- 
-     /* fill info
-      * blk_connect supplies sector-size and sectors
-      */
-     xenstore_write_be_int(&blkdev->xendev, "feature-flush-cache", 1);
-     xenstore_write_be_int(&blkdev->xendev, "feature-persistent",
--                          !blkdev->feature_grant_copy);
-+                          !xen_feature_grant_copy);
-     xenstore_write_be_int(&blkdev->xendev, "info", info);
- 
-     xenstore_write_be_int(&blkdev->xendev, "max-ring-page-order",
-diff --git a/hw/xen/xen_backend.c b/hw/xen/xen_backend.c
-index c46cbb0759..0f849a26d2 100644
---- a/hw/xen/xen_backend.c
-+++ b/hw/xen/xen_backend.c
-@@ -44,6 +44,7 @@ BusState *xen_sysbus;
- /* public */
- struct xs_handle *xenstore = NULL;
- const char *xen_protocol;
-+bool xen_feature_grant_copy;
- 
- /* private */
- static int debug;
-@@ -519,6 +520,8 @@ void xenstore_update_fe(char *watch, struct XenDevice *xendev)
- 
- int xen_be_init(void)
- {
-+    xengnttab_handle *gnttabdev;
-+
-     xenstore = xs_daemon_open();
-     if (!xenstore) {
-         xen_pv_printf(NULL, 0, "can't connect to xenstored\n");
-@@ -532,6 +535,14 @@ int xen_be_init(void)
-         goto err;
-     }
- 
-+    gnttabdev = xengnttab_open(NULL, 0);
-+    if (gnttabdev != NULL) {
-+        if (xengnttab_grant_copy(gnttabdev, 0, NULL) == 0) {
-+            xen_feature_grant_copy = true;
-+        }
-+        xengnttab_close(gnttabdev);
-+    }
-+
-     xen_sysdev = qdev_create(NULL, TYPE_XENSYSDEV);
-     qdev_init_nofail(xen_sysdev);
-     xen_sysbus = qbus_create(TYPE_XENSYSBUS, DEVICE(xen_sysdev), "xen-sysbus");
-diff --git a/include/hw/xen/xen_backend.h b/include/hw/xen/xen_backend.h
-index 8a6fbcbe20..3a27692407 100644
---- a/include/hw/xen/xen_backend.h
-+++ b/include/hw/xen/xen_backend.h
-@@ -16,6 +16,7 @@
- /* variables */
- extern struct xs_handle *xenstore;
- extern const char *xen_protocol;
-+extern bool xen_feature_grant_copy;
- extern DeviceState *xen_sysdev;
- extern BusState *xen_sysbus;
- 
--- 
-2.12.3
+Could a Darwin test be added? Both x86 and PowerPC versions would be great.
