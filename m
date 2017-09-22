@@ -1,32 +1,34 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:50218)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52249)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dvHLW-0006ZG-DU
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:21:55 -0400
+	(envelope-from <bounces@canonical.com>) id 1dvHe8-00012T-8h
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:41:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dvHLS-0006l0-Eu
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:21:54 -0400
-Received: from mail-qt0-x244.google.com ([2607:f8b0:400d:c0d::244]:37704)
+	(envelope-from <bounces@canonical.com>) id 1dvHe5-0001Is-5h
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:41:08 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53632)
 	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dvHLS-0006ks-AA
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:21:50 -0400
-Received: by mail-qt0-x244.google.com with SMTP id u48so102673qtc.4
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 23:21:50 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <1506049617-25716-1-git-send-email-thuth@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <df8f9d2e-9b89-f5b2-3f2e-222cd08ff8df@amsat.org>
-Date: Fri, 22 Sep 2017 03:21:45 -0300
+	(Exim 4.71) (envelope-from <bounces@canonical.com>)
+	id 1dvHe4-0001Ig-Vq
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:41:05 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+	by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+	id 1dvHe2-00029D-VL
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 06:41:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+	by loganberry.canonical.com (Postfix) with ESMTP id D5A3E2E8490
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 06:41:02 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1506049617-25716-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tests/boot-sector: Increase timeout to 600
- seconds
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 22 Sep 2017 06:34:22 -0000
+From: ChristianEhrhardt <1718719@bugs.launchpad.net>
+Reply-To: Bug 1718719 <1718719@bugs.launchpad.net>
+Sender: bounces@canonical.com
+References: <150601012428.28823.10384460665730601462.malonedeb@gac.canonical.com>
+Message-Id: <150606206243.30646.1570377130776394901.malone@wampee.canonical.com>
+Errors-To: bounces@canonical.com
+Subject: [Qemu-devel] [Bug 1718719] Re: qemu can't capture keys properly
+ under wayland
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,43 +37,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Stefan Weil <sw@weilnetz.de>, Jason Wang <jasowang@redhat.com>, Victor Kaplansky <victork@redhat.com>
+To: qemu-devel@nongnu.org
 
-Hi Thomas,
+Hi Mathieu,
+thanks for the report but since we are up-to-date with qemu and I can't fin=
+d an obvious breakage we might have introduced for this, this should go to =
+qmeu-upstream in this case.
 
-On 09/22/2017 12:06 AM, Thomas Huth wrote:
-> If QEMU has been compiled with the flags --enable-tcg-interpreter and
-> --enable-debug, the guest is running incredibly slow. The pxe boot test
+Furthermore are these actually two issues?:
+#1 - wayland crashes under spice
+     more of a wayland bug then I'd expect, but upstream qemu
+     might have heard of it and have good pointers
+#2 - new qemu does not recognize keys correctly with the default (SDL I'd t=
+hink) frontend?
+     That is worth to report upstream qemu for sure.
 
-There already is a qtest_get_arch(), it might be convenient to have a 
-qtest_get_accel() at some point.
+I added an upstream qemu (and a wayland) task and you can help them to
+recreate in case they have questions on how exactly to do so.
 
-> can take up to 400 seconds when testing the pseries ppc64 machine. While
-> we should still look for ways to speed up the test on the pseries machine,
-> it's better to increase the timeout in this test to 600 seconds anyway to
-> allow the test to pass successfully now with this unusal configuration
-> already.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->   tests/boot-sector.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/boot-sector.c b/tests/boot-sector.c
-> index 9ee8537..be29d5b 100644
-> --- a/tests/boot-sector.c
-> +++ b/tests/boot-sector.c
-> @@ -137,9 +137,9 @@ void boot_sector_test(void)
->       uint16_t signature;
->       int i;
->   
-> -    /* Wait at most 90 seconds */
-> +    /* Wait at most 600 seconds (test is slow with TCI and --enable-debug) */
->   #define TEST_DELAY (1 * G_USEC_PER_SEC / 10)
-> -#define TEST_CYCLES MAX((90 * G_USEC_PER_SEC / TEST_DELAY), 1)
-> +#define TEST_CYCLES MAX((600 * G_USEC_PER_SEC / TEST_DELAY), 1)
->   
->       /* Poll until code has run and modified memory.  Once it has we know BIOS
->        * initialization is done.  TODO: check that IP reached the halt
-> 
+** Also affects: qemu
+   Importance: Undecided
+       Status: New
+
+** Also affects: wayland (Ubuntu)
+   Importance: Undecided
+       Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1718719
+
+Title:
+  qemu can't capture keys properly under wayland
+
+Status in QEMU:
+  New
+Status in qemu package in Ubuntu:
+  New
+Status in wayland package in Ubuntu:
+  New
+
+Bug description:
+  This appears to be different than the previous similar bugs; patches
+  do look to be applied to use libinput in the wayland case. Still:
+
+  unknown keycodes `(unnamed)', please report to qemu-devel@nongnu.org
+
+  I am using qemu-system-x86                       1:2.10+dfsg-0ubuntu1
+  on artful.
+
+  Many key inputs work correctly, but at boot the system will not
+  properly catch the arrow keys, the above error shows up immediately
+  after hitting Esc (for instance) to get to the boot menu. Booting from
+  CD onto a daily Ubuntu desktop image, I can't navigate the splash
+  menu.
+
+  The same works correctly through virt-manager (which uses spice
+  AFAICT, but wayland tends to crash when running virt-manager), and
+  things work if I switch my session to Xorg rather than wayland.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1718719/+subscriptions
