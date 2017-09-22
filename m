@@ -1,23 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:47550)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:49000)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dvDk9-00072L-K3
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 22:31:06 -0400
+	(envelope-from <famz@redhat.com>) id 1dvDvQ-0000nY-D6
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 22:42:45 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dvDk7-0002dJ-VK
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 22:31:05 -0400
-Date: Fri, 22 Sep 2017 10:30:53 +0800
+	(envelope-from <famz@redhat.com>) id 1dvDvN-0000hx-2I
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 22:42:44 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39220)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dvDvM-0000gw-SN
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 22:42:40 -0400
+Date: Fri, 22 Sep 2017 10:42:35 +0800
 From: Fam Zheng <famz@redhat.com>
-Message-ID: <20170922023053.GB1397@lemon.lan>
-References: <20170921131707.17364-1-el13635@mail.ntua.gr>
-	<20170921131707.17364-2-el13635@mail.ntua.gr>
-	<20170921132943.GE13703@lemon.lan>
-	<20170921153935.ffyvqej37qhfkrm5@postretch>
+Message-ID: <20170922024235.GC1397@lemon.lan>
+References: <20170921150755.19914-1-famz@redhat.com>
+	<20170921150755.19914-4-famz@redhat.com>
+	<dfa1fda4-78d2-664a-1fb4-eb46b9c74dba@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170921153935.ffyvqej37qhfkrm5@postretch>
-Subject: Re: [Qemu-devel] [PATCH v2 1/3] block: add bdrv_co_drain_end
- callback
+In-Reply-To: <dfa1fda4-78d2-664a-1fb4-eb46b9c74dba@redhat.com>
+Subject: Re: [Qemu-devel] [PATCH v11 03/13] scripts: Add archive-source.sh
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,77 +28,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Manos Pitsidianakis <el13635@mail.ntua.gr>, qemu-devel <qemu-devel@nongnu.org>, qemu-block <qemu-block@nongnu.org>, Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Max Reitz <mreitz@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-On Thu, 09/21 18:39, Manos Pitsidianakis wrote:
-> On Thu, Sep 21, 2017 at 09:29:43PM +0800, Fam Zheng wrote:
-> > On Thu, 09/21 16:17, Manos Pitsidianakis wrote:
-> > > BlockDriverState has a bdrv_do_drain() callback but no equivalent for the end
+On Thu, 09/21 10:22, Eric Blake wrote:
+> On 09/21/2017 10:07 AM, Fam Zheng wrote:
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> >  scripts/archive-source.sh | 51 +++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 51 insertions(+)
+> >  create mode 100755 scripts/archive-source.sh
 > > 
-> > s/bdrv_do_drain/bdrv_co_drain/
-> > 
-> > > of the drain. The throttle driver (block/throttle.c) needs a way to mark the
-> > > end of the drain in order to toggle io_limits_disabled correctly, thus
-> > > bdrv_co_drain_end is needed.
-> > > 
-> > > Signed-off-by: Manos Pitsidianakis <el13635@mail.ntua.gr>
-> > > ---
-> > >  include/block/block_int.h |  6 ++++++
-> > >  block/io.c                | 48 +++++++++++++++++++++++++++++++++--------------
-> > >  2 files changed, 40 insertions(+), 14 deletions(-)
-> > > 
-> > > diff --git a/include/block/block_int.h b/include/block/block_int.h
-> > > index ba4c383393..21950cfda3 100644
-> > > --- a/include/block/block_int.h
-> > > +++ b/include/block/block_int.h
-> > > @@ -356,8 +356,14 @@ struct BlockDriver {
-> > >      /**
-> > >       * Drain and stop any internal sources of requests in the driver, and
-> > >       * remain so until next I/O callback (e.g. bdrv_co_writev) is called.
-> > 
-> > This line needs update too, maybe:
-> > 
-> >       /**
-> >        * bdrv_co_drain drains and stops any ... and remain so until
-> >        * bdrv_co_drain_end is called.
-> > 
-> > > +     *
-> > > +     * The callbacks are called at the beginning and ending of the drain
-> > > +     * respectively. They should be implemented if the driver needs to e.g.
-> > 
-> > As implied by above change, should we explicitly require "should both be
-> > implemented"? It may not be technically required, but I think is cleaner and
-> > easier to reason about.
-> > 
+> > diff --git a/scripts/archive-source.sh b/scripts/archive-source.sh
+> > new file mode 100755
+> > index 0000000000..8aa363d3a0
+> > --- /dev/null
+> > +++ b/scripts/archive-source.sh
+> > @@ -0,0 +1,51 @@
+> > +#!/bin/bash
+> > +#
+> > +# Author: Fam Zheng <famz@redhat.com>
+> > +#
+> > +# Archive source tree, including submodules. This is created for test code to
+> > +# export the source files, in order to be built in a different enviornment,
 > 
-> It might imply to someone that there's an assert(drv->bdrv_co_drain_begin &&
-> drv->bdrv_co_drain_end) somewhere unless you state they don't have to be
-> implemented at the same time. How about we be completely explicit:
+> s/enviornment/environment/
 > 
->  bdrv_co_drain_begin is called if implemented in the beggining of a
->  drain operation to drain and stop any internal sources of requests in
->  the driver.
->  bdrv_co_drain_end is called if implemented at the end of the drain.
+> > +# such as in a docker instance or VM.
+> > +#
+> > +# This code is licensed under the GPL version 2 or later.  See
+> > +# the COPYING file in the top-level directory.
+> > +
+> > +error() {
+> > +    echo "$@" >&2
 > 
->  They should be used by the driver to e.g. manage scheduled I/O
->  requests, or toggle an internal state. After the end of the drain new
->  requests will continue normally.
+> slightly risky if $@ contains \ - using 'printf %s\\n "$*"' is nicer.
+> But this particular script can get away with it, as I don't see use of \
+> (other than if you have a weird $0).
 > 
-> I hope this is easier for a reader to understand!
+> > +
+> > +if test -n "$submodules"; then
+> > +    {
+> > +        git ls-files || error "git ls-files failed"
+> > +        for sm in $submodules; do
+> > +            (cd $sm; git ls-files) | sed "s:^:$sm/:"
+> > +            if test "${PIPESTATUS[0]} ${PIPESTATUS[1]}" != "0 0"; then
+> 
+> Could shorten to "${PIPESTATUS[*]}", as discussed in another mail, but
+> this works too.
+> 
+> With the typo fixed, and your choice of how to handle my other two nits
+> (including doing nothing),
+> Reviewed-by: Eric Blake <eblake@redhat.com>
 
-I don't like the inconsistent semantics of when the drained section ends, if we
-allow drivers to implement bdrv_co_drain_begin but omit bdrv_co_drained_end.
-Currently the point where the section ends is, as said in the comment, when next
-I/O callback is invoked. Now we are adding the explicit ".bdrv_co_drain_end"
-into the fomular, if we still keep the previous convention, the interface
-contract is just mixed of two things for no good reason. I don't think it's
-technically necessary.
+Fixing all of them and adding your r-b line.
 
-Let's just add the assert:
-
-    assert(!!drv->bdrv_co_drain_begin == !!bdrv_co_drain_end);
-
-in bdrv_drain_invoke, add a comment here, then add an empty .bdrv_co_drain_end
-in qed.
+> 
+> -- 
+> Eric Blake, Principal Software Engineer
+> Red Hat, Inc.           +1-919-301-3266
+> Virtualization:  qemu.org | libvirt.org
+> 
 
 Fam
