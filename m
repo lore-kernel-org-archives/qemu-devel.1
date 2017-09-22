@@ -1,33 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:56368)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56414)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dvN8V-0000Z6-5j
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:32:52 -0400
+	(envelope-from <amarnath.valluri@intel.com>) id 1dvN8Z-0000db-TF
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:32:57 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <clg@kaod.org>) id 1dvN8R-0005og-1j
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:32:51 -0400
-Received: from 5.mo179.mail-out.ovh.net ([46.105.43.140]:54850)
+	(envelope-from <amarnath.valluri@intel.com>) id 1dvN8Y-0005sd-JN
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:32:55 -0400
+Received: from mga07.intel.com ([134.134.136.100]:27337)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <clg@kaod.org>) id 1dvN8Q-0005nr-PR
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:32:46 -0400
-Received: from player690.ha.ovh.net (b6.ovh.net [213.186.33.56])
-	by mo179.mail-out.ovh.net (Postfix) with ESMTP id 6321964E06
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 14:32:45 +0200 (CEST)
-References: <20170911171235.29331-1-clg@kaod.org>
-	<20170919082020.GT27153@umbus> <20170919084618.GY27153@umbus>
-	<98b6f737-a554-1c83-79f9-2c8021e1cf69@kaod.org>
-	<20170921012508.GA4998@umbus.fritz.box>
-	<53b4c971-920f-816b-59fb-f77a03663d81@kaod.org>
-	<20170922103350.GL4998@umbus.fritz.box>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <77052464-e455-757e-c2a7-e55bb7d26d14@kaod.org>
-Date: Fri, 22 Sep 2017 14:32:33 +0200
+	(Exim 4.71) (envelope-from <amarnath.valluri@intel.com>)
+	id 1dvN8Y-0005pe-Av
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 08:32:54 -0400
+From: Amarnath Valluri <amarnath.valluri@intel.com>
+Date: Fri, 22 Sep 2017 15:33:40 +0300
+Message-Id: <1506083624-20621-5-git-send-email-amarnath.valluri@intel.com>
+In-Reply-To: <1506083624-20621-1-git-send-email-amarnath.valluri@intel.com>
+References: <1506083624-20621-1-git-send-email-amarnath.valluri@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170922103350.GL4998@umbus.fritz.box>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [Qemu-devel] [RFC PATCH v2 00/21] Guest exploitation of the
- XIVE interrupt controller (POWER9)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: [Qemu-devel] [PATCH v7 4/8] tpm-backend: Made few interface methods
+ optional
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -36,133 +28,220 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Gibson <david@gibson.dropbear.id.au>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Alexey Kardashevskiy <aik@ozlabs.ru>, Alexander Graf <agraf@suse.de>
+To: qemu-devel@nongnu.org
+Cc: Stefan Berger <stefanb@linux.vnet.ibm.com>, =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@gmail.com>, Amarnath Valluri <amarnath.valluri@intel.com>
 
-On 09/22/2017 12:33 PM, David Gibson wrote:
-> On Thu, Sep 21, 2017 at 04:18:33PM +0200, C=E9dric Le Goater wrote:
->> On 09/21/2017 03:25 AM, David Gibson wrote:
->>> On Wed, Sep 20, 2017 at 02:33:37PM +0200, C=E9dric Le Goater wrote:
->>>> On 09/19/2017 10:46 AM, David Gibson wrote:
->>>>> On Tue, Sep 19, 2017 at 06:20:20PM +1000, David Gibson wrote:
->>>>>> On Mon, Sep 11, 2017 at 07:12:14PM +0200, C=E9dric Le Goater wrote=
-:
->>>>>>> On a POWER9 sPAPR machine, the Client Architecture Support (CAS)
->>>>>>> negotiation process determines whether the guest operates with an
->>>>>>> interrupt controller using the XICS legacy model, as found on POW=
-ER8,
->>>>>>> or in XIVE exploitation mode, the newer POWER9 interrupt model. T=
-his
->>>>>>> patchset is a proposal to add XIVE support in POWER9 sPAPR machin=
-e.
->>>>>>>
->>>>>>> Follows a model for the XIVE interrupt controller and support for=
- the
->>>>>>> Hypervisor's calls which are used to configure the interrupt sour=
-ces
->>>>>>> and the event/notification queues of the guest. The last patch
->>>>>>> integrates XIVE in the sPAPR machine.
->>>>>>>
->>>>>>> Code is here:
->>>>>>
->>>>>>
->>>>>> An overall comment:
->>>>>>
->>>>>> I note in several replies here that I think the way XICS objects a=
-re
->>>>>> re-used for XIVE is really ugly, and I think it will make future
->>>>>> maintenance pretty painful.
->>>>
->>>> I agree. That was one way to identify what we need for migration=20
->>>> compatibility and CAS reset.  =20
->>>>
->>>>>> I'm thinking maybe trying to support the CAS negotiation of interr=
-upt
->>>>>> controller from day 1 is warping the design.  A better approach mi=
-ght
->>>>>> be first to implement XIVE only when given a specific machine opti=
-on -
->>>>>> guest gets one or the other and can't negotiate.
->>>>
->>>> ok.=20
->>>>
->>>> CAS is not the most complex problem, we mostly need to share=20
->>>> the ICSIRQState array and the source offset. migration from older
->>>> machine is a problem.
->>>
->>> Uh.. what?  Migration from an older machine isn't a thing.  We can
->>> migrate from an older qemu, but the machine type (and version) has to
->>> be identical at each end.  That's *why* we keep around the older
->>> machine types on newer qemus.
->>
->> yes. I am just wondering how I am going to handle a xics-only=20
->> machine migrating to a xics/xive machine.=20
->=20
-> Won't ever happen.  Older machine types will always be xics, newer
-> machine type will always be xive (at least with POWER9).
->=20
->> The xive machine option we are talking about will activate=20
->> the xive interrupt mode and instantiate the objects behind it.=20
->> So when we migrate from an older machine we will need to start=20
->> the target machine with xive=3Doff. I guess that is OK.
->=20
-> Again, we *don't* migrate from an older machine.  Ever.  We only ever
-> migrate from an older qemu version to a newer qemu using the older
-> machine type.
+This allows backend implementations left optional interface methods.
+For mandatory methods assertion checks added.
 
-Sorry I was talking about QEMU version, and not machine version.
-I still have to look at how both machines will cohabitate in the=20
-newer QEMU.=20
+Took the opportunity to remove unused tpm_backend_get_desc() method
 
-Thanks,
+Signed-off-by: Amarnath Valluri <amarnath.valluri@intel.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Stefan Berger<stefanb@linux.vnet.ibm.com>
+---
+ backends/tpm.c               | 29 +++++++++++++++++------------
+ hw/tpm/tpm_passthrough.c     | 23 +----------------------
+ include/sysemu/tpm_backend.h | 10 +---------
+ tpm.c                        |  2 +-
+ 4 files changed, 20 insertions(+), 44 deletions(-)
 
-C.=20
-
-
->>
->> Thanks for the insights and the time to review the code,
->>
->> C.=20
->>
->>>> We are doomed to keep the existing XICS
->>>> framework available.
->>>>
->>>>>> That should allow a more natural XIVE design to emerge, *then* we =
-can
->>>>>> look at what's necessary to make boot-time negotiation possible.
->>>>>
->>>>> Actually, it just occurred to me that we might be making life hard =
-for
->>>>> ourselves by trying to actually switch between full XICS and XIVE
->>>>> models.  Coudln't we have new machine types always construct the XI=
-VE
->>>>> infrastructure,=20
->>>>
->>>> yes.
->>>>
->>>>> but then implement the XICS RTAS and hcalls in terms of the XIVE vi=
-rtual=20
->>>>> hardware.
->>>>
->>>> ok but migration will not be supported.
->>>
->>> Right, this would only be for newer machine types, and you can never
->>> migrate between different machine types.
->>>
->>>>> Since something more or less equivalent
->>>>> has already been done in both OPAL and the host kernel, I'm guessin=
-g
->>>>> this shouldn't be too hard at this point.
->>>>
->>>> Indeed that is how it is working currently on P9 kvm guests. hcalls =
-are
->>>> implemented on top of XIVE native.
->>>>
->>>> Thanks,
->>>>
->>>>
->>>> C.
->>>>
->>>
->>
->=20
+diff --git a/backends/tpm.c b/backends/tpm.c
+index cf5abf1..c409a46 100644
+--- a/backends/tpm.c
++++ b/backends/tpm.c
+@@ -44,13 +44,6 @@ enum TpmType tpm_backend_get_type(TPMBackend *s)
+     return k->ops->type;
+ }
+ 
+-const char *tpm_backend_get_desc(TPMBackend *s)
+-{
+-    TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+-
+-    return k->ops->desc();
+-}
+-
+ int tpm_backend_init(TPMBackend *s, TPMState *state,
+                      TPMRecvDataCB *datacb)
+ {
+@@ -59,7 +52,7 @@ int tpm_backend_init(TPMBackend *s, TPMState *state,
+     s->tpm_state = state;
+     s->recv_data_callback = datacb;
+ 
+-    return k->ops->init(s);
++    return k->ops->init ? k->ops->init(s) : 0;
+ }
+ 
+ int tpm_backend_startup_tpm(TPMBackend *s)
+@@ -73,13 +66,15 @@ int tpm_backend_startup_tpm(TPMBackend *s)
+                                        NULL);
+     g_thread_pool_push(s->thread_pool, (gpointer)TPM_BACKEND_CMD_INIT, NULL);
+ 
+-    return k->ops->startup_tpm(s);
++    return k->ops->startup_tpm ? k->ops->startup_tpm(s) : 0;
+ }
+ 
+ bool tpm_backend_had_startup_error(TPMBackend *s)
+ {
+     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+ 
++    assert(k->ops->had_startup_error);
++
+     return k->ops->had_startup_error(s);
+ }
+ 
+@@ -87,6 +82,8 @@ size_t tpm_backend_realloc_buffer(TPMBackend *s, TPMSizedBuffer *sb)
+ {
+     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+ 
++    assert(k->ops->realloc_buffer);
++
+     return k->ops->realloc_buffer(sb);
+ }
+ 
+@@ -100,7 +97,9 @@ void tpm_backend_reset(TPMBackend *s)
+ {
+     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+ 
+-    k->ops->reset(s);
++    if (k->ops->reset) {
++        k->ops->reset(s);
++    }
+ 
+     tpm_backend_thread_end(s);
+ }
+@@ -109,6 +108,8 @@ void tpm_backend_cancel_cmd(TPMBackend *s)
+ {
+     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+ 
++    assert(k->ops->cancel_cmd);
++
+     k->ops->cancel_cmd(s);
+ }
+ 
+@@ -116,20 +117,24 @@ bool tpm_backend_get_tpm_established_flag(TPMBackend *s)
+ {
+     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+ 
+-    return k->ops->get_tpm_established_flag(s);
++    return k->ops->get_tpm_established_flag ?
++           k->ops->get_tpm_established_flag(s) : false;
+ }
+ 
+ int tpm_backend_reset_tpm_established_flag(TPMBackend *s, uint8_t locty)
+ {
+     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+ 
+-    return k->ops->reset_tpm_established_flag(s, locty);
++    return k->ops->reset_tpm_established_flag ?
++           k->ops->reset_tpm_established_flag(s, locty) : 0;
+ }
+ 
+ TPMVersion tpm_backend_get_tpm_version(TPMBackend *s)
+ {
+     TPMBackendClass *k = TPM_BACKEND_GET_CLASS(s);
+ 
++    assert(k->ops->get_tpm_version);
++
+     return k->ops->get_tpm_version(s);
+ }
+ 
+diff --git a/hw/tpm/tpm_passthrough.c b/hw/tpm/tpm_passthrough.c
+index 815a72e..a0459a6 100644
+--- a/hw/tpm/tpm_passthrough.c
++++ b/hw/tpm/tpm_passthrough.c
+@@ -227,15 +227,6 @@ static void tpm_passthrough_handle_request(TPMBackend *tb, TPMBackendCmd cmd)
+     }
+ }
+ 
+-/*
+- * Start the TPM (thread). If it had been started before, then terminate
+- * and start it again.
+- */
+-static int tpm_passthrough_startup_tpm(TPMBackend *tb)
+-{
+-    return 0;
+-}
+-
+ static void tpm_passthrough_reset(TPMBackend *tb)
+ {
+     TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
+@@ -247,11 +238,6 @@ static void tpm_passthrough_reset(TPMBackend *tb)
+     tpm_pt->had_startup_error = false;
+ }
+ 
+-static int tpm_passthrough_init(TPMBackend *tb)
+-{
+-    return 0;
+-}
+-
+ static bool tpm_passthrough_get_tpm_established_flag(TPMBackend *tb)
+ {
+     return false;
+@@ -309,11 +295,6 @@ static void tpm_passthrough_cancel_cmd(TPMBackend *tb)
+     }
+ }
+ 
+-static const char *tpm_passthrough_create_desc(void)
+-{
+-    return "Passthrough TPM backend driver";
+-}
+-
+ static TPMVersion tpm_passthrough_get_tpm_version(TPMBackend *tb)
+ {
+     TPMPassthruState *tpm_pt = TPM_PASSTHROUGH(tb);
+@@ -453,10 +434,8 @@ static const QemuOptDesc tpm_passthrough_cmdline_opts[] = {
+ static const TPMDriverOps tpm_passthrough_driver = {
+     .type                     = TPM_TYPE_PASSTHROUGH,
+     .opts                     = tpm_passthrough_cmdline_opts,
+-    .desc                     = tpm_passthrough_create_desc,
++    .desc                     = "Passthrough TPM backend driver",
+     .create                   = tpm_passthrough_create,
+-    .init                     = tpm_passthrough_init,
+-    .startup_tpm              = tpm_passthrough_startup_tpm,
+     .realloc_buffer           = tpm_passthrough_realloc_buffer,
+     .reset                    = tpm_passthrough_reset,
+     .had_startup_error        = tpm_passthrough_get_startup_error,
+diff --git a/include/sysemu/tpm_backend.h b/include/sysemu/tpm_backend.h
+index 202ec8d..13311cf 100644
+--- a/include/sysemu/tpm_backend.h
++++ b/include/sysemu/tpm_backend.h
+@@ -75,7 +75,7 @@ struct TPMDriverOps {
+     enum TpmType type;
+     const QemuOptDesc *opts;
+     /* get a descriptive text of the backend to display to the user */
+-    const char *(*desc)(void);
++    const char *desc;
+ 
+     TPMBackend *(*create)(QemuOpts *opts, const char *id);
+ 
+@@ -109,14 +109,6 @@ struct TPMDriverOps {
+ enum TpmType tpm_backend_get_type(TPMBackend *s);
+ 
+ /**
+- * tpm_backend_get_desc:
+- * @s: the backend
+- *
+- * Returns a human readable description of the backend.
+- */
+-const char *tpm_backend_get_desc(TPMBackend *s);
+-
+-/**
+  * tpm_backend_init:
+  * @s: the backend to initialized
+  * @state: TPMState
+diff --git a/tpm.c b/tpm.c
+index b19b1a3..db14849 100644
+--- a/tpm.c
++++ b/tpm.c
+@@ -62,7 +62,7 @@ static void tpm_display_backend_drivers(void)
+             continue;
+         }
+         fprintf(stderr, "%12s   %s\n",
+-                TpmType_str(i), be_drivers[i]->desc());
++                TpmType_str(i), be_drivers[i]->desc);
+     }
+     fprintf(stderr, "\n");
+ }
+-- 
+2.7.4
