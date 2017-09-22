@@ -1,44 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35375)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:35800)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dvOvC-0002Jr-2h
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:27:15 -0400
+	(envelope-from <richard.henderson@linaro.org>) id 1dvOwZ-00032H-2T
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:28:40 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pasic@linux.vnet.ibm.com>) id 1dvOv8-0001Oy-1j
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:27:14 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40428)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <pasic@linux.vnet.ibm.com>)
-	id 1dvOv7-0001O6-OG
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:27:09 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8MEPggm030666
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 10:27:05 -0400
-Received: from e06smtp13.uk.ibm.com (e06smtp13.uk.ibm.com [195.75.94.109])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d51nhverh-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 10:27:05 -0400
-Received: from localhost
-	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <pasic@linux.vnet.ibm.com>;
-	Fri, 22 Sep 2017 15:27:03 +0100
-References: <20170922083855.102341-1-borntraeger@de.ibm.com>
-	<20170922083855.102341-3-borntraeger@de.ibm.com>
-	<5e7ba7d5-82d4-f1e6-532a-37c2c445c227@linux.vnet.ibm.com>
-	<ccb6e3eb-320e-b5dd-f728-09d8cab440c4@de.ibm.com>
-	<eee7e600-a8b0-6e23-580b-803f3b4e9efa@linux.vnet.ibm.com>
-	<4a31c53b-98aa-747a-1402-1a93e74c565b@de.ibm.com>
-From: Halil Pasic <pasic@linux.vnet.ibm.com>
-Date: Fri, 22 Sep 2017 16:27:00 +0200
+	(envelope-from <richard.henderson@linaro.org>) id 1dvOwV-0002Ia-4v
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:28:39 -0400
+Received: from mail-io0-x229.google.com ([2607:f8b0:4001:c06::229]:48097)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <richard.henderson@linaro.org>)
+	id 1dvOwU-0002Hs-Vs
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:28:35 -0400
+Received: by mail-io0-x229.google.com with SMTP id e189so3454152ioa.4
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 07:28:33 -0700 (PDT)
+References: <20170922140338.6068-1-david@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <156237eb-1f40-9dbc-02b5-9827332bd432@linaro.org>
+Date: Fri, 22 Sep 2017 09:28:29 -0500
 MIME-Version: 1.0
-In-Reply-To: <4a31c53b-98aa-747a-1402-1a93e74c565b@de.ibm.com>
+In-Reply-To: <20170922140338.6068-1-david@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Message-Id: <5cdfe359-2e78-7e2a-72c2-d3e69574288e@linux.vnet.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH/RFC 2/3] s390x/ais: enable ais when
- migration is available
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v2] s390x/kvm: fix and cleanup storing CPU
+ status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -47,88 +31,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>, Pierre Morel <pmorel@linux.vnet.ibm.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: Yi Min Zhao <zyimin@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>, Richard Henderson <rth@twiddle.net>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
 
-
-
-On 09/22/2017 04:07 PM, Christian Borntraeger wrote:
+On 09/22/2017 09:03 AM, David Hildenbrand wrote:
+> env->psa is a 64bit value, while we copy 4 bytes into the save area,
+> resulting always in 0 getting stored.
 > 
+> Let's try to reduce such errors by using a proper structure. While at
+> it, use correct cpu->be conversion (and get_psw_mask()), as we will be
+> reusing this code for TCG soon.
 > 
-> On 09/22/2017 04:02 PM, Pierre Morel wrote:
->> On 22/09/2017 14:40, Christian Borntraeger wrote:
->>>
->>>
->>> On 09/22/2017 02:13 PM, Pierre Morel wrote:
->>>> On 22/09/2017 10:38, Christian Borntraeger wrote:
->>>>> Instead of unconditionally enabling the KVM AIS capability
->>>>> in the kvm arch init function, do this in the flic realize function
->>>>> when we know if migration is available. This requires to initialize
->>>>> flic before the CPUs.
->>>>
->>>> I am not sure to agree.
->>>>
->>>> AIS facility is used for PCI (currently only PCI)
->>>> We want to support PCI emulation and PCI VFIO
->>>>
->>>>
->>>> Not having AIS support in the host kernel or not supporting AISM in the host kernel does not affect the emulation.
->>>> Neither virtio-pci nor TCG.
->>>> The only devices, (currently), which can not work without AIS and is not migratable without AISM are PCI VFIO devices.
->>>
->>> This patch enable the conditional enablement facility for the KVM host mask. The cpu model enablement is done
->>> differently for KVM and TCG anyway.
->>> Right now AIS is only enabled for KVM. For TCG AIS is not implemented at all and disabled. So for whenever this
->>> is fixed in TCG it can be handled then.
->>>
->>> And for emulated devices under KVM you still need the kernel support - otherwise migration is really broken for
->>> the nimm/dimm values.
->>>
->>
->> Yes, that is right.
->> I do not pretend that it is working directly.
->>
->> To support AIS emulation we have some work to do there (the migration), in kvm_s390_inject_airq() and other functions using ais_supported, to use emulated values.
->>
->> Don't you think that we could use emulation instead of faulting when the kernel can not handle values needed for pass-through?
->>
->> We can fault at the moment a VFIO device is realized.
->> Migration will be stopped on realizing VFIO PCI devices instead of flic.
->>
->> I can miss something, is there a reason not to do so?
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
 > 
-> The problem is not vfio vs emulation. The problem is that for KVM the kernel is handling the interrupts.
-> and it holds the state of the interrupt controller (nimm/dimm) and without an interface to read/write these, 
-> the PCI core will be in a wrong state after migration regarding AIS.
+> v1 -> v2:
+>  - dropped QEMU_PACKED
+>  - Moved QEMU_BUILD_BUG_ON()
+>  - Retested if it works now
 > 
-> Really, this patch just moves the supported host kernel from >=4.12 to >=4.13. It makes absolutely no
-> sense to start having a mixed interrupt stack (qemu + kernel) just to make this work on 4.12.
-> 
+>  target/s390x/kvm.c | 62 ++++++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 42 insertions(+), 20 deletions(-)
 
-I tend to agree with Christian. I don't really understand Pierre's
-proposal. I'm sure a patch would help clarify things. If it's too
-complicated for writing up a patch, I think it's too complicated for
-discussing too.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-About the wrong state. Back then I did some reasoning about how bad this
-bad state actually is. In case of AIS starting with the initial state
-after the migration might not be fatal (all cases considered). I was
-asking myself is there any problem beyond getting more irqs delivered
-than necessary, and does that only affect the performance of the guest,
-or could it lead to correctness issues?  I found the later question
-difficult to answer.
 
-The whole AIS stuff was a while ago. From what I see what Christian is
-trying to do is both sane and conservative. Would need to revisit
-everything to say more.
-
-One thing I would find very helpful is what do we expect to work and not
-work for which version. Kind of a matrix. For instance should vfio pci
-work for versions prior 2.11. I think in the not so distant past we
-changed how SIC works (so it complains when we don't have ais).
-
-Btw nimm/dimm is simm/nimm. And I would really like to hear something
-form the original author(s) too.
-
-Regards,
-Halil
+r~
