@@ -1,25 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35856)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:36404)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dvIXp-0005Lc-OM
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:38:42 -0400
+	(envelope-from <jan.kiszka@siemens.com>) id 1dvIbW-0006LE-Sb
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:42:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dvIXm-0005Jq-Ic
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:38:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:40622)
+	(envelope-from <jan.kiszka@siemens.com>) id 1dvIbT-0007hx-QO
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:42:30 -0400
+Received: from goliath.siemens.de ([192.35.17.28]:42469)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dvIXm-0005JU-9m
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:38:38 -0400
-Date: Fri, 22 Sep 2017 09:38:24 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170922093824.58a83358.cohuck@redhat.com>
-In-Reply-To: <20170921185028.GK21016@localhost.localdomain>
-References: <1505811353-29151-1-git-send-email-thuth@redhat.com>
-	<20170921185028.GK21016@localhost.localdomain>
+	(Exim 4.71) (envelope-from <jan.kiszka@siemens.com>)
+	id 1dvIbT-0007hf-H0
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:42:27 -0400
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Message-ID: <af89f372-3fa7-a727-b49c-6418c3fab985@siemens.com>
+Date: Fri, 22 Sep 2017 09:42:25 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [RFC PATCH] qdev: Mark devices as non-hotpluggable
- by default
+Subject: [Qemu-devel] [PATCH] usb: Fix usb-host build
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,56 +26,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, Igor Mammedov <imammedo@redhat.com>, Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>, Stefano Stabellini <sstabellini@kernel.org>, Xiao Guangrong <guangrong.xiao@linux.intel.com>, "Michael S. Tsirkin" <mst@redhat.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>, Anthony Perard <anthony.perard@citrix.com>, Marcel Apfelbaum <marcel@redhat.com>
+To: qemu-devel <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 
-On Thu, 21 Sep 2017 15:50:28 -0300
-Eduardo Habkost <ehabkost@redhat.com> wrote:
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-> On Tue, Sep 19, 2017 at 10:55:53AM +0200, Thomas Huth wrote:
-> > Historically we've marked all devices as hotpluggable by default. However,
-> > most devices are not hotpluggable, and you also need a HotplugHandler to
-> > support these devices. So if the user tries to "device_add" or "device_del"
-> > such a non-hotpluggable device during runtime, either nothing really usable
-> > happens, or QEMU even crashes/aborts unexpectedly (see for example commit
-> > 84ebd3e8c7d4fe955b - "Mark diag288 watchdog as non-hotpluggable").
-> > So let's change this dangerous default behaviour and mark the devices as
-> > non-hotpluggable by default. Certain parent devices classes which are known
-> > as hotpluggable (e.g. PCI, USB, etc.) are marked with "hotpluggable = true",
-> > so that devices that are derived from these classes continue to work as
-> > expected.  
-> 
-> These seem to be missing:
-> * TYPE_CPU (or at least TYPE_X86_CPU and TYPE_S390_CPU)
+This reverts the incorrect commit 2041649f0b04 (these are
+machine-independent objects) and fixes the name of the config var.
 
-I think it would be better to set it for TYPE_CPU (and have
-architectures override if needed).
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+ hw/usb/Makefile.objs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> * TYPE_VIRTIO_SERIAL_PORT
-> * TYPE_CCID_CARD
-> * TYPE_XENSYSDEV
-> 
-> Also, I don't think we need to set it for TYPE_CPU_CORE, just for
-> TYPE_SPAPR_CPU_CORE.
-
-> hw/s390x/s390-virtio-ccw.c:446:    mc->get_hotplug_handler = s390_get_hotplug_handler;
-> s390_get_hotplug_handler accepts:
-> * TYPE_CPU
-
-Nod.
-
-> hw/s390x/css-bridge.c=94=VirtualCssBus *virtual_css_bus_init(void)
-> hw/s390x/css-bridge.c:110:    qbus_set_hotplug_handler(bus, dev, &error_abort);
-> * This seems to be for TYPE_CCW_DEVICE
-
-Yes, it is.
-
-> 
-> hw/s390x/s390-pci-bus.c=548=static int s390_pcihost_init(SysBusDevice *dev)
-> hw/s390x/s390-pci-bus.c:564:    qbus_set_hotplug_handler(bus, DEVICE(dev), NULL);
-> hw/s390x/s390-pci-bus.c:568:    qbus_set_hotplug_handler(BUS(s->bus), DEVICE(s), NULL);
-> hw/s390x/s390-pci-bus.c=660=static void s390_pcihost_hot_plug(HotplugHandler *hotplug_dev,
-> hw/s390x/s390-pci-bus.c:676:        qbus_set_hotplug_handler(bus, DEVICE(s), errp);
-> * TYPE_PCI only, it seems.
-
-Yes.
+diff --git a/hw/usb/Makefile.objs b/hw/usb/Makefile.objs
+index 757e365562..c7f0a52f44 100644
+--- a/hw/usb/Makefile.objs
++++ b/hw/usb/Makefile.objs
+@@ -38,7 +38,7 @@ endif
+ common-obj-$(CONFIG_USB_REDIR) += redirect.o quirks.o
+ 
+ # usb pass-through
+-ifeq ($(CONFIG_LIBUSB)$(CONFIG_USB),yy)
++ifeq ($(CONFIG_USB_LIBUSB),y)
+ common-obj-y += host-libusb.o host-legacy.o
+ else
+ common-obj-y += host-stub.o
+-- 
+2.12.3
