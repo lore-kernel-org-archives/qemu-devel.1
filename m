@@ -1,24 +1,28 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:35009)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:37124)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dvUO4-0001GH-1R
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:17:25 -0400
+	(envelope-from <programmingkidx@gmail.com>) id 1dvUSe-0005Hb-SW
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:22:09 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dgilbert@redhat.com>) id 1dvUNz-0008I7-2r
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:17:24 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:57010)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dvUNy-0008HX-PP
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:17:18 -0400
-Date: Fri, 22 Sep 2017 21:17:13 +0100
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Message-ID: <20170922201712.GO2620@work-vm>
-References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
-	<1504081950-2528-32-git-send-email-peterx@redhat.com>
-MIME-Version: 1.0
+	(envelope-from <programmingkidx@gmail.com>) id 1dvUSa-00039n-UK
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:22:08 -0400
+Received: from mail-io0-x243.google.com ([2607:f8b0:4001:c06::243]:34716)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <programmingkidx@gmail.com>)
+	id 1dvUSa-00039V-PD
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 16:22:04 -0400
+Received: by mail-io0-x243.google.com with SMTP id g32so258959ioj.1
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 13:22:04 -0700 (PDT)
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1504081950-2528-32-git-send-email-peterx@redhat.com>
-Subject: Re: [Qemu-devel] [RFC v2 31/33] migration: store listen task tag
+Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
+From: Programmingkid <programmingkidx@gmail.com>
+In-Reply-To: <20170922124405.GB32000@lemon>
+Date: Fri, 22 Sep 2017 16:22:02 -0400
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <D76563D8-D9EB-47E2-9479-DC1A6C34DA3E@gmail.com>
+References: <mailman.3351.1506066493.14747.qemu-devel@nongnu.org>
+	<726A2123-0371-407B-9270-6672DF66D511@gmail.com>
+	<20170922124405.GB32000@lemon>
+Subject: Re: [Qemu-devel] [PULL 28/36] tests: Add ubuntu.i386 image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,103 +31,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Xu <peterx@redhat.com>
-Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
+To: Fam Zheng <famz@redhat.com>
+Cc: "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
 
-* Peter Xu (peterx@redhat.com) wrote:
-> Store the task tag for migration types: tcp/unix/fd/exec in current
-> MigrationIncomingState struct.
-> 
-> For defered migration, no need to store task tag since there is no task
-> running in the main loop at all. For RDMA, let's mark it as todo.
-> 
-> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> On Sep 22, 2017, at 8:44 AM, Fam Zheng <famz@redhat.com> wrote:
+>=20
+> On Fri, 09/22 08:10, Programmingkid wrote:
+>> Could a Darwin test be added? Both x86 and PowerPC versions would be =
+great.
+>=20
+> It's nice to cover macOS in our test, but to be honest I don't know =
+how to do
+> it. If there isn't any copyright problem, and if there are =
+instructions
+> available in wiki.qemu.org descirbing how to create such a guest step =
+by step
+> like [1], we can add one.
+>=20
+> [1]: https://wiki.qemu.org/Hosts/BSD
+>=20
+> Fam
 
-> ---
->  migration/migration.c | 22 ++++++++++++++++++----
->  migration/migration.h |  2 ++
->  2 files changed, 20 insertions(+), 4 deletions(-)
-> 
-> diff --git a/migration/migration.c b/migration/migration.c
-> index c9b7085..daf356b 100644
-> --- a/migration/migration.c
-> +++ b/migration/migration.c
-> @@ -171,6 +171,7 @@ void migration_incoming_state_destroy(void)
->          mis->from_src_file = NULL;
->      }
->  
-> +    mis->listen_task_tag = 0;
->      qemu_event_destroy(&mis->main_thread_load_event);
->  }
->  
-> @@ -265,25 +266,31 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, const char *rbname,
->  void qemu_start_incoming_migration(const char *uri, Error **errp)
->  {
->      const char *p;
-> +    guint task_tag = 0;
-> +    MigrationIncomingState *mis = migration_incoming_get_current();
->  
->      qapi_event_send_migration(MIGRATION_STATUS_SETUP, &error_abort);
->      if (!strcmp(uri, "defer")) {
->          deferred_incoming_migration(errp);
->      } else if (strstart(uri, "tcp:", &p)) {
-> -        tcp_start_incoming_migration(p, errp);
-> +        task_tag = tcp_start_incoming_migration(p, errp);
->  #ifdef CONFIG_RDMA
->      } else if (strstart(uri, "rdma:", &p)) {
-> +        /* TODO: store task tag for RDMA migrations */
->          rdma_start_incoming_migration(p, errp);
->  #endif
->      } else if (strstart(uri, "exec:", &p)) {
-> -        exec_start_incoming_migration(p, errp);
-> +        task_tag = exec_start_incoming_migration(p, errp);
->      } else if (strstart(uri, "unix:", &p)) {
-> -        unix_start_incoming_migration(p, errp);
-> +        task_tag = unix_start_incoming_migration(p, errp);
->      } else if (strstart(uri, "fd:", &p)) {
-> -        fd_start_incoming_migration(p, errp);
-> +        task_tag = fd_start_incoming_migration(p, errp);
->      } else {
->          error_setg(errp, "unknown migration protocol: %s", uri);
-> +        return;
->      }
-> +
-> +    mis->listen_task_tag = task_tag;
->  }
->  
->  static void process_incoming_migration_bh(void *opaque)
-> @@ -422,6 +429,13 @@ void migration_fd_process_incoming(QEMUFile *f)
->          co = qemu_coroutine_create(process_incoming_migration_co, f);
->          qemu_coroutine_enter(co);
->      }
-> +
-> +    /*
-> +     * When reach here, we should not need the listening port any
-> +     * more. We'll detach the listening task soon, let's reset the
-> +     * listen task tag.
-> +     */
-> +    mis->listen_task_tag = 0;
->  }
->  
->  /*
-> diff --git a/migration/migration.h b/migration/migration.h
-> index d041369..1f4faef 100644
-> --- a/migration/migration.h
-> +++ b/migration/migration.h
-> @@ -26,6 +26,8 @@
->  /* State for the incoming migration */
->  struct MigrationIncomingState {
->      QEMUFile *from_src_file;
-> +    /* Task tag for incoming listen port. Valid when >0. */
-> +    guint listen_task_tag;
->  
->      /*
->       * Free at the start of the main state load, set as the main thread finishes
-> -- 
-> 2.7.4
-> 
-> 
---
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Mac OS X is built on top of Darwin. Darwin is completely open source and =
+free. There are no copyright issues because it is released under the =
+Apple Public Source License.=20
+
+I think I can make the directions available in the wiki soon.=20=
