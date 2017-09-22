@@ -1,32 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:53696)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:56092)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dvETV-0000X8-K3
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 23:18:00 -0400
+	(envelope-from <famz@redhat.com>) id 1dvEfi-00036d-B2
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 23:30:35 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dvETR-0001jy-5e
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 23:17:57 -0400
-Received: from mail-qk0-x22f.google.com ([2607:f8b0:400d:c09::22f]:47239)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dvETR-0001hL-0t
-	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 23:17:53 -0400
-Received: by mail-qk0-x22f.google.com with SMTP id b82so7644712qkc.4
-	for <qemu-devel@nongnu.org>; Thu, 21 Sep 2017 20:17:51 -0700 (PDT)
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-References: <20170921150755.19914-1-famz@redhat.com>
-	<20170921150755.19914-8-famz@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2ea507f1-3ff3-54e9-2fbf-d69c727de5c6@amsat.org>
-Date: Fri, 22 Sep 2017 00:17:40 -0300
+	(envelope-from <famz@redhat.com>) id 1dvEfe-0004fm-Ck
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 23:30:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:56090)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dvEfe-0004fM-67
+	for qemu-devel@nongnu.org; Thu, 21 Sep 2017 23:30:30 -0400
+Date: Fri, 22 Sep 2017 11:30:26 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170922033026.GE1397@lemon.lan>
+References: <20170921170209.9101-1-ehabkost@redhat.com>
+	<7ad0e182-536b-42d8-5b80-bfcd03612a00@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170921150755.19914-8-famz@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v11 07/13] tests: Add FreeBSD image
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <7ad0e182-536b-42d8-5b80-bfcd03612a00@redhat.com>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH] MAINTAINERS: Fix subsystem name for "Build
+ and test automation"
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -35,79 +29,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>, qemu-devel@nongnu.org
-Cc: berrange@redhat.com, =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
+To: Thomas Huth <thuth@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
 
-Hi Fam,
+On Fri, 09/22 05:14, Thomas Huth wrote:
+> On 21.09.2017 19:02, Eduardo Habkost wrote:
+> > The subsystem name for the "Build test automation" section is
+> > "-------------------------", because an actual subsystem name
+> > line is missing:
+> >=20
+> >   $ ./scripts/get_maintainer.pl -f tests/docker/docker.py
+> >   "Alex Benn=E9e" <alex.bennee@linaro.org> (maintainer:--------------=
+---...)
+> >   Fam Zheng <famz@redhat.com> (maintainer:-----------------...)
+> >   "Philippe Mathieu-Daud=E9" <f4bug@amsat.org> (reviewer:------------=
+-----...)
+> >   qemu-devel@nongnu.org (open list:-----------------...)
+> >=20
+> > Fix the issue by inserting a subsystem name line where
+> > get_maintainer.pl expects it.
+> >=20
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> >  MAINTAINERS | 1 +
+> >  1 file changed, 1 insertion(+)
+> >=20
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index e511ba780f..13c1ac65b7 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -1896,6 +1896,7 @@ F: docs/block-replication.txt
+> > =20
+> >  Build and test automation
+> >  -------------------------
+> > +Build and test automation
+>=20
+> Would it make sense to use something more specific here? Like "Travis
+> and Docker" or so? ... in case we add other subsections in the future?
 
-On 09/21/2017 12:07 PM, Fam Zheng wrote:
-> The image is prepared following instructions as in:
-> 
-> https://wiki.qemu.org/Hosts/BSD
-> 
-> Signed-off-by: Fam Zheng <famz@redhat.com>
-> ---
->   tests/vm/freebsd | 42 ++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 42 insertions(+)
->   create mode 100755 tests/vm/freebsd
-> 
-> diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-> new file mode 100755
-> index 0000000000..039dad8f69
-> --- /dev/null
-> +++ b/tests/vm/freebsd
-> @@ -0,0 +1,42 @@
-> +#!/usr/bin/env python
-> +#
-> +# FreeBSD VM image
-> +#
-> +# Copyright 2017 Red Hat Inc.
-> +#
-> +# Authors:
-> +#  Fam Zheng <famz@redhat.com>
-> +#
-> +# This code is licensed under the GPL version 2 or later.  See
-> +# the COPYING file in the top-level directory.
-> +#
-> +
-> +import os
-> +import sys
-> +import subprocess
-> +import basevm
-> +
-> +class FreeBSDVM(basevm.BaseVM):
-> +    name = "freebsd"
-> +    BUILD_SCRIPT = """
-> +        set -e;
-> +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
-> +        tar -xf /dev/vtbd1;
-> +        ./configure {configure_opts};
-> +        gmake -j{jobs};
-> +        gmake check;
-> +    """
-> +
-> +    def build_image(self, img):
-> +        cimg = self._download_with_cache("http://download.patchew.org/freebsd-11.1-amd64.img.xz",
-> +                sha256sum='adcb771549b37bc63826c501f05121a206ed3d9f55f49145908f7e1432d65891')
-> +        img_tmp_xz = img + ".tmp.xz"
-> +        img_tmp = img + ".tmp"
-> +        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+Unless we are to split off (i.e. more people volunteering maintaining a c=
+ertain
+subset), the list will just go on and on in this line. For not it's alrea=
+dy
+going to be "Travis, Shippable, Docker and VM test".. so I think a generi=
+c
+description here is okay, though the duplication is a bit odd (but I don'=
+t have
+a better idea).
 
-I'd rather see this part common to 3 images refactored as @static 
-BaseVM.download_and_extract_image() and some logging:
-
-         logging.debug("Extracting %s...", fname)
-
-> +        subprocess.check_call(["xz", "-df", img_tmp_xz])
-
-else one wonder what's happening here.
-
-(for another patch on top on this series)
-
-> +        if os.path.exists(img):
-> +            os.remove(img)
-> +        os.rename(img_tmp, img)
-> +
-> +if __name__ == "__main__":
-> +    sys.exit(basevm.main(FreeBSDVM))
-> 
+Fam
