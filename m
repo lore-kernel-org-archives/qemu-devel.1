@@ -1,18 +1,29 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:54011)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:54684)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dvOYZ-0007LP-7g
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:03:55 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dvOa9-000095-U4
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:05:30 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <david@redhat.com>) id 1dvOYT-0001cL-4c
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:03:51 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43674)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dvOYS-0001bt-SS
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:03:45 -0400
-From: David Hildenbrand <david@redhat.com>
-Date: Fri, 22 Sep 2017 16:03:38 +0200
-Message-Id: <20170922140338.6068-1-david@redhat.com>
-Subject: [Qemu-devel] [PATCH v2] s390x/kvm: fix and cleanup storing CPU
+	(envelope-from <rth7680@gmail.com>) id 1dvOa4-0002X3-UD
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:05:29 -0400
+Received: from mail-io0-x242.google.com ([2607:f8b0:4001:c06::242]:34306)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dvOa4-0002Ws-PI
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:05:24 -0400
+Received: by mail-io0-x242.google.com with SMTP id g32so716380ioj.1
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 07:05:24 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170921213052.1765-1-david@redhat.com>
+	<9d640173-93fe-0850-9335-d545dd34b2de@twiddle.net>
+	<cd4dda74-77c1-27a2-7427-d963a51e06ca@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <d05db15e-11f7-120b-88fb-156620b2ee6b@twiddle.net>
+Date: Fri, 22 Sep 2017 09:05:19 -0500
+MIME-Version: 1.0
+In-Reply-To: <cd4dda74-77c1-27a2-7427-d963a51e06ca@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/kvm: fix and cleanup storing CPU
  status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
@@ -22,115 +33,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-devel@nongnu.org
-Cc: thuth@redhat.com, cohuck@redhat.com, david@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
 
-env->psa is a 64bit value, while we copy 4 bytes into the save area,
-resulting always in 0 getting stored.
+On 09/22/2017 08:18 AM, David Hildenbrand wrote:
+> On 22.09.2017 15:12, Richard Henderson wrote:
+>> I don't believe you need to use QEMU_PACKED.  Unless the "addr" that's passed
+>> in can really be arbitrary?  (If so, the memory returned by
+>> cpu_physical_memory_map will be unaligned and so we do need the PACKED to force
+>> the compiler to generate unaligned stores into the structure.)
+> 
+> The address is either 0x1200 or it is masked with 0x7ffffe00u.
+> 
+> So most probably this should be fine without QEMU_PACKED, right?
 
-Let's try to reduce such errors by using a proper structure. While at
-it, use correct cpu->be conversion (and get_psw_mask()), as we will be
-reusing this code for TCG soon.
+Yes.
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
 
-v1 -> v2:
- - dropped QEMU_PACKED
- - Moved QEMU_BUILD_BUG_ON()
- - Retested if it works now
-
- target/s390x/kvm.c | 62 ++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 42 insertions(+), 20 deletions(-)
-
-diff --git a/target/s390x/kvm.c b/target/s390x/kvm.c
-index ebb75cafaa..b63fcc5f1f 100644
---- a/target/s390x/kvm.c
-+++ b/target/s390x/kvm.c
-@@ -1553,22 +1553,37 @@ static int do_store_adtl_status(S390CPU *cpu, hwaddr addr, hwaddr len)
-     return 0;
- }
- 
-+struct sigp_save_area {
-+    uint64_t    fprs[16];                       /* 0x0000 */
-+    uint64_t    grs[16];                        /* 0x0080 */
-+    PSW         psw;                            /* 0x0100 */
-+    uint8_t     pad_0x0110[0x0118 - 0x0110];    /* 0x0110 */
-+    uint32_t    prefix;                         /* 0x0118 */
-+    uint32_t    fpc;                            /* 0x011c */
-+    uint8_t     pad_0x0120[0x0124 - 0x0120];    /* 0x0120 */
-+    uint32_t    todpr;                          /* 0x0124 */
-+    uint64_t    cputm;                          /* 0x0128 */
-+    uint64_t    ckc;                            /* 0x0130 */
-+    uint8_t     pad_0x0138[0x0140 - 0x0138];    /* 0x0138 */
-+    uint32_t    ars[16];                        /* 0x0140 */
-+    uint64_t    crs[16];                        /* 0x0384 */
-+};
-+QEMU_BUILD_BUG_ON(sizeof(struct sigp_save_area) != 512);
-+
- #define KVM_S390_STORE_STATUS_DEF_ADDR offsetof(LowCore, floating_pt_save_area)
--#define SAVE_AREA_SIZE 512
- static int kvm_s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
- {
-     static const uint8_t ar_id = 1;
--    uint64_t ckc = cpu->env.ckc >> 8;
--    void *mem;
-+    struct sigp_save_area *sa;
-+    hwaddr len = sizeof(*sa);
-     int i;
--    hwaddr len = SAVE_AREA_SIZE;
- 
--    mem = cpu_physical_memory_map(addr, &len, 1);
--    if (!mem) {
-+    sa = cpu_physical_memory_map(addr, &len, 1);
-+    if (!sa) {
-         return -EFAULT;
-     }
--    if (len != SAVE_AREA_SIZE) {
--        cpu_physical_memory_unmap(mem, len, 1, 0);
-+    if (len != sizeof(*sa)) {
-+        cpu_physical_memory_unmap(sa, len, 1, 0);
-         return -EFAULT;
-     }
- 
-@@ -1576,19 +1591,26 @@ static int kvm_s390_store_status(S390CPU *cpu, hwaddr addr, bool store_arch)
-         cpu_physical_memory_write(offsetof(LowCore, ar_access_id), &ar_id, 1);
-     }
-     for (i = 0; i < 16; ++i) {
--        *((uint64_t *)mem + i) = get_freg(&cpu->env, i)->ll;
--    }
--    memcpy(mem + 128, &cpu->env.regs, 128);
--    memcpy(mem + 256, &cpu->env.psw, 16);
--    memcpy(mem + 280, &cpu->env.psa, 4);
--    memcpy(mem + 284, &cpu->env.fpc, 4);
--    memcpy(mem + 292, &cpu->env.todpr, 4);
--    memcpy(mem + 296, &cpu->env.cputm, 8);
--    memcpy(mem + 304, &ckc, 8);
--    memcpy(mem + 320, &cpu->env.aregs, 64);
--    memcpy(mem + 384, &cpu->env.cregs, 128);
-+        sa->fprs[i] = cpu_to_be64(get_freg(&cpu->env, i)->ll);
-+    }
-+    for (i = 0; i < 16; ++i) {
-+        sa->grs[i] = cpu_to_be64(cpu->env.regs[i]);
-+    }
-+    sa->psw.addr = cpu_to_be64(cpu->env.psw.addr);
-+    sa->psw.mask = cpu_to_be64(get_psw_mask(&cpu->env));
-+    sa->prefix = cpu_to_be32(cpu->env.psa);
-+    sa->fpc = cpu_to_be32(cpu->env.fpc);
-+    sa->todpr = cpu_to_be32(cpu->env.todpr);
-+    sa->cputm = cpu_to_be64(cpu->env.cputm);
-+    sa->ckc = cpu_to_be64(cpu->env.ckc >> 8);
-+    for (i = 0; i < 16; ++i) {
-+        sa->ars[i] = cpu_to_be32(cpu->env.aregs[i]);
-+    }
-+    for (i = 0; i < 16; ++i) {
-+        sa->ars[i] = cpu_to_be64(cpu->env.cregs[i]);
-+    }
- 
--    cpu_physical_memory_unmap(mem, len, 1, len);
-+    cpu_physical_memory_unmap(sa, len, 1, len);
- 
-     return 0;
- }
--- 
-2.13.5
+r~
