@@ -1,21 +1,24 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42947)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44853)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dvKbH-0004qv-Hu
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:50:24 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dvKhC-0006vY-8r
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:56:31 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dvKbG-0002S6-NI
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:50:23 -0400
-Date: Fri, 22 Sep 2017 10:50:07 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170922095007.GI12725@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <20170922093926.9723-1-pbutsykin@virtuozzo.com>
+	(envelope-from <dgilbert@redhat.com>) id 1dvKh8-0006lH-4V
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:56:30 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:34464)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dvKh7-0006kq-R1
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:56:26 -0400
+Date: Fri, 22 Sep 2017 10:56:18 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170922095617.GB2620@work-vm>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-17-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170922093926.9723-1-pbutsykin@virtuozzo.com>
-Subject: Re: [Qemu-devel] [PATCH v2 0/2] Truncate the tail of the image file
- in qcow2 shrinking
+In-Reply-To: <1504081950-2528-17-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 16/33] migration: rebuild channel on source
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,24 +27,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, den@openvz.org, jsnow@redhat.com
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On Fri, Sep 22, 2017 at 12:39:24PM +0300, Pavel Butsykin wrote:
-> Now after shrinking the qcow2 image, at the end of the image file, there might
-> be a tail that probably will never be used. Although it will not bring any
-> tangible benefit, we can cut the tail if it is. Yes, it will not free up disk
-> space, but if the blocks were be allocated sequentially and the image is not
-> heavily fragmented then the virtual size of the image file will be commensurate
-> with the real size. It also doesn't look like a great plus.. Well, at least we
-> can discuss it.
+* Peter Xu (peterx@redhat.com) wrote:
+> This patch detects the "resume" flag of migration command, rebuild the
+> channels only if the flag is set.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-If the block backend has discard support enabled, can't we get the tail
-to be discarded rather than merely truncated ?
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+> ---
+>  migration/migration.c | 92 ++++++++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 69 insertions(+), 23 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 15b8eb1..deb947b 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1233,49 +1233,75 @@ bool migration_is_blocked(Error **errp)
+>      return false;
+>  }
+>  
+> -void qmp_migrate(const char *uri, bool has_blk, bool blk,
+> -                 bool has_inc, bool inc, bool has_detach, bool detach,
+> -                 bool has_resume, bool resume, Error **errp)
+> +/* Returns true if continue to migrate, or false if error detected */
+> +static bool migrate_prepare(MigrationState *s, bool blk, bool blk_inc,
+> +                            bool resume, Error **errp)
+>  {
+>      Error *local_err = NULL;
+> -    MigrationState *s = migrate_get_current();
+> -    const char *p;
+> +
+> +    if (resume) {
+> +        if (s->state != MIGRATION_STATUS_POSTCOPY_PAUSED) {
+> +            error_setg(errp, "Cannot resume if there is no "
+> +                       "paused migration");
+> +            return false;
+> +        }
+> +        /* This is a resume, skip init status */
+> +        return true;
+> +    }
+>  
+>      if (migration_is_setup_or_active(s->state) ||
+>          s->state == MIGRATION_STATUS_CANCELLING ||
+>          s->state == MIGRATION_STATUS_COLO) {
+>          error_setg(errp, QERR_MIGRATION_ACTIVE);
+> -        return;
+> +        return false;
+>      }
+> +
+>      if (runstate_check(RUN_STATE_INMIGRATE)) {
+>          error_setg(errp, "Guest is waiting for an incoming migration");
+> -        return;
+> +        return false;
+>      }
+>  
+>      if (migration_is_blocked(errp)) {
+> -        return;
+> +        return false;
+>      }
+>  
+> -    if ((has_blk && blk) || (has_inc && inc)) {
+> +    if (blk || blk_inc) {
+>          if (migrate_use_block() || migrate_use_block_incremental()) {
+>              error_setg(errp, "Command options are incompatible with "
+>                         "current migration capabilities");
+> -            return;
+> +            return false;
+>          }
+>          migrate_set_block_enabled(true, &local_err);
+>          if (local_err) {
+>              error_propagate(errp, local_err);
+> -            return;
+> +            return false;
+>          }
+>          s->must_remove_block_options = true;
+>      }
+>  
+> -    if (has_inc && inc) {
+> +    if (blk_inc) {
+>          migrate_set_block_incremental(s, true);
+>      }
+>  
+>      migrate_init(s);
+>  
+> +    return true;
+> +}
+> +
+> +void qmp_migrate(const char *uri, bool has_blk, bool blk,
+> +                 bool has_inc, bool inc, bool has_detach, bool detach,
+> +                 bool has_resume, bool resume, Error **errp)
+> +{
+> +    Error *local_err = NULL;
+> +    MigrationState *s = migrate_get_current();
+> +    const char *p;
+> +
+> +    if (!migrate_prepare(s, has_blk && blk, has_inc && inc,
+> +                         has_resume && resume, errp)) {
+> +        /* Error detected, put into errp */
+> +        return;
+> +    }
+> +
+>      if (strstart(uri, "tcp:", &p)) {
+>          tcp_start_outgoing_migration(s, p, &local_err);
+>  #ifdef CONFIG_RDMA
+> @@ -1697,7 +1723,8 @@ out:
+>      return NULL;
+>  }
+>  
+> -static int open_return_path_on_source(MigrationState *ms)
+> +static int open_return_path_on_source(MigrationState *ms,
+> +                                      bool create_thread)
+>  {
+>  
+>      ms->rp_state.from_dst_file = qemu_file_get_return_path(ms->to_dst_file);
+> @@ -1706,6 +1733,12 @@ static int open_return_path_on_source(MigrationState *ms)
+>      }
+>  
+>      trace_open_return_path_on_source();
+> +
+> +    if (!create_thread) {
+> +        /* We're done */
+> +        return 0;
+> +    }
+> +
+>      qemu_thread_create(&ms->rp_state.rp_thread, "return path",
+>                         source_return_path_thread, ms, QEMU_THREAD_JOINABLE);
+>  
+> @@ -2263,15 +2296,24 @@ static void *migration_thread(void *opaque)
+>  
+>  void migrate_fd_connect(MigrationState *s)
+>  {
+> -    s->expected_downtime = s->parameters.downtime_limit;
+> -    s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
+> +    int64_t rate_limit;
+> +    bool resume = s->state == MIGRATION_STATUS_POSTCOPY_PAUSED;
+>  
+> -    qemu_file_set_blocking(s->to_dst_file, true);
+> -    qemu_file_set_rate_limit(s->to_dst_file,
+> -                             s->parameters.max_bandwidth / XFER_LIMIT_RATIO);
+> +    if (resume) {
+> +        /* This is a resumed migration */
+> +        rate_limit = INT64_MAX;
+> +    } else {
+> +        /* This is a fresh new migration */
+> +        rate_limit = s->parameters.max_bandwidth / XFER_LIMIT_RATIO;
+> +        s->expected_downtime = s->parameters.downtime_limit;
+> +        s->cleanup_bh = qemu_bh_new(migrate_fd_cleanup, s);
+>  
+> -    /* Notify before starting migration thread */
+> -    notifier_list_notify(&migration_state_notifiers, s);
+> +        /* Notify before starting migration thread */
+> +        notifier_list_notify(&migration_state_notifiers, s);
+> +    }
+> +
+> +    qemu_file_set_rate_limit(s->to_dst_file, rate_limit);
+> +    qemu_file_set_blocking(s->to_dst_file, true);
+>  
+>      /*
+>       * Open the return path. For postcopy, it is used exclusively. For
+> @@ -2279,15 +2321,19 @@ void migrate_fd_connect(MigrationState *s)
+>       * QEMU uses the return path.
+>       */
+>      if (migrate_postcopy_ram() || migrate_use_return_path()) {
+> -        if (open_return_path_on_source(s)) {
+> +        if (open_return_path_on_source(s, !resume)) {
+>              error_report("Unable to open return-path for postcopy");
+> -            migrate_set_state(&s->state, MIGRATION_STATUS_SETUP,
+> -                              MIGRATION_STATUS_FAILED);
+> +            migrate_set_state(&s->state, s->state, MIGRATION_STATUS_FAILED);
+>              migrate_fd_cleanup(s);
+>              return;
+>          }
+>      }
+>  
+> +    if (resume) {
+> +        /* TODO: do the resume logic */
+> +        return;
+> +    }
+> +
+>      qemu_thread_create(&s->thread, "live_migration", migration_thread, s,
+>                         QEMU_THREAD_JOINABLE);
+>      s->migration_thread_running = true;
+> -- 
+> 2.7.4
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
