@@ -1,29 +1,22 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60066)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:60464)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dvIKF-0006na-1N
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:24:40 -0400
+	(envelope-from <jasowang@redhat.com>) id 1dvIMo-0007jf-1T
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:27:19 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dvIKB-00040O-3c
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:24:39 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35782)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dvIKA-0003zw-Tc
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:24:35 -0400
-Date: Fri, 22 Sep 2017 09:24:26 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170922092426.53ca16ca.cohuck@redhat.com>
-In-Reply-To: <31127d34-b117-59ec-ee8d-c4a7f8324173@de.ibm.com>
-References: <20170921151446.40015-1-borntraeger@de.ibm.com>
-	<20170921151446.40015-2-borntraeger@de.ibm.com>
-	<20170921172142.1052a887.cohuck@redhat.com>
-	<150601262807.14100.4805165453968988313@sif>
-	<150602559136.14100.15716317748570889468@sif>
-	<31127d34-b117-59ec-ee8d-c4a7f8324173@de.ibm.com>
+	(envelope-from <jasowang@redhat.com>) id 1dvIMm-00058B-Sk
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:27:18 -0400
+References: <20170918195100.17593-1-andrew.smirnov@gmail.com>
+	<20170918195100.17593-5-andrew.smirnov@gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <dbc5a135-10d5-e332-94b3-4e59596f1d76@redhat.com>
+Date: Fri, 22 Sep 2017 15:27:05 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH 1/1] s390x/ais: for 2.10 stable: disable
- ais facility
+In-Reply-To: <20170918195100.17593-5-andrew.smirnov@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH 04/17] imx_fec: Change queue flushing
+ heuristics
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -32,45 +25,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, David Hildenbrand <david@redhat.com>, qemu-devel <qemu-devel@nongnu.org>, Alexander Graf <agraf@suse.de>, Richard Henderson <rth@twiddle.net>
+To: Andrey Smirnov <andrew.smirnov@gmail.com>, qemu-arm@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, yurovsky@gmail.com
 
-On Fri, 22 Sep 2017 08:47:41 +0200
-Christian Borntraeger <borntraeger@de.ibm.com> wrote:
 
-> On 09/21/2017 10:26 PM, Michael Roth wrote:
-> > Quoting Michael Roth (2017-09-21 11:50:28)  
-> >> Quoting Cornelia Huck (2017-09-21 10:21:42)  
-> >>> On Thu, 21 Sep 2017 17:14:46 +0200
-> >>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
-> >>>  
-> >>>> The migration interface for ais was introduced with kernel 4.13
-> >>>> but the capability itself had been active since 4.12. As migration
-> >>>> support is considered necessary lets disable ais in the 2.10
-> >>>> stable version. A proper fix and re-enablement will be done
-> >>>> for qemu 2.11.  
-> >>>
-> >>> Also now with qemu-devel on cc:
-> >>>
-> >>> So, should I apply to s390-next? Or can this be applied just to stable?  
-> >>
-> >> Ideally we would get it in master or at least a branch that'll
-> >> eventually get pulled so we can reference the upstream commit ID.
-> >> It's not set in stone, but usually only patches specifically ported
-> >> to stable are applied directly.  
-> > 
-> > Somehow I missed the "for 2.10 stable" in the subject line. I can apply
-> > this directly if it comes to that, but it seems safer to apply this
-> > upstream as well in the meantime, IMO. If the proper fix didn't make
-> > 2.11 for whatever reason we'd still be okay with 2.10.1<->2.11, for
-> > instance.
-> >   
-> 
-> So what about the following. We will schedule this disable patch also for
-> current master. Whenever we have a proper fix we can then revert/fixup the
-> disable patch. This patch will then be backported to 2.10.1
-> For 2.11 we then fixup the ais code and also add the "disable ais for compat
-> machines" patch.
 
-Sounds good. I'll queue this one and send a pull request, just to be on
-the safe side.
+On 2017=E5=B9=B409=E6=9C=8819=E6=97=A5 03:50, Andrey Smirnov wrote:
+> In current implementation, packet queue flushing logic seem to suffer
+> from a deadlock like scenario if a packet is received by the interface
+> before before Rx ring is initialized by Guest's driver. Consider the
+> following sequence of events:
+>
+> 	1. A QEMU instance is started against a TAP device on Linux
+> 	   host, running Linux guest, e. g., something to the effect
+> 	   of:
+>
+> 	   qemu-system-arm \
+> 	      -net nic,model=3Dimx.fec,netdev=3Dlan0 \
+> 	      netdev tap,id=3Dlan0,ifname=3Dtap0,script=3Dno,downscript=3Dno \
+> 	      ... rest of the arguments ...
+>
+> 	2. Once QEMU starts, but before guest reaches the point where
+> 	   FEC deriver is done initializing the HW, Guest, via TAP
+> 	   interface, receives a number of multicast MDNS packets from
+> 	   Host (not necessarily true for every OS, but it happens at
+> 	   least on Fedora 25)
+>
+> 	3. Recieving a packet in such a state results in
+> 	   imx_eth_can_receive() returning '0', which in turn causes
+> 	   tap_send() to disable corresponding event (tap.c:203)
+>
+> 	4. Once Guest's driver reaches the point where it is ready to
+> 	   recieve packets it prepares Rx ring descriptors and writes
+> 	   ENET_RDAR_RDAR to ENET_RDAR register to indicate to HW that
+> 	   more descriptors are ready. And at this points emulation
+> 	   layer does this:
+>
+> 	   	 s->regs[index] =3D ENET_RDAR_RDAR;
+>                   imx_eth_enable_rx(s);
+>
+> 	   which, combined with:
+>
+> 	   	  if (!s->regs[ENET_RDAR]) {
+> 		     qemu_flush_queued_packets(qemu_get_queue(s->nic));
+> 		  }
+
+Not familiar with FEC, but if you are tracking 0->1 transition, why not=20
+simply introduce a parameter of imx_eth_enable_rx() to force the flushing=
+?
+
+Thanks
+
+>
+> 	   results in Rx queue never being flushed and corresponding
+> 	   I/O event beign disabled.
+>
+> Change the code to remember the fact that can_receive callback was
+> called before Rx ring was ready and use it to make a decision if
+> receive queue needs to be flushed.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: qemu-devel@nongnu.org
+> Cc: qemu-arm@nongnu.org
+> Cc: yurovsky@gmail.com
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> ---
+>   hw/net/imx_fec.c         | 6 ++++--
+>   include/hw/net/imx_fec.h | 1 +
+>   2 files changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/net/imx_fec.c b/hw/net/imx_fec.c
+> index 84085afe09..767402909d 100644
+> --- a/hw/net/imx_fec.c
+> +++ b/hw/net/imx_fec.c
+> @@ -544,8 +544,9 @@ static void imx_eth_enable_rx(IMXFECState *s)
+>  =20
+>       if (rx_ring_full) {
+>           FEC_PRINTF("RX buffer full\n");
+> -    } else if (!s->regs[ENET_RDAR]) {
+> +    } else if (s->needs_flush) {
+>           qemu_flush_queued_packets(qemu_get_queue(s->nic));
+> +        s->needs_flush =3D false;
+>       }
+>  =20
+>       s->regs[ENET_RDAR] =3D rx_ring_full ? 0 : ENET_RDAR_RDAR;
+> @@ -930,7 +931,8 @@ static int imx_eth_can_receive(NetClientState *nc)
+>  =20
+>       FEC_PRINTF("\n");
+>  =20
+> -    return s->regs[ENET_RDAR] ? 1 : 0;
+> +    s->needs_flush =3D !s->regs[ENET_RDAR];
+> +    return !!s->regs[ENET_RDAR];
+>   }
+>  =20
+>   static ssize_t imx_fec_receive(NetClientState *nc, const uint8_t *buf=
+,
+> diff --git a/include/hw/net/imx_fec.h b/include/hw/net/imx_fec.h
+> index 62ad473b05..4bc8f03ec2 100644
+> --- a/include/hw/net/imx_fec.h
+> +++ b/include/hw/net/imx_fec.h
+> @@ -252,6 +252,7 @@ typedef struct IMXFECState {
+>       uint32_t phy_int_mask;
+>  =20
+>       bool is_fec;
+> +    bool needs_flush;
+>   } IMXFECState;
+>  =20
+>   #endif
