@@ -1,38 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39442)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39932)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dvM7G-0000bS-OI
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:27:31 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dvMAB-0001l2-VE
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:30:33 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <borntraeger@de.ibm.com>) id 1dvM7D-0000qk-IV
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:27:30 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34324)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <borntraeger@de.ibm.com>)
-	id 1dvM7D-0000pp-9I
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:27:27 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.16.0.21/8.16.0.21) with SMTP id
-	v8MBNqAY004431
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 07:27:22 -0400
-Received: from e06smtp10.uk.ibm.com (e06smtp10.uk.ibm.com [195.75.94.106])
-	by mx0a-001b2d01.pphosted.com with ESMTP id 2d4ywry6fm-1
-	(version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 07:27:21 -0400
-Received: from localhost
-	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use
-	Only! Violators will be prosecuted
-	for <qemu-devel@nongnu.org> from <borntraeger@de.ibm.com>;
-	Fri, 22 Sep 2017 12:27:19 +0100
-References: <20170922083855.102341-1-borntraeger@de.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Date: Fri, 22 Sep 2017 13:27:16 +0200
+	(envelope-from <dgibson@ozlabs.org>) id 1dvMA8-0002NI-O5
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:30:31 -0400
+Date: Fri, 22 Sep 2017 21:20:42 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170922112042.GR4998@umbus.fritz.box>
+References: <87vakdhnyn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920065700.GO5520@umbus.fritz.box>
+	<87poalhm74.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920115342.GQ5520@umbus.fritz.box>
+	<87377gpuyh.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170921053107.GD4998@umbus.fritz.box>
+	<87y3p7nugc.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<e2ad1b05-0e93-5389-92b5-7d9ebdd273f8@kaod.org>
+	<20170922101201.GG4998@umbus.fritz.box>
+	<8cf3e77a-e397-c082-f1a2-b6b8c6be439f@kaod.org>
 MIME-Version: 1.0
-In-Reply-To: <20170922083855.102341-1-borntraeger@de.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Message-Id: <c2bb9668-3056-c0bf-a794-878f1e4a058c@de.ibm.com>
-Subject: Re: [Qemu-devel] [PATCH/RFC 0/3] ais fixups for 2.11
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="6nfUOKxk8V1TQsEu"
+Content-Disposition: inline
+In-Reply-To: <8cf3e77a-e397-c082-f1a2-b6b8c6be439f@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -41,67 +33,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Cornelia Huck <cohuck@redhat.com>
-Cc: Richard Henderson <rth@twiddle.net>, Alexander Graf <agraf@suse.de>, Yi Min Zhao <zyimin@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.vnet.ibm.com>, qemu-devel <qemu-devel@nongnu.org>, David Hildenbrand <david@redhat.com>, "Jason J . Herne" <jjherne@linux.vnet.ibm.com>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
-On 09/22/2017 10:38 AM, Christian Borntraeger wrote:
-> Conny, this seem to work on KVM (needs more testing and review).
-> Can you check what happens with TCG?
-> 
-> Patch 1 is the known base patch,
-> Patch 2 fixes the ais detection to be based on the flic interfaces
-> Patch 3 disables ais for all compat machines <= 2.10
-> 
-> 
-> 
-> Christian Borntraeger (3):
->   s390x/ais: disable ais facility as it is broken
->   s390x/ais: enable ais when migration is available
->   s390x/ais: disable ais for compat machines
-> 
->  hw/intc/s390_flic.c                | 11 +++++++++--
->  hw/intc/s390_flic_kvm.c            | 10 +++++++++-
->  hw/s390x/s390-virtio-ccw.c         | 18 ++++++++++++++++--
->  include/hw/s390x/s390-virtio-ccw.h |  3 +++
->  include/hw/s390x/s390_flic.h       |  1 +
->  target/s390x/cpu_models.c          |  6 ++++++
->  target/s390x/kvm.c                 |  3 +--
->  7 files changed, 45 insertions(+), 7 deletions(-)
-> 
 
-FWIW, with patch 1 backported to 2.10 and patches 1,2,3 on top of current master (as 211)
-I started some crossmigration test and successfully tested
-the following combinations with KVM and -cpu host on an 4.13 kernel
+--6nfUOKxk8V1TQsEu
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Machine s390-ccw-virtio-2.11
-211-->211  	
+On Fri, Sep 22, 2017 at 12:46:58PM +0200, C=E9dric Le Goater wrote:
+> On 09/22/2017 12:12 PM, David Gibson wrote:
+> > On Fri, Sep 22, 2017 at 08:07:06AM +0200, C=E9dric Le Goater wrote:
+> >> On 09/22/2017 08:00 AM, Nikunj A Dadhania wrote:
+> >>> David Gibson <david@gibson.dropbear.id.au> writes:
+> >>>
+> >>>>>>>
+> >>>>>>> As smp_thread defaults to 1 in vl.c, similarly smp_cores also has=
+ the
+> >>>>>>> default value of 1 in vl.c. In powernv, we were setting nr-cores =
+like
+> >>>>>>> this:
+> >>>>>>>
+> >>>>>>>         object_property_set_int(chip, smp_cores, "nr-cores", &err=
+or_fatal);
+> >>>>>>>
+> >>>>>>> Even when there were multiple cpus (-smp 4), when the guest boots=
+ up, we
+> >>>>>>> just get one core (i.e. smp_cores was 1) with single thread(smp_t=
+hreads
+> >>>>>>> was 1), which is wrong as per the command-line that was provided.
+> >>>>>>
+> >>>>>> Right, so, -smp 4 defaults to 4 sockets, each with 1 core of 1
+> >>>>>> thread.  If you can't supply 4 sockets you should error, but you
+> >>>>>> shouldn't go and change the number of cores per socket.
+> >>>>>
+> >>>>> OK, that makes sense now. And I do see that smp_cpus is 4 in the ab=
+ove
+> >>>>> case. Now looking more into it, i see that powernv has something ca=
+lled
+> >>>>> "num_chips", isnt this same as sockets ? Do we need num_chips separ=
+ately?
+> >>>>
+> >>>> Ah, yes, I see.  It's probably still reasonable to keep num_chips as
+> >>>> an internal variable, rather than using (smp_cpus / smp_cores /
+> >>>> smp_threads) everywhere.  But we shouldn't have it as a direct
+> >>>> user-settable property, instead setting it from the -smp command line
+> >>>> option.
+> >>>
+> >>> Something like the below works till num_chips=3D2, after that guest d=
+oes
+> >>> not boot up. This might be some limitation within the OS, Cedric might
+> >>> have some clue.
+> >>
+> >> Some controllers might need some more tweaking, PSI, LPC, to elect a=
+=20
+> >> master one.
+> >=20
+> > Uh.. why?
+>=20
+> that's not true. I managed to boot a pnv machine with 4 chips/sockets=20
+> each having 4 cpus using a 4.4.9-openpower2 skiroot kernel, from an=20
+> openpower firmare 1.10 I think. Recent openpower kernel must be using=20
+> some new features/instructions that we don't manage well in QEMU.
+>=20
+> I would need to build a kernel with more output.
+>=20
+> >> Anyhow I don't think we want to deduce the number of chips
+> >> from the number of cpus. These two figures are very different.
+> >=20
+> > How so?  It's not totally perfect, but making a single chip correspond
+> > to a "socket" in qemu's (somewhat x86 centric) terminology is still a
+> > pretty good match.
+>=20
+> well, it would be good to be able to define chips with different
+> numbers of cpus. That is something will we want to do for sure.
 
-Machine s390-ccw-virtio-2.10
-211-->210,211	
-210-->210,211	
+You mean multiple chips in a single system with non-uniform numbers of
+cores?  Are there really such systems in the wild?
 
-Machine s390-ccw-virtio-2.9
-211-->29,210,211
-210-->29,210,211
-29--->29,210,211
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
-Machine s390-ccw-virtio-2.8
-211-->28,29,210,211
-210-->28,29,210,211
-29--->28,29,210,211
-28--->28,29,210,211
+--6nfUOKxk8V1TQsEu
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Machine s390-ccw-virtio-2.7
-211-->27,28,29,210,211
-210-->27,28,29,210,211
-29--->27,28,29,210,211
-28--->27,28,29,210,211
-27--->27,28,29,210,211
+-----BEGIN PGP SIGNATURE-----
 
-Machine s390-ccw-virtio-2.6
-211-->26 27 28 29 210 211
-210-->26 27 28 29 210 211
-29--->26 27 28 29 210 211
-28--->26 27 28 29 210 211
-27--->26 27 28 29 210 211
-26--->26 27 28 29 210 211
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnE8ggACgkQbDjKyiDZ
+s5IDlQ//RofrfmU9Spa6mrhoOfD4eBmFnZtQEVHIO9R58vAX20DYYxtVR1blw7dy
+Xz90IyJERe5XEV4Gw9JcE0/k2+HC9SLIkLrSzrBVJ5ypvJUisRjFTybQ+zw8o2gN
+jbdum9IRMMhS84hO9+FAXN9M/t32mFunrrTn5eE/j3wFEYOJ1aC0LSiRv/46aBrT
+FvDl6a4DNeAchlv8gniy2j9dSVh1EZrS7maFVmxjOZ33X37dKFCZbijM0ZzLKq4L
+Q8KEPcWxClvcjU5hEGJFTXpjbL+cq1KgcxDIP67tzSKwWzJfnICHtJW7gDFpA4cW
+mxqRK4DGJ8Q+CYICXks1s+xLKT/3rXrnG8UNIx58i5w9bPBdvSxivxUs2cbtmuGl
+zAK83Nw7+zXMuk7yzwR5vHA5vt12EZ54g/njJIsGz0ejovQT04bYm4PodCe6GGpN
++Rf5YfyJU38/peYNEp/D8PRDmxw5GTClipcJkhLQNAeDcuzD9OrkSSqCFjpOyFMr
+yPw+qNvhhPvHx8z0FswzrTLeMZMoQ25nsFfZ01HvaGzR45VbdUNSQT+Rxj3G2vk+
+7bPZrLzkD3llHfvxAPsovo+TDazS7CmI6uotp1ZI+x5q1aVh9o2QEgMPsfxxRbPL
+M8hxAoQp4F5ull/SSuTwD9qB/iDfyrj8gWkAEiBAhRMzBYLmtOI=
+=ZyMI
+-----END PGP SIGNATURE-----
+
+--6nfUOKxk8V1TQsEu--
