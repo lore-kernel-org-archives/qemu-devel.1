@@ -1,26 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42512)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42572)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dvNqk-0006WX-7j
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:18:35 -0400
+	(envelope-from <david@redhat.com>) id 1dvNr8-0006i7-1T
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:18:59 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <berrange@redhat.com>) id 1dvNqg-0002MV-4k
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:18:34 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36790)
+	(envelope-from <david@redhat.com>) id 1dvNr5-0002Us-CH
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:18:58 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53678)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <berrange@redhat.com>) id 1dvNqf-0002MH-Tx
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:18:30 -0400
-Date: Fri, 22 Sep 2017 14:18:19 +0100
-From: "Daniel P. Berrange" <berrange@redhat.com>
-Message-ID: <20170922131819.GP12725@redhat.com>
-Reply-To: "Daniel P. Berrange" <berrange@redhat.com>
-References: <mailman.3351.1506066493.14747.qemu-devel@nongnu.org>
-	<726A2123-0371-407B-9270-6672DF66D511@gmail.com>
-	<20170922124405.GB32000@lemon>
+	(Exim 4.71) (envelope-from <david@redhat.com>) id 1dvNr5-0002Tk-5X
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:18:55 -0400
+References: <20170921213052.1765-1-david@redhat.com>
+	<9d640173-93fe-0850-9335-d545dd34b2de@twiddle.net>
+From: David Hildenbrand <david@redhat.com>
+Message-ID: <cd4dda74-77c1-27a2-7427-d963a51e06ca@redhat.com>
+Date: Fri, 22 Sep 2017 15:18:52 +0200
 MIME-Version: 1.0
+In-Reply-To: <9d640173-93fe-0850-9335-d545dd34b2de@twiddle.net>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170922124405.GB32000@lemon>
-Subject: Re: [Qemu-devel] [PULL 28/36] tests: Add ubuntu.i386 image
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH v1] s390x/kvm: fix and cleanup storing CPU
+ status
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -29,27 +29,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: Programmingkid <programmingkidx@gmail.com>, "qemu-devel@nongnu.org qemu-devel" <qemu-devel@nongnu.org>
+To: Richard Henderson <rth@twiddle.net>, qemu-devel@nongnu.org
+Cc: thuth@redhat.com, cohuck@redhat.com, Christian Borntraeger <borntraeger@de.ibm.com>, Alexander Graf <agraf@suse.de>
 
-On Fri, Sep 22, 2017 at 08:44:05PM +0800, Fam Zheng wrote:
-> On Fri, 09/22 08:10, Programmingkid wrote:
-> > Could a Darwin test be added? Both x86 and PowerPC versions would be great.
+On 22.09.2017 15:12, Richard Henderson wrote:
+> On 09/21/2017 04:30 PM, David Hildenbrand wrote:
+>> +struct sigp_save_area {
+>> +    uint64_t    fprs[16];                       /* 0x0000 */
+>> +    uint64_t    grs[16];                        /* 0x0080 */
+>> +    PSW         psw;                            /* 0x0100 */
+>> +    uint8_t     pad_0x0110[0x0118 - 0x0110];    /* 0x0110 */
+>> +    uint32_t    prefix;                         /* 0x0118 */
+>> +    uint32_t    fpc;                            /* 0x011c */
+>> +    uint8_t     pad_0x0120[0x0124 - 0x0120];    /* 0x0120 */
+>> +    uint32_t    todpr;                          /* 0x0124 */
+>> +    uint64_t    cputm;                          /* 0x0128 */
+>> +    uint64_t    ckc;                            /* 0x0130 */
+>> +    uint8_t     pad_0x0138[0x0140 - 0x0138];    /* 0x0138 */
+>> +    uint32_t    ars[16];                        /* 0x0140 */
+>> +    uint64_t    crs[16];                        /* 0x0384 */
+>> +} QEMU_PACKED;
 > 
-> It's nice to cover macOS in our test, but to be honest I don't know how to do
-> it. If there isn't any copyright problem, and if there are instructions
-> available in wiki.qemu.org descirbing how to create such a guest step by step
-> like [1], we can add one.
+> I don't believe you need to use QEMU_PACKED.  Unless the "addr" that's passed
+> in can really be arbitrary?  (If so, the memory returned by
+> cpu_physical_memory_map will be unaligned and so we do need the PACKED to force
+> the compiler to generate unaligned stores into the structure.)
 
-AFAICT we can not just provide or host OS-X images and let individual
-devs run the without it being a license violation, so best avoided.
+The address is either 0x1200 or it is masked with 0x7ffffe00u.
 
-IMHO it easier to just rely on Travis' OS-X builders for testing OS-X
-platform builds, so that licensing compliance is their responsibility.
+So most probably this should be fine without QEMU_PACKED, right?
 
-Regards,
-Daniel
+> 
+>> QEMU_BUILD_BUG_ON(sizeof(*sa) != 512);
+> 
+> Put this right next to the structure?
+> 
+
+Wasn't aware that this can be moved outside of a function. Thanks!
+
+Thanks!
+
+> 
+> r~
+> 
+
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
+Thanks,
+
+David
