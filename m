@@ -1,22 +1,35 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:45686)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46869)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <dzagorui@cisco.com>) id 1dvO10-0003lT-F1
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:29:11 -0400
+	(envelope-from <rth7680@gmail.com>) id 1dvO3N-0005JR-2m
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:31:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <dzagorui@cisco.com>) id 1dvO0x-0008M4-RG
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:29:10 -0400
-Received: from aer-iport-4.cisco.com ([173.38.203.54]:33077)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_ARCFOUR_SHA1:16) (Exim 4.71)
-	(envelope-from <dzagorui@cisco.com>) id 1dvO0x-0008Io-GL
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:29:07 -0400
-From: Denys Zagorui <dzagorui@cisco.com>
-Message-ID: <8e67afb3-46b4-9d04-552f-740331165f8f@cisco.com>
-Date: Fri, 22 Sep 2017 16:28:40 +0300
+	(envelope-from <rth7680@gmail.com>) id 1dvO3K-0002Cj-Fa
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:31:37 -0400
+Received: from mail-io0-x232.google.com ([2607:f8b0:4001:c06::232]:48718)
+	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+	(Exim 4.71) (envelope-from <rth7680@gmail.com>) id 1dvO3K-0002CX-A1
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 09:31:34 -0400
+Received: by mail-io0-x232.google.com with SMTP id n69so3050977ioi.5
+	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 06:31:34 -0700 (PDT)
+Sender: Richard Henderson <rth7680@gmail.com>
+References: <20170911022839.23231-1-f4bug@amsat.org>
+	<1c72c0c6-bd29-5228-d4ad-b26b11afa712@linaro.org>
+	<CAFEAcA9+iDKf7UmQ2tevR9KQb_F2fJoBY03zrMMwM7ypFUdeAw@mail.gmail.com>
+	<cff16e31-4be0-9665-62d7-88a12b6d0b56@weilnetz.de>
+	<15608989-cb43-a522-9a7d-b57b3a393155@weilnetz.de>
+	<abc99a4a-1386-2757-e605-f10d0afe6b3e@redhat.com>
+	<2a90999d-6f79-cbd4-aaba-a6cd425980c6@redhat.com>
+	<125b2e2a-290e-568a-0e33-d40150220912@redhat.com>
+From: Richard Henderson <rth@twiddle.net>
+Message-ID: <be48c711-10af-c4bc-f129-88a844f3ecc4@twiddle.net>
+Date: Fri, 22 Sep 2017 08:31:29 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <125b2e2a-290e-568a-0e33-d40150220912@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Subject: [Qemu-devel] KVM serial8250: too much work for irq3
+Content-Transfer-Encoding: 7bit
+Subject: Re: [Qemu-devel] [PATCH] tcg/tci: do not use ldst label (never
+ implemented)
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,73 +38,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: hpa@zytor.com
-Cc: qemu-devel@nongnu.org
+To: Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Weil <sw@weilnetz.de>, Peter Maydell <peter.maydell@linaro.org>, Richard Henderson <richard.henderson@linaro.org>, QEMU Developers <qemu-devel@nongnu.org>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
 
-Hello
+On 09/21/2017 04:59 AM, Thomas Huth wrote:
+> $ time ppc64-softmmu/qemu-system-ppc64 -nographic -vga none -prom-env
+> 'use-nvramrc?=true' -prom-env 'nvramrc=power-off'
+> [...]
+> real	0m13.953s
+> user	0m13.904s
+> sys	0m0.046s
+> 
+> That's impressive! Richard, may I ask what's the current state of this?
+> Do you plan to merge this soon, or are there still issues (like the ones
+> that Paolo mentioned)?
 
-This is known issue, it was mentioned at first time about 9 years ago.
+I had been assuming that it would go in via the normal ppc tree.
+If I should just merge it with tcg-next, I can do so...
 
-https://lkml.org/lkml/2008/2/5/401
+> However, I only see that speed-up with the normal x86 backend. I've also
+> tried it with TCI, but I hardly saw any improvements there ... is there
+> still something missing in the TCI backend that is required for the
+> tcg_gen_lookup_and_goto_ptr feature?
 
-https://bugzilla.redhat.com/show_bug.cgi?id=986761
+Yes.
 
-
-But it seems not fixed. I tested on my setup.
-
-My Host machine Debian Stretch (kernel 4.9-30), Guest vanilla kernel 
-4.4-76. Tried on Qemu  2.8 and 2.10
-
-qemu-system-x86_64 -name guest=guest,debug-threads=on -S -object 
-secret,id=masterKey0,format=raw,file=/var/lib/libvirt/qemu/domain-7-guest/master-key.aes 
--machine pc-i440fx-2.8,accel=kvm,usb=off,dump-guest-core=off -cpu 
-SkylakeClient,ds=on,acpi=on,ss=on,ht=on,tm=on,pbe=on,dtes64=on,monitor=on,ds_cpl=on,vmx=on,smx=on,est=on,tm2=on,xtpr=on,pdcm=on,osxsave=on,tsc_adjust=on,clflushopt=on,pdpe1gb=on 
--m 4096 -realtime mlock=off -smp 4,sockets=1,cores=4,threads=1 -uuid 
-4537ca29-73b2-40c3-9b43-666de182ba5f -display none -no-user-config 
--nodefaults -chardev 
-socket,id=charmonitor,path=/var/lib/libvirt/qemu/domain-7-guest/monitor.sock,server,nowait 
--mon chardev=charmonitor,id=monitor,mode=control -rtc 
-base=utc,driftfix=slew -global kvm-pit.lost_tick_policy=delay -no-hpet 
--no-shutdown -global PIIX4_PM.disable_s3=1 -global PIIX4_PM.disable_s4=1 
--boot strict=on -device ich9-usb-ehci1,id=usb,bus=pci.0,addr=0x8.0x7 
--device 
-ich9-usb-uhci1,masterbus=usb.0,firstport=0,bus=pci.0,multifunction=on,addr=0x8 
--device 
-ich9-usb-uhci2,masterbus=usb.0,firstport=2,bus=pci.0,addr=0x8.0x1 
--device 
-ich9-usb-uhci3,masterbus=usb.0,firstport=4,bus=pci.0,addr=0x8.0x2 -drive 
-file=/home/dzagorui/csr/csr_disk.qcow2,format=qcow2,if=none,id=drive-ide0-0-0 
--device 
-ide-hd,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0,bootindex=1 
--netdev tap,fd=25,id=hostnet0 -device 
-e1000,netdev=hostnet0,id=net0,mac=52:54:00:a9:4c:86,bus=pci.0,addr=0x3 
--netdev tap,fd=27,id=hostnet1 -device 
-e1000,netdev=hostnet1,id=net1,mac=52:54:00:d4:7f:fa,bus=pci.0,addr=0x4 
--netdev tap,fd=28,id=hostnet2 -device 
-e1000,netdev=hostnet2,id=net2,mac=52:54:00:d6:ec:f6,bus=pci.0,addr=0x5 
--netdev tap,fd=29,id=hostnet3 -device 
-e1000,netdev=hostnet3,id=net3,mac=52:54:00:99:2b:46,bus=pci.0,addr=0xa 
--chardev 
-socket,id=charserial0,host=127.0.0.1,port=4000,telnet,server,nowait 
--device isa-serial,chardev=charserial0,id=serial0 -chardev 
-socket,id=charserial1,host=127.0.0.1,port=4001,telnet,server,nowait 
--device isa-serial,chardev=charserial1,id=serial1 -device 
-virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x9 -msg timestamp=on
-
-
-With this 100% reproduce:
-
-dd if=/dev/zero of=/dev/ttyS1
-
-
-And there is fix proposed by H. Peter Anvin in 2008
-
-https://lkml.org/lkml/2008/2/7/485
-
-
-So maybe it needs to be reworked?
-
-
-Regards,
-
-Denys
+r~
