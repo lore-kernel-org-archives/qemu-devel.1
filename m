@@ -1,25 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:44149)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:44261)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dvMYr-0002z4-PJ
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:56:02 -0400
+	(envelope-from <dgilbert@redhat.com>) id 1dvMZF-0003Cg-PN
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:56:26 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dvMYr-0008UE-1D
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:56:01 -0400
-Received: from mail-wm0-x22e.google.com ([2a00:1450:400c:c09::22e]:45870)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dvMYq-0008Tm-Qd
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:56:00 -0400
-Received: by mail-wm0-x22e.google.com with SMTP id q124so3205898wmb.0
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 04:56:00 -0700 (PDT)
+	(envelope-from <dgilbert@redhat.com>) id 1dvMZA-0000GM-7B
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:56:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:60014)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <dgilbert@redhat.com>) id 1dvMZ9-0000Dm-VX
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:56:20 -0400
+Date: Fri, 22 Sep 2017 12:56:12 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Message-ID: <20170922115612.GJ2620@work-vm>
+References: <1504081950-2528-1-git-send-email-peterx@redhat.com>
+	<1504081950-2528-27-git-send-email-peterx@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20170922074659.30097-1-famz@redhat.com>
-References: <20170922074659.30097-1-famz@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Sep 2017 12:55:39 +0100
-Message-ID: <CAFEAcA-zqvcOSTi0jTVMH6uhuRdQzANd9pHFO_pm=-=Zsw185w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [PULL v5 00/36] Build and test automation patches
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1504081950-2528-27-git-send-email-peterx@redhat.com>
+Subject: Re: [Qemu-devel] [RFC v2 26/33] migration: final handshake for the
+ resume
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -28,32 +28,86 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Fam Zheng <famz@redhat.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+To: Peter Xu <peterx@redhat.com>
+Cc: qemu-devel@nongnu.org, Laurent Vivier <lvivier@redhat.com>, "Daniel P . Berrange" <berrange@redhat.com>, Alexey Perevalov <a.perevalov@samsung.com>, Juan Quintela <quintela@redhat.com>, Andrea Arcangeli <aarcange@redhat.com>
 
-On 22 September 2017 at 08:46, Fam Zheng <famz@redhat.com> wrote:
-> The following changes since commit 0a8066f0c068f1e318a1aacd7864fc00e455a37b:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20170921' into staging (2017-09-21 17:42:27 +0100)
->
-> are available in the git repository at:
->
->   git://github.com/famz/qemu.git tags/build-and-test-automation-pull-request
->
-> for you to fetch changes up to 4f6afe41f2ee3d8170eef7a9122d256588b707b2:
->
->   docker: Drop 'set -e' from run script (2017-09-22 14:51:43 +0800)
->
-> ----------------------------------------------------------------
->
-> Since v4:
->
-> - Drop three iffy -cflags patches from me (for gtk/vnc/curses).
-> - Revised VM test scripts after addressing comments.
-> - Add Eduardo's small tweak on MAINTAINERS.
->
-> ----------------------------------------------------------------
+* Peter Xu (peterx@redhat.com) wrote:
+> Finish the last step to do the final handshake for the recovery.
+> 
+> First source sends one MIG_CMD_RESUME to dst, telling that source is
+> ready to resume.
+> 
+> Then, dest replies with MIG_RP_MSG_RESUME_ACK to source, telling that
+> dest is ready to resume (after switch to postcopy-active state).
+> 
+> When source received the RESUME_ACK, it switches its state to
+> postcopy-active, and finally the recovery is completed.
+> 
+> Signed-off-by: Peter Xu <peterx@redhat.com>
 
-Applied, thanks.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 
--- PMM
+> ---
+>  migration/migration.c | 28 ++++++++++++++++++++++++----
+>  1 file changed, 24 insertions(+), 4 deletions(-)
+> 
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 19aed72..c9b7085 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -1694,7 +1694,8 @@ static int migrate_handle_rp_resume_ack(MigrationState *s, uint32_t value)
+>      migrate_set_state(&s->state, MIGRATION_STATUS_POSTCOPY_RECOVER,
+>                        MIGRATION_STATUS_POSTCOPY_ACTIVE);
+>  
+> -    /* TODO: notify send thread that time to continue send pages */
+> +    /* Notify send thread that time to continue send pages */
+> +    qemu_sem_post(&s->rp_state.rp_sem);
+>  
+>      return 0;
+>  }
+> @@ -2169,6 +2170,21 @@ typedef enum MigThrError {
+>      MIG_THR_ERR_FATAL = 2,
+>  } MigThrError;
+>  
+> +static int postcopy_resume_handshake(MigrationState *s)
+> +{
+> +    qemu_savevm_send_postcopy_resume(s->to_dst_file);
+> +
+> +    while (s->state == MIGRATION_STATUS_POSTCOPY_RECOVER) {
+> +        qemu_sem_wait(&s->rp_state.rp_sem);
+> +    }
+> +
+> +    if (s->state == MIGRATION_STATUS_POSTCOPY_ACTIVE) {
+> +        return 0;
+> +    }
+> +
+> +    return -1;
+> +}
+> +
+>  /* Return zero if success, or <0 for error */
+>  static int postcopy_do_resume(MigrationState *s)
+>  {
+> @@ -2186,10 +2202,14 @@ static int postcopy_do_resume(MigrationState *s)
+>      }
+>  
+>      /*
+> -     * TODO: handshake with dest using MIG_CMD_RESUME,
+> -     * MIG_RP_MSG_RESUME_ACK, then switch source state to
+> -     * "postcopy-active"
+> +     * Last handshake with destination on the resume (destination will
+> +     * switch to postcopy-active afterwards)
+>       */
+> +    ret = postcopy_resume_handshake(s);
+> +    if (ret) {
+> +        error_report("%s: handshake failed: %d", __func__, ret);
+> +        return ret;
+> +    }
+>  
+>      return 0;
+>  }
+> -- 
+> 2.7.4
+> 
+> 
+--
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
