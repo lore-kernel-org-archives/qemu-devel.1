@@ -1,15 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:46834)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:46874)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dvPQV-0007sX-1l
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:59:36 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dvPQW-0007tX-6h
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:59:37 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pm215@archaic.org.uk>) id 1dvPQU-000415-B0
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:59:35 -0400
+	(envelope-from <pm215@archaic.org.uk>) id 1dvPQV-00042U-A3
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 10:59:36 -0400
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Sep 2017 15:59:47 +0100
-Message-Id: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
-Subject: [Qemu-devel] [PATCH 00/20] ARM v8M: exception entry,
- exit and security
+Date: Fri, 22 Sep 2017 15:59:48 +0100
+Message-Id: <1506092407-26985-2-git-send-email-peter.maydell@linaro.org>
+In-Reply-To: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
+References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
+Subject: [Qemu-devel] [PATCH 01/20] nvic: Clear the vector arrays and
+ prigroup on reset
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -21,60 +23,37 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Cc: patches@linaro.org
 
-Another week, another set of v8M patches.
-This lot adds:
- * v8M and security extension changes in exception entry and exit
- * the Security Attribution Unit
- * SG and BLXNS instructions
- * secure function return
- * and a couple of fixes for bugs in already-in-master changes
+Reset for devices does not include an automatic clear of the
+device state (unlike CPU state, where most of the state
+structure is cleared to zero). Add some missing initialization
+of NVIC state that meant that the device was left in the wrong
+state if the guest did a warm reset.
 
-Most of this is just plodding through fairly obvious implementation,
-but the handling of the SG instruction is a bit funky (see commit
-messages in those patches for detail).
+(In particular, since we were resetting the computed state like
+s->exception_prio but not all the state it was computed
+from like s->vectors[x].active, the NVIC wound up in an
+inconsistent state that could later trigger assertion failures.)
 
-This is very nearly enough to get the mbed uvisor example
-running (on a hacked-up mps2 setup): I think the main missing
-piece for that is that it expects the banked systick device,
-which we haven't implemented yet. (There are also various
-missing things that I don't think the uvisor exercises.)
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/intc/armv7m_nvic.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-thanks
--- PMM
-
-Peter Maydell (20):
-  nvic: Clear the vector arrays and prigroup on reset
-  target/arm: Don't switch to target stack early in v7M exception return
-  target/arm: Prepare for CONTROL.SPSEL being nonzero in Handler mode
-  target/arm: Restore security state on exception return
-  target/arm: Restore SPSEL to correct CONTROL register on exception
-    return
-  target/arm: Check for xPSR mismatch usage faults earlier for v8M
-  target/arm: Warn about restoring to unaligned stack
-  target/arm: Don't warn about exception return with PC low bit set for
-    v8M
-  target/arm: Add new-in-v8M SFSR and SFAR
-  target/arm: Update excret sanity checks for v8M
-  target/arm: Add support for restoring v8M additional state context
-  target/arm: Add v8M support to exception entry code
-  nvic: Implement Security Attribution Unit registers
-  target/arm: Implement security attribute lookups for memory accesses
-  target/arm: Fix calculation of secure mm_idx values
-  target/arm: Factor out "get mmuidx for specified security state"
-  target/arm: Implement SG instruction
-  target/arm: Implement BLXNS
-  target/arm: Implement secure function return
-  nvic: Add missing code for writing SHCSR.HARDFAULTPENDED bit
-
- target/arm/cpu.h       |  60 ++-
- target/arm/helper.h    |   1 +
- target/arm/internals.h |  23 ++
- hw/intc/armv7m_nvic.c  | 158 +++++++-
- target/arm/cpu.c       |  27 ++
- target/arm/helper.c    | 970 ++++++++++++++++++++++++++++++++++++++++++++-----
- target/arm/machine.c   |  16 +
- target/arm/translate.c |  31 +-
- 8 files changed, 1181 insertions(+), 105 deletions(-)
-
+diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
+index d90d8d0..bc7b66d 100644
+--- a/hw/intc/armv7m_nvic.c
++++ b/hw/intc/armv7m_nvic.c
+@@ -1782,6 +1782,11 @@ static void armv7m_nvic_reset(DeviceState *dev)
+     int resetprio;
+     NVICState *s = NVIC(dev);
+ 
++    memset(s->vectors, 0, sizeof(s->vectors));
++    memset(s->sec_vectors, 0, sizeof(s->sec_vectors));
++    s->prigroup[M_REG_NS] = 0;
++    s->prigroup[M_REG_S] = 0;
++
+     s->vectors[ARMV7M_EXCP_NMI].enabled = 1;
+     /* MEM, BUS, and USAGE are enabled through
+      * the System Handler Control register
 -- 
 2.7.4
