@@ -1,21 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:41108)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:42611)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1dvGLC-0002WL-Qy
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 01:17:31 -0400
+	(envelope-from <famz@redhat.com>) id 1dvGYW-000528-0l
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 01:31:17 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <sw@weilnetz.de>) id 1dvGL9-0006Ft-JV
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 01:17:30 -0400
-References: <1506049617-25716-1-git-send-email-thuth@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Message-ID: <260e3fea-6fc3-4d6c-a6b7-5fd2fd73eb42@weilnetz.de>
-Date: Fri, 22 Sep 2017 07:17:26 +0200
+	(envelope-from <famz@redhat.com>) id 1dvGYS-0006wd-R6
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 01:31:16 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33798)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dvGYS-0006wJ-LQ
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 01:31:12 -0400
+Date: Fri, 22 Sep 2017 13:31:07 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170922053107.GF1397@lemon.lan>
+References: <20170921150755.19914-1-famz@redhat.com>
+	<20170921150755.19914-8-famz@redhat.com>
+	<2ea507f1-3ff3-54e9-2fbf-d69c727de5c6@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <1506049617-25716-1-git-send-email-thuth@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] tests/boot-sector: Increase timeout to 600
- seconds
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <2ea507f1-3ff3-54e9-2fbf-d69c727de5c6@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v11 07/13] tests: Add FreeBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -24,44 +29,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Victor Kaplansky <victork@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-Am 22.09.2017 um 05:06 schrieb Thomas Huth:
-> If QEMU has been compiled with the flags --enable-tcg-interpreter and
-> --enable-debug, the guest is running incredibly slow. The pxe boot test
-> can take up to 400 seconds when testing the pseries ppc64 machine. While
-> we should still look for ways to speed up the test on the pseries machine,
-> it's better to increase the timeout in this test to 600 seconds anyway to
-> allow the test to pass successfully now with this unusal configuration
-> already.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/boot-sector.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tests/boot-sector.c b/tests/boot-sector.c
-> index 9ee8537..be29d5b 100644
-> --- a/tests/boot-sector.c
-> +++ b/tests/boot-sector.c
-> @@ -137,9 +137,9 @@ void boot_sector_test(void)
->      uint16_t signature;
->      int i;
->  
-> -    /* Wait at most 90 seconds */
-> +    /* Wait at most 600 seconds (test is slow with TCI and --enable-debug) */
->  #define TEST_DELAY (1 * G_USEC_PER_SEC / 10)
-> -#define TEST_CYCLES MAX((90 * G_USEC_PER_SEC / TEST_DELAY), 1)
-> +#define TEST_CYCLES MAX((600 * G_USEC_PER_SEC / TEST_DELAY), 1)
->  
->      /* Poll until code has run and modified memory.  Once it has we know BIOS
->       * initialization is done.  TODO: check that IP reached the halt
-> 
+On Fri, 09/22 00:17, Philippe Mathieu-Daud=E9 wrote:
+> Hi Fam,
+>=20
+> On 09/21/2017 12:07 PM, Fam Zheng wrote:
+> > The image is prepared following instructions as in:
+> >=20
+> > https://wiki.qemu.org/Hosts/BSD
+> >=20
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+> > ---
+> >   tests/vm/freebsd | 42 ++++++++++++++++++++++++++++++++++++++++++
+> >   1 file changed, 42 insertions(+)
+> >   create mode 100755 tests/vm/freebsd
+> >=20
+> > diff --git a/tests/vm/freebsd b/tests/vm/freebsd
+> > new file mode 100755
+> > index 0000000000..039dad8f69
+> > --- /dev/null
+> > +++ b/tests/vm/freebsd
+> > @@ -0,0 +1,42 @@
+> > +#!/usr/bin/env python
+> > +#
+> > +# FreeBSD VM image
+> > +#
+> > +# Copyright 2017 Red Hat Inc.
+> > +#
+> > +# Authors:
+> > +#  Fam Zheng <famz@redhat.com>
+> > +#
+> > +# This code is licensed under the GPL version 2 or later.  See
+> > +# the COPYING file in the top-level directory.
+> > +#
+> > +
+> > +import os
+> > +import sys
+> > +import subprocess
+> > +import basevm
+> > +
+> > +class FreeBSDVM(basevm.BaseVM):
+> > +    name =3D "freebsd"
+> > +    BUILD_SCRIPT =3D """
+> > +        set -e;
+> > +        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
+> > +        tar -xf /dev/vtbd1;
+> > +        ./configure {configure_opts};
+> > +        gmake -j{jobs};
+> > +        gmake check;
+> > +    """
+> > +
+> > +    def build_image(self, img):
+> > +        cimg =3D self._download_with_cache("http://download.patchew.=
+org/freebsd-11.1-amd64.img.xz",
+> > +                sha256sum=3D'adcb771549b37bc63826c501f05121a206ed3d9=
+f55f49145908f7e1432d65891')
+> > +        img_tmp_xz =3D img + ".tmp.xz"
+> > +        img_tmp =3D img + ".tmp"
+> > +        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
+>=20
+> I'd rather see this part common to 3 images refactored as @static
+> BaseVM.download_and_extract_image() and some logging:
+>=20
+>         logging.debug("Extracting %s...", fname)
+>=20
+> > +        subprocess.check_call(["xz", "-df", img_tmp_xz])
+>=20
+> else one wonder what's happening here.
+>=20
+> (for another patch on top on this series)
 
-Reviewed-by: Stefan Weil <sw@weilnetz.de>
+Yep, that sounds good.
 
-cc'ing qemu-trivial
-
-Thanks,
-Stefan
+Fam
