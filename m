@@ -1,23 +1,30 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:40496)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:40839)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dvMDy-0003M5-7j
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:34:30 -0400
+	(envelope-from <dgibson@ozlabs.org>) id 1dvMFi-0004ZV-6d
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:36:15 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <cohuck@redhat.com>) id 1dvMDv-0003on-3r
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:34:26 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:35868)
-	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <cohuck@redhat.com>) id 1dvMDu-0003oW-US
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:34:23 -0400
-Date: Fri, 22 Sep 2017 13:34:16 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-Message-ID: <20170922133416.34c1cd65.cohuck@redhat.com>
-In-Reply-To: <20170920153016.3858-1-david@redhat.com>
-References: <20170920153016.3858-1-david@redhat.com>
+	(envelope-from <dgibson@ozlabs.org>) id 1dvMFf-0004uG-2e
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 07:36:14 -0400
+Date: Fri, 22 Sep 2017 21:36:00 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+Message-ID: <20170922113600.GT4998@umbus.fritz.box>
+References: <87y3pagdg0.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920061756.GJ5520@umbus.fritz.box>
+	<87vakdhnyn.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920065700.GO5520@umbus.fritz.box>
+	<87poalhm74.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170920115342.GQ5520@umbus.fritz.box>
+	<87377gpuyh.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<20170921053107.GD4998@umbus.fritz.box>
+	<87y3p7nugc.fsf@abhimanyu.i-did-not-set--mail-host-address--so-tickle-me>
+	<15582716-0d6e-aa7e-e429-08e1078765a4@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH v3 0/3] Implement basic MSA functions
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="a6Ri6/t33sscKOaw"
+Content-Disposition: inline
+In-Reply-To: <15582716-0d6e-aa7e-e429-08e1078765a4@kaod.org>
+Subject: Re: [Qemu-devel] [PATCH] ppc/pnv: fix cores per chip for multiple
+ cpus
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,57 +33,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: David Hildenbrand <david@redhat.com>
-Cc: qemu-devel@nongnu.org, Richard Henderson <richard.henderson@linaro.org>, thuth@redhat.com, Alexander Graf <agraf@suse.de>, Aurelien Jarno <aurelien@aurel32.net>
+To: =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>
+Cc: Nikunj A Dadhania <nikunj@linux.vnet.ibm.com>, qemu-ppc@nongnu.org, qemu-devel@nongnu.org, bharata@linux.vnet.ibm.com, benh@kernel.crashing.org
 
-On Wed, 20 Sep 2017 17:30:13 +0200
-David Hildenbrand <david@redhat.com> wrote:
 
-> Some leftover from "target/s390x: tcg improvments + MSA functions".
-> 
-> Implement all basic MSA (cpacf/crypto) instructions <= z13. Only provide
-> the query subfunction (to query available subfunctions), no actual
-> de/encryption yet. Good enough to unlock the STFL bits.
-> 
-> I have written kvm-unit-tests for MSA functions and for SPM/IPM. Will
-> send them out soon. I use the following cpu model to test with an upstream
-> kernel compiled for z10:
-> 
-> ... -cpu qemu,mvcos=on,stfle=on,ldisp=on,ldisphp=on,\
->               eimm=on,stckf=on,csst=on,csst2=on,ginste=on,\
->               exrl=on,msa-base=on,msa3-base=on,msa4-base=on,msa5-base=on ...
-> 
-> Available on: https://github.com/davidhildenbrand/qemu.git s390x-msa
-> 
-> v2 -> v3:
->  - "s390x/tcg: add basic MSA features"
->  -- drop one check (fc >= 128) that can due to masking never happen
-> 
-> v1 -> v2:
->  - "s390x/tcg: implement spm (SET PROGRAM MASK)"
->  -- use tcg_gen_extrl_i64_i32 + tcg_gen_extract_i32
->  - "s390x/tcg: move wrap_address() to internal.h"
->  -- internal.h instead of cpu.h
->  - "s390x/tcg: add basic MSA features"
->  -- minor style fixes
-> 
-> 
-> David Hildenbrand (3):
->   s390x/tcg: implement spm (SET PROGRAM MASK)
->   s390x/tcg: move wrap_address() to internal.h
->   s390x/tcg: add basic MSA features
-> 
->  target/s390x/Makefile.objs   |  2 +-
->  target/s390x/cpu.h           |  2 ++
->  target/s390x/cpu_models.c    |  4 +++
->  target/s390x/crypto_helper.c | 65 ++++++++++++++++++++++++++++++++++++++++++
->  target/s390x/helper.h        |  1 +
->  target/s390x/insn-data.def   | 15 ++++++++++
->  target/s390x/internal.h      | 14 +++++++++
->  target/s390x/mem_helper.c    | 14 ---------
->  target/s390x/translate.c     | 67 ++++++++++++++++++++++++++++++++++++++++++++
->  9 files changed, 169 insertions(+), 15 deletions(-)
->  create mode 100644 target/s390x/crypto_helper.c
-> 
+--a6Ri6/t33sscKOaw
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks, applied.
+On Fri, Sep 22, 2017 at 12:56:40PM +0200, C=E9dric Le Goater wrote:
+> On 09/22/2017 08:00 AM, Nikunj A Dadhania wrote:
+> > David Gibson <david@gibson.dropbear.id.au> writes:
+> >=20
+> >>>>>
+> >>>>> As smp_thread defaults to 1 in vl.c, similarly smp_cores also has t=
+he
+> >>>>> default value of 1 in vl.c. In powernv, we were setting nr-cores li=
+ke
+> >>>>> this:
+> >>>>>
+> >>>>>         object_property_set_int(chip, smp_cores, "nr-cores", &error=
+_fatal);
+> >>>>>
+> >>>>> Even when there were multiple cpus (-smp 4), when the guest boots u=
+p, we
+> >>>>> just get one core (i.e. smp_cores was 1) with single thread(smp_thr=
+eads
+> >>>>> was 1), which is wrong as per the command-line that was provided.
+> >>>>
+> >>>> Right, so, -smp 4 defaults to 4 sockets, each with 1 core of 1
+> >>>> thread.  If you can't supply 4 sockets you should error, but you
+> >>>> shouldn't go and change the number of cores per socket.
+> >>>
+> >>> OK, that makes sense now. And I do see that smp_cpus is 4 in the above
+> >>> case. Now looking more into it, i see that powernv has something call=
+ed
+> >>> "num_chips", isnt this same as sockets ? Do we need num_chips separat=
+ely?
+> >>
+> >> Ah, yes, I see.  It's probably still reasonable to keep num_chips as
+> >> an internal variable, rather than using (smp_cpus / smp_cores /
+> >> smp_threads) everywhere.  But we shouldn't have it as a direct
+> >> user-settable property, instead setting it from the -smp command line
+> >> option.
+> >=20
+> > Something like the below works till num_chips=3D2, after that guest does
+> > not boot up. This might be some limitation within the OS, Cedric might
+> > have some clue. Otherwise, I see that multiple chips are created with
+> > single core having single thread.
+> >=20
+> >     ppc/pnv: Use num_chips for multiple sockets
+> >    =20
+> >     When the user does not provide the cpu topology, e.g. "-smp 4", mac=
+hine fails to
+> >     initialize 4 cpus. QEMU assumes smp_threads and smp_cores both as 1=
+=2E Make sure
+> >     that we initialize multiple chips for this.
+>=20
+> -smp 4          would give a machine with 4 sockets with 1 core
+> -smp 4,cores=3D4  would give a machine with 1 socket  with 4 cores
+>=20
+> correct ?
+
+That's right.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--a6Ri6/t33sscKOaw
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAlnE9Z4ACgkQbDjKyiDZ
+s5JrPA/+Pmr6ms5YFTwKQrSyNmHIC9tStL1DhqC60Ao3f+WI/rzolkLok2TZN8ep
+Ht0RjZ8tqtxBH7AdY38az2NUd5POL2g+lOIMKjCZffN0/M4zi4JU03M/Whdonnnb
+hNSlZ04Q1MiZPmDtz3/Ta+4jG+3R4uwtsv2arrd91SUdf86WC5b8A2yJYQA7GS49
+oSP48Q5UCWExsR1IpPI8EtHSut3cqYMJU4Ds9f/2TQsc3aqVYYh1T0F69T7ajheu
+ouZepgfBiIjyD37EJG+g5PffLl/GcXZ8kvcv/1W6+QApgEPQ9IpXcRhkXtxqFCm4
+magopno6Ed6DfroUY0ajvV+ORUkk7yDh5KT1/5/g54RvbiyoB4ocDIQ23kdCXPSd
+8kbje4Ti1Cf7o8XsmF/9YS6Urmd0v1a3OEV0nvOEonDlnmmVjHBfHDGj+8cBMb2Q
+kBIRgJ1gs1/0g3ljZcm6AFAvzihMVTWq+7dkvBtK8tg8/7ztepr/LzT+jKkuT5qa
+tqCcemihSMjNmrqWoC42ML5Z/45Brb31Z+QzjLWEYJoceUC7DR86vDouVAgxFjCZ
+4OfME4PvDJeyiCoGIa/XWU/3NpRmJZcZUejklxaK0Thcsy/q1HuEzHMg4x9CmmKP
+7OSh7vk2b9zsmxFyNj2oEGuQ408RlhMtn3/n+Niu9nn+NxHliaw=
+=CdXr
+-----END PGP SIGNATURE-----
+
+--a6Ri6/t33sscKOaw--
