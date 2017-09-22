@@ -1,27 +1,20 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:60771)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:32945)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dvRbF-0008GF-VN
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 13:18:50 -0400
+	(envelope-from <alistair23@gmail.com>) id 1dvRcR-0000wR-07
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 13:20:07 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <peter.maydell@linaro.org>) id 1dvRbF-0006GW-1v
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 13:18:49 -0400
-Received: from mail-wm0-x22f.google.com ([2a00:1450:400c:c09::22f]:46613)
-	by eggs.gnu.org with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-	(Exim 4.71) (envelope-from <peter.maydell@linaro.org>)
-	id 1dvRbE-0006FI-PN
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 13:18:48 -0400
-Received: by mail-wm0-x22f.google.com with SMTP id m72so5751402wmc.1
-	for <qemu-devel@nongnu.org>; Fri, 22 Sep 2017 10:18:48 -0700 (PDT)
+	(envelope-from <alistair23@gmail.com>) id 1dvRcQ-00078N-3F
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 13:20:02 -0400
 MIME-Version: 1.0
-In-Reply-To: <1506092407-26985-18-git-send-email-peter.maydell@linaro.org>
-References: <1506092407-26985-1-git-send-email-peter.maydell@linaro.org>
-	<1506092407-26985-18-git-send-email-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 22 Sep 2017 18:18:26 +0100
-Message-ID: <CAFEAcA8n+M1hA3SKVJr-pEEaB5hJ_aKS6UK_wJ1g46rmjmHpMA@mail.gmail.com>
+Sender: alistair23@gmail.com
+In-Reply-To: <20170922171323.10348-1-f4bug@amsat.org>
+References: <20170922171323.10348-1-f4bug@amsat.org>
+From: Alistair Francis <alistair.francis@xilinx.com>
+Date: Fri, 22 Sep 2017 10:19:28 -0700
+Message-ID: <CAKmqyKPQ2bKdQ9X=TDsbXnLtC3vpqKUPMRfM8CAsgOjb-4hGHQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Subject: Re: [Qemu-devel] [Qemu-arm] [PATCH 17/20] target/arm: Implement SG
- instruction
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v5 0/7] Generalize MDIO framework
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,24 +23,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
-Cc: "patches@linaro.org" <patches@linaro.org>
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Grant Likely <grant.likely@arm.com>, Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, Alistair Francis <alistair.francis@xilinx.com>, qemu-arm <qemu-arm@nongnu.org>, "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 
-On 22 September 2017 at 16:00, Peter Maydell <peter.maydell@linaro.org> wrote:
-> Implement the SG instruction, which we emulate 'by hand' in the
-> exception handling code path.
+On Fri, Sep 22, 2017 at 10:13 AM, Philippe Mathieu-Daud=C3=A9
+<f4bug@amsat.org> wrote:
+> Hi,
+>
+> I have a follow up series using multiples PHY on the MDIO bus based on th=
+is
+> series.
 
-I've just realised that this patch is correct as far as it goes
-but it only implements the common path case for SG (where it is
-in S&NSC memory and executed by a CPU in NS state). There is
-also defined behaviour for:
- * SG in NS memory (behaves as a NOP)
- * SG in S memory and CPU already secure (clears IT bits and
-   does nothing else)
+I haven't looked at this yet, but it looks interesting.
 
-Those can be implemented in translate.c in the usual way;
-I'll put a patch for that in the next set (or in a respin
-of this set).
+We actually have this concept merged in our tree and it works pretty
+well. You can see it here:
+https://github.com/Xilinx/qemu/tree/master/hw/mdio
 
-thanks
--- PMM
+Thanks,
+Alistair
+
+>
+> Regards,
+>
+> Phil.
+>
+> Grant's previous work:
+> http://lists.nongnu.org/archive/html/qemu-devel/2013-02/msg00257.html
+>
+> "There is more work to be done, particularly in moving to the common GPIO=
+ api,
+>  but that work can be done as a follow on patch series."
+>
+> Grant Likely (7):
+>   hw/mdio: Generalize etraxfs MDIO bitbanging emulation
+>   hw/mdio: Add PHY register definition
+>   hw/mdio: Generalize phy initialization routine
+>   hw/mdio: Mask out read-only bits.
+>   hw/mdio: Refactor bitbanging state machine
+>   hw/mdio: Add VMState support
+>   hw/mdio: Use bitbang core for smc91c111 network device
+>
+>  include/hw/net/mdio.h   | 124 +++++++++++++++++++++
+>  hw/net/etraxfs_eth.c    | 291 +-----------------------------------------=
+------
+>  hw/net/mdio.c           | 280 ++++++++++++++++++++++++++++++++++++++++++=
+++++
+>  hw/net/smc91c111.c      |  27 ++++-
+>  hw/net/xilinx_axienet.c | 189 +------------------------------
+>  hw/net/Makefile.objs    |   2 +
+>  6 files changed, 438 insertions(+), 475 deletions(-)
+>  create mode 100644 include/hw/net/mdio.h
+>  create mode 100644 hw/net/mdio.c
+>
+> --
+> 2.14.1
+>
+>
