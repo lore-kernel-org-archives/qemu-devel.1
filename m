@@ -1,27 +1,26 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:52461)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:52889)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dvHfa-0001mr-Fu
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:42:39 -0400
+	(envelope-from <famz@redhat.com>) id 1dvHiY-0002bD-DL
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:45:43 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <marcel@redhat.com>) id 1dvHfX-00024Q-Cq
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:42:38 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50192)
+	(envelope-from <famz@redhat.com>) id 1dvHiV-0003Yp-3l
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:45:42 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:14915)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <marcel@redhat.com>) id 1dvHfX-00022w-3i
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:42:35 -0400
-References: <1505942471-11260-1-git-send-email-zuban32s@gmail.com>
-	<f5dbe1a3-bb18-28ff-515b-e8a9ef924835@redhat.com>
-	<CAKSfGUAjsBb-zmwZPMcApL0p5mz8Futdpis0W6v_ry-3nhBypA@mail.gmail.com>
-From: Marcel Apfelbaum <marcel@redhat.com>
-Message-ID: <527b0b71-0e0b-f9a1-3c11-7ce622ae06db@redhat.com>
-Date: Fri, 22 Sep 2017 09:42:30 +0300
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dvHiU-0003Yd-MK
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 02:45:38 -0400
+Date: Fri, 22 Sep 2017 14:45:33 +0800
+From: Fam Zheng <famz@redhat.com>
+Message-ID: <20170922064533.GH1397@lemon.lan>
+References: <20170921150755.19914-1-famz@redhat.com>
+	<20170921150755.19914-8-famz@redhat.com>
+	<49d5d158-9103-d14d-8ce6-35196754aafb@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKSfGUAjsBb-zmwZPMcApL0p5mz8Futdpis0W6v_ry-3nhBypA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Subject: Re: [Qemu-devel] [PATCH] hw/pci-bridge/pcie_pci_bridge: properly
- handle MSI unavailability case
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+In-Reply-To: <49d5d158-9103-d14d-8ce6-35196754aafb@amsat.org>
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [PATCH v11 07/13] tests: Add FreeBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -30,118 +29,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Aleksandr Bezzubikov <zuban32s@gmail.com>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, Peter Maydell <peter.maydell@linaro.org>, stefanha@redhat.com, Cleber Rosa <crosa@redhat.com>, pbonzini@redhat.com, eblake@redhat.com, Kamil Rytarowski <kamil@netbsd.org>
 
-On 21/09/2017 21:12, Aleksandr Bezzubikov wrote:
-> 2017-09-21 13:16 GMT+03:00 Marcel Apfelbaum <marcel@redhat.com>:
->> Hi Aleksandr,
->>
->> On 21/09/2017 0:21, Aleksandr Bezzubikov wrote:
->>>
->>> Signed-off-by: Aleksandr Bezzubikov <zuban32s@gmail.com>
->>> ---
->>>    hw/pci-bridge/pcie_pci_bridge.c | 24 ++++++++++++++++++------
->>>    1 file changed, 18 insertions(+), 6 deletions(-)
->>>
->>
->> Please add Eduardo's Reported-by tag and the
->> actual failure in the commit message.
->> You might even explain in the commit message that you
->> moved msi prop to ON_OFF_AUTO_AUTO.
-> 
-> Should I send a new one, or resend, or just reply to this post?
-> 
+On Fri, 09/22 03:09, Philippe Mathieu-Daud=E9 wrote:
+> On 09/21/2017 12:07 PM, Fam Zheng wrote:
+> > The image is prepared following instructions as in:
+> >=20
+> > https://wiki.qemu.org/Hosts/BSD
+> >=20
+> > Signed-off-by: Fam Zheng <famz@redhat.com>
+>=20
+> $ QEMU=3D`pwd`/x86_64-softmmu/qemu-system-x86_64 make vm-build-freebsd =
+V=3D1
+> [...]
+>   CC      tests/test-io-channel-socket.o
+>   CC      tests/io-channel-helpers.o
+>   LINK    tests/test-io-channel-socket
+>=20
+> the build hang here, stopping to use the cpu, keeping 2GB of resident
+> physical memory until I hit ^C ... not enough ram for the guest? guest =
+tmpfs
+> full?
 
-A new version would be preferred.
+For how long? The four images doing "J=3D8" takes 1~2 hours here usually.=
+  This
+worked for me on at least two machines (one laptop and one server). :-/
 
->>
->>
->>> diff --git a/hw/pci-bridge/pcie_pci_bridge.c
->>> b/hw/pci-bridge/pcie_pci_bridge.c
->>> index 9aa5cc3..da562fe 100644
->>> --- a/hw/pci-bridge/pcie_pci_bridge.c
->>> +++ b/hw/pci-bridge/pcie_pci_bridge.c
->>> @@ -65,10 +65,18 @@ static void pcie_pci_bridge_realize(PCIDevice *d,
->>> Error **errp)
->>>            goto aer_error;
->>>        }
->>>    +    Error *local_err = NULL;
->>>        if (pcie_br->msi != ON_OFF_AUTO_OFF) {
->>> -        rc = msi_init(d, 0, 1, true, true, errp);
->>> +        rc = msi_init(d, 0, 1, true, true, &local_err);
->>>            if (rc < 0) {
->>> -            goto msi_error;
->>> +            assert(rc == -ENOTSUP);
->>> +            if (pcie_br->msi != ON_OFF_AUTO_ON) {
->>> +                error_free(local_err);
->>
->>
->> In that case it will fallback to legacy INTx, right?
-> 
-> Exactly. Maybe I should add this to the commit message.
-> 
+>=20
+> useful enough for:
+> Tested-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
-With the above comment:
-
-Reviewed-by: Marcel Apfelbaum <marcel@redhat.com>
-
-Thanks,
-Marcel
-
->>
->> Thanks,
->> Marcel
->>
->>
->>> +            } else {
->>> +                /* failed to satisfy user's explicit request for MSI */
->>> +                error_propagate(errp, local_err);
->>> +                goto msi_error;
->>> +            }
->>>            }
->>>        }
->>>        pci_register_bar(d, 0, PCI_BASE_ADDRESS_SPACE_MEMORY |
->>> @@ -81,7 +89,7 @@ aer_error:
->>>    pm_error:
->>>        pcie_cap_exit(d);
->>>    cap_error:
->>> -    shpc_free(d);
->>> +    shpc_cleanup(d, &pcie_br->shpc_bar);
->>>    error:
->>>        pci_bridge_exitfn(d);
->>>    }
->>> @@ -98,7 +106,9 @@ static void pcie_pci_bridge_reset(DeviceState *qdev)
->>>    {
->>>        PCIDevice *d = PCI_DEVICE(qdev);
->>>        pci_bridge_reset(qdev);
->>> -    msi_reset(d);
->>> +    if (msi_present(d)) {
->>> +        msi_reset(d);
->>> +    }
->>>        shpc_reset(d);
->>>    }
->>>    @@ -106,12 +116,14 @@ static void pcie_pci_bridge_write_config(PCIDevice
->>> *d,
->>>            uint32_t address, uint32_t val, int len)
->>>    {
->>>        pci_bridge_write_config(d, address, val, len);
->>> -    msi_write_config(d, address, val, len);
->>> +    if (msi_present(d)) {
->>> +        msi_write_config(d, address, val, len);
->>> +    }
->>>        shpc_cap_write_config(d, address, val, len);
->>>    }
->>>      static Property pcie_pci_bridge_dev_properties[] = {
->>> -        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi,
->>> ON_OFF_AUTO_ON),
->>> +        DEFINE_PROP_ON_OFF_AUTO("msi", PCIEPCIBridge, msi,
->>> ON_OFF_AUTO_AUTO),
->>>            DEFINE_PROP_END_OF_LIST(),
->>>    };
->>>
->>
->>
-> 
-> 
-> 
+Fam
