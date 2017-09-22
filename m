@@ -1,24 +1,25 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:42027)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:43665)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dvQ5M-0005OB-ME
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:41:50 -0400
+	(envelope-from <pbonzini@redhat.com>) id 1dvQ94-0000iz-0u
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:45:39 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <philippe.mathieu.daude@gmail.com>)
-	id 1dvQ5K-0003eE-VF
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:41:48 -0400
-Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
-	<philippe.mathieu.daude@gmail.com>
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Date: Fri, 22 Sep 2017 12:40:02 -0300
-Message-Id: <20170922154014.29350-23-f4bug@amsat.org>
-In-Reply-To: <20170922154014.29350-1-f4bug@amsat.org>
-References: <20170922154014.29350-1-f4bug@amsat.org>
+	(envelope-from <pbonzini@redhat.com>) id 1dvQ90-0005w1-Sa
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:45:38 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48994)
+	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
+	(Exim 4.71) (envelope-from <pbonzini@redhat.com>) id 1dvQ90-0005vH-KE
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 11:45:34 -0400
+References: <20170922151208.24590-1-aik@ozlabs.ru>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <df2f7ce1-a868-4a99-52ec-d4f934e1b7b7@redhat.com>
+Date: Fri, 22 Sep 2017 17:45:28 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: [Qemu-devel] [PATCH 22/34] hw/input/i8042: extract API from
- hw/i386/pc.h
+In-Reply-To: <20170922151208.24590-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [Qemu-devel] [RFC PATCH qemu] virtio-pci: Replace modern_as
+ with direct access to modern_bar
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -27,354 +28,260 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-To: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>, Yongbok Kim <yongbok.kim@imgtec.com>, Richard Henderson <rth@twiddle.net>, =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>, David Gibson <david@gibson.dropbear.id.au>, Alexander Graf <agraf@suse.de>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Artyom Tarasenko <atar4qemu@gmail.com>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-devel@nongnu.org, qemu-ppc@nongnu.org
+To: Alexey Kardashevskiy <aik@ozlabs.ru>, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
 
-- include vmmouse
-- add entries in MAINTAINERS (pckbd.c, i8042.h)
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- include/hw/i386/pc.h     | 11 -----------
- include/hw/input/i8042.h | 30 ++++++++++++++++++++++++++++++
- hw/alpha/dp264.c         |  3 ++-
- hw/i386/pc.c             |  5 +++--
- hw/input/pckbd.c         |  2 +-
- hw/input/vmmouse.c       |  3 +--
- hw/mips/mips_fulong2e.c  |  3 ++-
- hw/mips/mips_jazz.c      |  1 +
- hw/mips/mips_malta.c     |  3 ++-
- hw/mips/mips_r4k.c       |  3 ++-
- hw/misc/vmport.c         |  1 +
- hw/ppc/prep.c            |  5 +++--
- hw/sparc64/sun4u.c       |  3 ++-
- hw/unicore32/puv3.c      |  1 +
- MAINTAINERS              |  4 +++-
- 15 files changed, 54 insertions(+), 24 deletions(-)
- create mode 100644 include/hw/input/i8042.h
-
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 25ba378bd8..6a2e947332 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -193,17 +193,6 @@ static inline void vmport_init(ISABus *bus)
- }
- 
- void vmport_register(unsigned char command, VMPortReadFunc *func, void *opaque);
--void vmmouse_get_data(uint32_t *data);
--void vmmouse_set_data(const uint32_t *data);
+On 22/09/2017 17:12, Alexey Kardashevskiy wrote:
+> The modern bar is accessed now via yet another address space created ju=
+st
+> for that purpose and it does not really need FlatView and dispatch tree
+> as it has a single memory region so it is just a waste of memory. Thing=
+s
+> get even worse when there are dozens or hundreds of virtio-pci devices =
 -
--/* pckbd.c */
--#define I8042_A20_LINE "a20"
--
--void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
--                   MemoryRegion *region, ram_addr_t size,
--                   hwaddr mask);
--void i8042_isa_mouse_fake_event(void *opaque);
--void i8042_setup_a20_line(ISADevice *dev, qemu_irq a20_out);
- 
- /* pc.c */
- extern int fd_bootchk;
-diff --git a/include/hw/input/i8042.h b/include/hw/input/i8042.h
-new file mode 100644
-index 0000000000..836417304b
---- /dev/null
-+++ b/include/hw/input/i8042.h
-@@ -0,0 +1,30 @@
-+/*
-+ * QEMU PS/2 Controller
-+ *
-+ * Copyright (c) 2003 Fabrice Bellard
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+#ifndef HW_INPUT_I8042_H
-+#define HW_INPUT_I8042_H
-+
-+#include "hw/hw.h"
-+#include "hw/isa/isa.h"
-+
-+#define TYPE_I8042 "i8042"
-+
-+#define I8042_A20_LINE "a20"
-+
-+void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
-+                   MemoryRegion *region, ram_addr_t size,
-+                   hwaddr mask);
-+void i8042_isa_mouse_fake_event(void *opaque);
-+void i8042_setup_a20_line(ISADevice *dev, qemu_irq a20_out);
-+
-+#define TYPE_VMMOUSE "vmmouse"
-+
-+void vmmouse_get_data(uint32_t *data);
-+void vmmouse_set_data(const uint32_t *data);
-+
-+#endif /* HW_INPUT_I8042_H */
-diff --git a/hw/alpha/dp264.c b/hw/alpha/dp264.c
-index 1bd5243648..2253990654 100644
---- a/hw/alpha/dp264.c
-+++ b/hw/alpha/dp264.c
-@@ -19,6 +19,7 @@
- #include "hw/timer/mc146818rtc.h"
- #include "hw/ide.h"
- #include "hw/timer/i8254.h"
-+#include "hw/input/i8042.h"
- #include "hw/char/serial.h"
- #include "qemu/cutils.h"
- 
-@@ -82,7 +83,7 @@ static void clipper_init(MachineState *machine)
-     rtc_init(isa_bus, 1900, rtc_irq);
- 
-     i8254_pit_init(isa_bus, 0x40, 0, NULL);
--    isa_create_simple(isa_bus, "i8042");
-+    isa_create_simple(isa_bus, TYPE_I8042);
- 
-     /* VGA setup.  Don't bother loading the bios.  */
-     pci_vga_init(pci_bus);
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 5cb0ae67cd..3aa10c780b 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -40,6 +40,7 @@
- #include "multiboot.h"
- #include "hw/timer/mc146818rtc.h"
- #include "hw/timer/i8254.h"
-+#include "hw/input/i8042.h"
- #include "hw/audio/pcspk.h"
- #include "hw/pci/msi.h"
- #include "hw/sysbus.h"
-@@ -1564,11 +1565,11 @@ void pc_basic_device_init(ISABus *isa_bus, qemu_irq *gsi,
-     parallel_hds_isa_init(isa_bus, MAX_PARALLEL_PORTS);
- 
-     a20_line = qemu_allocate_irqs(handle_a20_line_change, first_cpu, 2);
--    i8042 = isa_create_simple(isa_bus, "i8042");
-+    i8042 = isa_create_simple(isa_bus, TYPE_I8042);
-     i8042_setup_a20_line(i8042, a20_line[0]);
-     if (!no_vmport) {
-         vmport_init(isa_bus);
--        vmmouse = isa_try_create(isa_bus, "vmmouse");
-+        vmmouse = isa_try_create(isa_bus, TYPE_VMMOUSE);
-     } else {
-         vmmouse = NULL;
-     }
-diff --git a/hw/input/pckbd.c b/hw/input/pckbd.c
-index c479f827b6..f17f18e51b 100644
---- a/hw/input/pckbd.c
-+++ b/hw/input/pckbd.c
-@@ -26,6 +26,7 @@
- #include "hw/isa/isa.h"
- #include "hw/i386/pc.h"
- #include "hw/input/ps2.h"
-+#include "hw/input/i8042.h"
- #include "sysemu/sysemu.h"
- 
- /* debug PC keyboard */
-@@ -480,7 +481,6 @@ void i8042_mm_init(qemu_irq kbd_irq, qemu_irq mouse_irq,
-     qemu_register_reset(kbd_reset, s);
- }
- 
--#define TYPE_I8042 "i8042"
- #define I8042(obj) OBJECT_CHECK(ISAKBDState, (obj), TYPE_I8042)
- 
- typedef struct ISAKBDState {
-diff --git a/hw/input/vmmouse.c b/hw/input/vmmouse.c
-index b6d22086f4..c48c07c564 100644
---- a/hw/input/vmmouse.c
-+++ b/hw/input/vmmouse.c
-@@ -24,7 +24,7 @@
- #include "qemu/osdep.h"
- #include "hw/hw.h"
- #include "ui/console.h"
--#include "hw/input/ps2.h"
-+#include "hw/input/i8042.h"
- #include "hw/i386/pc.h"
- #include "hw/qdev.h"
- 
-@@ -52,7 +52,6 @@
- #define DPRINTF(fmt, ...) do { } while (0)
- #endif
- 
--#define TYPE_VMMOUSE "vmmouse"
- #define VMMOUSE(obj) OBJECT_CHECK(VMMouseState, (obj), TYPE_VMMOUSE)
- 
- typedef struct VMMouseState
-diff --git a/hw/mips/mips_fulong2e.c b/hw/mips/mips_fulong2e.c
-index 22e6c05fb5..a35745a407 100644
---- a/hw/mips/mips_fulong2e.c
-+++ b/hw/mips/mips_fulong2e.c
-@@ -42,6 +42,7 @@
- #include "hw/isa/vt82c686.h"
- #include "hw/timer/mc146818rtc.h"
- #include "hw/timer/i8254.h"
-+#include "hw/input/i8042.h"
- #include "sysemu/blockdev.h"
- #include "exec/address-spaces.h"
- #include "sysemu/qtest.h"
-@@ -367,7 +368,7 @@ static void mips_fulong2e_init(MachineState *machine)
-     DMA_init(isa_bus, 0);
- 
-     /* Super I/O */
--    isa_create_simple(isa_bus, "i8042");
-+    isa_create_simple(isa_bus, TYPE_I8042);
- 
-     rtc_init(isa_bus, 2000, NULL);
- 
-diff --git a/hw/mips/mips_jazz.c b/hw/mips/mips_jazz.c
-index 25f0294236..1bbef7eeb5 100644
---- a/hw/mips/mips_jazz.c
-+++ b/hw/mips/mips_jazz.c
-@@ -41,6 +41,7 @@
- #include "hw/timer/i8254.h"
- #include "hw/display/vga.h"
- #include "hw/audio/pcspk.h"
-+#include "hw/input/i8042.h"
- #include "sysemu/block-backend.h"
- #include "hw/sysbus.h"
- #include "exec/address-spaces.h"
-diff --git a/hw/mips/mips_malta.c b/hw/mips/mips_malta.c
-index de547d732f..45c7f589aa 100644
---- a/hw/mips/mips_malta.c
-+++ b/hw/mips/mips_malta.c
-@@ -45,6 +45,7 @@
- #include "hw/loader.h"
- #include "elf.h"
- #include "hw/timer/mc146818rtc.h"
-+#include "hw/input/i8042.h"
- #include "hw/timer/i8254.h"
- #include "sysemu/blockdev.h"
- #include "exec/address-spaces.h"
-@@ -1221,7 +1222,7 @@ void mips_malta_init(MachineState *machine)
-     DMA_init(isa_bus, 0);
- 
-     /* Super I/O */
--    isa_create_simple(isa_bus, "i8042");
-+    isa_create_simple(isa_bus, TYPE_I8042);
- 
-     rtc_init(isa_bus, 2000, NULL);
-     serial_hds_isa_init(isa_bus, 0, 2);
-diff --git a/hw/mips/mips_r4k.c b/hw/mips/mips_r4k.c
-index 48fad52540..946097a31f 100644
---- a/hw/mips/mips_r4k.c
-+++ b/hw/mips/mips_r4k.c
-@@ -27,6 +27,7 @@
- #include "hw/loader.h"
- #include "elf.h"
- #include "hw/timer/mc146818rtc.h"
-+#include "hw/input/i8042.h"
- #include "hw/timer/i8254.h"
- #include "sysemu/block-backend.h"
- #include "exec/address-spaces.h"
-@@ -295,7 +296,7 @@ void mips_r4k_init(MachineState *machine)
-                      hd[MAX_IDE_DEVS * i],
- 		     hd[MAX_IDE_DEVS * i + 1]);
- 
--    isa_create_simple(isa_bus, "i8042");
-+    isa_create_simple(isa_bus, TYPE_I8042);
- }
- 
- static void mips_machine_init(MachineClass *mc)
-diff --git a/hw/misc/vmport.c b/hw/misc/vmport.c
-index 165500223f..bc078eb20a 100644
---- a/hw/misc/vmport.c
-+++ b/hw/misc/vmport.c
-@@ -25,6 +25,7 @@
- #include "hw/hw.h"
- #include "hw/isa/isa.h"
- #include "hw/i386/pc.h"
-+#include "hw/input/i8042.h"
- #include "sysemu/hw_accel.h"
- #include "hw/qdev.h"
- 
-diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
-index 94138a4e8c..16f4537093 100644
---- a/hw/ppc/prep.c
-+++ b/hw/ppc/prep.c
-@@ -41,6 +41,7 @@
- #include "hw/ide.h"
- #include "hw/loader.h"
- #include "hw/timer/mc146818rtc.h"
-+#include "hw/input/i8042.h"
- #include "hw/isa/pc87312.h"
- #include "sysemu/block-backend.h"
- #include "sysemu/arch_init.h"
-@@ -643,7 +644,7 @@ static void ppc_prep_init(MachineState *machine)
-                      hd[2 * i],
- 		     hd[2 * i + 1]);
-     }
--    isa_create_simple(isa_bus, "i8042");
-+    isa_create_simple(isa_bus, TYPE_I8042);
- 
-     cpu = POWERPC_CPU(first_cpu);
-     sysctrl->reset_irq = cpu->env.irq_inputs[PPC6xx_INPUT_HRESET];
-@@ -775,7 +776,7 @@ static void ibm_40p_init(MachineState *machine)
- 
-     /* add some more devices */
-     if (defaults_enabled()) {
--        isa_create_simple(isa_bus, "i8042");
-+        isa_create_simple(isa_bus, TYPE_I8042);
-         m48t59 = NVRAM(isa_create_simple(isa_bus, "isa-m48t59"));
- 
-         dev = DEVICE(isa_create(isa_bus, "cs4231a"));
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index c3280aaf38..973daed977 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -31,6 +31,7 @@
- #include "hw/i386/pc.h"
- #include "hw/char/serial.h"
- #include "hw/timer/m48t59.h"
-+#include "hw/input/i8042.h"
- #include "hw/block/fdc.h"
- #include "net/net.h"
- #include "qemu/timer.h"
-@@ -488,7 +489,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
- 
-     pci_cmd646_ide_init(pci_bus, hd, 1);
- 
--    isa_create_simple(isa_bus, "i8042");
-+    isa_create_simple(isa_bus, TYPE_I8042);
- 
-     /* Floppy */
-     for(i = 0; i < MAX_FD; i++) {
-diff --git a/hw/unicore32/puv3.c b/hw/unicore32/puv3.c
-index 6849bac59c..cf79c89f12 100644
---- a/hw/unicore32/puv3.c
-+++ b/hw/unicore32/puv3.c
-@@ -19,6 +19,7 @@
- 
- #undef DEBUG_PUV3
- #include "hw/unicore32/puv3.h"
-+#include "hw/input/i8042.h"
- 
- #define KERNEL_LOAD_ADDR        0x03000000
- #define KERNEL_MAX_SIZE         0x00800000 /* Just a guess */
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f7d377ead9..cc1f8bb66b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -834,12 +834,13 @@ F: hw/misc/sga.c
- PC Chipset
- M: Michael S. Tsirkin <mst@redhat.com>
- M: Paolo Bonzini <pbonzini@redhat.com>
--S: Support
-+S: Supported
- F: hw/char/debugcon.c
- F: hw/char/parallel.c
- F: hw/char/serial*
- F: hw/dma/i8257*
- F: hw/i2c/pm_smbus.c
-+F: hw/input/pckbd.c
- F: hw/intc/apic*
- F: hw/intc/ioapic*
- F: hw/intc/i8259*
-@@ -849,6 +850,7 @@ F: hw/timer/hpet*
- F: hw/timer/i8254*
- F: hw/timer/mc146818rtc*
- F: include/hw/i2c/pm_smbus.h
-+F: include/hw/input/i8042.h
- F: include/hw/timer/hpet.h
- F: include/hw/timer/i8254*
- F: include/hw/timer/mc146818rtc*
--- 
-2.14.1
+> since these address spaces are global, changing any of them triggers
+> rebuilding all address spaces.
+>=20
+> This replaces indirect accesses to the modern BAR with a simple lookup
+> and direct calls to memory_region_dispatch_read/write.
+>=20
+> This is expected to save lots of memory at boot time after applying:
+> [Qemu-devel] [PULL 00/32] Misc changes for 2017-09-22
+>=20
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+
+There used to be this patch:
+https://marc.info/?l=3Dlinux-virtualization&m=3D142363659531278&q=3Draw
+
+> What is the easiest way to test it? Git history suggests that only
+> SeaBIOS supports this, is this still correct?
+>=20
+> What is best to do if MR is not found (and is it possible in practice)?
+> assert or redirect to unassigned memory?
+
+Do nothing at all, I think.
+
+I haven't thought much about the endian switches, but it looks good
+apart from that.
+
+Paolo
+
+> ---
+>  hw/virtio/virtio-pci.h | 17 +++++++-----
+>  hw/virtio/virtio-pci.c | 71 ++++++++++++++++++++++++++++--------------=
+--------
+>  2 files changed, 50 insertions(+), 38 deletions(-)
+>=20
+> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+> index 69f5959623..12d3a90686 100644
+> --- a/hw/virtio/virtio-pci.h
+> +++ b/hw/virtio/virtio-pci.h
+> @@ -155,15 +155,18 @@ typedef struct VirtIOPCIQueue {
+>  struct VirtIOPCIProxy {
+>      PCIDevice pci_dev;
+>      MemoryRegion bar;
+> -    VirtIOPCIRegion common;
+> -    VirtIOPCIRegion isr;
+> -    VirtIOPCIRegion device;
+> -    VirtIOPCIRegion notify;
+> -    VirtIOPCIRegion notify_pio;
+> +    union {
+> +        struct {
+> +            VirtIOPCIRegion common;
+> +            VirtIOPCIRegion isr;
+> +            VirtIOPCIRegion device;
+> +            VirtIOPCIRegion notify;
+> +            VirtIOPCIRegion notify_pio;
+> +        };
+> +        VirtIOPCIRegion regs[5];
+> +    };
+>      MemoryRegion modern_bar;
+>      MemoryRegion io_bar;
+> -    MemoryRegion modern_cfg;
+> -    AddressSpace modern_as;
+>      uint32_t legacy_io_bar_idx;
+>      uint32_t msix_bar_idx;
+>      uint32_t modern_io_bar_idx;
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index 8b0d6b69cd..0fcb8589f7 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -545,6 +545,24 @@ static const MemoryRegionOps virtio_pci_config_ops=
+ =3D {
+>      .endianness =3D DEVICE_LITTLE_ENDIAN,
+>  };
+> =20
+> +static MemoryRegion *virtio_address_space_lookup(VirtIOPCIProxy *proxy=
+,
+> +                                                 hwaddr *off, int len)
+> +{
+> +    int i;
+> +    VirtIOPCIRegion *reg;
+> +
+> +    for (i =3D 0; i < ARRAY_SIZE(proxy->regs); ++i) {
+> +        reg =3D &proxy->regs[i];
+> +        if (*off >=3D reg->offset &&
+> +            *off + len <=3D reg->offset + reg->size) {
+> +            *off -=3D reg->offset;
+> +            return &reg->mr;
+> +        }
+> +    }
+> +
+> +    return NULL;
+> +}
+> +
+>  /* Below are generic functions to do memcpy from/to an address space,
+>   * without byteswaps, with input validation.
+>   *
+> @@ -558,63 +576,68 @@ static const MemoryRegionOps virtio_pci_config_op=
+s =3D {
+>   * Note: host pointer must be aligned.
+>   */
+>  static
+> -void virtio_address_space_write(AddressSpace *as, hwaddr addr,
+> +void virtio_address_space_write(VirtIOPCIProxy *proxy, hwaddr addr,
+>                                  const uint8_t *buf, int len)
+>  {
+> -    uint32_t val;
+> +    uint64_t val;
+> +    MemoryRegion *mr;
+> =20
+>      /* address_space_* APIs assume an aligned address.
+>       * As address is under guest control, handle illegal values.
+>       */
+>      addr &=3D ~(len - 1);
+> =20
+> +    mr =3D virtio_address_space_lookup(proxy, &addr, len);
+> +    assert(mr);
+> +
+>      /* Make sure caller aligned buf properly */
+>      assert(!(((uintptr_t)buf) & (len - 1)));
+> =20
+>      switch (len) {
+>      case 1:
+>          val =3D pci_get_byte(buf);
+> -        address_space_stb(as, addr, val, MEMTXATTRS_UNSPECIFIED, NULL)=
+;
+>          break;
+>      case 2:
+> -        val =3D pci_get_word(buf);
+> -        address_space_stw_le(as, addr, val, MEMTXATTRS_UNSPECIFIED, NU=
+LL);
+> +        val =3D cpu_to_le16(pci_get_word(buf));
+>          break;
+>      case 4:
+> -        val =3D pci_get_long(buf);
+> -        address_space_stl_le(as, addr, val, MEMTXATTRS_UNSPECIFIED, NU=
+LL);
+> +        val =3D cpu_to_le32(pci_get_long(buf));
+>          break;
+>      default:
+>          /* As length is under guest control, handle illegal values. */
+> -        break;
+> +        return;
+>      }
+> +    memory_region_dispatch_write(mr, addr, val, len, MEMTXATTRS_UNSPEC=
+IFIED);
+>  }
+> =20
+>  static void
+> -virtio_address_space_read(AddressSpace *as, hwaddr addr, uint8_t *buf,=
+ int len)
+> +virtio_address_space_read(VirtIOPCIProxy *proxy, hwaddr addr,
+> +                          uint8_t *buf, int len)
+>  {
+> -    uint32_t val;
+> +    uint64_t val;
+> +    MemoryRegion *mr;
+> =20
+>      /* address_space_* APIs assume an aligned address.
+>       * As address is under guest control, handle illegal values.
+>       */
+>      addr &=3D ~(len - 1);
+> =20
+> +    mr =3D virtio_address_space_lookup(proxy, &addr, len);
+> +    assert(mr);
+> +
+>      /* Make sure caller aligned buf properly */
+>      assert(!(((uintptr_t)buf) & (len - 1)));
+> =20
+> +    memory_region_dispatch_read(mr, addr, &val, len, MEMTXATTRS_UNSPEC=
+IFIED);
+>      switch (len) {
+>      case 1:
+> -        val =3D address_space_ldub(as, addr, MEMTXATTRS_UNSPECIFIED, N=
+ULL);
+>          pci_set_byte(buf, val);
+>          break;
+>      case 2:
+> -        val =3D address_space_lduw_le(as, addr, MEMTXATTRS_UNSPECIFIED=
+, NULL);
+> -        pci_set_word(buf, val);
+> +        pci_set_word(buf, le16_to_cpu(val));
+>          break;
+>      case 4:
+> -        val =3D address_space_ldl_le(as, addr, MEMTXATTRS_UNSPECIFIED,=
+ NULL);
+> -        pci_set_long(buf, val);
+> +        pci_set_long(buf, le32_to_cpu(val));
+>          break;
+>      default:
+>          /* As length is under guest control, handle illegal values. */
+> @@ -650,8 +673,7 @@ static void virtio_write_config(PCIDevice *pci_dev,=
+ uint32_t address,
+> =20
+>          if (len =3D=3D 1 || len =3D=3D 2 || len =3D=3D 4) {
+>              assert(len <=3D sizeof cfg->pci_cfg_data);
+> -            virtio_address_space_write(&proxy->modern_as, off,
+> -                                       cfg->pci_cfg_data, len);
+> +            virtio_address_space_write(proxy, off, cfg->pci_cfg_data, =
+len);
+>          }
+>      }
+>  }
+> @@ -675,8 +697,7 @@ static uint32_t virtio_read_config(PCIDevice *pci_d=
+ev,
+> =20
+>          if (len =3D=3D 1 || len =3D=3D 2 || len =3D=3D 4) {
+>              assert(len <=3D sizeof cfg->pci_cfg_data);
+> -            virtio_address_space_read(&proxy->modern_as, off,
+> -                                      cfg->pci_cfg_data, len);
+> +            virtio_address_space_read(proxy, off, cfg->pci_cfg_data, l=
+en);
+>          }
+>      }
+> =20
+> @@ -1783,15 +1804,6 @@ static void virtio_pci_realize(PCIDevice *pci_de=
+v, Error **errp)
+>                         /* PCI BAR regions must be powers of 2 */
+>                         pow2ceil(proxy->notify.offset + proxy->notify.s=
+ize));
+> =20
+> -    memory_region_init_alias(&proxy->modern_cfg,
+> -                             OBJECT(proxy),
+> -                             "virtio-pci-cfg",
+> -                             &proxy->modern_bar,
+> -                             0,
+> -                             memory_region_size(&proxy->modern_bar));
+> -
+> -    address_space_init(&proxy->modern_as, &proxy->modern_cfg, "virtio-=
+pci-cfg-as");
+> -
+>      if (proxy->disable_legacy =3D=3D ON_OFF_AUTO_AUTO) {
+>          proxy->disable_legacy =3D pcie_port ? ON_OFF_AUTO_ON : ON_OFF_=
+AUTO_OFF;
+>      }
+> @@ -1860,10 +1872,7 @@ static void virtio_pci_realize(PCIDevice *pci_de=
+v, Error **errp)
+> =20
+>  static void virtio_pci_exit(PCIDevice *pci_dev)
+>  {
+> -    VirtIOPCIProxy *proxy =3D VIRTIO_PCI(pci_dev);
+> -
+>      msix_uninit_exclusive_bar(pci_dev);
+> -    address_space_destroy(&proxy->modern_as);
+>  }
+> =20
+>  static void virtio_pci_reset(DeviceState *qdev)
+>=20
