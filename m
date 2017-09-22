@@ -1,20 +1,23 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:38088)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:38103)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dvIgt-00008b-M3
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:48:05 -0400
+	(envelope-from <famz@redhat.com>) id 1dvIgu-00009F-Qo
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:48:06 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <famz@redhat.com>) id 1dvIgo-0001BI-WF
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:48:03 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53048)
+	(envelope-from <famz@redhat.com>) id 1dvIgq-0001Bs-S7
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:48:04 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48898)
 	by eggs.gnu.org with esmtps (TLS1.0:DHE_RSA_AES_256_CBC_SHA1:32)
-	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dvIgo-0001Ar-OG
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:47:58 -0400
+	(Exim 4.71) (envelope-from <famz@redhat.com>) id 1dvIgq-0001Bc-M1
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 03:48:00 -0400
 From: Fam Zheng <famz@redhat.com>
-Date: Fri, 22 Sep 2017 15:46:51 +0800
-Message-Id: <20170922074659.30097-29-famz@redhat.com>
+Date: Fri, 22 Sep 2017 15:46:52 +0800
+Message-Id: <20170922074659.30097-30-famz@redhat.com>
 In-Reply-To: <20170922074659.30097-1-famz@redhat.com>
 References: <20170922074659.30097-1-famz@redhat.com>
-Subject: [Qemu-devel] [PULL 28/36] tests: Add ubuntu.i386 image
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Subject: [Qemu-devel] [PULL 29/36] tests: Add FreeBSD image
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -26,26 +29,26 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>
 
-This adds a 32bit guest.
+The image is prepared following instructions as in:
 
-The official LTS cloud image is downloaded and initialized with
-cloud-init.
+https://wiki.qemu.org/Hosts/BSD
 
 Signed-off-by: Fam Zheng <famz@redhat.com>
+Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 ---
- tests/vm/ubuntu.i386 | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 89 insertions(+)
- create mode 100755 tests/vm/ubuntu.i386
+ tests/vm/freebsd | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
+ create mode 100755 tests/vm/freebsd
 
-diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
+diff --git a/tests/vm/freebsd b/tests/vm/freebsd
 new file mode 100755
-index 0000000000..fc319e0e6e
+index 0000000000..039dad8f69
 --- /dev/null
-+++ b/tests/vm/ubuntu.i386
-@@ -0,0 +1,89 @@
++++ b/tests/vm/freebsd
+@@ -0,0 +1,42 @@
 +#!/usr/bin/env python
 +#
-+# Ubuntu i386 image
++# FreeBSD VM image
 +#
 +# Copyright 2017 Red Hat Inc.
 +#
@@ -60,77 +63,32 @@ index 0000000000..fc319e0e6e
 +import sys
 +import subprocess
 +import basevm
-+import time
 +
-+class UbuntuX86VM(basevm.BaseVM):
-+    name = "ubuntu.i386"
-+    BUILD_SCRIPT = """
++class FreeBSDVM(basevm.BaseVM):
++    name =3D "freebsd"
++    BUILD_SCRIPT =3D """
 +        set -e;
-+        cd $(mktemp -d);
-+        sudo chmod a+r /dev/vdb;
-+        tar -xf /dev/vdb;
++        cd $(mktemp -d /var/tmp/qemu-test.XXXXXX);
++        tar -xf /dev/vtbd1;
 +        ./configure {configure_opts};
-+        make -j{jobs};
-+        make check;
++        gmake -j{jobs};
++        gmake check;
 +    """
 +
-+    def _gen_cloud_init_iso(self):
-+        cidir = self._tmpdir
-+        mdata = open(os.path.join(cidir, "meta-data"), "w")
-+        mdata.writelines(["instance-id: ubuntu-vm-0\n",
-+                          "local-hostname: ubuntu-guest\n"])
-+        mdata.close()
-+        udata = open(os.path.join(cidir, "user-data"), "w")
-+        udata.writelines(["#cloud-config\n",
-+                          "chpasswd:\n",
-+                          "  list: |\n",
-+                          "    root:%s\n" % self.ROOT_PASS,
-+                          "    %s:%s\n" % (self.GUEST_USER, self.GUEST_PASS),
-+                          "  expire: False\n",
-+                          "users:\n",
-+                          "  - name: %s\n" % self.GUEST_USER,
-+                          "    sudo: ALL=(ALL) NOPASSWD:ALL\n",
-+                          "    ssh-authorized-keys:\n",
-+                          "    - %s\n" % basevm.SSH_PUB_KEY,
-+                          "  - name: root\n",
-+                          "    ssh-authorized-keys:\n",
-+                          "    - %s\n" % basevm.SSH_PUB_KEY,
-+                          "locale: en_US.UTF-8\n"])
-+        udata.close()
-+        subprocess.check_call(["genisoimage", "-output", "cloud-init.iso",
-+                               "-volid", "cidata", "-joliet", "-rock",
-+                               "user-data", "meta-data"],
-+                               cwd=cidir,
-+                               stdin=self._devnull, stdout=self._stdout,
-+                               stderr=self._stdout)
-+        return os.path.join(cidir, "cloud-init.iso")
-+
 +    def build_image(self, img):
-+        cimg = self._download_with_cache("https://cloud-images.ubuntu.com/releases/16.04/release/ubuntu-16.04-server-cloudimg-i386-disk1.img")
-+        img_tmp = img + ".tmp"
-+        subprocess.check_call(["cp", "-f", cimg, img_tmp])
-+        subprocess.check_call(["qemu-img", "resize", img_tmp, "50G"])
-+        self.boot(img_tmp, extra_args = ["-cdrom", self._gen_cloud_init_iso()])
-+        self.wait_ssh()
-+        self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
-+        self.ssh_root_check("apt-get update")
-+        self.ssh_root_check("apt-get install -y cloud-initramfs-growroot")
-+        # Don't check the status in case the guest hang up too quickly
-+        self.ssh_root("sync && reboot")
-+        time.sleep(5)
-+        self.wait_ssh()
-+        # The previous update sometimes doesn't survive a reboot, so do it again
-+        self.ssh_root_check("apt-get update")
-+        self.ssh_root_check("apt-get build-dep -y qemu")
-+        self.ssh_root_check("apt-get install -y libfdt-dev")
-+        self.ssh_root("poweroff")
-+        self.wait()
++        cimg =3D self._download_with_cache("http://download.patchew.org/=
+freebsd-11.1-amd64.img.xz",
++                sha256sum=3D'adcb771549b37bc63826c501f05121a206ed3d9f55f=
+49145908f7e1432d65891')
++        img_tmp_xz =3D img + ".tmp.xz"
++        img_tmp =3D img + ".tmp"
++        subprocess.check_call(["cp", "-f", cimg, img_tmp_xz])
++        subprocess.check_call(["xz", "-df", img_tmp_xz])
 +        if os.path.exists(img):
 +            os.remove(img)
 +        os.rename(img_tmp, img)
-+        return 0
 +
-+if __name__ == "__main__":
-+    sys.exit(basevm.main(UbuntuX86VM))
--- 
++if __name__ =3D=3D "__main__":
++    sys.exit(basevm.main(FreeBSDVM))
+--=20
 2.13.5
