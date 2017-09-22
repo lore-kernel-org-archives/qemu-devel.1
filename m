@@ -1,19 +1,17 @@
-Received: from eggs.gnu.org ([2001:4830:134:3::10]:39527)
+Received: from eggs.gnu.org ([2001:4830:134:3::10]:39597)
 	by lists.gnu.org with esmtp (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dvKRH-00004v-DM
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:40:07 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dvKRQ-0000Fa-9h
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:40:13 -0400
 Received: from Debian-exim by eggs.gnu.org with spam-scanned (Exim 4.71)
-	(envelope-from <pbutsykin@virtuozzo.com>) id 1dvKRG-0004NZ-GM
-	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:40:03 -0400
+	(envelope-from <pbutsykin@virtuozzo.com>) id 1dvKRL-0004a2-Dv
+	for qemu-devel@nongnu.org; Fri, 22 Sep 2017 05:40:12 -0400
 From: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Date: Fri, 22 Sep 2017 12:39:25 +0300
-Message-Id: <20170922093926.9723-2-pbutsykin@virtuozzo.com>
-In-Reply-To: <20170922093926.9723-1-pbutsykin@virtuozzo.com>
-References: <20170922093926.9723-1-pbutsykin@virtuozzo.com>
+Date: Fri, 22 Sep 2017 12:39:24 +0300
+Message-Id: <20170922093926.9723-1-pbutsykin@virtuozzo.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Subject: [Qemu-devel] [PATCH v2 1/2] qcow2: fix return error code in
- qcow2_truncate()
+Subject: [Qemu-devel] [PATCH v2 0/2] Truncate the tail of the image file in
+ qcow2 shrinking
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
 	<mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -25,35 +23,25 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 To: qemu-block@nongnu.org, qemu-devel@nongnu.org
 Cc: pbutsykin@virtuozzo.com, kwolf@redhat.com, mreitz@redhat.com, eblake@redhat.com, jsnow@redhat.com, den@openvz.org
 
-Signed-off-by: Pavel Butsykin <pbutsykin@virtuozzo.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- block/qcow2.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Now after shrinking the qcow2 image, at the end of the image file, there might
+be a tail that probably will never be used. Although it will not bring any
+tangible benefit, we can cut the tail if it is. Yes, it will not free up disk
+space, but if the blocks were be allocated sequentially and the image is not
+heavily fragmented then the virtual size of the image file will be commensurate
+with the real size. It also doesn't look like a great plus.. Well, at least we
+can discuss it.
 
-diff --git a/block/qcow2.c b/block/qcow2.c
-index 2174a84d1f..8a4311d338 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -3166,7 +3166,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         if (old_file_size < 0) {
-             error_setg_errno(errp, -old_file_size,
-                              "Failed to inquire current file length");
--            return ret;
-+            return old_file_size;
-         }
- 
-         nb_new_data_clusters = DIV_ROUND_UP(offset - old_length,
-@@ -3195,7 +3195,7 @@ static int qcow2_truncate(BlockDriverState *bs, int64_t offset,
-         if (allocation_start < 0) {
-             error_setg_errno(errp, -allocation_start,
-                              "Failed to resize refcount structures");
--            return -allocation_start;
-+            return allocation_start;
-         }
- 
-         clusters_allocated = qcow2_alloc_clusters_at(bs, allocation_start,
+Changes from v1:
+- rewrite qcow2_get_last_cluster() function according to Max's comments. (2)
+
+Pavel Butsykin (2):
+  qcow2: fix return error code in qcow2_truncate()
+  qcow2: truncate the tail of the image file after shrinking the image
+
+ block/qcow2-refcount.c | 22 ++++++++++++++++++++++
+ block/qcow2.c          | 27 +++++++++++++++++++++++++--
+ block/qcow2.h          |  1 +
+ 3 files changed, 48 insertions(+), 2 deletions(-)
+
 -- 
 2.14.1
